@@ -1,0 +1,67 @@
+{
+  "id": "emergencycv",
+  "name": "EmergencyCV",
+  "domain": "emergencycv.gva.es",
+  "region": "Comunitat Valenciana",
+  "language": "es-ES",
+  "branding": {
+    "primaryColor": "#003d7a",
+    "secondaryColor": "#e95420",
+    "accentColor": "#0073e6",
+    "logo": "/tenants/emergencycv/logo.svg",
+    "favicon": "/tenants/emergencycv/favicon.ico",
+    "logoAlt": "EmergencyCV - Sistema d'Emergències de la Comunitat Valenciana"
+  },
+  "contact": {
+    "phone": "+34 96 789 0123",
+    "email": "info@emergencycv.gva.es",
+    "emergencyNumber": "112",
+    "website": "https://www.emergencycv.gva.es"
+  },
+  "features": {
+    "e2eEncryption": true,
+    "offlineMode": true,
+    "multiTransport": true,
+    "cadIntegration": true,
+    "verificationRequired": true
+  },
+  "coverage": {
+    "municipalities": [
+      "València",
+      "Alicante/Alacant",
+      "Castelló de la Plana",
+      "Elche/Elx",
+      "Torrent",
+      "Gandía",
+      "Paterna",
+      "Sagunto"
+    ],
+    "population": 5000000,
+    "area": "23255 km²"
+  },
+  "integrations": {
+    "cadSystem": "112-CV",
+    "weatherService": "AEMET",
+    "mapProvider": "ICV"
+  },
+  "theme": {
+    "fontFamily": "Roboto, system-ui, sans-serif",
+    "borderRadius": "4px",
+    "shadowIntensity": "strong"
+  },
+  "i18n": {
+    "defaultLanguage": "es",
+    "availableLanguages": ["es", "ca", "en"]
+  },
+  "deployment": {
+    "environment": "production",
+    "apiEndpoint": "https://api.emergencycv.gva.es",
+    "cdnUrl": "https://cdn.emergencycv.gva.es"
+  },
+  "metadata": {
+    "createdAt": "2024-09-09T00:00:00Z",
+    "updatedAt": "2024-09-09T00:00:00Z",
+    "version": "1.0.0",
+    "maintainer": "Generalitat Valenciana - Protecció Civil"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "alertacat",
+  "name": "AlertaCat",
+  "domain": "alertacat.cat",
+  "region": "Catalunya",
+  "language": "ca-ES",
+  "branding": {
+    "primaryColor": "#fcdd09",
+    "secondaryColor": "#da121a",
+    "accentColor": "#003893",
+    "logo": "/tenants/alertacat/logo.svg",
+    "favicon": "/tenants/alertacat/favicon.ico",
+    "logoAlt": "AlertaCat - Sistema d'Alertes de Catalunya"
+  },
+  "contact": {
+    "phone": "+34 93 456 7890",
+    "email": "info@alertacat.cat",
+    "emergencyNumber": "112",
+    "website": "https://www.alertacat.cat"
+  },
+  "features": {
+    "e2eEncryption": true,
+    "offlineMode": true,
+    "multiTransport": true,
+    "cadIntegration": true,
+    "verificationRequired": true
+  },
+  "coverage": {
+    "municipalities": [
+      "Barcelona",
+      "L'Hospitalet de Llobregat",
+      "Terrassa",
+      "Badalona",
+      "Sabadell",
+      "Lleida",
+      "Tarragona",
+      "Girona"
+    ],
+    "population": 7750000,
+    "area": "32108 km²"
+  },
+  "integrations": {
+    "cadSystem": "112-Catalunya",
+    "weatherService": "Meteo.cat",
+    "mapProvider": "ICGC"
+  },
+  "theme": {
+    "fontFamily": "Montserrat, system-ui, sans-serif",
+    "borderRadius": "6px",
+    "shadowIntensity": "light"
+  },
+  "i18n": {
+    "defaultLanguage": "ca",
+    "availableLanguages": ["ca", "es", "en"]
+  },
+  "deployment": {
+    "environment": "production",
+    "apiEndpoint": "https://api.alertacat.cat",
+    "cdnUrl": "https://cdn.alertacat.cat"
+  },
+  "metadata": {
+    "createdAt": "2024-09-09T00:00:00Z",
+    "updatedAt": "2024-09-09T00:00:00Z",
+    "version": "1.0.0",
+    "maintainer": "Generalitat de Catalunya - Protecció Civil"
+  }
+}

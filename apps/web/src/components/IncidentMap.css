@@ -1,0 +1,63 @@
+.incident-map {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.map-legend {
+  margin-bottom: 1rem;
+}
+
+.map-legend h3 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legend-dot.official {
+  background: #28a745;
+}
+
+.legend-dot.corroborated {
+  background: #17a2b8;
+}
+
+.legend-dot.unverified {
+  background: #ffc107;
+}
+
+.legend-dot.disputed {
+  background: #dc3545;
+}
+
+.stats {
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.stats p {
+  margin: 0.25rem 0;
+}

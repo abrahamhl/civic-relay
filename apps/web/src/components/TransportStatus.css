@@ -1,0 +1,42 @@
+.transport-status {
+  background: white;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-indicator .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: pulse-dot 2s infinite;
+}
+
+.status-indicator.online .dot {
+  background: #38ef7d;
+}
+
+.status-indicator.offline .dot {
+  background: #f5af19;
+  animation: none;
+}
+
+.status-indicator .label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #555;
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

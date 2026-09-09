@@ -1,0 +1,76 @@
+.emergency-buttons {
+  margin-bottom: 2rem;
+}
+
+.emergency-buttons h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.emergency-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.emergency-btn .icon {
+  font-size: 2rem;
+}
+
+.emergency-btn .label {
+  font-size: 0.875rem;
+}
+
+.emergency-btn.safe {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.emergency-btn.sos {
+  background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+  animation: pulse 2s infinite;
+}
+
+.emergency-btn.medical {
+  background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);
+}
+
+.emergency-btn.fire {
+  background: linear-gradient(135deg, #f85032 0%, #e73827 100%);
+}
+
+.emergency-btn.infrastructure {
+  background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+}
+
+.emergency-btn.report {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(235, 51, 73, 0.6);
+  }
+}
+
+@media (max-width: 640px) {
+  .button-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

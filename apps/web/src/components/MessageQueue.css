@@ -1,0 +1,168 @@
+.message-queue {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.message-queue.empty {
+  text-align: center;
+  color: #999;
+  padding: 3rem 1.5rem;
+}
+
+.message-queue h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.message-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: box-shadow 0.2s;
+}
+
+.message-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.message-header {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.message-type {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: #e0e0e0;
+  color: #555;
+}
+
+.message-type.type-safe {
+  background: #d4edda;
+  color: #155724;
+}
+
+.message-type.type-sos {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.message-type.type-medical {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.message-type.type-fire {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.message-priority {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.message-priority.priority-critical {
+  background: #dc3545;
+  color: white;
+}
+
+.message-priority.priority-high {
+  background: #fd7e14;
+  color: white;
+}
+
+.message-priority.priority-medium {
+  background: #ffc107;
+  color: #333;
+}
+
+.message-priority.priority-low {
+  background: #6c757d;
+  color: white;
+}
+
+.message-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.message-time {
+  font-weight: 500;
+}
+
+.message-status {
+  color: #555;
+}
+
+.verification-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-unverified {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.badge-corroborated {
+  background: #cfe2ff;
+  color: #084298;
+}
+
+.badge-official {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+
+.badge-disputed {
+  background: #f8d7da;
+  color: #842029;
+}
+
+.message-details {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e0e0e0;
+  font-size: 0.875rem;
+}
+
+.message-details summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: #667eea;
+}
+
+.message-details ul {
+  margin-top: 0.5rem;
+  margin-left: 1.5rem;
+  color: #666;
+}
+
+.message-details li {
+  padding: 0.25rem 0;
+}

@@ -1,0 +1,66 @@
+{
+  "id": "alertamadrid",
+  "name": "AlertaMadrid",
+  "domain": "alertamadrid.com",
+  "region": "Comunidad de Madrid",
+  "language": "es-ES",
+  "branding": {
+    "primaryColor": "#c41e3a",
+    "secondaryColor": "#ffd700",
+    "accentColor": "#1e3a8a",
+    "logo": "/tenants/alertamadrid/logo.svg",
+    "favicon": "/tenants/alertamadrid/favicon.ico",
+    "logoAlt": "AlertaMadrid - Sistema de Alertas de la Comunidad de Madrid"
+  },
+  "contact": {
+    "phone": "+34 91 234 5678",
+    "email": "info@alertamadrid.com",
+    "emergencyNumber": "112",
+    "website": "https://www.alertamadrid.com"
+  },
+  "features": {
+    "e2eEncryption": true,
+    "offlineMode": true,
+    "multiTransport": true,
+    "cadIntegration": true,
+    "verificationRequired": true
+  },
+  "coverage": {
+    "municipalities": [
+      "Madrid",
+      "Alcalá de Henares",
+      "Getafe",
+      "Móstoles",
+      "Fuenlabrada",
+      "Leganés",
+      "Alcorcón"
+    ],
+    "population": 6750000,
+    "area": "8028 km²"
+  },
+  "integrations": {
+    "cadSystem": "112-Madrid",
+    "weatherService": "AEMET",
+    "mapProvider": "IGN"
+  },
+  "theme": {
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "borderRadius": "8px",
+    "shadowIntensity": "medium"
+  },
+  "i18n": {
+    "defaultLanguage": "es",
+    "availableLanguages": ["es", "en", "ca"]
+  },
+  "deployment": {
+    "environment": "production",
+    "apiEndpoint": "https://api.alertamadrid.com",
+    "cdnUrl": "https://cdn.alertamadrid.com"
+  },
+  "metadata": {
+    "createdAt": "2024-09-09T00:00:00Z",
+    "updatedAt": "2024-09-09T00:00:00Z",
+    "version": "1.0.0",
+    "maintainer": "Comunidad de Madrid - Protección Civil"
+  }
+}

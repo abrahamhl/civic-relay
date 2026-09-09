@@ -1,0 +1,63 @@
+Contact: security@civic-relay.example.com
+Expires: 2027-12-31T23:59:59.000Z
+Preferred-Languages: en, es
+Canonical: https://civic-relay.github.io/.well-known/security.txt
+Policy: https://civic-relay.github.io/docs/SECURITY_POLICY.html
+Acknowledgments: https://civic-relay.github.io/docs/SECURITY_ACKNOWLEDGMENTS.html
+
+# Security Policy
+
+## Reporting a Vulnerability
+
+If you discover a security vulnerability in Civic Relay, please report it privately to:
+
+**Email:** security@civic-relay.example.com
+
+Please include:
+- Description of the vulnerability
+- Steps to reproduce
+- Potential impact
+- Suggested fix (if any)
+
+We aim to respond within 48 hours and will keep you updated on the remediation progress.
+
+## Scope
+
+This security policy applies to:
+- Civic Relay core packages (@civic-relay/*)
+- Web application (apps/web)
+- Deployed instances (civic-relay.github.io)
+
+## Out of Scope
+
+- Third-party dependencies (report to their maintainers)
+- Demo/test instances (clearly marked as non-production)
+
+## Public Disclosure
+
+We follow coordinated disclosure:
+1. You report the issue privately
+2. We confirm and develop a fix
+3. We release a patch
+4. After 90 days (or earlier if agreed), we publish a security advisory
+
+## Bug Bounty
+
+Currently, we do not offer a bug bounty program. This may change in the future.
+
+## Security Best Practices
+
+When deploying Civic Relay:
+- ✅ Use HTTPS only
+- ✅ Keep dependencies updated
+- ✅ Enable audit logging
+- ✅ Follow ENS Alto compliance (for Spanish public sector)
+
+## Acknowledgments
+
+We thank these security researchers for responsible disclosure:
+(None yet - be the first!)
+
+---
+
+Last updated: 2026-09-09
