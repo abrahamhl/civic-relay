@@ -76,6 +76,10 @@
 <body>
   <h1>🔥 Civic Relay - Wildfire Demo</h1>
 
+  <div class="demo-controls" style="border: 2px solid #e74c3c; padding: 1rem; background: #fff5f5;">
+    <p><strong>AVISO:</strong> Este archivo es un diario de invocación histórico con <em>registros fijados a mano</em>; no ejecuta el núcleo de mensajería. La demo verificable está en la aplicación web (datos ficticios, transporte simulado, cola en memoria). Abre <a href="/civic-relay/">la demo real</a>.</p>
+  </div>
+
   <div class="demo-controls">
     <h2>Demo Controls</h2>
     <p>This demonstrates the V0.1 acceptance test: multipath routing, store-and-forward, and deduplication.</p>
@@ -207,7 +211,7 @@
     });
 
     openAppBtn.addEventListener('click', () => {
-      window.open('http://localhost:3000', '_blank');
+      window.open('/civic-relay/', '_blank');
     });
 
     async function executeStep() {

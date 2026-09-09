@@ -1,4 +1,6 @@
 # Posicionamiento Estratégico – Civic Relay
+
+> ⚠️ **DOCUMENTO HISTÓRICO RETRACTADO.** Personas/escenarios sintéticos de IA; **no** representan participación de instituciones reales ni respaldo. Presupuestos (€20M–100M), ROI y probabilidades son escenarios, no datos. Sustituido por `docs/AUDITORIAS_INVERSION_PUBLICA.md`.
 ## Análisis Multi-Stakeholder para Subvenciones y Ventas Institucionales
 
 **Fecha:** 2026-09-09  

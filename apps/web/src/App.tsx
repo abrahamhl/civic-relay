@@ -1,70 +1,56 @@
 import { useState, useEffect } from 'react';
-import { Dispatcher } from '@civic-relay/core';
-import { IPTransport, LocalMeshTransport, CellularTransport } from '@civic-relay/transports';
-import type { MessageEnvelope, MessageType, Priority } from '@civic-relay/schemas';
+import { createDemoSession } from '@civic-relay/core';
+import type { MessageType, Priority, MessageEnvelope } from '@civic-relay/schemas';
 import EmergencyButtons from './components/EmergencyButtons';
 import TransportStatus from './components/TransportStatus';
 import MessageQueue from './components/MessageQueue';
 import IncidentMap from './components/IncidentMap';
 import './App.css';
 
-// Global dispatcher instance
-const dispatcher = new Dispatcher();
+const session = createDemoSession();
+session.transports.ip.setSimulatedState(true);
+session.transports.mesh.setSimulatedState(true, 3);
+session.transports.cellular.setSimulatedState(false);
 
-// Register transports
-const ipTransport = new IPTransport();
-const meshTransport = new LocalMeshTransport();
-const cellularTransport = new CellularTransport();
+session.dispatcher.startPeriodicRetry(10000);
 
-dispatcher.registerTransport(ipTransport);
-dispatcher.registerTransport(meshTransport);
-dispatcher.registerTransport(cellularTransport);
-
-// Start periodic retry
-dispatcher.startPeriodicRetry(10000);
-
-// Expose for demo control
-(window as any).civicRelay = {
-  dispatcher,
-  transports: { ipTransport, meshTransport, cellularTransport },
+(window as unknown as { civicRelay: unknown }).civicRelay = {
+  dispatcher: session.dispatcher,
+  receiver: session.receiver,
+  transports: session.transports,
 };
 
 function App() {
   const [messages, setMessages] = useState<MessageEnvelope[]>([]);
   const [role, setRole] = useState<'citizen' | 'coordinator'>('citizen');
 
-  // Poll for message updates
   useEffect(() => {
     const interval = setInterval(() => {
-      const allMessages = dispatcher.getStore().getAll();
-      setMessages([...allMessages].reverse()); // Newest first
+      setMessages([...session.dispatcher.getStore().getAll()].reverse());
     }, 1000);
-
     return () => clearInterval(interval);
   }, []);
 
   const handleEmergencyAction = async (type: MessageType, priority: Priority) => {
-    const message: MessageEnvelope = {
+    const message = {
       id: crypto.randomUUID(),
       incidentId: null,
       createdAt: new Date().toISOString(),
       priority,
-      origin: 'user-001',
+      origin: 'demo-citizen',
       payloadType: type,
-      payload: { text: `${type} reported by citizen` },
+      payload: { text: `${type} (datos ficticios)` },
       approximateLocation: {
-        lat: 40.4168, // Madrid
+        lat: 40.4168,
         lon: -3.7038,
-        confidence: 'MEDIUM',
-        source: 'GPS',
+        confidence: 'LOW' as const,
+        source: 'MANUAL' as const,
       },
-      ttl: 3600, // 1 hour
-      verificationState: 'UNVERIFIED',
+      ttl: 3600,
+      verificationState: 'UNVERIFIED' as const,
       deliveryHistory: [],
     };
-
-    await dispatcher.dispatch(message);
-    console.log('Message dispatched:', message.id);
+    await session.dispatcher.dispatch(message as never);
   };
 
   return (
@@ -72,16 +58,10 @@ function App() {
       <header className="app-header">
         <h1>🆘 Civic Relay</h1>
         <div className="role-toggle">
-          <button
-            className={role === 'citizen' ? 'active' : ''}
-            onClick={() => setRole('citizen')}
-          >
+          <button className={role === 'citizen' ? 'active' : ''} onClick={() => setRole('citizen')}>
             Citizen
           </button>
-          <button
-            className={role === 'coordinator' ? 'active' : ''}
-            onClick={() => setRole('coordinator')}
-          >
+          <button className={role === 'coordinator' ? 'active' : ''} onClick={() => setRole('coordinator')}>
             Coordinator
           </button>
         </div>
@@ -102,7 +82,7 @@ function App() {
 
       <footer className="app-footer">
         <small>
-          V0.1 Prototype • Local transports simulated • No real RF transmission
+          Demo ficticia • transportes simulados en esta misma página • cola en memoria (se pierde al recargar) • sin aval institucional • no atiende emergencias reales
         </small>
       </footer>
     </div>

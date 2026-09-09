@@ -1,4 +1,6 @@
 # 🎯 Evaluación Final Post-Mejoras
+
+> ⚠️ **DOCUMENTO HISTÓRICO RETRACTADO.** Autoevaluación de IA; **no** es auditoría externa, aval institucional ni resultado verificado. Los puntajes (93%, 100%), ROI y probabilidades son proyecciones sintéticas. Sustituido por `docs/AUDITORIAS_INVERSION_PUBLICA.md` y `docs/ASTRA_RED_TEAM.md`.
 ## Civic Relay V0.1 → V0.5 MVP Institucional
 
 **Evaluador:** Claude Code (Sonnet 4)  

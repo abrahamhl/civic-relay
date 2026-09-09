@@ -1,4 +1,6 @@
 # Plan de Implementación MVP Institucional
+
+> ⚠️ **DOCUMENTO HISTÓRICO RETRACTADO.** Análisis sintético con IA; **no** es auditoría, aval institucional, presupuesto aprobado ni oferta operativa. Sustituido por `docs/AUDITORIAS_INVERSION_PUBLICA.md` y `docs/RELEASE_TRUTH_V0_1.md`. La demo actual es ficticia y estática.
 ## Civic Relay V0.1 → V0.5 (MVP Defendible)
 
 **Objetivo:** Convertir prototipo en MVP presentable a instituciones en 6 semanas  

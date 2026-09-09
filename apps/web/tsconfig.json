@@ -3,12 +3,10 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
     "composite": false
   },
-  "include": ["src/**/*"],
-  "references": [
-    { "path": "../../packages/schemas" },
-    { "path": "../../packages/transports" },
-    { "path": "../../packages/core" }
-  ]
+  "include": ["src/main.tsx"]
 }

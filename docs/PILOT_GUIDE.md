@@ -1,5 +1,7 @@
 # Guía de Piloto - Civic Relay
 
+> ⚠️ **DOCUMENTO HISTÓRICO RETRACTADO.** No hay piloto ejecutado ni institución asociada. Los importes (€0, €2.500/mes, etc.) son escenarios; las referencias a ENS/ayuntamiento son plantillas no verificadas. Sustituido por `docs/AUDITORIAS_INVERSION_PUBLICA.md`.
+
 **Versión:** 1.0  
 **Fecha:** 2026-09-09  
 **Autor:** Abraham Haddioui  

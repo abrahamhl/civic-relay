@@ -1,37 +1,58 @@
-import type { MessageEnvelope, TransportCapability } from '@civic-relay/schemas';
+import type {
+  MessageEnvelope, ReceiverAcknowledgment, TransportCapability,
+} from '@civic-relay/schemas';
 
-/**
- * Base transport interface
- * All transports must implement this contract
- */
+export interface SendResult {
+  accepted: boolean;
+  acknowledgment?: ReceiverAcknowledgment;
+  error?: string;
+}
+
 export interface ITransport {
   readonly id: string;
   readonly type: TransportCapability['transportType'];
-
-  /**
-   * Report current capabilities
-   * Called by router to make decisions
-   */
   getCapabilities(): Promise<TransportCapability>;
-
-  /**
-   * Send a message through this transport
-   * Returns true if accepted for delivery (not necessarily delivered yet)
-   */
-  send(message: MessageEnvelope): Promise<boolean>;
-
-  /**
-   * Check if this transport is currently available
-   */
+  /** Acceptance alone is never proof of delivery. */
+  send(message: MessageEnvelope): Promise<SendResult>;
   isAvailable(): Promise<boolean>;
 }
 
-/**
- * Result of a send attempt
- */
-export interface SendResult {
-  success: boolean;
-  transportId: string;
-  error?: string;
-  estimatedDeliveryTime?: number; // milliseconds
+export type SimulatedReceiver = (
+  message: unknown,
+  transportId: string,
+) => ReceiverAcknowledgment | Promise<ReceiverAcknowledgment>;
+
+/** In-process simulation only. No sockets, radios, timers, or network probes. */
+export abstract class SimulatedTransport implements ITransport {
+  abstract readonly id: string;
+  abstract readonly type: TransportCapability['transportType'];
+  protected available = false;
+
+  private receiver?: SimulatedReceiver;
+
+  constructor(receiver?: SimulatedReceiver) {
+    this.receiver = receiver;
+  }
+
+  setAvailable(available: boolean): void {
+    this.available = available;
+  }
+
+  /** Bind the same-page demo receiver that returns the acknowledgment. */
+  setReceiver(receiver: SimulatedReceiver): void {
+    this.receiver = receiver;
+  }
+
+  abstract getCapabilities(): Promise<TransportCapability>;
+
+  async isAvailable(): Promise<boolean> {
+    return this.available;
+  }
+
+  async send(message: MessageEnvelope): Promise<SendResult> {
+    if (!await this.isAvailable()) return { accepted: false, error: 'Simulator unavailable' };
+    if (!this.receiver) return { accepted: true };
+    const acknowledgment = await this.receiver(structuredClone(message), this.id);
+    return { accepted: true, acknowledgment };
+  }
 }

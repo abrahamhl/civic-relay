@@ -1,8 +1,8 @@
 {
   "id": "alertamadrid",
-  "name": "AlertaMadrid",
-  "domain": "alertamadrid.com",
-  "region": "Comunidad de Madrid",
+  "name": "Civic Relay Demo Sierra",
+  "domain": "sierra.civic-relay.example",
+  "region": "Sierra ficticia (demo)",
   "language": "es-ES",
   "branding": {
     "primaryColor": "#c41e3a",
@@ -10,38 +10,33 @@
     "accentColor": "#1e3a8a",
     "logo": "/tenants/alertamadrid/logo.svg",
     "favicon": "/tenants/alertamadrid/favicon.ico",
-    "logoAlt": "AlertaMadrid - Sistema de Alertas de la Comunidad de Madrid"
+    "logoAlt": "Civic Relay Demo Sierra - demo ficticia sin aval institucional"
   },
   "contact": {
-    "phone": "+34 91 234 5678",
-    "email": "info@alertamadrid.com",
-    "emergencyNumber": "112",
-    "website": "https://www.alertamadrid.com"
+    "phone": "",
+    "email": "demo@sierra.civic-relay.example",
+    "emergencyNumber": "",
+    "website": "https://sierra.civic-relay.example"
   },
   "features": {
-    "e2eEncryption": true,
+    "e2eEncryption": false,
     "offlineMode": true,
     "multiTransport": true,
-    "cadIntegration": true,
-    "verificationRequired": true
+    "cadIntegration": false,
+    "verificationRequired": false
   },
   "coverage": {
     "municipalities": [
-      "Madrid",
-      "Alcalá de Henares",
-      "Getafe",
-      "Móstoles",
-      "Fuenlabrada",
-      "Leganés",
-      "Alcorcón"
+      "Sector Sierra A (ficticio)",
+      "Sector Sierra B (ficticio)"
     ],
-    "population": 6750000,
-    "area": "8028 km²"
+    "population": 0,
+    "area": "Sin cobertura operativa; escenario ficticio"
   },
   "integrations": {
-    "cadSystem": "112-Madrid",
-    "weatherService": "AEMET",
-    "mapProvider": "IGN"
+    "cadSystem": "Mock local; sin conexion a emergencias",
+    "weatherService": "Datos ficticios; sin servicio meteorologico",
+    "mapProvider": "No configurado por el tenant"
   },
   "theme": {
     "fontFamily": "Inter, system-ui, sans-serif",
@@ -53,14 +48,14 @@
     "availableLanguages": ["es", "en", "ca"]
   },
   "deployment": {
-    "environment": "production",
-    "apiEndpoint": "https://api.alertamadrid.com",
-    "cdnUrl": "https://cdn.alertamadrid.com"
+    "environment": "demo",
+    "apiEndpoint": "https://api.sierra.civic-relay.example",
+    "cdnUrl": "https://cdn.sierra.civic-relay.example"
   },
   "metadata": {
     "createdAt": "2024-09-09T00:00:00Z",
     "updatedAt": "2024-09-09T00:00:00Z",
     "version": "1.0.0",
-    "maintainer": "Comunidad de Madrid - Protección Civil"
+    "maintainer": "kinkydisorder/civic-relay (demo independiente; sin aval institucional)"
   }
 }

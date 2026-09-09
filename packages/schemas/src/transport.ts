@@ -18,6 +18,16 @@ export const TransportCapabilitySchema = z.object({
 
 export type TransportCapability = z.infer<typeof TransportCapabilitySchema>;
 
+/** Receipt from the same-page demo receiver, not a network or authenticated ACK. */
+export const ReceiverAcknowledgmentSchema = z.object({
+  messageId: z.string().uuid(),
+  transportId: z.string().trim().min(1),
+  receiverId: z.string().trim().min(1),
+  receivedAt: z.string().datetime({ offset: true }),
+}).strict();
+
+export type ReceiverAcknowledgment = z.infer<typeof ReceiverAcknowledgmentSchema>;
+
 /**
  * Routing decision with explanation
  */

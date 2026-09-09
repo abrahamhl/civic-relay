@@ -1,5 +1,7 @@
 # Deployment Checklist - Civic Relay Piloto
 
+> ⚠️ **DOCUMENTO HISTÓRICO RETRACTADO.** El despliegue real del piloto para instituciones **no** ha ocurrido; dominios como `civic-relay-pilot.ayuntamiento.es` son plantillas ficticias. La demo publicada es estática y ficticia. No usar como guía de producción.
+
 **Versión:** 1.0  
 **Fecha:** 2026-09-09  
 **Objetivo:** Garantizar despliegue exitoso del piloto institucional

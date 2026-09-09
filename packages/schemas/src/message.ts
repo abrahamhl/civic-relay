@@ -57,8 +57,8 @@ export type Location = z.infer<typeof LocationSchema>;
  * Delivery attempt record
  */
 export const DeliveryAttemptSchema = z.object({
-  transportId: z.string(),
-  attemptedAt: z.string(), // ISO 8601
+  transportId: z.string().trim().min(1),
+  attemptedAt: z.string().datetime({ offset: true }),
   status: z.enum(['QUEUED', 'IN_TRANSIT', 'DELIVERED', 'FAILED']),
   error: z.string().optional(),
 });
@@ -74,15 +74,15 @@ export type DeliveryAttempt = z.infer<typeof DeliveryAttemptSchema>;
 export const MessageEnvelopeSchema = z.object({
   id: z.string().uuid(),
   incidentId: z.string().uuid().nullable(),
-  createdAt: z.string(), // ISO 8601
+  createdAt: z.string().datetime({ offset: true }),
   priority: z.nativeEnum(Priority),
-  origin: z.string(), // userId or deviceId
+  origin: z.string().trim().min(1), // userId or deviceId
   payloadType: z.nativeEnum(MessageType),
   payload: z.record(z.unknown()), // Type-specific payload
   approximateLocation: LocationSchema.nullable(),
-  ttl: z.number().int().positive(), // seconds
+  ttl: z.number().int().positive().safe(), // seconds
   verificationState: z.nativeEnum(VerificationState),
   deliveryHistory: z.array(DeliveryAttemptSchema),
-});
+}).strict();
 
 export type MessageEnvelope = z.infer<typeof MessageEnvelopeSchema>;

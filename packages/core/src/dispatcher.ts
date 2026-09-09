@@ -1,24 +1,20 @@
 import type { MessageEnvelope } from '@civic-relay/schemas';
 import type { ITransport } from '@civic-relay/transports';
-import { Router } from './router';
-import { MessageStore } from './store';
+import { Router } from './router.js';
+import { MessageStore } from './store.js';
+import { isExpired } from './envelope.js';
 
 /**
- * Dispatcher - Coordinates message routing and delivery
- *
- * Flow:
- * 1. User creates message
- * 2. Dispatcher stores locally
- * 3. Router selects transports
- * 4. Dispatcher attempts delivery through selected transports
- * 5. If no transports available, message stays queued
- * 6. Periodic retry for queued messages
+ * Dispatcher - route through available transports and reconcile only receiver
+ * acknowledgments. Accepted-but-unescorted transmissions are recorded IN_TRANSIT
+ * and never promoted to DELIVERED without a receiver receipt.
  */
 export class Dispatcher {
-  private router: Router;
-  private store: MessageStore;
-  private transports: Map<string, ITransport> = new Map();
+  private readonly router: Router;
+  private readonly store: MessageStore;
+  private readonly transports = new Map<string, ITransport>();
   private retryInterval: number | null = null;
+  private retrying = false;
 
   constructor() {
     this.router = new Router();
@@ -30,108 +26,125 @@ export class Dispatcher {
     this.router.registerTransport(transport);
   }
 
-  /**
-   * Submit a message for delivery
-   * Always returns immediately - delivery is asynchronous
-   */
   async dispatch(message: MessageEnvelope): Promise<void> {
-    // Always store locally first
     this.store.enqueue(message);
-
-    // Attempt immediate delivery
     await this.attemptDelivery(message);
   }
 
-  /**
-   * Attempt to deliver a message through available transports
-   */
   private async attemptDelivery(message: MessageEnvelope): Promise<void> {
-    const decision = await this.router.route(message);
-
-    console.log(`[Dispatcher] Routing decision for ${message.id}: ${decision.explanation}`);
-
-    if (decision.selectedTransports.length === 0) {
-      console.log(`[Dispatcher] No transports available - message ${message.id} queued`);
-      return;
-    }
-
-    // Attempt delivery through all selected transports (multipath)
-    const attempts = decision.selectedTransports.map(async (transportId) => {
-      const transport = this.transports.get(transportId);
-      if (!transport) return;
-
-      try {
-        const success = await transport.send(message);
-        this.store.recordDeliveryAttempt(message.id, {
-          transportId,
-          attemptedAt: new Date().toISOString(),
-          status: success ? 'DELIVERED' : 'FAILED',
-        });
-
-        if (success) {
-          console.log(`[Dispatcher] Message ${message.id} delivered via ${transportId}`);
-        }
-      } catch (error) {
-        this.store.recordDeliveryAttempt(message.id, {
-          transportId,
-          attemptedAt: new Date().toISOString(),
-          status: 'FAILED',
-          error: String(error),
-        });
-      }
-    });
-
-    await Promise.all(attempts);
-  }
-
-  /**
-   * Retry delivery for all queued messages
-   * Called periodically or when transports become available
-   */
-  async retryQueued(): Promise<void> {
-    const queued = this.store.getQueued();
-
-    if (queued.length === 0) {
-      return;
-    }
-
-    console.log(`[Dispatcher] Retrying ${queued.length} queued messages`);
-
-    for (const message of queued) {
-      await this.attemptDelivery(message);
-    }
-  }
-
-  /**
-   * Start periodic retry of queued messages
-   */
-  startPeriodicRetry(intervalMs: number = 10000): void {
-    if (this.retryInterval !== null) {
-      return; // Already running
-    }
-
-    this.retryInterval = setInterval(() => {
-      this.retryQueued();
+    if (isExpired(message, Date.now())) {
       this.store.cleanupExpired();
-    }, intervalMs) as any;
+      return;
+    }
 
-    console.log(`[Dispatcher] Periodic retry started (every ${intervalMs}ms)`);
+    const decision = await this.router.route(message);
+    const pending = decision.selectedTransports.filter(
+      (id) => !this.store.hasAcknowledgment(message.id, id)
+    );
+
+    if (pending.length === 0) {
+      this.store.completeDelivery(message.id, this.requiredAcknowledgments(message));
+      return;
+    }
+
+    await Promise.all(
+      pending.map(async (transportId) => {
+        const transport = this.transports.get(transportId);
+        if (!transport) return;
+        try {
+          const result = await transport.send(message);
+          const attemptedAt = new Date().toISOString();
+          if (!result.accepted) {
+            this.store.recordDeliveryAttempt(message.id, {
+              transportId,
+              attemptedAt,
+              status: 'FAILED',
+              error: result.error ?? 'Simulator unavailable',
+            });
+            return;
+          }
+
+          if (!result.acknowledgment) {
+            this.store.recordDeliveryAttempt(message.id, {
+              transportId,
+              attemptedAt,
+              status: 'IN_TRANSIT',
+            });
+            return;
+          }
+
+          const ack = result.acknowledgment;
+          if (ack.messageId !== message.id || ack.transportId !== transportId) {
+            this.store.recordDeliveryAttempt(message.id, {
+              transportId,
+              attemptedAt,
+              status: 'FAILED',
+              error: 'Receiver acknowledgment mismatch',
+            });
+            return;
+          }
+
+          this.store.recordDeliveryAttempt(message.id, {
+            transportId,
+            attemptedAt,
+            status: 'DELIVERED',
+          });
+        } catch (error) {
+          this.store.recordDeliveryAttempt(message.id, {
+            transportId,
+            attemptedAt: new Date().toISOString(),
+            status: 'FAILED',
+            error: String(error),
+          });
+        }
+      })
+    );
+
+    // The receiver only acknowledged the paths it saw; keep sender pending any
+    // required path that has not yet returned a receipt.
+    this.store.completeDelivery(message.id, this.requiredAcknowledgments(message));
   }
 
-  /**
-   * Stop periodic retry
-   */
+  private requiredAcknowledgments(message: MessageEnvelope): number {
+    switch (message.priority) {
+      case 'CRITICAL':
+        return 3;
+      case 'HIGH':
+        return 2;
+      case 'MEDIUM':
+      case 'LOW':
+        return 1;
+    }
+  }
+
+  async retryQueued(): Promise<void> {
+    if (this.retrying) return;
+    const queued = this.store.getQueued();
+    if (queued.length === 0) return;
+    this.retrying = true;
+    try {
+      for (const message of queued) {
+        await this.attemptDelivery(message);
+      }
+    } finally {
+      this.retrying = false;
+    }
+  }
+
+  startPeriodicRetry(intervalMs = 10000): void {
+    if (this.retryInterval !== null) return;
+    this.retryInterval = setInterval(() => {
+      void this.retryQueued();
+    }, intervalMs) as unknown as number;
+  }
+
   stopPeriodicRetry(): void {
     if (this.retryInterval !== null) {
       clearInterval(this.retryInterval);
       this.retryInterval = null;
-      console.log('[Dispatcher] Periodic retry stopped');
     }
   }
 
-  /**
-   * Get the message store for inspection
-   */
   getStore(): MessageStore {
     return this.store;
   }

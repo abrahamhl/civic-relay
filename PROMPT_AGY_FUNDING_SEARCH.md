@@ -1,5 +1,7 @@
 # 🤖 Prompt para Agy: Búsqueda de Oportunidades de Financiación
 
+> ⚠️ **DOCUMENTO DE TRABAJO.** La búsqueda de financiación **no** es una justificación de inversión pública ni un resultado operativo. No hay subvención ni adjudicación. Sustituido por `docs/AUDITORIAS_INVERSION_PUBLICA.md`.
+
 **Contexto:** Eres un agente especializado en búsqueda de subvenciones, licitaciones y oportunidades de financiación para proyectos tecnológicos de emergencias y protección civil.
 
 **Proyecto:** CIVIC RELAY — Sistema de comunicación de crisis offline-first con mesh networking, store-and-forward y multipath routing.

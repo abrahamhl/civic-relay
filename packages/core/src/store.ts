@@ -1,104 +1,116 @@
-import type { MessageEnvelope, DeliveryAttempt } from '@civic-relay/schemas';
-import { CryptoManager } from './crypto';
+import { DeliveryAttemptSchema, type MessageEnvelope, type DeliveryAttempt } from '@civic-relay/schemas';
+import { CryptoManager } from './crypto.js';
+import { assertSameMessage, isExpired, parseUntrustedMessage } from './envelope.js';
+
+export type DeliveryState = 'QUEUED' | 'ACKNOWLEDGED' | 'DELIVERED' | 'EXPIRED';
 
 /**
- * MessageStore - Local queue with store-and-forward capability
- *
- * Messages remain queued until:
- * 1. Successfully delivered through at least one transport
- * 2. TTL expires
- * 3. Manually removed
+ * Session-memory sender store only. A page reload loses messages, acknowledgments,
+ * history and ID-conflict protection; no persistence is claimed.
  */
 export class MessageStore {
-  private messages: Map<string, MessageEnvelope> = new Map();
-  private deliveryState: Map<string, 'QUEUED' | 'DELIVERED' | 'FAILED'> = new Map();
+  private readonly messages = new Map<string, MessageEnvelope>();
+  private readonly states = new Map<string, DeliveryState>();
+  private readonly acknowledgments = new Map<string, Set<string>>();
 
-  /**
-   * Add message to local queue
-   */
-  enqueue(message: MessageEnvelope): void {
+  constructor(private readonly now: () => number = Date.now) {}
+
+  enqueue(input: unknown): MessageEnvelope {
+    const message = parseUntrustedMessage(input, this.now());
+    const existing = this.messages.get(message.id);
+    if (existing) {
+      assertSameMessage(existing, message);
+      return structuredClone(existing);
+    }
+
+    if (isExpired(message, this.now())) throw new Error('Expired message rejected');
+
+    // Delivery history is local bookkeeping, never trusted from the sender.
+    message.deliveryHistory = [];
     this.messages.set(message.id, message);
-    this.deliveryState.set(message.id, 'QUEUED');
-    console.log(`[MessageStore] Enqueued message ${message.id}`);
+    this.states.set(message.id, 'QUEUED');
+    this.acknowledgments.set(message.id, new Set());
+    return structuredClone(message);
   }
 
-  /**
-   * Encrypt message and store it securely
-   * Mejora #1: E2E Encryption
-   */
+  /** Experimental primitive wrapper; the demo does not claim live E2E encryption. */
   async encryptAndStore(message: MessageEnvelope, recipientPublicKey: string): Promise<void> {
     const encrypted = await CryptoManager.encryptMessage(message, recipientPublicKey);
     this.enqueue(encrypted);
   }
 
-  /**
-   * Get all queued messages (not yet delivered)
-   */
+  /** Sender still owes delivery along at least one route for these states. */
   getQueued(): MessageEnvelope[] {
-    return Array.from(this.messages.values()).filter(
-      (msg) => this.deliveryState.get(msg.id) === 'QUEUED'
-    );
+    this.cleanupExpired();
+    return this.getAll().filter((message) => {
+      const state = this.states.get(message.id);
+      return state === 'QUEUED' || state === 'ACKNOWLEDGED';
+    });
   }
 
-  /**
-   * Get all messages (for history view)
-   */
   getAll(): MessageEnvelope[] {
-    return Array.from(this.messages.values());
+    return structuredClone(Array.from(this.messages.values()));
   }
 
-  /**
-   * Get one message by ID
-   */
   get(id: string): MessageEnvelope | undefined {
-    return this.messages.get(id);
+    const message = this.messages.get(id);
+    return message ? structuredClone(message) : undefined;
   }
 
-  /**
-   * Record a delivery attempt
-   */
+  getState(id: string): DeliveryState | undefined {
+    this.cleanupExpired();
+    return this.states.get(id);
+  }
+
+  hasAcknowledgment(messageId: string, transportId: string): boolean {
+    return this.acknowledgments.get(messageId)?.has(transportId) ?? false;
+  }
+
+  getAcknowledgedPaths(messageId: string): string[] {
+    return Array.from(this.acknowledgments.get(messageId) ?? []);
+  }
+
+  /** Internal receiver-Ack movement. A transport returning accepted is not enough. */
   recordDeliveryAttempt(messageId: string, attempt: DeliveryAttempt): void {
     const message = this.messages.get(messageId);
     if (!message) return;
+    const validated = DeliveryAttemptSchema.parse(attempt);
 
-    message.deliveryHistory.push(attempt);
+    if (validated.status === 'DELIVERED') {
+      this.acknowledgments.get(messageId)?.add(validated.transportId);
+      const previous = message.deliveryHistory.findIndex(
+        (item) => item.transportId === validated.transportId && item.status === 'DELIVERED'
+      );
+      if (previous >= 0) message.deliveryHistory[previous] = validated;
+      else message.deliveryHistory.push(validated);
+      const current = this.states.get(messageId);
+      if (current !== 'DELIVERED' && current !== 'EXPIRED') {
+        this.states.set(messageId, 'ACKNOWLEDGED');
+      }
+      return;
+    }
 
-    // Update overall delivery state
-    const hasSuccessful = message.deliveryHistory.some((a) => a.status === 'DELIVERED');
-    if (hasSuccessful) {
-      this.deliveryState.set(messageId, 'DELIVERED');
+    message.deliveryHistory.push(validated);
+  }
+
+  /** Complete only after the receiver acknowledges at least the route count requested. */
+  completeDelivery(messageId: string, requiredAcknowledgments: number): void {
+    const id = this.messages.get(messageId)?.id;
+    if (!id || this.states.get(id) === 'EXPIRED') return;
+    if ((this.acknowledgments.get(id)?.size ?? 0) >= requiredAcknowledgments) {
+      this.states.set(id, 'DELIVERED');
     }
   }
 
-  /**
-   * Check if message has been delivered through at least one transport
-   */
-  isDelivered(messageId: string): boolean {
-    return this.deliveryState.get(messageId) === 'DELIVERED';
-  }
-
-  /**
-   * Clean up expired messages (TTL exceeded)
-   */
   cleanupExpired(): number {
-    const now = Date.now();
-    let cleaned = 0;
-
-    for (const [id, message] of this.messages.entries()) {
-      const createdAt = new Date(message.createdAt).getTime();
-      const expiresAt = createdAt + message.ttl * 1000;
-
-      if (now > expiresAt) {
-        this.messages.delete(id);
-        this.deliveryState.delete(id);
-        cleaned++;
+    let expired = 0;
+    for (const [id, message] of this.messages) {
+      const state = this.states.get(id);
+      if (isExpired(message, this.now()) && state !== 'DELIVERED' && state !== 'EXPIRED') {
+        this.states.set(id, 'EXPIRED');
+        expired++;
       }
     }
-
-    if (cleaned > 0) {
-      console.log(`[MessageStore] Cleaned up ${cleaned} expired messages`);
-    }
-
-    return cleaned;
+    return expired;
   }
 }

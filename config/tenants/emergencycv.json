@@ -1,8 +1,8 @@
 {
   "id": "emergencycv",
-  "name": "EmergencyCV",
-  "domain": "emergencycv.gva.es",
-  "region": "Comunitat Valenciana",
+  "name": "Civic Relay Demo Costa",
+  "domain": "costa.civic-relay.example",
+  "region": "Costa ficticia (demo)",
   "language": "es-ES",
   "branding": {
     "primaryColor": "#003d7a",
@@ -10,39 +10,33 @@
     "accentColor": "#0073e6",
     "logo": "/tenants/emergencycv/logo.svg",
     "favicon": "/tenants/emergencycv/favicon.ico",
-    "logoAlt": "EmergencyCV - Sistema d'Emergències de la Comunitat Valenciana"
+    "logoAlt": "Civic Relay Demo Costa - demo ficticia sin aval institucional"
   },
   "contact": {
-    "phone": "+34 96 789 0123",
-    "email": "info@emergencycv.gva.es",
-    "emergencyNumber": "112",
-    "website": "https://www.emergencycv.gva.es"
+    "phone": "",
+    "email": "demo@costa.civic-relay.example",
+    "emergencyNumber": "",
+    "website": "https://costa.civic-relay.example"
   },
   "features": {
-    "e2eEncryption": true,
+    "e2eEncryption": false,
     "offlineMode": true,
     "multiTransport": true,
-    "cadIntegration": true,
-    "verificationRequired": true
+    "cadIntegration": false,
+    "verificationRequired": false
   },
   "coverage": {
     "municipalities": [
-      "València",
-      "Alicante/Alacant",
-      "Castelló de la Plana",
-      "Elche/Elx",
-      "Torrent",
-      "Gandía",
-      "Paterna",
-      "Sagunto"
+      "Sector Costa A (ficticio)",
+      "Sector Costa B (ficticio)"
     ],
-    "population": 5000000,
-    "area": "23255 km²"
+    "population": 0,
+    "area": "Sin cobertura operativa; escenario ficticio"
   },
   "integrations": {
-    "cadSystem": "112-CV",
-    "weatherService": "AEMET",
-    "mapProvider": "ICV"
+    "cadSystem": "Mock local; sin conexion a emergencias",
+    "weatherService": "Datos ficticios; sin servicio meteorologico",
+    "mapProvider": "No configurado por el tenant"
   },
   "theme": {
     "fontFamily": "Roboto, system-ui, sans-serif",
@@ -54,14 +48,14 @@
     "availableLanguages": ["es", "ca", "en"]
   },
   "deployment": {
-    "environment": "production",
-    "apiEndpoint": "https://api.emergencycv.gva.es",
-    "cdnUrl": "https://cdn.emergencycv.gva.es"
+    "environment": "demo",
+    "apiEndpoint": "https://api.costa.civic-relay.example",
+    "cdnUrl": "https://cdn.costa.civic-relay.example"
   },
   "metadata": {
     "createdAt": "2024-09-09T00:00:00Z",
     "updatedAt": "2024-09-09T00:00:00Z",
     "version": "1.0.0",
-    "maintainer": "Generalitat Valenciana - Protecció Civil"
+    "maintainer": "kinkydisorder/civic-relay (demo independiente; sin aval institucional)"
   }
 }

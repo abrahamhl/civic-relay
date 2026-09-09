@@ -1,5 +1,7 @@
 # 📊 RESUMEN EJECUTIVO — Civic Relay MVP Institucional
 
+> ⚠️ **DOCUMENTO HISTÓRICO RETRACTADO.** Análisis sintético de IA; **no** es auditoría, aval institucional ni resultado verificable. Sustituido por `docs/AUDITORIAS_INVERSION_PUBLICA.md`. La demo actual es una demo ficticia estática.
+
 **Para:** Abraham Haddioui  
 **De:** Claude Code (Análisis Estratégico Completo)  
 **Fecha:** 2026-09-09  

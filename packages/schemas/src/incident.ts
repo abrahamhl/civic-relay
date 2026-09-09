@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MessageType, VerificationState, LocationSchema } from './message';
+import { MessageType, VerificationState, LocationSchema } from './message.js';
 
 /**
  * Incident status lifecycle

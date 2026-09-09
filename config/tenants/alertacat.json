@@ -1,8 +1,8 @@
 {
   "id": "alertacat",
-  "name": "AlertaCat",
-  "domain": "alertacat.cat",
-  "region": "Catalunya",
+  "name": "Civic Relay Demo Delta",
+  "domain": "delta.civic-relay.example",
+  "region": "Delta ficticio (demo)",
   "language": "ca-ES",
   "branding": {
     "primaryColor": "#fcdd09",
@@ -10,39 +10,33 @@
     "accentColor": "#003893",
     "logo": "/tenants/alertacat/logo.svg",
     "favicon": "/tenants/alertacat/favicon.ico",
-    "logoAlt": "AlertaCat - Sistema d'Alertes de Catalunya"
+    "logoAlt": "Civic Relay Demo Delta - demo ficticia sin aval institucional"
   },
   "contact": {
-    "phone": "+34 93 456 7890",
-    "email": "info@alertacat.cat",
-    "emergencyNumber": "112",
-    "website": "https://www.alertacat.cat"
+    "phone": "",
+    "email": "demo@delta.civic-relay.example",
+    "emergencyNumber": "",
+    "website": "https://delta.civic-relay.example"
   },
   "features": {
-    "e2eEncryption": true,
+    "e2eEncryption": false,
     "offlineMode": true,
     "multiTransport": true,
-    "cadIntegration": true,
-    "verificationRequired": true
+    "cadIntegration": false,
+    "verificationRequired": false
   },
   "coverage": {
     "municipalities": [
-      "Barcelona",
-      "L'Hospitalet de Llobregat",
-      "Terrassa",
-      "Badalona",
-      "Sabadell",
-      "Lleida",
-      "Tarragona",
-      "Girona"
+      "Sector Delta A (ficticio)",
+      "Sector Delta B (ficticio)"
     ],
-    "population": 7750000,
-    "area": "32108 km²"
+    "population": 0,
+    "area": "Sin cobertura operativa; escenario ficticio"
   },
   "integrations": {
-    "cadSystem": "112-Catalunya",
-    "weatherService": "Meteo.cat",
-    "mapProvider": "ICGC"
+    "cadSystem": "Mock local; sin conexion a emergencias",
+    "weatherService": "Datos ficticios; sin servicio meteorologico",
+    "mapProvider": "No configurado por el tenant"
   },
   "theme": {
     "fontFamily": "Montserrat, system-ui, sans-serif",
@@ -54,14 +48,14 @@
     "availableLanguages": ["ca", "es", "en"]
   },
   "deployment": {
-    "environment": "production",
-    "apiEndpoint": "https://api.alertacat.cat",
-    "cdnUrl": "https://cdn.alertacat.cat"
+    "environment": "demo",
+    "apiEndpoint": "https://api.delta.civic-relay.example",
+    "cdnUrl": "https://cdn.delta.civic-relay.example"
   },
   "metadata": {
     "createdAt": "2024-09-09T00:00:00Z",
     "updatedAt": "2024-09-09T00:00:00Z",
     "version": "1.0.0",
-    "maintainer": "Generalitat de Catalunya - Protecció Civil"
+    "maintainer": "kinkydisorder/civic-relay (demo independiente; sin aval institucional)"
   }
 }

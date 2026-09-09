@@ -1,6 +1,6 @@
 /**
- * Tenant Configuration Loader
- * Mejora #3: White-label Branding - Dynamic Tenant Loading
+ * Fictional demo tenant configuration. No institutional endorsement.
+ * Legacy IDs and asset paths are retained for stored tenant selections.
  */
 
 export interface TenantConfig {
@@ -24,6 +24,7 @@ export interface TenantConfig {
     website: string;
   };
   features: {
+    // Demo configuration flags, not proof of security or operational capabilities.
     e2eEncryption: boolean;
     offlineMode: boolean;
     multiTransport: boolean;
@@ -69,8 +70,7 @@ let currentTenant: TenantConfig | null = null;
  */
 export async function loadTenant(tenantId: string): Promise<TenantConfig> {
   try {
-    // In production: fetch from API or CDN
-    // For demo: fetch from public config files
+    // Demo configs use reserved .example endpoints, not operational services.
     const response = await fetch(`/config/tenants/${tenantId}.json`);
 
     if (!response.ok) {
@@ -147,21 +147,21 @@ export function getCurrentTenant(): TenantConfig | null {
 }
 
 /**
- * Detect tenant from hostname (for multi-domain deployments)
+ * Detect fictional demo tenant from reserved example hostnames
  */
 export function detectTenantFromHostname(): string {
   const hostname = window.location.hostname;
 
-  // Map domains to tenant IDs
+  // Keep legacy IDs; only the fictional demo names and domains are public branding.
   const domainMap: Record<string, string> = {
-    'alertamadrid.com': 'alertamadrid',
-    'alertacat.cat': 'alertacat',
-    'emergencycv.gva.es': 'emergencycv',
+    'sierra.civic-relay.example': 'alertamadrid',
+    'delta.civic-relay.example': 'alertacat',
+    'costa.civic-relay.example': 'emergencycv',
     'localhost': 'alertamadrid', // Default for development
   };
 
   for (const [domain, tenantId] of Object.entries(domainMap)) {
-    if (hostname.includes(domain)) {
+    if (hostname === domain) {
       return tenantId;
     }
   }
@@ -183,9 +183,9 @@ export async function switchTenant(tenantId: string): Promise<void> {
  */
 export function getAvailableTenants(): Array<{ id: string; name: string; region: string }> {
   return [
-    { id: 'alertamadrid', name: 'AlertaMadrid', region: 'Comunidad de Madrid' },
-    { id: 'alertacat', name: 'AlertaCat', region: 'Catalunya' },
-    { id: 'emergencycv', name: 'EmergencyCV', region: 'Comunitat Valenciana' },
+    { id: 'alertamadrid', name: 'Civic Relay Demo Sierra', region: 'Sierra ficticia (demo)' },
+    { id: 'alertacat', name: 'Civic Relay Demo Delta', region: 'Delta ficticio (demo)' },
+    { id: 'emergencycv', name: 'Civic Relay Demo Costa', region: 'Costa ficticia (demo)' },
   ];
 }
 

@@ -1,54 +1,28 @@
-import type { MessageEnvelope, TransportCapability } from '@civic-relay/schemas';
-import type { ITransport } from './base';
+import type { TransportCapability } from '@civic-relay/schemas';
+import { SimulatedTransport } from './base.js';
 
-/**
- * LocalMeshTransport - SIMULATED transport
- * V0.1 does NOT implement real Bluetooth mesh
- * This is a deterministic simulator for demo purposes
- *
- * NEVER claim this performs real mesh transmission
- */
-export class LocalMeshTransport implements ITransport {
+/** Simulated mesh path. Peer count is a routing input, not discovered devices. */
+export class LocalMeshTransport extends SimulatedTransport {
   readonly id = 'local-mesh-sim-001';
   readonly type = 'LOCAL_MESH' as const;
+  private simulatedPeerCount = 1;
 
-  private simulatedAvailable: boolean = false;
-  private simulatedPeerCount: number = 0;
-
-  /**
-   * Control simulation state (for demo scenario)
-   */
-  setSimulatedState(available: boolean, peerCount: number = 0): void {
-    this.simulatedAvailable = available;
-    this.simulatedPeerCount = peerCount;
-    console.log(`[LocalMeshTransport] Simulation state: available=${available}, peers=${peerCount}`);
+  setSimulatedState(available: boolean, peerCount: number = 1): void {
+    this.simulatedPeerCount = Math.max(0, Math.floor(peerCount));
+    this.setAvailable(available && this.simulatedPeerCount > 0);
   }
 
   async getCapabilities(): Promise<TransportCapability> {
     return {
       transportId: this.id,
-      transportType: 'LOCAL_MESH',
-      available: this.simulatedAvailable,
-      estimatedReliability: this.simulatedPeerCount > 0 ? 0.7 : 0.0,
-      latency: this.simulatedAvailable ? 500 : 999999,
+      transportType: this.type,
+      available: this.available,
+      estimatedReliability: this.available ? 0.7 : 0,
+      latency: 500,
       energyCost: 'MEDIUM',
       monetaryCost: 'FREE',
-      bandwidth: this.simulatedPeerCount * 50_000, // 50 KB/s per peer
+      bandwidth: this.available ? this.simulatedPeerCount * 50_000 : 0,
       lastSeen: new Date().toISOString(),
     };
-  }
-
-  async send(message: MessageEnvelope): Promise<boolean> {
-    if (!this.simulatedAvailable) {
-      return false;
-    }
-
-    // SIMULATED: Log instead of real transmission
-    console.log(`[LocalMeshTransport] SIMULATED mesh forward (${this.simulatedPeerCount} peers):`, message.id);
-    return true;
-  }
-
-  async isAvailable(): Promise<boolean> {
-    return this.simulatedAvailable;
   }
 }

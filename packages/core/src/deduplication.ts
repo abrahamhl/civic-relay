@@ -1,73 +1,46 @@
-import type { MessageEnvelope } from '@civic-relay/schemas';
+import type { MessageEnvelope, ReceiverAcknowledgment } from '@civic-relay/schemas';
+import { assertSameMessage, isExpired, parseUntrustedMessage } from './envelope.js';
 
-/**
- * Deduplicator - Ensures each logical message is stored once
- *
- * When the same message arrives through multiple paths:
- * - Keep only one copy
- * - Merge delivery history from all paths
- * - Preserve provenance information
- */
+/** Independent, session-memory receiver. History records only locally observed paths. */
 export class Deduplicator {
-  private seen: Map<string, MessageEnvelope> = new Map();
+  private seen = new Map<string, MessageEnvelope>();
+  readonly id = 'same-page-demo-receiver';
 
-  /**
-   * Process an incoming message
-   * Returns the canonical message (either existing or new)
-   */
-  deduplicate(incoming: MessageEnvelope): {
+  constructor(private readonly now: () => number = Date.now) {}
+
+  deduplicate(input: unknown, transportId: string): {
     message: MessageEnvelope;
     isDuplicate: boolean;
     paths: number;
+    acknowledgment: ReceiverAcknowledgment;
   } {
-    const existing = this.seen.get(incoming.id);
-
-    if (!existing) {
-      // First time seeing this message
-      this.seen.set(incoming.id, incoming);
-      return {
-        message: incoming,
-        isDuplicate: false,
-        paths: 1,
-      };
+    const now = this.now();
+    const incoming = parseUntrustedMessage(input, now);
+    if (isExpired(incoming, now)) throw new Error('Expired message rejected by receiver');
+    if (typeof transportId !== 'string' || !transportId.trim()) {
+      throw new Error('An observed transport ID is required');
     }
-
-    // Duplicate detected - merge delivery history
-    const newDeliveries = incoming.deliveryHistory.filter(
-      (newAttempt) =>
-        !existing.deliveryHistory.some(
-          (existingAttempt) =>
-            existingAttempt.transportId === newAttempt.transportId &&
-            existingAttempt.attemptedAt === newAttempt.attemptedAt
-        )
-    );
-
-    existing.deliveryHistory.push(...newDeliveries);
-
-    const totalPaths = new Set(existing.deliveryHistory.map((a) => a.transportId)).size;
-
-    console.log(
-      `[Deduplicator] Duplicate message ${incoming.id} received via ${totalPaths} paths total`
-    );
-
+    const existing = this.seen.get(incoming.id);
+    if (existing) assertSameMessage(existing, incoming);
+    const message = existing ?? { ...incoming, deliveryHistory: [] };
+    const receivedAt = new Date(now).toISOString();
+    if (!message.deliveryHistory.some((attempt) => attempt.transportId === transportId)) {
+      message.deliveryHistory.push({ transportId, attemptedAt: receivedAt, status: 'DELIVERED' });
+    }
+    this.seen.set(message.id, message);
     return {
-      message: existing,
-      isDuplicate: true,
-      paths: totalPaths,
+      message: structuredClone(message),
+      isDuplicate: Boolean(existing),
+      paths: message.deliveryHistory.length,
+      acknowledgment: { messageId: message.id, transportId, receiverId: this.id, receivedAt },
     };
   }
 
-  /**
-   * Check if we've seen this message before
-   */
   hasSeen(messageId: string): boolean {
     return this.seen.has(messageId);
   }
 
-  /**
-   * Get all unique messages
-   */
   getAll(): MessageEnvelope[] {
-    return Array.from(this.seen.values());
+    return structuredClone(Array.from(this.seen.values()));
   }
 }

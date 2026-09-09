@@ -1,5 +1,7 @@
 # 🚀 MEGA-PROMPT: Deployment Completo Mientras Duermes
 
+> ⚠️ **DOCUMENTO HISTÓRICO RETRACTADO (instrucción de agente).** Contiene afirmaciones y presupuestos no verificados y asunciones. La demo publicada es **ficticia y estática**, sin aval institucional ni conformidad ENS. Sustituido por `docs/RELEASE_TRUTH_V0_1.md`.
+
 **Para:** Opus 4.5 / Equipo Dev  
 **Objetivo:** Implementar TODAS las mejoras + alcanzar **100% score** (85% base + 15% toque personal)  
 **Timeline:** 6-8 horas (overnight)  
