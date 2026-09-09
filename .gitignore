@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# TypeScript incremental build info (not reproducible input)
+*.tsbuildinfo
+
 # Build outputs
 dist/
 build/
