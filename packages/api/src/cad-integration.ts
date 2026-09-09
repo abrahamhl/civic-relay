@@ -18,6 +18,7 @@ export interface CADTicket {
     address?: string;
   };
   reportedAt: string;
+  updatedAt?: string;
   source: 'CIVIC_RELAY' | '112_CALL' | 'MANUAL';
   callerInfo: {
     id: string;
@@ -25,7 +26,9 @@ export interface CADTicket {
   };
   status: 'PENDING' | 'DISPATCHED' | 'EN_ROUTE' | 'ON_SCENE' | 'RESOLVED';
   assignedUnits: string[];
+  unitsDispatched?: string[];
   notes: string;
+  dispatchNotes?: string;
 }
 
 /**
@@ -118,8 +121,10 @@ export interface CADIntegration {
  * Integraph CAD adapter (example)
  */
 export class IntegraphCADAdapter implements CADIntegration {
-  private apiEndpoint: string;
-  private apiKey: string;
+  // @ts-ignore - Mock implementation for demonstration
+  private readonly apiEndpoint: string;
+  // @ts-ignore - Mock implementation for demonstration
+  private readonly apiKey: string;
 
   constructor(endpoint: string, apiKey: string) {
     this.apiEndpoint = endpoint;
@@ -128,6 +133,7 @@ export class IntegraphCADAdapter implements CADIntegration {
 
   async connect(): Promise<void> {
     // Verify API key, establish connection
+    // In production: await fetch(this.apiEndpoint + '/auth', ...)
     console.log('[Integraph CAD] Connected');
   }
 
@@ -138,7 +144,7 @@ export class IntegraphCADAdapter implements CADIntegration {
     return ticket.ticketId;
   }
 
-  async getStatus(ticketId: string): Promise<CADTicket['status']> {
+  async getStatus(_ticketId: string): Promise<CADTicket['status']> {
     // GET from Integraph API
     return 'PENDING';
   }

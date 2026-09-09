@@ -3,13 +3,13 @@
  * Mejora #2: Integración 112/CAD - REST API
  */
 
-import express from 'express';
+import express, { type Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { MockCADSystem } from './cad-integration.js';
 
-const app = express();
+const app: Express = express();
 const cad = new MockCADSystem();
 
 // Security middleware
@@ -28,7 +28,7 @@ app.use('/api/', limiter);
 /**
  * Health check endpoint
  */
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
@@ -46,10 +46,11 @@ app.post('/api/cad/dispatch', (req, res) => {
     const message = req.body;
 
     if (!message || !message.payload) {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'Invalid message format',
         details: 'Message body and payload are required'
       });
+      return;
     }
 
     const ticket = cad.createTicket(message);
@@ -72,7 +73,7 @@ app.post('/api/cad/dispatch', (req, res) => {
  * GET /api/cad/tickets
  * Get all CAD tickets
  */
-app.get('/api/cad/tickets', (req, res) => {
+app.get('/api/cad/tickets', (_req, res) => {
   try {
     const tickets = cad.getAllTickets();
     res.json({
@@ -98,10 +99,11 @@ app.get('/api/cad/ticket/:id', (req, res) => {
     const ticket = cad.getTicket(req.params.id);
 
     if (!ticket) {
-      return res.status(404).json({
+      res.status(404).json({
         error: 'Ticket not found',
         ticketId: req.params.id
       });
+      return;
     }
 
     res.json({
@@ -129,20 +131,22 @@ app.patch('/api/cad/ticket/:id/status', (req, res) => {
     const ticket = cad.getTicket(id);
 
     if (!ticket) {
-      return res.status(404).json({
+      res.status(404).json({
         error: 'Ticket not found',
         ticketId: id
       });
+      return;
     }
 
     // Update ticket status (simplified - in real CAD system this would be complex workflow)
     const validStatuses = ['NEW', 'DISPATCHED', 'EN_ROUTE', 'ON_SCENE', 'RESOLVED', 'CLOSED'];
 
     if (status && !validStatuses.includes(status)) {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'Invalid status',
         validStatuses
       });
+      return;
     }
 
     if (status) {
@@ -173,7 +177,7 @@ app.patch('/api/cad/ticket/:id/status', (req, res) => {
  * GET /api/cad/stats
  * Get CAD system statistics
  */
-app.get('/api/cad/stats', (req, res) => {
+app.get('/api/cad/stats', (_req, res) => {
   try {
     const tickets = cad.getAllTickets();
 
@@ -188,7 +192,7 @@ app.get('/api/cad/stats', (req, res) => {
         return acc;
       }, {} as Record<string, number>),
       avgResponseTime: '4.2 min', // Mock - in production calculate from real data
-      unitsDispatched: tickets.filter(t => t.unitsDispatched.length > 0).length
+      unitsDispatched: tickets.filter(t => t.unitsDispatched && t.unitsDispatched.length > 0).length
     };
 
     res.json({
@@ -214,7 +218,7 @@ app.use((req, res) => {
 });
 
 // Error handler
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Unhandled error:', err);
   res.status(500).json({
     error: 'Internal Server Error',
