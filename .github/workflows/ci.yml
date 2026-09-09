@@ -36,7 +36,7 @@ jobs:
       run: pnpm type-check
 
     - name: Run tests
-      run: pnpm test --passWithNoTests
+      run: pnpm test
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
