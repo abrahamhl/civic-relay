@@ -4,6 +4,8 @@ Demo ficticia de comunicación en crisis, offline-first y de transporte múltipl
 
 > ⚠️ No es un servicio de emergencias. No hay aval institucional, conformidad ENS ni prestación operativa. Todo el transporte es **simulado en la misma página** y la cola es **en memoria** (se pierde al recargar). No introduzcas datos personales ni emergencias reales.
 
+🌐 **Demo en vivo:** https://abrahamhl.github.io/civic-relay/
+
 ## Qué demuestra
 
 - **Transporte múltiple** – un mensaje puede propagarse por varias rutas simuladas.

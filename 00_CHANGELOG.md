@@ -1,6 +1,10 @@
 # Changelog
 
-## V0.1 (demo ficticia, endurecida)
+## V0.1 (demo ficticia, endurecida, publicada)
+
+- Publicada en GitHub Pages: `https://abrahamhl.github.io/civic-relay/` (repo `abrahamhl/civic-relay`).
+- Reproducibilidad: se eliminan `*.tsbuildinfo` versionados; CI `install -> build -> type-check -> test`.
+- Carga limpia verificada y CI verde (28 s).
 
 - Core: `Dispatcher`/`MessageStore` separan aceptación de entrega; `DELIVERED` solo con ACK del receptor.
 - Core: `demo.ts` conecta el flujo real (router/store/dedup) al escenario dorado.
