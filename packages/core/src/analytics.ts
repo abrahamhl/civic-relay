@@ -87,7 +87,7 @@ export function aggregateStats(messages: MessageEnvelope[]): MessageStats {
     }
 
     // Verification rate
-    if (msg.verificationState === 'VERIFIED') {
+    if (msg.verificationState === 'OFFICIAL') {
       verifiedCount++;
     }
   }
@@ -101,7 +101,7 @@ export function aggregateStats(messages: MessageEnvelope[]): MessageStats {
   const resolvedCount = messages.filter(
     (m) =>
       m.deliveryHistory.some((d) => d.status === 'DELIVERED') &&
-      m.verificationState === 'VERIFIED'
+      m.verificationState === 'OFFICIAL'
   ).length;
 
   // Timeline aggregation
