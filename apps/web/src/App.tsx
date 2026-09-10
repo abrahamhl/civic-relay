@@ -6,6 +6,7 @@ import EmergencyButtons from './components/EmergencyButtons';
 import TransportStatus from './components/TransportStatus';
 import MessageQueue from './components/MessageQueue';
 import IncidentMap from './components/IncidentMap';
+import { SimulationPanel } from './components/SimulationPanel';
 import './App.css';
 
 const session = createDemoSession();
@@ -55,6 +56,36 @@ function App() {
     await session.dispatcher.dispatch(message as never);
   };
 
+  const dispatchSimulatedMessage = async (type: MessageType, priority: Priority, text: string, deliveryHistory: any[]) => {
+    const message = {
+      id: crypto.randomUUID(),
+      incidentId: null,
+      createdAt: new Date().toISOString(),
+      priority,
+      origin: role === 'coordinator' ? 'demo-coordinator' : 'demo-citizen',
+      payloadType: type,
+      payload: { text },
+      approximateLocation: {
+        lat: 40.4168 + (Math.random() * 0.01 - 0.005),
+        lon: -3.7038 + (Math.random() * 0.01 - 0.005),
+        confidence: 'HIGH' as const,
+        source: 'MANUAL' as const,
+      },
+      ttl: 3600,
+      verificationState: role === 'coordinator' ? 'OFFICIAL' as const : 'UNVERIFIED' as const,
+      deliveryHistory: [],
+    };
+    
+    const store = session.dispatcher.getStore();
+    store.enqueue(message as never);
+    
+    for (const attempt of deliveryHistory) {
+      store.recordDeliveryAttempt(message.id, attempt as never);
+    }
+    
+    setMessages([...store.getAll()].reverse());
+  };
+
   if (showLanding) {
     return <LandingPage onEnterApp={() => setShowLanding(false)} />;
   }
@@ -62,7 +93,7 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg">
+      <header className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -95,6 +126,8 @@ function App() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left column */}
           <div className="lg:col-span-1 space-y-6">
+            <SimulationPanel role={role} session={session} dispatchSimulatedMessage={dispatchSimulatedMessage} />
+            
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-xl font-bold mb-4 text-slate-900">Estado de Transporte</h2>
               <TransportStatus />
