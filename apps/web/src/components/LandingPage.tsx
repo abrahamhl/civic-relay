@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
-import { Satellite, Radio, Shield, Globe, Users, ArrowRight, Check, Activity, Cpu } from 'lucide-react';
+import { motion, useScroll } from 'framer-motion';
+import { Satellite, Radio, Shield, Globe, Users, ArrowRight, Check, Activity, Cpu, Menu } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { SatelliteVisualization } from './SatelliteVisualization';
 
 const features = [
@@ -43,8 +44,37 @@ const competitors = [
 ];
 
 export function LandingPage({ onEnterApp }: { onEnterApp: () => void }) {
+  const [scrolled, setScrolled] = useState(false);
+  
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-slate-950 text-white overflow-hidden selection:bg-blue-500/30 font-sans">
+    <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-blue-500/30 overflow-hidden relative">
+      
+      {/* Premium Fixed Navigation */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${scrolled ? 'bg-slate-950/80 backdrop-blur-md border-slate-800 py-4' : 'bg-transparent border-transparent py-6'}`}>
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+          <div className="flex items-center gap-3 group cursor-pointer">
+            <Shield className="w-8 h-8 text-blue-500 group-hover:text-blue-400 transition-colors" />
+            <span className="font-bold text-xl tracking-tight">CIVIC RELAY</span>
+          </div>
+          <div className="hidden md:flex items-center gap-8 text-sm font-mono text-slate-300">
+            <a href="#mapeo" className="hover:text-blue-400 transition-colors">OSINT LEO</a>
+            <a href="#pitch" className="hover:text-blue-400 transition-colors">OBSOLESCENCIA</a>
+            <button onClick={onEnterApp} className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-bold transition-all shadow-[0_0_15px_rgba(59,130,246,0.4)]">
+              SIMULACIÓN TÁCTICA
+            </button>
+          </div>
+          <div className="md:hidden">
+            <Menu className="w-6 h-6 text-slate-300" />
+          </div>
+        </div>
+      </nav>
+
       {/* Cinematic Background */}
       <div className="fixed inset-0 z-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950"></div>
