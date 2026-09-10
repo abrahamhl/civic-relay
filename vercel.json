@@ -1,7 +1,7 @@
 {
   "version": 2,
   "name": "civic-relay",
-  "buildCommand": "pnpm build",
+  "buildCommand": "cd apps/web && pnpm build",
   "outputDirectory": "apps/web/dist",
   "installCommand": "pnpm install --frozen-lockfile",
   "framework": null,
