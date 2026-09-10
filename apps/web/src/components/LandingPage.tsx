@@ -1,49 +1,87 @@
-import { motion } from 'framer-motion';
-import { Satellite, Radio, Shield, Globe, Users, ArrowRight, Check, Activity, Cpu, Menu } from 'lucide-react';
+import { motion, useTransform, useScroll } from 'framer-motion';
+import { Satellite, Radio, Shield, ChevronRight, Cpu, Menu, Smartphone, Bluetooth, Lock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { SatelliteVisualization } from './SatelliteVisualization';
 
-const features = [
-  {
-    icon: Radio,
-    title: "Malla Terrestre Descentralizada",
-    description: "Operación continua 0-day ante colapso de infraestructura crítica. Enrutamiento dinámico Bluetooth/Wi-Fi Direct sin single-points-of-failure.",
-    color: "from-blue-500 to-cyan-500"
-  },
-  {
-    icon: Satellite,
-    title: "Uplink Satelital (LEO)",
-    description: "Integración nativa con constelaciones LEO (Starlink, Iridium) para comandos estratégicos de alta prioridad. Cobertura global instantánea.",
-    color: "from-purple-500 to-pink-500"
-  },
-  {
-    icon: Shield,
-    title: "Criptografía Grado Militar",
-    description: "Curvas elípticas (Ed25519/X25519) con Perfect Forward Secrecy. Arquitectura Zero-Trust cumpliendo normativas ENS Alto.",
-    color: "from-orange-500 to-red-500"
-  },
-  {
-    icon: Cpu,
-    title: "IA de Enrutamiento Predictivo",
-    description: "Algoritmos genéticos que optimizan la propagación de mensajes en escenarios de topología de red severamente degradada.",
-    color: "from-green-500 to-emerald-500"
-  }
-];
+const SmoothScrollLink = ({ href, children, className }: any) => {
+  const handleClick = (e: any) => {
+    e.preventDefault();
+    const target = document.getElementById(href.replace('#', ''));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  return <a href={href} onClick={handleClick} className={className}>{children}</a>;
+};
 
-const stats = [
-  { value: "0ms", label: "Latencia P2P Local" },
-  { value: "100%", label: "Resiliencia ante Blackouts" },
-  { value: "€0", label: "Costo de Hardware Dedicado" },
-  { value: "10x", label: "ROI vs. Sistemas Legacy" },
-];
+// SIMULATORS
 
-const competitors = [
-  { name: "SITRE / Legacy", offline: false, mesh: false, multiTransport: false, cost: "€2.5M+", highlight: false },
-  { name: "Airbus / Motorola TETRA", offline: false, mesh: false, multiTransport: false, cost: "€5.0M+", highlight: false },
-  { name: "Civic Relay", offline: true, mesh: true, multiTransport: true, cost: "€150k", highlight: true },
-];
+const MeshNetworkSimulator = () => {
+  const [nodes, setNodes] = useState<{id: number, active: boolean}[]>([
+    {id: 1, active: true}, {id: 2, active: false}, {id: 3, active: true}, {id: 4, active: true}
+  ]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNodes(prev => prev.map(n => ({ ...n, active: Math.random() > 0.3 })));
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="bg-black/50 border border-blue-500/30 rounded-2xl p-6 relative overflow-hidden font-mono shadow-inner">
+      <div className="flex items-center gap-2 mb-4 border-b border-white/10 pb-2">
+        <Radio className="w-4 h-4 text-blue-500" />
+        <span className="text-slate-400 text-xs">MESH-ROUTING.SIMULATOR</span>
+      </div>
+      <div className="flex justify-between items-center px-4 h-24">
+        {nodes.map(n => (
+          <div key={n.id} className={`flex flex-col items-center gap-2 ${n.active ? 'text-blue-400 opacity-100' : 'text-slate-600 opacity-50'}`}>
+            <Smartphone className="w-6 h-6" />
+            <span className="text-[10px]">P{n.id}</span>
+          </div>
+        ))}
+      </div>
+      <div className="absolute inset-0 bg-blue-500/5 mix-blend-overlay" />
+    </div>
+  );
+};
+
+const SatelliteUplinkSimulator = () => {
+  const [log, setLog] = useState("");
+  useEffect(() => {
+    const states = [
+      "SEARCHING LEO CONSTELLATION...",
+      "LOCK: SAT-49B (AZ 45°, EL 72°)",
+      "UPLINK ESTABLISHED. 12KB/s",
+      "SENDING BATCH #992...",
+      "ACK RECEIVED."
+    ];
+    let i = 0;
+    const interval = setInterval(() => {
+      setLog(states[i]);
+      i = (i + 1) % states.length;
+    }, 1500);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="bg-black/50 border border-blue-500/30 rounded-2xl p-6 relative overflow-hidden font-mono text-xs shadow-inner flex flex-col justify-between">
+      <div className="flex items-center gap-2 border-b border-white/10 pb-2">
+        <Satellite className="w-4 h-4 text-emerald-500" />
+        <span className="text-slate-400">SAT-COM-LINK</span>
+      </div>
+      <div className="h-16 flex items-center justify-center">
+        <span className="text-emerald-400 animate-pulse text-center">{log}</span>
+      </div>
+    </div>
+  );
+};
 
 export function LandingPage({ onEnterApp }: { onEnterApp: () => void }) {
+  const { scrollY } = useScroll();
+  const yHero = useTransform(scrollY, [0, 800], [0, 150]);
+  const opacityHero = useTransform(scrollY, [0, 400], [1, 0]);
+
   const [scrolled, setScrolled] = useState(false);
   
   useEffect(() => {
@@ -53,20 +91,21 @@ export function LandingPage({ onEnterApp }: { onEnterApp: () => void }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-blue-500/30 overflow-hidden relative">
+    <div className="min-h-screen bg-[#020617] text-white font-sans selection:bg-blue-500/30 overflow-hidden relative">
       
       {/* Premium Fixed Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${scrolled ? 'bg-slate-950/80 backdrop-blur-md border-slate-800 py-4' : 'bg-transparent border-transparent py-6'}`}>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${scrolled ? 'bg-[#020617]/90 backdrop-blur-xl border-white/5 py-4 shadow-2xl' : 'bg-transparent border-transparent py-6'}`}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3 group cursor-pointer">
-            <Shield className="w-8 h-8 text-blue-500 group-hover:text-blue-400 transition-colors" />
-            <span className="font-bold text-xl tracking-tight">CIVIC RELAY</span>
+          <div className="flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo(0,0)}>
+            <Shield className="w-6 h-6 text-blue-500 group-hover:text-blue-400 transition-colors" />
+            <span className="font-bold tracking-[0.2em] text-sm text-slate-200">CIVIC RELAY</span>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-mono text-slate-300">
-            <a href="#mapeo" className="hover:text-blue-400 transition-colors">OSINT LEO</a>
-            <a href="#pitch" className="hover:text-blue-400 transition-colors">OBSOLESCENCIA</a>
-            <button onClick={onEnterApp} className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-bold transition-all shadow-[0_0_15px_rgba(59,130,246,0.4)]">
-              SIMULACIÓN TÁCTICA
+          <div className="hidden md:flex items-center gap-10 text-[11px] font-mono tracking-widest text-slate-400">
+            <SmoothScrollLink href="#context" className="hover:text-blue-400 transition-colors">01. EL FALLO</SmoothScrollLink>
+            <SmoothScrollLink href="#mvp" className="hover:text-blue-400 transition-colors">02. EL MVP</SmoothScrollLink>
+            <SmoothScrollLink href="#pitch" className="hover:text-blue-400 transition-colors">03. INVERSIÓN</SmoothScrollLink>
+            <button onClick={onEnterApp} className="px-6 py-2.5 bg-white text-black hover:bg-blue-500 hover:text-white rounded-none font-bold transition-all">
+              SIMULADOR TÁCTICO
             </button>
           </div>
           <div className="md:hidden">
@@ -77,319 +116,157 @@ export function LandingPage({ onEnterApp }: { onEnterApp: () => void }) {
 
       {/* Cinematic Background */}
       <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950"></div>
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC4wNSkiLz48L3N2Zz4=')] opacity-50"></div>
+        <SatelliteVisualization />
       </div>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-20 z-10">
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-          >
-            <div className="inline-flex items-center gap-3 px-5 py-2 bg-blue-900/30 border border-blue-500/30 rounded-full text-blue-300 text-sm mb-8 backdrop-blur-md">
-              <Activity className="w-4 h-4 animate-pulse" />
-              <span className="font-mono tracking-widest uppercase">Sistema Táctico de Siguiente Generación</span>
-            </div>
+      <section className="relative h-screen flex items-center justify-center pt-20">
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-[#020617]/50 to-[#020617]" />
+        
+        <motion.div 
+          style={{ y: yHero, opacity: opacityHero }}
+          className="relative z-20 text-center max-w-5xl mx-auto px-4 mt-32"
+        >
+          <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-black/50 border border-white/10 rounded-full text-slate-300 text-xs font-mono mb-8 backdrop-blur-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+            OFFLINE-FIRST RESILIENCE PROTOCOL
+          </div>
+          
+          <h1 className="text-5xl md:text-8xl font-black mb-6 leading-[0.9] tracking-tighter">
+            Las Torres <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-500">
+              Han Caído.
+            </span>
+          </h1>
+          
+          <p className="text-lg md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+            Plataforma de comunicación de emergencias peer-to-peer. Cuando las redes celulares colapsan, los ciudadanos se convierten en la red de rescate.
+          </p>
 
-            <h1 className="text-5xl md:text-8xl font-extrabold mb-6 tracking-tight">
-              <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                Civic Relay
-              </span>
-            </h1>
-
-            <p className="text-2xl md:text-4xl text-slate-300 mb-6 font-light max-w-4xl mx-auto">
-              Infraestructura crítica que sobrevive al colapso.
-            </p>
-            <p className="text-lg md:text-xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-              El único protocolo descentralizado capaz de reemplazar las redes Motorola y Airbus obsoletas. Comunicación militar civil con tecnología Multi-Transport y zero-hardware deployment.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
-              <motion.button
-                onClick={onEnterApp}
-                className="group relative px-8 py-4 bg-blue-600 rounded-lg text-lg font-bold shadow-[0_0_40px_rgba(37,99,235,0.4)] hover:shadow-[0_0_60px_rgba(37,99,235,0.6)] transition-all overflow-hidden"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <span className="relative flex items-center gap-2 text-white">
-                  INICIAR SIMULACIÓN TÁCTICA
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </motion.button>
-              
-              <motion.a
-                href="#pitch"
-                className="px-8 py-4 bg-slate-900 border border-slate-700 rounded-lg text-lg font-semibold hover:bg-slate-800 hover:border-slate-600 transition-all text-slate-300"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Ver Informe Inversores
-              </motion.a>
-            </div>
-
-            {/* Premium Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
-              {stats.map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 + 0.8 }}
-                  className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-xl p-6 text-left hover:border-blue-500/30 transition-colors"
-                >
-                  <div className="text-4xl font-black text-white mb-2">{stat.value}</div>
-                  <div className="text-xs font-mono text-blue-400 uppercase tracking-widest">{stat.label}</div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
+          <SmoothScrollLink href="#context" className="inline-flex items-center justify-center w-14 h-14 rounded-full border border-white/20 hover:bg-white/10 transition-colors">
+            <ChevronRight className="w-6 h-6 rotate-90 text-slate-400" />
+          </SmoothScrollLink>
+        </motion.div>
       </section>
 
-      {/* 3D Satellite Visualization Section */}
-      <section className="relative py-32 px-4 z-10 border-t border-slate-800 bg-slate-950/50 backdrop-blur-3xl">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1 }}
-          >
-            <div className="mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-900/30 border border-blue-500/30 rounded text-blue-400 text-xs font-mono mb-6 uppercase tracking-widest">
-                <Globe className="w-3 h-3" /> Visualización de Enrutamiento
-              </div>
-              <h2 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
-                Telemetría en Tiempo Real
-              </h2>
-              <p className="text-xl text-slate-400 max-w-3xl leading-relaxed">
-                Nuestra arquitectura híbrida enruta paquetes cifrados a través de la constelación LEO y la red mesh terrestre simultáneamente, garantizando la entrega incluso si el 90% de la infraestructura colapsa.
+      {/* Context & Storytelling */}
+      <section id="context" className="relative py-32 px-4 z-20 bg-[#020617]">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center gap-4 mb-12">
+            <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-blue-500/50" />
+            <span className="font-mono text-xs tracking-[0.2em] text-blue-400">01. EL FALLO SISTÉMICO</span>
+            <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-blue-500/50" />
+          </div>
+          
+          <h2 className="text-4xl md:text-5xl font-bold mb-10 tracking-tight leading-tight">
+            Nuestros sistemas de emergencia dependen de antenas que se rompen con el viento.
+          </h2>
+          
+          <div className="space-y-8 text-xl text-slate-400 font-light leading-relaxed">
+            <p>
+              TETRA (Motorola/Airbus) cuesta cientos de millones, pero cuando hay un huracán, inundación o terremoto, las torres celulares y de radio <strong className="text-white font-medium">se quedan sin energía o son destruidas</strong>. Y en el peor momento, nadie puede pedir ayuda.
+            </p>
+            <p>
+              Cada ciudadano tiene en su bolsillo un ordenador hiper-potente con antenas de Bluetooth, Wi-Fi Direct y acceso a satélites LEO (Low Earth Orbit). <strong className="text-white font-medium">¿Por qué seguimos dependiendo de una torre?</strong>
+            </p>
+            <div className="p-8 border-l-4 border-blue-500 bg-white/5 rounded-r-2xl">
+              <p className="text-white italic">
+                "Civic Relay es la evolución natural de la protección civil. Transforma los teléfonos móviles en una red neuronal local (Mesh) que se auto-repara y enruta señales de SOS saltando de móvil en móvil hasta encontrar una salida satelital o IP."
               </p>
             </div>
-
-            <SatelliteVisualization />
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Comunicación Dual & Múltiples Ópticas */}
-      <section className="relative py-32 px-4 z-10">
+      {/* The MVP Explained (Simulators) */}
+      <section id="mvp" className="relative py-32 px-4 z-20 border-t border-white/5 bg-slate-950/50">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
+        
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-900/30 border border-green-500/30 rounded text-green-400 text-xs font-mono mb-6 uppercase tracking-widest">
-              <Radio className="w-3 h-3" /> Arquitectura Dual
-            </div>
-            <h2 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
-              Diseñado para Todos los Actores
-            </h2>
-            <p className="text-xl text-slate-400 max-w-4xl mx-auto leading-relaxed">
-              Civic Relay no es solo una herramienta de backend. Es una interfaz de supervivencia paramétrica que adapta su complejidad según el operador, garantizando que tanto ciudadanos bajo pánico como coordinadores tácticos puedan operar eficazmente.
-            </p>
+          <div className="flex items-center gap-4 mb-16">
+            <span className="font-mono text-xs tracking-[0.2em] text-cyan-400">02. EL PRODUCTO MÍNIMO VIABLE (MVP)</span>
+            <div className="h-[1px] flex-1 bg-gradient-to-r from-cyan-500/50 to-transparent" />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
-            {/* Óptica Ciudadano */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="bg-slate-900 border border-slate-800 p-10 rounded-3xl"
-            >
-              <div className="flex items-center gap-4 mb-8">
-                <div className="p-4 bg-blue-500/20 rounded-full">
-                  <Users className="w-8 h-8 text-blue-400" />
-                </div>
-                <h3 className="text-3xl font-bold">Óptica: Ciudadano Aislado</h3>
-              </div>
-              <ul className="space-y-6 text-slate-300">
-                <li className="flex gap-4">
-                  <Check className="w-6 h-6 text-blue-500 shrink-0" />
-                  <span><strong>Interfaz de Un Solo Toque:</strong> Botones de emergencia gigantes para reportar SOS, incendios o necesidades médicas bajo alto estrés.</span>
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-4xl font-bold mb-6 tracking-tight">La v1.0 está viva.</h2>
+              <p className="text-lg text-slate-400 mb-8 leading-relaxed">
+                Hemos desarrollado el SDK Core que unifica las vías de transporte (BLE, Wi-Fi Aware, Satélite LEO, IP). Funciona al 100% como un enrutador inteligente (Store & Forward).
+              </p>
+              <ul className="space-y-6">
+                <li className="flex gap-4 items-start">
+                  <div className="mt-1 p-2 rounded bg-blue-500/20"><Bluetooth className="w-5 h-5 text-blue-400" /></div>
+                  <div>
+                    <strong className="block text-white mb-1">1. Mesh Routing Asíncrono</strong>
+                    <span className="text-slate-400 text-sm">Si no hay cobertura, tu SOS se guarda. Si pasas cerca de alguien, se transmite por Bluetooth automáticamente en segundo plano.</span>
+                  </div>
                 </li>
-                <li className="flex gap-4">
-                  <Check className="w-6 h-6 text-blue-500 shrink-0" />
-                  <span><strong>Mesh Bluetooth Automático:</strong> El dispositivo se convierte en un relé silencioso sin requerir configuración técnica.</span>
+                <li className="flex gap-4 items-start">
+                  <div className="mt-1 p-2 rounded bg-emerald-500/20"><Satellite className="w-5 h-5 text-emerald-400" /></div>
+                  <div>
+                    <strong className="block text-white mb-1">2. Salto Satelital (LEO)</strong>
+                    <span className="text-slate-400 text-sm">Cuando el paquete salta de teléfono en teléfono y encuentra a un usuario con visión satelital (ej. iPhone 14+), expulsa los SOS acumulados al exterior.</span>
+                  </div>
                 </li>
-                <li className="flex gap-4">
-                  <Check className="w-6 h-6 text-blue-500 shrink-0" />
-                  <span><strong>Cola de Espera Resiliente (Store & Forward):</strong> Los mensajes se guardan cifrados localmente y se transmiten automáticamente cuando otro nodo pasa cerca.</span>
+                <li className="flex gap-4 items-start">
+                  <div className="mt-1 p-2 rounded bg-purple-500/20"><Lock className="w-5 h-5 text-purple-400" /></div>
+                  <div>
+                    <strong className="block text-white mb-1">3. Deduplicación Criptográfica</strong>
+                    <span className="text-slate-400 text-sm">Mil teléfonos enviando la misma alerta no saturan el ancho de banda; el hash del paquete se colapsa en uno solo en la capa Mesh.</span>
+                  </div>
                 </li>
               </ul>
-            </motion.div>
+            </div>
 
-            {/* Óptica Coordinador */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="bg-slate-900 border border-slate-800 p-10 rounded-3xl relative overflow-hidden"
+            {/* Bento Box Simulators */}
+            <div className="grid gap-4">
+              <MeshNetworkSimulator />
+              <div className="grid grid-cols-2 gap-4">
+                <SatelliteUplinkSimulator />
+                <div className="bg-black/50 border border-white/10 rounded-2xl p-6 backdrop-blur-md">
+                   <h3 className="text-sm font-mono text-slate-400 mb-4 flex items-center gap-2"><Cpu className="w-4 h-4"/> CARGA</h3>
+                   <div className="text-3xl font-light text-white mb-1">12 KB/s</div>
+                   <div className="text-xs text-blue-400 font-mono">Coste Reducido (Deduplicación)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pitch CTA */}
+      <section id="pitch" className="relative py-32 px-4 z-20 bg-[#020617] border-t border-white/10">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="w-24 h-24 mx-auto mb-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-3xl flex items-center justify-center shadow-[0_0_50px_rgba(59,130,246,0.3)] rotate-3">
+             <Shield className="w-12 h-12 text-white -rotate-3" />
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
+            El Fin de la Obsolescencia TETRA.
+          </h2>
+          <p className="text-xl text-slate-400 mb-12 leading-relaxed font-light">
+            Buscamos €500k de capital pre-seed para empaquetar el SDK en un API para gobiernos y entidades de rescate. Mercado objetivo: €2.4B (Europa).
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <button 
+              onClick={onEnterApp}
+              className="px-10 py-5 bg-white text-black rounded-sm text-sm font-bold tracking-widest uppercase hover:bg-blue-500 hover:text-white transition-all w-full sm:w-auto shadow-2xl shadow-blue-500/20"
             >
-              <div className="absolute top-0 right-0 p-8 opacity-10">
-                <Shield className="w-64 h-64 text-red-500" />
-              </div>
-              <div className="flex items-center gap-4 mb-8 relative z-10">
-                <div className="p-4 bg-red-500/20 rounded-full">
-                  <Activity className="w-8 h-8 text-red-400" />
-                </div>
-                <h3 className="text-3xl font-bold text-white">Óptica: Coordinación PM/PC</h3>
-              </div>
-              <ul className="space-y-6 text-slate-300 relative z-10">
-                <li className="flex gap-4">
-                  <Check className="w-6 h-6 text-red-500 shrink-0" />
-                  <span><strong>HUD Geospacial Táctico:</strong> Visualización de reportes triangulados en tiempo real con marcadores de confianza de origen.</span>
-                </li>
-                <li className="flex gap-4">
-                  <Check className="w-6 h-6 text-red-500 shrink-0" />
-                  <span><strong>Despacho Vía Constelación LEO:</strong> Capacidad de inyectar broadcasts de evacuación que descienden desde satélite a la malla terrestre.</span>
-                </li>
-                <li className="flex gap-4">
-                  <Check className="w-6 h-6 text-red-500 shrink-0" />
-                  <span><strong>Deduplicación Criptográfica:</strong> Filtra automáticamente miles de reportes del mismo evento en un único incidente acotado.</span>
-                </li>
-              </ul>
-            </motion.div>
+              PROBAR SIMULACIÓN TÁCTICA
+            </button>
+            <a
+              href="mailto:inversores@civic-relay.com"
+              className="px-10 py-5 bg-transparent border border-slate-700 hover:border-slate-400 text-white rounded-sm text-sm font-bold tracking-widest uppercase transition-all w-full sm:w-auto"
+            >
+              SOLICITAR DUE DILIGENCE
+            </a>
           </div>
         </div>
       </section>
-
-      {/* Differentiation & Competitors */}
-      <section id="pitch" className="relative py-32 px-4 z-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
-              Obsolescencia Programada
-            </h2>
-            <p className="text-xl text-slate-400 max-w-4xl mx-auto leading-relaxed">
-              Airbus y Motorola dependen de torres centralizadas (TETRA) que fallan durante desastres naturales. SITRE demostró su vulnerabilidad en 2023. Civic Relay es la evolución necesaria.
-            </p>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl mb-32"
-          >
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-slate-950/50 border-b border-slate-800 text-sm font-mono tracking-widest text-slate-400">
-                    <th className="px-8 py-6 uppercase">Sistema</th>
-                    <th className="px-8 py-6 text-center uppercase">Offline-First</th>
-                    <th className="px-8 py-6 text-center uppercase">Mesh Dinámico</th>
-                    <th className="px-8 py-6 text-center uppercase">Multi-Transport</th>
-                    <th className="px-8 py-6 text-right uppercase">CAPEX Estimado</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800">
-                  {competitors.map((comp) => (
-                    <tr
-                      key={comp.name}
-                      className={`transition-colors hover:bg-slate-800/50 ${comp.highlight ? 'bg-blue-900/10' : ''}`}
-                    >
-                      <td className="px-8 py-6 font-medium text-lg flex items-center gap-3">
-                        {comp.name}
-                        {comp.highlight && (
-                          <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded border border-blue-500/30 font-mono">NEXT-GEN</span>
-                        )}
-                      </td>
-                      <td className="px-8 py-6 text-center">
-                        {comp.offline ? <Check className="w-6 h-6 text-blue-400 mx-auto" /> : <span className="text-slate-600 font-mono">FALLO</span>}
-                      </td>
-                      <td className="px-8 py-6 text-center">
-                        {comp.mesh ? <Check className="w-6 h-6 text-blue-400 mx-auto" /> : <span className="text-slate-600 font-mono">FALLO</span>}
-                      </td>
-                      <td className="px-8 py-6 text-center">
-                        {comp.multiTransport ? <Check className="w-6 h-6 text-blue-400 mx-auto" /> : <span className="text-slate-600 font-mono">FALLO</span>}
-                      </td>
-                      <td className="px-8 py-6 text-right font-mono text-lg">
-                        <span className={comp.highlight ? 'text-blue-400 font-bold' : 'text-slate-500'}>{comp.cost}</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {features.map((feature, i) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-slate-900/50 backdrop-blur-md border border-slate-800 p-10 rounded-3xl hover:border-slate-700 transition-colors"
-              >
-                <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${feature.color} mb-6 shadow-lg`}>
-                  <feature.icon className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-3xl font-bold mb-4 tracking-tight">{feature.title}</h3>
-                <p className="text-slate-400 text-lg leading-relaxed">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Final Pitch CTA */}
-      <section className="relative py-32 px-4 z-10 border-t border-slate-800 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950">
-        <div className="max-w-5xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="bg-slate-900 border border-blue-500/30 rounded-[3rem] p-16 relative overflow-hidden"
-          >
-            {/* Tech grid overlay */}
-            <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(59, 130, 246, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.5) 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
-            
-            <Users className="w-20 h-20 mx-auto mb-8 text-blue-400 relative z-10" />
-            <h2 className="text-5xl font-extrabold mb-6 relative z-10 tracking-tight">
-              El Futuro de la Protección Civil
-            </h2>
-            <p className="text-xl text-slate-300 mb-12 max-w-2xl mx-auto relative z-10 leading-relaxed">
-              Buscamos €500k Seed para acelerar el despliegue de pilotos institucionales. 5 auditorías superadas. Mercado objetivo: €2.4B (Europa).
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 relative z-10">
-              <motion.button
-                onClick={onEnterApp}
-                className="px-10 py-5 bg-white text-slate-950 rounded-xl text-lg font-bold shadow-2xl hover:shadow-white/20 transition-all flex items-center gap-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Evaluar Simulación Táctica
-                <ArrowRight className="w-5 h-5" />
-              </motion.button>
-              <a
-                href="mailto:inversores@civic-relay.com"
-                className="px-10 py-5 bg-transparent border-2 border-slate-700 rounded-xl text-lg font-bold hover:bg-slate-800 hover:border-slate-600 transition-all text-white"
-              >
-                Solicitar Due Diligence
-              </a>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="relative border-t border-slate-900 py-12 px-4 z-10 bg-slate-950">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-slate-600 font-mono">
-          <div>
-            © 2026 Civic Relay Systems. Todos los derechos reservados.
-          </div>
-          <div className="flex items-center gap-8">
-            <a href="https://github.com/abrahamhl/civic-relay" className="hover:text-blue-400 transition-colors">Repositorio Confidencial</a>
-            <a href="#" className="hover:text-blue-400 transition-colors">Auditoría ENS</a>
-            <a href="mailto:security@civic-relay.com" className="hover:text-blue-400 transition-colors">VDP</a>
-          </div>
-        </div>
+      
+      <footer className="py-8 text-center text-xs font-mono text-slate-600 bg-black">
+        © 2026 CIVIC RELAY (RESILIENCE PROTOCOL). PROTECCIÓN CIVIL DISTRIBUIDA.
       </footer>
     </div>
   );
