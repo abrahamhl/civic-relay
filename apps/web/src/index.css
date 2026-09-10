@@ -1,38 +1,81 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    @apply bg-slate-50 text-slate-900;
+  }
+
+  #root {
+    width: 100vw;
+    min-height: 100vh;
+  }
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background: #f5f5f5;
-  color: #333;
-  overflow: hidden;
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }
 
-#root {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
 }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  outline: none;
-  transition: all 0.2s;
+::-webkit-scrollbar-track {
+  background: #1e293b;
 }
 
-button:active {
-  transform: scale(0.95);
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 5px;
 }
 
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Leaflet */
 .leaflet-container {
   font-family: inherit;
+}
+
+/* Gradient animations */
+@keyframes gradient-xy {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-xy {
+  animation: gradient-xy 15s ease infinite;
+  background-size: 400% 400%;
+}
+
+/* Glow effect */
+.glow {
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.5),
+              0 0 40px rgba(249, 115, 22, 0.3),
+              0 0 60px rgba(249, 115, 22, 0.1);
+}
+
+.glow-hover:hover {
+  box-shadow: 0 0 30px rgba(249, 115, 22, 0.6),
+              0 0 60px rgba(249, 115, 22, 0.4),
+              0 0 90px rgba(249, 115, 22, 0.2);
+  transition: box-shadow 0.3s ease;
 }

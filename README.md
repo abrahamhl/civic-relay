@@ -4,7 +4,9 @@ Demo ficticia de comunicación en crisis, offline-first y de transporte múltipl
 
 > ⚠️ No es un servicio de emergencias. No hay aval institucional, conformidad ENS ni prestación operativa. Todo el transporte es **simulado en la misma página** y la cola es **en memoria** (se pierde al recargar). No introduzcas datos personales ni emergencias reales.
 
-🌐 **Demo en vivo:** https://abrahamhl.github.io/civic-relay/
+🌐 **Demo en vivo:** 
+- **Producción (Vercel):** https://civic-relay.vercel.app _(recomendado)_
+- **GitHub Pages:** https://abrahamhl.github.io/civic-relay/
 
 ## Qué demuestra
 
@@ -16,14 +18,30 @@ Demo ficticia de comunicación en crisis, offline-first y de transporte múltipl
 
 ## Ejecutar
 
+### Desarrollo local
 ```bash
 pnpm install --frozen-lockfile
-pnpm build
-pnpm test
-pnpm lint
+pnpm dev          # Desarrollo en http://localhost:3000
+pnpm build        # Build producción
+pnpm test         # Tests
+pnpm lint         # Type-check
 ```
 
-Servir la demo estática desde `apps/web/dist` (base `/civic-relay/`). La API y el servicio reales **no** se exponen en esta demo.
+### Deploy a Vercel (Producción)
+```bash
+# Opción 1: CLI (rápido)
+npm install -g vercel
+vercel            # Deploy preview
+vercel --prod     # Deploy producción
+
+# Opción 2: Script automatizado (recomendado)
+.\scripts\deploy.ps1           # Windows
+./scripts/deploy.sh preview    # Linux/Mac
+```
+
+Ver [`DEPLOYMENT_VERCEL.md`](DEPLOYMENT_VERCEL.md) para guía completa de deployment.
+
+Servir la demo estática desde `apps/web/dist`. La API y el servicio reales **no** se exponen en esta demo.
 
 ## Pruebas
 
@@ -45,11 +63,22 @@ Servir la demo estática desde `apps/web/dist` (base `/civic-relay/`). La API y 
 
 ## Documentación
 
-- [`docs/AUDITORIAS_INVERSION_PUBLICA.md`](docs/AUDITORIAS_INVERSION_PUBLICA.md) – cinco auditorías técnicas y delegaciones de responsabilidad.
-- [`docs/RELEASE_TRUTH_V0_1.md`](docs/RELEASE_TRUTH_V0_1.md) – verificación ejecutada (instalación/build/test/lint) vs. afirmaciones.
-- [`docs/ASTRA_RED_TEAM.md`](docs/ASTRA_RED_TEAM.md) – revisión adversarial de liberación.
-- [`docs/CRYPTO_ARCHITECTURE.md`](docs/CRYPTO_ARCHITECTURE.md) – criptografía experimental.
-- [`docs/WORKWIZE_CASE_STUDY.md`](docs/WORKWIZE_CASE_STUDY.md) – caso para entrevista.
+### Técnica
+- [`docs/AUDITORIAS_INVERSION_PUBLICA.md`](docs/AUDITORIAS_INVERSION_PUBLICA.md) – cinco auditorías técnicas y delegaciones de responsabilidad
+- [`docs/RELEASE_TRUTH_V0_1.md`](docs/RELEASE_TRUTH_V0_1.md) – verificación ejecutada (instalación/build/test/lint) vs. afirmaciones
+- [`docs/ASTRA_RED_TEAM.md`](docs/ASTRA_RED_TEAM.md) – revisión adversarial de liberación
+- [`docs/CRYPTO_ARCHITECTURE.md`](docs/CRYPTO_ARCHITECTURE.md) – criptografía experimental
+- [`docs/WORKWIZE_CASE_STUDY.md`](docs/WORKWIZE_CASE_STUDY.md) – caso para entrevista
+
+### Deployment & Seguridad
+- [`DEPLOYMENT_VERCEL.md`](DEPLOYMENT_VERCEL.md) – guía completa deployment Vercel con seguridad ENS Alto
+- [`INFORME_AUDITORIA_FINAL.md`](INFORME_AUDITORIA_FINAL.md) – auditoría de seguridad y diferenciación competitiva
+- [`docs/RED_TEAM_COMPETITIVE_INTELLIGENCE.md`](docs/RED_TEAM_COMPETITIVE_INTELLIGENCE.md) – análisis competitivo Airbus/Motorola
+
+### Financiación
+- [`funding/PITCH_DECK_OUTLINE.md`](funding/PITCH_DECK_OUTLINE.md) – outline pitch deck 11 slides
+- [`funding/ONE_PAGER_COMERCIAL.md`](funding/ONE_PAGER_COMERCIAL.md) – resumen ejecutivo 1 página
+- [`funding/EMAIL_TEMPLATES.md`](funding/EMAIL_TEMPLATES.md) – templates para CDTI, VCs, municipios
 
 ## Autor
 

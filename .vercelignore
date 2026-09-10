@@ -1,0 +1,43 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+.next
+out
+build
+
+# Development
+.env*
+.vscode
+.idea
+
+# Testing
+coverage
+*.test.*
+*.spec.*
+__tests__
+tests
+
+# Misc
+.DS_Store
+*.log
+.cache
+
+# Source maps
+*.map
+
+# Documentation (not needed in deployment)
+docs
+*.md
+!README.md
+
+# Config files not needed
+.editorconfig
+.prettierrc
+.eslintrc*
+
+# Git
+.git
+.gitignore

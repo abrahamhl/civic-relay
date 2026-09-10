@@ -1,8 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 export default defineConfig({
-  base: '/civic-relay/',
+  base: isProduction ? '/' : '/civic-relay/',
   plugins: [
     react(),
     {
@@ -25,7 +27,31 @@ export default defineConfig({
       },
     },
   ],
+  build: {
+    outDir: 'dist',
+    sourcemap: !isProduction,
+    minify: isProduction ? 'terser' : false,
+    terserOptions: isProduction ? {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    } : undefined,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'map-vendor': ['leaflet', 'react-leaflet'],
+        },
+      },
+    },
+  },
   server: {
     port: 3000,
+    strictPort: false,
+  },
+  preview: {
+    port: 3000,
+    strictPort: false,
   },
 });
