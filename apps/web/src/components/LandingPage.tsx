@@ -146,6 +146,86 @@ export function LandingPage({ onEnterApp }: { onEnterApp: () => void }) {
         </div>
       </section>
 
+      {/* Comunicación Dual & Múltiples Ópticas */}
+      <section className="relative py-32 px-4 z-10">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-900/30 border border-green-500/30 rounded text-green-400 text-xs font-mono mb-6 uppercase tracking-widest">
+              <Radio className="w-3 h-3" /> Arquitectura Dual
+            </div>
+            <h2 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
+              Diseñado para Todos los Actores
+            </h2>
+            <p className="text-xl text-slate-400 max-w-4xl mx-auto leading-relaxed">
+              Civic Relay no es solo una herramienta de backend. Es una interfaz de supervivencia paramétrica que adapta su complejidad según el operador, garantizando que tanto ciudadanos bajo pánico como coordinadores tácticos puedan operar eficazmente.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
+            {/* Óptica Ciudadano */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="bg-slate-900 border border-slate-800 p-10 rounded-3xl"
+            >
+              <div className="flex items-center gap-4 mb-8">
+                <div className="p-4 bg-blue-500/20 rounded-full">
+                  <Users className="w-8 h-8 text-blue-400" />
+                </div>
+                <h3 className="text-3xl font-bold">Óptica: Ciudadano Aislado</h3>
+              </div>
+              <ul className="space-y-6 text-slate-300">
+                <li className="flex gap-4">
+                  <Check className="w-6 h-6 text-blue-500 shrink-0" />
+                  <span><strong>Interfaz de Un Solo Toque:</strong> Botones de emergencia gigantes para reportar SOS, incendios o necesidades médicas bajo alto estrés.</span>
+                </li>
+                <li className="flex gap-4">
+                  <Check className="w-6 h-6 text-blue-500 shrink-0" />
+                  <span><strong>Mesh Bluetooth Automático:</strong> El dispositivo se convierte en un relé silencioso sin requerir configuración técnica.</span>
+                </li>
+                <li className="flex gap-4">
+                  <Check className="w-6 h-6 text-blue-500 shrink-0" />
+                  <span><strong>Cola de Espera Resiliente (Store & Forward):</strong> Los mensajes se guardan cifrados localmente y se transmiten automáticamente cuando otro nodo pasa cerca.</span>
+                </li>
+              </ul>
+            </motion.div>
+
+            {/* Óptica Coordinador */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="bg-slate-900 border border-slate-800 p-10 rounded-3xl relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 p-8 opacity-10">
+                <Shield className="w-64 h-64 text-red-500" />
+              </div>
+              <div className="flex items-center gap-4 mb-8 relative z-10">
+                <div className="p-4 bg-red-500/20 rounded-full">
+                  <Activity className="w-8 h-8 text-red-400" />
+                </div>
+                <h3 className="text-3xl font-bold text-white">Óptica: Coordinación PM/PC</h3>
+              </div>
+              <ul className="space-y-6 text-slate-300 relative z-10">
+                <li className="flex gap-4">
+                  <Check className="w-6 h-6 text-red-500 shrink-0" />
+                  <span><strong>HUD Geospacial Táctico:</strong> Visualización de reportes triangulados en tiempo real con marcadores de confianza de origen.</span>
+                </li>
+                <li className="flex gap-4">
+                  <Check className="w-6 h-6 text-red-500 shrink-0" />
+                  <span><strong>Despacho Vía Constelación LEO:</strong> Capacidad de inyectar broadcasts de evacuación que descienden desde satélite a la malla terrestre.</span>
+                </li>
+                <li className="flex gap-4">
+                  <Check className="w-6 h-6 text-red-500 shrink-0" />
+                  <span><strong>Deduplicación Criptográfica:</strong> Filtra automáticamente miles de reportes del mismo evento en un único incidente acotado.</span>
+                </li>
+              </ul>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Differentiation & Competitors */}
       <section id="pitch" className="relative py-32 px-4 z-10">
         <div className="max-w-7xl mx-auto">

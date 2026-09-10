@@ -289,6 +289,10 @@ export function SatelliteVisualization() {
               <span>TERRESTRIAL MESH</span>
             </div>
             <div className="flex items-center gap-2">
+              <div className="w-3 h-0.5 bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
+              <span>CELLULAR FALLBACK</span>
+            </div>
+            <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)] animate-pulse" />
               <span>ACTIVE RELAY</span>
             </div>
