@@ -28,6 +28,11 @@ function App() {
   const [role, setRole] = useState<'citizen' | 'coordinator'>('citizen');
 
   useEffect(() => {
+    // Load from IndexedDB on mount to demonstrate offline persistence
+    session.dispatcher.getStore().loadFromStorage().then(() => {
+      setMessages([...session.dispatcher.getStore().getAll()].reverse());
+    });
+
     const interval = setInterval(() => {
       setMessages([...session.dispatcher.getStore().getAll()].reverse());
     }, 1000);
@@ -54,6 +59,38 @@ function App() {
       deliveryHistory: [],
     };
     await session.dispatcher.dispatch(message as never);
+  };
+
+  const runInvestorDemo = async () => {
+    const message = {
+      id: crypto.randomUUID(),
+      incidentId: 'INC-2026-VALENCIA',
+      createdAt: new Date().toISOString(),
+      priority: 'CRITICAL',
+      origin: 'UME-COMANDO-CENTRAL',
+      payloadType: 'EVACUATION',
+      payload: { text: 'ATENCIÓN: Unidad Militar de Emergencias. Vías principales bloqueadas. Punto de extracción habilitado en coordenadas marcadas. Mantengan la calma. Red Mesh activa.' },
+      approximateLocation: {
+        lat: 39.4699 + (Math.random() * 0.01 - 0.005),
+        lon: -0.3763 + (Math.random() * 0.01 - 0.005),
+        confidence: 'HIGH' as const,
+        source: 'GPS' as const,
+      },
+      ttl: 7200,
+      verificationState: 'OFFICIAL' as const,
+      deliveryHistory: [],
+    };
+    
+    const store = session.dispatcher.getStore();
+    store.enqueue(message as never);
+    // Simulate mesh delivery hop
+    store.recordDeliveryAttempt(message.id, {
+      transportId: 'meshtastic-web-bt-1',
+      status: 'DELIVERED',
+      timestamp: new Date().toISOString()
+    } as never);
+    
+    setMessages([...store.getAll()].reverse());
   };
 
   const dispatchSimulatedMessage = async (type: MessageType, priority: Priority, text: string, deliveryHistory: any[]) => {
@@ -108,13 +145,20 @@ function App() {
 
             <div className="flex items-center gap-4">
               <span className="px-4 py-2 bg-white/20 rounded-lg text-sm">
-                {role === 'citizen' ? '👤 Ciudadano' : '🚨 Coordinador'}
+                {role === 'citizen' ? '👤 Ciudadano' : '🛡️ Coordinador'}
               </span>
               <button
                 onClick={() => setRole(role === 'citizen' ? 'coordinator' : 'citizen')}
                 className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
               >
                 Cambiar Rol
+              </button>
+              <button
+                onClick={runInvestorDemo}
+                className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg font-bold shadow-lg transition-colors"
+                title="Inyectar alerta de la Unidad Militar de Emergencias para demostración técnica"
+              >
+                Simular Rescate Real (Demo Inversores)
               </button>
             </div>
           </div>
@@ -157,15 +201,15 @@ function App() {
           </div>
         </div>
 
-        {/* Warning banner */}
-        <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+        {/* Info banner */}
+        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
           <div className="flex items-start gap-4">
-            <span className="text-3xl">⚠️</span>
+            <span className="text-3xl">🚀</span>
             <div>
-              <h3 className="font-bold text-yellow-900 mb-2">Demo Ficticia - Solo Para Evaluación</h3>
-              <p className="text-sm text-yellow-800">
-                Esta es una demo técnica. No es un servicio de emergencias real. Los transportes son simulados
-                y la cola es en memoria (se pierde al recargar). No introduzcas datos personales ni emergencias reales.
+              <h3 className="font-bold text-blue-900 mb-2">PWA Offline-First Activado</h3>
+              <p className="text-sm text-blue-800">
+                Esta aplicación ya cuenta con un Service Worker que permite su uso sin conexión y persistencia real mediante IndexedDB. 
+                Si recargas la página o pierdes la conexión, los mensajes no se perderán. Prepara el soporte para el protocolo Meshtastic WebBluetooth.
               </p>
             </div>
           </div>

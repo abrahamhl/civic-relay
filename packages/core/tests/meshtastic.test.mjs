@@ -24,7 +24,7 @@ test('Meshtastic Integration: Stub test for GATT Proxy', async (t) => {
     deliveryHistory: []
   };
 
-  const result = await transport.send(message as any);
+  const result = await transport.send(message);
   
   // The current stub behavior in MeshtasticWebBluetoothTransport when not connected
   // simulates acceptance into the local buffer (since it's a stub).
