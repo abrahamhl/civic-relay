@@ -34,3 +34,6 @@ coverage/
 
 .vercel
 .env*
+
+# pnpm temp files
+_tmp_*
