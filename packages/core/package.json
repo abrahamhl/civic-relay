@@ -18,6 +18,7 @@
   "dependencies": {
     "@civic-relay/schemas": "workspace:*",
     "@civic-relay/transports": "workspace:*",
+    "idb-keyval": "^6.3.0",
     "libsodium-wrappers-sumo": "^0.8.4"
   },
   "devDependencies": {

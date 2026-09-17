@@ -1,19 +1,56 @@
 import { DeliveryAttemptSchema, type MessageEnvelope, type DeliveryAttempt } from '@civic-relay/schemas';
 import { CryptoManager } from './crypto.js';
 import { assertSameMessage, isExpired, parseUntrustedMessage } from './envelope.js';
+import { get, set, createStore, UseStore } from 'idb-keyval';
 
 export type DeliveryState = 'QUEUED' | 'ACKNOWLEDGED' | 'DELIVERED' | 'EXPIRED';
 
 /**
- * Session-memory sender store only. A page reload loses messages, acknowledgments,
- * history and ID-conflict protection; no persistence is claimed.
+ * Message store with IndexedDB persistence for offline-first capabilities.
  */
 export class MessageStore {
   private readonly messages = new Map<string, MessageEnvelope>();
   private readonly states = new Map<string, DeliveryState>();
   private readonly acknowledgments = new Map<string, Set<string>>();
+  private readonly idbStore?: UseStore;
 
-  constructor(private readonly now: () => number = Date.now) {}
+  constructor(private readonly now: () => number = Date.now) {
+    if (typeof indexedDB !== 'undefined') {
+      this.idbStore = createStore('civic-relay-db', 'message-store');
+    }
+  }
+
+  async loadFromStorage(): Promise<void> {
+    if (!this.idbStore) return;
+    try {
+      const storedMessages = await get<MessageEnvelope[]>('messages', this.idbStore);
+      const storedStates = await get<[string, DeliveryState][]>('states', this.idbStore);
+      const storedAcks = await get<[string, string[]][]>('acks', this.idbStore);
+      
+      if (storedMessages) {
+        for (const m of storedMessages) this.messages.set(m.id, m);
+      }
+      if (storedStates) {
+        for (const [k, v] of storedStates) this.states.set(k, v);
+      }
+      if (storedAcks) {
+        for (const [k, v] of storedAcks) this.acknowledgments.set(k, new Set(v));
+      }
+    } catch (e) {
+      console.warn('Failed to load MessageStore from IndexedDB', e);
+    }
+  }
+
+  private persist(): void {
+    if (!this.idbStore) return;
+    try {
+      set('messages', Array.from(this.messages.values()), this.idbStore).catch(() => {});
+      set('states', Array.from(this.states.entries()), this.idbStore).catch(() => {});
+      set('acks', Array.from(this.acknowledgments.entries()).map(([k, v]) => [k, Array.from(v)]), this.idbStore).catch(() => {});
+    } catch (e) {
+      console.warn('Failed to persist MessageStore to IndexedDB', e);
+    }
+  }
 
   enqueue(input: unknown): MessageEnvelope {
     const message = parseUntrustedMessage(input, this.now());
@@ -30,6 +67,8 @@ export class MessageStore {
     this.messages.set(message.id, message);
     this.states.set(message.id, 'QUEUED');
     this.acknowledgments.set(message.id, new Set());
+    
+    this.persist();
     return structuredClone(message);
   }
 
@@ -76,6 +115,8 @@ export class MessageStore {
     if (!message) return;
     const validated = DeliveryAttemptSchema.parse(attempt);
 
+    let changed = false;
+
     if (validated.status === 'DELIVERED') {
       this.acknowledgments.get(messageId)?.add(validated.transportId);
       const previous = message.deliveryHistory.findIndex(
@@ -87,10 +128,13 @@ export class MessageStore {
       if (current !== 'DELIVERED' && current !== 'EXPIRED') {
         this.states.set(messageId, 'ACKNOWLEDGED');
       }
-      return;
+      changed = true;
+    } else {
+      message.deliveryHistory.push(validated);
+      changed = true;
     }
 
-    message.deliveryHistory.push(validated);
+    if (changed) this.persist();
   }
 
   /** Complete only after the receiver acknowledges at least the route count requested. */
@@ -98,7 +142,10 @@ export class MessageStore {
     const id = this.messages.get(messageId)?.id;
     if (!id || this.states.get(id) === 'EXPIRED') return;
     if ((this.acknowledgments.get(id)?.size ?? 0) >= requiredAcknowledgments) {
-      this.states.set(id, 'DELIVERED');
+      if (this.states.get(id) !== 'DELIVERED') {
+        this.states.set(id, 'DELIVERED');
+        this.persist();
+      }
     }
   }
 
@@ -111,6 +158,7 @@ export class MessageStore {
         expired++;
       }
     }
+    if (expired > 0) this.persist();
     return expired;
   }
 }

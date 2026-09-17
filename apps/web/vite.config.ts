@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -7,6 +8,22 @@ export default defineConfig({
   base: './',
   plugins: [
     react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      manifest: {
+        name: 'Civic Relay',
+        short_name: 'Civic Relay',
+        description: 'Offline-first crisis communication engine',
+        theme_color: '#000000',
+        background_color: '#ffffff',
+        display: 'standalone'
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        maximumFileSizeToCacheInBytes: 5000000
+      }
+    }),
     {
       name: 'security-headers',
       configureServer(server) {
