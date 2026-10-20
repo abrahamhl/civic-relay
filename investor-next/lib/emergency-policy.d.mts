@@ -7,5 +7,5 @@ export declare function capabilityState(p?:{supported?:boolean;restricted?:boole
 export declare function recordSafetyResponse(p:{response:SafetyResponse;now?:number;retentionSeconds?:number;shareLocation?:boolean;location?:unknown;consented?:boolean}):SafetyRecord;
 export declare function revokeSafetyRecord(r:SafetyRecord):SafetyRecord;
 export declare function expireSafetyRecord(r:SafetyRecord,now?:number):SafetyRecord;
-export declare function energyPolicy(battery:number,alertActive:boolean):{profile:'NORMAL'|'ALERT'|'CONSERVATION'|'CRITICAL';discoverySeconds:number;retrySeconds:number;relay:boolean;systemBatterySaverChanged:false;measurements:'NOT_MEASURED'};
+export declare function energyPolicy(battery:number,alertActive:boolean):{profile:'NORMAL'|'ALERT'|'CONSERVATION'|'CRITICAL';discoverySeconds:number;discoveryIntervalSeconds:number;retrySeconds:number;relay:boolean;systemBatterySaverChanged:false;measurements:'NOT_MEASURED'};
 export declare function acceptAuthorizedCapAlert(alert:unknown,verifyIssuer:(alert:unknown)=>Promise<{authenticated:boolean;trustAnchorId:string}|false>,options?:{now?:number}):Promise<unknown>;
