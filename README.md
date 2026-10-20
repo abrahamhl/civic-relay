@@ -1,80 +1,49 @@
-# Civic Relay Demo (V0.1)
+# Civic Relay — offline-first crisis messaging research prototype
 
-Demo ficticia de comunicación en crisis, offline-first y de transporte múltiple, diseñada como ejercicio de ingeniería para entornos de conectividad degradada.
+**Status:** browser-based research demonstration, **not an emergency service**. No live responder, governmental, satellite, Bluetooth mesh or carrier infrastructure is connected.
 
-> ⚠️ No es un servicio de emergencias. No hay aval institucional, conformidad ENS ni prestación operativa. Todo el transporte es **simulado en la misma página** y la cola es **en memoria** (se pierde al recargar). No introduzcas datos personales ni emergencias reales.
+This repository explores how a message can be prepared, retained locally, routed through **simulated** links and marked as delivered **only after a simulated receiver acknowledgment**. It is not safe for real incidents or personal information.
 
-🌐 **Demo en vivo:** 
-- **Producción (Vercel):** https://civic-relay.vercel.app _(recomendado)_
-- **GitHub Pages:** https://abrahamhl.github.io/civic-relay/
+## Demo & source
+- [Production site (may run an older release)](https://civic-relay.vercel.app/)
+- [Source repository](https://github.com/abrahamhl/civic-relay)
+- [Human Story Mode and EN/ES/NL lab — change proposal](https://github.com/abrahamhl/civic-relay/pull/2)
 
-## Qué demuestra
+## What this implementation includes
+- Seven-step **Human Story Mode** describing network outage → local queue → hypothetical route → fictional receiver ACK → field-validation gap.
+- Investor landing with traceable capability boundaries instead of fabricated satellite throughput, official dispatch or certification.
+- Shared **EN / ES / NL** selector on landing and laboratory, persisted in browser storage and URL `?lang=en|es|nl`.
+- Core in-page routing simulator with deterministic receiver acknowledgment and deduplication logic.
+- IndexedDB-backed message store in supported browsers; **browser storage can be unavailable or deleted**.
+- Vite/PWA configuration that can cache the application shell; embedded maps and remote resources are not guaranteed to work offline.
 
-- **Transporte múltiple** – un mensaje puede propagarse por varias rutas simuladas.
-- **Almacenar y reenviar** – si no hay rutas, el mensaje queda en cola (`QUEUED`) hasta que aparezcan.
-- **Canalización** – `MESSAGE → STORE → ROUTE → MULTIPATH → DEDUP → ACK`.
-- **Deduplicación real** – el mismo sobre entregado por dos rutas produce **un** mensaje lógico que retiene ambas rutas.
-- **Límites honestos** – separa explícitamente lo simulado de lo no probado.
+## Run locally
+Requirements: Node.js supported by this workspace and Corepack.
 
-## Ejecutar
-
-### Desarrollo local
 ```bash
+corepack enable
 pnpm install --frozen-lockfile
-pnpm dev          # Desarrollo en http://localhost:3000
-pnpm build        # Build producción
-pnpm test         # Tests
-pnpm lint         # Type-check
+pnpm build
+pnpm type-check
+pnpm test
+pnpm dev
 ```
 
-### Deploy a Vercel (Producción)
-```bash
-# Opción 1: CLI (rápido)
-npm install -g vercel
-vercel            # Deploy preview
-vercel --prod     # Deploy producción
+The web app is at `apps/web` and runs on `http://localhost:3000`. Production build output is `apps/web/dist` (this is **not** a Next.js app).
 
-# Opción 2: Script automatizado (recomendado)
-.\scripts\deploy.ps1           # Windows
-./scripts/deploy.sh preview    # Linux/Mac
-```
+## Limits and safety
+- **Real transports:** unavailable. All IP, mesh and cellular paths in the lab are same-page mocks.
+- **Satellite:** conceptual graphic only; no real uplink, relay gateway or satellite API.
+- **Official messages:** no identity proof and no governmental agreement; all newly created lab reports are unverified.
+- **Encryption:** do not claim deployed or audited E2E protection.
+- **Reliability:** browser storage, background operations, route discovery, power loss, accessibility and field tests need independent validation.
+- **Offline:** the interface may be cached after a successful online load, but browser storage and tile availability are not guaranteed.
+- **License:** MIT. Forking and modification are permitted under its terms; a permissive OSS license is not anti-copy protection.
 
+## Verification
+CI runs `pnpm build`, `pnpm type-check` and `pnpm test`. This demonstrates basic build/integration health, **not** emergency-grade assurance, penetration testing, device-to-device links or compliance certification.
 
-Servir la demo estática desde `apps/web/dist`. La API y el servicio reales **no** se exponen en esta demo.
+See [Story Mode delivery brief](docs/STORY_MODE_DELIVERY_2026-10-20.md) for manual acceptance checks, field-trial prerequisites and further engineering tasks.
 
-## Pruebas
-
-`packages/core/tests/*.test.mjs` (runner nativo de Node) cubre:
-
-- escenario dorado offline → mesh → later IP → receptor único → 2 rutas;
-- recepción **sin** acknowledgment del receptor → nunca `DELIVERED`;
-- TTL caducado rechazado antes de rutar;
-- `verificationState=OFFICIAL` forjado, sobre malformado y colisión de ID rechazados;
-- mismo mensaje por dos rutas → un mensaje con ambas rutas;
-- una ruta que falla no bloquea una ruta sana.
-
-## Límites conocidos
-
-- La cola, el historial y la deduplicación son **de sesión** (memoria).
-- No hay cifrado extremo a extremo en el flujo de la demo; las primitivas criptográficas existen pero son experimentales y no están conectadas al despacho.
-- No se registra ningún service worker ni PWA; el manifiesto es mínimo.
-- No hay backend productivo, autenticación, autorización ni sistema de emergencias.
-
-## Documentación
-
-### Técnica
-- [`docs/AUDITORIAS_INVERSION_PUBLICA.md`](docs/AUDITORIAS_INVERSION_PUBLICA.md) – cinco auditorías técnicas y delegaciones de responsabilidad
-- [`docs/RELEASE_TRUTH_V0_1.md`](docs/RELEASE_TRUTH_V0_1.md) – verificación ejecutada (instalación/build/test/lint) vs. afirmaciones
-- [`docs/ASTRA_RED_TEAM.md`](docs/ASTRA_RED_TEAM.md) – revisión adversarial de liberación
-- [`docs/CRYPTO_ARCHITECTURE.md`](docs/CRYPTO_ARCHITECTURE.md) – criptografía experimental
-- [`docs/WORKWIZE_CASE_STUDY.md`](docs/WORKWIZE_CASE_STUDY.md) – caso para entrevista
-
-## Autor
-
-Abraham Haddioui · AI-native product engineer · proyecto asistido por IA.
-
-## Licencia
-
-MIT.
-
-Este repositorio es una **demo ficticia** para evaluación y aprendizaje. No está pensado para uso en emergencias reales ni para su adquisición operativa en su estado actual.
+## Copyright & contact
+© 2026 Abraham Haddioui. Licensed under MIT. Do not represent the demo as an endorsed official public warning channel.
