@@ -152,7 +152,13 @@ export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAtt
       r.envelope=null;r.status='REVOKED';r.nextAttemptAt=null;
       audit(id,'REVOKED','Exercise payload cleared');return true;
     },
-    purge(id){const deleted=records.delete(id);if(deleted){for(let i=events.length-1;i>=0;i--)if(events[i].id===id)events.splice(i,1);}return deleted;},
+    purge(id){const r=records.get(id);if(!r)return false;
+      // Wipe local sensitive references before detaching the record from its map.
+      r.envelope=null;r.status='REVOKED';r.nextAttemptAt=null;
+      records.delete(id);
+      for(let i=events.length-1;i>=0;i--)if(events[i].id===id)events.splice(i,1);
+      return true;
+    },
     inspect(id){const r=records.get(id);if(r)expire(r);return view(r);},
     snapshot(){return [...records.values()].map(r=>{expire(r);return view(r);});},
     audit(){return json(events);}
