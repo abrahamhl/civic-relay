@@ -16,12 +16,12 @@ export default function MissionControl({locale}:{locale:Locale}) {
   return (
     <div className="mission-console" aria-label="Interactive conceptual crisis communication simulator">
       <div className="console-top">
-        <span className="console-heading"><i className="indicator"/> {t.top} <b>/</b> ROUTING MODEL</span>
+        <span className="console-heading"><i className="indicator"/> {t.top} <b>/</b> {t.modelLabel}</span>
         <span className="console-tag">{t.synthetic}</span>
       </div>
       <div className="globe-stage">
         <div className="vertical-ruler" aria-hidden="true">90° N <span>45° N</span><span>00°</span><span>45° S</span> 90° S</div>
-        <svg className="planet-art" viewBox="0 0 730 600" role="img" aria-label="Stylized Earth with illustrative mesh links, satellites, and a hypothetical emergency location">
+        <svg className="planet-art" viewBox="0 0 730 600" role="img" aria-label={t.svgAlt}>
           <defs>
             <radialGradient id="globeGradient" cx="27%" cy="29%" r="76%">
               <stop offset="0" stopColor="#1b3f59"/>
@@ -64,7 +64,7 @@ export default function MissionControl({locale}:{locale:Locale}) {
         </svg>
         <div className="globe-floating left-floating"><span>{t.threat}</span><strong>{t.threatValue}</strong><small>Scenario: simulated</small></div>
         <div className="globe-floating right-floating"><span>{t.route}</span><strong className={hasRoute?'online':'offline'}>{hasRoute?t.routeOn:t.routeOff}</strong><small>{t.routeNote}</small></div>
-        <div className="stage-coordinate">51.9808° N&nbsp; / &nbsp;5.9114° E <span>REFERENCE COORDINATES</span></div>
+        <div className="stage-coordinate">51.9808° N&nbsp; / &nbsp;5.9114° E <span>{t.reference}</span></div>
       </div>
       <div className="console-bottom">
         <div className="console-section-title"><span>01 / {t.conditions}</span><span>{t.select} ↓</span></div>
