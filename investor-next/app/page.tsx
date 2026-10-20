@@ -1,4 +1,5 @@
 import MissionControl from './mission-control';
+import ScrollExperience from './scroll-experience';
 
 const source='https://github.com/abrahamhl/civic-relay';
 const demo='https://civic-relay-kvg9qgsuv-2fabraham-7129s-projects.vercel.app';
@@ -22,16 +23,13 @@ export default function Page(){
     <h1>WHEN THE<br/><span className="heading-muted">NETWORK</span><br/><span className="heading-urgent">GOES DARK<span className="full-stop">.</span></span></h1>
     <div className="hero-divider"><span>COMMUNICATION MUST ENDURE</span><span>↓ SCROLL TO EXPLORE</span></div>
     <p className="hero-lede">Resilient crisis messaging, designed for the moment infrastructure fails. <strong>Offline-first. Verifiable. Open source.</strong></p>
-    <div className="hero-actions"><a className="button-primary" href={demo} target="_blank" rel="noopener noreferrer">OPEN ENGINE DEMO <span>↗</span></a><a className="button-outline" href="#architecture">EXPLORE TECHNOLOGY <span>↘</span></a></div>
+    <div className="hero-actions"><a className="button-primary" href={demo} target="_blank" rel="noopener noreferrer">OPEN ENGINE DEMO <span>↗</span></a><a className="button-outline" href="#architecture">ENTER THE 5-STAGE MISSION <span>↘</span></a></div>
     <div className="proof-rail"><div><span className="proof-circle"/> SIMULATOR VERIFIED IN SOFTWARE TESTS</div><div>HARDWARE INTEGRATION <b>NOT YET VALIDATED</b></div></div>
    </div>
    <MissionControl/>
   </section>
   <div className="ribbon"><div className="container ribbon-inner"><span>MISSION / CIVIC RELAY</span><strong>CRITICAL MESSAGES. RESILIENT PATHS. VERIFIED RECEIPTS.</strong><span>RESEARCH PROTOTYPE · NO LIVE NETWORK</span></div></div>
-  <section id="architecture" className="architecture container">
-   <div className="section-heading"><div><p className="eyebrow">01 / CORE ARCHITECTURE</p><h2>ENGINEERED FOR<br/><em>THE UNEXPECTED.</em></h2></div><p>Not a promise of universal coverage. A testable foundation for communication when conventional connectivity becomes unreliable.</p></div>
-   <div className="features">{features.map(f=><article className="feature" key={f.n}><div className="feature-index"><span>{f.n} / 03</span><span>↗</span></div><div className="feature-sigil" aria-hidden="true"><i/><i/><i/></div><p className="feature-label">{f.label}</p><h3>{f.title}</h3><p className="feature-text">{f.text}</p></article>)}</div>
-  </section>
+  <ScrollExperience/>
   <section id="roadmap" className="roadmap-band"><div className="container roadmap-inner">
    <div className="roadmap-intro"><p className="eyebrow">02 / DEVELOPMENT PROGRAM</p><h2>FROM PROTOTYPE<br/>TO <em>FIELD PROOF.</em></h2><p>The first milestone is software behavior. The next requires devices, first responders and institutional partners.</p><a className="text-cta" href={source+'/blob/feat/eu-resilience-investor-mvp-2026/docs/PRODUCT_EU_2026.md'} target="_blank" rel="noopener noreferrer">READ THE TECHNICAL DOSSIER ↗</a></div>
    <div className="roadmap-steps">
