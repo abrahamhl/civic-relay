@@ -10,7 +10,7 @@ export interface LabAdapter {id:string;kind:'SIMULATOR_ADAPTER';evidence:'SIMULA
  describe():Promise<{available:boolean;permitted:boolean;compatible:boolean;secure:boolean;
  reliability:number;latencyMs:number;energyCost:number;monetaryCost:number;capacity:number}>;
  send(envelope:LabMessage):Promise<{accepted:boolean;receipt?:{kind:string;messageId:string;transportId:string}}>;
- getReceived():LabMessage[]}
+ getReceived():Array<{id:string;provenance:'SYNTHETIC_EXERCISE_ONLY'}>}
 export interface LabEngine {
  registerAdapter(adapter:LabAdapter):void;enqueue(message:LabMessage):LabStatusRecord;
  dispatch(id:string):Promise<LabStatusRecord>;retryDue():Promise<LabStatusRecord[]>;
