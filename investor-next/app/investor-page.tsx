@@ -19,7 +19,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
   <LanguageDocument locale={locale}/>
   <div className="global-grid" aria-hidden="true"/>
   <header className="topbar container">
-   <a className="wordmark" href="#top" aria-label="Proyecto de comunicaciones por satélite para emergencias offline"><span className="mark-symbol"><span/><span/><span/></span><span className="new-project-name">Proyecto de comunicaciones por satélite para emergencias offline</span></a>
+   <a className="wordmark" href="#top" aria-label="OEP — Offline Emergency Protocol"><span className="mark-symbol"><span/><span/><span/></span><span className="new-project-name">OEP — Offline Emergency Protocol</span></a>
    <div className="topbar-center"><span className="pulse"/><span>EUROPEAN CIVIL RESILIENCE</span><span className="topbar-year">/ 2026</span></div>
    <nav aria-label={t.nav.language}><a href="#story">{t.nav.experience}</a><a href="#solution">{t.nav.solution}</a><a href="#investment">{t.nav.invest}</a><a className="topbar-source" href={source} target="_blank" rel="noopener noreferrer">{t.nav.source} ↗</a></nav>
    <div className="locale-links" role="group" aria-label={t.nav.language}>
@@ -37,7 +37,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
    </div>
    <MissionControl locale={locale}/>
   </section>
-  <div className="ribbon"><div className="container ribbon-inner"><span>MASTER ROUTING / INTEROPERABLE EMERGENCY COORDINATION</span><strong>{t.hero.line}</strong><span>2026 / OPEN SOURCE R&D</span></div></div>
+  <div className="ribbon"><div className="container ribbon-inner"><span>OEP / INTEROPERABLE OFFLINE EMERGENCY COORDINATION</span><strong>{t.hero.line}</strong><span>2026 / OPEN SOURCE R&D</span></div></div>
   <CrisisStory locale={locale}/>
   <ScrollExperience locale={locale}/>
   <CoordinationLab locale={locale}/>
@@ -68,6 +68,6 @@ export default function InvestorPage({locale}:{locale:Locale}){
    </div>
    <div className="closing-actions"><a className="button-primary" href={contact} target="_blank" rel="noopener noreferrer">{t.closing.contact} <span>↗</span></a><a className="button-outline" href={funding} target="_blank" rel="noopener noreferrer">{t.closing.funding} <span>↗</span></a><a className="text-cta" href={source} target="_blank" rel="noopener noreferrer">{t.closing.source} ↗</a></div>
   </section>
-  <footer className="footer"><div className="container footer-inner"><span className="footer-brand">Proyecto de comunicaciones por satélite para emergencias offline <small>© 2026</small></span><span>{t.footer}</span><a href="#top">↑ TOP</a></div></footer>
+  <footer className="footer"><div className="container footer-inner"><span className="footer-brand">OEP — Offline Emergency Protocol <small>© 2026</small></span><span>{t.footer}</span><a href="#top">↑ TOP</a></div></footer>
  </main>;
 }
