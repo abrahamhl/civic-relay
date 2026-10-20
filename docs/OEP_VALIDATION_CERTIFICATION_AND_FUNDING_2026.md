@@ -80,3 +80,17 @@ Official Horizon portal: https://ec.europa.eu/info/funding-tenders/opportunities
 
 ### Funding-agent relevance rubric (mandatory)
 Classify every lead **ACTIVE ELIGIBLE / ACTIVE CONDITIONAL / FUTURE / CLOSED / NOT A GRANT / CERTIFICATION PATH**. Require: official URL, topic ID, call status, exact date and timezone, product fit, legal applicant requirements, funding and co-financing, proof of consortium, current TRL, blocker, one *verifiable* next action, retrieved date. Never fill unknown fields with plausible figures. Rank speed-to-next-action, not grant amount alone. Do not treat a standard, security test, pre-assessment, independent exercise or technical open-source licence as a granted certificate.
+
+### Netherlands and Gelderland — early-stage funding realism (21 October 2026)
+
+| Programme | Status | Relevance | Critical blocking conditions | Source |
+| --- | --- | --- | --- | --- |
+| RVO Vroegefasefinanciering (VFF) / Proof-of-concept Funding | **OPEN for 2026**; LOAN, not grant | Potential measured OEP technical proof of concept and business plan | SME or innovative startup, investor letter of intent covering continuation at least matching requested funding; project economics, registration and non-started phase conditions; **interest-bearing debt risk** | https://english.rvo.nl/subsidies-financing/proof-concept-funding/conditions/innovative-startups |
+| Oost NL venture/investment funds | **Intake possible**, investment not grant | Regional technology venture introductions if company will be based in Gelderland/Overijssel | Company status, location and sector fit, investment readiness, investor governance | https://oostnl.nl/en/investing |
+| Oost NL VFF Gelderland | **CLOSED since 2025** | Historical regional fund, not a 2026 application | Do NOT apply to expired regional fund; investigate national VFF | https://oostnl.nl/producten/vroegefasefinanciering-gelderland |
+| EFRO Oost Innovatieprojecten 2026 | **CLOSED 30 Sep 2026** according to application interval | Potential *future* regional partnership track | Original programme targets collaboration at TRL 4–8; cannot claim funding available after expiry | https://www.efro-oost.eu/innovatieprojecten-2026 |
+| MIT Haalbaarheidsprojecten Gelderland 2026 | Opening 7 Apr 2026; **check 2027 follow-up**, first-day exhaustion reported | Earlier-stage research feasibility for registered SME, may fit future call | 2026 funding likely exhausted, not a current quick grant | https://oostnl.nl/nieuws-overzicht/breng-de-haalbaarheid-van-je-innovatie-in-kaart-met-mit-subsidie |
+
+**Capital discipline:** OEP presently needs small verified experiments and end-user discovery rather than debt-financed large-scale productisation. Do not describe a LOAN as a non-repayable grant or push debt-financed schemes without cash-flow and legal review. RVO VFF quickscan is an exploratory application step, not a grant award.
+
+**Documentation needed before any submission:** applicant legal identity and registration, budget and own funds, demonstration link with immutable source SHA, safety and privacy risk register, consortium-partner letters, pilot validation protocol and evidence, target call requirements. Absence must be marked NOT VERIFIED.
