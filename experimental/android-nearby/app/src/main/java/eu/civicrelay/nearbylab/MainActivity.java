@@ -69,7 +69,7 @@ public final class MainActivity extends Activity {
         scroll.addView(body);
         setContentView(scroll);
         TextView heading = new TextView(this);
-        heading.setText("CIVIC RELAY — TWO PHONE EXPERIMENT\nNO REAL SOS • NO 112 • NO LOCATION");
+        heading.setText("OEP — TWO PHONE EXPERIMENT\nNO REAL SOS • NO 112 • NO LOCATION");
         heading.setTextSize(19);
         body.addView(heading);
         addButton(body, "1. I CONSENT TO THE EXPERIMENT", () -> {
@@ -192,7 +192,7 @@ public final class MainActivity extends Activity {
                     .setMessage("Discovered: " + info.getEndpointName() +
                         "\nAnother confirmation with matching digits will follow.")
                     .setPositiveButton("Request", (d, which) ->
-                        connections.requestConnection("Civic Relay Lab", endpointId, lifecycle)
+                        connections.requestConnection("OEP Offline Lab", endpointId, lifecycle)
                             .addOnFailureListener(e -> log("Request failed: " + e.getClass().getSimpleName())))
                     .setNegativeButton("Ignore", (d, which) -> {})
                     .show();
@@ -202,7 +202,7 @@ public final class MainActivity extends Activity {
     };
 
     private void advertise() {
-        connections.startAdvertising("Civic Relay Lab", SERVICE_ID, lifecycle,
+        connections.startAdvertising("OEP Offline Lab", SERVICE_ID, lifecycle,
                 new AdvertisingOptions.Builder().setStrategy(STRATEGY).build())
             .addOnSuccessListener(v -> log("Advertising LAB receiver; no radios toggled by app."))
             .addOnFailureListener(e -> log("Advertising unavailable: " + e.getClass().getSimpleName() +
