@@ -31,7 +31,7 @@ test('offline without gateway queues every explicit message',()=>{
 test('critical battery never relays an intermediate device',()=>{
  const r=runScenario({participation:100,permissions:100,damaged:100,battery:5,
    responses:15,helpRequests:2});
- for(const route of r.routes)for(const intermediary of route.path.slice(1,-2))
+ for(const route of r.routes)for(const intermediary of route.path.slice(1,-1))
    assert.equal(r.devices.find(d=>d.id===intermediary)?.energy==='CRITICAL',false);
 });
 test('simulation never claims institutional authenticity or physical delivery',()=>{
