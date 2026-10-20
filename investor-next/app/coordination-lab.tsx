@@ -95,9 +95,7 @@ export default function CoordinationLab({locale}:{locale:Locale}){
  const result=useMemo(()=>runScenario(params),[params]);
  const s=result.summary;
  const set=(key:keyof ScenarioParameters,value:number|boolean)=>setParams(prev=>({...prev,[key]:value}));
- const ranges:[
-  [keyof ScenarioParameters,string,number,number,number,string?][]
- = [
+ const ranges: [keyof ScenarioParameters,string,number,number,number,string?][] = [
   ['devices',w.devices,20,100,1],
   ['participation',w.participants,0,100,5,'%'],
   ['permissions',w.permissions,0,100,5,'%'],
