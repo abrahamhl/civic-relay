@@ -78,7 +78,7 @@ export function makeEvidenceReport(){
    'The abstract range is normalised graph distance and not a measured Bluetooth or Wi-Fi range.',
    'Synthetic ACKs confirm virtual receipt in the model, not successful RF transmission.',
    'No measured physical power, latency, reliability, location or emergency response outcome.',
-   'Test sweep checks defined invariants only; it is not formal verification, a safety certificate or independent audit.',
+   'Test sweep checks defined invariants only; it is not a safety certificate, formal verification or an independent audit.',
    'Security review, two-phone field data and third-party validation remain separate gates.'
   ]
  };
