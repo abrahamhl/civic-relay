@@ -12,7 +12,8 @@ export function WhatItDoes({locale}:{locale:Locale}){
    <div className="oep-brief-intro">
     <p className="eyebrow">{t.eyebrow}</p>
     <h2 id="oep-brief-title">{t.heading}</h2>
-    <p className="oep-brief-lead">{t.summary.replace(/<\/?strong>/g,'')}</p>
+    <p className="oep-brief-lead">{t.summary.split(/<\/?strong>/).map((part,i)=>
+     i===1?<strong key={i}>{part}</strong>:<span key={i}>{part}</span>)}</p>
     <p className="oep-brief-accent"><span aria-hidden="true">↗</span>{t.accent}</p>
    </div>
    <div className="oep-brief-grid">{t.features.map(feature=>
