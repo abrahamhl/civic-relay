@@ -1,13 +1,14 @@
 import MissionControl from './mission-control';
 import ScrollExperience from './scroll-experience';
 import CrisisStory from './crisis-story';
+import CoordinationLab from './coordination-lab';
 import {getCopy,labels,locales,type Locale} from './copy';
 import LanguageDocument from './language-document';
 
 const source='https://github.com/abrahamhl/civic-relay';
 const demo='https://civic-relay-4zbvbbxxm-2fabraham-7129s-projects.vercel.app';
 const funding='https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-CL3-2026-01-SSRI-04';
-const dossier=source+'/blob/feat/eu-resilience-investor-mvp-2026/docs/PRODUCT_EU_2026.md';
+const dossier=source+'/blob/feat/master-emergency-routing-v1-20261020/docs/MASTER_EMERGENCY_ROUTING_2026.md';
 const contact=source+'/issues/new';
 
 export default function InvestorPage({locale}:{locale:Locale}){
@@ -37,6 +38,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
   <div className="ribbon"><div className="container ribbon-inner"><span>MISSION / EMERGENCY SATELLITE COMMUNICATIONS</span><strong>{t.hero.line}</strong><span>2026 / OPEN SOURCE R&D</span></div></div>
   <CrisisStory locale={locale}/>
   <ScrollExperience locale={locale}/>
+  <CoordinationLab locale={locale}/>
   <section id="solution" className="product-section container">
    <div className="product-title-block">
     <div><p className="eyebrow">{t.solution.eyebrow}</p><h2>{t.solution.title}</h2><p className="product-subhead">{t.solution.lead}</p></div>
