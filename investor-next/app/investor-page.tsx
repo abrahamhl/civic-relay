@@ -2,6 +2,7 @@ import MissionControl from './mission-control';
 import ScrollExperience from './scroll-experience';
 import CrisisStory from './crisis-story';
 import CoordinationLab from './coordination-lab';
+import EvidenceBoard from './evidence-board';
 import {routingPitch} from './routing-pitch';
 import {getCopy,labels,locales,type Locale} from './copy';
 import LanguageDocument from './language-document';
@@ -41,6 +42,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
   <CrisisStory locale={locale}/>
   <ScrollExperience locale={locale}/>
   <CoordinationLab locale={locale}/>
+  <EvidenceBoard locale={locale}/>
   <section id="solution" className="product-section container">
    <div className="product-title-block">
     <div><p className="eyebrow">{t.solution.eyebrow}</p><h2>{pitch.title}</h2><p className="product-subhead">{pitch.lead}</p></div>
