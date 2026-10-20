@@ -39,8 +39,11 @@ jobs:
           mkdir -p "$RUNNER_TEMP/oep-jvm"
           javac --release 17 -d "$RUNNER_TEMP/oep-jvm" \
             experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/LabDeliveryGuard.java \
-            experimental/android-nearby/app/src/test/java/eu/civicrelay/nearbylab/LabDeliveryGuardTest.java
+            experimental/android-nearby/app/src/test/java/eu/civicrelay/nearbylab/LabDeliveryGuardTest.java \
+            experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/LabTrialJournal.java \
+            experimental/android-nearby/app/src/test/java/eu/civicrelay/nearbylab/LabTrialJournalTest.java
           java -cp "$RUNNER_TEMP/oep-jvm" eu.civicrelay.nearbylab.LabDeliveryGuardTest
+          java -cp "$RUNNER_TEMP/oep-jvm" eu.civicrelay.nearbylab.LabTrialJournalTest
       - name: Compile debug APK without connecting to emergency services
         working-directory: experimental/android-nearby
         run: gradle :app:assembleDebug --no-daemon --stacktrace
