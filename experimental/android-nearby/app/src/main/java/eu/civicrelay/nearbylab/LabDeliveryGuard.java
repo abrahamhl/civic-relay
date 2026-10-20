@@ -49,8 +49,12 @@ public final class LabDeliveryGuard {
     }
 
     /** Late transport errors must not cancel a newer message. */
-    public synchronized void abortOutgoing(String id) {
-        if (pendingId != null && pendingId.equals(id)) clearOutgoing();
+    public synchronized boolean abortOutgoing(String id) {
+        if (pendingId != null && pendingId.equals(id)) {
+            clearOutgoing();
+            return true;
+        }
+        return false; // Late transport failure must not affect a newer active trial.
     }
 
     /** Binding to both the exact message and approved endpoint avoids cross-peer false ACK. */
