@@ -38,3 +38,11 @@ jobs:
         run: gradle :app:assembleDebug --no-daemon --stacktrace
       - name: Confirm APK produced (build proof ONLY)
         run: test -s experimental/android-nearby/app/build/outputs/apk/debug/app-debug.apk
+      - name: Publish short-lived consented research APK (not for real emergencies)
+        uses: actions/upload-artifact@v4
+        with:
+          name: oep-two-phone-lab-debug-apk
+          path: experimental/android-nearby/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
+
