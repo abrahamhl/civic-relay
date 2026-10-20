@@ -145,17 +145,21 @@ public final class MainActivity extends Activity {
     private void armExpiry(String id, long deadlineMs) {
         if (pendingExpiryTask != null) foregroundTimer.removeCallbacks(pendingExpiryTask);
         final long epoch = sessionEpoch;
+        final long monotonicDeadline = SystemClock.elapsedRealtime() + TTL_MILLIS;
         final Runnable[] self = new Runnable[1];
         self[0] = () -> {
             if (!userConsented || sessionEpoch != epoch || !id.equals(activeTrialId)) return;
             long now = System.currentTimeMillis();
-            if (now >= deadlineMs) {
-                if (!deliveryGuard.hasPending(now)) {
-                    finishTrial(id, "EXPIRED");
-                    log("LAB TIMEOUT: no receiver ACK before expiry; NOT delivered.");
-                }
+            long monotonicNow = SystemClock.elapsedRealtime();
+            if (now >= deadlineMs || monotonicNow >= monotonicDeadline) {
+                // Deadline can be reached by either conservative wall expiry or monotonic TTL.
+                // Explicit abort also closes a pending guard when the wall clock moved backwards.
+                deliveryGuard.abortOutgoing(id);
+                finishTrial(id, "EXPIRED");
+                log("LAB TIMEOUT: no receiver ACK before expiry; NOT delivered.");
             } else {
-                foregroundTimer.postDelayed(self[0], Math.max(50L, deadlineMs - now));
+                foregroundTimer.postDelayed(self[0],
+                    Math.max(50L, Math.min(deadlineMs - now, monotonicDeadline - monotonicNow)));
             }
         };
         pendingExpiryTask = self[0];
@@ -371,6 +375,14 @@ public final class MainActivity extends Activity {
                         .put("challenge", challenge);
                     sendPacket(endpointId, receipt);
                 } else if ("LAB_RECEIPT".equals(type)) {
+                    // Guard against wall-clock changes: accept only within the sender's monotonic TTL.
+                    if (id.equals(activeTrialId) && sendStartedElapsed > 0L &&
+                        SystemClock.elapsedRealtime() - sendStartedElapsed >= TTL_MILLIS) {
+                        deliveryGuard.abortOutgoing(id);
+                        finishTrial(id, "EXPIRED");
+                        log("Late lab receipt rejected by monotonic TTL; NOT delivered.");
+                        return;
+                    }
                     LabDeliveryGuard.ReceiptState receiptState = deliveryGuard.acceptReceipt(
                         id, endpointId, challenge, System.currentTimeMillis());
                     if (receiptState == LabDeliveryGuard.ReceiptState.ACCEPTED) {
