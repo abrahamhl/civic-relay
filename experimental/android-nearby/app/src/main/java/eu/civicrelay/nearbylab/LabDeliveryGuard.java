@@ -17,6 +17,7 @@ public final class LabDeliveryGuard {
     private static final int MAX_SEEN = 100;
     private String pendingId;
     private String pendingPeer;
+    private String pendingChallenge;
     private long pendingDeadline;
     private final LinkedHashMap<String, Long> seen = new LinkedHashMap<>();
 
@@ -27,11 +28,12 @@ public final class LabDeliveryGuard {
     }
 
     /** One pending message per session. Expired messages may be replaced without a reset. */
-    public synchronized boolean beginOutgoing(String id, String peer, long now, long expiresAt) {
+    public synchronized boolean beginOutgoing(String id, String peer, String challenge, long now, long expiresAt) {
         clearExpiredOutgoing(now);
-        if (pendingId != null || !validId(id) || peer == null || peer.isEmpty() ||
+        if (pendingId != null || !validId(id) || !validId(challenge) ||
+            peer == null || peer.isEmpty() ||
             expiresAt <= now || expiresAt - now > MAX_TTL_MS) return false;
-        pendingId = id; pendingPeer = peer; pendingDeadline = expiresAt;
+        pendingId = id; pendingPeer = peer; pendingChallenge = challenge; pendingDeadline = expiresAt;
         return true;
     }
 
@@ -45,7 +47,7 @@ public final class LabDeliveryGuard {
     }
 
     private void clearOutgoing() {
-        pendingId = null; pendingPeer = null; pendingDeadline = 0L;
+        pendingId = null; pendingPeer = null; pendingChallenge = null; pendingDeadline = 0L;
     }
 
     /** Late transport errors must not cancel a newer message. */
@@ -58,14 +60,14 @@ public final class LabDeliveryGuard {
     }
 
     /** Binding to both the exact message and approved endpoint avoids cross-peer false ACK. */
-    public synchronized ReceiptState acceptReceipt(String id, String peer, long now) {
+    public synchronized ReceiptState acceptReceipt(String id, String peer, String challenge, long now) {
         if (pendingId == null) return ReceiptState.NO_PENDING;
         if (now >= pendingDeadline) {
             clearOutgoing();
             return ReceiptState.EXPIRED;
         }
         if (!pendingPeer.equals(peer)) return ReceiptState.WRONG_PEER;
-        if (!pendingId.equals(id)) return ReceiptState.WRONG_ID;
+        if (!pendingId.equals(id) || !pendingChallenge.equals(challenge)) return ReceiptState.WRONG_ID;
         clearOutgoing();
         return ReceiptState.ACCEPTED;
     }
