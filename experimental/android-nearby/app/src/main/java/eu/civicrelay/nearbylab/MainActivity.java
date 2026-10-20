@@ -109,7 +109,7 @@ public final class MainActivity extends Activity {
             required.add(Manifest.permission.BLUETOOTH_ADVERTISE);
             required.add(Manifest.permission.BLUETOOTH_SCAN);
             required.add(Manifest.permission.BLUETOOTH_CONNECT);
-            if (Build.VERSION.SDK_INT >= 32) required.add("android.permission.NEARBY_WIFI_DEVICES");
+            if (Build.VERSION.SDK_INT >= 33) required.add("android.permission.NEARBY_WIFI_DEVICES");
         } else if (Build.VERSION.SDK_INT >= 29) {
             required.add(Manifest.permission.ACCESS_FINE_LOCATION);
         } else {
@@ -177,7 +177,7 @@ public final class MainActivity extends Activity {
         }
         @Override public void onDisconnected(String endpointId) {
             if (endpointId.equals(connectedPeer)) {
-                connected = false;connectedPeer = null;
+                connected = false;connectedPeer = null;lastSentId = null;
                 log("DISCONNECTED. Pending payload must not be marked delivered.");
             }
         }
@@ -216,6 +216,7 @@ public final class MainActivity extends Activity {
                 ". Check permissions and manually enable radios."));
     }
     private void sendTest() {
+        if (lastSentId != null) { log("A previous lab message is still awaiting a receipt; stop/reset before another send.");return; }
         if (!userConsented || !connected || connectedPeer == null) {
             log("DENIED: obtain consent and accept a matching-code connection first.");return;
         }
@@ -243,6 +244,7 @@ public final class MainActivity extends Activity {
                 String id = packet.optString("id");
                 if (!id.matches("[0-9a-fA-F-]{36}")) return;
                 if ("LAB_MESSAGE".equals(type)) {
+                    if (!"SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS".equals(packet.optString("body"))) return;
                     long expires = packet.optLong("expiresAt", 0);
                     if (expires < System.currentTimeMillis() ||
                         expires > System.currentTimeMillis() + TTL_MILLIS + 1000) {
