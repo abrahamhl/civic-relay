@@ -56,6 +56,7 @@ public final class MainActivity extends Activity {
     private boolean connected = false;
     private String connectedPeer = null;
     private String lastSentId = null;
+    private long lastSentExpiresAt = 0L;
     private String waitingRole = null;
     private final Set<String> seenIds = new LinkedHashSet<>();
 
@@ -177,7 +178,7 @@ public final class MainActivity extends Activity {
         }
         @Override public void onDisconnected(String endpointId) {
             if (endpointId.equals(connectedPeer)) {
-                connected = false;connectedPeer = null;lastSentId = null;
+                connected = false;connectedPeer = null;lastSentId = null;lastSentExpiresAt = 0L;
                 log("DISCONNECTED. Pending payload must not be marked delivered.");
             }
         }
@@ -223,9 +224,10 @@ public final class MainActivity extends Activity {
         try {
             String id = UUID.randomUUID().toString();
             lastSentId = id;
+            lastSentExpiresAt = System.currentTimeMillis() + TTL_MILLIS;
             JSONObject packet = new JSONObject()
                 .put("v", 1).put("type", "LAB_MESSAGE").put("id", id)
-                .put("expiresAt", System.currentTimeMillis() + TTL_MILLIS)
+                .put("expiresAt", lastSentExpiresAt)
                 .put("body", "SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS");
             sendPacket(connectedPeer, packet);
             log("Message queued for Nearby transport; awaiting explicit receiver ACK for " + id);
@@ -250,14 +252,19 @@ public final class MainActivity extends Activity {
                         expires > System.currentTimeMillis() + TTL_MILLIS + 1000) {
                         log("Expired or malformed test message rejected.");return;
                     }
-                    if (seenIds.size() >= 100) seenIds.remove(seenIds.iterator().next());
+                    if (!seenIds.contains(id) && seenIds.size() >= 100)
+                        seenIds.remove(seenIds.iterator().next());
                     if (seenIds.add(id)) log("LAB MESSAGE RECEIVED; duplicate guard active.");
                     JSONObject receipt = new JSONObject()
                         .put("v", 1).put("type", "LAB_RECEIPT").put("id", id);
                     sendPacket(endpointId, receipt);
                 } else if ("LAB_RECEIPT".equals(type) && id.equals(lastSentId)) {
+                    boolean expired = System.currentTimeMillis() > lastSentExpiresAt;
                     lastSentId = null;
-                    log("RECEIVER ACK received over the accepted Nearby connection. LAB ONLY; not a rescue confirmation.");
+                    lastSentExpiresAt = 0L;
+                    log(expired
+                        ? "Expired lab receiver receipt ignored; no successful delivery claimed."
+                        : "RECEIVER ACK received over the accepted Nearby connection. LAB ONLY; not a rescue confirmation.");
                 }
             } catch (JSONException e) { log("Invalid lab JSON ignored."); }
         }
@@ -279,6 +286,7 @@ public final class MainActivity extends Activity {
         connected = false;
         connectedPeer = null;
         lastSentId = null;
+        lastSentExpiresAt = 0L;
         waitingRole = null;
         seenIds.clear();
         connections.stopAdvertising();
