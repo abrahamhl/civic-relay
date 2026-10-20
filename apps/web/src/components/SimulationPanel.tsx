@@ -29,11 +29,11 @@ export function SimulationPanel({ role, locale, dispatchSimulatedMessage }: Prop
       <h2 className="mb-4 text-xl font-bold">🎮 {t(locale,'scenarioTitle')}</h2>
       <p className="mb-5 text-sm leading-6 text-slate-600">{t(locale,'scenarioExplanation')}</p>
       {role === 'coordinator' ? (
-        <button type="button" onClick={() => void dispatchSimulatedMessage('INFO','LOW','EXERCISE / fictional coordinator announcement')} className="w-full rounded-lg bg-slate-800 px-4 py-3 font-bold text-white hover:bg-slate-700">{t(locale,'scenarioBroadcast')}</button>
+        <button type="button" onClick={() => void dispatchSimulatedMessage('GENERAL_REPORT','LOW','EXERCISE / fictional coordinator announcement')} className="w-full rounded-lg bg-slate-800 px-4 py-3 font-bold text-white hover:bg-slate-700">{t(locale,'scenarioBroadcast')}</button>
       ) : (
         <div className="space-y-3">
           <button type="button" onClick={startExercise} className="w-full rounded-lg bg-blue-700 px-4 py-3 font-bold text-white hover:bg-blue-600">{t(locale,'scenarioAlert')}</button>
-          <button type="button" onClick={() => void dispatchSimulatedMessage('INFO','LOW','EXERCISE / fictional two-way message')} className="w-full rounded-lg bg-indigo-700 px-4 py-3 font-bold text-white hover:bg-indigo-600">{t(locale,'scenarioBidi')}</button>
+          <button type="button" onClick={() => void dispatchSimulatedMessage('GENERAL_REPORT','LOW','EXERCISE / fictional two-way message')} className="w-full rounded-lg bg-indigo-700 px-4 py-3 font-bold text-white hover:bg-indigo-600">{t(locale,'scenarioBidi')}</button>
           {exercise && (
             <div role="status" className="rounded-xl border-2 border-orange-300 bg-orange-50 p-4 text-orange-950">
               <p className="font-bold">{t(locale,'scenarioAlertText')}</p>
