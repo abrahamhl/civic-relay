@@ -17,6 +17,15 @@ jobs:
           node-version: '22'
       - name: Deterministic model invariants
         run: node --test investor-next/tests/*.test.mjs
+      - name: Generate independently reproducible synthetic research evidence
+        run: node investor-next/scripts/oep-evidence-run.mjs --out evidence/oep-virtual-scenario-report.json
+      - name: Publish simulation evidence (NOT physical testing)
+        uses: actions/upload-artifact@v4
+        with:
+          name: oep-synthetic-evidence
+          path: evidence/oep-virtual-scenario-report.json
+          retention-days: 30
+          if-no-files-found: error
       - name: Install investor dependencies
         working-directory: investor-next
         run: npm install --no-audit --no-fund
