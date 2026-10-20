@@ -55,3 +55,23 @@ GO for open-source research demo and partner outreach. NO-GO for general-public 
 
 ## Next outreach
 Use the simulation and this dossier to request 30-minute technical validation meetings and consortium introductions. Present the official call identifier, counterpart's proposed role, consortium deadline and evidence missing. Never imply we already collaborate with those institutions.
+
+## Source verification / latest execution (20 October 2026)
+
+The EU **Funding & Tenders Portal** currently lists the following as **OPEN FOR SUBMISSION**, opened 6 May 2026 and closing **5 November 2026**:
+- **HORIZON-CL3-2026-01-SSRI-04**, *Development of ecosystem and next-generation capabilities for a secured European Critical Communication System in civil security* (Innovation Action). This is the **most directly relevant strategic title** to a coordination-routing overlay; topic-specific eligibility, budget, proposal template and consortium composition **NOT VERIFIED**.
+- **HORIZON-CL3-2026-01-DRS-03**, *Development of innovative tools, processes, equipment and technologies through responses to disasters and emergencies for search and rescue in hazardous conditions* (Innovation Action). A credible match for the building-collapse exercise if end-users and methodology join; topic-specific eligibility **NOT VERIFIED**.
+- **HORIZON-CL3-2026-01-DRS-01**, *Designing new ways of risk awareness and enhanced disaster preparedness* (Research and Innovation Action). More relevant to the zone-orchestration and community-inclusion research than physical emergency routing.
+- **HORIZON-CL3-2026-01-DRS-04**, *Open topic on driving innovation uptake of disaster risk solutions* (Innovation Action). Treat as later-stage: actual field maturity/uptake evidence is missing.
+
+Primary call listing (topic title, action type, opening date, deadline):
+https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/calls-for-proposals?callIdentifier=HORIZON-CL3-2026-01&frameworkProgramme=43108390&isExactMatch=true&order=DESC&pageNumber=1&pageSize=50&status=31094502
+
+**Implementation evidence update:** feature branch now contains testable, bounded in-memory store-and-forward exercise code and a live browser sandbox controlling a fake gateway, on top of the already reproducible 20–100-node scenario. This increases demonstrator traceability, **not field maturity**. Sender signatures, real two-phone measurements and partner letters of intent are still missing. Proposal submission readiness remains low without a consortium and formal work programme review. Do not infer that the topic is suitable solely from the title.
+
+**Pilot API candidate (not yet integrated):** Google Nearby Connections officially supports offline nearby discovery and communication on Android, but permission prompts are required; consent, mutual endpoint acceptance and identity verification remain mandatory. Sources:
+https://developers.google.com/nearby/connections/android/get-started
+https://developers.google.com/nearby/connections/android/manage-connections
+
+**CAP official specification:** OASIS CAP v1.2 defines messaging and may carry XML signatures; the existence of a well-formed CAP document alone does NOT establish the issuing authority's authenticity. A trusted verification infrastructure is a separate WP.
+https://docs.oasis-open.org/emergency/cap/v1.2/cs01/CAP-v1.2-cs01.html
