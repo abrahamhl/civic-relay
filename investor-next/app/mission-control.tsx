@@ -1,25 +1,23 @@
 'use client';
 
 import { useState } from 'react';
+import {getCopy,type Locale} from './copy';
 
 type Scenario = 'outage' | 'intermittent' | 'restored';
 
-const scenarios: {id:Scenario;name:string;subtitle:string}[] = [
-  {id:'outage',name:'BLACKOUT',subtitle:'No route available'},
-  {id:'intermittent',name:'DEGRADED',subtitle:'Intermittent route'},
-  {id:'restored',name:'RECOVERY',subtitle:'Synthetic path restored'}
-];
+const scenarioIds:Scenario[]=['outage','intermittent','restored'];
 
-export default function MissionControl() {
+export default function MissionControl({locale}:{locale:Locale}) {
+  const t=getCopy(locale).mission;
   const [scenario,setScenario]=useState<Scenario>('outage');
   const [packets,setPackets]=useState(0);
   const hasRoute=scenario!=='outage';
-  const result=packets===0?'NO PACKETS IN MODEL':!hasRoute?'LOCALLY QUEUED (MODEL)':'SIMULATED ACK · LOCAL ONLY';
+  const result=packets===0?t.none:!hasRoute?t.queued:t.ack;
   return (
     <div className="mission-console" aria-label="Interactive conceptual crisis communication simulator">
       <div className="console-top">
-        <span className="console-heading"><i className="indicator"/> MISSION CONTROL <b>/</b> ROUTING MODEL</span>
-        <span className="console-tag">ILLUSTRATIVE · NOT LIVE</span>
+        <span className="console-heading"><i className="indicator"/> {t.top} <b>/</b> ROUTING MODEL</span>
+        <span className="console-tag">{t.synthetic}</span>
       </div>
       <div className="globe-stage">
         <div className="vertical-ruler" aria-hidden="true">90° N <span>45° N</span><span>00°</span><span>45° S</span> 90° S</div>
@@ -64,20 +62,20 @@ export default function MissionControl() {
           <g className="sat-icon slow" transform="translate(119 160) rotate(16)"><rect x="-5" y="-6" width="10" height="12" rx="2" fill="#d2e8ed"/><rect x="-25" y="-9" width="17" height="18" fill="#1e536d" stroke="#80baca"/><rect x="8" y="-9" width="17" height="18" fill="#1e536d" stroke="#80baca"/></g>
           <g className="svg-coordinates"><text x="253" y="424">NODE / 001</text><text x="585" y="97">LEO / CONCEPT</text><text x="361" y="520" textAnchor="middle">EARTH REFERENCE / SYNTHETIC TOPOLOGY</text></g>
         </svg>
-        <div className="globe-floating left-floating"><span>THREAT MODEL</span><strong>LOSS OF CONNECTIVITY</strong><small>Scenario: simulated</small></div>
-        <div className="globe-floating right-floating"><span>ROUTE AVAILABILITY</span><strong className={hasRoute?'online':'offline'}>{hasRoute?'PATH AVAILABLE':'NO ROUTE'}</strong><small>No device or satellite connection</small></div>
+        <div className="globe-floating left-floating"><span>{t.threat}</span><strong>{t.threatValue}</strong><small>Scenario: simulated</small></div>
+        <div className="globe-floating right-floating"><span>{t.route}</span><strong className={hasRoute?'online':'offline'}>{hasRoute?t.routeOn:t.routeOff}</strong><small>{t.routeNote}</small></div>
         <div className="stage-coordinate">51.9808° N&nbsp; / &nbsp;5.9114° E <span>REFERENCE COORDINATES</span></div>
       </div>
       <div className="console-bottom">
-        <div className="console-section-title"><span>01 / NETWORK CONDITIONS</span><span>SELECT SCENARIO ↓</span></div>
-        <div className="scenario-switch" role="group" aria-label="Select a fictional network scenario">
-          {scenarios.map(item=><button key={item.id} type="button" aria-pressed={scenario===item.id} className={scenario===item.id?'scenario-active':''} onClick={()=>setScenario(item.id)}><span className="scenario-name">{item.name}</span><small>{item.subtitle}</small></button>)}
+        <div className="console-section-title"><span>01 / {t.conditions}</span><span>{t.select} ↓</span></div>
+        <div className="scenario-switch" role="group" aria-label={t.select}>
+          {scenarioIds.map((id,i)=><button key={id} type="button" aria-pressed={scenario===id} className={scenario===id?'scenario-active':''} onClick={()=>setScenario(id)}><span className="scenario-name">{t.scenarios[i].name}</span><small>{t.scenarios[i].subtitle}</small></button>)}
         </div>
         <div className="console-footer">
-          <div className="telemetry"><span>02 / PACKET STATE</span><strong aria-live="polite">{result}</strong></div>
-          <button type="button" className="inject-packet" onClick={()=>setPackets(n=>n+1)}>+ INJECT TEST PACKET <span>↗</span></button>
+          <div className="telemetry"><span>02 / {t.packet}</span><strong aria-live="polite">{result}</strong></div>
+          <button type="button" className="inject-packet" onClick={()=>setPackets(n=>n+1)}>{t.inject} <span>↗</span></button>
         </div>
-        <p className="console-disclaimer">Visualization models a scenario only. Use the separate engine demo to inspect real browser-local queue and ACK behavior.</p>
+        <p className="console-disclaimer">{t.disclaimer}</p>
       </div>
     </div>
   );
