@@ -6,7 +6,7 @@ export default function EmergencyBuilding({model,stage}:{model:SimulationResult;
  const holder=useRef<HTMLDivElement>(null);
  const [fallback,setFallback]=useState(false);
  useEffect(()=>{
-  const host=holder.current;if(!host)return;
+  const host=holder.current!;if(!host)return;
   let destroyed=false,raf=0;let cleanup=()=>{};
   async function setup(){
    const THREE=await import('three');if(destroyed)return;
@@ -25,7 +25,7 @@ export default function EmergencyBuilding({model,stage}:{model:SimulationResult;
    const floorMat=new THREE.MeshStandardMaterial({color:'#324658',metalness:.22,roughness:.7,transparent:true,opacity:.88});
    for(let i=0;i<5;i++){
     const floor=new THREE.Mesh(new THREE.BoxGeometry(7.1,.09,3.4),floorMat);
-    floor.position.set(i>2?.15*i:0,(i-2)*.7,0);
+    floor.position.set(i>2 ? .15*i : 0,(i-2)*.7,0);
     if(stage>0&&i===2){floor.rotation.z=-.16;floor.position.y-=.26;}
     building.add(floor);
     for(let j=-3;j<=3;j++){
