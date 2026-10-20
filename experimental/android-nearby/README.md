@@ -32,3 +32,15 @@
 - https://developers.google.com/nearby/connections/android/exchange-data
 - https://android-developers.googleblog.com/2026/07/upcoming-changes-nearby-connections-api.html
 - https://developers.google.com/android/guides/releases
+
+## M1.1 protocol hardening — 21 October 2026
+- LabDeliveryGuard.java is a JDK-testable state machine. Every application ACK must match the current UUID and consent-confirmed endpoint and arrive strictly before its 60-second local deadline. Stale ACKs, wrong peers, wrong IDs and expired envelopes never become successful messages.
+- Timeout no longer locks sending forever: pressing SEND after the prior TTL expires records an expired attempt and permits a new fictional message.
+- onConnectionResult now requires explicit local approval of matching authentication digits, not merely a successful Nearby status; old dialogs are blocked after consent revocation by a session epoch. Discovery/advertising and byte exchange still require normal Android permissions.
+- Payload-level FAILURE and CANCELED from Nearby, distinguished using the outgoing payload's transport ID, clear the matching outstanding application trial. Successful sendPayload or byte transfer alone **never** means the receiver acknowledged the app message.
+- An informed opt-in dialog documents nearby discoverability, battery implications and optional manual CSV sharing. STOP clears consent, messages, peer approvals and trial journal. Trial CSV is locally bounded to 120 events (UUID, outcome, local monotonic elapsed milliseconds) with no names, phone IDs, coordinates or distress text. Its only exit is an **explicit user-invoked system share chooser**; external copies cannot be recalled.
+- JVM regression tests: LabDeliveryGuardTest.java and LabTrialJournalTest.java run before the Android APK build in .github/workflows/android-nearby-ci.yml. A passing CI compile **does not** attest to successful Android device-to-device transmission.
+- **Known residual risks:** in-memory state is not persistent store-forward; the 60-second absolute wall-clock expiry in the message assumes reasonably synchronised phone clocks; locally recorded sender elapsed times are not calibrated RF measurements; a manually confirmed Nearby pairing code does not establish persistent trusted identity. No physical multi-hop, satellites, emergency-dispatch calls, third-party security audit or actual 30-trial dataset exists.
+
+### Collecting voluntary reproducible data
+Two owners review consent and verify the same Nearby digits on each screen. For each run, note the test scenario and manually export the local CSV after the trials; pair the files with the external worksheet only with volunteers' explicit approval. Include unsuccessful and expired runs, different vendor/Android versions, and radio-off tests. This is an experiment, not a rescue product. Use experimental/android-nearby/PILOT_ACCEPTANCE.md as the field checklist.
