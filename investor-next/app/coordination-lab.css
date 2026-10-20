@@ -65,3 +65,18 @@
 .mer-safety-record button{background:#1a3740;color:#e3f5f5;border:1px solid #67949b;padding:.5rem .8rem;cursor:pointer}
 @media(max-width:800px){.mer-safety-choices{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:500px){.mer-human{padding:1.2rem}.mer-safety-choices{grid-template-columns:1fr}}
+
+/* Synthetic store-and-forward proof: deliberately separated from operational rescue UI. */
+.mer-forward-lab{border:1px solid rgba(117,185,195,.4);border-radius:14px;padding:1.25rem;background:rgba(9,23,34,.95);margin:1.25rem 0;color:#eaf5f7}
+.mer-forward-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.mer-forward-head h3{margin:0 0 .5rem;font-size:1.05rem;letter-spacing:.05em}
+.mer-forward-head p{margin:.2rem 0 1rem;max-width:680px;line-height:1.5;color:#c5d5dc}
+.mer-gateway-up,.mer-gateway-down{font-size:.72rem;letter-spacing:.08em;padding:.45rem .65rem;border-radius:99px;border:1px solid currentColor}
+.mer-gateway-up{color:#93e1c5}.mer-gateway-down{color:#ffc2ad}
+.mer-forward-lab .mer-tools{display:flex;gap:.6rem;flex-wrap:wrap;margin:.6rem 0 1rem}
+.mer-forward-lab .mer-tools button{min-height:42px}
+.mer-forward-results{border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:.8rem}
+.mer-forward-results ul{list-style:none;margin:.7rem 0 0;padding:0}
+.mer-forward-results li{display:grid;grid-template-columns:minmax(90px,1fr) minmax(130px,1fr) minmax(140px,2fr);gap:.5rem;border-top:1px solid rgba(255,255,255,.13);padding:.6rem 0;align-items:center;overflow-wrap:anywhere}
+.mer-forward-results small{color:#a9bbc4}
+@media(max-width:650px){.mer-forward-results li{display:flex;flex-direction:column;align-items:flex-start;gap:.2rem}}
