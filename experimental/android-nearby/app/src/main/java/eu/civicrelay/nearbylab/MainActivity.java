@@ -34,9 +34,10 @@ import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.UUID;
 
 /**
@@ -52,13 +53,13 @@ public final class MainActivity extends Activity {
     private static final long TTL_MILLIS = 60000L;
     private ConnectionsClient connections;
     private TextView output;
-    private boolean userConsented = false;
-    private boolean connected = false;
-    private String connectedPeer = null;
-    private String lastSentId = null;
-    private long lastSentExpiresAt = 0L;
+    private volatile boolean userConsented = false;
+    private volatile boolean connected = false;
+    private volatile String connectedPeer = null;
+    private volatile long sessionEpoch = 0L;
     private String waitingRole = null;
-    private final Set<String> seenIds = new LinkedHashSet<>();
+    private final LabDeliveryGuard deliveryGuard = new LabDeliveryGuard();
+    private final Set<String> approvedPeers = Collections.synchronizedSet(new HashSet<>());
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -149,52 +150,73 @@ public final class MainActivity extends Activity {
 
     private final ConnectionLifecycleCallback lifecycle = new ConnectionLifecycleCallback() {
         @Override public void onConnectionInitiated(String endpointId, ConnectionInfo info) {
+            final long requestEpoch = sessionEpoch;
             runOnUiThread(() -> {
-                if (!userConsented) { connections.rejectConnection(endpointId);return; }
+                if (!userConsented || requestEpoch != sessionEpoch || connected) {
+                    connections.rejectConnection(endpointId);return;
+                }
                 new AlertDialog.Builder(MainActivity.this)
                     .setTitle("VERIFY PEER / LAB ONLY")
                     .setMessage("Compare these digits on BOTH devices: " +
                         info.getAuthenticationDigits() +
                         "\nDo not accept unless they match. No identity is implied.")
                     .setPositiveButton("Codes match", (dialog, which) -> {
-                        if (userConsented) connections.acceptConnection(endpointId, payloads)
-                            .addOnFailureListener(e -> log("Accept failed: " + e.getClass().getSimpleName()));
+                        if (!userConsented || sessionEpoch != requestEpoch || connected) {
+                            connections.rejectConnection(endpointId);return;
+                        }
+                        approvedPeers.add(endpointId); // Only after human-verified matching digits.
+                        connections.acceptConnection(endpointId, payloads)
+                            .addOnFailureListener(e -> {
+                                approvedPeers.remove(endpointId);
+                                log("Accept failed: " + e.getClass().getSimpleName());
+                            });
                     })
-                    .setNegativeButton("Reject", (dialog, which) -> connections.rejectConnection(endpointId))
+                    .setNegativeButton("Reject", (dialog, which) -> {
+                        approvedPeers.remove(endpointId);
+                        connections.rejectConnection(endpointId);
+                    })
                     .setCancelable(false)
                     .show();
             });
         }
         @Override public void onConnectionResult(String endpointId, ConnectionResolution result) {
-            if (result.getStatus().getStatusCode() == ConnectionsStatusCodes.STATUS_OK && userConsented) {
+            if (result.getStatus().getStatusCode() == ConnectionsStatusCodes.STATUS_OK &&
+                userConsented && approvedPeers.contains(endpointId) &&
+                (!connected || endpointId.equals(connectedPeer))) {
                 connected = true;
                 connectedPeer = endpointId;
                 connections.stopAdvertising();
                 connections.stopDiscovery();
-                log("LINK CONNECTED (peer accepted). NOT a delivered-message receipt.");
+                log("LINK CONNECTED (manually verified peer). NOT a delivered-message receipt.");
             } else {
-                log("Connection rejected or failed: " + result.getStatus().getStatusCode());
+                approvedPeers.remove(endpointId);
+                connections.disconnectFromEndpoint(endpointId);
+                log("Unapproved, rejected or failed connection: " + result.getStatus().getStatusCode());
             }
         }
         @Override public void onDisconnected(String endpointId) {
             if (endpointId.equals(connectedPeer)) {
-                connected = false;connectedPeer = null;lastSentId = null;lastSentExpiresAt = 0L;
-                log("DISCONNECTED. Pending payload must not be marked delivered.");
+                connected = false;connectedPeer = null;approvedPeers.remove(endpointId);
+                deliveryGuard.reset();
+                log("DISCONNECTED. Pending payload cleared; no delivery assumed.");
             }
         }
     };
 
     private final EndpointDiscoveryCallback discovery = new EndpointDiscoveryCallback() {
         @Override public void onEndpointFound(String endpointId, DiscoveredEndpointInfo info) {
+            final long discoveredEpoch = sessionEpoch;
             runOnUiThread(() -> {
-                if (!userConsented || connected) return;
+                if (!userConsented || connected || sessionEpoch != discoveredEpoch) return;
                 new AlertDialog.Builder(MainActivity.this)
                     .setTitle("Request lab connection?")
                     .setMessage("Discovered: " + info.getEndpointName() +
                         "\nAnother confirmation with matching digits will follow.")
-                    .setPositiveButton("Request", (d, which) ->
+                    .setPositiveButton("Request", (d, which) -> {
+                        if (!userConsented || connected || sessionEpoch != discoveredEpoch) return;
                         connections.requestConnection("OEP Offline Lab", endpointId, lifecycle)
-                            .addOnFailureListener(e -> log("Request failed: " + e.getClass().getSimpleName())))
+                            .addOnFailureListener(e -> log("Request failed: " + e.getClass().getSimpleName()));
+                    })
                     .setNegativeButton("Ignore", (d, which) -> {})
                     .show();
             });
@@ -217,20 +239,26 @@ public final class MainActivity extends Activity {
                 ". Check permissions and manually enable radios."));
     }
     private void sendTest() {
-        if (lastSentId != null) { log("A previous lab message is still awaiting a receipt; stop/reset before another send.");return; }
+        long now = System.currentTimeMillis();
+        if (deliveryGuard.hasPending(now)) {
+            log("A previous test message still awaits an ACK; retry after its 60s expiry.");
+            return;
+        }
         if (!userConsented || !connected || connectedPeer == null) {
             log("DENIED: obtain consent and accept a matching-code connection first.");return;
         }
         try {
             String id = UUID.randomUUID().toString();
-            lastSentId = id;
-            lastSentExpiresAt = System.currentTimeMillis() + TTL_MILLIS;
+            long deadline = now + TTL_MILLIS;
             JSONObject packet = new JSONObject()
                 .put("v", 1).put("type", "LAB_MESSAGE").put("id", id)
-                .put("expiresAt", lastSentExpiresAt)
+                .put("expiresAt", deadline)
                 .put("body", "SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS");
+            if (!deliveryGuard.beginOutgoing(id, connectedPeer, now, deadline)) {
+                log("DENIED: invalid or pending lab message.");return;
+            }
             sendPacket(connectedPeer, packet);
-            log("Message queued for Nearby transport; awaiting explicit receiver ACK for " + id);
+            log("Message submitted to Nearby API; NOT delivered until receiver ACK: " + id);
         } catch (JSONException e) { log("Packet encoding failed."); }
     }
 
@@ -247,24 +275,27 @@ public final class MainActivity extends Activity {
                 if (!id.matches("[0-9a-fA-F-]{36}")) return;
                 if ("LAB_MESSAGE".equals(type)) {
                     if (!"SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS".equals(packet.optString("body"))) return;
-                    long expires = packet.optLong("expiresAt", 0);
-                    if (expires < System.currentTimeMillis() ||
-                        expires > System.currentTimeMillis() + TTL_MILLIS + 1000) {
+                    long expires = packet.optLong("expiresAt", 0L);
+                    LabDeliveryGuard.IncomingState seen = deliveryGuard.acceptIncoming(
+                        id, expires, System.currentTimeMillis());
+                    if (seen == LabDeliveryGuard.IncomingState.REJECTED) {
                         log("Expired or malformed test message rejected.");return;
                     }
-                    if (!seenIds.contains(id) && seenIds.size() >= 100)
-                        seenIds.remove(seenIds.iterator().next());
-                    if (seenIds.add(id)) log("LAB MESSAGE RECEIVED; duplicate guard active.");
+                    if (seen == LabDeliveryGuard.IncomingState.NEW)
+                        log("LAB MESSAGE RECEIVED; bounded duplicate guard active.");
                     JSONObject receipt = new JSONObject()
                         .put("v", 1).put("type", "LAB_RECEIPT").put("id", id);
                     sendPacket(endpointId, receipt);
-                } else if ("LAB_RECEIPT".equals(type) && id.equals(lastSentId)) {
-                    boolean expired = System.currentTimeMillis() > lastSentExpiresAt;
-                    lastSentId = null;
-                    lastSentExpiresAt = 0L;
-                    log(expired
-                        ? "Expired lab receiver receipt ignored; no successful delivery claimed."
-                        : "RECEIVER ACK received over the accepted Nearby connection. LAB ONLY; not a rescue confirmation.");
+                } else if ("LAB_RECEIPT".equals(type)) {
+                    LabDeliveryGuard.ReceiptState receiptState = deliveryGuard.acceptReceipt(
+                        id, endpointId, System.currentTimeMillis());
+                    if (receiptState == LabDeliveryGuard.ReceiptState.ACCEPTED) {
+                        log("RECEIVER ACK from approved peer. LAB ONLY; not rescue or satellite proof.");
+                    } else if (receiptState == LabDeliveryGuard.ReceiptState.EXPIRED) {
+                        log("Late lab receipt rejected; timeout allows next trial.");
+                    } else {
+                        log("Unexpected receiver receipt ignored: " + receiptState);
+                    }
                 }
             } catch (JSONException e) { log("Invalid lab JSON ignored."); }
         }
@@ -278,17 +309,21 @@ public final class MainActivity extends Activity {
         byte[] bytes = packet.toString().getBytes(StandardCharsets.UTF_8);
         if (bytes.length > MAX_BYTES) { log("Packet exceeds lab limit."); return; }
         connections.sendPayload(endpointId, Payload.fromBytes(bytes))
-            .addOnFailureListener(e -> log("Send rejected by Nearby: " + e.getClass().getSimpleName()));
+            .addOnFailureListener(e -> {
+                if ("LAB_MESSAGE".equals(packet.optString("type")))
+                    deliveryGuard.abortOutgoing(packet.optString("id"));
+                log("Send rejected by Nearby; no delivered status: " + e.getClass().getSimpleName());
+            });
     }
 
     private void stopAndClear() {
         userConsented = false;
         connected = false;
         connectedPeer = null;
-        lastSentId = null;
-        lastSentExpiresAt = 0L;
+        sessionEpoch++; // Invalidates consent dialogs left open across STOP and re-consent.
         waitingRole = null;
-        seenIds.clear();
+        deliveryGuard.reset();
+        approvedPeers.clear();
         connections.stopAdvertising();
         connections.stopDiscovery();
         connections.stopAllEndpoints();
