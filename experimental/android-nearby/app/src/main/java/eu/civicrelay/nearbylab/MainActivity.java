@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
@@ -38,6 +39,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -60,6 +63,8 @@ public final class MainActivity extends Activity {
     private String waitingRole = null;
     private final LabDeliveryGuard deliveryGuard = new LabDeliveryGuard();
     private final Set<String> approvedPeers = Collections.synchronizedSet(new HashSet<>());
+    private final Map<Long, String> outgoingPayloads = Collections.synchronizedMap(new HashMap<>());
+    private volatile long sendStartedElapsed = 0L;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -74,9 +79,17 @@ public final class MainActivity extends Activity {
         heading.setText("OEP — TWO PHONE EXPERIMENT\nNO REAL SOS • NO 112 • NO LOCATION");
         heading.setTextSize(19);
         body.addView(heading);
-        addButton(body, "1. I CONSENT TO THE EXPERIMENT", () -> {
-            userConsented = true;
-            log("Consent enabled for this session only.");
+        addButton(body, "1. REVIEW & CONSENT (LAB ONLY)", () -> {
+            new AlertDialog.Builder(MainActivity.this)
+                .setTitle("OEP research trial — consent")
+                .setMessage("This is a non-operational exercise. The app may broadcast its presence to nearby phones; the radio link can use additional battery and reveal proximity to your chosen peer. Nearby permissions are requested by Android. No GPS readings, real distress calls, rescue claims or background discovery are made. Only fictional test messages are exchanged, with both users comparing pairing digits. You may STOP at any moment. No personal details are required.")
+                .setPositiveButton("I UNDERSTAND & AGREE", (dialog, which) -> {
+                    userConsented = true;
+                    log("Explicit lab consent granted for this foreground session.");
+                })
+                .setNegativeButton("DO NOT PARTICIPATE", (dialog, which) ->
+                    log("Consent declined; no discovery initiated."))
+                .show();
         });
         addButton(body, "2A. ADVERTISE AS LAB RECEIVER", () -> startRole("ADVERTISE"));
         addButton(body, "2B. DISCOVER AS LAB SENDER", () -> startRole("DISCOVER"));
@@ -101,7 +114,10 @@ public final class MainActivity extends Activity {
 
     private void log(String note) {
         runOnUiThread(() -> {
-            if (output != null) output.setText(note + "\n" + output.getText());
+            if (output != null) {
+                String next = note + "\n" + output.getText();
+                output.setText(next.length() > 6000 ? next.substring(0, 6000) : next);
+            }
         });
     }
 
@@ -198,6 +214,8 @@ public final class MainActivity extends Activity {
             if (endpointId.equals(connectedPeer)) {
                 connected = false;connectedPeer = null;approvedPeers.remove(endpointId);
                 deliveryGuard.reset();
+                outgoingPayloads.clear();
+                sendStartedElapsed = 0L;
                 log("DISCONNECTED. Pending payload cleared; no delivery assumed.");
             }
         }
@@ -257,6 +275,7 @@ public final class MainActivity extends Activity {
             if (!deliveryGuard.beginOutgoing(id, connectedPeer, now, deadline)) {
                 log("DENIED: invalid or pending lab message.");return;
             }
+            sendStartedElapsed = SystemClock.elapsedRealtime();
             sendPacket(connectedPeer, packet);
             log("Message submitted to Nearby API; NOT delivered until receiver ACK: " + id);
         } catch (JSONException e) { log("Packet encoding failed."); }
@@ -290,7 +309,11 @@ public final class MainActivity extends Activity {
                     LabDeliveryGuard.ReceiptState receiptState = deliveryGuard.acceptReceipt(
                         id, endpointId, System.currentTimeMillis());
                     if (receiptState == LabDeliveryGuard.ReceiptState.ACCEPTED) {
-                        log("RECEIVER ACK from approved peer. LAB ONLY; not rescue or satellite proof.");
+                        long latencyMs = sendStartedElapsed == 0L ? -1L :
+                            SystemClock.elapsedRealtime() - sendStartedElapsed;
+                        sendStartedElapsed = 0L;
+                        log("RECEIVER ACK from approved peer. Local elapsed: " + latencyMs +
+                            "ms (single test, NOT a performance guarantee). LAB ONLY; not rescue proof.");
                     } else if (receiptState == LabDeliveryGuard.ReceiptState.EXPIRED) {
                         log("Late lab receipt rejected; timeout allows next trial.");
                     } else {
@@ -300,18 +323,36 @@ public final class MainActivity extends Activity {
             } catch (JSONException e) { log("Invalid lab JSON ignored."); }
         }
         @Override public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) {
-            if (update.getStatus() == PayloadTransferUpdate.Status.FAILURE)
-                log("Nearby payload transfer failed. Do not report delivered.");
+            int status = update.getStatus();
+            if (status == PayloadTransferUpdate.Status.FAILURE ||
+                status == PayloadTransferUpdate.Status.CANCELED) {
+                String outgoing = outgoingPayloads.remove(update.getPayloadId());
+                if (outgoing != null) {
+                    deliveryGuard.abortOutgoing(outgoing);
+                    sendStartedElapsed = 0L;
+                }
+                log("Nearby payload transfer failed or canceled. Not delivered.");
+            } else if (status == PayloadTransferUpdate.Status.SUCCESS) {
+                outgoingPayloads.remove(update.getPayloadId());
+                // Nearby byte-transfer success is NOT an application receiver ACK.
+            }
         }
     };
 
     private void sendPacket(String endpointId, JSONObject packet) {
         byte[] bytes = packet.toString().getBytes(StandardCharsets.UTF_8);
         if (bytes.length > MAX_BYTES) { log("Packet exceeds lab limit."); return; }
-        connections.sendPayload(endpointId, Payload.fromBytes(bytes))
+        Payload outgoing = Payload.fromBytes(bytes);
+        String messageId = "LAB_MESSAGE".equals(packet.optString("type"))
+            ? packet.optString("id") : null;
+        if (messageId != null) outgoingPayloads.put(outgoing.getId(), messageId);
+        connections.sendPayload(endpointId, outgoing)
             .addOnFailureListener(e -> {
-                if ("LAB_MESSAGE".equals(packet.optString("type")))
-                    deliveryGuard.abortOutgoing(packet.optString("id"));
+                outgoingPayloads.remove(outgoing.getId());
+                if (messageId != null) {
+                    deliveryGuard.abortOutgoing(messageId);
+                    sendStartedElapsed = 0L;
+                }
                 log("Send rejected by Nearby; no delivered status: " + e.getClass().getSimpleName());
             });
     }
@@ -324,6 +365,8 @@ public final class MainActivity extends Activity {
         waitingRole = null;
         deliveryGuard.reset();
         approvedPeers.clear();
+        outgoingPayloads.clear();
+        sendStartedElapsed = 0L;
         connections.stopAdvertising();
         connections.stopDiscovery();
         connections.stopAllEndpoints();
