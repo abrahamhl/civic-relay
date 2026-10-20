@@ -38,3 +38,14 @@ test('unverified or test alerts never activate institutional zone',async()=>{
  assert.equal(trusted.action,'ACTIVATE');
  assert.equal(trusted.permissionPolicy,'EXPLICIT_OPT_IN');
 });
+
+test('low battery increases discovery interval while reducing scan window',()=>{
+ const alert=energyPolicy(70,true);
+ const conservation=energyPolicy(27,true);
+ const critical=energyPolicy(5,true);
+ assert.ok(alert.discoveryIntervalSeconds<conservation.discoveryIntervalSeconds);
+ assert.ok(conservation.discoveryIntervalSeconds<critical.discoveryIntervalSeconds);
+ assert.ok(alert.discoverySeconds>=conservation.discoverySeconds);
+ assert.equal(critical.relay,false);
+ assert.equal(critical.systemBatterySaverChanged,false);
+});
