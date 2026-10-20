@@ -43,9 +43,9 @@ export function runScenario(p={}) {
       let at=null,best=Infinity;
       for(const [id,v] of dist)if(!visited.has(id)&&v<best){best=v;at=id;}
       if(at===null)return null;
+      if(at!==start&&byId.get(at).energy==='CRITICAL'){visited.add(at);continue;}
       if(exit.has(at)){const route=[at];while(prev.has(at)){at=prev.get(at);route.unshift(at);}return [...route,'GATEWAY'];}
       visited.add(at);
-      if(at!==start&&byId.get(at).energy==='CRITICAL')continue;
       for(const edge of graph.get(at)||[]){
         if(visited.has(edge.id))continue;
         if(best+edge.weight<(dist.get(edge.id)??Infinity)){dist.set(edge.id,best+edge.weight);prev.set(edge.id,at);}
