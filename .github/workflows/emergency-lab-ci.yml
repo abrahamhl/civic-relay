@@ -1,0 +1,31 @@
+name: Emergency routing research lab
+on:
+  push:
+    branches: [feat/master-emergency-routing-v1-20261020]
+  pull_request:
+    paths:
+      - 'investor-next/**'
+      - 'docs/MASTER_EMERGENCY_ROUTING_2026.md'
+      - '.github/workflows/emergency-lab-ci.yml'
+jobs:
+  simulator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Deterministic model invariants
+        run: node --test investor-next/tests/emergency-routing.test.mjs
+      - name: Install investor dependencies
+        working-directory: investor-next
+        run: npm install --no-audit --no-fund
+      - name: Strict Next.js TypeScript validation
+        working-directory: investor-next
+        run: npm run type-check
+      - name: Build investor experience (preserve Three.js)
+        working-directory: investor-next
+        run: npm run build
+      - name: Translation markup smoke
+        working-directory: investor-next
+        run: npm run check:locales
