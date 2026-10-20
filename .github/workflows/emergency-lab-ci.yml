@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: '22'
       - name: Deterministic model invariants
-        run: node --test investor-next/tests/emergency-routing.test.mjs
+        run: node --test investor-next/tests/*.test.mjs
       - name: Install investor dependencies
         working-directory: investor-next
         run: npm install --no-audit --no-fund
