@@ -103,3 +103,20 @@ test('bounded queue fails closed instead of silently dropping SOS messages',()=>
  engine.enqueue(message());
  assert.throws(()=>engine.enqueue(message('EXERCISE_2')),/queue full/i);
 });
+
+test('revocation during asynchronous send cannot be resurrected by a late receipt',async()=>{
+ const clock=lab(),engine=clock.engine();let finish;
+ const adapter=createInMemoryAdapter();
+ adapter.send=()=>new Promise(resolve=>{finish=resolve;});
+ engine.registerAdapter(adapter);engine.enqueue(message());
+ const pending=engine.dispatch('EXERCISE_1');
+ // Wait until async transport description has completed and send() is pending.
+ for(let i=0;i<10&&!finish;i++)await Promise.resolve();
+ assert.equal(typeof finish,'function');
+ engine.revoke('EXERCISE_1');
+ finish({accepted:true,receipt:{kind:'SIMULATED_RECEIVER_RECEIPT',messageId:'EXERCISE_1',transportId:'LAB_GATEWAY'}});
+ const done=await pending;
+ assert.equal(done.status,'REVOKED');
+ assert.equal(done.hasPayload,false);
+ assert.equal(engine.inspect('EXERCISE_1').status,'REVOKED');
+});
