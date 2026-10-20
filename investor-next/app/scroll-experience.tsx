@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 
 import {getCopy,type Locale} from './copy';
+import {storyContent} from './system-story-data';
 const tones=['failure','queued','mesh','ack','recovery'] as const;
 
 type GlobeProps={progressRef:RefObject<number>;active:number;reduceMotion:boolean;satelliteLabel:string;fallback:string;frame:string};
@@ -214,6 +215,8 @@ function GlobeCanvas({progressRef,active,reduceMotion,satelliteLabel,fallback,fr
 export default function ScrollExperience({locale}:{locale:Locale}){
   const t=getCopy(locale).journey;
   const phases=t.phases;
+  // Tie each preserved orbital chapter to an inspectable real subsystem.
+  const links=[0,3,4,5,1].map(index=>storyContent[locale].steps[index]);
   const sectionRef=useRef<HTMLElement>(null);
   const chaptersRef=useRef<Array<HTMLElement|null>>([]);
   const progressRef=useRef(0);
@@ -254,6 +257,10 @@ export default function ScrollExperience({locale}:{locale:Locale}){
           <div className="chapter-rail"><span>{String(i+1).padStart(2,'0')} / 05</span><i/></div>
           <div className="chapter-copy"><p className="eyebrow">{phase.tag}</p><h3>{phase.title}</h3><h4>{phase.subtitle}</h4><p>{phase.detail}</p>
             <span className="chapter-claim">{t.claim[i]}</span>
+            <div className="journey-tech-note"><span>{links[i].shorthand} / {links[i].status}</span>
+             <p>{links[i].engineering}</p>
+             <a href={'#system-step-'+links[i].id}>{storyContent[locale].walkthrough.code} ↘</a>
+            </div>
           </div>
         </article>)}
       </div>
