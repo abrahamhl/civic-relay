@@ -156,7 +156,7 @@ function AdvancedSatellite({ position, label, active, delay = 0 }: { position: [
         <Html position={[0, 1, 0]} center className="pointer-events-none">
           <div className={`px-2 py-1 rounded bg-slate-900/80 backdrop-blur border text-xs font-mono tracking-widest flex flex-col items-center ${active ? 'border-green-500/50 text-green-400' : 'border-red-500/50 text-red-400'}`}>
             <span className="font-bold">{label}</span>
-            <span className="text-[8px] opacity-70">{active ? 'UPLINK ACTIVE' : 'NO SIGNAL'}</span>
+            <span className="text-[8px] opacity-70">{active ? 'MODEL PATH ON' : 'MODEL PATH OFF'}</span>
           </div>
         </Html>
       </group>
@@ -231,14 +231,14 @@ function DataOverlay() {
 
 export function SatelliteVisualization() {
   return (
-    <div className="w-full h-[700px] relative bg-slate-950 rounded-2xl overflow-hidden shadow-2xl shadow-blue-900/20 border border-slate-800">
+    <div className="w-full h-[620px] lg:h-[690px] relative bg-[#040b13] overflow-hidden shadow-2xl shadow-blue-900/10 border border-slate-700/40">
       <DataOverlay />
       <div className="absolute top-6 left-6 z-20 flex flex-col gap-2 pointer-events-none">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.8)]" />
-          <span className="text-green-400 font-mono text-xs tracking-widest font-bold">SYSTEM ACTIVE</span>
+          <span className="text-green-400 font-mono text-xs tracking-widest font-bold">3D MODEL / SYNTHETIC</span>
         </div>
-        <div className="text-slate-400 font-mono text-xs">GLOBAL MESH PROTOCOL v2.1</div>
+        <div className="text-slate-400 font-mono text-xs">SIMULATED ORBITAL NETWORK / NO LIVE TELEMETRY</div>
       </div>
 
       <Canvas camera={{ position: [0, 4, 8], fov: 45 }} gl={{ antialias: true, alpha: false }}>
@@ -278,31 +278,31 @@ export function SatelliteVisualization() {
       {/* Advanced HUD Legend */}
       <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end pointer-events-none z-20">
         <div className="bg-slate-900/60 backdrop-blur-md px-6 py-4 rounded-xl border border-slate-700/50 flex flex-col gap-3">
-          <div className="text-xs font-mono text-slate-400 mb-1 border-b border-slate-700 pb-2">NETWORK TOPOLOGY</div>
-          <div className="flex items-center gap-4 text-xs font-mono text-white">
+          <div className="text-xs font-mono text-slate-400 mb-1 border-b border-slate-700 pb-2">SIMULATED NETWORK TOPOLOGY</div>
+          <div className="flex flex-wrap items-center gap-3 text-[9px] font-mono text-slate-200">
             <div className="flex items-center gap-2">
               <div className="w-3 h-0.5 bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
-              <span>SATELLITE UPLINK</span>
+              <span>SATELLITE PATH · CONCEPT</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-0.5 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
-              <span>TERRESTRIAL MESH</span>
+              <span>MESH LINKS · MODEL</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-0.5 bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
-              <span>CELLULAR FALLBACK</span>
+              <span>CELLULAR · MODEL</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)] animate-pulse" />
-              <span>ACTIVE RELAY</span>
+              <span>ILLUSTRATIVE NODES</span>
             </div>
           </div>
         </div>
 
         <div className="text-right flex flex-col items-end gap-1 font-mono text-[10px] text-slate-500">
-          <div>DATA: AES-256 ENCRYPTED</div>
-          <div>LATENCY: &lt;45ms</div>
-          <div>PACKET LOSS: 0.001%</div>
+          <div>SECURITY: UNVERIFIED MODEL</div>
+          <div>LATENCY: NOT MEASURED</div>
+          <div>NETWORK: NO LIVE LINK</div>
         </div>
       </div>
     </div>
