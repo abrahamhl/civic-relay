@@ -3,13 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 
-const phases = [
-  { number:'01',tag:'SYSTEM FAILURE',title:'THE BLACKOUT.',subtitle:'The network disappears.',detail:'Infrastructure can fail without warning. We begin with every modeled route unavailable.',status:'NETWORK ISOLATED',metric:'0',unit:'MODEL PATHS',tone:'failure' },
-  { number:'02',tag:'LOCAL RESILIENCE',title:'THE MESSAGE SURVIVES.',subtitle:'Store first. Send when possible.',detail:'A fictional SOS is placed in the browser-local queue. The message can wait for a future route.',status:'LOCAL QUEUE',metric:'1',unit:'QUEUED / ILLUSTRATIVE',tone:'queued' },
-  { number:'03',tag:'NETWORK DISCOVERY',title:'A PATH EMERGES.',subtitle:'Peers create possibilities.',detail:'A conceptual mesh shows nearby relays reconnecting. Real device-to-device transport remains a research milestone.',status:'MESH CONCEPT',metric:'3',unit:'NODES / ILLUSTRATIVE',tone:'mesh' },
-  { number:'04',tag:'RESILIENT DELIVERY',title:'ROUTE. RETRY. ACK.',subtitle:'Delivery needs evidence.',detail:'Synthetic multipath routes illuminate as simulated acknowledgements return. No external delivery is claimed.',status:'ACK MODEL',metric:'ACK',unit:'SYNTHETIC RECEIPT',tone:'ack' },
-  { number:'05',tag:'FIELD VALIDATION',title:'DESIGN FOR RECOVERY.',subtitle:'From simulated to deployable.',detail:'The next frontier is hardware, secure identity and public-safety pilots. The orbital gateway remains conceptual.',status:'PILOT REQUIRED',metric:'NEXT',unit:'PHYSICAL VALIDATION',tone:'recovery' }
-] as const;
+import {getCopy,type Locale} from './copy';
+const tones=['failure','queued','mesh','ack','recovery'] as const;
 
 type GlobeProps={progressRef:RefObject<number>;active:number;reduceMotion:boolean};
 
@@ -212,11 +207,13 @@ function GlobeCanvas({progressRef,active,reduceMotion}:GlobeProps){
   },[progressRef,reduceMotion]);
   return <div ref={containerRef} className="scroll-globe-canvas" aria-label="Illustrative orbital model, not live satellite data">
     {!supported&&<div className="scroll-globe-fallback" role="img" aria-label="Fallback orbital Earth graphic"><span>◉</span><p>ORBITAL MODEL / STATIC VIEW</p></div>}
-    <div className="scroll-globe-caption" aria-hidden="true">SYNTHETIC EARTH TOPOLOGY <span>FRAME {String(active+1).padStart(2,'0')}/05</span></div>
+    <div className="scroll-globe-caption" aria-hidden="true">{t.satellite} <span>FRAME {String(active+1).padStart(2,'0')}/05</span></div>
   </div>;
 }
 
-export default function ScrollExperience(){
+export default function ScrollExperience({locale}:{locale:Locale}){
+  const t=getCopy(locale).journey;
+  const phases=t.phases;
   const sectionRef=useRef<HTMLElement>(null);
   const chaptersRef=useRef<Array<HTMLElement|null>>([]);
   const progressRef=useRef(0);
@@ -249,32 +246,32 @@ export default function ScrollExperience(){
     return()=>{window.removeEventListener('scroll',onScroll);window.removeEventListener('resize',onScroll);cancelAnimationFrame(frame)};
   },[]);
   const step=phases[active];
-  return <section id="architecture" className="journey" ref={sectionRef} aria-label="Five-stage scroll-controlled communications resilience story">
-    <div className="container journey-heading"><span className="eyebrow">01 / INTERACTIVE MISSION</span><h2>WATCH THE NETWORK <em>EVOLVE.</em></h2><p>Scroll to move through five stages of a simulated communications crisis.</p></div>
+  return <section id="architecture" className="journey" ref={sectionRef} aria-label={t.description}>
+    <div className="container journey-heading"><span className="eyebrow">{t.eyebrow}</span><h2>{t.title}</h2><p>{t.description}</p></div>
     <div className="container journey-grid">
       <div className="journey-chapters">
-        {phases.map((phase,i)=><article key={phase.number} id={'stage-'+(i+1)} ref={node=>{chaptersRef.current[i]=node}} className={'journey-chapter '+(active===i?'chapter-current':'')}>
-          <div className="chapter-rail"><span>{phase.number} / 05</span><i/></div>
+        {phases.map((phase,i)=><article key={i} id={'stage-'+(i+1)} ref={node=>{chaptersRef.current[i]=node}} className={'journey-chapter '+(active===i?'chapter-current':'')}>
+          <div className="chapter-rail"><span>{String(i+1).padStart(2,'0')} / 05</span><i/></div>
           <div className="chapter-copy"><p className="eyebrow">{phase.tag}</p><h3>{phase.title}</h3><h4>{phase.subtitle}</h4><p>{phase.detail}</p>
-            <span className="chapter-claim">{i<2?'BROWSER SOFTWARE CONCEPT':i<4?'SYNTHETIC NETWORK VISUALIZATION':'RESEARCH ROADMAP / NOT CERTIFIED'}</span>
+            <span className="chapter-claim">{t.claim[i]}</span>
           </div>
         </article>)}
       </div>
       <div className="journey-viewport">
         <div className="journey-stage-panel" data-phase={active}>
-          <div className="journey-topline"><span><i/> MISSION SIMULATION / SCROLL ENGINE</span><span>0{active+1} / 05</span></div>
+          <div className="journey-topline"><span><i/> {t.heading}</span><span>0{active+1} / 05</span></div>
           <div className="journey-visual"><GlobeCanvas progressRef={progressRef} active={active} reduceMotion={reduceMotion}/>
-            <div className="journey-hud hud-top"><span>MODEL STATE</span><strong className={'tone-'+step.tone}>{step.status}</strong></div>
-            <div className="journey-hud hud-bottom"><span>OBSERVATION</span><strong>{step.metric}</strong><small>{step.unit}</small></div>
+            <div className="journey-hud hud-top"><span>{t.model}</span><strong className={'tone-'+tones[active]}>{step.status}</strong></div>
+            <div className="journey-hud hud-bottom"><span>{t.observation}</span><strong>{step.metric}</strong><small>{step.unit}</small></div>
             <div className="journey-crosshair" aria-hidden="true"><span>+</span></div>
           </div>
           <div className="journey-controls">
-            <div className="journey-progress"><span>SEQUENCE PROGRESS</span><strong>{Math.round((active/4)*100)}%</strong><div className="journey-track"><i/></div></div>
-            <div className="journey-phase-nav" role="group" aria-label="Jump between the five chapters">
-              {phases.map((phase,i)=><button type="button" key={phase.number} aria-label={'Go to '+phase.tag} aria-current={active===i?'step':undefined} className={active===i?'selected':''} onClick={()=>chaptersRef.current[i]?.scrollIntoView({behavior:reduceMotion?'instant':'smooth',block:'center'})}>{phase.number}</button>)}
+            <div className="journey-progress"><span>{t.progress}</span><strong>{Math.round(progressRef.current*100)}%</strong><div className="journey-track"><i/></div></div>
+            <div className="journey-phase-nav" role="group" aria-label={t.chapter}>
+              {phases.map((phase,i)=><button type="button" key={i} aria-label={t.chapter+': '+phase.tag} aria-current={active===i?'step':undefined} className={active===i?'selected':''} onClick={()=>chaptersRef.current[i]?.scrollIntoView({behavior:reduceMotion?'instant':'smooth',block:'center'})}>{String(i+1).padStart(2,'0')}</button>)}
             </div>
           </div>
-          <p className="journey-footnote">All paths, satellites and scenario telemetry are illustrative. No real device, official alert or live uplink.</p>
+          <p className="journey-footnote">{t.disclaimer}</p>
         </div>
       </div>
     </div>
