@@ -1,0 +1,36 @@
+name: Android Nearby laboratory (build-only)
+on:
+  push:
+    branches: [feat/master-emergency-routing-v1-20261020]
+    paths:
+      - 'experimental/android-nearby/**'
+      - '.github/workflows/android-nearby-ci.yml'
+  pull_request:
+    paths:
+      - 'experimental/android-nearby/**'
+      - '.github/workflows/android-nearby-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  android-build:
+    name: Compile experimental two-phone APK (not physical validation)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK 35
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Compile debug APK without connecting to emergency services
+        working-directory: experimental/android-nearby
+        run: gradle :app:assembleDebug --no-daemon --stacktrace
+      - name: Confirm APK produced (build proof ONLY)
+        run: test -s experimental/android-nearby/app/build/outputs/apk/debug/app-debug.apk
