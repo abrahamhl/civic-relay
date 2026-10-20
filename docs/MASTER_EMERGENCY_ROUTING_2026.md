@@ -57,3 +57,15 @@ Local civil protection agency authentic alert endpoint; hospital/first-responder
 
 ## Evidence-based milestones
 **M0** reproducible simulation and public risk register; **M1** two-phone validated offline transfer with receipts; **M2** safe gateway and signed authority alert proof of concept; **M3** multi-party exercise and independently documented usability/security tests. Investors should evaluate test logs and external letters of intent, not unsourced hypothetical rescue outcomes.
+
+## Execution 2 — in-memory store-and-forward demonstrator (20 October 2026)
+
+Code: `investor-next/lib/store-forward.mjs` and its `.d.mts` type contract. Interactive client: `investor-next/app/transport-sandbox.tsx`. Tests: `investor-next/tests/store-forward.test.mjs`; GitHub Actions runs the lab suite and builds the existing Three.js/Next.js experience.
+
+**What the executable engine actually does:** validates strictly synthetic, explicitly initiated messages; enforces bounded queue capacity and TTL (max 24h); blocks non-lab destinations; labels every adapter `SIMULATED`; checks declared availability/permission/compatibility/security/capacity; scores proposed relative latency, reliability and energy costs; selects a compatible adapter; queues on failure; retries with exponential wait; deduplicates IDs; accepts only a structurally matching *simulated* receiver receipt; distinguishes `FORWARDED_UNCONFIRMED` from `ACK_SYNTHETIC`; supports revocation, expiry and audit deletion. Critical-energy model gives explicit SOS priority over non-SOS traffic. All adapters here are process-local fake implementations.
+
+**Important limits:** There is NO real encryption/authenticated receiver proof, no actual cross-device discovery, no measured throughput or battery drain, no multi-hop RF forwarding, no certified CAP source, no emergency response integration and no satellite access. The JS engine is a second research fixture, not yet the authoritative transport dispatcher in `packages/core`. An `ACK_SYNTHETIC` means only that a fake receiver returned a matching in-memory test receipt; it is never proof of physical delivery, human safety or rescue. React UI status choices stay in this page's memory and now self-expire while the page is open; they are not 112 calls.
+
+**Replicate:** `node --test investor-next/tests/*.test.mjs`; `cd investor-next && npm install && npm run type-check && npm run build`. In the 3D lab, turn off the external gateway, generate a *fictional* SOS, then turn the gateway on and retry the queued message (the retry-backoff timer applies). No live devices participate in that exercise.
+
+**Next evidence gate:** create an *isolated* Android adapter/pilot with two consented devices; do not relabel synthetic ACK as verified. Record phone/OS versions, consent, genuine authenticated receiver receipts, p50/p95 delivery delay, success denominator, replay resistance and power-consumption methodology. Leave official CAP and commercial satellite gateways for separate institutional integrations.
