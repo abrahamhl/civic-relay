@@ -28,3 +28,11 @@ test('the evidence board explicitly distinguishes model-only checks from physica
  assert.match(board,/NIET FYSIEK GETEST/);
  assert.match(board,/No official alerts, no rescue confirmation/);
 });
+
+test('investor can export complete deterministic synthetic routes with evidence warning',()=>{
+ const lab=read('investor-next/app/coordination-lab.tsx');
+ assert.match(lab,/OEP_SYNTHETIC_EVIDENCE_EXPORT/);
+ assert.match(lab,/SIMULATION_ONLY_NOT_PHYSICALLY_TESTED_NOT_AN_EMERGENCY_SERVICE/);
+ assert.match(lab,/input:params,result/);
+ assert.match(lab,/application\/json/);
+});
