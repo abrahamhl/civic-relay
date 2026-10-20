@@ -32,3 +32,17 @@ M3: partner tabletop test, verified alert ingestion, threat analysis, privacy/DP
 M4: ask a standards laboratory about a **defined** product cybersecurity evaluation / interoperability exercise. Neither M1 nor an ISO guideline certifies emergency efficacy.
 
 **Disallowed claim:** an Android CI green badge, app permission screen or local transport receipt makes OEP deployable for real emergency response.
+
+## Added M1.3 fail-closed timeout acceptance (unexecuted field trials)
+These are explicit **planned** hardware test steps, not successful test results:
+
+| Trial ID | Setup on two consented Android phones | Expected result | Evidence to capture |
+| --- | --- | --- | --- |
+| TIMEOUT-NO-ACK | Establish paired link, send synthetic message, disconnect B before the application receipt, leave A foregrounded for at least 60 seconds | A shows an automatic `LAB TIMEOUT`, journal records `EXPIRED`, never `ACK_RECEIVED` | Both screens, local CSV and sender elapsed time |
+| TTL-RETRY | Following TIMEOUT-NO-ACK, reconnect and submit a fresh trial without restarting A | New UUID and challenge are accepted; older receipt cannot close the new trial | New UUID, journal rows, packet logs with no personal identifiers |
+| CLOCK-ROLLBACK | During a pending synthetic trial, manually set A's wall clock backwards while keeping the activity foregrounded | The sender's monotonic watchdog still expires after elapsed TTL; late ACK is rejected | Elapsed time and changed clock procedure; no unsupported accuracy claims |
+| REVOKE-TIMER | Begin synthetic send, press STOP while still pending | No later timeout or receipt re-creates local trial data or starts background discovery | Zero local rows after STOP and no subsequent ACK success |
+| SETTINGS-FOREGROUND | Open Wi-Fi/Bluetooth Settings from inside the app | Activity stops and revokes session; returning requires new informed consent and peer verification | Foreground/consent screenshots |
+| FORGED-ACK | Without a matching consent-verified session, send wrong UUID or challenge using a controlled lab harness | No accepted application ACK; test only within authorized pairing | Guard test / captured response with no external traffic |
+
+**Threshold:** This matrix does not upgrade the project to PHYSICALLY_TESTED until every asserted result is observed, failed cases recorded, and evidence independently reviewed. The sender timeout is an application-level guarantee under a foreground process, not proof the operating system will keep the app running during a catastrophe.
