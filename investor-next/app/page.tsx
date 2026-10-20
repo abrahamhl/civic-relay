@@ -1,7 +1,7 @@
 import MissionControl from './mission-control';
 
 const source='https://github.com/abrahamhl/civic-relay';
-const demo='https://civic-relay.vercel.app';
+const demo='https://civic-relay-kvg9qgsuv-2fabraham-7129s-projects.vercel.app';
 const funding='https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-CL3-2026-01-SSRI-04';
 const features=[
  {n:'01',title:'PERSIST',label:'STORE & FORWARD',text:'Queue messages locally when the modeled transport disappears.'},
