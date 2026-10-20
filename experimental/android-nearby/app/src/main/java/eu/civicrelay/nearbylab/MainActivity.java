@@ -250,7 +250,7 @@ public final class MainActivity extends Activity {
                         expires > System.currentTimeMillis() + TTL_MILLIS + 1000) {
                         log("Expired or malformed test message rejected.");return;
                     }
-                    if (seenIds.size() >= 100) seenIds.clear();
+                    if (seenIds.size() >= 100) seenIds.remove(seenIds.iterator().next());
                     if (seenIds.add(id)) log("LAB MESSAGE RECEIVED; duplicate guard active.");
                     JSONObject receipt = new JSONObject()
                         .put("v", 1).put("type", "LAB_RECEIPT").put("id", id);
