@@ -46,10 +46,22 @@ export async function acceptAuthorizedCapAlert(alert,verifyIssuer,{now=Date.now(
  for(const field of ['identifier','sender','sent']){
   if(typeof alert[field]!=='string'||!alert[field])throw new Error('Missing CAP '+field);
  }
- if(!Array.isArray(alert.polygons)||!alert.polygons.length)throw new Error('Missing geometry');
- if(alert.expires&&!Number.isFinite(Date.parse(alert.expires)))throw new Error('Invalid expiry');
+ if(!Number.isSafeInteger(now)||now<0)throw new Error('Invalid verification clock');
+ if(!Number.isFinite(Date.parse(alert.sent)))throw new Error('Invalid CAP sent timestamp');
+ if(!Array.isArray(alert.polygons)||alert.polygons.length===0||alert.polygons.length>50||
+    !alert.polygons.every(poly=>Array.isArray(poly)&&poly.length>=3&&poly.length<=500&&
+      poly.every(point=>Array.isArray(point)&&point.length===2&&
+        typeof point[0]==='number'&&typeof point[1]==='number'&&
+        Number.isFinite(point[0])&&Number.isFinite(point[1])&&
+        point[0]>=-90&&point[0]<=90&&point[1]>=-180&&point[1]<=180)))
+   throw new Error('Invalid CAP polygon geometry');
+ if(!alert.expires||!Number.isFinite(Date.parse(alert.expires)))throw new Error('Missing or invalid CAP expiry');
  if(alert.expires&&Date.parse(alert.expires)<=now)throw new Error('Expired CAP alert');
  if(Date.parse(alert.sent)>now+60000)throw new Error('Future alert rejected');
+ if(Date.parse(alert.expires)<=Date.parse(alert.sent))throw new Error('CAP expiry must follow issue timestamp');
+ if((alert.msgType==='Update'||alert.msgType==='Cancel')&&
+    (typeof alert.references!=='string'||!alert.references.trim()))
+   throw new Error('Update/Cancel requires an authentic referenced prior alert');
  const proof=await verifyIssuer(alert);
  if(!proof||proof.authenticated!==true||typeof proof.trustAnchorId!=='string'||!proof.trustAnchorId)
    throw new Error('Untrusted issuer; institutional actions prohibited');
