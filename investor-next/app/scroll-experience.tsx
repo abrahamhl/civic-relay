@@ -6,9 +6,9 @@ import type { RefObject } from 'react';
 import {getCopy,type Locale} from './copy';
 const tones=['failure','queued','mesh','ack','recovery'] as const;
 
-type GlobeProps={progressRef:RefObject<number>;active:number;reduceMotion:boolean};
+type GlobeProps={progressRef:RefObject<number>;active:number;reduceMotion:boolean;satelliteLabel:string};
 
-function GlobeCanvas({progressRef,active,reduceMotion}:GlobeProps){
+function GlobeCanvas({progressRef,active,reduceMotion,satelliteLabel}:GlobeProps){
   const containerRef=useRef<HTMLDivElement>(null);
   const [supported,setSupported]=useState(true);
   useEffect(()=>{
@@ -207,7 +207,7 @@ function GlobeCanvas({progressRef,active,reduceMotion}:GlobeProps){
   },[progressRef,reduceMotion]);
   return <div ref={containerRef} className="scroll-globe-canvas" aria-label="Illustrative orbital model, not live satellite data">
     {!supported&&<div className="scroll-globe-fallback" role="img" aria-label="Fallback orbital Earth graphic"><span>◉</span><p>ORBITAL MODEL / STATIC VIEW</p></div>}
-    <div className="scroll-globe-caption" aria-hidden="true">{t.satellite} <span>FRAME {String(active+1).padStart(2,'0')}/05</span></div>
+    <div className="scroll-globe-caption" aria-hidden="true">{satelliteLabel} <span>FRAME {String(active+1).padStart(2,'0')}/05</span></div>
   </div>;
 }
 
@@ -260,7 +260,7 @@ export default function ScrollExperience({locale}:{locale:Locale}){
       <div className="journey-viewport">
         <div className="journey-stage-panel" data-phase={active}>
           <div className="journey-topline"><span><i/> {t.heading}</span><span>0{active+1} / 05</span></div>
-          <div className="journey-visual"><GlobeCanvas progressRef={progressRef} active={active} reduceMotion={reduceMotion}/>
+          <div className="journey-visual"><GlobeCanvas progressRef={progressRef} active={active} reduceMotion={reduceMotion} satelliteLabel={t.satellite}/>
             <div className="journey-hud hud-top"><span>{t.model}</span><strong className={'tone-'+tones[active]}>{step.status}</strong></div>
             <div className="journey-hud hud-bottom"><span>{t.observation}</span><strong>{step.metric}</strong><small>{step.unit}</small></div>
             <div className="journey-crosshair" aria-hidden="true"><span>+</span></div>
