@@ -41,9 +41,12 @@ jobs:
             experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/LabDeliveryGuard.java \
             experimental/android-nearby/app/src/test/java/eu/civicrelay/nearbylab/LabDeliveryGuardTest.java \
             experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/LabTrialJournal.java \
-            experimental/android-nearby/app/src/test/java/eu/civicrelay/nearbylab/LabTrialJournalTest.java
+            experimental/android-nearby/app/src/test/java/eu/civicrelay/nearbylab/LabTrialJournalTest.java \
+            experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/LabDeadlinePolicy.java \
+            experimental/android-nearby/app/src/test/java/eu/civicrelay/nearbylab/LabDeadlinePolicyTest.java
           java -cp "$RUNNER_TEMP/oep-jvm" eu.civicrelay.nearbylab.LabDeliveryGuardTest
           java -cp "$RUNNER_TEMP/oep-jvm" eu.civicrelay.nearbylab.LabTrialJournalTest
+          java -cp "$RUNNER_TEMP/oep-jvm" eu.civicrelay.nearbylab.LabDeadlinePolicyTest
       - name: Compile debug APK without connecting to emergency services
         working-directory: experimental/android-nearby
         run: gradle :app:assembleDebug --no-daemon --stacktrace
