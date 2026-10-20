@@ -44,3 +44,6 @@
 
 ### Collecting voluntary reproducible data
 Two owners review consent and verify the same Nearby digits on each screen. For each run, note the test scenario and manually export the local CSV after the trials; pair the files with the external worksheet only with volunteers' explicit approval. Include unsuccessful and expired runs, different vendor/Android versions, and radio-off tests. This is an experiment, not a rescue product. Use experimental/android-nearby/PILOT_ACCEPTANCE.md as the field checklist.
+
+### Lab protocol v2 — challenge-bound receipts
+Each fictional LAB_MESSAGE now carries a fresh cryptographically random UUID challenge in addition to the message UUID, expiry and fixed synthetic body. The consenting receiver echoes both IDs in its LAB_RECEIPT; the sender checks the exact message ID, per-message challenge, approved Nearby peer and local deadline. Version 1 payloads are intentionally rejected. Both handsets must run a v2 build. This **does not** create authenticated signatures, prevent a malicious approved peer from lying, guarantee disaster connectivity, or count as physical delivery without an observed hardware trial. It narrows simple mismatched/replayed receipt mistakes in the research protocol.
