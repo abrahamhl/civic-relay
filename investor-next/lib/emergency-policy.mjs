@@ -28,10 +28,10 @@ export function energyPolicy(battery,alertActive){
  const profile=battery<=15?'CRITICAL':battery<=35?'CONSERVATION':alertActive?'ALERT':'NORMAL';
  // Proposed configuration knobs, NOT real measured power draws.
  const suggestions={
-  NORMAL:{discoverySeconds:8,retrySeconds:60,relay:true},
-  ALERT:{discoverySeconds:12,retrySeconds:25,relay:true},
-  CONSERVATION:{discoverySeconds:5,retrySeconds:90,relay:true},
-  CRITICAL:{discoverySeconds:2,retrySeconds:180,relay:false}
+  NORMAL:{discoverySeconds:8,discoveryIntervalSeconds:60,retrySeconds:60,relay:true},
+  ALERT:{discoverySeconds:8,discoveryIntervalSeconds:20,retrySeconds:25,relay:true},
+  CONSERVATION:{discoverySeconds:4,discoveryIntervalSeconds:120,retrySeconds:90,relay:true},
+  CRITICAL:{discoverySeconds:2,discoveryIntervalSeconds:300,retrySeconds:180,relay:false}
  };
  return {profile,...suggestions[profile],systemBatterySaverChanged:false,measurements:'NOT_MEASURED'};
 }
