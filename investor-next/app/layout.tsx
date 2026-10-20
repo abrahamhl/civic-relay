@@ -1,17 +1,14 @@
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import './globals.css';
 
-export const metadata: Metadata = {
-  metadataBase: new URL('https://github.com/abrahamhl/civic-relay'),
-  title: 'Civic Relay | Resilient Crisis Messaging Research',
-  description: 'Evidence-led EU civil security technology prototype. Simulated store-and-forward, multipath acknowledgements and local-first messaging research. Not an emergency service.',
-  robots: { index: true, follow: true },
+const inter=Inter({subsets:['latin'],display:'swap',variable:'--font-inter'});
+export const metadata: Metadata={
+  title:'Civic Relay — Communication Beyond Blackout',
+  description:'Civic Relay develops offline-first crisis messaging research. Explore an interactive simulated mission model, open-source code and the European field-validation roadmap. Not an emergency service.',
+  openGraph:{title:'Civic Relay | Resilience by design',description:'When networks go dark, communication must endure. Open-source research prototype; transport links shown are simulated.',type:'website'},
+  robots:{index:true,follow:true}
 };
-
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
+export default function RootLayout({children}:Readonly<{children:React.ReactNode}>){
+  return <html lang="en"><body className={inter.variable}>{children}</body></html>;
 }
