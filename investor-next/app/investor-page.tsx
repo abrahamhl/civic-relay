@@ -9,7 +9,7 @@ import {getCopy,labels,locales,type Locale} from './copy';
 import LanguageDocument from './language-document';
 
 const source='https://github.com/abrahamhl/civic-relay';
-const demo='https://civic-relay-4zbvbbxxm-2fabraham-7129s-projects.vercel.app';
+
 const funding='https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-CL3-2026-01-SSRI-04';
 const dossier=source+'/blob/feat/master-emergency-routing-v1-20261020/docs/MASTER_EMERGENCY_ROUTING_2026.md';
 const contact=source+'/issues/new';
@@ -34,7 +34,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
     <h1>{t.hero.first}<br/><span className="heading-muted">{t.hero.middle}</span><br/><span className="heading-urgent">{t.hero.last}</span></h1>
     <div className="hero-divider"><span>{t.hero.line}</span><span>↓</span></div>
     <p className="hero-lede">{t.hero.desc} <strong>{pitch.promise}</strong></p>
-    <div className="hero-actions"><a className="button-primary" href="#story">{t.hero.action} <span>↘</span></a><a className="button-outline" href={demo} target="_blank" rel="noopener noreferrer">{t.hero.demo} <span>↗</span></a></div>
+    <div className="hero-actions"><a className="button-primary" href="#story">{t.hero.action} <span>↘</span></a><a className="button-outline" href="#routing-lab">{t.hero.demo} <span>↘</span></a></div>
     <div className="proof-rail"><div><span className="proof-circle"/>{t.hero.proof}</div><div>{t.hero.gap}</div><div className="prototype-warning">{t.hero.note}</div></div>
    </div>
    <MissionControl locale={locale}/>
