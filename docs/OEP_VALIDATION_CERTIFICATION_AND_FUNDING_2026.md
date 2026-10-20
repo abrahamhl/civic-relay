@@ -50,3 +50,33 @@
 - **Civil-protection training/research partner** for tabletop exercise, not to endorse operational deployment.
 
 A draft message pack can be prepared, but no letters, emails or application submissions have been sent.
+
+## Update — 21 October 2026: broader non-duplicate funding + certification triage
+
+### Newly verified opportunity: INNOWWIDE 2026, international market feasibility
+- **Status:** Call 5 is in its published application window **1 October–1 December 2026, 14:00 CET**; RVO general overview marks it OPEN. The detailed RVO page may still show a generic "temporarily closed" heading: check the actual submission form before stating that an application is accepted.
+- **Amount:** fixed **€60,000** grant where awarded, minimum eligible project cost **€86,000** (up to 70%). RVO publishes total call budget €4.2m for 70 projects.
+- **Critical eligibility:** registered eligible SME and an international feasibility project **with an external-country counterpart in Africa, the Americas, Middle East, Asia or Oceania**. A Netherlands-only two-Android engineering pilot or a partnership only in EU Member States is **not sufficient**; commercial market testing is a different work package from emergency-device R&D.
+- **OEP decision:** **CONDITIONAL FIT ONLY** if an actual eligible third-country market/civil resilience partner and legally eligible applicant exist; do not divert scarce effort from the Nov 5 Horizon opportunity. Do not label a one-person unregistered research repo as a Dutch SME applicant.
+- **Source:** RVO official https://english.rvo.nl/subsidies-financing/innowwide and current overview https://www.rvo.nl/onderwerpen/internationaal-innoveren/regelingen
+
+### EUCC: real security certification route, NOT rescue approval
+- **Instrument:** European Common Criteria-based Cybersecurity Certification (EUCC), based on ISO/IEC 15408, available for qualifying ICT hardware/software/components. ENISA reports certificates can be issued since February 2025 and accredited certification bodies/labs perform the assessment.
+- **OEP fit:** prospective **product-specific cybersecurity evaluation only after a precisely defined target of evaluation (TOE), security target, controlled build, software updates and repeatable assurance evidence**. It cannot validate emergency communications coverage or grant authority to send official alerts or 112 signals.
+- **Current decision:** **NOT CERTIFICATION READY**. Do not claim the project, developers or simulation are EUCC/ISO 27001 certified. Ask accredited assessor about scope, feasibility and cost only after the security architecture and device lab stabilize.
+- **Sources:** ENISA https://certification.enisa.europa.eu/browse-topic/eucc_en and EU cybersecurity certification framework https://www.enisa.europa.eu/topics/product-security-and-certification/cybersecurity-certification-framework
+
+### Priority order of independent evidence
+1. M0: CI reproducibility — evidence matrix reports **810 virtual scenario executions / 12,150 model invariant checks**, downloadable artifact for exact commit once GitHub Action succeeds. Not independent field evidence.
+2. M1: repeatable consenting Android→Android transfer over a supported physical transport, document failed runs too (minimum explicit trial denominator); **pending actual devices**.
+3. M2: cross-vendor interoperability exercise with compatible interfaces and consenting technical partners; **no ETSI Plugtests invitation or result claimed**.
+4. M3: independent application penetration test, privacy/DPIA assessment and emergency-practitioner tabletop exercise using synthetic test data; **all pending**.
+5. M4: define product/security scope and explore EUCC assessment with an accredited body; only then consider product assurance label. **No certified scope exists today**.
+
+### Funding submission reality as of 21 October
+**Horizon CL3 SSRI-04 and DRS-03: open, deadline 5 November 2026** on the European Commission portal; that does not establish that OEP can submit alone. **Eurostars-3 call 12: opens 17 December 2026, closes 4 March 2027**; RVO specifies Dutch company eligibility and co-financing. **Innowwide: call window open but fundamentally international market-feasibility focused**. No signed consortium, external field validation, grant application or certification filing has been verified.
+
+Official Horizon portal: https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/calls-for-proposals?callIdentifier=HORIZON-CL3-2026-01
+
+### Funding-agent relevance rubric (mandatory)
+Classify every lead **ACTIVE ELIGIBLE / ACTIVE CONDITIONAL / FUTURE / CLOSED / NOT A GRANT / CERTIFICATION PATH**. Require: official URL, topic ID, call status, exact date and timezone, product fit, legal applicant requirements, funding and co-financing, proof of consortium, current TRL, blocker, one *verifiable* next action, retrieved date. Never fill unknown fields with plausible figures. Rank speed-to-next-action, not grant amount alone. Do not treat a standard, security test, pre-assessment, independent exercise or technical open-source licence as a granted certificate.
