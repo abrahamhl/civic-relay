@@ -328,8 +328,8 @@ public final class MainActivity extends Activity {
                 status == PayloadTransferUpdate.Status.CANCELED) {
                 String outgoing = outgoingPayloads.remove(update.getPayloadId());
                 if (outgoing != null) {
-                    deliveryGuard.abortOutgoing(outgoing);
-                    sendStartedElapsed = 0L;
+                    if (deliveryGuard.abortOutgoing(outgoing))
+                        sendStartedElapsed = 0L;
                 }
                 log("Nearby payload transfer failed or canceled. Not delivered.");
             } else if (status == PayloadTransferUpdate.Status.SUCCESS) {
@@ -350,8 +350,8 @@ public final class MainActivity extends Activity {
             .addOnFailureListener(e -> {
                 outgoingPayloads.remove(outgoing.getId());
                 if (messageId != null) {
-                    deliveryGuard.abortOutgoing(messageId);
-                    sendStartedElapsed = 0L;
+                    if (deliveryGuard.abortOutgoing(messageId))
+                        sendStartedElapsed = 0L;
                 }
                 log("Send rejected by Nearby; no delivered status: " + e.getClass().getSimpleName());
             });
