@@ -1,5 +1,5 @@
 import type { MessageType, Priority } from '@civic-relay/schemas';
-import { Check, Siren, HeartPulse, Flame, TriangleAlert, FileText } from 'lucide-react';
+import { Check, Siren, HeartPulse, Flame, AlertTriangle, FileText } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 const actions:{type:MessageType;priority:Priority;name:string;code:string;icon:LucideIcon}[]=[
@@ -7,7 +7,7 @@ const actions:{type:MessageType;priority:Priority;name:string;code:string;icon:L
  {type:'SOS',priority:'CRITICAL',name:'REQUEST HELP',code:'SOS',icon:Siren},
  {type:'MEDICAL',priority:'HIGH',name:'MEDICAL',code:'MED',icon:HeartPulse},
  {type:'FIRE',priority:'CRITICAL',name:'FIRE REPORT',code:'FIRE',icon:Flame},
- {type:'INFRASTRUCTURE',priority:'MEDIUM',name:'INFRASTRUCTURE',code:'INFRA',icon:TriangleAlert},
+ {type:'INFRASTRUCTURE',priority:'MEDIUM',name:'INFRASTRUCTURE',code:'INFRA',icon:AlertTriangle},
  {type:'GENERAL_REPORT',priority:'LOW',name:'GENERAL REPORT',code:'GEN',icon:FileText}
 ];
 
