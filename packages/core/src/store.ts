@@ -13,6 +13,8 @@ export class MessageStore {
   private readonly states = new Map<string, DeliveryState>();
   private readonly acknowledgments = new Map<string, Set<string>>();
   private readonly idbStore?: UseStore;
+  private writeChain: Promise<void> = Promise.resolve();
+  private persistenceError: unknown = null;
 
   constructor(private readonly now: () => number = Date.now) {
     if (typeof indexedDB !== 'undefined') {
@@ -23,12 +25,27 @@ export class MessageStore {
   async loadFromStorage(): Promise<void> {
     if (!this.idbStore) return;
     try {
-      const storedMessages = await get<MessageEnvelope[]>('messages', this.idbStore);
-      const storedStates = await get<[string, DeliveryState][]>('states', this.idbStore);
-      const storedAcks = await get<[string, string[]][]>('acks', this.idbStore);
+      // A single atomic snapshot avoids torn writes between the messages/states/acks keys.
+      // Legacy keys are read only for migration from the first demo version.
+      const snapshot = await get<{
+        messages: MessageEnvelope[];
+        states: [string, DeliveryState][];
+        acks: [string, string[]][];
+      }>('snapshot', this.idbStore);
+      const storedMessages = snapshot?.messages ?? await get<MessageEnvelope[]>('messages', this.idbStore);
+      const storedStates = snapshot?.states ?? await get<[string, DeliveryState][]>('states', this.idbStore);
+      const storedAcks = snapshot?.acks ?? await get<[string, string[]][]>('acks', this.idbStore);
       
       if (storedMessages) {
-        for (const m of storedMessages) this.messages.set(m.id, m);
+        for (const m of storedMessages) {
+          // Never trust browser storage to upgrade a message into an official notice.
+          try {
+            const validated = parseUntrustedMessage(m, this.now());
+            this.messages.set(validated.id, validated);
+          } catch {
+            console.warn('Ignoring invalid or untrusted local message');
+          }
+        }
       }
       if (storedStates) {
         for (const [k, v] of storedStates) this.states.set(k, v);
@@ -37,19 +54,39 @@ export class MessageStore {
         for (const [k, v] of storedAcks) this.acknowledgments.set(k, new Set(v));
       }
     } catch (e) {
-      console.warn('Failed to load MessageStore from IndexedDB', e);
+      console.error('Failed to load MessageStore from IndexedDB', e);
+      throw e;
     }
   }
 
+  /**
+   * Serialize immutable, coherent snapshots. A browser crash cannot leave an
+   * acknowledged delivery state paired with stale message data across keys.
+   * Real durability still requires browser power-loss tests.
+   */
   private persist(): void {
-    if (!this.idbStore) return;
-    try {
-      set('messages', Array.from(this.messages.values()), this.idbStore).catch(() => {});
-      set('states', Array.from(this.states.entries()), this.idbStore).catch(() => {});
-      set('acks', Array.from(this.acknowledgments.entries()).map(([k, v]) => [k, Array.from(v)]), this.idbStore).catch(() => {});
-    } catch (e) {
-      console.warn('Failed to persist MessageStore to IndexedDB', e);
-    }
+    const db = this.idbStore;
+    if (!db) return;
+    const snapshot = {
+      messages: Array.from(this.messages.values()),
+      states: Array.from(this.states.entries()),
+      acks: Array.from(this.acknowledgments.entries()).map(
+        ([key, paths]) => [key, Array.from(paths)] as [string, string[]]
+      ),
+    };
+    this.writeChain = this.writeChain.catch(() => undefined).then(async () => {
+      await set('snapshot', snapshot, db);
+      this.persistenceError = null;
+    }).catch((error: unknown) => {
+      this.persistenceError = error;
+      console.error('Failed to persist MessageStore to IndexedDB', error);
+    });
+  }
+
+  /** Caller must await this before reporting that a message is safely staged. */
+  async flushPersistence(): Promise<void> {
+    await this.writeChain;
+    if (this.persistenceError) throw new Error('Local message persistence failed');
   }
 
   enqueue(input: unknown): MessageEnvelope {
