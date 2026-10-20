@@ -49,3 +49,19 @@ test('low battery increases discovery interval while reducing scan window',()=>{
  assert.equal(critical.relay,false);
  assert.equal(critical.systemBatterySaverChanged,false);
 });
+
+test('CAP gate refuses malformed geometry, clocks and unauthenticated cancellations',async()=>{
+ const trusted=async()=>({authenticated:true,trustAnchorId:'FIXTURE_ONLY'});
+ const options={now:Date.parse('2026-10-20T14:00:00Z')};
+ await assert.rejects(acceptAuthorizedCapAlert({...alert,sent:'not-a-date'},trusted,options),/timestamp/);
+ await assert.rejects(acceptAuthorizedCapAlert({...alert,polygons:[[[999,2],[3,4],[1,4]]]},trusted,options),/geometry/);
+ await assert.rejects(acceptAuthorizedCapAlert({...alert,polygons:[[]]},trusted,options),/geometry/);
+ await assert.rejects(acceptAuthorizedCapAlert({...alert,expires:undefined},trusted,options),/expiry/);
+ await assert.rejects(acceptAuthorizedCapAlert({...alert,msgType:'Cancel'},trusted,options),/referenced prior alert/);
+ await assert.rejects(acceptAuthorizedCapAlert({...alert,msgType:'Update'},trusted,options),/referenced prior alert/);
+ await assert.rejects(acceptAuthorizedCapAlert({...alert,expires:'2026-10-19T12:00:00Z'},trusted,options),/Expired/);
+ const cancelled=await acceptAuthorizedCapAlert({...alert,msgType:'Cancel',
+   references:'example.test,ZONE-0,2026-10-19T12:00:00Z'},trusted,options);
+ assert.equal(cancelled.action,'CANCEL');
+ assert.equal(cancelled.permissionPolicy,'EXPLICIT_OPT_IN');
+});
