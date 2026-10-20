@@ -120,3 +120,29 @@ test('revocation during asynchronous send cannot be resurrected by a late receip
  assert.equal(done.hasPayload,false);
  assert.equal(engine.inspect('EXERCISE_1').status,'REVOKED');
 });
+
+test('forged or mismatched receiver receipt cannot become a successful ACK',async()=>{
+ const clock=lab(),engine=clock.engine();
+ const forged=createInMemoryAdapter({id:'LAB_FAKE'});
+ forged.send=async()=>({accepted:true,receipt:{
+  kind:'SIMULATED_RECEIVER_RECEIPT',messageId:'SOME_OTHER_MESSAGE',transportId:'LAB_FAKE'}});
+ engine.registerAdapter(forged);engine.enqueue(message());
+ const state=await engine.dispatch('EXERCISE_1');
+ assert.equal(state.status,'FORWARDED_UNCONFIRMED');
+ assert.equal(state.receiptKind,null);
+ assert.equal(state.hasPayload,true);
+});
+test('fallback next adapter after failure; no real measurement or delivery claims',async()=>{
+ const clock=lab(),engine=clock.engine({maxAttempts:3});
+ const first=createInMemoryAdapter({id:'LAB_FIRST',failures:3,reliability:1});
+ const second=createInMemoryAdapter({id:'LAB_SECOND',reliability:.7});
+ engine.registerAdapter(first);engine.registerAdapter(second);engine.enqueue(message());
+ const initial=await engine.dispatch('EXERCISE_1');
+ assert.equal(initial.status,'QUEUED');
+ assert.equal(initial.selectedTransport,'LAB_FIRST');
+ clock.advance(2000);
+ const retry=(await engine.retryDue())[0];
+ assert.equal(retry.status,'ACK_SYNTHETIC');
+ assert.equal(retry.selectedTransport,'LAB_SECOND');
+ assert.equal(second.getReceived().length,1);
+});
