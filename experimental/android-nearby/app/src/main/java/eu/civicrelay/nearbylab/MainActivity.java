@@ -295,12 +295,13 @@ public final class MainActivity extends Activity {
         }
         try {
             String id = UUID.randomUUID().toString();
+            String challenge = UUID.randomUUID().toString(); // Echo proof for this packet only.
             long deadline = now + TTL_MILLIS;
             JSONObject packet = new JSONObject()
-                .put("v", 1).put("type", "LAB_MESSAGE").put("id", id)
-                .put("expiresAt", deadline)
+                .put("v", 2).put("type", "LAB_MESSAGE").put("id", id)
+                .put("challenge", challenge).put("expiresAt", deadline)
                 .put("body", "SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS");
-            if (!deliveryGuard.beginOutgoing(id, connectedPeer, now, deadline)) {
+            if (!deliveryGuard.beginOutgoing(id, connectedPeer, challenge, now, deadline)) {
                 log("DENIED: invalid or pending lab message.");return;
             }
             sendStartedElapsed = SystemClock.elapsedRealtime();
@@ -317,10 +318,12 @@ public final class MainActivity extends Activity {
                 payload.asBytes().length > MAX_BYTES) return;
             try {
                 JSONObject packet = new JSONObject(new String(payload.asBytes(), StandardCharsets.UTF_8));
-                if (packet.optInt("v") != 1) return;
+                if (packet.optInt("v") != 2) return; // Reject incompatible pilot protocol versions.
                 String type = packet.optString("type");
                 String id = packet.optString("id");
-                if (!id.matches("[0-9a-fA-F-]{36}")) return;
+                String challenge = packet.optString("challenge");
+                if (!LabDeliveryGuard.validId(id) ||
+                    !LabDeliveryGuard.validId(challenge)) return;
                 if ("LAB_MESSAGE".equals(type)) {
                     if (!"SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS".equals(packet.optString("body"))) return;
                     long expires = packet.optLong("expiresAt", 0L);
@@ -332,11 +335,12 @@ public final class MainActivity extends Activity {
                     if (seen == LabDeliveryGuard.IncomingState.NEW)
                         log("LAB MESSAGE RECEIVED; bounded duplicate guard active.");
                     JSONObject receipt = new JSONObject()
-                        .put("v", 1).put("type", "LAB_RECEIPT").put("id", id);
+                        .put("v", 2).put("type", "LAB_RECEIPT").put("id", id)
+                        .put("challenge", challenge);
                     sendPacket(endpointId, receipt);
                 } else if ("LAB_RECEIPT".equals(type)) {
                     LabDeliveryGuard.ReceiptState receiptState = deliveryGuard.acceptReceipt(
-                        id, endpointId, System.currentTimeMillis());
+                        id, endpointId, challenge, System.currentTimeMillis());
                     if (receiptState == LabDeliveryGuard.ReceiptState.ACCEPTED) {
                         long latencyMs = finishTrial(id, "ACK_RECEIVED");
                         log("RECEIVER ACK from approved peer. Local elapsed: " + latencyMs +
