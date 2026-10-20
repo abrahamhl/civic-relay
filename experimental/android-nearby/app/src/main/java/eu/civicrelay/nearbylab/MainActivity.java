@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
@@ -67,6 +69,8 @@ public final class MainActivity extends Activity {
     private volatile long sendStartedElapsed = 0L;
     private volatile String activeTrialId = null;
     private final LabTrialJournal journal = new LabTrialJournal();
+    private final Handler foregroundTimer = new Handler(Looper.getMainLooper());
+    private Runnable pendingExpiryTask = null;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -134,12 +138,39 @@ public final class MainActivity extends Activity {
         });
     }
 
+    /**
+     * Foreground-only watchdog. A lost ACK must become EXPIRED without another tap.
+     * Session epoch and message UUID reject stale timer callbacks after STOP or a new trial.
+     */
+    private void armExpiry(String id, long deadlineMs) {
+        if (pendingExpiryTask != null) foregroundTimer.removeCallbacks(pendingExpiryTask);
+        final long epoch = sessionEpoch;
+        final Runnable[] self = new Runnable[1];
+        self[0] = () -> {
+            if (!userConsented || sessionEpoch != epoch || !id.equals(activeTrialId)) return;
+            long now = System.currentTimeMillis();
+            if (now >= deadlineMs) {
+                if (!deliveryGuard.hasPending(now)) {
+                    finishTrial(id, "EXPIRED");
+                    log("LAB TIMEOUT: no receiver ACK before expiry; NOT delivered.");
+                }
+            } else {
+                foregroundTimer.postDelayed(self[0], Math.max(50L, deadlineMs - now));
+            }
+        };
+        pendingExpiryTask = self[0];
+        foregroundTimer.postDelayed(pendingExpiryTask,
+            Math.max(50L, deadlineMs - System.currentTimeMillis()));
+    }
+
     /** In-app elapsed time is a single sample, never a claimed throughput or safety metric. */
     private synchronized long finishTrial(String id, String outcome) {
         if (id == null || !id.equals(activeTrialId)) return -1L;
         long elapsed = sendStartedElapsed == 0L ? -1L :
             Math.max(0L, SystemClock.elapsedRealtime() - sendStartedElapsed);
         journal.record(id, outcome, elapsed);
+        if (pendingExpiryTask != null) foregroundTimer.removeCallbacks(pendingExpiryTask);
+        pendingExpiryTask = null;
         activeTrialId = null;
         sendStartedElapsed = 0L;
         return elapsed;
@@ -306,6 +337,7 @@ public final class MainActivity extends Activity {
             }
             sendStartedElapsed = SystemClock.elapsedRealtime();
             activeTrialId = id;
+            armExpiry(id, deadline);
             sendPacket(connectedPeer, packet);
             log("Message submitted to Nearby API; NOT delivered until receiver ACK: " + id);
         } catch (JSONException e) { log("Packet encoding failed."); }
@@ -400,6 +432,8 @@ public final class MainActivity extends Activity {
         outgoingPayloads.clear();
         activeTrialId = null;
         sendStartedElapsed = 0L;
+        if (pendingExpiryTask != null) foregroundTimer.removeCallbacks(pendingExpiryTask);
+        pendingExpiryTask = null;
         journal.clear();
         connections.stopAdvertising();
         connections.stopDiscovery();
