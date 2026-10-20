@@ -61,11 +61,13 @@ export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAtt
     enqueue(input){
       const envelope=validate(input,now()),id=envelope.id,prior=records.get(id);
       if(prior){
-        if(prior.fingerprint!==stable(envelope))throw Error('Conflicting duplicate message ID');
+        if(!prior.envelope)throw Error('Terminal message ID cannot be reused');
+        if(stable(prior.envelope)!==stable(envelope))throw Error('Conflicting duplicate message ID');
         audit(id,'DEDUPLICATED');return view(prior);
       }
       if(records.size>=maxEntries)throw Error('Exercise queue full; fail closed');
-      const r={id,category:envelope.category,envelope,fingerprint:stable(envelope),
+      // Keep one active payload copy only; finalized IDs remain payload-free tombstones.
+      const r={id,category:envelope.category,envelope,
         status:'QUEUED',attempts:0,nextAttemptAt:now(),selectedTransport:null,receiptKind:null};
       if(now()>=envelope.createdAt+envelope.ttlSeconds*1000)
         throw Error('Expired envelope cannot be enqueued');
@@ -94,14 +96,18 @@ export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAtt
           }catch{audit(id,'ADAPTER_DESCRIPTION_FAILED',a.id);}
         }
         candidates.sort((a,b)=>b.score-a.score||a.a.id.localeCompare(b.a.id));
-        if(TERMINAL.has(r.status)||!records.has(id))return view(r);
+        if(records.get(id)!==r)return view(r);
+        expire(r); // Clock may have advanced while checking adapter availability.
+        if(TERMINAL.has(r.status))return view(r);
         if(!candidates.length){
           r.nextAttemptAt=now()+retryMs;audit(id,'NO_COMPATIBLE_ROUTE');return view(r);
         }
         const selected=candidates[r.attempts%candidates.length].a;
         r.selectedTransport=selected.id;r.attempts++;
         const sent=await selected.send(json(r.envelope));
-        if(TERMINAL.has(r.status)||!records.has(id))return view(r);
+        if(records.get(id)!==r)return view(r);
+        expire(r); // A late receipt must not revive an expired message.
+        if(TERMINAL.has(r.status))return view(r);
         if(sent?.accepted===true&&sent?.receipt?.kind==='SIMULATED_RECEIVER_RECEIPT'&&
           sent.receipt.messageId===id&&sent.receipt.transportId===selected.id){
           r.status='ACK_SYNTHETIC';r.receiptKind='SIMULATED_RECEIVER_RECEIPT';
@@ -112,12 +118,18 @@ export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAtt
         r.status=sent?.accepted===true?'FORWARDED_UNCONFIRMED':'QUEUED';
         audit(id,r.status,selected.id);
       }catch{
-        if(!TERMINAL.has(r.status)&&records.has(id)){
-          r.status='QUEUED';audit(id,'ADAPTER_SEND_FAILED',r.selectedTransport||'');
+        if(records.get(id)===r){
+          expire(r);
+          if(!TERMINAL.has(r.status)){
+            r.status='QUEUED';audit(id,'ADAPTER_SEND_FAILED',r.selectedTransport||'');
+          }
         }
       }finally{
         inFlight.delete(id);
-        if(!TERMINAL.has(r.status)){
+        if(records.get(id)===r&&!TERMINAL.has(r.status)){
+          expire(r);
+        }
+        if(records.get(id)===r&&!TERMINAL.has(r.status)){
           if(r.attempts>=maxAttempts){
             r.status='EXHAUSTED';r.envelope=null;r.nextAttemptAt=null;
             audit(id,'EXHAUSTED','Payload cleared; no delivery claim');
@@ -137,7 +149,7 @@ export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAtt
     },
     revoke(id){
       const r=records.get(id);if(!r)return false;
-      r.envelope=null;r.status='REVOKED';r.nextAttemptAt=null;r.fingerprint=null;
+      r.envelope=null;r.status='REVOKED';r.nextAttemptAt=null;
       audit(id,'REVOKED','Exercise payload cleared');return true;
     },
     purge(id){const deleted=records.delete(id);if(deleted){for(let i=events.length-1;i>=0;i--)if(events[i].id===id)events.splice(i,1);}return deleted;},
@@ -158,7 +170,8 @@ export function createInMemoryAdapter({id='LAB_GATEWAY',available=true,receipts=
     async send(envelope){
       if(!enabled)return {accepted:false};
       if(remaining>0){remaining--;return {accepted:false};}
-      received.push(json(envelope));
+      // Record only non-sensitive test metadata. This does not imply remote deletion.
+      received.push({id:envelope.id,provenance:'SYNTHETIC_EXERCISE_ONLY'});
       return {accepted:true,...(receipts?{receipt:{kind:'SIMULATED_RECEIVER_RECEIPT',
         messageId:envelope.id,transportId:id}}:{})};
     },
