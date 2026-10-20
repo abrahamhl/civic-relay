@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUpRight, ArrowRight, Radio, Layers3, ShieldCheck, Satellite, Activity } from 'lucide-react';
+import { ArrowDown, ArrowUpRight, ArrowRight, Radio, Layers3, ShieldCheck, Activity } from 'lucide-react';
 import { SatelliteVisualization } from './SatelliteVisualization';
 
 const steps=[
