@@ -1,4 +1,3 @@
-import React from 'react';
 import type { MessageEnvelope } from '@civic-relay/schemas';
 import './MessageQueue.css';
 
