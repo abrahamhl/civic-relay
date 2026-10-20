@@ -1,4 +1,4 @@
-# Civic Relay — two-phone Android Nearby laboratory
+# OEP — Offline Emergency Protocol | two-phone Android Nearby laboratory
 
 **Safety / provenance:** this is an EXPERIMENTAL, separately buildable Android app. It is not a production emergency system, a satellite uplink, an official alert, a rescue confirmation or a test call to 112. The current source has NOT been physically tested; any build-only CI means BUILDABLE, not PHYSICALLY_TESTED.
 
