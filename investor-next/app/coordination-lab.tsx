@@ -1,6 +1,7 @@
 'use client';
 import {useMemo,useState} from 'react';
 import EmergencyBuilding from './emergency-building';
+import HumanSafetyPanel from './human-safety-panel';
 import {runScenario} from '../lib/emergency-routing.mjs';
 import type {ScenarioParameters} from '../lib/emergency-routing.mjs';
 import type {Locale} from './copy';
@@ -126,6 +127,7 @@ export default function CoordinationLab({locale}:{locale:Locale}){
      </div>
     </div>
    </div>
+   <HumanSafetyPanel locale={locale}/>
    <div className="mer-bottom">
     <div className="mer-controls"><h3>{w.controls}</h3>
      <div className="mer-sliders">{ranges.map(([key,label,min,max,step,suffix])=><label key={key}>
