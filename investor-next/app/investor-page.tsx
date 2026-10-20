@@ -3,6 +3,7 @@ import ScrollExperience from './scroll-experience';
 import CrisisStory from './crisis-story';
 import CoordinationLab from './coordination-lab';
 import EvidenceBoard from './evidence-board';
+import {WhatItDoes,SystemExplained,DeveloperBlueprint} from './system-explained';
 import {routingPitch} from './routing-pitch';
 import {getCopy,labels,locales,type Locale} from './copy';
 import LanguageDocument from './language-document';
@@ -22,7 +23,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
   <header className="topbar container">
    <a className="wordmark" href="#top" aria-label="OEP — Offline Emergency Protocol"><span className="mark-symbol"><span/><span/><span/></span><span className="new-project-name">OEP — Offline Emergency Protocol</span></a>
    <div className="topbar-center"><span className="pulse"/><span>EUROPEAN CIVIL RESILIENCE</span><span className="topbar-year">/ 2026</span></div>
-   <nav aria-label={t.nav.language}><a href="#story">{t.nav.experience}</a><a href="#solution">{t.nav.solution}</a><a href="#investment">{t.nav.invest}</a><a className="topbar-source" href={source} target="_blank" rel="noopener noreferrer">{t.nav.source} ↗</a></nav>
+   <nav aria-label={t.nav.language}><a href="#story">{t.nav.experience}</a><a href="#how-it-works">{locale==='es'?'CÓMO FUNCIONA':locale==='nl'?'WERKING':'HOW IT WORKS'}</a><a href="#solution">{t.nav.solution}</a><a href="#investment">{t.nav.invest}</a><a className="topbar-source" href={source} target="_blank" rel="noopener noreferrer">{t.nav.source} ↗</a></nav>
    <div className="locale-links" role="group" aria-label={t.nav.language}>
     {locales.map(l=><a key={l} href={l==='en'?'/':'/'+l+'/'} hrefLang={l} lang={l} aria-label={labels[l]} aria-current={locale===l?'page':undefined} className={locale===l?'active':''}>{l.toUpperCase()}</a>)}
    </div>
@@ -39,9 +40,12 @@ export default function InvestorPage({locale}:{locale:Locale}){
    <MissionControl locale={locale}/>
   </section>
   <div className="ribbon"><div className="container ribbon-inner"><span>OEP / INTEROPERABLE OFFLINE EMERGENCY COORDINATION</span><strong>{t.hero.line}</strong><span>2026 / OPEN SOURCE R&D</span></div></div>
+  <WhatItDoes locale={locale}/>
   <CrisisStory locale={locale}/>
   <ScrollExperience locale={locale}/>
+  <SystemExplained locale={locale}/>
   <CoordinationLab locale={locale}/>
+  <DeveloperBlueprint locale={locale}/>
   <EvidenceBoard locale={locale}/>
   <section id="solution" className="product-section container">
    <div className="product-title-block">
