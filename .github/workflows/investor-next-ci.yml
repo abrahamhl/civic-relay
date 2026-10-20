@@ -29,6 +29,9 @@ jobs:
       - name: Build static site
         working-directory: investor-next
         run: npm run build
+      - name: Check static EN / ES / NL investor copy
+        working-directory: investor-next
+        run: npm run check:locales
       - name: Upload export
         uses: actions/upload-artifact@v4
         with:
