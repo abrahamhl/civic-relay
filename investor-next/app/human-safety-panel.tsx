@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 import {recordSafetyResponse,revokeSafetyRecord} from '../lib/emergency-policy.mjs';
 import type {SafetyResponse,SafetyRecord} from '../lib/emergency-policy.mjs';
 import type {Locale} from './copy';
@@ -12,6 +12,13 @@ const copy={
 const answers:SafetyResponse[]=['SAFE','SOS_EXPLICIT','OTHERS_AFFECTED','CANNOT_DETERMINE'];
 export default function HumanSafetyPanel({locale}:{locale:Locale}){
  const t=copy[locale];const [consent,setConsent]=useState(false);const [record,setRecord]=useState<SafetyRecord|null>(null);
+ // In-memory responses MUST expire even when the user keeps the tab open.
+ useEffect(()=>{
+  if(!record)return;
+  const remaining=Math.max(0,Date.parse(record.expiresAt)-Date.now());
+  const timer=window.setTimeout(()=>{setRecord(null);setConsent(false);},remaining);
+  return ()=>window.clearTimeout(timer);
+ },[record]);
  const apply=(response:SafetyResponse)=>{
   if(!consent)return;
   setRecord(recordSafetyResponse({response,consented:true,retentionSeconds:3600,shareLocation:false}));
