@@ -151,7 +151,7 @@ public final class MainActivity extends Activity {
             if (!userConsented || sessionEpoch != epoch || !id.equals(activeTrialId)) return;
             long now = System.currentTimeMillis();
             long monotonicNow = SystemClock.elapsedRealtime();
-            if (now >= deadlineMs || monotonicNow >= monotonicDeadline) {
+            if (LabDeadlinePolicy.expired(now, deadlineMs, monotonicNow, monotonicDeadline)) {
                 // Deadline can be reached by either conservative wall expiry or monotonic TTL.
                 // Explicit abort also closes a pending guard when the wall clock moved backwards.
                 deliveryGuard.abortOutgoing(id);
@@ -159,7 +159,8 @@ public final class MainActivity extends Activity {
                 log("LAB TIMEOUT: no receiver ACK before expiry; NOT delivered.");
             } else {
                 foregroundTimer.postDelayed(self[0],
-                    Math.max(50L, Math.min(deadlineMs - now, monotonicDeadline - monotonicNow)));
+                    Math.max(1L, LabDeadlinePolicy.nextCheckDelayMs(
+                        now, deadlineMs, monotonicNow, monotonicDeadline)));
             }
         };
         pendingExpiryTask = self[0];
@@ -377,7 +378,8 @@ public final class MainActivity extends Activity {
                 } else if ("LAB_RECEIPT".equals(type)) {
                     // Guard against wall-clock changes: accept only within the sender's monotonic TTL.
                     if (id.equals(activeTrialId) && sendStartedElapsed > 0L &&
-                        SystemClock.elapsedRealtime() - sendStartedElapsed >= TTL_MILLIS) {
+                        LabDeadlinePolicy.elapsedTtlReached(
+                            sendStartedElapsed, SystemClock.elapsedRealtime(), TTL_MILLIS)) {
                         deliveryGuard.abortOutgoing(id);
                         finishTrial(id, "EXPIRED");
                         log("Late lab receipt rejected by monotonic TTL; NOT delivered.");
