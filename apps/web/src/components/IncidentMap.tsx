@@ -3,6 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import type { MessageEnvelope } from '@civic-relay/schemas';
 import L from 'leaflet';
 import './IncidentMap.css';
+import type { Locale } from '../i18n';
+import { t } from '../i18n';
 
 // Fix Leaflet default marker icon issue with Vite
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -13,10 +15,11 @@ L.Icon.Default.mergeOptions({
 });
 
 interface Props {
+  locale: Locale;
   messages: MessageEnvelope[];
 }
 
-const IncidentMap: React.FC<Props> = ({ messages }) => {
+const IncidentMap: React.FC<Props> = ({ messages, locale }) => {
   const incidents = useMemo(() => {
     return messages.filter((msg) => msg.approximateLocation !== null);
   }, [messages]);
@@ -52,28 +55,28 @@ const IncidentMap: React.FC<Props> = ({ messages }) => {
   return (
     <div className="incident-map">
       <div className="map-legend">
-        <h3>Incident Dashboard</h3>
+        <h3>{t(locale,'mapTitle')}</h3>
         <div className="legend-items">
           <div className="legend-item">
             <span className="legend-dot official"></span>
-            <span>Official</span>
+            <span>{t(locale,'official')}</span>
           </div>
           <div className="legend-item">
             <span className="legend-dot corroborated"></span>
-            <span>Corroborated</span>
+            <span>{t(locale,'corroborated')}</span>
           </div>
           <div className="legend-item">
             <span className="legend-dot unverified"></span>
-            <span>Unverified</span>
+            <span>{t(locale,'unverified')}</span>
           </div>
           <div className="legend-item">
             <span className="legend-dot disputed"></span>
-            <span>Disputed</span>
+            <span>{t(locale,'disputed')}</span>
           </div>
         </div>
         <div className="stats">
-          <p>Total Incidents: {incidents.length}</p>
-          <p>Unverified: {incidents.filter((m) => m.verificationState === 'UNVERIFIED').length}</p>
+          <p>{t(locale,'mapTotal')}: {incidents.length}</p>
+          <p>{t(locale,'unverified')}: {incidents.filter((m) => m.verificationState === 'UNVERIFIED').length}</p>
         </div>
       </div>
 
@@ -112,13 +115,13 @@ const IncidentMap: React.FC<Props> = ({ messages }) => {
                       {icon} {msg.payloadType}
                     </strong>
                     <br />
-                    Priority: {msg.priority}
+                    {t(locale,'priority')}: {msg.priority}
                     <br />
-                    Verification: {msg.verificationState}
+                    {t(locale,'verification')}: {msg.verificationState}
                     <br />
-                    Time: {new Date(msg.createdAt).toLocaleString()}
+                    {t(locale,'time')}: {new Date(msg.createdAt).toLocaleString()}
                     <br />
-                    Location Confidence: {confidence}
+                    {t(locale,'mapConfidence')}: {confidence}
                   </div>
                 </Popup>
               </Marker>
