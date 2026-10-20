@@ -146,3 +146,61 @@ test('fallback next adapter after failure; no real measurement or delivery claim
  assert.equal(retry.selectedTransport,'LAB_SECOND');
  assert.equal(second.getReceived().length,1);
 });
+
+test('terminal ACK and EXPIRED tombstones reject replay without retaining a duplicate payload',async()=>{
+ const clock=lab(),engine=clock.engine(),adapter=createInMemoryAdapter();
+ engine.registerAdapter(adapter);
+ engine.enqueue(message('TERMINAL_ACK',{payload:{secret:'sensitive-synthetic-blob'}}));
+ assert.equal((await engine.dispatch('TERMINAL_ACK')).status,'ACK_SYNTHETIC');
+ assert.equal(engine.inspect('TERMINAL_ACK').hasPayload,false);
+ assert.throws(()=>engine.enqueue(message('TERMINAL_ACK',{payload:{secret:'sensitive-synthetic-blob'}})),/Terminal message ID/);
+ // This fixture never stores plaintext messages in the fake transport's receipt ledger.
+ assert.equal(adapter.getReceived()[0].payload,undefined);
+ engine.enqueue(message('TERMINAL_EXP',{ttlSeconds:1,payload:{secret:'expires'}}));
+ clock.advance(1000);
+ assert.equal(engine.inspect('TERMINAL_EXP').status,'EXPIRED');
+ assert.equal(engine.inspect('TERMINAL_EXP').hasPayload,false);
+ assert.throws(()=>engine.enqueue(message('TERMINAL_EXP',{ttlSeconds:1,payload:{secret:'expires'}})),/Terminal message ID/);
+});
+test('late success must be ignored if local TTL elapses during adapter send',async()=>{
+ const clock=lab(),engine=clock.engine(),adapter=createInMemoryAdapter();
+ let finish;
+ adapter.send=()=>new Promise(resolve=>{finish=resolve;});
+ engine.registerAdapter(adapter);
+ engine.enqueue(message('TTL_IN_FLIGHT',{ttlSeconds:1}));
+ const pending=engine.dispatch('TTL_IN_FLIGHT');
+ for(let i=0;i<10&&!finish;i++)await Promise.resolve();
+ assert.equal(typeof finish,'function');
+ clock.advance(1000);
+ finish({accepted:true,receipt:{kind:'SIMULATED_RECEIVER_RECEIPT',
+  messageId:'TTL_IN_FLIGHT',transportId:'LAB_GATEWAY'}});
+ const result=await pending;
+ assert.equal(result.status,'EXPIRED');
+ assert.equal(result.receiptKind,null);
+ assert.equal(result.hasPayload,false);
+});
+test('purged message cannot be revived by a late fake receipt',async()=>{
+ const clock=lab(),engine=clock.engine(),adapter=createInMemoryAdapter();
+ let finish;
+ adapter.send=()=>new Promise(resolve=>{finish=resolve;});
+ engine.registerAdapter(adapter);
+ engine.enqueue(message('PURGED'));
+ const pending=engine.dispatch('PURGED');
+ for(let i=0;i<10&&!finish;i++)await Promise.resolve();
+ assert.equal(typeof finish,'function');
+ assert.equal(engine.purge('PURGED'),true);
+ finish({accepted:true,receipt:{kind:'SIMULATED_RECEIVER_RECEIPT',
+  messageId:'PURGED',transportId:'LAB_GATEWAY'}});
+ const completed=await pending;
+ assert.equal(completed.status,'REVOKED');
+ assert.equal(completed.hasPayload,false);
+ assert.equal(engine.inspect('PURGED'),null);
+ assert.equal(engine.audit().length,0);
+});
+test('synthetic adapter receipt ledger is metadata-only',async()=>{
+ const clock=lab(),engine=clock.engine(),adapter=createInMemoryAdapter();
+ engine.registerAdapter(adapter);
+ engine.enqueue(message('ONLY_METADATA',{payload:{syntheticSensitive:'shouldNotPersist'}}));
+ await engine.dispatch('ONLY_METADATA');
+ assert.deepEqual(adapter.getReceived(),[{id:'ONLY_METADATA',provenance:'SYNTHETIC_EXERCISE_ONLY'}]);
+});
