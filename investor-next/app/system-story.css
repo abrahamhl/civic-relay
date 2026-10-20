@@ -151,3 +151,10 @@
  .oep-system-active{animation:none}
  .oep-system-chapter,.oep-node-index{transition:none}
 }
+
+/* Additive technical anchor inside the existing five-act, Three.js orbital chapter. */
+.journey-tech-note{margin-top:25px;padding:17px 17px 18px;border-left:2px solid #87ccce;background:linear-gradient(90deg,#16343cbe,#101a2200)}
+.journey-tech-note>span{font:700 9px ui-monospace,monospace;color:#9adbd9;letter-spacing:.08em;line-height:1.6}
+.journey-tech-note p{font-size:12px!important;line-height:1.65!important;color:#bed4da!important;max-width:440px;margin:10px 0!important}
+.journey-tech-note a{display:inline-block;margin-top:7px;color:#ffe2d3;border-bottom:1px solid #ad8c82;font:700 9px ui-monospace,monospace;letter-spacing:.08em;padding-bottom:8px}
+.journey-tech-note a:hover,.journey-tech-note a:focus-visible{color:white}
