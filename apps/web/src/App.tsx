@@ -73,7 +73,9 @@ function App() {
 
   async function togglePath(path: Path) {
     const next = !paths[path];
-    session.transports[path].setSimulatedState(next, 3);
+    if (path === 'ip') session.transports.ip.setSimulatedState(next);
+    else if (path === 'mesh') session.transports.mesh.setSimulatedState(next, 3);
+    else session.transports.cellular.setSimulatedState(next, 3);
     setPaths(previous => ({ ...previous, [path]: next }));
     try {
       await session.dispatcher.retryQueued();
