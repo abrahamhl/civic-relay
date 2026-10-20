@@ -32,7 +32,7 @@ const words={
   active:'Enabled',off:'Disabled',safe:'SAFE',sos:'EXPLICIT SOS',unknown:'UNKNOWN',acks:'SYNTHETIC ACK',queued:'QUEUED',
   baseline:'CELLULAR-ONLY MODEL',adaptive:'ADAPTIVE MODEL',legend:'Orange = unknown · coral = explicit SOS · mint = SAFE',
   disclaimer:'No real Bluetooth, Wi-Fi, satellite, CAP authentication, triangulation or emergency service dispatch. A synthetic ACK means modelled gateway receipt only.',
-  refresh:'RESET EXPERIMENT',audit:'TRACE OF MODEL DECISIONS',copy:'COPY REPRODUCIBLE INPUT'
+  refresh:'RESET EXPERIMENT',audit:'TRACE OF MODEL DECISIONS',copy:'COPY REPRODUCIBLE INPUT',download:'EXPORT SYNTHETIC EVIDENCE JSON'
  },
  es:{
   eyebrow:'LABORATORIO / 20–100 DISPOSITIVOS SINTÉTICOS',title:'EL EDIFICIO CAE. EL MODELO DE COORDINACIÓN CONTINÚA.',
@@ -57,7 +57,7 @@ const words={
   active:'Activado',off:'Desactivado',safe:'ESTOY BIEN',sos:'SOS EXPLÍCITO',unknown:'DESCONOCIDO',acks:'ACK SINTÉTICOS',queued:'EN COLA',
   baseline:'SOLO CELULAR / MODELO',adaptive:'MODELO ADAPTATIVO',legend:'Ámbar = desconocido · coral = SOS · verde = bien',
   disclaimer:'Sin Bluetooth, Wi-Fi, satélite, autenticación CAP, triangulación ni envíos reales al 112. Los ACK son confirmaciones ficticias de recepción en el modelo.',
-  refresh:'REINICIAR EJERCICIO',audit:'TRAZA DE DECISIONES',copy:'COPIAR PARÁMETROS'
+  refresh:'REINICIAR EJERCICIO',audit:'TRAZA DE DECISIONES',copy:'COPIAR PARÁMETROS',download:'EXPORTAR EVIDENCIA FICTICIA JSON'
  },
  nl:{
   eyebrow:'ONDERZOEKSLAB / 20–100 VIRTUELE APPARATEN',title:'HET GEBOUW STORT IN. DE COÖRDINATIE WORDT GESIMULEERD.',
@@ -82,7 +82,7 @@ const words={
   active:'Aan',off:'Uit',safe:'VEILIG',sos:'EXPLICIETE SOS',unknown:'ONBEKEND',acks:'GESIMULEERDE ACK',queued:'IN WACHTRIJ',
   baseline:'ALLEEN MOBIEL / MODEL',adaptive:'ADAPTIEF MODEL',legend:'Oranje = onbekend · koraal = SOS · groen = veilig',
   disclaimer:'Geen echte Bluetooth-, Wi-Fi- of satellietverbinding, CAP-verificatie, triangulatie of contact met 112. ACK is uitsluitend een gesimuleerde ontvangst.',
-  refresh:'OEFENING OPNIEUW',audit:'BESLISLOG',copy:'KOPIEER INSTELLINGEN'
+  refresh:'OEFENING OPNIEUW',audit:'BESLISLOG',copy:'KOPIEER INSTELLINGEN',download:'EXPORTEER GESIMULEERD JSON-BEWIJS'
  }
 } as const;
 const steps=Array.from({length:12},(_,i)=>i);
@@ -95,6 +95,18 @@ export default function CoordinationLab({locale}:{locale:Locale}){
   responses:10,helpRequests:3,bluetooth:true,wifi:true,gateway:true
  });
  const result=useMemo(()=>runScenario(params),[params]);
+ const exportSyntheticEvidence=()=>{
+  // All values come from the deterministic simulator; no live device data or precise user location.
+  const data=JSON.stringify({kind:'OEP_SYNTHETIC_EVIDENCE_EXPORT',exportVersion:1,
+   warning:'SIMULATION_ONLY_NOT_PHYSICALLY_TESTED_NOT_AN_EMERGENCY_SERVICE',
+   input:params,result},null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='oep-simulation-seed-'+String(result.seed)+'.json';
+  document.body.appendChild(a);a.click();a.remove();
+  window.setTimeout(()=>URL.revokeObjectURL(url),1000);
+ };
  const s=result.summary;
  const set=(key:keyof ScenarioParameters,value:number|boolean)=>setParams(prev=>({...prev,[key]:value}));
  const ranges: [keyof ScenarioParameters,string,number,number,number,string?][] = [
@@ -146,7 +158,8 @@ export default function CoordinationLab({locale}:{locale:Locale}){
       setParams({devices:60,seed:20261020,participation:80,permissions:85,battery:65,damaged:85,responses:10,helpRequests:3,bluetooth:true,wifi:true,gateway:true});
       setStage(0);
      }}>{w.refresh}</button>
-     <button type="button" onClick={()=>{void navigator.clipboard?.writeText(JSON.stringify({seed:result.seed,params,summary:s},null,2));}}>{w.copy}</button></div>
+     <button type="button" onClick={()=>{void navigator.clipboard?.writeText(JSON.stringify({seed:result.seed,params,summary:s},null,2));}}>{w.copy}</button>
+     <button type="button" onClick={exportSyntheticEvidence}>{w.download}</button></div>
     </div>
     <div className="mer-output"><h3>{w.results}</h3>
      <div className="mer-stat-grid">
