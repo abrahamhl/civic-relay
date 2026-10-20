@@ -65,6 +65,8 @@ public final class MainActivity extends Activity {
     private final Set<String> approvedPeers = Collections.synchronizedSet(new HashSet<>());
     private final Map<Long, String> outgoingPayloads = Collections.synchronizedMap(new HashMap<>());
     private volatile long sendStartedElapsed = 0L;
+    private volatile String activeTrialId = null;
+    private final LabTrialJournal journal = new LabTrialJournal();
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -82,7 +84,7 @@ public final class MainActivity extends Activity {
         addButton(body, "1. REVIEW & CONSENT (LAB ONLY)", () -> {
             new AlertDialog.Builder(MainActivity.this)
                 .setTitle("OEP research trial — consent")
-                .setMessage("This is a non-operational exercise. The app may broadcast its presence to nearby phones; the radio link can use additional battery and reveal proximity to your chosen peer. Nearby permissions are requested by Android. No GPS readings, real distress calls, rescue claims or background discovery are made. Only fictional test messages are exchanged, with both users comparing pairing digits. You may STOP at any moment. No personal details are required.")
+                .setMessage("This is a non-operational exercise. The app may broadcast its presence to nearby phones; the radio link can use additional battery and reveal proximity to your chosen peer. Nearby permissions are requested by Android. No GPS readings, real distress calls, rescue claims or background discovery are made. Only fictional test messages are exchanged, with both users comparing pairing digits. Optional CSV export is manually shared with an app of your choosing; third-party copies cannot be recalled. STOP clears local trial records. No personal details are required.")
                 .setPositiveButton("I UNDERSTAND & AGREE", (dialog, which) -> {
                     userConsented = true;
                     log("Explicit lab consent granted for this foreground session.");
@@ -94,6 +96,17 @@ public final class MainActivity extends Activity {
         addButton(body, "2A. ADVERTISE AS LAB RECEIVER", () -> startRole("ADVERTISE"));
         addButton(body, "2B. DISCOVER AS LAB SENDER", () -> startRole("DISCOVER"));
         addButton(body, "3. SEND SYNTHETIC TEST MESSAGE", this::sendTest);
+        addButton(body, "4. MANUALLY SHARE LAB TRIAL CSV", () -> {
+            if (!userConsented || journal.size() == 0) {
+                log("No consented field trial events to export."); return;
+            }
+            // Explicit system chooser. User controls destination; external copies cannot be revoked.
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("text/plain");
+            share.putExtra(Intent.EXTRA_SUBJECT, "OEP anonymous lab trials — not certified");
+            share.putExtra(Intent.EXTRA_TEXT, journal.csv());
+            startActivity(Intent.createChooser(share, "Share synthetic test evidence manually"));
+        });
         addButton(body, "OPEN BLUETOOTH SETTINGS", () -> startActivity(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS)));
         addButton(body, "OPEN WI-FI SETTINGS", () -> startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS)));
         addButton(body, "STOP / REVOKE CONSENT / CLEAR", this::stopAndClear);
@@ -119,6 +132,17 @@ public final class MainActivity extends Activity {
                 output.setText(next.length() > 6000 ? next.substring(0, 6000) : next);
             }
         });
+    }
+
+    /** In-app elapsed time is a single sample, never a claimed throughput or safety metric. */
+    private synchronized long finishTrial(String id, String outcome) {
+        if (id == null || !id.equals(activeTrialId)) return -1L;
+        long elapsed = sendStartedElapsed == 0L ? -1L :
+            Math.max(0L, SystemClock.elapsedRealtime() - sendStartedElapsed);
+        journal.record(id, outcome, elapsed);
+        activeTrialId = null;
+        sendStartedElapsed = 0L;
+        return elapsed;
     }
 
     private String[] runtimePermissions() {
@@ -213,9 +237,9 @@ public final class MainActivity extends Activity {
         @Override public void onDisconnected(String endpointId) {
             if (endpointId.equals(connectedPeer)) {
                 connected = false;connectedPeer = null;approvedPeers.remove(endpointId);
+                finishTrial(activeTrialId, "DISCONNECTED");
                 deliveryGuard.reset();
                 outgoingPayloads.clear();
-                sendStartedElapsed = 0L;
                 log("DISCONNECTED. Pending payload cleared; no delivery assumed.");
             }
         }
@@ -262,6 +286,10 @@ public final class MainActivity extends Activity {
             log("A previous test message still awaits an ACK; retry after its 60s expiry.");
             return;
         }
+        if (activeTrialId != null) {
+            finishTrial(activeTrialId, "EXPIRED");
+            log("Previous lab trial timed out; new attempt is now allowed.");
+        }
         if (!userConsented || !connected || connectedPeer == null) {
             log("DENIED: obtain consent and accept a matching-code connection first.");return;
         }
@@ -276,6 +304,7 @@ public final class MainActivity extends Activity {
                 log("DENIED: invalid or pending lab message.");return;
             }
             sendStartedElapsed = SystemClock.elapsedRealtime();
+            activeTrialId = id;
             sendPacket(connectedPeer, packet);
             log("Message submitted to Nearby API; NOT delivered until receiver ACK: " + id);
         } catch (JSONException e) { log("Packet encoding failed."); }
@@ -309,12 +338,11 @@ public final class MainActivity extends Activity {
                     LabDeliveryGuard.ReceiptState receiptState = deliveryGuard.acceptReceipt(
                         id, endpointId, System.currentTimeMillis());
                     if (receiptState == LabDeliveryGuard.ReceiptState.ACCEPTED) {
-                        long latencyMs = sendStartedElapsed == 0L ? -1L :
-                            SystemClock.elapsedRealtime() - sendStartedElapsed;
-                        sendStartedElapsed = 0L;
+                        long latencyMs = finishTrial(id, "ACK_RECEIVED");
                         log("RECEIVER ACK from approved peer. Local elapsed: " + latencyMs +
                             "ms (single test, NOT a performance guarantee). LAB ONLY; not rescue proof.");
                     } else if (receiptState == LabDeliveryGuard.ReceiptState.EXPIRED) {
+                        finishTrial(id, "EXPIRED");
                         log("Late lab receipt rejected; timeout allows next trial.");
                     } else {
                         log("Unexpected receiver receipt ignored: " + receiptState);
@@ -329,7 +357,7 @@ public final class MainActivity extends Activity {
                 String outgoing = outgoingPayloads.remove(update.getPayloadId());
                 if (outgoing != null) {
                     if (deliveryGuard.abortOutgoing(outgoing))
-                        sendStartedElapsed = 0L;
+                        finishTrial(outgoing, "SEND_FAILED");
                 }
                 log("Nearby payload transfer failed or canceled. Not delivered.");
             } else if (status == PayloadTransferUpdate.Status.SUCCESS) {
@@ -351,7 +379,7 @@ public final class MainActivity extends Activity {
                 outgoingPayloads.remove(outgoing.getId());
                 if (messageId != null) {
                     if (deliveryGuard.abortOutgoing(messageId))
-                        sendStartedElapsed = 0L;
+                        finishTrial(messageId, "SEND_FAILED");
                 }
                 log("Send rejected by Nearby; no delivered status: " + e.getClass().getSimpleName());
             });
@@ -366,7 +394,9 @@ public final class MainActivity extends Activity {
         deliveryGuard.reset();
         approvedPeers.clear();
         outgoingPayloads.clear();
+        activeTrialId = null;
         sendStartedElapsed = 0L;
+        journal.clear();
         connections.stopAdvertising();
         connections.stopDiscovery();
         connections.stopAllEndpoints();
