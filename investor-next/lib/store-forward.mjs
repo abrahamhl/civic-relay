@@ -94,12 +94,14 @@ export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAtt
           }catch{audit(id,'ADAPTER_DESCRIPTION_FAILED',a.id);}
         }
         candidates.sort((a,b)=>b.score-a.score||a.a.id.localeCompare(b.a.id));
+        if(TERMINAL.has(r.status)||!records.has(id))return view(r);
         if(!candidates.length){
           r.nextAttemptAt=now()+retryMs;audit(id,'NO_COMPATIBLE_ROUTE');return view(r);
         }
         const selected=candidates[r.attempts%candidates.length].a;
         r.selectedTransport=selected.id;r.attempts++;
         const sent=await selected.send(json(r.envelope));
+        if(TERMINAL.has(r.status)||!records.has(id))return view(r);
         if(sent?.accepted===true&&sent?.receipt?.kind==='SIMULATED_RECEIVER_RECEIPT'&&
           sent.receipt.messageId===id&&sent.receipt.transportId===selected.id){
           r.status='ACK_SYNTHETIC';r.receiptKind='SIMULATED_RECEIVER_RECEIPT';
@@ -110,7 +112,9 @@ export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAtt
         r.status=sent?.accepted===true?'FORWARDED_UNCONFIRMED':'QUEUED';
         audit(id,r.status,selected.id);
       }catch{
-        r.status='QUEUED';audit(id,'ADAPTER_SEND_FAILED',r.selectedTransport||'');
+        if(!TERMINAL.has(r.status)&&records.has(id)){
+          r.status='QUEUED';audit(id,'ADAPTER_SEND_FAILED',r.selectedTransport||'');
+        }
       }finally{
         inFlight.delete(id);
         if(!TERMINAL.has(r.status)){
