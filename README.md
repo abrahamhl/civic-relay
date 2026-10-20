@@ -1,4 +1,17 @@
-# Civic Relay Demo (V0.1)
+# OEP — Offline Emergency Protocol
+**Protocolo de Emergencias Offline · Distributed Emergency Coordination & Adaptive Multi-Network Routing**
+
+OEP is a **research prototype**, not an official emergency protocol, emergency call provider, satellite network, regulatory certification or deployment-ready safety system. It studies how *consenting* existing devices might coordinate synthetic status checks, queue messages and select compatible paths during connectivity loss.
+
+**Research:** [OEP funding + independent validation roadmap](docs/OEP_VALIDATION_CERTIFICATION_AND_FUNDING_2026.md) · [Investor diligence](docs/OEP_INVESTOR_DILIGENCE_AND_PITCH.md) · [Master architecture](docs/MASTER_EMERGENCY_ROUTING_2026.md).
+
+**Evidence levels:** 20–100 virtual nodes with deterministic automated scenario tests; a Java Android two-phone research lab with APK build CI; **NO measured two-phone field trial**, no official CAP trust chain, no verified satellite route, no 112 integration. Consult the exact-commit GitHub Actions job before claiming an APK build.
+
+**Repository identity:** `abrahamhl/civic-relay` remains unchanged to preserve history, deployments and existing issue/PR references. Civic Relay is the historical repo name.
+
+---
+
+## Historical Civic Relay V0.1 demo
 
 Demo ficticia de comunicación en crisis, offline-first y de transporte múltiple, diseñada como ejercicio de ingeniería para entornos de conectividad degradada.
 
