@@ -35,6 +35,16 @@ public final class LabReceiptSignerTest {
         check(!LabReceiptSigner.verifyReceipt(pub, MSG_ID, CHALLENGE, "PEER_A", 1700000000000L, "not-base64!"),
             "Malformed signature must fail closed");
 
+
+        // Key exchange validation: peer key must be parseable P-256, not arbitrary input.
+        check(LabReceiptSigner.isSupportedPublicKey(pub), "Generated P-256 peer key accepted");
+        check(!LabReceiptSigner.isSupportedPublicKey("not-base64!"), "Bad Base64 key rejected");
+        check(!LabReceiptSigner.isSupportedPublicKey("A".repeat(600)), "Oversized key rejected");
+        check(!LabReceiptSigner.isSupportedPublicKey(null), "Missing key rejected");
+        // Detached signer key is never stable across fresh laboratory sessions.
+        check(!LabReceiptSigner.verifyReceipt(attacker.publicKeyBase64(), MSG_ID, CHALLENGE,
+            "PEER_A", 1700000000000L, sig), "Substituted session key rejected");
+
         System.out.println("LabReceiptSignerTest PASS (" + assertions + " assertions)");
     }
 }
