@@ -10,7 +10,7 @@
 1. **Explicit Opt-In Participation Only:**
    - In the simulation engine (`investor-next/lib/emergency-routing.mjs`), non-participating devices (`participating: false`) never receive status prompts, never generate messages, and never act as relay hops.
    - In the store-and-forward engine (`investor-next/lib/store-forward.mjs`), `enqueue()` throws `Error('Explicit consent required')` unless `consented === true`.
-   - In the Android Nearby lab (`experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/MainActivity.java`), radio advertisement/discovery and payload transmission are blocked until the operator explicitly checks the laboratory consent box and confirms the 4-digit peer token.
+   - In the Android Nearby lab (`experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/MainActivity.java`), radio advertisement/discovery and payload transmission are blocked until the operator explicitly checks the laboratory consent box and confirms the Nearby authentication digits.
 
 2. **No Silent Casualty or Location Inference (`UNKNOWN !== INJURED`):**
    - Device silence or lack of connectivity is recorded strictly as `UNKNOWN` or `NO_CONTACT`.
@@ -26,7 +26,7 @@
    - Every queued exercise message requires an explicit integer `ttlSeconds` ($1..86400\text{ s}$).
    - When a message reaches `ACK_SYNTHETIC`, `EXPIRED`, `REVOKED`, or `EXHAUSTED`, its `envelope` payload is immediately cleared (`r.envelope = null`).
    - Calling `purge(id)` in `store-forward.mjs` wipes the payload, deletes the record, and removes all audit entries for that message ID.
-   - In the Android Nearby lab, tapping `STOP & CLEAR` invokes `SessionCancellationGuard.cancelAndNextEpoch()`, stops all Nearby endpoints, clears the in-memory CSV trial rows, and wipes the on-screen log.
+   - In the Android Nearby lab, tapping `STOP & CLEAR` invokes the STOP handler in `MainActivity.java`, stops all Nearby endpoints, clears the in-memory CSV trial rows, and wipes the on-screen log.
 
 ---
 

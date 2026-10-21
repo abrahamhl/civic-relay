@@ -9,12 +9,12 @@
 
 | Subsystem | Source Files | Automated Test Files | Verification Status |
 |---|---|---|---|
-| **Deterministic 20–100 Node Routing Engine** | `investor-next/lib/emergency-routing.mjs` | `investor-next/tests/emergency-routing.test.mjs`, `investor-next/tests/oep-evidence-run.test.mjs` | `IMPLEMENTED`, `AUTOMATED_TESTED`, `SIMULATED_ONLY` |
+| **Deterministic 20–100 Node Routing Engine** | `investor-next/lib/emergency-routing.mjs` | `investor-next/tests/emergency-routing.test.mjs`, `investor-next/tests/oep-evidence-report.test.mjs` | `IMPLEMENTED`, `AUTOMATED_TESTED`, `SIMULATED_ONLY` |
 | **Bounded Store-and-Forward Queue Engine** | `investor-next/lib/store-forward.mjs` | `investor-next/tests/store-forward.test.mjs` | `IMPLEMENTED`, `AUTOMATED_TESTED`, `SIMULATED_ONLY` |
 | **Consent, Energy & CAP Boundary Policies** | `investor-next/lib/emergency-policy.mjs` | `investor-next/tests/emergency-policy.test.mjs` | `IMPLEMENTED`, `AUTOMATED_TESTED`, `SIMULATED_ONLY` |
-| **810-Scenario Sweep & Evidence Generator** | `investor-next/scripts/oep-evidence-run.mjs` | `investor-next/tests/oep-evidence-run.test.mjs` | `IMPLEMENTED`, `AUTOMATED_TESTED` |
+| **810-Scenario Sweep & Evidence Generator** | `investor-next/scripts/oep-evidence-run.mjs` | `investor-next/tests/oep-evidence-report.test.mjs` | `IMPLEMENTED`, `AUTOMATED_TESTED` |
 | **Multilingual Next.js + Three.js Web Lab** | `investor-next/app/*` | `investor-next/tests/system-story.test.mjs`, `oep-brand-evidence.test.mjs`, `test-locales.mjs` | `IMPLEMENTED`, `BUILD_VERIFIED`, `BROWSER_TESTED` |
-| **Experimental Android Nearby 2-Phone Lab** | `experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/*` | `experimental/android-nearby/app/src/test/java/eu/civicrelay/nearbylab/NearbyLabProtocolTest.java` | `IMPLEMENTED`, `BUILD_VERIFIED`, `AUTOMATED_TESTED`, `PHYSICAL_TEST_PENDING` |
+| **Experimental Android Nearby 2-Phone Lab** | `experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/*` | `experimental/android-nearby/app/src/test/java/eu/civicrelay/nearbylab/`LabDeliveryGuardTest.java` / `LabDeadlinePolicyTest.java` / `LabTrialJournalTest.java` | `IMPLEMENTED`, `BUILD_VERIFIED`, `AUTOMATED_TESTED`, `PHYSICAL_TEST_PENDING` |
 | **Automated Synthetic Stakeholder Audit** | `abrahamhl/buyer-arena`: `scripts/civic-relay-review.mjs` | 78 Chromium assertions across `P01`–`P08` (`audit/personas/`) | `IMPLEMENTED`, `BROWSER_TESTED` |
 
 ---
@@ -39,7 +39,7 @@ pnpm --dir investor-next run check:locales
 For the experimental Android Nearby lab (requires JDK 17 + Android SDK):
 ```bash
 cd experimental/android-nearby
-gradle testDebugUnitTest assembleDebug
+gradle :app:assembleDebug
 ```
 
 ---

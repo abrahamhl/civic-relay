@@ -1,63 +1,59 @@
 # Dependency and License Audit — OEP / Civic Relay
 
-**Audit Date:** 2026-10-21  
+**Audit Date:** 2026-10-21 (re-verified against `package.json` and `build.gradle.kts`; earlier draft contained incorrect versions and non-existent test dependencies — corrected here)  
 **Status:** `IMPLEMENTED` / `BUILD_VERIFIED`  
 **Repository License:** MIT (`LICENSE`)
 
----
-
-## 1. Repository License & Open-Source Compliance
-
-- **Primary License:** MIT License (`LICENSE` at repository root, Copyright (c) 2026 Abraham).
-- **Compatibility:** All direct runtime and development dependencies across the root workspace, `investor-next/`, and `experimental/android-nearby/` use permissive licenses compatible with MIT and EU public-research grant requirements (Horizon Europe / NGI / RVO).
+> **Limitation:** This is a manual inventory of *direct* dependencies. No automated SBOM (CycloneDX/SPDX) or transitive license scan has been run yet. That is a recommended follow-up (`pnpm licenses list`, `osv-scanner`).
 
 ---
 
-## 2. Direct Dependency Inventory (`investor-next/package.json`)
+## 1. Direct Dependencies — `investor-next/package.json`
 
-| Package | Pinned / Declared Version | Scope | License | Purpose |
+| Package | Declared Version | Scope | License | Purpose |
 |---|---|---|---|---|
-| `next` | `16.2.4` (resolved `16.3.6`) | Runtime (`dependencies`) | MIT | Static-export (`output: 'export'`) React framework for `/`, `/es/`, `/nl/` |
-| `react` | `19.2.5` | Runtime (`dependencies`) | MIT | UI component rendering |
-| `react-dom` | `19.2.5` | Runtime (`dependencies`) | MIT | DOM rendering and static HTML generation |
-| `three` | `0.183.2` | Runtime (`dependencies`) | MIT | 3D orbital crisis globe and 5-floor emergency building visualizer |
-| `typescript` | `5.9.3` | Dev (`devDependencies`) | Apache-2.0 | Strict static type checking (`tsc --noEmit`) |
-| `@types/node` | `22.19.17` | Dev (`devDependencies`) | MIT | Node.js type definitions |
-| `@types/react` | `19.2.14` | Dev (`devDependencies`) | MIT | React type definitions |
-| `@types/react-dom` | `19.2.3` | Dev (`devDependencies`) | MIT | React DOM type definitions |
-| `@types/three` | `0.183.1` | Dev (`devDependencies`) | MIT | Three.js type definitions |
+| `next` | `16.3.6` | dependencies | MIT | Static export (`/`, `/es`, `/nl`) |
+| `react` | `19.2.0` | dependencies | MIT | UI rendering |
+| `react-dom` | `19.2.0` | dependencies | MIT | DOM rendering / static HTML |
+| `three` | `0.180.0` | dependencies | MIT | Scroll globe and 3D building scene |
+| `typescript` | `5.8.3` | devDependencies | Apache-2.0 | `tsc --noEmit` |
+| `@types/node` | `22.15.3` | devDependencies | MIT | Types |
+| `@types/react` | `19.2.0` | devDependencies | MIT | Types |
+| `@types/react-dom` | `19.2.0` | devDependencies | MIT | Types |
+| `@types/three` | `0.180.0` | devDependencies | MIT | Types |
 
-### Core Simulation & Policy Engine Dependencies (`investor-next/lib/*.mjs`)
-- `investor-next/lib/emergency-routing.mjs`: **Zero external dependencies** (pure ES module).
-- `investor-next/lib/emergency-policy.mjs`: **Zero external dependencies** (pure ES module).
-- `investor-next/lib/store-forward.mjs`: **Zero external dependencies** (pure ES module).
+The research engines `investor-next/lib/emergency-routing.mjs`, `emergency-policy.mjs` and `store-forward.mjs` have **zero external dependencies**.
 
 ---
 
-## 3. Experimental Android Nearby Lab Dependencies (`experimental/android-nearby/app/build.gradle`)
+## 2. Experimental Android Lab — `experimental/android-nearby/`
 
 | Artifact | Version | Scope | License | Notes |
 |---|---|---|---|---|
-| `com.google.android.gms:play-services-nearby` | `19.3.0` | `implementation` | Google Play Services Terms / Android SDK | Proprietary Google Play Services client library on Android devices; used strictly in optional `experimental/android-nearby/` lab module. |
-| `junit:junit` | `4.13.2` | `testImplementation` | EPL-1.0 | JVM unit testing for `LabDeliveryGuard`, `SessionCancellationGuard`, and `TrialExportFormatter`. |
-| `org.json:json` | `20240303` | `testImplementation` | JSON License (permissive) | Local JVM test parsing of JSON envelopes. |
+| `com.android.application` (AGP) | `8.9.2` | build plugin | Apache-2.0 | Build tooling |
+| `com.google.android.gms:play-services-nearby` | `19.5.1` | implementation | Android SDK / Google Play Services terms (proprietary) | Only runtime dependency. Requires Google Play services on the handset. |
 
-> **Architectural Isolation Note:** Because `com.google.android.gms:play-services-nearby` depends on Google Play Services on the handset, it is isolated inside `experimental/android-nearby/`. The core OEP protocol logic (`investor-next/lib/*.mjs` and `packages/core`) remains 100% open-source and transport-agnostic so future AOSP BLE / Wi-Fi Aware adapters can be plugged in without proprietary SDK lock-in.
+- `minSdk = 26`, `targetSdk = 35`. Nearby strategy in `MainActivity.java`: `Strategy.P2P_POINT_TO_POINT` (one-to-one, not mesh).
+- JVM tests (`LabDeliveryGuardTest`, `LabDeadlinePolicyTest`, `LabTrialJournalTest`) are **JDK-only, no JUnit**: CI compiles them with `javac --release 17` and runs them with `java`.
 
----
-
-## 4. CI/CD Supply-Chain & Workflow Permissions Audit
-
-| Workflow File | Trigger Scope | Token Permissions | Status |
-|---|---|---|---|
-| `.github/workflows/emergency-lab-ci.yml` | `investor-next/**`, `docs/**` | `permissions: contents: read` | `IMPLEMENTED` |
-| `.github/workflows/investor-next-ci.yml` | `investor-next/**` | `permissions: contents: read` | `IMPLEMENTED` |
-| `.github/workflows/android-nearby-lab.yml` | `experimental/android-nearby/**` | `permissions: contents: read` | `IMPLEMENTED` |
-| `.github/workflows/ci.yml` | Workspace root | Standard read checkout | `IMPLEMENTED` |
+> **Isolation note:** The proprietary Play Services dependency is confined to `experimental/`. Core protocol logic stays transport-agnostic so an AOSP BLE / Wi-Fi Aware adapter could replace it.
 
 ---
 
-## 5. Secret & Credential Hygiene Verification
+## 3. CI Workflow Permissions
 
-- Verified `.gitignore` excludes `.env*`, `.vercel`, `node_modules/`, `dist/`, `out/`, `.next/`, and `docs/internal/`.
-- Verified zero API keys, private tokens, or personal data exist in tracked Git files (`git log` and working tree audited).
+| Workflow | Token permissions |
+|---|---|
+| `.github/workflows/emergency-lab-ci.yml` | `contents: read` |
+| `.github/workflows/investor-next-ci.yml` | `contents: read` |
+| `.github/workflows/android-nearby-ci.yml` | `contents: read` |
+| `.github/workflows/ci.yml` (historical V0.1 workspace) | default (not yet restricted) |
+
+Note: third-party actions in civic-relay workflows are pinned by tag (`@v4`), not by commit SHA. Pinning by SHA is a recommended hardening step.
+
+---
+
+## 4. Secret Hygiene
+
+- `.gitignore` excludes `.env*`, `.vercel`, `node_modules/`, `dist/`, `out/`, `.next/`, `docs/internal/`.
+- No automated secret scanner (gitleaks/trufflehog) is wired into civic-relay CI yet; adding one is a recommended follow-up.

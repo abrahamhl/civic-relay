@@ -1,25 +1,26 @@
 # Funding Opportunities — European Union & Netherlands (Verified 2026)
 
 **Scope:** Non-dilutive public R&D grants, open-source fellowships, and deep-tech innovation instruments applicable to **OEP — Offline Emergency Protocol (`abrahamhl/civic-relay`)**.  
-**Verification Note:** Deadlines and program rules reflect official European Commission (REA / HaDEA / EIC), NLnet (NGI), and Dutch RVO publications as of October 2026.
+**Verification Note:** Re-checked on 2026-10-21 via web search of public sources. Earlier drafts listed the NGI Zero Commons Fund as open and mislabeled the Horizon topic; both corrected below. Always confirm on the official portal before applying.
 
 ---
 
 ## 1. European Union Instruments
 
-### 1.1 Horizon Europe — Cluster 3: Civil Security for Society (Disaster-Resilient Society 2026)
-- **Primary Topic:** `HORIZON-CL3-2026-01-SSRI-04` / Disaster-Resilient Society (`DRS`) topics under Work Programme 2026–2027.
-- **Official Source:** [European Research Executive Agency (REA) — Disaster-Resilient Society](https://rea.ec.europa.eu/funding-and-grants/horizon-europe-cluster-3-civil-security-society/disaster-resilient-society-europe_en) and EU Funding & Tenders Portal.
-- **Call Status & Dates:** Opened **6 May 2026**; submission deadline **5 November 2026 (17:00 CET)**.
-- **Eligibility & Consortium Requirements:** Typically requires at least 3 independent legal entities from 3 different EU Member States or Associated Countries, often including end-user / practitioner organizations (civil protection, first responders, municipalities).
-- **Fit for OEP:** High fit as a **technical work-package provider or open-source research partner** (citizen status check-in semantics, offline store-and-forward, deterministic scenario simulation, and Buyer Arena stakeholder evaluation).
-- **Current Action Status:** Not submitted; seeking consortium coordinator / practitioner partners.
+### 1.1 Horizon Europe — Cluster 3: Civil Security for Society (call `HORIZON-CL3-2026-01`)
+- **Relevant topics:** `HORIZON-CL3-2026-01-SSRI-04` — *"Development of ecosystem and next-generation capabilities for a secured European Critical Communication System in civil security"* — and Disaster-Resilient Society topics `HORIZON-CL3-2026-01-DRS-01…04`.
+- **Official Source:** [REA — Disaster-Resilient Society](https://rea.ec.europa.eu/funding-and-grants/horizon-europe-cluster-3-civil-security-society/disaster-resilient-society-europe_en) and the EU Funding & Tenders Portal.
+- **Deadline:** **5 November 2026, 17:00 Brussels time.**
+- **Eligibility:** Multi-beneficiary consortia (typically ≥3 entities from ≥3 eligible countries) and, for most security topics, mandatory practitioner participation.
+- **Honest fit:** SSRI-04 targets mission-critical communications for responders (EUCCS), not citizen check-in apps. OEP could at most contribute a narrow open-source work package. With ~15 days left, leading a proposal is not realistic; the only viable move is offering a small partner/subcontract role to an existing consortium.
+- **Current Action Status:** Not submitted.
 
-### 1.2 Next Generation Internet (NGI) / NLnet Foundation Open Calls (NGI Zero Commons Fund)
-- **Official Source:** [NLnet Foundation — Current Open Calls](https://nlnet.nl/propose/)
-- **Grant Range:** **€5,000 to €50,000** (pure non-dilutive milestone-based R&D grants for free and open-source software).
-- **Eligibility:** Individual researchers, independent developers, SMEs, or research institutions building MIT/Apache/GPL open-source internet commons components. No multi-country consortium required.
-- **Fit for OEP:** **Immediate, highest-accessibility fit** for funding Milestones M1–M2 (two-phone Android validation, AOSP transport abstraction removing proprietary Play Services dependency, and cryptographic receipt signing).
+### 1.2 NLnet Foundation — Open Internet Stack funds (successor to NGI Zero)
+- **Official Source:** [NLnet — Propose](https://nlnet.nl/propose/)
+- **Status:** The NGI Zero Commons Fund closed its final call on **1 June 2026**. Current funds include the **Restack Fund** and **CodeSupply Fund**, plus a general proposal route. Deadlines fall on the **3rd of every odd month**; **next: 3 November 2026, 12:00 CET.**
+- **Grant Range:** Typically **€5,000–€50,000** initial grants; open licenses required; European dimension required.
+- **AI policy (critical):** NLnet does not accept proposals generated entirely by AI and enforces transparency on AI use. The proposal text must be written by the applicant, and AI assistance in the codebase should be disclosed.
+- **Fit for OEP:** Best realistic first grant, *if* scoped as reusable open internet infrastructure (an open, transport-agnostic store-and-forward + verifiable-receipt library with an AOSP transport), not as an "emergency app".
 
 ### 1.3 Union Civil Protection Mechanism (UCPM) — KAPP (Knowledge for Action in Prevention & Preparedness)
 - **Official Source:** [EU Civil Protection Knowledge Network — KAPP 2026 Call](https://civil-protection-knowledge-network.europa.eu/knowledge-action-prevention-preparedness-2026-call-proposals)

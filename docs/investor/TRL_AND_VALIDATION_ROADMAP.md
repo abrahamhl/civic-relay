@@ -12,7 +12,7 @@
 | **Emergency Routing & Topology Model (`emergency-routing.mjs`)** | **TRL 3** (Analytical & experimental proof of concept) | 20–100 node deterministic simulation validated across 810 seeded scenarios (`AUTOMATED_TESTED`, `SIMULATED_ONLY`). | **TRL 4:** Calibrate link weights with physical 2-phone latency/loss distributions. |
 | **Store-and-Forward & Receipt Engine (`store-forward.mjs`)** | **TRL 4** (Component validation in laboratory environment) | Bounded queue, dedup, TTL, anti-replay tombstones, and receipt verification tested across 26 unit/adversarial test cases (`AUTOMATED_TESTED`). | **TRL 5:** Persistent SQLite/Room queue on Android surviving process restarts. |
 | **Consent, Energy & CAP Trust Policy (`emergency-policy.mjs`)** | **TRL 3–4** | Fail-closed CAP gate and capability/energy state machine verified in CI (`AUTOMATED_TESTED`). | **TRL 5:** Connect X.509 / institutional CAP test feed in a controlled pilot. |
-| **Android Nearby 2-Phone Hardware Lab (`experimental/android-nearby/`)** | **TRL 3.5 → 4** (`BUILD_VERIFIED`, `PHYSICAL_TEST_PENDING`) | APK compiles in CI (`assembleDebug`) and JVM protocol tests pass (`NearbyLabProtocolTest`), but physical 2-phone RF execution of the 30-trial matrix is pending. | **TRL 4 Complete:** Publish 30-trial CSV dataset + independent observer sign-off. |
+| **Android Nearby 2-Phone Hardware Lab (`experimental/android-nearby/`)** | **TRL 3.5 → 4** (`BUILD_VERIFIED`, `PHYSICAL_TEST_PENDING`) | APK compiles in CI (`assembleDebug`) and JVM protocol tests pass (`LabDeliveryGuardTest`, `LabDeadlinePolicyTest`, `LabTrialJournalTest`), but physical 2-phone RF execution of the 30-trial matrix is pending. | **TRL 4 Complete:** Publish 30-trial CSV dataset + independent observer sign-off. |
 
 ---
 
