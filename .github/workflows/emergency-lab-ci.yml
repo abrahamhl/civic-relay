@@ -1,11 +1,17 @@
 name: Emergency routing research lab
+permissions:
+  contents: read
 on:
   push:
-    branches: [feat/master-emergency-routing-v1-20261020]
+    branches: [feat/master-emergency-routing-v1-20261020, master]
+    paths:
+      - 'investor-next/**'
+      - 'docs/**'
+      - '.github/workflows/emergency-lab-ci.yml'
   pull_request:
     paths:
       - 'investor-next/**'
-      - 'docs/MASTER_EMERGENCY_ROUTING_2026.md'
+      - 'docs/**'
       - '.github/workflows/emergency-lab-ci.yml'
 jobs:
   simulator:
