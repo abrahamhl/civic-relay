@@ -11,6 +11,17 @@
 .oep-brief-feature:last-child{border:0}.oep-brief-feature:hover{background:#15343d66}
 .oep-brief-label{font:700 10px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.13em;color:#ffc19b}
 .oep-brief-feature p{color:#d3e3e8;line-height:1.6;font-size:13px;margin-top:24px;max-width:240px}
+.oep-brief-pipeline-wrap{margin-top:36px;border:1px solid #304b56;background:#07141bd9;padding:22px}
+.oep-brief-pipeline-title{margin:0 0 18px;font:700 10px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.09em;color:#9adbd9}
+.oep-brief-pipeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.oep-pipeline-card{border:1px solid #2b4550;background:#0a1b24;padding:14px;min-width:0}
+.oep-pipeline-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;border-bottom:1px solid #253d47;padding-bottom:8px;margin-bottom:10px}
+.oep-pipeline-head span{font:700 9px ui-monospace,monospace;color:#8cb6c0;letter-spacing:.06em}
+.oep-pipeline-head code{font:700 9px ui-monospace,monospace;color:#ffc19b;overflow-wrap:anywhere}
+.oep-pipeline-dl{margin:0;display:grid;gap:6px}
+.oep-pipeline-dl div{display:grid;gap:2px}
+.oep-pipeline-dl dt{font:700 8px ui-monospace,monospace;letter-spacing:.08em;color:#7fb2bc}
+.oep-pipeline-dl dd{margin:0;font-size:11px;line-height:1.45;color:#cde0e5;overflow-wrap:anywhere}
 .oep-brief-evidence{display:flex;align-items:center;gap:11px;margin:26px 0 0;color:#82aab5;font:10px ui-monospace,monospace;letter-spacing:.07em;line-height:1.6}
 .oep-mini-beacon{display:inline-block;width:8px;height:8px;border-radius:50%;flex:none;background:#70d0bf;box-shadow:0 0 0 5px #70d0bf15,0 0 18px #70d0bf66}
 
@@ -103,6 +114,7 @@
  .oep-system-layout{grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr);gap:22px}
  .oep-system-io>div{grid-template-columns:90px 1fr}
  .oep-brief-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .oep-brief-pipeline{grid-template-columns:repeat(2,minmax(0,1fr))}
  .oep-brief-feature:nth-child(2){border-right:0}
  .oep-brief-feature:nth-child(-n+2){border-bottom:1px solid #35505b}
  .oep-blueprint-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -127,6 +139,8 @@
 }
 @media(max-width:560px){
  .oep-brief-grid{grid-template-columns:1fr}
+ .oep-brief-pipeline{grid-template-columns:1fr}
+ .oep-brief-pipeline-wrap{padding:14px}
  .oep-brief-feature{border-right:0;border-bottom:1px solid #35505b!important;min-height:120px;padding:19px}
  .oep-brief-feature:last-child{border:0!important}
  .oep-brief-feature p{margin:12px 0}

@@ -5,8 +5,11 @@ export type SignalStep = {
   input:string; logic:string; result:string; value:string; engineering:string;
   status:string; source:string; sourceLabel:string;
 };
+export type PipelineStage = {
+  code:string; stage:string; input:string; decision:string; software:string; output:string; limitation:string;
+};
 export type StoryContent = {
-  brief:{eyebrow:string;heading:string;summary:string;accent:string;features:{label:string;detail:string}[];note:string};
+  brief:{eyebrow:string;heading:string;summary:string;accent:string;features:{label:string;detail:string}[];pipelineTitle:string;pipelineLabels:{input:string;decision:string;software:string;output:string;limitation:string};pipeline:PipelineStage[];note:string};
   walkthrough:{eyebrow:string;title:string;lead:string;example:string;stepLabel:string;input:string;logic:string;result:string;investor:string;developer:string;code:string;footnote:string};
   blueprint:{eyebrow:string;title:string;lead:string;source:string;layers:{number:string;tag:string;title:string;description:string;file:string;path:string;status:string}[];semantics:string;states:{label:string;definition:string}[];proofTitle:string;proof:{stage:string;proof:string;level:string}[];end:string;cta:string};
   steps:SignalStep[];
@@ -19,6 +22,18 @@ es:{
   summary:'OEP investiga una capa que permite a dispositivos participantes <strong>confirmar voluntariamente su situación</strong>, conservar mensajes cuando no hay salida, buscar transportes autorizados y distinguir entre entrega confirmada y ausencia de contacto.',
   accent:'No crea satélites ni sustituye operadoras: coordina lo que ya existe y lo que cada dispositivo permite.',
   features:[{label:'01 / ALERTA',detail:'Zona y origen de emergencia, con verificación pendiente para emisores reales.'},{label:'02 / PERSONAS',detail:'Estoy bien, SOS voluntario o estado desconocido sin inferir víctimas.'},{label:'03 / MENSAJE',detail:'Cola, TTL, deduplicación, reintentos y restricciones energéticas.'},{label:'04 / RUTA',detail:'Selección de enlaces compatibles y ACK distinguido de un rescate.'}],
+  pipelineTitle:'FLUJO ARQUITECTÓNICO DE EXTREMO A EXTREMO: EMERGENCY EVENT → ZONE → HUMAN STATUS → CONSENT → MESSAGE → NETWORK PATH → ACK → EVIDENCE',
+  pipelineLabels:{input:'ENTRADA',decision:'DECISIÓN',software:'SOFTWARE',output:'SALIDA',limitation:'LÍMITE ACTUAL'},
+  pipeline:[
+   {code:'EMERGENCY EVENT',stage:'01 · Evento',input:'Parámetro de incidente o alerta CAP candidata.',decision:'Rechazar emisores no verificados o modos Test/Exercise como alertas oficiales.',software:'evaluateCapAlert() en emergency-policy.mjs.',output:'Evento candidato o rechazo seguro.',limitation:'Sin PKI gubernamental conectada.'},
+   {code:'ZONE',stage:'02 · Zona',input:'Polígono geográfico, ventana temporal y severidad.',decision:'Validar geometría cerrada ≥4 puntos y vigencia antes de activar ejercicio.',software:'Validación de polígono y ventana temporal.',output:'Zona EXERCISE_ONLY acotada.',limitation:'Coordenadas normalizadas; sin GPS en vivo.'},
+   {code:'HUMAN STATUS',stage:'03 · Estado humano',input:'Acción voluntaria: SAFE, SOS_EXPLICIT, OTHERS_AFFECTED.',decision:'Mantener silencio como UNKNOWN/NO_CONTACT; jamás inferir víctimas.',software:'humanStatusOutcome() y human-safety-panel.tsx.',output:'Estado explícito auditable con TTL.',limitation:'Solo entrada local del usuario.'},
+   {code:'CONSENT',stage:'04 · Consentimiento',input:'Opt-in del usuario, permiso del SO y nivel de batería.',decision:'Clasificar AVAILABLE/DISABLED/PERMISSION_REQUIRED y aplicar perfil energético.',software:'normalizeCapability() y energyPolicy().',output:'Nodo elegible o excluido del relé.',limitation:'No modifica ajustes del sistema operativo.'},
+   {code:'MESSAGE',stage:'05 · Mensaje',input:'Sobre JSON con ID, categoría explícita, destino LAB_* y TTL.',decision:'Validar esquema, deduplicar IDs, encolar con límite y purgar al expirar.',software:'createStoreForwardEngine() en store-forward.mjs.',output:'Estado QUEUED, EXPIRED o REVOKED.',limitation:'Cola en memoria; sin almacenamiento móvil persistente.'},
+   {code:'NETWORK PATH',stage:'06 · Ruta de red',input:'Adaptadores disponibles, fiabilidad, latencia y energía.',decision:'Puntuar rutas compatibles y evitar nodos intermediarios en batería crítica.',software:'runScenario() y selector de adaptadores.',output:'Ruta celular/gateway modelada o espera local.',limitation:'Grafo virtual; sin malla física multi-hop.'},
+   {code:'ACK',stage:'07 · Acuse (ACK)',input:'Recibo del transporte con messageId, transportId y desafío.',decision:'Exigir coincidencia exacta antes del TTL antes de marcar ACK_SYNTHETIC.',software:'Verificador de recibos y LabDeliveryGuard.java.',output:'ACK_SYNTHETIC distinguido de rescate real.',limitation:'Recibo sintético; sin enlace a 112.'},
+   {code:'EVIDENCE',stage:'08 · Evidencia',input:'Semilla, parámetros, trazas de auditoría y resultados.',decision:'Etiquetar cada salida como SIMULATED_ONLY y exportar JSON reproducible.',software:'exportSyntheticEvidence() y suite de 810 escenarios.',output:'JSON verificable y registros CSV Android.',limitation:'Ensayo físico de 2 teléfonos pendiente.'}
+  ],
   note:'HOY: MODELO VIRTUAL + APK ANDROID EXPERIMENTAL COMPILADA. NO ES UN SERVICIO REAL.'
  },
  walkthrough:{
@@ -95,6 +110,18 @@ en:{
   summary:'OEP researches an opt-in coordination layer where people can <strong>explicitly report their status</strong>, messages can wait when connectivity is lost, compatible authorised paths can be evaluated, and receipt is never confused with rescue.',
   accent:'We are not building satellites or replacing operators: we coordinate existing capabilities, where users and platforms permit.',
   features:[{label:'01 / ALERT',detail:'Emergency zone, source and expiry; real issuer verification is a future integration.'},{label:'02 / PEOPLE',detail:'Explicit SAFE or SOS; silence remains unknown, never an inferred victim.'},{label:'03 / MESSAGE',detail:'Bounded queue, TTL, deduplication, retries and energy policies.'},{label:'04 / ROUTE',detail:'Compatible routes and receipt semantics separate from rescue outcomes.'}],
+  pipelineTitle:'END-TO-END ARCHITECTURE FLOW: EMERGENCY EVENT → ZONE → HUMAN STATUS → CONSENT → MESSAGE → NETWORK PATH → ACK → EVIDENCE',
+  pipelineLabels:{input:'INPUT',decision:'DECISION',software:'SOFTWARE',output:'OUTPUT',limitation:'CURRENT LIMITATION'},
+  pipeline:[
+   {code:'EMERGENCY EVENT',stage:'01 · Event',input:'Scenario incident parameters or candidate CAP alert.',decision:'Reject unverified issuers or Test/Exercise modes as official public alerts.',software:'evaluateCapAlert() in emergency-policy.mjs.',output:'Candidate exercise event or fail-closed rejection.',limitation:'No live government PKI trust chain connected.'},
+   {code:'ZONE',stage:'02 · Zone',input:'Geographic polygon, time window and severity.',decision:'Validate closed polygon (≥4 points) and active window before exercise activation.',software:'Polygon & expiry gate in emergency-policy.mjs.',output:'Bounded EXERCISE_ONLY zone.',limitation:'Normalized virtual coordinates; no live GPS.'},
+   {code:'HUMAN STATUS',stage:'03 · Human Status',input:'Voluntary user action: SAFE, SOS_EXPLICIT, OTHERS_AFFECTED.',decision:'Keep non-response as UNKNOWN/NO_CONTACT; never infer injury from silence.',software:'humanStatusOutcome() and human-safety-panel.tsx.',output:'Auditable explicit status with TTL.',limitation:'Local browser/UI state only.'},
+   {code:'CONSENT',stage:'04 · Consent',input:'Explicit user opt-in, OS permission state and battery level.',decision:'Classify AVAILABLE/DISABLED/PERMISSION_REQUIRED and enforce energy profile.',software:'normalizeCapability() and energyPolicy().',output:'Eligible or excluded relay node.',limitation:'Never toggles OS radios or permissions.'},
+   {code:'MESSAGE',stage:'05 · Message',input:'JSON envelope with ID, explicit category, LAB_* destination and TTL.',decision:'Validate schema, deduplicate IDs, bound queue size and wipe expired payloads.',software:'createStoreForwardEngine() in store-forward.mjs.',output:'QUEUED, EXPIRED or REVOKED record.',limitation:'In-memory queue; no durable mobile SOS storage.'},
+   {code:'NETWORK PATH',stage:'06 · Network Path',input:'Available adapters, reliability, latency and energy cost.',decision:'Score compatible routes and exclude CRITICAL-battery intermediary relays.',software:'runScenario() and adapter scoring engine.',output:'Modelled cellular/gateway path or local queue hold.',limitation:'Virtual graph; no physical multi-hop mesh.'},
+   {code:'ACK',stage:'07 · Receiver ACK',input:'Transport receipt with messageId, transportId and challenge.',decision:'Require exact ID/transport match before TTL expiry to mark ACK_SYNTHETIC.',software:'Receipt guard in store-forward.mjs & LabDeliveryGuard.java.',output:'ACK_SYNTHETIC distinct from human rescue.',limitation:'Synthetic receipt only; no live 112 dispatch.'},
+   {code:'EVIDENCE',stage:'08 · Evidence',input:'Seed, scenario parameters, audit log and invariant checks.',decision:'Tag every record SIMULATED_ONLY and export reproducible JSON bundle.',software:'exportSyntheticEvidence() & 810-run sweep suite.',output:'Verifiable JSON artifact & Android CSV schema.',limitation:'Two-phone physical field trials pending.'}
+  ],
   note:'TODAY: VIRTUAL MODEL + COMPILED EXPERIMENTAL ANDROID APK. NOT A LIVE EMERGENCY SERVICE.'
  },
  walkthrough:{
@@ -166,6 +193,18 @@ nl:{
   summary:'OEP onderzoekt een vrijwillige coördinatielaag: deelnemers kunnen <strong>zelf hun status melden</strong>, berichten kunnen wachten bij netwerkuitval, toegestane routes worden vergeleken en ontvangst is nooit hetzelfde als een redding.',
   accent:'Geen eigen satellieten en geen vervanging voor providers: alleen bestaande mogelijkheden die gebruikers en systemen toestaan.',
   features:[{label:'01 / MELDING',detail:'Incidentzone, bron en verloopdatum; verificatie van echte afzenders volgt later.'},{label:'02 / MENSEN',detail:'Vrijwillige VEILIG- of SOS-melding; stilte blijft onbekend.'},{label:'03 / BERICHT',detail:'Wachtrij, TTL, deduplicatie, herpogingen en energiebeleid.'},{label:'04 / ROUTE',detail:'Compatibele verbindingen met aantoonbaar onderscheiden ontvangststatus.'}],
+  pipelineTitle:'END-TO-END ARCHITECTUURSTROOM: EMERGENCY EVENT → ZONE → HUMAN STATUS → CONSENT → MESSAGE → NETWORK PATH → ACK → EVIDENCE',
+  pipelineLabels:{input:'INPUT',decision:'BESLISSING',software:'SOFTWARE',output:'OUTPUT',limitation:'HUIDIGE BEPERKING'},
+  pipeline:[
+   {code:'EMERGENCY EVENT',stage:'01 · Gebeurtenis',input:'Scenarioparameters of kandidaat-CAP-melding.',decision:'Weiger niet-geverifieerde afzenders of Test/Exercise als officieel alarm.',software:'evaluateCapAlert() in emergency-policy.mjs.',output:'Kandidaat-oefenevent of veilige weigering.',limitation:'Geen live overheids-PKI gekoppeld.'},
+   {code:'ZONE',stage:'02 · Zone',input:'Geografische polygoon, tijdvenster en ernst.',decision:'Valideer gesloten polygoon (≥4 punten) en geldigheid vóór activatie.',software:'Polygoon- en verloopcontrole in emergency-policy.mjs.',output:'Begrensde EXERCISE_ONLY-zone.',limitation:'Virtuele coördinaten; geen live GPS.'},
+   {code:'HUMAN STATUS',stage:'03 · Menselijke status',input:'Vrijwillige actie: SAFE, SOS_EXPLICIT, OTHERS_AFFECTED.',decision:'Houd stilte op UNKNOWN/NO_CONTACT; leid nooit letsel af uit stilte.',software:'humanStatusOutcome() en human-safety-panel.tsx.',output:'Controleerbare expliciete status met TTL.',limitation:'Alleen lokale browserstatus.'},
+   {code:'CONSENT',stage:'04 · Toestemming',input:'Expliciete opt-in, OS-permissie en batterijniveau.',decision:'Classificeer AVAILABLE/DISABLED/PERMISSION_REQUIRED en pas energieprofiel toe.',software:'normalizeCapability() en energyPolicy().',output:'Geschikte of uitgesloten relay-node.',limitation:'Wijzigt nooit OS-radio’s of permissies.'},
+   {code:'MESSAGE',stage:'05 · Bericht',input:'JSON-envelop met ID, expliciete categorie, LAB_*-doel en TTL.',decision:'Valideer schema, ontdubbel ID’s, begrens wachtrij en wis verlopen inhoud.',software:'createStoreForwardEngine() in store-forward.mjs.',output:'Status QUEUED, EXPIRED of REVOKED.',limitation:'Geheugenwachtrij; geen duurzame telefoonopslag.'},
+   {code:'NETWORK PATH',stage:'06 · Netwerkpad',input:'Beschikbare adapters, betrouwbaarheid, latentie en energie.',decision:'Scoor compatibele routes en sluit tussenstations met kritieke accu uit.',software:'runScenario() en adapterselectie.',output:'Gesimuleerd mobiel/gateway-pad of lokale wachtrij.',limitation:'Virtuele graaf; geen fysieke multi-hop mesh.'},
+   {code:'ACK',stage:'07 · Ontvangst (ACK)',input:'Transportbewijs met messageId, transportId en challenge.',decision:'Vereis exacte ID/transport-match vóór TTL om ACK_SYNTHETIC te markeren.',software:'Ontvangstbewaker & LabDeliveryGuard.java.',output:'ACK_SYNTHETIC onderscheiden van redding.',limitation:'Gesimuleerd bewijs; geen 112-koppeling.'},
+   {code:'EVIDENCE',stage:'08 · Bewijs',input:'Seed, parameters, auditlog en invariantcontroles.',decision:'Label elke uitvoer als SIMULATED_ONLY en exporteer reproduceerbare JSON.',software:'exportSyntheticEvidence() & 810-scenariotests.',output:'Verifieerbare JSON & Android CSV-schema.',limitation:'Fysieke proef met 2 telefoons nog open.'}
+  ],
   note:'NU: VIRTUEEL MODEL + GECOMPILEERDE EXPERIMENTELE ANDROID-APK. GEEN HULPDIENST.'
  },
  walkthrough:{

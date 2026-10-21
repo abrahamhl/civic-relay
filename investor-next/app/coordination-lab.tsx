@@ -154,12 +154,12 @@ export default function CoordinationLab({locale}:{locale:Locale}){
        <input type="checkbox" checked={params[key]!==false} onChange={e=>set(key,e.currentTarget.checked)}/>
        <span>{key==='gateway'?w.gateway:key.toUpperCase()}</span></label>)}
      </div>
-     <div className="mer-tools"><button type="button" onClick={()=>{
+     <div className="mer-tools"><button type="button" data-testid="reset-scenario" onClick={()=>{
       setParams({devices:60,seed:20261020,participation:80,permissions:85,battery:65,damaged:85,responses:10,helpRequests:3,bluetooth:true,wifi:true,gateway:true});
       setStage(0);
      }}>{w.refresh}</button>
-     <button type="button" onClick={()=>{void navigator.clipboard?.writeText(JSON.stringify({seed:result.seed,params,summary:s},null,2));}}>{w.copy}</button>
-     <button type="button" onClick={exportSyntheticEvidence}>{w.download}</button></div>
+     <button type="button" data-testid="copy-scenario-input" onClick={()=>{void navigator.clipboard?.writeText(JSON.stringify({seed:result.seed,params,summary:s},null,2));}}>{w.copy}</button>
+     <button type="button" data-testid="export-synthetic-evidence" onClick={exportSyntheticEvidence}>{w.download}</button></div>
     </div>
     <div className="mer-output"><h3>{w.results}</h3>
      <div className="mer-stat-grid">

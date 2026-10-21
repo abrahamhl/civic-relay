@@ -21,6 +21,22 @@ export function WhatItDoes({locale}:{locale:Locale}){
      <span className="oep-brief-label">{feature.label}</span>
      <p>{feature.detail}</p>
     </article>)}</div>
+   <div className="oep-brief-pipeline-wrap" aria-label={t.pipelineTitle}>
+    <p className="oep-brief-pipeline-title">{t.pipelineTitle}</p>
+    <div className="oep-brief-pipeline">
+     {t.pipeline.map(item=>
+      <article className="oep-pipeline-card" key={item.code}>
+       <div className="oep-pipeline-head"><span>{item.stage}</span><code>{item.code}</code></div>
+       <dl className="oep-pipeline-dl">
+        <div><dt>{t.pipelineLabels.input}</dt><dd>{item.input}</dd></div>
+        <div><dt>{t.pipelineLabels.decision}</dt><dd>{item.decision}</dd></div>
+        <div><dt>{t.pipelineLabels.software}</dt><dd>{item.software}</dd></div>
+        <div><dt>{t.pipelineLabels.output}</dt><dd>{item.output}</dd></div>
+        <div><dt>{t.pipelineLabels.limitation}</dt><dd>{item.limitation}</dd></div>
+       </dl>
+      </article>)}
+    </div>
+   </div>
    <p className="oep-brief-evidence"><span className="oep-mini-beacon" aria-hidden="true"/>{t.note}</p>
   </div>
  </section>;

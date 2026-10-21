@@ -47,9 +47,9 @@ export default function TransportSandbox({locale,gatewayAvailable}:{locale:Local
    <span className={gatewayAvailable?'mer-gateway-up':'mer-gateway-down'}>{t.transport}: {gatewayAvailable?t.enabled:t.disabled}</span>
   </div>
   <div className="mer-tools">
-   <button type="button" disabled={busy} onClick={()=>{void send();}}>{t.send}</button>
-   <button type="button" disabled={busy||!records.length} onClick={()=>{void retry();}}>{t.retry}</button>
-   <button type="button" disabled={busy||!records.length} onClick={clear}>{t.clear}</button>
+   <button type="button" data-testid="sandbox-send-sos" disabled={busy} onClick={()=>{void send();}}>{t.send}</button>
+   <button type="button" data-testid="sandbox-retry-queue" disabled={busy||!records.length} onClick={()=>{void retry();}}>{t.retry}</button>
+   <button type="button" data-testid="sandbox-clear-data" disabled={busy||!records.length} onClick={clear}>{t.clear}</button>
   </div>
   <div aria-live="polite" className="mer-forward-results"><strong>{t.status}</strong>
    {records.length===0?<p>{t.empty}</p>:<ul>{records.slice(-5).reverse().map(r=>

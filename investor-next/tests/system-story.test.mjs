@@ -73,3 +73,10 @@ test('copy accurately says Android is compiled but physical interoperability rem
  'NU: SIMULATIE IN DE BROWSER. LATER: FYSIEKE RADIO'])
   assert.ok(!c.includes(erroneous),'outdated claim: '+erroneous);
 });
+test('eight-stage scannable architecture pipeline is present in EN, ES and NL with input, decision, software, output and limitation',()=>{
+ const data=read('investor-next/app/system-story-data.ts');
+ for(const code of ['EMERGENCY EVENT','ZONE','HUMAN STATUS','CONSENT','MESSAGE','NETWORK PATH','ACK','EVIDENCE']){
+  assert.equal(data.split("code:'"+code+"'").length-1,3,'Missing locale pipeline stage '+code);
+ }
+ assert.match(data,/EMERGENCY EVENT → ZONE → HUMAN STATUS → CONSENT → MESSAGE → NETWORK PATH → ACK → EVIDENCE/);
+});
