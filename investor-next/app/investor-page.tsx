@@ -16,9 +16,9 @@ const funding='https://ec.europa.eu/info/funding-tenders/opportunities/portal/sc
 const dossier=source+'/blob/master/docs/README.md';
 const contact=source+'/issues/new?template=pilot-or-grant-partner.yml';
 const chapterNavigation:Record<Locale,Array<{href:string;label:string}>>={
- en:[{href:'#what-oep-does',label:'WHAT IT DOES'},{href:'#telecom-rf-radar-suite',label:'TODAY VS OEP & RF RADAR'},{href:'#live-hardware-and-funding',label:'LIVE NODE & FUNDING'},{href:'#architecture',label:'THE 3D STORY'},{href:'#how-it-works',label:'HOW IT WORKS'},{href:'#routing-lab',label:'TRY THE LAB'},{href:'#developer-stack',label:'TECH STACK'},{href:'#evidence',label:'EVIDENCE'}],
- es:[{href:'#what-oep-does',label:'QUÉ HACE'},{href:'#telecom-rf-radar-suite',label:'HOY VS OEP Y RADAR RF'},{href:'#live-hardware-and-funding',label:'NODO VIVO E INVERSIÓN'},{href:'#architecture',label:'HISTORIA 3D'},{href:'#how-it-works',label:'CÓMO FUNCIONA'},{href:'#routing-lab',label:'PROBAR LAB'},{href:'#developer-stack',label:'TECNOLOGÍA'},{href:'#evidence',label:'EVIDENCIAS'}],
- nl:[{href:'#what-oep-does',label:'WAT HET DOET'},{href:'#telecom-rf-radar-suite',label:'NU VS OEP & RF-RADAR'},{href:'#live-hardware-and-funding',label:'LIVE NODE & FONDSEN'},{href:'#architecture',label:'3D-VERHAAL'},{href:'#how-it-works',label:'WERKING'},{href:'#routing-lab',label:'LAB PROBEREN'},{href:'#developer-stack',label:'TECHNIEK'},{href:'#evidence',label:'BEWIJS'}]
+ en:[{href:'#what-oep-does',label:'WHAT IT DOES'},{href:'#architecture',label:'THE 3D STORY'},{href:'#how-it-works',label:'HOW IT WORKS'},{href:'#routing-lab',label:'TRY THE LAB'},{href:'#developer-stack',label:'TECH STACK'},{href:'#evidence',label:'EVIDENCE'}],
+ es:[{href:'#what-oep-does',label:'QUÉ HACE'},{href:'#architecture',label:'HISTORIA 3D'},{href:'#how-it-works',label:'CÓMO FUNCIONA'},{href:'#routing-lab',label:'PROBAR LAB'},{href:'#developer-stack',label:'TECNOLOGÍA'},{href:'#evidence',label:'EVIDENCIAS'}],
+ nl:[{href:'#what-oep-does',label:'WAT HET DOET'},{href:'#architecture',label:'3D-VERHAAL'},{href:'#how-it-works',label:'WERKING'},{href:'#routing-lab',label:'LAB PROBEREN'},{href:'#developer-stack',label:'TECHNIEK'},{href:'#evidence',label:'BEWIJS'}]
 };
 
 export default function InvestorPage({locale}:{locale:Locale}){
