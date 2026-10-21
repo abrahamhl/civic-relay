@@ -7,6 +7,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.Signature;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -57,6 +58,20 @@ public final class LabReceiptSigner {
             return Base64.getEncoder().encodeToString(sig.sign());
         } catch (GeneralSecurityException ex) {
             throw new IllegalStateException("Failed to sign lab receipt", ex);
+        }
+    }
+
+    /** Reject malformed or non-P256 public-key material before pinning a lab session. */
+    public static boolean isSupportedPublicKey(String publicKeyB64) {
+        if (publicKeyB64 == null || publicKeyB64.length() < 60 || publicKeyB64.length() > 512) return false;
+        try {
+            byte[] encoded = Base64.getDecoder().decode(publicKeyB64);
+            if (encoded.length > 256) return false;
+            PublicKey key = KeyFactory.getInstance("EC").generatePublic(new X509EncodedKeySpec(encoded));
+            return key instanceof ECPublicKey &&
+                ((ECPublicKey) key).getParams().getCurve().getField().getFieldSize() == 256;
+        } catch (IllegalArgumentException | GeneralSecurityException ex) {
+            return false;
         }
     }
 
