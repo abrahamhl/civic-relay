@@ -1,15 +1,16 @@
-# OEP — Offline Emergency Protocol
-**Protocolo de Emergencias Offline · Distributed Emergency Coordination & Adaptive Multi-Network Routing**
+# OEP / Civic Relay — Offline Emergency Protocol
 
-OEP is a **research prototype**, not an official emergency protocol, emergency call provider, satellite network, regulatory certification or deployment-ready safety system. It studies how *consenting* existing devices might coordinate synthetic status checks, queue messages and select compatible paths during connectivity loss.
+**Investigación en coordinación descentralizada para emergencias con conectividad degradada.** OEP estudia cómo dispositivos participantes y redes compatibles podrían coordinar avisos sintéticos, almacenar/reintentar mensajes y seleccionar rutas alternativas con consentimiento.
 
-**Research:** [OEP funding + independent validation roadmap](docs/OEP_VALIDATION_CERTIFICATION_AND_FUNDING_2026.md) · [Investor diligence](docs/OEP_INVESTOR_DILIGENCE_AND_PITCH.md) · [Master architecture](docs/MASTER_EMERGENCY_ROUTING_2026.md).
+🌐 **[Abrir la web avanzada de OEP — demostración interactiva ES / EN / NL](https://civic-relay-investor-f5c2a3kdr-2fabraham-7129s-projects.vercel.app)**  
+🧪 **[Ver el código y mejoras de la versión avanzada (PR #3)](https://github.com/abrahamhl/civic-relay/pull/3)**  
+📋 **[Revisar el plan de investigación y validación](https://github.com/abrahamhl/civic-relay/blob/feat/master-emergency-routing-v1-20261020/docs/OEP_VALIDATION_CERTIFICATION_AND_FUNDING_2026.md)**
 
-**Evidence levels:** 20–100 virtual nodes with deterministic automated scenario tests; a Java Android two-phone research lab with APK build CI; **NO measured two-phone field trial**, no official CAP trust chain, no verified satellite route, no 112 integration. Consult the exact-commit GitHub Actions job before claiming an APK build.
-
-**Repository identity:** `abrahamhl/civic-relay` remains unchanged to preserve history, deployments and existing issue/PR references. Civic Relay is the historical repo name.
+> **Estado de publicación (21-10-2026):** el enlace anterior es un despliegue de previsualización `READY` verificado en Vercel para el commit `c18c6ac`. La versión avanzada aún vive en una rama experimental y no sustituye la base `master`. Solo demuestra rutas y dispositivos **simulados**; no se han validado comunicaciones físicas entre teléfonos, integración real con 112, comunicaciones satelitales ni certificación institucional. No debe utilizarse en emergencias reales.
 
 ---
+
+## Archivo de la demo histórica V0.1
 
 ## Historical Civic Relay V0.1 demo
 
