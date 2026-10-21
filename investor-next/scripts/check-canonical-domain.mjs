@@ -42,9 +42,11 @@ function walk(full) {
 }
 for (const name of roots) walk(resolve(root,name));
 const readme=readFileSync(resolve(root,'README.md'),'utf8');
-const layout=readFileSync(resolve(root,'investor-next/app/layout.tsx'),'utf8');
+const layout=readFileSync(resolve(root,'investor-next/app/(en)/layout.tsx'),'utf8');
+const localizedLayout=readFileSync(resolve(root,'investor-next/app/(localized)/[locale]/layout.tsx'),'utf8');
 assert.ok(readme.includes(CANONICAL),'README does not link canonical public domain');
-assert.ok(layout.includes(CANONICAL),'SEO metadataBase does not match public domain');
+assert.ok(layout.includes(CANONICAL),'English SEO metadataBase does not match public domain');
+assert.ok(localizedLayout.includes(CANONICAL),'Localized SEO metadataBase does not match public domain');
 if (violations.length) {
   console.error(JSON.stringify({ok:false,canonical:CANONICAL,violations},null,2));
   process.exitCode=1;
