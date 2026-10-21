@@ -1,12 +1,14 @@
 package eu.civicrelay.nearbylab;
 
 import java.nio.charset.StandardCharsets;
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.Signature;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -20,6 +22,9 @@ import java.util.Base64;
  */
 public final class LabReceiptSigner {
     private static final String DOMAIN = "OEP_LAB_RECEIPT_V1";
+    // Exact NIST P-256 subgroup order; field size alone also matches unrelated curves.
+    private static final BigInteger P256_ORDER = new BigInteger(
+        "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551", 16);
     private final PrivateKey privateKey;
     private final PublicKey publicKey;
 
@@ -60,6 +65,21 @@ public final class LabReceiptSigner {
         }
     }
 
+    /** Reject malformed or non-P256 public-key material before pinning a lab session. */
+    public static boolean isSupportedPublicKey(String publicKeyB64) {
+        if (publicKeyB64 == null || publicKeyB64.length() < 60 || publicKeyB64.length() > 512) return false;
+        try {
+            byte[] encoded = Base64.getDecoder().decode(publicKeyB64);
+            if (encoded.length > 256) return false;
+            PublicKey key = KeyFactory.getInstance("EC").generatePublic(new X509EncodedKeySpec(encoded));
+            return key instanceof ECPublicKey &&
+                ((ECPublicKey) key).getParams().getCurve().getField().getFieldSize() == 256 &&
+                P256_ORDER.equals(((ECPublicKey) key).getParams().getOrder());
+        } catch (IllegalArgumentException | GeneralSecurityException ex) {
+            return false;
+        }
+    }
+
     public static boolean verifyReceipt(
             String publicKeyB64,
             String messageId,
@@ -67,7 +87,7 @@ public final class LabReceiptSigner {
             String peerId,
             long issuedAtMs,
             String signatureB64) {
-        if (publicKeyB64 == null || signatureB64 == null) return false;
+        if (signatureB64 == null || !isSupportedPublicKey(publicKeyB64)) return false;
         try {
             byte[] transcript = canonicalTranscript(messageId, challenge, peerId, issuedAtMs);
             byte[] keyBytes = Base64.getDecoder().decode(publicKeyB64);

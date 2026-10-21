@@ -36,6 +36,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -48,7 +51,8 @@ import java.util.UUID;
 /**
  * Experimental two-phone link only. Not an emergency service, satellite app, nor a 112 integration.
  * Explicit app consent + Android permissions + matching-code confirmation required.
- * Only synthetic messages are allowed; ephemeral in-memory state (no location collection).
+ * Only synthetic messages are allowed; file-backed lab records contain fixed fake payloads.
+ * NO sensitive user data, delivery guarantee, automatic retry after a restart, or encryption at rest.
  */
 public final class MainActivity extends Activity {
     private static final String SERVICE_ID = "eu.civicrelay.nearbylab";
@@ -69,6 +73,10 @@ public final class MainActivity extends Activity {
     private volatile long sendStartedElapsed = 0L;
     private volatile String activeTrialId = null;
     private final LabTrialJournal journal = new LabTrialJournal();
+    private final LabReceiptSigner receiptSigner = new LabReceiptSigner();
+    private final Map<String,String> pinnedPeerKeys = Collections.synchronizedMap(new HashMap<>());
+    private LabPersistentQueue durableQueue = null;
+    private volatile boolean durableQueueHealthy = false;
     private final Handler foregroundTimer = new Handler(Looper.getMainLooper());
     private Runnable pendingExpiryTask = null;
 
@@ -118,8 +126,59 @@ public final class MainActivity extends Activity {
         output.setTextSize(15);
         output.setPadding(0, 24, 0, 15);
         body.addView(output);
+        initialiseLabQueue();
         log("Permissioned lab. Manually turn on radios if disabled; no hidden toggles. " +
             "Keep both apps foregrounded. Confirm the same pairing digits on BOTH phones.");
+    }
+
+    private Path labQueuePath() {
+        return getFilesDir().toPath().resolve("oep-lab-queue.tsv");
+    }
+
+    /** The queue is a LAB-ONLY crash journal. No automatic transmission on restart. */
+    private void initialiseLabQueue() {
+        try {
+            durableQueue = new LabPersistentQueue(labQueuePath(), System.currentTimeMillis());
+            durableQueueHealthy = true;
+            int pending = 0;
+            for (LabPersistentQueue.Record record : durableQueue.snapshot(System.currentTimeMillis())) {
+                if (record.status == LabPersistentQueue.Status.QUEUED) pending++;
+            }
+            if (pending > 0) log(pending + " synthetic queued lab record(s) restored from interrupted run. " +
+                "No retry without NEW consent/pairing. STOP & CLEAR removes these local records.");
+        } catch (IOException error) {
+            durableQueueHealthy = false;
+            durableQueue = null;
+            log("P0 STORAGE ERROR: lab queue unavailable/corrupted. SENDING BLOCKED. " +
+                "Press STOP & CLEAR; no hidden data recovery or transmission.");
+        }
+    }
+
+    private boolean persistLabMessage(String id, long now) {
+        if (!durableQueueHealthy || durableQueue == null) {
+            log("DENIED: lab storage not healthy. STOP & CLEAR and re-consent."); return false;
+        }
+        try {
+            durableQueue.enqueue(id, "SAFE", "SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS", now, TTL_MILLIS);
+            return true;
+        } catch (IOException | IllegalArgumentException | IllegalStateException failure) {
+            durableQueueHealthy = false;
+            log("P0 STORAGE ERROR: message not sent; disk write failed."); return false;
+        }
+    }
+
+    private void settleLabRecord(String id, String outcome) {
+        if (durableQueue == null) return;
+        try {
+            if ("ACK_RECEIVED".equals(outcome)) durableQueue.markAckVerified(id, System.currentTimeMillis());
+            else durableQueue.revoke(id, System.currentTimeMillis());
+        } catch (IOException failure) {
+            durableQueueHealthy = false;
+            log("P0 STORAGE ERROR: trial result is not durably recorded; no persistence claim.");
+        } catch (IllegalArgumentException failure) {
+            durableQueueHealthy = false;
+            log("P0 STORAGE ERROR: missing lab record; further sends blocked.");
+        }
     }
 
     private void addButton(LinearLayout parent, String label, Runnable action) {
@@ -175,6 +234,7 @@ public final class MainActivity extends Activity {
         if (id == null || !id.equals(activeTrialId)) return -1L;
         long elapsed = sendStartedElapsed == 0L ? -1L :
             Math.max(0L, SystemClock.elapsedRealtime() - sendStartedElapsed);
+        settleLabRecord(id, outcome);
         journal.record(id, outcome, elapsed);
         if (pendingExpiryTask != null) foregroundTimer.removeCallbacks(pendingExpiryTask);
         pendingExpiryTask = null;
@@ -265,7 +325,8 @@ public final class MainActivity extends Activity {
                 connectedPeer = endpointId;
                 connections.stopAdvertising();
                 connections.stopDiscovery();
-                log("LINK CONNECTED (manually verified peer). NOT a delivered-message receipt.");
+                log("LINK CONNECTED (manual digits checked). Awaiting ECDSA session-key exchange.");
+                sendSessionHello(endpointId);
             } else {
                 approvedPeers.remove(endpointId);
                 connections.disconnectFromEndpoint(endpointId);
@@ -275,6 +336,7 @@ public final class MainActivity extends Activity {
         @Override public void onDisconnected(String endpointId) {
             if (endpointId.equals(connectedPeer)) {
                 connected = false;connectedPeer = null;approvedPeers.remove(endpointId);
+                pinnedPeerKeys.remove(endpointId);
                 finishTrial(activeTrialId, "DISCONNECTED");
                 deliveryGuard.reset();
                 outgoingPayloads.clear();
@@ -331,16 +393,27 @@ public final class MainActivity extends Activity {
         if (!userConsented || !connected || connectedPeer == null) {
             log("DENIED: obtain consent and accept a matching-code connection first.");return;
         }
+        if (!durableQueueHealthy || durableQueue == null) {
+            log("DENIED: damaged/unavailable lab store; no sending."); return;
+        }
+        if (!pinnedPeerKeys.containsKey(connectedPeer)) {
+            sendSessionHello(connectedPeer); // Manual resend if hello raced connection setup.
+            log("WAIT: ECDSA session key not received. Retry sending after peer handshake."); return;
+        }
         try {
             String id = UUID.randomUUID().toString();
             String challenge = UUID.randomUUID().toString(); // Echo proof for this packet only.
             long deadline = now + TTL_MILLIS;
             JSONObject packet = new JSONObject()
-                .put("v", 2).put("type", "LAB_MESSAGE").put("id", id)
+                .put("v", 3).put("type", "LAB_MESSAGE").put("id", id)
                 .put("challenge", challenge).put("expiresAt", deadline)
                 .put("body", "SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS");
             if (!deliveryGuard.beginOutgoing(id, connectedPeer, challenge, now, deadline)) {
                 log("DENIED: invalid or pending lab message.");return;
+            }
+            if (!persistLabMessage(id, now)) {
+                deliveryGuard.abortOutgoing(id);
+                return;
             }
             sendStartedElapsed = SystemClock.elapsedRealtime();
             activeTrialId = id;
@@ -350,6 +423,19 @@ public final class MainActivity extends Activity {
         } catch (JSONException e) { log("Packet encoding failed."); }
     }
 
+    private void sendSessionHello(String endpointId) {
+        if (!userConsented || !connected || !endpointId.equals(connectedPeer) ||
+            !approvedPeers.contains(endpointId)) return;
+        try {
+            JSONObject hello = new JSONObject().put("v", 3).put("type", "LAB_KEY_HELLO")
+                .put("publicKey", receiptSigner.publicKeyBase64());
+            sendPacket(endpointId, hello);
+        } catch (JSONException failure) {
+            log("ECDSA session-key exchange failed; close connection and retry pairing.");
+            connections.disconnectFromEndpoint(endpointId);
+        }
+    }
+
     private final PayloadCallback payloads = new PayloadCallback() {
         @Override public void onPayloadReceived(String endpointId, Payload payload) {
             if (!connected || !userConsented || !endpointId.equals(connectedPeer) ||
@@ -357,13 +443,27 @@ public final class MainActivity extends Activity {
                 payload.asBytes().length > MAX_BYTES) return;
             try {
                 JSONObject packet = new JSONObject(new String(payload.asBytes(), StandardCharsets.UTF_8));
-                if (packet.optInt("v") != 2) return; // Reject incompatible pilot protocol versions.
+                if (packet.optInt("v") != 3) return; // Reject old unsigned v2 ACKs.
                 String type = packet.optString("type");
+                if ("LAB_KEY_HELLO".equals(type)) {
+                    String candidate = packet.optString("publicKey");
+                    if (candidate.length() > 512 || !LabReceiptSigner.isSupportedPublicKey(candidate)) {
+                        log("Rejected malformed ECDSA key."); return;
+                    }
+                    String previous = pinnedPeerKeys.putIfAbsent(endpointId, candidate);
+                    if (previous != null && !previous.equals(candidate)) {
+                        log("P0: session peer key changed. Disconnecting and revoking consent.");
+                        stopAndClear(); return;
+                    }
+                    log("ECDSA key bound to manually verified Nearby session (not institutional identity).");
+                    return;
+                }
                 String id = packet.optString("id");
                 String challenge = packet.optString("challenge");
                 if (!LabDeliveryGuard.validId(id) ||
                     !LabDeliveryGuard.validId(challenge)) return;
                 if ("LAB_MESSAGE".equals(type)) {
+                    if (!pinnedPeerKeys.containsKey(endpointId)) return;
                     if (!"SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS".equals(packet.optString("body"))) return;
                     long expires = packet.optLong("expiresAt", 0L);
                     LabDeliveryGuard.IncomingState seen = deliveryGuard.acceptIncoming(
@@ -373,11 +473,24 @@ public final class MainActivity extends Activity {
                     }
                     if (seen == LabDeliveryGuard.IncomingState.NEW)
                         log("LAB MESSAGE RECEIVED; bounded duplicate guard active.");
+                    long issuedAtMs = System.currentTimeMillis();
                     JSONObject receipt = new JSONObject()
-                        .put("v", 2).put("type", "LAB_RECEIPT").put("id", id)
-                        .put("challenge", challenge);
+                        .put("v", 3).put("type", "LAB_RECEIPT").put("id", id)
+                        .put("challenge", challenge).put("issuedAtMs", issuedAtMs)
+                        .put("signature", receiptSigner.signReceipt(id, challenge, SERVICE_ID, issuedAtMs));
                     sendPacket(endpointId, receipt);
                 } else if ("LAB_RECEIPT".equals(type)) {
+                    String pinnedKey = pinnedPeerKeys.get(endpointId);
+                    long issuedAt = packet.optLong("issuedAtMs", 0L);
+                    // The sender's monotonic watchdog governs freshness: an offline
+                    // receiver may have a skewed wall clock. issuedAt is still signed.
+                    if (pinnedKey == null || issuedAt <= 0L ||
+                        !LabReceiptSigner.verifyReceipt(pinnedKey, id, challenge,
+                            SERVICE_ID, issuedAt, packet.optString("signature"))) {
+                        log("P0 REJECTED: receiver ECDSA proof invalid or no session key.");
+                        return;
+                    }
+                    // Ephemeral key bound to a manually approved Nearby session; NOT PKI identity.
                     // Guard against wall-clock changes: accept only within the sender's monotonic TTL.
                     if (id.equals(activeTrialId) && sendStartedElapsed > 0L &&
                         LabDeadlinePolicy.elapsedTtlReached(
@@ -445,12 +558,24 @@ public final class MainActivity extends Activity {
         waitingRole = null;
         deliveryGuard.reset();
         approvedPeers.clear();
+        pinnedPeerKeys.clear();
         outgoingPayloads.clear();
         activeTrialId = null;
         sendStartedElapsed = 0L;
         if (pendingExpiryTask != null) foregroundTimer.removeCallbacks(pendingExpiryTask);
         pendingExpiryTask = null;
         journal.clear();
+        // On STOP and on backgrounding, revoke consent and delete the lab's
+        // own file. A crashed process may leave synthetic data, never auto-send it.
+        try {
+            if (durableQueue != null) durableQueue.purgeAll();
+            else Files.deleteIfExists(labQueuePath());
+            durableQueue = new LabPersistentQueue(labQueuePath(), System.currentTimeMillis());
+            durableQueueHealthy = true;
+        } catch (IOException error) {
+            durableQueueHealthy = false;
+            log("P0 STORAGE ERROR: STOP could not erase lab file; check app storage manually.");
+        }
         if (output != null) output.setText("");
         connections.stopAdvertising();
         connections.stopDiscovery();

@@ -3,14 +3,20 @@
 **Investigación en coordinación descentralizada para emergencias con conectividad degradada.** OEP estudia cómo dispositivos participantes y redes compatibles podrían coordinar avisos sintéticos, almacenar/reintentar mensajes y seleccionar rutas alternativas con consentimiento.
 
 🌐 **[Abrir la web avanzada de OEP — demostración interactiva ES / EN / NL](https://civic-relay-investor.vercel.app)**  
-🧪 **[Ver el código y mejoras de la versión avanzada (PR #3)](https://github.com/abrahamhl/civic-relay/pull/3)**  
-📋 **[Revisar el plan de investigación y validación](https://github.com/abrahamhl/civic-relay/blob/feat/master-emergency-routing-v1-20261020/docs/OEP_VALIDATION_CERTIFICATION_AND_FUNDING_2026.md)**
+🧪 **[Código oficial integrado en master](https://github.com/abrahamhl/civic-relay/tree/master/investor-next)**  
+📋 **[Expediente técnico y estado real](https://github.com/abrahamhl/civic-relay/blob/master/docs/audits/LATEST_ENGINEERING_STATUS.md)**
 
-> **ÚNICO DOMINIO OFICIAL:** https://civic-relay-investor.vercel.app. Todas las páginas públicas y propuestas deben utilizar esta URL con rutas `/`, `/es/` y `/nl/`. El historial de la demo V0.1 existe como código, pero no representa el producto actual. La rama de investigación y la auditoría siguen bajo revisión; las comunicaciones Android↔Android no están validadas físicamente y no existe integración operativa con 112, satélites o radar trans-pared. No usar en emergencias reales.
+> **ÚNICO DOMINIO OFICIAL:** https://civic-relay-investor.vercel.app. Todas las páginas públicas y propuestas deben utilizar esta URL con rutas `/`, `/es/` y `/nl/`. El historial de la demo V0.1 existe como código, pero no representa el producto actual. El núcleo de investigación y las correcciones web están en `master`; nuevas mitigaciones de seguridad se revisan por PR antes de fusionar. La producción puede ir por detrás del último commit; las comunicaciones Android↔Android no están validadas físicamente y no existe integración operativa con 112, satélites o radar trans-pared. No usar en emergencias reales.
 
-> **Fuente verificable:** [PR #7 — endurecimiento y evidencia](https://github.com/abrahamhl/civic-relay/pull/7) y [estado del CTO](https://github.com/abrahamhl/civic-relay/blob/audit/funding-truth-gate-20261021/docs/audits/LATEST_ENGINEERING_STATUS.md). Verificar el SHA publicado y estado de CI antes de enviar un dossier.
+> **Fuente verificable:** [estado del CTO](docs/audits/LATEST_ENGINEERING_STATUS.md), [registro de evidencias](docs/investor/EVIDENCE_REGISTER.md) y [PR #8 (fiabilidad experimental)](https://github.com/abrahamhl/civic-relay/pull/8). Verificar SHA y CI exactos antes de enviar un dossier.
 
 ---
+
+## Transparencia del uso de inteligencia artificial
+
+Civic Relay incluye desarrollo, documentación y pruebas asistidos por IA generativa (entre otras herramientas, ChatGPT y asistentes de programación). Los cambios generados requieren revisión humana, validación automatizada y atribución transparente; los tests green no reemplazan una auditoría independiente. No se presenta código generado como trabajo puramente humano.
+
+**Restricción NLnet:** desde el 20-10-2026, [la política v2.0](https://nlnet.nl/foundation/policies/generativeAI/2.0/) prohíbe redacción, edición y traducción de solicitudes mediante IA generativa (salvo la excepción de accesibilidad declarada) y producir artefactos financiados con GenAI. Por tanto, este repositorio y estos documentos no autorizan una candidatura automatizada a NLnet. Antes de presentarse debe verificarse y declarar el uso previo de IA y establecer un plan de trabajo que cumpla estrictamente las condiciones.
 
 ## Archivo de la demo histórica V0.1
 

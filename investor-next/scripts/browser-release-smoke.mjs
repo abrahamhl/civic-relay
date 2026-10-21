@@ -28,10 +28,107 @@ const server=createServer((req,res)=>{
   }catch(e){res.writeHead(500);res.end('Static preview error');}
 });
 const cases=[
-  {id:'P01',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:390,height:844}},
-  {id:'P03',locale:'en',url:'/',text:'WHEN THE',viewport:{width:1280,height:800}},
-  {id:'P08',locale:'nl',url:'/nl/',text:'ALS HET',viewport:{width:820,height:1180}}
+  {id:'P01',role:'Citizen mobile / consent and revocation',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:390,height:844}},
+  {id:'P02',role:'First responder / scenario switching',locale:'en',url:'/',text:'WHEN THE',viewport:{width:1024,height:768}},
+  {id:'P03',role:'Investor / evidence and grant eligibility',locale:'en',url:'/',text:'WHEN THE',viewport:{width:1280,height:800}},
+  {id:'P04',role:'Engineer / export real synthetic report',locale:'en',url:'/',text:'WHEN THE',viewport:{width:1440,height:900}},
+  {id:'P05',role:'NL privacy reviewer / radio claim boundary',locale:'nl',url:'/nl/',text:'ALS HET',viewport:{width:1024,height:768}},
+  {id:'P06',role:'Volunteer / deny implicit SOS',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:412,height:915}},
+  {id:'P07',role:'Keyboard and reduced-motion accessibility',locale:'en',url:'/',text:'WHEN THE',viewport:{width:390,height:844}},
+  {id:'P08',role:'Institutional partner / roadmap and limitations',locale:'nl',url:'/nl/',text:'ALS HET',viewport:{width:820,height:1180}}
 ];
+async function runRoleTask(page,trial,evidenceDir){
+ const observations={role:trial.role,actions:[],verified:false};
+ const note=(action,value)=>observations.actions.push({action,result:value});
+ switch(trial.id){
+  case 'P01': {
+   const group=page.locator('.mer-human');
+   const safe=group.locator('button').first();
+   const denied=await safe.isDisabled();note('SAFE disabled before consent',denied);
+   await group.locator('input[type=checkbox]').check();
+   await safe.click();
+   const saved=await group.locator('.mer-safety-record').innerText();
+   note('Explicit SAFE saved locally',saved.includes('SAFE'));
+   await group.locator('.mer-safety-record button').click();
+   const erased=await group.locator('.mer-safety-record').count()===0;
+   note('Revoke removed response',erased);
+   observations.verified=denied&&saved.includes('SAFE')&&erased;
+   break;
+  }
+  case 'P02': {
+   const tab=page.locator('[data-testid="case-tab-3"]');
+   await tab.click();
+   const selected=await tab.getAttribute('aria-selected');
+   const scenarioVisible=await page.locator('#today-vs-oep').isVisible();
+   note('Switch fourth simulation scenario',selected);
+   observations.verified=selected==='true'&&scenarioVisible;
+   break;
+  }
+  case 'P03': {
+   const cards=await page.locator('[data-testid^="funding-card-"]').count();
+   const disclaimers=await page.locator('#evidence').count();
+   const nlnet=await page.locator('[data-testid="funding-card-F01-NLNET"]').innerText();
+   note('Funding programmes surfaced',cards);
+   note('NLnet AI policy disclosure visible',/20 October 2026|20 Oktober 2026|20 octubre 2026/.test(nlnet));
+   observations.verified=cards===8&&disclaimers===1&&/generative AI/i.test(nlnet);
+   break;
+  }
+  case 'P04': {
+   const [download]=await Promise.all([
+    page.waitForEvent('download',{timeout:12000}),
+    page.locator('[data-testid="export-synthetic-evidence"]').click()
+   ]);
+   const destination=join(evidenceDir,'P04-synthetic-route-export.json');
+   await download.saveAs(destination);
+   const parsed=JSON.parse(readFileSync(destination,'utf8'));
+   note('Generated browser evidence payload',parsed.kind);
+   observations.verified=parsed.kind==='OEP_SYNTHETIC_EVIDENCE_EXPORT' &&
+      parsed.warning==='SIMULATION_ONLY_NOT_PHYSICALLY_TESTED_NOT_AN_EMERGENCY_SERVICE' &&
+      parsed.result?.kind==='RESEARCH_SIMULATION_NOT_OPERATIONAL';
+   break;
+  }
+  case 'P05': {
+   const banner=await page.locator('.oep-ts-auth-banner').innerText();
+   const targets=await page.locator('[data-testid="rf-radar-target-list"]').count();
+   note('RF simulator authorization warning',banner.slice(0,200));
+   observations.verified=targets===1&&/simulat|simulati|geen echte|research/i.test(banner);
+   break;
+  }
+  case 'P06': {
+   const group=page.locator('.mer-human');
+   const emergency=group.locator('button').nth(1);
+   const initiallyDisabled=await emergency.isDisabled();
+   await group.locator('input[type=checkbox]').check();
+   await emergency.click();
+   const explicit=await group.locator('.mer-safety-record').innerText();
+   await group.locator('input[type=checkbox]').uncheck();
+   const cleared=await group.locator('.mer-safety-record').count()===0;
+   note('SOS only after voluntary consent; unchecked removes it',{initiallyDisabled,explicit,cleared});
+   observations.verified=initiallyDisabled&&explicit.includes('SOS_EXPLICIT')&&cleared;
+   break;
+  }
+  case 'P07': {
+   await page.emulateMedia({reducedMotion:'reduce'});
+   await page.keyboard.press('Tab');
+   const keyboard=await page.evaluate(()=>document.activeElement?.matches('a,button,input,select'));
+   const landmarks=await page.locator('main').count();
+   const reduced=await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches);
+   note('Tab reaches interactive control, main landmark, prefers-reduced-motion',{keyboard,landmarks,reduced});
+   observations.verified=Boolean(keyboard)&&landmarks>=1&&reduced;
+   break;
+  }
+  case 'P08': {
+   const roadmap=await page.locator('#roadmap').count();
+   const partner=await page.locator('#partner').count();
+   const warnings=await page.locator('#evidence').innerText();
+   note('Roadmap and partner section with risk disclosure',{roadmap,partner});
+   observations.verified=roadmap===1&&partner===1&&/FYSIEK|PHYSICAL|SIMULAT/i.test(warnings);
+   break;
+  }
+ }
+ return observations;
+}
+
 let browser;
 const log=[];
 try{
@@ -45,7 +142,10 @@ try{
   page.on('console', msg=>{if(msg.type()==='error')consoleErrors.push(msg.text().slice(0,450));});
   const response=await page.goto(base+trial.url,{waitUntil:'domcontentloaded',timeout:30000});
   await page.locator('h1').first().waitFor({timeout:15000});
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(400);
+  let task;
+  try{task=await runRoleTask(page,trial,evidenceDir);}
+  catch(error){task={role:trial.role,actions:[],verified:false,error:String(error)};}
   const obs=await page.evaluate(()=>({
    lang:document.documentElement.lang,
    title:document.title,
@@ -55,15 +155,15 @@ try{
    eightStage:document.body.innerText.includes('EMERGENCY EVENT → ZONE → HUMAN STATUS → CONSENT → MESSAGE → NETWORK PATH → ACK → EVIDENCE'),
    obsoleteLinks:[...document.querySelectorAll('a[href]')].map(a=>a.href).filter(h=>/^https?:\/\/(?:civic-relay\.vercel\.app|civic-relay-pi\.vercel\.app|abrahamhl\.github\.io\/civic-relay)/i.test(h))
   }));
-  const pass=Boolean(response?.status()===200&&obs.lang===trial.locale&&obs.headings.some(x=>x.includes(trial.text))&&obs.canonical?.startsWith('https://civic-relay-investor.vercel.app')&&obs.disclaimers>0&&obs.eightStage&&obs.obsoleteLinks.length===0&&pageErrors.length===0);
-  const record={id:trial.id,kind:'REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER',sha:process.env.GITHUB_SHA||'LOCAL',timestamp_utc:new Date().toISOString(),locale:trial.locale,viewport:trial.viewport,steps:['Open static release in Chromium','Verify DOM language and localized heading','Inspect canonical and simulation disclaimer','Check architecture and stale external links','Inspect pageerror events'],expected:{http:200,htmlLang:trial.locale,canonicalHost:'civic-relay-investor.vercel.app',noPageErrors:true},observed:{http:response?.status(),...obs,pageErrors,consoleErrors},verdict:pass?'PASS':'FAIL'};
+  const pass=Boolean(response?.status()===200&&obs.lang===trial.locale&&obs.headings.some(x=>x.includes(trial.text))&&obs.canonical?.startsWith('https://civic-relay-investor.vercel.app')&&obs.disclaimers>0&&obs.eightStage&&obs.obsoleteLinks.length===0&&pageErrors.length===0&&task.verified);
+  const record={id:trial.id,kind:'REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER',sha:process.env.GITHUB_SHA||'LOCAL',timestamp_utc:new Date().toISOString(),locale:trial.locale,viewport:trial.viewport,role:trial.role,roleTask:task,steps:['Open static release in Chromium','Verify DOM language and localized heading','Inspect canonical and simulation disclaimer','Check architecture and stale external links','Inspect pageerror events'],expected:{http:200,htmlLang:trial.locale,canonicalHost:'civic-relay-investor.vercel.app',noPageErrors:true},observed:{http:response?.status(),...obs,pageErrors,consoleErrors},verdict:pass?'PASS':'FAIL'};
   await page.screenshot({path:join(evidenceDir,trial.id+'-'+trial.locale+'.png'),fullPage:false});
   writeFileSync(join(evidenceDir,trial.id+'-'+trial.locale+'.json'),JSON.stringify(record,null,2));
   log.push(record);
   console.log(record.verdict,trial.id,trial.locale,JSON.stringify({lang:obs.lang,errors:pageErrors.length,canonical:obs.canonical}));
   await page.close();
  }
- const result={sha:process.env.GITHUB_SHA||'LOCAL',completed_at_utc:new Date().toISOString(),scope:'Browser + static site only. Never a real person, responder, radio, satellite or field test.',runs:log};
+ const result={sha:process.env.GITHUB_SHA||'LOCAL',completed_at_utc:new Date().toISOString(),scope:'EIGHT automated Chromium task roles on synthetic local website. Neither human Buyer Arena interviews nor physical/field or real RF validation.',runs:log};
  writeFileSync(join(evidenceDir,'summary.json'),JSON.stringify(result,null,2));
  assert.ok(log.every(x=>x.verdict==='PASS'),'Browser release regression failed; inspect evidence/browser-release');
 }finally{

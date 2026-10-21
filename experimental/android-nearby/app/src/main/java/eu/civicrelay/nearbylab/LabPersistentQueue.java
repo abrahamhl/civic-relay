@@ -3,6 +3,7 @@ package eu.civicrelay.nearbylab;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -37,7 +38,12 @@ public final class LabPersistentQueue {
         }
     }
 
+    // A research journal, not a general-purpose encrypted emergency message store.
+    // Refuse arbitrary user text, precise location, or PII at the persistence boundary.
+    private static final String LAB_ONLY_PAYLOAD = "SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS";
     private static final int MAX_ENTRIES = 100;
+    private static final int MAX_FILE_BYTES = 160000;
+    private static final String HEADER = "# OEP LAB PERSISTENT QUEUE V1";
     private final Path storagePath;
     private final LinkedHashMap<String, Record> records = new LinkedHashMap<>();
 
@@ -52,8 +58,7 @@ public final class LabPersistentQueue {
               "OTHERS_AFFECTED".equals(category) || "CANNOT_DETERMINE".equals(category))) {
             throw new IllegalArgumentException("Explicit human status category required");
         }
-        if (payload == null || payload.isEmpty() || payload.length() > 1024 ||
-            payload.indexOf('\n') >= 0 || payload.indexOf('\r') >= 0 || payload.indexOf('\t') >= 0) {
+        if (!LAB_ONLY_PAYLOAD.equals(payload)) {
             throw new IllegalArgumentException("Invalid or oversized lab payload");
         }
         if (ttlMs < 1000L || ttlMs > 86400000L) {
@@ -72,7 +77,8 @@ public final class LabPersistentQueue {
         }
         Record created = new Record(id, category, nowMs, nowMs + ttlMs, Status.QUEUED, payload);
         records.put(id, created);
-        persistToDisk();
+        try { persistToDisk(); }
+        catch (IOException ex) { records.remove(id); throw ex; }
         return created;
     }
 
@@ -83,7 +89,8 @@ public final class LabPersistentQueue {
         if (r.status != Status.QUEUED) return r;
         Record updated = new Record(r.id, r.category, r.createdAtMs, r.expiresAtMs, Status.ACK_VERIFIED, "");
         records.put(id, updated);
-        persistToDisk();
+        try { persistToDisk(); }
+        catch (IOException ex) { records.put(id, r); throw ex; }
         return updated;
     }
 
@@ -93,7 +100,8 @@ public final class LabPersistentQueue {
         if (r == null) return null;
         Record updated = new Record(r.id, r.category, r.createdAtMs, r.expiresAtMs, Status.REVOKED, "");
         records.put(id, updated);
-        persistToDisk();
+        try { persistToDisk(); }
+        catch (IOException ex) { records.put(id, r); throw ex; }
         return updated;
     }
 
@@ -122,25 +130,49 @@ public final class LabPersistentQueue {
     private void loadFromDisk(long nowMs) throws IOException {
         records.clear();
         if (!Files.exists(storagePath)) return;
+        // Fail closed on corruption; never ignore missing records or resurrect payloads.
+        if (Files.size(storagePath) > MAX_FILE_BYTES) throw new IOException("Oversized lab queue; STOP & CLEAR required");
         List<String> lines = Files.readAllLines(storagePath, StandardCharsets.UTF_8);
-        for (String line : lines) {
-            if (line.isEmpty() || line.startsWith("#")) continue;
-            String[] parts = line.split("\t", -1);
-            if (parts.length != 6) continue;
-            String id = parts[0];
-            String category = parts[1];
-            long createdAt = Long.parseLong(parts[2]);
-            long expiresAt = Long.parseLong(parts[3]);
-            Status status = Status.valueOf(parts[4]);
-            String payload = status == Status.QUEUED ? parts[5] : "";
-            records.put(id, new Record(id, category, createdAt, expiresAt, status, payload));
+        if (lines.isEmpty() || !HEADER.equals(lines.get(0)) || lines.size() > MAX_ENTRIES + 1) {
+            throw new IOException("Invalid lab queue header or record count; STOP & CLEAR required");
+        }
+        try {
+            for (int i = 1; i < lines.size(); i++) {
+                String[] parts = lines.get(i).split("\t", -1);
+                if (parts.length != 6 || !LabDeliveryGuard.validId(parts[0]) ||
+                    !("SAFE".equals(parts[1]) || "SOS_EXPLICIT".equals(parts[1]) ||
+                      "OTHERS_AFFECTED".equals(parts[1]) || "CANNOT_DETERMINE".equals(parts[1]))) {
+                    throw new IllegalArgumentException("Invalid lab record fields");
+                }
+                long createdAt = Long.parseLong(parts[2]);
+                long expiresAt = Long.parseLong(parts[3]);
+                if (createdAt < 0 || expiresAt <= createdAt ||
+                    expiresAt - createdAt > 86400000L || expiresAt < 0) {
+                    throw new IllegalArgumentException("Invalid lab record TTL");
+                }
+                Status status = Status.valueOf(parts[4]);
+                String rawPayload = parts[5];
+                if (status == Status.QUEUED) {
+                    if (!LAB_ONLY_PAYLOAD.equals(rawPayload)) {
+                        throw new IllegalArgumentException("Invalid queued lab payload");
+                    }
+                } else if (!rawPayload.isEmpty()) {
+                    throw new IllegalArgumentException("Terminal lab record contains a payload");
+                }
+                if (records.containsKey(parts[0])) throw new IllegalArgumentException("Duplicate persisted lab ID");
+                records.put(parts[0], new Record(parts[0], parts[1], createdAt, expiresAt,
+                    status, status == Status.QUEUED ? rawPayload : ""));
+            }
+        } catch (RuntimeException ex) {
+            records.clear();
+            throw new IOException("Corrupted lab queue; fail closed until STOP & CLEAR", ex);
         }
         if (expireDue(nowMs)) persistToDisk();
     }
 
     private void persistToDisk() throws IOException {
         Path tmp = storagePath.resolveSibling(storagePath.getFileName().toString() + ".tmp");
-        StringBuilder sb = new StringBuilder("# OEP LAB PERSISTENT QUEUE V1\n");
+        StringBuilder sb = new StringBuilder(HEADER).append('\n');
         for (Record r : records.values()) {
             sb.append(r.id).append('\t')
               .append(r.category).append('\t')
@@ -151,6 +183,10 @@ public final class LabPersistentQueue {
               .append('\n');
         }
         Files.write(tmp, sb.toString().getBytes(StandardCharsets.UTF_8));
-        Files.move(tmp, storagePath, StandardCopyOption.REPLACE_EXISTING);
+        try {
+            Files.move(tmp, storagePath, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        } catch (AtomicMoveNotSupportedException notSupported) {
+            Files.move(tmp, storagePath, StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 }

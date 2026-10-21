@@ -1,6 +1,8 @@
 package eu.civicrelay.nearbylab;
 
 import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import java.util.List;
  */
 public final class LabPersistentQueueTest {
     private static int assertions = 0;
+    private static final String LAB_PAYLOAD = "SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS";
     private static final String ID1 = "11111111-1111-4111-8111-111111111111";
     private static final String ID2 = "22222222-2222-4222-8222-222222222222";
 
@@ -22,14 +25,14 @@ public final class LabPersistentQueueTest {
         Path file = tmpDir.resolve("queue.tsv");
         try {
             LabPersistentQueue q1 = new LabPersistentQueue(file, 1000L);
-            q1.enqueue(ID1, "SOS_EXPLICIT", "LAB_PAYLOAD_1", 1000L, 5000L);
-            q1.enqueue(ID2, "SAFE", "LAB_PAYLOAD_2", 1000L, 2000L);
+            q1.enqueue(ID1, "SOS_EXPLICIT", LAB_PAYLOAD, 1000L, 5000L);
+            q1.enqueue(ID2, "SAFE", LAB_PAYLOAD, 1000L, 2000L);
 
             // Simulate process restart at t=2500ms (ID1 still active, ID2 still active)
             LabPersistentQueue q2 = new LabPersistentQueue(file, 2500L);
             List<LabPersistentQueue.Record> snap = q2.snapshot(2500L);
             check(snap.size() == 2, "Both records must survive process restart");
-            check("LAB_PAYLOAD_1".equals(snap.get(0).payload), "Active queued payload must persist");
+            check(LAB_PAYLOAD.equals(snap.get(0).payload), "Active queued payload must persist");
 
             // Mark ID1 as ACK_VERIFIED; payload must be wiped on disk and tombstone must block replay
             LabPersistentQueue.Record acked = q2.markAckVerified(ID1, 2600L);
@@ -44,14 +47,50 @@ public final class LabPersistentQueueTest {
 
             boolean replayRejected = false;
             try {
-                q3.enqueue(ID1, "SOS_EXPLICIT", "REPLAY", 3600L, 5000L);
+                q3.enqueue(ID1, "SOS_EXPLICIT", LAB_PAYLOAD, 3600L, 5000L);
             } catch (IllegalStateException expected) {
                 replayRejected = true;
             }
             check(replayRejected, "Tombstone must reject replay after restart");
 
+            boolean arbitraryRejected = false;
+            try { q3.enqueue("33333333-3333-4333-8333-333333333333", "SAFE", "GPS:52.0,5.0", 3600L, 5000L); }
+            catch (IllegalArgumentException expected) { arbitraryRejected = true; }
+            check(arbitraryRejected, "Arbitrary personal/location payload must not persist");
             q3.purgeAll();
             check(!Files.exists(file), "purgeAll must delete backing file");
+
+            // Regression: a corrupted queue must fail CLOSED, never silently skip bad
+            // rows or recreate a plausible receipt history.
+            String validRow = ID1 + "\tSOS_EXPLICIT\t1000\t6000\tQUEUED\tSYNTHETIC_STATUS_CHECK_NOT_REAL_SOS\n";
+            String header = "# OEP LAB PERSISTENT QUEUE V1\n";
+            String[] corruptions = {
+                "not a queue\n" + validRow,
+                header + "TRUNCATED_ROW\n",
+                header + ID1 + "\tSOS_EXPLICIT\tnot-a-number\t6000\tQUEUED\tSYNTHETIC_STATUS_CHECK_NOT_REAL_SOS\n",
+                header + validRow + validRow,
+                header + ID1 + "\tSOS_EXPLICIT\t1000\t6000\tACK_VERIFIED\tREVIVED_PAYLOAD\n",
+                header + ID1 + "\tSOS_EXPLICIT\t6000\t1000\tQUEUED\tSYNTHETIC_STATUS_CHECK_NOT_REAL_SOS\n",
+                header + ID1 + "\tSOS_EXPLICIT\t1000\t6000\tQUEUED\t\n"
+            };
+            for (String corrupted : corruptions) {
+                Files.write(file, corrupted.getBytes(StandardCharsets.UTF_8));
+                boolean rejected = false;
+                try {
+                    new LabPersistentQueue(file, 2000L);
+                } catch (IOException expected) {
+                    rejected = true;
+                }
+                check(rejected, "Corrupted file must prevent rehydration");
+            }
+            // Reopen a valid queue after a corrupted file has been explicitly cleared.
+            Files.deleteIfExists(file);
+            LabPersistentQueue recovered = new LabPersistentQueue(file, 2000L);
+            recovered.enqueue(ID1, "SOS_EXPLICIT", LAB_PAYLOAD, 2000L, 3000L);
+            check(new LabPersistentQueue(file, 2500L).snapshot(2500L).size() == 1,
+                "Clean lab file must recover after explicit CLEAR");
+            recovered.purgeAll();
+
             System.out.println("LabPersistentQueueTest PASS (" + assertions + " assertions)");
         } finally {
             Files.deleteIfExists(file);
