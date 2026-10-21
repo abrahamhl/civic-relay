@@ -1,0 +1,77 @@
+{
+  "schema": "BUYER_ARENA_PERSONA_RUN_V1",
+  "actor_id": "P08",
+  "legacy_id": "08-partner-nl",
+  "role": "Municipal partner, NL",
+  "objective": "Understand institutional value and integration limits",
+  "disclosure": "AUTOMATED SYNTHETIC ROLE — NOT A RECRUITED HUMAN TESTER",
+  "campaign_mode": "SINGLE-VERSION SMOKE",
+  "target_url": "https://civic-relay-investor.vercel.app",
+  "target_commit": "c18c6ac936c8b3c6560997b113e46b50cab51302",
+  "language": "nl",
+  "viewport": {
+    "width": 1280,
+    "height": 850
+  },
+  "started_at": "2026-10-21T06:08:10.758Z",
+  "completed_at": "2026-10-21T06:08:12.222Z",
+  "visited_urls": [
+    "https://civic-relay-investor.vercel.app/nl",
+    "https://civic-relay-investor.vercel.app/nl#evidence"
+  ],
+  "actions_performed": [
+    "goto https://civic-relay-investor.vercel.app/nl/",
+    "click chapter anchor #evidence"
+  ],
+  "selector_interactions": [
+    {
+      "selector": "h1",
+      "action": "innerText",
+      "observed": "ALS HET\nNETWERK\nUITVALT."
+    },
+    {
+      "selector": "#what-oep-does",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#architecture",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#how-it-works",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#routing-lab",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#developer-stack",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#evidence",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": ".oep-chapter-nav a",
+      "action": "count",
+      "observed": 6
+    },
+    {
+      "selector": ".oep-chapter-nav a[href=\"#evidence\"]",
+      "action": "click",
+      "result_url": "https://civic-relay-investor.vercel.app/nl#evidence"
+    }
+  ],
+  "verdict": "AUTOMATED_BROWSER_CHECKS_PASSED",
+  "passed_checks": 9,
+  "failed_checks": 0,
+  "critical_failures": 0
+}

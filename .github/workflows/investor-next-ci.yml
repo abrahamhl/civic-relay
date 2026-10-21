@@ -1,0 +1,41 @@
+name: Investor microsite checks
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - "investor-next/**"
+      - ".github/workflows/investor-next-ci.yml"
+  push:
+    branches: [master]
+    paths:
+      - "investor-next/**"
+      - ".github/workflows/investor-next-ci.yml"
+
+jobs:
+  investor-next:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned site dependencies
+        working-directory: investor-next
+        run: npm install --no-audit --no-fund
+      - name: Type check
+        working-directory: investor-next
+        run: npm run type-check
+      - name: Build static site
+        working-directory: investor-next
+        run: npm run build
+      - name: Check static EN / ES / NL investor copy
+        working-directory: investor-next
+        run: npm run check:locales
+      - name: Upload export
+        uses: actions/upload-artifact@v4
+        with:
+          name: investor-next-export
+          path: investor-next/out
