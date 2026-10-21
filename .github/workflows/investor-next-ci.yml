@@ -25,6 +25,22 @@ jobs:
       - name: Install pinned site dependencies
         working-directory: investor-next
         run: npm install --no-audit --no-fund
+      - name: Production dependency vulnerabilities (high/critical are release blockers)
+        working-directory: investor-next
+        run: npm audit --omit=dev --audit-level=high
+      - name: Export CycloneDX software bill of materials
+        working-directory: investor-next
+        run: |
+          mkdir -p ../evidence
+          npm sbom --sbom-format cyclonedx --json > ../evidence/investor-next-sbom.cdx.json
+      - name: Upload dependency inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: investor-dependency-sbom
+          path: evidence/investor-next-sbom.cdx.json
+          retention-days: 30
+          if-no-files-found: warn
       - name: Canonical public domain gate
         run: node investor-next/scripts/check-canonical-domain.mjs
       - name: Type check
