@@ -1,7 +1,7 @@
 # Civic Relay — Engineering status / investor truth gate
 ## PRE-PILOT ENGINEERING ASSESSMENT — 22 October 2026 (PR #8)
 
-**Latest scope:** [PR #8](https://github.com/abrahamhl/civic-relay/pull/8) against `master` `f314028b`. Status is **engineering change pending exact-SHA green CI and merge**. Do not confuse reviewed source with the production domain SHA or hardware trials.
+**Current merged scope:** [PR #8](https://github.com/abrahamhl/civic-relay/pull/8) was **merged into `master`** as [`159796d74ce6e0989b41940987d5c0163555c3fb`](https://github.com/abrahamhl/civic-relay/commit/159796d74ce6e0989b41940987d5c0163555c3fb). The exact pre-merge source SHA `455d34a682ddd898865689af33e708e7e4bc3af9` passed **5/5 GitHub Actions** including Android build/JVM, SCA/SBOM and eight actual Chromium QA tasks. This is machine-tested source, not physical delivery.
 
 ### Fixed failures and verifiable tests
 | Finding | Baseline defect | Change made on PR #8 | Evidence / limitations |
@@ -12,7 +12,7 @@
 | P0-W1 Vulnerable dependency | `next@16.3.6` triggered HIGH GitHub advisory findings during a newly enabled `npm audit` | Pinned `next@16.4.2` following npm's remediation; CI now refuses high/critical production vulnerability results and archives CycloneDX SBOM | Only mark remediated after exact-final-SHA audit PASS; lockfile/transitive reproducibility not yet fully solved |
 | P1-Q1 Persona evidence stale | Historic Buyer Arena P01-P08 files are from an earlier SHA; current release used only 3 Chromium smoke tasks | [Browser release QA](../../.github/workflows/browser-release-qa.yml) now performs **8 distinct actual Chromium tasks**, one per P01–P08, logging observed action/results and screenshot JSON; P04 exports generated real synthetic evidence | **Automated scripts, not 8 real people** and **not a fresh execution of the Buyer Arena CLI**; zero hardware inference |
 | P0-F1 Grant compliance | Funding pitch still recommended NLnet and allowed AI writing despite v2 policy | [Funding opportunities](../investor/FUNDING_OPPORTUNITIES.md) and [financial scenarios](../investor/FINANCIAL_SCENARIOS.md) now block GenAI-assisted NLnet submission and mark all budgets unverified | Read-only evaluation only. NLnet v2 forbids proposal GenAI and AI-generated funded deliverables |
-| P0-R1 Release domain | Public alias served a build older than current `master` | Existing single-domain code gates and historical redirect retained; source and actual served SHA documented separately | **Still BLOCKED:** Vercel quota/production branch alignment; inspect alias and 3 routes before declaring web current |
+| P0-R1 Release domain | Public alias served a build older than current `master` | Existing single-domain code gates and historical redirect retained; source and actual served SHA documented separately | **Partially corrected:** official alias now serves a READY preview with identical investor-web source, `/`, `/es/`, `/nl/` independently verified; Git-driven master production release automation is STILL unresolved |
 
 ### Transparent internal score — constant weighted rubric (NOT a grant-provider rating)
 Weights and approximate retrospective baseline/conditional current score:
@@ -25,11 +25,15 @@ Weights and approximate retrospective baseline/conditional current score:
 | Automated QA and reproducibility | 10 | 7 | 10 | Eight genuine Chromium role tasks, Android adversarial regressions, SCA + SBOM; lockfile is still a gap |
 | Usability / multilingual web | 10 | 8 | 8 | EN/ES/NL, limitations and design kept; not independently WCAG certified |
 | Eligibility / commercial plan | 5 | 3 | 3 | Truthful claims; no funded partner agreement or legally established eligibility |
-| Release operations | 5 | 2 | 2 | Domain serves older SHA; deployment automation remains unresolved |
+| Release operations | 5 | 2 | 3 | Live alias now serves reviewed site tree and all three routes; automatic deployment/legacy redirect proof still open |
 | Physical / external validation | 20 | 0 | 0 | No field evidence, no third-party responder evaluation |
-| **TOTAL** | **100** | **43** | **53 provisional** | **Gain is limited to independently machine-checkable software evidence** |
+| **TOTAL** | **100** | **43** | **54 provisional** | **Gain is limited to independently machine-checkable software evidence** |
 
-**Score rule:** 53 is a **provisional internal estimate conditional on all final workflows and review**. Do NOT claim independent score uplift until tests pass and changes are merged. **Global TRL stays approximately 3.** This project is fit for *research partner discussions*, not operational emergency deployment.
+**Score rule:** 54 is an **internal provisional assessment** after the PR #8 exact-SHA machine tests and squash merge. It is NOT independently audited or a financing/certification approval. **Global TRL stays approximately 3.** This project is fit for *research partner discussions*, not operational emergency deployment.
+
+**Canonical live release gate:** `civic-relay-investor.vercel.app` is assigned to Vercel READY deployment `dpl_Hm4YDkX53r81KnTQA8JPmG3KCg2h`, source SHA `0804f2327477e46d45230a90ef3cb4523ab1bcce`. Comparing this build to the final reviewed PR head showed **only Android signer code and this audit documentation** changed; the investor website source was identical. Independent live fetch verified EN `lang=en`, ES `lang=es`, NL `lang=nl`, canonical tags, research disclaimers and no navigation links to stale sites. The code merged into master is newer and Vercel Git production branch/preview mapping still needs a durable correction; [issue #6](https://github.com/abrahamhl/civic-relay/issues/6) remains OPEN. No claim of deployed physical networking.
+
+**Latest exact-SHA CI evidence:** [Browser eight-task QA](https://github.com/abrahamhl/civic-relay/actions/runs/39690193482) (JSON + screenshots), [Android JVM + experimental APK](https://github.com/abrahamhl/civic-relay/actions/runs/39690193435), [Site build/SCA + CycloneDX inventory](https://github.com/abrahamhl/civic-relay/actions/runs/39690193459); all green. Eight scripted browser stakeholders ≠ eight humans or full Buyer Arena CLI.
 
 ### Outstanding investment blockers / next gate
 1. **P0 release**: Vercel production SHA must equal the reviewed `master` (or an explicitly reviewed release SHA); live `/`, `/es/`, `/nl/` must have correct `html lang`, canonical links and zero stale marketing claims. [Issue #6](https://github.com/abrahamhl/civic-relay/issues/6).
