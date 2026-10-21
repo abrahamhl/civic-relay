@@ -1,4 +1,46 @@
 # Civic Relay — Engineering status / investor truth gate
+## PRE-PILOT ENGINEERING ASSESSMENT — 22 October 2026 (PR #8)
+
+**Latest scope:** [PR #8](https://github.com/abrahamhl/civic-relay/pull/8) against `master` `f314028b`. Status is **engineering change pending exact-SHA green CI and merge**. Do not confuse reviewed source with the production domain SHA or hardware trials.
+
+### Fixed failures and verifiable tests
+| Finding | Baseline defect | Change made on PR #8 | Evidence / limitations |
+| --- | --- | --- | --- |
+| P0-A1 Android persistence | `LabPersistentQueue.java` existed but `MainActivity.sendTest()` did not call it; durability was overstated | Fixed synthetic-only disk queue is wired **before** Nearby send; actual ACK/STOP update and purge it; corruption or failed writes block new sends | JVM corruption/replay tests + debug APK compile; not physically measured; no automatic resend after restart |
+| P0-A2 Cryptographic receipts | `LabReceiptSigner` was unit-tested but not called by the live Nearby flow | Protocol **v3** exchanges ephemeral P-256 keys after manual-digit-approved pairing, pins them by endpoint for the current session, signs receiver ACK, verifies before challenge check; unsigned v2 rejected | JVM ECDSA tests and Android build only; **not** institutionally rooted identity or field-proven exchange; key substitution threats require device adversarial trials |
+| P0-A3 Sensitive data | TSV file is plaintext, generic payload allowed | Enforces fixed `SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS` only, rejects arbitrary PII and malformed persisted records; STOP/onStop erases local file | **Not encryption**; user data must NOT be stored or transmitted |
+| P0-W1 Vulnerable dependency | `next@16.3.6` triggered HIGH GitHub advisory findings during a newly enabled `npm audit` | Pinned `next@16.4.2` following npm's remediation; CI now refuses high/critical production vulnerability results and archives CycloneDX SBOM | Only mark remediated after exact-final-SHA audit PASS; lockfile/transitive reproducibility not yet fully solved |
+| P1-Q1 Persona evidence stale | Historic Buyer Arena P01-P08 files are from an earlier SHA; current release used only 3 Chromium smoke tasks | [Browser release QA](../../.github/workflows/browser-release-qa.yml) now performs **8 distinct actual Chromium tasks**, one per P01–P08, logging observed action/results and screenshot JSON; P04 exports generated real synthetic evidence | **Automated scripts, not 8 real people** and **not a fresh execution of the Buyer Arena CLI**; zero hardware inference |
+| P0-F1 Grant compliance | Funding pitch still recommended NLnet and allowed AI writing despite v2 policy | [Funding opportunities](../investor/FUNDING_OPPORTUNITIES.md) and [financial scenarios](../investor/FINANCIAL_SCENARIOS.md) now block GenAI-assisted NLnet submission and mark all budgets unverified | Read-only evaluation only. NLnet v2 forbids proposal GenAI and AI-generated funded deliverables |
+| P0-R1 Release domain | Public alias served a build older than current `master` | Existing single-domain code gates and historical redirect retained; source and actual served SHA documented separately | **Still BLOCKED:** Vercel quota/production branch alignment; inspect alias and 3 routes before declaring web current |
+
+### Transparent internal score — constant weighted rubric (NOT a grant-provider rating)
+Weights and approximate retrospective baseline/conditional current score:
+
+| Dimension | Weight | Baseline 21 Oct | Conditional after full PR #8 CI & merge | Why |
+| --- | ---: | ---: | ---: | --- |
+| Architecture / boundaries | 15 | 10 | 11 | Existing simulation solid; cleaner Android protocol boundary |
+| Safety / privacy / cryptography | 20 | 7 | 10 | Fixed lab PII allowlist and session-level ACK signatures; still not independently audited |
+| Offline reliability / persistence | 15 | 6 | 9 | Actual queue wiring, corruption fail-closed and atomic replacement; still one hop |
+| Automated QA and reproducibility | 10 | 7 | 10 | Eight genuine Chromium role tasks, Android adversarial regressions, SCA + SBOM; lockfile is still a gap |
+| Usability / multilingual web | 10 | 8 | 8 | EN/ES/NL, limitations and design kept; not independently WCAG certified |
+| Eligibility / commercial plan | 5 | 3 | 3 | Truthful claims; no funded partner agreement or legally established eligibility |
+| Release operations | 5 | 2 | 2 | Domain serves older SHA; deployment automation remains unresolved |
+| Physical / external validation | 20 | 0 | 0 | No field evidence, no third-party responder evaluation |
+| **TOTAL** | **100** | **43** | **53 provisional** | **Gain is limited to independently machine-checkable software evidence** |
+
+**Score rule:** 53 is a **provisional internal estimate conditional on all final workflows and review**. Do NOT claim independent score uplift until tests pass and changes are merged. **Global TRL stays approximately 3.** This project is fit for *research partner discussions*, not operational emergency deployment.
+
+### Outstanding investment blockers / next gate
+1. **P0 release**: Vercel production SHA must equal the reviewed `master` (or an explicitly reviewed release SHA); live `/`, `/es/`, `/nl/` must have correct `html lang`, canonical links and zero stale marketing claims. [Issue #6](https://github.com/abrahamhl/civic-relay/issues/6).
+2. **P0 security**: independent audit of ephemeral Nearby-key binding, replay/forgery tests, encrypted storage design for any future non-fictional content, supply-chain lockfile, privacy/DPIA for proposed use cases. [Issue #4](https://github.com/abrahamhl/civic-relay/issues/4).
+3. **P0 physical**: two explicitly consenting phones and full ≥30 recorded attempts with failures and latency; still missing. [Issue #5](https://github.com/abrahamhl/civic-relay/issues/5).
+4. **P1 licensing / funding**: confirm legal entity and consortium path. Horizon SSRI-04 remains a research partner opportunity only; NLnet cannot be treated as immediately available under AI-assisted development. No applications have been sent during this audit.
+
+### Agent 2 funding handoff — verified scope
+Open-source software models **explicit opt-in SAFE/SOS → TTL-bounded local queue → compatible route choice → correctly typed receiver ACK**. Browser WebCrypto and real local browser interactions coexist with synthetic graph/RF/NTN models. Android provides a single-hop experimental Nearby prototype with manual code verification and a v3 source-level signed receipt path, **not a validated physical network**. Next fundable technical work package: independent review + consented two-phone physical validation, then three-phone authenticated multi-hop. Do not claim satellite transmission, CSI through walls, government alerts, a working rescue service, partner endorsement, or 112 integration.
+
+
 ## CURRENT RELEASE UPDATE — 21 October 2026 (later CTO verification)
 
 **One public domain:** [https://civic-relay-investor.vercel.app](https://civic-relay-investor.vercel.app) with `/`, `/es/`, `/nl/`. Vercel alias **confirmed assigned** to deployment `dpl_2JiFK5wWFZPMkr9wLsyU84Niccdc`, SHA `dd35abec52d70ec27196a87ccca4384a9a12c670`, state `READY`. These three **public routes** were fetched and localized content and canonical metadata inspected successfully. **Caveat:** this served SHA still has incorrect `html lang=en` on ES/NL routes; don't claim this public defect fixed until a newer build is published.
