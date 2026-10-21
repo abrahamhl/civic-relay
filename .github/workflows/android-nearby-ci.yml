@@ -1,7 +1,7 @@
 name: Android Nearby laboratory (build-only)
 on:
   push:
-    branches: [feat/master-emergency-routing-v1-20261020]
+    branches: [feat/master-emergency-routing-v1-20261020, master]
     paths:
       - 'experimental/android-nearby/**'
       - '.github/workflows/android-nearby-ci.yml'
@@ -33,7 +33,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-      - name: Unit test pure JVM message guard (without Android radio)
+      - name: Unit test pure JVM message guard, ECDSA receipt signer and persistent queue (without Android radio)
         shell: bash
         run: |
           mkdir -p "$RUNNER_TEMP/oep-jvm"
@@ -43,20 +43,25 @@ jobs:
             experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/LabTrialJournal.java \
             experimental/android-nearby/app/src/test/java/eu/civicrelay/nearbylab/LabTrialJournalTest.java \
             experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/LabDeadlinePolicy.java \
-            experimental/android-nearby/app/src/test/java/eu/civicrelay/nearbylab/LabDeadlinePolicyTest.java
+            experimental/android-nearby/app/src/test/java/eu/civicrelay/nearbylab/LabDeadlinePolicyTest.java \
+            experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/LabReceiptSigner.java \
+            experimental/android-nearby/app/src/test/java/eu/civicrelay/nearbylab/LabReceiptSignerTest.java \
+            experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/LabPersistentQueue.java \
+            experimental/android-nearby/app/src/test/java/eu/civicrelay/nearbylab/LabPersistentQueueTest.java
           java -cp "$RUNNER_TEMP/oep-jvm" eu.civicrelay.nearbylab.LabDeliveryGuardTest
           java -cp "$RUNNER_TEMP/oep-jvm" eu.civicrelay.nearbylab.LabTrialJournalTest
           java -cp "$RUNNER_TEMP/oep-jvm" eu.civicrelay.nearbylab.LabDeadlinePolicyTest
+          java -cp "$RUNNER_TEMP/oep-jvm" eu.civicrelay.nearbylab.LabReceiptSignerTest
+          java -cp "$RUNNER_TEMP/oep-jvm" eu.civicrelay.nearbylab.LabPersistentQueueTest
       - name: Compile debug APK without connecting to emergency services
         working-directory: experimental/android-nearby
         run: gradle :app:assembleDebug --no-daemon --stacktrace
       - name: Confirm APK produced (build proof ONLY)
         run: test -s experimental/android-nearby/app/build/outputs/apk/debug/app-debug.apk
-      - name: Publish short-lived consented research APK (not for real emergencies)
+      - name: Publish consented research APK (not for real emergencies)
         uses: actions/upload-artifact@v4
         with:
           name: oep-two-phone-lab-debug-apk
           path: experimental/android-nearby/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          retention-days: 7
-
+          retention-days: 30
