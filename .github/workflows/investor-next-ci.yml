@@ -49,6 +49,11 @@ jobs:
       - name: Build static site
         working-directory: investor-next
         run: npm run build
+      - name: Verify static release provenance and deployment smoke parser
+        working-directory: investor-next
+        run: |
+          node --check scripts/smoke-deploy.mjs
+          node --input-type=module -e "import fs from 'node:fs';import assert from 'node:assert/strict';let p=JSON.parse(fs.readFileSync('out/release-provenance.json','utf8'));assert.equal(p.schema,'oep-public-build-provenance/v1');assert.equal(p.sourceSha,process.env.GITHUB_SHA.toLowerCase());assert.equal(p.emergencyService,false);console.log('PASS build provenance:',p.sourceSha)"
       - name: Check static EN / ES / NL investor copy
         working-directory: investor-next
         run: npm run check:locales
