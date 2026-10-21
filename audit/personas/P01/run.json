@@ -1,0 +1,91 @@
+{
+  "schema": "BUYER_ARENA_PERSONA_RUN_V1",
+  "actor_id": "P01",
+  "legacy_id": "01-resident-es",
+  "role": "Affected citizen, ES",
+  "objective": "Understand purpose and human-status states",
+  "disclosure": "AUTOMATED SYNTHETIC ROLE — NOT A RECRUITED HUMAN TESTER",
+  "campaign_mode": "SINGLE-VERSION SMOKE",
+  "target_url": "https://civic-relay-investor.vercel.app",
+  "target_commit": "c18c6ac936c8b3c6560997b113e46b50cab51302",
+  "language": "es",
+  "viewport": {
+    "width": 390,
+    "height": 850
+  },
+  "started_at": "2026-10-21T06:07:56.806Z",
+  "completed_at": "2026-10-21T06:07:58.704Z",
+  "visited_urls": [
+    "https://civic-relay-investor.vercel.app/es",
+    "https://civic-relay-investor.vercel.app/es#what-oep-does",
+    "https://civic-relay-investor.vercel.app/es#routing-lab"
+  ],
+  "actions_performed": [
+    "goto https://civic-relay-investor.vercel.app/es/",
+    "click chapter anchor #what-oep-does",
+    "click chapter anchor #routing-lab",
+    "check human status consent checkbox",
+    "click SAFE human status response button"
+  ],
+  "selector_interactions": [
+    {
+      "selector": "h1",
+      "action": "innerText",
+      "observed": "CUANDO LA\nRED\nSE APAGA."
+    },
+    {
+      "selector": "#what-oep-does",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#architecture",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#how-it-works",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#routing-lab",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#developer-stack",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#evidence",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": ".oep-chapter-nav a",
+      "action": "count",
+      "observed": 6
+    },
+    {
+      "selector": ".oep-chapter-nav a[href=\"#what-oep-does\"]",
+      "action": "click",
+      "result_url": "https://civic-relay-investor.vercel.app/es#what-oep-does"
+    },
+    {
+      "selector": ".oep-chapter-nav a[href=\"#routing-lab\"]",
+      "action": "click",
+      "result_url": "https://civic-relay-investor.vercel.app/es#routing-lab"
+    },
+    {
+      "selector": "#routing-lab .mer-safety-record",
+      "action": "innerText",
+      "observed": "Respuesta local de ejercicio: SAFE\nCaduca en una hora; se elimina al salir de la página\nREVOCAR Y ELIMINAR"
+    }
+  ],
+  "verdict": "AUTOMATED_BROWSER_CHECKS_PASSED",
+  "passed_checks": 10,
+  "failed_checks": 0,
+  "critical_failures": 0
+}
