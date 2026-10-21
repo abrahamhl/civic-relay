@@ -4,9 +4,9 @@ import './globals.css';
 
 const inter=Inter({subsets:['latin'],display:'swap',variable:'--font-inter'});
 export const metadata: Metadata={
-  title:'OEP — Offline Emergency Protocol — Simulador 3D y propuesta europea',
-  description:'OEP — Offline Emergency Protocol: investigación y simulación 3D de mensajería resiliente. Explore an interactive simulated mission model, open-source code and the European field-validation roadmap. Not an emergency service.',
-  openGraph:{title:'OEP — Offline Emergency Protocol | Resiliencia civil europea',description:'When networks go dark, communication must endure. Open-source research prototype; transport links shown are simulated.',type:'website'},
+  title:'OEP — Offline Emergency Protocol | Coordinación offline, rutas y ACK',
+  description:'OEP investiga el flujo consentimiento → SAFE/SOS → cola local → enrutamiento adaptativo → ACK. Simulación 3D reproducible, arquitectura Next.js y laboratorio Android experimental. Sin enlaces de emergencias operativos.',
+  openGraph:{title:'OEP — Offline Emergency Protocol | Resiliencia civil europea',description:'See exactly how OEP models opt-in safety check-ins, offline message queuing, adaptive paths and receiver receipts. Open-source prototype; no real disaster routing claimed.',type:'website'},
   robots:{index:true,follow:true}
 };
 export default function RootLayout({children}:Readonly<{children:React.ReactNode}>){
