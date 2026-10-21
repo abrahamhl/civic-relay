@@ -73,3 +73,34 @@ test('unified OEP protocol entrypoint exports routing, store-forward, and policy
   assert.equal(existsSync(resolve(root,'docs/README.md')),true);
   assert.equal(existsSync(resolve(root,'.github/ISSUE_TEMPLATE/pilot-or-grant-partner.yml')),true);
 });
+
+
+test('browser lab never fabricates FFT sensor readings or cross-tab RTT',()=>{
+  const source=read('investor-next/app/live-hardware-console.tsx');
+  assert.ok(source.includes('setMicError(true)'), 'mic permission error must be visible');
+  assert.ok(source.includes('setFftBins(Array.from({ length: 32 }, () => 0))'), 'permission denied must be fail-closed');
+  assert.ok(!source.includes('Fallback oscillator FFT in case microphone permission is denied'), 'fabricated FFT fallback returned');
+  assert.ok(!source.includes('Math.max(0.4, Date.now() - incoming.timestampMs)'), 'fake cross-tab RTT returned');
+  assert.ok(source.includes('BROADCAST_CHANNEL_SAME_ORIGIN_CONTEXT_ONLY'), 'cross-tab transport must not be called phone P2P');
+  assert.ok(source.includes('WebRTC same-page loopback RTT (lab only)'), 'loopback must not be sold as phone P2P');
+});
+
+test('funding copy respects NLnet GenAI v2.0 and does not assert unverified grant eligibility',()=>{
+  const source=read('investor-next/app/live-hardware-console.tsx');
+  assert.ok(source.includes("target.id === 'F01-NLNET' ? ''"), 'NLnet proposal generation should stay disabled');
+  assert.ok(source.includes('https://nlnet.nl/propose/'), 'official NLnet call link absent');
+  assert.ok(source.includes('3 November 2026, 12:00 CET'), 'verified NLnet deadline absent');
+  assert.ok(source.includes('5 November 2026 (official call)'), 'verified Horizon deadline absent');
+  assert.ok(source.includes('ELIGIBILITY UNVERIFIED'), 'grant programme exploratory gates absent');
+  assert.ok(!source.includes('Apache-2.0 Repository:'), 'MIT/Apache false assertion returned');
+  assert.ok(!source.includes('Verified live prototype & code facts:'), 'unsubstantiated funding claims returned');
+});
+
+test('RF and satellite UI labels remain explicitly synthetic across three languages',()=>{
+  const source=read('investor-next/app/telecom-rf-radar-suite.tsx');
+  assert.ok(source.includes('CÁMARA ACTIVA · MAPA RF SINTÉTICO (NO MEDICIÓN)'));
+  assert.ok(source.includes('CAMERA ACTIVE · SYNTHETIC RF OVERLAY (NOT MEASURED)'));
+  assert.ok(source.includes('CAMERA ACTIEF · GESIMULEERDE RF-OVERLAY (GEEN METING)'));
+  assert.ok(source.includes('SYNTHETIC TARGETS: ${radarResult.detectedCount}/3'));
+  assert.ok(!source.includes('DETECTED BEHIND WALL: ${radarResult.detectedCount}/3'));
+});

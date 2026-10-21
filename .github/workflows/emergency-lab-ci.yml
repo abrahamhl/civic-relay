@@ -21,6 +21,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Canonical public domain gate
+        run: node investor-next/scripts/check-canonical-domain.mjs
       - name: Deterministic model invariants
         run: node --test investor-next/tests/*.test.mjs
       - name: Generate independently reproducible synthetic research evidence

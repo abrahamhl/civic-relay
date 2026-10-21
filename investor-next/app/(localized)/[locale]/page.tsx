@@ -1,6 +1,6 @@
 import type {Metadata} from 'next';
-import InvestorPage from '../investor-page';
-import {getCopy,type Locale} from '../copy';
+import InvestorPage from '../../investor-page';
+import {getCopy,type Locale} from '../../copy';
 export function generateStaticParams(){return [{locale:'es'},{locale:'nl'}];}
 export const dynamicParams=false;
 export async function generateMetadata({params}:{params:Promise<{locale:string}>}):Promise<Metadata>{

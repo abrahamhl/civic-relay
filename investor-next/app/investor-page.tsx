@@ -46,6 +46,10 @@ export default function InvestorPage({locale}:{locale:Locale}){
    </div>
    <MissionControl locale={locale}/>
   </section>
+  <aside role="note" className="container" style={{ marginTop: '1rem', marginBottom: '1rem', padding: '1rem', border: '1px solid #f59e0b', borderRadius: '0.65rem', background: '#211f1a', color: '#fde68a', fontSize: '0.93rem', lineHeight: 1.6 }}>
+   <strong>{locale==='es'?'ESTADO REAL · PROTOTIPO DE INVESTIGACIÓN':locale==='nl'?'WERKELIJKE STATUS · ONDERZOEKSPROTOTYPE':'ACTUAL STATUS · RESEARCH PROTOTYPE'}</strong>
+   <p>{locale==='es'?'La simulación de rutas, satélites, zonas y radar RF/CSI es sintética. WebCrypto ejecuta firmas reales en el navegador; WebRTC realiza un bucle local, no un enlace entre teléfonos. Android Nearby es un laboratorio sin ensayos físicos publicados. No hay detección validada de personas detrás de paredes, SOS operativo, conexión 112 ni transmisión satelital.':locale==='nl'?'Routes, satellieten, zones en RF/CSI-radar zijn gesimuleerd. WebCrypto gebruikt echte browserhandtekeningen, maar WebRTC is een lokale loopback, geen verbinding tussen telefoons. De Android Nearby-labapp heeft geen gepubliceerde fysieke veldproeven. Geen gevalideerde mensdetectie door muren, echte SOS-dienst, 112-koppeling of satellietuplink.':'Routing, satellite, zone and RF/CSI radar data are simulated. WebCrypto performs real browser signatures, but WebRTC is a same-page loopback, not phone-to-phone communication. Android Nearby is a laboratory app with no published physical field trials. No validated through-wall human sensing, operational SOS, 112 integration, or satellite uplink.'}</p>
+  </aside>
   <div className="ribbon"><div className="container ribbon-inner"><span>OEP / INTEROPERABLE OFFLINE EMERGENCY COORDINATION</span><strong>{t.hero.line}</strong><span>2026 / OPEN SOURCE R&D</span></div></div>
   <nav className="oep-chapter-nav" aria-label={locale==='es'?'Recorrer el protocolo':locale==='nl'?'Verken het protocol':'Explore the protocol'}>
    <div className="container oep-chapter-nav-inner">

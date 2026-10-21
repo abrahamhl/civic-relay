@@ -82,7 +82,7 @@ test('real-time Keplerian orbital ephemeris computes elevation, azimuth, slant r
   }
 });
 
-test('LiveHardwareAndDealRoomConsole exposes 8 real funding tracks and ChatGPT prompts in EN, ES, and NL', () => {
+test('funding catalogue has eight source-gated options shared by the three locales', () => {
   const page = readFileSync(resolve(root, 'investor-next/app/investor-page.tsx'), 'utf8');
   const consoleFile = readFileSync(resolve(root, 'investor-next/app/live-hardware-console.tsx'), 'utf8');
   assert.ok(page.includes('<LiveHardwareAndDealRoomConsole locale={locale}/>'));
@@ -96,10 +96,9 @@ test('LiveHardwareAndDealRoomConsole exposes 8 real funding tracks and ChatGPT p
     'F07-RVO-NETHERLANDS',
     'F08-VC-DEEPTECH-SEED'
   ]) {
-    assert.equal(
-      consoleFile.split(`id: '${id}'`).length - 1,
-      3,
-      `Missing localized funding track ${id}`
-    );
+    assert.equal(consoleFile.split(`id: '${id}'`).length - 1, 1, `Missing unique catalogue entry ${id}`);
   }
+  assert.ok(consoleFile.includes('const fundingDescriptions: Record<Locale, string[]>'), 'missing trilingual descriptions');
+  assert.ok(consoleFile.includes("(['es','en','nl'] as const).reduce"), 'all locales must render the same sourced catalogue');
+  assert.ok(consoleFile.includes("target.id === 'F01-NLNET' ? ''"), 'NLnet must not auto-generate applications');
 });
