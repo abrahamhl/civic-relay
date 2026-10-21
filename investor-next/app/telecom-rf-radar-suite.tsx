@@ -84,17 +84,18 @@ const suiteCopy: Record<
     palettes: Record<string, string>;
   }
 > = {
+  // DensePoseFromWiFi: research literature reference only, not captured/implemented sensor data.
   es: {
-    'LABORATORIO DE TELECOMUNICACIONES · MODELOS Y SIMULACIONES',
+    eyebrow: 'LABORATORIO DE TELECOMUNICACIONES · MODELOS Y SIMULACIONES',
     title: 'CÓMO FALLA TODO HOY FRENTE A NUESTRA INFRAESTRUCTURA: SATÉLITES, MÓVILES, TELEMETRÍA POR ZONAS Y RADAR RF TRANS-PARED',
-    'Explora modelos matemáticos de enlace NTN, rutas virtuales entre 20–100 nodos, sectores sintéticos y un visor de CSI/RF simulado. No se captura CSI de la tarjeta Wi-Fi del móvil ni se detectan personas detrás de paredes.',
+    lead: 'Explora modelos matemáticos de enlace NTN, rutas virtuales entre 20–100 nodos, sectores sintéticos y un visor de CSI/RF simulado. No se captura CSI de la tarjeta Wi-Fi del móvil ni se detectan personas detrás de paredes.',
     authBadge: 'LÍMITE DE AUTORIZACIÓN',
     authBanner:
       'DEMO DE INVESTIGACIÓN: los modelos de rutas D2D, enlace satelital y radar RF/CSI son simulaciones de software. El navegador no opera radiofrecuencia satelital ni extrae CSI real. Son necesarias pruebas físicas, integración autorizada y verificación independiente antes de afirmaciones operativas.',
     casesEyebrow: '01 / COMPARATIVA OPERATIVA EN ESCENARIOS REALES',
     casesTitle: 'Cómo funciona todo HOY sin nuestra tecnología vs. Qué resuelve OEP al instante',
     todayTag: 'HOY (SIN OEP · COLAPSO TRADICIONAL)',
-    'CON OEP (ESCENARIO HIPOTÉTICO · SIMULADO)',
+    oepTag: 'CON OEP (ESCENARIO HIPOTÉTICO · SIMULADO)',
     loadPresetBtn: 'CARGAR ESTE ESCENARIO EN LAS CONSOLAS DE SATÉLITE, ZONAS Y RADAR RF ↓',
     fnEyebrow: '02 / CATÁLOGO DE FUNCIONES DE INGENIERÍA Y PROBLEMAS RESUELTOS',
     fnTitle: 'Presentación de cada función: qué problema real resuelve y qué módulo lo ejecuta',
@@ -119,7 +120,7 @@ const suiteCopy: Record<
     distLabel: 'Distancia del Efectivo al Muro',
     paletteLabel: 'Paleta Espectral («Térmica RF»)',
     bandsLabel: 'Bandas de Frecuencia y Sensores en Escaneo:',
-    'VER SUPERPOSICIÓN DEMOSTRATIVA EN CÁMARA (NO ES RADAR REAL)',
+    arBtnStart: 'VER SUPERPOSICIÓN DEMOSTRATIVA EN CÁMARA (NO ES RADAR REAL)',
     arBtnStop: 'DETENER CÁMARA AR (VOLVER A MODO SIMULACIÓN)',
     arStatusSim: 'MODO TOMOGRAFÍA ESPECTRAL RF / WI-FI CSI (64 SUBPORTADORAS OFDM)',
     arStatusLive: 'CÁMARA AR ACTIVA · SUPERPOSICIÓN TÉRMICA DE RADIOFRECUENCIAS EN TIEMPO REAL',
@@ -315,16 +316,16 @@ const suiteCopy: Record<
     ]
   },
   en: {
-    'TELECOM RESEARCH LAB · COMPUTATIONAL MODELS AND SIMULATION',
+    eyebrow: 'TELECOM RESEARCH LAB · COMPUTATIONAL MODELS AND SIMULATION',
     title: 'HOW EVERYTHING FAILS TODAY VS. OUR INFRASTRUCTURE: SATELLITES, MOBILE MESH, ZONE TELEMETRY & THROUGH-WALL RF RADAR',
-    'Explore mathematical NTN link-budget models, routes between 20–100 virtual devices, synthetic zone sectors and simulated CSI/RF overlays. No live handset Wi-Fi CSI is captured and no people are detected behind walls.',
+    lead: 'Explore mathematical NTN link-budget models, routes between 20–100 virtual devices, synthetic zone sectors and simulated CSI/RF overlays. No live handset Wi-Fi CSI is captured and no people are detected behind walls.',
     authBadge: 'AUTHORIZATION BOUNDARY',
     authBanner:
       'RESEARCH DEMO: D2D routing, satellite links and RF/CSI radar are software simulations. The browser does not transmit satellite RF or extract real Wi-Fi CSI. Physical trials, authorized integrations and independent validation remain mandatory.',
     casesEyebrow: '01 / OPERATIONAL COMPARISON ACROSS REAL SCENARIOS',
     casesTitle: 'How everything fails TODAY without our technology vs. What OEP solves immediately',
     todayTag: 'TODAY (WITHOUT OEP · TRADITIONAL COLLAPSE)',
-    'WITH OEP (HYPOTHETICAL · SIMULATED)',
+    oepTag: 'WITH OEP (HYPOTHETICAL · SIMULATED)',
     loadPresetBtn: 'LOAD THIS SCENARIO INTO THE SATELLITE, ZONE & RF RADAR CONSOLES ↓',
     fnEyebrow: '02 / ENGINEERING FUNCTION CATALOG & PROBLEMS SOLVED',
     fnTitle: 'Function-by-function breakdown: real problem solved, runnable software, and authorization point',
@@ -349,7 +350,7 @@ const suiteCopy: Record<
     distLabel: 'Responder Stand-off Distance to Wall',
     paletteLabel: 'Spectral Palette ("RF Thermal")',
     bandsLabel: 'Active Frequency Bands & Sensors in Scan:',
-    'SHOW CAMERA DEMO OVERLAY (NOT A LIVE RF RADAR)',
+    arBtnStart: 'SHOW CAMERA DEMO OVERLAY (NOT A LIVE RF RADAR)',
     arBtnStop: 'STOP AR CAMERA (RETURN TO SIMULATION VIEW)',
     arStatusSim: 'RF / WI-FI CSI SPECTRAL TOMOGRAPHY MODE (64 OFDM SUBCARRIERS)',
     arStatusLive: 'LIVE AR CAMERA ACTIVE · REAL-TIME RADIO-FREQUENCY THERMAL HUD OVERLAY',
@@ -545,16 +546,16 @@ const suiteCopy: Record<
     ]
   },
   nl: {
-    'TELECOMONDERZOEK · REKENMODELLEN EN SIMULATIES',
+    eyebrow: 'TELECOMONDERZOEK · REKENMODELLEN EN SIMULATIES',
     title: 'HOE ALLES NU FAALT TEGENOVER ONZE INFRASTRUCTUUR: SATELLIETEN, MOBIELE MESH, ZONETELEMETRIE & DOOR-DE-MUUR RF-RADAR',
-    'Ontdek NTN-rekenmodellen, routes tussen 20–100 virtuele apparaten, synthetische zones en gesimuleerde CSI/RF-beelden. Er worden geen echte Wi-Fi CSI-data gemeten en er worden geen personen achter muren gedetecteerd.',
+    lead: 'Ontdek NTN-rekenmodellen, routes tussen 20–100 virtuele apparaten, synthetische zones en gesimuleerde CSI/RF-beelden. Er worden geen echte Wi-Fi CSI-data gemeten en er worden geen personen achter muren gedetecteerd.',
     authBadge: 'AUTORISATIEGRENS',
     authBanner:
       'ONDERZOEKSDEMO: D2D-routering, satellietverbindingen en RF/CSI-radar zijn softwaresimulaties. De browser zendt geen satelliet-RF uit en leest geen echte Wi-Fi CSI. Fysieke proeven, bevoegde integratie en onafhankelijke validatie zijn vereist.',
     casesEyebrow: '01 / OPERATIONELE VERGELIJKING IN ECHTE SCENARIO’S',
     casesTitle: 'Hoe alles NU faalt zonder onze technologie vs. Wat OEP direct oplost',
     todayTag: 'NU (ZONDER OEP · TRADITIONELE UITVAL)',
-    'MET OEP (HYPOTHETISCH · GESIMULEERD)',
+    oepTag: 'MET OEP (HYPOTHETISCH · GESIMULEERD)',
     loadPresetBtn: 'LAAD DIT SCENARIO IN DE SATELLIET-, ZONE- & RF-RADARCONSOLES ↓',
     fnEyebrow: '02 / CATALOGUS VAN ENGINEERINGFUNCTIES & OPGELOSTE PROBLEMEN',
     fnTitle: 'Overzicht per functie: welk probleem wordt opgelost en welke module dit uitvoert',
@@ -579,7 +580,7 @@ const suiteCopy: Record<
     distLabel: 'Afstand Hulpverlener tot Muur',
     paletteLabel: 'Spectraal Palet («RF-Thermisch»)',
     bandsLabel: 'Actieve Frequentiebanden & Sensoren in Scan:',
-    'TOON CAMERA-DEMO (GEEN ECHTE RF-RADAR)',
+    arBtnStart: 'TOON CAMERA-DEMO (GEEN ECHTE RF-RADAR)',
     arBtnStop: 'STOP AR-CAMERA (TERUG NAAR SIMULATIEMODUS)',
     arStatusSim: 'RF / WI-FI CSI SPECTRALE TOMOGRAFIEMODUS (64 OFDM-SUBCARRIERS)',
     arStatusLive: 'LIVE AR-CAMERA ACTIEF · REALTIME RADIOFREQUENTIE-WARMTEBEELD OVERLAY',
