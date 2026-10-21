@@ -93,14 +93,14 @@ const suiteCopy: Record<
     authBanner:
       'DEMO DE INVESTIGACIÓN: los modelos de rutas D2D, enlace satelital y radar RF/CSI son simulaciones de software. El navegador no opera radiofrecuencia satelital ni extrae CSI real. Son necesarias pruebas físicas, integración autorizada y verificación independiente antes de afirmaciones operativas.',
     casesEyebrow: '01 / COMPARATIVA OPERATIVA EN ESCENARIOS REALES',
-    casesTitle: 'Cómo funciona todo HOY sin nuestra tecnología vs. Qué resuelve OEP al instante',
+    casesTitle: 'Escenarios hipotéticos: problema investigado vs. comportamiento del modelo OEP',
     todayTag: 'HOY (SIN OEP · COLAPSO TRADICIONAL)',
     oepTag: 'CON OEP (ESCENARIO HIPOTÉTICO · SIMULADO)',
     loadPresetBtn: 'CARGAR ESTE ESCENARIO EN LAS CONSOLAS DE SATÉLITE, ZONAS Y RADAR RF ↓',
     fnEyebrow: '02 / CATÁLOGO DE FUNCIONES DE INGENIERÍA Y PROBLEMAS RESUELTOS',
     fnTitle: 'Presentación de cada función: qué problema real resuelve y qué módulo lo ejecuta',
     fnProblemLabel: 'Problema actual sin resolver:',
-    fnSolutionLabel: 'Ingeniería OEP implementada:',
+    fnSolutionLabel: 'Software experimental o capacidad aún simulada:',
     fnAuthLabel: 'Punto de autorización externa:',
     infraEyebrow: '03 / INFRAESTRUCTURA COMPLETA DE SATÉLITES, MÓVILES Y TELEMETRÍA POR ZONAS',
     infraTitle: 'Consola de Enlace Satelital 3GPP NTN + Malla Móvil D2D + Telemetría Táctica por Sectores',
@@ -109,7 +109,7 @@ const suiteCopy: Record<
     elevLabel: 'Ángulo de Elevación del Satélite',
     freqLabel: 'Banda de Frecuencia Portadora',
     damageLabel: 'Daño en Red Celular Terrestre',
-    satBridgeLabel: 'Activar Puente Satelital NTN de Emergencia',
+    satBridgeLabel: 'Simular puente NTN (sin transmisión satelital)',
     frameTitle: 'Trama Binaria Compacta OEP-NTN (24 Bytes + CRC-16-CCITT · 8.6x más ligera que JSON):',
     zonePanelTitle: 'Telemetría por Zonas Poligonales (9 Sectores Tácticos · Pulsa una celda)',
     radarEyebrow: '04 / RADAR ESPECTRAL TRANS-PARED (WI-FI CSI + RF) Y CÁMARA AR «TÉRMICA DE FRECUENCIAS»',
@@ -123,8 +123,8 @@ const suiteCopy: Record<
     arBtnStart: 'VER SUPERPOSICIÓN DEMOSTRATIVA EN CÁMARA (NO ES RADAR REAL)',
     arBtnStop: 'DETENER CÁMARA AR (VOLVER A MODO SIMULACIÓN)',
     arStatusSim: 'MODO TOMOGRAFÍA ESPECTRAL RF / WI-FI CSI (64 SUBPORTADORAS OFDM)',
-    arStatusLive: 'CÁMARA AR ACTIVA · SUPERPOSICIÓN TÉRMICA DE RADIOFRECUENCIAS EN TIEMPO REAL',
-    targetsTitle: 'Emisiones de Móvil y Firmas CSI Detectadas Detrás del Muro',
+    arStatusLive: 'CÁMARA ACTIVA · MAPA RF SINTÉTICO (NO MEDICIÓN)',
+    targetsTitle: 'Objetivos artificiales del modelo RF/CSI (no detectados físicamente)',
     walls: {
       DRYWALL: 'Tabique / Pladur (12 cm · Atenuación baja)',
       BRICK_25CM: 'Muro de Ladrillo Macizo (25 cm · Atenuación media)',
@@ -253,7 +253,7 @@ const suiteCopy: Record<
           ['Subportadoras Wi-Fi CSI', '64 canales OFDM (Fase/Amp)'],
           ['Bandas combinadas', 'Sub-GHz + BLE + Wi-Fi + IMU'],
           ['Modo Cámara AR WebRTC', 'En vivo en navegador'],
-          ['Objetivos tras hormigón', 'Detectados con SNR ≥ 6 dB']
+          ['Objetivos en simulación', 'Umbral matemático ilustrativo (NO detectados)']
         ],
         preset: { orbit: 'LEO_D2C_550KM', elevation: 60, freq: 850, damage: 80, wall: 'COLLAPSED_RUBBLE', distance: 2.8 }
       }
@@ -323,14 +323,14 @@ const suiteCopy: Record<
     authBanner:
       'RESEARCH DEMO: D2D routing, satellite links and RF/CSI radar are software simulations. The browser does not transmit satellite RF or extract real Wi-Fi CSI. Physical trials, authorized integrations and independent validation remain mandatory.',
     casesEyebrow: '01 / OPERATIONAL COMPARISON ACROSS REAL SCENARIOS',
-    casesTitle: 'How everything fails TODAY without our technology vs. What OEP solves immediately',
+    casesTitle: 'Hypothetical scenarios: observed challenge versus the simulated OEP response',
     todayTag: 'TODAY (WITHOUT OEP · TRADITIONAL COLLAPSE)',
     oepTag: 'WITH OEP (HYPOTHETICAL · SIMULATED)',
     loadPresetBtn: 'LOAD THIS SCENARIO INTO THE SATELLITE, ZONE & RF RADAR CONSOLES ↓',
     fnEyebrow: '02 / ENGINEERING FUNCTION CATALOG & PROBLEMS SOLVED',
     fnTitle: 'Function-by-function breakdown: real problem solved, runnable software, and authorization point',
     fnProblemLabel: 'Current unsolved problem:',
-    fnSolutionLabel: 'Implemented OEP engineering:',
+    fnSolutionLabel: 'Research code or simulated target:',
     fnAuthLabel: 'External authorization point:',
     infraEyebrow: '03 / COMPLETE SATELLITE, MOBILE MESH & POLYGONAL ZONE TELEMETRY INFRASTRUCTURE',
     infraTitle: '3GPP NTN Satellite Link Console + D2D Mobile Mesh + Tactical Sector Telemetry',
@@ -339,7 +339,7 @@ const suiteCopy: Record<
     elevLabel: 'Satellite Elevation Angle',
     freqLabel: 'Carrier Frequency Band',
     damageLabel: 'Terrestrial Cellular Damage',
-    satBridgeLabel: 'Enable Emergency NTN Satellite Bridge',
+    satBridgeLabel: 'Simulate NTN Bridge (no satellite transmission)',
     frameTitle: 'OEP-NTN Compact Binary Frame (24 Bytes + CRC-16-CCITT · 8.6x smaller than JSON):',
     zonePanelTitle: 'Polygonal Zone Telemetry (9 Tactical Sectors · Click any cell)',
     radarEyebrow: '04 / THROUGH-WALL RF & WI-FI CSI SPECTRAL RADAR + AR "FREQUENCY THERMAL" CAMERA',
@@ -353,8 +353,8 @@ const suiteCopy: Record<
     arBtnStart: 'SHOW CAMERA DEMO OVERLAY (NOT A LIVE RF RADAR)',
     arBtnStop: 'STOP AR CAMERA (RETURN TO SIMULATION VIEW)',
     arStatusSim: 'RF / WI-FI CSI SPECTRAL TOMOGRAPHY MODE (64 OFDM SUBCARRIERS)',
-    arStatusLive: 'LIVE AR CAMERA ACTIVE · REAL-TIME RADIO-FREQUENCY THERMAL HUD OVERLAY',
-    targetsTitle: 'Behind-Wall Mobile Emissions & CSI Signatures Detected',
+    arStatusLive: 'CAMERA ACTIVE · SYNTHETIC RF OVERLAY (NOT MEASURED)',
+    targetsTitle: 'Synthetic RF/CSI targets (not real behind-wall detections)',
     walls: {
       DRYWALL: 'Drywall / Partition (12 cm · Low attenuation)',
       BRICK_25CM: 'Solid Brick Wall (25 cm · Medium attenuation)',
@@ -483,7 +483,7 @@ const suiteCopy: Record<
           ['Wi-Fi CSI subcarriers', '64 OFDM channels'],
           ['Fused spectrum bands', 'Sub-GHz + BLE + Wi-Fi + IMU'],
           ['WebRTC AR Camera mode', 'Live in browser'],
-          ['Targets behind concrete', 'Detected at SNR ≥ 6 dB']
+          ['Synthetic model targets', 'Illustrative SNR threshold (NOT detected)']
         ],
         preset: { orbit: 'LEO_D2C_550KM', elevation: 60, freq: 850, damage: 80, wall: 'COLLAPSED_RUBBLE', distance: 2.8 }
       }
@@ -553,14 +553,14 @@ const suiteCopy: Record<
     authBanner:
       'ONDERZOEKSDEMO: D2D-routering, satellietverbindingen en RF/CSI-radar zijn softwaresimulaties. De browser zendt geen satelliet-RF uit en leest geen echte Wi-Fi CSI. Fysieke proeven, bevoegde integratie en onafhankelijke validatie zijn vereist.',
     casesEyebrow: '01 / OPERATIONELE VERGELIJKING IN ECHTE SCENARIO’S',
-    casesTitle: 'Hoe alles NU faalt zonder onze technologie vs. Wat OEP direct oplost',
+    casesTitle: 'Hypothetische scenario's: uitdaging versus gesimuleerde OEP-reactie',
     todayTag: 'NU (ZONDER OEP · TRADITIONELE UITVAL)',
     oepTag: 'MET OEP (HYPOTHETISCH · GESIMULEERD)',
     loadPresetBtn: 'LAAD DIT SCENARIO IN DE SATELLIET-, ZONE- & RF-RADARCONSOLES ↓',
     fnEyebrow: '02 / CATALOGUS VAN ENGINEERINGFUNCTIES & OPGELOSTE PROBLEMEN',
     fnTitle: 'Overzicht per functie: welk probleem wordt opgelost en welke module dit uitvoert',
     fnProblemLabel: 'Huidig onopgelost probleem:',
-    fnSolutionLabel: 'Geïmplementeerde OEP-engineering:',
+    fnSolutionLabel: 'Onderzoekssoftware of gesimuleerd doel:',
     fnAuthLabel: 'Extern autorisatiepunt:',
     infraEyebrow: '03 / VOLLEDIGE SATELLIET-, MOBIELE MESH- & POLYGONALE ZONETELEMETRIE-INFRASTRUCTUUR',
     infraTitle: '3GPP NTN-Satellietconsole + D2D Mobiele Mesh + Tactische Sectortelemetrie',
@@ -569,7 +569,7 @@ const suiteCopy: Record<
     elevLabel: 'Elevatiehoek van Satelliet',
     freqLabel: 'Draaggolffrequentieband',
     damageLabel: 'Schade aan Terrestrisch Mobiel Netwerk',
-    satBridgeLabel: 'Activeer Nood-NTN Satellietbrug',
+    satBridgeLabel: 'Simuleer NTN-brug (geen satellietuitzending)',
     frameTitle: 'OEP-NTN Compact Binair Frame (24 Bytes + CRC-16-CCITT · 8.6x kleiner dan JSON):',
     zonePanelTitle: 'Polygonale Zonetelemetrie (9 Tactische Sectoren · Klik op een cel)',
     radarEyebrow: '04 / DOOR-DE-MUUR RF- & WI-FI CSI-RADAR + AR «FREQUENTIE-WARMTEBEELDCAMERA»',
@@ -583,8 +583,8 @@ const suiteCopy: Record<
     arBtnStart: 'TOON CAMERA-DEMO (GEEN ECHTE RF-RADAR)',
     arBtnStop: 'STOP AR-CAMERA (TERUG NAAR SIMULATIEMODUS)',
     arStatusSim: 'RF / WI-FI CSI SPECTRALE TOMOGRAFIEMODUS (64 OFDM-SUBCARRIERS)',
-    arStatusLive: 'LIVE AR-CAMERA ACTIEF · REALTIME RADIOFREQUENTIE-WARMTEBEELD OVERLAY',
-    targetsTitle: 'Mobiele Emissies & CSI-Signaturen Achter de Muur Gedetecteerd',
+    arStatusLive: 'CAMERA ACTIEF · GESIMULEERDE RF-OVERLAY (GEEN METING)',
+    targetsTitle: 'Gesimuleerde RF/CSI-doelen (geen echte detectie)',
     walls: {
       DRYWALL: 'Gipswand / Scheidingswand (12 cm · Lage demping)',
       BRICK_25CM: 'Massieve Bakstenen Muur (25 cm · Gemiddelde demping)',
@@ -713,7 +713,7 @@ const suiteCopy: Record<
           ['Wi-Fi CSI-subcarriers', '64 OFDM-kanalen'],
           ['Gecombineerde banden', 'Sub-GHz + BLE + Wi-Fi + IMU'],
           ['WebRTC AR-cameramodus', 'Live in browser'],
-          ['Doelen achter beton', 'Gedetecteerd bij SNR ≥ 6 dB']
+          ['Gesimuleerde modeldoelen', 'SNR-drempel fictief (NIET gedetecteerd)']
         ],
         preset: { orbit: 'LEO_D2C_550KM', elevation: 60, freq: 850, damage: 80, wall: 'COLLAPSED_RUBBLE', distance: 2.8 }
       }
@@ -1042,7 +1042,7 @@ export default function TelecomAndRfRadarSuite({ locale }: { locale: Locale }) {
     ctx.fillStyle = '#7dd3fc';
     ctx.font = '10px monospace';
     ctx.fillText(
-      `IEEE 802.11bf WI-FI CSI 64-SUBCARRIER OFDM TOMOGRAPHY · DETECTED BEHIND WALL: ${radarResult.detectedCount}/3`,
+      `IEEE 802.11bf WI-FI CSI 64-SUBCARRIER OFDM TOMOGRAPHY · SYNTHETIC TARGETS: ${radarResult.detectedCount}/3`,
       12,
       stripY + 15
     );
