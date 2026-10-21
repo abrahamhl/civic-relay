@@ -1,4 +1,16 @@
 # Civic Relay — Engineering status / investor truth gate
+## CURRENT RELEASE UPDATE — 21 October 2026 (later CTO verification)
+
+**One public domain:** [https://civic-relay-investor.vercel.app](https://civic-relay-investor.vercel.app) with `/`, `/es/`, `/nl/`. Vercel alias **confirmed assigned** to deployment `dpl_2JiFK5wWFZPMkr9wLsyU84Niccdc`, SHA `dd35abec52d70ec27196a87ccca4384a9a12c670`, state `READY`. These three **public routes** were fetched and localized content and canonical metadata inspected successfully. **Caveat:** this served SHA still has incorrect `html lang=en` on ES/NL routes; don't claim this public defect fixed until a newer build is published.
+
+**Historical domain:** `civic-relay-pi.vercel.app` alias reassigned to build `dpl_7RDvPFMYUXKRhYdMYp9nurp7ZYrG` (READY) containing a permanent 308 catch-all redirect to the official domain. Vercel configuration is in root `vercel.json`. Third-party HTTP extraction returned an empty-content error for that redirect and cannot independently confirm the observed status code. The unowned older name `civic-relay.vercel.app` is NOT a controlled domain and cannot be promised a redirect.
+
+**New source changes (not yet live):** proper distinct static Next.js root layouts for EN and ES/NL in `investor-next/app/(en)` and `investor-next/app/(localized)/[locale]`; source-gated domain audit; translated HTML `lang`, Three.js retained, and real Chromium browser release QA. At commit `b6be6615730938fd614adcc44f25dba59a2500cc`, all **four** workflows passed: main CI, investor microsite, emergency research, and [real Chromium QA](https://github.com/abrahamhl/civic-relay/actions/runs/39681164899). That CI performed three real browser navigations (automated personas P01/P03/P08) on the **local static artifact** and uploaded screenshots plus individual JSON: [oep-browser-release-qa artifact](https://github.com/abrahamhl/civic-relay/actions/runs/39681164899/artifacts/12383623834). This is not Buyer Arena's full eight-persona rerun and it is not a hardware test.
+
+**Publication constraint:** Vercel rejected an extra API deployment with `402 api-deployments-free-per-day` (over 100 free API deployments in the current 24-hour window). Therefore the newest per-locale HTML fix is still source/CI verified but NOT publicly served; do not assign the older SHA's production status to this newer commit. Do not purchase an upgrade or increase spending silently. Monitor actual master→production Git deployment and validate new alias SHA before marking the release finished.
+
+**Measured release gate improvement:** automatic domain consistency gate, a root-layout accessibility fix, CI pass and evidence-bearing real Chromium tests. **Unchanged product gate:** global diagnostic TRL ≈3, no physical two-phone ACK and no operational emergency readiness. Neither commit count nor green website tests warrants a higher overall hardware score.
+
 **Review date:** 2026-10-21 UTC. **Working branch:** `audit/funding-truth-gate-20261021`, downstream draft PR [#7](https://github.com/abrahamhl/civic-relay/pull/7). **Production remains unchanged by this review.** This report is an evidence register, NOT certification.
 
 ## Executive decision (scope-specific)
