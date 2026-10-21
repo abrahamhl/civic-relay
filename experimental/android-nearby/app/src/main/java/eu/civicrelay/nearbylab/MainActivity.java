@@ -130,7 +130,9 @@ public final class MainActivity extends Activity {
     }
 
     private void log(String note) {
+        final long logEpoch = sessionEpoch;
         runOnUiThread(() -> {
+            if (logEpoch != sessionEpoch) return;
             if (output != null) {
                 String next = note + "\n" + output.getText();
                 output.setText(next.length() > 6000 ? next.substring(0, 6000) : next);
@@ -449,6 +451,7 @@ public final class MainActivity extends Activity {
         if (pendingExpiryTask != null) foregroundTimer.removeCallbacks(pendingExpiryTask);
         pendingExpiryTask = null;
         journal.clear();
+        if (output != null) output.setText("");
         connections.stopAdvertising();
         connections.stopDiscovery();
         connections.stopAllEndpoints();
