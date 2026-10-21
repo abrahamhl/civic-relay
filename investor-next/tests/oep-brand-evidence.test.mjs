@@ -10,8 +10,8 @@ const read=(path)=>readFileSync(resolve(base,path),'utf8');
 test('public OEP name is consistent across investor languages, metadata and Android lab',()=>{
  const page=read('investor-next/app/investor-page.tsx');
  const locales=read('investor-next/app/copy.ts');
- const metadata=read('investor-next/app/layout.tsx');
- const localeMetadata=read('investor-next/app/[locale]/page.tsx');
+ const metadata=read('investor-next/app/(en)/layout.tsx');
+ const localeMetadata=read('investor-next/app/(localized)/[locale]/page.tsx');
  const manifest=read('experimental/android-nearby/app/src/main/AndroidManifest.xml');
  assert.match(page,/OEP — Offline Emergency Protocol/);
  assert.match(locales,/OEP — Offline Emergency Protocol/g);
