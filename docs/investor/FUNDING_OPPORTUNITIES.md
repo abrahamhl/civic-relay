@@ -1,7 +1,7 @@
 # Funding Opportunities — European Union & Netherlands (Verified 2026)
 
 **Scope:** Non-dilutive public R&D grants, open-source fellowships, and deep-tech innovation instruments applicable to **OEP — Offline Emergency Protocol (`abrahamhl/civic-relay`)**.  
-**Verification Note:** Re-checked on 2026-10-21 via web search of public sources. Earlier drafts listed the NGI Zero Commons Fund as open and mislabeled the Horizon topic; both corrected below. Always confirm on the official portal before applying.
+**Verification Note:** Funding criteria re-checked on 2026-10-22 against NLnet policy v2.0 and the official EU call listing. Earlier drafts listed the NGI Zero Commons Fund as open and mislabeled the Horizon topic; both corrected below. Always confirm on the official portal before applying.
 
 ---
 
@@ -15,12 +15,13 @@
 - **Honest fit:** SSRI-04 targets mission-critical communications for responders (EUCCS), not citizen check-in apps. OEP could at most contribute a narrow open-source work package. With ~15 days left, leading a proposal is not realistic; the only viable move is offering a small partner/subcontract role to an existing consortium.
 - **Current Action Status:** Not submitted.
 
-### 1.2 NLnet Foundation — Open Internet Stack funds (successor to NGI Zero)
-- **Official Source:** [NLnet — Propose](https://nlnet.nl/propose/)
-- **Status:** The NGI Zero Commons Fund closed its final call on **1 June 2026**. Current funds include the **Restack Fund** and **CodeSupply Fund**, plus a general proposal route. Deadlines fall on the **3rd of every odd month**; **next: 3 November 2026, 12:00 CET.**
-- **Grant Range:** Typically **€5,000–€50,000** initial grants; open licenses required; European dimension required.
-- **AI policy (critical):** NLnet does not accept proposals generated entirely by AI and enforces transparency on AI use. The proposal text must be written by the applicant, and AI assistance in the codebase should be disclosed.
-- **Fit for OEP:** Best realistic first grant, *if* scoped as reusable open internet infrastructure (an open, transport-agnostic store-and-forward + verifiable-receipt library with an AOSP transport), not as an "emergency app".
+### 1.2 NLnet Foundation — Restack / CodeSupply (ELIGIBILITY GATE: HIGH RISK)
+- **Official call:** [NLnet — Propose](https://nlnet.nl/propose/). Upcoming cycle listed for **3 November 2026, 12:00 CET**; confirm current deadlines on the official portal.
+- **Critical policy update effective 20 October 2026:** [NLnet GenAI policy 2.0](https://nlnet.nl/foundation/policies/generativeAI/2.0/) **forbids using generative AI to draft, structure, shorten, translate, or answer questions about applications**, except a disclosed accessibility-assistance exception. Within funded projects, generated code, design, documentation, and other artefacts are also **not allowed**; read-only review is allowed with transparency.
+- **Existing AI-generated source must be disclosed** when significant. This repository includes AI-assisted coding and documentation. Disclosure **does not by itself resolve** the prohibition on using GenAI for grant-funded deliverables. The applicant must personally assess whether its future work can comply.
+- **Decision:** **NO AUTOMATED APPLICATION OR AI-WRITTEN SUBMISSION.** Neither this document nor ChatGPT output should be copied into an NLnet proposal. Eligibility remains **UNVERIFIED**; exclude NLnet from any shortlist marked `READY_TO_SUBMIT` until the user independently reviews the rules and establishes a compliant, human-written work plan.
+- **Grant amount:** consult the official call and separate eligible work-package budget; figures quoted elsewhere are not awards or commitments.
+- **Current action:** read-only funding research, no application generated or sent.
 
 ### 1.3 Union Civil Protection Mechanism (UCPM) — KAPP (Knowledge for Action in Prevention & Preparedness)
 - **Official Source:** [EU Civil Protection Knowledge Network — KAPP 2026 Call](https://civil-protection-knowledge-network.europa.eu/knowledge-action-prevention-preparedness-2026-call-proposals)
