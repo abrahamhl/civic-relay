@@ -18,6 +18,8 @@ for(const {locale,paths,words} of checks){
   assert.ok(/SIMULAT|SIMULACI|SIMULATIE/i.test(html),`${locale}: missing simulation disclosure`);
   assert.ok(!/Proyecto de comunicaciones por satélite para emergencias offline/i.test(html),`${locale}: legacy satellite SEO claim still present`);
   assert.ok(html.includes('rel="canonical"'),`${locale}: missing canonical link`);
+  assert.match(html, new RegExp('<html[^>]*\\\\blang="'+locale+'"','i'),`${locale}: HTML language is incorrect`);
+  assert.ok(html.includes('https://civic-relay-investor.vercel.app'),`${locale}: canonical domain missing`);
   assert.ok(html.includes('hrefLang="en"')&&html.includes('hrefLang="es"')&&html.includes('hrefLang="nl"'),`${locale}: missing hreflang alternates`);
   assert.ok(html.includes('EMERGENCY EVENT → ZONE → HUMAN STATUS → CONSENT → MESSAGE → NETWORK PATH → ACK → EVIDENCE'),`${locale}: missing 8-stage architecture flow`);
   console.log(`PASS ${locale.toUpperCase()}: static markup, investor proposition, honest claims, EU link and i18n routes`);
