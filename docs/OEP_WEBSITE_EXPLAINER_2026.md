@@ -45,3 +45,10 @@ The original GlobeCanvas / five-act scroll journey, building collapse 3D scene, 
 1. Browser screenshot/device accessibility audit; fix any overflow or invisible text.
 2. Human usability test with one engineer and one non-technical evaluator; measure comprehension of QUEUED, UNKNOWN, ACK_SYNTHETIC.
 3. Physical Android pilot, independent security assessment and institutional alert-provider trust architecture before operational pitch.
+
+## Website navigation and publishing status — 21 October 2026
+- Added a dedicated six-anchor reader journey immediately after the hero ribbon: WHAT IT DOES / 3D STORY / HOW IT WORKS / TRY THE LAB / TECH STACK / EVIDENCE, with proper ES, EN and NL text. Narrow screens use a horizontally scrollable, keyboard-focusable navigation strip rather than hiding the essential links.
+- The hero's first meaningful explanation now includes concrete opt-in SAFE/SOS → queue → compatible modelled route → matching ACK semantics in all three languages. This is intentionally more specific than generic “critical connectivity” copy.
+- Search/open-graph description now names the actual observable OEP functions. Product limitations updated in all three languages to acknowledge a compiled Android experimental client **without** claiming that physical links work.
+- Added regression tests for six in-page anchor targets, full trilingual labels, mobile nav and truthful prototype states. Tests run through the existing GitHub Actions research workflow.
+- Publishing blocker: connected Vercel `civic-relay-investor` responds HTTP 402 `api-deployments-free-per-day` (more than 100 API deployments per day) when asked to create a fresh preview of the exact feature-branch SHA. We did not upgrade the plan or promote an outdated production release. Do not show users an older READY deployment as though it contains these edits; an actual new preview needs quota recovery, followed by mobile/desktop visual QA.
