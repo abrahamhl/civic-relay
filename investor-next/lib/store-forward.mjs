@@ -134,7 +134,7 @@ export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAtt
           if(r.attempts>=maxAttempts){
             r.status='EXHAUSTED';r.envelope=null;r.nextAttemptAt=null;
             audit(id,'EXHAUSTED','Payload cleared; no delivery claim');
-          }else r.nextAttemptAt=now()+retryMs*2**(r.attempts-1);
+          }else if(r.nextAttemptAt<=now())r.nextAttemptAt=now()+retryMs*2**(r.attempts-1);
         }
       }
       return view(r);
