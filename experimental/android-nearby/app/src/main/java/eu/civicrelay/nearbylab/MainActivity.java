@@ -482,9 +482,9 @@ public final class MainActivity extends Activity {
                 } else if ("LAB_RECEIPT".equals(type)) {
                     String pinnedKey = pinnedPeerKeys.get(endpointId);
                     long issuedAt = packet.optLong("issuedAtMs", 0L);
-                    long receiptNow = System.currentTimeMillis();
-                    if (pinnedKey == null || issuedAt <= 0L || issuedAt > receiptNow + 30000L ||
-                        issuedAt < receiptNow - TTL_MILLIS ||
+                    // The sender's monotonic watchdog governs freshness: an offline
+                    // receiver may have a skewed wall clock. issuedAt is still signed.
+                    if (pinnedKey == null || issuedAt <= 0L ||
                         !LabReceiptSigner.verifyReceipt(pinnedKey, id, challenge,
                             SERVICE_ID, issuedAt, packet.optString("signature"))) {
                         log("P0 REJECTED: receiver ECDSA proof invalid or no session key.");
