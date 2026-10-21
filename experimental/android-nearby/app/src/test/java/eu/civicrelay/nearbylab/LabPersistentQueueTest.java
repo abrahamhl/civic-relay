@@ -47,7 +47,7 @@ public final class LabPersistentQueueTest {
 
             boolean replayRejected = false;
             try {
-                q3.enqueue(ID1, "SOS_EXPLICIT", "REPLAY", 3600L, 5000L);
+                q3.enqueue(ID1, "SOS_EXPLICIT", LAB_PAYLOAD, 3600L, 5000L);
             } catch (IllegalStateException expected) {
                 replayRejected = true;
             }
