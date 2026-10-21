@@ -44,3 +44,14 @@ export {
   type ThroughWallTarget,
   type ThroughWallRadarResult
 } from './telecom-suite.mjs';
+export {
+  REAL_ORBITAL_SHELLS,
+  generateRealEcdsaKeyPair,
+  signAndPackRealOepPacket,
+  verifyRealOepPacket,
+  computeLiveOrbitalEphemeris,
+  type RealEcdsaKeyBundle,
+  type SignedOepRealPacket,
+  type VerifiedOepPacketResult,
+  type LiveOrbitalPass
+} from './live-protocol-node.mjs';

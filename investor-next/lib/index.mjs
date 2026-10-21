@@ -3,7 +3,8 @@
  * Exports the deterministic 20-100 node scenario topology engine,
  * the bounded store-and-forward queue & receipt verification engine,
  * the consent, capability, energy & CAP 1.2 trust-boundary policies,
- * and the satellite NTN link-budget, polygonal zone telemetry & through-wall Wi-Fi CSI / RF radar engines.
+ * the satellite NTN link-budget, polygonal zone telemetry & through-wall Wi-Fi CSI / RF radar engines,
+ * and the real WebCrypto ECDSA P-256 packet signer/verifier + live Keplerian orbital ephemeris engine.
  */
 export { runScenario } from './emergency-routing.mjs';
 export { createStoreForwardEngine, createInMemoryAdapter } from './store-forward.mjs';
@@ -26,3 +27,10 @@ export {
   computeZoneTelemetryGrid,
   runThroughWallRfRadar
 } from './telecom-suite.mjs';
+export {
+  REAL_ORBITAL_SHELLS,
+  generateRealEcdsaKeyPair,
+  signAndPackRealOepPacket,
+  verifyRealOepPacket,
+  computeLiveOrbitalEphemeris
+} from './live-protocol-node.mjs';
