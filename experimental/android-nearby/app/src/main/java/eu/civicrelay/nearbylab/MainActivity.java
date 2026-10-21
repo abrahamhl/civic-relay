@@ -326,14 +326,7 @@ public final class MainActivity extends Activity {
                 connections.stopAdvertising();
                 connections.stopDiscovery();
                 log("LINK CONNECTED (manual digits checked). Awaiting ECDSA session-key exchange.");
-                try {
-                    JSONObject hello = new JSONObject().put("v", 3).put("type", "LAB_KEY_HELLO")
-                        .put("publicKey", receiptSigner.publicKeyBase64());
-                    sendPacket(endpointId, hello);
-                } catch (JSONException failure) {
-                    connections.disconnectFromEndpoint(endpointId);
-                    log("ECDSA key exchange failed; peer connection closed.");
-                }
+                sendSessionHello(endpointId);
             } else {
                 approvedPeers.remove(endpointId);
                 connections.disconnectFromEndpoint(endpointId);
@@ -404,7 +397,8 @@ public final class MainActivity extends Activity {
             log("DENIED: damaged/unavailable lab store; no sending."); return;
         }
         if (!pinnedPeerKeys.containsKey(connectedPeer)) {
-            log("DENIED: receiver ECDSA session key not yet bound to manual-digit-verified peer."); return;
+            sendSessionHello(connectedPeer); // Manual resend if hello raced connection setup.
+            log("WAIT: ECDSA session key not received. Retry sending after peer handshake."); return;
         }
         try {
             String id = UUID.randomUUID().toString();
@@ -427,6 +421,19 @@ public final class MainActivity extends Activity {
             sendPacket(connectedPeer, packet);
             log("Message submitted to Nearby API; NOT delivered until receiver ACK: " + id);
         } catch (JSONException e) { log("Packet encoding failed."); }
+    }
+
+    private void sendSessionHello(String endpointId) {
+        if (!userConsented || !connected || !endpointId.equals(connectedPeer) ||
+            !approvedPeers.contains(endpointId)) return;
+        try {
+            JSONObject hello = new JSONObject().put("v", 3).put("type", "LAB_KEY_HELLO")
+                .put("publicKey", receiptSigner.publicKeyBase64());
+            sendPacket(endpointId, hello);
+        } catch (JSONException failure) {
+            log("ECDSA session-key exchange failed; close connection and retry pairing.");
+            connections.disconnectFromEndpoint(endpointId);
+        }
     }
 
     private final PayloadCallback payloads = new PayloadCallback() {
