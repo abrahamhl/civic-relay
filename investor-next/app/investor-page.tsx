@@ -11,8 +11,8 @@ import LanguageDocument from './language-document';
 const source='https://github.com/abrahamhl/civic-relay';
 
 const funding='https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-CL3-2026-01-SSRI-04';
-const dossier=source+'/blob/feat/master-emergency-routing-v1-20261020/docs/MASTER_EMERGENCY_ROUTING_2026.md';
-const contact=source+'/issues/new';
+const dossier=source+'/blob/master/docs/README.md';
+const contact=source+'/issues/new?template=pilot-or-grant-partner.yml';
 const chapterNavigation:Record<Locale,Array<{href:string;label:string}>>={
  en:[{href:'#what-oep-does',label:'WHAT IT DOES'},{href:'#architecture',label:'THE 3D STORY'},{href:'#how-it-works',label:'HOW IT WORKS'},{href:'#routing-lab',label:'TRY THE LAB'},{href:'#developer-stack',label:'TECH STACK'},{href:'#evidence',label:'EVIDENCE'}],
  es:[{href:'#what-oep-does',label:'QUÉ HACE'},{href:'#architecture',label:'HISTORIA 3D'},{href:'#how-it-works',label:'CÓMO FUNCIONA'},{href:'#routing-lab',label:'PROBAR LAB'},{href:'#developer-stack',label:'TECNOLOGÍA'},{href:'#evidence',label:'EVIDENCIAS'}],
