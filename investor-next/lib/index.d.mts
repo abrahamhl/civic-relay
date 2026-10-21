@@ -29,3 +29,18 @@ export {
   type SafetyResponse,
   type SafetyRecord
 } from './emergency-policy.mjs';
+export {
+  WALL_MATERIALS,
+  SATELLITE_PROFILES,
+  crc16Ccitt,
+  encodeCompactSatelliteBurst,
+  computeSatelliteLinkBudget,
+  computeZoneTelemetryGrid,
+  runThroughWallRfRadar,
+  type SatelliteBurstFrame,
+  type SatelliteLinkBudgetResult,
+  type ZoneSectorTelemetry,
+  type ZoneTelemetryGridResult,
+  type ThroughWallTarget,
+  type ThroughWallRadarResult
+} from './telecom-suite.mjs';
