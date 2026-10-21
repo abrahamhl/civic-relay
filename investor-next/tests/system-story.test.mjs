@@ -46,3 +46,30 @@ test('interactive explainer is keyboard usable, responsive and evidence truthful
  for(const item of ['no es un servicio real','not a live emergency service','geen hulpdienst','sin ensayo físico','not physically','nog geen veldproef'])
    assert.ok(data.includes(item),'Caveat absent: '+item);
 });
+
+test('mobile/investor navigation exposes the whole end-to-end journey in EN ES NL',()=>{
+ const page=read('investor-next/app/investor-page.tsx');
+ const css=read('investor-next/app/system-story.css');
+ const anchors=[
+  '#what-oep-does','#architecture','#how-it-works','#routing-lab','#developer-stack','#evidence'
+ ];
+ for(const anchor of anchors){
+  assert.equal(page.split("href:'"+anchor+"'").length-1,3,'missing locale navigation '+anchor);
+ }
+ for(const label of ['QUÉ HACE','HOW IT WORKS','WERKING','TECH STACK','TECNOLOGÍA','BEWIJS'])
+  assert.ok(page.includes(label),'missing localized nav: '+label);
+ for(const part of ['className="oep-chapter-nav"','aria-label=', 'overflow-x:auto','scroll-snap-type:x proximity',':focus-visible'])
+  assert.ok((page+'\n'+css).includes(part),'missing keyboard/mobile nav: '+part);
+ assert.ok(!page.includes("civic-relay-4zbvbbxxm"),'outdated unrelated preview destination');
+});
+
+test('copy accurately says Android is compiled but physical interoperability remains unverified',()=>{
+ const c=read('investor-next/app/copy.ts');
+ assert.match(c,/EXPERIMENTAL ANDROID APK \(BUILD-TESTED ONLY\)/);
+ assert.match(c,/ANDROID EXPERIMENTAL COMPILADA/);
+ assert.match(c,/EXPERIMENTELE ANDROID-APK \(ALLEEN BUILD-GETEST\)/);
+ for(const erroneous of ['Real phone-to-phone transport is not yet implemented.',
+ 'La transmisión real entre móviles todavía no está implementada.',
+ 'NU: SIMULATIE IN DE BROWSER. LATER: FYSIEKE RADIO'])
+  assert.ok(!c.includes(erroneous),'outdated claim: '+erroneous);
+});
