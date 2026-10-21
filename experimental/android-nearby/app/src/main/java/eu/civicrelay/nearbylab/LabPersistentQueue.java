@@ -38,6 +38,9 @@ public final class LabPersistentQueue {
         }
     }
 
+    // A research journal, not a general-purpose encrypted emergency message store.
+    // Refuse arbitrary user text, precise location, or PII at the persistence boundary.
+    private static final String LAB_ONLY_PAYLOAD = "SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS";
     private static final int MAX_ENTRIES = 100;
     private static final int MAX_FILE_BYTES = 160000;
     private static final String HEADER = "# OEP LAB PERSISTENT QUEUE V1";
@@ -55,8 +58,7 @@ public final class LabPersistentQueue {
               "OTHERS_AFFECTED".equals(category) || "CANNOT_DETERMINE".equals(category))) {
             throw new IllegalArgumentException("Explicit human status category required");
         }
-        if (payload == null || payload.isEmpty() || payload.length() > 1024 ||
-            payload.indexOf('\n') >= 0 || payload.indexOf('\r') >= 0 || payload.indexOf('\t') >= 0) {
+        if (!LAB_ONLY_PAYLOAD.equals(payload)) {
             throw new IllegalArgumentException("Invalid or oversized lab payload");
         }
         if (ttlMs < 1000L || ttlMs > 86400000L) {
@@ -151,8 +153,7 @@ public final class LabPersistentQueue {
                 Status status = Status.valueOf(parts[4]);
                 String rawPayload = parts[5];
                 if (status == Status.QUEUED) {
-                    if (rawPayload.isEmpty() || rawPayload.length() > 1024 ||
-                        rawPayload.indexOf('\r') >= 0 || rawPayload.indexOf('\n') >= 0) {
+                    if (!LAB_ONLY_PAYLOAD.equals(rawPayload)) {
                         throw new IllegalArgumentException("Invalid queued lab payload");
                     }
                 } else if (!rawPayload.isEmpty()) {
