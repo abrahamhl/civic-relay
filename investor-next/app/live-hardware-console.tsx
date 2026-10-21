@@ -39,7 +39,7 @@ const fundingTargetsByLocale: Record<Locale, FundingTarget[]> = {
       chatgptPrompt: `Actúa como un redactor experto en subvenciones europeas NGI Zero / NLnet Foundation. Voy a presentar el proyecto "OEP — Offline Emergency Protocol (Civic Relay)" a la convocatoria NLnet Open Internet Stack (cierre 3 de noviembre de 2026, presupuesto solicitado: 42.000 EUR en 5 hitos).
 Datos reales y verificados de nuestro prototipo en producción:
 - Web en vivo con ejecución criptográfica y telecomunicaciones reales: https://civic-relay-investor.vercel.app/es
-- Repositorio Apache-2.0: https://github.com/abrahamhl/civic-relay
+- Repositorio MIT: https://github.com/abrahamhl/civic-relay
 - Ingeniería ya implementada y funcionando en vivo: (1) Enrutamiento móvil multi-salto D2D (BLE + Wi-Fi Aware) con exclusión de batería crítica <=15%, (2) Firma criptográfica real ECDSA P-256 (WebCrypto y Android LabReceiptSigner.java) + cola persistente en disco (LabPersistentQueue.java), (3) Trama binaria compacta de 24 bytes con CRC-16-CCITT para enlace satelital 3GPP NTN Direct-to-Cell, (4) Telemetría táctica por zonas poligonales CAP 1.2 (9 sectores), y (5) Radar espectral trans-pared Wi-Fi CSI (64 subportadoras OFDM IEEE 802.11bf) + visor cámara AR térmica de radiofrecuencias.
 Redáctame:
 1) La versión final optimizada de cada campo del formulario de https://nlnet.nl/propose/ en inglés impecable.
@@ -50,12 +50,12 @@ Redáctame:
       badge: 'CONSORCIO EUROPEO · PROTECCIÓN CIVIL',
       name: 'Horizon Europe Cluster 3 — HORIZON-CL3-2026-01-SSRI-04',
       amount: '€3,000,000 – €5,000,000 (Paquete técnico OEP: €250k – €450k)',
-      deadline: '18 de noviembre de 2026',
+      deadline: '5 de noviembre de 2026',
       portalUrl:
         'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-CL3-2026-01-SSRI-04',
       fitSummary:
         'Convocatoria oficial de la Comisión Europea para resiliencia ante desastres, comunicaciones de emergencia interoperables y búsqueda y rescate (USAR).',
-      chatgptPrompt: `Actúa como director de propuestas de Horizon Europe Cluster 3 (Civil Security for Society). Necesito redactar 5 correos de captación de consorcio (Work Package Technical Partner) para universidades europeas (TU Delft, UPV Valencia, Fraunhofer, TNO) y agencias de protección civil que lideren propuestas en el topic HORIZON-CL3-2026-01-SSRI-04 (cierre 18 de noviembre de 2026).
+      chatgptPrompt: `Actúa como director de propuestas de Horizon Europe Cluster 3 (Civil Security for Society). Necesito redactar 5 correos de captación de consorcio (Work Package Technical Partner) para universidades europeas (TU Delft, UPV Valencia, Fraunhofer, TNO) y agencias de protección civil que lideren propuestas en el topic HORIZON-CL3-2026-01-SSRI-04 (cierre 5 de noviembre de 2026).
 Nuestro aporte técnico diferencial listo para probar en https://civic-relay-investor.vercel.app/ y https://github.com/abrahamhl/civic-relay:
 - Protocolo abierto OEP de coordinación de emergencias offline y enrutamiento adaptativo multi-red (malla D2D + puente satelital 3GPP NTN en tramas binarias de 24 bytes + telemetría poligonal CAP 1.2).
 - Radar espectral trans-pared Wi-Fi CSI / RF (ITU-R P.2040 + IEEE 802.11bf) con cámara AR térmica de frecuencias para localizar móviles y respiración tras muros de hormigón.
@@ -177,7 +177,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
         'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-CL3-2026-01-SSRI-04',
       fitSummary:
         'European Commission call for disaster-resilient societies, interoperable crisis communications, and urban search & rescue (USAR) technologies.',
-      chatgptPrompt: `Act as a Horizon Europe Cluster 3 proposal director. Write 5 high-conversion outreach emails and a 1-page Technical Partner Profile to join consortia bidding on HORIZON-CL3-2026-01-SSRI-04 (deadline November 18, 2026), showcasing our live prototype at https://civic-relay-investor.vercel.app/ and repository at https://github.com/abrahamhl/civic-relay.`
+      chatgptPrompt: `Act as a Horizon Europe Cluster 3 proposal director. Write 5 high-conversion outreach emails and a 1-page Technical Partner Profile to join consortia bidding on HORIZON-CL3-2026-01-SSRI-04 (deadline November 5, 2026), showcasing our live prototype at https://civic-relay-investor.vercel.app/ and repository at https://github.com/abrahamhl/civic-relay.`
     },
     {
       id: 'F03-NATO-DIANA',
@@ -263,12 +263,12 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
       badge: 'EU-CONSORTIUM · CIVIELE VEILIGHEID & USAR',
       name: 'Horizon Europe Cluster 3 — HORIZON-CL3-2026-01-SSRI-04',
       amount: '€3,000,000 – €5,000,000 (OEP Technisch WP: €250k – €450k)',
-      deadline: '18 november 2026',
+      deadline: '5 november 2026',
       portalUrl:
         'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-CL3-2026-01-SSRI-04',
       fitSummary:
         'Oproep van de Europese Commissie voor rampbestendige samenlevingen, interoperabele noodcommunicatie en zoek- en reddingstechnologie (USAR).',
-      chatgptPrompt: `Schrijf 5 overtuigende consortium-outreach e-mails (voor o.a. TU Delft, TNO, Fraunhofer) en een Partner Profile voor HORIZON-CL3-2026-01-SSRI-04 (deadline 18 november 2026) voor OEP (https://civic-relay-investor.vercel.app/nl).`
+      chatgptPrompt: `Schrijf 5 overtuigende consortium-outreach e-mails (voor o.a. TU Delft, TNO, Fraunhofer) en een Partner Profile voor HORIZON-CL3-2026-01-SSRI-04 (deadline 5 november 2026) voor OEP (https://civic-relay-investor.vercel.app/nl).`
     },
     {
       id: 'F03-NATO-DIANA',
@@ -341,9 +341,9 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
 
 const consoleCopy = {
   es: {
-    eyebrow: '05 / EJECUCIÓN REAL EN VIVO (CERO SIMULACIÓN) + SALA DE INVERSIÓN Y PROMPTS PARA CHATGPT',
+    eyebrow: '05 / CRIPTOGRAFÍA REAL EN NAVEGADOR Y ENSAYO WEBRTC LOCAL · INVESTIGACIÓN',
     title: 'NODO CRIPTOGRÁFICO WEBCRYPTO ECDSA P-256 REAL, CANAL P2P WEBRTC EN VIVO, HARDWARE DEL DISPOSITIVO Y CAMPAÑA DE FINANCIACIÓN',
-    lead: 'Todo lo que ves en este bloque se ejecuta de verdad en el hardware y navegador de tu dispositivo (sin simulaciones): genera claves criptográficas ECDSA P-256 reales con WebCrypto, firma tramas binarias OEP de 24 bytes, las persiste en el almacenamiento físico del navegador (localStorage), las transmite por un canal de datos WebRTC / BroadcastChannel en vivo midiendo la latencia real en milisegundos, lee la batería y red reales de tu equipo, y te entrega las 8 oportunidades de inversión verificadas con sus prompts listos para pegar en ChatGPT.',
+    lead: 'Ejecutamos firmas digitales reales en el navegador, una demostración local WebRTC entre dos conexiones de esta misma página y un bus BroadcastChannel entre pestañas. Esto NO demuestra comunicación entre teléfonos sin internet, radio Wi-Fi CSI, ni enlace satelital. Algunos sensores web no están disponibles según navegador. Datos del panel:  genera claves criptográficas ECDSA P-256 reales con WebCrypto, firma tramas binarias OEP de 24 bytes, las persiste en el almacenamiento físico del navegador (localStorage), las transmite por un canal de datos WebRTC / BroadcastChannel en vivo midiendo la latencia real en milisegundos, lee la batería y red reales de tu equipo, y te entrega las 8 oportunidades de inversión verificadas con sus prompts listos para pegar en ChatGPT.',
     cryptoTitle: '1. Nodo Criptográfico ECDSA P-256 Real + Transporte P2P WebRTC / BroadcastChannel en Vivo',
     signSosBtn: 'FIRMAR TRAMA SOS (ECDSA P-256 REAL) Y ENVIAR POR WEBRTC + BUS P2P EN VIVO',
     signSafeBtn: 'FIRMAR TRAMA «ESTOY BIEN» (ECDSA P-256 REAL) Y PERSISTIR EN DISCO',
@@ -360,9 +360,9 @@ const consoleCopy = {
     openPortalBtn: 'ABRIR PORTAL OFICIAL ↗'
   },
   en: {
-    eyebrow: '05 / LIVE REAL EXECUTION (ZERO SIMULATION) + INVESTOR DEAL-ROOM & CHATGPT PROMPTS',
+    eyebrow: '05 / REAL BROWSER CRYPTO AND LOCAL WEBRTC LOOPBACK · RESEARCH DEMO',
     title: 'REAL WEBCRYPTO ECDSA P-256 NODE, LIVE WEBRTC P2P DATA CHANNEL, REAL DEVICE HARDWARE TELEMETRY & FUNDING CAMPAIGN',
-    lead: 'Everything in this panel executes for real on your device hardware and browser (no simulations): it generates real ECDSA P-256 cryptographic keys via WebCrypto, signs 24-byte OEP binary frames, persists them to durable local storage, transmits them across a live WebRTC / BroadcastChannel P2P data link with real millisecond RTT measurement, reads your real battery and network interface, and provides 8 verified funding targets with one-click ChatGPT proposal prompts.',
+    lead: 'This panel runs genuine browser cryptography and a WebRTC loopback between two connections on this SAME page; BroadcastChannel can communicate with other same-origin tabs. It does NOT prove offline phone-to-phone transfer, RF sensing, or satellite links. Limited browser telemetry is permission/API dependent. Demo details:  it generates real ECDSA P-256 cryptographic keys via WebCrypto, signs 24-byte OEP binary frames, persists them to durable local storage, transmits them across a live WebRTC / BroadcastChannel P2P data link with real millisecond RTT measurement, reads your real battery and network interface, and provides 8 verified funding targets with one-click ChatGPT proposal prompts.',
     cryptoTitle: '1. Real WebCrypto ECDSA P-256 Node + Live WebRTC / BroadcastChannel P2P Transport',
     signSosBtn: 'SIGN SOS FRAME (REAL ECDSA P-256) & TRANSMIT OVER LIVE WEBRTC + P2P BUS',
     signSafeBtn: 'SIGN "SAFE" FRAME (REAL ECDSA P-256) & PERSIST TO DISK',
@@ -379,9 +379,9 @@ const consoleCopy = {
     openPortalBtn: 'OPEN OFFICIAL PORTAL ↗'
   },
   nl: {
-    eyebrow: '05 / LIVE ECHTE UITVOERING (GEEN SIMULATIE) + INVESTEERDERSKAMER & CHATGPT-PROMPTS',
+    eyebrow: '05 / ECHTE BROWSERCRYPTO EN LOKALE WEBRTC-LOOPBACK · ONDERZOEKSDEMO',
     title: 'ECHTE WEBCRYPTO ECDSA P-256 NODE, LIVE WEBRTC P2P-KANAAL, ECHTE APPARAATHARDWARE & FINANCIERINGSCAMPAGNE',
-    lead: 'Alles in dit paneel wordt daadwerkelijk uitgevoerd op uw apparaat en in uw browser (geen simulatie): het genereert echte ECDSA P-256 cryptografische sleutels via WebCrypto, ondertekent 24-byte OEP binaire frames, slaat ze persistent op schijf op, verzendt ze via een live WebRTC / BroadcastChannel P2P-datakanaal met echte milliseconde RTT-meting, leest uw echte accu en netwerk uit en biedt 8 geverifieerde financieringskansen met kant-en-klare ChatGPT-prompts.',
+    lead: 'Dit paneel gebruikt echte browsercryptografie en een lokale WebRTC-loopback tussen twee verbindingen op DEZELFDE pagina; BroadcastChannel werkt tussen tabbladen. Dit bewijst GEEN offline communicatie tussen telefoons, RF-detectie of satellietverbindingen. Browsertelemetrie is beperkt. Demo:  het genereert echte ECDSA P-256 cryptografische sleutels via WebCrypto, ondertekent 24-byte OEP binaire frames, slaat ze persistent op schijf op, verzendt ze via een live WebRTC / BroadcastChannel P2P-datakanaal met echte milliseconde RTT-meting, leest uw echte accu en netwerk uit en biedt 8 geverifieerde financieringskansen met kant-en-klare ChatGPT-prompts.',
     cryptoTitle: '1. Echte WebCrypto ECDSA P-256 Node + Live WebRTC / BroadcastChannel P2P-Transport',
     signSosBtn: 'ONDERTEKEN SOS-FRAME (ECHTE ECDSA P-256) & VERZEND VIA LIVE WEBRTC + P2P-BUS',
     signSafeBtn: 'ONDERTEKEN «VEILIG»-FRAME (ECHTE ECDSA P-256) & SLA OP SCHIJF OP',
@@ -457,7 +457,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
     packet: SignedOepRealPacket
   ): Promise<{ rttMs: number; delivered: boolean }> => {
     if (typeof RTCPeerConnection === 'undefined') {
-      return { rttMs: 0.8, delivered: true };
+      return { rttMs: 0, delivered: false };
     }
     return new Promise((resolvePromise) => {
       const t0 = performance.now();
@@ -473,7 +473,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
         } catch {}
         resolvePromise({ rttMs: Number(rtt.toFixed(2)), delivered: ok });
       };
-      const timeout = window.setTimeout(() => finish(performance.now() - t0, true), 1200);
+      const timeout = window.setTimeout(() => finish(performance.now() - t0, false), 1200);
 
       pc1.onicecandidate = (e) => {
         if (e.candidate) pc2.addIceCandidate(e.candidate).catch(() => {});
@@ -503,7 +503,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
         .then((answer) => pc2.setLocalDescription(answer).then(() => pc1.setRemoteDescription(answer)))
         .catch(() => {
           window.clearTimeout(timeout);
-          finish(performance.now() - t0, true);
+          finish(performance.now() - t0, false);
         });
     });
   };
@@ -544,7 +544,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
           valid: ver.valid,
           reason: ver.reason,
           verifyTimeMs: ver.verifyTimeMs,
-          webrtcRttMs: 1.4,
+          webrtcRttMs: null,
           transportUsed: 'WEBCRYPTO_ECDSA_P256 + LOCALSTORAGE_PERSISTED'
         });
       })
@@ -650,7 +650,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
       reason: ver.reason,
       verifyTimeMs: ver.verifyTimeMs,
       webrtcRttMs: rtc.rttMs,
-      transportUsed: 'WEBRTC_DATACHANNEL + BROADCAST_BUS + LOCALSTORAGE'
+      transportUsed: rtc.delivered ? 'WEBRTC_SAME_PAGE_LOOPBACK + BROADCAST_BUS + LOCALSTORAGE' : 'WEBRTC_LOOPBACK_NOT_CONFIRMED + BROADCAST_BUS + LOCALSTORAGE'
     });
   };
 
@@ -931,6 +931,11 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', marginTop: '0.6rem' }}>
+                  {item.id === 'F01-NLNET' ? (
+                    <p role="note" style={{ fontSize: '0.79rem', color: '#fde68a', lineHeight: 1.5 }}>
+                      NLnet (policy 20 October 2026): generative AI must not draft, translate, or edit the submitted proposal; AI-generated funded deliverables are not eligible. Verify eligibility and write independently. This is NOT an application submission.
+                    </p>
+                  ) : (
                   <button
                     type="button"
                     data-testid={`copy-chatgpt-${item.id}`}
@@ -940,6 +945,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
                   >
                     {copiedId === item.id ? c.copiedBadge : c.copyPromptBtn}
                   </button>
+                  )}
                   <a
                     href={item.portalUrl}
                     target="_blank"
