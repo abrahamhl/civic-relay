@@ -9,7 +9,7 @@
 
 | Scenario | Target Funding Source | Total Budget | Primary TRL Progression | Core Deliverable |
 |---|---|---|---|---|
-| **Scenario A — Lean Open-Source Validation** | NLnet / NGI Zero Commons Fund or RVO MIT Feasibility | **€50,000** (6–9 months) | **TRL 3.5 $\rightarrow$ TRL 4.5** | Two-phone physical validation (30+ trials), AOSP BLE/Wi-Fi Aware transport adapter, Ed25519 receipt signing, independent security audit. |
+| **Scenario A — Lean Open-Source Validation** | NLnet (Open Internet Stack — Restack / general call) or RVO MIT Feasibility | **€50,000** (6–9 months) | **TRL 3.5 $\rightarrow$ TRL 4.5** | Two-phone physical validation (30+ trials), AOSP BLE/Wi-Fi Aware transport adapter, Ed25519 receipt signing, independent security audit. |
 | **Scenario B — Institutional Pilot & Hardening** | Pre-Seed Impact / Deep-Tech Angel + RVO WBSO / MIT | **€180,000** (12 months) | **TRL 4 $\rightarrow$ TRL 6** | Multi-hop (3–5 node) persistent Android/iOS SDK, sandbox CAP 1.2 PKI verifier, municipal tabletop + 20-handset field exercise, DPIA & external pentest. |
 | **Scenario C — European Consortium Work Package** | Horizon Europe Cluster 3 (`DRS`) Partner Allocation | **€350,000 – €500,000** (18–24 months) | **TRL 4 $\rightarrow$ TRL 7** | Cross-border civil-protection interoperability, external edge gateway adapters (LoRa / municipal Wi-Fi / NTN testbed), standardized open-source reference suite. |
 
