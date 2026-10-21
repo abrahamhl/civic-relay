@@ -24,10 +24,7 @@ jobs:
           node-version: '22'
       - name: Install pinned site dependencies
         working-directory: investor-next
-        run: npm install --no-audit --no-fund
-      - name: Export npm exact-resolution lock for reproducible source control (temporary)
-        working-directory: investor-next
-        run: node -e "const fs=require('fs');console.log('OEP_LOCK_JSON_START'+JSON.stringify(fs.readFileSync('package-lock.json','utf8'))+'OEP_LOCK_JSON_END')"
+        run: npm ci --no-audit --no-fund
       - name: Production dependency vulnerabilities (high/critical are release blockers)
         working-directory: investor-next
         run: npm audit --omit=dev --audit-level=high
