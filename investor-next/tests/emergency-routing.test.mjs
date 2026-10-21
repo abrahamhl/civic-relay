@@ -47,3 +47,24 @@ test('no radio plus total outage cannot invent a local route',()=>{
    bluetooth:false,wifi:false,gateway:true,responses:5,helpRequests:1});
  assert.equal(r.summary.syntheticAcks,0);
 });
+test('offline to online transition and gateway recovery restore synthetic acknowledgments deterministically',()=>{
+ const totalOutage=runScenario({seed:9001,devices:50,participation:100,permissions:100,damaged:100,gateway:false,responses:10,helpRequests:4});
+ assert.equal(totalOutage.summary.syntheticAcks,0);
+ assert.equal(totalOutage.summary.queued,14);
+
+ const gatewayRestored=runScenario({seed:9001,devices:50,participation:100,permissions:100,damaged:100,gateway:true,responses:10,helpRequests:4});
+ assert.ok(gatewayRestored.summary.simulatedLocalGatewayAcks>0);
+ assert.equal(gatewayRestored.summary.syntheticAcks+gatewayRestored.summary.queued,14);
+
+ const cellularRestored=runScenario({seed:9001,devices:50,participation:100,permissions:100,damaged:0,gateway:false,responses:10,helpRequests:4});
+ assert.equal(cellularRestored.summary.cellularOnlyAcks,14);
+ assert.equal(cellularRestored.summary.syntheticAcks,14);
+ assert.equal(cellularRestored.summary.queued,0);
+});
+test('revoked relay permissions prevent multi-hop local gateway forwarding during cellular outage',()=>{
+ const noPermissions=runScenario({seed:9001,devices:50,participation:100,permissions:0,damaged:100,gateway:true,responses:8,helpRequests:2});
+ assert.equal(noPermissions.summary.permissioned,0);
+ assert.equal(noPermissions.summary.simulatedLocalGatewayAcks,0);
+ assert.equal(noPermissions.summary.syntheticAcks,0);
+ assert.equal(noPermissions.summary.queued,10);
+});

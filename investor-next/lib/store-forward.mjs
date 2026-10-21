@@ -23,7 +23,8 @@ function validate(input,now){
     throw Error('Invalid message lifetime');
   let detached;
   try{detached=json(payload);}catch{throw Error('Payload must be JSON serializable');}
-  if(detached===undefined||stable(detached).length>4096)throw Error('Invalid or oversized payload');
+  if(!detached||typeof detached!=='object'||Array.isArray(detached)||stable(detached).length>4096)
+    throw Error('Invalid or oversized payload');
   return {id,category,createdAt,ttlSeconds,consented:true,destination,payload:detached,
     provenance:'SYNTHETIC_EXERCISE_ONLY'};
 }

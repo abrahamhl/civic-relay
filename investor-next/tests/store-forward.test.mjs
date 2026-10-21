@@ -204,3 +204,70 @@ test('synthetic adapter receipt ledger is metadata-only',async()=>{
  await engine.dispatch('ONLY_METADATA');
  assert.deepEqual(adapter.getReceived(),[{id:'ONLY_METADATA',provenance:'SYNTHETIC_EXERCISE_ONLY'}]);
 });
+test('non-object payloads (null, array, primitive) are rejected',()=>{
+ const clock=lab(),engine=clock.engine();
+ for(const badPayload of [null,[1,2,3],'raw-string',42,true]){
+   assert.throws(()=>engine.enqueue(message('BAD_PAYLOAD',{payload:badPayload})),/Invalid or oversized payload/);
+ }
+});
+test('concurrent dispatch calls while inFlight do not double-send or double-increment attempts',async()=>{
+ const clock=lab(),engine=clock.engine(),adapter=createInMemoryAdapter();
+ let finish;
+ adapter.send=()=>new Promise(resolve=>{finish=resolve;});
+ engine.registerAdapter(adapter);
+ engine.enqueue(message('CONCURRENT_1'));
+ const first=engine.dispatch('CONCURRENT_1');
+ for(let i=0;i<10&&!finish;i++)await Promise.resolve();
+ assert.equal(typeof finish,'function');
+ const second=await engine.dispatch('CONCURRENT_1');
+ assert.equal(second.attempts,1);
+ finish({accepted:true,receipt:{kind:'SIMULATED_RECEIVER_RECEIPT',messageId:'CONCURRENT_1',transportId:'LAB_GATEWAY'}});
+ const done=await first;
+ assert.equal(done.status,'ACK_SYNTHETIC');
+ assert.equal(done.attempts,1);
+});
+test('cross-adapter receipt spoofing and unaccepted receipts cannot forge ACK_SYNTHETIC',async()=>{
+ const clock=lab(),engine=clock.engine();
+ const spoofed=createInMemoryAdapter({id:'LAB_PRIMARY'});
+ spoofed.send=async()=>({accepted:true,receipt:{
+  kind:'SIMULATED_RECEIVER_RECEIPT',messageId:'SPOOF_1',transportId:'LAB_OTHER_ADAPTER'}});
+ engine.registerAdapter(spoofed);
+ engine.enqueue(message('SPOOF_1'));
+ const r1=await engine.dispatch('SPOOF_1');
+ assert.equal(r1.status,'FORWARDED_UNCONFIRMED');
+ assert.equal(r1.receiptKind,null);
+
+ const unaccepted=createInMemoryAdapter({id:'LAB_REJECT'});
+ unaccepted.send=async()=>({accepted:false,receipt:{
+  kind:'SIMULATED_RECEIVER_RECEIPT',messageId:'SPOOF_2',transportId:'LAB_REJECT'}});
+ const engine2=clock.engine();
+ engine2.registerAdapter(unaccepted);
+ engine2.enqueue(message('SPOOF_2'));
+ const r2=await engine2.dispatch('SPOOF_2');
+ assert.equal(r2.status,'QUEUED');
+ assert.equal(r2.receiptKind,null);
+});
+test('REVOKED and EXHAUSTED tombstones reject message ID replay',async()=>{
+ const clock=lab(),engine=clock.engine({maxAttempts:1}),adapter=createInMemoryAdapter({failures:2});
+ engine.registerAdapter(adapter);
+ engine.enqueue(message('REVOKED_ID'));
+ engine.revoke('REVOKED_ID');
+ assert.throws(()=>engine.enqueue(message('REVOKED_ID')),/Terminal message ID/);
+
+ engine.enqueue(message('EXHAUSTED_ID'));
+ assert.equal((await engine.dispatch('EXHAUSTED_ID')).status,'EXHAUSTED');
+ assert.throws(()=>engine.enqueue(message('EXHAUSTED_ID')),/Terminal message ID/);
+});
+test('adapter describe() exception is isolated when a secondary healthy adapter is available',async()=>{
+ const clock=lab(),engine=clock.engine();
+ const broken=createInMemoryAdapter({id:'LAB_BROKEN'});
+ broken.describe=async()=>{throw Error('Simulated adapter description fault');};
+ const healthy=createInMemoryAdapter({id:'LAB_HEALTHY'});
+ engine.registerAdapter(broken);
+ engine.registerAdapter(healthy);
+ engine.enqueue(message('ISOLATED_1'));
+ const res=await engine.dispatch('ISOLATED_1');
+ assert.equal(res.status,'ACK_SYNTHETIC');
+ assert.equal(res.selectedTransport,'LAB_HEALTHY');
+ assert.ok(engine.audit().some(e=>e.event==='ADAPTER_DESCRIPTION_FAILED'&&e.detail==='LAB_BROKEN'));
+});
