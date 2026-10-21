@@ -8,6 +8,12 @@
 import assert from 'node:assert/strict';
 
 const BASE_URL = (process.env.SMOKE_BASE_URL || 'https://civic-relay-investor.vercel.app').replace(/\/$/, '');
+const EXPECTED_SOURCE_SHA = process.env.EXPECTED_SOURCE_SHA || '';
+const CANONICAL = 'https://civic-relay-investor.vercel.app';
+if (EXPECTED_SOURCE_SHA && !/^[a-f0-9]{40}$/i.test(EXPECTED_SOURCE_SHA)) {
+  throw new Error('EXPECTED_SOURCE_SHA must be a 40-character Git commit SHA');
+}
+
 
 const ROUTES = [
   {
@@ -46,17 +52,41 @@ async function run() {
   const results = [];
   for (const route of ROUTES) {
     const url = `${BASE_URL}${route.path}`;
-    const res = await fetch(url, { redirect: 'follow' });
+    const res = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(15000) });
     assert.equal(res.status, 200, `${url} returned HTTP ${res.status}`);
     const html = await res.text();
     for (const expected of route.expectedStrings) {
       assert.ok(html.includes(expected), `${url} missing expected string: ${expected}`);
     }
     assert.ok(/SIMULAT|SIMULACI|SIMULATIE/i.test(html), `${url} missing simulation disclosure`);
+    assert.match(html,new RegExp('<html[^>]*lang="'+route.locale+'"','i'),`${url} wrong document language`);
+    assert.ok(html.includes('rel="canonical"') && html.includes(CANONICAL),
+      `${url} missing the one canonical public origin`);
+    for(const lang of ['en','es','nl']){
+      assert.ok(html.includes('hrefLang="'+lang+'"'),`${url} missing hreflang ${lang}`);
+    }
+    assert.ok(!/https?:\\/\\/(?:civic-relay\\.vercel\\.app|civic-relay-pi\\.vercel\\.app)/i.test(
+      [...html.matchAll(/href="([^"]+)"/g)].map(m=>m[1]).join(' ')),`${url} links to legacy host`);
     results.push({ locale: route.locale, url, status: res.status, bytes: html.length });
     console.log(`PASS [${route.locale.toUpperCase()}] ${url} -> HTTP ${res.status} (${html.length} bytes)`);
   }
-  console.log(JSON.stringify({ ok: true, baseUrl: BASE_URL, checkedAt: new Date().toISOString(), routes: results }, null, 2));
+  let observedSha=null;
+  if(EXPECTED_SOURCE_SHA){
+    const proof=await fetch(BASE_URL+'/release-provenance.json',{
+      redirect:'follow',signal:AbortSignal.timeout(15000)
+    });
+    assert.equal(proof.status,200,'Public release provenance missing; not deploy-parity verified');
+    const payload=await proof.json();
+    assert.equal(payload.schema,'oep-public-build-provenance/v1');
+    assert.equal(payload.canonical,CANONICAL);
+    assert.equal(payload.physicalValidation,'NOT_PERFORMED');
+    observedSha=payload.sourceSha;
+    assert.equal(observedSha,EXPECTED_SOURCE_SHA.toLowerCase(),
+      'Live alias is not serving the expected release commit');
+  }
+  console.log(JSON.stringify({ ok: true, baseUrl: BASE_URL, checkedAt: new Date().toISOString(),
+    routes: results, sourceParity: EXPECTED_SOURCE_SHA ? 'MATCHED':'NOT_CHECKED',
+    expectedSha: EXPECTED_SOURCE_SHA || null,observedSha }, null, 2));
 }
 
 run().catch((err) => {
