@@ -65,9 +65,13 @@ async function run() {
     for(const lang of ['en','es','nl']){
       assert.ok(html.includes('hrefLang="'+lang+'"'),`${url} missing hreflang ${lang}`);
     }
-    const obsolete = [...html.matchAll(/href="([^"]+)"/g)].map(m=>m[1]).filter(h=>
-      h.startsWith('https://civic-relay.vercel.app') ||
-      h.startsWith('https://civic-relay-pi.vercel.app'));
+    const staleHosts = new Set(['civic-relay.vercel.app', 'civic-relay-pi.vercel.app']);
+    const obsolete = [...html.matchAll(/href="([^"]+)"/g)]
+      .map(match => match[1])
+      .filter(href => {
+        try {return staleHosts.has(new URL(href, BASE_URL).hostname);}
+        catch{return false;}
+      });
     assert.equal(obsolete.length,0,`${url} contains links to obsolete official hosts`);
     results.push({ locale: route.locale, url, status: res.status, bytes: html.length });
     console.log(`PASS [${route.locale.toUpperCase()}] ${url} -> HTTP ${res.status} (${html.length} bytes)`);
