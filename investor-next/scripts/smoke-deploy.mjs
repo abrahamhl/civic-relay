@@ -65,8 +65,10 @@ async function run() {
     for(const lang of ['en','es','nl']){
       assert.ok(html.includes('hrefLang="'+lang+'"'),`${url} missing hreflang ${lang}`);
     }
-    assert.ok(!/https?:\\/\\/(?:civic-relay\\.vercel\\.app|civic-relay-pi\\.vercel\\.app)/i.test(
-      [...html.matchAll(/href="([^"]+)"/g)].map(m=>m[1]).join(' ')),`${url} links to legacy host`);
+    const obsolete = [...html.matchAll(/href="([^"]+)"/g)].map(m=>m[1]).filter(h=>
+      h.startsWith('https://civic-relay.vercel.app') ||
+      h.startsWith('https://civic-relay-pi.vercel.app'));
+    assert.equal(obsolete.length,0,`${url} contains links to obsolete official hosts`);
     results.push({ locale: route.locale, url, status: res.status, bytes: html.length });
     console.log(`PASS [${route.locale.toUpperCase()}] ${url} -> HTTP ${res.status} (${html.length} bytes)`);
   }
