@@ -3,6 +3,7 @@ import ScrollExperience from './scroll-experience';
 import CrisisStory from './crisis-story';
 import CoordinationLab from './coordination-lab';
 import EvidenceBoard from './evidence-board';
+import TelecomAndRfRadarSuite from './telecom-rf-radar-suite';
 import {WhatItDoes,SystemExplained,DeveloperBlueprint} from './system-explained';
 import {routingPitch} from './routing-pitch';
 import {getCopy,labels,locales,type Locale} from './copy';
@@ -14,9 +15,9 @@ const funding='https://ec.europa.eu/info/funding-tenders/opportunities/portal/sc
 const dossier=source+'/blob/master/docs/README.md';
 const contact=source+'/issues/new?template=pilot-or-grant-partner.yml';
 const chapterNavigation:Record<Locale,Array<{href:string;label:string}>>={
- en:[{href:'#what-oep-does',label:'WHAT IT DOES'},{href:'#architecture',label:'THE 3D STORY'},{href:'#how-it-works',label:'HOW IT WORKS'},{href:'#routing-lab',label:'TRY THE LAB'},{href:'#developer-stack',label:'TECH STACK'},{href:'#evidence',label:'EVIDENCE'}],
- es:[{href:'#what-oep-does',label:'QUÉ HACE'},{href:'#architecture',label:'HISTORIA 3D'},{href:'#how-it-works',label:'CÓMO FUNCIONA'},{href:'#routing-lab',label:'PROBAR LAB'},{href:'#developer-stack',label:'TECNOLOGÍA'},{href:'#evidence',label:'EVIDENCIAS'}],
- nl:[{href:'#what-oep-does',label:'WAT HET DOET'},{href:'#architecture',label:'3D-VERHAAL'},{href:'#how-it-works',label:'WERKING'},{href:'#routing-lab',label:'LAB PROBEREN'},{href:'#developer-stack',label:'TECHNIEK'},{href:'#evidence',label:'BEWIJS'}]
+ en:[{href:'#what-oep-does',label:'WHAT IT DOES'},{href:'#telecom-rf-radar-suite',label:'TODAY VS OEP & RF RADAR'},{href:'#architecture',label:'THE 3D STORY'},{href:'#how-it-works',label:'HOW IT WORKS'},{href:'#routing-lab',label:'TRY THE LAB'},{href:'#developer-stack',label:'TECH STACK'},{href:'#evidence',label:'EVIDENCE'}],
+ es:[{href:'#what-oep-does',label:'QUÉ HACE'},{href:'#telecom-rf-radar-suite',label:'HOY VS OEP Y RADAR RF'},{href:'#architecture',label:'HISTORIA 3D'},{href:'#how-it-works',label:'CÓMO FUNCIONA'},{href:'#routing-lab',label:'PROBAR LAB'},{href:'#developer-stack',label:'TECNOLOGÍA'},{href:'#evidence',label:'EVIDENCIAS'}],
+ nl:[{href:'#what-oep-does',label:'WAT HET DOET'},{href:'#telecom-rf-radar-suite',label:'NU VS OEP & RF-RADAR'},{href:'#architecture',label:'3D-VERHAAL'},{href:'#how-it-works',label:'WERKING'},{href:'#routing-lab',label:'LAB PROBEREN'},{href:'#developer-stack',label:'TECHNIEK'},{href:'#evidence',label:'BEWIJS'}]
 };
 
 export default function InvestorPage({locale}:{locale:Locale}){
@@ -28,7 +29,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
   <header className="topbar container">
    <a className="wordmark" href="#top" aria-label="OEP — Offline Emergency Protocol"><span className="mark-symbol"><span/><span/><span/></span><span className="new-project-name">OEP — Offline Emergency Protocol</span></a>
    <div className="topbar-center"><span className="pulse"/><span>EUROPEAN CIVIL RESILIENCE</span><span className="topbar-year">/ 2026</span></div>
-   <nav aria-label={t.nav.language}><a href="#story">{t.nav.experience}</a><a href="#how-it-works">{locale==='es'?'CÓMO FUNCIONA':locale==='nl'?'WERKING':'HOW IT WORKS'}</a><a href="#solution">{t.nav.solution}</a><a href="#investment">{t.nav.invest}</a><a className="topbar-source" href={source} target="_blank" rel="noopener noreferrer">{t.nav.source} ↗</a></nav>
+   <nav aria-label={t.nav.language}><a href="#story">{t.nav.experience}</a><a href="#telecom-rf-radar-suite">{locale==='es'?'HOY VS OEP Y RADAR RF':locale==='nl'?'NU VS OEP & RF-RADAR':'TODAY VS OEP & RF RADAR'}</a><a href="#how-it-works">{locale==='es'?'CÓMO FUNCIONA':locale==='nl'?'WERKING':'HOW IT WORKS'}</a><a href="#solution">{t.nav.solution}</a><a href="#investment">{t.nav.invest}</a><a className="topbar-source" href={source} target="_blank" rel="noopener noreferrer">{t.nav.source} ↗</a></nav>
    <div className="locale-links" role="group" aria-label={t.nav.language}>
     {locales.map(l=><a key={l} href={l==='en'?'/':'/'+l+'/'} hrefLang={l} lang={l} aria-label={labels[l]} aria-current={locale===l?'page':undefined} className={locale===l?'active':''}>{l.toUpperCase()}</a>)}
    </div>
@@ -39,7 +40,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
     <h1>{t.hero.first}<br/><span className="heading-muted">{t.hero.middle}</span><br/><span className="heading-urgent">{t.hero.last}</span></h1>
     <div className="hero-divider"><span>{t.hero.line}</span><span>↓</span></div>
     <p className="hero-lede">{t.hero.desc} <strong>{pitch.promise}</strong></p>
-    <div className="hero-actions"><a className="button-primary" href="#story">{t.hero.action} <span>↘</span></a><a className="button-outline" href="#routing-lab">{t.hero.demo} <span>↘</span></a></div>
+    <div className="hero-actions"><a className="button-primary" href="#telecom-rf-radar-suite">{t.hero.action} <span>↘</span></a><a className="button-outline" href="#routing-lab">{t.hero.demo} <span>↘</span></a></div>
     <div className="proof-rail"><div><span className="proof-circle"/>{t.hero.proof}</div><div>{t.hero.gap}</div><div className="prototype-warning">{t.hero.note}</div></div>
    </div>
    <MissionControl locale={locale}/>
@@ -51,6 +52,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
    </div>
   </nav>
   <WhatItDoes locale={locale}/>
+  <TelecomAndRfRadarSuite locale={locale}/>
   <CrisisStory locale={locale}/>
   <ScrollExperience locale={locale}/>
   <SystemExplained locale={locale}/>
