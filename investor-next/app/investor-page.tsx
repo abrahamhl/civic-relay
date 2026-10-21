@@ -13,6 +13,11 @@ const source='https://github.com/abrahamhl/civic-relay';
 const funding='https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-CL3-2026-01-SSRI-04';
 const dossier=source+'/blob/feat/master-emergency-routing-v1-20261020/docs/MASTER_EMERGENCY_ROUTING_2026.md';
 const contact=source+'/issues/new';
+const chapterNavigation:Record<Locale,Array<{href:string;label:string}>>={
+ en:[{href:'#what-oep-does',label:'WHAT IT DOES'},{href:'#architecture',label:'THE 3D STORY'},{href:'#how-it-works',label:'HOW IT WORKS'},{href:'#routing-lab',label:'TRY THE LAB'},{href:'#developer-stack',label:'TECH STACK'},{href:'#evidence',label:'EVIDENCE'}],
+ es:[{href:'#what-oep-does',label:'QUÉ HACE'},{href:'#architecture',label:'HISTORIA 3D'},{href:'#how-it-works',label:'CÓMO FUNCIONA'},{href:'#routing-lab',label:'PROBAR LAB'},{href:'#developer-stack',label:'TECNOLOGÍA'},{href:'#evidence',label:'EVIDENCIAS'}],
+ nl:[{href:'#what-oep-does',label:'WAT HET DOET'},{href:'#architecture',label:'3D-VERHAAL'},{href:'#how-it-works',label:'WERKING'},{href:'#routing-lab',label:'LAB PROBEREN'},{href:'#developer-stack',label:'TECHNIEK'},{href:'#evidence',label:'BEWIJS'}]
+};
 
 export default function InvestorPage({locale}:{locale:Locale}){
  const t=getCopy(locale);
@@ -40,6 +45,11 @@ export default function InvestorPage({locale}:{locale:Locale}){
    <MissionControl locale={locale}/>
   </section>
   <div className="ribbon"><div className="container ribbon-inner"><span>OEP / INTEROPERABLE OFFLINE EMERGENCY COORDINATION</span><strong>{t.hero.line}</strong><span>2026 / OPEN SOURCE R&D</span></div></div>
+  <nav className="oep-chapter-nav" aria-label={locale==='es'?'Recorrer el protocolo':locale==='nl'?'Verken het protocol':'Explore the protocol'}>
+   <div className="container oep-chapter-nav-inner">
+    {chapterNavigation[locale].map((item,i)=><a href={item.href} key={item.href}><span>{String(i+1).padStart(2,'0')}</span>{item.label}</a>)}
+   </div>
+  </nav>
   <WhatItDoes locale={locale}/>
   <CrisisStory locale={locale}/>
   <ScrollExperience locale={locale}/>
