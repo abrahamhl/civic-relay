@@ -1,0 +1,48 @@
+name: Browser release QA (real Chromium, synthetic website only)
+permissions:
+  contents: read
+on:
+  pull_request:
+    paths:
+      - 'investor-next/**'
+      - '.github/workflows/browser-release-qa.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'investor-next/**'
+      - '.github/workflows/browser-release-qa.yml'
+jobs:
+  trilingual-browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install static-site dependencies
+        working-directory: investor-next
+        run: npm install --no-audit --no-fund
+      - name: Verify real release build and languages
+        working-directory: investor-next
+        run: |
+          npm run build
+          npm run check:locales
+      - name: Install pinned Playwright in CI only
+        working-directory: investor-next
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.63.0
+          npx playwright install chromium
+      - name: Execute three real Chromium journeys and record screenshot proof
+        working-directory: investor-next
+        run: node scripts/browser-release-smoke.mjs
+      - name: Upload real browser observations (PASS or FAIL)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oep-browser-release-qa
+          path: evidence/browser-release/
+          if-no-files-found: warn
+          retention-days: 14
