@@ -442,8 +442,9 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
   });
 
   // Live WebAudio FFT Acoustic Spectrum state
-  const [fftBins, setFftBins] = useState<number[]>(Array.from({ length: 32 }, () => 8));
+  const [fftBins, setFftBins] = useState<number[]>(Array.from({ length: 32 }, () => 0));
   const [micActive, setMicActive] = useState(false);
+  const [micError, setMicError] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -563,8 +564,8 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
             valid: ver.valid,
             reason: ver.reason,
             verifyTimeMs: ver.verifyTimeMs,
-            webrtcRttMs: Number(Math.max(0.4, Date.now() - incoming.timestampMs).toFixed(2)),
-            transportUsed: 'LIVE_CROSS_TAB_BROADCAST_CHANNEL_P2P'
+            webrtcRttMs: null,
+            transportUsed: 'BROADCAST_CHANNEL_SAME_ORIGIN_CONTEXT_ONLY'
           });
         }
       };
@@ -676,6 +677,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
       return;
     }
     try {
+      setMicError(false);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
       micStreamRef.current = stream;
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -694,9 +696,10 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
       };
       loop();
     } catch {
-      // Fallback oscillator FFT in case microphone permission is denied
-      setMicActive(true);
-      setFftBins(Array.from({ length: 32 }, (_, i) => Math.round(25 + 60 * Math.abs(Math.sin(i * 0.35)))));
+      // Fail closed: never show fabricated data as real microphone spectrum.
+      setMicActive(false);
+      setMicError(true);
+      setFftBins(Array.from({ length: 32 }, () => 0));
     }
   };
 
@@ -742,7 +745,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
                 <strong>{keyInfo ? keyInfo.fingerprint : '...'}</strong>
               </div>
               <div className="oep-ts-kpi">
-                <span>WebRTC P2P RTT</span>
+                <span>WebRTC same-page loopback RTT (lab only)</span>
                 <strong style={{ color: '#38bdf8' }}>
                   {verifyState?.webrtcRttMs != null ? `${verifyState.webrtcRttMs} ms` : '—'}
                 </strong>
@@ -841,6 +844,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
               {micActive ? c.micBtnStop : c.micBtnStart}
             </button>
 
+            {micError && <p role="alert" style={{ color: '#fde68a', marginBottom: '0.75rem' }}>{locale === 'es' ? 'Micrófono no disponible o permiso denegado. No se muestra ninguna lectura sintética.' : locale === 'nl' ? 'Microfoon niet beschikbaar of toestemming geweigerd. Geen synthetische meting getoond.' : 'Microphone unavailable or permission denied. No synthetic reading is displayed.'}</p>}
             <div
               style={{
                 display: 'flex',
