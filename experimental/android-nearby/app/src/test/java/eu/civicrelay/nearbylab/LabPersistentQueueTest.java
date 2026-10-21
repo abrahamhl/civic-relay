@@ -50,11 +50,38 @@ public final class LabPersistentQueueTest {
             }
             check(replayRejected, "Tombstone must reject replay after restart");
 
+            // Expired payloads must be flushed even when API exits early or throws.
+            Path expiryFile = tmpDir.resolve("expiry.tsv");
+            for (int branch = 0; branch < 3; branch++) {
+                Files.deleteIfExists(expiryFile);
+                LabPersistentQueue expiring = new LabPersistentQueue(expiryFile, 1000L);
+                expiring.enqueue(ID1, "SAFE", "SYNTHETIC_EXPIRED_SECRET", 1000L, 1000L);
+                if (branch == 0) {
+                    check(expiring.markAckVerified(ID1, 2500L).status == LabPersistentQueue.Status.EXPIRED,
+                        "Late ACK must not revive expired payload");
+                } else if (branch == 1) {
+                    boolean denied = false;
+                    try { expiring.enqueue(ID1, "SAFE", "REPLAY", 2500L, 1000L); }
+                    catch (IllegalStateException expected) { denied = true; }
+                    check(denied, "Expired UUID replay must be rejected");
+                } else {
+                    check(expiring.revoke(ID2, 2500L) == null, "Unknown revoke remains a no-op");
+                }
+                check(!Files.readString(expiryFile).contains("SYNTHETIC_EXPIRED_SECRET"),
+                    "Expiry must remove plaintext from persistent storage on every early exit");
+            }
+            Files.deleteIfExists(expiryFile);
+
+            // An interrupted write can leave a second plaintext queue copy.
+            Path staleTmp = file.resolveSibling(file.getFileName().toString() + ".tmp");
+            Files.writeString(staleTmp, "SYNTHETIC_STALE_PAYLOAD");
             q3.purgeAll();
             check(!Files.exists(file), "purgeAll must delete backing file");
+            check(!Files.exists(staleTmp), "purgeAll must delete interrupted-write temporary file");
             System.out.println("LabPersistentQueueTest PASS (" + assertions + " assertions)");
         } finally {
             Files.deleteIfExists(file);
+            Files.deleteIfExists(file.resolveSibling(file.getFileName().toString() + ".tmp"));
             Files.deleteIfExists(tmpDir);
         }
     }

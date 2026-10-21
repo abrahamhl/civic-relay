@@ -59,7 +59,7 @@ public final class LabPersistentQueue {
         if (ttlMs < 1000L || ttlMs > 86400000L) {
             throw new IllegalArgumentException("Invalid TTL");
         }
-        expireDue(nowMs);
+        if (expireDue(nowMs)) persistToDisk();
         Record existing = records.get(id);
         if (existing != null) {
             if (existing.status != Status.QUEUED) {
@@ -77,7 +77,7 @@ public final class LabPersistentQueue {
     }
 
     public synchronized Record markAckVerified(String id, long nowMs) throws IOException {
-        expireDue(nowMs);
+        if (expireDue(nowMs)) persistToDisk();
         Record r = records.get(id);
         if (r == null) throw new IllegalArgumentException("Unknown message ID");
         if (r.status != Status.QUEUED) return r;
@@ -88,7 +88,7 @@ public final class LabPersistentQueue {
     }
 
     public synchronized Record revoke(String id, long nowMs) throws IOException {
-        expireDue(nowMs);
+        if (expireDue(nowMs)) persistToDisk();
         Record r = records.get(id);
         if (r == null) return null;
         Record updated = new Record(r.id, r.category, r.createdAtMs, r.expiresAtMs, Status.REVOKED, "");
@@ -104,7 +104,16 @@ public final class LabPersistentQueue {
 
     public synchronized void purgeAll() throws IOException {
         records.clear();
-        Files.deleteIfExists(storagePath);
+        Path tmp = storagePath.resolveSibling(storagePath.getFileName().toString() + ".tmp");
+        IOException failure = null;
+        try { Files.deleteIfExists(storagePath); }
+        catch (IOException ex) { failure = ex; }
+        try { Files.deleteIfExists(tmp); }
+        catch (IOException ex) {
+            if (failure == null) failure = ex;
+            else failure.addSuppressed(ex);
+        }
+        if (failure != null) throw failure;
     }
 
     private boolean expireDue(long nowMs) {
