@@ -1,4 +1,15 @@
 # Civic Relay — Engineering status / investor truth gate
+## RELEASE HARDENING — 22 October 2026 / PR #9
+
+**Scope:** [PR #9](https://github.com/abrahamhl/civic-relay/pull/9) addresses **two previously reproducible gaps** found after PR #8 merged. These changes are not automatically evidence of a deployed production release.
+
+1. **Nondeterministic build dependency graph:** `investor-next/package-lock.json` was missing while three GitHub workflows used `npm install`. A real clean GitHub Actions install produced a 36,515-byte npm lock v3 (70 packages, `next@16.4.2`), which is now tracked. CI switches to `npm ci` to abort on lock mismatch. The bootstrap logging step was removed after committing the lock.
+2. **Misstated ephemeral key lifecycle:** Android `LabReceiptSigner` was a `final` Activity field: STOP revoked the peer map but the ECDSA signer remained reusable within the same Activity. PR #9 regenerates the key after explicit STOP and disconnected peers; JVM tests prove the old signature does not verify under the next session public key. **No phone-to-phone cryptographic interoperability has yet been validated.**
+3. **STOP erasure warning hidden:** the Activity previously logged disk deletion errors and then cleared the same UI, potentially hiding the failure. The new order preserves a visible fail-closed warning and blocks further sends.
+4. **Release parity gap:** the production host served a correctly localised **older Vercel preview** rather than the latest GitHub master source. The build now emits a public `release-provenance.json` with its exact source SHA (not a signed attestation), and `smoke:deploy` can enforce `EXPECTED_SOURCE_SHA` against the actual host. The environment must supply/build a real SHA for a *production* parity PASS. Absence of the proof or mismatch fails closed if parity is requested.
+
+**Critical remaining distinction:** the source-level fixes, CI tests and the deployable static artefact are different from live release. Check [release issue #6](https://github.com/abrahamhl/civic-relay/issues/6) before treating the website as published at the latest SHA. The **overall TRL remains approximately 3**; working offline radio hardware is still unmeasured.
+
 ## PRE-PILOT ENGINEERING ASSESSMENT — 22 October 2026 (PR #8)
 
 **Current merged scope:** [PR #8](https://github.com/abrahamhl/civic-relay/pull/8) was **merged into `master`** as [`159796d74ce6e0989b41940987d5c0163555c3fb`](https://github.com/abrahamhl/civic-relay/commit/159796d74ce6e0989b41940987d5c0163555c3fb). The exact pre-merge source SHA `455d34a682ddd898865689af33e708e7e4bc3af9` passed **5/5 GitHub Actions** including Android build/JVM, SCA/SBOM and eight actual Chromium QA tasks. This is machine-tested source, not physical delivery.

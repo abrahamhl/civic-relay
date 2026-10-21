@@ -73,7 +73,8 @@ public final class MainActivity extends Activity {
     private volatile long sendStartedElapsed = 0L;
     private volatile String activeTrialId = null;
     private final LabTrialJournal journal = new LabTrialJournal();
-    private final LabReceiptSigner receiptSigner = new LabReceiptSigner();
+    // Never reuse a signing identity after STOP, peer disconnect, or consent revocation.
+    private volatile LabReceiptSigner receiptSigner = new LabReceiptSigner();
     private final Map<String,String> pinnedPeerKeys = Collections.synchronizedMap(new HashMap<>());
     private LabPersistentQueue durableQueue = null;
     private volatile boolean durableQueueHealthy = false;
@@ -337,6 +338,7 @@ public final class MainActivity extends Activity {
             if (endpointId.equals(connectedPeer)) {
                 connected = false;connectedPeer = null;approvedPeers.remove(endpointId);
                 pinnedPeerKeys.remove(endpointId);
+                receiptSigner = new LabReceiptSigner();
                 finishTrial(activeTrialId, "DISCONNECTED");
                 deliveryGuard.reset();
                 outgoingPayloads.clear();
@@ -559,28 +561,33 @@ public final class MainActivity extends Activity {
         deliveryGuard.reset();
         approvedPeers.clear();
         pinnedPeerKeys.clear();
+        receiptSigner = new LabReceiptSigner(); // New opt-in must establish fresh ephemeral key material.
         outgoingPayloads.clear();
         activeTrialId = null;
         sendStartedElapsed = 0L;
         if (pendingExpiryTask != null) foregroundTimer.removeCallbacks(pendingExpiryTask);
         pendingExpiryTask = null;
         journal.clear();
-        // On STOP and on backgrounding, revoke consent and delete the lab's
-        // own file. A crashed process may leave synthetic data, never auto-send it.
+        if (output != null) output.setText("");
+        // A revocation failure is not a successful erasure. Keep sending blocked
+        // and surface the failure *after* the UI is cleared, never hide the warning.
+        boolean eraseSucceeded = false;
         try {
             if (durableQueue != null) durableQueue.purgeAll();
             else Files.deleteIfExists(labQueuePath());
             durableQueue = new LabPersistentQueue(labQueuePath(), System.currentTimeMillis());
             durableQueueHealthy = true;
+            eraseSucceeded = true;
         } catch (IOException error) {
             durableQueueHealthy = false;
-            log("P0 STORAGE ERROR: STOP could not erase lab file; check app storage manually.");
+            durableQueue = null;
         }
-        if (output != null) output.setText("");
         connections.stopAdvertising();
         connections.stopDiscovery();
         connections.stopAllEndpoints();
-        log("Local lab stopped; consent and message identifiers cleared.");
+        if (eraseSucceeded) log("Local lab stopped; consent and message identifiers cleared.");
+        else log("P0 STORAGE ERROR: STOPPED, but disk erasure failed. " +
+            "SENDING DISABLED. Manually clear application storage.");
     }
     @Override protected void onStop() {
         super.onStop();

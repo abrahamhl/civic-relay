@@ -45,6 +45,16 @@ public final class LabReceiptSignerTest {
         check(!LabReceiptSigner.verifyReceipt(attacker.publicKeyBase64(), MSG_ID, CHALLENGE,
             "PEER_A", 1700000000000L, sig), "Substituted session key rejected");
 
+        // This models STOP/disconnect key rotation: old sender receipts may not
+        // authenticate against a freshly generated session-pinned public key.
+        LabReceiptSigner afterStop = new LabReceiptSigner();
+        check(!pub.equals(afterStop.publicKeyBase64()), "STOP session must not reuse the previous signing key");
+        check(!LabReceiptSigner.verifyReceipt(afterStop.publicKeyBase64(), MSG_ID, CHALLENGE,
+            "PEER_A", 1700000000000L, sig), "Old receipt must fail with next session key");
+        String renewedSig = afterStop.signReceipt(MSG_ID, CHALLENGE, "PEER_A", 1700000000001L);
+        check(LabReceiptSigner.verifyReceipt(afterStop.publicKeyBase64(), MSG_ID, CHALLENGE,
+            "PEER_A", 1700000000001L, renewedSig), "Rotated session key must verify its own receipt");
+
         System.out.println("LabReceiptSignerTest PASS (" + assertions + " assertions)");
     }
 }

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/finalize-locales.mjs",
+    "build": "node scripts/write-release-proof.mjs && next build && node scripts/finalize-locales.mjs",
     "start": "next start",
     "type-check": "tsc --noEmit",
     "check:locales": "node test-locales.mjs",

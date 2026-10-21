@@ -24,7 +24,7 @@ jobs:
           node-version: '22'
       - name: Install static-site dependencies
         working-directory: investor-next
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Verify real release build and languages
         working-directory: investor-next
         run: |
