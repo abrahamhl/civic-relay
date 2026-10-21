@@ -12,7 +12,7 @@
 
 | Package | Declared Version | Scope | License | Purpose |
 |---|---|---|---|---|
-| `next` | `16.3.6` | dependencies | MIT | Static export (`/`, `/es`, `/nl`) |
+| `next` | `16.4.2` | dependencies | MIT | Static export (`/`, `/es`, `/nl`) |
 | `react` | `19.2.0` | dependencies | MIT | UI rendering |
 | `react-dom` | `19.2.0` | dependencies | MIT | DOM rendering / static HTML |
 | `three` | `0.180.0` | dependencies | MIT | Scroll globe and 3D building scene |
@@ -57,3 +57,9 @@ Note: third-party actions in civic-relay workflows are pinned by tag (`@v4`), no
 
 - `.gitignore` excludes `.env*`, `.vercel`, `node_modules/`, `dist/`, `out/`, `.next/`, `docs/internal/`.
 - No automated secret scanner (gitleaks/trufflehog) is wired into civic-relay CI yet; adding one is a recommended follow-up.
+
+## Security update — 22 October 2026 (PR #8)
+
+The new CI vulnerability gate `npm audit --omit=dev --audit-level=high` flagged `next@16.3.6` as affected by high-severity GitHub advisories (including `GHSA-3w37-wq28-93x7`, `GHSA-mcj8-r9mp-w47p` and `GHSA-cjq9-62q9-8jv4`). The audit recommended `next@16.4.2` as the patched version. We updated the direct pinned dependency to that version. **This is not marked remediated until the same check is green on the final PR SHA.** The workflow also generates a CycloneDX SBOM artefact for the actual installed production dependency graph.
+
+The repository currently lacks a committed `investor-next/package-lock.json`; direct dependencies are pinned but npm transitive resolution is not yet provably immutable. A reviewed, committed lockfile with `npm ci` is a separate reproducibility gate, not silently claimed complete.
