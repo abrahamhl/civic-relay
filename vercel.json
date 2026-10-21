@@ -70,8 +70,8 @@
   ],
   "redirects": [
     {
-      "source": "/home",
-      "destination": "/",
+      "source": "/:path*",
+      "destination": "https://civic-relay-investor.vercel.app/:path*",
       "permanent": true
     }
   ],
