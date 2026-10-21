@@ -553,7 +553,7 @@ const suiteCopy: Record<
     authBanner:
       'ONDERZOEKSDEMO: D2D-routering, satellietverbindingen en RF/CSI-radar zijn softwaresimulaties. De browser zendt geen satelliet-RF uit en leest geen echte Wi-Fi CSI. Fysieke proeven, bevoegde integratie en onafhankelijke validatie zijn vereist.',
     casesEyebrow: '01 / OPERATIONELE VERGELIJKING IN ECHTE SCENARIO’S',
-    casesTitle: 'Hypothetische scenario's: uitdaging versus gesimuleerde OEP-reactie',
+    casesTitle: 'Hypothetische situaties: uitdaging versus gesimuleerde OEP-reactie',
     todayTag: 'NU (ZONDER OEP · TRADITIONELE UITVAL)',
     oepTag: 'MET OEP (HYPOTHETISCH · GESIMULEERD)',
     loadPresetBtn: 'LAAD DIT SCENARIO IN DE SATELLIET-, ZONE- & RF-RADARCONSOLES ↓',
