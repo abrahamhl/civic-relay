@@ -73,6 +73,8 @@ public final class MainActivity extends Activity {
     private volatile long sendStartedElapsed = 0L;
     private volatile String activeTrialId = null;
     private final LabTrialJournal journal = new LabTrialJournal();
+    private final LabReceiptSigner receiptSigner = new LabReceiptSigner();
+    private final Map<String,String> pinnedPeerKeys = Collections.synchronizedMap(new HashMap<>());
     private LabPersistentQueue durableQueue = null;
     private volatile boolean durableQueueHealthy = false;
     private final Handler foregroundTimer = new Handler(Looper.getMainLooper());
@@ -323,7 +325,15 @@ public final class MainActivity extends Activity {
                 connectedPeer = endpointId;
                 connections.stopAdvertising();
                 connections.stopDiscovery();
-                log("LINK CONNECTED (manually verified peer). NOT a delivered-message receipt.");
+                log("LINK CONNECTED (manual digits checked). Awaiting ECDSA session-key exchange.");
+                try {
+                    JSONObject hello = new JSONObject().put("v", 3).put("type", "LAB_KEY_HELLO")
+                        .put("publicKey", receiptSigner.publicKeyBase64());
+                    sendPacket(endpointId, hello);
+                } catch (JSONException failure) {
+                    connections.disconnectFromEndpoint(endpointId);
+                    log("ECDSA key exchange failed; peer connection closed.");
+                }
             } else {
                 approvedPeers.remove(endpointId);
                 connections.disconnectFromEndpoint(endpointId);
@@ -333,6 +343,7 @@ public final class MainActivity extends Activity {
         @Override public void onDisconnected(String endpointId) {
             if (endpointId.equals(connectedPeer)) {
                 connected = false;connectedPeer = null;approvedPeers.remove(endpointId);
+                pinnedPeerKeys.remove(endpointId);
                 finishTrial(activeTrialId, "DISCONNECTED");
                 deliveryGuard.reset();
                 outgoingPayloads.clear();
@@ -392,12 +403,15 @@ public final class MainActivity extends Activity {
         if (!durableQueueHealthy || durableQueue == null) {
             log("DENIED: damaged/unavailable lab store; no sending."); return;
         }
+        if (!pinnedPeerKeys.containsKey(connectedPeer)) {
+            log("DENIED: receiver ECDSA session key not yet bound to manual-digit-verified peer."); return;
+        }
         try {
             String id = UUID.randomUUID().toString();
             String challenge = UUID.randomUUID().toString(); // Echo proof for this packet only.
             long deadline = now + TTL_MILLIS;
             JSONObject packet = new JSONObject()
-                .put("v", 2).put("type", "LAB_MESSAGE").put("id", id)
+                .put("v", 3).put("type", "LAB_MESSAGE").put("id", id)
                 .put("challenge", challenge).put("expiresAt", deadline)
                 .put("body", "SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS");
             if (!deliveryGuard.beginOutgoing(id, connectedPeer, challenge, now, deadline)) {
@@ -422,13 +436,27 @@ public final class MainActivity extends Activity {
                 payload.asBytes().length > MAX_BYTES) return;
             try {
                 JSONObject packet = new JSONObject(new String(payload.asBytes(), StandardCharsets.UTF_8));
-                if (packet.optInt("v") != 2) return; // Reject incompatible pilot protocol versions.
+                if (packet.optInt("v") != 3) return; // Reject old unsigned v2 ACKs.
                 String type = packet.optString("type");
+                if ("LAB_KEY_HELLO".equals(type)) {
+                    String candidate = packet.optString("publicKey");
+                    if (candidate.length() > 512 || !LabReceiptSigner.isSupportedPublicKey(candidate)) {
+                        log("Rejected malformed ECDSA key."); return;
+                    }
+                    String previous = pinnedPeerKeys.putIfAbsent(endpointId, candidate);
+                    if (previous != null && !previous.equals(candidate)) {
+                        log("P0: session peer key changed. Disconnecting and revoking consent.");
+                        stopAndClear(); return;
+                    }
+                    log("ECDSA key bound to manually verified Nearby session (not institutional identity).");
+                    return;
+                }
                 String id = packet.optString("id");
                 String challenge = packet.optString("challenge");
                 if (!LabDeliveryGuard.validId(id) ||
                     !LabDeliveryGuard.validId(challenge)) return;
                 if ("LAB_MESSAGE".equals(type)) {
+                    if (!pinnedPeerKeys.containsKey(endpointId)) return;
                     if (!"SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS".equals(packet.optString("body"))) return;
                     long expires = packet.optLong("expiresAt", 0L);
                     LabDeliveryGuard.IncomingState seen = deliveryGuard.acceptIncoming(
@@ -438,11 +466,24 @@ public final class MainActivity extends Activity {
                     }
                     if (seen == LabDeliveryGuard.IncomingState.NEW)
                         log("LAB MESSAGE RECEIVED; bounded duplicate guard active.");
+                    long issuedAtMs = System.currentTimeMillis();
                     JSONObject receipt = new JSONObject()
-                        .put("v", 2).put("type", "LAB_RECEIPT").put("id", id)
-                        .put("challenge", challenge);
+                        .put("v", 3).put("type", "LAB_RECEIPT").put("id", id)
+                        .put("challenge", challenge).put("issuedAtMs", issuedAtMs)
+                        .put("signature", receiptSigner.signReceipt(id, challenge, SERVICE_ID, issuedAtMs));
                     sendPacket(endpointId, receipt);
                 } else if ("LAB_RECEIPT".equals(type)) {
+                    String pinnedKey = pinnedPeerKeys.get(endpointId);
+                    long issuedAt = packet.optLong("issuedAtMs", 0L);
+                    long receiptNow = System.currentTimeMillis();
+                    if (pinnedKey == null || issuedAt <= 0L || issuedAt > receiptNow + 30000L ||
+                        issuedAt < receiptNow - TTL_MILLIS ||
+                        !LabReceiptSigner.verifyReceipt(pinnedKey, id, challenge,
+                            SERVICE_ID, issuedAt, packet.optString("signature"))) {
+                        log("P0 REJECTED: receiver ECDSA proof invalid or no session key.");
+                        return;
+                    }
+                    // Ephemeral key bound to a manually approved Nearby session; NOT PKI identity.
                     // Guard against wall-clock changes: accept only within the sender's monotonic TTL.
                     if (id.equals(activeTrialId) && sendStartedElapsed > 0L &&
                         LabDeadlinePolicy.elapsedTtlReached(
@@ -510,6 +551,7 @@ public final class MainActivity extends Activity {
         waitingRole = null;
         deliveryGuard.reset();
         approvedPeers.clear();
+        pinnedPeerKeys.clear();
         outgoingPayloads.clear();
         activeTrialId = null;
         sendStartedElapsed = 0L;
