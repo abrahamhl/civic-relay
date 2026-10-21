@@ -1,6 +1,8 @@
 package eu.civicrelay.nearbylab;
 
 import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -52,6 +54,38 @@ public final class LabPersistentQueueTest {
 
             q3.purgeAll();
             check(!Files.exists(file), "purgeAll must delete backing file");
+
+            // Regression: a corrupted queue must fail CLOSED, never silently skip bad
+            // rows or recreate a plausible receipt history.
+            String validRow = ID1 + "\tSOS_EXPLICIT\t1000\t6000\tQUEUED\tLAB_PAYLOAD_1\n";
+            String header = "# OEP LAB PERSISTENT QUEUE V1\n";
+            String[] corruptions = {
+                "not a queue\n" + validRow,
+                header + "TRUNCATED_ROW\n",
+                header + ID1 + "\tSOS_EXPLICIT\tnot-a-number\t6000\tQUEUED\tLAB_PAYLOAD_1\n",
+                header + validRow + validRow,
+                header + ID1 + "\tSOS_EXPLICIT\t1000\t6000\tACK_VERIFIED\tREVIVED_PAYLOAD\n",
+                header + ID1 + "\tSOS_EXPLICIT\t6000\t1000\tQUEUED\tLAB_PAYLOAD_1\n",
+                header + ID1 + "\tSOS_EXPLICIT\t1000\t6000\tQUEUED\t\n"
+            };
+            for (String corrupted : corruptions) {
+                Files.write(file, corrupted.getBytes(StandardCharsets.UTF_8));
+                boolean rejected = false;
+                try {
+                    new LabPersistentQueue(file, 2000L);
+                } catch (IOException expected) {
+                    rejected = true;
+                }
+                check(rejected, "Corrupted file must prevent rehydration");
+            }
+            // Reopen a valid queue after a corrupted file has been explicitly cleared.
+            Files.deleteIfExists(file);
+            LabPersistentQueue recovered = new LabPersistentQueue(file, 2000L);
+            recovered.enqueue(ID1, "SOS_EXPLICIT", "LAB_PAYLOAD_1", 2000L, 3000L);
+            check(new LabPersistentQueue(file, 2500L).snapshot(2500L).size() == 1,
+                "Clean lab file must recover after explicit CLEAR");
+            recovered.purgeAll();
+
             System.out.println("LabPersistentQueueTest PASS (" + assertions + " assertions)");
         } finally {
             Files.deleteIfExists(file);
