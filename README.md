@@ -2,11 +2,11 @@
 
 **Investigación en coordinación descentralizada para emergencias con conectividad degradada.** OEP estudia cómo dispositivos participantes y redes compatibles podrían coordinar avisos sintéticos, almacenar/reintentar mensajes y seleccionar rutas alternativas con consentimiento.
 
-🌐 **[Abrir la web avanzada de OEP — demostración interactiva ES / EN / NL](https://civic-relay-investor-f5c2a3kdr-2fabraham-7129s-projects.vercel.app)**  
+🌐 **[Abrir la web avanzada de OEP — demostración interactiva ES / EN / NL](https://civic-relay-investor.vercel.app)**  
 🧪 **[Ver el código y mejoras de la versión avanzada (PR #3)](https://github.com/abrahamhl/civic-relay/pull/3)**  
 📋 **[Revisar el plan de investigación y validación](https://github.com/abrahamhl/civic-relay/blob/feat/master-emergency-routing-v1-20261020/docs/OEP_VALIDATION_CERTIFICATION_AND_FUNDING_2026.md)**
 
-> **Estado de publicación (21-10-2026):** el enlace anterior es un despliegue de previsualización `READY` verificado en Vercel para el commit `c18c6ac`. La versión avanzada aún vive en una rama experimental y no sustituye la base `master`. Solo demuestra rutas y dispositivos **simulados**; no se han validado comunicaciones físicas entre teléfonos, integración real con 112, comunicaciones satelitales ni certificación institucional. No debe utilizarse en emergencias reales.
+> **Estado de publicación (21-10-2026):** el enlace anterior es el despliegue de **producción `READY`** verificado en Vercel para el commit `c18c6ac`. La versión avanzada aún vive en una rama experimental y no sustituye la base `master`. Solo demuestra rutas y dispositivos **simulados**; no se han validado comunicaciones físicas entre teléfonos, integración real con 112, comunicaciones satelitales ni certificación institucional. No debe utilizarse en emergencias reales.
 
 ---
 
