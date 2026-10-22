@@ -101,9 +101,15 @@ export default function DeviceFieldDiagnostics({ locale }: { locale: Locale }) {
   };
 
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
+      mountedRef.current = false;
+      cameraEpochRef.current += 1;
       if (sampleTimerRef.current !== null) window.clearInterval(sampleTimerRef.current);
+      sampleTimerRef.current = null;
       streamRef.current?.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+      if (videoRef.current) videoRef.current.srcObject = null;
     };
   }, []);
 
@@ -162,6 +168,8 @@ export default function DeviceFieldDiagnostics({ locale }: { locale: Locale }) {
   };
 
   const stopCamera = () => {
+    // Invalidates pending camera permission requests; OS dialogs cannot be closed by web apps.
+    cameraEpochRef.current += 1;
     stopTracks();
     setCameraStatus("idle");
     setCameraMeasurement(null);
