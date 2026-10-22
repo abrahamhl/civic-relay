@@ -12,3 +12,4 @@ test("late camera permission resolution is invalidated after cancellation or unm
   assert.match(source, /stream\.getTracks\(\)\.forEach\(track => track\.stop\(\)\)/);
   assert.match(source, /mountedRef\.current = false/);
 });
+
