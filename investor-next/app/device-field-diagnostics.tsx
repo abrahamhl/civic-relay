@@ -89,6 +89,8 @@ export default function DeviceFieldDiagnostics({ locale }: { locale: Locale }) {
   const streamRef = useRef<MediaStream | null>(null);
   const sampleTimerRef = useRef<number | null>(null);
   const samplesRef = useRef(0);
+  const mountedRef = useRef(false);
+  const cameraEpochRef = useRef(0);
 
   const stopTracks = () => {
     if (sampleTimerRef.current !== null) window.clearInterval(sampleTimerRef.current);
