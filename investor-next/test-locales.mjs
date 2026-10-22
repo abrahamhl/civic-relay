@@ -12,6 +12,8 @@ for(const {locale,paths,words} of checks){
   const file=paths.find(existsSync);
   assert.ok(file,`Missing prerendered output for ${locale}: ${paths.join(', ')}`);
   const html=readFileSync(file,'utf8');
+  const htmlTag=html.match(/<html\b[^>]*>/i)?.[0] ?? '';
+  assert.match(htmlTag,new RegExp(`\\blang=["']${locale}["']`),`${locale}: HTML document language does not match route`);
   for(const word of words){assert.ok(html.includes(word),`${locale}: missing translated content ${word}`);}
   assert.ok(html.includes('/es/')&&html.includes('/nl/'),`${locale}: missing language links`);
   assert.ok(html.includes('HORIZON-CL3-2026-01-SSRI-04'),`${locale}: missing official funding topic`);
