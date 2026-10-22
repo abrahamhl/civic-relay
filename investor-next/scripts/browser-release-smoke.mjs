@@ -38,7 +38,9 @@ const cases=[
   {id:'P07',role:'Keyboard and reduced-motion accessibility',locale:'en',url:'/',text:'WHEN THE',viewport:{width:390,height:844}},
   {id:'P08',role:'Institutional partner / roadmap and limitations',locale:'nl',url:'/nl/',text:'ALS HET',viewport:{width:820,height:1180}},
   {id:'P09',role:'3D Globe object selection, scenario sync and Mars educational mode',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:1440,height:900}},
-  {id:'P10',role:'Sector Intelligence El Tiemblo CCTV, Anti-SSRF and Unified Pipeline',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:1440,height:900}}
+  {id:'P10',role:'Sector Intelligence El Tiemblo CCTV, Anti-SSRF and Unified Pipeline',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:1440,height:900}},
+  {id:'P11',role:'Narrow mobile responsive menu and touch targets',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:320,height:720}},
+  {id:'P12',role:'Wide desktop navigation density and no overlap',locale:'en',url:'/',text:'WHEN THE',viewport:{width:1536,height:864}}
 ];
 async function runRoleTask(page,trial,evidenceDir){
  const observations={role:trial.role,actions:[],verified:false};
@@ -152,6 +154,47 @@ async function runRoleTask(page,trial,evidenceDir){
      livingNavVisible;
    break;
   }
+  case 'P11': {
+   const header=page.locator('[data-testid="responsive-header"]');
+   const menu=page.locator('[data-testid="header-menu-toggle"]');
+   const panel=page.locator('[data-testid="header-menu-panel"]');
+   const bounds=await header.evaluate((el)=>{
+     const rect=el.getBoundingClientRect();
+     const actions=el.querySelector('.oep-header-actions')?.getBoundingClientRect();
+     return {left:rect.left,right:rect.right,viewport:window.innerWidth,actionsRight:actions?.right};
+   });
+   const menuHeight=await menu.evaluate(el=>el.getBoundingClientRect().height);
+   const initiallyClosed=await menu.getAttribute('aria-expanded')==='false';
+   await menu.click();
+   const open=await menu.getAttribute('aria-expanded')==='true'&&await panel.isVisible();
+   const evidenceLink=panel.locator('a[href="#evidence"]');
+   const reachable=await evidenceLink.isVisible();
+   await evidenceLink.click();
+   const closed=await menu.getAttribute('aria-expanded')==='false';
+   note('320px header width, menu open/close, evidence anchor, touch size',{bounds,menuHeight,initiallyClosed,open,reachable,closed});
+   observations.verified=bounds.left>=-1&&bounds.right<=bounds.viewport+1&&
+      (bounds.actionsRight??Infinity)<=bounds.viewport+1&&menuHeight>=44&&
+      initiallyClosed&&open&&reachable&&closed;
+   break;
+  }
+  case 'P12': {
+   const header=page.locator('[data-testid="responsive-header"]');
+   const brand=header.locator('.oep-brand');
+   const nav=header.locator('.oep-header-desktop');
+   const actions=header.locator('.oep-header-actions');
+   const [brandBox,navBox,actionsBox]=await Promise.all([brand.boundingBox(),nav.boundingBox(),actions.boundingBox()]);
+   const primaryCount=await nav.locator('a').count();
+   const menu=page.locator('[data-testid="header-menu-toggle"]');
+   await menu.click();
+   const opened=await page.locator('[data-testid="header-menu-panel"]').isVisible();
+   await page.keyboard.press('Escape');
+   const closed=await menu.getAttribute('aria-expanded')==='false';
+   note('1536px navigation columns, primary links and Escape close',{brandBox,navBox,actionsBox,primaryCount,opened,closed});
+   observations.verified=Boolean(brandBox&&navBox&&actionsBox)&&primaryCount===4&&opened&&closed&&
+     brandBox.x+brandBox.width<=navBox.x+2&&navBox.x+navBox.width<=actionsBox.x+2&&
+     actionsBox.x+actionsBox.width<=1536;
+   break;
+  }
   case 'P10': {
    const secSection=page.locator('[data-testid="sector-intelligence-section"]');
    await secSection.scrollIntoViewIfNeeded();
@@ -211,7 +254,7 @@ try{
   console.log(record.verdict,trial.id,trial.locale,JSON.stringify({lang:obs.lang,errors:pageErrors.length,canonical:obs.canonical}));
   await page.close();
  }
- const result={sha:process.env.GITHUB_SHA||'LOCAL',completed_at_utc:new Date().toISOString(),scope:'TEN automated Chromium task roles (P01-P10) on synthetic local website including 3D Globe, Mars educational mode, El Tiemblo Sector Intelligence CCTV, Anti-SSRF, and Unified Pipeline.',runs:log};
+ const result={sha:process.env.GITHUB_SHA||'LOCAL',completed_at_utc:new Date().toISOString(),scope:'TWELVE automated Chromium task roles (P01-P12) on synthetic local website including 3D Globe, Mars educational mode, El Tiemblo Sector Intelligence CCTV, Anti-SSRF, and Unified Pipeline.',runs:log};
  writeFileSync(join(evidenceDir,'summary.json'),JSON.stringify(result,null,2));
  assert.ok(log.every(x=>x.verdict==='PASS'),'Browser release regression failed; inspect evidence/browser-release');
 }finally{

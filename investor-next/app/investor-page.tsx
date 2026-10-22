@@ -10,7 +10,8 @@ import {HyperFramesCinemaDeck} from './hyperframes-cinema-deck';
 import {AppleLivingNav} from './apple-living-nav';
 import {WhatItDoes,SystemExplained,DeveloperBlueprint} from './system-explained';
 import {routingPitch} from './routing-pitch';
-import {getCopy,labels,locales,type Locale} from './copy';
+import {getCopy,type Locale} from './copy';
+import ResponsiveHeader from './responsive-header';
 import LanguageDocument from './language-document';
 
 const source='https://github.com/abrahamhl/civic-relay';
@@ -120,14 +121,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
  return <main id="top" className="site-root">
   <LanguageDocument locale={locale}/>
   <div className="global-grid" aria-hidden="true"/>
-  <header className="topbar container">
-   <a className="wordmark" href="#top" aria-label="Civic Relay · OEP — Offline Emergency Protocol"><span className="mark-symbol"><span/><span/><span/></span><span className="new-project-name">Civic Relay · OEP — Offline Emergency Protocol</span></a>
-   <div className="topbar-center"><span className="pulse"/><span>EUROPEAN CIVIL RESILIENCE</span><span className="topbar-year">/ 2026</span></div>
-   <nav aria-label={t.nav.language}><a href="#story">{t.nav.experience}</a><a href="#sector-intelligence">{locale==='es'?'SECTORES Y CÁMARAS':locale==='nl'?'SECTOREN & CAMERA’S':'SECTORS & CAMERAS'}</a><a href="#telecom-rf-radar-suite">{locale==='es'?'HOY VS OEP Y RADAR RF':locale==='nl'?'NU VS OEP & RF-RADAR':'TODAY VS OEP & RF RADAR'}</a><a href="#live-hardware-and-funding">{locale==='es'?'NODO VIVO E INVERSIÓN':locale==='nl'?'LIVE NODE & FONDSEN':'LIVE NODE & FUNDING'}</a><a href="#how-it-works">{locale==='es'?'CÓMO FUNCIONA':locale==='nl'?'WERKING':'HOW IT WORKS'}</a><a href="#solution">{t.nav.solution}</a><a href="#investment">{t.nav.invest}</a><a className="topbar-source" href={source} target="_blank" rel="noopener noreferrer">{t.nav.source} ↗</a></nav>
-   <div className="locale-links" role="group" aria-label={t.nav.language}>
-    {locales.map(l=><a key={l} href={l==='en'?'/':'/'+l+'/'} hrefLang={l} lang={l} aria-label={labels[l]} aria-current={locale===l?'page':undefined} className={locale===l?'active':''}>{l.toUpperCase()}</a>)}
-   </div>
-  </header>
+  <ResponsiveHeader locale={locale}/>
   <section id="hero-30s" className="hero container">
    <div className="hero-copy">
     <div className="eyebrow"><span className="eyebrow-line"/>{t.hero.eyebrow}</div>
