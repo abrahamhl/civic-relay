@@ -38,11 +38,16 @@ jobs:
       - name: Execute three real Chromium journeys and record screenshot proof
         working-directory: investor-next
         run: node scripts/browser-release-smoke.mjs
+      - name: Verify opt-in device telemetry and export using real Chromium
+        working-directory: investor-next
+        run: node scripts/device-field-browser-smoke.mjs
       - name: Upload real browser observations (PASS or FAIL)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: oep-browser-release-qa
-          path: evidence/browser-release/
+          path: |
+            evidence/browser-release/
+            evidence/device-field/
           if-no-files-found: warn
           retention-days: 14
