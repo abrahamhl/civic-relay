@@ -91,12 +91,17 @@ export function analyzeFieldTrialsCsv(csvText) {
   }
 
   const rows = [];
+  const seenTrialIds = new Set();
   for (let i = 1; i < lines.length; i++) {
     const values = parseCsvLine(lines[i]);
     if (values.length !== EXPECTED_HEADERS.length) {
       throw new Error(`Row ${i + 1} has ${values.length} columns; expected ${EXPECTED_HEADERS.length}`);
     }
     const row = Object.fromEntries(EXPECTED_HEADERS.map((h, idx) => [h, values[idx]]));
+    if (!row.trial_id || seenTrialIds.has(row.trial_id)) {
+      throw new Error(`Row ${i + 1} has empty or duplicate trial_id`);
+    }
+    seenTrialIds.add(row.trial_id);
     if (/fictitious|synthetic|mock|todo|placeholder/i.test(row.trial_id + ' ' + row.observations)) {
       throw new Error(`Row ${i + 1} (${row.trial_id}) contains synthetic/placeholder markers; only physical trials allowed`);
     }
@@ -110,6 +115,7 @@ export function analyzeFieldTrialsCsv(csvText) {
     return {
       status: 'PHYSICAL_TEST_PENDING',
       gatePassed: false,
+      csvGatePassed: false,
       totalTrials: 0,
       minimumRequiredTrials: 30,
       validAckSuccesses: 0,
@@ -131,8 +137,13 @@ export function analyzeFieldTrialsCsv(csvText) {
     const beforeTtl = r.ack_before_ttl === 'true';
     const authVerified = r.auth_digits_verified_both === 'true';
     const offlineConfirmed = r.airplane_mode_state === 'true' && r.internet_connectivity_confirmed_absent === 'true';
+    const transportConfirmed = r.permissions_granted_both === 'true' &&
+      r.endpoint_discovery_success === 'true' &&
+      r.nearby_connection_success === 'true' &&
+      r.transfer_accepted === 'true' &&
+      r.receiver_payload_received === 'true';
 
-    if (ackReturned && beforeTtl && authVerified && offlineConfirmed) {
+    if (ackReturned && beforeTtl && authVerified && offlineConfirmed && transportConfirmed) {
       validAckSuccesses++;
       const ms = Number(r.round_trip_ms);
       if (Number.isFinite(ms) && ms > 0) {
@@ -148,11 +159,14 @@ export function analyzeFieldTrialsCsv(csvText) {
 
   rtts.sort((a, b) => a - b);
   const totalTrials = rows.length;
-  const gatePassed = totalTrials >= 30 && validAckSuccesses > 0;
+  const csvGatePassed = totalTrials >= 30 && validAckSuccesses > 0;
 
   return {
-    status: gatePassed ? 'PHYSICALLY_TESTED_M1_COMPLETE' : 'PARTIAL_FIELD_DATA_BELOW_30_TRIALS',
-    gatePassed,
+    // Self-reported CSV data cannot independently establish physical delivery.
+    // Two consenting phones and independently reviewed logs are still required.
+    status: csvGatePassed ? 'FIELD_CSV_REVIEW_REQUIRED' : 'PARTIAL_FIELD_DATA_BELOW_30_TRIALS',
+    gatePassed: false,
+    csvGatePassed,
     totalTrials,
     minimumRequiredTrials: 30,
     validAckSuccesses,
