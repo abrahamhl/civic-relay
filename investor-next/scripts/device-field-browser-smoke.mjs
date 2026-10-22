@@ -17,7 +17,7 @@ const types = { ".html": "text/html", ".js": "application/javascript", ".css": "
 const server = createServer((req, res) => {
   try {
     const pathname = new URL(req.url, "http://localhost").pathname;
-    const clean = pathname.replace(/^\\/+|\\/+$/g, "");
+    const clean = pathname.split("/").filter(Boolean).join("/");
     const candidates = pathname === "/es/" ? ["es.html", "es/index.html"] : [clean, clean + ".html", clean + "/index.html"];
     const file = candidates.map(p => resolve(outDir, p)).find(p => p.startsWith(outDir + sep) && existsSync(p) && statSync(p).isFile());
     if (!file) { res.writeHead(404); res.end(); return; }
@@ -38,8 +38,7 @@ try {
   assert.match(await page.locator('[data-testid="field-snapshot-status"]').innerText(), /Sin medir/);
   assert.match(await page.locator('[data-testid="field-camera-state"]').innerText(), /Desactivada/);
   await page.locator('[data-testid="field-inspect"]').click();
-  const snapshot = page.locator('[data-testid="field-snapshot-status"]');
-  await assert.doesNotReject(() => snapshot.getByText(/Medido localmente/).waitFor({ timeout: 15000 }));
+  await page.waitForFunction(() => document.querySelector('[data-testid="field-snapshot-status"]')?.textContent?.includes("Medido localmente"), null, { timeout: 15000 });
   const measurementCount = await page.locator('[data-testid="field-measurements"] div').count();
   assert.ok(measurementCount >= 12, "Expected browser API measurements");
   assert.match(await page.locator('[data-testid="field-camera-state"]').innerText(), /Desactivada/);
