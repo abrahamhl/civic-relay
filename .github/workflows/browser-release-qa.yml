@@ -46,6 +46,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: oep-browser-release-qa
-          path: |\n            evidence/browser-release/\n            evidence/device-field/
+          path: |
+            evidence/browser-release/
+            evidence/device-field/
           if-no-files-found: warn
           retention-days: 14
