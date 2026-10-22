@@ -4,6 +4,7 @@ import CoordinationLab from './coordination-lab';
 import TelecomAndRfRadarSuite from './telecom-rf-radar-suite';
 import LiveHardwareAndDealRoomConsole from './live-hardware-console';
 import EvidenceBoard from './evidence-board';
+import { HyperFramesCinemaDeck } from './hyperframes-cinema-deck';
 import { SystemExplained, DeveloperBlueprint } from './system-explained';
 import LanguageDocument from './language-document';
 import { labels, locales, type Locale } from './copy';
@@ -116,6 +117,7 @@ export default function SurfaceView({
         <>
           <div className="container">
             <MissionControl locale={locale} />
+            <HyperFramesCinemaDeck locale={locale} />
           </div>
           <SectorIntelligenceConsole locale={locale} />
           <CoordinationLab locale={locale} />

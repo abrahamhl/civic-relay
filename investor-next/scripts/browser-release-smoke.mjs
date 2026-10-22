@@ -138,13 +138,18 @@ async function runRoleTask(page,trial,evidenceDir){
    await page.locator('[data-testid="globe-mode-space"]').click();
    await page.locator('[data-testid="celestial-body-mars"]').click();
    const marsBanner=await page.locator('[data-testid="non-earth-educational-banner"]').innerText();
-   note('30s thesis, scenario counter transition, camera selection & Mars disclaimer',{outageCounters,intermittentCounters,marsBanner:marsBanner.slice(0,120)});
+   await page.locator('[data-testid="hf-act-3"]').click();
+   const hfBanner=await page.locator('[data-testid="hf-active-act-banner"]').innerText();
+   const livingNavVisible=await page.locator('[data-testid="apple-living-nav"]').isVisible();
+   note('30s thesis, scenario counter transition, camera selection, Mars disclaimer, HyperFrames Act 3 & Apple Living Nav',{outageCounters,intermittentCounters,marsBanner:marsBanner.slice(0,120),hfBanner,livingNavVisible});
    observations.verified=
      thesis.includes('Civic Relay investiga') &&
      outageCounters.includes('0') &&
      !intermittentCounters.includes('ACK sintéticos: 0') &&
      inspector.includes('N-403') &&
-     marsBanner.includes('NO opera en Marte');
+     marsBanner.includes('NO opera en Marte') &&
+     hfBanner.includes('ACT 03') &&
+     livingNavVisible;
    break;
   }
   case 'P10': {

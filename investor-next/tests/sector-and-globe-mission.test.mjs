@@ -145,3 +145,30 @@ test('all 6 mandatory docs/product specifications exist and are populated', () =
     assert.ok(text.length > 1500, `Product doc ${rel} is unexpectedly short`);
   }
 });
+
+
+test('HyperFrames deterministic HTML video composition, Cinema Deck, and Apple Living Navigation Dock are wired and valid', () => {
+  const hfHtml = readFileSync(resolve(root, 'investor-next/public/hyperframes/index.html'), 'utf8');
+  const hfDeck = readFileSync(resolve(root, 'investor-next/app/hyperframes-cinema-deck.tsx'), 'utf8');
+  const livingNav = readFileSync(resolve(root, 'investor-next/app/apple-living-nav.tsx'), 'utf8');
+  const page = readFileSync(resolve(root, 'investor-next/app/investor-page.tsx'), 'utf8');
+
+  // HyperFrames root contract
+  assert.ok(hfHtml.includes('data-composition-id="main"'));
+  assert.ok(hfHtml.includes('data-duration="25"'));
+  assert.ok(hfHtml.includes('window.__timelines["main"] = tl'));
+  for (const clipId of ['act-1-clip', 'act-2-clip', 'act-3-clip', 'act-4-clip', 'act-5-clip']) {
+    assert.ok(hfHtml.includes(`id="${clipId}"`), `Missing HyperFrames clip ${clipId}`);
+  }
+  // Cut-the-curve & inverse zoom-through seams
+  assert.ok(hfHtml.includes('x: -230'));
+  assert.ok(hfHtml.includes('scale: 1.22'));
+
+  // Cinema Deck & Apple Living Nav
+  assert.ok(hfDeck.includes('data-testid="hyperframes-cinema-deck"'));
+  assert.ok(hfDeck.includes('data-testid="hf-play-pause"'));
+  assert.ok(hfDeck.includes('data-testid="hf-scrubber"'));
+  assert.ok(livingNav.includes('data-testid="apple-living-nav"'));
+  assert.ok(page.includes('<HyperFramesCinemaDeck locale={locale}/>'));
+  assert.ok(page.includes('<AppleLivingNav locale={locale}/>'));
+});

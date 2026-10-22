@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Civic Relay · OEP — HyperFrames Keynote Film (Deterministic 1080p)</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --bg: #05090c;
+        --panel: #0b141c;
+        --line: #283a45;
+        --text: #f4f7f8;
+        --muted: #9fb2bc;
+        --accent: #ff7756;
+        --ice: #91d7e8;
+        --emerald: #34d399;
+        --amber: #fbbf24;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 1920px;
+        height: 1080px;
+        background: #05090c;
+        color: #f4f7f8;
+        font-family: Inter, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        overflow: hidden;
+      }
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: radial-gradient(circle at 75% 22%, #133142 0%, #071018 52%, #05090c 100%);
+      }
+      .clip {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+      .scene-carrier {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        padding: 88px 112px;
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 64px;
+        align-items: center;
+      }
+      .copy-col {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        width: 860px;
+      }
+      .kicker-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        width: 560px;
+        padding: 10px 18px;
+        border-radius: 999px;
+        background: #10212d;
+        border: 1px solid #2b4758;
+        font-family: monospace;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        color: #91d7e8;
+        text-transform: uppercase;
+      }
+      .kicker-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #ff7756;
+        display: inline-block;
+      }
+      .headline {
+        margin: 0;
+        font-size: 76px;
+        font-weight: 850;
+        line-height: 1.02;
+        letter-spacing: -0.045em;
+        color: #f8fafc;
+        width: 840px;
+      }
+      .headline-accent {
+        color: #ff7756;
+      }
+      .headline-ice {
+        color: #91d7e8;
+      }
+      .headline-emerald {
+        color: #34d399;
+      }
+      .lead {
+        margin: 0;
+        font-size: 27px;
+        line-height: 1.48;
+        color: #cbd5e1;
+        width: 800px;
+        font-weight: 450;
+      }
+      .badge-row {
+        display: flex;
+        gap: 16px;
+        width: 820px;
+        margin-top: 8px;
+      }
+      .truth-chip {
+        padding: 12px 20px;
+        border-radius: 14px;
+        background: #0d1b26;
+        border: 1px solid #2d4654;
+        font-family: monospace;
+        font-size: 16px;
+        font-weight: 700;
+        color: #e2e8f0;
+        letter-spacing: 0.06em;
+      }
+      .truth-chip.coral {
+        border-color: #ff7756;
+        color: #ffab94;
+        background: #231412;
+      }
+      .truth-chip.emerald {
+        border-color: #34d399;
+        color: #6ee7b7;
+        background: #0b241e;
+      }
+      .truth-chip.amber {
+        border-color: #fbbf24;
+        color: #fde68a;
+        background: #241d0e;
+      }
+      .stage-card {
+        width: 760px;
+        height: 680px;
+        border-radius: 32px;
+        background: linear-gradient(160deg, #11222f 0%, #09131b 65%, #060d13 100%);
+        border: 1px solid #2d4552;
+        box-shadow: 0 40px 100px rgba(0, 0, 0, 0.72);
+        padding: 36px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+      }
+      .card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #233844;
+        font-family: monospace;
+        font-size: 16px;
+        color: #91d7e8;
+        letter-spacing: 0.08em;
+      }
+      .card-visual {
+        position: relative;
+        width: 688px;
+        height: 410px;
+        border-radius: 22px;
+        background: #060e15;
+        border: 1px solid #1e313d;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .card-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        width: 688px;
+      }
+      .metric-box {
+        padding: 18px 20px;
+        border-radius: 18px;
+        background: #0b1721;
+        border: 1px solid #233845;
+      }
+      .metric-label {
+        display: block;
+        font-family: monospace;
+        font-size: 14px;
+        color: #9fb2bc;
+        letter-spacing: 0.08em;
+        margin-bottom: 6px;
+      }
+      .metric-val {
+        display: block;
+        font-family: monospace;
+        font-size: 30px;
+        font-weight: 800;
+        color: #f8fafc;
+      }
+      .hud-bar {
+        position: absolute;
+        left: 112px;
+        right: 112px;
+        bottom: 34px;
+        height: 52px;
+        border-radius: 999px;
+        background: rgba(11, 22, 31, 0.92);
+        border: 1px solid #29404d;
+        padding: 0 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: monospace;
+        font-size: 15px;
+        color: #cbd5e1;
+        letter-spacing: 0.08em;
+      }
+      .node-pill {
+        position: absolute;
+        width: 190px;
+        height: 82px;
+        border-radius: 18px;
+        background: #102230;
+        border: 2px solid #91d7e8;
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .node-pill strong {
+        font-size: 17px;
+        color: #f8fafc;
+      }
+      .node-pill span {
+        font-family: monospace;
+        font-size: 14px;
+        color: #91d7e8;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-width="1920"
+      data-height="1080"
+      data-duration="25"
+    >
+      <!-- ACT I (0.0s - 5.2s): CONVENTIONAL NETWORK FAILURE -->
+      <section id="act-1-clip" class="clip" data-start="0" data-duration="5.2" data-track-index="1">
+        <div id="act-1-carrier" class="scene-carrier">
+          <div class="copy-col">
+            <div id="a1-kicker" class="kicker-pill">
+              <span class="kicker-dot"></span>
+              <span>ACTO 01 · COLAPSO DE RED CONVENCIONAL</span>
+            </div>
+            <h1 id="a1-title" class="headline">
+              Cuando cae la antena,<br />
+              <span class="headline-accent">el silencio no es una opción.</span>
+            </h1>
+            <p id="a1-lead" class="lead">
+              Incendio forestal en El Tiemblo (Ávila) o DANA en Valencia: el 85% de las celdas
+              celulares caen a 0 rutas. Las apps dependientes de la nube fallan en silencio.
+            </p>
+            <div id="a1-badges" class="badge-row">
+              <span class="truth-chip coral">0 RUTAS IP ACTIVAS</span>
+              <span class="truth-chip amber">SYNTHETIC SIMULATION</span>
+            </div>
+          </div>
+          <div id="a1-card" class="stage-card">
+            <div class="card-top">
+              <span>SECTOR · ES-AV-TIEMBLO (40.41°N, -4.50°E)</span>
+              <span style="color:#ff7756">CELLULAR OUTAGE · 85%</span>
+            </div>
+            <div class="card-visual">
+              <svg width="640" height="360" viewBox="0 0 640 360">
+                <circle id="a1-ring-outer" cx="320" cy="180" r="135" fill="none" stroke="#ff7756" stroke-width="2" stroke-dasharray="8 8" />
+                <circle id="a1-ring-inner" cx="320" cy="180" r="78" fill="rgba(255,119,86,0.12)" stroke="#ff7756" stroke-width="2.5" />
+                <line x1="120" y1="90" x2="320" y2="180" stroke="#475569" stroke-width="2" stroke-dasharray="6 6" />
+                <line x1="520" y1="95" x2="320" y2="180" stroke="#475569" stroke-width="2" stroke-dasharray="6 6" />
+                <circle cx="320" cy="180" r="14" fill="#ff7756" />
+                <text x="320" y="235" text-anchor="middle" fill="#f8fafc" font-family="monospace" font-size="17" font-weight="700">TORRE N-403 · CAÍDA DE BACKHAUL</text>
+              </svg>
+            </div>
+            <div class="card-metrics">
+              <div class="metric-box">
+                <span class="metric-label">CELDAS CAÍDAS</span>
+                <span class="metric-val" style="color:#ff7756">85%</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">NODOS EN ZONA</span>
+                <span class="metric-val">50</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">ESTADO INICIAL</span>
+                <span class="metric-val" style="color:#fbbf24">ISOLATED</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACT II (4.8s - 10.2s): SECTOR INTELLIGENCE & CCTV OBSERVATION -->
+      <section id="act-2-clip" class="clip" data-start="4.8" data-duration="5.4" data-track-index="2">
+        <div id="act-2-carrier" class="scene-carrier">
+          <div class="copy-col">
+            <div id="a2-kicker" class="kicker-pill">
+              <span class="kicker-dot" style="background:#91d7e8"></span>
+              <span>ACTO 02 · OBSERVACIÓN SECTORIAL Y CCTV</span>
+            </div>
+            <h2 id="a2-title" class="headline">
+              Del Globo 3D al sector:<br />
+              <span class="headline-ice">cámaras y conos FOV.</span>
+            </h2>
+            <p id="a2-lead" class="lead">
+              El coordinador abre El Tiemblo, Valencia o Arnhem. Inspecciona cámaras abiertas
+              (DGT NAP / Rijkswaterstaat) separadas de la telemetría sintética y sin biometría.
+            </p>
+            <div id="a2-badges" class="badge-row">
+              <span class="truth-chip emerald">PUBLIC_CATALOG_VERIFIED</span>
+              <span class="truth-chip amber">FOV 2.5D NO CALIBRADO</span>
+            </div>
+          </div>
+          <div id="a2-card" class="stage-card">
+            <div class="card-top">
+              <span>MATRIZ CCTV · 4 CÁMARAS + ANTI-SSRF</span>
+              <span style="color:#34d399">RGPD · SIN BIOMETRÍA / LPR</span>
+            </div>
+            <div class="card-visual">
+              <svg width="640" height="360" viewBox="0 0 640 360">
+                <polygon id="a2-sector-poly" points="110,70 510,55 555,285 150,310" fill="rgba(56,189,248,0.08)" stroke="#91d7e8" stroke-width="2" />
+                <polygon id="a2-fov-1" points="210,190 360,95 390,215" fill="rgba(52,211,153,0.22)" stroke="#34d399" stroke-width="2" />
+                <polygon id="a2-fov-2" points="420,230 530,130 555,255" fill="rgba(251,191,36,0.20)" stroke="#fbbf24" stroke-width="2" />
+                <circle cx="210" cy="190" r="9" fill="#34d399" />
+                <circle cx="420" cy="230" r="9" fill="#fbbf24" />
+                <text x="210" y="222" fill="#6ee7b7" font-family="monospace" font-size="15" font-weight="700">DGT N-403 KM 82 (VERIFIED)</text>
+                <text x="355" y="268" fill="#fde68a" font-family="monospace" font-size="15" font-weight="700">EMBALSE CHARCO (SYNTHETIC)</text>
+              </svg>
+            </div>
+            <div class="card-metrics">
+              <div class="metric-box">
+                <span class="metric-label">FUENTE ABIERTA</span>
+                <span class="metric-val" style="color:#34d399">DGT / RWS</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">FILTRO ANTI-SSRF</span>
+                <span class="metric-val" style="color:#91d7e8">HTTPS ONLY</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">BIOMETRÍA / LPR</span>
+                <span class="metric-val" style="color:#ff7756">PROHIBITED</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACT III (9.8s - 15.2s): LOCAL STORE-AND-FORWARD QUEUE -->
+      <section id="act-3-clip" class="clip" data-start="9.8" data-duration="5.4" data-track-index="1">
+        <div id="act-3-carrier" class="scene-carrier">
+          <div class="copy-col">
+            <div id="a3-kicker" class="kicker-pill">
+              <span class="kicker-dot" style="background:#fbbf24"></span>
+              <span>ACTO 03 · COLA LOCAL STORE-AND-FORWARD</span>
+            </div>
+            <h2 id="a3-title" class="headline">
+              Cero rutas hoy.<br />
+              <span class="headline-accent">Cero mensajes perdidos.</span>
+            </h2>
+            <p id="a3-lead" class="lead">
+              Con consentimiento opt-in explícito, el sobre firmado ECDSA P-256 entra en
+              cola local (0 rutas → QUEUED) con TTL acotado y purga inmediata si el usuario pulsa STOP.
+            </p>
+            <div id="a3-badges" class="badge-row">
+              <span class="truth-chip emerald">REAL CODE / LOCAL LAB</span>
+              <span class="truth-chip amber">0 ROUTES → QUEUED_LOCAL</span>
+            </div>
+          </div>
+          <div id="a3-card" class="stage-card">
+            <div class="card-top">
+              <span>MOTOR · createStoreForwardEngine()</span>
+              <span style="color:#fbbf24">TTL BOUNDED · 3600s</span>
+            </div>
+            <div class="card-visual">
+              <div id="a3-node-origin" class="node-pill" style="left:48px;top:155px;border-color:#ff7756">
+                <strong>NODO ORIGEN</strong>
+                <span style="color:#ffab94">SOS_EXPLICIT (OPT-IN)</span>
+              </div>
+              <div id="a3-node-queue" class="node-pill" style="left:258px;top:155px;border-color:#fbbf24;width:210px">
+                <strong>COLA PERSISTENTE</strong>
+                <span style="color:#fde68a">STATE: QUEUED (SHA-256)</span>
+              </div>
+              <div id="a3-node-gate" class="node-pill" style="left:490px;top:155px;border-color:#64748b">
+                <strong>GATEWAY BORDE</strong>
+                <span style="color:#94a3b8">WAITING ROUTE...</span>
+              </div>
+            </div>
+            <div class="card-metrics">
+              <div class="metric-box">
+                <span class="metric-label">FIRMA SESIÓN</span>
+                <span class="metric-val" style="color:#34d399">ECDSA P-256</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">SILENCIO = VÍCTIMA</span>
+                <span class="metric-val" style="color:#ff7756">JAMÁS (UNKNOWN)</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">ESTADO EN COLA</span>
+                <span class="metric-val" style="color:#fbbf24">QUEUED</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACT IV (14.8s - 20.2s): OPPORTUNISTIC HOP & MULTIPATH DEDUP -->
+      <section id="act-4-clip" class="clip" data-start="14.8" data-duration="5.4" data-track-index="2">
+        <div id="act-4-carrier" class="scene-carrier">
+          <div class="copy-col">
+            <div id="a4-kicker" class="kicker-pill">
+              <span class="kicker-dot" style="background:#34d399"></span>
+              <span>ACTO 04 · POLICÍA DE TRÁFICO Y DEDUPLICACIÓN</span>
+            </div>
+            <h2 id="a4-title" class="headline">
+              Salto oportunista.<br />
+              <span class="headline-ice">Un único sobre lógico.</span>
+            </h2>
+            <p id="a4-lead" class="lead">
+              Cuando aparece un relé con batería suficiente (batería CRITICAL nunca retransmite),
+              el sobre viaja por BLE y Wi-Fi y se deduplica en destino por huella SHA-256.
+            </p>
+            <div id="a4-badges" class="badge-row">
+              <span class="truth-chip emerald">MULTIPATH DEDUP</span>
+              <span class="truth-chip">BATTERY GUARD ACTIVE</span>
+            </div>
+          </div>
+          <div id="a4-card" class="stage-card">
+            <div class="card-top">
+              <span>RUTEO · emergency-routing.mjs</span>
+              <span style="color:#91d7e8">2 RUTAS → 1 MENSAJE LÓGICO</span>
+            </div>
+            <div class="card-visual">
+              <svg width="640" height="360" viewBox="0 0 640 360">
+                <path id="a4-path-ble" d="M 110 180 Q 320 65 530 180" fill="none" stroke="#91d7e8" stroke-width="4" />
+                <path id="a4-path-wifi" d="M 110 180 Q 320 295 530 180" fill="none" stroke="#34d399" stroke-width="4" />
+                <circle cx="110" cy="180" r="22" fill="#ff7756" />
+                <circle cx="320" cy="115" r="18" fill="#91d7e8" />
+                <circle cx="320" cy="245" r="18" fill="#34d399" />
+                <circle cx="530" cy="180" r="26" fill="#34d399" />
+                <text x="320" y="82" text-anchor="middle" fill="#91d7e8" font-family="monospace" font-size="15" font-weight="700">RUTA A · BLE MESH (SALTO LOCAL)</text>
+                <text x="320" y="305" text-anchor="middle" fill="#6ee7b7" font-family="monospace" font-size="15" font-weight="700">RUTA B · WI-FI / GATEWAY BORDE</text>
+              </svg>
+            </div>
+            <div class="card-metrics">
+              <div class="metric-box">
+                <span class="metric-label">RUTAS OBSERVADAS</span>
+                <span class="metric-val" style="color:#91d7e8">BLE + WIFI</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">DUPLICADOS</span>
+                <span class="metric-val" style="color:#34d399">0 (DEDUP)</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">NODOS CRITICAL</span>
+                <span class="metric-val" style="color:#fbbf24">PROTECTED</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACT V (19.8s - 25.0s): EXPLICIT ACK & SCIENTIFIC TRUTH MATRIX -->
+      <section id="act-5-clip" class="clip" data-start="19.8" data-duration="5.2" data-track-index="1">
+        <div id="act-5-carrier" class="scene-carrier">
+          <div class="copy-col">
+            <div id="a5-kicker" class="kicker-pill">
+              <span class="kicker-dot" style="background:#34d399"></span>
+              <span>ACTO 05 · ACK EXPLÍCITO Y FRONTERA CIENTÍFICA</span>
+            </div>
+            <h2 id="a5-title" class="headline">
+              Entregado solo con ACK.<br />
+              <span class="headline-emerald">Evidencia sin humo.</span>
+            </h2>
+            <p id="a5-lead" class="lead">
+              Enviar no equivale a entregar: OEP exige recibo firmado. Hoy 84 tests validan el
+              software; los 30 ensayos físicos entre 2 móviles Android son el siguiente hito.
+            </p>
+            <div id="a5-badges" class="badge-row">
+              <span class="truth-chip emerald">84/84 TESTS PASS</span>
+              <span class="truth-chip amber">PHYSICAL FIELD TEST PENDING</span>
+            </div>
+          </div>
+          <div id="a5-card" class="stage-card">
+            <div class="card-top">
+              <span>VERIFICACIÓN · SCIENTIFIC TRUTH MATRIX</span>
+              <span style="color:#34d399">TRL 3–4 · HONESTIDAD RADICAL</span>
+            </div>
+            <div class="card-visual">
+              <svg width="640" height="360" viewBox="0 0 640 360">
+                <rect x="55" y="45" width="530" height="76" rx="16" fill="#0b241e" stroke="#34d399" stroke-width="2" />
+                <text x="85" y="90" fill="#6ee7b7" font-family="monospace" font-size="18" font-weight="700">✓ REAL CODE: Cola, Dedup, WebCrypto, Anti-SSRF (84 tests)</text>
+                <rect x="55" y="142" width="530" height="76" rx="16" fill="#241d0e" stroke="#fbbf24" stroke-width="2" />
+                <text x="85" y="187" fill="#fde68a" font-family="monospace" font-size="18" font-weight="700">⧗ EN INVESTIGACIÓN: 30 ensayos físicos Android↔Android</text>
+                <rect x="55" y="239" width="530" height="76" rx="16" fill="#231412" stroke="#ff7756" stroke-width="2" />
+                <text x="85" y="284" fill="#ffab94" font-family="monospace" font-size="18" font-weight="700">✕ NO RECLAMADO: 112 directo, satélite real, radar pared</text>
+              </svg>
+            </div>
+            <div class="card-metrics">
+              <div class="metric-box">
+                <span class="metric-label">TESTS UNIT/E2E</span>
+                <span class="metric-val" style="color:#34d399">84 + 10 P</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">SIMULACIONES</span>
+                <span class="metric-val" style="color:#91d7e8">810 SEEDS</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">DESPACHO 112</span>
+                <span class="metric-val" style="color:#fbbf24">NO-CLAIM</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Persistent Bottom Telemetry Bar -->
+      <div id="hud-overlay" class="clip hud-bar" data-start="0" data-duration="25" data-track-index="3">
+        <span>HYPERFRAMES DETERMINISTIC ENGINE · 1920×1080 · MOTION DOCTRINE (CUT-THE-CURVE)</span>
+        <span style="color:#91d7e8">OBSERVAR → DECIDIR → COORDINAR · CIVIC RELAY / OEP</span>
+      </div>
+    </div>
+
+    <script>
+      // Immediate setup outside timeline per HyperFrames gsap_timeline_set_initial_hide rule
+      gsap.set("#act-2-carrier", { x: 230, opacity: 0 });
+      gsap.set("#act-3-carrier", { x: 230, opacity: 0 });
+      gsap.set("#act-4-carrier", { x: 230, opacity: 0 });
+      gsap.set("#act-5-carrier", { scale: 1.22, opacity: 0 });
+
+      const tl = gsap.timeline({ paused: true });
+
+      // ACT I: Waterfall entry + sustained orbital pulse
+      tl.fromTo("#a1-kicker", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.38, ease: "power4.out" }, 0.08);
+      tl.fromTo("#a1-title", { y: 64, opacity: 0 }, { y: 0, opacity: 1, duration: 0.46, ease: "power4.out" }, 0.16);
+      tl.fromTo("#a1-lead", { y: 44, opacity: 0 }, { y: 0, opacity: 1, duration: 0.42, ease: "power3.out" }, 0.28);
+      tl.fromTo("#a1-badges", { y: 32, opacity: 0 }, { y: 0, opacity: 1, duration: 0.36, ease: "power3.out" }, 0.38);
+      tl.fromTo("#a1-card", { x: 140, opacity: 0, scale: 0.94 }, { x: 0, opacity: 1, scale: 1, duration: 0.55, ease: "expo.out" }, 0.18);
+      tl.fromTo("#a1-ring-outer", { rotation: 0, scale: 0.88, transformOrigin: "50% 50%" }, { rotation: 90, scale: 1.06, duration: 4.2, ease: "none" }, 0.4);
+      tl.fromTo("#a1-ring-inner", { scale: 0.92, transformOrigin: "50% 50%" }, { scale: 1.12, duration: 2.2, ease: "power2.out" }, 1.2);
+
+      // SEAM 1 -> 2 (t=4.8s): Cut-the-Curve LEFT (-230px -> +230px to 0, mirrored power4.in / power4.out)
+      tl.to("#act-1-carrier", { x: -230, duration: 0.34, ease: "power4.in" }, 4.8);
+      tl.to("#act-1-carrier", { opacity: 0, duration: 0.22, ease: "none" }, 4.8);
+      tl.fromTo("#act-2-carrier", { x: 230, opacity: 0.35 }, { x: 0, opacity: 1, duration: 0.38, ease: "power4.out" }, 4.95);
+      tl.fromTo("#a2-fov-1", { scale: 0.7, opacity: 0, transformOrigin: "210px 190px" }, { scale: 1, opacity: 1, duration: 0.65, ease: "expo.out" }, 5.35);
+      tl.fromTo("#a2-fov-2", { scale: 0.7, opacity: 0, transformOrigin: "420px 230px" }, { scale: 1, opacity: 1, duration: 0.65, ease: "expo.out" }, 5.65);
+      tl.to("#a2-sector-poly", { scale: 1.03, transformOrigin: "50% 50%", duration: 3.6, ease: "none" }, 5.4);
+
+      // SEAM 2 -> 3 (t=9.8s): Cut-the-Curve LEFT
+      tl.to("#act-2-carrier", { x: -230, duration: 0.34, ease: "power4.in" }, 9.8);
+      tl.to("#act-2-carrier", { opacity: 0, duration: 0.22, ease: "none" }, 9.8);
+      tl.fromTo("#act-3-carrier", { x: 230, opacity: 0.35 }, { x: 0, opacity: 1, duration: 0.38, ease: "power4.out" }, 9.95);
+      tl.fromTo("#a3-node-origin", { y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 0.42, ease: "back.out(1.5)" }, 10.35);
+      tl.fromTo("#a3-node-queue", { scale: 0.84, opacity: 0 }, { scale: 1.04, opacity: 1, duration: 0.52, ease: "back.out(1.6)" }, 10.85);
+      tl.fromTo("#a3-node-gate", { y: 36, opacity: 0 }, { y: 0, opacity: 0.65, duration: 0.42, ease: "power3.out" }, 11.35);
+
+      // SEAM 3 -> 4 (t=14.8s): Cut-the-Curve LEFT
+      tl.to("#act-3-carrier", { x: -230, duration: 0.34, ease: "power4.in" }, 14.8);
+      tl.to("#act-3-carrier", { opacity: 0, duration: 0.22, ease: "none" }, 14.8);
+      tl.fromTo("#act-4-carrier", { x: 230, opacity: 0.35 }, { x: 0, opacity: 1, duration: 0.38, ease: "power4.out" }, 14.95);
+      tl.fromTo("#a4-path-ble", { opacity: 0.15, scale: 0.92, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.7, ease: "expo.out" }, 15.35);
+      tl.fromTo("#a4-path-wifi", { opacity: 0.15, scale: 0.92, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.7, ease: "expo.out" }, 15.75);
+
+      // SEAM 4 -> 5 (t=19.8s): Inverse Zoom-Through Arrival
+      tl.to("#act-4-carrier", { scale: 0.82, duration: 0.24, ease: "power3.in" }, 19.8);
+      tl.to("#act-4-carrier", { opacity: 0, duration: 0.22, ease: "none" }, 19.8);
+      tl.fromTo("#act-5-carrier", { scale: 1.22, opacity: 0.2 }, { scale: 1, opacity: 1, duration: 0.52, ease: "expo.out" }, 19.98);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+
+      function syncClipVisibility(t) {
+        const clips = document.querySelectorAll(".clip");
+        clips.forEach((c) => {
+          const s = parseFloat(c.getAttribute("data-start") || "0");
+          const d = parseFloat(c.getAttribute("data-duration") || "25");
+          const active = t >= s && t <= s + d;
+          c.style.pointerEvents = active ? "auto" : "none";
+          c.style.opacity = active ? "1" : "0";
+        });
+      }
+
+      syncClipVisibility(0);
+
+      window.__civicRelayHyperFrames = {
+        seek(seconds) {
+          const clamped = Math.max(0, Math.min(25, Number(seconds) || 0));
+          syncClipVisibility(clamped);
+          tl.seek(clamped, false);
+          return clamped;
+        },
+        getDuration() {
+          return 25;
+        },
+        getTime() {
+          return tl.time();
+        }
+      };
+
+      window.addEventListener("message", (ev) => {
+        if (!ev.data || typeof ev.data !== "object") return;
+        if ((ev.data.type === "hf:seek" || ev.data.type === "hyperframes:seek") && typeof ev.data.time === "number") {
+          window.__civicRelayHyperFrames.seek(ev.data.time);
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -6,6 +6,8 @@ import EvidenceBoard from './evidence-board';
 import TelecomAndRfRadarSuite from './telecom-rf-radar-suite';
 import LiveHardwareAndDealRoomConsole from './live-hardware-console';
 import SectorIntelligenceConsole from './sector-intelligence-console';
+import {HyperFramesCinemaDeck} from './hyperframes-cinema-deck';
+import {AppleLivingNav} from './apple-living-nav';
 import {WhatItDoes,SystemExplained,DeveloperBlueprint} from './system-explained';
 import {routingPitch} from './routing-pitch';
 import {getCopy,labels,locales,type Locale} from './copy';
@@ -126,16 +128,25 @@ export default function InvestorPage({locale}:{locale:Locale}){
     {locales.map(l=><a key={l} href={l==='en'?'/':'/'+l+'/'} hrefLang={l} lang={l} aria-label={labels[l]} aria-current={locale===l?'page':undefined} className={locale===l?'active':''}>{l.toUpperCase()}</a>)}
    </div>
   </header>
-  <section className="hero container">
+  <section id="hero-30s" className="hero container">
    <div className="hero-copy">
     <div className="eyebrow"><span className="eyebrow-line"/>{t.hero.eyebrow}</div>
     <h1>{t.hero.first}<br/><span className="heading-muted">{t.hero.middle}</span><br/><span className="heading-urgent">{t.hero.last}</span></h1>
     <div className="hero-divider"><span>{t.hero.line}</span><span>↓</span></div>
-    <div data-testid="thirty-second-thesis-card" style={{margin:'0.85rem 0',padding:'0.95rem 1.05rem',borderRadius:'0.65rem',border:'1px solid rgba(56,189,248,0.38)',background:'rgba(8,25,39,0.9)'}}>
-     <small style={{display:'block',color:'#38bdf8',fontWeight:700,letterSpacing:'0.04em',marginBottom:'0.3rem'}}>{th.brandTag}</small>
-     <h2 style={{fontSize:'1.12rem',margin:'0 0 0.4rem 0',color:'#f8fafc'}}>{th.title}</h2>
-     <p style={{fontSize:'0.9rem',color:'#dbeafe',margin:'0 0 0.55rem 0',lineHeight:1.55}}>{th.subtitle}</p>
-     <blockquote style={{margin:0,padding:'0.55rem 0.75rem',borderLeft:'3px solid #34d399',background:'rgba(4,14,23,0.75)',color:'#e2e8f0',fontSize:'0.83rem',lineHeight:1.55}}>
+    <div data-testid="thirty-second-thesis-card" className="apple-bento-thesis">
+     <div className="apple-thesis-top">
+      <small className="apple-thesis-kicker">{th.brandTag}</small>
+      <div className="apple-loop-strip" aria-hidden="true">
+       <span className="apple-loop-pill is-coral">01 · {locale==='es'?'OBSERVAR':locale==='nl'?'OBSERVEREN':'OBSERVE'}</span>
+       <span className="apple-loop-arrow">→</span>
+       <span className="apple-loop-pill is-ice">02 · {locale==='es'?'DECIDIR':locale==='nl'?'BESLISSEN':'DECIDE'}</span>
+       <span className="apple-loop-arrow">→</span>
+       <span className="apple-loop-pill is-emerald">03 · {locale==='es'?'COORDINAR':locale==='nl'?'COÖRDINEREN':'COORDINATE'}</span>
+      </div>
+     </div>
+     <h2 className="apple-thesis-title">{th.title}</h2>
+     <p className="apple-thesis-subtitle">{th.subtitle}</p>
+     <blockquote className="apple-thesis-quote">
       {th.exactQuote}
      </blockquote>
     </div>
@@ -144,6 +155,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
      <a className="button-primary" data-testid="hero-cta-simulate" href="#routing-lab">{th.ctaSimulate} <span>↘</span></a>
      <a className="button-outline" data-testid="hero-cta-explore-map" href="#sector-intelligence">{th.ctaExploreMap} <span>↘</span></a>
      <a className="button-outline" data-testid="hero-cta-evidence" href="#evidence">{th.ctaEvidence} <span>↘</span></a>
+     <a className="button-outline" href="#hyperframes-cinema">{locale==='es'?'VER PELÍCULA KEYNOTE (5 ACTOS)':locale==='nl'?'BEKIJK KEYNOTE-FILM (5 AKTEN)':'WATCH KEYNOTE FILM (5 ACTS)'} <span>↘</span></a>
      <a className="button-outline" href="#telecom-rf-radar-suite">{t.hero.action} <span>↘</span></a>
      <a className="button-outline" href="#live-hardware-and-funding">{locale==='es'?'EJECUCIÓN REAL + INVERSIÓN':locale==='nl'?'LIVE NODE & FONDSEN':'LIVE NODE & FUNDING'} <span>↘</span></a>
     </div>
@@ -153,20 +165,23 @@ export default function InvestorPage({locale}:{locale:Locale}){
   </section>
 
   {/* Three Complementary Surfaces Switcher (A: Discover / B: Explore Mission Control / C: Investigate Science) */}
-  <section className="container" aria-label={th.surfacesTitle} data-testid="three-surfaces-switcher" style={{marginTop:'1rem',marginBottom:'1rem'}}>
-   <div style={{padding:'1rem 1.15rem',borderRadius:'0.75rem',border:'1px solid rgba(120,190,210,0.24)',background:'rgba(7,18,29,0.92)'}}>
-    <p className="eyebrow" style={{margin:'0 0 0.65rem 0',color:'#7dd3fc'}}>{th.surfacesTitle}</p>
-    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(240px, 1fr))',gap:'0.75rem'}}>
+  <section className="container apple-surfaces-section" aria-label={th.surfacesTitle} data-testid="three-surfaces-switcher">
+   <div className="apple-bento-surfaces">
+    <div className="apple-bento-surfaces-head">
+     <p className="eyebrow" style={{margin:0,color:'#91d7e8'}}>{th.surfacesTitle}</p>
+     <span className="apple-bento-tag">APPLE HIG · PROGRESSIVE DISCLOSURE</span>
+    </div>
+    <div className="apple-bento-surfaces-grid">
      {th.surfaces.map(s=>
-      <article key={s.id} data-testid={s.id} style={{padding:'0.8rem',borderRadius:'0.55rem',border:'1px solid rgba(148,163,184,0.25)',background:'rgba(12,28,44,0.8)',display:'flex',flexDirection:'column',justifyContent:'space-between',gap:'0.45rem'}}>
+      <article key={s.id} data-testid={s.id} className="apple-bento-surface-card">
        <div>
-        <small style={{color:'#38bdf8',fontWeight:700,fontSize:'0.72rem'}}>{s.tag}</small>
-        <h3 style={{fontSize:'0.95rem',margin:'0.2rem 0',color:'#f8fafc'}}>{s.name}</h3>
-        <p style={{fontSize:'0.78rem',color:'#cbd5e1',margin:0,lineHeight:1.48}}>{s.desc}</p>
+        <small className="apple-surface-kicker">{s.tag}</small>
+        <h3 className="apple-surface-name">{s.name}</h3>
+        <p className="apple-surface-desc">{s.desc}</p>
        </div>
-       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'0.5rem',marginTop:'0.35rem',fontSize:'0.76rem'}}>
-        <a href={s.targetAnchor} style={{color:'#34d399',fontWeight:700,textDecoration:'underline'}}>Ir a sección ↘</a>
-        <a href={s.routeHref} style={{color:'#93c5fd',textDecoration:'underline'}}>Vista dedicada ↗</a>
+       <div className="apple-surface-links">
+        <a href={s.targetAnchor} className="apple-surface-anchor-link">{locale==='es'?'Ir a sección ↘':locale==='nl'?'Ga naar sectie ↘':'Jump to section ↘'}</a>
+        <a href={s.routeHref} className="apple-surface-route-link">{locale==='es'?'Vista dedicada ↗':locale==='nl'?'Eigen weergave ↗':'Dedicated view ↗'}</a>
        </div>
       </article>
      )}
@@ -175,21 +190,22 @@ export default function InvestorPage({locale}:{locale:Locale}){
   </section>
 
   {/* 8-Scene Causal Journey Overview Strip (Section 4 of PROMPT_MASTER.md) */}
-  <section className="container" aria-label="Eight-scene causal product journey" data-testid="eight-scene-journey-bar" style={{marginBottom:'1rem'}}>
-   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(195px, 1fr))',gap:'0.55rem'}}>
+  <section className="container apple-scenes-section" aria-label="Eight-scene causal product journey" data-testid="eight-scene-journey-bar">
+   <div className="apple-bento-scenes-grid">
     {th.eightScenes.map(sc=>
-     <a key={sc.num} href={sc.targetAnchor} data-testid={`scene-card-${sc.num}`} style={{padding:'0.65rem 0.75rem',borderRadius:'0.5rem',border:'1px solid rgba(125,211,252,0.2)',background:'rgba(9,22,34,0.88)',color:'#e2f1f8',textDecoration:'none',display:'flex',flexDirection:'column',justifyContent:'space-between',gap:'0.35rem'}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'0.3rem'}}>
-       <strong style={{fontSize:'0.76rem',color:'#38bdf8'}}>{sc.num} — {sc.tag}</strong>
+     <a key={sc.num} href={sc.targetAnchor} data-testid={`scene-card-${sc.num}`} className="apple-bento-scene-card">
+      <div className="apple-scene-top">
+       <strong className="apple-scene-num">{sc.num} — {sc.tag}</strong>
+       <span className="apple-scene-arrow" aria-hidden="true">↘</span>
       </div>
-      <p style={{fontSize:'0.73rem',color:'#cbd5e1',margin:0,lineHeight:1.42}}>{sc.summary}</p>
-      <small style={{fontSize:'0.63rem',color:'#fde68a',fontWeight:700}}>{sc.badge}</small>
+      <p className="apple-scene-summary">{sc.summary}</p>
+      <small className="apple-scene-badge">{sc.badge}</small>
      </a>
     )}
    </div>
   </section>
 
-  <aside role="note" className="container" style={{ marginTop: '1rem', marginBottom: '1rem', padding: '1rem', border: '1px solid #f59e0b', borderRadius: '0.65rem', background: '#211f1a', color: '#fde68a', fontSize: '0.93rem', lineHeight: 1.6 }}>
+  <aside role="note" className="container apple-truth-note">
    <strong>{locale==='es'?'ESTADO REAL · PROTOTIPO DE INVESTIGACIÓN':locale==='nl'?'WERKELIJKE STATUS · ONDERZOEKSPROTOTYPE':'ACTUAL STATUS · RESEARCH PROTOTYPE'}</strong>
    <p>{locale==='es'?'La simulación de rutas, satélites, zonas y radar RF/CSI es sintética. WebCrypto ejecuta firmas reales en el navegador; WebRTC realiza un bucle local, no un enlace entre teléfonos. Android Nearby es un laboratorio sin ensayos físicos publicados. No hay detección validada de personas detrás de paredes, SOS operativo, conexión 112 ni transmisión satelital.':locale==='nl'?'Routes, satellieten, zones en RF/CSI-radar zijn gesimuleerd. WebCrypto gebruikt echte browserhandtekeningen, maar WebRTC is een lokale loopback, geen verbinding tussen telefoons. De Android Nearby-labapp heeft geen gepubliceerde fysieke veldproeven. Geen gevalideerde mensdetectie door muren, echte SOS-dienst, 112-koppeling of satellietuplink.':'Routing, satellite, zone and RF/CSI radar data are simulated. WebCrypto performs real browser signatures, but WebRTC is a same-page loopback, not phone-to-phone communication. Android Nearby is a laboratory app with no published physical field trials. No validated through-wall human sensing, operational SOS, 112 integration, or satellite uplink.'}</p>
   </aside>
@@ -199,6 +215,9 @@ export default function InvestorPage({locale}:{locale:Locale}){
     {chapterNavigation[locale].map((item,i)=><a href={item.href} key={item.href}><span>{String(i+1).padStart(2,'0')}</span>{item.label}</a>)}
    </div>
   </nav>
+  <div className="container">
+   <HyperFramesCinemaDeck locale={locale}/>
+  </div>
   <WhatItDoes locale={locale}/>
   <SectorIntelligenceConsole locale={locale}/>
   <TelecomAndRfRadarSuite locale={locale}/>
@@ -237,5 +256,6 @@ export default function InvestorPage({locale}:{locale:Locale}){
    <div className="closing-actions"><a className="button-primary" href={contact} target="_blank" rel="noopener noreferrer">{t.closing.contact} <span>↗</span></a><a className="button-outline" href={funding} target="_blank" rel="noopener noreferrer">{t.closing.funding} <span>↗</span></a><a className="text-cta" href={source} target="_blank" rel="noopener noreferrer">{t.closing.source} ↗</a></div>
   </section>
   <footer className="footer"><div className="container footer-inner"><span className="footer-brand">Civic Relay · OEP — Offline Emergency Protocol <small>© 2026</small></span><span>{t.footer}</span><a href="#top">↑ TOP</a></div></footer>
+  <AppleLivingNav locale={locale}/>
  </main>;
 }
