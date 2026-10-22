@@ -141,8 +141,25 @@ export async function verifyRealOepPacket(packet) {
       return { valid: false, reason: 'CRC16_MISMATCH', verifyTimeMs: 0 };
     }
 
-    // 2. Import SPKI public key and verify ECDSA-P256-SHA256 signature
+    // Verify that the signed canonical string matches every consumer-visible field.
+    const expectedCanonical = `OEP_V1|${packet.messageId}|${packet.status}|${packet.zoneId}|${packet.sectorIndex}|${packet.batteryPct}|${packet.timestampMs}|${packet.binaryFrameHex}`;
+    if (packet.canonicalString !== expectedCanonical) {
+      return { valid: false, reason: 'SIGNED_FIELDS_MISMATCH', verifyTimeMs: 0 };
+    }
+    if (packet.protocol !== 'OEP_REAL_EXECUTION_V1' || packet.byteLength !== 24 ||
+        packet.crc16Hex !== '0x' + expectedCrc.toString(16).padStart(4, '0').toUpperCase()) {
+      return { valid: false, reason: 'FRAME_METADATA_MISMATCH', verifyTimeMs: 0 };
+    }
+
+    // Fingerprints identify key material, not a trusted person or emergency authority.
     const spkiBytes = fromHex(packet.publicKeySpkiHex);
+    const digest = new Uint8Array(await subtle.digest('SHA-256', spkiBytes));
+    const expectedFingerprint = Array.from(digest.slice(0, 8))
+      .map((b) => b.toString(16).padStart(2, '0').toUpperCase()).join(':');
+    if (packet.signerFingerprint !== expectedFingerprint) {
+      return { valid: false, reason: 'SIGNER_FINGERPRINT_MISMATCH', verifyTimeMs: 0 };
+    }
+    // 2. Import SPKI public key and verify ECDSA-P256-SHA256 signature
     const pubKey = await subtle.importKey(
       'spki',
       spkiBytes,

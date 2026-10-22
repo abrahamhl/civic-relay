@@ -67,7 +67,7 @@ test('real WebCrypto verifier rejects tampered binary CRC-16 frames and forged E
   };
   const sigCheck = await verifyRealOepPacket(tamperedSigPacket);
   assert.equal(sigCheck.valid, false);
-  assert.equal(sigCheck.reason, 'INVALID_ECDSA_SIGNATURE');
+  assert.equal(sigCheck.reason, 'SIGNED_FIELDS_MISMATCH');
 });
 
 test('real-time Keplerian orbital ephemeris computes elevation, azimuth, slant range and Doppler across 4 shells', () => {
