@@ -237,6 +237,7 @@ export default function DeviceFieldDiagnostics({ locale }: { locale: Locale }) {
         }
       }, 600);
     } catch {
+      if (requestEpoch !== cameraEpochRef.current || !mountedRef.current) return;
       stopTracks();
       setCameraStatus("denied");
       setCameraMeasurement(null);
