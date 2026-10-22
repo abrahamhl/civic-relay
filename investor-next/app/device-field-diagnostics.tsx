@@ -205,6 +205,10 @@ export default function DeviceFieldDiagnostics({ locale }: { locale: Locale }) {
       }
       video.srcObject = stream;
       await video.play();
+      if (requestEpoch !== cameraEpochRef.current || !mountedRef.current) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
       setCameraStatus("active");
       samplesRef.current = 0;
       const canvas = document.createElement("canvas");
