@@ -7,7 +7,7 @@
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { readFileSync,existsSync,mkdirSync,writeFileSync } from 'node:fs';
+import { readFileSync,existsSync,mkdirSync,writeFileSync,statSync } from 'node:fs';
 import { resolve,extname,join,sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
@@ -22,7 +22,7 @@ const server=createServer((req,res)=>{
     let pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
     const clean=pathname.replace(/^\/+|\/+$/g,'');
     const paths=pathname==='/'?['index.html']:pathname==='/es'||pathname==='/es/'?['es.html','es/index.html']:pathname==='/nl'||pathname==='/nl/'?['nl.html','nl/index.html']:[clean,clean+'.html',clean+'/index.html'];
-    const file=paths.map(p=>resolve(out,p)).find(p=>(p===out||p.startsWith(out+sep))&&existsSync(p));
+    const file=paths.map(p=>resolve(out,p)).find(p=>(p===out||p.startsWith(out+sep))&&existsSync(p)&&statSync(p).isFile());
     if(!file){res.writeHead(404);res.end('Not found');return;}
     res.setHeader('content-type',mimetypes[extname(file)]||'application/octet-stream');
     res.writeHead(200);res.end(readFileSync(file));

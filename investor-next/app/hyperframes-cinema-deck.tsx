@@ -276,7 +276,7 @@ export function HyperFramesCinemaDeck({ locale = "es" }: { locale?: Locale }) {
             {t.engineBadge}
           </span>
           <a
-            href="/hyperframes/index.html"
+            href="/hyperframes"
             target="_blank"
             rel="noreferrer"
             className="hf-raw-link"
@@ -321,7 +321,7 @@ export function HyperFramesCinemaDeck({ locale = "es" }: { locale?: Locale }) {
           >
             <iframe
               ref={iframeRef}
-              src="/hyperframes/index.html"
+              src="/hyperframes"
               title={t.title}
               className="hf-stage-iframe"
               data-testid="hf-stage-iframe"
