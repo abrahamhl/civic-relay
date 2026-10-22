@@ -10,6 +10,7 @@ import {
   type SignedOepRealPacket
 } from '../lib/live-protocol-node.mjs';
 import { energyPolicy } from '../lib/emergency-policy.mjs';
+import { sendWebRtcLoopbackPacket } from '../lib/webrtc-loopback.mjs';
 
 interface FundingTarget {
   id: string;
@@ -411,6 +412,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
     reason: string;
     verifyTimeMs: number;
     webrtcRttMs: number | null;
+    webrtcResult: string;
     transportUsed: string;
   } | null>(null);
   const [durableQueue, setDurableQueue] = useState<SignedOepRealPacket[]>([]);
@@ -452,62 +454,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
   const [utcNow, setUtcNow] = useState<number>(1792569600000);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Transmit a packet over a real WebRTC RTCPeerConnection DataChannel loopback
-  const sendOverRealWebRtcDataChannel = async (
-    packet: SignedOepRealPacket
-  ): Promise<{ rttMs: number; delivered: boolean }> => {
-    if (typeof RTCPeerConnection === 'undefined') {
-      return { rttMs: 0.8, delivered: true };
-    }
-    return new Promise((resolvePromise) => {
-      const t0 = performance.now();
-      const pc1 = new RTCPeerConnection();
-      const pc2 = new RTCPeerConnection();
-      let settled = false;
-      const finish = (rtt: number, ok: boolean) => {
-        if (settled) return;
-        settled = true;
-        try {
-          pc1.close();
-          pc2.close();
-        } catch {}
-        resolvePromise({ rttMs: Number(rtt.toFixed(2)), delivered: ok });
-      };
-      const timeout = window.setTimeout(() => finish(performance.now() - t0, true), 1200);
-
-      pc1.onicecandidate = (e) => {
-        if (e.candidate) pc2.addIceCandidate(e.candidate).catch(() => {});
-      };
-      pc2.onicecandidate = (e) => {
-        if (e.candidate) pc1.addIceCandidate(e.candidate).catch(() => {});
-      };
-      pc2.ondatachannel = (ev) => {
-        const rx = ev.channel;
-        rx.onmessage = (msgEv) => {
-          const parsed = JSON.parse(String(msgEv.data));
-          if (parsed && parsed.messageId === packet.messageId) {
-            window.clearTimeout(timeout);
-            finish(performance.now() - t0, true);
-          }
-        };
-      };
-
-      const tx = pc1.createDataChannel('oep-emergency-d2d');
-      tx.onopen = () => {
-        tx.send(JSON.stringify(packet));
-      };
-      pc1
-        .createOffer()
-        .then((offer) => pc1.setLocalDescription(offer).then(() => pc2.setRemoteDescription(offer)))
-        .then(() => pc2.createAnswer())
-        .then((answer) => pc2.setLocalDescription(answer).then(() => pc1.setRemoteDescription(answer)))
-        .catch(() => {
-          window.clearTimeout(timeout);
-          finish(performance.now() - t0, true);
-        });
-    });
-  };
-
+  // WebRTC is only a SAME-BROWSER loopback experiment, never a remote receipt.
   // Bootstrap real WebCrypto ECDSA P-256 keypair, durable localStorage queue, BroadcastChannel, and Hardware APIs
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -544,7 +491,8 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
           valid: ver.valid,
           reason: ver.reason,
           verifyTimeMs: ver.verifyTimeMs,
-          webrtcRttMs: 1.4,
+          webrtcRttMs: null,
+          webrtcResult: 'NOT_TESTED',
           transportUsed: 'WEBCRYPTO_ECDSA_P256 + LOCALSTORAGE_PERSISTED'
         });
       })
@@ -563,8 +511,9 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
             valid: ver.valid,
             reason: ver.reason,
             verifyTimeMs: ver.verifyTimeMs,
-            webrtcRttMs: Number(Math.max(0.4, Date.now() - incoming.timestampMs).toFixed(2)),
-            transportUsed: 'LIVE_CROSS_TAB_BROADCAST_CHANNEL_P2P'
+            webrtcRttMs: null,
+            webrtcResult: 'NOT_TESTED',
+            transportUsed: 'BROADCAST_CHANNEL_SAME_ORIGIN_TAB'
           });
         }
       };
@@ -642,15 +591,16 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
     }
 
     // 3. Transmit over real WebRTC RTCPeerConnection DataChannel & verify signature
-    const rtc = await sendOverRealWebRtcDataChannel(pkt);
+    const rtc = await sendWebRtcLoopbackPacket(pkt);
     const ver = await verifyRealOepPacket(pkt);
     setLastPacket(pkt);
     setVerifyState({
       valid: ver.valid,
       reason: ver.reason,
       verifyTimeMs: ver.verifyTimeMs,
-      webrtcRttMs: rtc.rttMs,
-      transportUsed: 'WEBRTC_DATACHANNEL + BROADCAST_BUS + LOCALSTORAGE'
+      webrtcRttMs: rtc.delivered ? rtc.rttMs : null,
+      webrtcResult: rtc.reason,
+      transportUsed: `WEBRTC_LOCAL_LOOPBACK_${rtc.reason} + BROADCAST_CHANNEL + LOCALSTORAGE`
     });
   };
 
@@ -742,12 +692,20 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
                 <strong>{keyInfo ? keyInfo.fingerprint : '...'}</strong>
               </div>
               <div className="oep-ts-kpi">
-                <span>WebRTC P2P RTT</span>
+                <span>WebRTC local loopback RTT</span>
                 <strong style={{ color: '#38bdf8' }}>
                   {verifyState?.webrtcRttMs != null ? `${verifyState.webrtcRttMs} ms` : '—'}
                 </strong>
               </div>
             </div>
+            <p role="status" aria-live="polite" data-testid="webrtc-loopback-status">
+              {locale === 'es'
+                ? 'WebRTC: prueba local en este navegador, NO entrega a otro dispositivo.'
+                : locale === 'nl'
+                  ? 'WebRTC: lokale test in deze browser, GEEN aflevering op een ander apparaat.'
+                  : 'WebRTC: local test inside this browser, NOT delivery to another device.'}
+              {' '}{verifyState?.webrtcResult ?? 'NOT_TESTED'}
+            </p>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.55rem', marginBottom: '0.9rem' }}>
               <button
