@@ -34,7 +34,7 @@ type CameraStatus = "idle" | "requesting" | "active" | "unavailable" | "denied";
 const dictionary: Record<Locale, {
   eyebrow: string; title: string; description: string; inspect: string;
   notMeasured: string; recorded: string; unavailable: string;
-  cameraTitle: string; cameraStart: string; cameraStop: string;
+  cameraTitle: string; cameraStart: string; cameraStop: string; cameraCancel: string;
   cameraDenied: string; cameraIdle: string; cameraActive: string;
   export: string; disclaimer: string; nodeTitle: string; nodeStatus: string;
 }> = {
