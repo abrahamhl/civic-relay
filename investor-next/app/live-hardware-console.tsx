@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Locale } from './copy';
+import DeviceFieldDiagnostics from './device-field-diagnostics';
 import {
   generateRealEcdsaKeyPair,
   signAndPackRealOepPacket,
@@ -337,7 +338,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
         online: Boolean(nav.onLine),
         batteryPct: battPct,
         charging: battCharging,
-        netType: nav.connection?.effectiveType?.toUpperCase() || (nav.onLine ? 'WIFI_OR_ETHERNET' : 'OFFLINE'),
+        netType: nav.connection?.effectiveType?.toUpperCase() || (nav.onLine ? 'CONNECTION_TYPE_UNKNOWN' : 'BROWSER_OFFLINE_FLAG'),
         downlinkMbps: typeof nav.connection?.downlink === 'number' ? nav.connection.downlink : null,
         netRttMs: typeof nav.connection?.rtt === 'number' ? nav.connection.rtt : null,
         cores: typeof nav.hardwareConcurrency === 'number' ? nav.hardwareConcurrency : null,
@@ -474,6 +475,8 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
           <p>{c.lead}</p>
         </div>
 
+        <DeviceFieldDiagnostics locale={locale} />
+
         <div className="oep-ts-infra-layout" style={{ marginBottom: '2.5rem' }}>
           {/* PANEL 1: REAL WEBCRYPTO ECDSA-P256 + WEBRTC DATACHANNEL + LOCALSTORAGE */}
           <div className="oep-ts-panel">
@@ -548,7 +551,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
                 <strong>
                   {hwState.batteryPct !== null
                     ? `${hwState.batteryPct}% (${hwState.charging ? 'CHARGING' : 'BATTERY'})`
-                    : 'OS PROTECTED (DEFAULT 75%)'}
+                    : 'N/A · BATTERY API UNAVAILABLE'}
                 </strong>
               </div>
               <div className="oep-ts-kpi">
@@ -562,8 +565,8 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
                 </strong>
               </div>
               <div className="oep-ts-kpi">
-                <span>Measured Net RTT</span>
-                <strong>{hwState.netRttMs !== null ? `${hwState.netRttMs} ms` : 'LOCAL'}</strong>
+                <span>Network API estimated RTT (not ping)</span>
+                <strong>{hwState.netRttMs !== null ? `${hwState.netRttMs} ms` : 'N/A'}</strong>
               </div>
               <div className="oep-ts-kpi">
                 <span>CPU Cores / WebRTC</span>
@@ -572,10 +575,10 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
                 </strong>
               </div>
               <div className="oep-ts-kpi">
-                <span>WebBluetooth / Crypto</span>
+                <span>Browser Bluetooth / WebCrypto APIs</span>
                 <strong>
                   {hwState.bluetoothApiAvailable ? 'BLE API OK' : 'BLE OS-Gated'} ·{' '}
-                  {hwState.webcryptoAvailable ? 'HW Crypto OK' : '—'}
+                  {hwState.webcryptoAvailable ? 'WebCrypto API OK' : '—'}
                 </strong>
               </div>
             </div>
