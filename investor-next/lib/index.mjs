@@ -4,7 +4,8 @@
  * the bounded store-and-forward queue & receipt verification engine,
  * the consent, capability, energy & CAP 1.2 trust-boundary policies,
  * the satellite NTN link-budget, polygonal zone telemetry & through-wall Wi-Fi CSI / RF radar engines,
- * and the real WebCrypto ECDSA P-256 packet signer/verifier + live Keplerian orbital ephemeris engine.
+ * the real WebCrypto ECDSA P-256 packet signer/verifier + live Keplerian orbital ephemeris engine,
+ * and the Sector Intelligence / Authorized Camera Adapter & Anti-SSRF/RBAC engine.
  */
 export { runScenario } from './emergency-routing.mjs';
 export { createStoreForwardEngine, createInMemoryAdapter } from './store-forward.mjs';
@@ -34,3 +35,14 @@ export {
   verifyRealOepPacket,
   computeLiveOrbitalEphemeris
 } from './live-protocol-node.mjs';
+export {
+  EVIDENCE_LABELS,
+  ALLOWED_CAMERA_DOMAINS,
+  CELESTIAL_BODIES,
+  PILOT_SECTORS,
+  CAMERA_SOURCES,
+  validateCameraUpstreamUrl,
+  checkSectorAccessPolicy,
+  computeFovPolygon,
+  createSectorCameraAdapter
+} from './sector-camera-engine.mjs';

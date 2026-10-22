@@ -20,7 +20,8 @@ const mimetypes={'.html':'text/html; charset=utf-8','.js':'application/javascrip
 const server=createServer((req,res)=>{
   try{
     let pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
-    const paths=pathname==='/'?['index.html']:pathname==='/es'||pathname==='/es/'?['es.html','es/index.html']:pathname==='/nl'||pathname==='/nl/'?['nl.html','nl/index.html']:[pathname.replace(/^\/+/,'')];
+    const clean=pathname.replace(/^\/+|\/+$/g,'');
+    const paths=pathname==='/'?['index.html']:pathname==='/es'||pathname==='/es/'?['es.html','es/index.html']:pathname==='/nl'||pathname==='/nl/'?['nl.html','nl/index.html']:[clean,clean+'.html',clean+'/index.html'];
     const file=paths.map(p=>resolve(out,p)).find(p=>(p===out||p.startsWith(out+sep))&&existsSync(p));
     if(!file){res.writeHead(404);res.end('Not found');return;}
     res.setHeader('content-type',mimetypes[extname(file)]||'application/octet-stream');
@@ -35,7 +36,9 @@ const cases=[
   {id:'P05',role:'NL privacy reviewer / radio claim boundary',locale:'nl',url:'/nl/',text:'ALS HET',viewport:{width:1024,height:768}},
   {id:'P06',role:'Volunteer / deny implicit SOS',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:412,height:915}},
   {id:'P07',role:'Keyboard and reduced-motion accessibility',locale:'en',url:'/',text:'WHEN THE',viewport:{width:390,height:844}},
-  {id:'P08',role:'Institutional partner / roadmap and limitations',locale:'nl',url:'/nl/',text:'ALS HET',viewport:{width:820,height:1180}}
+  {id:'P08',role:'Institutional partner / roadmap and limitations',locale:'nl',url:'/nl/',text:'ALS HET',viewport:{width:820,height:1180}},
+  {id:'P09',role:'3D Globe object selection, scenario sync and Mars educational mode',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:1440,height:900}},
+  {id:'P10',role:'Sector Intelligence El Tiemblo CCTV, Anti-SSRF and Unified Pipeline',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:1440,height:900}}
 ];
 async function runRoleTask(page,trial,evidenceDir){
  const observations={role:trial.role,actions:[],verified:false};
@@ -125,6 +128,46 @@ async function runRoleTask(page,trial,evidenceDir){
    observations.verified=roadmap===1&&partner===1&&/FYSIEK|PHYSICAL|SIMULAT/i.test(warnings);
    break;
   }
+  case 'P09': {
+   const thesis=await page.locator('[data-testid="thirty-second-thesis-card"]').innerText();
+   const outageCounters=await page.locator('[data-testid="globe-route-counters"]').innerText();
+   await page.locator('[data-testid="mission-scenario-intermittent"]').click();
+   const intermittentCounters=await page.locator('[data-testid="globe-route-counters"]').innerText();
+   await page.locator('[data-testid="globe-object-CAM-DGT-N403-PK82"]').click();
+   const inspector=await page.locator('[data-testid="globe-selected-inspector"]').innerText();
+   await page.locator('[data-testid="globe-mode-space"]').click();
+   await page.locator('[data-testid="celestial-body-mars"]').click();
+   const marsBanner=await page.locator('[data-testid="non-earth-educational-banner"]').innerText();
+   note('30s thesis, scenario counter transition, camera selection & Mars disclaimer',{outageCounters,intermittentCounters,marsBanner:marsBanner.slice(0,120)});
+   observations.verified=
+     thesis.includes('Civic Relay investiga') &&
+     outageCounters.includes('0') &&
+     !intermittentCounters.includes('ACK sintéticos: 0') &&
+     inspector.includes('N-403') &&
+     marsBanner.includes('NO opera en Marte');
+   break;
+  }
+  case 'P10': {
+   const secSection=page.locator('[data-testid="sector-intelligence-section"]');
+   await secSection.scrollIntoViewIfNeeded();
+   await page.locator('[data-testid="sector-btn-SECTOR-AVILA-TIEMBLO"]').click();
+   const camGrid=await page.locator('[data-testid="sector-camera-grid"]').innerText();
+   await page.locator('[data-testid="ssrf-test-loopback"]').click();
+   const ssrfBlocked=await page.locator('[data-testid="ssrf-validator-verdict"]').innerText();
+   await page.locator('[data-testid="ssrf-test-dgt"]').click();
+   const ssrfAllowed=await page.locator('[data-testid="ssrf-validator-verdict"]').innerText();
+   await page.locator('[data-testid="pipeline-node-5"]').click();
+   const pipeDetail=await page.locator('[data-testid="pipeline-active-detail"]').innerText();
+   note('El Tiemblo cameras, Anti-SSRF block/allow, and Unified Pipeline step 6',{ssrfBlocked,ssrfAllowed});
+   observations.verified=
+     camGrid.includes('PUBLIC_CATALOG_VERIFIED') &&
+     camGrid.includes('SYNTHETIC') &&
+     camGrid.includes('STALE') &&
+     ssrfBlocked.startsWith('BLOCK:') &&
+     ssrfAllowed.startsWith('ALLOW:') &&
+     pipeDetail.includes('emergency-routing.mjs');
+   break;
+  }
  }
  return observations;
 }
@@ -163,7 +206,7 @@ try{
   console.log(record.verdict,trial.id,trial.locale,JSON.stringify({lang:obs.lang,errors:pageErrors.length,canonical:obs.canonical}));
   await page.close();
  }
- const result={sha:process.env.GITHUB_SHA||'LOCAL',completed_at_utc:new Date().toISOString(),scope:'EIGHT automated Chromium task roles on synthetic local website. Neither human Buyer Arena interviews nor physical/field or real RF validation.',runs:log};
+ const result={sha:process.env.GITHUB_SHA||'LOCAL',completed_at_utc:new Date().toISOString(),scope:'TEN automated Chromium task roles (P01-P10) on synthetic local website including 3D Globe, Mars educational mode, El Tiemblo Sector Intelligence CCTV, Anti-SSRF, and Unified Pipeline.',runs:log};
  writeFileSync(join(evidenceDir,'summary.json'),JSON.stringify(result,null,2));
  assert.ok(log.every(x=>x.verdict==='PASS'),'Browser release regression failed; inspect evidence/browser-release');
 }finally{

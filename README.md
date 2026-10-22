@@ -83,6 +83,14 @@ Servir la demo estática desde `apps/web/dist`. La API y el servicio reales **no
 
 ## Documentación
 
+### Producto, Arquitectura 3D Mission Control y Sector Intelligence (2026-10-22)
+- [`docs/product/VOICE_VISION_REQUIREMENTS_2026-10-22.md`](docs/product/VOICE_VISION_REQUIREMENTS_2026-10-22.md) – transcripción íntegra con marcas temporales (`00:00`–`06:33.59`) de la visión original del fundador, matriz funcional (`V01..V13`, `W01..W03`) y contraste con el código
+- [`docs/product/WEBSITE_INFORMATION_ARCHITECTURE.md`](docs/product/WEBSITE_INFORMATION_ARCHITECTURE.md) – tesis de comprensión en 30 segundos, relación `Civic Relay` / `OEP`, arquitectura de 3 superficies (`Descubrir`, `Explorar / Mission Control`, `Investigar / Science`), recorrido causal de 8 escenas y rutas estáticas (`EN`, `ES`, `NL`)
+- [`docs/product/INTERACTION_SPEC_AND_STATE_MODEL.md`](docs/product/INTERACTION_SPEC_AND_STATE_MODEL.md) – especificación de interacción 3D (`THREE.Raycaster`, órbitas Tierra/Luna/Marte, máscara continental Natural Earth 1:110m, fallback SVG 2D) y acoplamiento determinista con `runScenario()` y `createStoreForwardEngine()`
+- [`docs/product/CAMERA_SECTOR_ARCHITECTURE.md`](docs/product/CAMERA_SECTOR_ARCHITECTURE.md) – arquitectura de **Sector Intelligence & CCTV Coordination** (`El Tiemblo · Ávila`, `Valencia · Turia`, `Arnhem · NL`), catálogo abierto DGT/Rijkswaterstaat vs. telemetría sintética, validación anti-SSRF, RBAC fail-closed, mosaico de privacidad y conos FOV 2.5D no calibrados
+- [`docs/product/SCIENTIFIC_TRUTH_MATRIX.md`](docs/product/SCIENTIFIC_TRUTH_MATRIX.md) – matriz de verdad científica (`IMPLEMENTADO`, `SIMULADO`, `EN INVESTIGACIÓN`, `SIN PERMISOS`, `NO FACTIBLE CON WEB ACTUAL`)
+- [`docs/product/BEFORE_AFTER_UX_AUDIT.md`](docs/product/BEFORE_AFTER_UX_AUDIT.md) – auditoría antes/después desde 6 perspectivas, 10 deficiencias corregidas y evidencia automatizada en Chromium (`P01..P10`)
+
 ### Técnica e Inversión (Dossier 2026)
 - [`docs/investor/EXECUTIVE_SUMMARY.md`](docs/investor/EXECUTIVE_SUMMARY.md) – resumen ejecutivo y posicionamiento técnico (TRL 3–4)
 - [`docs/investor/ONE_PAGE_PITCH.md`](docs/investor/ONE_PAGE_PITCH.md) – pitch de una página para inversores e instituciones

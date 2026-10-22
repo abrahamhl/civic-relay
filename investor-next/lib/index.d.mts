@@ -55,3 +55,22 @@ export {
   type VerifiedOepPacketResult,
   type LiveOrbitalPass
 } from './live-protocol-node.mjs';
+export {
+  EVIDENCE_LABELS,
+  ALLOWED_CAMERA_DOMAINS,
+  CELESTIAL_BODIES,
+  PILOT_SECTORS,
+  CAMERA_SOURCES,
+  validateCameraUpstreamUrl,
+  checkSectorAccessPolicy,
+  computeFovPolygon,
+  createSectorCameraAdapter,
+  type EvidenceLabel,
+  type CelestialBodyId,
+  type CelestialBodySpec,
+  type SectorSpec,
+  type SubSectorSpec,
+  type CameraSource,
+  type EnrichedCameraSource,
+  type SectorCausalTrace
+} from './sector-camera-engine.mjs';
