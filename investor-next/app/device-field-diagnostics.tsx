@@ -181,9 +181,14 @@ export default function DeviceFieldDiagnostics({ locale }: { locale: Locale }) {
       setCameraStatus("unavailable");
       return;
     }
+    const requestEpoch = ++cameraEpochRef.current;
     setCameraStatus("requesting");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: "environment" } });
+      if (requestEpoch !== cameraEpochRef.current || !mountedRef.current) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
       streamRef.current = stream;
       for (const track of stream.getVideoTracks()) {
         track.onended = () => {
