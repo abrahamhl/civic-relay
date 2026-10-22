@@ -1,0 +1,137 @@
+/* Responsive investor navigation. All selectors are scoped to avoid affecting mission control.
+   Mobile and desktop share the same navigable sections; no visual overflow by design. */
+.topbar.oep-responsive-header {
+  display: grid;
+  grid-template-columns: minmax(188px, auto) minmax(0, 1fr) auto;
+  gap: clamp(12px, 1.7vw, 28px);
+  align-items: center;
+  min-height: 76px;
+  width: 100%;
+  padding-block: 10px;
+  isolation: isolate;
+}
+.topbar.oep-responsive-header .oep-brand {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  white-space: normal;
+  letter-spacing: -0.02em;
+}
+.oep-brand .mark-symbol { flex-shrink: 0; }
+.oep-brand-copy { display: grid; gap: 3px; min-width: 0; }
+.oep-brand-copy strong { font-size: clamp(15px, 1.15vw, 18px); line-height: 1.12; font-weight: 820; white-space: nowrap; }
+.oep-brand-subtitle { font-size: 10px; color: #a6b7c1; line-height: 1.35; font-weight: 550; letter-spacing: .012em; }
+.topbar.oep-responsive-header .oep-header-desktop {
+  display: flex;
+  min-width: 0;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(11px, 1.6vw, 26px);
+  margin: 0;
+}
+.topbar.oep-responsive-header .oep-header-desktop a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  min-width: 0;
+  padding: 6px 0;
+  font-size: clamp(11px, .85vw, 13px);
+  font-weight: 670;
+  letter-spacing: .005em;
+  line-height: 1.3;
+  white-space: normal;
+  text-wrap: balance;
+}
+.oep-header-actions { display: flex; align-items: center; gap: 12px; justify-self: end; min-width: 0; }
+.topbar.oep-responsive-header .oep-header-locales { margin: 0; }
+.oep-header-locales a { min-width: 32px; min-height: 44px; display: inline-flex; justify-content: center; align-items: center; }
+.oep-menu-toggle {
+  min-width: 88px;
+  min-height: 44px;
+  padding: 10px 13px;
+  color: #f2f7f9;
+  background: rgba(145,215,232,.07);
+  border: 1px solid rgba(145,215,232,.36);
+  border-radius: 9px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-weight: 720;
+  font-size: 12px;
+  letter-spacing: .015em;
+}
+.oep-menu-toggle:hover,.oep-menu-toggle.is-open { background: rgba(145,215,232,.16); border-color: #91d7e8; }
+.oep-menu-icon { display: grid; gap: 4px; width: 15px; flex-shrink: 0; }
+.oep-menu-icon span { display: block; height: 2px; width: 15px; border-radius: 2px; background: currentColor; }
+.oep-menu-panel {
+  display: block;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: clamp(12px, 4.5vw, 76px);
+  width: min(590px, calc(100vw - 24px));
+  max-height: calc(100dvh - 100px);
+  padding: clamp(16px, 2.5vw, 28px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid #38515e;
+  border-radius: 15px;
+  background: #0a1720;
+  box-shadow: 0 24px 70px #000e;
+  z-index: 101;
+}
+.oep-menu-panel[hidden] { display: none !important; }
+.oep-menu-kicker { margin: 0 0 13px; color: #91d7e8; font: 730 11px/1.3 ui-monospace,Consolas,monospace; letter-spacing: .14em; }
+.topbar.oep-responsive-header .oep-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+.topbar.oep-responsive-header .oep-menu-grid a {
+  min-width: 0;
+  min-height: 54px;
+  padding: 12px 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #344751;
+  border-radius: 7px;
+  background: #10232d;
+  color: #e8f1f4;
+  font-size: 13px;
+  line-height: 1.35;
+  letter-spacing: .005em;
+  white-space: normal;
+}
+.topbar.oep-responsive-header .oep-menu-grid a:hover { border-color: #91d7e8; background: #18313d; }
+.oep-menu-index { flex-shrink: 0; font: 750 11px ui-monospace,monospace; color: #e6967b; }
+.oep-menu-arrow { margin-left: auto; font-size: 15px; color: #91d7e8; }
+.oep-menu-footer { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; margin-top: 14px; }
+.oep-menu-footer a { display: inline-flex; align-items: center; min-height: 44px; color: #accad3; font-size: 12px; }
+@media (max-width: 1250px) {
+ .topbar.oep-responsive-header { grid-template-columns: minmax(0, 1fr) auto; }
+ .topbar.oep-responsive-header .oep-header-desktop { display: none; }
+}
+@media (max-width: 760px) {
+ .topbar.oep-responsive-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; min-height: 68px; flex-wrap: nowrap; padding-block: 9px; }
+ .oep-brand-subtitle { font-size: 9px; }
+ .oep-header-actions { gap: 7px; }
+ .oep-menu-toggle { min-width: 44px; padding: 10px; }
+ .oep-menu-text { display: none; }
+ .oep-brand-copy strong { font-size: 16px; }
+}
+@media (max-width: 430px) {
+ .oep-brand-subtitle { display: none; }
+ .topbar.oep-responsive-header .oep-brand { gap: 9px; }
+ .oep-brand .mark-symbol { transform: rotate(-29deg) scale(.85); width: 21px; }
+ .oep-brand-copy strong { font-size: 14px; }
+ .topbar.oep-responsive-header .oep-header-locales a { min-width: 28px; padding-inline: 5px; font-size: 10px; }
+ .oep-menu-panel { right: 12px; }
+ .topbar.oep-responsive-header .oep-menu-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+ .oep-menu-panel, .oep-menu-toggle { transition: none; }
+}
