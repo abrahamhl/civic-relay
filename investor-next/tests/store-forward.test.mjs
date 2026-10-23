@@ -2,6 +2,20 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createStoreForwardEngine,createInMemoryAdapter} from '../lib/store-forward.mjs';
 
+test('fake receiver metadata ledger stays bounded after many synthetic deliveries',async()=>{
+ let now=100000;
+ const engine=createStoreForwardEngine({now:()=>now,maxEntries:1100});
+ const adapter=createInMemoryAdapter({maxReceiptEntries:3});
+ engine.registerAdapter(adapter);
+ for(let i=0;i<5;i++){
+   const id=`BOUND_${i}`;
+   engine.enqueue({id,category:'SAFE',consented:true,payload:{},createdAt:now,ttlSeconds:60});
+   assert.equal((await engine.dispatch(id)).status,'ACK_SYNTHETIC');
+ }
+ assert.deepEqual(adapter.getReceived().map(r=>r.id),['BOUND_2','BOUND_3','BOUND_4']);
+ assert.throws(()=>createInMemoryAdapter({maxReceiptEntries:0}),/capacity/);
+});
+
 const message=(id='EXERCISE_1',extra={})=>({
  id,category:'SOS_EXPLICIT',consented:true,destination:'LAB_CENTRE',
  payload:{anonymous:true},ttlSeconds:60,...extra

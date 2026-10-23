@@ -167,7 +167,9 @@ export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAtt
 }
 /** Lab-only fake adapter; its receipt is simulated, not a cryptographic or field-tested ACK. */
 export function createInMemoryAdapter({id='LAB_GATEWAY',available=true,receipts=true,
-  failures=0,reliability=.8,latencyMs=100,energyCost=.2,monetaryCost=0}={}){
+  failures=0,reliability=.8,latencyMs=100,energyCost=.2,monetaryCost=0,maxReceiptEntries=1000}={}){
+  if(!Number.isSafeInteger(maxReceiptEntries)||maxReceiptEntries<1)
+    throw Error('Invalid simulated receipt ledger capacity');
   let enabled=available,remaining=failures;const received=[];
   return {
     id,kind:'SIMULATOR_ADAPTER',evidence:'SIMULATED',
@@ -179,6 +181,7 @@ export function createInMemoryAdapter({id='LAB_GATEWAY',available=true,receipts=
       if(remaining>0){remaining--;return {accepted:false};}
       // Record only non-sensitive test metadata. This does not imply remote deletion.
       received.push({id:envelope.id,provenance:'SYNTHETIC_EXERCISE_ONLY'});
+      if(received.length>maxReceiptEntries)received.shift();
       return {accepted:true,...(receipts?{receipt:{kind:'SIMULATED_RECEIVER_RECEIPT',
         messageId:envelope.id,transportId:id}}:{})};
     },
