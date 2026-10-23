@@ -446,11 +446,14 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
   });
 
   // Live WebAudio FFT Acoustic Spectrum state
-  const [fftBins, setFftBins] = useState<number[]>(Array.from({ length: 32 }, () => 8));
+  const [fftBins, setFftBins] = useState<number[]>(Array.from({ length: 32 }, () => 0));
   const [micActive, setMicActive] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
+  const micRequestEpochRef = useRef(0);
+  const micPendingRef = useRef(false);
+  const queueEpochRef = useRef(0);
 
   // 3. Real-time UTC clock for Orbital Ephemerides
   const [utcNow, setUtcNow] = useState<number>(1792569600000);
@@ -472,6 +475,8 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
       }
     } catch {}
 
+    // Do not restore a cleared message from a pending bootstrap signature.
+    const bootstrapEpoch = queueEpochRef.current;
     // Generate real ECDSA P-256 keypair and sign initial live packet
     generateRealEcdsaKeyPair()
       .then(async (bundle) => {
@@ -488,6 +493,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
           timestampMs: Date.now()
         });
         const ver = await verifyRealOepPacket(pkt);
+        if (bootstrapEpoch !== queueEpochRef.current) return;
         setLastPacket(assessPacketVerification(pkt, ver).packet);
         setVerifyState({
           valid: ver.valid,
@@ -558,11 +564,18 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
     return () => {
       window.clearInterval(clockInterval);
       if (bc) bc.close();
+      micRequestEpochRef.current += 1;
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      micStreamRef.current?.getTracks().forEach((track) => track.stop());
+      micStreamRef.current = null;
+      if (audioCtxRef.current) void audioCtxRef.current.close().catch(() => {});
+      audioCtxRef.current = null;
     };
   }, []);
 
   const triggerRealSignedTransmission = async (statusType: 'SOS_EXPLICIT' | 'SAFE') => {
     if (!keyInfo) return;
+    const queueEpoch = queueEpochRef.current;
     const nextIdx = msgCounter + 1;
     setMsgCounter(nextIdx);
     const id = `MSG-LIVE-${String(nextIdx).padStart(2, '0')}`;
@@ -577,6 +590,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
       batteryPct: hwState.batteryPct ?? 80,
       timestampMs: Date.now()
     });
+    if (queueEpoch !== queueEpochRef.current) return;
 
     // 1. Persist to durable browser disk storage (localStorage)
     const updatedQueue = [pkt, ...durableQueue].slice(0, 8);
@@ -597,6 +611,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
     // 3. Transmit over real WebRTC RTCPeerConnection DataChannel & verify signature
     const rtc = await sendWebRtcLoopbackPacket(pkt);
     const ver = await verifyRealOepPacket(pkt);
+    if (queueEpoch !== queueEpochRef.current) return;
     setLastPacket(assessPacketVerification(pkt, ver).packet);
     setVerifyState({
       valid: ver.valid,
@@ -610,7 +625,10 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
   };
 
   const clearDiskQueue = () => {
+    queueEpochRef.current += 1; // Cancel pending signature/loopback UI writes.
     setDurableQueue([]);
+    setLastPacket(null);
+    setVerifyState(null);
     try {
       window.localStorage.removeItem(STORAGE_KEY);
     } catch {}
@@ -618,23 +636,31 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
 
   const toggleLiveFftScanner = async () => {
     if (micActive) {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (micStreamRef.current) {
-        micStreamRef.current.getTracks().forEach((tr) => tr.stop());
-        micStreamRef.current = null;
-      }
-      if (audioCtxRef.current) {
-        audioCtxRef.current.close().catch(() => {});
-        audioCtxRef.current = null;
-      }
+      micRequestEpochRef.current += 1;
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      micStreamRef.current?.getTracks().forEach((track) => track.stop());
+      micStreamRef.current = null;
+      if (audioCtxRef.current) void audioCtxRef.current.close().catch(() => {});
+      audioCtxRef.current = null;
       setMicActive(false);
+      setFftBins(Array.from({ length: 32 }, () => 0));
       return;
     }
+    if (micPendingRef.current) return;
+    micPendingRef.current = true;
+    const requestEpoch = ++micRequestEpochRef.current;
+    let stream: MediaStream | null = null;
+    let ctx: AudioContext | null = null;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-      micStreamRef.current = stream;
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      if (requestEpoch !== micRequestEpochRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      const ctx = new AudioCtx();
+      ctx = new AudioCtx();
+      micStreamRef.current = stream;
       audioCtxRef.current = ctx;
       const source = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();
@@ -643,15 +669,23 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
       const data = new Uint8Array(analyser.frequencyBinCount);
       setMicActive(true);
       const loop = () => {
+        if (requestEpoch !== micRequestEpochRef.current) return;
         analyser.getByteFrequencyData(data);
         setFftBins(Array.from(data.slice(0, 32)).map((v) => Math.max(4, Math.round((v / 255) * 100))));
         rafRef.current = requestAnimationFrame(loop);
       };
       loop();
     } catch {
-      // Fallback oscillator FFT in case microphone permission is denied
-      setMicActive(true);
-      setFftBins(Array.from({ length: 32 }, (_, i) => Math.round(25 + 60 * Math.abs(Math.sin(i * 0.35)))));
+      stream?.getTracks().forEach((track) => track.stop());
+      if (ctx) void ctx.close().catch(() => {});
+      if (requestEpoch === micRequestEpochRef.current) {
+        micStreamRef.current = null;
+        audioCtxRef.current = null;
+        setMicActive(false);
+        setFftBins(Array.from({ length: 32 }, () => 0));
+      }
+    } finally {
+      micPendingRef.current = false;
     }
   };
 
