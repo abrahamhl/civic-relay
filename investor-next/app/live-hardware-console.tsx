@@ -11,6 +11,7 @@ import {
 } from '../lib/live-protocol-node.mjs';
 import { energyPolicy } from '../lib/emergency-policy.mjs';
 import { sendWebRtcLoopbackPacket } from '../lib/webrtc-loopback.mjs';
+import { assessPacketVerification } from '../lib/packet-verification-state.mjs';
 
 interface FundingTarget {
   id: string;
@@ -409,6 +410,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
   const [lastPacket, setLastPacket] = useState<SignedOepRealPacket | null>(null);
   const [verifyState, setVerifyState] = useState<{
     valid: boolean;
+    trustStatus: 'SIGNATURE_INVALID' | 'SIGNATURE_VALID_UNTRUSTED';
     reason: string;
     verifyTimeMs: number;
     webrtcRttMs: number | null;
@@ -485,10 +487,11 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
           batteryPct: 82,
           timestampMs: Date.now()
         });
-        setLastPacket(pkt);
         const ver = await verifyRealOepPacket(pkt);
+        setLastPacket(assessPacketVerification(pkt, ver).packet);
         setVerifyState({
           valid: ver.valid,
+          trustStatus: assessPacketVerification(pkt, ver).status,
           reason: ver.reason,
           verifyTimeMs: ver.verifyTimeMs,
           webrtcRttMs: null,
@@ -506,9 +509,10 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
         const incoming = ev.data as SignedOepRealPacket;
         if (incoming && incoming.protocol === 'OEP_REAL_EXECUTION_V1') {
           const ver = await verifyRealOepPacket(incoming);
-          setLastPacket(incoming);
+          setLastPacket(assessPacketVerification(incoming, ver).packet);
           setVerifyState({
             valid: ver.valid,
+            trustStatus: assessPacketVerification(incoming, ver).status,
             reason: ver.reason,
             verifyTimeMs: ver.verifyTimeMs,
             webrtcRttMs: null,
@@ -593,9 +597,10 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
     // 3. Transmit over real WebRTC RTCPeerConnection DataChannel & verify signature
     const rtc = await sendWebRtcLoopbackPacket(pkt);
     const ver = await verifyRealOepPacket(pkt);
-    setLastPacket(pkt);
+    setLastPacket(assessPacketVerification(pkt, ver).packet);
     setVerifyState({
       valid: ver.valid,
+      trustStatus: assessPacketVerification(pkt, ver).status,
       reason: ver.reason,
       verifyTimeMs: ver.verifyTimeMs,
       webrtcRttMs: rtc.delivered ? rtc.rttMs : null,
@@ -732,19 +737,26 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
               )}
             </div>
 
-            {lastPacket && (
+            {verifyState && (
               <div className="oep-ts-hex-box" data-testid="live-ecdsa-packet-box">
-                <div style={{ color: '#6ee7b7', fontWeight: 700 }}>
-                  STATUS: {verifyState?.reason} (Sign: {lastPacket.signTimeMs}ms · Verify:{' '}
-                  {verifyState?.verifyTimeMs}ms)
+                <div
+                  role="status"
+                  data-testid="live-ecdsa-verification-status"
+                  style={{ color: verifyState.valid ? '#fbbf24' : '#fb7185', fontWeight: 700 }}
+                >
+                  STATUS: {verifyState.trustStatus} · {verifyState.reason} (Verify: {verifyState.verifyTimeMs}ms)
                 </div>
-                <div>
-                  MSG: {lastPacket.messageId} ({lastPacket.status}) · TRANSPORT: {verifyState?.transportUsed}
-                </div>
-                <div>24B OEP-NTN HEX: {lastPacket.binaryFrameHex} (CRC16: {lastPacket.crc16Hex})</div>
-                <div style={{ color: '#cbd5e1', fontSize: '0.7rem', marginTop: '0.25rem' }}>
-                  REAL ECDSA-P256 SIGNATURE: {lastPacket.signatureHex.slice(0, 72)}...
-                </div>
+                {lastPacket && (
+                  <>
+                    <div>
+                      MSG: {lastPacket.messageId} ({lastPacket.status}) · TRANSPORT: {verifyState.transportUsed}
+                    </div>
+                    <div>24B OEP-NTN HEX: {lastPacket.binaryFrameHex} (CRC16: {lastPacket.crc16Hex})</div>
+                    <div style={{ color: '#cbd5e1', fontSize: '0.7rem', marginTop: '0.25rem' }}>
+                      REAL ECDSA-P256 SIGNATURE: {lastPacket.signatureHex.slice(0, 72)}...
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
