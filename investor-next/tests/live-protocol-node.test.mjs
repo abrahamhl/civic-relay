@@ -103,3 +103,40 @@ test('LiveHardwareAndDealRoomConsole exposes 8 real funding tracks and ChatGPT p
     );
   }
 });
+
+test('browser privacy guard: denied microphone never generates fictional acoustic FFT', () => {
+  const source = readFileSync(resolve(root, 'investor-next/app/live-hardware-console.tsx'), 'utf8');
+  const scanner = source.slice(source.indexOf('  const toggleLiveFftScanner = async () => {'), source.indexOf('  const liveOrbits = useMemo'));
+  assert.ok(scanner.includes('navigator.mediaDevices.getUserMedia'));
+  assert.ok(scanner.includes('setMicActive(false)'));
+  assert.ok(scanner.includes('setFftBins(Array.from({ length: 32 }, () => 0))'));
+  assert.ok(!scanner.includes('Fallback oscillator'));
+  assert.ok(!scanner.includes('Math.sin('));
+  assert.match(source, /const \[fftBins, setFftBins\] = useState<number\[\]>\(Array\.from\(\{ length: 32 \}, \(\) => 0\)\)/);
+});
+
+test('browser privacy guard: stop and unmount release microphone and FFT resources', () => {
+  const source = readFileSync(resolve(root, 'investor-next/app/live-hardware-console.tsx'), 'utf8');
+  const cleanup = source.slice(source.indexOf('      window.clearInterval(clockInterval);'), source.indexOf('  const triggerRealSignedTransmission'));
+  const scanner = source.slice(source.indexOf('  const toggleLiveFftScanner = async () => {'), source.indexOf('  const liveOrbits = useMemo'));
+  for (const block of [cleanup, scanner]) {
+    assert.ok(block.includes('micRequestEpochRef.current += 1'));
+    assert.ok(block.includes('cancelAnimationFrame(rafRef.current)'));
+    assert.ok(block.includes('getTracks().forEach((track) => track.stop())'));
+    assert.ok(block.includes('audioCtxRef.current.close()'));
+  }
+  assert.ok(scanner.includes('requestEpoch !== micRequestEpochRef.current'));
+});
+
+test('browser privacy guard: clear invalidates pending signatures and delayed UI updates', () => {
+  const source = readFileSync(resolve(root, 'investor-next/app/live-hardware-console.tsx'), 'utf8');
+  const transmission = source.slice(source.indexOf('  const triggerRealSignedTransmission = async'), source.indexOf('  const clearDiskQueue = () => {'));
+  const clearing = source.slice(source.indexOf('  const clearDiskQueue = () => {'), source.indexOf('  const toggleLiveFftScanner = async'));
+  const bootstrap = source.slice(source.indexOf('    const bootstrapEpoch = queueEpochRef.current;'), source.indexOf('    // Listen on BroadcastChannel'));
+  assert.ok(clearing.includes('queueEpochRef.current += 1'));
+  assert.ok(clearing.includes('window.localStorage.removeItem(STORAGE_KEY)'));
+  assert.ok(clearing.includes('setLastPacket(null)'));
+  assert.ok(transmission.indexOf('if (queueEpoch !== queueEpochRef.current) return;') < transmission.indexOf('window.localStorage.setItem'));
+  assert.equal(transmission.split('if (queueEpoch !== queueEpochRef.current) return;').length - 1, 2);
+  assert.ok(bootstrap.includes('if (bootstrapEpoch !== queueEpochRef.current) return;'));
+});
