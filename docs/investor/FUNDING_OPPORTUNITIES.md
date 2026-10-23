@@ -19,7 +19,7 @@
 - **Official Source:** [NLnet — Propose](https://nlnet.nl/propose/)
 - **Status:** The NGI Zero Commons Fund closed its final call on **1 June 2026**. Current funds include the **Restack Fund** and **CodeSupply Fund**, plus a general proposal route. Deadlines fall on the **3rd of every odd month**; **next: 3 November 2026, 12:00 CET.**
 - **Grant Range:** Typically **€5,000–€50,000** initial grants; open licenses required; European dimension required.
-- **AI policy (critical):** NLnet does not accept proposals generated entirely by AI and enforces transparency on AI use. The proposal text must be written by the applicant, and AI assistance in the codebase should be disclosed.
+- **AI policy (critical, corrected 23 Oct 2026):** NLnet **v2.0 effective 20 Oct 2026** prohibits generative AI use for **any proposal writing, ideas, restructuring, shortening or LLM translation**, except declared accessibility support. During funded work, generative AI is permitted **read-only** for review, not to generate code, design or documentation; AI costs are ineligible. Existing AI-generated code must be disclosed and its acceptance is case-specific; a heavily agent-generated codebase is a material eligibility concern. **Do not copy AI-generated application prose from this document into NLnet's form.** Primary sources: https://nlnet.nl/foundation/policies/generativeAI/2.0/ and https://nlnet.nl/foundation/policies/generativeAI/faq/ .
 - **Fit for OEP:** Best realistic first grant, *if* scoped as reusable open internet infrastructure (an open, transport-agnostic store-and-forward + verifiable-receipt library with an AOSP transport), not as an "emergency app".
 
 ### 1.3 Union Civil Protection Mechanism (UCPM) — KAPP (Knowledge for Action in Prevention & Preparedness)
@@ -29,7 +29,7 @@
 
 ### 1.4 EIC Accelerator / EIC Pathfinder (Horizon Europe Pillar III)
 - **Official Source:** [European Innovation Council (EIC)](https://eic.ec.europa.eu/)
-- **Fit & Timing:** EIC Pathfinder (TRL 1–4 consortium research) or EIC Accelerator (TRL 5–6+ deep-tech SME scaling, grants up to €2.5M + equity). OEP is currently at TRL 3–4; EIC Accelerator should only be targeted after completing M1–M3 field validation and incorporating an operating SME.
+- **Fit & Timing:** EIC Pathfinder (TRL 1–4 consortium research) or EIC Accelerator (TRL 5–6+ deep-tech SME scaling, grants up to €2.5M + equity). OEP's independently substantiated TRL is UNKNOWN (simulations and Android source do not establish field TRL); EIC Accelerator should only be targeted after completing M1–M3 field validation and incorporating an operating SME.
 
 ---
 
