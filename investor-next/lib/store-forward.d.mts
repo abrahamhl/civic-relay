@@ -7,9 +7,9 @@ export interface LabStatusRecord {id:string;category:LabCategory;status:LabStatu
  receiptKind:string|null;hasPayload:boolean}
 export interface LabAdapter {id:string;kind:'SIMULATOR_ADAPTER';evidence:'SIMULATED';
  setAvailable(enabled:boolean):void;
- describe():Promise<{available:boolean;permitted:boolean;compatible:boolean;secure:boolean;
+ describe(options?:{signal:AbortSignal}):Promise<{available:boolean;permitted:boolean;compatible:boolean;secure:boolean;
  reliability:number;latencyMs:number;energyCost:number;monetaryCost:number;capacity:number}>;
- send(envelope:LabMessage):Promise<{accepted:boolean;receipt?:{kind:string;messageId:string;transportId:string}}>;
+ send(envelope:LabMessage,options?:{signal:AbortSignal}):Promise<{accepted:boolean;receipt?:{kind:string;messageId:string;transportId:string}}>;
  getReceived():Array<{id:string;provenance:'SYNTHETIC_EXERCISE_ONLY'}>}
 export interface LabEngine {
  registerAdapter(adapter:LabAdapter):void;enqueue(message:LabMessage):LabStatusRecord;
@@ -19,6 +19,6 @@ export interface LabEngine {
  audit():Array<{at:number;id:string;event:string;detail:string}>;
 }
 export declare function createStoreForwardEngine(opts?:{now?:()=>number;retryMs?:number;
- maxAttempts?:number;maxEntries?:number;energyProfile?:'NORMAL'|'ALERT'|'CONSERVATION'|'CRITICAL'}):LabEngine;
+ maxAttempts?:number;maxEntries?:number;operationTimeoutMs?:number;energyProfile?:'NORMAL'|'ALERT'|'CONSERVATION'|'CRITICAL'}):LabEngine;
 export declare function createInMemoryAdapter(opts?:{id?:string;available?:boolean;receipts?:boolean;
  failures?:number;reliability?:number;latencyMs?:number;energyCost?:number;monetaryCost?:number}):LabAdapter;

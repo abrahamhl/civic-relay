@@ -29,11 +29,29 @@ function validate(input,now){
     provenance:'SYNTHETIC_EXERCISE_ONLY'};
 }
 export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAttempts=4,maxEntries=1000,
-  energyProfile='ALERT'}={}){
+  energyProfile='ALERT',operationTimeoutMs=5000}={}){
   if(typeof now!=='function'||!Number.isSafeInteger(retryMs)||retryMs<1||
      !Number.isSafeInteger(maxAttempts)||maxAttempts<1||
-     !Number.isSafeInteger(maxEntries)||maxEntries<1)throw Error('Invalid engine settings');
-  const adapters=new Map(),records=new Map(),events=[],inFlight=new Set();
+     !Number.isSafeInteger(maxEntries)||maxEntries<1||
+     !Number.isSafeInteger(operationTimeoutMs)||operationTimeoutMs<1||operationTimeoutMs>60000)
+    throw Error('Invalid engine settings');
+  const adapters=new Map(),records=new Map(),events=[],inFlight=new Map();
+  const cancel=(r)=>{const active=inFlight.get(r.id);if(active?.record===r)active.controller.abort();};
+  // Bound every foreign promise. Abort is cooperative: an adapter may already hold a copy.
+  const invoke=(operation,r,controller)=>new Promise((resolve,reject)=>{
+    const signal=controller.signal;
+    let timer;
+    const finish=(fn,value)=>{clearTimeout(timer);signal.removeEventListener('abort',aborted);fn(value);};
+    const aborted=()=>finish(reject,Error('Adapter operation cancelled or timed out'));
+    if(signal.aborted){aborted();return;}
+    signal.addEventListener('abort',aborted,{once:true});
+    const remaining=r.envelope.createdAt+r.envelope.ttlSeconds*1000-now();
+    timer=setTimeout(()=>controller.abort(),Math.max(0,Math.min(operationTimeoutMs,remaining)));
+    Promise.resolve().then(()=>{
+      if(signal.aborted)throw Error('Adapter operation cancelled');
+      return operation(signal);
+    }).then(value=>finish(resolve,value),error=>finish(reject,error));
+  });
   const audit=(id,event,detail='')=>{
     events.push({at:now(),id,event,detail});
     if(events.length>1000)events.shift();
@@ -44,6 +62,7 @@ export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAtt
   const expire=(r)=>{
     if(r.envelope&&now()>=r.envelope.createdAt+r.envelope.ttlSeconds*1000){
       r.status='EXPIRED';r.envelope=null;r.nextAttemptAt=null;audit(r.id,'EXPIRED','Payload cleared');
+      cancel(r);
     }
   };
   const chooseScore=(d,category)=>{
@@ -82,19 +101,21 @@ export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAtt
       if(energyProfile==='CRITICAL'&&r.category!=='SOS_EXPLICIT'){
         r.nextAttemptAt=now()+retryMs;audit(id,'ENERGY_HOLD');return view(r);
       }
-      inFlight.add(id);
+      const active={record:r,controller:new AbortController()};
+      inFlight.set(id,active);
       try{
         const candidates=[];
         for(const a of adapters.values()){
           try{
-            const d=await a.describe();
+            if(active.controller.signal.aborted||records.get(id)!==r||TERMINAL.has(r.status))break;
+            const d=await invoke(signal=>a.describe({signal}),r,active.controller);
             if(d&&d.available===true&&d.permitted===true&&d.compatible===true&&d.secure===true&&
               isNumber(d.reliability,0,1)&&isNumber(d.latencyMs,0,600000)&&
               isNumber(d.energyCost,0,1)&&isNumber(d.monetaryCost,0,1)&&
               Number.isSafeInteger(d.capacity)&&d.capacity>0){
               candidates.push({a,score:chooseScore(d,r.category)});
             }
-          }catch{audit(id,'ADAPTER_DESCRIPTION_FAILED',a.id);}
+          }catch{if(records.get(id)===r&&!TERMINAL.has(r.status))audit(id,'ADAPTER_DESCRIPTION_FAILED',a.id);}
         }
         candidates.sort((a,b)=>b.score-a.score||a.a.id.localeCompare(b.a.id));
         if(records.get(id)!==r)return view(r);
@@ -105,7 +126,7 @@ export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAtt
         }
         const selected=candidates[r.attempts%candidates.length].a;
         r.selectedTransport=selected.id;r.attempts++;
-        const sent=await selected.send(json(r.envelope));
+        const sent=await invoke(signal=>selected.send(json(r.envelope),{signal}),r,active.controller);
         if(records.get(id)!==r)return view(r);
         expire(r); // A late receipt must not revive an expired message.
         if(TERMINAL.has(r.status))return view(r);
@@ -126,7 +147,7 @@ export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAtt
           }
         }
       }finally{
-        inFlight.delete(id);
+        if(inFlight.get(id)===active)inFlight.delete(id);
         if(records.get(id)===r&&!TERMINAL.has(r.status)){
           expire(r);
         }
@@ -151,11 +172,15 @@ export function createStoreForwardEngine({now=()=>Date.now(),retryMs=2000,maxAtt
     revoke(id){
       const r=records.get(id);if(!r)return false;
       r.envelope=null;r.status='REVOKED';r.nextAttemptAt=null;
+      cancel(r);
       audit(id,'REVOKED','Exercise payload cleared');return true;
     },
     purge(id){const r=records.get(id);if(!r)return false;
       // Wipe local sensitive references before detaching the record from its map.
       r.envelope=null;r.status='REVOKED';r.nextAttemptAt=null;
+      cancel(r);
+      // Detach this operation now; its finally block cannot release a new record's lock.
+      if(inFlight.get(id)?.record===r)inFlight.delete(id);
       records.delete(id);
       for(let i=events.length-1;i>=0;i--)if(events[i].id===id)events.splice(i,1);
       return true;
