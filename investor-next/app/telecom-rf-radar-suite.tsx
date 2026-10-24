@@ -1,4 +1,5 @@
 'use client';
+import RfExplorer from './rf-explorer';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Locale } from './copy';
 import {
@@ -85,21 +86,21 @@ const suiteCopy: Record<
   }
 > = {
   es: {
-    eyebrow: 'INGENIERÍA DE TELECOMUNICACIONES RESUELTA · PROTOTIPO INTERACTIVO PARA INVERSORES',
-    title: 'CÓMO FALLA TODO HOY FRENTE A NUESTRA INFRAESTRUCTURA: SATÉLITES, MÓVILES, TELEMETRÍA POR ZONAS Y RADAR RF TRANS-PARED',
-    lead: 'Prueba en tiempo real cada subsistema resuelto: comparativa operativa Hoy vs. Con OEP, presupuesto de enlace satelital 3GPP NTN con tramas binarias de 24 bytes, malla móvil D2D multi-salto, telemetría táctica por sectores poligonales y radar espectral Wi-Fi CSI / RF para detectar señales de móviles y respiración tras muros apuntando con la cámara como una cámara térmica de radiofrecuencias.',
+    eyebrow: 'LABORATORIO EXPERIMENTAL · SIMULACIÓN Y APIS DEL NAVEGADOR',
+    title: 'Modelos de telecomunicaciones y sensores autorizados',
+    lead: 'Explora adaptadores del navegador y modelos de investigación. RF, CSI, malla y satélites permanecen experimentales; las cifras de los casos son supuestos de demostración.',
     authBadge: 'LÍMITE DE AUTORIZACIÓN',
     authBanner:
-      'Toda la ingeniería de telecomunicaciones, algoritmos de enrutamiento, tramas binarias satelitales (CRC-16 + ECDSA P-256), telemetría poligonal y tomografía espectral RF/CSI están 100 % implementados y son ejecutables en este prototipo. Los únicos puntos no activados en red pública son aquellos que requieren llaves o licencias regulatorias externas (espectro satelital NTN de operador, clave privada PKI gubernamental CAP 1.2 o firmware CSI en chip Wi-Fi comercial).',
-    casesEyebrow: '01 / COMPARATIVA OPERATIVA EN ESCENARIOS REALES',
-    casesTitle: 'Cómo funciona todo HOY sin nuestra tecnología vs. Qué resuelve OEP al instante',
+      'DEMO_ONLY · RF/CSI/NTN require compatible hardware and validation. Browser APIs provide no generic Wi-Fi scan, hidden people, thermal image or satellite service.',
+    casesEyebrow: '01 / ESCENARIOS DE SIMULACIÓN',
+    casesTitle: 'Supuestos sin OEP y con rutas hipotéticas',
     todayTag: 'HOY (SIN OEP · COLAPSO TRADICIONAL)',
-    oepTag: 'CON OEP (INGENIERÍA RESUELTA Y PROBABLE AQUÍ)',
+    oepTag: 'CON OEP · MODELO SIMULADO',
     loadPresetBtn: 'CARGAR ESTE ESCENARIO EN LAS CONSOLAS DE SATÉLITE, ZONAS Y RADAR RF ↓',
     fnEyebrow: '02 / CATÁLOGO DE FUNCIONES DE INGENIERÍA Y PROBLEMAS RESUELTOS',
-    fnTitle: 'Presentación de cada función: qué problema real resuelve y qué módulo lo ejecuta',
+    fnTitle: 'Hipótesis de investigación y módulos de laboratorio',
     fnProblemLabel: 'Problema actual sin resolver:',
-    fnSolutionLabel: 'Ingeniería OEP implementada:',
+    fnSolutionLabel: 'Hipótesis de investigación OEP:',
     fnAuthLabel: 'Punto de autorización externa:',
     infraEyebrow: '03 / INFRAESTRUCTURA COMPLETA DE SATÉLITES, MÓVILES Y TELEMETRÍA POR ZONAS',
     infraTitle: 'Consola de Enlace Satelital 3GPP NTN + Malla Móvil D2D + Telemetría Táctica por Sectores',
@@ -112,18 +113,18 @@ const suiteCopy: Record<
     frameTitle: 'Trama Binaria Compacta OEP-NTN (24 Bytes + CRC-16-CCITT · 8.6x más ligera que JSON):',
     zonePanelTitle: 'Telemetría por Zonas Poligonales (9 Sectores Tácticos · Pulsa una celda)',
     radarEyebrow: '04 / RADAR ESPECTRAL TRANS-PARED (WI-FI CSI + RF) Y CÁMARA AR «TÉRMICA DE FRECUENCIAS»',
-    radarTitle: 'Visor Trans-Pared de Emisiones de Móvil, Wi-Fi CSI (IEEE 802.11bf) y Sensores para Equipos de Rescate',
+    radarTitle: 'Explorador RF · sensor requerido y DEMO separada',
     radarLead:
-      'Inspirado en las arquitecturas abiertas de visión trans-pared por Wi-Fi CSI (DensePoseFromWiFi, Nexmon CSI, IEEE 802.11bf) y propagación ITU-R P.2040. Permite a los efectivos en zonas de emergencia apuntar a un muro con la cámara y visualizar como un mapa térmico las radiaciones RF reales (Sub-GHz celular, Wi-Fi 2.4/5 GHz, BLE) y la perturbación de fase de 64 subportadoras OFDM provocada por cuerpos u dispositivos detrás de paredes.',
+      'Sin receptor compatible no hay espectro RF, CSI ni RSSI. La cámara solo capta vídeo óptico; la DEMO muestra emisores ficticios, nunca personas.',
     wallLabel: 'Material del Muro / Obstáculo',
     distLabel: 'Distancia del Efectivo al Muro',
     paletteLabel: 'Paleta Espectral («Térmica RF»)',
     bandsLabel: 'Bandas de Frecuencia y Sensores en Escaneo:',
-    arBtnStart: 'ACTIVAR CÁMARA AR EN VIVO + SENSORES (VER A TRAVÉS DEL MURO)',
-    arBtnStop: 'DETENER CÁMARA AR (VOLVER A MODO SIMULACIÓN)',
-    arStatusSim: 'MODO TOMOGRAFÍA ESPECTRAL RF / WI-FI CSI (64 SUBPORTADORAS OFDM)',
-    arStatusLive: 'CÁMARA AR ACTIVA · SUPERPOSICIÓN TÉRMICA DE RADIOFRECUENCIAS EN TIEMPO REAL',
-    targetsTitle: 'Emisiones de Móvil y Firmas CSI Detectadas Detrás del Muro',
+    arBtnStart: 'AUTORIZAR CÁMARA ÓPTICA · SIN DETECCIÓN RF',
+    arBtnStop: 'STOP · LIBERAR CÁMARA',
+    arStatusSim: 'DEMO_ONLY',
+    arStatusLive: 'DEVICE_CONNECTED · SOLO VÍDEO ÓPTICO',
+    targetsTitle: 'Emisores sintéticos de demostración · no son personas',
     walls: {
       DRYWALL: 'Tabique / Pladur (12 cm · Atenuación baja)',
       BRICK_25CM: 'Muro de Ladrillo Macizo (25 cm · Atenuación media)',
@@ -260,7 +261,7 @@ const suiteCopy: Record<
     functions: [
       {
         code: 'FN-01 · MOBILE D2D MESH',
-        status: 'RESUELTO Y EJECUTABLE',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'Enrutamiento Móvil Multi-Salto (BLE + Wi-Fi Aware + Dijkstra Energético)',
         problem: 'Cuando cae la estación base 4G/5G, los móviles aislados no pueden alcanzar pasarelas cercanas ni coordinarse entre vecinos.',
         solution: 'Grafo determinista de 20–100 nodos con selección óptima de ruta multi-salto, respeto estricto de consentimiento y corte de retransmisión si la batería baja del 15 %.',
@@ -269,7 +270,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-02 · DURABLE STORE & ECDSA',
-        status: 'RESUELTO Y EJECUTABLE',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'Cola Store-and-Forward en Disco + Firma Criptográfica ECDSA P-256',
         problem: 'Los mensajes de auxilio en memoria RAM se pierden si el teléfono se apaga, y los recibos sin firma pueden ser suplantados.',
         solution: 'Persistencia en disco (LabPersistentQueue.java), expiración dual por reloj monótono, anti-replay por tombstones y firma asimétrica SHA256withECDSA (LabReceiptSigner.java).',
@@ -278,7 +279,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-03 · SATELLITE NTN BRIDGE',
-        status: 'RESUELTO Y EJECUTABLE',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'Puente Satelital 3GPP NTN / Direct-to-Cell (Trama Binaria de 24 Bytes)',
         problem: 'Los enlaces satelitales de emergencia (LEO/MEO/GEO) tienen ancho de banda muy limitado y alto desplazamiento Doppler; el JSON/HTTP convencional colapsa.',
         solution: 'Calculadora física de Link Budget (FSPL, C/N0, SNR, Doppler) y codificador binario OEP-NTN de 24 bytes con CRC-16-CCITT (8.6x más compacto que JSON).',
@@ -287,7 +288,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-04 · POLYGONAL ZONE TELEMETRY',
-        status: 'RESUELTO Y EJECUTABLE',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'Telemetría Táctica por Zonas Poligonales (CAP 1.2 + Sectores A1..C3)',
         problem: 'Los centros de mando reciben llamadas sueltas sin visión estructurada por cuadrículas de dónde hay cobertura, cuántos están bien y dónde faltan pasarelas.',
         solution: 'Validación geométrica de polígonos CAP 1.2 y partición automática en 9 sectores tácticos con métricas agregadas SAFE / SOS / UNKNOWN y selección de backhaul.',
@@ -296,7 +297,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-05 · THROUGH-WALL WIFI CSI',
-        status: 'RESUELTO Y EJECUTABLE',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'Radar Trans-Pared Wi-Fi CSI (IEEE 802.11bf · 64 Subportadoras OFDM)',
         problem: 'Las cámaras ópticas y térmicas infrarrojas no atraviesan paredes; los rescatistas no ven si hay personas o dispositivos emitiendo detrás de un muro.',
         solution: 'Tomografía de amplitud y fase sobre 64 subportadoras OFDM, compensación de atenuación de materiales (ITU-R P.2040) y detección de micro-Doppler respiratorio.',
@@ -305,7 +306,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-06 · AR RF THERMAL CAMERA',
-        status: 'RESUELTO Y EJECUTABLE',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'Visor Cámara AR «Térmica de Frecuencias» + Fusión de Sensores Móviles',
         problem: 'Un técnico en una emergencia no puede interpretar tablas de dBm en crudo; necesita apuntar con su cámara y ver intuitivamente dónde están las fuentes RF.',
         solution: 'Fusión en tiempo real de cámara WebRTC + orientación IMU/magnetómetro + mapa de calor falso-color (Ironbow/CSI) que proyecta las señales tras la pared.',
@@ -315,21 +316,21 @@ const suiteCopy: Record<
     ]
   },
   en: {
-    eyebrow: 'RESOLVED TELECOMMUNICATIONS ENGINEERING · INTERACTIVE INVESTOR PROTOTYPE',
-    title: 'HOW EVERYTHING FAILS TODAY VS. OUR INFRASTRUCTURE: SATELLITES, MOBILE MESH, ZONE TELEMETRY & THROUGH-WALL RF RADAR',
-    lead: 'Test every resolved subsystem live: operational Today vs. With OEP comparison, 3GPP NTN satellite link-budget and 24-byte binary burst framing, multi-hop D2D mobile mesh, polygonal sector telemetry, and a Wi-Fi CSI / RF through-wall spectral radar that lets responders point their camera at a wall like a radio-frequency thermal camera.',
+    eyebrow: 'EXPERIMENTAL LAB · SIMULATION AND BROWSER APIS',
+    title: 'Telecom models and authorized sensors',
+    lead: 'Explore browser adapters and research models. RF, CSI, mesh and satellite paths remain experimental; case figures are demonstration assumptions.',
     authBadge: 'AUTHORIZATION BOUNDARY',
     authBanner:
-      'All telecommunications engineering, routing algorithms, compact satellite binary framing (CRC-16 + ECDSA P-256), polygonal zone telemetry, and RF/CSI spectral tomography are 100% implemented and runnable in this prototype. The only external plug-in points are regulatory or hardware authorization keys (licensed carrier NTN spectrum, government CAP 1.2 PKI private keys, or low-level Wi-Fi NIC CSI firmware access).',
-    casesEyebrow: '01 / OPERATIONAL COMPARISON ACROSS REAL SCENARIOS',
-    casesTitle: 'How everything fails TODAY without our technology vs. What OEP solves immediately',
+      'DEMO_ONLY · RF/CSI/NTN require compatible hardware and validation. Browser APIs provide no generic Wi-Fi scan, hidden people, thermal image or satellite service.',
+    casesEyebrow: '01 / SIMULATED SCENARIOS',
+    casesTitle: 'Assumptions without OEP and with hypothetical routes',
     todayTag: 'TODAY (WITHOUT OEP · TRADITIONAL COLLAPSE)',
-    oepTag: 'WITH OEP (RESOLVED ENGINEERING · TESTABLE BELOW)',
+    oepTag: 'WITH OEP · SIMULATED MODEL',
     loadPresetBtn: 'LOAD THIS SCENARIO INTO THE SATELLITE, ZONE & RF RADAR CONSOLES ↓',
     fnEyebrow: '02 / ENGINEERING FUNCTION CATALOG & PROBLEMS SOLVED',
-    fnTitle: 'Function-by-function breakdown: real problem solved, runnable software, and authorization point',
+    fnTitle: 'Research hypotheses and laboratory modules',
     fnProblemLabel: 'Current unsolved problem:',
-    fnSolutionLabel: 'Implemented OEP engineering:',
+    fnSolutionLabel: 'OEP research hypothesis:',
     fnAuthLabel: 'External authorization point:',
     infraEyebrow: '03 / COMPLETE SATELLITE, MOBILE MESH & POLYGONAL ZONE TELEMETRY INFRASTRUCTURE',
     infraTitle: '3GPP NTN Satellite Link Console + D2D Mobile Mesh + Tactical Sector Telemetry',
@@ -342,18 +343,18 @@ const suiteCopy: Record<
     frameTitle: 'OEP-NTN Compact Binary Frame (24 Bytes + CRC-16-CCITT · 8.6x smaller than JSON):',
     zonePanelTitle: 'Polygonal Zone Telemetry (9 Tactical Sectors · Click any cell)',
     radarEyebrow: '04 / THROUGH-WALL RF & WI-FI CSI SPECTRAL RADAR + AR "FREQUENCY THERMAL" CAMERA',
-    radarTitle: 'Through-Wall Mobile Emission, Wi-Fi CSI (IEEE 802.11bf) & Sensor Fusion Viewfinder for First Responders',
+    radarTitle: 'RF Explorer · sensor required and separate DEMO',
     radarLead:
-      'Inspired by open-source Wi-Fi CSI through-wall sensing architectures (DensePoseFromWiFi, Nexmon CSI, IEEE 802.11bf) and ITU-R P.2040 propagation physics. Enables emergency teams to point their camera at a wall and visualize real RF radiations (Sub-GHz cellular, Wi-Fi 2.4/5 GHz, BLE) and 64-subcarrier OFDM phase perturbations as a thermal-style spectral overlay.',
+      'Without a compatible receiver there is no RF spectrum, CSI or RSSI. The camera captures optical video only; DEMO shows fictional emitters, never people.',
     wallLabel: 'Wall / Obstacle Material',
     distLabel: 'Responder Stand-off Distance to Wall',
     paletteLabel: 'Spectral Palette ("RF Thermal")',
     bandsLabel: 'Active Frequency Bands & Sensors in Scan:',
-    arBtnStart: 'ACTIVATE LIVE AR CAMERA + SENSORS (SEE THROUGH WALL OVERLAY)',
-    arBtnStop: 'STOP AR CAMERA (RETURN TO SIMULATION VIEW)',
-    arStatusSim: 'RF / WI-FI CSI SPECTRAL TOMOGRAPHY MODE (64 OFDM SUBCARRIERS)',
-    arStatusLive: 'LIVE AR CAMERA ACTIVE · REAL-TIME RADIO-FREQUENCY THERMAL HUD OVERLAY',
-    targetsTitle: 'Behind-Wall Mobile Emissions & CSI Signatures Detected',
+    arBtnStart: 'AUTHORIZE OPTICAL CAMERA · NO RF DETECTION',
+    arBtnStop: 'STOP · RELEASE CAMERA',
+    arStatusSim: 'DEMO_ONLY',
+    arStatusLive: 'DEVICE_CONNECTED · OPTICAL VIDEO ONLY',
+    targetsTitle: 'Synthetic demonstration emitters · no people detected',
     walls: {
       DRYWALL: 'Drywall / Partition (12 cm · Low attenuation)',
       BRICK_25CM: 'Solid Brick Wall (25 cm · Medium attenuation)',
@@ -490,7 +491,7 @@ const suiteCopy: Record<
     functions: [
       {
         code: 'FN-01 · MOBILE D2D MESH',
-        status: 'RESOLVED & RUNNABLE',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'Multi-Hop Mobile Mesh Routing (BLE + Wi-Fi Aware + Energy Dijkstra)',
         problem: 'When 4G/5G towers fail, isolated handsets cannot reach surviving gateways or coordinate across neighboring devices.',
         solution: 'Deterministic 20–100 node graph with optimal multi-hop path selection, strict consent gating, and automatic relay cutoff at ≤ 15% battery.',
@@ -499,7 +500,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-02 · DURABLE STORE & ECDSA',
-        status: 'RESOLVED & RUNNABLE',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'Disk-Backed Store-and-Forward Queue + ECDSA P-256 Receipt Signing',
         problem: 'In-memory SOS messages vanish when a phone reboots, and unsigned transport ACKs can be spoofed.',
         solution: 'Durable file-backed queue (LabPersistentQueue.java), dual-clock TTL, tombstone anti-replay, and asymmetric SHA256withECDSA signing (LabReceiptSigner.java).',
@@ -508,7 +509,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-03 · SATELLITE NTN BRIDGE',
-        status: 'RESOLVED & RUNNABLE',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: '3GPP NTN / Direct-to-Cell Satellite Bridge (24-Byte Binary Burst)',
         problem: 'Emergency satellite links (LEO/MEO/GEO) have severe bandwidth limits and high Doppler shift; standard JSON/HTTPS fails.',
         solution: 'Physical Link-Budget calculator (FSPL, C/N0, SNR, Doppler) and 24-byte OEP-NTN binary frame encoder with CRC-16-CCITT (8.6x smaller than JSON).',
@@ -517,7 +518,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-04 · POLYGONAL ZONE TELEMETRY',
-        status: 'RESOLVED & RUNNABLE',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'Polygonal Zone Tactical Telemetry (CAP 1.2 + Sectors A1..C3)',
         problem: 'Command centers receive fragmented calls without a structured grid showing sector coverage, SAFE counts, and backhaul status.',
         solution: 'CAP 1.2 polygon validation and automatic 9-sector tactical grid aggregation tracking SAFE / SOS / UNKNOWN and active backhaul per cell.',
@@ -526,7 +527,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-05 · THROUGH-WALL WIFI CSI',
-        status: 'RESOLVED & RUNNABLE',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'Through-Wall Wi-Fi CSI Radar (IEEE 802.11bf · 64 OFDM Subcarriers)',
         problem: 'Optical and infrared thermal cameras cannot see through solid walls; responders cannot see survivors or radiating phones behind barriers.',
         solution: '64-subcarrier OFDM amplitude/phase tomography, ITU-R P.2040 wall attenuation compensation, and respiratory micro-Doppler detection.',
@@ -535,7 +536,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-06 · AR RF THERMAL CAMERA',
-        status: 'RESOLVED & RUNNABLE',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'AR "Frequency Thermal" Camera Viewfinder + Mobile Sensor Fusion',
         problem: 'First responders in the field cannot read raw dBm tables; they need to point their camera at a wall and visually see RF sources.',
         solution: 'Real-time WebRTC camera feed + IMU/magnetometer orientation + false-color thermal RF overlay projecting behind-wall emissions.',
@@ -545,21 +546,21 @@ const suiteCopy: Record<
     ]
   },
   nl: {
-    eyebrow: 'OPGELOSTE TELECOM-ENGINEERING · INTERACTIEF PROTOTYPE VOOR INVESTEERDERS',
-    title: 'HOE ALLES NU FAALT TEGENOVER ONZE INFRASTRUCTUUR: SATELLIETEN, MOBIELE MESH, ZONETELEMETRIE & DOOR-DE-MUUR RF-RADAR',
-    lead: 'Test elk opgelost subsysteem live: operationele vergelijking Nu vs. Met OEP, 3GPP NTN-satelliet link-budget met 24-byte binaire frames, multi-hop D2D mobiele mesh, polygonale sectortelemetrie en een Wi-Fi CSI / RF door-de-muur spectrale radar waarmee hulpverleners hun camera op een muur richten als een radiofrequentie-warmtebeeldcamera.',
+    eyebrow: 'EXPERIMENTEEL LAB · SIMULATIE EN BROWSER-APIS',
+    title: 'Telecommodellen en toegestane sensoren',
+    lead: 'Verken browseradapters en onderzoeksmodellen. RF, CSI, mesh en satellietroutes blijven experimenteel; scenariocijfers zijn demo-aannames.',
     authBadge: 'AUTORISATIEGRENS',
     authBanner:
-      'Alle telecom-engineering, routeringsalgoritmen, compacte binaire satellietframes (CRC-16 + ECDSA P-256), polygonale zonetelemetrie en RF/CSI-spectrale tomografie zijn 100% geïmplementeerd en uitvoerbaar in dit prototype. De enige externe koppelingen zijn regulatoire of hardware-autorisatiesleutels (gelicentieerd NTN-satellietspectrum, overheids-PKI voor CAP 1.2 of low-level Wi-Fi CSI-firmware).',
-    casesEyebrow: '01 / OPERATIONELE VERGELIJKING IN ECHTE SCENARIO’S',
-    casesTitle: 'Hoe alles NU faalt zonder onze technologie vs. Wat OEP direct oplost',
+      'DEMO_ONLY · RF/CSI/NTN require compatible hardware and validation. Browser APIs provide no generic Wi-Fi scan, hidden people, thermal image or satellite service.',
+    casesEyebrow: '01 / SIMULATIESCENARIO’S',
+    casesTitle: 'Aannames zonder OEP en met hypothetische routes',
     todayTag: 'NU (ZONDER OEP · TRADITIONELE UITVAL)',
-    oepTag: 'MET OEP (OPGELOSTE ENGINEERING · HIER TESTBAAR)',
+    oepTag: 'MET OEP · GESIMULEERD MODEL',
     loadPresetBtn: 'LAAD DIT SCENARIO IN DE SATELLIET-, ZONE- & RF-RADARCONSOLES ↓',
     fnEyebrow: '02 / CATALOGUS VAN ENGINEERINGFUNCTIES & OPGELOSTE PROBLEMEN',
-    fnTitle: 'Overzicht per functie: welk probleem wordt opgelost en welke module dit uitvoert',
+    fnTitle: 'Onderzoekshypothesen en labmodules',
     fnProblemLabel: 'Huidig onopgelost probleem:',
-    fnSolutionLabel: 'Geïmplementeerde OEP-engineering:',
+    fnSolutionLabel: 'OEP-onderzoekshypothese:',
     fnAuthLabel: 'Extern autorisatiepunt:',
     infraEyebrow: '03 / VOLLEDIGE SATELLIET-, MOBIELE MESH- & POLYGONALE ZONETELEMETRIE-INFRASTRUCTUUR',
     infraTitle: '3GPP NTN-Satellietconsole + D2D Mobiele Mesh + Tactische Sectortelemetrie',
@@ -572,18 +573,18 @@ const suiteCopy: Record<
     frameTitle: 'OEP-NTN Compact Binair Frame (24 Bytes + CRC-16-CCITT · 8.6x kleiner dan JSON):',
     zonePanelTitle: 'Polygonale Zonetelemetrie (9 Tactische Sectoren · Klik op een cel)',
     radarEyebrow: '04 / DOOR-DE-MUUR RF- & WI-FI CSI-RADAR + AR «FREQUENTIE-WARMTEBEELDCAMERA»',
-    radarTitle: 'Door-de-Muur Mobiele Emissie, Wi-Fi CSI (IEEE 802.11bf) & Sensorfusie-Zoeker voor Hulpverleners',
+    radarTitle: 'RF Explorer · sensor vereist en aparte DEMO',
     radarLead:
-      'Geïnspireerd door open-source Wi-Fi CSI door-de-muur architecturen (DensePoseFromWiFi, Nexmon CSI, IEEE 802.11bf) en ITU-R P.2040-propagatiefysica. Stelt noodteams in staat hun camera op een muur te richten en RF-straling (Sub-GHz mobiel, Wi-Fi 2.4/5 GHz, BLE) en 64-subcarrier OFDM-faseverstoringen te zien als een thermische spectrale overlay.',
+      'Zonder compatibele ontvanger zijn er geen RF-spectra, CSI of RSSI. De camera registreert alleen optische video; DEMO toont fictieve zenders, nooit personen.',
     wallLabel: 'Muur- / Obstakelmateriaal',
     distLabel: 'Afstand Hulpverlener tot Muur',
     paletteLabel: 'Spectraal Palet («RF-Thermisch»)',
     bandsLabel: 'Actieve Frequentiebanden & Sensoren in Scan:',
-    arBtnStart: 'ACTIVEER LIVE AR-CAMERA + SENSOREN (KIJK DOOR DE MUUR OVERLAY)',
-    arBtnStop: 'STOP AR-CAMERA (TERUG NAAR SIMULATIEMODUS)',
-    arStatusSim: 'RF / WI-FI CSI SPECTRALE TOMOGRAFIEMODUS (64 OFDM-SUBCARRIERS)',
-    arStatusLive: 'LIVE AR-CAMERA ACTIEF · REALTIME RADIOFREQUENTIE-WARMTEBEELD OVERLAY',
-    targetsTitle: 'Mobiele Emissies & CSI-Signaturen Achter de Muur Gedetecteerd',
+    arBtnStart: 'OPTISCHE CAMERA TOESTAAN · GEEN RF-DETECTIE',
+    arBtnStop: 'STOP · CAMERA VRIJGEVEN',
+    arStatusSim: 'DEMO_ONLY',
+    arStatusLive: 'DEVICE_CONNECTED · ALLEEN OPTISCHE VIDEO',
+    targetsTitle: 'Synthetische demozenders · geen personen gedetecteerd',
     walls: {
       DRYWALL: 'Gipswand / Scheidingswand (12 cm · Lage demping)',
       BRICK_25CM: 'Massieve Bakstenen Muur (25 cm · Gemiddelde demping)',
@@ -720,7 +721,7 @@ const suiteCopy: Record<
     functions: [
       {
         code: 'FN-01 · MOBILE D2D MESH',
-        status: 'OPGELOST & UITVOERBAAR',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'Multi-Hop Mobiele Mesh-Routering (BLE + Wi-Fi Aware + Energie-Dijkstra)',
         problem: 'Wanneer 4G/5G-masten uitvallen, kunnen geïsoleerde telefoons geen gateways bereiken of onderling coördineren.',
         solution: 'Deterministische graaf van 20–100 nodes met optimale multi-hop padselectie, strikte toestemming en automatische relay-stop bij ≤ 15% accu.',
@@ -729,7 +730,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-02 · DURABLE STORE & ECDSA',
-        status: 'OPGELOST & UITVOERBAAR',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'Schijf-Persistente Store-and-Forward + ECDSA P-256 Ondertekening',
         problem: 'SOS-berichten in RAM verdwijnen bij herstart, en ongetekende ACK’s kunnen worden vervalst.',
         solution: 'Persistente wachtrij op schijf (LabPersistentQueue.java), dubbele klok-TTL, tombstone anti-replay en asymmetrische SHA256withECDSA-handtekening (LabReceiptSigner.java).',
@@ -738,7 +739,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-03 · SATELLITE NTN BRIDGE',
-        status: 'OPGELOST & UITVOERBAAR',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: '3GPP NTN / Direct-to-Cell Satellietbrug (24-Byte Binair Frame)',
         problem: 'Noodsatellietverbindingen (LEO/MEO/GEO) hebben beperkte bandbreedte en hoge Doppler-verschuiving; standaard JSON/HTTPS faalt.',
         solution: 'Fysische Link-Budget calculator (FSPL, C/N0, SNR, Doppler) en 24-byte OEP-NTN binaire frame-encoder met CRC-16-CCITT (8.6x kleiner dan JSON).',
@@ -747,7 +748,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-04 · POLYGONAL ZONE TELEMETRY',
-        status: 'OPGELOST & UITVOERBAAR',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'Polygonale Tactische Zonetelemetrie (CAP 1.2 + Sectoren A1..C3)',
         problem: 'Meldkamers ontvangen losse oproepen zonder gestructureerd raster van sectordekking, VEILIG-aantallen en backhaul-status.',
         solution: 'CAP 1.2-polygoonvalidatie en automatische 9-sector aggregatie van SAFE / SOS / UNKNOWN en actieve backhaul per cel.',
@@ -756,7 +757,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-05 · THROUGH-WALL WIFI CSI',
-        status: 'OPGELOST & UITVOERBAAR',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'Door-de-Muur Wi-Fi CSI-Radar (IEEE 802.11bf · 64 OFDM-Subcarriers)',
         problem: 'Optische en infrarood-warmtecamera’s kijken niet door muren; redders zien geen overlevenden of zendende telefoons achter obstakels.',
         solution: '64-subcarrier OFDM amplitude/fase-tomografie, ITU-R P.2040 muurdemping-compensatie en ademhalings-micro-Doppler-detectie.',
@@ -765,7 +766,7 @@ const suiteCopy: Record<
       },
       {
         code: 'FN-06 · AR RF THERMAL CAMERA',
-        status: 'OPGELOST & UITVOERBAAR',
+        status: 'SIMULATED / HARDWARE_REQUIRED',
         title: 'AR «Frequentie-Warmtebeeld» Camerazoeker + Mobiele Sensorfusie',
         problem: 'Hulpverleners in het veld kunnen geen ruwe dBm-tabellen lezen; ze moeten hun camera op een muur richten en RF-bronnen direct zien.',
         solution: 'Realtime WebRTC-camerabeeld + IMU/magnetometer-oriëntatie + false-color thermische RF-overlay van bronnen achter de muur.',
@@ -825,6 +826,10 @@ export default function TelecomAndRfRadarSuite({ locale }: { locale: Locale }) {
     IMU_MAG: true
   });
   const [tick, setTick] = useState(0);
+  const [demoEnabled, setDemoEnabled] = useState(false);
+  const [cameraStatus, setCameraStatus] = useState('NO_SENSOR');
+  const cameraEpoch = useRef(0);
+  const cameraPending = useRef(false);
   const [arCameraLive, setArCameraLive] = useState(false);
   const [deviceHeading, setDeviceHeading] = useState<number | null>(null);
 
@@ -864,24 +869,25 @@ export default function TelecomAndRfRadarSuite({ locale }: { locale: Locale }) {
   const radarResult = useMemo(
     () =>
       runThroughWallRfRadar({
+        mode: demoEnabled ? 'DEMO' : 'LIVE',
         wallMaterial,
         scannerDistanceMeters: scannerDistance,
         activeBands,
         timeStep: tick
       }),
-    [wallMaterial, scannerDistance, activeBands, tick]
+    [wallMaterial, scannerDistance, activeBands, tick, demoEnabled]
   );
 
   // Subtle animation clock for CSI respiratory micro-Doppler & canvas rendering
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !demoEnabled) return;
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
     if (reduced) return;
     const timer = window.setInterval(() => {
       setTick((prev) => (prev + 1) % 3600);
     }, 180);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [demoEnabled]);
 
   // Device orientation listener when AR mode is active
   useEffect(() => {
@@ -898,6 +904,7 @@ export default function TelecomAndRfRadarSuite({ locale }: { locale: Locale }) {
   // Cleanup camera stream on unmount
   useEffect(() => {
     return () => {
+      cameraEpoch.current += 1;
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((tr) => tr.stop());
         streamRef.current = null;
@@ -906,7 +913,8 @@ export default function TelecomAndRfRadarSuite({ locale }: { locale: Locale }) {
   }, []);
 
   const toggleArCamera = async () => {
-    if (arCameraLive) {
+    if (arCameraLive || cameraPending.current) {
+      cameraEpoch.current += 1;
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((tr) => tr.stop());
         streamRef.current = null;
@@ -915,26 +923,34 @@ export default function TelecomAndRfRadarSuite({ locale }: { locale: Locale }) {
         videoRef.current.srcObject = null;
       }
       setArCameraLive(false);
+      setCameraStatus('NO_SENSOR');
       return;
     }
+    if (!navigator.mediaDevices?.getUserMedia) { setCameraStatus('UNSUPPORTED'); return; }
+    const epoch = ++cameraEpoch.current;
+    cameraPending.current = true;
+    setCameraStatus('PERMISSION_PENDING');
     try {
       if (typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: { ideal: 'environment' } },
           audio: false
         });
+        if (epoch !== cameraEpoch.current) { stream.getTracks().forEach(tr => tr.stop()); return; }
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          await videoRef.current.play().catch(() => {});
+          await videoRef.current.play();
         }
       }
+      if (epoch !== cameraEpoch.current) return;
       setArCameraLive(true);
+      setCameraStatus('DEVICE_CONNECTED');
     } catch {
-      // Even without physical camera permission (e.g., desktop without webcam or headless CI),
-      // activate AR HUD overlay mode so the investor can test the viewfinder interface.
-      setArCameraLive(true);
-    }
+      streamRef.current?.getTracks().forEach(tr => tr.stop());
+      streamRef.current = null;
+      if (epoch === cameraEpoch.current) { setArCameraLive(false); setCameraStatus('UNAVAILABLE'); }
+    } finally { cameraPending.current = false; }
   };
 
   // Render the Thermal-RF Through-Wall Heatmap + 64-Subcarrier CSI Spectrogram on Canvas
@@ -946,6 +962,13 @@ export default function TelecomAndRfRadarSuite({ locale }: { locale: Locale }) {
     const w = canvas.width;
     const h = canvas.height;
     ctx.clearRect(0, 0, w, h);
+    if (!demoEnabled) {
+      ctx.fillStyle = '#07111f'; ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#cbd5e1'; ctx.font = '18px monospace';
+      ctx.fillText('HARDWARE_REQUIRED', 18, 40);
+      ctx.font = '14px monospace';ctx.fillText('NO RF MEASUREMENT',18,65);
+      return;
+    }
 
     // 1. Draw Thermal-RF Heatmap Grid
     const grid = radarResult.heatmapGrid;
@@ -1041,7 +1064,7 @@ export default function TelecomAndRfRadarSuite({ locale }: { locale: Locale }) {
     ctx.fillStyle = '#7dd3fc';
     ctx.font = '10px monospace';
     ctx.fillText(
-      `IEEE 802.11bf WI-FI CSI 64-SUBCARRIER OFDM TOMOGRAPHY · DETECTED BEHIND WALL: ${radarResult.detectedCount}/3`,
+      `DEMO_ONLY · SYNTHETIC EMITTERS: ${radarResult.detectedCount}/3 · NO PEOPLE DETECTION`,
       12,
       stripY + 15
     );
@@ -1057,7 +1080,7 @@ export default function TelecomAndRfRadarSuite({ locale }: { locale: Locale }) {
       ctx.fillStyle = i % 2 === 0 ? 'rgba(56, 189, 248, 0.72)' : 'rgba(52, 211, 153, 0.72)';
       ctx.fillRect(bx, by, Math.max(2, barW - 2), bh);
     }
-  }, [radarResult, palette, arCameraLive, tick]);
+  }, [radarResult, palette, arCameraLive, tick, demoEnabled]);
 
   const applyCasePreset = (c: CasePreset) => {
     setOrbitProfile(c.preset.orbit);
@@ -1088,6 +1111,9 @@ export default function TelecomAndRfRadarSuite({ locale }: { locale: Locale }) {
           <span>{t.authBanner}</span>
         </div>
 
+        <RfExplorer locale={locale}/>
+        <p role="note">DEMO_ONLY · {locale === 'es' ? 'Los casos, cifras y sectores siguientes son supuestos de simulación, sin mediciones físicas.' : locale === 'nl' ? 'De volgende scenario’s, cijfers en sectoren zijn simulatieaannames, zonder fysieke metingen.' : 'The following cases, figures and sectors are simulation assumptions without physical measurements.'}</p>
+        <label><input type="checkbox" checked={demoEnabled} onChange={event => setDemoEnabled(event.target.checked)}/> DEMO · {locale === 'es' ? 'mostrar emisores sintéticos' : locale === 'nl' ? 'synthetische zenders tonen' : 'show synthetic emitters'}</label>
         {/* BLOCK 1: TODAY (WITHOUT OEP) VS WITH OEP + CASE STUDIES */}
         <div className="oep-ts-block" id="today-vs-oep">
           <div className="oep-ts-block-head">
@@ -1097,16 +1123,29 @@ export default function TelecomAndRfRadarSuite({ locale }: { locale: Locale }) {
             </div>
           </div>
 
-          <div className="oep-ts-case-tabs" role="tablist">
+          <div className="oep-ts-case-tabs" role="tablist" aria-label={t.casesTitle}>
             {t.cases.map((item, idx) => (
               <button
                 key={item.id}
                 type="button"
                 role="tab"
+                id={`oep-case-${idx}`}
+                aria-controls="oep-case-panel"
+                tabIndex={activeCaseIndex === idx ? 0 : -1}
                 aria-selected={activeCaseIndex === idx}
                 data-testid={`case-tab-${idx}`}
                 className={`oep-ts-case-tab${activeCaseIndex === idx ? ' is-active' : ''}`}
                 onClick={() => setActiveCaseIndex(idx)}
+                onKeyDown={event=>{
+                  let next=idx;
+                  if(event.key==='ArrowRight')next=(idx+1)%t.cases.length;
+                  else if(event.key==='ArrowLeft')next=(idx+t.cases.length-1)%t.cases.length;
+                  else if(event.key==='Home')next=0;
+                  else if(event.key==='End')next=t.cases.length-1;
+                  else return;
+                  event.preventDefault();setActiveCaseIndex(next);
+                  document.getElementById(`oep-case-${next}`)?.focus();
+                }}
               >
                 <small>{item.tag}</small>
                 <strong>{item.title}</strong>
@@ -1114,7 +1153,7 @@ export default function TelecomAndRfRadarSuite({ locale }: { locale: Locale }) {
             ))}
           </div>
 
-          <div className="oep-ts-vs-grid">
+          <div className="oep-ts-vs-grid" id="oep-case-panel" role="tabpanel" aria-labelledby={`oep-case-${activeCaseIndex}`}>
             <article className="oep-ts-vs-card is-today">
               <span className="oep-ts-vs-tag">{t.todayTag}</span>
               <h4>{currentCase.todayTitle}</h4>
@@ -1391,10 +1430,10 @@ export default function TelecomAndRfRadarSuite({ locale }: { locale: Locale }) {
               />
               <div className="oep-ts-hud-topbar">
                 <span className="oep-ts-hud-pill">
-                  {arCameraLive ? t.arStatusLive : t.arStatusSim}
+                  {cameraStatus} · {demoEnabled ? 'DEMO_ONLY' : 'HARDWARE_REQUIRED'}
                 </span>
                 <span className="oep-ts-hud-pill">
-                  IMU HEADING: {deviceHeading !== null ? `${deviceHeading}°` : 'SYNTHETIC 042° NE'}
+                  ORIENTATION ALPHA: {deviceHeading !== null ? `${deviceHeading}° (uncalibrated)` : 'UNAVAILABLE'}
                 </span>
               </div>
               <canvas
@@ -1492,7 +1531,7 @@ export default function TelecomAndRfRadarSuite({ locale }: { locale: Locale }) {
                     <div style={{ margin: '0.2rem 0', color: '#e2e8f0' }}>{tgt.label}</div>
                     <div style={{ fontFamily: 'monospace', fontSize: '0.73rem', color: '#94a3b8' }}>
                       Dist: {tgt.totalDistanceMeters}m (Behind wall: {tgt.depthBehindWallMeters}m) · Bearing:{' '}
-                      {tgt.bearingDeg}° · Confidence: {tgt.confidencePct}%
+                      DEMO · {tgt.bearingDeg}° · Confidence: UNKNOWN
                       {tgt.hasHumanMicroDoppler ? ` · CSI Respiration: ${tgt.respirationBpm} BPM` : ''}
                     </div>
                   </div>

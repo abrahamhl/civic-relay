@@ -133,7 +133,7 @@ export function encodeCompactSatelliteBurst({
   buf[17] = (ts >>> 16) & 0xff;
   buf[18] = (ts >>> 8) & 0xff;
   buf[19] = ts & 0xff;
-  // 2-byte deterministic ECDSA-P256 short tag placeholder + 2-byte CRC16-CCITT
+  // 2-byte NON-CRYPTOGRAPHIC tag + 2-byte CRC16-CCITT (neither authenticates a sender).
   const tag = ((zHash ^ (safe16 << 4) ^ (sos16 << 8) ^ unk16) & 0xffff) >>> 0;
   buf[20] = (tag >>> 8) & 0xff;
   buf[21] = tag & 0xff;
@@ -149,7 +149,9 @@ export function encodeCompactSatelliteBurst({
     byteLength: 24,
     crc16Hex: '0x' + crc.toString(16).padStart(4, '0').toUpperCase(),
     hexFrame: hex,
-    compressionRatioVsJson: 8.6
+    compressionRatioVsJson: new TextEncoder().encode(JSON.stringify({
+      zoneId,sectorIndex,safeCount,sosCount,unknownCount,relayNodes,timestampSec
+    })).length / 24
   };
 }
 
@@ -367,11 +369,18 @@ export function computeZoneTelemetryGrid({
  * - A 16x10 thermal-style RF spectral power grid for real-time heatmap / AR camera HUD rendering.
  */
 export function runThroughWallRfRadar({
+  mode = 'LIVE',
   wallMaterial = 'CONCRETE_30CM',
   scannerDistanceMeters = 4.5,
   activeBands = { SUB_GHZ: true, WIFI_24: true, BLE_24: true, WIFI_50: true, IMU_MAG: true },
   timeStep = 0
 } = {}) {
+  if(mode !== 'DEMO')return {
+    wallMaterial,wallThicknessCm:0,wallAttenuationDb:{},scannerDistanceMeters,
+    detectedCount:0,targets:[],csiSubcarriers:[],heatmapGrid:[],
+    evidence:'IMPLEMENTED_UNVERIFIED',engineeringStatus:'HARDWARE_REQUIRED',
+    authorizationBoundary:'No connected RF sensor. Camera pixels do not provide RF, CSI, RSSI or people detection.'
+  };
   const mat = WALL_MATERIALS[wallMaterial] || WALL_MATERIALS.CONCRETE_30CM;
   const dist = Math.max(1.0, Math.min(25.0, Number(scannerDistanceMeters) || 4.5));
   const t = Number(timeStep) || 0;
@@ -380,31 +389,31 @@ export function runThroughWallRfRadar({
   const baseTargets = [
     {
       id: 'TARGET-01-SOS-BEACON',
-      label: 'Mobile Handset #A4 (Explicit SOS + BLE/Wi-Fi Probe + Respiration CSI)',
+      label: 'DEMO emitter A (synthetic)',
       bearingDeg: -18,
       depthBehindWallMeters: 2.8,
       lateralX: 0.28,
       verticalY: 0.46,
       txPowerDbm: { SUB_GHZ: 23, WIFI_24: 18, BLE_24: 8, WIFI_50: 16 },
       respirationHz: 0.28,
-      hasHumanMicroDoppler: true,
+      hasHumanMicroDoppler: false,
       deviceSensorsActive: ['BLE_ADVERTISING', 'WIFI_CSI_REFLECTION', 'CELLULAR_PRACH_BURST', 'BAROMETER_FLOOR_2']
     },
     {
       id: 'TARGET-02-PASSIVE-CSI',
-      label: 'Passive Human Body Reflection (Wi-Fi 2.4 GHz CSI Multipath Perturbation)',
+      label: 'DEMO emitter B (synthetic)',
       bearingDeg: 14,
       depthBehindWallMeters: 4.1,
       lateralX: 0.66,
       verticalY: 0.54,
       txPowerDbm: { SUB_GHZ: -99, WIFI_24: 14, BLE_24: -99, WIFI_50: 12 },
       respirationHz: 0.33,
-      hasHumanMicroDoppler: true,
+      hasHumanMicroDoppler: false,
       deviceSensorsActive: ['WIFI_CSI_64_SUBCARRIER_PHASE_SHIFT']
     },
     {
       id: 'TARGET-03-RELAY-NODE',
-      label: 'Mobile Relay Node #B9 (Store-and-Forward Queue Active · Battery 62%)',
+      label: 'DEMO emitter C (synthetic)',
       bearingDeg: 31,
       depthBehindWallMeters: 6.2,
       lateralX: 0.82,
@@ -469,7 +478,7 @@ export function runThroughWallRfRadar({
       bestRssiDbm: detectable ? bestRssiDbm : null,
       snrDb: detectable ? snrDb : null,
       detectable,
-      confidencePct,
+      confidencePct: null,
       hasHumanMicroDoppler: target.hasHumanMicroDoppler,
       respirationBpm: target.hasHumanMicroDoppler ? Math.round(target.respirationHz * 60) : 0,
       bandRssi,
@@ -528,8 +537,9 @@ export function runThroughWallRfRadar({
     targets: detectedTargets,
     csiSubcarriers,
     heatmapGrid,
-    engineeringStatus: 'CSI_AND_RF_PROPAGATION_TOMOGRAPHY_IMPLEMENTED',
+    evidence: 'SIMULATED',
+    engineeringStatus: 'DEMO_ONLY',
     authorizationBoundary:
-      'ITU-R P.2040 wall-attenuation math, 64-subcarrier CSI phase/amplitude tomography, and WebRTC AR camera HUD run live in the browser; raw Wi-Fi NIC CSI matrix extraction on commercial phones requires root/Nexmon firmware or IEEE 802.11bf OS API access.'
+      'Synthetic illustrative propagation and CSI-like arrays only. No receiver, RF capture, tomography, thermal image, physiological measurement or person detection.'
   };
 }

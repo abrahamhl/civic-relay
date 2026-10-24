@@ -68,12 +68,12 @@ test('polygonal 9-sector zone telemetry preserves node accounting and restores c
 });
 
 test('through-wall Wi-Fi CSI & RF spectral radar models ITU-R P.2040 wall attenuation and 64-subcarrier OFDM tomography', () => {
-  const drywall = runThroughWallRfRadar({
+  const drywall = runThroughWallRfRadar({ mode: 'DEMO',
     wallMaterial: 'DRYWALL',
     scannerDistanceMeters: 3.0,
     timeStep: 2
   });
-  const concrete = runThroughWallRfRadar({
+  const concrete = runThroughWallRfRadar({ mode: 'DEMO',
     wallMaterial: 'CONCRETE_30CM',
     scannerDistanceMeters: 3.0,
     timeStep: 2
@@ -93,7 +93,7 @@ test('through-wall Wi-Fi CSI & RF spectral radar models ITU-R P.2040 wall attenu
   assert.equal(t1Dry.detectable, true);
   assert.equal(t1Conc.detectable, true);
   assert.ok(t1Dry.bestRssiDbm > t1Conc.bestRssiDbm);
-  assert.ok(t1Conc.respirationBpm > 10 && t1Conc.respirationBpm < 30);
+  assert.equal(t1Conc.respirationBpm, 0);
 });
 
 test('TelecomAndRfRadarSuite is integrated in investor-page.tsx across EN, ES, and NL', () => {
@@ -101,6 +101,6 @@ test('TelecomAndRfRadarSuite is integrated in investor-page.tsx across EN, ES, a
   const suite = readFileSync(resolve(root, 'investor-next/app/telecom-rf-radar-suite.tsx'), 'utf8');
   assert.ok(page.includes('<TelecomAndRfRadarSuite locale={locale}/>'));
   assert.ok(suite.includes('IEEE 802.11bf'));
-  assert.ok(suite.includes('DensePoseFromWiFi'));
+  assert.ok(suite.includes('HARDWARE_REQUIRED'));
   assert.ok(suite.includes('getUserMedia'));
 });

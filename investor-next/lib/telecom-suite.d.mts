@@ -73,7 +73,7 @@ export interface ThroughWallTarget {
   bestRssiDbm: number | null;
   snrDb: number | null;
   detectable: boolean;
-  confidencePct: number;
+  confidencePct: number | null;
   hasHumanMicroDoppler: boolean;
   respirationBpm: number;
   bandRssi: Record<string, number | null>;
@@ -81,6 +81,7 @@ export interface ThroughWallTarget {
 }
 
 export interface ThroughWallRadarResult {
+  evidence: 'SIMULATED' | 'IMPLEMENTED_UNVERIFIED';
   wallMaterial: string;
   wallThicknessCm: number;
   wallAttenuationDb: Record<string, number>;
@@ -140,6 +141,7 @@ export declare function computeZoneTelemetryGrid(params?: {
 }): ZoneTelemetryGridResult;
 
 export declare function runThroughWallRfRadar(params?: {
+  mode?: 'LIVE' | 'DEMO';
   wallMaterial?: string;
   scannerDistanceMeters?: number;
   activeBands?: { SUB_GHZ?: boolean; WIFI_24?: boolean; BLE_24?: boolean; WIFI_50?: boolean; IMU_MAG?: boolean };

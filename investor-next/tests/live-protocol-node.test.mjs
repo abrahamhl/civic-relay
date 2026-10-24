@@ -70,11 +70,11 @@ test('real WebCrypto verifier rejects tampered binary CRC-16 frames and forged E
   assert.equal(sigCheck.reason, 'SIGNED_FIELDS_MISMATCH');
 });
 
-test('real-time Keplerian orbital ephemeris computes elevation, azimuth, slant range and Doppler across 4 shells', () => {
+test('illustrative circular shells preserve geometry bounds without claiming satellite observations', () => {
   const passes = computeLiveOrbitalEphemeris(1792569600000, 39.4699, -0.3763);
   assert.equal(passes.length, 4);
   for (const p of passes) {
-    assert.ok(p.elevationDeg >= 12 && p.elevationDeg <= 89);
+    assert.ok(p.elevationDeg >= -90 && p.elevationDeg <= 90);
     assert.ok(p.azimuthDeg >= 0 && p.azimuthDeg <= 360);
     assert.ok(p.slantRangeKm >= p.altitudeKm);
     assert.ok(Number.isFinite(p.dopplerShiftHz));

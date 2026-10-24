@@ -1,5 +1,5 @@
 /**
- * OEP Real Execution Protocol Node (Zero-Simulation WebCrypto ECDSA P-256 + Real-Time Keplerian Ephemeris).
+ * OEP Real Execution Protocol Node (WebCrypto ECDSA P-256 + illustrative circular shells).
  *
  * Uses native WebCrypto (`globalThis.crypto.subtle`) available in modern browsers and Node.js 18+
  * to execute real asymmetric key generation, real SHA-256 ECDSA digital signatures over binary
@@ -64,14 +64,14 @@ export async function signAndPackRealOepPacket({
   privateKey,
   publicKeySpkiHex,
   fingerprint,
-  messageId = 'MSG-LIVE-01',
+  messageId = globalThis.crypto.randomUUID(),
   status = 'SOS_EXPLICIT',
   zoneId = 'ZONE-VLC-01',
   sectorIndex = 5,
-  safeCount = 18,
-  sosCount = 4,
-  unknownCount = 29,
-  batteryPct = 78,
+  safeCount = 0,
+  sosCount = 0,
+  unknownCount = 0,
+  batteryPct = null,
   timestampMs = Date.now()
 } = {}) {
   const subtle = globalThis.crypto?.subtle;
@@ -197,7 +197,7 @@ export async function verifyRealOepPacket(packet) {
 export const REAL_ORBITAL_SHELLS = Object.freeze([
   {
     id: 'STARLINK-D2C-540KM',
-    name: 'LEO Direct-to-Cell Shell (540 km · 53° inc · 1.99 GHz)',
+    name: 'Illustrative LEO shell (540 km · nominal 1.99 GHz)',
     altitudeKm: 540,
     inclinationDeg: 53.0,
     periodSec: 5728,
@@ -206,7 +206,7 @@ export const REAL_ORBITAL_SHELLS = Object.freeze([
   },
   {
     id: 'IRIDIUM-NEXT-780KM',
-    name: 'LEO Polar L-Band Shell (780 km · 86.4° inc · 1.616 GHz)',
+    name: 'Illustrative polar LEO shell (780 km · nominal 1.616 GHz)',
     altitudeKm: 780,
     inclinationDeg: 86.4,
     periodSec: 6025,
@@ -215,7 +215,7 @@ export const REAL_ORBITAL_SHELLS = Object.freeze([
   },
   {
     id: 'ONEWEB-LEO-1200KM',
-    name: 'LEO High-Inclination Shell (1,200 km · 87.9° inc · 1.99 GHz)',
+    name: 'Illustrative LEO shell (1200 km · nominal 1.99 GHz)',
     altitudeKm: 1200,
     inclinationDeg: 87.9,
     periodSec: 6566,
@@ -224,7 +224,7 @@ export const REAL_ORBITAL_SHELLS = Object.freeze([
   },
   {
     id: 'GALILEO-SAR-MEO-23222KM',
-    name: 'Galileo SAR Emergency Return Link MEO (23,222 km · 56° inc · 1.544 GHz)',
+    name: 'Illustrative MEO shell (23222 km · nominal 1.544 GHz)',
     altitudeKm: 23222,
     inclinationDeg: 56.0,
     periodSec: 50680,
@@ -233,90 +233,39 @@ export const REAL_ORBITAL_SHELLS = Object.freeze([
   }
 ]);
 
-/**
- * Computes real-time Keplerian circular orbital ephemerides synchronized to the UTC clock
- * (`utcTimestampMs`) for an observer at `(observerLatDeg, observerLonDeg)`.
+/** Illustrative circular shell model. No observed elements, epoch or validated propagator.
+ * Legacy export name retained for compatibility; never use this to plan contact windows.
  */
-export function computeLiveOrbitalEphemeris(
-  utcTimestampMs = Date.now(),
-  observerLatDeg = 39.4699, // Valencia, Spain default reference
-  observerLonDeg = -0.3763
-) {
-  const earthRadiusKm = 6371.0;
-  const cMps = 299792458;
-  const tSec = utcTimestampMs / 1000;
-
-  return REAL_ORBITAL_SHELLS.map((shell) => {
-    const meanMotionRadPerSec = (2 * Math.PI) / shell.periodSec;
-    const meanAnomaly = (tSec * meanMotionRadPerSec + (shell.raanOffsetDeg * Math.PI) / 180) % (2 * Math.PI);
-    const incRad = (shell.inclinationDeg * Math.PI) / 180;
-
-    // Sub-satellite point in active local pass window near observer
-    const subLatDeg = Number(
-      (observerLatDeg * 0.65 + Math.sin(meanAnomaly) * (shell.inclinationDeg * 0.35)).toFixed(3)
-    );
-    const subLonDeg = Number(
-      (observerLonDeg + Math.cos(meanAnomaly) * 14.5).toFixed(3)
-    );
-
-    const dLatRad = ((subLatDeg - observerLatDeg) * Math.PI) / 180;
-    const dLonRad = ((subLonDeg - observerLonDeg) * Math.PI) / 180;
-    const centralAngleRad = Math.max(
-      0.01,
-      Math.acos(
-        Math.min(
-          1,
-          Math.max(
-            -1,
-            Math.sin((observerLatDeg * Math.PI) / 180) * Math.sin((subLatDeg * Math.PI) / 180) +
-              Math.cos((observerLatDeg * Math.PI) / 180) *
-                Math.cos((subLatDeg * Math.PI) / 180) *
-                Math.cos(dLonRad)
-          )
-        )
-      )
-    );
-
-    const rOrbit = earthRadiusKm + shell.altitudeKm;
-    const slantRangeKm = Number(
-      Math.sqrt(
-        earthRadiusKm * earthRadiusKm +
-          rOrbit * rOrbit -
-          2 * earthRadiusKm * rOrbit * Math.cos(centralAngleRad)
-      ).toFixed(1)
-    );
-
-    const elevationRad = Math.acos(
-      Math.min(1, Math.max(-1, (rOrbit * Math.sin(centralAngleRad)) / slantRangeKm))
-    );
-    const elevationDeg = Number(Math.max(12, Math.min(89, (elevationRad * 180) / Math.PI)).toFixed(1));
-    const azimuthDeg = Number(
-      (((Math.atan2(dLonRad, dLatRad) * 180) / Math.PI + 360) % 360).toFixed(1)
-    );
-
-    const orbitalVelMps = Math.sqrt(398600.4418 / rOrbit) * 1000;
-    const radialVelFactor = Math.cos(elevationRad) * Math.sin(meanAnomaly + incRad * 0.2);
-    const dopplerShiftHz = Math.round(
-      (orbitalVelMps / cMps) * (shell.freqMhz * 1e6) * radialVelFactor * (earthRadiusKm / rOrbit)
-    );
-
-    const fsplDb = Number(
-      (32.44 + 20 * Math.log10(slantRangeKm) + 20 * Math.log10(shell.freqMhz)).toFixed(2)
-    );
-
-    return {
-      id: shell.id,
-      name: shell.name,
-      altitudeKm: shell.altitudeKm,
-      freqMhz: shell.freqMhz,
-      subLatDeg,
-      subLonDeg,
-      elevationDeg,
-      azimuthDeg,
-      slantRangeKm,
-      dopplerShiftHz,
-      fsplDb,
-      utcIso: new Date(utcTimestampMs).toISOString()
+export function computeLiveOrbitalEphemeris(utcTimestampMs=Date.now(),observerLatDeg=39.4699,observerLonDeg=-0.3763) {
+  if(!Number.isFinite(utcTimestampMs)||!Number.isFinite(observerLatDeg)||Math.abs(observerLatDeg)>90||
+     !Number.isFinite(observerLonDeg)||Math.abs(observerLonDeg)>180)throw Error('Invalid orbital illustration inputs');
+  const R=6371,mu=398600.4418,rad=Math.PI/180,t=utcTimestampMs/1000;
+  const lat=observerLatDeg*rad,lon=observerLonDeg*rad;
+  return REAL_ORBITAL_SHELLS.map(shell=>{
+    const radius=R+shell.altitudeKm,inc=shell.inclinationDeg*rad;
+    const n=Math.sqrt(mu/radius**3);
+    const point=sec=>{
+      const u=(sec*n)%(2*Math.PI),theta=(sec*7.292115e-5)%(2*Math.PI)-shell.raanOffsetDeg*rad;
+      const x=Math.cos(u),y=Math.cos(inc)*Math.sin(u),z=Math.sin(inc)*Math.sin(u);
+      return {lat:Math.asin(z),lon:Math.atan2(y,x)-theta};
     };
+    const geometry=sec=>{
+      const p=point(sec),dl=p.lon-lon;
+      const cosAngle=Math.max(-1,Math.min(1,Math.sin(lat)*Math.sin(p.lat)+Math.cos(lat)*Math.cos(p.lat)*Math.cos(dl)));
+      const range=Math.sqrt(radius**2+R**2-2*radius*R*cosAngle);
+      return {...p,range,cosAngle};
+    };
+    const g=geometry(t);
+    const elevationDeg=Math.asin(Math.max(-1,Math.min(1,(radius*g.cosAngle-R)/g.range)))/rad;
+    const azimuthDeg=(Math.atan2(Math.sin(g.lon-lon)*Math.cos(g.lat),Math.cos(lat)*Math.sin(g.lat)-Math.sin(lat)*Math.cos(g.lat)*Math.cos(g.lon-lon))/rad+360)%360;
+    const rangeRateMps=(geometry(t+0.5).range-geometry(t-0.5).range)*1000;
+    return {id:shell.id,name:shell.name,altitudeKm:shell.altitudeKm,freqMhz:shell.freqMhz,
+      subLatDeg:g.lat/rad,subLonDeg:((g.lon/rad+180)%360+360)%360-180,
+      elevationDeg,azimuthDeg,slantRangeKm:g.range,
+      dopplerShiftHz:-rangeRateMps/299792458*shell.freqMhz*1e6,
+      fsplDb:32.44+20*Math.log10(g.range)+20*Math.log10(shell.freqMhz),
+      utcIso:new Date(utcTimestampMs).toISOString(),evidence:'SIMULATED',status:'DEMO_ONLY',
+      source:'IDEAL_CIRCULAR_SHELL_NO_OBSERVED_ELEMENTS',unit:'km / deg / Hz / dB',
+      uncertainty:'UNKNOWN',orbitalElementsEpoch:null};
   });
 }

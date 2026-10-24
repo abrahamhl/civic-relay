@@ -1,0 +1,100 @@
+TAP version 13
+# Subtest: real WebCrypto ECDSA P-256 key generation, signing, and verification succeed without simulation
+ok 1 - real WebCrypto ECDSA P-256 key generation, signing, and verification succeed without simulation
+  ---
+  duration_ms: 17.9543
+  type: 'test'
+  ...
+# Subtest: real WebCrypto verifier rejects tampered binary CRC-16 frames and forged ECDSA signatures
+ok 2 - real WebCrypto verifier rejects tampered binary CRC-16 frames and forged ECDSA signatures
+  ---
+  duration_ms: 2.0928
+  type: 'test'
+  ...
+# Subtest: illustrative circular shells preserve geometry bounds without claiming satellite observations
+ok 3 - illustrative circular shells preserve geometry bounds without claiming satellite observations
+  ---
+  duration_ms: 3.001
+  type: 'test'
+  ...
+# Subtest: LiveHardwareAndDealRoomConsole exposes 8 real funding tracks and ChatGPT prompts in EN, ES, and NL
+ok 4 - LiveHardwareAndDealRoomConsole exposes 8 real funding tracks and ChatGPT prompts in EN, ES, and NL
+  ---
+  duration_ms: 1.6004
+  type: 'test'
+  ...
+# Subtest: browser privacy guard: denied microphone never generates fictional acoustic FFT
+ok 5 - browser privacy guard: denied microphone never generates fictional acoustic FFT
+  ---
+  duration_ms: 1.1427
+  type: 'test'
+  ...
+# Subtest: browser privacy guard: stop and unmount release microphone and FFT resources
+ok 6 - browser privacy guard: stop and unmount release microphone and FFT resources
+  ---
+  duration_ms: 0.8706
+  type: 'test'
+  ...
+# Subtest: browser privacy guard: clear invalidates pending signatures and delayed UI updates
+ok 7 - browser privacy guard: clear invalidates pending signatures and delayed UI updates
+  ---
+  duration_ms: 1.6313
+  type: 'test'
+  ...
+# Subtest: without RF hardware there are no inferred emitters, persons, CSI bins or confidence scores
+ok 8 - without RF hardware there are no inferred emitters, persons, CSI bins or confidence scores
+  ---
+  duration_ms: 2.1196
+  type: 'test'
+  ...
+# Subtest: RF demonstration is opt-in, labelled synthetic and never identifies people
+ok 9 - RF demonstration is opt-in, labelled synthetic and never identifies people
+  ---
+  duration_ms: 2.6718
+  type: 'test'
+  ...
+# Subtest: orbital illustrations explicitly lack observational elements and do not move with the observer
+ok 10 - orbital illustrations explicitly lack observational elements and do not move with the observer
+  ---
+  duration_ms: 2.2291
+  type: 'test'
+  ...
+# Subtest: 24-byte OEP-NTN compact binary burst frame encodes magic header and deterministic CRC-16-CCITT
+ok 11 - 24-byte OEP-NTN compact binary burst frame encodes magic header and deterministic CRC-16-CCITT
+  ---
+  duration_ms: 2.9638
+  type: 'test'
+  ...
+# Subtest: 3GPP NTN satellite link budget computes realistic slant range, FSPL, Doppler shift, and viable burst bitrate
+ok 12 - 3GPP NTN satellite link budget computes realistic slant range, FSPL, Doppler shift, and viable burst bitrate
+  ---
+  duration_ms: 0.686
+  type: 'test'
+  ...
+# Subtest: polygonal 9-sector zone telemetry preserves node accounting and restores connectivity via mesh + NTN bridge
+ok 13 - polygonal 9-sector zone telemetry preserves node accounting and restores connectivity via mesh + NTN bridge
+  ---
+  duration_ms: 1.1063
+  type: 'test'
+  ...
+# Subtest: through-wall Wi-Fi CSI & RF spectral radar models ITU-R P.2040 wall attenuation and 64-subcarrier OFDM tomography
+ok 14 - through-wall Wi-Fi CSI & RF spectral radar models ITU-R P.2040 wall attenuation and 64-subcarrier OFDM tomography
+  ---
+  duration_ms: 2.9858
+  type: 'test'
+  ...
+# Subtest: TelecomAndRfRadarSuite is integrated in investor-page.tsx across EN, ES, and NL
+ok 15 - TelecomAndRfRadarSuite is integrated in investor-page.tsx across EN, ES, and NL
+  ---
+  duration_ms: 1.0299
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 152.5205

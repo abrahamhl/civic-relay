@@ -12,7 +12,7 @@ export interface SignedOepRealPacket {
   status: string;
   zoneId: string;
   sectorIndex: number;
-  batteryPct: number;
+  batteryPct: number | null;
   timestampMs: number;
   binaryFrameHex: string;
   crc16Hex: string;
@@ -33,6 +33,12 @@ export interface VerifiedOepPacketResult {
 }
 
 export interface LiveOrbitalPass {
+  evidence: 'SIMULATED';
+  status: 'DEMO_ONLY';
+  uncertainty: 'UNKNOWN';
+  orbitalElementsEpoch: null;
+  source: string;
+  unit: string;
   id: string;
   name: string;
   altitudeKm: number;
@@ -69,7 +75,7 @@ export declare function signAndPackRealOepPacket(params: {
   safeCount?: number;
   sosCount?: number;
   unknownCount?: number;
-  batteryPct?: number;
+  batteryPct?: number | null;
   timestampMs?: number;
 }): Promise<SignedOepRealPacket>;
 export declare function verifyRealOepPacket(packet: SignedOepRealPacket): Promise<VerifiedOepPacketResult>;
