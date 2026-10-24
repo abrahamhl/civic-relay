@@ -1,0 +1,91 @@
+{
+  "schema": "BUYER_ARENA_PERSONA_RUN_V1",
+  "actor_id": "P06",
+  "legacy_id": "06-volunteer-es",
+  "role": "Field volunteer, ES",
+  "objective": "Interact with simulator and export JSON",
+  "disclosure": "AUTOMATED SYNTHETIC ROLE — NOT A RECRUITED HUMAN TESTER",
+  "campaign_mode": "SINGLE-VERSION SMOKE",
+  "target_url": "https://civic-relay-investor.vercel.app",
+  "target_commit": "c18c6ac936c8b3c6560997b113e46b50cab51302",
+  "language": "es",
+  "viewport": {
+    "width": 768,
+    "height": 850
+  },
+  "started_at": "2026-10-21T06:08:07.875Z",
+  "completed_at": "2026-10-21T06:08:09.724Z",
+  "visited_urls": [
+    "https://civic-relay-investor.vercel.app/es"
+  ],
+  "actions_performed": [
+    "goto https://civic-relay-investor.vercel.app/es/",
+    "set virtual devices range slider to 20",
+    "click GENERATE SYNTHETIC SOS in Store & Forward sandbox",
+    "click EXPORT SYNTHETIC EVIDENCE JSON button"
+  ],
+  "selector_interactions": [
+    {
+      "selector": "h1",
+      "action": "innerText",
+      "observed": "CUANDO LA\nRED\nSE APAGA."
+    },
+    {
+      "selector": "#what-oep-does",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#architecture",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#how-it-works",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#routing-lab",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#developer-stack",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#evidence",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": ".oep-chapter-nav a",
+      "action": "count",
+      "observed": 6
+    },
+    {
+      "selector": "#routing-lab .mer-sliders input[type=range]:first",
+      "action": "fill(20)",
+      "before": "60",
+      "after": "20",
+      "displayed": "20"
+    },
+    {
+      "selector": "#routing-lab .mer-forward-lab .mer-tools button:first",
+      "action": "click",
+      "observed": "ESTADO DE LA COLA EXERCISE_0001 ACK_SYNTHETIC 1 attempt(s) · SIMULATED_ONLY"
+    },
+    {
+      "selector": "#routing-lab .mer-controls .mer-tools button:nth(2)",
+      "action": "click+download",
+      "filename": "oep-simulation-seed-20261020.json",
+      "kind": "OEP_SYNTHETIC_EVIDENCE_EXPORT"
+    }
+  ],
+  "verdict": "AUTOMATED_BROWSER_CHECKS_PASSED",
+  "passed_checks": 9,
+  "failed_checks": 0,
+  "critical_failures": 0
+}
