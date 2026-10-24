@@ -1,5 +1,6 @@
 /** Separate, static investor site. The existing Vite simulation remains the product demo. */
 const config = {
+  agentRules: false,
   output: 'export',
   reactStrictMode: true,
   poweredByHeader: false,
