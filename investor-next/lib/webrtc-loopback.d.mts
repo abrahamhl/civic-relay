@@ -6,6 +6,7 @@ export interface WebRtcLoopbackResult {
 export function sendWebRtcLoopbackPacket(
   packet: { messageId: string; protocol: string; signatureHex: string },
   options?: {
+    signal?: AbortSignal;
     PeerConnection?: typeof RTCPeerConnection | false;
     timeoutMs?: number;
     now?: () => number;

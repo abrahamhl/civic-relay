@@ -1,5 +1,7 @@
 /** Same-browser WebRTC DataChannel exercise. Never evidence of a remote device. */
 export async function sendWebRtcLoopbackPacket(packet, options = {}) {
+  const signal = options.signal;
+  if (signal?.aborted) return { delivered: false, rttMs: null, reason: 'ABORTED' };
   const PeerConnection = options.PeerConnection ?? globalThis.RTCPeerConnection;
   if (typeof PeerConnection !== 'function') {
     return { delivered: false, rttMs: null, reason: 'API_UNAVAILABLE' };
@@ -15,10 +17,12 @@ export async function sendWebRtcLoopbackPacket(packet, options = {}) {
     let pc2;
     let timer;
     let settled = false;
+    const aborted = () => finish('ABORTED');
     const finish = (reason) => {
       if (settled) return;
       settled = true;
       if (timer !== undefined) clearTimer(timer);
+      signal?.removeEventListener('abort', aborted);
       try { pc1?.close(); } catch {}
       try { pc2?.close(); } catch {}
       const delivered = reason === 'RECEIVED_LOOPBACK';
@@ -30,6 +34,7 @@ export async function sendWebRtcLoopbackPacket(packet, options = {}) {
     };
 
     try {
+      signal?.addEventListener('abort', aborted, { once: true });
       pc1 = new PeerConnection();
       pc2 = new PeerConnection();
       timer = setTimer(() => finish('TIMEOUT'), timeoutMs);
@@ -53,13 +58,14 @@ export async function sendWebRtcLoopbackPacket(packet, options = {}) {
       };
       const tx = pc1.createDataChannel('oep-browser-loopback');
       tx.onopen = () => {
+        if (settled) return;
         try { tx.send(JSON.stringify(packet)); }
         catch { finish('SEND_FAILED'); }
       };
       pc1.createOffer()
-        .then((offer) => pc1.setLocalDescription(offer).then(() => pc2.setRemoteDescription(offer)))
-        .then(() => pc2.createAnswer())
-        .then((answer) => pc2.setLocalDescription(answer).then(() => pc1.setRemoteDescription(answer)))
+        .then(async (offer) => { if (settled) return; await pc1.setLocalDescription(offer); if (!settled) await pc2.setRemoteDescription(offer); })
+        .then(() => { if (!settled) return pc2.createAnswer(); })
+        .then(async (answer) => { if (settled) return; await pc2.setLocalDescription(answer); if (!settled) await pc1.setRemoteDescription(answer); })
         .catch(() => finish('NEGOTIATION_FAILED'));
     } catch {
       finish('SETUP_FAILED');

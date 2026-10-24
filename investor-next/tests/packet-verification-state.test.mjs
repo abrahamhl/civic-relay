@@ -30,7 +30,9 @@ test('valid self-signed packet is displayed as untrusted, not authorized', () =>
 
 test('BroadcastChannel UI uses assessed packets and renders verification failures', () => {
   const source = readFileSync(new URL('../app/live-hardware-console.tsx', import.meta.url), 'utf8');
-  assert.match(source, /setLastPacket\(assessPacketVerification\(incoming, ver\)\.packet\)/);
+  assert.match(source, /await inboxRef\.current\.receive\(ev\.data\)/);
+  assert.match(source, /if\(!result\.packet\|\|!result\.verification\)/);
+  assert.match(source, /setLastPacket\(result\.packet\)/);
   assert.doesNotMatch(source, /setLastPacket\(incoming\)/);
   assert.match(source, /\{verifyState && \(/);
   assert.match(source, /STATUS: \{verifyState\.trustStatus\}/);

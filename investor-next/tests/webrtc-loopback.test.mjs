@@ -4,6 +4,23 @@ import { sendWebRtcLoopbackPacket } from '../lib/webrtc-loopback.mjs';
 
 const packet = { protocol: 'OEP_REAL_EXECUTION_V1', messageId: 'test-1', signatureHex: 'deadbeef' };
 
+test('STOP aborts a hung negotiation and prevents late offer work or sends',async()=>{
+  let offer,lateWork=0,closed=0,channel;
+  class Peer {
+    createDataChannel(){channel={onopen:null,send:()=>lateWork++};return channel;}
+    createOffer(){return new Promise(resolve=>offer=resolve);}
+    setLocalDescription(){lateWork++;return Promise.resolve();}
+    close(){closed++;}
+  }
+  const controller=new AbortController();
+  const pending=sendWebRtcLoopbackPacket(packet,{PeerConnection:Peer,signal:controller.signal});
+  controller.abort();
+  assert.deepEqual(await pending,{delivered:false,rttMs:null,reason:'ABORTED'});
+  offer({type:'offer'});channel.onopen();
+  for(let i=0;i<10;i++)await Promise.resolve();
+  assert.equal(lateWork,0);assert.equal(closed,2);
+});
+
 test('unsupported WebRTC never claims successful delivery or fabricates latency', async () => {
   assert.deepEqual(await sendWebRtcLoopbackPacket(packet, { PeerConnection: false }), {
     delivered: false, rttMs: null, reason: 'API_UNAVAILABLE'

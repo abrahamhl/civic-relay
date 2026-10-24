@@ -11,6 +11,7 @@ import {
 } from '../lib/live-protocol-node.mjs';
 import { energyPolicy } from '../lib/emergency-policy.mjs';
 import { sendWebRtcLoopbackPacket } from '../lib/webrtc-loopback.mjs';
+import { createPacketInbox } from '../lib/packet-inbox.mjs';
 import { assessPacketVerification } from '../lib/packet-verification-state.mjs';
 
 interface FundingTarget {
@@ -38,14 +39,7 @@ const fundingTargetsByLocale: Record<Locale, FundingTarget[]> = {
       portalUrl: 'https://nlnet.nl/propose/',
       fitSummary:
         'Financia protocolos abiertos, enrutamiento descentralizado resiliente y comunicaciones offline sin necesidad de consorcio ni empresa constituida.',
-      chatgptPrompt: `Actúa como un redactor experto en subvenciones europeas NGI Zero / NLnet Foundation. Voy a presentar el proyecto "OEP — Offline Emergency Protocol (Civic Relay)" a la convocatoria NLnet Open Internet Stack (cierre 3 de noviembre de 2026, presupuesto solicitado: 42.000 EUR en 5 hitos).
-Datos reales y verificados de nuestro prototipo en producción:
-- Web en vivo con ejecución criptográfica y telecomunicaciones reales: https://civic-relay-investor.vercel.app/es
-- Repositorio Apache-2.0: https://github.com/abrahamhl/civic-relay
-- Ingeniería ya implementada y funcionando en vivo: (1) Enrutamiento móvil multi-salto D2D (BLE + Wi-Fi Aware) con exclusión de batería crítica <=15%, (2) Firma criptográfica real ECDSA P-256 (WebCrypto y Android LabReceiptSigner.java) + cola persistente en disco (LabPersistentQueue.java), (3) Trama binaria compacta de 24 bytes con CRC-16-CCITT para enlace satelital 3GPP NTN Direct-to-Cell, (4) Telemetría táctica por zonas poligonales CAP 1.2 (9 sectores), y (5) Radar espectral trans-pared Wi-Fi CSI (64 subportadoras OFDM IEEE 802.11bf) + visor cámara AR térmica de radiofrecuencias.
-Redáctame:
-1) La versión final optimizada de cada campo del formulario de https://nlnet.nl/propose/ en inglés impecable.
-2) Un correo breve de seguimiento para el comité técnico de NLnet destacando que el código y el nodo WebCrypto/WebRTC ya funcionan en vivo.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F02-HORIZON-CL3',
@@ -57,12 +51,7 @@ Redáctame:
         'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-CL3-2026-01-SSRI-04',
       fitSummary:
         'Convocatoria oficial de la Comisión Europea para resiliencia ante desastres, comunicaciones de emergencia interoperables y búsqueda y rescate (USAR).',
-      chatgptPrompt: `Actúa como director de propuestas de Horizon Europe Cluster 3 (Civil Security for Society). Necesito redactar 5 correos de captación de consorcio (Work Package Technical Partner) para universidades europeas (TU Delft, UPV Valencia, Fraunhofer, TNO) y agencias de protección civil que lideren propuestas en el topic HORIZON-CL3-2026-01-SSRI-04 (cierre 18 de noviembre de 2026).
-Nuestro aporte técnico diferencial listo para probar en https://civic-relay-investor.vercel.app/ y https://github.com/abrahamhl/civic-relay:
-- Protocolo abierto OEP de coordinación de emergencias offline y enrutamiento adaptativo multi-red (malla D2D + puente satelital 3GPP NTN en tramas binarias de 24 bytes + telemetría poligonal CAP 1.2).
-- Radar espectral trans-pared Wi-Fi CSI / RF (ITU-R P.2040 + IEEE 802.11bf) con cámara AR térmica de frecuencias para localizar móviles y respiración tras muros de hormigón.
-- 67 tests deterministas automatizados + APK Android Nearby compilado y firmado con ECDSA P-256.
-Genera: (1) Email en inglés e español para coordinadores de consorcio, (2) Ficha Partner Profile de 1 página lista para enviar.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F03-NATO-DIANA',
@@ -73,12 +62,7 @@ Genera: (1) Email en inglés e español para coordinadores de consorcio, (2) Fic
       portalUrl: 'https://www.diana.nato.int/',
       fitSummary:
         'Aceleradora de innovación dual de la OTAN para comunicaciones resilientes cuando caen las redes terrestres, entornos electromagnéticos degradados y detección RF pasiva.',
-      chatgptPrompt: `Actúa como asesor de aplicaciones para NATO DIANA (Defence Innovation Accelerator for the North Atlantic) en el reto "Contested Electromagnetic Environments & Resilient Infrastructure".
-Prepara una propuesta ejecutiva en inglés para presentar OEP / Civic Relay (https://civic-relay-investor.vercel.app/):
-- Uso dual civil/defensa: continuidad de mando y telemetría por sectores cuando el 85-100% de las estaciones base celulares son destruidas o interferidas.
-- Tramas binarias ultracompactas de 24 bytes (CRC-16 + firma ECDSA P-256) capaces de transmitirse por enlaces tácticos estrechos o satélites LEO Direct-to-Cell desde 300 bps.
-- Radar espectral trans-pared RF / Wi-Fi CSI de 64 subportadoras OFDM y visor AR para equipos de rescate en estructuras colapsadas.
-Genera el Pitch Deck guionizado de 10 diapositivas y el formulario técnico de impacto dual-use.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F04-EIC-ACCELERATOR',
@@ -89,11 +73,7 @@ Genera el Pitch Deck guionizado de 10 diapositivas y el formulario técnico de i
       portalUrl: 'https://eic.ec.europa.eu/eic-funding-opportunities/eic-accelerator_en',
       fitSummary:
         'Financia startups europeas deep-tech que resuelven brechas críticas de soberanía tecnológica europea (EU Critical Communication System y rescate trans-pared).',
-      chatgptPrompt: `Actúa como evaluador del EIC Accelerator (Step 1 Short Application). Redacta la propuesta Step 1 completa (4 páginas + guion del vídeo de 3 minutos + estructura de 10 slides) para OEP — Offline Emergency Protocol (https://civic-relay-investor.vercel.app/es).
-Enfócalo en:
-1) El problema europeo: apagones, DANA/inundaciones, incendios y colapso de torres 4G/5G que dejan incomunicados a millones de ciudadanos y a ciegas a los equipos de emergencia.
-2) La innovación disruptiva: un único protocolo ligero que une malla móvil D2D, puente satelital 3GPP NTN de 24 bytes, telemetría poligonal CAP 1.2 y radar trans-pared Wi-Fi CSI / RF con cámara AR.
-3) Plan financiero para escalar de TRL 4/5 a TRL 8 con operadoras móviles europeas y fabricantes OEM.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F05-GSMA-HUMANITARIAN',
@@ -104,10 +84,7 @@ Enfócalo en:
       portalUrl: 'https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/gsma-innovation-fund/',
       fitSummary:
         'Respaldado por la asociación mundial de operadoras móviles (GSMA) para sistemas de alerta temprana (EW4All) y coordinación móvil durante desastres naturales.',
-      chatgptPrompt: `Actúa como especialista en propuestas para el GSMA Innovation Fund (Mobile for Humanitarian Innovation) y la iniciativa Early Warnings for All (EW4All) de la ONU/UIT.
-Redacta una propuesta de concepto y correo de presentación para el equipo de GSMA Mobile for Development presentando OEP (https://civic-relay-investor.vercel.app/):
-- Cómo OEP evita el colapso de las baterías móviles por tormentas PRACH cuando cae una antena tras un terremoto o inundación.
-- Cómo convierte los smartphones existentes en una malla Store-and-Forward firmada con ECDSA P-256 y comprime la telemetría de cada zona en 24 bytes para pasarelas satelitales NTN o células portátiles (COW).`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F06-CDTI-NEOTEC-SPAIN',
@@ -118,11 +95,7 @@ Redacta una propuesta de concepto y correo de presentación para el equipo de GS
       portalUrl: 'https://www.cdti.es/ayudas/neotec',
       fitSummary:
         'Subvención a fondo perdido en España para Empresas de Base Tecnológica (EBT) con tecnología propia en telecomunicaciones críticas, ciberseguridad e IA/sensórica.',
-      chatgptPrompt: `Actúa como consultor experto en memorias técnicas de CDTI Neotec e INCIBE Emprende en España.
-Redacta la Memoria Técnica Ejecutiva en español para presentar OEP — Offline Emergency Protocol (https://civic-relay-investor.vercel.app/es):
-- Caso de uso nacional directo: emergencias tipo DANA (inundaciones en sótanos y garajes sin cobertura), apagones eléctricos e incendios forestales en la España vaciada.
-- Tecnología propia verificable en https://github.com/abrahamhl/civic-relay: motor determinista de enrutamiento multi-salto, criptografía ECDSA P-256 en WebCrypto y Android, trama satelital NTN de 24 bytes con CRC-16, telemetría poligonal y radar trans-pared Wi-Fi CSI / RF con cámara AR.
-Incluye plan de trabajo a 24 meses, presupuesto de 350.000 EUR y retorno socioeconómico en España.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F07-RVO-NETHERLANDS',
@@ -133,9 +106,7 @@ Incluye plan de trabajo a 24 meses, presupuesto de 350.000 EUR y retorno socioec
       portalUrl: 'https://www.rvo.nl/subsidies-financiering/wbso',
       fitSummary:
         'Financiación directa e incentivo fiscal en Países Bajos (interfaz web ya traducida íntegramente al neerlandés en /nl/) para desarrollo de software técnico original.',
-      chatgptPrompt: `Actúa como consultor de subvenciones RVO en los Países Bajos (WBSO + MIT-regeling).
-Redacta la solicitud técnica WBSO (Speur- en Ontwikkelingswerk) y el resumen MIT Haalbaarheidsproject para OEP (versión neerlandesa ya activa en https://civic-relay-investor.vercel.app/nl):
-- Destaca los cuellos de botella técnico-científicos resueltos por programación propia: sincronización de cola Store-and-Forward con relojes monótonos, codificación binaria satelital de 24 bytes (CRC-16) y tomografía espectral Wi-Fi CSI de 64 subportadoras a través de muros.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F08-VC-DEEPTECH-SEED',
@@ -146,10 +117,7 @@ Redacta la solicitud técnica WBSO (Speur- en Ontwikkelingswerk) y el resumen MI
       portalUrl: 'https://civic-relay-investor.vercel.app/es#investment',
       fitSummary:
         'Inversores institucionales de capital riesgo que buscan software de infraestructura de telecomunicaciones, SDKs licenciables a operadoras/OEMs y defensa civil.',
-      chatgptPrompt: `Actúa como un Partner de un fondo de Venture Capital Deep-Tech europeo (como Bullnet Capital, Kibo Ventures, Inveready, Keen Venture Partners o Lakestar).
-Necesito que me redactes:
-1) 5 mensajes cortos y ultra-directos de LinkedIn / Email frío para enviar a General Partners de fondos Deep-Tech, Telecom y Dual-Use en España y Europa, invitándoles a probar en 60 segundos nuestro prototipo en vivo: https://civic-relay-investor.vercel.app/es
-2) Un Investment Memo de 2 páginas explicando el modelo de negocio B2B/B2G (licencia de SDK OEP-NTN para operadoras móviles Direct-to-Cell, aseguradoras, protección civil y equipos de rescate con radar trans-pared Wi-Fi CSI) para levantar una ronda Pre-Seed de 750.000 EUR.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     }
   ],
   en: [
@@ -162,12 +130,7 @@ Necesito que me redactes:
       portalUrl: 'https://nlnet.nl/propose/',
       fitSummary:
         'Funds open-source protocols, resilient decentralized routing, and offline emergency communications without requiring a multi-country consortium.',
-      chatgptPrompt: `Act as an expert European grant writer for NLnet Foundation / NGI Zero. Prepare the complete submission for "OEP — Offline Emergency Protocol (Civic Relay)" for the NLnet Open Internet Stack call (deadline November 3, 2026, requested budget: €42,000 across 5 verifiable milestones).
-Verified live prototype & code facts:
-- Live application executing real WebCrypto ECDSA P-256, WebRTC P2P & telecom link budgets: https://civic-relay-investor.vercel.app/
-- Apache-2.0 Repository: https://github.com/abrahamhl/civic-relay
-- Implemented engineering: (1) Multi-hop D2D routing (BLE + Wi-Fi Aware) with <=15% battery relay protection, (2) Real ECDSA P-256 receipt signing (WebCrypto + Android LabReceiptSigner.java) & disk queue (LabPersistentQueue.java), (3) 24-byte OEP-NTN compact binary satellite burst frame (CRC-16-CCITT), (4) 9-sector polygonal CAP 1.2 telemetry, and (5) Through-wall Wi-Fi CSI (64-subcarrier OFDM IEEE 802.11bf) & RF AR thermal camera radar.
-Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise cover email.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F02-HORIZON-CL3',
@@ -179,7 +142,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
         'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-CL3-2026-01-SSRI-04',
       fitSummary:
         'European Commission call for disaster-resilient societies, interoperable crisis communications, and urban search & rescue (USAR) technologies.',
-      chatgptPrompt: `Act as a Horizon Europe Cluster 3 proposal director. Write 5 high-conversion outreach emails and a 1-page Technical Partner Profile to join consortia bidding on HORIZON-CL3-2026-01-SSRI-04 (deadline November 18, 2026), showcasing our live prototype at https://civic-relay-investor.vercel.app/ and repository at https://github.com/abrahamhl/civic-relay.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F03-NATO-DIANA',
@@ -190,7 +153,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
       portalUrl: 'https://www.diana.nato.int/',
       fitSummary:
         'NATO dual-use accelerator backing resilient communications when terrestrial networks collapse, narrowband tactical framing, and through-wall RF sensing.',
-      chatgptPrompt: `Act as a NATO DIANA proposal advisor for "Contested Electromagnetic Environments". Write a complete executive application and 10-slide deck script for OEP (https://civic-relay-investor.vercel.app/), highlighting our 24-byte CRC-16/ECDSA satellite burst protocol, multi-hop D2D mesh, and 64-subcarrier Wi-Fi CSI through-wall AR radar.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F04-EIC-ACCELERATOR',
@@ -201,7 +164,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
       portalUrl: 'https://eic.ec.europa.eu/eic-funding-opportunities/eic-accelerator_en',
       fitSummary:
         'Backs high-impact European deep-tech startups addressing strategic autonomy in emergency communications and satellite-terrestrial convergence.',
-      chatgptPrompt: `Act as an EIC Accelerator evaluator. Draft the complete Step 1 Short Application (4-page proposal + 3-minute video script + 10-slide pitch deck) for OEP — Offline Emergency Protocol (https://civic-relay-investor.vercel.app/) to scale from TRL 4/5 to TRL 8 across European mobile operators and civil protection agencies.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F05-GSMA-HUMANITARIAN',
@@ -212,7 +175,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
       portalUrl: 'https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/gsma-innovation-fund/',
       fitSummary:
         'Backed by the global mobile operator ecosystem (GSMA) to fund Early Warnings for All (EW4All) and disaster-resilient mobile coordination.',
-      chatgptPrompt: `Act as a GSMA Innovation Fund advisor. Write a concept note and operator partnership pitch for OEP (https://civic-relay-investor.vercel.app/), explaining how our protocol prevents PRACH battery drain storms during tower outages and compresses zone telemetry into 24-byte NTN satellite bursts.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F06-CDTI-NEOTEC-SPAIN',
@@ -223,7 +186,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
       portalUrl: 'https://www.cdti.es/ayudas/neotec',
       fitSummary:
         'Spanish national non-dilutive grant for technology-based startups developing proprietary telecom, cybersecurity, and RF sensing software.',
-      chatgptPrompt: `Write a complete CDTI Neotec / INCIBE executive technical proposal for OEP (https://civic-relay-investor.vercel.app/es), focusing on DANA flood resilience, power blackouts, wildfires, and our proprietary D2D + 3GPP NTN + Through-Wall Wi-Fi CSI radar stack.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F07-RVO-NETHERLANDS',
@@ -234,7 +197,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
       portalUrl: 'https://www.rvo.nl/subsidies-financiering/wbso',
       fitSummary:
         'Dutch R&D tax credit and SME innovation grant (Dutch localized interface live at /nl/) for original software and protocol engineering.',
-      chatgptPrompt: `Write a Dutch RVO WBSO and MIT Haalbaarheidsproject application for OEP (https://civic-relay-investor.vercel.app/nl), detailing the technical bottlenecks solved in our store-and-forward queue, 24-byte NTN binary framing, and 64-subcarrier Wi-Fi CSI through-wall tomography.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F08-VC-DEEPTECH-SEED',
@@ -245,7 +208,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
       portalUrl: 'https://civic-relay-investor.vercel.app/#investment',
       fitSummary:
         'Private institutional investors backing licensable B2B/B2G telecom SDKs for Direct-to-Cell satellite operators, OEMs, insurers, and first responders.',
-      chatgptPrompt: `Act as a European Deep-Tech VC General Partner. Write 5 high-converting cold outreach emails/LinkedIn messages and a 2-page Investment Memo for OEP (https://civic-relay-investor.vercel.app/) to raise a €750,000 Pre-Seed round based on our live WebCrypto/WebRTC protocol node, 24-byte NTN satellite bridge, and through-wall Wi-Fi CSI AR radar.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     }
   ],
   nl: [
@@ -258,7 +221,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
       portalUrl: 'https://nlnet.nl/propose/',
       fitSummary:
         'Nederlandse stichting die open-source protocollen, decentrale noodroutering en offline communicatie financiert zonder consortiumvereiste.',
-      chatgptPrompt: `Schrijf als NGI Zero / NLnet-subsidie-expert de volledige aanvraag voor "OEP — Offline Emergency Protocol" voor de NLnet Open Internet Stack oproep (deadline 3 november 2026, budget €42.000 over 5 mijlpalen), met verwijzing naar ons live prototype op https://civic-relay-investor.vercel.app/nl en https://github.com/abrahamhl/civic-relay.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F02-HORIZON-CL3',
@@ -270,7 +233,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
         'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-CL3-2026-01-SSRI-04',
       fitSummary:
         'Oproep van de Europese Commissie voor rampbestendige samenlevingen, interoperabele noodcommunicatie en zoek- en reddingstechnologie (USAR).',
-      chatgptPrompt: `Schrijf 5 overtuigende consortium-outreach e-mails (voor o.a. TU Delft, TNO, Fraunhofer) en een Partner Profile voor HORIZON-CL3-2026-01-SSRI-04 (deadline 18 november 2026) voor OEP (https://civic-relay-investor.vercel.app/nl).`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F03-NATO-DIANA',
@@ -281,7 +244,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
       portalUrl: 'https://www.diana.nato.int/',
       fitSummary:
         'NAVO dual-use accelerator voor veerkrachtige communicatie bij netwerkuitval, 24-byte satelliet-framing en door-de-muur RF-detectie.',
-      chatgptPrompt: `Schrijf een volledige NATO DIANA aanvraag en 10-slide pitchdeck voor OEP (https://civic-relay-investor.vercel.app/nl) gericht op veerkrachtige D2D-mesh, 24-byte NTN-satellietframes en door-de-muur Wi-Fi CSI-radar.`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F04-EIC-ACCELERATOR',
@@ -292,7 +255,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
       portalUrl: 'https://eic.ec.europa.eu/eic-funding-opportunities/eic-accelerator_en',
       fitSummary:
         'Ondersteunt Europese deep-tech startups die kritieke gaten in Europese technologische soevereiniteit en noodcommunicatie oplossen.',
-      chatgptPrompt: `Schrijf de EIC Accelerator Step 1 Short Application en 3-minuten videoscript voor OEP (https://civic-relay-investor.vercel.app/nl).`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F05-GSMA-HUMANITARIAN',
@@ -303,7 +266,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
       portalUrl: 'https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/gsma-innovation-fund/',
       fitSummary:
         'Ondersteund door wereldwijde mobiele providers (GSMA) voor Early Warnings for All (EW4All) en mobiele coördinatie tijdens rampen.',
-      chatgptPrompt: `Schrijf een GSMA Innovation Fund concept note en telecom-pitch voor OEP (https://civic-relay-investor.vercel.app/nl).`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F06-CDTI-NEOTEC-SPAIN',
@@ -314,7 +277,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
       portalUrl: 'https://www.cdti.es/ayudas/neotec',
       fitSummary:
         'Spaanse nationale subsidie voor technologische startups met eigen telecom-, cybersecurity- en RF-detectiesoftware.',
-      chatgptPrompt: `Schrijf een technische samenvatting voor CDTI Neotec / INCIBE voor OEP (https://civic-relay-investor.vercel.app/es).`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F07-RVO-NETHERLANDS',
@@ -325,7 +288,7 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
       portalUrl: 'https://www.rvo.nl/subsidies-financiering/wbso',
       fitSummary:
         'Directe Nederlandse R&D-regelingen voor eigen technische softwareontwikkeling (volledig Nederlandstalig prototype live op /nl/).',
-      chatgptPrompt: `Schrijf een volledige RVO WBSO en MIT Haalbaarheidsproject aanvraag in het Nederlands voor OEP (https://civic-relay-investor.vercel.app/nl).`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     },
     {
       id: 'F08-VC-DEEPTECH-SEED',
@@ -336,65 +299,65 @@ Write the final copy-paste answers for https://nlnet.nl/propose/ and a concise c
       portalUrl: 'https://civic-relay-investor.vercel.app/nl#investment',
       fitSummary:
         'Particuliere investeerders gericht op licentieerbare B2B/B2G telecom-SDK’s voor satelliet- en mobiele providers en hulpdiensten.',
-      chatgptPrompt: `Schrijf 5 directe LinkedIn/e-mail berichten en een Investment Memo van 2 pagina’s om €750.000 Pre-Seed op te halen bij Europese Deep-Tech VC’s voor OEP (https://civic-relay-investor.vercel.app/nl).`
+      chatgptPrompt: 'Evidence-scoped draft; verify official portal first.'
     }
   ]
 };
 
 const consoleCopy = {
   es: {
-    eyebrow: '05 / EJECUCIÓN REAL EN VIVO (CERO SIMULACIÓN) + SALA DE INVERSIÓN Y PROMPTS PARA CHATGPT',
-    title: 'NODO CRIPTOGRÁFICO WEBCRYPTO ECDSA P-256 REAL, CANAL P2P WEBRTC EN VIVO, HARDWARE DEL DISPOSITIVO Y CAMPAÑA DE FINANCIACIÓN',
-    lead: 'Todo lo que ves en este bloque se ejecuta de verdad en el hardware y navegador de tu dispositivo (sin simulaciones): genera claves criptográficas ECDSA P-256 reales con WebCrypto, firma tramas binarias OEP de 24 bytes, las persiste en el almacenamiento físico del navegador (localStorage), las transmite por un canal de datos WebRTC / BroadcastChannel en vivo midiendo la latencia real en milisegundos, lee la batería y red reales de tu equipo, y te entrega las 8 oportunidades de inversión verificadas con sus prompts listos para pegar en ChatGPT.',
-    cryptoTitle: '1. Nodo Criptográfico ECDSA P-256 Real + Transporte P2P WebRTC / BroadcastChannel en Vivo',
-    signSosBtn: 'FIRMAR TRAMA SOS (ECDSA P-256 REAL) Y ENVIAR POR WEBRTC + BUS P2P EN VIVO',
-    signSafeBtn: 'FIRMAR TRAMA «ESTOY BIEN» (ECDSA P-256 REAL) Y PERSISTIR EN DISCO',
+    eyebrow: 'LABORATORIO LOCAL · CRIPTOGRAFÍA, SENSORES Y LÍMITES',
+    title: 'Firmas reales y transportes locales experimentales',
+    lead: 'WebCrypto ejecuta firmas reales sobre datos de laboratorio; WebRTC prueba un loopback local y BroadcastChannel conecta pestañas del mismo origen. La batería y red pueden no estar disponibles. Las órbitas son ilustrativas; las rutas de financiación requieren verificar condiciones actuales.',
+    cryptoTitle: '1. WebCrypto real · laboratorio local',
+    signSosBtn: 'FIRMAR SOS DE LABORATORIO · LOOPBACK LOCAL',
+    signSafeBtn: 'FIRMAR SAFE DE LABORATORIO · LOOPBACK LOCAL',
     clearDiskBtn: 'VACIAR COLA EN DISCO',
-    hwTitle: '2. Telemetría Real del Hardware de Tu Dispositivo + Escáner Acústico/Ultrasónico FFT en Vivo',
-    micBtnStart: 'ACTIVAR ESCÁNER ESPECTRAL ACÚSTICO / ULTRASÓNICO FFT EN VIVO (WEBAUDIO REAL)',
+    hwTitle: '2. Datos expuestos por el navegador · sin calibración física',
+    micBtnStart: 'AUTORIZAR MICRÓFONO · ESPECTRO ACÚSTICO',
     micBtnStop: 'DETENER ESCÁNER ACÚSTICO FFT',
-    orbTitle: '3. Efemérides Orbitales Satelitales en Tiempo Real (Sincronizadas con Reloj UTC Actual)',
-    dealTitle: '4. Posibilidades Reales de Inversión y Subvenciones 2026 + Prompts Maestros para ChatGPT',
+    orbTitle: '3. Órbitas ilustrativas · DEMO_ONLY',
+    dealTitle: 'Rutas de financiación · pendientes de verificar',
     dealLead:
-      'Haz clic en «COPIAR PROMPT + PROPUESTA PARA CHATGPT» en cualquiera de las 8 vías de financiación reales para pegarlo directamente en ChatGPT y enviar hoy mismo las solicitudes o correos a inversores:',
+      'Fechas, importes y condiciones heredadas sin verificar en esta revisión. Los prompts solo preparan borradores sujetos a comprobación.',
     copyPromptBtn: 'COPIAR PROMPT MAESTRO + PROPUESTA PARA CHATGPT',
     copiedBadge: '¡PROMPT COPIADO AL PORTAPAPELES! PÉGALO EN CHATGPT',
     openPortalBtn: 'ABRIR PORTAL OFICIAL ↗'
   },
   en: {
-    eyebrow: '05 / LIVE REAL EXECUTION (ZERO SIMULATION) + INVESTOR DEAL-ROOM & CHATGPT PROMPTS',
-    title: 'REAL WEBCRYPTO ECDSA P-256 NODE, LIVE WEBRTC P2P DATA CHANNEL, REAL DEVICE HARDWARE TELEMETRY & FUNDING CAMPAIGN',
-    lead: 'Everything in this panel executes for real on your device hardware and browser (no simulations): it generates real ECDSA P-256 cryptographic keys via WebCrypto, signs 24-byte OEP binary frames, persists them to durable local storage, transmits them across a live WebRTC / BroadcastChannel P2P data link with real millisecond RTT measurement, reads your real battery and network interface, and provides 8 verified funding targets with one-click ChatGPT proposal prompts.',
-    cryptoTitle: '1. Real WebCrypto ECDSA P-256 Node + Live WebRTC / BroadcastChannel P2P Transport',
-    signSosBtn: 'SIGN SOS FRAME (REAL ECDSA P-256) & TRANSMIT OVER LIVE WEBRTC + P2P BUS',
-    signSafeBtn: 'SIGN "SAFE" FRAME (REAL ECDSA P-256) & PERSIST TO DISK',
+    eyebrow: 'LOCAL LAB · CRYPTOGRAPHY, SENSORS AND LIMITS',
+    title: 'Real signatures and experimental local transports',
+    lead: 'WebCrypto executes real signatures on laboratory data; WebRTC tests a local loopback and BroadcastChannel connects same-origin tabs. Battery and network data may be unavailable. Orbits are illustrative; funding routes require current eligibility checks.',
+    cryptoTitle: '1. Real WebCrypto · local laboratory',
+    signSosBtn: 'SIGN LAB SOS · LOCAL LOOPBACK',
+    signSafeBtn: 'SIGN LAB SAFE · LOCAL LOOPBACK',
     clearDiskBtn: 'CLEAR DISK QUEUE',
-    hwTitle: '2. Real Device Hardware Telemetry + Live WebAudio FFT Acoustic/Ultrasonic Scanner',
-    micBtnStart: 'START LIVE FFT ACOUSTIC / ULTRASONIC SPECTRUM SCANNER (REAL WEBAUDIO)',
+    hwTitle: '2. Browser-reported data · no physical calibration',
+    micBtnStart: 'AUTHORIZE MICROPHONE · ACOUSTIC SPECTRUM',
     micBtnStop: 'STOP FFT ACOUSTIC SCANNER',
-    orbTitle: '3. Real-Time Satellite Orbital Ephemerides (Synchronized to Live UTC Clock)',
-    dealTitle: '4. Real 2026 Funding & Investment Opportunities + Master Prompts for ChatGPT',
+    orbTitle: '3. Illustrative orbital shells · DEMO_ONLY',
+    dealTitle: 'Funding routes · verification required',
     dealLead:
-      'Click "COPY MASTER PROMPT + PROPOSAL FOR CHATGPT" on any of the 8 verified funding tracks to paste directly into ChatGPT and dispatch applications or investor emails immediately:',
+      'Inherited dates, amounts and conditions are unverified in this review. Prompts only prepare drafts requiring verification.',
     copyPromptBtn: 'COPY MASTER PROMPT + PROPOSAL FOR CHATGPT',
     copiedBadge: 'PROMPT COPIED TO CLIPBOARD! PASTE INTO CHATGPT',
     openPortalBtn: 'OPEN OFFICIAL PORTAL ↗'
   },
   nl: {
-    eyebrow: '05 / LIVE ECHTE UITVOERING (GEEN SIMULATIE) + INVESTEERDERSKAMER & CHATGPT-PROMPTS',
-    title: 'ECHTE WEBCRYPTO ECDSA P-256 NODE, LIVE WEBRTC P2P-KANAAL, ECHTE APPARAATHARDWARE & FINANCIERINGSCAMPAGNE',
-    lead: 'Alles in dit paneel wordt daadwerkelijk uitgevoerd op uw apparaat en in uw browser (geen simulatie): het genereert echte ECDSA P-256 cryptografische sleutels via WebCrypto, ondertekent 24-byte OEP binaire frames, slaat ze persistent op schijf op, verzendt ze via een live WebRTC / BroadcastChannel P2P-datakanaal met echte milliseconde RTT-meting, leest uw echte accu en netwerk uit en biedt 8 geverifieerde financieringskansen met kant-en-klare ChatGPT-prompts.',
-    cryptoTitle: '1. Echte WebCrypto ECDSA P-256 Node + Live WebRTC / BroadcastChannel P2P-Transport',
-    signSosBtn: 'ONDERTEKEN SOS-FRAME (ECHTE ECDSA P-256) & VERZEND VIA LIVE WEBRTC + P2P-BUS',
-    signSafeBtn: 'ONDERTEKEN «VEILIG»-FRAME (ECHTE ECDSA P-256) & SLA OP SCHIJF OP',
+    eyebrow: 'LOKAAL LAB · CRYPTOGRAFIE, SENSOREN EN GRENZEN',
+    title: 'Echte handtekeningen en experimentele lokale verbindingen',
+    lead: 'WebCrypto voert echte handtekeningen uit op labgegevens; WebRTC test een lokale loopback en BroadcastChannel verbindt tabbladen van dezelfde oorsprong. Accu- en netwerkgegevens kunnen ontbreken. Banen zijn illustratief; financieringsroutes vereisen actuele controle.',
+    cryptoTitle: '1. Echte WebCrypto · lokaal laboratorium',
+    signSosBtn: 'LAB-SOS ONDERTEKENEN · LOKALE LOOPBACK',
+    signSafeBtn: 'LAB-SAFE ONDERTEKENEN · LOKALE LOOPBACK',
     clearDiskBtn: 'WIS SCHIJFWACHTRIJ',
-    hwTitle: '2. Echte Apparaathardware-Telemetrie + Live WebAudio FFT Akoestische Scanner',
-    micBtnStart: 'START LIVE FFT AKOESTISCHE / ULTRASONE SPECTRUMSCANNER (ECHTE WEBAUDIO)',
+    hwTitle: '2. Browsergegevens · zonder fysieke kalibratie',
+    micBtnStart: 'MICROFOON TOESTAAN · AKOESTISCH SPECTRUM',
     micBtnStop: 'STOP FFT AKOESTISCHE SCANNER',
-    orbTitle: '3. Realtime Satelliet-Ephemeriden (Gesynchroniseerd met Live UTC-Klok)',
-    dealTitle: '4. Echte Financierings- & Investeringskansen 2026 + Master-Prompts voor ChatGPT',
+    orbTitle: '3. Illustratieve banen · DEMO_ONLY',
+    dealTitle: 'Financieringsroutes · verificatie vereist',
     dealLead:
-      'Klik op «KOPIEER MASTER-PROMPT + VOORSTEL VOOR CHATGPT» bij een van de 8 financieringsroutes om direct in ChatGPT te plakken en aanvragen te versturen:',
+      'Overgenomen datums, bedragen en voorwaarden zijn niet geverifieerd. Prompts maken alleen concepten die controle vereisen.',
     copyPromptBtn: 'KOPIEER MASTER-PROMPT + VOORSTEL VOOR CHATGPT',
     copiedBadge: 'PROMPT GEKOPIEERD! PLAK IN CHATGPT',
     openPortalBtn: 'OPEN OFFICIEEL PORTAAL ↗'
@@ -418,11 +381,16 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
     transportUsed: string;
   } | null>(null);
   const [durableQueue, setDurableQueue] = useState<SignedOepRealPacket[]>([]);
-  const [msgCounter, setMsgCounter] = useState(1);
+  const queueRef = useRef<SignedOepRealPacket[]>([]);
+  const busyRef = useRef(false);
+  const [busy, setBusy] = useState(false);
+  const [operationStatus, setOperationStatus] = useState('NOT_TESTED');
+  const loopbackAbortRef = useRef<AbortController|null>(null);
+  const inboxRef = useRef(createPacketInbox());
 
   // 2. Real Device Hardware Telemetry state
   const [hwState, setHwState] = useState<{
-    online: boolean;
+    online: boolean | null;
     batteryPct: number | null;
     charging: boolean | null;
     netType: string;
@@ -433,7 +401,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
     webrtcApiAvailable: boolean;
     webcryptoAvailable: boolean;
   }>({
-    online: true,
+    online: null,
     batteryPct: null,
     charging: null,
     netType: 'DETECTING',
@@ -448,6 +416,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
   // Live WebAudio FFT Acoustic Spectrum state
   const [fftBins, setFftBins] = useState<number[]>(Array.from({ length: 32 }, () => 0));
   const [micActive, setMicActive] = useState(false);
+  const [fftProvenance,setFftProvenance]=useState<{sampleRateHz:number;timestamp:string}|null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -464,68 +433,59 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
   useEffect(() => {
     if (typeof window === 'undefined') return;
     setUtcNow(Date.now());
-    const clockInterval = window.setInterval(() => setUtcNow(Date.now()), 1000);
-
-    // Load persisted queue from localStorage
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) setDurableQueue(parsed);
+    const clockInterval = window.setInterval(() => {
+      const at=Date.now();setUtcNow(at);
+      const fresh=queueRef.current.filter(packet=>at<packet.timestampMs+60000);
+      if(fresh.length!==queueRef.current.length){
+        queueRef.current=fresh;setDurableQueue(fresh);
+        try{if(fresh.length)window.localStorage.setItem(STORAGE_KEY,JSON.stringify(fresh));
+          else window.localStorage.removeItem(STORAGE_KEY);}
+        catch{setOperationStatus('RETENTION_CLEANUP_FAILED');}
       }
-    } catch {}
+      setLastPacket(packet=>packet&&at>=packet.timestampMs+60000?null:packet);
+    }, 1000);
 
-    // Do not restore a cleared message from a pending bootstrap signature.
     const bootstrapEpoch = queueEpochRef.current;
-    // Generate real ECDSA P-256 keypair and sign initial live packet
-    generateRealEcdsaKeyPair()
-      .then(async (bundle) => {
-        setKeyInfo(bundle);
-        const pkt = await signAndPackRealOepPacket({
-          privateKey: bundle.keyPair.privateKey,
-          publicKeySpkiHex: bundle.publicKeySpkiHex,
-          fingerprint: bundle.fingerprint,
-          messageId: 'MSG-LIVE-01',
-          status: 'SOS_EXPLICIT',
-          zoneId: 'ZONE-VLC-01',
-          sectorIndex: 5,
-          batteryPct: 82,
-          timestampMs: Date.now()
-        });
-        const ver = await verifyRealOepPacket(pkt);
+    // Restore only fresh, verified lab packets. Stored browser data is untrusted input.
+    void (async()=>{
+      try {
+        const raw=window.localStorage.getItem(STORAGE_KEY);
+        if(!raw)return;
+        if(raw.length>65536)throw Error('OVERSIZED_STORAGE');
+        const parsed=JSON.parse(raw);
+        if(!Array.isArray(parsed))throw Error('INVALID_STORAGE');
+        const restored:SignedOepRealPacket[]=[];
+        const restoreInbox=createPacketInbox();
+        for(const item of parsed.slice(0,8)){
+          const result=await restoreInbox.receive(item);
+          if(result.packet)restored.push(result.packet);
+        }
         if (bootstrapEpoch !== queueEpochRef.current) return;
-        setLastPacket(assessPacketVerification(pkt, ver).packet);
-        setVerifyState({
-          valid: ver.valid,
-          trustStatus: assessPacketVerification(pkt, ver).status,
-          reason: ver.reason,
-          verifyTimeMs: ver.verifyTimeMs,
-          webrtcRttMs: null,
-          webrtcResult: 'NOT_TESTED',
-          transportUsed: 'WEBCRYPTO_ECDSA_P256 + LOCALSTORAGE_PERSISTED'
-        });
-      })
-      .catch(() => {});
+        queueRef.current=restored;setDurableQueue(restored);
+        if(restored.length)window.localStorage.setItem(STORAGE_KEY,JSON.stringify(restored));
+        else window.localStorage.removeItem(STORAGE_KEY);
+      }catch{if(bootstrapEpoch===queueEpochRef.current)setOperationStatus('STORAGE_UNAVAILABLE_OR_INVALID');}
+    })();
+    // Key generation is local; an SOS is created only by a labelled lab button.
+    generateRealEcdsaKeyPair().then(bundle=>{
+      if (bootstrapEpoch !== queueEpochRef.current) return;
+      setKeyInfo(bundle);
+    }).catch(()=>{if(bootstrapEpoch===queueEpochRef.current)setOperationStatus('WEBCRYPTO_UNAVAILABLE');});
 
     // Listen on BroadcastChannel for real cross-tab P2P packets
     let bc: BroadcastChannel | null = null;
     if (typeof BroadcastChannel !== 'undefined') {
       bc = new BroadcastChannel(CHANNEL_NAME);
       bc.onmessage = async (ev) => {
-        const incoming = ev.data as SignedOepRealPacket;
-        if (incoming && incoming.protocol === 'OEP_REAL_EXECUTION_V1') {
-          const ver = await verifyRealOepPacket(incoming);
-          setLastPacket(assessPacketVerification(incoming, ver).packet);
-          setVerifyState({
-            valid: ver.valid,
-            trustStatus: assessPacketVerification(incoming, ver).status,
-            reason: ver.reason,
-            verifyTimeMs: ver.verifyTimeMs,
-            webrtcRttMs: null,
-            webrtcResult: 'NOT_TESTED',
-            transportUsed: 'BROADCAST_CHANNEL_SAME_ORIGIN_TAB'
-          });
-        }
+        const receiveEpoch=queueEpochRef.current;
+        const result=await inboxRef.current.receive(ev.data);
+        if(receiveEpoch!==queueEpochRef.current)return;
+        if(!result.packet||!result.verification){setOperationStatus(result.status);return;}
+        const ver=result.verification;
+        setLastPacket(result.packet);
+        setVerifyState({valid:true,trustStatus:'SIGNATURE_VALID_UNTRUSTED',reason:ver.reason,
+          verifyTimeMs:ver.verifyTimeMs,webrtcRttMs:null,webrtcResult:'NOT_TESTED',
+          transportUsed:'BROADCAST_CHANNEL_SAME_ORIGIN_TAB'});
       };
     }
 
@@ -542,15 +502,16 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
       if (typeof nav.getBattery === 'function') {
         try {
           const b = await nav.getBattery();
-          battPct = Math.round(b.level * 100);
-          battCharging = Boolean(b.charging);
+          if(Number.isFinite(b.level)&&b.level>=0&&b.level<=1)battPct = Math.round(b.level * 100);
+          if(typeof b.charging==='boolean')battCharging = b.charging;
         } catch {}
       }
+      if(bootstrapEpoch!==queueEpochRef.current)return;
       setHwState({
-        online: Boolean(nav.onLine),
+        online: typeof nav.onLine==='boolean'?nav.onLine:null,
         batteryPct: battPct,
         charging: battCharging,
-        netType: nav.connection?.effectiveType?.toUpperCase() || (nav.onLine ? 'WIFI_OR_ETHERNET' : 'OFFLINE'),
+        netType: nav.connection?.effectiveType?.toUpperCase() || 'UNKNOWN',
         downlinkMbps: typeof nav.connection?.downlink === 'number' ? nav.connection.downlink : null,
         netRttMs: typeof nav.connection?.rtt === 'number' ? nav.connection.rtt : null,
         cores: typeof nav.hardwareConcurrency === 'number' ? nav.hardwareConcurrency : null,
@@ -563,6 +524,9 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
 
     return () => {
       window.clearInterval(clockInterval);
+      queueEpochRef.current += 1;
+      inboxRef.current.clear();
+      loopbackAbortRef.current?.abort();
       if (bc) bc.close();
       micRequestEpochRef.current += 1;
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
@@ -574,64 +538,54 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
   }, []);
 
   const triggerRealSignedTransmission = async (statusType: 'SOS_EXPLICIT' | 'SAFE') => {
-    if (!keyInfo) return;
+    if (!keyInfo || busyRef.current) return;
+    busyRef.current=true;setBusy(true);
     const queueEpoch = queueEpochRef.current;
-    const nextIdx = msgCounter + 1;
-    setMsgCounter(nextIdx);
-    const id = `MSG-LIVE-${String(nextIdx).padStart(2, '0')}`;
-    const pkt = await signAndPackRealOepPacket({
-      privateKey: keyInfo.keyPair.privateKey,
-      publicKeySpkiHex: keyInfo.publicKeySpkiHex,
-      fingerprint: keyInfo.fingerprint,
-      messageId: id,
-      status: statusType,
-      zoneId: 'ZONE-VLC-01',
-      sectorIndex: 5,
-      batteryPct: hwState.batteryPct ?? 80,
-      timestampMs: Date.now()
-    });
-    if (queueEpoch !== queueEpochRef.current) return;
-
-    // 1. Persist to durable browser disk storage (localStorage)
-    const updatedQueue = [pkt, ...durableQueue].slice(0, 8);
-    setDurableQueue(updatedQueue);
+    loopbackAbortRef.current=new AbortController();
+    setOperationStatus('SIGNING_LAB_PACKET');
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedQueue));
-    } catch {}
-
-    // 2. Broadcast over real BroadcastChannel to any open peer tabs
-    if (typeof BroadcastChannel !== 'undefined') {
+      const pkt = await signAndPackRealOepPacket({
+        privateKey:keyInfo.keyPair.privateKey,publicKeySpkiHex:keyInfo.publicKeySpkiHex,
+        fingerprint:keyInfo.fingerprint,messageId:crypto.randomUUID(),status:statusType,
+        zoneId:'LAB-SYNTHETIC',sectorIndex:0,batteryPct:hwState.batteryPct,timestampMs:Date.now()
+      });
+      if (queueEpoch !== queueEpochRef.current) return;
+      const updatedQueue=[pkt,...queueRef.current.filter(p=>Date.now()<p.timestampMs+60000)].slice(0,8);
+      queueRef.current=updatedQueue;setDurableQueue(updatedQueue);
+      let storage='STORAGE_UNAVAILABLE';
       try {
-        const bc = new BroadcastChannel(CHANNEL_NAME);
-        bc.postMessage(pkt);
-        bc.close();
-      } catch {}
-    }
-
-    // 3. Transmit over real WebRTC RTCPeerConnection DataChannel & verify signature
-    const rtc = await sendWebRtcLoopbackPacket(pkt);
-    const ver = await verifyRealOepPacket(pkt);
-    if (queueEpoch !== queueEpochRef.current) return;
-    setLastPacket(assessPacketVerification(pkt, ver).packet);
-    setVerifyState({
-      valid: ver.valid,
-      trustStatus: assessPacketVerification(pkt, ver).status,
-      reason: ver.reason,
-      verifyTimeMs: ver.verifyTimeMs,
-      webrtcRttMs: rtc.delivered ? rtc.rttMs : null,
-      webrtcResult: rtc.reason,
-      transportUsed: `WEBRTC_LOCAL_LOOPBACK_${rtc.reason} + BROADCAST_CHANNEL + LOCALSTORAGE`
-    });
+        const serialized=JSON.stringify(updatedQueue);
+        window.localStorage.setItem(STORAGE_KEY,serialized);
+        if(window.localStorage.getItem(STORAGE_KEY)===serialized)storage='LOCAL_STORAGE_WRITTEN';
+      }catch{/* Explicit status below; no durability claim when storage fails. */}
+      let channel='BROADCAST_UNAVAILABLE';
+      if(typeof BroadcastChannel!=='undefined'){
+        try {const bc=new BroadcastChannel(CHANNEL_NAME);bc.postMessage(pkt);bc.close();channel='TAB_POSTED_UNCONFIRMED';}catch{}
+      }
+      const rtc=await sendWebRtcLoopbackPacket(pkt,{signal:loopbackAbortRef.current.signal});
+      const ver=await verifyRealOepPacket(pkt);
+      if (queueEpoch !== queueEpochRef.current) return;
+      setLastPacket(assessPacketVerification(pkt,ver).packet);
+      setVerifyState({valid:ver.valid,trustStatus:assessPacketVerification(pkt,ver).status,reason:ver.reason,
+        verifyTimeMs:ver.verifyTimeMs,webrtcRttMs:rtc.delivered?rtc.rttMs:null,webrtcResult:rtc.reason,
+        transportUsed:`WEBRTC_LOCAL_LOOPBACK_${rtc.reason} + ${channel} + ${storage}`});
+      setOperationStatus(`${storage} · ${channel} · LAB_ONLY`);
+    }catch{if(queueEpoch===queueEpochRef.current)setOperationStatus('SIGN_OR_TRANSPORT_FAILED');}
+    finally{busyRef.current=false;setBusy(false);}
   };
 
   const clearDiskQueue = () => {
     queueEpochRef.current += 1; // Cancel pending signature/loopback UI writes.
+    loopbackAbortRef.current?.abort();
+    inboxRef.current.clear();
+    queueRef.current=[];
     setDurableQueue([]);
     setLastPacket(null);
     setVerifyState(null);
     try {
       window.localStorage.removeItem(STORAGE_KEY);
-    } catch {}
+      setOperationStatus(window.localStorage.getItem(STORAGE_KEY)===null?'LOCAL_PURGE_CONFIRMED':'PURGE_FAILED');
+    } catch {setOperationStatus('PURGE_FAILED');}
   };
 
   const toggleLiveFftScanner = async () => {
@@ -644,6 +598,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
       if (audioCtxRef.current) void audioCtxRef.current.close().catch(() => {});
       audioCtxRef.current = null;
       setMicActive(false);
+      setFftProvenance(null);
       setFftBins(Array.from({ length: 32 }, () => 0));
       return;
     }
@@ -668,10 +623,15 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
       source.connect(analyser);
       const data = new Uint8Array(analyser.frequencyBinCount);
       setMicActive(true);
+      let lastUpdate=0;
       const loop = () => {
         if (requestEpoch !== micRequestEpochRef.current) return;
-        analyser.getByteFrequencyData(data);
-        setFftBins(Array.from(data.slice(0, 32)).map((v) => Math.max(4, Math.round((v / 255) * 100))));
+        if(performance.now()-lastUpdate>=100){
+          lastUpdate=performance.now();
+          analyser.getByteFrequencyData(data);
+          setFftBins(Array.from(data.slice(0, 32)).map((v) => Math.round((v / 255) * 100)));
+          setFftProvenance({sampleRateHz:ctx!.sampleRate,timestamp:new Date().toISOString()});
+        }
         rafRef.current = requestAnimationFrame(loop);
       };
       loop();
@@ -691,12 +651,16 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
 
   const liveOrbits = useMemo(() => computeLiveOrbitalEphemeris(utcNow), [utcNow]);
   const liveEnergyPolicy = useMemo(
-    () => energyPolicy(hwState.batteryPct ?? 75, true),
+    () => hwState.batteryPct === null ? null : energyPolicy(hwState.batteryPct, true),
     [hwState.batteryPct]
   );
 
-  const copyPromptToClipboard = (target: FundingTarget) => {
-    void navigator.clipboard?.writeText(target.chatgptPrompt);
+  const copyPromptToClipboard = async (target: FundingTarget) => {
+    const boundary=locale==='es'?'Redacta un borrador sujeto a verificación. OEP es un prototipo experimental: WebCrypto real, WebRTC solo loopback local, RF/CSI/satélites simulados o HARDWARE_REQUIRED; cero ensayos físicos verificados. No afirmes disponibilidad, elegibilidad, fechas, certificación, clientes ni financiación sin fuente actual. Verifica primero el portal oficial.':locale==='nl'?'Maak een te verifiëren concept. OEP is experimenteel: echte WebCrypto, WebRTC alleen lokale loopback, RF/CSI/satellieten gesimuleerd of HARDWARE_REQUIRED; nul geverifieerde fysieke proeven. Verifieer beschikbaarheid, voorwaarden, datums en financiering op het officiële portaal.':'Prepare a draft for verification. OEP is experimental: real WebCrypto, local WebRTC loopback only, RF/CSI/satellites simulated or HARDWARE_REQUIRED; zero verified physical trials. Verify availability, eligibility, dates, certification, customers and funding against current official sources.';
+    try {
+      if(!navigator.clipboard?.writeText)throw Error('CLIPBOARD_UNAVAILABLE');
+      await navigator.clipboard.writeText(`${boundary}\n${target.name}\n${target.portalUrl}`);
+    }catch{setOperationStatus('CLIPBOARD_UNAVAILABLE');return;}
     setCopiedId(target.id);
     window.setTimeout(() => setCopiedId((prev) => (prev === target.id ? null : prev)), 3500);
   };
@@ -752,6 +716,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
                 data-testid="btn-live-ecdsa-sos"
                 className="oep-ts-load-btn"
                 style={{ marginTop: 0 }}
+                disabled={busy || !keyInfo}
                 onClick={() => triggerRealSignedTransmission('SOS_EXPLICIT')}
               >
                 {c.signSosBtn}
@@ -760,17 +725,19 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
                 type="button"
                 data-testid="btn-live-ecdsa-safe"
                 className="oep-ts-ar-btn"
+                disabled={busy || !keyInfo}
                 onClick={() => triggerRealSignedTransmission('SAFE')}
               >
                 {c.signSafeBtn}
               </button>
-              {durableQueue.length > 0 && (
+              {(
                 <button type="button" className="oep-ts-ar-btn is-live" onClick={clearDiskQueue}>
                   {c.clearDiskBtn} ({durableQueue.length})
                 </button>
               )}
             </div>
 
+            <p role="status" aria-live="polite">{operationStatus}</p>
             {verifyState && (
               <div className="oep-ts-hex-box" data-testid="live-ecdsa-packet-box">
                 <div
@@ -809,7 +776,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
               </div>
               <div className="oep-ts-kpi">
                 <span>OEP Energy Profile</span>
-                <strong style={{ color: '#6ee7b7' }}>{liveEnergyPolicy.profile}</strong>
+                <strong style={{ color: '#6ee7b7' }}>{liveEnergyPolicy?.profile ?? 'UNKNOWN'}</strong>
               </div>
               <div className="oep-ts-kpi">
                 <span>Real Network Interface</span>
@@ -844,6 +811,8 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
             >
               {micActive ? c.micBtnStop : c.micBtnStart}
             </button>
+
+            <p role="status">{micActive?'LIVE_MEASUREMENT':'NO_SENSOR'} · WebAudio microphone analyser · relative byte amplitude % · confidence: UNCALIBRATED · {fftProvenance?`${fftProvenance.sampleRateHz} Hz sample rate / FFT 64 / ${fftProvenance.timestamp}`:'UNAVAILABLE'} · No RF, dBm or calibrated sound pressure.</p>
 
             <div
               style={{
@@ -882,21 +851,22 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
               UTC CLOCK: {new Date(utcNow).toISOString()}
             </span>
           </div>
+          <p role="note">DEMO_ONLY · SIMULATED · {locale==='es'?'Sin elementos orbitales observados ni época de procedencia; incertidumbre desconocida. No predice pases ni conectividad.':locale==='nl'?'Geen waargenomen baanelementen of brondatum; onzekerheid onbekend. Geen voorspelling van passages of verbindingen.':'No observed orbital elements or source epoch; uncertainty unknown. Does not predict passes or connectivity.'}</p>
           <div className="oep-ts-fn-grid">
             {liveOrbits.map((orb) => (
               <div className="oep-ts-fn-card" key={orb.id}>
                 <div className="oep-ts-fn-top">
                   <span>{orb.id}</span>
-                  <span className="oep-ts-fn-status">EL {orb.elevationDeg}° · AZ {orb.azimuthDeg}°</span>
+                  <span className="oep-ts-fn-status">EL {orb.elevationDeg.toFixed(1)}° · AZ {orb.azimuthDeg.toFixed(1)}°</span>
                 </div>
                 <strong style={{ fontSize: '0.92rem' }}>{orb.name}</strong>
                 <div style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#cbd5e1' }}>
                   <div>
-                    Slant Range: <strong>{orb.slantRangeKm} km</strong> · FSPL: <strong>{orb.fsplDb} dB</strong>
+                    DEMO Range: <strong>{orb.slantRangeKm.toFixed(1)} km</strong> · FSPL: <strong>{orb.fsplDb.toFixed(2)} dB</strong>
                   </div>
                   <div>
-                    Live Doppler: <strong>{orb.dopplerShiftHz >= 0 ? `+${orb.dopplerShiftHz}` : orb.dopplerShiftHz} Hz</strong> ·
-                    Sub-Point: {orb.subLatDeg}°, {orb.subLonDeg}°
+                    DEMO Doppler: <strong>{orb.dopplerShiftHz.toFixed(0)} Hz</strong> ·
+                    DEMO Sub-Point: {orb.subLatDeg.toFixed(3)}°, {orb.subLonDeg.toFixed(3)}°
                   </div>
                 </div>
               </div>
@@ -920,14 +890,14 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
               <article className="oep-ts-fn-card" key={item.id} data-testid={`funding-card-${item.id}`}>
                 <div>
                   <div className="oep-ts-fn-top">
-                    <span className="oep-ts-fn-status">{item.badge}</span>
+                    <span className="oep-ts-fn-status">UNVERIFIED · {item.badge}</span>
                   </div>
                   <h4>{item.name}</h4>
                   <p style={{ fontFamily: 'monospace', fontSize: '0.82rem', color: '#6ee7b7', margin: '0.25rem 0' }}>
-                    {item.amount}
+                    UNVERIFIED · {item.amount}
                   </p>
                   <p style={{ fontFamily: 'monospace', fontSize: '0.76rem', color: '#fde68a', margin: '0.2rem 0 0.5rem' }}>
-                    Deadline: {item.deadline}
+                    Deadline: UNVERIFIED · {item.deadline}
                   </p>
                   <p style={{ fontSize: '0.85rem', color: 'rgba(226, 236, 248, 0.85)', lineHeight: 1.45 }}>
                     {item.fitSummary}

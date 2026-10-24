@@ -1,0 +1,94 @@
+TAP version 13
+# Subtest: inbox validates UUID, TTL, status and bounded fields before cryptography
+ok 1 - inbox validates UUID, TTL, status and bounded fields before cryptography
+  ---
+  duration_ms: 8.3372
+  type: 'test'
+  ...
+# Subtest: clear during verification cannot restore content; expired late verification fails
+ok 2 - clear during verification cannot restore content; expired late verification fails
+  ---
+  duration_ms: 3.0761
+  type: 'test'
+  ...
+# Subtest: inbox reserves concurrent IDs and bounds metadata and verification work
+ok 3 - inbox reserves concurrent IDs and bounds metadata and verification work
+  ---
+  duration_ms: 1.6844
+  type: 'test'
+  ...
+# Subtest: inbox verifies real ECDSA and never converts self-signed data into trusted identity
+ok 4 - inbox verifies real ECDSA and never converts self-signed data into trusted identity
+  ---
+  duration_ms: 6.0672
+  type: 'test'
+  ...
+# Subtest: invalid ECDSA signature cannot enter the accepted packet view
+ok 5 - invalid ECDSA signature cannot enter the accepted packet view
+  ---
+  duration_ms: 1.8768
+  type: 'test'
+  ...
+# Subtest: CRC mismatch cannot enter the accepted packet view
+ok 6 - CRC mismatch cannot enter the accepted packet view
+  ---
+  duration_ms: 0.2537
+  type: 'test'
+  ...
+# Subtest: malformed or missing verification fails closed
+ok 7 - malformed or missing verification fails closed
+  ---
+  duration_ms: 0.2388
+  type: 'test'
+  ...
+# Subtest: valid self-signed packet is displayed as untrusted, not authorized
+ok 8 - valid self-signed packet is displayed as untrusted, not authorized
+  ---
+  duration_ms: 0.2634
+  type: 'test'
+  ...
+# Subtest: BroadcastChannel UI uses assessed packets and renders verification failures
+ok 9 - BroadcastChannel UI uses assessed packets and renders verification failures
+  ---
+  duration_ms: 1.1726
+  type: 'test'
+  ...
+# Subtest: STOP aborts a hung negotiation and prevents late offer work or sends
+ok 10 - STOP aborts a hung negotiation and prevents late offer work or sends
+  ---
+  duration_ms: 5.0046
+  type: 'test'
+  ...
+# Subtest: unsupported WebRTC never claims successful delivery or fabricates latency
+ok 11 - unsupported WebRTC never claims successful delivery or fabricates latency
+  ---
+  duration_ms: 0.2471
+  type: 'test'
+  ...
+# Subtest: failed negotiation never claims delivery
+ok 12 - failed negotiation never claims delivery
+  ---
+  duration_ms: 0.4706
+  type: 'test'
+  ...
+# Subtest: timeout never claims delivery
+ok 13 - timeout never claims delivery
+  ---
+  duration_ms: 5.7958
+  type: 'test'
+  ...
+# Subtest: only a matching packet received on a local data channel is marked loopback-delivered
+ok 14 - only a matching packet received on a local data channel is marked loopback-delivered
+  ---
+  duration_ms: 1.0809
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 145.8763
