@@ -140,8 +140,11 @@ function GlobeCanvas({progressRef,active,reduceMotion,satelliteLabel,fallback,fr
       resizeObserver=new ResizeObserver(measure);resizeObserver.observe(mount);measure();
       let visible=false;let t=0,last=0;
       const clock=new THREE.Clock();
+      let contextLost=false;
+      const onContextLost=(event:Event)=>{event.preventDefault();contextLost=true;cancelAnimationFrame(frame);setSupported(false);};
+      renderer.domElement.addEventListener('webglcontextlost',onContextLost);
       function paint(timestamp=0){
-        if(destroyed||!visible)return;
+        if(destroyed||contextLost||!visible)return;
         if(timestamp-last<28&&!reduceMotion){frame=requestAnimationFrame(paint);return;}
         last=timestamp;
         const progress=Math.max(0,Math.min(1,progressRef.current??0));
@@ -188,6 +191,7 @@ function GlobeCanvas({progressRef,active,reduceMotion,satelliteLabel,fallback,fr
       window.addEventListener('scroll',onWindowScroll,{passive:true});
       window.addEventListener('resize',onWindowResize,{passive:true});
       stop=()=>{
+        renderer.domElement.removeEventListener('webglcontextlost',onContextLost);
         window.removeEventListener('scroll',onWindowScroll);
         window.removeEventListener('resize',onWindowResize);
         cancelAnimationFrame(frame);
@@ -206,7 +210,7 @@ function GlobeCanvas({progressRef,active,reduceMotion,satelliteLabel,fallback,fr
     void setup().catch(()=>{if(!destroyed)setSupported(false)});
     return()=>{destroyed=true;stop();observer?.disconnect();resizeObserver?.disconnect();cancelAnimationFrame(frame)};
   },[progressRef,reduceMotion]);
-  return <div ref={containerRef} className="scroll-globe-canvas" aria-label="Illustrative orbital model, not live satellite data">
+  return <div ref={containerRef} className="scroll-globe-canvas" role="img" aria-label="Illustrative orbital model, not live satellite data">
     {!supported&&<div className="scroll-globe-fallback" role="img" aria-label="Fallback orbital Earth graphic"><span>◉</span><p>{fallback}</p></div>}
     <div className="scroll-globe-caption" aria-hidden="true">{satelliteLabel} <span>{frame} {String(active+1).padStart(2,'0')}/05</span></div>
   </div>;

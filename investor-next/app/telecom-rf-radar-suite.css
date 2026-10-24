@@ -121,7 +121,7 @@
 
 .oep-ts-vs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
   gap: 1.25rem;
 }
 
@@ -218,7 +218,7 @@
 /* Function Showcase */
 .oep-ts-fn-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
   gap: 1rem;
 }
 
@@ -275,7 +275,7 @@
 /* Satellite + Zone Telemetry Console */
 .oep-ts-infra-layout {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
   gap: 1.5rem;
 }
 
@@ -537,3 +537,13 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Reality review: long protocol identifiers and Dutch words must remain readable. */
+.oep-telecom-suite p,.oep-telecom-suite h2,.oep-telecom-suite h3,.oep-telecom-suite h4,
+.oep-telecom-suite small,.oep-telecom-suite button,.oep-telecom-suite code{overflow-wrap:anywhere;hyphens:auto}
+.oep-ts-fn-card,.oep-ts-block-head>div,.oep-ts-fn-card>div{min-width:0}
+.oep-rf-explorer .button-outline{min-height:44px;white-space:normal}
+.oep-telecom-suite button:focus-visible,.oep-telecom-suite input:focus-visible,.oep-telecom-suite select:focus-visible{outline:3px solid #91d7e8;outline-offset:3px}
+.oep-telecom-suite button:disabled{opacity:.55;cursor:default}
+@media(max-width:540px){.oep-ts-block-head{flex-wrap:wrap}.oep-ts-kpi-grid{grid-template-columns:minmax(0,1fr)}}
+.oep-ts-auth-banner>span{min-width:0;overflow-wrap:anywhere}

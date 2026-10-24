@@ -47,7 +47,9 @@ export default function EvidenceBoard({locale}:{locale:Locale}){
      <h3>{c.title}</h3><p className="oep-evidence-description">{c.text}</p>
     </article>)}</div>
    <div className="oep-evidence-foot"><p>{t.disclaimer}</p>
+    <p>{locale==='es'?'SOFTWARE_TESTED: WebCrypto, cola limitada y validación de paquetes. SIMULATED: topología, DEMO RF y órbitas. HARDWARE_REQUIRED: receptor RF/CSI. PHYSICALLY_TESTED: 0.':locale==='nl'?'SOFTWARE_TESTED: WebCrypto, begrensde wachtrij en pakketvalidatie. SIMULATED: topologie, RF-demo en banen. HARDWARE_REQUIRED: RF/CSI-ontvanger. PHYSICALLY_TESTED: 0.':'SOFTWARE_TESTED: WebCrypto, bounded routing and packet validation. SIMULATED: topology, RF demo and orbital shells. HARDWARE_REQUIRED: RF/CSI receiver. PHYSICALLY_TESTED: 0.'}</p>
     <div><a className="button-outline" href={evidence} target="_blank" rel="noopener noreferrer">GITHUB ACTIONS ↗</a>
+    <a className="text-cta" href="#rf-explorer">{locale==='es'?'ESTADO Y PROCEDENCIA DE SENSORES':locale==='nl'?'SENSORSTATUS EN HERKOMST':'SENSOR STATUS AND PROVENANCE'} ↑</a>
     <a className="text-cta" href={roadmap} target="_blank" rel="noopener noreferrer">{t.action} ↗</a></div>
    </div>
   </div>

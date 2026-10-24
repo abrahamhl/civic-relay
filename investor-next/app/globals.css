@@ -240,3 +240,21 @@
 .oep-evidence a:focus-visible{outline:2px solid #ffc39b;outline-offset:4px}
 @media(max-width:820px){.oep-evidence-grid{grid-template-columns:1fr}.oep-evidence-number{margin-top:18px}.oep-evidence-card{padding:22px}.oep-evidence-unit{margin-bottom:14px}}
 @media(prefers-reduced-motion:reduce){.oep-evidence *{scroll-behavior:auto}}
+
+/* Keep translated navigation and product headings within their actual columns. */
+.topbar-center{flex-wrap:wrap;min-width:0;justify-content:flex-end}
+.locale-links,.wordmark{flex-shrink:0}
+.product-title-block,.product-title-block>div{min-width:0}
+.product-title-block h2,.product-subhead,.product-explainer{overflow-wrap:anywhere;hyphens:auto}
+.topbar nav{min-width:0;flex-shrink:1}
+.topbar-center{flex:1 1 0}
+.chapter-copy{min-width:0;overflow-wrap:anywhere;hyphens:auto}
+@media(max-width:420px){.journey-chapter{gap:12px}.chapter-copy{width:100%;max-width:100%}}
+/* Header columns reserve space for the language selector; links wrap inside the nav. */
+.topbar{display:grid;grid-template-columns:minmax(180px,255px) minmax(0,1fr) auto;gap:20px}
+.topbar-center{display:none}
+.topbar nav{grid-column:2;flex-wrap:wrap;justify-content:flex-end;row-gap:12px}
+.topbar .locale-links{grid-column:3}
+.wordmark{min-width:0}.mark-symbol{flex-shrink:0}
+.scenario-active small{color:#dbe9ed}
+@media(max-width:760px){.topbar{grid-template-columns:minmax(0,1fr) auto;gap:12px}.topbar .locale-links{grid-column:2}}

@@ -171,7 +171,7 @@ export default function CoordinationLab({locale}:{locale:Locale}){
       <div><span>{w.baseline}</span><strong>{s.cellularOnlyAcks} / {s.modelledMessages}</strong></div>
       <div><span>{w.adaptive}</span><strong>{s.syntheticAcks} / {s.modelledMessages}</strong></div>
      </div>
-     <div className="mer-trace"><strong>{w.audit}</strong>
+     <div className="mer-trace" tabIndex={0} role="region" aria-label={locale==='es'?'Registro del modelo de enrutamiento':locale==='nl'?'Logboek van het routeringsmodel':'Routing model event log'}><strong>{w.audit}</strong>
       {result.audit.map(item=><p key={item.event}><b>{item.event}</b>: {item.detail}</p>)}
      </div>
      <p className="mer-warning">{w.disclaimer}</p>
