@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-24",
+  "repository": "https://github.com/abrahamhl/civic-relay",
+  "branch": "feat/master-emergency-routing-v1-20261020",
+  "verifiedRemoteSha": "619359356700c10c9da8d9d1895f007fe09876e0",
+  "baseRemoteChecks": {
+    "Emergency routing research lab": {"result":"success","url":"https://github.com/abrahamhl/civic-relay/actions/runs/40072293659"},
+    "Android Nearby laboratory (build-only)": {"result":"success","url":"https://github.com/abrahamhl/civic-relay/actions/runs/40072293497"}
+  },
+  "localCommitsRemoteCi": "NOT_RUN_NOT_PUSHED",
+  "githubMutations": [],
+  "deploymentsAttempted": 0,
+  "pushBlockedInThisClone": "remote.origin.pushurl=DISABLED_LOCAL_ONLY; push.default=nothing",
+  "limitation": "Explicit alternate push URLs or other clients can bypass clone-local defaults; this is not a network sandbox."
+}

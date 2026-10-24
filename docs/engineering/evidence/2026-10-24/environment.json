@@ -1,0 +1,15 @@
+{
+  "jdk": "Temurin 17.0.20.1+1 portable; no system Java settings changed",
+  "jdkPath": "C:/dev/_tools/jdk17-oep/jdk-17.0.20.1+1",
+  "verifiedZipSha256": "e53a79c3c3d86865bd7e787903884331068e71321714ffd44f145785affc7cb0",
+  "jdkSource": "https://api.adoptium.net/v3/assets/latest/17/hotspot?architecture=x64&image_type=jdk&os=windows&vendor=eclipse",
+  "androidAssembleDebug": "NOT_EXECUTED: Android SDK API35/build-tools35 and Gradle8.11.1 unavailable in this checkout",
+  "jvm": "5 pure-Java suites passed, 186 assertions; no Android radios or emulator",
+  "axe": "4.14.0 installed in C:/dev/_tools/oep-browser-audit; local browser software audit only",
+  "newGeneratedFilesRemoved": [
+    "investor-next/AGENTS.md",
+    "investor-next/CLAUDE.md"
+  ],
+  "removalReason": "Created by this run's next dev. Bundled matching docs were read; agentRules:false prevents regeneration. No pre-existing source file deleted.",
+  "repositoryStorage": "Local git objects repacked; clone-created alternates file removed; git fsck passed. Independent of original object store."
+}

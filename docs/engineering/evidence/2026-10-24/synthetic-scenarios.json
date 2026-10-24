@@ -1,0 +1,148 @@
+{
+  "schema": "OEP_RESEARCH_EVIDENCE_V1",
+  "project": "OEP — Offline Emergency Protocol",
+  "methodology": "Fixed virtual scenario matrix. No random sampling of a physical population.",
+  "evidence": {
+    "proofLevel": "SIMULATED",
+    "transport": "ABSTRACT_VIRTUAL_TOPOLOGY",
+    "physicalDeliveryMeasured": false,
+    "radiosActivated": false,
+    "satelliteLinkTested": false,
+    "officialCAPVerified": false,
+    "distressCallsSent": false,
+    "humanRescueVerified": false,
+    "batteryPerformanceMeasured": false
+  },
+  "runCount": 810,
+  "invocationsPerGroup": 135,
+  "caseGroups": 6,
+  "invariantsCheckedPerRun": 15,
+  "passedInvariantChecks": 12150,
+  "failedInvariantChecks": 0,
+  "dataSemantics": "Counts are sums of modelled synthetic events across independent runs, not unique people/devices nor real deliveries.",
+  "totals": {
+    "syntheticAcks": 2174,
+    "queued": 4660,
+    "explicitSOS": 1575,
+    "virtualDevices": 48600
+  },
+  "groups": [
+    {
+      "name": "noParticipants",
+      "presets": {
+        "participation": 0,
+        "permissions": 100,
+        "bluetooth": true,
+        "wifi": true,
+        "gateway": true,
+        "damaged": 100
+      },
+      "cases": 135,
+      "syntheticAcks": 0,
+      "queued": 0,
+      "explicitSOS": 0,
+      "virtualDevices": 8100,
+      "minAcks": 0,
+      "maxAcks": 0
+    },
+    {
+      "name": "isolation",
+      "presets": {
+        "participation": 100,
+        "permissions": 100,
+        "bluetooth": false,
+        "wifi": false,
+        "gateway": false,
+        "damaged": 100
+      },
+      "cases": 135,
+      "syntheticAcks": 0,
+      "queued": 1390,
+      "explicitSOS": 315,
+      "virtualDevices": 8100,
+      "minAcks": 0,
+      "maxAcks": 0
+    },
+    {
+      "name": "partialOutage",
+      "presets": {
+        "participation": 80,
+        "permissions": 65,
+        "bluetooth": true,
+        "wifi": true,
+        "gateway": true,
+        "damaged": 65
+      },
+      "cases": 135,
+      "syntheticAcks": 837,
+      "queued": 524,
+      "explicitSOS": 315,
+      "virtualDevices": 8100,
+      "minAcks": 0,
+      "maxAcks": 18
+    },
+    {
+      "name": "conservation",
+      "presets": {
+        "participation": 85,
+        "permissions": 85,
+        "bluetooth": true,
+        "wifi": true,
+        "gateway": true,
+        "damaged": 85,
+        "battery": 20
+      },
+      "cases": 135,
+      "syntheticAcks": 1081,
+      "queued": 280,
+      "explicitSOS": 315,
+      "virtualDevices": 8100,
+      "minAcks": 0,
+      "maxAcks": 18
+    },
+    {
+      "name": "criticalEnergy",
+      "presets": {
+        "participation": 85,
+        "permissions": 85,
+        "bluetooth": true,
+        "wifi": true,
+        "gateway": true,
+        "damaged": 85,
+        "battery": 5
+      },
+      "cases": 135,
+      "syntheticAcks": 256,
+      "queued": 1105,
+      "explicitSOS": 315,
+      "virtualDevices": 8100,
+      "minAcks": 0,
+      "maxAcks": 7
+    },
+    {
+      "name": "noGateway",
+      "presets": {
+        "participation": 80,
+        "permissions": 65,
+        "bluetooth": true,
+        "wifi": true,
+        "gateway": false,
+        "damaged": 100
+      },
+      "cases": 135,
+      "syntheticAcks": 0,
+      "queued": 1361,
+      "explicitSOS": 315,
+      "virtualDevices": 8100,
+      "minAcks": 0,
+      "maxAcks": 0
+    }
+  ],
+  "limitations": [
+    "The abstract range is normalised graph distance and not a measured Bluetooth or Wi-Fi range.",
+    "Synthetic ACKs confirm virtual receipt in the model, not successful RF transmission.",
+    "No measured physical power, latency, reliability, location or emergency response outcome.",
+    "Test sweep checks defined invariants only; it is not a safety certificate, formal verification or an independent audit.",
+    "Security review, two-phone field data and third-party validation remain separate gates."
+  ]
+}

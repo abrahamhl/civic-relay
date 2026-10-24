@@ -1,0 +1,243 @@
+{
+  "date": "2026-10-24",
+  "testedImplementationSha": "2e2e73eb2fffe490fde09792e74474adcff74ce1",
+  "classification": "SOFTWARE_AND_SYNTHETIC_EVIDENCE_ONLY",
+  "physicalTrials": 0,
+  "files": [
+    {
+      "path": "docs/engineering/evidence/2026-10-24/axe-after.json",
+      "sha256": "3c164b064008c16d47f08034a10bc8aede2869e31ebc2605ba61b17eb741a57f",
+      "bytes": 696
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/axe-before.json",
+      "sha256": "7745a0bdf445d6b4b020a118c1782a41658f705d99599b975b6e4e5c809613d2",
+      "bytes": 336
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/axe-expanded-before.json",
+      "sha256": "c75017acae14ece9850a0e92c0799d919f73b67988a5150c6bab6465985e1b51",
+      "bytes": 1179
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/axe-tool-install.txt",
+      "sha256": "84b3615a2b55669c4069410770606e7290261ae70a9db72789bff656c372ce48",
+      "bytes": 23
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/baseline-core.txt",
+      "sha256": "2ea57c40233bece71ca92073fc928e81a1b2f30c66e54de578b45afceef9b26d",
+      "bytes": 5515
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/baseline-node.txt",
+      "sha256": "c7ac5926b111f138dc5b49b6434e0857f69ff2aad9f8d1625b4fb6f647c4e2c2",
+      "bytes": 18913
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/baseline-typecheck.txt",
+      "sha256": "8c07d667e522dc5cadb029da654f47d435e4c253901a7a6973310b9a82085098",
+      "bytes": 56
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/browser-offline.json",
+      "sha256": "1f1a0b3c6662ae0daf3247179e7446c1816411f4d56777e050840c1eebbf7ffd",
+      "bytes": 299
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/browser-qa.json",
+      "sha256": "93a86924dfcf055f3424583ce73652d24a6769123bd21529816600efdbf2f6e8",
+      "bytes": 3437
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/browser-qa.txt",
+      "sha256": "191a08fc8a5c5f4130489e74aeda1adcfc651af921d8fc7c5084ab788f7dc194",
+      "bytes": 3705
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/dependencies.txt",
+      "sha256": "513ecbd2d9e5e0b74219ae54ae084ed87ad7f0fd43134c5084467f58ee139f06",
+      "bytes": 26
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/dependency-audit-before.json",
+      "sha256": "ba63a192f109c07b4e1381831e0738469608420f2c57427a47f41c5fc64621bc",
+      "bytes": 6213
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/dependency-audit.json",
+      "sha256": "ed641ab53851beff8dee6d198f790f88fbaa3986744f942f42097268de9d4306",
+      "bytes": 384
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/environment.json",
+      "sha256": "950f1e62033aeb9dc7f065950456ac25a3dc82a6077dc004a4b0c7a0651c670a",
+      "bytes": 1083
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/field-pilot.json",
+      "sha256": "e7629bf5462c0dcce4d57e37e9be19700d5fe4045b238a8ca1a8875c426da186",
+      "bytes": 309
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/git-fsck.txt",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/home-after-1440.png",
+      "sha256": "f158a02aa017a21d4516fea4d994e1c3b1bec0a281881cf7358003a633653261",
+      "bytes": 587697
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/integrated-node-first.txt",
+      "sha256": "b21a2172953c53c496f8e12698733a67825c03ab49cd74c2d677567cf11feafc",
+      "bytes": 785
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/integrated-node.txt",
+      "sha256": "84189216c40ff6bbc1ea90d1506365823877d1c2eb4253d4ffffbd3fe882846b",
+      "bytes": 23337
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/investor-build.txt",
+      "sha256": "4664ffe3c7f91665e505a057df623fdaa006ea29435c0daf95ff1e2778d5330b",
+      "bytes": 946
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/investor-typecheck.txt",
+      "sha256": "8c07d667e522dc5cadb029da654f47d435e4c253901a7a6973310b9a82085098",
+      "bytes": 56
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/jvm-replay.txt",
+      "sha256": "25eb5c088840f892e912826a6b6c985701a6e728464a6854273d5ff143fb2dcc",
+      "bytes": 266
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/jvm.txt",
+      "sha256": "25eb5c088840f892e912826a6b6c985701a6e728464a6854273d5ff143fb2dcc",
+      "bytes": 266
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/locales.txt",
+      "sha256": "7a361fd5f59b5f84b36f127d0da72f1c492ed74afa07ded9d5594cce42186c18",
+      "bytes": 324
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/loopback-after.txt",
+      "sha256": "5705c47ec92755040b3b582f3f113f1e9d0dee7ff288bee04708e96544908f6c",
+      "bytes": 1050
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/loopback-before.txt",
+      "sha256": "a81ddf7443b660835240ad5fd65df15f64cefc6e24d8dcf04d0bb34877fa3df0",
+      "bytes": 82
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/npm-ci.txt",
+      "sha256": "513ecbd2d9e5e0b74219ae54ae084ed87ad7f0fd43134c5084467f58ee139f06",
+      "bytes": 26
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/p1-after.txt",
+      "sha256": "2257e63ea2f946f6012b2509fe33775e57eb78c197f3774153148827d8129371",
+      "bytes": 6096
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/p1-before.txt",
+      "sha256": "b52e86045cc2ef812e0d57d8bf898d177c294171b910e6ffeb7fd74256a3031d",
+      "bytes": 3473
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/receiver-after.txt",
+      "sha256": "0d3366083a9e2b55ae6684fc2ed369498ec1d312c8228a56a3ee28f1521ac7e9",
+      "bytes": 2889
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/remote-state.json",
+      "sha256": "f2371cfc6e5a3500aad1a283a0d439902d1ca598ae5954422bb5e0651787fd0b",
+      "bytes": 842
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/rf-after-375.png",
+      "sha256": "e189b7f4610262fb713e232b39dab7aa621f5b50d82788636a26f5916dad1bcb",
+      "bytes": 80576
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/rf-before-375.png",
+      "sha256": "bbc00411158bf3465c3979191497fdbc1287aefbadd74520341031235ea70465",
+      "bytes": 84444
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/security-upgrade.txt",
+      "sha256": "d9755752a46b344002af419bfed279849374618b76136baffd0b6fe25dfd730a",
+      "bytes": 27
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/selector-parser-css-regression.json",
+      "sha256": "6089d59bc2d3056f06fab77bd46cd34c1f0bdd75432848de3a43c3bc69829e23",
+      "bytes": 193
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/sensor-tests.txt",
+      "sha256": "deae2eed22a44cf5e549c7602a89654efd5e833a45cbb0e5f159c83a2c35f79a",
+      "bytes": 1638
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/synthetic-scenarios.json",
+      "sha256": "6124d6132883fa568313f349d7eaa3cca400bbc9cbcd7a61a620c39e994621d4",
+      "bytes": 3877
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/synthetic-scenarios.txt",
+      "sha256": "c715cd3fca97ae4ca761488d97a8f68104f0a0a0e54b2e3ba2c7b9beded55f42",
+      "bytes": 166
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/truth-after.txt",
+      "sha256": "cbe66a3805f23c61c31c40875a15132e15f978583e4c915724624c301c3c81f5",
+      "bytes": 3902
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/truth-before.txt",
+      "sha256": "9db63b590104fbca94c178289e2ce503c7c34ee101d16058046ce21ee8c98aad",
+      "bytes": 3475
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/workspace-build.txt",
+      "sha256": "28584793c0c1ad8af05a9d01b2fbe3a625a95dc5f55f3a467d434a857905c7e3",
+      "bytes": 2957
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/workspace-dependency-audit-before.json",
+      "sha256": "d68f57cafe03ff330f4740d63e42a5e6d32440733f600b2722d03b77115fbd33",
+      "bytes": 28139
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/workspace-dependency-audit.json",
+      "sha256": "d819d941787e43032c33e0ea2e35b48a0a7d14c1757d20d98a48de91fb54916f",
+      "bytes": 328
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/workspace-install.txt",
+      "sha256": "d4b163f60be447e9ece59d98e5e8f1b31a0ee45aa0ed23ef4a2f09c381036641",
+      "bytes": 1928
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/workspace-security-upgrade.txt",
+      "sha256": "a9e3339b59d87f34b69f9418e604f7a79536bf92c695b5744c08fe217a3ad99a",
+      "bytes": 977
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/workspace-tests.txt",
+      "sha256": "e9586f0b3224648a4442049458df6b69e2d3ae8b7a59ab6f6a3062aa5df91a16",
+      "bytes": 8888
+    },
+    {
+      "path": "docs/engineering/evidence/2026-10-24/workspace-typecheck.txt",
+      "sha256": "e0618264348969bcc5d70f2a6ab244327de93a45a2ab505906dc9c88100286a7",
+      "bytes": 389
+    }
+  ]
+}

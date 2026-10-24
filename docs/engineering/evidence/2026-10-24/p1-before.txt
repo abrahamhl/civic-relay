@@ -8,7 +8,7 @@ not ok 1 - a hung adapter description cannot block dispatch indefinitely
   failureType: 'testCodeFailure'
   error: |-
     Expected "actual" to be strictly unequal to:
-    
+
     'HUNG'
   code: 'ERR_ASSERTION'
   name: 'AssertionError'
@@ -29,7 +29,7 @@ not ok 2 - a hung send times out without fabricating ACK and releases its lock f
   failureType: 'testCodeFailure'
   error: |-
     Expected "actual" to be strictly unequal to:
-    
+
     'HUNG'
   code: 'ERR_ASSERTION'
   name: 'AssertionError'
@@ -50,9 +50,9 @@ not ok 3 - purge cancels a hung send without letting the old operation unlock a 
   failureType: 'testCodeFailure'
   error: |-
     The expression evaluated to a falsy value:
-    
+
       assert.ok(signal)
-    
+
   code: 'ERR_ASSERTION'
   name: 'AssertionError'
   expected: true
@@ -71,7 +71,7 @@ not ok 4 - revocation during a hung description settles promptly and never invok
   failureType: 'testCodeFailure'
   error: |-
     Expected "actual" to be strictly unequal to:
-    
+
     'HUNG'
   code: 'ERR_ASSERTION'
   name: 'AssertionError'

@@ -1,0 +1,1 @@
+{"tool":"4.14.0","violations":[{"id":"aria-prohibited-attr","impact":"serious","description":"Ensure ARIA attributes are not prohibited for an element's role","nodes":[{"target":[".scroll-globe-canvas"],"summary":"Fix all of the following:\n  aria-label attribute cannot be used on \"div\" elements with no valid role attribute."}]}]}

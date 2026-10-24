@@ -9,10 +9,10 @@ not ok 1 - without RF hardware there are no inferred emitters, persons, CSI bins
   error: |-
     Expected values to be strictly equal:
     + actual - expected
-    
+
     + 'CSI_AND_RF_PROPAGATION_TOMOGRAPHY_IMPLEMENTED'
     - 'HARDWARE_REQUIRED'
-    
+
   code: 'ERR_ASSERTION'
   name: 'AssertionError'
   expected: 'HARDWARE_REQUIRED'
@@ -35,10 +35,10 @@ not ok 2 - RF demonstration is opt-in, labelled synthetic and never identifies p
   error: |-
     Expected values to be strictly equal:
     + actual - expected
-    
+
     + undefined
     - 'SIMULATED'
-    
+
   code: 'ERR_ASSERTION'
   name: 'AssertionError'
   expected: 'SIMULATED'
@@ -62,10 +62,10 @@ not ok 3 - orbital illustrations explicitly lack observational elements and do n
   error: |-
     Expected values to be strictly equal:
     + actual - expected
-    
+
     + undefined
     - 'SIMULATED'
-    
+
   code: 'ERR_ASSERTION'
   name: 'AssertionError'
   expected: 'SIMULATED'

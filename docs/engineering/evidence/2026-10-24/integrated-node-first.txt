@@ -1,0 +1,6 @@
+Initial integrated run after receiver refactor: 105 tests; 104 pass; 1 fails.
+Failing test: BroadcastChannel UI uses assessed packets and renders verification failures.
+Cause: inherited source-text assertion expected assessPacketVerification(incoming, ver) inline, while new inbox verifies and validates before exposing result.packet.
+Resolution: updated the integration assertion to require inbox.receive, reject missing packet/verification, and use only result.packet. Dynamic adversarial inbox tests independently verify signature, schema, replay, TTL and purge behavior.
+Full original tool output remains local in .agent-work/integrated-node-first-full.txt; compacted here to avoid duplicating the full console source in evidence.
+Final integrated result: see integrated-node.txt.

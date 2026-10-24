@@ -1,0 +1,7 @@
+
+> civic-relay-investor@0.1.0 check:locales
+> node test-locales.mjs
+
+PASS EN: static markup, investor proposition, honest claims, EU link and i18n routes
+PASS ES: static markup, investor proposition, honest claims, EU link and i18n routes
+PASS NL: static markup, investor proposition, honest claims, EU link and i18n routes

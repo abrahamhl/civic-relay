@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: sensor APIs require explicit consent and never invoke a fallback on unsupported browsers
+ok 1 - sensor APIs require explicit consent and never invoke a fallback on unsupported browsers
+  ---
+  duration_ms: 3.1284
+  type: 'test'
+  ...
+# Subtest: camera rejection cannot report DEVICE_CONNECTED or LIVE_MEASUREMENT
+ok 2 - camera rejection cannot report DEVICE_CONNECTED or LIVE_MEASUREMENT
+  ---
+  duration_ms: 0.4393
+  type: 'test'
+  ...
+# Subtest: STOP invalidates pending media grants and stops the late tracks
+ok 3 - STOP invalidates pending media grants and stops the late tracks
+  ---
+  duration_ms: 1.3593
+  type: 'test'
+  ...
+# Subtest: late geolocation success after STOP does not expose coordinates
+ok 4 - late geolocation success after STOP does not expose coordinates
+  ---
+  duration_ms: 0.5473
+  type: 'test'
+  ...
+# Subtest: connectivity metadata does not invent Wi-Fi, RTT, downlink or RSSI
+ok 5 - connectivity metadata does not invent Wi-Fi, RTT, downlink or RSSI
+  ---
+  duration_ms: 0.3981
+  type: 'test'
+  ...
+# Subtest: BLE chooser is service-filtered; permission and stream presence are distinct from measurements
+ok 6 - BLE chooser is service-filtered; permission and stream presence are distinct from measurements
+  ---
+  duration_ms: 1.0723
+  type: 'test'
+  ...
+# Subtest: RF fixtures have provenance and cannot assert live capture or calibrated power
+ok 7 - RF fixtures have provenance and cannot assert live capture or calibrated power
+  ---
+  duration_ms: 1.1859
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 126.4686
