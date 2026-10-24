@@ -12,7 +12,7 @@
 
 | Package | Declared Version | Scope | License | Purpose |
 |---|---|---|---|---|
-| `next` | `16.3.6` | dependencies | MIT | Static export (`/`, `/es`, `/nl`) |
+| `next` | `16.4.3` | dependencies | MIT | Static export (`/`, `/es`, `/nl`) |
 | `react` | `19.2.0` | dependencies | MIT | UI rendering |
 | `react-dom` | `19.2.0` | dependencies | MIT | DOM rendering / static HTML |
 | `three` | `0.180.0` | dependencies | MIT | Scroll globe and 3D building scene |
@@ -57,3 +57,10 @@ Note: third-party actions in civic-relay workflows are pinned by tag (`@v4`), no
 
 - `.gitignore` excludes `.env*`, `.vercel`, `node_modules/`, `dist/`, `out/`, `.next/`, `docs/internal/`.
 - No automated secret scanner (gitleaks/trufflehog) is wired into civic-relay CI yet; adding one is a recommended follow-up.
+
+
+## Local security remediation — 24 October 2026
+
+Installed-package advisory audits were re-run; these identify vulnerable dependency versions, not proof of exploitation. Investor Next.js upgraded to 16.4.3 with a lockfile (production npm audit now reports zero advisories). The static export has image optimization disabled and does not enable Cache Components; the advisory upgrade is still applied. References: https://github.com/advisories/GHSA-2464-fhr4-w9xw and https://github.com/advisories/GHSA-673q-mjm6-r5xr ; release https://github.com/vercel/next.js/releases/tag/v16.4.3 .
+
+Workspace production audit originally reported 1 critical, 3 high, 3 moderate findings. Patched proxy-addr2.0.8, body-parser1.20.9, qs6.16.0 and source-map-js1.2.2 through exact PNPM overrides; upgraded schemas to Zod4.6.6 with the explicit record key/value signature. PostCSS selector-parser7.1.6 is also pinned; the complete Vite build produces byte-identical CSS before/after that parser upgrade. Final production audits report zero advisories for investor and workspace dependencies; no global security clearance follows from this package-audit result. Relevant primary notices: https://github.com/advisories/GHSA-jqcg-44mw-7w3h , https://github.com/advisories/GHSA-27r3-jxmh-p828 and https://github.com/advisories/GHSA-mrhx-c7xc-m3w5 .
