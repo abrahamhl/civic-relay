@@ -1,5 +1,7 @@
 'use client';
 import {useMemo,useState} from 'react';
+import BuildingMissionLab from './building-mission-lab';
+import {buildingMissionCopy} from './building-mission-copy';
 import EmergencyBuilding from './emergency-building';
 import HumanSafetyPanel from './human-safety-panel';
 import TransportSandbox from './transport-sandbox';
@@ -87,7 +89,7 @@ const words={
 } as const;
 const steps=Array.from({length:12},(_,i)=>i);
 
-export default function CoordinationLab({locale}:{locale:Locale}){
+function AdvancedCoordinationLab({locale}:{locale:Locale}){
  const w=words[locale];
  const [stage,setStage]=useState(0);
  const [params,setParams]=useState<ScenarioParameters>({
@@ -118,9 +120,9 @@ export default function CoordinationLab({locale}:{locale:Locale}){
   ['responses',w.responses,0,Number(params.devices),1],
   ['helpRequests',w.help,0,Number(params.devices),1]
  ];
- return <section className="mer-lab" id="routing-lab" aria-labelledby="mer-title">
-  <div className="container mer-inner">
-   <div className="mer-intro"><p className="eyebrow">{w.eyebrow}</p><h2 id="mer-title">{w.title}</h2><p>{w.summary}</p></div>
+ return <div className="mer-advanced-lab">
+  <div className="mer-inner">
+   <div className="mer-intro"><p className="eyebrow">{w.eyebrow}</p><h3>{w.title}</h3><p>{w.summary}</p></div>
    <div className="mer-topology">
     <div className="mer-visual-wrap">
      <EmergencyBuilding model={result} stage={stage}/>
@@ -178,5 +180,16 @@ export default function CoordinationLab({locale}:{locale:Locale}){
     </div>
    </div>
   </div>
- </section>;
+ </div>;
+}
+
+export default function CoordinationLab({locale}:{locale:Locale}){
+ const [advanced,setAdvanced]=useState(false);const t=buildingMissionCopy[locale];
+ return <section className="mer-lab" id="routing-lab" aria-labelledby="mer-title"><div className="container mer-inner">
+  <BuildingMissionLab locale={locale}/>
+  <details className="bml-research" onToggle={event=>setAdvanced(event.currentTarget.open)}>
+   <summary><strong>{t.research}</strong><span>{t.researchHint}</span></summary>
+   {advanced&&<AdvancedCoordinationLab locale={locale}/>}
+  </details>
+ </div></section>;
 }

@@ -25,6 +25,20 @@ export function runScenario(p={}) {
   const safe=clamp(p.responses,0,participants.length-sos,8);
   for(let i=0;i<safe;i++)participants[i].humanStatus='SAFE';
   for(let i=safe;i<safe+sos;i++)participants[i].humanStatus='SOS_EXPLICIT';
+  // Optional explicit responses from the interactive fictional-terminal exercise.
+  // Unknown/silence never creates a message, and nonparticipants cannot be enrolled here.
+  if(p.responsesByNode!==undefined){
+    if(!p.responsesByNode||typeof p.responsesByNode!=='object'||Array.isArray(p.responsesByNode))
+      throw Error('Invalid fictional response overrides');
+    for(const [id,status] of Object.entries(p.responsesByNode)){
+      if(!['SAFE','SOS_EXPLICIT','UNKNOWN'].includes(status))throw Error('Invalid explicit human status');
+      const device=participants.find(d=>d.id===id);
+      if(!device)throw Error('Fictional response requires a participating device');
+      device.humanStatus=status;
+    }
+  }
+  const actualSafe=participants.filter(d=>d.humanStatus==='SAFE').length;
+  const actualSos=participants.filter(d=>d.humanStatus==='SOS_EXPLICIT').length;
   const usable=devices.filter(d=>d.participating&&d.permission&&(bluetooth||wifi));
   const byId=new Map(devices.map(d=>[d.id,d]));
   const range=wifi?.275:.175; // normalized virtual topology, NEVER metres or physical capability
@@ -63,7 +77,7 @@ export function runScenario(p={}) {
   });
   const ack=routes.filter(r=>r.delivery==='ACK_SYNTHETIC').length;
   const summary={totalDevices:n,participating:participants.length,permissioned:usable.length,
-    humanSafe:safe,humanSOS:sos,humanUnknown:participants.length-safe-sos,noContact:n-participants.length,
+    humanSafe:actualSafe,humanSOS:actualSos,humanUnknown:participants.length-actualSafe-actualSos,noContact:n-participants.length,
     modelledMessages:messages.length,syntheticAcks:ack,queued:messages.length-ack,
     cellularOnlyAcks:messages.filter(d=>d.online).length,
     simulatedLocalGatewayAcks:routes.filter(r=>r.transport==='SIMULATED_LOCAL_GATEWAY').length,
@@ -81,7 +95,7 @@ export function runScenario(p={}) {
       {event:'EXERCISE_CREATED',detail:'No official alert or emergency dispatch'},
       {event:'CAPABILITY_POLICY',detail:`${usable.length} consented virtual devices can relay`},
       {event:'SIMULATED_DELIVERY',detail:`${ack} synthetic gateway ACK, ${messages.length-ack} queued`},
-      {event:'HUMAN_SAFETY',detail:`${sos} explicit SOS, ${summary.humanUnknown} UNKNOWN; silence never implies injury`}
+      {event:'HUMAN_SAFETY',detail:`${actualSos} explicit SOS, ${summary.humanUnknown} UNKNOWN; silence never implies injury`}
     ]
   };
 }

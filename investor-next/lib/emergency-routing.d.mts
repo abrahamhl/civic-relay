@@ -1,6 +1,7 @@
 export interface ScenarioParameters {
  devices?:number; participation?:number; permissions?:number; battery?:number; damaged?:number;
  responses?:number; helpRequests?:number; seed?:number; bluetooth?:boolean; wifi?:boolean; gateway?:boolean;
+ responsesByNode?:Record<string,HumanStatus>;
 }
 export type HumanStatus='SAFE'|'SOS_EXPLICIT'|'UNKNOWN';
 export interface VirtualDevice {

@@ -1,0 +1,68 @@
+{
+  "kind": "LOCAL_BUILDING_INTERACTION_BROWSER_QA",
+  "checks": [
+    {
+      "name": "Keyboard changes terminal without using the 3D canvas",
+      "passed": true
+    },
+    {
+      "name": "Keyboard activates floor focus",
+      "passed": true
+    },
+    {
+      "name": "Raycasting a visible phone selects its corresponding terminal",
+      "passed": true
+    },
+    {
+      "name": "Normal-motion packet visibly moves along the computed path",
+      "passed": true
+    },
+    {
+      "name": "No horizontal page overflow at 200% CSS zoom",
+      "passed": true
+    },
+    {
+      "name": "WebGL unavailable at startup also shows the 2D interface",
+      "passed": true
+    },
+    {
+      "name": "Startup without WebGL completes the same queue-to-receipt journey",
+      "passed": true
+    },
+    {
+      "name": "Advanced independent experiments retain all twelve steps",
+      "passed": true
+    },
+    {
+      "name": "Closing advanced experiments unmounts them without changing the main mission",
+      "passed": true
+    }
+  ],
+  "contrastReview": [
+    {
+      "target": [
+        "button[aria-label=\"Alejar\"]"
+      ],
+      "reason": [
+        "Element content contains only non-text characters"
+      ]
+    },
+    {
+      "target": [
+        "button[aria-label=\"Centrar vista\"]"
+      ],
+      "reason": [
+        "Element content contains only non-text characters"
+      ]
+    },
+    {
+      "target": [
+        ".bml-tour > span[aria-hidden=\"true\"]"
+      ],
+      "reason": [
+        "Element content contains only non-text characters"
+      ]
+    }
+  ],
+  "failed": []
+}

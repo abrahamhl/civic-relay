@@ -25,3 +25,9 @@ Remote base: 619359356700c10c9da8d9d1895f007fe09876e0. Isolated local checkout o
 ## Operational decision
 
 NO-GO for real emergencies. Issues #4/#5 remain open. No physical trials, external assurance, satellite access, live CAP trust or rescue outcomes. SOFTWARE_TESTED/SIMULATED cannot satisfy HARDWARE_TESTED, PHYSICALLY_TESTED or EXTERNALLY_VALIDATED gates.
+
+## Follow-up requested by the user — interactive building
+
+The building screenshot is now a connected, bounded mission at `/es/#routing-lab`: explicit fictional response, real local queue/controller, computed model path and synthetic receipt. The original twelve-step research UI remains in a collapsed independent advanced panel. No radio, physical measurement or operational readiness promotion.
+
+Validation: 112 web tests, static build/types/locales, 51 browser checks, ES/EN/NL layouts at 320/375/768/1440, six scoped axe runs and startup/context-loss 2D fallback. See [the focused UX audit and receipts](BUILDING_MISSION_UX.md). Historical baseline counts above describe the earlier checkpoint; this addendum records the subsequent building implementation. Manual assistive-technology and new-user comprehension testing remain pending.

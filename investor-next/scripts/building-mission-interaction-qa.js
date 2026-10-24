@@ -1,0 +1,43 @@
+async(page)=>{
+ const dir='docs/engineering/evidence/2026-10-24-building';const report={kind:'LOCAL_BUILDING_INTERACTION_BROWSER_QA',checks:[],contrastReview:[]};
+ const check=(value,name)=>report.checks.push({name,passed:Boolean(value)});
+ await page.emulateMedia({reducedMotion:'no-preference'});await page.setViewportSize({width:1440,height:1000});
+ await page.goto('http://127.0.0.1:8766/es/?interaction='+Date.now()+'#routing-lab');
+ const scene=page.getByTestId('mission-scene'),picker=page.getByTestId('mission-source');await scene.locator('canvas').waitFor();
+ await picker.focus();await picker.press('ArrowDown');await picker.press('Enter');
+ check(await picker.inputValue()!=='NODE-001','Keyboard changes terminal without using the 3D canvas');
+ const floor=page.locator('.bml-floors').getByRole('button',{name:'Planta 3',exact:true});await floor.focus();await floor.press('Enter');
+ check(await floor.getAttribute('aria-pressed')==='true','Keyboard activates floor focus');
+ await page.locator('.bml-floors').getByRole('button',{name:'Todas',exact:true}).click();
+ await picker.selectOption('NODE-003');await scene.scrollIntoViewIfNeeded();
+ const label=await scene.locator('.bml-node-label').boundingBox();
+ await picker.selectOption('NODE-001');await page.mouse.click(label.x-12,label.y+28);
+ check(await picker.inputValue()==='NODE-003','Raycasting a visible phone selects its corresponding terminal');
+ await page.getByTestId('mission-tour').click();await page.waitForFunction(()=>document.querySelector('[data-testid=mission-status]').dataset.state==='IN_TRANSIT');
+ await scene.scrollIntoViewIfNeeded();const before=await scene.locator('canvas').screenshot();await page.waitForTimeout(180);const after=await scene.locator('canvas').screenshot();
+ check(!before.equals(after),'Normal-motion packet visibly moves along the computed path');
+ await page.getByTestId('mission-stop').click();
+ await page.locator('[data-testid=building-mission]').screenshot({path:dir+'/desktop-overview.png'});
+ await page.setViewportSize({width:375,height:900});await page.locator('#routing-lab').evaluate(e=>e.scrollIntoView({block:'start'}));await page.screenshot({path:dir+'/mobile-overview.png'});
+ await page.evaluate(()=>{document.body.style.zoom='2';});
+ await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));
+ check(await page.evaluate(()=>document.documentElement.scrollWidth===innerWidth),'No horizontal page overflow at 200% CSS zoom');
+ await page.evaluate(()=>{document.body.style.zoom='';});
+ // Record elements axe cannot resolve over translucent panels; manual comparison uses their foreground/background palette.
+ await page.addScriptTag({path:'C:/dev/_tools/oep-browser-audit/node_modules/axe-core/axe.min.js'});
+ report.contrastReview=await page.evaluate(async()=>{const r=await axe.run(document.querySelector('#routing-lab'),{runOnly:['color-contrast']});return r.incomplete.flatMap(v=>v.nodes.map(n=>({target:n.target,reason:n.any.map(c=>c.message),foreground:n.any[0]?.data?.fgColor,background:n.any[0]?.data?.bgColor})));});
+ const context=await page.context().browser().newContext({viewport:{width:375,height:900},reducedMotion:'reduce'});
+ await context.addInitScript(()=>{const get=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...args){if(type==='webgl'||type==='webgl2'||type==='experimental-webgl')return null;return get.call(this,type,...args);};});
+ const unsupported=await context.newPage();await unsupported.goto('http://127.0.0.1:8766/es/');
+ await unsupported.waitForFunction(()=>document.querySelector('[data-testid=mission-scene]')?.dataset.fallback==='true');
+ check(await unsupported.locator('.bml-flat-view').isVisible(),'WebGL unavailable at startup also shows the 2D interface');
+ await unsupported.getByTestId('mission-tour').click();await unsupported.waitForFunction(()=>document.querySelector('[data-testid=mission-status]')?.dataset.state==='RECEIVED');
+ check(await unsupported.getByTestId('mission-status').getAttribute('data-state')==='RECEIVED','Startup without WebGL completes the same queue-to-receipt journey');
+ await context.close();
+ const research=page.locator('.bml-research');await research.locator('summary').first().click();
+ await page.locator('.mer-step-picker button').nth(11).click();
+ check(await page.locator('.mer-step-picker button').count()===12&&(await page.locator('.mer-step-picker .mer-current').innerText())==='12','Advanced independent experiments retain all twelve steps');
+ await research.locator('summary').first().click();await page.locator('.mer-advanced-lab').waitFor({state:'detached'});
+ check(await page.getByTestId('mission-status').getAttribute('data-state')==='IDLE','Closing advanced experiments unmounts them without changing the main mission');
+ report.failed=report.checks.filter(c=>!c.passed);return report;
+}
