@@ -1,0 +1,39 @@
+! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-9.12.3.tgz
+
+> civic-relay@0.1.0 build C:\Users\2fabr\civic-relay-vision
+> pnpm -r build
+
+Scope: 5 of 6 workspace projects
+packages/schemas build$ tsc -b --force
+packages/schemas build: Done
+packages/transports build$ tsc -b --force
+packages/transports build: Done
+packages/core build$ tsc -b --force
+packages/core build: Done
+apps/web build$ tsc && vite build
+packages/api build$ tsc -b --force
+packages/api build: Done
+apps/web build: vite v5.4.21 building for production...
+apps/web build: transforming...
+apps/web build: ✓ 2499 modules transformed.
+apps/web build: rendering chunks...
+apps/web build: computing gzip size...
+apps/web build: dist/registerSW.js                        0.14 kB
+apps/web build: dist/manifest.webmanifest                 0.23 kB
+apps/web build: dist/index.html                           1.10 kB │ gzip:   0.56 kB
+apps/web build: dist/assets/index-DwFaXOTF.css           31.42 kB │ gzip:   6.54 kB
+apps/web build: dist/assets/react-vendor-QsssMSdl.js      0.03 kB │ gzip:   0.05 kB
+apps/web build: dist/assets/map-vendor-BgmBdlPk.js      293.13 kB │ gzip:  88.93 kB
+apps/web build: dist/assets/index-DnMhMCX7.js         1,600.12 kB │ gzip: 474.88 kB
+apps/web build: (!) Some chunks are larger than 500 kB after minification. Consider:
+apps/web build: - Using dynamic import() to code-split the application
+apps/web build: - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+apps/web build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+apps/web build: ✓ built in 20.30s
+apps/web build: PWA v1.3.0
+apps/web build: mode      generateSW
+apps/web build: precache  7 entries (1880.93 KiB)
+apps/web build: files generated
+apps/web build:   dist/sw.js
+apps/web build:   dist/workbox-9c191d2f.js
+apps/web build: Done

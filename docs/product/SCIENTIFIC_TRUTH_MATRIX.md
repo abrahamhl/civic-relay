@@ -1,5 +1,7 @@
 # Scientific Truth Matrix & Capability Classification
 
+> Historical snapshot (2026-10-22). Its M01–M19 identifiers are local to this document and differ from the canonical M01–M20 in [CR-VM-2026-10-25](CIVIC_RELAY_VISION_MAESTRA_2026-10-25.md). Use [the integration register](MASTER_VISION_INTEGRATION.md) for the current product programme. Old file references and capability labels require current verification; this matrix is not proof of deployment.
+
 **Date:** 2026-10-22  
 **Canonical Public Domain:** `https://civic-relay-investor.vercel.app`  
 **Worktree Branch:** `feat/mission-control-sector-intel-20261022`  

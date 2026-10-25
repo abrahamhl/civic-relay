@@ -1,0 +1,50 @@
+{
+  "id": "P13",
+  "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+  "sha": "LOCAL",
+  "timestamp_utc": "2026-10-24T23:54:44.153Z",
+  "locale": "es",
+  "viewport": {
+    "width": 320,
+    "height": 720
+  },
+  "role": "Master vision, custody and complete catalogue ES mobile",
+  "roleTask": {
+    "role": "Master vision, custody and complete catalogue ES mobile",
+    "actions": [
+      {
+        "action": "Five custody states, 20 modules, audience/scenario filtering, cross-cutting evidence, keyboard and download",
+        "result": true
+      }
+    ],
+    "verified": true
+  },
+  "steps": [
+    "Open static release in Chromium",
+    "Verify DOM language and localized heading",
+    "Inspect canonical and simulation disclaimer",
+    "Check architecture and stale external links",
+    "Inspect pageerror events"
+  ],
+  "expected": {
+    "http": 200,
+    "htmlLang": "es",
+    "canonicalHost": "civic-relay-investor.vercel.app",
+    "noPageErrors": true
+  },
+  "observed": {
+    "http": 200,
+    "lang": "es",
+    "title": "¿QUÉ ES OEP? | Coordinación de emergencias offline y enrutamiento adaptativo",
+    "headings": [
+      "CUANDO LAREDSE APAGA."
+    ],
+    "canonical": "https://civic-relay-investor.vercel.app/es/",
+    "disclaimers": 31,
+    "eightStage": true,
+    "obsoleteLinks": [],
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "verdict": "PASS"
+}

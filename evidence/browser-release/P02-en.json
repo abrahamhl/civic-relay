@@ -1,0 +1,50 @@
+{
+  "id": "P02",
+  "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+  "sha": "LOCAL",
+  "timestamp_utc": "2026-10-24T23:54:13.857Z",
+  "locale": "en",
+  "viewport": {
+    "width": 1024,
+    "height": 768
+  },
+  "role": "First responder / scenario switching",
+  "roleTask": {
+    "role": "First responder / scenario switching",
+    "actions": [
+      {
+        "action": "Switch fourth simulation scenario",
+        "result": "true"
+      }
+    ],
+    "verified": true
+  },
+  "steps": [
+    "Open static release in Chromium",
+    "Verify DOM language and localized heading",
+    "Inspect canonical and simulation disclaimer",
+    "Check architecture and stale external links",
+    "Inspect pageerror events"
+  ],
+  "expected": {
+    "http": 200,
+    "htmlLang": "en",
+    "canonicalHost": "civic-relay-investor.vercel.app",
+    "noPageErrors": true
+  },
+  "observed": {
+    "http": 200,
+    "lang": "en",
+    "title": "OEP — Offline Emergency Protocol | Distributed Emergency Coordination & Adaptive Multi-Network Routing",
+    "headings": [
+      "WHEN THENETWORKGOES DARK."
+    ],
+    "canonical": "https://civic-relay-investor.vercel.app/",
+    "disclaimers": 63,
+    "eightStage": true,
+    "obsoleteLinks": [],
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "verdict": "PASS"
+}

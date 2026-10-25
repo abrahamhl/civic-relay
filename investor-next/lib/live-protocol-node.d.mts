@@ -26,6 +26,7 @@ export interface SignedOepRealPacket {
 
 export interface VerifiedOepPacketResult {
   valid: boolean;
+  identityAuthenticated?: false;
   crc16Verified?: boolean;
   ecdsaVerified?: boolean;
   reason: string;

@@ -1,0 +1,53 @@
+{
+  "id": "P10",
+  "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+  "sha": "LOCAL",
+  "timestamp_utc": "2026-10-24T23:54:34.642Z",
+  "locale": "es",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "role": "Sector Intelligence El Tiemblo CCTV, Anti-SSRF and Unified Pipeline",
+  "roleTask": {
+    "role": "Sector Intelligence El Tiemblo CCTV, Anti-SSRF and Unified Pipeline",
+    "actions": [
+      {
+        "action": "El Tiemblo cameras, Anti-SSRF block/allow, and Unified Pipeline step 6",
+        "result": {
+          "ssrfBlocked": "BLOCK: NON_HTTPS_PROTOCOL_BLOCKED",
+          "ssrfAllowed": "ALLOW: ALLOWLISTED_PUBLIC_HTTPS_SOURCE"
+        }
+      }
+    ],
+    "verified": true
+  },
+  "steps": [
+    "Open static release in Chromium",
+    "Verify DOM language and localized heading",
+    "Inspect canonical and simulation disclaimer",
+    "Check architecture and stale external links",
+    "Inspect pageerror events"
+  ],
+  "expected": {
+    "http": 200,
+    "htmlLang": "es",
+    "canonicalHost": "civic-relay-investor.vercel.app",
+    "noPageErrors": true
+  },
+  "observed": {
+    "http": 200,
+    "lang": "es",
+    "title": "¿QUÉ ES OEP? | Coordinación de emergencias offline y enrutamiento adaptativo",
+    "headings": [
+      "CUANDO LAREDSE APAGA."
+    ],
+    "canonical": "https://civic-relay-investor.vercel.app/es/",
+    "disclaimers": 31,
+    "eightStage": true,
+    "obsoleteLinks": [],
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "verdict": "PASS"
+}

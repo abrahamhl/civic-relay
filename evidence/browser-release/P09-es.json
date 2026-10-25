@@ -1,0 +1,56 @@
+{
+  "id": "P09",
+  "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+  "sha": "LOCAL",
+  "timestamp_utc": "2026-10-24T23:54:31.691Z",
+  "locale": "es",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "role": "3D Globe object selection, scenario sync and Mars educational mode",
+  "roleTask": {
+    "role": "3D Globe object selection, scenario sync and Mars educational mode",
+    "actions": [
+      {
+        "action": "30s thesis, scenario counter transition, camera selection, Mars disclaimer, HyperFrames Act 3 & Apple Living Nav",
+        "result": {
+          "outageCounters": "ACK sintéticos: 0 · En cola (QUEUED): 15",
+          "intermittentCounters": "ACK sintéticos: 13 · En cola (QUEUED): 2",
+          "marsBanner": "Marte (Exploración 3D educativa): MODO EDUCATIVO ESPACIAL: Visualización planetaria 3D de geometría y retícula. Civic Re",
+          "hfBanner": "ACT 03 · 10.0s–15.0s\n·\nCola Store-and-Forward",
+          "livingNavVisible": true
+        }
+      }
+    ],
+    "verified": true
+  },
+  "steps": [
+    "Open static release in Chromium",
+    "Verify DOM language and localized heading",
+    "Inspect canonical and simulation disclaimer",
+    "Check architecture and stale external links",
+    "Inspect pageerror events"
+  ],
+  "expected": {
+    "http": 200,
+    "htmlLang": "es",
+    "canonicalHost": "civic-relay-investor.vercel.app",
+    "noPageErrors": true
+  },
+  "observed": {
+    "http": 200,
+    "lang": "es",
+    "title": "¿QUÉ ES OEP? | Coordinación de emergencias offline y enrutamiento adaptativo",
+    "headings": [
+      "CUANDO LAREDSE APAGA."
+    ],
+    "canonical": "https://civic-relay-investor.vercel.app/es/",
+    "disclaimers": 29,
+    "eightStage": true,
+    "obsoleteLinks": [],
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "verdict": "PASS"
+}

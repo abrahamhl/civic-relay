@@ -1,0 +1,72 @@
+{
+  "id": "P12",
+  "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+  "sha": "LOCAL",
+  "timestamp_utc": "2026-10-24T23:54:39.719Z",
+  "locale": "en",
+  "viewport": {
+    "width": 1536,
+    "height": 864
+  },
+  "role": "Wide desktop navigation density and no overlap",
+  "roleTask": {
+    "role": "Wide desktop navigation density and no overlap",
+    "actions": [
+      {
+        "action": "1536px navigation columns, primary links and Escape close",
+        "result": {
+          "brandBox": {
+            "x": 102.109375,
+            "y": 19.359375,
+            "width": 188,
+            "height": 36.265625
+          },
+          "navBox": {
+            "x": 316.21875,
+            "y": 15.5,
+            "width": 893.5625,
+            "height": 44
+          },
+          "actionsBox": {
+            "x": 1235.890625,
+            "y": 14.5,
+            "width": 198,
+            "height": 46
+          },
+          "primaryCount": 4,
+          "opened": true,
+          "closed": true
+        }
+      }
+    ],
+    "verified": true
+  },
+  "steps": [
+    "Open static release in Chromium",
+    "Verify DOM language and localized heading",
+    "Inspect canonical and simulation disclaimer",
+    "Check architecture and stale external links",
+    "Inspect pageerror events"
+  ],
+  "expected": {
+    "http": 200,
+    "htmlLang": "en",
+    "canonicalHost": "civic-relay-investor.vercel.app",
+    "noPageErrors": true
+  },
+  "observed": {
+    "http": 200,
+    "lang": "en",
+    "title": "OEP — Offline Emergency Protocol | Distributed Emergency Coordination & Adaptive Multi-Network Routing",
+    "headings": [
+      "WHEN THENETWORKGOES DARK."
+    ],
+    "canonical": "https://civic-relay-investor.vercel.app/",
+    "disclaimers": 63,
+    "eightStage": true,
+    "obsoleteLinks": [],
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "verdict": "PASS"
+}

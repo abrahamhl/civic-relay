@@ -13,7 +13,7 @@ const linksByLocale: Record<Locale, Array<{ href: string; label: string }>> = {
     { href: "#telecom-rf-radar-suite", label: "Network research" },
     { href: "#live-hardware-and-funding", label: "Test my device" },
     { href: "#how-it-works", label: "How it works" },
-    { href: "#solution", label: "The solution" },
+    { href: "#master-vision", label: "Full programme" },
     { href: "#investment", label: "Funding" },
     { href: "#evidence", label: "Evidence & limits" }
   ],
@@ -23,7 +23,7 @@ const linksByLocale: Record<Locale, Array<{ href: string; label: string }>> = {
     { href: "#telecom-rf-radar-suite", label: "Investigación de redes" },
     { href: "#live-hardware-and-funding", label: "Probar mi dispositivo" },
     { href: "#how-it-works", label: "Cómo funciona" },
-    { href: "#solution", label: "La solución" },
+    { href: "#master-vision", label: "Programa completo" },
     { href: "#investment", label: "Financiación" },
     { href: "#evidence", label: "Evidencias y límites" }
   ],
@@ -33,7 +33,7 @@ const linksByLocale: Record<Locale, Array<{ href: string; label: string }>> = {
     { href: "#telecom-rf-radar-suite", label: "Netwerkonderzoek" },
     { href: "#live-hardware-and-funding", label: "Mijn toestel testen" },
     { href: "#how-it-works", label: "Hoe het werkt" },
-    { href: "#solution", label: "De oplossing" },
+    { href: "#master-vision", label: "Volledig programma" },
     { href: "#investment", label: "Financiering" },
     { href: "#evidence", label: "Bewijs en grenzen" }
   ]

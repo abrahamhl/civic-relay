@@ -40,12 +40,51 @@ const cases=[
   {id:'P09',role:'3D Globe object selection, scenario sync and Mars educational mode',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:1440,height:900}},
   {id:'P10',role:'Sector Intelligence El Tiemblo CCTV, Anti-SSRF and Unified Pipeline',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:1440,height:900}},
   {id:'P11',role:'Narrow mobile responsive menu and touch targets',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:320,height:720}},
-  {id:'P12',role:'Wide desktop navigation density and no overlap',locale:'en',url:'/',text:'WHEN THE',viewport:{width:1536,height:864}}
+  {id:'P12',role:'Wide desktop navigation density and no overlap',locale:'en',url:'/',text:'WHEN THE',viewport:{width:1536,height:864}},
+  {id:'P13',role:'Master vision, custody and complete catalogue ES mobile',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:320,height:720}},
+  {id:'P14',role:'Master vision, custody and complete catalogue EN desktop',locale:'en',url:'/',text:'WHEN THE',viewport:{width:1440,height:900}},
+  {id:'P15',role:'Master vision, custody and complete catalogue NL mobile',locale:'nl',url:'/nl/',text:'ALS HET',viewport:{width:390,height:844}}
 ];
 async function runRoleTask(page,trial,evidenceDir){
  const observations={role:trial.role,actions:[],verified:false};
  const note=(action,value)=>observations.actions.push({action,result:value});
  switch(trial.id){
+  case 'P13': case 'P14': case 'P15': {
+   await page.emulateMedia({reducedMotion:'reduce'});
+   const section=page.getByTestId('master-vision');
+   await section.scrollIntoViewIfNeeded();
+   const state=page.getByTestId('vision-delivery');
+   assert.ok((await state.innerText()).includes('NO_ROUTE'));
+   for(const [stage,status] of [['GATEWAY_ACK','PENDING'],['DESTINATION_ACK','DESTINATION_ACK'],['READ','READ'],['EXPIRED','EXPIRED'],['NO_ROUTE','NO_ROUTE']]){
+    await page.getByTestId('vision-stage-'+stage).click();
+    assert.ok((await state.innerText()).startsWith(status));
+   }
+   await page.getByTestId('vision-audience').selectOption('ALL');
+   await section.locator('.cr-catalog summary').click();
+   assert.equal(await page.locator('[data-testid^="vision-module-M"]').count(),20);
+   await page.getByTestId('vision-audience').selectOption('regulated');
+   await page.getByTestId('vision-scenario').selectOption('S06');
+   assert.deepEqual(await page.locator('[data-testid^="vision-module-M"]').evaluateAll(els=>els.map(el=>el.getAttribute('data-testid'))),['vision-module-M15','vision-module-M16','vision-module-M19']);
+   await page.getByTestId('vision-scenario').selectOption('S04');
+   assert.equal(await page.locator('[data-testid^="vision-module-M"]').count(),1);
+   assert.equal(await page.getByTestId('vision-module-M19').count(),1,'scientific evidence applies to every scenario');
+   assert.ok((await page.getByTestId('vision-module-list').innerText()).length>20);
+   await page.getByTestId('vision-audience').selectOption('family');
+   await page.getByTestId('vision-scenario').selectOption('ALL');
+   const overflow=await section.evaluate(el=>el.scrollWidth>el.clientWidth+1);
+   assert.equal(overflow,false);
+   const file=await page.request.get(new URL('/vision-master.md',page.url()).href);
+   assert.equal(file.status(),200);assert.ok((await file.text()).includes('CR-VM-2026-10-25'));
+   await page.getByTestId('vision-stage-NO_ROUTE').focus();
+   await page.keyboard.press('Tab');
+   assert.equal(await page.getByTestId('vision-stage-GATEWAY_ACK').evaluate(el=>el===document.activeElement),true);
+   await page.keyboard.press('Enter');assert.ok((await state.innerText()).startsWith('PENDING'));
+   await section.locator('.cr-catalog summary').click();
+   await section.screenshot({path:join(evidenceDir,trial.id+'-master-vision.png')});
+   note('Five custody states, 20 modules, audience/scenario filtering, cross-cutting evidence, keyboard and download',true);
+   observations.verified=true;
+   break;
+  }
   case 'P01': {
    const group=page.locator('.mer-human');
    const safe=group.locator('button').first();
@@ -254,7 +293,7 @@ try{
   console.log(record.verdict,trial.id,trial.locale,JSON.stringify({lang:obs.lang,errors:pageErrors.length,canonical:obs.canonical}));
   await page.close();
  }
- const result={sha:process.env.GITHUB_SHA||'LOCAL',completed_at_utc:new Date().toISOString(),scope:'TWELVE automated Chromium task roles (P01-P12) on synthetic local website including 3D Globe, Mars educational mode, El Tiemblo Sector Intelligence CCTV, Anti-SSRF, and Unified Pipeline.',runs:log};
+ const result={sha:process.env.GITHUB_SHA||'LOCAL',completed_at_utc:new Date().toISOString(),scope:'FIFTEEN automated Chromium task roles (P01-P15) on synthetic local website including master vision, typed custody, 20-module catalogue, keyboard, mobile and trilingual checks.',runs:log};
  writeFileSync(join(evidenceDir,'summary.json'),JSON.stringify(result,null,2));
  assert.ok(log.every(x=>x.verdict==='PASS'),'Browser release regression failed; inspect evidence/browser-release');
 }finally{

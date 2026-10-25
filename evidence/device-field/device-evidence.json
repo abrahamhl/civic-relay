@@ -1,0 +1,31 @@
+{
+  "schema": "oep-device-local-evidence/v1",
+  "evidenceClass": "BROWSER_API_OBSERVATION_NOT_PHYSICAL_RELAY_PROOF",
+  "observedAtUtc": "2026-10-24T23:50:23.101Z",
+  "exportedAtUtc": "2026-10-24T23:50:23.266Z",
+  "snapshot": {
+    "observedAtUtc": "2026-10-24T23:50:23.101Z",
+    "secureContext": true,
+    "browserReportedOnline": true,
+    "cpuLogicalCores": 16,
+    "memoryGbHint": 32,
+    "networkEffectiveTypeHint": "4g",
+    "networkDownlinkHintMbps": 9.9,
+    "networkRttHintMs": 0,
+    "batteryPercent": 100,
+    "batteryCharging": true,
+    "webCryptoApi": true,
+    "indexedDbApi": true,
+    "webRtcApi": true,
+    "webBluetoothApi": true,
+    "serviceWorkerApi": true,
+    "storageUsageBytes": 0,
+    "storageQuotaBytes": 6442450944
+  },
+  "cameraMeasurement": null,
+  "rawVideoIncluded": false,
+  "remoteTransferPerformedByAudit": false,
+  "physicalPeerAckVerified": false,
+  "satelliteRfCsiMeasured": false,
+  "emergencyServiceIntegrationVerified": false
+}

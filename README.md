@@ -1,6 +1,8 @@
 # OEP / Civic Relay — Offline Emergency Protocol
 
-**Investigación en coordinación descentralizada para emergencias con conectividad degradada.** OEP estudia cómo dispositivos participantes y redes compatibles podrían coordinar avisos sintéticos, almacenar/reintentar mensajes y seleccionar rutas alternativas con consentimiento.
+**Plataforma europea modular de anticipación de riesgos, continuidad de comunicaciones y coordinación de personas, equipos e infraestructuras.** Civic Relay persigue esta visión mediante OEP, adaptadores autorizados y una cadena de evidencia que distingue observación, predicción, custodia y confirmación. El software actual es un laboratorio de investigación; el programa completo requiere validación física y socios.
+
+**Visión canónica:** [maestro CR-VM-2026-10-25](docs/product/CIVIC_RELAY_VISION_MAESTRA_2026-10-25.md) · [integración, arquitectura, pruebas y límites](docs/product/MASTER_VISION_INTEGRATION.md). El maestro conserva los 20 módulos y ocho escenarios; no acredita capacidades operativas. Prevalece sobre formulaciones anteriores del alcance.
 
 🌐 **[Abrir la web avanzada de OEP — demostración interactiva ES / EN / NL](https://civic-relay-investor.vercel.app)**  
 🧪 **[Código oficial integrado en master](https://github.com/abrahamhl/civic-relay/tree/master/investor-next)**  

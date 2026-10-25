@@ -1,0 +1,862 @@
+{
+  "schema": "civic-relay-master-integration/v1",
+  "recordedAt": "2026-10-25T00:14:18.089Z",
+  "baseSha": "bf888764bb1b3e36dc8bca5ebc1c0ec4183ee34c",
+  "sourceState": "LOCAL_UNCOMMITTED_CHANGES",
+  "remoteCiForChanges": "NOT_RUN",
+  "physicalValidation": "NOT_PERFORMED",
+  "browser": {
+    "count": 15,
+    "pass": 15,
+    "completedAt": "2026-10-24T23:54:54.871Z"
+  },
+  "unitTests": {
+    "lab": 98,
+    "core": 26
+  },
+  "device": {
+    "outcome": "PASS",
+    "measurementCount": 16
+  },
+  "remoteBaseline": {
+    "checks": [
+      {
+        "conclusion": "success",
+        "head_sha": "bf888764bb1b3e36dc8bca5ebc1c0ec4183ee34c",
+        "html_url": "https://github.com/abrahamhl/civic-relay/actions/runs/39757309358/job/119752786068",
+        "name": "deploy",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "head_sha": "bf888764bb1b3e36dc8bca5ebc1c0ec4183ee34c",
+        "html_url": "https://github.com/abrahamhl/civic-relay/actions/runs/39757309411/job/119752475063",
+        "name": "build (20.x)",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "head_sha": "bf888764bb1b3e36dc8bca5ebc1c0ec4183ee34c",
+        "html_url": "https://github.com/abrahamhl/civic-relay/actions/runs/39757309409/job/119752472164",
+        "name": "trilingual-browser-smoke",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "head_sha": "bf888764bb1b3e36dc8bca5ebc1c0ec4183ee34c",
+        "html_url": "https://github.com/abrahamhl/civic-relay/actions/runs/39757309355/job/119752471965",
+        "name": "investor-next",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "head_sha": "bf888764bb1b3e36dc8bca5ebc1c0ec4183ee34c",
+        "html_url": "https://github.com/abrahamhl/civic-relay/actions/runs/39757309358/job/119752471963",
+        "name": "build",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "head_sha": "bf888764bb1b3e36dc8bca5ebc1c0ec4183ee34c",
+        "html_url": "https://github.com/abrahamhl/civic-relay/actions/runs/39757309353/job/119752471863",
+        "name": "simulator",
+        "status": "completed"
+      }
+    ],
+    "total_count": 6
+  },
+  "files": [
+    {
+      "path": "ASSET_MAP.md",
+      "sha256": "ce4188458f23f979d46bffee218f37b1be8696f902b922168cdc01a7a5b85502"
+    },
+    {
+      "path": "README.md",
+      "sha256": "b45a0755ae48e44614e37d990138b9d193ead278e27ececfb2feb28d4f6b4c36"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "8beeee521e9b4a06952bceed2266c71ec5f3ee91ae75be7bc8dfb157e2c2642d"
+    },
+    {
+      "path": "docs/audits/MASTER_VISION_DELIVERY_2026-10-25.md",
+      "sha256": "fda18fdd4bf8d0a30fa905328467dc3411b8cc636983563ae84c60954d10d550"
+    },
+    {
+      "path": "docs/product/CIVIC_RELAY_VISION_MAESTRA_2026-10-25.md",
+      "sha256": "5ad9daf7d10e229077e207951772761d73f3624b3f7a8c94288d13816c0f553c"
+    },
+    {
+      "path": "docs/product/MASTER_VISION_INTEGRATION.md",
+      "sha256": "b823073f795941133c5c3fd7b9af7cd13557210730cc6ab3af28d068b10fc0d2"
+    },
+    {
+      "path": "docs/product/SCIENTIFIC_TRUTH_MATRIX.md",
+      "sha256": "d902372eeca68fdd8fd6ed71bed4daa462687b2d7058a6e65262635874436f2a"
+    },
+    {
+      "path": "investor-next/app/investor-page.tsx",
+      "sha256": "41a4c8ebc6f6c94c4a07d44bb685c8a8ba59809dc8879ca26c557ca0c29501f2"
+    },
+    {
+      "path": "investor-next/app/master-vision.css",
+      "sha256": "69987ffbf341f30d2854d4fe11ea26d48c21877e186305699dc6eab7fc3fa7d4"
+    },
+    {
+      "path": "investor-next/app/master-vision.tsx",
+      "sha256": "8f3196ba7de57e05a28c33c1a384afeffe75713e56fc1f90f564dffb5931a02b"
+    },
+    {
+      "path": "investor-next/app/responsive-header.tsx",
+      "sha256": "588b1debc8094caff9b2ae57546c142d754d0b0b1f1b4065e2775ab72938bf4b"
+    },
+    {
+      "path": "investor-next/lib/live-protocol-node.d.mts",
+      "sha256": "7a6493c5f6df96bd584696fc2dd65eeb0e311c82e866275676c2b145a6ea1548"
+    },
+    {
+      "path": "investor-next/lib/live-protocol-node.mjs",
+      "sha256": "469f640244d96c81dc8a47c18cd5a56e96ce7f8e2baf20a695a6034f1c41067b"
+    },
+    {
+      "path": "investor-next/lib/master-vision.d.mts",
+      "sha256": "6a438085ea36dd66a35b514f12cfcea9e52b2ef911f5cc176d8308698d169018"
+    },
+    {
+      "path": "investor-next/lib/master-vision.mjs",
+      "sha256": "382533ebd0b89d77756ea85a33ea2c04b208ec45472061064c5521222c5949b4"
+    },
+    {
+      "path": "investor-next/lib/vision-contracts.mjs",
+      "sha256": "287d0ddcbef052592587d3827e9292f733571db319a4d0a24a27f692a6e39534"
+    },
+    {
+      "path": "investor-next/public/vision-master.md",
+      "sha256": "5ad9daf7d10e229077e207951772761d73f3624b3f7a8c94288d13816c0f553c"
+    },
+    {
+      "path": "investor-next/scripts/browser-release-smoke.mjs",
+      "sha256": "54ce80a950145aed550fed662a3ed1ac3cd8eb02b0fdfe09857b9cede75bc00f"
+    },
+    {
+      "path": "investor-next/scripts/write-release-proof.mjs",
+      "sha256": "9fc38a2df3ceb3d518f0e89186b8603a7b3bbdc6e421ca758ad9f6cbe38df1da"
+    },
+    {
+      "path": "investor-next/tests/master-vision.test.mjs",
+      "sha256": "a8d934caab91a2d833641bb4b1b10c0ed86de3e60f7a4a01a5408d9dfba55ad7"
+    },
+    {
+      "path": "investor-next/tsconfig.json",
+      "sha256": "6906dec17e1a4c66bb249ca408bb1ba4f4b42d5953e93533912e9e1110e1ea01"
+    },
+    {
+      "path": "scripts/record-vision-evidence.mjs",
+      "sha256": "b7ad541e5889b66ccf4a5900f4e6e123de22f56692dbf1818ec0e7c9d2683b1f"
+    }
+  ],
+  "logs": [
+    {
+      "path": "evidence/vision-integration/vision-tests.txt",
+      "sha256": "c765d06713b3e0115a166ae236a9de14b56c4b40d46ac5f1149f66fabf4ac769"
+    },
+    {
+      "path": "evidence/vision-integration/vision-build.txt",
+      "sha256": "fbcbd03cd719e88220bd6ef9623c872cdc1b0f5cf5547144cf2b2e1b147bf76a"
+    },
+    {
+      "path": "evidence/vision-integration/vision-browser.txt",
+      "sha256": "c9fcc1330d6ffdcf37c5a3098f205d17412f7310494fbe472e7a24f4c89eb986"
+    },
+    {
+      "path": "evidence/vision-integration/workspace-build.txt",
+      "sha256": "391f456cc48abe60847694f55e75acdad48822bc39dc18afb5c77c82f5b49cb1"
+    },
+    {
+      "path": "evidence/vision-integration/workspace-types.txt",
+      "sha256": "04f54910317f3f8acad7ddf3d096edaf77da65893ce29fba9d13379f071e897f"
+    },
+    {
+      "path": "evidence/vision-integration/workspace-tests.txt",
+      "sha256": "751da75aa034682d880aa029b0ce0b7be85a23d4368145b15cd0cb2d00b41b92"
+    }
+  ],
+  "modules": [
+    {
+      "id": "M01",
+      "title": {
+        "es": "Protocolo y confirmaciones",
+        "en": "Protocol and receipts",
+        "nl": "Protocol en ontvangstbewijzen"
+      },
+      "state": [
+        "E",
+        "S"
+      ],
+      "gate": "G1",
+      "scenarios": [
+        "S01",
+        "S07",
+        "S08"
+      ],
+      "surfaces": [
+        "family",
+        "community",
+        "institution",
+        "science"
+      ],
+      "core": "Protocol Core",
+      "acceptance": {
+        "es": "Esquema común, vectores cruzados y resistencia a manipulación.",
+        "en": "Common schema, cross-language vectors and tamper resistance.",
+        "nl": "Gemeenschappelijk schema, taaloverschrijdende testvectoren en manipulatiebestendigheid."
+      },
+      "existing": [
+        "investor-next/lib/live-protocol-node.mjs",
+        "packages/core/src/crypto.ts"
+      ],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M02",
+      "title": {
+        "es": "Proximidad con consentimiento",
+        "en": "Consented proximity",
+        "nl": "Nabijheid met toestemming"
+      },
+      "state": [
+        "L"
+      ],
+      "gate": "G2",
+      "scenarios": [
+        "S01",
+        "S08"
+      ],
+      "surfaces": [
+        "family",
+        "community",
+        "science"
+      ],
+      "core": "Transport Orchestrator",
+      "acceptance": {
+        "es": "Dos Android; al menos 30 intentos con fracasos registrados.",
+        "en": "Two Android phones; at least 30 attempts including failures.",
+        "nl": "Twee Android-telefoons; minstens 30 pogingen inclusief mislukkingen."
+      },
+      "existing": [
+        "experimental/android-nearby"
+      ],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M03",
+      "title": {
+        "es": "Custodia y reenvío multisalto",
+        "en": "Custody and multihop forwarding",
+        "nl": "Bewaring en doorsturen via meerdere hops"
+      },
+      "state": [
+        "S",
+        "R"
+      ],
+      "gate": "G3",
+      "scenarios": [
+        "S01",
+        "S08"
+      ],
+      "surfaces": [
+        "family",
+        "community",
+        "science"
+      ],
+      "core": "Durable Custody",
+      "acceptance": {
+        "es": "Tres nodos físicos, reinicio, cortes y reconciliación.",
+        "en": "Three physical nodes, restart, disruption and reconciliation.",
+        "nl": "Drie fysieke knooppunten, herstart, uitval en reconciliatie."
+      },
+      "existing": [
+        "investor-next/lib/store-forward.mjs"
+      ],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M04",
+      "title": {
+        "es": "Oportunidades orbitales",
+        "en": "Orbital opportunities",
+        "nl": "Orbitale kansen"
+      },
+      "state": [
+        "S",
+        "R"
+      ],
+      "gate": "G4",
+      "scenarios": [
+        "S01",
+        "S02"
+      ],
+      "surfaces": [
+        "science",
+        "institution"
+      ],
+      "core": "Satellite Opportunity Planner",
+      "acceptance": {
+        "es": "SGP4, TLE/OMM trazables, caducidad y comparación independiente.",
+        "en": "SGP4, traceable TLE/OMM, expiry and independent comparison.",
+        "nl": "SGP4, herleidbare TLE/OMM, vervaldatum en onafhankelijke vergelijking."
+      },
+      "existing": [
+        "investor-next/lib/live-protocol-node.mjs"
+      ],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M05",
+      "title": {
+        "es": "Enlace satelital autorizado",
+        "en": "Authorized satellite link",
+        "nl": "Geautoriseerde satellietverbinding"
+      },
+      "state": [
+        "R",
+        "X"
+      ],
+      "gate": "G5",
+      "scenarios": [
+        "S01",
+        "S08"
+      ],
+      "surfaces": [
+        "family",
+        "institution",
+        "science"
+      ],
+      "core": "Transport Orchestrator",
+      "acceptance": {
+        "es": "Operador, terminal compatible y recibo por enlace físico.",
+        "en": "Operator, compatible terminal and receipt over a physical link.",
+        "nl": "Operator, geschikte terminal en ontvangstbewijs via een fysieke verbinding."
+      },
+      "existing": [],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M06",
+      "title": {
+        "es": "Avisos CAP y autoridad",
+        "en": "CAP alerts and authority",
+        "nl": "CAP-waarschuwingen en bevoegdheid"
+      },
+      "state": [
+        "E",
+        "R",
+        "X"
+      ],
+      "gate": "G6",
+      "scenarios": [
+        "S02",
+        "S03",
+        "S07"
+      ],
+      "surfaces": [
+        "institution"
+      ],
+      "core": "Institutional Trust & Interop",
+      "acceptance": {
+        "es": "Raíces de confianza, revocación y convenio institucional.",
+        "en": "Trust anchors, revocation and institutional agreement.",
+        "nl": "Vertrouwensankers, intrekking en institutionele overeenkomst."
+      },
+      "existing": [],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M07",
+      "title": {
+        "es": "Riesgo y planificación",
+        "en": "Risk and planning",
+        "nl": "Risico en planning"
+      },
+      "state": [
+        "S",
+        "R",
+        "X"
+      ],
+      "gate": "G4",
+      "scenarios": [
+        "S02",
+        "S03",
+        "S04"
+      ],
+      "surfaces": [
+        "family",
+        "institution",
+        "industry"
+      ],
+      "core": "Situation & Forecast",
+      "acceptance": {
+        "es": "Separar previsión y orden; validar falsos positivos.",
+        "en": "Separate forecasts from orders; validate false positives.",
+        "nl": "Voorspellingen van bevelen scheiden; foutpositieven valideren."
+      },
+      "existing": [],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M08",
+      "title": {
+        "es": "Estado humano voluntario",
+        "en": "Voluntary human status",
+        "nl": "Vrijwillige menselijke status"
+      },
+      "state": [
+        "E",
+        "S"
+      ],
+      "gate": "G2",
+      "scenarios": [
+        "S01",
+        "S05",
+        "S07"
+      ],
+      "surfaces": [
+        "family",
+        "community"
+      ],
+      "core": "Human Interfaces",
+      "acceptance": {
+        "es": "Consentimiento e identidad; falta de respuesta significa UNKNOWN.",
+        "en": "Consent and identity; no response means UNKNOWN.",
+        "nl": "Toestemming en identiteit; geen antwoord betekent UNKNOWN."
+      },
+      "existing": [
+        "investor-next/lib/emergency-routing.mjs"
+      ],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M09",
+      "title": {
+        "es": "Observación ambiental",
+        "en": "Environmental observation",
+        "nl": "Omgevingswaarneming"
+      },
+      "state": [
+        "R",
+        "X"
+      ],
+      "gate": "G4",
+      "scenarios": [
+        "S02",
+        "S03"
+      ],
+      "surfaces": [
+        "industry",
+        "institution",
+        "science"
+      ],
+      "core": "Situation & Forecast",
+      "acceptance": {
+        "es": "Fuentes autorizadas, calidad, frescura y errores medidos.",
+        "en": "Authorized sources, quality, freshness and measured errors.",
+        "nl": "Geautoriseerde bronnen, kwaliteit, actualiteit en gemeten fouten."
+      },
+      "existing": [],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M10",
+      "title": {
+        "es": "Observación sísmica",
+        "en": "Seismic observation",
+        "nl": "Seismische waarneming"
+      },
+      "state": [
+        "R",
+        "X"
+      ],
+      "gate": "G4",
+      "scenarios": [
+        "S04"
+      ],
+      "surfaces": [
+        "industry",
+        "science"
+      ],
+      "core": "Situation & Forecast",
+      "acceptance": {
+        "es": "Sensores opt-in; estudio de detección posterior al inicio.",
+        "en": "Opt-in sensors; study detection after earthquake onset.",
+        "nl": "Opt-insensoren; detectie na het begin van een aardbeving onderzoeken."
+      },
+      "existing": [],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M11",
+      "title": {
+        "es": "GIS, edificios y cámaras",
+        "en": "GIS, buildings and cameras",
+        "nl": "GIS, gebouwen en camera’s"
+      },
+      "state": [
+        "E",
+        "S",
+        "X"
+      ],
+      "gate": "G6",
+      "scenarios": [
+        "S02",
+        "S03",
+        "S05"
+      ],
+      "surfaces": [
+        "community",
+        "institution",
+        "industry"
+      ],
+      "core": "GIS/Digital Twin",
+      "acceptance": {
+        "es": "Datos permitidos; ocupación sólo si está confirmada.",
+        "en": "Permitted data; occupancy only when confirmed.",
+        "nl": "Toegestane gegevens; bezetting alleen indien bevestigd."
+      },
+      "existing": [
+        "investor-next/lib/sector-camera-engine.mjs"
+      ],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M12",
+      "title": {
+        "es": "Decisión de ruta y recursos",
+        "en": "Routing and resource decisions",
+        "nl": "Route- en middelenkeuze"
+      },
+      "state": [
+        "E",
+        "S"
+      ],
+      "gate": "G3",
+      "scenarios": [
+        "S01",
+        "S06",
+        "S08"
+      ],
+      "surfaces": [
+        "family",
+        "community",
+        "science"
+      ],
+      "core": "Transport Orchestrator",
+      "acceptance": {
+        "es": "Comparar rutas con métricas físicas y baselines.",
+        "en": "Compare routes using physical metrics and baselines.",
+        "nl": "Routes vergelijken met fysieke metingen en baselines."
+      },
+      "existing": [
+        "investor-next/lib/emergency-routing.mjs"
+      ],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M13",
+      "title": {
+        "es": "Colas bajo congestión",
+        "en": "Queues under congestion",
+        "nl": "Wachtrijen bij congestie"
+      },
+      "state": [
+        "R",
+        "X"
+      ],
+      "gate": "G3",
+      "scenarios": [
+        "S03",
+        "S08"
+      ],
+      "surfaces": [
+        "industry",
+        "science"
+      ],
+      "core": "Durable Custody",
+      "acceptance": {
+        "es": "Presupuestos de cola y pruebas de carga; QoS exige operador.",
+        "en": "Queue budgets and load tests; QoS needs an operator.",
+        "nl": "Wachtrijbudgetten en belastingtests; QoS vereist een operator."
+      },
+      "existing": [],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M14",
+      "title": {
+        "es": "Energía y permisos",
+        "en": "Energy and permissions",
+        "nl": "Energie en machtigingen"
+      },
+      "state": [
+        "E",
+        "L"
+      ],
+      "gate": "G2",
+      "scenarios": [
+        "S08"
+      ],
+      "surfaces": [
+        "family",
+        "science"
+      ],
+      "core": "Transport Orchestrator",
+      "acceptance": {
+        "es": "Consumo medido y permisos reales del dispositivo.",
+        "en": "Measured energy usage and actual device permissions.",
+        "nl": "Gemeten energieverbruik en werkelijke apparaatmachtigingen."
+      },
+      "existing": [],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M15",
+      "title": {
+        "es": "Confianza de navegación",
+        "en": "Navigation confidence",
+        "nl": "Betrouwbaarheid van navigatie"
+      },
+      "state": [
+        "R",
+        "X"
+      ],
+      "gate": "G7",
+      "scenarios": [
+        "S06"
+      ],
+      "surfaces": [
+        "regulated",
+        "science"
+      ],
+      "core": "Situation & Forecast",
+      "acceptance": {
+        "es": "Fusión sensorial con error estimado y validación.",
+        "en": "Sensor fusion with estimated error and validation.",
+        "nl": "Sensorfusie met geschatte fout en validatie."
+      },
+      "existing": [],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M16",
+      "title": {
+        "es": "Telemetría de drones",
+        "en": "Drone telemetry",
+        "nl": "Dronetelemetrie"
+      },
+      "state": [
+        "R",
+        "X"
+      ],
+      "gate": "G7",
+      "scenarios": [
+        "S06"
+      ],
+      "surfaces": [
+        "regulated"
+      ],
+      "core": "Institutional Trust & Interop",
+      "acceptance": {
+        "es": "Operador acreditado; no sustituye C2 certificado.",
+        "en": "Accredited operator; does not replace certified C2.",
+        "nl": "Bevoegde operator; vervangt geen gecertificeerde C2."
+      },
+      "existing": [],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M17",
+      "title": {
+        "es": "Identidad y canales profesionales",
+        "en": "Identity and professional channels",
+        "nl": "Identiteit en professionele kanalen"
+      },
+      "state": [
+        "E",
+        "R",
+        "X"
+      ],
+      "gate": "G6",
+      "scenarios": [
+        "S07"
+      ],
+      "surfaces": [
+        "institution",
+        "regulated"
+      ],
+      "core": "Institutional Trust & Interop",
+      "acceptance": {
+        "es": "Ciclo de claves, revocación, autorización y E2EE revisados.",
+        "en": "Reviewed key lifecycle, revocation, authorization and E2EE.",
+        "nl": "Beoordeelde sleutellevenscyclus, intrekking, autorisatie en E2EE."
+      },
+      "existing": [],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M18",
+      "title": {
+        "es": "Soberanía e interoperabilidad",
+        "en": "Sovereignty and interoperability",
+        "nl": "Soevereiniteit en interoperabiliteit"
+      },
+      "state": [
+        "E",
+        "R"
+      ],
+      "gate": "G1",
+      "scenarios": [
+        "S01",
+        "S07",
+        "S08"
+      ],
+      "surfaces": [
+        "science",
+        "industry",
+        "institution"
+      ],
+      "core": "Protocol Core",
+      "acceptance": {
+        "es": "Adaptadores abiertos, SBOM, licencia y gobernanza.",
+        "en": "Open adapters, SBOM, licensing and governance.",
+        "nl": "Open adapters, SBOM, licentie en governance."
+      },
+      "existing": [],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M19",
+      "title": {
+        "es": "Evidencia científica",
+        "en": "Scientific evidence",
+        "nl": "Wetenschappelijk bewijs"
+      },
+      "state": [
+        "E",
+        "S"
+      ],
+      "gate": "G0",
+      "scenarios": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08"
+      ],
+      "surfaces": [
+        "science",
+        "family",
+        "community",
+        "institution",
+        "industry",
+        "regulated"
+      ],
+      "core": "Human Interfaces",
+      "acceptance": {
+        "es": "SHA, pruebas y límites por módulo; auditoría independiente pendiente.",
+        "en": "SHA, tests and limits per module; independent audit pending.",
+        "nl": "SHA, tests en grenzen per module; onafhankelijke audit nog nodig."
+      },
+      "existing": [],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    },
+    {
+      "id": "M20",
+      "title": {
+        "es": "Investigación institucional regulada",
+        "en": "Regulated institutional research",
+        "nl": "Gereguleerd institutioneel onderzoek"
+      },
+      "state": [
+        "R",
+        "X"
+      ],
+      "gate": "G7",
+      "scenarios": [
+        "S07"
+      ],
+      "surfaces": [
+        "regulated"
+      ],
+      "core": "Institutional Trust & Interop",
+      "acceptance": {
+        "es": "Proyecto separado autorizado; ninguna promesa de invisibilidad RF.",
+        "en": "Separate authorized project; no promise of RF invisibility.",
+        "nl": "Afzonderlijk geautoriseerd project; geen belofte van RF-onzichtbaarheid."
+      },
+      "existing": [],
+      "operational": false,
+      "contract": "investor-next/lib/vision-contracts.mjs",
+      "test": "investor-next/tests/master-vision.test.mjs",
+      "evidence": "docs/product/MASTER_VISION_INTEGRATION.md"
+    }
+  ]
+}

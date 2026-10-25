@@ -1,0 +1,16 @@
+! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-9.12.3.tgz
+
+> civic-relay@0.1.0 type-check C:\Users\2fabr\civic-relay-vision
+> pnpm -r type-check
+
+Scope: 5 of 6 workspace projects
+packages/schemas type-check$ tsc --noEmit
+packages/schemas type-check: Done
+packages/transports type-check$ tsc --noEmit
+packages/transports type-check: Done
+packages/core type-check$ tsc --noEmit
+packages/core type-check: Done
+apps/web type-check$ tsc --noEmit
+packages/api type-check$ tsc --noEmit
+packages/api type-check: Done
+apps/web type-check: Done

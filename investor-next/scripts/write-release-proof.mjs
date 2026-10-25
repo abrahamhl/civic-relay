@@ -11,16 +11,22 @@ import {fileURLToPath} from 'node:url';
 const project=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const manifest=JSON.parse(readFileSync(resolve(project,'package.json'),'utf8'));
 let gitCommit=null;
+let workingTree='UNKNOWN';
 try{gitCommit=execFileSync('git',['rev-parse','HEAD'],{cwd:project,encoding:'utf8',stdio:['ignore','pipe','ignore'],timeout:5000}).trim();}
 catch{/* Some Vercel builds omit a Git checkout. */}
-const sha=/^[a-f0-9]{40}$/i.test(process.env.VERCEL_GIT_COMMIT_SHA??'')
+try{workingTree=execFileSync('git',['status','--porcelain','--untracked-files=normal'],{cwd:project,encoding:'utf8',stdio:['ignore','pipe','ignore'],timeout:5000}).trim()?'MODIFIED':'CLEAN';}
+catch{/* Unknown is not clean. */}
+const sha=/^[a-f0-9]{40}$/i.test(process.env.GITHUB_SHA??'')
+  ?process.env.GITHUB_SHA
+  : /^[a-f0-9]{40}$/i.test(process.env.VERCEL_GIT_COMMIT_SHA??'')
   ?process.env.VERCEL_GIT_COMMIT_SHA
   : /^[a-f0-9]{40}$/i.test(gitCommit??'')?gitCommit
-  : /^[a-f0-9]{40}$/i.test(process.env.GITHUB_SHA??'')?process.env.GITHUB_SHA
   :'UNVERIFIED_LOCAL_BUILD';
 const evidence={
  schema:'oep-public-build-provenance/v1',
  sourceSha:sha.toLowerCase(),
+ workingTree,
+ sourceScope:workingTree==='MODIFIED'?'BASE_COMMIT_WITH_LOCAL_CHANGES':'COMMIT_ID_NOT_DEPLOYMENT_PROOF',
  canonical:'https://civic-relay-investor.vercel.app',
  nextVersion:manifest.dependencies.next,
  commitSource:'SOURCE_BUILD_ID_ONLY_NOT_A_SIGNED_ATTESTATION',

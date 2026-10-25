@@ -1,0 +1,175 @@
+! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-9.12.3.tgz
+
+> civic-relay@0.1.0 test C:\Users\2fabr\civic-relay-vision
+> pnpm -r test
+
+Scope: 5 of 6 workspace projects
+packages/core test$ node --test tests/*.test.mjs
+packages/core test: TAP version 13
+packages/core test: # Subtest: generates separate Ed25519 and X25519 keys with consistent Base64
+packages/core test: ok 1 - generates separate Ed25519 and X25519 keys with consistent Base64
+packages/core test:   ---
+packages/core test:   duration_ms: 5.2847
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: sealed boxes round-trip JSON payloads without mutating the original envelope
+packages/core test: ok 2 - sealed boxes round-trip JSON payloads without mutating the original envelope
+packages/core test:   ---
+packages/core test:   duration_ms: 4.0828
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: sealed boxes produce different ciphertexts for the same payload and recipient
+packages/core test: ok 3 - sealed boxes produce different ciphertexts for the same payload and recipient
+packages/core test:   ---
+packages/core test:   duration_ms: 1.7278
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: decrypt rejects the wrong recipient and signing keys
+packages/core test: ok 4 - decrypt rejects the wrong recipient and signing keys
+packages/core test:   ---
+packages/core test:   duration_ms: 2.605
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: decrypt rejects tampered and truncated ciphertext
+packages/core test: ok 5 - decrypt rejects tampered and truncated ciphertext
+packages/core test:   ---
+packages/core test:   duration_ms: 1.9251
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: decrypt fails closed on plain payloads, unsupported algorithms and malformed Base64
+packages/core test: ok 6 - decrypt fails closed on plain payloads, unsupported algorithms and malformed Base64
+packages/core test:   ---
+packages/core test:   duration_ms: 1.3017
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: decrypt rejects valid sealed boxes containing a non-object JSON payload
+packages/core test: ok 7 - decrypt rejects valid sealed boxes containing a non-object JSON payload
+packages/core test:   ---
+packages/core test:   duration_ms: 4.7883
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: Ed25519 verifies the original envelope and rejects a different signer
+packages/core test: ok 8 - Ed25519 verifies the original envelope and rejects a different signer
+packages/core test:   ---
+packages/core test:   duration_ms: 3.4352
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: signatures reject changed payload and every immutable metadata field
+packages/core test: ok 9 - signatures reject changed payload and every immutable metadata field
+packages/core test:   ---
+packages/core test:   duration_ms: 5.3126
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: signatures ignore routing history and signature fields, but normalize nested object order
+packages/core test: ok 10 - signatures ignore routing history and signature fields, but normalize nested object order
+packages/core test:   ---
+packages/core test:   duration_ms: 1.9064
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: malformed signatures and public keys return false
+packages/core test: ok 11 - malformed signatures and public keys return false
+packages/core test:   ---
+packages/core test:   duration_ms: 1.2309
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: encrypt then sign allows verification before decrypting, not after replacing the payload
+packages/core test: ok 12 - encrypt then sign allows verification before decrypting, not after replacing the payload
+packages/core test:   ---
+packages/core test:   duration_ms: 4.393
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: optional storage encrypts secrets with fresh salt/IV, authenticates metadata and rejects empty passphrases
+packages/core test: ok 13 - optional storage encrypts secrets with fresh salt/IV, authenticates metadata and rejects empty passphrases
+packages/core test:   ---
+packages/core test:   duration_ms: 133.7683
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: golden scenario queues offline then deduplicates two simulated paths to one logical message
+packages/core test: ok 14 - golden scenario queues offline then deduplicates two simulated paths to one logical message
+packages/core test:   ---
+packages/core test:   duration_ms: 11.795
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: transport accepted without receiver acknowledgment never becomes delivered
+packages/core test: ok 15 - transport accepted without receiver acknowledgment never becomes delivered
+packages/core test:   ---
+packages/core test:   duration_ms: 0.9229
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: all transports unavailable leaves message queued
+packages/core test: ok 16 - all transports unavailable leaves message queued
+packages/core test:   ---
+packages/core test:   duration_ms: 0.7326
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: expired messages are rejected before routing
+packages/core test: ok 17 - expired messages are rejected before routing
+packages/core test:   ---
+packages/core test:   duration_ms: 0.9032
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: untrusted messages may not forge OFFICIAL or fail validation
+packages/core test: ok 18 - untrusted messages may not forge OFFICIAL or fail validation
+packages/core test:   ---
+packages/core test:   duration_ms: 1.6243
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: same message delivered twice via two transports is one logical message with both paths
+packages/core test: ok 19 - same message delivered twice via two transports is one logical message with both paths
+packages/core test:   ---
+packages/core test:   duration_ms: 0.5641
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: ID collision with diverging content is rejected without overwriting
+packages/core test: ok 20 - ID collision with diverging content is rejected without overwriting
+packages/core test:   ---
+packages/core test:   duration_ms: 0.7518
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: one failing transport does not block a healthy path from acknowledging
+packages/core test: ok 21 - one failing transport does not block a healthy path from acknowledging
+packages/core test:   ---
+packages/core test:   duration_ms: 1.1631
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # MeshtasticWebBluetoothTransport: Not connected. Simulating message accepted by local buffer.
+packages/core test: # Subtest: Meshtastic Integration: Stub test for GATT Proxy
+packages/core test: ok 22 - Meshtastic Integration: Stub test for GATT Proxy
+packages/core test:   ---
+packages/core test:   duration_ms: 2.7349
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: Store and Forward: Enqueue and Read
+packages/core test: ok 23 - Store and Forward: Enqueue and Read
+packages/core test:   ---
+packages/core test:   duration_ms: 6.871
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: Store and Forward: Acknowledgment and Completion
+packages/core test: ok 24 - Store and Forward: Acknowledgment and Completion
+packages/core test:   ---
+packages/core test:   duration_ms: 1.3207
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: Store and Forward: Expiry Eviction
+packages/core test: ok 25 - Store and Forward: Expiry Eviction
+packages/core test:   ---
+packages/core test:   duration_ms: 0.561
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: # Subtest: Store and Forward: Idempotent Enqueue (Conflict Protection)
+packages/core test: ok 26 - Store and Forward: Idempotent Enqueue (Conflict Protection)
+packages/core test:   ---
+packages/core test:   duration_ms: 0.6312
+packages/core test:   type: 'test'
+packages/core test:   ...
+packages/core test: 1..26
+packages/core test: # tests 26
+packages/core test: # suites 0
+packages/core test: # pass 26
+packages/core test: # fail 0
+packages/core test: # cancelled 0
+packages/core test: # skipped 0
+packages/core test: # todo 0
+packages/core test: # duration_ms 335.2456
+packages/core test: Done

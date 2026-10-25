@@ -1,0 +1,53 @@
+{
+  "id": "P08",
+  "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+  "sha": "LOCAL",
+  "timestamp_utc": "2026-10-24T23:54:28.161Z",
+  "locale": "nl",
+  "viewport": {
+    "width": 820,
+    "height": 1180
+  },
+  "role": "Institutional partner / roadmap and limitations",
+  "roleTask": {
+    "role": "Institutional partner / roadmap and limitations",
+    "actions": [
+      {
+        "action": "Roadmap and partner section with risk disclosure",
+        "result": {
+          "roadmap": 1,
+          "partner": 1
+        }
+      }
+    ],
+    "verified": true
+  },
+  "steps": [
+    "Open static release in Chromium",
+    "Verify DOM language and localized heading",
+    "Inspect canonical and simulation disclaimer",
+    "Check architecture and stale external links",
+    "Inspect pageerror events"
+  ],
+  "expected": {
+    "http": 200,
+    "htmlLang": "nl",
+    "canonicalHost": "civic-relay-investor.vercel.app",
+    "noPageErrors": true
+  },
+  "observed": {
+    "http": 200,
+    "lang": "nl",
+    "title": "WAT IS OEP? | Gedistribueerde noodcoördinatie en adaptieve routering",
+    "headings": [
+      "ALS HETNETWERKUITVALT."
+    ],
+    "canonical": "https://civic-relay-investor.vercel.app/nl/",
+    "disclaimers": 35,
+    "eightStage": true,
+    "obsoleteLinks": [],
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "verdict": "PASS"
+}

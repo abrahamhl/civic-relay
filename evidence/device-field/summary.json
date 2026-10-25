@@ -1,0 +1,8 @@
+{
+  "outcome": "PASS",
+  "mode": "REAL_CHROMIUM_BROWSER_APIS_NOT_PHONE_D2D",
+  "sha": "LOCAL",
+  "measuredAtUtc": "2026-10-24T23:50:24.216Z",
+  "measurementCount": 16,
+  "proof": "C:\\Users\\2fabr\\civic-relay-vision\\evidence\\device-field\\device-evidence.json"
+}

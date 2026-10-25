@@ -14,12 +14,32 @@ function toHex(uint8) {
 }
 
 function fromHex(hexStr) {
-  const clean = String(hexStr || '').replace(/[^0-9a-fA-F]/g, '');
+  if (typeof hexStr !== 'string' || !/^(?:[0-9a-fA-F]{2}\s*)+$/.test(hexStr)) {
+    throw new Error('INVALID_HEX');
+  }
+  const clean = hexStr.replace(/\s/g, '');
   const out = new Uint8Array(Math.floor(clean.length / 2));
   for (let i = 0; i < out.length; i++) {
     out[i] = parseInt(clean.slice(i * 2, i * 2 + 2), 16);
   }
   return out;
+}
+
+// Rebuild signed bytes from the fields actually consumed by the application.
+// V1 remains a lab format, not the cross-language canonical protocol or E2EE.
+function packetSigningText(packet) {
+  for (const key of ['messageId', 'status', 'zoneId']) {
+    if (typeof packet[key] !== 'string' || !/^[A-Za-z0-9_.:-]{1,128}$/.test(packet[key])) {
+      throw new Error('INVALID_SIGNED_FIELD');
+    }
+  }
+  if (!['SAFE', 'SOS_EXPLICIT', 'UNKNOWN'].includes(packet.status) ||
+      !Number.isSafeInteger(packet.sectorIndex) || packet.sectorIndex < 0 || packet.sectorIndex > 255 ||
+      !Number.isSafeInteger(packet.batteryPct) || packet.batteryPct < 0 || packet.batteryPct > 100 ||
+      !Number.isSafeInteger(packet.timestampMs) || packet.timestampMs < 0) {
+    throw new Error('INVALID_SIGNED_FIELD');
+  }
+  return `OEP_V1|${packet.messageId}|${packet.status}|${packet.zoneId}|${packet.sectorIndex}|${packet.batteryPct}|${packet.timestampMs}|${packet.binaryFrameHex}`;
 }
 
 /**
@@ -89,7 +109,7 @@ export async function signAndPackRealOepPacket({
     timestampSec: Math.floor(timestampMs / 1000)
   });
 
-  const canonicalString = `OEP_V1|${messageId}|${status}|${zoneId}|${sectorIndex}|${batteryPct}|${timestampMs}|${burst.hexFrame}`;
+  const canonicalString = packetSigningText({messageId, status, zoneId, sectorIndex, batteryPct, timestampMs, binaryFrameHex: burst.hexFrame});
   const payloadBytes = new TextEncoder().encode(canonicalString);
   const sigBuffer = await subtle.sign(
     { name: 'ECDSA', hash: { name: 'SHA-256' } },
@@ -141,8 +161,23 @@ export async function verifyRealOepPacket(packet) {
       return { valid: false, reason: 'CRC16_MISMATCH', verifyTimeMs: 0 };
     }
 
+    if (packet.protocol !== 'OEP_REAL_EXECUTION_V1' || packet.byteLength !== rawFrame.length ||
+        packet.crc16Hex !== '0x' + actualCrc.toString(16).padStart(4, '0').toUpperCase()) {
+      return { valid: false, reason: 'INVALID_FRAME_METADATA', verifyTimeMs: 0 };
+    }
+    const reconstructed = packetSigningText(packet);
+    if (packet.canonicalString !== reconstructed) {
+      return { valid: false, reason: 'INVALID_ECDSA_SIGNATURE', verifyTimeMs: 0 };
+    }
+
     // 2. Import SPKI public key and verify ECDSA-P256-SHA256 signature
     const spkiBytes = fromHex(packet.publicKeySpkiHex);
+    const fingerprintBytes = new Uint8Array(await subtle.digest('SHA-256', spkiBytes));
+    const fingerprint = Array.from(fingerprintBytes.slice(0, 8))
+      .map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(':');
+    if (packet.signerFingerprint !== fingerprint) {
+      return { valid: false, reason: 'SIGNER_FINGERPRINT_MISMATCH', verifyTimeMs: 0 };
+    }
     const pubKey = await subtle.importKey(
       'spki',
       spkiBytes,
@@ -150,7 +185,7 @@ export async function verifyRealOepPacket(packet) {
       false,
       ['verify']
     );
-    const payloadBytes = new TextEncoder().encode(packet.canonicalString);
+    const payloadBytes = new TextEncoder().encode(reconstructed);
     const sigBytes = fromHex(packet.signatureHex);
     const verified = await subtle.verify(
       { name: 'ECDSA', hash: { name: 'SHA-256' } },
@@ -165,6 +200,8 @@ export async function verifyRealOepPacket(packet) {
       valid: verified,
       crc16Verified: true,
       ecdsaVerified: verified,
+      // A self-supplied key proves integrity, never institutional authority.
+      identityAuthenticated: false,
       reason: verified ? 'CRYPTOGRAPHICALLY_VERIFIED_ECDSA_P256' : 'INVALID_ECDSA_SIGNATURE',
       verifyTimeMs
     };

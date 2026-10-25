@@ -13,6 +13,7 @@ import {routingPitch} from './routing-pitch';
 import {getCopy,type Locale} from './copy';
 import ResponsiveHeader from './responsive-header';
 import LanguageDocument from './language-document';
+import MasterVision from './master-vision';
 
 const source='https://github.com/abrahamhl/civic-relay';
 
@@ -40,7 +41,7 @@ const thirtySecondThesis:Record<Locale,{
  es:{
   brandTag:'CIVIC RELAY (PLATAFORMA) · OEP — OFFLINE EMERGENCY PROTOCOL (PROTOCOLO DE INVESTIGACIÓN)',
   title:'Cuando cae la red, la coordinación no debería desaparecer.',
-  subtitle:'Explora cómo Civic Relay investiga el uso coordinado de dispositivos participantes y redes compatibles para conservar avisos, encontrar rutas alternativas y comunicar estados voluntarios durante emergencias. Hoy puedes comprobar el modelo en una simulación; la conexión física a gran escala sigue en investigación.',
+  subtitle:'Civic Relay es un programa tecnológico europeo de anticipación de riesgos, continuidad de comunicaciones y coordinación de personas, equipos e infraestructuras. Une información con procedencia, mensajes conservados, rutas terrestres o satelitales autorizadas y confirmaciones verificables. Hoy se demuestra software y simulación; la validación física y las integraciones institucionales siguen pendientes.',
   exactQuote:'«Civic Relay investiga cómo coordinar avisos, estados voluntarios de personas y rutas alternativas entre dispositivos y redes compatibles cuando falla parte de la conectividad. El prototipo permite experimentar con zonas de emergencia, permisos, mensajes, almacenamiento y reenvío y confirmaciones en un escenario simulado. La comunicación real entre teléfonos y con servicios oficiales todavía requiere validación e integración autorizada».',
   ctaSimulate:'Simular una emergencia',
   ctaExploreMap:'Explorar el mapa interactivo',
@@ -65,7 +66,7 @@ const thirtySecondThesis:Record<Locale,{
  en:{
   brandTag:'CIVIC RELAY (PLATFORM) · OEP — OFFLINE EMERGENCY PROTOCOL (RESEARCH PROTOCOL)',
   title:'When the network goes down, coordination should not disappear.',
-  subtitle:'Explore how Civic Relay researches coordinated use of participating devices and compatible networks to preserve alerts, find alternative paths, and communicate voluntary status during emergencies. Today you can test the model in a deterministic simulation; large-scale physical links remain under research.',
+  subtitle:'Civic Relay is a European technology programme for risk anticipation, communication continuity and coordination of people, teams and infrastructure. It brings together sourced information, retained messages, authorized terrestrial or satellite routes and verifiable receipts. Today it demonstrates software and simulation; physical validation and institutional integrations remain pending.',
   exactQuote:'“Civic Relay researches how to coordinate alerts, voluntary human status check-ins, and alternative routes across participating devices and compatible networks when connectivity partially fails. The prototype lets you experiment with emergency zones, permissions, messages, store-and-forward queuing, and acknowledgments in a simulated scenario. Real phone-to-phone and official emergency service communication still requires validation and authorized integration.”',
   ctaSimulate:'Simulate an emergency',
   ctaExploreMap:'Explore interactive map',
@@ -90,7 +91,7 @@ const thirtySecondThesis:Record<Locale,{
  nl:{
   brandTag:'CIVIC RELAY (PLATFORM) · OEP — OFFLINE EMERGENCY PROTOCOL (ONDERZOEKSPROTOCOL)',
   title:'Als het netwerk uitvalt, mag de coördinatie niet verdwijnen.',
-  subtitle:'Ontdek hoe Civic Relay onderzoekt hoe deelnemende apparaten en compatibele netwerken meldingen bewaren, alternatieve routes vinden en vrijwillige statussen delen tijdens noodsituaties. Vandaag test u het model in een simulatie; fysieke koppeling op grote schaal is nog in onderzoek.',
+  subtitle:'Civic Relay is een Europees technologieprogramma voor risicoanticipatie, communicatiecontinuïteit en coördinatie van mensen, teams en infrastructuur. Het verbindt herleidbare informatie, bewaarde berichten, geautoriseerde aardse of satellietroutes en verifieerbare ontvangstbewijzen. Vandaag demonstreert het software en simulatie; fysieke validatie en institutionele integraties zijn nog nodig.',
   exactQuote:'“Civic Relay onderzoekt hoe meldingen, vrijwillige persoonsstatussen en alternatieve routes tussen deelnemende apparaten en compatibele netwerken gecoördineerd kunnen worden bij gedeeltelijke netwerkuitval. Het prototype laat u experimenteren met noodzones, toestemmingen, berichten, store-and-forward wachtrijen en ontvangstbevestigingen in een gesimuleerd scenario. Echte communicatie tussen telefoons en met hulpdiensten vereist nog validatie en geautoriseerde integratie.”',
   ctaSimulate:'Simuleer een noodgeval',
   ctaExploreMap:'Verken interactieve kaart',
@@ -158,6 +159,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
    <MissionControl locale={locale}/>
   </section>
 
+  <MasterVision locale={locale}/>
   {/* Three Complementary Surfaces Switcher (A: Discover / B: Explore Mission Control / C: Investigate Science) */}
   <section className="container apple-surfaces-section" aria-label={th.surfacesTitle} data-testid="three-surfaces-switcher">
    <div className="apple-bento-surfaces">

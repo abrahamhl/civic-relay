@@ -1,0 +1,823 @@
+{
+  "sha": "LOCAL",
+  "completed_at_utc": "2026-10-24T23:54:54.871Z",
+  "scope": "FIFTEEN automated Chromium task roles (P01-P15) on synthetic local website including master vision, typed custody, 20-module catalogue, keyboard, mobile and trilingual checks.",
+  "runs": [
+    {
+      "id": "P01",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:11.607Z",
+      "locale": "es",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "role": "Citizen mobile / consent and revocation",
+      "roleTask": {
+        "role": "Citizen mobile / consent and revocation",
+        "actions": [
+          {
+            "action": "SAFE disabled before consent",
+            "result": true
+          },
+          {
+            "action": "Explicit SAFE saved locally",
+            "result": true
+          },
+          {
+            "action": "Revoke removed response",
+            "result": true
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "es",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "es",
+        "title": "¿QUÉ ES OEP? | Coordinación de emergencias offline y enrutamiento adaptativo",
+        "headings": [
+          "CUANDO LAREDSE APAGA."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/es/",
+        "disclaimers": 31,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "P02",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:13.857Z",
+      "locale": "en",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "role": "First responder / scenario switching",
+      "roleTask": {
+        "role": "First responder / scenario switching",
+        "actions": [
+          {
+            "action": "Switch fourth simulation scenario",
+            "result": "true"
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "en",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "en",
+        "title": "OEP — Offline Emergency Protocol | Distributed Emergency Coordination & Adaptive Multi-Network Routing",
+        "headings": [
+          "WHEN THENETWORKGOES DARK."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/",
+        "disclaimers": 63,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "P03",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:16.166Z",
+      "locale": "en",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "role": "Investor / evidence and grant eligibility",
+      "roleTask": {
+        "role": "Investor / evidence and grant eligibility",
+        "actions": [
+          {
+            "action": "Funding programmes surfaced",
+            "result": 8
+          },
+          {
+            "action": "NLnet AI policy disclosure visible",
+            "result": true
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "en",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "en",
+        "title": "OEP — Offline Emergency Protocol | Distributed Emergency Coordination & Adaptive Multi-Network Routing",
+        "headings": [
+          "WHEN THENETWORKGOES DARK."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/",
+        "disclaimers": 63,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "P04",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:18.981Z",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "role": "Engineer / export real synthetic report",
+      "roleTask": {
+        "role": "Engineer / export real synthetic report",
+        "actions": [
+          {
+            "action": "Generated browser evidence payload",
+            "result": "OEP_SYNTHETIC_EVIDENCE_EXPORT"
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "en",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "en",
+        "title": "OEP — Offline Emergency Protocol | Distributed Emergency Coordination & Adaptive Multi-Network Routing",
+        "headings": [
+          "WHEN THENETWORKGOES DARK."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/",
+        "disclaimers": 63,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "P05",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:21.150Z",
+      "locale": "nl",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "role": "NL privacy reviewer / radio claim boundary",
+      "roleTask": {
+        "role": "NL privacy reviewer / radio claim boundary",
+        "actions": [
+          {
+            "action": "RF simulator authorization warning",
+            "result": "AUTORISATIEGRENS\nONDERZOEKSDEMO: D2D-routering, satellietverbindingen en RF/CSI-radar zijn softwaresimulaties. De browser zendt geen satelliet-RF uit en leest geen echte Wi-Fi CSI. Fysieke proeven, be"
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "nl",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "nl",
+        "title": "WAT IS OEP? | Gedistribueerde noodcoördinatie en adaptieve routering",
+        "headings": [
+          "ALS HETNETWERKUITVALT."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/nl/",
+        "disclaimers": 35,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "P06",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:23.738Z",
+      "locale": "es",
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "role": "Volunteer / deny implicit SOS",
+      "roleTask": {
+        "role": "Volunteer / deny implicit SOS",
+        "actions": [
+          {
+            "action": "SOS only after voluntary consent; unchecked removes it",
+            "result": {
+              "initiallyDisabled": true,
+              "explicit": "Respuesta local de ejercicio: SOS_EXPLICIT\nCaduca en una hora; se elimina al salir de la página\nREVOCAR Y ELIMINAR",
+              "cleared": true
+            }
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "es",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "es",
+        "title": "¿QUÉ ES OEP? | Coordinación de emergencias offline y enrutamiento adaptativo",
+        "headings": [
+          "CUANDO LAREDSE APAGA."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/es/",
+        "disclaimers": 31,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "P07",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:26.105Z",
+      "locale": "en",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "role": "Keyboard and reduced-motion accessibility",
+      "roleTask": {
+        "role": "Keyboard and reduced-motion accessibility",
+        "actions": [
+          {
+            "action": "Tab reaches interactive control, main landmark, prefers-reduced-motion",
+            "result": {
+              "keyboard": true,
+              "landmarks": 1,
+              "reduced": true
+            }
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "en",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "en",
+        "title": "OEP — Offline Emergency Protocol | Distributed Emergency Coordination & Adaptive Multi-Network Routing",
+        "headings": [
+          "WHEN THENETWORKGOES DARK."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/",
+        "disclaimers": 62,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "P08",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:28.161Z",
+      "locale": "nl",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "role": "Institutional partner / roadmap and limitations",
+      "roleTask": {
+        "role": "Institutional partner / roadmap and limitations",
+        "actions": [
+          {
+            "action": "Roadmap and partner section with risk disclosure",
+            "result": {
+              "roadmap": 1,
+              "partner": 1
+            }
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "nl",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "nl",
+        "title": "WAT IS OEP? | Gedistribueerde noodcoördinatie en adaptieve routering",
+        "headings": [
+          "ALS HETNETWERKUITVALT."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/nl/",
+        "disclaimers": 35,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "P09",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:31.691Z",
+      "locale": "es",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "role": "3D Globe object selection, scenario sync and Mars educational mode",
+      "roleTask": {
+        "role": "3D Globe object selection, scenario sync and Mars educational mode",
+        "actions": [
+          {
+            "action": "30s thesis, scenario counter transition, camera selection, Mars disclaimer, HyperFrames Act 3 & Apple Living Nav",
+            "result": {
+              "outageCounters": "ACK sintéticos: 0 · En cola (QUEUED): 15",
+              "intermittentCounters": "ACK sintéticos: 13 · En cola (QUEUED): 2",
+              "marsBanner": "Marte (Exploración 3D educativa): MODO EDUCATIVO ESPACIAL: Visualización planetaria 3D de geometría y retícula. Civic Re",
+              "hfBanner": "ACT 03 · 10.0s–15.0s\n·\nCola Store-and-Forward",
+              "livingNavVisible": true
+            }
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "es",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "es",
+        "title": "¿QUÉ ES OEP? | Coordinación de emergencias offline y enrutamiento adaptativo",
+        "headings": [
+          "CUANDO LAREDSE APAGA."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/es/",
+        "disclaimers": 29,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "P10",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:34.642Z",
+      "locale": "es",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "role": "Sector Intelligence El Tiemblo CCTV, Anti-SSRF and Unified Pipeline",
+      "roleTask": {
+        "role": "Sector Intelligence El Tiemblo CCTV, Anti-SSRF and Unified Pipeline",
+        "actions": [
+          {
+            "action": "El Tiemblo cameras, Anti-SSRF block/allow, and Unified Pipeline step 6",
+            "result": {
+              "ssrfBlocked": "BLOCK: NON_HTTPS_PROTOCOL_BLOCKED",
+              "ssrfAllowed": "ALLOW: ALLOWLISTED_PUBLIC_HTTPS_SOURCE"
+            }
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "es",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "es",
+        "title": "¿QUÉ ES OEP? | Coordinación de emergencias offline y enrutamiento adaptativo",
+        "headings": [
+          "CUANDO LAREDSE APAGA."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/es/",
+        "disclaimers": 31,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "P11",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:37.258Z",
+      "locale": "es",
+      "viewport": {
+        "width": 320,
+        "height": 720
+      },
+      "role": "Narrow mobile responsive menu and touch targets",
+      "roleTask": {
+        "role": "Narrow mobile responsive menu and touch targets",
+        "actions": [
+          {
+            "action": "320px header width, menu open/close, evidence anchor, touch size",
+            "result": {
+              "bounds": {
+                "left": 0,
+                "right": 320,
+                "viewport": 320,
+                "actionsRight": 298
+              },
+              "menuHeight": 44,
+              "initiallyClosed": true,
+              "open": true,
+              "reachable": true,
+              "closed": true
+            }
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "es",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "es",
+        "title": "¿QUÉ ES OEP? | Coordinación de emergencias offline y enrutamiento adaptativo",
+        "headings": [
+          "CUANDO LAREDSE APAGA."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/es/",
+        "disclaimers": 31,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "P12",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:39.719Z",
+      "locale": "en",
+      "viewport": {
+        "width": 1536,
+        "height": 864
+      },
+      "role": "Wide desktop navigation density and no overlap",
+      "roleTask": {
+        "role": "Wide desktop navigation density and no overlap",
+        "actions": [
+          {
+            "action": "1536px navigation columns, primary links and Escape close",
+            "result": {
+              "brandBox": {
+                "x": 102.109375,
+                "y": 19.359375,
+                "width": 188,
+                "height": 36.265625
+              },
+              "navBox": {
+                "x": 316.21875,
+                "y": 15.5,
+                "width": 893.5625,
+                "height": 44
+              },
+              "actionsBox": {
+                "x": 1235.890625,
+                "y": 14.5,
+                "width": 198,
+                "height": 46
+              },
+              "primaryCount": 4,
+              "opened": true,
+              "closed": true
+            }
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "en",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "en",
+        "title": "OEP — Offline Emergency Protocol | Distributed Emergency Coordination & Adaptive Multi-Network Routing",
+        "headings": [
+          "WHEN THENETWORKGOES DARK."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/",
+        "disclaimers": 63,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "P13",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:44.153Z",
+      "locale": "es",
+      "viewport": {
+        "width": 320,
+        "height": 720
+      },
+      "role": "Master vision, custody and complete catalogue ES mobile",
+      "roleTask": {
+        "role": "Master vision, custody and complete catalogue ES mobile",
+        "actions": [
+          {
+            "action": "Five custody states, 20 modules, audience/scenario filtering, cross-cutting evidence, keyboard and download",
+            "result": true
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "es",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "es",
+        "title": "¿QUÉ ES OEP? | Coordinación de emergencias offline y enrutamiento adaptativo",
+        "headings": [
+          "CUANDO LAREDSE APAGA."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/es/",
+        "disclaimers": 31,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "P14",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:49.873Z",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "role": "Master vision, custody and complete catalogue EN desktop",
+      "roleTask": {
+        "role": "Master vision, custody and complete catalogue EN desktop",
+        "actions": [
+          {
+            "action": "Five custody states, 20 modules, audience/scenario filtering, cross-cutting evidence, keyboard and download",
+            "result": true
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "en",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "en",
+        "title": "OEP — Offline Emergency Protocol | Distributed Emergency Coordination & Adaptive Multi-Network Routing",
+        "headings": [
+          "WHEN THENETWORKGOES DARK."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/",
+        "disclaimers": 63,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "P15",
+      "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
+      "sha": "LOCAL",
+      "timestamp_utc": "2026-10-24T23:54:54.736Z",
+      "locale": "nl",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "role": "Master vision, custody and complete catalogue NL mobile",
+      "roleTask": {
+        "role": "Master vision, custody and complete catalogue NL mobile",
+        "actions": [
+          {
+            "action": "Five custody states, 20 modules, audience/scenario filtering, cross-cutting evidence, keyboard and download",
+            "result": true
+          }
+        ],
+        "verified": true
+      },
+      "steps": [
+        "Open static release in Chromium",
+        "Verify DOM language and localized heading",
+        "Inspect canonical and simulation disclaimer",
+        "Check architecture and stale external links",
+        "Inspect pageerror events"
+      ],
+      "expected": {
+        "http": 200,
+        "htmlLang": "nl",
+        "canonicalHost": "civic-relay-investor.vercel.app",
+        "noPageErrors": true
+      },
+      "observed": {
+        "http": 200,
+        "lang": "nl",
+        "title": "WAT IS OEP? | Gedistribueerde noodcoördinatie en adaptieve routering",
+        "headings": [
+          "ALS HETNETWERKUITVALT."
+        ],
+        "canonical": "https://civic-relay-investor.vercel.app/nl/",
+        "disclaimers": 35,
+        "eightStage": true,
+        "obsoleteLinks": [],
+        "pageErrors": [],
+        "consoleErrors": []
+      },
+      "verdict": "PASS"
+    }
+  ]
+}

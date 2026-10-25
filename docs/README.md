@@ -1,6 +1,8 @@
 # OEP / Civic Relay — Canonical Documentation Index
 
-To prevent documentation sprawl and allow grant evaluators, security auditors, and technical partners to review the project in under 10 minutes, **these 8 documents are the canonical source of truth**:
+Start with the [founder's master vision CR-VM-2026-10-25](product/CIVIC_RELAY_VISION_MAESTRA_2026-10-25.md) and [integration/evidence boundaries](product/MASTER_VISION_INTEGRATION.md). They define the full programme and take precedence over earlier scope descriptions. Capability evidence remains separate from product ambition.
+
+The following dossier preserves earlier engineering, funding and field-test work. Historical module identifiers and test counts are not the master registry or current release results.
 
 ## 1. Core Five-Document Technical & Funding Dossier
 1. **[`docs/investor/ONE_PAGE_PITCH.md`](investor/ONE_PAGE_PITCH.md)** — 60-second overview of problem, architecture, verified evidence, and non-claims.
