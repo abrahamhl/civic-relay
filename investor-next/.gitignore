@@ -7,3 +7,5 @@ out/
 !.env.example
 
 public/release-provenance.json
+.vercel
+.env*
