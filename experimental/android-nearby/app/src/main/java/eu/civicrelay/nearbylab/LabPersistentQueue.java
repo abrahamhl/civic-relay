@@ -65,6 +65,12 @@ public final class LabPersistentQueue {
             if (existing.status != Status.QUEUED) {
                 throw new IllegalStateException("Terminal message ID cannot be replayed");
             }
+            // Idempotency is safe only for an identical record. Reusing a UUID
+            // with different human status, payload or TTL is an integrity error.
+            if (!existing.category.equals(category) || !existing.payload.equals(payload) ||
+                existing.expiresAtMs - existing.createdAtMs != ttlMs) {
+                throw new IllegalStateException("Message UUID conflict: mismatched record");
+            }
             return existing;
         }
         if (records.size() >= MAX_ENTRIES) {

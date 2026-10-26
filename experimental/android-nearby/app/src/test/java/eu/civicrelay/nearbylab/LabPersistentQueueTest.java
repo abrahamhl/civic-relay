@@ -17,6 +17,14 @@ public final class LabPersistentQueueTest {
         assertions++;
     }
 
+    private static void assertConflict(LabPersistentQueue queue, String category,
+                                       String payload, long ttl, String field) throws Exception {
+        boolean rejected = false;
+        try { queue.enqueue(ID1, category, payload, 1100L, ttl); }
+        catch (IllegalStateException expected) { rejected = true; }
+        check(rejected, "Reusing a UUID with different " + field + " must fail closed");
+    }
+
     public static void main(String[] args) throws Exception {
         Path tmpDir = Files.createTempDirectory("oep-queue-test");
         Path file = tmpDir.resolve("queue.tsv");
@@ -24,6 +32,14 @@ public final class LabPersistentQueueTest {
             LabPersistentQueue q1 = new LabPersistentQueue(file, 1000L);
             q1.enqueue(ID1, "SOS_EXPLICIT", "LAB_PAYLOAD_1", 1000L, 5000L);
             q1.enqueue(ID2, "SAFE", "LAB_PAYLOAD_2", 1000L, 2000L);
+
+            // Exact retry remains idempotent; conflicting UUID reuse must fail closed.
+            check(q1.enqueue(ID1, "SOS_EXPLICIT", "LAB_PAYLOAD_1", 1100L, 5000L).id.equals(ID1),
+                "Identical retry must return the original record");
+            assertConflict(q1, "SAFE", "LAB_PAYLOAD_1", 5000L, "category");
+            assertConflict(q1, "SOS_EXPLICIT", "DIFFERENT_PAYLOAD", 5000L, "payload");
+            assertConflict(q1, "SOS_EXPLICIT", "LAB_PAYLOAD_1", 4000L, "TTL");
+            check(q1.snapshot(1100L).size() == 2, "Conflicts must not change queue size");
 
             // Simulate process restart at t=2500ms (ID1 still active, ID2 still active)
             LabPersistentQueue q2 = new LabPersistentQueue(file, 2500L);
