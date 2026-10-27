@@ -80,3 +80,11 @@ test('eight-stage scannable architecture pipeline is present in EN, ES and NL wi
  }
  assert.match(data,/EMERGENCY EVENT → ZONE → HUMAN STATUS → CONSENT → MESSAGE → NETWORK PATH → ACK → EVIDENCE/);
 });
+
+test('primary navigation and language selector have distinct translated accessible names',()=>{
+ const page=read('investor-next/app/investor-page.tsx');
+ for(const name of ['Main navigation','Navegación principal','Hoofdnavigatie'])
+   assert.ok(page.includes(name),'Missing primary navigation label: '+name);
+ assert.ok(page.includes('className="locale-links" role="group" aria-label={t.nav.language}'));
+ assert.ok(!page.includes('<nav aria-label={t.nav.language}>'),'Primary nav must not be named as language selector');
+});
