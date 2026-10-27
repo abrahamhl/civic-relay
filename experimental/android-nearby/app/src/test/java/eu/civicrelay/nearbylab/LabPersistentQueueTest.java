@@ -25,6 +25,42 @@ public final class LabPersistentQueueTest {
         check(rejected, "Reusing a UUID with different " + field + " must fail closed");
     }
 
+    /** A corrupt file must fail closed without discarding tombstones or rewriting evidence. */
+    private static void assertRestoreRejected(Path file, String content, String why) throws Exception {
+        Files.writeString(file, content);
+        boolean rejected = false;
+        try { new LabPersistentQueue(file, 1000L); }
+        catch (java.io.IOException expected) {
+            rejected = expected.getMessage().contains("Invalid lab queue");
+        }
+        check(rejected, why);
+        check(Files.readString(file).equals(content), "Corrupt file must remain unchanged");
+    }
+
+    private static void testCorruptRestore(Path dir) throws Exception {
+        Path file = dir.resolve("corrupt.tsv");
+        String header = "# OEP LAB PERSISTENT QUEUE V1\n";
+        try {
+            assertRestoreRejected(file, "", "Empty persisted file must fail closed");
+            assertRestoreRejected(file, ID1 + "\tSAFE\t1000\t3000\tQUEUED\tLAB\n", "Missing header");
+            assertRestoreRejected(file, header + ID1 + "\tSAFE\tNaN\t3000\tQUEUED\tLAB\n", "Invalid timestamp");
+            assertRestoreRejected(file, header + ID1 + "\tSAFE\t1000\t3000\tUNKNOWN\tLAB\n", "Invalid state");
+            assertRestoreRejected(file, header + ID1 + "\tINVALID\t1000\t3000\tQUEUED\tLAB\n", "Invalid category");
+            assertRestoreRejected(file, header + ID1 + "\tSAFE\t1000\t3000\tACK_VERIFIED\tSECRET\n", "Terminal plaintext");
+            String record = ID1 + "\tSAFE\t1000\t3000\tQUEUED\tLAB\n";
+            assertRestoreRejected(file, header + record + record, "Duplicate UUID");
+            StringBuilder tooMany = new StringBuilder(header);
+            for (int i = 0; i < 101; i++) {
+                tooMany.append(String.format("%08d-1111-4111-8111-111111111111", i))
+                    .append("\tSAFE\t1000\t3000\tQUEUED\tLAB\n");
+            }
+            assertRestoreRejected(file, tooMany.toString(), "Over-capacity restore");
+        } finally {
+            Files.deleteIfExists(file);
+            Files.deleteIfExists(file.resolveSibling("corrupt.tsv.tmp"));
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         Path tmpDir = Files.createTempDirectory("oep-queue-test");
         Path file = tmpDir.resolve("queue.tsv");
@@ -94,6 +130,7 @@ public final class LabPersistentQueueTest {
             q3.purgeAll();
             check(!Files.exists(file), "purgeAll must delete backing file");
             check(!Files.exists(staleTmp), "purgeAll must delete interrupted-write temporary file");
+            testCorruptRestore(tmpDir);
             System.out.println("LabPersistentQueueTest PASS (" + assertions + " assertions)");
         } finally {
             Files.deleteIfExists(file);

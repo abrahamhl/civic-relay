@@ -137,18 +137,53 @@ public final class LabPersistentQueue {
     private void loadFromDisk(long nowMs) throws IOException {
         records.clear();
         if (!Files.exists(storagePath)) return;
+        // Fail closed on corruption: silently dropping records would discard anti-replay IDs.
+        // Do not log stored plaintext or overwrite the damaged file.
+        if (Files.size(storagePath) > 1_048_576L) {
+            throw new IOException("Invalid lab queue; STOP & CLEAR required");
+        }
         List<String> lines = Files.readAllLines(storagePath, StandardCharsets.UTF_8);
-        for (String line : lines) {
-            if (line.isEmpty() || line.startsWith("#")) continue;
-            String[] parts = line.split("\t", -1);
-            if (parts.length != 6) continue;
-            String id = parts[0];
-            String category = parts[1];
-            long createdAt = Long.parseLong(parts[2]);
-            long expiresAt = Long.parseLong(parts[3]);
-            Status status = Status.valueOf(parts[4]);
-            String payload = status == Status.QUEUED ? parts[5] : "";
-            records.put(id, new Record(id, category, createdAt, expiresAt, status, payload));
+        try {
+            if (lines.isEmpty() || !"# OEP LAB PERSISTENT QUEUE V1".equals(lines.get(0))) {
+                throw new IllegalArgumentException("Invalid queue header");
+            }
+            for (int i = 1; i < lines.size(); i++) {
+                String[] parts = lines.get(i).split("\t", -1);
+                if (parts.length != 6) throw new IllegalArgumentException("Malformed queue record");
+                String id = parts[0];
+                String category = parts[1];
+                if (!LabDeliveryGuard.validId(id) || records.containsKey(id)) {
+                    throw new IllegalArgumentException("Invalid or duplicate UUID");
+                }
+                if (!("SAFE".equals(category) || "SOS_EXPLICIT".equals(category) ||
+                      "OTHERS_AFFECTED".equals(category) || "CANNOT_DETERMINE".equals(category))) {
+                    throw new IllegalArgumentException("Invalid status category");
+                }
+                long createdAt = Long.parseLong(parts[2]);
+                long expiresAt = Long.parseLong(parts[3]);
+                if (createdAt < 0 || expiresAt < createdAt ||
+                    expiresAt - createdAt < 1000L || expiresAt - createdAt > 86400000L) {
+                    throw new IllegalArgumentException("Invalid lifetime");
+                }
+                Status status = Status.valueOf(parts[4]);
+                String payload = parts[5];
+                if (status == Status.QUEUED) {
+                    if (payload.isEmpty() || payload.length() > 1024 ||
+                        payload.indexOf('\n') >= 0 || payload.indexOf('\r') >= 0 ||
+                        payload.indexOf('\t') >= 0) {
+                        throw new IllegalArgumentException("Invalid active payload");
+                    }
+                } else if (!payload.isEmpty()) {
+                    throw new IllegalArgumentException("Terminal payload must be empty");
+                }
+                if (records.size() >= MAX_ENTRIES) {
+                    throw new IllegalArgumentException("Queue exceeds capacity");
+                }
+                records.put(id, new Record(id, category, createdAt, expiresAt, status, payload));
+            }
+        } catch (IllegalArgumentException ex) {
+            records.clear();
+            throw new IOException("Invalid lab queue; STOP & CLEAR required", ex);
         }
         if (expireDue(nowMs)) persistToDisk();
     }
