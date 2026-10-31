@@ -1,0 +1,41 @@
+name: Technical Pilot, Academic Benchmark, or Grant Consortium Inquiry
+description: Propose a controlled two-phone/multi-node validation pilot, academic RF collaboration, or EU/NL grant partnership (Horizon Europe, NLnet, RVO).
+title: "[PILOT / CONSORTIUM]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reviewing **OEP — Offline Emergency Protocol (`abrahamhl/civic-relay`)**.
+        *Safety note: OEP is an open-source research prototype (`EXERCISE_ONLY`), not an operational emergency service or 112 channel. Please do not include sensitive personal or operational emergency data.*
+  - type: dropdown
+    id: partner-type
+    attributes:
+      label: Organization / Partner Type
+      options:
+        - University / Academic Research Lab (RF, Distributed Systems, Crisis Informatics)
+        - Civil Protection / First-Responder Agency / Safety Region (Veiligheidsregio / Protección Civil)
+        - Public Grant Evaluator / Foundation (NLnet, Horizon Europe, RVO, NWO)
+        - Telecom / Edge Gateway / Open-Source Maintainer
+        - Other Technical Collaborator
+    validations:
+      required: true
+  - type: dropdown
+    id: collaboration-scope
+    attributes:
+      label: Proposed Collaboration or Review Scope
+      options:
+        - Milestone M1: Two-Phone Offline Benchmark Validation (30-trial protocol)
+        - Milestone M2: Open AOSP BLE / Wi-Fi Direct Transport & Cryptographic Receipts
+        - Milestone M3: Controlled Tabletop / Non-Emergency Field Exercise (10-20 nodes)
+        - Horizon Europe / RVO / NLnet Consortium or Letter of Interest (LOI)
+        - Technical Due Diligence / Security Audit Feedback
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context & Proposed Next Step (e.g., 20-minute technical call)
+      placeholder: Briefly describe your institution/group, the scenario or call of interest, and how we can coordinate a short technical exchange.
+    validations:
+      required: true

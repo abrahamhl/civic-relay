@@ -1,4 +1,6 @@
 name: Investor microsite checks
+permissions:
+  contents: read
 
 on:
   pull_request:
