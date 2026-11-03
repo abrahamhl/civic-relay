@@ -1,0 +1,91 @@
+1
+00:00:00,800 --> 00:00:10,500
+Cuando la red cae, el mensaje no debería morir. Esto es Civic Relay: su ingeniería, su arquitectura y su estado real.
+
+2
+00:00:11,200 --> 00:00:19,000
+En un apagón, una inundación o un sismo, las antenas caen y las aplicaciones fallan en silencio, agotando la batería en reintentos inútiles.
+
+3
+00:00:19,000 --> 00:00:27,500
+Y lo más peligroso: el silencio se malinterpreta. Un teléfono que no responde no es una víctima confirmada.
+
+4
+00:00:28,200 --> 00:00:37,000
+Civic Relay es una capa europea, abierta y con consentimiento, para coordinar mensajes cuando la conectividad se degrada.
+
+5
+00:00:37,000 --> 00:00:44,500
+No sustituye al 112, ni a los operadores, ni activa radios sin permiso. Coordina lo que ya está autorizado.
+
+6
+00:00:45,200 --> 00:00:59,500
+Tres compromisos de ingeniería: verdad verificable, continuidad honesta y soberanía gradual. Si no hay ruta, el sistema dice «sin ruta». Nunca promete una entrega que no ocurrió.
+
+7
+00:01:00,200 --> 00:01:14,000
+La arquitectura implementada sigue ocho etapas: evento, zona, estado humano, consentimiento, mensaje, ruta, confirmación y evidencia. Cada una vive en un módulo concreto del repositorio.
+
+8
+00:01:14,000 --> 00:01:29,500
+Las alertas sin verificador de autoridad fallan cerradas. El silencio queda como desconocido, nunca como herido. Y «paquete enviado» jamás se presenta como «persona rescatada».
+
+9
+00:01:30,200 --> 00:01:49,500
+La arquitectura objetivo separa ocho núcleos con fronteras de confianza: protocolo, orquestación de transportes, custodia durable, situación y previsión, planificación satelital, confianza institucional, gemelo digital e interfaces humanas. Cada uno se valida por separado.
+
+10
+00:01:50,200 --> 00:02:03,000
+Escenario de referencia: desde Arnhem, en Países Bajos, Abraham escribe a Ismael, en San Martín de Valdeiglesias, que no tiene cobertura. El mensaje se cifra, se persiste y queda en custodia de un gateway autorizado.
+
+11
+00:02:03,000 --> 00:02:16,500
+Sólo cuando existe una ruta real hasta el dispositivo de Ismael se emite la confirmación de destino. Y si no existe, el mensaje no llega, sigue cifrado en cola y caduca. La interfaz lo dice.
+
+12
+00:02:17,200 --> 00:02:31,000
+Lo que ya está construido es medible por máquina: noventa y ocho de noventa y ocho tests del laboratorio en verde, ochocientos diez escenarios simulados sin violar invariantes, y quince tareas automatizadas en un navegador real.
+
+13
+00:02:31,000 --> 00:02:41,500
+Seis flujos de integración continua, con inventario de dependencias y análisis de vulnerabilidades. Unas veintidós mil líneas de código, en tres idiomas, con licencia MIT.
+
+14
+00:02:42,200 --> 00:02:55,000
+El laboratorio Android usa Nearby Connections con emparejamiento confirmado, claves efímeras P-256, cola en disco y confirmaciones firmadas. Si algo falla, se bloquea. Al pulsar STOP, borra y regenera la clave.
+
+15
+00:02:55,000 --> 00:03:01,500
+Compila y pasa sus tests, pero la entrega física entre dos teléfonos aún no se ha medido.
+
+16
+00:03:02,200 --> 00:03:13,000
+Este es el estado real. Simulación, cola, política y web: probados. Android: compilado, pendiente de prueba física. Malla real y satélite: no validados. Integración con el 112: no existe.
+
+17
+00:03:13,000 --> 00:03:23,500
+Madurez global: TRL tres. Puntuación interna provisional: cincuenta y cuatro sobre cien. La validación física vale veinte puntos, y hoy tiene cero. Eso es exactamente lo que financia la siguiente fase.
+
+18
+00:03:24,200 --> 00:03:41,500
+La visión completa tiene veinte módulos: del sobre universal a la planificación satelital, sensores, gemelo digital o drones autorizados. La ambición no se recorta; se etiqueta con su estado de verdad.
+
+19
+00:03:42,200 --> 00:03:52,000
+La hoja de ruta avanza gate a gate, desbloqueada por evidencia y no por pantallas. Primero, una sola verdad. Después, protocolo y custodia.
+
+20
+00:03:52,000 --> 00:04:01,500
+El siguiente hito financiable: revisión de seguridad independiente y validación física con dos teléfonos, al menos treinta intentos registrados. Después, tres nodos y un gateway.
+
+21
+00:04:02,200 --> 00:04:23,500
+Para desarrolladores, un monorepo abierto y reproducible. Para clientes, auditoría de resiliencia sin dependencia de un proveedor cerrado. Para entidades, pilotos controlados sin tocar tráfico real del 112. Y para inversores, un riesgo técnico declarado, donde cada euro compra evidencia.
+
+22
+00:04:24,200 --> 00:04:41,500
+Tres escenarios ilustrativos: cincuenta mil euros para la validación física, ciento ochenta mil para un piloto institucional, y hasta medio millón como paquete de trabajo en un consorcio europeo. El núcleo sigue abierto; la sostenibilidad llega con auditoría e integración.
+
+23
+00:04:42,200 --> 00:04:57,500
+Buscamos socios para convertir evidencia de laboratorio en evidencia de campo. Civic Relay. Prototipo de investigación: no usar en emergencias reales.

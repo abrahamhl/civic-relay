@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<title>Civic Relay · OEP — Vídeo de ingeniería y estado real</title>
+<!--
+  Película determinista 1920×1080. Todo el movimiento depende de window.seek(t):
+  sin animaciones CSS ni temporizadores, así cada fotograma es reproducible.
+  Fuente de los datos: docs/audits/LATEST_ENGINEERING_STATUS.md, docs/investor/*,
+  docs/product/CIVIC_RELAY_VISION_MAESTRA_2026-10-25.md, evidence/*. Ver SOURCES.md.
+-->
+<script src="land.js"></script>
+<style>
+  :root{
+    --bg:#05090c; --panel:#0a1016; --panel2:#0e1821; --line:#203240;
+    --text:#f2f4f4; --muted:#9fb2bc; --dim:#5f7682;
+    --coral:#ff7756; --ice:#91d7e8; --emerald:#34d399; --amber:#fbbf24; --violet:#b9a3ff; --red:#ff5b6e;
+    --mono:"DejaVu Sans Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--text);
+    font-family:Inter,"Inter Display",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  #bg{position:absolute;inset:0}
+  .scene{position:absolute;inset:0;padding:110px 130px 100px;opacity:0;display:flex;flex-direction:column;justify-content:center}
+  [data-t]{opacity:0}
+  .kicker{font-family:var(--mono);font-size:22px;letter-spacing:.18em;text-transform:uppercase;color:var(--coral);margin-bottom:26px}
+  h1{font-size:104px;line-height:1.02;font-weight:800;letter-spacing:-.035em;margin:0}
+  h2{font-size:72px;line-height:1.05;font-weight:800;letter-spacing:-.03em;margin:0 0 34px}
+  h3{font-size:34px;font-weight:700;margin:0 0 12px;letter-spacing:-.01em}
+  p{margin:0}
+  .lead{font-size:36px;line-height:1.35;color:var(--muted);max-width:1500px}
+  .ice{color:var(--ice)} .coral{color:var(--coral)} .em{color:var(--emerald)} .amb{color:var(--amber)} .mut{color:var(--muted)}
+  .mono{font-family:var(--mono)}
+  .card{background:linear-gradient(180deg,rgba(14,24,33,.92),rgba(10,16,22,.92));border:1px solid var(--line);border-radius:22px;padding:34px 36px}
+  .grid{display:grid;gap:26px}
+  .chip{display:inline-block;font-family:var(--mono);font-size:20px;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:#0b141c;color:var(--ice);margin:0 10px 12px 0}
+  .badge{display:inline-block;font-family:var(--mono);font-size:17px;font-weight:700;letter-spacing:.06em;padding:6px 11px;border-radius:8px}
+  .b-impl{background:rgba(52,211,153,.14);color:var(--emerald);border:1px solid rgba(52,211,153,.45)}
+  .b-sim{background:rgba(145,215,232,.12);color:var(--ice);border:1px solid rgba(145,215,232,.45)}
+  .b-pend{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.5)}
+  .b-no{background:rgba(255,91,110,.12);color:var(--red);border:1px solid rgba(255,91,110,.5)}
+  .b-x{background:rgba(185,163,255,.12);color:var(--violet);border:1px solid rgba(185,163,255,.5)}
+
+  /* Chrome persistente */
+  #chapter{position:absolute;top:44px;left:130px;font-family:var(--mono);font-size:19px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase}
+  #chapter b{color:var(--coral);font-weight:700;margin-right:14px}
+  #brand{position:absolute;top:40px;right:130px;font-weight:800;font-size:24px;letter-spacing:-.01em}
+  #brand span{color:var(--coral)}
+  #foot{position:absolute;bottom:40px;left:130px;right:130px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:16px;color:var(--dim);letter-spacing:.04em}
+  #prog{position:absolute;bottom:0;left:0;height:5px;background:linear-gradient(90deg,var(--coral),var(--ice));width:0}
+
+  /* S5 pipeline */
+  .pipe{position:relative;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:18px;margin-top:40px}
+  .stage{background:#0b141c;border:1px solid var(--line);border-radius:18px;padding:26px 20px;min-height:360px}
+  .stage .n{font-family:var(--mono);font-size:18px;color:var(--dim)}
+  .stage .t{font-size:29px;font-weight:800;margin:10px 0 12px;letter-spacing:-.01em}
+  .stage .d{font-size:21px;line-height:1.4;color:var(--muted)}
+  .stage .f{font-family:var(--mono);font-size:15px;color:var(--ice);margin-top:14px;word-break:break-all}
+  #packet{position:absolute;top:-34px;width:22px;height:22px;border-radius:50%;background:var(--coral);box-shadow:0 0 30px 8px rgba(255,119,86,.55)}
+  .pipe-note{margin-top:46px;font-size:30px;color:var(--muted)}
+
+  /* S6 cores */
+  .cores{grid-template-columns:repeat(4,1fr)}
+  .core{padding:28px 28px 26px;min-height:200px}
+  .core .i{font-family:var(--mono);color:var(--coral);font-size:18px}
+  .core h3{font-size:30px;margin-top:8px}
+  .core p{font-size:20px;line-height:1.4;color:var(--muted)}
+
+  /* S7 mapa */
+  #map{position:absolute;left:110px;top:200px;width:1000px;height:760px;border-radius:24px;border:1px solid var(--line);background:#071018}
+  .s7r{position:absolute;left:1170px;top:200px;width:630px}
+  .state{display:flex;align-items:center;gap:18px;padding:18px 22px;border:1px solid var(--line);border-radius:14px;background:#0b141c;margin-bottom:14px;font-size:24px}
+  .state .dot{width:16px;height:16px;border-radius:50%;background:var(--dim);flex:none}
+  .state code{font-family:var(--mono);font-size:20px;color:var(--ice);margin-left:auto}
+
+  /* S8 números */
+  .nums{grid-template-columns:repeat(4,1fr)}
+  .num{padding:30px 30px}
+  .num .v{font-size:84px;font-weight:800;letter-spacing:-.04em;line-height:1}
+  .num .l{font-size:21px;color:var(--muted);margin-top:12px;line-height:1.35}
+  .num .s{font-family:var(--mono);font-size:14px;color:var(--dim);margin-top:12px}
+
+  /* S10 tabla */
+  table{border-collapse:collapse;width:100%;font-size:24px}
+  td{padding:12px 18px;border-bottom:1px solid var(--line);vertical-align:middle}
+  td:first-child{color:var(--text);font-weight:600}
+  td.f{font-family:var(--mono);font-size:16px;color:var(--dim)}
+
+  /* S11 módulos */
+  .mods{grid-template-columns:repeat(5,1fr);gap:16px}
+  .mod{padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:#0b141c;min-height:128px}
+  .mod .id{font-family:var(--mono);font-size:17px;color:var(--coral)}
+  .mod .nm{font-size:19px;line-height:1.28;margin:6px 0 10px;font-weight:600}
+  .mod .tags span{font-family:var(--mono);font-size:14px;font-weight:700;padding:3px 7px;border-radius:6px;margin-right:5px}
+
+  /* S12 roadmap */
+  .road{position:relative;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:16px;margin-top:70px}
+  .road .g{position:relative;padding:24px 20px 70px;border-radius:16px;border:1px solid var(--line);background:#0b141c;min-height:380px}
+  .road .g .k{font-family:var(--mono);font-size:30px;font-weight:800}
+  .road .g h4{font-size:25px;margin:10px 0 10px;line-height:1.2}
+  .road .g p{font-size:19px;line-height:1.35;color:var(--muted)}
+  .road .g .st{position:absolute;bottom:18px;left:18px}
+  #roadline{position:absolute;top:-30px;left:0;height:4px;background:linear-gradient(90deg,var(--emerald),var(--amber));border-radius:2px}
+
+  /* S13 públicos */
+  .aud{grid-template-columns:repeat(4,1fr)}
+  .aud .card{min-height:600px}
+  .aud .ico{font-size:54px;margin-bottom:12px}
+  .aud ul{margin:16px 0 0;padding-left:24px;font-size:25px;line-height:1.45;color:var(--muted)}
+  .aud li{margin-bottom:10px}
+
+  /* S14 fondos */
+  .env{grid-template-columns:repeat(3,1fr)}
+  .env .v{font-size:76px;font-weight:800;letter-spacing:-.04em}
+  .env p{font-size:22px;line-height:1.4;color:var(--muted);margin-top:10px}
+</style>
+</head>
+<body>
+<canvas id="bg" width="1920" height="1080"></canvas>
+<div id="chapter"><b>00</b><span id="chapname">Civic Relay · OEP</span></div>
+<div id="brand">Civic Relay <span>·</span> OEP</div>
+
+<!-- S1 · Apertura -->
+<section class="scene" data-start="0" data-end="11" data-ch="00" data-name="Apertura" >
+  <div class="kicker" data-t="0.4">Offline Emergency Protocol</div>
+  <h1 data-t="1.0">Cuando la red cae,</h1>
+  <h1 data-t="2.4" class="coral">el mensaje no debería morir.</h1>
+  <p class="lead" data-t="5.2" style="margin-top:46px">Ingeniería, arquitectura y <b style="color:var(--text)">estado real verificado</b> de Civic Relay.<br>Para desarrolladores, clientes, entidades e inversores.</p>
+</section>
+
+<!-- S2 · Problema -->
+<section class="scene" data-start="11" data-end="28" data-ch="01" data-name="El problema">
+  <div class="kicker" data-t="0.2">El problema</div>
+  <h2 data-t="0.5">Las antenas caen. Las apps fallan <span class="coral">en silencio</span>.</h2>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-top:30px">
+    <div class="card" data-t="2.2"><div style="font-size:56px">⚡</div><h3>Apagones en cascada</h3><p class="mut" style="font-size:24px;line-height:1.4">Estaciones base y backhaul sin energía. La app de mensajería normal reintenta y agota la batería.</p></div>
+    <div class="card" data-t="3.4"><div style="font-size:56px">🌊</div><h3>Inundaciones e incendios</h3><p class="mut" style="font-size:24px;line-height:1.4">Cobertura intermitente. No hay forma estructurada de dejar un estado <span class="mono ice">SAFE</span> o <span class="mono coral">SOS</span> que sobreviva al corte.</p></div>
+    <div class="card" data-t="4.6"><div style="font-size:56px">🏚️</div><h3>Sismos y edificios</h3><p class="mut" style="font-size:24px;line-height:1.4">Los teléfonos cercanos tienen Bluetooth y Wi-Fi, pero no existe una capa abierta y con consentimiento que los coordine.</p></div>
+  </div>
+  <p class="lead" data-t="7.5" style="margin-top:48px">Y lo más peligroso: <b style="color:var(--text)">el silencio se malinterpreta.</b> Un dispositivo que no responde <span class="mono amb">UNKNOWN</span> no es una víctima confirmada.</p>
+</section>
+
+<!-- S3 · Qué es -->
+<section class="scene" data-start="28" data-end="45" data-ch="02" data-name="Qué es">
+  <div class="kicker" data-t="0.2">Qué es Civic Relay</div>
+  <h2 data-t="0.5" style="max-width:1600px">Una capa europea, abierta y <span class="ice">con consentimiento</span> para coordinar mensajes cuando la conectividad se degrada.</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:20px">
+    <div class="card" data-t="3.0" style="border-color:rgba(52,211,153,.45)">
+      <h3 class="em">Es</h3>
+      <ul style="font-size:26px;line-height:1.55;color:var(--muted);margin:10px 0 0;padding-left:26px">
+        <li>Protocolo <b style="color:var(--text)">agnóstico de transporte</b>: proximidad, IP, gateways y, en el futuro, NTN autorizado</li>
+        <li>Cola <b style="color:var(--text)">store-and-forward</b> con TTL, deduplicación y anti-replay</li>
+        <li>ACK tipado: nunca confunde «enviado» con «entregado»</li>
+        <li>100 % open source · licencia MIT</li>
+      </ul>
+    </div>
+    <div class="card" data-t="4.6" style="border-color:rgba(255,91,110,.45)">
+      <h3 style="color:var(--red)">No es</h3>
+      <ul style="font-size:26px;line-height:1.55;color:var(--muted);margin:10px 0 0;padding-left:26px">
+        <li>Un sustituto del 112 ni de los avisos oficiales</li>
+        <li>Un operador de telecomunicaciones ni una constelación de satélites</li>
+        <li>Un sistema que active radios sin permiso del usuario</li>
+        <li>Un servicio de emergencias operativo hoy</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- S4 · Compromisos -->
+<section class="scene" data-start="45" data-end="60" data-ch="03" data-name="Principios de diseño">
+  <div class="kicker" data-t="0.2">Tres compromisos de ingeniería</div>
+  <h2 data-t="0.5">La verdad es una <span class="coral">característica del producto</span>.</h2>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-top:30px">
+    <div class="card" data-t="2.0"><div class="mono coral" style="font-size:22px">01</div><h3 style="font-size:38px;margin-top:10px">Verdad verificable</h3><p class="mut" style="font-size:25px;line-height:1.42">Un ACK de vecino no es un ACK de coordinador. Una predicción no es una medición. Un satélite visible no garantiza conectividad.</p></div>
+    <div class="card" data-t="3.6"><div class="mono coral" style="font-size:22px">02</div><h3 style="font-size:38px;margin-top:10px">Continuidad honesta</h3><p class="mut" style="font-size:25px;line-height:1.42">Conservar y reintentar cuando aparezca una ruta real. Si no existe, mostrar <span class="mono amb">NO_ROUTE</span> / <span class="mono amb">PENDING</span>, nunca prometer entrega.</p></div>
+    <div class="card" data-t="5.2"><div class="mono coral" style="font-size:22px">03</div><h3 style="font-size:38px;margin-top:10px">Soberanía gradual</h3><p class="mut" style="font-size:25px;line-height:1.42">Interfaces abiertas y testables, roles claros y adaptadores autorizados. Sin confundir la dependencia actual con independencia ya lograda.</p></div>
+  </div>
+</section>
+
+<!-- S5 · Pipeline -->
+<section class="scene" data-start="60" data-end="90" data-ch="04" data-name="Arquitectura · flujo de decisión" data-fx="pipe">
+  <div class="kicker" data-t="0.2">Arquitectura implementada · flujo de 8 etapas</div>
+  <h2 data-t="0.5">Del evento a la evidencia, <span class="ice">cada paso es auditable</span>.</h2>
+  <div class="pipe" data-t="1.4">
+    <div id="packet"></div>
+    <div class="stage"><div class="n">01</div><div class="t">Evento</div><div class="d">Alerta CAP candidata. Falla cerrado si no hay verificador de autoridad.</div><div class="f">emergency-policy.mjs</div></div>
+    <div class="stage"><div class="n">02</div><div class="t">Zona</div><div class="d">Polígono cerrado y ventana de validez.</div><div class="f">emergency-policy.mjs</div></div>
+    <div class="stage"><div class="n">03</div><div class="t">Estado humano</div><div class="d">Sólo acciones explícitas. Silencio = UNKNOWN, nunca herido.</div><div class="f">human-safety-panel.tsx</div></div>
+    <div class="stage"><div class="n">04</div><div class="t">Consentimiento</div><div class="d">Opt-in, permisos del SO y perfil de batería.</div><div class="f">energyPolicy()</div></div>
+    <div class="stage"><div class="n">05</div><div class="t">Mensaje</div><div class="d">Cola acotada, ≤4 KB, TTL, dedup, anti-replay.</div><div class="f">store-forward.mjs</div></div>
+    <div class="stage"><div class="n">06</div><div class="t">Ruta</div><div class="d">Puntúa adaptadores; Dijkstra ponderado que evita nodos con batería crítica.</div><div class="f">emergency-routing.mjs</div></div>
+    <div class="stage"><div class="n">07</div><div class="t">ACK</div><div class="d">Exige messageId, par aprobado y challenge aleatorio antes del TTL.</div><div class="f">LabDeliveryGuard.java</div></div>
+    <div class="stage"><div class="n">08</div><div class="t">Evidencia</div><div class="d">JSON / CSV reproducible con semilla y aviso de procedencia.</div><div class="f">oep-evidence-run.mjs</div></div>
+  </div>
+  <p class="pipe-note" data-t="20">Estados separados sin ambigüedad: <span class="mono amb">QUEUED</span> → <span class="mono ice">FORWARDED_UNCONFIRMED</span> → <span class="mono em">ACK</span>. «Paquete enviado» nunca se presenta como «persona rescatada».</p>
+</section>
+
+<!-- S6 · Arquitectura objetivo -->
+<section class="scene" data-start="90" data-end="110" data-ch="05" data-name="Arquitectura objetivo">
+  <div class="kicker" data-t="0.2">Arquitectura objetivo · 8 núcleos con fronteras de confianza</div>
+  <h2 data-t="0.5">Modular por diseño: cada núcleo se valida <span class="coral">por separado</span>.</h2>
+  <div class="grid cores">
+    <div class="card core" data-t="1.6"><div class="i">01</div><h3>Protocol Core</h3><p>Esquema canónico, tipos de mensaje, TTL, prioridad, firma y ACK por nivel.</p></div>
+    <div class="card core" data-t="2.2"><div class="i">02</div><h3>Transport Orchestrator</h3><p>Adaptadores intercambiables que reportan capacidad medida. No pueden inventar ACK.</p></div>
+    <div class="card core" data-t="2.8"><div class="i">03</div><h3>Durable Custody</h3><p>Colas transaccionales, recibos, expiración y tombstones anti-replay.</p></div>
+    <div class="card core" data-t="3.4"><div class="i">04</div><h3>Situation &amp; Forecast</h3><p>Ingesta con fuente, fecha y confianza. La autoridad decide la alerta pública.</p></div>
+    <div class="card core" data-t="4.0"><div class="i">05</div><h3>Satellite Planner</h3><p>Ventanas orbitales con incertidumbre; NTN sólo vía pasarelas autorizadas.</p></div>
+    <div class="card core" data-t="4.6"><div class="i">06</div><h3>Institutional Trust</h3><p>CAP 1.2 e interoperabilidad tras convenios. Nunca suplanta 112 ni EUCCS.</p></div>
+    <div class="card core" data-t="5.2"><div class="i">07</div><h3>GIS / Digital Twin</h3><p>Sectores, nodos consentidos y edificios: inferido ≠ confirmado.</p></div>
+    <div class="card core" data-t="5.8"><div class="i">08</div><h3>Human Interfaces</h3><p>Familia, voluntariado, centro y laboratorio con estados inequívocos.</p></div>
+  </div>
+  <p class="lead" data-t="9" style="margin-top:34px;font-size:30px">Estados de entrega por nivel: <span class="mono amb">QUEUED</span> · <span class="mono ice">HOP_ACK</span> · <span class="mono ice">GATEWAY_ACK</span> · <span class="mono em">DESTINATION_ACK</span> · <span class="mono">READ</span> · <span class="mono" style="color:var(--red)">EXPIRED</span></p>
+</section>
+
+<!-- S7 · Escenario Arnhem → San Martín -->
+<section class="scene" data-start="110" data-end="137" data-ch="06" data-name="Escenario S01" data-fx="map">
+  <div class="kicker" data-t="0.2" style="position:absolute;top:110px;left:130px">Escenario de referencia S01 · objetivo de diseño</div>
+  <canvas id="map" width="1000" height="760" data-t="0.6"></canvas>
+  <div class="s7r">
+    <h3 data-t="1.0" style="font-size:40px;line-height:1.15">Arnhem (NL) → San Martín de Valdeiglesias (ES)</h3>
+    <p class="mut" data-t="1.6" style="font-size:22px;margin:10px 0 24px">«Ismael, ¿qué tal estás?» — Ismael no tiene cobertura celular.</p>
+    <div class="state" id="st1"><span class="dot"></span>Cifrado y persistido en origen<code>QUEUED</code></div>
+    <div class="state" id="st2"><span class="dot"></span>Custodia en gateway autorizado<code>GATEWAY_ACK</code></div>
+    <div class="state" id="st3"><span class="dot"></span>Buscando ruta real de recepción<code>PENDING</code></div>
+    <div class="state" id="st4"><span class="dot"></span>Entregado al dispositivo de Ismael<code>DESTINATION_ACK</code></div>
+    <div class="card" id="neg" style="margin-top:22px;border-color:rgba(255,91,110,.5);padding:22px 26px">
+      <div class="mono" style="color:var(--red);font-size:19px;letter-spacing:.08em">PRUEBA NEGATIVA OBLIGATORIA</div>
+      <p style="font-size:22px;line-height:1.4;margin-top:8px">Sin hardware ni enlace compatible cerca de Ismael, el mensaje <b>no llega</b>: sigue cifrado, en cola, y caduca. <span class="mono amb">NO_ROUTE</span> — y la interfaz lo dice.</p>
+    </div>
+  </div>
+</section>
+
+<!-- S8 · Ingeniería construida -->
+<section class="scene" data-start="137" data-end="162" data-ch="07" data-name="Ingeniería construida" data-fx="nums">
+  <div class="kicker" data-t="0.2">Lo que ya está construido y medido por máquina</div>
+  <h2 data-t="0.5">Ingeniería real, <span class="em">reproducible</span> desde el repositorio.</h2>
+  <div class="grid nums">
+    <div class="card num" data-t="1.4"><div class="v em" data-count="98" data-suffix="/98">0</div><div class="l">tests del laboratorio en verde</div><div class="s">node --test · commit 4c310f7 · 03-11-2026</div></div>
+    <div class="card num" data-t="2.0"><div class="v em" data-count="810" data-suffix="">0</div><div class="l">escenarios sintéticos barridos con <b style="color:var(--text)">0</b> violaciones de invariantes</div><div class="s">oep-evidence-run.mjs · SIMULATED_ONLY</div></div>
+    <div class="card num" data-t="2.6"><div class="v ice" data-count="15" data-suffix="/15">0</div><div class="l">tareas automatizadas en Chromium real (ciudadano, coordinador, móvil, teclado…)</div><div class="s">evidence/browser-release · 24-10-2026</div></div>
+    <div class="card num" data-t="3.2"><div class="v ice" data-count="26" data-suffix="">0</div><div class="l">tests del núcleo: entrega, dedup, TTL, cripto</div><div class="s">packages/core · manifest 25-10-2026</div></div>
+    <div class="card num" data-t="3.8"><div class="v" data-count="6" data-suffix="">0</div><div class="l">workflows de CI: build, Android, SCA + SBOM, Chromium QA, laboratorio</div><div class="s">.github/workflows</div></div>
+    <div class="card num" data-t="4.4"><div class="v" data-count="22" data-suffix="k">0</div><div class="l">líneas de código (TS, JS, Java, CSS) en monorepo pnpm</div><div class="s">apps · packages · investor-next · android</div></div>
+    <div class="card num" data-t="5.0"><div class="v" data-count="3" data-suffix="">0</div><div class="l">idiomas en la web pública: ES · EN · NL</div><div class="s">civic-relay-investor.vercel.app</div></div>
+    <div class="card num" data-t="5.6"><div class="v coral" data-count="20" data-suffix="">0</div><div class="l">módulos y 8 escenarios en el documento maestro de visión</div><div class="s">CR-VM-2026-10-25</div></div>
+  </div>
+  <div data-t="8" style="margin-top:30px">
+    <span class="chip">Next.js 16</span><span class="chip">React</span><span class="chip">Three.js</span><span class="chip">WebCrypto ECDSA P-256</span><span class="chip">WebRTC</span><span class="chip">Android Nearby Connections</span><span class="chip">Java · JVM tests</span><span class="chip">Ed25519 / X25519</span><span class="chip">CycloneDX SBOM</span><span class="chip">npm ci lockfile</span><span class="chip">GitHub Actions</span><span class="chip">Vercel</span>
+  </div>
+</section>
+
+<!-- S9 · Android y seguridad -->
+<section class="scene" data-start="162" data-end="182" data-ch="08" data-name="Laboratorio Android y seguridad" data-fx="proto">
+  <div class="kicker" data-t="0.2">Laboratorio Android Nearby · protocolo v3</div>
+  <h2 data-t="0.5">Recibos firmados y <span class="coral">fallo cerrado</span> por defecto.</h2>
+  <div class="grid" style="grid-template-columns:repeat(5,1fr);margin-top:26px" id="proto">
+    <div class="card" data-t="1.6"><div class="mono coral">1</div><h3 style="font-size:27px;margin-top:8px">Emparejamiento</h3><p class="mut" style="font-size:20px;line-height:1.4">El usuario confirma manualmente los dígitos de Nearby.</p></div>
+    <div class="card" data-t="2.4"><div class="mono coral">2</div><h3 style="font-size:27px;margin-top:8px">Clave efímera</h3><p class="mut" style="font-size:20px;line-height:1.4">Intercambio P-256 fijado por endpoint durante la sesión.</p></div>
+    <div class="card" data-t="3.2"><div class="mono coral">3</div><h3 style="font-size:27px;margin-top:8px">Cola en disco</h3><p class="mut" style="font-size:20px;line-height:1.4">Escritura antes del envío; corrupción o fallo bloquean nuevos envíos.</p></div>
+    <div class="card" data-t="4.0"><div class="mono coral">4</div><h3 style="font-size:27px;margin-top:8px">ACK firmado</h3><p class="mut" style="font-size:20px;line-height:1.4">ECDSA verificado antes del challenge; v2 sin firma se rechaza.</p></div>
+    <div class="card" data-t="4.8"><div class="mono coral">5</div><h3 style="font-size:27px;margin-top:8px">STOP</h3><p class="mut" style="font-size:20px;line-height:1.4">Revoca pares, borra el fichero y regenera la clave de sesión.</p></div>
+  </div>
+  <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:30px">
+    <div class="card" data-t="7"><div class="mono em" style="font-size:19px;letter-spacing:.08em">VERIFICADO</div><p style="font-size:24px;line-height:1.45;margin-top:10px">APK compilado en CI · tests JVM de corrupción, replay y rotación de claves · sólo payload sintético permitido.</p><div style="margin-top:14px"><span class="badge b-impl">BUILD_VERIFIED</span> <span class="badge b-impl">AUTOMATED_TESTED</span></div></div>
+    <div class="card" data-t="8.5"><div class="mono amb" style="font-size:19px;letter-spacing:.08em">PENDIENTE</div><p style="font-size:24px;line-height:1.45;margin-top:10px">Entrega física teléfono↔teléfono aún <b>no medida</b>. Sin cifrado en reposo. Sin identidad institucional.</p><div style="margin-top:14px"><span class="badge b-pend">PHYSICAL_TEST_PENDING</span></div></div>
+  </div>
+</section>
+
+<!-- S10 · Matriz de verdad -->
+<section class="scene" data-start="182" data-end="204" data-ch="09" data-name="Estado real">
+  <div class="kicker" data-t="0.2">Estado real · registro de evidencias</div>
+  <h2 data-t="0.5" style="margin-bottom:22px">Lo que existe, lo que es simulado <span class="amb">y lo que falta</span>.</h2>
+  <table>
+    <tr data-t="1.4"><td>Simulador de rutas 20–100 nodos con semilla</td><td><span class="badge b-impl">AUTOMATED_TESTED</span> <span class="badge b-sim">SIMULATED_ONLY</span></td><td class="f">emergency-routing.mjs</td></tr>
+    <tr data-t="2.0"><td>Store-and-forward: consentimiento, TTL, dedup, anti-replay</td><td><span class="badge b-impl">AUTOMATED_TESTED</span></td><td class="f">store-forward.mjs</td></tr>
+    <tr data-t="2.6"><td>Política CAP que falla cerrado · UNKNOWN ≠ herido</td><td><span class="badge b-impl">AUTOMATED_TESTED</span></td><td class="f">emergency-policy.mjs</td></tr>
+    <tr data-t="3.2"><td>Web trilingüe con laboratorio 3D y exportación de evidencia</td><td><span class="badge b-impl">BROWSER_TESTED</span></td><td class="f">investor-next/</td></tr>
+    <tr data-t="3.8"><td>Android Nearby de un salto con ACK firmado</td><td><span class="badge b-impl">BUILD_VERIFIED</span> <span class="badge b-pend">PHYSICAL_PENDING</span></td><td class="f">experimental/android-nearby</td></tr>
+    <tr data-t="4.4"><td>Malla multisalto real y gateway</td><td><span class="badge b-pend">NO VALIDADO</span></td><td class="f">gate G3</td></tr>
+    <tr data-t="5.0"><td>Enlace satelital NTN · RF/CSI tras paredes</td><td><span class="badge b-sim">SÓLO MODELO</span></td><td class="f">telecom-suite.mjs</td></tr>
+    <tr data-t="5.6"><td>Integración 112 / CAP institucional firmado</td><td><span class="badge b-no">NO EXISTE</span></td><td class="f">requiere convenio</td></tr>
+  </table>
+  <div class="grid" style="grid-template-columns:1fr 1fr 1.4fr;margin-top:30px">
+    <div class="card" data-t="8"><div class="v" style="font-size:66px;font-weight:800" class="amb"><span class="amb">TRL ≈ 3</span></div><p class="mut" style="font-size:20px;margin-top:6px">Madurez global de investigación (evaluación interna).</p></div>
+    <div class="card" data-t="9"><div style="font-size:66px;font-weight:800">54<span class="mut" style="font-size:36px">/100</span></div><p class="mut" style="font-size:20px;margin-top:6px">Rúbrica interna provisional. No es auditoría ni certificación.</p></div>
+    <div class="card" data-t="10" style="border-color:rgba(251,191,36,.45)"><p style="font-size:25px;line-height:1.45">Validación física y externa: <b class="amb">0 de 20 puntos</b>. Es exactamente lo que financia la siguiente fase.</p></div>
+  </div>
+</section>
+
+<!-- S11 · 20 módulos -->
+<section class="scene" data-start="204" data-end="222" data-ch="10" data-name="Catálogo de módulos" data-fx="mods">
+  <div class="kicker" data-t="0.2">Visión completa · 20 módulos con estado de verdad</div>
+  <h2 data-t="0.5" style="font-size:60px;margin-bottom:24px">La ambición no se recorta; <span class="ice">se etiqueta</span>.</h2>
+  <div class="grid mods" id="mods"></div>
+  <div data-t="9" style="margin-top:22px;display:flex;gap:28px;font-size:20px;color:var(--muted)">
+    <span><span class="badge b-impl">E</span> software existente</span><span><span class="badge b-sim">S</span> simulación</span><span><span class="badge b-pend">L</span> laboratorio físico no validado</span><span><span class="badge" style="background:rgba(159,178,188,.12);color:var(--muted);border:1px solid var(--line)">R</span> investigación futura</span><span><span class="badge b-x">X</span> requiere convenio, licencia u operador</span>
+  </div>
+</section>
+
+<!-- S12 · Hoja de ruta -->
+<section class="scene" data-start="222" data-end="242" data-ch="11" data-name="Hoja de ruta" data-fx="road">
+  <div class="kicker" data-t="0.2">Hoja de ruta · gates desbloqueados por evidencia, no por pantallas</div>
+  <h2 data-t="0.5">De la simulación al <span class="em">campo</span>, gate a gate.</h2>
+  <div class="road">
+    <div id="roadline"></div>
+    <div class="g" data-t="1.4" style="border-color:rgba(52,211,153,.5)"><div class="k em">G0</div><h4>Una sola verdad</h4><p>Documento maestro, requisitos trazables, claims exactos.</p><div class="st"><span class="badge b-impl">HECHO</span></div></div>
+    <div class="g" data-t="2.0" style="border-color:rgba(52,211,153,.35)"><div class="k em">G1</div><h4>Protocolo y custodia</h4><p>Sobre firmable, outbox durable, tests de tamper/replay.</p><div class="st"><span class="badge b-sim">EN CURSO</span></div></div>
+    <div class="g" data-t="2.6" style="border-color:rgba(251,191,36,.7);box-shadow:0 0 40px rgba(251,191,36,.18)"><div class="k amb">G2</div><h4>Dos móviles físicos</h4><p>Envío offline real y ACK de destinatario. ≥30 intentos registrados, incluidos fallos.</p><div class="st"><span class="badge b-pend">SIGUIENTE</span></div></div>
+    <div class="g" data-t="3.2"><div class="k">G3</div><h4>Tres nodos + gateway</h4><p>A→B→C sin Internet, disrupción reproducible, energía.</p></div>
+    <div class="g" data-t="3.8"><div class="k">G4</div><h4>Predicción y alertas</h4><p>SGP4 con datos orbitales reales, meteo e hidrología.</p></div>
+    <div class="g" data-t="4.4"><div class="k">G5</div><h4>Operador NTN</h4><p>Gateway satelital autorizado y recibo medido.</p></div>
+    <div class="g" data-t="5.0"><div class="k">G6</div><h4>Piloto institucional</h4><p>Convenio, DPIA, simulacro con protección civil.</p></div>
+    <div class="g" data-t="5.6"><div class="k">G7</div><h4>Extensiones reguladas</h4><p>Drones y alta resiliencia, en proyectos autorizados.</p></div>
+  </div>
+  <p class="lead" data-t="9" style="margin-top:40px;font-size:30px">Primer hito financiable: <b style="color:var(--text)">revisión de seguridad independiente + validación física con dos teléfonos</b>, después relay autenticado de tres nodos.</p>
+</section>
+
+<!-- S13 · Públicos -->
+<section class="scene" data-start="242" data-end="264" data-ch="12" data-name="Para quién">
+  <div class="kicker" data-t="0.2">Qué ofrece a cada actor</div>
+  <h2 data-t="0.5" style="margin-bottom:28px">Un mismo protocolo, <span class="coral">cuatro conversaciones</span>.</h2>
+  <div class="grid aud">
+    <div class="card" data-t="1.6"><div class="ico">🧑‍💻</div><h3>Desarrolladores</h3><ul><li>Monorepo MIT con tests reproducibles</li><li>Contratos de adaptador para nuevos transportes</li><li>Vectores y escenarios con semilla</li><li>Issues abiertos: seguridad, físico, release</li></ul></div>
+    <div class="card" data-t="2.6"><div class="ico">🏙️</div><h3>Clientes</h3><ul><li>Municipios, campus e infraestructuras críticas</li><li>Auditoría de resiliencia con simulación determinista</li><li>Integración en apps propias</li><li>Sin dependencia de un proveedor cerrado</li></ul></div>
+    <div class="card" data-t="3.6"><div class="ico">🏛️</div><h3>Entidades</h3><ul><li>Protección civil, universidades, telecos</li><li>Piloto controlado de 12 semanas, sin tráfico 112 real</li><li>Semántica humana estricta y trazabilidad</li><li>Consorcio europeo de I+D</li></ul></div>
+    <div class="card" data-t="4.6"><div class="ico">📈</div><h3>Inversores</h3><ul><li>Riesgo técnico declarado y medible por gates</li><li>Cada euro compra evidencia, no pantallas</li><li>Núcleo abierto + servicios de integración</li><li>Mercado de resiliencia y comunicaciones críticas en la UE</li></ul></div>
+  </div>
+</section>
+
+<!-- S14 · Financiación -->
+<section class="scene" data-start="264" data-end="282" data-ch="13" data-name="Financiación">
+  <div class="kicker" data-t="0.2">Escenarios de financiación · ilustrativos, no comprometidos</div>
+  <h2 data-t="0.5">Tres envolventes, <span class="ice">gates medibles</span>.</h2>
+  <div class="grid env">
+    <div class="card" data-t="1.6"><div class="mono mut" style="font-size:18px">ESCENARIO A · 6–9 MESES</div><div class="v">€50k</div><p><b style="color:var(--text)">TRL 3.5 → 4.5</b>. Validación con dos teléfonos (30+ intentos), adaptador BLE/Wi-Fi Aware, recibos firmados y auditoría de seguridad independiente.</p></div>
+    <div class="card" data-t="2.6"><div class="mono mut" style="font-size:18px">ESCENARIO B · 12 MESES</div><div class="v">€180k</div><p><b style="color:var(--text)">TRL 4 → 6</b>. SDK multisalto persistente, verificador CAP de sandbox, simulacro municipal con 20 terminales, DPIA y pentest externo.</p></div>
+    <div class="card" data-t="3.6"><div class="mono mut" style="font-size:18px">ESCENARIO C · 18–24 MESES</div><div class="v">€350–500k</div><p><b style="color:var(--text)">TRL 4 → 7</b>. Paquete de trabajo en consorcio europeo: interoperabilidad transfronteriza y gateways LoRa / Wi-Fi municipal / testbed NTN.</p></div>
+  </div>
+  <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:28px">
+    <div class="card" data-t="6"><h3 style="font-size:28px">Modelo de sostenibilidad (post-TRL 6)</h3><p class="mut" style="font-size:22px;line-height:1.45">Protocolo y simulador de referencia MIT · suite de simulación y auditoría de resiliencia B2G/B2B · ingeniería de integración para operadores, municipios y OEM.</p></div>
+    <div class="card" data-t="7.5" style="border-color:rgba(251,191,36,.45)"><h3 style="font-size:28px" class="amb">Disciplina financiera</h3><p class="mut" style="font-size:22px;line-height:1.45">Cifras de planificación, no presupuestos validados. Sin capex satelital especulativo. Cada partida requiere cotización, entidad legal y criterio de aceptación observable.</p></div>
+  </div>
+</section>
+
+<!-- S15 · Cierre -->
+<section class="scene" data-start="282" data-end="298" data-ch="14" data-name="Únete" >
+  <div class="kicker" data-t="0.3">Buscamos socios</div>
+  <h1 data-t="0.8" style="font-size:88px">Convirtamos evidencia de laboratorio<br>en <span class="em">evidencia de campo</span>.</h1>
+  <div data-t="3.0" style="margin-top:54px;display:flex;gap:30px">
+    <div class="card" style="padding:26px 34px"><div class="mono mut" style="font-size:17px">WEB · ES / EN / NL</div><div style="font-size:34px;font-weight:700;margin-top:6px" class="ice">civic-relay-investor.vercel.app</div></div>
+    <div class="card" style="padding:26px 34px"><div class="mono mut" style="font-size:17px">CÓDIGO Y EVIDENCIAS · MIT</div><div style="font-size:34px;font-weight:700;margin-top:6px">github.com/abrahamhl/civic-relay</div></div>
+  </div>
+  <p data-t="4.5" style="margin-top:40px;font-size:28px;color:var(--muted)">Abraham Haddioui · fundador · AI-native product engineer</p>
+  <p data-t="6.5" class="mono" style="margin-top:40px;font-size:18px;color:var(--dim);line-height:1.6;max-width:1600px">Prototipo de investigación. No usar en emergencias reales. Sin integración con 112, satélites ni avales institucionales. Desarrollo asistido por IA con revisión humana. Datos a 03-11-2026, commit 4c310f7.</p>
+</section>
+
+<div id="foot"><span>Prototipo de investigación · TRL ≈ 3 · No usar en emergencias reales</span><span id="tc">00:00</span></div>
+<div id="prog"></div>
+
+<script>
+const DURATION = 298;
+const W = 1920, H = 1080;
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const ease = x => 1 - Math.pow(1 - clamp(x), 3);
+const easeIO = x => { x = clamp(x); return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3) / 2; };
+const scenes = [...document.querySelectorAll('.scene')];
+
+/* ---------- Fondo: red de nodos determinista ---------- */
+const bg = document.getElementById('bg').getContext('2d');
+function rng(seed){ return () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }; }
+const R = rng(20261025);
+const NODES = Array.from({length: 70}, () => ({x: R()*W, y: R()*H, vx: (R()-.5)*14, vy: (R()-.5)*10, p: R()*6.28}));
+function drawBg(t){
+  const g = bg.createRadialGradient(W*.78, H*.18, 50, W*.6, H*.5, W*.9);
+  g.addColorStop(0, '#11293a'); g.addColorStop(.55, '#071018'); g.addColorStop(1, '#05090c');
+  bg.fillStyle = g; bg.fillRect(0, 0, W, H);
+  bg.strokeStyle = 'rgba(145,215,232,0.035)'; bg.lineWidth = 1;
+  for (let x = 0; x < W; x += 80){ bg.beginPath(); bg.moveTo(x, 0); bg.lineTo(x, H); bg.stroke(); }
+  for (let y = 0; y < H; y += 80){ bg.beginPath(); bg.moveTo(0, y); bg.lineTo(W, y); bg.stroke(); }
+  const pts = NODES.map(n => ({x: ((n.x + n.vx*t) % W + W) % W, y: ((n.y + n.vy*t) % H + H) % H, p: n.p}));
+  for (let i = 0; i < pts.length; i++) for (let j = i+1; j < pts.length; j++){
+    const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y, d = Math.hypot(dx, dy);
+    if (d < 190){ bg.strokeStyle = `rgba(145,215,232,${0.09*(1-d/190)})`; bg.beginPath(); bg.moveTo(pts[i].x, pts[i].y); bg.lineTo(pts[j].x, pts[j].y); bg.stroke(); }
+  }
+  for (const p of pts){ const a = .25 + .2*Math.sin(t*1.3 + p.p); bg.fillStyle = `rgba(145,215,232,${a})`; bg.beginPath(); bg.arc(p.x, p.y, 2.2, 0, 6.283); bg.fill(); }
+  // pulso de paquete viajando por la red
+  const k = Math.floor(t / 2.5), f = (t % 2.5) / 2.5, a = pts[k % pts.length], b = pts[(k*7 + 3) % pts.length];
+  bg.fillStyle = `rgba(255,119,86,${0.5*Math.sin(f*Math.PI)})`; bg.beginPath(); bg.arc(a.x + (b.x-a.x)*f, a.y + (b.y-a.y)*f, 4, 0, 6.283); bg.fill();
+}
+
+/* ---------- Efectos por escena ---------- */
+const FX = {};
+FX.pipe = (lt, sc) => {
+  const stages = sc.querySelectorAll('.stage');
+  const p0 = 3, per = 2.0; // segundos por etapa
+  const pos = clamp((lt - p0) / per, 0, 7.999);
+  const idx = Math.floor(pos);
+  const pk = sc.querySelector('#packet');
+  const s0 = stages[0], s7 = stages[7];
+  const x0 = s0.offsetLeft + s0.offsetWidth/2 - 11, x7 = s7.offsetLeft + s7.offsetWidth/2 - 11;
+  pk.style.left = (x0 + (x7 - x0) * (lt < p0 ? 0 : clamp((lt - p0)/(per*7)))) + 'px';
+  pk.style.opacity = lt < p0 - .5 ? 0 : 1;
+  stages.forEach((s, i) => {
+    const on = lt >= p0 + i*per - .2;
+    const cur = on && i === idx && lt < p0 + per*8;
+    s.style.borderColor = cur ? '#ff7756' : on ? 'rgba(145,215,232,.55)' : '#203240';
+    s.style.background = cur ? 'rgba(255,119,86,.10)' : on ? 'rgba(145,215,232,.06)' : '#0b141c';
+    s.style.transform = `translateY(${cur ? -8 : 0}px)`;
+    s.style.boxShadow = cur ? '0 18px 50px rgba(255,119,86,.18)' : 'none';
+  });
+};
+
+const MAP = {lon0: -12, lon1: 16, lat0: 35, lat1: 57};
+function proj(lon, lat, w, h){ return [(lon - MAP.lon0)/(MAP.lon1 - MAP.lon0)*w, (MAP.lat1 - lat)/(MAP.lat1 - MAP.lat0)*h]; }
+FX.map = (lt, sc) => {
+  const cv = sc.querySelector('#map'), c = cv.getContext('2d'), w = cv.width, h = cv.height;
+  c.clearRect(0, 0, w, h);
+  c.fillStyle = '#071018'; c.fillRect(0, 0, w, h);
+  c.strokeStyle = 'rgba(145,215,232,0.06)';
+  for (let lo = -10; lo <= 15; lo += 5){ const [x] = proj(lo, 0, w, h); c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); }
+  for (let la = 35; la <= 57; la += 5){ const [, y] = proj(0, la, w, h); c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); c.stroke(); }
+  c.fillStyle = '#10202b'; c.strokeStyle = 'rgba(145,215,232,0.35)'; c.lineWidth = 1.2;
+  for (const r of (window.LAND?.rings || [])){
+    let inside = false;
+    for (let i = 0; i < r.length; i += 2){ if (r[i] > -30 && r[i] < 40 && r[i+1] > 25 && r[i+1] < 72){ inside = true; break; } }
+    if (!inside) continue;
+    c.beginPath();
+    for (let i = 0; i < r.length; i += 2){ const [x, y] = proj(r[i], r[i+1], w, h); i ? c.lineTo(x, y) : c.moveTo(x, y); }
+    c.closePath(); c.fill(); c.stroke();
+  }
+  const A = proj(5.91, 51.98, w, h), B = proj(-4.40, 40.36, w, h), G = proj(0.9, 46.6, w, h);
+  // arco
+  const prog = clamp((lt - 3) / 5);
+  const ctrl = [(A[0]+B[0])/2 + 180, (A[1]+B[1])/2 - 40];
+  const bez = (t) => [(1-t)*(1-t)*A[0] + 2*(1-t)*t*ctrl[0] + t*t*B[0], (1-t)*(1-t)*A[1] + 2*(1-t)*t*ctrl[1] + t*t*B[1]];
+  // fase: hasta gateway (0.5) en 3..8 s; espera; entrega a 15..18 s
+  const legA = clamp((lt - 3) / 4) * 0.5;
+  const legB = clamp((lt - 14) / 3.5) * 0.5;
+  const reach = legA + legB;
+  c.setLineDash([8, 10]); c.strokeStyle = 'rgba(145,215,232,0.25)'; c.lineWidth = 2;
+  c.beginPath(); for (let i = 0; i <= 60; i++){ const p = bez(i/60); i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]); } c.stroke();
+  c.setLineDash([]);
+  if (reach > 0){
+    c.strokeStyle = '#ff7756'; c.lineWidth = 4; c.beginPath();
+    for (let i = 0; i <= 60; i++){ const tt = i/60*reach; const p = bez(tt); i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]); } c.stroke();
+    const hp = bez(reach); c.fillStyle = '#ff7756'; c.shadowColor = '#ff7756'; c.shadowBlur = 24; c.beginPath(); c.arc(hp[0], hp[1], 9, 0, 6.283); c.fill(); c.shadowBlur = 0;
+  }
+  const gw = bez(0.5);
+  const waiting = lt > 7 && lt < 14;
+  const pin = (p, col, label, sub, pulse) => {
+    if (pulse){ const r = 14 + 22 * ((lt*0.8) % 1); c.strokeStyle = col; c.globalAlpha = 1 - ((lt*0.8) % 1); c.lineWidth = 2; c.beginPath(); c.arc(p[0], p[1], r, 0, 6.283); c.stroke(); c.globalAlpha = 1; }
+    c.fillStyle = col; c.beginPath(); c.arc(p[0], p[1], 10, 0, 6.283); c.fill();
+    c.fillStyle = '#f2f4f4'; c.font = '700 24px Inter'; c.fillText(label, p[0] + 18, p[1] - 4);
+    c.fillStyle = '#9fb2bc'; c.font = '17px "DejaVu Sans Mono"'; c.fillText(sub, p[0] + 18, p[1] + 20);
+  };
+  pin(A, '#91d7e8', 'Arnhem · NL', 'Abraham · con Internet', false);
+  if (lt > 5) pin(gw, '#fbbf24', 'Gateway autorizado', waiting ? 'custodia · PENDING' : 'custodia', waiting);
+  const dest = lt > 17.5 ? '#34d399' : '#5f7682';
+  pin(B, dest, 'San Martín de V. · ES', lt > 17.5 ? 'DESTINATION_ACK' : 'sin cobertura celular', lt > 17.5);
+  c.fillStyle = '#5f7682'; c.font = '14px "DejaVu Sans Mono"'; c.fillText('Natural Earth 1:110m · contexto cartográfico · escenario ilustrativo', 20, h - 18);
+
+  const st = [['st1', 2.5], ['st2', 7], ['st3', 9.5], ['st4', 17.5]];
+  st.forEach(([id, at], i) => {
+    const el = sc.querySelector('#' + id), a = ease((lt - at + 0.6) / 0.7);
+    el.style.opacity = 0.25 + 0.75*a;
+    const active = lt >= at && (i === 3 || lt < st[i+1][1]);
+    const col = i === 3 ? '#34d399' : i === 2 ? '#fbbf24' : '#91d7e8';
+    el.querySelector('.dot').style.background = lt >= at ? col : '#5f7682';
+    el.style.borderColor = active ? col : '#203240';
+    el.style.boxShadow = active ? `0 0 30px ${col}33` : 'none';
+  });
+  const neg = sc.querySelector('#neg'), na = ease((lt - 20) / 0.8);
+  neg.style.opacity = na; neg.style.transform = `translateY(${(1-na)*20}px)`;
+};
+
+FX.nums = (lt, sc) => {
+  sc.querySelectorAll('[data-count]').forEach((el, i) => {
+    const target = +el.dataset.count, a = easeIO((lt - 1.6 - i*0.6) / 2.2);
+    el.textContent = Math.round(target * a) + (el.dataset.suffix || '');
+  });
+};
+
+const MODS = [
+  ['M01','Sobre universal, TTL, dedup y ACK tipado','ES'],['M02','Descubrimiento local Bluetooth/Wi-Fi/Nearby','L'],['M03','Malla multisalto y gateway durable','SR'],['M04','Ventanas orbitales reales (SGP4)','SR'],['M05','Acceso satelital directo o vía gateway','RX'],
+  ['M06','Ingesta CAP, roles y canales oficiales','ERX'],['M07','Alertas, previsión y recomendaciones','SRX'],['M08','Check-in SAFE / SOS / UNKNOWN','ES'],['M09','Meteo, hidrología, incendios','RX'],['M10','Correlación sísmica local','RX'],
+  ['M11','GIS 3D / BIM / catastro y cámaras permitidas','ESX'],['M12','Motor de decisión de ruta','ES'],['M13','Tráfico bajo congestión y envío diferido','RX'],['M14','Perfil de batería y radios opt-in','EL'],['M15','Navegación con GNSS degradado','RX'],
+  ['M16','Telemetría con drones autorizados','RX'],['M17','Identidades verificadas, revocación y E2EE','ERX'],['M18','Soberanía del protocolo y SBOM','ER'],['M19','Trazabilidad modelled / measured','ES'],['M20','Investigación institucional autorizada','RX'],
+];
+const TAGC = {E:['rgba(52,211,153,.16)','#34d399'], S:['rgba(145,215,232,.14)','#91d7e8'], L:['rgba(251,191,36,.14)','#fbbf24'], R:['rgba(159,178,188,.12)','#9fb2bc'], X:['rgba(185,163,255,.14)','#b9a3ff']};
+const modsEl = document.getElementById('mods');
+modsEl.innerHTML = MODS.map(([id, nm, tg]) => `<div class="mod"><div class="id">${id}</div><div class="nm">${nm}</div><div class="tags">${[...tg].map(k => `<span style="background:${TAGC[k][0]};color:${TAGC[k][1]}">${k}</span>`).join('')}</div></div>`).join('');
+FX.mods = (lt, sc) => {
+  sc.querySelectorAll('.mod').forEach((m, i) => { const a = ease((lt - 1.2 - i*0.22) / 0.6); m.style.opacity = a; m.style.transform = `translateY(${(1-a)*18}px) scale(${0.97 + 0.03*a})`; });
+};
+FX.road = (lt, sc) => {
+  const line = sc.querySelector('#roadline'), road = sc.querySelector('.road');
+  line.style.width = (road.offsetWidth * (2.5/8) * ease((lt - 1.5) / 3)) + 'px';
+};
+FX.proto = () => {};
+
+/* ---------- Motor de tiempo ---------- */
+function fmt(t){ const m = Math.floor(t/60), s = Math.floor(t%60); return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0'); }
+window.seek = (t) => {
+  drawBg(t);
+  let active = null;
+  for (const sc of scenes){
+    const s = +sc.dataset.start, e = +sc.dataset.end, lt = t - s;
+    const fade = Math.min(ease(lt / 0.7), ease((e - t) / 0.6));
+    const vis = t >= s - 0.01 && t <= e;
+    sc.style.opacity = vis ? fade : 0;
+    sc.style.visibility = vis ? 'visible' : 'hidden';
+    if (!vis) continue;
+    if (!active || fade > 0.5) active = sc;
+    sc.querySelectorAll('[data-t]').forEach(el => {
+      const a = ease((lt - +el.dataset.t) / 0.75);
+      el.style.opacity = a;
+      el.style.transform = `translateY(${(1 - a) * 26}px)`;
+    });
+    if (sc.dataset.fx && FX[sc.dataset.fx]) FX[sc.dataset.fx](lt, sc);
+  }
+  if (active){ document.querySelector('#chapter b').textContent = active.dataset.ch; document.getElementById('chapname').textContent = active.dataset.name; }
+  document.getElementById('tc').textContent = fmt(t) + ' / ' + fmt(DURATION);
+  document.getElementById('prog').style.width = (t / DURATION * 100) + '%';
+};
+window.DURATION = DURATION;
+// Vista previa en navegador: ?t=120 congela, sin parámetro reproduce en tiempo real.
+const qp = new URLSearchParams(location.search);
+if (qp.has('t')) seek(+qp.get('t'));
+else if (!qp.has('render')) { const t0 = performance.now(); const loop = () => { seek(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); }; loop(); }
+else seek(0);
+</script>
+</body>
+</html>
