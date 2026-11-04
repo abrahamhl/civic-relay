@@ -32,7 +32,7 @@ const base = process.env.SENDA_BASE_URL || `http://127.0.0.1:${server.address().
 const results = []; const t0 = Date.now();
 const check = (name, ok, detail = {}) => { results.push({ name, ok: !!ok, ...detail }); console.log(`${ok ? 'PASS' : 'FAIL'} · ${name}`); if (!ok) process.exitCode = 1; };
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({ args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 async function phone(label, name) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
   const page = await ctx.newPage();
@@ -135,6 +135,21 @@ await C.page.waitForFunction(() => window.SENDA_PANEL?.sim?.secondTrainKnownS !=
 const panel = await C.page.evaluate(() => ({ s: window.SENDA_PANEL.sim.secondTrainKnownS, sites: window.SENDA_PANEL.sim.final.sites.length }));
 check('Panel de coordinación abre sin red y separa los 2 trenes en segundos', panel.sites === 2 && panel.s < 90, { secondTrainKnownS: panel.s });
 await C.page.setViewportSize({ width: 1280, height: 900 }); await C.page.screenshot({ path: resolve(outDir, 'e2e-06-coordination-panel.png'), fullPage: true });
+
+// ---- Gemelo digital de edificios (sin red, precargado)
+await C.page.goto(base + '/edificios');
+await C.page.waitForFunction(() => window.SENDA_BUILDINGS?.sim, null, { timeout: 15000 });
+const tw = await C.page.evaluate(() => { const s = window.SENDA_BUILDINGS.sim; return { affected: s.zone.affected, total: s.zone.total, located: s.routers.located, within1: s.routers.floorWithin1Pct, gateways: s.routers.gateways, lost: s.routers.lostBetweenSurveys, board: s.board.length }; });
+await C.page.waitForTimeout(600); await C.page.screenshot({ path: resolve(outDir, 'e2e-07-zone-drone.png') });
+await C.page.click('[data-v="tower"]'); await C.page.waitForTimeout(800); await C.page.screenshot({ path: resolve(outDir, 'e2e-08-building-3d.png') });
+await C.page.click('#send-alert');
+const alertOut = await C.page.textContent('#alert-out');
+await C.page.click('[data-v="ar"]'); await C.page.waitForTimeout(1500);
+const arShown = await C.page.evaluate(() => window.SENDA_BUILDINGS.arShown ?? 0);
+await C.page.screenshot({ path: resolve(outDir, 'e2e-09-camera-heatmap.png') });
+check('Gemelo digital sin red: recuento de zona, edificio 3D, routers por planta, alerta dirigida y cámara con mapa de calor',
+  tw.total === 14 && tw.affected >= 5 && tw.located >= 50 && tw.within1 >= 95 && tw.gateways >= 1 && tw.board === 15 && /plantas 1, 2, 3, 4/.test(alertOut) && arShown > 0,
+  { ...tw, arSignalsInView: arShown });
 
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 

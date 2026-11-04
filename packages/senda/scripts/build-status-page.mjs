@@ -7,6 +7,7 @@
  */
 import { execFileSync, spawnSync } from 'node:child_process';
 import { simulateTwoTrainIncident } from '../src/rail-scenario.mjs';
+import { simulateBuildingIncident } from '../src/building-scenario.mjs';
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -24,6 +25,7 @@ const e2e = JSON.parse(readFileSync(resolve(root, 'evidence/senda/offline-e2e.js
 const sc = JSON.parse(readFileSync(resolve(root, 'evidence/senda/scenarios.json'), 'utf8'));
 let sha = 'desconocido'; try { sha = execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(); } catch { /* sin git */ }
 const rail = simulateTwoTrainIncident();
+const twin = simulateBuildingIncident();
 const railSeeds = [1, 2, 3, 4, 5, 6, 7, 8].map((seed) => simulateTwoTrainIncident({ seed }).secondTrainKnownS);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const ok = (b) => (b ? '<span class="ok">✔</span>' : '<span class="ko">✘</span>');
@@ -56,6 +58,7 @@ ${e2e.results.map((r) => `<tr><td>${ok(r.ok)}</td><td>${esc(r.name)}</td><td cla
 </table><p class="m">${esc(e2e.scope)} Red: ${esc(e2e.network)}.</p>
 <h2>Escenarios de referencia (algoritmos reales de SENDA)</h2>
 <div class="card"><b>S01 · Arnhem → San Martín de Valdeiglesias</b>. Antena caída 8 h.<br>${sc.s01.plan.routes.map((r) => `${esc(r.path)} · <code>${r.channels.join(' + ')}</code> · <b>${r.etaMinutes} min</b>`).join('<br>')}</div>
+<div class="card"><b>S10 · Gemelo digital · edificio 14 (15 plantas × 4 viviendas)</b>: ${twin.zone.affected}/${twin.zone.total} edificios afectados (EMS-98); ${twin.routers.located}/${twin.routers.truth} routers localizados por su señal con barrido tipo dron (planta exacta ${twin.routers.floorExactPct} %, ±1 planta ${twin.routers.floorWithin1Pct} %, vivienda ${twin.routers.unitPct} %); ${twin.routers.lostBetweenSurveys} routers apagados entre barridos; ${twin.routers.gateways} pasarelas con Internet confirmado; ${twin.people.locatedNoResponse} personas localizadas sin respuesta (±1 planta ${twin.people.locatedFloorWithin1Pct} %) y ${twin.people.missing} desaparecidas sin confirmar. Órdenes remotas firmadas por coordinador verificado. <a href="/senda/edificios">Ver en 3D</a></div>
 <div class="card"><b>S09 · Accidente con dos trenes (tipo Adamuz)</b>: ${rail.phonesWithSenda} teléfonos con SENDA detectan el impacto por sí solos; primer emplazamiento conocido a los ${rail.firstSiteKnownS} s y <b>segundo tren identificado a los ${rail.secondTrainKnownS} s</b> (8 semillas: ${Math.min(...railSeeds)}–${Math.max(...railSeeds)} s), con coches prioritarios, atrapados y personas sin respuesta. Referencia publicada: ≈45 min hasta reconocer el segundo tren. <a href="/senda/incidente">Ver panel en vivo</a></div>
 <div class="card"><b>S04 · Sismo</b>: epicentro localizado por ${sc.s04.location.stations} teléfonos con un error de ${sc.s04.location.errorKm} km; el modo relé se activa solo al corroborarlo una fuente pública (${sc.s04.activation.networkOnly} → ${sc.s04.activation.withPublicFeed}).</div>
 <div class="card"><b>S05 · Escombros</b>: víctima localizada a ${sc.s05.horizontalErrorM} m mediante Bluetooth y marcada en la cámara; puente automático por <code>${esc(sc.s05.bridge.id)}</code>; respiración detectada a ${sc.s05.csiThroughWall.withPerson.rpm} rpm con Wi-Fi CSI.</div>

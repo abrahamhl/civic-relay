@@ -1,10 +1,11 @@
 /* SENDA Campo · service worker (raíz, alcance /senda): la app entera queda instalada en el teléfono y abre sin red.
    Está en la raíz porque el sitio usa URL limpias (/senda sin barra final). */
-const VERSION = 'senda-campo-v4';
+const VERSION = 'senda-campo-v5';
 const ASSETS = [
   '/senda', '/senda/app.css', '/senda/app.mjs', '/senda/db.mjs', '/senda/audio.mjs', '/senda/icon.svg', '/senda/manifest.webmanifest',
   '/senda/core/b64.mjs', '/senda/core/envelope.mjs', '/senda/core/bundle.mjs', '/senda/core/acoustic-modem.mjs', '/senda/core/zones.mjs', '/senda/core/feeds.mjs',
   '/senda/core/orbital.mjs', '/senda/core/router.mjs', '/senda/core/channels.mjs', '/senda/core/ladder.mjs', '/senda/core/brand.mjs', '/senda/core/rail-incident.mjs', '/senda/incidente', '/senda/core/rail-scenario.mjs',
+  '/senda/edificios', '/senda/vendor/three-0.158.0.min.js', '/senda/core/building-twin.mjs', '/senda/core/building-scenario.mjs', '/senda/core/remote-command.mjs', '/senda/core/rubble.mjs', '/senda/core/roles.mjs',
 ];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(VERSION).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });

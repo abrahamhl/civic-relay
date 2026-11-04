@@ -72,6 +72,22 @@ Repositorio identificado: **`bilawalsidhu/gods-eye-view`** (Bilawal Sidhu, ex-Go
 
 SENDA **no sustituye al 112** ni a AML (que ya envía la posición de quien llama): aporta la **imagen agregada** de los teléfonos de los pasajeros, que hoy no existe.
 
+
+## 2 quater. Gemelo digital de edificios afectados (v0.4 · 04-11-2026)
+
+| Capacidad | Módulo | Verificación |
+| --- | --- | --- |
+| Recuento de la zona (vista dron) por grado de daño **EMS-98** con foto adjunta | `building-twin.mjs#damageSummary` | Tests |
+| Huellas reales de **OpenStreetMap** (Overpass, `building:levels`/`height`) — Catastro INSPIRE como siguiente fuente | `buildingsFromOverpass`, `overpassQuery` | Tests + botón en `/senda/edificios` |
+| Edificio en 3D rotable por plantas y viviendas | `/senda/edificios` (three.js) | E2E sin red |
+| **Routers localizados por su señal** (barrido a pie o con dron por la fachada), apagados entre barridos y **pasarelas** solo con Internet confirmado por un teléfono SENDA conectado | `locateAccessPoints` | Escenario: 56/60 routers, ±1 planta 100 %, vivienda 100 % |
+| Personas: **DESAPARECIDO sin confirmar** (nunca «víctima») tras ≥2 alertas; «señal sin respuesta» si su teléfono se localiza | `personState` | Tests |
+| **Alertas dirigidas** por edificio/planta/vivienda | `targetAudience` | Tests + panel |
+| **Órdenes remotas** (baliza BLE, sirena, barrido Wi-Fi, estado) firmadas por coordinador verificado; exigen consentimiento del dueño y zona declarada; plan según batería y límites del SO | `remote-command.mjs` | Tests de firma, robo de clave, repetición, caducidad, rol y destino |
+| **Cámara con mapa de calor**: señales proyectadas sobre la imagen en color por intensidad | `edificios.html` + `rubble.projectToCamera` + `signalColor` | E2E con cámara simulada |
+
+Límites: la lectura de redes Wi-Fi no existe en navegadores; la hace la app Android (WifiManager), un accesorio ESP32 o un dron con escáner. La reconstrucción 3D por IA desde una foto es línea futura; hoy la foto se adjunta a la evaluación EMS-98.
+
 ## 6. Lo que falta para que un Estado lo adopte (por orden de impacto)
 
 1. **Pasarela con el 112 / NG112**: entregar la fusión de incidentes como datos estructurados al centro 112 de cada comunidad (piloto con una comunidad autónoma).

@@ -2,10 +2,10 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-04T03:10:35.395Z",
-  "durationS": 6.9,
-  "passed": 14,
-  "total": 14,
+  "at": "2026-11-04T03:20:05.167Z",
+  "durationS": 20.9,
+  "passed": 15,
+  "total": 15,
   "results": [
     {
       "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
@@ -65,6 +65,18 @@
       "name": "Panel de coordinación abre sin red y separa los 2 trenes en segundos",
       "ok": true,
       "secondTrainKnownS": 34
+    },
+    {
+      "name": "Gemelo digital sin red: recuento de zona, edificio 3D, routers por planta, alerta dirigida y cámara con mapa de calor",
+      "ok": true,
+      "affected": 6,
+      "total": 14,
+      "located": 56,
+      "within1": 100,
+      "gateways": 10,
+      "lost": 4,
+      "board": 15,
+      "arSignalsInView": 28
     },
     {
       "name": "Sin errores de JavaScript en los 3 teléfonos",
