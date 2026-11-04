@@ -11,11 +11,11 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 </style></head><body><main>
 <p class="m">SENDA · Sistema de Enrutamiento de Emergencia por canales alternativos</p>
 <h1>Verificación técnica</h1>
-<p class="m">Generado automáticamente desde las pruebas el 2026-11-04 09:55 UTC · commit <code>7e1d131</code>. Reprodúcelo tú mismo con los comandos del final.</p>
+<p class="m">Generado automáticamente desde las pruebas el 2026-11-04 19:36 UTC · commit <code>458c4dd</code>. Reprodúcelo tú mismo con los comandos del final.</p>
 <p><a class="btn" href="/senda">Abrir SENDA Campo</a></p>
 <div class="kpis">
  <div class="k"><b>106/106</b>pruebas del núcleo superadas</div>
- <div class="k"><b>25/25</b>comprobaciones de extremo a extremo con la red cortada (Chromium real)</div>
+ <div class="k"><b>27/27</b>comprobaciones de extremo a extremo con la red cortada (Chromium real)</div>
  <div class="k"><b>4.01 min</b>entrega en el escenario Arnhem → San Martín, frente a 480 min esperando a que vuelva la antena</div>
  <div class="k"><b>0</b>dependencias externas en el núcleo (WebCrypto estándar)</div>
  <div class="k"><b>2/2</b>pruebas del relé por Internet (ciego al contenido, Docker)</div>
@@ -38,6 +38,8 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <tr><td><span class="ok">✔</span></td><td>Panel de coordinación abre sin red y separa los 2 trenes en segundos</td><td class="m"></td></tr>
 <tr><td><span class="ok">✔</span></td><td>Gemelo digital sin red: recuento de zona, edificio 3D, routers por planta, alerta dirigida y cámara con mapa de calor</td><td class="m"></td></tr>
 <tr><td><span class="ok">✔</span></td><td>Visión por capas sin red: probabilidad, espectro, estructura y topografía sobre la cámara; la vivienda con «atrapado» encabeza la prioridad con ≥98 % corroborado por 2 fuentes</td><td class="m"></td></tr>
+<tr><td><span class="ok">✔</span></td><td>Ojo de SENDA sin red: 7 casos reales, satélite visible con elevación, distancia y latencia calculadas, y plan k-de-n ≥99 % con los canales que quedan</td><td class="m"></td></tr>
+<tr><td><span class="ok">✔</span></td><td>Incendio sin red: la antena de Valdeolmos cae antes de su hora límite (aviso adelantado), Navalcerro se avisa a su hora y Hoyarrubia queda fuera de alcance</td><td class="m"></td></tr>
 <tr><td><span class="ok">✔</span></td><td>Vigilancia ferroviaria sin red: escalón del circuito de vía detectado ≥20 h antes sin alarma del umbral, defectos de vía por los móviles, transición sin supervisión y muro con lluvia</td><td class="m"></td></tr>
 <tr><td><span class="ok">✔</span></td><td>Organismo firma credencial; alerta firmada viaja por la mula; el residente la verifica, responde «atrapado» y el coordinador lo ve en su cuadro</td><td class="m"></td></tr>
 <tr><td><span class="ok">✔</span></td><td>La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono</td><td class="m"></td></tr>
@@ -46,7 +48,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <tr><td><span class="ok">✔</span></td><td>Red SENDA sin red: reparto k-de-n entre varios portadores ≥99 %, prueba real de pérdida de portadores, catálogo satelital, previsión de apagón con pasarelas y CAP con auditoría que delata alteraciones</td><td class="m"></td></tr>
 <tr><td><span class="ok">✔</span></td><td>Panel ferroviario exporta cada emplazamiento a la sala 112 en CAP 1.2 con auditoría íntegra</td><td class="m"></td></tr>
 <tr><td><span class="ok">✔</span></td><td>Modo fácil: un toque «Estoy atrapado» sale cifrado y el contacto lo recibe; la vista sencilla deja solo los botones grandes</td><td class="m"></td></tr>
-<tr><td><span class="ok">✔</span></td><td>Accesibilidad automática en las 7 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo</td><td class="m"></td></tr>
+<tr><td><span class="ok">✔</span></td><td>Accesibilidad automática en las 9 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo</td><td class="m"></td></tr>
 <tr><td><span class="ok">✔</span></td><td>Sin errores de JavaScript en los 3 teléfonos</td><td class="m"></td></tr>
 </table><p class="m">Tres navegadores Chromium independientes. La onda acústica es la que genera la app emisora, inyectada en la receptora (sin altavoz/micrófono físicos en CI). Red: OFFLINE (context.setOffline(true) en los 3 contextos tras instalar).</p>
 <h2>Infraestructura fuera del navegador</h2>
