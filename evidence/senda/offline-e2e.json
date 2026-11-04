@@ -2,10 +2,10 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-04T03:20:05.167Z",
-  "durationS": 20.9,
-  "passed": 15,
-  "total": 15,
+  "at": "2026-11-04T03:41:24.897Z",
+  "durationS": 22.9,
+  "passed": 19,
+  "total": 19,
   "results": [
     {
       "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
@@ -77,6 +77,26 @@
       "lost": 4,
       "board": 15,
       "arSignalsInView": 28
+    },
+    {
+      "name": "Organismo firma credencial; alerta firmada viaja por la mula; el residente la verifica, responde «atrapado» y el coordinador lo ve en su cuadro",
+      "ok": true,
+      "issuer": "FIRE · JEFE_INCIDENTE · Parque 3 (firma verificada)",
+      "board": "EdificioPlantaA salvoAtrap./ayudaSin resp.FueraB1430100"
+    },
+    {
+      "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
+      "ok": true,
+      "href": "senda://accion?a=BLE_BEACON&id=023fc620588234ae&b=B14&f=3&u=B&bat=100&cmd=41D05kN7yaiO47h7"
+    },
+    {
+      "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",
+      "ok": true,
+      "reason": "NO_OWNER_CONSENT"
+    },
+    {
+      "name": "Relé por Internet: A sube con conexión, C baja y transporta sin red, B lo recibe; el relé no puede leerlo",
+      "ok": true
     },
     {
       "name": "Sin errores de JavaScript en los 3 teléfonos",

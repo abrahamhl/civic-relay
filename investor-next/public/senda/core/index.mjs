@@ -11,3 +11,4 @@ export * from './through-wall.mjs';
 export * from './orbital.mjs';
 export * from './feeds.mjs';
 export * from './scenarios.mjs';
+export * from './beacon.mjs';

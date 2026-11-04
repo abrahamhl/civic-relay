@@ -171,6 +171,8 @@ importers:
 
   packages/senda: {}
 
+  packages/senda-relay: {}
+
   packages/transports:
     dependencies:
       '@civic-relay/schemas':

@@ -112,3 +112,22 @@ export function canJoinChannel(actor, channel) {
   if (channel.type === 'ZONE_PUBLIC') return true;
   return false;
 }
+
+/** Persistencia del organismo (solo en el equipo del organismo; la clave privada nunca viaja). */
+export async function exportOrganization(org) {
+  return { id: org.id, name: org.name, kind: org.kind, privateJwk: await subtle.exportKey('jwk', org.keys.privateKey), publicJwk: org.anchor.publicJwk };
+}
+export async function importOrganization({ id, name, kind, privateJwk, publicJwk }) {
+  const privateKey = await subtle.importKey('jwk', privateJwk, { name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign']);
+  const publicKey = await subtle.importKey('jwk', publicJwk, { name: 'ECDSA', namedCurve: 'P-256' }, true, ['verify']);
+  return { id, name, kind, keys: { privateKey, publicKey }, anchor: { id, name, kind, publicJwk } };
+}
+
+/** Códigos de texto portables (QR, SMS, correo, papel) para anclas, solicitudes y credenciales. */
+export const CODE = Object.freeze({ ANCHOR: 'SENDA-ANCLA:', REQUEST: 'SENDA-SOLICITUD:', CREDENTIAL: 'SENDA-CREDENCIAL:' });
+export const encodeCode = (prefix, obj) => prefix + btoa(unescape(encodeURIComponent(JSON.stringify(obj)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+export function decodeCode(prefix, text) {
+  const t = String(text).trim(); const i = t.indexOf(prefix); if (i < 0) throw new Error(`Se esperaba un código ${prefix}`);
+  const s = t.slice(i + prefix.length).split(/\s/)[0].replace(/-/g, '+').replace(/_/g, '/');
+  return JSON.parse(decodeURIComponent(escape(atob(s + '==='.slice((s.length + 3) % 4)))));
+}

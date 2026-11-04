@@ -22,6 +22,7 @@ export const BUNDLE_FORMAT = 'senda-bundle/1';
 export function createBundleStore({ owner, quotaBytes = 8 * 1024 * 1024, initialCopies = 8, maxHops = 24 } = {}) {
   const items = new Map();      // id → {env, copies, hops, size, storedAt}
   const receipts = new Map();   // id → ackSecret (verificado)
+  const broadcasts = new Map(); // id → {payload, expiresAt}: alertas/órdenes FIRMADAS (públicas) para toda una zona
   let used = 0;
 
   const size = (env) => JSON.stringify(env).length;
@@ -55,7 +56,16 @@ export function createBundleStore({ owner, quotaBytes = 8 * 1024 * 1024, initial
     },
 
     /** Elimina caducados. */
-    purgeExpired(now) { let n = 0; for (const [id, i] of items) if (now > i.env.header.expiresAt) { items.delete(id); used -= i.size; n++; } return n; },
+    purgeExpired(now) { let n = 0; for (const [id, i] of items) if (now > i.env.header.expiresAt) { items.delete(id); used -= i.size; n++; } for (const [id, b] of broadcasts) if (now > b.expiresAt) { broadcasts.delete(id); n++; } return n; },
+
+    /** Difusión firmada (alerta u orden de coordinador). Se transporta a todos; cada teléfono verifica la firma. */
+    putBroadcast(payload, { now }) {
+      if (!payload?.id || !(payload.expiresAt > now)) return { stored: false, reason: 'EXPIRED_OR_INVALID' };
+      if (broadcasts.has(payload.id)) return { stored: false, reason: 'DUPLICATE' };
+      if (broadcasts.size >= 200) return { stored: false, reason: 'QUOTA' };
+      broadcasts.set(payload.id, { payload, expiresAt: payload.expiresAt }); return { stored: true };
+    },
+    listBroadcasts: () => [...broadcasts.values()].map((b) => b.payload),
 
     /** Registra un recibo si es auténtico (hash coincide) y borra la copia. */
     async acceptReceipt({ id, ackSecret }) {
@@ -67,16 +77,17 @@ export function createBundleStore({ owner, quotaBytes = 8 * 1024 * 1024, initial
       return true;
     },
 
-    summary() { return { owner, ids: [...items.keys()], receipts: [...receipts.keys()] }; },
+    summary() { return { owner, ids: [...items.keys()], receipts: [...receipts.keys()], broadcasts: [...broadcasts.keys()] }; },
 
     /** Lista de lo que transporta este teléfono (solo cabeceras: nunca contenido). */
     list() { return [...items.values()].map((i) => ({ id: i.env.header.id, to: i.env.header.to, priority: i.env.header.priority, kind: i.env.header.kind, expiresAt: i.env.header.expiresAt, copies: i.copies, hops: i.hops })); },
 
     /** Instantánea serializable para persistir en el dispositivo (IndexedDB / disco). */
-    snapshot() { return { owner, items: [...items.values()].map(({ env, copies, hops, storedAt }) => ({ env, copies, hops, storedAt })), receipts: [...receipts] }; },
+    snapshot() { return { owner, items: [...items.values()].map(({ env, copies, hops, storedAt }) => ({ env, copies, hops, storedAt })), receipts: [...receipts], broadcasts: [...broadcasts.values()].map((b) => b.payload) }; },
     restore(snap, { now }) {
       for (const [id, s] of snap.receipts ?? []) receipts.set(id, s);
       for (const it of snap.items ?? []) this.put(it.env, { copies: it.copies, hops: it.hops, now });
+      for (const b of snap.broadcasts ?? []) this.putBroadcast(b, { now });
       return this;
     },
 
@@ -100,18 +111,21 @@ export function createBundleStore({ owner, quotaBytes = 8 * 1024 * 1024, initial
         if (!direct) i.copies -= give;
         bytes += i.size;
       }
-      return { envelopes: out, receipts: outReceipts };
+      const peerB = new Set(peerSummary.broadcasts ?? []);
+      const outB = [...broadcasts.values()].filter((b) => !peerB.has(b.payload.id) && now <= b.expiresAt).map((b) => b.payload);
+      return { envelopes: out, receipts: outReceipts, broadcasts: outB };
     },
 
     /** Ingiere lo recibido de un par. Devuelve los sobres dirigidos a mí. */
-    async ingest({ envelopes = [], receipts: rs = [] }, { now }) {
+    async ingest({ envelopes = [], receipts: rs = [], broadcasts: bs = [] }, { now }) {
       for (const r of rs) await this.acceptReceipt(r);
+      const newBroadcasts = bs.filter((b) => this.putBroadcast(b, { now }).stored);
       const forMe = [], stored = [];
       for (const { env, copies, hops } of envelopes) {
         if (env.header.to === owner) { if (!receipts.has(env.header.id) && !forMe.some((e) => e.header.id === env.header.id)) forMe.push(env); continue; }
         if (this.put(env, { copies, hops, now }).stored) stored.push(env.header.id);
       }
-      return { forMe, stored };
+      return { forMe, stored, newBroadcasts };
     },
   };
 }

@@ -11,6 +11,7 @@ import { zoneFromQuake, relayActivation, createConsentProfile } from './core/zon
 import { detectCrash, crashResponsePolicy, buildIncidentReport, fuseIncidentReports, emergencyBrief, G } from './core/rail-incident.mjs';
 import * as kv from './db.mjs';
 import { emit, listen, decodeSamples } from './audio.mjs';
+import { initCoordination } from './coord.mjs';
 
 const $ = (s) => document.querySelector(s);
 const now = () => Date.now();
@@ -47,6 +48,8 @@ async function boot() {
   S.store = createBundleStore({ owner: S.me.publicIdentity.fingerprint });
   const snap = await kv.get('store'); if (snap) S.store.restore(snap, { now: now() });
   S.store.purgeExpired(now());
+  await CO.load();
+  for (const b of S.store.listBroadcasts()) await CO.handleBroadcast(b, 'almacenado');
   $('#tabs').hidden = false; show('home');
 }
 
@@ -79,7 +82,8 @@ async function receiveEnvelope(env, via) {
     const sender = S.contacts.find((c) => c.signPub.x === m.from.x && c.signPub.y === m.from.y);
     let incident = null;
     if (typeof m.body === 'string' && m.body.startsWith(INCIDENT_PREFIX)) { try { incident = JSON.parse(m.body.slice(INCIDENT_PREFIX.length).split('\n')[0]); } catch { /* texto libre */ } }
-    S.inbox.unshift({ id: env.header.id, from: sender?.name ?? 'Desconocido (firma válida)', body: incident ? humanIncident(incident) : m.body, kind: env.header.kind, at: now(), via, incident });
+    const coordText = typeof m.body === 'string' && m.body.startsWith(CO.RESPONSE_PREFIX) ? CO.onResponseMessage(m.body, m.from) : null;
+    S.inbox.unshift({ id: env.header.id, from: sender?.name ?? (coordText ? 'Residente (firma válida)' : 'Desconocido (firma válida)'), body: incident ? humanIncident(incident) : coordText ?? m.body, kind: env.header.kind, at: now(), via, incident, coordination: !!coordText });
     await S.store.acceptReceipt(m.receipt); // el recibo viajará y borrará copias en otros teléfonos
     await persist(); render(); return toast(`Mensaje de ${sender?.name ?? 'desconocido'} vía ${via}`);
   }
@@ -139,7 +143,7 @@ function outgoing() { return S.store.list().filter((i) => i.to !== S.me.publicId
 
 async function receiveText(t, via) {
   t = t.trim();
-  if (t.startsWith('{')) { const r = await importBundleFile(S.store, t, { now: now() }); for (const e of r.forMe) await receiveEnvelope(e, via); await persist(); render(); return toast(`Paquete: ${r.forMe.length} para ti, ${r.stored.length} en tránsito`); }
+  if (t.startsWith('{')) { const r = await importBundleFile(S.store, t, { now: now() }); for (const e of r.forMe) await receiveEnvelope(e, via); for (const b of r.newBroadcasts ?? []) await CO.handleBroadcast(b, via); await persist(); render(); return toast(`Paquete: ${r.forMe.length} para ti, ${r.stored.length} en tránsito${r.newBroadcasts?.length ? `, ${r.newBroadcasts.length} alerta(s)` : ''}`); }
   const m = t.match(/SENDA:([A-Za-z0-9_-]+)/); if (!m) return toast('No es un código SENDA');
   await receiveBytes(unb64(m[1]), via);
 }
@@ -249,6 +253,7 @@ function render() {
   $('#relay-consent').checked = !!S.consent?.relayInDeclaredZones;
   const incidents = S.inbox.filter((m) => m.incident).map((m) => m.incident);
   $('#incidents').textContent = incidents.length ? emergencyBrief(fuseIncidentReports(incidents)) || `${incidents.length} informe(s); hacen falta 2 por emplazamiento para fusionar.` : 'Sin informes.';
+  CO.renderCoord();
   $('#zones').innerHTML = S.zones.slice(0, 20).map((z) => `<li><b>${esc(z.event)}</b><div class="meta">${z.provider} · radio ${z.circle.radiusKm} km (modelo) · hasta ${new Date(z.expiresAt).toLocaleString()}</div></li>`).join('') || '<li class="fine">Sin zonas guardadas.</li>';
 }
 
@@ -274,6 +279,9 @@ if ('serviceWorker' in navigator) {
     .catch(() => { $('#sw').textContent = 'sin modo offline'; $('#sw').className = 'pill off'; });
 }
 
+/* Coordinación (residente / coordinador / relé) */
+const CO = initCoordination({ S, kv, $, toast, persist, render: () => render(), esc, ask, copy, receiveEnvelope: (e, v) => receiveEnvelope(e, v) });
+
 /* Ganchos para pruebas automáticas (sin efecto para el usuario). */
 Object.assign(window.SENDA_TEST, {
   ready: boot(),
@@ -285,4 +293,7 @@ Object.assign(window.SENDA_TEST, {
   countdownS: null,
   tripFeed: async ({ motion, gps, train = null, coach = null }) => { S.trip = { ...S.trip, active: true, motion, gps, train, coach, pending: true }; return evaluateCrash(); },
   lastIncident: () => S.lastIncident ?? null,
+  alertCountdownS: null,
+  co: () => CO,
+  lastResponse: () => S.lastResponse ?? null,
 });

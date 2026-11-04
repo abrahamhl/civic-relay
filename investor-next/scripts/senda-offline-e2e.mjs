@@ -151,6 +151,66 @@ check('Gemelo digital sin red: recuento de zona, edificio 3D, routers por planta
   tw.total === 14 && tw.affected >= 5 && tw.located >= 50 && tw.within1 >= 95 && tw.gateways >= 1 && tw.board === 15 && /plantas 1, 2, 3, 4/.test(alertOut) && arShown > 0,
   { ...tw, arSignalsInView: arShown });
 
+// ---- Flujo institucional real: organismo → credencial → alerta firmada → mula → residente → respuesta → cuadro
+const orgPage = await A.ctx.newPage(); orgPage.on('pageerror', (e) => A.errors.push(String(e)));
+await orgPage.goto(base + '/organismo');
+await orgPage.fill('#o-id', 'es-bomberos-piloto'); await orgPage.fill('#o-name', 'Bomberos (piloto)'); await orgPage.selectOption('#o-kind', 'FIRE'); await orgPage.click('#o-create');
+await orgPage.waitForFunction(() => document.querySelector('#o-anchor').value.startsWith('SENDA-ANCLA:'));
+const anchorCode = await orgPage.evaluate(() => window.SENDA_ORG.anchor());
+const reqCode = await A.page.evaluate(() => window.SENDA_TEST.co().requestCode());
+const credCode = await orgPage.evaluate((r) => window.SENDA_ORG.sign(r), reqCode);
+await orgPage.close();
+const coStatus = await A.page.evaluate(async ({ a, c }) => { const co = window.SENDA_TEST.co(); await co.importAnchorCode(a); return co.importCredentialCode(c); }, { a: anchorCode, c: credCode });
+await B.page.evaluate(async (a) => { const co = window.SENDA_TEST.co(); await co.importAnchorCode(a); await co.setProfile({ buildingId: 'B14', floor: 3, unit: 'B', consentRemote: true }); window.SENDA_TEST.alertCountdownS = 30; }, anchorCode);
+await C.page.goto(base); await C.page.waitForFunction(() => window.SENDA_TEST?.ready, null, { timeout: 15000 }); await C.page.evaluate(() => window.SENDA_TEST.ready);
+await C.page.evaluate((a) => window.SENDA_TEST.co().importAnchorCode(a), anchorCode);
+await A.page.click('[data-tab="coord"]');
+await A.page.fill('#co-building', 'B14'); await A.page.fill('#co-floors', '1-4');
+await A.page.click('[data-co="send-alert"]');
+await A.page.waitForFunction(() => window.SENDA_TEST.state.coord.alerts.length === 1);
+// A → mula C → B (sin red)
+await C.page.evaluate((t) => window.SENDA_TEST.receiveText(t), await A.page.evaluate(() => window.SENDA_TEST.exportBundle()));
+const cLog = await C.page.evaluate(() => window.SENDA_TEST.state.cmdLog[0]);
+await B.page.evaluate((t) => window.SENDA_TEST.receiveText(t), await C.page.evaluate(() => window.SENDA_TEST.exportBundle()));
+await B.page.waitForSelector('#alert:not([hidden])', { timeout: 5000 });
+const issuerText = await B.page.textContent('#alert-issuer');
+await B.page.waitForFunction(() => document.querySelector('#alert-native')?.href?.startsWith('senda://accion'));
+const nativeHref = await B.page.getAttribute('#alert-native', 'href');
+await B.page.screenshot({ path: resolve(outDir, 'e2e-10-signed-alert.png') });
+await B.page.click('#alert-opts [data-rs="TRAPPED"]');
+await B.page.waitForFunction(() => window.SENDA_TEST.lastResponse()?.status === 'TRAPPED');
+// B → mula C → A
+await C.page.evaluate((t) => window.SENDA_TEST.receiveText(t), await B.page.evaluate(() => window.SENDA_TEST.exportBundle()));
+await A.page.evaluate((t) => window.SENDA_TEST.receiveText(t), await C.page.evaluate(() => window.SENDA_TEST.exportBundle()));
+await A.page.click('[data-tab="coord"]'); await A.page.waitForTimeout(300);
+const boardText = await A.page.textContent('#co-board');
+await A.page.screenshot({ path: resolve(outDir, 'e2e-11-coordinator-board.png'), fullPage: true });
+check('Organismo firma credencial; alerta firmada viaja por la mula; el residente la verifica, responde «atrapado» y el coordinador lo ve en su cuadro',
+  /FIRE · JEFE_INCIDENTE/.test(coStatus.text) && /Bomberos \(piloto\)|FIRE/.test(issuerText) && /B14/.test(boardText) && /3/.test(boardText),
+  { issuer: issuerText, board: boardText.slice(0, 120) });
+const nat = new URL(nativeHref);
+check('La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono', nat.searchParams.get('a').includes('BLE_BEACON') && /^[0-9a-f]{16}$/.test(nat.searchParams.get('id')) && nat.searchParams.get('f') === '3', { href: nativeHref });
+check('Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)', cLog && cLog.accepted === false && cLog.reason === 'NO_OWNER_CONSENT', { reason: cLog?.reason });
+
+// ---- Relé por Internet (cuando hay conexión)
+// Solo en local: desde el origen público https, Chromium puede bloquear el acceso a un relé en 127.0.0.1
+// (protección de red local). En producción el relé se despliega con su propio dominio HTTPS.
+if (!process.env.SENDA_BASE_URL) {
+const { createRelay } = await import('../../packages/senda-relay/server.mjs');
+const { mkdtempSync } = await import('node:fs'); const { tmpdir } = await import('node:os'); const { join } = await import('node:path');
+const relay = createRelay({ dataDir: mkdtempSync(join(tmpdir(), 'senda-e2e-relay-')) }); await new Promise((r) => relay.server.listen(0, r));
+const relayUrl = `http://127.0.0.1:${relay.server.address().port}`;
+const M5 = 'Mensaje por relé: estoy en el albergue';
+await compose(A, M5);
+await A.ctx.setOffline(false); await C.ctx.setOffline(false);
+await A.page.evaluate((u) => { document.querySelector('#relay-url').value = u; }, relayUrl); await A.page.evaluate(() => window.SENDA_TEST.co().syncRelay());
+await C.page.evaluate((u) => { document.querySelector('#relay-url').value = u; }, relayUrl); await C.page.evaluate(() => window.SENDA_TEST.co().syncRelay());
+await A.ctx.setOffline(true); await C.ctx.setOffline(true);
+await B.page.evaluate((t) => window.SENDA_TEST.receiveText(t), await C.page.evaluate(() => window.SENDA_TEST.exportBundle()));
+check('Relé por Internet: A sube con conexión, C baja y transporta sin red, B lo recibe; el relé no puede leerlo', (await inboxHas(B, M5)) && !JSON.stringify(relay.store.snapshot()).includes('albergue'));
+await relay.close();
+} else console.log('SKIP · Relé por Internet (solo en local; ver comentario)');
+
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 
 await browser.close(); server.close();

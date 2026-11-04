@@ -1,0 +1,13 @@
+{
+  "name": "@senda/relay",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Relé SENDA: almacenar-transportar-reenviar por Internet cuando lo hay. Ciego al contenido (solo ve cabeceras de enrutamiento). Sin dependencias.",
+  "type": "module",
+  "main": "./server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "license": "MIT"
+}

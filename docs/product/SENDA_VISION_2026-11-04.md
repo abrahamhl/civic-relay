@@ -86,7 +86,21 @@ SENDA **no sustituye al 112** ni a AML (que ya envía la posición de quien llam
 | **Órdenes remotas** (baliza BLE, sirena, barrido Wi-Fi, estado) firmadas por coordinador verificado; exigen consentimiento del dueño y zona declarada; plan según batería y límites del SO | `remote-command.mjs` | Tests de firma, robo de clave, repetición, caducidad, rol y destino |
 | **Cámara con mapa de calor**: señales proyectadas sobre la imagen en color por intensidad | `edificios.html` + `rubble.projectToCamera` + `signalColor` | E2E con cámara simulada |
 
-Límites: la lectura de redes Wi-Fi no existe en navegadores; la hace la app Android (WifiManager), un accesorio ESP32 o un dron con escáner. La reconstrucción 3D por IA desde una foto es línea futura; hoy la foto se adjunta a la evaluación EMS-98.
+Límites: la lectura de redes Wi-Fi no existe en navegadores; la hace SENDA Android (`apps/senda-android`, WifiManager) o el accesorio ESP32 (`hardware/esp32-survey`), en mano, en mástil o en dron. La reconstrucción 3D por IA desde una foto es línea futura; hoy la foto se adjunta a la evaluación EMS-98.
+
+## 2 quinquies. Infraestructura de coordinación lista en la app (v0.5 · 04-11-2026)
+
+| Pieza | Dónde | Verificación |
+| --- | --- | --- |
+| **Herramienta de organismo**: crea su ancla de confianza y firma credenciales de coordinador (la clave privada no sale del equipo) | `/senda/organismo`, `roles.mjs` (códigos `SENDA-ANCLA/SOLICITUD/CREDENCIAL`) | E2E |
+| **Pestaña Coordinar**: credencial, alerta dirigida por edificio/plantas, cuadro de respuestas por planta, importación de barridos | `/senda` › Coordinar, `coord.mjs` | E2E: organismo → credencial → alerta → mula → residente «atrapado» → cuadro (B14 · planta 3) |
+| **Alertas firmadas difundidas** sin destinatario por la red DTN (dedupe, caducidad, persistencia) | `bundle.mjs#putBroadcast` | Tests + E2E (un teléfono sin consentimiento la ignora y la sigue transportando) |
+| **Respuesta del residente** cifrada al coordinador; sin respuesta en 60 s → «teléfono activo, sin respuesta» | `remote-command.mjs#buildResidentResponse/aggregateResponses` | Tests + E2E |
+| **Relé por Internet** ciego al contenido, autoalojable | `packages/senda-relay` (Docker) | Tests + E2E (el texto no aparece en su almacén) + imagen arrancada en CI |
+| **SENDA Android**: baliza BLE, escucha de balizas, barrido Wi-Fi; se abre desde la alerta (`senda://accion`) con lista blanca y toque del usuario | `apps/senda-android` | 14 invariantes JVM + APK compilado en CI |
+| **Accesorio ESP32** (mástil o dron): barrido Wi-Fi + balizas → JSONL | `hardware/esp32-survey` | Trama probada en g++ con los mismos vectores + firmware compilado en CI |
+
+Arquitectura completa, modelo de confianza y despliegue: [`docs/architecture/SENDA_ARCHITECTURE.md`](../architecture/SENDA_ARCHITECTURE.md).
 
 ## 6. Lo que falta para que un Estado lo adopte (por orden de impacto)
 
@@ -95,7 +109,7 @@ Límites: la lectura de redes Wi-Fi no existe en navegadores; la hace la app And
 3. **Ficha médica offline compartible** (alergias, medicación, contacto) que el sanitario recibe por sonido o Bluetooth sin desbloquear el teléfono.
 4. **Primeros auxilios guiados sin red** para quien ayuda a otros (hemorragias, RCP), con el recuento de heridos de su coche.
 5. **Reunificación familiar**: «estoy bien» automático a la familia y consulta segura por parte de los familiares, sin colapsar el 112.
-6. **App nativa Android/iOS** con detección en segundo plano y Bluetooth/Wi-Fi Aware (la web ya demuestra la lógica).
+6. **App nativa iOS y Android en segundo plano** (Bluetooth/Wi-Fi Aware): SENDA Android ya existe para baliza, escucha y barrido con el toque del usuario; falta el modo en segundo plano y la versión iOS.
 7. **Auditoría de seguridad independiente y DPIA**: requisito para cualquier contratación pública.
 8. **Piloto de campo** con protección civil: simulacro en un tren parado con 50–100 voluntarios y medición del tiempo hasta conocer cada coche.
 

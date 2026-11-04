@@ -75,12 +75,21 @@
       <canvas id="scope" width="600" height="80"></canvas><p id="audio-status" class="fine"></p></div>
     <div class="card"><h3>📦 Paquete .senda · Quick Share / AirDrop / Bluetooth / USB</h3>
       <div class="row"><button data-act="bundle-share" class="primary">Compartir paquete</button><label class="btn">Importar paquete<input type="file" id="bundle-file" accept=".senda,application/json" hidden></label></div></div>
+    <div class="card"><h3>🌐 Relé por Internet (cuando haya conexión)</h3>
+      <div class="row"><input id="relay-url" placeholder="https://rele.ejemplo.es" style="flex:1"><button data-co="relay-sync">Sincronizar</button></div>
+      <p class="fine">El relé no puede leer nada: solo ve a quién va cada sobre cifrado. Lo puede operar tu ayuntamiento o protección civil.</p></div>
     <div class="card"><h3>✉️ Texto / SMS</h3>
       <div class="row"><button data-act="sms">Enviar como SMS</button><button data-act="text-copy">Copiar como texto</button><button data-act="paste">Pegar texto recibido</button></div></div>
   </section>
 
   <section id="zone" class="view" hidden>
     <h2>Zona de emergencia</h2>
+    <div class="card"><h3>🏠 Mi edificio</h3><p class="fine">Opcional y solo en este teléfono. Permite recibir alertas dirigidas a tu edificio y planta.</p>
+      <div class="row"><input id="pf-building" placeholder="Edificio (código o dirección)" style="flex:2"><input id="pf-floor" type="number" min="0" max="200" placeholder="Planta" style="max-width:96px"><input id="pf-unit" placeholder="Puerta" style="max-width:96px"></div>
+      <label class="check"><input type="checkbox" id="pf-remote"> Permito que coordinadores <b>verificados</b> activen en este teléfono sirena, destellos, baliza y envío de batería/posición durante una emergencia declarada.</label>
+      <p class="fine">Id de tu baliza (SENDA Android / ESP32): <code id="pf-beacon">—</code></p>
+      <h3 style="margin-top:12px">Organismos de confianza</h3><ul id="anchor-list" class="list"></ul><button data-co="anchor-add">Importar código de organismo</button>
+      <h3 style="margin-top:12px">Alertas recibidas</h3><ul id="cmd-log" class="list"></ul></div>
     <div class="card"><h3>🚨 Incidentes recibidos</h3><p class="fine">Informes de accidente que te han llegado (cifrados, solo tú los lees), fusionados por tren y coche.</p><pre id="incidents" class="brief">Sin informes.</pre>
       <p><a href="/senda/incidente">Panel de coordinación · accidente con dos trenes</a><br><a href="/senda/edificios">Gemelo digital de edificios afectados (3D, routers, alertas por planta)</a></p></div>
     <div class="card"><h3>Modo relé</h3><p id="relay-state" class="big"></p>
@@ -90,14 +99,38 @@
   </section>
 </main>
 
+  <section id="coord" class="view" hidden>
+    <h2>Coordinar</h2>
+    <div class="card"><h3>🪪 Credencial</h3><p id="co-status" class="warn"></p>
+      <div class="row"><button data-co="request">Copiar mi solicitud</button><button data-co="cred-import">Importar credencial</button><a class="btn" href="/senda/organismo">Soy un organismo</a></div>
+      <p class="fine">Tu clave nunca sale del teléfono: el organismo firma tu solicitud y te devuelve la credencial.</p></div>
+    <div class="card"><h3>📣 Alerta dirigida</h3>
+      <div class="row"><input id="co-building" placeholder="Edificio (ej. B14)" style="flex:1"><input id="co-floors" placeholder="Plantas (ej. 1-4,6)" style="flex:1"></div>
+      <textarea id="co-msg" rows="2" placeholder="Mensaje para las personas de esas plantas">Bomberos en la fachada este. Si puedes, pulsa «Estoy atrapado».</textarea>
+      <div class="row" id="co-actions"><label class="check"><input type="checkbox" value="SIREN" checked> Sirena</label><label class="check"><input type="checkbox" value="FLASH"> Destellos</label><label class="check"><input type="checkbox" value="REPORT_STATUS" checked> Batería y posición</label><label class="check"><input type="checkbox" value="BLE_BEACON" checked> Baliza BLE (Android)</label><label class="check"><input type="checkbox" value="WIFI_SCAN"> Barrido Wi-Fi (Android)</label></div>
+      <button data-co="send-alert" class="primary">Firmar y poner en camino</button><p id="co-sent" class="fine"></p></div>
+    <div class="card"><h3>📊 Respuestas por edificio y planta</h3><table id="co-board" class="board"></table>
+      <p class="fine"><a href="/senda/edificios">Abrir el gemelo 3D</a></p></div>
+    <div class="card"><h3>📶 Barrido Wi-Fi (SENDA Android, ESP32 o dron)</h3>
+      <div class="row"><input id="sv-w" type="number" placeholder="Ancho m" style="max-width:110px"><input id="sv-d" type="number" placeholder="Fondo m" style="max-width:110px"><input id="sv-levels" type="number" placeholder="Plantas" style="max-width:110px"><label class="btn">Importar barrido<input type="file" id="sv-file" accept=".jsonl,.json,.txt" hidden></label></div>
+      <div id="sv-out"></div></div>
+  </section>
+
 <nav class="tabs" id="tabs" hidden>
-  <button data-tab="home">Inicio</button><button data-tab="contacts">Contactos</button><button data-tab="messages">Mensajes</button><button data-tab="transfer">Transferir</button><button data-tab="zone">Zona</button>
+  <button data-tab="home">Inicio</button><button data-tab="contacts">Contactos</button><button data-tab="messages">Mensajes</button><button data-tab="transfer">Transferir</button><button data-tab="zone">Zona</button><button data-tab="coord">Coordinar</button>
 </nav>
 <div id="crash" hidden role="alertdialog" aria-labelledby="crash-title"><div class="crash-box">
   <h2 id="crash-title">¿Estás bien?</h2><p id="crash-why" class="fine"></p>
   <div id="crash-count" class="count">30</div><p class="fine">Si no respondes, SENDA avisará automáticamente.</p>
   <div id="crash-opts" class="opts"></div>
   <label>Heridos cerca de ti <input id="crash-near" type="number" min="0" max="50" value="0" inputmode="numeric"></label>
+</div></div>
+<div id="alert" hidden role="alertdialog" aria-labelledby="alert-title"><div class="crash-box alert-box">
+  <p class="fine">ALERTA DE COORDINACIÓN</p><h2 id="alert-title">⚠️ <span id="alert-msg"></span></h2><p id="alert-issuer" class="ok"></p>
+  <ul id="alert-plan" class="fine plan"></ul>
+  <a id="alert-native" class="btn primary" hidden>📶 Activar baliza / barrido con SENDA Android</a>
+  <div id="alert-count" class="count">60</div><p class="fine">Si no respondes, SENDA avisará de que tu teléfono está activo.</p>
+  <div id="alert-opts" class="opts"></div>
 </div></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <dialog id="dlg"><form method="dialog"><p id="dlg-text"></p><textarea id="dlg-input" rows="4"></textarea><menu><button value="cancel">Cancelar</button><button value="ok" class="primary">Aceptar</button></menu></form></dialog>

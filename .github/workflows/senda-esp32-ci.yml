@@ -1,0 +1,29 @@
+name: SENDA ESP32 (compilación)
+on:
+  push:
+    branches: [master]
+    paths: ['hardware/esp32-survey/**', '.github/workflows/senda-esp32-ci.yml']
+  pull_request:
+    paths: ['hardware/esp32-survey/**', '.github/workflows/senda-esp32-ci.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sketch:
+    name: Trama en el PC (g++) + firmware ESP32
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Misma lógica de trama que corre en el ESP32, probada en el PC
+        run: g++ -std=c++17 -Wall -Wextra -Werror -I hardware/esp32-survey hardware/esp32-survey/test/host_test.cpp -o /tmp/t && /tmp/t
+      - uses: arduino/compile-sketches@v1
+        with:
+          fqbn: esp32:esp32:esp32:PartitionScheme=huge_app
+          platforms: |
+            - name: esp32:esp32
+              source-url: https://espressif.github.io/arduino-esp32/package_esp32_index.json
+              version: 3.0.7
+          sketch-paths: |
+            - hardware/esp32-survey
+          enable-warnings-report: true
