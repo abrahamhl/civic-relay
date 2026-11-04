@@ -104,6 +104,8 @@
 
 ## 8. Criterios de aceptación de la primera versión (A8)
 
+> **Estado v0.9 (04-11-2026):** `/senda/ojo` existe como **globo 2D ortográfico** (no CesiumJS todavía): constelaciones Iridium/Galileo/QO-100 propagadas con `orbital.mjs` (geometría pública, posiciones ilustrativas), 7 casos reales con fuente y módulos, ruta caso → satélite → relé → 112 con elevación, distancia y latencia, plan k-de-n por caso, terminador día/noche, funciona sin red (precargado) y está en el E2E (27/27). `/senda/incendio` cubre la capa de incendio con el núcleo `wildfire.mjs`. **Pendiente:** CesiumJS con terreno IGN/PNOA, FIRMS en vivo, cámaras DGT, ADS-B propio y TLE reales en línea (criterios 1–3 de esta lista).
+
 1. `/senda/ojo` abre sin red con una zona precargada (≤ 50 MB para 10 km²).
 2. Capas: terreno, edificios OSM, focos FIRMS (cacheados), cámaras DGT, teléfonos y pasarelas SENDA, y cobertura prevista.
 3. Pellizco para inclinar, selector de capas, línea de tiempo y 60 fps en un portátil medio.

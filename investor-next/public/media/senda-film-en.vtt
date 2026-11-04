@@ -5,105 +5,137 @@ WEBVTT
 When the network falls, the message shouldn't die.
 
 2
-00:00:03.382 --> 00:00:17.206
+00:00:03.382 --> 00:00:17.334
 On the twenty-eighth of April, twenty twenty-five, Spain's mobile network didn't fail when the power went out. It failed when the batteries in the masts ran dry. Within hours, users with a stable connection dropped from ninety to forty percent.
 
 3
-00:00:17.556 --> 00:00:23.743
+00:00:17.684 --> 00:00:23.892
 And in the Valencia floods, the mass alert to phones didn't arrive until eleven minutes past eight in the evening.
 
 4
-00:00:25.343 --> 00:00:28.991
+00:00:25.492 --> 00:00:29.161
 This is SENDA: emergency routing over alternative channels.
 
 5
-00:00:29.341 --> 00:00:42.951
+00:00:29.511 --> 00:00:43.101
 It isn't another messaging app. It's the layer that coordinates everything that can carry a message: nearby phones, sound, direct-to-phone satellite, LoRa, Iridium, amateur radio, drones, and whatever network is still standing.
 
 6
-00:00:44.551 --> 00:00:57.394
+00:00:44.701 --> 00:00:57.543
 It works without Internet from the very first second. Messages are end-to-end encrypted and travel by sound between two phones, in a file, or hand to hand: every phone running SENDA carries messages it cannot read.
 
 7
-00:00:57.744 --> 00:01:03.589
+00:00:57.893 --> 00:01:03.696
 When the recipient gets it, their unforgeable receipt erases the copies still travelling through the network.
 
 8
-00:01:05.189 --> 00:01:15.643
+00:01:05.296 --> 00:01:15.557
 What nobody does yet: SENDA splits every message with Reed-Solomon coding and spreads the fragments across different bearers. Any few of them arriving is enough to rebuild it.
 
 9
-00:01:15.993 --> 00:01:31.523
+00:01:15.907 --> 00:01:31.438
 With satellite, LoRa, SMS and neighbours, an SOS reaches a ninety-nine percent delivery probability, calculated exactly. In the live trial, one hundred and ninety-seven of two hundred messages were rebuilt byte for byte while bearers were dropped at random.
 
 10
-00:01:33.123 --> 00:01:50.275
+00:01:33.038 --> 00:01:50.190
 Every satellite network is classed by access level: those your phone already has, those that need a module such as Iridium, amateur ones such as QO-100, where the law forbids encryption and SENDA sends only signed public status, and government networks, which require an agreement.
 
 11
-00:01:50.625 --> 00:01:55.724
+00:01:50.540 --> 00:01:55.639
 Anything still under development, such as Galileo's warning service, is labelled as such.
 
 12
-00:01:57.324 --> 00:02:05.303
-SENDA also forecasts the blackout. It models how long each mast lasts on battery and works out when and where people will lose coverage.
+00:01:57.239 --> 00:02:12.193
+The SENDA Eye computes where every satellite is, in real time: the Iridium constellation in low orbit for short messages, Galileo in medium orbit for position and search and rescue, and the geostationary QO-100 for radio amateurs.
 
 13
-00:02:05.653 --> 00:02:17.599
-Then it decides where to place gateways before it happens, using an algorithm with a mathematical guarantee. In the test city, five gateways reach seventy-two percent of the people who would be left in the dark.
+00:02:12.543 --> 00:02:24.554
+Spain's real cases sit on the globe. Pick one, and SENDA finds the visible satellite, computes its elevation, distance and latency, and traces the alert's path to the 112 control room.
 
 14
-00:02:19.199 --> 00:02:26.453
-In a rail accident, every phone detects the impact, asks if you are all right and, if you don't answer, raises the alarm on its own.
+00:02:26.154 --> 00:02:34.047
+SENDA also forecasts the blackout. It models how long each mast lasts on battery and works out when and where people will lose coverage.
 
 15
-00:02:26.803 --> 00:02:44.189
-By fusing the reports, the panel separates the two trains in thirty-four seconds of simulation. At Adamuz, recognising the second train took around forty-five minutes, according to the published timeline. And everything is exported in CAP, the format emergency control rooms already read.
+00:02:34.397 --> 00:02:46.429
+Then it decides where to place gateways before it happens, using an algorithm with a mathematical guarantee. In the test city, five gateways reach seventy-two percent of the people who would be left in the dark.
 
 16
-00:02:45.789 --> 00:02:53.875
-In a damaged building, SENDA locates routers floor by floor with walk-through or drone sweeps, and sends alerts only to the affected floors.
+00:02:48.029 --> 00:02:55.304
+In a rail accident, every phone detects the impact, asks if you are all right and, if you don't answer, raises the alarm on its own.
 
 17
-00:02:54.225 --> 00:02:58.939
-Anyone who doesn't answer is listed as missing, unconfirmed, never as a victim.
+00:02:55.654 --> 00:03:12.998
+By fusing the reports, the panel separates the two trains in thirty-four seconds of simulation. At Adamuz, recognising the second train took around forty-five minutes, according to the published timeline. And everything is exported in CAP, the format emergency control rooms already read.
 
 18
-00:03:00.539 --> 00:03:10.225
-Only a coordinator holding a credential signed by their agency can trigger anything on your phone, and only if you authorised it and an emergency has been declared.
+00:03:14.598 --> 00:03:22.705
+In a damaged building, SENDA locates routers floor by floor with walk-through or drone sweeps, and sends alerts only to the affected floors.
 
 19
-00:03:10.575 --> 00:03:18.660
-A trapped person presses one button, the reply travels encrypted from neighbour to neighbour, and the coordinator sees it on a floor-by-floor board.
+00:03:23.055 --> 00:03:27.769
+Anyone who doesn't answer is listed as missing, unconfirmed, never as a victim.
 
 20
-00:03:20.260 --> 00:03:25.209
-For those who need it, easy mode: three big buttons. I'm safe, I need help, I'm trapped.
+00:03:29.369 --> 00:03:42.660
+No camera sees through a wall. SENDA does something more useful: it fuses each person's reply, their phone's signal, breathing detected over Wi-Fi and knocking, and computes a probability per flat, with its margin of error.
 
 21
-00:03:25.559 --> 00:03:29.826
-And every screen passes an automatic accessibility check on every change.
+00:03:43.010 --> 00:03:53.527
+It only says ninety-eight percent when two independent sources agree; over two hundred simulations, it was right every time it said so. And it paints it over the camera, in layers.
 
 22
-00:03:31.426 --> 00:03:42.711
-And it's ready to deploy: a self-hosted relay in Docker that the agency itself controls, an Android app for a Bluetooth beacon and Wi-Fi sweeps, and a low-cost accessory for drones and masts.
+00:03:55.127 --> 00:04:05.965
+At Adamuz, according to a Guardia Civil report that Adif disputes, the track circuit logged a voltage drop about twenty-two hours earlier, with no alarm, because it stayed above the threshold.
 
 23
-00:03:43.061 --> 00:03:48.288
-The same formats are tested in three programming languages, so nothing breaks between the parts.
+00:04:06.315 --> 00:04:21.696
+SENDA compares each circuit with its own history and proposes an inspection. It adds track geometry measured with passengers' phones, curves without speed supervision, and walls under heavy rain. The data are synthetic; the official investigation will decide.
 
 24
-00:03:49.888 --> 00:03:58.955
-Everything is machine-verified on every change: more than seventy core tests, and more than twenty end-to-end checks with the network cut, in real browsers.
+00:04:23.296 --> 00:04:29.867
+In a wildfire, SENDA computes how the fire spreads with wind and slope, and crosses it with the mobile phone masts.
 
 25
-00:03:59.305 --> 00:04:08.073
-What's missing, we say: field pilots with physical phones and rescue teams, an independent security audit, and certification for public procurement.
+00:04:30.217 --> 00:04:41.417
+In this scenario, a town's mast burns one hundred and seven minutes before its warning deadline. The alert must go out earlier, or through neighbours, LoRa and satellite once coverage is gone.
 
 26
-00:04:09.673 --> 00:04:19.827
-SENDA is for citizens, coordinators, police and emergency services, public administrations, and anyone who wants to invest in making sure no message is lost.
+00:04:43.017 --> 00:04:52.809
+Only a coordinator holding a credential signed by their agency can trigger anything on your phone, and only if you authorised it and an emergency has been declared.
 
 27
-00:04:20.177 --> 00:04:23.463
+00:04:53.159 --> 00:05:01.244
+A trapped person presses one button, the reply travels encrypted from neighbour to neighbour, and the coordinator sees it on a floor-by-floor board.
+
+28
+00:05:02.844 --> 00:05:07.772
+For those who need it, easy mode: three big buttons. I'm safe, I need help, I'm trapped.
+
+29
+00:05:08.122 --> 00:05:12.389
+And every screen passes an automatic accessibility check on every change.
+
+30
+00:05:13.989 --> 00:05:25.231
+And it's ready to deploy: a self-hosted relay in Docker that the agency itself controls, an Android app for a Bluetooth beacon and Wi-Fi sweeps, and a low-cost accessory for drones and masts.
+
+31
+00:05:25.581 --> 00:05:30.915
+The same formats are tested in three programming languages, so nothing breaks between the parts.
+
+32
+00:05:32.515 --> 00:05:41.795
+Everything is machine-verified on every change: more than one hundred core tests, and twenty-seven end-to-end checks with the network cut, in real browsers.
+
+33
+00:05:42.145 --> 00:05:50.870
+What's missing, we say: field pilots with physical phones and rescue teams, an independent security audit, and certification for public procurement.
+
+34
+00:05:52.470 --> 00:06:02.582
+SENDA is for citizens, coordinators, police and emergency services, public administrations, and anyone who wants to invest in making sure no message is lost.
+
+35
+00:06:02.932 --> 00:06:06.239
 Try it now, with nothing to install, at the address on screen.
