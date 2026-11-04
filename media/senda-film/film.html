@@ -3,8 +3,10 @@
 <head>
 <meta charset="utf-8">
 <title>SENDA · película</title>
+<script src="/senda/vendor/three-0.158.0.min.js"></script>
+<script src="sims.js"></script>
 <!--
-  Película SENDA v4 · 1280×720. Determinista: window.seek(t) fija cada fotograma (sin temporizadores).
+  Película SENDA v5 · 1280×720. Escenas «call», «drone3d», «arch3d» y «howsim» calculadas con el núcleo real (sims.js). Determinista: window.seek(t) fija cada fotograma (sin temporizadores).
   film.html?lang=es|en  ·  carga script.json y out/timeline-<lang>.js (servidos por render.mjs).
 -->
 <style>
@@ -34,6 +36,14 @@ svg{position:absolute;inset:0}
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}.chip{padding:10px 14px;border-radius:999px;border:1px solid var(--l);background:#0b141c;font-size:17px}
 .url{font:700 30px ui-monospace,monospace;color:var(--i);margin-top:26px}
 .missing li{color:var(--m);font-size:19px;margin:8px 0}.missing{padding-left:22px}
+canvas.c2d{width:640px;height:600px}
+.scene.full{padding:56px 64px}.scene.full>*{position:relative;z-index:2}.scene.full .slot{position:absolute;inset:0;z-index:0}.scene.full .slot canvas{width:1280px;height:720px;display:block}
+.scene.full .shade{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(5,9,12,.94) 0,rgba(5,9,12,.82) 30%,rgba(5,9,12,0) 50%)}
+.hud{position:absolute!important;right:28px;bottom:44px;width:300px;background:rgba(11,20,28,.86);border:1px solid var(--l);border-radius:14px;padding:12px 14px;font-size:13px;color:var(--m)}
+.hud .h-t{font:700 12px ui-monospace,monospace;color:var(--c);letter-spacing:.06em;margin-bottom:6px}.hud code{color:var(--i)}.hud .h-s{color:var(--t);font-weight:600;margin-bottom:8px}
+.hud .h-big{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}.hud .h-big b{display:block;font-size:26px;color:var(--t);line-height:1.1}.hud .h-big span{font-size:11px}.hud .strike{text-decoration:line-through;text-decoration-color:#ff7756;color:#ff9a86!important}
+.hud table{width:100%;border-collapse:collapse}.hud td{padding:2px 4px;border-top:1px solid #16242e;color:var(--t)}.hud td.s{color:#ff9a86;text-decoration:line-through}.hud td i{color:var(--m);font-style:normal;font-size:11px}
+.hud.small{width:232px;font-size:12px;padding:10px 12px}.hud .h-l{display:flex;align-items:center;gap:8px;margin:3px 0;color:var(--t)}.hud .h-l i{width:12px;height:12px;border-radius:3px;display:inline-block}
 #brand{position:absolute;left:64px;bottom:22px;font:700 14px system-ui;letter-spacing:.22em;color:var(--m)}#brand b{color:var(--c)}
 #prog{position:absolute;left:0;bottom:0;height:4px;background:var(--c)}
 </style>
@@ -80,13 +90,17 @@ function visualHTML(sc, idx) {
   }
   if (v.kind === 'stack') return `<div class="stack">${(L[LANG] ?? L.en).stack.map(([t, p], i) => `<div class="card s${i}"><b>${t}</b><p>${p}</p></div>`).join('')}</div>`;
   if (v.kind === 'verify') { const l = L[LANG] ?? L.en; return `<div class="kpis"><div class="kpi k0"><b>${NUM.core}/${NUM.core}</b><span>${l.core}</span></div><div class="kpi k1"><b>${NUM.e2e}/${NUM.e2e}</b><span>${l.e2e}</span></div><div class="kpi warn k2"><ul class="missing">${l.missing.map((m) => `<li>${m}</li>`).join('')}</ul></div></div>`; }
+  if (v.kind === 'call' || v.kind === 'howsim') return '<canvas class="c2d" width="640" height="600"></canvas>';
   if (v.kind === 'cta') { const l = L[LANG] ?? L.en; return `<div><div class="chips">${l.who.map((w, i) => `<span class="chip w${i}">${w}</span>`).join('')}</div><div class="url">civic-relay-investor.vercel.app/senda</div></div>`; }
   return '';
 }
 
 function build() {
   const stage = document.getElementById('stage');
-  stage.innerHTML = SCRIPT.scenes.map((sc, i) => `<section class="scene" id="sc-${i}"><div><div class="eyebrow">SENDA · ${String(i + 1).padStart(2, '0')} / ${SCRIPT.scenes.length}</div><h1>${T(sc.title).split(' ').map((w) => `<span>${w}</span>`).join('')}</h1></div><div class="vis">${visualHTML(sc, i)}</div></section>`).join('');
+  const head = (sc, i) => `<div><div class="eyebrow">SENDA · ${String(i + 1).padStart(2, '0')} / ${SCRIPT.scenes.length}</div><h1>${T(sc.title).split(' ').map((w) => `<span>${w}</span>`).join('')}</h1></div>`;
+  stage.innerHTML = SCRIPT.scenes.map((sc, i) => SIMS.full(sc.visual.kind)
+    ? `<section class="scene full" id="sc-${i}"><div class="slot"></div><div class="shade"></div>${head(sc, i)}<div></div><div class="hud"></div></section>`
+    : `<section class="scene" id="sc-${i}">${head(sc, i)}<div class="vis">${visualHTML(sc, i)}</div></section>`).join('');
   scenesEl = SCRIPT.scenes.map((_, i) => document.getElementById('sc-' + i));
 }
 
@@ -111,6 +125,7 @@ window.seek = (t) => {
     // elementos ligados a la frase que los explica
     for (let k = 0; k < 6; k++) { appear(`.k${k}`, cue(Math.min(k + (SCRIPT.scenes[i].visual.kind === 'kpis' ? 1 : SCRIPT.scenes[i].visual.kind === 'shots' ? 1 : 0), s.cues.length - 1)) + 0.3 + (SCRIPT.scenes[i].visual.kind === 'kpis' ? 0 : k * 0.6)); appear(`.s${k}`, cue(0) + 0.6 + k * 1.6); appear(`.w${k}`, cue(0) + 0.4 + k * 0.5); appear(`.f${k}`, 0.3 + k * 0.5, 40); }
     el.querySelectorAll('.f0 img,.f1 img').forEach((im) => { const z = 1 + 0.04 * clamp(lt / d); im.style.transformOrigin = '50% 0'; im.style.transform = `scale(${z})`; });
+    SIMS.draw(SCRIPT.scenes[i].visual.kind, el, lt, d, cue);
     const url = el.querySelector('.url'); if (url) { const p = ease((lt - cue(1)) / 0.8); url.style.opacity = p; }
     const hub = el.querySelector('.hub');
     if (hub) {
@@ -129,6 +144,8 @@ window.seek = (t) => {
   TL = window.TIMELINE; window.DURATION = TL.duration;
   document.documentElement.lang = LANG;
   build();
+  await SIMS.init();
+  SCRIPT.scenes.forEach((sc, i) => { const c = SIMS.canvasFor(sc.visual.kind); if (c) scenesEl[i].querySelector('.slot').appendChild(c); });
   await Promise.all([...document.images].map((im) => (im.complete ? 1 : new Promise((r) => { im.onload = im.onerror = r; }))));
   window.seek(+(new URLSearchParams(location.search).get('t') || 0));
   window.READY = true;

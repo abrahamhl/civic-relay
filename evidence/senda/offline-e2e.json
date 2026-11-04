@@ -2,10 +2,10 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-04T22:20:16.439Z",
-  "durationS": 141.7,
-  "passed": 31,
-  "total": 31,
+  "at": "2026-11-04T23:36:15.840Z",
+  "durationS": 126.5,
+  "passed": 32,
+  "total": 32,
   "results": [
     {
       "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
@@ -100,8 +100,8 @@
       "ok": true,
       "path": {
         "sat": "Iridium 2-5",
-        "elevationDeg": 24.7,
-        "rangeKm": 1548,
+        "elevationDeg": 24.8,
+        "rangeKm": 1546,
         "delayMs": 5.16
       },
       "plan": {
@@ -192,7 +192,7 @@
       "cur": "d-rescue",
       "edges": 5,
       "detail": "Probado en simulación nuevoConcurrencia de direcciones aleatorias → teléfonos por planta; inferencia bayesiana exacta → personas con intervalo del 90 %.Código: rf-census.mjsAparece en: 🚁 Censo con dronAbrir /senda/dron →",
-      "nodes": 35,
+      "nodes": 36,
       "links": [
         "/senda/dron",
         "/senda/llamada"
@@ -205,8 +205,8 @@
       "answerBytes": 72,
       "offerSoundS": 7.8,
       "audioPackets": [
-        151,
-        150
+        150,
+        151
       ],
       "requests": []
     },
@@ -216,10 +216,28 @@
       "connected": true,
       "offerBytes": 79,
       "answerBytes": 72,
-      "connectMs": 350,
+      "connectMs": 326,
       "message": "¿Me oyes? Estoy en la 3.ª planta, puerta B",
-      "rttMs": 1,
+      "rttMs": 0,
       "audioPackets": 75
+    },
+    {
+      "name": "Cadena de voz real A → B → C: B reenvía la voz de A (C oye el tono de 440 Hz de A) y el chat; el plan nunca usa como repetidor a quien tiene poca batería y avisa de quién queda aislado",
+      "ok": true,
+      "freqAtC": 441,
+      "audioPacketsAtC": 100,
+      "relays": [
+        "Ana",
+        "Iker",
+        "Juan",
+        "Portero",
+        "Sara"
+      ],
+      "isolatedWhenLow": [
+        "Ana",
+        "Luis",
+        "Marta"
+      ]
     },
     {
       "name": "Organismo firma credencial; alerta firmada viaja por la mula; el residente la verifica, responde «atrapado» y el coordinador lo ve en su cuadro",
@@ -230,7 +248,7 @@
     {
       "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
       "ok": true,
-      "href": "senda://accion?a=BLE_BEACON&id=93e1cd491376ac4c&b=B14&f=3&u=B&bat=100&cmd=6qRiZk9lB8MyEMS8"
+      "href": "senda://accion?a=BLE_BEACON&id=1728e5a87b438fe8&b=B14&f=3&u=B&bat=100&cmd=_dXi4Grcx9urK5_a"
     },
     {
       "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",

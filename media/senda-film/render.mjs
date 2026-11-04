@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Render determinista de la película SENDA v3 (1280×720, 25 fps, H.264 + AAC) por idioma.
+ * Render determinista de la película SENDA v5 (1280×720, 25 fps, H.264 + AAC) por idioma.
  *   LANG=es CORE=78 E2E=23 node render.mjs          → out/senda-film-es.mp4
  *   node render.mjs --stills es 3,40,90              → out/stills-<lang>/t-<s>.png
  * Requisitos: python3 -I voice.py … <lang> antes (out/voice-<lang>.wav, out/timeline-<lang>.js).
@@ -16,19 +16,20 @@ const { chromium } = createRequire(import.meta.url)('playwright');
 const here = dirname(fileURLToPath(import.meta.url));
 const out = resolve(here, 'out'); mkdirSync(out, { recursive: true });
 const FPS = +(process.env.FPS || 25), JOBS = +(process.env.JOBS || 3);
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png' };
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png' };
+const pub = resolve(here, '../../investor-next/public'); // núcleo real y three.js servidos en /senda/
 
 function serve() {
   return new Promise((res) => {
     const s = createServer(async (req, rsp) => {
-      try { const p = resolve(here, '.' + decodeURIComponent(new URL(req.url, 'http://x').pathname)); if (!p.startsWith(here)) throw 0; const b = await readFile(p); rsp.writeHead(200, { 'content-type': MIME[extname(p)] ?? 'application/octet-stream' }); rsp.end(b); }
+      try { const u = decodeURIComponent(new URL(req.url, 'http://x').pathname), root = u.startsWith('/senda/') ? pub : here, p = resolve(root, '.' + u); if (!p.startsWith(root)) throw 0; const b = await readFile(p); rsp.writeHead(200, { 'content-type': MIME[extname(p)] ?? 'application/octet-stream' }); rsp.end(b); }
       catch { rsp.writeHead(404); rsp.end(); }
     }).listen(0, () => res(s));
   });
 }
 async function openPage(lang) {
   const srv = await serve();
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
   const errors = []; page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto(`http://127.0.0.1:${srv.address().port}/film.html?lang=${lang}&core=${process.env.CORE || 0}&e2e=${process.env.E2E || 0}`);

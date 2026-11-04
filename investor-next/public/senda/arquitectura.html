@@ -79,6 +79,22 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{padding:8px 6px
   </div>
 </section>
 
+<section class="card" style="margin-top:14px" aria-labelledby="h-phys">
+  <h2 id="h-phys">Del plano al mundo físico: qué se puede desplegar</h2>
+  <p class="m" style="margin-top:0">La arquitectura no depende de hardware nuevo: usa lo que ya existe y añade piezas baratas y abiertas. Esto es lo que hay construido y lo que falta para llevarlo a la calle.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Pieza física</th><th>Qué hace</th><th>Qué existe hoy</th><th>Qué falta</th></tr></thead>
+    <tbody>
+      <tr><td><b>📱 Cualquier móvil</b></td><td>SOS, mensajes, llamadas, cadena de voz y sonido</td><td>App web instalable que abre sin red (12 pantallas en la prueba automática)</td><td>Ensayo con teléfonos físicos en un edificio real: alcance del punto de acceso por planta</td></tr>
+      <tr><td><b>🤖 Móvil Android con la app nativa</b></td><td>Baliza Bluetooth, escucha de balizas, barrido Wi-Fi</td><td><code>apps/senda-android</code>: baliza y barrido, solo con el toque del usuario</td><td>Wi-Fi Aware/Direct para llamar sin ninguna red; publicación en tiendas</td></tr>
+      <tr><td><b>📡 Accesorio ESP32</b></td><td>Barrido de routers y balizas desde un mástil o un dron</td><td><code>hardware/esp32-survey</code>, con la misma trama que la web y Android y probado con vectores comunes</td><td>Montaje en dron y ensayo de campo del censo con ocupación conocida</td></tr>
+      <tr><td><b>📶 Pasarela de barrio LoRa</b></td><td>Mantener el canal cuando cae la red móvil</td><td>Planificación de portadores y de la colocación de pasarelas en el núcleo</td><td>Prototipo físico con radio LoRa y batería</td></tr>
+      <tr><td><b>🚁 Dron con punto de acceso</b></td><td>Reconectar una planta aislada de la cadena de voz; transportar mensajes como mula</td><td>Plan de misión, mula y aviso de aislamiento en el núcleo</td><td>Integración con un operador de drones autorizado</td></tr>
+      <tr><td><b>🖥️ Relé del organismo</b></td><td>Puente con Internet cuando lo hay, sin poder leer el contenido</td><td><code>packages/senda-relay</code> en Docker, con pruebas</td><td>Despliegue piloto en un organismo</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
 <section class="card" style="margin-top:14px" aria-labelledby="h-mx">
   <h2 id="h-mx">Qué sensores y radios del teléfono usa SENDA</h2>
   <p class="m" style="margin-top:0">Un Android normal lleva una decena de sensores y radios. Esta es la lista honesta: qué aporta cada uno, con qué interfaz pública, qué permiso exige y en qué estado está en SENDA.</p>
@@ -124,6 +140,7 @@ const N = [
   ['c-route', 'core', 'Enrutador y escalera', 'web', 'Decide por dónde salir: Bluetooth, Wi-Fi, SMS o esperar 4 minutos al satélite (enrutamiento por grafo de contactos, como en las redes de la NASA).', 'router.mjs · ladder.mjs'],
   ['c-multi', 'core', 'Multi-portador k-de-n', 'web', 'Parte el mensaje en fragmentos Reed-Solomon y los reparte por varios portadores: llega aunque fallen algunos.', 'erasure.mjs · bearers.mjs'],
   ['c-call', 'core', 'Señalización compacta', 'web', 'Reduce la descripción de una llamada WebRTC de ~2 KB a 80–110 bytes para que quepa por sonido o en un código corto.', 'sdp-compact.mjs', '/senda/llamada', 1],
+  ['c-mesh', 'core', 'Malla de voz', 'web', 'Si dos personas no se alcanzan, los teléfonos intermedios reenvían voz y chat. Árbol con los saltos mínimos, turno de palabra (1 flujo por enlace) y nunca repite quien tiene poca batería.', 'voice-mesh.mjs', '/senda/llamada', 1],
   ['c-census', 'core', 'Censo radio por planta', 'sim', 'Concurrencia de direcciones aleatorias → teléfonos por planta; inferencia bayesiana exacta → personas con intervalo del 90 %.', 'rf-census.mjs', '/senda/dron', 1],
   ['c-fusion', 'core', 'Fusión de evidencias', 'sim', 'Probabilidad de que haya una persona por vivienda, uniendo SOS, radio, térmica y golpes, y la siguiente medida más útil.', 'occupancy.mjs · sensor-fabric.mjs', '/senda/edificios'],
   ['c-hazard', 'core', 'Peligros', 'sim', 'Sismo, frente de incendio y antenas que caerán, vigilancia de vía y previsión de apagón de comunicaciones.', 'seismic · wildfire · rail-watch · blackout', '/senda/incendio'],
@@ -184,6 +201,12 @@ const SCEN = [
     ['c-route', 'Antes de que caigan, se preparan rutas alternativas: LoRa, mula, satélite.'],
     ['b-lora', 'Las pasarelas de barrio mantienen el canal cuando cae la red móvil.'],
     ['d-org', 'Protección Civil decide las alertas; SENDA le da margen de tiempo.'],
+  ] },
+  { id: 'malla', name: '🎙️ Cadena de voz', intro: 'Ana está en la 4.ª planta; el equipo de rescate, en la calle. Ningún punto de acceso cubre los dos extremos.', steps: [
+    ['a-call', 'Ana mantiene pulsado «hablar»: pide el turno de palabra, como en un walkie-talkie.'],
+    ['c-mesh', 'SENDA elige el árbol de repetidores por la escalera. Marta, con un 12 % de batería, participa pero no repite.'],
+    ['b-lan', 'La voz salta de teléfono en teléfono por la red local, como mucho 6 saltos. Cada enlace lleva un solo flujo.'],
+    ['d-rescue', 'El equipo la oye y responde. Si un repetidor se queda sin batería, SENDA avisa de quién queda aislado y pide un dron con punto de acceso.'],
   ] },
   { id: 'via', name: '🚆 Vía de tren', intro: 'Prevención, no solo respuesta: patrones que precedieron a accidentes documentados.', steps: [
     ['ext', 'Datos que ya existen: circuitos de vía, detectores en vía y registros de marcha.'],

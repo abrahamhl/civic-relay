@@ -232,6 +232,11 @@ check('Llamada sin Internet: oferta de <110 bytes por sonido (onda real, decodif
 await D.page.evaluate(() => document.querySelector('#hang').click());
 const demo = await E.page.evaluate(async () => { await window.SENDA_CALL_API.demoHere(); return window.SENDA_CALL.demo; });
 check('Llamada de prueba en un solo dispositivo (sin micrófono): dos conexiones reales A↔B con el código por forma de onda, mensaje y audio recibidos', demo.connected && demo.message?.includes('3.ª planta') && demo.audioPackets > 10, demo);
+const chain = await E.page.evaluate(async () => { const before = window.SENDA_CALL.mesh; document.querySelector('#mesh-bat').click(); await new Promise((r) => setTimeout(r, 150)); const low = window.SENDA_CALL.mesh; document.querySelector('#mesh-bat').click(); await window.SENDA_CALL_API.chainDemo(); return { before, low, ...window.SENDA_CALL.chain }; });
+await E.page.locator('#mesh').screenshot({ path: resolve(outDir, 'e2e-21-cadena-voz.png') });
+check('Cadena de voz real A → B → C: B reenvía la voz de A (C oye el tono de 440 Hz de A) y el chat; el plan nunca usa como repetidor a quien tiene poca batería y avisa de quién queda aislado',
+  chain.connected && Math.abs(chain.freqAtC - 440) <= 12 && chain.audioPacketsAtC > 20 && chain.message?.includes('4.ª planta') && !chain.before.relays.includes('Marta') && chain.before.unreachable.length === 0 && chain.low.unreachable.join() === 'Ana,Luis,Marta',
+  { freqAtC: chain.freqAtC, audioPacketsAtC: chain.audioPacketsAtC, relays: chain.before.relays, isolatedWhenLow: chain.low.unreachable });
 for (const p of [D, E]) { A.errors.push(...p.errors); await p.ctx.close(); }
 
 // ---- Flujo institucional real: organismo → credencial → alerta firmada → mula → residente → respuesta → cuadro

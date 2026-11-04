@@ -67,3 +67,24 @@ verificando cero peticiones de red, que es la propiedad que importa. Falta prueb
 Nota de confianza: **85 %**. Las cifras de Android/Chrome/AOSP están verificadas en fuente primaria; las de SENDA
 son medidas propias reproducibles; los dos preprints de conteo con direcciones aleatorias se citan por
 identificador sin haber revisado su contenido completo.
+
+## 6. v0.11 · Malla de voz y despliegue físico (añadido el mismo día)
+
+**Entrada:** arquitectura nueva, real y llevable al plano físico.
+
+**Procesamiento (`packages/senda/src/voice-mesh.mjs`):**
+- Si dos personas no se alcanzan por la red local, los teléfonos intermedios **reenvían la voz y el chat**. WebRTC permite reenviar una pista recibida por otra conexión.
+- Se elige un **árbol** que minimiza los saltos máximos. Quien tiene menos del 20 % de batería participa pero **nunca repite**.
+- **Turno de palabra** (como el walkie-talkie profesional): con una sola persona hablando, cada enlace lleva **1 flujo** sea cual sea el tamaño de la sala. Sin turno, lleva tantos flujos como personas hablando a la vez.
+- **Replanificación por batería:** si un repetidor se apaga, el plan dice quién queda aislado (para enviar una mula, un dron con punto de acceso o una pasarela LoRa).
+
+**Validación:**
+- 5 pruebas unitarias.
+- Prueba real en Chromium: cadena A → B → C con cuatro conexiones WebRTC, señalización compacta y **C oyendo el tono de 440 Hz de A a 441 Hz medidos** a través de B, más el chat reenviado.
+- Incluida en la E2E.
+
+**Límite honesto:** DTLS-SRTP cifra **salto a salto**, así que quien repite oye la voz (como en una conferencia). El texto sí puede ir cifrado de extremo a extremo con el sobre SENDA. El alcance real de un punto de acceso por planta está **pendiente de medir** con teléfonos físicos.
+
+**Despliegue físico:** la tabla «Del plano al mundo físico» de `/senda/arquitectura` resume, pieza a pieza, qué existe hoy y qué falta:
+- **Ya existen:** la app web sin red, la app Android (baliza y barrido), el accesorio ESP32 (misma trama que la web y Android) y el relé en Docker.
+- **Faltan:** el prototipo LoRa, la integración con el dron y los ensayos de campo.

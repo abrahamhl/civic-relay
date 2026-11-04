@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Doblaje de la película SENDA v3 (Kokoro-82M v1.0).
+"""Doblaje de la película SENDA v5 (Kokoro-82M v1.0). <lang>_say = texto pronunciado; <lang> = subtítulo.
 
 Uso: python3 -I voice.py <modelo.onnx> <voces.npz> <es|en> [salida_dir]
 Genera en salida_dir: voice-<lang>.wav, timeline-<lang>.js y subtitles-<lang>.vtt
@@ -30,7 +30,8 @@ track, scenes, subs, t = [], [], [], 0.0
 sil = lambda s: np.zeros(int(s * SR), dtype=np.float32)
 for sc in cfg["scenes"]:
     start = t; track.append(sil(LEAD)); t += LEAD; cues = []
-    for i, text in enumerate(sc[lang]):
+    say = sc.get(f"{lang}_say", sc[lang])  # lo que se pronuncia; sc[lang] es lo que se lee
+    for i, text in enumerate(say):
         if i: track.append(sil(GAP)); t += GAP
         audio, sr = k.create(speakable(text), voice=vc["voice"], speed=vc["speed"], lang=vc["lang"])
         assert sr == SR, sr

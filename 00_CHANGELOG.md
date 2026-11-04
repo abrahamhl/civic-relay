@@ -1,5 +1,34 @@
 # Changelog
 
+## SENDA v0.11 · 04-11-2026 · Malla de voz, despliegue físico y película v5 con simulaciones y 3D
+
+**Entrada (fundador):**
+- Seguir creando una arquitectura nueva, pero real, funcional y llevable al plano físico.
+- Rehacer la película (inglés y español) incluyendo lo nuevo.
+- Que la película se centre en cómo funcionan las simulaciones, los renders 3D, la arquitectura y la app, y en lo fácil que es usarla.
+
+**Procesamiento:**
+- `voice-mesh.mjs` (núcleo, nuevo): cadena y sala de voz entre teléfonos que no se alcanzan todos entre sí.
+  - Árbol de repetidores con los saltos mínimos.
+  - Quien tiene poca batería participa pero nunca repite.
+  - Turno de palabra tipo walkie-talkie: 1 flujo por enlace sea cual sea el tamaño de la sala.
+  - Replanificación por batería con aviso de quién queda aislado.
+  - 5 pruebas.
+- `/senda/llamada`: nueva sección «Cadena de voz».
+  - Edificio con el árbol elegido y botón «Iker se queda sin batería».
+  - Demo real A → B → C en una pestaña con cuatro conexiones WebRTC: C oye el tono de 440 Hz de A (441 Hz medidos) a través de B, y el chat llega reenviado.
+- `/senda/arquitectura`: añadidos la pieza «Malla de voz», el escenario «Cadena de voz» y la tabla «Del plano al mundo físico», que dice para cada pieza qué existe hoy y qué falta.
+- Película v5 (es/en, subtítulos es/en/nl): la v4 íntegra más 4 escenas calculadas con el núcleo real (`media/senda-film/sims.js`).
+  1. Llamar sin Internet: el código de 91 bytes se convierte en su partitura real de tonos, la conexión es directa y sigue la cadena de voz.
+  2. Censo con dron en 3D (three.js): edificio, dron, anuncios Bluetooth y panel con direcciones frente a teléfonos y personas.
+  3. Arquitectura en 3D: las 5 capas con el estado real de cada pieza y paquetes recorriendo 4 escenarios.
+  4. «Cada imagen es el código real»: código del núcleo ejecutándose, pruebas automáticas, render determinista y «un toque».
+- Subtítulos sin fonética: el texto que se pronuncia (`<lang>_say`) va separado del que se lee. Por ejemplo, la voz dice «Rid Sólomon» y el subtítulo muestra «Reed-Solomon».
+
+**Validación:** núcleo 123/123 + relé 2/2 · E2E en Chromium 32/32 (incluida la cadena de voz real) · web: compilación, idiomas y 98/98.
+
+— Registrado por el asistente de orquestación (Claude Code), bajo la dirección de Abraham Haddioui.
+
 ## SENDA v0.10 · 04-11-2026 · SENDA como canal de comunicación: llamadas sin Internet, censo radio con dron y arquitectura visible
 
 **Entrada (fundador):** que la app no sea solo sonido sino un canal de comunicación de verdad (llamar y comunicarse en general), que use los sensores del teléfono y de los drones (estimar por radio cuántas personas hay en un edificio), centrarse en la arquitectura del sistema de forma visual y funcional, e inventar tecnología nueva.

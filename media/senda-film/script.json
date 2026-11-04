@@ -1,5 +1,5 @@
 {
- "note": "Película SENDA v4. Cada escena: visual + narración por idioma (es/en) + subtítulos nl (traducción de en, mismos tiempos). Cifras: evidence/senda/*.json y fuentes en docs/research/PROCUREMENT_GAP_2026.md. v4 añade: Ojo de SENDA, ver lo que no se ve, vías de tren e incendios.",
+ "note": "Película SENDA v5. Cada escena: visual + narración por idioma (es/en) + subtítulos nl. Si existe <lang>_say, es lo que se PRONUNCIA; <lang> es lo que se LEE en subtítulos. v5 añade: llamar sin Internet y cadena de voz, censo con dron en 3D, arquitectura en 3D y cómo se calcula cada imagen (simulaciones con el núcleo real).",
  "voices": {
   "es": {
    "voice": "ef_dora",
@@ -69,7 +69,7 @@
    },
    "es": [
     "Esto es SENDA, el Sistema de Enrutamiento de Emergencia por canales alternativos.",
-    "No es otra aplicación de mensajería. Es la capa que coordina todo lo que pueda mover un mensaje: teléfonos cercanos, sonido, satélite directo al móvil, Lora, Iridium, radioaficionados, drones, y la red que quede en pie."
+    "No es otra aplicación de mensajería. Es la capa que coordina todo lo que pueda mover un mensaje: teléfonos cercanos, sonido, satélite directo al móvil, LoRa, Iridium, radioaficionados, drones, y la red que quede en pie."
    ],
    "en": [
     "This is SENDA: emergency routing over alternative channels.",
@@ -78,6 +78,10 @@
    "nl": [
     "Dit is SENDA: noodroutering via alternatieve kanalen.",
     "Het is geen zoveelste berichtenapp. Het is de laag die alles coördineert wat een bericht kan vervoeren: telefoons in de buurt, geluid, satelliet rechtstreeks naar de telefoon, LoRa, Iridium, zendamateurs, drones en wat er nog van het netwerk overeind staat."
+   ],
+   "es_say": [
+    "Esto es SENDA, el Sistema de Enrutamiento de Emergencia por canales alternativos.",
+    "No es otra aplicación de mensajería. Es la capa que coordina todo lo que pueda mover un mensaje: teléfonos cercanos, sonido, satélite directo al móvil, Lora, Iridium, radioaficionados, drones, y la red que quede en pie."
    ]
   },
   {
@@ -105,6 +109,37 @@
    "nl": [
     "Het werkt vanaf de eerste seconde zonder internet. Berichten zijn end-to-end versleuteld en reizen via geluid tussen twee telefoons, in een bestand of van hand tot hand: elke telefoon met SENDA vervoert berichten die hij zelf niet kan lezen.",
     "Zodra de ontvanger het krijgt, wist zijn onvervalsbare ontvangstbewijs de kopieën die nog onderweg zijn."
+   ]
+  },
+  {
+   "id": "s3b",
+   "visual": {
+    "kind": "call"
+   },
+   "title": {
+    "es": "Llamar sin Internet",
+    "en": "Calling without Internet",
+    "nl": "Bellen zonder internet"
+   },
+   "es": [
+    "Ahora SENDA también llama. Dos teléfonos en la misma wifi, o en el punto de acceso de uno de ellos, hablan sin Internet, sin operador y sin servidor.",
+    "El truco está en el arranque: lo que normalmente necesitaba un servidor, unos dos mil caracteres, SENDA lo reduce a unos noventa bytes y lo pasa por sonido en menos de nueve segundos.",
+    "Después, la voz y el chat viajan cifrados directamente entre los dos. Y si no os alcanzáis, un tercer teléfono en la escalera repite la voz: en la prueba, el tercero oyó el tono exacto del primero a través del segundo."
+   ],
+   "en": [
+    "Now SENDA can also call. Two phones on the same Wi-Fi, or on one phone's hotspot, talk with no Internet, no carrier and no server.",
+    "The trick is the setup: what normally needed a server, about two thousand characters, SENDA shrinks to about ninety bytes and sends it by sound in under nine seconds.",
+    "Then voice and chat travel encrypted, directly between the two. And if you can't reach each other, a third phone on the stairs relays the voice: in the test, the third phone heard the first phone's exact tone through the second."
+   ],
+   "nl": [
+    "Nu kan SENDA ook bellen. Twee telefoons op hetzelfde wifi-netwerk, of op de hotspot van een van beide, praten zonder internet, zonder provider en zonder server.",
+    "De truc zit in de opbouw: wat normaal een server nodig had, zo'n tweeduizend tekens, brengt SENDA terug tot ongeveer negentig bytes en stuurt het in minder dan negen seconden via geluid.",
+    "Daarna reizen spraak en chat versleuteld rechtstreeks tussen de twee. En als jullie elkaar niet bereiken, geeft een derde telefoon op de trap de stem door: in de test hoorde de derde telefoon via de tweede precies de toon van de eerste."
+   ],
+   "es_say": [
+    "Ahora Senda también llama. Dos teléfonos en la misma uifi, o en el punto de acceso de uno de ellos, hablan sin Internet, sin operador y sin servidor.",
+    "El truco está en el arranque: lo que normalmente necesitaba un servidor, unos dos mil caracteres, Senda lo reduce a unos noventa bytes y lo pasa por sonido en menos de nueve segundos.",
+    "Después, la voz y el chat viajan cifrados directamente entre los dos. Y si no os alcanzáis, un tercer teléfono en la escalera repite la voz: en la prueba, el tercero oyó el tono exacto del primero a través del segundo."
    ]
   },
   {
@@ -140,8 +175,8 @@
     "nl": "Eén bericht, vele routes tegelijk"
    },
    "es": [
-    "Lo que nadie hace todavía: SENDA trocea cada mensaje con codificación Rid Sólomon y reparte los fragmentos entre portadores distintos. Basta con que lleguen unos cuantos, cualesquiera, para reconstruirlo.",
-    "Con satélite, Lora, SMS y vecinos, un ese o ese alcanza un noventa y nueve por ciento de probabilidad de entrega, calculada de forma exacta. En la prueba real, ciento noventa y siete de doscientos mensajes se reconstruyeron byte a byte, perdiendo portadores al azar."
+    "Lo que nadie hace todavía: SENDA trocea cada mensaje con codificación Reed-Solomon y reparte los fragmentos entre portadores distintos. Basta con que lleguen unos cuantos, cualesquiera, para reconstruirlo.",
+    "Con satélite, LoRa, SMS y vecinos, un SOS alcanza un noventa y nueve por ciento de probabilidad de entrega, calculada de forma exacta. En la prueba real, ciento noventa y siete de doscientos mensajes se reconstruyeron byte a byte, perdiendo portadores al azar."
    ],
    "en": [
     "What nobody does yet: SENDA splits every message with Reed-Solomon coding and spreads the fragments across different bearers. Any few of them arriving is enough to rebuild it.",
@@ -150,6 +185,10 @@
    "nl": [
     "Wat nog niemand doet: SENDA splitst elk bericht met Reed-Solomon-codering en verdeelt de fragmenten over verschillende dragers. Een paar willekeurige fragmenten zijn genoeg om het te herstellen.",
     "Met satelliet, LoRa, sms en buren haalt een SOS een afleverkans van negenennegentig procent, exact berekend. In de live test werden honderdzevenennegentig van de tweehonderd berichten byte voor byte hersteld terwijl dragers willekeurig wegvielen."
+   ],
+   "es_say": [
+    "Lo que nadie hace todavía: SENDA trocea cada mensaje con codificación Rid Sólomon y reparte los fragmentos entre portadores distintos. Basta con que lleguen unos cuantos, cualesquiera, para reconstruirlo.",
+    "Con satélite, Lora, SMS y vecinos, un ese o ese alcanza un noventa y nueve por ciento de probabilidad de entrega, calculada de forma exacta. En la prueba real, ciento noventa y siete de doscientos mensajes se reconstruyeron byte a byte, perdiendo portadores al azar."
    ]
   },
   {
@@ -167,7 +206,7 @@
     "nl": "Het hele satellietnetwerk, per toegangsniveau"
    },
    "es": [
-    "Cada red satelital está clasificada por nivel de acceso: las que ya lleva tu móvil, las que necesitan un módulo como Iridium, las de radioaficionado como cu o cien, donde la ley prohíbe cifrar y SENDA solo envía estados públicos firmados, y las gubernamentales, que requieren convenio.",
+    "Cada red satelital está clasificada por nivel de acceso: las que ya lleva tu móvil, las que necesitan un módulo como Iridium, las de radioaficionado como QO-100, donde la ley prohíbe cifrar y SENDA solo envía estados públicos firmados, y las gubernamentales, que requieren convenio.",
     "Lo que todavía está en desarrollo, como el servicio de alertas de Galileo, se marca así."
    ],
    "en": [
@@ -177,6 +216,10 @@
    "nl": [
     "Elk satellietnetwerk is ingedeeld naar toegangsniveau: wat je telefoon al heeft, wat een module zoals Iridium nodig heeft, amateurnetwerken zoals QO-100, waar de wet versleuteling verbiedt en SENDA alleen ondertekende openbare statussen verstuurt, en overheidsnetwerken, waarvoor een overeenkomst nodig is.",
     "Wat nog in ontwikkeling is, zoals de waarschuwingsdienst van Galileo, wordt zo aangeduid."
+   ],
+   "es_say": [
+    "Cada red satelital está clasificada por nivel de acceso: las que ya lleva tu móvil, las que necesitan un módulo como Iridium, las de radioaficionado como cu o cien, donde la ley prohíbe cifrar y SENDA solo envía estados públicos firmados, y las gubernamentales, que requieren convenio.",
+    "Lo que todavía está en desarrollo, como el servicio de alertas de Galileo, se marca así."
    ]
   },
   {
@@ -294,7 +337,7 @@
    },
    "es": [
     "En un accidente ferroviario, cada teléfono detecta el impacto, pregunta si estás bien y, si no respondes, avisa solo.",
-    "Al fusionar los informes, el panel separa los dos trenes en treinta y cuatro segundos de simulación. En Adamuz, reconocer el segundo tren llevó unos cuarenta y cinco minutos, según la cronología publicada. Y todo sale en el formato cap que ya leen las salas uno uno dos."
+    "Al fusionar los informes, el panel separa los dos trenes en treinta y cuatro segundos de simulación. En Adamuz, reconocer el segundo tren llevó unos cuarenta y cinco minutos, según la cronología publicada. Y todo sale en el formato CAP que ya leen las salas 112."
    ],
    "en": [
     "In a rail accident, every phone detects the impact, asks if you are all right and, if you don't answer, raises the alarm on its own.",
@@ -303,6 +346,10 @@
    "nl": [
     "Bij een treinongeval detecteert elke telefoon de klap, vraagt of alles goed is en slaat zelf alarm als je niet antwoordt.",
     "Door de meldingen samen te voegen onderscheidt het paneel de twee treinen in vierendertig seconden simulatie. In Adamuz duurde het volgens de gepubliceerde tijdlijn ongeveer vijfenveertig minuten om de tweede trein te herkennen. En alles wordt geëxporteerd in CAP, het formaat dat meldkamers al lezen."
+   ],
+   "es_say": [
+    "En un accidente ferroviario, cada teléfono detecta el impacto, pregunta si estás bien y, si no respondes, avisa solo.",
+    "Al fusionar los informes, el panel separa los dos trenes en treinta y cuatro segundos de simulación. En Adamuz, reconocer el segundo tren llevó unos cuarenta y cinco minutos, según la cronología publicada. Y todo sale en el formato cap que ya leen las salas uno uno dos."
    ]
   },
   {
@@ -330,6 +377,37 @@
    "nl": [
     "In een beschadigd gebouw lokaliseert SENDA routers per verdieping met inspecties te voet of per drone, en stuurt waarschuwingen alleen naar de getroffen verdiepingen.",
     "Wie niet antwoordt, staat als vermist, onbevestigd, nooit als slachtoffer."
+   ]
+  },
+  {
+   "id": "s8a",
+   "visual": {
+    "kind": "drone3d"
+   },
+   "title": {
+    "es": "Contar personas por planta, desde fuera",
+    "en": "Counting people per floor, from outside",
+    "nl": "Mensen per verdieping tellen, van buitenaf"
+   },
+   "es": [
+    "Cuando nadie puede entrar en un edificio, un dron sube por la fachada planta a planta y escucha las señales Bluetooth que emiten los teléfonos, sin conectarse a ellos ni leer nada.",
+    "Contar señales engaña: cada móvil cambia de dirección cada pocos minutos. SENDA cuenta cuántas están activas a la vez, y de ahí deduce los teléfonos exactos de cada planta.",
+    "Después calcula cuántas personas hay, con un margen honesto. En setecientas veinte plantas simuladas, ese margen contuvo la cifra real en el noventa y cinco por ciento de los casos. Solo salen números, nunca identidades."
+   ],
+   "en": [
+    "When nobody can enter a building, a drone climbs the façade floor by floor and listens to the Bluetooth signals that phones emit, without connecting to them or reading anything.",
+    "Counting signals is misleading: every phone changes its address every few minutes. SENDA counts how many are active at the same time, and from that it deduces the exact number of phones on each floor.",
+    "Then it estimates how many people there are, with an honest margin. Across seven hundred and twenty simulated floors, the margin contained the real figure ninety-five per cent of the time. Only numbers come out, never identities."
+   ],
+   "nl": [
+    "Als niemand een gebouw in kan, vliegt een drone verdieping per verdieping langs de gevel en luistert naar de Bluetooth-signalen van telefoons, zonder verbinding te maken of iets te lezen.",
+    "Signalen tellen misleidt: elke telefoon wisselt om de paar minuten van adres. SENDA telt hoeveel er tegelijk actief zijn en leidt daaruit het exacte aantal telefoons per verdieping af.",
+    "Daarna berekent het hoeveel mensen er zijn, met een eerlijke marge. In zevenhonderdtwintig gesimuleerde verdiepingen bevatte die marge in vijfennegentig procent van de gevallen het echte aantal. Er komen alleen getallen uit, nooit identiteiten."
+   ],
+   "es_say": [
+    "Cuando nadie puede entrar en un edificio, un dron sube por la fachada planta a planta y escucha las señales Blutuz que emiten los teléfonos, sin conectarse a ellos ni leer nada.",
+    "Contar señales engaña: cada móvil cambia de dirección cada pocos minutos. SENDA cuenta cuántas están activas a la vez, y de ahí deduce los teléfonos exactos de cada planta.",
+    "Después calcula cuántas personas hay, con un margen honesto. En setecientas veinte plantas simuladas, ese margen contuvo la cifra real en el noventa y cinco por ciento de los casos. Solo salen números, nunca identidades."
    ]
   },
   {
@@ -523,6 +601,68 @@
    ]
   },
   {
+   "id": "s10b",
+   "visual": {
+    "kind": "arch3d"
+   },
+   "title": {
+    "es": "Toda la arquitectura, en 3D",
+    "en": "The whole architecture, in 3D",
+    "nl": "De hele architectuur, in 3D"
+   },
+   "es": [
+    "Así está construido SENDA por dentro, en cinco capas. Abajo, todo lo que mide o mueve datos: micrófono, acelerómetro, barómetro, Bluetooth, wifi, drones y satélites.",
+    "Encima, los portadores: sonido, red local, mulas, LoRa y satélite. En el centro, el núcleo, que vive dentro del propio teléfono: cifra, elige la ruta, trocea los mensajes y fusiona las evidencias.",
+    "Y arriba, las aplicaciones y quién recibe: familia, equipos de rescate, el 112 y los organismos. Cada pieza muestra en la web su estado real: probada, simulada o pendiente."
+   ],
+   "es_say": [
+    "Así está construido Senda por dentro, en cinco capas. Abajo, todo lo que mide o mueve datos: micrófono, acelerómetro, barómetro, Blutuz, uifi, drones y satélites.",
+    "Encima, los portadores: sonido, red local, mulas, Lora y satélite. En el centro, el núcleo, que vive dentro del propio teléfono: cifra, elige la ruta, trocea los mensajes y fusiona las evidencias.",
+    "Y arriba, las aplicaciones y quién recibe: familia, equipos de rescate, el uno uno dos y los organismos. Cada pieza muestra en la web su estado real: probada, simulada o pendiente."
+   ],
+   "en": [
+    "This is how SENDA is built inside, in five layers. At the bottom, everything that measures or moves data: microphone, accelerometer, barometer, Bluetooth, Wi-Fi, drones and satellites.",
+    "Above them, the bearers: sound, local network, mules, LoRa and satellite. In the middle, the core, which lives inside the phone itself: it encrypts, chooses the route, splits messages and fuses the evidence.",
+    "And at the top, the apps and the recipients: family, rescue teams, 112 and agencies. Every piece shows its real status on the website: tested, simulated or pending."
+   ],
+   "en_say": [
+    "This is how SENDA is built inside, in five layers. At the bottom, everything that measures or moves data: microphone, accelerometer, barometer, Bluetooth, Wi-Fi, drones and satellites.",
+    "Above them, the bearers: sound, local network, mules, LoRa and satellite. In the middle, the core, which lives inside the phone itself: it encrypts, chooses the route, splits messages and fuses the evidence.",
+    "And at the top, the apps and the recipients: family, rescue teams, one one two and agencies. Every piece shows its real status on the website: tested, simulated or pending."
+   ],
+   "nl": [
+    "Zo is SENDA van binnen opgebouwd, in vijf lagen. Onderaan alles wat meet of data verplaatst: microfoon, versnellingsmeter, barometer, Bluetooth, wifi, drones en satellieten.",
+    "Daarboven de dragers: geluid, lokaal netwerk, koeriers, LoRa en satelliet. In het midden de kern, die in de telefoon zelf draait: hij versleutelt, kiest de route, knipt berichten op en combineert het bewijs.",
+    "En bovenaan de apps en de ontvangers: familie, reddingsteams, 112 en de organisaties. Elk onderdeel toont op de website zijn echte status: getest, gesimuleerd of nog te doen."
+   ]
+  },
+  {
+   "id": "s10c",
+   "visual": {
+    "kind": "howsim"
+   },
+   "title": {
+    "es": "Cada imagen es el código real",
+    "en": "Every frame is the real code",
+    "nl": "Elk beeld is de echte code"
+   },
+   "es": [
+    "Nada de lo que has visto está animado a mano. Cada simulación de esta película la calcula, fotograma a fotograma, el mismo código que llevará el teléfono.",
+    "Ese código se comprueba solo en cada cambio, y los números que ves aquí son los mismos que salen en las pruebas automáticas.",
+    "Por eso puedes abrir la web, pulsar los mismos botones y obtener los mismos resultados. Para quien lo usa, todo se reduce a un toque: llamar, pedir ayuda o decir que está bien."
+   ],
+   "en": [
+    "Nothing you have seen is hand-animated. Every simulation in this film is computed, frame by frame, by the same code the phone will run.",
+    "That code checks itself on every change, and the numbers you see here are the same ones the automated tests produce.",
+    "That is why you can open the website, press the same buttons and get the same results. For the person using it, it all comes down to one tap: call, ask for help, or say you are safe."
+   ],
+   "nl": [
+    "Niets van wat je hebt gezien is met de hand geanimeerd. Elke simulatie in deze film wordt beeld voor beeld berekend door dezelfde code die op de telefoon draait.",
+    "Die code test zichzelf bij elke wijziging, en de getallen die je hier ziet zijn dezelfde als die uit de automatische tests komen.",
+    "Daarom kun je de website openen, op dezelfde knoppen drukken en dezelfde resultaten krijgen. Voor wie het gebruikt komt alles neer op één tik: bellen, hulp vragen of laten weten dat het goed gaat."
+   ]
+  },
+  {
    "id": "s11",
    "visual": {
     "kind": "stack"
@@ -533,7 +673,7 @@
     "nl": "Klaar voor uitrol"
    },
    "es": [
-    "Y está preparado para desplegarse: un relé autoalojable en Dóquer que el propio organismo controla, una aplicación Ándroid para baliza Blutuz y barrido wifi, y un accesorio de bajo coste para drones y mástiles.",
+    "Y está preparado para desplegarse: un relé autoalojable en Docker que el propio organismo controla, una aplicación Android para baliza Bluetooth y barrido wifi, y un accesorio de bajo coste para drones y mástiles.",
     "Los mismos formatos se prueban en tres lenguajes de programación, para que nada se rompa entre piezas."
    ],
    "en": [
@@ -543,6 +683,10 @@
    "nl": [
     "En het is klaar voor uitrol: een zelf gehoste relay in Docker die de organisatie zelf beheert, een Android-app voor een Bluetooth-baken en wifi-scans, en een goedkoop accessoire voor drones en masten.",
     "Dezelfde formaten worden in drie programmeertalen getest, zodat er tussen de onderdelen niets breekt."
+   ],
+   "es_say": [
+    "Y está preparado para desplegarse: un relé autoalojable en Dóquer que el propio organismo controla, una aplicación Ándroid para baliza Blutuz y barrido wifi, y un accesorio de bajo coste para drones y mástiles.",
+    "Los mismos formatos se prueban en tres lenguajes de programación, para que nada se rompa entre piezas."
    ]
   },
   {
@@ -556,15 +700,15 @@
     "nl": "Machinaal geverifieerd. Eerlijk over wat ontbreekt."
    },
    "es": [
-    "Todo se verifica por máquina en cada cambio: más de cien pruebas del núcleo, y veintisiete comprobaciones de extremo a extremo con la red cortada, en navegadores reales.",
+    "Todo se verifica por máquina en cada cambio: más de ciento veinte pruebas del núcleo, y treinta y dos comprobaciones de extremo a extremo en navegadores reales, casi todas con la red cortada.",
     "Lo que falta, lo decimos: pilotos de campo con teléfonos físicos y equipos de rescate, una auditoría de seguridad independiente, y la certificación para la compra pública."
    ],
    "en": [
-    "Everything is machine-verified on every change: more than one hundred core tests, and twenty-seven end-to-end checks with the network cut, in real browsers.",
+    "Everything is machine-verified on every change: more than one hundred and twenty core tests, and thirty-two end-to-end checks in real browsers, almost all with the network cut.",
     "What's missing, we say: field pilots with physical phones and rescue teams, an independent security audit, and certification for public procurement."
    ],
    "nl": [
-    "Alles wordt bij elke wijziging machinaal geverifieerd: meer dan honderd kerntests en zevenentwintig end-to-end-controles met het netwerk uitgeschakeld, in echte browsers.",
+    "Alles wordt bij elke wijziging machinaal geverifieerd: meer dan honderdtwintig kerntests en tweeëndertig end-to-end-controles in echte browsers, bijna allemaal met het netwerk uitgeschakeld.",
     "Wat ontbreekt, zeggen we eerlijk: veldproeven met echte telefoons en reddingsteams, een onafhankelijke beveiligingsaudit en certificering voor overheidsaanbestedingen."
    ]
   },
