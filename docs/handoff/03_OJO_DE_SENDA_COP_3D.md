@@ -44,6 +44,12 @@
 
 - **Lo que sí se hace:** proyectar sobre la imagen de la cámara las **señales de radio localizadas** detrás de una pared (balizas BLE de personas atrapadas, routers, teléfonos) con un color según la intensidad. Ya está en `/senda/edificios`. A eso se suma la detección de respiración por Wi-Fi CSI (`through-wall.mjs`) con hardware compatible.
 - **Lo que no existe:** una cámara de móvil que vea a través de una pared.
+- **Lo que se ha construido (v0.7):** un **motor determinista de fusión de evidencias**
+  (`occupancy.mjs`) que combina respuestas, la señal del teléfono, respiración por CSI, golpes,
+  térmica real y búsquedas negativas en una probabilidad **calibrada** por vivienda, con intervalo,
+  traza en decibanes y la insignia «≥98 %» solo con dos familias independientes. Se pinta sobre la
+  cámara por capas (`vision-layers.mjs`: probabilidad, espectro, estructura, topografía, térmica
+  real). Validación en simulación y límites: [`docs/architecture/MOTOR_FUSION_EVIDENCIAS.md`](../architecture/MOTOR_FUSION_EVIDENCIAS.md).
 - **Escaneo 3D de una habitación:**
   - En iOS con LiDAR, RoomPlan (app nativa).
   - En Android, ARCore Depth.

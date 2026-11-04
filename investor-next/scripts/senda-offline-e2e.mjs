@@ -151,6 +151,24 @@ check('Gemelo digital sin red: recuento de zona, edificio 3D, routers por planta
   tw.total === 14 && tw.affected >= 5 && tw.located >= 50 && tw.within1 >= 95 && tw.gateways >= 1 && tw.board === 15 && /plantas 1, 2, 3, 4/.test(alertOut) && arShown > 0,
   { ...tw, arSignalsInView: arShown });
 
+// ---- Visión por capas: motor de fusión + capas sobre la cámara (sin red)
+await C.page.click('[data-v="vision"]'); await C.page.check('#layers input[value="TOPOGRAFIA"]'); await C.page.waitForTimeout(1500);
+const vis = await C.page.evaluate(() => window.SENDA_BUILDINGS.vision);
+const fusionRows = await C.page.locator('#fusion-table tr').count();
+await C.page.screenshot({ path: resolve(outDir, 'e2e-14-vision-layers.png') });
+check('Visión por capas sin red: probabilidad, espectro, estructura y topografía sobre la cámara; la vivienda con «atrapado» encabeza la prioridad con ≥98 % corroborado por 2 fuentes',
+  vis && ['PROBABILIDAD', 'ESPECTRO', 'ESTRUCTURA', 'TOPOGRAFIA'].every((k) => vis.byLayer[k] > 0) && vis.top.cls === 'CONFIRMADO_POR_RESPUESTA' && vis.top.badge98 && fusionRows >= 9,
+  { byLayer: vis?.byLayer, top: vis?.top, planTop: vis?.planTop });
+
+// ---- Vigilancia ferroviaria (sin red)
+await C.page.goto(base + '/via');
+await C.page.waitForFunction(() => window.SENDA_RAIL, null, { timeout: 20000 });
+const rail = await C.page.evaluate(() => window.SENDA_RAIL);
+await C.page.waitForTimeout(300); await C.page.screenshot({ path: resolve(outDir, 'e2e-15-rail-watch.png'), fullPage: true });
+check('Vigilancia ferroviaria sin red: escalón del circuito de vía detectado ≥20 h antes sin alarma del umbral, defectos de vía por los móviles, transición sin supervisión y muro con lluvia',
+  rail.events === 1 && rail.thresholdAlarms === 0 && rail.leadTimeH >= 20 && rail.geoAlerts.some((a) => a.kinds.includes('IMPACTO_REPETIDO')) && rail.geoAlerts.some((a) => a.kinds.includes('DEGRADACION')) && rail.topTransition === 'ALTO_SIN_SUPERVISION' && rail.topAsset === 3,
+  rail);
+
 // ---- Flujo institucional real: organismo → credencial → alerta firmada → mula → residente → respuesta → cuadro
 const orgPage = await A.ctx.newPage(); orgPage.on('pageerror', (e) => A.errors.push(String(e)));
 await orgPage.goto(base + '/organismo');
@@ -249,12 +267,12 @@ const a11y = async (page) => page.evaluate(() => {
   return issues;
 });
 const a11yIssues = {};
-for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/estado']) {
+for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/estado']) {
   await R.goto(base + path); await R.waitForLoadState('load'); await R.waitForTimeout(300);
   const iss = await a11y(R); if (iss.length) a11yIssues[path || '/'] = iss;
 }
 await R.close();
-check('Accesibilidad automática en las 6 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
+check('Accesibilidad automática en las 7 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
 
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 

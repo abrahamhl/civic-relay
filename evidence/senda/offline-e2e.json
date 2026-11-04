@@ -2,10 +2,10 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-04T04:37:25.368Z",
-  "durationS": 47.4,
-  "passed": 23,
-  "total": 23,
+  "at": "2026-11-04T08:58:41.645Z",
+  "durationS": 35.5,
+  "passed": 25,
+  "total": 25,
   "results": [
     {
       "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
@@ -79,6 +79,55 @@
       "arSignalsInView": 28
     },
     {
+      "name": "Visión por capas sin red: probabilidad, espectro, estructura y topografía sobre la cámara; la vivienda con «atrapado» encabeza la prioridad con ≥98 % corroborado por 2 fuentes",
+      "ok": true,
+      "byLayer": {
+        "TOPOGRAFIA": 26,
+        "ESTRUCTURA": 20,
+        "PROBABILIDAD": 60,
+        "ESPECTRO": 66
+      },
+      "top": {
+        "id": "3B",
+        "cls": "CONFIRMADO_POR_RESPUESTA",
+        "p": 0.9988151569971068,
+        "badge98": true
+      },
+      "planTop": "csi-p2"
+    },
+    {
+      "name": "Vigilancia ferroviaria sin red: escalón del circuito de vía detectado ≥20 h antes sin alarma del umbral, defectos de vía por los móviles, transición sin supervisión y muro con lluvia",
+      "ok": true,
+      "leadTimeH": 21.5,
+      "thresholdAlarms": 0,
+      "events": 1,
+      "geoAlerts": [
+        {
+          "fromPk": 7800,
+          "kinds": [
+            "RUGOSIDAD",
+            "IMPACTO_REPETIDO"
+          ]
+        },
+        {
+          "fromPk": 12350,
+          "kinds": [
+            "RUGOSIDAD",
+            "DEGRADACION"
+          ]
+        },
+        {
+          "fromPk": 12400,
+          "kinds": [
+            "RUGOSIDAD",
+            "DEGRADACION"
+          ]
+        }
+      ],
+      "topTransition": "ALTO_SIN_SUPERVISION",
+      "topAsset": 3
+    },
+    {
       "name": "Organismo firma credencial; alerta firmada viaja por la mula; el residente la verifica, responde «atrapado» y el coordinador lo ve en su cuadro",
       "ok": true,
       "issuer": "FIRE · JEFE_INCIDENTE · Parque 3 (firma verificada)",
@@ -87,7 +136,7 @@
     {
       "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
       "ok": true,
-      "href": "senda://accion?a=BLE_BEACON&id=676141a1eb073fee&b=B14&f=3&u=B&bat=100&cmd=lAnUJt3zoi3blKr3"
+      "href": "senda://accion?a=BLE_BEACON&id=1851194d0d6a4bcb&b=B14&f=3&u=B&bat=100&cmd=7zq7qaHbVGYdO4FW"
     },
     {
       "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",
@@ -102,7 +151,7 @@
       "name": "Red SENDA sin red: reparto k-de-n entre varios portadores ≥99 %, prueba real de pérdida de portadores, catálogo satelital, previsión de apagón con pasarelas y CAP con auditoría que delata alteraciones",
       "ok": true,
       "pDelivery": 0.9909,
-      "trialSuccess": 1,
+      "trialSuccess": 0.98,
       "halfDarkAtH": 4,
       "gateways": 5
     },
@@ -119,7 +168,7 @@
       "easy": true
     },
     {
-      "name": "Accesibilidad automática en las 6 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
+      "name": "Accesibilidad automática en las 7 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
       "ok": true,
       "issues": {}
     },

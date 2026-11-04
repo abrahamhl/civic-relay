@@ -18,3 +18,7 @@ export * from './satellites.mjs';
 export * from './blackout.mjs';
 export * from './drone.mjs';
 export * from './interop.mjs';
+export * from './occupancy.mjs';
+export * from './sensor-fabric.mjs';
+export * from './vision-layers.mjs';
+export * from './rail-watch.mjs';

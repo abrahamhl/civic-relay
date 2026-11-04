@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Vigilancia ferroviaria</title>
+<meta name="description" content="Prevención ferroviaria con datos que ya existen: escalones en circuitos de vía, geometría de vía con los móviles de los viajeros, transiciones de velocidad sin supervisión y muros o taludes con lluvia.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.45 Inter,system-ui,sans-serif}
+main{max-width:1240px;margin:0 auto;padding:20px 16px 60px}h1{font-size:28px;margin:4px 0}h2{font-size:17px;margin:0 0 8px}.m{color:var(--m)}a{color:var(--i)}
+.card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:14px;margin-top:14px;min-width:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:960px){.grid{grid-template-columns:1fr}}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:14px 0}@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.k{background:var(--p);border:1px solid var(--l);border-radius:12px;padding:10px}.k b{display:block;font-size:24px}
+canvas{width:100%;height:220px;display:block;border-radius:10px;background:#071018;border:1px solid var(--l)}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid var(--l);padding:5px 4px;text-align:left;vertical-align:top}
+.tag{display:inline-block;border-radius:6px;padding:1px 6px;font-size:12px;font-weight:700}.l3{background:var(--r);color:#1a0306}.l2{background:var(--a);color:#1a1203}.l1{background:#1f3b4a}.l0{background:#14222b;color:var(--m)}
+.note{border-left:3px solid var(--a);padding:6px 10px;background:#0f1a22;border-radius:6px;font-size:13px}
+</style>
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/incidente">Incidente ferroviario</a> · <a href="/senda/edificios">Edificios</a> · <a href="/senda/estado">Verificación</a></p>
+<h1>Vigilancia ferroviaria</h1>
+<p class="m">Prevención con datos que <b>ya existen</b>: registros de circuitos de vía, acelerómetros de los móviles de los viajeros, perfiles de velocidad y lluvia sobre muros y taludes. SENDA no opera trenes ni señales: <b>propone inspecciones</b> al gestor de la infraestructura con la evidencia adjunta.</p>
+<p class="note" id="disclaimer"></p>
+
+<div class="kpis">
+  <div class="k"><b id="k-lead">–</b>horas de margen ante el escalón del circuito</div>
+  <div class="k"><b id="k-thr">–</b>alarmas del umbral absoluto</div>
+  <div class="k"><b id="k-geo">–</b>tramos señalados por los viajeros</div>
+  <div class="k"><b id="k-tr">–</b>bajadas de velocidad sin supervisión</div>
+  <div class="k"><b id="k-as">–</b>activos para proponer limitación</div>
+</div>
+
+<div class="grid">
+  <section class="card" aria-labelledby="h-circ">
+    <h2 id="h-circ">1 · Circuito de vía: escalón por encima del umbral (patrón Adamuz)</h2>
+    <canvas id="c-circ" role="img" aria-label="Tensión del circuito de vía durante 48 horas con el umbral de ocupación y el escalón detectado"></canvas>
+    <p class="m" id="circ-explain"></p>
+  </section>
+  <section class="card" aria-labelledby="h-geo">
+    <h2 id="h-geo">2 · Geometría de vía con los móviles de los viajeros</h2>
+    <canvas id="c-geo" role="img" aria-label="Rugosidad relativa por tramo de 50 metros; reciente frente a anterior"></canvas>
+    <div class="scroll"><table id="geo-table"></table></div>
+  </section>
+  <section class="card" aria-labelledby="h-tr">
+    <h2 id="h-tr">3 · Transiciones de velocidad (patrón Angrois)</h2>
+    <div class="scroll"><table id="tr-table"></table></div>
+    <p class="m" style="font-size:12px">«Supervisada» es un dato del gestor: el sistema de protección en servicio controla de forma continua la reducción hasta ese punto.</p>
+  </section>
+  <section class="card" aria-labelledby="h-as">
+    <h2 id="h-as">4 · Muros y taludes con lluvia (patrón Gelida)</h2>
+    <div class="scroll"><table id="as-table"></table></div>
+    <p class="m" style="font-size:12px">Con red: lluvia de AEMET OpenData; sin red, la última conocida con su edad. Umbrales ilustrativos y configurables.</p>
+  </section>
+</div>
+
+<section class="card" aria-labelledby="h-acc">
+  <h2 id="h-acc">Por qué estos cuatro detectores</h2>
+  <div class="scroll"><table>
+    <tr><th>Accidente</th><th>Qué se sabe (fuente)</th><th>Señal previa</th><th>Detector</th></tr>
+    <tr><td>Adamuz (Córdoba), 18-01-2026</td><td>La CIAF mantiene como causa principal la rotura del carril en una soldadura; un informe de la Guardia Civil al juzgado describe una caída de tensión del circuito ~22 h antes que no generó alarma por quedar sobre el umbral (Adif lo discute). <a href="https://www.infobae.com/espana/2026/04/28/conclusion-del-accidente-de-adamuz-la-ciaf-dice-que-se-rompio-el-carril-y-descarta-anomalias-previas-en-los-trenes/">Infobae</a> · <a href="https://forbes.es/economia/902492/adif-asegura-que-la-caida-de-tension-de-la-via-de-adamuz-22-horas-antes-no-tiene-por-que-deberse-a-una-rotura/">Forbes</a></td><td>Escalón en el registro de mantenimiento</td><td>1</td></tr>
+    <tr><td>Angrois (Santiago), 24-07-2013</td><td>179 km/h en una curva limitada a 80; tramo sin supervisión continua de esa reducción (CIAF). <a href="https://en.wikipedia.org/wiki/Santiago_de_Compostela_derailment">Wikipedia</a></td><td>Bajada de 120 km/h confiada al maquinista</td><td>3</td></tr>
+    <tr><td>Gelida (Barcelona), 20-01-2026</td><td>Un muro de contención cayó sobre la vía durante el temporal; CIAF expediente 011/2026 abierto. <a href="https://www.eldebate.com/espana/cataluna/20260122/ciaf-abre-expediente-investigar-causa-descarrilamiento-tren-gelida-barcelona_377180_amp.html">El Debate</a></td><td>Lluvia + estado del muro + avisos de maquinistas</td><td>4</td></tr>
+    <tr><td>Investigación aplicada</td><td>Correlación &gt; 0,85 entre nivel longitudinal y aceleración vertical a bordo en 11 km (Paixão et al., 2019); repetibilidad y variedad de móviles como reto (TU Delft, 2025). <a href="https://repository.tudelft.nl/record/uuid:ff7db447-b831-4277-ae93-638d59224887">TU Delft</a></td><td>Aceleración de los viajeros</td><td>2</td></tr>
+  </table></div>
+  <p class="m">Revisión completa con fuentes: <code>docs/research/ACCIDENTES_GRAVES_Y_PREVENCION_2026-11-04.md</code>.</p>
+</section>
+</main>
+<script type="module">
+import { runRailWatchDemo } from '/senda/core/rail-watch-scenario.mjs';
+const $ = (s) => document.querySelector(s);
+const d = runRailWatchDemo();
+window.SENDA_RAIL = { leadTimeH: d.circuit.leadTimeH, thresholdAlarms: d.circuit.thresholdAlarms, events: d.circuit.events.length, geoAlerts: d.geometry.alerts.map((a) => ({ fromPk: a.fromPk, kinds: a.kinds })), topTransition: d.transitions[0].risk, topAsset: d.assets[0].level };
+$('#disclaimer').textContent = d.disclaimer;
+const e = d.circuit.events[0];
+const es = (x) => (x == null ? '—' : x.toLocaleString('es-ES'));
+$('#k-lead').textContent = es(d.circuit.leadTimeH); $('#k-thr').textContent = d.circuit.thresholdAlarms;
+$('#k-geo').textContent = d.geometry.alerts.length; $('#k-tr').textContent = d.transitions.filter((t) => !t.supervised).length; $('#k-as').textContent = d.assets.filter((a) => a.level === 3).length;
+$('#circ-explain').textContent = e ? `${e.explain} Confirmado ${d.circuit.detectionDelayMin} min después del escalón: ${es(d.circuit.leadTimeH)} h antes del final de la serie. Veredicto: inspeccionar la vía.` : 'Sin escalones.';
+
+function setup(cv) { const r = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight; cv.width = w * r; cv.height = h * r; const g = cv.getContext('2d'); g.scale(r, r); return { g, w, h }; }
+function drawCircuit() {
+  const { g, w, h } = setup($('#c-circ')), s = d.circuit.samples, T = d.circuit.accidentAtS, x = (t) => 30 + ((w - 40) * t) / T, y = (v) => h - 20 - ((h - 34) * v) / 2.2;
+  g.strokeStyle = '#203240'; g.fillStyle = '#9fb2bc'; g.font = '11px Inter';
+  for (const v of [0, 0.5, 1, 1.5, 2]) { g.beginPath(); g.moveTo(30, y(v)); g.lineTo(w - 10, y(v)); g.stroke(); g.fillText(v.toFixed(1), 2, y(v) + 4); }
+  for (let hh = 0; hh <= 48; hh += 12) g.fillText(`${hh} h`, Math.min(x(hh * 3600) - 8, w - 34), h - 5);
+  g.fillStyle = 'rgba(159,178,188,.35)'; for (const p of s) if (p.occupied) g.fillRect(x(p.t), y(p.v) - 1, 2, 2);
+  g.strokeStyle = '#91d7e8'; g.lineWidth = 1.5; g.beginPath(); let first = true; for (const p of s) { if (p.occupied) continue; first ? g.moveTo(x(p.t), y(p.v)) : g.lineTo(x(p.t), y(p.v)); first = false; } g.stroke();
+  g.strokeStyle = '#fbbf24'; g.setLineDash([5, 4]); g.beginPath(); g.moveTo(30, y(d.circuit.thresholdV)); g.lineTo(w - 10, y(d.circuit.thresholdV)); g.stroke(); g.setLineDash([]);
+  g.fillStyle = '#fbbf24'; g.fillText(`umbral de ocupación ${d.circuit.thresholdV} V`, 36, y(d.circuit.thresholdV) - 4);
+  if (e) { g.strokeStyle = '#ff5b6e'; g.lineWidth = 2; g.beginPath(); g.moveTo(x(e.detectedAtT), 10); g.lineTo(x(e.detectedAtT), h - 20); g.stroke(); g.fillStyle = '#ff5b6e'; g.fillText('escalón detectado', Math.min(x(e.detectedAtT) + 4, w - 110), 20); }
+}
+function drawGeometry() {
+  const { g, w, h } = setup($('#c-geo')), segs = d.geometry.segments, L = segs.at(-1).toPk, x = (pk) => 30 + ((w - 40) * pk) / L, y = (v) => h - 20 - ((h - 34) * Math.min(v, 3.5)) / 3.5;
+  const alert = new Set(d.geometry.alerts.map((a) => a.fromPk));
+  g.fillStyle = '#9fb2bc'; g.font = '11px Inter'; for (let k = 0; k <= L; k += 5000) g.fillText(`PK ${k / 1000}`, Math.min(x(k) - 12, w - 44), h - 5);
+  for (const v of [1, 2, 3]) { g.strokeStyle = '#203240'; g.beginPath(); g.moveTo(30, y(v)); g.lineTo(w - 10, y(v)); g.stroke(); g.fillText(`×${v}`, 4, y(v) + 4); }
+  for (const s of segs) { g.fillStyle = alert.has(s.fromPk) ? '#ff5b6e' : 'rgba(52,211,153,.6)'; const bw = Math.max(1, x(s.toPk) - x(s.fromPk)); g.fillRect(x(s.fromPk), y(s.recentIndex ?? s.index), alert.has(s.fromPk) ? Math.max(3, bw) : bw, h - 20 - y(s.recentIndex ?? s.index)); }
+}
+const KIND = { RUGOSIDAD: 'rugosidad', IMPACTO_REPETIDO: 'impacto repetido', DEGRADACION: 'degradación' };
+$('#geo-table').innerHTML = '<tr><th>Tramo</th><th>Señal</th><th>Índice reciente / anterior</th><th>Móviles</th><th>Acción propuesta</th></tr>' + d.geometry.alerts.map((a) =>
+  `<tr><td>PK ${es(a.fromPk / 1000)}–${es(a.toPk / 1000)}</td><td>${a.kinds.map((k) => KIND[k]).join(' · ')}</td><td>${es(a.recentIndex)} / ${es(a.oldIndex)}</td><td>${a.devices}</td><td>${a.action}</td></tr>`).join('');
+const RISK = { ALTO_SIN_SUPERVISION: ['l3', 'alto, sin supervisión'], MEDIO_SIN_SUPERVISION: ['l2', 'medio, sin supervisión'], SUPERVISADA: ['l0', 'supervisada'] };
+$('#tr-table').innerHTML = '<tr><th>PK</th><th>Punto</th><th>km/h</th><th>Energía ×</th><th>Frenado</th><th>Riesgo</th></tr>' + d.transitions.map((t) =>
+  `<tr><td>${es(t.pk / 1000)}</td><td>${t.name ?? ''}</td><td>${t.fromKmh} → ${t.toKmh}</td><td>${es(t.energyRatio)}</td><td>${t.brakingM} m · ${t.brakingS} s</td><td><span class="tag ${RISK[t.risk][0]}">${RISK[t.risk][1]}</span></td></tr>`).join('');
+$('#as-table').innerHTML = '<tr><th>Activo</th><th>Lluvia 24 h / 72 h</th><th>Estado</th><th>Avisos</th><th>Propuesta</th></tr>' + d.assets.map((a) =>
+  `<tr><td>${a.id}${a.name ? `<br><span class="m">${a.name}</span>` : ''}</td><td>${a.mm24} / ${a.mm72} mm</td><td>${a.condition}/5 · ${a.daysSinceInspection} d sin inspección</td><td>${a.reports}</td><td><span class="tag l${a.level}">${a.proposal}</span></td></tr>`).join('');
+const draw = () => { drawCircuit(); drawGeometry(); };
+addEventListener('resize', draw); draw();
+</script>
+</body></html>
