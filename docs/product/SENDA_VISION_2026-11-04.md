@@ -40,6 +40,24 @@ Resultado de los escenarios (`pnpm --filter @senda/core evidence`):
 - **S05 escombros:** posición de la víctima con error horizontal < 1 m (RSSI sintético), puente elegido automáticamente, mensaje a la familia; CSI detecta 14 rpm con persona y nada en sala vacía.
 - **S07 coordinación:** bombero verificado actualiza a «localizado a salvo»; la familia lo recibe; el voluntario no puede cambiar estados; canales internos aislados por organismo.
 
+
+## 2 bis. Offline-first verificado (v0.2 · 04-11-2026)
+
+| Capacidad | Módulo | Verificación |
+| --- | --- | --- |
+| **App instalable que abre sin red** (service worker + IndexedDB) | `investor-next/public/senda/` → `/senda/` | Chromium real, 3 teléfonos con la red cortada (`investor-next/scripts/senda-offline-e2e.mjs`) |
+| **Datos por sonido** (MFSK-16, Hamming(7,4) + entrelazado, CRC-32, sincronización por preámbulo) | `acoustic-modem.mjs` | Ida y vuelta con eco de sala, ruido 10 dB, zumbido de red, 48→44,1 kHz; nunca entrega basura |
+| **Almacenar-transportar-reenviar** (anti-entropía, spray-and-wait, cuotas por prioridad) | `bundle.mjs` | Ciudad de 40 teléfonos sin red que entregan solo por encuentros |
+| **Recibos infalsificables** que purgan copias en toda la red | `envelope.mjs` + `bundle.mjs` | Recibo falso ignorado; recibo real borra la copia de la «mula» |
+| **Sobre binario compacto** (~300 B + texto) para sonido / SMS / QR | `envelope.mjs` | Ida y vuelta exacta; un mensaje viaja en ~31 s de audio |
+| **Paridad app ↔ núcleo probado** | `tests/web-parity.test.mjs` | La app usa byte a byte el núcleo probado y el SW precarga todo |
+
+Panel público regenerado desde las pruebas: [`/senda/estado.html`](../../investor-next/public/senda/estado.html). CI dedicado: `.github/workflows/senda-ci.yml`.
+
+## 4 bis. God's Eye View (bilawalsidhu/gods-eye-view, MIT)
+
+Repositorio identificado: **`bilawalsidhu/gods-eye-view`** (Bilawal Sidhu, ex-Google), globo 3D de inteligencia espacial con fuentes públicas en tiempo real. Su **código es MIT** (reutilizable con atribución); **sus datos no**: el mapa de cables submarinos de TeleGeography (CC BY-NC-SA), las imágenes de Vantor (CC BY-NC) y las APIs de Google Maps y OpenSky restringen el uso comercial. Encaje con SENDA: God's Eye View aporta la **visión de situación** (aviones, barcos, satélites, sismos, incendios) para centros de coordinación; SENDA aporta la **última milla de comunicación sin red**. SENDA ya consume las mismas fuentes abiertas que esa herramienta (USGS, CelesTrak). La integración visual en la consola de coordinación es el siguiente paso, usando solo capas con licencia compatible.
+
 ## 3. Lo que la física y los sistemas operativos permiten (y cómo lo resolvemos)
 
 | Deseo | Realidad | Solución en SENDA |

@@ -1,0 +1,29 @@
+name: SENDA
+permissions:
+  contents: read
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  senda:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Núcleo SENDA (cifrado, módem acústico, DTN, enrutador, zonas, rescate)
+        run: node --test packages/senda/tests/*.test.mjs
+      - name: Escenarios de referencia
+        run: node packages/senda/scripts/run-scenarios.mjs
+      - name: Chromium para la prueba sin red
+        run: npx --yes playwright@1.63.0 install --with-deps chromium && npm i --no-save --prefix /tmp/pw playwright@1.63.0
+      - name: App SENDA Campo extremo a extremo con la red cortada
+        run: NODE_PATH=/tmp/pw/node_modules node investor-next/scripts/senda-offline-e2e.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: senda-evidence
+          path: evidence/senda/

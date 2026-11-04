@@ -12,6 +12,7 @@ import {WhatItDoes,SystemExplained,DeveloperBlueprint} from './system-explained'
 import {routingPitch} from './routing-pitch';
 import {getCopy,type Locale} from './copy';
 import ResponsiveHeader from './responsive-header';
+import SendaBanner from './senda-banner';
 import LanguageDocument from './language-document';
 import MasterVision from './master-vision';
 
@@ -123,6 +124,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
   <LanguageDocument locale={locale}/>
   <div className="global-grid" aria-hidden="true"/>
   <ResponsiveHeader locale={locale}/>
+  <SendaBanner locale={locale}/>
   <section id="hero-30s" className="hero container">
    <div className="hero-copy">
     <div className="eyebrow"><span className="eyebrow-line"/>{t.hero.eyebrow}</div>

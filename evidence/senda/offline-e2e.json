@@ -1,0 +1,55 @@
+{
+  "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
+  "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
+  "at": "2026-11-04T02:31:06.050Z",
+  "durationS": 4,
+  "passed": 10,
+  "total": 10,
+  "results": [
+    {
+      "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
+      "ok": true
+    },
+    {
+      "name": "Tarjetas intercambiadas sin red",
+      "ok": true
+    },
+    {
+      "name": "Camino SONIDO: B descifra el mensaje de A a partir del audio emitido",
+      "ok": true,
+      "airtimeSeconds": 31.4,
+      "bytes": 349
+    },
+    {
+      "name": "Camino ARCHIVO: B recibe y descifra el paquete .senda",
+      "ok": true
+    },
+    {
+      "name": "La mula C transporta el SOS cifrado y no puede leerlo",
+      "ok": true
+    },
+    {
+      "name": "Camino MULA: B recibe el SOS a través de C",
+      "ok": true
+    },
+    {
+      "name": "El recibo infalsificable de B borra la copia que llevaba C",
+      "ok": true
+    },
+    {
+      "name": "Duplicados descartados (cada mensaje una sola vez)",
+      "ok": true
+    },
+    {
+      "name": "Tras reiniciar sin red, B conserva sus mensajes (IndexedDB)",
+      "ok": true
+    },
+    {
+      "name": "Sin errores de JavaScript en los 3 teléfonos",
+      "ok": true,
+      "errors": []
+    }
+  ],
+  "offlineNetworkAttemptsBlocked": 0,
+  "scope": "Tres navegadores Chromium independientes. La onda acústica es la que genera la app emisora, inyectada en la receptora (sin altavoz/micrófono físicos en CI)."
+}

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SENDA Campo — mensajes de emergencia sin Internet</title>
+<meta name="description" content="SENDA: Sistema de Enrutamiento de Emergencia por canales alternativos. Mensajes cifrados que viajan sin Internet: por sonido, por archivo o de teléfono en teléfono.">
+<meta name="theme-color" content="#05090c">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
+<link rel="stylesheet" href="./app.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img src="./icon.svg" alt="" width="28" height="28"><div><b>SENDA</b><small>Campo</small></div></div>
+  <div class="status"><span id="net" class="pill">…</span><span id="sw" class="pill">…</span></div>
+</header>
+
+<main id="main">
+  <section id="onboard" class="view" hidden>
+    <h1>Mensajes que encuentran camino</h1>
+    <p class="lead">SENDA funciona <b>sin Internet, sin cobertura y sin servidores</b>. Tus mensajes viajan cifrados por <b>sonido</b> entre teléfonos, en <b>archivos</b> (Quick Share, AirDrop, Bluetooth) o de mano en mano a través de otros teléfonos con SENDA.</p>
+    <label>Tu nombre (visible para tus contactos)<input id="ob-name" maxlength="40" autocomplete="name" placeholder="Ej. Abraham"></label>
+    <label class="check"><input type="checkbox" id="ob-relay" checked> Preautorizo que mi teléfono transporte mensajes cifrados de otras personas cuando haya una emergencia declarada (sin poder leerlos).</label>
+    <button id="ob-go" class="primary">Crear mi identidad cifrada</button>
+    <p class="fine">Tus claves se generan y se guardan solo en este teléfono. Nadie más las tiene.</p>
+  </section>
+
+  <section id="home" class="view" hidden>
+    <div class="card me"><div><small>Tú</small><h2 id="me-name"></h2><code id="me-fp"></code></div></div>
+    <button id="sos" class="sos">SOS</button>
+    <p class="fine center">Envía tu posición y «necesito ayuda» a tus contactos de emergencia por todos los caminos disponibles.</p>
+    <div class="grid3">
+      <div class="stat"><b id="st-inbox">0</b><small>recibidos</small></div>
+      <div class="stat"><b id="st-carry">0</b><small>transportando</small></div>
+      <div class="stat"><b id="st-contacts">0</b><small>contactos</small></div>
+    </div>
+    <div class="card"><h3>Cómo llega tu mensaje</h3>
+      <ol class="how"><li><b>Sonido</b>: acerca dos teléfonos y pulsa «Emitir» en uno y «Escuchar» en otro. No necesita red ni Bluetooth.</li>
+      <li><b>Archivo .senda</b>: compártelo por Quick Share, AirDrop o Bluetooth; funcionan sin Internet.</li>
+      <li><b>De mano en mano</b>: cada teléfono con SENDA lleva los mensajes cifrados de otros hasta encontrarse con el destinatario o con alguien que tenga conexión.</li>
+      <li><b>SMS</b>: si los datos no van pero el SMS sí, envía el mensaje cifrado como texto.</li></ol></div>
+  </section>
+
+  <section id="contacts" class="view" hidden>
+    <h2>Contactos</h2>
+    <div class="card"><h3>Mi tarjeta</h3>
+      <div class="row"><button data-act="card-sound">🔊 Emitir por sonido</button><button data-act="card-copy">📋 Copiar código</button><button data-act="card-file">📤 Compartir archivo</button></div></div>
+    <div class="card"><h3>Añadir contacto</h3>
+      <div class="row"><button data-act="listen">🎙️ Escuchar</button><button data-act="paste">📥 Pegar código</button><label class="btn">📂 Importar<input type="file" id="card-file" accept=".sendacard,.senda,.txt,application/json" hidden></label></div></div>
+    <ul id="contact-list" class="list"></ul>
+  </section>
+
+  <section id="messages" class="view" hidden>
+    <h2>Mensajes</h2>
+    <div class="card compose">
+      <select id="to"></select>
+      <textarea id="body" maxlength="400" rows="3" placeholder="Escribe un mensaje (máx. 400 caracteres)"></textarea>
+      <div class="row"><select id="prio"><option value="3">Familia</option><option value="2">Coordinación</option><option value="0">SOS</option></select><button id="send" class="primary">Cifrar y poner en camino</button></div>
+    </div>
+    <h3>Recibidos</h3><ul id="inbox" class="list"></ul>
+    <h3>En camino (cifrados, este teléfono los transporta)</h3><ul id="carry" class="list"></ul>
+  </section>
+
+  <section id="transfer" class="view" hidden>
+    <h2>Transferir</h2>
+    <div class="card"><h3>🔊 Sonido · sin ninguna red</h3>
+      <p class="fine">Pon los teléfonos a menos de un metro, con el volumen alto. Un mensaje tarda unos 30 segundos.</p>
+      <div class="row"><button data-act="emit" class="primary">Emitir lo urgente</button><button data-act="listen">Escuchar</button></div>
+      <canvas id="scope" width="600" height="80"></canvas><p id="audio-status" class="fine"></p></div>
+    <div class="card"><h3>📦 Paquete .senda · Quick Share / AirDrop / Bluetooth / USB</h3>
+      <div class="row"><button data-act="bundle-share" class="primary">Compartir paquete</button><label class="btn">Importar paquete<input type="file" id="bundle-file" accept=".senda,application/json" hidden></label></div></div>
+    <div class="card"><h3>✉️ Texto / SMS</h3>
+      <div class="row"><button data-act="sms">Enviar como SMS</button><button data-act="text-copy">Copiar como texto</button><button data-act="paste">Pegar texto recibido</button></div></div>
+  </section>
+
+  <section id="zone" class="view" hidden>
+    <h2>Zona de emergencia</h2>
+    <div class="card"><h3>Modo relé</h3><p id="relay-state" class="big"></p>
+      <label class="check"><input type="checkbox" id="relay-consent"> Preautorizo transportar mensajes cifrados de otros en zonas declaradas.</label></div>
+    <div class="card"><h3>Alertas y sismos</h3><p class="fine">Con red, SENDA descarga los sismos del USGS y los guarda para usarlos sin conexión.</p>
+      <button data-act="feeds">Actualizar fuentes</button><ul id="zones" class="list"></ul></div>
+  </section>
+</main>
+
+<nav class="tabs" id="tabs" hidden>
+  <button data-tab="home">Inicio</button><button data-tab="contacts">Contactos</button><button data-tab="messages">Mensajes</button><button data-tab="transfer">Transferir</button><button data-tab="zone">Zona</button>
+</nav>
+<div id="toast" role="status" aria-live="polite"></div>
+<dialog id="dlg"><form method="dialog"><p id="dlg-text"></p><textarea id="dlg-input" rows="4"></textarea><menu><button value="cancel">Cancelar</button><button value="ok" class="primary">Aceptar</button></menu></form></dialog>
+<script type="module" src="./app.mjs"></script>
+</body>
+</html>

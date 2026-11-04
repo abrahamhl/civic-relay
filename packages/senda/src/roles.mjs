@@ -7,10 +7,9 @@
  * Sin credencial, cualquiera puede declararse «coordinador voluntario», pero con
  * permisos limitados y siempre etiquetado como NO VERIFICADO.
  */
+import { b64, unb64 } from './b64.mjs';
 const subtle = globalThis.crypto.subtle;
 const enc = new TextEncoder();
-const b64 = (buf) => Buffer.from(new Uint8Array(buf)).toString('base64url');
-const unb64 = (s) => new Uint8Array(Buffer.from(s, 'base64url'));
 
 export const ORG_KINDS = Object.freeze(['POLICE', 'FIRE', 'CIVIL_PROTECTION', 'HEALTH', 'MILITARY_EMERGENCY_UNIT', 'NGO']);
 

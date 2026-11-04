@@ -1,0 +1,12 @@
+{
+  "name": "SENDA Campo — mensajes de emergencia sin Internet",
+  "short_name": "SENDA",
+  "description": "Mensajes cifrados que viajan sin Internet: por sonido, por archivo o de teléfono en teléfono.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#05090c",
+  "theme_color": "#05090c",
+  "lang": "es",
+  "icons": [{ "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

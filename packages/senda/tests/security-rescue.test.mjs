@@ -76,3 +76,33 @@ test('CSI: detecta respiración (~14 rpm) con persona y nada en sala vacía; dec
   assert.deepEqual(parseEsp32CsiLine('CSI_DATA,...,"[3 4 0 5]"'), [5, 5]);
   assert.equal(CAPABILITIES.find((c) => c.id === 'CAMERA_ALONE_THROUGH_WALL').status, 'NOT_PHYSICALLY_POSSIBLE');
 });
+
+test('codificación binaria: ida y vuelta, tamaño compacto, identidad persistente y tarjeta de contacto', async () => {
+  const { packEnvelope, unpackEnvelope, exportIdentity, importIdentity, packContact, unpackContact } = await import('../src/envelope.mjs');
+  const a = await generateIdentity(), b = await generateIdentity();
+  const body = 'SOS: 3 personas en el sótano de Calle Real 4';
+  const env = await sealMessage({ sender: a, recipient: b.publicIdentity, body, priority: 0, ttlS: 86400, now, kind: 'SOS' });
+  const bin = packEnvelope(env);
+  assert.ok(bin.length < 320 + body.length, `binario ${bin.length} B`);
+  const back = unpackEnvelope(bin);
+  assert.deepEqual(back, env);
+  const b2 = await importIdentity(await exportIdentity(b));
+  assert.equal(b2.publicIdentity.fingerprint, b.publicIdentity.fingerprint);
+  assert.equal((await openMessage({ recipient: b2, envelope: back, now })).body, body);
+  const card = await unpackContact(packContact(a.publicIdentity, 'Abraham'));
+  assert.equal(card.name, 'Abraham');
+  assert.equal(card.fingerprint, a.publicIdentity.fingerprint);
+  assert.throws(() => unpackEnvelope(bin.subarray(0, 50)), /truncado/);
+});
+
+test('extremo a extremo por SONIDO: tarjeta + sobre cifrado viajan por el módem acústico', async () => {
+  const { packEnvelope, unpackEnvelope, packContact, unpackContact } = await import('../src/envelope.mjs');
+  const { modulate, demodulate } = await import('../src/acoustic-modem.mjs');
+  const a = await generateIdentity(), b = await generateIdentity();
+  const card = demodulate(modulate(packContact(b.publicIdentity, 'Ismael')));
+  const ismael = await unpackContact(card.payload);
+  const env = await sealMessage({ sender: a, recipient: ismael, body: 'Ismael, ¿qué tal estás?', priority: 3, ttlS: 3600, now });
+  const heard = demodulate(modulate(packEnvelope(env)));
+  const opened = await openMessage({ recipient: b, envelope: unpackEnvelope(heard.payload), now });
+  assert.equal(opened.body, 'Ismael, ¿qué tal estás?');
+});
