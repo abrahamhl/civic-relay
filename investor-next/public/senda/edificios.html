@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Gemelo digital de edificios afectados</title>
+<meta name="description" content="Recuento de edificios afectados, edificio en 3D por plantas y viviendas, routers y pasarelas localizados por su señal, personas por estado y alertas dirigidas por planta.">
+<link rel="icon" href="/senda/icon.svg">
+<script src="/senda/vendor/three-0.158.0.min.js"></script>
+<style>
+:root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.45 Inter,system-ui,sans-serif}
+main{max-width:1240px;margin:0 auto;padding:20px 14px 60px}h1{font-size:28px;margin:4px 0}h2{font-size:17px;margin:0 0 8px}.m{color:var(--m)}a{color:var(--i)}
+.card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:14px}
+.grid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}@media(max-width:960px){.grid{grid-template-columns:1fr}}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:14px 0}@media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}}
+.k{background:var(--p);border:1px solid var(--l);border-radius:12px;padding:10px}.k b{display:block;font-size:24px}
+.view3d{position:relative;width:100%;aspect-ratio:4/3;border-radius:12px;overflow:hidden;border:1px solid var(--l);background:#071018;touch-action:none}
+.view3d canvas,.view3d video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.tabs button,button{min-height:40px;padding:8px 12px;border-radius:10px;border:1px solid var(--l);background:#0f1d27;color:var(--t);font:inherit;cursor:pointer}
+.tabs button.on,button.p{background:var(--c);border-color:var(--c);color:#140804;font-weight:800}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid var(--l);padding:5px 4px;text-align:center}td:first-child,th:first-child{text-align:left}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--m);margin-top:8px}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.floors{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}.floors label{border:1px solid var(--l);border-radius:8px;padding:4px 7px;font-size:13px;cursor:pointer}.floors input{margin-right:4px}
+.hud{position:absolute;left:10px;top:10px;font:12px ui-monospace,monospace;background:rgba(5,9,12,.7);padding:6px 8px;border-radius:8px}
+.scale{position:absolute;right:10px;bottom:10px;width:160px;height:12px;border-radius:6px;background:linear-gradient(90deg,rgb(0,0,255),rgb(0,255,0) 50%,rgb(255,0,0));}
+.scale+span{position:absolute;right:10px;bottom:24px;font-size:11px;color:#fff}
+pre{white-space:pre-wrap;font:12px ui-monospace,monospace;color:var(--i)}
+</style>
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/incidente">Incidente ferroviario</a> · <a href="/senda/estado">Verificación</a></p>
+<h1>Gemelo digital de edificios afectados</h1>
+<p class="m">Recuento de la zona con la escala europea EMS-98, edificio en 3D por plantas y viviendas, <b>routers localizados por su señal</b> (barrido a pie o con dron), <b>pasarelas</b> con Internet confirmado, personas por estado (<b>desaparecido sin confirmar</b>, nunca «víctima») y <b>alertas dirigidas por planta</b>. Escenario «edificio 14» sintético procesado con los algoritmos reales; el botón OSM carga edificios reales de OpenStreetMap a tu alrededor.</p>
+
+<div class="kpis">
+  <div class="k"><b id="k-aff">–</b>edificios afectados (EMS-98 ≥ 2)</div>
+  <div class="k"><b id="k-rt">–</b>routers localizados en el edificio 14</div>
+  <div class="k"><b id="k-fl">–</b>planta exacta (±1: <span id="k-fl1"></span>)</div>
+  <div class="k"><b id="k-lost">–</b>routers apagados entre barridos</div>
+  <div class="k"><b id="k-gw">–</b>pasarelas con Internet</div>
+  <div class="k"><b id="k-miss">–</b>localizados sin respuesta / desaparecidos</div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="tabs"><button data-v="zone" class="on">Zona (vista dron)</button><button data-v="tower">Edificio 14 en 3D</button><button data-v="ar">Cámara · mapa de calor</button><button id="osm">Cargar edificios reales (OSM)</button></div>
+    <div class="view3d" id="view"><canvas id="gl"></canvas><video id="cam" playsinline muted hidden></video><canvas id="overlay" hidden></canvas><div class="hud" id="hud"></div></div>
+    <div class="legend" id="legend"></div>
+    <p class="m" id="osm-state"></p>
+  </div>
+  <div class="card">
+    <h2>Estado por planta · edificio 14</h2>
+    <table id="board"></table>
+    <h2 style="margin-top:14px">Alerta dirigida (coordinador verificado)</h2>
+    <div class="floors" id="floors"></div>
+    <textarea id="msg" aria-label="Mensaje de la alerta" rows="2" style="width:100%;background:#071018;color:var(--t);border:1px solid var(--l);border-radius:10px;padding:8px">Bomberos en la fachada este. Si puedes, golpea 3 veces o pulsa «Estoy atrapado».</textarea>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><label class="m"><input type="checkbox" id="a-ble" checked> Baliza Bluetooth</label><label class="m"><input type="checkbox" id="a-siren" checked> Sirena</label><label class="m"><input type="checkbox" id="a-scan" checked> Barrido Wi-Fi</label><label class="m"><input type="checkbox" id="a-status" checked> Batería y sensores</label></div>
+    <p><button class="p" id="send-alert">Preparar alerta firmada</button></p>
+    <pre id="alert-out" class="m"></pre>
+  </div>
+</div>
+</main>
+<script type="module">
+import { simulateBuildingIncident, ZONE_ORIGIN } from '/senda/core/building-scenario.mjs';
+import { signalColor, buildingsFromOverpass, prepareBuilding, overpassQuery, targetAudience, FLOOR_HEIGHT_M, EMS98 } from '/senda/core/building-twin.mjs';
+import { projectToCamera } from '/senda/core/rubble.mjs';
+import { ACTIONS } from '/senda/core/remote-command.mjs';
+const $ = (s) => document.querySelector(s);
+const sim = simulateBuildingIncident();
+window.SENDA_BUILDINGS = { sim };
+$('#k-aff').textContent = `${sim.zone.affected}/${sim.zone.total}`;
+$('#k-rt').textContent = `${sim.routers.located}/${sim.routers.truth}`;
+$('#k-fl').textContent = sim.routers.floorExactPct + ' %'; $('#k-fl1').textContent = sim.routers.floorWithin1Pct + ' %';
+$('#k-lost').textContent = sim.routers.lostBetweenSurveys; $('#k-gw').textContent = sim.routers.gateways;
+$('#k-miss').textContent = `${sim.people.locatedNoResponse} / ${sim.people.missing}`;
+
+/* ---------- tabla por planta ---------- */
+$('#board').innerHTML = '<tr><th>Planta</th><th>Routers</th><th>Apag.</th><th>Pasar.</th><th>A salvo</th><th>Atrap.</th><th>Señal s/resp.</th><th>Desap.</th></tr>' +
+  sim.board.map((f) => `<tr><td>${f.label}</td><td>${f.routersActive}</td><td style="color:${f.routersLost ? '#ff5b6e' : ''}">${f.routersLost}</td><td style="color:#91d7e8">${f.gateways}</td><td style="color:#34d399">${f.CONFIRMED_SAFE}</td><td style="color:#ff5b6e">${f.TRAPPED_CONFIRMED + f.CONFIRMED_NEEDS_HELP}</td><td style="color:#fbbf24">${f.SIGNAL_NO_RESPONSE}</td><td style="color:#fbbf24">${f.MISSING_UNCONFIRMED}</td></tr>`).join('');
+$('#floors').innerHTML = Array.from({ length: 15 }, (_, f) => `<label><input type="checkbox" value="${f}" ${f >= 1 && f <= 4 ? 'checked' : ''}>${f === 0 ? 'Bajo' : f}</label>`).join('');
+$('#send-alert').onclick = () => {
+  const floors = [...document.querySelectorAll('#floors input:checked')].map((i) => +i.value);
+  const aud = targetAudience(sim.people.list, { buildingId: 'B14', floors });
+  const acts = [['a-ble', 'BLE_BEACON'], ['a-siren', 'SIREN'], ['a-scan', 'WIFI_SCAN'], ['a-status', 'REPORT_STATUS']].filter(([id]) => $('#' + id).checked).map(([, a]) => a);
+  $('#alert-out').textContent = `Destino: edificio 14, plantas ${floors.join(', ') || '—'}\nPersonas registradas con SENDA: ${aud.length}\nAcciones: ${acts.map((a) => ACTIONS[a].label).join(' · ')}\nMensaje: ${$('#msg').value}\n\nSe firma con la credencial institucional del coordinador (ECDSA P-256) y viaja por cualquier canal SENDA. Cada teléfono solo la ejecuta si su dueño lo preautorizó y está en la zona declarada; con batería ≤15 % pasa a baliza de bajo consumo.`;
+};
+
+/* ---------- 3D ---------- */
+const view = $('#view'), canvas = $('#gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(45, 4 / 3, 0.5, 2000);
+scene.add(new THREE.AmbientLight(0xffffff, 0.55)); const sun = new THREE.DirectionalLight(0xffffff, 1.1); sun.position.set(80, 160, 60); scene.add(sun);
+const GRADE_COL = [0x5f7682, 0x34d399, 0xa3e635, 0xfbbf24, 0xff7a3d, 0xff3b4e];
+const groups = { zone: new THREE.Group(), tower: new THREE.Group(), osm: new THREE.Group() };
+Object.values(groups).forEach((g) => scene.add(g));
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshStandardMaterial({ color: 0x0a1820 })); ground.rotation.x = -Math.PI / 2; scene.add(ground);
+const grid = new THREE.GridHelper(600, 60, 0x1d3340, 0x12232d); scene.add(grid);
+
+function extrude(local, h, color, opacity = 1) {
+  const shape = new THREE.Shape(local.map((p) => new THREE.Vector2(p.x, -p.y)));
+  const geo = new THREE.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false }); geo.rotateX(-Math.PI / 2);
+  const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, transparent: opacity < 1, opacity }));
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: 0x91d7e8, transparent: true, opacity: 0.35 }));
+  const g = new THREE.Group(); g.add(m, e); return g;
+}
+for (const b of sim.buildings) { const g = extrude(b.local, b.levels * FLOOR_HEIGHT_M, GRADE_COL[b.grade]); g.userData = b; groups.zone.add(g); }
+
+// Torre en 3D: forjados translúcidos, routers y personas.
+const T = sim.tower; const tc = { x: (T.bbox.minX + T.bbox.maxX) / 2, y: (T.bbox.minY + T.bbox.maxY) / 2 };
+for (let f = 0; f <= T.levels; f++) { const slab = extrude(T.local, 0.25, f >= 1 && f <= 4 ? 0x3a1018 : 0x16303c, 0.35); slab.position.y = f * FLOOR_HEIGHT_M; groups.tower.add(slab); }
+const shell = extrude(T.local, T.heightM, 0x91d7e8, 0.13); groups.tower.add(shell);
+const sph = (r, c) => new THREE.Mesh(new THREE.SphereGeometry(r, 16, 12), new THREE.MeshBasicMaterial({ color: c }));
+for (const a of sim.aps) if (a.position) { const col = a.state === 'LOST' ? 0x7a2230 : a.gateway ? 0x91d7e8 : 0x34d399; const s = sph(a.gateway ? 0.9 : 0.6, col); s.position.set(a.position.x, a.position.z, -a.position.y); groups.tower.add(s); }
+const PCOL = { CONFIRMED_SAFE: 0x34d399, TRAPPED_CONFIRMED: 0xff3b4e, CONFIRMED_NEEDS_HELP: 0xff3b4e, SIGNAL_NO_RESPONSE: 0xfbbf24, MISSING_UNCONFIRMED: 0xfbbf24 };
+const unitXY = { A: [-1, 1], B: [1, 1], C: [-1, -1], D: [1, -1] };
+for (const p of sim.people.list) if (PCOL[p.state]) { const [sx, sy] = unitXY[p.unit]; const m = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.8, 1.1), new THREE.MeshBasicMaterial({ color: PCOL[p.state] })); m.position.set(tc.x + sx * 5 + (Math.random() - 0.5) * 3, p.floor * FLOOR_HEIGHT_M + 1, -(tc.y + sy * 5 + (Math.random() - 0.5) * 3)); groups.tower.add(m); }
+
+let mode = 'zone', yaw = 0.8, pitch = 0.55, dist = 260, target = new THREE.Vector3(0, 10, 0), drag = null;
+view.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY }; view.setPointerCapture(e.pointerId); });
+view.addEventListener('pointermove', (e) => { if (drag && mode === 'ar') { heading -= (e.clientX - drag.x) * 0.004; tilt = Math.max(-0.6, Math.min(1.2, tilt + (e.clientY - drag.y) * 0.004)); drag = { x: e.clientX, y: e.clientY }; return; } if (!drag || mode === 'ar') return; yaw -= (e.clientX - drag.x) * 0.008; pitch = Math.max(0.05, Math.min(1.45, pitch + (e.clientY - drag.y) * 0.006)); drag = { x: e.clientX, y: e.clientY }; });
+view.addEventListener('pointerup', () => (drag = null));
+view.addEventListener('wheel', (e) => { e.preventDefault(); dist = Math.max(30, Math.min(700, dist * (1 + e.deltaY * 0.001))); }, { passive: false });
+function setMode(m) {
+  mode = m; document.querySelectorAll('.tabs [data-v]').forEach((b) => b.classList.toggle('on', b.dataset.v === m));
+  groups.zone.visible = m === 'zone'; groups.tower.visible = m === 'tower'; groups.osm.visible = m === 'osm';
+  ground.visible = grid.visible = m !== 'ar'; canvas.hidden = m === 'ar'; $('#cam').hidden = $('#overlay').hidden = m !== 'ar';
+  if (m === 'zone') { target.set(0, 8, 0); dist = 300; pitch = 0.9; }
+  if (m === 'tower') { target.set(tc.x, T.heightM / 2, -tc.y); dist = 95; pitch = 0.35; }
+  if (m === 'ar') startAR();
+  $('#legend').innerHTML = m === 'zone' ? EMS98.map((g, i) => `<span><i style="background:#${GRADE_COL[i].toString(16).padStart(6, '0')}"></i>${g.label}</span>`).join('')
+    : m === 'tower' ? '<span><i style="background:#34d399"></i>router activo</span><span><i style="background:#91d7e8"></i>pasarela (Internet confirmado)</span><span><i style="background:#7a2230"></i>router apagado entre barridos</span><span><i style="background:#34d399;border-radius:2px"></i>persona a salvo</span><span><i style="background:#ff3b4e;border-radius:2px"></i>atrapada / necesita ayuda</span><span><i style="background:#fbbf24;border-radius:2px"></i>señal sin respuesta / desaparecida</span>'
+    : m === 'ar' ? '<span>Cada marcador es un router o teléfono estimado tras la pared; el color indica la intensidad de su señal (rojo fuerte · azul débil). La cámara no ve a través del muro: muestra dónde está la señal.</span>' : '';
+}
+document.querySelectorAll('.tabs [data-v]').forEach((b) => (b.onclick = () => setMode(b.dataset.v)));
+function resize() { const w = view.clientWidth, h = view.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); for (const c of [$('#overlay')]) { c.width = w; c.height = h; } }
+addEventListener('resize', resize); resize();
+let t0 = performance.now();
+function loop() {
+  if (mode !== 'ar') {
+    if (!drag) yaw += 0.0015;
+    camera.position.set(target.x + dist * Math.cos(pitch) * Math.sin(yaw), target.y + dist * Math.sin(pitch), target.z + dist * Math.cos(pitch) * Math.cos(yaw)); camera.lookAt(target);
+    renderer.render(scene, camera);
+    $('#hud').textContent = mode === 'zone' ? `Zona · ${sim.zone.total} edificios · ${sim.zone.affected} afectados · arrastra para rotar` : mode === 'tower' ? `Edificio 14 · ${T.levels} plantas × ${T.unitsPerFloor} viviendas · ${sim.routers.located} routers` : $('#hud').textContent;
+  } else drawAR();
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* ---------- Cámara + mapa de calor ---------- */
+let heading = 0, tilt = 0.35, camOk = false;
+addEventListener('deviceorientation', (e) => { if (e.alpha != null) { heading = (360 - e.alpha) * Math.PI / 180; tilt = ((e.beta ?? 90) - 90) * Math.PI / 180; } });
+async function startAR() {
+  if (camOk) return;
+  try { const st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false }); const v = $('#cam'); v.srcObject = st; await v.play(); camOk = true; }
+  catch (e) { $('#hud').textContent = 'Cámara no disponible: ' + e.message + ' (se muestra la superposición igualmente)'; }
+}
+function drawAR() {
+  const c = $('#overlay'), g = c.getContext('2d'), W = c.width, H = c.height;
+  g.clearRect(0, 0, W, H); if (!camOk) { g.fillStyle = '#071018'; g.fillRect(0, 0, W, H); }
+  // El observador está a 25 m al oeste de la torre, a pie de calle, mirando hacia ella.
+  const obs = { x: tc.x - 25, y: tc.y, z: 1.6 };
+  const yawCam = heading; // brújula del móvil o arrastre; 0 = mirando al este, hacia la torre
+  const cam = { pos: obs, yaw: yawCam, pitch: tilt, hfovRad: 1.15, width: W, height: H };
+  let shown = 0;
+  for (const a of sim.aps) {
+    if (!a.position || a.state === 'LOST') continue;
+    const d = Math.hypot(a.position.x - obs.x, a.position.y - obs.y, a.position.z - obs.z);
+    const rssi = -38 - 30 * Math.log10(Math.max(1, d)) - 6; // pared exterior
+    const pr = projectToCamera({ ...a.position, errorM: a.position.errorM }, cam); if (!pr.visible) continue;
+    const col = signalColor(rssi); shown++;
+    const grd = g.createRadialGradient(pr.u, pr.v, 2, pr.u, pr.v, Math.max(14, pr.radiusPx));
+    grd.addColorStop(0, col.css.replace('rgb', 'rgba').replace(')', ',0.85)')); grd.addColorStop(1, col.css.replace('rgb', 'rgba').replace(')', ',0)'));
+    g.fillStyle = grd; g.beginPath(); g.arc(pr.u, pr.v, Math.max(14, pr.radiusPx), 0, 6.3); g.fill();
+    if (a.gateway) { g.strokeStyle = '#91d7e8'; g.lineWidth = 2; g.beginPath(); g.arc(pr.u, pr.v, 10, 0, 6.3); g.stroke(); }
+  }
+  for (const p of sim.people.list) if (p.state === 'SIGNAL_NO_RESPONSE' || p.state === 'TRAPPED_CONFIRMED') {
+    const [sx, sy] = unitXY[p.unit]; const pt = { x: tc.x + sx * 5, y: tc.y + sy * 5, z: p.floor * FLOOR_HEIGHT_M + 1, errorM: 2 };
+    const pr = projectToCamera(pt, cam); if (!pr.visible) continue;
+    g.fillStyle = p.state === 'TRAPPED_CONFIRMED' ? '#ff3b4e' : '#fbbf24'; g.font = '700 13px Inter'; g.fillText(`▲ ${p.state === 'TRAPPED_CONFIRMED' ? 'atrapado' : 'señal sin respuesta'} · P${p.floor}±1`, pr.u + 8, pr.v);
+  }
+  g.fillStyle = 'rgba(5,9,12,.7)'; g.fillRect(W - 180, H - 40, 170, 32);
+  const lg = g.createLinearGradient(W - 170, 0, W - 20, 0); lg.addColorStop(0, 'rgb(0,0,255)'); lg.addColorStop(0.5, 'rgb(0,255,0)'); lg.addColorStop(1, 'rgb(255,0,0)'); g.fillStyle = lg; g.fillRect(W - 170, H - 22, 150, 8);
+  g.fillStyle = '#fff'; g.font = '11px Inter'; g.fillText('débil            señal            fuerte', W - 170, H - 27);
+  $('#hud').textContent = `Cámara · ${shown} señales en vista · rumbo ${Math.round((yawCam * 180) / Math.PI)}°`;
+  window.SENDA_BUILDINGS.arShown = shown;
+}
+
+/* ---------- Edificios reales de OpenStreetMap ---------- */
+$('#osm').onclick = async () => {
+  if (!navigator.onLine) { $('#osm-state').textContent = 'Sin red: carga OSM cuando haya conexión; quedará guardado para usarlo sin red.'; return; }
+  $('#osm-state').textContent = 'Obteniendo posición y edificios de OpenStreetMap…';
+  let c = ZONE_ORIGIN; try { const p = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { timeout: 8000 })); c = { lat: p.coords.latitude, lon: p.coords.longitude }; } catch { /* usa la zona de demostración */ }
+  try {
+    const r = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: 'data=' + encodeURIComponent(overpassQuery(c, 250)) });
+    const bs = buildingsFromOverpass(await r.json()).map((b) => prepareBuilding(b, c));
+    groups.osm.clear(); for (const b of bs) groups.osm.add(extrude(b.local, b.levels * FLOOR_HEIGHT_M, 0x5f7682));
+    setMode('osm'); target.set(0, 5, 0); dist = 320; pitch = 0.9;
+    $('#osm-state').textContent = `${bs.length} edificios reales de OpenStreetMap (© colaboradores de OSM, ODbL) en 250 m; plantas según building:levels/height. Pendiente de evaluar daños.`;
+  } catch (e) { $('#osm-state').textContent = 'No se pudo consultar Overpass: ' + e.message; }
+};
+setMode('zone');
+</script>
+</body></html>

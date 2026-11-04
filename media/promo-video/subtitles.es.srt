@@ -1,0 +1,279 @@
+1
+00:00:00,700 --> 00:00:03,623
+Cuando la red cae, el mensaje no debería morir.
+
+2
+00:00:04,003 --> 00:00:13,496
+Esto es Civic Relay, el Offline Emergency Protocol. En los próximos minutos te explico su ingeniería, su arquitectura y, sobre todo, su estado real. Sin adornos.
+
+3
+00:00:15,296 --> 00:00:18,432
+Pensemos en un apagón, una inundación o un terremoto.
+
+4
+00:00:18,812 --> 00:00:27,281
+Las estaciones base se quedan sin energía, y las aplicaciones de siempre fallan en silencio, agotando la batería en reintentos inútiles.
+
+5
+00:00:27,661 --> 00:00:33,635
+No existe una forma estructurada de dejar un estado, a salvo o necesito ayuda, que sobreviva al corte.
+
+6
+00:00:34,015 --> 00:00:40,031
+Y los teléfonos cercanos tienen Bluetooth y wifi, pero nada los coordina de forma abierta y con permiso.
+
+7
+00:00:40,411 --> 00:00:47,173
+Lo más peligroso es que el silencio se malinterpreta: un teléfono que no responde no es una víctima confirmada.
+
+8
+00:00:48,973 --> 00:00:56,163
+Civic Relay es una capa europea, abierta y con consentimiento, para coordinar mensajes cuando la conectividad se degrada.
+
+9
+00:00:56,543 --> 00:01:08,511
+Es un protocolo agnóstico de transporte, con una cola que almacena y reenvía, caducidad, deduplicación, y confirmaciones que nunca confunden enviado con entregado. Y es cien por cien código abierto.
+
+10
+00:01:08,891 --> 00:01:17,125
+Lo que no es: no sustituye al uno uno dos, no es un operador ni una constelación de satélites, y nunca activa radios sin permiso del usuario.
+
+11
+00:01:18,925 --> 00:01:21,528
+Todo el diseño parte de tres compromisos.
+
+12
+00:01:21,908 --> 00:01:28,393
+Uno: verdad verificable. Una predicción no es una medición, y un satélite visible no garantiza conectividad.
+
+13
+00:01:28,773 --> 00:01:35,195
+Dos: continuidad honesta. Si no hay ruta, el sistema lo dice. Nunca promete una entrega que no ha ocurrido.
+
+14
+00:01:35,575 --> 00:01:40,289
+Y tres: soberanía gradual, con interfaces abiertas y adaptadores autorizados.
+
+15
+00:01:42,089 --> 00:01:50,559
+Así funciona la arquitectura que ya está implementada. Un mensaje recorre ocho etapas, y cada una vive en un módulo concreto del repositorio.
+
+16
+00:01:50,939 --> 00:01:55,504
+Primero, el evento: una alerta que, sin verificador de autoridad, falla cerrada.
+
+17
+00:01:55,884 --> 00:01:58,700
+La zona, con su polígono y su ventana de validez.
+
+18
+00:01:59,080 --> 00:02:02,408
+El estado humano, que sólo registra acciones explícitas.
+
+19
+00:02:02,788 --> 00:02:06,649
+El consentimiento, con permisos del sistema y perfil de batería.
+
+20
+00:02:07,029 --> 00:02:11,829
+El mensaje, en una cola acotada con caducidad y protección contra repeticiones.
+
+21
+00:02:12,209 --> 00:02:16,647
+La ruta, elegida por un algoritmo que evita los nodos con batería crítica.
+
+22
+00:02:17,027 --> 00:02:21,763
+La confirmación, que exige el identificador, el par aprobado y un reto aleatorio.
+
+23
+00:02:22,143 --> 00:02:25,236
+Y la evidencia, exportada de forma reproducible.
+
+24
+00:02:25,616 --> 00:02:33,275
+En cola, reenviado sin confirmar y confirmado son estados distintos. Paquete enviado nunca significa persona rescatada.
+
+25
+00:02:35,075 --> 00:02:40,472
+Hacia dónde vamos: la arquitectura objetivo separa ocho núcleos con fronteras de confianza.
+
+26
+00:02:40,852 --> 00:02:46,868
+En la base, el núcleo de protocolo, el orquestador de transportes y la custodia durable de los mensajes.
+
+27
+00:02:47,248 --> 00:02:54,480
+Encima, la situación y la previsión, y un planificador de ventanas satelitales que sólo usará pasarelas autorizadas.
+
+28
+00:02:54,860 --> 00:03:03,735
+Después, la confianza institucional, el gemelo digital del territorio y, arriba, las interfaces para familias, voluntarios y centros de coordinación.
+
+29
+00:03:04,115 --> 00:03:10,387
+Cada nivel se valida por separado, y cada confirmación dice exactamente hasta dónde llegó el mensaje.
+
+30
+00:03:12,187 --> 00:03:14,341
+Veamos el escenario de referencia.
+
+31
+00:03:14,721 --> 00:03:23,937
+Desde Arnhem, en Países Bajos, Abraham escribe a Ismael, en San Martín de Valdeiglesias, que no tiene cobertura. El mensaje se cifra y se guarda en origen.
+
+32
+00:03:24,317 --> 00:03:28,627
+Viaja hasta un gateway autorizado, que confirma la custodia, no la lectura.
+
+33
+00:03:29,007 --> 00:03:34,212
+Allí espera, en estado pendiente, mientras el sistema busca una ruta real de recepción.
+
+34
+00:03:34,592 --> 00:03:40,203
+Sólo cuando existe esa ruta hasta el dispositivo de Ismael, se emite la confirmación de destino.
+
+35
+00:03:40,583 --> 00:03:50,183
+Y si no existe, el mensaje no llega: sigue cifrado en la cola y caduca. La interfaz lo dice con claridad. Es un objetivo de diseño, no una capacidad desplegada.
+
+36
+00:03:51,983 --> 00:03:55,097
+Ahora, lo que ya está construido y medido por máquina.
+
+37
+00:03:55,477 --> 00:04:01,067
+Noventa y ocho de noventa y ocho pruebas del laboratorio en verde, verificadas de nuevo hoy.
+
+38
+00:04:01,447 --> 00:04:06,332
+Ochocientos diez escenarios simulados, sin una sola violación de sus invariantes.
+
+39
+00:04:06,712 --> 00:04:11,853
+Quince tareas automatizadas en un navegador real, y veintiséis pruebas del núcleo.
+
+40
+00:04:12,233 --> 00:04:22,559
+Seis flujos de integración continua, con inventario de dependencias. Unas veintidós mil líneas de código, una web en tres idiomas, y un documento maestro con veinte módulos.
+
+41
+00:04:24,359 --> 00:04:28,327
+El laboratorio Android conecta dos teléfonos con Nearby Connections.
+
+42
+00:04:28,707 --> 00:04:33,315
+El usuario confirma el emparejamiento, y cada sesión usa una clave efímera.
+
+43
+00:04:33,695 --> 00:04:40,201
+El mensaje se escribe en disco antes de enviarse, y la confirmación del receptor llega firmada y verificada.
+
+44
+00:04:40,581 --> 00:04:46,256
+Si algo falla, el sistema se bloquea. Y al pulsar stop, borra los datos y regenera la clave.
+
+45
+00:04:46,636 --> 00:04:49,793
+Compila en integración continua y pasa sus pruebas.
+
+46
+00:04:50,173 --> 00:04:55,699
+Pero la entrega física entre dos teléfonos todavía no se ha medido. Lo decimos claramente.
+
+47
+00:04:57,499 --> 00:04:59,632
+Este es el estado real, fila a fila.
+
+48
+00:05:00,012 --> 00:05:04,876
+La simulación, la cola, la política y la web están probadas automáticamente.
+
+49
+00:05:05,256 --> 00:05:14,259
+El Android está compilado, pendiente de prueba física. La malla real y el satélite no están validados, y la integración con el uno uno dos no existe.
+
+50
+00:05:14,639 --> 00:05:21,935
+Madurez global: nivel tres de preparación tecnológica. Puntuación interna provisional: cincuenta y cuatro sobre cien.
+
+51
+00:05:22,315 --> 00:05:29,312
+La validación física vale veinte puntos, y hoy tiene cero. Eso es exactamente lo que financia la siguiente fase.
+
+52
+00:05:31,112 --> 00:05:39,923
+La visión completa tiene veinte módulos: del sobre universal a la planificación orbital, los sensores, el gemelo digital o los drones autorizados.
+
+53
+00:05:40,303 --> 00:05:50,500
+La ambición no se recorta; se etiqueta. Cada módulo indica si es software existente, simulación, laboratorio o investigación, y si necesita un convenio o un operador.
+
+54
+00:05:52,300 --> 00:05:57,889
+La hoja de ruta avanza por puertas, y cada puerta se abre con evidencia, no con pantallas.
+
+55
+00:05:58,269 --> 00:06:04,008
+La primera, una sola verdad, ya está hecha. La segunda, protocolo y custodia, está en curso.
+
+56
+00:06:04,388 --> 00:06:11,023
+La siguiente es la clave: dos teléfonos físicos, con al menos treinta intentos registrados, incluidos los fallos.
+
+57
+00:06:11,403 --> 00:06:19,936
+Después vendrán tres nodos con gateway, la predicción, un operador satelital, un piloto institucional y, por último, las extensiones reguladas.
+
+58
+00:06:21,736 --> 00:06:24,701
+Un mismo protocolo abre cuatro conversaciones.
+
+59
+00:06:25,081 --> 00:06:31,929
+A los desarrolladores les ofrece un monorepo abierto, reproducible y con contratos claros para nuevos transportes.
+
+60
+00:06:32,309 --> 00:06:38,795
+A los clientes, municipios e infraestructuras, auditorías de resiliencia sin depender de un proveedor cerrado.
+
+61
+00:06:39,175 --> 00:06:43,655
+A las entidades, pilotos controlados sin tocar tráfico real de emergencias.
+
+62
+00:06:44,035 --> 00:06:49,624
+Y a los inversores, un riesgo técnico declarado y medible, donde cada euro compra evidencia.
+
+63
+00:06:51,424 --> 00:06:55,243
+Planteamos tres escenarios de financiación, todos ilustrativos.
+
+64
+00:06:55,623 --> 00:07:02,087
+Cincuenta mil euros para la validación física con dos teléfonos y una auditoría de seguridad independiente.
+
+65
+00:07:02,467 --> 00:07:06,840
+Ciento ochenta mil para un SDK multisalto y un simulacro municipal.
+
+66
+00:07:07,220 --> 00:07:11,657
+Y hasta medio millón como paquete de trabajo dentro de un consorcio europeo.
+
+67
+00:07:12,037 --> 00:07:18,864
+El núcleo sigue siendo abierto. La sostenibilidad llega con la auditoría de resiliencia y la ingeniería de integración.
+
+68
+00:07:20,664 --> 00:07:25,208
+Buscamos socios para convertir evidencia de laboratorio en evidencia de campo.
+
+69
+00:07:25,588 --> 00:07:30,879
+Encontrarás la web, el código y todas las evidencias en los enlaces que ves en pantalla.
+
+70
+00:07:31,259 --> 00:07:35,461
+Civic Relay es un prototipo de investigación. Gracias por tu tiempo.

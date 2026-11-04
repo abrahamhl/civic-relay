@@ -1,0 +1,109 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:03.501
+Cuando cae la red, el mensaje no debería morir.
+
+2
+00:00:03.851 --> 00:00:17.633
+El veintiocho de abril de dos mil veinticinco, la red móvil no cayó al irse la luz: cayó cuando se agotaron las baterías de las antenas. En pocas horas, los usuarios con conexión estable pasaron del noventa al cuarenta por ciento.
+
+3
+00:00:17.983 --> 00:00:23.444
+Y en la dana de Valencia, el aviso masivo a los móviles no llegó hasta las ocho y once de la tarde.
+
+4
+00:00:25.044 --> 00:00:29.609
+Esto es SENDA, el Sistema de Enrutamiento de Emergencia por canales alternativos.
+
+5
+00:00:29.959 --> 00:00:42.567
+No es otra aplicación de mensajería. Es la capa que coordina todo lo que pueda mover un mensaje: teléfonos cercanos, sonido, satélite directo al móvil, Lora, Iridium, radioaficionados, drones, y la red que quede en pie.
+
+6
+00:00:44.167 --> 00:00:57.735
+Funciona sin Internet desde el primer segundo. Los mensajes van cifrados de extremo a extremo y viajan por sonido entre dos móviles, en un archivo, o de mano en mano: cada teléfono con SENDA transporta mensajes que no puede leer.
+
+7
+00:00:58.085 --> 00:01:04.016
+Cuando el destinatario lo recibe, su recibo infalsificable borra las copias que aún viajaban por la red.
+
+8
+00:01:05.616 --> 00:01:17.968
+Lo que nadie hace todavía: SENDA trocea cada mensaje con codificación Rid Sólomon y reparte los fragmentos entre portadores distintos. Basta con que lleguen unos cuantos, cualesquiera, para reconstruirlo.
+
+9
+00:01:18.318 --> 00:01:34.105
+Con satélite, Lora, SMS y vecinos, un ese o ese alcanza un noventa y nueve por ciento de probabilidad de entrega, calculada de forma exacta. En la prueba real, ciento noventa y siete de doscientos mensajes se reconstruyeron byte a byte, perdiendo portadores al azar.
+
+10
+00:01:35.705 --> 00:01:52.259
+Cada red satelital está clasificada por nivel de acceso: las que ya lleva tu móvil, las que necesitan un módulo como Iridium, las de radioaficionado como cu o cien, donde la ley prohíbe cifrar y SENDA solo envía estados públicos firmados, y las gubernamentales, que requieren convenio.
+
+11
+00:01:52.609 --> 00:01:57.601
+Lo que todavía está en desarrollo, como el servicio de alertas de Galileo, se marca así.
+
+12
+00:01:59.201 --> 00:02:07.543
+SENDA también prevé el apagón. Modela cuánto aguanta cada antena con batería y calcula cuándo y dónde quedará la población sin cobertura.
+
+13
+00:02:07.893 --> 00:02:20.479
+Después decide dónde colocar pasarelas antes de que ocurra, con un algoritmo con garantía matemática. En la ciudad de prueba, cinco pasarelas alcanzan al setenta y dos por ciento de quienes se quedarían a oscuras.
+
+14
+00:02:22.079 --> 00:02:28.778
+En un accidente ferroviario, cada teléfono detecta el impacto, pregunta si estás bien y, si no respondes, avisa solo.
+
+15
+00:02:29.128 --> 00:02:45.171
+Al fusionar los informes, el panel separa los dos trenes en treinta y cuatro segundos de simulación. En Adamuz, reconocer el segundo tren llevó unos cuarenta y cinco minutos, según la cronología publicada. Y todo sale en el formato cap que ya leen las salas uno uno dos.
+
+16
+00:02:46.771 --> 00:02:55.432
+En un edificio dañado, SENDA localiza los routers planta a planta con barridos a pie o con dron, y dirige las alertas solo a las plantas afectadas.
+
+17
+00:02:55.782 --> 00:03:00.347
+Quien no responde figura como desaparecido sin confirmar, nunca como víctima.
+
+18
+00:03:01.947 --> 00:03:10.993
+Solo un coordinador con credencial firmada por su organismo puede activar algo en tu teléfono, y solo si tú lo autorizaste y hay una emergencia declarada.
+
+19
+00:03:11.343 --> 00:03:19.193
+La persona atrapada pulsa un botón, su respuesta viaja cifrada de vecino en vecino, y el coordinador la ve en su cuadro por planta.
+
+20
+00:03:20.793 --> 00:03:27.257
+Para quien lo necesita, el modo fácil: tres botones grandes. Estoy bien, necesito ayuda, estoy atrapado.
+
+21
+00:03:27.607 --> 00:03:32.343
+Y cada pantalla pasa una revisión automática de accesibilidad en cada cambio.
+
+22
+00:03:33.943 --> 00:03:46.487
+Y está preparado para desplegarse: un relé autoalojable en Dóquer que el propio organismo controla, una aplicación Ándroid para baliza Blutuz y barrido wifi, y un accesorio de bajo coste para drones y mástiles.
+
+23
+00:03:46.837 --> 00:03:52.832
+Los mismos formatos se prueban en tres lenguajes de programación, para que nada se rompa entre piezas.
+
+24
+00:03:54.432 --> 00:04:04.757
+Todo se verifica por máquina en cada cambio: más de setenta pruebas del núcleo, y más de veinte comprobaciones de extremo a extremo con la red cortada, en navegadores reales.
+
+25
+00:04:05.107 --> 00:04:15.518
+Lo que falta, lo decimos: pilotos de campo con teléfonos físicos y equipos de rescate, una auditoría de seguridad independiente, y la certificación para la compra pública.
+
+26
+00:04:17.118 --> 00:04:27.145
+SENDA es para la ciudadanía, los coordinadores, los cuerpos de seguridad y emergencias, las administraciones, y para quien quiera invertir en que ningún mensaje se pierda.
+
+27
+00:04:27.495 --> 00:04:31.591
+Pruébalo ahora, sin instalar nada, en la dirección que ves en pantalla.

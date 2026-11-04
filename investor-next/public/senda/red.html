@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Red: satélites, LoRa, drones y previsión de apagón</title>
+<meta name="description" content="SENDA como capa centralizadora: reparte cada mensaje en fragmentos k-de-n por satélite, LoRa, Iridium, SMS, radioaficionados, drones y teléfonos cercanos; prevé dónde y cuándo se quedará la población sin cobertura.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#a9bcc5;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:16px/1.5 Inter,system-ui,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:22px 16px 70px}h1{font-size:30px;margin:4px 0 6px}h2{font-size:20px;margin:0 0 10px}h3{margin:12px 0 6px;font-size:16px}.m{color:var(--m)}a{color:var(--i)}
+.card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:16px;margin:14px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:900px){.grid{grid-template-columns:1fr}}
+button{min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid var(--l);background:#0f1d27;color:var(--t);font:inherit;cursor:pointer}button.p{background:var(--c);color:#140804;border-color:var(--c);font-weight:700}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--a);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--l);border-radius:10px;background:#081219;font-size:14px}
+.chip.ham{border-color:rgba(251,191,36,.5)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}@media(max-width:700px){.kpis{grid-template-columns:1fr 1fr}}.k{background:#081219;border:1px solid var(--l);border-radius:12px;padding:12px}.k b{display:block;font-size:26px}.k.good b{color:var(--e)}.k.bad b{color:var(--r)}
+.bars div{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:13px}.bars i{display:inline-block;height:14px;border-radius:4px;background:var(--i)}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{border-bottom:1px solid var(--l);padding:8px 6px;text-align:left;vertical-align:top}
+.tag{font:12px ui-monospace,monospace;padding:2px 6px;border-radius:6px;border:1px solid var(--l)}.OPERATIONAL{color:var(--e)}.ROLLING_OUT{color:var(--i)}.UNDER_DEVELOPMENT,.PLANNED{color:var(--a)}
+canvas{width:100%;height:auto;border-radius:10px;background:#071018;border:1px solid var(--l)}input[type=range]{width:100%}
+code,pre{font:12px ui-monospace,monospace;color:var(--i)}pre{white-space:pre-wrap;word-break:break-all;max-height:220px;overflow:auto;background:#071018;padding:10px;border-radius:8px}
+.ok{color:var(--e);font-weight:700}.ko{color:var(--r);font-weight:700}label{color:var(--m)}select,input[type=number],input[type=text]{background:#071018;color:var(--t);border:1px solid var(--l);border-radius:8px;padding:8px;font:inherit}
+</style>
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/incidente">Incidente ferroviario</a> · <a href="/senda/edificios">Edificios</a> · <a href="/senda/estado">Verificación</a></p>
+<h1>La red SENDA: todo lo que mueva bytes, coordinado</h1>
+<p class="m">SENDA no es una app más: es la <b>capa que centraliza</b> satélites, LoRa, Iridium, SMS, radioaficionados, drones y los teléfonos cercanos. Cada mensaje cifrado se trocea en <b>k de n fragmentos</b> (Reed-Solomon) que viajan por portadores distintos: basta con que lleguen <b>k cualesquiera</b>. Ningún portador lleva el mensaje entero. Todo lo de esta página se calcula en tu navegador, sin red.</p>
+
+<section class="card" aria-labelledby="h-plan"><h2 id="h-plan">1 · Planificador multiportador</h2>
+  <p class="m">Marca lo que tienes disponible. SENDA calcula la probabilidad <b>exacta</b> de entrega (Poisson-binomial agrupada: si falla un portador, se pierden todos sus fragmentos) y el reparto más barato y rápido que alcanza el objetivo.</p>
+  <div class="chips" id="bearers"></div>
+  <div class="grid" style="margin-top:10px">
+    <label>Tamaño del mensaje (bytes) <input id="len" type="number" value="380" min="20" max="20000"></label>
+    <label>Objetivo de entrega <select id="target"><option value="0.9">90 %</option><option value="0.99" selected>99 %</option><option value="0.999">99,9 %</option></select></label>
+  </div>
+  <label class="chip" style="margin-top:8px"><input type="checkbox" id="public"> Es un estado público firmado (permite bandas de radioaficionado, donde está prohibido cifrar)</label>
+  <div class="kpis" style="margin-top:12px">
+    <div class="k" id="k-p"><b>–</b>probabilidad de entrega</div><div class="k"><b id="k-kn">–</b>fragmentos k de n</div>
+    <div class="k"><b id="k-eta">–</b>tiempo para alcanzar el objetivo</div><div class="k good"><b id="k-gain">–</b>mejora frente al mejor portador solo</div>
+  </div>
+  <div class="bars" id="alloc" style="margin-top:10px"></div><p class="m" id="excluded"></p>
+  <div class="row"><button class="p" id="trial">Prueba real: enviar y perder portadores al azar ×200</button> <span id="trial-out" class="m"></span></div>
+</section>
+
+<section class="card" aria-labelledby="h-sat"><h2 id="h-sat">2 · Red satelital por nivel de acceso</h2>
+  <p class="m">Solo redes con fuente pública. Lo que está «en desarrollo» se dice. Si hace falta un módulo, antena o licencia, se indica.</p>
+  <div style="overflow:auto"><table id="sats"><thead><tr><th>Red</th><th>Acceso</th><th>Estado</th><th>Qué permite</th><th>Hardware</th><th>Uso en SENDA</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<section class="card" aria-labelledby="h-bo"><h2 id="h-bo">3 · Previsión de apagón de comunicaciones</h2>
+  <p class="m">En el apagón ibérico del 28-04-2025 la red móvil no cayó al irse la luz: cayó cuando se agotaron las baterías de las antenas, y los usuarios con conexión estable bajaron del 90 % al 40 % hacia las 15:00. SENDA calcula <b>cuándo y dónde</b> quedará la población a oscuras y <b>dónde colocar pasarelas</b> antes de que ocurra (algoritmo voraz con garantía ≥63 % del óptimo).</p>
+  <div class="grid"><div><canvas id="bo-map" width="560" height="560" aria-label="Mapa de cobertura prevista por celda"></canvas>
+    <label>Horas desde el corte de luz: <b id="bo-h">4</b> <input id="bo-t" type="range" min="0" max="24" step="0.5" value="4"></label></div>
+    <div><canvas id="bo-chart" width="560" height="260" aria-label="Población con cobertura a lo largo del tiempo"></canvas>
+      <div class="kpis" style="grid-template-columns:1fr 1fr;margin-top:10px"><div class="k bad"><b id="bo-dark">–</b>personas sin cobertura</div><div class="k"><b id="bo-half">–</b>mitad de la ciudad a oscuras</div>
+      <div class="k good"><b id="bo-reach">–</b>de ellas alcanzadas con 5 pasarelas</div><div class="k"><b id="bo-med">–</b>mediana de baterías calibrada con el 28-04</div></div>
+      <p class="m">Ciudad sintética reproducible (60 antenas, 90 % solo con baterías). Carga antenas reales en formato OpenCelliD: <input type="file" id="bo-file" accept=".csv,.txt" aria-label="CSV de antenas OpenCelliD"></p></div></div>
+</section>
+
+<div class="grid">
+<section class="card" aria-labelledby="h-dr"><h2 id="h-dr">4 · Drones</h2>
+  <p class="m">Barrido de fachada planta a planta con el accesorio ESP32 (routers y balizas de personas atrapadas). Exporta el plan a QGroundControl.</p>
+  <div class="row"><label>Ancho m <input id="d-w" type="number" value="20" style="width:80px"></label> <label>Fondo m <input id="d-d" type="number" value="16" style="width:80px"></label> <label>Plantas <input id="d-l" type="number" value="15" style="width:80px"></label></div>
+  <button class="p" id="d-go">Generar misión .plan</button><p id="d-out" class="m"></p>
+  <h3>Identificación remota de drones (Open Drone ID)</h3>
+  <label>Mensaje de 25 bytes (hex) <input id="odid" type="text" style="width:100%" aria-label="Mensaje Open Drone ID en hexadecimal"></label><pre id="odid-out"></pre>
+</section>
+<section class="card" aria-labelledby="h-cap"><h2 id="h-cap">5 · Hacia la sala de mando</h2>
+  <p class="m">Todo lo que SENDA sabe sale en <b>CAP 1.2</b> (OASIS), el formato que ya consumen EU-Alert, Meteoalarm y las plataformas 112, con <b>registro de auditoría encadenado</b> (SHA-256): cualquier alteración se detecta.</p>
+  <button class="p" id="cap-go">Generar CAP de ejemplo y verificar auditoría</button><pre id="cap-out"></pre>
+</section>
+</div>
+</main>
+<script type="module">
+import { BEARERS, planMultiBearer, shardForPlan, fromBearerFrame, splitShards } from '/senda/core/bearers.mjs';
+import { createReassembler } from '/senda/core/erasure.mjs';
+import { SATELLITE_NETWORKS } from '/senda/core/satellites.mjs';
+import { syntheticCity, forecastBlackout, placeGateways, cellCoverage, calibrateBatteryMedian, parseOpenCellId } from '/senda/core/blackout.mjs';
+import { facadeMission, encodeLocation, decodeOdid } from '/senda/core/drone.mjs';
+import { toCap, createAuditLog, verifyAuditLog } from '/senda/core/interop.mjs';
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const DEFAULT = new Set(['SAT_D2C_SMS', 'MESHTASTIC', 'SMS', 'PHONE_MESH']);
+$('#bearers').innerHTML = Object.entries(BEARERS).map(([id, b]) => `<label class="chip ${b.encryptionAllowed ? '' : 'ham'}" title="${esc(b.note ?? '')}"><input type="checkbox" value="${id}" ${DEFAULT.has(id) ? 'checked' : ''}> ${esc(b.label)} <span class="m">· ${b.mtu > 9999 ? '∞' : b.mtu} B · p ${b.p}${b.encryptionAllowed ? '' : ' · sin cifrado'}</span></label>`).join('');
+let plan = null;
+function replan() {
+  const avail = [...document.querySelectorAll('#bearers input:checked')].map((i) => ({ id: i.value }));
+  plan = planMultiBearer(+$('#len').value || 380, avail, { target: +$('#target').value, publicCleartext: $('#public').checked });
+  const P = plan.pDelivery ?? 0;
+  $('#k-p b').textContent = plan.messages ? (100 * P).toFixed(2) + ' %' : '0 %'; $('#k-p').className = 'k ' + (plan.feasible ? 'good' : 'bad');
+  $('#k-kn').textContent = plan.messages ? `${plan.k} de ${plan.n}` : '–';
+  $('#k-eta').textContent = plan.messages && Number.isFinite(plan.etaS) ? (plan.etaS < 120 ? plan.etaS + ' s' : Math.round(plan.etaS / 60) + ' min') : 'no alcanza';
+  $('#k-gain').textContent = plan.gainOverSingle != null ? '+' + (100 * plan.gainOverSingle).toFixed(1) + ' pp' : '–';
+  const by = {}; for (const m of plan.messages ?? []) by[m.id] = (by[m.id] ?? 0) + m.shards;
+  $('#alloc').innerHTML = Object.entries(by).map(([id, n]) => `<div><span style="width:220px">${esc(BEARERS[id].label)}</span><i style="width:${n * 18}px"></i> ${n} fragmento(s)</div>`).join('');
+  $('#excluded').textContent = (plan.excluded ?? []).map((e) => `${BEARERS[e.id].label}: ${e.reason}`).join(' · ') + (plan.feasible ? '' : plan.messages ? ' · Con estos portadores no se alcanza el objetivo: añade otro o baja el objetivo.' : '');
+}
+document.addEventListener('change', (e) => { if (e.target.closest('#bearers') || ['len', 'target', 'public'].includes(e.target.id)) replan(); });
+$('#trial').onclick = () => {
+  if (!plan?.messages) return;
+  let ok = 0; const N = 200, len = +$('#len').value || 380;
+  for (let t = 0; t < N; t++) {
+    const msg = crypto.getRandomValues(new Uint8Array(len)); const frames = shardForPlan(msg, plan); const ra = createReassembler(); let out = null;
+    for (const f of frames) { if (Math.random() > BEARERS[f.bearer].p) continue; for (const s of splitShards(fromBearerFrame(f.frame))) out = ra.add(s, f.bearer) ?? out; }
+    if (out && out.data.length === len && out.data.every((v, i) => v === msg[i])) ok++;
+  }
+  $('#trial-out').innerHTML = `<span class="${ok / N >= 0.95 ? 'ok' : 'ko'}">${ok}/${N}</span> mensajes reconstruidos byte a byte (teoría: ${(100 * plan.pDelivery).toFixed(1)} %)`;
+  window.SENDA_RED.trial = ok / N;
+};
+replan();
+
+const ACC = { PUBLIC_PHONE: 'Móvil de serie', PUBLIC_ACCESSORY: 'Accesorio que se compra', AMATEUR_LICENSED: 'Radioaficionado (licencia)', RECEIVE_ONLY: 'Solo recepción', GOVERNMENT: 'Gubernamental (convenio)' };
+$('#sats tbody').innerHTML = SATELLITE_NETWORKS.map((n) => `<tr><td><b>${esc(n.label)}</b><br>${n.sources.map((u, i) => `<a href="${esc(u)}" rel="noopener" target="_blank">fuente ${i + 1}</a>`).join(' ')}</td><td>${ACC[n.access]}</td><td><span class="tag ${n.status}">${n.status}</span></td><td>${esc(n.capability)}${n.legal ? `<br><span class="m">${esc(n.legal)}</span>` : ''}</td><td>${esc(n.hardware)}</td><td class="m">${esc(n.sendaUse)}</td></tr>`).join('');
+
+// ---- apagón
+let city = syntheticCity(), fc = forecastBlackout(city), gw = placeGateways({ ...city, k: 5, tH: 4 });
+const med = calibrateBatteryMedian({ ...city, observation: { h: 2.45, relativeConnected: 40 / 90 } });
+function drawMap() {
+  const h = +$('#bo-t').value; $('#bo-h').textContent = h;
+  const c = $('#bo-map'), g = c.getContext('2d'); g.clearRect(0, 0, c.width, c.height);
+  const lats = city.cells.map((x) => x.lat), lons = city.cells.map((x) => x.lon);
+  const [a, b, d, e] = [Math.min(...lats), Math.max(...lats), Math.min(...lons), Math.max(...lons)];
+  const px = (p) => [((p.lon - d) / (e - d || 1)) * (c.width - 40) + 20, (1 - (p.lat - a) / (b - a || 1)) * (c.height - 40) + 20];
+  const n = Math.round(Math.sqrt(city.cells.length)), w = (c.width - 40) / Math.max(1, n - 1);
+  let dark = 0;
+  for (const cell of city.cells) { const cov = cellCoverage(cell, city.towers, h); dark += cell.pop * (1 - cov); const [x, y] = px(cell); const alpha = Math.min(1, cell.pop / 2500);
+    g.fillStyle = `rgba(${Math.round(255 * (1 - cov))},${Math.round(90 + 120 * cov)},${Math.round(120 * cov)},${0.15 + 0.75 * alpha})`; g.fillRect(x - w / 2, y - w / 2, w + 1, w + 1); }
+  for (const t of city.towers) { const [x, y] = px(t); g.fillStyle = t.backup === 'GENERATOR' ? '#34d399' : t.backup === 'EXTENDED' ? '#91d7e8' : '#f2f4f4'; g.fillRect(x - 2, y - 2, 4, 4); }
+  for (const p of gw.picks) { const [x, y] = px(p); g.strokeStyle = '#fbbf24'; g.lineWidth = 3; g.beginPath(); g.arc(x, y, 12, 0, 7); g.stroke(); }
+  $('#bo-dark').textContent = Math.round(dark).toLocaleString('es');
+}
+function drawChart() {
+  const c = $('#bo-chart'), g = c.getContext('2d'); g.clearRect(0, 0, c.width, c.height);
+  g.strokeStyle = '#203240'; for (let i = 0; i <= 4; i++) { const y = 20 + i * 55; g.beginPath(); g.moveTo(40, y); g.lineTo(550, y); g.stroke(); g.fillStyle = '#a9bcc5'; g.font = '12px system-ui'; g.fillText(100 - i * 25 + ' %', 2, y + 4); }
+  g.strokeStyle = '#ff7756'; g.lineWidth = 3; g.beginPath();
+  fc.timeline.forEach((p, i) => { const x = 40 + (p.h / 24) * 510, y = 20 + (1 - p.coveredPct / 100) * 220; i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+  g.fillStyle = '#a9bcc5'; g.fillText('horas tras el corte de luz →', 380, 255);
+}
+function refreshBlackout() { fc = forecastBlackout(city); gw = placeGateways({ ...city, k: 5, tH: 4 }); $('#bo-half').textContent = fc.halfDarkAtH != null ? `a las ${fc.halfDarkAtH} h` : 'no llega'; $('#bo-reach').textContent = gw.reachedPct + ' %'; drawMap(); drawChart(); }
+$('#bo-med').textContent = med + ' h';
+$('#bo-t').oninput = drawMap;
+$('#bo-file').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; const towers = parseOpenCellId(await f.text()); if (!towers.length) return alert('CSV sin antenas válidas'); city = { ...city, towers: towers.map((t) => ({ ...t, backup: 'BATTERY' })) }; refreshBlackout(); };
+refreshBlackout();
+
+// ---- drones
+$('#d-go').onclick = () => {
+  const m = facadeMission({ center: { lat: 39.4699, lon: -0.3763 }, widthM: +$('#d-w').value, depthM: +$('#d-d').value, levels: +$('#d-l').value });
+  const blob = new Blob([JSON.stringify(m.plan, null, 1)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'senda-fachada.plan'; a.click();
+  $('#d-out').textContent = `${m.waypoints} puntos, ${m.lengthM} m de vuelo. Descargado senda-fachada.plan (QGroundControl).`;
+};
+const sample = encodeLocation({ lat: 39.4699, lon: -0.3763, altGeoM: 95, heightM: 40, directionDeg: 270, speedMs: 8.5, tenthsSinceHour: 3600 });
+$('#odid').value = [...sample].map((b) => b.toString(16).padStart(2, '0')).join('');
+const odid = () => { try { const h = $('#odid').value.replace(/[^0-9a-f]/gi, ''); $('#odid-out').textContent = JSON.stringify(decodeOdid(Uint8Array.from(h.match(/../g).map((x) => parseInt(x, 16)))), null, 1); } catch (e) { $('#odid-out').textContent = 'No válido: ' + e.message; } };
+$('#odid').oninput = odid; odid();
+
+// ---- CAP + auditoría
+$('#cap-go').onclick = async () => {
+  const now = Date.now(), log = createAuditLog();
+  const cap = toCap({ identifier: 'SENDA-DEMO-' + now, sender: 'senda@organismo.example', sent: now, status: 'Exercise', scope: 'Restricted',
+    info: { category: 'Infra', event: 'Apagón de comunicaciones previsto', urgency: 'Expected', severity: 'Severe', certainty: 'Likely', headline: `Mitad de la población sin cobertura ${fc.halfDarkAtH != null ? 'a las ' + fc.halfDarkAtH + ' h' : ''}`, description: `Pasarelas recomendadas: ${gw.picks.map((p) => p.id).join(', ')}`, area: { areaDesc: 'Ciudad sintética', circle: { center: city.center, radiusKm: 6 } } } });
+  await log.append({ at: now, actor: 'coordinador', action: 'CAP_GENERATED', data: { bytes: cap.length } });
+  await log.append({ at: now + 1, actor: 'coordinador', action: 'GATEWAYS_PLANNED', data: gw.picks.map((p) => p.id) });
+  const v = await verifyAuditLog(log.entries()); const t = log.entries(); t[0].data.bytes = 1; const v2 = await verifyAuditLog(t);
+  $('#cap-out').textContent = cap + `\n\nAuditoría: ${v.ok ? 'íntegra ✔' : 'ROTA'} (cabeza ${v.head.slice(0, 16)}…) · alterada a propósito: ${v2.ok ? 'no detectada ✘' : 'detectada en la entrada ' + v2.brokenAt + ' ✔'}`;
+  window.SENDA_RED.cap = { ok: v.ok, tamperDetected: !v2.ok, cap };
+};
+window.SENDA_RED = { plan: () => plan, forecast: () => fc, gateways: () => gw, calibratedMedianH: med };
+</script>
+</body></html>

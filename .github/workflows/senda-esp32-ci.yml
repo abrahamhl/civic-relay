@@ -1,0 +1,29 @@
+name: SENDA ESP32 (compilación)
+on:
+  push:
+    branches: [master]
+    paths: ['hardware/esp32-survey/**', '.github/workflows/senda-esp32-ci.yml']
+  pull_request:
+    paths: ['hardware/esp32-survey/**', '.github/workflows/senda-esp32-ci.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sketch:
+    name: Trama en el PC (g++) + firmware ESP32
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Misma lógica de trama que corre en el ESP32, probada en el PC
+        run: g++ -std=c++17 -Wall -Wextra -Werror -I hardware/esp32-survey hardware/esp32-survey/test/host_test.cpp -o /tmp/t && /tmp/t
+      # arduino-cli directo: arduino/compile-sketches@v1 fija Python 3.12.4, que no existe en ubuntu-latest (26.04).
+      - uses: arduino/setup-arduino-cli@v2
+      - name: Núcleo ESP32 3.0.7
+        env:
+          URL: https://espressif.github.io/arduino-esp32/package_esp32_index.json
+        run: |
+          arduino-cli core update-index --additional-urls "$URL"
+          arduino-cli core install esp32:esp32@3.0.7 --additional-urls "$URL"
+      - name: Compilar firmware (Wi-Fi + BLE caben solo en la partición huge_app)
+        run: arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=huge_app --warnings default hardware/esp32-survey

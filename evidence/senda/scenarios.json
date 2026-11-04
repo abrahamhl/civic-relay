@@ -1,0 +1,350 @@
+{
+  "generatedAt": "2026-11-04T03:44:17.113Z",
+  "s01": {
+    "id": "S01_ARNHEM_SAN_MARTIN",
+    "options": {
+      "neighbours": true,
+      "d2d": true
+    },
+    "plan": {
+      "status": "DELIVERABLE",
+      "etaMinutes": 4.01,
+      "whatsappBaselineMinutes": 480,
+      "advantageMinutes": 476,
+      "deliveryProbability": 1,
+      "probabilityBeforeWhatsapp": 1,
+      "routes": [
+        {
+          "path": "abraham → INTERNET → maria → pedro → ismael",
+          "channels": [
+            "CELL_DATA",
+            "SAT_BROADBAND",
+            "WIFI_DIRECT",
+            "BLE"
+          ],
+          "etaMinutes": 4.01,
+          "confidence": 0.65
+        },
+        {
+          "path": "abraham → INTERNET → SAT_NETWORK → ismael",
+          "channels": [
+            "CELL_DATA",
+            "INTERNET",
+            "SAT_D2D_SMS"
+          ],
+          "etaMinutes": 91.31,
+          "confidence": 0.6
+        },
+        {
+          "path": "abraham → INTERNET → ismael",
+          "channels": [
+            "CELL_DATA"
+          ],
+          "etaMinutes": 480.01,
+          "confidence": 1
+        }
+      ],
+      "explanation": "Carrera por 3 ruta(s) en paralelo; la primera en entregar gana y el receptor deduplica."
+    },
+    "satellitePasses": [
+      {
+        "satellite": "DEMO-D2D-2",
+        "startMinute": 90.8,
+        "durationS": 135,
+        "maxElevationDeg": 30
+      },
+      {
+        "satellite": "DEMO-D2D-4",
+        "startMinute": 140.5,
+        "durationS": 255,
+        "maxElevationDeg": 52.4
+      },
+      {
+        "satellite": "DEMO-D2D-3",
+        "startMinute": 266.3,
+        "durationS": 270,
+        "maxElevationDeg": 81.9
+      },
+      {
+        "satellite": "DEMO-D2D-5",
+        "startMinute": 317,
+        "durationS": 240,
+        "maxElevationDeg": 50.5
+      }
+    ],
+    "nodes": {
+      "maria": {
+        "relay": "RELAY_ACTIVE (alerta oficial, preautorizado en la instalación)"
+      },
+      "pedro": {
+        "relay": "RELAY_ACTIVE"
+      }
+    },
+    "disclaimer": "Simulación con algoritmos reales de SENDA. Vecinos, tiempos y constelación D2D son ilustrativos."
+  },
+  "s01_onlySatellite": {
+    "id": "S01_ARNHEM_SAN_MARTIN",
+    "options": {
+      "neighbours": false,
+      "d2d": true
+    },
+    "plan": {
+      "status": "DELIVERABLE",
+      "etaMinutes": 91.31,
+      "whatsappBaselineMinutes": 480,
+      "advantageMinutes": 388.7,
+      "deliveryProbability": 1,
+      "probabilityBeforeWhatsapp": 1,
+      "routes": [
+        {
+          "path": "abraham → INTERNET → SAT_NETWORK → ismael",
+          "channels": [
+            "CELL_DATA",
+            "INTERNET",
+            "SAT_D2D_SMS"
+          ],
+          "etaMinutes": 91.31,
+          "confidence": 0.6
+        },
+        {
+          "path": "abraham → INTERNET → ismael",
+          "channels": [
+            "CELL_DATA"
+          ],
+          "etaMinutes": 480.01,
+          "confidence": 1
+        },
+        {
+          "path": "abraham → INTERNET → ismael",
+          "channels": [
+            "CELL_DATA",
+            "SMS"
+          ],
+          "etaMinutes": 480.15,
+          "confidence": 1
+        }
+      ],
+      "explanation": "Carrera por 3 ruta(s) en paralelo; la primera en entregar gana y el receptor deduplica."
+    },
+    "satellitePasses": [
+      {
+        "satellite": "DEMO-D2D-2",
+        "startMinute": 90.8,
+        "durationS": 135,
+        "maxElevationDeg": 30
+      },
+      {
+        "satellite": "DEMO-D2D-4",
+        "startMinute": 140.5,
+        "durationS": 255,
+        "maxElevationDeg": 52.4
+      },
+      {
+        "satellite": "DEMO-D2D-3",
+        "startMinute": 266.3,
+        "durationS": 270,
+        "maxElevationDeg": 81.9
+      },
+      {
+        "satellite": "DEMO-D2D-5",
+        "startMinute": 317,
+        "durationS": 240,
+        "maxElevationDeg": 50.5
+      }
+    ],
+    "nodes": {},
+    "disclaimer": "Simulación con algoritmos reales de SENDA. Vecinos, tiempos y constelación D2D son ilustrativos."
+  },
+  "s01_noAlternatives": {
+    "id": "S01_ARNHEM_SAN_MARTIN",
+    "options": {
+      "neighbours": false,
+      "d2d": false
+    },
+    "plan": {
+      "status": "DELIVERABLE",
+      "etaMinutes": 480.01,
+      "whatsappBaselineMinutes": 480,
+      "advantageMinutes": 0,
+      "deliveryProbability": 1,
+      "probabilityBeforeWhatsapp": 1,
+      "routes": [
+        {
+          "path": "abraham → INTERNET → ismael",
+          "channels": [
+            "CELL_DATA"
+          ],
+          "etaMinutes": 480.01,
+          "confidence": 1
+        },
+        {
+          "path": "abraham → INTERNET → ismael",
+          "channels": [
+            "CELL_DATA",
+            "SMS"
+          ],
+          "etaMinutes": 480.15,
+          "confidence": 1
+        }
+      ],
+      "explanation": "Carrera por 2 ruta(s) en paralelo; la primera en entregar gana y el receptor deduplica."
+    },
+    "satellitePasses": [],
+    "nodes": {},
+    "disclaimer": "Simulación con algoritmos reales de SENDA. Vecinos, tiempos y constelación D2D son ilustrativos."
+  },
+  "s04": {
+    "id": "S04_QUAKE",
+    "location": {
+      "lat": 37.683,
+      "lon": -1.705,
+      "errorKm": 0.5,
+      "rmsS": 0.093,
+      "stations": 14,
+      "confidence": "HIGH"
+    },
+    "activation": {
+      "networkOnly": "STANDBY",
+      "withPublicFeed": "RELAY_ACTIVE",
+      "reason": "Detección corroborada por dos fuentes independientes"
+    },
+    "sWaveLeadSeconds": [
+      {
+        "city": "Lorca",
+        "leadS": -12.8
+      },
+      {
+        "city": "Murcia",
+        "leadS": 4.4
+      },
+      {
+        "city": "Alicante",
+        "leadS": 24.3
+      },
+      {
+        "city": "Granada",
+        "leadS": 37.4
+      },
+      {
+        "city": "Madrid",
+        "leadS": 87
+      }
+    ],
+    "disclaimer": "Llegadas P sintéticas. La alerta solo puede adelantarse a las ondas dañinas en lugares alejados del epicentro."
+  },
+  "s05": {
+    "id": "S05_RUBBLE",
+    "victimTruth": {
+      "x": 6,
+      "y": 3.5,
+      "z": -2.5
+    },
+    "estimate": {
+      "x": 6.14,
+      "y": 3.65,
+      "z": -2.38,
+      "errorM": 0.5
+    },
+    "horizontalErrorM": 0.21,
+    "arOverlay": {
+      "u": 540,
+      "v": 1173,
+      "radiusPx": 61,
+      "label": "Señal del teléfono atrapado (estimación)"
+    },
+    "bridge": {
+      "id": "bombero-7",
+      "rssi": -71,
+      "uplinks": [
+        "CELL_DATA",
+        "SAT_BROADBAND"
+      ],
+      "why": "Mejor señal hacia la víctima entre los teléfonos con relé activo y salida a Internet"
+    },
+    "messageToFamily": {
+      "status": "DELIVERABLE",
+      "etaMinutes": 0.02,
+      "whatsappBaselineMinutes": 0,
+      "advantageMinutes": 0,
+      "deliveryProbability": 0.7,
+      "probabilityBeforeWhatsapp": 0,
+      "routes": [
+        {
+          "path": "atrapado → bombero-7 → INTERNET → familia",
+          "channels": [
+            "BLE",
+            "CELL_DATA"
+          ],
+          "etaMinutes": 0.02,
+          "confidence": 0.7
+        }
+      ],
+      "explanation": "Carrera por 1 ruta(s) en paralelo; la primera en entregar gana y el receptor deduplica."
+    },
+    "csiThroughWall": {
+      "withPerson": {
+        "detected": true,
+        "rpm": 14.1,
+        "bandShare": 0.196
+      },
+      "emptyRoom": {
+        "detected": false
+      },
+      "note": "Señal CSI sintética; requiere accesorio ESP32 y calibración en campo"
+    },
+    "disclaimer": "Lecturas RSSI y CSI sintéticas con ruido; en escombros reales el error es mayor y debe calibrarse."
+  },
+  "s07": {
+    "id": "S07_COORDINATION",
+    "actors": [
+      {
+        "user": "u-jefe",
+        "trust": "VERIFIED_INSTITUTIONAL",
+        "orgKind": "FIRE",
+        "coordinator": true
+      },
+      {
+        "user": "u-agente",
+        "trust": "VERIFIED_INSTITUTIONAL",
+        "orgKind": "POLICE",
+        "coordinator": false
+      },
+      {
+        "user": "u-vol",
+        "trust": "VOLUNTEER_UNVERIFIED",
+        "orgKind": null,
+        "coordinator": true
+      },
+      {
+        "user": "u-hermana",
+        "trust": "CITIZEN",
+        "orgKind": null,
+        "coordinator": false
+      }
+    ],
+    "familyView": {
+      "id": "P1",
+      "name": "Ismael",
+      "status": "LOCATED_SAFE",
+      "updatedAt": 1793793600000,
+      "updatedBy": "FIRE:Parque 3"
+    },
+    "familyNotifiedVia": "fp-hermana",
+    "volunteerCannotSetVictimStatus": true,
+    "channels": {
+      "policeInternal": {
+        "agente": true,
+        "bombero": false
+      },
+      "interagency": {
+        "jefeBomberos": true,
+        "voluntario": false
+      }
+    },
+    "secureDocuments": {
+      "jefe": true,
+      "voluntario": false
+    },
+    "disclaimer": "Organizaciones y credenciales de demostración; la integración real exige convenio y gestión de claves por cada organismo."
+  }
+}

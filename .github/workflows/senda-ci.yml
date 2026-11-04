@@ -1,0 +1,47 @@
+name: SENDA
+permissions:
+  contents: read
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  senda:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Núcleo SENDA (cifrado, módem acústico, DTN, enrutador, zonas, rescate)
+        run: node --test packages/senda/tests/*.test.mjs
+      - name: Relé por Internet (Node, sin dependencias)
+        run: node --test packages/senda-relay/tests/*.test.mjs
+      - name: Imagen Docker del relé (construye, arranca sin privilegios, sincroniza y persiste)
+        run: |
+          docker build -f packages/senda-relay/Dockerfile -t senda-relay .
+          docker run -d --name relay -p 8787:8787 -v senda-data:/data senda-relay
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8787/health && break; sleep 1; done
+          curl -fsS -X POST -H 'content-type: application/json' -d '{"summary":{"owner":"ci","ids":[],"receipts":[],"broadcasts":[]},"envelopes":[],"receipts":[],"broadcasts":[]}' http://127.0.0.1:8787/sync
+          sleep 6 && docker exec relay test -s /data/store.json && docker logs relay
+      - name: Paridad de formatos web / Android (JVM) / ESP32 (C++)
+        run: |
+          mkdir -p "$RUNNER_TEMP/senda-jvm"
+          javac --release 17 -d "$RUNNER_TEMP/senda-jvm" apps/senda-android/app/src/main/java/eu/senda/field/SendaFormats.java apps/senda-android/app/src/main/java/eu/senda/field/NativeAction.java apps/senda-android/app/src/test/java/eu/senda/field/SendaFormatsTest.java
+          java -cp "$RUNNER_TEMP/senda-jvm" eu.senda.field.SendaFormatsTest
+          g++ -std=c++17 -Wall -Wextra -Werror -I hardware/esp32-survey hardware/esp32-survey/test/host_test.cpp -o "$RUNNER_TEMP/senda-frame" && "$RUNNER_TEMP/senda-frame"
+      - name: Escenarios de referencia
+        run: node packages/senda/scripts/run-scenarios.mjs
+      - name: Chromium para la prueba sin red
+        run: npx --yes playwright@1.63.0 install --with-deps chromium && npm i --no-save --prefix /tmp/pw playwright@1.63.0
+      - name: App SENDA Campo extremo a extremo con la red cortada
+        run: NODE_PATH=/tmp/pw/node_modules node investor-next/scripts/senda-offline-e2e.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: senda-evidence
+          path: evidence/senda/
+      - name: Verificación del despliegue público (solo en master)
+        if: github.ref == 'refs/heads/master'
+        run: SENDA_BASE_URL=https://civic-relay-investor.vercel.app/senda NODE_PATH=/tmp/pw/node_modules node investor-next/scripts/senda-offline-e2e.mjs

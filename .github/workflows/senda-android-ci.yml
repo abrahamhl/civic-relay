@@ -1,0 +1,44 @@
+name: SENDA Android (compilación)
+on:
+  push:
+    branches: [master]
+    paths: ['apps/senda-android/**', '.github/workflows/senda-android-ci.yml']
+  pull_request:
+    paths: ['apps/senda-android/**', '.github/workflows/senda-android-ci.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  apk:
+    name: Formatos (JVM) + APK de depuración
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Paridad de formatos con la web (baliza, barrido, enlace senda://)
+        run: |
+          mkdir -p "$RUNNER_TEMP/jvm"
+          javac --release 17 -d "$RUNNER_TEMP/jvm" apps/senda-android/app/src/main/java/eu/senda/field/SendaFormats.java apps/senda-android/app/src/main/java/eu/senda/field/NativeAction.java apps/senda-android/app/src/test/java/eu/senda/field/SendaFormatsTest.java
+          java -cp "$RUNNER_TEMP/jvm" eu.senda.field.SendaFormatsTest
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
+          log-accepted-android-sdk-licenses: 'false'
+      - run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Compilar APK (prueba de compilación; la validación de radio es en campo)
+        working-directory: apps/senda-android
+        run: gradle :app:assembleDebug --no-daemon --stacktrace
+      - run: test -s apps/senda-android/app/build/outputs/apk/debug/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: senda-android-debug-apk
+          path: apps/senda-android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
