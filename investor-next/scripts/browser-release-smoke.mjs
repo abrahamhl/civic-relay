@@ -16,7 +16,7 @@ const app=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const out=resolve(app,'out');
 const evidenceDir=resolve(app,'../evidence/browser-release');
 mkdirSync(evidenceDir,{recursive:true});
-const mimetypes={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.woff2':'font/woff2'};
+const mimetypes={'.html':'text/html; charset=utf-8','.mjs':'application/javascript; charset=utf-8','.mp4':'video/mp4','.vtt':'text/vtt; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.woff2':'font/woff2'};
 const server=createServer((req,res)=>{
   try{
     let pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
@@ -29,21 +29,25 @@ const server=createServer((req,res)=>{
   }catch(e){res.writeHead(500);res.end('Static preview error');}
 });
 const cases=[
-  {id:'P01',role:'Citizen mobile / consent and revocation',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:390,height:844}},
-  {id:'P02',role:'First responder / scenario switching',locale:'en',url:'/',text:'WHEN THE',viewport:{width:1024,height:768}},
-  {id:'P03',role:'Investor / evidence and grant eligibility',locale:'en',url:'/',text:'WHEN THE',viewport:{width:1280,height:800}},
-  {id:'P04',role:'Engineer / export real synthetic report',locale:'en',url:'/',text:'WHEN THE',viewport:{width:1440,height:900}},
-  {id:'P05',role:'NL privacy reviewer / radio claim boundary',locale:'nl',url:'/nl/',text:'ALS HET',viewport:{width:1024,height:768}},
-  {id:'P06',role:'Volunteer / deny implicit SOS',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:412,height:915}},
-  {id:'P07',role:'Keyboard and reduced-motion accessibility',locale:'en',url:'/',text:'WHEN THE',viewport:{width:390,height:844}},
-  {id:'P08',role:'Institutional partner / roadmap and limitations',locale:'nl',url:'/nl/',text:'ALS HET',viewport:{width:820,height:1180}},
-  {id:'P09',role:'3D Globe object selection, scenario sync and Mars educational mode',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:1440,height:900}},
-  {id:'P10',role:'Sector Intelligence El Tiemblo CCTV, Anti-SSRF and Unified Pipeline',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:1440,height:900}},
-  {id:'P11',role:'Narrow mobile responsive menu and touch targets',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:320,height:720}},
-  {id:'P12',role:'Wide desktop navigation density and no overlap',locale:'en',url:'/',text:'WHEN THE',viewport:{width:1536,height:864}},
-  {id:'P13',role:'Master vision, custody and complete catalogue ES mobile',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:320,height:720}},
-  {id:'P14',role:'Master vision, custody and complete catalogue EN desktop',locale:'en',url:'/',text:'WHEN THE',viewport:{width:1440,height:900}},
-  {id:'P15',role:'Master vision, custody and complete catalogue NL mobile',locale:'nl',url:'/nl/',text:'ALS HET',viewport:{width:390,height:844}}
+  {id:'P01',role:'Citizen mobile / consent and revocation',locale:'es',url:'/es/lab/',text:'CUANDO LA',viewport:{width:390,height:844}},
+  {id:'P02',role:'First responder / scenario switching',locale:'en',url:'/lab/',text:'WHEN THE',viewport:{width:1024,height:768}},
+  {id:'P03',role:'Investor / evidence and grant eligibility',locale:'en',url:'/lab/',text:'WHEN THE',viewport:{width:1280,height:800}},
+  {id:'P04',role:'Engineer / export real synthetic report',locale:'en',url:'/lab/',text:'WHEN THE',viewport:{width:1440,height:900}},
+  {id:'P05',role:'NL privacy reviewer / radio claim boundary',locale:'nl',url:'/nl/lab/',text:'ALS HET',viewport:{width:1024,height:768}},
+  {id:'P06',role:'Volunteer / deny implicit SOS',locale:'es',url:'/es/lab/',text:'CUANDO LA',viewport:{width:412,height:915}},
+  {id:'P07',role:'Keyboard and reduced-motion accessibility',locale:'en',url:'/lab/',text:'WHEN THE',viewport:{width:390,height:844}},
+  {id:'P08',role:'Institutional partner / roadmap and limitations',locale:'nl',url:'/nl/lab/',text:'ALS HET',viewport:{width:820,height:1180}},
+  {id:'P09',role:'3D Globe object selection, scenario sync and Mars educational mode',locale:'es',url:'/es/lab/',text:'CUANDO LA',viewport:{width:1440,height:900}},
+  {id:'P10',role:'Sector Intelligence El Tiemblo CCTV, Anti-SSRF and Unified Pipeline',locale:'es',url:'/es/lab/',text:'CUANDO LA',viewport:{width:1440,height:900}},
+  {id:'P11',role:'Narrow mobile responsive menu and touch targets',locale:'es',url:'/es/lab/',text:'CUANDO LA',viewport:{width:320,height:720}},
+  {id:'P12',role:'Wide desktop navigation density and no overlap',locale:'en',url:'/lab/',text:'WHEN THE',viewport:{width:1536,height:864}},
+  {id:'P13',role:'Master vision, custody and complete catalogue ES mobile',locale:'es',url:'/es/lab/',text:'CUANDO LA',viewport:{width:320,height:720}},
+  {id:'P14',role:'Master vision, custody and complete catalogue EN desktop',locale:'en',url:'/lab/',text:'WHEN THE',viewport:{width:1440,height:900}},
+  {id:'P15',role:'Master vision, custody and complete catalogue NL mobile',locale:'nl',url:'/nl/lab/',text:'ALS HET',viewport:{width:390,height:844}}
+,
+  {id:'P16',role:'New SENDA home EN: live demos, levels, wildfire recompute, real crypto tamper, film',locale:'en',url:'/',text:'WHEN THE',viewport:{width:1440,height:900}},
+  {id:'P17',role:'New SENDA home ES mobile: live demos, levels, no horizontal overflow',locale:'es',url:'/es/',text:'CUANDO LA',viewport:{width:390,height:844}},
+  {id:'P18',role:'New SENDA home NL tablet: live demos, levels, film',locale:'nl',url:'/nl/',text:'ALS HET',viewport:{width:820,height:1180}}
 ];
 async function runRoleTask(page,trial,evidenceDir){
  const observations={role:trial.role,actions:[],verified:false};
@@ -234,6 +238,27 @@ async function runRoleTask(page,trial,evidenceDir){
      actionsBox.x+actionsBox.width<=1536;
    break;
   }
+  case 'P16': case 'P17': case 'P18': {
+   await page.waitForFunction(()=>[...document.querySelectorAll('[data-demo]')].every(h=>h.querySelector('canvas')),null,{timeout:20000});
+   const demos=await page.locator('[data-demo] canvas').count();
+   await page.locator('.sx-levels button').nth(2).click();
+   const engVisible=await page.locator('.sx-lens[data-l="eng"]').first().isVisible();
+   const citizenHidden=!(await page.locator('.sx-lens[data-l="citizen"]').first().isVisible());
+   await page.locator('#incendio').scrollIntoViewIfNeeded();
+   const fire=page.locator('[data-demo="fire"] canvas'), before=await fire.getAttribute('aria-label');
+   await page.locator('[data-demo="fire"] input[type=range]').first().evaluate(el=>{el.value='60';el.dispatchEvent(new Event('input',{bubbles:true}));});
+   const after=await fire.getAttribute('aria-label');
+   await page.locator('#cifrado').scrollIntoViewIfNeeded();
+   await page.waitForFunction(()=>/firma|signature|handtekening/i.test(document.querySelector('[data-demo="crypto"] canvas')?.getAttribute('aria-label')||''),null,{timeout:15000});
+   await page.locator('[data-demo="crypto"] .sd-btn.is-danger').click();
+   await page.waitForFunction(()=>/RECHAZADO|REJECTED|GEWEIGERD/.test(document.querySelector('[data-demo="crypto"] canvas')?.getAttribute('aria-label')||''),null,{timeout:15000});
+   const film=await page.locator('#pelicula video source').first().getAttribute('src');
+   const filmStatus=(await page.request.get(new URL(film,page.url()).href)).status();
+   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
+   note('7 live demos, engineer lens, wildfire recompute on wind change, AES-GCM/ECDSA tamper rejected, film served',{demos,engVisible,citizenHidden,before,after,film,filmStatus,overflow});
+   observations.verified=demos>=7&&engVisible&&citizenHidden&&before!==after&&filmStatus===200&&!overflow;
+   break;
+  }
   case 'P10': {
    const secSection=page.locator('[data-testid="sector-intelligence-section"]');
    await secSection.scrollIntoViewIfNeeded();
@@ -293,7 +318,7 @@ try{
   console.log(record.verdict,trial.id,trial.locale,JSON.stringify({lang:obs.lang,errors:pageErrors.length,canonical:obs.canonical}));
   await page.close();
  }
- const result={sha:process.env.GITHUB_SHA||'LOCAL',completed_at_utc:new Date().toISOString(),scope:'FIFTEEN automated Chromium task roles (P01-P15) on synthetic local website including master vision, typed custody, 20-module catalogue, keyboard, mobile and trilingual checks.',runs:log};
+ const result={sha:process.env.GITHUB_SHA||'LOCAL',completed_at_utc:new Date().toISOString(),scope:'EIGHTEEN automated Chromium task roles (P01-P15 on /lab, P16-P18 on the new live-demo home) on synthetic local website including master vision, typed custody, 20-module catalogue, keyboard, mobile and trilingual checks.',runs:log};
  writeFileSync(join(evidenceDir,'summary.json'),JSON.stringify(result,null,2));
  assert.ok(log.every(x=>x.verdict==='PASS'),'Browser release regression failed; inspect evidence/browser-release');
 }finally{

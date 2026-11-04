@@ -31,7 +31,7 @@ try {
   browser = await chromium.launch({ headless: true, args: ["--enable-webgl", "--use-gl=swiftshader"] });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, acceptDownloads: true });
   const base = "http://127.0.0.1:" + server.address().port;
-  const response = await page.goto(base + "/es/", { waitUntil: "domcontentloaded" });
+  const response = await page.goto(base + "/es/lab/", { waitUntil: "domcontentloaded" });
   assert.equal(response?.status(), 200);
   const field = page.locator('[data-testid="device-field-audit"]');
   await field.scrollIntoViewIfNeeded();
