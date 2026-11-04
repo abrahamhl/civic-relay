@@ -357,7 +357,7 @@ function railDemo(host, o) {
     if (st.geo) {
       const segs = st.geo.segments, Lm = segs.at(-1).toPk;
       for (const sg of segs) { const v = clamp(((sg.recentIndex ?? sg.index) - 0.8) / 2, 0, 1); g.fillStyle = `rgb(${Math.round(52 + 203 * v)},${Math.round(211 - 120 * v)},${Math.round(153 - 60 * v)})`; g.fillRect(gx + (gw * sg.fromPk) / Lm, sy, Math.max(1, (gw * 50) / Lm), sh); }
-      for (const a of st.geo.alerts.filter((q, i, arr) => i === 0 || q.fromPk - arr[i - 1].fromPk > 100)) { const x = gx + (gw * a.fromPk) / Lm; txt(g, '▲', x, sy + sh + 14, { size: 12, color: C.red, align: 'center' }); txt(g, `PK ${nf(o.lang, a.fromPk / 1000, 1)} · ${a.kinds.includes('IMPACTO_REPETIDO') ? L.impact : L.degr}`, x, sy + sh + 28, { size: fs - 1, color: C.text, align: 'center' }); }
+      st.geo.alerts.filter((q, i, arr) => i === 0 || q.fromPk - arr[i - 1].fromPk > 100).forEach((a, k) => { const x = gx + (gw * a.fromPk) / Lm, dy = W < 700 && k % 2 ? 15 : 0; txt(g, '▲', x, sy + sh + 14, { size: 12, color: C.red, align: 'center' }); txt(g, `PK ${nf(o.lang, a.fromPk / 1000, 1)} · ${a.kinds.includes('IMPACTO_REPETIDO') ? L.impact : L.degr}`, x, sy + sh + 28 + dy, { size: fs - 1, color: C.text, align: 'center' }); });
     }
   } };
 }
