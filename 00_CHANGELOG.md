@@ -1,5 +1,23 @@
 # Changelog
 
+## SENDA v0.8 · 04-11-2026 · Portada en vivo por niveles, incendio forestal, película y reels
+
+**Entrada:** web más corta e inmersiva, con demostraciones en vivo de cada innovación; foco en incendios, vías, comunicación sin red, seguridad y satélite; material audiovisual para inversión.
+
+**Procesamiento:**
+- `wildfire.mjs` (núcleo): tiempo mínimo de llegada del fuego (Dijkstra, elipse de viento, pendiente con forma de Rothermel), FIRMS, y cruce con antenas: si la antena de un pueblo cae antes de su hora límite de aviso, la alerta sale antes o por portadores sin red (`planMultiBearer`). 7 pruebas. Corregido un fallo de precisión Float32 en el montículo que detenía la propagación sin viento.
+- `investor-next/public/senda/home/demos.mjs`: 7 demos deterministas `render(t)` sobre el núcleo (malla, k-de-n, cifrado WebCrypto real, fusión, incendio, vía, órbitas con costas Natural Earth). Las mismas demos alimentan la web y los vídeos.
+- Portada nueva `senda-experience.tsx` (es/en/nl): selector de nivel (ciudadanía, coordinación, ingeniería, inversión), 6 capítulos con demo en vivo, película y reels, algoritmo, inversión y verdad declarada. El laboratorio anterior completo pasa a `/lab` (en/es/nl) sin perder nada.
+- `media/senda-promo`: guiones, voz Kokoro local, compositor `promo.html`, render por tramos, publicación. Película para inversores (16:9) y 3 reels (9:16) en es/en.
+
+**Validación:** núcleo + relé 108/108; E2E sin red; web: compilación, idiomas y 98/98; capturas de control de escritorio, móvil y fotogramas de vídeo.
+
+**Salida:** `/` `/es/` `/nl/` nuevas; `/lab/`; `public/media/promo/*`.
+
+**Siguiente:** combustibles reales (SIOSE/CORINE) y AEMET para el incendio; TLE reales en la demo orbital; medición Lighthouse de la portada nueva.
+
+— Registrado por el asistente de orquestación (Claude Code), bajo la dirección de Abraham Haddioui.
+
 ## SENDA v0.7 · 04-11-2026 · Motor de fusión de evidencias, visión por capas y vigilancia ferroviaria
 
 **Entrada:** convertir «una cámara que vea a través de las paredes no existe» en algo construible y verificable; prevenir accidentes ferroviarios con datos que ya existen.
