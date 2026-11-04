@@ -231,7 +231,7 @@ await A.page.click('[data-tab="home"]');
 await A.page.click('[data-quick="TRAPPED"]');
 await A.page.waitForFunction(() => window.SENDA_TEST.state.lastQuick?.status === 'TRAPPED');
 await B.page.evaluate((t) => window.SENDA_TEST.receiveText(t), await A.page.evaluate(() => window.SENDA_TEST.exportBundle()));
-await A.page.click('[data-tab="home"]'); await A.page.check('#easy-only');
+await A.page.click('[data-tab="home"]'); await A.page.check('#easy-only'); await A.page.waitForTimeout(5500);
 const easyVisible = await A.page.evaluate(() => ({ sosHidden: getComputedStyle(document.querySelector('#sos')).display === 'none', easy: getComputedStyle(document.querySelector('#easy')).display !== 'none' }));
 await A.page.screenshot({ path: resolve(outDir, 'e2e-13-modo-facil.png') });
 await A.page.uncheck('#easy-only');

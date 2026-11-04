@@ -2,8 +2,8 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-04T04:27:12.951Z",
-  "durationS": 29.6,
+  "at": "2026-11-04T04:37:25.368Z",
+  "durationS": 47.4,
   "passed": 23,
   "total": 23,
   "results": [
@@ -87,7 +87,7 @@
     {
       "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
       "ok": true,
-      "href": "senda://accion?a=BLE_BEACON&id=cc0108f778e20391&b=B14&f=3&u=B&bat=100&cmd=bXsYbcbRRDGbXku0"
+      "href": "senda://accion?a=BLE_BEACON&id=676141a1eb073fee&b=B14&f=3&u=B&bat=100&cmd=lAnUJt3zoi3blKr3"
     },
     {
       "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",
@@ -102,7 +102,7 @@
       "name": "Red SENDA sin red: reparto k-de-n entre varios portadores ≥99 %, prueba real de pérdida de portadores, catálogo satelital, previsión de apagón con pasarelas y CAP con auditoría que delata alteraciones",
       "ok": true,
       "pDelivery": 0.9909,
-      "trialSuccess": 0.985,
+      "trialSuccess": 1,
       "halfDarkAtH": 4,
       "gateways": 5
     },

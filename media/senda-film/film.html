@@ -18,7 +18,7 @@ h1 span{display:inline-block;margin-right:.24em}
 .vis{position:relative;height:600px;display:flex;align-items:center;justify-content:center;gap:24px}
 .phone{width:250px;border-radius:30px;border:6px solid #1d2c37;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.55);background:#071018}
 .phone img,.desk img{display:block;width:100%}
-.desk{width:700px;border-radius:14px;border:1px solid var(--l);overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.55);background:#071018;position:relative}
+.desk{width:636px;border-radius:14px;border:1px solid var(--l);overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.55);background:#071018;position:relative}
 .desk .bar{height:26px;background:#0f1d27;display:flex;gap:6px;align-items:center;padding:0 10px}.desk .bar i{width:10px;height:10px;border-radius:50%;background:#2a3d4a}
 .crop{overflow:hidden;position:relative}.crop img{position:absolute;left:0;top:0;width:100%}
 .kpis{display:flex;flex-direction:column;gap:16px;width:100%}
@@ -66,7 +66,7 @@ function visualHTML(sc, idx) {
   if (v.kind === 'shots') {
     const frames = v.images.map((f, i) => {
       if (/e2e-(06|08|12)/.test(f)) {
-        const [y0, y1] = v.crop ? CROPS[v.crop] : [0, /06/.test(f) ? 1000 : 900]; const sc2 = 700 / 1280;
+        const [y0, y1] = v.crop ? CROPS[v.crop] : [0, /06/.test(f) ? 1000 : 900]; const sc2 = 636 / 1280;
         return `<div class="desk f${i}"><div class="bar"><i></i><i></i><i></i></div><div class="crop" style="height:${Math.round((y1 - y0) * sc2)}px"><img src="${img(f)}" style="top:${-Math.round(y0 * sc2)}px"></div></div>`;
       }
       const tall = /e2e-11/.test(f);
