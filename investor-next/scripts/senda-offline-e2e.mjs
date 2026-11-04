@@ -211,6 +211,51 @@ check('Relé por Internet: A sube con conexión, C baja y transporta sin red, B 
 await relay.close();
 } else console.log('SKIP · Relé por Internet (solo en local; ver comentario)');
 
+// ---- Capa centralizadora: red multiportador, satélites, previsión de apagón, drones y CAP (sin red)
+const R = await C.ctx.newPage(); R.on('pageerror', (e) => C.errors.push(String(e)));
+await R.goto(base + '/red'); await R.waitForFunction(() => window.SENDA_RED?.plan(), null, { timeout: 15000 });
+await R.click('#trial'); await R.waitForFunction(() => window.SENDA_RED.trial != null);
+await R.click('#cap-go'); await R.waitForFunction(() => window.SENDA_RED.cap != null);
+const red = await R.evaluate(() => ({ p: window.SENDA_RED.plan().pDelivery, feasible: window.SENDA_RED.plan().feasible, bearers: new Set(window.SENDA_RED.plan().messages.map((m) => m.id)).size, trial: window.SENDA_RED.trial, half: window.SENDA_RED.forecast().halfDarkAtH, gw: window.SENDA_RED.gateways().picks.length, cap: window.SENDA_RED.cap, sats: document.querySelectorAll('#sats tbody tr').length }));
+await R.setViewportSize({ width: 1280, height: 900 }); await R.screenshot({ path: resolve(outDir, 'e2e-12-red-multiportador.png'), fullPage: true });
+check('Red SENDA sin red: reparto k-de-n entre varios portadores ≥99 %, prueba real de pérdida de portadores, catálogo satelital, previsión de apagón con pasarelas y CAP con auditoría que delata alteraciones',
+  red.feasible && red.p >= 0.99 && red.bearers >= 2 && red.trial >= 0.95 && red.half != null && red.gw === 5 && red.cap.ok && red.cap.tamperDetected && /cap:1\.2/.test(red.cap.cap) && red.sats >= 8,
+  { pDelivery: +red.p.toFixed(4), trialSuccess: red.trial, halfDarkAtH: red.half, gateways: red.gw });
+await R.goto(base + '/incidente'); await R.waitForFunction(() => window.SENDA_PANEL?.sim?.final, null, { timeout: 15000 });
+await R.click('#cap'); await R.waitForFunction(() => window.SENDA_PANEL.cap != null);
+const capInc = await R.evaluate(() => window.SENDA_PANEL.cap);
+check('Panel ferroviario exporta cada emplazamiento a la sala 112 en CAP 1.2 con auditoría íntegra', capInc.count === 2 && capInc.auditOk && /<severity>Extreme<\/severity>/.test(capInc.xml), { sites: capInc.count });
+
+// ---- Modo fácil: un toque «Estoy atrapado» llega cifrado al contacto
+await A.page.click('[data-tab="home"]');
+await A.page.click('[data-quick="TRAPPED"]');
+await A.page.waitForFunction(() => window.SENDA_TEST.state.lastQuick?.status === 'TRAPPED');
+await B.page.evaluate((t) => window.SENDA_TEST.receiveText(t), await A.page.evaluate(() => window.SENDA_TEST.exportBundle()));
+await A.page.click('[data-tab="home"]'); await A.page.check('#easy-only');
+const easyVisible = await A.page.evaluate(() => ({ sosHidden: getComputedStyle(document.querySelector('#sos')).display === 'none', easy: getComputedStyle(document.querySelector('#easy')).display !== 'none' }));
+await A.page.screenshot({ path: resolve(outDir, 'e2e-13-modo-facil.png') });
+await A.page.uncheck('#easy-only');
+const easyInbox = await B.page.evaluate(() => window.SENDA_TEST.state.inbox.some((m) => m.body.startsWith('ESTOY ATRAPADO · Abraham')));
+check('Modo fácil: un toque «Estoy atrapado» sale cifrado y el contacto lo recibe; la vista sencilla deja solo los botones grandes', easyInbox && easyVisible.sosHidden && easyVisible.easy, { easyInbox, ...easyVisible });
+
+// ---- Accesibilidad (automática): idioma, nombre accesible de cada control, alt en imágenes
+const a11y = async (page) => page.evaluate(() => {
+  const issues = [];
+  if (!document.documentElement.lang) issues.push('html sin lang');
+  const named = (el) => el.getAttribute('aria-label') || el.getAttribute('aria-labelledby') || el.closest('label') || (el.id && document.querySelector(`label[for="${el.id}"]`)) || el.title;
+  for (const el of document.querySelectorAll('input:not([type=hidden]),select,textarea')) if (!named(el)) issues.push(`${el.tagName.toLowerCase()}#${el.id || '?'} sin etiqueta`);
+  for (const b of document.querySelectorAll('button,a[href]')) if (!(b.textContent.trim() || b.getAttribute('aria-label') || b.title || b.querySelector('img[alt]:not([alt=""])'))) issues.push(`${b.tagName.toLowerCase()}#${b.id || '?'} sin nombre`);
+  for (const img of document.querySelectorAll('img')) if (!img.hasAttribute('alt')) issues.push('img sin alt');
+  return issues;
+});
+const a11yIssues = {};
+for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/estado']) {
+  await R.goto(base + path); await R.waitForLoadState('load'); await R.waitForTimeout(300);
+  const iss = await a11y(R); if (iss.length) a11yIssues[path || '/'] = iss;
+}
+await R.close();
+check('Accesibilidad automática en las 6 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
+
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 
 await browser.close(); server.close();

@@ -2,10 +2,10 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-04T03:41:24.897Z",
-  "durationS": 22.9,
-  "passed": 19,
-  "total": 19,
+  "at": "2026-11-04T04:27:12.951Z",
+  "durationS": 29.6,
+  "passed": 23,
+  "total": 23,
   "results": [
     {
       "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
@@ -87,7 +87,7 @@
     {
       "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
       "ok": true,
-      "href": "senda://accion?a=BLE_BEACON&id=023fc620588234ae&b=B14&f=3&u=B&bat=100&cmd=41D05kN7yaiO47h7"
+      "href": "senda://accion?a=BLE_BEACON&id=cc0108f778e20391&b=B14&f=3&u=B&bat=100&cmd=bXsYbcbRRDGbXku0"
     },
     {
       "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",
@@ -97,6 +97,31 @@
     {
       "name": "Relé por Internet: A sube con conexión, C baja y transporta sin red, B lo recibe; el relé no puede leerlo",
       "ok": true
+    },
+    {
+      "name": "Red SENDA sin red: reparto k-de-n entre varios portadores ≥99 %, prueba real de pérdida de portadores, catálogo satelital, previsión de apagón con pasarelas y CAP con auditoría que delata alteraciones",
+      "ok": true,
+      "pDelivery": 0.9909,
+      "trialSuccess": 0.985,
+      "halfDarkAtH": 4,
+      "gateways": 5
+    },
+    {
+      "name": "Panel ferroviario exporta cada emplazamiento a la sala 112 en CAP 1.2 con auditoría íntegra",
+      "ok": true,
+      "sites": 2
+    },
+    {
+      "name": "Modo fácil: un toque «Estoy atrapado» sale cifrado y el contacto lo recibe; la vista sencilla deja solo los botones grandes",
+      "ok": true,
+      "easyInbox": true,
+      "sosHidden": true,
+      "easy": true
+    },
+    {
+      "name": "Accesibilidad automática en las 6 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
+      "ok": true,
+      "issues": {}
     },
     {
       "name": "Sin errores de JavaScript en los 3 teléfonos",

@@ -1,4 +1,4 @@
-# SENDA · Arquitectura e infraestructura (v0.5 · 04-11-2026)
+# SENDA · Arquitectura e infraestructura (v0.6 · 04-11-2026)
 
 > **Entrada → Procesamiento → Validación → Salida.** Este documento describe qué pieza hace qué,
 > quién confía en quién, por dónde viajan los datos, cómo se despliega cada componente y cómo se
@@ -12,6 +12,7 @@
                 │ roles (organismo, credenciales, códigos) · remote-command (alertas firmadas, respuestas, cuadro)        │
                 │ building-twin (EMS-98, routers, personas) · beacon (trama BLE, barrido JSONL, enlace nativo)           │
                 │ acoustic-modem · rubble · through-wall · rail-incident · orbital · feeds                                │
+                │ erasure (k-de-n GF256) · bearers (portadores + plan exacto) · satellites · blackout · drone · interop   │
                 └───────────────┬───────────────────────────┬───────────────────────────────┬────────────────────────────┘
                                 │ sync-web (copia literal)   │ import                         │ mismos vectores de prueba
               ┌─────────────────▼──────────────┐ ┌──────────▼───────────┐   ┌────────────────▼───────────────┐
@@ -30,6 +31,28 @@
 | Relé por Internet | `packages/senda-relay` | Contenedor del organismo (`Dockerfile`), detrás de HTTPS | Tests de unidad + E2E + arranque de la imagen en CI |
 | SENDA Android | `apps/senda-android` | APK (CI `senda-android-ci.yml`) | Formatos en JVM (14 invariantes) + compilación del APK |
 | Accesorio ESP32 | `hardware/esp32-survey` | Firmware Arduino (`esp32:esp32@3.0.7`) | Trama en g++ (mismos vectores) + compilación en CI + autotest al arrancar |
+
+
+## 1 bis. Capa centralizadora multiportador (v0.6)
+
+```
+ mensaje cifrado (envelope)  ──►  erasure.encodeShards(k, n)  ──►  bearers.planMultiBearer()  ──►  tramas por portador
+                                   Reed-Solomon GF(2^8), Cauchy       P(≥k) exacta (Poisson-binomial    SMS/D2C: texto «SND1 …» ≤160
+                                   cualquier k de n reconstruye       agrupada), coste, latencia,        LoRa/Iridium/QO-100: binario ≤ MTU
+                                                                      ley (aficionado = sin cifrar)      vecinos/dron/relé: paquete DTN
+ receptor / pasarela  ◄──  createReassembler().add(fragmento, vía)  ◄──  fragmentos de cualquier portador, en cualquier orden
+```
+
+| Módulo | Qué hace | Base |
+|---|---|---|
+| `erasure.mjs` | Fragmentación k-de-n MDS y reensamblado desde cualquier portador | Reed-Solomon sistemático, matriz de Cauchy sobre GF(256) |
+| `bearers.mjs` | Registro de portadores (MTU, p, latencia, coste, hardware, acceso, cifrado permitido), plan óptimo y adaptadores de trama | Poisson-binomial agrupada; asignación voraz por ganancia marginal |
+| `satellites.mjs` | Redes satelitales por nivel de acceso, con fuentes y estado | Starlink D2C, Skylo, Iridium SBD, QO-100, Cospas-Sarsat/Galileo, EWSS, GOVSATCOM/IRIS², SatNOGS |
+| `blackout.mjs` | Previsión de cobertura tras un corte de luz y colocación de pasarelas | Supervivencia Weibull por clase de respaldo; cobertura 1−Π(1−S); voraz submodular ≥(1−1/e) |
+| `drone.mjs` | Open Drone ID (ubicación e identificación), misión de fachada QGroundControl, dron mula | ASTM F3411 / EN 4709-002 (disposición según opendroneid-core-c) |
+| `interop.mjs` | CAP 1.2 de incidentes y alertas, mapeo EMSI, auditoría encadenada SHA-256 | OASIS CAP 1.2; ISO/TR 22351 (pendiente de validar) |
+
+Pantalla: `/senda/red` (planificador con prueba real de pérdida, catálogo satelital, mapa de apagón, drones y CAP).
 
 ## 2. Modelo de confianza (quién puede pedir qué a qué teléfono)
 
@@ -96,4 +119,5 @@ Organismo (protección civil, bomberos…)            Coordinador               
 
 | Fecha | Versión | Cambio |
 |---|---|---|
+| 04-11-2026 | v0.6 | Capa centralizadora: fragmentos k-de-n entre portadores con probabilidad exacta y límites legales; catálogo satelital con fuentes; previsión de apagón y pasarelas óptimas; drones (Open Drone ID, misión QGroundControl); CAP 1.2 y auditoría encadenada; modo fácil y auditoría automática de accesibilidad; portada trilingüe con película. Núcleo 78/78, E2E 23/23. |
 | 04-11-2026 | v0.5 | Infraestructura de coordinación: herramienta de organismo, credenciales portables, alertas firmadas difundidas por DTN y relé, respuestas cifradas y cuadro por planta; relé Docker; SENDA Android (baliza, escucha, barrido); accesorio ESP32; formatos compartidos con vectores de paridad; E2E 19/19. |

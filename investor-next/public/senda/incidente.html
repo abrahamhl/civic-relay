@@ -24,7 +24,7 @@ code{font:12px ui-monospace,monospace;color:var(--i)}
 </style>
 </head>
 <body><main>
-<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/estado">Verificación</a></p>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/red">Red y satélites</a> · <a href="/senda/estado">Verificación</a></p>
 <h1>Panel de coordinación · accidente con dos trenes</h1>
 <p class="m">Configuración tipo Adamuz: un tren descarrila e invade la vía contigua y otro, en sentido contrario, lo embiste 20 s después. Cada punto es un teléfono con SENDA que <b>detecta el impacto por sí solo</b>, pregunta «¿estás bien?» y, si nadie responde, informa. Los informes viajan por cobertura propia o por Bluetooth hasta un compañero con señal. <b>Simulación sintética con los algoritmos reales</b>; no reproduce datos del accidente.</p>
 
@@ -35,7 +35,7 @@ code{font:12px ui-monospace,monospace;color:var(--i)}
   <div class="k"><b id="k-phones">–</b>teléfonos con SENDA (adopción <span id="k-adop"></span>)</div>
 </div>
 
-<div class="card"><div class="row"><button class="p" id="play">▶ Reproducir</button><label class="m">Segundo <b id="tlabel">0</b></label><input type="range" id="t" min="0" max="300" value="0" style="flex:1"></div>
+<div class="card"><div class="row"><button class="p" id="play">▶ Reproducir</button><label class="m">Segundo <b id="tlabel">0</b></label><input type="range" id="t" aria-label="Segundo de la simulación" min="0" max="300" value="0" style="flex:1"></div>
 <div class="row" style="margin-top:8px"><label class="m">Adopción <select id="adoption"><option value="0.05">5 %</option><option value="0.1">10 %</option><option value="0.25" selected>25 %</option><option value="0.5">50 %</option></select></label>
 <label class="m">Cobertura móvil <select id="coverage"><option value="0.2">20 %</option><option value="0.55" selected>55 %</option><option value="0.9">90 %</option></select></label>
 <label class="m">Semilla <input id="seed" type="number" value="18" style="width:80px"></label><button id="rerun">Recalcular</button></div></div>
@@ -47,6 +47,9 @@ code{font:12px ui-monospace,monospace;color:var(--i)}
     <h2 style="margin-top:14px">Para el 112 (texto, cabe en un SMS largo)</h2><pre id="brief" style="white-space:pre-wrap;font:12px ui-monospace,monospace;color:#91d7e8"></pre></div>
 </div>
 
+<div class="card" style="margin-top:14px"><h2>Enviar a la sala 112 (CAP 1.2 + auditoría)</h2>
+  <p class="m">Cada emplazamiento fusionado sale como alerta <b>CAP 1.2</b> (el formato abierto que ya consumen las plataformas 112, EU-Alert y Meteoalarm) y queda en un <b>registro de auditoría encadenado</b> (SHA-256) que delata cualquier alteración posterior.</p>
+  <button class="p" id="cap">Exportar CAP de los emplazamientos</button> <span id="cap-st" class="m"></span><pre id="cap-out" style="white-space:pre-wrap;max-height:240px;overflow:auto;font:12px ui-monospace,monospace;color:#91d7e8"></pre></div>
 <div class="card" style="margin-top:14px"><h2>Tiempo hasta saber que hay un segundo tren</h2>
   <p class="m">SENDA <b id="cmp-s"></b></p><div class="bar" id="bar-s" style="width:1%"></div>
   <p class="m">Referencia publicada (Adamuz): ~45 min</p><div class="bar ref" style="width:100%"></div>
@@ -55,6 +58,7 @@ code{font:12px ui-monospace,monospace;color:var(--i)}
 <script type="module">
 import { simulateTwoTrainIncident } from '/senda/core/rail-scenario.mjs';
 import { fuseIncidentReports, emergencyBrief } from '/senda/core/rail-incident.mjs';
+import { railIncidentToCap, createAuditLog, verifyAuditLog } from '/senda/core/interop.mjs';
 const $ = (s) => document.querySelector(s);
 let sim, playing = null;
 function run() {
@@ -91,5 +95,16 @@ $('#t').oninput = (e) => draw(+e.target.value);
 $('#rerun').onclick = run; ['#adoption', '#coverage'].forEach((s) => ($(s).onchange = run));
 $('#play').onclick = () => { if (playing) { clearInterval(playing); playing = null; $('#play').textContent = '▶ Reproducir'; return; } $('#t').value = 0; $('#play').textContent = '⏸ Pausa'; playing = setInterval(() => { const v = Math.min(300, +$('#t').value + 1); $('#t').value = v; draw(v); if (v >= 300) { clearInterval(playing); playing = null; $('#play').textContent = '▶ Reproducir'; } }, 60); };
 run(); $('#t').value = 120; draw(120);
+
+const audit = createAuditLog();
+document.querySelector('#cap').onclick = async () => {
+  const now = Date.now(); const caps = sim.final.sites.map((site) => railIncidentToCap(site, { now }));
+  for (const [i, c] of caps.entries()) await audit.append({ at: now + i, actor: 'panel-coordinacion', action: 'CAP_EXPORTED', data: { site: sim.final.sites[i].site, bytes: c.length } });
+  const v = await verifyAuditLog(audit.entries());
+  document.querySelector('#cap-out').textContent = caps.join('\n\n');
+  document.querySelector('#cap-st').textContent = `${caps.length} alerta(s) CAP · auditoría ${v.ok ? 'íntegra ✔ (' + v.length + ' entradas)' : 'ROTA'}`;
+  const blob = new Blob([caps.join('\n')], { type: 'application/xml' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'senda-incidente-cap.xml'; a.click();
+  window.SENDA_PANEL.cap = { count: caps.length, auditOk: v.ok, xml: caps[0] };
+};
 </script>
 </body></html>

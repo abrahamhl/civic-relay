@@ -50,6 +50,7 @@ async function boot() {
   S.store.purgeExpired(now());
   await CO.load();
   for (const b of S.store.listBroadcasts()) await CO.handleBroadcast(b, 'almacenado');
+  if (await kv.get('easyOnly')) { document.body.classList.add('easy-only'); $('#easy-only').checked = true; }
   $('#tabs').hidden = false; show('home');
 }
 
@@ -163,6 +164,22 @@ async function sendMessage() {
   S.store.put(env, { now: now(), copies: 8 }); await persist(); $('#body').value = ''; render();
   toast('Cifrado y en camino: emítelo por sonido, comparte el paquete o deja que otros lo transporten');
 }
+
+/* Modo fácil: un toque = estado + posición cifrados a todos los contactos. */
+const QUICK = { OK: 'ESTOY BIEN', NEED_HELP: 'NECESITO AYUDA', TRAPPED: 'ESTOY ATRAPADO' };
+async function quickStatus(status) {
+  if (!S.contacts.length) { toast('Añade primero un contacto (pestaña Contactos).', 5000); show('contacts'); return null; }
+  const where = S.pos ? `${S.pos.lat.toFixed(5)},${S.pos.lon.toFixed(5)}` : 'posición desconocida';
+  const urgent = status !== 'OK';
+  const body = `${QUICK[status]} · ${S.name} · ${where} · ${new Date().toLocaleString()}`;
+  for (const c of S.contacts) S.store.put(await sealMessage({ sender: S.me, recipient: c, body, priority: urgent ? 0 : 3, ttlS: 3 * 86400, now: now(), kind: urgent ? 'SOS' : 'HUMAN_STATUS' }), { now: now(), copies: 16 });
+  S.lastQuick = { status, body, at: now() }; await persist(); render();
+  toast(`«${QUICK[status]}» cifrado para ${S.contacts.length} contacto(s).${urgent ? ' Emítelo o compártelo ya.' : ''}`, 5000);
+  if (urgent) show('transfer');
+  return S.lastQuick;
+}
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-quick]'); if (b) quickStatus(b.dataset.quick).catch((err) => toast(err.message)); });
+document.addEventListener('change', async (e) => { if (e.target.id === 'easy-only') { document.body.classList.toggle('easy-only', e.target.checked); await kv.set('easyOnly', e.target.checked); } });
 
 async function sos() {
   if (!S.contacts.length) return toast('Añade al menos un contacto primero');
@@ -296,4 +313,5 @@ Object.assign(window.SENDA_TEST, {
   alertCountdownS: null,
   co: () => CO,
   lastResponse: () => S.lastResponse ?? null,
+  quick: (st) => quickStatus(st),
 });

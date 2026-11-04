@@ -18,13 +18,13 @@
     <button id="o-create" class="primary">Crear claves del organismo</button>
     <p class="fine">La clave privada se guarda solo en este equipo (IndexedDB). En producción: módulo HSM o tarjeta del organismo.</p></div>
   <div class="card" id="org" hidden><h3>2 · Ancla pública (publícala)</h3><p id="o-info"></p>
-    <textarea id="o-anchor" rows="3" readonly></textarea><button id="o-copy">Copiar ancla</button>
+    <textarea id="o-anchor" rows="3" readonly aria-label="Código de ancla pública del organismo"></textarea><button id="o-copy">Copiar ancla</button>
     <p class="fine">La ciudadanía la importa en SENDA › Zona › Organismos de confianza (web, QR, bando municipal).</p></div>
   <div class="card" id="issue" hidden><h3>3 · Firmar credencial de coordinador</h3>
     <label>Solicitud del coordinador<textarea id="i-req" rows="2" placeholder="SENDA-SOLICITUD:…"></textarea></label>
     <div class="row"><label style="flex:1">Rol<select id="i-role"><option>COORDINADOR</option><option>JEFE_INCIDENTE</option><option>MANDO</option><option>AGENTE</option></select></label><label style="flex:1">Unidad<input id="i-unit" placeholder="CECOPAL / Parque 3"></label><label style="max-width:120px">Días<input id="i-days" type="number" value="30" min="1" max="365"></label></div>
     <button id="i-sign" class="primary">Firmar credencial</button>
-    <textarea id="i-out" rows="3" readonly></textarea><button id="i-copy">Copiar credencial</button></div>
+    <textarea id="i-out" rows="3" readonly aria-label="Credencial firmada"></textarea><button id="i-copy">Copiar credencial</button></div>
 </main>
 <div id="toast" role="status"></div>
 <script type="module">

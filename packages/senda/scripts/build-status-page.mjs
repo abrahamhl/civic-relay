@@ -87,5 +87,6 @@ ${e2e.results.map((r) => `<tr><td>${ok(r.ok)}</td><td>${esc(r.name)}</td><td cla
 <h2>Siguiente fase</h2><p class="m">Pilotos de campo con teléfonos físicos y equipos de rescate: alcance acústico y Bluetooth bajo escombros, calibración Wi-Fi CSI en edificios reales y convenios con protección civil y operadores con satélite directo al móvil.</p>
 </main></body></html>`;
 writeFileSync(resolve(root, 'investor-next/public/senda/estado.html'), html);
+writeFileSync(resolve(root, 'investor-next/public/senda/estado.json'), JSON.stringify({ core: unit.pass, coreTotal: unit.total, e2e: e2e.passed, e2eTotal: e2e.total, relay: relay.pass, android: parity.android, esp32: parity.esp32, sha, generatedAt: new Date().toISOString() }, null, 1) + '\n');
 console.log(`estado.html · núcleo ${unit.pass}/${unit.total} · relé ${relay.pass}/${relay.total} · e2e ${e2e.passed}/${e2e.total} · Android ${parity.android} · ESP32 ${parity.esp32} · ${sha}`);
 if (unit.fail || e2e.passed !== e2e.total || relay.pass !== relay.total || /FALLO/.test(parity.android + parity.esp32)) process.exit(1);

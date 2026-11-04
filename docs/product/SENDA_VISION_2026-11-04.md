@@ -102,6 +102,12 @@ Límites: la lectura de redes Wi-Fi no existe en navegadores; la hace SENDA Andr
 
 Arquitectura completa, modelo de confianza y despliegue: [`docs/architecture/SENDA_ARCHITECTURE.md`](../architecture/SENDA_ARCHITECTURE.md).
 
+## 2 sexies. Capa centralizadora multiportador y compra pública (v0.6 · 04-11-2026)
+
+- **El hueco** (con fuentes en [`docs/research/PROCUREMENT_GAP_2026.md`](../research/PROCUREMENT_GAP_2026.md)): toda la cadena oficial de alerta depende de la red celular, que cae al agotarse las baterías de las antenas. Los sistemas de mando (TETRA, MCX, EUCCS desde 2030) conectan a los intervinientes, no a la ciudadanía. Nadie prevé dónde se quedará la población a oscuras.
+- **La respuesta:** fragmentos k-de-n entre satélite, LoRa, Iridium, SMS, radioaficionados, drones y vecinos (`/senda/red`), previsión de apagón con pasarelas óptimas, CAP 1.2 y auditoría hacia la sala 112, y modo fácil accesible.
+- **Evaluación con rúbrica y evidencias:** [`SENDA_EVALUACION_2026-11-04.md`](SENDA_EVALUACION_2026-11-04.md).
+
 ## 6. Lo que falta para que un Estado lo adopte (por orden de impacto)
 
 1. **Pasarela con el 112 / NG112**: entregar la fusión de incidentes como datos estructurados al centro 112 de cada comunidad (piloto con una comunidad autónoma).

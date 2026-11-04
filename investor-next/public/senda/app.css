@@ -46,3 +46,9 @@ table.board,#sv-out table{width:100%;border-collapse:collapse;font-size:13px}tab
 td.g{color:var(--em)}td.r{color:var(--red)}td.y{color:var(--amb)}
 textarea{margin-bottom:8px}
 #alert-native[hidden]{display:none}#alert-native{margin:8px 0;text-decoration:none}
+
+.easy-btns{display:grid;grid-template-columns:1fr;gap:10px}.q{min-height:64px;font-size:20px;font-weight:800;border-radius:16px}
+.q-ok{background:rgba(52,211,153,.15);border-color:var(--em)}.q-help{background:rgba(251,191,36,.15);border-color:var(--amb)}.q-trap{background:rgba(255,91,110,.18);border-color:var(--red)}
+body.easy-only #home>:not(#easy):not(.me){display:none}body.easy-only{font-size:19px}body.easy-only .q{min-height:88px;font-size:24px}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--amb);outline-offset:2px}
+.status a.pill{color:var(--ice);text-decoration:none}

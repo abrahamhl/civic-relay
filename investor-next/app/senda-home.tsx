@@ -1,0 +1,150 @@
+/** Portada SENDA en el índice (/, /es, /nl): app, todas las funciones, la película y la verificación. */
+import { readFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import './senda-home.css';
+
+type Locale = 'en' | 'es' | 'nl';
+type Proof = { core?: number; e2e?: number; relay?: number; sha?: string; generatedAt?: string };
+function readProof(): Proof {
+  const p = resolve(process.cwd(), 'public/senda/estado.json');
+  try { return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : {}; } catch { return {}; }
+}
+
+const C = {
+  es: {
+    tag: 'SENDA · Sistema de Enrutamiento de Emergencia por canales alternativos',
+    h1: 'Cuando cae la red, el mensaje sigue su camino.',
+    lead: 'SENDA es la capa que coordina todo lo que puede mover un mensaje de emergencia: teléfonos cercanos, sonido, satélite directo al móvil, LoRa, Iridium, radioaficionados, drones y la red que quede en pie. Cifrado de extremo a extremo, abre en modo avión y no necesita servidores.',
+    open: 'Abrir SENDA Campo', easy: 'Modo fácil (3 botones)', red: 'Red y satélites', proof: 'Verificación técnica',
+    filmT: 'La película: qué es SENDA y qué ya funciona', filmNote: 'Doblada en español e inglés; subtítulos en español, inglés y neerlandés.',
+    gapT: 'El hueco que nadie cubre',
+    gap: [['90 % → 40 %', 'usuarios con conexión estable en el apagón ibérico del 28-04-2025: la red cayó al agotarse las baterías de las antenas.', 'https://www.laecuaciondigital.com/actualidad/el-apagon-electrico-colapsa-redes-moviles-en-espana-y-portugal-el-28-de-abril/'], ['20:11', 'hora del ES-Alert en la DANA de Valencia (29-10-2024). La alerta oficial depende de la red celular.', 'https://www.eldebate.com/espana/comunidad-valenciana/20251204/principal-tecnico-emergencia-dana-sostiene-alert-retraso-diferenciar-valenciano-catalan_362211.html'], ['2030–2036', 'despliegue previsto del sistema europeo de comunicación crítica (EUCCS) para los intervinientes, no para la ciudadanía.', 'https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en']],
+    featT: 'Todo lo que hace, ya en la app',
+    feats: [
+      ['📡', 'Sin Internet', 'Sonido entre móviles, archivo .senda, de mano en mano (DTN) y recibos infalsificables que borran las copias.', '/senda'],
+      ['🧩', 'Un mensaje, muchos caminos', 'Fragmentos k-de-n (Reed-Solomon) repartidos entre portadores con probabilidad de entrega exacta.', '/senda/red'],
+      ['🛰️', 'Red satelital por nivel de acceso', 'Satélite directo al móvil, Iridium, QO-100, Galileo SAR… con el hardware y la ley de cada uno.', '/senda/red'],
+      ['🔋', 'Previsión de apagón', 'Cuándo y dónde se quedará la población sin cobertura y dónde colocar pasarelas antes.', '/senda/red'],
+      ['🚆', 'Accidente ferroviario', 'Detección de impacto, aviso automático y separación de dos trenes en segundos (simulación).', '/senda/incidente'],
+      ['🏢', 'Gemelo digital de edificios', 'Daños EMS-98, routers por planta, alertas dirigidas y cámara con mapa de calor.', '/senda/edificios'],
+      ['🔏', 'Coordinación con firma', 'Organismo → credencial → alerta firmada → respuesta cifrada → cuadro por planta. Solo con tu consentimiento.', '/senda/organismo'],
+      ['🛸', 'Drones', 'Misión de fachada para QGroundControl, identificación remota (Open Drone ID) y dron como mula de datos.', '/senda/red'],
+      ['🏛️', 'Sala 112', 'Exportación CAP 1.2 y registro de auditoría encadenado que delata cualquier alteración.', '/senda/incidente'],
+      ['♿', 'Accesible', 'Modo fácil de tres botones y revisión automática de accesibilidad en cada cambio.', '/senda'],
+      ['📱', 'Android y ESP32', 'Baliza Bluetooth, escucha de balizas y barrido Wi-Fi; accesorio para mástil o dron.', 'https://github.com/abrahamhl/civic-relay/tree/master/apps/senda-android'],
+      ['🖥️', 'Relé soberano', 'Relé autoalojable en Docker, ciego al contenido, que opera el propio organismo.', 'https://github.com/abrahamhl/civic-relay/tree/master/packages/senda-relay'],
+    ],
+    whoT: 'Para quién',
+    who: [['Ciudadanía y víctimas', 'Un canal que sigue funcionando sin red. Nadie figura como víctima sin confirmación.'], ['Coordinadores', 'Imagen operativa por planta y por tren, y alertas dirigidas firmadas.'], ['Cuerpos y fuerzas de seguridad', 'Credenciales institucionales verificables y canales internos separados por organismo.'], ['Servicios de emergencia', 'Informes estructurados en CAP hacia el 112, con auditoría.'], ['Administraciones', 'Continuidad hasta EUCCS, soberanía del relé y código abierto auditable.'], ['Inversores', 'Núcleo difícil de replicar y retorno por licencias institucionales, integración y kits.']],
+    vT: 'Verificado por máquina', vCore: 'pruebas del núcleo', vE2e: 'comprobaciones extremo a extremo con la red cortada', vRelay: 'pruebas del relé',
+    next: 'Siguiente fase: pilotos de campo con teléfonos físicos y equipos de rescate, auditoría de seguridad independiente y certificación para compra pública.',
+    research: 'Análisis de compras públicas y del hueco (con fuentes)',
+  },
+  en: {
+    tag: 'SENDA · Emergency routing over alternative channels',
+    h1: 'When the network falls, the message finds its way.',
+    lead: 'SENDA is the layer that coordinates everything that can carry an emergency message: nearby phones, sound, direct-to-phone satellite, LoRa, Iridium, amateur radio, drones and whatever network is still standing. End-to-end encrypted, it opens in airplane mode and needs no servers.',
+    open: 'Open SENDA Field', easy: 'Easy mode (3 buttons)', red: 'Network & satellites', proof: 'Technical verification',
+    filmT: 'The film: what SENDA is and what already works', filmNote: 'Voiced in Spanish and English; subtitles in Spanish, English and Dutch.',
+    gapT: 'The gap nobody covers',
+    gap: [['90% → 40%', 'users with a stable connection during the Iberian blackout of 28-04-2025: the network fell when the masts’ batteries ran out.', 'https://www.laecuaciondigital.com/actualidad/el-apagon-electrico-colapsa-redes-moviles-en-espana-y-portugal-el-28-de-abril/'], ['20:11', 'time of the ES-Alert during the Valencia floods (29-10-2024). Official alerts depend on the cellular network.', 'https://www.eldebate.com/espana/comunidad-valenciana/20251204/principal-tecnico-emergencia-dana-sostiene-alert-retraso-diferenciar-valenciano-catalan_362211.html'], ['2030–2036', 'planned rollout of the EU Critical Communication System (EUCCS), for first responders, not citizens.', 'https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en']],
+    featT: 'Everything it does, already in the app',
+    feats: [
+      ['📡', 'No Internet needed', 'Sound between phones, .senda files, hand-to-hand delivery (DTN) and unforgeable receipts that erase copies.', '/senda'],
+      ['🧩', 'One message, many paths', 'k-of-n fragments (Reed-Solomon) spread across bearers with an exact delivery probability.', '/senda/red'],
+      ['🛰️', 'Satellite network by access level', 'Direct-to-phone, Iridium, QO-100, Galileo SAR… with the hardware and legal limits of each.', '/senda/red'],
+      ['🔋', 'Blackout forecast', 'When and where people will lose coverage, and where to place gateways beforehand.', '/senda/red'],
+      ['🚆', 'Rail accident', 'Impact detection, automatic alert and two trains told apart in seconds (simulation).', '/senda/incidente'],
+      ['🏢', 'Building digital twin', 'EMS-98 damage, routers per floor, targeted alerts and a camera heat map.', '/senda/edificios'],
+      ['🔏', 'Signed coordination', 'Agency → credential → signed alert → encrypted reply → floor-by-floor board. Only with your consent.', '/senda/organismo'],
+      ['🛸', 'Drones', 'Façade missions for QGroundControl, Remote ID (Open Drone ID) and drones as data mules.', '/senda/red'],
+      ['🏛️', '112 control room', 'CAP 1.2 export and a hash-chained audit log that exposes any tampering.', '/senda/incidente'],
+      ['♿', 'Accessible', 'Three-button easy mode and an automatic accessibility check on every change.', '/senda'],
+      ['📱', 'Android & ESP32', 'Bluetooth beacon, beacon listening and Wi-Fi sweeps; an accessory for masts or drones.', 'https://github.com/abrahamhl/civic-relay/tree/master/apps/senda-android'],
+      ['🖥️', 'Sovereign relay', 'Self-hosted Docker relay, content-blind, run by the agency itself.', 'https://github.com/abrahamhl/civic-relay/tree/master/packages/senda-relay'],
+    ],
+    whoT: 'Who it is for',
+    who: [['Citizens & victims', 'A channel that keeps working with no network. Nobody is listed as a victim without confirmation.'], ['Coordinators', 'A floor-by-floor and train-by-train operational picture, plus signed targeted alerts.'], ['Police & security forces', 'Verifiable institutional credentials and internal channels separated by agency.'], ['Emergency services', 'Structured CAP reports to the 112 room, with an audit trail.'], ['Public administrations', 'Continuity until EUCCS, a sovereign relay and auditable open source.'], ['Investors', 'A core that is hard to replicate, with revenue from institutional licences, integration and kits.']],
+    vT: 'Machine-verified', vCore: 'core tests', vE2e: 'end-to-end checks with the network cut', vRelay: 'relay tests',
+    next: 'Next phase: field pilots with physical phones and rescue teams, an independent security audit and public-procurement certification.',
+    research: 'Public-procurement and gap analysis (with sources)',
+  },
+  nl: {
+    tag: 'SENDA · Noodroutering via alternatieve kanalen',
+    h1: 'Als het netwerk uitvalt, vindt het bericht zijn weg.',
+    lead: 'SENDA is de laag die alles coördineert wat een noodbericht kan vervoeren: telefoons in de buurt, geluid, satelliet rechtstreeks naar de telefoon, LoRa, Iridium, zendamateurs, drones en wat er nog van het netwerk overeind staat. End-to-end versleuteld, opent in vliegtuigmodus en heeft geen servers nodig.',
+    open: 'SENDA Field openen', easy: 'Eenvoudige modus (3 knoppen)', red: 'Netwerk & satellieten', proof: 'Technische verificatie',
+    filmT: 'De film: wat SENDA is en wat al werkt', filmNote: 'Ingesproken in het Spaans en Engels; ondertiteling in het Spaans, Engels en Nederlands.',
+    gapT: 'Het gat dat niemand dicht',
+    gap: [['90% → 40%', 'gebruikers met een stabiele verbinding tijdens de Iberische stroomstoring van 28-04-2025: het netwerk viel uit toen de accu’s van de masten leeg raakten.', 'https://www.laecuaciondigital.com/actualidad/el-apagon-electrico-colapsa-redes-moviles-en-espana-y-portugal-el-28-de-abril/'], ['20:11', 'tijdstip van de ES-Alert bij de overstromingen in Valencia (29-10-2024). Officiële waarschuwingen hangen af van het mobiele netwerk.', 'https://www.eldebate.com/espana/comunidad-valenciana/20251204/principal-tecnico-emergencia-dana-sostiene-alert-retraso-diferenciar-valenciano-catalan_362211.html'], ['2030–2036', 'geplande uitrol van het Europese systeem voor kritieke communicatie (EUCCS), voor hulpverleners, niet voor burgers.', 'https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en']],
+    featT: 'Alles wat het doet, al in de app',
+    feats: [
+      ['📡', 'Zonder internet', 'Geluid tussen telefoons, .senda-bestanden, van hand tot hand (DTN) en onvervalsbare ontvangstbewijzen die kopieën wissen.', '/senda'],
+      ['🧩', 'Eén bericht, vele routes', 'k-van-n-fragmenten (Reed-Solomon) verdeeld over dragers met een exacte afleverkans.', '/senda/red'],
+      ['🛰️', 'Satellietnetwerk per toegangsniveau', 'Direct-naar-telefoon, Iridium, QO-100, Galileo SAR… met de hardware en wettelijke grenzen van elk.', '/senda/red'],
+      ['🔋', 'Voorspelling van black-outs', 'Wanneer en waar mensen hun dekking verliezen en waar vooraf gateways moeten komen.', '/senda/red'],
+      ['🚆', 'Treinongeval', 'Detectie van de klap, automatisch alarm en twee treinen in seconden onderscheiden (simulatie).', '/senda/incidente'],
+      ['🏢', 'Digitale tweeling van gebouwen', 'EMS-98-schade, routers per verdieping, gerichte waarschuwingen en een warmtebeeld via de camera.', '/senda/edificios'],
+      ['🔏', 'Ondertekende coördinatie', 'Organisatie → bewijs → ondertekende waarschuwing → versleuteld antwoord → overzicht per verdieping. Alleen met jouw toestemming.', '/senda/organismo'],
+      ['🛸', 'Drones', 'Gevelmissies voor QGroundControl, Remote ID (Open Drone ID) en drones als datakoerier.', '/senda/red'],
+      ['🏛️', 'Meldkamer 112', 'CAP 1.2-export en een geketend auditlog dat elke manipulatie verraadt.', '/senda/incidente'],
+      ['♿', 'Toegankelijk', 'Eenvoudige modus met drie knoppen en een automatische toegankelijkheidscontrole bij elke wijziging.', '/senda'],
+      ['📱', 'Android & ESP32', 'Bluetooth-baken, bakens beluisteren en wifi-scans; een accessoire voor masten of drones.', 'https://github.com/abrahamhl/civic-relay/tree/master/apps/senda-android'],
+      ['🖥️', 'Soevereine relay', 'Zelf gehoste Docker-relay, blind voor de inhoud, beheerd door de organisatie zelf.', 'https://github.com/abrahamhl/civic-relay/tree/master/packages/senda-relay'],
+    ],
+    whoT: 'Voor wie',
+    who: [['Burgers & slachtoffers', 'Een kanaal dat zonder netwerk blijft werken. Niemand staat als slachtoffer zonder bevestiging.'], ['Coördinatoren', 'Een operationeel beeld per verdieping en per trein, en ondertekende gerichte waarschuwingen.'], ['Politie & veiligheidsdiensten', 'Verifieerbare institutionele bewijzen en interne kanalen per organisatie.'], ['Hulpdiensten', 'Gestructureerde CAP-meldingen naar de meldkamer, met audittrail.'], ['Overheden', 'Continuïteit tot EUCCS, een soevereine relay en controleerbare open source.'], ['Investeerders', 'Een moeilijk te kopiëren kern, met inkomsten uit institutionele licenties, integratie en kits.']],
+    vT: 'Machinaal geverifieerd', vCore: 'kerntests', vE2e: 'end-to-end-controles met het netwerk uitgeschakeld', vRelay: 'relay-tests',
+    next: 'Volgende fase: veldproeven met echte telefoons en reddingsteams, een onafhankelijke beveiligingsaudit en certificering voor overheidsaanbestedingen.',
+    research: 'Analyse van overheidsaanbestedingen en het gat (met bronnen)',
+  },
+} as const;
+
+export default function SendaHome({ locale }: { locale: Locale }) {
+  const c = C[locale] ?? C.en;
+  const p = readProof();
+  const film = locale === 'es' ? 'es' : 'en';
+  return (
+    <section className="senda-home" aria-labelledby="senda-h1" lang={locale}>
+      <div className="sh-hero">
+        <p className="sh-tag">{c.tag}</p>
+        <h1 id="senda-h1">{c.h1}</h1>
+        <p className="sh-lead">{c.lead}</p>
+        <div className="sh-cta">
+          <a className="sh-btn" href="/senda">{c.open}</a>
+          <a className="sh-btn ghost" href="/senda">{c.easy}</a>
+          <a className="sh-btn ghost" href="/senda/red">{c.red}</a>
+          <a className="sh-link" href="/senda/estado">{c.proof} →</a>
+        </div>
+      </div>
+
+      <div className="sh-film">
+        <h2>{c.filmT}</h2>
+        <video controls preload="metadata" playsInline poster={`/media/senda-film-poster-${film}.jpg`} aria-label={c.filmT}>
+          <source src={`/media/senda-film-${film}.mp4`} type="video/mp4"/>
+          <track kind="subtitles" srcLang="es" label="Español" src="/media/senda-film-es.vtt" default={locale === 'es'}/>
+          <track kind="subtitles" srcLang="en" label="English" src="/media/senda-film-en.vtt" default={locale === 'en'}/>
+          <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/senda-film-nl.vtt" default={locale === 'nl'}/>
+        </video>
+        <p className="sh-note">{c.filmNote}</p>
+      </div>
+
+      <h2 className="sh-h2">{c.gapT}</h2>
+      <div className="sh-gap">{c.gap.map(([v, t, u]) => <a key={v} className="sh-fact" href={u} rel="noopener" target="_blank"><b>{v}</b><span>{t}</span></a>)}</div>
+
+      <h2 className="sh-h2">{c.featT}</h2>
+      <div className="sh-feats">{c.feats.map(([i, t, d, h]) => <a key={t} className="sh-feat" href={h}><span aria-hidden="true">{i}</span><b>{t}</b><p>{d}</p></a>)}</div>
+
+      <h2 className="sh-h2">{c.whoT}</h2>
+      <div className="sh-who">{c.who.map(([t, d]) => <div key={t} className="sh-w"><b>{t}</b><p>{d}</p></div>)}</div>
+
+      <h2 className="sh-h2">{c.vT}</h2>
+      <div className="sh-proof">
+        <div><b>{p.core ?? '–'}/{p.core ?? '–'}</b><span>{c.vCore}</span></div>
+        <div><b>{p.e2e ?? '–'}/{p.e2e ?? '–'}</b><span>{c.vE2e}</span></div>
+        <div><b>{p.relay ?? '–'}/{p.relay ?? '–'}</b><span>{c.vRelay}</span></div>
+      </div>
+      <p className="sh-note">{c.next} <a href="https://github.com/abrahamhl/civic-relay/blob/master/docs/research/PROCUREMENT_GAP_2026.md">{c.research}</a>{p.sha ? <> · commit <code>{p.sha}</code></> : null}</p>
+    </section>
+  );
+}

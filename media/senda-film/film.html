@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>SENDA · película</title>
+<!--
+  Película SENDA v3 · 1280×720. Determinista: window.seek(t) fija cada fotograma (sin temporizadores).
+  film.html?lang=es|en  ·  carga script.json y out/timeline-<lang>.js (servidos por render.mjs).
+-->
+<style>
+:root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#a9bcc5;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e}
+*{box-sizing:border-box}html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:var(--bg);color:var(--t);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+#bg{position:absolute;inset:0}
+.scene{position:absolute;inset:0;padding:56px 64px;display:grid;grid-template-columns:470px 1fr;gap:44px;align-items:center;opacity:0}
+.eyebrow{font:600 13px ui-monospace,monospace;letter-spacing:.18em;color:var(--c);text-transform:uppercase;margin-bottom:16px}
+h1{font-size:44px;line-height:1.08;margin:0;font-weight:800;letter-spacing:-.01em}
+h1 span{display:inline-block;margin-right:.24em}
+.vis{position:relative;height:600px;display:flex;align-items:center;justify-content:center;gap:24px}
+.phone{width:250px;border-radius:30px;border:6px solid #1d2c37;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.55);background:#071018}
+.phone img,.desk img{display:block;width:100%}
+.desk{width:700px;border-radius:14px;border:1px solid var(--l);overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.55);background:#071018;position:relative}
+.desk .bar{height:26px;background:#0f1d27;display:flex;gap:6px;align-items:center;padding:0 10px}.desk .bar i{width:10px;height:10px;border-radius:50%;background:#2a3d4a}
+.crop{overflow:hidden;position:relative}.crop img{position:absolute;left:0;top:0;width:100%}
+.kpis{display:flex;flex-direction:column;gap:16px;width:100%}
+.kpi{background:rgba(11,20,28,.88);border:1px solid var(--l);border-radius:18px;padding:18px 22px}.kpi b{display:block;font-size:56px;line-height:1;color:var(--e);font-weight:800}.kpi span{color:var(--m);font-size:17px}
+.kpi.warn b{color:var(--a)}
+.over{position:absolute;right:0;bottom:10px;display:flex;flex-direction:column;gap:10px;width:300px}.over .kpi b{font-size:38px}.over .kpi span{font-size:14px}
+.hub{position:relative;width:640px;height:600px}
+.node{position:absolute;transform:translate(-50%,-50%);padding:10px 14px;border-radius:14px;background:#0b141c;border:1px solid var(--l);font-size:16px;white-space:nowrap}
+.core{background:var(--c);color:#140804;font-weight:800;font-size:24px;padding:18px 26px;border:none}
+svg{position:absolute;inset:0}
+.stack{display:grid;grid-template-columns:1fr;gap:14px;width:100%}
+.card{background:rgba(11,20,28,.9);border:1px solid var(--l);border-radius:16px;padding:16px 20px}.card b{font-size:22px}.card p{margin:6px 0 0;color:var(--m);font-size:16px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}.chip{padding:10px 14px;border-radius:999px;border:1px solid var(--l);background:#0b141c;font-size:17px}
+.url{font:700 30px ui-monospace,monospace;color:var(--i);margin-top:26px}
+.missing li{color:var(--m);font-size:19px;margin:8px 0}.missing{padding-left:22px}
+#brand{position:absolute;left:64px;bottom:22px;font:700 14px system-ui;letter-spacing:.22em;color:var(--m)}#brand b{color:var(--c)}
+#prog{position:absolute;left:0;bottom:0;height:4px;background:var(--c)}
+</style>
+</head>
+<body>
+<canvas id="bg" width="1280" height="720"></canvas>
+<div id="stage"></div>
+<div id="brand"><b>SENDA</b> · civic-relay-investor.vercel.app/senda</div><div id="prog"></div>
+<script>
+const LANG = new URLSearchParams(location.search).get('lang') || 'es';
+const T = (o) => (typeof o === 'string' ? o : o?.[LANG] ?? o?.en ?? '');
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+const CROPS = { top: [235, 965], middle: [985, 2060], lower: [2090, 2860] };
+const BEARERS = { es: ['Teléfonos cercanos', 'Sonido', 'Satélite directo al móvil', 'LoRa', 'Iridium', 'Radioaficionados · QO-100', 'Drones', 'SMS', 'Relé por Internet', 'Galileo SAR'], en: ['Nearby phones', 'Sound', 'Direct-to-phone satellite', 'LoRa', 'Iridium', 'Amateur radio · QO-100', 'Drones', 'SMS', 'Internet relay', 'Galileo SAR'] };
+const L = {
+  es: { stack: [['Relé autoalojable (Docker)', 'Lo opera el organismo. Ciego al contenido. Persistente.'], ['SENDA Android', 'Baliza Bluetooth, escucha de balizas y barrido wifi. Nunca sin tu toque.'], ['Accesorio ESP32', 'Barrido de routers y balizas desde mástil o dron.'], ['Mismos formatos en JS · Java · C++', 'Vectores de prueba compartidos: nada se rompe entre piezas.']],
+    missing: ['Pilotos de campo con teléfonos físicos y equipos de rescate', 'Auditoría de seguridad independiente', 'Certificación para compra pública (ENS, accesibilidad EN 301 549)'], core: 'pruebas del núcleo', e2e: 'comprobaciones extremo a extremo sin red', who: ['Ciudadanía', 'Coordinadores', 'Cuerpos de seguridad', 'Servicios de emergencia', 'Administraciones', 'Inversores'] },
+  en: { stack: [['Self-hosted relay (Docker)', 'Run by the agency. Content-blind. Persistent.'], ['SENDA Android', 'Bluetooth beacon, beacon listening and Wi-Fi sweeps. Never without your tap.'], ['ESP32 accessory', 'Router and beacon sweeps from a mast or drone.'], ['Same formats in JS · Java · C++', 'Shared test vectors: nothing breaks between parts.']],
+    missing: ['Field pilots with physical phones and rescue teams', 'Independent security audit', 'Public-procurement certification (security, EN 301 549 accessibility)'], core: 'core tests', e2e: 'offline end-to-end checks', who: ['Citizens', 'Coordinators', 'Police', 'Emergency services', 'Public administrations', 'Investors'] },
+};
+let SCRIPT, TL, scenesEl = [];
+const NUM = { core: +(new URLSearchParams(location.search).get('core') || 0), e2e: +(new URLSearchParams(location.search).get('e2e') || 0) };
+
+function visualHTML(sc, idx) {
+  const v = sc.visual, img = (f) => `assets/${f}`;
+  const kp = (list, cls = '') => list.map((k, i) => `<div class="kpi ${cls} k${i}"><b>${k.v}</b><span>${T(k.l)}</span></div>`).join('');
+  if (v.kind === 'kpis') return `<div class="kpis">${kp(v.kpis)}</div>`;
+  if (v.kind === 'hub') { const B = BEARERS[LANG] ?? BEARERS.en; return `<div class="hub"><svg width="640" height="600" id="hub-svg-${idx}"></svg>${B.map((b, i) => { const a = (i / B.length) * Math.PI * 2 - Math.PI / 2; return `<div class="node b${i}" style="left:${320 + 250 * Math.cos(a)}px;top:${300 + 225 * Math.sin(a)}px">${b}</div>`; }).join('')}<div class="node core" style="left:320px;top:300px">SENDA</div></div>`; }
+  if (v.kind === 'shots') {
+    const frames = v.images.map((f, i) => {
+      if (/e2e-(06|08|12)/.test(f)) {
+        const [y0, y1] = v.crop ? CROPS[v.crop] : [0, /06/.test(f) ? 1000 : 900]; const sc2 = 700 / 1280;
+        return `<div class="desk f${i}"><div class="bar"><i></i><i></i><i></i></div><div class="crop" style="height:${Math.round((y1 - y0) * sc2)}px"><img src="${img(f)}" style="top:${-Math.round(y0 * sc2)}px"></div></div>`;
+      }
+      const tall = /e2e-11/.test(f);
+      return `<div class="phone f${i}"><div class="crop" style="height:${tall ? 520 : 540}px"><img src="${img(f)}"></div></div>`;
+    }).join('');
+    return frames + (v.kpis ? `<div class="over">${kp(v.kpis)}</div>` : '');
+  }
+  if (v.kind === 'stack') return `<div class="stack">${(L[LANG] ?? L.en).stack.map(([t, p], i) => `<div class="card s${i}"><b>${t}</b><p>${p}</p></div>`).join('')}</div>`;
+  if (v.kind === 'verify') { const l = L[LANG] ?? L.en; return `<div class="kpis"><div class="kpi k0"><b>${NUM.core}/${NUM.core}</b><span>${l.core}</span></div><div class="kpi k1"><b>${NUM.e2e}/${NUM.e2e}</b><span>${l.e2e}</span></div><div class="kpi warn k2"><ul class="missing">${l.missing.map((m) => `<li>${m}</li>`).join('')}</ul></div></div>`; }
+  if (v.kind === 'cta') { const l = L[LANG] ?? L.en; return `<div><div class="chips">${l.who.map((w, i) => `<span class="chip w${i}">${w}</span>`).join('')}</div><div class="url">civic-relay-investor.vercel.app/senda</div></div>`; }
+  return '';
+}
+
+function build() {
+  const stage = document.getElementById('stage');
+  stage.innerHTML = SCRIPT.scenes.map((sc, i) => `<section class="scene" id="sc-${i}"><div><div class="eyebrow">SENDA · ${String(i + 1).padStart(2, '0')} / ${SCRIPT.scenes.length}</div><h1>${T(sc.title).split(' ').map((w) => `<span>${w}</span>`).join('')}</h1></div><div class="vis">${visualHTML(sc, i)}</div></section>`).join('');
+  scenesEl = SCRIPT.scenes.map((_, i) => document.getElementById('sc-' + i));
+}
+
+function drawBg(t) {
+  const c = document.getElementById('bg'), g = c.getContext('2d');
+  g.fillStyle = '#05090c'; g.fillRect(0, 0, 1280, 720);
+  const grd = g.createRadialGradient(980, 360, 40, 980, 360, 700); grd.addColorStop(0, 'rgba(255,119,86,.10)'); grd.addColorStop(1, 'rgba(5,9,12,0)'); g.fillStyle = grd; g.fillRect(0, 0, 1280, 720);
+  g.fillStyle = 'rgba(145,215,232,.22)';
+  for (let i = 0; i < 90; i++) { const x = (i * 137.5 + t * (6 + (i % 5))) % 1300 - 10, y = (i * 71.3 + Math.sin(t * 0.3 + i) * 8) % 720; g.fillRect(x, y, 2, 2); }
+}
+
+window.seek = (t) => {
+  drawBg(t);
+  document.getElementById('prog').style.width = (100 * t / TL.duration) + '%';
+  TL.scenes.forEach((s, i) => {
+    const el = scenesEl[i]; const lt = t - s.start, d = s.end - s.start;
+    const vis = lt >= -0.01 && lt < d; const fade = Math.min(ease(lt / 0.6), ease((d - lt) / 0.5));
+    el.style.opacity = vis ? fade : 0; if (!vis) return;
+    el.querySelectorAll('h1 span').forEach((w, j) => { const p = ease((lt - 0.15 - j * 0.07) / 0.5); w.style.opacity = p; w.style.transform = `translateY(${(1 - p) * 18}px)`; });
+    const cue = (n) => s.cues[n] ?? s.cues[s.cues.length - 1] ?? 0;
+    const appear = (sel, at, dy = 26) => el.querySelectorAll(sel).forEach((x) => { const p = ease((lt - at) / 0.7); x.style.opacity = p; x.style.transform = `translateY(${(1 - p) * dy}px) scale(${0.97 + 0.03 * p})`; });
+    // elementos ligados a la frase que los explica
+    for (let k = 0; k < 6; k++) { appear(`.k${k}`, cue(Math.min(k + (SCRIPT.scenes[i].visual.kind === 'kpis' ? 1 : SCRIPT.scenes[i].visual.kind === 'shots' ? 1 : 0), s.cues.length - 1)) + 0.3 + (SCRIPT.scenes[i].visual.kind === 'kpis' ? 0 : k * 0.6)); appear(`.s${k}`, cue(0) + 0.6 + k * 1.6); appear(`.w${k}`, cue(0) + 0.4 + k * 0.5); appear(`.f${k}`, 0.3 + k * 0.5, 40); }
+    el.querySelectorAll('.f0 img,.f1 img').forEach((im) => { const z = 1 + 0.04 * clamp(lt / d); im.style.transformOrigin = '50% 0'; im.style.transform = `scale(${z})`; });
+    const url = el.querySelector('.url'); if (url) { const p = ease((lt - cue(1)) / 0.8); url.style.opacity = p; }
+    const hub = el.querySelector('.hub');
+    if (hub) {
+      const nodes = [...hub.querySelectorAll('.node:not(.core)')]; const svg = hub.querySelector('svg');
+      let lines = '';
+      nodes.forEach((n, j) => { const at = cue(1) + j * 0.55; const p = ease((lt - at) / 0.5); n.style.opacity = 0.15 + 0.85 * p; const x = parseFloat(n.style.left), y = parseFloat(n.style.top);
+        if (p > 0) { const ph = ((lt * 0.8 + j * 0.13) % 1); lines += `<line x1="320" y1="300" x2="${x}" y2="${y}" stroke="rgba(145,215,232,${0.35 * p})" stroke-width="2"/><circle cx="${x + (320 - x) * ph}" cy="${y + (300 - y) * ph}" r="5" fill="#ff7756" opacity="${p}"/>`; } });
+      svg.innerHTML = lines;
+    }
+  });
+};
+
+(async () => {
+  SCRIPT = await (await fetch('script.json')).json();
+  await new Promise((res) => { const s = document.createElement('script'); s.src = `out/timeline-${LANG}.js`; s.onload = res; document.head.appendChild(s); });
+  TL = window.TIMELINE; window.DURATION = TL.duration;
+  document.documentElement.lang = LANG;
+  build();
+  await Promise.all([...document.images].map((im) => (im.complete ? 1 : new Promise((r) => { im.onload = im.onerror = r; }))));
+  window.seek(+(new URLSearchParams(location.search).get('t') || 0));
+  window.READY = true;
+})();
+</script>
+</body>
+</html>
