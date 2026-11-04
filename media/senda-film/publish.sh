@@ -4,7 +4,7 @@ set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"; dst="$here/../../investor-next/public/media"; mkdir -p "$dst"
 for l in es en; do
   [ -f "$here/out/senda-film-$l.mp4" ] || { echo "falta senda-film-$l.mp4"; exit 1; }
-  cp "$here/out/senda-film-$l.mp4" "$dst/senda-film-$l.mp4"
+  ffmpeg -loglevel error -y -i "$here/out/senda-film-$l.mp4" -c:v libx264 -preset slow -crf 27 -pix_fmt yuv420p -c:a copy -movflags +faststart "$dst/senda-film-$l.mp4"
   ffmpeg -loglevel error -y -ss 26 -i "$here/out/senda-film-$l.mp4" -frames:v 1 -q:v 4 "$dst/senda-film-poster-$l.jpg"
 done
 cp "$here/out/subtitles-es.vtt" "$dst/senda-film-es.vtt"
