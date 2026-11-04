@@ -1,8 +1,9 @@
 {
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
+  "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-04T02:31:06.050Z",
-  "durationS": 4,
+  "at": "2026-11-04T02:49:04.903Z",
+  "durationS": 4.2,
   "passed": 10,
   "total": 10,
   "results": [

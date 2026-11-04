@@ -23,10 +23,11 @@ const outDir = resolve(here, '../../evidence/senda');
 await mkdir(outDir, { recursive: true });
 const MIME = { '.html': 'text/html', '.mjs': 'text/javascript', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json', '.json': 'application/json' };
 const server = createServer(async (req, res) => {
-  try { let p = resolve(pub, '.' + decodeURIComponent(new URL(req.url, 'http://x').pathname)); if (!p.startsWith(pub)) throw 0; if (p.endsWith('/') || !extname(p)) p = resolve(p, 'index.html'); const body = await readFile(p); res.writeHead(200, { 'content-type': MIME[extname(p)] ?? 'application/octet-stream' }); res.end(body); }
+  try { let p = resolve(pub, '.' + decodeURIComponent(new URL(req.url, 'http://x').pathname)); if (!p.startsWith(pub)) throw 0; if (!extname(p)) { const html = p.replace(/\/$/, '') + '.html'; p = (await readFile(html).then(() => true, () => false)) ? html : resolve(p, 'index.html'); } const body = await readFile(p); res.writeHead(200, { 'content-type': MIME[extname(p)] ?? 'application/octet-stream' }); res.end(body); }
   catch { res.writeHead(404); res.end(); }
 }).listen(0);
-const base = `http://127.0.0.1:${server.address().port}/senda/index.html`;
+// SENDA_BASE_URL=https://civic-relay-investor.vercel.app/senda verifica el despliegue publicado en lugar del local.
+const base = process.env.SENDA_BASE_URL || `http://127.0.0.1:${server.address().port}/senda`;
 
 const results = []; const t0 = Date.now();
 const check = (name, ok, detail = {}) => { results.push({ name, ok: !!ok, ...detail }); console.log(`${ok ? 'PASS' : 'FAIL'} · ${name}`); if (!ok) process.exitCode = 1; };
@@ -108,7 +109,7 @@ await C.page.click('[data-tab="messages"]'); await C.page.screenshot({ path: res
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 
 await browser.close(); server.close();
-const evidence = { kind: 'REAL_CHROMIUM_AUTOMATED_E2E', network: 'OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)', at: new Date().toISOString(),
+const evidence = { kind: 'REAL_CHROMIUM_AUTOMATED_E2E', target: process.env.SENDA_BASE_URL ? base : 'local static server (investor-next/public)', network: 'OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)', at: new Date().toISOString(),
   durationS: +((Date.now() - t0) / 1000).toFixed(1), passed: results.filter((r) => r.ok).length, total: results.length, results, offlineNetworkAttemptsBlocked: offlineNetworkAttempts.length,
   scope: 'Tres navegadores Chromium independientes. La onda acústica es la que genera la app emisora, inyectada en la receptora (sin altavoz/micrófono físicos en CI).' };
 await writeFile(resolve(outDir, 'offline-e2e.json'), JSON.stringify(evidence, null, 2) + '\n');

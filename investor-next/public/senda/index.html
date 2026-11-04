@@ -6,14 +6,14 @@
 <title>SENDA Campo — mensajes de emergencia sin Internet</title>
 <meta name="description" content="SENDA: Sistema de Enrutamiento de Emergencia por canales alternativos. Mensajes cifrados que viajan sin Internet: por sonido, por archivo o de teléfono en teléfono.">
 <meta name="theme-color" content="#05090c">
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" href="./icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="./icon.svg">
-<link rel="stylesheet" href="./app.css">
+<link rel="manifest" href="/senda/manifest.webmanifest">
+<link rel="icon" href="/senda/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/senda/icon.svg">
+<link rel="stylesheet" href="/senda/app.css">
 </head>
 <body>
 <header class="top">
-  <div class="brand"><img src="./icon.svg" alt="" width="28" height="28"><div><b>SENDA</b><small>Campo</small></div></div>
+  <div class="brand"><img src="/senda/icon.svg" alt="" width="28" height="28"><div><b>SENDA</b><small>Campo</small></div></div>
   <div class="status"><span id="net" class="pill">…</span><span id="sw" class="pill">…</span></div>
 </header>
 
@@ -89,6 +89,6 @@
 </nav>
 <div id="toast" role="status" aria-live="polite"></div>
 <dialog id="dlg"><form method="dialog"><p id="dlg-text"></p><textarea id="dlg-input" rows="4"></textarea><menu><button value="cancel">Cancelar</button><button value="ok" class="primary">Aceptar</button></menu></form></dialog>
-<script type="module" src="./app.mjs"></script>
+<script type="module" src="/senda/app.mjs"></script>
 </body>
 </html>

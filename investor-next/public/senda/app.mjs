@@ -198,7 +198,7 @@ for (const id of ['#card-file', '#bundle-file']) $(id).addEventListener('change'
 addEventListener('online', netBadge); addEventListener('offline', netBadge); netBadge();
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(() => navigator.serviceWorker.ready).then(() => { $('#sw').textContent = 'instalada offline'; $('#sw').className = 'pill ok'; })
+  navigator.serviceWorker.register('/senda-sw.js', { scope: '/senda' }).then(() => navigator.serviceWorker.ready).then(() => { $('#sw').textContent = 'instalada offline'; $('#sw').className = 'pill ok'; })
     .catch(() => { $('#sw').textContent = 'sin modo offline'; $('#sw').className = 'pill off'; });
 }
 

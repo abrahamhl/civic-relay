@@ -27,3 +27,6 @@ jobs:
         with:
           name: senda-evidence
           path: evidence/senda/
+      - name: Verificación del despliegue público (solo en master)
+        if: github.ref == 'refs/heads/master'
+        run: SENDA_BASE_URL=https://civic-relay-investor.vercel.app/senda NODE_PATH=/tmp/pw/node_modules node investor-next/scripts/senda-offline-e2e.mjs

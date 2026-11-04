@@ -15,9 +15,9 @@ test('la app web usa EXACTAMENTE el núcleo probado (sin copias divergentes)', (
 });
 
 test('el service worker precarga todos los módulos que la app importa', () => {
-  const sw = readFileSync(resolve(web, 'sw.js'), 'utf8');
+  const sw = readFileSync(resolve(web, '../senda-sw.js'), 'utf8');
   const imports = new Set();
   const scan = (file, base) => { for (const m of readFileSync(file, 'utf8').matchAll(/from '\.\/([\w./-]+)'/g)) { const rel = (base ? base + '/' : '') + m[1]; if (!imports.has(rel)) { imports.add(rel); scan(resolve(web, rel), rel.includes('/') ? rel.split('/').slice(0, -1).join('/') : ''); } } };
   scan(resolve(web, 'app.mjs'), '');
-  for (const rel of imports) assert.ok(sw.includes(`'./${rel}'`), `sw.js no precarga ./${rel}`);
+  for (const rel of imports) assert.ok(sw.includes(`'/senda/${rel}'`), `senda-sw.js no precarga /senda/${rel}`);
 });

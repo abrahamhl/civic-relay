@@ -10,7 +10,7 @@ export default function SendaBanner({ locale }: { locale: Locale }) {
   return (
     <section className="senda-banner container" aria-label="SENDA">
       <div><span className="senda-tag">{c.tag}</span><h2>{c.title}</h2><p>{c.body}</p></div>
-      <div className="senda-cta"><a className="senda-btn" href="/senda/index.html">{c.cta}</a><a className="senda-link" href="/senda/estado.html">{c.proof}</a></div>
+      <div className="senda-cta"><a className="senda-btn" href="/senda">{c.cta}</a><a className="senda-link" href="/senda/estado">{c.proof}</a></div>
     </section>
   );
 }

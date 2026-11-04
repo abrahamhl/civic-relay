@@ -27,7 +27,7 @@ const ok = (b) => (b ? '<span class="ok">✔</span>' : '<span class="ko">✘</sp
 
 const html = `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SENDA · Verificación técnica</title><meta name="description" content="Resultados reproducibles de las pruebas de SENDA: núcleo, app sin red y escenarios.">
-<link rel="icon" href="./icon.svg"><style>
+<link rel="icon" href="/senda/icon.svg"><style>
 :root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399}
 body{margin:0;background:var(--bg);color:var(--t);font:16px/1.5 Inter,system-ui,sans-serif}main{max-width:980px;margin:0 auto;padding:28px 18px 60px}
 h1{font-size:34px;margin:0 0 6px}h2{margin:34px 0 10px}a{color:var(--i)}.m{color:var(--m)}code{font:13px ui-monospace,monospace;color:var(--i)}
@@ -39,7 +39,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <p class="m">SENDA · Sistema de Enrutamiento de Emergencia por canales alternativos</p>
 <h1>Verificación técnica</h1>
 <p class="m">Generado automáticamente desde las pruebas el ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC · commit <code>${sha}</code>. Reprodúcelo tú mismo con los comandos del final.</p>
-<p><a class="btn" href="./index.html">Abrir SENDA Campo</a></p>
+<p><a class="btn" href="/senda">Abrir SENDA Campo</a></p>
 <div class="kpis">
  <div class="k"><b>${unit.pass}/${unit.total}</b>pruebas del núcleo superadas</div>
  <div class="k"><b>${e2e.passed}/${e2e.total}</b>comprobaciones de extremo a extremo con la red cortada (Chromium real)</div>
