@@ -1,5 +1,22 @@
 # Changelog
 
+## SENDA v0.10 · 04-11-2026 · SENDA como canal de comunicación: llamadas sin Internet, censo radio con dron y arquitectura visible
+
+**Entrada (fundador):** que la app no sea solo sonido sino un canal de comunicación de verdad (llamar y comunicarse en general), que use los sensores del teléfono y de los drones (estimar por radio cuántas personas hay en un edificio), centrarse en la arquitectura del sistema de forma visual y funcional, e inventar tecnología nueva.
+
+**Procesamiento:**
+- `sdp-compact.mjs` (núcleo, nuevo): señalización WebRTC compacta. Plantilla común (Opus + canal de datos) y solo lo variable en binario: claves ICE, huella SHA-256 DTLS, rol y candidatos host (IPv4 o mDNS). Oferta 79–103 bytes (~20 veces menos que el SDP), transmitible por el módem acústico en 8–10 s o como código de texto. 4 pruebas.
+- `/senda/llamada`: llamada de voz y chat cifrados (DTLS-SRTP) entre dos teléfonos de la misma red local o punto de acceso, sin Internet ni servidor: crear/responder, enviar y escuchar el código por sonido, copiar/compartir, pulsar para hablar, colgar, ida y vuelta, pérdidas, kbit/s y botón «Estoy atrapado». Incluye una **llamada de prueba en un solo dispositivo** (sin micrófono) con la «partitura» de tonos del código.
+- `rf-census.mjs` (núcleo, nuevo): censo radio por planta. Planta por RSSI mediano; teléfonos = máximo de direcciones simultáneas por familia (inmune a la rotación de direcciones BLE); personas por **inferencia bayesiana exacta** (0/1/2 teléfonos por persona, hipótesis 12 %/8 % pendiente de calibrar) con mediana e intervalo del 90 %; «0 teléfonos» = «0, quizá 1». Solo recuentos. Escenario sintético realista (personas sin móvil o con dos; generador mulberry32). 8 pruebas.
+- `/senda/dron`: fachada en vivo con el dron y los anuncios Bluetooth, tabla por planta (direcciones vs teléfonos vs personas vs verdad simulada), línea de tiempo «cada fila un dispositivo, cada segmento una dirección», distribución posterior, el dron como plataforma de sensores con estado honesto, y privacidad/ley.
+- `/senda/arquitectura`: 5 capas (sensores y radios → portadores → núcleo → aplicaciones → destinos), 35 piezas con estado real (navegador / simulación / app Android / app nativa / hoja de ruta), 6 escenarios animados paso a paso (llamada, atrapada tras un sismo, dron, satélite, incendio, vía), ficha de cada pieza con código y enlace, matriz de sensores Android con interfaz y permiso, y fuentes.
+- Investigación: `docs/research/SENSORES_Y_CANALES_ANDROID_2026-11-04.md` (Science 2025 sobre alertas sísmicas Android, Wi-Fi Aware, límite de 200 Hz de Android 12, BarcodeDetector, Wi-Fi RTT; infrarrojos descartado como canal).
+- Integración: tarjetas nuevas en la portada (es/en/nl), accesos desde SENDA Campo, service worker v11 con las tres pantallas precargadas, E2E ampliada.
+
+**Validación:** núcleo + relé 120/120 · E2E en Chromium 31/31 con las nuevas comprobaciones (llamada con oferta por onda acústica real, voz y chat, cero peticiones de red durante la llamada; demo en un dispositivo; dron; arquitectura; accesibilidad en 12 pantallas). Límite declarado: la emulación «offline» de Chromium también bloquea WebRTC local, así que la llamada se prueba sin ningún servidor y con cero peticiones; falta ensayo con dos teléfonos físicos.
+
+— Registrado por el asistente de orquestación (Claude Code), bajo la dirección de Abraham Haddioui.
+
 ## SENDA v0.9 · 04-11-2026 · Corrección de rumbo: portada restaurada, Ojo de SENDA, incendio cartográfico y película v4
 
 **Entrada (fundador):** la v0.8 bajó el nivel. Volver a la portada anterior con sus explicaciones largas; que «ver como» cambie la página de verdad; explicar el globo (satélites, casos y módulos); película con introducción, en inglés y español, al nivel de la v3.

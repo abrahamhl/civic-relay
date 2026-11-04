@@ -23,3 +23,5 @@ export * from './sensor-fabric.mjs';
 export * from './vision-layers.mjs';
 export * from './rail-watch.mjs';
 export * from './wildfire.mjs';
+export * from './sdp-compact.mjs';
+export * from './rf-census.mjs';

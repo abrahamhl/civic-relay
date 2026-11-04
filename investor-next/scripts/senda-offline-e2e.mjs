@@ -191,6 +191,49 @@ check('Vigilancia ferroviaria sin red: escalón del circuito de vía detectado �
   rail.events === 1 && rail.thresholdAlarms === 0 && rail.leadTimeH >= 20 && rail.geoAlerts.some((a) => a.kinds.includes('IMPACTO_REPETIDO')) && rail.geoAlerts.some((a) => a.kinds.includes('DEGRADACION')) && rail.topTransition === 'ALTO_SIN_SUPERVISION' && rail.topAsset === 3,
   rail);
 
+// ---- Censo radio con dron (sin red): teléfonos exactos por planta e intervalo de personas que cubre la verdad
+await C.page.goto(base + '/dron');
+await C.page.waitForFunction(() => window.SENDA_DRON?.r, null, { timeout: 20000 });
+const dron = await C.page.evaluate(() => { const S = window.SENDA_DRON; return { phones: S.r.floors.map((f) => f.phones.lo), truePhones: S.sc.phones, covered: S.r.floors.every((f) => f.people.lo <= S.sc.truth[f.floor] && S.sc.truth[f.floor] <= f.people.hi), addresses: S.r.addresses, total: S.r.total, empty: S.r.floors[3].people }; });
+await C.page.screenshot({ path: resolve(outDir, 'e2e-18-dron-censo.png'), fullPage: true });
+check('Censo radio con dron sin red: teléfonos exactos por planta pese a la rotación de direcciones, intervalo de personas que contiene la verdad en las 6 plantas y planta sin teléfonos = «0, quizá 1»',
+  JSON.stringify(dron.phones) === JSON.stringify(dron.truePhones) && dron.covered && dron.addresses > 2.5 * dron.total.mid && dron.empty.mid === 0 && dron.empty.hi === 1, dron);
+
+// ---- Arquitectura (sin red): escenarios paso a paso y ficha de cada pieza
+await C.page.goto(base + '/arquitectura');
+await C.page.waitForFunction(() => window.SENDA_ARQ, null, { timeout: 20000 });
+await C.page.click('#sc button[data-i="2"]');
+for (let i = 0; i < 5; i++) await C.page.click('#next');
+await C.page.click('.node[data-id="c-census"]');
+const arq = await C.page.evaluate(() => ({ step: window.SENDA_ARQ.step, cur: document.querySelector('.node.cur')?.dataset.id, edges: document.querySelectorAll('#edges > path').length, detail: document.querySelector('#node-body').textContent, nodes: document.querySelectorAll('.node').length, links: [...new Set([...document.querySelectorAll('#node-body a, .inv a')].map((a) => a.getAttribute('href')))] }));
+await C.page.screenshot({ path: resolve(outDir, 'e2e-19-arquitectura.png'), fullPage: true });
+check('Arquitectura sin red: el escenario «Censo con dron» recorre sus 6 pasos con sus 5 conexiones, y cada pieza muestra estado real, código y enlace',
+  arq.step === 5 && arq.cur === 'd-rescue' && arq.edges === 5 && /Probado en simulación/.test(arq.detail) && /rf-census\.mjs/.test(arq.detail) && arq.nodes >= 30, arq);
+
+// ---- Llamada sin Internet: dos teléfonos nuevos, código por SONIDO (onda real) y conexión directa sin servidor.
+// (La emulación «offline» de Chromium también bloquea WebRTC local, así que aquí se demuestra lo equivalente:
+//  sin servidores STUN/TURN ni de señalización y CERO peticiones de red desde que empieza la llamada.)
+const callPhone = async () => { const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, permissions: ['microphone'] }); const page = await ctx.newPage(); const errors = []; page.on('pageerror', (e) => errors.push(String(e))); await page.goto(base + '/llamada'); await page.waitForFunction(() => window.SENDA_CALL_API); const reqs = []; page.on('request', (r) => reqs.push(r.url())); return { ctx, page, errors, reqs }; };
+const D = await callPhone(), E = await callPhone();
+const offerCode = await D.page.evaluate(() => window.SENDA_CALL_API.createOffer());
+const offerWave = await D.page.evaluate(async (t) => { const m = await import('/senda/core/acoustic-modem.mjs'), s = await import('/senda/core/sdp-compact.mjs'); return Array.from(m.modulate(s.callFromText(t), { sampleRate: 48000 })); }, offerCode);
+const heardOffer = await E.page.evaluate(async (arr) => { const m = await import('/senda/core/acoustic-modem.mjs'), s = await import('/senda/core/sdp-compact.mjs'); const r = m.demodulate(Float32Array.from(arr), { sampleRate: 48000 }); return r && s.callToText(r.payload); }, offerWave);
+const answerCode = await E.page.evaluate((t) => window.SENDA_CALL_API.acceptOffer(t), heardOffer);
+await D.page.evaluate((t) => window.SENDA_CALL_API.acceptAnswer(t), answerCode);
+await D.page.waitForFunction(() => window.SENDA_CALL.state === 'connected', null, { timeout: 15000 }).catch(() => {});
+await E.page.waitForFunction(() => window.SENDA_CALL.state === 'connected', null, { timeout: 15000 }).catch(() => {});
+await D.page.evaluate(() => window.SENDA_CALL_API.send('Hola, te oigo')); await E.page.click('#sos');
+await D.page.waitForTimeout(2500);
+const call = { d: await D.page.evaluate(() => ({ ...window.SENDA_CALL, path: document.querySelector('#k-path').textContent })), e: await E.page.evaluate(() => ({ ...window.SENDA_CALL })), offerS: +(offerWave.length / 48000).toFixed(1), soundExact: heardOffer === offerCode, requestsDuringCall: [...D.reqs, ...E.reqs].filter((u) => !u.startsWith('data:')) };
+await D.page.screenshot({ path: resolve(outDir, 'e2e-20-llamada.png'), fullPage: true });
+check('Llamada sin Internet: oferta de <110 bytes por sonido (onda real, decodificada exacta), conexión directa cifrada, voz Opus y chat en ambos sentidos y cero peticiones de red durante la llamada',
+  call.soundExact && call.d.sentBytes < 110 && call.e.sentBytes < 110 && call.d.state === 'connected' && call.e.state === 'connected' && call.e.received.includes('Hola, te oigo') && call.d.received.some((m) => m.startsWith('🆘')) && call.d.audioPackets > 20 && call.e.audioPackets > 20 && call.requestsDuringCall.length === 0 && call.d.path === 'local, sin servidor',
+  { offerBytes: call.d.sentBytes, answerBytes: call.e.sentBytes, offerSoundS: call.offerS, audioPackets: [call.d.audioPackets, call.e.audioPackets], requests: call.requestsDuringCall });
+await D.page.evaluate(() => document.querySelector('#hang').click());
+const demo = await E.page.evaluate(async () => { await window.SENDA_CALL_API.demoHere(); return window.SENDA_CALL.demo; });
+check('Llamada de prueba en un solo dispositivo (sin micrófono): dos conexiones reales A↔B con el código por forma de onda, mensaje y audio recibidos', demo.connected && demo.message?.includes('3.ª planta') && demo.audioPackets > 10, demo);
+for (const p of [D, E]) { A.errors.push(...p.errors); await p.ctx.close(); }
+
 // ---- Flujo institucional real: organismo → credencial → alerta firmada → mula → residente → respuesta → cuadro
 const orgPage = await A.ctx.newPage(); orgPage.on('pageerror', (e) => A.errors.push(String(e)));
 await orgPage.goto(base + '/organismo');
@@ -289,12 +332,12 @@ const a11y = async (page) => page.evaluate(() => {
   return issues;
 });
 const a11yIssues = {};
-for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado']) {
+for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura']) {
   await R.goto(base + path); await R.waitForLoadState('load'); await R.waitForTimeout(300);
   const iss = await a11y(R); if (iss.length) a11yIssues[path || '/'] = iss;
 }
 await R.close();
-check('Accesibilidad automática en las 9 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
+check('Accesibilidad automática en las 12 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
 
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 

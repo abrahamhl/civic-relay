@@ -2,10 +2,10 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-04T11:01:50.013Z",
-  "durationS": 93.6,
-  "passed": 27,
-  "total": 27,
+  "at": "2026-11-04T22:20:16.439Z",
+  "durationS": 141.7,
+  "passed": 31,
+  "total": 31,
   "results": [
     {
       "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
@@ -100,8 +100,8 @@
       "ok": true,
       "path": {
         "sat": "Iridium 2-5",
-        "elevationDeg": 24.8,
-        "rangeKm": 1546,
+        "elevationDeg": 24.7,
+        "rangeKm": 1548,
         "delayMs": 5.16
       },
       "plan": {
@@ -153,6 +153,75 @@
       "topAsset": 3
     },
     {
+      "name": "Censo radio con dron sin red: teléfonos exactos por planta pese a la rotación de direcciones, intervalo de personas que contiene la verdad en las 6 plantas y planta sin teléfonos = «0, quizá 1»",
+      "ok": true,
+      "phones": [
+        4,
+        8,
+        5,
+        0,
+        5,
+        3
+      ],
+      "truePhones": [
+        4,
+        8,
+        5,
+        0,
+        5,
+        3
+      ],
+      "covered": true,
+      "addresses": 113,
+      "total": {
+        "lo": 20,
+        "mid": 25,
+        "hi": 37
+      },
+      "empty": {
+        "lo": 0,
+        "mid": 0,
+        "hi": 1,
+        "pEmpty": 0.88
+      }
+    },
+    {
+      "name": "Arquitectura sin red: el escenario «Censo con dron» recorre sus 6 pasos con sus 5 conexiones, y cada pieza muestra estado real, código y enlace",
+      "ok": true,
+      "step": 5,
+      "cur": "d-rescue",
+      "edges": 5,
+      "detail": "Probado en simulación nuevoConcurrencia de direcciones aleatorias → teléfonos por planta; inferencia bayesiana exacta → personas con intervalo del 90 %.Código: rf-census.mjsAparece en: 🚁 Censo con dronAbrir /senda/dron →",
+      "nodes": 35,
+      "links": [
+        "/senda/dron",
+        "/senda/llamada"
+      ]
+    },
+    {
+      "name": "Llamada sin Internet: oferta de <110 bytes por sonido (onda real, decodificada exacta), conexión directa cifrada, voz Opus y chat en ambos sentidos y cero peticiones de red durante la llamada",
+      "ok": true,
+      "offerBytes": 79,
+      "answerBytes": 72,
+      "offerSoundS": 7.8,
+      "audioPackets": [
+        151,
+        150
+      ],
+      "requests": []
+    },
+    {
+      "name": "Llamada de prueba en un solo dispositivo (sin micrófono): dos conexiones reales A↔B con el código por forma de onda, mensaje y audio recibidos",
+      "ok": true,
+      "connected": true,
+      "offerBytes": 79,
+      "answerBytes": 72,
+      "connectMs": 350,
+      "message": "¿Me oyes? Estoy en la 3.ª planta, puerta B",
+      "rttMs": 1,
+      "audioPackets": 75
+    },
+    {
       "name": "Organismo firma credencial; alerta firmada viaja por la mula; el residente la verifica, responde «atrapado» y el coordinador lo ve en su cuadro",
       "ok": true,
       "issuer": "FIRE · JEFE_INCIDENTE · Parque 3 (firma verificada)",
@@ -161,7 +230,7 @@
     {
       "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
       "ok": true,
-      "href": "senda://accion?a=BLE_BEACON&id=d1efac23ddf8e5b0&b=B14&f=3&u=B&bat=100&cmd=V44-ciIQUn2m7ldS"
+      "href": "senda://accion?a=BLE_BEACON&id=93e1cd491376ac4c&b=B14&f=3&u=B&bat=100&cmd=6qRiZk9lB8MyEMS8"
     },
     {
       "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",
@@ -193,7 +262,7 @@
       "easy": true
     },
     {
-      "name": "Accesibilidad automática en las 9 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
+      "name": "Accesibilidad automática en las 12 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
       "ok": true,
       "issues": {}
     },

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Llamada sin Internet</title>
+<meta name="description" content="Llamadas de voz y chat cifrados entre teléfonos sin Internet ni servidor: la conexión se intercambia por sonido o con un código corto.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 Inter,system-ui,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:20px 16px 60px}h1{font-size:30px;margin:4px 0}h2{font-size:18px;margin:0 0 8px}.m{color:var(--m)}a{color:var(--i)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:16px;min-width:0}
+button{font:inherit;min-height:48px;padding:10px 16px;border-radius:12px;border:1px solid var(--l);background:#0f1d27;color:var(--t);cursor:pointer;font-weight:700}
+button.p{background:var(--c);border-color:var(--c);color:#140804}button.g{background:var(--e);border-color:var(--e);color:#03140d}button.r{background:var(--r);border-color:var(--r);color:#1a0306}
+button:disabled{opacity:.45;cursor:not-allowed}
+textarea,input[type=text]{width:100%;font:13px ui-monospace,monospace;background:#071018;color:var(--t);border:1px solid var(--l);border-radius:10px;padding:10px}
+.code{font:600 13px ui-monospace,monospace;word-break:break-all;background:#071018;border:1px dashed var(--i);border-radius:10px;padding:10px;color:var(--i);min-height:48px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0}.steps li{counter-increment:s;position:relative;padding:4px 0 4px 32px}.steps li::before{content:counter(s);position:absolute;left:0;top:4px;width:22px;height:22px;border-radius:50%;background:#12323f;color:var(--i);font-weight:800;text-align:center;line-height:22px;font-size:12px}
+.call{display:none;margin-top:14px}.call.on{display:block}
+.status{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800}.dot{width:14px;height:14px;border-radius:50%;background:var(--a)}.dot.ok{background:var(--e);box-shadow:0 0 12px var(--e)}
+.meter{height:10px;border-radius:6px;background:#0f1d27;overflow:hidden;flex:1 1 160px}.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--e),var(--a))}
+.kv{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}@media(max-width:640px){.kv{grid-template-columns:repeat(2,1fr)}}.kv div{background:#071018;border:1px solid var(--l);border-radius:10px;padding:8px}.kv b{display:block;font-size:20px}.kv span{font-size:11px;color:var(--m)}
+.chat{height:180px;overflow:auto;background:#071018;border:1px solid var(--l);border-radius:10px;padding:8px;margin-top:10px;font-size:14px}.chat p{margin:4px 0}.chat .me{color:var(--i)}.chat .them{color:var(--e)}
+.ptt{min-height:72px;font-size:18px;flex:1 1 220px;user-select:none;touch-action:none}.ptt.on{background:var(--e);color:#03140d;border-color:var(--e)}
+.note{border-left:3px solid var(--a);padding:6px 10px;background:#0f1a22;border-radius:6px;font-size:13px;margin-top:10px}
+.long{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}@media(max-width:900px){.long{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/arquitectura">Arquitectura</a> · <a href="/senda/red">Red y satélites</a> · <a href="/senda/estado">Verificación</a></p>
+<h1>Llamada sin Internet</h1>
+<p class="m">Voz y chat cifrados de extremo a extremo entre dos teléfonos, <b>sin Internet, sin operador y sin servidor</b>. Basta con que estén en la misma red Wi-Fi local: si no hay ninguna, uno activa su <b>punto de acceso</b> (no hace falta datos móviles) y el otro se conecta. Para arrancar la llamada, los teléfonos se pasan un código de unos 80–110 bytes <b>por sonido</b> (8–10 s, altavoz → micrófono) o como texto corto.</p>
+
+<div class="grid" id="setup">
+  <section class="card" aria-labelledby="h-call">
+    <h2 id="h-call">1 · Llamar</h2>
+    <ol class="steps"><li>Pulsa <b>Crear llamada</b> y acepta el micrófono.</li><li>Acerca los teléfonos y pulsa <b>Enviar por sonido</b> (o comparte el código).</li><li>Cuando el otro responda, <b>escucha</b> o pega su código.</li></ol>
+    <div class="row"><button class="p" id="mk">Crear llamada</button></div>
+    <p class="m" style="margin:10px 0 4px">Tu código (<span id="mk-size">—</span>):</p><div class="code" id="mk-code" aria-live="polite">—</div>
+    <div class="row"><button id="mk-sound" disabled>🔊 Enviar por sonido</button><button id="mk-copy" disabled>Copiar</button><button id="mk-share" disabled>Compartir</button></div>
+    <p class="m" style="margin:12px 0 4px">Respuesta del otro teléfono:</p>
+    <textarea id="mk-in" rows="2" aria-label="Código de respuesta"></textarea>
+    <div class="row"><button id="mk-listen" disabled>👂 Escuchar respuesta</button><button class="g" id="mk-connect" disabled>Conectar</button></div>
+  </section>
+  <section class="card" aria-labelledby="h-ans">
+    <h2 id="h-ans">2 · Responder</h2>
+    <ol class="steps"><li>Pulsa <b>Escuchar llamada</b> junto al otro teléfono (o pega su código).</li><li>Pulsa <b>Responder</b> y acepta el micrófono.</li><li>Envía tu respuesta por sonido o compártela.</li></ol>
+    <textarea id="an-in" rows="2" aria-label="Código de la llamada"></textarea>
+    <div class="row"><button id="an-listen">👂 Escuchar llamada</button><button class="p" id="an-go">Responder</button></div>
+    <p class="m" style="margin:10px 0 4px">Tu respuesta (<span id="an-size">—</span>):</p><div class="code" id="an-code" aria-live="polite">—</div>
+    <div class="row"><button id="an-sound" disabled>🔊 Enviar por sonido</button><button id="an-copy" disabled>Copiar</button><button id="an-share" disabled>Compartir</button></div>
+  </section>
+</div>
+
+<section class="card" id="demo" aria-labelledby="h-demo" style="margin-top:14px">
+  <h2 id="h-demo">Pruébalo ahora en este dispositivo</h2>
+  <p class="m" style="margin-top:0">Sin segundo teléfono ni micrófono: esta pestaña hace de <b>teléfono A</b> y de <b>teléfono B</b> con dos conexiones independientes. El código de llamada se convierte en tonos reales, se vuelve a decodificar desde esa forma de onda y la llamada se establece sin ningún servidor. Cada teléfono envía un tono de prueba como «voz».</p>
+  <div class="row"><button class="p" id="demo-go">▶ Llamada de prueba A ↔ B</button><label class="m"><input type="checkbox" id="demo-hear"> Oír los tonos del código (≈ 8 s cada uno)</label></div>
+  <canvas id="demo-scope" width="900" height="96" aria-label="Partitura del código: cada barra es un símbolo de 25 ms en uno de 16 tonos" style="width:100%;height:96px;margin-top:10px;border-radius:8px;background:#071018" aria-hidden="true"></canvas>
+  <p class="m" style="font-size:12px;margin:4px 0 0">Partitura del código: cada barra es un símbolo de 25 ms en uno de 16 tonos entre 2 y 5 kHz (en ámbar, el preámbulo de sincronía).</p>
+  <ol id="demo-log" class="m" style="margin:8px 0 0;padding-left:20px"></ol>
+</section>
+
+<section class="card call" id="call" aria-labelledby="h-live">
+  <h2 id="h-live" class="status"><span class="dot" id="dot"></span><span id="state">Conectando…</span> <span class="m" id="timer" style="font-weight:600"></span></h2>
+  <div class="row"><span class="m">Tu micrófono</span><div class="meter" aria-hidden="true"><i id="lvl"></i></div><label class="m"><input type="checkbox" id="ptt-mode"> Pulsar para hablar</label></div>
+  <div class="row"><button class="ptt" id="ptt">🎙️ Micrófono abierto</button><button class="r" id="hang">Colgar</button></div>
+  <div class="kv"><div><b id="k-rtt">—</b><span>ida y vuelta</span></div><div><b id="k-loss">—</b><span>paquetes perdidos</span></div><div><b id="k-kbps">—</b><span>audio Opus</span></div><div><b id="k-path">—</b><span>ruta</span></div></div>
+  <div class="chat" id="chat" aria-live="polite"></div>
+  <div class="row"><input type="text" id="msg" aria-label="Mensaje" placeholder="Escribe un mensaje cifrado…"><button id="send">Enviar</button><button id="sos">🆘 Estoy atrapado</button></div>
+  <audio id="remote" autoplay></audio>
+</section>
+
+<div class="long">
+  <section class="card"><h2>Por qué funciona sin Internet</h2><p>WebRTC ya sabe hablar teléfono a teléfono dentro de una red local. Lo que siempre necesitaba Internet era el <b>arranque</b>: un servidor que pasara a cada uno la descripción del otro (2–5 KB).</p><p>SENDA usa una plantilla común (audio Opus + canal de datos) y transmite solo lo que cambia: credenciales ICE, la huella del certificado y las direcciones locales. Son <b>80–110 bytes</b>, unas 20 veces menos, y caben por sonido en 8–10 segundos.</p></section>
+  <section class="card"><h2>Seguridad</h2><p>La llamada va cifrada con DTLS-SRTP. La <b>huella del certificado</b> viaja dentro del código, así que solo puede conectarse quien recibió ese código por sonido o en mano: nadie en medio puede suplantarlo sin cambiar la huella.</p><p>El chat usa el canal de datos cifrado de la misma conexión.</p></section>
+  <section class="card"><h2>Límites y siguiente paso</h2><p>Necesita una Wi-Fi local compartida; algunos puntos de acceso aíslan a sus clientes. En la app Android, <b>Wi-Fi Aware</b> y <b>Wi-Fi Direct</b> conectan dos teléfonos sin ninguna red, y las notas de voz cortas pueden viajar por LoRa o satélite como mensajes SENDA.</p><p class="m">SENDA es un canal secundario: no sustituye al 112.</p></section>
+</div>
+</main>
+<script type="module">
+import { compactFromSdp, sdpFromCompact, callToText, callFromText } from '/senda/core/sdp-compact.mjs';
+import { emit, listen } from '/senda/audio.mjs';
+import { airtimeSeconds, modulate, demodulate, PROFILE } from '/senda/core/acoustic-modem.mjs';
+const $ = (s) => document.querySelector(s);
+const S = { pc: null, dc: null, stream: null, bytes: null, t0: 0, ptt: false };
+window.SENDA_CALL = { state: 'idle', received: [], sentBytes: 0 };
+
+async function newPc() {
+  const pc = new RTCPeerConnection({ iceServers: [] }); // sin STUN/TURN: solo la red local
+  S.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+  S.stream.getTracks().forEach((t) => pc.addTrack(t, S.stream));
+  pc.ontrack = (e) => { $('#remote').srcObject = e.streams[0] ?? new MediaStream([e.track]); };
+  pc.ondatachannel = (e) => bindDc(e.channel);
+  pc.onconnectionstatechange = () => onState(pc.connectionState);
+  meter(S.stream); return pc;
+}
+const gathered = (pc) => new Promise((ok) => { if (pc.iceGatheringState === 'complete') return ok(); const t = setTimeout(ok, 4000); pc.onicegatheringstatechange = () => { if (pc.iceGatheringState === 'complete') { clearTimeout(t); ok(); } }; });
+function showCode(prefix, bytes) {
+  S.bytes = bytes; window.SENDA_CALL.sentBytes = bytes.length;
+  $(`#${prefix}-code`).textContent = callToText(bytes);
+  $(`#${prefix}-size`).textContent = `${bytes.length} bytes · ≈ ${airtimeSeconds(bytes.length).toFixed(0)} s por sonido`;
+  for (const b of ['sound', 'copy', 'share']) $(`#${prefix}-${b}`).disabled = false;
+}
+async function createOffer() {
+  S.pc = await newPc(); bindDc(S.pc.createDataChannel('senda'));
+  await S.pc.setLocalDescription(await S.pc.createOffer()); await gathered(S.pc);
+  const bytes = compactFromSdp(S.pc.localDescription.sdp, 'offer'); showCode('mk', bytes);
+  $('#mk-listen').disabled = $('#mk-connect').disabled = false; return callToText(bytes);
+}
+async function acceptOffer(text) {
+  S.pc = await newPc(); await S.pc.setRemoteDescription(sdpFromCompact(callFromText(text)));
+  await S.pc.setLocalDescription(await S.pc.createAnswer()); await gathered(S.pc);
+  const bytes = compactFromSdp(S.pc.localDescription.sdp, 'answer'); showCode('an', bytes); return callToText(bytes);
+}
+async function acceptAnswer(text) { await S.pc.setRemoteDescription(sdpFromCompact(callFromText(text))); $('#call').classList.add('on'); }
+function bindDc(dc) { S.dc = dc; dc.onmessage = (m) => { window.SENDA_CALL.received.push(m.data); line(m.data, 'them'); }; }
+function line(t, who) { const p = document.createElement('p'); p.className = who; p.textContent = (who === 'me' ? 'Tú: ' : 'Otro: ') + t; $('#chat').append(p); $('#chat').scrollTop = 1e9; }
+function send(t) { if (!t || S.dc?.readyState !== 'open') return false; S.dc.send(t); line(t, 'me'); return true; }
+function onState(s) {
+  window.SENDA_CALL.state = s; $('#call').classList.add('on');
+  const L = { new: 'Preparando…', connecting: 'Conectando…', connected: 'Conectada · cifrada (DTLS-SRTP)', disconnected: 'Señal perdida, reintentando…', failed: 'No se pudo conectar: ¿estáis en la misma Wi-Fi?', closed: 'Llamada terminada' };
+  $('#state').textContent = L[s] ?? s; $('#dot').classList.toggle('ok', s === 'connected');
+  if (s === 'connected' && !S.t0) { S.t0 = Date.now(); stats(); $('#call').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+}
+async function stats() {
+  if (!S.pc || S.pc.connectionState === 'closed') return; let prev = S.prevBytes ?? 0;
+  (await S.pc.getStats()).forEach((r) => {
+    if (r.type === 'candidate-pair' && r.nominated && r.state === 'succeeded') { $('#k-rtt').textContent = r.currentRoundTripTime != null ? `${Math.round(r.currentRoundTripTime * 1000)} ms` : '—'; }
+    if (r.type === 'inbound-rtp' && r.kind === 'audio') { $('#k-loss').textContent = `${r.packetsLost ?? 0}`; $('#k-kbps').textContent = `${Math.round(((r.bytesReceived - prev) * 8) / 1000)} kbit/s`; S.prevBytes = r.bytesReceived; window.SENDA_CALL.audioPackets = r.packetsReceived; }
+    if (r.type === 'local-candidate' && r.candidateType) $('#k-path').textContent = r.candidateType === 'host' ? 'local, sin servidor' : r.candidateType;
+  });
+  const s = Math.floor((Date.now() - S.t0) / 1000); $('#timer').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  setTimeout(stats, 1000);
+}
+function meter(stream) { try { const ac = new AudioContext(), an = ac.createAnalyser(); ac.createMediaStreamSource(stream).connect(an); const d = new Uint8Array(an.fftSize); const tick = () => { an.getByteTimeDomainData(d); let m = 0; for (const v of d) m = Math.max(m, Math.abs(v - 128)); $('#lvl').style.width = `${Math.min(100, m * 1.6)}%`; requestAnimationFrame(tick); }; tick(); } catch {} }
+const mic = (on) => S.stream?.getAudioTracks().forEach((t) => (t.enabled = on));
+const sound = async (btn) => { btn.disabled = true; btn.textContent = '🔊 Sonando…'; try { await emit(S.bytes); } finally { btn.disabled = false; btn.textContent = '🔊 Enviar por sonido'; } };
+const hear = async (btn, target, then) => { btn.textContent = '👂 Escuchando… acerca el otro teléfono'; await listen({ maxS: 30, onPayload: async (bytes) => { target.value = callToText(bytes); btn.textContent = '✓ Recibido por sonido'; await then(target.value); } }); };
+const share = (text) => (navigator.share ? navigator.share({ title: 'Llamada SENDA', text }).catch(() => {}) : navigator.clipboard?.writeText(text));
+
+$('#mk').onclick = () => createOffer().catch((e) => alert(e.message));
+$('#mk-sound').onclick = (e) => sound(e.target); $('#mk-copy').onclick = () => navigator.clipboard?.writeText($('#mk-code').textContent); $('#mk-share').onclick = () => share($('#mk-code').textContent);
+$('#mk-listen').onclick = (e) => hear(e.target, $('#mk-in'), acceptAnswer);
+$('#mk-connect').onclick = () => acceptAnswer($('#mk-in').value).catch((e) => alert(e.message));
+$('#an-listen').onclick = (e) => hear(e.target, $('#an-in'), acceptOffer);
+$('#an-go').onclick = () => acceptOffer($('#an-in').value).catch((e) => alert(e.message));
+$('#an-sound').onclick = (e) => sound(e.target); $('#an-copy').onclick = () => navigator.clipboard?.writeText($('#an-code').textContent); $('#an-share').onclick = () => share($('#an-code').textContent);
+$('#send').onclick = () => { if (send($('#msg').value)) $('#msg').value = ''; };
+$('#msg').onkeydown = (e) => { if (e.key === 'Enter') $('#send').click(); };
+$('#sos').onclick = () => send('🆘 ESTOY ATRAPADO · necesito ayuda (enviado desde SENDA)');
+$('#hang').onclick = () => { S.pc?.close(); S.stream?.getTracks().forEach((t) => t.stop()); onState('closed'); };
+$('#ptt-mode').onchange = (e) => { S.ptt = e.target.checked; mic(!S.ptt); $('#ptt').textContent = S.ptt ? '🎙️ Mantén pulsado para hablar' : '🎙️ Micrófono abierto'; };
+const down = () => { if (S.ptt) { mic(true); $('#ptt').classList.add('on'); } }, up = () => { if (S.ptt) { mic(false); $('#ptt').classList.remove('on'); } };
+$('#ptt').addEventListener('pointerdown', down); $('#ptt').addEventListener('pointerup', up); $('#ptt').addEventListener('pointerleave', up);
+/** «Partitura» del código: en cada símbolo de 25 ms, cuál de los 16 tonos (2–5 kHz) suena. */
+function drawTones(canvas, wave, sr = 48000) {
+  const g = canvas.getContext('2d'), w = canvas.width, h = canvas.height, P = PROFILE;
+  const ns = Math.round(P.symS * sr), step = ns + Math.round(P.guardS * sr), lead = Math.round(0.05 * sr);
+  const nSym = Math.floor((wave.length - 2 * lead) / step), bw = w / nSym;
+  g.fillStyle = '#071018'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < nSym; i++) {
+    let best = 0, bk = 0;
+    for (let k = 0; k < P.tones; k++) {
+      const c = 2 * Math.cos((2 * Math.PI * (P.f0 + k * P.df)) / sr); let s1 = 0, s2 = 0;
+      for (let j = lead + i * step, e = j + ns; j < e; j++) { const s0 = wave[j] + c * s1 - s2; s2 = s1; s1 = s0; }
+      const pw = s1 * s1 + s2 * s2 - c * s1 * s2; if (pw > best) { best = pw; bk = k; }
+    }
+    g.fillStyle = i < P.preamble.length ? '#fbbf24' : `hsl(${190 + bk * 6},70%,${55 + (bk % 4) * 5}%)`;
+    g.fillRect(i * bw, h - ((bk + 1) * h) / P.tones, Math.max(1, bw - 0.5), h / P.tones - 1);
+  }
+}
+// ---- Demostración en un solo dispositivo: dos conexiones reales, código por forma de onda real
+async function demoHere() {
+  const log = (t) => { const li = document.createElement('li'); li.textContent = t; $('#demo-log').append(li); };
+  $('#demo-log').innerHTML = ''; $('#demo-go').disabled = true;
+  const out = (window.SENDA_CALL.demo = { connected: false });
+  try {
+    const ac = new AudioContext(); await ac.resume();
+    const tone = (f) => { const o = ac.createOscillator(), g = ac.createGain(), d = ac.createMediaStreamDestination(); o.frequency.value = f; g.gain.value = 0.03; o.connect(g); g.connect(d); o.start(); return d.stream; };
+    const a = new RTCPeerConnection({ iceServers: [] }), b = new RTCPeerConnection({ iceServers: [] });
+    for (const [pc, f] of [[a, 440], [b, 660]]) { const st = tone(f); st.getTracks().forEach((t) => pc.addTrack(t, st)); }
+    const dc = a.createDataChannel('senda'); const t0 = performance.now();
+    b.ondatachannel = (e) => { e.channel.onmessage = (m) => { out.message = m.data; log(`B recibe por el canal cifrado: «${m.data}»`); }; };
+    const viaSound = async (bytes, who) => {
+      const wave = modulate(bytes, { sampleRate: 48000 }); drawTones($('#demo-scope'), wave);
+      if ($('#demo-hear').checked) await emit(bytes);
+      const r = demodulate(wave, { sampleRate: 48000 }), same = r && r.payload.length === bytes.length && r.payload.every((x, i) => x === bytes[i]);
+      log(`${who}: ${bytes.length} bytes → ${(wave.length / 48000).toFixed(1)} s de tonos → decodificados ${same ? 'sin un solo error' : 'CON ERRORES'}`);
+      if (!same) throw new Error('el sonido no se decodificó'); return r.payload;
+    };
+    await a.setLocalDescription(await a.createOffer()); await gathered(a);
+    const offer = compactFromSdp(a.localDescription.sdp, 'offer'); out.offerBytes = offer.length;
+    log(`A crea la llamada: descripción completa de ${a.localDescription.sdp.length} caracteres → código de ${offer.length} bytes`);
+    await b.setRemoteDescription(sdpFromCompact(await viaSound(offer, 'Oferta por sonido A → B')));
+    await b.setLocalDescription(await b.createAnswer()); await gathered(b);
+    const ans = compactFromSdp(b.localDescription.sdp, 'answer'); out.answerBytes = ans.length;
+    await a.setRemoteDescription(sdpFromCompact(await viaSound(ans, 'Respuesta por sonido B → A')));
+    await new Promise((ok, ko) => { const t = setTimeout(() => ko(new Error('sin conexión en 10 s')), 10000); const chk = () => { if (a.connectionState === 'connected') { clearTimeout(t); ok(); } else if (a.connectionState === 'failed') { clearTimeout(t); ko(new Error('conexión fallida')); } }; a.onconnectionstatechange = chk; chk(); });
+    out.connected = true; out.connectMs = Math.round(performance.now() - t0);
+    log(`Conectados en ${out.connectMs} ms · cifrado DTLS-SRTP · ningún servidor STUN/TURN ni de señalización`);
+    if (dc.readyState !== 'open') await new Promise((ok) => (dc.onopen = ok));
+    dc.send('¿Me oyes? Estoy en la 3.ª planta, puerta B');
+    await new Promise((ok) => setTimeout(ok, 1500));
+    (await b.getStats()).forEach((r) => { if (r.type === 'inbound-rtp' && r.kind === 'audio') out.audioPackets = r.packetsReceived; if (r.type === 'candidate-pair' && r.nominated && r.state === 'succeeded') out.rttMs = r.currentRoundTripTime != null ? Math.round(r.currentRoundTripTime * 1000) : null; });
+    log(`B recibe la voz de A: ${out.audioPackets ?? 0} paquetes de audio Opus en 1,5 s · ida y vuelta ${out.rttMs ?? '—'} ms`);
+    a.close(); b.close(); ac.close(); log('Llamada de prueba terminada. Con dos teléfonos reales es igual, pero el código viaja por el aire.');
+  } catch (e) { out.error = e.message; log(`No se pudo completar: ${e.message}`); }
+  finally { $('#demo-go').disabled = false; }
+}
+$('#demo-go').onclick = demoHere;
+window.SENDA_CALL_API = { createOffer, acceptOffer, acceptAnswer, send, demoHere };
+</script>
+</body></html>
