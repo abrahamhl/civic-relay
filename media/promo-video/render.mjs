@@ -91,6 +91,6 @@ execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0'
   '-map', '0:v', '-map', '[a]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', target], { stdio: 'inherit' });
 const subbed = resolve(out, 'civic-relay-promo-subtitulado.mp4');
 execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', target, '-vf',
-  `subtitles=${resolve(here, 'subtitles.es.srt')}:force_style='FontName=Inter,FontSize=15,PrimaryColour=&H00F4F4F2,OutlineColour=&H80000000,BorderStyle=3,Outline=1,Shadow=0,MarginV=58'`,
+  `subtitles=${resolve(here, 'subtitles.es.srt')}:force_style='FontName=Inter,FontSize=9,PrimaryColour=&H00F4F4F2,OutlineColour=&H99000000,BorderStyle=3,Outline=1,Shadow=0,MarginV=14'`,
   '-c:v', 'libx264', '-preset', 'medium', '-crf', '20', '-c:a', 'copy', '-movflags', '+faststart', subbed], { stdio: 'inherit' });
 console.log('OK →', target, '\nOK →', subbed);
