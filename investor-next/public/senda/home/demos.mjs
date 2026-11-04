@@ -51,7 +51,7 @@ const ease = (k) => k * k * (3 - 2 * k);
 export function hash(a, b) { let h = Math.imul(a ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul((b | 0) + 0x632be5ab, 0xc2b2ae35); h ^= h >>> 15; h = Math.imul(h, 0x2c1b3c6d); h ^= h >>> 12; return (h >>> 0) / 4294967296; }
 const nf = (lang, x, d = 0) => (Number.isFinite(x) ? x.toLocaleString(lang === 'en' ? 'en-GB' : lang, { maximumFractionDigits: d, minimumFractionDigits: d }) : '—');
 const pct = (lang, p, d = 1) => `${nf(lang, p * 100, d)} %`;
-const hm = (min) => (Number.isFinite(min) ? `${Math.floor(min / 60)} h ${String(Math.round(min % 60)).padStart(2, '0')}` : '—');
+const hm = (min) => { if (!Number.isFinite(min)) return '—'; const m = Math.round(min); return `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`; };
 
 function txt(g, s, x, y, { size = 14, color = C.text, weight = 600, align = 'left', base = 'alphabetic', mono = false, alpha = 1 } = {}) {
   g.globalAlpha = alpha; g.fillStyle = color; g.textAlign = align; g.textBaseline = base;
