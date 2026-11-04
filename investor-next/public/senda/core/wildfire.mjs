@@ -137,8 +137,9 @@ export function syntheticLandscape({ w = 96, h = 64, cellM = 100, seed = 5 } = {
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
     const i = y * w + x;
     elev[i] = 600 + hills.reduce((a, q) => a + q.a * Math.exp(-((x - q.x) ** 2 + (y - q.y) ** 2) / (2 * q.r * q.r)), 0);
-    const n = Math.sin(x * 0.31 + seed) * Math.cos(y * 0.27) + (R() - 0.5) * 0.9;
-    fuel[i] = n > 0.45 ? 1 : n > -0.2 ? 2 : 3;
+    // Manchas continuas de combustible (campo suave, sin ruido por celda): pasto en lomas, matorral, arbolado en vaguadas.
+    const n = 0.55 * Math.sin(x * 0.13 + seed) * Math.cos(y * 0.11) + 0.35 * Math.sin((x + y) * 0.07 + 1.3) + 0.25 * Math.cos(x * 0.23 - y * 0.19) - (elev[i] - 750) / 900;
+    fuel[i] = n > 0.3 ? 1 : n > -0.15 ? 2 : 3;
     if (Math.abs(y - (40 + 6 * Math.sin(x / 9))) < 0.8) fuel[i] = 0; // río
     if (x === 55 && y < 36) fuel[i] = 5; // carretera
     for (const t of towns) if (Math.abs(x - t.x) <= t.r && Math.abs(y - t.y) <= t.r) fuel[i] = 4;

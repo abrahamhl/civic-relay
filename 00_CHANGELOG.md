@@ -1,5 +1,22 @@
 # Changelog
 
+## SENDA v0.9 · 04-11-2026 · Corrección de rumbo: portada restaurada, Ojo de SENDA, incendio cartográfico y película v4
+
+**Entrada (fundador):** la v0.8 bajó el nivel. Volver a la portada anterior con sus explicaciones largas; que «ver como» cambie la página de verdad; explicar el globo (satélites, casos y módulos); película con introducción, en inglés y español, al nivel de la v3.
+
+**Procesamiento:**
+- Portada restaurada tal como estaba (todas las secciones). Retirados la portada condensada, `/lab`, los cuadros de demos y la película/reels v0.8.
+- `audience-filter.tsx`: «Ver la página como» Todo · Ciudadanía · Coordinación · Ingeniería · Inversión. Cada perfil ve su recorrido completo (9–13 secciones, con sus explicaciones) y «Todo» la página entera (20).
+- `/senda/ojo` (spec 03): globo en tiempo real con Iridium (66, LEO), Galileo (24, MEO) y QO-100 (GEO), 7 casos reales con fuente y módulos, ruta del aviso caso → satélite → relé → 112 con elevación, distancia y latencia, plan k-de-n con los canales que quedan; terminador día/noche exacto. Incrustado en la portada con explicación en es/en/nl.
+- `/senda/incendio`: relieve sombreado, curvas de nivel, vegetación continua, frente con resplandor y humo, isócronas por marching squares, antenas con cobertura, línea de tiempo y explicación larga con fuentes. Paisaje sintético con manchas de combustible continuas (antes, ruido por celda).
+- Película v4 = v3 íntegra + 4 escenas (Ojo de SENDA, ver lo que no se ve, vías, incendio) con capturas reales y voz Kokoro de precisión completa (fp32) en es y en; subtítulos es/en/nl.
+
+**Validación:** núcleo + relé 108/108 · E2E sin red 27/27 (Ojo e incendio incluidos, accesibilidad en 9 pantallas) · web: compilación, idiomas y 98/98.
+
+**Lección registrada:** «acortar» no es «sustituir»; antes de retirar contenido, preguntar.
+
+— Registrado por el asistente de orquestación (Claude Code), bajo la dirección de Abraham Haddioui.
+
 ## SENDA v0.8 · 04-11-2026 · Portada en vivo por niveles, incendio forestal, película y reels
 
 **Entrada:** web más corta e inmersiva, con demostraciones en vivo de cada innovación; foco en incendios, vías, comunicación sin red, seguridad y satélite; material audiovisual para inversión.

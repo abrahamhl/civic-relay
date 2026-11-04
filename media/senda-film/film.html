@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>SENDA · película</title>
 <!--
-  Película SENDA v3 · 1280×720. Determinista: window.seek(t) fija cada fotograma (sin temporizadores).
+  Película SENDA v4 · 1280×720. Determinista: window.seek(t) fija cada fotograma (sin temporizadores).
   film.html?lang=es|en  ·  carga script.json y out/timeline-<lang>.js (servidos por render.mjs).
 -->
 <style>
@@ -60,11 +60,15 @@ const NUM = { core: +(new URLSearchParams(location.search).get('core') || 0), e2
 
 function visualHTML(sc, idx) {
   const v = sc.visual, img = (f) => `assets/${f}`;
-  const kp = (list, cls = '') => list.map((k, i) => `<div class="kpi ${cls} k${i}"><b>${k.v}</b><span>${T(k.l)}</span></div>`).join('');
+  const kp = (list, cls = '') => list.map((k, i) => `<div class="kpi ${cls} k${i}"><b>${T(k.v)}</b><span>${T(k.l)}</span></div>`).join('');
   if (v.kind === 'kpis') return `<div class="kpis">${kp(v.kpis)}</div>`;
   if (v.kind === 'hub') { const B = BEARERS[LANG] ?? BEARERS.en; return `<div class="hub"><svg width="640" height="600" id="hub-svg-${idx}"></svg>${B.map((b, i) => { const a = (i / B.length) * Math.PI * 2 - Math.PI / 2; return `<div class="node b${i}" style="left:${320 + 250 * Math.cos(a)}px;top:${300 + 225 * Math.sin(a)}px">${b}</div>`; }).join('')}<div class="node core" style="left:320px;top:300px">SENDA</div></div>`; }
   if (v.kind === 'shots') {
     const frames = v.images.map((f, i) => {
+      if (typeof f === 'object') { // v4: captura de escritorio con recorte explícito (y0, y1 en píxeles de 1280 de ancho)
+        const sc2 = 636 / 1280, [y0, y1] = f.crop;
+        return `<div class="desk f${i}"><div class="bar"><i></i><i></i><i></i></div><div class="crop" style="height:${Math.round((y1 - y0) * sc2)}px"><img src="${img(f.f)}" style="top:${-Math.round(y0 * sc2)}px"></div></div>`;
+      }
       if (/e2e-(06|08|12)/.test(f)) {
         const [y0, y1] = v.crop ? CROPS[v.crop] : [0, /06/.test(f) ? 1000 : 900]; const sc2 = 636 / 1280;
         return `<div class="desk f${i}"><div class="bar"><i></i><i></i><i></i></div><div class="crop" style="height:${Math.round((y1 - y0) * sc2)}px"><img src="${img(f)}" style="top:${-Math.round(y0 * sc2)}px"></div></div>`;

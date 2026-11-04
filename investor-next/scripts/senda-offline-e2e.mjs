@@ -160,6 +160,28 @@ check('Visión por capas sin red: probabilidad, espectro, estructura y topograf�
   vis && ['PROBABILIDAD', 'ESPECTRO', 'ESTRUCTURA', 'TOPOGRAFIA'].every((k) => vis.byLayer[k] > 0) && vis.top.cls === 'CONFIRMADO_POR_RESPUESTA' && vis.top.badge98 && fusionRows >= 9,
   { byLayer: vis?.byLayer, top: vis?.top, planTop: vis?.planTop });
 
+// ---- Ojo de SENDA (sin red): constelaciones, casos reales y ruta del aviso
+await C.page.goto(base + '/ojo');
+await C.page.waitForFunction(() => window.SENDA_OJO, null, { timeout: 20000 });
+await C.page.click('#cases button[data-id="adamuz"]'); await C.page.waitForTimeout(1500);
+const ojo = await C.page.evaluate(() => window.SENDA_OJO);
+await C.page.screenshot({ path: resolve(outDir, 'e2e-17-ojo.png'), fullPage: true });
+check('Ojo de SENDA sin red: 7 casos reales, satélite visible con elevación, distancia y latencia calculadas, y plan k-de-n ≥99 % con los canales que quedan',
+  ojo.cases === 7 && ojo.selected === 'adamuz' && ojo.path && ojo.path.elevationDeg >= 10 && ojo.path.rangeKm > 700 && ojo.path.delayMs > 2 && ojo.plan.p >= 0.99 && ojo.visible.galileo > 0,
+  { path: ojo.path, plan: ojo.plan, visible: ojo.visible });
+
+// ---- Incendio forestal (sin red): frente, antenas y canal de aviso por pueblo
+await C.page.goto(base + '/incendio');
+await C.page.waitForFunction(() => window.SENDA_FIRE, null, { timeout: 20000 });
+await C.page.evaluate(() => { document.querySelector('#play').click(); const t = document.querySelector('#t'); t.value = '125'; t.dispatchEvent(new Event('input', { bubbles: true })); });
+await C.page.waitForTimeout(1200);
+const fireRes = await C.page.evaluate(() => window.SENDA_FIRE.assets);
+await C.page.screenshot({ path: resolve(outDir, 'e2e-16-incendio.png'), fullPage: true });
+const byId = Object.fromEntries(fireRes.map((a) => [a.id, a]));
+check('Incendio sin red: la antena de Valdeolmos cae antes de su hora límite (aviso adelantado), Navalcerro se avisa a su hora y Hoyarrubia queda fuera de alcance',
+  byId.A.antennaFirst && byId.A.commsLossMin < byId.A.deadlineMin && !byId.B.antennaFirst && byId.C.status === 'FUERA_DE_ALCANCE',
+  { gapMin: Math.round(byId.A.deadlineMin - byId.A.commsLossMin) });
+
 // ---- Vigilancia ferroviaria (sin red)
 await C.page.goto(base + '/via');
 await C.page.waitForFunction(() => window.SENDA_RAIL, null, { timeout: 20000 });
@@ -267,12 +289,12 @@ const a11y = async (page) => page.evaluate(() => {
   return issues;
 });
 const a11yIssues = {};
-for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/estado']) {
+for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado']) {
   await R.goto(base + path); await R.waitForLoadState('load'); await R.waitForTimeout(300);
   const iss = await a11y(R); if (iss.length) a11yIssues[path || '/'] = iss;
 }
 await R.close();
-check('Accesibilidad automática en las 7 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
+check('Accesibilidad automática en las 9 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
 
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 

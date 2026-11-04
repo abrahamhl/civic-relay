@@ -2,10 +2,10 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-04T09:55:26.656Z",
-  "durationS": 33.3,
-  "passed": 25,
-  "total": 25,
+  "at": "2026-11-04T11:01:50.013Z",
+  "durationS": 93.6,
+  "passed": 27,
+  "total": 27,
   "results": [
     {
       "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
@@ -96,6 +96,31 @@
       "planTop": "csi-p2"
     },
     {
+      "name": "Ojo de SENDA sin red: 7 casos reales, satélite visible con elevación, distancia y latencia calculadas, y plan k-de-n ≥99 % con los canales que quedan",
+      "ok": true,
+      "path": {
+        "sat": "Iridium 2-5",
+        "elevationDeg": 24.8,
+        "rangeKm": 1546,
+        "delayMs": 5.16
+      },
+      "plan": {
+        "k": 6,
+        "n": 14,
+        "p": 0.9967008916259765
+      },
+      "visible": {
+        "iridium": 2,
+        "galileo": 8,
+        "qo100": 1
+      }
+    },
+    {
+      "name": "Incendio sin red: la antena de Valdeolmos cae antes de su hora límite (aviso adelantado), Navalcerro se avisa a su hora y Hoyarrubia queda fuera de alcance",
+      "ok": true,
+      "gapMin": 107
+    },
+    {
       "name": "Vigilancia ferroviaria sin red: escalón del circuito de vía detectado ≥20 h antes sin alarma del umbral, defectos de vía por los móviles, transición sin supervisión y muro con lluvia",
       "ok": true,
       "leadTimeH": 21.5,
@@ -136,7 +161,7 @@
     {
       "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
       "ok": true,
-      "href": "senda://accion?a=BLE_BEACON&id=73455340a10e4aa6&b=B14&f=3&u=B&bat=100&cmd=XWe2iFJKNjeDq7x5"
+      "href": "senda://accion?a=BLE_BEACON&id=d1efac23ddf8e5b0&b=B14&f=3&u=B&bat=100&cmd=V44-ciIQUn2m7ldS"
     },
     {
       "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",
@@ -151,7 +176,7 @@
       "name": "Red SENDA sin red: reparto k-de-n entre varios portadores ≥99 %, prueba real de pérdida de portadores, catálogo satelital, previsión de apagón con pasarelas y CAP con auditoría que delata alteraciones",
       "ok": true,
       "pDelivery": 0.9909,
-      "trialSuccess": 0.995,
+      "trialSuccess": 0.99,
       "halfDarkAtH": 4,
       "gateways": 5
     },
@@ -168,7 +193,7 @@
       "easy": true
     },
     {
-      "name": "Accesibilidad automática en las 7 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
+      "name": "Accesibilidad automática en las 9 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
       "ok": true,
       "issues": {}
     },

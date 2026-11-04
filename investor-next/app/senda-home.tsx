@@ -33,7 +33,15 @@ const C = {
       ['♿', 'Accesible', 'Modo fácil de tres botones y revisión automática de accesibilidad en cada cambio.', '/senda'],
       ['📱', 'Android y ESP32', 'Baliza Bluetooth, escucha de balizas y barrido Wi-Fi; accesorio para mástil o dron.', 'https://github.com/abrahamhl/civic-relay/tree/master/apps/senda-android'],
       ['🖥️', 'Relé soberano', 'Relé autoalojable en Docker, ciego al contenido, que opera el propio organismo.', 'https://github.com/abrahamhl/civic-relay/tree/master/packages/senda-relay'],
+      ['🌍', 'Ojo de SENDA', 'Globo en tiempo real: Iridium, Galileo y QO-100, los casos reales de España y la ruta de cada aviso hasta el 112, con elevación, distancia y latencia.', '/senda/ojo'],
+      ['🔥', 'Incendio: avisar antes de que caiga la antena', 'Avance del fuego con viento y pendiente, cruzado con las antenas: hasta cuándo se puede avisar por la red móvil y por qué canal después.', '/senda/incendio'],
+      ['🛤️', 'Vigilancia ferroviaria', 'Escalones en circuitos de vía (patrón Adamuz), geometría de vía con móviles, curvas sin supervisión y muros con lluvia.', '/senda/via'],
+      ['👁️', 'Ver lo que no se ve', 'Probabilidad calibrada de personas por vivienda fusionando respuestas, teléfonos, wifi y golpes; «≥98 %» solo con dos fuentes.', '/senda/edificios'],
     ],
+    ojoT: 'Ojo de SENDA: qué satélite ve cada emergencia y cómo llega el aviso',
+    ojoLead: 'Cada punto del globo es un satélite real de su constelación, calculado en tu navegador con el mismo código que usa el enrutador. Los puntos de colores sobre España son casos reales (o, en el incendio, un escenario de demostración). Al elegir uno, SENDA busca el satélite visible con mayor elevación, calcula la distancia y la latencia y traza la ruta del aviso hasta la sala del 112.',
+    ojoPts: [['Iridium · órbita baja (cian)', '66 satélites a ~780 km que cubren todo el planeta. SENDA envía por ellos mensajes cifrados de hasta 340 B con un módem RockBLOCK.'], ['Galileo · órbita media (ámbar)', '24 satélites a 23 222 km: posición precisa y búsqueda y salvamento con enlace de retorno para radiobalizas.'], ['QO-100 · geoestacionario (violeta)', 'Fijo a 25,9° E y siempre visible desde España; radioaficionados con licencia, solo estados públicos firmados.'], ['Casos y módulos', 'Cada caso enlaza a su fuente y a los módulos de SENDA que habrían actuado: alertas firmadas, red multiportador, previsión de apagón, vías, edificios o incendio.']],
+    ojoOpen: 'Abrir el Ojo de SENDA a pantalla completa',
     whoT: 'Para quién',
     who: [['Ciudadanía y víctimas', 'Un canal que sigue funcionando sin red. Nadie figura como víctima sin confirmación.'], ['Coordinadores', 'Imagen operativa por planta y por tren, y alertas dirigidas firmadas.'], ['Cuerpos y fuerzas de seguridad', 'Credenciales institucionales verificables y canales internos separados por organismo.'], ['Servicios de emergencia', 'Informes estructurados en CAP hacia el 112, con auditoría.'], ['Administraciones', 'Continuidad hasta EUCCS, soberanía del relé y código abierto auditable.'], ['Inversores', 'Núcleo difícil de replicar y retorno por licencias institucionales, integración y kits.']],
     vT: 'Verificado por máquina', vCore: 'pruebas del núcleo', vE2e: 'comprobaciones extremo a extremo con la red cortada', vRelay: 'pruebas del relé',
@@ -62,7 +70,15 @@ const C = {
       ['♿', 'Accessible', 'Three-button easy mode and an automatic accessibility check on every change.', '/senda'],
       ['📱', 'Android & ESP32', 'Bluetooth beacon, beacon listening and Wi-Fi sweeps; an accessory for masts or drones.', 'https://github.com/abrahamhl/civic-relay/tree/master/apps/senda-android'],
       ['🖥️', 'Sovereign relay', 'Self-hosted Docker relay, content-blind, run by the agency itself.', 'https://github.com/abrahamhl/civic-relay/tree/master/packages/senda-relay'],
+      ['🌍', 'SENDA Eye', 'Real-time globe: Iridium, Galileo and QO-100, Spain’s real cases and each alert’s route to 112, with elevation, distance and latency.', '/senda/ojo'],
+      ['🔥', 'Wildfire: warn before the mast burns', 'Fire spread with wind and slope, crossed with phone masts: until when the mobile network can warn, and which channel to use after.', '/senda/incendio'],
+      ['🛤️', 'Rail watch', 'Track-circuit steps (Adamuz pattern), track geometry from phones, unsupervised curves and walls under heavy rain.', '/senda/via'],
+      ['👁️', 'Seeing the unseen', 'Calibrated probability of people per flat fusing replies, phones, Wi-Fi and knocks; “≥98 %” only with two sources.', '/senda/edificios'],
     ],
+    ojoT: 'SENDA Eye: which satellite sees each emergency, and how the alert gets through',
+    ojoLead: 'Every dot on the globe is a satellite of its constellation, computed in your browser with the same code the router uses. The coloured markers over Spain are real cases (the wildfire is a demonstration scenario). Pick one and SENDA finds the visible satellite with the highest elevation, computes distance and latency, and traces the alert’s route to the 112 control room.',
+    ojoPts: [['Iridium · low orbit (cyan)', '66 satellites at ~780 km covering the whole planet. SENDA sends encrypted messages of up to 340 B through them with a RockBLOCK modem.'], ['Galileo · medium orbit (amber)', '24 satellites at 23,222 km: precise position and search and rescue with a return link for distress beacons.'], ['QO-100 · geostationary (violet)', 'Fixed at 25.9° E and always visible from Spain; licensed radio amateurs, signed public status only.'], ['Cases and modules', 'Each case links to its source and to the SENDA modules that would have acted: signed alerts, multi-bearer network, blackout forecast, rail, buildings or wildfire.']],
+    ojoOpen: 'Open the SENDA Eye full screen',
     whoT: 'Who it is for',
     who: [['Citizens & victims', 'A channel that keeps working with no network. Nobody is listed as a victim without confirmation.'], ['Coordinators', 'A floor-by-floor and train-by-train operational picture, plus signed targeted alerts.'], ['Police & security forces', 'Verifiable institutional credentials and internal channels separated by agency.'], ['Emergency services', 'Structured CAP reports to the 112 room, with an audit trail.'], ['Public administrations', 'Continuity until EUCCS, a sovereign relay and auditable open source.'], ['Investors', 'A core that is hard to replicate, with revenue from institutional licences, integration and kits.']],
     vT: 'Machine-verified', vCore: 'core tests', vE2e: 'end-to-end checks with the network cut', vRelay: 'relay tests',
@@ -91,7 +107,15 @@ const C = {
       ['♿', 'Toegankelijk', 'Eenvoudige modus met drie knoppen en een automatische toegankelijkheidscontrole bij elke wijziging.', '/senda'],
       ['📱', 'Android & ESP32', 'Bluetooth-baken, bakens beluisteren en wifi-scans; een accessoire voor masten of drones.', 'https://github.com/abrahamhl/civic-relay/tree/master/apps/senda-android'],
       ['🖥️', 'Soevereine relay', 'Zelf gehoste Docker-relay, blind voor de inhoud, beheerd door de organisatie zelf.', 'https://github.com/abrahamhl/civic-relay/tree/master/packages/senda-relay'],
+      ['🌍', 'SENDA-oog', 'Realtime wereldbol: Iridium, Galileo en QO-100, de echte Spaanse gevallen en de route van elk alarm naar 112, met elevatie, afstand en vertraging.', '/senda/ojo'],
+      ['🔥', 'Natuurbrand: waarschuwen voordat de mast brandt', 'Vuurverspreiding met wind en helling, gekruist met gsm-masten: tot wanneer het mobiele netwerk kan waarschuwen en via welk kanaal daarna.', '/senda/incendio'],
+      ['🛤️', 'Spoorbewaking', 'Sprongen in spoorstroomcircuits (Adamuz-patroon), spoorgeometrie via telefoons, bochten zonder bewaking en muren bij zware regen.', '/senda/via'],
+      ['👁️', 'Zien wat je niet ziet', 'Gekalibreerde kans op mensen per woning uit antwoorden, telefoons, wifi en kloppen; “≥98 %” alleen met twee bronnen.', '/senda/edificios'],
     ],
+    ojoT: 'SENDA-oog: welke satelliet elke noodsituatie ziet en hoe het alarm aankomt',
+    ojoLead: 'Elke stip op de wereldbol is een satelliet van zijn constellatie, berekend in je browser met dezelfde code als de router. De gekleurde markeringen boven Spanje zijn echte gevallen (de natuurbrand is een demonstratiescenario). Kies er een en SENDA zoekt de zichtbare satelliet met de hoogste elevatie, berekent afstand en vertraging en tekent de route van het alarm naar de 112-meldkamer.',
+    ojoPts: [['Iridium · lage baan (cyaan)', '66 satellieten op ~780 km die de hele planeet dekken. SENDA stuurt er versleutelde berichten tot 340 B via met een RockBLOCK-modem.'], ['Galileo · middelhoge baan (amber)', '24 satellieten op 23.222 km: nauwkeurige positie en opsporing en redding met terugmeldkanaal voor noodbakens.'], ['QO-100 · geostationair (violet)', 'Vast op 25,9° O en altijd zichtbaar vanuit Spanje; zendamateurs met licentie, alleen ondertekende openbare statussen.'], ['Gevallen en modules', 'Elk geval linkt naar zijn bron en naar de SENDA-modules die zouden hebben ingegrepen: ondertekende alarmen, multidragernetwerk, black-outvoorspelling, spoor, gebouwen of natuurbrand.']],
+    ojoOpen: 'SENDA-oog volledig scherm openen',
     whoT: 'Voor wie',
     who: [['Burgers & slachtoffers', 'Een kanaal dat zonder netwerk blijft werken. Niemand staat als slachtoffer zonder bevestiging.'], ['Coördinatoren', 'Een operationeel beeld per verdieping en per trein, en ondertekende gerichte waarschuwingen.'], ['Politie & veiligheidsdiensten', 'Verifieerbare institutionele bewijzen en interne kanalen per organisatie.'], ['Hulpdiensten', 'Gestructureerde CAP-meldingen naar de meldkamer, met audittrail.'], ['Overheden', 'Continuïteit tot EUCCS, een soevereine relay en controleerbare open source.'], ['Investeerders', 'Een moeilijk te kopiëren kern, met inkomsten uit institutionele licenties, integratie en kits.']],
     vT: 'Machinaal geverifieerd', vCore: 'kerntests', vE2e: 'end-to-end-controles met het netwerk uitgeschakeld', vRelay: 'relay-tests',
@@ -127,6 +151,14 @@ export default function SendaHome({ locale }: { locale: Locale }) {
           <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/senda-film-nl.vtt" default={locale === 'nl'}/>
         </video>
         <p className="sh-note">{c.filmNote}</p>
+      </div>
+
+      <div className="sh-ojo" id="ojo">
+        <h2 className="sh-h2">{c.ojoT}</h2>
+        <p className="sh-lead">{c.ojoLead}</p>
+        <div className="sh-ojo-pts">{c.ojoPts.map(([t, d]) => <div key={t}><b>{t}</b><p>{d}</p></div>)}</div>
+        <iframe src={`/senda/ojo?embed=1${locale === 'es' ? '' : '&lang=en'}`} title={c.ojoT} loading="lazy"/>
+        <p className="sh-note"><a href={`/senda/ojo${locale === 'es' ? '' : '?lang=en'}`}>{c.ojoOpen} →</a></p>
       </div>
 
       <h2 className="sh-h2">{c.gapT}</h2>

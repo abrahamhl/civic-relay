@@ -1,6 +1,6 @@
 /* SENDA Campo · service worker (raíz, alcance /senda): la app entera queda instalada en el teléfono y abre sin red.
    Está en la raíz porque el sitio usa URL limpias (/senda sin barra final). */
-const VERSION = 'senda-campo-v9';
+const VERSION = 'senda-campo-v10';
 const ASSETS = [
   '/senda', '/senda/app.css', '/senda/app.mjs', '/senda/db.mjs', '/senda/audio.mjs', '/senda/icon.svg', '/senda/manifest.webmanifest',
   '/senda/core/b64.mjs', '/senda/core/envelope.mjs', '/senda/core/bundle.mjs', '/senda/core/acoustic-modem.mjs', '/senda/core/zones.mjs', '/senda/core/feeds.mjs',
@@ -8,7 +8,7 @@ const ASSETS = [
   '/senda/edificios', '/senda/vendor/three-0.158.0.min.js', '/senda/core/building-twin.mjs', '/senda/core/building-scenario.mjs', '/senda/core/remote-command.mjs', '/senda/core/rubble.mjs', '/senda/core/roles.mjs',
   '/senda/coord.mjs', '/senda/organismo', '/senda/core/beacon.mjs',
   '/senda/red', '/senda/estado', '/senda/core/erasure.mjs', '/senda/core/bearers.mjs', '/senda/core/satellites.mjs', '/senda/core/blackout.mjs', '/senda/core/drone.mjs', '/senda/core/interop.mjs',
-  '/senda/via', '/senda/core/rail-watch.mjs', '/senda/core/rail-watch-scenario.mjs', '/senda/core/occupancy.mjs', '/senda/core/rescue-scenario.mjs', '/senda/core/vision-layers.mjs', '/senda/core/sensor-fabric.mjs',
+  '/senda/ojo', '/senda/incendio', '/senda/core/wildfire.mjs', '/geo/land-110m.json', '/senda/via', '/senda/core/rail-watch.mjs', '/senda/core/rail-watch-scenario.mjs', '/senda/core/occupancy.mjs', '/senda/core/rescue-scenario.mjs', '/senda/core/vision-layers.mjs', '/senda/core/sensor-fabric.mjs',
 ];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(VERSION).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
