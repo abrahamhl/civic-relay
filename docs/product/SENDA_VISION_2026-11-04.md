@@ -58,6 +58,31 @@ Panel público regenerado desde las pruebas: [`/senda/estado.html`](../../invest
 
 Repositorio identificado: **`bilawalsidhu/gods-eye-view`** (Bilawal Sidhu, ex-Google), globo 3D de inteligencia espacial con fuentes públicas en tiempo real. Su **código es MIT** (reutilizable con atribución); **sus datos no**: el mapa de cables submarinos de TeleGeography (CC BY-NC-SA), las imágenes de Vantor (CC BY-NC) y las APIs de Google Maps y OpenSky restringen el uso comercial. Encaje con SENDA: God's Eye View aporta la **visión de situación** (aviones, barcos, satélites, sismos, incendios) para centros de coordinación; SENDA aporta la **última milla de comunicación sin red**. SENDA ya consume las mismas fuentes abiertas que esa herramienta (USGS, CelesTrak). La integración visual en la consola de coordinación es el siguiente paso, usando solo capas con licencia compatible.
 
+
+## 2 ter. Módulo de incidente ferroviario (v0.3 · 04-11-2026)
+
+**Por qué:** según la cronología publicada del accidente de **Adamuz (Córdoba, 18-01-2026)**, la primera llamada al 112 llegó en torno a 1 minuto después, pero los servicios de emergencia tardaron **≈45 minutos** en saber que había un **segundo tren** (Alvia) descarrilado, porque la información inicial solo llevaba las coordenadas del primero. La asociación de víctimas denunció después fallos de coordinación y comunicación entre servicios. (Fuente: artículo «Accidente ferroviario de Adamuz» y prensa; cifras a contrastar con la investigación oficial. El 28-10-2026 se produjo además el choque de Urda, Toledo.)
+
+| Pieza | Módulo | Qué aporta | Verificación |
+| --- | --- | --- | --- |
+| Detección en cada teléfono | `rail-incident.mjs#detectCrash` | Velocidad previa + impacto + parada brusca y/o vuelco; descarta caída del móvil, frenada y baches | Tests de falsos positivos y E2E en Chromium |
+| «¿Estás bien?» con cuenta atrás | `crashResponsePolicy` + app | 20–30 s; si no responde, informa «sin respuesta» (dato clave para rescate) | E2E: aviso automático sin red |
+| Fusión de cientos de informes | `fuseIncidentReports` | Nº de trenes/emplazamientos, coches prioritarios, atrapados, sin respuesta; texto para el 112 | Tests + panel en vivo `/senda/incidente` |
+| Escenario dos trenes | `rail-scenario.mjs` | Segundo tren identificado en **30–41 s** (8 semillas), también con 5 % de adopción | Tests + página de verificación |
+
+SENDA **no sustituye al 112** ni a AML (que ya envía la posición de quien llama): aporta la **imagen agregada** de los teléfonos de los pasajeros, que hoy no existe.
+
+## 6. Lo que falta para que un Estado lo adopte (por orden de impacto)
+
+1. **Pasarela con el 112 / NG112**: entregar la fusión de incidentes como datos estructurados al centro 112 de cada comunidad (piloto con una comunidad autónoma).
+2. **Acuerdo con operadores ferroviarios** (Adif, Renfe, Iryo, Ouigo): modo viaje activado al validar el billete, número de tren y coche automáticos, y manifiesto de pasajeros para reunificación familiar.
+3. **Ficha médica offline compartible** (alergias, medicación, contacto) que el sanitario recibe por sonido o Bluetooth sin desbloquear el teléfono.
+4. **Primeros auxilios guiados sin red** para quien ayuda a otros (hemorragias, RCP), con el recuento de heridos de su coche.
+5. **Reunificación familiar**: «estoy bien» automático a la familia y consulta segura por parte de los familiares, sin colapsar el 112.
+6. **App nativa Android/iOS** con detección en segundo plano y Bluetooth/Wi-Fi Aware (la web ya demuestra la lógica).
+7. **Auditoría de seguridad independiente y DPIA**: requisito para cualquier contratación pública.
+8. **Piloto de campo** con protección civil: simulacro en un tren parado con 50–100 voluntarios y medición del tiempo hasta conocer cada coche.
+
 ## 3. Lo que la física y los sistemas operativos permiten (y cómo lo resolvemos)
 
 | Deseo | Realidad | Solución en SENDA |

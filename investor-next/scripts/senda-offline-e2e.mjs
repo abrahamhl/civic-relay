@@ -106,6 +106,36 @@ check('Tras reiniciar sin red, B conserva sus mensajes (IndexedDB)', true);
 await B.page.click('[data-tab="messages"]'); await B.page.screenshot({ path: resolve(outDir, 'e2e-02-inbox-offline.png'), fullPage: true });
 await C.page.click('[data-tab="messages"]'); await C.page.screenshot({ path: resolve(outDir, 'e2e-03-mule.png'), fullPage: true });
 
+// ---- Modo viaje: accidente detectado por sensores, sin respuesta → aviso automático
+const crashSignal = (opts) => B.page.evaluate((o) => {
+  const G = 9.80665; let s = 3; const n = () => ((s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296 - 0.5) * 0.6;
+  const t0 = performance.now() / 1000, motion = [], gps = [];
+  for (let t = -70; t <= 20; t += 0.05) { const g = o.overturn && t > 1 ? [G, 0, 0] : [0, 0, G]; const m = { t: t0 + t, ax: g[0] + n(), ay: g[1] + n(), az: g[2] + n() }; if (o.impactG && t >= 0 && t < 0.15) { m.ax += o.impactG * G * 0.6; m.ay += o.impactG * G * 0.8; } motion.push(m); }
+  for (let t = -70; t <= 20; t += 1) gps.push({ t: t0 + t, speed: o.speed && t < 0 ? o.speed : o.speed && o.stopS ? Math.max(0, o.speed * (1 - t / o.stopS)) : 0, lat: 37.995, lon: -4.53, heading: 45, accuracy: 20 });
+  window.SENDA_TEST.countdownS = 2;
+  return window.SENDA_TEST.tripFeed({ motion, gps, train: 'Tren 2384 (prueba)', coach: '6' });
+}, opts);
+const drop = await crashSignal({ impactG: 8 });
+check('Modo viaje: una caída del móvil NO dispara alarma', drop.state === 'PHONE_DROP' && (await B.page.isHidden('#crash')));
+const crash = await crashSignal({ impactG: 7, overturn: true, speed: 55, stopS: 3 });
+const overlay = await B.page.isVisible('#crash');
+await B.page.screenshot({ path: resolve(outDir, 'e2e-04-crash-prompt.png') });
+await B.page.waitForFunction(() => window.SENDA_TEST.lastIncident() !== null, null, { timeout: 8000 });
+const inc = await B.page.evaluate(() => window.SENDA_TEST.lastIncident());
+check('Modo viaje: vuelco a 200 km/h → «¿Estás bien?» y, sin respuesta, aviso automático', crash.state === 'CRASH_LIKELY' && overlay && inc.status === 'NO_RESPONSE' && inc.coach === '6', { detection: crash.state, peakG: crash.peakG, tiltDeg: crash.tiltDeg });
+await A.page.evaluate((t) => window.SENDA_TEST.receiveText(t), await B.page.evaluate(() => window.SENDA_TEST.exportBundle()));
+await A.page.click('[data-tab="zone"]');
+const brief = await A.page.textContent('#incidents');
+check('El contacto recibe el aviso de accidente cifrado sin red y lo ve legible', (await A.page.evaluate(() => window.SENDA_TEST.state.inbox.some((m) => m.incident?.status === 'NO_RESPONSE'))) && brief !== 'Sin informes.' && /informe|SITIO/.test(brief), { brief });
+await A.page.screenshot({ path: resolve(outDir, 'e2e-05-incident-received.png'), fullPage: true });
+
+// ---- Panel de coordinación sin red (precargado por el service worker)
+await C.page.goto(base + '/incidente');
+await C.page.waitForFunction(() => window.SENDA_PANEL?.sim?.secondTrainKnownS != null, null, { timeout: 15000 });
+const panel = await C.page.evaluate(() => ({ s: window.SENDA_PANEL.sim.secondTrainKnownS, sites: window.SENDA_PANEL.sim.final.sites.length }));
+check('Panel de coordinación abre sin red y separa los 2 trenes en segundos', panel.sites === 2 && panel.s < 90, { secondTrainKnownS: panel.s });
+await C.page.setViewportSize({ width: 1280, height: 900 }); await C.page.screenshot({ path: resolve(outDir, 'e2e-06-coordination-panel.png'), fullPage: true });
+
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 
 await browser.close(); server.close();

@@ -29,3 +29,11 @@ canvas{width:100%;height:60px;margin-top:10px;background:#071018;border-radius:1
 #toast.show{opacity:1}
 dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:16px;max-width:520px;width:92vw}dialog::backdrop{background:rgba(0,0,0,.6)}
 menu{display:flex;gap:8px;justify-content:flex-end;padding:0;margin:12px 0 0}
+
+#crash{position:fixed;inset:0;z-index:20;background:rgba(40,4,8,.92);display:flex;align-items:center;justify-content:center;padding:16px}
+#crash[hidden]{display:none}
+.crash-box{max-width:520px;width:100%;background:var(--panel);border:2px solid var(--red);border-radius:20px;padding:20px;text-align:center}
+.crash-box h2{font-size:30px;margin:4px 0}.count{font-size:64px;font-weight:900;color:var(--red);line-height:1}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}.opts button{min-height:56px;font-weight:700}
+.opts button[data-st=OK]{background:#103524;border-color:var(--em)}.opts button[data-st=TRAPPED],.opts button[data-st=INJURED_SERIOUS]{background:#3a1018;border-color:var(--red)}
+pre.brief{white-space:pre-wrap;font:12px ui-monospace,monospace;color:var(--ice);background:#071018;border:1px solid var(--line);border-radius:10px;padding:10px}

@@ -8,6 +8,7 @@ import { generateIdentity, exportIdentity, importIdentity, sealMessage, openMess
 import { createBundleStore, exportBundleFile, importBundleFile } from './core/bundle.mjs';
 import { parseUsgs, SOURCES } from './core/feeds.mjs';
 import { zoneFromQuake, relayActivation, createConsentProfile } from './core/zones.mjs';
+import { detectCrash, crashResponsePolicy, buildIncidentReport, fuseIncidentReports, emergencyBrief, G } from './core/rail-incident.mjs';
 import * as kv from './db.mjs';
 import { emit, listen, decodeSamples } from './audio.mjs';
 
@@ -76,7 +77,9 @@ async function receiveEnvelope(env, via) {
     if (S.inbox.some((m) => m.id === env.header.id)) return toast('Ya lo tenías (duplicado descartado)');
     const m = await openMessage({ recipient: S.me, envelope: env, now: now() });
     const sender = S.contacts.find((c) => c.signPub.x === m.from.x && c.signPub.y === m.from.y);
-    S.inbox.unshift({ id: env.header.id, from: sender?.name ?? 'Desconocido (firma válida)', body: m.body, kind: env.header.kind, at: now(), via });
+    let incident = null;
+    if (typeof m.body === 'string' && m.body.startsWith(INCIDENT_PREFIX)) { try { incident = JSON.parse(m.body.slice(INCIDENT_PREFIX.length).split('\n')[0]); } catch { /* texto libre */ } }
+    S.inbox.unshift({ id: env.header.id, from: sender?.name ?? 'Desconocido (firma válida)', body: incident ? humanIncident(incident) : m.body, kind: env.header.kind, at: now(), via, incident });
     await S.store.acceptReceipt(m.receipt); // el recibo viajará y borrará copias en otros teléfonos
     await persist(); render(); return toast(`Mensaje de ${sender?.name ?? 'desconocido'} vía ${via}`);
   }
@@ -166,6 +169,72 @@ async function sos() {
   await persist(); render(); toast(`SOS cifrado para ${S.contacts.length} contacto(s). Emítelo o compártelo ya.`, 5000); show('transfer');
 }
 
+
+/* ---------------- modo viaje: detección de accidente ---------------- */
+const INCIDENT_PREFIX = 'SENDA-INCIDENTE ';
+const STATUS_ES = { OK: 'está bien', HELPING_OTHERS: 'está bien y ayuda a otros', NEED_HELP: 'NECESITA AYUDA', INJURED_SERIOUS: 'HERIDO GRAVE', TRAPPED: 'ATRAPADO', NO_RESPONSE: 'SIN RESPUESTA tras el impacto' };
+const humanIncident = (r) => `🚨 Accidente${r.train ? ' en ' + r.train : ''}${r.coach ? ', coche ' + r.coach : ''}: ${STATUS_ES[r.status]}${r.nearbyInjured ? ` · ${r.nearbyInjured} herido(s) cerca` : ''} · ${r.lat.toFixed(5)},${r.lon.toFixed(5)}`;
+S.trip = { active: false, motion: [], gps: [], pending: false, watch: null };
+const tnow = () => performance.now() / 1000;
+
+function onMotion(e) {
+  const a = e.accelerationIncludingGravity; if (!a || a.x == null) return;
+  const s = { t: tnow(), ax: a.x, ay: a.y, az: a.z };
+  S.trip.motion.push(s); const cut = s.t - 120; while (S.trip.motion.length && S.trip.motion[0].t < cut) S.trip.motion.shift();
+  if (!S.trip.pending && Math.abs(Math.hypot(s.ax, s.ay, s.az) - G) / G >= 2.5) { S.trip.pending = true; setTimeout(evaluateCrash, 9000); }
+}
+function onGps(p) {
+  const c = p.coords; S.pos = { lat: c.latitude, lon: c.longitude };
+  S.trip.gps.push({ t: tnow(), speed: c.speed ?? 0, lat: c.latitude, lon: c.longitude, heading: c.heading, accuracy: c.accuracy });
+  const cut = tnow() - 300; while (S.trip.gps.length && S.trip.gps[0].t < cut) S.trip.gps.shift();
+}
+
+async function toggleTrip() {
+  if (S.trip.active) {
+    removeEventListener('devicemotion', onMotion); if (S.trip.watch != null) navigator.geolocation.clearWatch(S.trip.watch);
+    S.trip.active = false; $('#trip-toggle').textContent = 'Activar'; $('#trip-state').textContent = 'Modo viaje desactivado.'; return;
+  }
+  try { if (typeof DeviceMotionEvent?.requestPermission === 'function') await DeviceMotionEvent.requestPermission(); } catch { /* iOS rechazado */ }
+  addEventListener('devicemotion', onMotion);
+  if (navigator.geolocation) S.trip.watch = navigator.geolocation.watchPosition(onGps, () => {}, { enableHighAccuracy: true, maximumAge: 1000 });
+  S.trip.train = $('#trip-train').value.trim() || null; S.trip.coach = $('#trip-coach').value.trim() || null;
+  S.trip.active = true; $('#trip-toggle').textContent = 'Desactivar';
+  $('#trip-state').textContent = `Vigilando${S.trip.train ? ' ' + S.trip.train : ''}${S.trip.coach ? ', coche ' + S.trip.coach : ''}. Funciona sin red; mantén la app abierta.`;
+}
+
+async function evaluateCrash() {
+  const det = detectCrash({ motion: S.trip.motion, gps: S.trip.gps });
+  const pol = crashResponsePolicy(det);
+  if (!pol.prompt) { S.trip.pending = false; return det; }
+  showCrashPrompt(det, pol); return det;
+}
+
+function showCrashPrompt(det, pol) {
+  const box = $('#crash'); box.hidden = false;
+  $('#crash-why').textContent = det.reasons.join(' · ');
+  $('#crash-opts').innerHTML = pol.options.map(([k, label]) => `<button data-st="${k}">${label}</button>`).join('');
+  let left = window.SENDA_TEST.countdownS ?? pol.countdownS; $('#crash-count').textContent = left;
+  if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 400]);
+  const finish = (status) => { clearInterval(timer); box.hidden = true; S.trip.pending = false; sendIncident(det, status).catch((e) => toast(e.message)); };
+  const timer = setInterval(() => { left--; $('#crash-count').textContent = left; if (left <= 0) finish(pol.onTimeout); }, 1000);
+  $('#crash-opts').onclick = (e) => { const b = e.target.closest('[data-st]'); if (b) finish(b.dataset.st); };
+}
+
+async function sendIncident(det, status) {
+  const last = S.trip.gps[S.trip.gps.length - 1] ?? {};
+  const before = S.trip.gps.filter((f) => det.at == null || f.t <= det.at).pop() ?? last;
+  const report = buildIncidentReport({ reporterId: S.me.publicIdentity.fingerprint, detection: det, status, at: now() / 1000,
+    position: { lat: last.lat ?? S.pos?.lat ?? 0, lon: last.lon ?? S.pos?.lon ?? 0, accuracyM: last.accuracy, headingDeg: before.heading ?? null, speedBeforeMs: before.speed ?? null },
+    trip: { train: S.trip.train, coach: S.trip.coach }, nearbyInjured: +$('#crash-near').value || 0 });
+  const body = INCIDENT_PREFIX + JSON.stringify(report); // compacto: el receptor lo muestra legible
+  const urgent = status !== 'OK' && status !== 'HELPING_OTHERS';
+  for (const c of S.contacts) S.store.put(await sealMessage({ sender: S.me, recipient: c, body, priority: urgent ? 0 : 3, ttlS: 3 * 86400, now: now(), kind: urgent ? 'SOS' : 'HUMAN_STATUS' }), { now: now(), copies: 16 });
+  S.lastIncident = report; await persist(); render();
+  toast(urgent ? 'Aviso de accidente cifrado para tus contactos. Emítelo o compártelo; viaja también por otros teléfonos.' : 'Aviso «estoy bien» preparado para tu familia.', 6000);
+  if (urgent) show('transfer');
+  return report;
+}
+
 /* ---------------- render ---------------- */
 function render() {
   if (!S.me) return;
@@ -178,6 +247,8 @@ function render() {
   const act = relayActivation({ zones: S.zones, position: S.pos ?? { lat: 0, lon: 0 }, consent: S.consent, now: now() });
   $('#relay-state').textContent = { OFF: 'Fuera de zona declarada', STANDBY: 'En espera', RELAY_ACTIVE: 'Relé ACTIVO' }[act.mode] + ' — ' + act.reason;
   $('#relay-consent').checked = !!S.consent?.relayInDeclaredZones;
+  const incidents = S.inbox.filter((m) => m.incident).map((m) => m.incident);
+  $('#incidents').textContent = incidents.length ? emergencyBrief(fuseIncidentReports(incidents)) || `${incidents.length} informe(s); hacen falta 2 por emplazamiento para fusionar.` : 'Sin informes.';
   $('#zones').innerHTML = S.zones.slice(0, 20).map((z) => `<li><b>${esc(z.event)}</b><div class="meta">${z.provider} · radio ${z.circle.radiusKm} km (modelo) · hasta ${new Date(z.expiresAt).toLocaleString()}</div></li>`).join('') || '<li class="fine">Sin zonas guardadas.</li>';
 }
 
@@ -193,6 +264,7 @@ document.addEventListener('click', (e) => {
 });
 $('#send').addEventListener('click', () => sendMessage().catch((e) => toast(e.message)));
 $('#sos').addEventListener('click', () => sos().catch((e) => toast(e.message)));
+$('#trip-toggle').addEventListener('click', () => toggleTrip().catch((e) => toast(e.message)));
 $('#relay-consent').addEventListener('change', async (e) => { S.consent = createConsentProfile({ ...(S.consent ?? { termsVersion: 'senda-campo-1' }), acceptedAt: new Date().toISOString(), relayInDeclaredZones: e.target.checked }); await persist(); render(); });
 for (const id of ['#card-file', '#bundle-file']) $(id).addEventListener('change', async (e) => { for (const f of e.target.files) await receiveText(await f.text(), 'archivo').catch((err) => toast(err.message)); e.target.value = ''; });
 addEventListener('online', netBadge); addEventListener('offline', netBadge); netBadge();
@@ -210,4 +282,7 @@ Object.assign(window.SENDA_TEST, {
   myCard: () => 'SENDA:' + b64(packContact(S.me.publicIdentity, S.name)),
   exportBundle: () => exportBundleFile(S.store, { now: now() }),
   emitTop: () => ACTIONS.emit(),
+  countdownS: null,
+  tripFeed: async ({ motion, gps, train = null, coach = null }) => { S.trip = { ...S.trip, active: true, motion, gps, train, coach, pending: true }; return evaluateCrash(); },
+  lastIncident: () => S.lastIncident ?? null,
 });

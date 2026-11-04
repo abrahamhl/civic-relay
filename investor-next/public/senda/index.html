@@ -31,6 +31,10 @@
     <div class="card me"><div><small>Tú</small><h2 id="me-name"></h2><code id="me-fp"></code></div></div>
     <button id="sos" class="sos">SOS</button>
     <p class="fine center">Envía tu posición y «necesito ayuda» a tus contactos de emergencia por todos los caminos disponibles.</p>
+    <div class="card" id="trip-card"><h3>🚆 Modo viaje</h3>
+      <p class="fine">Si el tren o el autobús sufre un accidente, SENDA lo detecta (impacto + parada brusca o vuelco), te pregunta si estás bien y, si no respondes, avisa solo a tus contactos y a quien coordine.</p>
+      <div class="row"><input id="trip-train" placeholder="Tren o línea (opcional)" style="flex:2"><input id="trip-coach" placeholder="Coche" inputmode="numeric" style="max-width:96px"><button id="trip-toggle" class="primary">Activar</button></div>
+      <p id="trip-state" class="fine"></p></div>
     <div class="grid3">
       <div class="stat"><b id="st-inbox">0</b><small>recibidos</small></div>
       <div class="stat"><b id="st-carry">0</b><small>transportando</small></div>
@@ -77,6 +81,8 @@
 
   <section id="zone" class="view" hidden>
     <h2>Zona de emergencia</h2>
+    <div class="card"><h3>🚨 Incidentes recibidos</h3><p class="fine">Informes de accidente que te han llegado (cifrados, solo tú los lees), fusionados por tren y coche.</p><pre id="incidents" class="brief">Sin informes.</pre>
+      <p><a href="/senda/incidente">Ver el panel de coordinación (simulación de dos trenes)</a></p></div>
     <div class="card"><h3>Modo relé</h3><p id="relay-state" class="big"></p>
       <label class="check"><input type="checkbox" id="relay-consent"> Preautorizo transportar mensajes cifrados de otros en zonas declaradas.</label></div>
     <div class="card"><h3>Alertas y sismos</h3><p class="fine">Con red, SENDA descarga los sismos del USGS y los guarda para usarlos sin conexión.</p>
@@ -87,6 +93,12 @@
 <nav class="tabs" id="tabs" hidden>
   <button data-tab="home">Inicio</button><button data-tab="contacts">Contactos</button><button data-tab="messages">Mensajes</button><button data-tab="transfer">Transferir</button><button data-tab="zone">Zona</button>
 </nav>
+<div id="crash" hidden role="alertdialog" aria-labelledby="crash-title"><div class="crash-box">
+  <h2 id="crash-title">¿Estás bien?</h2><p id="crash-why" class="fine"></p>
+  <div id="crash-count" class="count">30</div><p class="fine">Si no respondes, SENDA avisará automáticamente.</p>
+  <div id="crash-opts" class="opts"></div>
+  <label>Heridos cerca de ti <input id="crash-near" type="number" min="0" max="50" value="0" inputmode="numeric"></label>
+</div></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <dialog id="dlg"><form method="dialog"><p id="dlg-text"></p><textarea id="dlg-input" rows="4"></textarea><menu><button value="cancel">Cancelar</button><button value="ok" class="primary">Aceptar</button></menu></form></dialog>
 <script type="module" src="/senda/app.mjs"></script>

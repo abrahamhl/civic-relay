@@ -2,10 +2,10 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-04T02:49:04.903Z",
-  "durationS": 4.2,
-  "passed": 10,
-  "total": 10,
+  "at": "2026-11-04T03:10:35.395Z",
+  "durationS": 6.9,
+  "passed": 14,
+  "total": 14,
   "results": [
     {
       "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
@@ -44,6 +44,27 @@
     {
       "name": "Tras reiniciar sin red, B conserva sus mensajes (IndexedDB)",
       "ok": true
+    },
+    {
+      "name": "Modo viaje: una caída del móvil NO dispara alarma",
+      "ok": true
+    },
+    {
+      "name": "Modo viaje: vuelco a 200 km/h → «¿Estás bien?» y, sin respuesta, aviso automático",
+      "ok": true,
+      "detection": "CRASH_LIKELY",
+      "peakG": 6.06,
+      "tiltDeg": 90
+    },
+    {
+      "name": "El contacto recibe el aviso de accidente cifrado sin red y lo ve legible",
+      "ok": true,
+      "brief": "1 informe(s); hacen falta 2 por emplazamiento para fusionar."
+    },
+    {
+      "name": "Panel de coordinación abre sin red y separa los 2 trenes en segundos",
+      "ok": true,
+      "secondTrainKnownS": 34
     },
     {
       "name": "Sin errores de JavaScript en los 3 teléfonos",
