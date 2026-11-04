@@ -1,3 +1,15 @@
+# SENDA — Sistema de Enrutamiento de Emergencia por canales alternativos
+
+*(antes Civic Relay / OEP)* · **Si existe un camino hasta tu gente, SENDA lo encuentra.**
+
+SENDA hace llegar un mensaje **antes que WhatsApp** cuando la red cae: combina vecinos con la app (Bluetooth, Wi-Fi Direct), quien tenga Internet por satélite u otro operador, SMS, satélites directos al móvil y gateways, y elige en cada momento la ruta más rápida. Cuando una autoridad declara una zona de emergencia (o la red de teléfonos detecta un sismo corroborado), los teléfonos con SENDA pasan a **modo relé preautorizado**. Incluye coordinación de familias e instituciones (policía, bomberos, protección civil), puente para personas atrapadas bajo escombros y localización de víctimas con realidad aumentada y Wi-Fi CSI.
+
+- **Visión vigente:** [docs/product/SENDA_VISION_2026-11-04.md](docs/product/SENDA_VISION_2026-11-04.md)
+- **Núcleo:** [`packages/senda`](packages/senda) — `pnpm --filter @senda/core test` · `pnpm --filter @senda/core evidence`
+- **Evidencia de escenarios:** [`evidence/senda/scenarios.json`](evidence/senda/scenarios.json)
+
+---
+
 # OEP / Civic Relay — Offline Emergency Protocol
 
 **Plataforma europea modular de anticipación de riesgos, continuidad de comunicaciones y coordinación de personas, equipos e infraestructuras.** Civic Relay persigue esta visión mediante OEP, adaptadores autorizados y una cadena de evidencia que distingue observación, predicción, custodia y confirmación. El software actual es un laboratorio de investigación; el programa completo requiere validación física y socios.
