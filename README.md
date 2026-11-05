@@ -86,6 +86,7 @@ Servir la demo estática desde `apps/web/dist`. La API y el servicio reales **no
 ## Documentación
 
 - [`docs/funding/RUTAS_FINANCIACION_Y_PROMOCION_2026-11.md`](docs/funding/RUTAS_FINANCIACION_Y_PROMOCION_2026-11.md) – rutas de financiación, promoción y certificación (2026-11-05) · [reel 60 s](media/civic-relay-reel-60s.mp4)
+- [`docs/funding/ESTRATEGIA_ES_NL_PROTECCION_Y_FOCO_2026-11.md`](docs/funding/ESTRATEGIA_ES_NL_PROTECCION_Y_FOCO_2026-11.md) – estrategia España + Países Bajos, protección del nombre y foco · [`TRADEMARKS.md`](TRADEMARKS.md)
 
 ### Producto, Arquitectura 3D Mission Control y Sector Intelligence (2026-10-22)
 - [`docs/product/VOICE_VISION_REQUIREMENTS_2026-10-22.md`](docs/product/VOICE_VISION_REQUIREMENTS_2026-10-22.md) – transcripción íntegra con marcas temporales (`00:00`–`06:33.59`) de la visión original del fundador, matriz funcional (`V01..V13`, `W01..W03`) y contraste con el código
