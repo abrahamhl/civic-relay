@@ -116,7 +116,7 @@ function walk(dir, base = dir, acc = []) {
   return acc;
 }
 const commit = (() => { try { return sh('git rev-parse --short HEAD'); } catch { return 'sin-git'; } })();
-const dirty = (() => { try { return sh('git status --porcelain').length > 0; } catch { return false; } })();
+const dirty = (() => { try { return sh("git status --porcelain -- . ':!entrega'").length > 0; } catch { return false; } })();
 rmSync(ZIPS, { recursive: true, force: true }); mkdirSync(ZIPS, { recursive: true });
 
 const web = walk(OUT).map((name) => ({ name, path: join(OUT, name) }));
