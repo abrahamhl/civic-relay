@@ -29,6 +29,8 @@
 - La respiración por Wi-Fi a través de muros no tiene validación independiente.
 - Interrogar aerogeneradores u otra infraestructura ajena queda en NUNCA; usarlos como marcas visibles es PASIVO.
 
+**Vídeo de capacidades (español, 4:13):** grabado fotograma a fotograma desde las propias páginas en modo película (`media/senda-film/features.json`); publicado en `/senda/arquitectura` con subtítulos.
+
 **Auditoría:** `docs/evaluacion/AUDITORIA_5_PERSPECTIVAS_2026-11-05.md` (TRL por capacidad, 5 perspectivas simuladas, huecos, multiplataforma, infraestructura, modelo de negocio, 90 días).
 
 **Validación:** núcleo + relé 146/146 · E2E en Chromium 37/37 (accesibilidad en 17 pantallas) · web: compilación, idiomas y 98/98.
