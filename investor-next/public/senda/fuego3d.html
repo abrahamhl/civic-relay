@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Incendio en 3D</title>
+<meta name="description" content="Incendio de San Martín de Valdeiglesias (23-07-2026) en 3D con datos reales: terreno Copernicus, imágenes Sentinel-2 y meteorología GFS del día. Viento 3D con conservación de masa calculado en el navegador, pluma que aspira aire, humo, pavesas, cámaras con oclusión del relieve, coches como estación meteorológica y pasada de un avión de extinción.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+<script src="/senda/vendor/three-0.158.0.min.js"></script>
+<style>
+.stage{position:relative;border-radius:12px;overflow:hidden;background:#0d1a22}
+#c3{width:100%;height:min(72vh,720px);display:block;touch-action:none;border-radius:0;cursor:grab}
+.hud{position:absolute;left:10px;top:10px;background:rgba(5,9,12,.82);border:1px solid var(--l);border-radius:10px;padding:8px 10px;font-size:12.5px;max-width:300px;pointer-events:none}
+.hud b{font-size:14px}.hud .r{display:grid;grid-template-columns:auto auto;gap:2px 10px;margin-top:4px}
+.views{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.views button{min-height:40px;padding:6px 10px;font-size:13px;background:rgba(15,29,39,.9)}
+#syn{position:absolute;right:10px;bottom:10px;width:230px;height:180px;border:1px solid var(--l);border-radius:8px;background:rgba(5,9,12,.85)}
+.layers{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:14px}.layers label{display:flex;align-items:center;gap:6px;min-height:32px}
+.ctl{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;font-size:14px;margin-top:8px}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid}
+@media(max-width:700px){.hud{max-width:58%;font-size:11.5px}#syn{width:150px;height:120px}.views button{min-height:36px;font-size:12px;padding:4px 8px}}
+</style>
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/fuego">Seguimiento 2D</a> · <a href="/senda/incendio">Frente de llama</a> · <a href="/senda/arquitectura">Arquitectura</a></p>
+<h1>El incendio en 3D, con datos reales</h1>
+<p class="lead m">Terreno <b>real</b> (Copernicus, 30 m), imágenes <b>reales</b> de Sentinel-2 antes, durante y después del incendio, y la meteorología <b>real</b> del 23-07-2026 (GFS). Encima, el navegador calcula el <b>viento en 3D</b> sobre el relieve conservando la masa. También calcula la <b>pluma</b> que aspira aire, el humo y las pavesas, lo que ve cada <b>cámara</b>, los <b>coches</b> que miden el viento y el efecto de un <b>avión</b>. Todo funciona sin conexión.</p>
+
+<section class="card" data-viz="fuego3d" style="margin-top:14px;padding:10px" aria-labelledby="h-3d">
+  <h2 id="h-3d" style="margin:4px 6px 8px">🛰️ San Martín de Valdeiglesias · 23 y 24-07-2026</h2>
+  <div class="stage">
+    <canvas id="c3" tabindex="0" aria-label="Vista 3D del terreno real con la imagen de satélite, el frente del incendio, el viento, la pluma de humo, las cámaras y los coches. Un dedo mueve el mapa; dos dedos acercan, giran e inclinan; con teclado, flechas, + y −, Q y E para girar, W y S para inclinar"></canvas>
+    <div class="hud" id="hud" aria-live="polite"></div>
+    <div class="views" role="group" aria-label="Vistas">
+      <button id="v-top" aria-label="Vista cenital">⬇ Cenital</button><button id="v-tilt" aria-label="Vista inclinada">◢ 3D</button><button id="v-hor" aria-label="Vista horizontal">➖ Horizonte</button><button id="v-n" aria-label="Norte arriba">N ↑</button><button id="v-fire" aria-label="Centrar en el fuego">🔥</button>
+    </div>
+    <canvas id="syn" aria-label="Mapa sinóptico real: isobaras de presión a nivel del mar, temperatura a 2 m y viento a 10 m del modelo GFS sobre el centro peninsular"></canvas>
+  </div>
+  <div class="row"><button id="play" class="p" aria-pressed="false">▶ Reproducir</button><label for="t" class="m" style="font-size:13px">Tiempo</label><input id="t" type="range" min="0" max="1220" step="5" value="180" aria-label="Minutos desde la ignición calibrada"><b id="t-l" style="min-width:150px"></b></div>
+  <div class="layers" role="group" aria-label="Capas">
+    <label><select id="img" aria-label="Imagen de satélite"><option value="pre">Sentinel-2 16-07 (antes)</option><option value="d0724">Sentinel-2 24-07 (durante)</option><option value="d0729" selected>Sentinel-2 29-07</option><option value="d0808">Sentinel-2 08-08 (después)</option></select></label>
+    <label><input type="checkbox" id="l-sev"> Gravedad dNBR (real)</label>
+    <label><input type="checkbox" id="l-scar" checked> Cicatrices reales 24-07 / 29-07 / 08-08</label>
+    <label><input type="checkbox" id="l-front" checked> Frente simulado</label>
+    <label><input type="checkbox" id="l-prob"> Probabilidad</label>
+    <label><input type="checkbox" id="l-wind" checked> Viento 3D</label>
+    <label><input type="checkbox" id="l-smoke" checked> Pluma y humo</label>
+    <label><input type="checkbox" id="l-ember" checked> Pavesas</label>
+    <label><input type="checkbox" id="l-xsec"> Corte de la masa de aire</label>
+    <label><input type="checkbox" id="l-cam" checked> Cámaras</label>
+    <label><input type="checkbox" id="l-car" checked> Coches-estación</label>
+    <label><input type="checkbox" id="l-lab" checked> Rótulos</label>
+  </div>
+  <div class="ctl">
+    <label for="exag">Exageración vertical</label><input id="exag" type="range" min="1" max="3" step="0.25" value="1.5"><output id="o-exag">1,5×</output>
+    <label for="q">Potencia del frente</label><input id="q" type="range" min="0" max="30" step="0.5" value="14.5"><output id="o-q">14,5 GW</output>
+    <label for="pset">Probabilidad</label><select id="pset"><option value="1">tras asimilar la cicatriz del 24-07</option><option value="0">sin asimilar (modelo tal cual)</option></select><span></span>
+  </div>
+  <div class="row"><button id="cam1">📷 Desde la cámara 1</button><button id="cam2">📷 Cámara 2</button><button id="cam3">📷 Cámara 3</button><button id="plane">✈️ Pasada de un CL-415</button><button id="heli">🚁 Helicóptero en estacionario</button></div>
+  <p class="src" id="status">Cargando datos reales…</p>
+</section>
+
+<div class="g2">
+  <section class="card" aria-labelledby="h-am"><h2 id="h-am">🌡️ La masa de aire del día (GFS real, punto de inicio)</h2><div class="tw"><table><thead><tr><th>UTC</th><th>T</th><th>HR</th><th>Viento</th><th>Racha</th><th>Capa de mezcla</th><th>Densidad</th><th>Haines</th></tr></thead><tbody id="am"></tbody></table></div>
+  <p class="m" style="font-size:13.5px">A las 15 UTC: 36 °C, 7 % de humedad, capa de mezcla de casi 2 km e <b>índice de Haines 6, el máximo</b>, con potencial de crecimiento dominado por la columna. El aire es un 15 % menos denso que el estándar. Por la noche el viento rola al noroeste y se calma.</p></section>
+  <section class="card" aria-labelledby="h-val"><h2 id="h-val">📏 ¿Acierta el modelo? Comparado con la cicatriz real</h2><div id="val" style="font-size:14px"></div></section>
+</div>
+<div class="g2">
+  <section class="card" aria-labelledby="h-sens"><h2 id="h-sens">🚗 Coches, móviles y cámaras como estación meteorológica</h2><div id="sens" style="font-size:14px"></div></section>
+  <section class="card" aria-labelledby="h-air"><h2 id="h-air">✈️ Aviones, helicópteros y descargas</h2><div id="air" style="font-size:14px"></div></section>
+</div>
+<section class="card" style="margin-top:14px" aria-labelledby="h-how"><h2 id="h-how">🧮 Qué calcula y con qué</h2>
+  <ul class="m" style="font-size:14px">
+    <li><b>Viento 3D:</b> el perfil real de GFS se descompone sobre una malla de voxels del terreno y se corrige lo mínimo para que no se cree ni se destruya aire (∇·u = 0). Es el método variacional de WindNinja, con el relieve como pared. El viento rodea y remonta las sierras.</li>
+    <li><b>Pluma:</b> flujo de flotabilidad de Briggs con la potencia del frente y la estabilidad real. Se impone la corriente ascendente y la conservación de masa crea sola la aspiración de aire hacia el fuego.</li>
+    <li><b>Humo y pavesas:</b> partículas transportadas por el campo 3D, con turbulencia; las pavesas caen a 4 m/s y arden 240 s (supuestos).</li>
+    <li><b>Frente:</b> llegada mínima sobre el terreno real con el combustible estimado por Sentinel-2 y el viento de cada hora. Calibrado con la cicatriz del 24-07; sin calibrar, el modelo falla, y se dice.</li>
+    <li><b>Cámaras:</b> en las cumbres más altas a 10-16 km. Desde ninguna se ve la base del fuego, porque la tapa el relieve, pero sí la columna. Por eso se triangula la columna en 3D.</li>
+  </ul>
+  <p class="src">Fuentes y licencias: Copernicus DEM GLO-30 (© DLR e.V. 2010-2014 y © Airbus Defence and Space GmbH 2014-2018, en el marco de COPERNICUS de la UE y la ESA); contiene datos modificados de Copernicus Sentinel (2026); NOAA GFS 0,25° (dominio público). Todo descargado de AWS Open Data. Procesado reproducible en <code>scripts/datos-reales/</code> y <code>packages/senda/scripts/fire3d-real.mjs</code>. Núcleo: <code>atmos3d.mjs</code>, <code>fire-field.mjs</code> y <code>utm.mjs</code>. Paper científico con todas las cifras: <a href="/senda/paper">/senda/paper</a> (y <code>docs/paper/</code>, también en PDF).</p>
+</section>
+</main>
+<script type="module">
+import { $, FILM } from '/senda/kit.mjs';
+import * as A from '/senda/core/atmos3d.mjs';
+import { pixelRay } from '/senda/core/fire-field.mjs';
+import { toUtm, fromUtm } from '/senda/core/utm.mjs';
+import { CASE_SMV_2026 } from '/senda/core/fire-watch.mjs';
+const S = { ok: false, errors: [] }; window.SENDA_FUEGO3D = S;
+const fmt = (x, d = 0) => (x == null || !Number.isFinite(+x) ? '—' : (+x).toFixed(d).replace('.', ','));
+const LITE = FILM || new URLSearchParams(location.search).get('lite') === '1' || navigator.webdriver;
+try {
+const B = '/senda/data/smv2026/';
+const [meta, gfs, syn, res] = await Promise.all(['real.json', 'gfs_20260723_12z.json', 'gfs_sinoptico.json', 'fire3d.json'].map((f) => fetch(B + f).then((r) => r.json())));
+const [demB, , burnB, probB, arrB] = await Promise.all(['dem_100m.bin', 'fuel_100m.bin', 'burn_100m.bin', 'prob_roi.bin', 'arrival_roi.bin'].map((f) => fetch(B + f).then((r) => r.arrayBuffer())));
+const W = meta.dem.w, H = meta.dem.h, DX = 100, X0 = meta.malla.x0, Y1 = meta.malla.y1, dem = new Int16Array(demB), burn = new Uint8Array(burnB), prob = new Uint8Array(probB), arr = new Uint16Array(arrB), ROI = res.conjunto.roi;
+const zMin = meta.dem.min, CX = X0 + (W * DX) / 2, CY = Y1 - (H * DX) / 2;
+const heightAt = (x, y) => { const fi = (x - X0) / DX - 0.5, fj = (Y1 - y) / DX - 0.5, i = Math.max(0, Math.min(W - 2, Math.floor(fi))), j = Math.max(0, Math.min(H - 2, Math.floor(fj))), a = Math.max(0, Math.min(1, fi - i)), b = Math.max(0, Math.min(1, fj - j)); return (1 - a) * (1 - b) * dem[j * W + i] + a * (1 - b) * dem[j * W + i + 1] + (1 - a) * b * dem[(j + 1) * W + i] + a * b * dem[(j + 1) * W + i + 1]; };
+const ign = toUtm(CASE_SMV_2026.ignition.lat, CASE_SMV_2026.ignition.lon, 30), center = fromUtm(CX, CY, 30);
+
+// ---------------------------------------------------------------- Escena
+const canvas = $('#c3'), renderer = new THREE.WebGLRenderer({ canvas, antialias: !LITE, preserveDrawingBuffer: !!FILM });
+renderer.setPixelRatio(Math.min(LITE ? 1 : 2, devicePixelRatio || 1));
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xaec2cf); scene.fog = new THREE.Fog(0xaec2cf, 45000, 120000);
+const camera = new THREE.PerspectiveCamera(50, 1, 20, 300000);
+scene.add(new THREE.HemisphereLight(0xdfeaf2, 0x40382c, 0.75)); const sun = new THREE.DirectionalLight(0xfff1dd, 1.25); sun.position.set(-30000, 40000, 25000); scene.add(sun);
+const world = new THREE.Group(); scene.add(world);
+const P = (x, y, z) => new THREE.Vector3(x - CX, z - zMin, -(y - CY)); // UTM (x este, y norte, z altitud) → escena
+// Terreno real con la imagen de Sentinel-2
+const geo = new THREE.PlaneGeometry(W * DX, H * DX, W - 1, H - 1); geo.rotateX(-Math.PI / 2);
+const pos = geo.attributes.position; for (let k = 0; k < pos.count; k++) pos.setY(k, dem[k] - zMin); geo.computeVertexNormals();
+const loader = new THREE.TextureLoader(), tex = {}; const loadTex = (k) => (tex[k] ??= new Promise((r) => loader.load(`${B}tci_${k}.jpg`, (t) => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; r(t); })));
+const terrainMat = new THREE.MeshStandardMaterial({ roughness: 1, metalness: 0, color: 0xffffff }); terrainMat.map = await loadTex('d0729'); terrainMat.needsUpdate = true;
+const terrain = new THREE.Mesh(geo, terrainMat); world.add(terrain);
+const overlay = (map, order) => { const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 - order, polygonOffsetUnits: -4 - order })); m.renderOrder = order; world.add(m); return m; };
+const sevTex = await new Promise((r) => loader.load(`${B}dnbr_d0808.png`, r)); sevTex.colorSpace = THREE.SRGBColorSpace; const sevMesh = overlay(sevTex, 1); sevMesh.visible = false;
+const mkCanvasTex = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; const t = new THREE.CanvasTexture(c); t.magFilter = THREE.NearestFilter; return { c, g: c.getContext('2d'), t }; };
+// Cicatrices reales (bordes) por fecha
+const scar = mkCanvasTex(); { const im = scar.g.createImageData(W, H), fill = [[255, 214, 70, 70], [255, 140, 40, 55], [215, 45, 60, 45]];
+  for (let j = 1; j < H - 1; j++) for (let i = 1; i < W - 1; i++) { const k = j * W + i, v = burn[k]; if (!v) continue; const first = v & 1 ? 0 : v & 2 ? 1 : 2, fin = (x) => (x >> 2) & 1 || (x >> 1) & 1 || x & 1; const edge = !fin(burn[k - 1]) || !fin(burn[k + 1]) || !fin(burn[k - W]) || !fin(burn[k + W]); im.data.set(edge ? [255, 255, 255, 200] : fill[first], k * 4); }
+  scar.g.putImageData(im, 0, 0); scar.t.magFilter = THREE.LinearFilter; scar.t.needsUpdate = true; }
+const scarMesh = overlay(scar.t, 3);
+// Frente simulado y probabilidad (región del incendio)
+const front = mkCanvasTex(), frontMesh = overlay(front.t, 4), probT = mkCanvasTex(), probMesh = overlay(probT.t, 2); probMesh.visible = false;
+const roiIdx = (i, j) => j * ROI.w + i;
+function drawFront(tMin) {
+  const im = front.g.createImageData(W, H);
+  for (let j = 0; j < ROI.h; j++) for (let i = 0; i < ROI.w; i++) { const a = arr[roiIdx(i, j)]; if (a === 65535 || a > tMin) continue; const k = ((j + ROI.j0) * W + i + ROI.i0) * 4, age = tMin - a; im.data.set(age < 20 ? [255, 120 + 6 * age, 20, 255] : age < 90 ? [120, 40, 20, 170] : [30, 20, 18, 130], k); }
+  front.g.putImageData(im, 0, 0); front.t.needsUpdate = true;
+}
+function drawProb(set, h) {
+  const im = probT.g.createImageData(W, H), o = (set * 4 + h) * ROI.w * ROI.h;
+  for (let j = 0; j < ROI.h; j++) for (let i = 0; i < ROI.w; i++) { const p = prob[o + roiIdx(i, j)]; if (p < 5) continue; const k = ((j + ROI.j0) * W + i + ROI.i0) * 4; im.data.set(p >= 90 ? [170, 20, 60, 200] : p >= 50 ? [240, 90, 40, 170] : p >= 20 ? [250, 200, 60, 140] : [120, 200, 255, 90], k); }
+  probT.g.putImageData(im, 0, 0); probT.t.needsUpdate = true;
+}
+// Rótulos
+const labels = new THREE.Group(); world.add(labels);
+const sprite = (txt, color = '#fff', size = 1) => { const c = document.createElement('canvas'), g = c.getContext('2d'); g.font = '700 44px Inter,system-ui'; const w = Math.ceil(g.measureText(txt).width) + 28; c.width = w; c.height = 64; g.font = '700 44px Inter,system-ui'; g.lineWidth = 8; g.strokeStyle = 'rgba(5,9,12,.85)'; g.strokeText(txt, 14, 46); g.fillStyle = color; g.fillText(txt, 14, 46); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false, transparent: true, sizeAttenuation: false })); s.scale.set((w / 64) * 0.034 * size, 0.034 * size, 1); s.renderOrder = 10; return s; };
+for (const p of Object.values(CASE_SMV_2026.places)) { const u = toUtm(p.lat, p.lon, 30); if (u.x < X0 || u.x > X0 + W * DX || u.y > Y1 || u.y < Y1 - H * DX) continue; const s = sprite(p.name); s.position.copy(P(u.x, u.y, heightAt(u.x, u.y) + 450)); labels.add(s); }
+{ const s = sprite('Inicio: M-501 km 57', '#ffd27a', 0.9); s.position.copy(P(ign.x, ign.y, heightAt(ign.x, ign.y) + 1600)); labels.add(s); }
+// Carreteras
+const roadsG = new THREE.Group(); world.add(roadsG);
+for (const r of CASE_SMV_2026.roads) { const pts = r.path.map((v) => { const u = toUtm(v.lat, v.lon, 30); return P(u.x, u.y, heightAt(u.x, u.y) + 25); }); roadsG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: r.id === 'N-403' ? 0xffd166 : 0xffffff }))); }
+
+// ---------------------------------------------------------------- Viento 3D en el navegador
+const DX3 = LITE ? 1500 : 1000, DZ = 80, NX = Math.floor((W * DX) / DX3), NY = Math.floor((H * DX) / DX3), zBase = Math.floor(meta.dem.min / DZ) * DZ - DZ, NZ = Math.ceil((meta.dem.max + 2200 - zBase) / DZ);
+const solved = new Map();
+function solve(k, qGW) {
+  const key = `${k}:${qGW}`; if (solved.has(key)) return solved.get(key);
+  const t0 = performance.now(), prof = A.gfsProfile(gfs.times[k], gfs.grid, center.lat, center.lon), dg = A.airMassDiagnosis(prof);
+  const g = A.makeWindGrid({ nx: NX, ny: NY, nz: NZ, dx: DX3, dz: DZ, x0: X0, y0: Y1 - NY * DX3, heightAt, zBase }), f0 = A.initialWind(g, (z) => A.profileAt(prof, z));
+  let f, plume = null;
+  if (qGW > 0) { const mix = A.profileAt(prof, 600), U = Math.hypot(mix.u, mix.v), to = ((Math.atan2(mix.u, mix.v) * 180) / Math.PI + 360) % 360; const imp = A.imposePlume(g, f0, { x: ign.x, y: ign.y, qW: qGW * 1e9, U, dirToDeg: to, N2: dg.freeTropN2 ?? 5e-5, hpbl: dg.hpblM ?? 1500 }); plume = imp.plume; f = A.massConsistent(g, imp.field, { iters: LITE ? 90 : 160, fixedW: imp.fixedW, vertWeight: (dg.hpblM ?? 1000) < 300 ? 0.3 : 1 }); }
+  else f = A.massConsistent(g, f0, { iters: LITE ? 90 : 160, vertWeight: (dg.hpblM ?? 1000) < 300 ? 0.3 : 1 });
+  const out = { g, f, prof, dg, plume, ms: Math.round(performance.now() - t0) }; solved.set(key, out); return out;
+}
+// Partículas
+const dot = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(0.5, 'rgba(255,255,255,.5)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
+function cloud(n, size, blending, opacity) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); const pts = new THREE.Points(g, new THREE.PointsMaterial({ size, map: dot, vertexColors: true, transparent: true, depthWrite: false, blending, opacity, sizeAttenuation: true })); pts.frustumCulled = false; world.add(pts); return { pts, n, st: Array.from({ length: n }, () => ({ x: 0, y: 0, z: 0, age: 1e9, life: 0 })) }; }
+const windP = cloud(LITE ? 900 : 3000, 260, THREE.NormalBlending, 0.9), smokeP = cloud(LITE ? 600 : 2000, 1500, THREE.NormalBlending, 0.5), emberP = cloud(LITE ? 200 : 500, 200, THREE.AdditiveBlending, 1);
+let R = 12345; const rnd = () => ((R = (R * 16807) % 2147483647) / 2147483647);
+const frontCells = () => { const out = []; for (let j = 0; j < ROI.h; j++) for (let i = 0; i < ROI.w; i++) { const a = arr[roiIdx(i, j)]; if (a !== 65535 && a <= st.t && st.t - a < 30) out.push([i + ROI.i0, j + ROI.j0]); } return out; };
+let fcache = { t: -1, cells: [] };
+function stepParticles(dt) {
+  const F = cur, { g, f } = F;
+  const wcol = (s) => { const k = Math.min(1, s / 15); return [0.55 + 0.45 * k, 0.85 - 0.5 * k, 1 - 0.8 * k]; };
+  if (layer.wind) { const a = windP.pts.geometry.attributes, p = a.position.array, c = a.color.array; for (let n = 0; n < windP.n; n++) { const q = windP.st[n]; if (q.age > q.life) { q.x = X0 + rnd() * W * DX; q.y = Y1 - rnd() * H * DX; q.z = heightAt(q.x, q.y) + 30 + rnd() * rnd() * 1600; q.age = 0; q.life = 40 + rnd() * 80; } const v = A.sampleWind(g, f, q.x, q.y, q.z); q.x += v.u * dt * 6; q.y += v.v * dt * 6; q.z = Math.max(heightAt(q.x, q.y) + 15, q.z + v.w * dt * 6); q.age += 1; if (q.x < X0 || q.x > X0 + W * DX || q.y > Y1 || q.y < Y1 - H * DX) q.age = 1e9; const s = Math.hypot(v.u, v.v); const v3 = P(q.x, q.y, q.z); p.set([v3.x, v3.y, v3.z], n * 3); c.set(wcol(s), n * 3); } a.position.needsUpdate = a.color.needsUpdate = true; }
+  if (fcache.t !== st.t) fcache = { t: st.t, cells: frontCells() };
+  const src = fcache.cells;
+  if (layer.smoke && src.length) { const a = smokeP.pts.geometry.attributes, p = a.position.array, c = a.color.array; for (let n = 0; n < smokeP.n; n++) { const q = smokeP.st[n]; if (q.age > q.life) { const [i, j] = src[Math.floor(rnd() * src.length)]; q.x = X0 + (i + rnd()) * DX; q.y = Y1 - (j + rnd()) * DX; q.z = heightAt(q.x, q.y) + 20; q.age = 0; q.life = 60 + rnd() * 140; } const v = A.sampleWind(g, f, q.x, q.y, q.z); q.x += (v.u + (rnd() - 0.5) * 2) * dt * 6; q.y += (v.v + (rnd() - 0.5) * 2) * dt * 6; q.z += (Math.max(v.w, 0) + 2.5) * dt * 6; q.age += 1; const v3 = P(q.x, q.y, q.z), sh = 0.35 + 0.4 * Math.min(1, q.age / q.life); p.set([v3.x, v3.y, v3.z], n * 3); c.set([sh, sh * 0.97, sh * 0.93], n * 3); } a.position.needsUpdate = a.color.needsUpdate = true; }
+  if (layer.ember && src.length) { const a = emberP.pts.geometry.attributes, p = a.position.array, c = a.color.array; for (let n = 0; n < emberP.n; n++) { const q = emberP.st[n]; if (q.age > q.life || q.z <= heightAt(q.x, q.y) + 2) { const [i, j] = src[Math.floor(rnd() * src.length)]; q.x = X0 + (i + rnd()) * DX; q.y = Y1 - (j + rnd()) * DX; q.z = heightAt(q.x, q.y) + 100 + rnd() * 900; q.age = 0; q.life = 120; } const v = A.sampleWind(g, f, q.x, q.y, q.z); q.x += v.u * dt * 6; q.y += v.v * dt * 6; q.z += (v.w - 4) * dt * 6; q.age += 1; const v3 = P(q.x, q.y, q.z); p.set([v3.x, v3.y, v3.z], n * 3); const fl = 0.7 + 0.3 * Math.sin(q.age * 1.7 + n); c.set([1, 0.45 * fl, 0.1], n * 3); } a.position.needsUpdate = a.color.needsUpdate = true; }
+}
+// Corte vertical de la masa de aire (θ y viento vertical) de oeste a este por el punto de inicio
+const xsec = (() => { const c = document.createElement('canvas'); c.width = 190; c.height = 60; const t = new THREE.CanvasTexture(c); const m = new THREE.Mesh(new THREE.PlaneGeometry(W * DX, 3600), new THREE.MeshBasicMaterial({ map: t, transparent: true, opacity: 0.82, side: THREE.DoubleSide, depthWrite: false })); m.position.copy(P(CX, ign.y, zMin + 1800)); m.visible = false; world.add(m); const lab = sprite('Corte O–E por el inicio: temperatura potencial (azul frío → rojo cálido) y viento vertical', '#ffffff', 0.7); lab.position.set(0, 3900, 0); m.add(lab); return { c, g: c.getContext('2d'), t, m }; })();
+function drawXsec() {
+  const { g, c } = xsec, im = g.createImageData(c.width, c.height), F = cur;
+  for (let px = 0; px < c.width; px++) { const x = X0 + ((px + 0.5) / c.width) * W * DX, zg = heightAt(x, ign.y); for (let py = 0; py < c.height; py++) { const z = zMin + 3600 * (1 - (py + 0.5) / c.height), k = (py * c.width + px) * 4; if (z < zg) { im.data.set([40, 32, 26, 230], k); continue; } const pr = A.profileAt(F.prof, z - zg), v = A.sampleWind(F.g, F.f, x, ign.y, z), th0 = A.profileAt(F.prof, 2).theta, d = Math.max(0, Math.min(1, (pr.theta - th0 + 2) / 14)), w = Math.max(-1, Math.min(1, v.w / 2)); const base = [[49, 54, 149], [69, 117, 180], [116, 173, 209], [254, 224, 144], [244, 109, 67], [165, 0, 38]], q = d * 5, i0 = Math.min(4, Math.floor(q)), f2 = q - i0, col = base[i0].map((c0, n) => c0 + (base[i0 + 1][n] - c0) * f2); if (Math.abs(w) > 0.15) { const m = Math.abs(w); col[0] = w > 0 ? col[0] + (255 - col[0]) * m * 0.7 : col[0] * (1 - 0.6 * m); col[2] = w < 0 ? col[2] + (255 - col[2]) * m * 0.7 : col[2] * (1 - 0.6 * m); } im.data.set([...col.map(Math.round), 215], k); } }
+  g.putImageData(im, 0, 0); xsec.t.needsUpdate = true;
+}
+// Cámaras (cumbres reales elegidas por el experimento) y vista desde cada una
+const camG = new THREE.Group(); world.add(camG); const cams = res.camaras.camaras.map((c, i) => { const u = toUtm(c.lat, c.lon, 30), z = heightAt(u.x, u.y) + 12; const mast = new THREE.Mesh(new THREE.CylinderGeometry(40, 40, 400, 8), new THREE.MeshStandardMaterial({ color: 0x91d7e8, emissive: 0x204050 })); mast.position.copy(P(u.x, u.y, z - 200 + 200)); camG.add(mast); const s = sprite(`Cámara ${i + 1}`, '#91d7e8', 0.8); s.position.copy(P(u.x, u.y, z + 650)); camG.add(s); const az = ((Math.atan2(ign.x - u.x, ign.y - u.y) * 180) / Math.PI + 360) % 360; camG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([P(u.x, u.y, z), P(ign.x, ign.y, heightAt(ign.x, ign.y) + 1200)]), new THREE.LineDashedMaterial({ color: 0x91d7e8, dashSize: 300, gapSize: 200 }))); return { x: u.x, y: u.y, z, az }; });
+camG.children.forEach((o) => o.computeLineDistances?.());
+// Coches como estación meteorológica sobre la M-501 y la N-403
+const carG = new THREE.Group(); world.add(carG); const roadsU = CASE_SMV_2026.roads.map((r) => r.path.map((v) => toUtm(v.lat, v.lon, 30)));
+const cars = Array.from({ length: 16 }, (_, n) => ({ r: n % roadsU.length, s: (n * 0.137) % 1, dir: n % 2 ? 1 : -1, mesh: new THREE.Mesh(new THREE.BoxGeometry(150, 90, 300), new THREE.MeshStandardMaterial({ color: [0xd9dee2, 0x7a1f24, 0x1f3f6b, 0x9aa4ab][n % 4] })) }));
+cars.forEach((c) => carG.add(c.mesh));
+const alongRoad = (pts, s) => { const L = []; let tot = 0; for (let i = 1; i < pts.length; i++) { const l = Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y); L.push(l); tot += l; } let d = s * tot; for (let i = 1; i < pts.length; i++) { if (d <= L[i - 1]) { const a = d / L[i - 1]; return { x: pts[i - 1].x + (pts[i].x - pts[i - 1].x) * a, y: pts[i - 1].y + (pts[i].y - pts[i - 1].y) * a, hd: ((Math.atan2(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y) * 180) / Math.PI + 360) % 360 }; } d -= L[i - 1]; } const e = pts.at(-1); return { x: e.x, y: e.y, hd: 0 }; };
+function stepCars(dt) { const obs = []; let tu = 0, tv = 0; for (const c of cars) { c.s = (c.s + c.dir * dt * 0.004 + 1) % 1; const q = alongRoad(roadsU[c.r], c.s), hd = (q.hd + (c.dir < 0 ? 180 : 0)) % 360, z = heightAt(q.x, q.y); c.mesh.position.copy(P(q.x, q.y, z + 70)); c.mesh.rotation.y = -((hd * Math.PI) / 180); const v = A.sampleWind(cur.g, cur.f, q.x, q.y, z + 3); tu += v.u / cars.length; tv += v.v / cars.length; const wPar = v.u * Math.sin((hd * Math.PI) / 180) + v.v * Math.cos((hd * Math.PI) / 180); obs.push({ headingDeg: hd, wParMs: wPar + 0.8 * (rnd() - 0.5) * 2, sdMs: 1 }); } const fw = A.fleetWind(obs); S.fleet = fw.ok ? { est: Math.hypot(fw.u, fw.v), dir: fw.dirFromDeg, err: Math.hypot(fw.u - tu, fw.v - tv) } : null; }
+// Aviones
+const planeG = new THREE.Group(); world.add(planeG); let flight = null;
+function makePlane() { const g = new THREE.Group(), m = new THREE.MeshStandardMaterial({ color: 0xf2c94c }); g.add(new THREE.Mesh(new THREE.BoxGeometry(260, 260, 1960), m)); const w = new THREE.Mesh(new THREE.BoxGeometry(2860, 60, 360), m); w.position.y = 120; g.add(w); const tl = new THREE.Mesh(new THREE.BoxGeometry(900, 40, 220), m); tl.position.set(0, 160, 900); g.add(tl); return g; }
+const dropP = cloud(LITE ? 200 : 600, 220, THREE.NormalBlending, 0.9);
+function startFlight(kind) {
+  planeG.clear(); const fc = fcache.cells.length ? fcache.cells : frontCells(); const [i, j] = fc[Math.floor(fc.length / 2)] ?? [ROI.i0 + 50, ROI.j0 + 50]; const x = X0 + (i + 0.5) * DX, y = Y1 - (j + 0.5) * DX;
+  const ac = kind === 'heli' ? A.AIRCRAFT['helicoptero-medio'] : A.AIRCRAFT['CL-415'], obj = kind === 'heli' ? new THREE.Mesh(new THREE.SphereGeometry(400, 12, 8), new THREE.MeshStandardMaterial({ color: 0xff5b6e })) : makePlane();
+  planeG.add(obj); flight = { kind, x, y, t: 0, obj, ac }; const rho = cur.dg.rhoSfc, I = res.pluma.intensidadKWm;
+  const info = kind === 'heli' ? A.rotorDownwash({ ...ac, rho }) : A.wakeVortex({ ...ac, rho, heightM: 40 }), drop = A.dropEffect({ litres: ac.litres, intensityKWm: I });
+  $('#air').innerHTML = kind === 'heli'
+    ? `<p><b>Helicóptero medio en estacionario</b> (${ac.massKg.toLocaleString('es-ES')} kg, rotor de ${ac.rotorRadiusM} m): chorro inducido de <b>${fmt(info.induced, 1)} m/s</b> y hasta <b>${fmt(info.farWake, 1)} m/s</b> en la estela, con la densidad real del día (${fmt(rho, 3)} kg/m³). Puede avivar las llamas si se queda encima del frente.</p><p>Descarga de ${ac.litres.toLocaleString('es-ES')} L sobre ${fmt(I)} kW/m: absorbe ${fmt(drop.energyGJ, 1)} GJ y equivale a <b>${fmt(drop.secondsCancelled, 1)} s</b> de la potencia del frente en su huella.</p>`
+    : `<p><b>CL-415</b> (${ac.litres.toLocaleString('es-ES')} L): estela con circulación de <b>${fmt(info.circulation)} m²/s</b> que baja a ${fmt(info.descentMs, 2)} m/s y tarda ≈ ${fmt(info.timeToGroundS)} s en llegar al suelo desde 40 m, con una racha inducida de ≈ ${fmt(info.groundGustMs, 1)} m/s.</p><p>Sobre un frente de <b>${fmt(I)} kW/m</b>, la descarga absorbe ${fmt(drop.energyGJ, 1)} GJ (η = 0,3, supuesto): equivale a <b>${fmt(drop.secondsCancelled, 1)} s</b> de la potencia del frente en 120 m. Sirve para proteger un punto o reforzar una línea, no para apagar la cabeza (clase de ataque 4).</p>`;
+  S.flight = { kind, ...info, drop };
+}
+function stepFlight(dt) {
+  if (!flight) return; flight.t += dt; const { x, y, obj, kind } = flight, z0 = heightAt(x, y);
+  if (kind === 'heli') { obj.position.copy(P(x, y, z0 + 60)); } else { const s = -6000 + flight.t * 62 * 6; obj.position.copy(P(x + s * 0.7, y + s * 0.7, Math.max(z0 + 45, heightAt(x + s * 0.7, y + s * 0.7) + 45))); obj.rotation.y = -Math.PI / 4 + Math.PI; }
+  const a = dropP.pts.geometry.attributes, p = a.position.array, c = a.color.array, wp = obj.position;
+  for (let n = 0; n < dropP.n; n++) { const q = dropP.st[n]; if (q.age > q.life) { q.x = wp.x + (rnd() - 0.5) * 300; q.y = wp.y; q.z = wp.z + (rnd() - 0.5) * 300; q.age = 0; q.life = 25 + rnd() * 25; q.vy = kind === 'heli' ? -60 - rnd() * 40 : -20 - rnd() * 30; } q.vy -= 6; q.y = Math.max(0, q.y + q.vy * 0.2); q.age++; p.set([q.x, q.y, q.z], n * 3); c.set(kind === 'heli' ? [0.85, 0.9, 1] : [0.75, 0.88, 1], n * 3); }
+  a.position.needsUpdate = a.color.needsUpdate = true; if (flight.t > (kind === 'heli' ? 40 : 34)) { flight = null; planeG.clear(); dropP.st.forEach((q) => (q.age = 1e9, q.y = -1e5)); }
+}
+
+// ---------------------------------------------------------------- Controles tipo Google Maps
+const view = { tx: ign.x - CX, tz: -(ign.y - CY), dist: 26000, yaw: 0.6, pitch: 1.0, fixed: null };
+function applyView() {
+  if (view.fixed) { const c = view.fixed; camera.position.copy(P(c.x, c.y, c.z)).multiply(new THREE.Vector3(1, world.scale.y, 1)); const tgt = P(ign.x, ign.y, heightAt(ign.x, ign.y) + 900).multiply(new THREE.Vector3(1, world.scale.y, 1)); camera.fov = 40; camera.updateProjectionMatrix(); camera.lookAt(tgt); return; }
+  if (camera.fov !== 50) { camera.fov = 50; camera.updateProjectionMatrix(); }
+  view.pitch = Math.max(0.02, Math.min(1.5, view.pitch)); view.dist = Math.max(1500, Math.min(90000, view.dist));
+  const gy = heightAt(view.tx + CX, CY - view.tz) - zMin; const sp = Math.sin(view.pitch), cp = Math.cos(view.pitch);
+  camera.position.set(view.tx + view.dist * sp * Math.sin(view.yaw), gy * world.scale.y + view.dist * cp, view.tz + view.dist * sp * Math.cos(view.yaw));
+  camera.up.set(0, 1, 0); if (view.pitch < 0.05) camera.up.set(-Math.sin(view.yaw), 0, -Math.cos(view.yaw)); camera.lookAt(view.tx, gy * world.scale.y, view.tz);
+  const minY = (heightAt(camera.position.x + CX, CY - camera.position.z) - zMin) * world.scale.y + 120; if (camera.position.y < minY) camera.position.y = minY;
+}
+const ptrs = new Map(); let last = null;
+const pan = (dx, dy) => { const k = view.dist / canvas.clientHeight * 1.1, s = Math.sin(view.yaw), c = Math.cos(view.yaw); view.tx += (-dx * c - dy * s * Math.max(0.3, Math.cos(view.pitch) + 0.3)) * k; view.tz += (dx * s - dy * c * Math.max(0.3, Math.cos(view.pitch) + 0.3)) * k; };
+const two = () => { const [a, b] = [...ptrs.values()]; return { cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2, d: Math.hypot(a.x - b.x, a.y - b.y), ang: Math.atan2(b.y - a.y, b.x - a.x) }; };
+canvas.addEventListener('pointerdown', (e) => { canvas.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY, b: e.button, mod: e.shiftKey || e.ctrlKey }); last = ptrs.size === 2 ? two() : null; view.fixed = null; canvas.style.cursor = 'grabbing'; });
+canvas.addEventListener('pointermove', (e) => {
+  const p = ptrs.get(e.pointerId); if (!p) return; const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
+  if (ptrs.size === 1) { if (p.b === 2 || p.mod) { view.yaw -= dx * 0.005; view.pitch -= dy * 0.005; } else pan(dx, dy); }
+  else if (ptrs.size === 2) { const n = two(); if (last) { view.dist *= last.d / Math.max(1, n.d); view.yaw += n.ang - last.ang; if (Math.abs(n.d - last.d) < 6) view.pitch -= (n.cy - last.cy) * 0.006; else pan(n.cx - last.cx, n.cy - last.cy); } last = n; }
+});
+const up = (e) => { ptrs.delete(e.pointerId); last = ptrs.size === 2 ? two() : null; if (!ptrs.size) canvas.style.cursor = 'grab'; };
+canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up); canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+canvas.addEventListener('wheel', (e) => { e.preventDefault(); view.fixed = null; view.dist *= Math.exp(e.deltaY * 0.0012); }, { passive: false });
+canvas.addEventListener('keydown', (e) => { const k = e.key, m = { ArrowLeft: () => pan(40, 0), ArrowRight: () => pan(-40, 0), ArrowUp: () => pan(0, 40), ArrowDown: () => pan(0, -40), '+': () => (view.dist *= 0.85), '-': () => (view.dist *= 1.18), q: () => (view.yaw += 0.08), e: () => (view.yaw -= 0.08), w: () => (view.pitch += 0.06), s: () => (view.pitch -= 0.06) }[k]; if (m) { e.preventDefault(); view.fixed = null; m(); } });
+const goView = (pitch, yaw) => { view.fixed = null; view.pitch = pitch; if (yaw != null) view.yaw = yaw; };
+$('#v-top').onclick = () => goView(0.02); $('#v-tilt').onclick = () => goView(1.0); $('#v-hor').onclick = () => goView(1.45); $('#v-n').onclick = () => goView(view.pitch, 0); $('#v-fire').onclick = () => { view.fixed = null; view.tx = ign.x - CX; view.tz = -(ign.y - CY); view.dist = 16000; };
+[1, 2, 3].forEach((n) => ($(`#cam${n}`).onclick = () => { const c = cams[n - 1]; if (c) view.fixed = c; S.cameraView = n; }));
+S.api = { tilt: (p) => goView(p), view };
+
+// ---------------------------------------------------------------- Estado, capas y tiempo
+const layer = {}; const sync = () => { for (const k of ['sev', 'scar', 'front', 'prob', 'wind', 'smoke', 'ember', 'xsec', 'cam', 'car', 'lab']) layer[k] = $(`#l-${k}`).checked; sevMesh.visible = layer.sev; scarMesh.visible = layer.scar; frontMesh.visible = layer.front; probMesh.visible = layer.prob; windP.pts.visible = layer.wind; smokeP.pts.visible = layer.smoke; emberP.pts.visible = layer.ember; xsec.m.visible = layer.xsec; camG.visible = layer.cam; carG.visible = layer.car; labels.visible = layer.lab; if (layer.xsec) drawXsec(); };
+document.querySelectorAll('.layers input').forEach((el) => el.addEventListener('change', sync));
+$('#img').onchange = async (e) => { terrainMat.map = await loadTex(e.target.value); terrainMat.needsUpdate = true; S.image = e.target.value; };
+$('#exag').oninput = (e) => { world.scale.y = +e.target.value; $('#o-exag').textContent = `${fmt(+e.target.value, 2)}×`; };
+const st = { t: +$('#t').value, play: false, q: +$('#q').value }; const ignH = parseInt(res.conjunto.llegada.ignicionUTC, 10);
+const clock = (t) => { const m = ignH * 60 + t, d = m >= 1440 ? 24 : 23, mm = m % 1440; return `${d}-07 ${String(Math.floor(mm / 60)).padStart(2, '0')}:${String(mm % 60).padStart(2, '0')} UTC`; };
+const gfsIdx = (t) => Math.max(0, Math.min(4, Math.round(((ignH - 12) * 60 + t) / 180)));
+let cur = solve(gfsIdx(st.t), st.q);
+const probH = () => { const h = res.conjunto.horizontesMin, i = h.findIndex((x) => st.t <= x); return i < 0 ? h.length - 1 : i; };
+function refresh() {
+  const k = gfsIdx(st.t); cur = solve(k, st.q); drawFront(st.t); drawProb(+$('#pset').value, probH()); if (layer.xsec) drawXsec();
+  const d = cur.dg; $('#t-l').textContent = clock(st.t);
+  $('#hud').innerHTML = `<b>${clock(st.t)}</b> · viento GFS de las ${gfs.times[k].validUTC.slice(11, 16)} UTC<div class="r"><span>T / HR</span><b>${fmt(d.t2, 1)} °C · ${fmt(d.rh2)} %</b><span>Viento 10 m</span><b>${fmt(d.wind10Kmh)} km/h de ${d.dirFrom10}°</b><span>Racha</span><b>${fmt(d.gustKmh)} km/h</b><span>Capa de mezcla</span><b>${fmt(d.hpblM)} m</b><span>Densidad</span><b>${fmt(d.rhoSfc, 3)} kg/m³</b><span>Haines</span><b>${d.haines?.value ?? '—'}</b><span>Pluma</span><b>${cur.plume ? `${fmt(cur.plume.finalRiseM)} m` : 'sin pluma'}</b><span>Flota (16 coches)</span><b>${S.fleet ? `${fmt(S.fleet.est * 3.6)} km/h, error ${fmt(S.fleet.err, 1)} m/s` : '—'}</b></div>`;
+  S.state = { k, ms: cur.ms, divBefore: cur.f.divBefore, divAfter: cur.f.divAfter, plumeTop: cur.plume?.finalRiseM ?? null, t: st.t }; drawSyn(k);
+}
+$('#t').oninput = (e) => { st.t = +e.target.value; refresh(); };
+let qTimer; $('#q').oninput = (e) => { st.q = +e.target.value; $('#o-q').textContent = `${fmt(st.q, 1)} GW`; clearTimeout(qTimer); qTimer = setTimeout(refresh, 250); };
+$('#pset').onchange = () => drawProb(+$('#pset').value, probH());
+$('#play').onclick = () => { st.play = !st.play; $('#play').textContent = st.play ? '⏸ Pausa' : '▶ Reproducir'; $('#play').setAttribute('aria-pressed', String(st.play)); };
+$('#plane').onclick = () => startFlight('plane'); $('#heli').onclick = () => startFlight('heli');
+// Mapa sinóptico (isobaras reales por cuadrados en marcha)
+function drawSyn(k) {
+  const cv = $('#syn'), g = cv.getContext('2d'), r = Math.min(2, devicePixelRatio || 1), w = cv.clientWidth, h = cv.clientHeight; cv.width = w * r; cv.height = h * r; g.scale(r, r);
+  const T = syn.times[k], la = syn.lats, lo = syn.lons, X = (i) => (i / (lo.length - 1)) * w, Y = (j) => (j / (la.length - 1)) * h;
+  for (let j = 0; j < la.length - 1; j++) for (let i = 0; i < lo.length - 1; i++) { const t = T.t2[j][i] - 273.15, a = Math.max(0, Math.min(1, (t - 15) / 25)); g.fillStyle = `rgb(${40 + 200 * a},${90 + 40 * (1 - a)},${150 - 120 * a})`; g.fillRect(X(i), Y(j), X(i + 1) - X(i) + 1, Y(j + 1) - Y(j) + 1); }
+  g.strokeStyle = '#fff'; g.lineWidth = 1; const pv = T.mslp.map((row) => row.map((v) => v / 100)); let mn = Infinity, mx = -Infinity; pv.forEach((row) => row.forEach((v) => { mn = Math.min(mn, v); mx = Math.max(mx, v); }));
+  for (let L = Math.ceil(mn); L <= mx; L += 1) { g.beginPath(); for (let j = 0; j < la.length - 1; j++) for (let i = 0; i < lo.length - 1; i++) { const c = [pv[j][i], pv[j][i + 1], pv[j + 1][i + 1], pv[j + 1][i]], pts = []; const e = [[0, 1, 0, 0, 1, 0], [1, 2, 1, 0, 1, 1], [2, 3, 1, 1, 0, 1], [3, 0, 0, 1, 0, 0]]; for (const [a, b, x1, y1, x2, y2] of e) { if ((c[a] - L) * (c[b] - L) < 0) { const f = (L - c[a]) / (c[b] - c[a]); pts.push([X(i + x1 + (x2 - x1) * f), Y(j + y1 + (y2 - y1) * f)]); } } if (pts.length >= 2) { g.moveTo(...pts[0]); g.lineTo(...pts[1]); } } g.stroke(); }
+  g.fillStyle = '#fff'; g.strokeStyle = 'rgba(255,255,255,.8)'; for (let j = 1; j < la.length; j += 3) for (let i = 1; i < lo.length; i += 3) { const u = T.u10[j][i], v = T.v10[j][i], x = X(i), y = Y(j); g.beginPath(); g.moveTo(x, y); g.lineTo(x + u * 2, y - v * 2); g.stroke(); }
+  const fi = ((CASE_SMV_2026.ignition.lon - lo[0]) / (lo.at(-1) - lo[0])) * w, fj = ((la[0] - CASE_SMV_2026.ignition.lat) / (la[0] - la.at(-1))) * h; g.fillStyle = '#ff5b6e'; g.beginPath(); g.arc(fi, fj, 4, 0, 7); g.fill();
+  g.fillStyle = 'rgba(5,9,12,.75)'; g.fillRect(0, h - 16, w, 16); g.fillStyle = '#e8eef1'; g.font = '10px Inter,system-ui'; g.fillText(`GFS ${T.validUTC.slice(11, 16)} UTC · isobaras cada 1 hPa · T 2 m`, 5, h - 5);
+}
+// Tablas con resultados reales
+$('#am').innerHTML = res.masaDeAire.map((d) => `<tr><td>${d.validUTC.slice(11, 16)}</td><td>${fmt(d.t2, 1)} °C</td><td>${fmt(d.rh2)} %</td><td>${fmt(d.viento10Kmh)} km/h · ${d.dirDesde}°</td><td>${fmt(d.rachaKmh)}</td><td>${fmt(d.capaMezclaM)} m</td><td>${fmt(d.densidad, 3)}</td><td><b>${d.haines ?? '—'}</b></td></tr>`).join('');
+const V = res.validacion, cb = V.calibracionEnMuestra.mejorConAreaCoherente ?? V.calibracionEnMuestra.mejorForma, ex = V.experimentos;
+$('#val').innerHTML = `<p>Cicatriz real del incendio de San Martín el <b>24-07</b> (Sentinel-2): <b>${V.cicatrizObservadaHa} ha</b>, creciendo hacia <b>${V.rumboObservado}°</b> (este-sureste).</p>
+<ul><li><b>Modelo tal cual</b> (viento GFS real, sin ajustar): Jaccard ${ex.map((e) => `${fmt(e.jaccard, 3)} (${e.ignicionUTC})`).join(', ')}, peor que un círculo (${fmt(V.jaccardCirculo, 3)}). Crece hacia ${ex.map((e) => e.rumboSimulado).join('°, ')}° y ocupa entre ${fmt(Math.min(...ex.map((e) => e.razonArea)), 1)} y ${fmt(Math.max(...ex.map((e) => e.razonArea)), 1)} veces más que lo observado. <b>No acierta</b>, y lo decimos.</li>
+<li><b>Tras asimilar la cicatriz</b>: el ajuste necesario es girar el viento <b>${cb.giroVientoDeg}°</b> (más del oeste-noroeste), multiplicar la velocidad base por ${fmt(cb.multVelocidad, 2)} e iniciar a las ${cb.ignicionUTC} UTC. Jaccard <b>${fmt(cb.jaccard, 3)}</b>, área ×${fmt(cb.razonAreaImagen, 2)} y rumbo ${cb.rumbo}°.</li>
+<li>Conjunto de ${res.conjunto.miembros} simulaciones: la cicatriz cae en la zona de probabilidad ≥ 50 % en el ${fmt(100 * res.conjunto.aciertoObservadoConP50)} % sin asimilar y en el <b>${fmt(100 * res.conjunto.trasAsimilar.aciertoObservadoConP50)} %</b> tras asimilar. La falsa alarma sigue alta (${fmt(100 * res.conjunto.trasAsimilar.falsaAlarmaP50)} %).</li></ul>
+<p class="src">Ajuste dentro de muestra: muestra el sesgo, no es una validación independiente. Validarlo exige otra fecha con su propia meteorología.</p>`;
+const cr = res.camaras;
+$('#sens').innerHTML = `<ul><li><b>Coches como anemómetro:</b> con la deceleración en rueda libre y la Ley de Datos u OBD-II, cada coche mide el viento a lo largo de su carretera; con rumbos distintos se despeja el vector. Error mediano frente al viento 3D real: ${res.flota.map((f) => `${f.coches} coches ${fmt(f.errorMedianoMs, 1)} m/s`).join(' · ')}.</li>
+<li><b>Barómetros de móviles y coches</b> (presión del PID 0x33): con su sesgo corregido por Kalman e interpolación óptima, una depresión de 1 hPa alrededor del fuego (sintética) se recupera de ${fmt(res.presion[0].rmseFondoHpa, 2)} a <b>${fmt(res.presion.at(-1).rmseAnalisisHpa, 2)} hPa</b> de error con ${res.presion.at(-1).sensores} sensores.</li>
+<li><b>Cámaras en las 3 cumbres más altas</b> a ${cr.camaras.map((c) => `${fmt(c.distanciaKm, 1)} km`).join(', ')}: <b>ninguna ve la base del fuego</b>, porque la tapa el relieve; las tres ven la columna desde ${cr.alturaComunTriangulada} m. Triangulando la columna: posición a ${cr.errorMedianoPosicionColumna3Camaras_M} m, altura de la cima a ${cr.errorMedianoAlturaCima_M} m y potencia ${fmt(cr.calorDesdeColumnaGW_mediana, 1)} GW (P10-P90 ${fmt(cr.calorDesdeColumnaGW_p10p90[0], 1)}-${fmt(cr.calorDesdeColumnaGW_p10p90[1], 1)}), con ${cr.ruido}.</li>
+<li><b>Pluma</b> de ${fmt(res.pluma.calorGW, 1)} GW: sube a ${fmt(res.pluma.alturaFinalM)} m; las pavesas caen a ${fmt(res.pluma.pavesas.p50M / 1000, 1)} km (mediana) y ${fmt(res.pluma.pavesas.p90M / 1000, 1)} km (P90) del frente, con velocidad terminal y tiempo de combustión supuestos.</li></ul>`;
+$('#air').innerHTML = '<p>Pulsa «Pasada de un CL-415» o «Helicóptero» en la vista 3D.</p>';
+// Bucle
+function resize() { const w = canvas.clientWidth, h = canvas.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); } addEventListener('resize', resize); resize();
+world.scale.y = +$('#exag').value; sync(); refresh(); startFlight; applyView();
+let lastT = performance.now(), acc = 0;
+function frame(now) { const dt = Math.min(0.1, (now - lastT) / 1000); lastT = now; if (st.play) { acc += dt * 20; if (acc >= 5) { st.t = Math.min(1220, st.t + Math.floor(acc / 5) * 5); acc %= 5; $('#t').value = st.t; refresh(); if (st.t >= 1220) st.play = false; } } stepParticles(dt); stepCars(dt); stepFlight(dt); applyView(); renderer.render(scene, camera); requestAnimationFrame(frame); }
+window.SENDA_VIZ = { names: ['fuego3d'], seek: (t) => { st.t = Math.round((Math.min(16, Math.max(0, t)) / 16) * 1200 / 5) * 5; view.yaw = 0.6 + t * 0.05; view.pitch = 1.05 - t * 0.02; refresh(); for (let k = 0; k < 8; k++) { stepParticles(0.05); stepCars(0.05); } applyView(); renderer.render(scene, camera); } };
+if (FILM) { window.SENDA_VIZ.seek(0); } else requestAnimationFrame(frame);
+S.ok = true; S.grid = `${NX}×${NY}×${NZ}`; S.dem = { w: W, h: H, min: meta.dem.min, max: meta.dem.max }; S.layers = Object.keys(layer).length; S.cams = cams.length; S.cars = cars.length;
+$('#status').textContent = `Listo · terreno ${W}×${H} (100 m) · viento 3D ${S.grid} resuelto en ${cur.ms} ms en este dispositivo · divergencia ${cur.f.divBefore.toExponential(1)} → ${cur.f.divAfter.toExponential(1)} · sin conexión: datos del 23-07-2026 guardados.`;
+window.SENDA_VIZ_READY = true;
+} catch (e) { S.errors.push(String(e?.stack || e)); $('#status').textContent = `Error: ${e.message}`; window.SENDA_VIZ_READY = true; throw e; }
+</script>
+</body></html>

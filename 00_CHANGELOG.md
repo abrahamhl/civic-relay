@@ -1,5 +1,78 @@
 # Changelog
 
+## SENDA v0.19 · 05-11-2026 · Incendio en 3D con datos reales: masa de aire, viento 3D, pluma, cámaras, coches-estación y paper
+
+**Entrada (fundador):**
+- Subir el nivel matemático, físico y de telecomunicaciones del seguimiento de incendios.
+- Masas de aire, densidades y flujos en 3D, con vista cenital, inclinada u horizontal y gestos de dos dedos como en Google Maps.
+- Simulación determinista con todos los datos de la zona, incluidas las descargas de los aviones.
+- Dashcams, coches y cámaras de seguridad como estación meteorológica; triangulación con cámaras y cartografía topográfica.
+- Un paper científico, los huecos del 112 y los canales ciudadanos.
+- Confluencia de canales que no se hablan entre sí, y Países Bajos.
+
+**Procesamiento:**
+- **Datos reales descargados de AWS Open Data** (scripts en `scripts/datos-reales/`):
+  - terreno Copernicus GLO-30;
+  - 4 escenas Sentinel-2 (16-07, 24-07, 29-07, 08-08) con color natural, cicatriz dNBR por fecha y combustible por NDVI;
+  - meteorología NOAA GFS del 23-07-2026, de 12 a 00 UTC.
+  - **Calibración radiométrica corregida:** los metadatos indican un desfase que daría reflectancias negativas.
+- **Masa de aire real a las 15 UTC en el km 57 de la M-501:** 36,3 °C, 7 % HR, 23 km/h de 228° (racha 36), capa de mezcla 1946 m, densidad 1,040 kg/m³ e **índice de Haines 6**.
+- **Núcleo `atmos3d.mjs`** (9 pruebas):
+  - termodinámica: densidad, θ, N², punto de rocío, LCL y Haines;
+  - perfiles GFS en cualquier punto y altura;
+  - interpolación óptima con Cholesky;
+  - OBD-II (PID 0x33 y 0x46);
+  - anemometría de flota por rueda libre;
+  - barómetros con sesgo por Kalman;
+  - **viento 3D con conservación de masa** (Poisson variacional, malla MAC y SOR);
+  - pluma de Briggs impuesta, con aspiración emergente;
+  - estelas de avión, chorro de rotor y energía de una descarga;
+  - partículas de humo y pavesas.
+- **Núcleo `fire-field.mjs`** (7 pruebas):
+  - llegada del fuego con viento variable en el espacio y el tiempo;
+  - conjunto Monte Carlo;
+  - Jaccard, Sørensen y habilidad frente al círculo;
+  - cámaras: proyección, línea de visión con el DEM, triangulación 3D e inversión del calor desde la columna;
+  - parpadeo de llama y sincronización por destellos.
+- **`utm.mjs`:** fórmulas de Snyder; error frente a pyproj menor de 1 cm.
+- **Corrección importante:** la propagación descartaba frentes por comparar en 64 bits valores guardados en 32 bits. Detectado por las pruebas antes de publicar resultados.
+- **Experimento reproducible con datos reales** (`fire3d-real.mjs`):
+  - **sin asimilar, el modelo no supera a un círculo** (Jaccard ≤ 0,064 frente a 0,131). Se publica tal cual;
+  - **asimilando la cicatriz del 24-07** (giro del viento de 60°, velocidad ×0,35, inicio a las 15:00): Jaccard **0,352** con área ×1,21, dentro de muestra;
+  - conjunto: la cicatriz cae en P ≥ 50 % en el 74 % de su superficie sin asimilar y en el 100 % tras asimilar;
+  - cámaras en cumbres reales: ninguna ve la base del fuego, pero la columna se triangula a 42 m y la cima a 19 m;
+  - flota de 32 coches: viento a 0,96 m/s;
+  - barómetros: de 0,39 a 0,15 hPa.
+- **Web `/senda/fuego3d`** (three.js, sin conexión):
+  - terreno real con la imagen Sentinel-2 de cada fecha;
+  - cicatrices reales, gravedad dNBR, frente calibrado y probabilidad antes y después de asimilar;
+  - **viento 3D resuelto en el teléfono**, pluma, humo, pavesas y corte vertical de la masa de aire;
+  - vista desde cada cámara (se ve la oclusión);
+  - coches-estación, pasada de un CL-415 y helicóptero;
+  - mapa sinóptico de isobaras reales.
+  - **Gestos tipo Google Maps:** un dedo mueve, dos dedos acercan, giran e inclinan; con teclado, flechas, + y −, Q y E, W y S; botones Cenital, 3D, Horizonte, Norte y Fuego.
+- **Paper científico** (`docs/paper/`, md, html y pdf, más `/senda/paper`): generado desde los resultados, sin cifras escritas a mano. Incluye métodos con ecuaciones, resultados negativos y positivos, ética y legalidad, madurez honesta (64/100) y el camino a ≥ 80.
+- **Investigación** `docs/research/CANALES_SENSORES_Y_HUECOS_112_2026-11-05.md`:
+  - accesibilidad del 112 (EAA, texto en tiempo real);
+  - 017 de INCIBE, Burgernet y natuurbrandrisico;
+  - KNMI con licencia CC BY 4.0;
+  - barómetros de móviles (Mass y Madaus, 2014);
+  - un evento canónico para unir CAP, DATEX II, C-ITS, OBD-II y satélite.
+- **`platforms.mjs`:** 10 integraciones nuevas, cada una con su modo de acceso. Las cámaras privadas solo entran si su titular las cede (CONVENIO), distinto de las cámaras sin permiso (NUNCA).
+
+**Validación:**
+- núcleo + relé 223/223;
+- **E2E en Chromium 47/47 sin red** (accesibilidad en 26 pantallas);
+- web: compilación, idiomas y 98/98.
+
+**Límites:**
+- combustible aproximado por NDVI;
+- ajuste dentro de muestra (falta validar con otra fecha y su meteorología);
+- velocidad terminal y tiempo de combustión de las pavesas supuestos;
+- anomalía de presión sintética;
+- marco legal de la recepción ADS-B pendiente de verificar;
+- sin ensayo de campo.
+
 ## SENDA v0.18 · 05-11-2026 · Seguimiento de incendio, entrega para Hostinger y ronda de financiación
 
 **Entrada (fundador):**

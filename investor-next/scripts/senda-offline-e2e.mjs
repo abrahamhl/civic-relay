@@ -277,6 +277,12 @@ check('Seguimiento de incendio sin red: la columna se sitúa a < 400 m cruzando 
   fu.fix.errM < 400 && fu.fix.rejected.includes('movil-4') && Math.abs(fu.ros - 25) <= 5 && fu.level === 'extrema' && fu.roads.find((r) => r.id === 'M-501').action === 'cortar' && fu.roads.find((r) => r.id === 'M-501').section.pkTo >= 56.5 && fu.alerts >= 1 && fu.firstTown === 'Pelayos de la Presa'
   && fuCalc.rule30 === 0 && fuCalc.attack === 1 && /a mano/.test(fuCalc.sighting.rumbo) && /se queda en el teléfono/.test(fuCalc.sighting.foto), { fu, fuCalc });
 
+// ---- v0.19 sin red: incendio en 3D con datos reales (terreno, satélite, GFS), viento 3D, cámaras y gestos
+const f3 = await cap('/fuego3d', () => window.SENDA_FUEGO3D, 'e2e-35-fuego3d.png');
+const f3b = await C.page.evaluate(async () => { const S = window.SENDA_FUEGO3D; S.api.tilt(0.02); const top = S.api.view.pitch; S.api.tilt(1.45); const hor = S.api.view.pitch; document.querySelector('#cam2').click(); document.querySelector('#plane').click(); await new Promise((r) => setTimeout(r, 300)); return { top, hor, cam: S.cameraView, flight: S.flight?.circulation ?? null, drop: S.flight?.drop?.secondsCancelled ?? null }; });
+check('Incendio en 3D sin red: terreno Copernicus 380×339 y GFS real del 23-07 cargados; el viento 3D se resuelve en el teléfono conservando la masa; la pluma sube; vistas cenital y horizontal, vista desde una cámara y pasada de un CL-415 con su estela',
+  f3.ok && f3.errors.length === 0 && f3.dem.w === 380 && f3.dem.h === 339 && f3.state.divAfter < f3.state.divBefore / 50 && f3.state.plumeTop > 200 && f3b.top < 0.05 && f3b.hor > 1.4 && f3b.cam === 2 && f3b.flight > 50 && f3b.drop > 0, { f3: { ok: f3.ok, errors: f3.errors, state: f3.state, grid: f3.grid }, f3b });
+
 // ---- Llamada sin Internet: dos teléfonos nuevos, código por SONIDO (onda real) y conexión directa sin servidor.
 // (La emulación «offline» de Chromium también bloquea WebRTC local, así que aquí se demuestra lo equivalente:
 //  sin servidores STUN/TURN ni de señalización y CERO peticiones de red desde que empieza la llamada.)
@@ -404,7 +410,7 @@ const a11y = async (page) => page.evaluate(() => {
   return issues;
 });
 const a11yIssues = {};
-const a11yScreens = ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva', '/carretera', '/camaras', '/paises', '/dgt', '/trafico', '/vehiculos', '/fuego'];
+const a11yScreens = ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva', '/carretera', '/camaras', '/paises', '/dgt', '/trafico', '/vehiculos', '/fuego', '/fuego3d'];
 for (const path of a11yScreens) {
   await R.goto(base + path); await R.waitForLoadState('load'); await R.waitForTimeout(300);
   const iss = await a11y(R); if (iss.length) a11yIssues[path || '/'] = iss;

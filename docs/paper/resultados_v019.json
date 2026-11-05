@@ -1,0 +1,439 @@
+{
+ "generado": "2026-11-05",
+ "fuentes": "Contiene datos modificados de Copernicus Sentinel (2026), procesados por SENDA; Copernicus DEM GLO-30 © DLR e.V. 2010-2014 y © Airbus Defence and Space GmbH 2014-2018, proporcionado en el marco de COPERNICUS por la Unión Europea y la ESA",
+ "rapido": false,
+ "malla": {
+  "w": 380,
+  "h": 339,
+  "dx": 100,
+  "x0": 362000,
+  "y1": 4482300,
+  "crs": "EPSG:32630"
+ },
+ "ignicion": {
+  "lat": 40.362,
+  "lon": -4.385,
+  "label": "M-501, km 57 (aprox.)",
+  "i": 204,
+  "j": 134
+ },
+ "masaDeAire": [
+  {
+   "validUTC": "2026-07-23T12:00Z",
+   "t2": 34.2,
+   "rh2": 10,
+   "td2": -1.3,
+   "viento10Kmh": 20.6,
+   "dirDesde": 219,
+   "rachaKmh": 28.6,
+   "capaMezclaM": 1619,
+   "vientoMaxMezclaKmh": 33.4,
+   "densidad": 1.048,
+   "haines": 6,
+   "cape": 0,
+   "regla30": 2,
+   "regla30ConRacha": 2
+  },
+  {
+   "validUTC": "2026-07-23T15:00Z",
+   "t2": 36.3,
+   "rh2": 7,
+   "td2": -4.3,
+   "viento10Kmh": 22.6,
+   "dirDesde": 228,
+   "rachaKmh": 35.5,
+   "capaMezclaM": 1946,
+   "vientoMaxMezclaKmh": 50.1,
+   "densidad": 1.04,
+   "haines": 6,
+   "cape": 0,
+   "regla30": 2,
+   "regla30ConRacha": 3
+  },
+  {
+   "validUTC": "2026-07-23T18:00Z",
+   "t2": 33.9,
+   "rh2": 9,
+   "td2": -3.7,
+   "viento10Kmh": 19.2,
+   "dirDesde": 232,
+   "rachaKmh": 29.6,
+   "capaMezclaM": 1258,
+   "vientoMaxMezclaKmh": 33.7,
+   "densidad": 1.047,
+   "haines": 6,
+   "cape": 0,
+   "regla30": 2,
+   "regla30ConRacha": 2
+  },
+  {
+   "validUTC": "2026-07-23T21:00Z",
+   "t2": 24.8,
+   "rh2": 16,
+   "td2": -2.4,
+   "viento10Kmh": 7,
+   "dirDesde": 315,
+   "rachaKmh": 7.3,
+   "capaMezclaM": 15,
+   "vientoMaxMezclaKmh": null,
+   "densidad": 1.08,
+   "haines": 6,
+   "cape": 0,
+   "regla30": 1,
+   "regla30ConRacha": 1
+  },
+  {
+   "validUTC": "2026-07-24T00:00Z",
+   "t2": 22.8,
+   "rh2": 19,
+   "td2": -2.3,
+   "viento10Kmh": 5,
+   "dirDesde": 283,
+   "rachaKmh": 6.1,
+   "capaMezclaM": 12,
+   "vientoMaxMezclaKmh": null,
+   "densidad": 1.086,
+   "haines": 6,
+   "cape": 0,
+   "regla30": 1,
+   "regla30ConRacha": 1
+  }
+ ],
+ "viento3D": {
+  "malla": "76×67×50 celdas de 500×500×60 m",
+  "divergencia": [
+   {
+    "antes": 0.0224,
+    "despues": 0.0000202,
+    "iter": 260
+   },
+   {
+    "antes": 0.0246,
+    "despues": 0.0000226,
+    "iter": 260
+   },
+   {
+    "antes": 0.0227,
+    "despues": 0.0000198,
+    "iter": 260
+   },
+   {
+    "antes": 0.0109,
+    "despues": 0.00000752,
+    "iter": 260
+   },
+   {
+    "antes": 0.0102,
+    "despues": 0.00000607,
+    "iter": 260
+   }
+  ]
+ },
+ "validacion": {
+  "cicatrizObservadaHa": 868,
+  "rumboObservado": 120,
+  "jaccardCirculo": 0.131,
+  "experimentos": [
+   {
+    "ignicionUTC": "12:00",
+    "jaccard": 0.013,
+    "sorensen": 0.025,
+    "habilidadVsCirculo": -0.136,
+    "jaccardVientoFijo15Z": 0.013,
+    "habilidadVientoFijo": -0.135,
+    "rumboSimulado": 55,
+    "minutosHastaAreaObservada": 204,
+    "haSimuladasALaHoraDeLaImagen": 12044,
+    "razonArea": 13.88
+   },
+   {
+    "ignicionUTC": "15:00",
+    "jaccard": 0.014,
+    "sorensen": 0.028,
+    "habilidadVsCirculo": -0.135,
+    "jaccardVientoFijo15Z": 0.013,
+    "habilidadVientoFijo": -0.135,
+    "rumboSimulado": 60,
+    "minutosHastaAreaObservada": 198,
+    "haSimuladasALaHoraDeLaImagen": 8494,
+    "razonArea": 9.79
+   },
+   {
+    "ignicionUTC": "18:00",
+    "jaccard": 0.04,
+    "sorensen": 0.076,
+    "habilidadVsCirculo": -0.105,
+    "jaccardVientoFijo15Z": 0.013,
+    "habilidadVientoFijo": -0.135,
+    "rumboSimulado": 76,
+    "minutosHastaAreaObservada": 244,
+    "haSimuladasALaHoraDeLaImagen": 5614,
+    "razonArea": 6.47
+   },
+   {
+    "ignicionUTC": "20:00",
+    "jaccard": 0.064,
+    "sorensen": 0.12,
+    "habilidadVsCirculo": -0.077,
+    "jaccardVientoFijo15Z": 0.013,
+    "habilidadVientoFijo": -0.135,
+    "rumboSimulado": 82,
+    "minutosHastaAreaObservada": 321,
+    "haSimuladasALaHoraDeLaImagen": 3864,
+    "razonArea": 4.45
+   }
+  ],
+  "mejor": "20:00",
+  "calibracionEnMuestra": {
+   "mejorForma": {
+    "ignicionUTC": "15:00",
+    "giroVientoDeg": 60,
+    "multVelocidad": 0.75,
+    "jaccard": 0.383,
+    "razonAreaImagen": 4.53,
+    "rumbo": 131
+   },
+   "mejorConAreaCoherente": {
+    "ignicionUTC": "15:00",
+    "giroVientoDeg": 60,
+    "multVelocidad": 0.35,
+    "jaccard": 0.352,
+    "razonAreaImagen": 1.21,
+    "rumbo": 135
+   },
+   "top5": [
+    {
+     "ignicionUTC": "15:00",
+     "giroVientoDeg": 60,
+     "multVelocidad": 0.75,
+     "jaccard": 0.383,
+     "razonAreaImagen": 4.53,
+     "rumbo": 131
+    },
+    {
+     "ignicionUTC": "15:00",
+     "giroVientoDeg": 60,
+     "multVelocidad": 1,
+     "jaccard": 0.371,
+     "razonAreaImagen": 10.12,
+     "rumbo": 127
+    },
+    {
+     "ignicionUTC": "15:00",
+     "giroVientoDeg": 60,
+     "multVelocidad": 0.5,
+     "jaccard": 0.361,
+     "razonAreaImagen": 2.12,
+     "rumbo": 135
+    },
+    {
+     "ignicionUTC": "15:00",
+     "giroVientoDeg": 75,
+     "multVelocidad": 1,
+     "jaccard": 0.357,
+     "razonAreaImagen": 12.31,
+     "rumbo": 143
+    },
+    {
+     "ignicionUTC": "15:00",
+     "giroVientoDeg": 60,
+     "multVelocidad": 0.35,
+     "jaccard": 0.352,
+     "razonAreaImagen": 1.21,
+     "rumbo": 135
+    }
+   ],
+   "nota": "Ajuste dentro de muestra: indica el sesgo que explica la cicatriz; no es una validación independiente"
+  }
+ },
+ "conjunto": {
+  "miembros": 24,
+  "horizontesMin": [
+   180,
+   360,
+   720,
+   920
+  ],
+  "aciertoObservadoConP50": 0.742,
+  "falsaAlarmaP50": 0.821,
+  "trasAsimilar": {
+   "aciertoObservadoConP50": 1,
+   "falsaAlarmaP50": 0.895,
+   "horizontesMin": [
+    180,
+    360,
+    720,
+    1220
+   ],
+   "parametros": {
+    "ignicionUTC": "15:00",
+    "giroVientoDeg": 60,
+    "multVelocidad": 0.35,
+    "jaccard": 0.352,
+    "razonAreaImagen": 1.21,
+    "rumbo": 135
+   }
+  },
+  "roi": {
+   "i0": 133,
+   "j0": 57,
+   "i1": 343,
+   "j1": 216,
+   "w": 210,
+   "h": 159,
+   "horizontesMin": [
+    180,
+    360,
+    720,
+    920
+   ],
+   "ignicionUTC": "20:00"
+  },
+  "llegada": {
+   "fichero": "arrival_roi.bin (Uint16, minutos desde la ignición calibrada; 65535 = no llega)",
+   "ignicionUTC": "15:00",
+   "giroVientoDeg": 60,
+   "multVelocidad": 0.35
+  },
+  "capas": "prob_roi.bin: 8 capas Uint8 (4 horizontes sin asimilar + 4 tras asimilar), cada una roi.w × roi.h"
+ },
+ "pluma": {
+  "calorGW": 19.59,
+  "intensidadKWm": 9794,
+  "rosCabezaMMin": 16.3,
+  "frenteM": 2000,
+  "alturaFinalM": 1880,
+  "vientoMezclaMs": 9.8,
+  "dirHacia": 61,
+  "flujoFlotabilidad": 191882,
+  "aspiracion": {
+   "sinPlumaMs": -0.22,
+   "conPlumaMs": 0.05
+  },
+  "pavesas": {
+   "pavesas": 200,
+   "caidas": 200,
+   "vivasAlCaer": 133,
+   "p50M": 1765,
+   "p90M": 3438,
+   "supuestos": "velocidad terminal 4 m/s y 240 s de combustión (supuestos)"
+  }
+ },
+ "aviones": {
+  "CL-415": {
+   "circulation": 134.67,
+   "b0": 22.46,
+   "descentMs": 0.95,
+   "groundGustMs": 0.54,
+   "timeToGroundS": 41.92
+  },
+  "helicoptero": {
+   "induced": 12.37,
+   "farWake": 24.75
+  },
+  "descargaCL415": {
+   "energyGJ": 4.77,
+   "firePowerMW": 1175.28,
+   "secondsCancelled": 4.06,
+   "linePerLitreM": 0.02
+  },
+  "descargaAT802": {
+   "energyGJ": 2.35,
+   "firePowerMW": 1175.28,
+   "secondsCancelled": 2,
+   "linePerLitreM": 0.04
+  }
+ },
+ "flota": [
+  {
+   "coches": 2,
+   "errorMedianoMs": 4.65,
+   "errorP90Ms": 7.47
+  },
+  {
+   "coches": 4,
+   "errorMedianoMs": 2.11,
+   "errorP90Ms": 4.84
+  },
+  {
+   "coches": 8,
+   "errorMedianoMs": 1.61,
+   "errorP90Ms": 3.76
+  },
+  {
+   "coches": 16,
+   "errorMedianoMs": 1.42,
+   "errorP90Ms": 2.3
+  },
+  {
+   "coches": 32,
+   "errorMedianoMs": 0.96,
+   "errorP90Ms": 1.58
+  }
+ ],
+ "presion": [
+  {
+   "sensores": 10,
+   "rmseFondoHpa": 0.393,
+   "rmseAnalisisHpa": 0.222
+  },
+  {
+   "sensores": 40,
+   "rmseFondoHpa": 0.393,
+   "rmseAnalisisHpa": 0.247
+  },
+  {
+   "sensores": 120,
+   "rmseFondoHpa": 0.393,
+   "rmseAnalisisHpa": 0.15
+  }
+ ],
+ "camaras": {
+  "camaras": [
+   {
+    "lat": 40.4522,
+    "lon": -4.5148,
+    "altitudM": 1310,
+    "distanciaKm": 14.9
+   },
+   {
+    "lat": 40.2741,
+    "lon": -4.4967,
+    "altitudM": 1215,
+    "distanciaKm": 13.6
+   },
+   {
+    "lat": 40.4198,
+    "lon": -4.2913,
+    "altitudM": 953,
+    "distanciaKm": 10.2
+   }
+  ],
+  "venLaBase": [
+   false,
+   false,
+   false
+  ],
+  "venLaCima": [
+   true,
+   true,
+   true
+  ],
+  "alturaVisiblePorCamaraM": [
+   100,
+   125,
+   25
+  ],
+  "alturaComunTriangulada": 125,
+  "errorMedianoBase1CamaraDEM_M": null,
+  "errorMedianoPosicionColumna3Camaras_M": 42,
+  "errorMedianoAlturaCima_M": 19,
+  "ruido": "2 px y 0,15° de orientación (supuestos)",
+  "calorDesdeColumnaGW_mediana": 19.52,
+  "calorDesdeColumnaGW_p10p90": [
+   18.72,
+   20.27
+  ],
+  "calorDelFrenteGW": 19.59
+ }
+}

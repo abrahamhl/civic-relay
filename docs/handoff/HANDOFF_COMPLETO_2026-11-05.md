@@ -1,6 +1,6 @@
 # SENDA · Traspaso completo (handoff v2) para cualquier IA o persona
 
-> **Fecha:** 05-11-2026 · **Versión del producto:** v0.18 · **Rama:** `ccr-357397d4-i6q247` · **PR:** #13 (borrador, apilado sobre #12 `ccr-bb7a95b8-t79scj`).
+> **Fecha:** 05-11-2026 · **Versión del producto:** v0.19 · **Rama:** `ccr-357397d4-i6q247` · **PR:** #13 (borrador, apilado sobre #12 `ccr-bb7a95b8-t79scj`).
 > **Estructura:** Entrada → Procesamiento → Validación → Salida. Este documento sustituye como punto de partida a `README.md` (v1, 04-11-2026), que sigue valiendo como contexto histórico.
 > **Responsable y última palabra:** Abraham Haddioui (fundador). Ninguna IA decide alcance, licencia, marca, precio ni promesas públicas.
 
@@ -39,15 +39,17 @@
    - premiar con puntos la rapidez o acercarse al peligro.
 6. **Antes de quitar contenido, preguntar al fundador.** «Acortar» no es «sustituir».
 
-## 3. Estado (v0.18)
+## 3. Estado (v0.19)
 
 | Medida | Valor |
 |---|---|
-| Pruebas del núcleo y del relé | 207/207 (`node --test packages/senda/tests/*.test.mjs packages/senda-relay/tests/*.test.mjs`) |
-| E2E en Chromium, sin red | 46/46, con accesibilidad en 25 pantallas (`node investor-next/scripts/senda-offline-e2e.mjs`). La misma batería pasa contra la **exportación servida por Apache** con el `.htaccess` de Hostinger (`SENDA_BASE_URL=http://127.0.0.1:8088/senda`) |
+| Pruebas del núcleo y del relé | 223/223 (`node --test packages/senda/tests/*.test.mjs packages/senda-relay/tests/*.test.mjs`) |
+| E2E en Chromium, sin red | 47/47, con accesibilidad en 26 pantallas (`node investor-next/scripts/senda-offline-e2e.mjs`). La misma batería pasa contra la **exportación servida por Apache** con el `.htaccess` de Hostinger (`SENDA_BASE_URL=http://127.0.0.1:8088/senda`) |
 | Web | `npm run build`, `node test-locales.mjs`, `node --test tests/*.test.mjs` (98/98) en `investor-next` |
 | Módulos del núcleo | 55 ficheros en `packages/senda/src` (copiados a `investor-next/public/senda/core` con `sync-web.mjs`) |
-| Pantallas de la app | 25 en `investor-next/public/senda/*.html` (nueva: `/senda/fuego`) |
+| Pantallas de la app | 27 en `investor-next/public/senda/*.html` (nuevas: `/senda/fuego3d` y `/senda/paper`) |
+| Datos reales | `investor-next/public/senda/data/smv2026/` (Copernicus DEM, Sentinel-2 y GFS del 23-07-2026). Se reproducen con `scripts/datos-reales/` y `packages/senda/scripts/fire3d-real.mjs` |
+| Paper | `docs/paper/SENDA_FUEGO3D_paper.(md\|html\|pdf)`, generado con `node packages/senda/scripts/build-paper.mjs --pdf` desde `resultados_v019.json` |
 | Vídeos publicados | Película v5 (es/en), capacidades v0.12 (es), **ruta** (es/en, subtítulos es/en/nl) y visión real (`/media/vision/`) |
 | Entrega autocontenida | `entrega/` con 7 zips deterministas (web para Hostinger, vídeos, código, documentación, evidencias, visión), `LEEME_PRIMERO` y huellas SHA-256. Se regenera con `node scripts/entrega/generar-entrega.mjs [--build]` |
 | Financiación | `docs/financiacion/RONDA_FINANCIACION_2026-11-05.md` (convocatorias con fecha y fuente, diligencia, ajustes del software, plan de 90 días) |
@@ -173,6 +175,7 @@ Después, esperar el estado `READY` y comprobar un archivo nuevo, por ejemplo `/
 | v0.14 | Ruta protectora: frenada, choque, SOS por coches, PK sin red, escena PAS y puntos cívicos |
 | v0.15 | 20 situaciones al volante, V16 + SENDA, cámaras públicas (visibilidad), DATEX II, rood kruis, perfiles España y Países Bajos |
 | v0.17 | Visión con vídeo real (`packages/senda-vision`: YOLOX Apache + ByteTrack), coches conectados y fusión (`vehicle-link.mjs`: Ley de Datos, DFRS, k-anonimato, Kalman, posición de ~10 m a ~1-2 m), renders realistas en el kit, `/senda/trafico`, `/senda/vehiculos`, documento `docs/architecture/BACKEND_VEHICULOS_Y_FUSION_2026-11-05.md` |
+| v0.19 | Incendio en 3D con datos reales (terreno Copernicus, Sentinel-2, GFS): masa de aire, viento 3D con conservación de masa, pluma, cámaras con oclusión, coches-estación, aviones, conjunto y asimilación de la cicatriz; visor three.js con gestos; paper científico; investigación del 112 y de canales |
 | v0.18 | Seguimiento de incendio (`fire-watch.mjs`, `/senda/fuego`): columna situada cruzando rumbos de torres, cámaras y la brújula del móvil, perímetro y avance por satélite, 30-30-30, HDW, Fosberg e ISI, intensidad de Byram, criticidad, carreteras a cortar y avisos a coches. Caso real: M-501, 23-07-2026. Entrega autocontenida para Hostinger (`entrega/`), validada con Apache. Paquete de financiación |
 | v0.16 | Infraestructura de la DGT validada (ninguna pasarela de radio; datos publicados y DGT 3.0), aforos → cola, paneles → avisos, radares publicados → límite. Kit de vídeo para otras IA (`validate.mjs`, `make.sh`, `ruta.json`) y este handoff |
 
