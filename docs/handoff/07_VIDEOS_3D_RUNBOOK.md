@@ -40,12 +40,13 @@ Voces usadas: `ef_dora` (español) y `bf_emma` (inglés), a velocidad 0,95.
 cd media/senda-film
 node validate.mjs ruta es                          # 1) sin errores
 CORE=192 E2E=43 ./make.sh ruta es                  # 2) voz + imagen + mezcla → out/senda-ruta-es.mp4
-node render.mjs --stills es 5,40,90,150            # 3) fotogramas sueltos para revisar (out/stills-es/)
+SCRIPT=ruta CORE=192 E2E=43 node render.mjs --stills es 5,40,90,150   # 3) fotogramas sueltos (out/stills-es/)
 CORE=192 E2E=43 ./make.sh ruta es publicar         # 4) publicar en investor-next/public/media/
 ```
 
 - `CORE` y `E2E` son las cifras de pruebas que muestra la escena `verify`. Cópialas de `investor-next/public/senda/estado.json` del último commit; no las inventes.
 - Para `--stills` hay que generar antes la voz (paso 2), porque los tiempos salen de `out/timeline-*.js`.
+- **`--stills` necesita `SCRIPT=<guion>`** (y `CORE`/`E2E` si sale la escena `verify`): sin él carga `script.json` y la línea de tiempo de la película, no la del guion que estás revisando.
 - Duración orientativa en un contenedor de 4 núcleos: la voz tarda 2–4 min y la imagen de un vídeo de 4 min unos 20–40 min.
 
 ## 3. Escribir o cambiar un guion
@@ -66,6 +67,9 @@ CORE=192 E2E=43 ./make.sh ruta es publicar         # 4) publicar en investor-nex
 
 - **Tipos de escena (`visual.kind`):** `page`, `arch3d`, `drone3d`, `call`, `howsim`, `hub`, `kpis`, `shots`, `stack`, `verify` y `cta`.
 - **`es` y `es_say` tienen el mismo número de frases.** `es_say` escribe con palabras lo que la voz lee mal (números largos, unidades, símbolos, «SENDA» → «Senda», «112» → «ciento doce»). Si se omite, se pronuncia `es`.
+- **Inglés:** `en` y `en_say` (voz `bf_emma`; «112» → «one one two», siglas separadas: «D G T»).
+- El validador bloquea las promesas falsas («replaces 112», «sustituye al 112») salvo si van negadas («SENDA never replaces 112», «nunca sustituye al 112»).
+- Los subtítulos neerlandeses (`nl`) solo se generan si **todas** las escenas traen `nl`, con los tiempos de la voz inglesa.
 - **Una frase = un subtítulo.** Que tenga menos de 260 caracteres; mejor 2–3 frases por escena.
 - **Escenas `page` disponibles** (página: identificadores):
 
@@ -134,6 +138,6 @@ Escena 3D nueva en `sims.js` (solo si no puede vivir en una página): añade el 
 
 | Vídeo | Guion | Estado |
 |---|---|---|
-| Ruta protectora, cámaras, Países Bajos y DGT (es) | `ruta.json` | **Grabado y publicado** en `investor-next/public/media/senda-ruta-es.mp4` (+ `.vtt` y póster, 05-11-2026) |
-| La misma versión en inglés (+ subtítulos nl) | `ruta.json` | **Grabado y publicado** en `investor-next/public/media/senda-ruta-en.mp4` (+ `.vtt` en/nl y póster, 05-11-2026) |
+| Ruta protectora, cámaras, Países Bajos y DGT (es) | `ruta.json` | **Publicado** (05-11-2026): `investor-next/public/media/senda-ruta-es.mp4`, `.vtt` y póster; enlazado en la portada, en `/senda/arquitectura` y en `/senda/carretera` |
+| La misma versión en inglés (+ subtítulos nl) | `ruta.json` (campos `en`, `en_say`, `title.en` y `nl`) | **Publicado** (05-11-2026): `senda-ruta-en.mp4`, `.vtt` en/nl y póster. Los subtítulos `nl` usan los tiempos de la voz inglesa. Los rótulos dibujados en los lienzos de la app siguen en español: la narración dice en voz alta «simulation», «synthetic image» e «invented road» |
 | Piezas verticales de 45–60 s (una por escena) | un guion de 1–2 escenas | Pendiente; el formato vertical necesitaría otra plantilla de `film.html` |

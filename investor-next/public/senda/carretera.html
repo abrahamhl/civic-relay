@@ -243,7 +243,7 @@ $('#s-f').oninput = (e) => { S.flow = +e.target.value; $('#s-fv').textContent = 
 sos();
 const gs = canvas($('#cv-sos'));
 function drawSos(t) {
-  const g = gs, P = 20, lt = t % P, simS = clamp(lt / 17) * 12 * 60, r = S.road, X = (x) => 20 + (x / 24000) * 600;
+  const g = gs, P = 24, lt = t % P, simS = clamp(lt / 17) * 12 * 60, r = S.road, X = (x) => 20 + (x / 24000) * 600;
   g.fillStyle = '#081109'; g.fillRect(0, 0, 640, 600);
   text(g, 'Carretera de montaña, de noche · sin cobertura entre el km 3 y el 21', 20, 30, { c: C.t, f: '800 14px Inter,system-ui' });
   text(g, `minuto ${fmt(simS / 60, 1)}`, 620, 30, { c: C.a, f: '800 15px Inter,system-ui', al: 'right' });

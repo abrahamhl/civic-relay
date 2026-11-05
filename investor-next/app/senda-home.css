@@ -9,6 +9,7 @@
 .sh-film{margin-top:34px}.sh-film h2,.sh-h2{font-size:clamp(22px,2.6vw,30px);margin:38px 0 14px}
 .sh-film video{width:100%;aspect-ratio:16/9;border-radius:18px;border:1px solid #203240;background:#05090c}
 .sh-note{color:#a9bcc5;font-size:14px;margin-top:10px}.sh-note a{color:#91d7e8}
+.sh-alt{margin-top:10px}.sh-alt summary{cursor:pointer;color:#91d7e8;font-size:14px;padding:6px 0}.sh-alt video{margin-top:10px}
 .sh-gap{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .sh-fact{display:block;padding:18px;border-radius:16px;border:1px solid rgba(255,91,110,.4);background:rgba(255,91,110,.06);color:#f2f4f4;text-decoration:none}
 .sh-fact b{display:block;font-size:34px;color:#ff7756}.sh-fact span{color:#b7c7cf;font-size:15px}

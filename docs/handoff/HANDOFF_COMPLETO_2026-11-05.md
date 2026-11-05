@@ -48,7 +48,7 @@
 | Web | `npm run build`, `node test-locales.mjs`, `node --test tests/*.test.mjs` (98/98) en `investor-next` |
 | Módulos del núcleo | 53 en `packages/senda/src` (copiados a `investor-next/public/senda/core` con `sync-web.mjs`) |
 | Pantallas de la app | 22 en `investor-next/public/senda/*.html` |
-| Vídeos publicados | Película v5 (es/en), capacidades v0.12 (es) y ruta protectora v0.16 (`senda-ruta-es.mp4` y `senda-ruta-en.mp4`, con subtítulos es/en/nl) |
+| Vídeos publicados | Película v5 (es/en), capacidades v0.12 (es) y **ruta** (es/en, subtítulos es/en/nl, 05-11-2026: carretera, cámaras, Países Bajos y DGT) |
 
 ## 4. Mapa del repositorio
 
@@ -62,7 +62,7 @@
 | `hardware/esp32-survey/` | Accesorio ESP32 (misma trama en C++) |
 | `investor-next/` | Web Next.js (portada es/en/nl) y app estática en `public/senda/` |
 | `investor-next/public/senda/kit.mjs` | Utilidades de las pantallas y **modo película** (`?film=1&viz=<id>`, `SENDA_VIZ.seek(t)`) |
-| `investor-next/public/senda-sw.js` | Service worker (versión `senda-campo-v17`); **añadir aquí cada página o módulo nuevo** |
+| `investor-next/public/senda-sw.js` | Service worker (versión `senda-campo-v18`); **añadir aquí cada página o módulo nuevo** |
 | `investor-next/scripts/senda-offline-e2e.mjs` | E2E sin red con tres teléfonos virtuales |
 | `media/senda-film/` | Vídeos: ver [07_VIDEOS_3D_RUNBOOK.md](07_VIDEOS_3D_RUNBOOK.md) |
 | `docs/research/SENSORES_Y_CANALES_ANDROID_2026-11-04.md` | Investigación con fuentes, por versión (§ 1–9) |
@@ -140,7 +140,7 @@ Después, esperar el estado `READY` y comprobar un archivo nuevo, por ejemplo `/
 4. Primer convenio: DGT 3.0 o un ayuntamiento.
 5. Socio para el piloto neerlandés.
 6. Fusionar los PR #12 y #13.
-7. Vídeos: versión inglesa de `ruta.json` y piezas verticales.
+7. Vídeos: piezas verticales y si se traducen al inglés los rótulos de los lienzos de la app (hoy en español también en el vídeo inglés de `ruta`).
 
 ## 8. Historial resumido
 

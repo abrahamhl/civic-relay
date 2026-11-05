@@ -59,5 +59,6 @@ def vtt(sublang):
         lines += [str(n), f"{ts(a)} --> {ts(b)}", by[sid][sublang][i], ""]
     (out / f"subtitles-{PFX}{sublang}.vtt").write_text("\n".join(lines), encoding="utf-8")
 vtt(lang)
-if lang == "en": vtt("nl")
+# Subtítulos neerlandeses con los tiempos ingleses, solo si el guion los trae (script.json sí; ruta.json no).
+if lang == "en" and all("nl" in s for s in cfg["scenes"]): vtt("nl")
 print(f"total {t:.1f}s → {out}")

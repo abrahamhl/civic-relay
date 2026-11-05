@@ -1,93 +1,93 @@
 WEBVTT
 
 1
-00:00:00.600 --> 00:00:10.776
-In Spain, 1,119 people died on interurban roads in 2025. Most of them on single-lane roads with sparse traffic and poor signal.
+00:00:00.600 --> 00:00:12.077
+In Spain, 1,119 people died on interurban roads in 2025. Most of them on roads with one lane in each direction, little traffic and poor coverage.
 
 2
-00:00:11.126 --> 00:00:21.323
-SENDA rides with you: it warns of what you can't see, calls for help even with no network, and guides you if you stop to assist. It never replaces your attention or 112.
+00:00:12.427 --> 00:00:23.627
+SENDA travels with you: it warns you of what you can't see, calls for help even with no network and guides you if you stop to help. SENDA never replaces 112, or your attention on the road.
 
 3
-00:00:22.923 --> 00:00:33.483
-Fog, 120 km/h, and 1.2 seconds between cars. Each driver reacts to the brake lights ahead and the delay adds up: five cars pile up.
+00:00:25.227 --> 00:00:36.001
+Fog, 120 km/h and 1.2 seconds between cars. Each driver reacts to the brake lights ahead and the delays add up: five cars crash in a chain.
 
 4
-00:00:33.833 --> 00:00:45.567
-With SENDA, the first phone detects hard braking from GPS speed and alerts everyone at once. Only the car tailgating right behind collides: only a safe following distance fixes that.
+00:00:36.351 --> 00:00:48.084
+With SENDA, the first car's phone detects the braking from its GPS speed and warns everyone at once. Only the car tailgating right behind still crashes: only a safe distance fixes that.
 
 5
-00:00:47.167 --> 00:00:56.340
-A night crash along 18 kilometres with zero coverage. The phone in the wrecked car broadcasts an SOS, and any passing car with SENDA carries it out.
+00:00:49.684 --> 00:00:59.967
+A night-time crash on 18 kilometres of road with no network at all. The crashed car's phone broadcasts the SOS, and any passing car with SENDA picks it up and carries it.
 
 6
-00:00:56.690 --> 00:01:04.306
-With just one in ten cars, the alert gets out in about seven minutes. And oncoming cars warn drivers heading toward the crash.
+00:01:00.317 --> 00:01:10.237
+In this simulation, with only one car in ten running SENDA, the alert gets out in about seven minutes. And oncoming cars warn the drivers heading towards the crash.
 
 7
-00:01:05.906 --> 00:01:13.351
-GPS works without the Internet. What's missing is knowing what to say: road code, kilometre marker, and direction of travel.
+00:01:11.837 --> 00:01:18.535
+GPS works without the Internet. What's missing is knowing what to say: road, kilometre point and direction.
 
 8
-00:01:13.701 --> 00:01:21.061
-SENDA computes it offline, adds the nearest visible landmark, such as a wind turbine, and tracks your position inside a tunnel.
+00:01:18.885 --> 00:01:29.104
+SENDA works it out with no network, adds the nearest visible landmark, such as a wind turbine, and keeps tracking you inside a tunnel. The road shown is invented, for the demo.
 
 9
-00:01:22.661 --> 00:01:31.515
-Anyone who stops can coordinate the scene following the official protocol: protect, alert, and assist. Every task is confirmed by a second person.
+00:01:30.704 --> 00:01:39.109
+Whoever stops can coordinate the scene using the DGT's routine: protect, alert and help. Each task is confirmed by another person.
 
 10
-00:01:31.865 --> 00:01:39.694
-When traffic police arrive, they take command and receive the summary. Confirmed actions earn civic points in a tamper-evident ledger.
+00:01:39.459 --> 00:01:47.843
+When the Guardia Civil arrives, it takes command and receives the summary. Confirmed actions earn civic points in a record that cannot be altered.
 
 11
-00:01:41.294 --> 00:01:49.166
-The first to know is the phone of the driver who took the wrong ramp: three consecutive positions against the carriageway flow are enough to warn them.
+00:01:49.443 --> 00:01:57.699
+The first to know is the phone of the driver who made the mistake: three positions in a row against the direction of the carriageway are enough to warn them.
 
 12
-00:01:49.516 --> 00:01:55.020
-Oncoming drivers receive the time until they cross paths and what to do: keep right and slow down.
+00:01:58.049 --> 00:02:04.172
+Oncoming drivers get the time left before they meet and what to do: keep to the right-hand lane and slow down.
 
 13
-00:01:56.620 --> 00:02:03.767
-The tail of a traffic jam grows backward. Using traffic-flow theory, SENDA calculates how fast that shockwave moves.
+00:02:05.772 --> 00:02:11.767
+The end of a traffic jam grows backwards. Using traffic-flow theory, SENDA calculates how fast.
 
 14
-00:02:04.117 --> 00:02:10.410
-So it warns you where the tail of the queue will be when you reach it, not where it was, letting you slow down much earlier.
+00:02:12.117 --> 00:02:17.493
+So it warns you where the queue will be when you get there, not where it was, and you slow down much earlier.
 
 15
-00:02:12.010 --> 00:02:18.538
-SENDA only uses public traffic cameras released for reuse, and only to measure road conditions, never people.
+00:02:19.093 --> 00:02:25.322
+SENDA only uses public cameras released for reuse, and only to measure the state of the road, never people.
 
 16
-00:02:18.888 --> 00:02:29.320
-From a dark reference at a known distance, it calculates visibility in metres and the safe speed to stop within sight. This image is synthetic, built to verify the method.
+00:02:25.672 --> 00:02:36.445
+With a dark object at a known distance, it works out the visibility in metres and the speed at which you can stop within what you can see. This is a synthetic image, made to test the method.
 
 17
-00:02:30.920 --> 00:02:39.069
-Both 112 and DATEX II traffic feeds are shared across the European Union. That is why the exact same core works in the Netherlands.
+00:02:38.045 --> 00:02:46.216
+112 and DATEX II traffic information are common across the whole European Union. That is why the same core works in the Netherlands.
 
 18
-00:02:39.419 --> 00:02:46.523
-There, a red cross above a lane means the lane is closed. SENDA reads it from open data and speaks the warning in Dutch.
+00:02:46.566 --> 00:02:53.158
+There, a red cross over a lane means the lane is closed. SENDA reads it from open data and tells you in Dutch.
 
 19
-00:02:48.123 --> 00:02:58.214
-Speed cameras, message signs, and loop detectors aren't radios we can tap into: each talks to the traffic authority over a closed link. Radar detection is also illegal.
+00:02:54.758 --> 00:03:06.235
+Speed radars, message signs and traffic counting stations are not radios we can use: each one talks to the DGT over a closed channel. Detecting speed radars is also prohibited.
 
 20
-00:02:58.564 --> 00:03:06.863
-Instead, SENDA fuses what the authority publishes. For example, loop-detector readings reveal where a queue starts and how fast it grows.
+00:03:06.585 --> 00:03:15.567
+SENDA adds up what the DGT publishes. In this example, readings from the counting stations show where the queue starts and how fast it grows.
 
 21
-00:03:08.463 --> 00:03:14.927
-Everything you have seen is computed by the same app core, backed by automated tests that run completely offline.
+00:03:17.167 --> 00:03:22.969
+Everything you have seen is calculated by the app's own core, with automated tests that run offline.
 
 22
-00:03:15.277 --> 00:03:22.914
-The most important part is still ahead: real-road trials, the native app for car-to-car alerts, and agreements with traffic authorities.
+00:03:23.319 --> 00:03:31.277
+The most important part is still missing: trials on real roads, the native app for car-to-car alerts and agreements with the DGT.
 
 23
-00:03:24.514 --> 00:03:28.887
+00:03:32.877 --> 00:03:37.250
 SENDA: the channel that remains when everything else fails. Try it on the web.

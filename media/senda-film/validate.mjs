@@ -12,6 +12,8 @@ const here = dirname(fileURLToPath(import.meta.url)), name = process.argv[2] || 
 const cfg = JSON.parse(readFileSync(resolve(here, `${name}.json`), 'utf8')), pub = resolve(here, '../../investor-next/public');
 const KINDS = new Set(['hub', 'kpis', 'shots', 'stack', 'verify', 'page', 'call', 'howsim', 'cta', 'arch3d', 'drone3d']);
 const BANNED = [/sustituye (al|el) 112/i, /reemplaza (al|el) 112/i, /garantiza(mos)? (que )?(salvar|sobrevivir)/i, /100 ?% (seguro|fiable)/i, /replaces? (the )?112/i];
+// Un aviso negado («SENDA never replaces 112», «nunca sustituye al 112») es lo contrario de una promesa falsa.
+const NEG = /\b(never|not|no|nunca|jamás|doesn't|does not|won't|cannot)\s+$/i;
 const errs = [], warn = [], ids = new Set();
 if (!cfg.voices?.[lang]) errs.push(`no hay voz para «${lang}» en voices`);
 for (const s of cfg.scenes ?? []) {
@@ -22,7 +24,7 @@ for (const s of cfg.scenes ?? []) {
   const read = s[lang], say = s[`${lang}_say`] ?? read;
   if (!Array.isArray(read) || !read.length) errs.push(`${at}: falta el texto «${lang}»`);
   else if (say.length !== read.length) errs.push(`${at}: «${lang}» tiene ${read.length} frases y «${lang}_say» ${say.length}`);
-  for (const t of [...(read ?? []), ...(say ?? [])]) { if (t.length > 260) warn.push(`${at}: frase de ${t.length} caracteres (más de 260 cansa)`); for (const b of BANNED) if (b.test(t)) errs.push(`${at}: promesa prohibida «${t.match(b)[0]}»`); }
+  for (const t of [...(read ?? []), ...(say ?? [])]) { if (t.length > 260) warn.push(`${at}: frase de ${t.length} caracteres (más de 260 cansa)`); for (const b of BANNED) for (const m of t.matchAll(new RegExp(b.source, 'gi'))) if (!NEG.test(t.slice(0, m.index))) errs.push(`${at}: promesa prohibida «${m[0]}»`); }
   for (const t of say ?? []) if (/[→²³±≤≥%]|m\/s/.test(t)) warn.push(`${at}: «${lang}_say» lleva símbolos que la voz lee mal: escríbelos con palabras`);
   if (s.visual?.kind === 'page') {
     const m = (s.visual.src ?? '').match(/^\/senda\/([\w-]+)\?film=1&viz=([\w-]+)$/);

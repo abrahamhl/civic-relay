@@ -1,5 +1,48 @@
 # Changelog
 
+## SENDA v0.16.1 · 05-11-2026 · Vídeo «ruta» publicado en español e inglés
+
+**Entrada (fundador):**
+- Grabar y publicar el vídeo `ruta` en español, ya validado.
+- Hacer la versión inglesa con las mismas cifras y la misma honestidad: «synthetic image», «invented road», «SENDA never replaces 112».
+- Enlazarlos en la portada y en `/senda/arquitectura` sin quitar los vídeos existentes.
+
+**Procesamiento:**
+- Máquina: kokoro-onnx 0.6.1, modelos `kokoro-v1.0.onnx` y `voices-v1.0.bin` (lanzamiento `model-files-v1.0`) y ffmpeg.
+- Español: `CORE=192 E2E=43 ./make.sh ruta es publicar` → `investor-next/public/media/senda-ruta-es.mp4` (3:29, 8,2 MB), `.vtt` y póster.
+- Inglés: `title.en`, `en` y `en_say` en las 12 escenas de `ruta.json`, con el mismo número de frases que `es`. Voz `bf_emma` (en-gb), 3:38.
+  - Los rótulos dibujados en los lienzos de la app siguen en español. Por eso la narración inglesa dice en voz alta lo que en español solo aparece en pantalla: «In this simulation» (SOS sin cobertura), «The road shown is invented» (PK) e «In this example» (aforos).
+- Web:
+  - **Portada (es/en/nl):** bloque nuevo `#ruta` bajo la película. Muestra el vídeo del idioma (en `nl`, el inglés con subtítulos neerlandeses por defecto) y el otro idioma desplegable, cada uno con sus propias pistas de subtítulos.
+  - **`/senda/arquitectura`:** tarjeta nueva tras la del vídeo de capacidades, con el vídeo español y el inglés desplegable.
+  - **`/senda/carretera`, visualización `sos`:** ciclo de 20 → 24 s. La escena inglesa dura 22,2 s y el contador volvía a «minuto 0,8» justo antes del corte; ahora mantiene el resultado final («SOS fuera de la zona sin red a los 7,4 min»). El vídeo español no cambia: todos sus fotogramas caen antes del segundo 20.
+  - Service worker `senda-campo-v18`, para que quien ya tenga la app instalada reciba `arquitectura` y `carretera` nuevas.
+- **Integración con el commit paralelo `692a3a8`**, que hizo la misma tarea mientras tanto:
+  - se conservan sus subtítulos `nl`, alineados con este audio inglés solo donde el contenido cambia (simulación, carretera inventada, imagen sintética, «vervangt nooit 112», un carril por sentido, Guardia Civil y DGT), y su sección de vídeos en `/senda/carretera`;
+  - el texto inglés y los MP4 son los de esta entrada: el inglés remoto no decía «synthetic image», «invented road» ni «SENDA never replaces 112», y su render no mostraba los emojis de los lienzos;
+  - `senda-ruta-nl.vtt` se ha regenerado con los tiempos de esta voz inglesa (23 cues, mismos tiempos que `en`). El commit `692a3a8` sigue en el historial.
+- Kit de vídeo:
+  - `make.sh` publica también `senda-<guion>-nl.vtt` cuando `voice.py` lo acaba de generar.
+  - `validate.mjs` ya no marca como promesa prohibida un aviso **negado** («SENDA never replaces 112», «nunca sustituye al 112»). La afirmación sigue bloqueada (probado con un guion de prueba).
+  - `voice.py` solo genera subtítulos `nl` si todas las escenas los traen (antes fallaba con `ruta.json` en inglés).
+  - Guía: `--stills` necesita `SCRIPT=<guion>`.
+
+**Validación:**
+- `validate.mjs ruta es|en` sin errores; `script` y `features` siguen validando.
+- Subtítulos es/en: 23 cues cada uno, idénticos a las frases leídas y sin fonética (comprobación automática).
+- Fotogramas sueltos de las 12 escenas (arranque, mitad y final en 3 de ellas): sin pantallas en blanco ni textos cortados; `verify` muestra 192/192 y 43/43.
+- La voz publicada es idéntica bit a bit a la revisada; el MP4 publicado frente al revisado da un PSNR de 47 dB.
+- Núcleo + relé 192/192 · E2E en Chromium 43/43, sin red (accesibilidad en 22 pantallas) · web: compilación, idiomas (es/en/nl) y 98/98.
+- Portada (es/nl) y `/senda/arquitectura` compiladas: cada vídeo nuevo, su póster y su `.vtt` responden 200; capturas en escritorio y en móvil (390 px) sin solapes.
+
+**Límites:**
+- En el vídeo inglés, los rótulos de los lienzos de las páginas de la app están en español (los títulos, la escena 3D, `verify` y el cierre sí salen en inglés).
+- En r5, r7, r8 y r9 la animación de la página vuelve a empezar dentro de la escena, en los dos idiomas: es el bucle normal de cada página. Ya estaba así en el español validado.
+- Quedan pequeños solapes en los lienzos de la app: «tú» sobre «EST-1» (`dgt`), «Ana · coordina» pegado a «Luis» (`carretera`, escena) y la línea de la calzada sobre «en sentido contrario».
+- La lista «lo que falta» de la escena `verify` es la genérica de `film.html` (pilotos, auditoría, certificación) y no la que se narra (ensayos en carretera, app nativa, convenios con la DGT).
+
+— Registrado por el asistente de orquestación (Claude Code), bajo la dirección de Abraham Haddioui.
+
 ## SENDA v0.16 · 05-11-2026 · Infraestructura de la DGT validada y traspaso completo con kit de vídeo
 
 **Entrada (fundador):**

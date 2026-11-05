@@ -18,5 +18,8 @@ if [ "$pub" = publicar ]; then
   ffmpeg -loglevel error -y -i "$src" -c:v libx264 -preset slow -crf 27 -pix_fmt yuv420p -c:a copy -movflags +faststart "$dst/senda-$base-$lang.mp4"
   ffmpeg -loglevel error -y -ss 12 -i "$src" -frames:v 1 -q:v 4 "$dst/senda-$base-poster-$lang.jpg"
   cp "$here/out/subtitles-$pfx$lang.vtt" "$dst/senda-$base-$lang.vtt"
+  # Subtítulos neerlandeses (tiempos de la voz inglesa), solo si voice.py acaba de generarlos en esta pasada.
+  nl="$here/out/subtitles-${pfx}nl.vtt"
+  if [ "$lang" = en ] && [ "$nl" -nt "$here/out/voice-$pfx$lang.wav" ]; then cp "$nl" "$dst/senda-$base-nl.vtt"; fi
   ls -la "$dst"/senda-"$base"-*
 fi

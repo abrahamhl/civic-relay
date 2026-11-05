@@ -11,7 +11,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 </style></head><body><main>
 <p class="m">SENDA · Sistema de Enrutamiento de Emergencia por canales alternativos</p>
 <h1>Verificación técnica</h1>
-<p class="m">Generado automáticamente desde las pruebas el 2026-11-05 13:25 UTC · commit <code>f7038f7</code>. Reprodúcelo tú mismo con los comandos del final.</p>
+<p class="m">Generado automáticamente desde las pruebas el 2026-11-05 13:48 UTC · commit <code>692a3a8</code>. Reprodúcelo tú mismo con los comandos del final.</p>
 <p><a class="btn" href="/senda">Abrir SENDA Campo</a></p>
 <div class="kpis">
  <div class="k"><b>190/190</b>pruebas del núcleo superadas</div>
@@ -70,8 +70,8 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <h2>Infraestructura fuera del navegador</h2>
 <table><tr><th></th><th>Pieza</th><th>Resultado en este equipo</th></tr>
 <tr><td><span class="ok">✔</span></td><td>Relé por Internet (<code>packages/senda-relay</code>)</td><td class="m">2/2 pruebas</td></tr>
-<tr><td><span class="ok">✔</span></td><td>SENDA Android · formatos en JVM (<code>apps/senda-android</code>)</td><td class="m">no ejecutado aquí (sin JDK; lo ejecuta CI)</td></tr>
-<tr><td><span class="ok">✔</span></td><td>Accesorio ESP32 · trama en C++ (<code>hardware/esp32-survey</code>)</td><td class="m">no ejecutado aquí (sin g++; lo ejecuta CI)</td></tr>
+<tr><td><span class="ok">✔</span></td><td>SENDA Android · formatos en JVM (<code>apps/senda-android</code>)</td><td class="m">14 invariantes de formato SENDA (paridad web / Android / ESP32).</td></tr>
+<tr><td><span class="ok">✔</span></td><td>Accesorio ESP32 · trama en C++ (<code>hardware/esp32-survey</code>)</td><td class="m">trama SENDA en C++ idéntica a web y Android (3 vectores + CRC)</td></tr>
 </table><p class="m">La compilación del APK y del firmware ESP32 y el arranque de la imagen Docker del relé se ejecutan en GitHub Actions en cada cambio. Arquitectura: <code>docs/architecture/SENDA_ARCHITECTURE.md</code>.</p>
 <h2>Escenarios de referencia (algoritmos reales de SENDA)</h2>
 <div class="card"><b>S01 · Arnhem → San Martín de Valdeiglesias</b>. Antena caída 8 h.<br>abraham → INTERNET → maria → pedro → ismael · <code>CELL_DATA + SAT_BROADBAND + WIFI_DIRECT + BLE</code> · <b>4.01 min</b><br>abraham → INTERNET → SAT_NETWORK → ismael · <code>CELL_DATA + INTERNET + SAT_D2D_SMS</code> · <b>91.31 min</b><br>abraham → INTERNET → ismael · <code>CELL_DATA</code> · <b>480.01 min</b></div>

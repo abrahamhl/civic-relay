@@ -1,6 +1,6 @@
 /* SENDA Campo · service worker (raíz, alcance /senda): la app entera queda instalada en el teléfono y abre sin red.
    Está en la raíz porque el sitio usa URL limpias (/senda sin barra final). */
-const VERSION = 'senda-campo-v17';
+const VERSION = 'senda-campo-v18';
 const ASSETS = [
   '/senda', '/senda/app.css', '/senda/app.mjs', '/senda/db.mjs', '/senda/audio.mjs', '/senda/icon.svg', '/senda/manifest.webmanifest',
   '/senda/core/b64.mjs', '/senda/core/envelope.mjs', '/senda/core/bundle.mjs', '/senda/core/acoustic-modem.mjs', '/senda/core/zones.mjs', '/senda/core/feeds.mjs',
