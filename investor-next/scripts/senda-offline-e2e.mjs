@@ -210,6 +210,26 @@ await C.page.screenshot({ path: resolve(outDir, 'e2e-19-arquitectura.png'), full
 check('Arquitectura sin red: el escenario «Censo con dron» recorre sus 6 pasos con sus 5 conexiones, y cada pieza muestra estado real, código y enlace',
   arq.step === 5 && arq.cur === 'd-rescue' && arq.edges === 5 && /Probado en simulación/.test(arq.detail) && /rf-census\.mjs/.test(arq.detail) && arq.nodes >= 30, arq);
 
+// ---- Capacidades v0.12 (sin red): sentidos, riadas, triaje, monte y dron casa por casa
+const cap = async (path, fn, shot) => { await C.page.goto(base + path); await C.page.waitForFunction(() => window.SENDA_VIZ_READY, null, { timeout: 20000 }); await C.page.waitForTimeout(600); const r = await C.page.evaluate(fn); await C.page.screenshot({ path: resolve(outDir, shot), fullPage: true }); return r; };
+const sent = await cap('/sentidos', () => window.SENDA_SENTIDOS, 'e2e-22-sentidos.png');
+check('Sentidos ampliados sin red: el golpe se sitúa a < 0,5 m con 5 móviles y relojes desfasados, y la respiración por Wi-Fi se detecta (≈14 rpm) solo cuando hay persona',
+  sent.result.err < 0.5 && sent.csi.person.detected && Math.abs(sent.csi.person.rpm - 14) < 1.5 && !sent.csi.empty.detected, { err: sent.result.err, csi: sent.csi });
+const agua = await cap('/agua', () => window.SENDA_AGUA, 'e2e-23-riadas.png');
+check('Riadas y maremotos sin red: la subida aguas arriba avisa ≥ 2 h antes en pueblos donde casi no llueve, y subir a una 3.ª planta es más rápido que la llegada del maremoto',
+  agua.result.every((r) => r.leadMin >= 120 && r.localRainMm < 10) && agua.people.every((p) => p.verticalMin < Math.min(...agua.coasts.map((c) => c.etaMin))), { leads: agua.result.map((r) => r.leadMin), coasts: agua.coasts });
+await C.page.goto(base + '/triaje'); await C.page.waitForFunction(() => window.SENDA_VIZ_READY);
+const tri = await C.page.evaluate(() => { const click = (t) => [...document.querySelectorAll('#wiz button')].find((b) => b.textContent.startsWith(t)).click(); click('No'); click('Sí'); click('Más de 7'); document.querySelector('[data-f=bleeding]').click(); const steps = document.querySelector('#out').textContent; document.querySelector('#add').click(); return { cat: window.SENDA_TRIAJE.victims[0].cat, msg: window.SENDA_TRIAJE.msg, steps }; });
+await C.page.screenshot({ path: resolve(outDir, 'e2e-24-triaje.png'), fullPage: true });
+check('Triaje sin red: «no camina, respira, más de 30/min» → ROJO, con indicaciones de hemorragia y un parte de ≤ 160 caracteres que pide el 112 primero',
+  tri.cat === 'ROJO' && /Presión directa/.test(tri.steps) && tri.msg.length <= 160 && /\| 112,/.test(tri.msg), tri);
+const monte = await cap('/monte', () => ({ err: window.SENDA_MONTE.fix.err, maj: window.SENDA_MONTE.fix.errMajorM, tiles: window.SENDA_MONTE.tiles }), 'e2e-25-monte.png');
+check('Monte sin red: posición por rumbos a aerogeneradores y antena dentro de su elipse de error, y mapas de una sierra en menos de 100 MB',
+  monte.err < 2.5 * monte.maj && monte.tiles.mb < 100, monte);
+const bar = await cap('/barrido', () => window.SENDA_BARRIDO, 'e2e-26-barrido.png');
+check('Dron casa por casa sin red: 24 edificios en varias salidas que respetan la batería y tablero de prioridad que encabeza el edificio con más personas probables y daño',
+  bar.sorties.length >= 2 && bar.sorties.flatMap((s) => s.houses).length === 24 && bar.top[0] === 'D2', { sorties: bar.sorties.length, top: bar.top });
+
 // ---- Llamada sin Internet: dos teléfonos nuevos, código por SONIDO (onda real) y conexión directa sin servidor.
 // (La emulación «offline» de Chromium también bloquea WebRTC local, así que aquí se demuestra lo equivalente:
 //  sin servidores STUN/TURN ni de señalización y CERO peticiones de red desde que empieza la llamada.)
@@ -337,12 +357,12 @@ const a11y = async (page) => page.evaluate(() => {
   return issues;
 });
 const a11yIssues = {};
-for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura']) {
+for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido']) {
   await R.goto(base + path); await R.waitForLoadState('load'); await R.waitForTimeout(300);
   const iss = await a11y(R); if (iss.length) a11yIssues[path || '/'] = iss;
 }
 await R.close();
-check('Accesibilidad automática en las 12 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
+check('Accesibilidad automática en las 17 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
 
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 

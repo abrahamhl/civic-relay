@@ -2,10 +2,10 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-04T23:36:15.840Z",
-  "durationS": 126.5,
-  "passed": 32,
-  "total": 32,
+  "at": "2026-11-05T02:11:49.072Z",
+  "durationS": 238.2,
+  "passed": 37,
+  "total": 37,
   "results": [
     {
       "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
@@ -101,7 +101,7 @@
       "path": {
         "sat": "Iridium 2-5",
         "elevationDeg": 24.8,
-        "rangeKm": 1546,
+        "rangeKm": 1547,
         "delayMs": 5.16
       },
       "plan": {
@@ -192,10 +192,108 @@
       "cur": "d-rescue",
       "edges": 5,
       "detail": "Probado en simulación nuevoConcurrencia de direcciones aleatorias → teléfonos por planta; inferencia bayesiana exacta → personas con intervalo del 90 %.Código: rf-census.mjsAparece en: 🚁 Censo con dronAbrir /senda/dron →",
-      "nodes": 36,
+      "nodes": 48,
       "links": [
         "/senda/dron",
         "/senda/llamada"
+      ]
+    },
+    {
+      "name": "Sentidos ampliados sin red: el golpe se sitúa a < 0,5 m con 5 móviles y relojes desfasados, y la respiración por Wi-Fi se detecta (≈14 rpm) solo cuando hay persona",
+      "ok": true,
+      "err": 0.1034804098746653,
+      "csi": {
+        "person": {
+          "detected": true,
+          "rpm": 14.1,
+          "bandShare": 0.196
+        },
+        "empty": {
+          "detected": false
+        }
+      }
+    },
+    {
+      "name": "Riadas y maremotos sin red: la subida aguas arriba avisa ≥ 2 h antes en pueblos donde casi no llueve, y subir a una 3.ª planta es más rápido que la llegada del maremoto",
+      "ok": true,
+      "leads": [
+        150,
+        220
+      ],
+      "coasts": [
+        {
+          "id": "faro",
+          "etaMin": 28.6
+        },
+        {
+          "id": "huelva",
+          "etaMin": 60
+        },
+        {
+          "id": "cadiz",
+          "etaMin": 61
+        }
+      ]
+    },
+    {
+      "name": "Triaje sin red: «no camina, respira, más de 30/min» → ROJO, con indicaciones de hemorragia y un parte de ≤ 160 caracteres que pide el 112 primero",
+      "ok": true,
+      "cat": "ROJO",
+      "msg": "SENDA TRIAJE R1 A0 V0 | 39.45210,-0.43020 ±25m | hemorragia 1 | 112,Sanitario | 02:10",
+      "steps": "Qué hacer ahoraPresión directa y firme sobre la herida con lo más limpio que tengas; no la levantes para mirar.Si sangra a chorro en un brazo o una pierna y la presión no basta: torniquete unos 5–7 cm por encima de la herida, aprieta hasta que pare y anota la hora.Si respira mejor sentado, déjale sentado; si no, tumbado con las piernas estiradas.\n  Servicios: 112 → Sanitario➕ Añadir a la escena y siguiente víctimaRepetir"
+    },
+    {
+      "name": "Monte sin red: posición por rumbos a aerogeneradores y antena dentro de su elipse de error, y mapas de una sierra en menos de 100 MB",
+      "ok": true,
+      "err": 105.82338042564945,
+      "maj": 116.29897173179175,
+      "tiles": {
+        "perZoom": [
+          {
+            "z": 8,
+            "tiles": 1
+          },
+          {
+            "z": 9,
+            "tiles": 2
+          },
+          {
+            "z": 10,
+            "tiles": 2
+          },
+          {
+            "z": 11,
+            "tiles": 6
+          },
+          {
+            "z": 12,
+            "tiles": 20
+          },
+          {
+            "z": 13,
+            "tiles": 80
+          },
+          {
+            "z": 14,
+            "tiles": 266
+          },
+          {
+            "z": 15,
+            "tiles": 988
+          }
+        ],
+        "tiles": 1365,
+        "mb": 26.7
+      }
+    },
+    {
+      "name": "Dron casa por casa sin red: 24 edificios en varias salidas que respetan la batería y tablero de prioridad que encabeza el edificio con más personas probables y daño",
+      "ok": true,
+      "sorties": 4,
+      "top": [
+        "D2",
+        "D4",
+        "A3"
       ]
     },
     {
@@ -205,8 +303,8 @@
       "answerBytes": 72,
       "offerSoundS": 7.8,
       "audioPackets": [
-        150,
-        151
+        151,
+        150
       ],
       "requests": []
     },
@@ -216,9 +314,9 @@
       "connected": true,
       "offerBytes": 79,
       "answerBytes": 72,
-      "connectMs": 326,
+      "connectMs": 369,
       "message": "¿Me oyes? Estoy en la 3.ª planta, puerta B",
-      "rttMs": 0,
+      "rttMs": 2,
       "audioPackets": 75
     },
     {
@@ -248,7 +346,7 @@
     {
       "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
       "ok": true,
-      "href": "senda://accion?a=BLE_BEACON&id=1728e5a87b438fe8&b=B14&f=3&u=B&bat=100&cmd=_dXi4Grcx9urK5_a"
+      "href": "senda://accion?a=BLE_BEACON&id=ef40af94538399f9&b=B14&f=3&u=B&bat=100&cmd=oMTM-ybkzsQn3Yw8"
     },
     {
       "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",
@@ -280,7 +378,7 @@
       "easy": true
     },
     {
-      "name": "Accesibilidad automática en las 12 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
+      "name": "Accesibilidad automática en las 17 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
       "ok": true,
       "issues": {}
     },

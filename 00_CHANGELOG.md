@@ -1,5 +1,40 @@
 # Changelog
 
+## SENDA v0.12 · 05-11-2026 · Arquitectura multiplataforma, sentidos ampliados, riadas, triaje, monte y dron casa por casa
+
+**Entrada (fundador):**
+- Auditoría desde 5 perspectivas.
+- Preparar SENDA para varias plataformas (móvil, ordenador, dron, ferrocarril), también sin acceso a sistemas de terceros.
+- Tener en cuenta las tragedias recientes de España y Europa.
+- Más «sentidos» reales (dron casa por casa, respiración por Wi-Fi).
+- Más escenarios: terremoto, maremoto, conflicto, evacuación de heridos, monte, riadas.
+- Infraestructura e ideas de inversión.
+- Arquitectura primero; después la web y los vídeos.
+
+**Procesamiento (núcleo, 6 módulos nuevos, 21 pruebas):**
+- `platforms.mjs`: plataformas donde corre SENDA, integraciones con modo de acceso (PASIVO = legal hoy · CONVENIO · NUNCA), planes por escenario (8) con planificador de cobertura y lecciones de catástrofes reales con fuente.
+- `flood-watch.mjs`: hidrograma de Nash, embalse y alarma por subida aguas arriba. En el escenario sintético, 2 h 30 y 3 h 40 de margen en pueblos donde caen 3 mm. Maremoto con √(g·h) y evacuación vertical.
+- `triage.mjs`: START para varias víctimas, RCP para una sola (Consejo Europeo de Resucitación 2021), qué hacer ya, servicios (112 primero) y parte ≤ 160 caracteres. Nunca declara fallecidos.
+- `geo-offline.mjs`: resección con rumbos a marcas conocidas (aerogeneradores con luces de balizamiento, antenas, campanarios) con elipse de error, detección de pasos, estima por pasos y tamaño de mapas sin conexión.
+- `senses.mjs`: escucha coral (golpes localizados con 5 móviles y relojes desfasados, < 0,5 m tras el pitido de sincronía) y modo detector de avalancha para la baliza Bluetooth.
+- `house-sweep.mjs`: dron casa por casa, con orden de visita (vecino más cercano + 2-opt), salidas por batería con reserva y tablero de prioridad (personas probables × daño EMS-98).
+
+**Web (5 pantallas nuevas, con «modo película» `?film=1&viz=` grabable desde la app real):**
+- `/senda/sentidos`, `/senda/agua`, `/senda/triaje`, `/senda/monte`, `/senda/barrido`.
+- `/senda/arquitectura`: 12 piezas nuevas, 3 escenarios nuevos (riada, monte, múltiples víctimas) y la sección «Plataformas, permisos y planes por escenario» con planificador interactivo.
+- Portada (es/en/nl), SENDA Campo, service worker v13.
+
+**Correcciones honestas registradas:**
+- Los NOAA con imagen APT se dieron de baja en 2025.
+- La respiración por Wi-Fi a través de muros no tiene validación independiente.
+- Interrogar aerogeneradores u otra infraestructura ajena queda en NUNCA; usarlos como marcas visibles es PASIVO.
+
+**Auditoría:** `docs/evaluacion/AUDITORIA_5_PERSPECTIVAS_2026-11-05.md` (TRL por capacidad, 5 perspectivas simuladas, huecos, multiplataforma, infraestructura, modelo de negocio, 90 días).
+
+**Validación:** núcleo + relé 146/146 · E2E en Chromium 37/37 (accesibilidad en 17 pantallas) · web: compilación, idiomas y 98/98.
+
+— Registrado por el asistente de orquestación (Claude Code), bajo la dirección de Abraham Haddioui.
+
 ## SENDA v0.11 · 04-11-2026 · Malla de voz, despliegue físico y película v5 con simulaciones y 3D
 
 **Entrada (fundador):**
