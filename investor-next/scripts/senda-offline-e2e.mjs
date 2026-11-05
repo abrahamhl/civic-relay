@@ -245,6 +245,18 @@ await C.page.screenshot({ path: resolve(outDir, 'e2e-28-carretera.png'), fullPag
 check('Ruta protectora sin red: con 1,2 s entre coches el aviso SENDA reduce el choque en cadena de 5 a 1, el SOS sale de la zona sin cobertura en menos de 10 min con los coches que pasan, el libro de puntos cívicos verifica su cadena SHA-256 y el detector marca la frenada',
   road.no === 5 && road.si === 1 && road.sos !== null && road.sos < 10 && road.warned >= 1 && road.ok && road.ratio < 0.1 && road.live === 'HARD_BRAKE' && road.hex === 24, road);
 
+// ---- v0.15 sin red: situaciones al volante, V16 + SENDA, cámaras (visibilidad física) y exportación a Países Bajos (DATEX II y rood kruis)
+const drv = await C.page.evaluate(() => { const S = window.SENDA_CARRETERA; return { v16: S.v16.incidents[0].kind, trapped: S.v16.incidents[0].trapped, orphan: S.v16.orphans.length, w: S.lwr.w, calc: S.calc, rows: document.querySelectorAll('#z-tb tr').length }; });
+check('Situaciones al volante sin red: V16 + SENDA convierte una baliza en «accidente con atrapado», la cola crece hacia atrás a 14,3 km/h (LWR) y las calculadoras de niebla, firme y agua responden',
+  drv.v16 === 'ACCIDENTE' && drv.trapped === 1 && drv.orphan === 1 && drv.w === -14.3 && drv.calc.vis === 72 && drv.calc.flood === 'PIERDE_CONTROL' && drv.rows >= 18, drv);
+const cam = await cap('/camaras', () => ({ est: window.SENDA_CAMARAS.est.visM, vis: window.SENDA_CAMARAS.vis, never: [...document.querySelectorAll('#f-tb .chip.no')].length }), 'e2e-29-camaras.png');
+check('Cámaras sin red: la visibilidad estimada en la imagen con niebla de 120 m queda a menos del 15 % y lo prohibido (cámaras sin permiso, «Ojo de Dios», biometría) aparece como NUNCA',
+  Math.abs(cam.est - cam.vis) / cam.vis < 0.15 && cam.never === 3, cam);
+const nl = await cap('/paises', () => ({ d: window.SENDA_PAISES.datex, conv: window.SENDA_PAISES.plan.needsConvenio }), 'e2e-30-paises.png');
+const msi = await C.page.evaluate(async () => { document.querySelector('#m-say').click(); await new Promise((r) => setTimeout(r, 50)); return window.SENDA_PAISES.spoken; });
+check('Exportación a Países Bajos sin red: el lector DATEX II convierte la publicación en avisos y se queda con los 3 de la ruta; el rood kruis se dice en neerlandés; las cámaras allí requieren convenio',
+  nl.d.records === 5 && nl.d.route === 3 && /Rood kruis op rijstrook 1: voeg in naar rechts/.test(msi) && nl.conv.includes('Cámaras'), { ...nl, msi });
+
 // ---- Llamada sin Internet: dos teléfonos nuevos, código por SONIDO (onda real) y conexión directa sin servidor.
 // (La emulación «offline» de Chromium también bloquea WebRTC local, así que aquí se demuestra lo equivalente:
 //  sin servidores STUN/TURN ni de señalización y CERO peticiones de red desde que empieza la llamada.)
@@ -372,12 +384,12 @@ const a11y = async (page) => page.evaluate(() => {
   return issues;
 });
 const a11yIssues = {};
-for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva', '/carretera']) {
+for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva', '/carretera', '/camaras', '/paises']) {
   await R.goto(base + path); await R.waitForLoadState('load'); await R.waitForTimeout(300);
   const iss = await a11y(R); if (iss.length) a11yIssues[path || '/'] = iss;
 }
 await R.close();
-check('Accesibilidad automática en las 19 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
+check('Accesibilidad automática en las 21 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
 
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 

@@ -1,5 +1,55 @@
 # Changelog
 
+## SENDA v0.15 · 05-11-2026 · Situaciones al volante, V16 + SENDA, cámaras públicas y exportación a Países Bajos
+
+**Entrada (fundador):**
+- La V16 conectada siempre está activa y con SIM: SENDA le da el sentido que le falta.
+- Cubrir todas las situaciones al volante.
+- Integrar los datos de la DGT y de Países Bajos (carriles cortados, desvíos, obras, Waze) como primera exportación.
+- Un módulo de cámaras públicas (DGT y otras fuentes, repositorios abiertos).
+- Mi opinión sobre el proyecto y cómo acotarlo.
+
+**Procesamiento (núcleo: 3 módulos nuevos, 16 pruebas más):**
+- `drive-cases.mjs`: catálogo de 20 situaciones, cada una con su señal, acción, fuente, estado y permiso.
+  - **Sentido contrario:** lo detecta el propio móvil con tres posiciones contra la calzada, y calcula el tiempo hasta cruzarse.
+  - **Final de retención:** onda de choque de Lighthill-Whitham-Richards (−14,3 km/h en el ejemplo) y punto de encuentro.
+  - **Niebla y firme:** velocidad para parar dentro de lo que se ve (50 m: 64 km/h en seco, 53 en mojado) y distancias con el rozamiento.
+  - **Curvas:** radio exacto desde la geometría y velocidad AASHTO; la horquilla de 40 m da 30 km/h.
+  - Fatiga, caída de motorista y agua en la calzada (umbrales del servicio meteorológico de EE. UU.).
+  - **V16 + SENDA (`v16Fusion`):** la baliza dice dónde y SENDA dice qué pasa. Un choque sin baliza pide encenderla.
+- `datex2.mjs`:
+  - lector DATEX II (v2 y v3, con o sin prefijos) para cualquier Punto de Acceso Nacional (Reglamento Delegado (UE) 2022/670);
+  - conversión a avisos SENDA y pasillo de la ruta;
+  - **señales de carril neerlandesas (rood kruis)** con aviso en neerlandés, español e inglés;
+  - nuevo `scripts/datex-pack.mjs` para que el relé descargue DGT o NDW.
+- `cameras.mjs`:
+  - fuentes con licencia y permiso; las cámaras sin permiso, los agregadores tipo «Ojo de Dios» y la biometría quedan en NUNCA, y Rijkswaterstaat solo por convenio;
+  - **visibilidad en metros** por canal oscuro y ley de Koschmieder, con un error menor del 15 % y del lado prudente;
+  - índice de nieve.
+- `road-guard.mjs`: tipos nuevos de peligro (carril cerrado, sentido contrario, puente abierto, inundación, incendio) y relevancia del sentido contrario.
+- `platforms.mjs`:
+  - **perfiles de país España y Países Bajos** y `countryPlan`;
+  - integraciones: feed de Waze y NDW, cámaras abiertas, cámaras sin permiso (NUNCA) y SIM de la V16 (NUNCA).
+
+**Web:**
+- `/senda/camaras`: visibilidad medida en una cámara (modo película), prueba con la cámara del teléfono y fuentes con su permiso.
+- `/senda/paises`: perfil por país, rood kruis hablado (modo película), lector DATEX II en el navegador y lista para el piloto neerlandés.
+- `/senda/carretera`: V16 + SENDA, retención en un diagrama espacio-tiempo (modo película), sentido contrario (modo película), catálogo de situaciones y calculadoras.
+- Arquitectura: 3 piezas, 2 aplicaciones y el escenario «Países Bajos».
+- Portada (es/en/nl) y service worker v16.
+
+**Validación:** núcleo + relé 188/188 · E2E en Chromium 42/42, sin red (accesibilidad en 21 pantallas) · web: compilación, idiomas y 98/98.
+
+**Límites:**
+- La red de este entorno bloquea `nap.dgt.es` y `*.ndw.nu`. El lector se ha probado con una publicación construida según el esquema, no con datos reales.
+- El formato exacto del feed de señales de NDW está pendiente.
+- Las imágenes de cámaras deben leerse desde el relé (el navegador no puede leer píxeles de otro dominio) y cada cámara necesita calibrar su referencia.
+- Datos de la V16 (cada 100 s, conectividad) según fabricantes y prensa.
+
+**Decisiones del fundador:** las del documento `docs/evaluacion/FOCO_Y_ACOTACION_2026-11-05.md`.
+
+— Registrado por el asistente de orquestación (Claude Code), bajo la dirección de Abraham Haddioui.
+
 ## SENDA v0.14 · 05-11-2026 · Ruta protectora: carretera, frenadas, SOS sin cobertura y coordinador de escena
 
 **Entrada (fundador):** el escenario de los accidentes de coche. SENDA como «senda protectora» que va contigo en el viaje, con permisos al instalar. Integración con Waze y Google Maps y mapas sin conexión. Posición con GPS, telemetría y aerogeneradores. Aviso automático de «frena» si el coche de delante frena de golpe. Avisos de carretera más fáciles. Coordinador ciudadano del accidente con puntos cívicos.

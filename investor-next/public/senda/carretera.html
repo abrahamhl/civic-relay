@@ -104,6 +104,40 @@
     <div><p class="m" style="font-size:13px"><b>Para Waze (CIFS), solo con convenio y tras confirmar:</b></p><pre id="r-cifs" style="font-size:11px;white-space:pre-wrap;margin:0"></pre></div></div>
 </section>
 
+<section class="card" style="margin-top:14px" aria-labelledby="h-v">
+  <h2 id="h-v">🔶 Baliza V16 + SENDA: la baliza dice dónde, SENDA dice qué pasa</h2>
+  <div class="g2" style="margin-top:0">
+    <div><p class="m" style="margin-top:0">Desde el 1-1-2026, cada coche detenido en la vía lleva una V16 conectada: con su propia tarjeta SIM envía su posición a DGT 3.0 (cada 100 s, según los fabricantes) y la DGT la pasa a los paneles y a los navegadores. Es una red de balizas que <b>siempre</b> marca dónde hay un vehículo parado. Pero solo dice eso: no sabe si es una avería o un choque, si hay heridos, si alguien está atrapado ni quién coordina.</p>
+      <p class="m">SENDA lo completa cruzando cada baliza con los informes de SENDA cercanos en espacio (250 m) y tiempo (15 min). Una baliza con un choque detectado y un atrapado sube a <b>prioridad máxima</b>. Un choque sin baliza recibe el aviso «enciéndela». Sin cobertura, la V16 es solo una luz; el aviso de SENDA, con «V16 encendida aquí», viaja con los coches que pasan.</p>
+      <div class="note">SENDA <b>nunca</b> usa la SIM ni la radio de la baliza: es un dispositivo homologado y cerrado. Recibir las balizas de DGT 3.0 y enviarle a la DGT el «qué pasa» requiere <span class="chip todo">convenio</span>. Frecuencia de envío y conectividad según fabricantes y prensa, pendientes de confirmar en la norma.</div></div>
+    <div class="tw"><table><thead><tr><th>Baliza o informe</th><th>Qué es</th><th>Fuentes</th><th>Prioridad</th></tr></thead><tbody id="v-tb"></tbody></table><p class="src">Datos de ejemplo, inventados para la demostración. Código: <code>v16Fusion</code> en <code>drive-cases.mjs</code>.</p></div>
+  </div>
+</section>
+
+<div class="g2">
+  <section class="card" data-viz="retencion" aria-labelledby="h-q">
+    <h2 id="h-q">🚦 Final de retención: dónde estará la cola cuando llegues</h2>
+    <canvas id="cv-q" aria-label="Diagrama espacio-tiempo: trayectorias de coches que llegan a una retención cuyo final crece hacia atrás; un coche con SENDA reduce antes y llega sin frenazo"></canvas>
+    <p class="m" style="font-size:14px">El final de una cola no está quieto: <b>crece hacia atrás</b>. Con la teoría de tráfico de Lighthill-Whitham-Richards, su velocidad es w = Δq/Δk, la diferencia de caudal entre la diferencia de densidad. Llegan 1.800 coches/h a 100 km/h y salen 1.200 coches/h a 20 km/h, así que la cola avanza hacia ti a 14,3 km/h. SENDA calcula dónde te la vas a encontrar, no dónde estaba, y te avisa de reducir mucho antes. Los datos salen de las velocidades de los móviles SENDA y de los detectores que publican la DGT y NDW.</p>
+  </section>
+  <section class="card" data-viz="kamikaze" aria-labelledby="h-k2">
+    <h2 id="h-k2">⛔ Un coche en sentido contrario por tu calzada</h2>
+    <canvas id="cv-kz" aria-label="Autovía de dos carriles: un coche entra en sentido contrario; su propio móvil lo detecta y le avisa, emite el aviso y el coche que viene de frente se aparta al carril derecho y reduce"></canvas>
+    <p class="m" style="font-size:14px">Son unos 130 accidentes al año en España, según la prensa citando datos antiguos, y casi siempre por despiste en un acceso o una rotonda, no por intención. El primero en saberlo es <b>el propio móvil de quien se equivoca</b>: tres posiciones seguidas contra el sentido de una calzada de sentido único bastan para avisarle al momento («¡Vas en sentido contrario!») y emitir el peligro. Los que vienen de frente reciben el tiempo hasta cruzarse: a 120 y 90 km/h, 800 m son 14 s.</p>
+  </section>
+</div>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-z">
+  <h2 id="h-z">🧭 Todas las situaciones al volante</h2>
+  <div class="g3" style="margin-top:0">
+    <div><h3>Niebla</h3><label class="m">Visibilidad <b id="z-vv">60</b> m <input type="range" id="z-v" min="20" max="300" step="5" value="60" aria-label="Visibilidad en metros"></label><p class="m" id="z-vo"></p></div>
+    <div><h3>Firme</h3><label class="m">Estado <select id="z-mu" aria-label="Estado del firme"><option value="seco">Seco</option><option value="mojado">Mojado</option><option value="nieve">Nieve</option><option value="hielo">Hielo</option></select></label> <label class="m">a <b id="z-sv">100</b> km/h <input type="range" id="z-s" min="30" max="130" step="5" value="100" aria-label="Velocidad en km/h"></label><p class="m" id="z-so"></p></div>
+    <div><h3>Agua en la calzada</h3><label class="m">Profundidad <b id="z-dv">20</b> cm <input type="range" id="z-d" min="0" max="80" step="5" value="20" aria-label="Profundidad del agua en centímetros"></label><p class="m" id="z-do"></p></div>
+  </div>
+  <div class="tw"><table><thead><tr><th>Situación</th><th>Qué la detecta</th><th>Qué hace SENDA</th><th>Datos</th><th>Estado</th><th>Acceso</th></tr></thead><tbody id="z-tb"></tbody></table></div>
+  <p class="src">Rozamiento: valores típicos de manual (seco 0,7, mojado 0,4, nieve 0,2, hielo 0,1). Curvas: modelo de masa puntual de AASHTO, v² = g·R·(e + f). Agua: campaña «Turn Around, Don't Drown» del servicio meteorológico de EE. UU. (15 cm: pérdida de control; 30 cm en movimiento: arrastra la mayoría de coches; 60 cm: todoterrenos). Código: <code>drive-cases.mjs</code>.</p>
+</section>
+
 <section class="card" style="margin-top:14px" aria-labelledby="h-f">
   <h2 id="h-f">📚 Datos y límites</h2>
   <ul class="m" style="font-size:14px">
@@ -113,13 +147,14 @@
     <li>Las incidencias de la DGT son <b>datos abiertos</b> en DATEX II (Punto de Acceso Nacional).</li>
     <li>Umbrales de frenada y choque <b>pendientes de calibrar</b> con datos reales; tiempos de reacción de referencia (0,7–1,5 s según lo esperado que sea el aviso) de la literatura de factores humanos.</li>
   </ul>
-  <p class="src">Fuentes: <a href="https://www.dgt.es/comunicacion/notas-de-prensa/20260108-2025-finaliza-1119-fallecidos-en-siniestros-de-trafico-en-vias-interurbanas">DGT, balance 2025</a> · <a href="https://www.dgt.es/export/sites/web-DGT/.galleries/downloads/dgt-en-cifras/24h/Informe-Siniestralidad_Cierre-2024_v10_FINAL.pdf">DGT, cierre 2024</a> · <a href="https://www.interior.gob.es/opencms/es/detalle/articulo/DGT-3.0-ya-envia-a-los-navegadores-la-ubicacion-de-los-vehiculos-averiados-en-carretera-que-utilizan-la-V-16-conectada/">Interior: DGT 3.0 y la V16 en los navegadores</a> · <a href="https://nap.dgt.es/en/dataset/incidencias-dgt-datex2-v3-7">NAP DGT, incidencias DATEX II</a> · <a href="https://www.km77.com/glosario/ecall">eCall</a> (Reglamento (UE) 2015/758) · <a href="https://www.autofacil.es/alerta-en-seguridad-y-emisiones-la-edad-media-del-coche-espanol-ya-roza-los-15-anos/">ANFAC, edad media 14,6 años</a> · <a href="https://developers.google.com/waze/api">Waze, enlaces profundos</a> · <a href="https://developers.google.com/waze/data-feed/overview">Waze, feed de socios (CIFS)</a> · <a href="https://support.google.com/waze/partners/answer/10618477">Waze for Cities</a> · <a href="https://developers.google.com/maps/documentation/urls/get-started">Google Maps URLs</a> · <a href="https://sede.dgt.gob.es/export/sites/dgt/.galleries/permisos-de-conducir/certificacion-aptitud-profesores-formacion-vial/2026/MANUAL-IX-Primeros-auxilios.pdf">DGT, manual de primeros auxilios (PAS)</a> · <a href="https://www.boe.es/buscar/act.php?id=BOE-A-1995-25444">Código Penal, art. 195</a> · <a href="https://novelbits.io/maximum-data-bluetooth-advertising-packet-ble/">tamaño de un anuncio Bluetooth LE</a> · deceleración de 3,4 m/s²: AASHTO, <i>A Policy on Geometric Design of Highways and Streets</i> · tiempos de reacción: M. Green (2000), <i>Transportation Human Factors</i> 2(3). Código: <code>road-guard.mjs</code>, <code>rail-incident.mjs</code>, <code>triage.mjs</code>.</p>
+  <p class="src">Fuentes: <a href="https://www.dgt.es/comunicacion/notas-de-prensa/20260108-2025-finaliza-1119-fallecidos-en-siniestros-de-trafico-en-vias-interurbanas">DGT, balance 2025</a> · <a href="https://www.dgt.es/export/sites/web-DGT/.galleries/downloads/dgt-en-cifras/24h/Informe-Siniestralidad_Cierre-2024_v10_FINAL.pdf">DGT, cierre 2024</a> · <a href="https://www.interior.gob.es/opencms/es/detalle/articulo/DGT-3.0-ya-envia-a-los-navegadores-la-ubicacion-de-los-vehiculos-averiados-en-carretera-que-utilizan-la-V-16-conectada/">Interior: DGT 3.0 y la V16 en los navegadores</a> · <a href="https://nap.dgt.es/en/dataset/incidencias-dgt-datex2-v3-7">NAP DGT, incidencias DATEX II</a> · <a href="https://www.km77.com/glosario/ecall">eCall</a> (Reglamento (UE) 2015/758) · <a href="https://www.autofacil.es/alerta-en-seguridad-y-emisiones-la-edad-media-del-coche-espanol-ya-roza-los-15-anos/">ANFAC, edad media 14,6 años</a> · <a href="https://developers.google.com/waze/api">Waze, enlaces profundos</a> · <a href="https://developers.google.com/waze/data-feed/overview">Waze, feed de socios (CIFS)</a> · <a href="https://support.google.com/waze/partners/answer/10618477">Waze for Cities</a> · <a href="https://developers.google.com/maps/documentation/urls/get-started">Google Maps URLs</a> · <a href="https://sede.dgt.gob.es/export/sites/dgt/.galleries/permisos-de-conducir/certificacion-aptitud-profesores-formacion-vial/2026/MANUAL-IX-Primeros-auxilios.pdf">DGT, manual de primeros auxilios (PAS)</a> · <a href="https://www.boe.es/buscar/act.php?id=BOE-A-1995-25444">Código Penal, art. 195</a> · <a href="https://novelbits.io/maximum-data-bluetooth-advertising-packet-ble/">tamaño de un anuncio Bluetooth LE</a> · deceleración de 3,4 m/s²: AASHTO, <i>A Policy on Geometric Design of Highways and Streets</i> · tiempos de reacción: M. Green (2000), <i>Transportation Human Factors</i> 2(3). · <a href="https://bandaancha.eu/articulos/que-datos-envian-dgt-nuevas-balizas-10464">qué datos envía la V16</a> · <a href="https://www.motorpasion.com/seguridad/racc-infotransit-app-que-detecta-kamikazes-10-segundos-avisa-peligro-al-resto-conductores">RACC: aviso de conductores en sentido contrario</a> · <a href="https://okdiario.com/espana/kamikazes-provocan-media-130-accidentes-anuales-30-muertes-8060245">cifras de conducción en sentido contrario</a> · <a href="https://weather.gov/shv/awarenessweek_flood_tadd">NWS, «Turn Around, Don't Drown»</a>. Código: <code>road-guard.mjs</code>, <code>drive-cases.mjs</code>, <code>rail-incident.mjs</code>, <code>triage.mjs</code>.</p>
 </section>
 </main>
 <script type="module">
 import { $, C, canvas, text, rr, run, clamp, ease, FILM } from '/senda/kit.mjs';
 import { brakeChain, alertGain, roadScenario, contactProbability, demoRoad, pointAt, roadLocate, roadDeadReckon, describePosition, landmarksAlong, roadSosText, call112Script, createScene, sceneAct, sceneBrief, civicLedger, verifyLedger, CIVIC_RULES, PAS, corridorTiles, ROUTE_MAD_VLC, navLinks, REPORT_KINDS, encodeHazard, reportBelief, toCifs, detectHardBrake, brakeAdvice } from '/senda/core/road-guard.mjs';
 import { INTEGRATIONS, ACCESS } from '/senda/core/platforms.mjs';
+import { DRIVE_CASES, MU, stoppingDistance, safeSpeedForVisibility, floodedRoad, v16Fusion, shockwaveKmh, wrongWayMeet } from '/senda/core/drive-cases.mjs';
 import { startTriage } from '/senda/core/triage.mjs';
 const fmt = (x, d = 0) => x.toFixed(d).replace('.', ',');
 const S = { gapS: 1.2, share: 1, sShare: 0.1, flow: 300, buffer: 2 }; window.SENDA_CARRETERA = S;
@@ -317,6 +352,71 @@ $('#r-btns').onclick = (e) => {
   S.report = k;
 };
 
-run({ cadena: drawCad, sos: drawSos, pk: drawPk, escena: drawEsc });
+
+// ---------- 8) V16 + SENDA
+const V16DEMO = v16Fusion([{ id: 'V16-A', lat: 40.2, lon: -3.3, t: 1000 }, { id: 'V16-B', lat: 40.5, lon: -3.6, t: 1100 }, { id: 'V16-C', lat: 39.9, lon: -2.5, t: 1200 }],
+  [{ id: 'S-1', lat: 40.2005, lon: -3.3004, t: 1040, kind: 'CRASH', injured: 2, trapped: 1, coordinator: 'Ana' }, { id: 'S-2', lat: 39.9003, lon: -2.5002, t: 1250, kind: 'BREAKDOWN' }, { id: 'S-3', lat: 41.0, lon: -3.0, t: 900, kind: 'CRASH', injured: 1 }]);
+S.v16 = V16DEMO;
+$('#v-tb').innerHTML = [...V16DEMO.incidents.map((i) => `<tr><td>${i.v16}</td><td><b>${{ ACCIDENTE: 'Accidente', AVERIA: 'Avería', VEHICULO_DETENIDO: 'Vehículo detenido (¿qué pasa?)' }[i.kind]}</b>${i.injured ? ` · ${i.injured} heridos` : ''}${i.trapped ? ` · ${i.trapped} atrapado` : ''}${i.coordinator ? ` · coordina ${i.coordinator}` : ''}</td><td>${i.sources.join(' + ')}</td><td>${'🔴'.repeat(i.priority) || '⚪'}</td></tr>`), ...V16DEMO.orphans.map((o) => `<tr><td>${o.report}</td><td><b>Accidente sin baliza</b> · ${o.say}</td><td>SENDA</td><td>🔴</td></tr>`)].join('');
+
+// ---------- 9) Retención (Lighthill-Whitham-Richards)
+const LWR = { qUp: 1800, vUp: 100, qDown: 1200, vDown: 20, x0: 4200 }; LWR.w = shockwaveKmh(LWR); S.lwr = LWR;
+const gq = canvas($('#cv-q'));
+function drawQ(t) {
+  const g = gq, P = 16, lt = t % P, T = 240, tNow = clamp(lt / 13) * T, X = (s) => 70 + (s / T) * 540, Y = (m) => 520 - (m / 6000) * 460;
+  const vU = LWR.vUp / 3.6, vD = LWR.vDown / 3.6, w = LWR.w / 3.6, shock = (s) => LWR.x0 + w * s;
+  g.fillStyle = C.bg; g.fillRect(0, 0, 640, 600);
+  g.strokeStyle = C.l; g.strokeRect(70, 60, 540, 460);
+  for (let m = 0; m <= 6000; m += 1000) text(g, `${m / 1000} km`, 62, Y(m) + 4, { c: C.m, f: '11px Inter,system-ui', al: 'right' });
+  for (let s = 0; s <= T; s += 60) text(g, `${s / 60} min`, X(s), 540, { c: C.m, f: '11px Inter,system-ui', al: 'center' });
+  g.fillStyle = 'rgba(255,91,110,.10)'; g.beginPath(); g.moveTo(X(0), Y(LWR.x0)); g.lineTo(X(T), Y(shock(T))); g.lineTo(X(T), Y(6000)); g.lineTo(X(0), Y(6000)); g.closePath(); g.fill();
+  g.strokeStyle = C.r; g.lineWidth = 3; g.beginPath(); g.moveTo(X(0), Y(LWR.x0)); g.lineTo(X(Math.min(tNow, T)), Y(shock(Math.min(tNow, T)))); g.stroke(); g.lineWidth = 1;
+  // trayectorias: entran cada 8 s desde 0 m; libres hasta la onda de choque, luego despacio
+  for (let k = -20; k < 30; k++) {
+    const t0 = k * 8, senda = k === 6; let s = Math.max(0, t0), y = t0 < 0 ? -t0 * vU : 0, met = false, warned = false;
+    g.strokeStyle = senda ? C.i : 'rgba(207,216,220,.45)'; g.lineWidth = senda ? 3 : 1.2; g.beginPath(); g.moveTo(X(s), Y(y));
+    for (; s <= Math.min(tNow, T); s += 1) {
+      if (!met && y >= shock(s)) met = true;
+      const dist = shock(s) - y; if (senda && !met && dist < 1500) warned = true;
+      const v = met ? vD : senda && warned ? Math.max(vD, vU - (1500 - dist) * 0.012) : vU; y += v; g.lineTo(X(s), Y(Math.min(6000, y)));
+    }
+    g.stroke(); g.lineWidth = 1;
+    if (senda && warned) { const xe = X(Math.min(tNow, T)), right = xe > 470; text(g, 'aviso SENDA: reduce', right ? xe - 8 : xe + 6, Y(Math.min(6000, y)) + (right ? 18 : -4), { c: C.i, f: '700 12px Inter,system-ui', al: right ? 'right' : 'left' }); }
+  }
+  text(g, `Final de la retención: crece hacia atrás a ${String(Math.abs(LWR.w)).replace('.', ',')} km/h`, 70, 40, { c: C.r, f: '800 14px Inter,system-ui' });
+  text(g, 'distancia en la carretera ↑ · tiempo →', 610, 562, { c: C.m, f: '11px Inter,system-ui', al: 'right' });
+  text(g, `w = Δq/Δk = (${LWR.qDown} − ${LWR.qUp}) / (${LWR.qDown / LWR.vDown} − ${LWR.qUp / LWR.vUp}) veh/km`, 70, 580, { c: C.g, f: '12px Inter,system-ui' });
+}
+
+// ---------- 10) Sentido contrario
+const gk2 = canvas($('#cv-kz'));
+function drawKz(t) {
+  const g = gk2, P = 14, lt = t % P, d0 = 1500, vMe = 120 / 3.6, vK = 90 / 3.6, alertAt = 3, reactS = 1.5;
+  const tt = Math.min(lt, 11), meAlert = tt > alertAt + reactS, myV = (s) => (s > alertAt + reactS ? Math.max(80 / 3.6, vMe - 2.5 * (s - alertAt - reactS)) : vMe);
+  let yMe = 0; for (let s = 0; s < tt; s += 0.05) yMe += myV(s) * 0.05; const yK = d0 - vK * tt, gap = Math.max(0, yK - yMe);
+  const view = (m) => 560 - ((m - yMe + 100) / 1700) * 540, laneMe = meAlert ? clamp((tt - alertAt - reactS) / 3) : 0;
+  g.fillStyle = '#0d1418'; g.fillRect(0, 0, 640, 600); g.fillStyle = '#2b3338'; g.fillRect(230, 0, 180, 600);
+  g.strokeStyle = '#e5e7eb'; g.lineWidth = 3; [230, 410].forEach((x) => { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 600); g.stroke(); }); g.setLineDash([20, 16]); g.lineWidth = 2; g.lineDashOffset = yMe * 0.33; g.beginPath(); g.moveTo(320, 0); g.lineTo(320, 600); g.stroke(); g.setLineDash([]); g.lineWidth = 1;
+  text(g, '↑ sentido de la calzada', 420, 590, { c: C.m, f: '11px Inter,system-ui' });
+  const xMe = 275 + laneMe * 90; g.fillStyle = C.i; rr(g, xMe - 14, view(yMe) - 23, 28, 46, 7); g.fill(); text(g, 'Tú', xMe, view(yMe) + 40, { c: C.i, f: '800 12px Inter,system-ui', al: 'center' });
+  const yk = view(yK); if (yk > -50) { g.fillStyle = C.r; rr(g, 261, yk - 23, 28, 46, 7); g.fill(); text(g, 'en sentido contrario', 255, yk - 30, { c: C.r, f: '700 12px Inter,system-ui', al: 'right' }); }
+  g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 20, 600, 96, 12); g.fill(); g.strokeStyle = tt > alertAt ? C.r : C.l; g.stroke();
+  const m = wrongWayMeet({ distM: gap, vMeMs: myV(tt), vOtherMs: vK });
+  text(g, tt < alertAt ? 'Un coche entra por la salida de la autovía…' : `Su móvil: «¡Vas en sentido contrario!» · el tuyo: «${m.say.split(':')[0]}»`, 34, 50, { c: tt < alertAt ? C.t : C.r, f: '800 13px Inter,system-ui' });
+  text(g, tt < alertAt ? 'Tres posiciones seguidas contra el sentido bastan para detectarlo' : `Os separan ${Math.round(gap)} m · ${String(m.tS).replace('.', ',')} s para cruzaros · carril derecho y a 80 km/h`, 34, 76, { c: C.m, f: '12px Inter,system-ui' });
+  text(g, 'Velocidades de ejemplo: tú a 120 km/h, el otro a 90 km/h', 34, 100, { c: C.g, f: '11px Inter,system-ui' });
+}
+
+// ---------- 11) Calculadoras
+$('#z-tb').innerHTML = DRIVE_CASES.map((c) => `<tr><td><b>${c.name}</b></td><td>${c.signal}</td><td>${c.action}</td><td class="m">${c.source}</td><td><span class="chip ${c.status === 'HECHO' ? 'ok' : c.status === 'PENDIENTE' ? 'todo' : 'sim'}">${c.status}</span></td><td><span class="chip ${c.access === 'PASIVO' ? 'ok' : 'todo'}">${c.access}</span></td></tr>`).join('');
+const calc = () => {
+  const v = +$('#z-v').value, a = safeSpeedForVisibility(v), b = safeSpeedForVisibility(v, { mu: MU.mojado }); $('#z-vv').textContent = v; $('#z-vo').innerHTML = `Para parar dentro de lo que ves: <b>${a.kmh} km/h</b> en seco, <b>${b.kmh} km/h</b> en mojado.`;
+  const sp = +$('#z-s').value, mu = MU[$('#z-mu').value], d = stoppingDistance(sp / 3.6, { mu }); $('#z-sv').textContent = sp; $('#z-so').innerHTML = `Distancia de parada: <b>${d.totalM} m</b> (${d.reactM} reaccionando + ${d.brakeM} frenando).`;
+  const dp = +$('#z-d').value, f = floodedRoad({ depthCm: dp }); $('#z-dv').textContent = dp; $('#z-do').innerHTML = `<b>${f.say}</b>`;
+  S.calc = { vis: a.kmh, stop: d.totalM, flood: f.level };
+};
+['#z-v', '#z-s', '#z-mu', '#z-d'].forEach((id) => ($(id).oninput = calc)); calc();
+
+run({ cadena: drawCad, sos: drawSos, pk: drawPk, escena: drawEsc, retencion: drawQ, kamikaze: drawKz });
 </script>
 </body></html>

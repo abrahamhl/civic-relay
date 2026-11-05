@@ -26,3 +26,12 @@ test('plan de carretera: coche y móvil cubren avisar y localizar; la lectura de
   assert.equal(INTEGRATIONS.find((i) => i.id === 'leer-navegadores').access, 'NUNCA');
   assert.equal(INTEGRATIONS.find((i) => i.id === 'dgt30').access, 'CONVENIO');
 });
+
+test('exportar a Países Bajos: mismo 112 y DATEX II; las cámaras allí requieren convenio y hay puentes y señales de carril', async () => {
+  const { countryPlan, COUNTRIES } = await import('../src/platforms.mjs');
+  const nl = countryPlan('NL'), es = countryPlan('ES');
+  assert.equal(COUNTRIES.NL.emergency, '112'); assert.match(COUNTRIES.NL.nap, /DATEX II/);
+  assert.ok(nl.needsConvenio.includes('Cámaras') && !es.needsConvenio.includes('Cámaras'));
+  assert.ok(nl.rows.some((r) => /puentes/.test(r.source))); assert.ok(es.needsConvenio.includes('Vehículo detenido'));
+  assert.equal(INTEGRATIONS.find((i) => i.id === 'v16-sim').access, 'NUNCA');
+});

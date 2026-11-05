@@ -2,10 +2,10 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-05T04:03:18.851Z",
-  "durationS": 238.6,
-  "passed": 39,
-  "total": 39,
+  "at": "2026-11-05T04:41:02.601Z",
+  "durationS": 266.2,
+  "passed": 42,
+  "total": 42,
   "results": [
     {
       "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
@@ -100,9 +100,9 @@
       "ok": true,
       "path": {
         "sat": "Iridium 2-5",
-        "elevationDeg": 24.8,
-        "rangeKm": 1546,
-        "delayMs": 5.16
+        "elevationDeg": 24.7,
+        "rangeKm": 1549,
+        "delayMs": 5.17
       },
       "plan": {
         "k": 6,
@@ -192,7 +192,7 @@
       "cur": "d-rescue",
       "edges": 5,
       "detail": "Probado en simulación nuevoConcurrencia de direcciones aleatorias → teléfonos por planta; inferencia bayesiana exacta → personas con intervalo del 90 %.Código: rf-census.mjsAparece en: 🚁 Censo con dronAbrir /senda/dron →",
-      "nodes": 54,
+      "nodes": 59,
       "links": [
         "/senda/dron",
         "/senda/llamada"
@@ -239,7 +239,7 @@
       "name": "Triaje sin red: «no camina, respira, más de 30/min» → ROJO, con indicaciones de hemorragia y un parte de ≤ 160 caracteres que pide el 112 primero",
       "ok": true,
       "cat": "ROJO",
-      "msg": "SENDA TRIAJE R1 A0 V0 | 39.45210,-0.43020 ±25m | hemorragia 1 | 112,Sanitario | 04:01",
+      "msg": "SENDA TRIAJE R1 A0 V0 | 39.45210,-0.43020 ±25m | hemorragia 1 | 112,Sanitario | 04:38",
       "steps": "Qué hacer ahoraPresión directa y firme sobre la herida con lo más limpio que tengas; no la levantes para mirar.Si sangra a chorro en un brazo o una pierna y la presión no basta: torniquete unos 5–7 cm por encima de la herida, aprieta hasta que pare y anota la hora.Si respira mejor sentado, déjale sentado; si no, tumbado con las piernas estiradas.\n  Servicios: 112 → Sanitario➕ Añadir a la escena y siguiente víctimaRepetir"
     },
     {
@@ -329,14 +329,48 @@
       "hex": 24
     },
     {
+      "name": "Situaciones al volante sin red: V16 + SENDA convierte una baliza en «accidente con atrapado», la cola crece hacia atrás a 14,3 km/h (LWR) y las calculadoras de niebla, firme y agua responden",
+      "ok": true,
+      "v16": "ACCIDENTE",
+      "trapped": 1,
+      "orphan": 1,
+      "w": -14.3,
+      "calc": {
+        "vis": 72,
+        "stop": 98,
+        "flood": "PIERDE_CONTROL"
+      },
+      "rows": 20
+    },
+    {
+      "name": "Cámaras sin red: la visibilidad estimada en la imagen con niebla de 120 m queda a menos del 15 % y lo prohibido (cámaras sin permiso, «Ojo de Dios», biometría) aparece como NUNCA",
+      "ok": true,
+      "est": 114,
+      "vis": 120,
+      "never": 3
+    },
+    {
+      "name": "Exportación a Países Bajos sin red: el lector DATEX II convierte la publicación en avisos y se queda con los 3 de la ruta; el rood kruis se dice en neerlandés; las cámaras allí requieren convenio",
+      "ok": true,
+      "d": {
+        "records": 5,
+        "hazards": 4,
+        "route": 3
+      },
+      "conv": [
+        "Cámaras"
+      ],
+      "msi": "Over 600 meter. Rood kruis op rijstrook 1: voeg in naar rechts. Maximaal 70."
+    },
+    {
       "name": "Llamada sin Internet: oferta de <110 bytes por sonido (onda real, decodificada exacta), conexión directa cifrada, voz Opus y chat en ambos sentidos y cero peticiones de red durante la llamada",
       "ok": true,
       "offerBytes": 79,
       "answerBytes": 72,
       "offerSoundS": 7.8,
       "audioPackets": [
-        200,
-        200
+        151,
+        150
       ],
       "requests": []
     },
@@ -348,7 +382,7 @@
       "answerBytes": 72,
       "connectMs": 392,
       "message": "¿Me oyes? Estoy en la 3.ª planta, puerta B",
-      "rttMs": 6,
+      "rttMs": 1,
       "audioPackets": 75
     },
     {
@@ -378,7 +412,7 @@
     {
       "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
       "ok": true,
-      "href": "senda://accion?a=BLE_BEACON&id=9a7d27d4f671e723&b=B14&f=3&u=B&bat=100&cmd=tL3TDNsKodUsFH9n"
+      "href": "senda://accion?a=BLE_BEACON&id=59cb5d930667059e&b=B14&f=3&u=B&bat=100&cmd=JsWdB8tSCprZB3HR"
     },
     {
       "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",
@@ -393,7 +427,7 @@
       "name": "Red SENDA sin red: reparto k-de-n entre varios portadores ≥99 %, prueba real de pérdida de portadores, catálogo satelital, previsión de apagón con pasarelas y CAP con auditoría que delata alteraciones",
       "ok": true,
       "pDelivery": 0.9909,
-      "trialSuccess": 0.99,
+      "trialSuccess": 0.975,
       "halfDarkAtH": 4,
       "gateways": 5
     },
@@ -410,7 +444,7 @@
       "easy": true
     },
     {
-      "name": "Accesibilidad automática en las 19 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
+      "name": "Accesibilidad automática en las 21 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
       "ok": true,
       "issues": {}
     },

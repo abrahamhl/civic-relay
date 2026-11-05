@@ -166,3 +166,36 @@ Son cuatro piezas de ingeniería real:
 - Las categorías de apps permitidas en Android Auto y CarPlay.
 - El alcance real de Bluetooth entre coches.
 
+## 9. v0.15 · V16, situaciones al volante, cámaras y Países Bajos (2026-11-05)
+
+| Tema | Verificado | Implicación para SENDA |
+|---|---|---|
+| V16 conectada | Envía a su fabricante: identificador, celda, cobertura, batería y posición. El fabricante pasa a DGT 3.0 un conjunto reducido («protocolo B»). La DGT lo pasa a los navegadores. Frecuencia de 100 s y SIM integrada según fabricantes | La V16 dice **dónde**; SENDA dice **qué pasa**. Fusión por posición y tiempo; nunca usar su SIM |
+| Cámaras DGT | NAP: ubicaciones en DATEX II v3.6. El conjunto antiguo con imagen en tiempo real queda obsoleto el 12-01-2026 | Lista de cámaras de la ruta en la reserva; imágenes desde el relé |
+| Cámaras en otras administraciones | Open Data Euskadi: URL de imagen y localización, CC BY 4.0 (catálogo). Generalitat: XML, reutilización citando fuente (por verificar). Madrid Informo: ~270 cámaras, licencia de imagen no confirmada | PASIVO donde hay licencia; convenio en el resto |
+| Cámaras en Países Bajos | Rijkswaterstaat solo las ve en su central; no graba ni publica (RGPD) | Solo convenio para emergencias |
+| NDW | Incidencias cada minuto (incidents.xml.gz), ~17.000 señales de carril, más de 300 puentes, obras (Melvin). Todo en DATEX II; abiertos «en principio» | Lector DATEX II común; condiciones exactas pendientes |
+| Rood kruis | Carril cerrado; nunca está puesto «por nada»; multa de al menos 260 € | Aviso hablado en neerlandés |
+| UE | Reglamento Delegado 2022/670: Punto de Acceso Nacional en cada Estado y DATEX II como referencia | Un lector para todos los países |
+| Sentido contrario | ~130 accidentes al año (prensa, datos antiguos). El RACC ya tuvo una app que avisaba | Detección en el propio móvil; antecedente que valida la idea |
+| Agua en la calzada | NWS: 15 cm, pérdida de control; 30 cm en movimiento, arrastra la mayoría de coches; 60 cm, todoterrenos | Aviso «da la vuelta» |
+| «Ojo de Dios» | Nombre usado por agregadores de datos personales y localización de dispositivos | NUNCA |
+
+**Fuentes:**
+- [Banda Ancha: qué datos envía la V16](https://bandaancha.eu/articulos/que-datos-envian-dgt-nuevas-balizas-10464)
+- [NAP DGT: cámaras](https://nap.dgt.es/en/dataset/camaras-dgt-datex2-v3-6-nuevo)
+- [Open Data Euskadi](https://datos.gob.es/es/iniciativas/open-data-euskadi)
+- [Madrid Informo](https://diario.madrid.es/blog/notas-de-prensa/arranca-la-renovada-web-de-informacion-del-trafico/)
+- [Rijkswaterstaat: imágenes de cámaras](https://www.rijkswaterstaat.nl/wegen/wegbeheer/onderzoek/verkeersonderzoek/wat-doet-rijkswaterstaat-met-camerabeelden)
+- [NDW: nuestros datos](https://english.ndw.nu/our-data)
+- [NDW: incidencias](https://docs.ndw.nu/en/faq/incidenten/)
+- [Rijkswaterstaat: nietvoorniX](https://www.rijkswaterstaat.nl/wegen/wegbeheer/nietvoornix)
+- [Reglamento Delegado (UE) 2022/670](https://eur-lex.europa.eu/eli/reg_del/2022/670/oj/eng)
+- [Pyronear](https://github.com/pyronear/PyroNear)
+- [RACC Infotransit](https://www.motorpasion.com/seguridad/racc-infotransit-app-que-detecta-kamikazes-10-segundos-avisa-peligro-al-resto-conductores)
+- [NWS: Turn Around, Don't Drown](https://weather.gov/shv/awarenessweek_flood_tadd)
+- He, Sun y Tang (2009), *Dark Channel Prior*
+- Ley de Koschmieder
+
+**Bloqueo del entorno:** `nap.dgt.es`, `opendata.ndw.nu`, `docs.ndw.nu` y `english.ndw.nu` están denegados por la política de red de esta sesión. Para probar con datos reales hay que añadirlos a los dominios permitidos o ejecutar `scripts/datex-pack.mjs` en otra máquina.
+

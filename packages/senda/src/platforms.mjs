@@ -54,6 +54,11 @@ export const INTEGRATIONS = Object.freeze([
   { id: 'dgt-nap', what: 'Incidencias de tráfico de la DGT en DATEX II (Punto de Acceso Nacional)', access: 'PASIVO', note: 'Datos abiertos; se guardan en la reserva antes de salir' },
   { id: 'dgt30', what: 'Enviar y recibir avisos verificados por la plataforma DGT 3.0 (la que ya lleva las balizas V16 a los navegadores)', access: 'CONVENIO', note: 'Un solo convenio llegaría a todos los navegadores que conecta la DGT' },
   { id: 'waze-cifs', what: 'Alimentar Waze con avisos confirmados (formato CIFS de Waze for Cities)', access: 'CONVENIO', note: 'El programa es para organismos públicos: a través de un socio público' },
+  { id: 'waze-feed', what: 'Recibir alertas y atascos de Waze (intercambio bidireccional de Waze for Cities)', access: 'CONVENIO', note: 'Solo a través de un organismo público socio y para su territorio' },
+  { id: 'ndw', what: 'Países Bajos: incidencias, obras, señales de carril y puentes de NDW en DATEX II', access: 'PASIVO', note: 'Datos abiertos; condiciones de uso exactas pendientes de verificar' },
+  { id: 'camaras-abiertas', what: 'Cámaras de tráfico publicadas para reutilización (DGT, Euskadi, Cataluña)', access: 'PASIVO', note: 'Solo visibilidad y estado de la vía: nunca personas ni matrículas' },
+  { id: 'camaras-sin-permiso', what: 'Cámaras privadas sin protección, agregadores tipo «Ojo de Dios», reconocimiento facial o de matrículas', access: 'NUNCA' },
+  { id: 'v16-sim', what: 'Usar la tarjeta SIM o la radio de la baliza V16', access: 'NUNCA', note: 'Dispositivo homologado y cerrado: SENDA la complementa, no la toca' },
   { id: 'leer-navegadores', what: 'Leer la ruta o las alertas de Waze o Google Maps fuera de sus programas oficiales', access: 'NUNCA' },
   { id: 'iridium', what: 'Mensajes por satélite Iridium (módulo SBD)', access: 'CONVENIO', note: 'Contrato de servicio' },
   { id: 'scada-ajeno', what: 'Interrogar o controlar sistemas industriales ajenos', access: 'NUNCA' },
@@ -137,4 +142,27 @@ export function planDeployment(playbookId, availableIds) {
     return { ...ph, cover, gaps: ph.need.filter((r) => cover[r].length === 0) };
   });
   return { id: playbookId, name: pb.name, guard: pb.guard ?? null, phases, gaps: [...new Set(phases.flatMap((p) => p.gaps))] };
+}
+
+/**
+ * Perfiles de país para exportar SENDA. Lo común en la UE: el 112 y la información de tráfico en
+ * DATEX II en un Punto de Acceso Nacional (Reglamento Delegado (UE) 2022/670). Lo que cambia: el canal
+ * oficial de alertas, las señales de carril, la baliza V16 y la política de cámaras.
+ */
+export const COUNTRIES = Object.freeze({
+  ES: { name: 'España', lang: 'es', emergency: '112', officialAlert: 'ES-Alert (difusión celular)', nap: 'DGT · nap.dgt.es (DATEX II v3.6/v3.7: incidencias, paneles, ubicaciones de cámaras)', laneSignals: 'Paneles de mensaje variable de la DGT (DATEX II)', beacon: 'Baliza V16 conectada obligatoria desde el 1-1-2026 (posición a DGT 3.0)', cameras: 'DGT, Open Data Euskadi y Generalitat publican cámaras o sus ubicaciones', extra: [] },
+  NL: { name: 'Países Bajos', lang: 'nl', emergency: '112', officialAlert: 'NL-Alert (difusión celular)', nap: 'NDW · Nationaal Dataportaal Wegverkeer (DATEX II: incidencias cada minuto, obras de Melvin, velocidades)', laneSignals: 'Matrixsignaalgevers: ~17.000 señales; rood kruis = carril cerrado (multa ≥ 260 €)', beacon: 'Sin baliza conectada obligatoria', cameras: 'Rijkswaterstaat no publica sus cámaras (RGPD): solo convenio', extra: ['Aperturas de más de 300 puentes móviles en tiempo real (NDW)', 'Estado de carriles de hora punta y carriles reversibles (NDW)'] },
+});
+/** Qué fuentes enchufar en cada país para cada pieza de SENDA, y con qué permiso. */
+export function countryPlan(code) {
+  const c = COUNTRIES[code]; if (!c) throw new Error(`país desconocido: ${code}`);
+  const rows = [
+    { piece: 'Llamar y avisar', source: `${c.emergency} y ${c.officialAlert}`, access: 'PASIVO', note: 'SENDA es un canal secundario: nunca sustituye al oficial' },
+    { piece: 'Incidencias y obras en la ruta', source: c.nap, access: 'PASIVO', module: 'datex2' },
+    { piece: 'Carriles cerrados', source: c.laneSignals, access: code === 'NL' ? 'PASIVO' : 'PASIVO', module: 'datex2' },
+    { piece: 'Vehículo detenido', source: c.beacon, access: code === 'ES' ? 'CONVENIO' : '—', module: 'drive-cases' },
+    { piece: 'Cámaras', source: c.cameras, access: code === 'NL' ? 'CONVENIO' : 'PASIVO', module: 'cameras' },
+    ...c.extra.map((x) => ({ piece: 'Propio del país', source: x, access: 'PASIVO', module: 'datex2' })),
+  ];
+  return { code, name: c.name, lang: c.lang, rows, needsConvenio: rows.filter((r) => r.access === 'CONVENIO').map((r) => r.piece) };
 }

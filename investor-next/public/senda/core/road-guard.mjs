@@ -66,10 +66,10 @@ export const CAR_CRASH = Object.freeze({ impactG: 4, speedContextMs: 25 / 3.6, s
 export const detectCarCrash = (input, opts = {}) => detectCrash(input, { ...CAR_CRASH, ...opts });
 
 // ---------------------------------------------------------------- 3) Trama de aviso entre coches
-export const HAZARD = Object.freeze({ BRAKE: 1, CRASH: 2, STOPPED: 3, OBSTACLE: 4, ANIMAL: 5, FOG: 6, ICE: 7, QUEUE: 8, WORKS: 9, SOS: 10 });
+export const HAZARD = Object.freeze({ BRAKE: 1, CRASH: 2, STOPPED: 3, OBSTACLE: 4, ANIMAL: 5, FOG: 6, ICE: 7, QUEUE: 8, WORKS: 9, SOS: 10, LANE_CLOSED: 11, WRONG_WAY: 12, BRIDGE_OPEN: 13, FLOOD: 14, FIRE: 15 });
 const HAZARD_NAME = Object.fromEntries(Object.entries(HAZARD).map(([k, v]) => [v, k]));
 /** Peligros de un solo sentido (mismo carril) frente a peligros de zona (niebla, hielo, animales). */
-const ONE_WAY = new Set([HAZARD.BRAKE, HAZARD.CRASH, HAZARD.STOPPED, HAZARD.OBSTACLE, HAZARD.QUEUE, HAZARD.SOS]);
+const ONE_WAY = new Set([HAZARD.BRAKE, HAZARD.CRASH, HAZARD.STOPPED, HAZARD.OBSTACLE, HAZARD.QUEUE, HAZARD.SOS, HAZARD.LANE_CLOSED]);
 export const HAZARD_BYTES = 24;
 
 /**
@@ -109,6 +109,10 @@ export function hazardRelevance(me, hz, { now, maxAheadM = 2000, straightMaxM = 
   }
   const f = localFrame(me.lat, me.lon), p = f.toXY(hz.lat, hz.lon), h = rad(me.headingDeg ?? 0);
   const along = p.x * Math.sin(h) + p.y * Math.cos(h), cross = Math.abs(p.x * Math.cos(h) - p.y * Math.sin(h));
+  if (hz.type === HAZARD.WRONG_WAY) { // un coche en sentido contrario por MI calzada: viene de frente y delante
+    const head = hdgDiff(me.headingDeg ?? 0, hz.headingDeg ?? 0) >= 145;
+    return head && along > 0 && along <= maxAheadM && cross <= 2 * laneM ? { relevant: true, aheadM: Math.round(along), crossM: Math.round(cross), why: 'vehículo en sentido contrario por tu calzada' } : { relevant: false, aheadM: Math.round(along), why: 'no viene por tu calzada' };
+  }
   if (ONE_WAY.has(hz.type) && hdgDiff(me.headingDeg ?? 0, hz.headingDeg ?? 0) > headingTolDeg) return { relevant: false, aheadM: Math.round(along), why: 'circula en otro sentido' };
   if (along <= 0) return { relevant: false, aheadM: Math.round(along), why: 'detrás de mí' };
   if (along > straightMaxM) return { relevant: false, aheadM: Math.round(along), why: 'lejos para juzgarlo sin la geometría de la vía' };
