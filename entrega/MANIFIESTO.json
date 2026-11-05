@@ -1,7 +1,7 @@
 {
   "proyecto": "SENDA",
   "generado": "2026-11-05",
-  "commit": "b375ec3",
+  "commit": "496ae33",
   "cambiosSinCommit": false,
   "siteUrl": "https://civic-relay-investor.vercel.app",
   "zips": [
@@ -9,9 +9,9 @@
       "file": "1-web-hostinger.zip",
       "title": "Web completa para subir a public_html (sin las dos películas largas)",
       "note": "Descomprime en public_html. Contiene .htaccess (fichero oculto).",
-      "files": 195,
-      "bytes": 32620562,
-      "sha256": "de44a55d2be6d879378d2487f42314e61440856f521681f8859b2479413c8400"
+      "files": 214,
+      "bytes": 34133665,
+      "sha256": "3a5075c2e68f100d104872a23c12dbec116e33ecde080c69f7b4a33b30bc21e6"
     },
     {
       "file": "2-web-video-senda-film-en.zip",
@@ -33,25 +33,25 @@
       "file": "4-codigo-fuente.zip",
       "title": "Código fuente completo (núcleo, relé, web, visión, scripts, pruebas)",
       "note": "Sin los vídeos (van en la web) ni las capturas de evidencias (van aparte).",
-      "files": 621,
-      "bytes": 8306051,
-      "sha256": "3e7718c78d124b3364a6c2f93768d6c99a6412967434a42c18a1ff3434881bce"
+      "files": 656,
+      "bytes": 10083020,
+      "sha256": "2f556372aa3bcd062e6286bdb50caee75f883d4a7a4a95bf7c0e252ed687d1a1"
     },
     {
       "file": "5-documentacion.zip",
       "title": "Documentación: traspaso, arquitectura, financiación, investigación y registro de cambios",
       "note": "Empieza por docs/handoff/HANDOFF_COMPLETO_2026-11-05.md.",
-      "files": 88,
-      "bytes": 360238,
-      "sha256": "fe3ea86b35dc4d89f75ee3d4c678aa1b8b727376c22b48df290f70ef16d56f02"
+      "files": 93,
+      "bytes": 569238,
+      "sha256": "53a6a3f8765039500503db0c60c3195ee8a6ab644865157db1471eaa758675e0"
     },
     {
       "file": "6-evidencias.zip",
       "title": "Evidencias: resultados de las pruebas de extremo a extremo y capturas",
       "note": "offline-e2e.json resume las comprobaciones sin red.",
-      "files": 86,
-      "bytes": 21841835,
-      "sha256": "f67c519084ed0fb6623cb053be47652e0f4a3924fc4e42f6de3a45508a64015f"
+      "files": 87,
+      "bytes": 23459932,
+      "sha256": "9b8b2c911870118bb5404f1dc792e7d1accdc60504a4223e989937ad669ee781"
     },
     {
       "file": "7-vision-python.zip",
