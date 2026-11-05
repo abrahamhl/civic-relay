@@ -1,0 +1,212 @@
+{
+ "note": "SENDA · vídeo «Ruta protectora, cámaras, Países Bajos y DGT» (v0.14–v0.16, español). Escenas «page» grabadas desde las páginas reales (?film=1&viz=…). Validar con: node validate.mjs ruta",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "r0",
+   "visual": {
+    "kind": "arch3d"
+   },
+   "title": {
+    "es": "Ruta protectora: SENDA en la carretera"
+   },
+   "es": [
+    "En España murieron 1.119 personas en vías interurbanas en 2025. La mayoría, en carreteras de un carril por sentido, con poco tráfico y poca cobertura.",
+    "SENDA va contigo en el viaje: avisa de lo que no ves, pide ayuda aunque no haya red y te guía si te paras a ayudar. Nunca sustituye tu atención ni el 112."
+   ],
+   "es_say": [
+    "En España murieron mil ciento diecinueve personas en vías interurbanas en dos mil veinticinco. La mayoría, en carreteras de un carril por sentido, con poco tráfico y poca cobertura.",
+    "Senda va contigo en el viaje: avisa de lo que no ves, pide ayuda aunque no haya red y te guía si te paras a ayudar. Nunca sustituye tu atención ni el ciento doce."
+   ]
+  },
+  {
+   "id": "r1",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=cadena"
+   },
+   "title": {
+    "es": "La frenada que no ves"
+   },
+   "es": [
+    "Niebla, 120 km/h y 1,2 segundos entre coches. Cada conductor reacciona a las luces del de delante y el retraso se suma: cinco coches chocan en cadena.",
+    "Con SENDA, el móvil del primero detecta la frenada por la velocidad del GPS y avisa a todos a la vez. Solo choca el que va pegado justo detrás: eso solo lo arregla la distancia de seguridad."
+   ],
+   "es_say": [
+    "Niebla, ciento veinte kilómetros por hora y uno coma dos segundos entre coches. Cada conductor reacciona a las luces del de delante y el retraso se suma: cinco coches chocan en cadena.",
+    "Con Senda, el móvil del primero detecta la frenada por la velocidad del GPS y avisa a todos a la vez. Solo choca el que va pegado justo detrás: eso solo lo arregla la distancia de seguridad."
+   ]
+  },
+  {
+   "id": "r2",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=sos"
+   },
+   "title": {
+    "es": "Sin cobertura, el SOS viaja con los coches"
+   },
+   "es": [
+    "Un accidente de noche en 18 kilómetros sin ninguna red. El móvil del coche accidentado anuncia el SOS y cualquier coche con SENDA que pase se lo lleva.",
+    "Con solo uno de cada diez coches, el aviso sale en unos siete minutos. Y los que vienen de frente avisan a quienes van hacia el accidente."
+   ],
+   "es_say": [
+    "Un accidente de noche en dieciocho kilómetros sin ninguna red. El móvil del coche accidentado anuncia el SOS y cualquier coche con Senda que pase se lo lleva.",
+    "Con solo uno de cada diez coches, el aviso sale en unos siete minutos. Y los que vienen de frente avisan a quienes van hacia el accidente."
+   ]
+  },
+  {
+   "id": "r3",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=pk"
+   },
+   "title": {
+    "es": "Dónde estás, en el idioma del 112"
+   },
+   "es": [
+    "El GPS funciona sin Internet. Lo que falta es saber qué decir: carretera, punto kilométrico y sentido.",
+    "SENDA lo calcula sin red, añade la referencia visible más cercana, como un aerogenerador, y sigue tu posición dentro de un túnel."
+   ],
+   "es_say": [
+    "El GPS funciona sin Internet. Lo que falta es saber qué decir: carretera, punto kilométrico y sentido.",
+    "Senda lo calcula sin red, añade la referencia visible más cercana, como un aerogenerador, y sigue tu posición dentro de un túnel."
+   ]
+  },
+  {
+   "id": "r4",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=escena"
+   },
+   "title": {
+    "es": "Te paras a ayudar"
+   },
+   "es": [
+    "Quien se para puede coordinar la escena con la conducta de la DGT: proteger, avisar y socorrer. Cada tarea la confirma otra persona.",
+    "Cuando llega la Guardia Civil, asume el mando y recibe el resumen. Las acciones confirmadas suman puntos cívicos en un registro que no se puede alterar."
+   ],
+   "es_say": [
+    "Quien se para puede coordinar la escena con la conducta de la DGT: proteger, avisar y socorrer. Cada tarea la confirma otra persona.",
+    "Cuando llega la Guardia Civil, asume el mando y recibe el resumen. Las acciones confirmadas suman puntos cívicos en un registro que no se puede alterar."
+   ]
+  },
+  {
+   "id": "r5",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=kamikaze"
+   },
+   "title": {
+    "es": "Un coche en sentido contrario"
+   },
+   "es": [
+    "El primero en saberlo es el móvil de quien se equivoca: tres posiciones seguidas contra el sentido de la calzada bastan para avisarle.",
+    "Los que vienen de frente reciben el tiempo que falta para cruzarse y qué hacer: carril derecho y reducir."
+   ]
+  },
+  {
+   "id": "r6",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=retencion"
+   },
+   "title": {
+    "es": "El final de la cola se mueve"
+   },
+   "es": [
+    "El final de una retención crece hacia atrás. Con la teoría de tráfico, SENDA calcula a qué velocidad.",
+    "Así te avisa de dónde estará la cola cuando llegues, no de dónde estaba, y reduces mucho antes."
+   ]
+  },
+  {
+   "id": "r7",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/camaras?film=1&viz=niebla"
+   },
+   "title": {
+    "es": "Cuánto se ve, medido en una cámara"
+   },
+   "es": [
+    "SENDA usa solo cámaras públicas publicadas para reutilizarse, y solo para medir el estado de la vía, nunca a las personas.",
+    "Con un objeto oscuro a distancia conocida calcula la visibilidad en metros y la velocidad para poder parar dentro de lo que se ve. Esta imagen es sintética, para comprobar el método."
+   ],
+   "es_say": [
+    "Senda usa solo cámaras públicas publicadas para reutilizarse, y solo para medir el estado de la vía, nunca a las personas.",
+    "Con un objeto oscuro a distancia conocida calcula la visibilidad en metros y la velocidad para poder parar dentro de lo que se ve. Esta imagen es sintética, para comprobar el método."
+   ]
+  },
+  {
+   "id": "r8",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/paises?film=1&viz=msi"
+   },
+   "title": {
+    "es": "Países Bajos: la cruz roja sobre tu carril"
+   },
+   "es": [
+    "El 112 y la información de tráfico en DATEX II son comunes en toda la Unión Europea. Por eso el mismo núcleo sirve en Países Bajos.",
+    "Allí, una cruz roja sobre el carril significa carril cerrado. SENDA lo lee de los datos abiertos y te lo dice en neerlandés."
+   ],
+   "es_say": [
+    "El ciento doce y la información de tráfico en DATEX dos son comunes en toda la Unión Europea. Por eso el mismo núcleo sirve en Países Bajos.",
+    "Allí, una cruz roja sobre el carril significa carril cerrado. Senda lo lee de los datos abiertos y te lo dice en neerlandés."
+   ]
+  },
+  {
+   "id": "r9",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/dgt?film=1&viz=detectores"
+   },
+   "title": {
+    "es": "La infraestructura de la DGT, como dato"
+   },
+   "es": [
+    "Radares, paneles y estaciones de aforo no son radios que podamos usar: cada uno habla con la DGT por un canal cerrado. Detectar radares, además, está prohibido.",
+    "SENDA suma lo que la DGT publica. Por ejemplo, las medidas de las estaciones de aforo dicen dónde empieza la cola y a qué velocidad crece."
+   ]
+  },
+  {
+   "id": "r10",
+   "visual": {
+    "kind": "verify"
+   },
+   "title": {
+    "es": "Comprobado, y lo que falta"
+   },
+   "es": [
+    "Todo lo que has visto lo calcula el mismo núcleo de la app, con pruebas automáticas que se ejecutan sin red.",
+    "Falta lo más importante: ensayos en carretera real, la app nativa para el aviso entre coches y los convenios con la DGT."
+   ]
+  },
+  {
+   "id": "r11",
+   "visual": {
+    "kind": "cta"
+   },
+   "title": {
+    "es": "SENDA"
+   },
+   "es": [
+    "SENDA: el canal que queda cuando falla todo lo demás. Pruébalo en la web."
+   ],
+   "es_say": [
+    "Senda: el canal que queda cuando falla todo lo demás. Pruébalo en la web."
+   ]
+  }
+ ]
+}

@@ -1,5 +1,46 @@
 # Changelog
 
+## SENDA v0.16 · 05-11-2026 · Infraestructura de la DGT validada y traspaso completo con kit de vídeo
+
+**Entrada (fundador):**
+- Seguir con los últimos toques de la DGT.
+- Comprobar si los puntos móviles y los radares de la DGT, como posibles pasarelas o emisores, pueden sumarse a SENDA.
+- Redactar el traspaso completo para otras IA, con la capacidad de hacer los vídeos 3D con una IA más barata.
+
+**Validación de la idea (con fuentes):**
+- **Ningún equipo de la DGT en la vía es una pasarela utilizable** (radares, paneles, cámaras, aforos, postes SOS, balizas V16). Cada uno habla con la DGT por un canal propio y cerrado; usarlo para transmitir sería entrar en un sistema ajeno.
+- La única vía oficial es **DGT 3.0 por convenio**.
+- **Detectar radares está prohibido desde 2014** (multa y 3 puntos; la cuantía es de 200 o 500 € según la fuente, pendiente del BOE) e **inhibirlos se sanciona con hasta 6.000 € y 6 puntos**.
+- **Avisar de la ubicación publicada de un radar fijo es lícito**, como hacen los navegadores.
+- Los postes SOS: la DGT anunció en 2010 la retirada de la mayoría y dejar los de zonas sin cobertura; no hay listado actual.
+
+**Procesamiento:**
+- Núcleo `dgt-infra.mjs`:
+  - catálogo de 10 equipos con lo que emiten, si son pasarela, lo que suman a SENDA, el permiso y la nota legal;
+  - zona de control publicada con deceleración hasta el límite;
+  - radar de tramo con la media y el aviso; nunca sugiere superar el límite;
+  - aforos → final de la retención y su onda de choque;
+  - texto de los paneles (es/nl) → aviso.
+- `datex2.mjs`: medidas de estaciones de aforo (MeasuredDataPublication) y paneles, con ejemplos construidos según el esquema.
+- `platforms.mjs`: integraciones de radares publicados y aforos o paneles (PASIVO) y detección de radares o controles móviles (NUNCA).
+- 4 pruebas nuevas.
+- Web `/senda/dgt`: equipo por equipo, aforos → cola (modo película), radares publicados con el límite y paneles. Además, arquitectura, portada (es/en/nl), service worker v17 y E2E.
+- Vídeo:
+  - `media/senda-film/validate.mjs` comprueba el guion antes de gastar CPU;
+  - `make.sh` hace todo de un comando: validar, voz, imagen, mezcla y publicación;
+  - nuevo guion `ruta.json` (12 escenas, 3:29), con la voz ya generada y fotogramas de muestra revisados.
+- Traspaso:
+  - `docs/handoff/HANDOFF_COMPLETO_2026-11-05.md`: estado, mapa, principios, procedimiento, despliegue, bloqueos, decisiones y mensaje de arranque;
+  - `docs/handoff/07_VIDEOS_3D_RUNBOOK.md`: guía de vídeo para una IA más barata.
+
+**Validación:** núcleo + relé 192/192 · E2E en Chromium 43/43, sin red (accesibilidad en 22 pantallas) · web: compilación, idiomas y 98/98 · guion `ruta.json` validado, voz generada y fotogramas correctos.
+
+**Límites:**
+- La red de esta sesión bloquea los portales de la DGT y de NDW: aforos y paneles, probados con ejemplos construidos según el esquema.
+- El vídeo `ruta` está listo para grabar, pero sin render completo.
+
+— Registrado por el asistente de orquestación (Claude Code), bajo la dirección de Abraham Haddioui.
+
 ## SENDA v0.15 · 05-11-2026 · Situaciones al volante, V16 + SENDA, cámaras públicas y exportación a Países Bajos
 
 **Entrada (fundador):**

@@ -2,10 +2,10 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-05T04:41:02.601Z",
-  "durationS": 266.2,
-  "passed": 42,
-  "total": 42,
+  "at": "2026-11-05T12:31:53.456Z",
+  "durationS": 204,
+  "passed": 43,
+  "total": 43,
   "results": [
     {
       "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
@@ -100,9 +100,9 @@
       "ok": true,
       "path": {
         "sat": "Iridium 2-5",
-        "elevationDeg": 24.7,
-        "rangeKm": 1549,
-        "delayMs": 5.17
+        "elevationDeg": 24.8,
+        "rangeKm": 1546,
+        "delayMs": 5.16
       },
       "plan": {
         "k": 6,
@@ -192,7 +192,7 @@
       "cur": "d-rescue",
       "edges": 5,
       "detail": "Probado en simulación nuevoConcurrencia de direcciones aleatorias → teléfonos por planta; inferencia bayesiana exacta → personas con intervalo del 90 %.Código: rf-census.mjsAparece en: 🚁 Censo con dronAbrir /senda/dron →",
-      "nodes": 59,
+      "nodes": 61,
       "links": [
         "/senda/dron",
         "/senda/llamada"
@@ -239,7 +239,7 @@
       "name": "Triaje sin red: «no camina, respira, más de 30/min» → ROJO, con indicaciones de hemorragia y un parte de ≤ 160 caracteres que pide el 112 primero",
       "ok": true,
       "cat": "ROJO",
-      "msg": "SENDA TRIAJE R1 A0 V0 | 39.45210,-0.43020 ±25m | hemorragia 1 | 112,Sanitario | 04:38",
+      "msg": "SENDA TRIAJE R1 A0 V0 | 39.45210,-0.43020 ±25m | hemorragia 1 | 112,Sanitario | 12:30",
       "steps": "Qué hacer ahoraPresión directa y firme sobre la herida con lo más limpio que tengas; no la levantes para mirar.Si sangra a chorro en un brazo o una pierna y la presión no basta: torniquete unos 5–7 cm por encima de la herida, aprieta hasta que pare y anota la hora.Si respira mejor sentado, déjale sentado; si no, tumbado con las piernas estiradas.\n  Servicios: 112 → Sanitario➕ Añadir a la escena y siguiente víctimaRepetir"
     },
     {
@@ -363,6 +363,32 @@
       "msi": "Over 600 meter. Rood kruis op rijstrook 1: voeg in naar rechts. Maximaal 70."
     },
     {
+      "name": "Infraestructura DGT sin red: ningún equipo de la vía es pasarela (solo DGT 3.0 por convenio), detectar radares y publicar controles móviles es NUNCA, las estaciones de aforo localizan la cola y los paneles se convierten en avisos",
+      "ok": true,
+      "gw": [
+        "dgt30"
+      ],
+      "q": {
+        "sTail": 3000,
+        "between": [
+          "EST-3",
+          "EST-4"
+        ],
+        "wKmh": -17.3,
+        "growing": true
+      },
+      "vms": [
+        "CRASH",
+        "FOG",
+        "CRASH"
+      ],
+      "radar": {
+        "zone": true,
+        "avg": 106
+      },
+      "never": 2
+    },
+    {
       "name": "Llamada sin Internet: oferta de <110 bytes por sonido (onda real, decodificada exacta), conexión directa cifrada, voz Opus y chat en ambos sentidos y cero peticiones de red durante la llamada",
       "ok": true,
       "offerBytes": 79,
@@ -380,9 +406,9 @@
       "connected": true,
       "offerBytes": 79,
       "answerBytes": 72,
-      "connectMs": 392,
+      "connectMs": 380,
       "message": "¿Me oyes? Estoy en la 3.ª planta, puerta B",
-      "rttMs": 1,
+      "rttMs": 0,
       "audioPackets": 75
     },
     {
@@ -412,7 +438,7 @@
     {
       "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
       "ok": true,
-      "href": "senda://accion?a=BLE_BEACON&id=59cb5d930667059e&b=B14&f=3&u=B&bat=100&cmd=JsWdB8tSCprZB3HR"
+      "href": "senda://accion?a=BLE_BEACON&id=15bf6de3a28cb62e&b=B14&f=3&u=B&bat=100&cmd=nqqZM4EXasWO_dk3"
     },
     {
       "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",
@@ -427,7 +453,7 @@
       "name": "Red SENDA sin red: reparto k-de-n entre varios portadores ≥99 %, prueba real de pérdida de portadores, catálogo satelital, previsión de apagón con pasarelas y CAP con auditoría que delata alteraciones",
       "ok": true,
       "pDelivery": 0.9909,
-      "trialSuccess": 0.975,
+      "trialSuccess": 0.99,
       "halfDarkAtH": 4,
       "gateways": 5
     },
@@ -444,7 +470,7 @@
       "easy": true
     },
     {
-      "name": "Accesibilidad automática en las 21 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
+      "name": "Accesibilidad automática en las 22 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
       "ok": true,
       "issues": {}
     },

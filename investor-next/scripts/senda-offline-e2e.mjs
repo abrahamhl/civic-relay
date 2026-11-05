@@ -257,6 +257,11 @@ const msi = await C.page.evaluate(async () => { document.querySelector('#m-say')
 check('Exportación a Países Bajos sin red: el lector DATEX II convierte la publicación en avisos y se queda con los 3 de la ruta; el rood kruis se dice en neerlandés; las cámaras allí requieren convenio',
   nl.d.records === 5 && nl.d.route === 3 && /Rood kruis op rijstrook 1: voeg in naar rechts/.test(msi) && nl.conv.includes('Cámaras'), { ...nl, msi });
 
+// ---- v0.16 sin red: infraestructura de la DGT (solo datos publicados), cola desde aforos DATEX II y paneles
+const dgt = await cap('/dgt', () => { const S = window.SENDA_DGT; return { gw: S.gateways, q: S.queue, vms: S.vms, radar: S.radar, never: document.querySelectorAll('#t-tb .chip.no').length }; }, 'e2e-31-dgt.png');
+check('Infraestructura DGT sin red: ningún equipo de la vía es pasarela (solo DGT 3.0 por convenio), detectar radares y publicar controles móviles es NUNCA, las estaciones de aforo localizan la cola y los paneles se convierten en avisos',
+  dgt.gw.join() === 'dgt30' && dgt.never === 2 && dgt.q.sTail === 3000 && dgt.q.growing && dgt.vms.join() === 'CRASH,FOG,CRASH' && dgt.radar.zone && dgt.radar.avg === 106, dgt);
+
 // ---- Llamada sin Internet: dos teléfonos nuevos, código por SONIDO (onda real) y conexión directa sin servidor.
 // (La emulación «offline» de Chromium también bloquea WebRTC local, así que aquí se demuestra lo equivalente:
 //  sin servidores STUN/TURN ni de señalización y CERO peticiones de red desde que empieza la llamada.)
@@ -384,12 +389,12 @@ const a11y = async (page) => page.evaluate(() => {
   return issues;
 });
 const a11yIssues = {};
-for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva', '/carretera', '/camaras', '/paises']) {
+for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva', '/carretera', '/camaras', '/paises', '/dgt']) {
   await R.goto(base + path); await R.waitForLoadState('load'); await R.waitForTimeout(300);
   const iss = await a11y(R); if (iss.length) a11yIssues[path || '/'] = iss;
 }
 await R.close();
-check('Accesibilidad automática en las 21 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
+check('Accesibilidad automática en las 22 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
 
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 

@@ -128,3 +128,41 @@ export const SAMPLE_DATEX2 = `<?xml version="1.0" encoding="UTF-8"?>
    <sit:locationReference xsi:type="loc:PointLocation"><loc:pointByCoordinates><loc:pointCoordinates><loc:latitude>42.8000</loc:latitude><loc:longitude>-1.6400</loc:longitude></loc:pointCoordinates></loc:pointByCoordinates></sit:locationReference>
    <sit:vehicleObstructionType>brokenDownVehicle</sit:vehicleObstructionType></sit:situationRecord></sit:situation>
 </d2:payload>`;
+
+// ---------------------------------------------------------------- Medidas de tráfico y paneles (DATEX II)
+/**
+ * Medidas de estaciones de aforo (MeasuredDataPublication): caudal (veh/h) y velocidad media (km/h)
+ * por punto de medida. Tolerante con prefijos y versiones; si hay varios carriles, suma caudales y
+ * promedia velocidades ponderando por caudal.
+ */
+export function parseMeasured(xml) {
+  const out = [], re = new RegExp(`<(${NS}siteMeasurements)\\b[^>]*>([\\s\\S]*?)</\\1>`, 'g');
+  for (const m of xml.matchAll(re)) {
+    const body = m[2], ref = body.match(new RegExp(`<${NS}measurementSiteReference\\b[^>]*\\bid="([^"]+)"`));
+    const flows = allTags(body, 'vehicleFlowRate').map(Number), speeds = allTags(body, 'speed').map(Number);
+    const flow = flows.reduce((a, b) => a + b, 0), speed = speeds.length ? (flows.length === speeds.length && flow > 0 ? speeds.reduce((s, v, i) => s + v * flows[i], 0) / flow : speeds.reduce((a, b) => a + b, 0) / speeds.length) : null;
+    out.push({ id: ref ? ref[1] : null, time: firstTag(body, 'measurementTimeDefault'), flowVehH: flows.length ? flow : null, speedKmh: speed == null ? null : +speed.toFixed(1) });
+  }
+  return out;
+}
+/** Paneles de mensaje variable: identificador, posición si viene y líneas de texto (cualquier elemento *TextLine). */
+export function parseVms(xml) {
+  const out = [], re = new RegExp(`<(${NS}(?:vmsUnit|vmsController|vmsControllerStatus|vmsUnitStatus|vms))\\b([^>]*)>([\\s\\S]*?)</\\1>`, 'g');
+  for (const m of xml.matchAll(re)) {
+    const body = m[3], lines = [...body.matchAll(new RegExp(`<${NS}\\w*[tT]extLine\\b[^>]*>([^<]+)</`, 'g'))].map((x) => x[1].trim()).filter(Boolean);
+    if (!lines.length) continue;
+    const lat = firstTag(body, 'latitude'), lon = firstTag(body, 'longitude');
+    out.push({ id: attr(m[2], 'id'), lat: lat == null ? null : +lat, lon: lon == null ? null : +lon, lines });
+  }
+  return out;
+}
+/** Medidas de EJEMPLO con la estructura de DATEX II v3 (no son una captura real): 6 estaciones cada 1 km. */
+export const SAMPLE_MEASURED = `<d2:payload xmlns:d2="http://datex2.eu/schema/3/d2Payload" xmlns:mst="http://datex2.eu/schema/3/measuredData" xmlns:roa="http://datex2.eu/schema/3/roadTrafficData" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="mst:MeasuredDataPublication">
+${[[1800, 98], [1790, 96], [1810, 94], [1200, 22], [1180, 18], [1250, 24]].map(([q, v], i) => ` <mst:siteMeasurements><mst:measurementSiteReference id="EST-${i + 1}" version="1" targetClass="MeasurementSiteRecord"/><mst:measurementTimeDefault>2026-11-05T07:40:00Z</mst:measurementTimeDefault>
+  <mst:physicalQuantity><mst:basicData xsi:type="roa:TrafficFlow"><roa:vehicleFlow><roa:vehicleFlowRate>${q}</roa:vehicleFlowRate></roa:vehicleFlow></mst:basicData></mst:physicalQuantity>
+  <mst:physicalQuantity><mst:basicData xsi:type="roa:TrafficSpeed"><roa:averageVehicleSpeed><roa:speed>${v}</roa:speed></roa:averageVehicleSpeed></mst:basicData></mst:physicalQuantity></mst:siteMeasurements>`).join('\n')}
+</d2:payload>`;
+/** Paneles de EJEMPLO (estructura orientativa; no es una captura real de la DGT ni de NDW). */
+export const SAMPLE_VMS = `<payload><vmsUnit id="PMV-A3-118"><latitude>40.05</latitude><longitude>-3.05</longitude><vmsTextLine>ACCIDENTE KM 121</vmsTextLine><vmsTextLine>CARRIL IZQ. CERRADO</vmsTextLine></vmsUnit>
+<vmsUnit id="PMV-A3-160"><latitude>39.92</latitude><longitude>-2.6</longitude><vmsTextLine>NIEBLA</vmsTextLine><vmsTextLine>MODERE SU VELOCIDAD</vmsTextLine></vmsUnit>
+<vmsUnit id="DRIP-A12-34"><vmsTextLine>ONGEVAL</vmsTextLine><vmsTextLine>FILE 4 KM</vmsTextLine></vmsUnit></payload>`;

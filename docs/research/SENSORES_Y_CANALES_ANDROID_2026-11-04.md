@@ -199,3 +199,28 @@ Son cuatro piezas de ingeniería real:
 
 **Bloqueo del entorno:** `nap.dgt.es`, `opendata.ndw.nu`, `docs.ndw.nu` y `english.ndw.nu` están denegados por la política de red de esta sesión. Para probar con datos reales hay que añadirlos a los dominios permitidos o ejecutar `scripts/datex-pack.mjs` en otra máquina.
 
+## 10. v0.16 · ¿Son pasarelas los radares y los equipos de la DGT? (2026-11-05)
+
+| Equipo | Qué emite o con quién habla | ¿Pasarela para SENDA? | Qué sí se suma |
+|---|---|---|---|
+| Radar fijo | Microondas o láser; envía las denuncias a la DGT por su canal | No | Ubicación publicada por la DGT (vía, PK, sentido) |
+| Radar de tramo | Dos pórticos y velocidad media | No | Tramos publicados; media propia sin sugerir superar el límite |
+| Radares móviles, Pegasus y drones | Sin ubicación publicada | No | Nada: SENDA no publica controles (decisión de diseño) |
+| Paneles | Texto en la vía; estado en DATEX II v3.6 | No | Leer el texto y convertirlo en aviso; escribir en ellos solo con convenio |
+| Aforos | Caudal y velocidad hacia el centro de gestión | No | Cola y onda de choque (España: disponibilidad pendiente; NDW sí publica) |
+| V16 | Posición a DGT 3.0 por la red móvil | No | Fusión V16 + SENDA por convenio |
+| Postes SOS | Línea propia | No | El más cercano, si existe un listado |
+| DGT 3.0 | Plataforma de datos | **Sí, por convenio** | El canal oficial |
+
+**Legalidad de los radares:**
+- Detectores prohibidos desde 2014: multa (200 o 500 € según la fuente) y 3 puntos.
+- Inhibidores: hasta 6.000 € y 6 puntos.
+- Avisadores de ubicaciones publicadas: lícitos.
+
+**Fuentes:**
+- [Motorpasión: la DGT y los avisadores](https://www.motorpasion.com/seguridad/dgt-recuerda-que-puedes-usar-avisador-radares-cambio-detectores-e-inhibidores-conllevan-cuantiosa-multa)
+- [Motor16: inhibidores](https://www.motor16.com/noticias/dgt-6-000-euros-6-puntos-multa/)
+- [Motor16: ubicación de los radares fijos](https://www.motor16.com/noticias/donde-estan-radares-fijos-dgt/)
+- [Highmotor: retirada de postes SOS](https://www.highmotor.com/dgt-retirara-gran-parte-postes-sos-carreteras-espanolas.html)
+- [NAP DGT: paneles](https://nap.dgt.es/en/dataset/paneles-dgt-tiempo-real-datex2-v3-6)
+

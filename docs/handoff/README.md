@@ -1,5 +1,7 @@
 # SENDA · Paquete de traspaso (handoff) para un proyecto limpio
 
+> **Actualizado (05-11-2026):** empieza por **[HANDOFF_COMPLETO_2026-11-05.md](HANDOFF_COMPLETO_2026-11-05.md)** (estado v0.16, mapa, procedimiento y mensaje de arranque). Vídeos: **[07_VIDEOS_3D_RUNBOOK.md](07_VIDEOS_3D_RUNBOOK.md)**. Lo que sigue es la versión 1 (contexto histórico).
+
 > Versión 1 · 04-11-2026 · commit de referencia `c933c9b` (rama `ccr-bb7a95b8-t79scj`, PR #12).
 > Entrada → Procesamiento → Validación → Salida: todo lo necesario para que cualquier persona o
 > agente retome el proyecto sin el historial de conversación.

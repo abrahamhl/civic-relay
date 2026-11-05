@@ -39,3 +39,4 @@ export * from './road-guard.mjs';
 export * from './drive-cases.mjs';
 export * from './datex2.mjs';
 export * from './cameras.mjs';
+export * from './dgt-infra.mjs';
