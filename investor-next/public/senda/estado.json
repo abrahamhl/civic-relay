@@ -4,8 +4,8 @@
  "e2e": 43,
  "e2eTotal": 43,
  "relay": 2,
- "android": "14 invariantes de formato SENDA (paridad web / Android / ESP32).",
- "esp32": "trama SENDA en C++ idéntica a web y Android (3 vectores + CRC)",
- "sha": "1c117be",
- "generatedAt": "2026-11-05T12:33:22.432Z"
+ "android": "no ejecutado aquí (sin JDK; lo ejecuta CI)",
+ "esp32": "no ejecutado aquí (sin g++; lo ejecuta CI)",
+ "sha": "f7038f7",
+ "generatedAt": "2026-11-05T13:25:18.171Z"
 }

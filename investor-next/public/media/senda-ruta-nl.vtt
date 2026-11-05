@@ -1,0 +1,93 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:10.776
+In Spanje kwamen in 2025 1.119 mensen om op wegen buiten de bebouwde kom. De meesten op enkelbaanswegen met weinig verkeer en slecht bereik.
+
+2
+00:00:11.126 --> 00:00:21.323
+SENDA reist met je mee: het waarschuwt voor wat je niet ziet, vraagt hulp zonder bereik en begeleidt je als je stopt om te helpen. Het vervangt nooit je aandacht of 112.
+
+3
+00:00:22.923 --> 00:00:33.483
+Mist, 120 km/u en 1,2 seconde tussen auto's. Elke bestuurder reageert op de remlichten voor zich en de vertraging telt op: vijf auto's botsen op elkaar.
+
+4
+00:00:33.833 --> 00:00:45.567
+Met SENDA detecteert de eerste telefoon het harde remmen via de GPS-snelheid en waarschuwt iedereen tegelijk. Alleen wie direct bumperkleeft botst nog: dat lost alleen volgafstand op.
+
+5
+00:00:47.167 --> 00:00:56.340
+Een nachtelijk ongeval op 18 kilometer zonder enig bereik. De telefoon in de verongelukte auto zendt een SOS uit en elke passerende auto met SENDA neemt het mee.
+
+6
+00:00:56.690 --> 00:01:04.306
+Met slechts één op de tien auto's komt de melding in ongeveer zeven minuten naar buiten. En tegenliggers waarschuwen wie op het ongeval afrijdt.
+
+7
+00:01:05.906 --> 00:01:13.351
+GPS werkt zonder internet. Wat ontbreekt is weten wat je moet zeggen: wegnummer, hectometerpaal en rijrichting.
+
+8
+00:01:13.701 --> 00:01:21.061
+SENDA berekent dit offline, voegt het dichtstbijzijnde zichtbare herkenningspunt toe, zoals een windturbine, en volgt je positie in een tunnel.
+
+9
+00:01:22.661 --> 00:01:31.515
+Wie stopt kan de plek van het ongeval coördineren volgens het protocol: beveiligen, alarmeren en helpen. Elke taak wordt door een tweede persoon bevestigd.
+
+10
+00:01:31.865 --> 00:01:39.694
+Wanneer de politie arriveert, neemt zij de leiding over en ontvangt het overzicht. Bevestigde acties leveren burgerpunten op in een onwijzigbaar logboek.
+
+11
+00:01:41.294 --> 00:01:49.166
+De eerste die het weet is de telefoon van de spookrijder zelf: drie opeenvolgende posities tegen de rijrichting in volstaan om hem te waarschuwen.
+
+12
+00:01:49.516 --> 00:01:55.020
+Tegenliggers krijgen de tijd tot de kruising en wat ze moeten doen: rechts houden en afremmen.
+
+13
+00:01:56.620 --> 00:02:03.767
+De staart van een file groeit achteruit. Met verkeersstroomtheorie berekent SENDA hoe snel die schokgolf beweegt.
+
+14
+00:02:04.117 --> 00:02:10.410
+Zo waarschuwt het waar de filestaart zal zijn wanneer jij aankomt, niet waar die was, zodat je veel eerder afremt.
+
+15
+00:02:12.010 --> 00:02:18.538
+SENDA gebruikt alleen openbare verkeerscamera's die zijn vrijgegeven voor hergebruik, en alleen om de wegcondities te meten, nooit personen.
+
+16
+00:02:18.888 --> 00:02:29.320
+Met een donker referentiepunt op bekende afstand berekent het het zicht in meters en de veilige snelheid om binnen het zicht te kunnen stoppen. Dit beeld is synthetisch om de methode te testen.
+
+17
+00:02:30.920 --> 00:02:39.069
+Zowel 112 als verkeersinformatie in DATEX II zijn gemeenschappelijk in de hele Europese Unie. Daarom werkt precies dezelfde kern ook in Nederland.
+
+18
+00:02:39.419 --> 00:02:46.523
+Daar betekent een rood kruis boven de rijstrook dat de strook gesloten is. SENDA leest dit uit open data en spreekt de waarschuwing in het Nederlands uit.
+
+19
+00:02:48.123 --> 00:02:58.214
+Flitspalen, matrixborden en telpunten zijn geen radio's die we kunnen gebruiken: elk praat via een gesloten lijn met de wegbeheerder. Radardetectie is bovendien verboden.
+
+20
+00:02:58.564 --> 00:03:06.863
+SENDA voegt samen wat de wegbeheerder publiceert. Metingen van telpunten laten bijvoorbeeld zien waar de file begint en hoe snel die groeit.
+
+21
+00:03:08.463 --> 00:03:14.927
+Alles wat je hebt gezien wordt berekend door dezelfde kern van de app, met automatische tests die volledig offline draaien.
+
+22
+00:03:15.277 --> 00:03:22.914
+Het belangrijkste moet nog komen: praktijkproeven op de weg, de native app voor waarschuwingen tussen auto's en convenanten met wegbeheerders.
+
+23
+00:03:24.514 --> 00:03:28.887
+SENDA: het kanaal dat overblijft wanneer al het andere uitvalt. Probeer het op het web.

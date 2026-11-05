@@ -134,6 +134,6 @@ Escena 3D nueva en `sims.js` (solo si no puede vivir en una página): añade el 
 
 | Vídeo | Guion | Estado |
 |---|---|---|
-| Ruta protectora, cámaras, Países Bajos y DGT (es) | `ruta.json` | **Listo para grabar**: validado, voz generada y fotogramas de muestra revisados (05-11-2026) |
-| La misma versión en inglés | copiar `ruta.json` y añadir `en`, `en_say` y `title.en` | Pendiente |
+| Ruta protectora, cámaras, Países Bajos y DGT (es) | `ruta.json` | **Grabado y publicado** en `investor-next/public/media/senda-ruta-es.mp4` (+ `.vtt` y póster, 05-11-2026) |
+| La misma versión en inglés (+ subtítulos nl) | `ruta.json` | **Grabado y publicado** en `investor-next/public/media/senda-ruta-en.mp4` (+ `.vtt` en/nl y póster, 05-11-2026) |
 | Piezas verticales de 45–60 s (una por escena) | un guion de 1–2 escenas | Pendiente; el formato vertical necesitaría otra plantilla de `film.html` |

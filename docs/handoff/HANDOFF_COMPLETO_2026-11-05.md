@@ -48,7 +48,7 @@
 | Web | `npm run build`, `node test-locales.mjs`, `node --test tests/*.test.mjs` (98/98) en `investor-next` |
 | Módulos del núcleo | 53 en `packages/senda/src` (copiados a `investor-next/public/senda/core` con `sync-web.mjs`) |
 | Pantallas de la app | 22 en `investor-next/public/senda/*.html` |
-| Vídeos publicados | Película v5 (es/en) y capacidades v0.12 (es). Guion `ruta.json` listo para grabar |
+| Vídeos publicados | Película v5 (es/en), capacidades v0.12 (es) y ruta protectora v0.16 (`senda-ruta-es.mp4` y `senda-ruta-en.mp4`, con subtítulos es/en/nl) |
 
 ## 4. Mapa del repositorio
 

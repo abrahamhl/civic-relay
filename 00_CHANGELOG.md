@@ -37,7 +37,7 @@
 
 **Límites:**
 - La red de esta sesión bloquea los portales de la DGT y de NDW: aforos y paneles, probados con ejemplos construidos según el esquema.
-- El vídeo `ruta` está listo para grabar, pero sin render completo.
+- Vídeos `senda-ruta-es.mp4` y `senda-ruta-en.mp4` (con subtítulos `es`, `en` y `nl`) grabados y publicados en `investor-next/public/media/`.
 
 — Registrado por el asistente de orquestación (Claude Code), bajo la dirección de Abraham Haddioui.
 
