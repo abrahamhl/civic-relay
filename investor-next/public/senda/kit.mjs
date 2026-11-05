@@ -27,7 +27,7 @@ export function run(draws) {
   window.SENDA_VIZ = { seek: (t, name = VIZ) => (name ? [draws[name]] : Object.values(draws)).forEach((f) => f?.(t)), names: Object.keys(draws) };
   if (FILM) {
     const el = document.querySelector(`[data-viz="${VIZ}"] canvas`);
-    if (el) { document.body.replaceChildren(el); document.body.style.cssText = 'margin:0;background:#05090c;display:grid;place-items:center;height:100vh;overflow:hidden'; el.style.cssText = `max-width:100vw;max-height:100vh;width:auto;height:100vh;aspect-ratio:${el.style.aspectRatio}`; }
+    if (el) { document.querySelector('main')?.style.setProperty('display', 'none'); document.body.appendChild(el); document.body.style.cssText = 'margin:0;background:#05090c;display:grid;place-items:center;height:100vh;overflow:hidden'; el.style.cssText = `max-width:100vw;max-height:100vh;width:auto;height:100vh;aspect-ratio:${el.style.aspectRatio}`; }
     window.SENDA_VIZ.seek(0); window.SENDA_VIZ_READY = true; return;
   }
   const t0 = performance.now(); const tick = () => { window.SENDA_VIZ.seek((performance.now() - t0) / 1000, null); requestAnimationFrame(tick); }; requestAnimationFrame(tick);

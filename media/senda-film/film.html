@@ -37,6 +37,7 @@ svg{position:absolute;inset:0}
 .url{font:700 30px ui-monospace,monospace;color:var(--i);margin-top:26px}
 .missing li{color:var(--m);font-size:19px;margin:8px 0}.missing{padding-left:22px}
 canvas.c2d{width:640px;height:600px}
+iframe.pg{width:640px;height:600px;border:0;border-radius:14px;background:#05090c;box-shadow:0 30px 80px rgba(0,0,0,.55)}
 .scene.full{padding:56px 64px}.scene.full>*{position:relative;z-index:2}.scene.full .slot{position:absolute;inset:0;z-index:0}.scene.full .slot canvas{width:1280px;height:720px;display:block}
 .scene.full .shade{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(5,9,12,.94) 0,rgba(5,9,12,.82) 30%,rgba(5,9,12,0) 50%)}
 .hud{position:absolute!important;right:28px;bottom:44px;width:300px;background:rgba(11,20,28,.86);border:1px solid var(--l);border-radius:14px;padding:12px 14px;font-size:13px;color:var(--m)}
@@ -54,6 +55,7 @@ canvas.c2d{width:640px;height:600px}
 <div id="brand"><b>SENDA</b> · civic-relay-investor.vercel.app/senda</div><div id="prog"></div>
 <script>
 const LANG = new URLSearchParams(location.search).get('lang') || 'es';
+const SCRIPT_NAME = new URLSearchParams(location.search).get('script') || 'script', PFX = SCRIPT_NAME === 'script' ? '' : `${SCRIPT_NAME}-`;
 const T = (o) => (typeof o === 'string' ? o : o?.[LANG] ?? o?.en ?? '');
 const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
 const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
@@ -90,6 +92,7 @@ function visualHTML(sc, idx) {
   }
   if (v.kind === 'stack') return `<div class="stack">${(L[LANG] ?? L.en).stack.map(([t, p], i) => `<div class="card s${i}"><b>${t}</b><p>${p}</p></div>`).join('')}</div>`;
   if (v.kind === 'verify') { const l = L[LANG] ?? L.en; return `<div class="kpis"><div class="kpi k0"><b>${NUM.core}/${NUM.core}</b><span>${l.core}</span></div><div class="kpi k1"><b>${NUM.e2e}/${NUM.e2e}</b><span>${l.e2e}</span></div><div class="kpi warn k2"><ul class="missing">${l.missing.map((m) => `<li>${m}</li>`).join('')}</ul></div></div>`; }
+  if (v.kind === 'page') return `<iframe class="pg" src="${v.src}" width="640" height="600" title="${T(sc.title)}"></iframe>`;
   if (v.kind === 'call' || v.kind === 'howsim') return '<canvas class="c2d" width="640" height="600"></canvas>';
   if (v.kind === 'cta') { const l = L[LANG] ?? L.en; return `<div><div class="chips">${l.who.map((w, i) => `<span class="chip w${i}">${w}</span>`).join('')}</div><div class="url">civic-relay-investor.vercel.app/senda</div></div>`; }
   return '';
@@ -126,6 +129,7 @@ window.seek = (t) => {
     for (let k = 0; k < 6; k++) { appear(`.k${k}`, cue(Math.min(k + (SCRIPT.scenes[i].visual.kind === 'kpis' ? 1 : SCRIPT.scenes[i].visual.kind === 'shots' ? 1 : 0), s.cues.length - 1)) + 0.3 + (SCRIPT.scenes[i].visual.kind === 'kpis' ? 0 : k * 0.6)); appear(`.s${k}`, cue(0) + 0.6 + k * 1.6); appear(`.w${k}`, cue(0) + 0.4 + k * 0.5); appear(`.f${k}`, 0.3 + k * 0.5, 40); }
     el.querySelectorAll('.f0 img,.f1 img').forEach((im) => { const z = 1 + 0.04 * clamp(lt / d); im.style.transformOrigin = '50% 0'; im.style.transform = `scale(${z})`; });
     SIMS.draw(SCRIPT.scenes[i].visual.kind, el, lt, d, cue);
+    const pg = el.querySelector('iframe.pg'); if (pg) pg.contentWindow?.SENDA_VIZ?.seek(Math.max(0, lt - 0.3));
     const url = el.querySelector('.url'); if (url) { const p = ease((lt - cue(1)) / 0.8); url.style.opacity = p; }
     const hub = el.querySelector('.hub');
     if (hub) {
@@ -139,13 +143,14 @@ window.seek = (t) => {
 };
 
 (async () => {
-  SCRIPT = await (await fetch('script.json')).json();
-  await new Promise((res) => { const s = document.createElement('script'); s.src = `out/timeline-${LANG}.js`; s.onload = res; document.head.appendChild(s); });
+  SCRIPT = await (await fetch(`${SCRIPT_NAME}.json`)).json();
+  await new Promise((res) => { const s = document.createElement('script'); s.src = `out/timeline-${PFX}${LANG}.js`; s.onload = res; document.head.appendChild(s); });
   TL = window.TIMELINE; window.DURATION = TL.duration;
   document.documentElement.lang = LANG;
   build();
   await SIMS.init();
   SCRIPT.scenes.forEach((sc, i) => { const c = SIMS.canvasFor(sc.visual.kind); if (c) scenesEl[i].querySelector('.slot').appendChild(c); });
+  await Promise.all([...document.querySelectorAll('iframe.pg')].map((f) => new Promise((ok) => { const chk = () => (f.contentWindow?.SENDA_VIZ_READY ? ok() : setTimeout(chk, 50)); chk(); })));
   await Promise.all([...document.images].map((im) => (im.complete ? 1 : new Promise((r) => { im.onload = im.onerror = r; }))));
   window.seek(+(new URLSearchParams(location.search).get('t') || 0));
   window.READY = true;
