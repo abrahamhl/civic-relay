@@ -18,7 +18,7 @@
   - Edificio con el árbol elegido y botón «Iker se queda sin batería».
   - Demo real A → B → C en una pestaña con cuatro conexiones WebRTC: C oye el tono de 440 Hz de A (441 Hz medidos) a través de B, y el chat llega reenviado.
 - `/senda/arquitectura`: añadidos la pieza «Malla de voz», el escenario «Cadena de voz» y la tabla «Del plano al mundo físico», que dice para cada pieza qué existe hoy y qué falta.
-- Película v5 (es/en, subtítulos es/en/nl): la v4 íntegra más 4 escenas calculadas con el núcleo real (`media/senda-film/sims.js`).
+- Película v5 (español 8:36, inglés 8:22; subtítulos es/en/nl): la v4 íntegra más 4 escenas calculadas con el núcleo real (`media/senda-film/sims.js`).
   1. Llamar sin Internet: el código de 91 bytes se convierte en su partitura real de tonos, la conexión es directa y sigue la cadena de voz.
   2. Censo con dron en 3D (three.js): edificio, dron, anuncios Bluetooth y panel con direcciones frente a teléfonos y personas.
   3. Arquitectura en 3D: las 5 capas con el estado real de cada pieza y paquetes recorriendo 4 escenarios.
