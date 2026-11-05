@@ -49,7 +49,7 @@
 </section>
 </main>
 <script type="module">
-import { $, C, canvas, text, rr, run, clamp, FILM } from '/senda/kit.mjs';
+import { $, C, canvas, text, rr, run, clamp, FILM, drawCar, drawRoad } from '/senda/kit.mjs';
 import { COUNTRIES, countryPlan } from '/senda/core/platforms.mjs';
 import { parseDatex2, toHazards, corridorPack, msiAdvice, SAMPLE_DATEX2 } from '/senda/core/datex2.mjs';
 import { ROUTE_MAD_VLC } from '/senda/core/road-guard.mjs';
@@ -82,9 +82,7 @@ const gm = canvas($('#cv-m'));
 function drawM(t) {
   const g = gm, P = 14, lt = t % P, sMe = 400 + (lt / P) * 2600, Y = (s) => 560 - ((s - sMe + 300) / 2400) * 560;
   g.fillStyle = '#0d1418'; g.fillRect(0, 0, 640, 600);
-  const lx = [200, 280, 360, 440]; g.fillStyle = '#2b3338'; g.fillRect(200, 0, 240, 600);
-  g.strokeStyle = '#e5e7eb'; g.lineWidth = 3; [200, 440].forEach((x) => { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 600); g.stroke(); });
-  g.setLineDash([22, 18]); g.lineWidth = 2; [280, 360].forEach((x) => { g.beginPath(); g.lineDashOffset = -sMe; g.moveTo(x, 0); g.lineTo(x, 600); g.stroke(); }); g.setLineDash([]);
+  const lx = [200, 280, 360, 440]; g.fillStyle = '#16231b'; g.fillRect(0, 0, 640, 600); drawRoad(g, 188, 0, 264, 600, { lanes: 3, vertical: true, shoulder: 0.045, offset: -sMe * 0.25 });
   for (const gt of GANTRIES) { const y = Y(gt.s); if (y < -40 || y > 640) continue; g.fillStyle = '#5b6770'; g.fillRect(190, y - 4, 260, 8);
     gt.lanes.forEach((v, i) => { const cx = (lx[i] + lx[i + 1]) / 2; g.fillStyle = '#05080a'; rr(g, cx - 24, y - 54, 48, 44, 6); g.fill();
       if (v === 'X') { g.strokeStyle = '#ff2a2a'; g.lineWidth = 5; g.beginPath(); g.moveTo(cx - 13, y - 45); g.lineTo(cx + 13, y - 19); g.moveTo(cx + 13, y - 45); g.lineTo(cx - 13, y - 19); g.stroke(); }
@@ -93,7 +91,7 @@ function drawM(t) {
       else { g.strokeStyle = '#ff2a2a'; g.lineWidth = 3; g.beginPath(); g.arc(cx, y - 32, 15, 0, 7); g.stroke(); text(g, v, cx, y - 27, { c: '#f5f5f5', f: '800 13px Inter,system-ui', al: 'center' }); }
     }); g.lineWidth = 1; }
   const a = msiAdvice(GANTRIES, sMe, { lang: S.lang }), lane = a?.closedLanes.includes(1) && a.atM < 900 ? 1 : 0, cx = (lx[lane] + lx[lane + 1]) / 2;
-  g.fillStyle = C.i; rr(g, cx - 14, 520, 28, 46, 7); g.fill(); g.fillStyle = '#0b141c'; g.fillRect(cx - 9, 528, 18, 10);
+  drawCar(g, cx, 540, { len: 50, ang: -Math.PI / 2, color: '#91d7e8', lights: true });
   g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 20, 600, 88, 12); g.fill(); g.strokeStyle = a?.closedLanes.length ? C.r : C.l; g.stroke();
   text(g, a ? a.say : 'Sin limitaciones por delante', 34, 52, { c: a?.closedLanes.length ? C.t : C.e, f: '800 14px Inter,system-ui' });
   const es = msiAdvice(GANTRIES, sMe, { lang: 'es' }); if (S.lang !== 'es' && es) text(g, es.say, 34, 78, { c: C.m, f: '12px Inter,system-ui' });

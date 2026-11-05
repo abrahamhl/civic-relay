@@ -83,7 +83,7 @@ function drawN(t) {
   text(g, `Visibilidad estimada: ${e.visM} m`, 34, 470, { c: danger ? C.a : C.t, f: '800 18px Inter,system-ui' });
   text(g, `referencia usada: objeto a ${e.distM} m · transmisión t = ${fmt(e.t, 2)} · luz del aire A = ${fmt(e.A, 2)}`, 34, 494, { c: C.m, f: '12px Inter,system-ui' });
   text(g, `Velocidad para parar dentro de lo que se ve: ${safeSpeedForVisibility(e.visM).kmh} km/h en seco · ${safeSpeedForVisibility(e.visM, { mu: MU.mojado }).kmh} en mojado`, 34, 520, { c: C.t, f: '13px Inter,system-ui' });
-  text(g, danger ? '⚠️ Aviso de niebla con su velocidad a los que se acercan a esta cámara' : 'Sin aviso: visibilidad suficiente', 34, 548, { c: danger ? C.a : C.e, f: '700 13px Inter,system-ui' });
+  text(g, danger ? 'Aviso de niebla, con su velocidad, a los que se acercan a esta cámara' : 'Sin aviso: visibilidad suficiente', 34, 548, { c: danger ? C.a : C.e, f: '700 13px Inter,system-ui' });
   text(g, 'I = J·t + A·(1 − t) · t = e^(−β·d) · V = 3,912 / β', 34, 572, { c: C.g, f: '12px Inter,system-ui' });
 }
 

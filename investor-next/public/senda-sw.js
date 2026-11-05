@@ -14,6 +14,7 @@ const ASSETS = [
   '/senda/carretera', '/senda/core/road-guard.mjs',
   '/senda/camaras', '/senda/paises', '/senda/core/drive-cases.mjs', '/senda/core/datex2.mjs', '/senda/core/cameras.mjs',
   '/senda/dgt', '/senda/core/dgt-infra.mjs',
+  '/senda/trafico', '/senda/vehiculos', '/senda/core/vehicle-link.mjs', '/media/vision/dashcam.json', '/media/vision/fixed.json',
 ];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(VERSION).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });

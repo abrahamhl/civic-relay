@@ -1,5 +1,51 @@
 # Changelog
 
+## SENDA v0.17 · 05-11-2026 · Visión con vídeo real, coches conectados, fusión de posición y renders realistas
+
+**Entrada (fundador):**
+- Simuladores y renders menos infantiles.
+- Proyectos de Python que siguen vehículos en cámaras: probar con imágenes reales cuánto tráfico hay por minuto, en qué tramo y cuándo se acerca.
+- Integrar coches conectados y eléctricos (datos a los fabricantes, acuerdos con marcas, módulos de emergencia) con el resto de puntos (aerogeneradores, Wi-Fi, otros coches, Waze, Google Maps, radares, satélite).
+- Diseñar el backend de conexión.
+
+**Procesamiento:**
+- **`packages/senda-vision/` (Python, nuevo):**
+  - detector **YOLOX-s en ONNX (Apache 2.0)** sin PyTorch y seguimiento **ByteTrack** (supervision 0.26.1, MIT);
+  - dibujo sobrio: esquinas, etiquetas, estelas y panel con la tipografía Inter;
+  - `track_fixed.py`: conteo por sentido en una línea y ritmo por minuto;
+  - `track_dashcam.py`, el coche como sensor:
+    - tiempo hasta alcanzarlo sin calibrar, por la altura de la caja;
+    - distancia estimada por la altura de un turismo;
+    - vehículos de la calzada contraria contados como contactos del SOS;
+    - filtros de artefactos (cajas en el borde, acercamientos de más de 25 m/s).
+  - Ultralytics se descarta para el producto por su licencia AGPL-3.0.
+- **Vídeos reales procesados y publicados** en `/media/vision/`:
+  - cámara a bordo (Udacity, MIT): 12 vehículos seguidos en 36 s, 15 contactos por minuto de la calzada contraria y ningún falso «¡Frena!»;
+  - cámara fija (Intel, CC BY 4.0): 1 vehículo en 30 s en un aparcamiento, presentado como dato real.
+- **Núcleo `vehicle-link.mjs` (6 pruebas):**
+  - fuentes con su base legal: Ley de Datos de la UE (art. 5), DFRS/SRTI, OBD-II, Android Automotive, cámaras, aforos, V16 y Waze; el eCall y la reidentificación son NUNCA;
+  - 8 categorías SRTI y eventos del coche → avisos;
+  - **k-anonimato** por celda de vía y franja de tiempo;
+  - velocidad por tramo con **Kalman** y varianza que crece con la edad del dato;
+  - **posición por mínimos cuadrados con GNSS, vía, rumbo a un aerogenerador, Wi-Fi con tiempo de vuelo y otro coche**: de ~10 m a **0,3–2,1 m** en 6 semillas;
+  - puentes entre la visión y el núcleo.
+- **Render:** el kit de lienzos dibuja coches y camiones con volumen (sombra, degradado, lunas, retrovisores, faros, pilotos de freno con brillo), asfalto con textura y marcas viales, choque vectorial y personas sin rasgos.
+  - Aplicado a la cadena de frenadas, el sentido contrario, la escena PAS, la retención de la DGT y el rood kruis.
+  - Fuera los emojis de las animaciones de carretera.
+- **Web:** `/senda/trafico` (vídeos reales con sus métricas y cómo se conecta todo) y `/senda/vehiculos` (fuentes, fusión de posición paso a paso, velocidad por tramo, privacidad y arquitectura). Además, arquitectura (2 piezas y 2 aplicaciones), portada (es/en/nl), service worker v18 y E2E.
+- **Documento:** `docs/architecture/BACKEND_VEHICULOS_Y_FUSION_2026-11-05.md`.
+
+**Validación:** núcleo + relé 198/198 · E2E en Chromium 45/45, sin red (accesibilidad en 24 pantallas) · web: compilación, idiomas y 98/98.
+
+**Límites:**
+- No hay vídeo real de autovía con cámara fija y licencia libre accesible desde esta sesión: el conteo de alta densidad queda para las cámaras públicas reales.
+- Distancias aproximadas (±30 %).
+- Carril propio marcado a mano.
+- Adaptadores reales de fabricantes, DFRS y Android Automotive pendientes de convenio y de verificar.
+- La escena 3D de la frenada sigue pendiente.
+
+— Registrado por el asistente de orquestación (Claude Code), bajo la dirección de Abraham Haddioui.
+
 ## SENDA v0.16.1 · 05-11-2026 · Vídeo «ruta» publicado en español e inglés
 
 **Entrada (fundador):**

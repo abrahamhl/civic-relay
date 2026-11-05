@@ -54,7 +54,7 @@
 </section>
 </main>
 <script type="module">
-import { $, C, canvas, text, rr, run, clamp, FILM } from '/senda/kit.mjs';
+import { $, C, canvas, text, rr, run, clamp, FILM, drawCar, drawRoad, carColor } from '/senda/kit.mjs';
 import { DGT_INFRA, speedZoneAdvice, sectionAverage, detectorQueue, vmsToHazard } from '/senda/core/dgt-infra.mjs';
 import { parseMeasured, parseVms, SAMPLE_MEASURED, SAMPLE_VMS } from '/senda/core/datex2.mjs';
 import { queueWarning } from '/senda/core/drive-cases.mjs';
@@ -71,12 +71,18 @@ const gd = canvas($('#cv-d'));
 function drawD(t) {
   const g = gd, P = 16, lt = t % P, tt = clamp(lt / 14) * 240, w = S.queue.wKmh / 3.6, tail = S.queue.sTail + w * tt, X = (s) => 50 + ((s + 3000) / 9000) * 560;
   g.fillStyle = C.bg; g.fillRect(0, 0, 640, 600);
-  g.fillStyle = '#2b3338'; g.fillRect(20, 300, 600, 70); g.setLineDash([16, 14]); g.strokeStyle = '#cfd8dc'; g.beginPath(); g.moveTo(20, 335); g.lineTo(620, 335); g.stroke(); g.setLineDash([]);
-  g.fillStyle = 'rgba(255,91,110,.16)'; g.fillRect(X(tail), 300, 620 - X(tail), 70);
+  drawRoad(g, 20, 296, 600, 80, { lanes: 2, offset: tt * 6 });
+  // tráfico: separación de ~45 m libre y ~8 m en la cola (densidades de las estaciones), avanzando a su velocidad
+  const md = (a, m) => ((a % m) + m) % m;
+  for (let lane = 0; lane < 2; lane++) {
+    for (let k = 0; k < 40; k++) { const sP = -3000 + md(k * 330 + lane * 160 + tt * 27, 12000); if (sP < tail - 60 && X(sP) > 24) drawCar(g, X(sP), 316 + lane * 38, { len: 15, color: carColor(k + lane), lights: true }); }
+    for (let k = 0; k < 60; k++) { const sQ = tail + md(k * 120 + lane * 60 + tt * 5, Math.max(1, 6000 - tail)); if (X(sQ) < 616) drawCar(g, X(sQ), 316 + lane * 38, { len: 15, color: carColor(k + 3 * lane), braking: true }); }
+  }
+  g.fillStyle = 'rgba(255,91,110,.12)'; g.fillRect(X(tail), 296, 620 - X(tail), 80);
   sites.forEach((x) => { const cong = x.s >= tail, v = cong ? 22 : 96, h = (v / 110) * 200, xx = X(x.s); g.fillStyle = cong ? C.r : C.e; rr(g, xx - 14, 280 - h, 28, h, 4); g.fill(); text(g, `${v}`, xx, 272 - h, { c: C.t, f: '700 12px Inter,system-ui', al: 'center' }); g.fillStyle = '#e5e7eb'; g.fillRect(xx - 2, 300, 4, 70); text(g, x.id, xx, 392, { c: C.m, f: '11px Inter,system-ui', al: 'center' }); });
   g.strokeStyle = C.r; g.lineWidth = 3; g.beginPath(); g.moveTo(X(tail), 290); g.lineTo(X(tail), 380); g.stroke(); g.lineWidth = 1; text(g, '← la cola crece', X(tail) - 6, 418, { c: C.r, f: '700 12px Inter,system-ui', al: 'right' });
   const me = -2800 + (110 / 3.6) * tt * 0.5, qw = queueWarning({ sMe: me, vMeKmh: 110, sTail: tail, wKmh: S.queue.wKmh });
-  if (me < tail - 50) { g.fillStyle = C.i; rr(g, X(me) - 16, 342, 32, 18, 5); g.fill(); text(g, 'tú', X(me), 384, { c: C.i, f: '700 11px Inter,system-ui', al: 'center' }); }
+  if (me < tail - 50) { drawCar(g, X(me), 354, { len: 20, color: '#91d7e8', lights: true }); text(g, 'tú', X(me), 392, { c: C.i, f: '700 11px Inter,system-ui', al: 'center' }); }
   text(g, 'Velocidad media en cada estación (km/h) · datos DATEX II', 20, 34, { c: C.t, f: '800 14px Inter,system-ui' });
   g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 450, 600, 130, 12); g.fill(); g.strokeStyle = C.a; g.stroke();
   text(g, me < tail - 50 ? `SENDA: «${qw.say}»` : 'Llegas a la cola ya a baja velocidad, sin frenazo', 34, 482, { c: C.a, f: '800 14px Inter,system-ui' });

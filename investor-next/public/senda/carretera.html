@@ -170,7 +170,7 @@
 </section>
 </main>
 <script type="module">
-import { $, C, canvas, text, rr, run, clamp, ease, FILM } from '/senda/kit.mjs';
+import { $, C, canvas, text, rr, run, clamp, ease, FILM, drawCar, drawRoad, drawImpact, drawPerson, carColor } from '/senda/kit.mjs';
 import { brakeChain, alertGain, roadScenario, contactProbability, demoRoad, pointAt, roadLocate, roadDeadReckon, describePosition, landmarksAlong, roadSosText, call112Script, createScene, sceneAct, sceneBrief, civicLedger, verifyLedger, CIVIC_RULES, PAS, corridorTiles, ROUTE_MAD_VLC, navLinks, REPORT_KINDS, encodeHazard, reportBelief, toCifs, detectHardBrake, brakeAdvice } from '/senda/core/road-guard.mjs';
 import { INTEGRATIONS, ACCESS } from '/senda/core/platforms.mjs';
 import { DRIVE_CASES, MU, stoppingDistance, safeSpeedForVisibility, floodedRoad, v16Fusion, shockwaveKmh, wrongWayMeet } from '/senda/core/drive-cases.mjs';
@@ -192,18 +192,17 @@ chain();
 const gc = canvas($('#cv-cad'));
 function lane(g, res, y0, label, t) {
   const tr = res.trace, f = tr[Math.min(tr.length - 1, Math.floor(t / 0.05))], X = (x) => 40 + ((x + 250) / 330) * 560;
-  g.fillStyle = '#121c24'; g.fillRect(20, y0, 600, 70); g.setLineDash([14, 12]); g.strokeStyle = '#3a4a55'; g.beginPath(); g.moveTo(20, y0 + 35); g.lineTo(620, y0 + 35); g.stroke(); g.setLineDash([]);
+  drawRoad(g, 20, y0, 600, 76, { lanes: 2, offset: (f.x[0] + 250) * 1.7 });
   text(g, label, 20, y0 - 10, { c: C.t, f: '800 14px Inter,system-ui' });
   for (let i = 5; i >= 0; i--) {
-    const sd = res.cars[i].senda, brk = f.braking[i], hit = f.hit[i], x = X(f.x[i]) - (hit ? (5 - i) * 0 : 0), y = y0 + 40 + (hit ? (i % 2 ? -14 : 12) : 0), w = 26;
-    if (brk && !hit) { g.fillStyle = 'rgba(255,60,60,.3)'; g.beginPath(); g.arc(x - w, y + 10, 13, 0, 7); g.fill(); }
-    g.fillStyle = hit ? C.r : i ? '#cfd8dc' : C.a; rr(g, x - w, y, w, 20, 5); g.fill();
-    g.fillStyle = brk ? '#ff2a2a' : '#5b1010'; g.fillRect(x - w - 1, y + 2, 3, 5); g.fillRect(x - w - 1, y + 13, 3, 5);
-    if (sd) { g.strokeStyle = C.i; g.lineWidth = 2; rr(g, x - w - 2, y - 2, w + 4, 24, 6); g.stroke(); g.lineWidth = 1; }
-    text(g, `${i + 1}`, x - w / 2, y + 15, { c: '#0b141c', f: '800 11px Inter,system-ui', al: 'center' });
+    const sd = res.cars[i].senda, brk = f.braking[i], hit = f.hit[i], x = X(f.x[i]) - 15, y = y0 + 57 + (hit ? (i % 2 ? -12 : 0) : 0);
+    drawCar(g, x, y, { len: 30, color: i ? carColor(i + 1) : '#c9a227', braking: brk, hit, lights: true });
+    if (sd) { g.fillStyle = C.i; g.beginPath(); g.arc(x, y - 14, 3, 0, 7); g.fill(); }
+    if (hit) drawImpact(g, x + 15, y - 2, 8);
+    text(g, `${i + 1}`, x, y + 22, { c: hit ? C.r : C.m, f: '700 10px Inter,system-ui', al: 'center' });
   }
-  if (res.cars[0].senda && t > 0.05 && t < 1.6) { g.save(); g.beginPath(); g.rect(20, y0, 600, 70); g.clip(); for (let k = 0; k < 3; k++) { const r = ((t + k * 0.15) / 0.5) * 120; g.strokeStyle = `rgba(145,215,232,${clamp(1 - t / 1.6) * 0.8})`; g.lineWidth = 2; g.beginPath(); g.arc(X(f.x[0]) - 15, y0 + 50, r, 0, 7); g.stroke(); } g.restore(); g.lineWidth = 1; }
-  text(g, `${res.collisions ? `💥 ${res.collisions} choque${res.collisions > 1 ? 's' : ''} · peor a ${res.worstImpactKmh} km/h` : '✅ todos paran a tiempo'}`, 620, y0 - 10, { c: res.collisions ? C.r : C.e, f: '700 13px Inter,system-ui', al: 'right' });
+  if (res.cars[0].senda && t > 0.05 && t < 1.6) { g.save(); g.beginPath(); g.rect(20, y0, 600, 76); g.clip(); for (let k = 0; k < 3; k++) { const r = ((t + k * 0.15) / 0.5) * 120; g.strokeStyle = `rgba(145,215,232,${clamp(1 - t / 1.6) * 0.8})`; g.lineWidth = 2; g.beginPath(); g.arc(X(f.x[0]) - 15, y0 + 57, r, 0, 7); g.stroke(); } g.restore(); g.lineWidth = 1; }
+  text(g, res.collisions ? `${res.collisions} choque${res.collisions > 1 ? 's' : ''} · peor a ${res.worstImpactKmh} km/h` : 'Todos paran a tiempo', 620, y0 - 10, { c: res.collisions ? C.r : C.e, f: '700 13px Inter,system-ui', al: 'right' });
 }
 function drawCad(t) {
   const g = gc, P = 12, lt = t % P, st = clamp(lt - 0.8, 0, 9);
@@ -247,11 +246,11 @@ function drawSos(t) {
   g.fillStyle = '#081109'; g.fillRect(0, 0, 640, 600);
   text(g, 'Carretera de montaña, de noche · sin cobertura entre el km 3 y el 21', 20, 30, { c: C.t, f: '800 14px Inter,system-ui' });
   text(g, `minuto ${fmt(simS / 60, 1)}`, 620, 30, { c: C.a, f: '800 15px Inter,system-ui', al: 'right' });
-  for (const [a, b] of r.params.coverage) { g.fillStyle = 'rgba(52,211,153,.12)'; g.fillRect(X(a * 1000), 60, X(b * 1000) - X(a * 1000), 300); text(g, '📶 cobertura', (X(a * 1000) + X(b * 1000)) / 2, 80, { c: C.e, f: '700 11px Inter,system-ui', al: 'center' }); }
+  for (const [a, b] of r.params.coverage) { g.fillStyle = 'rgba(52,211,153,.12)'; g.fillRect(X(a * 1000), 60, X(b * 1000) - X(a * 1000), 300); text(g, 'cobertura', (X(a * 1000) + X(b * 1000)) / 2, 80, { c: C.e, f: '700 11px Inter,system-ui', al: 'center' }); }
   text(g, 'sin ninguna red', 320, 80, { c: C.g, f: '700 12px Inter,system-ui', al: 'center' });
   g.fillStyle = '#1a2620'; g.fillRect(20, 170, 600, 90); g.setLineDash([10, 10]); g.strokeStyle = '#4b5d52'; g.beginPath(); g.moveTo(20, 215); g.lineTo(620, 215); g.stroke(); g.setLineDash([]);
   text(g, '← sentido Valle', 24, 162, { c: C.m, f: '11px Inter,system-ui' }); text(g, 'sentido Puerto →', 616, 282, { c: C.m, f: '11px Inter,system-ui', al: 'right' });
-  const wx = X(r.params.accidentKm * 1000); g.fillStyle = C.r; rr(g, wx - 7, 232, 14, 12, 3); g.fill(); text(g, '💥 accidente', wx, 300, { c: C.r, f: '800 12px Inter,system-ui', al: 'center' });
+  const wx = X(r.params.accidentKm * 1000); drawImpact(g, wx, 238, 9); text(g, 'accidente', wx, 300, { c: C.r, f: '800 12px Inter,system-ui', al: 'center' });
   if (simS > 0) { const k = (simS % 2) / 2; g.strokeStyle = `rgba(255,91,110,${1 - k})`; g.beginPath(); g.arc(wx, 238, 6 + k * 22, 0, 7); g.stroke(); }
   for (const p of r.positions(simS)) {
     const y = p.dir === 1 ? 238 : 192, x = X(p.x);
@@ -263,7 +262,7 @@ function drawSos(t) {
   items.forEach(([c, l], i) => { g.fillStyle = c; g.beginPath(); g.arc(30 + i * 150, 330, 5, 0, 7); g.fill(); text(g, l, 40 + i * 150, 334, { c: C.m, f: '11px Inter,system-ui' }); });
   g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 380, 600, 200, 12); g.fill(); g.strokeStyle = C.l; g.stroke();
   const ev = r.timeline.filter((e) => e.t <= simS).slice(-5);
-  text(g, r.sosDeliveredMin != null && simS / 60 >= r.sosDeliveredMin ? `✅ SOS fuera de la zona sin red a los ${fmt(r.sosDeliveredMin, 1)} min` : r.sosDeliveredMin == null ? 'Sin coches con SENDA el SOS no sale de aquí' : 'El SOS viaja con los coches que pasan…', 34, 406, { c: r.sosDeliveredMin != null && simS / 60 >= r.sosDeliveredMin ? C.e : C.t, f: '800 14px Inter,system-ui' });
+  text(g, r.sosDeliveredMin != null && simS / 60 >= r.sosDeliveredMin ? `SOS fuera de la zona sin red a los ${fmt(r.sosDeliveredMin, 1)} min` : r.sosDeliveredMin == null ? 'Sin coches con SENDA el SOS no sale de aquí' : 'El SOS viaja con los coches que pasan…', 34, 406, { c: r.sosDeliveredMin != null && simS / 60 >= r.sosDeliveredMin ? C.e : C.t, f: '800 14px Inter,system-ui' });
   ev.forEach((e, i) => text(g, `${fmt(e.t / 60, 1)} min · ${e.what.length > 78 ? e.what.slice(0, 78) + '…' : e.what}`, 34, 432 + i * 22, { c: i === ev.length - 1 ? C.t : C.m, f: '12px Inter,system-ui' }));
   text(g, `${r.cars} coches simulados · ${r.sendaCars} con SENDA (${Math.round(r.params.share * 100)} %) · ${r.params.flowVehH} coches/h por sentido · 80 km/h`, 34, 566, { c: C.g, f: '11px Inter,system-ui' });
 }
@@ -310,12 +309,12 @@ function drawEsc(t) {
   const g = ge, P = 24, lt = t % P, T = mapT(lt), sc = sceneAt(T), mm = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
   g.fillStyle = C.bg; g.fillRect(0, 0, 640, 600);
   // escena esquemática
-  g.fillStyle = '#121c24'; g.fillRect(20, 50, 600, 120); g.fillStyle = '#8a8f93'; g.fillRect(20, 176, 600, 4); text(g, 'guardarraíl', 610, 194, { c: C.g, f: '10px Inter,system-ui', al: 'right' });
-  g.fillStyle = '#cfd8dc'; rr(g, 300, 90, 54, 28, 6); g.fill(); g.save(); g.translate(372, 112); g.rotate(-0.5); g.fillStyle = '#9fb2bc'; rr(g, -27, -14, 54, 28, 6); g.fill(); g.restore();
+  drawRoad(g, 20, 50, 600, 124, { lanes: 2, shoulder: 0.1 }); g.fillStyle = '#8a8f93'; g.fillRect(20, 176, 600, 4); g.fillStyle = '#5d6e78'; for (let x = 30; x < 620; x += 40) g.fillRect(x, 174, 3, 9); text(g, 'guardarraíl', 610, 196, { c: C.g, f: '10px Inter,system-ui', al: 'right' });
+  drawCar(g, 327, 128, { len: 56, color: '#d9dee2', hit: true }); drawCar(g, 380, 108, { len: 56, ang: -0.5, color: '#7a1f24', hit: true }); drawImpact(g, 356, 118, 7);
   const v16 = sc.tasks[0].doneAt != null; if (v16 && Math.floor(lt * 3) % 2) { g.fillStyle = '#ffb020'; g.beginPath(); g.arc(327, 86, 7, 0, 7); g.fill(); g.fillStyle = 'rgba(255,176,32,.25)'; g.beginPath(); g.arc(327, 86, 22, 0, 7); g.fill(); }
   const people = [['Ana', 470, 210], ['Luis', 520, 210], ['Marta', 400, 210]].filter(([n]) => sc.participants.includes(n));
-  for (const [n, x, y] of people) { g.fillStyle = sc.coordinator.userId === n ? C.c : C.a; g.beginPath(); g.arc(x, y, 9, 0, 7); g.fill(); text(g, n + (sc.coordinator.userId === n ? ' · coordina' : ''), x, y + 24, { c: C.t, f: '11px Inter,system-ui', al: 'center' }); }
-  if (sc.handover) { g.fillStyle = '#2563eb'; rr(g, 120, 96, 70, 30, 6); g.fill(); text(g, 'Guardia Civil', 155, 146, { c: '#93c5fd', f: '700 11px Inter,system-ui', al: 'center' }); if (Math.floor(lt * 4) % 2) { g.fillStyle = '#60a5fa'; g.fillRect(140, 90, 12, 5); } }
+  for (const [n, x, y] of people) { drawPerson(g, x, y, sc.coordinator.userId === n ? C.c : C.a); text(g, n + (sc.coordinator.userId === n ? ' · coordina' : ''), x, y + 28, { c: C.t, f: '11px Inter,system-ui', al: 'center' }); }
+  if (sc.handover) { drawCar(g, 155, 92, { len: 60, color: '#e9e6df', lights: true }); g.fillStyle = '#1f4fbf'; g.fillRect(140, 88, 30, 8); if (Math.floor(lt * 4) % 2) { g.fillStyle = 'rgba(96,165,250,.5)'; g.beginPath(); g.arc(155, 92, 22, 0, 7); g.fill(); } text(g, 'Guardia Civil', 155, 150, { c: '#93c5fd', f: '700 11px Inter,system-ui', al: 'center' }); }
   sc.victims.forEach((v, i) => { g.fillStyle = { ROJO: C.r, AMARILLO: C.a, VERDE: C.e }[v.cat] ?? C.g; rr(g, 250 + i * 28, 136, 20, 20, 4); g.fill(); text(g, v.id, 260 + i * 28, 150, { c: '#0b141c', f: '800 9px Inter,system-ui', al: 'center' }); });
   text(g, `Escena abierta por Ana · ${mm(T)} desde el accidente`, 20, 34, { c: C.t, f: '800 14px Inter,system-ui' });
   // lista PAS
@@ -329,12 +328,12 @@ function drawEsc(t) {
   });
   g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 448, 600, 136, 12); g.fill(); g.strokeStyle = sc.handover ? C.e : C.l; g.stroke();
   if (sc.handover) {
-    text(g, `✅ Traspaso a la Guardia Civil de Tráfico (${mm(sc.handover.at)})`, 34, 474, { c: C.e, f: '800 14px Inter,system-ui' });
+    text(g, `Traspaso a la Guardia Civil de Tráfico (${mm(sc.handover.at)})`, 34, 474, { c: C.e, f: '800 14px Inter,system-ui' });
     const b = sceneBrief(sc).text; text(g, b.length > 92 ? b.slice(0, 92) + '…' : b, 34, 498, { c: C.t, f: '12px Inter,system-ui' });
-    if (S.ledger && lt > 18) { text(g, `🏅 Puntos cívicos: ${Object.entries(S.ledger.totals).map(([w, p]) => `${w} ${p}`).join(' · ')}`, 34, 526, { c: C.a, f: '800 13px Inter,system-ui' }); text(g, `${S.ledger.entries.length} asientos encadenados por SHA-256 ${S.ledgerOk ? '· cadena verificada' : ''}`, 34, 550, { c: C.m, f: '12px Inter,system-ui' }); }
+    if (S.ledger && lt > 18) { text(g, `Puntos cívicos: ${Object.entries(S.ledger.totals).map(([w, p]) => `${w} ${p}`).join(' · ')}`, 34, 526, { c: C.a, f: '800 13px Inter,system-ui' }); text(g, `${S.ledger.entries.length} asientos encadenados por SHA-256 ${S.ledgerOk ? '· cadena verificada' : ''}`, 34, 550, { c: C.m, f: '12px Inter,system-ui' }); }
   } else {
     sc.log.slice(-4).forEach((e, i, a) => text(g, `${mm(e.t)} · ${e.who} ${e.what}`, 34, 474 + i * 24, { c: i === a.length - 1 ? C.t : C.m, f: '12px Inter,system-ui' }));
-    if (sc.calls.length) text(g, '📞 112 avisado con carretera, PK y sentido', 606, 570, { c: C.e, f: '700 12px Inter,system-ui', al: 'right' });
+    if (sc.calls.length) text(g, '112 avisado con carretera, PK y sentido', 606, 570, { c: C.e, f: '700 12px Inter,system-ui', al: 'right' });
   }
 }
 
@@ -414,11 +413,11 @@ function drawKz(t) {
   const tt = Math.min(lt, 11), meAlert = tt > alertAt + reactS, myV = (s) => (s > alertAt + reactS ? Math.max(80 / 3.6, vMe - 2.5 * (s - alertAt - reactS)) : vMe);
   let yMe = 0; for (let s = 0; s < tt; s += 0.05) yMe += myV(s) * 0.05; const yK = d0 - vK * tt, gap = Math.max(0, yK - yMe);
   const view = (m) => 560 - ((m - yMe + 100) / 1700) * 540, laneMe = meAlert ? clamp((tt - alertAt - reactS) / 3) : 0;
-  g.fillStyle = '#0d1418'; g.fillRect(0, 0, 640, 600); g.fillStyle = '#2b3338'; g.fillRect(230, 0, 180, 600);
-  g.strokeStyle = '#e5e7eb'; g.lineWidth = 3; [230, 410].forEach((x) => { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 600); g.stroke(); }); g.setLineDash([20, 16]); g.lineWidth = 2; g.lineDashOffset = yMe * 0.33; g.beginPath(); g.moveTo(320, 0); g.lineTo(320, 600); g.stroke(); g.setLineDash([]); g.lineWidth = 1;
-  text(g, '↑ sentido de la calzada', 420, 590, { c: C.m, f: '11px Inter,system-ui' });
-  const xMe = 275 + laneMe * 90; g.fillStyle = C.i; rr(g, xMe - 14, view(yMe) - 23, 28, 46, 7); g.fill(); text(g, 'Tú', xMe, view(yMe) + 40, { c: C.i, f: '800 12px Inter,system-ui', al: 'center' });
-  const yk = view(yK); if (yk > -50) { g.fillStyle = C.r; rr(g, 261, yk - 23, 28, 46, 7); g.fill(); text(g, 'en sentido contrario', 255, yk - 30, { c: C.r, f: '700 12px Inter,system-ui', al: 'right' }); }
+  g.fillStyle = '#16231b'; g.fillRect(0, 0, 640, 600); drawRoad(g, 220, 0, 200, 600, { lanes: 2, vertical: true, offset: yMe * 0.33 });
+  g.fillStyle = '#5d6e78'; g.fillRect(205, 0, 6, 600); text(g, 'mediana', 200, 590, { c: C.g, f: '10px Inter,system-ui', al: 'right' });
+  text(g, '↑ sentido de la calzada', 430, 590, { c: C.m, f: '11px Inter,system-ui' });
+  const xMe = 270 + laneMe * 100; drawCar(g, xMe, view(yMe), { len: 46, ang: -Math.PI / 2, color: '#91d7e8', lights: true, braking: meAlert && myV(tt) > 80 / 3.6 + 0.1 }); text(g, 'Tú', xMe, view(yMe) + 42, { c: C.i, f: '800 12px Inter,system-ui', al: 'center' });
+  const yk = view(yK); if (yk > -50) { drawCar(g, 270, yk, { len: 46, ang: Math.PI / 2, color: '#c94b56', lights: true }); text(g, 'en sentido contrario', 250, yk + 4, { c: C.r, f: '700 12px Inter,system-ui', al: 'right' }); }
   g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 20, 600, 96, 12); g.fill(); g.strokeStyle = tt > alertAt ? C.r : C.l; g.stroke();
   const m = wrongWayMeet({ distM: gap, vMeMs: myV(tt), vOtherMs: vK });
   text(g, tt < alertAt ? 'Un coche entra por la salida de la autovía…' : `Su móvil: «¡Vas en sentido contrario!» · el tuyo: «${m.say.split(':')[0]}»`, 34, 50, { c: tt < alertAt ? C.t : C.r, f: '800 13px Inter,system-ui' });

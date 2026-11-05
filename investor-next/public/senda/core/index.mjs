@@ -40,3 +40,4 @@ export * from './drive-cases.mjs';
 export * from './datex2.mjs';
 export * from './cameras.mjs';
 export * from './dgt-infra.mjs';
+export * from './vehicle-link.mjs';

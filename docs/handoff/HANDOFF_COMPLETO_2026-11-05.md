@@ -152,6 +152,7 @@ Después, esperar el estado `READY` y comprobar un archivo nuevo, por ejemplo `/
 | v0.13 | Batería de Internet, biblioteca de vecinos, puntos de rebote |
 | v0.14 | Ruta protectora: frenada, choque, SOS por coches, PK sin red, escena PAS y puntos cívicos |
 | v0.15 | 20 situaciones al volante, V16 + SENDA, cámaras públicas (visibilidad), DATEX II, rood kruis, perfiles España y Países Bajos |
+| v0.17 | Visión con vídeo real (`packages/senda-vision`: YOLOX Apache + ByteTrack), coches conectados y fusión (`vehicle-link.mjs`: Ley de Datos, DFRS, k-anonimato, Kalman, posición de ~10 m a ~1-2 m), renders realistas en el kit, `/senda/trafico`, `/senda/vehiculos`, documento `docs/architecture/BACKEND_VEHICULOS_Y_FUSION_2026-11-05.md` |
 | v0.16 | Infraestructura de la DGT validada (ninguna pasarela de radio; datos publicados y DGT 3.0), aforos → cola, paneles → avisos, radares publicados → límite. Kit de vídeo para otras IA (`validate.mjs`, `make.sh`, `ruta.json`) y este handoff |
 
 ## 9. Mensaje de arranque para otra IA

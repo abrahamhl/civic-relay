@@ -262,6 +262,14 @@ const dgt = await cap('/dgt', () => { const S = window.SENDA_DGT; return { gw: S
 check('Infraestructura DGT sin red: ningún equipo de la vía es pasarela (solo DGT 3.0 por convenio), detectar radares y publicar controles móviles es NUNCA, las estaciones de aforo localizan la cola y los paneles se convierten en avisos',
   dgt.gw.join() === 'dgt30' && dgt.never === 2 && dgt.q.sTail === 3000 && dgt.q.growing && dgt.vms.join() === 'CRASH,FOG,CRASH' && dgt.radar.zone && dgt.radar.avg === 106, dgt);
 
+// ---- v0.17 sin red: visión con vídeo real (métricas guardadas) y coches conectados (fusión de posición, Kalman, k-anonimato)
+const tv = await cap('/trafico', () => window.SENDA_TRAFICO, 'e2e-32-trafico.png');
+check('Visión de tráfico sin red: métricas del vídeo real (12 vehículos seguidos a bordo, 15 contactos/min de la calzada contraria, ningún falso «¡Frena!»; cámara fija convertida en caudal)',
+  tv.dash.tracked >= 10 && tv.dash.oncomingPerMin >= 10 && tv.dash.probe.alerts.length === 0 && tv.fixed.measured.flowVehH > 0, tv);
+const veh = await cap('/vehiculos', () => window.SENDA_VEHICULOS, 'e2e-33-vehiculos.png');
+check('Coches conectados sin red: la posición pasa de ~10 m (GNSS) a menos de 2,5 m sumando vía, aerogenerador, Wi-Fi y otro coche; el tramo se fusiona con Kalman y solo se publica la celda con k ≥ 5 fuentes',
+  veh.steps[0].err > 8 && veh.steps[4].err < 2.5 && veh.steps[4].rms < 1.5 && veh.segment.sdKmh < 3 && veh.privacy.published === 1 && veh.privacy.suppressed === 1, veh);
+
 // ---- Llamada sin Internet: dos teléfonos nuevos, código por SONIDO (onda real) y conexión directa sin servidor.
 // (La emulación «offline» de Chromium también bloquea WebRTC local, así que aquí se demuestra lo equivalente:
 //  sin servidores STUN/TURN ni de señalización y CERO peticiones de red desde que empieza la llamada.)
@@ -389,12 +397,12 @@ const a11y = async (page) => page.evaluate(() => {
   return issues;
 });
 const a11yIssues = {};
-for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva', '/carretera', '/camaras', '/paises', '/dgt']) {
+for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva', '/carretera', '/camaras', '/paises', '/dgt', '/trafico', '/vehiculos']) {
   await R.goto(base + path); await R.waitForLoadState('load'); await R.waitForTimeout(300);
   const iss = await a11y(R); if (iss.length) a11yIssues[path || '/'] = iss;
 }
 await R.close();
-check('Accesibilidad automática en las 22 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
+check('Accesibilidad automática en las 24 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
 
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 

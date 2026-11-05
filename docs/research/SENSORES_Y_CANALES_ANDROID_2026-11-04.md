@@ -224,3 +224,26 @@ Son cuatro piezas de ingeniería real:
 - [Highmotor: retirada de postes SOS](https://www.highmotor.com/dgt-retirara-gran-parte-postes-sos-carreteras-espanolas.html)
 - [NAP DGT: paneles](https://nap.dgt.es/en/dataset/paneles-dgt-tiempo-real-datex2-v3-6)
 
+## 11. v0.17 · Visión con vídeo real y coches conectados (2026-11-05)
+
+**Visión (probado en esta sesión):**
+- YOLOX-s ONNX (Apache 2.0) en ONNX Runtime CPU: 136–193 ms por fotograma.
+- ByteTrack (supervision 0.26.1, MIT). Las versiones 0.27 y posteriores ya no incluyen `sv.ByteTrack`.
+- Vídeos con licencia: Intel IoT DevKit sample-videos (CC BY 4.0) y Udacity CarND-Vehicle-Detection (MIT). Los de repositorios sin archivo LICENSE se descartan.
+- Ultralytics YOLO es AGPL-3.0: no apto para un servicio cerrado.
+
+**Coches conectados:**
+- [Ley de Datos y vehículos (StreamLex)](https://streamlex.eu/news/data-act-vehicle-data-guidance-explained/)
+- [Autovista](https://autovista24.autovistagroup.com/news/european-data-act-empowers-users-connected-vehicles/)
+- [DFRS (ERTICO)](https://ertico.com/what-we-do/innovation-platforms/dfrs)
+- [SRTI en DATEX II](https://datex2.eu/user-domains/srti/)
+- [eCall de nueva generación, Reglamento Delegado 2024/1180](https://eur-lex.europa.eu/eli/reg_del/2024/1180/oj)
+- [Android for Cars](https://developer.android.com/training/cars/apps)
+- [Tesla Fleet API, biblioteca comunitaria](https://pypi.org/project/tesla-fleet-api/0.4.9)
+- [High Mobility](https://www.high-mobility.com/car-api/tesla-data-api)
+
+**Pendiente de verificar:**
+- Qué fabricantes publican hoy en DFRS y con qué latencia.
+- Los permisos de datos del vehículo en Android Automotive para apps de terceros.
+- La cobertura de marcas de las plataformas multimarca en Europa.
+
