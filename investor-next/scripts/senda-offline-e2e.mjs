@@ -237,6 +237,14 @@ await C.page.screenshot({ path: resolve(outDir, 'e2e-27-reserva.png'), fullPage:
 check('Batería de Internet sin red: 1 GB cubre ≥ 95 % de lo necesario, la biblioteca de vecinos reconstruye el paquete exacto (Reed-Solomon y SHA-256) y la memoria de cobertura elige el cerro con antena de grupo electrógeno',
   resv.cov >= 0.95 && resv.used <= 1024 && resv.rt && resv.swarm.p >= 0.99 && resv.best === 'ermita' && resv.quota, resv);
 
+// ---- Ruta protectora (sin red): cadena de frenadas, SOS que viaja con los coches, puntos cívicos verificables, detector real
+await C.page.goto(base + '/carretera'); await C.page.waitForFunction(() => window.SENDA_VIZ_READY && window.SENDA_CARRETERA?.ledger, null, { timeout: 20000 });
+await C.page.click('#t-brake'); await C.page.click('#r-btns [data-k="animal"]');
+const road = await C.page.evaluate(() => { const S = window.SENDA_CARRETERA; return { no: S.no.collisions, si: S.si.collisions, sos: S.road.sosDeliveredMin, warned: S.road.warnedBeyondSight, ok: S.ledgerOk, pts: S.ledger.totals, ratio: S.corridor.ratio, live: S.live.state, hex: document.querySelector('#r-hex').textContent.trim().split(' ').length }; });
+await C.page.screenshot({ path: resolve(outDir, 'e2e-28-carretera.png'), fullPage: true });
+check('Ruta protectora sin red: con 1,2 s entre coches el aviso SENDA reduce el choque en cadena de 5 a 1, el SOS sale de la zona sin cobertura en menos de 10 min con los coches que pasan, el libro de puntos cívicos verifica su cadena SHA-256 y el detector marca la frenada',
+  road.no === 5 && road.si === 1 && road.sos !== null && road.sos < 10 && road.warned >= 1 && road.ok && road.ratio < 0.1 && road.live === 'HARD_BRAKE' && road.hex === 24, road);
+
 // ---- Llamada sin Internet: dos teléfonos nuevos, código por SONIDO (onda real) y conexión directa sin servidor.
 // (La emulación «offline» de Chromium también bloquea WebRTC local, así que aquí se demuestra lo equivalente:
 //  sin servidores STUN/TURN ni de señalización y CERO peticiones de red desde que empieza la llamada.)
@@ -364,12 +372,12 @@ const a11y = async (page) => page.evaluate(() => {
   return issues;
 });
 const a11yIssues = {};
-for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva']) {
+for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva', '/carretera']) {
   await R.goto(base + path); await R.waitForLoadState('load'); await R.waitForTimeout(300);
   const iss = await a11y(R); if (iss.length) a11yIssues[path || '/'] = iss;
 }
 await R.close();
-check('Accesibilidad automática en las 18 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
+check('Accesibilidad automática en las 19 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
 
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 

@@ -27,6 +27,7 @@ export const PLATFORMS = Object.freeze([
   { id: 'esp32', name: 'Accesorio ESP32 (sensor y pasarela)', runtime: 'C++ con la misma trama', roles: ['detectar', 'comunicar'], sensors: ['Wi-Fi CSI (respiración)', 'BLE', 'LoRa*'], status: 'PARCIAL', note: 'Barrido hecho; CSI y LoRa por montar' },
   { id: 'vehiculo', name: 'Vehículo de emergencias como pasarela', runtime: 'Ordenador de a bordo con el relé y enlace satelital', roles: ['comunicar', 'coordinar', 'energia'], sensors: ['satélite', 'LoRa', 'Wi-Fi'], status: 'HOJA_DE_RUTA' },
   { id: 'sdr', name: 'Receptor de radio definida por software', runtime: 'Ordenador con receptor USB (~30 €)', roles: ['detectar', 'avisar'], sensors: ['ADS-B', 'AIS', 'satélites meteorológicos'], status: 'HOJA_DE_RUTA', note: 'Solo recepción' },
+  { id: 'coche', name: 'Coche particular (móvil en el soporte)', runtime: 'App con servicio en primer plano durante el viaje; pantalla del coche (Android Auto / CarPlay) pendiente', roles: ['avisar', 'comunicar', 'localizar'], sensors: ['GNSS', 'acelerómetro', 'Bluetooth LE'], status: 'PARCIAL', note: 'Detección y avisos hechos en el núcleo; la difusión Bluetooth entre coches necesita la app nativa (la web no puede anunciar)' },
   { id: 'via', name: 'Ferrocarril (datos del gestor)', runtime: 'Lectura de datos que ya existen', roles: ['detectar', 'avisar'], sensors: ['circuitos de vía', 'detectores en vía'], status: 'CONVENIO', note: 'Solo lectura: nunca control de la señalización' },
 ]);
 
@@ -49,6 +50,11 @@ export const INTEGRATIONS = Object.freeze([
   { id: 'mavlink', what: 'Drones abiertos (ArduPilot/PX4) por MAVLink', access: 'CONVENIO', note: 'Con el operador autorizado del dron' },
   { id: 'remote-id', what: 'Identificación remota de drones (Open Drone ID)', access: 'PASIVO' },
   { id: 'adif', what: 'Datos de circulación y de vía del gestor ferroviario', access: 'CONVENIO' },
+  { id: 'nav-enlaces', what: 'Abrir la ruta en Waze o Google Maps con sus enlaces públicos', access: 'PASIVO', note: 'Solo abre la ruta: no lee nada de vuelta' },
+  { id: 'dgt-nap', what: 'Incidencias de tráfico de la DGT en DATEX II (Punto de Acceso Nacional)', access: 'PASIVO', note: 'Datos abiertos; se guardan en la reserva antes de salir' },
+  { id: 'dgt30', what: 'Enviar y recibir avisos verificados por la plataforma DGT 3.0 (la que ya lleva las balizas V16 a los navegadores)', access: 'CONVENIO', note: 'Un solo convenio llegaría a todos los navegadores que conecta la DGT' },
+  { id: 'waze-cifs', what: 'Alimentar Waze con avisos confirmados (formato CIFS de Waze for Cities)', access: 'CONVENIO', note: 'El programa es para organismos públicos: a través de un socio público' },
+  { id: 'leer-navegadores', what: 'Leer la ruta o las alertas de Waze o Google Maps fuera de sus programas oficiales', access: 'NUNCA' },
   { id: 'iridium', what: 'Mensajes por satélite Iridium (módulo SBD)', access: 'CONVENIO', note: 'Contrato de servicio' },
   { id: 'scada-ajeno', what: 'Interrogar o controlar sistemas industriales ajenos', access: 'NUNCA' },
   { id: 'interceptar', what: 'Interceptar comunicaciones de terceros', access: 'NUNCA' },
@@ -65,6 +71,7 @@ export const EVENTS = Object.freeze([
   { id: 'tempi-2023', where: 'Tempi (Grecia)', when: '28-02-2023', what: 'Choque frontal de dos trenes en la misma vía', toll: '57 fallecidos', lesson: 'Detectar dos trenes en sentidos opuestos sobre la misma vía con fuentes independientes (incluidos los móviles de los viajeros), como aviso complementario al gestor', modules: ['rail-watch'], source: 'Wikipedia (Tempi train crash)' },
   { id: 'ahr-2021', where: 'Valle del Ahr (Alemania)', when: '14/15-07-2021', what: 'Riada nocturna', toll: '190 fallecidos en Alemania, 134 en el valle del Ahr', lesson: 'De noche el aviso tiene que despertar a la gente y llegar sin red', modules: ['flood-watch', 'bearers'], source: 'Natural Hazards and Earth System Sciences, 2025' },
   { id: 'turquia-2023', where: 'Turquía y Siria', when: '06-02-2023', what: 'Terremotos de magnitud 7,8 y 7,5', toll: 'más de 50 000 fallecidos', lesson: 'Comunicaciones caídas y miles de edificios: priorizar por evidencia y buscar con todos los sentidos', modules: ['seismic', 'rf-census', 'senses', 'occupancy'] },
+  { id: 'carreteras-2025', where: 'España (vías interurbanas)', when: '2025', what: 'Siniestralidad en carretera', toll: '1.119 fallecidos a 24 horas (DGT, balance 2025); en 2024, el 72 % en vías convencionales', lesson: 'En la carretera de un carril por sentido hay menos tráfico que vea el accidente y peor cobertura: el aviso tiene que salir solo y viajar con los coches que pasan', modules: ['road-guard', 'rail-incident', 'triage'], source: 'DGT, notas de prensa de 08-01-2026 y de cierre de 2024' },
   { id: 'lorca-2011', where: 'Lorca, Murcia (España)', when: '11-05-2011', what: 'Terremoto moderado con caída de elementos de fachada', toll: '9 fallecidos', lesson: 'Un sismo moderado basta: avisar de los segundos que quedan y alejarse de fachadas', modules: ['seismic'] },
   { id: 'lisboa-1755', where: 'Golfo de Cádiz y Lisboa', when: '01-11-1755', what: 'Terremoto y maremoto que alcanzó la costa atlántica andaluza', lesson: 'El tiempo de llegada del maremoto se calcula con la profundidad del mar: evacuar en vertical si no da tiempo', modules: ['flood-watch'] },
 ]);
@@ -94,6 +101,12 @@ export const PLAYBOOKS = Object.freeze({
     { t: 'prevención', need: ['detectar'], modules: ['rail-watch'], do: 'Patrones previos en datos que ya existen' },
     { t: '0–5 min', need: ['avisar', 'comunicar'], modules: ['rail-incident', 'triage'], do: 'Impacto detectado por los móviles y aviso automático' },
   ] },
+  carretera: { name: 'Accidente de carretera', phases: [
+    { t: 'antes de salir', need: ['localizar'], modules: ['road-guard', 'net-reserve'], do: 'Pasillo de mapas de la ruta, PK, incidencias de la DGT y referencias visibles guardados' },
+    { t: 'en ruta', need: ['avisar'], modules: ['road-guard'], do: 'Frenada brusca delante: aviso por voz a los de detrás que no la ven' },
+    { t: '0–2 min', need: ['avisar', 'comunicar'], modules: ['road-guard', 'rail-incident', 'bearers'], do: 'Choque detectado, cuenta atrás y SOS con PK; sin cobertura, lo llevan los coches que pasan' },
+    { t: 'hasta que llegan', need: ['coordinar'], modules: ['road-guard', 'triage'], do: 'Una persona coordina la conducta PAS y el triaje; traspaso al servicio verificado' },
+  ], guard: 'No sustituye la atención del conductor, la distancia de seguridad, el eCall ni el 112. Con el coche en marcha, solo avisos por voz: no se toca el móvil' },
   monte: { name: 'Perdido en el monte', phases: [
     { t: 'antes de salir', need: ['localizar'], modules: ['geo-offline'], do: 'Mapas y ventanas de satélite descargados' },
     { t: 'perdido', need: ['localizar', 'comunicar'], modules: ['geo-offline', 'orbital', 'bearers'], do: 'Posición por marcas conocidas y pasos; SOS por satélite cuando pase' },

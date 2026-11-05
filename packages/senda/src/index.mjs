@@ -35,3 +35,4 @@ export * from './house-sweep.mjs';
 export * from './net-reserve.mjs';
 export * from './swarm-cache.mjs';
 export * from './coverage-memory.mjs';
+export * from './road-guard.mjs';

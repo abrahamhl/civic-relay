@@ -18,3 +18,11 @@ test('zona de conflicto lleva salvaguarda y los hechos citados tienen lección y
   for (const e of EVENTS) assert.ok(e.lesson && e.modules.length, e.id);
   assert.ok(Object.keys(PLAYBOOKS).length >= 8 && PLATFORMS.length >= 10);
 });
+
+test('plan de carretera: coche y móvil cubren avisar y localizar; la lectura de Waze/Google queda en NUNCA', () => {
+  const p = planDeployment('carretera', ['coche', 'movil-web']);
+  assert.ok(!p.gaps.includes('avisar') && !p.gaps.includes('localizar'));
+  assert.match(p.guard, /no se toca el móvil/);
+  assert.equal(INTEGRATIONS.find((i) => i.id === 'leer-navegadores').access, 'NUNCA');
+  assert.equal(INTEGRATIONS.find((i) => i.id === 'dgt30').access, 'CONVENIO');
+});

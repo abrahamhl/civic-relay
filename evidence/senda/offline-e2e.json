@@ -2,10 +2,10 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-05T03:19:04.326Z",
-  "durationS": 247.8,
-  "passed": 38,
-  "total": 38,
+  "at": "2026-11-05T04:03:18.851Z",
+  "durationS": 238.6,
+  "passed": 39,
+  "total": 39,
   "results": [
     {
       "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
@@ -100,8 +100,8 @@
       "ok": true,
       "path": {
         "sat": "Iridium 2-5",
-        "elevationDeg": 24.7,
-        "rangeKm": 1548,
+        "elevationDeg": 24.8,
+        "rangeKm": 1546,
         "delayMs": 5.16
       },
       "plan": {
@@ -192,7 +192,7 @@
       "cur": "d-rescue",
       "edges": 5,
       "detail": "Probado en simulación nuevoConcurrencia de direcciones aleatorias → teléfonos por planta; inferencia bayesiana exacta → personas con intervalo del 90 %.Código: rf-census.mjsAparece en: 🚁 Censo con dronAbrir /senda/dron →",
-      "nodes": 52,
+      "nodes": 54,
       "links": [
         "/senda/dron",
         "/senda/llamada"
@@ -239,7 +239,7 @@
       "name": "Triaje sin red: «no camina, respira, más de 30/min» → ROJO, con indicaciones de hemorragia y un parte de ≤ 160 caracteres que pide el 112 primero",
       "ok": true,
       "cat": "ROJO",
-      "msg": "SENDA TRIAJE R1 A0 V0 | 39.45210,-0.43020 ±25m | hemorragia 1 | 112,Sanitario | 03:17",
+      "msg": "SENDA TRIAJE R1 A0 V0 | 39.45210,-0.43020 ±25m | hemorragia 1 | 112,Sanitario | 04:01",
       "steps": "Qué hacer ahoraPresión directa y firme sobre la herida con lo más limpio que tengas; no la levantes para mirar.Si sangra a chorro en un brazo o una pierna y la presión no basta: torniquete unos 5–7 cm por encima de la herida, aprieta hasta que pare y anota la hora.Si respira mejor sentado, déjale sentado; si no, tumbado con las piernas estiradas.\n  Servicios: 112 → Sanitario➕ Añadir a la escena y siguiente víctimaRepetir"
     },
     {
@@ -313,14 +313,30 @@
       "quota": true
     },
     {
+      "name": "Ruta protectora sin red: con 1,2 s entre coches el aviso SENDA reduce el choque en cadena de 5 a 1, el SOS sale de la zona sin cobertura en menos de 10 min con los coches que pasan, el libro de puntos cívicos verifica su cadena SHA-256 y el detector marca la frenada",
+      "ok": true,
+      "no": 5,
+      "si": 1,
+      "sos": 7.4,
+      "warned": 14,
+      "pts": {
+        "Luis": 10,
+        "Ana": 40,
+        "Marta": 20
+      },
+      "ratio": 0.065,
+      "live": "HARD_BRAKE",
+      "hex": 24
+    },
+    {
       "name": "Llamada sin Internet: oferta de <110 bytes por sonido (onda real, decodificada exacta), conexión directa cifrada, voz Opus y chat en ambos sentidos y cero peticiones de red durante la llamada",
       "ok": true,
       "offerBytes": 79,
       "answerBytes": 72,
       "offerSoundS": 7.8,
       "audioPackets": [
-        152,
-        151
+        200,
+        200
       ],
       "requests": []
     },
@@ -330,9 +346,9 @@
       "connected": true,
       "offerBytes": 79,
       "answerBytes": 72,
-      "connectMs": 390,
+      "connectMs": 392,
       "message": "¿Me oyes? Estoy en la 3.ª planta, puerta B",
-      "rttMs": 3,
+      "rttMs": 6,
       "audioPackets": 75
     },
     {
@@ -362,7 +378,7 @@
     {
       "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
       "ok": true,
-      "href": "senda://accion?a=BLE_BEACON&id=0fd766e63eaa8e8c&b=B14&f=3&u=B&bat=100&cmd=HfDEPcPx67c2UTdm"
+      "href": "senda://accion?a=BLE_BEACON&id=9a7d27d4f671e723&b=B14&f=3&u=B&bat=100&cmd=tL3TDNsKodUsFH9n"
     },
     {
       "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",
@@ -377,7 +393,7 @@
       "name": "Red SENDA sin red: reparto k-de-n entre varios portadores ≥99 %, prueba real de pérdida de portadores, catálogo satelital, previsión de apagón con pasarelas y CAP con auditoría que delata alteraciones",
       "ok": true,
       "pDelivery": 0.9909,
-      "trialSuccess": 0.985,
+      "trialSuccess": 0.99,
       "halfDarkAtH": 4,
       "gateways": 5
     },
@@ -394,7 +410,7 @@
       "easy": true
     },
     {
-      "name": "Accesibilidad automática en las 18 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
+      "name": "Accesibilidad automática en las 19 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
       "ok": true,
       "issues": {}
     },

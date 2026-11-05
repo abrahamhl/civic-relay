@@ -117,3 +117,52 @@ Son cuatro piezas de ingeniería real:
 - Tamaños de la Wikipedia en español sin conexión: ~37 GB con imágenes y ~9 GB sin ellas, según guías de terceros (pendiente de verificar en download.kiwix.org).
 
 **Corrección registrada:** la primera versión sumaba como independientes las huellas de una misma antena y daba un 99,9 % irreal. Ahora se agrupan por antena: si muere, fallan todas.
+
+## 8. v0.14 · Carretera: «ruta protectora» (2026-11-05)
+
+**Pregunta del fundador:** que SENDA acompañe en los viajes. Que se integre con Waze y Google Maps, avise de frenadas del coche de delante, pida ayuda sin cobertura y deje coordinar un accidente con puntos cívicos.
+
+**Qué es real hoy y qué no:**
+
+| Idea | Realidad verificada | Qué hace SENDA |
+|---|---|---|
+| Sincronizar con Waze | Waze ofrece enlaces profundos (`waze.com/ul?ll=…&navigate=yes`) y un feed de **entrada** para socios (CIFS, XML o JSON). El programa Waze for Cities es para organismos públicos. No hay API pública para leer la ruta ni las alertas | Abre la ruta en Waze o Google Maps (PASIVO). Envía avisos confirmados por un socio público (CONVENIO). Leerlos queda en NUNCA |
+| Mapas sin conexión | Waze no tiene mapas descargables. Google Maps descarga **rectángulos**; sin red no hay tráfico ni rutas alternativas, y caducan (fuentes secundarias: hasta 1 año) | Pasillo de la ruta. Madrid–Valencia con 2 km a cada lado: 62 MB frente a 951 MB del rectángulo |
+| Avisos a todos los navegadores | Desde el 1-1-2026 la V16 conectada es obligatoria. **DGT 3.0 ya envía a los navegadores** la ubicación de los vehículos averiados | Convenio con DGT 3.0: un solo canal llega a todos los navegadores |
+| Incidencias oficiales | NAP de la DGT: incidencias en DATEX II v3.6/v3.7 (la v1.0 queda obsoleta en 2026) | Se guardan en la reserva antes de salir (PASIVO) |
+| Llamada automática | eCall es obligatorio en tipos homologados desde el 31-3-2018: llamada al 112 con un mensaje mínimo de 140 bytes. La edad media del parque es de 14,6 años (ANFAC 2025) | Complemento para coches sin eCall. Además hace lo que eCall no hace: avisar a los de detrás y coordinar la escena |
+| Detección de choque en el móvil | Google Pixel lo hace con movimiento, ubicación y sonido; existe en España. Puede fallar y dar falsas alarmas | Mismo principio con umbrales abiertos y cuenta atrás. Umbrales pendientes de calibrar |
+| Aviso de frenada | El estándar europeo C-ITS incluye la luz de freno electrónica de emergencia (EEBL, mensajes DENM), pero requiere equipos en el coche | Versión de bolsillo por Bluetooth LE con trama de 24 bytes. El valor está en los coches que no ves; mejor empezar por flotas |
+| Coordinar el accidente | Conducta **PAS** de la DGT (Proteger, Avisar, Socorrer). El art. 195 del Código Penal castiga la omisión del deber de socorro | Coordinador ciudadano con PAS, traspaso a credencial verificada y puntos cívicos en un libro encadenado por huellas |
+
+**Bases matemáticas:**
+- Deceleración necesaria: a = v²/2(d − v·t_r − margen).
+- Ganancia frente a la cadena de luces: N·t_r − (saltos·latencia + t_alerta).
+- Contacto al cruzarse: P = 1 − (1 − p_rx)^(2R/v_rel/Δt).
+- Entrega por coches que pasan, con llegadas de Poisson: E[T] = 60/(q·s·P) + t_viaje.
+- Creencia en un aviso: log-odds con pesos de frescura.
+- Huellas encadenadas con SHA-256.
+
+**Fuentes:**
+- [DGT, balance 2025 (1.119 fallecidos)](https://www.dgt.es/comunicacion/notas-de-prensa/20260108-2025-finaliza-1119-fallecidos-en-siniestros-de-trafico-en-vias-interurbanas)
+- [DGT, cierre 2024 (1.154; 72 % en vías convencionales)](https://www.dgt.es/export/sites/web-DGT/.galleries/downloads/dgt-en-cifras/24h/Informe-Siniestralidad_Cierre-2024_v10_FINAL.pdf)
+- [Interior: DGT 3.0 envía a los navegadores las V16](https://www.interior.gob.es/opencms/es/detalle/articulo/DGT-3.0-ya-envia-a-los-navegadores-la-ubicacion-de-los-vehiculos-averiados-en-carretera-que-utilizan-la-V-16-conectada/)
+- [NAP DGT, DATEX II v3.7](https://nap.dgt.es/en/dataset/incidencias-dgt-datex2-v3-7)
+- [Waze, enlaces profundos](https://developers.google.com/waze/api)
+- [Waze, feed de socios (CIFS)](https://developers.google.com/waze/data-feed/overview)
+- [Waze for Cities](https://support.google.com/waze/partners/answer/10618477)
+- [eCall (km77)](https://www.km77.com/glosario/ecall) y Reglamento (UE) 2015/758
+- [ANFAC, 14,6 años](https://www.autofacil.es/alerta-en-seguridad-y-emisiones-la-edad-media-del-coche-espanol-ya-roza-los-15-anos/)
+- [Detección de choques de Pixel](https://9to5google.com/2023/10/31/google-pixel-car-crash-detection-new-countries/)
+- [C-ITS en Europa (arXiv)](https://arxiv.org/pdf/1609.03876)
+- [DGT, manual de primeros auxilios (PAS)](https://sede.dgt.gob.es/export/sites/dgt/.galleries/permisos-de-conducir/certificacion-aptitud-profesores-formacion-vial/2026/MANUAL-IX-Primeros-auxilios.pdf)
+- [RACE, omisión del deber de socorro](https://www.race.es/no-ayudar-victimas-accidente-trafico-delito-multa)
+- [Bluetooth LE, tamaño de anuncio](https://novelbits.io/maximum-data-bluetooth-advertising-packet-ble/)
+
+**Pendiente de verificar:**
+- Si el NAP publica también las V16.
+- La cobertura de los PK de la red estatal en datos abiertos (IGN/CNIG).
+- Los campos exactos de CIFS.
+- Las categorías de apps permitidas en Android Auto y CarPlay.
+- El alcance real de Bluetooth entre coches.
+

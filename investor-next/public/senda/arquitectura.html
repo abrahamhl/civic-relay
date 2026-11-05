@@ -146,7 +146,7 @@ const N = [
   ['mic', 'sens', 'Micrófono y altavoz', 'web', 'Módem acústico: datos por sonido entre teléfonos (16 tonos entre 2 y 5 kHz, corrección de errores y CRC). También escucha de golpes y voces.', 'acoustic-modem.mjs', '/senda'],
   ['acc', 'sens', 'Acelerómetro', 'sim', 'Detección sísmica cooperativa: muchos teléfonos quietos que notan la onda P a la vez. Mismo principio que Android Earthquake Alerts, con algoritmo propio.', 'seismic.mjs'],
   ['baro', 'sens', 'Barómetro', 'sim', 'Planta de la persona por barometría diferencial frente a un teléfono de referencia a pie de calle.', 'sensor-fabric.mjs'],
-  ['gnss', 'sens', 'GNSS y velocidad', 'web', 'Posición del SOS. Los cambios bruscos de velocidad como indicio de impacto o descarrilamiento están en la hoja de ruta.', 'envelope.mjs'],
+  ['gnss', 'sens', 'GNSS y velocidad', 'web', 'Posición del SOS sin Internet. La velocidad Doppler detecta frenadas bruscas y, junto al acelerómetro, choques (un coche no frena a más de ~1 g).', 'road-guard.mjs · rail-incident.mjs', '/senda/carretera'],
   ['cam', 'sens', 'Cámara y flash', 'web', 'Visión por capas sobre la cámara (contornos, mapa de calor, topografía). Siguiente: leer códigos QR de llamada con la cámara y baliza óptica con el flash.', 'vision-layers.mjs', '/senda/edificios'],
   ['ble', 'sens', 'Bluetooth LE', 'android', 'Baliza y escáner: localización por intensidad y censo por planta. La app Android ya emite la baliza SENDA; el accesorio ESP32 escanea.', 'beacon.mjs · rf-census.mjs', '/senda/dron'],
   ['wifi', 'sens', 'Wi-Fi: RTT, CSI y Aware', 'native', 'Distancia a puntos de acceso (RTT), presencia y respiración a través de paredes (CSI, investigación) y enlace directo sin router (Aware).', 'through-wall.mjs · sensor-fabric.mjs'],
@@ -175,6 +175,7 @@ const N = [
   ['c-reserve', 'core', 'Batería de Internet', 'web', 'Reserva de red en el teléfono: mochila 0/1 por valor y frescura, recarga en ventanas cortas y cola de intenciones. Usa el almacenamiento persistente real del navegador.', 'net-reserve.mjs', '/senda/reserva', 1],
   ['c-swarm', 'core', 'Biblioteca de vecinos', 'web', 'Paquete común repartido en fragmentos Reed-Solomon entre vecinos; inventario con filtros de Bloom y piezas nombradas por su huella SHA-256.', 'swarm-cache.mjs', '/senda/reserva', 1],
   ['c-rebote', 'core', 'Puntos de rebote', 'sim', 'Huellas de cobertura + mapa abierto de antenas + supervivencia sin luz + Tobler: adónde ir para que salga el mensaje.', 'coverage-memory.mjs', '/senda/reserva', 1],
+  ['c-road', 'core', 'Ruta protectora', 'sim', 'Frenada brusca delante → aviso de 24 bytes a los de detrás con la deceleración que necesitan; choque → SOS con carretera, PK y sentido calculados sin red, que llevan los coches que pasan; coordinador de escena con conducta PAS y puntos cívicos encadenados por SHA-256.', 'road-guard.mjs', '/senda/carretera', 1],
   ['c-plat', 'core', 'Plataformas y permisos', 'web', 'Dónde corre SENDA y con qué modo de acceso: pasivo (legal hoy), convenio o nunca. Planes por escenario con lo que haya disponible.', 'platforms.mjs', '/senda/arquitectura', 1],
   ['c-hazard', 'core', 'Peligros', 'sim', 'Sismo, frente de incendio y antenas que caerán, vigilancia de vía y previsión de apagón de comunicaciones.', 'seismic · wildfire · rail-watch · blackout', '/senda/incendio'],
   ['a-campo', 'app', 'SENDA Campo', 'web', 'App que funciona sin conexión: SOS, mensajes cifrados, tarjetas de contacto, envío por sonido, archivo y mula.', 'app.mjs', '/senda'],
@@ -190,6 +191,7 @@ const N = [
   ['a-sentidos', 'app', 'Sentidos', 'sim', 'Escucha coral, modo detector y respiración Wi-Fi.', 'sentidos', '/senda/sentidos', 1],
   ['a-barrido', 'app', 'Casa por casa', 'sim', 'Barrido con dron y prioridad para equipos.', 'barrido', '/senda/barrido', 1],
   ['a-reserva', 'app', 'Batería de Internet', 'web', 'Reserva, biblioteca de vecinos y puntos de rebote.', 'reserva', '/senda/reserva', 1],
+  ['a-carretera', 'app', 'Carretera', 'sim', 'Copiloto que vigila: avisos de frenada, SOS sin cobertura, avisos de un toque y coordinación de la escena hasta que llegan.', 'carretera', '/senda/carretera', 1],
   ['a-coord', 'app', 'Coordinación', 'sim', 'Panel del incidente para quien coordina: casos, prioridades y órdenes verificadas.', 'incidente', '/senda/incidente'],
   ['d-person', 'dest', 'Familia y vecinos', 'web', 'Mensajes y llamadas entre personas, sin Internet.'],
   ['d-rescue', 'dest', 'Equipos de rescate', 'sim', 'Reciben la prioridad por planta y vivienda y la posición de cada SOS.'],
@@ -276,6 +278,15 @@ const SCEN = [
     ['b-sat', 'Si no hay rebote cerca, sale por el próximo satélite útil: SOS primero.'],
     ['d-person', 'La familia recibe el «estoy bien» y la reserva se refresca en esa misma ventana.'],
   ] },
+  { id: 'carretera', name: '🚗 Accidente de carretera', intro: 'Noche y niebla en una carretera de montaña sin cobertura. Varios coches llevan SENDA.', steps: [
+    ['gnss', 'La velocidad del GPS (sin Internet) detecta una frenada de 7 m/s² a 120 km/h.'],
+    ['c-road', 'El móvil decide al momento: frenada brusca, no un bache ni una caída del teléfono.'],
+    ['b-ble', 'Emite una trama de 24 bytes; los coches de detrás calculan si les afecta y dicen «¡Frena!».'],
+    ['acc', 'Más adelante, un choque: impacto, parada en un segundo y nadie responde a la cuenta atrás.'],
+    ['b-mule', 'Sin ninguna red, el SOS con carretera, PK y sentido lo recogen los coches que pasan en los dos sentidos.'],
+    ['a-carretera', 'Una conductora se para y coordina la escena: Proteger, Avisar, Socorrer, con tareas confirmadas.'],
+    ['d-112', 'El 112 recibe el aviso con el PK exacto; la Guardia Civil de Tráfico asume la escena al llegar.'],
+  ] },
   { id: 'via', name: '🚆 Vía de tren', intro: 'Prevención, no solo respuesta: patrones que precedieron a accidentes documentados.', steps: [
     ['ext', 'Datos que ya existen: circuitos de vía, detectores en vía y registros de marcha.'],
     ['c-hazard', 'La vigilancia de vía detecta escalones anómalos y patrones de riesgo.'],
@@ -310,7 +321,7 @@ function render() {
   const col = { cur: '#ff7756', done: '#91d7e8', todo: '#2a3f4d', all: '#91d7e855' };
   svg.innerHTML = `<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#91d7e8"/></marker><marker id="arc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#ff7756"/></marker></defs>` +
     edgesFor().map(([a, b, k]) => `<path d="${curve(a, b)}" fill="none" stroke="${col[k]}" stroke-width="${k === 'cur' ? 3 : k === 'todo' ? 1.2 : 2}" ${k === 'todo' ? 'stroke-dasharray="4 4"' : ''} ${k === 'cur' ? 'marker-end="url(#arc)" id="curpath"' : k === 'done' ? 'marker-end="url(#ar)"' : ''}/>`).join('') + '<circle id="pkt" r="6" fill="#ff7756" opacity="0"/>';
-  $('#sc-intro').textContent = S.all ? 'Todas las conexiones que recorren los seis escenarios. Pulsa un escenario para seguirlo paso a paso.' : sc.intro;
+  $('#sc-intro').textContent = S.all ? 'Todas las conexiones que recorren los escenarios. Pulsa un escenario para seguirlo paso a paso.' : sc.intro;
   $('#h-story').textContent = S.all ? 'Todo el sistema' : sc.name.replace(/^\S+\s/, '');
   $('#steps').innerHTML = S.all ? '' : sc.steps.map(([id, t], i) => `<li class="${i < S.step ? 'done' : i === S.step ? 'cur' : ''}"><b>${byId[id].name}.</b> ${t}</li>`).join('');
   $('#prev').disabled = $('#nprev').disabled = S.all || S.step === 0; $('#next').disabled = $('#nnext').disabled = S.all || S.step === sc.steps.length - 1;

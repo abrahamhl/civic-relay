@@ -1,5 +1,57 @@
 # Changelog
 
+## SENDA v0.14 · 05-11-2026 · Ruta protectora: carretera, frenadas, SOS sin cobertura y coordinador de escena
+
+**Entrada (fundador):** el escenario de los accidentes de coche. SENDA como «senda protectora» que va contigo en el viaje, con permisos al instalar. Integración con Waze y Google Maps y mapas sin conexión. Posición con GPS, telemetría y aerogeneradores. Aviso automático de «frena» si el coche de delante frena de golpe. Avisos de carretera más fáciles. Coordinador ciudadano del accidente con puntos cívicos.
+
+**Procesamiento (núcleo: `road-guard.mjs`, 14 pruebas, más 1 de plataformas):**
+- **Frenada brusca** por la velocidad Doppler del GNSS, ajustada por mínimos cuadrados en una ventana de 1,5 s. No depende de cómo vaya colocado el móvil. Por encima de ~13 m/s² ya no es una frenada (un coche frena hasta ~1 g): se trata como golpe.
+- **Choque de coche**: el detector de `rail-incident.mjs` con umbrales de coche y cuenta atrás humana.
+- **Trama de aviso de 24 bytes**: con las cabeceras suma 31 bytes, un anuncio Bluetooth LE clásico. Lleva relés con tope de saltos.
+- **Relevancia del aviso**: mismo sentido, delante y en el mismo carril. Con geometría de la vía se mide la distancia por carretera.
+- **Consejo de frenada**: a = v²/2(d − v·t − margen). «¡Frena!» por encima de 3,4 m/s² (deceleración de diseño de AASHTO).
+- **Columna de coches con cinemática exacta.** Con 1,2 s entre coches a 120 km/h y niebla:
+  - sin SENDA, choque en cadena de 5 coches (hasta 90 km/h de impacto);
+  - con SENDA, solo choca el de justo detrás;
+  - con 2 s de separación no choca nadie.
+- **SOS sin cobertura**: probabilidad de contacto al cruzarse y entrega por los coches que pasan (Poisson). Simulación determinista de una carretera de montaña de 24 km con 18 km sin red y un 10 % de coches con SENDA:
+  - el SOS sale en 7,4 min;
+  - los que se acercan con SENDA se enteran a una mediana de 6,5 km, gracias al tráfico contrario.
+- **PK y sentido sin red**: encaje en la vía, interpolación entre hitos, referencia visible más cercana con su lado («300 m después del aerogenerador AE-12, a la derecha») y estima en túneles.
+- **Pasillo de mapas de la ruta**: Madrid–Valencia ocupa 62 MB frente a 951 MB del rectángulo (6,5 %).
+- **Avisos de un toque** con creencia bayesiana que se apaga sola, y exportación al formato CIFS de Waze (solo con convenio; campos por validar).
+- **SMS de SOS** de 160 caracteres como máximo y guion para el 112.
+- **Coordinador de escena PAS**:
+  - nadie se confirma a sí mismo;
+  - el traspaso solo va a una credencial institucional verificada;
+  - los **puntos cívicos** quedan en un libro encadenado por SHA-256 que delata cualquier alteración.
+- `platforms.mjs`:
+  - plataforma «Coche particular»;
+  - integraciones: enlaces a Waze y Google Maps y NAP DGT (PASIVO); DGT 3.0 y Waze CIFS (CONVENIO); leer navegadores (NUNCA);
+  - plan «Accidente de carretera» con salvaguarda;
+  - hecho «carreteras-2025».
+
+**Web:**
+- `/senda/carretera`, con cuatro simulaciones en modo película: cadena de frenadas, SOS que viaja, PK en el idioma del 112 y escena con puntos.
+- Sensores reales del teléfono (GPS y acelerómetro) con el mismo detector y aviso por voz.
+- Botones reales a Waze y Google Maps y tabla de accesos.
+- Avisos de un toque con su trama y su CIFS.
+- Arquitectura: pieza «Ruta protectora», aplicación «Carretera» y escenario «Accidente de carretera». El sensor GNSS deja de estar en la hoja de ruta.
+- Portada (es/en/nl), SENDA Campo y service worker v15.
+
+**Validación:** núcleo + relé 172/172 · E2E en Chromium 39/39, sin red (accesibilidad en 19 pantallas) · web: compilación, idiomas y 98/98.
+
+**Límites:**
+- No lee datos de Waze ni de Google Maps, porque no hay API pública para ello. Les hace llegar avisos por DGT 3.0 o por Waze for Cities, con convenio.
+- La difusión Bluetooth entre coches necesita la app nativa: la web no puede anunciar.
+- Umbrales y alcance de radio entre coches pendientes de medir en ensayo real.
+- Carretera, hitos y aerogeneradores de la demostración son inventados.
+- Nunca sustituye la atención del conductor, la distancia de seguridad, el eCall ni el 112.
+
+**Decisión pendiente del fundador:** qué reconocen los puntos cívicos y si hay clasificación pública (por defecto, no).
+
+— Registrado por el asistente de orquestación (Claude Code), bajo la dirección de Abraham Haddioui.
+
 ## SENDA v0.13 · 05-11-2026 · Batería de Internet: reserva de red, biblioteca de vecinos y puntos de rebote
 
 **Entrada (fundador):** que los móviles que ya tienen SENDA guarden una especie de batería, pero de Internet (~1 GB), y la usen como si fuera la red; además, gateways y puntos de rebote para cuando no hay cobertura.
