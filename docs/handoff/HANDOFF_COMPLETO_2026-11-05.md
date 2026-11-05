@@ -1,6 +1,6 @@
 # SENDA · Traspaso completo (handoff v2) para cualquier IA o persona
 
-> **Fecha:** 05-11-2026 · **Versión del producto:** v0.16 · **Rama:** `ccr-357397d4-i6q247` · **PR:** #13 (borrador, apilado sobre #12 `ccr-bb7a95b8-t79scj`).
+> **Fecha:** 05-11-2026 · **Versión del producto:** v0.18 · **Rama:** `ccr-357397d4-i6q247` · **PR:** #13 (borrador, apilado sobre #12 `ccr-bb7a95b8-t79scj`).
 > **Estructura:** Entrada → Procesamiento → Validación → Salida. Este documento sustituye como punto de partida a `README.md` (v1, 04-11-2026), que sigue valiendo como contexto histórico.
 > **Responsable y última palabra:** Abraham Haddioui (fundador). Ninguna IA decide alcance, licencia, marca, precio ni promesas públicas.
 
@@ -39,16 +39,18 @@
    - premiar con puntos la rapidez o acercarse al peligro.
 6. **Antes de quitar contenido, preguntar al fundador.** «Acortar» no es «sustituir».
 
-## 3. Estado (v0.16)
+## 3. Estado (v0.18)
 
 | Medida | Valor |
 |---|---|
-| Pruebas del núcleo y del relé | 192/192 (`node --test packages/senda/tests/*.test.mjs packages/senda-relay/tests/*.test.mjs`) |
-| E2E en Chromium, sin red | 43/43, con accesibilidad en 22 pantallas (`node investor-next/scripts/senda-offline-e2e.mjs`) |
+| Pruebas del núcleo y del relé | 207/207 (`node --test packages/senda/tests/*.test.mjs packages/senda-relay/tests/*.test.mjs`) |
+| E2E en Chromium, sin red | 46/46, con accesibilidad en 25 pantallas (`node investor-next/scripts/senda-offline-e2e.mjs`). La misma batería pasa contra la **exportación servida por Apache** con el `.htaccess` de Hostinger (`SENDA_BASE_URL=http://127.0.0.1:8088/senda`) |
 | Web | `npm run build`, `node test-locales.mjs`, `node --test tests/*.test.mjs` (98/98) en `investor-next` |
-| Módulos del núcleo | 53 en `packages/senda/src` (copiados a `investor-next/public/senda/core` con `sync-web.mjs`) |
-| Pantallas de la app | 22 en `investor-next/public/senda/*.html` |
-| Vídeos publicados | Película v5 (es/en), capacidades v0.12 (es) y **ruta** (es/en, subtítulos es/en/nl, 05-11-2026: carretera, cámaras, Países Bajos y DGT) |
+| Módulos del núcleo | 55 ficheros en `packages/senda/src` (copiados a `investor-next/public/senda/core` con `sync-web.mjs`) |
+| Pantallas de la app | 25 en `investor-next/public/senda/*.html` (nueva: `/senda/fuego`) |
+| Vídeos publicados | Película v5 (es/en), capacidades v0.12 (es), **ruta** (es/en, subtítulos es/en/nl) y visión real (`/media/vision/`) |
+| Entrega autocontenida | `entrega/` con 7 zips deterministas (web para Hostinger, vídeos, código, documentación, evidencias, visión), `LEEME_PRIMERO` y huellas SHA-256. Se regenera con `node scripts/entrega/generar-entrega.mjs [--build]` |
+| Financiación | `docs/financiacion/RONDA_FINANCIACION_2026-11-05.md` (convocatorias con fecha y fuente, diligencia, ajustes del software, plan de 90 días) |
 
 ## 4. Mapa del repositorio
 
@@ -115,6 +117,17 @@ Con el conector de Vercel, crear el despliegue con estos parámetros:
 ```
 Después, esperar el estado `READY` y comprobar un archivo nuevo, por ejemplo `/senda/estado.json` o `/senda/core/<modulo>.mjs`. El contenedor de la sesión no puede leer `vercel.app` directamente: hay que usar el conector.
 
+### Exportar a otro alojamiento (Hostinger o cualquier Apache/LiteSpeed)
+
+1. `cd investor-next && npm run build`; si hay dominio propio, `SITE_URL=https://dominio npm run build`.
+2. `node scripts/entrega/generar-entrega.mjs`, que crea `entrega/zips/*.zip`, `MANIFIESTO.json`, `SHA256SUMS.txt` y `LEEME_PRIMERO.md/.html`.
+3. Se suben a `public_html` los zips `*-web-*` y se extraen allí. El `.htaccess` replica lo que hacía Vercel:
+   - URL limpias;
+   - tipos MIME de `.mjs`, `.vtt` y `.webmanifest`;
+   - el service worker sin caché;
+   - HTTPS obligatorio.
+4. Para probarlo en local: Apache con `AllowOverride All` y los módulos `rewrite`, `headers` y `deflate`. Después, `SENDA_BASE_URL=http://127.0.0.1:8088/senda node investor-next/scripts/senda-offline-e2e.mjs`.
+
 ### Convenciones de git
 
 - Commits en español, terminados con las líneas de atribución que indique la sesión.
@@ -131,6 +144,8 @@ Después, esperar el estado `READY` y comprobar un archivo nuevo, por ejemplo `/
 | Convenios no firmados (DGT 3.0, 112, Waze for Cities, Rijkswaterstaat, veiligheidsregio) | Las piezas CONVENIO están preparadas pero sin activar | Decisión y gestión del fundador |
 | Sin ensayos de campo | Umbrales y alcance de radio sin calibrar | 3 ensayos propuestos en `FOCO_Y_ACOTACION` |
 | Servidor de contenidos de la reserva | Mapas detallados, albergues y hospitales pendientes | Diseño hecho; falta implementarlo |
+| La red de la sesión deniega NASA FIRMS, NASA Worldview/GIBS, Open-Meteo, AEMET OpenData, EFFIS y comunidad.madrid | El seguimiento de incendio usa una reconstrucción ilustrativa sobre la geografía real; no hay imagen de satélite real del incendio de julio de 2026 | Añadir esos dominios a la red del entorno, o descargar en una máquina sin bloqueo y guardar en `fixtures/` con su licencia |
+| La web de la Comunidad de Madrid con fuegos y cámaras que recuerda el fundador no se ha localizado | Se integra lo verificable: páginas del ASEM 112 (PASIVO) y torres INFOMA (CONVENIO) | Pedir la URL al fundador y verificar titular y licencia |
 
 ## 7. Decisiones pendientes del fundador
 
@@ -141,6 +156,11 @@ Después, esperar el estado `READY` y comprobar un archivo nuevo, por ejemplo `/
 5. Socio para el piloto neerlandés.
 6. Fusionar los PR #12 y #13.
 7. Vídeos: piezas verticales y si se traducen al inglés los rótulos de los lienzos de la app (hoy en español también en el vídeo inglés de `ruta`).
+8. ¿La sociedad está constituida? Lo exigen ENISA, EIC y ESA BIC.
+9. Dominio propio para Hostinger (`SITE_URL`) y cuándo cambiar los DNS.
+10. Presentarse al **12.º CASSINI Hackathon** (27-29-11-2026) con el flujo de incendio.
+11. Programas de doble uso (NATO DIANA, fondos de defensa): sí o no.
+12. URL de la web de fuegos y cámaras de la Comunidad de Madrid que recuerda.
 
 ## 8. Historial resumido
 
@@ -153,6 +173,7 @@ Después, esperar el estado `READY` y comprobar un archivo nuevo, por ejemplo `/
 | v0.14 | Ruta protectora: frenada, choque, SOS por coches, PK sin red, escena PAS y puntos cívicos |
 | v0.15 | 20 situaciones al volante, V16 + SENDA, cámaras públicas (visibilidad), DATEX II, rood kruis, perfiles España y Países Bajos |
 | v0.17 | Visión con vídeo real (`packages/senda-vision`: YOLOX Apache + ByteTrack), coches conectados y fusión (`vehicle-link.mjs`: Ley de Datos, DFRS, k-anonimato, Kalman, posición de ~10 m a ~1-2 m), renders realistas en el kit, `/senda/trafico`, `/senda/vehiculos`, documento `docs/architecture/BACKEND_VEHICULOS_Y_FUSION_2026-11-05.md` |
+| v0.18 | Seguimiento de incendio (`fire-watch.mjs`, `/senda/fuego`): columna situada cruzando rumbos de torres, cámaras y la brújula del móvil, perímetro y avance por satélite, 30-30-30, HDW, Fosberg e ISI, intensidad de Byram, criticidad, carreteras a cortar y avisos a coches. Caso real: M-501, 23-07-2026. Entrega autocontenida para Hostinger (`entrega/`), validada con Apache. Paquete de financiación |
 | v0.16 | Infraestructura de la DGT validada (ninguna pasarela de radio; datos publicados y DGT 3.0), aforos → cola, paneles → avisos, radares publicados → límite. Kit de vídeo para otras IA (`validate.mjs`, `make.sh`, `ruta.json`) y este handoff |
 
 ## 9. Mensaje de arranque para otra IA

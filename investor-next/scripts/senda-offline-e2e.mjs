@@ -270,6 +270,13 @@ const veh = await cap('/vehiculos', () => window.SENDA_VEHICULOS, 'e2e-33-vehicu
 check('Coches conectados sin red: la posición pasa de ~10 m (GNSS) a menos de 2,5 m sumando vía, aerogenerador, Wi-Fi y otro coche; el tramo se fusiona con Kalman y solo se publica la celda con k ≥ 5 fuentes',
   veh.steps[0].err > 8 && veh.steps[4].err < 2.5 && veh.steps[4].rms < 1.5 && veh.segment.sdKmh < 3 && veh.privacy.published === 1 && veh.privacy.suppressed === 1, veh);
 
+// ---- v0.18 sin red: seguimiento de incendio (rumbos de torres y móviles, satélite, meteorología, criticidad, carreteras y coches)
+const fu = await cap('/fuego', () => window.SENDA_FUEGO, 'e2e-34-fuego.png');
+const fuCalc = await C.page.evaluate(async () => { const set = (id, v) => { const el = document.querySelector(id); el.value = v; el.dispatchEvent(new Event('input')); }; set('#w-t', 22); set('#w-h', 60); set('#w-v', 10); set('#w-r', 0.5); set('#w-u', 'pasto'); await new Promise((r) => setTimeout(r, 30)); const out = { ...window.SENDA_FUEGO.calc }; document.querySelector('#p-add').click(); return { ...out, sighting: window.SENDA_FUEGO.sighting }; });
+check('Seguimiento de incendio sin red: la columna se sitúa a < 400 m cruzando rumbos y se descarta la brújula descalibrada; satélite → avance de 25 m/min; criticidad extrema; se corta la M-501 alrededor del km 57 con aviso a los coches; la calculadora baja a clase 1 sin 30-30-30 y el móvil prepara la observación sin enviar la foto',
+  fu.fix.errM < 400 && fu.fix.rejected.includes('movil-4') && Math.abs(fu.ros - 25) <= 5 && fu.level === 'extrema' && fu.roads.find((r) => r.id === 'M-501').action === 'cortar' && fu.roads.find((r) => r.id === 'M-501').section.pkTo >= 56.5 && fu.alerts >= 1 && fu.firstTown === 'Pelayos de la Presa'
+  && fuCalc.rule30 === 0 && fuCalc.attack === 1 && /a mano/.test(fuCalc.sighting.rumbo) && /se queda en el teléfono/.test(fuCalc.sighting.foto), { fu, fuCalc });
+
 // ---- Llamada sin Internet: dos teléfonos nuevos, código por SONIDO (onda real) y conexión directa sin servidor.
 // (La emulación «offline» de Chromium también bloquea WebRTC local, así que aquí se demuestra lo equivalente:
 //  sin servidores STUN/TURN ni de señalización y CERO peticiones de red desde que empieza la llamada.)
@@ -397,12 +404,13 @@ const a11y = async (page) => page.evaluate(() => {
   return issues;
 });
 const a11yIssues = {};
-for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva', '/carretera', '/camaras', '/paises', '/dgt', '/trafico', '/vehiculos']) {
+const a11yScreens = ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva', '/carretera', '/camaras', '/paises', '/dgt', '/trafico', '/vehiculos', '/fuego'];
+for (const path of a11yScreens) {
   await R.goto(base + path); await R.waitForLoadState('load'); await R.waitForTimeout(300);
   const iss = await a11y(R); if (iss.length) a11yIssues[path || '/'] = iss;
 }
 await R.close();
-check('Accesibilidad automática en las 24 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
+check(`Accesibilidad automática en las ${a11yScreens.length} pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo`, Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
 
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 

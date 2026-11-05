@@ -114,6 +114,7 @@ export function parseFirmsCsv(text) {
   return rows.map((l) => l.split(',')).filter((r) => r.length === cols.length).map((r) => ({
     lat: +at(r, 'latitude'), lon: +at(r, 'longitude'), frp: +(at(r, 'frp') ?? 0), confidence: at(r, 'confidence'),
     when: `${at(r, 'acq_date')}T${String(at(r, 'acq_time')).padStart(4, '0').replace(/(\d\d)(\d\d)/, '$1:$2')}Z`, satellite: at(r, 'satellite') ?? null,
+    instrument: at(r, 'instrument') ?? null, scanKm: cols.includes('scan') ? +at(r, 'scan') : null, trackKm: cols.includes('track') ? +at(r, 'track') : null, daynight: at(r, 'daynight') ?? null,
   }));
 }
 

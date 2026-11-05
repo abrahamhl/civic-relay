@@ -65,6 +65,11 @@ export const INTEGRATIONS = Object.freeze([
   { id: 'data-act', what: 'Datos del coche por orden de su titular (Ley de Datos de la UE, art. 5)', access: 'CONVENIO', note: 'Integración con cada fabricante o plataforma multimarca; compensación razonable' },
   { id: 'dfrs', what: 'Avisos de seguridad generados por coches (DFRS / SRTI) publicados en los NAP', access: 'PASIVO', note: 'Aportar los de SENDA requiere adhesión a DFRS (reciprocidad)' },
   { id: 'reidentificar', what: 'Seguir un vehículo concreto entre cámaras o leer matrículas', access: 'NUNCA' },
+  { id: 'torres-infoma', what: 'Rumbo a la columna de humo desde las torres y cámaras de vigilancia forestal (plan INFOMA)', access: 'CONVENIO', note: 'Sus imágenes van a los operadores; SENDA solo recibe el rumbo y la hora' },
+  { id: 'brujula-movil', what: 'Rumbo a la columna con la brújula y el GPS del móvil de quien la ve', access: 'PASIVO', note: 'Con su toque; la foto no sale del teléfono' },
+  { id: 'avisos-asem112', what: 'Estado oficial de un incendio, cortes y confinamientos publicados por el 112', access: 'PASIVO', note: 'Información pública oficial; SENDA la cita, no la reescribe' },
+  { id: 'escucha-radio-emergencias', what: 'Escuchar o difundir las radios de policía, bomberos o protección civil', access: 'NUNCA', note: 'Van cifradas (TETRA); vulneraría el secreto de las comunicaciones' },
+  { id: 'drones-sobre-incendio', what: 'Volar drones propios sobre un incendio activo', access: 'NUNCA', note: 'Sin autorización de la dirección de extinción pone en peligro a los medios aéreos' },
   { id: 'leer-navegadores', what: 'Leer la ruta o las alertas de Waze o Google Maps fuera de sus programas oficiales', access: 'NUNCA' },
   { id: 'iridium', what: 'Mensajes por satélite Iridium (módulo SBD)', access: 'CONVENIO', note: 'Contrato de servicio' },
   { id: 'scada-ajeno', what: 'Interrogar o controlar sistemas industriales ajenos', access: 'NUNCA' },
@@ -83,6 +88,7 @@ export const EVENTS = Object.freeze([
   { id: 'ahr-2021', where: 'Valle del Ahr (Alemania)', when: '14/15-07-2021', what: 'Riada nocturna', toll: '190 fallecidos en Alemania, 134 en el valle del Ahr', lesson: 'De noche el aviso tiene que despertar a la gente y llegar sin red', modules: ['flood-watch', 'bearers'], source: 'Natural Hazards and Earth System Sciences, 2025' },
   { id: 'turquia-2023', where: 'Turquía y Siria', when: '06-02-2023', what: 'Terremotos de magnitud 7,8 y 7,5', toll: 'más de 50 000 fallecidos', lesson: 'Comunicaciones caídas y miles de edificios: priorizar por evidencia y buscar con todos los sentidos', modules: ['seismic', 'rf-census', 'senses', 'occupancy'] },
   { id: 'carreteras-2025', where: 'España (vías interurbanas)', when: '2025', what: 'Siniestralidad en carretera', toll: '1.119 fallecidos a 24 horas (DGT, balance 2025); en 2024, el 72 % en vías convencionales', lesson: 'En la carretera de un carril por sentido hay menos tráfico que vea el accidente y peor cobertura: el aviso tiene que salir solo y viajar con los coches que pasan', modules: ['road-guard', 'rail-incident', 'triage'], source: 'DGT, notas de prensa de 08-01-2026 y de cierre de 2024' },
+  { id: 'valdeiglesias-2026', where: 'San Martín de Valdeiglesias (Madrid) y Almorox (Toledo)', when: '23-07-2026', what: 'Incendio forestal iniciado por un coche en llamas en la calzada de la M-501 (km 57), que acabó uniéndose al de Almorox', toll: 'Almorox, a 24-07: 890 ha, 700 personas evacuadas y 26 viviendas destruidas (cifras parciales; balance oficial pendiente)', lesson: 'El primer aviso puede salir de la carretera: un coche ardiendo junto al monte con calor, sequedad y viento es un inicio de incendio, y los conductores que lo ven pueden situar la columna con la brújula antes de que llegue el satélite', modules: ['fire-watch', 'road-guard', 'wildfire', 'bearers'], source: 'Guardia Civil vía hibridosyelectricos.com; moncloa.com 24-07-2026; ASEM 112 (comunidad.madrid)' },
   { id: 'lorca-2011', where: 'Lorca, Murcia (España)', when: '11-05-2011', what: 'Terremoto moderado con caída de elementos de fachada', toll: '9 fallecidos', lesson: 'Un sismo moderado basta: avisar de los segundos que quedan y alejarse de fachadas', modules: ['seismic'] },
   { id: 'lisboa-1755', where: 'Golfo de Cádiz y Lisboa', when: '01-11-1755', what: 'Terremoto y maremoto que alcanzó la costa atlántica andaluza', lesson: 'El tiempo de llegada del maremoto se calcula con la profundidad del mar: evacuar en vertical si no da tiempo', modules: ['flood-watch'] },
 ]);
@@ -105,9 +111,11 @@ export const PLAYBOOKS = Object.freeze({
     { t: 'después', need: ['detectar', 'coordinar'], modules: ['house-sweep', 'occupancy'], do: 'Barrido casa por casa y desaparecidos sin confirmar' },
   ] },
   incendio: { name: 'Incendio forestal', phases: [
-    { t: 'horas antes', need: ['avisar'], modules: ['wildfire', 'blackout'], do: 'Avisar antes de que caiga la antena del pueblo' },
+    { t: 'primeros minutos', need: ['detectar', 'localizar'], modules: ['fire-watch'], do: 'Torres, cámaras y la brújula de los móviles que ven la columna la sitúan en el mapa; un coche en llamas junto al monte se avisa al 112 al momento' },
+    { t: 'horas antes', need: ['avisar'], modules: ['wildfire', 'fire-watch', 'blackout'], do: 'Perímetro y avance por satélite, meteorología del incendio y aviso antes de que caiga la antena del pueblo' },
+    { t: 'en la carretera', need: ['avisar'], modules: ['fire-watch', 'road-guard'], do: 'Tramos que el fuego alcanzará: corte propuesto, aviso a los coches que se acercan y velocidad segura con humo' },
     { t: 'durante', need: ['comunicar'], modules: ['bearers', 'voice-mesh'], do: 'Seguir comunicados cuando cae la red' },
-  ] },
+  ], guard: 'SENDA no dirige la extinción ni declara la situación operativa: propone datos y avisos al centro de mando. Nunca escucha las radios de emergencia ni vuela drones sobre el incendio' },
   ferroviario: { name: 'Accidente ferroviario', phases: [
     { t: 'prevención', need: ['detectar'], modules: ['rail-watch'], do: 'Patrones previos en datos que ya existen' },
     { t: '0–5 min', need: ['avisar', 'comunicar'], modules: ['rail-incident', 'triage'], do: 'Impacto detectado por los móviles y aviso automático' },

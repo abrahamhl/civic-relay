@@ -1,5 +1,58 @@
 # Changelog
 
+## SENDA v0.18 · 05-11-2026 · Seguimiento de incendio, entrega para Hostinger y ronda de financiación
+
+**Entrada (fundador):**
+- Preparar la ronda de financiación: qué busca un inversor, convocatorias y campañas abiertas, y qué ajustar en el software.
+- Una carpeta autocontenida con todos los zips y la web lista para salir de Vercel y subirla a Hostinger por FTP, porque las exportaciones de la sesión no se entienden.
+- Seguir con imágenes reales y fuentes públicas.
+- Integrar la web de la Comunidad de Madrid con fuegos y cámaras para perimetrar, seguir el avance, la meteorología, la virulencia y la criticidad, y conectarlo con los coches.
+- Que satélites, sensores del móvil y todo lo demás funcionen juntos.
+
+**Procesamiento:**
+- **Núcleo `fire-watch.mjs` (9 pruebas):**
+  - columna de humo situada **cruzando rumbos** de torres, cámaras orientables y la **brújula del móvil** (fórmula W3C DeviceOrientation), con elipse de error y **rechazo de rumbos incoherentes**: < 400 m en 6 semillas, y la brújula descalibrada descartada en 5 de 6;
+  - **perímetro por satélite** (envolvente de píxeles VIIRS/MODIS, cota superior), potencia radiativa y biomasa (0,368 kg/MJ, Wooster 2005), y **avance entre pasadas** (25 m/min medido frente a 25 reales);
+  - **meteorología del incendio:** 30-30-30, déficit de presión de vapor (Magnus), HDW (Srock 2018), Fosberg con la humedad de equilibrio de Simard e ISI del sistema canadiense FWI;
+  - **comportamiento:** intensidad de Byram, longitud de llama y clase de ataque (Andrews y Rothermel);
+  - **criticidad** (criterio SENDA, no oficial);
+  - **pueblos y carreteras** que alcanzará, y cuándo: corte propuesto por punto kilométrico, tramas HAZARD.FIRE de 24 bytes para los coches, velocidad segura con humo y riesgo de que un coche en llamas inicie un incendio;
+  - **fuentes con su modo de acceso:**
+    - PASIVO: FIRMS, EFFIS, Sentinel-2, AEMET, ASEM 112 y la brújula del móvil;
+    - CONVENIO: las torres del INFOMA y los coches por la Ley de Datos;
+    - NUNCA: escuchar las radios de emergencia (TETRA cifrado), volar drones sobre el incendio y las cámaras privadas.
+- **Caso real con fuentes:** incendio de San Martín de Valdeiglesias (23-07-2026), iniciado por un coche en llamas en la calzada de la M-501 (km 57), que se unió al de Almorox. La reconstrucción sobre su geografía real va marcada como ilustrativa.
+- **Web `/senda/fuego`:**
+  - mapa operativo animado: frente, humo, rumbos, elipse, focos de 375 m, perímetro y previsión;
+  - la M-501 se corta según avanza el fuego y los coches avisados se detienen antes del tramo;
+  - criticidad, calculadora meteorológica, prueba con la brújula del móvil, el caso real y la web de la Comunidad de Madrid (lo verificable y lo que falta).
+- **Integración:**
+  - arquitectura con el sensor «Brújula y orientación», el núcleo «Seguimiento de incendio», la app y el escenario «Incendio desde la carretera»;
+  - 3 fases nuevas en el plan de incendio y el evento `valdeiglesias-2026`;
+  - 5 integraciones nuevas en `platforms.mjs`;
+  - tarjeta en la portada (es/en/nl);
+  - service worker v19;
+  - el lector FIRMS conserva el instrumento y el tamaño de píxel.
+- **Entrega `entrega/`:**
+  - 7 zips **deterministas**, generados por un escritor ZIP propio sin dependencias: web para Hostinger, las dos películas, código, documentación, evidencias y visión;
+  - `.htaccess` que replica a Vercel: URL limpias, MIME de `.mjs`, `.vtt` y `.webmanifest`, service worker sin caché, HTTPS y caché inmutable de `_next/static`;
+  - `LEEME_PRIMERO` (md y html) paso a paso para hPanel y FileZilla, `MANIFIESTO.json` y `SHA256SUMS.txt`;
+  - dominio configurable con `SITE_URL`.
+- **Financiación:** `docs/financiacion/RONDA_FINANCIACION_2026-11-05.md`, con convocatorias abiertas y próximas con fecha y fuente, qué mira un inversor, ajustes del software P0-P2, riesgos con respuesta, índice del data room y plan de 90 días.
+
+**Validación:**
+- núcleo + relé 207/207;
+- E2E en Chromium 46/46, sin red, con accesibilidad en 25 pantallas;
+- **la misma E2E contra la exportación servida por Apache con el `.htaccess`**;
+- web: compilación, idiomas y 98/98;
+- zips verificados con `unzip -t`.
+
+**Límites:**
+- La red de la sesión bloquea FIRMS, Worldview, Open-Meteo, AEMET, EFFIS y comunidad.madrid, así que no hay imagen de satélite real del incendio de julio.
+- La web de la Comunidad de Madrid que recuerda el fundador sigue sin localizarse: hace falta su URL.
+- Coeficientes de combustible y del error de las brújulas, supuestos.
+- Sin ensayo de campo.
+
 ## SENDA v0.17 · 05-11-2026 · Visión con vídeo real, coches conectados, fusión de posición y renders realistas
 
 **Entrada (fundador):**

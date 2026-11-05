@@ -2,10 +2,10 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-05T16:14:49.742Z",
-  "durationS": 235,
-  "passed": 45,
-  "total": 45,
+  "at": "2026-11-05T22:11:04.403Z",
+  "durationS": 223.6,
+  "passed": 46,
+  "total": 46,
   "results": [
     {
       "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
@@ -100,9 +100,9 @@
       "ok": true,
       "path": {
         "sat": "Iridium 2-5",
-        "elevationDeg": 24.8,
-        "rangeKm": 1546,
-        "delayMs": 5.16
+        "elevationDeg": 24.7,
+        "rangeKm": 1549,
+        "delayMs": 5.17
       },
       "plan": {
         "k": 6,
@@ -192,7 +192,7 @@
       "cur": "d-rescue",
       "edges": 5,
       "detail": "Probado en simulación nuevoConcurrencia de direcciones aleatorias → teléfonos por planta; inferencia bayesiana exacta → personas con intervalo del 90 %.Código: rf-census.mjsAparece en: 🚁 Censo con dronAbrir /senda/dron →",
-      "nodes": 65,
+      "nodes": 68,
       "links": [
         "/senda/dron",
         "/senda/llamada"
@@ -239,7 +239,7 @@
       "name": "Triaje sin red: «no camina, respira, más de 30/min» → ROJO, con indicaciones de hemorragia y un parte de ≤ 160 caracteres que pide el 112 primero",
       "ok": true,
       "cat": "ROJO",
-      "msg": "SENDA TRIAJE R1 A0 V0 | 39.45210,-0.43020 ±25m | hemorragia 1 | 112,Sanitario | 16:12",
+      "msg": "SENDA TRIAJE R1 A0 V0 | 39.45210,-0.43020 ±25m | hemorragia 1 | 112,Sanitario | 22:08",
       "steps": "Qué hacer ahoraPresión directa y firme sobre la herida con lo más limpio que tengas; no la levantes para mirar.Si sangra a chorro en un brazo o una pierna y la presión no basta: torniquete unos 5–7 cm por encima de la herida, aprieta hasta que pare y anota la hora.Si respira mejor sentado, déjale sentado; si no, tumbado con las piernas estiradas.\n  Servicios: 112 → Sanitario➕ Añadir a la escena y siguiente víctimaRepetir"
     },
     {
@@ -466,6 +466,73 @@
       }
     },
     {
+      "name": "Seguimiento de incendio sin red: la columna se sitúa a < 400 m cruzando rumbos y se descarta la brújula descalibrada; satélite → avance de 25 m/min; criticidad extrema; se corta la M-501 alrededor del km 57 con aviso a los coches; la calculadora baja a clase 1 sin 30-30-30 y el móvil prepara la observación sin enviar la foto",
+      "ok": true,
+      "fu": {
+        "fix": {
+          "errM": 197,
+          "majorM": 139.08,
+          "rejected": [
+            "movil-4"
+          ],
+          "used": 6
+        },
+        "areaHa": 871,
+        "ros": 25,
+        "level": "extrema",
+        "score": 100,
+        "roads": [
+          {
+            "id": "M-501",
+            "action": "cortar",
+            "section": {
+              "pkFrom": 50.8,
+              "pkTo": 57.2
+            }
+          },
+          {
+            "id": "N-403",
+            "action": "vigilar",
+            "section": null
+          }
+        ],
+        "alerts": 1,
+        "firstTown": "Pelayos de la Presa",
+        "calc": {
+          "rule30": 3,
+          "hdw": 500,
+          "ffwi": 53,
+          "isi": 37.8,
+          "flameM": 6.5,
+          "attack": 4
+        },
+        "sighting": {
+          "ejemplo": "así sale una observación",
+          "rumbo": "75,0° (a mano)",
+          "errorTipico": "±8°",
+          "posicion": "40.361, -4.336 (redondeada)",
+          "foto": "se queda en el teléfono"
+        }
+      },
+      "fuCalc": {
+        "rule30": 0,
+        "hdw": 29,
+        "ffwi": 10,
+        "isi": 12.5,
+        "flameM": 0.5,
+        "attack": 1,
+        "sighting": {
+          "tipo": "avistamiento de humo",
+          "rumbo": "75.0° (a mano)",
+          "errorTipico": "±8°",
+          "posicion": "sin GPS en este dispositivo",
+          "hora": "2026-11-05T22:09:26.000Z",
+          "foto": "se queda en el teléfono",
+          "modo": "PASIVO, con tu toque"
+        }
+      }
+    },
+    {
       "name": "Llamada sin Internet: oferta de <110 bytes por sonido (onda real, decodificada exacta), conexión directa cifrada, voz Opus y chat en ambos sentidos y cero peticiones de red durante la llamada",
       "ok": true,
       "offerBytes": 79,
@@ -483,10 +550,10 @@
       "connected": true,
       "offerBytes": 79,
       "answerBytes": 72,
-      "connectMs": 342,
+      "connectMs": 355,
       "message": "¿Me oyes? Estoy en la 3.ª planta, puerta B",
       "rttMs": 0,
-      "audioPackets": 73
+      "audioPackets": 75
     },
     {
       "name": "Cadena de voz real A → B → C: B reenvía la voz de A (C oye el tono de 440 Hz de A) y el chat; el plan nunca usa como repetidor a quien tiene poca batería y avisa de quién queda aislado",
@@ -515,7 +582,7 @@
     {
       "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
       "ok": true,
-      "href": "senda://accion?a=BLE_BEACON&id=def92a2def7a2be6&b=B14&f=3&u=B&bat=100&cmd=6pN3JDO0k4VfyXet"
+      "href": "senda://accion?a=BLE_BEACON&id=3b549f928d823005&b=B14&f=3&u=B&bat=100&cmd=VyZwoLhPf2QgBjRE"
     },
     {
       "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",
@@ -547,7 +614,7 @@
       "easy": true
     },
     {
-      "name": "Accesibilidad automática en las 24 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
+      "name": "Accesibilidad automática en las 25 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
       "ok": true,
       "issues": {}
     },
