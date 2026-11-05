@@ -1,5 +1,29 @@
 # Changelog
 
+## SENDA v0.13 · 05-11-2026 · Batería de Internet: reserva de red, biblioteca de vecinos y puntos de rebote
+
+**Entrada (fundador):** que los móviles que ya tienen SENDA guarden una especie de batería, pero de Internet (~1 GB), y la usen como si fuera la red; además, gateways y puntos de rebote para cuando no hay cobertura.
+
+**Procesamiento (núcleo, 3 módulos nuevos, 11 pruebas):**
+- `net-reserve.mjs`: catálogo por zona y riesgo y mochila 0/1 exacta por valor y frescura. 1 GB cubre el 95,7 % del valor y lo esencial cabe en 200 MB. Incluye semivida de lo urgente, recarga por densidad en ventanas cortas, recarga por difusión y cola de intenciones.
+- `swarm-cache.mjs`: paquete común repartido con Reed-Solomon k-de-n entre vecinos (6 GB entre 40 vecinos: 462 MB por móvil, 99,2 % de recuperación). Inventario con filtro de Bloom (2000 piezas en 2,4 KB) y piezas nombradas por SHA-256, con ida y vuelta real verificada.
+- `coverage-memory.mjs`: huellas de cobertura agrupadas por antena, supervivencia sin luz, Tobler y tiempo esperado hasta enviar. Elige un cerro con antena de grupo electrógeno frente a la plaza (antenas agotadas) y frente a esperar al satélite.
+- `platforms.mjs`: integraciones OpenCellID, Kiwix, huellas propias (PASIVO) y difusión (CONVENIO); plan «Días sin red».
+
+**Web:**
+- `/senda/reserva`: batería animada; **almacenamiento real del dispositivo** (`storage.estimate`, `storage.persist`, batería y tipo de conexión); botón que llena de verdad la reserva con la app; biblioteca de vecinos y puntos de rebote con modo película.
+- Arquitectura: 3 piezas nuevas y el escenario «Tres días sin red».
+- Portada (es/en/nl), SENDA Campo, service worker v14.
+
+**Validación:** núcleo + relé 157/157 · E2E en Chromium 38/38 (accesibilidad en 18 pantallas) · web: compilación, idiomas y 98/98.
+
+**Límites:**
+- Sin red no se puede consultar contenido nuevo de Internet: se usa lo guardado y lo nuevo se encola.
+- Mapas detallados, albergues y hospitales necesitan el servidor de contenidos de SENDA (pendiente).
+- El transporte de fragmentos entre vecinos y la recogida de huellas reales requieren la app nativa.
+
+— Registrado por el asistente de orquestación (Claude Code), bajo la dirección de Abraham Haddioui.
+
 ## SENDA v0.12 · 05-11-2026 · Arquitectura multiplataforma, sentidos ampliados, riadas, triaje, monte y dron casa por casa
 
 **Entrada (fundador):**

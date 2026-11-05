@@ -32,3 +32,6 @@ export * from './triage.mjs';
 export * from './geo-offline.mjs';
 export * from './senses.mjs';
 export * from './house-sweep.mjs';
+export * from './net-reserve.mjs';
+export * from './swarm-cache.mjs';
+export * from './coverage-memory.mjs';

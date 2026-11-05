@@ -42,6 +42,10 @@ export const INTEGRATIONS = Object.freeze([
   { id: 'meteosat-lrpt', what: 'Imágenes de satélites meteorológicos con antena casera', access: 'PASIVO', note: 'NOAA APT terminó en 2025; Meteor-M LRPT irregular: pendiente de verificar' },
   { id: 'eolicos', what: 'Aerogeneradores, antenas y campanarios como marcas de posición conocidas', access: 'PASIVO', note: 'Triangulación visual con brújula; sin emitir nada' },
   { id: 'eolicos-scada', what: 'Telemetría de parques eólicos (viento, estado)', access: 'CONVENIO' },
+  { id: 'opencellid', what: 'Mapa abierto de antenas de telefonía (OpenCellID) para la memoria de cobertura', access: 'PASIVO', note: 'Licencia CC BY-SA 4.0; clave gratuita para descargar' },
+  { id: 'kiwix', what: 'Contenidos libres sin conexión para la reserva (Wikipedia temática, guías)', access: 'PASIVO', note: 'Licencias libres; tamaños por verificar en el catálogo' },
+  { id: 'huellas', what: 'Huellas de cobertura de los propios usuarios (dónde hubo señal)', access: 'PASIVO', note: 'Solo con consentimiento y compartidas con los vecinos; nunca a terceros' },
+  { id: 'datacast', what: 'Recarga de la reserva por difusión (canal de datos por satélite de TV o radio digital)', access: 'CONVENIO', note: 'Una vía, sin saturarse; requiere un emisor' },
   { id: 'mavlink', what: 'Drones abiertos (ArduPilot/PX4) por MAVLink', access: 'CONVENIO', note: 'Con el operador autorizado del dron' },
   { id: 'remote-id', what: 'Identificación remota de drones (Open Drone ID)', access: 'PASIVO' },
   { id: 'adif', what: 'Datos de circulación y de vía del gestor ferroviario', access: 'CONVENIO' },
@@ -97,6 +101,11 @@ export const PLAYBOOKS = Object.freeze({
   victimas: { name: 'Múltiples víctimas o evacuación de heridos', phases: [
     { t: '0–10 min', need: ['localizar', 'comunicar'], modules: ['triage'], do: 'Triaje por cualquier persona y recuento por colores' },
     { t: '10–60 min', need: ['coordinar'], modules: ['triage', 'occupancy'], do: 'Qué servicio necesita cada caso y a dónde se evacua' },
+  ] },
+  sinred: { name: 'Días sin red (apagón prolongado)', phases: [
+    { t: 'antes', need: ['comunicar', 'localizar'], modules: ['net-reserve', 'swarm-cache', 'coverage-memory'], do: 'Llenar la reserva con Wi-Fi y cargando; repartir el paquete común entre vecinos; recordar dónde hay señal' },
+    { t: 'sin red', need: ['comunicar', 'localizar'], modules: ['net-reserve', 'swarm-cache', 'bundle', 'voice-mesh'], do: 'Responder desde la reserva y la biblioteca de vecinos; encolar intenciones; hablar por la malla local' },
+    { t: 'ventana', need: ['comunicar'], modules: ['coverage-memory', 'net-reserve', 'orbital'], do: 'Ir al punto de rebote o esperar al satélite; vaciar la cola (SOS primero) y refrescar lo urgente' },
   ] },
   conflicto: { name: 'Zona de conflicto o evacuación de civiles', phases: [
     { t: 'siempre', need: ['comunicar'], modules: ['bearers', 'voice-mesh'], do: 'Comunicación sin infraestructura y con mínima emisión de radio' },

@@ -230,6 +230,13 @@ const bar = await cap('/barrido', () => window.SENDA_BARRIDO, 'e2e-26-barrido.pn
 check('Dron casa por casa sin red: 24 edificios en varias salidas que respetan la batería y tablero de prioridad que encabeza el edificio con más personas probables y daño',
   bar.sorties.length >= 2 && bar.sorties.flatMap((s) => s.houses).length === 24 && bar.top[0] === 'D2', { sorties: bar.sorties.length, top: bar.top });
 
+// ---- Batería de Internet (sin red): reserva, biblioteca de vecinos y puntos de rebote
+await C.page.goto(base + '/reserva'); await C.page.waitForFunction(() => window.SENDA_VIZ_READY && window.SENDA_RESERVA?.roundTrip, null, { timeout: 20000 });
+const resv = await C.page.evaluate(async () => { const S = window.SENDA_RESERVA; const st = await navigator.storage.estimate(); return { cov: S.coverage, used: S.plan.usedMB, swarm: S.swarm, rt: S.roundTrip.ok, best: S.rebote.best.id, quota: st.quota > 0 }; });
+await C.page.screenshot({ path: resolve(outDir, 'e2e-27-reserva.png'), fullPage: true });
+check('Batería de Internet sin red: 1 GB cubre ≥ 95 % de lo necesario, la biblioteca de vecinos reconstruye el paquete exacto (Reed-Solomon y SHA-256) y la memoria de cobertura elige el cerro con antena de grupo electrógeno',
+  resv.cov >= 0.95 && resv.used <= 1024 && resv.rt && resv.swarm.p >= 0.99 && resv.best === 'ermita' && resv.quota, resv);
+
 // ---- Llamada sin Internet: dos teléfonos nuevos, código por SONIDO (onda real) y conexión directa sin servidor.
 // (La emulación «offline» de Chromium también bloquea WebRTC local, así que aquí se demuestra lo equivalente:
 //  sin servidores STUN/TURN ni de señalización y CERO peticiones de red desde que empieza la llamada.)
@@ -357,12 +364,12 @@ const a11y = async (page) => page.evaluate(() => {
   return issues;
 });
 const a11yIssues = {};
-for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido']) {
+for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva']) {
   await R.goto(base + path); await R.waitForLoadState('load'); await R.waitForTimeout(300);
   const iss = await a11y(R); if (iss.length) a11yIssues[path || '/'] = iss;
 }
 await R.close();
-check('Accesibilidad automática en las 17 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
+check('Accesibilidad automática en las 18 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
 
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 

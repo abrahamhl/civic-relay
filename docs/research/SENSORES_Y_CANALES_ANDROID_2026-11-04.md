@@ -88,3 +88,32 @@ identificador sin haber revisado su contenido completo.
 **Despliegue físico:** la tabla «Del plano al mundo físico» de `/senda/arquitectura` resume, pieza a pieza, qué existe hoy y qué falta:
 - **Ya existen:** la app web sin red, la app Android (baliza y barrido), el accesorio ESP32 (misma trama que la web y Android) y el relé en Docker.
 - **Faltan:** el prototipo LoRa, la integración con el dron y los ensayos de campo.
+
+## 7. v0.13 · «Batería de Internet»: qué hacer cuando no hay ninguna red (2026-11-05)
+
+**Entrada del fundador:** que los móviles que ya tienen SENDA guarden algo como una batería, pero de Internet (~1 GB), y lo usen como si fuera la red; además, gateways y puntos de rebote.
+
+**Verdad técnica:** no se puede «almacenar Internet» para navegar por contenido nuevo sin red. Sí se puede:
+1. guardar la parte que se va a necesitar;
+2. repartir entre vecinos lo que no cabe en un móvil;
+3. encolar lo nuevo para la primera ventana;
+4. saber adónde ir para que haya ventana.
+
+Son cuatro piezas de ingeniería real:
+
+| Pieza | Base matemática | Evidencia | Estado |
+|---|---|---|---|
+| **Reserva de red** (`net-reserve.mjs`) | Mochila 0/1 exacta por valor (utilidad × riesgo) y frescura con semivida 2^(−edad/semivida); recarga por densidad de valor en ventanas cortas; cola de intenciones por prioridad | 1 GB cubre el 95,7 % del valor en zona de riada; lo esencial cabe en 200 MB; en 30 s a 2 Mbit/s se refresca primero lo urgente | Algoritmo y página hechos; llenado real de la app en el almacenamiento del navegador |
+| **Almacenamiento del dispositivo** | API StorageManager: `estimate()` y `persist()` | Chromium permite hasta ~60 % del disco por web; iOS 17+ ~20 % por web, ~60 % si está instalada en la pantalla de inicio (MDN) | Real en `/senda/reserva` |
+| **Biblioteca de vecinos** (`swarm-cache.mjs`) | Reed-Solomon k-de-n; P = Σ C(n,i)pⁱ(1−p)ⁿ⁻ⁱ; filtro de Bloom m = −n ln p/(ln 2)²; piezas nombradas por SHA-256 | 6 GB entre 40 vecinos al alcance al 50 %: 462 MB por móvil con 99,2 % de recuperación; ida y vuelta real byte a byte | Algoritmo hecho; transporte local (Wi-Fi o Bluetooth) pendiente en la app nativa |
+| **Puntos de rebote** (`coverage-memory.mjs`) | Huellas de cobertura agrupadas por antena, supervivencia de Weibull sin luz y función de senderismo de Tobler; E[T] = t_andar + (1−P)·t_alternativa | En el escenario: cerro con antena de grupo electrógeno al 98 %, 38 min frente a 63 min esperando al satélite | Algoritmo hecho; falta recoger huellas reales (app nativa, con consentimiento) |
+| **Recarga por difusión** | Una vía; capacidad = kbit/s × tiempo | Toosheh reparte paquetes de hasta 8 GB al día por satélite de TV doméstico | Requiere convenio con un emisor |
+
+**Fuentes:**
+- [MDN, cuotas de almacenamiento](https://developer.mozilla.org/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria)
+- [web.dev, caso Kiwix](https://web.dev/case-studies/kiwix)
+- [Toosheh (Wikipedia)](https://www.wikipedia.org/wiki/Toosheh)
+- [OpenCellID (Wikipedia)](https://www.wikipedia.org/wiki/OpenCellID), licencia CC BY-SA 4.0
+- Tamaños de la Wikipedia en español sin conexión: ~37 GB con imágenes y ~9 GB sin ellas, según guías de terceros (pendiente de verificar en download.kiwix.org).
+
+**Corrección registrada:** la primera versión sumaba como independientes las huellas de una misma antena y daba un 99,9 % irreal. Ahora se agrupan por antena: si muere, fallan todas.
