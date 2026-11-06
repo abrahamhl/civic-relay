@@ -83,7 +83,7 @@ export function assessCameraMeasurement(observation, { nowMs = Date.now(), maxAg
     if (!c.calibrationId || c.method !== 'ROAD_PLANE_HOMOGRAPHY' ||
         !finite(c.uncertaintyKmh) || c.uncertaintyKmh <= 0) issues.push('SPEED_NOT_GEOMETRICALLY_CALIBRATED');
   }
-  if (!finite(o.value) || o.value < 0 || o.metric === 'temperatureC' && o.value > 2000) issues.push('INVALID_MEASUREMENT');
+  if (!finite(o.value) || (o.metric !== 'temperatureC' && o.value < 0) || (o.metric === 'temperatureC' && (o.value < -273.15 || o.value > 2000))) issues.push('INVALID_MEASUREMENT');
   if (o.privacyReviewPassed !== true) issues.push('PRIVACY_REVIEW_PENDING');
   return { status: issues.length ? 'RESEARCH_ONLY' : 'ELIGIBLE_FOR_FUSION_REVIEW', issues,
     canEnterLivePredictor: issues.length === 0,
