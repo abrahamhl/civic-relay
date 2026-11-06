@@ -68,7 +68,18 @@ No es correcto afirmar “SENDA habría avisado 8,5 h antes” como éxito medid
 9. Comparar motores frente a referencia mecánica y nulo, documentar pérdida por cada sensor, testear cortes de red, retraso, fallo del sensor, duplicados, problemas horario UTC y fallos de vídeo.
 10. Presentar panel de inversores con indicadores separados: observación real / modelo experimental / validación de campo / autorización institucional. En PR draft hasta evidencias.
 
-## 5. Límites de esta continuación
+## 5. Base de datos relacional reproducible (nueva en esta PR)
+Se ha creado `packages/senda/data/build_source_db.py` (Python 3 + SQLite stdlib). Se alimenta exclusivamente de `packages/senda/data/source-registry.v021.json`, sin descargar ni copiar imágenes.
+Contiene 7 tablas con claves y restricciones: `sources`, `sensors`, `calibrations`, `observation_batches`, `observations`, `verification_events`, `experiment_runs`. Mantiene versiones de permisos, hora real de observación, hora de importación, SHA-256 de contenido, máscara GOES y clase de origen REAL/PRONÓSTICO/MODELO/SIMULACIÓN. Una ejecución sin nuevos datos solo inserta 12 fichas documentales, **0 mediciones** y **0 permisos de ingesta**.
+
+```bash
+python3 packages/senda/data/build_source_db.py --db /tmp/senda-sources.sqlite
+python3 -m unittest discover -s packages/senda/data -p 'test_*.py' -v
+```
+
+**NO ejecutar SQLite sobre una base externa o un servidor de emergencias sin revisión y autorización.** Para la próxima fase faltan ingestores API oficiales, comprobaciones de endpoint/credenciales, normalización espacial, licencias, calibraciones por cámara y evaluación temporal fuera de muestra. La tabla `verification_events` está vacía, no contiene falsos resultados de uptime.
+
+## 6. Límites de esta continuación
 - No se han descargado de nuevo históricos GOES en este entorno ni se han observado streams de cámara en tiempo real.
 - No hay aprobación institucional o contrato de acceso nuevo.
 - No se ha calculado una nueva cifra de velocidad de incendios: las antiguas están señaladas como **pendientes de reproceso con máscaras**.
