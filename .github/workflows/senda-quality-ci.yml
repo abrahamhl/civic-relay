@@ -1,0 +1,30 @@
+name: SENDA v0.21 Evidence Quality
+on:
+  push:
+    branches:
+      - research/senda-v021-evidence-quality-20261106
+  pull_request:
+    branches:
+      - ccr-357397d4-i6q247
+permissions:
+  contents: read
+jobs:
+  quality-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax for science pipeline
+        run: |
+          node --check packages/senda/src/observation-quality.mjs
+          node --check packages/senda/scripts/referencias-real.mjs
+      - name: Quality gate and all core regression tests
+        run: node --test packages/senda/tests/*.test.mjs
+      - name: Python camera-flow syntax (without network or inference)
+        run: python3 -m py_compile packages/senda-vision/camera_flow.py
+      - name: Assert the official catalog is only documentation-checked
+        run: |
+          node --input-type=module -e "import r from './packages/senda/data/source-registry.v021.json' with {type:'json'}; if(r.sources.length<10 || !r.sources.every(s=>s.status==='OFFICIAL_DOCUMENTATION_CHECKED')) process.exit(1)"
