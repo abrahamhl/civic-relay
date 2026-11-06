@@ -50,7 +50,13 @@ Usar miembros de conjunto con perturbaciones de viento espacialmente correlacion
 - NO comparar un píxel GOES como si fuera el perímetro de incendio. Confrontar con VIIRS y geometrías NIFC/EFFIS a la hora **efectiva**, usando tolerancias espaciales dinámicas.
 - Entrenar por incendio, no por fotograma; validación leave-one-incident-out, prueba en región/combustible nuevos y comprobar calibración de intervalos por incidente.
 
-### 3.3 Acoplamiento a evacuación
+### 3.3 Nueva implementación de frente robusto (investigación)
+`packages/senda/src/fire-front-robust.mjs` contiene un estimador alternativo que exige
+**máscaras GOES estrictas, al menos 3 píxeles por fotograma y 4 fotogramas, origen y rumbo explícitos**. Proyecta cada píxel sobre el rumbo de avance, calcula el cuantil 0,80 por fotograma y ajusta pendiente robusta de **Theil–Sen** por parejas de observaciones. Devuelve además desviación mediana de pendientes, incertidumbre mínima impuesta por tamaño del píxel, descartes y un `status`. Si el desplazamiento completo no supera 1,5 píxeles, devuelve `speedKmh:null`. Tiene pruebas geométricas y de atípicos sintéticos; **su exactitud sobre incendios reales NO se ha validado**.
+
+Se produce un campo `frenteRobustoExploratorio` en el resultado regenerado **solo cuando existen máscaras crudas**. Si el histórico tiene el código de máscara perdido, devuelve `REQUIRES_MASKED_RAW_GOES` y no simula un nuevo valor científico. Este estimador no reemplaza las cifras anteriores sin validación externa sobre incendios completos.
+
+### 3.4 Acoplamiento a evacuación
 Por tramo e: `T_f(e)` = tiempo aleatorio de llegada del fuego, `T_c(e)` = tiempo de despeje de vehículos, `T_s(e)` = llegada de humo peligroso. Definir margen de seguridad aleatorio:
 `M_e=min(T_f(e),T_s(e))−T_c(e)−τ_e`. Todos los tiempos usan el mismo origen y ruta; humo o fuego, el que alcance antes, limita el despeje. τ_e es el margen de seguridad.
 Proponer **revisión humana prioritaria** cuando `P(M_e<0)` supere un umbral acordado con el organismo. No abrir/cerrar vías ni emitir alertas oficiales automáticamente. El filtro EnKF solo puede asimilar velocidades/capacidades con incertidumbre y calibración documentadas; mantener pruebas ciegas contra PeMS u otro detector independiente.
