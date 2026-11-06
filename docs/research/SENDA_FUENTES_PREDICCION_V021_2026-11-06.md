@@ -52,7 +52,7 @@ Usar miembros de conjunto con perturbaciones de viento espacialmente correlacion
 
 ### 3.3 Acoplamiento a evacuación
 Por tramo e: `T_f(e)` = tiempo aleatorio de llegada del fuego, `T_c(e)` = tiempo de despeje de vehículos, `T_s(e)` = llegada de humo peligroso. Definir margen de seguridad aleatorio:
-`M_e=T_f(e)−max(T_c(e),T_s(e))−τ_e` (la fórmula se deberá adaptar para comparar correctamente tiempos de humo y despeje en una misma escala temporal).
+`M_e=min(T_f(e),T_s(e))−T_c(e)−τ_e`. Todos los tiempos usan el mismo origen y ruta; humo o fuego, el que alcance antes, limita el despeje. τ_e es el margen de seguridad.
 Proponer **revisión humana prioritaria** cuando `P(M_e<0)` supere un umbral acordado con el organismo. No abrir/cerrar vías ni emitir alertas oficiales automáticamente. El filtro EnKF solo puede asimilar velocidades/capacidades con incertidumbre y calibración documentadas; mantener pruebas ciegas contra PeMS u otro detector independiente.
 No es correcto afirmar “SENDA habría avisado 8,5 h antes” como éxito medido. La expresión correcta es **“contrafactual retrospectivo del simulador, condicionado a disponibilidad, latencia y calidad de detecciones históricas; no ha sido probado como alerta en campo”**.
 
