@@ -1,0 +1,53 @@
+name: SENDA Real Official Observations (Research)
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - ccr-357397d4-i6q247
+    paths:
+      - 'packages/senda/data/**'
+      - '.github/workflows/senda-real-observations-ci.yml'
+permissions:
+  contents: read
+jobs:
+  real-observation-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline source registry / archived real camera tests (no model files)
+        run: python3 -m unittest discover -s packages/senda/data -p 'test_*.py' -v
+      - name: Ingest authentic 2026 recorded TfL & Caltrans detector summaries
+        run: |
+          mkdir -p "$RUNNER_TEMP/senda-evidence"
+          python3 packages/senda/data/ingest_recorded_real_cameras.py --db "$RUNNER_TEMP/senda-evidence/camera_measurements.sqlite" | tee "$RUNNER_TEMP/senda-evidence/ingest-summary.json"
+      - name: Retrieve real Digitraffic Finnish TMS measurements (CC BY 4.0)
+        run: |
+          python3 packages/senda/data/fetch_real_digitraffic_tms.py --station 23001 --out "$RUNNER_TEMP/senda-evidence" | tee "$RUNNER_TEMP/senda-evidence/digitraffic-summary.json"
+      - name: Assertions: genuine source URL, data hash, UTC, and no active fusion permissions
+        run: |
+          python3 - "$RUNNER_TEMP/senda-evidence" <<'PY'
+          import hashlib,json,pathlib,sqlite3,sys
+          d=pathlib.Path(sys.argv[1])
+          report=json.loads((d/'digitraffic_tms_23001.normalized.json').read_text())
+          original=(d/report['raw_filename']).read_bytes()
+          assert hashlib.sha256(original).hexdigest()==report['raw_sha256']
+          assert report['source_url']=='https://tie.digitraffic.fi/api/tms/v1/stations/23001/data'
+          assert report['number_of_numeric_readings']>0
+          assert report['station_measured_utc'].endswith('Z')
+          assert report['meaning']=='REAL_INSTRUMENT_READINGS_NOT_CAMERA_VIDEO_NOT_FIRE_PREDICTIONS'
+          with sqlite3.connect(d/'camera_measurements.sqlite') as db:
+              assert db.execute('select count(*) from observations').fetchone()[0]==57
+              assert db.execute('select count(*) from observations where allow_model_fusion=1').fetchone()[0]==0
+              assert db.execute('select count(*) from sensors where operational_permission=1').fetchone()[0]==0
+          print('REAL observation artifact: 57 model-derived camera observations +',report['number_of_numeric_readings'],'physical TMS sensor values; NONE approved for public emergency alerts')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: senda-real-sources-research-only
+          path: ${{ runner.temp }}/senda-evidence/
+          retention-days: 14
