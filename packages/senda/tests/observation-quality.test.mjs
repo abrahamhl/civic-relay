@@ -11,6 +11,8 @@ test('GOES: only NOAA lowest-false-alarm mask classes are strict; cloudy/high/me
   for (const n of [10,11,30,31]) assert.equal(classifyGoesPixel([34,-118,9,n]),'STRICT');
   for (const n of [12,13,14,15,32,33,34,35]) assert.equal(classifyGoesPixel([34,-118,9,n]),'EXPLORATORY');
   assert.equal(classifyGoesPixel([34,-118,9]),'MISSING_MASK');
+  assert.equal(classifyGoesPixel([34,-118,9,10,0]),'STRICT');
+  assert.equal(classifyGoesPixel([34,-118,9,10,3]),'INVALID', 'GOES DQF invalid geometry is not trusted');
   assert.equal(classifyGoesPixel([400,-118,9,10]),'INVALID');
 });
 test('GOES: cloud detections never enter strict calibration, retain counts and time',()=>{
