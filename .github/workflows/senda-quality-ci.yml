@@ -36,6 +36,10 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/senda-real"
           python3 packages/senda/data/ingest_recorded_real_cameras.py --db "$RUNNER_TEMP/senda-real/evidence.sqlite" | tee "$RUNNER_TEMP/senda-real/recorded-camera-summary.json"
+      - name: Ingest authentic NOAA archived fire pixels and historical HRRR forecast values
+        run: |
+          set -euo pipefail
+          python3 packages/senda/data/ingest_real_goes_hrrr_archive.py --db "$RUNNER_TEMP/senda-real/evidence.sqlite" | tee "$RUNNER_TEMP/senda-real/noaa-archive-summary.json"
       - name: Query one actual public Fintraffic physical road detector (no credentials)
         run: |
           set -euo pipefail
@@ -54,6 +58,8 @@ jobs:
           assert val["source_id"]=="digitraffic_tms"
           with sqlite3.connect(root/"evidence.sqlite") as db:
               assert db.execute("select count(*) from observations where source_quality_code='REAL_VIDEO_MODEL_DERIVED_UNVERIFIED'").fetchone()[0]==57
+              assert db.execute("select count(*) from observations where source_quality_code='REAL_SATELLITE_PIXEL_MASK_LOST_NO_CALIBRATION'").fetchone()[0]==13116
+              assert db.execute("select count(*) from observations where source_quality_code='REAL_NOAA_ARCHIVED_FORECAST_ISSUE_TIME_MISSING'").fetchone()[0]==535
               assert db.execute("select count(*) from observations where source_quality_code='REAL_PHYSICAL_SENSOR_RESEARCH_UNCALIBRATED'").fetchone()[0]>0
               assert db.execute("select count(*) from observations where allow_model_fusion=1").fetchone()[0]==0
           print("Evidence provenance verified; zero emergency approvals.")
