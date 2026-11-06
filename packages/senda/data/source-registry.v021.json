@@ -207,6 +207,57 @@
       "timing": "offline labelled dataset",
       "use": "benchmark smoke classifier, disjoint by camera, fire event and geography",
       "gap": "Avoid train/test leakage from same camera. Dataset release versions differ."
+    },
+    {
+      "id": "sentinel3_slstr_frp",
+      "region": "GLOBAL",
+      "owner": "EUMETSAT / Copernicus Sentinel-3",
+      "kind": "satellite_radiative_fire_power",
+      "modality": "SLSTR_L2_FRP_THERMAL",
+      "homepage": "https://www.eumetsat.int/S3-NRT-FRP",
+      "rights": "COPERNICUS_PRODUCT_LICENSE_CHECK",
+      "access": "PORTAL_AND_DATASTORE",
+      "auth": "PRODUCT_SPECIFIC",
+      "status": "OFFICIAL_DOCUMENTATION_CHECKED",
+      "productionVideoPermission": null,
+      "spatialAccuracy": "~1 km pixel, not flame temperature or perimeter",
+      "timing": "NRT latency less than 3 h for specified product; verify actual granule timestamps",
+      "use": "independent polar-orbit FRP corroboration for European and global cases",
+      "gap": "NRT product/version/nighttime limitations and rights; true flame-front speed requires perimeter cross-validation."
+    },
+    {
+      "id": "eumetsat_mtg_frp_pixel",
+      "region": "EU_AFRICA_SA",
+      "owner": "EUMETSAT LSA SAF",
+      "kind": "geostationary_fire_radiative_power",
+      "modality": "MTG_FCI_FRP_PIXEL",
+      "homepage": "https://lsa-saf.eumetsat.int/en/data/products/fire-products/",
+      "rights": "LSA_SAF_SERVER_PRODUCT_TERMS",
+      "access": "REGISTRATION_REQUIRED",
+      "auth": "DATA_SERVER_ACCOUNT",
+      "status": "OFFICIAL_DOCUMENTATION_CHECKED",
+      "productionVideoPermission": null,
+      "spatialAccuracy": "~1 km MTG demonstration product",
+      "timing": "10 min MTG demo; product availability depends on region and status",
+      "use": "European heat emission and time-resolved fire product candidate",
+      "gap": "MTFRPPIXEL LSA-509 listed DEMONSTRATION not universally operational. Confirm API contract and training quality."
+    },
+    {
+      "id": "landsat_tirs",
+      "region": "GLOBAL",
+      "owner": "USGS / NASA Landsat 8-9",
+      "kind": "radiometric_surface_temperature",
+      "modality": "TIRS_THERMAL_INFRARED",
+      "homepage": "https://www.usgs.gov/landsat-missions/landsat-8",
+      "rights": "USGS_LANDSAT_OPEN_PRODUCTS",
+      "access": "PUBLIC_ARCHIVE",
+      "auth": "PRODUCT_SPECIFIC",
+      "status": "OFFICIAL_DOCUMENTATION_CHECKED",
+      "productionVideoPermission": null,
+      "spatialAccuracy": "100 m native thermal bands, frequently resampled to 30 m grid",
+      "timing": "orbital repeat and cloud gaps; NOT continuous emergency camera",
+      "use": "historical burn/thermal surface context, independent land radiance",
+      "gap": "Sensor saturation, emissivity and atmospheric correction; not flame temperature and cannot provide continuous real-time front."
     }
   ]
 }
