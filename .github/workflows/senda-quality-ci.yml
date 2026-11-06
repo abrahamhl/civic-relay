@@ -25,6 +25,10 @@ jobs:
         run: node --test packages/senda/tests/*.test.mjs
       - name: Python camera-flow syntax (without network or inference)
         run: python3 -m py_compile packages/senda-vision/camera_flow.py
+      - name: SQLite normalized evidence registry tests (offline)
+        run: |
+          python3 -m unittest discover -s packages/senda/data -p 'test_*.py' -v
+          python3 packages/senda/data/build_source_db.py --db /tmp/senda-sources-evidence.sqlite
       - name: Assert the official catalog is only documentation-checked
         run: |
           node --input-type=module -e "import r from './packages/senda/data/source-registry.v021.json' with {type:'json'}; if(r.sources.length<10 || !r.sources.every(s=>s.status==='OFFICIAL_DOCUMENTATION_CHECKED')) process.exit(1)"
