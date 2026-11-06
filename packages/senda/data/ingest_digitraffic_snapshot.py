@@ -65,11 +65,13 @@ def ingest_digitraffic_snapshot(db: pathlib.Path, directory: pathlib.Path, stati
                      metric,value,unit,uncertainty,source_quality_code,calibration_id,
                      evidence_json,allow_model_fusion)
                      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,0)""",
-                    (obsid,batch_id,sid,observed,norm["retrieved_utc"],
+                    (obsid,batch_id,sid,rec["observed_utc"],norm["retrieved_utc"],
                      rec["sensor_name"],float(rec["value"]),rec["unit"],None,
                      "REAL_PHYSICAL_SENSOR_RESEARCH_UNCALIBRATED",None,
                      json.dumps({"publisher_url":norm["source_url"],
                         "original_sha256":sha,"window_start_utc":rec.get("window_start_utc"),
+                        "window_end_utc":rec.get("window_end_utc"),"time_basis":rec.get("time_basis"),
+                        "station_time_basis":norm.get("station_time_basis"),
                         "dataset_licence":norm["source_licence"],"freshness":norm["freshness"],
                         "independent_data_validation":"NOT_CERTIFIED"},sort_keys=True)))
                 added+=conn.total_changes-before
