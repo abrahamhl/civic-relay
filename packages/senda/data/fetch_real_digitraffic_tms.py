@@ -29,12 +29,18 @@ def parsed_utc(s: str) -> dt.datetime:
 
 def normalize_tms(payload: dict, station: int, now: dt.datetime) -> dict:
     if not isinstance(payload,dict): raise ValueError("Expected JSON object")
+    # /stations/data -> list tmsStations; /stations/{id}/data -> SINGLE station JSON.
+    # Both shapes are documented; use the exact source shape, never construct readings.
     values=payload.get("tmsStations")
-    if not isinstance(values,list) or not values: raise ValueError(f"No real station observations in response; keys={list(payload)[:20]}; tmsStationsType={type(values).__name__}; length={len(values) if isinstance(values,list) else None}")
+    if values is None and payload.get("id") is not None:
+        values=[payload]
+    if not isinstance(values,list) or not values: raise ValueError(f"No real station observations in response; keys={list(payload)[:20]}")
     matching=[x for x in values if int(x.get("id",-1))==station]
     if len(matching)!=1: raise ValueError("Expected exactly one matched station")
     x=matching[0]
-    when=parsed_utc(x["measuredTime"])
+    has_measured=bool(x.get("measuredTime"))
+    publisher_timestamp=x.get("measuredTime") or x.get("dataUpdatedTime") or payload.get("dataUpdatedTime")
+    when=parsed_utc(publisher_timestamp)
     age=(now-when).total_seconds()
     if age < -60 or age > 86400*30: raise ValueError("Unreasonable station timestamp")
     sensors=x.get("sensorValues")
@@ -55,12 +61,14 @@ def normalize_tms(payload: dict, station: int, now: dt.datetime) -> dict:
             parsed_utc(start)
         readings.append({"sensor_id":str(sv.get("id","")),
           "sensor_name":name,"value":v,"unit":unit,
-          "observed_utc":when.isoformat().replace("+00:00","Z"),
-          "window_start_utc":start,
+          "observed_utc":parsed_utc(sv.get("timeWindowEnd")).isoformat().replace("+00:00","Z") if sv.get("timeWindowEnd") else when.isoformat().replace("+00:00","Z"),
+          "window_start_utc":start,"window_end_utc":sv.get("timeWindowEnd"),
+          "time_basis":"SENSOR_WINDOW_END" if sv.get("timeWindowEnd") else ("STATION_MEASURED_TIME" if has_measured else "PUBLISHER_UPDATED_TIME_PROXY"),
           "quality":"REAL_PHYSICAL_SENSOR_UNCALIBRATED_FOR_EMERGENCY_USE"})
     if not readings: raise ValueError("No numeric measurements after validation")
     return {"source_id":"digitraffic_tms","station_id":station,
       "station_measured_utc":when.isoformat().replace("+00:00","Z"),
+      "station_time_basis":"STATION_MEASURED_TIME" if has_measured else "PUBLISHER_UPDATED_TIME_PROXY",
       "retrieved_utc":now.isoformat().replace("+00:00","Z"),
       "age_seconds":round(age),
       "freshness":"CURRENT" if age <= 900 else "STALE_RESEARCH_ONLY",
