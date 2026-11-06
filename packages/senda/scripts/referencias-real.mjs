@@ -18,6 +18,8 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as FC from '../src/fire-cases.mjs';
 import * as TF from '../src/traffic-fusion.mjs';
+import { filterGoesFrames } from '../src/observation-quality.mjs';
+import { estimateRobustFront } from '../src/fire-front-robust.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const OUT = resolve(ROOT, 'investor-next/public/senda/data/referencias'); mkdirSync(OUT, { recursive: true });
@@ -35,7 +37,7 @@ if (RAW) {
   const all = {};
   for (const [f, [file, key]] of Object.entries(FIRES)) {
     const j = JSON.parse(readFileSync(resolve(RAW, file), 'utf8'));
-    all[f] = { satelite: j.satelite, frames: j.frames[key].map((x) => ({ t: x.t, det: x.det.map((d) => [+d[0].toFixed(4), +d[1].toFixed(4), Math.round(d[2] || 0)]) })), hrrr: j.hrrr[key] };
+    all[f] = { satelite: j.satelite, frames: j.frames[key].map((x) => ({ t: x.t, det: x.det.map((d) => [+d[0].toFixed(4), +d[1].toFixed(4), d[2] == null ? null : Math.round(d[2]), d[3] == null ? null : Number(d[3]), d[4] == null ? null : Number(d[4])]) })), hrrr: j.hrrr[key] };
   }
   writeFileSync(GOES, JSON.stringify({ fuente: 'NOAA GOES-R ABI L2 Fire Detection (FDCC) y NOAA HRRR 3 km (AWS Open Data, dominio público). Descargado por scripts/datos-reales/goes_hrrr_incendio.py', casos: all }));
 }
@@ -71,11 +73,20 @@ const G = G0, TFLC = JSON.parse(readFileSync(resolve(OUT, 'tfl_camaras.json'), '
 const CALF = resolve(OUT, 'caltrans_corredores.json'), CAL = existsSync(CALF) ? JSON.parse(readFileSync(CALF, 'utf8')) : null;
 
 // ── 2. progresión medida y tramos ───────────────────────────────────────────────
-const prog = {}, points = [];
+const prog = {}, points = [], sourceQA = {};
 for (const [f, c] of Object.entries(G)) {
-  const P = FC.goesProgression(c.frames, { hrrr: c.hrrr }), seg = FC.runSegments(P, c.hrrr);
+  // Legacy v0.20 compact frames dropped the mask. They are replayable but NOT quality-certified.
+  // New raw exports preserve d[3], and strict pixels are used when sufficient observations remain.
+  const Q = filterGoesFrames(c.frames);
+  sourceQA[f] = { status: Q.status, usableForCalibration: Q.usableForCalibration, counts: Q.counts, removedFraction: Q.removedFraction };
+  const candidateFrames = Q.usableForCalibration ? Q.frames : c.frames;
+  const P = FC.goesProgression(candidateFrames, { hrrr: c.hrrr }), seg = FC.runSegments(P, c.hrrr);
   prog[f] = { ...META[f], primeraDeteccion: P.firstDetection, origen: P.origin.map((x) => +x.toFixed(4)), dirDeg: P.dirDeg, dirFuente: P.dirFuente, pixelKm: [+P.pixel.dxKm.toFixed(2), +P.pixel.dyKm.toFixed(2)],
     filas: P.rows.map((r) => ({ t: r.t, min: Math.round(r.min), n: r.n, frpMW: r.frpMW, frenteKm: r.frontMaxKm })), tramos: seg,
+    frenteRobustoExploratorio: Q.usableForCalibration ?
+      estimateRobustFront(c.frames, { origin: P.origin, spreadToDeg: P.dirDeg,
+        pixelResolutionKm: Math.max(P.pixel.dxKm, P.pixel.dyKm), minPixelsPerFrame: 3, minFrames: 4, frontQuantile: 0.8 }) :
+      { status: 'REQUIRES_MASKED_RAW_GOES', speedKmh: null, forOperationalAlert: false },
     hrrr: c.hrrr.map((h) => ({ t: h.validUTC, u10Kmh: +(Math.hypot(h.u10, h.v10) * 3.6).toFixed(1), rachaKmh: +(h.gust * 3.6).toFixed(1), t2: h.t2, hr: h.rh2 })) };
   for (const s of seg) if (s.resuelto) points.push({ caso: f, combustible: META[f].combustible, ...s });
 }
@@ -195,7 +206,10 @@ const totalCross = TFLC.camaras.reduce((a, c) => a + c.cruces, 0), totalDur = TF
 
 // ── salida ──────────────────────────────────────────────────────────────────────
 const result = {
-  version: 'v0.20', generado: new Date().toISOString().slice(0, 10),
+  version: 'v0.21-research-replay', generado: new Date().toISOString().slice(0, 10),
+  observationQuality: { sources: sourceQA, trainingStatus: Object.values(sourceQA).every((q) => q.usableForCalibration)
+    ? 'FILTERED_RESEARCH_NOT_FIELD_VALIDATED' : 'LEGACY_UNVERIFIED_REPROCESS_RAW_GOES_REQUIRED',
+    note: 'If any raw mask is lost, numerical fit remains a reproducibility reference only. Do not claim operational predictive accuracy, lead-time or calibration.' },
   fuentes: FC.FIRE_SOURCES_REF, base: FC.REFERENCE_FIRES.map(({ id, nombre, pais, fecha, combustible, satelite, hechos, leccion }) => ({ id, nombre, pais, fecha, combustible, satelite, hechos, leccion })),
   progresion: prog,
   entrenamiento: { puntos: points, loo: { n: loo.n, casos: loo.casos, scores: loo.scores, preds: loo.preds }, regla10Calibrada: { mu: cal.mu, sigma: cal.sigma, sigmaPred: cal.sigmaPred, n: cal.n, factorMediana: cal.factorMediana }, cobertura80: { cobertura: cov80.cobertura, n: cov80.n, filas: cov80.rows }, cobertura90: { cobertura: cov90.cobertura, n: cov90.n }, nistCamp },
@@ -210,6 +224,7 @@ writeFileSync(resolve(OUT, 'referencias.json'), JSON.stringify(result));
 writeFileSync(resolve(ROOT, 'docs/paper/resultados_v020.json'), JSON.stringify({ ...result, progresion: Object.fromEntries(Object.entries(prog).map(([k, v]) => [k, { ...v, filas: undefined, hrrr: undefined }])), aproximacion: Object.fromEntries(Object.entries(approach).map(([k, v]) => [k, { ...v, serie: undefined }])), gemelos: { atascoChico: { deteccion: detA, convergencia: convA }, palisadesBloqueo: { deteccion: detB } } }, null, 1));
 
 const fmt = (t, tz = -8) => (t ? new Date(Date.parse(t) + tz * 3.6e6).toISOString().slice(11, 16) : '—');
+console.log('GOES observation quality:', JSON.stringify(result.observationQuality));
 console.log('puntos de entrenamiento', points.length, 'de', new Set(points.map((p) => p.caso)).size, 'incendios');
 console.log('LOO', JSON.stringify(loo.scores));
 console.log('regla 10 % calibrada', JSON.stringify({ mu: cal.mu, sigma: cal.sigma, factor: cal.factorMediana }), 'cobertura 80 %', cov80.cobertura, '90 %', cov90.cobertura);

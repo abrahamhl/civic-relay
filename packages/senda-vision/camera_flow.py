@@ -7,10 +7,10 @@ Entrada: un clip real (p. ej. HLS de Caltrans o DelDOT) y, opcionalmente, una ca
 Salida (JSON, sin imágenes):
   - cruces por sentido en una línea horizontal y flujo (veh/h);
   - vehículos en imagen (media y máximo), que es una medida de ocupación;
-  - velocidad aproximada por vehículo seguido. La escala sale del propio vehículo: un turismo mide
-    ≈ 4,5 m, así que desplazamiento / tamaño de la caja × 4,5 m / Δt. La perspectiva afecta igual
-    a ambos y se compensa en parte; la incertidumbre es de ≈ ±30 %, suficiente para distinguir
-    flujo libre de congestión;
+  - proxy de movimiento NO CALIBRADO. Se calcula con una hipótesis de 4,5 m de longitud de
+    turismo, pero la perspectiva, clase, oclusiones y cámara invalidan una cota genérica de ±30 %.
+    NO se publica como velocidad observada ni se introduce en un filtro de Kalman hasta aportar
+    homografía de la calzada, puntos de referencia y error de validación por cámara;
   - conteo de vehículos en cada imagen fija, en orden temporal.
 
 Privacidad: los números de seguimiento son temporales y anónimos; no se guarda ninguna imagen, ni se
@@ -56,10 +56,16 @@ if cap.isOpened():
     tot = counts['baja'] + counts['sube']
     res.update({'frames': i, 'fps': fps, 'w': W, 'h': H, 'durS': round(dur, 1), 'cruces': counts, 'total': tot, 'flujoVehH': round(tot / max(dur, 1) * 3600),
                 'mediaEnImagen': round(float(np.mean(per_frame)), 2) if per_frame else 0, 'maxEnImagen': int(max(per_frame)) if per_frame else 0,
-                'seguidos': len(hist), 'velocidadesKmh': sorted(speeds), 'velMedianaKmh': round(float(np.median(speeds)), 1) if speeds else None,
-                # Separar los que circulan de los parados (aparcados o en el semáforo): < 5 km/h = parado.
-                'velMedianaMovKmh': round(float(np.median([v for v in speeds if v >= 5])), 1) if any(v >= 5 for v in speeds) else None,
-                'fraccionParados': round(sum(v < 5 for v in speeds) / len(speeds), 2) if speeds else None,
+                'seguidos': len(hist), 'velocidadesKmh': sorted(speeds), 'velMedianaKmh': None, 'velMedianaMovKmh': None, 'fraccionParados': None,
+                # Proxies exploratorios, NUNCA velocidades medidas sin homografía.
+                'calibrationStatus': 'NO_ROAD_PLANE_HOMOGRAPHY',
+                'usoEnFiltroKalman': False,
+                'velMedianaNoCalibradaKmh': round(float(np.median(speeds)), 1) if speeds else None,
+                'velMedianaMovNoCalibradaKmh': round(float(np.median([v for v in speeds if v >= 5])), 1) if any(v >= 5 for v in speeds) else None,
+                'fraccionParadosNoCalibrada': round(sum(v < 5 for v in speeds) / len(speeds), 2) if speeds else None,
+                # Poisson approximate 95% interval; very wide for short clips.
+                'flujoIntervalo95VehH': [round(max(0, (tot - 1.96 * np.sqrt(tot)) / max(dur, 1) * 3600)),
+                                         round((tot + 1.96 * np.sqrt(tot + 1)) / max(dur, 1) * 3600)],
                 'procS': round(time.time() - t0, 1)})
 if IMGS:
     serie = []

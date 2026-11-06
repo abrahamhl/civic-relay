@@ -1,7 +1,7 @@
 """SENDA · Progresión REAL de incendios con GOES-R ABI Fire Detection (FDC, CONUS, cada 5 min) y viento HRRR 3 km.
 Fuentes: NOAA GOES-16/18 y NOAA HRRR en AWS Open Data (dominio público). Uso: python3 -I goes_hrrr_incendio.py <caso> <salida>
 Casos: camp (Camp Fire, 08-11-2018, GOES-16) y la (Palisades y Eaton, 07/08-01-2025, GOES-18)."""
-import os, sys, json, ssl, time, re, urllib.request, numpy as np, netCDF4, eccodes, math
+import os, sys, json, ssl, time, re, urllib.request, datetime as dt, numpy as np, netCDF4, eccodes, math
 CASE, OUT = sys.argv[1], sys.argv[2]; os.makedirs(OUT, exist_ok=True)
 ctx = ssl.create_default_context(cafile='/root/.ccr/ca-bundle.crt')
 def get(url, rng=None):
@@ -44,11 +44,14 @@ for yr, doy, hh in C['slots']:
     for k in keys:
         data = get(f"https://{C['bucket']}.s3.amazonaws.com/{k}"); nc = netCDF4.Dataset('mem', memory=data)
         if grid is None: lat, lon = latlon(nc); grid = (lat, lon); sel = {f: np.where((lat >= v['bbox'][0]) & (lat <= v['bbox'][1]) & (lon >= v['bbox'][2]) & (lon <= v['bbox'][3])) for f, v in C['fires'].items()}
-        mask = nc.variables['Mask'][:]; power = nc.variables['Power'][:]; t = re.search(r'_s(\d{4})(\d{3})(\d{2})(\d{2})(\d{2})', k).groups()
-        tt = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.mktime(time.strptime(f'{t[0]} {t[1]} {t[2]} {t[3]} {t[4]}', '%Y %j %H %M %S')) - time.timezone))
+        mask = nc.variables['Mask'][:]; power = nc.variables['Power'][:]
+        dqf = nc.variables['DQF'][:] if 'DQF' in nc.variables else None
+        t = re.search(r'_s(\d{4})(\d{3})(\d{2})(\d{2})(\d{2})', k).groups()
+        tt = dt.datetime.strptime(f'{t[0]} {t[1]} {t[2]} {t[3]} {t[4]}', '%Y %j %H %M %S').replace(tzinfo=dt.timezone.utc).isoformat().replace('+00:00', 'Z')
         for f, (jj, ii) in sel.items():
             m = np.asarray(mask[jj, ii]); keep = np.isin(m, list(FIRE)); pw = np.asarray(np.ma.filled(power[jj, ii], np.nan))
-            frames[f].append({'t': tt, 'det': [[round(float(grid[0][jj[q], ii[q]]), 4), round(float(grid[1][jj[q], ii[q]]), 4), None if np.isnan(pw[q]) else round(float(pw[q]), 1), int(m[q])] for q in np.where(keep)[0]]})
+            dq = np.asarray(np.ma.filled(dqf[jj, ii], -1)) if dqf is not None else None
+            frames[f].append({'t': tt, 'det': [[round(float(grid[0][jj[q], ii[q]]), 4), round(float(grid[1][jj[q], ii[q]]), 4), None if np.isnan(pw[q]) else round(float(pw[q]), 1), int(m[q]), int(dq[q]) if dq is not None else None] for q in np.where(keep)[0]]})
         nc.close()
     print(CASE, yr, doy, hh, {f: len(frames[f][-1]['det']) for f in frames}, flush=True)
 # Viento HRRR en el centroide de las primeras detecciones de cada incendio
