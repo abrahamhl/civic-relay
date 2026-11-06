@@ -32,3 +32,35 @@ jobs:
       - name: Assert the official catalog is only documentation-checked
         run: |
           node --input-type=module -e "import r from './packages/senda/data/source-registry.v021.json' with {type:'json'}; if(r.sources.length<10 || !r.sources.every(s=>s.status==='OFFICIAL_DOCUMENTATION_CHECKED')) process.exit(1)"
+      - name: Populate SQLite with 2026 genuine recorded TfL-Caltrans detector observations
+        run: |
+          mkdir -p "$RUNNER_TEMP/senda-real"
+          python3 packages/senda/data/ingest_recorded_real_cameras.py --db "$RUNNER_TEMP/senda-real/evidence.sqlite" | tee "$RUNNER_TEMP/senda-real/recorded-camera-summary.json"
+      - name: Query one actual public Fintraffic physical road detector (no credentials)
+        run: |
+          python3 packages/senda/data/fetch_real_digitraffic_tms.py --station 23001 --out "$RUNNER_TEMP/senda-real" | tee "$RUNNER_TEMP/senda-real/physical-tms-summary.json"
+          python3 packages/senda/data/ingest_digitraffic_snapshot.py --station 23001 --db "$RUNNER_TEMP/senda-real/evidence.sqlite" --snapshot-dir "$RUNNER_TEMP/senda-real" | tee "$RUNNER_TEMP/senda-real/composed-sqlite-summary.json"
+      - name: Validate physical data + source hashes + no incident decision permissions
+        if: success()
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib,sqlite3
+          root=pathlib.Path(os.environ["RUNNER_TEMP"])/"senda-real"
+          val=json.loads((root/"digitraffic_tms_23001.normalized.json").read_text())
+          raw=(root/val["raw_filename"]).read_bytes()
+          assert hashlib.sha256(raw).hexdigest()==val["raw_sha256"]
+          assert val["number_of_numeric_readings"]>0
+          assert val["source_id"]=="digitraffic_tms"
+          with sqlite3.connect(root/"evidence.sqlite") as db:
+              assert db.execute("select count(*) from observations where source_quality_code='REAL_VIDEO_MODEL_DERIVED_UNVERIFIED'").fetchone()[0]==57
+              assert db.execute("select count(*) from observations where source_quality_code='REAL_PHYSICAL_SENSOR_RESEARCH_UNCALIBRATED'").fetchone()[0]>0
+              assert db.execute("select count(*) from observations where allow_model_fusion=1").fetchone()[0]==0
+          print("Evidence provenance verified; zero emergency approvals.")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: senda-real-observations-evidence
+          path: ${{ runner.temp }}/senda-real/
+          if-no-files-found: warn
+          retention-days: 14
