@@ -16,7 +16,7 @@ class RegistryTest(unittest.TestCase):
             path = pathlib.Path(tmp) / "evidence.sqlite"
             first = module.create_database(path)
             second = module.create_database(path)
-            self.assertEqual(first["sources"], 15)
+            self.assertEqual(first["sources"], 24)
             self.assertEqual(first["observations"], 0)
             self.assertEqual(second["sources"], first["sources"])
             self.assertEqual(second["permitted_to_ingest"], 0)
