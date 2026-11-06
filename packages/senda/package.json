@@ -12,7 +12,8 @@
     "test": "node --test tests/*.test.mjs",
     "evidence": "node scripts/run-scenarios.mjs",
     "sync-web": "node scripts/sync-web.mjs",
-    "status-page": "node scripts/build-status-page.mjs"
+    "status-page": "node scripts/build-status-page.mjs",
+    "evidence-fusion-rail": "node scripts/run-fusion-rail.mjs"
   },
   "license": "MIT"
 }

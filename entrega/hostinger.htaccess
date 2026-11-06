@@ -1,0 +1,69 @@
+# SENDA · configuración para Hostinger (LiteSpeed) o Apache. Va en public_html/ junto a index.html.
+# Replica lo que hacía Vercel: URL limpias (/senda/fuego → fuego.html), tipos MIME de los módulos y caché.
+
+Options -MultiViews -Indexes
+DirectorySlash Off
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# 1) HTTPS obligatorio (el modo sin conexión necesita HTTPS). No se aplica en localhost para poder probar.
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:[0-9]+)?$
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# 2) Quitar la barra final si existe la página .html (/es/ → /es)
+RewriteCond %{REQUEST_URI} ^(.+)/$
+RewriteCond %{DOCUMENT_ROOT}%1.html -f
+RewriteRule ^ %1 [L,R=301]
+
+# 3) URL limpia → fichero .html (/senda/fuego → /senda/fuego.html)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}.html -f
+RewriteRule ^ %{REQUEST_URI}.html [L]
+
+# 4) Carpeta → su index.html SIN redirigir (/senda → /senda/index.html), como espera el service worker
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteCond %{REQUEST_FILENAME}/index.html -f
+RewriteRule ^(.*?)/?$ $1/index.html [L]
+
+# 5) Copia descargable del documento maestro
+RewriteRule ^vision-master\.md$ vision-master.txt [L]
+</IfModule>
+
+# Tipos MIME: sin esto los módulos .mjs no cargan («Failed to load module script»)
+AddType text/javascript .js .mjs
+AddType application/json .json
+AddType application/manifest+json .webmanifest
+AddType text/vtt .vtt
+AddType image/svg+xml .svg
+AddType font/woff2 .woff2
+AddType video/mp4 .mp4
+AddType application/wasm .wasm
+AddType text/markdown .md
+AddDefaultCharset utf-8
+AddCharset utf-8 .html .css .js .mjs .json .txt .md .vtt .webmanifest .svg
+
+<IfModule mod_headers.c>
+Header always set X-Content-Type-Options "nosniff"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set X-Frame-Options "SAMEORIGIN"
+Header always set Permissions-Policy "geolocation=(self), camera=(self), microphone=(self), accelerometer=(self), gyroscope=(self), magnetometer=(self)"
+<FilesMatch "\.(html|json|webmanifest)$">
+Header set Cache-Control "no-cache"
+</FilesMatch>
+<Files "senda-sw.js">
+Header set Cache-Control "no-cache, no-store, must-revalidate"
+Header set Service-Worker-Allowed "/"
+</Files>
+<FilesMatch "\.(mp4|jpg|jpeg|png|webp|svg|woff2|vtt)$">
+Header set Cache-Control "public, max-age=2592000"
+</FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+AddOutputFilterByType DEFLATE text/html text/css text/javascript application/json application/manifest+json image/svg+xml text/vtt text/markdown text/plain
+</IfModule>

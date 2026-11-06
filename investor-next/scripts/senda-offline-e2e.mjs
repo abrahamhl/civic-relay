@@ -151,6 +151,175 @@ check('Gemelo digital sin red: recuento de zona, edificio 3D, routers por planta
   tw.total === 14 && tw.affected >= 5 && tw.located >= 50 && tw.within1 >= 95 && tw.gateways >= 1 && tw.board === 15 && /plantas 1, 2, 3, 4/.test(alertOut) && arShown > 0,
   { ...tw, arSignalsInView: arShown });
 
+// ---- Visión por capas: motor de fusión + capas sobre la cámara (sin red)
+await C.page.click('[data-v="vision"]'); await C.page.check('#layers input[value="TOPOGRAFIA"]'); await C.page.waitForTimeout(1500);
+const vis = await C.page.evaluate(() => window.SENDA_BUILDINGS.vision);
+const fusionRows = await C.page.locator('#fusion-table tr').count();
+await C.page.screenshot({ path: resolve(outDir, 'e2e-14-vision-layers.png') });
+check('Visión por capas sin red: probabilidad, espectro, estructura y topografía sobre la cámara; la vivienda con «atrapado» encabeza la prioridad con ≥98 % corroborado por 2 fuentes',
+  vis && ['PROBABILIDAD', 'ESPECTRO', 'ESTRUCTURA', 'TOPOGRAFIA'].every((k) => vis.byLayer[k] > 0) && vis.top.cls === 'CONFIRMADO_POR_RESPUESTA' && vis.top.badge98 && fusionRows >= 9,
+  { byLayer: vis?.byLayer, top: vis?.top, planTop: vis?.planTop });
+
+// ---- Ojo de SENDA (sin red): constelaciones, casos reales y ruta del aviso
+await C.page.goto(base + '/ojo');
+await C.page.waitForFunction(() => window.SENDA_OJO, null, { timeout: 20000 });
+await C.page.click('#cases button[data-id="adamuz"]'); await C.page.waitForTimeout(1500);
+const ojo = await C.page.evaluate(() => window.SENDA_OJO);
+await C.page.screenshot({ path: resolve(outDir, 'e2e-17-ojo.png'), fullPage: true });
+check('Ojo de SENDA sin red: 7 casos reales, satélite visible con elevación, distancia y latencia calculadas, y plan k-de-n ≥99 % con los canales que quedan',
+  ojo.cases === 7 && ojo.selected === 'adamuz' && ojo.path && ojo.path.elevationDeg >= 10 && ojo.path.rangeKm > 700 && ojo.path.delayMs > 2 && ojo.plan.p >= 0.99 && ojo.visible.galileo > 0,
+  { path: ojo.path, plan: ojo.plan, visible: ojo.visible });
+
+// ---- Incendio forestal (sin red): frente, antenas y canal de aviso por pueblo
+await C.page.goto(base + '/incendio');
+await C.page.waitForFunction(() => window.SENDA_FIRE, null, { timeout: 20000 });
+await C.page.evaluate(() => { document.querySelector('#play').click(); const t = document.querySelector('#t'); t.value = '125'; t.dispatchEvent(new Event('input', { bubbles: true })); });
+await C.page.waitForTimeout(1200);
+const fireRes = await C.page.evaluate(() => window.SENDA_FIRE.assets);
+await C.page.screenshot({ path: resolve(outDir, 'e2e-16-incendio.png'), fullPage: true });
+const byId = Object.fromEntries(fireRes.map((a) => [a.id, a]));
+check('Incendio sin red: la antena de Valdeolmos cae antes de su hora límite (aviso adelantado), Navalcerro se avisa a su hora y Hoyarrubia queda fuera de alcance',
+  byId.A.antennaFirst && byId.A.commsLossMin < byId.A.deadlineMin && !byId.B.antennaFirst && byId.C.status === 'FUERA_DE_ALCANCE',
+  { gapMin: Math.round(byId.A.deadlineMin - byId.A.commsLossMin) });
+
+// ---- Vigilancia ferroviaria (sin red)
+await C.page.goto(base + '/via');
+await C.page.waitForFunction(() => window.SENDA_RAIL, null, { timeout: 20000 });
+const rail = await C.page.evaluate(() => window.SENDA_RAIL);
+await C.page.waitForTimeout(300); await C.page.screenshot({ path: resolve(outDir, 'e2e-15-rail-watch.png'), fullPage: true });
+check('Vigilancia ferroviaria sin red: escalón del circuito de vía detectado ≥20 h antes sin alarma del umbral, defectos de vía por los móviles, transición sin supervisión y muro con lluvia',
+  rail.events === 1 && rail.thresholdAlarms === 0 && rail.leadTimeH >= 20 && rail.geoAlerts.some((a) => a.kinds.includes('IMPACTO_REPETIDO')) && rail.geoAlerts.some((a) => a.kinds.includes('DEGRADACION')) && rail.topTransition === 'ALTO_SIN_SUPERVISION' && rail.topAsset === 3,
+  rail);
+
+// ---- Censo radio con dron (sin red): teléfonos exactos por planta e intervalo de personas que cubre la verdad
+await C.page.goto(base + '/dron');
+await C.page.waitForFunction(() => window.SENDA_DRON?.r, null, { timeout: 20000 });
+const dron = await C.page.evaluate(() => { const S = window.SENDA_DRON; return { phones: S.r.floors.map((f) => f.phones.lo), truePhones: S.sc.phones, covered: S.r.floors.every((f) => f.people.lo <= S.sc.truth[f.floor] && S.sc.truth[f.floor] <= f.people.hi), addresses: S.r.addresses, total: S.r.total, empty: S.r.floors[3].people }; });
+await C.page.screenshot({ path: resolve(outDir, 'e2e-18-dron-censo.png'), fullPage: true });
+check('Censo radio con dron sin red: teléfonos exactos por planta pese a la rotación de direcciones, intervalo de personas que contiene la verdad en las 6 plantas y planta sin teléfonos = «0, quizá 1»',
+  JSON.stringify(dron.phones) === JSON.stringify(dron.truePhones) && dron.covered && dron.addresses > 2.5 * dron.total.mid && dron.empty.mid === 0 && dron.empty.hi === 1, dron);
+
+// ---- Arquitectura (sin red): escenarios paso a paso y ficha de cada pieza
+await C.page.goto(base + '/arquitectura');
+await C.page.waitForFunction(() => window.SENDA_ARQ, null, { timeout: 20000 });
+await C.page.click('#sc button[data-i="2"]');
+for (let i = 0; i < 5; i++) await C.page.click('#next');
+await C.page.click('.node[data-id="c-census"]');
+const arq = await C.page.evaluate(() => ({ step: window.SENDA_ARQ.step, cur: document.querySelector('.node.cur')?.dataset.id, edges: document.querySelectorAll('#edges > path').length, detail: document.querySelector('#node-body').textContent, nodes: document.querySelectorAll('.node').length, links: [...new Set([...document.querySelectorAll('#node-body a, .inv a')].map((a) => a.getAttribute('href')))] }));
+await C.page.screenshot({ path: resolve(outDir, 'e2e-19-arquitectura.png'), fullPage: true });
+check('Arquitectura sin red: el escenario «Censo con dron» recorre sus 6 pasos con sus 5 conexiones, y cada pieza muestra estado real, código y enlace',
+  arq.step === 5 && arq.cur === 'd-rescue' && arq.edges === 5 && /Probado en simulación/.test(arq.detail) && /rf-census\.mjs/.test(arq.detail) && arq.nodes >= 30, arq);
+
+// ---- Capacidades v0.12 (sin red): sentidos, riadas, triaje, monte y dron casa por casa
+const cap = async (path, fn, shot) => { await C.page.goto(base + path); await C.page.waitForFunction(() => window.SENDA_VIZ_READY, null, { timeout: 20000 }); await C.page.waitForTimeout(600); const r = await C.page.evaluate(fn); await C.page.screenshot({ path: resolve(outDir, shot), fullPage: true }); return r; };
+const sent = await cap('/sentidos', () => window.SENDA_SENTIDOS, 'e2e-22-sentidos.png');
+check('Sentidos ampliados sin red: el golpe se sitúa a < 0,5 m con 5 móviles y relojes desfasados, y la respiración por Wi-Fi se detecta (≈14 rpm) solo cuando hay persona',
+  sent.result.err < 0.5 && sent.csi.person.detected && Math.abs(sent.csi.person.rpm - 14) < 1.5 && !sent.csi.empty.detected, { err: sent.result.err, csi: sent.csi });
+const agua = await cap('/agua', () => window.SENDA_AGUA, 'e2e-23-riadas.png');
+check('Riadas y maremotos sin red: la subida aguas arriba avisa ≥ 2 h antes en pueblos donde casi no llueve, y subir a una 3.ª planta es más rápido que la llegada del maremoto',
+  agua.result.every((r) => r.leadMin >= 120 && r.localRainMm < 10) && agua.people.every((p) => p.verticalMin < Math.min(...agua.coasts.map((c) => c.etaMin))), { leads: agua.result.map((r) => r.leadMin), coasts: agua.coasts });
+await C.page.goto(base + '/triaje'); await C.page.waitForFunction(() => window.SENDA_VIZ_READY);
+const tri = await C.page.evaluate(() => { const click = (t) => [...document.querySelectorAll('#wiz button')].find((b) => b.textContent.startsWith(t)).click(); click('No'); click('Sí'); click('Más de 7'); document.querySelector('[data-f=bleeding]').click(); const steps = document.querySelector('#out').textContent; document.querySelector('#add').click(); return { cat: window.SENDA_TRIAJE.victims[0].cat, msg: window.SENDA_TRIAJE.msg, steps }; });
+await C.page.screenshot({ path: resolve(outDir, 'e2e-24-triaje.png'), fullPage: true });
+check('Triaje sin red: «no camina, respira, más de 30/min» → ROJO, con indicaciones de hemorragia y un parte de ≤ 160 caracteres que pide el 112 primero',
+  tri.cat === 'ROJO' && /Presión directa/.test(tri.steps) && tri.msg.length <= 160 && /\| 112,/.test(tri.msg), tri);
+const monte = await cap('/monte', () => ({ err: window.SENDA_MONTE.fix.err, maj: window.SENDA_MONTE.fix.errMajorM, tiles: window.SENDA_MONTE.tiles }), 'e2e-25-monte.png');
+check('Monte sin red: posición por rumbos a aerogeneradores y antena dentro de su elipse de error, y mapas de una sierra en menos de 100 MB',
+  monte.err < 2.5 * monte.maj && monte.tiles.mb < 100, monte);
+const bar = await cap('/barrido', () => window.SENDA_BARRIDO, 'e2e-26-barrido.png');
+check('Dron casa por casa sin red: 24 edificios en varias salidas que respetan la batería y tablero de prioridad que encabeza el edificio con más personas probables y daño',
+  bar.sorties.length >= 2 && bar.sorties.flatMap((s) => s.houses).length === 24 && bar.top[0] === 'D2', { sorties: bar.sorties.length, top: bar.top });
+
+// ---- Batería de Internet (sin red): reserva, biblioteca de vecinos y puntos de rebote
+await C.page.goto(base + '/reserva'); await C.page.waitForFunction(() => window.SENDA_VIZ_READY && window.SENDA_RESERVA?.roundTrip, null, { timeout: 20000 });
+const resv = await C.page.evaluate(async () => { const S = window.SENDA_RESERVA; const st = await navigator.storage.estimate(); return { cov: S.coverage, used: S.plan.usedMB, swarm: S.swarm, rt: S.roundTrip.ok, best: S.rebote.best.id, quota: st.quota > 0 }; });
+await C.page.screenshot({ path: resolve(outDir, 'e2e-27-reserva.png'), fullPage: true });
+check('Batería de Internet sin red: 1 GB cubre ≥ 95 % de lo necesario, la biblioteca de vecinos reconstruye el paquete exacto (Reed-Solomon y SHA-256) y la memoria de cobertura elige el cerro con antena de grupo electrógeno',
+  resv.cov >= 0.95 && resv.used <= 1024 && resv.rt && resv.swarm.p >= 0.99 && resv.best === 'ermita' && resv.quota, resv);
+
+// ---- Ruta protectora (sin red): cadena de frenadas, SOS que viaja con los coches, puntos cívicos verificables, detector real
+await C.page.goto(base + '/carretera'); await C.page.waitForFunction(() => window.SENDA_VIZ_READY && window.SENDA_CARRETERA?.ledger, null, { timeout: 20000 });
+await C.page.click('#t-brake'); await C.page.click('#r-btns [data-k="animal"]');
+const road = await C.page.evaluate(() => { const S = window.SENDA_CARRETERA; return { no: S.no.collisions, si: S.si.collisions, sos: S.road.sosDeliveredMin, warned: S.road.warnedBeyondSight, ok: S.ledgerOk, pts: S.ledger.totals, ratio: S.corridor.ratio, live: S.live.state, hex: document.querySelector('#r-hex').textContent.trim().split(' ').length }; });
+await C.page.screenshot({ path: resolve(outDir, 'e2e-28-carretera.png'), fullPage: true });
+check('Ruta protectora sin red: con 1,2 s entre coches el aviso SENDA reduce el choque en cadena de 5 a 1, el SOS sale de la zona sin cobertura en menos de 10 min con los coches que pasan, el libro de puntos cívicos verifica su cadena SHA-256 y el detector marca la frenada',
+  road.no === 5 && road.si === 1 && road.sos !== null && road.sos < 10 && road.warned >= 1 && road.ok && road.ratio < 0.1 && road.live === 'HARD_BRAKE' && road.hex === 24, road);
+
+// ---- v0.15 sin red: situaciones al volante, V16 + SENDA, cámaras (visibilidad física) y exportación a Países Bajos (DATEX II y rood kruis)
+const drv = await C.page.evaluate(() => { const S = window.SENDA_CARRETERA; return { v16: S.v16.incidents[0].kind, trapped: S.v16.incidents[0].trapped, orphan: S.v16.orphans.length, w: S.lwr.w, calc: S.calc, rows: document.querySelectorAll('#z-tb tr').length }; });
+check('Situaciones al volante sin red: V16 + SENDA convierte una baliza en «accidente con atrapado», la cola crece hacia atrás a 14,3 km/h (LWR) y las calculadoras de niebla, firme y agua responden',
+  drv.v16 === 'ACCIDENTE' && drv.trapped === 1 && drv.orphan === 1 && drv.w === -14.3 && drv.calc.vis === 72 && drv.calc.flood === 'PIERDE_CONTROL' && drv.rows >= 18, drv);
+const cam = await cap('/camaras', () => ({ est: window.SENDA_CAMARAS.est.visM, vis: window.SENDA_CAMARAS.vis, never: [...document.querySelectorAll('#f-tb .chip.no')].length, rows: document.querySelectorAll('#f-tb tr').length }), 'e2e-29-camaras.png');
+check('Cámaras sin red: la visibilidad estimada en la imagen con niebla de 120 m queda a menos del 15 %; el registro reúne ≥ 30 fuentes oficiales con licencia y lo prohibido (cámaras sin permiso, agregadores de datos personales, matrículas, biometría) aparece como NUNCA',
+  Math.abs(cam.est - cam.vis) / cam.vis < 0.15 && cam.never === 4 && cam.rows >= 30, cam);
+const nl = await cap('/paises', () => ({ d: window.SENDA_PAISES.datex, conv: window.SENDA_PAISES.plan.needsConvenio }), 'e2e-30-paises.png');
+const msi = await C.page.evaluate(async () => { document.querySelector('#m-say').click(); await new Promise((r) => setTimeout(r, 50)); return window.SENDA_PAISES.spoken; });
+check('Exportación a Países Bajos sin red: el lector DATEX II convierte la publicación en avisos y se queda con los 3 de la ruta; el rood kruis se dice en neerlandés; las cámaras allí requieren convenio',
+  nl.d.records === 5 && nl.d.route === 3 && /Rood kruis op rijstrook 1: voeg in naar rechts/.test(msi) && nl.conv.includes('Cámaras'), { ...nl, msi });
+
+// ---- v0.16 sin red: infraestructura de la DGT (solo datos publicados), cola desde aforos DATEX II y paneles
+const dgt = await cap('/dgt', () => { const S = window.SENDA_DGT; return { gw: S.gateways, q: S.queue, vms: S.vms, radar: S.radar, never: document.querySelectorAll('#t-tb .chip.no').length }; }, 'e2e-31-dgt.png');
+check('Infraestructura DGT sin red: ningún equipo de la vía es pasarela (solo DGT 3.0 por convenio), detectar radares y publicar controles móviles es NUNCA, las estaciones de aforo localizan la cola y los paneles se convierten en avisos',
+  dgt.gw.join() === 'dgt30' && dgt.never === 2 && dgt.q.sTail === 3000 && dgt.q.growing && dgt.vms.join() === 'CRASH,FOG,CRASH' && dgt.radar.zone && dgt.radar.avg === 106, dgt);
+
+// ---- v0.17 sin red: visión con vídeo real (métricas guardadas) y coches conectados (fusión de posición, Kalman, k-anonimato)
+const tv = await cap('/trafico', () => window.SENDA_TRAFICO, 'e2e-32-trafico.png');
+check('Visión de tráfico sin red: métricas del vídeo real (12 vehículos seguidos a bordo, 15 contactos/min de la calzada contraria, ningún falso «¡Frena!»; cámara fija convertida en caudal)',
+  tv.dash.tracked >= 10 && tv.dash.oncomingPerMin >= 10 && tv.dash.probe.alerts.length === 0 && tv.fixed.measured.flowVehH > 0, tv);
+const veh = await cap('/vehiculos', () => window.SENDA_VEHICULOS, 'e2e-33-vehiculos.png');
+check('Coches conectados sin red: la posición pasa de ~10 m (GNSS) a menos de 2,5 m sumando vía, aerogenerador, Wi-Fi y otro coche; el tramo se fusiona con Kalman y solo se publica la celda con k ≥ 5 fuentes',
+  veh.steps[0].err > 8 && veh.steps[4].err < 2.5 && veh.steps[4].rms < 1.5 && veh.segment.sdKmh < 3 && veh.privacy.published === 1 && veh.privacy.suppressed === 1, veh);
+
+// ---- v0.18 sin red: seguimiento de incendio (rumbos de torres y móviles, satélite, meteorología, criticidad, carreteras y coches)
+const fu = await cap('/fuego', () => window.SENDA_FUEGO, 'e2e-34-fuego.png');
+const fuCalc = await C.page.evaluate(async () => { const set = (id, v) => { const el = document.querySelector(id); el.value = v; el.dispatchEvent(new Event('input')); }; set('#w-t', 22); set('#w-h', 60); set('#w-v', 10); set('#w-r', 0.5); set('#w-u', 'pasto'); await new Promise((r) => setTimeout(r, 30)); const out = { ...window.SENDA_FUEGO.calc }; document.querySelector('#p-add').click(); return { ...out, sighting: window.SENDA_FUEGO.sighting }; });
+check('Seguimiento de incendio sin red: la columna se sitúa a < 400 m cruzando rumbos y se descarta la brújula descalibrada; satélite → avance de 25 m/min; criticidad extrema; se corta la M-501 alrededor del km 57 con aviso a los coches; la calculadora baja a clase 1 sin 30-30-30 y el móvil prepara la observación sin enviar la foto',
+  fu.fix.errM < 400 && fu.fix.rejected.includes('movil-4') && Math.abs(fu.ros - 25) <= 5 && fu.level === 'extrema' && fu.roads.find((r) => r.id === 'M-501').action === 'cortar' && fu.roads.find((r) => r.id === 'M-501').section.pkTo >= 56.5 && fu.alerts >= 1 && fu.firstTown === 'Pelayos de la Presa'
+  && fuCalc.rule30 === 0 && fuCalc.attack === 1 && /a mano/.test(fuCalc.sighting.rumbo) && /se queda en el teléfono/.test(fuCalc.sighting.foto), { fu, fuCalc });
+
+// ---- v0.19 sin red: incendio en 3D con datos reales (terreno, satélite, GFS), viento 3D, cámaras y gestos
+const f3 = await cap('/fuego3d', () => window.SENDA_FUEGO3D, 'e2e-35-fuego3d.png');
+const f3b = await C.page.evaluate(async () => { const S = window.SENDA_FUEGO3D; S.api.tilt(0.02); const top = S.api.view.pitch; S.api.tilt(1.45); const hor = S.api.view.pitch; document.querySelector('#cam2').click(); document.querySelector('#plane').click(); await new Promise((r) => setTimeout(r, 300)); return { top, hor, cam: S.cameraView, flight: S.flight?.circulation ?? null, drop: S.flight?.drop?.secondsCancelled ?? null }; });
+check('Incendio en 3D sin red: terreno Copernicus 380×339 y GFS real del 23-07 cargados; el viento 3D se resuelve en el teléfono conservando la masa; la pluma sube; vistas cenital y horizontal, vista desde una cámara y pasada de un CL-415 con su estela',
+  f3.ok && f3.errors.length === 0 && f3.dem.w === 380 && f3.dem.h === 339 && f3.state.divAfter < f3.state.divBefore / 50 && f3.state.plumeTop > 200 && f3b.top < 0.05 && f3b.hor > 1.4 && f3b.cam === 2 && f3b.flight > 50 && f3b.drop > 0, { f3: { ok: f3.ok, errors: f3.errors, state: f3.state, grid: f3.grid }, f3b });
+
+// ---- v0.20 sin red: incendios de referencia (GOES y HRRR reales) y coches + cámaras de tráfico + fuego
+const rf = await cap('/referencias', () => window.SENDA_REF, 'e2e-36-referencias.png');
+check('Incendios de referencia sin red: 14 casos con fuentes y ≥ 5 reconstruidos con GOES; Camp medido por satélite ≈ 7,5 km/h como NIST; el fuego llega a ≤ 3 km de Pentz Rd hacia las 08:17 (NIST: 08:30); validación dejando fuera incendios enteros',
+  rf.ok && rf.casos >= 14 && rf.reconstruidos >= 5 && Math.abs(rf.campGoes - 7.5) < 2.5 && rf.pentz[0] >= '08:00' && rf.pentz[0] <= '08:45' && rf.puntos >= 4 && rf.cobertura80 > 0.5, rf);
+const ev = await cap('/evacuacion', () => window.SENDA_EVAC, 'e2e-37-evacuacion.png');
+check('Coches, cámaras y fuego sin red: en Eaton SENDA avisa a Altadena oeste horas antes de la orden real; en Skyway los cierres casi eliminan la exposición; el filtro de Kalman detecta el atasco de Chico y el bloqueo de Palisades Dr en ≤ 10 min; cámaras reales de Caltrans y TfL',
+  ev.ok && ev.eatonAdelantoH > 3 && ev.escenarios['cierres-senda'].expuestos * 100 < ev.escenarios['aviso-al-detectar'].expuestos && ev.deteccionAtasco - 45 <= 10 && ev.deteccionBloqueo - 50 <= 10 && ev.caltrans >= 10 && ev.caltransVideo >= 5 && ev.tfl >= 10, ev);
+
+// ---- Llamada sin Internet: dos teléfonos nuevos, código por SONIDO (onda real) y conexión directa sin servidor.
+// (La emulación «offline» de Chromium también bloquea WebRTC local, así que aquí se demuestra lo equivalente:
+//  sin servidores STUN/TURN ni de señalización y CERO peticiones de red desde que empieza la llamada.)
+const callPhone = async () => { const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, permissions: ['microphone'] }); const page = await ctx.newPage(); const errors = []; page.on('pageerror', (e) => errors.push(String(e))); await page.goto(base + '/llamada'); await page.waitForFunction(() => window.SENDA_CALL_API); const reqs = []; page.on('request', (r) => reqs.push(r.url())); return { ctx, page, errors, reqs }; };
+const D = await callPhone(), E = await callPhone();
+const offerCode = await D.page.evaluate(() => window.SENDA_CALL_API.createOffer());
+const offerWave = await D.page.evaluate(async (t) => { const m = await import('/senda/core/acoustic-modem.mjs'), s = await import('/senda/core/sdp-compact.mjs'); return Array.from(m.modulate(s.callFromText(t), { sampleRate: 48000 })); }, offerCode);
+const heardOffer = await E.page.evaluate(async (arr) => { const m = await import('/senda/core/acoustic-modem.mjs'), s = await import('/senda/core/sdp-compact.mjs'); const r = m.demodulate(Float32Array.from(arr), { sampleRate: 48000 }); return r && s.callToText(r.payload); }, offerWave);
+const answerCode = await E.page.evaluate((t) => window.SENDA_CALL_API.acceptOffer(t), heardOffer);
+await D.page.evaluate((t) => window.SENDA_CALL_API.acceptAnswer(t), answerCode);
+await D.page.waitForFunction(() => window.SENDA_CALL.state === 'connected', null, { timeout: 15000 }).catch(() => {});
+await E.page.waitForFunction(() => window.SENDA_CALL.state === 'connected', null, { timeout: 15000 }).catch(() => {});
+await D.page.evaluate(() => window.SENDA_CALL_API.send('Hola, te oigo')); await E.page.click('#sos');
+await D.page.waitForTimeout(2500);
+const call = { d: await D.page.evaluate(() => ({ ...window.SENDA_CALL, path: document.querySelector('#k-path').textContent })), e: await E.page.evaluate(() => ({ ...window.SENDA_CALL })), offerS: +(offerWave.length / 48000).toFixed(1), soundExact: heardOffer === offerCode, requestsDuringCall: [...D.reqs, ...E.reqs].filter((u) => !u.startsWith('data:')) };
+await D.page.screenshot({ path: resolve(outDir, 'e2e-20-llamada.png'), fullPage: true });
+check('Llamada sin Internet: oferta de <110 bytes por sonido (onda real, decodificada exacta), conexión directa cifrada, voz Opus y chat en ambos sentidos y cero peticiones de red durante la llamada',
+  call.soundExact && call.d.sentBytes < 110 && call.e.sentBytes < 110 && call.d.state === 'connected' && call.e.state === 'connected' && call.e.received.includes('Hola, te oigo') && call.d.received.some((m) => m.startsWith('🆘')) && call.d.audioPackets > 20 && call.e.audioPackets > 20 && call.requestsDuringCall.length === 0 && call.d.path === 'local, sin servidor',
+  { offerBytes: call.d.sentBytes, answerBytes: call.e.sentBytes, offerSoundS: call.offerS, audioPackets: [call.d.audioPackets, call.e.audioPackets], requests: call.requestsDuringCall });
+await D.page.evaluate(() => document.querySelector('#hang').click());
+const demo = await E.page.evaluate(async () => { await window.SENDA_CALL_API.demoHere(); return window.SENDA_CALL.demo; });
+check('Llamada de prueba en un solo dispositivo (sin micrófono): dos conexiones reales A↔B con el código por forma de onda, mensaje y audio recibidos', demo.connected && demo.message?.includes('3.ª planta') && demo.audioPackets > 10, demo);
+const chain = await E.page.evaluate(async () => { const before = window.SENDA_CALL.mesh; document.querySelector('#mesh-bat').click(); await new Promise((r) => setTimeout(r, 150)); const low = window.SENDA_CALL.mesh; document.querySelector('#mesh-bat').click(); await window.SENDA_CALL_API.chainDemo(); return { before, low, ...window.SENDA_CALL.chain }; });
+await E.page.locator('#mesh').screenshot({ path: resolve(outDir, 'e2e-21-cadena-voz.png') });
+check('Cadena de voz real A → B → C: B reenvía la voz de A (C oye el tono de 440 Hz de A) y el chat; el plan nunca usa como repetidor a quien tiene poca batería y avisa de quién queda aislado',
+  chain.connected && Math.abs(chain.freqAtC - 440) <= 12 && chain.audioPacketsAtC > 20 && chain.message?.includes('4.ª planta') && !chain.before.relays.includes('Marta') && chain.before.unreachable.length === 0 && chain.low.unreachable.join() === 'Ana,Luis,Marta',
+  { freqAtC: chain.freqAtC, audioPacketsAtC: chain.audioPacketsAtC, relays: chain.before.relays, isolatedWhenLow: chain.low.unreachable });
+for (const p of [D, E]) { A.errors.push(...p.errors); await p.ctx.close(); }
+
 // ---- Flujo institucional real: organismo → credencial → alerta firmada → mula → residente → respuesta → cuadro
 const orgPage = await A.ctx.newPage(); orgPage.on('pageerror', (e) => A.errors.push(String(e)));
 await orgPage.goto(base + '/organismo');
@@ -249,12 +418,13 @@ const a11y = async (page) => page.evaluate(() => {
   return issues;
 });
 const a11yIssues = {};
-for (const path of ['', '/red', '/organismo', '/incidente', '/edificios', '/estado']) {
+const a11yScreens = ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva', '/carretera', '/camaras', '/paises', '/dgt', '/trafico', '/vehiculos', '/fuego', '/fuego3d', '/referencias', '/evacuacion'];
+for (const path of a11yScreens) {
   await R.goto(base + path); await R.waitForLoadState('load'); await R.waitForTimeout(300);
   const iss = await a11y(R); if (iss.length) a11yIssues[path || '/'] = iss;
 }
 await R.close();
-check('Accesibilidad automática en las 6 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo', Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
+check(`Accesibilidad automática en las ${a11yScreens.length} pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo`, Object.keys(a11yIssues).length === 0, { issues: a11yIssues });
 
 check('Sin errores de JavaScript en los 3 teléfonos', [A, B, C].every((p) => p.errors.length === 0), { errors: [A, B, C].flatMap((p) => p.errors) });
 

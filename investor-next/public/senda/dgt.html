@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Infraestructura DGT</title>
+<meta name="description" content="Qué equipos de la DGT en la vía (radares, paneles, cámaras, aforos, postes SOS, balizas V16) se pueden sumar a SENDA, cómo y qué no: solo datos publicados y convenio; nunca detectar radares ni usar sus radios.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/carretera">Ruta protectora</a> · <a href="/senda/camaras">Cámaras</a> · <a href="/senda/paises">España y Países Bajos</a> · <a href="/senda/arquitectura">Arquitectura</a></p>
+<h1>Infraestructura de la DGT</h1>
+<p class="lead m">En la carretera hay miles de equipos de la DGT: radares, paneles, cámaras, estaciones de aforo, postes SOS y, desde 2026, una baliza V16 en cada coche parado. ¿Pueden ser pasarelas de SENDA? La respuesta comprobada es <b>no como radio, sí como dato</b>. Cada equipo habla con la DGT por un canal propio y cerrado, y usarlo para transmitir sería entrar en un sistema ajeno. Pero la DGT <b>publica</b> muchas de sus ubicaciones, estados y medidas, y con un <b>convenio</b> (DGT 3.0) SENDA pasaría a formar parte del sistema.</p>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-t">
+  <h2 id="h-t">🧾 Equipo por equipo</h2>
+  <div class="tw"><table><thead><tr><th>Equipo</th><th>Qué emite o hace</th><th>¿Pasarela?</th><th>Qué suma a SENDA</th><th>Acceso</th><th>Nota legal</th></tr></thead><tbody id="t-tb"></tbody></table></div>
+</section>
+
+<section class="card" data-viz="detectores" style="margin-top:14px" aria-labelledby="h-d">
+  <h2 id="h-d">📶 Estaciones de aforo: la cola, vista desde los datos de la DGT</h2>
+  <div class="g2" style="margin-top:0">
+    <div><canvas id="cv-d" aria-label="Autovía con seis estaciones de aforo; las barras muestran la velocidad media en cada una; la retención crece hacia atrás y SENDA avisa al coche que se acerca de dónde se encontrará la cola"></canvas></div>
+    <div>
+      <div class="kv" style="grid-template-columns:repeat(2,1fr)"><div><b id="d-tail">—</b><span>final de la retención</span></div><div><b id="d-w">—</b><span>velocidad a la que crece hacia atrás</span></div></div>
+      <p class="m" style="font-size:14px">Cada estación mide <b>caudal</b> (coches por hora) y <b>velocidad media</b>, y la DGT o NDW las publican en DATEX II. SENDA lee esas medidas y encuentra la primera estación lenta. Con la diferencia de caudal y densidad a cada lado calcula a qué velocidad crece la cola: w = Δq/Δk. Al coche que se acerca no le dice dónde estaba la cola, sino <b>dónde estará cuando llegue</b>.</p>
+      <div class="tw"><table><thead><tr><th>Estación</th><th>Caudal</th><th>Velocidad</th></tr></thead><tbody id="d-tb"></tbody></table></div>
+      <p class="src">Medidas de <b>ejemplo</b> con la estructura de DATEX II v3, leídas con el mismo lector (<code>parseMeasured</code>). Disponibilidad abierta de los aforos en tiempo real de la DGT: <b>pendiente de verificar</b> en su Punto de Acceso Nacional.</p>
+    </div>
+  </div>
+</section>
+
+<div class="g2">
+  <section class="card" aria-labelledby="h-r">
+    <h2 id="h-r">📍 Radares publicados: el límite, no el truco</h2>
+    <p class="m" style="margin-top:0">La DGT publica la vía, el PK y el sentido de sus radares fijos y de tramo. Avisar de esa ubicación es lícito, y lo hacen todos los navegadores. SENDA lo usa para <b>recordar el límite</b> y marcar puntos de riesgo. En los tramos calcula tu media y te avisa si la superas, pero <b>nunca</b> te dice «puedes ir más rápido el resto», porque el límite rige en cada punto.</p>
+    <div class="row"><label class="m">Tu velocidad <b id="r-vv">120</b> km/h <input type="range" id="r-v" min="60" max="150" step="5" value="120" aria-label="Tu velocidad en km/h"></label></div>
+    <p class="m" id="r-o"></p>
+    <div class="row"><label class="m">Tramo de 5 km recorrido en <b id="r-tv">170</b> s <input type="range" id="r-t" min="120" max="300" step="5" value="170" aria-label="Segundos para recorrer el tramo"></label></div>
+    <p class="m" id="r-s"></p>
+    <div class="note" style="border-color:var(--r)"><b>Nunca:</b> detectar las emisiones de un radar (detectores prohibidos desde 2014: multa y 3 puntos), anularlas (inhibidores: hasta 6.000 € y 6 puntos) ni publicar controles móviles de la policía. Esto último no está prohibido por ley, pero SENDA quiere ser socio de la DGT, no una herramienta para esquivarla.</div>
+  </section>
+  <section class="card" aria-labelledby="h-p">
+    <h2 id="h-p">🪧 Paneles: lo que dice la vía, también sin red</h2>
+    <p class="m" style="margin-top:0">El texto de los paneles de mensaje variable se publica en DATEX II. SENDA lo lee, lo convierte en aviso (en español o en neerlandés) y lo guarda en la reserva de la ruta: si más adelante pierdes la cobertura, el aviso sigue ahí.</p>
+    <div class="tw"><table><thead><tr><th>Panel</th><th>Texto</th><th>Aviso SENDA</th></tr></thead><tbody id="p-tb"></tbody></table></div>
+    <p class="src">Paneles de <b>ejemplo</b> (estructura orientativa). Datos reales: «Paneles DGT · tiempo real · DATEX II v3.6» en el Punto de Acceso Nacional; en Países Bajos, NDW.</p>
+  </section>
+</div>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-f">
+  <h2 id="h-f">📚 Fuentes</h2>
+  <p class="src"><a href="https://www.motorpasion.com/seguridad/dgt-recuerda-que-puedes-usar-avisador-radares-cambio-detectores-e-inhibidores-conllevan-cuantiosa-multa">DGT: avisadores lícitos; detectores e inhibidores sancionados</a> · <a href="https://www.motor16.com/noticias/dgt-6-000-euros-6-puntos-multa/">inhibidores: 6.000 € y 6 puntos</a> · <a href="https://www.motor16.com/noticias/donde-estan-radares-fijos-dgt/">ubicación de radares publicada por la DGT</a> · <a href="https://www.highmotor.com/dgt-retirara-gran-parte-postes-sos-carreteras-espanolas.html">retirada de postes SOS</a> · <a href="https://nap.dgt.es/en/dataset/paneles-dgt-tiempo-real-datex2-v3-6">paneles de la DGT en DATEX II</a> · <a href="https://nap.dgt.es/en/dataset/camaras-dgt-datex2-v3-6-nuevo">cámaras de la DGT</a> · <a href="https://english.ndw.nu/our-data">NDW</a>. La cuantía exacta de la multa por detector (200 o 500 €, según la fuente) está pendiente de confirmar en el BOE. Código: <code>dgt-infra.mjs</code>, <code>datex2.mjs</code>, <code>drive-cases.mjs</code>.</p>
+</section>
+</main>
+<script type="module">
+import { $, C, canvas, text, rr, run, clamp, FILM, drawCar, drawRoad, carColor } from '/senda/kit.mjs';
+import { DGT_INFRA, speedZoneAdvice, sectionAverage, detectorQueue, vmsToHazard } from '/senda/core/dgt-infra.mjs';
+import { parseMeasured, parseVms, SAMPLE_MEASURED, SAMPLE_VMS } from '/senda/core/datex2.mjs';
+import { queueWarning } from '/senda/core/drive-cases.mjs';
+const S = {}; window.SENDA_DGT = S;
+const CH = { PASIVO: 'ok', CONVENIO: 'todo', NUNCA: 'no' };
+$('#t-tb').innerHTML = DGT_INFRA.map((d) => `<tr><td><b>${d.name}</b></td><td class="m">${d.emits}</td><td>${d.gateway ? '✅ canal oficial' : '❌'}</td><td>${d.senda}</td><td><span class="chip ${CH[d.access]}">${d.access}</span></td><td class="m">${d.legal}</td></tr>`).join('');
+S.gateways = DGT_INFRA.filter((d) => d.gateway).map((d) => d.id);
+
+// ---- aforos
+const sites = parseMeasured(SAMPLE_MEASURED).map((x, i) => ({ ...x, s: i * 1000 })); S.queue = detectorQueue(sites);
+$('#d-tail').textContent = `${S.queue.sTail / 1000} km`; $('#d-w').textContent = `${String(Math.abs(S.queue.wKmh)).replace('.', ',')} km/h`;
+$('#d-tb').innerHTML = sites.map((x) => `<tr><td>${x.id}</td><td>${x.flowVehH} veh/h</td><td>${x.speedKmh < 30 ? '🔴' : '🟢'} ${x.speedKmh} km/h</td></tr>`).join('');
+const gd = canvas($('#cv-d'));
+function drawD(t) {
+  const g = gd, P = 16, lt = t % P, tt = clamp(lt / 14) * 240, w = S.queue.wKmh / 3.6, tail = S.queue.sTail + w * tt, X = (s) => 50 + ((s + 3000) / 9000) * 560;
+  g.fillStyle = C.bg; g.fillRect(0, 0, 640, 600);
+  drawRoad(g, 20, 296, 600, 80, { lanes: 2, offset: tt * 6 });
+  // tráfico: separación de ~45 m libre y ~8 m en la cola (densidades de las estaciones), avanzando a su velocidad
+  const md = (a, m) => ((a % m) + m) % m;
+  for (let lane = 0; lane < 2; lane++) {
+    for (let k = 0; k < 40; k++) { const sP = -3000 + md(k * 330 + lane * 160 + tt * 27, 12000); if (sP < tail - 60 && X(sP) > 24) drawCar(g, X(sP), 316 + lane * 38, { len: 15, color: carColor(k + lane), lights: true }); }
+    for (let k = 0; k < 60; k++) { const sQ = tail + md(k * 120 + lane * 60 + tt * 5, Math.max(1, 6000 - tail)); if (X(sQ) < 616) drawCar(g, X(sQ), 316 + lane * 38, { len: 15, color: carColor(k + 3 * lane), braking: true }); }
+  }
+  g.fillStyle = 'rgba(255,91,110,.12)'; g.fillRect(X(tail), 296, 620 - X(tail), 80);
+  sites.forEach((x) => { const cong = x.s >= tail, v = cong ? 22 : 96, h = (v / 110) * 200, xx = X(x.s); g.fillStyle = cong ? C.r : C.e; rr(g, xx - 14, 280 - h, 28, h, 4); g.fill(); text(g, `${v}`, xx, 272 - h, { c: C.t, f: '700 12px Inter,system-ui', al: 'center' }); g.fillStyle = '#e5e7eb'; g.fillRect(xx - 2, 300, 4, 70); text(g, x.id, xx, 392, { c: C.m, f: '11px Inter,system-ui', al: 'center' }); });
+  g.strokeStyle = C.r; g.lineWidth = 3; g.beginPath(); g.moveTo(X(tail), 290); g.lineTo(X(tail), 380); g.stroke(); g.lineWidth = 1; text(g, '← la cola crece', X(tail) - 6, 418, { c: C.r, f: '700 12px Inter,system-ui', al: 'right' });
+  const me = -2800 + (110 / 3.6) * tt * 0.5, qw = queueWarning({ sMe: me, vMeKmh: 110, sTail: tail, wKmh: S.queue.wKmh });
+  if (me < tail - 50) { drawCar(g, X(me), 354, { len: 20, color: '#91d7e8', lights: true }); text(g, 'tú', X(me), 392, { c: C.i, f: '700 11px Inter,system-ui', al: 'center' }); }
+  text(g, 'Velocidad media en cada estación (km/h) · datos DATEX II', 20, 34, { c: C.t, f: '800 14px Inter,system-ui' });
+  g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 450, 600, 130, 12); g.fill(); g.strokeStyle = C.a; g.stroke();
+  text(g, me < tail - 50 ? `SENDA: «${qw.say}»` : 'Llegas a la cola ya a baja velocidad, sin frenazo', 34, 482, { c: C.a, f: '800 14px Inter,system-ui' });
+  text(g, `Final de la retención ahora: km ${(tail / 1000).toFixed(1).replace('.', ',')} · crece hacia atrás a ${String(Math.abs(S.queue.wKmh)).replace('.', ',')} km/h`, 34, 510, { c: C.t, f: '13px Inter,system-ui' });
+  text(g, `Entre ${S.queue.between.join(' y ')}: de 1.810 coches/h a 94 km/h, a 1.200 coches/h a 22 km/h`, 34, 534, { c: C.m, f: '12px Inter,system-ui' });
+  text(g, `minuto ${(tt / 60).toFixed(1).replace('.', ',')}`, 34, 560, { c: C.g, f: '12px Inter,system-ui' });
+}
+
+// ---- radares publicados
+const radar = () => { const v = +$('#r-v').value, z = speedZoneAdvice({ vKmh: v, limitKmh: 100, distM: 600 }); $('#r-vv').textContent = v; $('#r-o').innerHTML = z.over ? `Zona de control publicada a 600 m: <b>${z.say}</b> (≈ ${String(z.decelMs2).replace('.', ',')} m/s²).` : 'Vas dentro del límite de 100 km/h: sin aviso.';
+  const tS = +$('#r-t').value, a = sectionAverage({ travelledM: 5000, elapsedS: tS, limitKmh: 100 }); $('#r-tv').textContent = tS; $('#r-s').innerHTML = a.over ? `<b>${a.say}</b>.` : `Tu media en el tramo es ${a.avgKmh} km/h, dentro del límite.`; S.radar = { zone: z.over, avg: a.avgKmh }; };
+$('#r-v').oninput = radar; $('#r-t').oninput = radar; radar();
+
+// ---- paneles
+const vms = parseVms(SAMPLE_VMS); S.vms = vms.map((p) => vmsToHazard(p.lines));
+const LBL = { CRASH: 'Accidente', FOG: 'Niebla', QUEUE: 'Retención', LANE_CLOSED: 'Carril cerrado', WORKS: 'Obras', ICE: 'Hielo', WRONG_WAY: 'Sentido contrario', STOPPED: 'Vehículo detenido', ANIMAL: 'Animal', FIRE: 'Incendio', FLOOD: 'Inundación' };
+$('#p-tb').innerHTML = vms.map((p, i) => `<tr><td><code>${p.id}</code></td><td>${p.lines.join(' · ')}</td><td>${LBL[S.vms[i]] ?? '—'}</td></tr>`).join('');
+run({ detectores: drawD });
+</script>
+</body></html>

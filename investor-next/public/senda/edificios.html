@@ -24,12 +24,13 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px
 .floors{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}.floors label{border:1px solid var(--l);border-radius:8px;padding:4px 7px;font-size:13px;cursor:pointer}.floors input{margin-right:4px}
 .hud{position:absolute;left:10px;top:10px;font:12px ui-monospace,monospace;background:rgba(5,9,12,.7);padding:6px 8px;border-radius:8px}
 .scale{position:absolute;right:10px;bottom:10px;width:160px;height:12px;border-radius:6px;background:linear-gradient(90deg,rgb(0,0,255),rgb(0,255,0) 50%,rgb(255,0,0));}
+.layers{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;margin-top:8px}.layers label{border:1px solid var(--l);border-radius:8px;padding:3px 7px;cursor:pointer}
 .scale+span{position:absolute;right:10px;bottom:24px;font-size:11px;color:#fff}
 pre{white-space:pre-wrap;font:12px ui-monospace,monospace;color:var(--i)}
 </style>
 </head>
 <body><main>
-<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/incidente">Incidente ferroviario</a> · <a href="/senda/estado">Verificación</a></p>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/incidente">Incidente ferroviario</a> · <a href="/senda/via">Vigilancia ferroviaria</a> · <a href="/senda/estado">Verificación</a></p>
 <h1>Gemelo digital de edificios afectados</h1>
 <p class="m">Recuento de la zona con la escala europea EMS-98, edificio en 3D por plantas y viviendas, <b>routers localizados por su señal</b> (barrido a pie o con dron), <b>pasarelas</b> con Internet confirmado, personas por estado (<b>desaparecido sin confirmar</b>, nunca «víctima») y <b>alertas dirigidas por planta</b>. Escenario «edificio 14» sintético procesado con los algoritmos reales; el botón OSM carga edificios reales de OpenStreetMap a tu alrededor.</p>
 
@@ -44,12 +45,25 @@ pre{white-space:pre-wrap;font:12px ui-monospace,monospace;color:var(--i)}
 
 <div class="grid">
   <div class="card">
-    <div class="tabs"><button data-v="zone" class="on">Zona (vista dron)</button><button data-v="tower">Edificio 14 en 3D</button><button data-v="ar">Cámara · mapa de calor</button><button id="osm">Cargar edificios reales (OSM)</button></div>
+    <div class="tabs"><button data-v="zone" class="on">Zona (vista dron)</button><button data-v="tower">Edificio 14 en 3D</button><button data-v="ar">Cámara · mapa de calor</button><button data-v="vision">Visión por capas</button><button id="osm">Cargar edificios reales (OSM)</button></div>
     <div class="view3d" id="view"><canvas id="gl"></canvas><video id="cam" playsinline muted hidden></video><canvas id="overlay" hidden></canvas><div class="hud" id="hud"></div></div>
+    <div class="layers" id="layers" hidden><span class="m">Capas:</span>
+      <label><input type="checkbox" value="PROBABILIDAD" checked> Probabilidad</label><label><input type="checkbox" value="ESPECTRO" checked> Espectro</label>
+      <label><input type="checkbox" value="ESTRUCTURA" checked> Estructura</label><label><input type="checkbox" value="TOPOGRAFIA"> Topografía</label>
+      <label title="Necesita una cámara térmica USB-C conectada"><input type="checkbox" value="TERMICA" disabled> Térmica real</label></div>
     <div class="legend" id="legend"></div>
     <p class="m" id="osm-state"></p>
   </div>
   <div class="card">
+    <div id="fusion-card" hidden>
+      <h2>Dónde buscar primero · motor de fusión</h2>
+      <p class="m" id="fusion-sum"></p>
+      <table id="fusion-table"></table>
+      <h2 style="margin-top:12px">Siguiente medida recomendada</h2>
+      <table id="plan-table"></table>
+      <details style="margin-top:8px"><summary>Por qué (traza de la vivienda más prioritaria)</summary><pre id="fusion-trace"></pre></details>
+      <p class="m" style="font-size:12px">Probabilidad calculada con parámetros hipotéticos hasta la calibración de campo. Intervalo = rango de los parámetros. «≥98 %» solo con dos familias de evidencia independientes. Nadie se declara víctima.</p>
+    </div>
     <h2>Estado por planta · edificio 14</h2>
     <table id="board"></table>
     <h2 style="margin-top:14px">Alerta dirigida (coordinador verificado)</h2>
@@ -66,6 +80,10 @@ import { simulateBuildingIncident, ZONE_ORIGIN } from '/senda/core/building-scen
 import { signalColor, buildingsFromOverpass, prepareBuilding, overpassQuery, targetAudience, FLOOR_HEIGHT_M, EMS98 } from '/senda/core/building-twin.mjs';
 import { projectToCamera } from '/senda/core/rubble.mjs';
 import { ACTIONS } from '/senda/core/remote-command.mjs';
+import { fuseOccupancy } from '/senda/core/occupancy.mjs';
+import { fusionInputFromBuildingSim } from '/senda/core/rescue-scenario.mjs';
+import { composeLayers, LAYERS, SPECTRUM_COLORS, probabilityColor } from '/senda/core/vision-layers.mjs';
+import { planNextSensing } from '/senda/core/sensor-fabric.mjs';
 const $ = (s) => document.querySelector(s);
 const sim = simulateBuildingIncident();
 window.SENDA_BUILDINGS = { sim };
@@ -118,18 +136,19 @@ for (const p of sim.people.list) if (PCOL[p.state]) { const [sx, sy] = unitXY[p.
 
 let mode = 'zone', yaw = 0.8, pitch = 0.55, dist = 260, target = new THREE.Vector3(0, 10, 0), drag = null;
 view.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY }; view.setPointerCapture(e.pointerId); });
-view.addEventListener('pointermove', (e) => { if (drag && mode === 'ar') { heading -= (e.clientX - drag.x) * 0.004; tilt = Math.max(-0.6, Math.min(1.2, tilt + (e.clientY - drag.y) * 0.004)); drag = { x: e.clientX, y: e.clientY }; return; } if (!drag || mode === 'ar') return; yaw -= (e.clientX - drag.x) * 0.008; pitch = Math.max(0.05, Math.min(1.45, pitch + (e.clientY - drag.y) * 0.006)); drag = { x: e.clientX, y: e.clientY }; });
+view.addEventListener('pointermove', (e) => { if (drag && (mode === 'ar' || mode === 'vision')) { heading -= (e.clientX - drag.x) * 0.004; tilt = Math.max(-0.6, Math.min(1.2, tilt + (e.clientY - drag.y) * 0.004)); drag = { x: e.clientX, y: e.clientY }; return; } if (!drag || mode === 'ar' || mode === 'vision') return; yaw -= (e.clientX - drag.x) * 0.008; pitch = Math.max(0.05, Math.min(1.45, pitch + (e.clientY - drag.y) * 0.006)); drag = { x: e.clientX, y: e.clientY }; });
 view.addEventListener('pointerup', () => (drag = null));
 view.addEventListener('wheel', (e) => { e.preventDefault(); dist = Math.max(30, Math.min(700, dist * (1 + e.deltaY * 0.001))); }, { passive: false });
 function setMode(m) {
   mode = m; document.querySelectorAll('.tabs [data-v]').forEach((b) => b.classList.toggle('on', b.dataset.v === m));
   groups.zone.visible = m === 'zone'; groups.tower.visible = m === 'tower'; groups.osm.visible = m === 'osm';
-  ground.visible = grid.visible = m !== 'ar'; canvas.hidden = m === 'ar'; $('#cam').hidden = $('#overlay').hidden = m !== 'ar';
+  const camMode = m === 'ar' || m === 'vision'; ground.visible = grid.visible = !camMode; canvas.hidden = camMode; $('#cam').hidden = $('#overlay').hidden = !camMode; $('#layers').hidden = $('#fusion-card').hidden = m !== 'vision';
   if (m === 'zone') { target.set(0, 8, 0); dist = 300; pitch = 0.9; }
   if (m === 'tower') { target.set(tc.x, T.heightM / 2, -tc.y); dist = 95; pitch = 0.35; }
-  if (m === 'ar') startAR();
+  if (camMode) startAR();
   $('#legend').innerHTML = m === 'zone' ? EMS98.map((g, i) => `<span><i style="background:#${GRADE_COL[i].toString(16).padStart(6, '0')}"></i>${g.label}</span>`).join('')
     : m === 'tower' ? '<span><i style="background:#34d399"></i>router activo</span><span><i style="background:#91d7e8"></i>pasarela (Internet confirmado)</span><span><i style="background:#7a2230"></i>router apagado entre barridos</span><span><i style="background:#34d399;border-radius:2px"></i>persona a salvo</span><span><i style="background:#ff3b4e;border-radius:2px"></i>atrapada / necesita ayuda</span><span><i style="background:#fbbf24;border-radius:2px"></i>señal sin respuesta / desaparecida</span>'
+    : m === 'vision' ? visionLegend()
     : m === 'ar' ? '<span>Cada marcador es un router o teléfono estimado tras la pared; el color indica la intensidad de su señal (rojo fuerte · azul débil). La cámara no ve a través del muro: muestra dónde está la señal.</span>' : '';
 }
 document.querySelectorAll('.tabs [data-v]').forEach((b) => (b.onclick = () => setMode(b.dataset.v)));
@@ -137,12 +156,12 @@ function resize() { const w = view.clientWidth, h = view.clientHeight; renderer.
 addEventListener('resize', resize); resize();
 let t0 = performance.now();
 function loop() {
-  if (mode !== 'ar') {
+  if (mode !== 'ar' && mode !== 'vision') {
     if (!drag) yaw += 0.0015;
     camera.position.set(target.x + dist * Math.cos(pitch) * Math.sin(yaw), target.y + dist * Math.sin(pitch), target.z + dist * Math.cos(pitch) * Math.cos(yaw)); camera.lookAt(target);
     renderer.render(scene, camera);
     $('#hud').textContent = mode === 'zone' ? `Zona · ${sim.zone.total} edificios · ${sim.zone.affected} afectados · arrastra para rotar` : mode === 'tower' ? `Edificio 14 · ${T.levels} plantas × ${T.unitsPerFloor} viviendas · ${sim.routers.located} routers` : $('#hud').textContent;
-  } else drawAR();
+  } else if (mode === 'ar') drawAR(); else drawVision();
   requestAnimationFrame(loop);
 }
 loop();
@@ -184,6 +203,52 @@ function drawAR() {
   g.fillStyle = '#fff'; g.font = '11px Inter'; g.fillText('débil            señal            fuerte', W - 170, H - 27);
   $('#hud').textContent = `Cámara · ${shown} señales en vista · rumbo ${Math.round((yawCam * 180) / Math.PI)}°`;
   window.SENDA_BUILDINGS.arShown = shown;
+}
+
+/* ---------- Visión por capas (motor de fusión + capas sobre la cámara) ---------- */
+const fin = fusionInputFromBuildingSim(sim), fusion = fuseOccupancy(fin);
+const CLS = { CONFIRMADO_POR_RESPUESTA: 'confirmado por respuesta', MUY_PROBABLE: 'muy probable', PROBABLE: 'probable', POSIBLE: 'posible', IMPROBABLE: 'improbable' };
+const pct = (x) => Math.round(x * 100) + ' %';
+$('#fusion-sum').textContent = `${fusion.summary.cells} viviendas · ${fusion.summary.byClass.CONFIRMADO_POR_RESPUESTA ?? 0} confirmadas por respuesta · ${fusion.summary.badge98} con ≥98 % corroborado · ${fin.cellEvidence.length} sensores (CSI, escucha, búsqueda)`;
+$('#fusion-table').innerHTML = '<tr><th>Vivienda</th><th>P(persona)</th><th>Intervalo</th><th>Prioridad</th><th>Fuentes</th></tr>' + fusion.ranked.slice(0, 8).map((c) =>
+  `<tr><td>${c.floor === 0 ? 'Bajo' : 'P' + c.floor} ${c.unit}</td><td style="color:${probabilityColor(c.p).css}">${pct(c.p)}${c.badge98 ? ' ≥98 %' : ''}</td><td>${pct(c.lo)}–${pct(c.hi)}</td><td>${CLS[c.cls]}</td><td>${c.families.length}</td></tr>`).join('');
+const cellC = (id) => fin.cells.find((c) => c.id === id).center;
+const plan = planNextSensing(fusion, [
+  { id: 'csi-p2', label: 'Accesorio CSI en fachada oeste, planta 2', at: { ...cellC('2A'), x: cellC('2A').x - 3 }, radiusM: 7, pd: 0.8, pfa: 0.05, costMin: 6 },
+  { id: 'escucha-p4', label: 'Escucha de golpes en planta 4 (equipo en escalera)', at: cellC('4C'), radiusM: 5, pd: 0.6, pfa: 0.08, costMin: 8 },
+  { id: 'perro-p1', label: 'Perro de rescate en planta 1', at: cellC('1D'), radiusM: 6, pd: 0.7, pfa: 0.02, costMin: 20 },
+  { id: 'dron-facade', label: 'Segundo barrido de dron por la fachada este', at: { ...cellC('3D'), x: cellC('3D').x + 6 }, radiusM: 9, pd: 0.5, pfa: 0.05, costMin: 12 },
+]);
+$('#plan-table').innerHTML = '<tr><th>Acción</th><th>Bits/min</th><th>P(hallazgo)</th></tr>' + plan.map((a) => `<tr><td>${a.label}</td><td>${a.bitsPerMin}</td><td>${pct(a.findP)}</td></tr>`).join('');
+const top = fusion.ranked[0];
+$('#fusion-trace').textContent = `${top.id} · ${pct(top.p)} [${pct(top.lo)}–${pct(top.hi)}]\n` + top.trace.map((t) => `· ${t.text}${t.db != null ? `  (${t.db > 0 ? '+' : ''}${t.db} dB)` : ''}`).join('\n');
+const activeLayers = () => Object.fromEntries([...document.querySelectorAll('#layers input:checked')].map((i) => [i.value, i.value === 'TOPOGRAFIA' ? 0.6 : i.value === 'PROBABILIDAD' ? 0.8 : 1]));
+function visionLegend() { return Object.keys(activeLayers()).map((k) => `<span><b>${LAYERS[k].label}:</b> ${LAYERS[k].honest}</span>`).join('') + Object.entries({ Router: SPECTRUM_COLORS.ROUTER, Teléfono: SPECTRUM_COLORS.PHONE_RF, CSI: SPECTRUM_COLORS.BODY_RF, Sonido: SPECTRUM_COLORS.ACOUSTIC }).map(([k, c]) => `<span><i style="background:${c}"></i>${k}</span>`).join(''); }
+document.querySelectorAll('#layers input').forEach((i) => (i.onchange = () => { $('#legend').innerHTML = visionLegend(); }));
+function drawVision() {
+  const c = $('#overlay'), g = c.getContext('2d'), W = c.width, H = c.height;
+  g.clearRect(0, 0, W, H); if (!camOk) { g.fillStyle = '#04070a'; g.fillRect(0, 0, W, H); }
+  const cam = { pos: { x: tc.x - 62, y: tc.y, z: 1.6 }, yaw: heading, pitch: Math.max(tilt, 0.38), hfovRad: 1.1, width: W, height: H };
+  const out = composeLayers({ building: T, fusion, aps: sim.aps, persons: fin.persons, cellEvidence: fin.cellEvidence, damagedFloors: [1, 2, 3, 4] }, cam, activeLayers());
+  const placed = [];
+  for (const p of out.primitives) {
+    g.globalAlpha = p.alpha ?? 1;
+    if (p.kind === 'poly') { g.strokeStyle = p.color; g.lineWidth = p.width ?? 1; g.beginPath(); p.points.forEach(([u, v], i) => (i ? g.lineTo(u, v) : g.moveTo(u, v))); g.stroke(); }
+    else if (p.kind === 'glow') { const gr = g.createRadialGradient(p.u, p.v, 1, p.u, p.v, p.r); gr.addColorStop(0, p.color.replace('rgb', 'rgba').replace(')', ',0.95)')); gr.addColorStop(1, p.color.replace('rgb', 'rgba').replace(')', ',0)')); g.fillStyle = gr; g.beginPath(); g.arc(p.u, p.v, p.r, 0, 6.3); g.fill(); }
+    else if (p.kind === 'dot') { g.fillStyle = p.color; g.beginPath(); g.arc(p.u, p.v, p.r, 0, 6.3); g.fill(); }
+    else if (p.kind === 'ring') { g.strokeStyle = p.color; g.lineWidth = 1.5; g.setLineDash(p.dashed ? [4, 4] : []); g.beginPath(); g.arc(p.u, p.v, p.r, 0, 6.3); g.stroke(); g.setLineDash([]); }
+  }
+  for (const p of out.primitives) {
+    if (p.text) {
+      g.globalAlpha = 1; g.font = '700 12px Inter'; const tw = g.measureText(p.text).width + 8; let x = p.u + 6, y = p.v - 19;
+      while (placed.some((b) => x < b.x + b.w && b.x < x + tw && y < b.y + 18 && b.y < y + 18)) y += 19; // sin solapes
+      placed.push({ x, y, w: tw }); g.fillStyle = 'rgba(5,9,12,.82)'; g.fillRect(x, y, tw, 17); g.fillStyle = '#fff'; g.fillText(p.text, x + 4, y + 13);
+      if (y !== p.v - 19) { g.strokeStyle = 'rgba(255,255,255,.5)'; g.beginPath(); g.moveTo(p.u, p.v); g.lineTo(x, y + 9); g.stroke(); }
+    }
+  }
+  g.globalAlpha = 1;
+  $('#hud').textContent = `Visión por capas · ${Object.entries(out.byLayer).map(([k, n]) => `${LAYERS[k].label} ${n}`).join(' · ') || 'gira la cámara hacia el edificio'} · rumbo ${Math.round((heading * 180) / Math.PI)}°`;
+  window.SENDA_BUILDINGS.vision = { byLayer: out.byLayer, top: { id: top.id, cls: top.cls, p: top.p, badge98: top.badge98 }, badge98: fusion.summary.badge98, planTop: plan[0].id };
 }
 
 /* ---------- Edificios reales de OpenStreetMap ---------- */

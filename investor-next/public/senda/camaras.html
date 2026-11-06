@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Cámaras públicas</title>
+<meta name="description" content="Cámaras de tráfico y de paisaje publicadas para reutilizarse: SENDA mide en ellas la visibilidad (niebla, nieve) con física, avisa a los que se acercan y nunca mira a las personas.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/carretera">Ruta protectora</a> · <a href="/senda/paises">España y Países Bajos</a> · <a href="/senda/incendio">Incendio</a> · <a href="/senda/arquitectura">Arquitectura</a></p>
+<h1>Cámaras públicas</h1>
+<p class="lead m">Miles de cámaras públicas vigilan carreteras, puertos de montaña y ríos. SENDA usa <b>solo las que un organismo publica para que se reutilicen</b>, y solo para medir el estado de la vía: <b>cuánto se ve</b> (niebla), si hay <b>nieve</b>, si el río <b>sube</b>, si hay <b>humo</b>. Con eso avisa a quien se acerca, aunque luego se quede sin red. Nunca identifica personas ni vehículos.</p>
+
+<section class="card" data-viz="niebla" style="margin-top:14px" aria-labelledby="h-n">
+  <h2 id="h-n">🌫️ Cuánto se ve, en metros, desde una cámara</h2>
+  <div class="g2" style="margin-top:0">
+    <div><canvas id="cv-n" aria-label="Imagen de una cámara de carretera con niebla creciente; cuatro objetos oscuros a 30, 60, 120 y 250 metros sirven de referencia y SENDA calcula la visibilidad y la velocidad segura"></canvas>
+      <div class="row"><label class="m" style="flex:1">Visibilidad real (para probar el método): <b id="n-vv">120</b> m <input type="range" id="n-v" min="30" max="600" step="10" value="120" aria-label="Visibilidad real en metros"></label></div></div>
+    <div>
+      <div class="kv" style="grid-template-columns:repeat(2,1fr)"><div><b id="n-est">—</b><span>visibilidad estimada por SENDA</span></div><div><b id="n-err">—</b><span>error (prudente: tiende a quedarse corta)</span></div><div><b id="n-seco">—</b><span>velocidad para parar en seco</span></div><div><b id="n-moj">—</b><span>en mojado</span></div></div>
+      <p class="m" style="font-size:14px">La niebla mezcla cada objeto con el blanco del aire según su distancia: <b>I = J·t + A·(1 − t)</b>, con <b>t = e<sup>−β·d</sup></b>. Un objeto oscuro a distancia conocida en el encuadre (un poste, una señal, el borde de un pinar), medido <b>una vez por cámara</b>, permite despejar β con el «canal oscuro» (He, Sun y Tang, 2009). Después la ley de Koschmieder da la visibilidad: <b>V = 3,912 / β</b>. Con ella, la velocidad que permite parar dentro de lo que se ve: <b>v·t + v²/2a = V</b>.</p>
+      <div class="note">Esta imagen es <b>sintética</b>, generada con el mismo modelo físico, para comprobar el método: el error es menor del 15 % en todo el rango y casi siempre por el lado prudente. En cámaras reales falta calibrar las referencias de cada una y descargar sus imágenes desde el relé, porque el navegador no puede leer los píxeles de una imagen de otro dominio.</div>
+    </div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-y">
+  <h2 id="h-y">📷 Pruébalo con tu cámara</h2>
+  <p class="m" style="margin-top:0">Apunta a un paisaje con niebla o bruma. Pon en el recuadro central algo oscuro (un árbol, un poste) y escribe a qué distancia está. Todo se calcula en el teléfono y no se guarda ninguna imagen.</p>
+  <div class="row"><button class="p" id="y-go">▶ Abrir cámara</button><label class="m">Distancia al objeto: <input type="number" id="y-d" value="100" min="5" max="5000" step="5" style="width:90px;min-height:44px" aria-label="Distancia al objeto en metros"> m</label><button id="y-mea">Medir</button></div>
+  <video id="y-vid" playsinline muted style="width:100%;max-width:480px;border-radius:10px;display:none" aria-label="Vista de la cámara"></video>
+  <p class="m" id="y-msg" aria-live="polite"></p>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-f">
+  <h2 id="h-f">🗂️ Qué cámaras, con qué permiso</h2>
+  <p class="m" style="font-size:14px;margin-top:0">El catálogo incluye las fuentes oficiales que documenta <a href="https://github.com/bilawalsidhu/gods-eye-view">God's Eye View</a> (MIT) con su licencia: departamentos de transporte de EE. UU., Canadá, Australia, Finlandia, Noruega, Estonia, Italia y Hong Kong, además de TfL y las españolas. Las de <b>Caltrans</b> y <b>TfL</b> ya se han procesado de verdad: <a href="/senda/evacuacion">coches, cámaras y fuego</a>. Si una fuente exige acuerdo o solo permite uso personal, va como CONVENIO.</p>
+  <div class="tw"><table><thead><tr><th>País</th><th>Quién</th><th>Qué publica</th><th>Licencia</th><th>Acceso</th></tr></thead><tbody id="f-tb"></tbody></table></div>
+  <div class="g3">
+    <div><h3>🛣️ Carretera</h3><p class="m">SENDA guarda en la reserva, antes del viaje, las cámaras públicas de tu ruta. Mientras hay red, el relé del organismo descarga sus imágenes y mide en ellas la visibilidad y la nieve. Si una cámara da menos de 150 m, sale un aviso de niebla con la velocidad segura a los que se acercan, que viaja por la misma trama de 24 bytes.</p></div>
+    <div><h3>🔥 Incendios</h3><p class="m">Para el humo, nada de umbrales caseros: modelos entrenados y abiertos como <b>Pyronear</b> (Apache 2.0), sobre cámaras propias o de socios que miran al monte. El foco detectado entra en el módulo de incendio, junto a los satélites.</p></div>
+    <div><h3>🌊 Ríos y vados</h3><p class="m">Una cámara que ve una regla de nivel o un vado mide si el agua sube. Combinada con la alarma por subida aguas arriba, el aviso es claro: «da la vuelta, 30 cm de agua en movimiento arrastran un coche».</p></div>
+  </div>
+  <div class="note" style="border-color:var(--r)"><b>Lo que SENDA no hará nunca</b> (decisión de diseño, no técnica):
+    <ul style="margin:6px 0 0">
+      <li>Entrar en cámaras privadas sin contraseña que aparecen en buscadores: es acceso ilícito a un sistema.</li>
+      <li>Usar agregadores de datos personales (bots de búsqueda de personas tipo «Ojo de Dios»; no confundir con God's Eye View, que solo usa fuentes oficiales).</li>
+      <li>Reconocer caras o leer matrículas.</li>
+      <li>Grabar la vía pública con cámaras propias.</li>
+    </ul>
+    Las imágenes de tráfico pueden contener datos personales: SENDA solo calcula indicadores y descarta la imagen.</div>
+  <p class="src">Fuentes: <a href="https://nap.dgt.es/en/dataset/camaras-dgt-datex2-v3-6-nuevo">DGT, cámaras en DATEX II</a> · <a href="https://datos.gob.es/es/iniciativas/open-data-euskadi">Open Data Euskadi</a> · <a href="https://wiki.openstreetmap.org/wiki/Ca:Import_Generalitat_de_Catalunya">cámaras de la Generalitat (wiki de OpenStreetMap)</a> · <a href="https://diario.madrid.es/blog/notas-de-prensa/arranca-la-renovada-web-de-informacion-del-trafico/">Madrid Informo</a> · <a href="https://www.rijkswaterstaat.nl/wegen/wegbeheer/onderzoek/verkeersonderzoek/wat-doet-rijkswaterstaat-met-camerabeelden">Rijkswaterstaat: qué hace con las imágenes</a> · <a href="https://github.com/pyronear/PyroNear">Pyronear</a> · canal oscuro: K. He, J. Sun, X. Tang, <i>Single Image Haze Removal Using Dark Channel Prior</i>, CVPR 2009 · visibilidad: ley de Koschmieder (umbral de contraste del 2 %). Código: <code>cameras.mjs</code>, <code>drive-cases.mjs</code>.</p>
+</section>
+</main>
+<script type="module">
+import { $, C, canvas, text, rr, run, clamp, FILM } from '/senda/kit.mjs';
+import { CAMERA_SOURCES, fogScene, estimateVisibilityMulti, estimateVisibility } from '/senda/core/cameras.mjs';
+import { safeSpeedForVisibility, MU } from '/senda/core/drive-cases.mjs';
+const fmt = (x, d = 0) => x.toFixed(d).replace('.', ',');
+const S = { vis: 120 }; window.SENDA_CAMARAS = S;
+const CH = { PASIVO: 'ok', CONVENIO: 'todo', NUNCA: 'no' };
+$('#f-tb').innerHTML = CAMERA_SOURCES.map((c) => `<tr><td>${c.country}</td><td>${c.url ? `<a href="${c.url}" target="_blank" rel="noopener">${c.operator}</a>` : c.operator}</td><td>${c.what}</td><td class="m">${c.license}</td><td><span class="chip ${CH[c.access]}">${c.access}</span></td></tr>`).join('');
+
+function measure(vis) {
+  const sc = fogScene({ visM: vis }), e = estimateVisibilityMulti(sc.rgba, sc.w, sc.h, sc.refs);
+  S.scene = sc; S.est = e; S.vis = vis;
+  $('#n-est').textContent = `${e.visM} m`; $('#n-err').textContent = `${e.visM >= vis ? '+' : '−'}${fmt(Math.abs(e.visM - vis) / vis * 100)} %`;
+  $('#n-seco').textContent = `${safeSpeedForVisibility(e.visM).kmh} km/h`; $('#n-moj').textContent = `${safeSpeedForVisibility(e.visM, { mu: MU.mojado }).kmh} km/h`;
+}
+$('#n-v').oninput = (e) => { $('#n-vv').textContent = e.target.value; measure(+e.target.value); };
+measure(120);
+const gn = canvas($('#cv-n')), off = document.createElement('canvas');
+function drawN(t) {
+  const g = gn;
+  if (FILM) { const P = 16, lt = t % P, v = Math.round(600 - 560 * clamp(lt / 12)); if (v !== S.vis) measure(v); }
+  const sc = S.scene, e = S.est; off.width = sc.w; off.height = sc.h; off.getContext('2d').putImageData(new ImageData(sc.rgba, sc.w, sc.h), 0, 0);
+  g.fillStyle = C.bg; g.fillRect(0, 0, 640, 600); g.imageSmoothingEnabled = true; g.drawImage(off, 20, 50, 600, 375);
+  const k = 600 / sc.w;
+  sc.refs.forEach((r) => { const used = r.distM === e.distM; g.strokeStyle = used ? C.a : 'rgba(145,215,232,.7)'; g.lineWidth = used ? 3 : 1.5; g.strokeRect(20 + r.x * k - 2, 50 + r.y * k - 2, r.w * k + 4, r.h * k + 4); text(g, `${r.distM} m`, 20 + r.x * k, 50 + r.y * k - 6, { c: used ? C.a : C.i, f: '700 12px Inter,system-ui' }); });
+  g.lineWidth = 1;
+  text(g, 'Cámara de carretera (imagen sintética)', 20, 32, { c: C.t, f: '800 14px Inter,system-ui' }); text(g, `niebla real: ${S.vis} m`, 620, 32, { c: C.m, f: '12px Inter,system-ui', al: 'right' });
+  g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 440, 600, 144, 12); g.fill(); const danger = e.visM < 150; g.strokeStyle = danger ? C.a : C.l; g.stroke();
+  text(g, `Visibilidad estimada: ${e.visM} m`, 34, 470, { c: danger ? C.a : C.t, f: '800 18px Inter,system-ui' });
+  text(g, `referencia usada: objeto a ${e.distM} m · transmisión t = ${fmt(e.t, 2)} · luz del aire A = ${fmt(e.A, 2)}`, 34, 494, { c: C.m, f: '12px Inter,system-ui' });
+  text(g, `Velocidad para parar dentro de lo que se ve: ${safeSpeedForVisibility(e.visM).kmh} km/h en seco · ${safeSpeedForVisibility(e.visM, { mu: MU.mojado }).kmh} en mojado`, 34, 520, { c: C.t, f: '13px Inter,system-ui' });
+  text(g, danger ? 'Aviso de niebla, con su velocidad, a los que se acercan a esta cámara' : 'Sin aviso: visibilidad suficiente', 34, 548, { c: danger ? C.a : C.e, f: '700 13px Inter,system-ui' });
+  text(g, 'I = J·t + A·(1 − t) · t = e^(−β·d) · V = 3,912 / β', 34, 572, { c: C.g, f: '12px Inter,system-ui' });
+}
+
+// ---- cámara del teléfono (todo local)
+let stream = null;
+$('#y-go').onclick = async () => { try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false }); const v = $('#y-vid'); v.srcObject = stream; v.style.display = 'block'; await v.play(); $('#y-msg').textContent = 'Encuadra un objeto oscuro en el centro y pulsa «Medir».'; } catch (e) { $('#y-msg').textContent = `No se pudo abrir la cámara: ${e.message}`; } };
+$('#y-mea').onclick = () => {
+  const v = $('#y-vid'); if (!stream || !v.videoWidth) { $('#y-msg').textContent = 'Abre antes la cámara.'; return; }
+  const w = 160, h = Math.round((160 * v.videoHeight) / v.videoWidth), c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); x.drawImage(v, 0, 0, w, h);
+  const img = x.getImageData(0, 0, w, h), d = +$('#y-d').value || 100, e = estimateVisibility(img.data, w, h, { x: (w >> 1) - 4, y: (h >> 1) - 4, w: 8, h: 8, distM: d });
+  S.live = e; $('#y-msg').textContent = e.t > 0.97 ? `Aire limpio a ${d} m: la visibilidad supera con creces esa distancia (t = ${fmt(e.t, 2)}).` : `Visibilidad estimada: ${e.visM} m (t = ${fmt(e.t, 2)} a ${d} m). Velocidad para parar dentro de lo que ves: ${safeSpeedForVisibility(e.visM).kmh} km/h.`;
+};
+run({ niebla: drawN });
+</script>
+</body></html>

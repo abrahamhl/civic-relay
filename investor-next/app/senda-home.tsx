@@ -16,7 +16,8 @@ const C = {
     h1: 'Cuando cae la red, el mensaje sigue su camino.',
     lead: 'SENDA es la capa que coordina todo lo que puede mover un mensaje de emergencia: teléfonos cercanos, sonido, satélite directo al móvil, LoRa, Iridium, radioaficionados, drones y la red que quede en pie. Cifrado de extremo a extremo, abre en modo avión y no necesita servidores.',
     open: 'Abrir SENDA Campo', easy: 'Modo fácil (3 botones)', red: 'Red y satélites', proof: 'Verificación técnica',
-    filmT: 'La película: qué es SENDA y qué ya funciona', filmNote: 'Doblada en español e inglés; subtítulos en español, inglés y neerlandés.',
+    filmT: 'La película: qué es SENDA y qué ya funciona', filmNote: 'Doblada en español e inglés; subtítulos en español, inglés y neerlandés. Las simulaciones y los renders 3D los calcula el mismo código que lleva la app.',
+    rutaT: 'En la carretera: ruta protectora, cámaras, Países Bajos y DGT', rutaNote: 'Grabado fotograma a fotograma desde las páginas de la app, con el núcleo real. Las situaciones de tráfico son simulaciones, la imagen de cámara es sintética y la carretera de demostración, inventada. SENDA nunca sustituye al 112.', rutaAlt: 'Versión en inglés, con subtítulos', rutaAltLang: 'en',
     gapT: 'El hueco que nadie cubre',
     gap: [['90 % → 40 %', 'usuarios con conexión estable en el apagón ibérico del 28-04-2025: la red cayó al agotarse las baterías de las antenas.', 'https://www.laecuaciondigital.com/actualidad/el-apagon-electrico-colapsa-redes-moviles-en-espana-y-portugal-el-28-de-abril/'], ['20:11', 'hora del ES-Alert en la DANA de Valencia (29-10-2024). La alerta oficial depende de la red celular.', 'https://www.eldebate.com/espana/comunidad-valenciana/20251204/principal-tecnico-emergencia-dana-sostiene-alert-retraso-diferenciar-valenciano-catalan_362211.html'], ['2030–2036', 'despliegue previsto del sistema europeo de comunicación crítica (EUCCS) para los intervinientes, no para la ciudadanía.', 'https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en']],
     featT: 'Todo lo que hace, ya en la app',
@@ -33,7 +34,34 @@ const C = {
       ['♿', 'Accesible', 'Modo fácil de tres botones y revisión automática de accesibilidad en cada cambio.', '/senda'],
       ['📱', 'Android y ESP32', 'Baliza Bluetooth, escucha de balizas y barrido Wi-Fi; accesorio para mástil o dron.', 'https://github.com/abrahamhl/civic-relay/tree/master/apps/senda-android'],
       ['🖥️', 'Relé soberano', 'Relé autoalojable en Docker, ciego al contenido, que opera el propio organismo.', 'https://github.com/abrahamhl/civic-relay/tree/master/packages/senda-relay'],
+      ['🌍', 'Ojo de SENDA', 'Globo en tiempo real: Iridium, Galileo y QO-100, los casos reales de España y la ruta de cada aviso hasta el 112, con elevación, distancia y latencia.', '/senda/ojo'],
+      ['🔥', 'Incendio: avisar antes de que caiga la antena', 'Avance del fuego con viento y pendiente, cruzado con las antenas: hasta cuándo se puede avisar por la red móvil y por qué canal después.', '/senda/incendio'],
+      ['🛤️', 'Vigilancia ferroviaria', 'Escalones en circuitos de vía (patrón Adamuz), geometría de vía con móviles, curvas sin supervisión y muros con lluvia.', '/senda/via'],
+      ['👁️', 'Ver lo que no se ve', 'Probabilidad calibrada de personas por vivienda fusionando respuestas, teléfonos, wifi y golpes; «≥98 %» solo con dos fuentes.', '/senda/edificios'],
+      ['📞', 'Llamadas sin Internet', 'Voz y chat cifrados entre dos teléfonos sin operador ni servidor: el arranque de la llamada (80–110 bytes) viaja por sonido en menos de 10 segundos. Si no os alcanzáis, otro teléfono repite la voz (cadena de voz).', '/senda/llamada'],
+      ['📡', 'Censo radio con dron', 'Personas por planta sin entrar: el dron escucha el Bluetooth de los teléfonos y SENDA cuenta dispositivos pese a las direcciones aleatorias, con margen honesto y sin identificar a nadie.', '/senda/dron'],
+      ['🧭', 'Arquitectura del sistema', 'Sensores y radios → portadores → núcleo en el teléfono → apps → destinos. Seis escenarios animados y el estado real de cada pieza.', '/senda/arquitectura'],
+      ['🔋', 'Batería de Internet', 'Reserva de red en el teléfono (hasta ~1 GB elegido por valor y frescura), biblioteca común entre vecinos y adónde ir para que salga el mensaje.', '/senda/reserva'],
+      ['🚗', 'Ruta protectora', 'En carretera: aviso de frenada brusca a los coches que no la ven, SOS sin cobertura que llevan los coches que pasan, PK sin red y coordinación del accidente con puntos cívicos.', '/senda/carretera'],
+      ['📷', 'Cámaras públicas', 'Solo las publicadas para reutilizarse: SENDA mide en ellas cuánto se ve (niebla) y si hay nieve, y avisa a quien se acerca. Nunca personas ni matrículas.', '/senda/camaras'],
+      ['🇳🇱', 'España → Países Bajos', 'El mismo núcleo en toda la UE: 112 y DATEX II comunes; en Países Bajos, cruces rojas sobre los carriles, puentes móviles y avisos en neerlandés.', '/senda/paises'],
+      ['🛣️', 'Infraestructura de la DGT', 'Radares, paneles, cámaras, aforos y balizas V16: ninguno es una radio que usar, pero lo que la DGT publica se suma a SENDA, y DGT 3.0 por convenio. Nunca detectar radares.', '/senda/dgt'],
+      ['🎥', 'Visión de tráfico (vídeo real)', 'Vehículos detectados y seguidos en vídeo real: conteo por sentido, distancia, tiempo hasta alcanzarlos y contactos de la calzada contraria. Solo salen números.', '/senda/trafico'],
+      ['🚗', 'Coches, cámaras y fuego', 'Cámaras oficiales de Caltrans y TfL contadas de verdad, satélite GOES y un modelo de tráfico por celdas con filtro de Kalman: cuándo avisar, qué tramo cerrar y cómo ver un atasco minutos antes. En Eaton 2025 habría avisado horas antes.', '/senda/evacuacion'],
+      ['📚', 'Incendios de referencia', '14 incendios reales con fuentes, 7 reconstruidos con satélite NOAA: velocidad del frente medida, validación fuera de muestra y la incertidumbre real que usan los avisos.', '/senda/referencias'],
+      ['🌪️', 'Incendio en 3D con datos reales', 'Terreno Copernicus, Sentinel-2 y el modelo GFS del día: viento 3D sobre el relieve, pluma que aspira aire, humo y pavesas, cámaras con oclusión y coches como estación meteorológica. Vista cenital, inclinada u horizontal.', '/senda/fuego3d'],
+      ['🔥', 'Seguimiento de incendio', 'Torres, cámaras y la brújula del móvil sitúan la columna; el satélite mide el perímetro y el avance; meteorología del incendio, criticidad, carreteras a cortar y avisos a los coches. Caso real: M-501, julio de 2026.', '/senda/fuego'],
+      ['🚘', 'Coches conectados', 'Ley de Datos de la UE y avisos de seguridad de los coches (DFRS), con privacidad por diseño. La posición pasa de ~10 m a ~1-2 m sumando vía, aerogeneradores, Wi-Fi y otros coches.', '/senda/vehiculos'],
+      ['👂', 'Sentidos ampliados', 'Ver los sonidos (golpes localizados con varios móviles), oír la radio como un detector de avalanchas y ver la respiración por Wi-Fi con placas de pocos euros.', '/senda/sentidos'],
+      ['🌧️', 'Riadas y maremotos', 'Aviso por la subida aguas arriba con horas de margen donde no llueve (patrón DANA) y tiempo de llegada de un maremoto con evacuación vertical.', '/senda/agua'],
+      ['🩹', 'Triaje para cualquiera', 'START paso a paso, qué hacer mientras llega la ayuda, a qué servicio avisar y un parte que cabe en un SMS.', '/senda/triaje'],
+      ['🧭', 'Perdido en el monte', 'Posición sin señal con rumbos a aerogeneradores y antenas, estima por pasos, mapas guardados y SOS por satélite.', '/senda/monte'],
+      ['🚁', 'Dron casa por casa', 'Ruta optimizada con cambios de batería y tablero de prioridad: personas probables por daño del edificio.', '/senda/barrido'],
     ],
+    ojoT: 'Ojo de SENDA: qué satélite ve cada emergencia y cómo llega el aviso',
+    ojoLead: 'Cada punto del globo es un satélite real de su constelación, calculado en tu navegador con el mismo código que usa el enrutador. Los puntos de colores sobre España son casos reales (o, en el incendio, un escenario de demostración). Al elegir uno, SENDA busca el satélite visible con mayor elevación, calcula la distancia y la latencia y traza la ruta del aviso hasta la sala del 112.',
+    ojoPts: [['Iridium · órbita baja (cian)', '66 satélites a ~780 km que cubren todo el planeta. SENDA envía por ellos mensajes cifrados de hasta 340 B con un módem RockBLOCK.'], ['Galileo · órbita media (ámbar)', '24 satélites a 23 222 km: posición precisa y búsqueda y salvamento con enlace de retorno para radiobalizas.'], ['QO-100 · geoestacionario (violeta)', 'Fijo a 25,9° E y siempre visible desde España; radioaficionados con licencia, solo estados públicos firmados.'], ['Casos y módulos', 'Cada caso enlaza a su fuente y a los módulos de SENDA que habrían actuado: alertas firmadas, red multiportador, previsión de apagón, vías, edificios o incendio.']],
+    ojoOpen: 'Abrir el Ojo de SENDA a pantalla completa',
     whoT: 'Para quién',
     who: [['Ciudadanía y víctimas', 'Un canal que sigue funcionando sin red. Nadie figura como víctima sin confirmación.'], ['Coordinadores', 'Imagen operativa por planta y por tren, y alertas dirigidas firmadas.'], ['Cuerpos y fuerzas de seguridad', 'Credenciales institucionales verificables y canales internos separados por organismo.'], ['Servicios de emergencia', 'Informes estructurados en CAP hacia el 112, con auditoría.'], ['Administraciones', 'Continuidad hasta EUCCS, soberanía del relé y código abierto auditable.'], ['Inversores', 'Núcleo difícil de replicar y retorno por licencias institucionales, integración y kits.']],
     vT: 'Verificado por máquina', vCore: 'pruebas del núcleo', vE2e: 'comprobaciones extremo a extremo con la red cortada', vRelay: 'pruebas del relé',
@@ -45,7 +73,8 @@ const C = {
     h1: 'When the network falls, the message finds its way.',
     lead: 'SENDA is the layer that coordinates everything that can carry an emergency message: nearby phones, sound, direct-to-phone satellite, LoRa, Iridium, amateur radio, drones and whatever network is still standing. End-to-end encrypted, it opens in airplane mode and needs no servers.',
     open: 'Open SENDA Field', easy: 'Easy mode (3 buttons)', red: 'Network & satellites', proof: 'Technical verification',
-    filmT: 'The film: what SENDA is and what already works', filmNote: 'Voiced in Spanish and English; subtitles in Spanish, English and Dutch.',
+    filmT: 'The film: what SENDA is and what already works', filmNote: 'Voiced in Spanish and English; subtitles in Spanish, English and Dutch. The simulations and 3D renders are computed by the same code the app runs.',
+    rutaT: 'On the road: protective route, cameras, the Netherlands and the DGT', rutaNote: 'Recorded frame by frame from the app’s own pages, with the real core; the on-screen app labels are in Spanish. The traffic situations are simulations, the camera image is synthetic and the demo road is invented. SENDA never replaces 112.', rutaAlt: 'Spanish version, with subtitles', rutaAltLang: 'es',
     gapT: 'The gap nobody covers',
     gap: [['90% → 40%', 'users with a stable connection during the Iberian blackout of 28-04-2025: the network fell when the masts’ batteries ran out.', 'https://www.laecuaciondigital.com/actualidad/el-apagon-electrico-colapsa-redes-moviles-en-espana-y-portugal-el-28-de-abril/'], ['20:11', 'time of the ES-Alert during the Valencia floods (29-10-2024). Official alerts depend on the cellular network.', 'https://www.eldebate.com/espana/comunidad-valenciana/20251204/principal-tecnico-emergencia-dana-sostiene-alert-retraso-diferenciar-valenciano-catalan_362211.html'], ['2030–2036', 'planned rollout of the EU Critical Communication System (EUCCS), for first responders, not citizens.', 'https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en']],
     featT: 'Everything it does, already in the app',
@@ -62,7 +91,34 @@ const C = {
       ['♿', 'Accessible', 'Three-button easy mode and an automatic accessibility check on every change.', '/senda'],
       ['📱', 'Android & ESP32', 'Bluetooth beacon, beacon listening and Wi-Fi sweeps; an accessory for masts or drones.', 'https://github.com/abrahamhl/civic-relay/tree/master/apps/senda-android'],
       ['🖥️', 'Sovereign relay', 'Self-hosted Docker relay, content-blind, run by the agency itself.', 'https://github.com/abrahamhl/civic-relay/tree/master/packages/senda-relay'],
+      ['🌍', 'SENDA Eye', 'Real-time globe: Iridium, Galileo and QO-100, Spain’s real cases and each alert’s route to 112, with elevation, distance and latency.', '/senda/ojo'],
+      ['🔥', 'Wildfire: warn before the mast burns', 'Fire spread with wind and slope, crossed with phone masts: until when the mobile network can warn, and which channel to use after.', '/senda/incendio'],
+      ['🛤️', 'Rail watch', 'Track-circuit steps (Adamuz pattern), track geometry from phones, unsupervised curves and walls under heavy rain.', '/senda/via'],
+      ['👁️', 'Seeing the unseen', 'Calibrated probability of people per flat fusing replies, phones, Wi-Fi and knocks; “≥98 %” only with two sources.', '/senda/edificios'],
+      ['📞', 'Calls without Internet', 'Encrypted voice and chat between two phones with no carrier or server: the call setup (80–110 bytes) travels by sound in under 10 seconds. If you can’t reach each other, another phone relays the voice (voice chain).', '/senda/llamada'],
+      ['📡', 'Drone radio census', 'People per floor without going inside: the drone listens to phones’ Bluetooth and SENDA counts devices despite random addresses, with an honest margin and no identities.', '/senda/dron'],
+      ['🧭', 'System architecture', 'Sensors and radios → bearers → on-phone core → apps → recipients. Six animated scenarios and the real status of every piece.', '/senda/arquitectura'],
+      ['🔋', 'Internet battery', 'A network reserve inside the phone (up to ~1 GB chosen by value and freshness), a shared library between neighbours and where to go so the message gets out.', '/senda/reserva'],
+      ['🚗', 'Protective route', 'On the road: hard-braking alerts for the cars that cannot see it, an SOS with no coverage carried by passing cars, kilometre point without network and coordination of the crash scene with civic points.', '/senda/carretera'],
+      ['📷', 'Public cameras', 'Only cameras published for reuse: SENDA measures how far you can see (fog) and whether there is snow, and warns whoever is approaching. Never people or number plates.', '/senda/camaras'],
+      ['🇳🇱', 'Spain → Netherlands', 'The same core across the EU: 112 and DATEX II are shared; in the Netherlands, red crosses over lanes, movable bridges and alerts in Dutch.', '/senda/paises'],
+      ['🛣️', 'DGT roadside infrastructure', 'Speed cameras, message signs, cameras, traffic counters and V16 beacons: none is a radio to borrow, but what the DGT publishes feeds SENDA, and DGT 3.0 by agreement. Never radar detection.', '/senda/dgt'],
+      ['🎥', 'Traffic vision (real video)', 'Vehicles detected and tracked in real video: counts by direction, distance, time to reach them and contacts from the opposite carriageway. Only numbers leave.', '/senda/trafico'],
+      ['🚗', 'Cars, cameras and fire', 'Official Caltrans and TfL cameras actually counted, GOES satellite and a cell transmission traffic model with a Kalman filter: when to warn, which section to close and how to see a jam minutes earlier. In Eaton 2025 it would have warned hours earlier.', '/senda/evacuacion'],
+      ['📚', 'Reference wildfires', '14 real fires with sources, 7 reconstructed with NOAA satellites: measured front speed, out-of-sample validation and the real uncertainty used by warnings.', '/senda/referencias'],
+      ['🌪️', 'Wildfire in 3D with real data', 'Copernicus terrain, Sentinel-2 and the GFS model of the day: 3D wind over the relief, a plume that draws air in, smoke and embers, cameras with terrain occlusion and cars as a weather station. Top-down, tilted or horizon view.', '/senda/fuego3d'],
+      ['🔥', 'Wildfire tracking', 'Lookout towers, cameras and the phone compass locate the smoke column; satellites measure the perimeter and spread; fire weather, criticality, roads to close and warnings to cars. Real case: M-501, July 2026.', '/senda/fuego'],
+      ['🚘', 'Connected cars', 'The EU Data Act and vehicle-generated safety warnings (DFRS), with privacy by design. Position goes from ~10 m to ~1-2 m by adding the road, wind turbines, Wi-Fi and other cars.', '/senda/vehiculos'],
+      ['👂', 'Extended senses', 'See sounds (knocks located with several phones), hear radio like an avalanche transceiver and see breathing through Wi-Fi with boards costing a few euros.', '/senda/sentidos'],
+      ['🌧️', 'Flash floods and tsunamis', 'Warning from the upstream rise, hours ahead where it is not raining (DANA pattern), and tsunami arrival times with vertical evacuation.', '/senda/agua'],
+      ['🩹', 'Triage for anyone', 'Step-by-step START, what to do until help arrives, which service to alert and a report that fits in one SMS.', '/senda/triaje'],
+      ['🧭', 'Lost in the mountains', 'Position without signal from bearings to wind turbines and masts, step counting, offline maps and satellite SOS.', '/senda/monte'],
+      ['🚁', 'House-by-house drone', 'Optimised route with battery swaps and a priority board: likely people times building damage.', '/senda/barrido'],
     ],
+    ojoT: 'SENDA Eye: which satellite sees each emergency, and how the alert gets through',
+    ojoLead: 'Every dot on the globe is a satellite of its constellation, computed in your browser with the same code the router uses. The coloured markers over Spain are real cases (the wildfire is a demonstration scenario). Pick one and SENDA finds the visible satellite with the highest elevation, computes distance and latency, and traces the alert’s route to the 112 control room.',
+    ojoPts: [['Iridium · low orbit (cyan)', '66 satellites at ~780 km covering the whole planet. SENDA sends encrypted messages of up to 340 B through them with a RockBLOCK modem.'], ['Galileo · medium orbit (amber)', '24 satellites at 23,222 km: precise position and search and rescue with a return link for distress beacons.'], ['QO-100 · geostationary (violet)', 'Fixed at 25.9° E and always visible from Spain; licensed radio amateurs, signed public status only.'], ['Cases and modules', 'Each case links to its source and to the SENDA modules that would have acted: signed alerts, multi-bearer network, blackout forecast, rail, buildings or wildfire.']],
+    ojoOpen: 'Open the SENDA Eye full screen',
     whoT: 'Who it is for',
     who: [['Citizens & victims', 'A channel that keeps working with no network. Nobody is listed as a victim without confirmation.'], ['Coordinators', 'A floor-by-floor and train-by-train operational picture, plus signed targeted alerts.'], ['Police & security forces', 'Verifiable institutional credentials and internal channels separated by agency.'], ['Emergency services', 'Structured CAP reports to the 112 room, with an audit trail.'], ['Public administrations', 'Continuity until EUCCS, a sovereign relay and auditable open source.'], ['Investors', 'A core that is hard to replicate, with revenue from institutional licences, integration and kits.']],
     vT: 'Machine-verified', vCore: 'core tests', vE2e: 'end-to-end checks with the network cut', vRelay: 'relay tests',
@@ -74,7 +130,8 @@ const C = {
     h1: 'Als het netwerk uitvalt, vindt het bericht zijn weg.',
     lead: 'SENDA is de laag die alles coördineert wat een noodbericht kan vervoeren: telefoons in de buurt, geluid, satelliet rechtstreeks naar de telefoon, LoRa, Iridium, zendamateurs, drones en wat er nog van het netwerk overeind staat. End-to-end versleuteld, opent in vliegtuigmodus en heeft geen servers nodig.',
     open: 'SENDA Field openen', easy: 'Eenvoudige modus (3 knoppen)', red: 'Netwerk & satellieten', proof: 'Technische verificatie',
-    filmT: 'De film: wat SENDA is en wat al werkt', filmNote: 'Ingesproken in het Spaans en Engels; ondertiteling in het Spaans, Engels en Nederlands.',
+    filmT: 'De film: wat SENDA is en wat al werkt', filmNote: 'Ingesproken in het Spaans en Engels; ondertiteling in het Spaans, Engels en Nederlands. De simulaties en 3D-renders worden berekend door dezelfde code als de app.',
+    rutaT: 'Op de weg: beschermende route, camera’s, Nederland en de DGT', rutaNote: 'Beeld voor beeld opgenomen vanaf de pagina’s van de app, met de echte kern. Ingesproken in het Engels, met Nederlandse en Engelse ondertiteling; de labels in de app zijn Spaans. De verkeerssituaties zijn simulaties, het camerabeeld is synthetisch en de demoweg is verzonnen. SENDA vervangt nooit 112.', rutaAlt: 'Spaanse versie, met ondertiteling', rutaAltLang: 'es',
     gapT: 'Het gat dat niemand dicht',
     gap: [['90% → 40%', 'gebruikers met een stabiele verbinding tijdens de Iberische stroomstoring van 28-04-2025: het netwerk viel uit toen de accu’s van de masten leeg raakten.', 'https://www.laecuaciondigital.com/actualidad/el-apagon-electrico-colapsa-redes-moviles-en-espana-y-portugal-el-28-de-abril/'], ['20:11', 'tijdstip van de ES-Alert bij de overstromingen in Valencia (29-10-2024). Officiële waarschuwingen hangen af van het mobiele netwerk.', 'https://www.eldebate.com/espana/comunidad-valenciana/20251204/principal-tecnico-emergencia-dana-sostiene-alert-retraso-diferenciar-valenciano-catalan_362211.html'], ['2030–2036', 'geplande uitrol van het Europese systeem voor kritieke communicatie (EUCCS), voor hulpverleners, niet voor burgers.', 'https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en']],
     featT: 'Alles wat het doet, al in de app',
@@ -91,7 +148,34 @@ const C = {
       ['♿', 'Toegankelijk', 'Eenvoudige modus met drie knoppen en een automatische toegankelijkheidscontrole bij elke wijziging.', '/senda'],
       ['📱', 'Android & ESP32', 'Bluetooth-baken, bakens beluisteren en wifi-scans; een accessoire voor masten of drones.', 'https://github.com/abrahamhl/civic-relay/tree/master/apps/senda-android'],
       ['🖥️', 'Soevereine relay', 'Zelf gehoste Docker-relay, blind voor de inhoud, beheerd door de organisatie zelf.', 'https://github.com/abrahamhl/civic-relay/tree/master/packages/senda-relay'],
+      ['🌍', 'SENDA-oog', 'Realtime wereldbol: Iridium, Galileo en QO-100, de echte Spaanse gevallen en de route van elk alarm naar 112, met elevatie, afstand en vertraging.', '/senda/ojo'],
+      ['🔥', 'Natuurbrand: waarschuwen voordat de mast brandt', 'Vuurverspreiding met wind en helling, gekruist met gsm-masten: tot wanneer het mobiele netwerk kan waarschuwen en via welk kanaal daarna.', '/senda/incendio'],
+      ['🛤️', 'Spoorbewaking', 'Sprongen in spoorstroomcircuits (Adamuz-patroon), spoorgeometrie via telefoons, bochten zonder bewaking en muren bij zware regen.', '/senda/via'],
+      ['👁️', 'Zien wat je niet ziet', 'Gekalibreerde kans op mensen per woning uit antwoorden, telefoons, wifi en kloppen; “≥98 %” alleen met twee bronnen.', '/senda/edificios'],
+      ['📞', 'Bellen zonder internet', 'Versleutelde spraak en chat tussen twee telefoons zonder provider of server: de gespreksopbouw (80–110 bytes) gaat in minder dan 10 seconden via geluid. Bereiken jullie elkaar niet, dan geeft een andere telefoon de stem door (spraakketen).', '/senda/llamada'],
+      ['📡', 'Radiotelling met drone', 'Mensen per verdieping zonder naar binnen te gaan: de drone luistert naar Bluetooth van telefoons en SENDA telt apparaten ondanks willekeurige adressen, met eerlijke marge en zonder identiteiten.', '/senda/dron'],
+      ['🧭', 'Systeemarchitectuur', 'Sensoren en radio’s → dragers → kern op de telefoon → apps → ontvangers. Zes geanimeerde scenario’s en de echte status van elk onderdeel.', '/senda/arquitectura'],
+      ['🔋', 'Internetbatterij', 'Een netwerkreserve in de telefoon (tot ~1 GB gekozen op waarde en actualiteit), een gedeelde bibliotheek tussen buren en waar je heen moet zodat het bericht verstuurd wordt.', '/senda/reserva'],
+      ['🚗', 'Beschermende route', 'Op de weg: waarschuwing bij hard remmen voor auto’s die het niet zien, een SOS zonder bereik die passerende auto’s meenemen, kilometerpunt zonder netwerk en coördinatie van het ongeval met burgerpunten.', '/senda/carretera'],
+      ['📷', 'Openbare camera’s', 'Alleen camera’s die voor hergebruik zijn gepubliceerd: SENDA meet hoe ver je kunt zien (mist) en of er sneeuw ligt, en waarschuwt wie eraan komt. Nooit personen of kentekens.', '/senda/camaras'],
+      ['🇳🇱', 'Spanje → Nederland', 'Dezelfde kern in de hele EU: 112 en DATEX II zijn gedeeld; in Nederland rode kruisen boven rijstroken, beweegbare bruggen en meldingen in het Nederlands.', '/senda/paises'],
+      ['🛣️', 'Infrastructuur van de DGT', 'Flitspalen, matrixborden, camera’s, telpunten en V16-bakens: geen enkele is een radio om te lenen, maar wat de DGT publiceert voedt SENDA, en DGT 3.0 via een overeenkomst. Nooit flitspaaldetectie.', '/senda/dgt'],
+      ['🎥', 'Verkeersbeeld (echte video)', 'Voertuigen gedetecteerd en gevolgd in echte video: tellingen per richting, afstand, tijd tot inhalen en tegenliggers op de andere rijbaan. Alleen getallen gaan eruit.', '/senda/trafico'],
+      ['🚗', 'Auto’s, camera’s en vuur', 'Officiële camera’s van Caltrans en TfL echt geteld, GOES-satelliet en een celtransmissiemodel met Kalmanfilter: wanneer waarschuwen, welk wegvak afsluiten en een file minuten eerder zien. Bij Eaton 2025 had het uren eerder gewaarschuwd.', '/senda/evacuacion'],
+      ['📚', 'Referentiebranden', '14 echte branden met bronnen, 7 gereconstrueerd met NOAA-satellieten: gemeten frontsnelheid, validatie buiten de steekproef en de echte onzekerheid voor waarschuwingen.', '/senda/referencias'],
+      ['🌪️', 'Bosbrand in 3D met echte data', 'Copernicus-terrein, Sentinel-2 en het GFS-model van die dag: 3D-wind over het reliëf, een rookpluim die lucht aanzuigt, rook en vliegvuur, camera’s met afscherming door het terrein en auto’s als weerstation.', '/senda/fuego3d'],
+      ['🔥', 'Bosbrand volgen', 'Uitkijktorens, camera’s en het kompas van de telefoon bepalen de rookkolom; satellieten meten de omtrek en de voortgang; brandweer, ernst, af te sluiten wegen en waarschuwingen aan auto’s. Echte casus: M-501, juli 2026.', '/senda/fuego'],
+      ['🚘', 'Verbonden auto’s', 'De EU-Dataverordening en veiligheidsmeldingen van auto’s (DFRS), met privacy by design. Positie van ~10 m naar ~1-2 m door weg, windturbines, wifi en andere auto’s te combineren.', '/senda/vehiculos'],
+      ['👂', 'Uitgebreide zintuigen', 'Geluid zien (klopgeluiden gelokaliseerd met meerdere telefoons), radio horen als een lawinepieper en ademhaling zien via wifi met bordjes van een paar euro.', '/senda/sentidos'],
+      ['🌧️', 'Overstromingen en tsunami’s', 'Waarschuwing op basis van de stijging stroomopwaarts, uren vooraf waar het niet regent (DANA-patroon), en aankomsttijden van een tsunami met verticale evacuatie.', '/senda/agua'],
+      ['🩹', 'Triage voor iedereen', 'START stap voor stap, wat te doen tot er hulp komt, welke dienst te waarschuwen en een melding die in één sms past.', '/senda/triaje'],
+      ['🧭', 'Verdwaald in de bergen', 'Positie zonder signaal via peilingen naar windturbines en masten, stappen tellen, offline kaarten en satelliet-SOS.', '/senda/monte'],
+      ['🚁', 'Drone huis voor huis', 'Geoptimaliseerde route met batterijwissels en een prioriteitenbord: waarschijnlijke mensen maal schade aan het gebouw.', '/senda/barrido'],
     ],
+    ojoT: 'SENDA-oog: welke satelliet elke noodsituatie ziet en hoe het alarm aankomt',
+    ojoLead: 'Elke stip op de wereldbol is een satelliet van zijn constellatie, berekend in je browser met dezelfde code als de router. De gekleurde markeringen boven Spanje zijn echte gevallen (de natuurbrand is een demonstratiescenario). Kies er een en SENDA zoekt de zichtbare satelliet met de hoogste elevatie, berekent afstand en vertraging en tekent de route van het alarm naar de 112-meldkamer.',
+    ojoPts: [['Iridium · lage baan (cyaan)', '66 satellieten op ~780 km die de hele planeet dekken. SENDA stuurt er versleutelde berichten tot 340 B via met een RockBLOCK-modem.'], ['Galileo · middelhoge baan (amber)', '24 satellieten op 23.222 km: nauwkeurige positie en opsporing en redding met terugmeldkanaal voor noodbakens.'], ['QO-100 · geostationair (violet)', 'Vast op 25,9° O en altijd zichtbaar vanuit Spanje; zendamateurs met licentie, alleen ondertekende openbare statussen.'], ['Gevallen en modules', 'Elk geval linkt naar zijn bron en naar de SENDA-modules die zouden hebben ingegrepen: ondertekende alarmen, multidragernetwerk, black-outvoorspelling, spoor, gebouwen of natuurbrand.']],
+    ojoOpen: 'SENDA-oog volledig scherm openen',
     whoT: 'Voor wie',
     who: [['Burgers & slachtoffers', 'Een kanaal dat zonder netwerk blijft werken. Niemand staat als slachtoffer zonder bevestiging.'], ['Coördinatoren', 'Een operationeel beeld per verdieping en per trein, en ondertekende gerichte waarschuwingen.'], ['Politie & veiligheidsdiensten', 'Verifieerbare institutionele bewijzen en interne kanalen per organisatie.'], ['Hulpdiensten', 'Gestructureerde CAP-meldingen naar de meldkamer, met audittrail.'], ['Overheden', 'Continuïteit tot EUCCS, een soevereine relay en controleerbare open source.'], ['Investeerders', 'Een moeilijk te kopiëren kern, met inkomsten uit institutionele licenties, integratie en kits.']],
     vT: 'Machinaal geverifieerd', vCore: 'kerntests', vE2e: 'end-to-end-controles met het netwerk uitgeschakeld', vRelay: 'relay-tests',
@@ -127,6 +211,32 @@ export default function SendaHome({ locale }: { locale: Locale }) {
           <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/senda-film-nl.vtt" default={locale === 'nl'}/>
         </video>
         <p className="sh-note">{c.filmNote}</p>
+      </div>
+
+      <div className="sh-film" id="ruta">
+        <h2>{c.rutaT}</h2>
+        <video controls preload="metadata" playsInline poster={`/media/senda-ruta-poster-${film}.jpg`} aria-label={c.rutaT}>
+          <source src={`/media/senda-ruta-${film}.mp4`} type="video/mp4"/>
+          <track kind="subtitles" srcLang={film} label={film === 'es' ? 'Español' : 'English'} src={`/media/senda-ruta-${film}.vtt`} default={locale !== 'nl'}/>
+          {film === 'en' && <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/senda-ruta-nl.vtt" default={locale === 'nl'}/>}
+        </video>
+        <p className="sh-note">{c.rutaNote}</p>
+        <details className="sh-alt" lang={c.rutaAltLang}>
+          <summary>{c.rutaAlt}</summary>
+          <video controls preload="none" playsInline poster={`/media/senda-ruta-poster-${c.rutaAltLang}.jpg`} aria-label={c.rutaAlt}>
+            <source src={`/media/senda-ruta-${c.rutaAltLang}.mp4`} type="video/mp4"/>
+            <track kind="subtitles" srcLang={c.rutaAltLang} label={c.rutaAltLang === 'es' ? 'Español' : 'English'} src={`/media/senda-ruta-${c.rutaAltLang}.vtt`} default/>
+            {c.rutaAltLang === 'en' && <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/senda-ruta-nl.vtt"/>}
+          </video>
+        </details>
+      </div>
+
+      <div className="sh-ojo" id="ojo">
+        <h2 className="sh-h2">{c.ojoT}</h2>
+        <p className="sh-lead">{c.ojoLead}</p>
+        <div className="sh-ojo-pts">{c.ojoPts.map(([t, d]) => <div key={t}><b>{t}</b><p>{d}</p></div>)}</div>
+        <iframe src={`/senda/ojo?embed=1${locale === 'es' ? '' : '&lang=en'}`} title={c.ojoT} loading="lazy"/>
+        <p className="sh-note"><a href={`/senda/ojo${locale === 'es' ? '' : '?lang=en'}`}>{c.ojoOpen} →</a></p>
       </div>
 
       <h2 className="sh-h2">{c.gapT}</h2>

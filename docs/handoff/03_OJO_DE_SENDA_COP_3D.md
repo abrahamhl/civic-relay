@@ -44,6 +44,12 @@
 
 - **Lo que sí se hace:** proyectar sobre la imagen de la cámara las **señales de radio localizadas** detrás de una pared (balizas BLE de personas atrapadas, routers, teléfonos) con un color según la intensidad. Ya está en `/senda/edificios`. A eso se suma la detección de respiración por Wi-Fi CSI (`through-wall.mjs`) con hardware compatible.
 - **Lo que no existe:** una cámara de móvil que vea a través de una pared.
+- **Lo que se ha construido (v0.7):** un **motor determinista de fusión de evidencias**
+  (`occupancy.mjs`) que combina respuestas, la señal del teléfono, respiración por CSI, golpes,
+  térmica real y búsquedas negativas en una probabilidad **calibrada** por vivienda, con intervalo,
+  traza en decibanes y la insignia «≥98 %» solo con dos familias independientes. Se pinta sobre la
+  cámara por capas (`vision-layers.mjs`: probabilidad, espectro, estructura, topografía, térmica
+  real). Validación en simulación y límites: [`docs/architecture/MOTOR_FUSION_EVIDENCIAS.md`](../architecture/MOTOR_FUSION_EVIDENCIAS.md).
 - **Escaneo 3D de una habitación:**
   - En iOS con LiDAR, RoomPlan (app nativa).
   - En Android, ARCore Depth.
@@ -97,6 +103,8 @@
   - Nunca escucha de radio de terceros.
 
 ## 8. Criterios de aceptación de la primera versión (A8)
+
+> **Estado v0.9 (04-11-2026):** `/senda/ojo` existe como **globo 2D ortográfico** (no CesiumJS todavía): constelaciones Iridium/Galileo/QO-100 propagadas con `orbital.mjs` (geometría pública, posiciones ilustrativas), 7 casos reales con fuente y módulos, ruta caso → satélite → relé → 112 con elevación, distancia y latencia, plan k-de-n por caso, terminador día/noche, funciona sin red (precargado) y está en el E2E (27/27). `/senda/incendio` cubre la capa de incendio con el núcleo `wildfire.mjs`. **Pendiente:** CesiumJS con terreno IGN/PNOA, FIRMS en vivo, cámaras DGT, ADS-B propio y TLE reales en línea (criterios 1–3 de esta lista).
 
 1. `/senda/ojo` abre sin red con una zona precargada (≤ 50 MB para 10 km²).
 2. Capas: terreno, edificios OSM, focos FIRMS (cacheados), cámaras DGT, teléfonos y pasarelas SENDA, y cobertura prevista.

@@ -1,0 +1,171 @@
+{
+  "kind": "DETERMINISTIC_SIMULATION",
+  "circuit": {
+    "events": [
+      {
+        "t": 93600,
+        "detectedAtT": 95400,
+        "beforeV": 1.904,
+        "afterV": 1.236,
+        "dropV": 0.668,
+        "dropPct": 35,
+        "sigmas": 31.1,
+        "aboveOccupancyThreshold": true,
+        "thresholdOnlyWouldAlarm": false,
+        "persistent": true,
+        "verdict": "ESCALON_PERSISTENTE_INSPECCIONAR_VIA",
+        "explain": "Escalón de 0.67 V (31 σ de su propia historia) con la vía libre; sigue por encima del umbral de ocupación (0.78 V), por eso un umbral absoluto no avisa."
+      }
+    ],
+    "thresholdAlarms": 0,
+    "samplesFree": 480,
+    "stepAtS": 93600,
+    "accidentAtS": 172800,
+    "thresholdV": 0.78,
+    "leadTimeH": 21.5,
+    "detectionDelayMin": 30
+  },
+  "geometry": {
+    "alerts": [
+      {
+        "fromPk": 7800,
+        "toPk": 7850,
+        "passes": 60,
+        "devices": 24,
+        "index": 2.766,
+        "spread": 0.886,
+        "recentIndex": 2.333,
+        "oldIndex": 3.21,
+        "impulseShare": 0.85,
+        "trend": 0.73,
+        "kinds": [
+          "RUGOSIDAD",
+          "IMPACTO_REPETIDO"
+        ],
+        "confidence": 1,
+        "action": "Inspección visual y ultrasonidos de juntas/soldaduras en el tramo"
+      },
+      {
+        "fromPk": 12350,
+        "toPk": 12400,
+        "passes": 60,
+        "devices": 24,
+        "index": 1.511,
+        "spread": 0.851,
+        "recentIndex": 2.462,
+        "oldIndex": 1.25,
+        "impulseShare": 0.08,
+        "trend": 1.97,
+        "kinds": [
+          "RUGOSIDAD",
+          "DEGRADACION"
+        ],
+        "confidence": 1,
+        "action": "Auscultación de geometría en el próximo paso del vehículo de medida"
+      },
+      {
+        "fromPk": 12400,
+        "toPk": 12450,
+        "passes": 60,
+        "devices": 24,
+        "index": 1.753,
+        "spread": 0.96,
+        "recentIndex": 2.64,
+        "oldIndex": 1.188,
+        "impulseShare": 0.12,
+        "trend": 2.22,
+        "kinds": [
+          "RUGOSIDAD",
+          "DEGRADACION"
+        ],
+        "confidence": 1,
+        "action": "Auscultación de geometría en el próximo paso del vehículo de medida"
+      }
+    ],
+    "trips": 60,
+    "devices": 24,
+    "binM": 50
+  },
+  "transitions": [
+    {
+      "pk": 35200,
+      "name": "Curva de entrada a la estación (ilustrativa)",
+      "fromKmh": 200,
+      "toKmh": 80,
+      "dropKmh": 120,
+      "supervised": false,
+      "energyRatio": 6.25,
+      "brakingM": 2160,
+      "brakingS": 56,
+      "risk": "ALTO_SIN_SUPERVISION"
+    },
+    {
+      "pk": 37000,
+      "name": "Andén",
+      "fromKmh": 80,
+      "toKmh": 30,
+      "dropKmh": 50,
+      "supervised": true,
+      "energyRatio": 7.11,
+      "brakingM": 354,
+      "brakingS": 23,
+      "risk": "SUPERVISADA"
+    },
+    {
+      "pk": 18000,
+      "name": "Viaducto",
+      "fromKmh": 220,
+      "toKmh": 160,
+      "dropKmh": 60,
+      "supervised": true,
+      "energyRatio": 1.89,
+      "brakingM": 1466,
+      "brakingS": 28,
+      "risk": "SUPERVISADA"
+    }
+  ],
+  "assets": [
+    {
+      "id": "MURO-PK47",
+      "kind": "MURO",
+      "pk": 47200,
+      "condition": 4,
+      "daysSinceInspection": 640,
+      "name": "Muro de contención en trinchera (ilustrativo)",
+      "mm24": 85,
+      "mm72": 160,
+      "forecastMm24": 40,
+      "reports": 2,
+      "score": 3.22,
+      "level": 3,
+      "proposal": "Proponer limitación de velocidad o cierre al gestor"
+    },
+    {
+      "id": "TERR-PK58",
+      "kind": "TERRAPLEN",
+      "pk": 58800,
+      "condition": 3,
+      "daysSinceInspection": 300,
+      "mm24": 70,
+      "mm72": 110,
+      "reports": 0,
+      "score": 1.24,
+      "level": 2,
+      "proposal": "Inspección antes del próximo tren"
+    },
+    {
+      "id": "TRIN-PK52",
+      "kind": "TRINCHERA",
+      "pk": 52100,
+      "condition": 2,
+      "daysSinceInspection": 120,
+      "mm24": 30,
+      "mm72": 55,
+      "reports": 0,
+      "score": 0.47,
+      "level": 0,
+      "proposal": "Normal"
+    }
+  ],
+  "disclaimer": "Datos sintéticos e ilustrativos: reproducen la forma de patrones documentados, no datos reales de ningún gestor u operador."
+}

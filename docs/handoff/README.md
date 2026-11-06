@@ -1,5 +1,7 @@
 # SENDA · Paquete de traspaso (handoff) para un proyecto limpio
 
+> **Actualizado (05-11-2026):** empieza por **[HANDOFF_COMPLETO_2026-11-05.md](HANDOFF_COMPLETO_2026-11-05.md)** (estado v0.16, mapa, procedimiento y mensaje de arranque). Vídeos: **[07_VIDEOS_3D_RUNBOOK.md](07_VIDEOS_3D_RUNBOOK.md)**. Lo que sigue es la versión 1 (contexto histórico).
+
 > Versión 1 · 04-11-2026 · commit de referencia `c933c9b` (rama `ccr-bb7a95b8-t79scj`, PR #12).
 > Entrada → Procesamiento → Validación → Salida: todo lo necesario para que cualquier persona o
 > agente retome el proyecto sin el historial de conversación.
@@ -67,6 +69,7 @@
 | [02_AGENTES_Y_PROMPTS.md](02_AGENTES_Y_PROMPTS.md) | 12 agentes especialistas con prompt optimizado, archivos de entrada, entregables, criterios y skills |
 | [03_OJO_DE_SENDA_COP_3D.md](03_OJO_DE_SENDA_COP_3D.md) | Especificación de la imagen operativa 3D (cámaras, sensores, aviones, drones como pasarela, SITRE, WhatsApp) con límites legales |
 | [04_DESASTRES_ESPANA.md](04_DESASTRES_ESPANA.md) | Desastres recientes en España y qué habría cambiado SENDA |
+| [../research/SENSORES_Y_CANALES_ANDROID_2026-11-04.md](../research/SENSORES_Y_CANALES_ANDROID_2026-11-04.md) | v0.10: llamadas sin Internet (señalización compacta por sonido), censo radio con dron, matriz de sensores Android con fuentes, pasos siguientes para decidir |
 | [05_CERTIFICACIONES_Y_PERMISOS.md](05_CERTIFICACIONES_Y_PERMISOS.md) | ENS, NIS2, RGPD, accesibilidad, CE/RED, drones, espectro, financiación pública |
 | [06_PROMPT_INICIAL.md](06_PROMPT_INICIAL.md) | Prompt maestro para abrir la nueva conversación |
 | [templates/CLAUDE.md](templates/CLAUDE.md) | Reglas del repositorio para cualquier agente (copiar a la raíz del nuevo repo) |

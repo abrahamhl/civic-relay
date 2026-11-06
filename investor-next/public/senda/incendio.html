@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Incendio forestal: avisar antes de que caiga la antena</title>
+<meta name="description" content="Avance del fuego con viento y pendiente, cruzado con las antenas de telefonía: cuándo llega a cada pueblo, cuándo se queda sin cobertura y por qué canal avisar a tiempo.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e;--cy:#22d3ee}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 Inter,system-ui,sans-serif}
+main{max-width:1320px;margin:0 auto;padding:20px 16px 60px}h1{font-size:30px;margin:4px 0}h2{font-size:18px;margin:0 0 8px}.m{color:var(--m)}a{color:var(--i)}
+.grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);gap:14px;margin-top:14px}@media(max-width:980px){.grid{grid-template-columns:1fr}}
+.card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:14px;min-width:0}
+.map{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--l)}canvas#map{display:block;width:100%;height:auto;cursor:crosshair;touch-action:none}
+.ctrl{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.ctrl label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--l);border-radius:10px;padding:6px 10px;font-size:13px;background:#0f1d27}
+.ctrl input[type=range]{accent-color:var(--c)}.ctrl output{color:var(--i);font-weight:800;font-variant-numeric:tabular-nums;min-width:4ch}
+button{font:inherit;font-size:13px;min-height:38px;padding:7px 12px;border-radius:10px;border:1px solid var(--l);background:#0f1d27;color:var(--t);cursor:pointer}
+.time{flex:1 1 280px}.time input{width:100%}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid var(--l);padding:6px 4px;text-align:left;vertical-align:top}
+.pill{display:inline-block;border-radius:6px;padding:1px 7px;font-size:12px;font-weight:800}.s0{background:#14222b;color:var(--m)}.s1{background:#1f3b4a}.s2{background:var(--a);color:#1a1203}.s3{background:var(--r);color:#1a0306}
+.big{font-size:26px;font-weight:900;color:var(--cy)}
+.note{border-left:3px solid var(--a);padding:6px 10px;background:#0f1a22;border-radius:6px;font-size:13px}
+.long{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px}@media(max-width:900px){.long{grid-template-columns:1fr}}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--m);margin-top:8px}.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-2px}
+</style>
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/ojo">Ojo de SENDA</a> · <a href="/senda/red">Red y satélites</a> · <a href="/senda/via">Vigilancia ferroviaria</a> · <a href="/senda/estado">Verificación</a></p>
+<h1>Incendio forestal: avisar antes de que caiga la antena</h1>
+<p class="m">El aviso a la población suele calcularse por cuándo llega el fuego. Pero las antenas de telefonía están en cerros y pistas forestales, y arden antes que los pueblos: con ellas cae la cobertura y el aviso ya no llega. SENDA calcula el avance del fuego con el viento y la pendiente, lo cruza con las antenas y dice, pueblo a pueblo, <b>hasta cuándo se puede avisar por la red móvil</b> y por qué canal hacerlo después.</p>
+<p class="note">Escenario de demostración con paisaje sintético (zona tipo El Tiemblo): relieve, vegetación, pueblos y antenas son ilustrativos y los coeficientes no están calibrados. El cálculo es el del núcleo probado (<code>wildfire.mjs</code>, 7 pruebas).</p>
+
+<div class="grid">
+  <section class="card" aria-labelledby="h-map">
+    <h2 id="h-map">Mapa del incendio <span class="m" id="clock" style="font-weight:600"></span></h2>
+    <div class="map"><canvas id="map" role="img" aria-label="Mapa del incendio con frente de llama, isócronas, antenas y pueblos"></canvas></div>
+    <div class="ctrl">
+      <button type="button" id="play">Pausa</button>
+      <label class="time">Tiempo <input type="range" id="t" min="0" max="360" value="0" aria-label="Minutos desde la ignición"> <output id="to">0 h 00</output></label>
+      <label>Viento (km/h) <input type="range" id="w" min="0" max="60" step="5" value="30" aria-label="Velocidad del viento"> <output id="wo">30</output></label>
+      <label>Hacia <input type="range" id="d" min="0" max="345" step="15" value="15" aria-label="Dirección hacia la que sopla el viento"> <output id="do">15°</output></label>
+    </div>
+    <div class="legend"><span><i style="background:#ffb020"></i>frente activo</span><span><i style="background:#2a1d18"></i>superficie quemada</span><span><i style="border:1px solid #fff;background:none"></i>isócrona cada hora</span><span><i style="background:#22d3ee"></i>antena con servicio (círculo: cobertura)</span><span><i style="background:#ff5b6e"></i>antena perdida</span><span>Toca el mapa para mover el foco.</span></div>
+  </section>
+  <aside class="card" aria-live="polite">
+    <h2>Pueblo a pueblo</h2>
+    <div id="key"></div>
+    <table id="towns"></table>
+    <p class="m" style="font-size:13px">«Avisar antes de» = llegada del fuego − tiempo de evacuación − 10 min de notificación. «Antena cae» = el fuego alcanza la antena menos 10 min de margen (antes falla la alimentación).</p>
+  </aside>
+</div>
+
+<div class="long">
+  <section class="card"><h2>Qué calcula</h2>
+    <p>El terreno se divide en celdas de 100 m. Para cada celda, SENDA calcula el <b>tiempo mínimo de llegada</b> del fuego, como hacen los simuladores operativos: el fuego avanza de celda en celda por el camino más rápido (algoritmo de Dijkstra sobre 16 vecinos).</p>
+    <p>La velocidad depende de la <b>vegetación</b> (pasto, matorral, arbolado; agua y roca no arden), del <b>viento</b> (el frente se estira en elipse en la dirección en la que sopla) y de la <b>pendiente</b> (ladera arriba corre mucho más, con la forma del factor de pendiente de Rothermel).</p>
+    <p>Los focos pueden venir de los satélites: el núcleo lee el formato de <b>NASA FIRMS</b> (VIIRS/MODIS) y los convierte en celdas de ignición.</p></section>
+  <section class="card"><h2>La idea nueva: las antenas</h2>
+    <p>Para cada pueblo, SENDA calcula tres horas: cuándo llega el fuego, hasta cuándo hay que avisar para que dé tiempo a evacuar y <b>cuándo pierde su última antena</b>.</p>
+    <p>Si la antena cae <b>antes</b> de la hora límite, avisar «a tiempo según el fuego» ya no sirve: el mensaje no llegará. SENDA marca ese pueblo en azul y propone adelantar la alerta o enviarla por canales que no dependen de la antena.</p>
+    <p>En el escenario por defecto, Valdeolmos pierde la antena <b id="gap"></b> antes de su hora límite de aviso.</p></section>
+  <section class="card"><h2>Cómo avisa cuando ya no hay antena</h2>
+    <p>El aviso se trocea en fragmentos k-de-n y se reparte entre <b>vecinos por Bluetooth y sonido</b>, <b>LoRa</b>, <b>satélite directo al móvil</b>, <b>Iridium</b> y, si el director de extinción lo autoriza, un <b>dron mula</b>. El plan calcula la probabilidad exacta de que llegue (<a href="/senda/red">red multiportador</a>).</p>
+    <p>Las alertas van firmadas por el organismo: los teléfonos solo obedecen credenciales verificadas (<a href="/senda/organismo">organismo</a>). En el globo puedes ver qué satélite está a la vista de la zona (<a href="/senda/ojo">Ojo de SENDA</a>).</p></section>
+  <section class="card"><h2>Límites y fuentes</h2>
+    <p>No dirige la extinción ni sustituye a ES-Alert: propone alertas y colocación de pasarelas al centro de mando. Para operar, se acopla a combustibles reales (SIOSE/CORINE), meteorología de AEMET y modelos validados (Rothermel, FARSITE, Wildfire Analyst).</p>
+    <p>Fuentes: tiempo mínimo de viaje (Finney, 2002); factor de pendiente (Rothermel, 1972); <a href="https://firms.modaps.eosdis.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA FIRMS</a>; <a href="https://opendata.aemet.es/" target="_blank" rel="noopener noreferrer">AEMET OpenData</a>.</p></section>
+</div>
+</main>
+<script type="module">
+import { syntheticLandscape, arrivalTimes, assessAssets } from '/senda/core/wildfire.mjs';
+const $ = (s) => document.querySelector(s), Ld = syntheticLandscape(), G = Ld.grid, UP = 6;
+const st = { wind: 30, dir: 15, ign: { x: 30, y: 20 }, now: 0, playing: true, minPerS: 8, T: null, assets: null };
+const hm = (min) => { if (!Number.isFinite(min)) return '—'; const m = Math.round(min); return `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`; };
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x)), lerp = (a, b, k) => a + (b - a) * k;
+const cv = $('#map'), g = cv.getContext('2d'), BW = G.w * UP, BH = G.h * UP;
+
+/* ---------- relieve sombreado, vegetación suave y curvas de nivel (una vez) ---------- */
+const FUEL = { 0: [46, 104, 160], 1: [176, 160, 104], 2: [104, 116, 70], 3: [52, 82, 54], 4: [150, 146, 140], 5: [196, 192, 182] };
+const at = (arr, x, y) => arr[clamp(y, 0, G.h - 1) * G.w + clamp(x, 0, G.w - 1)];
+const bil = (arr, x, y) => { const x0 = Math.floor(x), y0 = Math.floor(y), fx = x - x0, fy = y - y0; return lerp(lerp(at(arr, x0, y0), at(arr, x0 + 1, y0), fx), lerp(at(arr, x0, y0 + 1), at(arr, x0 + 1, y0 + 1), fx), fy); };
+const base = document.createElement('canvas'); base.width = BW; base.height = BH;
+{ const bg = base.getContext('2d'), img = bg.createImageData(BW, BH), L = [-0.6, -0.6, 0.53];
+  for (let py = 0; py < BH; py++) for (let px = 0; px < BW; px++) {
+    const x = px / UP - 0.5, y = py / UP - 0.5, e = bil(G.elev, x, y), dx = (bil(G.elev, x + 0.3, y) - bil(G.elev, x - 0.3, y)) / 60, dy = (bil(G.elev, x, y + 0.3) - bil(G.elev, x, y - 0.3)) / 60;
+    const nl = Math.hypot(dx, dy, 1), shade = clamp(((-dx * L[0] - dy * L[1] + L[2]) / nl) * 1.35, 0.45, 1.25);
+    const x0 = Math.floor(x), y0 = Math.floor(y), fx = x - x0, fy = y - y0, c = [0, 0, 0]; // mezcla suave de colores de vegetación
+    for (const [ox, oy, w] of [[0, 0, (1 - fx) * (1 - fy)], [1, 0, fx * (1 - fy)], [0, 1, (1 - fx) * fy], [1, 1, fx * fy]]) { const f = FUEL[at(G.fuel, x0 + ox, y0 + oy)]; c[0] += f[0] * w; c[1] += f[1] * w; c[2] += f[2] * w; }
+    const minor = Math.abs(((e % 25) + 25) % 25 - 12.5) > 11.9, major = Math.abs(((e % 100) + 100) % 100 - 50) > 49.2, k = major ? 0.72 : minor ? 0.88 : 1;
+    img.data.set([c[0] * shade * k, c[1] * shade * k, c[2] * shade * k, 255], (py * BW + px) * 4);
+  }
+  bg.putImageData(img, 0, 0);
+}
+/* ---------- isócronas por marching squares ---------- */
+function contour(T, level) {
+  const v = (x, y) => { const t = T[y * G.w + x]; return Number.isFinite(t) ? t : 1e9; }, segs = [], I = (a, b) => (level - a) / (b - a);
+  for (let y = 0; y < G.h - 1; y++) for (let x = 0; x < G.w - 1; x++) {
+    const a = v(x, y), b = v(x + 1, y), c = v(x + 1, y + 1), d = v(x, y + 1), idx = (a < level) | ((b < level) << 1) | ((c < level) << 2) | ((d < level) << 3);
+    if (idx === 0 || idx === 15) continue;
+    const top = [x + I(a, b), y], right = [x + 1, y + I(b, c)], bot = [x + I(d, c), y + 1], left = [x, y + I(a, d)];
+    const S = { 1: [left, top], 2: [top, right], 3: [left, right], 4: [right, bot], 5: [left, top, right, bot], 6: [top, bot], 7: [left, bot], 8: [bot, left], 9: [top, bot], 10: [top, right, bot, left], 11: [right, bot], 12: [right, left], 13: [top, right], 14: [left, top] }[idx];
+    for (let k = 0; k < S.length; k += 2) segs.push([S[k], S[k + 1]]);
+  }
+  return segs;
+}
+let ISO = [];
+function compute() {
+  st.T = arrivalTimes(G, [st.ign], { windKmh: st.wind, windToDeg: st.dir }, { maxMin: 720 });
+  st.assets = assessAssets(G, st.T, Ld.towns, Ld.towers);
+  ISO = [60, 120, 180, 240, 300, 360].map((l) => ({ l, segs: contour(st.T, l) }));
+  const a = st.assets.find((x) => x.id === 'A'); $('#gap').textContent = a && a.antennaFirst ? `${Math.round(a.deadlineMin - a.commsLossMin)} minutos` : '— (con este viento la antena no cae antes)';
+  table(); window.SENDA_FIRE = { assets: st.assets.map(({ id, status, arrivalMin, deadlineMin, commsLossMin, antennaFirst, channel }) => ({ id, status, arrivalMin, deadlineMin, commsLossMin, antennaFirst, channel })) };
+}
+function table() {
+  const ch = { RED_MOVIL_Y_ES_ALERT: 'Red móvil y ES-Alert a su hora', AVISAR_YA_POR_RED_MOVIL: 'Adelantar el aviso por red móvil', PORTADORES_SIN_RED: 'Canales sin red (k-de-n)' };
+  $('#towns').innerHTML = '<tr><th>Pueblo</th><th>Fuego llega</th><th>Avisar antes de</th><th>Antena cae</th><th>Canal</th></tr>' + st.assets.map((a) => {
+    const late = st.now >= a.sendByMin, cls = a.status === 'FUERA_DE_ALCANCE' ? 's0' : a.antennaFirst ? 's2' : 's1';
+    return `<tr><td><b>${a.name}</b><br><span class="m">${a.population} hab.</span></td><td>${hm(a.arrivalMin)}</td><td>${hm(a.deadlineMin)}</td><td style="color:${a.antennaFirst ? 'var(--a)' : ''}">${hm(a.commsLossMin)}</td><td><span class="pill ${cls}">${a.status === 'FUERA_DE_ALCANCE' ? 'Fuera de alcance' : ch[a.channel]}</span>${a.offlinePlan ? `<br><span class="m">sin red: ${a.offlinePlan.k} de ${a.offlinePlan.n} fragmentos · P ${(a.offlinePlan.pDelivery * 100).toFixed(1).replace('.', ',')} %</span>` : ''}${late && a.status !== 'FUERA_DE_ALCANCE' ? '<br><b style="color:var(--r)">pasada la hora de enviar</b>' : ''}</td></tr>`; }).join('');
+  const a = st.assets.find((x) => x.antennaFirst); $('#key').innerHTML = a ? `<p style="margin:0 0 8px"><span class="big">${Math.round(a.deadlineMin - a.commsLossMin)} min</span><br>antes de la hora límite de aviso cae la antena de <b>${a.name}</b>: hay que avisar como tarde a las <b>T + ${hm(a.sendByMin)}</b>, no a las T + ${hm(a.deadlineMin)}.</p>` : '<p class="m">Con este viento ninguna antena cae antes de su hora límite.</p>';
+}
+
+/* ---------- dibujo ---------- */
+function resize() { const r = Math.min(2, devicePixelRatio || 1), w = cv.clientWidth, h = Math.round((w * G.h) / G.w); cv.width = w * r; cv.height = h * r; g.setTransform(r, 0, 0, r, 0, 0); st.W = w; st.H = h; }
+addEventListener('resize', resize); resize();
+const glow = document.createElement('canvas'); glow.width = BW; glow.height = BH; const glw = glow.getContext('2d');
+const fire = document.createElement('canvas'); fire.width = BW; fire.height = BH; const fg = fire.getContext('2d'), fimg = fg.createImageData(BW, BH); let lastFireMin = -1;
+function drawFire(now) {
+  if (Math.abs(now - lastFireMin) < 0.5) return; lastFireMin = now; const d = fimg.data, T = st.T;
+  for (let py = 0; py < BH; py++) for (let px = 0; px < BW; px++) {
+    const x = px / UP - 0.5, y = py / UP - 0.5, x0 = Math.floor(x), y0 = Math.floor(y), fx = x - x0, fy = y - y0;
+    const v = [at(T, x0, y0), at(T, x0 + 1, y0), at(T, x0, y0 + 1), at(T, x0 + 1, y0 + 1)].map((q) => (Number.isFinite(q) ? q : 1e6));
+    const t = lerp(lerp(v[0], v[1], fx), lerp(v[2], v[3], fx), fy), o = (py * BW + px) * 4;
+    if (t > now) { d[o + 3] = 0; continue; }
+    const age = now - t;
+    if (age < 14) { const k = age / 14; d[o] = 255; d[o + 1] = Math.round(230 - 150 * k); d[o + 2] = Math.round(90 - 70 * k); d[o + 3] = Math.round(235 - 40 * k); }
+    else { const n = ((px * 73856093) ^ (py * 19349663)) & 15, ember = age < 40 && n === 0; d[o] = ember ? 190 : 38 + n; d[o + 1] = ember ? 70 : 28 + n; d[o + 2] = ember ? 30 : 24 + n; d[o + 3] = Math.round(clamp(150 + age, 150, 205)); }
+  }
+  fg.putImageData(fimg, 0, 0);
+  glw.clearRect(0, 0, BW, BH); glw.filter = 'blur(5px)'; glw.drawImage(fire, 0, 0); glw.filter = 'none'; // resplandor: una vez por avance, no por fotograma
+}
+function frame(ts) {
+  const W = st.W, H = st.H, sx = W / G.w, sy = H / G.h, now = st.now;
+  g.imageSmoothingEnabled = true; g.drawImage(base, 0, 0, W, H);
+  drawFire(now); g.drawImage(fire, 0, 0, W, H);
+  // resplandor del frente
+  g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.55; g.drawImage(glow, 0, 0, W, H); g.restore();
+  // humo arrastrado por el viento
+  const ang = (st.dir * Math.PI) / 180, wv = Math.max(0.2, st.wind / 30);
+  for (let i = 0; i < st.T.length; i += 7) { const t = st.T[i]; if (!(t <= now && t > now - 14)) continue;
+    for (let k = 0; k < 3; k++) { const ph = ((ts / 4000 + k / 3 + (i % 11) / 11) % 1), r = (6 + ph * 30) * sx / 6, x = ((i % G.w) + 0.5) * sx + Math.cos(ang) * ph * 60 * wv * sx / 6, y = (Math.floor(i / G.w) + 0.5) * sy + Math.sin(ang) * ph * 60 * wv * sy / 6;
+      const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(170,170,170,${0.16 * (1 - ph)})`); gr.addColorStop(1, 'rgba(170,170,170,0)'); g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); } }
+  // isócronas
+  g.lineWidth = 1.2; g.font = '600 11px Inter';
+  for (const iso of ISO) { if (iso.l > now + 0.01) continue; g.strokeStyle = 'rgba(255,255,255,.55)'; g.beginPath(); for (const [a, b] of iso.segs) { g.moveTo((a[0] + 0.5) * sx, (a[1] + 0.5) * sy); g.lineTo((b[0] + 0.5) * sx, (b[1] + 0.5) * sy); } g.stroke();
+    const s = iso.segs[Math.floor(iso.segs.length * 0.35)]; if (s) { g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect((s[0][0] + 0.5) * sx - 2, (s[0][1] + 0.5) * sy - 11, 28, 14); g.fillStyle = '#fff'; g.fillText(`${iso.l / 60} h`, (s[0][0] + 0.5) * sx + 1, (s[0][1] + 0.5) * sy); } }
+  // antenas con cobertura
+  for (const tw of Ld.towers) { const lossAt = Math.min(...[-1, 0, 1].flatMap((dy) => [-1, 0, 1].map((dx) => at(st.T, tw.x + dx, tw.y + dy)))) - 10, lost = now >= lossAt, x = (tw.x + 0.5) * sx, y = (tw.y + 0.5) * sy;
+    g.setLineDash([4, 4]); g.strokeStyle = lost ? 'rgba(255,91,110,.35)' : 'rgba(34,211,238,.55)'; g.beginPath(); g.arc(x, y, 30 * sx, 0, 7); g.stroke(); g.setLineDash([]);
+    g.strokeStyle = lost ? '#ff5b6e' : '#22d3ee'; g.lineWidth = 2.2; g.beginPath(); g.moveTo(x - 7, y + 10); g.lineTo(x, y - 10); g.lineTo(x + 7, y + 10); g.moveTo(x - 4, y + 2); g.lineTo(x + 4, y + 2); g.stroke();
+    for (let r = 1; r <= 2 && !lost; r++) { g.beginPath(); g.arc(x, y - 10, 4 * r, -2.4, -0.7); g.stroke(); }
+    if (lost) { g.font = '800 13px Inter'; g.fillStyle = '#ff5b6e'; g.fillText('✕ sin servicio', x + 9, y - 6); } }
+  // pueblos y alertas
+  for (const tn of Ld.towns) { const a = st.assets.find((q) => q.id === tn.id), x = (tn.x + 0.5) * sx, y = (tn.y + 0.5) * sy;
+    if (Number.isFinite(a.sendByMin) && now >= a.sendByMin && now < a.sendByMin + 40) { const k = (now - a.sendByMin) / 40, col = a.antennaFirst ? '#22d3ee' : '#34d399'; for (let r = 0; r < 3; r++) { const kk = (k + r / 3) % 1; g.strokeStyle = col; g.globalAlpha = 1 - kk; g.lineWidth = 2.5; g.beginPath(); g.arc(x, y, 8 + kk * 60 * sx / 6, 0, 7); g.stroke(); } g.globalAlpha = 1; }
+    g.fillStyle = 'rgba(5,9,12,.78)'; const label = `${tn.name} · ${a.status === 'FUERA_DE_ALCANCE' ? 'fuera de alcance' : 'fuego ' + hm(a.arrivalMin)}`; g.font = '800 13px Inter'; const tw2 = g.measureText(label).width + 12; g.fillRect(x + 8, y - 22, tw2, 20);
+    g.fillStyle = a.status === 'FUERA_DE_ALCANCE' ? '#9fb2bc' : a.antennaFirst ? '#22d3ee' : '#34d399'; g.fillText(label, x + 14, y - 7); g.beginPath(); g.arc(x, y, 5, 0, 7); g.fillStyle = '#fff'; g.fill(); }
+  // foco, viento, norte y escala
+  const ix = (st.ign.x + 0.5) * sx, iy = (st.ign.y + 0.5) * sy; g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.arc(ix, iy, 7, 0, 7); g.stroke(); g.beginPath(); g.moveTo(ix - 11, iy); g.lineTo(ix + 11, iy); g.moveTo(ix, iy - 11); g.lineTo(ix, iy + 11); g.stroke();
+  g.fillStyle = 'rgba(5,9,12,.75)'; g.fillRect(10, 10, 132, 62); g.save(); g.translate(40, 41); g.rotate(ang); g.strokeStyle = '#fff'; g.lineWidth = 3; g.beginPath(); g.moveTo(-16, 0); g.lineTo(14, 0); g.moveTo(8, -6); g.lineTo(15, 0); g.lineTo(8, 6); g.stroke(); g.restore();
+  g.fillStyle = '#fff'; g.font = '800 14px Inter'; g.fillText(`${st.wind} km/h`, 66, 38); g.font = '11px Inter'; g.fillStyle = '#9fb2bc'; g.fillText('viento', 66, 54);
+  g.fillStyle = 'rgba(5,9,12,.75)'; g.fillRect(W - 30 - 10 * sx - 40, H - 38, 10 * sx + 60, 28); g.fillStyle = '#fff'; g.fillRect(W - 20 - 10 * sx - 40, H - 22, 10 * sx, 4); g.font = '11px Inter'; g.fillText('1 km', W - 52, H - 17);
+  g.fillStyle = 'rgba(5,9,12,.75)'; g.fillRect(W - 40, 10, 30, 34); g.fillStyle = '#fff'; g.font = '800 13px Inter'; g.fillText('N', W - 30, 26); g.fillText('↑', W - 29, 40);
+  $('#clock').textContent = `· T + ${hm(now)}`;
+  requestAnimationFrame(tick);
+}
+let last = performance.now();
+function tick(ts) { const dt = Math.min(0.1, (ts - last) / 1000); last = ts; if (st.playing) { st.now = (st.now + dt * st.minPerS) % 361; $('#t').value = Math.round(st.now); $('#to').textContent = hm(st.now); if (Math.round(st.now) % 10 === 0) table(); } frame(ts); }
+
+/* ---------- controles ---------- */
+$('#play').onclick = () => { st.playing = !st.playing; $('#play').textContent = st.playing ? 'Pausa' : 'Reanudar'; };
+$('#t').oninput = (e) => { st.now = +e.target.value; $('#to').textContent = hm(st.now); table(); };
+$('#w').oninput = (e) => { st.wind = +e.target.value; $('#wo').textContent = st.wind; compute(); lastFireMin = -1; };
+$('#d').oninput = (e) => { st.dir = +e.target.value; $('#do').textContent = st.dir + '°'; compute(); lastFireMin = -1; };
+cv.addEventListener('pointerdown', (e) => { const r = cv.getBoundingClientRect(), x = Math.floor(((e.clientX - r.left) / r.width) * G.w), y = Math.floor(((e.clientY - r.top) / r.height) * G.h); if (x >= 0 && y >= 0 && x < G.w && y < G.h) { st.ign = { x, y }; st.now = 0; compute(); lastFireMin = -1; } });
+compute(); requestAnimationFrame(tick);
+</script>
+</body></html>
