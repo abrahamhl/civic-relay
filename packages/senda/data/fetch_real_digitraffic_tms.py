@@ -30,7 +30,7 @@ def parsed_utc(s: str) -> dt.datetime:
 def normalize_tms(payload: dict, station: int, now: dt.datetime) -> dict:
     if not isinstance(payload,dict): raise ValueError("Expected JSON object")
     values=payload.get("tmsStations")
-    if not isinstance(values,list) or not values: raise ValueError("No real station observations in response")
+    if not isinstance(values,list) or not values: raise ValueError(f"No real station observations in response; keys={list(payload)[:20]}; tmsStationsType={type(values).__name__}; length={len(values) if isinstance(values,list) else None}")
     matching=[x for x in values if int(x.get("id",-1))==station]
     if len(matching)!=1: raise ValueError("Expected exactly one matched station")
     x=matching[0]
@@ -87,11 +87,12 @@ def pull_one(station: int, out: pathlib.Path) -> dict:
     elif encoding not in ("","identity"): raise ValueError("Unsupported content encoding")
     if len(b)>MAX_BYTES or not b: raise ValueError("Oversized/empty uncompressed response")
     data=json.loads(b)
-    now=dt.datetime.now(dt.timezone.utc)
-    normalized=normalize_tms(data,station,now)
     out.mkdir(parents=True,exist_ok=True)
+    # Preserve original authentic response even if schema validation fails: never fill with fake samples.
     original_path=out/f"digitraffic_tms_{station}.raw.json"
     original_path.write_bytes(b)
+    now=dt.datetime.now(dt.timezone.utc)
+    normalized=normalize_tms(data,station,now)
     normalized.update({"source_url":url,"raw_sha256":hashlib.sha256(b).hexdigest(),
       "source_licence":LICENSE,
       "raw_filename":original_path.name,
