@@ -63,7 +63,7 @@ Proponer **revisión humana prioritaria** cuando `P(M_e<0)` supere un umbral aco
 No es correcto afirmar “SENDA habría avisado 8,5 h antes” como éxito medido. La expresión correcta es **“contrafactual retrospectivo del simulador, condicionado a disponibilidad, latencia y calidad de detecciones históricas; no ha sido probado como alerta en campo”**.
 
 ## 4. Requisitos de aceptación para v0.22
-1. Regenerar originales con máscaras GOES preservadas, hash por fichero, URL exacta, instante de adquisición, nodo y satélite, estadísticas de descartes; comparar 10/11/30/31 frente a 10–15/30–35.
+1. Regenerar originales con máscaras GOES **y DQF** preservados (el importador Python ya guarda ambos en nuevos datos), hash por fichero, URL exacta, instante de adquisición UTC, nodo y satélite, estadísticas de descartes; comparar 10/11/30/31 frente a 10–15/30–35 y rechazar DQF de calidad inválida. Los originales históricos v0.20 no pueden reconstruirse desde la copia compacta.
 2. Recalcular Camp/Eaton/Palisades con la nueva entrada. **Invalidar y reetiquetar** cualquier titular de velocidad/adelanto que no sobreviva a la depuración; no reutilizar métricas legacy sin recalcular.
 3. Obtener perímetros con hora válida NIFC (US) y EFFIS (EU); completar al menos un caso europeo con observaciones temporales independientes.
 4. Identificar por cámara el tipo real: RGB / térmica no radiométrica / radiométrica. Se requiere documentación y permiso, no inferencia desde la imagen.
