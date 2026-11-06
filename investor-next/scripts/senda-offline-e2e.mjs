@@ -249,9 +249,9 @@ check('Ruta protectora sin red: con 1,2 s entre coches el aviso SENDA reduce el 
 const drv = await C.page.evaluate(() => { const S = window.SENDA_CARRETERA; return { v16: S.v16.incidents[0].kind, trapped: S.v16.incidents[0].trapped, orphan: S.v16.orphans.length, w: S.lwr.w, calc: S.calc, rows: document.querySelectorAll('#z-tb tr').length }; });
 check('Situaciones al volante sin red: V16 + SENDA convierte una baliza en «accidente con atrapado», la cola crece hacia atrás a 14,3 km/h (LWR) y las calculadoras de niebla, firme y agua responden',
   drv.v16 === 'ACCIDENTE' && drv.trapped === 1 && drv.orphan === 1 && drv.w === -14.3 && drv.calc.vis === 72 && drv.calc.flood === 'PIERDE_CONTROL' && drv.rows >= 18, drv);
-const cam = await cap('/camaras', () => ({ est: window.SENDA_CAMARAS.est.visM, vis: window.SENDA_CAMARAS.vis, never: [...document.querySelectorAll('#f-tb .chip.no')].length }), 'e2e-29-camaras.png');
-check('Cámaras sin red: la visibilidad estimada en la imagen con niebla de 120 m queda a menos del 15 % y lo prohibido (cámaras sin permiso, «Ojo de Dios», biometría) aparece como NUNCA',
-  Math.abs(cam.est - cam.vis) / cam.vis < 0.15 && cam.never === 3, cam);
+const cam = await cap('/camaras', () => ({ est: window.SENDA_CAMARAS.est.visM, vis: window.SENDA_CAMARAS.vis, never: [...document.querySelectorAll('#f-tb .chip.no')].length, rows: document.querySelectorAll('#f-tb tr').length }), 'e2e-29-camaras.png');
+check('Cámaras sin red: la visibilidad estimada en la imagen con niebla de 120 m queda a menos del 15 %; el registro reúne ≥ 30 fuentes oficiales con licencia y lo prohibido (cámaras sin permiso, agregadores de datos personales, matrículas, biometría) aparece como NUNCA',
+  Math.abs(cam.est - cam.vis) / cam.vis < 0.15 && cam.never === 4 && cam.rows >= 30, cam);
 const nl = await cap('/paises', () => ({ d: window.SENDA_PAISES.datex, conv: window.SENDA_PAISES.plan.needsConvenio }), 'e2e-30-paises.png');
 const msi = await C.page.evaluate(async () => { document.querySelector('#m-say').click(); await new Promise((r) => setTimeout(r, 50)); return window.SENDA_PAISES.spoken; });
 check('Exportación a Países Bajos sin red: el lector DATEX II convierte la publicación en avisos y se queda con los 3 de la ruta; el rood kruis se dice en neerlandés; las cámaras allí requieren convenio',
@@ -282,6 +282,14 @@ const f3 = await cap('/fuego3d', () => window.SENDA_FUEGO3D, 'e2e-35-fuego3d.png
 const f3b = await C.page.evaluate(async () => { const S = window.SENDA_FUEGO3D; S.api.tilt(0.02); const top = S.api.view.pitch; S.api.tilt(1.45); const hor = S.api.view.pitch; document.querySelector('#cam2').click(); document.querySelector('#plane').click(); await new Promise((r) => setTimeout(r, 300)); return { top, hor, cam: S.cameraView, flight: S.flight?.circulation ?? null, drop: S.flight?.drop?.secondsCancelled ?? null }; });
 check('Incendio en 3D sin red: terreno Copernicus 380×339 y GFS real del 23-07 cargados; el viento 3D se resuelve en el teléfono conservando la masa; la pluma sube; vistas cenital y horizontal, vista desde una cámara y pasada de un CL-415 con su estela',
   f3.ok && f3.errors.length === 0 && f3.dem.w === 380 && f3.dem.h === 339 && f3.state.divAfter < f3.state.divBefore / 50 && f3.state.plumeTop > 200 && f3b.top < 0.05 && f3b.hor > 1.4 && f3b.cam === 2 && f3b.flight > 50 && f3b.drop > 0, { f3: { ok: f3.ok, errors: f3.errors, state: f3.state, grid: f3.grid }, f3b });
+
+// ---- v0.20 sin red: incendios de referencia (GOES y HRRR reales) y coches + cámaras de tráfico + fuego
+const rf = await cap('/referencias', () => window.SENDA_REF, 'e2e-36-referencias.png');
+check('Incendios de referencia sin red: 14 casos con fuentes y ≥ 5 reconstruidos con GOES; Camp medido por satélite ≈ 7,5 km/h como NIST; el fuego llega a ≤ 3 km de Pentz Rd hacia las 08:17 (NIST: 08:30); validación dejando fuera incendios enteros',
+  rf.ok && rf.casos >= 14 && rf.reconstruidos >= 5 && Math.abs(rf.campGoes - 7.5) < 2.5 && rf.pentz[0] >= '08:00' && rf.pentz[0] <= '08:45' && rf.puntos >= 4 && rf.cobertura80 > 0.5, rf);
+const ev = await cap('/evacuacion', () => window.SENDA_EVAC, 'e2e-37-evacuacion.png');
+check('Coches, cámaras y fuego sin red: en Eaton SENDA avisa a Altadena oeste horas antes de la orden real; en Skyway los cierres casi eliminan la exposición; el filtro de Kalman detecta el atasco de Chico y el bloqueo de Palisades Dr en ≤ 10 min; cámaras reales de Caltrans y TfL',
+  ev.ok && ev.eatonAdelantoH > 3 && ev.escenarios['cierres-senda'].expuestos * 100 < ev.escenarios['aviso-al-detectar'].expuestos && ev.deteccionAtasco - 45 <= 10 && ev.deteccionBloqueo - 50 <= 10 && ev.caltrans >= 10 && ev.caltransVideo >= 5 && ev.tfl >= 10, ev);
 
 // ---- Llamada sin Internet: dos teléfonos nuevos, código por SONIDO (onda real) y conexión directa sin servidor.
 // (La emulación «offline» de Chromium también bloquea WebRTC local, así que aquí se demuestra lo equivalente:
@@ -410,7 +418,7 @@ const a11y = async (page) => page.evaluate(() => {
   return issues;
 });
 const a11yIssues = {};
-const a11yScreens = ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva', '/carretera', '/camaras', '/paises', '/dgt', '/trafico', '/vehiculos', '/fuego', '/fuego3d'];
+const a11yScreens = ['', '/red', '/organismo', '/incidente', '/edificios', '/via', '/ojo', '/incendio', '/estado', '/llamada', '/dron', '/arquitectura', '/sentidos', '/agua', '/triaje', '/monte', '/barrido', '/reserva', '/carretera', '/camaras', '/paises', '/dgt', '/trafico', '/vehiculos', '/fuego', '/fuego3d', '/referencias', '/evacuacion'];
 for (const path of a11yScreens) {
   await R.goto(base + path); await R.waitForLoadState('load'); await R.waitForTimeout(300);
   const iss = await a11y(R); if (iss.length) a11yIssues[path || '/'] = iss;

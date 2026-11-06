@@ -4,11 +4,13 @@
 
 **Autoría:** Abraham Haddioui (SENDA). Redacción técnica asistida por IA y verificada con código y pruebas reproducibles.
 
-**Versión:** v0.19, 2026-11-05. **Repositorio:** `abrahamhl/civic-relay`. **Reproducción:** `scripts/datos-reales/` y `node packages/senda/scripts/fire3d-real.mjs`.
+**Versión:** v0.20, 2026-11-06 (v0.19 para el caso de Madrid). **Repositorio:** `abrahamhl/civic-relay`. **Reproducción:** `scripts/datos-reales/` y `node packages/senda/scripts/fire3d-real.mjs`.
 
 ---
 
 ## Resumen
+
+**Novedad de v0.20.** Base de referencia con 14 incendios reales documentados (cada dato con su fuente o marcado «pendiente de verificar»). 7 se reconstruyen con el satélite GOES (NOAA, cada 5–10 min) y el viento HRRR. En el Camp Fire el satélite mide 8,0 km/h en los primeros 90 min, y NIST documenta ≈ 7,5 km/h. El fuego llega a ≤ 3 km de Pentz Rd a las 08:17; NIST sitúa a las 08:30 el fuego sobre el tráfico de esa vía. Validando con un incendio entero fuera, la regla del 10 % publicada sigue siendo el mejor predictor puntual. Lo aprendido es su sesgo (mediana ×1,43) y su dispersión real (σ = 0,88 en logaritmo), que fijan el P90 de los avisos. Un modelo de tráfico por celdas con filtro de Kalman cruza cámaras oficiales (Caltrans y TfL, contadas de verdad), coches sonda y la llegada del fuego. En Eaton 2025 su umbral dinámico habría avisado a Altadena oeste 8,5 h antes de la orden real.
 
 Presentamos SENDA-3D, un sistema que funciona sin conexión y une en una sola cadena:
 - los perfiles verticales de un modelo meteorológico abierto (NOAA GFS 0,25°);
@@ -152,6 +154,35 @@ Tiempo mínimo de llegada sobre la malla de 100 m con 16 vecinos (Dijkstra). La 
 - **Potencia del fuego desde la columna:** se invierte el ascenso de Briggs con la base y un punto de la columna, F = (Δz·U/(1,6·x^(2/3)))³.
 - **Parpadeo y sincronización:** frecuencia de parpadeo y anchura aproximada, f ≈ 1,5·D^(−1/2) (Cetegen y Ahmed, 1993); las cámaras se sincronizan por destellos con correlación cruzada.
 
+### 3.7 Base de referencia y entrenamiento (v0.20)
+
+- **Datos:** detecciones GOES-R ABI L2 FDC (CONUS, 5–10 min) y viento HRRR a 10 m (3 km), ambos de NOAA en AWS Open Data. Se descargan con `scripts/datos-reales/goes_hrrr_incendio.py`, sin inventar nada.
+- **Frente medido:** el píxel detectado más avanzado a sotavento. La dirección es la media vectorial del viento HRRR en las tres primeras horas. Se toma el máximo acumulado, porque el humo puede ocultar píxeles un instante.
+- **Tramos:** ajuste por trozos del frente frente al tiempo (programación dinámica, ≤ 3 tramos de ≥ 90 min, penalización BIC). Un tramo se considera **resuelto** si avanza más de un píxel; si no, el satélite no puede medirlo y no entra en el entrenamiento.
+- **Modelos comparados:**
+  - ley potencial ln ROS = a + b·ln U10;
+  - razón por combustible;
+  - regla del 10 % actualizada por Bayes;
+  - regla del 10 % publicada (Cruz y Alexander, 2019);
+  - la media.
+- **Validación:** dejando fuera un **incendio entero**, no un punto.
+- **Calibración:** se calibra la regla con sus residuos r = ln(ROS / 0,1·U10). El intervalo predictivo usa la t de Student con σ·√(1 + 1/n), y se mide su cobertura fuera de muestra.
+
+### 3.8 Coches, cámaras de tráfico y fuego (v0.20)
+
+- **Tráfico:** modelo de transmisión de celdas (Daganzo, 1994) con diagrama triangular.
+- **Humo:** velocidad limitada por la distancia de parada, v·t_r + v²/(2a) ≤ visibilidad, y capacidad por hueco de seguridad, q = v/(v·t_r + L).
+- **Salidas:** escalonadas tras el aviso con una curva de Rayleigh.
+- **Exposición:** vehículos·minuto presentes en tramos ya alcanzados por el fuego.
+- **Hora de cierre:** la llegada del fuego a cada tramo menos el tiempo de cruzarlo y un margen.
+- **Último aviso seguro:** por bisección sobre la hora de aviso.
+- **Umbral dinámico de aviso** (Cova et al., 2005; Larsen et al., 2011; Li et al., 2019): distancia = ROS hacia el lugar × (despeje + margen) + pavesas. La ROS hacia el lugar se reduce con una elipse de viento según el ángulo.
+- **Filtro de Kalman por conjuntos** (Evensen, 2003), estocástico, 40 miembros:
+  - estado: vehículos por celda y el logit del factor de capacidad de cada cuello de botella sospechoso (parámetros ocultos);
+  - observaciones: densidad y flujo de cámara (con el operador de flujo del propio CTM) y velocidad de coches sonda;
+  - ruido de cámara: tomado de conteos reales.
+- **Cámaras reales:** `packages/senda-vision/camera_flow.py` (YOLOX-s + ByteTrack) cuenta cruces por sentido y vehículos en imagen. La velocidad se aproxima usando el propio vehículo como escala (≈ ±30 %). No se guarda ninguna imagen ni se leen matrículas.
+
 ## 4. Resultados (datos reales)
 
 ### 4.1 Masa de aire del 23-07-2026 en el punto de inicio
@@ -235,6 +266,55 @@ Es coherente con la doctrina: en la clase de ataque 4 las descargas protegen pun
 - **Error** (2 px y 0,15° de orientación (supuestos)): posición de la columna 42 m; altura de la cima 19 m.
 - **Potencia recuperada:** 19,52 GW (P10-P90 18,72-20,27) frente a 19,59 GW reales. Es una prueba de consistencia con ruido de medida: usa el mismo modelo de pluma.
 
+### 4.8 Siete incendios reconstruidos con satélite
+
+| Incendio | Satélite | Píxel (km) | Frente máximo | Tramos (ROS km/h · U10 km/h) |
+|---|---|---|---|---|
+| camp | GOES-16 | 3,9 × 6,3 | 21,7 km | 8,0 · 36; 2,2 · 39 (no resuelto); 0,8 · 31 (no resuelto) |
+| palisades | GOES-18 | 2,3 × 2,7 | 5,2 km | 0,3 · 42 (no resuelto); 0,4 · 47 (no resuelto); 0,0 · 44 (no resuelto) |
+| eaton | GOES-18 | 2,3 × 2,7 | 1,5 km | 0,0 · 62 (no resuelto); 0,0 · 65 (no resuelto); 0,8 · 65 (no resuelto) |
+| marshall | GOES-16 | 2,7 × 6,1 | 6,5 km | 2,9 · 69; 0,0 · 69 (no resuelto) |
+| smokehouse | GOES-16 | 2,5 × 2,9 | 73,6 km | 12,4 · 48; 10,8 · 32; 0,0 · 20 (no resuelto) |
+| troublesome | GOES-16 | 2,7 × 6,2 | 24,5 km | 1,1 · 29; 4,0 · 19; 0,3 · 20 (no resuelto) |
+| creek | GOES-16 | 3,6 × 5,9 | 11,3 km | 2,7 · 15; 0,3 · 14 (no resuelto); 0,1 · 7 (no resuelto) |
+
+**Validación dejando fuera un incendio** (7 tramos resueltos de 5 incendios):
+
+| Modelo | Error medio (km/h) | Error log | Dentro de ×2 | Sesgo log |
+|---|---|---|---|---|
+| potencia | 5,59 | 1,002 | 43 % | 0,095 |
+| razon-combustible | 6,74 | 1,228 | 43 % | -0,204 |
+| bayes-10% | 5,29 | 0,989 | 43 % | -0,167 |
+| regla10 | 4,11 | 0,875 | 14 % | -0,361 |
+| media | 4,59 | 0,928 | 57 % | -0,013 |
+
+- **Calibración de la regla del 10 %:** μ = 0,361, σ = 0,883.
+- **Cobertura fuera de muestra:** 71 % para el intervalo nominal del 80 % y 100 % para el del 90 %.
+- **Contraste con hechos documentados:**
+  - Camp, GOES frente a NIST: 8,0 frente a ≈ 7,5 km/h.
+  - Pentz Rd: ≤ 3 km a las 08:17 y ≤ 2 km a las 08:37; NIST, 08:30.
+  - Caso español SMV 2026 (fuera de muestra): la cicatriz Sentinel-2 da una media mínima de 0,34 km/h en 20 h. La predicción calibrada es 3,24 km/h (P10 0,83 – P90 12,64): coherente, sin ser una prueba fuerte.
+
+### 4.9 Avisos, cierres y atascos
+
+- **Eaton 2025.** El fuego llega a ≤ 3 km de Altadena oeste (punto aproximado) a las 20:51. El umbral dinámico de SENDA dispara a las 18:31, con 5,3 km. La orden real llegó después de las 03:00. Adelanto posible: 8,5 h con el umbral dinámico y 6,1 h con un umbral fijo de 3 km.
+- **Camp 2018, Skyway** (supuestos de demanda explícitos; llegada del fuego por GOES):
+
+| Estrategia | Despeje (min) | Vehículos·min expuestos | Máx. atrapados | Desviados |
+|---|---|---|---|---|
+| aviso-al-detectar | 431 | 375166 | 3194 | 0 |
+| aviso-60min | 534 | 771733 | 3498 | 0 |
+| contraflujo-al-detectar | 430 | 13739 | 1172 | 0 |
+| cierres-senda | 183 | 2 | 1 | 3708 |
+
+  El último aviso sin exposición es 122 min antes de la primera detección, o 53 min antes con contraflujo. Con un frente a 8 km/h y una sola vía, **ningún aviso tras la ignición basta**: hacen falta evacuación preventiva en días de alerta roja, contraflujo y cierres a tiempo.
+- **Gemelos simulados del filtro.**
+  - Atasco en Chico (la salida cae al 30 % en el minuto 45): SENDA lo detecta en el minuto 52 y lo cuantifica en el 56.
+  - Coches abandonados en Palisades Dr (la celda 3 cae al 5 % en el minuto 50): localizados en el minuto 58.
+- **Cámaras reales.**
+  - TfL: 21 cruces en 125 s de 12 cámaras, de noche.
+  - Caltrans: 13 cámaras en los corredores de evacuación de Camp, Palisades y Eaton, consultadas en hora punta. 6 estaban fuera de servicio («Temporarily Unavailable»): en una emergencia no se puede depender de una sola cámara. Con vídeo: Hwy 32 at Main St Chico: 1153 veh/h; Hwy 99 at Neal: 1189 veh/h; Hwy 99 at Skyway 1: 648 veh/h; Hwy 99 at Hwy 32 1: 3000 veh/h; I-10 : (101) Mcclure West: 155 veh/h; SR-1 : (245) Bay Club Dr: 0 veh/h; I-210 : (449) Lake Ave: 3173 veh/h.
+
 ## 5. Discusión
 
 1. **Resultado negativo honesto.** Con el viento de GFS a 0,25° tal cual, la forma prevista apunta al noreste (≈ 55°), mientras que la cicatriz real crece hacia el este-sureste (120°). El modelo crece entre 4,5 y 13,9 veces de más. Causas probables:
@@ -245,6 +325,8 @@ Es coherente con la doctrina: en la clase de ataque 4 las descargas protegen pun
 2. **La asimilación importa.** Una sola cicatriz (o, en operación, el primer foco del satélite o la columna triangulada) basta para identificar un sesgo de ≈ 60° y reducir la velocidad. Es lo que SENDA puede automatizar en minutos.
 3. **Las cámaras en cumbres no ven el fondo de los valles.** Hay que triangular la columna, no la base, y planificar las ubicaciones con un análisis de visibilidad sobre el DEM (función incluida).
 4. **La flota como anemómetro funciona** con decenas de coches. En Países Bajos, llano y con tráfico denso, es aún más prometedora.
+5. **Con pocos incendios, calibrar la incertidumbre vale más que una ley nueva** (v0.20). La regla del 10 % publicada se ajustó con decenas de incendios y generaliza mejor que cualquier ajuste con cinco. Lo que la base aporta es su sesgo y su dispersión reales, que deciden el P90 de los avisos. Para mejorar el ajuste hacen falta VIIRS (375 m), perímetros oficiales por hora y casos europeos con datos horarios.
+6. **La evacuación falla por hora de aviso y cuellos de botella, no por falta de datos** (v0.20). Una cámara de conteo en la salida identifica la capacidad oculta del cuello de botella aguas abajo en minutos. El modelo de una sola ruta no representa las alternativas: los «desviados» deben tener una ruta con capacidad.
 
 ## 6. Ética, legalidad y seguridad
 
@@ -262,13 +344,17 @@ Es coherente con la doctrina: en la clase de ataque 4 las descargas protegen pun
 
 | Componente | Evidencia | TRL estimado |
 |---|---|---|
-| Núcleo de cálculo (masa de aire, viento 3D, propagación, cámaras) | 223 pruebas automáticas; datos reales | 4 |
+| Núcleo de cálculo (masa de aire, viento 3D, propagación, cámaras) | 234 pruebas automáticas; datos reales | 4 |
 | Validación con datos reales | 1 incendio, resultado negativo sin asimilar y positivo dentro de muestra | 4 |
 | Sensores de flota y barómetros | Simulación con el viento 3D real; sin ensayo | 3 |
 | App sin conexión | E2E en Chromium sin red, accesibilidad automatizada | 5 (laboratorio) |
+| Base de referencia multi-incendio (GOES + HRRR) | 7 incendios reconstruidos, validación dejando uno fuera, contraste con NIST | 4 |
+| Coches + cámaras de tráfico + fuego | CTM + EnKF con pruebas; cámaras reales de Caltrans y TfL contadas; gemelos simulados | 3–4 |
 | Ensayo de campo | No realizado | — |
 
-**Nota global de preparación para financiación: 64/100.**
+**Nota global de preparación para financiación: 68/100** (64 en v0.19).
+- **Qué sube la nota:** la validación pasa de un caso a siete incendios reales con satélite y hay un cruce real de cámaras de tráfico oficiales.
+- **Qué la sigue frenando:** no hay ensayo de campo ni convenios.
 - **Puntos fuertes:** innovación técnica, datos reales y reproducibilidad.
 - **Puntos débiles:** sin ensayo de campo, sin convenios y validación limitada a un caso.
 - **Camino verificable a ≥ 80/100:**
@@ -287,6 +373,12 @@ Con datos abiertos y sensores que la gente ya lleva encima, un teléfono puede c
 - Andrews, P. L. y Rothermel, R. C. (1982). Charts for interpreting wildland fire behavior characteristics. USDA Forest Service, GTR INT-131.
 - Briggs, G. A. (1969). *Plume Rise*. USAEC Critical Review Series.
 - Byram, G. M. (1959). Combustion of forest fuels. En Davis, K. P. (ed.), *Forest Fire: Control and Use*. McGraw-Hill.
+- Cova, T. J., Dennison, P. E., Kim, T. H. y Moritz, M. A. (2005). Setting wildfire evacuation trigger points using fire spread modeling and GIS. *Transactions in GIS* 9(4), 603–617.
+- Cruz, M. G. y Alexander, M. E. (2019). The 10% wind speed rule of thumb for estimating a wildfire's forward rate of spread in forests and shrublands. *Annals of Forest Science* 76, 44. doi:10.1007/s13595-019-0829-8.
+- Cruz, M. G. et al. (2012). Anatomy of a catastrophic wildfire: the Black Saturday Kilmore East fire in Victoria, Australia. *Forest Ecology and Management* 284, 269–285.
+- Daganzo, C. F. (1994). The cell transmission model: a dynamic representation of highway traffic consistent with the hydrodynamic theory. *Transportation Research Part B* 28(4), 269–287.
+- Dowell, D. C. et al. (2022). The High-Resolution Rapid Refresh (HRRR): an hourly updating convection-allowing forecast model. Part I. *Weather and Forecasting* 37.
+- Evensen, G. (2003). The Ensemble Kalman Filter: theoretical formulation and practical implementation. *Ocean Dynamics* 53, 343–367.
 - Cetegen, B. M. y Ahmed, T. A. (1993). Experiments on the periodic instability of buoyant plumes and pool fires. *Combustion and Flame* 93, 157–184.
 - Dewangan, A. et al. (2022). FIgLib & SmokeyNet: dataset and deep learning model for real-time wildland fire smoke detection. arXiv:2112.08598.
 - Finney, M. A. (1998). FARSITE: Fire Area Simulator — model development and evaluation. USDA Forest Service, RMRS-RP-4.
@@ -294,7 +386,10 @@ Con datos abiertos y sensores que la gente ya lleva encima, un teléfono puede c
 - Gandin, L. S. (1963). *Objective Analysis of Meteorological Fields*. Gidrometeoizdat.
 - Haines, D. A. (1988). A lower atmospheric severity index for wildland fires. *National Weather Digest* 13(2).
 - Key, C. H. y Benson, N. C. (2006). Landscape Assessment. En *FIREMON*, USDA Forest Service, RMRS-GTR-164-CD.
+- Larsen, J. C., Dennison, P. E., Cova, T. J. y Jones, C. (2011). Evaluating dynamic wildfire evacuation trigger buffers using the 2003 Cedar Fire. *Applied Geography* 31(1), 12–19.
+- Li, D., Cova, T. J. y Dennison, P. E. (2019). Setting wildfire evacuation triggers by coupling fire and traffic simulation models: a spatiotemporal GIS approach. *Fire Technology* 55, 617–642.
 - Linn, R. R. et al. (2020). QUIC-fire: a fast-running simulation tool for prescribed fire planning. *Environ. Model. Softw.* 125.
+- Maranghides, A. et al. (2021). A Case Study of the Camp Fire – Fire Progression Timeline. NIST Technical Note 2135. doi:10.6028/NIST.TN.2135.
 - Mandel, J., Beezley, J. D. y Kochanski, A. K. (2011). Coupled atmosphere–wildland fire modeling with WRF 3.3 and SFIRE 2011. *Geosci. Model Dev.* 4.
 - Mass, C. F. y Madaus, L. E. (2014). Surface pressure observations from smartphones. *BAMS* 95(9), 1343–1349. doi:10.1175/BAMS-D-13-00188.1.
 - Morton, B. R., Taylor, G. I. y Turner, J. S. (1956). Turbulent gravitational convection from maintained and instantaneous sources. *Proc. R. Soc. Lond. A* 234.
@@ -309,4 +404,5 @@ Con datos abiertos y sensores que la gente ya lleva encima, un teléfono puede c
 **Datos:**
 - Copernicus DEM GLO-30: © DLR e.V. 2010-2014 y © Airbus Defence and Space GmbH 2014-2018, en el marco de COPERNICUS de la UE y la ESA.
 - Contiene datos modificados de Copernicus Sentinel (2026).
-- NOAA GFS (dominio público).
+- NOAA GFS, GOES-R ABI L2 FDC y HRRR (dominio público, AWS Open Data).
+- Cámaras: Caltrans CCTV (datos públicos de Caltrans) y TfL JamCams (Powered by TfL Open Data; contiene datos de OS © Crown copyright and database rights).

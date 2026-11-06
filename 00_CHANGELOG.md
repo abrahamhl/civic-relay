@@ -1,5 +1,54 @@
 # Changelog
 
+## SENDA v0.20 · 06-11-2026 · Incendios de referencia con satélite real y cruce de coches, cámaras de tráfico y fuego
+
+**Entrada (fundador):**
+- Contrastar con otros incendios e investigaciones y entrenar con ellos una base de referencia propia.
+- Datos reales en lugar de sintéticos, también las cámaras abiertas del catálogo de *God's Eye View*.
+- Sobre todo: coches, cámaras de tráfico y cruzar esos datos.
+
+**Procesamiento:**
+- **Datos reales nuevos** (`scripts/datos-reales/goes_hrrr_incendio.py`): detecciones GOES-16/18 FDC cada 5–10 min y viento HRRR para siete incendios:
+  - Camp 2018;
+  - Palisades 2025;
+  - Eaton 2025;
+  - Marshall 2021;
+  - Smokehouse Creek 2024;
+  - East Troublesome 2020;
+  - Creek 2020.
+- **Núcleo `fire-cases.mjs`** (6 pruebas):
+  - base de 14 incendios con fuentes, «verificado» o «pendiente de verificar»;
+  - progresión a sotavento y tramos por programación dinámica + BIC;
+  - modelos de ROS y validación dejando fuera un incendio entero;
+  - regla del 10 % calibrada con intervalos de Student y su cobertura fuera de muestra;
+  - aproximación del fuego a lugares.
+- **Núcleo `traffic-fusion.mjs`** (5 pruebas):
+  - modelo de celdas de Daganzo con humo (distancia de parada) y salidas de Rayleigh;
+  - exposición, cierres y último aviso seguro;
+  - umbral dinámico de aviso;
+  - filtro de Kalman por conjuntos con capacidad oculta (logit) y operador de flujo del CTM;
+  - ruido de cámara a partir de conteos reales.
+- **Cámaras reales:**
+  - 12 cámaras de TfL en Londres (catálogo de 890);
+  - 13 de Caltrans en los corredores de evacuación de Camp, Palisades y Eaton: vídeo HLS en hora punta e historial de 3 h;
+  - analizadas con el nuevo `packages/senda-vision/camera_flow.py`: cruces, ocupación, velocidad aproximada y detección de «Temporarily Unavailable».
+- **Registro de cámaras** de 10 a 32 fuentes (23 PASIVO, 5 CONVENIO, 4 NUNCA) a partir de *God's Eye View* (MIT). Se añade ALPR como NUNCA.
+- **Web:**
+  - `/senda/referencias` y `/senda/evacuacion`;
+  - tarjetas en la portada (es, en, nl), nodos y escenario en la arquitectura;
+  - service worker `senda-campo-v21`.
+- **Paper** ampliado (métodos 3.7–3.8, resultados 4.8–4.9, nota 68/100) y documento de investigación `docs/research/REFERENCIAS_COCHES_CAMARAS_2026-11-06.md`.
+- **Entorno de la sesión `civic-relay`** (aprobado por el fundador): permite los catálogos oficiales de cámaras.
+
+**Validación:**
+- **Camp:** GOES mide 8,0 km/h en los primeros 90 min; NIST, ≈ 7,5 km/h. En Pentz Rd el fuego queda a ≤ 3 km a las 08:17 y a ≤ 2 km a las 08:37; NIST: 08:30.
+- **Eaton:** el umbral dinámico avisa a Altadena oeste a las 18:31, 8,5 h antes de la orden real (después de las 03:00).
+- **Entrenamiento:** con 7 tramos de 5 incendios, la regla publicada gana en error puntual. Se aprenden su sesgo (×1,43) y su dispersión (σ = 0,88); la cobertura del 80 % es del 71 % fuera de muestra.
+- **Gemelos simulados del filtro:** el atasco de Chico se detecta en 7 min y el bloqueo de Palisades Dr se localiza en 8 min.
+- **Pruebas:** 234/234 del núcleo y el relé; E2E 49/49 sin red, con accesibilidad en 28 pantallas; web 98/98.
+
+**Salida:** ver `entrega/` regenerada y las páginas nuevas en producción.
+
 ## SENDA v0.19 · 05-11-2026 · Incendio en 3D con datos reales: masa de aire, viento 3D, pluma, cámaras, coches-estación y paper
 
 **Entrada (fundador):**

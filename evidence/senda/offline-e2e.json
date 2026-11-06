@@ -2,10 +2,10 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-05T23:45:33.049Z",
-  "durationS": 227.3,
-  "passed": 47,
-  "total": 47,
+  "at": "2026-11-06T01:39:48.545Z",
+  "durationS": 197.4,
+  "passed": 49,
+  "total": 49,
   "results": [
     {
       "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
@@ -100,9 +100,9 @@
       "ok": true,
       "path": {
         "sat": "Iridium 2-5",
-        "elevationDeg": 24.8,
-        "rangeKm": 1546,
-        "delayMs": 5.16
+        "elevationDeg": 24.7,
+        "rangeKm": 1549,
+        "delayMs": 5.17
       },
       "plan": {
         "k": 6,
@@ -192,7 +192,7 @@
       "cur": "d-rescue",
       "edges": 5,
       "detail": "Probado en simulación nuevoConcurrencia de direcciones aleatorias → teléfonos por planta; inferencia bayesiana exacta → personas con intervalo del 90 %.Código: rf-census.mjsAparece en: 🚁 Censo con dronAbrir /senda/dron →",
-      "nodes": 71,
+      "nodes": 75,
       "links": [
         "/senda/dron",
         "/senda/llamada"
@@ -239,7 +239,7 @@
       "name": "Triaje sin red: «no camina, respira, más de 30/min» → ROJO, con indicaciones de hemorragia y un parte de ≤ 160 caracteres que pide el 112 primero",
       "ok": true,
       "cat": "ROJO",
-      "msg": "SENDA TRIAJE R1 A0 V0 | 39.45210,-0.43020 ±25m | hemorragia 1 | 112,Sanitario | 23:43",
+      "msg": "SENDA TRIAJE R1 A0 V0 | 39.45210,-0.43020 ±25m | hemorragia 1 | 112,Sanitario | 01:37",
       "steps": "Qué hacer ahoraPresión directa y firme sobre la herida con lo más limpio que tengas; no la levantes para mirar.Si sangra a chorro en un brazo o una pierna y la presión no basta: torniquete unos 5–7 cm por encima de la herida, aprieta hasta que pare y anota la hora.Si respira mejor sentado, déjale sentado; si no, tumbado con las piernas estiradas.\n  Servicios: 112 → Sanitario➕ Añadir a la escena y siguiente víctimaRepetir"
     },
     {
@@ -343,11 +343,12 @@
       "rows": 20
     },
     {
-      "name": "Cámaras sin red: la visibilidad estimada en la imagen con niebla de 120 m queda a menos del 15 % y lo prohibido (cámaras sin permiso, «Ojo de Dios», biometría) aparece como NUNCA",
+      "name": "Cámaras sin red: la visibilidad estimada en la imagen con niebla de 120 m queda a menos del 15 %; el registro reúne ≥ 30 fuentes oficiales con licencia y lo prohibido (cámaras sin permiso, agregadores de datos personales, matrículas, biometría) aparece como NUNCA",
       "ok": true,
       "est": 114,
       "vis": 120,
-      "never": 3
+      "never": 4,
+      "rows": 32
     },
     {
       "name": "Exportación a Países Bajos sin red: el lector DATEX II convierte la publicación en avisos y se queda con los 3 de la ruta; el rood kruis se dice en neerlandés; las cámaras allí requieren convenio",
@@ -526,7 +527,7 @@
           "rumbo": "75.0° (a mano)",
           "errorTipico": "±8°",
           "posicion": "sin GPS en este dispositivo",
-          "hora": "2026-11-05T23:43:58.000Z",
+          "hora": "2026-11-06T01:38:25.000Z",
           "foto": "se queda en el teléfono",
           "modo": "PASIVO, con tu toque"
         }
@@ -540,7 +541,7 @@
         "errors": [],
         "state": {
           "k": 2,
-          "ms": 294,
+          "ms": 200,
           "divBefore": 0.1318294766743978,
           "divAfter": 0.0005385902822017674,
           "plumeTop": 1537.0159725870542,
@@ -557,14 +558,58 @@
       }
     },
     {
+      "name": "Incendios de referencia sin red: 14 casos con fuentes y ≥ 5 reconstruidos con GOES; Camp medido por satélite ≈ 7,5 km/h como NIST; el fuego llega a ≤ 3 km de Pentz Rd hacia las 08:17 (NIST: 08:30); validación dejando fuera incendios enteros",
+      "ok": true,
+      "casos": 14,
+      "reconstruidos": 7,
+      "puntos": 7,
+      "mejor": "regla10",
+      "cobertura80": 0.71,
+      "campGoes": 8.02,
+      "pentz": [
+        "08:17",
+        "08:37"
+      ],
+      "eatonAdelantoH": 8.5
+    },
+    {
+      "name": "Coches, cámaras y fuego sin red: en Eaton SENDA avisa a Altadena oeste horas antes de la orden real; en Skyway los cierres casi eliminan la exposición; el filtro de Kalman detecta el atasco de Chico y el bloqueo de Palisades Dr en ≤ 10 min; cámaras reales de Caltrans y TfL",
+      "ok": true,
+      "eatonAdelantoH": 8.5,
+      "eatonAviso": "18:31",
+      "escenarios": {
+        "aviso-al-detectar": {
+          "despeje": 430.5,
+          "expuestos": 375166
+        },
+        "aviso-60min": {
+          "despeje": 533.5,
+          "expuestos": 771733
+        },
+        "contraflujo-al-detectar": {
+          "despeje": 429.5,
+          "expuestos": 13739
+        },
+        "cierres-senda": {
+          "despeje": 183,
+          "expuestos": 2
+        }
+      },
+      "deteccionAtasco": 52,
+      "deteccionBloqueo": 58,
+      "caltrans": 13,
+      "caltransVideo": 7,
+      "tfl": 12
+    },
+    {
       "name": "Llamada sin Internet: oferta de <110 bytes por sonido (onda real, decodificada exacta), conexión directa cifrada, voz Opus y chat en ambos sentidos y cero peticiones de red durante la llamada",
       "ok": true,
       "offerBytes": 79,
       "answerBytes": 72,
       "offerSoundS": 7.8,
       "audioPackets": [
-        250,
-        250
+        151,
+        151
       ],
       "requests": []
     },
@@ -574,9 +619,9 @@
       "connected": true,
       "offerBytes": 79,
       "answerBytes": 72,
-      "connectMs": 335,
+      "connectMs": 257,
       "message": "¿Me oyes? Estoy en la 3.ª planta, puerta B",
-      "rttMs": 0,
+      "rttMs": 1,
       "audioPackets": 75
     },
     {
@@ -606,7 +651,7 @@
     {
       "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
       "ok": true,
-      "href": "senda://accion?a=BLE_BEACON&id=f2035bb323c86c05&b=B14&f=3&u=B&bat=100&cmd=x-1cvlThx0IrYCfa"
+      "href": "senda://accion?a=BLE_BEACON&id=1ccfeb191b1c23e9&b=B14&f=3&u=B&bat=100&cmd=iN5jvsVo_GWqXmXH"
     },
     {
       "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",
@@ -621,7 +666,7 @@
       "name": "Red SENDA sin red: reparto k-de-n entre varios portadores ≥99 %, prueba real de pérdida de portadores, catálogo satelital, previsión de apagón con pasarelas y CAP con auditoría que delata alteraciones",
       "ok": true,
       "pDelivery": 0.9909,
-      "trialSuccess": 0.98,
+      "trialSuccess": 1,
       "halfDarkAtH": 4,
       "gateways": 5
     },
@@ -638,7 +683,7 @@
       "easy": true
     },
     {
-      "name": "Accesibilidad automática en las 26 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
+      "name": "Accesibilidad automática en las 28 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
       "ok": true,
       "issues": {}
     },
@@ -648,6 +693,6 @@
       "errors": []
     }
   ],
-  "offlineNetworkAttemptsBlocked": 0,
+  "offlineNetworkAttemptsBlocked": 2,
   "scope": "Tres navegadores Chromium independientes. La onda acústica es la que genera la app emisora, inyectada en la receptora (sin altavoz/micrófono físicos en CI)."
 }

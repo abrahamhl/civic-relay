@@ -39,17 +39,18 @@
    - premiar con puntos la rapidez o acercarse al peligro.
 6. **Antes de quitar contenido, preguntar al fundador.** «Acortar» no es «sustituir».
 
-## 3. Estado (v0.19)
+## 3. Estado (v0.20)
 
 | Medida | Valor |
 |---|---|
-| Pruebas del núcleo y del relé | 223/223 (`node --test packages/senda/tests/*.test.mjs packages/senda-relay/tests/*.test.mjs`) |
-| E2E en Chromium, sin red | 47/47, con accesibilidad en 26 pantallas (`node investor-next/scripts/senda-offline-e2e.mjs`). La misma batería pasa contra la **exportación servida por Apache** con el `.htaccess` de Hostinger (`SENDA_BASE_URL=http://127.0.0.1:8088/senda`) |
+| Pruebas del núcleo y del relé | 234/234 (`node --test packages/senda/tests/*.test.mjs packages/senda-relay/tests/*.test.mjs`) |
+| E2E en Chromium, sin red | 49/49, con accesibilidad en 28 pantallas (`node investor-next/scripts/senda-offline-e2e.mjs`). La misma batería pasa contra la **exportación servida por Apache** con el `.htaccess` de Hostinger (`SENDA_BASE_URL=http://127.0.0.1:8088/senda`) |
 | Web | `npm run build`, `node test-locales.mjs`, `node --test tests/*.test.mjs` (98/98) en `investor-next` |
-| Módulos del núcleo | 55 ficheros en `packages/senda/src` (copiados a `investor-next/public/senda/core` con `sync-web.mjs`) |
-| Pantallas de la app | 27 en `investor-next/public/senda/*.html` (nuevas: `/senda/fuego3d` y `/senda/paper`) |
+| Módulos del núcleo | 60 ficheros en `packages/senda/src` (v0.20: `fire-cases`, `traffic-fusion`) (copiados a `investor-next/public/senda/core` con `sync-web.mjs`) |
+| Pantallas de la app | 29 en `investor-next/public/senda/*.html` (v0.20: `/senda/referencias` y `/senda/evacuacion`) |
 | Datos reales | `investor-next/public/senda/data/smv2026/` (Copernicus DEM, Sentinel-2 y GFS del 23-07-2026). Se reproducen con `scripts/datos-reales/` y `packages/senda/scripts/fire3d-real.mjs` |
-| Paper | `docs/paper/SENDA_FUEGO3D_paper.(md\|html\|pdf)`, generado con `node packages/senda/scripts/build-paper.mjs --pdf` desde `resultados_v019.json` |
+| Paper | `docs/paper/SENDA_FUEGO3D_paper.(md\|html\|pdf)`, generado con `node packages/senda/scripts/build-paper.mjs --pdf` desde `resultados_v019.json` y `resultados_v020.json` |
+| Incendios de referencia y tráfico (v0.20) | `investor-next/public/senda/data/referencias/` (GOES + HRRR de 7 incendios, cámaras TfL y Caltrans). Se reproducen con `scripts/datos-reales/goes_hrrr_incendio.py`, `packages/senda-vision/camera_flow.py` y `node packages/senda/scripts/referencias-real.mjs [dirGOES dirTfL dirCaltrans]` |
 | Vídeos publicados | Película v5 (es/en), capacidades v0.12 (es), **ruta** (es/en, subtítulos es/en/nl) y visión real (`/media/vision/`) |
 | Entrega autocontenida | `entrega/` con 7 zips deterministas (web para Hostinger, vídeos, código, documentación, evidencias, visión), `LEEME_PRIMERO` y huellas SHA-256. Se regenera con `node scripts/entrega/generar-entrega.mjs [--build]` |
 | Financiación | `docs/financiacion/RONDA_FINANCIACION_2026-11-05.md` (convocatorias con fecha y fuente, diligencia, ajustes del software, plan de 90 días) |
@@ -141,6 +142,7 @@ Después, esperar el estado `READY` y comprobar un archivo nuevo, por ejemplo `/
 
 | Bloqueo | Efecto | Cómo se desbloquea |
 |---|---|---|
+| Entorno de sesión `civic-relay` (v0.20) | Permite Caltrans, WSDOT, DelDOT, NSW, Digitraffic, TfL, Generalitat, DGT y `wzmedia.dot.ca.gov`. Otras sesiones deben elegir ese entorno | Ya creado y aprobado por el fundador |
 | La red de la sesión deniega `nap.dgt.es`, `opendata.ndw.nu`, `docs.ndw.nu` y `english.ndw.nu` | El lector DATEX II solo se ha probado con publicaciones construidas según el esquema | Añadir esos dominios en la configuración de red del entorno, o ejecutar `datex-pack.mjs` en otra máquina |
 | No hay app nativa con difusión BLE, Wi-Fi Aware ni segundo plano | Sin aviso real entre coches ni malla Bluetooth | Prioridad técnica número 1 |
 | Convenios no firmados (DGT 3.0, 112, Waze for Cities, Rijkswaterstaat, veiligheidsregio) | Las piezas CONVENIO están preparadas pero sin activar | Decisión y gestión del fundador |
@@ -163,6 +165,8 @@ Después, esperar el estado `READY` y comprobar un archivo nuevo, por ejemplo `/
 10. Presentarse al **12.º CASSINI Hackathon** (27-29-11-2026) con el flujo de incendio.
 11. Programas de doble uso (NATO DIANA, fondos de defensa): sí o no.
 12. URL de la web de fuegos y cámaras de la Comunidad de Madrid que recuerda.
+13. Condiciones de reutilización de las imágenes de Caltrans (hoy solo se publican números y enlaces, no imágenes).
+14. Siguiente fuente de entrenamiento: VIIRS 375 m y perímetros oficiales por hora (NIFC) o casos europeos (EFFIS, MTG-FCI).
 
 ## 8. Historial resumido
 
@@ -177,6 +181,7 @@ Después, esperar el estado `READY` y comprobar un archivo nuevo, por ejemplo `/
 | v0.17 | Visión con vídeo real (`packages/senda-vision`: YOLOX Apache + ByteTrack), coches conectados y fusión (`vehicle-link.mjs`: Ley de Datos, DFRS, k-anonimato, Kalman, posición de ~10 m a ~1-2 m), renders realistas en el kit, `/senda/trafico`, `/senda/vehiculos`, documento `docs/architecture/BACKEND_VEHICULOS_Y_FUSION_2026-11-05.md` |
 | v0.19 | Incendio en 3D con datos reales (terreno Copernicus, Sentinel-2, GFS): masa de aire, viento 3D con conservación de masa, pluma, cámaras con oclusión, coches-estación, aviones, conjunto y asimilación de la cicatriz; visor three.js con gestos; paper científico; investigación del 112 y de canales |
 | v0.18 | Seguimiento de incendio (`fire-watch.mjs`, `/senda/fuego`): columna situada cruzando rumbos de torres, cámaras y la brújula del móvil, perímetro y avance por satélite, 30-30-30, HDW, Fosberg e ISI, intensidad de Byram, criticidad, carreteras a cortar y avisos a coches. Caso real: M-501, 23-07-2026. Entrega autocontenida para Hostinger (`entrega/`), validada con Apache. Paquete de financiación |
+| v0.20 | Incendios de referencia con satélite real (GOES + HRRR, 7 incendios, validación dejando uno fuera, contraste con NIST), coches + cámaras de tráfico + fuego (`traffic-fusion.mjs`: CTM, EnKF, cierres, umbral dinámico), cámaras reales de Caltrans y TfL, registro de 32 fuentes, `/senda/referencias` y `/senda/evacuacion` |
 | v0.16 | Infraestructura de la DGT validada (ninguna pasarela de radio; datos publicados y DGT 3.0), aforos → cola, paneles → avisos, radares publicados → límite. Kit de vídeo para otras IA (`validate.mjs`, `make.sh`, `ruta.json`) y este handoff |
 
 ## 9. Mensaje de arranque para otra IA
