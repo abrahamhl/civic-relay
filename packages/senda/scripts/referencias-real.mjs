@@ -37,7 +37,7 @@ if (RAW) {
   const all = {};
   for (const [f, [file, key]] of Object.entries(FIRES)) {
     const j = JSON.parse(readFileSync(resolve(RAW, file), 'utf8'));
-    all[f] = { satelite: j.satelite, frames: j.frames[key].map((x) => ({ t: x.t, det: x.det.map((d) => [+d[0].toFixed(4), +d[1].toFixed(4), d[2] == null ? null : Math.round(d[2]), d[3] == null ? null : Number(d[3])]) })), hrrr: j.hrrr[key] };
+    all[f] = { satelite: j.satelite, frames: j.frames[key].map((x) => ({ t: x.t, det: x.det.map((d) => [+d[0].toFixed(4), +d[1].toFixed(4), d[2] == null ? null : Math.round(d[2]), d[3] == null ? null : Number(d[3]), d[4] == null ? null : Number(d[4])]) })), hrrr: j.hrrr[key] };
   }
   writeFileSync(GOES, JSON.stringify({ fuente: 'NOAA GOES-R ABI L2 Fire Detection (FDCC) y NOAA HRRR 3 km (AWS Open Data, dominio público). Descargado por scripts/datos-reales/goes_hrrr_incendio.py', casos: all }));
 }
