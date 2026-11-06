@@ -16,6 +16,9 @@ export function classifyGoesPixel(det) {
       Math.abs(det[0]) > 90 || Math.abs(det[1]) > 180) return 'INVALID';
   if (det.length < 4 || det[3] == null) return 'MISSING_MASK';
   if (!Number.isInteger(det[3])) return 'INVALID';
+  // GOES DQF=0 is a good-quality fire pixel; reject bad quality when the product supplies DQF.
+  // Old 4-field records remain mask-only candidates and are not independently calibrated.
+  if (det.length >= 5 && det[4] != null && det[4] !== 0) return 'INVALID';
   return STRICT.has(det[3]) ? 'STRICT' : RESEARCH.has(det[3]) ? 'EXPLORATORY' : 'INVALID';
 }
 
