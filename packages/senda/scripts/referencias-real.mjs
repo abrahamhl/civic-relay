@@ -19,6 +19,7 @@ import { fileURLToPath } from 'node:url';
 import * as FC from '../src/fire-cases.mjs';
 import * as TF from '../src/traffic-fusion.mjs';
 import { filterGoesFrames } from '../src/observation-quality.mjs';
+import { estimateRobustFront } from '../src/fire-front-robust.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const OUT = resolve(ROOT, 'investor-next/public/senda/data/referencias'); mkdirSync(OUT, { recursive: true });
@@ -82,6 +83,10 @@ for (const [f, c] of Object.entries(G)) {
   const P = FC.goesProgression(candidateFrames, { hrrr: c.hrrr }), seg = FC.runSegments(P, c.hrrr);
   prog[f] = { ...META[f], primeraDeteccion: P.firstDetection, origen: P.origin.map((x) => +x.toFixed(4)), dirDeg: P.dirDeg, dirFuente: P.dirFuente, pixelKm: [+P.pixel.dxKm.toFixed(2), +P.pixel.dyKm.toFixed(2)],
     filas: P.rows.map((r) => ({ t: r.t, min: Math.round(r.min), n: r.n, frpMW: r.frpMW, frenteKm: r.frontMaxKm })), tramos: seg,
+    frenteRobustoExploratorio: Q.usableForCalibration ?
+      estimateRobustFront(c.frames, { origin: P.origin, spreadToDeg: P.dirDeg,
+        pixelResolutionKm: Math.max(P.pixel.dxKm, P.pixel.dyKm), minPixelsPerFrame: 3, minFrames: 4, frontQuantile: 0.8 }) :
+      { status: 'REQUIRES_MASKED_RAW_GOES', speedKmh: null, forOperationalAlert: false },
     hrrr: c.hrrr.map((h) => ({ t: h.validUTC, u10Kmh: +(Math.hypot(h.u10, h.v10) * 3.6).toFixed(1), rachaKmh: +(h.gust * 3.6).toFixed(1), t2: h.t2, hr: h.rh2 })) };
   for (const s of seg) if (s.resuelto) points.push({ caso: f, combustible: META[f].combustible, ...s });
 }
