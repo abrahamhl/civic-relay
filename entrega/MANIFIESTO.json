@@ -1,7 +1,7 @@
 {
   "proyecto": "SENDA",
-  "generado": "2026-11-05",
-  "commit": "496ae33",
+  "generado": "2026-11-06",
+  "commit": "5b97a0e",
   "cambiosSinCommit": false,
   "siteUrl": "https://civic-relay-investor.vercel.app",
   "zips": [
@@ -9,9 +9,9 @@
       "file": "1-web-hostinger.zip",
       "title": "Web completa para subir a public_html (sin las dos películas largas)",
       "note": "Descomprime en public_html. Contiene .htaccess (fichero oculto).",
-      "files": 214,
-      "bytes": 34133665,
-      "sha256": "3a5075c2e68f100d104872a23c12dbec116e33ecde080c69f7b4a33b30bc21e6"
+      "files": 226,
+      "bytes": 34339015,
+      "sha256": "ff65d03609d8cc142305538c41000188185251efd9a653f88432c999ad6a16ea"
     },
     {
       "file": "2-web-video-senda-film-en.zip",
@@ -33,33 +33,33 @@
       "file": "4-codigo-fuente.zip",
       "title": "Código fuente completo (núcleo, relé, web, visión, scripts, pruebas)",
       "note": "Sin los vídeos (van en la web) ni las capturas de evidencias (van aparte).",
-      "files": 656,
-      "bytes": 10083020,
-      "sha256": "2f556372aa3bcd062e6286bdb50caee75f883d4a7a4a95bf7c0e252ed687d1a1"
+      "files": 677,
+      "bytes": 10392433,
+      "sha256": "3afc4a9a67e025240df411fd45f0f534603c3118d24b4cba5e2805211a30b385"
     },
     {
       "file": "5-documentacion.zip",
       "title": "Documentación: traspaso, arquitectura, financiación, investigación y registro de cambios",
       "note": "Empieza por docs/handoff/HANDOFF_COMPLETO_2026-11-05.md.",
-      "files": 93,
-      "bytes": 569238,
-      "sha256": "53a6a3f8765039500503db0c60c3195ee8a6ab644865157db1471eaa758675e0"
+      "files": 95,
+      "bytes": 630363,
+      "sha256": "c623a926676197914c7d01290a174455ec215439fa94cca3b06185fff9c48619"
     },
     {
       "file": "6-evidencias.zip",
       "title": "Evidencias: resultados de las pruebas de extremo a extremo y capturas",
       "note": "offline-e2e.json resume las comprobaciones sin red.",
-      "files": 87,
-      "bytes": 23459932,
-      "sha256": "9b8b2c911870118bb5404f1dc792e7d1accdc60504a4223e989937ad669ee781"
+      "files": 89,
+      "bytes": 25778302,
+      "sha256": "498bf6820638355a49d2846c30248fb418b1f31d2f90c9446c16bf2f3a776432"
     },
     {
       "file": "7-vision-python.zip",
       "title": "Visión de tráfico en Python (YOLOX + ByteTrack) con los vídeos anotados",
       "note": "Modelos y vídeos de origen se descargan con las instrucciones del README (licencias Apache 2.0, MIT y CC BY 4.0).",
-      "files": 14,
-      "bytes": 3841021,
-      "sha256": "b7f62d5a94338d15e6bf6bdaa98ebd06fab3fb1aa70a57ba544e6d0589a75a9d"
+      "files": 15,
+      "bytes": 3843534,
+      "sha256": "10653c4959e3fd6d3b5e6ca80d2ada25a1bcc8418baba799f47d95f9150fc319"
     }
   ]
 }
