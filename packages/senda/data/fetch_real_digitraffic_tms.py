@@ -65,7 +65,12 @@ def normalize_tms(payload: dict, station: int, now: dt.datetime) -> dict:
           "window_start_utc":start,"window_end_utc":sv.get("timeWindowEnd"),
           "time_basis":"SENSOR_WINDOW_END" if sv.get("timeWindowEnd") else ("STATION_MEASURED_TIME" if has_measured else "PUBLISHER_UPDATED_TIME_PROXY"),
           "quality":"REAL_PHYSICAL_SENSOR_UNCALIBRATED_FOR_EMERGENCY_USE"})
-    if not readings: raise ValueError("No numeric measurements after validation")
+    if not readings:
+        sample=[{"keys":list(q.keys())[:20],"name":q.get("name"),
+                 "value_type":type(q.get("sensorValue")).__name__,
+                 "value_key_type":type(q.get("value")).__name__,
+                 "unit":q.get("sensorUnit")} for q in sensors[:3]]
+        raise ValueError(f"No numeric measurements after validation, sensors={len(sensors)}, sample={sample}")
     return {"source_id":"digitraffic_tms","station_id":station,
       "station_measured_utc":when.isoformat().replace("+00:00","Z"),
       "station_time_basis":"STATION_MEASURED_TIME" if has_measured else "PUBLISHER_UPDATED_TIME_PROXY",
