@@ -11,7 +11,7 @@ function quantile(a,p) {
   const s=[...a].sort((x,y)=>x-y);
   if(!s.length)return null;
   const i=(s.length-1)*p, lo=Math.floor(i),hi=Math.ceil(i);
-  return s[lo]*(hi-i)+s[hi]*(i-lo) || s[lo]; // stable for integer i
+  return lo===hi ? s[lo] : s[lo]*(hi-i)+s[hi]*(i-lo);
 }
 function median(a){return quantile(a,0.5)}
 function slopeTheilSen(rows){
