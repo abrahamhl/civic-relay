@@ -38,6 +38,7 @@ jobs:
           python3 packages/senda/data/ingest_recorded_real_cameras.py --db "$RUNNER_TEMP/senda-real/evidence.sqlite" | tee "$RUNNER_TEMP/senda-real/recorded-camera-summary.json"
       - name: Query one actual public Fintraffic physical road detector (no credentials)
         run: |
+          set -euo pipefail
           python3 packages/senda/data/fetch_real_digitraffic_tms.py --station 23001 --out "$RUNNER_TEMP/senda-real" | tee "$RUNNER_TEMP/senda-real/physical-tms-summary.json"
           python3 packages/senda/data/ingest_digitraffic_snapshot.py --station 23001 --db "$RUNNER_TEMP/senda-real/evidence.sqlite" --snapshot-dir "$RUNNER_TEMP/senda-real" | tee "$RUNNER_TEMP/senda-real/composed-sqlite-summary.json"
       - name: Validate physical data + source hashes + no incident decision permissions
