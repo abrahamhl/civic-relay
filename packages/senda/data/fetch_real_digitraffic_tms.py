@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import hashlib
+import gzip
 import json
 import pathlib
 import re
@@ -72,13 +73,19 @@ def pull_one(station: int, out: pathlib.Path) -> dict:
     url=f"{BASE}{station}/data"
     req=urllib.request.Request(url,headers={
         "User-Agent":"SENDA-Civic-Relay-research/0.22 (https://github.com/abrahamhl/civic-relay)",
-        "Accept":"application/json"})
+        "Accept":"application/json",
+        "Accept-Encoding":"gzip",
+        "Digitraffic-User":"CivicRelay/0.22"})
     # No URL redirects to unapproved domains; GitHub runner HTTPS only.
     with urllib.request.urlopen(req,timeout=30) as response:
         if response.geturl()!=url: raise ValueError("Unexpected redirect")
         if response.status!=200: raise ValueError(f"HTTP {response.status}")
         b=response.read(MAX_BYTES+1)
-    if len(b)>MAX_BYTES or not b: raise ValueError("Oversized/empty response")
+        encoding=response.headers.get("Content-Encoding","").lower()
+    if len(b)>MAX_BYTES or not b: raise ValueError("Oversized/empty compressed response")
+    if encoding=="gzip": b=gzip.decompress(b)
+    elif encoding not in ("","identity"): raise ValueError("Unsupported content encoding")
+    if len(b)>MAX_BYTES or not b: raise ValueError("Oversized/empty uncompressed response")
     data=json.loads(b)
     now=dt.datetime.now(dt.timezone.utc)
     normalized=normalize_tms(data,station,now)
