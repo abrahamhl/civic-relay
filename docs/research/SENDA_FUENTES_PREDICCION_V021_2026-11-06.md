@@ -26,8 +26,12 @@
 - **DGT**: DATEX II v3.6 catálogo de ubicaciones, NO licencia automática para vídeo de cámaras. [DGT NAP](https://nap-test.dgt.es/dataset/camaras-dgt-localizaciones-datex2-v3-6).
 - **ALERTCalifornia**: red institucional de vigilancia y analítica, candidato relevante a convenio, pero una visualización pública no equivale a permiso de minería masiva. [UCSD](https://alertcalifornia.org/about/).
 - **Pyronear Pyro-SDIS**: conjunto RGB etiquetado para humo, no termografía ni medida de temperatura; imprescindible separación train/test por incendio, cámara y ubicación. [Dataset](https://huggingface.co/datasets/pyronear/pyro-sdis).
+- **Sentinel-3 SLSTR FRP**: producto térmico de focos/energía radiativa (orden de 1 km por píxel) y latencia NRT documentada inferior a tres horas; no resuelve temperaturas puntuales de llamas. [EUMETSAT](https://www.eumetsat.int/S3-NRT-FRP).
+- **MTG FCI FRP-Pixel (LSA SAF)**: producto europeo geoestacionario de demostración (≈1 km y 10 min), registro necesario y cobertura/status por validar, distinto de un producto ya operacional. [LSA SAF](https://lsa-saf.eumetsat.int/en/data/products/fire-products/).
+- **Landsat 8/9 TIRS**: dos bandas térmicas de 100 m nativos útiles para caracterización histórica; paso orbital/nubes impiden tratarlo como webcam termográfica continua. [USGS](https://www.usgs.gov/landsat-missions/landsat-8).
 
-**Nivel de verificación de estas 12 filas:** documentación pública del publicador consultada, **sin prueba individual de endpoint, disponibilidad actual, derecho de reutilización de cada vídeo o ingesta live desde este entorno**.
+
+**Nivel de verificación de estas 15 filas:** documentación pública del publicador consultada, **sin prueba individual de endpoint, disponibilidad actual, derecho de reutilización de cada vídeo o ingesta live desde este entorno**.
 
 ## 3. Modelo matemático de evolución propuesto
 ### 3.1 Observación y calibración
@@ -76,7 +80,7 @@ No es correcto afirmar “SENDA habría avisado 8,5 h antes” como éxito medid
 
 ## 5. Base de datos relacional reproducible (nueva en esta PR)
 Se ha creado `packages/senda/data/build_source_db.py` (Python 3 + SQLite stdlib). Se alimenta exclusivamente de `packages/senda/data/source-registry.v021.json`, sin descargar ni copiar imágenes.
-Contiene 7 tablas con claves y restricciones: `sources`, `sensors`, `calibrations`, `observation_batches`, `observations`, `verification_events`, `experiment_runs`. Mantiene versiones de permisos, hora real de observación, hora de importación, SHA-256 de contenido, máscara GOES y clase de origen REAL/PRONÓSTICO/MODELO/SIMULACIÓN. Una ejecución sin nuevos datos solo inserta 12 fichas documentales, **0 mediciones** y **0 permisos de ingesta**.
+Contiene 7 tablas con claves y restricciones: `sources`, `sensors`, `calibrations`, `observation_batches`, `observations`, `verification_events`, `experiment_runs`. Mantiene versiones de permisos, hora real de observación, hora de importación, SHA-256 de contenido, máscara GOES y clase de origen REAL/PRONÓSTICO/MODELO/SIMULACIÓN. Una ejecución sin nuevos datos solo inserta 15 fichas documentales, **0 mediciones** y **0 permisos de ingesta**.
 
 ```bash
 python3 packages/senda/data/build_source_db.py --db /tmp/senda-sources.sqlite
