@@ -48,9 +48,11 @@ def normalize_tms(payload: dict, station: int, now: dt.datetime) -> dict:
         raise ValueError("Unexpected station sensor count")
     readings=[]
     for sv in sensors:
-        v=sv.get("sensorValue")
+        # Digitraffic's current one-station response uses value/unit, while older
+        # API examples and all-stations envelopes use sensorValue/sensorUnit.
+        v=sv.get("value",sv.get("sensorValue"))
         name=sv.get("name")
-        unit=sv.get("sensorUnit")
+        unit=sv.get("unit",sv.get("sensorUnit"))
         if (isinstance(v,bool) or not isinstance(v,(float,int)) or
             not isinstance(name,str) or not name or
             not isinstance(unit,str) or not unit):
@@ -59,11 +61,14 @@ def normalize_tms(payload: dict, station: int, now: dt.datetime) -> dict:
         start=sv.get("timeWindowStart")
         if start is not None:
             parsed_utc(start)
+        has_sensor_measured=bool(sv.get("measuredTime"))
+        row_time=sv.get("measuredTime") or sv.get("timeWindowEnd") or publisher_timestamp
+        parsed_row_time=parsed_utc(row_time).isoformat().replace("+00:00","Z")
         readings.append({"sensor_id":str(sv.get("id","")),
           "sensor_name":name,"value":v,"unit":unit,
-          "observed_utc":parsed_utc(sv.get("timeWindowEnd")).isoformat().replace("+00:00","Z") if sv.get("timeWindowEnd") else when.isoformat().replace("+00:00","Z"),
+          "observed_utc":parsed_row_time,
           "window_start_utc":start,"window_end_utc":sv.get("timeWindowEnd"),
-          "time_basis":"SENSOR_WINDOW_END" if sv.get("timeWindowEnd") else ("STATION_MEASURED_TIME" if has_measured else "PUBLISHER_UPDATED_TIME_PROXY"),
+          "time_basis":"SENSOR_MEASURED_TIME" if has_sensor_measured else ("SENSOR_WINDOW_END" if sv.get("timeWindowEnd") else ("STATION_MEASURED_TIME" if has_measured else "PUBLISHER_UPDATED_TIME_PROXY")),
           "quality":"REAL_PHYSICAL_SENSOR_UNCALIBRATED_FOR_EMERGENCY_USE"})
     if not readings:
         sample=[{"keys":list(q.keys())[:20],"name":q.get("name"),
