@@ -1,0 +1,25 @@
+name: SENDA Calibration Evidence Gates
+on:
+  push:
+    branches:
+      - audit/senda-calibration-quality-gates-20261107
+  pull_request:
+    branches:
+      - research/senda-v021-evidence-quality-20261106
+permissions:
+  contents: read
+jobs:
+  calibration-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check calibration pipeline syntax
+        run: node --check packages/senda/src/calibration-gates.mjs
+      - name: Run anti-leakage, quality and metrics tests
+        run: node --test packages/senda/tests/calibration-gates.test.mjs
+      - name: Run existing SENDA core tests
+        run: node --test packages/senda/tests/*.test.mjs
