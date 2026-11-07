@@ -44,4 +44,4 @@ jobs:
           name: senda-research-public-snapshots
           path: ${{ runner.temp }}/senda-public-observations
           if-no-files-found: warn
-          retention-days: 7
+          retention-days: 30
