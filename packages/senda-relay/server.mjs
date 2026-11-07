@@ -11,6 +11,7 @@ import { createServer } from 'node:http';
 import { mkdirSync, readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createBundleStore } from '../senda/src/bundle.mjs';
+import { validateEnvelopeShape } from '../senda/src/envelope.mjs';
 
 export function createRelay({ dataDir = process.env.DATA_DIR ?? './data', maxBody = +(process.env.MAX_BODY ?? 2 * 1024 * 1024), allowedOrigins = (process.env.ALLOWED_ORIGINS ?? '*').split(','), ratePerMin = 120, now = () => Date.now() } = {}) {
   mkdirSync(dataDir, { recursive: true });
@@ -22,7 +23,7 @@ export function createRelay({ dataDir = process.env.DATA_DIR ?? './data', maxBod
   const timer = setInterval(() => { store.purgeExpired(now()); flush(); }, 5000); timer.unref();
   const buckets = new Map();
   const allow = (ip) => { const t = now(), b = buckets.get(ip) ?? { n: 0, t }; if (t - b.t > 60_000) { b.n = 0; b.t = t; } b.n++; buckets.set(ip, b); return b.n <= ratePerMin; };
-  const validEnv = (e) => e?.header && typeof e.header.id === 'string' && typeof e.header.to === 'string' && Number.isFinite(e.header.expiresAt) && typeof e.ct === 'string' && e.ct.length < 64 * 1024;
+  const validEnv = (e, t) => validateEnvelopeShape(e, { now: t }).ok;
   const validB = (b) => b && typeof b.id === 'string' && Number.isFinite(b.expiresAt) && b.type === 'SENDA_SIGNED_COMMAND' && typeof b.sig === 'string';
 
   const server = createServer(async (req, res) => {
@@ -38,10 +39,16 @@ export function createRelay({ dataDir = process.env.DATA_DIR ?? './data', maxBod
     for await (const c of req) { size += c.length; if (size > maxBody) { res.writeHead(413); return res.end(); } chunks.push(c); }
     let body; try { body = JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { res.writeHead(400); return res.end(); }
     const t = now();
-    const envelopes = (body.envelopes ?? []).filter((x) => validEnv(x?.env)).slice(0, 500);
-    const broadcasts = (body.broadcasts ?? []).filter(validB).slice(0, 50);
-    const receipts = (body.receipts ?? []).filter((r) => typeof r?.id === 'string' && typeof r?.ackSecret === 'string').slice(0, 1000);
-    const summary = { owner: String(body.summary?.owner ?? ''), ids: (body.summary?.ids ?? []).slice(0, 5000), receipts: (body.summary?.receipts ?? []).slice(0, 5000), broadcasts: (body.summary?.broadcasts ?? []).slice(0, 500) };
+    const envelopes = (Array.isArray(body.envelopes) ? body.envelopes : []).filter((x) => validEnv(x?.env, t)).slice(0, 500);
+    const broadcasts = (Array.isArray(body.broadcasts) ? body.broadcasts : []).filter(validB).slice(0, 50);
+    const receipts = (Array.isArray(body.receipts) ? body.receipts : []).filter((r) => typeof r?.id === 'string' && typeof r?.ackSecret === 'string').slice(0, 1000);
+    const summary = {
+      owner: String(body.summary?.owner ?? ''),
+      ids: (Array.isArray(body.summary?.ids) ? body.summary.ids : []).slice(0, 5000),
+      receipts: (Array.isArray(body.summary?.receipts) ? body.summary.receipts : []).slice(0, 5000),
+      pendingReceipts: (Array.isArray(body.summary?.pendingReceipts) ? body.summary.pendingReceipts : []).slice(0, 5000),
+      broadcasts: (Array.isArray(body.summary?.broadcasts) ? body.summary.broadcasts : []).slice(0, 500),
+    };
     await store.ingest({ envelopes, receipts, broadcasts }, { now: t });
     dirty = true;
     const out = store.prepareFor(summary, { now: t, maxBytes: 1024 * 1024 });

@@ -13,7 +13,54 @@ import { b64, unb64 } from './b64.mjs';
 const subtle = globalThis.crypto.subtle;
 const enc = new TextEncoder(), dec = new TextDecoder();
 const rand = (n) => globalThis.crypto.getRandomValues(new Uint8Array(n));
-const KINDS = ['PERSONAL', 'SOS', 'HUMAN_STATUS', 'OFFICIAL_ALERT', 'COORDINATION', 'RECEIPT'];
+export const KINDS = ['PERSONAL', 'SOS', 'HUMAN_STATUS', 'OFFICIAL_ALERT', 'COORDINATION', 'RECEIPT'];
+export const MAX_ENVELOPE_BYTES = 512 * 1024;
+export const MAX_TTL_S = 90 * 86400;
+const MAX_PRIORITY = 9;
+const MAX_EXPIRES_AT = 2 ** 48 - 1;
+
+/**
+ * Valida la forma de un sobre ANTES de almacenarlo o reenviarlo. No verifica la firma
+ * (un relé no puede: la clave del emisor viaja dentro del cifrado); solo impide que
+ * entren objetos gigantes, con base64 ambiguo, tipos desconocidos o vencimientos absurdos.
+ * @returns {{ok:boolean, reason?:string}}
+ */
+export function validateEnvelopeShape(envelope, { now = Date.now(), maxBytes = MAX_ENVELOPE_BYTES, maxTtlS = MAX_TTL_S } = {}) {
+  const fail = (reason) => ({ ok: false, reason });
+  if (!envelope || typeof envelope !== 'object' || Array.isArray(envelope)) return fail('MALFORMED_ENVELOPE');
+  const { header, eph, iv, ct, sig } = envelope;
+  if (!header || typeof header !== 'object' || Array.isArray(header)) return fail('MALFORMED_HEADER');
+  if (header.v !== 2) return fail('UNSUPPORTED_VERSION');
+  if (!isB64Url(header.id, 16)) return fail('BAD_ID');
+  if (!isB64Url(header.to, 16)) return fail('BAD_RECIPIENT');
+  if (!isB64Url(header.ackHash, 16)) return fail('BAD_ACK_HASH');
+  if (!Number.isSafeInteger(header.priority) || header.priority < 0 || header.priority > MAX_PRIORITY) return fail('BAD_PRIORITY');
+  if (!Number.isSafeInteger(header.expiresAt) || header.expiresAt < 0 || header.expiresAt > MAX_EXPIRES_AT) return fail('BAD_EXPIRY');
+  if (!KINDS.includes(header.kind)) return fail('BAD_KIND');
+  if (Number.isFinite(now) && Number.isFinite(maxTtlS) && header.expiresAt - now > maxTtlS * 1000 + 300_000) return fail('TTL_TOO_LONG');
+  if (!eph || typeof eph !== 'object' || !isB64Url(eph.x, 32) || !isB64Url(eph.y, 32)) return fail('BAD_EPHEMERAL_KEY');
+  if (!isB64Url(iv, 12)) return fail('BAD_IV');
+  if (!isB64Url(sig, 64)) return fail('BAD_SIGNATURE_SHAPE');
+  const ctBytes = b64UrlBytes(ct);
+  if (ctBytes === null) return fail('BAD_CIPHERTEXT');
+  if (ctBytes < 17) return fail('BAD_CIPHERTEXT');
+  if (ctBytes > maxBytes) return fail('ENVELOPE_TOO_LARGE');
+  return { ok: true };
+}
+
+function b64UrlBytes(value) {
+  if (typeof value !== 'string' || value.length === 0 || !/^[A-Za-z0-9_-]+$/.test(value)) return null;
+  try {
+    const bytes = unb64(value);
+    return b64(bytes) === value ? bytes.length : null;
+  } catch {
+    return null;
+  }
+}
+
+function isB64Url(value, byteLength) {
+  return b64UrlBytes(value) === byteLength;
+}
 
 export async function sha256b64(bytes) { return b64(await subtle.digest('SHA-256', bytes)); }
 export async function ackHashOf(secretBytes) { return b64(new Uint8Array(await subtle.digest('SHA-256', secretBytes)).subarray(0, 16)); }
@@ -95,6 +142,8 @@ export function relayView(envelope, now) {
 }
 
 export async function openMessage({ recipient, envelope, now }) {
+  const shape = validateEnvelopeShape(envelope, { now });
+  if (!shape.ok) throw new Error(shape.reason);
   const { header } = envelope;
   if (header.to !== recipient.publicIdentity.fingerprint) throw new Error('NOT_FOR_ME');
   if (now > header.expiresAt) throw new Error('EXPIRED');
@@ -113,11 +162,16 @@ export async function openMessage({ recipient, envelope, now }) {
 /* ---------- Codificación binaria compacta (sonido / SMS / QR) ---------- */
 export function packEnvelope(e) {
   const h = e.header, ct = unb64(e.ct), exp = h.expiresAt;
+  const ki = KINDS.indexOf(h.kind);
+  if (ki < 0) throw new Error(`Tipo desconocido: ${h.kind}`);
+  if (unb64(h.id).length !== 16 || unb64(h.to).length !== 16 || unb64(h.ackHash).length !== 16) throw new Error('Cabecera INVÁLIDA');
+  if (unb64(e.eph.x).length !== 32 || unb64(e.eph.y).length !== 32 || unb64(e.iv).length !== 12 || unb64(e.sig).length !== 64) throw new Error('Criptografía INVÁLIDA');
+  if (!Number.isSafeInteger(exp) || exp < 0 || exp > MAX_EXPIRES_AT) throw new Error('Caducidad INVÁLIDA');
   const out = new Uint8Array(1 + 16 + 16 + 1 + 6 + 1 + 16 + 64 + 12 + 64 + 2 + ct.length);
   let o = 0; const put = (bytes) => { out.set(bytes, o); o += bytes.length; };
   put([0xe2]); put(unb64(h.id)); put(unb64(h.to)); put([h.priority & 0xff]);
   put([Math.floor(exp / 2 ** 40) & 0xff, Math.floor(exp / 2 ** 32) & 0xff, Math.floor(exp / 2 ** 24) & 0xff, Math.floor(exp / 2 ** 16) & 0xff, Math.floor(exp / 2 ** 8) & 0xff, exp & 0xff]);
-  put([KINDS.indexOf(h.kind)]); put(unb64(h.ackHash)); put(unb64(e.eph.x)); put(unb64(e.eph.y)); put(unb64(e.iv)); put(unb64(e.sig));
+  put([ki]); put(unb64(h.ackHash)); put(unb64(e.eph.x)); put(unb64(e.eph.y)); put(unb64(e.iv)); put(unb64(e.sig));
   put([ct.length >> 8, ct.length & 0xff]); put(ct);
   return out;
 }
@@ -127,8 +181,10 @@ export function unpackEnvelope(b) {
   const id = b64(take(16)), to = b64(take(16)), priority = take(1)[0];
   const e6 = take(6); let expiresAt = 0; for (const x of e6) expiresAt = expiresAt * 256 + x;
   const kind = KINDS[take(1)[0]], ackHash = b64(take(16));
+  if (!kind) throw new Error('Tipo desconocido en sobre');
   const eph = { x: b64(take(32)), y: b64(take(32)) }, iv = b64(take(12)), sig = b64(take(64));
   const l = take(2), ct = b64(take((l[0] << 8) | l[1]));
+  if (o !== b.length) throw new Error('Sobre con bytes sobrantes');
   return { header: { v: 2, id, to, priority, expiresAt, kind, ackHash }, eph, iv, ct, sig };
 }
 

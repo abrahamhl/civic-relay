@@ -5,6 +5,8 @@ export * from './ladder.mjs';
 export * from './zones.mjs';
 export * from './seismic.mjs';
 export * from './envelope.mjs';
+export * from './bundle.mjs';
+export * from './opportunistic-routing.mjs';
 export * from './roles.mjs';
 export * from './rubble.mjs';
 export * from './through-wall.mjs';
