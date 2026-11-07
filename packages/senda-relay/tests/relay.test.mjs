@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { createRelay } from '../server.mjs';
 import { generateIdentity, sealMessage, openMessage } from '../../senda/src/envelope.mjs';
 import { createBundleStore } from '../../senda/src/bundle.mjs';
+import { b64 } from '../../senda/src/b64.mjs';
 
 const post = (port, body) => fetch(`http://127.0.0.1:${port}/sync`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
 async function syncWith(port, store, now) {
@@ -44,5 +45,28 @@ test('relé: rechaza basura, cuerpos enormes y ruta desconocida', async () => {
   assert.equal((await fetch(`http://127.0.0.1:${port}/admin`)).status, 404);
   const ok = await post(port, { summary: { owner: 'z' }, envelopes: [{ env: { header: { id: 1 } } }] });
   assert.equal(ok.status, 200); assert.equal(relay.store.count(), 0);
+  await relay.close();
+});
+
+test('relé: el recibo sin sobre queda en cuarentena, no se reenvía a quien ya lo tiene y persiste', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'senda-relay-'));
+  let relay = createRelay({ dataDir: dir }); await new Promise((r) => relay.server.listen(0, r));
+  const port = relay.server.address().port, now = Date.now();
+  const [a, b] = await Promise.all([generateIdentity(), generateIdentity()]);
+  const env = await sealMessage({ sender: a, recipient: b.publicIdentity, body: 'x', priority: 3, ttlS: 3600, now });
+  const ackSecret = b64(new Uint8Array(16).fill(7));
+
+  const r = await post(port, { summary: { owner: 'peer', ids: [], receipts: [], pendingReceipts: [] }, receipts: [{ id: env.header.id, ackSecret }] });
+  assert.equal(r.status, 200);
+  assert.ok(relay.store.summary().pendingReceipts.includes(env.header.id));
+
+  const next = await post(port, { summary: { owner: 'peer', ids: [], receipts: [], pendingReceipts: [env.header.id] } });
+  assert.equal(next.status, 200);
+  const out = await next.json();
+  assert.equal(out.receipts.some((x) => x.id === env.header.id), false, 'no reenviar a quien ya lo tiene');
+
+  await relay.close();
+  relay = createRelay({ dataDir: dir }); await new Promise((r) => relay.server.listen(0, r));
+  assert.ok(relay.store.summary().pendingReceipts.includes(env.header.id), 'la cuarentena persiste');
   await relay.close();
 });
