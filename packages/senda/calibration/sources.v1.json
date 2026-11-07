@@ -130,6 +130,7 @@
       "id": "nist-camp-fire",
       "provider": "NIST",
       "engines": [
+        "fire-hotspots",
         "fire-spread-3d",
         "evacuation-exposure"
       ],
@@ -147,6 +148,7 @@
       "id": "usgs-mtbs",
       "provider": "USGS MTBS",
       "engines": [
+        "fire-hotspots",
         "fire-spread-3d",
         "evacuation-exposure"
       ],
