@@ -1,8 +1,8 @@
 name: SENDA Public Research Snapshots
 on:
-  push:
+  pull_request:
     branches:
-      - audit/senda-calibration-quality-gates-20261107
+      - research/senda-v021-evidence-quality-20261106
   workflow_dispatch:
 permissions:
   contents: read
