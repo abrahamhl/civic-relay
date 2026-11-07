@@ -202,7 +202,7 @@ cd ../senda-relay
 node --test tests/relay.test.mjs
 ```
 
-Los JSON incluyen `source.commitAtGeneration` y `source.worktreeDirty`. La evidencia se genera antes de su propio commit; el SHA del commit de evidencia figura en el PR.
+Los JSON se generaron en un worktree limpio en `70ae9138db4c84be9384cc910b43af5effad7af5` con `source.worktreeDirty: false`. La evidencia se genera antes de su propio commit; el SHA del commit de evidencia figura en el PR.
 
 ---
 
