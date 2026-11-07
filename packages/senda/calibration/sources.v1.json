@@ -1,0 +1,378 @@
+{
+  "schema": "senda-calibration-sources/1",
+  "updated_utc": "2026-11-07",
+  "purpose": "Source discovery and per-engine independent evaluation planning; this does NOT certify, download, or calibrate a SENDA model.",
+  "policy": {
+    "allowed_statuses": [
+      "NOT_INGESTED",
+      "QUARANTINED",
+      "VERIFIED_OFFLINE"
+    ],
+    "default_status": "NOT_INGESTED",
+    "never_implies": [
+      "field-validated",
+      "operationally-authorised",
+      "sensor-calibrated",
+      "access-granted"
+    ],
+    "split_unit": "event_or_site_or_fire_with_time_holdout",
+    "retrospective_cutoff": "Each feature must have available_at_utc <= inference_at_utc. No post-event data in input features.",
+    "observation_requirements": [
+      "source URL and acquisition timestamp",
+      "UTC capture and availability timestamp",
+      "licence and operator permissions checked",
+      "original immutable bytes SHA-256",
+      "quality/missing-value masks",
+      "independent held-out truth source",
+      "sensor calibration, unit and spatial footprint"
+    ]
+  },
+  "engines": {
+    "fire-hotspots": [
+      "noaa-goes-fhs",
+      "nasa-firms-viirs-standard",
+      "nist-camp-fire",
+      "usgs-mtbs",
+      "copernicus-effis"
+    ],
+    "fire-spread-3d": [
+      "noaa-goes-fhs",
+      "nasa-firms-viirs-standard",
+      "nist-camp-fire",
+      "usgs-mtbs",
+      "copernicus-effis",
+      "ecmwf-era5"
+    ],
+    "weather-wind-smoke": [
+      "ecmwf-era5",
+      "digitraffic-road-weather",
+      "noaa-goes-fhs"
+    ],
+    "camera-vision-smoke": [
+      "digitraffic-weathercam",
+      "alertcalifornia-media",
+      "digitraffic-tms"
+    ],
+    "traffic-speed-flow": [
+      "digitraffic-tms",
+      "caltrans-pems",
+      "digitraffic-weathercam"
+    ],
+    "evacuation-exposure": [
+      "nist-camp-fire",
+      "caltrans-pems",
+      "jrc-ghsl-pop",
+      "usgs-mtbs"
+    ],
+    "flood-hydrology": [
+      "copernicus-glofas-historical",
+      "usgs-water-continuous"
+    ],
+    "earthquake-detection": [
+      "usgs-comcat"
+    ],
+    "rail-disruption": [
+      "network-rail-feeds"
+    ],
+    "gnss-orbit-geolocation": [
+      "noaa-cors-rinex"
+    ],
+    "offline-dtn-radio": [
+      "FIELD_TRIAL_REQUIRED"
+    ],
+    "wifi-csi-rescue": [
+      "FIELD_TRIAL_REQUIRED"
+    ],
+    "drone-relay": [
+      "FIELD_TRIAL_REQUIRED"
+    ],
+    "battery-device-telemetry": [
+      "FIELD_TRIAL_REQUIRED"
+    ]
+  },
+  "sources": [
+    {
+      "id": "noaa-goes-fhs",
+      "provider": "NOAA",
+      "engines": [
+        "fire-hotspots",
+        "fire-spread-3d",
+        "weather-wind-smoke"
+      ],
+      "role": "thermal anomaly predictor",
+      "official_url": "https://www.noaasis.noaa.gov/pdf/ps-pvr/goes18/ABI/Fires%20and%20Hot%20Spots%20Characterization/Full/GOES-18_ABI_L2_FireHotSpot_Full_ReadMe.pdf",
+      "access": "PUBLIC_PRODUCT",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Require original Mask/DQF and scan timestamps; a hot pixel is not a fire front.",
+        "No operational fire spread claim from pixel centroids."
+      ]
+    },
+    {
+      "id": "nasa-firms-viirs-standard",
+      "provider": "NASA FIRMS",
+      "engines": [
+        "fire-hotspots",
+        "fire-spread-3d"
+      ],
+      "role": "independent confirmation and historical labels",
+      "official_url": "https://firms2.modaps.eosdis.nasa.gov/download/",
+      "access": "EARTHDATA_OR_EMAIL_REQUEST",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "For historical science use standard quality rather than transient NRT where available.",
+        "Active-fire detections are not continuous perimeter ground truth."
+      ]
+    },
+    {
+      "id": "nist-camp-fire",
+      "provider": "NIST",
+      "engines": [
+        "fire-spread-3d",
+        "evacuation-exposure"
+      ],
+      "role": "time-stamped independent event reconstruction",
+      "official_url": "https://www.nist.gov/programs-projects/wildland-urban-interface-wui-fire-data-collection-parcel-vulnerabilities/nist/fire",
+      "access": "PUBLIC_REFERENCE",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Observation times must reflect report precision and reconstruction uncertainty.",
+        "One fire is one held-out group, not thousands of independent fires."
+      ]
+    },
+    {
+      "id": "usgs-mtbs",
+      "provider": "USGS MTBS",
+      "engines": [
+        "fire-spread-3d",
+        "evacuation-exposure"
+      ],
+      "role": "post-event perimeter and burn-severity truth",
+      "official_url": "https://burnseverity.cr.usgs.gov/direct-download",
+      "access": "PUBLIC_DOWNLOAD",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Post-event map cannot appear in pre-event features.",
+        "Final burned area does not provide minute-by-minute spread."
+      ]
+    },
+    {
+      "id": "copernicus-effis",
+      "provider": "Copernicus EFFIS",
+      "engines": [
+        "fire-hotspots",
+        "fire-spread-3d"
+      ],
+      "role": "European fire and burned-area independent comparison",
+      "official_url": "https://forest-fire.emergency.copernicus.eu/applications/data-and-services",
+      "access": "OPEN_DATA_OR_REQUEST",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Historical perimeter extracts may require a request.",
+        "Verify product date and appropriate licensing."
+      ]
+    },
+    {
+      "id": "ecmwf-era5",
+      "provider": "ECMWF/Copernicus C3S",
+      "engines": [
+        "fire-spread-3d",
+        "weather-wind-smoke"
+      ],
+      "role": "historical reanalysis baseline",
+      "official_url": "https://climate.copernicus.eu/climate-reanalysis",
+      "access": "CDS_TERMS_AND_LOGIN",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Reanalysis may contain future observations; never retrospectively claim it was available to a real-time system.",
+        "ERA5 spatial scale is not on-scene wind truth."
+      ]
+    },
+    {
+      "id": "digitraffic-road-weather",
+      "provider": "Fintraffic/Digitraffic",
+      "engines": [
+        "weather-wind-smoke"
+      ],
+      "role": "roadside weather observations",
+      "official_url": "https://www.digitraffic.fi/en/road-traffic/",
+      "access": "PUBLIC_API",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Per-sensor timestamp, quality, units, and cache staleness must be retained.",
+        "Road weather values require sensor-level review."
+      ]
+    },
+    {
+      "id": "digitraffic-weathercam",
+      "provider": "Fintraffic/Digitraffic",
+      "engines": [
+        "camera-vision-smoke",
+        "traffic-speed-flow"
+      ],
+      "role": "camera evidence subject to rights",
+      "official_url": "https://www.digitraffic.fi/en/road-traffic/",
+      "access": "PUBLIC_CAMERA_METADATA_USAGE_REVIEW",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Image capture timestamp and camera calibration required.",
+        "No ground-truth speed inferred from RGB alone.",
+        "Privacy and image reuse terms separately checked."
+      ]
+    },
+    {
+      "id": "digitraffic-tms",
+      "provider": "Fintraffic/Digitraffic",
+      "engines": [
+        "traffic-speed-flow",
+        "camera-vision-smoke"
+      ],
+      "role": "independent road-loop speed and count truth",
+      "official_url": "https://www.digitraffic.fi/en/road-traffic/",
+      "access": "PUBLIC_API",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Use sensor measuredTime, timeWindowStart/end and units, not only publisher update time.",
+        "Station-camera geometry and temporal alignment are mandatory."
+      ]
+    },
+    {
+      "id": "caltrans-pems",
+      "provider": "Caltrans",
+      "engines": [
+        "traffic-speed-flow",
+        "evacuation-exposure"
+      ],
+      "role": "historical detector truth and incidents",
+      "official_url": "https://dot.ca.gov/programs/traffic-operations/mpr/pems-source",
+      "access": "FREE_ACCOUNT_APPROVAL",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Account required; no implied access.",
+        "Detector health, lane coverage and missing data must be checked."
+      ]
+    },
+    {
+      "id": "alertcalifornia-media",
+      "provider": "ALERTCalifornia/UC San Diego",
+      "engines": [
+        "camera-vision-smoke"
+      ],
+      "role": "curated wildfire videos for independent labeling",
+      "official_url": "https://alertcalifornia.org/images-and-video/",
+      "access": "MEDIA_TERMS_AND_CREDIT",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Permission for model training and redistribution must be verified separately.",
+        "Requires manual smoke onset annotation and negatives."
+      ]
+    },
+    {
+      "id": "copernicus-glofas-historical",
+      "provider": "Copernicus CEMS",
+      "engines": [
+        "flood-hydrology"
+      ],
+      "role": "gridded hydrological model/reanalysis benchmark",
+      "official_url": "https://ewds.climate.copernicus.eu/datasets/cems-glofas-historical",
+      "access": "EWDS_LOGIN_AND_TERMS",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Model-derived discharge is not independent gauge truth.",
+        "July 2026 API request structure changed; pin data/version."
+      ]
+    },
+    {
+      "id": "usgs-water-continuous",
+      "provider": "USGS Water Data",
+      "engines": [
+        "flood-hydrology"
+      ],
+      "role": "observed gauge streamflow and stage truth",
+      "official_url": "https://api.waterdata.usgs.gov/",
+      "access": "PUBLIC_API",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Station quality, provisional flags and rating-curve changes are mandatory.",
+        "Use modern API; legacy water services retiring 2027."
+      ]
+    },
+    {
+      "id": "usgs-comcat",
+      "provider": "USGS Earthquake Hazards",
+      "engines": [
+        "earthquake-detection"
+      ],
+      "role": "independent confirmed event labels",
+      "official_url": "https://earthquake.usgs.gov/fdsnws/event/1/",
+      "access": "PUBLIC_API",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Catalog events are retrospective labels, not mobile-phone accelerometer validation.",
+        "Retain magnitude revisions and origin uncertainty."
+      ]
+    },
+    {
+      "id": "jrc-ghsl-pop",
+      "provider": "EC JRC GHSL",
+      "engines": [
+        "evacuation-exposure"
+      ],
+      "role": "settlement and population exposure baseline",
+      "official_url": "https://human-settlement.emergency.copernicus.eu/downloadWizard.php",
+      "access": "OPEN_DOWNLOAD_ATTRIBUTION",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Raster population is not a live person count or device count.",
+        "Spatial and census-year uncertainty required."
+      ]
+    },
+    {
+      "id": "network-rail-feeds",
+      "provider": "Network Rail",
+      "engines": [
+        "rail-disruption"
+      ],
+      "role": "rail movements and schedule contextual benchmark",
+      "official_url": "https://www.networkrail.co.uk/who-we-are/transparency-and-ethics/transparency/open-data-feeds/",
+      "access": "ACCOUNT_AND_TERMS",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Train describer data cannot be treated as safety-of-life clearance.",
+        "Account limited; access is not authorised until granted."
+      ]
+    },
+    {
+      "id": "noaa-cors-rinex",
+      "provider": "NOAA NGS",
+      "engines": [
+        "gnss-orbit-geolocation"
+      ],
+      "role": "reference GNSS observations and coordinates",
+      "official_url": "https://www.ngs.noaa.gov/CORS/data.shtml",
+      "access": "PUBLIC_NODD_ARCHIVE",
+      "rights": "REVIEW_PER_PRODUCT_AND_USE_CASE",
+      "ingestion": "NOT_INGESTED",
+      "limitations": [
+        "Reference receiver is not equivalent to phone GNSS in rubble or urban canyon.",
+        "CORS distribution moved to NODD November 2026."
+      ]
+    }
+  ]
+}
