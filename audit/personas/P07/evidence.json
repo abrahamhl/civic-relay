@@ -1,0 +1,89 @@
+{
+  "schema": "BUYER_ARENA_PERSONA_EVIDENCE_V1",
+  "actor_id": "P07",
+  "legacy_id": "07-accessibility-en",
+  "disclosure": "AUTOMATED SYNTHETIC ROLE — NOT A RECRUITED HUMAN TESTER",
+  "target_url": "https://civic-relay-investor.vercel.app",
+  "target_commit": "c18c6ac936c8b3c6560997b113e46b50cab51302",
+  "checks": [
+    {
+      "id": "http-response",
+      "pass": true,
+      "critical": true,
+      "expected": "HTTP 200 on language entry route",
+      "observation": "HTTP 200 at https://civic-relay-investor.vercel.app/",
+      "suggested_fix": "Fix the deployed language route and monitor availability."
+    },
+    {
+      "id": "visible-hero",
+      "pass": true,
+      "critical": true,
+      "expected": "Hero heading > 15 chars visible above fold",
+      "observation": "WHEN THE\nNETWORK\nGOES DARK.",
+      "suggested_fix": "Restore a readable hero heading."
+    },
+    {
+      "id": "six-sections",
+      "pass": true,
+      "critical": true,
+      "expected": "All 6 architectural anchor sections exist in DOM",
+      "observation": "Missing section anchors: none",
+      "suggested_fix": "Keep all six chapter navigation targets present in the deployed site."
+    },
+    {
+      "id": "chapter-navigation",
+      "pass": true,
+      "critical": true,
+      "expected": "6 sticky navigation chapter links present",
+      "observation": "Chapter anchor count 6",
+      "suggested_fix": "Restore navigation for all six major sections."
+    },
+    {
+      "id": "truthful-simulation-label",
+      "pass": true,
+      "critical": true,
+      "expected": "Explicit simulation-only disclaimer visible in body copy",
+      "observation": "Visible synthetic/non-operational disclaimer present: true",
+      "suggested_fix": "Put a clear research-only safety statement near the first interaction."
+    },
+    {
+      "id": "no-global-mobile-overflow",
+      "pass": true,
+      "critical": false,
+      "expected": "scrollWidth <= innerWidth + 3",
+      "observation": "{\"scroll\":360,\"window\":360}",
+      "suggested_fix": "Correct global horizontal overflow at this viewport; keep chapter strip locally scrollable."
+    },
+    {
+      "id": "keyboard-focus",
+      "pass": true,
+      "critical": true,
+      "expected": "Keyboard Tab focuses an interactive element",
+      "observation": "{\"tag\":\"A\",\"name\":\"OEP — Offline Emergency Protocol\"}",
+      "suggested_fix": "Ensure keyboard tab focus reaches an actionable visible control."
+    },
+    {
+      "id": "accessible-semantic-buttons",
+      "pass": true,
+      "critical": true,
+      "expected": ">= 12 native buttons in #how-it-works",
+      "observation": "Stage controls are native buttons: 12",
+      "suggested_fix": "Use native buttons, labels and aria-pressed for system-stage interactions."
+    },
+    {
+      "id": "images-have-alt",
+      "pass": true,
+      "critical": false,
+      "expected": "0 images missing alt attribute",
+      "observation": "Images without alt 0",
+      "suggested_fix": "Provide accessible image alternatives (empty alt for decorative images)."
+    }
+  ],
+  "downloaded_scenario_export": null,
+  "console_errors": [],
+  "page_errors": [],
+  "network_origins": [
+    "https://civic-relay-investor.vercel.app"
+  ],
+  "screenshot": "screenshots/07-accessibility-en.png"
+}
