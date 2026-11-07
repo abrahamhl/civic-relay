@@ -6,7 +6,7 @@
  */
 const finite = (v) => typeof v === 'number' && Number.isFinite(v);
 const SHA256 = /^sha256:[0-9a-f]{64}$/;
-const ISO = /(?:Z|[+-]\\d{2}:\\d{2})$/;
+const ISO = /(?:Z|[+-]\d{2}:\d{2})$/;
 const mean = (a) => a.reduce((s, x) => s + x, 0) / a.length;
 const squared = (x) => x * x;
 
