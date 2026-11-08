@@ -11,7 +11,7 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
-  const usgsLayerRef = useRef<L.LayerGroup | null>(null);
+  const usgsLayerRef = useRef<L.FeatureGroup | null>(null);
 
   const [filterType, setFilterType] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -110,7 +110,7 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
       return;
     }
     let active = true;
-    const layer = L.layerGroup().addTo(map);
+    const layer = L.featureGroup().addTo(map);
     usgsLayerRef.current = layer;
     setUsgsStatus('Consultando observaciones USGS...');
     api.getUsgsEarthquakes().then((snapshot: any) => {
@@ -145,6 +145,9 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
           detail.append(link);
         }
         point.bindPopup(detail).addTo(layer);
+      }
+      if (layer.getLayers().length > 0) {
+        map.fitBounds(layer.getBounds(), { padding: [24, 24], maxZoom: 5 });
       }
       const stamp = snapshot.source?.generatedAt ?? snapshot.fetchedAt;
       const time = stamp ? new Date(stamp).toLocaleString('es-ES') : 'desconocida';
