@@ -88,6 +88,7 @@ export const api = {
 
   // Public scientific source records (separate from SENDA emergency alerts).
   async getUsgsEarthquakes() { return request('/api/sources/usgs-earthquakes'); },
+  async getEonetWildfires() { return request('/api/sources/eonet-wildfires'); },
 
   // Events
   async getEvents(params: Record<string, string> = {}) {
