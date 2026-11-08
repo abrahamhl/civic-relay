@@ -1,0 +1,1749 @@
+{
+  "schema": "senda-routing-benchmark/1",
+  "status": "SIMULATED_BENCHMARK",
+  "physicalValidation": "PHYSICAL_TEST_PENDING",
+  "notFieldValidation": true,
+  "generatedAt": "2026-11-07T17:25:46.010Z",
+  "source": {
+    "script": "packages/senda/scripts/routing-benchmark.mjs",
+    "module": "packages/senda/src/opportunistic-routing.mjs",
+    "commitAtGeneration": "70ae9138db4c84be9384cc910b43af5effad7af5",
+    "worktreeDirty": false
+  },
+  "parameters": {
+    "seeds": 20,
+    "seedBase": 20261107,
+    "sizeBytesDefault": 512,
+    "scenarios": [
+      "scheduled-line",
+      "scheduled-partition",
+      "crowd",
+      "energy-scarce",
+      "held-out"
+    ],
+    "strategies": [
+      "direct",
+      "flooding",
+      "epidemic",
+      "spray",
+      "earliest",
+      "adaptive"
+    ]
+  },
+  "scenarios": {
+    "scheduled-line": {
+      "note": "Cadena lineal de contactos con ventanas escalonadas; no hay enlace directo S→T.",
+      "contacts": 4,
+      "source": "S",
+      "dest": "T",
+      "t0": 0,
+      "tEnd": 900,
+      "sizeBytes": 512
+    },
+    "scheduled-partition": {
+      "note": "Dos grupos separados que solo se comunican por una mula/ferry con ventana tardía.",
+      "contacts": 5,
+      "source": "S",
+      "dest": "T",
+      "t0": 0,
+      "tEnd": 950,
+      "sizeBytes": 512
+    },
+    "crowd": {
+      "note": "Multitud con contactos aleatorios sembrados y atajos; sin enlace directo S→T.",
+      "contacts": 26,
+      "source": "S",
+      "dest": "T",
+      "t0": 0,
+      "tEnd": 700,
+      "sizeBytes": 512
+    },
+    "energy-scarce": {
+      "note": "Ruta WiFi Direct rápida y cara frente a cadena BLE lenta y barata.",
+      "contacts": 5,
+      "source": "S",
+      "dest": "T",
+      "t0": 0,
+      "tEnd": 420,
+      "sizeBytes": 512
+    },
+    "held-out": {
+      "note": "Grafo aleatorio sembrado no usado para ajustar estrategias; sin enlace directo S→T.",
+      "contacts": 20,
+      "source": "S",
+      "dest": "T",
+      "t0": 0,
+      "tEnd": 917,
+      "sizeBytes": 512
+    }
+  },
+  "strategyNotes": {
+    "direct": "Solo fuente→destino; no hay relés.",
+    "flooding": "Cada portador intenta enviar en cada contacto; no deduplica antes de transmitir.",
+    "epidemic": "Inunda solo a nodos que aún no tienen el mensaje.",
+    "spray": "Spray-and-wait con 16 copias; reparte la mitad y con 1 copia solo entrega al destino.",
+    "earliest": "Ruta de llegada más temprana calculada una vez (tipo CGR); sin replanificación.",
+    "adaptive": "Enrutado por grafo de contactos con replanificación, tope de 12 portadores y política de energía que evita relés con coste ≥3."
+  },
+  "results": [
+    {
+      "scenario": "scheduled-line",
+      "strategy": "direct",
+      "runs": 20,
+      "delivered": 0,
+      "deliveryRate": 0,
+      "latencyS": {
+        "p50": null,
+        "p95": null,
+        "mean": null,
+        "min": null,
+        "max": null
+      },
+      "transfers": {
+        "mean": 0,
+        "p95": 0
+      },
+      "uniqueTransfers": {
+        "mean": 0
+      },
+      "overheadRatio": {
+        "mean": null
+      },
+      "hopCount": {
+        "mean": null
+      },
+      "bytesOnAir": {
+        "mean": 0
+      },
+      "energyProxy": {
+        "mean": 0,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 60,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 20
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "flooding",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 600.44096,
+        "p95": 600.44096,
+        "mean": 600.441,
+        "min": 600.44096,
+        "max": 600.44096
+      },
+      "transfers": {
+        "mean": 4,
+        "p95": 4
+      },
+      "uniqueTransfers": {
+        "mean": 4
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 4
+      },
+      "bytesOnAir": {
+        "mean": 2048
+      },
+      "energyProxy": {
+        "mean": 4,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "epidemic",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 600.44096,
+        "p95": 600.44096,
+        "mean": 600.441,
+        "min": 600.44096,
+        "max": 600.44096
+      },
+      "transfers": {
+        "mean": 4,
+        "p95": 4
+      },
+      "uniqueTransfers": {
+        "mean": 4
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 4
+      },
+      "bytesOnAir": {
+        "mean": 2048
+      },
+      "energyProxy": {
+        "mean": 4,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "spray",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 600.44096,
+        "p95": 600.44096,
+        "mean": 600.441,
+        "min": 600.44096,
+        "max": 600.44096
+      },
+      "transfers": {
+        "mean": 4,
+        "p95": 4
+      },
+      "uniqueTransfers": {
+        "mean": 4
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 4
+      },
+      "bytesOnAir": {
+        "mean": 2048
+      },
+      "energyProxy": {
+        "mean": 4,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "earliest",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 600.44096,
+        "p95": 600.44096,
+        "mean": 600.441,
+        "min": 600.44096,
+        "max": 600.44096
+      },
+      "transfers": {
+        "mean": 4,
+        "p95": 4
+      },
+      "uniqueTransfers": {
+        "mean": 4
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 4
+      },
+      "bytesOnAir": {
+        "mean": 2048
+      },
+      "energyProxy": {
+        "mean": 4,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "adaptive",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 600.44096,
+        "p95": 600.44096,
+        "mean": 600.441,
+        "min": 600.44096,
+        "max": 600.44096
+      },
+      "transfers": {
+        "mean": 4,
+        "p95": 4
+      },
+      "uniqueTransfers": {
+        "mean": 4
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 4
+      },
+      "bytesOnAir": {
+        "mean": 2048
+      },
+      "energyProxy": {
+        "mean": 4,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "direct",
+      "runs": 20,
+      "delivered": 0,
+      "deliveryRate": 0,
+      "latencyS": {
+        "p50": null,
+        "p95": null,
+        "mean": null,
+        "min": null,
+        "max": null
+      },
+      "transfers": {
+        "mean": 0,
+        "p95": 0
+      },
+      "uniqueTransfers": {
+        "mean": 0
+      },
+      "overheadRatio": {
+        "mean": null
+      },
+      "hopCount": {
+        "mean": null
+      },
+      "bytesOnAir": {
+        "mean": 0
+      },
+      "energyProxy": {
+        "mean": 0,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 80,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 20
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "flooding",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 700.44096,
+        "p95": 700.44096,
+        "mean": 700.441,
+        "min": 700.44096,
+        "max": 700.44096
+      },
+      "transfers": {
+        "mean": 5,
+        "p95": 5
+      },
+      "uniqueTransfers": {
+        "mean": 5
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 5
+      },
+      "bytesOnAir": {
+        "mean": 2560
+      },
+      "energyProxy": {
+        "mean": 5,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "epidemic",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 700.44096,
+        "p95": 700.44096,
+        "mean": 700.441,
+        "min": 700.44096,
+        "max": 700.44096
+      },
+      "transfers": {
+        "mean": 5,
+        "p95": 5
+      },
+      "uniqueTransfers": {
+        "mean": 5
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 5
+      },
+      "bytesOnAir": {
+        "mean": 2560
+      },
+      "energyProxy": {
+        "mean": 5,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "spray",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 700.44096,
+        "p95": 700.44096,
+        "mean": 700.441,
+        "min": 700.44096,
+        "max": 700.44096
+      },
+      "transfers": {
+        "mean": 5,
+        "p95": 5
+      },
+      "uniqueTransfers": {
+        "mean": 5
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 5
+      },
+      "bytesOnAir": {
+        "mean": 2560
+      },
+      "energyProxy": {
+        "mean": 5,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "earliest",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 700.44096,
+        "p95": 700.44096,
+        "mean": 700.441,
+        "min": 700.44096,
+        "max": 700.44096
+      },
+      "transfers": {
+        "mean": 5,
+        "p95": 5
+      },
+      "uniqueTransfers": {
+        "mean": 5
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 5
+      },
+      "bytesOnAir": {
+        "mean": 2560
+      },
+      "energyProxy": {
+        "mean": 5,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "adaptive",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 700.44096,
+        "p95": 700.44096,
+        "mean": 700.441,
+        "min": 700.44096,
+        "max": 700.44096
+      },
+      "transfers": {
+        "mean": 5,
+        "p95": 5
+      },
+      "uniqueTransfers": {
+        "mean": 5
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 5
+      },
+      "bytesOnAir": {
+        "mean": 2560
+      },
+      "energyProxy": {
+        "mean": 5,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "direct",
+      "runs": 20,
+      "delivered": 0,
+      "deliveryRate": 0,
+      "latencyS": {
+        "p50": null,
+        "p95": null,
+        "mean": null,
+        "min": null,
+        "max": null
+      },
+      "transfers": {
+        "mean": 0,
+        "p95": 0
+      },
+      "uniqueTransfers": {
+        "mean": 0
+      },
+      "overheadRatio": {
+        "mean": null
+      },
+      "hopCount": {
+        "mean": null
+      },
+      "bytesOnAir": {
+        "mean": 0
+      },
+      "energyProxy": {
+        "mean": 0,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 470,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 60
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "flooding",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 220.44096,
+        "p95": 220.44096,
+        "mean": 220.441,
+        "min": 220.44096,
+        "max": 220.44096
+      },
+      "transfers": {
+        "mean": 13.15,
+        "p95": 15
+      },
+      "uniqueTransfers": {
+        "mean": 9.8
+      },
+      "overheadRatio": {
+        "mean": 1.341
+      },
+      "hopCount": {
+        "mean": 3.85
+      },
+      "bytesOnAir": {
+        "mean": 6732.8
+      },
+      "energyProxy": {
+        "mean": 13.15,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 69,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "epidemic",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 220.44096,
+        "p95": 220.44096,
+        "mean": 220.441,
+        "min": 220.44096,
+        "max": 220.44096
+      },
+      "transfers": {
+        "mean": 9.8,
+        "p95": 11
+      },
+      "uniqueTransfers": {
+        "mean": 9.8
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 3.85
+      },
+      "bytesOnAir": {
+        "mean": 5017.6
+      },
+      "energyProxy": {
+        "mean": 9.8,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 69,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 67,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "spray",
+      "runs": 20,
+      "delivered": 4,
+      "deliveryRate": 0.2,
+      "latencyS": {
+        "p50": 300.44096,
+        "p95": 360.44096,
+        "mean": 295.441,
+        "min": 220.44096,
+        "max": 360.44096
+      },
+      "transfers": {
+        "mean": 5.05,
+        "p95": 8
+      },
+      "uniqueTransfers": {
+        "mean": 5.05
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 3.25
+      },
+      "bytesOnAir": {
+        "mean": 2585.6
+      },
+      "energyProxy": {
+        "mean": 5.05,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 309,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 56,
+        "COPY_LIMIT": 50,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "earliest",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 220.44096,
+        "p95": 220.44096,
+        "mean": 220.441,
+        "min": 220.44096,
+        "max": 220.44096
+      },
+      "transfers": {
+        "mean": 3.85,
+        "p95": 4
+      },
+      "uniqueTransfers": {
+        "mean": 3.85
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 3.85
+      },
+      "bytesOnAir": {
+        "mean": 1971.2
+      },
+      "energyProxy": {
+        "mean": 3.85,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 170,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 2,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 83,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "adaptive",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 220.44096,
+        "p95": 220.44096,
+        "mean": 220.441,
+        "min": 220.44096,
+        "max": 220.44096
+      },
+      "transfers": {
+        "mean": 9.8,
+        "p95": 11
+      },
+      "uniqueTransfers": {
+        "mean": 9.8
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 3.85
+      },
+      "bytesOnAir": {
+        "mean": 5017.6
+      },
+      "energyProxy": {
+        "mean": 9.8,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 69,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 67,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "direct",
+      "runs": 20,
+      "delivered": 0,
+      "deliveryRate": 0,
+      "latencyS": {
+        "p50": null,
+        "p95": null,
+        "mean": null,
+        "min": null,
+        "max": null
+      },
+      "transfers": {
+        "mean": 0,
+        "p95": 0
+      },
+      "uniqueTransfers": {
+        "mean": 0
+      },
+      "overheadRatio": {
+        "mean": null
+      },
+      "hopCount": {
+        "mean": null
+      },
+      "bytesOnAir": {
+        "mean": 0
+      },
+      "energyProxy": {
+        "mean": 0,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 60,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 40
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "flooding",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 101.5002048,
+        "p95": 101.5002048,
+        "mean": 101.5,
+        "min": 101.5002048,
+        "max": 101.5002048
+      },
+      "transfers": {
+        "mean": 3,
+        "p95": 3
+      },
+      "uniqueTransfers": {
+        "mean": 3
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 2
+      },
+      "bytesOnAir": {
+        "mean": 1536
+      },
+      "energyProxy": {
+        "mean": 7,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "epidemic",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 101.5002048,
+        "p95": 101.5002048,
+        "mean": 101.5,
+        "min": 101.5002048,
+        "max": 101.5002048
+      },
+      "transfers": {
+        "mean": 3,
+        "p95": 3
+      },
+      "uniqueTransfers": {
+        "mean": 3
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 2
+      },
+      "bytesOnAir": {
+        "mean": 1536
+      },
+      "energyProxy": {
+        "mean": 7,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "spray",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 101.5002048,
+        "p95": 101.5002048,
+        "mean": 101.5,
+        "min": 101.5002048,
+        "max": 101.5002048
+      },
+      "transfers": {
+        "mean": 3,
+        "p95": 3
+      },
+      "uniqueTransfers": {
+        "mean": 3
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 2
+      },
+      "bytesOnAir": {
+        "mean": 1536
+      },
+      "energyProxy": {
+        "mean": 7,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "earliest",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 101.5002048,
+        "p95": 101.5002048,
+        "mean": 101.5,
+        "min": 101.5002048,
+        "max": 101.5002048
+      },
+      "transfers": {
+        "mean": 2,
+        "p95": 2
+      },
+      "uniqueTransfers": {
+        "mean": 2
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 2
+      },
+      "bytesOnAir": {
+        "mean": 1024
+      },
+      "energyProxy": {
+        "mean": 6,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 20,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "adaptive",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 230.44096,
+        "p95": 230.44096,
+        "mean": 230.441,
+        "min": 230.44096,
+        "max": 230.44096
+      },
+      "transfers": {
+        "mean": 3,
+        "p95": 3
+      },
+      "uniqueTransfers": {
+        "mean": 3
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 3
+      },
+      "bytesOnAir": {
+        "mean": 1536
+      },
+      "energyProxy": {
+        "mean": 3,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 20,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 20,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "direct",
+      "runs": 20,
+      "delivered": 0,
+      "deliveryRate": 0,
+      "latencyS": {
+        "p50": null,
+        "p95": null,
+        "mean": null,
+        "min": null,
+        "max": null
+      },
+      "transfers": {
+        "mean": 0,
+        "p95": 0
+      },
+      "uniqueTransfers": {
+        "mean": 0
+      },
+      "overheadRatio": {
+        "mean": null
+      },
+      "hopCount": {
+        "mean": null
+      },
+      "bytesOnAir": {
+        "mean": 0
+      },
+      "energyProxy": {
+        "mean": 0,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 363,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 20
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "flooding",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 660.44096,
+        "p95": 705.44096,
+        "mean": 660.041,
+        "min": 593.44096,
+        "max": 734.44096
+      },
+      "transfers": {
+        "mean": 16.35,
+        "p95": 19
+      },
+      "uniqueTransfers": {
+        "mean": 12
+      },
+      "overheadRatio": {
+        "mean": 1.363
+      },
+      "hopCount": {
+        "mean": 8.7
+      },
+      "bytesOnAir": {
+        "mean": 13593.6
+      },
+      "energyProxy": {
+        "mean": 26.55,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 43,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "epidemic",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 660.44096,
+        "p95": 705.44096,
+        "mean": 660.041,
+        "min": 593.44096,
+        "max": 734.44096
+      },
+      "transfers": {
+        "mean": 12.2,
+        "p95": 13
+      },
+      "uniqueTransfers": {
+        "mean": 12
+      },
+      "overheadRatio": {
+        "mean": 1.017
+      },
+      "hopCount": {
+        "mean": 8.7
+      },
+      "bytesOnAir": {
+        "mean": 9830.4
+      },
+      "energyProxy": {
+        "mean": 19.2,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 43,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 83,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "spray",
+      "runs": 20,
+      "delivered": 1,
+      "deliveryRate": 0.05,
+      "latencyS": {
+        "p50": 619.44096,
+        "p95": 619.44096,
+        "mean": 619.441,
+        "min": 619.44096,
+        "max": 619.44096
+      },
+      "transfers": {
+        "mean": 4.9,
+        "p95": 7
+      },
+      "uniqueTransfers": {
+        "mean": 4.9
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 3
+      },
+      "bytesOnAir": {
+        "mean": 3891.2
+      },
+      "energyProxy": {
+        "mean": 7.6,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 216,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 20,
+        "COPY_LIMIT": 49,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "earliest",
+      "runs": 20,
+      "delivered": 19,
+      "deliveryRate": 0.95,
+      "latencyS": {
+        "p50": 660.44096,
+        "p95": 705.44096,
+        "mean": 656.125,
+        "min": 593.44096,
+        "max": 705.44096
+      },
+      "transfers": {
+        "mean": 8.35,
+        "p95": 12
+      },
+      "uniqueTransfers": {
+        "mean": 8.35
+      },
+      "overheadRatio": {
+        "mean": 1
+      },
+      "hopCount": {
+        "mean": 8.526
+      },
+      "bytesOnAir": {
+        "mean": 6681.6
+      },
+      "energyProxy": {
+        "mean": 13.05,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 139,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 5,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 59,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "adaptive",
+      "runs": 20,
+      "delivered": 20,
+      "deliveryRate": 1,
+      "latencyS": {
+        "p50": 660.44096,
+        "p95": 705.44096,
+        "mean": 660.041,
+        "min": 593.44096,
+        "max": 734.44096
+      },
+      "transfers": {
+        "mean": 12.2,
+        "p95": 13
+      },
+      "uniqueTransfers": {
+        "mean": 12
+      },
+      "overheadRatio": {
+        "mean": 1.017
+      },
+      "hopCount": {
+        "mean": 8.7
+      },
+      "bytesOnAir": {
+        "mean": 9830.4
+      },
+      "energyProxy": {
+        "mean": 19.2,
+        "unit": "unidades de energía del catálogo (NO julios)"
+      },
+      "dropReasons": {
+        "NO_HOLDER": 43,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 83,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0
+      },
+      "deterministic": true
+    }
+  ],
+  "summary": [
+    {
+      "scenario": "scheduled-line",
+      "strategy": "direct",
+      "deliveryRate": 0,
+      "p50LatencyS": null,
+      "overheadRatio": null,
+      "energyProxy": 0,
+      "hops": null
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "flooding",
+      "deliveryRate": 1,
+      "p50LatencyS": 600.44096,
+      "overheadRatio": 1,
+      "energyProxy": 4,
+      "hops": 4
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "epidemic",
+      "deliveryRate": 1,
+      "p50LatencyS": 600.44096,
+      "overheadRatio": 1,
+      "energyProxy": 4,
+      "hops": 4
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "spray",
+      "deliveryRate": 1,
+      "p50LatencyS": 600.44096,
+      "overheadRatio": 1,
+      "energyProxy": 4,
+      "hops": 4
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "earliest",
+      "deliveryRate": 1,
+      "p50LatencyS": 600.44096,
+      "overheadRatio": 1,
+      "energyProxy": 4,
+      "hops": 4
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "adaptive",
+      "deliveryRate": 1,
+      "p50LatencyS": 600.44096,
+      "overheadRatio": 1,
+      "energyProxy": 4,
+      "hops": 4
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "direct",
+      "deliveryRate": 0,
+      "p50LatencyS": null,
+      "overheadRatio": null,
+      "energyProxy": 0,
+      "hops": null
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "flooding",
+      "deliveryRate": 1,
+      "p50LatencyS": 700.44096,
+      "overheadRatio": 1,
+      "energyProxy": 5,
+      "hops": 5
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "epidemic",
+      "deliveryRate": 1,
+      "p50LatencyS": 700.44096,
+      "overheadRatio": 1,
+      "energyProxy": 5,
+      "hops": 5
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "spray",
+      "deliveryRate": 1,
+      "p50LatencyS": 700.44096,
+      "overheadRatio": 1,
+      "energyProxy": 5,
+      "hops": 5
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "earliest",
+      "deliveryRate": 1,
+      "p50LatencyS": 700.44096,
+      "overheadRatio": 1,
+      "energyProxy": 5,
+      "hops": 5
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "adaptive",
+      "deliveryRate": 1,
+      "p50LatencyS": 700.44096,
+      "overheadRatio": 1,
+      "energyProxy": 5,
+      "hops": 5
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "direct",
+      "deliveryRate": 0,
+      "p50LatencyS": null,
+      "overheadRatio": null,
+      "energyProxy": 0,
+      "hops": null
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "flooding",
+      "deliveryRate": 1,
+      "p50LatencyS": 220.44096,
+      "overheadRatio": 1.341,
+      "energyProxy": 13.15,
+      "hops": 3.85
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "epidemic",
+      "deliveryRate": 1,
+      "p50LatencyS": 220.44096,
+      "overheadRatio": 1,
+      "energyProxy": 9.8,
+      "hops": 3.85
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "spray",
+      "deliveryRate": 0.2,
+      "p50LatencyS": 300.44096,
+      "overheadRatio": 1,
+      "energyProxy": 5.05,
+      "hops": 3.25
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "earliest",
+      "deliveryRate": 1,
+      "p50LatencyS": 220.44096,
+      "overheadRatio": 1,
+      "energyProxy": 3.85,
+      "hops": 3.85
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "adaptive",
+      "deliveryRate": 1,
+      "p50LatencyS": 220.44096,
+      "overheadRatio": 1,
+      "energyProxy": 9.8,
+      "hops": 3.85
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "direct",
+      "deliveryRate": 0,
+      "p50LatencyS": null,
+      "overheadRatio": null,
+      "energyProxy": 0,
+      "hops": null
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "flooding",
+      "deliveryRate": 1,
+      "p50LatencyS": 101.5002048,
+      "overheadRatio": 1,
+      "energyProxy": 7,
+      "hops": 2
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "epidemic",
+      "deliveryRate": 1,
+      "p50LatencyS": 101.5002048,
+      "overheadRatio": 1,
+      "energyProxy": 7,
+      "hops": 2
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "spray",
+      "deliveryRate": 1,
+      "p50LatencyS": 101.5002048,
+      "overheadRatio": 1,
+      "energyProxy": 7,
+      "hops": 2
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "earliest",
+      "deliveryRate": 1,
+      "p50LatencyS": 101.5002048,
+      "overheadRatio": 1,
+      "energyProxy": 6,
+      "hops": 2
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "adaptive",
+      "deliveryRate": 1,
+      "p50LatencyS": 230.44096,
+      "overheadRatio": 1,
+      "energyProxy": 3,
+      "hops": 3
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "direct",
+      "deliveryRate": 0,
+      "p50LatencyS": null,
+      "overheadRatio": null,
+      "energyProxy": 0,
+      "hops": null
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "flooding",
+      "deliveryRate": 1,
+      "p50LatencyS": 660.44096,
+      "overheadRatio": 1.363,
+      "energyProxy": 26.55,
+      "hops": 8.7
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "epidemic",
+      "deliveryRate": 1,
+      "p50LatencyS": 660.44096,
+      "overheadRatio": 1.017,
+      "energyProxy": 19.2,
+      "hops": 8.7
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "spray",
+      "deliveryRate": 0.05,
+      "p50LatencyS": 619.44096,
+      "overheadRatio": 1,
+      "energyProxy": 7.6,
+      "hops": 3
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "earliest",
+      "deliveryRate": 0.95,
+      "p50LatencyS": 660.44096,
+      "overheadRatio": 1,
+      "energyProxy": 13.05,
+      "hops": 8.526
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "adaptive",
+      "deliveryRate": 1,
+      "p50LatencyS": 660.44096,
+      "overheadRatio": 1.017,
+      "energyProxy": 19.2,
+      "hops": 8.7
+    }
+  ],
+  "limitations": [
+    "Contactos y ventanas son sintéticos y sembrados; no provienen de radio real.",
+    "No hay Android, BLE, Wi-Fi Direct, LoRa ni Nearby; PHYSICAL_TEST_PENDING.",
+    "La energía es un proxy del catálogo de canales, no una medición en julios.",
+    "No se modelan colas, contención, pérdida de paquetes por SNR ni consumo en reposo.",
+    "El benchmark no certifica el sistema ni demuestra comportamiento en una emergencia real."
+  ]
+}

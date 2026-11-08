@@ -1,0 +1,698 @@
+{
+  "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
+  "target": "local static server (investor-next/public)",
+  "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
+  "at": "2026-11-06T01:39:48.545Z",
+  "durationS": 197.4,
+  "passed": 49,
+  "total": 49,
+  "results": [
+    {
+      "name": "La app abre sin red en los 3 teléfonos (service worker + IndexedDB)",
+      "ok": true
+    },
+    {
+      "name": "Tarjetas intercambiadas sin red",
+      "ok": true
+    },
+    {
+      "name": "Camino SONIDO: B descifra el mensaje de A a partir del audio emitido",
+      "ok": true,
+      "airtimeSeconds": 31.4,
+      "bytes": 349
+    },
+    {
+      "name": "Camino ARCHIVO: B recibe y descifra el paquete .senda",
+      "ok": true
+    },
+    {
+      "name": "La mula C transporta el SOS cifrado y no puede leerlo",
+      "ok": true
+    },
+    {
+      "name": "Camino MULA: B recibe el SOS a través de C",
+      "ok": true
+    },
+    {
+      "name": "El recibo infalsificable de B borra la copia que llevaba C",
+      "ok": true
+    },
+    {
+      "name": "Duplicados descartados (cada mensaje una sola vez)",
+      "ok": true
+    },
+    {
+      "name": "Tras reiniciar sin red, B conserva sus mensajes (IndexedDB)",
+      "ok": true
+    },
+    {
+      "name": "Modo viaje: una caída del móvil NO dispara alarma",
+      "ok": true
+    },
+    {
+      "name": "Modo viaje: vuelco a 200 km/h → «¿Estás bien?» y, sin respuesta, aviso automático",
+      "ok": true,
+      "detection": "CRASH_LIKELY",
+      "peakG": 6.06,
+      "tiltDeg": 90
+    },
+    {
+      "name": "El contacto recibe el aviso de accidente cifrado sin red y lo ve legible",
+      "ok": true,
+      "brief": "1 informe(s); hacen falta 2 por emplazamiento para fusionar."
+    },
+    {
+      "name": "Panel de coordinación abre sin red y separa los 2 trenes en segundos",
+      "ok": true,
+      "secondTrainKnownS": 34
+    },
+    {
+      "name": "Gemelo digital sin red: recuento de zona, edificio 3D, routers por planta, alerta dirigida y cámara con mapa de calor",
+      "ok": true,
+      "affected": 6,
+      "total": 14,
+      "located": 56,
+      "within1": 100,
+      "gateways": 10,
+      "lost": 4,
+      "board": 15,
+      "arSignalsInView": 28
+    },
+    {
+      "name": "Visión por capas sin red: probabilidad, espectro, estructura y topografía sobre la cámara; la vivienda con «atrapado» encabeza la prioridad con ≥98 % corroborado por 2 fuentes",
+      "ok": true,
+      "byLayer": {
+        "TOPOGRAFIA": 26,
+        "ESTRUCTURA": 20,
+        "PROBABILIDAD": 60,
+        "ESPECTRO": 66
+      },
+      "top": {
+        "id": "3B",
+        "cls": "CONFIRMADO_POR_RESPUESTA",
+        "p": 0.9988151569971068,
+        "badge98": true
+      },
+      "planTop": "csi-p2"
+    },
+    {
+      "name": "Ojo de SENDA sin red: 7 casos reales, satélite visible con elevación, distancia y latencia calculadas, y plan k-de-n ≥99 % con los canales que quedan",
+      "ok": true,
+      "path": {
+        "sat": "Iridium 2-5",
+        "elevationDeg": 24.7,
+        "rangeKm": 1549,
+        "delayMs": 5.17
+      },
+      "plan": {
+        "k": 6,
+        "n": 14,
+        "p": 0.9967008916259765
+      },
+      "visible": {
+        "iridium": 2,
+        "galileo": 8,
+        "qo100": 1
+      }
+    },
+    {
+      "name": "Incendio sin red: la antena de Valdeolmos cae antes de su hora límite (aviso adelantado), Navalcerro se avisa a su hora y Hoyarrubia queda fuera de alcance",
+      "ok": true,
+      "gapMin": 107
+    },
+    {
+      "name": "Vigilancia ferroviaria sin red: escalón del circuito de vía detectado ≥20 h antes sin alarma del umbral, defectos de vía por los móviles, transición sin supervisión y muro con lluvia",
+      "ok": true,
+      "leadTimeH": 21.5,
+      "thresholdAlarms": 0,
+      "events": 1,
+      "geoAlerts": [
+        {
+          "fromPk": 7800,
+          "kinds": [
+            "RUGOSIDAD",
+            "IMPACTO_REPETIDO"
+          ]
+        },
+        {
+          "fromPk": 12350,
+          "kinds": [
+            "RUGOSIDAD",
+            "DEGRADACION"
+          ]
+        },
+        {
+          "fromPk": 12400,
+          "kinds": [
+            "RUGOSIDAD",
+            "DEGRADACION"
+          ]
+        }
+      ],
+      "topTransition": "ALTO_SIN_SUPERVISION",
+      "topAsset": 3
+    },
+    {
+      "name": "Censo radio con dron sin red: teléfonos exactos por planta pese a la rotación de direcciones, intervalo de personas que contiene la verdad en las 6 plantas y planta sin teléfonos = «0, quizá 1»",
+      "ok": true,
+      "phones": [
+        4,
+        8,
+        5,
+        0,
+        5,
+        3
+      ],
+      "truePhones": [
+        4,
+        8,
+        5,
+        0,
+        5,
+        3
+      ],
+      "covered": true,
+      "addresses": 113,
+      "total": {
+        "lo": 20,
+        "mid": 25,
+        "hi": 37
+      },
+      "empty": {
+        "lo": 0,
+        "mid": 0,
+        "hi": 1,
+        "pEmpty": 0.88
+      }
+    },
+    {
+      "name": "Arquitectura sin red: el escenario «Censo con dron» recorre sus 6 pasos con sus 5 conexiones, y cada pieza muestra estado real, código y enlace",
+      "ok": true,
+      "step": 5,
+      "cur": "d-rescue",
+      "edges": 5,
+      "detail": "Probado en simulación nuevoConcurrencia de direcciones aleatorias → teléfonos por planta; inferencia bayesiana exacta → personas con intervalo del 90 %.Código: rf-census.mjsAparece en: 🚁 Censo con dronAbrir /senda/dron →",
+      "nodes": 75,
+      "links": [
+        "/senda/dron",
+        "/senda/llamada"
+      ]
+    },
+    {
+      "name": "Sentidos ampliados sin red: el golpe se sitúa a < 0,5 m con 5 móviles y relojes desfasados, y la respiración por Wi-Fi se detecta (≈14 rpm) solo cuando hay persona",
+      "ok": true,
+      "err": 0.1034804098746653,
+      "csi": {
+        "person": {
+          "detected": true,
+          "rpm": 14.1,
+          "bandShare": 0.196
+        },
+        "empty": {
+          "detected": false
+        }
+      }
+    },
+    {
+      "name": "Riadas y maremotos sin red: la subida aguas arriba avisa ≥ 2 h antes en pueblos donde casi no llueve, y subir a una 3.ª planta es más rápido que la llegada del maremoto",
+      "ok": true,
+      "leads": [
+        150,
+        220
+      ],
+      "coasts": [
+        {
+          "id": "faro",
+          "etaMin": 28.6
+        },
+        {
+          "id": "huelva",
+          "etaMin": 60
+        },
+        {
+          "id": "cadiz",
+          "etaMin": 61
+        }
+      ]
+    },
+    {
+      "name": "Triaje sin red: «no camina, respira, más de 30/min» → ROJO, con indicaciones de hemorragia y un parte de ≤ 160 caracteres que pide el 112 primero",
+      "ok": true,
+      "cat": "ROJO",
+      "msg": "SENDA TRIAJE R1 A0 V0 | 39.45210,-0.43020 ±25m | hemorragia 1 | 112,Sanitario | 01:37",
+      "steps": "Qué hacer ahoraPresión directa y firme sobre la herida con lo más limpio que tengas; no la levantes para mirar.Si sangra a chorro en un brazo o una pierna y la presión no basta: torniquete unos 5–7 cm por encima de la herida, aprieta hasta que pare y anota la hora.Si respira mejor sentado, déjale sentado; si no, tumbado con las piernas estiradas.\n  Servicios: 112 → Sanitario➕ Añadir a la escena y siguiente víctimaRepetir"
+    },
+    {
+      "name": "Monte sin red: posición por rumbos a aerogeneradores y antena dentro de su elipse de error, y mapas de una sierra en menos de 100 MB",
+      "ok": true,
+      "err": 105.82338042564945,
+      "maj": 116.29897173179175,
+      "tiles": {
+        "perZoom": [
+          {
+            "z": 8,
+            "tiles": 1
+          },
+          {
+            "z": 9,
+            "tiles": 2
+          },
+          {
+            "z": 10,
+            "tiles": 2
+          },
+          {
+            "z": 11,
+            "tiles": 6
+          },
+          {
+            "z": 12,
+            "tiles": 20
+          },
+          {
+            "z": 13,
+            "tiles": 80
+          },
+          {
+            "z": 14,
+            "tiles": 266
+          },
+          {
+            "z": 15,
+            "tiles": 988
+          }
+        ],
+        "tiles": 1365,
+        "mb": 26.7
+      }
+    },
+    {
+      "name": "Dron casa por casa sin red: 24 edificios en varias salidas que respetan la batería y tablero de prioridad que encabeza el edificio con más personas probables y daño",
+      "ok": true,
+      "sorties": 4,
+      "top": [
+        "D2",
+        "D4",
+        "A3"
+      ]
+    },
+    {
+      "name": "Batería de Internet sin red: 1 GB cubre ≥ 95 % de lo necesario, la biblioteca de vecinos reconstruye el paquete exacto (Reed-Solomon y SHA-256) y la memoria de cobertura elige el cerro con antena de grupo electrógeno",
+      "ok": true,
+      "cov": 0.957,
+      "used": 754.4,
+      "swarm": {
+        "k": 13,
+        "n": 40,
+        "perPhoneMB": 461.5,
+        "communityMB": 18461.5,
+        "p": 0.9917
+      },
+      "rt": true,
+      "best": "ermita",
+      "quota": true
+    },
+    {
+      "name": "Ruta protectora sin red: con 1,2 s entre coches el aviso SENDA reduce el choque en cadena de 5 a 1, el SOS sale de la zona sin cobertura en menos de 10 min con los coches que pasan, el libro de puntos cívicos verifica su cadena SHA-256 y el detector marca la frenada",
+      "ok": true,
+      "no": 5,
+      "si": 1,
+      "sos": 7.4,
+      "warned": 14,
+      "pts": {
+        "Luis": 10,
+        "Ana": 40,
+        "Marta": 20
+      },
+      "ratio": 0.065,
+      "live": "HARD_BRAKE",
+      "hex": 24
+    },
+    {
+      "name": "Situaciones al volante sin red: V16 + SENDA convierte una baliza en «accidente con atrapado», la cola crece hacia atrás a 14,3 km/h (LWR) y las calculadoras de niebla, firme y agua responden",
+      "ok": true,
+      "v16": "ACCIDENTE",
+      "trapped": 1,
+      "orphan": 1,
+      "w": -14.3,
+      "calc": {
+        "vis": 72,
+        "stop": 98,
+        "flood": "PIERDE_CONTROL"
+      },
+      "rows": 20
+    },
+    {
+      "name": "Cámaras sin red: la visibilidad estimada en la imagen con niebla de 120 m queda a menos del 15 %; el registro reúne ≥ 30 fuentes oficiales con licencia y lo prohibido (cámaras sin permiso, agregadores de datos personales, matrículas, biometría) aparece como NUNCA",
+      "ok": true,
+      "est": 114,
+      "vis": 120,
+      "never": 4,
+      "rows": 32
+    },
+    {
+      "name": "Exportación a Países Bajos sin red: el lector DATEX II convierte la publicación en avisos y se queda con los 3 de la ruta; el rood kruis se dice en neerlandés; las cámaras allí requieren convenio",
+      "ok": true,
+      "d": {
+        "records": 5,
+        "hazards": 4,
+        "route": 3
+      },
+      "conv": [
+        "Cámaras"
+      ],
+      "msi": "Over 600 meter. Rood kruis op rijstrook 1: voeg in naar rechts. Maximaal 70."
+    },
+    {
+      "name": "Infraestructura DGT sin red: ningún equipo de la vía es pasarela (solo DGT 3.0 por convenio), detectar radares y publicar controles móviles es NUNCA, las estaciones de aforo localizan la cola y los paneles se convierten en avisos",
+      "ok": true,
+      "gw": [
+        "dgt30"
+      ],
+      "q": {
+        "sTail": 3000,
+        "between": [
+          "EST-3",
+          "EST-4"
+        ],
+        "wKmh": -17.3,
+        "growing": true
+      },
+      "vms": [
+        "CRASH",
+        "FOG",
+        "CRASH"
+      ],
+      "radar": {
+        "zone": true,
+        "avg": 106
+      },
+      "never": 2
+    },
+    {
+      "name": "Visión de tráfico sin red: métricas del vídeo real (12 vehículos seguidos a bordo, 15 contactos/min de la calzada contraria, ningún falso «¡Frena!»; cámara fija convertida en caudal)",
+      "ok": true,
+      "dash": {
+        "tracked": 12,
+        "oncomingPerMin": 15,
+        "probe": {
+          "alerts": [],
+          "oncomingPerMin": 15,
+          "meanVisible": 1.17,
+          "leadShare": 0
+        }
+      },
+      "fixed": {
+        "total": 1,
+        "perMinute": 2,
+        "measured": {
+          "id": "CAM-1",
+          "flowVehH": 119,
+          "speedKmh": null,
+          "source": "camaras",
+          "perMinute": 2
+        }
+      }
+    },
+    {
+      "name": "Coches conectados sin red: la posición pasa de ~10 m (GNSS) a menos de 2,5 m sumando vía, aerogenerador, Wi-Fi y otro coche; el tramo se fusiona con Kalman y solo se publica la celda con k ≥ 5 fuentes",
+      "ok": true,
+      "steps": [
+        {
+          "rms": 11.31,
+          "err": 10.93
+        },
+        {
+          "rms": 8.19,
+          "err": 8.98
+        },
+        {
+          "rms": 8.13,
+          "err": 9.57
+        },
+        {
+          "rms": 2.95,
+          "err": 2.98
+        },
+        {
+          "rms": 1.18,
+          "err": 1.82
+        }
+      ],
+      "segment": {
+        "kmh": 57,
+        "sdKmh": 2.57,
+        "contrib": [
+          {
+            "source": "telefono",
+            "gain": 0.881
+          },
+          {
+            "source": "camaras",
+            "gain": 0.685
+          },
+          {
+            "source": "detectores",
+            "gain": 0.789
+          },
+          {
+            "source": "waze",
+            "gain": 0.066
+          }
+        ]
+      },
+      "privacy": {
+        "published": 1,
+        "suppressed": 1
+      }
+    },
+    {
+      "name": "Seguimiento de incendio sin red: la columna se sitúa a < 400 m cruzando rumbos y se descarta la brújula descalibrada; satélite → avance de 25 m/min; criticidad extrema; se corta la M-501 alrededor del km 57 con aviso a los coches; la calculadora baja a clase 1 sin 30-30-30 y el móvil prepara la observación sin enviar la foto",
+      "ok": true,
+      "fu": {
+        "fix": {
+          "errM": 197,
+          "majorM": 139.08,
+          "rejected": [
+            "movil-4"
+          ],
+          "used": 6
+        },
+        "areaHa": 871,
+        "ros": 25,
+        "level": "extrema",
+        "score": 100,
+        "roads": [
+          {
+            "id": "M-501",
+            "action": "cortar",
+            "section": {
+              "pkFrom": 50.8,
+              "pkTo": 57.2
+            }
+          },
+          {
+            "id": "N-403",
+            "action": "vigilar",
+            "section": null
+          }
+        ],
+        "alerts": 1,
+        "firstTown": "Pelayos de la Presa",
+        "calc": {
+          "rule30": 3,
+          "hdw": 500,
+          "ffwi": 53,
+          "isi": 37.8,
+          "flameM": 6.5,
+          "attack": 4
+        },
+        "sighting": {
+          "ejemplo": "así sale una observación",
+          "rumbo": "75,0° (a mano)",
+          "errorTipico": "±8°",
+          "posicion": "40.361, -4.336 (redondeada)",
+          "foto": "se queda en el teléfono"
+        }
+      },
+      "fuCalc": {
+        "rule30": 0,
+        "hdw": 29,
+        "ffwi": 10,
+        "isi": 12.5,
+        "flameM": 0.5,
+        "attack": 1,
+        "sighting": {
+          "tipo": "avistamiento de humo",
+          "rumbo": "75.0° (a mano)",
+          "errorTipico": "±8°",
+          "posicion": "sin GPS en este dispositivo",
+          "hora": "2026-11-06T01:38:25.000Z",
+          "foto": "se queda en el teléfono",
+          "modo": "PASIVO, con tu toque"
+        }
+      }
+    },
+    {
+      "name": "Incendio en 3D sin red: terreno Copernicus 380×339 y GFS real del 23-07 cargados; el viento 3D se resuelve en el teléfono conservando la masa; la pluma sube; vistas cenital y horizontal, vista desde una cámara y pasada de un CL-415 con su estela",
+      "ok": true,
+      "f3": {
+        "ok": true,
+        "errors": [],
+        "state": {
+          "k": 2,
+          "ms": 200,
+          "divBefore": 0.1318294766743978,
+          "divAfter": 0.0005385902822017674,
+          "plumeTop": 1537.0159725870542,
+          "t": 180
+        },
+        "grid": "25×22×48"
+      },
+      "f3b": {
+        "top": 0.02,
+        "hor": 1.45,
+        "cam": 2,
+        "flight": 133.26163540314164,
+        "drop": 4.0602326832754745
+      }
+    },
+    {
+      "name": "Incendios de referencia sin red: 14 casos con fuentes y ≥ 5 reconstruidos con GOES; Camp medido por satélite ≈ 7,5 km/h como NIST; el fuego llega a ≤ 3 km de Pentz Rd hacia las 08:17 (NIST: 08:30); validación dejando fuera incendios enteros",
+      "ok": true,
+      "casos": 14,
+      "reconstruidos": 7,
+      "puntos": 7,
+      "mejor": "regla10",
+      "cobertura80": 0.71,
+      "campGoes": 8.02,
+      "pentz": [
+        "08:17",
+        "08:37"
+      ],
+      "eatonAdelantoH": 8.5
+    },
+    {
+      "name": "Coches, cámaras y fuego sin red: en Eaton SENDA avisa a Altadena oeste horas antes de la orden real; en Skyway los cierres casi eliminan la exposición; el filtro de Kalman detecta el atasco de Chico y el bloqueo de Palisades Dr en ≤ 10 min; cámaras reales de Caltrans y TfL",
+      "ok": true,
+      "eatonAdelantoH": 8.5,
+      "eatonAviso": "18:31",
+      "escenarios": {
+        "aviso-al-detectar": {
+          "despeje": 430.5,
+          "expuestos": 375166
+        },
+        "aviso-60min": {
+          "despeje": 533.5,
+          "expuestos": 771733
+        },
+        "contraflujo-al-detectar": {
+          "despeje": 429.5,
+          "expuestos": 13739
+        },
+        "cierres-senda": {
+          "despeje": 183,
+          "expuestos": 2
+        }
+      },
+      "deteccionAtasco": 52,
+      "deteccionBloqueo": 58,
+      "caltrans": 13,
+      "caltransVideo": 7,
+      "tfl": 12
+    },
+    {
+      "name": "Llamada sin Internet: oferta de <110 bytes por sonido (onda real, decodificada exacta), conexión directa cifrada, voz Opus y chat en ambos sentidos y cero peticiones de red durante la llamada",
+      "ok": true,
+      "offerBytes": 79,
+      "answerBytes": 72,
+      "offerSoundS": 7.8,
+      "audioPackets": [
+        151,
+        151
+      ],
+      "requests": []
+    },
+    {
+      "name": "Llamada de prueba en un solo dispositivo (sin micrófono): dos conexiones reales A↔B con el código por forma de onda, mensaje y audio recibidos",
+      "ok": true,
+      "connected": true,
+      "offerBytes": 79,
+      "answerBytes": 72,
+      "connectMs": 257,
+      "message": "¿Me oyes? Estoy en la 3.ª planta, puerta B",
+      "rttMs": 1,
+      "audioPackets": 75
+    },
+    {
+      "name": "Cadena de voz real A → B → C: B reenvía la voz de A (C oye el tono de 440 Hz de A) y el chat; el plan nunca usa como repetidor a quien tiene poca batería y avisa de quién queda aislado",
+      "ok": true,
+      "freqAtC": 441,
+      "audioPacketsAtC": 100,
+      "relays": [
+        "Ana",
+        "Iker",
+        "Juan",
+        "Portero",
+        "Sara"
+      ],
+      "isolatedWhenLow": [
+        "Ana",
+        "Luis",
+        "Marta"
+      ]
+    },
+    {
+      "name": "Organismo firma credencial; alerta firmada viaja por la mula; el residente la verifica, responde «atrapado» y el coordinador lo ve en su cuadro",
+      "ok": true,
+      "issuer": "FIRE · JEFE_INCIDENTE · Parque 3 (firma verificada)",
+      "board": "EdificioPlantaA salvoAtrap./ayudaSin resp.FueraB1430100"
+    },
+    {
+      "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
+      "ok": true,
+      "href": "senda://accion?a=BLE_BEACON&id=1ccfeb191b1c23e9&b=B14&f=3&u=B&bat=100&cmd=iN5jvsVo_GWqXmXH"
+    },
+    {
+      "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",
+      "ok": true,
+      "reason": "NO_OWNER_CONSENT"
+    },
+    {
+      "name": "Relé por Internet: A sube con conexión, C baja y transporta sin red, B lo recibe; el relé no puede leerlo",
+      "ok": true
+    },
+    {
+      "name": "Red SENDA sin red: reparto k-de-n entre varios portadores ≥99 %, prueba real de pérdida de portadores, catálogo satelital, previsión de apagón con pasarelas y CAP con auditoría que delata alteraciones",
+      "ok": true,
+      "pDelivery": 0.9909,
+      "trialSuccess": 1,
+      "halfDarkAtH": 4,
+      "gateways": 5
+    },
+    {
+      "name": "Panel ferroviario exporta cada emplazamiento a la sala 112 en CAP 1.2 con auditoría íntegra",
+      "ok": true,
+      "sites": 2
+    },
+    {
+      "name": "Modo fácil: un toque «Estoy atrapado» sale cifrado y el contacto lo recibe; la vista sencilla deja solo los botones grandes",
+      "ok": true,
+      "easyInbox": true,
+      "sosHidden": true,
+      "easy": true
+    },
+    {
+      "name": "Accesibilidad automática en las 28 pantallas: idioma declarado, todos los controles con nombre accesible e imágenes con texto alternativo",
+      "ok": true,
+      "issues": {}
+    },
+    {
+      "name": "Sin errores de JavaScript en los 3 teléfonos",
+      "ok": true,
+      "errors": []
+    }
+  ],
+  "offlineNetworkAttemptsBlocked": 2,
+  "scope": "Tres navegadores Chromium independientes. La onda acústica es la que genera la app emisora, inyectada en la receptora (sin altavoz/micrófono físicos en CI)."
+}

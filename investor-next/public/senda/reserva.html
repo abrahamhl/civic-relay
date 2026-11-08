@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Batería de Internet</title>
+<meta name="description" content="Una reserva de red dentro del teléfono: SENDA guarda, mientras hay Wi-Fi, la parte de Internet que necesitarás sin cobertura, la comparte con tus vecinos y te dice adónde ir para que salga el mensaje.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/arquitectura">Arquitectura</a> · <a href="/senda/llamada">Llamada sin Internet</a> · <a href="/senda/monte">Monte</a> · <a href="/senda/ojo">Satélites</a></p>
+<h1>Batería de Internet</h1>
+<p class="lead m">Igual que la batería guarda energía para cuando no hay enchufe, SENDA guarda <b>red</b> para cuando no hay cobertura. Mientras tienes Wi-Fi y el móvil carga, llena una <b>reserva</b> con la parte de Internet que vas a necesitar: mapas, plan de emergencia, albergues, hospitales, primeros auxilios, zonas inundables, antenas, órbitas de satélites y tus documentos cifrados. Sin red, la app responde desde la reserva como si fuera la red. Lo que no se puede responder (enviar algo, consultar algo nuevo) se guarda como <b>intención</b> y sale en la primera ventana de conexión. Con tus vecinos, las reservas se suman en una <b>biblioteca común</b>, y la memoria de cobertura te dice <b>adónde ir</b> para que salga el mensaje.</p>
+
+<section class="card" data-viz="reserva" style="margin-top:14px" aria-labelledby="h-r">
+  <h2 id="h-r">🔋 Tu reserva: qué guarda y cuánto dura</h2>
+  <div class="g2" style="margin-top:0">
+    <div><canvas id="cv-res" aria-label="Batería de Internet con los contenidos guardados por colores, su frescura con el paso de las horas sin red y la recarga en una ventana de conexión"></canvas>
+      <div class="row"><label class="m">Riesgo de tu zona <select id="r-haz" aria-label="Riesgo de tu zona"><option value="riada">Riada</option><option value="terremoto">Terremoto</option><option value="incendio">Incendio</option><option value="apagon">Apagón</option><option value="monte">Monte</option></select></label>
+        <label class="m" style="flex:1">Tamaño <b id="r-bv">1024</b> MB <input type="range" id="r-b" min="100" max="2048" step="4" value="1024" aria-label="Tamaño de la reserva en megas"></label></div></div>
+    <div>
+      <div class="kv" style="grid-template-columns:repeat(2,1fr)"><div><b id="r-cov">—</b><span>de lo que probablemente necesitarás</span></div><div><b id="r-used">—</b><span>ocupados</span></div><div><b id="r-hl">—</b><span>hasta que lo urgente pierde la mitad de su valor</span></div><div><b id="r-win">—</b><span>se recuperan en 30 s de conexión</span></div></div>
+      <p class="m" style="font-size:14px">Cómo elige: cada contenido tiene un <b>valor</b> (utilidad × riesgo de tu zona) y una <b>frescura</b> que se reduce a la mitad cada cierto tiempo: horas para un aviso meteorológico, meses para un mapa. Con tu presupuesto de megas, SENDA resuelve una <b>mochila 0/1 exacta</b>. Lo esencial cabe en menos de 200 MB; 1 GB cubre más del 95 % del valor. En una ventana corta de conexión (30 s en una cima, un satélite, un vecino con Wi-Fi) se actualiza primero lo que más valor recupera por mega.</p>
+      <div class="tw"><table><thead><tr><th>Contenido</th><th>MB</th><th>Valor</th></tr></thead><tbody id="r-tb"></tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-d">
+  <h2 id="h-d">📱 Tu teléfono, de verdad</h2>
+  <p class="m" style="margin-top:0">Esto no es una simulación: lo pregunta a tu navegador ahora mismo. Los navegadores Chromium permiten que una web guarde hasta ~60 % del disco; en iPhone, una web instalada en la pantalla de inicio también llega a ~60 %. Con el <b>almacenamiento persistente</b>, el sistema no borra la reserva aunque le falte espacio.</p>
+  <div class="kv" id="dev"></div>
+  <div class="row"><button class="p" id="fill">⬇ Llenar mi reserva ahora</button><button id="persist">🔒 Proteger la reserva</button><button id="check">✓ Comprobar sin red</button></div>
+  <p class="m" id="fill-msg" style="font-size:14px" aria-live="polite"></p>
+  <div class="note">Hoy la reserva se llena con la app SENDA completa: pantallas, núcleo y guías, para que todo funcione sin red. Los mapas detallados, los albergues y los hospitales de tu zona necesitan el servidor de contenidos de SENDA, que está <b>pendiente</b>. La política es llenar solo con Wi-Fi y con el móvil cargando, para no gastar tus datos ni tu batería.</div>
+</section>
+
+<div class="g2">
+  <section class="card" data-viz="enjambre" aria-labelledby="h-e">
+    <h2 id="h-e">🐝 La biblioteca de tus vecinos</h2>
+    <canvas id="cv-enj" aria-label="Barrio con cuarenta móviles que guardan fragmentos distintos de un paquete común; los que están al alcance envían sus fragmentos y el paquete se reconstruye"></canvas>
+    <div class="row"><label class="m" style="flex:1">Vecinos al alcance: <b id="e-pv">50</b> % <input type="range" id="e-p" min="20" max="90" step="5" value="50" aria-label="Porcentaje de vecinos al alcance"></label></div>
+    <div class="kv" id="e-kv"></div>
+    <p class="m" style="font-size:14px">Un móvil guarda ~1 GB, pero cuarenta vecinos guardan ~40 GB. Cada uno guarda un <b>fragmento distinto</b> de un paquete común: mapas detallados de toda la comarca, la Wikipedia médica, el plan de evacuación de cada barrio… Con <b>k fragmentos cualesquiera</b> se reconstruye el paquete exacto (Reed-Solomon). Cada vecino anuncia lo que tiene en un <b>filtro de Bloom</b> de ~2,4 KB, y cada pieza se nombra por su huella SHA-256: da igual quién la sirva, se comprueba que es la buena.</p>
+  </section>
+  <section class="card" data-viz="rebote" aria-labelledby="h-b">
+    <h2 id="h-b">📍 Adónde ir para que salga el mensaje</h2>
+    <canvas id="cv-reb" aria-label="Valle con antenas que se apagan con las horas, huellas de cobertura de los vecinos y los puntos de rebote ordenados por tiempo esperado hasta enviar"></canvas>
+    <div class="row"><label class="m" style="flex:1">Horas desde el corte: <b id="b-hv">5</b> <input type="range" id="b-h" min="0" max="12" step="0.5" value="5" aria-label="Horas desde el corte de luz"></label></div>
+    <div class="tw"><table><thead><tr><th>Opción</th><th>P(señal)</th><th>Andando</th><th>Tiempo esperado</th></tr></thead><tbody id="b-tb"></tbody></table></div>
+    <p class="m" style="font-size:14px">Mientras hay red, cada móvil anota dónde tuvo señal y cuánta: son las <b>huellas de cobertura</b>. Sin red, SENDA las cruza con el mapa abierto de antenas y con cuánto aguanta cada una sin luz. Las huellas de una misma antena no se cuentan como independientes. Después calcula la ruta a pie con la función de Tobler y elige el menor <b>tiempo esperado hasta enviar</b>, con el satélite como alternativa.</p>
+  </section>
+</div>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-c">
+  <h2 id="h-c">☁️ Recargar la reserva sin red móvil</h2>
+  <div class="g3" style="margin-top:0">
+    <div><h3>Desde el cielo (difusión)</h3><p class="m">Una emisión en una sola dirección no se satura aunque la reciban millones. El proyecto Toosheh reparte paquetes de hasta 8 GB al día por satélite de televisión, con antena y receptor domésticos. Un canal de datos de 32 kbit/s da unos 340 MB al día. <span class="chip todo">requiere convenio con un emisor</span></p></div>
+    <div><h3>En una ventana corta</h3><p class="m">30 segundos de señal en una cima a 2 Mbit/s son ~7 MB: suficiente para refrescar avisos, hospitales y huellas, y para vaciar la cola de intenciones (SOS primero). <span class="chip sim">algoritmo hecho</span></p></div>
+    <div><h3>De mano en mano</h3><p class="m">Un vecino que vuelve de la ciudad trae la reserva actualizada y la comparte por Wi-Fi local: la «mula» de SENDA, ahora también para contenidos, no solo mensajes. <span class="chip sim">mensajes hechos; contenidos en diseño</span></p></div>
+  </div>
+  <p class="src">Fuentes: cuotas de almacenamiento de los navegadores, <a href="https://developer.mozilla.org/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria">MDN</a> · una web que guarda gigabytes sin conexión, <a href="https://web.dev/case-studies/kiwix">caso Kiwix en web.dev</a> · difusión por satélite, <a href="https://www.wikipedia.org/wiki/Toosheh">Toosheh</a> · antenas en datos abiertos, <a href="https://www.wikipedia.org/wiki/OpenCellID">OpenCellID</a> (CC BY-SA 4.0). Código: <code>net-reserve.mjs</code>, <code>swarm-cache.mjs</code>, <code>coverage-memory.mjs</code>.</p>
+</section>
+</main>
+<script type="module">
+import { $, C, canvas, text, rr, run, clamp, ease, FILM } from '/senda/kit.mjs';
+import { reserveCatalog, planReserve, freshness, urgentHalfLifeH, refreshPlan, windowMB } from '/senda/core/net-reserve.mjs';
+import { planSwarm, bloomParams, swarmRoundTrip, swarmScenario } from '/senda/core/swarm-cache.mjs';
+import { bestEscape, reboteScenario, coverageAt } from '/senda/core/coverage-memory.mjs';
+import { survival, BACKUP } from '/senda/core/blackout.mjs';
+const fmt = (x, d = 0) => x.toFixed(d).replace('.', ',');
+const S = { haz: 'riada', budget: 1024, pAvail: 0.5, hours: 5 }; window.SENDA_RESERVA = S;
+const CAT_COL = { app: C.e, contactos: C.e, documentos: C.e, auxilios: C.r, plan: C.c, sanidad: C.c, 'mapa-region': C.i, 'mapa-barrio': C.i, inundables: '#5aa0ff', antenas: C.v, huellas: C.v, avisos: C.a, orbitas: C.v, rutas: C.i, supervivencia: C.r, vecinos: C.i, idiomas: C.g, 'wiki-medicina': '#d9a2ff', ninos: '#f0abfc', 'wiki-completa': '#d9a2ff' };
+
+// ---------- 1) Reserva
+function plan() {
+  const cat = reserveCatalog({ hazards: [S.haz] }), p = planReserve(cat, S.budget);
+  S.plan = p; S.coverage = p.coverage; S.urgentH = urgentHalfLifeH(p.chosen);
+  S.refresh = refreshPlan(p.chosen.map((i) => ({ ...i, ageH: 30 })), windowMB(30, 2000));
+  $('#r-cov').textContent = `${Math.round(p.coverage * 100)} %`; $('#r-used').textContent = `${fmt(p.usedMB)} MB`; $('#r-hl').textContent = Number.isFinite(S.urgentH) ? `${fmt(S.urgentH, 1)} h` : '—'; $('#r-win').textContent = `${Math.round((S.refresh.gain / Math.max(1, p.chosen.filter((i) => i.hl <= 72).reduce((s, i) => s + i.u, 0))) * 100)} %`;
+  $('#r-tb').innerHTML = [...p.chosen.map((i) => `<tr><td>✅ ${i.name}</td><td>${fmt(i.mb, 1)}</td><td>${fmt(i.u)}</td></tr>`), ...p.skipped.map((i) => `<tr><td class="m">⛔ ${i.name}</td><td class="m">${fmt(i.mb, 0)}</td><td class="m">${fmt(i.u)}</td></tr>`)].join('');
+}
+$('#r-haz').onchange = (e) => { S.haz = e.target.value; plan(); }; $('#r-b').oninput = (e) => { S.budget = +e.target.value; $('#r-bv').textContent = S.budget; plan(); };
+plan();
+const gr = canvas($('#cv-res'));
+function drawRes(t) {
+  const g = gr, W = 640, H = 600, P = 20, lt = t % P, hours = lt < 15 ? (lt / 15) * 36 : 36, refreshed = lt >= 15.5;
+  g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
+  const p = S.plan, bx = 70, by = 70, bw = 500, bh = 150;
+  g.strokeStyle = C.t; g.lineWidth = 4; rr(g, bx, by, bw, bh, 18); g.stroke(); g.fillStyle = C.t; rr(g, bx + bw + 4, by + bh / 2 - 26, 16, 52, 6); g.fill();
+  let x = bx + 8; const inner = bw - 16, scale = inner / S.budget;
+  for (const it of p.chosen) {
+    const w = Math.max(3, it.mb * scale), age = it.hl <= 72 && !refreshed ? hours : 0, f = freshness(age, it.hl);
+    g.fillStyle = CAT_COL[it.id] ?? C.i; g.globalAlpha = 0.25 + 0.75 * f; g.fillRect(x, by + 8, Math.min(w, bx + bw - 8 - x), bh - 16); g.globalAlpha = 1; x += w; if (x > bx + bw - 8) break;
+  }
+  text(g, `${fmt(p.usedMB)} de ${S.budget} MB · ${Math.round(p.coverage * 100)} % de lo que probablemente necesitarás`, bx, by - 18, { c: C.t, f: '700 15px Inter,system-ui' });
+  const big = p.chosen.filter((i) => i.mb > 0.05 * S.budget || ['app', 'avisos', 'auxilios', 'huellas'].includes(i.id)).slice(0, 7);
+  big.forEach((it, k) => { const y = by + bh + 34 + k * 26; g.fillStyle = CAT_COL[it.id] ?? C.i; rr(g, bx, y - 12, 14, 14, 3); g.fill(); text(g, `${it.name.length > 54 ? it.name.slice(0, 54) + '…' : it.name}`, bx + 22, y, { c: C.t, f: '13px Inter,system-ui' }); text(g, `${fmt(it.mb, it.mb < 10 ? 1 : 0)} MB`, bx + bw, y, { c: C.m, f: '12px Inter,system-ui', al: 'right' }); });
+  // frescura de lo urgente con el tiempo sin red
+  const urg = p.chosen.filter((i) => i.hl <= 72), v0 = urg.reduce((s, i) => s + i.u, 0), gx = (h) => 70 + (h / 36) * 500, gy = (v) => 570 - v * 110;
+  g.strokeStyle = C.l; g.strokeRect(70, 460, 500, 110); text(g, 'Frescura de lo urgente (avisos, hospitales, huellas, órbitas) sin red', 70, 452, { c: C.m, f: '12px Inter,system-ui' });
+  g.strokeStyle = C.a; g.lineWidth = 2.5; g.beginPath(); for (let h = 0; h <= hours; h += 0.5) { const v = urg.reduce((s, i) => s + i.u * freshness(h, i.hl), 0) / v0; h ? g.lineTo(gx(h), gy(v)) : g.moveTo(gx(h), gy(v)); } g.stroke();
+  if (refreshed) { g.strokeStyle = C.e; g.beginPath(); g.moveTo(gx(36), gy(urg.reduce((s, i) => s + i.u * freshness(36, i.hl), 0) / v0)); g.lineTo(gx(36), gy(1)); g.stroke(); text(g, `30 s de señal: +${fmt(S.refresh.usedMB, 1)} MB → frescura restaurada`, 560, 478, { c: C.e, f: '700 12px Inter,system-ui', al: 'right' }); }
+  text(g, `${Math.floor(hours)} h sin red`, 20, 30, { c: C.t, f: '800 15px Inter,system-ui' });
+  [0, 12, 24, 36].forEach((h) => text(g, `${h} h`, gx(h), 588, { c: C.m, f: '11px Inter,system-ui', al: 'center' }));
+}
+
+// ---------- 2) Dispositivo real
+async function device() {
+  const est = (await navigator.storage?.estimate?.()) ?? {}, pers = (await navigator.storage?.persisted?.()) ?? false;
+  const conn = navigator.connection, bat = await navigator.getBattery?.().catch(() => null);
+  S.device = { quotaGB: est.quota ? est.quota / 2 ** 30 : null, usageMB: est.usage ? est.usage / 2 ** 20 : 0, persisted: pers, charging: bat?.charging ?? null, level: bat?.level ?? null, type: conn?.type ?? conn?.effectiveType ?? null };
+  $('#dev').innerHTML = `<div><b>${S.device.quotaGB ? fmt(S.device.quotaGB, 1) + ' GB' : '—'}</b><span>espacio que te deja el navegador</span></div><div><b>${fmt(S.device.usageMB, 1)} MB</b><span>usado por SENDA</span></div><div><b>${pers ? 'sí' : 'no'}</b><span>reserva protegida contra borrado</span></div><div><b>${bat ? `${Math.round(bat.level * 100)} %${bat.charging ? ' ⚡' : ''}` : '—'}</b><span>batería ${bat?.charging ? '(cargando)' : ''}</span></div>`;
+}
+const RES_URLS = ['/senda', '/senda/llamada', '/senda/triaje', '/senda/monte', '/senda/agua', '/senda/sentidos', '/senda/reserva', '/senda/arquitectura', '/senda/kit.mjs', '/senda/kit.css', '/senda/app.css', '/senda/app.mjs', '/senda/audio.mjs', '/senda/core/index.mjs', '/senda/core/net-reserve.mjs', '/senda/core/swarm-cache.mjs', '/senda/core/coverage-memory.mjs', '/senda/core/triage.mjs', '/senda/core/geo-offline.mjs', '/senda/core/sdp-compact.mjs', '/senda/core/acoustic-modem.mjs', '/senda/core/envelope.mjs', '/senda/core/bundle.mjs', '/senda/core/erasure.mjs', '/senda/core/blackout.mjs'];
+$('#fill').onclick = async () => {
+  const conn = navigator.connection; if (conn?.saveData) { $('#fill-msg').textContent = 'Tienes activado el ahorro de datos: SENDA no llena la reserva así.'; return; }
+  const c = await caches.open('senda-reserva-v1'); let bytes = 0, n = 0;
+  for (const u of RES_URLS) { try { const r = await fetch(u, { cache: 'reload' }); if (r.ok) { const b = await r.clone().arrayBuffer(); bytes += b.byteLength; n++; await c.put(u, r); } } catch {} }
+  S.filled = { files: n, mb: bytes / 2 ** 20 }; $('#fill-msg').textContent = `Reserva llenada: ${n} archivos, ${fmt(bytes / 2 ** 20, 2)} MB guardados en tu teléfono.`; device();
+};
+$('#persist').onclick = async () => { const ok = await navigator.storage?.persist?.(); $('#fill-msg').textContent = ok ? 'Reserva protegida: el sistema no la borrará aunque falte espacio.' : 'El navegador no la protegió todavía; suele concederlo a las webs que usas a menudo o que instalas en la pantalla de inicio.'; device(); };
+$('#check').onclick = async () => { const c = await caches.open('senda-reserva-v1'), keys = await c.keys(); S.checked = keys.length; $('#fill-msg').textContent = `En la reserva hay ${keys.length} archivos listos para usarse sin red.`; };
+device();
+
+// ---------- 3) Biblioteca de vecinos
+const sw = swarmScenario(), ge = canvas($('#cv-enj'));
+function swarmPlan() { S.swarm = planSwarm({ packMB: sw.packMB, phones: sw.nodes.length, pAvail: S.pAvail }); const b = bloomParams(2000, 0.01); $('#e-kv').innerHTML = `<div><b>${S.swarm ? fmt(S.swarm.perPhoneMB) + ' MB' : '—'}</b><span>por vecino (paquete de ${sw.packMB / 1000} GB)</span></div><div><b>${S.swarm ? `${S.swarm.k} de ${S.swarm.n}` : '—'}</b><span>fragmentos necesarios</span></div><div><b>${S.swarm ? fmt(S.swarm.p * 100, 1) + ' %' : '—'}</b><span>de recuperarlo</span></div><div><b>${fmt(b.bytes / 1024, 1)} KB</b><span>inventario (Bloom)</span></div>`; }
+$('#e-p').oninput = (e) => { S.pAvail = +e.target.value / 100; $('#e-pv').textContent = e.target.value; swarmPlan(); }; swarmPlan();
+swarmRoundTrip(new Uint8Array(120000).map((_, i) => (i * 131 + 17) & 255), { k: 12, n: 30, reachable: Array.from({ length: 30 }, (_, i) => i % 3 !== 1) }).then((r) => (S.roundTrip = r));
+function drawEnj(t) {
+  const g = ge, W = 640, H = 600, P = 12, lt = t % P, sp = S.swarm, reach = sw.nodes.map((n, i) => ((i * 7919) % 100) / 100 < S.pAvail);
+  g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
+  for (let k = 0; k < 7; k++) { g.fillStyle = '#0f1d27'; g.fillRect(30 + k * 88, 50, 60, 420); } for (let k = 0; k < 5; k++) { g.fillStyle = '#0f1d27'; g.fillRect(20, 60 + k * 90, 600, 40); }
+  const got = Math.min(sp?.k ?? 0, Math.floor(clamp((lt - 2) / 6) * (sp?.k ?? 0) * 1.25));
+  let shown = 0;
+  sw.nodes.forEach((n, i) => {
+    const has = i < (sp?.n ?? 0), r = reach[i] && has; g.fillStyle = !has ? '#1d2c37' : r ? C.i : '#2a3f4d'; rr(g, n.x - 8, n.y - 12, 16, 24, 4); g.fill();
+    if (has) { g.fillStyle = `hsl(${(i * 37) % 360},60%,60%)`; g.fillRect(n.x - 5, n.y - 8, 10, 6); }
+    if (lt > 0.5 && lt < 2.2 && r) { const f = (lt - 0.5) / 1.7; g.fillStyle = C.a; g.globalAlpha = 1 - f; g.fillRect(n.x + (sw.me.x - n.x) * f - 3, n.y + (sw.me.y - n.y) * f - 3, 6, 6); g.globalAlpha = 1; }
+    if (r && shown < got) { shown++; const f = clamp(((lt - 2) / 6) * (sp.k * 1.25) - shown + 1); if (f < 1) { g.fillStyle = `hsl(${(i * 37) % 360},70%,60%)`; g.fillRect(n.x + (sw.me.x - n.x) * f - 4, n.y + (sw.me.y - n.y) * f - 4, 8, 8); } else { g.strokeStyle = 'rgba(145,215,232,.25)'; g.beginPath(); g.moveTo(n.x, n.y); g.lineTo(sw.me.x, sw.me.y); g.stroke(); } }
+  });
+  g.fillStyle = C.c; g.beginPath(); g.arc(sw.me.x, sw.me.y, 14, 0, 7); g.fill(); text(g, 'Tú', sw.me.x, sw.me.y + 5, { c: '#05090c', f: '800 12px Inter,system-ui', al: 'center' });
+  const ok = sp && got >= sp.k;
+  g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 494, 600, 92, 12); g.fill(); g.strokeStyle = ok ? C.e : C.l; g.stroke();
+  text(g, lt < 2.2 ? '1 · Preguntas quién tiene qué: cada vecino responde con su filtro de Bloom' : ok ? `3 · Paquete reconstruido con ${sp.k} fragmentos · huella SHA-256 verificada` : `2 · Llegan fragmentos: ${got} de ${sp?.k ?? '—'} necesarios`, 34, 520, { c: ok ? C.e : C.t, f: '800 14px Inter,system-ui' });
+  text(g, sp ? `Cada vecino guarda ${fmt(sp.perPhoneMB)} MB · ${sp.n} vecinos con fragmentos · al alcance: ${Math.round(S.pAvail * 100)} % · probabilidad de recuperarlo: ${fmt(sp.p * 100, 1)} %` : 'Con tan pocos vecinos al alcance no se alcanza el 99 %', 34, 544, { c: C.m, f: '12px Inter,system-ui' });
+  text(g, S.roundTrip?.ok ? `Prueba real en este navegador: ${S.roundTrip.got} fragmentos recibidos → paquete idéntico byte a byte` : 'Prueba real en este navegador…', 34, 566, { c: C.i, f: '12px Inter,system-ui' });
+  text(g, `Barrio · ${sw.nodes.length} vecinos con SENDA · paquete común de ${sw.packMB / 1000} GB`, 20, 30, { c: C.t, f: '800 14px Inter,system-ui' });
+}
+
+// ---------- 4) Puntos de rebote
+const rb = reboteScenario(), gb = canvas($('#cv-reb')), o = rb.me, K = 0.11, XY = (p) => ({ x: 280 + (p.lon - o.lon) * 85000 * K, y: 300 - (p.lat - o.lat) * 111320 * K });
+function rebote() { const r = bestEscape({ ...rb, nowH: S.hours }); S.rebote = r; $('#b-tb').innerHTML = r.options.map((x, i) => `<tr><td>${i ? '' : '⭐ '}${x.name}</td><td>${Math.round(x.p * 100)} %</td><td>${x.walkMin ? fmt(x.walkMin) + ' min' : '—'}</td><td><b>${fmt(x.expectedMin)} min</b></td></tr>`).join(''); }
+$('#b-h').oninput = (e) => { S.hours = +e.target.value; $('#b-hv').textContent = fmt(S.hours, 1); rebote(); }; rebote();
+function drawReb(t) {
+  const g = gb, W = 640, H = 600, hrs = FILM ? clamp(t / 18) * 8 : S.hours;
+  if (FILM) { S.hours = hrs; rebote(); }
+  g.fillStyle = '#0a1612'; g.fillRect(0, 0, W, H);
+  for (let k = 0; k < 8; k++) { g.strokeStyle = `rgba(90,130,100,${0.15 + k * 0.04})`; g.beginPath(); g.ellipse(XY(rb.candidates[1]).x, XY(rb.candidates[1]).y, 30 + k * 34, 22 + k * 26, -0.4, 0, 7); g.stroke(); }
+  g.strokeStyle = '#2f6f8f'; g.lineWidth = 6; g.beginPath(); g.moveTo(0, 420); g.quadraticCurveTo(300, 360, 640, 410); g.stroke(); g.lineWidth = 1;
+  for (const p of rb.prints) { const q = XY(p); g.fillStyle = p.tH > 0 ? C.e : `rgba(145,215,232,${0.15 + 0.6 * clamp((p.dbm + 120) / 40)})`; g.beginPath(); g.arc(q.x, q.y, p.tH > 0 ? 4 : 2.5, 0, 7); g.fill(); }
+  for (const tw of rb.towers) { const q = XY(tw), s = survival(hrs, BACKUP[tw.backup]); g.strokeStyle = s > 0.5 ? C.e : s > 0.1 ? C.a : C.r; g.lineWidth = 2.5; g.beginPath(); g.moveTo(q.x - 8, q.y + 10); g.lineTo(q.x, q.y - 14); g.lineTo(q.x + 8, q.y + 10); g.stroke(); g.lineWidth = 1; text(g, `${tw.id} · ${Math.round(s * 100)} %`, q.x + 10, q.y - 6, { c: C.m, f: '11px Inter,system-ui' }); text(g, { BATTERY: 'batería', EXTENDED: 'batería ampliada', GENERATOR: 'grupo electrógeno' }[tw.backup], q.x + 10, q.y + 8, { c: C.g, f: '10px Inter,system-ui' }); }
+  const best = S.rebote.best, me = XY(o);
+  for (const c of rb.candidates) { const q = XY(c), op = S.rebote.options.find((x) => x.id === c.id), isBest = best.id === c.id; g.fillStyle = isBest ? C.c : '#0f1d27'; g.strokeStyle = op.p > 0.5 ? C.e : op.p > 0.1 ? C.a : C.r; g.lineWidth = 2; rr(g, q.x - 9, q.y - 9, 18, 18, 4); g.fill(); g.stroke(); g.lineWidth = 1; text(g, `${c.name.split(' (')[0]} · ${Math.round(op.p * 100)} %`, q.x, q.y + 24, { c: isBest ? C.c : C.t, f: `${isBest ? 800 : 600} 11px Inter,system-ui`, al: 'center' }); }
+  if (best.id !== 'sat') { const q = XY(rb.candidates.find((c) => c.id === best.id)); g.strokeStyle = C.c; g.setLineDash([6, 5]); g.lineWidth = 2.5; g.beginPath(); g.moveTo(me.x, me.y); g.lineTo(q.x, q.y); g.stroke(); g.setLineDash([]); g.lineWidth = 1; }
+  g.fillStyle = C.t; g.beginPath(); g.arc(me.x, me.y, 7, 0, 7); g.fill(); text(g, 'Tú', me.x - 12, me.y + 4, { c: C.t, f: '800 12px Inter,system-ui', al: 'right' });
+  g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 470, 600, 116, 12); g.fill(); g.strokeStyle = C.l; g.stroke();
+  text(g, `${fmt(hrs, 1)} h desde el corte · mejor opción: ${best.name}`, 34, 496, { c: C.c, f: '800 14px Inter,system-ui' });
+  S.rebote.options.slice(0, 3).forEach((x, i) => text(g, `${i + 1}. ${x.name.split(' (')[0]}: señal ${Math.round(x.p * 100)} % · ${x.walkMin ? fmt(x.walkMin) + ' min andando' : 'sin moverte'} · enviado en ${fmt(x.expectedMin)} min de media`, 34, 520 + i * 20, { c: i ? C.m : C.t, f: '12px Inter,system-ui' }));
+  text(g, '● huellas de antes del corte  ● huellas de después (evidencia directa)', 20, 26, { c: C.m, f: '11px Inter,system-ui' }); g.fillStyle = C.e; g.beginPath(); g.arc(206, 22, 4, 0, 7); g.fill();
+}
+run({ reserva: drawRes, enjambre: drawEnj, rebote: drawReb });
+</script>
+</body></html>
