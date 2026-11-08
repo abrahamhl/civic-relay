@@ -26,7 +26,12 @@ test('INTEGRACIÓN HTTP / SPA / SSE / SEGURIDAD', async (t) => {
     observations: [{ id: 'eonet:test', title: 'Synthetic wildfire', location: { lat: 42, lon: -5 } }],
     source: { provider: 'NASA EONET' }
   }) };
-  const { server, db } = createServer({ dbFile: TEST_HTTP_DB, usgsFeed, eonetFeed });
+  const weatherGridFeed = { read: async (region) => ({
+    schema: 'senda.atmosphere.grid/1', status: 'SOURCE_SNAPSHOT', region,
+    dataKind: 'MODEL_FORECAST', isOfficialAlert: false, calibratedBySenda: false,
+    times: [], points: [], source: { provider: 'Open-Meteo' }
+  }) };
+  const { server, db } = createServer({ dbFile: TEST_HTTP_DB, usgsFeed, eonetFeed, weatherGridFeed });
 
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const port = server.address().port;
@@ -92,6 +97,17 @@ test('INTEGRACIÓN HTTP / SPA / SSE / SEGURIDAD', async (t) => {
     assert.equal(body.dataKind, 'CURATED_EVENT_METADATA');
     assert.equal(body.isPerimeter, false);
     assert.equal(body.isOfficialAlert, false);
+  });
+
+  await t.test('7. Contrato meteorológico: predicción no equivale a estación ni alerta', async () => {
+    const res = await fetch(baseUrl + '/api/sources/weather-grid?region=valencia');
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.dataKind, 'MODEL_FORECAST');
+    assert.equal(data.calibratedBySenda, false);
+    assert.equal(data.isOfficialAlert, false);
+    const denied = await fetch(baseUrl + '/api/sources/weather-grid?region=private-gps-location');
+    assert.equal(denied.status, 400);
   });
 
   await t.test('4. Consulta de Feed y Adaptadores', async () => {
