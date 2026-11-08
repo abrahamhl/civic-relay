@@ -1,0 +1,36 @@
+{
+  "schema": "senda.release-manifest/1",
+  "claim": "UNCOMMITTED_BUILD",
+  "generatedAt": "2026-11-08T18:22:07.978Z",
+  "git": {
+    "commit": "99d95ad0f21df44133e2eb22e0d04395be65827d",
+    "tree": "9c65b1b91cf72fe5b7a19297c28ba806cf85b383",
+    "branch": "mission/senda-unified-platform-20261108",
+    "dirty": true,
+    "dirtyPaths": [
+      ".git-diff-preflight-corridor-fabric.patch"
+    ]
+  },
+  "source": {
+    "treeSha256": "235a2e097057a9146b2e93fe5d73e9f4d97f306dd4f539bbdcd3e15391964d4c",
+    "fileCount": 1086,
+    "lockfileSha256": "39208ae92082fde18a4d96b40ed0e00b230b56f0361a559c13edc75d05bae7e1"
+  },
+  "deployment": null,
+  "runtime": {
+    "node": "v22.22.2",
+    "platform": "win32",
+    "arch": "x64",
+    "gitAutocrlf": "true",
+    "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee"
+  },
+  "build": {
+    "command": null,
+    "artifact": null
+  },
+  "exclusions": [
+    ".git",
+    "node_modules",
+    "entorno no rastreado (cubierto por git.dirty)"
+  ]
+}
