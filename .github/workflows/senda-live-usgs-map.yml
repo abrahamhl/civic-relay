@@ -31,3 +31,14 @@ jobs:
         run: corepack pnpm --filter @senda/live type-check
       - name: Vite production build
         run: corepack pnpm --filter @senda/live build
+      - name: Optional live NASA EONET research receipt
+        continue-on-error: true
+        run: node apps/senda-live/scripts/capture-eonet-research.mjs
+      - name: Archive NASA catalog acquisition receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: senda-eonet-catalog-research
+          path: evidence/senda/eonet/latest-catalog-acquisition.json
+          if-no-files-found: warn
+          retention-days: 14
