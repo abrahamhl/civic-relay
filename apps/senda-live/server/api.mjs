@@ -16,12 +16,13 @@ import { adapterHealth } from './domain/source-adapters.mjs';
 import { createUsgsEarthquakeFeed } from './domain/usgs-earthquakes.mjs';
 import { createEonetWildfireFeed } from './domain/eonet-wildfires.mjs';
 import { createWeatherGridFeed, WEATHER_REGIONS } from './domain/weather-grid.mjs';
+import { createMetNorwayGridFeed } from './domain/metno-weather-grid.mjs';
 
 export function createApiHandler({
   db, auth, social, events, emergency, messaging, moderation, admin, rt,
   usgsFeed = createUsgsEarthquakeFeed(),
   eonetFeed = createEonetWildfireFeed(),
-  weatherGridFeed = createWeatherGridFeed(),
+  weatherGridFeed = process.env.SENDA_WEATHER_PROVIDER === 'openmeteo' ? createWeatherGridFeed() : createMetNorwayGridFeed(),
 }) {
   const router = createRouter();
   const rateLimiter = createRateLimiter();
