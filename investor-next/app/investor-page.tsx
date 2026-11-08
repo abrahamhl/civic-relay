@@ -48,11 +48,12 @@ const thirtySecondThesis:Record<Locale,{
   ctaSimulate:'Simular una emergencia',
   ctaExploreMap:'Explorar el mapa interactivo',
   ctaEvidence:'Ver qué funciona de verdad',
-  surfacesTitle:'TRES SUPERFICIES COMPLEMENTARIAS (DIVULGACIÓN PROGRESIVA)',
+  surfacesTitle:'CUATRO SUPERFICIES COMPLEMENTARIAS (DIVULGACIÓN PROGRESIVA)',
   surfaces:[
    {id:'surface-discover',tag:'A · DESCUBRIR',name:'Historia y Resumen en 30s',desc:'Qué problema resuelve, para quién y con qué límites honestos, sin necesidad de jerga 3GPP/CSI/CAP.',targetAnchor:'#what-oep-does',routeHref:'/es/'},
    {id:'surface-explore',tag:'B · EXPLORAR / MISSION CONTROL',name:'Globo 3D + Sector Intelligence CCTV',desc:'Globo 3D con selección raycast, sectores (El Tiemblo, Valencia, Arnhem), conos FOV estimados y cámaras públicas/demo.',targetAnchor:'#sector-intelligence',routeHref:'/es/mission-control/'},
-   {id:'surface-science',tag:'C · INVESTIGAR / SCIENCE & LAB',name:'Motor Determinista, Criptografía y Evidencia',desc:'Cola Store-and-Forward, firmas reales WebCrypto ECDSA P-256, laboratorio Android Nearby y matriz científica.',targetAnchor:'#routing-lab',routeHref:'/es/science/'}
+   {id:'surface-science',tag:'C · INVESTIGAR / SCIENCE & LAB',name:'Motor Determinista, Criptografía y Evidencia',desc:'Cola Store-and-Forward, firmas reales WebCrypto ECDSA P-256, laboratorio Android Nearby y matriz científica.',targetAnchor:'#routing-lab',routeHref:'/es/science/'},
+   {id:'surface-command',tag:'D · MANDO / PANEL MULTICANAL',name:'Activaciones, Rutas Mesh y Presupuesto RF',desc:'Escenarios de apagón, cobertura por canal, rutas con coste, trilateración y enlace RF. Ejercicio sintético sin radios ni dispatch real.',targetAnchor:'#telecom-rf-radar-suite',routeHref:'/es/mando/'}
   ],
   eightScenes:[
    {num:'01',tag:'DESASTRE',summary:'Incendio o apagón inutiliza una antena; la cobertura del sector cambia.',targetAnchor:'#story',badge:'SYNTHETIC SIMULATION'},
@@ -73,11 +74,12 @@ const thirtySecondThesis:Record<Locale,{
   ctaSimulate:'Simulate an emergency',
   ctaExploreMap:'Explore interactive map',
   ctaEvidence:'See what works today',
-  surfacesTitle:'THREE COMPLEMENTARY SURFACES (PROGRESSIVE DISCLOSURE)',
+  surfacesTitle:'FOUR COMPLEMENTARY SURFACES (PROGRESSIVE DISCLOSURE)',
   surfaces:[
    {id:'surface-discover',tag:'A · DISCOVER',name:'30-Second Story & Primer',desc:'What problem it solves, for whom, and with what explicit boundaries—no 3GPP/CSI/CAP jargon required.',targetAnchor:'#what-oep-does',routeHref:'/'},
    {id:'surface-explore',tag:'B · EXPLORE / MISSION CONTROL',name:'3D Globe + Sector Intelligence CCTV',desc:'3D Globe with raycast object selection, sectors (El Tiemblo, Valencia, Arnhem), estimated FOV cones, and public/demo cameras.',targetAnchor:'#sector-intelligence',routeHref:'/mission-control/'},
-   {id:'surface-science',tag:'C · INVESTIGATE / SCIENCE & LAB',name:'Deterministic Engine, Crypto & Evidence',desc:'Store-and-Forward queue, real WebCrypto ECDSA P-256 signatures, Android Nearby lab source, and scientific truth matrix.',targetAnchor:'#routing-lab',routeHref:'/science/'}
+   {id:'surface-science',tag:'C · INVESTIGATE / SCIENCE & LAB',name:'Deterministic Engine, Crypto & Evidence',desc:'Store-and-Forward queue, real WebCrypto ECDSA P-256 signatures, Android Nearby lab source, and scientific truth matrix.',targetAnchor:'#routing-lab',routeHref:'/science/'},
+   {id:'surface-command',tag:'D · COMMAND / MULTICHANNEL PANEL',name:'Activations, Mesh Routes & RF Budget',desc:'Blackout scenarios, per-channel coverage, costed routes, trilateration and RF link budgets. Synthetic exercise with no radios or real dispatch.',targetAnchor:'#telecom-rf-radar-suite',routeHref:'/mando/'}
   ],
   eightScenes:[
    {num:'01',tag:'DISASTER',summary:'Wildfire or blackout disables a tower; sector coverage map updates immediately.',targetAnchor:'#story',badge:'SYNTHETIC SIMULATION'},
@@ -98,11 +100,12 @@ const thirtySecondThesis:Record<Locale,{
   ctaSimulate:'Simuleer een noodgeval',
   ctaExploreMap:'Verken interactieve kaart',
   ctaEvidence:'Bekijk wat echt werkt',
-  surfacesTitle:'DRIE COMPLEMENTAIRE OPPERVLAKKEN (PROGRESSIEVE ONTSLUITING)',
+  surfacesTitle:'VIER COMPLEMENTAIRE OPPERVLAKKEN (PROGRESSIEVE ONTSLUITING)',
   surfaces:[
    {id:'surface-discover',tag:'A · ONTDEKKEN',name:'Verhaal & Overzicht in 30s',desc:'Welk probleem het oplost, voor wie en met welke eerlijke grenzen—zonder 3GPP/CSI/CAP-jargon.',targetAnchor:'#what-oep-does',routeHref:'/nl/'},
    {id:'surface-explore',tag:'B · VERKENNEN / MISSION CONTROL',name:'3D-Globe + Sector Intelligence CCTV',desc:'3D-globe met raycast-selectie, sectoren (El Tiemblo, Valencia, Arnhem), geschatte FOV-kegels en openbare/demo-camera’s.',targetAnchor:'#sector-intelligence',routeHref:'/nl/mission-control/'},
-   {id:'surface-science',tag:'C · ONDERZOEKEN / SCIENCE & LAB',name:'Deterministische Engine, Crypto & Bewijs',desc:'Store-and-Forward wachtrij, echte WebCrypto ECDSA P-256-handtekeningen, Android Nearby-lab en wetenschappelijke matrix.',targetAnchor:'#routing-lab',routeHref:'/nl/science/'}
+   {id:'surface-science',tag:'C · ONDERZOEKEN / SCIENCE & LAB',name:'Deterministische Engine, Crypto & Bewijs',desc:'Store-and-Forward wachtrij, echte WebCrypto ECDSA P-256-handtekeningen, Android Nearby-lab en wetenschappelijke matrix.',targetAnchor:'#routing-lab',routeHref:'/nl/science/'},
+   {id:'surface-command',tag:'D · COMMANDO / MULTIKANAAL PANEEL',name:'Activaties, Mesh-Routes & RF-Budget',desc:'Blackoutscenario’s, dekking per kanaal, routes met kosten, trilateratie en RF-linkbudgetten. Synthetische oefening zonder radio’s of echte dispatch.',targetAnchor:'#telecom-rf-radar-suite',routeHref:'/nl/mando/'}
   ],
   eightScenes:[
    {num:'01',tag:'RAMP',summary:'Natuurbrand of stroomuitval schakelt een mast uit; sectordekking verandert direct.',targetAnchor:'#story',badge:'SYNTHETIC SIMULATION'},
@@ -164,7 +167,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
   </section></div>
 
   <div data-for="coord eng inv"><MasterVision locale={locale}/></div>
-  {/* Three Complementary Surfaces Switcher (A: Discover / B: Explore Mission Control / C: Investigate Science) */}
+  {/* Complementary Surfaces Switcher (A: Discover / B: Explore Mission Control / C: Investigate Science / D: Command Panel) */}
   <div data-for="citizen coord inv"><section className="container apple-surfaces-section" aria-label={th.surfacesTitle} data-testid="three-surfaces-switcher">
    <div className="apple-bento-surfaces">
     <div className="apple-bento-surfaces-head">

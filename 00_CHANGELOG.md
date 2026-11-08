@@ -1,5 +1,92 @@
 # Changelog
 
+## SENDA v0.22 · 08-11-2026 · Modelo RF calibrable, rutas con respaldo y trilateración ponderada
+
+**Entrada (fundador):**
+- Afinar, ampliar y calibrar el modelo de `/mando` sin fingir mediciones de campo.
+- Aumentar la precisión y el realismo de enlaces, rutas y posicionamiento.
+- Añadir valor visible: entornos, incertidumbre, rutas de respaldo y nuevos indicadores.
+
+**Procesamiento:**
+- **Modelo `lib/command-surface.ts` v`mando-2.2.0`:**
+  - cinco entornos (`OPEN`, `RURAL`, `SUBURBAN`, `URBAN`, `RUBBLE`) con exponente de pérdida, sombra y clutter;
+  - 34 activaciones (`ACT-2401`…`ACT-2434`, hasta 899 s), antes 20;
+  - presupuesto log-distancia + sombra log-normal + clutter, margen P90 y probabilidad de enlace;
+  - alcance máximo despejado con el nuevo presupuesto y limitado por el alcance de planificación del canal;
+  - trilateración ponderada por sigma de ancla, GDOP y elipse de incertidumbre al 95 %;
+  - routing multicriterio con probabilidad por salto, energía, salto más débil y ruta de respaldo que evita el primer relay;
+  - `analyze` añade activaciones con ruta y entrega media a tres intentos;
+  - `collectAll` exporta esquema `v2` con entorno, sigma de sombra, modelo, fuentes de calibración, supuestos y rutas.
+- **Consola `app/command-surface.tsx` y `app/command-surface.css`:**
+  - panel de calibración global con entorno, desviación de sombra y versión del modelo; entorno y sigma alimentan presupuesto, rutas, calor de cobertura y exportación;
+  - resultados nuevos: pérdida media, margen P90 y P(enlace);
+  - KPIs nuevos: activaciones con ruta y probabilidad media de entrega a tres intentos;
+  - capa de calor de cobertura, elipse de posición al 95 % y ruta de respaldo en el mapa;
+  - ruta seleccionada con P(enlace), energía y probabilidad por salto;
+  - coordenadas y error con precisión acotada; nota explícita de modelo;
+  - copy ES/EN/NL para todas las etiquetas nuevas.
+- **Pruebas:**
+  - `tests/command-surface-model.test.mjs` con 9 pruebas de dataset, entornos, presupuesto, probabilidad, trilateración, rutas, cobertura, entrega y exportación;
+  - script `npm run test:command`.
+- **Documentación:**
+  - `docs/mando/00_INDICE.md`, `docs/telecom/MALLAS_OFFLINE_FISICA_MATEMATICA_2026-11-08.md` y este changelog.
+
+**Validación:**
+- `npm run type-check`: sin errores.
+- `npm run test:command`: 9/9 pruebas.
+- `npm run build`: 14 páginas estáticas; `/mando`, `/es/mando/` y `/nl/mando/` generadas.
+- `npm run check:locales`: 6/6 comprobaciones.
+- **Límite:** `SIMULATED_VALIDATED`; las fuentes de calibración son estándares y adaptaciones, no mediciones propias. La validación física sigue `PHYSICAL_TEST_PENDING`.
+
+**Salida:** el modelo distingue entorno, incertidumbre y probabilidad, y muestra una ruta de respaldo. Las cifras siguen siendo presupuestos de planificación, no garantías de servicio.
+
+## SENDA v0.21 · 08-11-2026 · Superficie `/mando`: panel multicanal, rutas mesh y presupuesto RF
+
+**Entrada (fundador):**
+- Reunir activaciones, taxonomía, seguimiento, rutas y enlaces en una sola superficie de mando.
+- Que el panel sea útil para revisión técnica e inversores sin fingir un servicio de emergencia real.
+- Completar el modelo, las rutas y la documentación antes de validar en campo.
+
+**Procesamiento:**
+- **Nueva superficie `/mando`** en inglés, español y neerlandés:
+  - `/mando/`, `/es/mando/` y `/nl/mando/`;
+  - metadatos, `canonical` y alternates `en`/`es`/`nl`;
+  - navegación «D · Mando / Panel Multicanal» en `SurfaceView`;
+  - cuarta tarjeta «D · Mando» en la portada, en las tres lenguas.
+- **Modelo `lib/command-surface.ts`:**
+  - 3 escenarios (`blackout`, `degraded`, `recovery`), 8 activos, 20 activaciones y 8 canales;
+  - cobertura por canal activo, activo compatible y distancia;
+  - trilateración 2D por mínimos cuadrados lineales;
+  - presupuesto de enlace FSPL + muros, ruido térmico, SNR, margen y Shannon;
+  - Dijkstra con coste de latencia, tiempo de aire y distancia; confianza por producto de saltos;
+  - modelos de aire para acústico, LoRa, SMS y satélite.
+- **Correcciones de v0.21:**
+  - `ACT-2416` pasa de un inexistente `CAMERA` a `CELL`, coherente con una cámara DGT;
+  - una activación de canal caído ya no cuenta como cubierta;
+  - el primer salto de una ruta exige un canal que el candidato también soporte;
+  - la carga ilimitada se muestra como `∞`;
+  - el HUD del mapa distingue «sin ruta» de «gateway caída».
+- **Consola `app/command-surface.tsx` y `app/command-surface.css`:**
+  - mapa con capas de activos, cobertura, pistas y rutas;
+  - cola filtrable por canal y estado; detalle, trilateración, ruta mesh, calculadora RF, auditoría y exportación;
+  - reloj de 0 a 900 s y activación simulada;
+  - diseño responsive y respeto a `prefers-reduced-motion`.
+- **Pruebas y despliegue estático:**
+  - `scripts/finalize-locales.mjs` comprueba `lang` en las tres rutas `/mando`;
+  - `test-locales.mjs` verifica contenido, simulación, canonical y alternates de las tres superficies.
+- **Documentación:**
+  - `docs/telecom/MALLAS_OFFLINE_FISICA_MATEMATICA_2026-11-08.md`;
+  - `docs/research/OSINT_MALLAS_OFFLINE_2026-11-08.md`;
+  - `docs/mando/00_INDICE.md`.
+
+**Validación:**
+- `npm run type-check`: sin errores.
+- `npm run build`: 14 páginas estáticas; `/mando`, `/es/mando/` y `/nl/mando/` generadas.
+- `npm run check:locales`: 6/6 comprobaciones, incluidas las tres superficies de mando.
+- **Límite:** `SIMULATED_VALIDATED`; no hay radios, cámaras, GPS ni dispatch 112 conectados. La validación física sigue `PHYSICAL_TEST_PENDING`.
+
+**Salida:** build estático listo para despliegue; las cifras de alcance, caudal y margen son presupuestos de planificación, no mediciones de campo.
+
 ## SENDA v0.20 · 06-11-2026 · Incendios de referencia con satélite real y cruce de coches, cámaras de tráfico y fuego
 
 **Entrada (fundador):**
