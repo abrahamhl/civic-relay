@@ -39,7 +39,7 @@ h1 span{display:inline-block;margin-right:.24em}
 .hub{position:relative;width:640px;height:600px}
 .node{position:absolute;transform:translate(-50%,-50%);padding:10px 14px;border-radius:14px;background:#0b141c;border:1px solid var(--l);font-size:16px;white-space:nowrap}
 .core{background:var(--c);color:#140804;font-weight:800;font-size:24px;padding:18px 26px;border:none}
-svg{position:absolute;inset:0}
+.hub>svg{position:absolute;inset:0}
 .stack{display:grid;grid-template-columns:1fr;gap:14px;width:100%}
 .card{background:rgba(11,20,28,.9);border:1px solid var(--l);border-radius:16px;padding:16px 20px}.card b{font-size:22px}.card p{margin:6px 0 0;color:var(--m);font-size:16px}
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}.chip{padding:10px 14px;border-radius:999px;border:1px solid var(--l);background:#0b141c;font-size:17px}
@@ -62,6 +62,181 @@ body.burnsub #sub span{background:rgba(5,9,12,.92);border:1px solid rgba(255,119
 #brand{position:absolute;left:64px;bottom:22px;font:700 14px system-ui;letter-spacing:.22em;color:var(--m)}#brand b{color:var(--c)}
 body.vertical #brand{left:40px;bottom:18px;font-size:12px}
 #prog{position:absolute;left:0;bottom:0;height:4px;background:var(--c)}
+/* English-only diagrams: no product screenshots in the English master. */
+.diag{width:640px;height:600px;border:1px solid var(--l);border-radius:18px;background:linear-gradient(160deg,#08121a 0%,#050a0e 72%);position:relative;overflow:hidden;padding:20px 22px;display:flex;flex-direction:column;gap:11px}
+.diag:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(145,215,232,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(145,215,232,.045) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.diag>*{position:relative;z-index:1}
+.dg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:22px}
+.dg-kick{font:700 12px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--c)}
+.dg-tag{font:700 10px ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--i);border:1px solid rgba(145,215,232,.35);border-radius:999px;padding:4px 9px;white-space:nowrap}
+.dg-tag.warn{color:var(--a);border-color:rgba(251,191,36,.4)}
+.diag h3{font-size:19px;line-height:1.16;margin:0;font-weight:800;letter-spacing:-.01em}
+.dg-foot{display:flex;align-items:center;gap:8px;font:600 11px ui-monospace,monospace;color:var(--m);margin-top:auto}
+.dg-foot b{color:var(--e)}
+.dg-row{display:flex;gap:10px}
+.dg-card{background:rgba(11,20,28,.9);border:1px solid var(--l);border-radius:12px;padding:10px 12px;flex:1;min-width:0}
+.dg-card b{display:block;font-size:14px;line-height:1.2}
+.dg-card span{display:block;font-size:11px;line-height:1.35;color:var(--m);margin-top:3px}
+.dg-num{font-size:25px!important;color:var(--e);letter-spacing:-.02em}
+.off-grid{display:grid;grid-template-columns:1fr 18px 1fr 1fr;gap:9px;align-items:stretch;flex:1;min-height:0}
+.mock{background:#071018;border:2px solid #2a3d4a;border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.mock.mule{border-color:rgba(251,191,36,.5)}
+.mock-top{display:flex;align-items:center;justify-content:space-between;gap:4px;font:700 10px ui-monospace,monospace;color:var(--i);letter-spacing:.06em}
+.mock .pill{font:700 8px ui-monospace,monospace;border-radius:999px;padding:3px 6px;background:#122430;color:var(--m);white-space:nowrap}
+.mock .pill.red{background:rgba(255,119,86,.18);color:var(--c)}
+.mock .pill.ok{background:rgba(52,211,153,.16);color:var(--e)}
+.mock-body{display:flex;flex-direction:column;gap:7px;flex:1;min-height:0}
+.bubble{border-radius:10px;padding:7px 8px;font-size:10px;line-height:1.3;background:#12323f;color:var(--t)}
+.bubble.out{background:#1b3a48;border-bottom-right-radius:2px}
+.sealed{border:1px dashed rgba(145,215,232,.5);border-radius:10px;padding:8px;background:rgba(145,215,232,.06)}
+.sealed b{display:block;font-size:11px;margin:4px 0 2px}
+.sealed span{display:block;font-size:9px;line-height:1.3;color:var(--m)}
+.lock{font:700 9px ui-monospace,monospace;color:var(--i);letter-spacing:.04em}
+.wave{display:flex;align-items:flex-end;gap:3px;height:24px;padding:0 4px}
+.wave i{width:4px;border-radius:2px;background:var(--c);height:40%}
+.wave i:nth-child(2){height:80%}.wave i:nth-child(3){height:55%}.wave i:nth-child(4){height:95%}
+.mock-note{font:600 9px ui-monospace,monospace;color:var(--m);margin-top:auto;line-height:1.3}
+.off-arrow{display:flex;align-items:center;justify-content:center;color:var(--c);font-size:22px;font-weight:800}
+.off-receipt{display:flex;align-items:center;gap:12px;border:1px solid rgba(52,211,153,.45);background:rgba(52,211,153,.07);border-radius:12px;padding:9px 12px}
+.off-receipt>div:first-child{flex:1;min-width:0}
+.off-receipt b{display:block;font-size:12px;color:var(--e)}
+.off-receipt span{display:block;font-size:10px;color:var(--m);line-height:1.3}
+.copies{display:flex;gap:4px}
+.copies span{font:600 9px ui-monospace,monospace;color:var(--m);text-decoration:line-through;border:1px solid var(--l);border-radius:6px;padding:3px 5px}
+.del{font:800 10px ui-monospace,monospace;color:var(--e);white-space:nowrap}
+.frag-flow{display:grid;grid-template-columns:132px 1fr 138px;gap:11px;align-items:center;flex:1;min-height:0}
+.frag-msg{background:#0b141c;border:1px solid var(--l);border-radius:14px;padding:12px;text-align:center}
+.frag-msg .frag-label{font:800 26px Inter,system-ui;color:var(--c)}
+.frag-msg b{display:block;font-size:15px;margin:2px 0}
+.frag-msg span{display:block;font:600 10px ui-monospace,monospace;color:var(--m)}
+.frag-chips{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin-top:8px}
+.frag-chips i{width:12px;height:9px;border-radius:2px;background:var(--i);display:block}
+.frag-lanes{display:flex;flex-direction:column;gap:7px}
+.lane{display:grid;grid-template-columns:82px 1fr 28px;align-items:center;gap:7px;font:600 10px ui-monospace,monospace;color:var(--m)}
+.lane-bar{display:flex;gap:4px;height:16px;align-items:center}
+.lane-bar i{width:24%;height:12px;border-radius:3px;background:var(--i);display:block}
+.lane-bar i.lost{background:#203240;position:relative}
+.lane-bar i.lost:after{content:"×";position:absolute;inset:0;display:grid;place-items:center;color:var(--r);font:800 11px Inter,system-ui}
+.lane em{font-style:normal;color:var(--e);text-align:right}
+.frag-out{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.4);border-radius:14px;padding:12px;text-align:center}
+.frag-out b{display:block;font-size:34px;color:var(--e);line-height:1}
+.frag-out span{display:block;font:700 11px ui-monospace,monospace;color:var(--t);margin-top:3px}
+.frag-out em{display:block;font:600 10px ui-monospace,monospace;color:var(--m);font-style:normal;margin-top:3px}
+.frag-kpis .dg-card b{color:var(--t)}
+.sat-rows{display:flex;flex-direction:column;gap:7px;flex:1;min-height:0;justify-content:center}
+.sat-row{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:10px;background:rgba(11,20,28,.88);border:1px solid var(--l);border-radius:11px;padding:8px 10px;min-height:0}
+.sat-lv{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:800 13px Inter,system-ui;background:#122430;color:var(--i);border:1px solid rgba(145,215,232,.4)}
+.sat-lv.l2{color:var(--a);border-color:rgba(251,191,36,.4)}
+.sat-lv.l3{color:var(--v);border-color:rgba(183,156,255,.4)}
+.sat-lv.l4{color:var(--c);border-color:rgba(255,119,86,.4)}
+.sat-lv.l5{color:var(--m);border-color:rgba(169,188,197,.35)}
+.sat-row b{display:block;font-size:12px}
+.sat-row span{display:block;font-size:10px;color:var(--m);margin-top:2px;line-height:1.25}
+.sat-row em{font:700 9px ui-monospace,monospace;color:var(--a);font-style:normal;text-transform:uppercase;letter-spacing:.05em;max-width:90px;text-align:right;line-height:1.3}
+.bo-grid{display:grid;grid-template-columns:270px 1fr;gap:12px;flex:1;min-height:0}
+.heat{position:relative;border-radius:12px;border:1px solid var(--l);overflow:hidden;background:radial-gradient(circle at 22% 26%,rgba(255,119,86,.9) 0 6%,transparent 7%),radial-gradient(circle at 35% 30%,rgba(255,119,86,.75) 0 9%,transparent 10%),radial-gradient(circle at 42% 55%,rgba(251,191,36,.85) 0 11%,transparent 12%),radial-gradient(circle at 68% 38%,rgba(255,119,86,.8) 0 8%,transparent 9%),radial-gradient(circle at 62% 70%,rgba(251,191,36,.8) 0 12%,transparent 13%),radial-gradient(circle at 78% 66%,rgba(52,211,153,.55) 0 14%,transparent 15%),radial-gradient(circle at 18% 74%,rgba(52,211,153,.5) 0 13%,transparent 14%),#0a3b2c}
+.heat:after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(5,9,12,.28) 1px,transparent 1px),linear-gradient(90deg,rgba(5,9,12,.28) 1px,transparent 1px);background-size:30px 30px}
+.gw{position:absolute;width:14px;height:14px;border:2px solid #fff;border-radius:50%;background:rgba(5,9,12,.7);box-shadow:0 0 12px rgba(145,215,232,.9);z-index:2}
+.heat-cap{position:absolute;left:9px;bottom:7px;z-index:2;font:600 9px ui-monospace,monospace;color:#fff;background:rgba(5,9,12,.7);padding:3px 6px;border-radius:5px}
+.bo-right{display:flex;flex-direction:column;gap:8px;min-width:0}
+.bo-chart{width:100%;height:150px;border:1px solid var(--l);border-radius:12px;background:rgba(7,16,24,.8)}
+.bo-stat{display:flex;align-items:baseline;gap:8px;background:rgba(11,20,28,.9);border:1px solid var(--l);border-radius:10px;padding:7px 10px}
+.bo-stat b{font-size:22px;color:var(--e);line-height:1}
+.bo-stat span{font-size:10px;color:var(--m);line-height:1.2}
+.rail-schematic{position:relative;height:130px;border:1px solid var(--l);border-radius:12px;background:#071018;overflow:hidden}
+.rail-schematic:before{content:"";position:absolute;left:8%;right:8%;top:50%;height:3px;background:#203240;transform:rotate(-8deg)}
+.train{position:absolute;display:flex;gap:4px;padding:5px;border-radius:8px;background:#12323f;border:1px solid var(--i)}
+.train i{display:block;width:14px;height:18px;border-radius:3px;background:rgba(145,215,232,.55)}
+.train.t1{left:8%;top:38%;transform:rotate(-8deg)}
+.train.t2{right:8%;top:52%;transform:rotate(-8deg)}
+.impact{position:absolute;left:50%;top:36%;transform:translateX(-50%);font:800 10px ui-monospace,monospace;color:var(--c);border:1px solid var(--c);border-radius:999px;padding:4px 8px;background:rgba(5,9,12,.8)}
+.time-bars{display:flex;flex-direction:column;gap:9px}
+.time-row{display:grid;grid-template-columns:150px 1fr 62px;align-items:center;gap:8px;font:600 11px ui-monospace,monospace;color:var(--m)}
+.time-row .bar{height:16px;background:#10202b;border-radius:8px;overflow:hidden}
+.time-row .bar i{display:block;height:100%;background:var(--c);border-radius:8px}
+.time-row .bar i.slow{background:var(--g)}
+.time-row b{text-align:right;font-size:13px;color:var(--t)}
+.time-note{font:700 11px ui-monospace,monospace;color:var(--e);text-align:right}
+.cap-card{border:1px solid rgba(145,215,232,.4);background:rgba(145,215,232,.07);border-radius:12px;padding:9px 12px}
+.cap-head{display:flex;justify-content:space-between;gap:8px;font-size:11px}
+.cap-head b{color:var(--i)}
+.cap-head span{color:var(--m);font-size:10px}
+.cap-sites{display:flex;gap:14px;margin-top:5px;font:600 10px ui-monospace,monospace;color:var(--t)}
+.bld-grid{display:grid;grid-template-columns:250px 1fr;gap:12px;flex:1;min-height:0}
+.bld{border:1px solid var(--l);border-radius:12px;background:#071018;padding:9px;display:flex;flex-direction:column;gap:4px}
+.floor{display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:8px;min-height:52px;border:1px solid #16242e;border-radius:8px;padding:0 10px;background:#0a141b}
+.floor span{font:800 12px ui-monospace,monospace;color:var(--m)}
+.floor .router{width:12px;height:12px;border-radius:50%;background:var(--i);box-shadow:0 0 10px rgba(145,215,232,.7);justify-self:start}
+.floor em{font:700 9px ui-monospace,monospace;color:var(--m);font-style:normal;text-transform:uppercase}
+.floor.alert{border-color:rgba(255,119,86,.55);background:rgba(255,119,86,.08)}
+.floor.alert em{color:var(--c)}
+.bld-base{text-align:center;font:700 10px ui-monospace,monospace;color:var(--m);padding:4px 0}
+.bld-right{display:flex;flex-direction:column;gap:8px}
+.bld-right .dg-card{flex:1;display:flex;flex-direction:column;justify-content:center}
+.dg-callout{border:1px solid rgba(251,191,36,.45);background:rgba(251,191,36,.08);border-radius:12px;padding:8px 12px;font-size:11px;color:var(--m)}
+.dg-callout b{color:var(--a)}
+.fusion-grid{display:grid;grid-template-columns:1fr 230px;gap:14px;flex:1;min-height:0}
+.layers{display:flex;flex-direction:column;justify-content:center;gap:8px}
+.layer{display:grid;grid-template-columns:30px 1fr;align-items:center;gap:10px;border:1px solid var(--l);border-left:3px solid var(--i);border-radius:10px;background:rgba(11,20,28,.9);padding:8px 10px}
+.layer:nth-child(2){border-left-color:var(--e)}.layer:nth-child(3){border-left-color:var(--a)}.layer:nth-child(4){border-left-color:var(--v)}
+.layer>span{font:800 11px ui-monospace,monospace;color:var(--m)}
+.layer b{display:block;font-size:12px}
+.layer em{display:block;font-size:10px;color:var(--m);font-style:normal;margin-top:2px}
+.fuse{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.fuse-line{font:700 10px ui-monospace,monospace;color:var(--e);text-align:center;line-height:1.3}
+.gauge{width:150px;height:150px;border-radius:50%;background:conic-gradient(var(--e) 0 98%,#1d2c37 98% 100%);display:grid;place-items:center;position:relative}
+.gauge:before{content:"";position:absolute;inset:12px;border-radius:50%;background:#071018;border:1px solid var(--l)}
+.gauge b{position:relative;font-size:32px;color:var(--e);line-height:1}
+.gauge span{position:relative;font:700 9px ui-monospace,monospace;color:var(--m);text-transform:uppercase}
+.gauge em{position:relative;font:600 9px ui-monospace,monospace;color:var(--m);font-style:normal}
+.fuse-note{font-size:10px;color:var(--m);text-align:center;line-height:1.3}
+.rail-chart{width:100%;height:220px;border:1px solid var(--l);border-radius:12px;background:rgba(7,16,24,.75)}
+.rail-legend{display:flex;gap:14px;font:600 10px ui-monospace,monospace;color:var(--m)}
+.rail-legend .lg{display:flex;align-items:center;gap:5px}
+.rail-legend i{width:10px;height:3px;border-radius:2px;display:inline-block}
+.rail-legend i.v{background:var(--i)}.rail-legend i.t{background:var(--a)}.rail-legend i.d{background:var(--c)}
+.fire-grid{display:grid;grid-template-columns:300px 1fr;gap:12px;flex:1;min-height:0}
+.fire-map{width:100%;height:auto;border:1px solid var(--l);border-radius:12px;background:#071018}
+.fire-right{display:flex;flex-direction:column;gap:9px;justify-content:center}
+.fire-kpi{border:1px solid rgba(255,119,86,.5);background:rgba(255,119,86,.08);border-radius:12px;padding:10px 12px}
+.fire-kpi b{display:block;font-size:38px;line-height:1;color:var(--c)}
+.fire-kpi span{display:block;font-size:11px;line-height:1.35;color:var(--m);margin-top:4px}
+.fire-timeline{display:flex;flex-direction:column;gap:0;border-left:2px solid #203240;margin-left:6px;padding-left:12px}
+.ft-row{position:relative;display:flex;align-items:baseline;gap:8px;padding:7px 0;font-size:11px}
+.ft-row .dot{position:absolute;left:-19px;top:12px;width:9px;height:9px;border-radius:50%;background:var(--c)}
+.ft-row .dot.warn{background:var(--a)}
+.ft-row b{font-size:11px}.ft-row span{margin-left:auto;font:600 10px ui-monospace,monospace;color:var(--m)}
+.fire-channels{display:flex;gap:6px;flex-wrap:wrap}
+.fire-channels span{font:700 9px ui-monospace,monospace;color:var(--i);border:1px solid rgba(145,215,232,.35);border-radius:999px;padding:4px 7px}
+.trust-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;min-height:0}
+.alert-phone{border:2px solid #2a3d4a;border-radius:18px;background:#071018;padding:12px;display:flex;flex-direction:column;gap:8px}
+.ap-top{display:flex;justify-content:space-between;align-items:center;font:800 10px ui-monospace,monospace;color:var(--c);letter-spacing:.08em}
+.ap-body{display:flex;flex-direction:column;gap:6px;flex:1}
+.ap-body>b{font-size:13px}
+.ap-body>span{font-size:10px;color:var(--m)}
+.ap-checks{display:flex;flex-direction:column;gap:4px;border:1px solid rgba(52,211,153,.35);background:rgba(52,211,153,.06);border-radius:9px;padding:7px 8px;font:600 9px ui-monospace,monospace;color:var(--e)}
+.ap-q{font-size:11px;font-weight:700;margin-top:2px}
+.ap-btns{display:flex;flex-direction:column;gap:5px;margin-top:auto}
+.ap-btns span{border-radius:8px;padding:7px 8px;font:800 10px Inter,system-ui;text-align:center;background:#122430;color:var(--m)}
+.ap-btns .safe{background:rgba(52,211,153,.18);color:var(--e)}
+.ap-btns .help{background:rgba(251,191,36,.18);color:var(--a)}
+.ap-btns .trap{background:rgba(255,119,86,.2);color:var(--c);border:1px solid rgba(255,119,86,.5)}
+.board{border:1px solid var(--l);border-radius:12px;background:rgba(11,20,28,.9);padding:10px;display:flex;flex-direction:column;gap:6px}
+.board-head{display:flex;justify-content:space-between;font:700 10px ui-monospace,monospace;color:var(--i);margin-bottom:2px}
+.board-head span{color:var(--e)}
+.b-row{display:grid;grid-template-columns:55px 1fr auto;gap:6px;align-items:center;border-top:1px solid #16242e;padding:7px 0;font-size:10px}
+.b-row span{color:var(--m)}.b-row b{font-size:10px}.b-row em{font-style:normal;color:var(--m);font-size:9px}
+.b-row b.trap{color:var(--c)}.b-row b.help{color:var(--a)}.b-row b.safe{color:var(--e)}
+.board-foot{margin-top:auto;border-top:1px solid var(--l);padding-top:7px;font:600 9px ui-monospace,monospace;color:var(--m);line-height:1.3}
+.easy-btns{display:flex;flex-direction:column;gap:10px;flex:1;justify-content:center}
+.easy{display:flex;flex-direction:column;gap:2px;border-radius:16px;padding:13px 20px;border:1px solid transparent}
+.easy b{font-size:25px;line-height:1.1}
+.easy span{font-size:11px;color:rgba(5,9,12,.72);font-weight:600}
+.easy.safe{background:var(--e);color:#04140c;border-color:#6ee7b7}
+.easy.help{background:var(--a);color:#1c1302;border-color:#fcd34d}
+.easy.trap{background:var(--c);color:#1c0804;border-color:#ff9a86}
+.easy-foot{display:flex;align-items:center;gap:8px;font:600 11px ui-monospace,monospace;color:var(--m)}
+.easy-foot b{color:var(--e)}
 </style>
 </head>
 <body>
@@ -142,6 +317,7 @@ function visualHTML(sc, idx) {
   if (!sceneInSlice(idx)) return '';
   const v = sc.visual, img = (f) => `assets/${f}`;
   const kp = (list, cls = '') => list.map((k, i) => `<div class="kpi ${cls} k${i}"><b>${T(k.v)}</b><span>${T(k.l)}</span></div>`).join('');
+  const dg = (kick, tag, title, body, foot, cls = '') => `<div class="diag"><div class="dg-head d0"><span class="dg-kick">${kick}</span><span class="dg-tag ${cls}">${tag}</span></div><h3 class="d1">${title}</h3>${body}<div class="dg-foot d4"><b>✓</b> ${foot}</div></div>`;
   if (v.kind === 'kpis') return `<div class="kpis">${kp(v.kpis)}</div>`;
   if (v.kind === 'hub') { const B = BEARERS[LANG] ?? BEARERS.en; return `<div class="hub"><svg width="640" height="600" id="hub-svg-${idx}"></svg>${B.map((b, i) => { const a = (i / B.length) * Math.PI * 2 - Math.PI / 2; return `<div class="node b${i}" style="left:${320 + 250 * Math.cos(a)}px;top:${300 + 225 * Math.sin(a)}px">${b}</div>`; }).join('')}<div class="node core" style="left:320px;top:300px">SENDA</div></div>`; }
   if (v.kind === 'shots') {
@@ -169,6 +345,92 @@ function visualHTML(sc, idx) {
     return `<iframe class="pg" src="${src}" width="640" height="600" title="${T(sc.title)}"></iframe>`;
   }
   if (v.kind === 'call' || v.kind === 'howsim') return '<canvas class="c2d" width="640" height="600"></canvas>';
+  if (v.kind === 'offline') return dg('No Internet · from second one', 'end-to-end encrypted', 'Every phone carries messages it cannot read.',
+    `<div class="off-grid d2">
+      <div class="mock"><div class="mock-top"><span>SENDA</span><span class="pill red">OFFLINE</span></div><div class="mock-body"><div class="bubble out">SOS · 4th floor · 3 people</div><div class="sealed"><span class="lock">AES-256-GCM</span><b>Sealed message</b><span>Only the recipient can open it.</span></div><div class="wave"><i></i><i></i><i></i><i></i></div><div class="mock-note">Sent by sound · no server</div></div></div>
+      <div class="off-arrow">→</div>
+      <div class="mock"><div class="mock-top"><span>SENDA</span><span class="pill ok">RECEIVED</span></div><div class="mock-body"><div class="bubble">I hear you. Coming.</div><div class="sealed"><span class="lock">RECEIPT</span><b>Signed by recipient</b><span>Unforgeable. Deletes every copy.</span></div><div class="wave"><i></i><i></i><i></i><i></i></div><div class="mock-note">Opened on the recipient’s phone</div></div></div>
+      <div class="mock mule"><div class="mock-top"><span>MULE</span><span class="pill">3 MESSAGES</span></div><div class="mock-body"><div class="bubble">Envelope 1</div><div class="bubble">Envelope 2</div><div class="sealed"><span class="lock">CANNOT READ</span><b>No keys</b><span>Carries the message. Never sees it.</span></div><div class="mock-note">Hand to hand · file · nearby phone</div></div></div>
+    </div>
+    <div class="off-receipt d3"><div><b>Unforgeable receipt</b><span>Returned when the message arrives.</span></div><div class="copies"><span>copy 1</span><span>copy 2</span><span>copy 3</span></div><div class="del">DELETED</div></div>`,
+    'Works with no network, no carrier and no server.');
+  if (v.kind === 'fragments') return dg('One message · many paths', 'Reed–Solomon k-of-n', 'The message is split. Any few fragments rebuild it.',
+    `<div class="frag-flow d2">
+      <div class="frag-msg"><span class="frag-label">SOS</span><b>380 B</b><span>11 fragments</span><div class="frag-chips"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+      <div class="frag-lanes">
+        <div class="lane"><span>Satellite</span><div class="lane-bar"><i></i><i></i></div><em>2/2</em></div>
+        <div class="lane"><span>LoRa</span><div class="lane-bar"><i></i><i></i></div><em>2/2</em></div>
+        <div class="lane"><span>SMS</span><div class="lane-bar"><i></i><i class="lost"></i></div><em>1/2</em></div>
+        <div class="lane"><span>Nearby</span><div class="lane-bar"><i></i><i></i></div><em>2/2</em></div>
+      </div>
+      <div class="frag-out"><b>197</b><span>/200 rebuilt</span><em>byte for byte</em></div>
+    </div>
+    <div class="dg-row frag-kpis d3"><div class="dg-card"><b class="dg-num">99.09 %</b><span>exact delivery probability</span></div><div class="dg-card"><b class="dg-num">3 of 11</b><span>fragments needed to rebuild</span></div></div>`,
+    'Bearers dropped at random; the message still arrives.');
+  if (v.kind === 'sataccess') return dg('Satellite networks · by access level', 'observed', 'What your phone can reach, and what it cannot.',
+    `<div class="sat-rows d2">
+      <div class="sat-row"><span class="sat-lv">1</span><div><b>Already on your phone</b><span>Starlink Direct Cell · Skylo NB-NTN</span></div><em>selected devices</em></div>
+      <div class="sat-row"><span class="sat-lv l2">2</span><div><b>Needs a module</b><span>Iridium Short Burst</span></div><em>add-on hardware</em></div>
+      <div class="sat-row"><span class="sat-lv l3">3</span><div><b>Amateur radio</b><span>QO-100 · signed public status only</span></div><em>no encryption</em></div>
+      <div class="sat-row"><span class="sat-lv l4">4</span><div><b>Government</b><span>EU GOVSATCOM · IRIS²</span></div><em>agreement required</em></div>
+      <div class="sat-row"><span class="sat-lv l5">5</span><div><b>Under development</b><span>Galileo SAR</span></div><em>not operational</em></div>
+    </div>`,
+    'Anything not operational is labelled as such.');
+  if (v.kind === 'blackout') return dg('Blackout forecast · test city', 'simulation', 'Where the lights go out, and where to place gateways.',
+    `<div class="bo-grid d2">
+      <div class="heat"><div class="gw" style="left:22%;top:28%"></div><div class="gw" style="left:48%;top:20%"></div><div class="gw" style="left:62%;top:48%"></div><div class="gw" style="left:38%;top:68%"></div><div class="gw" style="left:76%;top:74%"></div><span class="heat-cap">people in the dark</span></div>
+      <div class="bo-right">
+        <svg class="bo-chart" viewBox="0 0 300 150" aria-hidden="true"><g stroke="#16242e" stroke-width="1"><line x1="30" y1="15" x2="30" y2="126"/><line x1="30" y1="126" x2="288" y2="126"/><line x1="30" y1="70" x2="288" y2="70" stroke-dasharray="4 4"/></g><text x="34" y="24" fill="#a9bcc5" font-size="9" font-family="ui-monospace,monospace">100 %</text><text x="34" y="80" fill="#a9bcc5" font-size="9" font-family="ui-monospace,monospace">40 %</text><path d="M30 20 C72 22 98 30 128 48 C162 70 192 105 288 120" fill="none" stroke="#ff7756" stroke-width="3"/><circle cx="128" cy="48" r="3" fill="#fbbf24"/><text x="136" y="44" fill="#fbbf24" font-size="9" font-family="ui-monospace,monospace">coverage drops</text></svg>
+        <div class="bo-stat"><b>72.1 %</b><span>reached with 5 gateways</span></div>
+        <div class="bo-stat"><b>1.31 h</b><span>median mast battery</span></div>
+      </div>
+    </div>
+    <div class="dg-row d3"><div class="dg-card"><b>5 gateways</b><span>placed before the outage</span></div><div class="dg-card"><b>Mathematical guarantee</b><span>placement bound, not a guess</span></div></div>`,
+    '72 % of people left in the dark reach a gateway.', 'warn');
+  if (v.kind === 'railtime') return dg('Rail accident · two trains', 'simulation', 'The panel separates the two trains in seconds.',
+    `<div class="rail-schematic d2"><div class="train t1"><i></i><i></i><i></i></div><div class="impact">IMPACT</div><div class="train t2"><i></i><i></i><i></i></div></div>
+    <div class="time-bars d3">
+      <div class="time-row"><span>SENDA · simulation</span><div class="bar"><i style="width:12%"></i></div><b>34 s</b></div>
+      <div class="time-row"><span>Adamuz · published</span><div class="bar"><i class="slow" style="width:100%"></i></div><b>≈45 min</b></div>
+      <div class="time-note">×79 faster · same evidence, fused</div>
+    </div>
+    <div class="cap-card d3"><div class="cap-head"><b>CAP 1.2 export</b><span>read by 112 · EU-Alert · Meteoalarm</span></div><div class="cap-sites"><span>SITE 1 · 40 reports · ±145 m</span><span>SITE 2 · 23 reports · ±59 m</span></div></div>`,
+    'Every phone detects the impact and asks: are you all right?');
+  if (v.kind === 'floors') return dg('Damaged building · floor by floor', 'simulation', 'Routers located. Alerts sent only to affected floors.',
+    `<div class="bld-grid d2">
+      <div class="bld"><div class="floor"><span>5</span><i class="router"></i><em>clear</em></div><div class="floor alert"><span>4</span><i class="router"></i><em>alert</em></div><div class="floor alert"><span>3</span><i class="router"></i><em>alert</em></div><div class="floor alert"><span>2</span><i class="router"></i><em>alert</em></div><div class="floor"><span>1</span><i class="router"></i><em>clear</em></div><div class="floor"><span>G</span><i class="router"></i><em>clear</em></div><div class="bld-base">B14 · 6 floors</div></div>
+      <div class="bld-right"><div class="dg-card"><b>Walk-through sweep</b><span>Every router heard, floor by floor.</span></div><div class="dg-card"><b>Drone sweep</b><span>Façade climb when nobody can enter.</span></div><div class="dg-card"><b>Alert only where needed</b><span>Floors 2–4. Not the whole building.</span></div></div>
+    </div>
+    <div class="dg-callout d3"><b>No answer = unconfirmed.</b> Never labelled a victim.</div>`,
+    'Located routers, not assumptions.');
+  if (v.kind === 'fusion') return dg('Flat 4B · evidence fusion', 'simulation', 'No fake X-rays. A probability, with its margin.',
+    `<div class="fusion-grid d2">
+      <div class="layers"><div class="layer"><span>01</span><div><b>Reply</b><em>person answered</em></div></div><div class="layer"><span>02</span><div><b>Phone signal</b><em>device present</em></div></div><div class="layer"><span>03</span><div><b>Wi-Fi breathing</b><em>movement detected</em></div></div><div class="layer"><span>04</span><div><b>Knocking</b><em>rhythmic taps</em></div></div></div>
+      <div class="fuse"><div class="fuse-line">two independent sources agree</div><div class="gauge"><b>98%</b><span>probability</span><em>± margin</em></div><div class="fuse-note">Painted over the camera, in layers.</div></div>
+    </div>
+    <div class="dg-row d3"><div class="dg-card"><b class="dg-num">1149/1149</b><span>times “≥98 %” was right · 200 simulations</span></div><div class="dg-card"><b>Margin</b><span>always reported with the estimate</span></div></div>`,
+    'Only a probability. Never a guess dressed as fact.');
+  if (v.kind === 'railwatch') return dg('Track circuit · its own history', 'simulation · synthetic', 'The signal was in the data, 21.5 hours early.',
+    `<svg class="rail-chart d2" viewBox="0 0 580 230" aria-hidden="true"><g stroke="#16242e" stroke-width="1"><line x1="44" y1="20" x2="44" y2="190"/><line x1="44" y1="190" x2="556" y2="190"/></g><line x1="44" y1="130" x2="556" y2="130" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="6 5"/><text x="50" y="124" fill="#fbbf24" font-size="10" font-family="ui-monospace,monospace">absolute threshold</text><path d="M44 60 L300 60 L300 95 L450 95 L450 180 L556 180" fill="none" stroke="#91d7e8" stroke-width="3"/><circle cx="300" cy="95" r="4" fill="#ff7756"/><text x="308" y="90" fill="#ff7756" font-size="10" font-family="ui-monospace,monospace">drop · no alarm</text><line x1="300" y1="40" x2="450" y2="40" stroke="#ff7756" stroke-dasharray="4 4"/><text x="310" y="34" fill="#ff7756" font-size="10" font-family="ui-monospace,monospace">21.5 h of lead time</text><text x="455" y="174" fill="#fbbf24" font-size="10" font-family="ui-monospace,monospace">step</text><text x="50" y="28" fill="#a9bcc5" font-size="10" font-family="ui-monospace,monospace">circuit voltage</text><text x="492" y="210" fill="#7d8f99" font-size="9" font-family="ui-monospace,monospace">time →</text></svg>
+    <div class="rail-legend d3"><span class="lg"><i class="v"></i>circuit voltage</span><span class="lg"><i class="t"></i>absolute threshold</span><span class="lg"><i class="d"></i>drop · no alarm</span></div>
+    <div class="dg-row d3"><div class="dg-card"><b class="dg-num">0</b><span>absolute-threshold alarms</span></div><div class="dg-card"><b class="dg-num">21.5 h</b><span>lead time on the step</span></div><div class="dg-card"><b>Inspection</b><span>proposed from relative history</span></div></div>`,
+    'Adds phone geometry, curves without supervision, walls under rain.');
+  if (v.kind === 'fire') return dg('Wildfire · warn before the mast burns', 'simulation', 'The alert has to leave before the mast does.',
+    `<div class="fire-grid d2">
+      <svg class="fire-map" viewBox="0 0 300 300" aria-hidden="true"><rect width="300" height="300" fill="#071018"/><g stroke="#16242e" stroke-width="1" opacity=".65"><path d="M0 60 H300 M0 120 H300 M0 180 H300 M0 240 H300 M60 0 V300 M120 0 V300 M180 0 V300 M240 0 V300"/></g><path d="M40 240 C60 180 90 170 120 160 C150 150 160 120 190 110 C220 100 240 70 270 60 L290 120 C260 150 240 180 220 210 C190 250 140 270 90 280 Z" fill="rgba(255,119,86,.16)" stroke="#ff7756" stroke-width="2"/><path d="M70 230 C90 195 110 185 135 175 C160 165 175 140 200 130 C220 122 235 100 255 92 L265 130 C240 160 225 185 205 210 C180 240 145 250 110 255 Z" fill="rgba(255,119,86,.24)" stroke="#ff9a86" stroke-width="2"/><path d="M105 220 C120 200 135 190 155 182 C175 174 188 158 205 150 L215 175 C195 200 185 218 170 232 C150 248 130 250 115 248 Z" fill="rgba(251,191,36,.28)" stroke="#fbbf24" stroke-width="2"/><path d="M250 100 C235 115 230 125 232 138" fill="none" stroke="#91d7e8" stroke-width="3"/><polygon points="232,138 226,130 238,130" fill="#91d7e8"/><g transform="translate(232,200)"><rect x="-4" y="-26" width="8" height="52" fill="#a9bcc5"/><circle cx="0" cy="-30" r="6" fill="#ff7756"/><path d="M-14 -26 H14" stroke="#a9bcc5" stroke-width="2"/></g><circle cx="268" cy="242" r="6" fill="#91d7e8"/><text x="276" y="246" fill="#91d7e8" font-size="9" font-family="ui-monospace,monospace">town</text><text x="12" y="20" fill="#a9bcc5" font-size="9" font-family="ui-monospace,monospace">fire spread + wind + slope</text></svg>
+      <div class="fire-right"><div class="fire-kpi"><b>107 min</b><span>between losing the mast and the warning deadline</span></div><div class="fire-timeline"><div class="ft-row"><i class="dot"></i><b>Mast burns</b><span>t + 0</span></div><div class="ft-row"><i class="dot warn"></i><b>Warning deadline</b><span>t + 107 min</span></div></div><div class="fire-channels"><span>Neighbours</span><span>LoRa</span><span>Satellite</span></div></div>
+    </div>`,
+    'Fire spread × wind × slope, crossed with the mast network.', 'warn');
+  if (v.kind === 'trust') return dg('Signed alert · consent · zone', 'calculated', 'Nothing happens on your phone without all three.',
+    `<div class="trust-grid d2">
+      <div class="alert-phone"><div class="ap-top"><span>EMERGENCY ALERT</span><span class="pill red">LIVE</span></div><div class="ap-body"><b>Fire Service · pilot</b><span>Credential signed by the agency</span><div class="ap-checks"><span>✓ You authorised it</span><span>✓ Emergency declared</span><span>✓ Zone: B14 · floors 1–4</span></div><div class="ap-q">Are you all right?</div><div class="ap-btns"><span class="safe">I’m safe</span><span class="help">I need help</span><span class="trap">I’m trapped</span></div></div></div>
+      <div class="board"><div class="board-head"><b>Coordinator board</b><span>live</span></div><div class="b-row"><span>Floor 4</span><b class="trap">2 trapped</b><em>1 safe</em></div><div class="b-row"><span>Floor 3</span><b class="help">1 needs help</b><em>4 safe</em></div><div class="b-row"><span>Floor 2</span><b>3 unconfirmed</b><em>—</em></div><div class="b-row"><span>Floor 1</span><b class="safe">5 safe</b><em>—</em></div><div class="board-foot">Encrypted reply · neighbour to neighbour</div></div>
+    </div>`,
+    'A credential from the agency. Your consent. A declared emergency.');
+  if (v.kind === 'easy') return dg('Easy mode · three buttons', 'observed', 'No menus. No reading. One tap.',
+    `<div class="easy-btns d2"><div class="easy safe"><b>I’m safe</b><span>Tell your contacts you are okay.</span></div><div class="easy help"><b>I need help</b><span>Send your floor and status.</span></div><div class="easy trap"><b>I’m trapped</b><span>Alert rescue with your location.</span></div></div>
+    <div class="easy-foot d3"><b>✓</b> Automated accessibility check on every change.</div>`,
+    'Three big buttons. Nothing else in the way.');
   if (v.kind === 'cta') {
     const l = L[LANG] ?? L.en;
     return `<div><div class="chips">${l.who.map((w, i) => `<span class="chip w${i}">${w}</span>`).join('')}</div><div class="url">civic-relay-investor.vercel.app/senda</div><div class="copyright">© 2026 Abraham Haddioui · SENDA · MIT License · 112 first</div></div>`;
@@ -234,6 +496,7 @@ window.seek = (t) => {
       appear(`.s${k}`, 0.35 + k * 0.7);
       appear(`.w${k}`, 0.25 + k * 0.22);
       appear(`.f${k}`, 0.3 + k * 0.5, 40);
+      appear(`.d${k}`, 0.2 + k * 0.5, 20);
     }
     el.querySelectorAll('.f0 img,.f1 img').forEach((im) => { const z = 1 + 0.04 * clamp(lt / d); im.style.transformOrigin = '50% 0'; im.style.transform = `scale(${z})`; });
     const slt = Math.max(0, lt);

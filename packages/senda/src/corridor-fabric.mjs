@@ -1265,3 +1265,25 @@ export async function runPilotBNeighborhoodLab({
     verification,
   };
 }
+
+
+export {
+  calibrateOsintFeeds,
+  planSatelliteStoreAndForward,
+  verifyGalileoOsnmaTag,
+  MAVLINK_MSG_SPECS,
+  crc16Mcrf4xx,
+  packMavlinkV2Frame,
+  parseMavlinkV2Frame,
+  encodeGlobalPositionIntPayload,
+  projectDroneGimbalToGround,
+  planAerialMuleTour,
+  COTS_HARDWARE_KITS,
+  crc16Ccitt,
+  encodeKissFrame,
+  decodeKissFrame,
+  governEtsiDutyCycle,
+  compressThermalArray32x24,
+  translateMeshProtocol,
+  createByzantineValidatorRing,
+} from './sovereign-mesh-kit.mjs';

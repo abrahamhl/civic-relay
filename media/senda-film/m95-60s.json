@@ -75,29 +75,7 @@
     "packages/senda/src/multichannel.mjs"
    ],
    "visual": {
-    "kind": "shots",
-    "images": [
-     "e2e-12-red-multiportador.png"
-    ],
-    "crop": "top",
-    "kpis": [
-     {
-      "v": "99,09 %",
-      "l": {
-       "es": "probabilidad exacta de entrega",
-       "en": "exact delivery probability",
-       "nl": "exacte afleverkans"
-      }
-     },
-     {
-      "v": "197/200",
-      "l": {
-       "es": "reconstruidos perdiendo portadores al azar",
-       "en": "rebuilt while losing random bearers",
-       "nl": "hersteld bij willekeurig verlies van dragers"
-      }
-     }
-    ]
+    "kind": "fragments"
    },
    "title": {
     "es": "Un mensaje, muchos caminos a la vez",
@@ -133,11 +111,7 @@
     "packages/senda/src/pci-envelope.mjs"
    ],
    "visual": {
-    "kind": "shots",
-    "images": [
-     "e2e-10-signed-alert.png",
-     "e2e-11-coordinator-board.png"
-    ]
+    "kind": "trust"
    },
    "title": {
     "es": "Confianza: firma, consentimiento y zona",

@@ -173,5 +173,12 @@ test('CORRIDOR INTELLIGENCE mode exposes 9 layers, Pilot A (A12 Arnhem-Ede) and 
   const snapB = getCorridorIntelligenceSnapshot('LAB-BARRIO-EDIFICIO-01', 'RADIUS');
   assert.equal(snapB.sector.pilotCode, 'PILOT_B_BARRIO_LAB');
   assert.equal(snapB.sector.messages[0].state, 'VERIFIED');
+
+  assert.equal(snapA.cotsHardwareKits.length, 3);
+  assert.equal(snapA.meshInteropFormats.length, 4);
+  assert.equal(snapA.byzantineQuorum.distinctOperatorsVerified, 3);
+  assert.ok(snapA.sources.some(s => s.sourceId === 'DRONE-A12-POD-COTS02'));
+  assert.ok(snapA.sources.some(s => s.sourceId === 'SAT-NTN-IRIDIUM-GALILEO'));
+  assert.ok(snapA.sources.some(s => s.sourceId === 'NDW-NL-BRIDGES-V3'));
 });
 

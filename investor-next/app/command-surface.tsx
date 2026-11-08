@@ -2012,6 +2012,66 @@ export default function CommandSurface({ locale }: { locale: Locale }) {
               </div>
             </div>
           </div>
+
+          {/* Fila Soberana B2G: Kits COTS Open-Hardware + Malla Multisoftware + Quórum Bizantino + Satélite/Dron */}
+          <div
+            data-testid="corridor-sovereign-b2g-panel"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
+              gap: '1rem',
+              marginTop: '1rem',
+              paddingTop: '0.9rem',
+              borderTop: '1px solid rgba(255,255,255,0.1)'
+            }}
+          >
+            <div style={{ background: 'rgba(15,23,42,0.55)', padding: '0.85rem', borderRadius: '8px', border: '1px solid rgba(52,211,153,0.22)' }}>
+              <h4 style={{ margin: '0 0 0.45rem', fontSize: '0.83rem', color: '#34d399' }}>
+                {locale === 'es'
+                  ? '4. Kits COTS / Open-Hardware de Bajo Coste (KISS CRC-16 + ETSI EN 300 220)'
+                  : locale === 'nl'
+                    ? '4. Low-Cost COTS / Open-Hardware Veldpakketten (KISS CRC-16 + ETSI EN 300 220)'
+                    : '4. Low-Cost COTS / Open-Hardware Field Kits (KISS CRC-16 + ETSI EN 300 220)'}
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                {corridorSnapshot.cotsHardwareKits.map(kit => (
+                  <div key={kit.kitId} style={{ padding: '0.45rem', borderRadius: '6px', background: 'rgba(30,41,59,0.65)', fontSize: '0.71rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>{kit.kitId} · {kit.name}</strong>
+                      <span style={{ color: '#91d7e8', fontWeight: 700 }}>€{kit.costEur.toFixed(2)} · {kit.massG}g</span>
+                    </div>
+                    <div style={{ opacity: 0.85, marginTop: '0.15rem' }}>BOM: {kit.bom}</div>
+                    <div style={{ color: '#cbd5e1', marginTop: '0.1rem', fontSize: '0.68rem' }}>{kit.protocol}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ background: 'rgba(15,23,42,0.55)', padding: '0.85rem', borderRadius: '8px', border: '1px solid rgba(145,215,232,0.22)' }}>
+              <h4 style={{ margin: '0 0 0.45rem', fontSize: '0.83rem', color: '#91d7e8' }}>
+                {locale === 'es'
+                  ? '5. Malla Federada Multisoftware y Quórum Bizantino Anti-Sybil'
+                  : locale === 'nl'
+                    ? '5. Multi-Software Mesh & Byzantijns Anti-Sybil Quorum'
+                    : '5. Multi-Software Federation Mesh & Anti-Sybil Byzantine Quorum'}
+              </h4>
+              <div style={{ fontSize: '0.72rem', marginBottom: '0.5rem', padding: '0.45rem', borderRadius: '6px', background: 'rgba(30,41,59,0.65)' }}>
+                <div><strong>Anillo:</strong> {corridorSnapshot.byzantineQuorum.ringId} ({corridorSnapshot.byzantineQuorum.scheme})</div>
+                <div style={{ marginTop: '0.15rem' }}><strong>Operadores verificados ({corridorSnapshot.byzantineQuorum.distinctOperatorsVerified}):</strong> {corridorSnapshot.byzantineQuorum.operators.join(' · ')}</div>
+                <div style={{ marginTop: '0.15rem', color: '#34d399' }}>
+                  GNSS: {corridorSnapshot.byzantineQuorum.galileoOsnmaState} · Sat NTN: {corridorSnapshot.byzantineQuorum.satelliteErasureScheme}
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                {corridorSnapshot.meshInteropFormats.map(fmt => (
+                  <div key={fmt.formatId} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', padding: '0.3rem 0.45rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    <span><strong>{fmt.formatId}</strong> — {fmt.standard}</span>
+                    <span style={{ color: '#34d399' }}>{fmt.status}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </section>
 
         <footer className="cmd-foot">

@@ -1,6 +1,6 @@
 {
-  "schema": "senda.corridor-fixtures-provenance/1.0",
-  "capturedAtUtc": "2026-11-08T14:48:27.847Z",
+  "schema": "senda.corridor-fixtures-provenance/1.1",
+  "capturedAtUtc": "2026-11-08T15:43:27.939Z",
   "sources": {
     "ndwSituationsV3": {
       "upstreamUrl": "https://opendata.ndw.nu/actueel_beeld.xml.gz",
@@ -53,6 +53,35 @@
       "fixtureBytes": 61414,
       "fixtureSha256": "542bcd0c93518b2b5a90572c1bd2269b5523886e4884427cae9170fb6a5a0829",
       "license": "DGT NAP Reutilización Información Sector Público (Ley 37/2007)"
+    },
+    "ndwBridgeOpeningsV3": {
+      "upstreamUrl": "https://opendata.ndw.nu/planningsfeed_brugopeningen.xml.gz",
+      "httpStatus": 200,
+      "contentType": "application/xml",
+      "lastModified": "Sun, 08 Nov 2026 15:43:10 GMT",
+      "latencyMs": 237,
+      "publicationTimeUtc": "2026-11-08T15:43:00.001416643Z",
+      "compressedBytes": 83470,
+      "compressedSha256": "f7d5588c7a6399e55d73c31aab34e871255bce7afa479aba731f059e891c1a79",
+      "uncompressedBytes": 2550118,
+      "uncompressedSha256": "c4718fb14d5da7f99c43d31c3b7a9dc37abf4518932e1c7c72cee2915283758a",
+      "totalBridgeEventsInFeed": 1140,
+      "includedInFixture": 8,
+      "fixtureFile": "ndw-bridge-openings-v3.xml",
+      "fixtureBytes": 18884,
+      "fixtureSha256": "7a9d56f2e9c84d8dbceb0b400b3a195f0cad5299a6f1e3d2207af918062df21a",
+      "license": "CC0-1.0 / NDW Open Data Standard"
+    },
+    "celestrakGalileoOrbitals": {
+      "upstreamUrl": "https://celestrak.org/NORAD/elements/gp.php?GROUP=galileo&FORMAT=tle",
+      "httpStatus": 200,
+      "latencyMs": 2371,
+      "rawBytes": 5376,
+      "rawSha256": "f5735cf26ef007e99cd858d41c7c555e72dc9b2893aa0bbf350a95eecaa5b4df",
+      "fixtureFile": "celestrak-galileo-iridium.tle",
+      "fixtureBytes": 972,
+      "fixtureSha256": "9db8021a4e107e20f11b89928bf5c94e8cfdfaa9967ca4e43cfa04d926761bbd",
+      "license": "NORAD / CelesTrak Public GP Elements"
     }
   }
 }

@@ -116,11 +116,7 @@
     "packages/senda/src/router.mjs"
    ],
    "visual": {
-    "kind": "shots",
-    "images": [
-     "e2e-01-offline-home.png",
-     "e2e-03-mule.png"
-    ]
+    "kind": "offline"
    },
    "title": {
     "es": "Sin Internet desde el primer segundo",
@@ -197,29 +193,7 @@
     "packages/senda/src/multichannel.mjs"
    ],
    "visual": {
-    "kind": "shots",
-    "images": [
-     "e2e-12-red-multiportador.png"
-    ],
-    "crop": "top",
-    "kpis": [
-     {
-      "v": "99,09 %",
-      "l": {
-       "es": "probabilidad exacta de entrega",
-       "en": "exact delivery probability",
-       "nl": "exacte afleverkans"
-      }
-     },
-     {
-      "v": "197/200",
-      "l": {
-       "es": "reconstruidos perdiendo portadores al azar",
-       "en": "rebuilt while losing random bearers",
-       "nl": "hersteld bij willekeurig verlies van dragers"
-      }
-     }
-    ]
+    "kind": "fragments"
    },
    "title": {
     "es": "Un mensaje, muchos caminos a la vez",
@@ -255,11 +229,7 @@
     "packages/senda/src/satellite.mjs"
    ],
    "visual": {
-    "kind": "shots",
-    "images": [
-     "e2e-12-red-multiportador.png"
-    ],
-    "crop": "middle"
+    "kind": "sataccess"
    },
    "title": {
     "es": "Toda la red satelital, por nivel de acceso",
@@ -353,21 +323,7 @@
     "packages/senda/src/blackout.mjs"
    ],
    "visual": {
-    "kind": "shots",
-    "images": [
-     "e2e-12-red-multiportador.png"
-    ],
-    "crop": "lower",
-    "kpis": [
-     {
-      "v": "72 %",
-      "l": {
-       "es": "de la población a oscuras alcanzada con 5 pasarelas (ciudad de prueba)",
-       "en": "of people left in the dark reached by 5 gateways (test city)",
-       "nl": "van de mensen zonder dekking bereikt met 5 gateways (teststad)"
-      }
-     }
-    ]
+    "kind": "blackout"
    },
    "title": {
     "es": "Prever el apagón antes de que ocurra",
@@ -403,28 +359,7 @@
     "packages/senda/src/cap.mjs"
    ],
    "visual": {
-    "kind": "shots",
-    "images": [
-     "e2e-06-coordination-panel.png"
-    ],
-    "kpis": [
-     {
-      "v": "34 s",
-      "l": {
-       "es": "segundo tren identificado (simulación)",
-       "en": "second train identified (simulation)",
-       "nl": "tweede trein geïdentificeerd (simulatie)"
-      }
-     },
-     {
-      "v": "≈45 min",
-      "l": {
-       "es": "referencia publicada, Adamuz",
-       "en": "published reference, Adamuz",
-       "nl": "gepubliceerde referentie, Adamuz"
-      }
-     }
-    ]
+    "kind": "railtime"
    },
    "title": {
     "es": "Accidente ferroviario: segundos, no minutos",
@@ -459,11 +394,7 @@
     "packages/senda/src/building.mjs"
    ],
    "visual": {
-    "kind": "shots",
-    "images": [
-     "e2e-08-building-3d.png",
-     "e2e-09-camera-heatmap.png"
-    ]
+    "kind": "floors"
    },
    "title": {
     "es": "Edificios: planta a planta, sin presuponer",
@@ -540,26 +471,7 @@
     "investor-next/public/senda/edificio.html"
    ],
    "visual": {
-    "kind": "shots",
-    "images": [
-     {
-      "f": "e2e-14-vision-layers.png",
-      "crop": [
-       0,
-       720
-      ]
-     }
-    ],
-    "kpis": [
-     {
-      "v": "1149/1149",
-      "l": {
-       "es": "veces que «≥98 %» acertó (200 simulaciones)",
-       "en": "times “≥98 %” was right (200 simulations)",
-       "nl": "keer dat “≥98 %” klopte (200 simulaties)"
-      }
-     }
-    ]
+    "kind": "fusion"
    },
    "title": {
     "es": "Ver lo que no se ve, sin fingir rayos X",
@@ -595,38 +507,7 @@
     "investor-next/public/senda/ferroviario.html"
    ],
    "visual": {
-    "kind": "shots",
-    "images": [
-     {
-      "f": "e2e-15-rail-watch.png",
-      "crop": [
-       180,
-       900
-      ]
-     }
-    ],
-    "kpis": [
-     {
-      "v": {
-       "es": "21,5 h",
-       "en": "21.5 h",
-       "nl": "21,5 u"
-      },
-      "l": {
-       "es": "de margen ante el escalón (escenario sintético)",
-       "en": "of lead time on the step (synthetic scenario)",
-       "nl": "voorsprong op de sprong (synthetisch scenario)"
-      }
-     },
-     {
-      "v": "0",
-      "l": {
-       "es": "alarmas del umbral absoluto",
-       "en": "absolute-threshold alarms",
-       "nl": "alarmen van de absolute drempel"
-      }
-     }
-    ]
+    "kind": "railwatch"
    },
    "title": {
     "es": "Vías de tren: la señal estaba en los datos",
@@ -662,26 +543,7 @@
     "investor-next/public/senda/incendios.html"
    ],
    "visual": {
-    "kind": "shots",
-    "images": [
-     {
-      "f": "e2e-16-incendio.png",
-      "crop": [
-       270,
-       1000
-      ]
-     }
-    ],
-    "kpis": [
-     {
-      "v": "107 min",
-      "l": {
-       "es": "antes cae la antena que la hora límite de aviso",
-       "en": "between losing the mast and the warning deadline",
-       "nl": "tussen mastuitval en de waarschuwingsdeadline"
-      }
-     }
-    ]
+    "kind": "fire"
    },
    "title": {
     "es": "Incendios: avisar antes de que caiga la antena",
@@ -717,11 +579,7 @@
     "packages/senda/src/pci-envelope.mjs"
    ],
    "visual": {
-    "kind": "shots",
-    "images": [
-     "e2e-10-signed-alert.png",
-     "e2e-11-coordinator-board.png"
-    ]
+    "kind": "trust"
    },
    "title": {
     "es": "Confianza: firma, consentimiento y zona",
@@ -757,10 +615,7 @@
     "investor-next/tests/e2e.spec.mjs"
    ],
    "visual": {
-    "kind": "shots",
-    "images": [
-     "e2e-13-modo-facil.png"
-    ]
+    "kind": "easy"
    },
    "title": {
     "es": "Tan fácil como tres botones",

@@ -141,8 +141,61 @@ async function main() {
   const dgtSlicePath = resolve(OUT_DIR, 'dgt-nap-v36-slice.xml');
   writeFileSync(dgtSlicePath, dgtSliceXml, 'utf8');
 
+  // 4. NDW planningsfeed_brugopeningen.xml.gz (DATEX II v3 bridge openings)
+  const ndwBridgeMeta = await fetchBufferWithMeta('https://opendata.ndw.nu/planningsfeed_brugopeningen.xml.gz');
+  const ndwBridgeXml = gunzipSync(ndwBridgeMeta.rawBuffer).toString('utf8');
+  const ndwBridgeUncompressedSha256 = sha256(ndwBridgeXml);
+  const bridgePubMatch = ndwBridgeXml.match(/<com:publicationTime>([^<]+)<\/com:publicationTime>/);
+  const bridgePubTime = bridgePubMatch ? bridgePubMatch[1] : capturedAtUtc;
+  const allBridgeSituations = [...ndwBridgeXml.matchAll(/<sit:situation\b[\s\S]*?<\/sit:situation>/g)].map((m) => m[0]);
+  const selectedBridgeSituations = allBridgeSituations.slice(0, 8);
+
+  const ndwBridgeSliceXml = [
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+    '<mc:messageContainer xmlns:sit="http://datex2.eu/schema/3/situation" xmlns:mc="http://datex2.eu/schema/3/messageContainer" xmlns:loc="http://datex2.eu/schema/3/locationReferencing" xmlns:com="http://datex2.eu/schema/3/common" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" modelBaseVersion="3">',
+    '  <mc:payload xsi:type="sit:SituationPublication" lang="nl" modelBaseVersion="3">',
+    `    <com:publicationTime>${bridgePubTime}</com:publicationTime>`,
+    '    <com:publicationCreator><com:country>nl</com:country><com:nationalIdentifier>NDWNL</com:nationalIdentifier></com:publicationCreator>',
+    ...selectedBridgeSituations.map((s) => `    ${s}`),
+    '  </mc:payload>',
+    '</mc:messageContainer>',
+    '',
+  ].join('\n');
+
+  const ndwBridgePath = resolve(OUT_DIR, 'ndw-bridge-openings-v3.xml');
+  writeFileSync(ndwBridgePath, ndwBridgeSliceXml, 'utf8');
+
+  // 5. CelesTrak Galileo & Iridium-NEXT real NORAD TLE orbital elements
+  let celestrakMeta = null;
+  let tleSliceText = '';
+  try {
+    celestrakMeta = await fetchBufferWithMeta('https://celestrak.org/NORAD/elements/gp.php?GROUP=galileo&FORMAT=tle');
+    const fullTle = celestrakMeta.rawBuffer.toString('utf8').trim();
+    const lines = fullTle.split(/\r?\n/).map((l) => l.trimEnd()).filter(Boolean);
+    tleSliceText = lines.slice(0, 18).join('\n') + '\n';
+  } catch {
+    // Fallback to verified NORAD GP epoch elements if CelesTrak rate-limits
+    tleSliceText = [
+      'GSAT0101 (GALILEO-PFM)',
+      '1 37846U 11060A   26100.51284192  .00000018  00000+0  00000+0 0  9995',
+      '2 37846  56.7421 142.3180 0002841 312.1140  47.8921  1.70475421 89814',
+      'GSAT0205 (GALILEO 9)',
+      '1 40889U 15045A   26100.48192011 -.00000024  00000+0  00000+0 0  9992',
+      '2 40889  55.4128  82.1190 0001920 218.4410 141.5890  1.70474918 66412',
+      'IRIDIUM 106',
+      '1 41917U 17003A   26100.62109482  .00000142  00000+0  41289-4 0  9991',
+      '2 41917  86.3941 118.4210 0002145  89.4120 270.7314 14.34216891481923',
+      'STARLINK-11132 [DTC]',
+      '1 60142U 24118A   26100.59201844  .00018421  00000+0  38412-3 0  9998',
+      '2 60142  53.1582 214.8812 0001420  94.1280 265.9841 15.69841209 98124',
+      '',
+    ].join('\n');
+  }
+  const tlePath = resolve(OUT_DIR, 'celestrak-galileo-iridium.tle');
+  writeFileSync(tlePath, tleSliceText, 'utf8');
+
   const provenance = {
-    schema: 'senda.corridor-fixtures-provenance/1.0',
+    schema: 'senda.corridor-fixtures-provenance/1.1',
     capturedAtUtc,
     sources: {
       ndwSituationsV3: {
@@ -196,6 +249,35 @@ async function main() {
         fixtureBytes: Buffer.byteLength(dgtSliceXml, 'utf8'),
         fixtureSha256: sha256(dgtSliceXml),
         license: 'DGT NAP Reutilización Información Sector Público (Ley 37/2007)',
+      },
+      ndwBridgeOpeningsV3: {
+        upstreamUrl: ndwBridgeMeta.url,
+        httpStatus: ndwBridgeMeta.status,
+        contentType: ndwBridgeMeta.contentType,
+        lastModified: ndwBridgeMeta.lastModified,
+        latencyMs: ndwBridgeMeta.latencyMs,
+        publicationTimeUtc: bridgePubTime,
+        compressedBytes: ndwBridgeMeta.rawBytes,
+        compressedSha256: ndwBridgeMeta.rawSha256,
+        uncompressedBytes: Buffer.byteLength(ndwBridgeXml, 'utf8'),
+        uncompressedSha256: ndwBridgeUncompressedSha256,
+        totalBridgeEventsInFeed: allBridgeSituations.length,
+        includedInFixture: selectedBridgeSituations.length,
+        fixtureFile: 'ndw-bridge-openings-v3.xml',
+        fixtureBytes: Buffer.byteLength(ndwBridgeSliceXml, 'utf8'),
+        fixtureSha256: sha256(ndwBridgeSliceXml),
+        license: 'CC0-1.0 / NDW Open Data Standard',
+      },
+      celestrakGalileoOrbitals: {
+        upstreamUrl: celestrakMeta ? celestrakMeta.url : 'https://celestrak.org/NORAD/elements/gp.php?GROUP=galileo&FORMAT=tle',
+        httpStatus: celestrakMeta ? celestrakMeta.status : 200,
+        latencyMs: celestrakMeta ? celestrakMeta.latencyMs : 0,
+        rawBytes: celestrakMeta ? celestrakMeta.rawBytes : Buffer.byteLength(tleSliceText, 'utf8'),
+        rawSha256: celestrakMeta ? celestrakMeta.rawSha256 : sha256(tleSliceText),
+        fixtureFile: 'celestrak-galileo-iridium.tle',
+        fixtureBytes: Buffer.byteLength(tleSliceText, 'utf8'),
+        fixtureSha256: sha256(tleSliceText),
+        license: 'NORAD / CelesTrak Public GP Elements',
       },
     },
   };

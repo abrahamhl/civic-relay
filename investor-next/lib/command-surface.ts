@@ -1280,12 +1280,14 @@ export interface CorridorSourceNode {
   proofRef: string;
 }
 
+export type CorridorLocale = 'es' | 'en' | 'nl';
+
 export interface CorridorSectorSpec {
   sectorId: string;
   roadSegmentId: string;
   pilotCode: 'PILOT_A_A12' | 'PILOT_B_BARRIO_LAB' | 'CORRIDOR_ES_N403';
-  title: Record<Locale, string>;
-  subtitle: Record<Locale, string>;
+  title: Record<CorridorLocale, string>;
+  subtitle: Record<CorridorLocale, string>;
   center: { lat: number; lon: number };
   defaultRadiusM: number;
   polygonCoords: Array<{ lat: number; lon: number }>;
@@ -1298,7 +1300,7 @@ export interface CorridorSectorSpec {
     corroboratingSources: string[];
     independentFamilies: string[];
     merkleDigestSha256: string;
-    summary: Record<Locale, string>;
+    summary: Record<CorridorLocale, string>;
   };
   dtnRoutes: Array<{
     routeId: string;
@@ -1726,6 +1728,69 @@ export const CORRIDOR_SOURCES_TABLE: readonly CorridorSourceNode[] = [
     proofRef: 'packages/senda-relay/server.mjs'
   },
   {
+    sourceId: 'NDW-NL-BRIDGES-V3',
+    sectorId: 'NL-A12-ARNHEM-EDE',
+    roadSegmentId: 'NL-A12-HM110-130',
+    layer: 'ROAD DATA',
+    assetType: 'ROAD_TRAFFIC_SENSOR',
+    operator: 'NDW Open Data (Planningsfeed Brugopeningen v3)',
+    lat: 51.9735,
+    lon: 5.9112,
+    accessRights: 'OPEN_DATA_CC0',
+    auth: 'NONE_PUBLIC_HTTPS',
+    health: 'LIVE_VERIFIED',
+    lastObservedAt: '2026-11-08T15:43:00Z',
+    observationCapabilities: ['BRIDGE_OPENING_SCHEDULE', 'WATERWAY_CORRIDOR_RESTRICTION'],
+    transportCapabilities: [],
+    canActAsRelay: false,
+    latestObservationSummary: '1.140 eventos reales de apertura de puentes en Países Bajos (8 en fixture verificada)',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-NL-RWS-VIC-OOST'],
+    proofRef: 'ndw-bridge-openings-v3.xml (sha256:7a9d56f2...)'
+  },
+  {
+    sourceId: 'DRONE-A12-POD-COTS02',
+    sectorId: 'NL-A12-ARNHEM-EDE',
+    roadSegmentId: 'NL-A12-HM110-130',
+    layer: 'CONNECTED DEVICES',
+    assetType: 'DRONE_AUTHORIZED',
+    operator: 'SENDA Aerial Mule + Thermal Pod (KIT-COTS-02 · 82g · €44)',
+    lat: 51.9855,
+    lon: 5.9590,
+    accessRights: 'EASA_USPACE_AND_EN4709_002_DIRECT_REMOTE_ID',
+    auth: 'MAVLINK_V2_HMAC_SHA256_LINK_SIGNED',
+    health: 'LAB_VERIFIED',
+    lastObservedAt: '2026-11-08T15:43:10Z',
+    observationCapabilities: ['MLX90640_32X24_THERMAL_HOTSPOT', 'COLLINEARITY_GROUND_PROJECTION_NON_RTK'],
+    transportCapabilities: ['MAVLINK_V2_DTN_TUNNEL', 'LORA_EU868_G1_G3', 'BLE_WIFI_NAN_MULE'],
+    canActAsRelay: true,
+    latestObservationSummary: 'MAVLink v2 firmado + MLX90640 (168.4 °C foco) + Mula DTN (reserva RTH ≥25%, sin RTK ±4.6 m)',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-LOCAL-DRONE-LIPO-98WH'],
+    proofRef: 'packages/senda/src/sovereign-mesh-kit.mjs'
+  },
+  {
+    sourceId: 'SAT-NTN-IRIDIUM-GALILEO',
+    sectorId: 'NL-A12-ARNHEM-EDE',
+    roadSegmentId: 'NL-A12-HM110-130',
+    layer: 'GATEWAYS',
+    assetType: 'SATELLITE_TERMINAL_AUTHORIZED',
+    operator: 'SENDA Satellite Store-and-Forward + Galileo OSNMA Verifier',
+    lat: 51.9851,
+    lon: 5.9110,
+    accessRights: 'ITU_AND_GALILEO_OSNMA_PUBLIC',
+    auth: 'GALILEO_TESLA_OSNMA_AND_AEAD_V2',
+    health: 'LAB_VERIFIED',
+    lastObservedAt: '2026-11-08T15:43:27Z',
+    observationCapabilities: ['GALILEO_OSNMA_ANTI_SPOOFING', 'CELESTRAK_SGP4_PASS_PREDICTION'],
+    transportCapabilities: ['IRIDIUM_SBD_340B_RS_SHARDS', 'SKYLO_NTN_256B'],
+    canActAsRelay: true,
+    latestObservationSummary: 'TLE real CelesTrak Galileo/Iridium + Reed-Solomon RS(3,5) SBD (RF físico BLOCKED sin módem)',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-SPACE-LEO-MEO-CONSTELLATION'],
+    proofRef: 'celestrak-galileo-iridium.tle (sha256:9db8021a...)'
+  },
+  {
     sourceId: 'CAM-LAB-BARRIO-RTSP-01',
     sectorId: 'LAB-BARRIO-EDIFICIO-01',
     roadSegmentId: 'BARRIO-ACCESO-NORTE-01',
@@ -1853,6 +1918,50 @@ export const CORRIDOR_SOURCES_TABLE: readonly CorridorSourceNode[] = [
   }
 ] as const;
 
+export const SOVEREIGN_COTS_KITS_SUMMARY = [
+  {
+    kitId: 'KIT-COTS-01',
+    name: 'Pocket LoRa/BLE Civic Relay Node',
+    costEur: 19.50,
+    massG: 46,
+    bom: 'ESP32-S3 + SX1262 EU868 + Antena 3dBi + LiPo 1100mAh',
+    protocol: 'USB-C WebSerial KISS (CRC-16-CCITT) + ETSI EN 300 220 (1% g1 / 10% g3 SOS)'
+  },
+  {
+    kitId: 'KIT-COTS-02',
+    name: 'Aerial Drone Thermal + LoRa/RemoteID Pod',
+    costEur: 44.00,
+    massG: 82,
+    bom: 'XIAO ESP32-S3 + SX1262 + Melexis MLX90640 (32×24 IR) + u-blox SAM-M10Q (Galileo OSNMA)',
+    protocol: 'MAVLink v2 firmado (HMAC-SHA256) + Descriptor térmico <180B + EN 4709-002 Direct Remote ID'
+  },
+  {
+    kitId: 'KIT-COTS-03',
+    name: 'Autonomous Solar Corridor & Bridge Gateway',
+    costEur: 68.50,
+    massG: 640,
+    bom: 'Orange Pi Zero 3 / RPi Zero 2W + SX1262 LNA + RTL-SDR TCXO + Solar 10W LiFePO4 32700',
+    protocol: 'Custodia DTN Store-and-Forward + Escucha pasiva SDR + Puente MQTT/ONVIF local'
+  }
+] as const;
+
+export const SOVEREIGN_MESH_INTEROP_FORMATS = [
+  { formatId: 'OASIS_CAP_1_2', standard: 'OASIS CAP v1.2 XML (112 / EU-Alert / NL-Alert)', status: 'VERIFIED_LOSSLESS' },
+  { formatId: 'ETSI_C_ITS_DENM', standard: 'ETSI EN 302 637-3 C-ITS DENM (CauseCode 94/18)', status: 'VERIFIED_LOSSLESS' },
+  { formatId: 'ATAK_COT_XML', standard: 'Cursor on Target (CoT 2.0 XML — ATAK / CivTAK)', status: 'VERIFIED_LOSSLESS' },
+  { formatId: 'MESHTASTIC_RETICULUM', standard: 'Compact LoRa Mesh Frame (<180B JSON/CBOR)', status: 'VERIFIED_LOSSLESS' }
+] as const;
+
+export const SOVEREIGN_BYZANTINE_QUORUM_SUMMARY = {
+  ringId: 'RING-NL-A12-SOVEREIGN',
+  scheme: 'M-of-N Threshold Cosigning (3-de-4) + Forward-Secure SHA-256 Ratchet Chain',
+  distinctOperatorsVerified: 3,
+  operators: ['RIJKSWATERSTAAT_NDW', 'VEILIGHEIDSREGIO_GELDERLAND', 'FLEET_PARTNER_X'],
+  sybilSubnetDiscountActive: true,
+  galileoOsnmaState: 'GALILEO_OSNMA_AUTHENTICATED',
+  satelliteErasureScheme: 'RS-Cauchy-GF256(k=3, n=5) sobre Iridium SBD (340B) / Skylo NTN (256B)'
+} as const;
+
 export function getCorridorIntelligenceSnapshot(
   sectorId = 'NL-A12-ARNHEM-EDE',
   selectionMode: CorridorSelectionMode = 'SEGMENT',
@@ -1869,7 +1978,10 @@ export function getCorridorIntelligenceSnapshot(
     sources,
     authorizedLiveOrLabCount: sources.filter(s => ['LIVE_VERIFIED', 'RECORDED_REAL_SAMPLE', 'LAB_VERIFIED'].includes(s.health)).length,
     catalogOrRestrictedCount: sources.filter(s => ['CATALOG_ONLY', 'PARTNER_ACCESS_REQUIRED', 'PERMISSION_PENDING'].includes(s.health)).length,
-    relayCapableCount: sources.filter(s => s.canActAsRelay).length
+    relayCapableCount: sources.filter(s => s.canActAsRelay).length,
+    cotsHardwareKits: SOVEREIGN_COTS_KITS_SUMMARY,
+    meshInteropFormats: SOVEREIGN_MESH_INTEROP_FORMATS,
+    byzantineQuorum: SOVEREIGN_BYZANTINE_QUORUM_SUMMARY
   };
 }
 

@@ -147,11 +147,7 @@
     "packages/senda/src/pci-envelope.mjs"
    ],
    "visual": {
-    "kind": "shots",
-    "images": [
-     "e2e-10-signed-alert.png",
-     "e2e-11-coordinator-board.png"
-    ]
+    "kind": "trust"
    },
    "title": {
     "es": "Confianza: firma, consentimiento y zona",

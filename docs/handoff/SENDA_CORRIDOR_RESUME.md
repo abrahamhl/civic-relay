@@ -22,11 +22,18 @@
   - `R3`: Correlated Failure Routing (`planCorrelatedFailureRoutes`, `benchmarkR3CorrelatedFailureRouting`).
   - `R4`: Evidence-Carrying Messages (`createEvidenceCarryingMessage`, `verifyEvidenceCarryingMessage`).
   - `R5`: Adaptive Edge Inference (`computeAdaptiveEdgePolicy`).
+- **Fase 2 — Sovereign Mesh, Calibración OSINT, Satélites NTN, Drones MAVLink v2 y Kits COTS Open-Hardware (`packages/senda/src/sovereign-mesh-kit.mjs`):**
+  - **Calibración Estadística OSINT (`calibrateOsintFeeds`):** Brier Score empírico, Expected Calibration Error (ECE), temperatura de Platt y cuarentena automática por replay o anomalía cinemática.
+  - **Store-and-Forward Satelital + Anti-Spoofing Galileo OSNMA (`planSatelliteStoreAndForward`, `verifyGalileoOsnmaTag`):** Presupuesto de enlace SGP4/J2 + Doppler + FSPL, fragmentación Reed-Solomon `RS-Cauchy-GF256(k,n)` para `IRIDIUM_SBD` (340B), `SKYLO_NTN` (256B) y `STARLINK_D2C` (160B), bloqueo ITU Art. 25 de texto cifrado en radioaficionados (`QO100`) y autenticación TESLA + HMAC de Galileo OSNMA.
+  - **Integración de Drones (`packMavlinkV2Frame`, `parseMavlinkV2Frame`, `projectDroneGimbalToGround`, `planAerialMuleTour`):** Tramas binarias MAVLink v2 (`0xFD`) con CRC-16/MCRF4XX y firma de enlace de 13 bytes, proyección fotogramétrica de colinealidad que rehúsa declarar precisión submétrica sin RTK (`rtkFixType < 5`), y planificador energético de mula aérea DTN con reserva obligatoria del 25% RTH.
+  - **Kits COTS / AliExpress Open-Hardware (`COTS_HARDWARE_KITS`, `encodeKissFrame`, `decodeKissFrame`, `governEtsiDutyCycle`, `compressThermalArray32x24`):** Especificaciones completas de 3 kits reproducibles (€19,50 a €68,50), tramas serie KISS con CRC-16-CCITT, gobernador de ciclo de trabajo ETSI EN 300 220 (1% g1 / 10% g3 SOS) y compresor de matriz térmica infrarroja `MLX90640` ($32\times 24$) a $<180\text{ B}$.
+  - **Malla Multisoftware y Quórum Bizantino Multiusuario (`translateMeshProtocol`, `createByzantineValidatorRing`):** Traducción sin pérdida a **OASIS CAP v1.2**, **ETSI C-ITS DENM**, **ATAK CoT XML** y **Meshtastic/Reticulum**, junto con quórum umbral $M$-de-$N$ con diversidad de operador, descuento anti-Sybil por subred `/24` y cadena hash con trinquete Forward-Secure.
 - **Configuración Multiagente OpenCode v1.19.3:** Agentes A–J definidos en `.opencode/agents/corridor-agent-*.md`.
 
 ### `TESTED_LOCALLY`
 - `packages/senda/tests/corridor-fabric.test.mjs`: **21/21 pruebas superadas**.
-- `investor-next/tests/command-surface-model.test.mjs`: **10/10 pruebas superadas**.
+- `packages/senda/tests/sovereign-mesh-kit.test.mjs`: **6/6 suites integrales superadas**.
+- `investor-next/tests/command-surface-model.test.mjs`: **10/10 pruebas superadas** + `tsc --noEmit` sin errores.
 - `investor-next/tests/sector-and-globe-mission.test.mjs`: **9/9 pruebas superadas**.
 - Suite completa `@senda/core`, `@senda/pci`, `@senda/relay`, tests adversariales y `investor-next` ejecutada localmente en verde.
 

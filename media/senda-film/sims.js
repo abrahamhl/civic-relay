@@ -54,7 +54,7 @@
     const sendP = clamp((lt - c1 - 1.2) / 6.5), linkP = ease((lt - c2) / 1.2), chainP = ease((lt - c2 - 7.5) / 1.5);
     // teléfono A
     const sdpP = ease((lt - 1.2) / 2.2), shrink = ease((lt - 3.6) / 1.4);
-    const aLines = [{ t: tr('Sin Internet · sin servidor', 'No Internet · no server') }];
+    const aLines = [{ t: tr('Sin Internet', 'No Internet') }, { t: tr('sin servidor', 'no server'), c: C.m }];
     if (lt > 0.8) aLines.push({ t: tr('▶ Crear llamada', '▶ Create call'), c: C.c, f: '700 14px Inter,system-ui' });
     phone(g, A.x, A.y, A.w, A.h, tr('Teléfono A', 'Phone A'), aLines, C.c);
     if (lt > 0.8 && lt < 1.6) { const r = 10 + (lt - 0.8) * 40; g.strokeStyle = `rgba(255,119,86,${1 - (lt - 0.8) / 0.8})`; g.lineWidth = 3; g.beginPath(); g.arc(A.x + 70, A.y + 100, r, 0, 7); g.stroke(); }
@@ -64,7 +64,7 @@
       g.globalAlpha = fadeCode;
       const n = Math.floor(14 * (1 - shrink)) + 1; g.font = '9px ui-monospace,monospace';
       for (let i = 0; i < n; i++) { g.fillStyle = `rgba(169,188,197,${0.7 * sdpP})`; g.fillText(K.sdp[i % K.sdp.length].slice(0, 30), A.x + 22, A.y + 130 + i * 11); }
-      label(g, tr('SDP real de Chrome: 2 056 caracteres', 'Real Chrome SDP: 2,056 characters'), A.x + 22, A.y + 300, C.m, '12px Inter,system-ui');
+      label(g, tr('SDP real: 2 056 caracteres', 'Chrome SDP: 2,056 chars'), A.x + 22, A.y + 300, C.m, '12px Inter,system-ui');
       if (shrink > 0) { g.fillStyle = `rgba(145,215,232,${shrink})`; rr(g, A.x + 20, A.y + 150, A.w - 40, 56, 8); g.fill(); label(g, `${K.bytes} bytes`, A.x + A.w / 2, A.y + 186, C.bg, '800 26px Inter,system-ui', 'center'); label(g, tr('código de llamada', 'call code'), A.x + A.w / 2, A.y + 226, C.i, '700 13px Inter,system-ui', 'center'); }
       g.globalAlpha = 1;
     }
@@ -81,15 +81,15 @@
     }
     const bLines = [{ t: tr('Escuchando…', 'Listening…') }];
     if (sendP > 0) bLines.push({ t: `${Math.round(sendP * 100)} %`, c: C.i, f: '700 22px Inter,system-ui' });
-    if (sendP >= 1) bLines.push({ t: K.ok ? tr(`✓ ${K.bytes} bytes, 0 errores`, `✓ ${K.bytes} bytes, 0 errors`) : '✗', c: C.e, f: '700 14px Inter,system-ui' }, { t: tr('Responde igual (72 bytes)', 'Replies the same way (72 bytes)') });
+    if (sendP >= 1) bLines.push({ t: K.ok ? tr(`✓ ${K.bytes} bytes, 0 errores`, `✓ ${K.bytes} bytes, 0 errors`) : '✗', c: C.e, f: '700 14px Inter,system-ui' }, { t: tr('Responde igual', 'Replies the same') }, { t: tr('72 bytes', '72 bytes'), c: C.m });
     phone(g, B.x, B.y, B.w, B.h, tr('Teléfono B', 'Phone B'), bLines, C.i);
     // enlace directo cifrado con voz y chat
     if (linkP > 0) {
       const y = 280; g.strokeStyle = `rgba(52,211,153,${linkP})`; g.lineWidth = 4; g.beginPath(); g.moveTo(A.x + A.w, y); g.lineTo(B.x, y); g.stroke();
-      label(g, tr('Directo · cifrado DTLS-SRTP · sin servidor', 'Direct · DTLS-SRTP encrypted · no server'), (A.x + A.w + B.x) / 2, y - 14, C.e, '700 12px Inter,system-ui', 'center');
+      label(g, tr('Directo · cifrado · sin servidor', 'Direct · encrypted · no server'), (A.x + A.w + B.x) / 2, y - 14, C.e, '700 12px Inter,system-ui', 'center');
       for (let k = 0; k < 6; k++) { const f = ((lt * 0.9 + k / 6) % 1), dir = k % 2 ? 1 : -1, x = dir > 0 ? A.x + A.w + f * (B.x - A.x - A.w) : B.x - f * (B.x - A.x - A.w); g.fillStyle = dir > 0 ? C.c : C.i; g.globalAlpha = linkP; g.beginPath(); g.arc(x, y, 4, 0, 7); g.fill(); g.globalAlpha = 1; }
       for (const [P, s] of [[A, 1.3], [B, 2.1]]) for (let k = 0; k < 14; k++) { const h = 6 + 22 * Math.abs(Math.sin(lt * 7 * s + k * 0.8)) * linkP; g.fillStyle = C.e; g.fillRect(P.x + 30 + k * 11, A.y + A.h - 36 - h, 7, h); }
-      const msgs = [[tr('¿Me oyes? 4.ª planta', 'Can you hear me? 4th floor'), A, 1.5], [tr('Te oigo. Vamos.', 'I hear you. Coming.'), B, 3.2]];
+      const msgs = [[tr('¿Me oyes? 4.ª planta', 'Hear me? 4th floor'), A, 1.5], [tr('Te oigo. Vamos.', 'I hear you. Coming.'), B, 3.2]];
       for (const [t, P, at] of msgs) { const p = ease((lt - c2 - at) / 0.6); if (p <= 0) continue; g.globalAlpha = p; g.fillStyle = P === A ? '#1b3a48' : '#123d2c'; rr(g, P.x + 18, A.y + 236, P.w - 36, 30, 10); g.fill(); label(g, t, P.x + 28, A.y + 256, C.t, '12px Inter,system-ui'); g.globalAlpha = 1; }
     }
     // cadena de voz A → B → C (resultado medido)
