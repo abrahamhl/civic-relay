@@ -1,11 +1,13 @@
-name: SENDA LIVE · NASA/USGS geospatial evidence maps
+name: SENDA LIVE · NASA/USGS + Atmosphere 4D verified maps
 on:
   push:
     branches:
       - 'feat/senda-usgs-map-evidence-*'
+      - 'feat/senda-atmosphere4d-offline-*'
   pull_request:
     branches:
       - 'feat/senda-social-live-*'
+      - 'feat/senda-usgs-map-evidence-*'
       - master
   workflow_dispatch:
 permissions:
@@ -20,7 +22,7 @@ jobs:
         with:
           node-version: '22'
       - name: Offline deterministic upstream adapter tests
-        run: node --test apps/senda-live/tests/usgs-earthquakes.test.mjs apps/senda-live/tests/eonet-wildfires.test.mjs
+        run: node --test apps/senda-live/tests/usgs-earthquakes.test.mjs apps/senda-live/tests/eonet-wildfires.test.mjs apps/senda-live/tests/weather-grid.test.mjs apps/senda-live/tests/metno-weather-grid.test.mjs
       - name: Install locked dependencies
         run: |
           corepack enable
@@ -42,6 +44,21 @@ jobs:
           path: evidence/senda/eonet/latest-catalog-acquisition.json
           if-no-files-found: warn
           retention-days: 14
+      # MET Norway permits commercial reuse with attribution, but requires a well-behaved
+      # client. Trigger exactly once with [metno-live-check], NOT on every CI change.
+      - name: One-off MET Norway 9-point scientific source acquisition
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[metno-live-check]')
+        continue-on-error: true
+        run: node apps/senda-live/scripts/capture-metno-research.mjs valencia
+      - name: Upload one-off MET Norway acquisition receipt
+        if: always() && github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[metno-live-check]')
+        uses: actions/upload-artifact@v4
+        with:
+          name: senda-metno-source-receipt
+          path: evidence/senda/metno/latest-acquisition.json
+          if-no-files-found: warn
+          retention-days: 14
+
 
 
   chromium-map-qa:
