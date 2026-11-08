@@ -1,11 +1,11 @@
 {
   "releaseId": "senda-m95-video-2026-11",
-  "commit": "b9b1590e776ccc8deb50c53072bf7cb2e99a5f17",
-  "branch": "mission/senda-95-20261108",
+  "commit": "8becb7c6ceea1e1f8112ccdd76c408f9cc594eb2",
+  "branch": "mission/senda-corridor-fabric-20261108",
   "deployUrl": null,
   "deployStatus": "BLOCKED_EXTERNAL",
   "deployedAt": null,
-  "generatedAt": "2026-11-08T14:50:00+01:00",
+  "generatedAt": "2026-11-08T17:01:00+01:00",
   "audioLanguage": "en",
   "voiceModel": "kokoro-onnx==0.6.1 (bf_emma, en-gb, speed 0.95)",
   "subtitleLanguages": [
@@ -38,9 +38,9 @@
     },
     {
       "path": "/media/m95/senda-m95-60s-en.mp4",
-      "bytes": 11660496,
+      "bytes": 3790123,
       "duration": 62.48,
-      "sha256": "dcc69e80625efccebeca88256bc9469f353d32f412ec73fb84c74de19bdd9597"
+      "sha256": "edeaa687ab0accb3ed94fda0f226494a32b20061f623567cf0006d41333d0bf4"
     },
     {
       "path": "/media/m95/senda-m95-60s-en.vtt",
@@ -59,9 +59,9 @@
     },
     {
       "path": "/media/m95/senda-m95-90s-en.mp4",
-      "bytes": 9654400,
+      "bytes": 6059798,
       "duration": 92.24,
-      "sha256": "58cb968080b251a97441e0d99f741cebb623b184506ca24487ebfba441677ba2"
+      "sha256": "18437bdf3187102dd787a30d5d215ed292c512e201196a2483232029303d1efa"
     },
     {
       "path": "/media/m95/senda-m95-90s-en.vtt",
@@ -80,9 +80,9 @@
     },
     {
       "path": "/media/m95/senda-m95-film-en.mp4",
-      "bytes": 113395787,
+      "bytes": 56540056,
       "duration": 530.12,
-      "sha256": "043d9641c3e8e88b7dc93cad7cc57309653fcbea74029adc12c80f7cee80fa99"
+      "sha256": "7d53e52cd440fbee03a1639a42aef5b2569d2ade126e8505089818a426d14024"
     },
     {
       "path": "/media/m95/senda-m95-film-en.vtt",
@@ -101,8 +101,8 @@
     },
     {
       "path": "/media/m95/senda-m95-film-poster.jpg",
-      "bytes": 107283,
-      "sha256": "87f590bf6986d183f298c74672cbe29847c77234ecc3ab7bdb03844bceea6620"
+      "bytes": 91323,
+      "sha256": "820c65e4535b169a80c48e44057d15961d7854361c248e45bfb957d657bca8e3"
     },
     {
       "path": "/media/m95/senda-m95-ruta-en.mp4",
@@ -258,27 +258,27 @@
     },
     {
       "path": "/media/m95/senda-m95-vertical-45s-en-sub-en.mp4",
-      "bytes": 3268162,
+      "bytes": 3256084,
       "duration": 42.8,
-      "sha256": "71f3678654e2aeda9293444b9196ed48517593a550a2d4c928fd30ff1a3c5f32"
+      "sha256": "82be00a526235c01dfe75b4fbad62ad927cb85ecf33b5fcf5eac8d9bca4a355a"
     },
     {
       "path": "/media/m95/senda-m95-vertical-45s-en-sub-es.mp4",
-      "bytes": 3273921,
+      "bytes": 3263893,
       "duration": 42.8,
-      "sha256": "1649802584cd7fe1b0877dae06826f34ca058b588a3a97502793c8af767d2957"
+      "sha256": "da409d9cee2884b1ceadaffb7aa97842cea8b58db28cc914fbea0d4560e88c2f"
     },
     {
       "path": "/media/m95/senda-m95-vertical-45s-en-sub-nl.mp4",
-      "bytes": 3297592,
+      "bytes": 3287645,
       "duration": 42.8,
-      "sha256": "280eca84132ad4e6b8d74de4cef115bb3f0bb6233ed3d8148a4477c32328853a"
+      "sha256": "cce7cd80d1d250fc4bdb3d958fc8a85fbe7464bfe184931d5df82a95bb0a51e3"
     },
     {
       "path": "/media/m95/senda-m95-vertical-45s-en.mp4",
-      "bytes": 3024782,
+      "bytes": 3006695,
       "duration": 42.8,
-      "sha256": "132433efa15e546d3f513466a08a4f80531c7d0257f7a2bf33cc55a99312b5a8"
+      "sha256": "eb8ac1c788e786aa71810052097e6d8ffccea6611241a56af003e07817469931"
     },
     {
       "path": "/media/m95/senda-m95-vertical-45s-en.vtt",
@@ -308,6 +308,7 @@
     "legal": "PASS"
   },
   "unresolvedItems": [
+    "Video render sources are committed in 8becb7c on mission/senda-corridor-fabric-20261108; PR #23 (mission/senda-95) must merge or cherry-pick that commit before the release commit/branch fields are final.",
     "SECURITY.txt contains placeholder security@civic-relay.example.com; requires real founder-controlled security mailbox before claiming protected status (§ 9.4 / § 12).",
     "Dutch (nl) subtitles require native speaker sign-off before claiming native-verified status (marked REVIEW_REQUIRED per § 6.3 / § 12).",
     "Remote Vercel preview/production deployment requires VERCEL_TOKEN / founder confirmation (§ 8.2 / § 12).",

@@ -2,8 +2,8 @@
 
 - **Release ID:** `senda-m95-video-2026-11`
 - **Date:** 2026-11-08
-- **Branch:** `mission/senda-95-20261108`
-- **Base Commit:** `b9b1590e776ccc8deb50c53072bf7cb2e99a5f17`
+- **Branch:** `mission/senda-corridor-fabric-20261108`
+- **Base Commit:** `8becb7c6ceea1e1f8112ccdd76c408f9cc594eb2`
 
 ## 1. Mandatory Gates (§ 10.1)
 
@@ -26,8 +26,9 @@
 ### Gate 4 · Image (`PASS`)
 - [x] Horizontal masters and simulations (`11` pieces): `1920×1080`, `25 fps`, H.264 High (`avc1.640028`), `yuv420p` (TV range), `+faststart`.
 - [x] Vertical 9:16 cuts (`4` files: clean + burned-in `en`/`es`/`nl`): `1080×1920`, `25 fps`, H.264 High, `yuv420p`, `+faststart`.
-- [x] Control stills extracted and inspected at `5s, 8s, 40s, 90s, 150s, 255s, 395s, 430s, 475s, 500s, 520s` (`film`) and `8s, 35s, 60s, 82s, 98s, 115s, 132s, 148s, 165s, 185s, 204s, 215s` (`ruta`) in `evidence/video/m95/screenshots/`.
+- [x] Control stills extracted and inspected at `5s, 8s, 40s, 90s, 111s, 137s, 150s, 188s, 213s, 234s, 255s, 291s, 318s, 342s, 362s, 377s, 395s, 430s, 475s, 500s, 520s` (`film`) and `8s, 35s, 60s, 82s, 98s, 115s, 132s, 148s, 165s, 185s, 204s, 215s` (`ruta`) in `evidence/video/m95/screenshots/`.
 - [x] 100% English canvas labels on all interactive simulations in the English master (`0` Spanish leaks in `carretera.html`, `camaras.html`, `paises.html`, `dgt.html`, `sims.js`).
+- [x] English-only diagrams for `s3`–`s10` (offline, fragments, sataccess, blackout, railtime, floors, fusion, railwatch, fire, trust, easy); static Spanish app captures removed from the English master, `s5b` keeps the English `/senda/ojo` capture. Blackout, railwatch and wildfire SVGs verified after scoping the hub-only `svg` positioning rule.
 
 ### Gate 5 · Web (`PASS` local export / `BLOCKED_EXTERNAL` remote Vercel deploy)
 - [x] `/`, `/es`, `/nl` build and render cleanly (`14/14` static pages in `investor-next/out`, `6/6` `check:locales`, `107/107` `investor-next/tests/*.test.mjs`).

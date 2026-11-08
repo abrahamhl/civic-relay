@@ -35,15 +35,15 @@ All 36 `.vtt` files in `investor-next/public/media/m95/` were verified against t
 
 ## 3. Piece Inventory (36 WebVTT Files)
 
-1. `senda-m95-film-{es,en,nl}.vtt` — 22 scenes (`s1`…`s13` + `s12b`), 80 cues each, `530.12 s`
-2. `senda-m95-ruta-{es,en,nl}.vtt` — 12 scenes (`r0`…`r11`), 36 cues each, `218.25 s`
-3. `senda-m95-90s-{es,en,nl}.vtt` — 6 scenes, 16 cues each, `92.20 s`
-4. `senda-m95-60s-{es,en,nl}.vtt` — 4 scenes, 11 cues each, `62.46 s`
-5. `senda-m95-30s-{es,en,nl}.vtt` — 3 scenes, 6 cues each, `33.70 s`
-6. `senda-m95-vertical-45s-{es,en,nl}.vtt` — 4 scenes, 8 cues each, `42.79 s`
-7. `senda-m95-sim-braking-{es,en,nl}.vtt` — 1 scene (`r1`), 4 cues each, `24.46 s`
-8. `senda-m95-sim-sos-{es,en,nl}.vtt` — 1 scene (`r2`), 3 cues each, `22.15 s`
-9. `senda-m95-sim-wrongway-{es,en,nl}.vtt` — 1 scene (`r5`), 3 cues each, `16.33 s`
-10. `senda-m95-sim-queue-{es,en,nl}.vtt` — 1 scene (`r6`), 3 cues each, `19.29 s`
-11. `senda-m95-sim-visibility-{es,en,nl}.vtt` — 1 scene (`r7`), 3 cues each, `18.95 s`
-12. `senda-m95-sim-proof-{es,en,nl}.vtt` — 1 scene (`s12b`), 4 cues each, `27.62 s`
+1. `senda-m95-film-{es,en,nl}.vtt` — 22 scenes (`s1`…`s13` + `s12b`), 52 cues each, `530.12 s`
+2. `senda-m95-ruta-{es,en,nl}.vtt` — 12 scenes (`r0`…`r11`), 23 cues each, `218.28 s`
+3. `senda-m95-90s-{es,en,nl}.vtt` — 5 scenes (`s1,s2,s3b,s9,s13`), 10 cues each, `92.24 s`
+4. `senda-m95-60s-{es,en,nl}.vtt` — 4 scenes (`s1,s4,s9,s13`), 6 cues each, `62.48 s`
+5. `senda-m95-30s-{es,en,nl}.vtt` — 3 scenes, 4 cues each, `33.70 s`
+6. `senda-m95-vertical-45s-{es,en,nl}.vtt` — 3 scenes (`s1,s3b,s13`), 5 cues each, `42.80 s`
+7. `senda-m95-sim-braking-{es,en,nl}.vtt` — 1 scene (`r1`), 2 cues each, `24.48 s`
+8. `senda-m95-sim-sos-{es,en,nl}.vtt` — 1 scene (`r2`), 2 cues each, `22.16 s`
+9. `senda-m95-sim-wrongway-{es,en,nl}.vtt` — 1 scene (`r5`), 2 cues each, `16.36 s`
+10. `senda-m95-sim-queue-{es,en,nl}.vtt` — 1 scene (`r6`), 3 cues each, `19.30 s`
+11. `senda-m95-sim-visibility-{es,en,nl}.vtt` — 1 scene (`r7`), 2 cues each, `18.96 s`
+12. `senda-m95-sim-proof-{es,en,nl}.vtt` — 1 scene (`s12b`), 5 cues each, `27.64 s`
