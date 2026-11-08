@@ -54,10 +54,10 @@
 </section>
 </main>
 <script type="module">
-import { $, C, canvas, text, rr, run, clamp, FILM } from '/senda/kit.mjs';
+import { $, C, canvas, text, rr, run, clamp, FILM, LANG, tr } from '/senda/kit.mjs';
 import { CAMERA_SOURCES, fogScene, estimateVisibilityMulti, estimateVisibility } from '/senda/core/cameras.mjs';
 import { safeSpeedForVisibility, MU } from '/senda/core/drive-cases.mjs';
-const fmt = (x, d = 0) => x.toFixed(d).replace('.', ',');
+const fmt = (x, d = 0) => (LANG === 'en' ? x.toFixed(d) : x.toFixed(d).replace('.', ','));
 const S = { vis: 120 }; window.SENDA_CAMARAS = S;
 const CH = { PASIVO: 'ok', CONVENIO: 'todo', NUNCA: 'no' };
 $('#f-tb').innerHTML = CAMERA_SOURCES.map((c) => `<tr><td>${c.country}</td><td>${c.url ? `<a href="${c.url}" target="_blank" rel="noopener">${c.operator}</a>` : c.operator}</td><td>${c.what}</td><td class="m">${c.license}</td><td><span class="chip ${CH[c.access]}">${c.access}</span></td></tr>`).join('');
@@ -79,13 +79,13 @@ function drawN(t) {
   const k = 600 / sc.w;
   sc.refs.forEach((r) => { const used = r.distM === e.distM; g.strokeStyle = used ? C.a : 'rgba(145,215,232,.7)'; g.lineWidth = used ? 3 : 1.5; g.strokeRect(20 + r.x * k - 2, 50 + r.y * k - 2, r.w * k + 4, r.h * k + 4); text(g, `${r.distM} m`, 20 + r.x * k, 50 + r.y * k - 6, { c: used ? C.a : C.i, f: '700 12px Inter,system-ui' }); });
   g.lineWidth = 1;
-  text(g, 'Cámara de carretera (imagen sintética)', 20, 32, { c: C.t, f: '800 14px Inter,system-ui' }); text(g, `niebla real: ${S.vis} m`, 620, 32, { c: C.m, f: '12px Inter,system-ui', al: 'right' });
+  text(g, tr('Cámara de carretera (imagen sintética)', 'Road camera (SYNTHETIC IMAGE · method test)'), 20, 32, { c: C.t, f: '800 14px Inter,system-ui' }); text(g, tr(`niebla real: ${S.vis} m`, `true visibility: ${S.vis} m`), 620, 32, { c: C.m, f: '12px Inter,system-ui', al: 'right' });
   g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 440, 600, 144, 12); g.fill(); const danger = e.visM < 150; g.strokeStyle = danger ? C.a : C.l; g.stroke();
-  text(g, `Visibilidad estimada: ${e.visM} m`, 34, 470, { c: danger ? C.a : C.t, f: '800 18px Inter,system-ui' });
-  text(g, `referencia usada: objeto a ${e.distM} m · transmisión t = ${fmt(e.t, 2)} · luz del aire A = ${fmt(e.A, 2)}`, 34, 494, { c: C.m, f: '12px Inter,system-ui' });
-  text(g, `Velocidad para parar dentro de lo que se ve: ${safeSpeedForVisibility(e.visM).kmh} km/h en seco · ${safeSpeedForVisibility(e.visM, { mu: MU.mojado }).kmh} en mojado`, 34, 520, { c: C.t, f: '13px Inter,system-ui' });
-  text(g, danger ? 'Aviso de niebla, con su velocidad, a los que se acercan a esta cámara' : 'Sin aviso: visibilidad suficiente', 34, 548, { c: danger ? C.a : C.e, f: '700 13px Inter,system-ui' });
-  text(g, 'I = J·t + A·(1 − t) · t = e^(−β·d) · V = 3,912 / β', 34, 572, { c: C.g, f: '12px Inter,system-ui' });
+  text(g, tr(`Visibilidad estimada: ${e.visM} m`, `Estimated visibility: ${e.visM} m`), 34, 470, { c: danger ? C.a : C.t, f: '800 18px Inter,system-ui' });
+  text(g, tr(`referencia usada: objeto a ${e.distM} m · transmisión t = ${fmt(e.t, 2)} · luz del aire A = ${fmt(e.A, 2)}`, `reference used: dark target at ${e.distM} m · transmission t = ${fmt(e.t, 2)} · airlight A = ${fmt(e.A, 2)}`), 34, 494, { c: C.m, f: '12px Inter,system-ui' });
+  text(g, tr(`Velocidad para parar dentro de lo que se ve: ${safeSpeedForVisibility(e.visM).kmh} km/h en seco · ${safeSpeedForVisibility(e.visM, { mu: MU.mojado }).kmh} en mojado`, `Safe stopping speed within sight: ${safeSpeedForVisibility(e.visM).kmh} km/h dry · ${safeSpeedForVisibility(e.visM, { mu: MU.mojado }).kmh} km/h wet`), 34, 520, { c: C.t, f: '13px Inter,system-ui' });
+  text(g, danger ? tr('Aviso de niebla, con su velocidad, a los que se acercan a esta cámara', 'Fog alert with safe speed sent to drivers approaching this camera') : tr('Sin aviso: visibilidad suficiente', 'No alert needed: sufficient visibility'), 34, 548, { c: danger ? C.a : C.e, f: '700 13px Inter,system-ui' });
+  text(g, tr('I = J·t + A·(1 − t) · t = e^(−β·d) · V = 3,912 / β', 'I = J·t + A·(1 − t) · t = e^(−β·d) · V = 3.912 / β (Koschmieder)'), 34, 572, { c: C.g, f: '12px Inter,system-ui' });
 }
 
 // ---- cámara del teléfono (todo local)

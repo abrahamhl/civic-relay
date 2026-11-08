@@ -31,7 +31,7 @@
     // dron: escenario y censo reales
     S.rf = { RF, sc: RF.rfCensusScenario(), cacheT: -1, r: null };
     S.mesh = VM;
-    if (window.THREE) { setupDrone(); setupArch(); }
+    if (window.THREE) { if (window.__NEED_DRONE !== false) setupDrone(); if (window.__NEED_ARCH !== false) setupArch(); }
     return true;
   }
 
@@ -47,7 +47,9 @@
 
   // ---------------------------------------------------------------- 1) LLAMAR SIN INTERNET
   function drawCall(cv, lt, d, cue) {
-    const g = cv.getContext('2d'), W = 640, H = 600, K = S.call; g.clearRect(0, 0, W, H);
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (cv.width !== Math.round(640 * dpr)) { cv.width = Math.round(640 * dpr); cv.height = Math.round(600 * dpr); }
+    const g = cv.getContext('2d'), W = 640, H = 600, K = S.call; g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     const c1 = cue(1), c2 = cue(2), A = { x: 10, y: 40, w: 190, h: 330 }, B = { x: 440, y: 40, w: 190, h: 330 };
     const sendP = clamp((lt - c1 - 1.2) / 6.5), linkP = ease((lt - c2) / 1.2), chainP = ease((lt - c2 - 7.5) / 1.5);
     // teléfono A
@@ -113,8 +115,9 @@
     sp.scale.set(scale, (scale * h) / w, 1); return sp;
   }
   function makeRenderer() {
-    const canvas = document.createElement('canvas'); canvas.width = 1280; canvas.height = 720; canvas.className = 'c3d';
-    const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true }); r.setPixelRatio(1); r.setSize(1280, 720, false); r.setClearColor(0x05090c, 1);
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const canvas = document.createElement('canvas'); canvas.width = Math.round(1280 * dpr); canvas.height = Math.round(720 * dpr); canvas.className = 'c3d';
+    const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true }); r.setPixelRatio(dpr); r.setSize(1280, 720, false); r.setClearColor(0x05090c, 1);
     return r;
   }
   const hash = (s) => { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0; return h; };
@@ -228,7 +231,7 @@
     const A = S.arch; if (!A) return;
     const focus = lt < cue(1) ? [0] : lt < cue(2) ? [1, 2] : [3, 4];
     A.layers.forEach((L, i) => { const on = focus.includes(i); L.plane.material.opacity = on ? 0.85 : 0.35; L.edge.material.opacity = on ? 0.9 : 0.25; L.boxes.forEach((b) => (b.material.opacity = on ? 1 : 0.45)); L.lab.material.opacity = on ? 1 : 0.5; });
-    A.paths.forEach((p, k) => { const f = ((lt * 0.11 + k * 0.27) % 1), pt = p.curve.getPointAt(f); p.pk.position.copy(pt); p.halo.position.copy(pt); p.halo.scale.setScalar(1 + 0.3 * Math.sin(lt * 6 + k)); p.line.material.opacity = 0.35 + 0.3 * ease((lt - 1) / 2); });
+    A.paths.forEach((p, k) => { const f = Math.min(0.999999, Math.max(0, ((Math.max(0, lt) * 0.11 + k * 0.27) % 1 + 1) % 1)), pt = p.curve.getPointAt(f); p.pk.position.copy(pt); p.halo.position.copy(pt); p.halo.scale.setScalar(1 + 0.3 * Math.sin(lt * 6 + k)); p.line.material.opacity = 0.35 + 0.3 * ease((lt - 1) / 2); });
     const ang = -0.45 + lt * 0.03; A.cam.position.set(Math.sin(ang) * 58, 21 + 3 * Math.sin(lt * 0.12), Math.cos(ang) * 58); A.cam.lookAt(0, 11.5, 0);
     A.R.render(A.scene, A.cam);
     const leg = [[tr('Probado en navegador', 'Tested in browser'), '#34d399'], [tr('Probado en simulación', 'Tested in simulation'), '#fbbf24'], [tr('App Android', 'Android app'), '#91d7e8'], [tr('Requiere app nativa', 'Needs native app'), '#b79cff'], [tr('Hoja de ruta', 'Roadmap'), '#7d8f99']];
@@ -240,7 +243,9 @@
   const CODE = ['export function maxConcurrent(intervals) {', '  const ev = [];', '  for (const [a, b] of intervals)', '    { ev.push([a, 1]); ev.push([b, -1]); }', '  ev.sort((x, y) => x[0] - y[0] || x[1] - y[1]);', '  let cur = 0, max = 0;', '  for (const [, d] of ev)', '    { cur += d; max = Math.max(max, cur); }', '  return max; // = teléfonos reales', '}'];
   const IV = [[0.02, 0.3], [0.33, 0.62], [0.66, 0.96], [0.1, 0.45], [0.5, 0.9], [0.2, 0.55], [0.6, 0.8]];
   function drawHow(cv, lt, d, cue) {
-    const g = cv.getContext('2d'), W = 640, H = 600; g.clearRect(0, 0, W, H);
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (cv.width !== Math.round(640 * dpr)) { cv.width = Math.round(640 * dpr); cv.height = Math.round(600 * dpr); }
+    const g = cv.getContext('2d'), W = 640, H = 600; g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     const panel = (y, h, t) => { g.fillStyle = 'rgba(11,20,28,.92)'; rr(g, 0, y, W, h, 14); g.fill(); g.strokeStyle = C.l; g.lineWidth = 1; g.stroke(); label(g, t, 18, y + 26, C.c, '700 12px ui-monospace,monospace'); };
     // 1 · código real + barrido de eventos ejecutándose
     panel(0, 228, tr('1 · CÓDIGO DEL NÚCLEO · rf-census.mjs', '1 · CORE CODE · rf-census.mjs'));

@@ -3,6 +3,8 @@
 > **Para quién:** un agente más barato que retome los vídeos sin el historial de conversación.
 > **Regla de oro:** los vídeos **no se animan a mano**. Cada fotograma lo calcula el **mismo núcleo de la app**, de forma determinista (`seek(t)`). Si algo no está en el núcleo o en una página de la app, **no sale en el vídeo**.
 > Versión 1 · 05-11-2026 · rama `ccr-357397d4-i6q247`.
+>
+> **Suite profesional nueva:** para la película y la ruta en inglés a 1080p con VTT es/en/nl, web y QA, usa **[08_ANTIGRAVITY_VIDEO_HANDOFF.md](08_ANTIGRAVITY_VIDEO_HANDOFF.md)** y los prompts de **[prompts/antigravity/](prompts/antigravity/)**. Este runbook sigue siendo la referencia del pipeline; el handoff 08 manda sobre nombres, idiomas y aceptación.
 
 ## 0. Qué hay
 
@@ -44,7 +46,7 @@ SCRIPT=ruta CORE=192 E2E=43 node render.mjs --stills es 5,40,90,150   # 3) fotog
 CORE=192 E2E=43 ./make.sh ruta es publicar         # 4) publicar en investor-next/public/media/
 ```
 
-- `CORE` y `E2E` son las cifras de pruebas que muestra la escena `verify`. Cópialas de `investor-next/public/senda/estado.json` del último commit; no las inventes.
+- `CORE` y `E2E` son las cifras de pruebas que muestra la escena `verify`. Cópialas de `investor-next/public/senda/estado.json` **solo después de regenerarlo y comprobar que coincide con las suites actuales**; no las inventes. Si `estado.json` está desactualizado, ejecuta las pruebas y regenera la página de estado antes de renderizar.
 - Para `--stills` hay que generar antes la voz (paso 2), porque los tiempos salen de `out/timeline-*.js`.
 - **`--stills` necesita `SCRIPT=<guion>`** (y `CORE`/`E2E` si sale la escena `verify`): sin él carga `script.json` y la línea de tiempo de la película, no la del guion que estás revisando.
 - Duración orientativa en un contenedor de 4 núcleos: la voz tarda 2–4 min y la imagen de un vídeo de 4 min unos 20–40 min.
@@ -141,3 +143,4 @@ Escena 3D nueva en `sims.js` (solo si no puede vivir en una página): añade el 
 | Ruta protectora, cámaras, Países Bajos y DGT (es) | `ruta.json` | **Publicado** (05-11-2026): `investor-next/public/media/senda-ruta-es.mp4`, `.vtt` y póster; enlazado en la portada, en `/senda/arquitectura` y en `/senda/carretera` |
 | La misma versión en inglés (+ subtítulos nl) | `ruta.json` (campos `en`, `en_say`, `title.en` y `nl`) | **Publicado** (05-11-2026): `senda-ruta-en.mp4`, `.vtt` en/nl y póster. Los subtítulos `nl` usan los tiempos de la voz inglesa. Los rótulos dibujados en los lienzos de la app siguen en español: la narración dice en voz alta «simulation», «synthetic image» e «invented road» |
 | Piezas verticales de 45–60 s (una por escena) | un guion de 1–2 escenas | Pendiente; el formato vertical necesitaría otra plantilla de `film.html` |
+| Suite M95: película y ruta en inglés 1080p, VTT es/en/nl, cortes y simulaciones | `script.json` + `ruta.json` → `m95-film.json` / `m95-ruta.json` + escena `s12b` | **Pendiente**: encargo y prompts en [08_ANTIGRAVITY_VIDEO_HANDOFF.md](08_ANTIGRAVITY_VIDEO_HANDOFF.md) |

@@ -1,6 +1,6 @@
 # SENDA · Paquete de traspaso (handoff) para un proyecto limpio
 
-> **Actualizado (05-11-2026):** empieza por **[HANDOFF_COMPLETO_2026-11-05.md](HANDOFF_COMPLETO_2026-11-05.md)** (estado v0.16, mapa, procedimiento y mensaje de arranque). Vídeos: **[07_VIDEOS_3D_RUNBOOK.md](07_VIDEOS_3D_RUNBOOK.md)**. Lo que sigue es la versión 1 (contexto histórico).
+> **Actualizado (08-11-2026):** empieza por **[HANDOFF_COMPLETO_2026-11-05.md](HANDOFF_COMPLETO_2026-11-05.md)** (mapa y procedimiento) y **[08_ANTIGRAVITY_VIDEO_HANDOFF.md](08_ANTIGRAVITY_VIDEO_HANDOFF.md)** (suite de vídeo profesional, inglés 1080p, VTT es/en/nl y despliegue). Vídeos: **[07_VIDEOS_3D_RUNBOOK.md](07_VIDEOS_3D_RUNBOOK.md)**. La puntuación vigente es **6,7/10**, no el 7,9 histórico de § 4; para el estado real usa `docs/audits/SENDA_MISSION_95_STATUS.md`. Lo que sigue es la versión 1 (contexto histórico).
 
 > Versión 1 · 04-11-2026 · commit de referencia `c933c9b` (rama `ccr-bb7a95b8-t79scj`, PR #12).
 > Entrada → Procesamiento → Validación → Salida: todo lo necesario para que cualquier persona o
@@ -72,6 +72,9 @@
 | [../research/SENSORES_Y_CANALES_ANDROID_2026-11-04.md](../research/SENSORES_Y_CANALES_ANDROID_2026-11-04.md) | v0.10: llamadas sin Internet (señalización compacta por sonido), censo radio con dron, matriz de sensores Android con fuentes, pasos siguientes para decidir |
 | [05_CERTIFICACIONES_Y_PERMISOS.md](05_CERTIFICACIONES_Y_PERMISOS.md) | ENS, NIS2, RGPD, accesibilidad, CE/RED, drones, espectro, financiación pública |
 | [06_PROMPT_INICIAL.md](06_PROMPT_INICIAL.md) | Prompt maestro para abrir la nueva conversación |
+| [07_VIDEOS_3D_RUNBOOK.md](07_VIDEOS_3D_RUNBOOK.md) | Pipeline determinista de vídeo (Kokoro, Playwright, three.js, ffmpeg) |
+| [08_ANTIGRAVITY_VIDEO_HANDOFF.md](08_ANTIGRAVITY_VIDEO_HANDOFF.md) | Encargo profesional: película y ruta en inglés 1080p, VTT es/en/nl, web, protección y QA |
+| [prompts/antigravity/](prompts/antigravity/) | Prompts listos para pegar: maestro, película, ruta/sims, voz/subtítulos, web/deploy y QA |
 | [templates/CLAUDE.md](templates/CLAUDE.md) | Reglas del repositorio para cualquier agente (copiar a la raíz del nuevo repo) |
 | [templates/TRADEMARK.md](templates/TRADEMARK.md) | Política de marca (borrador para revisión legal) |
 

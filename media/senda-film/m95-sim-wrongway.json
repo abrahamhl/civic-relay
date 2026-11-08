@@ -1,0 +1,54 @@
+{
+ "note": "SENDA Mission 9.5 · Simulación explicada: Conductor en sentido contrario (r5)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "r5",
+   "claim": "SIMULATED",
+   "source": [
+    "investor-next/public/senda/carretera.html",
+    "packages/senda/src/road.mjs"
+   ],
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=kamikaze"
+   },
+   "title": {
+    "es": "Un coche en sentido contrario",
+    "en": "A car going the wrong way",
+    "nl": "Een spookrijder op de snelweg"
+   },
+   "es": [
+    "El primero en saberlo es el móvil de quien se equivoca: tres posiciones seguidas contra el sentido de la calzada bastan para avisarle.",
+    "Los que vienen de frente reciben el tiempo que falta para cruzarse y qué hacer: carril derecho y reducir."
+   ],
+   "es_say": [
+    "El primero en saberlo es el móvil de quien se equivoca: tres posiciones seguidas contra el sentido de la calzada bastan para avisarle.",
+    "Los que vienen de frente reciben el tiempo que falta para cruzarse y qué hacer: carril derecho y reducir."
+   ],
+   "en": [
+    "The first to know is the phone of the driver who made the mistake: three positions in a row against the direction of the carriageway are enough to warn them.",
+    "Oncoming drivers get the time left before they meet and what to do: keep to the right-hand lane and slow down."
+   ],
+   "en_say": [
+    "The first to know is the phone of the driver who made the mistake: three positions in a row against the direction of the carriageway are enough to warn them.",
+    "Oncoming drivers get the time left before they meet, and what to do: keep to the right-hand lane and slow down."
+   ],
+   "nl": [
+    "De eerste die het weet is de telefoon van de spookrijder zelf: drie opeenvolgende posities tegen de rijrichting in volstaan om hem te waarschuwen.",
+    "Tegenliggers krijgen de tijd tot de kruising en wat ze moeten doen: rechts houden en afremmen."
+   ]
+  }
+ ]
+}

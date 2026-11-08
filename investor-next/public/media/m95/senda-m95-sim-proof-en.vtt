@@ -1,0 +1,21 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:04.312
+Security is not a promise. It is a chain you can inspect.
+
+2
+00:00:04.662 --> 00:00:09.057
+Messages are encrypted end to end. Receipts are signed into a hash chain.
+
+3
+00:00:09.407 --> 00:00:12.905
+The identity key is bound to the card and exported encrypted.
+
+4
+00:00:13.255 --> 00:00:19.207
+The core has more than two hundred and sixty automated tests, and the custody protocol has its own suite.
+
+5
+00:00:19.557 --> 00:00:26.619
+That proves the code does what the tests check. It does not prove field performance, and no external audit has certified it yet.

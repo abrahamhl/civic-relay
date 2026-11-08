@@ -1,0 +1,96 @@
+{
+ "note": "SENDA Mission 9.5 · Simulación explicada: La prueba que puedes inspeccionar (s12b)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "s12b",
+   "claim": "OBSERVED",
+   "source": [
+    "packages/senda/src/pci-envelope.mjs",
+    "packages/senda/src/epistemic-ledger.mjs",
+    "packages/senda-pci/tests/pci.test.mjs",
+    "docs/security/SENDA_ASSURANCE_REVIEW.md"
+   ],
+   "visual": {
+    "kind": "kpis",
+    "kpis": [
+     {
+      "v": "266",
+      "l": {
+       "es": "pruebas del n?cleo, ejecutadas sin red",
+       "en": "core tests, run offline",
+       "nl": "kerntests, offline uitgevoerd"
+      }
+     },
+     {
+      "v": "13",
+      "l": {
+       "es": "pruebas de custodia PCI",
+       "en": "PCI custody tests",
+       "nl": "PCI-custodietests"
+      }
+     },
+     {
+      "v": "0",
+      "l": {
+       "es": "auditor?as externas completadas",
+       "en": "external audits completed",
+       "nl": "voltooide externe audits"
+      }
+     }
+    ]
+   },
+   "title": {
+    "es": "La prueba que puedes inspeccionar",
+    "en": "The proof you can inspect",
+    "nl": "Het bewijs dat je kunt controleren"
+   },
+   "en": [
+    "Security is not a promise. It is a chain you can inspect.",
+    "Messages are encrypted end to end. Receipts are signed into a hash chain.",
+    "The identity key is bound to the card and exported encrypted.",
+    "The core has more than two hundred and sixty automated tests, and the custody protocol has its own suite.",
+    "That proves the code does what the tests check. It does not prove field performance, and no external audit has certified it yet."
+   ],
+   "en_say": [
+    "Security is not a promise. It is a chain you can inspect.",
+    "Messages are encrypted end to end. Receipts are signed into a hash chain.",
+    "The identity key is bound to the card and exported encrypted.",
+    "The core has more than two hundred and sixty automated tests, and the custody protocol has its own suite.",
+    "That proves the code does what the tests check. It does not prove field performance, and no external audit has certified it yet."
+   ],
+   "es": [
+    "La seguridad no es una promesa. Es una cadena que se puede inspeccionar.",
+    "Los mensajes van cifrados de extremo a extremo. Los recibos se firman en una cadena de hashes.",
+    "La clave de identidad est? ligada a la tarjeta y se exporta cifrada.",
+    "El n?cleo tiene m?s de doscientas sesenta pruebas autom?ticas, y el protocolo de custodia tiene su propia bater?a.",
+    "Eso demuestra que el c?digo hace lo que comprueban las pruebas. No demuestra su comportamiento en campo, y ninguna auditor?a externa lo ha certificado todav?a."
+   ],
+   "es_say": [
+    "La seguridad no es una promesa. Es una cadena que se puede inspeccionar.",
+    "Los mensajes van cifrados de extremo a extremo. Los recibos se firman en una cadena de hashes.",
+    "La clave de identidad est? ligada a la tarjeta y se exporta cifrada.",
+    "El n?cleo tiene m?s de doscientas sesenta pruebas autom?ticas, y el protocolo de custodia tiene su propia bater?a.",
+    "Eso demuestra que el c?digo hace lo que comprueban las pruebas. No demuestra su comportamiento en campo, y ninguna auditor?a externa lo ha certificado todav?a."
+   ],
+   "nl": [
+    "Veiligheid is geen belofte. Het is een keten die je kunt controleren.",
+    "Berichten zijn end-to-end versleuteld. Ontvangstbewijzen worden ondertekend in een hash-keten.",
+    "De identiteitssleutel is aan de kaart gebonden en wordt versleuteld ge?xporteerd.",
+    "De kern heeft meer dan tweehonderdzestig automatische tests, en het custodieprotocol heeft een eigen suite.",
+    "Dat bewijst dat de code doet wat de tests controleren. Het bewijst geen veldprestaties, en geen externe audit heeft het gecertificeerd."
+   ]
+  }
+ ]
+}

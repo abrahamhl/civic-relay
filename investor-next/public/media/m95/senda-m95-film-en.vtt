@@ -1,0 +1,209 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:03.032
+When the network falls, the message shouldn't die.
+
+2
+00:00:03.382 --> 00:00:17.334
+On the twenty-eighth of April, twenty twenty-five, Spain's mobile network didn't fail when the power went out. It failed when the batteries in the masts ran dry. Within hours, users with a stable connection dropped from ninety to forty percent.
+
+3
+00:00:17.684 --> 00:00:23.892
+And in the Valencia floods, the mass alert to phones didn't arrive until eleven minutes past eight in the evening.
+
+4
+00:00:25.492 --> 00:00:29.161
+This is SENDA: emergency routing over alternative channels.
+
+5
+00:00:29.511 --> 00:00:43.015
+It isn't another messaging app. It's the layer that coordinates everything that can carry a message: nearby phones, sound, direct-to-phone satellite, LoRa, Iridium, amateur radio, drones, and whatever network is still standing.
+
+6
+00:00:44.615 --> 00:00:57.458
+It works without Internet from the very first second. Messages are end-to-end encrypted and travel by sound between two phones, in a file, or hand to hand: every phone running SENDA carries messages it cannot read.
+
+7
+00:00:57.808 --> 00:01:03.611
+When the recipient gets it, their unforgeable receipt erases the copies still travelling through the network.
+
+8
+00:01:05.211 --> 00:01:13.360
+Now SENDA can also call. Two phones on the same Wi-Fi, or on one phone's hotspot, talk with no Internet, no carrier and no server.
+
+9
+00:01:13.710 --> 00:01:23.161
+The trick is the setup: what normally needed a server, about two thousand characters, SENDA shrinks to about ninety bytes and sends it by sound in under nine seconds.
+
+10
+00:01:23.511 --> 00:01:36.097
+Then voice and chat travel encrypted, directly between the two. And if you can't reach each other, a third phone on the stairs relays the voice: in the test, the third phone heard the first phone's exact tone through the second.
+
+11
+00:01:37.697 --> 00:01:47.959
+What nobody does yet: SENDA splits every message with Reed-Solomon coding and spreads the fragments across different bearers. Any few of them arriving is enough to rebuild it.
+
+12
+00:01:48.309 --> 00:02:03.925
+With satellite, LoRa, SMS and neighbours, an SOS reaches a ninety-nine percent delivery probability, calculated exactly. In the live trial, one hundred and ninety-seven of two hundred messages were rebuilt byte for byte while bearers were dropped at random.
+
+13
+00:02:05.525 --> 00:02:22.677
+Every satellite network is classed by access level: those your phone already has, those that need a module such as Iridium, amateur ones such as QO-100, where the law forbids encryption and SENDA sends only signed public status, and government networks, which require an agreement.
+
+14
+00:02:23.027 --> 00:02:28.125
+Anything still under development, such as Galileo's warning service, is labelled as such.
+
+15
+00:02:29.725 --> 00:02:44.680
+The SENDA Eye computes where every satellite is, in real time: the Iridium constellation in low orbit for short messages, Galileo in medium orbit for position and search and rescue, and the geostationary QO-100 for radio amateurs.
+
+16
+00:02:45.030 --> 00:02:56.507
+Spain's real cases sit on the globe. Pick one, and SENDA finds the visible satellite, computes its elevation, distance and latency, and traces the alert's path to the 112 control room.
+
+17
+00:02:58.107 --> 00:03:06.001
+SENDA also forecasts the blackout. It models how long each mast lasts on battery and works out when and where people will lose coverage.
+
+18
+00:03:06.351 --> 00:03:18.383
+Then it decides where to place gateways before it happens, using an algorithm with a mathematical guarantee. In the test city, five gateways reach seventy-two percent of the people who would be left in the dark.
+
+19
+00:03:19.983 --> 00:03:27.257
+In a rail accident, every phone detects the impact, asks if you are all right and, if you don't answer, raises the alarm on its own.
+
+20
+00:03:27.607 --> 00:03:45.314
+By fusing the reports, the panel separates the two trains in thirty-four seconds of simulation. At Adamuz, recognising the second train took around forty-five minutes, according to the published timeline. And everything is exported in CAP, the format emergency control rooms already read.
+
+21
+00:03:46.914 --> 00:03:55.021
+In a damaged building, SENDA locates routers floor by floor with walk-through or drone sweeps, and sends alerts only to the affected floors.
+
+22
+00:03:55.371 --> 00:04:00.085
+Anyone who doesn't answer is listed as missing, unconfirmed, never as a victim.
+
+23
+00:04:01.685 --> 00:04:11.456
+When nobody can enter a building, a drone climbs the façade floor by floor and listens to the Bluetooth signals that phones emit, without connecting to them or reading anything.
+
+24
+00:04:11.806 --> 00:04:23.518
+Counting signals is misleading: every phone changes its address every few minutes. SENDA counts how many are active at the same time, and from that it deduces the exact number of phones on each floor.
+
+25
+00:04:23.868 --> 00:04:37.393
+Then it estimates how many people there are, with an honest margin. Across seven hundred and twenty simulated floors, the margin contained the real figure ninety-five per cent of the time. Only numbers come out, never identities.
+
+26
+00:04:38.993 --> 00:04:52.284
+No camera sees through a wall. SENDA does something more useful: it fuses each person's reply, their phone's signal, breathing detected over Wi-Fi and knocking, and computes a probability per flat, with its margin of error.
+
+27
+00:04:52.634 --> 00:05:03.151
+It only says ninety-eight percent when two independent sources agree; over two hundred simulations, it was right every time it said so. And it paints it over the camera, in layers.
+
+28
+00:05:04.751 --> 00:05:15.589
+At Adamuz, according to a Guardia Civil report that Adif disputes, the track circuit logged a voltage drop about twenty-two hours earlier, with no alarm, because it stayed above the threshold.
+
+29
+00:05:15.939 --> 00:05:31.320
+SENDA compares each circuit with its own history and proposes an inspection. It adds track geometry measured with passengers' phones, curves without speed supervision, and walls under heavy rain. The data are synthetic; the official investigation will decide.
+
+30
+00:05:32.920 --> 00:05:39.491
+In a wildfire, SENDA computes how the fire spreads with wind and slope, and crosses it with the mobile phone masts.
+
+31
+00:05:39.841 --> 00:05:51.190
+In this scenario, a town's mast burns one hundred and seven minutes before its warning deadline. The alert must go out earlier, or through neighbours, LoRa and satellite once coverage is gone.
+
+32
+00:05:52.790 --> 00:06:02.582
+Only a coordinator holding a credential signed by their agency can trigger anything on your phone, and only if you authorised it and an emergency has been declared.
+
+33
+00:06:02.932 --> 00:06:11.017
+A trapped person presses one button, the reply travels encrypted from neighbour to neighbour, and the coordinator sees it on a floor-by-floor board.
+
+34
+00:06:12.617 --> 00:06:17.545
+For those who need it, easy mode: three big buttons. I'm safe, I need help, I'm trapped.
+
+35
+00:06:17.895 --> 00:06:22.162
+And every screen passes an automatic accessibility check on every change.
+
+36
+00:06:23.762 --> 00:06:35.325
+This is how SENDA is built inside, in five layers. At the bottom, everything that measures or moves data: microphone, accelerometer, barometer, Bluetooth, Wi-Fi, drones and satellites.
+
+37
+00:06:35.675 --> 00:06:47.877
+Above them, the bearers: sound, local network, mules, LoRa and satellite. In the middle, the core, which lives inside the phone itself: it encrypts, chooses the route, splits messages and fuses the evidence.
+
+38
+00:06:48.227 --> 00:06:58.958
+And at the top, the apps and the recipients: family, rescue teams, 112 and agencies. Every piece shows its real status on the website: tested, simulated or pending.
+
+39
+00:07:00.558 --> 00:07:08.942
+Nothing you have seen is hand-animated. Every simulation in this film is computed, frame by frame, by the same code the phone will run.
+
+40
+00:07:09.292 --> 00:07:15.884
+That code checks itself on every change, and the numbers you see here are the same ones the automated tests produce.
+
+41
+00:07:16.234 --> 00:07:26.602
+That is why you can open the website, press the same buttons and get the same results. For the person using it, it all comes down to one tap: call, ask for help, or say you are safe.
+
+42
+00:07:28.202 --> 00:07:39.445
+And it's ready to deploy: a self-hosted relay in Docker that the agency itself controls, an Android app for a Bluetooth beacon and Wi-Fi sweeps, and a low-cost accessory for drones and masts.
+
+43
+00:07:39.795 --> 00:07:45.128
+The same formats are tested in three programming languages, so nothing breaks between the parts.
+
+44
+00:07:46.728 --> 00:07:56.989
+Everything is machine-verified on every change: two hundred and sixty-six core tests, and forty-nine end-to-end checks in real browsers, almost all with the network cut.
+
+45
+00:07:57.339 --> 00:08:06.129
+What is missing, we say: field pilots with physical phones and rescue teams, an independent security audit, and certification for public procurement.
+
+46
+00:08:07.729 --> 00:08:11.441
+Security is not a promise. It is a chain you can inspect.
+
+47
+00:08:11.791 --> 00:08:16.185
+Messages are encrypted end to end. Receipts are signed into a hash chain.
+
+48
+00:08:16.535 --> 00:08:20.034
+The identity key is bound to the card and exported encrypted.
+
+49
+00:08:20.384 --> 00:08:26.336
+The core has more than two hundred and sixty automated tests, and the custody protocol has its own suite.
+
+50
+00:08:26.686 --> 00:08:33.747
+That proves the code does what the tests check. It does not prove field performance, and no external audit has certified it yet.
+
+51
+00:08:35.347 --> 00:08:45.459
+SENDA is for citizens, coordinators, police and emergency services, public administrations, and anyone who wants to invest in making sure no message is lost.
+
+52
+00:08:45.809 --> 00:08:49.116
+Try it now, with nothing to install, at the address on screen.

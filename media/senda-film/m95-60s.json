@@ -1,0 +1,195 @@
+{
+ "note": "SENDA Mission 9.5 · Corte técnico 60s (s1 + s4 + s9 + s13)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "s1",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/public/senda/dgt.html",
+    "docs/video/M95_VIDEO_SOURCES.md"
+   ],
+   "visual": {
+    "kind": "kpis",
+    "kpis": [
+     {
+      "v": "90 % → 40 %",
+      "l": {
+       "es": "usuarios con conexión estable · apagón ibérico 28-04-2025",
+       "en": "users with a stable connection · Iberian blackout 28-04-2025",
+       "nl": "gebruikers met stabiele verbinding · Iberische stroomstoring 28-04-2025"
+      }
+     },
+     {
+      "v": "20:11",
+      "l": {
+       "es": "llega el ES-Alert · DANA de Valencia, 29-10-2024",
+       "en": "ES-Alert arrives · Valencia floods, 29-10-2024",
+       "nl": "ES-Alert komt aan · overstroming Valencia, 29-10-2024"
+      }
+     }
+    ]
+   },
+   "title": {
+    "es": "Cuando cae la red, el mensaje no debería morir.",
+    "en": "When the network falls, the message shouldn't die.",
+    "nl": "Als het netwerk uitvalt, mag het bericht niet sterven."
+   },
+   "es": [
+    "Cuando cae la red, el mensaje no debería morir.",
+    "El veintiocho de abril de dos mil veinticinco, la red móvil no cayó al irse la luz: cayó cuando se agotaron las baterías de las antenas. En pocas horas, los usuarios con conexión estable pasaron del noventa al cuarenta por ciento."
+   ],
+   "es_say": [
+    "Cuando cae la red, el mensaje no debería morir.",
+    "El veintiocho de abril de dos mil veinticinco, la red móvil no cayó al irse la luz: cayó cuando se agotaron las baterías de las antenas. En pocas horas, los usuarios con conexión estable pasaron del noventa al cuarenta por ciento."
+   ],
+   "en": [
+    "When the network falls, the message shouldn't die.",
+    "On the twenty-eighth of April, twenty twenty-five, Spain's mobile network didn't fail when the power went out. It failed when the batteries in the masts ran dry. Within hours, users with a stable connection dropped from ninety to forty percent."
+   ],
+   "en_say": [
+    "When the network falls, the message shouldn't die.",
+    "On the twenty-eighth of April, twenty twenty-five, Spain's mobile network didn't fail when the power went out. It failed when the batteries in the masts ran dry. Within hours, users with a stable connection dropped from ninety to forty percent."
+   ],
+   "nl": [
+    "Als het netwerk uitvalt, mag het bericht niet sterven.",
+    "Op 28 april 2025 viel het Spaanse mobiele netwerk niet uit toen de stroom wegviel, maar toen de accu's van de zendmasten leeg raakten. Binnen enkele uren daalde het aandeel gebruikers met een stabiele verbinding van negentig naar veertig procent."
+   ]
+  },
+  {
+   "id": "s4",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/erasure.mjs",
+    "packages/senda/src/multichannel.mjs"
+   ],
+   "visual": {
+    "kind": "shots",
+    "images": [
+     "e2e-12-red-multiportador.png"
+    ],
+    "crop": "top",
+    "kpis": [
+     {
+      "v": "99,09 %",
+      "l": {
+       "es": "probabilidad exacta de entrega",
+       "en": "exact delivery probability",
+       "nl": "exacte afleverkans"
+      }
+     },
+     {
+      "v": "197/200",
+      "l": {
+       "es": "reconstruidos perdiendo portadores al azar",
+       "en": "rebuilt while losing random bearers",
+       "nl": "hersteld bij willekeurig verlies van dragers"
+      }
+     }
+    ]
+   },
+   "title": {
+    "es": "Un mensaje, muchos caminos a la vez",
+    "en": "One message, many paths at once",
+    "nl": "Eén bericht, vele routes tegelijk"
+   },
+   "es": [
+    "Lo que nadie hace todavía: SENDA trocea cada mensaje con codificación Reed-Solomon y reparte los fragmentos entre portadores distintos. Basta con que lleguen unos cuantos, cualesquiera, para reconstruirlo.",
+    "Con satélite, LoRa, SMS y vecinos, un SOS alcanza un noventa y nueve por ciento de probabilidad de entrega, calculada de forma exacta. En la prueba real, ciento noventa y siete de doscientos mensajes se reconstruyeron byte a byte, perdiendo portadores al azar."
+   ],
+   "es_say": [
+    "Lo que nadie hace todavía: Senda trocea cada mensaje con codificación Rid Sólomon y reparte los fragmentos entre portadores distintos. Basta con que lleguen unos cuantos, cualesquiera, para reconstruirlo.",
+    "Con satélite, Lora, SMS y vecinos, un ese o ese alcanza un noventa y nueve por ciento de probabilidad de entrega, calculada de forma exacta. En la prueba real, ciento noventa y siete de doscientos mensajes se reconstruyeron byte a byte, perdiendo portadores al azar."
+   ],
+   "en": [
+    "What nobody does yet: SENDA splits every message with Reed-Solomon coding and spreads the fragments across different bearers. Any few of them arriving is enough to rebuild it.",
+    "With satellite, LoRa, SMS and neighbours, an SOS reaches a ninety-nine percent delivery probability, calculated exactly. In the live trial, one hundred and ninety-seven of two hundred messages were rebuilt byte for byte while bearers were dropped at random."
+   ],
+   "en_say": [
+    "What nobody does yet: Senda splits every message with Reed-Solomon coding and spreads the fragments across different bearers. Any few of them arriving is enough to rebuild it.",
+    "With satellite, LOR-ah, S M S and neighbours, an S O S reaches a ninety-nine percent delivery probability, calculated exactly. In the live trial, one hundred and ninety-seven of two hundred messages were rebuilt byte for byte while bearers were dropped at random."
+   ],
+   "nl": [
+    "Wat nog niemand doet: SENDA splitst elk bericht met Reed-Solomon-codering en verdeelt de fragmenten over verschillende dragers. Een paar willekeurige fragmenten zijn genoeg om het te herstellen.",
+    "Met satelliet, LoRa, sms en buren haalt een SOS een afleverkans van negenennegentig procent, exact berekend. In de live test werden honderdzevenennegentig van de tweehonderd berichten byte voor byte hersteld terwijl dragers willekeurig wegvielen."
+   ]
+  },
+  {
+   "id": "s9",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/warrant.mjs",
+    "packages/senda/src/pci-envelope.mjs"
+   ],
+   "visual": {
+    "kind": "shots",
+    "images": [
+     "e2e-10-signed-alert.png",
+     "e2e-11-coordinator-board.png"
+    ]
+   },
+   "title": {
+    "es": "Confianza: firma, consentimiento y zona",
+    "en": "Trust: signature, consent and zone",
+    "nl": "Vertrouwen: handtekening, toestemming en zone"
+   },
+   "es": [
+    "Solo un coordinador con credencial firmada por su organismo puede activar algo en tu teléfono, y solo si tú lo autorizaste y hay una emergencia declarada."
+   ],
+   "es_say": [
+    "Solo un coordinador con credencial firmada por su organismo puede activar algo en tu teléfono, y solo si tú lo autorizaste y hay una emergencia declarada."
+   ],
+   "en": [
+    "Only a coordinator holding a credential signed by their agency can trigger anything on your phone, and only if you authorised it and an emergency has been declared."
+   ],
+   "en_say": [
+    "Only a coordinator holding a credential signed by their agency can trigger anything on your phone, and only if you authorised it and an emergency has been declared."
+   ],
+   "nl": [
+    "Alleen een coördinator met een door de eigen organisatie ondertekend bewijs kan iets op je telefoon activeren, en alleen als jij dat hebt toegestaan en er een noodsituatie is afgekondigd."
+   ]
+  },
+  {
+   "id": "s13",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/app/senda-home.tsx",
+    "LICENSE"
+   ],
+   "visual": {
+    "kind": "cta"
+   },
+   "title": {
+    "es": "Para que ningún mensaje se pierda",
+    "en": "So that no message is lost",
+    "nl": "Zodat geen enkel bericht verloren gaat"
+   },
+   "es": [
+    "Pruébalo ahora, sin instalar nada, en la dirección que ves en pantalla."
+   ],
+   "es_say": [
+    "Pruébalo ahora, sin instalar nada, en la dirección que ves en pantalla."
+   ],
+   "en": [
+    "Try it now, with nothing to install, at the address on screen."
+   ],
+   "en_say": [
+    "Try it now, with nothing to install, at the address on screen."
+   ],
+   "nl": [
+    "Probeer het nu, zonder iets te installeren, op het adres in beeld."
+   ]
+  }
+ ]
+}

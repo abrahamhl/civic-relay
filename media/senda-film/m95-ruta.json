@@ -1,0 +1,453 @@
+{
+ "note": "SENDA Mission 9.5 · vídeo «Ruta protectora, cámaras, Países Bajos y DGT» (m95-ruta). Escenas «page» grabadas desde las páginas reales (?film=1&viz=…&lang=en) con lienzos 100 % en inglés y etiquetas de simulación visibles.",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "r0",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/public/senda/carretera.html",
+    "docs/video/M95_VIDEO_SOURCES.md"
+   ],
+   "visual": {
+    "kind": "arch3d"
+   },
+   "title": {
+    "es": "Ruta protectora: SENDA en la carretera",
+    "en": "Protective route: SENDA on the road",
+    "nl": "Beschermende route: SENDA op de weg"
+   },
+   "es": [
+    "En España murieron 1.119 personas en vías interurbanas en 2025. La mayoría, en carreteras de un carril por sentido, con poco tráfico y poca cobertura.",
+    "SENDA va contigo en el viaje: avisa de lo que no ves, pide ayuda aunque no haya red y te guía si te paras a ayudar. Nunca sustituye tu atención ni el 112."
+   ],
+   "es_say": [
+    "En España murieron mil ciento diecinueve personas en vías interurbanas en dos mil veinticinco. La mayoría, en carreteras de un carril por sentido, con poco tráfico y poca cobertura.",
+    "Senda va contigo en el viaje: avisa de lo que no ves, pide ayuda aunque no haya red y te guía si te paras a ayudar. Nunca sustituye tu atención ni el ciento doce."
+   ],
+   "en": [
+    "In Spain, 1,119 people died on interurban roads in 2025. Most of them on roads with one lane in each direction, little traffic and poor coverage.",
+    "SENDA travels with you: it warns you of what you can't see, calls for help even with no network and guides you if you stop to help. SENDA never replaces 112, or your attention on the road."
+   ],
+   "en_say": [
+    "In Spain, one thousand, one hundred and nineteen people died on interurban roads in twenty twenty-five. Most of them on roads with one lane in each direction, little traffic and poor coverage.",
+    "Senda travels with you: it warns you of what you can't see, calls for help even with no network, and guides you if you stop to help. Senda never replaces one one two, or your attention on the road."
+   ],
+   "nl": [
+    "In Spanje kwamen in 2025 1.119 mensen om op wegen buiten de bebouwde kom. De meesten op wegen met één rijstrook per richting, weinig verkeer en slecht bereik.",
+    "SENDA reist met je mee: het waarschuwt voor wat je niet ziet, vraagt hulp zonder bereik en begeleidt je als je stopt om te helpen. SENDA vervangt nooit 112, of je aandacht op de weg."
+   ]
+  },
+  {
+   "id": "r1",
+   "claim": "SIMULATED",
+   "source": [
+    "investor-next/public/senda/carretera.html",
+    "packages/senda/src/road.mjs"
+   ],
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=cadena"
+   },
+   "title": {
+    "es": "La frenada que no ves",
+    "en": "The braking you can't see",
+    "nl": "Het remmen dat je niet ziet"
+   },
+   "es": [
+    "Niebla, 120 km/h y 1,2 segundos entre coches. Cada conductor reacciona a las luces del de delante y el retraso se suma: cinco coches chocan en cadena.",
+    "Con SENDA, el móvil del primero detecta la frenada por la velocidad del GPS y avisa a todos a la vez. Solo choca el que va pegado justo detrás: eso solo lo arregla la distancia de seguridad."
+   ],
+   "es_say": [
+    "Niebla, ciento veinte kilómetros por hora y uno coma dos segundos entre coches. Cada conductor reacciona a las luces del de delante y el retraso se suma: cinco coches chocan en cadena.",
+    "Con Senda, el móvil del primero detecta la frenada por la velocidad del GPS y avisa a todos a la vez. Solo choca el que va pegado justo detrás: eso solo lo arregla la distancia de seguridad."
+   ],
+   "en": [
+    "Fog, 120 km/h and 1.2 seconds between cars. Each driver reacts to the brake lights ahead and the delays add up: five cars crash in a chain.",
+    "With SENDA, the first car's phone detects the braking from its GPS speed and warns everyone at once. Only the car tailgating right behind still crashes: only a safe distance fixes that."
+   ],
+   "en_say": [
+    "Fog, a hundred and twenty kilometres an hour, and one point two seconds between cars. Each driver reacts to the brake lights ahead, and the delays add up: five cars crash in a chain.",
+    "With Senda, the first car's phone detects the braking from its G P S speed and warns everyone at once. Only the car tailgating right behind still crashes: only a safe distance fixes that."
+   ],
+   "nl": [
+    "Mist, 120 km/u en 1,2 seconde tussen auto's. Elke bestuurder reageert op de remlichten voor zich en de vertraging telt op: vijf auto's botsen op elkaar.",
+    "Met SENDA detecteert de eerste telefoon het harde remmen via de GPS-snelheid en waarschuwt iedereen tegelijk. Alleen wie direct bumperkleeft botst nog: dat lost alleen volgafstand op."
+   ]
+  },
+  {
+   "id": "r2",
+   "claim": "SIMULATED",
+   "source": [
+    "investor-next/public/senda/carretera.html",
+    "packages/senda/src/road.mjs"
+   ],
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=sos"
+   },
+   "title": {
+    "es": "Sin cobertura, el SOS viaja con los coches",
+    "en": "No coverage: the SOS rides with the cars",
+    "nl": "Geen bereik: de SOS reist met de auto's mee"
+   },
+   "es": [
+    "Un accidente de noche en 18 kilómetros sin ninguna red. El móvil del coche accidentado anuncia el SOS y cualquier coche con SENDA que pase se lo lleva.",
+    "Con solo uno de cada diez coches, el aviso sale en unos siete minutos. Y los que vienen de frente avisan a quienes van hacia el accidente."
+   ],
+   "es_say": [
+    "Un accidente de noche en dieciocho kilómetros sin ninguna red. El móvil del coche accidentado anuncia el SOS y cualquier coche con Senda que pase se lo lleva.",
+    "Con solo uno de cada diez coches, el aviso sale en unos siete minutos. Y los que vienen de frente avisan a quienes van hacia el accidente."
+   ],
+   "en": [
+    "A night-time crash on 18 kilometres of road with no network at all. The crashed car's phone broadcasts the SOS, and any passing car with SENDA picks it up and carries it.",
+    "In this simulation, with only one car in ten running SENDA, the alert gets out in about seven minutes. And oncoming cars warn the drivers heading towards the crash."
+   ],
+   "en_say": [
+    "A night-time crash on eighteen kilometres of road with no network at all. The crashed car's phone broadcasts the S O S, and any passing car with Senda picks it up and carries it.",
+    "In this simulation, with only one car in ten running Senda, the alert gets out in about seven minutes. And oncoming cars warn the drivers heading towards the crash."
+   ],
+   "nl": [
+    "Een nachtelijk ongeval op 18 kilometer zonder enig bereik. De telefoon in de verongelukte auto zendt een SOS uit en elke passerende auto met SENDA neemt het mee.",
+    "In deze simulatie, met slechts één op de tien auto's met SENDA, komt de melding in ongeveer zeven minuten naar buiten. En tegenliggers waarschuwen wie op het ongeval afrijdt."
+   ]
+  },
+  {
+   "id": "r3",
+   "claim": "SIMULATED",
+   "source": [
+    "investor-next/public/senda/carretera.html",
+    "packages/senda/src/road.mjs"
+   ],
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=pk"
+   },
+   "title": {
+    "es": "Dónde estás, en el idioma del 112",
+    "en": "Where you are, in the words 112 needs",
+    "nl": "Waar je bent, in de woorden die 112 nodig heeft"
+   },
+   "es": [
+    "El GPS funciona sin Internet. Lo que falta es saber qué decir: carretera, punto kilométrico y sentido.",
+    "SENDA lo calcula sin red, añade la referencia visible más cercana, como un aerogenerador, y sigue tu posición dentro de un túnel."
+   ],
+   "es_say": [
+    "El GPS funciona sin Internet. Lo que falta es saber qué decir: carretera, punto kilométrico y sentido.",
+    "Senda lo calcula sin red, añade la referencia visible más cercana, como un aerogenerador, y sigue tu posición dentro de un túnel."
+   ],
+   "en": [
+    "GPS works without the Internet. What's missing is knowing what to say: road, kilometre point and direction.",
+    "SENDA works it out with no network, adds the nearest visible landmark, such as a wind turbine, and keeps tracking you inside a tunnel. The road shown is invented, for the demo."
+   ],
+   "en_say": [
+    "G P S works without the internet. What's missing is knowing what to say: road, kilometre point, and direction.",
+    "Senda works it out with no network, adds the nearest visible landmark, such as a wind turbine, and keeps tracking you inside a tunnel. The road shown is invented, for the demo."
+   ],
+   "nl": [
+    "GPS werkt zonder internet. Wat ontbreekt is weten wat je moet zeggen: wegnummer, hectometerpaal en rijrichting.",
+    "SENDA berekent dit offline, voegt het dichtstbijzijnde zichtbare herkenningspunt toe, zoals een windturbine, en volgt je positie in een tunnel. De getoonde weg is verzonnen, voor de demo."
+   ]
+  },
+  {
+   "id": "r4",
+   "claim": "SIMULATED",
+   "source": [
+    "investor-next/public/senda/carretera.html",
+    "packages/senda/src/road.mjs"
+   ],
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=escena"
+   },
+   "title": {
+    "es": "Te paras a ayudar",
+    "en": "You stop to help",
+    "nl": "Je stopt om te helpen"
+   },
+   "es": [
+    "Quien se para puede coordinar la escena con la conducta de la DGT: proteger, avisar y socorrer. Cada tarea la confirma otra persona.",
+    "Cuando llega la Guardia Civil, asume el mando y recibe el resumen. Las acciones confirmadas suman puntos cívicos en un registro que no se puede alterar."
+   ],
+   "es_say": [
+    "Quien se para puede coordinar la escena con la conducta de la DGT: proteger, avisar y socorrer. Cada tarea la confirma otra persona.",
+    "Cuando llega la Guardia Civil, asume el mando y recibe el resumen. Las acciones confirmadas suman puntos cívicos en un registro que no se puede alterar."
+   ],
+   "en": [
+    "Whoever stops can coordinate the scene using the DGT's routine: protect, alert and help. Each task is confirmed by another person.",
+    "When the Guardia Civil arrives, it takes command and receives the summary. Confirmed actions earn civic points in a record that cannot be altered."
+   ],
+   "en_say": [
+    "Whoever stops can coordinate the scene using the D G T's routine: protect, alert, and help. Each task is confirmed by another person.",
+    "When the Guardia Civil arrives, it takes command and receives the summary. Confirmed actions earn civic points in a record that cannot be altered."
+   ],
+   "nl": [
+    "Wie stopt kan de plek van het ongeval coördineren volgens de werkwijze van de DGT: beveiligen, alarmeren en helpen. Elke taak wordt door een tweede persoon bevestigd.",
+    "Wanneer de Guardia Civil arriveert, neemt zij de leiding over en ontvangt het overzicht. Bevestigde acties leveren burgerpunten op in een logboek dat niet te wijzigen is."
+   ]
+  },
+  {
+   "id": "r5",
+   "claim": "SIMULATED",
+   "source": [
+    "investor-next/public/senda/carretera.html",
+    "packages/senda/src/road.mjs"
+   ],
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=kamikaze"
+   },
+   "title": {
+    "es": "Un coche en sentido contrario",
+    "en": "A car going the wrong way",
+    "nl": "Een spookrijder op de snelweg"
+   },
+   "es": [
+    "El primero en saberlo es el móvil de quien se equivoca: tres posiciones seguidas contra el sentido de la calzada bastan para avisarle.",
+    "Los que vienen de frente reciben el tiempo que falta para cruzarse y qué hacer: carril derecho y reducir."
+   ],
+   "es_say": [
+    "El primero en saberlo es el móvil de quien se equivoca: tres posiciones seguidas contra el sentido de la calzada bastan para avisarle.",
+    "Los que vienen de frente reciben el tiempo que falta para cruzarse y qué hacer: carril derecho y reducir."
+   ],
+   "en": [
+    "The first to know is the phone of the driver who made the mistake: three positions in a row against the direction of the carriageway are enough to warn them.",
+    "Oncoming drivers get the time left before they meet and what to do: keep to the right-hand lane and slow down."
+   ],
+   "en_say": [
+    "The first to know is the phone of the driver who made the mistake: three positions in a row against the direction of the carriageway are enough to warn them.",
+    "Oncoming drivers get the time left before they meet, and what to do: keep to the right-hand lane and slow down."
+   ],
+   "nl": [
+    "De eerste die het weet is de telefoon van de spookrijder zelf: drie opeenvolgende posities tegen de rijrichting in volstaan om hem te waarschuwen.",
+    "Tegenliggers krijgen de tijd tot de kruising en wat ze moeten doen: rechts houden en afremmen."
+   ]
+  },
+  {
+   "id": "r6",
+   "claim": "SIMULATED",
+   "source": [
+    "investor-next/public/senda/carretera.html",
+    "packages/senda/src/road.mjs"
+   ],
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=retencion"
+   },
+   "title": {
+    "es": "El final de la cola se mueve",
+    "en": "The end of the queue moves",
+    "nl": "De staart van de file beweegt"
+   },
+   "es": [
+    "El final de una retención crece hacia atrás. Con la teoría de tráfico, SENDA calcula a qué velocidad.",
+    "Así te avisa de dónde estará la cola cuando llegues, no de dónde estaba, y reduces mucho antes."
+   ],
+   "es_say": [
+    "El final de una retención crece hacia atrás. Con la teoría de tráfico, Senda calcula a qué velocidad.",
+    "Así te avisa de dónde estará la cola cuando llegues, no de dónde estaba, y reduces mucho antes."
+   ],
+   "en": [
+    "The end of a traffic jam grows backwards. Using traffic-flow theory, SENDA calculates how fast.",
+    "So it warns you where the queue will be when you get there, not where it was, and you slow down much earlier."
+   ],
+   "en_say": [
+    "The end of a traffic jam grows backwards. Using traffic-flow theory, Senda calculates how fast.",
+    "So it warns you where the queue will be when you get there, not where it was, and you slow down much earlier."
+   ],
+   "nl": [
+    "De staart van een file groeit achteruit. Met verkeersstroomtheorie berekent SENDA hoe snel die schokgolf beweegt.",
+    "Zo waarschuwt het waar de filestaart zal zijn wanneer jij aankomt, niet waar die was, zodat je veel eerder afremt."
+   ]
+  },
+  {
+   "id": "r7",
+   "claim": "SIMULATED",
+   "source": [
+    "investor-next/public/senda/camaras.html",
+    "packages/senda/src/visibility.mjs"
+   ],
+   "visual": {
+    "kind": "page",
+    "src": "/senda/camaras?film=1&viz=niebla"
+   },
+   "title": {
+    "es": "Cuánto se ve, medido en una cámara",
+    "en": "How far you can see, measured by a camera",
+    "nl": "Hoe ver je kunt zien, gemeten met een camera"
+   },
+   "es": [
+    "SENDA usa solo cámaras públicas publicadas para reutilizarse, y solo para medir el estado de la vía, nunca a las personas.",
+    "Con un objeto oscuro a distancia conocida calcula la visibilidad en metros y la velocidad para poder parar dentro de lo que se ve. Esta imagen es sintética, para comprobar el método."
+   ],
+   "es_say": [
+    "Senda usa solo cámaras públicas publicadas para reutilizarse, y solo para medir el estado de la vía, nunca a las personas.",
+    "Con un objeto oscuro a distancia conocida calcula la visibilidad en metros y la velocidad para poder parar dentro de lo que se ve. Esta imagen es sintética, para comprobar el método."
+   ],
+   "en": [
+    "SENDA only uses public cameras released for reuse, and only to measure the state of the road, never people.",
+    "With a dark object at a known distance, it works out the visibility in metres and the speed at which you can stop within what you can see. This is a synthetic image, made to test the method."
+   ],
+   "en_say": [
+    "Senda only uses public cameras released for reuse, and only to measure the state of the road, never people.",
+    "With a dark object at a known distance, it works out the visibility in metres, and the speed at which you can stop within what you can see. This is a synthetic image, made to test the method."
+   ],
+   "nl": [
+    "SENDA gebruikt alleen openbare verkeerscamera's die zijn vrijgegeven voor hergebruik, en alleen om de wegcondities te meten, nooit personen.",
+    "Met een donker referentiepunt op bekende afstand berekent het het zicht in meters en de snelheid om binnen het zicht te kunnen stoppen. Dit is een synthetisch beeld, gemaakt om de methode te testen."
+   ]
+  },
+  {
+   "id": "r8",
+   "claim": "CALCULATED",
+   "source": [
+    "investor-next/public/senda/paises.html",
+    "packages/senda/src/datex.mjs"
+   ],
+   "visual": {
+    "kind": "page",
+    "src": "/senda/paises?film=1&viz=msi"
+   },
+   "title": {
+    "es": "Países Bajos: la cruz roja sobre tu carril",
+    "en": "Netherlands: the red cross over your lane",
+    "nl": "Nederland: het rode kruis boven je rijstrook"
+   },
+   "es": [
+    "El 112 y la información de tráfico en DATEX II son comunes en toda la Unión Europea. Por eso el mismo núcleo sirve en Países Bajos.",
+    "Allí, una cruz roja sobre el carril significa carril cerrado. SENDA lo lee de los datos abiertos y te lo dice en neerlandés."
+   ],
+   "es_say": [
+    "El ciento doce y la información de tráfico en DATEX dos son comunes en toda la Unión Europea. Por eso el mismo núcleo sirve en Países Bajos.",
+    "Allí, una cruz roja sobre el carril significa carril cerrado. Senda lo lee de los datos abiertos y te lo dice en neerlandés."
+   ],
+   "en": [
+    "112 and DATEX II traffic information are common across the whole European Union. That is why the same core works in the Netherlands.",
+    "There, a red cross over a lane means the lane is closed. SENDA reads it from open data and tells you in Dutch."
+   ],
+   "en_say": [
+    "One one two and DATEX two traffic information are common across the whole European Union. That is why the same core works in the Netherlands.",
+    "There, a red cross over a lane means the lane is closed. Senda reads it from open data and tells you in Dutch."
+   ],
+   "nl": [
+    "Zowel 112 als verkeersinformatie in DATEX II zijn gemeenschappelijk in de hele Europese Unie. Daarom werkt precies dezelfde kern ook in Nederland.",
+    "Daar betekent een rood kruis boven de rijstrook dat de strook gesloten is. SENDA leest dit uit open data en spreekt de waarschuwing in het Nederlands uit."
+   ]
+  },
+  {
+   "id": "r9",
+   "claim": "CALCULATED",
+   "source": [
+    "investor-next/public/senda/dgt.html",
+    "packages/senda/src/datex.mjs"
+   ],
+   "visual": {
+    "kind": "page",
+    "src": "/senda/dgt?film=1&viz=detectores"
+   },
+   "title": {
+    "es": "La infraestructura de la DGT, como dato",
+    "en": "DGT infrastructure, as data",
+    "nl": "DGT-infrastructuur als data"
+   },
+   "es": [
+    "Radares, paneles y estaciones de aforo no son radios que podamos usar: cada uno habla con la DGT por un canal cerrado. Detectar radares, además, está prohibido.",
+    "SENDA suma lo que la DGT publica. Por ejemplo, las medidas de las estaciones de aforo dicen dónde empieza la cola y a qué velocidad crece."
+   ],
+   "es_say": [
+    "Radares, paneles y estaciones de aforo no son radios que podamos usar: cada uno habla con la DGT por un canal cerrado. Detectar radares, además, está prohibido.",
+    "Senda suma lo que la DGT publica. Por ejemplo, las medidas de las estaciones de aforo dicen dónde empieza la cola y a qué velocidad crece."
+   ],
+   "en": [
+    "Speed radars, message signs and traffic counting stations are not radios we can use: each one talks to the DGT over a closed channel. Detecting speed radars is also prohibited.",
+    "SENDA adds up what the DGT publishes. In this example, readings from the counting stations show where the queue starts and how fast it grows."
+   ],
+   "en_say": [
+    "Speed radars, message signs and traffic counting stations are not radios we can use: each one talks to the D G T over a closed channel. Detecting speed radars is also prohibited.",
+    "Senda adds up what the D G T publishes. In this example, readings from the counting stations show where the queue starts, and how fast it grows."
+   ],
+   "nl": [
+    "Snelheidsradars, matrixborden en telpunten zijn geen radio's die we kunnen gebruiken: elk praat via een gesloten lijn met de DGT. Snelheidsradars detecteren is bovendien verboden.",
+    "SENDA telt op wat de DGT publiceert. In dit voorbeeld laten metingen van telpunten zien waar de file begint en hoe snel die groeit."
+   ]
+  },
+  {
+   "id": "r10",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/public/senda/carretera.html",
+    "docs/audits/SENDA_MISSION_95_STATUS.md"
+   ],
+   "visual": {
+    "kind": "verify"
+   },
+   "title": {
+    "es": "Comprobado, y lo que falta",
+    "en": "Verified, and what is missing",
+    "nl": "Geverifieerd, en wat er nog ontbreekt"
+   },
+   "es": [
+    "Todo lo que has visto lo calcula el mismo núcleo de la app, con pruebas automáticas que se ejecutan sin red.",
+    "Falta lo más importante: ensayos en carretera real, la app nativa para el aviso entre coches y los convenios con la DGT."
+   ],
+   "es_say": [
+    "Todo lo que has visto lo calcula el mismo núcleo de la app, con pruebas automáticas que se ejecutan sin red.",
+    "Falta lo más importante: ensayos en carretera real, la app nativa para el aviso entre coches y los convenios con la DGT."
+   ],
+   "en": [
+    "Everything you have seen is calculated by the app's own core, with automated tests that run offline.",
+    "The most important part is still missing: trials on real roads, the native app for car-to-car alerts and agreements with the DGT."
+   ],
+   "en_say": [
+    "Everything you have seen is calculated by the app's own core, with automated tests that run offline.",
+    "The most important part is still missing: trials on real roads, the native app for car-to-car alerts, and agreements with the D G T."
+   ],
+   "nl": [
+    "Alles wat je hebt gezien wordt berekend door dezelfde kern van de app, met automatische tests die volledig offline draaien.",
+    "Het belangrijkste ontbreekt nog: proeven op echte wegen, de native app voor waarschuwingen tussen auto's en afspraken met de DGT."
+   ]
+  },
+  {
+   "id": "r11",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/app/senda-home.tsx",
+    "LICENSE"
+   ],
+   "visual": {
+    "kind": "cta"
+   },
+   "title": {
+    "es": "SENDA",
+    "en": "SENDA",
+    "nl": "SENDA"
+   },
+   "es": [
+    "SENDA: el canal que queda cuando falla todo lo demás. Pruébalo en la web."
+   ],
+   "es_say": [
+    "Senda: el canal que queda cuando falla todo lo demás. Pruébalo en la web."
+   ],
+   "en": [
+    "SENDA: the channel that remains when everything else fails. Try it on the web."
+   ],
+   "en_say": [
+    "Senda: the channel that remains when everything else fails. Try it on the web."
+   ],
+   "nl": [
+    "SENDA: het kanaal dat overblijft wanneer al het andere uitvalt. Probeer het op het web."
+   ]
+  }
+ ]
+}

@@ -23,8 +23,16 @@ export function rssiToDistanceM(rssi, { txPower1m = -59, n = 3.2 } = {}) {
  * @returns {{x,y,z,errorM,reads}|null}
  */
 export function locateBeacon(reads, model = {}) {
-  if (reads.length < 3) return null;
-  const pts = reads.map((r) => ({ ...r, z: r.z ?? 0, d: rssiToDistanceM(r.rssi, model) }));
+  if (!Array.isArray(reads) || reads.length < 3) return null;
+  const pts = [];
+  for (const read of reads) {
+    const x = read?.x, y = read?.y, z = read?.z ?? 0, rssi = read?.rssi;
+    if (![x, y, z, rssi].every(Number.isFinite)) return null;
+    const d = rssiToDistanceM(rssi, model);
+    if (!Number.isFinite(d) || d <= 0) return null;
+    pts.push({ x, y, z, rssi, d });
+  }
+  if (anchorGeometryIsDegenerate(pts)) return null;
   let p = { x: pts.reduce((s, q) => s + q.x / q.d, 0) / pts.reduce((s, q) => s + 1 / q.d, 0),
     y: pts.reduce((s, q) => s + q.y / q.d, 0) / pts.reduce((s, q) => s + 1 / q.d, 0), z: Math.min(...pts.map((q) => q.z)) - 1 };
   for (let it = 0; it < 60; it++) {
@@ -35,9 +43,12 @@ export function locateBeacon(reads, model = {}) {
       const J = [dx / r, dy / r, dz / r], res = r - q.d;
       for (let i = 0; i < 3; i++) { Jtr[i] += w * J[i] * res; for (let j = 0; j < 3; j++) JtJ[i][j] += w * J[i] * J[j]; }
     }
+    if (!isFullRank3(JtJ)) return null;
     for (let i = 0; i < 3; i++) JtJ[i][i] += 1e-3; // amortiguación (Levenberg)
     const step = solve3(JtJ, Jtr);
-    p = { x: p.x - step[0], y: p.y - step[1], z: Math.min(0, p.z - step[2]) }; // la víctima no está por encima del suelo
+    if (!step || !step.every(Number.isFinite)) return null;
+    p = { x: p.x - step[0], y: p.y - step[1], z: Math.min(0, p.z - step[2]) };
+    if (![p.x, p.y, p.z].every(Number.isFinite)) return null; // la víctima no está por encima del suelo
     if (Math.hypot(...step) < 1e-4) break;
   }
   const residuals = pts.map((q) => Math.hypot(p.x - q.x, p.y - q.y, p.z - q.z) - q.d);
@@ -45,14 +56,44 @@ export function locateBeacon(reads, model = {}) {
   return { ...p, errorM: Math.max(0.5, rms * 1.5), reads: pts.length, model: 'LOG_DISTANCE_RSSI' };
 }
 
+function anchorGeometryIsDegenerate(pts) {
+  const unique = new Set(pts.map((q) => `${q.x}:${q.y}:${q.z}`));
+  if (unique.size < 3) return true;
+  const mx = pts.reduce((s, q) => s + q.x, 0) / pts.length;
+  const my = pts.reduce((s, q) => s + q.y, 0) / pts.length;
+  const mz = pts.reduce((s, q) => s + q.z, 0) / pts.length;
+  let xx = 0, xy = 0, xz = 0, yy = 0, yz = 0, zz = 0;
+  for (const q of pts) {
+    const x = q.x - mx, y = q.y - my, z = q.z - mz;
+    xx += x * x; xy += x * y; xz += x * z; yy += y * y; yz += y * z; zz += z * z;
+  }
+  const trace = xx + yy + zz;
+  if (!(trace > 0)) return true;
+  const second = xx * yy + xx * zz + yy * zz - xy * xy - xz * xz - yz * yz;
+  return second <= trace * trace * 1e-12;
+}
+
+function isFullRank3(A) {
+  const scale = Math.max(...A.flat().map((v) => Math.abs(v)));
+  if (!(scale > 0)) return false;
+  const det = A[0][0] * (A[1][1] * A[2][2] - A[1][2] * A[2][1])
+    - A[0][1] * (A[1][0] * A[2][2] - A[1][2] * A[2][0])
+    + A[0][2] * (A[1][0] * A[2][1] - A[1][1] * A[2][0]);
+  return Math.abs(det) > scale ** 3 * 1e-12;
+}
+
 function solve3(A, b) {
   const m = A.map((row, i) => [...row, b[i]]);
+  const scale = Math.max(...A.flat().map((v) => Math.abs(v)));
+  const eps = scale * 1e-12;
   for (let c = 0; c < 3; c++) {
     let piv = c; for (let r = c + 1; r < 3; r++) if (Math.abs(m[r][c]) > Math.abs(m[piv][c])) piv = r;
+    if (Math.abs(m[piv][c]) <= eps) return null;
     [m[c], m[piv]] = [m[piv], m[c]];
     for (let r = 0; r < 3; r++) if (r !== c) { const f = m[r][c] / m[c][c]; for (let k = c; k < 4; k++) m[r][k] -= f * m[c][k]; }
   }
-  return [m[0][3] / m[0][0], m[1][3] / m[1][1], m[2][3] / m[2][2]];
+  const out = [m[0][3] / m[0][0], m[1][3] / m[1][1], m[2][3] / m[2][2]];
+  return out.every(Number.isFinite) ? out : null;
 }
 
 /**
