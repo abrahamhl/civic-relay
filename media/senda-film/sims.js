@@ -31,7 +31,7 @@
     // dron: escenario y censo reales
     S.rf = { RF, sc: RF.rfCensusScenario(), cacheT: -1, r: null };
     S.mesh = VM;
-    if (window.THREE) { setupDrone(); setupArch(); }
+    if (window.THREE) { if (window.__NEED_DRONE !== false) setupDrone(); if (window.__NEED_ARCH !== false) setupArch(); }
     return true;
   }
 
@@ -47,12 +47,14 @@
 
   // ---------------------------------------------------------------- 1) LLAMAR SIN INTERNET
   function drawCall(cv, lt, d, cue) {
-    const g = cv.getContext('2d'), W = 640, H = 600, K = S.call; g.clearRect(0, 0, W, H);
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (cv.width !== Math.round(640 * dpr)) { cv.width = Math.round(640 * dpr); cv.height = Math.round(600 * dpr); }
+    const g = cv.getContext('2d'), W = 640, H = 600, K = S.call; g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     const c1 = cue(1), c2 = cue(2), A = { x: 10, y: 40, w: 190, h: 330 }, B = { x: 440, y: 40, w: 190, h: 330 };
     const sendP = clamp((lt - c1 - 1.2) / 6.5), linkP = ease((lt - c2) / 1.2), chainP = ease((lt - c2 - 7.5) / 1.5);
     // teléfono A
     const sdpP = ease((lt - 1.2) / 2.2), shrink = ease((lt - 3.6) / 1.4);
-    const aLines = [{ t: tr('Sin Internet · sin servidor', 'No Internet · no server') }];
+    const aLines = [{ t: tr('Sin Internet', 'No Internet') }, { t: tr('sin servidor', 'no server'), c: C.m }];
     if (lt > 0.8) aLines.push({ t: tr('▶ Crear llamada', '▶ Create call'), c: C.c, f: '700 14px Inter,system-ui' });
     phone(g, A.x, A.y, A.w, A.h, tr('Teléfono A', 'Phone A'), aLines, C.c);
     if (lt > 0.8 && lt < 1.6) { const r = 10 + (lt - 0.8) * 40; g.strokeStyle = `rgba(255,119,86,${1 - (lt - 0.8) / 0.8})`; g.lineWidth = 3; g.beginPath(); g.arc(A.x + 70, A.y + 100, r, 0, 7); g.stroke(); }
@@ -62,7 +64,7 @@
       g.globalAlpha = fadeCode;
       const n = Math.floor(14 * (1 - shrink)) + 1; g.font = '9px ui-monospace,monospace';
       for (let i = 0; i < n; i++) { g.fillStyle = `rgba(169,188,197,${0.7 * sdpP})`; g.fillText(K.sdp[i % K.sdp.length].slice(0, 30), A.x + 22, A.y + 130 + i * 11); }
-      label(g, tr('SDP real de Chrome: 2 056 caracteres', 'Real Chrome SDP: 2,056 characters'), A.x + 22, A.y + 300, C.m, '12px Inter,system-ui');
+      label(g, tr('SDP real: 2 056 caracteres', 'Chrome SDP: 2,056 chars'), A.x + 22, A.y + 300, C.m, '12px Inter,system-ui');
       if (shrink > 0) { g.fillStyle = `rgba(145,215,232,${shrink})`; rr(g, A.x + 20, A.y + 150, A.w - 40, 56, 8); g.fill(); label(g, `${K.bytes} bytes`, A.x + A.w / 2, A.y + 186, C.bg, '800 26px Inter,system-ui', 'center'); label(g, tr('código de llamada', 'call code'), A.x + A.w / 2, A.y + 226, C.i, '700 13px Inter,system-ui', 'center'); }
       g.globalAlpha = 1;
     }
@@ -79,15 +81,15 @@
     }
     const bLines = [{ t: tr('Escuchando…', 'Listening…') }];
     if (sendP > 0) bLines.push({ t: `${Math.round(sendP * 100)} %`, c: C.i, f: '700 22px Inter,system-ui' });
-    if (sendP >= 1) bLines.push({ t: K.ok ? tr(`✓ ${K.bytes} bytes, 0 errores`, `✓ ${K.bytes} bytes, 0 errors`) : '✗', c: C.e, f: '700 14px Inter,system-ui' }, { t: tr('Responde igual (72 bytes)', 'Replies the same way (72 bytes)') });
+    if (sendP >= 1) bLines.push({ t: K.ok ? tr(`✓ ${K.bytes} bytes, 0 errores`, `✓ ${K.bytes} bytes, 0 errors`) : '✗', c: C.e, f: '700 14px Inter,system-ui' }, { t: tr('Responde igual', 'Replies the same') }, { t: tr('72 bytes', '72 bytes'), c: C.m });
     phone(g, B.x, B.y, B.w, B.h, tr('Teléfono B', 'Phone B'), bLines, C.i);
     // enlace directo cifrado con voz y chat
     if (linkP > 0) {
       const y = 280; g.strokeStyle = `rgba(52,211,153,${linkP})`; g.lineWidth = 4; g.beginPath(); g.moveTo(A.x + A.w, y); g.lineTo(B.x, y); g.stroke();
-      label(g, tr('Directo · cifrado DTLS-SRTP · sin servidor', 'Direct · DTLS-SRTP encrypted · no server'), (A.x + A.w + B.x) / 2, y - 14, C.e, '700 12px Inter,system-ui', 'center');
+      label(g, tr('Directo · cifrado · sin servidor', 'Direct · encrypted · no server'), (A.x + A.w + B.x) / 2, y - 14, C.e, '700 12px Inter,system-ui', 'center');
       for (let k = 0; k < 6; k++) { const f = ((lt * 0.9 + k / 6) % 1), dir = k % 2 ? 1 : -1, x = dir > 0 ? A.x + A.w + f * (B.x - A.x - A.w) : B.x - f * (B.x - A.x - A.w); g.fillStyle = dir > 0 ? C.c : C.i; g.globalAlpha = linkP; g.beginPath(); g.arc(x, y, 4, 0, 7); g.fill(); g.globalAlpha = 1; }
       for (const [P, s] of [[A, 1.3], [B, 2.1]]) for (let k = 0; k < 14; k++) { const h = 6 + 22 * Math.abs(Math.sin(lt * 7 * s + k * 0.8)) * linkP; g.fillStyle = C.e; g.fillRect(P.x + 30 + k * 11, A.y + A.h - 36 - h, 7, h); }
-      const msgs = [[tr('¿Me oyes? 4.ª planta', 'Can you hear me? 4th floor'), A, 1.5], [tr('Te oigo. Vamos.', 'I hear you. Coming.'), B, 3.2]];
+      const msgs = [[tr('¿Me oyes? 4.ª planta', 'Hear me? 4th floor'), A, 1.5], [tr('Te oigo. Vamos.', 'I hear you. Coming.'), B, 3.2]];
       for (const [t, P, at] of msgs) { const p = ease((lt - c2 - at) / 0.6); if (p <= 0) continue; g.globalAlpha = p; g.fillStyle = P === A ? '#1b3a48' : '#123d2c'; rr(g, P.x + 18, A.y + 236, P.w - 36, 30, 10); g.fill(); label(g, t, P.x + 28, A.y + 256, C.t, '12px Inter,system-ui'); g.globalAlpha = 1; }
     }
     // cadena de voz A → B → C (resultado medido)
@@ -113,8 +115,9 @@
     sp.scale.set(scale, (scale * h) / w, 1); return sp;
   }
   function makeRenderer() {
-    const canvas = document.createElement('canvas'); canvas.width = 1280; canvas.height = 720; canvas.className = 'c3d';
-    const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true }); r.setPixelRatio(1); r.setSize(1280, 720, false); r.setClearColor(0x05090c, 1);
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const canvas = document.createElement('canvas'); canvas.width = Math.round(1280 * dpr); canvas.height = Math.round(720 * dpr); canvas.className = 'c3d';
+    const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true }); r.setPixelRatio(dpr); r.setSize(1280, 720, false); r.setClearColor(0x05090c, 1);
     return r;
   }
   const hash = (s) => { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0; return h; };
@@ -228,7 +231,7 @@
     const A = S.arch; if (!A) return;
     const focus = lt < cue(1) ? [0] : lt < cue(2) ? [1, 2] : [3, 4];
     A.layers.forEach((L, i) => { const on = focus.includes(i); L.plane.material.opacity = on ? 0.85 : 0.35; L.edge.material.opacity = on ? 0.9 : 0.25; L.boxes.forEach((b) => (b.material.opacity = on ? 1 : 0.45)); L.lab.material.opacity = on ? 1 : 0.5; });
-    A.paths.forEach((p, k) => { const f = ((lt * 0.11 + k * 0.27) % 1), pt = p.curve.getPointAt(f); p.pk.position.copy(pt); p.halo.position.copy(pt); p.halo.scale.setScalar(1 + 0.3 * Math.sin(lt * 6 + k)); p.line.material.opacity = 0.35 + 0.3 * ease((lt - 1) / 2); });
+    A.paths.forEach((p, k) => { const f = Math.min(0.999999, Math.max(0, ((Math.max(0, lt) * 0.11 + k * 0.27) % 1 + 1) % 1)), pt = p.curve.getPointAt(f); p.pk.position.copy(pt); p.halo.position.copy(pt); p.halo.scale.setScalar(1 + 0.3 * Math.sin(lt * 6 + k)); p.line.material.opacity = 0.35 + 0.3 * ease((lt - 1) / 2); });
     const ang = -0.45 + lt * 0.03; A.cam.position.set(Math.sin(ang) * 58, 21 + 3 * Math.sin(lt * 0.12), Math.cos(ang) * 58); A.cam.lookAt(0, 11.5, 0);
     A.R.render(A.scene, A.cam);
     const leg = [[tr('Probado en navegador', 'Tested in browser'), '#34d399'], [tr('Probado en simulación', 'Tested in simulation'), '#fbbf24'], [tr('App Android', 'Android app'), '#91d7e8'], [tr('Requiere app nativa', 'Needs native app'), '#b79cff'], [tr('Hoja de ruta', 'Roadmap'), '#7d8f99']];
@@ -240,7 +243,9 @@
   const CODE = ['export function maxConcurrent(intervals) {', '  const ev = [];', '  for (const [a, b] of intervals)', '    { ev.push([a, 1]); ev.push([b, -1]); }', '  ev.sort((x, y) => x[0] - y[0] || x[1] - y[1]);', '  let cur = 0, max = 0;', '  for (const [, d] of ev)', '    { cur += d; max = Math.max(max, cur); }', '  return max; // = teléfonos reales', '}'];
   const IV = [[0.02, 0.3], [0.33, 0.62], [0.66, 0.96], [0.1, 0.45], [0.5, 0.9], [0.2, 0.55], [0.6, 0.8]];
   function drawHow(cv, lt, d, cue) {
-    const g = cv.getContext('2d'), W = 640, H = 600; g.clearRect(0, 0, W, H);
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (cv.width !== Math.round(640 * dpr)) { cv.width = Math.round(640 * dpr); cv.height = Math.round(600 * dpr); }
+    const g = cv.getContext('2d'), W = 640, H = 600; g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     const panel = (y, h, t) => { g.fillStyle = 'rgba(11,20,28,.92)'; rr(g, 0, y, W, h, 14); g.fill(); g.strokeStyle = C.l; g.lineWidth = 1; g.stroke(); label(g, t, 18, y + 26, C.c, '700 12px ui-monospace,monospace'); };
     // 1 · código real + barrido de eventos ejecutándose
     panel(0, 228, tr('1 · CÓDIGO DEL NÚCLEO · rf-census.mjs', '1 · CORE CODE · rf-census.mjs'));

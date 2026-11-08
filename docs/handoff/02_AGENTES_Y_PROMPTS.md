@@ -91,6 +91,8 @@ Eres el especialista frontend de SENDA. 1) Internacionaliza la app de campo /sen
 
 ## A3 · Vídeo, simulaciones y renders
 
+> **Suite M95 (08-11-2026):** para la película y la ruta en inglés a 1080p, VTT es/en/nl, cortes, simulaciones y despliegue, la fuente de verdad es **[08_ANTIGRAVITY_VIDEO_HANDOFF.md](08_ANTIGRAVITY_VIDEO_HANDOFF.md)** y `prompts/antigravity/`. Esta ficha resume el pipeline histórico; no aplica su límite de 20 MB ni su render 720p a la suite M95 (hasta ~35 MB por pieza, 1920×1080).
+
 - **Misión:** películas y simulaciones deterministas para la web y la app, en varios idiomas y sin latencia.
 - **Entrada:** `media/senda-film/{script.json,film.html,voice.py,render.mjs,publish.sh}`, capturas de `evidence/senda/`.
 - **Pipeline probado:**
@@ -104,14 +106,15 @@ Eres el especialista frontend de SENDA. 1) Internacionaliza la app de campo /sen
   - Escenas nuevas cuando haya funciones nuevas (p. ej. Ojo de SENDA).
 - **Criterios:**
   - Cada cifra del guion sale de `evidence/` o de una fuente citada.
-  - Vídeo de la web ≤ 20 MB por idioma.
-  - Subtítulos sincronizados por frase.
+  - Vídeo de la web ≤ 20 MB por idioma en piezas históricas; ≤ ~35 MB por pieza en la suite M95.
+  - Subtítulos sincronizados por frase; en M95, tres VTT es/en/nl.
 - **Skills:** `anthropic-skills:algorithmic-art`, `anthropic-skills:canvas-design`, `dataviz`, `mcp__Canva__*` (piezas para redes).
-- **Prompt:**
+- **Prompt histórico (no usar para M95):**
 ```text
 [BLOQUE COMÚN]
 Eres el director técnico de vídeo de SENDA. Con media/senda-film/ como base: 1) crea script-30s.json y script-60s.json (es/en) con los 3 mensajes más fuertes y verificables; 2) añade el modo 9:16 a film.html (1080×1920) sin duplicar código; 3) renderiza es/en con voice.py y render.mjs y publica con publish.sh; 4) revisa fotogramas clave antes de publicar (texto que no desborde, capturas legibles). Entrega: rutas de los MP4/VTT, duración, peso y fotogramas de control.
 ```
+Para M95 usa `docs/handoff/prompts/antigravity/00_MASTER_PROMPT.md` y los prompts 01–05.
 
 ## A4 · Propiedad intelectual, licencias, marca y secretos (legal IP)
 

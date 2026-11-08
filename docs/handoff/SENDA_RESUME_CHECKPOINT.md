@@ -3,7 +3,8 @@
 Fecha: 2026-11-08  
 Rama: `mission/senda-95-20261108`  
 HEAD de código (producto): `c5821dd93a4b0aee5eadc853d2e7d85b43e25cd6`
-Estado: suite SENDA 266/266 y PCI 13/13; benchmark v2 final generado desde árbol limpio (`SOURCE_ONLY`); PCI v0.2 y F-02/F-05 commiteados en `c5821dd`; este checkpoint va en un commit aparte; push al PR #23 pendiente.
+HEAD actual de la rama: `b9b1590e776ccc8deb50c53072bf7cb2e99a5f17`
+Estado: suite SENDA 266/266 y PCI 13/13; benchmark v2 final generado desde árbol limpio (`SOURCE_ONLY`); PCI v0.2 y F-02/F-05 commiteados en `c5821dd`; este checkpoint va en un commit aparte; rama sincronizada con `origin/mission/senda-95-20261108`.
 
 ## 1. Qué está hecho
 
@@ -133,3 +134,7 @@ Detalle: `docs/security/SENDA_ASSURANCE_REVIEW.md`.
 - Windows PowerShell 5.1
 - Issue de referencia: #19 (SHA ambiguo)
 - PRs abiertos: #12, #13, #17, #18, #20, #21, #22, #23
+
+## 9. Encargo de vídeo pendiente
+
+La suite M95 (película y ruta en inglés a 1080p, VTT es/en/nl, cortes, simulaciones, web y evidencia) está especificada en `docs/handoff/08_ANTIGRAVITY_VIDEO_HANDOFF.md` y `docs/handoff/prompts/antigravity/`. Todavía **no se ha renderizado ni desplegado**. No usar `investor-next/public/senda/estado.json` (232/49, SHA `c0b10e6`) sin regenerarlo: las suites actuales son 266/266 y 13/13.

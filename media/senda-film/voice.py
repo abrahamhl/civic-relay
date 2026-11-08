@@ -1,64 +1,158 @@
 #!/usr/bin/env python3
-"""Doblaje de la película SENDA v5 (Kokoro-82M v1.0). <lang>_say = texto pronunciado; <lang> = subtítulo.
+"""Genera narración con Kokoro v1.0 (ONNX, 24 kHz) + timings.json + subtítulos WebVTT.
 
-Uso: python3 -I voice.py <modelo.onnx> <voces.npz> <es|en> [salida_dir]
-Genera en salida_dir: voice-<lang>.wav, timeline-<lang>.js y subtitles-<lang>.vtt
-(para «en» también subtitles-nl.vtt con los mismos tiempos y el texto neerlandés).
-Cada escena dura lo que su narración; cada frase marca un «cue» para la animación.
+Uso:
+  python3 voice.py                 # script.json en es + en (+ nl sobre tiempos en)
+  python3 voice.py ruta es         # ruta.json solo en es
+  python3 voice.py m95-film en     # m95-film.json en en (+ subtítulos en, es, nl sobre tiempos en)
 """
-import json, sys, wave, re, os
-from pathlib import Path
+import hashlib, json, os, pathlib, sys
 import numpy as np
+import soundfile as sf
 from kokoro_onnx import Kokoro
 
-here = Path(__file__).resolve().parent
-model, voices, lang = sys.argv[1], sys.argv[2], sys.argv[3]
-out = Path(sys.argv[4]) if len(sys.argv) > 4 else here / "out"
-out.mkdir(parents=True, exist_ok=True)
-SCRIPT = os.environ.get("SCRIPT", "script"); PFX = "" if SCRIPT == "script" else f"{SCRIPT}-"
-cfg = json.loads((here / f"{SCRIPT}.json").read_text(encoding="utf-8"))
-vc = cfg["voices"][lang]
-PRON = {"es": [(r"\bSENDA\b", "Senda"), (r"\bSMS\b", "ese eme ese"), (r"\bwifi\b", "uifi")],
-        "en": [(r"\bSENDA\b", "Senda"), (r"\bQO-100\b", "Q O one hundred"), (r"\bCAP\b", "cap")]}[lang]
-def speakable(t):
-    for a, b in PRON: t = re.sub(a, b, t)
-    return t
+ROOT = pathlib.Path(__file__).resolve().parent
+BUILD = ROOT / "build"
+BUILD.mkdir(exist_ok=True)
+TTS_CACHE = BUILD / "tts-cache"
+TTS_CACHE.mkdir(exist_ok=True)
 
+MODEL_DIR = pathlib.Path(os.environ.get("KOKORO_DIR", os.path.expanduser("~/.cache/kokoro")))
 SR = 24000
-LEAD, GAP, TAIL = 0.6, 0.35, 1.0
-k = Kokoro(model, voices)
-track, scenes, subs, t = [], [], [], 0.0
-sil = lambda s: np.zeros(int(s * SR), dtype=np.float32)
-for sc in cfg["scenes"]:
-    start = t; track.append(sil(LEAD)); t += LEAD; cues = []
-    say = sc.get(f"{lang}_say", sc[lang])  # lo que se pronuncia; sc[lang] es lo que se lee
-    for i, text in enumerate(say):
-        if i: track.append(sil(GAP)); t += GAP
-        audio, sr = k.create(speakable(text), voice=vc["voice"], speed=vc["speed"], lang=vc["lang"])
-        assert sr == SR, sr
-        audio = audio.astype(np.float32)
-        cues.append(round(t - start, 3))
-        subs.append((t, t + len(audio) / SR, sc["id"], i))
-        track.append(audio); t += len(audio) / SR
-    track.append(sil(TAIL)); t += TAIL
-    scenes.append({"id": sc["id"], "start": round(start, 3), "end": round(t, 3), "cues": cues})
-    print(f'{lang} {sc["id"]}: {t - start:5.1f}s', flush=True)
+LEAD_IN = 0.60      # silencio al entrar en escena (s)
+GAP = 0.35          # pausa entre frases de una misma escena (s)
+TAIL = 1.00         # colchón al cerrar escena (s)
 
-y = np.concatenate(track); y = y / (np.max(np.abs(y)) + 1e-9) * 0.89
-with wave.open(str(out / f"voice-{PFX}{lang}.wav"), "wb") as w:
-    w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((y * 32767).astype(np.int16).tobytes())
-(out / f"timeline-{PFX}{lang}.js").write_text(f"window.TIMELINE={json.dumps({'duration': round(t, 3), 'scenes': scenes})};\n", encoding="utf-8")
+raw_name = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] not in ("es", "en") else "script"
+NAME = pathlib.Path(raw_name).stem
+ONLY_LANG = sys.argv[2] if len(sys.argv) > 2 else (sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] in ("es", "en") else None)
+PFX = "" if NAME == "script" else f"{NAME}-"
 
-def ts(x):
-    h, r = divmod(x, 3600); m, s = divmod(r, 60)
-    return f"{int(h):02d}:{int(m):02d}:{s:06.3f}"
-by = {s["id"]: s for s in cfg["scenes"]}
-def vtt(sublang):
-    lines = ["WEBVTT", ""]
-    for n, (a, b, sid, i) in enumerate(subs, 1):
-        lines += [str(n), f"{ts(a)} --> {ts(b)}", by[sid][sublang][i], ""]
-    (out / f"subtitles-{PFX}{sublang}.vtt").write_text("\n".join(lines), encoding="utf-8")
-vtt(lang)
-# Subtítulos neerlandeses con los tiempos ingleses, solo si el guion los trae (script.json sí; ruta.json no).
-if lang == "en" and all("nl" in s for s in cfg["scenes"]): vtt("nl")
-print(f"total {t:.1f}s → {out}")
+
+def fmt_vtt(t: float) -> str:
+    h = int(t // 3600)
+    m = int((t % 3600) // 60)
+    s = t - h * 3600 - m * 60
+    return f"{h:02d}:{m:02d}:{s:06.3f}"
+
+
+def pad(sec: float) -> np.ndarray:
+    return np.zeros(int(round(sec * SR)), dtype=np.float32)
+
+
+def soft_edges(wav: np.ndarray, ms: float = 12.0) -> np.ndarray:
+    n = min(int(SR * ms / 1000.0), len(wav) // 4)
+    if n <= 1:
+        return wav
+    ramp = np.linspace(0.0, 1.0, n, dtype=np.float32)
+    out = wav.copy()
+    out[:n] *= ramp
+    out[-n:] *= ramp[::-1]
+    return out
+
+
+def main():
+    script_path = ROOT / f"{NAME}.json"
+    if not script_path.exists():
+        raise SystemExit(f"[FATAL] No existe {script_path}")
+    doc = json.loads(script_path.read_text(encoding="utf-8"))
+    kokoro = Kokoro(str(MODEL_DIR / "kokoro-v1.0.onnx"), str(MODEL_DIR / "voices-v1.0.bin"))
+
+    for lang, vcfg in doc["voices"].items():
+        if ONLY_LANG and lang != ONLY_LANG:
+            continue
+        voice = vcfg["voice"]
+        klang = vcfg["lang"]
+        speed = float(vcfg.get("speed", 1.0))
+
+        chunks = []
+        timings = {"script": NAME, "lang": lang, "voice": voice, "sr": SR, "scenes": []}
+        if lang == "en":
+            sub_langs = ["en"]
+            for extra in ("es", "nl"):
+                if all(extra in sc for sc in doc["scenes"]):
+                    sub_langs.append(extra)
+                elif NAME.startswith("m95-"):
+                    raise SystemExit(f"[FATAL] Falta idioma '{extra}' en alguna escena de {NAME}.json")
+        else:
+            sub_langs = [lang]
+        vtts = {sl: ["WEBVTT", ""] for sl in sub_langs}
+        cue_idx = 1
+        cursor = 0.0
+
+        for sc in doc["scenes"]:
+            sid = sc["id"]
+            sub_lines = sc[lang]
+            say_lines = sc.get(f"{lang}_say", sub_lines)
+            if len(say_lines) != len(sub_lines):
+                raise SystemExit(f"{sid}: {lang}_say ({len(say_lines)}) != {lang} ({len(sub_lines)})")
+            for sl in sub_langs:
+                if sl not in sc or len(sc[sl]) != len(say_lines):
+                    raise SystemExit(f"[FATAL] {sid}: longitud de '{sl}' no coincide con '{lang}_say'")
+            sc_start = cursor
+            chunks.append(pad(LEAD_IN))
+            cursor += LEAD_IN
+            line_spans = []
+
+            for i, (say_txt, sub_txt) in enumerate(zip(say_lines, sub_lines)):
+                ckey = hashlib.sha256(f"{voice}|{speed}|{klang}|{say_txt}".encode("utf-8")).hexdigest()[:24]
+                cfile = TTS_CACHE / f"{ckey}.npy"
+                if cfile.exists():
+                    wav = np.load(cfile)
+                else:
+                    wav, _ = kokoro.create(say_txt, voice=voice, speed=speed, lang=klang)
+                    wav = soft_edges(wav.astype(np.float32))
+                    np.save(cfile, wav)
+                dur = len(wav) / SR
+                t0, t1 = cursor, cursor + dur
+                chunks.append(wav)
+                cursor = t1
+                line_spans.append({"text": sub_txt, "start": round(t0, 3), "end": round(t1, 3)})
+
+                for sl in sub_langs:
+                    sl_lines = sc.get(sl, sub_lines)
+                    sl_txt = sl_lines[i] if i < len(sl_lines) else sub_txt
+                    vtts[sl].append(f"{cue_idx}")
+                    vtts[sl].append(f"{fmt_vtt(t0)} --> {fmt_vtt(t1)}")
+                    vtts[sl].append(sl_txt)
+                    vtts[sl].append("")
+                cue_idx += 1
+
+                if i < len(say_lines) - 1:
+                    chunks.append(pad(GAP))
+                    cursor += GAP
+
+            chunks.append(pad(TAIL))
+            cursor += TAIL
+            sc_end = cursor
+            title_obj = sc.get("title", {})
+            sc_title = title_obj.get(lang, title_obj.get("en", "")) if isinstance(title_obj, dict) else str(title_obj)
+            timings["scenes"].append({
+                "id": sid,
+                "claim": sc.get("claim", "CALCULATED"),
+                "title": sc_title,
+                "visual": sc["visual"],
+                "start": round(sc_start, 3),
+                "end": round(sc_end, 3),
+                "duration": round(sc_end - sc_start, 3),
+                "lines": line_spans,
+            })
+            print(f"[{NAME}:{lang}] {sid}: {sc_start:6.2f}s -> {sc_end:6.2f}s ({sc_end - sc_start:5.2f}s)")
+
+        full = np.concatenate(chunks)
+        peak = float(np.max(np.abs(full))) or 1.0
+        full = (full / peak) * 0.89  # ~ -1 dBFS pico antes de loudnorm en ffmpeg
+        timings["totalDuration"] = round(len(full) / SR, 3)
+
+        wav_path = BUILD / f"voice-{PFX}{lang}.wav"
+        sf.write(str(wav_path), full, SR, subtype="PCM_16")
+        (BUILD / f"timings-{PFX}{lang}.json").write_text(
+            json.dumps(timings, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        for sl, lines in vtts.items():
+            (BUILD / f"subtitles-{PFX}{sl}.vtt").write_text("\n".join(lines), encoding="utf-8")
+        print(f"=> {wav_path.name} ({timings['totalDuration']:.1f}s) · vtt: {','.join(sub_langs)}")
+
+
+if __name__ == "__main__":
+    main()

@@ -4,9 +4,10 @@ permissions:
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, fix/senda-dtn-receipt-quarantine-20261107 ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, fix/senda-dtn-receipt-quarantine-20261107 ]
+  workflow_dispatch:
 
 jobs:
   build:

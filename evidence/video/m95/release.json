@@ -1,0 +1,316 @@
+{
+  "releaseId": "senda-m95-video-2026-11",
+  "commit": "b9b1590e776ccc8deb50c53072bf7cb2e99a5f17",
+  "branch": "mission/senda-95-20261108",
+  "deployUrl": null,
+  "deployStatus": "BLOCKED_EXTERNAL",
+  "deployedAt": null,
+  "generatedAt": "2026-11-08T14:50:00+01:00",
+  "audioLanguage": "en",
+  "voiceModel": "kokoro-onnx==0.6.1 (bf_emma, en-gb, speed 0.95)",
+  "subtitleLanguages": [
+    "es",
+    "en",
+    "nl"
+  ],
+  "nlNativeReview": "REVIEW_REQUIRED",
+  "files": [
+    {
+      "path": "/media/m95/senda-m95-30s-en.mp4",
+      "bytes": 2012952,
+      "duration": 33.72,
+      "sha256": "1c28b22b3161374ab6f21a4b63be999c4f2478e8ceafd53bad7350b8a3a75e6a"
+    },
+    {
+      "path": "/media/m95/senda-m95-30s-en.vtt",
+      "bytes": 673,
+      "sha256": "b4da5b8fae0db86f4a8a35d797d2ab6f34d881fc8ddd822bed6a7ba349bf4c00"
+    },
+    {
+      "path": "/media/m95/senda-m95-30s-es.vtt",
+      "bytes": 689,
+      "sha256": "1d62135ca5865b86a591ade4a97c3f63d7ed59d0c5ff049aa03a40c699bd5964"
+    },
+    {
+      "path": "/media/m95/senda-m95-30s-nl.vtt",
+      "bytes": 683,
+      "sha256": "79d2b6547536904819c166cb9bfa4f2463cfba23ffaf4822c2a8a4799725bbbb"
+    },
+    {
+      "path": "/media/m95/senda-m95-60s-en.mp4",
+      "bytes": 11660496,
+      "duration": 62.48,
+      "sha256": "dcc69e80625efccebeca88256bc9469f353d32f412ec73fb84c74de19bdd9597"
+    },
+    {
+      "path": "/media/m95/senda-m95-60s-en.vtt",
+      "bytes": 1188,
+      "sha256": "aaa8cb4f26bc4f9fc2070d5e1539827b7f32f205cdf2f99d5f6e9f94a09b7d52"
+    },
+    {
+      "path": "/media/m95/senda-m95-60s-es.vtt",
+      "bytes": 1216,
+      "sha256": "d9341de7fe1cbc7cfeb45f3266f1ccc4e108d98118eb0c16386c403e21049aa0"
+    },
+    {
+      "path": "/media/m95/senda-m95-60s-nl.vtt",
+      "bytes": 1230,
+      "sha256": "f3b194dd16362a1a9aad491c6cf7327ceecadf22a2778b1c3cfb24f85702a5f6"
+    },
+    {
+      "path": "/media/m95/senda-m95-90s-en.mp4",
+      "bytes": 9654400,
+      "duration": 92.24,
+      "sha256": "58cb968080b251a97441e0d99f741cebb623b184506ca24487ebfba441677ba2"
+    },
+    {
+      "path": "/media/m95/senda-m95-90s-en.vtt",
+      "bytes": 1796,
+      "sha256": "ca8fa4bdadbb3e48f9a031f0aabdfc95d2605370905bca69daac6576af452055"
+    },
+    {
+      "path": "/media/m95/senda-m95-90s-es.vtt",
+      "bytes": 1846,
+      "sha256": "2eec07f48facf9e35ed855c873b01e5e92970389b825db6c434e078994199bea"
+    },
+    {
+      "path": "/media/m95/senda-m95-90s-nl.vtt",
+      "bytes": 1911,
+      "sha256": "12e7b6cc0b449482b9fc7c88bf3f9460bd67a5b7053ab22b1f22813b3bf944c8"
+    },
+    {
+      "path": "/media/m95/senda-m95-film-en.mp4",
+      "bytes": 113395787,
+      "duration": 530.12,
+      "sha256": "043d9641c3e8e88b7dc93cad7cc57309653fcbea74029adc12c80f7cee80fa99"
+    },
+    {
+      "path": "/media/m95/senda-m95-film-en.vtt",
+      "bytes": 10247,
+      "sha256": "0084cb97b65b4432f85c283e8c158d36f134e7edda85d65e4df6aa3ac81313f5"
+    },
+    {
+      "path": "/media/m95/senda-m95-film-es.vtt",
+      "bytes": 10609,
+      "sha256": "cc6ef2264f8b91c069f07781493d51f2bd6fa549488d8d61ce85d0fc267deb7e"
+    },
+    {
+      "path": "/media/m95/senda-m95-film-nl.vtt",
+      "bytes": 10709,
+      "sha256": "056a53a6c18a8ac95286b1d98040e7bd77b40151d9c6ec9e7c16a4f3387fd1c5"
+    },
+    {
+      "path": "/media/m95/senda-m95-film-poster.jpg",
+      "bytes": 107283,
+      "sha256": "87f590bf6986d183f298c74672cbe29847c77234ecc3ab7bdb03844bceea6620"
+    },
+    {
+      "path": "/media/m95/senda-m95-ruta-en.mp4",
+      "bytes": 23285391,
+      "duration": 218.28,
+      "sha256": "3a13e6fee05ab250c191181dd69426a52e8edd41e44265c74641ef96a20d8b20"
+    },
+    {
+      "path": "/media/m95/senda-m95-ruta-en.vtt",
+      "bytes": 4080,
+      "sha256": "17ee1aecfd790e8e6e8fb8456b1648a6e16237b60dcac9b3cd1eba11ebeafc74"
+    },
+    {
+      "path": "/media/m95/senda-m95-ruta-es.vtt",
+      "bytes": 3986,
+      "sha256": "5f0c6f85eb4ee8b1494cf39eaeaaa2fbb6d8cf0a998dcf88157c695273df633f"
+    },
+    {
+      "path": "/media/m95/senda-m95-ruta-nl.vtt",
+      "bytes": 4299,
+      "sha256": "2504f64d494c25a3bb540b93070de19be0e7429f1b5c5248d9aaab7f2c2094a3"
+    },
+    {
+      "path": "/media/m95/senda-m95-ruta-poster.jpg",
+      "bytes": 177635,
+      "sha256": "7e7b2fe437e87e76371ea4b56a8c3e1d21b6b4972ab7c89190e9c8ff35ecd407"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-braking-en.mp4",
+      "bytes": 1990787,
+      "duration": 24.48,
+      "sha256": "c1f40f1d0f3c60641d24dab1307f70224af88f7172e798f9b75df9a57d935cd5"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-braking-en.vtt",
+      "bytes": 408,
+      "sha256": "a03848d9de4281781d8b87d75c34c13264b0121434679b59564c78c278cfb642"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-braking-es.vtt",
+      "bytes": 426,
+      "sha256": "3a5b7576f3347fa0a370a5f19868235df4cfdab8b6f7b397b4ffc3e9984dfb6f"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-braking-nl.vtt",
+      "bytes": 419,
+      "sha256": "950c6563294c9a04094395c0d45b58a9da0f7474a64adc77844272511f6e9766"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-proof-en.mp4",
+      "bytes": 1316691,
+      "duration": 27.64,
+      "sha256": "ec1d3e8ace4c14214dc5b365f63679a4a3f51de2f683309e893b991e31c5a679"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-proof-en.vtt",
+      "bytes": 622,
+      "sha256": "7908fedc960f572c4c9c6d93e087e1696bb076bb31b780fc7ddf951ca5929530"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-proof-es.vtt",
+      "bytes": 705,
+      "sha256": "152c819ac25b4fef3b0697653d43ccc8c2142bcaec2aad1dec82bbd81a0ca1e7"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-proof-nl.vtt",
+      "bytes": 684,
+      "sha256": "97c31ab9316c123b2a2f758b7b01da56b9d67313322fc074f1e6bac0c7c54cc1"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-queue-en.mp4",
+      "bytes": 1521567,
+      "duration": 19.3,
+      "sha256": "12d82c5cc59d6cdbc9380ec3d709dd4115c94258a8bc62484bfbb2b2c827cbc2"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-queue-en.vtt",
+      "bytes": 404,
+      "sha256": "1fb65aae2b768ba96549a918769ce2a2c96e4239e79d54ca0549c0cc273e2198"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-queue-es.vtt",
+      "bytes": 402,
+      "sha256": "121ed2b95d05d048b6a6f754bf0810190c843a0674dd159ee5f2d3e4f5cccf43"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-queue-nl.vtt",
+      "bytes": 436,
+      "sha256": "c726d607ef5493452d3c661905ba00a842588f2df196d16fd8b241069bc42410"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-sos-en.mp4",
+      "bytes": 1988600,
+      "duration": 22.16,
+      "sha256": "a7d7e0b9828bed1a918770bc0c1b62c57af923608aec26f9793e32b67163d183"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-sos-en.vtt",
+      "bytes": 418,
+      "sha256": "76b21cf48f4c6d2d88f8811b5c4ab1b0d489d7e964c4670c88510ffd1aa2ef75"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-sos-es.vtt",
+      "bytes": 375,
+      "sha256": "649cb1b4efffec8b505983a4497af37d313fc54e3d18d8b0f18ece0985afd419"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-sos-nl.vtt",
+      "bytes": 421,
+      "sha256": "e4f201b0440567f037941511c4604b938621dca194a6c93727058efec295c476"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-visibility-en.mp4",
+      "bytes": 1662075,
+      "duration": 18.96,
+      "sha256": "887230dfc8a1a4d20ed72193d335484bfc26ed96da380ece627ac0ec623283fc"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-visibility-en.vtt",
+      "bytes": 381,
+      "sha256": "7268ddb43b49f9b29a8213e0bd1caea29bbfae1978db10589a26b5ee15495105"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-visibility-es.vtt",
+      "bytes": 393,
+      "sha256": "1473be534065539c928b75b3c0f2f90ddea4884afda4d61cd38c470b4adddb59"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-visibility-nl.vtt",
+      "bytes": 422,
+      "sha256": "7e0e3c4ab02c4626f85c542734390b1b47b3364b8a8e898fac65383d1b7727ed"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-wrongway-en.mp4",
+      "bytes": 1615230,
+      "duration": 16.36,
+      "sha256": "aea07ffd8e337111eeca165b7b60f9232c94940ef63805339bef262c925e6fb9"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-wrongway-en.vtt",
+      "bytes": 351,
+      "sha256": "a94eb6a49d7f14c391505571a3da6814556954ce5357e1b6d4997bbc81ca318a"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-wrongway-es.vtt",
+      "bytes": 325,
+      "sha256": "4bf390aee171442b95e24d620dbabb59e1320300feec5da03af0dce401dd0ce3"
+    },
+    {
+      "path": "/media/m95/senda-m95-sim-wrongway-nl.vtt",
+      "bytes": 324,
+      "sha256": "1f3c7485519052bd2d75bea26e5ecfdf244733e619f06d7d90914d2d1d88405c"
+    },
+    {
+      "path": "/media/m95/senda-m95-vertical-45s-en-sub-en.mp4",
+      "bytes": 3268162,
+      "duration": 42.8,
+      "sha256": "71f3678654e2aeda9293444b9196ed48517593a550a2d4c928fd30ff1a3c5f32"
+    },
+    {
+      "path": "/media/m95/senda-m95-vertical-45s-en-sub-es.mp4",
+      "bytes": 3273921,
+      "duration": 42.8,
+      "sha256": "1649802584cd7fe1b0877dae06826f34ca058b588a3a97502793c8af767d2957"
+    },
+    {
+      "path": "/media/m95/senda-m95-vertical-45s-en-sub-nl.mp4",
+      "bytes": 3297592,
+      "duration": 42.8,
+      "sha256": "280eca84132ad4e6b8d74de4cef115bb3f0bb6233ed3d8148a4477c32328853a"
+    },
+    {
+      "path": "/media/m95/senda-m95-vertical-45s-en.mp4",
+      "bytes": 3024782,
+      "duration": 42.8,
+      "sha256": "132433efa15e546d3f513466a08a4f80531c7d0257f7a2bf33cc55a99312b5a8"
+    },
+    {
+      "path": "/media/m95/senda-m95-vertical-45s-en.vtt",
+      "bytes": 850,
+      "sha256": "2cdb559c892271873e9db7a5c18efd7797f637635e42de9de16dbdd72955dcd6"
+    },
+    {
+      "path": "/media/m95/senda-m95-vertical-45s-es.vtt",
+      "bytes": 889,
+      "sha256": "52d941f6bbebf4f322fb2edd8aa6067f701c56a589fd9180f1bf41509498d12c"
+    },
+    {
+      "path": "/media/m95/senda-m95-vertical-45s-nl.vtt",
+      "bytes": 910,
+      "sha256": "ea007ca061e6ba9d11a1c35c6e14e5f5a8d4a68dcddbefe4243e91b45480a751"
+    }
+  ],
+  "verificationStatus": {
+    "content": "PASS",
+    "voice": "PASS",
+    "subtitles": "PASS_WITH_NL_REVIEW_REQUIRED",
+    "image": "PASS",
+    "webLocalBuild": "PASS",
+    "webProductionDeploy": "BLOCKED_EXTERNAL",
+    "securityHeadersConfig": "PASS",
+    "securityTxtContact": "BLOCKED_FOUNDER_EMAIL",
+    "legal": "PASS"
+  },
+  "unresolvedItems": [
+    "SECURITY.txt contains placeholder security@civic-relay.example.com; requires real founder-controlled security mailbox before claiming protected status (§ 9.4 / § 12).",
+    "Dutch (nl) subtitles require native speaker sign-off before claiming native-verified status (marked REVIEW_REQUIRED per § 6.3 / § 12).",
+    "Remote Vercel preview/production deployment requires VERCEL_TOKEN / founder confirmation (§ 8.2 / § 12).",
+    "Physical field validation with phones/radios and external cryptographic audit remain pending (0 external audits)."
+  ]
+}

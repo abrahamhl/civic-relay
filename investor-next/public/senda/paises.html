@@ -49,7 +49,7 @@
 </section>
 </main>
 <script type="module">
-import { $, C, canvas, text, rr, run, clamp, FILM, drawCar, drawRoad } from '/senda/kit.mjs';
+import { $, C, canvas, text, rr, run, clamp, FILM, LANG, tr, drawCar, drawRoad } from '/senda/kit.mjs';
 import { COUNTRIES, countryPlan } from '/senda/core/platforms.mjs';
 import { parseDatex2, toHazards, corridorPack, msiAdvice, SAMPLE_DATEX2 } from '/senda/core/datex2.mjs';
 import { ROUTE_MAD_VLC } from '/senda/core/road-guard.mjs';
@@ -93,9 +93,10 @@ function drawM(t) {
   const a = msiAdvice(GANTRIES, sMe, { lang: S.lang }), lane = a?.closedLanes.includes(1) && a.atM < 900 ? 1 : 0, cx = (lx[lane] + lx[lane + 1]) / 2;
   drawCar(g, cx, 540, { len: 50, ang: -Math.PI / 2, color: '#91d7e8', lights: true });
   g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 20, 600, 88, 12); g.fill(); g.strokeStyle = a?.closedLanes.length ? C.r : C.l; g.stroke();
-  text(g, a ? a.say : 'Sin limitaciones por delante', 34, 52, { c: a?.closedLanes.length ? C.t : C.e, f: '800 14px Inter,system-ui' });
-  const es = msiAdvice(GANTRIES, sMe, { lang: 'es' }); if (S.lang !== 'es' && es) text(g, es.say, 34, 78, { c: C.m, f: '12px Inter,system-ui' });
-  text(g, 'A-snelweg · datos de señales de NDW · aviso hablado de SENDA', 34, 100, { c: C.g, f: '11px Inter,system-ui' });
+  text(g, a ? a.say : tr('Sin limitaciones por delante', 'No lane restrictions ahead'), 34, 52, { c: a?.closedLanes.length ? C.t : C.e, f: '800 14px Inter,system-ui' });
+  const subLang = LANG === 'en' ? 'en' : 'es';
+  const subAdv = msiAdvice(GANTRIES, sMe, { lang: subLang }); if (S.lang !== subLang && subAdv) text(g, subAdv.say, 34, 78, { c: C.m, f: '12px Inter,system-ui' });
+  text(g, tr('A-snelweg · datos de señales de NDW · aviso hablado de SENDA', 'A-snelweg · NDW open lane-sign data · SENDA spoken warning'), 34, 100, { c: C.g, f: '11px Inter,system-ui' });
 }
 run({ msi: drawM });
 </script>

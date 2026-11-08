@@ -54,7 +54,7 @@
 </section>
 </main>
 <script type="module">
-import { $, C, canvas, text, rr, run, clamp, FILM, drawCar, drawRoad, carColor } from '/senda/kit.mjs';
+import { $, C, canvas, text, rr, run, clamp, FILM, LANG, tr, drawCar, drawRoad, carColor } from '/senda/kit.mjs';
 import { DGT_INFRA, speedZoneAdvice, sectionAverage, detectorQueue, vmsToHazard } from '/senda/core/dgt-infra.mjs';
 import { parseMeasured, parseVms, SAMPLE_MEASURED, SAMPLE_VMS } from '/senda/core/datex2.mjs';
 import { queueWarning } from '/senda/core/drive-cases.mjs';
@@ -80,15 +80,24 @@ function drawD(t) {
   }
   g.fillStyle = 'rgba(255,91,110,.12)'; g.fillRect(X(tail), 296, 620 - X(tail), 80);
   sites.forEach((x) => { const cong = x.s >= tail, v = cong ? 22 : 96, h = (v / 110) * 200, xx = X(x.s); g.fillStyle = cong ? C.r : C.e; rr(g, xx - 14, 280 - h, 28, h, 4); g.fill(); text(g, `${v}`, xx, 272 - h, { c: C.t, f: '700 12px Inter,system-ui', al: 'center' }); g.fillStyle = '#e5e7eb'; g.fillRect(xx - 2, 300, 4, 70); text(g, x.id, xx, 392, { c: C.m, f: '11px Inter,system-ui', al: 'center' }); });
-  g.strokeStyle = C.r; g.lineWidth = 3; g.beginPath(); g.moveTo(X(tail), 290); g.lineTo(X(tail), 380); g.stroke(); g.lineWidth = 1; text(g, '← la cola crece', X(tail) - 6, 418, { c: C.r, f: '700 12px Inter,system-ui', al: 'right' });
+  g.strokeStyle = C.r; g.lineWidth = 3; g.beginPath(); g.moveTo(X(tail), 290); g.lineTo(X(tail), 380); g.stroke(); g.lineWidth = 1; text(g, tr('← la cola crece', '← queue grows backwards'), X(tail) - 6, 418, { c: C.r, f: '700 12px Inter,system-ui', al: 'right' });
   const me = -2800 + (110 / 3.6) * tt * 0.5, qw = queueWarning({ sMe: me, vMeKmh: 110, sTail: tail, wKmh: S.queue.wKmh });
-  if (me < tail - 50) { drawCar(g, X(me), 354, { len: 20, color: '#91d7e8', lights: true }); text(g, 'tú', X(me), 392, { c: C.i, f: '700 11px Inter,system-ui', al: 'center' }); }
-  text(g, 'Velocidad media en cada estación (km/h) · datos DATEX II', 20, 34, { c: C.t, f: '800 14px Inter,system-ui' });
+  if (me < tail - 50) { drawCar(g, X(me), 354, { len: 20, color: '#91d7e8', lights: true }); text(g, tr('tú', 'you'), X(me), 288, { c: C.i, f: '700 11px Inter,system-ui', al: 'center' }); }
+  text(g, tr('Velocidad media en cada estación (km/h) · datos DATEX II', 'Mean speed at each counting station (km/h) · DATEX II open data'), 20, 34, { c: C.t, f: '800 14px Inter,system-ui' });
   g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 450, 600, 130, 12); g.fill(); g.strokeStyle = C.a; g.stroke();
-  text(g, me < tail - 50 ? `SENDA: «${qw.say}»` : 'Llegas a la cola ya a baja velocidad, sin frenazo', 34, 482, { c: C.a, f: '800 14px Inter,system-ui' });
-  text(g, `Final de la retención ahora: km ${(tail / 1000).toFixed(1).replace('.', ',')} · crece hacia atrás a ${String(Math.abs(S.queue.wKmh)).replace('.', ',')} km/h`, 34, 510, { c: C.t, f: '13px Inter,system-ui' });
-  text(g, `Entre ${S.queue.between.join(' y ')}: de 1.810 coches/h a 94 km/h, a 1.200 coches/h a 22 km/h`, 34, 534, { c: C.m, f: '12px Inter,system-ui' });
-  text(g, `minuto ${(tt / 60).toFixed(1).replace('.', ',')}`, 34, 560, { c: C.g, f: '12px Inter,system-ui' });
+  const qwEn = qw.say
+    .replace('Final de retención en ', 'End of queue in ')
+    .replace(': reduce y luces de emergencia', ': slow down and hazard lights')
+    .replace('Retención a ', 'Queue in ')
+    .replace(' (crece hacia ti): reduce ya a ', ' (growing towards you): slow down to ')
+    .replace('Cola delante: reduce suave', 'Queue ahead: slow down smoothly');
+  text(g, me < tail - 50 ? `SENDA: "${LANG === 'en' ? qwEn : qw.say}"` : tr('Llegas a la cola ya a baja velocidad, sin frenazo', 'You reach the queue already at low speed, without hard braking'), 34, 482, { c: C.a, f: '800 14px Inter,system-ui' });
+  const tailKm = LANG === 'en' ? (tail / 1000).toFixed(1) : (tail / 1000).toFixed(1).replace('.', ',');
+  const wStr = LANG === 'en' ? String(Math.abs(S.queue.wKmh)) : String(Math.abs(S.queue.wKmh)).replace('.', ',');
+  text(g, tr(`Final de la retención ahora: km ${tailKm} · crece hacia atrás a ${wStr} km/h`, `End of queue now: km ${tailKm} · grows backwards at ${wStr} km/h`), 34, 510, { c: C.t, f: '13px Inter,system-ui' });
+  text(g, tr(`Entre ${S.queue.between.join(' y ')}: de 1.810 coches/h a 94 km/h, a 1.200 coches/h a 22 km/h`, `Between ${S.queue.between.join(' and ')}: from 1,810 veh/h at 94 km/h down to 1,200 veh/h at 22 km/h`), 34, 534, { c: C.m, f: '12px Inter,system-ui' });
+  const minStr = LANG === 'en' ? (tt / 60).toFixed(1) : (tt / 60).toFixed(1).replace('.', ',');
+  text(g, tr(`minuto ${minStr}`, `minute ${minStr}`), 34, 560, { c: C.g, f: '12px Inter,system-ui' });
 }
 
 // ---- radares publicados

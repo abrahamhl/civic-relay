@@ -1,0 +1,22 @@
+SENDA · Third-Party Notices & Media Attribution
+================================================
+
+Code License: MIT (see LICENSE).
+The "SENDA" name and visual presentation identity are © 2026 Abraham Haddioui · SENDA and are not licensed as a trademark under MIT.
+
+1. Speech Synthesis (M95 Presentation Videos)
+   - Engine: kokoro-onnx v0.6.1 (https://github.com/thewh1teagle/kokoro-onnx) — MIT License
+   - Model: Kokoro v1.0 ONNX (`kokoro-v1.0.onnx`, voice `bf_emma`, British English `en-gb`, speed 0.95) — Apache License 2.0 (Hexgrad / Kokoro-82M)
+
+2. Procedural Soundtrack (M95 Presentation Videos)
+   - Generator: `media/promo-video/music.py` — in-repository procedural synthesis (D minor pentatonic ambient pad, 62 BPM, no third-party audio samples) — MIT License
+
+3. 3D & Stage Rendering (M95 Presentation Videos)
+   - Three.js r158 (`media/senda-film/vendor/three-0.158.0.min.js`) — MIT License (https://threejs.org)
+   - Simulations (`media/senda-film/sims.js` & `investor-next/public/senda/core/*.mjs`) — in-repository deterministic simulations — MIT License
+
+4. Public Reference Data Cited in M95 Videos
+   - GOES-16 / GOES-18 ABI L2+ Fire / Hotspot Characterization (FDCC) — NOAA / NASA public domain
+   - HRRR 3 km meteorology — NOAA public domain
+   - DGT NAP / DATEX II v3.6 public road incident schema — Dirección General de Tráfico (Spain), open public specification
+   - No non-commercial datasets (such as God's Eye View CC BY-NC-SA 4.0) or personal data (faces, number plates, identifiers) are included in the M95 video assets.

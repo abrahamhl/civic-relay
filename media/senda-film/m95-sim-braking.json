@@ -1,0 +1,54 @@
+{
+ "note": "SENDA Mission 9.5 · Simulación explicada: Frenada en cadena en niebla (r1)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "r1",
+   "claim": "SIMULATED",
+   "source": [
+    "investor-next/public/senda/carretera.html",
+    "packages/senda/src/road.mjs"
+   ],
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=cadena"
+   },
+   "title": {
+    "es": "La frenada que no ves",
+    "en": "The braking you can't see",
+    "nl": "Het remmen dat je niet ziet"
+   },
+   "es": [
+    "Niebla, 120 km/h y 1,2 segundos entre coches. Cada conductor reacciona a las luces del de delante y el retraso se suma: cinco coches chocan en cadena.",
+    "Con SENDA, el móvil del primero detecta la frenada por la velocidad del GPS y avisa a todos a la vez. Solo choca el que va pegado justo detrás: eso solo lo arregla la distancia de seguridad."
+   ],
+   "es_say": [
+    "Niebla, ciento veinte kilómetros por hora y uno coma dos segundos entre coches. Cada conductor reacciona a las luces del de delante y el retraso se suma: cinco coches chocan en cadena.",
+    "Con Senda, el móvil del primero detecta la frenada por la velocidad del GPS y avisa a todos a la vez. Solo choca el que va pegado justo detrás: eso solo lo arregla la distancia de seguridad."
+   ],
+   "en": [
+    "Fog, 120 km/h and 1.2 seconds between cars. Each driver reacts to the brake lights ahead and the delays add up: five cars crash in a chain.",
+    "With SENDA, the first car's phone detects the braking from its GPS speed and warns everyone at once. Only the car tailgating right behind still crashes: only a safe distance fixes that."
+   ],
+   "en_say": [
+    "Fog, a hundred and twenty kilometres an hour, and one point two seconds between cars. Each driver reacts to the brake lights ahead, and the delays add up: five cars crash in a chain.",
+    "With Senda, the first car's phone detects the braking from its G P S speed and warns everyone at once. Only the car tailgating right behind still crashes: only a safe distance fixes that."
+   ],
+   "nl": [
+    "Mist, 120 km/u en 1,2 seconde tussen auto's. Elke bestuurder reageert op de remlichten voor zich en de vertraging telt op: vijf auto's botsen op elkaar.",
+    "Met SENDA detecteert de eerste telefoon het harde remmen via de GPS-snelheid en waarschuwt iedereen tegelijk. Alleen wie direct bumperkleeft botst nog: dat lost alleen volgafstand op."
+   ]
+  }
+ ]
+}

@@ -1,25 +1,46 @@
 #!/usr/bin/env bash
-# Hace un vídeo completo de un guion: validar → voz (Kokoro) → imagen (Playwright) → mezcla → publicar.
-#   ./make.sh <guion> <es|en> [publicar]
-# Ejemplo: ./make.sh ruta es publicar   →  investor-next/public/media/senda-ruta-es.mp4 (+ .vtt y póster)
-# Variables: KOKORO_DIR (carpeta con kokoro-v1.0.onnx y voices-v1.0.bin), CORE y E2E (cifras de pruebas
-# para la escena «verify»), JOBS (procesos de render en paralelo, por defecto 3).
+# Construye un vídeo de SENDA (guion -> validación -> voz + VTT -> MP4 + fotogramas de control).
+# Uso:
+#   ./make.sh                     # script.json en es + en
+#   ./make.sh ruta es             # ruta.json solo en es
+#   ./make.sh m95-film en         # m95-film.json en en (+ VTT es/en/nl)
+#   STILLS=5,40,90,150 ./make.sh m95-film en
 set -euo pipefail
-here="$(cd "$(dirname "$0")" && pwd)"; name="${1:?guion}"; lang="${2:?idioma}"; pub="${3:-}"
-K="${KOKORO_DIR:-$HOME/.cache/kokoro}"
-[ -f "$K/kokoro-v1.0.onnx" ] && [ -f "$K/voices-v1.0.bin" ] || { echo "Faltan los modelos en $K (ver docs/handoff/07_VIDEOS_3D_RUNBOOK.md, paso 1)"; exit 1; }
-node "$here/validate.mjs" "$name" "$lang"
-SCRIPT="$name" python3 -I "$here/voice.py" "$K/kokoro-v1.0.onnx" "$K/voices-v1.0.bin" "$lang"
-SCRIPT="$name" LANG_FILM="$lang" CORE="${CORE:-0}" E2E="${E2E:-0}" node "$here/render.mjs" "$lang"
-pfx="$([ "$name" = script ] && echo "" || echo "$name-")"; base="$([ "$name" = script ] && echo film || echo "$name")"
-src="$here/out/senda-$base-$lang.mp4"; echo "Vídeo: $src"
-if [ "$pub" = publicar ]; then
-  dst="$here/../../investor-next/public/media"; mkdir -p "$dst"
-  ffmpeg -loglevel error -y -i "$src" -c:v libx264 -preset slow -crf 27 -pix_fmt yuv420p -c:a copy -movflags +faststart "$dst/senda-$base-$lang.mp4"
-  ffmpeg -loglevel error -y -ss 12 -i "$src" -frames:v 1 -q:v 4 "$dst/senda-$base-poster-$lang.jpg"
-  cp "$here/out/subtitles-$pfx$lang.vtt" "$dst/senda-$base-$lang.vtt"
-  # Subtítulos neerlandeses (tiempos de la voz inglesa), solo si voice.py acaba de generarlos en esta pasada.
-  nl="$here/out/subtitles-${pfx}nl.vtt"
-  if [ "$lang" = en ] && [ "$nl" -nt "$here/out/voice-$pfx$lang.wav" ]; then cp "$nl" "$dst/senda-$base-nl.vtt"; fi
-  ls -la "$dst"/senda-"$base"-*
-fi
+cd "$(dirname "$0")"
+
+NAME="${1:-script}"
+LANG="${2:-}"
+if [[ "$NAME" == "es" || "$NAME" == "en" ]]; then LANG="$NAME"; NAME="script"; fi
+PFX=""; [[ "$NAME" != "script" ]] && PFX="${NAME}-"
+OUTNAME="$NAME"; [[ "$NAME" == "script" ]] && OUTNAME="film"
+
+LANGS=("es" "en")
+[[ -n "$LANG" ]] && LANGS=("$LANG")
+
+for L in "${LANGS[@]}"; do
+  echo "=== [1/4] Validando ${NAME}.json [${L}] ==="
+  node validate.mjs "$NAME" "$L"
+done
+
+echo "=== [2/4] Sintetizando voz (Kokoro v1.0) ==="
+python3 voice.py "$NAME" ${LANG:+"$LANG"}
+
+echo "=== [2b/4] Verificando subtítulos WebVTT ==="
+for VTT in build/subtitles-${PFX}*.vtt; do
+  [[ -f "$VTT" ]] && node check-vtt.mjs "$VTT"
+done
+
+echo "=== [3/4] Grabando fotogramas y mezclando MP4 ==="
+JOBS="${JOBS:-2}" node render.mjs "$NAME" ${LANG:+"$LANG"}
+
+echo "=== [4/4] Fotogramas de control ==="
+IFS=',' read -ra TS <<< "${STILLS:-5,40,90,150}"
+for L in "${LANGS[@]}"; do
+  MP4="build/senda-${OUTNAME}-${L}.mp4"
+  [[ -f "$MP4" ]] || continue
+  for T in "${TS[@]}"; do
+    OUT="build/check-${OUTNAME}-${L}-${T}s.png"
+    ffmpeg -y -loglevel error -ss "$T" -i "$MP4" -frames:v 1 "$OUT" || true
+  done
+  ls -lh "$MP4" "build/subtitles-${PFX}${L}.vtt"
+done

@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {
   ACTIVATIONS,
   CALIBRATION_SOURCES,
+  CORRIDOR_INTELLIGENCE_LAYERS,
+  CORRIDOR_SECTORS,
   DEFAULT_ENVIRONMENT,
   ENVIRONMENTS,
   MODEL_VERSION,
@@ -12,6 +14,7 @@ import {
   computeRoutePlan,
   coverageField,
   deliveryProbability,
+  getCorridorIntelligenceSnapshot,
   linkProbabilityForChannel,
   trilaterate2D
 } from '../lib/command-surface.ts';
@@ -142,4 +145,40 @@ test('collectAll v2 export includes environment, model, assumptions and routes',
   assert.ok(Array.isArray(data.routes));
   assert.equal(data.routes.length, ACTIVATIONS.length);
   assert.equal(data.analysis.total, ACTIVATIONS.length);
+  assert.ok(data.corridorIntelligence);
 });
+
+test('CORRIDOR INTELLIGENCE mode exposes 9 layers, Pilot A (A12 Arnhem-Ede) and Pilot B (Barrio Lab) with honest RWS/DGT30 guards', () => {
+  assert.deepEqual(CORRIDOR_INTELLIGENCE_LAYERS, [
+    'CAMERAS',
+    'DASHCAMS',
+    'ROAD DATA',
+    'ENVIRONMENT',
+    'CONNECTED DEVICES',
+    'GATEWAYS',
+    'DTN ROUTES',
+    'DETECTED INCIDENTS',
+    'EVIDENCE'
+  ]);
+  assert.equal(CORRIDOR_SECTORS.length, 3);
+
+  const snapA = getCorridorIntelligenceSnapshot('NL-A12-ARNHEM-EDE', 'SEGMENT');
+  assert.equal(snapA.sector.pilotCode, 'PILOT_A_A12');
+  const rwsCam = snapA.sources.find(s => s.sourceId === 'RWS-NL-A12-CCTV-VELPERBROEK');
+  assert.ok(rwsCam);
+  assert.equal(rwsCam.health, 'PARTNER_ACCESS_REQUIRED');
+  assert.equal(rwsCam.videoPreviewUrl, null);
+  assert.equal(rwsCam.canActAsRelay, false);
+
+  const snapB = getCorridorIntelligenceSnapshot('LAB-BARRIO-EDIFICIO-01', 'RADIUS');
+  assert.equal(snapB.sector.pilotCode, 'PILOT_B_BARRIO_LAB');
+  assert.equal(snapB.sector.messages[0].state, 'VERIFIED');
+
+  assert.equal(snapA.cotsHardwareKits.length, 3);
+  assert.equal(snapA.meshInteropFormats.length, 4);
+  assert.equal(snapA.byzantineQuorum.distinctOperatorsVerified, 3);
+  assert.ok(snapA.sources.some(s => s.sourceId === 'DRONE-A12-POD-COTS02'));
+  assert.ok(snapA.sources.some(s => s.sourceId === 'SAT-NTN-IRIDIUM-GALILEO'));
+  assert.ok(snapA.sources.some(s => s.sourceId === 'NDW-NL-BRIDGES-V3'));
+});
+

@@ -16,8 +16,13 @@ const C = {
     h1: 'Cuando cae la red, el mensaje sigue su camino.',
     lead: 'SENDA es la capa que coordina todo lo que puede mover un mensaje de emergencia: teléfonos cercanos, sonido, satélite directo al móvil, LoRa, Iridium, radioaficionados, drones y la red que quede en pie. Cifrado de extremo a extremo, abre en modo avión y no necesita servidores.',
     open: 'Abrir SENDA Campo', easy: 'Modo fácil (3 botones)', red: 'Red y satélites', proof: 'Verificación técnica',
-    filmT: 'La película: qué es SENDA y qué ya funciona', filmNote: 'Doblada en español e inglés; subtítulos en español, inglés y neerlandés. Las simulaciones y los renders 3D los calcula el mismo código que lleva la app.',
-    rutaT: 'En la carretera: ruta protectora, cámaras, Países Bajos y DGT', rutaNote: 'Grabado fotograma a fotograma desde las páginas de la app, con el núcleo real. Las situaciones de tráfico son simulaciones, la imagen de cámara es sintética y la carretera de demostración, inventada. SENDA nunca sustituye al 112.', rutaAlt: 'Versión en inglés, con subtítulos', rutaAltLang: 'en',
+    filmT: 'La película: qué es SENDA y qué ya funciona',
+    filmNote: 'Locución original en inglés (bf_emma); subtítulos sincronizados en español, inglés y neerlandés. Todas las simulaciones y los renders 3D los calcula fotograma a fotograma el mismo código que ejecuta la app. SENDA nunca sustituye al 112.',
+    filmAlt: 'Cortes ejecutivos (90 s · 60 s · 30 s · vertical 9:16) y archivo doblado al español',
+    rutaT: 'En la carretera: ruta protectora, cámaras, Países Bajos y DGT',
+    rutaNote: 'Grabado fotograma a fotograma desde las páginas de la app, con el núcleo real y rótulos en inglés. Las situaciones de tráfico son simulaciones, la imagen de cámara es sintética y la carretera de demostración, inventada. SENDA nunca sustituye al 112.',
+    rutaAlt: 'Versión doblada al español y 6 simulaciones explicadas individuales',
+    rutaAltLang: 'es',
     gapT: 'El hueco que nadie cubre',
     gap: [['90 % → 40 %', 'usuarios con conexión estable en el apagón ibérico del 28-04-2025: la red cayó al agotarse las baterías de las antenas.', 'https://www.laecuaciondigital.com/actualidad/el-apagon-electrico-colapsa-redes-moviles-en-espana-y-portugal-el-28-de-abril/'], ['20:11', 'hora del ES-Alert en la DANA de Valencia (29-10-2024). La alerta oficial depende de la red celular.', 'https://www.eldebate.com/espana/comunidad-valenciana/20251204/principal-tecnico-emergencia-dana-sostiene-alert-retraso-diferenciar-valenciano-catalan_362211.html'], ['2030–2036', 'despliegue previsto del sistema europeo de comunicación crítica (EUCCS) para los intervinientes, no para la ciudadanía.', 'https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en']],
     featT: 'Todo lo que hace, ya en la app',
@@ -73,8 +78,13 @@ const C = {
     h1: 'When the network falls, the message finds its way.',
     lead: 'SENDA is the layer that coordinates everything that can carry an emergency message: nearby phones, sound, direct-to-phone satellite, LoRa, Iridium, amateur radio, drones and whatever network is still standing. End-to-end encrypted, it opens in airplane mode and needs no servers.',
     open: 'Open SENDA Field', easy: 'Easy mode (3 buttons)', red: 'Network & satellites', proof: 'Technical verification',
-    filmT: 'The film: what SENDA is and what already works', filmNote: 'Voiced in Spanish and English; subtitles in Spanish, English and Dutch. The simulations and 3D renders are computed by the same code the app runs.',
-    rutaT: 'On the road: protective route, cameras, the Netherlands and the DGT', rutaNote: 'Recorded frame by frame from the app’s own pages, with the real core; the on-screen app labels are in Spanish. The traffic situations are simulations, the camera image is synthetic and the demo road is invented. SENDA never replaces 112.', rutaAlt: 'Spanish version, with subtitles', rutaAltLang: 'es',
+    filmT: 'The film: what SENDA is and what already works',
+    filmNote: 'Original English narration (bf_emma); synchronised subtitles in Spanish, English and Dutch. Every simulation and 3D render is computed frame by frame by the same code the app runs. SENDA never replaces 112.',
+    filmAlt: 'Executive short cuts (90 s · 60 s · 30 s · 9:16 vertical) and Spanish-voiced archive',
+    rutaT: 'On the road: protective route, cameras, the Netherlands and the DGT',
+    rutaNote: 'Recorded frame by frame from the app’s own pages, with the real core and English on-screen labels. The traffic situations are simulations, the camera image is synthetic and the demo road is invented. SENDA never replaces 112.',
+    rutaAlt: 'Spanish-voiced version and 6 individual explained simulations',
+    rutaAltLang: 'es',
     gapT: 'The gap nobody covers',
     gap: [['90% → 40%', 'users with a stable connection during the Iberian blackout of 28-04-2025: the network fell when the masts’ batteries ran out.', 'https://www.laecuaciondigital.com/actualidad/el-apagon-electrico-colapsa-redes-moviles-en-espana-y-portugal-el-28-de-abril/'], ['20:11', 'time of the ES-Alert during the Valencia floods (29-10-2024). Official alerts depend on the cellular network.', 'https://www.eldebate.com/espana/comunidad-valenciana/20251204/principal-tecnico-emergencia-dana-sostiene-alert-retraso-diferenciar-valenciano-catalan_362211.html'], ['2030–2036', 'planned rollout of the EU Critical Communication System (EUCCS), for first responders, not citizens.', 'https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en']],
     featT: 'Everything it does, already in the app',
@@ -130,8 +140,13 @@ const C = {
     h1: 'Als het netwerk uitvalt, vindt het bericht zijn weg.',
     lead: 'SENDA is de laag die alles coördineert wat een noodbericht kan vervoeren: telefoons in de buurt, geluid, satelliet rechtstreeks naar de telefoon, LoRa, Iridium, zendamateurs, drones en wat er nog van het netwerk overeind staat. End-to-end versleuteld, opent in vliegtuigmodus en heeft geen servers nodig.',
     open: 'SENDA Field openen', easy: 'Eenvoudige modus (3 knoppen)', red: 'Netwerk & satellieten', proof: 'Technische verificatie',
-    filmT: 'De film: wat SENDA is en wat al werkt', filmNote: 'Ingesproken in het Spaans en Engels; ondertiteling in het Spaans, Engels en Nederlands. De simulaties en 3D-renders worden berekend door dezelfde code als de app.',
-    rutaT: 'Op de weg: beschermende route, camera’s, Nederland en de DGT', rutaNote: 'Beeld voor beeld opgenomen vanaf de pagina’s van de app, met de echte kern. Ingesproken in het Engels, met Nederlandse en Engelse ondertiteling; de labels in de app zijn Spaans. De verkeerssituaties zijn simulaties, het camerabeeld is synthetisch en de demoweg is verzonnen. SENDA vervangt nooit 112.', rutaAlt: 'Spaanse versie, met ondertiteling', rutaAltLang: 'es',
+    filmT: 'De film: wat SENDA is en wat al werkt',
+    filmNote: 'Originele Engelse voice-over (bf_emma); gesynchroniseerde ondertiteling in het Spaans, Engels en Nederlands. Elke simulatie en 3D-render wordt beeld voor beeld berekend door dezelfde code die de app draait. SENDA vervangt nooit 112.',
+    filmAlt: 'Korte versies (90 s · 60 s · 30 s · 9:16 verticaal) en Spaans ingesproken archief',
+    rutaT: 'Op de weg: beschermende route, camera’s, Nederland en de DGT',
+    rutaNote: 'Beeld voor beeld opgenomen vanaf de pagina’s van de app, met de echte kern en Engelse labels op het scherm. De verkeerssituaties zijn simulaties, het camerabeeld is synthetisch en de demoweg is verzonnen. SENDA vervangt nooit 112.',
+    rutaAlt: 'Spaans ingesproken versie en 6 afzonderlijke uitgelegde simulaties',
+    rutaAltLang: 'es',
     gapT: 'Het gat dat niemand dicht',
     gap: [['90% → 40%', 'gebruikers met een stabiele verbinding tijdens de Iberische stroomstoring van 28-04-2025: het netwerk viel uit toen de accu’s van de masten leeg raakten.', 'https://www.laecuaciondigital.com/actualidad/el-apagon-electrico-colapsa-redes-moviles-en-espana-y-portugal-el-28-de-abril/'], ['20:11', 'tijdstip van de ES-Alert bij de overstromingen in Valencia (29-10-2024). Officiële waarschuwingen hangen af van het mobiele netwerk.', 'https://www.eldebate.com/espana/comunidad-valenciana/20251204/principal-tecnico-emergencia-dana-sostiene-alert-retraso-diferenciar-valenciano-catalan_362211.html'], ['2030–2036', 'geplande uitrol van het Europese systeem voor kritieke communicatie (EUCCS), voor hulpverleners, niet voor burgers.', 'https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en']],
     featT: 'Alles wat het doet, al in de app',
@@ -187,7 +202,6 @@ const C = {
 export default function SendaHome({ locale }: { locale: Locale }) {
   const c = C[locale] ?? C.en;
   const p = readProof();
-  const film = locale === 'es' ? 'es' : 'en';
   return (
     <section className="senda-home" aria-labelledby="senda-h1" lang={locale}>
       <div className="sh-hero">
@@ -202,32 +216,63 @@ export default function SendaHome({ locale }: { locale: Locale }) {
         </div>
       </div>
 
-      <div className="sh-film">
+      <div className="sh-film" id="film">
         <h2>{c.filmT}</h2>
-        <video controls preload="metadata" playsInline poster={`/media/senda-film-poster-${film}.jpg`} aria-label={c.filmT}>
-          <source src={`/media/senda-film-${film}.mp4`} type="video/mp4"/>
-          <track kind="subtitles" srcLang="es" label="Español" src="/media/senda-film-es.vtt" default={locale === 'es'}/>
-          <track kind="subtitles" srcLang="en" label="English" src="/media/senda-film-en.vtt" default={locale === 'en'}/>
-          <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/senda-film-nl.vtt" default={locale === 'nl'}/>
+        <video
+          id="senda-m95-film-video"
+          controls
+          preload="metadata"
+          playsInline
+          poster="/media/m95/senda-m95-film-poster.jpg"
+          aria-label="SENDA: when the network falls. English narration with Spanish, English and Dutch subtitles."
+        >
+          <source src="/media/m95/senda-m95-film-en.mp4" type="video/mp4"/>
+          <track kind="subtitles" srcLang="es" label="Español" src="/media/m95/senda-m95-film-es.vtt" default={locale === 'es'}/>
+          <track kind="subtitles" srcLang="en" label="English" src="/media/m95/senda-m95-film-en.vtt" default={locale === 'en'}/>
+          <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/m95/senda-m95-film-nl.vtt" default={locale === 'nl'}/>
         </video>
+        <p className="sh-note">English narration · Subtítulos: Español · English · Nederlands</p>
         <p className="sh-note">{c.filmNote}</p>
+        <details className="sh-alt">
+          <summary>{c.filmAlt}</summary>
+          <p className="sh-note">
+            <a href="/media/m95/senda-m95-90s-en.mp4">90 s (MP4)</a> ·{' '}
+            <a href="/media/m95/senda-m95-60s-en.mp4">60 s (MP4)</a> ·{' '}
+            <a href="/media/m95/senda-m95-30s-en.mp4">30 s (MP4)</a> ·{' '}
+            <a href="/media/m95/senda-m95-vertical-45s-en.mp4">9:16 Vertical 45 s (MP4)</a> ·{' '}
+            <a href="/media/senda-film-es.mp4">Archivo v5 ES (MP4)</a>
+          </p>
+        </details>
       </div>
 
       <div className="sh-film" id="ruta">
         <h2>{c.rutaT}</h2>
-        <video controls preload="metadata" playsInline poster={`/media/senda-ruta-poster-${film}.jpg`} aria-label={c.rutaT}>
-          <source src={`/media/senda-ruta-${film}.mp4`} type="video/mp4"/>
-          <track kind="subtitles" srcLang={film} label={film === 'es' ? 'Español' : 'English'} src={`/media/senda-ruta-${film}.vtt`} default={locale !== 'nl'}/>
-          {film === 'en' && <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/senda-ruta-nl.vtt" default={locale === 'nl'}/>}
+        <video
+          id="senda-m95-ruta-video"
+          controls
+          preload="metadata"
+          playsInline
+          poster="/media/m95/senda-m95-ruta-poster.jpg"
+          aria-label="SENDA protective route on the road. English narration with Spanish, English and Dutch subtitles."
+        >
+          <source src="/media/m95/senda-m95-ruta-en.mp4" type="video/mp4"/>
+          <track kind="subtitles" srcLang="es" label="Español" src="/media/m95/senda-m95-ruta-es.vtt" default={locale === 'es'}/>
+          <track kind="subtitles" srcLang="en" label="English" src="/media/m95/senda-m95-ruta-en.vtt" default={locale === 'en'}/>
+          <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/m95/senda-m95-ruta-nl.vtt" default={locale === 'nl'}/>
         </video>
+        <p className="sh-note">English narration · Subtítulos: Español · English · Nederlands</p>
         <p className="sh-note">{c.rutaNote}</p>
         <details className="sh-alt" lang={c.rutaAltLang}>
           <summary>{c.rutaAlt}</summary>
-          <video controls preload="none" playsInline poster={`/media/senda-ruta-poster-${c.rutaAltLang}.jpg`} aria-label={c.rutaAlt}>
-            <source src={`/media/senda-ruta-${c.rutaAltLang}.mp4`} type="video/mp4"/>
-            <track kind="subtitles" srcLang={c.rutaAltLang} label={c.rutaAltLang === 'es' ? 'Español' : 'English'} src={`/media/senda-ruta-${c.rutaAltLang}.vtt`} default/>
-            {c.rutaAltLang === 'en' && <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/senda-ruta-nl.vtt"/>}
-          </video>
+          <p className="sh-note">
+            <a href="/media/m95/senda-m95-sim-braking-en.mp4">Sim 1: Braking</a> ·{' '}
+            <a href="/media/m95/senda-m95-sim-sos-en.mp4">Sim 2: SOS DTN</a> ·{' '}
+            <a href="/media/m95/senda-m95-sim-wrongway-en.mp4">Sim 3: Wrong-way</a> ·{' '}
+            <a href="/media/m95/senda-m95-sim-queue-en.mp4">Sim 4: Queue LWR</a> ·{' '}
+            <a href="/media/m95/senda-m95-sim-visibility-en.mp4">Sim 5: Visibility</a> ·{' '}
+            <a href="/media/m95/senda-m95-sim-proof-en.mp4">Sim 6: PCI Proof</a> ·{' '}
+            <a href="/media/senda-ruta-es.mp4">Archivo v5 ES (MP4)</a>
+          </p>
         </details>
       </div>
 

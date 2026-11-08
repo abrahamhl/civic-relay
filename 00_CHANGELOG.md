@@ -1,5 +1,38 @@
 # Changelog
 
+## SENDA v0.23 · 08-11-2026 · Suite de vídeos finales de presentación M95 (V1–V5, 1080p, voz en inglés `bf_emma`, subtítulos ES/EN/NL y evidencia de release)
+
+**Entrada (fundador):**
+- Crear los vídeos finales de presentación entendiendo bien el proyecto y manteniendo la calidad de los ya existentes (`docs/handoff/08_ANTIGRAVITY_VIDEO_HANDOFF.md`).
+
+**Procesamiento:**
+- **Guiones y fuentes verificables (`docs/video/M95_VIDEO_SOURCES.md` + `media/senda-film/m95-*.json`):**
+  - registro de fuentes para cada cifra dicha o mostrada (`OBSERVED`, `CALCULATED`, `SIMULATED`);
+  - `m95-film.json` (22 escenas `s1`…`s13` + nueva escena `s12b` *The proof you can inspect* con `266` pruebas de núcleo, `13` vectores PCI y `0` auditorías externas) y `m95-ruta.json` (12 escenas `r0`…`r11`);
+  - 10 guiones derivados (`m95-90s`, `m95-60s`, `m95-30s`, `m95-vertical-45s` y 6 simulaciones explicadas `m95-sim-braking`, `m95-sim-sos`, `m95-sim-wrongway`, `m95-sim-queue`, `m95-sim-visibility`, `m95-sim-proof`).
+- **Voz y subtítulos trilingües (`media/senda-film/voice.py` + `media/senda-film/check-vtt.mjs`):**
+  - narración inglesa `bf_emma` (`kokoro-onnx==0.6.1`, `en-gb`, `0,95x`, pausas de `350 ms`) con fonética separada en `en_say`;
+  - generación simultánea de 36 archivos `.vtt` (`es`, `en`, `nl`) sincronizados con la voz inglesa y verificados automáticamente (`36/36` pass en `check-vtt.mjs`; neerlandés marcado `REVIEW_REQUIRED` en `evidence/video/m95/subtitles-review.md`).
+- **Escenario 3D/2D y renderizado (`media/senda-film/film.html`, `sims.js`, `render.mjs`):**
+  - restauración y mejora del escenario v5 con Three.js (`drone3d`, `arch3d`), `call`, `howsim`, `hub` y simulaciones de páginas reales a `1920×1080` (`1,5x` DPR, `25 fps`, H.264 High `yuv420p` `+faststart`) y `1080×1920` vertical (limpio y con subtítulos incrustados `en`/`es`/`nl`);
+  - internacionalización completa al inglés (`?film=1&lang=en`) en `carretera.html`, `camaras.html`, `paises.html`, `dgt.html` y `kit.mjs` sin alterar la lógica del núcleo;
+  - banda sonora ambiental procedural (`media/promo-video/music.py`) con ducking por `sidechaincompress` y normalización a `-16 LUFS` / `-1,5 dBTP`.
+- **Integración web, cabeceras y evidencia (`investor-next/` + `evidence/video/m95/`):**
+  - publicación de los 53 artefactos en `investor-next/public/media/m95/` preservando los vídeos anteriores (`senda-film-*`, `senda-ruta-*`);
+  - integración en `investor-next/app/senda-home.tsx`, `investor-next/public/senda/carretera.html` y `investor-next/public/senda/arquitectura.html`;
+  - cabeceras de seguridad (§ 8.4) y caché de medios en `investor-next/vercel.json`;
+  - paquete de evidencia completo en `evidence/video/m95/` (`release.json`, `qa-report.md`, `headers.txt`, `subtitles-review.md`, `ffprobe-film.json`, `ffprobe-ruta.json`, `SHA256SUMS.txt` y `screenshots/`) y `docs/video/M95_VIDEO_RELEASE.md`.
+
+**Validación:**
+- `node --test packages/senda/tests/*.test.mjs`: `266/266` pass.
+- `node --test packages/senda-pci/tests/*.test.mjs`: `13/13` pass.
+- `node --test scripts/release-manifest.test.mjs`: `4/4` pass.
+- `pnpm --dir investor-next run type-check`, `pnpm --dir investor-next run build` (14 páginas), `pnpm --dir investor-next run check:locales` (`6/6`), `node --test investor-next/tests/*.test.mjs` (`107/107`).
+- `node media/senda-film/check-vtt.mjs`: `36/36` VTT válidos (`0` errores).
+- `node media/senda-film/verify-web.mjs`: HTTP `206` Range, `text/vtt`, tracks por idioma y `0` errores de consola en Chromium.
+
+**Salida:** suite completa M95 publicada en `investor-next/public/media/m95/` con hashes SHA-256 y evidencia en `evidence/video/m95/`.
+
 ## SENDA v0.22 · 08-11-2026 · Modelo RF calibrable, rutas con respaldo y trilateración ponderada
 
 **Entrada (fundador):**

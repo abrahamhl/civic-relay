@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:03.032
+When the network falls, the message shouldn't die.
+
+2
+00:00:03.382 --> 00:00:17.334
+On the twenty-eighth of April, twenty twenty-five, Spain's mobile network didn't fail when the power went out. It failed when the batteries in the masts ran dry. Within hours, users with a stable connection dropped from ninety to forty percent.
+
+3
+00:00:18.934 --> 00:00:29.195
+What nobody does yet: SENDA splits every message with Reed-Solomon coding and spreads the fragments across different bearers. Any few of them arriving is enough to rebuild it.
+
+4
+00:00:29.545 --> 00:00:45.161
+With satellite, LoRa, SMS and neighbours, an SOS reaches a ninety-nine percent delivery probability, calculated exactly. In the live trial, one hundred and ninety-seven of two hundred messages were rebuilt byte for byte while bearers were dropped at random.
+
+5
+00:00:46.761 --> 00:00:56.553
+Only a coordinator holding a credential signed by their agency can trigger anything on your phone, and only if you authorised it and an emergency has been declared.
+
+6
+00:00:58.153 --> 00:01:01.460
+Try it now, with nothing to install, at the address on screen.

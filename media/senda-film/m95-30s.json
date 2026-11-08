@@ -1,0 +1,107 @@
+{
+ "note": "SENDA Mission 9.5 · Teaser 30s (s1 + s13)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "s1",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/public/senda/dgt.html",
+    "docs/video/M95_VIDEO_SOURCES.md"
+   ],
+   "visual": {
+    "kind": "kpis",
+    "kpis": [
+     {
+      "v": "90 % → 40 %",
+      "l": {
+       "es": "usuarios con conexión estable · apagón ibérico 28-04-2025",
+       "en": "users with a stable connection · Iberian blackout 28-04-2025",
+       "nl": "gebruikers met stabiele verbinding · Iberische stroomstoring 28-04-2025"
+      }
+     },
+     {
+      "v": "20:11",
+      "l": {
+       "es": "llega el ES-Alert · DANA de Valencia, 29-10-2024",
+       "en": "ES-Alert arrives · Valencia floods, 29-10-2024",
+       "nl": "ES-Alert komt aan · overstroming Valencia, 29-10-2024"
+      }
+     }
+    ]
+   },
+   "title": {
+    "es": "Cuando cae la red, el mensaje no debería morir.",
+    "en": "When the network falls, the message shouldn't die.",
+    "nl": "Als het netwerk uitvalt, mag het bericht niet sterven."
+   },
+   "es": [
+    "Cuando cae la red, el mensaje no debería morir.",
+    "El veintiocho de abril de dos mil veinticinco, la red móvil no cayó al irse la luz: cayó cuando se agotaron las baterías de las antenas. En pocas horas, los usuarios con conexión estable pasaron del noventa al cuarenta por ciento."
+   ],
+   "es_say": [
+    "Cuando cae la red, el mensaje no debería morir.",
+    "El veintiocho de abril de dos mil veinticinco, la red móvil no cayó al irse la luz: cayó cuando se agotaron las baterías de las antenas. En pocas horas, los usuarios con conexión estable pasaron del noventa al cuarenta por ciento."
+   ],
+   "en": [
+    "When the network falls, the message shouldn't die.",
+    "On the twenty-eighth of April, twenty twenty-five, Spain's mobile network didn't fail when the power went out. It failed when the batteries in the masts ran dry. Within hours, users with a stable connection dropped from ninety to forty percent."
+   ],
+   "en_say": [
+    "When the network falls, the message shouldn't die.",
+    "On the twenty-eighth of April, twenty twenty-five, Spain's mobile network didn't fail when the power went out. It failed when the batteries in the masts ran dry. Within hours, users with a stable connection dropped from ninety to forty percent."
+   ],
+   "nl": [
+    "Als het netwerk uitvalt, mag het bericht niet sterven.",
+    "Op 28 april 2025 viel het Spaanse mobiele netwerk niet uit toen de stroom wegviel, maar toen de accu's van de zendmasten leeg raakten. Binnen enkele uren daalde het aandeel gebruikers met een stabiele verbinding van negentig naar veertig procent."
+   ]
+  },
+  {
+   "id": "s13",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/app/senda-home.tsx",
+    "LICENSE"
+   ],
+   "visual": {
+    "kind": "cta"
+   },
+   "title": {
+    "es": "Para que ningún mensaje se pierda",
+    "en": "So that no message is lost",
+    "nl": "Zodat geen enkel bericht verloren gaat"
+   },
+   "es": [
+    "SENDA es para la ciudadanía, los coordinadores, los cuerpos de seguridad y emergencias, las administraciones, y para quien quiera invertir en que ningún mensaje se pierda.",
+    "Pruébalo ahora, sin instalar nada, en la dirección que ves en pantalla."
+   ],
+   "es_say": [
+    "Senda es para la ciudadanía, los coordinadores, los cuerpos de seguridad y emergencias, las administraciones, y para quien quiera invertir en que ningún mensaje se pierda.",
+    "Pruébalo ahora, sin instalar nada, en la dirección que ves en pantalla."
+   ],
+   "en": [
+    "SENDA is for citizens, coordinators, police and emergency services, public administrations, and anyone who wants to invest in making sure no message is lost.",
+    "Try it now, with nothing to install, at the address on screen."
+   ],
+   "en_say": [
+    "Senda is for citizens, coordinators, police and emergency services, public administrations, and anyone who wants to invest in making sure no message is lost.",
+    "Try it now, with nothing to install, at the address on screen."
+   ],
+   "nl": [
+    "SENDA is er voor burgers, coördinatoren, politie en hulpdiensten, overheden en iedereen die wil investeren in het idee dat geen enkel bericht verloren gaat.",
+    "Probeer het nu, zonder iets te installeren, op het adres in beeld."
+   ]
+  }
+ ]
+}

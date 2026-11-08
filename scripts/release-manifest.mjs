@@ -19,14 +19,65 @@
 
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync, statSync, lstatSync, readlinkSync, existsSync } from 'node:fs';
-import { resolve, relative, sep, dirname } from 'node:path';
+import { readFileSync, writeFileSync, lstatSync, readlinkSync, readdirSync, existsSync } from 'node:fs';
+import { resolve, relative, sep, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const SCHEMA = 'senda.release-manifest/1';
 
+const DEPLOYMENT_FIELDS = ['provider', 'artifactMode', 'target', 'projectId', 'deploymentId', 'url', 'commitSha', 'artifactSha256', 'sourceTreeSha256', 'verifiedAt', 'verifiedBy', 'status'];
+
 function sha256(data) {
   return createHash('sha256').update(data).digest('hex');
+}
+
+export function normalizeDeployment(value, { commit, sourceTreeSha256, artifact, dirty }) {
+  if (value === null || value === undefined) return null;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('deployment debe ser un objeto');
+  const keys = Object.keys(value).sort();
+  if (keys.length !== DEPLOYMENT_FIELDS.length || keys.some((key, i) => key !== [...DEPLOYMENT_FIELDS].sort()[i])) {
+    throw new Error('deployment con campos no permitidos');
+  }
+  if (!artifact) throw new Error('deployment exige un artefacto hasheado');
+  if (value.provider !== 'vercel') throw new Error('deployment.provider no soportado');
+  if (value.artifactMode !== 'prebuilt') throw new Error('deployment.artifactMode debe ser prebuilt');
+  if (value.target !== 'production' && value.target !== 'preview') throw new Error('deployment.target inválido');
+  if (value.target === 'production' && dirty) throw new Error('DEPLOYMENT_REQUIRES_CLEAN_TREE');
+  if (value.status !== 'READY') throw new Error('deployment.status debe ser READY');
+  for (const field of ['projectId', 'deploymentId', 'verifiedBy']) {
+    if (typeof value[field] !== 'string' || value[field].trim() === '') throw new Error(`deployment.${field} inválido`);
+  }
+  if (typeof value.url !== 'string') throw new Error('deployment.url inválido');
+  let url;
+  try { url = new URL(value.url); } catch { throw new Error('deployment.url inválido'); }
+  if (url.protocol !== 'https:') throw new Error('deployment.url debe usar https');
+  if (typeof value.commitSha !== 'string' || !/^[0-9a-f]{40}$/.test(value.commitSha)) throw new Error('deployment.commitSha inválido');
+  if (value.commitSha !== commit) throw new Error('deployment.commitSha no coincide con HEAD');
+  if (typeof value.sourceTreeSha256 !== 'string' || !/^[0-9a-f]{64}$/.test(value.sourceTreeSha256)) throw new Error('deployment.sourceTreeSha256 inválido');
+  if (value.sourceTreeSha256 !== sourceTreeSha256) throw new Error('deployment.sourceTreeSha256 no coincide con el árbol');
+  if (typeof value.artifactSha256 !== 'string' || !/^[0-9a-f]{64}$/.test(value.artifactSha256)) throw new Error('deployment.artifactSha256 inválido');
+  if (value.artifactSha256 !== artifact.sha256) throw new Error('deployment.artifactSha256 no coincide con el artefacto');
+  if (typeof value.verifiedAt !== 'string' || !Number.isFinite(Date.parse(value.verifiedAt)) || new Date(value.verifiedAt).toISOString() !== value.verifiedAt) {
+    throw new Error('deployment.verifiedAt inválido');
+  }
+  return { ...value };
+}
+
+function deploymentMatches(manifest, current) {
+  const d = manifest?.deployment;
+  if (!d) return true;
+  return d.provider === 'vercel' &&
+    d.artifactMode === 'prebuilt' &&
+    (d.target === 'production' || d.target === 'preview') &&
+    d.status === 'READY' &&
+    typeof d.projectId === 'string' && d.projectId.length > 0 &&
+    typeof d.deploymentId === 'string' && d.deploymentId.length > 0 &&
+    typeof d.verifiedBy === 'string' && d.verifiedBy.length > 0 &&
+    typeof d.url === 'string' && d.url.startsWith('https://') &&
+    d.commitSha === current.git.commit &&
+    d.sourceTreeSha256 === current.source.treeSha256 &&
+    d.artifactSha256 === current.build.artifact?.sha256 &&
+    (d.target !== 'production' || !current.git.dirty);
 }
 
 export function hashFile(path) {
@@ -44,6 +95,26 @@ export function hashFiles(root, files) {
     return `${f.mode} ${hashFile(abs)} ${f.path.replaceAll(sep, '/')}`;
   }).sort();
   return { treeSha256: sha256(rows.join('\n') + '\n'), fileCount: rows.length, rows };
+}
+
+function artifactRows(dir, prefix = '') {
+  const rows = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+    const abs = join(dir, entry.name);
+    const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+    const st = lstatSync(abs);
+    if (st.isDirectory()) rows.push(...artifactRows(abs, rel));
+    else rows.push({ mode: st.isSymbolicLink() ? '120000' : st.mode & 0o111 ? '100755' : '100644', path: rel, bytes: st.size });
+  }
+  return rows;
+}
+
+export function describeArtifact(path) {
+  const st = lstatSync(path);
+  if (!st.isDirectory()) return { bytes: st.size, sha256: hashFile(path), fileCount: 1 };
+  const rows = artifactRows(path);
+  const { treeSha256, fileCount } = hashFiles(path, rows);
+  return { bytes: rows.reduce((sum, row) => sum + row.bytes, 0), sha256: treeSha256, fileCount };
 }
 
 function git(root, args) {
@@ -77,10 +148,11 @@ export function buildManifest(root = process.cwd(), opts = {}) {
   if (opts.artifact) {
     const abs = resolve(root, opts.artifact);
     if (!existsSync(abs)) throw new Error(`artefacto inexistente: ${opts.artifact}`);
-    artifact = { path: opts.artifact.replaceAll(sep, '/'), bytes: statSync(abs).size, sha256: hashFile(abs) };
+    artifact = { path: opts.artifact.replaceAll(sep, '/'), ...describeArtifact(abs) };
   }
 
-  const claim = dirty ? 'UNCOMMITTED_BUILD' : artifact ? 'ARTIFACT_HASHED' : 'SOURCE_ONLY';
+  const deployment = normalizeDeployment(opts.deployment, { commit, sourceTreeSha256: source.treeSha256, artifact, dirty });
+  const claim = dirty ? 'UNCOMMITTED_BUILD' : deployment ? 'DEPLOYMENT_LINKED' : artifact ? 'ARTIFACT_HASHED' : 'SOURCE_ONLY';
   return {
     schema: SCHEMA,
     claim,
@@ -91,6 +163,7 @@ export function buildManifest(root = process.cwd(), opts = {}) {
       fileCount: source.fileCount,
       lockfileSha256: lockfileHash(root),
     },
+    deployment,
     runtime: {
       node: process.version,
       platform: process.platform,
@@ -132,22 +205,25 @@ export function verifyManifest(root, manifest, opts = {}) {
   const artifactMatches = manifest?.build?.artifact
     ? current.build.artifact?.sha256 === manifest.build.artifact.sha256
     : true;
+  const linkedDeployment = deploymentMatches(manifest, current);
+  const productionTarget = opts.production ? !manifest?.deployment || manifest.deployment.target === 'production' : true;
   const clean = !current.git.dirty;
-  const verified = sourceMatches && artifactMatches && (!opts.production || clean);
-  return { verified, sourceMatches, artifactMatches, clean, claim: current.claim, current };
+  const verified = sourceMatches && artifactMatches && linkedDeployment && productionTarget && (!opts.production || clean);
+  return { verified, sourceMatches, artifactMatches, deploymentMatches: linkedDeployment, clean, claim: current.claim, current };
 }
 
 function parseArgs(argv) {
-  const out = { out: null, artifact: null, buildCommand: null, verify: null, production: false };
+  const out = { out: null, artifact: null, buildCommand: null, deployment: null, verify: null, production: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--out') out.out = argv[++i];
     else if (a === '--artifact') out.artifact = argv[++i];
     else if (a === '--build-command') out.buildCommand = argv[++i];
+    else if (a === '--deployment') out.deployment = argv[++i];
     else if (a === '--verify') out.verify = argv[++i];
     else if (a === '--production') out.production = true;
     else if (a === '--help' || a === '-h') {
-      console.log('uso: node scripts/release-manifest.mjs [--out f] [--artifact f] [--build-command c] | --verify f [--production]');
+      console.log('uso: node scripts/release-manifest.mjs [--out f] [--artifact f] [--build-command c] [--deployment f] | --verify f [--production]');
       process.exit(0);
     } else throw new Error(`argumento desconocido: ${a}`);
   }
@@ -165,7 +241,8 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       console.log(JSON.stringify(report, null, 2));
       process.exit(result.verified ? 0 : 1);
     }
-    const manifest = buildManifest(root, { artifact: args.artifact, buildCommand: args.buildCommand });
+    const deployment = args.deployment ? JSON.parse(readFileSync(resolve(root, args.deployment), 'utf8')) : null;
+    const manifest = buildManifest(root, { artifact: args.artifact, buildCommand: args.buildCommand, deployment });
     if (args.out) {
       const dest = resolve(root, args.out);
       writeFileSync(dest, JSON.stringify(manifest, null, 2) + '\n');

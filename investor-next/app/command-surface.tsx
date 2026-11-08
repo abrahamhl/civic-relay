@@ -37,7 +37,12 @@ import {
   type EnvironmentId,
   type ScenarioId,
   type Severity,
-  type WallMaterialId
+  type WallMaterialId,
+  CORRIDOR_INTELLIGENCE_LAYERS,
+  CORRIDOR_SECTORS,
+  getCorridorIntelligenceSnapshot,
+  type CorridorLayerId,
+  type CorridorSelectionMode
 } from '../lib/command-surface';
 import './command-surface.css';
 
@@ -857,6 +862,18 @@ export default function CommandSurface({ locale }: { locale: Locale }) {
     tracks: true,
     routes: true
   });
+  const [corridorSectorId, setCorridorSectorId] = useState<string>('NL-A12-ARNHEM-EDE');
+  const [corridorSelectionMode, setCorridorSelectionMode] = useState<CorridorSelectionMode>('SEGMENT');
+  const [corridorLayers, setCorridorLayers] = useState<CorridorLayerId[]>([...CORRIDOR_INTELLIGENCE_LAYERS]);
+  const [selectedCorridorSourceId, setSelectedCorridorSourceId] = useState<string>('DASHCAM-A12-REAL-TRACE-01');
+  const corridorSnapshot = useMemo(
+    () => getCorridorIntelligenceSnapshot(corridorSectorId, corridorSelectionMode, corridorLayers),
+    [corridorSectorId, corridorSelectionMode, corridorLayers]
+  );
+  const selectedCorridorSource = useMemo(
+    () => corridorSnapshot.sources.find(s => s.sourceId === selectedCorridorSourceId) ?? corridorSnapshot.sources[0] ?? null,
+    [corridorSnapshot, selectedCorridorSourceId]
+  );
   const [activated, setActivated] = useState<Record<string, number>>({});
   const [audit, setAudit] = useState<AuditEntry[]>([]);
   const [toast, setToast] = useState<string | null>(null);
@@ -1733,6 +1750,329 @@ export default function CommandSurface({ locale }: { locale: Locale }) {
             </div>
           </section>
         </div>
+
+        <section
+          className="cmd-panel cmd-corridor-intelligence"
+          data-testid="corridor-intelligence-mode"
+          aria-labelledby="corridor-intelligence-heading"
+          style={{ marginTop: '1.25rem', padding: '1.25rem' }}
+        >
+          <div className="cmd-section-head" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <div>
+              <span className="cmd-kicker">CORRIDOR INTELLIGENCE · 5 PLANOS (A–E) · PCI v0.2</span>
+              <h3 id="corridor-intelligence-heading">
+                {locale === 'es'
+                  ? 'CORRIDOR INTELLIGENCE — Fuentes Reales, Correlación Multisensor y Custodia DTN'
+                  : locale === 'nl'
+                    ? 'CORRIDOR INTELLIGENCE — Echte Bronnen, Multisensor-correlatie en DTN-custody'
+                    : 'CORRIDOR INTELLIGENCE — Real Sources, Multisensor Correlation & DTN Custody'}
+              </h3>
+              <p style={{ margin: '0.25rem 0 0', opacity: 0.85, fontSize: '0.86rem' }}>
+                {corridorSnapshot.sector.subtitle[locale]}
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              {CORRIDOR_SECTORS.map(sec => (
+                <button
+                  key={sec.sectorId}
+                  type="button"
+                  data-testid={`corridor-sector-${sec.sectorId}`}
+                  onClick={() => {
+                    setCorridorSectorId(sec.sectorId);
+                    setSelectedCorridorSourceId('');
+                  }}
+                  style={{
+                    padding: '0.4rem 0.75rem',
+                    borderRadius: '6px',
+                    border: corridorSectorId === sec.sectorId ? '1px solid #34d399' : '1px solid rgba(255,255,255,0.18)',
+                    background: corridorSectorId === sec.sectorId ? 'rgba(52,211,153,0.16)' : 'rgba(15,23,42,0.6)',
+                    color: '#f8fafc',
+                    fontSize: '0.78rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {sec.title[locale]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginTop: '0.9rem', paddingBottom: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              <strong style={{ fontSize: '0.75rem', opacity: 0.8, marginRight: '0.35rem' }}>
+                {locale === 'es' ? 'SELECCIÓN:' : locale === 'nl' ? 'SELECTIE:' : 'SELECTION:'}
+              </strong>
+              {(['SEGMENT', 'RADIUS', 'POLYGON'] as CorridorSelectionMode[]).map(mode => (
+                <button
+                  key={mode}
+                  type="button"
+                  data-testid={`corridor-select-${mode}`}
+                  onClick={() => setCorridorSelectionMode(mode)}
+                  style={{
+                    padding: '0.28rem 0.6rem',
+                    borderRadius: '4px',
+                    border: corridorSelectionMode === mode ? '1px solid #91d7e8' : '1px solid rgba(255,255,255,0.15)',
+                    background: corridorSelectionMode === mode ? 'rgba(145,215,232,0.18)' : 'transparent',
+                    color: '#e2e8f0',
+                    fontSize: '0.74rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {mode === 'SEGMENT'
+                    ? `${locale === 'es' ? 'Tramo' : locale === 'nl' ? 'Wegvak' : 'Segment'}: ${corridorSnapshot.sector.roadSegmentId}`
+                    : mode === 'RADIUS'
+                      ? `${locale === 'es' ? 'Radio' : locale === 'nl' ? 'Straal' : 'Radius'}: ${corridorSnapshot.sector.defaultRadiusM} m`
+                      : `${locale === 'es' ? 'Polígono' : locale === 'nl' ? 'Polygoon' : 'Polygon'} (${corridorSnapshot.sector.polygonCoords.length} pts)`}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', alignItems: 'center' }} data-testid="corridor-layer-toggles">
+              {CORRIDOR_INTELLIGENCE_LAYERS.map(layer => {
+                const active = corridorLayers.includes(layer);
+                return (
+                  <button
+                    key={layer}
+                    type="button"
+                    data-testid={`corridor-layer-${layer.replace(/\s+/g, '-')}`}
+                    onClick={() => {
+                      setCorridorLayers(prev =>
+                        prev.includes(layer) ? prev.filter(l => l !== layer) : [...prev, layer]
+                      );
+                    }}
+                    style={{
+                      padding: '0.24rem 0.55rem',
+                      borderRadius: '999px',
+                      border: active ? '1px solid #60a5fa' : '1px solid rgba(255,255,255,0.14)',
+                      background: active ? 'rgba(96,165,250,0.18)' : 'transparent',
+                      color: active ? '#f8fafc' : '#94a3b8',
+                      fontSize: '0.71rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {layer}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+            {/* Columna 1: Inventario de Fuentes y Separación Observación vs Transporte */}
+            <div style={{ background: 'rgba(15,23,42,0.55)', padding: '0.9rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.86rem' }}>
+                {locale === 'es'
+                  ? `1. Fuentes en Sector (${corridorSnapshot.authorizedLiveOrLabCount} activas / ${corridorSnapshot.catalogOrRestrictedCount} restringidas o catálogo)`
+                  : locale === 'nl'
+                    ? `1. Bronnen in Sector (${corridorSnapshot.authorizedLiveOrLabCount} actief / ${corridorSnapshot.catalogOrRestrictedCount} beperkt of catalogus)`
+                    : `1. Sector Sources (${corridorSnapshot.authorizedLiveOrLabCount} active / ${corridorSnapshot.catalogOrRestrictedCount} restricted or catalog)`}
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', maxHeight: '340px', overflowY: 'auto' }}>
+                {corridorSnapshot.sources.map(src => {
+                  const isLiveOrReal = ['LIVE_VERIFIED', 'RECORDED_REAL_SAMPLE', 'LAB_VERIFIED'].includes(src.health);
+                  const badgeColor = src.health === 'LIVE_VERIFIED'
+                    ? '#34d399'
+                    : src.health === 'RECORDED_REAL_SAMPLE' || src.health === 'LAB_VERIFIED'
+                      ? '#60a5fa'
+                      : src.health === 'PARTNER_ACCESS_REQUIRED' || src.health === 'PERMISSION_PENDING'
+                        ? '#fbbf24'
+                        : '#f87171';
+                  return (
+                    <div
+                      key={src.sourceId}
+                      onClick={() => setSelectedCorridorSourceId(src.sourceId)}
+                      data-testid={`corridor-source-row-${src.sourceId}`}
+                      style={{
+                        padding: '0.55rem',
+                        borderRadius: '6px',
+                        border: selectedCorridorSource?.sourceId === src.sourceId ? '1px solid #91d7e8' : '1px solid rgba(255,255,255,0.08)',
+                        background: isLiveOrReal ? 'rgba(30,41,59,0.75)' : 'rgba(15,23,42,0.45)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.4rem', alignItems: 'center' }}>
+                        <strong style={{ fontSize: '0.78rem' }}>{src.sourceId}</strong>
+                        <span style={{ fontSize: '0.68rem', padding: '0.12rem 0.45rem', borderRadius: '4px', border: `1px solid ${badgeColor}`, color: badgeColor }}>
+                          {src.health}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.72rem', opacity: 0.82, marginTop: '0.2rem' }}>
+                        {src.assetType} · {src.operator}
+                      </div>
+                      <div style={{ fontSize: '0.72rem', color: '#cbd5e1', marginTop: '0.25rem' }}>
+                        {src.latestObservationSummary}
+                      </div>
+                      <div style={{ fontSize: '0.68rem', opacity: 0.72, marginTop: '0.25rem' }}>
+                        OBS: [{src.observationCapabilities.join(', ') || 'NONE'}] · TX: [{src.transportCapabilities.join(', ') || 'NONE (NO ES PORTADOR)'}]
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Columna 2: Visualización Autorizada de Cámara/Dashcam + Evento Fusionado (Plano C) */}
+            <div style={{ background: 'rgba(15,23,42,0.55)', padding: '0.9rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.86rem' }}>
+                {locale === 'es'
+                  ? '2. Evidencia Visual Autorizada y Fusión Multisensor (Plano C)'
+                  : locale === 'nl'
+                    ? '2. Geautoriseerd Visueel Bewijs & Multisensor-fusie (Vlak C)'
+                    : '2. Authorized Visual Evidence & Multisensor Fusion (Plane C)'}
+              </h4>
+              {selectedCorridorSource?.videoPreviewUrl ? (
+                <div style={{ marginBottom: '0.65rem' }}>
+                  <video
+                    key={selectedCorridorSource.videoPreviewUrl}
+                    src={selectedCorridorSource.videoPreviewUrl}
+                    controls
+                    muted
+                    playsInline
+                    style={{ width: '100%', borderRadius: '6px', maxHeight: '165px', background: '#000' }}
+                  />
+                  <small style={{ display: 'block', fontSize: '0.7rem', color: '#93c5fd', marginTop: '0.2rem' }}>
+                    {selectedCorridorSource.sourceId} · {selectedCorridorSource.health} · {selectedCorridorSource.proofRef}
+                  </small>
+                </div>
+              ) : (
+                <div style={{ padding: '0.65rem', borderRadius: '6px', background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.35)', fontSize: '0.74rem', marginBottom: '0.65rem' }}>
+                  <strong>{selectedCorridorSource?.sourceId ?? 'SOURCE'}: {selectedCorridorSource?.health ?? 'CATALOG_ONLY'}</strong>
+                  <p style={{ margin: '0.25rem 0 0' }}>
+                    {locale === 'es'
+                      ? 'Esta fuente NO se representa como vídeo en directo (sin acuerdo de partner o solo telemetría vial).'
+                      : locale === 'nl'
+                        ? 'Deze bron wordt NIET weergegeven als live video (partnerovereenkomst vereist of enkel wegtelemetrie).'
+                        : 'This source is NOT represented as live video (partner access required or road telemetry only).'}
+                  </p>
+                </div>
+              )}
+
+              <div style={{ padding: '0.65rem', borderRadius: '6px', background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.3)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem' }}>
+                  <strong>{corridorSnapshot.sector.fusedIncident.decision}</strong>
+                  <span>
+                    P={Math.round(corridorSnapshot.sector.fusedIncident.posteriorConfidence * 1000) / 10}% (IC90: [{Math.round(corridorSnapshot.sector.fusedIncident.uncertaintyInterval90[0] * 100)}–{Math.round(corridorSnapshot.sector.fusedIncident.uncertaintyInterval90[1] * 100)}%])
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.74rem', margin: '0.35rem 0' }}>
+                  {corridorSnapshot.sector.fusedIncident.summary[locale]}
+                </p>
+                <div style={{ fontSize: '0.69rem', opacity: 0.85 }}>
+                  <div>Corroboran: {corridorSnapshot.sector.fusedIncident.corroboratingSources.join(' + ')}</div>
+                  <div>Familias independientes: {corridorSnapshot.sector.fusedIncident.independentFamilies.join(', ')}</div>
+                  <div>Incertidumbre espacial: ±{corridorSnapshot.sector.fusedIncident.location.uncertaintyRadiusM} m</div>
+                  <div style={{ wordBreak: 'break-all' }}>Merkle SHA-256: <code>{corridorSnapshot.sector.fusedIncident.merkleDigestSha256}</code></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Columna 3: Rutas Físicas R3, Fallo de Enlace y Máquina de Estados DTN (Plano D) */}
+            <div style={{ background: 'rgba(15,23,42,0.55)', padding: '0.9rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.86rem' }}>
+                {locale === 'es'
+                  ? '3. Rutas Físicas (R3), Fallo de Red y Cola de Custodia DTN (Plano D)'
+                  : locale === 'nl'
+                    ? '3. Fysieke Routes (R3), Netwerkuitval & DTN-wachtrij (Vlak D)'
+                    : '3. Physical Routes (R3), Link Failure & DTN Custody Queue (Plane D)'}
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '0.65rem' }}>
+                {corridorSnapshot.sector.dtnRoutes.map(rt => (
+                  <div key={rt.routeId} style={{ padding: '0.45rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.72rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>{rt.routeId} ({rt.bearer})</strong>
+                      <span style={{ color: rt.status === 'ACTIVE_CUSTODY' ? '#34d399' : rt.status === 'BLOCKED' ? '#fbbf24' : '#f87171' }}>
+                        {rt.status}
+                      </span>
+                    </div>
+                    <div style={{ opacity: 0.8, marginTop: '0.15rem' }}>
+                      Supervivencia R3: {rt.jointSurvivalProbPct}% · Loss: {rt.packetLossPct}% · Deps: [{rt.sharedDeps.join(', ')}]
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+                {corridorSnapshot.sector.messages.map(msg => (
+                  <div key={msg.messageId} data-testid={`corridor-msg-${msg.messageId}`} style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(30,41,59,0.75)', border: '1px solid rgba(145,215,232,0.28)', fontSize: '0.72rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>{msg.messageId} ({msg.kind} · {msg.wireSizeBytes} B)</strong>
+                      <span style={{ color: msg.state === 'VERIFIED' ? '#34d399' : '#fbbf24', fontWeight: 700 }}>{msg.state}</span>
+                    </div>
+                    <div style={{ marginTop: '0.2rem', color: '#91d7e8' }}>
+                      Ciclo: {msg.transitions.join(' → ')}
+                    </div>
+                    <div style={{ marginTop: '0.15rem', opacity: 0.85 }}>
+                      Ruta custodia: {msg.custodyPath.join(' → ')}
+                    </div>
+                    <div style={{ marginTop: '0.15rem', fontSize: '0.68rem', opacity: 0.8 }}>
+                      {msg.note}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Fila Soberana B2G: Kits COTS Open-Hardware + Malla Multisoftware + Quórum Bizantino + Satélite/Dron */}
+          <div
+            data-testid="corridor-sovereign-b2g-panel"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
+              gap: '1rem',
+              marginTop: '1rem',
+              paddingTop: '0.9rem',
+              borderTop: '1px solid rgba(255,255,255,0.1)'
+            }}
+          >
+            <div style={{ background: 'rgba(15,23,42,0.55)', padding: '0.85rem', borderRadius: '8px', border: '1px solid rgba(52,211,153,0.22)' }}>
+              <h4 style={{ margin: '0 0 0.45rem', fontSize: '0.83rem', color: '#34d399' }}>
+                {locale === 'es'
+                  ? '4. Kits COTS / Open-Hardware de Bajo Coste (KISS CRC-16 + ETSI EN 300 220)'
+                  : locale === 'nl'
+                    ? '4. Low-Cost COTS / Open-Hardware Veldpakketten (KISS CRC-16 + ETSI EN 300 220)'
+                    : '4. Low-Cost COTS / Open-Hardware Field Kits (KISS CRC-16 + ETSI EN 300 220)'}
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                {corridorSnapshot.cotsHardwareKits.map(kit => (
+                  <div key={kit.kitId} style={{ padding: '0.45rem', borderRadius: '6px', background: 'rgba(30,41,59,0.65)', fontSize: '0.71rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>{kit.kitId} · {kit.name}</strong>
+                      <span style={{ color: '#91d7e8', fontWeight: 700 }}>€{kit.costEur.toFixed(2)} · {kit.massG}g</span>
+                    </div>
+                    <div style={{ opacity: 0.85, marginTop: '0.15rem' }}>BOM: {kit.bom}</div>
+                    <div style={{ color: '#cbd5e1', marginTop: '0.1rem', fontSize: '0.68rem' }}>{kit.protocol}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ background: 'rgba(15,23,42,0.55)', padding: '0.85rem', borderRadius: '8px', border: '1px solid rgba(145,215,232,0.22)' }}>
+              <h4 style={{ margin: '0 0 0.45rem', fontSize: '0.83rem', color: '#91d7e8' }}>
+                {locale === 'es'
+                  ? '5. Malla Federada Multisoftware y Quórum Bizantino Anti-Sybil'
+                  : locale === 'nl'
+                    ? '5. Multi-Software Mesh & Byzantijns Anti-Sybil Quorum'
+                    : '5. Multi-Software Federation Mesh & Anti-Sybil Byzantine Quorum'}
+              </h4>
+              <div style={{ fontSize: '0.72rem', marginBottom: '0.5rem', padding: '0.45rem', borderRadius: '6px', background: 'rgba(30,41,59,0.65)' }}>
+                <div><strong>Anillo:</strong> {corridorSnapshot.byzantineQuorum.ringId} ({corridorSnapshot.byzantineQuorum.scheme})</div>
+                <div style={{ marginTop: '0.15rem' }}><strong>Operadores verificados ({corridorSnapshot.byzantineQuorum.distinctOperatorsVerified}):</strong> {corridorSnapshot.byzantineQuorum.operators.join(' · ')}</div>
+                <div style={{ marginTop: '0.15rem', color: '#34d399' }}>
+                  GNSS: {corridorSnapshot.byzantineQuorum.galileoOsnmaState} · Sat NTN: {corridorSnapshot.byzantineQuorum.satelliteErasureScheme}
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                {corridorSnapshot.meshInteropFormats.map(fmt => (
+                  <div key={fmt.formatId} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', padding: '0.3rem 0.45rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    <span><strong>{fmt.formatId}</strong> — {fmt.standard}</span>
+                    <span style={{ color: '#34d399' }}>{fmt.status}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
 
         <footer className="cmd-foot">
           <p>{t.disclaimer}</p>

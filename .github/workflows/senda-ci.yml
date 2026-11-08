@@ -3,9 +3,10 @@ permissions:
   contents: read
 on:
   push:
-    branches: [ master ]
+    branches: [ master, fix/senda-dtn-receipt-quarantine-20261107 ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, fix/senda-dtn-receipt-quarantine-20261107 ]
+  workflow_dispatch:
 jobs:
   senda:
     runs-on: ubuntu-latest
@@ -45,3 +46,32 @@ jobs:
       - name: Verificación del despliegue público (solo en master)
         if: github.ref == 'refs/heads/master'
         run: SENDA_BASE_URL=https://civic-relay-investor.vercel.app/senda NODE_PATH=/tmp/pw/node_modules node investor-next/scripts/senda-offline-e2e.mjs
+  senda-adversarial:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Trilateracion, sobre cifrado y DTN adversarial
+        run: node --test packages/senda/tests-adversarial/*.test.mjs
+  senda-pci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Cadena de custodia PCI
+        run: node --test packages/senda-pci/tests/*.test.mjs
+      - name: PCI adversarial y canonicalizacion
+        run: node --test packages/senda-pci/tests-adversarial/*.test.mjs
+  release-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Manifiesto fuente-build-artefacto
+        run: node --test scripts/release-manifest.test.mjs scripts/vercel-provenance.test.mjs
