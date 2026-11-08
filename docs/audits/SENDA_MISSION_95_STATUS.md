@@ -138,7 +138,7 @@ Sin 1–5, cualquier nota ≥9,5 sería una afirmación sin evidencia.
 
 ## 7. Próximos pasos inmediatos
 
-1. Commitear PCI v0.2, F-02/F-05 y estas actualizaciones; pushear al PR #23.
+1. PCI v0.2, F-02/F-05 y estas actualizaciones están commiteados en `c5821dd`; pushear al PR #23.
 2. Auditar PCI y la criptografía de identidad de forma externa.
 3. Integrar PCI en el producto y desplegarlo con hash verificable.
 4. Cerrar F-05 residual: keystore, rotación y revocación.

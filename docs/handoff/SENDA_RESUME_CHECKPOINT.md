@@ -2,8 +2,8 @@
 
 Fecha: 2026-11-08  
 Rama: `mission/senda-95-20261108`  
-HEAD de código: `3041a52435aadb936e34cf8546df3806a31c68a6`  
-Estado: suite 264/264; benchmark v2 final generado desde árbol limpio (`SOURCE_ONLY`); JSON de evidencia pendiente de commit.
+HEAD de código (producto): `c5821dd93a4b0aee5eadc853d2e7d85b43e25cd6`
+Estado: suite SENDA 266/266 y PCI 13/13; benchmark v2 final generado desde árbol limpio (`SOURCE_ONLY`); PCI v0.2 y F-02/F-05 commiteados en `c5821dd`; este checkpoint va en un commit aparte; push al PR #23 pendiente.
 
 ## 1. Qué está hecho
 
@@ -11,7 +11,11 @@ Estado: suite 264/264; benchmark v2 final generado desde árbol limpio (`SOURCE_
 - Validación fail-closed de incendios y 9 pruebas nuevas.
 - EAOR integrado con reapertura de contactos y 5 pruebas nuevas.
 - Benchmark DTN v2 con bootstrap por grafos y deltas pareados.
-- 264/264 pruebas SENDA en verde.
+- 266/266 pruebas SENDA en verde (incluye F-02 y F-05).
+- 13/13 pruebas PCI en verde; CLI PCI probada de extremo a extremo.
+- `@senda/pci` v0.2.0 con protocolo `senda.pci/1`, cadena de custodia, recibos y verificación fail-closed con anclas externas.
+- F-02: versión interna 3 liga la firma y la huella de caja a la tarjeta de contacto; los sobres v2 siguen abriéndose sin vinculación.
+- F-05: export/import cifrado de identidad con PBKDF2-SHA-256 + AES-256-GCM; queda pendiente keystore/rotación/revocación.
 - 61 módulos sincronizados a `investor-next/public/senda/core`.
 - Documentación de misión completa en `docs/`.
 - Bug de longitud binaria >65535 B corregido y probado.
@@ -24,7 +28,24 @@ node scripts/sync-web.mjs
 node --test tests/*.test.mjs
 ```
 
-Resultado actual: 264 pass, 0 fail.
+Resultado actual: 266 pass, 0 fail.
+
+```powershell
+cd C:\Users\2fabr\civic-relay\packages\senda-pci
+node --test tests/*.test.mjs
+```
+
+Resultado actual: 13 pass, 0 fail.
+
+```powershell
+cd C:\Users\2fabr\civic-relay\packages\senda-pci
+$dir = "$env:TEMP\senda-pci-smoke"
+New-Item -ItemType Directory -Force -Path $dir | Out-Null
+node cli.mjs keygen --name "Recogida" --org "Protección Civil" --out "$dir\collector.key.json"
+node cli.mjs pub --key "$dir\collector.key.json" --out "$dir\collector.pub.json"
+```
+
+El humo completo de CLI está descrito en la sección 5; no usar estas claves fuera de pruebas.
 
 ```powershell
 cd C:\Users\2fabr\civic-relay
@@ -46,21 +67,21 @@ node scripts/routing-benchmark-v2.mjs --graphs=2 --realizations=2 --bootstrap=40
 
 ## 3. Estado de Git
 
-El commit de código es `3041a52` y contiene 38 ficheros. Después se generó la evidencia desde ese commit con árbol limpio. El estado esperado antes del commit de evidencia es:
+El commit de producto es `c5821dd` y contiene PCI v0.2, F-02/F-05, el espejo web y las actualizaciones de estado/seguridad. Este checkpoint se commitea después; tras ese commit el árbol queda limpio.
 
 ```text
-?? evidence/senda/mission-95/routing-benchmark-m95.json
- M docs/audits/SENDA_MISSION_95_STATUS.md
- M docs/handoff/SENDA_RESUME_CHECKPOINT.md
- M evidence/senda/mission-95/README.md
+# estado esperado tras commitear este documento
+(limpio)
 ```
+
+No hacer force push. El push va a `mission/senda-95-20261108`, PR #23, no a `master`.
 
 ## 4. Qué falta
 
-1. Commitear el JSON y las actualizaciones de documentación.
-2. Abrir PR de `mission/senda-95-20261108`.
-3. Implementar PCI v0.2 en `packages/senda-pci/`.
-4. Cerrar hallazgos F-02 (vinculación de identidad) y F-05 (gestión de claves).
+1. Commitear PCI v0.2, F-02/F-05, el espejo web y estas actualizaciones; pushear al PR #23.
+2. Auditar PCI y la criptografía de identidad de forma externa.
+3. Integrar PCI en el producto y desplegarlo con hash verificable.
+4. Cerrar F-05 residual: keystore, rotación y revocación.
 5. Validación física DTN y calibración de incendios: BLOCKED por hardware/datos/permisos.
 
 ## 5. Evidencia limpia ya generada
@@ -74,13 +95,17 @@ El JSON final se generó con salida fuera del repo y árbol limpio:
 
 Para reproducir: commitear el código, verificar `git status --short` vacío, ejecutar con `--out` fuera del repo, comprobar `SOURCE_ONLY`, copiar el JSON y commitearlo aparte. No presentar un `UNCOMMITTED_BUILD` como release verificada.
 
-## 6. Hallazgos abiertos
+### 5.1 Humo PCI
 
-- F-01 PCI ausente (BLOCKED).
-- F-02 identidad del emisor no ligada a tarjeta de contacto.
+El paquete `packages/senda-pci/` se probó con tres custodios en `C:\Users\2fabr\AppData\Local\Temp\opencode\pci-smoke`: alta, transferencia, recibo, segundo custodio, sello y verificación. Resultado: 4 registros, ledger sellado, custodio final Bruno, digest `cede45246baacb9065a647cb289da99bb5cd48272ae5febeccb8c429b8a90733`. Fue un humo local; no es despliegue ni evidencia de campo.
+
+## 6. Hallazgos
+
+- F-01 PCI implementado localmente y probado (13/13), pero sin auditoría externa, integración ni despliegue verificable.
+- F-02 mitigado en código y probado: firma y huella de caja ligadas a la tarjeta; la UI aún debe exigir `expectedSender`.
 - F-03 el relé no puede verificar la firma (por diseño).
 - F-04 metadatos en cabecera.
-- F-05 gestión de claves.
+- F-05 mitigado parcialmente: export cifrado con frase de paso; faltan keystore, rotación, revocación y eliminar la exportación en claro.
 - F-06 broadcast no verificado en el almacén.
 - F-08 sin prueba formal ni auditoría externa.
 - F-09 evicción/DoS bajo carga.
@@ -107,4 +132,4 @@ Detalle: `docs/security/SENDA_ASSURANCE_REVIEW.md`.
 - Git: 2.53.0
 - Windows PowerShell 5.1
 - Issue de referencia: #19 (SHA ambiguo)
-- PRs abiertos: #12, #13, #17, #18, #20, #21, #22
+- PRs abiertos: #12, #13, #17, #18, #20, #21, #22, #23
