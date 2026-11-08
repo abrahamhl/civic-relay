@@ -12,12 +12,15 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const usgsLayerRef = useRef<L.FeatureGroup | null>(null);
+  const wildfireLayerRef = useRef<L.FeatureGroup | null>(null);
 
   const [filterType, setFilterType] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showUsgs, setShowUsgs] = useState(false);
   const [usgsStatus, setUsgsStatus] = useState('');
+  const [showWildfires, setShowWildfires] = useState(false);
+  const [wildfireStatus, setWildfireStatus] = useState('');
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -160,6 +163,74 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
     return () => { active = false; layer.remove(); if (usgsLayerRef.current === layer) usgsLayerRef.current = null; };
   }, [showUsgs]);
 
+
+  // Curated source records, not observed fire fronts or model predictions.
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !showWildfires) {
+      wildfireLayerRef.current?.clearLayers();
+      return;
+    }
+    let active = true;
+    const layer = L.featureGroup().addTo(map);
+    wildfireLayerRef.current = layer;
+    setWildfireStatus('Consultando acontecimientos NASA EONET...');
+    api.getEonetWildfires().then((snapshot: any) => {
+      if (!active) return;
+      const entries = Array.isArray(snapshot.observations) ? snapshot.observations : [];
+      for (const event of entries) {
+        if (!Number.isFinite(event.location?.lat) || !Number.isFinite(event.location?.lon)) continue;
+        const point = L.circleMarker([event.location.lat, event.location.lon], {
+          radius: 7, color: '#9a3412', fillColor: '#fb923c', fillOpacity: 0.78, weight: 2,
+        });
+        const popup = document.createElement('div');
+        popup.style.minWidth = '210px';
+        const title = document.createElement('strong');
+        title.textContent = String(event.title || 'Incendio registrado');
+        popup.append(title);
+        const date = document.createElement('div');
+        date.textContent = 'Fecha del registro: ' + new Date(event.observedAt).toLocaleString('es-ES');
+        popup.append(date);
+        const sources = document.createElement('div');
+        const sourceLabels = Array.isArray(event.reportedSources) ? event.reportedSources.join(', ') : '';
+        sources.textContent = 'Referencias: ' + (sourceLabels || 'Consultar NASA EONET');
+        popup.append(sources);
+        const legend = document.createElement('div');
+        legend.textContent = 'Punto de catálogo · No delimita el incendio ni es una alerta';
+        legend.style.fontSize = '11px';
+        popup.append(legend);
+        try {
+          const href = new URL(event.url);
+          if (href.protocol === 'https:' && href.hostname === 'eonet.gsfc.nasa.gov' &&
+              /^\/api\/v3\/events\/[A-Za-z0-9_-]+\/?$/.test(href.pathname)) {
+            const link = document.createElement('a');
+            link.href = href.origin + href.pathname;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = 'Abrir referencia EONET';
+            popup.append(link);
+          }
+        } catch { /* no valid source link */ }
+        point.bindPopup(popup).addTo(layer);
+      }
+      if (!showUsgs && layer.getLayers().length) {
+        map.fitBounds(layer.getBounds(), { padding: [24, 24], maxZoom: 5 });
+      }
+      const checkedAt = snapshot.fetchedAt ? new Date(snapshot.fetchedAt).toLocaleString('es-ES') : 'sin fecha';
+      const freshness = snapshot.status === 'STALE_SNAPSHOT' ? 'Copia anterior; proveedor no disponible' :
+        snapshot.status === 'CACHED_SNAPSHOT' ? 'Copia reciente en servidor' : 'Consulta a fuente pública';
+      setWildfireStatus(entries.length + ' acontecimientos catalogados (últimos 30 días). ' +
+        freshness + '. Fuente: NASA EONET · descarga ' + checkedAt +
+        '. No son perímetros, detecciones instantáneas ni alertas.');
+    }).catch(() => {
+      if (active) setWildfireStatus('NASA EONET no disponible; no se representan incendios ficticios.');
+    });
+    return () => {
+      active = false; layer.remove();
+      if (wildfireLayerRef.current === layer) wildfireLayerRef.current = null;
+    };
+  }, [showWildfires, showUsgs]);
+
   return (
     <div style={{ height: 'calc(100vh - 4rem)', display: 'flex', flexDirection: 'column' }}>
       {/* Map Control Bar */}
@@ -200,11 +271,22 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
           <input type="checkbox" checked={showUsgs} onChange={(e) => setShowUsgs(e.target.checked)} />
           Sismos USGS (M≥4,5)
         </label>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem', cursor: 'pointer' }}>
+          <input type="checkbox" checked={showWildfires} onChange={(e) => setShowWildfires(e.target.checked)} />
+          Incendios NASA EONET (catálogo)
+        </label>
       </div>
       {showUsgs && (
         <div role="status" aria-live="polite" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', background: 'var(--bg-secondary)' }}>
           {usgsStatus} {' '}
           <a href="https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php" target="_blank" rel="noopener noreferrer">Metodología y fuente</a>.
+        </div>
+      )}
+
+      {showWildfires && (
+        <div role="status" aria-live="polite" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', background: 'var(--bg-secondary)' }}>
+          {wildfireStatus}{' '}
+          <a href="https://eonet.gsfc.nasa.gov/docs/v3" target="_blank" rel="noopener noreferrer">NASA EONET · metodología</a>.
         </div>
       )}
 
