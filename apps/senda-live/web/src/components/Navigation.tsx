@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type NavTab = 'feed' | 'map' | 'publish' | 'messages' | 'alerts' | 'admin';
+export type NavTab = 'feed' | 'map' | 'publish' | 'messages' | 'alerts' | 'command' | 'lab' | 'admin';
 
 interface Props {
   activeTab: NavTab;
@@ -27,20 +27,49 @@ export const Navigation: React.FC<Props> = ({
     <>
       {/* Desktop Left Sidebar */}
       <aside className="left-nav">
-        <div style={{ padding: '0.5rem 0.75rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ padding: '0.5rem 0.75rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{ width: '2.5rem', height: '2.5rem', borderRadius: '0.75rem', background: 'var(--brand-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: '1.25rem' }}>
             S
           </div>
           <div>
             <h1 style={{ fontSize: '1.25rem', fontWeight: 800, lineHeight: 1.1 }}>SENDA</h1>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--brand-primary)', letterSpacing: '0.05em' }}>LIVE / AHORA</span>
+            <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--brand-primary)', letterSpacing: '0.05em' }}>UNIFIED PLATFORM</span>
           </div>
         </div>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
+        {/* Permanent SOS Emergency Button */}
+        <button
+          onClick={() => onSelectTab('alerts')}
+          style={{
+            background: '#b91c1c',
+            color: '#fff',
+            border: '2px solid #ef4444',
+            borderRadius: 'var(--radius)',
+            padding: '0.6rem 0.85rem',
+            fontWeight: 800,
+            fontSize: '0.85rem',
+            marginBottom: '1rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.5rem',
+            boxShadow: '0 2px 8px rgba(239, 68, 68, 0.4)'
+          }}
+          title="Botón de Emergencia Permanente"
+        >
+          <span>🚨</span>
+          <span>SOS EMERGENCIA</span>
+        </button>
+
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', flex: 1, overflowY: 'auto' }}>
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', padding: '0.2rem 0.5rem' }}>
+            Superficie Ciudadana
+          </div>
+
           <button
             className={`btn btn-outline ${activeTab === 'feed' ? 'btn-primary' : ''}`}
-            style={{ justifyContent: 'flex-start', padding: '0.75rem 1rem', fontSize: '1rem' }}
+            style={{ justifyContent: 'flex-start', padding: '0.6rem 0.85rem', fontSize: '0.9rem' }}
             onClick={() => onSelectTab('feed')}
           >
             🏠 Inicio / Feed
@@ -48,7 +77,7 @@ export const Navigation: React.FC<Props> = ({
 
           <button
             className={`btn btn-outline ${activeTab === 'map' ? 'btn-primary' : ''}`}
-            style={{ justifyContent: 'flex-start', padding: '0.75rem 1rem', fontSize: '1rem' }}
+            style={{ justifyContent: 'flex-start', padding: '0.6rem 0.85rem', fontSize: '0.9rem' }}
             onClick={() => onSelectTab('map')}
           >
             🗺️ Mapa de Sucesos
@@ -56,7 +85,7 @@ export const Navigation: React.FC<Props> = ({
 
           <button
             className={`btn btn-outline ${activeTab === 'messages' ? 'btn-primary' : ''}`}
-            style={{ justifyContent: 'flex-start', padding: '0.75rem 1rem', fontSize: '1rem' }}
+            style={{ justifyContent: 'flex-start', padding: '0.6rem 0.85rem', fontSize: '0.9rem' }}
             onClick={() => onSelectTab('messages')}
           >
             💬 Mensajes
@@ -65,26 +94,46 @@ export const Navigation: React.FC<Props> = ({
 
           <button
             className={`btn btn-outline ${activeTab === 'alerts' ? 'btn-primary' : ''}`}
-            style={{ justifyContent: 'flex-start', padding: '0.75rem 1rem', fontSize: '1rem' }}
+            style={{ justifyContent: 'flex-start', padding: '0.6rem 0.85rem', fontSize: '0.9rem' }}
             onClick={() => onSelectTab('alerts')}
           >
-            🚨 Alertas y SOS
+            🚨 Alertas Oficiales
             {unreadAlerts > 0 && <span className="badge badge-official" style={{ marginLeft: 'auto' }}>{unreadAlerts}</span>}
+          </button>
+
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', padding: '0.5rem 0.5rem 0.2rem' }}>
+            Superficies Profesionales
+          </div>
+
+          <button
+            className={`btn btn-outline ${activeTab === 'command' ? 'btn-primary' : ''}`}
+            style={{ justifyContent: 'flex-start', padding: '0.6rem 0.85rem', fontSize: '0.9rem' }}
+            onClick={() => onSelectTab('command')}
+          >
+            🛡️ Incident Command
+          </button>
+
+          <button
+            className={`btn btn-outline ${activeTab === 'lab' ? 'btn-primary' : ''}`}
+            style={{ justifyContent: 'flex-start', padding: '0.6rem 0.85rem', fontSize: '0.9rem' }}
+            onClick={() => onSelectTab('lab')}
+          >
+            🔬 Scientific Lab
           </button>
 
           {isAdmin && (
             <button
               className={`btn btn-outline ${activeTab === 'admin' ? 'btn-primary' : ''}`}
-              style={{ justifyContent: 'flex-start', padding: '0.75rem 1rem', fontSize: '1rem' }}
+              style={{ justifyContent: 'flex-start', padding: '0.6rem 0.85rem', fontSize: '0.9rem' }}
               onClick={() => onSelectTab('admin')}
             >
-              🛡️ Sala de Mando / Admin
+              ⚙️ Administración
             </button>
           )}
 
           <button
             className="btn btn-primary"
-            style={{ marginTop: '1rem', padding: '0.875rem 1rem', fontSize: '1rem' }}
+            style={{ marginTop: '0.75rem', padding: '0.75rem 1rem', fontSize: '0.95rem' }}
             onClick={() => onSelectTab('publish')}
           >
             ✍️ Publicar / Aporte

@@ -7,6 +7,8 @@ import { MapView } from './components/MapView';
 import { MessagesView } from './components/MessagesView';
 import { AlertsView } from './components/AlertsView';
 import { AdminPanel } from './components/AdminPanel';
+import { CommandView } from './components/CommandView';
+import { LabView } from './components/LabView';
 import { PublishModal } from './components/PublishModal';
 import { AuthModal } from './components/AuthModal';
 import { ReportModal } from './components/ReportModal';
@@ -180,6 +182,18 @@ export const App: React.FC = () => {
             user={user}
             onSelectEvent={(id) => setSelectedEventId(id)}
           />
+        )}
+
+        {activeTab === 'command' && (
+          <CommandView
+            user={user}
+            events={events}
+            onSelectEvent={(id) => setSelectedEventId(id)}
+          />
+        )}
+
+        {activeTab === 'lab' && (
+          <LabView user={user} />
         )}
 
         {activeTab === 'admin' && (
