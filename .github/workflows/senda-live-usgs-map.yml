@@ -1,0 +1,33 @@
+name: SENDA LIVE · USGS observations and secure map
+on:
+  push:
+    branches:
+      - 'feat/senda-usgs-map-evidence-*'
+  pull_request:
+    branches:
+      - 'feat/senda-social-live-*'
+      - master
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  usgs-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Offline deterministic upstream adapter tests
+        run: node --test apps/senda-live/tests/usgs-earthquakes.test.mjs
+      - name: Install locked dependencies
+        run: |
+          corepack enable
+          corepack pnpm install --frozen-lockfile
+      - name: SENDA LIVE API and feature tests
+        run: corepack pnpm --filter @senda/live test
+      - name: Web type checks
+        run: corepack pnpm --filter @senda/live type-check
+      - name: Vite production build
+        run: corepack pnpm --filter @senda/live build
