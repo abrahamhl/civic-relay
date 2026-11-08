@@ -47,11 +47,11 @@ jobs:
       # MET Norway permits commercial reuse with attribution, but requires a well-behaved
       # client. Trigger exactly once with [metno-live-check], NOT on every CI change.
       - name: One-off MET Norway 9-point scientific source acquisition
-        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[metno-live-check]')
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[metno-live-check]')
         continue-on-error: true
         run: node apps/senda-live/scripts/capture-metno-research.mjs valencia
       - name: Upload one-off MET Norway acquisition receipt
-        if: always() && github.event_name == 'push' && contains(github.event.head_commit.message, '[metno-live-check]')
+        if: always() && github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[metno-live-check]')
         uses: actions/upload-artifact@v4
         with:
           name: senda-metno-source-receipt
