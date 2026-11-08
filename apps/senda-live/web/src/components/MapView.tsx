@@ -72,22 +72,50 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
 
       const popupContent = document.createElement('div');
       popupContent.style.minWidth = '200px';
-      popupContent.innerHTML = `
-        <div style="font-weight:bold;font-size:14px;margin-bottom:4px;">${ev.title}</div>
-        <div style="font-size:11px;color:#666;margin-bottom:6px;">📍 ${ev.location.label || 'Ubicación aproximada (~1 km)'}</div>
-        <div style="display:inline-block;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:bold;background:${color}22;color:${color};margin-bottom:8px;">
-          ${ev.status}
-        </div>
-        <div>
-          <button id="btn-ev-${ev.id}" style="background:#e11d48;color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:12px;font-weight:bold;cursor:pointer;width:100%;">
-            Ver Acontecimiento
-          </button>
-        </div>
-      `;
 
-      popupContent.querySelector(`#btn-ev-${ev.id}`)?.addEventListener('click', () => {
+      const titleEl = document.createElement('div');
+      titleEl.style.fontWeight = 'bold';
+      titleEl.style.fontSize = '14px';
+      titleEl.style.marginBottom = '4px';
+      titleEl.textContent = String(ev.title ?? '');
+      popupContent.appendChild(titleEl);
+
+      const locEl = document.createElement('div');
+      locEl.style.fontSize = '11px';
+      locEl.style.color = '#666';
+      locEl.style.marginBottom = '6px';
+      locEl.textContent = `📍 ${ev.location?.label || 'Ubicación aproximada (~1 km)'}`;
+      popupContent.appendChild(locEl);
+
+      const statusEl = document.createElement('div');
+      statusEl.style.display = 'inline-block';
+      statusEl.style.padding = '2px 6px';
+      statusEl.style.borderRadius = '10px';
+      statusEl.style.fontSize = '10px';
+      statusEl.style.fontWeight = 'bold';
+      statusEl.style.backgroundColor = `${color}22`;
+      statusEl.style.color = color;
+      statusEl.style.marginBottom = '8px';
+      statusEl.textContent = String(ev.status ?? '');
+      popupContent.appendChild(statusEl);
+
+      const btnContainer = document.createElement('div');
+      const btn = document.createElement('button');
+      btn.style.backgroundColor = '#e11d48';
+      btn.style.color = '#fff';
+      btn.style.border = 'none';
+      btn.style.borderRadius = '6px';
+      btn.style.padding = '4px 8px';
+      btn.style.fontSize = '12px';
+      btn.style.fontWeight = 'bold';
+      btn.style.cursor = 'pointer';
+      btn.style.width = '100%';
+      btn.textContent = 'Ver Acontecimiento';
+      btn.addEventListener('click', () => {
         onSelectEvent(ev.id);
       });
+      btnContainer.appendChild(btn);
+      popupContent.appendChild(btnContainer);
 
       marker.bindPopup(popupContent);
       markersLayerRef.current?.addLayer(marker);

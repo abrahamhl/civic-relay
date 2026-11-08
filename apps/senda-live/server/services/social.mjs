@@ -285,8 +285,8 @@ export function createSocialService(db, { rt, notifier, events, audit, fetcher }
   function deletePost(userId, postId) {
     const p = db.get('SELECT author_id FROM posts WHERE id = ? AND deleted_at IS NULL', postId);
     if (!p) throw notFound('POST_NOT_FOUND');
-    if (p.author_id !== userId) throw forbidden();
-    db.run('UPDATE posts SET deleted_at = ?, body = "", title = "[eliminado]" WHERE id = ?', Date.now(), postId);
+    if (p.author_id !== userId) throw forbidden('NOT_AUTHORIZED', 'Solo el autor puede eliminar la publicación');
+    db.run('UPDATE posts SET deleted_at = ?, body = ?, title = ? WHERE id = ?', Date.now(), '', '[eliminado]', postId);
     return { deleted: true };
   }
 

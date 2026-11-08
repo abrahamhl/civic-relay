@@ -163,10 +163,26 @@ export function createMessagingService(db, { rt, notifier, emergency, audit }) {
 
   function hydrateMessage(m) {
     const sender = db.get('SELECT handle, display_name FROM profiles WHERE user_id = ?', m.sender_id);
+    const parsedEnvelope = m.envelope ? JSON.parse(m.envelope) : null;
+    let securityLevel = 'SERVER_STORED_PLAINTEXT';
+    let securityNotice = 'Chat social almacenado en servidor (sin E2EE)';
+    if (parsedEnvelope) {
+      if (parsedEnvelope.kind === 'SOS' || m.priority === 0) {
+        securityLevel = 'EMERGENCY_ENVELOPE_ENCRYPTED';
+        securityNotice = 'Mensaje de emergencia cifrado (ECDH/AES-GCM)';
+      } else if (parsedEnvelope.transport === 'dtn' || m.state === 'FORWARDED') {
+        securityLevel = 'DTN_TRANSPORT_ENCRYPTED';
+        securityNotice = 'Mensaje DTN transportado cifrado';
+      } else {
+        securityLevel = 'SENDA_ENVELOPE_ENCRYPTED';
+        securityNotice = 'Sobre SENDA cifrado (ECDH/AES-GCM)';
+      }
+    }
     return {
       id: m.id, conversationId: m.conversation_id, senderId: m.sender_id,
       sender: sender ? { id: m.sender_id, handle: sender.handle, displayName: sender.display_name } : { id: m.sender_id },
-      body: m.body, envelope: m.envelope ? JSON.parse(m.envelope) : null, envelopeId: m.envelope_id,
+      body: m.body, envelope: parsedEnvelope, envelopeId: m.envelope_id,
+      securityLevel, securityNotice,
       priority: m.priority, state: m.state, clientId: m.client_id, createdAt: m.created_at, deliveredAt: m.delivered_at, verifiedAt: m.verified_at,
       checks: m.state === 'VERIFIED' || m.state === 'DELIVERED' ? 2 : (m.state === 'IN_CUSTODY' || m.state === 'FORWARDED' ? 1 : 0),
     };

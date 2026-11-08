@@ -180,14 +180,19 @@ export const MessagesView: React.FC<Props> = ({ user }) => {
                         {m.sender?.displayName || 'Usuario'}
                       </div>
                     )}
-                    <div>{m.body || '[Sobre SENDA cifrado de extremo a extremo]'}</div>
-                    <div style={{ fontSize: '0.6875rem', marginTop: '0.25rem', textAlign: 'right', opacity: 0.8, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.25rem' }}>
-                      <span>{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      {isMe && (
-                        <span title={`Estado: ${m.state}`}>
-                          {m.state === 'VERIFIED' ? '🛡️ ✓✓' : m.state === 'DELIVERED' ? '✓✓' : m.state === 'IN_CUSTODY' ? '✓' : '⏳'}
-                        </span>
-                      )}
+                    <div>{m.body || (m.envelope ? `[Sobre SENDA cifrado: ${m.securityNotice || 'ECDH/AES-GCM'}]` : '[Mensaje vacío]')}</div>
+                    <div style={{ fontSize: '0.6875rem', marginTop: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', opacity: 0.85 }}>
+                      <span style={{ fontSize: '0.625rem', opacity: 0.8 }} title={m.securityNotice || (m.securityLevel === 'SERVER_STORED_PLAINTEXT' ? 'Chat ordinario en servidor' : 'Cifrado')}>
+                        {m.securityLevel === 'SERVER_STORED_PLAINTEXT' ? '💬 Servidor (sin E2EE)' : m.securityLevel === 'EMERGENCY_ENVELOPE_ENCRYPTED' ? '🚨 SOS Cifrado' : m.securityLevel === 'DTN_TRANSPORT_ENCRYPTED' ? '📡 DTN Cifrado' : '🛡️ Cifrado'}
+                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                        <span>{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        {isMe && (
+                          <span title={`Estado: ${m.state} (${m.securityNotice || ''})`}>
+                            {m.state === 'VERIFIED' ? '🛡️ ✓✓' : m.state === 'DELIVERED' ? '✓✓' : m.state === 'IN_CUSTODY' ? '✓' : '⏳'}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );

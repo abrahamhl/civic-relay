@@ -133,7 +133,7 @@ export function createApiHandler({
     sendJson(res, 200, { post });
   });
 
-  router.delete('/api/posts/:id', (req, res) => {
+  router.delete('/api/posts/:id', (req, res, { params }) => {
     const userId = requireUser(req);
     const result = social.deletePost(userId, params.id);
     sendJson(res, 200, result);

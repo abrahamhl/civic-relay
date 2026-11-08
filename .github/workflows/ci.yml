@@ -4,9 +4,9 @@ permissions:
 
 on:
   push:
-    branches: [ master, fix/senda-dtn-receipt-quarantine-20261107 ]
+    branches: [ master, 'mission/**', 'feat/**', 'fix/**' ]
   pull_request:
-    branches: [ master, fix/senda-dtn-receipt-quarantine-20261107 ]
+    branches: [ master, 'mission/**', 'feat/**', 'fix/**' ]
   workflow_dispatch:
 
 jobs:
@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [22.x, 24.x]
 
     steps:
     - uses: actions/checkout@v4
