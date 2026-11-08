@@ -3,6 +3,8 @@
  * Read-only source records; NEVER an emergency alert, SENDA detection, or model forecast.
  * Source: https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php
  */
+import { createHash } from 'node:crypto';
+
 export const USGS_FEED_URL = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson';
 export const USGS_FEED_DOCS = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php';
 const MAX_BYTES = 1_500_000;
@@ -95,7 +97,8 @@ async function readLimitedJson(response) {
   const bytes = new Uint8Array(size);
   let offset = 0;
   for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
-  return JSON.parse(new TextDecoder().decode(bytes));
+  return { data: JSON.parse(new TextDecoder().decode(bytes)),
+    rawSha256: createHash('sha256').update(bytes).digest('hex') };
 }
 
 /** Injectable clock/fetcher enable offline unit tests. */
@@ -111,9 +114,10 @@ export function createUsgsEarthquakeFeed({ fetcher = globalThis.fetch, clock = D
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
       const res = await fetcher(USGS_FEED_URL, { headers: { Accept: 'application/geo+json, application/json' }, signal: controller.signal });
-      const raw = await readLimitedJson(res);
+      const { data, rawSha256 } = await readLimitedJson(res);
       const at = clock();
-      const value = normalizeUsgsFeed(raw, { now: at });
+      const value = normalizeUsgsFeed(data, { now: at });
+      value.source.rawSha256 = rawSha256;
       cached = { at, value };
       retryAt = 0;
       return output(cached, 'SOURCE_SNAPSHOT');
