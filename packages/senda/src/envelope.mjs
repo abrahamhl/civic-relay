@@ -167,6 +167,7 @@ export function packEnvelope(e) {
   if (unb64(h.id).length !== 16 || unb64(h.to).length !== 16 || unb64(h.ackHash).length !== 16) throw new Error('Cabecera INVÁLIDA');
   if (unb64(e.eph.x).length !== 32 || unb64(e.eph.y).length !== 32 || unb64(e.iv).length !== 12 || unb64(e.sig).length !== 64) throw new Error('Criptografía INVÁLIDA');
   if (!Number.isSafeInteger(exp) || exp < 0 || exp > MAX_EXPIRES_AT) throw new Error('Caducidad INVÁLIDA');
+  if (ct.length > 0xffff) throw new Error('Ciphertext demasiado grande para el formato binario (máx. 65535 B)');
   const out = new Uint8Array(1 + 16 + 16 + 1 + 6 + 1 + 16 + 64 + 12 + 64 + 2 + ct.length);
   let o = 0; const put = (bytes) => { out.set(bytes, o); o += bytes.length; };
   put([0xe2]); put(unb64(h.id)); put(unb64(h.to)); put([h.priority & 0xff]);

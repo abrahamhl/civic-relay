@@ -89,18 +89,34 @@ export const OFFLINE_BEARERS = Object.freeze([{ id: 'PHONE_MESH' }, { id: 'MESHT
  * @param {Array<{id,x,y,serves:string[]}>} towers antenas y poblaciones a las que dan cobertura
  */
 export function assessAssets(grid, T, towns, towers, { nowMin = 0, notifyMin = 10, towerMarginMin = 10, alertBytes = 220 } = {}) {
+  if (!Array.isArray(towns) || !Array.isArray(towers)) throw new TypeError('assessAssets: towns y towers deben ser arrays');
+  if (!Number.isFinite(nowMin) || !Number.isFinite(notifyMin) || !Number.isFinite(towerMarginMin)) throw new RangeError('assessAssets: tiempos no finitos');
+  if (!Number.isFinite(alertBytes) || alertBytes <= 0) throw new RangeError(`assessAssets: alertBytes inválido (${alertBytes})`);
+  for (const tn of towns) {
+    if (!tn || typeof tn.id !== 'string') throw new TypeError('assessAssets: población sin id');
+    if (!Number.isFinite(tn.evacMin) || tn.evacMin < 0) throw new RangeError(`assessAssets: evacMin inválido en ${tn.id}`);
+    if (!Number.isFinite(tn.population) || tn.population < 0) throw new RangeError(`assessAssets: population inválida en ${tn.id}`);
+    if (!Number.isInteger(tn.x) || !Number.isInteger(tn.y)) throw new TypeError(`assessAssets: x/y deben ser enteros en ${tn.id}`);
+    if (tn.r != null && (!Number.isInteger(tn.r) || tn.r < 0)) throw new RangeError(`assessAssets: r inválido en ${tn.id}`);
+  }
+  for (const tw of towers) {
+    if (!tw || typeof tw.id !== 'string' || !Array.isArray(tw.serves)) throw new TypeError('assessAssets: antena sin id o serves');
+    if (!Number.isInteger(tw.x) || !Number.isInteger(tw.y)) throw new TypeError(`assessAssets: x/y deben ser enteros en antena ${tw.id}`);
+  }
   const towerLoss = towers.map((tw) => ({ ...tw, lossMin: minIn(grid, T, { ...tw, r: 1 }) - towerMarginMin }));
   return towns.map((tn) => {
     const arrivalMin = minIn(grid, T, tn);
     const serving = towerLoss.filter((tw) => tw.serves.includes(tn.id));
-    const commsLossMin = serving.length ? Math.max(...serving.map((tw) => tw.lossMin)) : -Infinity; // sin cobertura cuando caen TODAS
+    const noServingTower = serving.length === 0;
+    const commsLossMin = noServingTower ? null : Math.max(...serving.map((tw) => tw.lossMin)); // sin cobertura cuando caen TODAS
     const deadlineMin = arrivalMin - tn.evacMin - notifyMin;
     const lead = deadlineMin - nowMin;
     const status = !Number.isFinite(arrivalMin) ? 'FUERA_DE_ALCANCE' : lead <= 0 ? 'EVACUAR_YA' : lead <= tn.evacMin ? 'PREPARAR' : 'VIGILAR';
-    const sendByMin = Math.min(deadlineMin, commsLossMin);
-    const antennaFirst = Number.isFinite(arrivalMin) && commsLossMin < deadlineMin;
+    const sendByMin = noServingTower ? deadlineMin : Math.min(deadlineMin, commsLossMin);
+    const antennaFirst = Number.isFinite(arrivalMin) && (noServingTower || commsLossMin < deadlineMin);
     const plan = antennaFirst ? planMultiBearer(alertBytes, OFFLINE_BEARERS) : null;
     return { id: tn.id, name: tn.name, population: tn.population, arrivalMin, deadlineMin, commsLossMin, sendByMin, antennaFirst, status,
+      coverage: noServingTower ? 'SIN_ANTENA_DECLARADA' : 'CON_ANTENA',
       channel: !antennaFirst ? 'RED_MOVIL_Y_ES_ALERT' : sendByMin > nowMin ? 'AVISAR_YA_POR_RED_MOVIL' : 'PORTADORES_SIN_RED',
       offlinePlan: plan && { k: plan.k, n: plan.n, pDelivery: +plan.pDelivery.toFixed(4), etaS: plan.etaS, bearers: [...new Set(plan.messages.map((m) => m.id))] } };
   }).sort((a, b) => a.sendByMin - b.sendByMin);
