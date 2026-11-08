@@ -2,8 +2,8 @@
 
 Fecha: 2026-11-08  
 Rama: `mission/senda-95-20261108`  
-HEAD: `1136f572bb696a6a1da30eb4693b866b983f3b7e` (antes del commit de la misión)  
-Estado: árbol de trabajo sucio; suite 264/264; benchmark v2 generado pero pendiente de regenerar desde árbol limpio.
+HEAD de código: `3041a52435aadb936e34cf8546df3806a31c68a6`  
+Estado: suite 264/264; benchmark v2 final generado desde árbol limpio (`SOURCE_ONLY`); JSON de evidencia pendiente de commit.
 
 ## 1. Qué está hecho
 
@@ -35,66 +35,44 @@ Resultado actual: 4 pass, 0 fail.
 
 ```powershell
 cd C:\Users\2fabr\civic-relay\packages\senda
-node scripts/routing-benchmark-v2.mjs --graphs=30 --realizations=20 --bootstrap=2000 --repeats=10 --seed=20261107 --out=evidence/senda/mission-95/routing-benchmark-m95.json
+node scripts/routing-benchmark-v2.mjs --graphs=30 --realizations=20 --bootstrap=2000 --repeats=10 --seed=20261107 --out="C:\Users\2fabr\AppData\Local\Temp\opencode\routing-benchmark-m95.json"
 ```
 
 El benchmark tarda varios minutos. Para humo:
 
 ```powershell
-node scripts/routing-benchmark-v2.mjs --graphs=2 --realizations=2 --bootstrap=40 --repeats=2 --out=evidence/senda/mission-95/routing-benchmark-smoke.json
+node scripts/routing-benchmark-v2.mjs --graphs=2 --realizations=2 --bootstrap=40 --repeats=2 --out="$env:TEMP\smoke.json"
 ```
-
-Borrar el smoke después.
 
 ## 3. Estado de Git
 
-```powershell
-git status --short
-git diff --stat
+El commit de código es `3041a52` y contiene 38 ficheros. Después se generó la evidencia desde ese commit con árbol limpio. El estado esperado antes del commit de evidencia es:
+
+```text
+?? evidence/senda/mission-95/routing-benchmark-m95.json
+ M docs/audits/SENDA_MISSION_95_STATUS.md
+ M docs/handoff/SENDA_RESUME_CHECKPOINT.md
+ M evidence/senda/mission-95/README.md
 ```
-
-Modificados:
-
-- `packages/senda/src/{envelope,fire-field,opportunistic-routing,wildfire}.mjs`
-- `packages/senda/tests/dtn-hardening.test.mjs`
-- espejo `investor-next/public/senda/core/*`
-- `package.json`
-
-Nuevos:
-
-- `scripts/release-manifest.mjs`, `scripts/release-manifest.test.mjs`
-- `packages/senda/scripts/routing-benchmark-v2.mjs`
-- `packages/senda/tests/{eaor-routing,fire-audit,routing-benchmark-v2}.test.mjs`
-- `docs/**` de la misión
-- `evidence/senda/mission-95/`
-- `.opencode/agents/*` (11 agentes)
 
 ## 4. Qué falta
 
-1. Commit de código, tests, docs y agentes.
-2. Regenerar el benchmark desde árbol limpio:
-   - commit del código;
-   - ejecutar el benchmark con `--out` fuera del repo (por ejemplo, `%TEMP%`);
-   - copiar el JSON a `evidence/senda/mission-95/`;
-   - commitear la evidencia como acto de contabilidad.
-3. Abrir PR de `mission/senda-95-20261108`.
-4. Implementar PCI v0.2 en `packages/senda-pci/`.
-5. Cerrar hallazgos F-02 (vinculación de identidad) y F-05 (gestión de claves).
-6. Validación física DTN y calibración de incendios: BLOCKED por hardware/datos/permisos.
+1. Commitear el JSON y las actualizaciones de documentación.
+2. Abrir PR de `mission/senda-95-20261108`.
+3. Implementar PCI v0.2 en `packages/senda-pci/`.
+4. Cerrar hallazgos F-02 (vinculación de identidad) y F-05 (gestión de claves).
+5. Validación física DTN y calibración de incendios: BLOCKED por hardware/datos/permisos.
 
-## 5. Regeneración limpia de evidencia
+## 5. Evidencia limpia ya generada
 
-El manifiesto no puede describir limpio un árbol que contiene su propia salida sin commitear. Procedimiento honesto:
+El JSON final se generó con salida fuera del repo y árbol limpio:
 
-1. Commitear todo el código y la documentación, sin el JSON final.
-2. Verificar `git status --short` vacío.
-3. Ejecutar el benchmark con `--out="$env:TEMP\routing-benchmark-m95.json"`.
-4. Verificar que `source.manifestClaim` sea `SOURCE_ONLY` y que `source.git.dirtyPaths` esté vacío.
-5. Copiar el JSON a `evidence/senda/mission-95/routing-benchmark-m95.json`.
-6. Commitear solo ese JSON.
-7. En el PR, citar el commit de código medido y el commit de evidencia.
+- Commit medido: `3041a52435aadb936e34cf8546df3806a31c68a6`.
+- `source.manifestClaim = SOURCE_ONLY`.
+- `source.worktreeDirty = false`, `source.dirtyPaths = []`.
+- SHA-256 del JSON: `c399870d43f121c4739fb9bb4cc5ed7b652436eac99f7b1ce46642cc7ffcd860`.
 
-No presentar un `UNCOMMITTED_BUILD` como release verificada.
+Para reproducir: commitear el código, verificar `git status --short` vacío, ejecutar con `--out` fuera del repo, comprobar `SOURCE_ONLY`, copiar el JSON y commitearlo aparte. No presentar un `UNCOMMITTED_BUILD` como release verificada.
 
 ## 6. Hallazgos abiertos
 

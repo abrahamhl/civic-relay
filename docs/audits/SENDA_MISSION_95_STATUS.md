@@ -57,7 +57,8 @@ La misión produjo mejoras verificables en reproducibilidad, matemática de ince
 |---|---|---|
 | Suite SENDA | `cd packages/senda; node --test tests/*.test.mjs` | **264/264 pass** |
 | Manifiesto | `node --test scripts/release-manifest.test.mjs` | 4/4 pass |
-| Benchmark v2 | `node scripts/routing-benchmark-v2.mjs` | 30 grafos × 20 realizaciones, 2000 bootstrap |
+| Benchmark v2 | `node scripts/routing-benchmark-v2.mjs` | 30 grafos × 20 realizaciones, 2000 bootstrap; `SOURCE_ONLY` |
+| Evidencia DTN | SHA-256 del JSON | `c399870d43f121c4739fb9bb4cc5ed7b652436eac99f7b1ce46642cc7ffcd860` |
 | Paridad web | `node scripts/sync-web.mjs` + suite | 61 módulos sincronizados |
 | Datos | `docs/research/senda-data-sha256.txt` | 22 ficheros hasheados |
 
@@ -112,21 +113,21 @@ Sin 1–5, cualquier nota ≥9,5 sería una afirmación sin evidencia.
 - La energía es un proxy del catálogo, no julios.
 - El modelo de fuego no está calibrado con datos oficiales.
 - La revisión adversarial es interna; los subagentes comparten modelo.
-- La evidencia actual fue generada con árbol de trabajo sucio; el manifiesto lo declara.
+- La evidencia se generó desde el commit `3041a52` con árbol limpio (`SOURCE_ONLY`); el JSON se commitea aparte.
+- `SOURCE_ONLY` no es un artefacto atestiguado por CI ni una release firmada.
 - La licencia MIT ya publicada limita la estrategia de PI.
 
 ## 7. Próximos pasos inmediatos
 
-1. Commit de código, tests y documentación.
-2. Regenerar `routing-benchmark-m95.json` desde árbol limpio, con salida temporal fuera del repo, y commitear la evidencia como acto de contabilidad separado.
-3. Abrir PR de la misión.
-4. Empezar PCI v0.2.
-5. Cerrar F-02 y F-05.
-6. Preparar protocolo de validación externa.
+1. Commitear el JSON de evidencia como acto de contabilidad separado.
+2. Abrir PR de la misión.
+3. Empezar PCI v0.2.
+4. Cerrar F-02 y F-05.
+5. Preparar protocolo de validación externa.
 
 ## 8. Artefactos
 
-- `evidence/senda/mission-95/routing-benchmark-m95.json` — benchmark v2 (se regenerará desde árbol limpio).
+- `evidence/senda/mission-95/routing-benchmark-m95.json` — benchmark v2 desde árbol limpio (`SOURCE_ONLY`).
 - `evidence/senda/mission-95/README.md` — índice y estado de la evidencia.
 - `packages/senda/scripts/routing-benchmark-v2.mjs` — generador.
 - `packages/senda/tests/` — 264 pruebas.

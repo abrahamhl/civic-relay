@@ -1,14 +1,25 @@
 # Evidencia · Misión SENDA 9.5
 
 Fecha: 2026-11-08  
-Estado: `SIMULATED` + `UNCOMMITTED_BUILD` hasta regenerar desde árbol limpio.
+Estado: `SIMULATED` + `SOURCE_ONLY`; no es validación física.
 
 ## Ficheros
 
 | Fichero | Descripción | Estado |
 |---|---|---|
-| `routing-benchmark-m95.json` | Benchmark DTN v2, schema `senda.routing-benchmark/2` | Generado con árbol sucio; regenerar |
+| `routing-benchmark-m95.json` | Benchmark DTN v2, schema `senda.routing-benchmark/2` | `SOURCE_ONLY`, generado desde árbol limpio |
 | `README.md` | Este índice | — |
+
+## Procedencia
+
+- Commit medido: `3041a52435aadb936e34cf8546df3806a31c68a6`.
+- Árbol Git: `5445dd62a6af300e3769a15b4de7070288cec223`.
+- `source.manifestClaim`: `SOURCE_ONLY`.
+- `source.worktreeDirty`: `false`; `source.dirtyPaths`: `[]`.
+- SHA-256 del JSON: `c399870d43f121c4739fb9bb4cc5ed7b652436eac99f7b1ce46642cc7ffcd860`.
+- Script: `packages/senda/scripts/routing-benchmark-v2.mjs`, SHA-256 `25cb77407d9c77102a93205e2c893c9b0097487fad9a2a2f0ac8545e43ccd78c`.
+- Módulo: `packages/senda/src/opportunistic-routing.mjs`, SHA-256 `eb22d8f1ae8e3d42410c715a1e49289d1a1a2a98cfdea004be2d6931509c0b28`.
+- El JSON se commitea después del código medido; ese commit de evidencia no cambia el contenido medido.
 
 El smoke `routing-benchmark-smoke.json` se eliminó para no confundirlo con evidencia final.
 
@@ -42,7 +53,7 @@ cd C:\Users\2fabr\civic-relay\packages\senda
 node scripts/routing-benchmark-v2.mjs `
   --graphs=30 --realizations=20 --bootstrap=2000 --repeats=10 `
   --seed=20261107 `
-  --out="C:\Users\2fabr\AppData\Local\Temp\routing-benchmark-m95.json"
+  --out="C:\Users\2fabr\AppData\Local\Temp\opencode\routing-benchmark-m95.json"
 ```
 
 Para una comprobación rápida:
@@ -53,8 +64,8 @@ node scripts/routing-benchmark-v2.mjs --graphs=2 --realizations=2 --bootstrap=40
 
 ## Regla de honestidad
 
-- `source.manifestClaim = UNCOMMITTED_BUILD` significa que el árbol no estaba limpio. No es una release verificada.
-- Para una evidencia limpia: commitear código, ejecutar con salida fuera del repo, verificar `git.dirtyPaths` vacío, copiar el JSON y commitearlo aparte.
+- `source.manifestClaim = SOURCE_ONLY` significa que el árbol estaba limpio y que la evidencia se generó desde ese commit; no significa que el artefacto esté atestiguado por CI.
+- `UNCOMMITTED_BUILD` no es una release verificada.
 - `SIMULATED` no es `PHYSICALLY_VALIDATED`.
 - Los IC son nominales del 95 % y no están corregidos por comparaciones múltiples.
 - Los deltas son exploratorios y pareados por grafo.
