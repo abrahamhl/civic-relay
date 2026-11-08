@@ -13,7 +13,14 @@ const TEST_HTTP_DB = join(__dirname, '../data/test-http.db');
 test('INTEGRACIÓN HTTP / SPA / SSE / SEGURIDAD', async (t) => {
   if (existsSync(TEST_HTTP_DB)) rmSync(TEST_HTTP_DB, { force: true });
 
-  const { server, db } = createServer({ dbFile: TEST_HTTP_DB });
+  // Synthetic fixture only verifies HTTP wiring; it is NOT a live USGS acquisition.
+  const usgsFeed = { read: async () => ({
+    dataset: 'USGS_M45_WEEK_GEOJSON', status: 'SOURCE_SNAPSHOT',
+    dataKind: 'HISTORICAL_OBSERVATION', isOfficialAlert: false,
+    observations: [{ id: 'usgs:test', magnitude: 5.2, location: { lat: 40, lon: 1 } }],
+    source: { provider: 'USGS Earthquake Hazards Program' }
+  }) };
+  const { server, db } = createServer({ dbFile: TEST_HTTP_DB, usgsFeed });
 
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const port = server.address().port;
@@ -59,6 +66,16 @@ test('INTEGRACIÓN HTTP / SPA / SSE / SEGURIDAD', async (t) => {
     const data = await okRes.json();
     assert.ok(data.token);
     assert.equal(data.user.email, 'test@senda.live');
+  });
+
+  await t.test('5. Endpoint público de observaciones: se mantienen separadas de las alertas', async () => {
+    const res = await fetch(baseUrl + '/api/sources/usgs-earthquakes');
+    assert.equal(res.status, 200);
+    const body = await res.json();
+    assert.equal(body.dataset, 'USGS_M45_WEEK_GEOJSON');
+    assert.equal(body.dataKind, 'HISTORICAL_OBSERVATION');
+    assert.equal(body.isOfficialAlert, false);
+    assert.equal(body.observations[0].magnitude, 5.2);
   });
 
   await t.test('4. Consulta de Feed y Adaptadores', async () => {
