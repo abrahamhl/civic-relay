@@ -86,6 +86,9 @@ export const api = {
   async getComments(id: string) { return request(`/api/posts/${id}/comments`); },
   async getStories() { return request('/api/stories'); },
 
+  // Public scientific source records (separate from SENDA emergency alerts).
+  async getUsgsEarthquakes() { return request('/api/sources/usgs-earthquakes'); },
+
   // Events
   async getEvents(params: Record<string, string> = {}) {
     const qs = new URLSearchParams(params).toString();
