@@ -65,7 +65,7 @@ function isB64Url(value, byteLength) {
 export async function sha256b64(bytes) { return b64(await subtle.digest('SHA-256', bytes)); }
 export async function ackHashOf(secretBytes) { return b64(new Uint8Array(await subtle.digest('SHA-256', secretBytes)).subarray(0, 16)); }
 
-/** Huella pública = 16 primeros bytes de SHA-256(x‖y) de la clave de cifrado. */
+/** Huella pública = 16 primeros bytes de SHA-256(x‖y) de una clave P-256 (cifrado o firma). */
 export async function fingerprint(jwk) {
   const h = new Uint8Array(await subtle.digest('SHA-256', new Uint8Array([...unb64(jwk.x), ...unb64(jwk.y)])));
   return b64(h.subarray(0, 16));
@@ -98,6 +98,59 @@ export async function importIdentity({ sign, box }) {
   return identityFromKeys({ sign: s, box: b });
 }
 
+const IDENTITY_AAD = enc.encode('SENDA-identity-v1');
+const IDENTITY_KDF_ITERATIONS = 210_000;
+const IDENTITY_MIN_PASSPHRASE = 12;
+
+function assertPassphrase(passphrase) {
+  if (typeof passphrase !== 'string') throw new Error('BAD_PASSPHRASE');
+  if ([...passphrase].length < IDENTITY_MIN_PASSPHRASE) throw new Error(`La frase de paso debe tener al menos ${IDENTITY_MIN_PASSPHRASE} caracteres`);
+  if (passphrase.length > 1024) throw new Error('La frase de paso es demasiado larga');
+}
+
+async function identityKey(passphrase, salt, iterations) {
+  const material = await subtle.importKey('raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey']);
+  return subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations }, material, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+
+/**
+ * Exporta la identidad cifrada con PBKDF2-SHA-256 + AES-256-GCM.
+ * El resultado es un objeto JSON serializable; no contiene claves en claro.
+ */
+export async function exportIdentityEncrypted(id, passphrase, { iterations = IDENTITY_KDF_ITERATIONS, salt } = {}) {
+  assertPassphrase(passphrase);
+  if (!Number.isSafeInteger(iterations) || iterations < 100_000 || iterations > 2_000_000) throw new Error('ITERACIONES_INVÁLIDAS');
+  const saltBytes = salt ?? rand(16);
+  if (!(saltBytes instanceof Uint8Array) || saltBytes.length !== 16) throw new Error('SAL_INVÁLIDA');
+  const iv = rand(12);
+  const plain = enc.encode(JSON.stringify(await exportIdentity(id)));
+  const ct = new Uint8Array(await subtle.encrypt({ name: 'AES-GCM', iv, additionalData: IDENTITY_AAD }, await identityKey(passphrase, saltBytes, iterations), plain));
+  return { v: 1, kdf: 'PBKDF2-SHA-256', iterations, salt: b64(saltBytes), iv: b64(iv), ct: b64(ct) };
+}
+
+/** Importa una identidad exportada con `exportIdentityEncrypted`. Falla de forma cerrada con frase incorrecta o blob alterado. */
+export async function importIdentityEncrypted(blob, passphrase) {
+  assertPassphrase(passphrase);
+  if (!blob || typeof blob !== 'object' || blob.v !== 1 || blob.kdf !== 'PBKDF2-SHA-256') throw new Error('FORMATO_DE_IDENTIDAD_NO_SOPORTADO');
+  const iterations = blob.iterations;
+  if (!Number.isSafeInteger(iterations) || iterations < 100_000 || iterations > 2_000_000) throw new Error('ITERACIONES_INVÁLIDAS');
+  const salt = unb64(blob.salt), iv = unb64(blob.iv), ct = unb64(blob.ct);
+  if (salt.length !== 16 || iv.length !== 12 || ct.length < 17) throw new Error('BLOB_DE_IDENTIDAD_INVÁLIDO');
+  let plain;
+  try {
+    plain = await subtle.decrypt({ name: 'AES-GCM', iv, additionalData: IDENTITY_AAD }, await identityKey(passphrase, salt, iterations), ct);
+  } catch {
+    throw new Error('BAD_PASSPHRASE');
+  }
+  let material;
+  try {
+    material = JSON.parse(dec.decode(plain));
+  } catch {
+    throw new Error('IDENTIDAD_CORRUPTA');
+  }
+  return importIdentity(material);
+}
+
 /** Tarjeta de contacto compacta (132 B + nombre) para intercambiar por sonido/archivo/texto. */
 export function packContact(publicIdentity, name = '') {
   const n = enc.encode(name).subarray(0, 60);
@@ -117,9 +170,14 @@ async function aesKey(sharedBits, salt) {
 
 const headerBytes = (h) => enc.encode(JSON.stringify([h.v, h.id, h.to, h.priority, h.expiresAt, h.kind, h.ackHash]));
 
-/** Cifra y firma. `recipient` = identidad pública {boxPub, fingerprint}. */
-export async function sealMessage({ sender, recipient, body, priority, ttlS, now, kind = 'PERSONAL' }) {
+/**
+ * Cifra y firma. `recipient` = identidad pública {boxPub, fingerprint}.
+ * La versión interna 3 incluye la huella de la clave de caja del emisor dentro del
+ * plaintext firmado; el receptor puede ligarla a la tarjeta de contacto (F-02).
+ */
+export async function sealMessage({ sender, recipient, body, priority, ttlS, now, kind = 'PERSONAL', innerVersion = 3 }) {
   if (!KINDS.includes(kind)) throw new Error(`Tipo desconocido: ${kind}`);
+  if (innerVersion !== 2 && innerVersion !== 3) throw new Error('VERSIÓN_INTERNA_INVÁLIDA');
   const ackSecret = rand(16), idBytes = rand(16);
   const header = { v: 2, id: b64(idBytes), to: recipient.fingerprint, priority, expiresAt: now + ttlS * 1000, kind, ackHash: await ackHashOf(ackSecret) };
   const eph = await subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits']);
@@ -128,7 +186,9 @@ export async function sealMessage({ sender, recipient, body, priority, ttlS, now
   const iv = rand(12);
   const binary = typeof body !== 'string';
   const bodyBytes = binary ? body : enc.encode(body);
-  const inner = new Uint8Array([...rawFromJwk(sender.publicIdentity.signPub), ...ackSecret, binary ? 1 : 0, ...bodyBytes]);
+  const inner = innerVersion === 3
+    ? new Uint8Array([3, ...rawFromJwk(sender.publicIdentity.signPub), ...unb64(sender.publicIdentity.fingerprint ?? await fingerprint(sender.publicIdentity.boxPub)), ...ackSecret, binary ? 1 : 0, ...bodyBytes])
+    : new Uint8Array([...rawFromJwk(sender.publicIdentity.signPub), ...ackSecret, binary ? 1 : 0, ...bodyBytes]);
   const ct = new Uint8Array(await subtle.encrypt({ name: 'AES-GCM', iv, additionalData: headerBytes(header) }, await aesKey(shared, idBytes), inner));
   const ephPub = await subtle.exportKey('jwk', eph.publicKey);
   const sig = await subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, sender.sign.privateKey, new Uint8Array([...headerBytes(header), ...ct]));
@@ -141,7 +201,24 @@ export function relayView(envelope, now) {
   return { id: header.id, to: header.to, priority: header.priority, kind: header.kind, expired: now > header.expiresAt, sizeBytes: packEnvelope(envelope).length };
 }
 
-export async function openMessage({ recipient, envelope, now }) {
+async function bindExpectedSender({ expectedSender, from, fromFingerprint }) {
+  const contact = expectedSender?.publicIdentity ?? expectedSender;
+  const signPub = contact?.signPub ?? contact?.publicIdentity?.signPub;
+  if (!signPub || typeof signPub.x !== 'string' || typeof signPub.y !== 'string') throw new Error('EXPECTED_SENDER_INVÁLIDO');
+  if (from.x !== signPub.x || from.y !== signPub.y) throw new Error('SENDER_NOT_PINNED');
+  const expectedBoxFingerprint = contact.fingerprint ?? (contact.boxPub ? await fingerprint(contact.boxPub) : null);
+  if (!expectedBoxFingerprint) return 'SIGN_ONLY';
+  if (!fromFingerprint) throw new Error('SENDER_BINDING_MISSING');
+  if (fromFingerprint !== expectedBoxFingerprint) throw new Error('SENDER_NOT_PINNED');
+  return 'SIGN_AND_BOX';
+}
+
+/**
+ * Abre un sobre. `expectedSender` (opcional) es una tarjeta de contacto o identidad
+ * pública; si se aporta, la firma y la huella de caja deben coincidir (fail-closed).
+ * Los sobres antiguos sin huella de caja se rechazan cuando se exige vinculación.
+ */
+export async function openMessage({ recipient, envelope, now, expectedSender = null }) {
   const shape = validateEnvelopeShape(envelope, { now });
   if (!shape.ok) throw new Error(shape.reason);
   const { header } = envelope;
@@ -151,12 +228,31 @@ export async function openMessage({ recipient, envelope, now }) {
   const shared = await subtle.deriveBits({ name: 'ECDH', public: ephPub }, recipient.box.privateKey, 256);
   const ct = unb64(envelope.ct);
   const pt = new Uint8Array(await subtle.decrypt({ name: 'AES-GCM', iv: unb64(envelope.iv), additionalData: headerBytes(header) }, await aesKey(shared, unb64(header.id)), ct));
-  const from = jwkFromRaw(pt.subarray(0, 65));
-  const ackSecret = pt.slice(65, 81), binary = pt[81] === 1, bodyBytes = pt.slice(82);
+  const innerVersion = pt[0] === 3 ? 3 : 2;
+  let signRaw, fromFingerprint = null, ackSecret, binaryFlag, bodyBytes;
+  if (innerVersion === 3) {
+    if (pt.length < 99) throw new Error('INNER_TRUNCADO');
+    signRaw = pt.subarray(1, 66);
+    fromFingerprint = b64(pt.subarray(66, 82));
+    ackSecret = pt.slice(82, 98);
+    binaryFlag = pt[98];
+    bodyBytes = pt.slice(99);
+  } else {
+    if (pt.length < 82) throw new Error('INNER_TRUNCADO');
+    signRaw = pt.subarray(0, 65);
+    ackSecret = pt.slice(65, 81);
+    binaryFlag = pt[81];
+    bodyBytes = pt.slice(82);
+  }
+  if (signRaw.length !== 65) throw new Error('INNER_TRUNCADO');
+  if (binaryFlag !== 0 && binaryFlag !== 1) throw new Error('BAD_BODY_FLAG');
+  const from = jwkFromRaw(signRaw);
   const verifyKey = await subtle.importKey('jwk', { ...from, ext: true }, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
   if (!(await subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, verifyKey, unb64(envelope.sig), new Uint8Array([...headerBytes(header), ...ct])))) throw new Error('BAD_SIGNATURE');
   if ((await ackHashOf(ackSecret)) !== header.ackHash) throw new Error('BAD_ACK_COMMITMENT');
-  return { header, from, fromFingerprint: null, body: binary ? bodyBytes : dec.decode(bodyBytes), receipt: { id: header.id, ackSecret: b64(ackSecret) } };
+  const fromSignFingerprint = await fingerprint(from);
+  const senderBinding = expectedSender ? await bindExpectedSender({ expectedSender, from, fromFingerprint }) : null;
+  return { header, from, fromFingerprint, fromSignFingerprint, innerVersion, senderBinding, body: binaryFlag === 1 ? bodyBytes : dec.decode(bodyBytes), receipt: { id: header.id, ackSecret: b64(ackSecret) } };
 }
 
 /* ---------- Codificación binaria compacta (sonido / SMS / QR) ---------- */

@@ -41,27 +41,34 @@ Adversarios:
 | Destinatario de respuesta | La firma cubre `reply`; desviarlo invalida la firma | `coordination-flow.test.mjs` |
 | Deduplicación | Inbox y `seen` en órdenes | `security-rescue.test.mjs`, `coordination-flow.test.mjs` |
 | Límite de formato binario | Rechaza ciphertext >65535 B en vez de truncar | `dtn-hardening.test.mjs` (nuevo) |
+| Vinculación de emisor (F-02) | Versión interna 3 con huella de caja; `expectedSender` compara firma y huella | `security-rescue.test.mjs` (nuevo) |
+| Export cifrado de identidad (F-05) | PBKDF2-SHA-256 210 000 + AES-256-GCM, AAD y mínimo de frase | `security-rescue.test.mjs` (nuevo) |
+| Cadena de custodia PCI | `@senda/pci` v0.2.0: JSON canónico, hash/firma por registro, recibos y anclas externas | `packages/senda-pci/tests/pci.test.mjs` (nuevo) |
 
 ## 3. Hallazgos
 
-### F-01 · PCI ausente (Alto, gobernanza)
+### F-01 · PCI implementado, sin auditar (Alto, gobernanza)
 
 No hay paquete PCI verificable en Git. Sin él no se puede demostrar cadena de custodia, canonicalización ni verificación fail-closed de evidencias. No es un fallo de confidencialidad, pero bloquea la afirmación de auditabilidad.
 
-Estado: **BLOCKED**. Plan: `packages/senda-pci/` v0.2, no «recuperación» de la v0.1.
+Estado: **IMPLEMENTADO LOCALMENTE, SIN AUDITORÍA NI DESPLIEGUE**. `packages/senda-pci/` v0.2.0, protocolo `senda.pci/1`, 13 pruebas adversariales. No es «recuperación» de la v0.1. Falta revisión externa y despliegue identificable por hash.
 
 ### F-02 · Vinculación de identidad del emisor (Medio-Alto)
 
-`openMessage` verifica que el emisor posee la clave de firma incluida en el plaintext, pero no liga esa clave a una tarjeta de contacto ni a una identidad externa. `fromFingerprint` se devuelve como `null`. Un atacante puede generar una identidad nueva y presentarse con un nombre elegido si el usuario acepta su tarjeta.
+`openMessage` verifica que el emisor posee la clave de firma incluida en el plaintext, pero no liga esa clave a una tarjeta de contacto ni a una identidad externa. `fromFingerprint` se devuelve como `null` en sobres v2. Un atacante puede generar una identidad nueva y presentarse con un nombre elegido si el usuario acepta su tarjeta.
 
-Mitigaciones recomendadas:
+Mitigaciones aplicadas:
 
-- Incluir en el plaintext la huella de la clave de caja del emisor y compararla con la tarjeta de contacto.
-- Mostrar «contacto verificado» solo si la huella coincide.
+- La versión interna 3 del sobre incluye la huella de la clave de caja del emisor dentro del plaintext firmado.
+- `openMessage({ expectedSender })` compara la clave de firma y la huella de caja con la tarjeta; falla con `SENDER_NOT_PINNED` o `SENDER_BINDING_MISSING`.
+- Los sobres v2 siguen abriéndose, pero sin vinculación (`fromFingerprint = null`).
+
+Pendiente:
+
+- La UI debe mostrar «contacto verificado» solo si `expectedSender` se aporta y la comprobación pasa.
 - Añadir números de seguridad o QR presencial.
-- No confiar en el nombre que envía el emisor.
 
-Estado: **ABIERTO**.
+Estado: **MITIGADO EN CÓDIGO Y PROBADO**; falta integración de UI y revisión externa.
 
 ### F-03 · El relé no puede verificar la firma (Medio, por diseño)
 
@@ -91,16 +98,20 @@ Estado: **ABIERTO**.
 
 ### F-05 · Gestión de claves (Alto)
 
-`exportIdentity` devuelve claves privadas; no hay almacenamiento en hardware, frase de paso, recuperación, rotación ni revocación de identidad. El compromiso del teléfono permite leer mensajes futuros y suplantar al usuario.
+`exportIdentity` devuelve claves privadas en claro; no hay almacenamiento en hardware, recuperación, rotación ni revocación de identidad. El compromiso del teléfono permite leer mensajes futuros y suplantar al usuario.
 
-Mitigaciones:
+Mitigaciones aplicadas:
+
+- `exportIdentityEncrypted` / `importIdentityEncrypted` con PBKDF2-SHA-256 (210 000 iteraciones) + AES-256-GCM, AAD `SENDA-identity-v1`, mínimo 12 caracteres y fallo cerrado con frase incorrecta o blob alterado.
+
+Pendiente:
 
 - Guardar claves en el keystore del sistema.
-- Frase de paso y bloqueo.
 - Rotación y credenciales de revocación.
 - Protocolo de recuperación con contactos de confianza.
+- Eliminar la exportación en claro cuando la migración termine.
 
-Estado: **ABIERTO**.
+Estado: **MITIGADO PARCIALMENTE**.
 
 ### F-06 · Broadcast no verificado en el almacén (Medio)
 
@@ -142,11 +153,11 @@ Estado: **MITIGADO**.
 
 | ID | Probabilidad | Impacto | Riesgo | Estado |
 |---|---|---|---|---|
-| F-01 | Alta | Alto | Crítico | BLOCKED |
-| F-02 | Media | Alto | Alto | Abierto |
+| F-01 | Media | Alto | Alto | Implementado; sin auditar |
+| F-02 | Baja | Alto | Medio | Mitigado en código |
 | F-03 | Alta | Medio | Medio | Conocido |
 | F-04 | Alta | Medio | Medio | Abierto |
-| F-05 | Media | Alto | Alto | Abierto |
+| F-05 | Media | Alto | Alto | Parcial |
 | F-06 | Media | Medio | Medio | Parcial |
 | F-07 | Media | Medio | Medio | Corregido |
 | F-08 | Alta | Alto | Crítico | BLOCKED |
@@ -155,10 +166,10 @@ Estado: **MITIGADO**.
 
 ## 5. Recomendaciones priorizadas
 
-1. Implementar PCI v0.2 y verificación fail-closed.
-2. Cerrar F-02: vincular firma, caja y tarjeta de contacto; mostrar estado de verificación.
-3. Cerrar F-05: keystore, frase de paso, rotación y revocación.
-4. Añadir fuzzing de `validateEnvelopeShape`, `unpackEnvelope`, `unpackContact` y `decodeCode`.
+1. Auditar PCI v0.2 y desplegarlo con hash verificable.
+2. Integrar F-02 en la UI: exigir `expectedSender` y mostrar «verificado» solo si pasa.
+3. Cerrar F-05 residual: keystore, rotación, revocación y retirada de `exportIdentity` en claro.
+4. Añadir fuzzing de `validateEnvelopeShape`, `unpackEnvelope`, `unpackContact`, `decodeCode` y del parser PCI.
 5. Pruebas de carga y evicción con 10^4 sobres.
 6. Revisión criptográfica externa.
 7. Documentar el modelo de adversario y los límites de privacidad.
@@ -170,6 +181,9 @@ cd packages/senda
 node --test tests/security-rescue.test.mjs
 node --test tests/dtn-hardening.test.mjs
 node --test tests/coordination-flow.test.mjs
+
+cd ../senda-pci
+node --test tests/*.test.mjs
 ```
 
-Resultado esperado: todas en verde. Verde no significa seguro; significa que estos casos pasan.
+Resultado esperado: todas en verde. Verde no significa seguro; significa que estos casos pasan. PCI no está auditado externamente.

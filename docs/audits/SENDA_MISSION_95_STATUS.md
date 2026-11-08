@@ -7,7 +7,7 @@ Documento base: `docs/audits/SENDA_BASELINE_MISSION_95.md`.
 
 ## 1. Resumen ejecutivo
 
-La misión produjo mejoras verificables en reproducibilidad, matemática de incendios, routing DTN y documentación. También produjo una conclusión incómoda: la puntuación global sigue lejos de 9,5 porque faltan PCI, validación física, calibración independiente, auditoría externa y búsqueda sistemática de prior art. No se maquilla esa brecha.
+La misión produjo mejoras verificables en reproducibilidad, matemática de incendios, routing DTN, PCI v0.2, identidad ligada a tarjeta y export cifrado de claves. También produjo una conclusión incómoda: la puntuación global sigue lejos de 9,5 porque faltan validación física, calibración independiente, auditoría externa, despliegue verificable de PCI y búsqueda sistemática de prior art. No se maquilla esa brecha.
 
 ## 2. Cambios realizados
 
@@ -51,11 +51,28 @@ La misión produjo mejoras verificables en reproducibilidad, matemática de ince
 - `docs/handoff/SENDA_RESUME_CHECKPOINT.md`
 - `evidence/senda/mission-95/README.md`
 
+### 2.5 PCI v0.2
+
+- Nuevo paquete `@senda/pci` v0.2.0 en `packages/senda-pci/`; no es «recuperación» de la v0.1 desplegada y no recuperable.
+- Protocolo `senda.pci/1`: JSON canónico determinista, cadena `prev`/`hash`, firma ECDSA P-256/SHA-256 por registro, recibos `RECEIVED` ligados por `transferHash`, acciones `REGISTERED/TRANSFERRED/RECEIVED/VERIFIED/ACCESSED/SEALED`.
+- `verifyLedger` exige anclas de confianza externas y falla cerrado con `MISSING_TRUST_ANCHOR`; `appendEvent` solo exige integridad interna autocontenida.
+- CLI `senda-pci`: `keygen`, `pub`, `register`, `transfer`, `receive`, `seal`, `verify`, `receipt`, `digest`. `keygen` escribe la clave privada en claro y lo advierte; no es producción.
+- 13 pruebas adversariales: cadena completa, recibo, alteración de hash/firma/evidencia, borrado/reordenación/duplicado, transferencia sin recibo, custodio no autorizado, tiempo, anclas de confianza, campos desconocidos, sellado, export/import y canonicalización.
+- Humo CLI: 4 registros, sellado, custodio final Bruno, digest `cede45246baacb9065a647cb289da99bb5cd48272ae5febeccb8c429b8a90733`.
+
+### 2.6 Identidad del emisor y claves (F-02/F-05)
+
+- `openMessage` acepta `expectedSender` (tarjeta de contacto o identidad pública) y verifica que la firma y la huella de caja coinciden; falla con `SENDER_NOT_PINNED` o `SENDER_BINDING_MISSING`.
+- `sealMessage` usa versión interna 3 por defecto: incluye huella de caja del emisor dentro del plaintext firmado. Los sobres v2 siguen abriéndose sin vinculación y devuelven `fromFingerprint = null`.
+- `exportIdentityEncrypted` / `importIdentityEncrypted`: PBKDF2-SHA-256 (210 000 iteraciones por defecto) + AES-256-GCM, AAD `SENDA-identity-v1`, mínimo 12 caracteres. Falla cerrado con frase incorrecta o blob alterado.
+- `exportIdentity` en claro sigue existiendo para migración; no hay keystore de hardware, rotación ni revocación. F-05 queda mitigado parcialmente.
+
 ## 3. Evidencia
 
 | Evidencia | Comando | Resultado |
 |---|---|---|
-| Suite SENDA | `cd packages/senda; node --test tests/*.test.mjs` | **264/264 pass** |
+| Suite SENDA | `cd packages/senda; node --test tests/*.test.mjs` | **266/266 pass** |
+| Suite PCI | `cd packages/senda-pci; node --test tests/*.test.mjs` | **13/13 pass** |
 | Manifiesto | `node --test scripts/release-manifest.test.mjs` | 4/4 pass |
 | Benchmark v2 | `node scripts/routing-benchmark-v2.mjs` | 30 grafos × 20 realizaciones, 2000 bootstrap; `SOURCE_ONLY` |
 | Evidencia DTN | SHA-256 del JSON | `c399870d43f121c4739fb9bb4cc5ed7b652436eac99f7b1ce46642cc7ffcd860` |
@@ -87,22 +104,22 @@ Delta EAOR vs earliest: +86,5 pp de entrega (IC 95 %: 84,2–88,8), +75,7 s de l
 | Rigor científico | 4,0 | 7,0 | Bootstrap por grafos, deltas, incertidumbre; sin validación externa |
 | Incendios | 6,0 | 7,0 | Fail-closed y documentación; sin calibración oficial |
 | DTN | 5,0 | 7,5 | EAOR y benchmark v2; sin trazas reales ni campo |
-| PCI | 1,0 | 1,0 | Ausente; recuperación bloqueada |
-| Seguridad | 5,0 | 6,0 | Pruebas y bug corregido; F-02/F-05/F-08 abiertos |
+| PCI | 1,0 | 4,5 | Paquete v0.2 implementado y probado; sin auditoría externa, integración ni despliegue verificable |
+| Seguridad | 5,0 | 6,8 | F-02 probado y F-05 mitigado; sin keystore, rotación, revocación ni revisión criptográfica externa |
 | PI | 3,0 | 4,0 | Estrategia y prior art exploratorio; sin búsqueda sistemática |
 | Documentación | 4,0 | 8,0 | Informes completos y honestos; faltan resultados de campo |
-| **Global** | **4,8** | **6,1** | **Todavía no 9,5** |
+| **Global** | **4,8** | **6,7** | **Todavía no 9,5** |
 
 ## 5. Brecha para 9,5
 
-1. **PCI v0.2** implementado y verificado; sin él, la auditabilidad está BLOCKED.
+1. **PCI v0.2** implementado y probado localmente; falta auditoría externa, integración en el producto y despliegue identificable por hash.
 2. **Validación física DTN** LEVEL-4 con radios reales y energía medida.
 3. **Calibración de incendios** fuera de muestra con dos o más incendios independientes y perímetros oficiales.
-4. **Auditoría externa** de seguridad y revisión científica independiente.
+4. **Auditoría externa** de seguridad, criptografía y revisión científica independiente.
 5. **Búsqueda sistemática** de prior art y decisión de PI con abogado.
 6. **CI con atestación** de artefacto y despliegue identificable por hash.
 7. **Pruebas de carga** del almacén DTN y fuzzing de parsers.
-8. **Cierre de F-02 y F-05** en seguridad.
+8. **F-05 residual**: keystore de hardware, rotación, revocación y eliminación de exportación en claro.
 
 Sin 1–5, cualquier nota ≥9,5 sería una afirmación sin evidencia.
 
@@ -113,21 +130,24 @@ Sin 1–5, cualquier nota ≥9,5 sería una afirmación sin evidencia.
 - La energía es un proxy del catálogo, no julios.
 - El modelo de fuego no está calibrado con datos oficiales.
 - La revisión adversarial es interna; los subagentes comparten modelo.
+- PCI v0.2 está probado, pero no auditado ni desplegado; la interpretación del acrónimo PCI no está fijada por una especificación externa.
+- F-05 no elimina la exportación en claro ni usa keystore de hardware.
 - La evidencia se generó desde el commit `3041a52` con árbol limpio (`SOURCE_ONLY`); el JSON se commitea aparte.
 - `SOURCE_ONLY` no es un artefacto atestiguado por CI ni una release firmada.
 - La licencia MIT ya publicada limita la estrategia de PI.
 
 ## 7. Próximos pasos inmediatos
 
-1. Commitear el JSON de evidencia como acto de contabilidad separado.
-2. Abrir PR de la misión.
-3. Empezar PCI v0.2.
-4. Cerrar F-02 y F-05.
+1. Commitear PCI v0.2, F-02/F-05 y estas actualizaciones; pushear al PR #23.
+2. Auditar PCI y la criptografía de identidad de forma externa.
+3. Integrar PCI en el producto y desplegarlo con hash verificable.
+4. Cerrar F-05 residual: keystore, rotación y revocación.
 5. Preparar protocolo de validación externa.
 
 ## 8. Artefactos
 
 - `evidence/senda/mission-95/routing-benchmark-m95.json` — benchmark v2 desde árbol limpio (`SOURCE_ONLY`).
 - `evidence/senda/mission-95/README.md` — índice y estado de la evidencia.
+- `packages/senda-pci/` — paquete `@senda/pci` v0.2.0, CLI y 13 pruebas.
 - `packages/senda/scripts/routing-benchmark-v2.mjs` — generador.
-- `packages/senda/tests/` — 264 pruebas.
+- `packages/senda/tests/` — 266 pruebas.

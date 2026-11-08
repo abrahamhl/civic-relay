@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { generateIdentity, sealMessage, openMessage, relayView, createInbox } from '../src/envelope.mjs';
+import { generateIdentity, sealMessage, openMessage, relayView, createInbox, fingerprint, packContact, unpackContact } from '../src/envelope.mjs';
 import { createOrganization, issueCredential, verifyCredential, resolveActor, createFamilyRegistry } from '../src/roles.mjs';
 import { locateBeacon, projectToCamera, rssiToDistanceM } from '../src/rubble.mjs';
 import { analyzeCsi, synthesizeCsi, parseEsp32CsiLine, CAPABILITIES } from '../src/through-wall.mjs';
@@ -18,6 +18,42 @@ test('E2E: el destinatario lee, un relé no; manipular el sobre se detecta', asy
   const tampered = { ...env, header: { ...env.header, priority: 0 } };
   await assert.rejects(openMessage({ recipient: ismael, envelope: tampered, now }));
   await assert.rejects(openMessage({ recipient: ismael, envelope: env, now: now + 7200_000 }), /EXPIRED/);
+});
+
+test('F-02: la firma y la huella de caja del emisor se ligan a la tarjeta de contacto', async () => {
+  const sender = await generateIdentity(), recipient = await generateIdentity(), impostor = await generateIdentity();
+  const card = await unpackContact(packContact(sender.publicIdentity, 'Ana'));
+  const env = await sealMessage({ sender, recipient: recipient.publicIdentity, body: 'hola', priority: 3, ttlS: 3600, now });
+  const opened = await openMessage({ recipient, envelope: env, now, expectedSender: card });
+  assert.equal(opened.fromFingerprint, sender.publicIdentity.fingerprint);
+  assert.equal(opened.fromSignFingerprint, await fingerprint(sender.publicIdentity.signPub));
+  assert.equal(opened.senderBinding, 'SIGN_AND_BOX');
+  const forged = await sealMessage({ sender: impostor, recipient: recipient.publicIdentity, body: 'hola', priority: 3, ttlS: 3600, now });
+  await assert.rejects(openMessage({ recipient, envelope: forged, now, expectedSender: card }), /SENDER_NOT_PINNED/);
+  const legacy = await sealMessage({ sender, recipient: recipient.publicIdentity, body: 'hola', priority: 3, ttlS: 3600, now, innerVersion: 2 });
+  await assert.rejects(openMessage({ recipient, envelope: legacy, now, expectedSender: card }), /SENDER_BINDING_MISSING/);
+  const legacyOpened = await openMessage({ recipient, envelope: legacy, now });
+  assert.equal(legacyOpened.fromFingerprint, null);
+  assert.equal(legacyOpened.fromSignFingerprint, await fingerprint(sender.publicIdentity.signPub));
+  const signOnly = await openMessage({ recipient, envelope: env, now, expectedSender: { signPub: sender.publicIdentity.signPub } });
+  assert.equal(signOnly.senderBinding, 'SIGN_ONLY');
+});
+
+test('F-05: la identidad se exporta cifrada y falla con frase incorrecta o blob alterado', async () => {
+  const { exportIdentityEncrypted, importIdentityEncrypted, exportIdentity } = await import('../src/envelope.mjs');
+  const identity = await generateIdentity();
+  const passphrase = 'frase de paso larga';
+  const blob = await exportIdentityEncrypted(identity, passphrase, { iterations: 100_000 });
+  assert.equal(blob.kdf, 'PBKDF2-SHA-256');
+  assert.equal(blob.iterations, 100_000);
+  const restored = await importIdentityEncrypted(blob, passphrase);
+  assert.equal(restored.publicIdentity.fingerprint, identity.publicIdentity.fingerprint);
+  await assert.rejects(importIdentityEncrypted(blob, 'frase de paso incorrecta'), /BAD_PASSPHRASE/);
+  const tampered = { ...blob, ct: `${blob.ct.slice(0, -1)}${blob.ct.endsWith('A') ? 'B' : 'A'}` };
+  await assert.rejects(importIdentityEncrypted(tampered, passphrase), /BAD_PASSPHRASE/);
+  await assert.rejects(exportIdentityEncrypted(identity, 'corta'), /al menos 12/);
+  const plain = await exportIdentity(identity);
+  assert.ok(plain.sign.d, 'la exportación en claro sigue disponible para migración');
 });
 
 test('la carrera multicanal entrega duplicados y el receptor se queda con uno', async () => {
