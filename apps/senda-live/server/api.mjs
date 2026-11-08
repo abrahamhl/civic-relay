@@ -14,10 +14,12 @@ import {
 import { COOKIE_NAME } from './services/auth.mjs';
 import { adapterHealth } from './domain/source-adapters.mjs';
 import { createUsgsEarthquakeFeed } from './domain/usgs-earthquakes.mjs';
+import { createEonetWildfireFeed } from './domain/eonet-wildfires.mjs';
 
 export function createApiHandler({
   db, auth, social, events, emergency, messaging, moderation, admin, rt,
   usgsFeed = createUsgsEarthquakeFeed(),
+  eonetFeed = createEonetWildfireFeed(),
 }) {
   const router = createRouter();
   const rateLimiter = createRateLimiter();
@@ -503,6 +505,12 @@ export function createApiHandler({
   // USGS observations are not SENDA alerts, forecasts, or crisis dispatches.
   router.get('/api/sources/usgs-earthquakes', async (req, res) => {
     const snapshot = await usgsFeed.read();
+    sendJson(res, snapshot.status === 'UNAVAILABLE' ? 503 : 200, snapshot);
+  });
+
+  // EONET's curated event locations are NOT fire perimeters or emergency alerts.
+  router.get('/api/sources/eonet-wildfires', async (req, res) => {
+    const snapshot = await eonetFeed.read();
     sendJson(res, snapshot.status === 'UNAVAILABLE' ? 503 : 200, snapshot);
   });
 
