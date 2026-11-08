@@ -1,4 +1,4 @@
-name: SENDA LIVE · USGS observations and secure map
+name: SENDA LIVE · NASA/USGS geospatial evidence maps
 on:
   push:
     branches:
@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: '22'
       - name: Offline deterministic upstream adapter tests
-        run: node --test apps/senda-live/tests/usgs-earthquakes.test.mjs
+        run: node --test apps/senda-live/tests/usgs-earthquakes.test.mjs apps/senda-live/tests/eonet-wildfires.test.mjs
       - name: Install locked dependencies
         run: |
           corepack enable
