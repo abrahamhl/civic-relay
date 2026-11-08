@@ -90,6 +90,8 @@ export function normalizeEonetWildfires(payload, { now = Date.now(), rawSha256 =
     },
     observations,
     rejectedEvents,
+    requestedLimit: MAX_EVENTS,
+    resultLimitReached: payload.events.length === MAX_EVENTS,
   };
 }
 
@@ -129,6 +131,7 @@ export function createEonetWildfireFeed({
     isOfficialAlert: false, fetchedAt: null,
     source: { provider: 'NASA EONET', url: EONET_WILDFIRE_URL, docsUrl: EONET_DOCS_URL },
     observations: [], rejectedEvents: 0,
+    requestedLimit: MAX_EVENTS, resultLimitReached: false,
   });
 
   async function refresh() {
