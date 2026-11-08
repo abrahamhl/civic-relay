@@ -219,7 +219,8 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
       const checkedAt = snapshot.fetchedAt ? new Date(snapshot.fetchedAt).toLocaleString('es-ES') : 'sin fecha';
       const freshness = snapshot.status === 'STALE_SNAPSHOT' ? 'Copia anterior; proveedor no disponible' :
         snapshot.status === 'CACHED_SNAPSHOT' ? 'Copia reciente en servidor' : 'Consulta a fuente pública';
-      setWildfireStatus(entries.length + ' acontecimientos catalogados (últimos 30 días). ' +
+      setWildfireStatus(entries.length + ' acontecimientos catalogados (consulta de 30 días' +
+        (snapshot.resultLimitReached ? ', muestra limitada a ' + snapshot.requestedLimit : '') + '). ' +
         freshness + '. Fuente: NASA EONET · descarga ' + checkedAt +
         '. No son perímetros, detecciones instantáneas ni alertas.');
     }).catch(() => {
