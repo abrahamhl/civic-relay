@@ -1203,6 +1203,673 @@ export function collectAll(
       active: channelActive(channel, scenario),
       nominalMarginDb: nominalMargin(channel, environment),
       airtime96B: airtimeSecondsFor(channel, 96)
-    }))
+    })),
+    corridorIntelligence: getCorridorIntelligenceSnapshot('NL-A12-ARNHEM-EDE', 'SEGMENT')
   };
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SENDA CORRIDOR FABRIC — PLANO E: CORRIDOR INTELLIGENCE MODE
+// ═══════════════════════════════════════════════════════════════════════════
+
+export type CorridorLayerId =
+  | 'CAMERAS'
+  | 'DASHCAMS'
+  | 'ROAD DATA'
+  | 'ENVIRONMENT'
+  | 'CONNECTED DEVICES'
+  | 'GATEWAYS'
+  | 'DTN ROUTES'
+  | 'DETECTED INCIDENTS'
+  | 'EVIDENCE';
+
+export const CORRIDOR_INTELLIGENCE_LAYERS: readonly CorridorLayerId[] = [
+  'CAMERAS',
+  'DASHCAMS',
+  'ROAD DATA',
+  'ENVIRONMENT',
+  'CONNECTED DEVICES',
+  'GATEWAYS',
+  'DTN ROUTES',
+  'DETECTED INCIDENTS',
+  'EVIDENCE'
+] as const;
+
+export type CorridorSelectionMode = 'SEGMENT' | 'RADIUS' | 'POLYGON';
+
+export type CorridorVerificationHealth =
+  | 'LIVE_VERIFIED'
+  | 'RECORDED_REAL_SAMPLE'
+  | 'LAB_VERIFIED'
+  | 'CATALOG_ONLY'
+  | 'PARTNER_ACCESS_REQUIRED'
+  | 'PERMISSION_PENDING'
+  | 'STALE'
+  | 'UNSUPPORTED'
+  | 'SYNTHETIC';
+
+export type CorridorMessageLifecycleState =
+  | 'QUEUED'
+  | 'IN_CUSTODY'
+  | 'FORWARDED'
+  | 'RECEIVED'
+  | 'VERIFIED'
+  | 'EXPIRED'
+  | 'UNDELIVERABLE'
+  | 'BLOCKED';
+
+export interface CorridorSourceNode {
+  sourceId: string;
+  sectorId: string;
+  roadSegmentId: string;
+  layer: CorridorLayerId;
+  assetType: string;
+  operator: string;
+  lat: number;
+  lon: number;
+  accessRights: string;
+  auth: string;
+  health: CorridorVerificationHealth;
+  lastObservedAt: string | null;
+  observationCapabilities: string[];
+  transportCapabilities: string[];
+  canActAsRelay: boolean;
+  latestObservationSummary: string;
+  videoPreviewUrl: string | null;
+  sharedInfrastructureDeps: string[];
+  proofRef: string;
+}
+
+export interface CorridorSectorSpec {
+  sectorId: string;
+  roadSegmentId: string;
+  pilotCode: 'PILOT_A_A12' | 'PILOT_B_BARRIO_LAB' | 'CORRIDOR_ES_N403';
+  title: Record<Locale, string>;
+  subtitle: Record<Locale, string>;
+  center: { lat: number; lon: number };
+  defaultRadiusM: number;
+  polygonCoords: Array<{ lat: number; lon: number }>;
+  fusedIncident: {
+    eventId: string;
+    decision: string;
+    posteriorConfidence: number;
+    uncertaintyInterval90: [number, number];
+    location: { lat: number; lon: number; uncertaintyRadiusM: number };
+    corroboratingSources: string[];
+    independentFamilies: string[];
+    merkleDigestSha256: string;
+    summary: Record<Locale, string>;
+  };
+  dtnRoutes: Array<{
+    routeId: string;
+    bearer: string;
+    role: 'PRIMARY' | 'DIVERSE_BACKUP' | 'HARDWARE_BLOCKED';
+    status: 'OUTAGE_SIMULATED' | 'ACTIVE_CUSTODY' | 'BLOCKED';
+    packetLossPct: number;
+    latencyMs: number;
+    sharedDeps: string[];
+    jointSurvivalProbPct: number;
+  }>;
+  messages: Array<{
+    messageId: string;
+    kind: 'SOS' | 'OFFICIAL_ALERT';
+    state: CorridorMessageLifecycleState;
+    wireSizeBytes: number;
+    custodyPath: string[];
+    transitions: CorridorMessageLifecycleState[];
+    canonicalEvidenceHash: string;
+    receiptAckHash: string | null;
+    note: string;
+  }>;
+}
+
+export const CORRIDOR_SECTORS: readonly CorridorSectorSpec[] = [
+  {
+    sectorId: 'NL-A12-ARNHEM-EDE',
+    roadSegmentId: 'NL-A12-HM110-130',
+    pilotCode: 'PILOT_A_A12',
+    title: {
+      es: 'Piloto A · Corredor Vial A12 (Arnhem–Ede, PK 110–130)',
+      en: 'Pilot A · A12 Road Corridor (Arnhem–Ede, HM 110–130)',
+      nl: 'Pilot A · A12 Wegcorridor (Arnhem–Ede, HM 110–130)'
+    },
+    subtitle: {
+      es: 'NDW DATEX II v3 SRTI + MONIBAS v2.3 + Dashcam real YOLOX-s/ByteTrack + Custodia DTN (0 cámaras públicas RWS falsas)',
+      en: 'NDW DATEX II v3 SRTI + MONIBAS v2.3 + Real YOLOX-s/ByteTrack Dashcam + DTN Custody (0 fake public RWS cameras)',
+      nl: 'NDW DATEX II v3 SRTI + MONIBAS v2.3 + Echte YOLOX-s/ByteTrack Dashcam + DTN Custody (0 valse publieke RWS-camera’s)'
+    },
+    center: { lat: 51.9852, lon: 5.9675 },
+    defaultRadiusM: 4500,
+    polygonCoords: [
+      { lat: 51.96, lon: 5.82 },
+      { lat: 51.96, lon: 6.02 },
+      { lat: 52.04, lon: 6.02 },
+      { lat: 52.04, lon: 5.82 }
+    ],
+    fusedIncident: {
+      eventId: 'evt-nl-a12-hm110-130-c838644c5d',
+      decision: 'CONFIRMED_MULTISENSOR_INCIDENT',
+      posteriorConfidence: 0.874,
+      uncertaintyInterval90: [0.789, 0.959],
+      location: { lat: 51.9852, lon: 5.9675, uncertaintyRadiusM: 12 },
+      corroboratingSources: ['NDW-NL-A12-SRTI-V3', 'DASHCAM-A12-REAL-TRACE-01', 'OBD-A12-VEHICLE-01'],
+      independentFamilies: ['FAMILY_NDW_RWS', 'FAMILY_EGO_VEHICLE_01'],
+      merkleDigestSha256: '9e40d658c13852a5e4ebe822edd45f25791800ecec2076e23547bdc6bfd6cea7',
+      summary: {
+        es: 'Vehículo detenido en A12 Velperbroek (NDW SRTI v3 id=NDW06_e1de14cb) corroborado por frenada brusca (-4.4 m/s²) y seguimiento visual YOLOX-s + ByteTrack (incertidumbre monocular ±30%).',
+        en: 'Stationary vehicle on A12 Velperbroek (NDW SRTI v3 id=NDW06_e1de14cb) corroborated by hard braking (-4.4 m/s²) and YOLOX-s + ByteTrack visual tracking (monocular uncertainty ±30%).',
+        nl: 'Stilstaand voertuig op A12 Velperbroek (NDW SRTI v3 id=NDW06_e1de14cb) bevestigd door hard remmen (-4.4 m/s²) en YOLOX-s + ByteTrack visuele tracking (monoculaire onzekerheid ±30%).'
+      }
+    },
+    dtnRoutes: [
+      {
+        routeId: 'ROUTE-CELL-KPN-PRIMARY',
+        bearer: 'LTE_5G_IP_BACKHAUL',
+        role: 'PRIMARY',
+        status: 'OUTAGE_SIMULATED',
+        packetLossPct: 100,
+        latencyMs: 9999,
+        sharedDeps: ['INFRA-NL-KPN-CELL-TOWER-ARNHEM-04', 'INFRA-NL-KPN-FIBER-ARNHEM', 'INFRA-NL-ALLIANDER-GRID-GELDERLAND'],
+        jointSurvivalProbPct: 52.2
+      },
+      {
+        routeId: 'ROUTE-OPPORTUNISTIC-NEARBY-P2P',
+        bearer: 'ANDROID_NEARBY_TO_LOCAL_RELAY',
+        role: 'DIVERSE_BACKUP',
+        status: 'ACTIVE_CUSTODY',
+        packetLossPct: 1.8,
+        latencyMs: 24,
+        sharedDeps: ['INFRA-LOCAL-BATTERY-PACK-01', 'INFRA-P2P-RF-SPECTRUM'],
+        jointSurvivalProbPct: 94.8
+      },
+      {
+        routeId: 'ROUTE-LORA-EU868-DONGLE',
+        bearer: 'LORA_ISM_EU868_SUB_GHZ',
+        role: 'HARDWARE_BLOCKED',
+        status: 'BLOCKED',
+        packetLossPct: 0,
+        latencyMs: 0,
+        sharedDeps: ['INFRA-LOCAL-BATTERY-PACK-01'],
+        jointSurvivalProbPct: 0
+      }
+    ],
+    messages: [
+      {
+        messageId: 'msg-a12-evt-nl-a12-hm110-130',
+        kind: 'OFFICIAL_ALERT',
+        state: 'VERIFIED',
+        wireSizeBytes: 642,
+        custodyPath: ['DASHCAM-A12-REAL-TRACE-01', 'NODE-ANDROID-A12-CARRIER-01', 'GATEWAY-A12-VELPERBROEK-RELAY', 'RECIPIENT-ARNHEM-CONSOLE'],
+        transitions: ['QUEUED', 'IN_CUSTODY', 'FORWARDED', 'RECEIVED', 'VERIFIED'],
+        canonicalEvidenceHash: '71185f8a0f683d6cdfa05f1bce4b4021c754eb902dad125c4581261f4cddd7c6',
+        receiptAckHash: 'ack-sha256-a12-velperbroek-verified',
+        note: 'Entregado y verificado criptográficamente tras caída del enlace celular primario.'
+      },
+      {
+        messageId: 'msg-a12-lora-hw-test',
+        kind: 'SOS',
+        state: 'BLOCKED',
+        wireSizeBytes: 248,
+        custodyPath: ['LORA-NODE-VELPERBROEK-868'],
+        transitions: ['QUEUED', 'BLOCKED'],
+        canonicalEvidenceHash: '9e40d658c13852a5e4ebe822edd45f25791800ecec2076e23547bdc6bfd6cea7',
+        receiptAckHash: null,
+        note: 'BLOCKED: Requiere dongle físico LoRa EU868 conectado por USB/BLE (no simulado como exitoso).'
+      }
+    ]
+  },
+  {
+    sectorId: 'LAB-BARRIO-EDIFICIO-01',
+    roadSegmentId: 'BARRIO-ACCESO-NORTE-01',
+    pilotCode: 'PILOT_B_BARRIO_LAB',
+    title: {
+      es: 'Piloto B · Barrio / Edificio Laboratorio Local',
+      en: 'Pilot B · Neighborhood / Building Local Lab',
+      nl: 'Pilot B · Wijk / Gebouw Lokaal Laboratorium'
+    },
+    subtitle: {
+      es: 'Cámara IP propia RTSP/ONVIF + Puente Edge MQTT + 2 Nodos Móviles + Pasarela senda-relay con corte WAN y recibo PCI v0.2',
+      en: 'Owned RTSP/ONVIF IP Camera + Edge MQTT Bridge + 2 Mobile Nodes + senda-relay Gateway with WAN cut & PCI v0.2 receipt',
+      nl: 'Eigen RTSP/ONVIF IP-camera + Edge MQTT-bridge + 2 mobiele nodes + senda-relay gateway met WAN-uitval & PCI v0.2 ontvangstbewijs'
+    },
+    center: { lat: 40.4168, lon: -3.7038 },
+    defaultRadiusM: 1200,
+    polygonCoords: [
+      { lat: 40.412, lon: -3.710 },
+      { lat: 40.412, lon: -3.698 },
+      { lat: 40.421, lon: -3.698 },
+      { lat: 40.421, lon: -3.710 }
+    ],
+    fusedIncident: {
+      eventId: 'evt-barrio-acceso-norte-01-lab',
+      decision: 'CONFIRMED_MULTISENSOR_INCIDENT',
+      posteriorConfidence: 0.912,
+      uncertaintyInterval90: [0.827, 0.995],
+      location: { lat: 40.4168, lon: -3.7038, uncertaintyRadiusM: 8 },
+      corroboratingSources: ['CAM-LAB-BARRIO-RTSP-01', 'EDGE-MQTT-BARRIO-BROKER-01', 'NODE-ANDROID-BARRIO-PEER-01'],
+      independentFamilies: ['FAMILY_BARRIO_LAB_EDGE', 'FAMILY_NODE-ANDROID-BARRIO-PEER-01'],
+      merkleDigestSha256: 'aff7eb13790f01b695d78761ea7d61c211e93e2ab041f777baf31c0b4c6ac509',
+      summary: {
+        es: 'Ocupación vial anómala (9 vehículos, visibilidad Koschmieder 580 m) en cámara IP de laboratorio corroborada por alerta acústica/IMU en Nodo Móvil A vía MQTT Edge Bridge.',
+        en: 'Anomalous lane occupancy (9 vehicles, Koschmieder visibility 580 m) on lab IP camera corroborated by acoustic/IMU alert on Mobile Node A via MQTT Edge Bridge.',
+        nl: 'Afwijkende rijstrookbezetting (9 voertuigen, Koschmieder-zicht 580 m) op lab IP-camera bevestigd door akoestisch/IMU-alarm op Mobiele Node A via MQTT Edge Bridge.'
+      }
+    },
+    dtnRoutes: [
+      {
+        routeId: 'BEARER-BARRIO-WAN-ISP',
+        bearer: 'WAN_FIBER_ISP',
+        role: 'PRIMARY',
+        status: 'OUTAGE_SIMULATED',
+        packetLossPct: 100,
+        latencyMs: 9999,
+        sharedDeps: ['INFRA-LAB-CELL-ISP-01'],
+        jointSurvivalProbPct: 48.0
+      },
+      {
+        routeId: 'BEARER-BARRIO-P2P-CUSTODY-LOOPBACK',
+        bearer: 'WIFI_DIRECT_P2P_TO_LOCAL_GATEWAY',
+        role: 'DIVERSE_BACKUP',
+        status: 'ACTIVE_CUSTODY',
+        packetLossPct: 1.2,
+        latencyMs: 14,
+        sharedDeps: ['INFRA-LAB-UPS-BATTERY-01'],
+        jointSurvivalProbPct: 96.4
+      }
+    ],
+    messages: [
+      {
+        messageId: 'msg-barrio-sos-custody-01',
+        kind: 'SOS',
+        state: 'VERIFIED',
+        wireSizeBytes: 596,
+        custodyPath: ['NODE-ANDROID-BARRIO-PEER-01', 'NODE-ANDROID-BARRIO-PEER-02', 'EDGE-MQTT-BARRIO-BROKER-01'],
+        transitions: ['QUEUED', 'IN_CUSTODY', 'FORWARDED', 'RECEIVED', 'VERIFIED'],
+        canonicalEvidenceHash: 'b322fa2dcada4b1a97e84e97fc098c8b7038ce4e2018e68c3bd76bd4e748c643',
+        receiptAckHash: 'ack-sha256-barrio-lab-verified',
+        note: 'Transferido por store-and-forward entre Peer 01 y Peer 02 hacia senda-relay local tras corte WAN.'
+      }
+    ]
+  },
+  {
+    sectorId: 'ES-AV-N403-EL-TIEMBLO',
+    roadSegmentId: 'ES-N403-PK80-95',
+    pilotCode: 'CORRIDOR_ES_N403',
+    title: {
+      es: 'Corredor N-403 El Tiemblo (Ávila) · DGT NAP v3.6 vs DGT 3.0',
+      en: 'N-403 Corridor El Tiemblo (Ávila) · DGT NAP v3.6 vs DGT 3.0',
+      nl: 'N-403 Corridor El Tiemblo (Ávila) · DGT NAP v3.6 vs DGT 3.0'
+    },
+    subtitle: {
+      es: 'Ingesta real DATEX II v3.6 desde nap.dgt.es diferenciada explícitamente de DGT 3.0 (PARTNER_ACCESS_REQUIRED)',
+      en: 'Real DATEX II v3.6 ingestion from nap.dgt.es explicitly differentiated from DGT 3.0 (PARTNER_ACCESS_REQUIRED)',
+      nl: 'Echte DATEX II v3.6-ingestie van nap.dgt.es expliciet onderscheiden van DGT 3.0 (PARTNER_ACCESS_REQUIRED)'
+    },
+    center: { lat: 40.412, lon: -4.501 },
+    defaultRadiusM: 6000,
+    polygonCoords: [
+      { lat: 40.38, lon: -4.54 },
+      { lat: 40.38, lon: -4.46 },
+      { lat: 40.44, lon: -4.46 },
+      { lat: 40.44, lon: -4.54 }
+    ],
+    fusedIncident: {
+      eventId: 'evt-es-n403-dgt-nap-v36',
+      decision: 'SINGLE_SOURCE_PROVISIONAL',
+      posteriorConfidence: 0.742,
+      uncertaintyInterval90: [0.622, 0.862],
+      location: { lat: 40.412, lon: -4.501, uncertaintyRadiusM: 50 },
+      corroboratingSources: ['DGT-ES-NAP-DATEX2-V36'],
+      independentFamilies: ['FAMILY_DGT_NAP'],
+      merkleDigestSha256: '542bcd0c93518b2b5a90572c1bd2269b5523886e4884427cae9170fb6a5a0829',
+      summary: {
+        es: 'Situación vial verificada en DGT NAP (DATEX II v3.6); la telemetría V-16 de DGT 3.0 permanece en PARTNER_ACCESS_REQUIRED hasta disponer de certificado mTLS de operador.',
+        en: 'Road situation verified in DGT NAP (DATEX II v3.6); DGT 3.0 V-16 telemetry remains in PARTNER_ACCESS_REQUIRED until operator mTLS certificate is provisioned.',
+        nl: 'Wegsituatie geverifieerd in DGT NAP (DATEX II v3.6); DGT 3.0 V-16-telemetrie blijft op PARTNER_ACCESS_REQUIRED totdat een operator mTLS-certificaat beschikbaar is.'
+      }
+    },
+    dtnRoutes: [
+      {
+        routeId: 'ROUTE-N403-RELAY-CUSTODY',
+        bearer: 'HTTP_CUSTODY_API',
+        role: 'PRIMARY',
+        status: 'ACTIVE_CUSTODY',
+        packetLossPct: 2.1,
+        latencyMs: 36,
+        sharedDeps: ['INFRA-ES-DGT-CGT-MADRID'],
+        jointSurvivalProbPct: 88.5
+      }
+    ],
+    messages: [
+      {
+        messageId: 'msg-n403-dgt-nap-01',
+        kind: 'OFFICIAL_ALERT',
+        state: 'IN_CUSTODY',
+        wireSizeBytes: 512,
+        custodyPath: ['DGT-ES-NAP-DATEX2-V36', 'GW-01'],
+        transitions: ['QUEUED', 'IN_CUSTODY'],
+        canonicalEvidenceHash: '542bcd0c93518b2b5a90572c1bd2269b5523886e4884427cae9170fb6a5a0829',
+        receiptAckHash: null,
+        note: 'En custodia local a la espera de confirmación de segundo sensor independiente.'
+      }
+    ]
+  }
+] as const;
+
+export const CORRIDOR_SOURCES_TABLE: readonly CorridorSourceNode[] = [
+  {
+    sourceId: 'NDW-NL-A12-SRTI-V3',
+    sectorId: 'NL-A12-ARNHEM-EDE',
+    roadSegmentId: 'NL-A12-HM110-130',
+    layer: 'ROAD DATA',
+    assetType: 'ROAD_TRAFFIC_SENSOR',
+    operator: 'Nationaal Dataportaal Wegverkeer (NDW)',
+    lat: 51.9852,
+    lon: 5.9675,
+    accessRights: 'OPEN_DATA_CC0',
+    auth: 'NONE_PUBLIC_HTTPS',
+    health: 'LIVE_VERIFIED',
+    lastObservedAt: '2026-11-08T14:48:00Z',
+    observationCapabilities: ['STATIONARY_VEHICLE_OBSTRUCTION', 'SRTI_SAFETY_MESSAGE'],
+    transportCapabilities: [],
+    canActAsRelay: false,
+    latestObservationSummary: 'sit:VehicleObstruction (stationary, evidence=80%) en A12 hm 126.4',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-NL-KPN-FIBER-ARNHEM', 'INFRA-NL-ALLIANDER-GRID-GELDERLAND'],
+    proofRef: 'ndw-a12-srti-v3.xml (sha256:9e40d658...)'
+  },
+  {
+    sourceId: 'NDW-NL-A12-MONIBAS-0121',
+    sectorId: 'NL-A12-ARNHEM-EDE',
+    roadSegmentId: 'NL-A12-HM110-130',
+    layer: 'ROAD DATA',
+    assetType: 'ROAD_TRAFFIC_SENSOR',
+    operator: 'NDW / Rijkswaterstaat MONIBAS',
+    lat: 52.0185,
+    lon: 5.864,
+    accessRights: 'OPEN_DATA_CC0',
+    auth: 'NONE_PUBLIC_HTTPS',
+    health: 'LIVE_VERIFIED',
+    lastObservedAt: '2026-11-08T14:47:42Z',
+    observationCapabilities: ['TRAFFIC_SPEED_KMH', 'TRAFFIC_FLOW_VEH_H'],
+    transportCapabilities: [],
+    canActAsRelay: false,
+    latestObservationSummary: 'RWS01_MONIBAS_0121: 89 estaciones A12 (migración DATEX II v3 antes de 02/2027)',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-NL-RWS-VIC-OOST'],
+    proofRef: 'ndw-a12-monibas-v2.xml (sha256:7d9b826d...)'
+  },
+  {
+    sourceId: 'RWS-NL-A12-CCTV-VELPERBROEK',
+    sectorId: 'NL-A12-ARNHEM-EDE',
+    roadSegmentId: 'NL-A12-HM110-130',
+    layer: 'CAMERAS',
+    assetType: 'ROAD_CAMERA',
+    operator: 'Rijkswaterstaat Verkeerscentrum Oost-Nederland',
+    lat: 51.9814,
+    lon: 5.9632,
+    accessRights: 'RESTRICTED_GDPR_PARTNER_ONLY',
+    auth: 'PARTNER_VPN_MTLS_REQUIRED',
+    health: 'PARTNER_ACCESS_REQUIRED',
+    lastObservedAt: null,
+    observationCapabilities: ['CCTV_TRAFFIC_STREAM_RESTRICTED'],
+    transportCapabilities: [],
+    canActAsRelay: false,
+    latestObservationSummary: 'BLOQUEADO: RWS no publica cámaras viales en abierto por privacidad (RGPD/AVG).',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-NL-RWS-VIC-OOST'],
+    proofRef: 'Política RGPD/AVG RWS — Sin vídeo público en A12'
+  },
+  {
+    sourceId: 'DASHCAM-A12-REAL-TRACE-01',
+    sectorId: 'NL-A12-ARNHEM-EDE',
+    roadSegmentId: 'NL-A12-HM110-130',
+    layer: 'DASHCAMS',
+    assetType: 'DASHCAM',
+    operator: 'SENDA Vision Probe (YOLOX-s ONNX + ByteTrack)',
+    lat: 51.986,
+    lon: 5.961,
+    accessRights: 'MIT_RECORDED_REAL_SAMPLE',
+    auth: 'DEVICE_ED25519_SESSION',
+    health: 'RECORDED_REAL_SAMPLE',
+    lastObservedAt: '2026-11-08T14:44:10Z',
+    observationCapabilities: ['VEHICLE_DETECTION', 'MONOCULAR_TTC_UNCERTAIN', 'BRAKING_EVENT'],
+    transportCapabilities: ['BLE_GATT_6LOWPAN', 'WIFI_AWARE_NAN'],
+    canActAsRelay: true,
+    latestObservationSummary: '451 frames reales, 12 vehículos, decel -4.4 m/s² (TTC monocular no calibrado ±30%)',
+    videoPreviewUrl: '/media/vision/dashcam.mp4',
+    sharedInfrastructureDeps: ['INFRA-VEHICLE-12V-BUS-01'],
+    proofRef: 'investor-next/public/media/vision/dashcam.json'
+  },
+  {
+    sourceId: 'OBD-A12-VEHICLE-01',
+    sectorId: 'NL-A12-ARNHEM-EDE',
+    roadSegmentId: 'NL-A12-HM110-130',
+    layer: 'CONNECTED DEVICES',
+    assetType: 'VEHICLE_OBD',
+    operator: 'SENDA Vehicle Link (OBD-II Consentido)',
+    lat: 51.986,
+    lon: 5.961,
+    accessRights: 'USER_CONSENTED_TELEMETRY',
+    auth: 'BLE_PIN_AND_CONSENT_TOKEN',
+    health: 'LAB_VERIFIED',
+    lastObservedAt: '2026-11-08T14:44:12Z',
+    observationCapabilities: ['WHEEL_SPEED_KMH', 'DECELERATION_MPS2', 'HAZARD_LIGHTS_STATE'],
+    transportCapabilities: [],
+    canActAsRelay: false,
+    latestObservationSummary: 'Velocidad 32 km/h, frenada -4.4 m/s², warning luces de emergencia activas',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-VEHICLE-12V-BUS-01'],
+    proofRef: 'packages/senda/src/vehicle-link.mjs'
+  },
+  {
+    sourceId: 'KNMI-NL-DEELEN-06275',
+    sectorId: 'NL-A12-ARNHEM-EDE',
+    roadSegmentId: 'NL-A12-HM110-130',
+    layer: 'ENVIRONMENT',
+    assetType: 'WEATHER_STATION',
+    operator: 'KNMI Station 06275 Deelen',
+    lat: 52.056,
+    lon: 5.873,
+    accessRights: 'OPEN_DATA_API_KEY_REQUIRED',
+    auth: 'API_KEY_PENDING',
+    health: 'CATALOG_ONLY',
+    lastObservedAt: null,
+    observationCapabilities: ['METEOROLOGY_VISIBILITY_M', 'PRECIPITATION_MM_H'],
+    transportCapabilities: [],
+    canActAsRelay: false,
+    latestObservationSummary: 'CATALOG_ONLY: Estación catalogada; nunca se muestra como telemetría en vivo.',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-NL-KPN-FIBER-ARNHEM'],
+    proofRef: 'Catálogo KNMI 06275'
+  },
+  {
+    sourceId: 'NODE-ANDROID-A12-CARRIER-01',
+    sectorId: 'NL-A12-ARNHEM-EDE',
+    roadSegmentId: 'NL-A12-HM110-130',
+    layer: 'CONNECTED DEVICES',
+    assetType: 'ANDROID_PHONE',
+    operator: 'SENDA Android Lab Instance #1',
+    lat: 51.9858,
+    lon: 5.9625,
+    accessRights: 'OPERATOR_OWNED_LAB_DEVICE',
+    auth: 'ECDSA_P256_AND_ED25519_PCI',
+    health: 'LAB_VERIFIED',
+    lastObservedAt: '2026-11-08T14:45:00Z',
+    observationCapabilities: ['GNSS_LOCATION', 'BAROMETER_HPA', 'ACCELEROMETER_IMU'],
+    transportCapabilities: ['ANDROID_NEARBY_CONNECTIONS', 'WIFI_AWARE_NAN', 'BLE_GATT_6LOWPAN'],
+    canActAsRelay: true,
+    latestObservationSummary: 'Custodio DTN activo en laboratorio (radio física de campo marcada BLOCKED)',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-NL-KPN-CELL-TOWER-ARNHEM-04'],
+    proofRef: 'apps/senda-android/ + envelope.mjs'
+  },
+  {
+    sourceId: 'GATEWAY-A12-VELPERBROEK-RELAY',
+    sectorId: 'NL-A12-ARNHEM-EDE',
+    roadSegmentId: 'NL-A12-HM110-130',
+    layer: 'GATEWAYS',
+    assetType: 'DTN_RELAY',
+    operator: 'SENDA Relay Server (Custody Node)',
+    lat: 51.9825,
+    lon: 5.9702,
+    accessRights: 'OPERATOR_OWNED_GATEWAY',
+    auth: 'ENVELOPE_V2_SHAPE_AND_RATE_LIMIT',
+    health: 'LAB_VERIFIED',
+    lastObservedAt: '2026-11-08T14:48:00Z',
+    observationCapabilities: ['RELAY_QUEUE_TELEMETRY'],
+    transportCapabilities: ['HTTP_CUSTODY_API', 'STORE_CARRY_FORWARD'],
+    canActAsRelay: true,
+    latestObservationSummary: 'Custodia verificada de sobres AEAD v2 y recibos criptográficos',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-NL-KPN-FIBER-ARNHEM'],
+    proofRef: 'packages/senda-relay/server.mjs'
+  },
+  {
+    sourceId: 'CAM-LAB-BARRIO-RTSP-01',
+    sectorId: 'LAB-BARRIO-EDIFICIO-01',
+    roadSegmentId: 'BARRIO-ACCESO-NORTE-01',
+    layer: 'CAMERAS',
+    assetType: 'PRIVATE_CAMERA_AUTHORIZED',
+    operator: 'Laboratorio SENDA (Cámara IP Propia Autorizada)',
+    lat: 40.4168,
+    lon: -3.7038,
+    accessRights: 'OWNER_EXPLICIT_AUTHORIZATION_GDPR_MINIMIZED',
+    auth: 'DIGEST_RTSP_ENV_SECRET',
+    health: 'LAB_VERIFIED',
+    lastObservedAt: '2026-11-08T14:51:30Z',
+    observationCapabilities: ['OCCUPANCY_RATIO', 'KOSCHMIEDER_VISIBILITY_M', 'STOPPED_VEHICLE_DETECTION'],
+    transportCapabilities: [],
+    canActAsRelay: false,
+    latestObservationSummary: '377 frames CC BY 4.0 + inferencia Koschmieder (580 m) y ocupación (9 veh)',
+    videoPreviewUrl: '/media/vision/fixed.mp4',
+    sharedInfrastructureDeps: ['INFRA-LAB-POE-SWITCH-01'],
+    proofRef: 'investor-next/public/media/vision/fixed.json'
+  },
+  {
+    sourceId: 'EDGE-MQTT-BARRIO-BROKER-01',
+    sectorId: 'LAB-BARRIO-EDIFICIO-01',
+    roadSegmentId: 'BARRIO-ACCESO-NORTE-01',
+    layer: 'GATEWAYS',
+    assetType: 'LOCAL_GATEWAY',
+    operator: 'Laboratorio SENDA (Edge MQTT / ONVIF Profile M Bridge)',
+    lat: 40.4169,
+    lon: -3.7037,
+    accessRights: 'OWNER_AUTHORIZED_EDGE_GATEWAY',
+    auth: 'BEARER_HMAC_TOKEN_ACL',
+    health: 'LAB_VERIFIED',
+    lastObservedAt: '2026-11-08T14:51:35Z',
+    observationCapabilities: ['EDGE_DETECTION_EVENT', 'GATEWAY_HEALTH'],
+    transportCapabilities: ['MQTT_LOCAL_BROKER', 'DTN_BUNDLE_FORWARDER'],
+    canActAsRelay: true,
+    latestObservationSummary: 'Esquema senda.edge-event/1.0 validado; vídeo bruto bloqueado hacia DTN',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-LAB-UPS-BATTERY-01'],
+    proofRef: 'packages/senda/src/corridor-connectors.mjs#createMqttEdgeBridge'
+  },
+  {
+    sourceId: 'NODE-ANDROID-BARRIO-PEER-01',
+    sectorId: 'LAB-BARRIO-EDIFICIO-01',
+    roadSegmentId: 'BARRIO-ACCESO-NORTE-01',
+    layer: 'CONNECTED DEVICES',
+    assetType: 'ANDROID_PHONE',
+    operator: 'Laboratorio SENDA (Nodo Móvil A)',
+    lat: 40.4167,
+    lon: -3.7039,
+    accessRights: 'OPERATOR_OWNED_LAB_DEVICE',
+    auth: 'ECDSA_P256_AND_ED25519_PCI',
+    health: 'LAB_VERIFIED',
+    lastObservedAt: '2026-11-08T14:51:35Z',
+    observationCapabilities: ['ACOUSTIC_HORN_DETECTOR', 'IMU_SHOCK_DETECTOR'],
+    transportCapabilities: ['ANDROID_NEARBY_CONNECTIONS', 'WIFI_DIRECT_P2P'],
+    canActAsRelay: true,
+    latestObservationSummary: 'Origen de alerta acústica/IMU; retiene mensaje en custodia tras corte WAN',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-LAB-CELL-ISP-01'],
+    proofRef: 'Piloto B Store-and-Forward Peer 01'
+  },
+  {
+    sourceId: 'NODE-ANDROID-BARRIO-PEER-02',
+    sectorId: 'LAB-BARRIO-EDIFICIO-01',
+    roadSegmentId: 'BARRIO-ACCESO-NORTE-01',
+    layer: 'CONNECTED DEVICES',
+    assetType: 'ANDROID_PHONE',
+    operator: 'Laboratorio SENDA (Nodo Móvil B · Mule DTN)',
+    lat: 40.4172,
+    lon: -3.7032,
+    accessRights: 'OPERATOR_OWNED_LAB_DEVICE',
+    auth: 'ECDSA_P256_AND_ED25519_PCI',
+    health: 'LAB_VERIFIED',
+    lastObservedAt: '2026-11-08T14:51:40Z',
+    observationCapabilities: ['GNSS_LOCATION'],
+    transportCapabilities: ['ANDROID_NEARBY_CONNECTIONS', 'HTTP_CUSTODY_API'],
+    canActAsRelay: true,
+    latestObservationSummary: 'Transporta sobre AEAD desde Peer 01 hasta pasarela local y retorna recibo',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-LAB-BACKUP-UPLINK-02'],
+    proofRef: 'Piloto B Store-and-Forward Peer 02'
+  },
+  {
+    sourceId: 'DGT-ES-NAP-DATEX2-V36',
+    sectorId: 'ES-AV-N403-EL-TIEMBLO',
+    roadSegmentId: 'ES-N403-PK80-95',
+    layer: 'ROAD DATA',
+    assetType: 'ROAD_TRAFFIC_SENSOR',
+    operator: 'Dirección General de Tráfico (DGT NAP España)',
+    lat: 40.412,
+    lon: -4.501,
+    accessRights: 'OPEN_DATA_LEY_37_2007',
+    auth: 'NONE_PUBLIC_HTTPS',
+    health: 'LIVE_VERIFIED',
+    lastObservedAt: '2026-11-08T14:47:20Z',
+    observationCapabilities: ['INCIDENT_STATUS', 'ROADWORKS_OR_RESTRICTION'],
+    transportCapabilities: [],
+    canActAsRelay: false,
+    latestObservationSummary: '548 situaciones activas en España vía DATEX II v3.6 (nap.dgt.es)',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-ES-DGT-CGT-MADRID'],
+    proofRef: 'dgt-nap-v36-slice.xml (sha256:542bcd0c...)'
+  },
+  {
+    sourceId: 'DGT-ES-30-CONNECTED-VEHICLE-CLOUD',
+    sectorId: 'ES-AV-N403-EL-TIEMBLO',
+    roadSegmentId: 'ES-N403-PK80-95',
+    layer: 'ROAD DATA',
+    assetType: 'ROAD_TRAFFIC_SENSOR',
+    operator: 'DGT 3.0 Plataforma Vehículo Conectado',
+    lat: 40.412,
+    lon: -4.501,
+    accessRights: 'PARTNER_AGREEMENT_REQUIRED',
+    auth: 'MTLS_PARTNER_CERTIFICATE',
+    health: 'PARTNER_ACCESS_REQUIRED',
+    lastObservedAt: null,
+    observationCapabilities: ['V16_BEACON_TELEMETRY_RESTRICTED'],
+    transportCapabilities: [],
+    canActAsRelay: false,
+    latestObservationSummary: 'PARTNER_ACCESS_REQUIRED: Diferenciado de DGT NAP abierto; sin convenio activo.',
+    videoPreviewUrl: null,
+    sharedInfrastructureDeps: ['INFRA-ES-DGT-CGT-MADRID'],
+    proofRef: 'Guardia de honestidad DGT 3.0'
+  }
+] as const;
+
+export function getCorridorIntelligenceSnapshot(
+  sectorId = 'NL-A12-ARNHEM-EDE',
+  selectionMode: CorridorSelectionMode = 'SEGMENT',
+  activeLayers: readonly CorridorLayerId[] = CORRIDOR_INTELLIGENCE_LAYERS
+) {
+  const sector = CORRIDOR_SECTORS.find(s => s.sectorId === sectorId) ?? CORRIDOR_SECTORS[0];
+  const sources = CORRIDOR_SOURCES_TABLE.filter(
+    src => src.sectorId === sector.sectorId && activeLayers.includes(src.layer)
+  );
+  return {
+    sector,
+    selectionMode,
+    activeLayers,
+    sources,
+    authorizedLiveOrLabCount: sources.filter(s => ['LIVE_VERIFIED', 'RECORDED_REAL_SAMPLE', 'LAB_VERIFIED'].includes(s.health)).length,
+    catalogOrRestrictedCount: sources.filter(s => ['CATALOG_ONLY', 'PARTNER_ACCESS_REQUIRED', 'PERMISSION_PENDING'].includes(s.health)).length,
+    relayCapableCount: sources.filter(s => s.canActAsRelay).length
+  };
+}
+
