@@ -23,6 +23,8 @@ test('NASA event reports preserve provenance without claiming perimeters, foreca
   assert.equal(data.source.rawSha256, 'a'.repeat(64));
   assert.equal(data.isOfficialAlert, false);
   assert.equal(data.isPerimeter, false);
+  assert.equal(data.resultLimitReached, false);
+  assert.equal(normalizeEonetWildfires(payload(Array.from({ length: 150 }, (_, i) => sourceEvent('EONET_' + i))), { now: NOW }).resultLimitReached, true);
   assert.equal(data.observations[0].pointMeaning, 'REPRESENTATIVE_CATALOG_LOCATION');
   assert.equal(data.observations[0].eventStatus, 'CATALOG_OPEN');
   assert.deepEqual(data.observations[0].location, { lat: 39.1, lon: -120.5 });
