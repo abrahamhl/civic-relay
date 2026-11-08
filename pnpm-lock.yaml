@@ -171,6 +171,8 @@ importers:
 
   packages/senda: {}
 
+  packages/senda-pci: {}
+
   packages/senda-relay: {}
 
   packages/transports:
