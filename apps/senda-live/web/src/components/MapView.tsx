@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { api } from '../api/client';
+import { Atmosphere4DStudio } from './Atmosphere4DStudio';
 
 interface Props {
   events: any[];
@@ -21,6 +22,7 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
   const [showUsgs, setShowUsgs] = useState(false);
   const [usgsStatus, setUsgsStatus] = useState('');
   const [showWildfires, setShowWildfires] = useState(false);
+  const [showAtmosphere4D, setShowAtmosphere4D] = useState(false);
   const [wildfireStatus, setWildfireStatus] = useState('');
 
   useEffect(() => {
@@ -277,6 +279,12 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
           <input type="checkbox" checked={showWildfires} onChange={(e) => setShowWildfires(e.target.checked)} />
           Incendios NASA EONET (catálogo)
         </label>
+        <button type="button" aria-pressed={showAtmosphere4D}
+          onClick={() => setShowAtmosphere4D((value) => !value)}
+          style={{ padding: '0.45rem 0.75rem', borderRadius: 9,
+            border: '1px solid #2563eb', background: showAtmosphere4D ? '#1d4ed8' : '#e0f2fe', color: showAtmosphere4D ? 'white' : '#0c4a6e', cursor: 'pointer', fontWeight: 700 }}>
+          {showAtmosphere4D ? 'Cerrar visor 4D' : 'Abrir Atmosphere 4D'}
+        </button>
       </div>
       {showUsgs && (
         <div role="status" aria-live="polite" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', background: 'var(--bg-secondary)' }}>
@@ -292,8 +300,15 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
         </div>
       )}
 
-      {/* Leaflet Map DOM Container */}
-      <div ref={mapContainerRef} style={{ flex: 1, width: '100%', minHeight: '400px' }} />
+      {/* Persistent map view; Atmosphere 4D overlays without destroying the community layers. */}
+      <div style={{ flex: 1, width: '100%', minHeight: '400px', position: 'relative' }}>
+        <div ref={mapContainerRef} style={{ position: 'absolute', inset: 0 }} />
+        {showAtmosphere4D && (
+          <div style={{ position: 'absolute', inset: 0, overflowY: 'auto', zIndex: 800, background: '#081625' }}>
+            <Atmosphere4DStudio onClose={() => setShowAtmosphere4D(false)} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
