@@ -263,7 +263,7 @@ export function Atmosphere4DStudio({ onClose }: { onClose: () => void }) {
       </div>
       <div role="status" aria-live="polite" style={{ fontSize: 12, color: loading ? '#fcd34d' : '#bae6fd', minHeight: 18 }}>
         {loading && !snapshot ? 'Abriendo fuentes locales y consultando proveedor…' :
-          !snapshot ? 'Sin datos disponibles: activar proveedor comercial o investigación local y descargar un pronóstico.' :
+          !snapshot ? 'Sin predicción utilizable: consulta MET Norway o abre un snapshot guardado previamente.' :
           sourceMode === 'OFFLINE_LOCAL_SNAPSHOT' || sourceMode === 'OFFLINE_EXPIRED_FORECAST'
             ? 'SNAPSHOT LOCAL · sin conexión nueva · ' + (lastValid ? 'predicción caducada' : 'predicción almacenada')
             : sourceMode === 'SERVER_STALE_SNAPSHOT' ? 'SNAPSHOT PREVIO EN SERVIDOR · proveedor sin actualización'
@@ -293,7 +293,7 @@ export function Atmosphere4DStudio({ onClose }: { onClose: () => void }) {
         ) : (
           <div style={{ minHeight: 270, padding: '40px 22px', color: '#bae6fd', textAlign: 'center' }}>
             <strong>Sin datos meteorológicos válidos</strong>
-            <p style={{ fontSize: 13, lineHeight: 1.5 }}>El motor no inventa valores. Una vez configurado el proveedor, guardará 24 horas de predicción pública en este dispositivo para su consulta offline.</p>
+            <p style={{ fontSize: 13, lineHeight: 1.5 }}>El visor no inventa valores. MET Norway ofrece una fuente meteorológica pública reutilizable con atribución; una vez descargada, la cuadrícula se guarda en este dispositivo para consultarla sin red.</p>
           </div>
         )}
         {snapshot && <div style={{ position: 'absolute', right: 12, top: 12, fontSize: 11, background: '#081625cc',
@@ -327,7 +327,7 @@ export function Atmosphere4DStudio({ onClose }: { onClose: () => void }) {
               style={{ background: '#19394f', color: 'white', padding: 6, border: '1px solid #426075', borderRadius: 6 }}>Restablecer cámara</button>
           </div>
           <div style={{ fontSize: 11, color: '#b6cbd9', lineHeight: 1.5 }}>
-            Fuente: <a href="https://open-meteo.com/en/docs" target="_blank" rel="noopener noreferrer" style={{ color: '#7dd3fc' }}>Open-Meteo</a>.
+            Fuente: <a href={snapshot.source.provider === 'MET Norway' ? 'https://api.met.no/weatherapi/locationforecast/2.0/documentation' : 'https://open-meteo.com/en/docs'} target="_blank" rel="noopener noreferrer" style={{ color: '#7dd3fc' }}>{snapshot.source.provider}</a>.
             Descarga: {new Date(snapshot.fetchedAt).toLocaleString('es-ES')}. Huella SHA-256: {snapshot.source.rawSha256?.slice(0, 14)}…
             La superficie 3D extruye una variable, no representa elevaciones reales. La interpolación visual entre 9 muestras no aumenta precisión espacial.
             {' '}{lastValid ? 'Las fechas válidas del pronóstico han vencido.' : ''}
