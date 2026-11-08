@@ -1,0 +1,5428 @@
+{
+  "schema": "senda.routing-benchmark/2",
+  "status": "SIMULATED_BENCHMARK",
+  "physicalValidation": "PHYSICAL_TEST_PENDING",
+  "notFieldValidation": true,
+  "generatedAt": "2026-11-08T11:17:55.617Z",
+  "source": {
+    "script": "packages/senda/scripts/routing-benchmark-v2.mjs",
+    "scriptSha256": "25cb77407d9c77102a93205e2c893c9b0097487fad9a2a2f0ac8545e43ccd78c",
+    "module": "packages/senda/src/opportunistic-routing.mjs",
+    "moduleSha256": "eb22d8f1ae8e3d42410c715a1e49289d1a1a2a98cfdea004be2d6931509c0b28",
+    "manifestSchema": "senda.release-manifest/1",
+    "manifestClaim": "SOURCE_ONLY",
+    "commitAtGeneration": "3041a52435aadb936e34cf8546df3806a31c68a6",
+    "gitTree": "5445dd62a6af300e3769a15b4de7070288cec223",
+    "sourceTreeSha256": "82e1905b1c3121b8c6092a4881ab059b3d4833a8557ff00bb0894d0827ad1c69",
+    "sourceFileCount": 852,
+    "lockfileSha256": "99b8d880c5a568198a4034b04078f7595ff0ca07230b1074cb33f62657ef9136",
+    "worktreeDirty": false,
+    "dirtyPaths": []
+  },
+  "parameters": {
+    "seedBase": 20261107,
+    "independentGraphs": 30,
+    "realizationsPerGraph": 20,
+    "deterministicRepeats": 10,
+    "sizeBytes": 512,
+    "scenarios": [
+      "scheduled-line",
+      "scheduled-partition",
+      "crowd",
+      "energy-scarce",
+      "held-out",
+      "unreliable-contacts"
+    ],
+    "strategies": [
+      "direct",
+      "flooding",
+      "epidemic",
+      "spray",
+      "earliest",
+      "adaptive",
+      "eaor"
+    ],
+    "baseline": "earliest",
+    "bootstrap": {
+      "B": 2000,
+      "seed": 1592614637,
+      "method": "percentile",
+      "nominalCoverage": 0.95
+    },
+    "scenarioClass": {
+      "deterministic": [
+        "scheduled-line",
+        "scheduled-partition",
+        "energy-scarce"
+      ],
+      "stochastic": [
+        "crowd",
+        "held-out",
+        "unreliable-contacts"
+      ]
+    }
+  },
+  "scenarios": {
+    "scheduled-line": {
+      "note": "Cadena lineal de contactos con ventanas escalonadas; no hay enlace directo S→T.",
+      "deterministic": true,
+      "contacts": 4,
+      "declaredSuccessMean": 1,
+      "source": "S",
+      "dest": "T",
+      "t0": 0,
+      "tEnd": 900,
+      "sizeBytes": 512
+    },
+    "scheduled-partition": {
+      "note": "Dos grupos separados que solo se comunican por una mula/ferry con ventana tardía.",
+      "deterministic": true,
+      "contacts": 5,
+      "declaredSuccessMean": 1,
+      "source": "S",
+      "dest": "T",
+      "t0": 0,
+      "tEnd": 950,
+      "sizeBytes": 512
+    },
+    "crowd": {
+      "note": "Multitud con contactos aleatorios sembrados y atajos; sin enlace directo S→T.",
+      "deterministic": false,
+      "contacts": 26,
+      "declaredSuccessMean": 1,
+      "source": "S",
+      "dest": "T",
+      "t0": 0,
+      "tEnd": 700,
+      "sizeBytes": 512
+    },
+    "energy-scarce": {
+      "note": "Ruta WiFi Direct rápida y cara frente a cadena BLE lenta y barata.",
+      "deterministic": true,
+      "contacts": 5,
+      "declaredSuccessMean": 1,
+      "source": "S",
+      "dest": "T",
+      "t0": 0,
+      "tEnd": 420,
+      "sizeBytes": 512
+    },
+    "held-out": {
+      "note": "Grafo aleatorio sembrado no usado para ajustar estrategias; sin enlace directo S→T.",
+      "deterministic": false,
+      "contacts": 19,
+      "declaredSuccessMean": 1,
+      "source": "S",
+      "dest": "T",
+      "t0": 0,
+      "tEnd": 835,
+      "sizeBytes": 512
+    },
+    "unreliable-contacts": {
+      "note": "Tres rutas con fiabilidad declarada distinta; los contactos fallan durante el ensayo. EAOR planifica con esa fiabilidad; las líneas base la ignoran.",
+      "deterministic": false,
+      "contacts": 13,
+      "declaredSuccessMean": 0.675,
+      "source": "S",
+      "dest": "T",
+      "t0": 0,
+      "tEnd": 300,
+      "sizeBytes": 512
+    }
+  },
+  "results": [
+    {
+      "scenario": "scheduled-line",
+      "strategy": "direct",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "graphsDelivered": 0
+      },
+      "latencyS": {
+        "mean": null,
+        "p50": null,
+        "p95": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": null,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 0,
+      "uniqueTransfersMean": 0,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": null,
+      "energyProxyMean": 0,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 30,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 10,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Cadena lineal de contactos con ventanas escalonadas; no hay enlace directo S→T.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "flooding",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 600.441,
+        "p50": 600.441,
+        "p95": 600.441,
+        "ci95OfGraphMeans": {
+          "lo": 600.441,
+          "hi": 600.441,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 4,
+        "ci95OfGraphMeans": {
+          "lo": 4,
+          "hi": 4,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 4,
+        "ci95OfGraphMeans": {
+          "lo": 4,
+          "hi": 4,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 2048,
+        "ci95OfGraphMeans": {
+          "lo": 2048,
+          "hi": 2048,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 4,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 4,
+      "uniqueTransfersMean": 4,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 4,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Cadena lineal de contactos con ventanas escalonadas; no hay enlace directo S→T.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "epidemic",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 600.441,
+        "p50": 600.441,
+        "p95": 600.441,
+        "ci95OfGraphMeans": {
+          "lo": 600.441,
+          "hi": 600.441,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 4,
+        "ci95OfGraphMeans": {
+          "lo": 4,
+          "hi": 4,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 4,
+        "ci95OfGraphMeans": {
+          "lo": 4,
+          "hi": 4,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 2048,
+        "ci95OfGraphMeans": {
+          "lo": 2048,
+          "hi": 2048,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 4,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 4,
+      "uniqueTransfersMean": 4,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 4,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Cadena lineal de contactos con ventanas escalonadas; no hay enlace directo S→T.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "spray",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 600.441,
+        "p50": 600.441,
+        "p95": 600.441,
+        "ci95OfGraphMeans": {
+          "lo": 600.441,
+          "hi": 600.441,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 4,
+        "ci95OfGraphMeans": {
+          "lo": 4,
+          "hi": 4,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 4,
+        "ci95OfGraphMeans": {
+          "lo": 4,
+          "hi": 4,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 2048,
+        "ci95OfGraphMeans": {
+          "lo": 2048,
+          "hi": 2048,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 4,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 4,
+      "uniqueTransfersMean": 4,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 4,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Cadena lineal de contactos con ventanas escalonadas; no hay enlace directo S→T.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "earliest",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 600.441,
+        "p50": 600.441,
+        "p95": 600.441,
+        "ci95OfGraphMeans": {
+          "lo": 600.441,
+          "hi": 600.441,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 4,
+        "ci95OfGraphMeans": {
+          "lo": 4,
+          "hi": 4,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 4,
+        "ci95OfGraphMeans": {
+          "lo": 4,
+          "hi": 4,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 2048,
+        "ci95OfGraphMeans": {
+          "lo": 2048,
+          "hi": 2048,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 4,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 4,
+      "uniqueTransfersMean": 4,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 4,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Cadena lineal de contactos con ventanas escalonadas; no hay enlace directo S→T.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "adaptive",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 600.441,
+        "p50": 600.441,
+        "p95": 600.441,
+        "ci95OfGraphMeans": {
+          "lo": 600.441,
+          "hi": 600.441,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 4,
+        "ci95OfGraphMeans": {
+          "lo": 4,
+          "hi": 4,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 4,
+        "ci95OfGraphMeans": {
+          "lo": 4,
+          "hi": 4,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 2048,
+        "ci95OfGraphMeans": {
+          "lo": 2048,
+          "hi": 2048,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 4,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 4,
+      "uniqueTransfersMean": 4,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 4,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Cadena lineal de contactos con ventanas escalonadas; no hay enlace directo S→T.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "eaor",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 600.441,
+        "p50": 600.441,
+        "p95": 600.441,
+        "ci95OfGraphMeans": {
+          "lo": 600.441,
+          "hi": 600.441,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 4,
+        "ci95OfGraphMeans": {
+          "lo": 4,
+          "hi": 4,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 4,
+        "ci95OfGraphMeans": {
+          "lo": 4,
+          "hi": 4,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 2048,
+        "ci95OfGraphMeans": {
+          "lo": 2048,
+          "hi": 2048,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 4,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 4,
+      "uniqueTransfersMean": 4,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 4,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Cadena lineal de contactos con ventanas escalonadas; no hay enlace directo S→T.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "direct",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "graphsDelivered": 0
+      },
+      "latencyS": {
+        "mean": null,
+        "p50": null,
+        "p95": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": null,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 0,
+      "uniqueTransfersMean": 0,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": null,
+      "energyProxyMean": 0,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 40,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 10,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Dos grupos separados que solo se comunican por una mula/ferry con ventana tardía.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "flooding",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 700.441,
+        "p50": 700.441,
+        "p95": 700.441,
+        "ci95OfGraphMeans": {
+          "lo": 700.441,
+          "hi": 700.441,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 5,
+        "ci95OfGraphMeans": {
+          "lo": 5,
+          "hi": 5,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 5,
+        "ci95OfGraphMeans": {
+          "lo": 5,
+          "hi": 5,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 2560,
+        "ci95OfGraphMeans": {
+          "lo": 2560,
+          "hi": 2560,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 5,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 5,
+      "uniqueTransfersMean": 5,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 5,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Dos grupos separados que solo se comunican por una mula/ferry con ventana tardía.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "epidemic",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 700.441,
+        "p50": 700.441,
+        "p95": 700.441,
+        "ci95OfGraphMeans": {
+          "lo": 700.441,
+          "hi": 700.441,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 5,
+        "ci95OfGraphMeans": {
+          "lo": 5,
+          "hi": 5,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 5,
+        "ci95OfGraphMeans": {
+          "lo": 5,
+          "hi": 5,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 2560,
+        "ci95OfGraphMeans": {
+          "lo": 2560,
+          "hi": 2560,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 5,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 5,
+      "uniqueTransfersMean": 5,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 5,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Dos grupos separados que solo se comunican por una mula/ferry con ventana tardía.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "spray",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 700.441,
+        "p50": 700.441,
+        "p95": 700.441,
+        "ci95OfGraphMeans": {
+          "lo": 700.441,
+          "hi": 700.441,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 5,
+        "ci95OfGraphMeans": {
+          "lo": 5,
+          "hi": 5,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 5,
+        "ci95OfGraphMeans": {
+          "lo": 5,
+          "hi": 5,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 2560,
+        "ci95OfGraphMeans": {
+          "lo": 2560,
+          "hi": 2560,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 5,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 5,
+      "uniqueTransfersMean": 5,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 5,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Dos grupos separados que solo se comunican por una mula/ferry con ventana tardía.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "earliest",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 700.441,
+        "p50": 700.441,
+        "p95": 700.441,
+        "ci95OfGraphMeans": {
+          "lo": 700.441,
+          "hi": 700.441,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 5,
+        "ci95OfGraphMeans": {
+          "lo": 5,
+          "hi": 5,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 5,
+        "ci95OfGraphMeans": {
+          "lo": 5,
+          "hi": 5,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 2560,
+        "ci95OfGraphMeans": {
+          "lo": 2560,
+          "hi": 2560,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 5,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 5,
+      "uniqueTransfersMean": 5,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 5,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Dos grupos separados que solo se comunican por una mula/ferry con ventana tardía.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "adaptive",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 700.441,
+        "p50": 700.441,
+        "p95": 700.441,
+        "ci95OfGraphMeans": {
+          "lo": 700.441,
+          "hi": 700.441,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 5,
+        "ci95OfGraphMeans": {
+          "lo": 5,
+          "hi": 5,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 5,
+        "ci95OfGraphMeans": {
+          "lo": 5,
+          "hi": 5,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 2560,
+        "ci95OfGraphMeans": {
+          "lo": 2560,
+          "hi": 2560,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 5,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 5,
+      "uniqueTransfersMean": 5,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 5,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Dos grupos separados que solo se comunican por una mula/ferry con ventana tardía.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "eaor",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 700.441,
+        "p50": 700.441,
+        "p95": 700.441,
+        "ci95OfGraphMeans": {
+          "lo": 700.441,
+          "hi": 700.441,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 5,
+        "ci95OfGraphMeans": {
+          "lo": 5,
+          "hi": 5,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 5,
+        "ci95OfGraphMeans": {
+          "lo": 5,
+          "hi": 5,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 2560,
+        "ci95OfGraphMeans": {
+          "lo": 2560,
+          "hi": 2560,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 5,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 5,
+      "uniqueTransfersMean": 5,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 5,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Dos grupos separados que solo se comunican por una mula/ferry con ventana tardía.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "direct",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 1,
+      "trials": 30,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        },
+        "graphsDelivered": 0
+      },
+      "latencyS": {
+        "mean": null,
+        "p50": null,
+        "p95": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": null,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 0,
+      "uniqueTransfersMean": 0,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": null,
+      "energyProxyMean": 0,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 693,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 90,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Multitud con contactos aleatorios sembrados y atajos; sin enlace directo S→T.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "flooding",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 1,
+      "trials": 30,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 220.441,
+        "p50": 220.441,
+        "p95": 220.441,
+        "ci95OfGraphMeans": {
+          "lo": 220.441,
+          "hi": 220.441,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 13.6,
+        "ci95OfGraphMeans": {
+          "lo": 13.1,
+          "hi": 14.167,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 13.6,
+        "ci95OfGraphMeans": {
+          "lo": 13.067,
+          "hi": 14.133,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 6963.2,
+        "ci95OfGraphMeans": {
+          "lo": 6707.2,
+          "hi": 7219.2,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 4,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 13.6,
+      "uniqueTransfersMean": 9.8,
+      "redundantTransmissionsMean": 3.8,
+      "overheadRatioMeanLegacy": 1.39,
+      "energyProxyMean": 13.6,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0.967,
+      "dropReasons": {
+        "NO_HOLDER": 87,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Multitud con contactos aleatorios sembrados y atajos; sin enlace directo S→T.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "epidemic",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 1,
+      "trials": 30,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 220.441,
+        "p50": 220.441,
+        "p95": 220.441,
+        "ci95OfGraphMeans": {
+          "lo": 220.441,
+          "hi": 220.441,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 9.833,
+        "ci95OfGraphMeans": {
+          "lo": 9.567,
+          "hi": 10.1,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 9.833,
+        "ci95OfGraphMeans": {
+          "lo": 9.567,
+          "hi": 10.1,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 5034.667,
+        "ci95OfGraphMeans": {
+          "lo": 4898.133,
+          "hi": 5171.2,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 4,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 9.833,
+      "uniqueTransfersMean": 9.8,
+      "redundantTransmissionsMean": 0.033,
+      "overheadRatioMeanLegacy": 1.003,
+      "energyProxyMean": 9.833,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0.967,
+      "dropReasons": {
+        "NO_HOLDER": 87,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 113,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Multitud con contactos aleatorios sembrados y atajos; sin enlace directo S→T.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "spray",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 1,
+      "trials": 30,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 0.2,
+        "ci95": {
+          "lo": 0.067,
+          "hi": 0.333,
+          "n": 30
+        },
+        "graphsDelivered": 6
+      },
+      "latencyS": {
+        "mean": 319.088,
+        "p50": 300.441,
+        "p95": 360.441,
+        "ci95OfGraphMeans": {
+          "lo": 304.348,
+          "hi": 339.088,
+          "n": 6
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 6.667,
+        "ci95OfGraphMeans": {
+          "lo": 5.833,
+          "hi": 7.5,
+          "n": 6
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 6.667,
+        "ci95OfGraphMeans": {
+          "lo": 5.833,
+          "hi": 7.5,
+          "n": 6
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 3413.333,
+        "ci95OfGraphMeans": {
+          "lo": 2986.667,
+          "hi": 3840,
+          "n": 6
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 3.333,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 4.9,
+      "uniqueTransfersMean": 4.9,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 4.9,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0.3,
+      "dropReasons": {
+        "NO_HOLDER": 477,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 84,
+        "COPY_LIMIT": 69,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Multitud con contactos aleatorios sembrados y atajos; sin enlace directo S→T.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "earliest",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 1,
+      "trials": 30,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 220.441,
+        "p50": 220.441,
+        "p95": 220.441,
+        "ci95OfGraphMeans": {
+          "lo": 220.441,
+          "hi": 220.441,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 4,
+        "ci95OfGraphMeans": {
+          "lo": 4,
+          "hi": 4,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 4,
+        "ci95OfGraphMeans": {
+          "lo": 4,
+          "hi": 4,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 2048,
+        "ci95OfGraphMeans": {
+          "lo": 2048,
+          "hi": 2048,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 4,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 4,
+      "uniqueTransfersMean": 4,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 4,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0.3,
+      "dropReasons": {
+        "NO_HOLDER": 230,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 4,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 121,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Multitud con contactos aleatorios sembrados y atajos; sin enlace directo S→T.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "adaptive",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 1,
+      "trials": 30,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 220.441,
+        "p50": 220.441,
+        "p95": 220.441,
+        "ci95OfGraphMeans": {
+          "lo": 220.441,
+          "hi": 220.441,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 9.833,
+        "ci95OfGraphMeans": {
+          "lo": 9.567,
+          "hi": 10.1,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 9.833,
+        "ci95OfGraphMeans": {
+          "lo": 9.567,
+          "hi": 10.1,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 5034.667,
+        "ci95OfGraphMeans": {
+          "lo": 4898.133,
+          "hi": 5171.2,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 4,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 9.833,
+      "uniqueTransfersMean": 9.8,
+      "redundantTransmissionsMean": 0.033,
+      "overheadRatioMeanLegacy": 1.003,
+      "energyProxyMean": 9.833,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0.967,
+      "dropReasons": {
+        "NO_HOLDER": 87,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 113,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Multitud con contactos aleatorios sembrados y atajos; sin enlace directo S→T.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "eaor",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 1,
+      "trials": 30,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 225.774,
+        "p50": 220.441,
+        "p95": 300.441,
+        "ci95OfGraphMeans": {
+          "lo": 220.441,
+          "hi": 233.774,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 5.167,
+        "ci95OfGraphMeans": {
+          "lo": 4.733,
+          "hi": 5.667,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 5.167,
+        "ci95OfGraphMeans": {
+          "lo": 4.733,
+          "hi": 5.633,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 2645.333,
+        "ci95OfGraphMeans": {
+          "lo": 2440.533,
+          "hi": 2884.267,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 4.167,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 5.167,
+      "uniqueTransfersMean": 5.167,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 5.167,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0.433,
+      "dropReasons": {
+        "NO_HOLDER": 200,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 25,
+        "COPY_LIMIT": 7,
+        "ROUTE_FILTER": 104,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Multitud con contactos aleatorios sembrados y atajos; sin enlace directo S→T.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "direct",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "graphsDelivered": 0
+      },
+      "latencyS": {
+        "mean": null,
+        "p50": null,
+        "p95": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": null,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 0,
+      "uniqueTransfersMean": 0,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": null,
+      "energyProxyMean": 0,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 30,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 20,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Ruta WiFi Direct rápida y cara frente a cadena BLE lenta y barata.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "flooding",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 101.5,
+        "p50": 101.5,
+        "p95": 101.5,
+        "ci95OfGraphMeans": {
+          "lo": 101.5,
+          "hi": 101.5,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 3,
+        "ci95OfGraphMeans": {
+          "lo": 3,
+          "hi": 3,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 7,
+        "ci95OfGraphMeans": {
+          "lo": 7,
+          "hi": 7,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 1536,
+        "ci95OfGraphMeans": {
+          "lo": 1536,
+          "hi": 1536,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 2,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 3,
+      "uniqueTransfersMean": 3,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 7,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Ruta WiFi Direct rápida y cara frente a cadena BLE lenta y barata.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "epidemic",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 101.5,
+        "p50": 101.5,
+        "p95": 101.5,
+        "ci95OfGraphMeans": {
+          "lo": 101.5,
+          "hi": 101.5,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 3,
+        "ci95OfGraphMeans": {
+          "lo": 3,
+          "hi": 3,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 7,
+        "ci95OfGraphMeans": {
+          "lo": 7,
+          "hi": 7,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 1536,
+        "ci95OfGraphMeans": {
+          "lo": 1536,
+          "hi": 1536,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 2,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 3,
+      "uniqueTransfersMean": 3,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 7,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Ruta WiFi Direct rápida y cara frente a cadena BLE lenta y barata.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "spray",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 101.5,
+        "p50": 101.5,
+        "p95": 101.5,
+        "ci95OfGraphMeans": {
+          "lo": 101.5,
+          "hi": 101.5,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 3,
+        "ci95OfGraphMeans": {
+          "lo": 3,
+          "hi": 3,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 7,
+        "ci95OfGraphMeans": {
+          "lo": 7,
+          "hi": 7,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 1536,
+        "ci95OfGraphMeans": {
+          "lo": 1536,
+          "hi": 1536,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 2,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 3,
+      "uniqueTransfersMean": 3,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 7,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Ruta WiFi Direct rápida y cara frente a cadena BLE lenta y barata.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "earliest",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 101.5,
+        "p50": 101.5,
+        "p95": 101.5,
+        "ci95OfGraphMeans": {
+          "lo": 101.5,
+          "hi": 101.5,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 2,
+        "ci95OfGraphMeans": {
+          "lo": 2,
+          "hi": 2,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 6,
+        "ci95OfGraphMeans": {
+          "lo": 6,
+          "hi": 6,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 1024,
+        "ci95OfGraphMeans": {
+          "lo": 1024,
+          "hi": 1024,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 2,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 2,
+      "uniqueTransfersMean": 2,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 6,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 10,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Ruta WiFi Direct rápida y cara frente a cadena BLE lenta y barata.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "adaptive",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 230.441,
+        "p50": 230.441,
+        "p95": 230.441,
+        "ci95OfGraphMeans": {
+          "lo": 230.441,
+          "hi": 230.441,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 3,
+        "ci95OfGraphMeans": {
+          "lo": 3,
+          "hi": 3,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 3,
+        "ci95OfGraphMeans": {
+          "lo": 3,
+          "hi": 3,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 1536,
+        "ci95OfGraphMeans": {
+          "lo": 1536,
+          "hi": 1536,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 3,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 3,
+      "uniqueTransfersMean": 3,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 3,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 10,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 10,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Ruta WiFi Direct rápida y cara frente a cadena BLE lenta y barata.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "eaor",
+      "independentGraphs": 1,
+      "realizationsPerGraph": 10,
+      "trials": 10,
+      "deterministicScenario": true,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "graphsDelivered": 1
+      },
+      "latencyS": {
+        "mean": 101.5,
+        "p50": 101.5,
+        "p95": 101.5,
+        "ci95OfGraphMeans": {
+          "lo": 101.5,
+          "hi": 101.5,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 3,
+        "ci95OfGraphMeans": {
+          "lo": 3,
+          "hi": 3,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 7,
+        "ci95OfGraphMeans": {
+          "lo": 7,
+          "hi": 7,
+          "n": 1
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 1536,
+        "ci95OfGraphMeans": {
+          "lo": 1536,
+          "hi": 1536,
+          "n": 1
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 2,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 3,
+      "uniqueTransfersMean": 3,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 7,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 0,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Ruta WiFi Direct rápida y cara frente a cadena BLE lenta y barata.",
+        "deterministicScenario": true,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "direct",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 1,
+      "trials": 30,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        },
+        "graphsDelivered": 0
+      },
+      "latencyS": {
+        "mean": null,
+        "p50": null,
+        "p95": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": null,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 0,
+      "uniqueTransfersMean": 0,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": null,
+      "energyProxyMean": 0,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 545,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 30,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Grafo aleatorio sembrado no usado para ajustar estrategias; sin enlace directo S→T.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "flooding",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 1,
+      "trials": 30,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 661.874,
+        "p50": 657.441,
+        "p95": 748.441,
+        "ci95OfGraphMeans": {
+          "lo": 646.241,
+          "hi": 677.774,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 16.4,
+        "ci95OfGraphMeans": {
+          "lo": 15.9,
+          "hi": 16.867,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 28,
+        "ci95OfGraphMeans": {
+          "lo": 26.4,
+          "hi": 29.633,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 14336,
+        "ci95OfGraphMeans": {
+          "lo": 13533.867,
+          "hi": 15155.2,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 8,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 16.4,
+      "uniqueTransfersMean": 12,
+      "redundantTransmissionsMean": 4.4,
+      "overheadRatioMeanLegacy": 1.367,
+      "energyProxyMean": 28,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0.3,
+      "dropReasons": {
+        "NO_HOLDER": 76,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Grafo aleatorio sembrado no usado para ajustar estrategias; sin enlace directo S→T.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "epidemic",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 1,
+      "trials": 30,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 661.874,
+        "p50": 657.441,
+        "p95": 748.441,
+        "ci95OfGraphMeans": {
+          "lo": 646.241,
+          "hi": 677.774,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 12.067,
+        "ci95OfGraphMeans": {
+          "lo": 12,
+          "hi": 12.167,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 19.4,
+        "ci95OfGraphMeans": {
+          "lo": 18.133,
+          "hi": 20.633,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 9932.8,
+        "ci95OfGraphMeans": {
+          "lo": 9284.267,
+          "hi": 10581.333,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 8,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 12.067,
+      "uniqueTransfersMean": 12,
+      "redundantTransmissionsMean": 0.067,
+      "overheadRatioMeanLegacy": 1.006,
+      "energyProxyMean": 19.4,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0.3,
+      "dropReasons": {
+        "NO_HOLDER": 76,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 130,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Grafo aleatorio sembrado no usado para ajustar estrategias; sin enlace directo S→T.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "spray",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 1,
+      "trials": 30,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 0.233,
+        "ci95": {
+          "lo": 0.1,
+          "hi": 0.4,
+          "n": 30
+        },
+        "graphsDelivered": 7
+      },
+      "latencyS": {
+        "mean": 683.441,
+        "p50": 662.441,
+        "p95": 759.441,
+        "ci95OfGraphMeans": {
+          "lo": 652.727,
+          "hi": 718.155,
+          "n": 7
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 6.571,
+        "ci95OfGraphMeans": {
+          "lo": 6,
+          "hi": 7.429,
+          "n": 7
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 10.857,
+        "ci95OfGraphMeans": {
+          "lo": 9,
+          "hi": 12.571,
+          "n": 7
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 5558.857,
+        "ci95OfGraphMeans": {
+          "lo": 4608,
+          "hi": 6509.714,
+          "n": 7
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 3.714,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 5.167,
+      "uniqueTransfersMean": 5.167,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 8.7,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0.1,
+      "dropReasons": {
+        "NO_HOLDER": 321,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 31,
+        "COPY_LIMIT": 69,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Grafo aleatorio sembrado no usado para ajustar estrategias; sin enlace directo S→T.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "earliest",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 1,
+      "trials": 30,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 661.874,
+        "p50": 657.441,
+        "p95": 748.441,
+        "ci95OfGraphMeans": {
+          "lo": 646.241,
+          "hi": 677.774,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 8,
+        "ci95OfGraphMeans": {
+          "lo": 6.833,
+          "hi": 9.067,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 12.133,
+        "ci95OfGraphMeans": {
+          "lo": 10.133,
+          "hi": 14.1,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 6212.267,
+        "ci95OfGraphMeans": {
+          "lo": 5137.067,
+          "hi": 7270.4,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 8,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 8,
+      "uniqueTransfersMean": 8,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 12.133,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0.233,
+      "dropReasons": {
+        "NO_HOLDER": 228,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 11,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 87,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Grafo aleatorio sembrado no usado para ajustar estrategias; sin enlace directo S→T.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "adaptive",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 1,
+      "trials": 30,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 661.874,
+        "p50": 657.441,
+        "p95": 748.441,
+        "ci95OfGraphMeans": {
+          "lo": 646.241,
+          "hi": 677.774,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 12.067,
+        "ci95OfGraphMeans": {
+          "lo": 12,
+          "hi": 12.167,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 19.4,
+        "ci95OfGraphMeans": {
+          "lo": 18.133,
+          "hi": 20.633,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 9932.8,
+        "ci95OfGraphMeans": {
+          "lo": 9284.267,
+          "hi": 10581.333,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 8,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 12.067,
+      "uniqueTransfersMean": 12,
+      "redundantTransmissionsMean": 0.067,
+      "overheadRatioMeanLegacy": 1.006,
+      "energyProxyMean": 19.4,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0.3,
+      "dropReasons": {
+        "NO_HOLDER": 76,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 130,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Grafo aleatorio sembrado no usado para ajustar estrategias; sin enlace directo S→T.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "eaor",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 1,
+      "trials": 30,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "El IC remuestrea casos independientes; no corrige comparaciones múltiples."
+      },
+      "deliveryRate": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 661.874,
+        "p50": 657.441,
+        "p95": 748.441,
+        "ci95OfGraphMeans": {
+          "lo": 646.241,
+          "hi": 677.774,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 8,
+        "ci95OfGraphMeans": {
+          "lo": 6.833,
+          "hi": 9.067,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 12.133,
+        "ci95OfGraphMeans": {
+          "lo": 10.133,
+          "hi": 14.1,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 6212.267,
+        "ci95OfGraphMeans": {
+          "lo": 5137.067,
+          "hi": 7270.4,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 8,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 8,
+      "uniqueTransfersMean": 8,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 12.133,
+      "failedContactsMean": 0,
+      "reopenedContactsMean": 0.233,
+      "dropReasons": {
+        "NO_HOLDER": 228,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 11,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 87,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 0,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Grafo aleatorio sembrado no usado para ajustar estrategias; sin enlace directo S→T.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "unreliable-contacts",
+      "strategy": "direct",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 20,
+      "trials": 600,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "Las realizaciones de fallos dentro de un grafo no son independientes; el IC remuestrea grafos."
+      },
+      "deliveryRate": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        },
+        "graphsDelivered": 0
+      },
+      "latencyS": {
+        "mean": null,
+        "p50": null,
+        "p95": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": null,
+        "ci95OfGraphMeans": null,
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": null,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 0,
+      "uniqueTransfersMean": 0,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": null,
+      "energyProxyMean": 0,
+      "failedContactsMean": 4.228,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 2888,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 2375,
+        "CONTACT_FAILED": 2537,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Tres rutas con fiabilidad declarada distinta; los contactos fallan durante el ensayo. EAOR planifica con esa fiabilidad; las líneas base la ignoran.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "unreliable-contacts",
+      "strategy": "flooding",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 20,
+      "trials": 600,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "Las realizaciones de fallos dentro de un grafo no son independientes; el IC remuestrea grafos."
+      },
+      "deliveryRate": {
+        "mean": 0.988,
+        "ci95": {
+          "lo": 0.98,
+          "hi": 0.997,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 140.702,
+        "p50": 141.277,
+        "p95": 148.651,
+        "ci95OfGraphMeans": {
+          "lo": 138.312,
+          "hi": 143.015,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 5.878,
+        "ci95OfGraphMeans": {
+          "lo": 5.794,
+          "hi": 5.963,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 8.746,
+        "ci95OfGraphMeans": {
+          "lo": 8.527,
+          "hi": 8.951,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 3980.256,
+        "ci95OfGraphMeans": {
+          "lo": 3894.159,
+          "hi": 4060.879,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 2.093,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 5.843,
+      "uniqueTransfersMean": 5.843,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 8.693,
+      "failedContactsMean": 4.228,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 437,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 2163,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Tres rutas con fiabilidad declarada distinta; los contactos fallan durante el ensayo. EAOR planifica con esa fiabilidad; las líneas base la ignoran.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "unreliable-contacts",
+      "strategy": "epidemic",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 20,
+      "trials": 600,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "Las realizaciones de fallos dentro de un grafo no son independientes; el IC remuestrea grafos."
+      },
+      "deliveryRate": {
+        "mean": 0.988,
+        "ci95": {
+          "lo": 0.98,
+          "hi": 0.997,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 140.702,
+        "p50": 141.277,
+        "p95": 148.651,
+        "ci95OfGraphMeans": {
+          "lo": 138.312,
+          "hi": 143.015,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 5.878,
+        "ci95OfGraphMeans": {
+          "lo": 5.794,
+          "hi": 5.963,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 8.746,
+        "ci95OfGraphMeans": {
+          "lo": 8.527,
+          "hi": 8.951,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 3980.256,
+        "ci95OfGraphMeans": {
+          "lo": 3894.159,
+          "hi": 4060.879,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 2.093,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 5.843,
+      "uniqueTransfersMean": 5.843,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 8.693,
+      "failedContactsMean": 4.228,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 437,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 2163,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Tres rutas con fiabilidad declarada distinta; los contactos fallan durante el ensayo. EAOR planifica con esa fiabilidad; las líneas base la ignoran.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "unreliable-contacts",
+      "strategy": "spray",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 20,
+      "trials": 600,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "Las realizaciones de fallos dentro de un grafo no son independientes; el IC remuestrea grafos."
+      },
+      "deliveryRate": {
+        "mean": 0.988,
+        "ci95": {
+          "lo": 0.98,
+          "hi": 0.997,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 141.819,
+        "p50": 142.166,
+        "p95": 151.276,
+        "ci95OfGraphMeans": {
+          "lo": 139.278,
+          "hi": 144.158,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 5.486,
+        "ci95OfGraphMeans": {
+          "lo": 5.42,
+          "hi": 5.547,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 8.411,
+        "ci95OfGraphMeans": {
+          "lo": 8.203,
+          "hi": 8.604,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 3808.442,
+        "ci95OfGraphMeans": {
+          "lo": 3728.213,
+          "hi": 3884.104,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 2.102,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 5.455,
+      "uniqueTransfersMean": 5.455,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 8.362,
+      "failedContactsMean": 4.228,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 463,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 233,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 2170,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Tres rutas con fiabilidad declarada distinta; los contactos fallan durante el ensayo. EAOR planifica con esa fiabilidad; las líneas base la ignoran.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "unreliable-contacts",
+      "strategy": "earliest",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 20,
+      "trials": 600,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "Las realizaciones de fallos dentro de un grafo no son independientes; el IC remuestrea grafos."
+      },
+      "deliveryRate": {
+        "mean": 0.112,
+        "ci95": {
+          "lo": 0.092,
+          "hi": 0.132,
+          "n": 30
+        },
+        "graphsDelivered": 28
+      },
+      "latencyS": {
+        "mean": 81.5,
+        "p50": 81.5,
+        "p95": 81.5,
+        "ci95OfGraphMeans": {
+          "lo": 81.5,
+          "hi": 81.5,
+          "n": 28
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 2,
+        "ci95OfGraphMeans": {
+          "lo": 2,
+          "hi": 2,
+          "n": 28
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 6,
+        "ci95OfGraphMeans": {
+          "lo": 6,
+          "hi": 6,
+          "n": 28
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 1024,
+        "ci95OfGraphMeans": {
+          "lo": 1024,
+          "hi": 1024,
+          "n": 28
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 2,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 0.483,
+      "uniqueTransfersMean": 0.483,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 1.45,
+      "failedContactsMean": 4.228,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 2580,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 2152,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 2443,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Tres rutas con fiabilidad declarada distinta; los contactos fallan durante el ensayo. EAOR planifica con esa fiabilidad; las líneas base la ignoran.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "unreliable-contacts",
+      "strategy": "adaptive",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 20,
+      "trials": 600,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "Las realizaciones de fallos dentro de un grafo no son independientes; el IC remuestrea grafos."
+      },
+      "deliveryRate": {
+        "mean": 0.985,
+        "ci95": {
+          "lo": 0.975,
+          "hi": 0.993,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 148.186,
+        "p50": 148.517,
+        "p95": 155.885,
+        "ci95OfGraphMeans": {
+          "lo": 145.91,
+          "hi": 150.32,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 5.515,
+        "ci95OfGraphMeans": {
+          "lo": 5.437,
+          "hi": 5.589,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 7.455,
+        "ci95OfGraphMeans": {
+          "lo": 7.28,
+          "hi": 7.607,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 3816.715,
+        "ci95OfGraphMeans": {
+          "lo": 3730.374,
+          "hi": 3897.622,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 2.107,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 5.468,
+      "uniqueTransfersMean": 5.468,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 7.388,
+      "failedContactsMean": 4.228,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 545,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 0,
+        "ENERGY_POLICY": 223,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 2223,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Tres rutas con fiabilidad declarada distinta; los contactos fallan durante el ensayo. EAOR planifica con esa fiabilidad; las líneas base la ignoran.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    },
+    {
+      "scenario": "unreliable-contacts",
+      "strategy": "eaor",
+      "independentGraphs": 30,
+      "realizationsPerGraph": 20,
+      "trials": 600,
+      "deterministicScenario": false,
+      "clusterBootstrap": {
+        "method": "percentile over independent graphs",
+        "B": 2000,
+        "seed": 1592614637,
+        "nominalCoverage": 0.95,
+        "caveat": "Las realizaciones de fallos dentro de un grafo no son independientes; el IC remuestrea grafos."
+      },
+      "deliveryRate": {
+        "mean": 0.977,
+        "ci95": {
+          "lo": 0.965,
+          "hi": 0.987,
+          "n": 30
+        },
+        "graphsDelivered": 30
+      },
+      "latencyS": {
+        "mean": 156.691,
+        "p50": 157.817,
+        "p95": 169.224,
+        "ci95OfGraphMeans": {
+          "lo": 153.801,
+          "hi": 159.43,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "transmissionsPerDelivery": {
+        "mean": 4.915,
+        "ci95OfGraphMeans": {
+          "lo": 4.845,
+          "hi": 4.982,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "energyPerDelivery": {
+        "mean": 7.05,
+        "ci95OfGraphMeans": {
+          "lo": 6.883,
+          "hi": 7.201,
+          "n": 30
+        },
+        "unit": "unidades del catálogo de canales (proxy, NO julios)",
+        "conditionalOnDelivery": true
+      },
+      "bytesPerDelivery": {
+        "mean": 3609.785,
+        "ci95OfGraphMeans": {
+          "lo": 3529.197,
+          "hi": 3687.702,
+          "n": 30
+        },
+        "conditionalOnDelivery": true
+      },
+      "hopCount": {
+        "mean": 2.151,
+        "conditionalOnDelivery": true
+      },
+      "transfersMean": 4.847,
+      "uniqueTransfersMean": 4.847,
+      "redundantTransmissionsMean": 0,
+      "overheadRatioMeanLegacy": 1,
+      "energyProxyMean": 6.95,
+      "failedContactsMean": 4.228,
+      "reopenedContactsMean": 0,
+      "dropReasons": {
+        "NO_HOLDER": 750,
+        "WINDOW_TOO_SMALL": 0,
+        "HORIZON": 0,
+        "ALREADY_HAS": 0,
+        "COPY_LIMIT": 0,
+        "ROUTE_FILTER": 591,
+        "ENERGY_POLICY": 0,
+        "NO_ROUTE": 0,
+        "DIRECT_ONLY": 0,
+        "CONTACT_FAILED": 2289,
+        "DEADLINE": 0
+      },
+      "notes": {
+        "scenario": "Tres rutas con fiabilidad declarada distinta; los contactos fallan durante el ensayo. EAOR planifica con esa fiabilidad; las líneas base la ignoran.",
+        "deterministicScenario": false,
+        "legacyOverheadRatio": "transfers/uniqueTransfers; se conserva solo para comparar con la evidencia v1"
+      }
+    }
+  ],
+  "pairedDeltas": [
+    {
+      "scenario": "scheduled-line",
+      "strategy": "direct",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": -1,
+        "ci95": {
+          "lo": -1,
+          "hi": -1,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "flooding",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "epidemic",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "spray",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "adaptive",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "scheduled-line",
+      "strategy": "eaor",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "direct",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": -1,
+        "ci95": {
+          "lo": -1,
+          "hi": -1,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "flooding",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "epidemic",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "spray",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "adaptive",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "scheduled-partition",
+      "strategy": "eaor",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "direct",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": -1,
+        "ci95": {
+          "lo": -1,
+          "hi": -1,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "flooding",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 9.6,
+        "ci95": {
+          "lo": 9.067,
+          "hi": 10.133,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 9.6,
+        "ci95": {
+          "lo": 9.067,
+          "hi": 10.133,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "epidemic",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 5.833,
+        "ci95": {
+          "lo": 5.567,
+          "hi": 6.067,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 5.833,
+        "ci95": {
+          "lo": 5.567,
+          "hi": 6.1,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "spray",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": -0.8,
+        "ci95": {
+          "lo": -0.933,
+          "hi": -0.667,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 98.647,
+        "ci95": {
+          "lo": 83.907,
+          "hi": 118.647,
+          "n": 6
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 2.667,
+        "ci95": {
+          "lo": 1.833,
+          "hi": 3.5,
+          "n": 6
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 2.667,
+        "ci95": {
+          "lo": 1.833,
+          "hi": 3.5,
+          "n": 6
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "adaptive",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 5.833,
+        "ci95": {
+          "lo": 5.567,
+          "hi": 6.067,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 5.833,
+        "ci95": {
+          "lo": 5.567,
+          "hi": 6.1,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "crowd",
+      "strategy": "eaor",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 5.333,
+        "ci95": {
+          "lo": 0,
+          "hi": 13.333,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 1.167,
+        "ci95": {
+          "lo": 0.767,
+          "hi": 1.667,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 1.167,
+        "ci95": {
+          "lo": 0.733,
+          "hi": 1.633,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "direct",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": -1,
+        "ci95": {
+          "lo": -1,
+          "hi": -1,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "flooding",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "epidemic",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "spray",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "adaptive",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 128.941,
+        "ci95": {
+          "lo": 128.941,
+          "hi": 128.941,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": -3,
+        "ci95": {
+          "lo": -3,
+          "hi": -3,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "energy-scarce",
+      "strategy": "eaor",
+      "baseline": "earliest",
+      "independentGraphs": 1,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 1,
+        "ci95": {
+          "lo": 1,
+          "hi": 1,
+          "n": 1
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "direct",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": -1,
+        "ci95": {
+          "lo": -1,
+          "hi": -1,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "flooding",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 8.4,
+        "ci95": {
+          "lo": 7,
+          "hi": 9.733,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 15.867,
+        "ci95": {
+          "lo": 13.3,
+          "hi": 18.533,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "epidemic",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 4.067,
+        "ci95": {
+          "lo": 2.9,
+          "hi": 5.167,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 7.267,
+        "ci95": {
+          "lo": 5.1,
+          "hi": 9.467,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "spray",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": -0.767,
+        "ci95": {
+          "lo": -0.9,
+          "hi": -0.6,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 7
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 2,
+        "ci95": {
+          "lo": 0.143,
+          "hi": 3.286,
+          "n": 7
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 4.286,
+        "ci95": {
+          "lo": 1.429,
+          "hi": 6.571,
+          "n": 7
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "adaptive",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 4.067,
+        "ci95": {
+          "lo": 2.9,
+          "hi": 5.167,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 7.267,
+        "ci95": {
+          "lo": 5.1,
+          "hi": 9.467,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "held-out",
+      "strategy": "eaor",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 0,
+        "ci95": {
+          "lo": 0,
+          "hi": 0,
+          "n": 30
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "unreliable-contacts",
+      "strategy": "direct",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": -0.112,
+        "ci95": {
+          "lo": -0.133,
+          "hi": -0.09,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": null,
+        "ci95": null,
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "unreliable-contacts",
+      "strategy": "flooding",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": 0.877,
+        "ci95": {
+          "lo": 0.855,
+          "hi": 0.898,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 58.976,
+        "ci95": {
+          "lo": 56.435,
+          "hi": 61.439,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 3.884,
+        "ci95": {
+          "lo": 3.794,
+          "hi": 3.975,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 2.789,
+        "ci95": {
+          "lo": 2.566,
+          "hi": 2.994,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "unreliable-contacts",
+      "strategy": "epidemic",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": 0.877,
+        "ci95": {
+          "lo": 0.855,
+          "hi": 0.898,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 58.976,
+        "ci95": {
+          "lo": 56.435,
+          "hi": 61.439,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 3.884,
+        "ci95": {
+          "lo": 3.794,
+          "hi": 3.975,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 2.789,
+        "ci95": {
+          "lo": 2.566,
+          "hi": 2.994,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "unreliable-contacts",
+      "strategy": "spray",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": 0.877,
+        "ci95": {
+          "lo": 0.855,
+          "hi": 0.898,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 60.131,
+        "ci95": {
+          "lo": 57.545,
+          "hi": 62.664,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 3.49,
+        "ci95": {
+          "lo": 3.421,
+          "hi": 3.554,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 2.453,
+        "ci95": {
+          "lo": 2.234,
+          "hi": 2.641,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "unreliable-contacts",
+      "strategy": "adaptive",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": 0.873,
+        "ci95": {
+          "lo": 0.852,
+          "hi": 0.897,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 66.994,
+        "ci95": {
+          "lo": 64.64,
+          "hi": 69.27,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 3.51,
+        "ci95": {
+          "lo": 3.427,
+          "hi": 3.595,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 1.453,
+        "ci95": {
+          "lo": 1.267,
+          "hi": 1.616,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    },
+    {
+      "scenario": "unreliable-contacts",
+      "strategy": "eaor",
+      "baseline": "earliest",
+      "independentGraphs": 30,
+      "deliveryRateDelta": {
+        "mean": 0.865,
+        "ci95": {
+          "lo": 0.842,
+          "hi": 0.888,
+          "n": 30
+        }
+      },
+      "latencySDelta": {
+        "mean": 75.685,
+        "ci95": {
+          "lo": 72.793,
+          "hi": 78.379,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "transmissionsPerDeliveryDelta": {
+        "mean": 2.904,
+        "ci95": {
+          "lo": 2.831,
+          "hi": 2.982,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true
+      },
+      "energyPerDeliveryDelta": {
+        "mean": 1.049,
+        "ci95": {
+          "lo": 0.864,
+          "hi": 1.208,
+          "n": 28
+        },
+        "conditionalOnBothDelivered": true,
+        "unit": "proxy del catálogo"
+      },
+      "exploratory": true,
+      "multiplicity": "sin corrección; IC nominales del 95 %"
+    }
+  ],
+  "limitations": [
+    "Contactos y ventanas son sintéticos y sembrados; no provienen de radio real ni de trazas de movilidad.",
+    "No hay Android, BLE, Wi-Fi Direct, LoRa ni Nearby; PHYSICAL_TEST_PENDING.",
+    "La energía es un proxy del catálogo de canales (unidades adimensionales), no una medida en julios.",
+    "No se modelan colas, contención, pérdida por SNR ni consumo en reposo.",
+    "Los escenarios deterministas se repiten para verificar reproducibilidad, pero aportan UN caso independiente; no se cuentan como réplicas.",
+    "En unreliable-contacts las realizaciones de fallos comparten grafo; el IC remuestrea grafos, no realizaciones.",
+    "Los deltas pareados son exploratorios y no llevan corrección por comparaciones múltiples.",
+    "El benchmark no certifica el sistema ni demuestra comportamiento en una emergencia real.",
+    "El árbol puede estar sucio: manifestClaim=UNCOMMITTED_BUILD no es una release verificada."
+  ]
+}

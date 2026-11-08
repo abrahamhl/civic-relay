@@ -175,6 +175,14 @@ test('límite conocido: el relé no puede verificar la firma del emisor; el dest
   await assert.rejects(openMessage({ recipient: b, envelope: forged, now: T0 }), /BAD_SIGNATURE/);
 });
 
+test('el formato binario rechaza ciphertext >65535 B en vez de truncar la longitud', async () => {
+  const [a, b] = await people(2);
+  const big = await sealMessage({ sender: a, recipient: b.publicIdentity, body: new Uint8Array(70_000), priority: 3, ttlS: 3600, now: T0 });
+  assert.throws(() => packEnvelope(big), /formato binario/);
+  const small = await sealMessage({ sender: a, recipient: b.publicIdentity, body: new Uint8Array(1000), priority: 3, ttlS: 3600, now: T0 });
+  assert.equal(unpackEnvelope(packEnvelope(small)).header.id, small.header.id);
+});
+
 test('difusiones: tamaño, caducidad y duplicados acotados', () => {
   const st = createBundleStore({ owner: 'x' });
   const base = { id: 'b1', expiresAt: T0 + 1000, type: 'SENDA_SIGNED_COMMAND', sig: 'x' };
