@@ -151,12 +151,35 @@ async function exercise(browser, name, viewport) {
   assert.equal(await page.evaluate(() => window.__injected), 0);
   assert.deepEqual(clientErrors, [], 'Unhandled browser exceptions');
 
+  // Offline hard-restart: first prime the production service-worker assets under its control,
+  // then disconnect the browser and reload. The model is already in IndexedDB.
+  await page.getByRole('button', { name: 'Volver al mapa 2D' }).click();
+  await page.waitForFunction(async () => {
+    if (!('serviceWorker' in navigator)) return false;
+    await navigator.serviceWorker.ready;
+    return !!navigator.serviceWorker.controller;
+  }, null, { timeout: 15_000 });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  if (name === 'mobile') await page.locator('.bottom-nav button').filter({ hasText: 'Mapa' }).click();
+  else await page.getByRole('button', { name: /Mapa de Sucesos/ }).click();
+  await page.getByRole('button', { name: 'Abrir Atmosphere 4D' }).click();
+  await page.getByText(/SNAPSHOT LOCAL/).waitFor({ timeout: 10_000 });
+  await page.context().setOffline(true);
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: 20_000 });
+  if (name === 'mobile') await page.locator('.bottom-nav button').filter({ hasText: 'Mapa' }).click();
+  else await page.getByRole('button', { name: /Mapa de Sucesos/ }).click();
+  await page.getByRole('button', { name: 'Abrir Atmosphere 4D' }).click();
+  await page.locator('canvas.senda-4d-canvas').waitFor({ state: 'visible', timeout: 12_000 });
+  await page.getByText(/SNAPSHOT LOCAL/).waitFor({ timeout: 12_000 });
+  assert.ok(await page.locator('canvas.senda-4d-canvas').evaluate((el) => el.width > 200));
+  assert.deepEqual(clientErrors, [], 'Unhandled browser exceptions after offline restart');
+
   await page.screenshot({ path: resolve(output, name + '.png'), fullPage: true });
   await page.close();
   return { viewport, status: 'PASS', visibleGeospatialMarkers: markers,
     sourceKinds: ['HISTORICAL_OBSERVATION', 'CURATED_EVENT_METADATA'],
     injectedMarkupExecuted: false, atmosphere4DRendered: true,
-    hourlyTimeNavigation: true, localSnapshotRecoveredAfterFeedLoss: true, fixtureOnly: true };
+    hourlyTimeNavigation: true, localSnapshotRecoveredAfterFeedLoss: true, offlinePwaRestart: true, fixtureOnly: true };
 }
 
 const browser = await chromium.launch({ headless: true });
@@ -169,7 +192,7 @@ const report = {
   schema: 'senda.browser-geospatial-qa/1',
   testedAt: new Date().toISOString(),
   codeType: 'CHROMIUM_REAL_BROWSER_WITH_SYNTHETIC_SOURCE_FIXTURES',
-  notProven: ['NASA/USGS upstream live in browser', 'real Open-Meteo forecast in browser', 'physical radio', 'wildfire forecast calibration', 'offline OSM tiles', 'offline PWA hard restart'],
+  notProven: ['NASA/USGS upstream live in browser', 'real Open-Meteo forecast in browser', 'physical radio', 'wildfire forecast calibration', 'offline OSM tiles'],
   results,
 };
 writeFileSync(resolve(output, 'report.json'), JSON.stringify(report, null, 2) + '\n');
