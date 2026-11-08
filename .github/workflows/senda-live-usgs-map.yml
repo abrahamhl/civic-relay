@@ -1,11 +1,13 @@
-name: SENDA LIVE · NASA/USGS geospatial evidence maps
+name: SENDA LIVE · NASA/USGS + Atmosphere 4D verified maps
 on:
   push:
     branches:
       - 'feat/senda-usgs-map-evidence-*'
+      - 'feat/senda-atmosphere4d-offline-*'
   pull_request:
     branches:
       - 'feat/senda-social-live-*'
+      - 'feat/senda-usgs-map-evidence-*'
       - master
   workflow_dispatch:
 permissions:
@@ -20,7 +22,7 @@ jobs:
         with:
           node-version: '22'
       - name: Offline deterministic upstream adapter tests
-        run: node --test apps/senda-live/tests/usgs-earthquakes.test.mjs apps/senda-live/tests/eonet-wildfires.test.mjs
+        run: node --test apps/senda-live/tests/usgs-earthquakes.test.mjs apps/senda-live/tests/eonet-wildfires.test.mjs apps/senda-live/tests/weather-grid.test.mjs
       - name: Install locked dependencies
         run: |
           corepack enable
