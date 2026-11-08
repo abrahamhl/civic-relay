@@ -42,3 +42,37 @@ jobs:
           path: evidence/senda/eonet/latest-catalog-acquisition.json
           if-no-files-found: warn
           retention-days: 14
+
+
+  chromium-map-qa:
+    name: Real browser geospatial QA (desktop + mobile)
+    needs: usgs-live
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install locked frontend dependencies
+        run: |
+          corepack enable
+          corepack pnpm install --frozen-lockfile
+          corepack pnpm --filter @senda/live build
+      - name: Install pinned Chromium browser
+        run: |
+          npx --yes playwright@1.63.0 install --with-deps chromium
+          npm install --no-save --prefix /tmp/senda-pw playwright@1.63.0
+      - name: Execute map security and layer interactions in Chromium
+        run: |
+          HOST=127.0.0.1 PORT=3011 DATABASE_FILE="$RUNNER_TEMP/senda-live-qa.db" node --disable-warning=ExperimentalWarning apps/senda-live/server/index.mjs > "$RUNNER_TEMP/senda-live-server.log" 2>&1 &
+          for i in $(seq 1 30); do if curl -fsS http://127.0.0.1:3011/ >/dev/null; then break; fi; sleep 1; done
+          SENDA_MAP_QA_URL=http://127.0.0.1:3011 SENDA_PLAYWRIGHT_MODULE=file:///tmp/senda-pw/node_modules/playwright/index.mjs node apps/senda-live/scripts/qa-geospatial-map.mjs
+      - name: Upload browser evidence (screenshots and results)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: senda-map-chromium-qa
+          path: evidence/senda/geospatial-qa/
+          if-no-files-found: warn
+          retention-days: 14
