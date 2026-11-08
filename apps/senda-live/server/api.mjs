@@ -15,11 +15,13 @@ import { COOKIE_NAME } from './services/auth.mjs';
 import { adapterHealth } from './domain/source-adapters.mjs';
 import { createUsgsEarthquakeFeed } from './domain/usgs-earthquakes.mjs';
 import { createEonetWildfireFeed } from './domain/eonet-wildfires.mjs';
+import { createWeatherGridFeed, WEATHER_REGIONS } from './domain/weather-grid.mjs';
 
 export function createApiHandler({
   db, auth, social, events, emergency, messaging, moderation, admin, rt,
   usgsFeed = createUsgsEarthquakeFeed(),
   eonetFeed = createEonetWildfireFeed(),
+  weatherGridFeed = createWeatherGridFeed(),
 }) {
   const router = createRouter();
   const rateLimiter = createRateLimiter();
@@ -512,6 +514,14 @@ export function createApiHandler({
   router.get('/api/sources/eonet-wildfires', async (req, res) => {
     const snapshot = await eonetFeed.read();
     sendJson(res, snapshot.status === 'UNAVAILABLE' ? 503 : 200, snapshot);
+  });
+
+  // Explicitly time-indexed NWP model forecast. Never an observed station or an alert.
+  router.get('/api/sources/weather-grid', async (req, res, { query }) => {
+    const region = query.region || 'valencia';
+    if (!Object.hasOwn(WEATHER_REGIONS, region)) return sendJson(res, 400, { error: 'INVALID_WEATHER_REGION' });
+    const snapshot = await weatherGridFeed.read(region);
+    sendJson(res, ['UNAVAILABLE', 'PROVIDER_NOT_CONFIGURED'].includes(snapshot.status) ? 503 : 200, snapshot);
   });
 
   /* ------------------- ADAPTERS & METADATA ------------------- */
