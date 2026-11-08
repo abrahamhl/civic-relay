@@ -15,6 +15,9 @@ const report = {
   source: result.source,
   status: result.status,
   count: result.observations.length,
+  requestedLimit: result.requestedLimit,
+  resultLimitReached: result.resultLimitReached,
+  completeness: result.resultLimitReached ? 'CAPPED_SAMPLE_NOT_GLOBAL_TOTAL' : 'UNDER_REQUEST_CAP',
   rejectedEvents: result.rejectedEvents,
   sampleIds: result.observations.slice(0, 5).map((x) => x.id),
   observedWindow: result.observations.length ? {
