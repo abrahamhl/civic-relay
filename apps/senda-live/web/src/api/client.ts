@@ -176,7 +176,16 @@ export const api = {
   async getAdminUsers() { return request('/api/admin/users'); },
   async getAdminOrgs() { return request('/api/admin/organizations'); },
   async createOrg(data: any) { return request('/api/admin/organizations', { method: 'POST', body: JSON.stringify(data) }); },
-  async assignRole(data: any) { return request('/api/admin/roles', { method: 'POST', body: JSON.stringify(data) }); }
+  async assignRole(data: any) { return request('/api/admin/roles', { method: 'POST', body: JSON.stringify(data) }); },
+
+  // UAV Tactical Science & Swarm Mission Planning
+  async getUavCameraPresets() { return request('/api/uav/camera-presets'); },
+  async generateUavFlightPlan(data: any) {
+    return request('/api/uav/tactical-plan', { method: 'POST', body: JSON.stringify(data) });
+  },
+  async evaluateUavSwarm(data: any) {
+    return request('/api/uav/swarm-evaluation', { method: 'POST', body: JSON.stringify(data) });
+  }
 };
 
 /**

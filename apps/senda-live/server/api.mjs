@@ -24,6 +24,11 @@ import { createCopernicusEffisFeed } from './domain/copernicus-effis.mjs';
 import { createAemetCapFeed } from './domain/aemet-cap.mjs';
 import { reconcileMultiHazardFeeds } from './domain/spatial-reconciliation-engine.mjs';
 import { createDatexMobilityFeed } from './domain/datex-mobility.mjs';
+import {
+  generateTacticalFlightPlan,
+  evaluateTacticalSwarmMission,
+  UAV_CAMERA_PRESETS,
+} from './domain/uav-tactical-planner.mjs';
 
 export function createApiHandler({
   db, auth, social, events, emergency, messaging, moderation, admin, rt,
@@ -599,6 +604,52 @@ export function createApiHandler({
     const candidates = correlateGdacsCatalogs(gdacs, usgs, eonet);
     sendJson(res, 200, { ...candidates, status: gdacs.status,
       fetchedAt: gdacs.fetchedAt, source: gdacs.source });
+  });
+
+  /* ------------------- UAV TACTICAL MAPPING & SWARM SCIENCE ------------------- */
+  router.get('/api/uav/camera-presets', (req, res) => {
+    sendJson(res, 200, { presets: UAV_CAMERA_PRESETS });
+  });
+
+  router.post('/api/uav/tactical-plan', async (req, res) => {
+    const body = await readJson(req);
+    try {
+      const plan = generateTacticalFlightPlan(body);
+      sendJson(res, 200, plan);
+    } catch (err) {
+      throw bad(err.message || 'INVALID_UAV_PLAN_PARAMETERS');
+    }
+  });
+
+  router.get('/api/uav/tactical-plan', (req, res, { query }) => {
+    if (!query.bbox) throw bad('BBOX_REQUIRED');
+    const coords = query.bbox.split(',').map(Number);
+    if (coords.length !== 4 || coords.some(isNaN)) throw bad('INVALID_BBOX');
+    try {
+      const plan = generateTacticalFlightPlan({
+        bbox: coords,
+        targetGsdCm: query.targetGsdCm ? Number(query.targetGsdCm) : 3.0,
+        camera: query.camera || 'DJI_MAVIC_3_ENTERPRISE',
+        forwardOverlapPct: query.forwardOverlapPct ? Number(query.forwardOverlapPct) : 75,
+        sideOverlapPct: query.sideOverlapPct ? Number(query.sideOverlapPct) : 65,
+        cruiseSpeedMs: query.cruiseSpeedMs ? Number(query.cruiseSpeedMs) : 10.0,
+        operationalCeilingM: query.operationalCeilingM ? Number(query.operationalCeilingM) : 300,
+        emergencyScenario: query.emergencyScenario || 'RAPID_DAMAGE_ASSESSMENT',
+      });
+      sendJson(res, 200, plan);
+    } catch (err) {
+      throw bad(err.message || 'INVALID_UAV_PLAN_PARAMETERS');
+    }
+  });
+
+  router.post('/api/uav/swarm-evaluation', async (req, res) => {
+    const body = await readJson(req);
+    try {
+      const evalResult = evaluateTacticalSwarmMission(body);
+      sendJson(res, 200, evalResult);
+    } catch (err) {
+      throw bad(err.message || 'INVALID_SWARM_PAYLOAD');
+    }
   });
 
   /* ------------------- ADAPTERS & METADATA ------------------- */

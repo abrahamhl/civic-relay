@@ -32,6 +32,10 @@ coverage/
 # Temporary
 *.tmp
 .cache/
+*.db
+*.sqlite
+*.sqlite3
+apps/senda-live/data/*.db
 
 .vercel
 .env*

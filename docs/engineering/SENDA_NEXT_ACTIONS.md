@@ -1,7 +1,7 @@
 # SENDA — Plan de Acción Inmediato y Hoja de Ruta Ejecutiva
 
-**Fecha de Actualización:** 2026-11-09T02:24:00Z  
-**Estado:** Bloques 1 al 8 COMPLETADOS, CONSOLIDADOS Y POTENCIADOS con Física Matemática Avanzada, Harness de Defensa Gubernamental y Movilidad DATEX II en [PR #30](https://github.com/abrahamhl/civic-relay/pull/30).
+**Fecha de Actualización:** 2026-11-09T02:45:00Z  
+**Estado:** Bloques 1 al 8 COMPLETADOS, CONSOLIDADOS Y POTENCIADOS con Física Matemática Avanzada, Ciencia Táctica UAV en Zonas Críticas, Harness de Defensa Gubernamental y Movilidad DATEX II en [PR #30](https://github.com/abrahamhl/civic-relay/pull/30).
 
 ---
 
@@ -16,7 +16,7 @@
   - Conector para **DATEX II (CEN/TS 16157)** para NDW (A12 Arnhem-Ede) y DGT 3.0 (España).
   - Motor de Reconciliación Espacio-Temporal con grafo de dependencias upstream y recibos Merkle (`generateReconciliationReceipt`).
 - [x] **Bloque 3 (Visualizadores GIS 3D/4D Profesionales):**
-  - `Globe4DStudio` con Three.js: Globo WGS84 interactivo, malla 3D Mapzen DEM con relieve $\times 1$ a $\times 6$, viento GPU, elipsoide Fresnel 3D y panel integrado de Física Telecom y Calificación Gubernamental.
+  - `Globe4DStudio` con Three.js: Globo WGS84 interactivo, malla 3D Mapzen DEM con relieve $\times 1$ a $\times 6$, viento GPU, trayectorias UAV 3D, elipsoide Fresnel 3D y panel integrado de Física Telecom y Calificación Gubernamental.
 - [x] **Bloque 4 (Física Matemática Telecom & Motores Científicos):**
   - Módulo `telecom-mathematical-physics.mjs`:
     - Percolación continua ($\lambda_c = 4.512 / (\pi R^2)$) y detección de transición de fase en mallas fragmentadas.
@@ -25,26 +25,35 @@
     - Atenuación por lluvia según ITU-R P.838-3.
     - Desvanecimiento Nakagami-m y capacidad de canal de Shannon.
     - Cinemática orbital Doppler para satélites LEO y ancho de banda PLL SDR.
-- [x] **Bloque 5 (Harness de Resiliencia Gubernamental y Defensa):**
+- [x] **Bloque 5 (Drones Tácticos, Swarm y Mapeo en Zonas de Conflicto / Sin GPS):**
+  - Módulos `uav-tactical-science.mjs` y `uav-tactical-planner.mjs`:
+    - Modelo de canal 3D Air-to-Ground (A2G) sigmoide Al-Hourani & ITU-R P.1410 con atenuación clutter por entorno (Suburbano, Urbano, Cañón Urbano / Escombros).
+    - Cálculo de ángulo óptimo de elevación $\theta_{\text{opt}}$ y altitud óptima de vuelo $h_{\text{opt}}$ maximizando radio de cobertura terrestre.
+    - Conectividad algebraica de enjambre (autovalor de Fiedler $\lambda_2$ de la matriz Laplaciana) con garantía matemática de no-partición de red.
+    - Parámetros de fotogrametría aérea: Ground Sampling Distance (GSD), solape longitudinal ($p_f \ge 75\%$) y transversal ($p_s \ge 65\%$) para reconstrucción 3D Structure-from-Motion (SfM).
+    - Margen de protección y ganancia de procesamiento DSSS/FHSS frente a guerra electrónica / jamming táctico ($J/S$).
+    - Planificador de misiones boustrophedon con exportación en estándares **QGroundControl / PX4 `.plan`** y **GeoJSON**.
+    - Endpoints de API REST `/api/uav/tactical-plan`, `/api/uav/camera-presets` y `/api/uav/swarm-evaluation`.
+- [x] **Bloque 6 (Harness de Resiliencia Gubernamental y Defensa):**
   - Módulo `government-resilience-harness.mjs`:
     - Evaluación de los 5 pilares estratégicos (Black-Sky, Capacidad de Evacuación, Agilidad de Espectro, Criptografía Forense y Calibración Empírica).
     - Categorización de cumplimiento (Tier 1 Soberano Defensa/UME, Tier 2 Protección Civil, Tier 3 Municipal).
     - Emisión de certificado criptográfico con sello SHA-256 inmutable.
-- [x] **Bloque 6 (Offline, Telemetría y Privacidad):**
+- [x] **Bloque 7 (Offline, Telemetría y Privacidad):**
   - IndexedDB v2 `cached_sources` con degradación transparente offline (`offlineCached: true`) en el cliente API.
   - Telemetría estrictamente opt-in para sensores del dispositivo.
-- [x] **Bloque 7 (SENDA LIVE e Interfaz Premium):**
+- [x] **Bloque 8 (SENDA LIVE e Interfaz Premium):**
   - Visualizador `Globe4DStudio` en `MapView.tsx`, protecciones XSS DOM-safe y controles multirriesgo.
-- [x] **Bloque 8 (Vídeos, Branding y Materiales para Inversores):**
+- [x] **Bloque 9 (Vídeos, Branding y Materiales para Inversores):**
   - Verificación de 53 archivos audiovisuales M95 con peticiones por rangos HTTP 206 y pistas de subtítulos en ES, EN y NL (`evidence/video/m95/release.json`).
 
 ---
 
 ## 2. Próximas Acciones Inmediatas
 
-1. **Supervisión de CI en GitHub Actions:**
-   - Confirmar la aprobación de la suite completa de workflows ejecutándose sobre el commit `036231f`.
-2. **Promoción de PR #30 hacia `master`:**
-   - Una vez concluido el ciclo de CI, realizar la fusión controlada hacia la rama principal de producción.
+1. **Commit y Push de Capacidades UAV Tácticas:**
+   - Subir `uav-tactical-science.mjs`, `uav-tactical-planner.mjs`, tests y componentes 3D a la rama `feat/senda-master-integration-20261109`.
+2. **Supervisión de CI en GitHub Actions:**
+   - Confirmar la aprobación de la suite completa de workflows ejecutándose en PR #30.
 3. **Simulaciones de Demostración para Gobiernos y Fuerzas de Seguridad:**
-   - Preparar el informe de auditoría generado por el arnés para los dos escenarios insignia: Corredor A12 Arnhem-Ede (Países Bajos) y Corredor A-3 Valencia (España).
+   - Demostración de vuelo táctico autónomo y mapeo de escombros en zonas sin GPS/GNSS con exportación de planes PX4 para la UME y cuerpos de emergencia.
