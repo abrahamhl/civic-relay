@@ -150,6 +150,15 @@ async function exercise(browser, name, viewport) {
   await page.getByRole('slider', { name: 'Exageración vertical del terreno' }).fill('5');
   assert.equal(await page.getByText(/DEM · 33×33 muestras georreferenciadas/).count(), 1);
   assert.ok(await page.locator('canvas.senda-4d-canvas').evaluate((el) => el.width > 200));
+  // Offline-capable geometry engine: Fresnel profile, height sensitivity and relay corridor.
+  await page.getByRole('button', { name: 'Abrir GeoRelay' }).click();
+  await page.locator('[data-testid="senda-rf-geometry-lab"]').waitFor({ state: 'visible' });
+  assert.equal(await page.getByRole('img', { name: /Perfil topográfico con rayo de radio/ }).count(), 1);
+  await page.getByLabel('Frecuencia de cribado').selectOption('868');
+  await page.getByRole('slider', { name: 'Altura hipotética de antena' }).fill('60');
+  await page.getByRole('slider', { name: 'Distancia máxima por salto' }).fill('20');
+  assert.equal(await page.locator('[data-testid="relay-corridor-status"]').count(), 1);
+  await page.getByRole('button', { name: 'Cerrar GeoRelay' }).click();
 
   await page.getByRole('slider', { name: 'Línea temporal de pronóstico' }).fill('9');
   assert.match(await page.getByText(/Centro del grid/).innerText(), /Centro del grid/);
@@ -205,6 +214,10 @@ async function exercise(browser, name, viewport) {
   await page.waitForFunction(() => document.querySelector('[data-testid="terrain-source-status"]')?.textContent?.includes('OFFLINE_LOCAL_DEM'), null, { timeout: 12_000 });
 
   assert.ok(await page.locator('canvas.senda-4d-canvas').evaluate((el) => el.width > 200));
+  await page.getByRole('button', { name: 'Abrir GeoRelay' }).click();
+  await page.locator('[data-testid="senda-rf-geometry-lab"]').waitFor({ state: 'visible' });
+  assert.equal(await page.getByRole('img', { name: /Perfil topográfico con rayo de radio/ }).count(), 1);
+  assert.equal(await page.locator('[data-testid="relay-corridor-status"]').count(), 1);
   assert.deepEqual(clientErrors, [], 'Unhandled browser exceptions after offline restart');
 
   await page.screenshot({ path: resolve(output, name + '.png'), fullPage: true });
@@ -213,6 +226,7 @@ async function exercise(browser, name, viewport) {
     sourceKinds: ['HISTORICAL_OBSERVATION', 'CURATED_EVENT_METADATA'],
     injectedMarkupExecuted: false, atmosphere4DRendered: true,
     hourlyTimeNavigation: true, realDemFixtureMesh: true, storedDemAfterOfflineRestart: true,
+    offlineTerrainRadioGeometry: true, fresnelCrossSection: true, relaySiteGraph: true,
     localSnapshotRecoveredAfterFeedLoss: true, offlinePwaRestart: true, fixtureOnly: true };
 }
 
