@@ -45,3 +45,7 @@ investor-next/public/media/m95/*.mp4
 *.patch
 evidence/senda/**/release-manifest.json
 
+
+__pycache__/
+*.pyc
+
