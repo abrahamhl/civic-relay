@@ -30,7 +30,7 @@ const HOST = process.env.HOST || '0.0.0.0';
 const DB_PATH = process.env.DATABASE_FILE || join(__dirname, '../data/senda-live.db');
 const WEB_DIST = join(__dirname, '../web/dist');
 
-export function createServer({ dbFile = DB_PATH, ipSalt = 'senda-ip-salt-default', usgsFeed, eonetFeed, weatherGridFeed, terrainGridFeed, gdacsFeed, effisFeed, aemetFeed } = {}) {
+export function createServer({ dbFile = DB_PATH, ipSalt = 'senda-ip-salt-default', usgsFeed, eonetFeed, weatherGridFeed, terrainGridFeed, gdacsFeed, effisFeed, aemetFeed, mobilityFeed } = {}) {
   const db = openDatabase(dbFile);
   migrate(db);
 
@@ -49,7 +49,7 @@ export function createServer({ dbFile = DB_PATH, ipSalt = 'senda-ip-salt-default
   const admin = createAdminService(db, { rt, emergency, audit });
 
   const handleApi = createApiHandler({
-    db, auth, social, events, emergency, messaging, moderation, admin, rt, usgsFeed, eonetFeed, weatherGridFeed, terrainGridFeed, gdacsFeed, effisFeed, aemetFeed
+    db, auth, social, events, emergency, messaging, moderation, admin, rt, usgsFeed, eonetFeed, weatherGridFeed, terrainGridFeed, gdacsFeed, effisFeed, aemetFeed, mobilityFeed
   });
 
   const server = http.createServer(async (req, res) => {

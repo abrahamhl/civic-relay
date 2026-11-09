@@ -53,3 +53,5 @@ export * from './corridor-fabric.mjs';
 export * from './sovereign-mesh-kit.mjs';
 export * from './scenario-engine.mjs';
 export * from './scientific-evaluation.mjs';
+export * from './telecom-mathematical-physics.mjs';
+export * from './government-resilience-harness.mjs';

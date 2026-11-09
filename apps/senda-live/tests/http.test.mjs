@@ -303,5 +303,9 @@ test('INTEGRACIÓN HTTP / SPA / SSE / SEGURIDAD', async (t) => {
     assert.equal(reconData.schema, 'senda.osint.reconciled-intelligence/1');
     assert.ok(reconData.receipt);
     assert.equal(reconData.receipt.rootSha256.length, 64);
+    const mobRes = await fetch(`${baseUrl}/api/sources/mobility-incidents`);
+    assert.equal(mobRes.status, 200);
+    const mobData = await mobRes.json();
+    assert.ok(Array.isArray(mobData.incidents));
   });
 });

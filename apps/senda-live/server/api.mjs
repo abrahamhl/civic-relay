@@ -23,6 +23,7 @@ import { correlateGdacsCatalogs } from './domain/osint-catalog-correlation.mjs';
 import { createCopernicusEffisFeed } from './domain/copernicus-effis.mjs';
 import { createAemetCapFeed } from './domain/aemet-cap.mjs';
 import { reconcileMultiHazardFeeds } from './domain/spatial-reconciliation-engine.mjs';
+import { createDatexMobilityFeed } from './domain/datex-mobility.mjs';
 
 export function createApiHandler({
   db, auth, social, events, emergency, messaging, moderation, admin, rt,
@@ -33,6 +34,7 @@ export function createApiHandler({
   gdacsFeed = createGdacsFeed(),
   effisFeed = createCopernicusEffisFeed(),
   aemetFeed = createAemetCapFeed(),
+  mobilityFeed = createDatexMobilityFeed(),
 }) {
   const router = createRouter();
   const rateLimiter = createRateLimiter();
@@ -569,6 +571,12 @@ export function createApiHandler({
       capFeed: cap,
     });
     sendJson(res, 200, reconciled);
+  });
+
+  // DATEX II (CEN/TS 16157) & NDW / DGT 3.0 mobility incidents and road closures
+  router.get('/api/sources/mobility-incidents', async (req, res) => {
+    const snapshot = await mobilityFeed.getIncidents();
+    sendJson(res, snapshot.status === 'UNAVAILABLE' ? 503 : 200, snapshot);
   });
 
   // Public OSINT only: GDACS risk events are not SENDA-issued emergency alerts.

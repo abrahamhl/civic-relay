@@ -118,6 +118,7 @@ export const api = {
   async getCopernicusEffis() { return requestWithOfflineCache('/api/sources/copernicus-effis', 'copernicus_effis'); },
   async getAemetWarnings() { return requestWithOfflineCache('/api/sources/aemet-warnings', 'aemet_warnings'); },
   async getReconciledIntelligence() { return requestWithOfflineCache('/api/sources/reconciled-intelligence', 'reconciled_intelligence'); },
+  async getMobilityIncidents() { return requestWithOfflineCache('/api/sources/mobility-incidents', 'mobility_incidents'); },
 
   // Events
   async getEvents(params: Record<string, string> = {}) {

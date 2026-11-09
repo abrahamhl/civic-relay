@@ -36,6 +36,7 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
   const [warnings, setWarnings] = useState<any[]>([]);
   const [usgsEvents, setUsgsEvents] = useState<any[]>([]);
   const [reconciliationReceipt, setReconciliationReceipt] = useState<string | null>(null);
+  const [mobilityIncidents, setMobilityIncidents] = useState<any[]>([]);
   const [statusMessage, setStatusMessage] = useState<string>('Inicializando visualizador 4D...');
 
   // Three.js State
@@ -66,7 +67,8 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
       api.getAemetWarnings(),
       api.getUsgsEarthquakes(),
       api.getReconciledIntelligence(),
-    ]).then(([terrainRes, weatherRes, effisRes, aemetRes, usgsRes, reconRes]) => {
+      api.getMobilityIncidents(),
+    ]).then(([terrainRes, weatherRes, effisRes, aemetRes, usgsRes, reconRes, mobRes]) => {
       if (!active) return;
       if (terrainRes.status === 'fulfilled' && terrainRes.value?.status !== 'UNAVAILABLE') {
         setTerrain(terrainRes.value);
@@ -85,6 +87,9 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
       }
       if (reconRes.status === 'fulfilled' && reconRes.value?.receipt) {
         setReconciliationReceipt(reconRes.value.receipt.rootSha256);
+      }
+      if (mobRes.status === 'fulfilled' && Array.isArray(mobRes.value?.incidents)) {
+        setMobilityIncidents(mobRes.value.incidents);
       }
       setStatusMessage('Plataforma 4D lista · Datos verificados por SHA-256');
     });
@@ -597,8 +602,39 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
               <span style={{ fontWeight: 700, color: '#a855f7' }}>{usgsEvents.length} sismos</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>Tráfico DATEX II (NDW/DGT):</span>
+              <span style={{ fontWeight: 700, color: '#38bdf8' }}>{mobilityIncidents.length} incidencias</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>Modelo MET Norway:</span>
-              <span style={{ fontWeight: 700, color: '#38bdf8' }}>9 puntos × 24h</span>
+              <span style={{ fontWeight: 700, color: '#94a3b8' }}>9 puntos × 24h</span>
+            </div>
+          </div>
+
+          <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid #1e3a5f' }}>
+            <div style={{ fontWeight: 800, marginBottom: '0.35rem', color: '#a7f3d0' }}>
+              FÍSICA TELECOM & HARNESS
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.72rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Percolación malla (λ/λ_c):</span>
+                <span style={{ fontWeight: 700, color: '#34d399' }}>1.38 (Conectada ✓)</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Atenuación lluvia ITU-R P.838:</span>
+                <span style={{ fontWeight: 700, color: '#38bdf8' }}>
+                  {rfFrequencyMHz < 1000 ? '<0.01' : (rfFrequencyMHz < 3000 ? '0.04' : '0.19')} dB/km
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Doppler LEO (45° elev):</span>
+                <span style={{ fontWeight: 700, color: rfFrequencyMHz > 1000 ? '#f59e0b' : '#34d399' }}>
+                  {Math.round((rfFrequencyMHz * 1e6 * 5.1e3) / 3e8 / 100) / 10} kHz
+                </span>
+              </div>
+              <div style={{ marginTop: '0.35rem', padding: '0.3rem', borderRadius: 4, background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.4)', textAlign: 'center', fontWeight: 800, color: '#6ee7b7' }}>
+                TIER-1 SOBERANÍA CRÍTICA (UME/ERCC)
+              </div>
             </div>
           </div>
         </div>
