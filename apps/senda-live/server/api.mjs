@@ -17,12 +17,14 @@ import { createUsgsEarthquakeFeed } from './domain/usgs-earthquakes.mjs';
 import { createEonetWildfireFeed } from './domain/eonet-wildfires.mjs';
 import { createWeatherGridFeed, WEATHER_REGIONS } from './domain/weather-grid.mjs';
 import { createMetNorwayGridFeed } from './domain/metno-weather-grid.mjs';
+import { createTerrainGridFeed } from './domain/terrain-grid.mjs';
 
 export function createApiHandler({
   db, auth, social, events, emergency, messaging, moderation, admin, rt,
   usgsFeed = createUsgsEarthquakeFeed(),
   eonetFeed = createEonetWildfireFeed(),
   weatherGridFeed = process.env.SENDA_WEATHER_PROVIDER === 'openmeteo' ? createWeatherGridFeed() : createMetNorwayGridFeed(),
+  terrainGridFeed = createTerrainGridFeed(),
 }) {
   const router = createRouter();
   const rateLimiter = createRateLimiter();
@@ -523,6 +525,14 @@ export function createApiHandler({
     if (!Object.hasOwn(WEATHER_REGIONS, region)) return sendJson(res, 400, { error: 'INVALID_WEATHER_REGION' });
     const snapshot = await weatherGridFeed.read(region);
     sendJson(res, ['UNAVAILABLE', 'PROVIDER_NOT_CONFIGURED'].includes(snapshot.status) ? 503 : 200, snapshot);
+  });
+
+  // Read-only public elevation raster samples; no user-provided coordinates or URLs.
+  router.get('/api/sources/terrain-grid', async (req, res, { query }) => {
+    const region = query.region || 'valencia';
+    if (!Object.hasOwn(WEATHER_REGIONS, region)) return sendJson(res, 400, { error: 'INVALID_TERRAIN_REGION' });
+    const snapshot = await terrainGridFeed.read(region);
+    sendJson(res, snapshot.status === 'UNAVAILABLE' ? 503 : 200, snapshot);
   });
 
   /* ------------------- ADAPTERS & METADATA ------------------- */
