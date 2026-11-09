@@ -40,8 +40,8 @@ test('GDACS fixed authenticated origin and bounded two-week query', () => {
   const url = new URL(buildGdacsUrl(NOW));
   assert.equal(url.hostname, 'www.gdacs.org');
   assert.equal(url.pathname, '/gdacsapi/api/events/geteventlist/SEARCH');
-  assert.equal(url.searchParams.get('fromdate'), '2026-10-26');
-  assert.equal(url.searchParams.get('todate'), '2026-11-09');
+  assert.equal(url.searchParams.get('fromDate'), '2026-10-26');
+  assert.equal(url.searchParams.get('toDate'), '2026-11-09');
   assert.equal(url.searchParams.get('eventlist'), 'EQ,WF,FL,TC,VO,DR');
 });
 
