@@ -23,26 +23,31 @@ Cuando las torres 4G/5G arden o la red eléctrica colapsa, aplicaciones como Goo
 
 ---
 
-## 2. BENCHMARK FRENTE AL ESTADO DEL ARTE
+## 2. BENCHMARK FRENTE AL ESTADO DEL ARTE (EVALUACIÓN RIGUROSA)
 
 | Capacidad Técnica | Google Maps / Waze | Sistemas 112 / AlertGov Clásicos | Radios TETRA / SIRDEE | SENDA Unified Platform |
 | :--- | :---: | :---: | :---: | :---: |
-| **Operación sin red celular** | ❌ 0% Inoperativo | ❌ 0% Inoperativo | ⚠️ Solo voz oficial | ✅ **100% Funcional (Malla DTN)** |
-| **Anticipación por humo/fuego** | ❌ Reactivo (retraso 15-30m)| ❌ Lento (decisión humana) | ❌ Inexistente | ✅ **Predictivo (Física acoplada)** |
-| **Cadena custodia criptográfica**| ❌ No pericial | ❌ Logs internos opacos | ❌ Grabación analógica | ✅ **Firma Ed25519 inmutable** |
-| **Participación ciudadana civil**| ⚠️ Reportes sin filtro | ❌ Unidireccional | ❌ Cerrado a profesionales | ✅ **Bidireccional con filtro anti-XSS** |
-| **Coste por despliegue vial** | N/A (App civil) | Millones € (Fibra/Torres) | Millones € (Repetidores) | ✅ **COTS (Reutiliza cámaras/bucles)** |
+| **Operación sin red celular** | ❌ 0% Inoperativo | ❌ 0% Inoperativo | ⚠️ Solo voz oficial | ✅ **Malla DTN con enrutamiento PAER (store-and-forward tolerante a cortes)** |
+| **Anticipación por humo/fuego** | ❌ Reactivo (retraso 15-30m)| ❌ Lento (decisión humana) | ❌ Inexistente | ✅ **Predictivo (Física acoplada Rothermel + IGN MDT05)** |
+| **Cadena custodia criptográfica**| ❌ No pericial | ❌ Logs internos opacos | ❌ Grabación analógica | ✅ **Firma Ed25519 inmutable y sellado de tiempo SHA-256** |
+| **Participación ciudadana civil**| ⚠️ Reportes sin filtro | ❌ Unidireccional | ❌ Cerrado a profesionales | ✅ **Bidireccional con filtro de suplantación y verificación cruzada** |
+| **Coste por despliegue vial** | N/A (App civil) | Millones € (Fibra/Torres) | Millones € (Repetidores) | ✅ **COTS (Reutiliza terminales civiles, bucles y cámaras existentes)** |
+
+*Nota de diligencia:* Consultar [`docs/funding/SENDA_INVESTOR_TRUTH_GATE.md`](file:///c:/Users/2fabr/civic-relay/docs/funding/SENDA_INVESTOR_TRUTH_GATE.md) para la matriz completa de evidencia, tolerancias normativas y límites físicos de cada claim.
 
 ---
 
-## 3. PROPIEDAD INTELECTUAL Y ESTRATEGIA DE ACTIVOS
+## 3. PROPIEDAD INTELECTUAL Y ACTIVOS TECNOLÓGICOS DEFENDIBLES
+
+- **Activos de Algoritmia Propietaria y Física Matemática:**
+  - Protocolo **PAER (Physics-Aware Emergency Routing)**: primer algoritmo de encaminamiento oportunista que discrimina nodos mediante modelos de propagación de frentes de peligro ambiental y presupuestos de enlace normativos (ITU-R P.526 / ITU-R P.838).
+  - Motor de Atenuación Radioeléctrica Continua: implementación cerrada y analítica de ITU-R P.838-3 libre de discontinuidades numéricas en bandas de 1 a 100 GHz.
+  - Cadena de Custodia Criptográfica Forense (`@senda/pci`): estructura de datos de bloques hash y doble recibo con verificación sin dependencias externas.
+  - Cinemática Doppler Topocéntrica y Ventanas de Paso: predicción orbital analítica para radiolocalización y demodulación SDR en terminales de emergencia.
 
 - **Arquitectura de Software Abierto Dual-License:**
-  - El núcleo matemático (`@senda/core`, `@senda/pci`) bajo licencia permisiva MIT/Apache 2.0 para facilitar su adopción como estándar industrial y gubernamental en la Unión Europea.
-  - Los módulos de mando táctico (`@senda/command`), fusión de vídeo YOLOX y pasarelas de infraestructura (`corridor-fabric`) bajo licencia comercial B2G para concesionarias viales, DGT y agencias de seguridad nacional.
-- **Secretos Industriales y Algoritmos Propietarios:**
-  - Función de transferencia y optimización de encaminamiento estocástico multicanal EAOR bajo cortes correlacionados de red.
-  - Calibración de anemometría de flota mediante rueda libre OBD-II en vehículos COTS.
+  - Núcleo científico (`@senda/core`, `@senda/pci`): código abierto para habilitar adopción estándar en la Unión Europea y auditoría científica por pares.
+  - Plataforma de mando táctico (`@senda/live`, consolas de centro de control y visualizadores 4D): licencia comercial B2G / B2B para agencias de seguridad nacional, DGT y concesionarias de infraestructuras críticas.
 
 ---
 
@@ -54,3 +59,4 @@ Cuando las torres 4G/5G arden o la red eléctrica colapsa, aplicaciones como Goo
    - Subvención a fondo perdido de hasta 2.5M€ + inversión de capital de hasta 15M€ para tecnologías de disrupción profunda (*deep tech*).
 3. **Contratación Pública Innovadora (CPI) — DGT / Ministerio del Interior:**
    - Proyectos de digitalización de la red de carreteras secundarias y sensorización de corredores de evacuación mediante fondos NextGenerationEU.
+

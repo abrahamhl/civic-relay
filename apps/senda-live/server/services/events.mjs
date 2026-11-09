@@ -205,9 +205,26 @@ export function createEventService(db, { rt, notifier, audit }) {
   function getEvent(idOrSlug, viewerId = null) {
     const ev = db.get('SELECT * FROM events WHERE id = ? OR slug = ?', idOrSlug, idOrSlug);
     if (!ev) throw notFound('EVENT_NOT_FOUND');
-    const posts = db.all(`SELECT p.id, p.title, p.body, p.url, p.kind, p.category, p.created_at, p.occurred_at, p.content_hash, ep.relation, pr.handle, pr.display_name
+    const rawPosts = db.all(`SELECT p.id, p.author_id, p.visibility, p.moderation_state, p.title, p.body, p.url, p.kind, p.category, p.created_at, p.occurred_at, p.content_hash, ep.relation, pr.handle, pr.display_name
       FROM event_posts ep JOIN posts p ON p.id = ep.post_id JOIN profiles pr ON pr.user_id = p.author_id
       WHERE ep.event_id = ? AND p.deleted_at IS NULL ORDER BY ep.linked_at DESC`, ev.id);
+
+    // Apply strict access authorization: NEVER leak private or followers-only posts or blocked content to unauthorized viewers
+    const posts = rawPosts.filter((p) => {
+      if (p.moderation_state === 'REMOVED' && p.author_id !== viewerId) return false;
+      if (p.visibility === 'PRIVATE' && p.author_id !== viewerId) return false;
+      if (p.visibility === 'FOLLOWERS' && p.author_id !== viewerId) {
+        if (!viewerId) return false;
+        const isFollowing = Boolean(db.get("SELECT 1 FROM follows WHERE follower_id = ? AND target_type = 'USER' AND target_id = ?", viewerId, p.author_id));
+        if (!isFollowing) return false;
+      }
+      if (viewerId && p.author_id !== viewerId) {
+        const isBlocked = Boolean(db.get("SELECT 1 FROM blocks WHERE (blocker_id = ? AND blocked_id = ?) OR (blocker_id = ? AND blocked_id = ?)", viewerId, p.author_id, p.author_id, viewerId));
+        if (isBlocked) return false;
+      }
+      return true;
+    }).map(({ author_id, visibility, moderation_state, ...safePost }) => safePost);
+
     const sources = db.all('SELECT id, source_kind, independence_key, post_id, alert_id, created_at FROM event_sources WHERE event_id = ? ORDER BY created_at', ev.id);
     const evidence = db.all('SELECT id, post_id, original_url, external_id, acquired_at, author_ref, metadata, report_hash, prev_hash FROM event_evidence WHERE event_id = ? ORDER BY created_at', ev.id)
       .map((e) => ({ ...e, metadata: JSON.parse(e.metadata) }));

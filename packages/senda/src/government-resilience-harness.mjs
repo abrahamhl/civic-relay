@@ -20,18 +20,45 @@ function finite(n, min = -Infinity, max = Infinity) {
   return typeof n === 'number' && Number.isFinite(n) && n >= min && n <= max;
 }
 
+export const RESILIENCE_INDEX_LEVELS = Object.freeze({
+  LEVEL_1_HIGH: {
+    minScore: 90,
+    label: 'SENDA Internal Index Level 1 — Alta Resiliencia Técnica de Malla',
+    description: 'Diagnóstico interno: cumple parámetros de redundancia multi-portador y densidad de percolación simulada'
+  },
+  LEVEL_2_MEDIUM: {
+    minScore: 75,
+    label: 'SENDA Internal Index Level 2 — Resiliencia Intermedia de Corredor',
+    description: 'Diagnóstico interno: conectividad oportunista con cobertura parcial de corredor'
+  },
+  LEVEL_3_BASIC: {
+    minScore: 60,
+    label: 'SENDA Internal Index Level 3 — Contingencia Local Básica',
+    description: 'Diagnóstico interno: funcionalidad mínima de alerta local sin garantía de evacuación'
+  },
+  LEVEL_INSUFFICIENT: {
+    minScore: 0,
+    label: 'SENDA Internal Index — No Apto / Fragmentado',
+    description: 'No alcanza los umbrales mínimos de densidad o resiliencia de transporte'
+  }
+});
+
+// Backward-compatibility aliases with explicit internal index labeling
 export const COMPLIANCE_TIERS = Object.freeze({
-  TIER_1_SOVEREIGN: { minScore: 90, label: 'TIER 1 — SOBERANÍA CRÍTICA DEFENSA / UME', description: 'Apto para despliegue en zona de catástrofe total sin infraestructuras' },
-  TIER_2_CIVIL_PROTECTION: { minScore: 75, label: 'TIER 2 — PROTECCIÓN CIVIL REGIONAL', description: 'Apto para coordinación interprovincial y rescate de emergencias' },
-  TIER_3_MUNICIPAL: { minScore: 60, label: 'TIER 3 — RESILIENCIA MUNICIPAL', description: 'Apto para soporte de evacuación local y alertas ciudadanas' },
-  TIER_INSUFFICIENT: { minScore: 0, label: 'NO APTO', description: 'No cumple los estándares de fiabilidad gubernamental' }
+  TIER_1_SOVEREIGN: RESILIENCE_INDEX_LEVELS.LEVEL_1_HIGH,
+  TIER_2_CIVIL_PROTECTION: RESILIENCE_INDEX_LEVELS.LEVEL_2_MEDIUM,
+  TIER_3_MUNICIPAL: RESILIENCE_INDEX_LEVELS.LEVEL_3_BASIC,
+  TIER_INSUFFICIENT: RESILIENCE_INDEX_LEVELS.LEVEL_INSUFFICIENT,
 });
 
 /**
- * Runs an exhaustive multi-criteria evaluation of an emergency operational sector.
+ * Runs an internal multi-criteria diagnostic of an emergency operational sector.
+ *
+ * NOTE: This is an internal technical assessment tool, NOT an official accreditation,
+ * certification of military/defense readiness, or regulatory qualification.
  *
  * @param {object} sectorParameters
- * @param {string} sectorParameters.sectorId Identifier of the tested territory (e.g. 'A12_ARNHEM_EDE', 'SECTOR_VALENCIA_A3').
+ * @param {string} sectorParameters.sectorId Identifier of the tested territory.
  * @param {number} sectorParameters.activeNodes Number of peer nodes (vehicles, responders, base stations).
  * @param {number} sectorParameters.areaKm2 Geographic area in square kilometers.
  * @param {number} sectorParameters.effectiveRfRangeM Effective transmission radius over terrain.
@@ -39,8 +66,8 @@ export const COMPLIANCE_TIERS = Object.freeze({
  * @param {number} sectorParameters.activeClosures Count of road or bridge closures from DATEX II.
  * @param {boolean} sectorParameters.zeroCloudCapable Whether local mesh functions with 100% cloud severance.
  * @param {boolean} sectorParameters.merkleChainValid Whether cryptographic receipts verify back to Genesis.
- * @param {number} [sectorParameters.modelIoU=0.78] Out-of-sample model IoU score.
- * @returns {object} Full audit report with cryptographic seal.
+ * @param {number} [sectorParameters.modelIoU=null] Out-of-sample model IoU score (no default artificial score).
+ * @returns {object} Full audit report with cryptographic seal and accreditation disclaimers.
  */
 export function evaluateGovernmentResilience(sectorParameters) {
   const {
@@ -52,7 +79,7 @@ export function evaluateGovernmentResilience(sectorParameters) {
     activeClosures,
     zeroCloudCapable,
     merkleChainValid,
-    modelIoU = 0.78
+    modelIoU = null
   } = sectorParameters;
 
   if (!sectorId || !finite(activeNodes, 1) || !finite(areaKm2, 0.1) || !finite(effectiveRfRangeM, 1)) {
@@ -60,7 +87,6 @@ export function evaluateGovernmentResilience(sectorParameters) {
   }
 
   // Pillar 1: Black-Sky Infrastructure Score (P1)
-  // Max score requires zeroCloudCapable + resilient density
   const observedDensityKm2 = activeNodes / areaKm2;
   const percolation = computePercolationThreshold(effectiveRfRangeM);
   const percState = percolation.percolationState(observedDensityKm2);
@@ -71,7 +97,6 @@ export function evaluateGovernmentResilience(sectorParameters) {
   p1Score = Math.min(100, Math.round(p1Score));
 
   // Pillar 2: Corridor Evacuation Capacity (P2)
-  // Highway lane nominal capacity: ~1800 vehicles/hour/lane per Highway Capacity Manual (HCM)
   const nominalCapacityVehiclesPerHour = Math.max(1, roadLanes) * 1800;
   const closurePenaltyFactor = Math.max(0.1, 1.0 - (activeClosures * 0.25));
   const effectiveCapacityVehiclesPerHour = Math.round(nominalCapacityVehiclesPerHour * closurePenaltyFactor);
@@ -80,7 +105,6 @@ export function evaluateGovernmentResilience(sectorParameters) {
   p2Score = Math.min(100, Math.max(0, p2Score));
 
   // Pillar 3: Multi-Carrier Spectrum Agility (P3)
-  // Simulates availability across 433 MHz, 868 MHz, 2.4 GHz, 5.8 GHz and Satellite
   const dtn = computeDtnEpidemicSpreading(Math.max(2, activeNodes), 3.5, 24);
   let p3Score = 0;
   if (dtn.r0 > 1.0) p3Score += 50;
@@ -95,10 +119,16 @@ export function evaluateGovernmentResilience(sectorParameters) {
   p4Score = Math.min(100, Math.round(p4Score));
 
   // Pillar 5: Scientific Calibration Out-of-Sample Soundness (P5)
-  let p5Score = Math.round(Math.min(1.0, modelIoU / 0.85) * 100);
-  p5Score = Math.min(100, Math.max(0, p5Score));
+  // No synthetic default precision: must be observed empirically
+  let p5Score = 0;
+  let p5Status = 'MISSING_OBSERVED_EMPIRICAL_METRICS';
+  if (modelIoU !== null && finite(modelIoU, 0, 1.0)) {
+    p5Score = Math.round(Math.min(1.0, modelIoU / 0.85) * 100);
+    p5Score = Math.min(100, Math.max(0, p5Score));
+    p5Status = 'OBSERVED_OUT_OF_SAMPLE_VALIDATION';
+  }
 
-  // Overall Government Resilience Score (GRS)
+  // Overall Internal Resilience Score (SIRI)
   // Weighted: P1 (25%), P2 (20%), P3 (20%), P4 (20%), P5 (15%)
   const overallGrs = Math.round(
     p1Score * 0.25 +
@@ -108,13 +138,13 @@ export function evaluateGovernmentResilience(sectorParameters) {
     p5Score * 0.15
   );
 
-  let qualification = COMPLIANCE_TIERS.TIER_INSUFFICIENT;
-  if (overallGrs >= COMPLIANCE_TIERS.TIER_1_SOVEREIGN.minScore) {
-    qualification = COMPLIANCE_TIERS.TIER_1_SOVEREIGN;
-  } else if (overallGrs >= COMPLIANCE_TIERS.TIER_2_CIVIL_PROTECTION.minScore) {
-    qualification = COMPLIANCE_TIERS.TIER_2_CIVIL_PROTECTION;
-  } else if (overallGrs >= COMPLIANCE_TIERS.TIER_3_MUNICIPAL.minScore) {
-    qualification = COMPLIANCE_TIERS.TIER_3_MUNICIPAL;
+  let qualification = RESILIENCE_INDEX_LEVELS.LEVEL_INSUFFICIENT;
+  if (overallGrs >= RESILIENCE_INDEX_LEVELS.LEVEL_1_HIGH.minScore) {
+    qualification = RESILIENCE_INDEX_LEVELS.LEVEL_1_HIGH;
+  } else if (overallGrs >= RESILIENCE_INDEX_LEVELS.LEVEL_2_MEDIUM.minScore) {
+    qualification = RESILIENCE_INDEX_LEVELS.LEVEL_2_MEDIUM;
+  } else if (overallGrs >= RESILIENCE_INDEX_LEVELS.LEVEL_3_BASIC.minScore) {
+    qualification = RESILIENCE_INDEX_LEVELS.LEVEL_3_BASIC;
   }
 
   // Generate deterministic audit seal
@@ -129,6 +159,7 @@ export function evaluateGovernmentResilience(sectorParameters) {
       effectiveCapacityVehiclesPerHour,
       bottleneckIndex: Math.round(bottleneckIndex * 100) / 100,
       dtnT90Hours: dtn.t90Hours,
+      modelIoU,
     }
   });
 
@@ -138,14 +169,18 @@ export function evaluateGovernmentResilience(sectorParameters) {
     sectorId,
     evaluatedAt: new Date().toISOString(),
     overallScore: overallGrs,
-    qualificationLabel: qualification.label,
+    indexLevelLabel: qualification.label,
+    qualificationLabel: qualification.label, // alias
     qualificationDescription: qualification.description,
+    isExternalAccreditedCertification: false,
+    certificationAuthority: 'SENDA_INTERNAL_SIMULATION_HARNESS_NO_EXTERNAL_HOMOLOGATION',
+    disclaimer: 'This evaluation is an internal algorithmic benchmark of simulated network conditions. It does NOT constitute official certification, homologation or procurement qualification by UME, DGT, ERCC, NATO, or national civil protection authorities without independent third-party laboratory verification.',
     pillars: {
       blackSkyResilience: { score: p1Score, isPercolating: percState.isPercolating, densityRatio: Math.round(percState.densityRatio * 100) / 100 },
       evacuationThroughput: { score: p2Score, effectiveCapacityVehiclesPerHour, bottleneckIndex: Math.round(bottleneckIndex * 100) / 100 },
       multiCarrierAgility: { score: p3Score, epidemicR0: dtn.r0, t90DeliveryHours: dtn.t90Hours },
       cryptographicForensics: { score: p4Score, merkleValid: merkleChainValid },
-      empiricalCalibration: { score: p5Score, modelIoU },
+      empiricalCalibration: { score: p5Score, modelIoU, status: p5Status },
     },
     auditSealSha256: auditSha256,
   };

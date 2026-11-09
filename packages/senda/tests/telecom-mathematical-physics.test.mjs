@@ -7,6 +7,7 @@ import {
   computeKnifeEdgeLossDb,
   computeDeygoutDiffractionLoss,
   computeRainAttenuation,
+  computeCompleteLinkBudget,
   computeFadingOutageAndCapacity,
   computeSatelliteDopplerKinematics,
 } from '../src/telecom-mathematical-physics.mjs';
@@ -100,3 +101,83 @@ test('Satellite Doppler: orbital velocity, shift and PLL loop bandwidth', () => 
   // At 45° elevation, Doppler shift is around 6-7 kHz -> exceeds 5 kHz COTS limit
   assert.equal(typeof sat.isNarrowbandCotsFeasible, 'boolean');
 });
+
+test('Rain Attenuation: ITU-R P.838-3 continuity and polarization tests', () => {
+  // Test continuity at the previous discontinuity boundary (6.00 GHz vs 6.01 GHz at 20 mm/h)
+  const rain600 = computeRainAttenuation(6.00, 20, 'V');
+  const rain601 = computeRainAttenuation(6.01, 20, 'V');
+  const relativeDiff = Math.abs(rain601.specificAttenuationDbPerKm - rain600.specificAttenuationDbPerKm) / rain600.specificAttenuationDbPerKm;
+
+  // The relative difference must be less than 1.5% (smooth continuity, no step jump)
+  assert.ok(relativeDiff < 0.015, `Continuity failed: relative jump was ${(relativeDiff * 100).toFixed(2)}%`);
+  assert.ok(rain600.specificAttenuationDbPerKm > 0.04 && rain600.specificAttenuationDbPerKm < 0.07);
+
+  // Horizontal polarization has higher specific attenuation than vertical polarization on terrestrial path
+  const rain10H = computeRainAttenuation(10.0, 30, 'H');
+  const rain10V = computeRainAttenuation(10.0, 30, 'V');
+  assert.ok(rain10H.specificAttenuationDbPerKm > rain10V.specificAttenuationDbPerKm, 'Horizontal loss must exceed vertical loss');
+
+  // Circular polarization attenuation is intermediate between H and V
+  const rain10Circ = computeRainAttenuation(10.0, 30, 'CIRCULAR');
+  assert.ok(
+    rain10Circ.specificAttenuationDbPerKm >= rain10V.specificAttenuationDbPerKm &&
+    rain10Circ.specificAttenuationDbPerKm <= rain10H.specificAttenuationDbPerKm,
+    'Circular polarization loss must lie between V and H'
+  );
+
+  // For horizontal polarization, increasing elevation angle tilts towards circular cross-section, reducing specific loss
+  const rainSlant45H = computeRainAttenuation(12.0, 25, 'H', 45);
+  const rainHorizH = computeRainAttenuation(12.0, 25, 'H', 0);
+  assert.ok(rainSlant45H.specificAttenuationDbPerKm <= rainHorizH.specificAttenuationDbPerKm, 'Slant path for H polarization must have lower or equal specific loss');
+
+  // For vertical polarization, path attenuation over slant path includes reduction in rain cell path length
+  const rainSlant45V = computeRainAttenuation(12.0, 25, 'V', 45);
+  assert.ok(rainSlant45V.specificAttenuationDbPerKm > 0);
+});
+
+test('Link Budget: complete end-to-end telecom budget and regulatory compliance', () => {
+  // LoRa 868.1 MHz link over 4 km with 6 dB terrain diffraction loss
+  const loraLink = computeCompleteLinkBudget({
+    txPowerDbm: 14.0,       // 25 mW ETSI limit
+    txAntennaGainDbi: 2.15, // dipole
+    txCableLossDb: 0.5,
+    rxAntennaGainDbi: 2.15,
+    rxCableLossDb: 0.5,
+    frequencyHz: 868.1e6,
+    distanceM: 4000,
+    diffractionLossDb: 6.0,
+    rainRateMmHr: 20,
+    bandwidthHz: 125e3,
+    rxNoiseFigureDb: 6.0,
+    rxSensitivityDbm: -137.0, // LoRa SF12 sensitivity
+    requiredFadeMarginDb: 10.0,
+  });
+
+  assert.equal(loraLink.isRegulatoryCompliant, true);
+  assert.ok(loraLink.eirpDbm <= 15.65);
+  assert.ok(loraLink.fsplDb > 100 && loraLink.fsplDb < 110);
+  assert.ok(loraLink.fadeMarginDb > 10.0, 'LoRa SF12 should maintain healthy fade margin at 4km with 6dB diffraction');
+  assert.equal(loraLink.linkStatus, 'VIABLE');
+
+  // Wi-Fi 2.4 GHz link over 1500m with 25 dB severe obstacle diffraction loss -> Outage
+  const wifiLink = computeCompleteLinkBudget({
+    txPowerDbm: 20.0,
+    txAntennaGainDbi: 3.0,
+    txCableLossDb: 1.0,
+    rxAntennaGainDbi: 3.0,
+    rxCableLossDb: 1.0,
+    frequencyHz: 2.437e9,
+    distanceM: 1500,
+    diffractionLossDb: 25.0,
+    rainRateMmHr: 30,
+    bandwidthHz: 20e6,
+    rxNoiseFigureDb: 7.0,
+    rxSensitivityDbm: -85.0,
+    requiredFadeMarginDb: 10.0,
+  });
+
+  assert.equal(wifiLink.isRegulatoryCompliant, false); // 20 + 3 - 1 = 22 dBm > 20 dBm ETSI limit
+  assert.equal(wifiLink.linkStatus, 'OUTAGE');
+  assert.equal(wifiLink.isViable, false);
+});
+

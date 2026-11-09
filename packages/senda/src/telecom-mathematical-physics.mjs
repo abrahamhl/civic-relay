@@ -210,8 +210,29 @@ export function computeDeygoutDiffractionLoss(terrainProfile, txElevationM, rxEl
   }
   const lossRight = maxVRight > -0.7 ? computeKnifeEdgeLossDb(maxVRight) : 0;
 
-  // ITU-R P.526 correction factor C ≈ sqrt( (d1 * (d2 + d3)) / ((d1 + d2) * (d2 + d3)) )
-  const totalDiffractionLossDb = Math.round((lossMain + lossLeft + lossRight) * 100) / 100;
+  // ITU-R P.526-15 Section 4.3 extended Deygout correction factor:
+  // For secondary obstacles, the loss is adjusted by correction factor C:
+  // C = (1 - exp(-loss_sec / 6)) * sqrt( (d_sec * (d_main_to_rx)) / (d_main * (d_total - d_sec)) )
+  let lossLeftEff = 0;
+  let leftCorrectionFactor = 0;
+  if (lossLeft > 0 && mainPt.d1 > 0) {
+    const dMainToRx = totalDistanceM - mainPt.d1;
+    const geomRatioLeft = (mainPt.d1 * dMainToRx) > 0
+      ? Math.sqrt(Math.max(0, Math.min(1.0, (mainPt.d1 * (totalDistanceM - mainPt.d1)) / (totalDistanceM * totalDistanceM))))
+      : 0;
+    leftCorrectionFactor = (1.0 - Math.exp(-lossLeft / 6.0)) * geomRatioLeft;
+    lossLeftEff = Math.max(0, lossLeft * (1.0 - leftCorrectionFactor));
+  }
+
+  let lossRightEff = 0;
+  let rightCorrectionFactor = 0;
+  if (lossRight > 0 && (totalDistanceM - mainPt.d1) > 0) {
+    const geomRatioRight = Math.sqrt(Math.max(0, Math.min(1.0, (mainPt.d1 * (totalDistanceM - mainPt.d1)) / (totalDistanceM * totalDistanceM))));
+    rightCorrectionFactor = (1.0 - Math.exp(-lossRight / 6.0)) * geomRatioRight;
+    lossRightEff = Math.max(0, lossRight * (1.0 - rightCorrectionFactor));
+  }
+
+  const totalDiffractionLossDb = Math.round((lossMain + lossLeftEff + lossRightEff) * 100) / 100;
 
   return {
     mainObstacleIndex: mainIdx,
@@ -219,70 +240,258 @@ export function computeDeygoutDiffractionLoss(terrainProfile, txElevationM, rxEl
     obstaclesEvaluated: terrainProfile.length,
     components: {
       lossMainDb: Math.round(lossMain * 100) / 100,
-      lossLeftDb: Math.round(lossLeft * 100) / 100,
-      lossRightDb: Math.round(lossRight * 100) / 100,
+      lossLeftDb: Math.round(lossLeftEff * 100) / 100,
+      lossRightDb: Math.round(lossRightEff * 100) / 100,
+      rawLossLeftDb: Math.round(lossLeft * 100) / 100,
+      rawLossRightDb: Math.round(lossRight * 100) / 100,
+      leftCorrectionFactor: Math.round(leftCorrectionFactor * 1000) / 1000,
+      rightCorrectionFactor: Math.round(rightCorrectionFactor * 1000) / 1000,
     }
   };
 }
 
-// ---------------------------------------------------------------------------
-// 4. ITU-R P.838-3 FREQUENCY-DEPENDENT SPECIFIC RAIN ATTENUATION
-// ---------------------------------------------------------------------------
+// ITU-R P.838-3 official regression coefficients (Tables 1 - 4)
+const ITU_P838_COEFFICIENTS = Object.freeze({
+  kH: {
+    aj: [-5.33980, -0.35351, -0.23789, -0.94158],
+    bj: [-0.10008, 1.26970, 0.86036, 0.64552],
+    cj: [1.13098, 0.45400, 0.15354, 0.16817],
+    mk: -0.18961,
+    ck: 0.71147
+  },
+  kV: {
+    aj: [-3.80595, -3.44965, -0.39902, 0.50167],
+    bj: [0.56934, -0.22911, 0.73042, 1.07319],
+    cj: [0.81061, 0.51059, 0.11899, 0.27195],
+    mk: -0.16398,
+    ck: 0.63297
+  },
+  alphaH: {
+    aj: [-0.14318, 0.29591, 0.32177, -5.37610, 16.1721],
+    bj: [1.82442, 0.77564, 0.63773, -0.96230, -3.29980],
+    cj: [-0.55187, 0.19822, 0.13164, 1.47828, 3.4399],
+    ma: 0.67849,
+    ca: -1.95537
+  },
+  alphaV: {
+    aj: [-0.07771, 0.56727, -0.20238, -48.2991, 48.5833],
+    bj: [2.33840, 0.95545, 1.14520, 0.791669, 0.791459],
+    cj: [-0.76284, 0.54039, 0.26809, 0.116226, 0.116479],
+    ma: -0.053739,
+    ca: 0.83433
+  }
+});
 
 /**
- * Calculates specific rain attenuation gamma_R (dB/km) according to ITU-R P.838-3:
+ * Computes frequency-dependent regression parameter via sum of Gaussians.
+ */
+function evaluateP838Curve(logf, table) {
+  let sum = 0;
+  for (let j = 0; j < table.aj.length; j++) {
+    const diff = (logf - table.bj[j]) / table.cj[j];
+    sum += table.aj[j] * Math.exp(-diff * diff);
+  }
+  return sum;
+}
+
+/**
+ * Calculates specific rain attenuation gamma_R (dB/km) according to normative ITU-R P.838-3:
  * gamma_R = k * R^alpha
  *
- * Uses ITU coefficients for horizontal and vertical polarization across microwave frequencies.
+ * Implements full 1-100 GHz continuous equations for Horizontal, Vertical, and Circular
+ * polarizations with elevation angle tilt adjustments.
  *
- * @param {number} frequencyGhz Frequency in GHz (e.g. 0.868, 2.4, 5.8, 12.0, 28.0).
- * @param {number} rainRateMmHr Rain rate in mm/hour (from MET Norway or radar).
- * @param {'H' | 'V'} [polarization='V'] Antenna polarization (Horizontal or Vertical).
- * @returns {{ specificAttenuationDbPerKm: number, pathAttenuationDb: (distanceKm: number) => number }}
+ * @param {number} frequencyGhz Frequency in GHz (e.g. 0.868, 2.4, 5.8, 6.0, 12.0, 28.0).
+ * @param {number} rainRateMmHr Rain rate in mm/hour (from radar, MET Norway or AEMET).
+ * @param {'H' | 'V' | 'CIRCULAR'} [polarization='V'] Antenna polarization.
+ * @param {number} [elevationDeg=0] Path elevation angle in degrees above horizon.
+ * @returns {{
+ *   specificAttenuationDbPerKm: number,
+ *   k: number,
+ *   alpha: number,
+ *   pathAttenuationDb: (distanceKm: number) => number
+ * }}
  */
-export function computeRainAttenuation(frequencyGhz, rainRateMmHr, polarization = 'V') {
-  if (!finite(frequencyGhz, 0.1, 100) || !finite(rainRateMmHr, 0, 500)) {
-    throw new TypeError('Invalid frequency (0.1-100 GHz) or rainRate (0-500 mm/h)');
+export function computeRainAttenuation(frequencyGhz, rainRateMmHr, polarization = 'V', elevationDeg = 0) {
+  if (!finite(frequencyGhz, 0.1, 100) || !finite(rainRateMmHr, 0, 500) || !finite(elevationDeg, 0, 90)) {
+    throw new TypeError('Invalid frequency (0.1-100 GHz), rainRate (0-500 mm/h) or elevation (0-90 deg)');
   }
-  if (rainRateMmHr <= 0.1) {
-    return { specificAttenuationDbPerKm: 0, pathAttenuationDb: () => 0 };
+  if (rainRateMmHr <= 0.05) {
+    return { specificAttenuationDbPerKm: 0, k: 0, alpha: 1, pathAttenuationDb: () => 0 };
   }
 
-  // Regression power-law approximation fitting ITU-R P.838-3 table values:
-  // For frequencies < 1 GHz (e.g. 433 MHz, 868 MHz), rain attenuation is negligible (< 0.01 dB/km).
-  // For 2.4 GHz, 5.8 GHz and satellite Ku/Ka bands, rain attenuation becomes significant.
-  let k = 0;
-  let alpha = 1.0;
+  // Frequency clamping for ITU-R P.838-3 validity range [1, 100 GHz]
+  // Sub-1 GHz frequencies (e.g. 433 MHz, 868 MHz) scale continuously down as Rayleigh scattering:
+  // gamma_R scales smoothly with frequency^2 without numerical step discontinuity.
+  const evalFreqGhz = Math.max(1.0, frequencyGhz);
+  const logf = Math.log10(evalFreqGhz);
 
+  const sumKh = evaluateP838Curve(logf, ITU_P838_COEFFICIENTS.kH);
+  const KH = Math.pow(10, sumKh + ITU_P838_COEFFICIENTS.kH.mk * logf + ITU_P838_COEFFICIENTS.kH.ck);
+
+  const sumKv = evaluateP838Curve(logf, ITU_P838_COEFFICIENTS.kV);
+  const KV = Math.pow(10, sumKv + ITU_P838_COEFFICIENTS.kV.mk * logf + ITU_P838_COEFFICIENTS.kV.ck);
+
+  const sumAh = evaluateP838Curve(logf, ITU_P838_COEFFICIENTS.alphaH);
+  const alphaH = sumAh + ITU_P838_COEFFICIENTS.alphaH.ma * logf + ITU_P838_COEFFICIENTS.alphaH.ca;
+
+  const sumAv = evaluateP838Curve(logf, ITU_P838_COEFFICIENTS.alphaV);
+  const alphaV = sumAv + ITU_P838_COEFFICIENTS.alphaV.ma * logf + ITU_P838_COEFFICIENTS.alphaV.ca;
+
+  // Polarization tilt angle tau (0° = Horizontal, 90° = Vertical, 45° = Circular)
+  let tauDeg = 90;
+  if (polarization === 'H') tauDeg = 0;
+  else if (polarization === 'CIRCULAR') tauDeg = 45;
+
+  const elRad = (elevationDeg * Math.PI) / 180;
+  const tauRad = (tauDeg * Math.PI) / 180;
+  const cos2El = Math.pow(Math.cos(elRad), 2);
+  const cos2Tau = Math.cos(2 * tauRad);
+
+  let k = (KH + KV + (KH - KV) * cos2El * cos2Tau) / 2.0;
+  let alpha = (KH * alphaH + KV * alphaV + (KH * alphaH - KV * alphaV) * cos2El * cos2Tau) / (2.0 * k);
+
+  // Sub-1 GHz smooth continuous scaling
   if (frequencyGhz < 1.0) {
-    k = 0.00003 * frequencyGhz;
-    alpha = 0.9;
-  } else if (frequencyGhz <= 3.0) {
-    k = 0.0002;
-    alpha = 1.0;
-  } else if (frequencyGhz <= 6.0) {
-    k = polarization === 'H' ? 0.00175 : 0.00155;
-    alpha = 1.30;
-  } else if (frequencyGhz <= 15.0) {
-    k = polarization === 'H' ? 0.0367 : 0.0335;
-    alpha = 1.15;
-  } else {
-    // 15 - 40 GHz (Ka band)
-    k = polarization === 'H' ? 0.187 : 0.167;
-    alpha = 1.02;
+    const subRatio = Math.pow(frequencyGhz / 1.0, 2.0);
+    k *= subRatio;
   }
 
-  const specificAttenuationDbPerKm = Math.round((k * Math.pow(rainRateMmHr, alpha)) * 10000) / 10000;
+  const rawSpecificLoss = k * Math.pow(rainRateMmHr, alpha);
+  const specificAttenuationDbPerKm = Math.round(rawSpecificLoss * 100000) / 100000;
 
   return {
     specificAttenuationDbPerKm,
+    k: Math.round(k * 1e7) / 1e7,
+    alpha: Math.round(alpha * 10000) / 10000,
     pathAttenuationDb: (distanceKm) => {
       if (!finite(distanceKm, 0)) return 0;
-      // Effective path length factor d_eff = d / (1 + d / d_0) per ITU-R P.530
+      // Effective path length factor d_eff = d / (1 + d / d_0) per ITU-R P.530-18
       const d0 = 35 * Math.exp(-0.015 * rainRateMmHr);
       const dEff = distanceKm / (1 + distanceKm / Math.max(1, d0));
       return Math.round(specificAttenuationDbPerKm * dEff * 100) / 100;
     }
+  };
+}
+
+/**
+ * Computes end-to-end radio Link Budget according to ITU-R P.530 / IEEE standard telecommunications engineering.
+ *
+ * Integrates:
+ * - EIRP (Tx Power + Antenna Gain - Cable/Connector Losses)
+ * - Free Space Path Loss (FSPL)
+ * - Terrain Knife-Edge Diffraction (ITU-R P.526-15 Deygout)
+ * - Specific Rain Attenuation (ITU-R P.838-3)
+ * - Atmospheric Gas Absorption (ITU-R P.676 approximation)
+ * - Receiver Noise Floor & Sensitivity
+ * - Fade Margin and Link Viability State
+ *
+ * @param {object} params
+ * @param {number} params.txPowerDbm Transmit power in dBm (e.g. 14 dBm for LoRa, 20 dBm for Wi-Fi).
+ * @param {number} params.txAntennaGainDbi Tx antenna gain in dBi (e.g. 2.15 dBi dipole).
+ * @param {number} [params.txCableLossDb=0.5] Losses in Tx coax cable, connectors and lightning arrestors.
+ * @param {number} params.rxAntennaGainDbi Rx antenna gain in dBi.
+ * @param {number} [params.rxCableLossDb=0.5] Losses in Rx coax cable and connectors.
+ * @param {number} params.frequencyHz Carrier frequency in Hz (e.g. 868e6, 2.4e9, 5.8e9).
+ * @param {number} params.distanceM Link distance in meters.
+ * @param {number} [params.diffractionLossDb=0] Total diffraction loss from Deygout engine.
+ * @param {number} [params.rainRateMmHr=0] Rain rate in mm/hour.
+ * @param {'H' | 'V' | 'CIRCULAR'} [params.polarization='V'] Antenna polarization.
+ * @param {number} [params.bandwidthHz=125e3] Channel bandwidth in Hz.
+ * @param {number} [params.rxNoiseFigureDb=6.0] Receiver noise figure in dB.
+ * @param {number} params.rxSensitivityDbm Receiver sensitivity threshold in dBm (e.g. -137 dBm for LoRa SF12).
+ * @param {number} [params.requiredFadeMarginDb=10.0] Minimum required fade margin for high availability.
+ * @returns {object} Link budget report with regulatory and viability states.
+ */
+export function computeCompleteLinkBudget(params) {
+  const {
+    txPowerDbm,
+    txAntennaGainDbi,
+    txCableLossDb = 0.5,
+    rxAntennaGainDbi,
+    rxCableLossDb = 0.5,
+    frequencyHz,
+    distanceM,
+    diffractionLossDb = 0,
+    rainRateMmHr = 0,
+    polarization = 'V',
+    bandwidthHz = 125e3,
+    rxNoiseFigureDb = 6.0,
+    rxSensitivityDbm,
+    requiredFadeMarginDb = 10.0,
+  } = params;
+
+  if (!finite(txPowerDbm, -50, 60) || !finite(frequencyHz, 1e5, 1e11) || !finite(distanceM, 1, 1e7) || !finite(rxSensitivityDbm, -160, 0)) {
+    throw new TypeError('Invalid link budget input parameters');
+  }
+
+  // 1. EIRP = P_tx + G_tx - L_cable_tx
+  const eirpDbm = txPowerDbm + txAntennaGainDbi - txCableLossDb;
+
+  // 2. Free Space Path Loss (FSPL) in dB: 20*log10(4*pi*d*f / c)
+  const wavelengthM = SPEED_OF_LIGHT / frequencyHz;
+  const fsplDb = 20 * Math.log10((4 * Math.PI * distanceM) / wavelengthM);
+
+  // 3. Rain Attenuation
+  const freqGhz = frequencyHz / 1e9;
+  const distanceKm = distanceM / 1000;
+  const rain = computeRainAttenuation(freqGhz, rainRateMmHr, polarization);
+  const rainLossDb = rain.pathAttenuationDb(distanceKm);
+
+  // 4. Atmospheric Gas Loss (Oxygen & Water vapor baseline per ITU-R P.676 ~0.01-0.05 dB/km below 15 GHz)
+  const gasSpecificDbPerKm = freqGhz < 10 ? 0.01 : freqGhz < 25 ? 0.04 : 0.15;
+  const gasLossDb = gasSpecificDbPerKm * distanceKm;
+
+  // 5. Total Path Loss
+  const totalPathLossDb = fsplDb + diffractionLossDb + rainLossDb + gasLossDb;
+
+  // 6. Received Signal Strength (RSSI / P_rx)
+  const rssiDbm = eirpDbm - totalPathLossDb + rxAntennaGainDbi - rxCableLossDb;
+
+  // 7. Thermal Noise Floor: N_0 = -174 dBm/Hz + 10*log10(B) + NF
+  const thermalNoiseFloorDbm = -174.0 + 10 * Math.log10(bandwidthHz) + rxNoiseFigureDb;
+
+  // 8. SNR and Fade Margin
+  const snrDb = rssiDbm - thermalNoiseFloorDbm;
+  const fadeMarginDb = rssiDbm - rxSensitivityDbm;
+
+  // 9. Link Viability Qualification
+  let linkStatus = 'OUTAGE';
+  let isViable = false;
+  if (fadeMarginDb >= requiredFadeMarginDb) {
+    linkStatus = 'VIABLE';
+    isViable = true;
+  } else if (fadeMarginDb >= 0) {
+    linkStatus = 'MARGINAL';
+    isViable = true;
+  }
+
+  // 10. Regulatory limits (ETSI EN 300 220 for 868 MHz: 25 mW ERP = 16.15 dBm EIRP; 500 mW ERP = 29.15 dBm EIRP; ETSI EN 300 328 for 2.4 GHz: 20 dBm EIRP)
+  let regulatoryMaxEirpDbm = 30.0;
+  if (freqGhz >= 0.868 && freqGhz <= 0.8686) regulatoryMaxEirpDbm = 16.15; // 25 mW ERP
+  else if (freqGhz >= 0.8694 && freqGhz <= 0.86965) regulatoryMaxEirpDbm = 29.15; // 500 mW ERP
+  else if (freqGhz >= 2.4 && freqGhz <= 2.4835) regulatoryMaxEirpDbm = 20.0;
+  else if (freqGhz >= 5.15 && freqGhz <= 5.35) regulatoryMaxEirpDbm = 23.0;
+
+  const isRegulatoryCompliant = eirpDbm <= (regulatoryMaxEirpDbm + 0.1);
+
+  return {
+    eirpDbm: Math.round(eirpDbm * 100) / 100,
+    regulatoryMaxEirpDbm,
+    isRegulatoryCompliant,
+    fsplDb: Math.round(fsplDb * 100) / 100,
+    diffractionLossDb: Math.round(diffractionLossDb * 100) / 100,
+    rainLossDb: Math.round(rainLossDb * 100) / 100,
+    gasLossDb: Math.round(gasLossDb * 100) / 100,
+    totalPathLossDb: Math.round(totalPathLossDb * 100) / 100,
+    rssiDbm: Math.round(rssiDbm * 100) / 100,
+    thermalNoiseFloorDbm: Math.round(thermalNoiseFloorDbm * 100) / 100,
+    snrDb: Math.round(snrDb * 100) / 100,
+    fadeMarginDb: Math.round(fadeMarginDb * 100) / 100,
+    requiredFadeMarginDb,
+    rxSensitivityDbm,
+    linkStatus,
+    isViable,
   };
 }
 

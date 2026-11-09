@@ -205,7 +205,8 @@ export function createApiHandler({
   });
 
   router.get('/api/stories', (req, res) => {
-    const stories = social.listStories();
+    const s = getSession(req);
+    const stories = social.listStories(Date.now(), s?.userId);
     sendJson(res, 200, { stories });
   });
 

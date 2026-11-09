@@ -345,3 +345,111 @@ export function computeRadioShadowField(terrain, {
     hypotheticalEquipment: true, fieldValidated: false,
   };
 }
+
+/**
+ * Standard COTS RF Transceiver presets for link budget estimation.
+ */
+export const LINK_BUDGET_PRESETS = Object.freeze({
+  low433: { frequencyMHz: 433, txPowerDbm: 10.0, txGainDbi: 2.15, rxGainDbi: 2.15, cableLossDb: 0.5, bandwidthKHz: 125, noiseFigureDb: 6.0, sensitivityDbm: -135.0, maxRegulatoryEirpDbm: 10.0 },
+  sr868: { frequencyMHz: 868, txPowerDbm: 14.0, txGainDbi: 2.15, rxGainDbi: 2.15, cableLossDb: 0.5, bandwidthKHz: 125, noiseFigureDb: 6.0, sensitivityDbm: -137.0, maxRegulatoryEirpDbm: 16.15 },
+  wifi24: { frequencyMHz: 2400, txPowerDbm: 20.0, txGainDbi: 3.0, rxGainDbi: 3.0, cableLossDb: 1.0, bandwidthKHz: 20000, noiseFigureDb: 7.0, sensitivityDbm: -92.0, maxRegulatoryEirpDbm: 20.0 },
+  wifi58: { frequencyMHz: 5800, txPowerDbm: 23.0, txGainDbi: 5.0, rxGainDbi: 5.0, cableLossDb: 1.5, bandwidthKHz: 40000, noiseFigureDb: 7.5, sensitivityDbm: -85.0, maxRegulatoryEirpDbm: 23.0 },
+});
+
+/**
+ * Computes a standard radio Link Budget including free space, diffraction, noise floor, and fade margin.
+ * NOT an authorized field deployment guarantee or certified spectrum license.
+ *
+ * @param {object} options
+ * @returns {object} Link budget analysis with regulatory checks and viability classification.
+ */
+export function computeRadioLinkBudget({
+  frequencyMHz = 868,
+  distanceM = 1000,
+  diffractionLossDb = 0,
+  rainRateMmHr = 0,
+  txPowerDbm = null,
+  txGainDbi = null,
+  rxGainDbi = null,
+  cableLossDb = null,
+  bandwidthKHz = null,
+  noiseFigureDb = null,
+  sensitivityDbm = null,
+  requiredMarginDb = 10.0,
+} = {}) {
+  if (!finite(frequencyMHz, 100, 10000) || !finite(distanceM, 1, 1000000)) {
+    throw Error('INVALID_LINK_BUDGET_INPUT');
+  }
+
+  // Find nearest preset for transceiver defaults
+  let preset = LINK_BUDGET_PRESETS.sr868;
+  if (frequencyMHz < 600) preset = LINK_BUDGET_PRESETS.low433;
+  else if (frequencyMHz < 1500) preset = LINK_BUDGET_PRESETS.sr868;
+  else if (frequencyMHz < 4000) preset = LINK_BUDGET_PRESETS.wifi24;
+  else preset = LINK_BUDGET_PRESETS.wifi58;
+
+  const txP = txPowerDbm !== null && finite(txPowerDbm, -40, 50) ? txPowerDbm : preset.txPowerDbm;
+  const txG = txGainDbi !== null && finite(txGainDbi, -10, 40) ? txGainDbi : preset.txGainDbi;
+  const rxG = rxGainDbi !== null && finite(rxGainDbi, -10, 40) ? rxGainDbi : preset.rxGainDbi;
+  const cLoss = cableLossDb !== null && finite(cableLossDb, 0, 20) ? cableLossDb : preset.cableLossDb;
+  const bw = bandwidthKHz !== null && finite(bandwidthKHz, 1, 160000) ? bandwidthKHz : preset.bandwidthKHz;
+  const nf = noiseFigureDb !== null && finite(noiseFigureDb, 1, 20) ? noiseFigureDb : preset.noiseFigureDb;
+  const sens = sensitivityDbm !== null && finite(sensitivityDbm, -160, 0) ? sensitivityDbm : preset.sensitivityDbm;
+
+  const eirpDbm = Number((txP + txG - cLoss).toFixed(2));
+  const km = distanceM / 1000;
+  const fsplDb = Number((32.44 + 20 * Math.log10(km) + 20 * Math.log10(frequencyMHz)).toFixed(2));
+
+  // ITU-R P.838 approximation for specific rain attenuation
+  const freqGhz = frequencyMHz / 1000;
+  let kRain = 0.0002;
+  let alphaRain = 1.0;
+  if (freqGhz >= 5.0) {
+    kRain = 0.0016;
+    alphaRain = 1.4;
+  }
+  const rainSpecificDbPerKm = rainRateMmHr > 0.1 ? kRain * Math.pow(rainRateMmHr, alphaRain) : 0;
+  const rainLossDb = Number((rainSpecificDbPerKm * km).toFixed(2));
+
+  const totalLossDb = Number((fsplDb + diffractionLossDb + rainLossDb).toFixed(2));
+  const rssiDbm = Number((eirpDbm - totalLossDb + rxG - cLoss).toFixed(2));
+
+  // Thermal noise floor = -174 dBm/Hz + 10*log10(BW_Hz) + NF
+  const bwHz = bw * 1000;
+  const noiseFloorDbm = Number((-174.0 + 10 * Math.log10(bwHz) + nf).toFixed(2));
+  const snrDb = Number((rssiDbm - noiseFloorDbm).toFixed(2));
+  const fadeMarginDb = Number((rssiDbm - sens).toFixed(2));
+
+  let linkStatus = 'OUTAGE';
+  if (fadeMarginDb >= requiredMarginDb) linkStatus = 'VIABLE';
+  else if (fadeMarginDb >= 0) linkStatus = 'MARGINAL';
+
+  const isRegulatoryCompliant = eirpDbm <= (preset.maxRegulatoryEirpDbm + 0.1);
+
+  return {
+    schema: 'senda.rf.link-budget/1',
+    frequencyMHz,
+    distanceM: Math.round(distanceM),
+    eirpDbm,
+    maxRegulatoryEirpDbm: preset.maxRegulatoryEirpDbm,
+    isRegulatoryCompliant,
+    pathLoss: {
+      freeSpaceLossDb: fsplDb,
+      diffractionLossDb: Number(diffractionLossDb.toFixed(2)),
+      rainLossDb,
+      totalLossDb,
+    },
+    receiver: {
+      rssiDbm,
+      noiseFloorDbm,
+      snrDb,
+      sensitivityDbm: sens,
+      fadeMarginDb,
+      requiredMarginDb,
+    },
+    linkStatus,
+    isViable: linkStatus !== 'OUTAGE',
+    disclaimer: 'THEORETICAL_ESTIMATE_NOT_MEASURED_RADIO_LINK',
+  };
+}
+

@@ -91,3 +91,44 @@ export function computeRadioShadowField(terrain: TerrainGridSnapshot, options?: 
   originSite?:string;frequencyMHz?:number;transmitterHeightM?:number;
   receiverHeightM?:number;gridSize?:number;maxRangeKm?:number;kFactor?:number;
 }): RadioShadowField;
+
+export interface RadioLinkBudgetResult {
+  schema: 'senda.rf.link-budget/1';
+  frequencyMHz: number;
+  distanceM: number;
+  eirpDbm: number;
+  maxRegulatoryEirpDbm: number;
+  isRegulatoryCompliant: boolean;
+  pathLoss: {
+    freeSpaceLossDb: number;
+    diffractionLossDb: number;
+    rainLossDb: number;
+    totalLossDb: number;
+  };
+  receiver: {
+    rssiDbm: number;
+    noiseFloorDbm: number;
+    snrDb: number;
+    sensitivityDbm: number;
+    fadeMarginDb: number;
+    requiredMarginDb: number;
+  };
+  linkStatus: 'VIABLE' | 'MARGINAL' | 'OUTAGE';
+  isViable: boolean;
+  disclaimer: string;
+}
+export function computeRadioLinkBudget(options?: {
+  frequencyMHz?: number;
+  distanceM?: number;
+  diffractionLossDb?: number;
+  rainRateMmHr?: number;
+  txPowerDbm?: number | null;
+  txGainDbi?: number | null;
+  rxGainDbi?: number | null;
+  cableLossDb?: number | null;
+  bandwidthKHz?: number | null;
+  noiseFigureDb?: number | null;
+  sensitivityDbm?: number | null;
+  requiredMarginDb?: number;
+}): RadioLinkBudgetResult;
+

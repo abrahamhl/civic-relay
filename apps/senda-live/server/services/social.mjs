@@ -162,6 +162,15 @@ export function createSocialService(db, { rt, notifier, events, audit, fetcher }
     if (!r) throw notFound('POST_NOT_FOUND');
     if (r.visibility === 'PRIVATE' && r.author_id !== viewerId) throw notFound('POST_NOT_FOUND');
     if (r.moderation_state === 'REMOVED' && r.author_id !== viewerId) throw notFound('POST_NOT_FOUND');
+    if (r.visibility === 'FOLLOWERS' && r.author_id !== viewerId) {
+      if (!viewerId) throw notFound('POST_NOT_FOUND');
+      const isFollowing = Boolean(db.get("SELECT 1 FROM follows WHERE follower_id = ? AND target_type = 'USER' AND target_id = ?", viewerId, r.author_id));
+      if (!isFollowing) throw notFound('POST_NOT_FOUND');
+    }
+    if (viewerId && r.author_id !== viewerId) {
+      const isBlocked = Boolean(db.get("SELECT 1 FROM blocks WHERE (blocker_id = ? AND blocked_id = ?) OR (blocker_id = ? AND blocked_id = ?)", viewerId, r.author_id, r.author_id, viewerId));
+      if (isBlocked) throw notFound('POST_NOT_FOUND');
+    }
     return hydratePosts([r], viewerId)[0];
   }
 
@@ -250,10 +259,32 @@ export function createSocialService(db, { rt, notifier, events, audit, fetcher }
       .map((r) => ({ id: r.id, postId: r.post_id, body: r.body, createdAt: r.created_at, author: { id: r.author_id, handle: r.handle, displayName: r.display_name } }));
   }
 
-  function listStories(now = Date.now()) {
-    return db.all(`SELECT s.*, p.handle, p.display_name, e.title AS event_title, e.status AS event_status
+  function listStories(now = Date.now(), viewerId = null) {
+    const rows = db.all(`SELECT s.*, p.handle, p.display_name, e.title AS event_title, e.status AS event_status
       FROM stories s JOIN profiles p ON p.user_id = s.author_id LEFT JOIN events e ON e.id = s.event_id
-      WHERE s.expires_at > ? ORDER BY s.created_at DESC LIMIT 60`, now).map((s) => ({
+      WHERE s.expires_at > ? ORDER BY s.created_at DESC LIMIT 60`, now);
+
+    return rows.filter((s) => {
+      // Check user blocks
+      if (viewerId && s.author_id !== viewerId) {
+        const isBlocked = Boolean(db.get("SELECT 1 FROM blocks WHERE (blocker_id = ? AND blocked_id = ?) OR (blocker_id = ? AND blocked_id = ?)", viewerId, s.author_id, s.author_id, viewerId));
+        if (isBlocked) return false;
+      }
+      // If story is linked to a post, ensure viewer is authorized to see that post
+      if (s.post_id) {
+        const p = db.get("SELECT author_id, visibility, moderation_state FROM posts WHERE id = ? AND deleted_at IS NULL", s.post_id);
+        if (p) {
+          if (p.moderation_state === 'REMOVED' && p.author_id !== viewerId) return false;
+          if (p.visibility === 'PRIVATE' && p.author_id !== viewerId) return false;
+          if (p.visibility === 'FOLLOWERS' && p.author_id !== viewerId) {
+            if (!viewerId) return false;
+            const isFollowing = Boolean(db.get("SELECT 1 FROM follows WHERE follower_id = ? AND target_type = 'USER' AND target_id = ?", viewerId, p.author_id));
+            if (!isFollowing) return false;
+          }
+        }
+      }
+      return true;
+    }).map((s) => ({
       id: s.id, mode: s.mode, postId: s.post_id, eventId: s.event_id, eventTitle: s.event_title, eventStatus: s.event_status,
       text: s.text, url: s.url, createdAt: s.created_at, expiresAt: s.expires_at,
       isSimulation: s.mode === 'RESEARCH_SIMULATION',

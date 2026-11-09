@@ -3,6 +3,14 @@ import * as THREE from 'three';
 import { api } from '../api/client';
 import type { TerrainGridSnapshot } from '../offline/terrain-snapshot';
 import type { WeatherSnapshot, WeatherMetric } from '../offline/weather-snapshot';
+import {
+  AUTHENTIC_DATED_TLES,
+  parseTle,
+  propagateKeplerJ2,
+  lookAngles,
+  type LookAnglesResult,
+  type ParsedTle
+} from '../science/orbital-kinematics.mjs';
 
 interface Props {
   onClose?: () => void;
@@ -23,6 +31,10 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
   const [showParticles, setShowParticles] = useState<boolean>(true);
   const [showFresnel, setShowFresnel] = useState<boolean>(true);
   const [showSatellites, setShowSatellites] = useState<boolean>(true);
+  const [orbitMode, setOrbitMode] = useState<'SCIENTIFIC_CALCULATED' | 'CINEMATIC_ILLUSTRATIVE'>('SCIENTIFIC_CALCULATED');
+  const [selectedSatKey, setSelectedSatKey] = useState<string>('SENTINEL_3A');
+  const [satTelemetry, setSatTelemetry] = useState<LookAnglesResult | null>(null);
+  const orbitModeRef = useRef<'SCIENTIFIC_CALCULATED' | 'CINEMATIC_ILLUSTRATIVE'>('SCIENTIFIC_CALCULATED');
   const [showObservations, setShowObservations] = useState<boolean>(true);
   const [showUavTactical, setShowUavTactical] = useState<boolean>(true);
   const [showCotsDrones, setShowCotsDrones] = useState<boolean>(true);
@@ -208,6 +220,92 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
     }
   };
 
+  // Live Satellite Telemetry Updates for selected ground station
+  useEffect(() => {
+    if (!showSatellites) return;
+    const updateTelemetry = () => {
+      const satMeta = AUTHENTIC_DATED_TLES[selectedSatKey as keyof typeof AUTHENTIC_DATED_TLES];
+      if (!satMeta) return;
+      try {
+        const el = parseTle(satMeta.name, satMeta.line1, satMeta.line2);
+        const observer = { lat: 39.4699, lon: -0.3763, altKm: 0.05 }; // Valencia / Iberia Station
+        const t = Date.now() + timeStep * 3600_000;
+        const angles = lookAngles(el, observer, t);
+        setSatTelemetry(angles);
+      } catch (e) {
+        console.warn('Error evaluating look angles:', e);
+      }
+    };
+    updateTelemetry();
+    const timer = setInterval(updateTelemetry, 1000);
+    return () => clearInterval(timer);
+  }, [showSatellites, selectedSatKey, timeStep]);
+
+  // Keep orbit mode ref and rebuild satellites on mode switch
+  useEffect(() => {
+    orbitModeRef.current = orbitMode;
+    const group = satellitesGroupRef.current;
+    if (!group) return;
+    group.clear();
+    if (orbitMode === 'SCIENTIFIC_CALCULATED') {
+      const timeNow = Date.now();
+      for (const [key, t] of Object.entries(AUTHENTIC_DATED_TLES)) {
+        try {
+          const el = parseTle(t.name, t.line1, t.line2);
+          const periodS = 86400 / el.nRevDay;
+          const pts: THREE.Vector3[] = [];
+          const STEPS = 96;
+          for (let i = 0; i <= STEPS; i++) {
+            const tStep = timeNow + (i / STEPS) * periodS * 1000;
+            const eci = propagateKeplerJ2(el, tStep);
+            const s = 1.5 / 6378.137;
+            pts.push(new THREE.Vector3(eci.x * s, eci.z * s, eci.y * s));
+          }
+          const orbitGeo = new THREE.BufferGeometry().setFromPoints(pts);
+          const color = new THREE.Color(t.colorHex);
+          const orbitLine = new THREE.Line(orbitGeo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.45 }));
+          group.add(orbitLine);
+
+          const satMarkerGeo = new THREE.BoxGeometry(0.045, 0.045, 0.09);
+          const satMarkerMat = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.8 });
+          const satMesh = new THREE.Mesh(satMarkerGeo, satMarkerMat);
+          satMesh.userData = { isScientific: true, el, key, meta: t };
+          group.add(satMesh);
+        } catch (err) {
+          console.warn('Error building orbit for', t.name, err);
+        }
+      }
+    } else {
+      const satellites = [
+        { name: 'Sentinel-3 (SLSTR)', r: 1.85, inc: 98.6, speed: 0.008, color: 0x10b981 },
+        { name: 'Terra (MODIS)', r: 1.88, inc: 98.2, speed: 0.007, color: 0xf59e0b },
+        { name: 'Suomi-NPP (VIIRS)', r: 1.92, inc: 98.7, speed: 0.009, color: 0xef4444 },
+        { name: 'Meteosat (MSG)', r: 2.45, inc: 0.0, speed: 0.001, color: 0x38bdf8 },
+      ];
+      satellites.forEach((sat) => {
+        const orbitGeo = new THREE.BufferGeometry();
+        const pts: THREE.Vector3[] = [];
+        const incRad = (sat.inc * Math.PI) / 180;
+        for (let i = 0; i <= 96; i++) {
+          const theta = (i / 96) * Math.PI * 2;
+          const x = sat.r * Math.cos(theta);
+          const y = sat.r * Math.sin(theta) * Math.sin(incRad);
+          const z = sat.r * Math.sin(theta) * Math.cos(incRad);
+          pts.push(new THREE.Vector3(x, y, z));
+        }
+        orbitGeo.setFromPoints(pts);
+        const orbitLine = new THREE.Line(orbitGeo, new THREE.LineBasicMaterial({ color: sat.color, transparent: true, opacity: 0.35 }));
+        group.add(orbitLine);
+
+        const satMarkerGeo = new THREE.BoxGeometry(0.04, 0.04, 0.08);
+        const satMarkerMat = new THREE.MeshBasicMaterial({ color: sat.color });
+        const satMesh = new THREE.Mesh(satMarkerGeo, satMarkerMat);
+        satMesh.userData = { isScientific: false, sat, theta: Math.random() * Math.PI * 2 };
+        group.add(satMesh);
+      });
+    }
+  }, [orbitMode]);
+
   // 2. Playback timer
   useEffect(() => {
     if (!isPlaying) return;
@@ -294,36 +392,69 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
     satellitesGroupRef.current = satGroup;
     globeGroup.add(satGroup);
 
-    // Sentinel / Terra / LEO Satellite Orbits
-    const satellites = [
-      { name: 'Sentinel-3 (SLSTR)', r: 1.85, inc: 98.6, speed: 0.008, color: 0x10b981 },
-      { name: 'Terra (MODIS)', r: 1.88, inc: 98.2, speed: 0.007, color: 0xf59e0b },
-      { name: 'Suomi-NPP (VIIRS)', r: 1.92, inc: 98.7, speed: 0.009, color: 0xef4444 },
-      { name: 'Meteosat (MSG)', r: 2.45, inc: 0.0, speed: 0.001, color: 0x38bdf8 },
-    ];
+    // Setup satellites according to current orbitMode
+    const setupSatellites = (group: THREE.Group, currentMode: 'SCIENTIFIC_CALCULATED' | 'CINEMATIC_ILLUSTRATIVE') => {
+      group.clear();
+      if (currentMode === 'SCIENTIFIC_CALCULATED') {
+        const timeNow = Date.now();
+        for (const [key, t] of Object.entries(AUTHENTIC_DATED_TLES)) {
+          try {
+            const el = parseTle(t.name, t.line1, t.line2);
+            const periodS = 86400 / el.nRevDay;
+            const pts: THREE.Vector3[] = [];
+            const STEPS = 96;
+            for (let i = 0; i <= STEPS; i++) {
+              const tStep = timeNow + (i / STEPS) * periodS * 1000;
+              const eci = propagateKeplerJ2(el, tStep);
+              const s = 1.5 / 6378.137;
+              pts.push(new THREE.Vector3(eci.x * s, eci.z * s, eci.y * s));
+            }
+            const orbitGeo = new THREE.BufferGeometry().setFromPoints(pts);
+            const color = new THREE.Color(t.colorHex);
+            const orbitLine = new THREE.Line(orbitGeo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.45 }));
+            group.add(orbitLine);
 
-    satellites.forEach((sat) => {
-      const orbitGeo = new THREE.BufferGeometry();
-      const pts = [];
-      const incRad = (sat.inc * Math.PI) / 180;
-      for (let i = 0; i <= 96; i++) {
-        const theta = (i / 96) * Math.PI * 2;
-        const x = sat.r * Math.cos(theta);
-        const y = sat.r * Math.sin(theta) * Math.sin(incRad);
-        const z = sat.r * Math.sin(theta) * Math.cos(incRad);
-        pts.push(new THREE.Vector3(x, y, z));
+            const satMarkerGeo = new THREE.BoxGeometry(0.045, 0.045, 0.09);
+            const satMarkerMat = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.8 });
+            const satMesh = new THREE.Mesh(satMarkerGeo, satMarkerMat);
+            satMesh.userData = { isScientific: true, el, key, meta: t };
+            group.add(satMesh);
+          } catch (err) {
+            console.warn('Error building orbit for', t.name, err);
+          }
+        }
+      } else {
+        const satellites = [
+          { name: 'Sentinel-3 (SLSTR)', r: 1.85, inc: 98.6, speed: 0.008, color: 0x10b981 },
+          { name: 'Terra (MODIS)', r: 1.88, inc: 98.2, speed: 0.007, color: 0xf59e0b },
+          { name: 'Suomi-NPP (VIIRS)', r: 1.92, inc: 98.7, speed: 0.009, color: 0xef4444 },
+          { name: 'Meteosat (MSG)', r: 2.45, inc: 0.0, speed: 0.001, color: 0x38bdf8 },
+        ];
+        satellites.forEach((sat) => {
+          const orbitGeo = new THREE.BufferGeometry();
+          const pts: THREE.Vector3[] = [];
+          const incRad = (sat.inc * Math.PI) / 180;
+          for (let i = 0; i <= 96; i++) {
+            const theta = (i / 96) * Math.PI * 2;
+            const x = sat.r * Math.cos(theta);
+            const y = sat.r * Math.sin(theta) * Math.sin(incRad);
+            const z = sat.r * Math.sin(theta) * Math.cos(incRad);
+            pts.push(new THREE.Vector3(x, y, z));
+          }
+          orbitGeo.setFromPoints(pts);
+          const orbitLine = new THREE.Line(orbitGeo, new THREE.LineBasicMaterial({ color: sat.color, transparent: true, opacity: 0.35 }));
+          group.add(orbitLine);
+
+          const satMarkerGeo = new THREE.BoxGeometry(0.04, 0.04, 0.08);
+          const satMarkerMat = new THREE.MeshBasicMaterial({ color: sat.color });
+          const satMesh = new THREE.Mesh(satMarkerGeo, satMarkerMat);
+          satMesh.userData = { isScientific: false, sat, theta: Math.random() * Math.PI * 2 };
+          group.add(satMesh);
+        });
       }
-      orbitGeo.setFromPoints(pts);
-      const orbitLine = new THREE.Line(orbitGeo, new THREE.LineBasicMaterial({ color: sat.color, transparent: true, opacity: 0.35 }));
-      satGroup.add(orbitLine);
+    };
 
-      // Satellite marker
-      const satMarkerGeo = new THREE.BoxGeometry(0.04, 0.04, 0.08);
-      const satMarkerMat = new THREE.MeshBasicMaterial({ color: sat.color });
-      const satMesh = new THREE.Mesh(satMarkerGeo, satMarkerMat);
-      satMesh.userData = { sat, theta: Math.random() * Math.PI * 2 };
-      satGroup.add(satMesh);
-    });
+    setupSatellites(satGroup, orbitModeRef.current);
 
     // Event Listeners for Orbit & Zoom
     const handleMouseDown = (e: MouseEvent) => {
@@ -368,15 +499,24 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
       // Rotate Satellites in Orbits
       if (satGroup && satGroup.children) {
         satGroup.children.forEach((child) => {
-          if (child instanceof THREE.Mesh && child.userData?.sat) {
-            const sat = child.userData.sat;
-            child.userData.theta += sat.speed;
-            const th = child.userData.theta;
-            const inc = (sat.inc * Math.PI) / 180;
-            child.position.x = sat.r * Math.cos(th);
-            child.position.y = sat.r * Math.sin(th) * Math.sin(inc);
-            child.position.z = sat.r * Math.sin(th) * Math.cos(inc);
-            child.rotation.y += 0.02;
+          if (child instanceof THREE.Mesh) {
+            if (child.userData?.isScientific && child.userData?.el) {
+              const el = child.userData.el;
+              const t = Date.now() + timeStep * 3600_000;
+              const eci = propagateKeplerJ2(el, t);
+              const s = 1.5 / 6378.137;
+              child.position.set(eci.x * s, eci.z * s, eci.y * s);
+              child.rotation.y += 0.01;
+            } else if (child.userData?.sat) {
+              const sat = child.userData.sat;
+              child.userData.theta += sat.speed;
+              const th = child.userData.theta;
+              const inc = (sat.inc * Math.PI) / 180;
+              child.position.x = sat.r * Math.cos(th);
+              child.position.y = sat.r * Math.sin(th) * Math.sin(inc);
+              child.position.z = sat.r * Math.sin(th) * Math.cos(inc);
+              child.rotation.y += 0.02;
+            }
           }
         });
       }
@@ -754,6 +894,71 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
               <span>Satélites & Órbitas LEO:</span>
               <input type="checkbox" checked={showSatellites} onChange={(e) => setShowSatellites(e.target.checked)} />
             </label>
+
+            {showSatellites && (
+              <div style={{ padding: '0.4rem', borderRadius: 6, background: '#0a192f', border: '1px solid #1e3a5f', fontSize: '0.72rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                  <span style={{ color: '#94a3b8' }}>Modo orbital:</span>
+                  <select
+                    value={orbitMode}
+                    onChange={(e) => setOrbitMode(e.target.value as any)}
+                    style={{ background: '#0f2744', color: '#7dd3fc', border: '1px solid #38bdf8', borderRadius: 4, padding: '0.15rem 0.3rem', fontSize: '0.68rem', fontWeight: 700 }}
+                  >
+                    <option value="SCIENTIFIC_CALCULATED">Científico (Kepler/J2)</option>
+                    <option value="CINEMATIC_ILLUSTRATIVE">Ilustración Cinematográfica</option>
+                  </select>
+                </div>
+
+                {orbitMode === 'CINEMATIC_ILLUSTRATIVE' ? (
+                  <div style={{ background: 'rgba(245, 158, 11, 0.15)', border: '1px solid rgba(245, 158, 11, 0.4)', borderRadius: 4, padding: '0.3rem', fontSize: '0.65rem', color: '#fcd34d' }}>
+                    ⚠️ <strong>MODO ILUSTRACIÓN CINEMATOGRÁFICA:</strong> Trayectorias y velocidades simplificadas para presentación visual. No apto para cálculo de enlace ni ventanas operativas.
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                      <span style={{ color: '#94a3b8' }}>Satélite:</span>
+                      <select
+                        value={selectedSatKey}
+                        onChange={(e) => setSelectedSatKey(e.target.value)}
+                        style={{ background: '#0f2744', color: '#fff', border: '1px solid #1e3a5f', borderRadius: 4, padding: '0.15rem 0.3rem', fontSize: '0.68rem' }}
+                      >
+                        {Object.entries(AUTHENTIC_DATED_TLES).map(([k, s]) => (
+                          <option key={k} value={k}>{s.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {satTelemetry && (
+                      <div style={{ fontSize: '0.68rem', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '0.15rem', background: 'rgba(16, 185, 129, 0.08)', padding: '0.35rem', borderRadius: 4, border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Visibilidad ({region}):</span>
+                          <span style={{ fontWeight: 800, color: satTelemetry.elevationDeg > 0 ? '#34d399' : '#94a3b8' }}>
+                            {satTelemetry.elevationDeg > 0 ? `LOS (Elev: ${satTelemetry.elevationDeg}°) ✓` : `Bajo horizonte (${satTelemetry.elevationDeg}°)`}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Acimut / Distancia:</span>
+                          <span style={{ fontWeight: 700, color: '#38bdf8' }}>{satTelemetry.azimuthDeg}° / {satTelemetry.rangeKm} km</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Altitud / V. Radial:</span>
+                          <span style={{ fontWeight: 700, color: '#a7f3d0' }}>{satTelemetry.altitudeKm} km / {satTelemetry.rangeRateKmS} km/s</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Doppler L-Band (1.6 GHz):</span>
+                          <span style={{ fontWeight: 700, color: '#f59e0b' }}>
+                            {satTelemetry.computeDopplerShiftHz ? (satTelemetry.computeDopplerShiftHz(1.621e9) / 1000).toFixed(2) : '0'} kHz
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.6rem', color: '#94a3b8', fontStyle: 'italic', marginTop: '0.2rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.2rem' }}>
+                          {satTelemetry.disclaimer}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
               <span>Viento & Partículas GPU:</span>
