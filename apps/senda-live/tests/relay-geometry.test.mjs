@@ -172,3 +172,46 @@ test('radio shadow rejects invalid grid sizes and arbitrary user-origin points',
   assert.throws(() => computeRadioShadowField(DEM(), { originSite: 'my-phone' }), /UNKNOWN_RELAY_SITE/);
   assert.throws(() => computeRadioShadowField(DEM(), { frequencyMHz: -1 }), /INVALID_RADIO_SHADOW_OPTIONS/);
 });
+
+
+test('performance: RF shadow grid validates DEM once, not all 1089 cells for every line sample', () => {
+  const terrain = DEM();
+  let numericReads = 0;
+  terrain.elevationsM = new Proxy(terrain.elevationsM, {
+    get(target, key, receiver) {
+      if (typeof key === 'string' && /^(0|[1-9][0-9]*)$/.test(key)) numericReads++;
+      return Reflect.get(target, key, receiver);
+    },
+  });
+  const field = computeRadioShadowField(terrain, {
+    originSite: 'A', gridSize: 11, frequencyMHz: 2400,
+    transmitterHeightM: 45, receiverHeightM: 15,
+    maxRangeKm: 40
+  });
+  assert.equal(field.cells.length, 121);
+  assert.ok(numericReads < 80_000,
+    'Repeated full DEM validation per sample regressed: ' + numericReads + ' elevation reads');
+});
+
+test('public terrainAt still rejects invalid DEM and optimized internal LOS retains endpoint guards', () => {
+  const invalid = DEM();
+  invalid.elevationsM[500] = NaN;
+  assert.throws(() => terrainAt(invalid, 40, 0), /INVALID_TERRAIN_GRID/);
+  assert.throws(() => analyzeTerrainLink(invalid, {
+    from: { ...near, antennaHeightM: 30 }, to: { ...far, antennaHeightM: 30 }
+  }), /INVALID_TERRAIN_GRID/);
+  assert.throws(() => computeRadioShadowField(invalid, { gridSize: 11 }), /INVALID_TERRAIN_GRID/);
+  assert.throws(() => planRelayCorridor(invalid, {}), /INVALID_TERRAIN_GRID/);
+  assert.throws(() => link(DEM(), 30, 2400, {
+    to: { lat: 40.5, lon: 0.02, antennaHeightM: 30 }
+  }), /LOCATION_OUTSIDE_DEM/);
+});
+
+test('mast-height clearance printed in report corresponds to rounded suggested mast value', () => {
+  const estimate = estimateEqualMastHeight(DEM(), {
+    from: near, to: far, frequencyMHz: 868, minMastM: 2, maxMastM: 120
+  });
+  assert.equal(estimate.status, 'GEOMETRIC_HEIGHT_ESTIMATE_ONLY');
+  const reproducible = link(DEM(), estimate.requiredHeightM, 868);
+  assert.equal(estimate.limitingClearanceM, reproducible.minFresnelClearanceM);
+});
