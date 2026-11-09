@@ -1,7 +1,7 @@
 # SENDA — Plan de Acción Inmediato y Hoja de Ruta Ejecutiva
 
-**Fecha de Actualización:** 2026-11-09T02:08:00Z  
-**Estado:** Bloques 1, 2, 3, 4, 5, 6 y 7 COMPLETADOS Y CONSOLIDADOS en [PR #30](https://github.com/abrahamhl/civic-relay/pull/30).
+**Fecha de Actualización:** 2026-11-09T02:24:00Z  
+**Estado:** Bloques 1 al 8 COMPLETADOS, CONSOLIDADOS Y POTENCIADOS con Física Matemática Avanzada, Harness de Defensa Gubernamental y Movilidad DATEX II en [PR #30](https://github.com/abrahamhl/civic-relay/pull/30).
 
 ---
 
@@ -12,28 +12,39 @@
   - Resolución de conflictos, verificación de paridad web y suites de tests al 100%.
   - Apertura de [PR #30](https://github.com/abrahamhl/civic-relay/pull/30) contra `master`.
 - [x] **Bloque 2 (OSINT e Inteligencia Multirriesgo):**
-  - Conector para **Copernicus EMS / EFFIS** (detecciones de anomalías térmicas activas con procedencia SHA-256 cruda y CC-BY 4.0).
-  - Conector para **AEMET / Meteoalarm CAP** (alertas meteorológicas oficiales con severidad Yellow/Orange/Red y ventanas temporales).
-  - Motor de Reconciliación Espacio-Temporal con grafo de dependencias upstream para neutralizar la falsa independencia, detección de discrepancias espaciales/magnitud, y generación de recibos criptográficos Merkle (`generateReconciliationReceipt`).
+  - Conectores para **Copernicus EMS / EFFIS** y **AEMET / Meteoalarm CAP**.
+  - Conector para **DATEX II (CEN/TS 16157)** para NDW (A12 Arnhem-Ede) y DGT 3.0 (España).
+  - Motor de Reconciliación Espacio-Temporal con grafo de dependencias upstream y recibos Merkle (`generateReconciliationReceipt`).
 - [x] **Bloque 3 (Visualizadores GIS 3D/4D Profesionales):**
-  - Implementación de `Globe4DStudio` con Three.js: Globo WGS84 interactivo, malla 3D de terreno Mapzen DEM con exageración de relieve ($\times 1$ a $\times 6$), partículas de viento aceleradas por GPU, órbitas satelitales con telemetría en tiempo real y elipsoide de Fresnel 3D con altura de mástiles (3–45 m) y frecuencias UHF/SHF.
-- [x] **Bloque 4 (Motores Científicos y Calibración):**
-  - Módulo `packages/senda/src/scientific-evaluation.mjs`: IoU espacial, matriz de confusión (Precision/Recall/F1/FPR), difracción en arista de cuchillo según recomendación ITU-R P.526, balance de enlace RF, y filtro de viabilidad satelital Doppler ($\Delta f > 5\text{ kHz}$) frente a hardware COTS de banda estrecha.
-- [x] **Bloque 5 (Offline, Telemetría y Privacidad):**
-  - Almacén IndexedDB v2 `cached_sources` con degradación transparente offline (`offlineCached: true`) en el cliente API.
+  - `Globe4DStudio` con Three.js: Globo WGS84 interactivo, malla 3D Mapzen DEM con relieve $\times 1$ a $\times 6$, viento GPU, elipsoide Fresnel 3D y panel integrado de Física Telecom y Calificación Gubernamental.
+- [x] **Bloque 4 (Física Matemática Telecom & Motores Científicos):**
+  - Módulo `telecom-mathematical-physics.mjs`:
+    - Percolación continua ($\lambda_c = 4.512 / (\pi R^2)$) y detección de transición de fase en mallas fragmentadas.
+    - Dinámica epidémica DTN markoviana ($R_0$, percentiles P50/P90/P99 de entrega y probabilidad de extinción).
+    - Difracción multi-obstáculo Deygout según ITU-R P.526-15.
+    - Atenuación por lluvia según ITU-R P.838-3.
+    - Desvanecimiento Nakagami-m y capacidad de canal de Shannon.
+    - Cinemática orbital Doppler para satélites LEO y ancho de banda PLL SDR.
+- [x] **Bloque 5 (Harness de Resiliencia Gubernamental y Defensa):**
+  - Módulo `government-resilience-harness.mjs`:
+    - Evaluación de los 5 pilares estratégicos (Black-Sky, Capacidad de Evacuación, Agilidad de Espectro, Criptografía Forense y Calibración Empírica).
+    - Categorización de cumplimiento (Tier 1 Soberano Defensa/UME, Tier 2 Protección Civil, Tier 3 Municipal).
+    - Emisión de certificado criptográfico con sello SHA-256 inmutable.
+- [x] **Bloque 6 (Offline, Telemetría y Privacidad):**
+  - IndexedDB v2 `cached_sources` con degradación transparente offline (`offlineCached: true`) en el cliente API.
   - Telemetría estrictamente opt-in para sensores del dispositivo.
-- [x] **Bloque 6 (SENDA LIVE e Interfaz Premium):**
-  - Integración del visualizador `Globe4DStudio` en `MapView.tsx`, preservación de protecciones XSS DOM-safe y controles multirriesgo.
-- [x] **Bloque 7 (Vídeos, Branding y Materiales para Inversores):**
+- [x] **Bloque 7 (SENDA LIVE e Interfaz Premium):**
+  - Visualizador `Globe4DStudio` en `MapView.tsx`, protecciones XSS DOM-safe y controles multirriesgo.
+- [x] **Bloque 8 (Vídeos, Branding y Materiales para Inversores):**
   - Verificación de 53 archivos audiovisuales M95 con peticiones por rangos HTTP 206 y pistas de subtítulos en ES, EN y NL (`evidence/video/m95/release.json`).
 
 ---
 
 ## 2. Próximas Acciones Inmediatas
 
-1. **Seguimiento de CI en GitHub Actions:**
-   - Supervisar los 5 workflows activos lanzados en PR #30 (`CI`, `Investor microsite checks`, `SENDA`, `SENDA LIVE · USGS observations and secure map`, `Emergency routing research lab`).
-2. **Validación de Despliegue en Staging (Vercel):**
-   - Confirmar el despliegue automático de staging para el commit `3ec8623` y documentar la URL de previsualización.
-3. **Ampliación de Movilidad y Corredores Transfronterizos:**
-   - Expandir el conector NDW / DATEX II para el corredor de pruebas A12 Arnhem-Ede y la DGT 3.0 en España.
+1. **Supervisión de CI en GitHub Actions:**
+   - Confirmar la aprobación de la suite completa de workflows ejecutándose sobre el commit `036231f`.
+2. **Promoción de PR #30 hacia `master`:**
+   - Una vez concluido el ciclo de CI, realizar la fusión controlada hacia la rama principal de producción.
+3. **Simulaciones de Demostración para Gobiernos y Fuerzas de Seguridad:**
+   - Preparar el informe de auditoría generado por el arnés para los dos escenarios insignia: Corredor A12 Arnhem-Ede (Países Bajos) y Corredor A-3 Valencia (España).
