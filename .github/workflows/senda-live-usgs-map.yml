@@ -80,6 +80,21 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      # One deliberate independent end-to-end mathematical run on actual raster.
+      # Not field RF measurements; avoid duplicate tile downloads on each commit.
+      - name: One-off real DEM -> Fresnel -> relay corridor evidence
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[relay-live-check]')
+        continue-on-error: true
+        run: node apps/senda-live/scripts/capture-relay-geometry-research.mjs
+      - name: Upload real DEM radio geometry research receipt
+        if: always() && github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[relay-live-check]')
+        uses: actions/upload-artifact@v4
+        with:
+          name: senda-rf-geometry-real-dem
+          path: evidence/senda/rf/real-dem-link-screening.json
+          if-no-files-found: warn
+          retention-days: 14
+
   chromium-map-qa:
     name: Real browser geospatial QA (desktop + mobile)
     needs: usgs-live
