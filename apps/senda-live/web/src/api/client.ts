@@ -86,6 +86,14 @@ export const api = {
   async getComments(id: string) { return request(`/api/posts/${id}/comments`); },
   async getStories() { return request('/api/stories'); },
 
+  // Public scientific source records (separate from SENDA emergency alerts).
+  async getUsgsEarthquakes() { return request('/api/sources/usgs-earthquakes'); },
+  async getEonetWildfires() { return request('/api/sources/eonet-wildfires'); },
+  async getGdacsDisasters() { return request('/api/sources/gdacs-disasters'); },
+  async getOsintCorrelations() { return request('/api/sources/osint-correlation'); },
+  async getWeatherGrid(region: string) { return request('/api/sources/weather-grid?region=' + encodeURIComponent(region)); },
+  async getTerrainGrid(region: string) { return request('/api/sources/terrain-grid?region=' + encodeURIComponent(region)); },
+
   // Events
   async getEvents(params: Record<string, string> = {}) {
     const qs = new URLSearchParams(params).toString();

@@ -13,9 +13,21 @@ import {
 } from './http.mjs';
 import { COOKIE_NAME } from './services/auth.mjs';
 import { adapterHealth } from './domain/source-adapters.mjs';
+import { createUsgsEarthquakeFeed } from './domain/usgs-earthquakes.mjs';
+import { createEonetWildfireFeed } from './domain/eonet-wildfires.mjs';
+import { createWeatherGridFeed, WEATHER_REGIONS } from './domain/weather-grid.mjs';
+import { createMetNorwayGridFeed } from './domain/metno-weather-grid.mjs';
+import { createTerrainGridFeed } from './domain/terrain-grid.mjs';
+import { createGdacsFeed } from './domain/gdacs-osint.mjs';
+import { correlateGdacsCatalogs } from './domain/osint-catalog-correlation.mjs';
 
 export function createApiHandler({
-  db, auth, social, events, emergency, messaging, moderation, admin, rt
+  db, auth, social, events, emergency, messaging, moderation, admin, rt,
+  usgsFeed = createUsgsEarthquakeFeed(),
+  eonetFeed = createEonetWildfireFeed(),
+  weatherGridFeed = process.env.SENDA_WEATHER_PROVIDER === 'openmeteo' ? createWeatherGridFeed() : createMetNorwayGridFeed(),
+  terrainGridFeed = createTerrainGridFeed(),
+  gdacsFeed = createGdacsFeed(),
 }) {
   const router = createRouter();
   const rateLimiter = createRateLimiter();
@@ -495,6 +507,58 @@ export function createApiHandler({
     const userId = requireUser(req);
     const health = admin.getSystemHealth(userId);
     sendJson(res, 200, health);
+  });
+
+  /* -------- READ-ONLY OFFICIAL SOURCE OBSERVATIONS -------- */
+  // USGS observations are not SENDA alerts, forecasts, or crisis dispatches.
+  router.get('/api/sources/usgs-earthquakes', async (req, res) => {
+    const snapshot = await usgsFeed.read();
+    sendJson(res, snapshot.status === 'UNAVAILABLE' ? 503 : 200, snapshot);
+  });
+
+  // EONET's curated event locations are NOT fire perimeters or emergency alerts.
+  router.get('/api/sources/eonet-wildfires', async (req, res) => {
+    const snapshot = await eonetFeed.read();
+    sendJson(res, snapshot.status === 'UNAVAILABLE' ? 503 : 200, snapshot);
+  });
+
+  // Explicitly time-indexed NWP model forecast. Never an observed station or an alert.
+  router.get('/api/sources/weather-grid', async (req, res, { query }) => {
+    const region = query.region || 'valencia';
+    if (!Object.hasOwn(WEATHER_REGIONS, region)) return sendJson(res, 400, { error: 'INVALID_WEATHER_REGION' });
+    const snapshot = await weatherGridFeed.read(region);
+    sendJson(res, ['UNAVAILABLE', 'PROVIDER_NOT_CONFIGURED'].includes(snapshot.status) ? 503 : 200, snapshot);
+  });
+
+  // Read-only public elevation raster samples; no user-provided coordinates or URLs.
+  router.get('/api/sources/terrain-grid', async (req, res, { query }) => {
+    const region = query.region || 'valencia';
+    if (!Object.hasOwn(WEATHER_REGIONS, region)) return sendJson(res, 400, { error: 'INVALID_TERRAIN_REGION' });
+    const snapshot = await terrainGridFeed.read(region);
+    sendJson(res, snapshot.status === 'UNAVAILABLE' ? 503 : 200, snapshot);
+  });
+
+
+  // Public OSINT only: GDACS risk events are not SENDA-issued emergency alerts.
+  router.get('/api/sources/gdacs-disasters', async (req, res) => {
+    const snapshot = await gdacsFeed.read();
+    sendJson(res, snapshot.status === 'UNAVAILABLE' ? 503 : 200, snapshot);
+  });
+
+  // Independent verification is NOT inferred from two dependent source catalogs.
+  router.get('/api/sources/osint-correlation', async (req, res) => {
+    const [gdacs, usgs, eonet] = await Promise.all([
+      gdacsFeed.read(), usgsFeed.read(), eonetFeed.read()
+    ]);
+    if (gdacs.status === 'UNAVAILABLE') {
+      return sendJson(res, 503, {
+        schema: 'senda.osint.cross-catalog/1', status: 'UNAVAILABLE',
+        observations: [], isSendaAlert: false, sourceIndependenceValidated: false
+      });
+    }
+    const candidates = correlateGdacsCatalogs(gdacs, usgs, eonet);
+    sendJson(res, 200, { ...candidates, status: gdacs.status,
+      fetchedAt: gdacs.fetchedAt, source: gdacs.source });
   });
 
   /* ------------------- ADAPTERS & METADATA ------------------- */

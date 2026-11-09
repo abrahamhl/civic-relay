@@ -13,7 +13,30 @@ const TEST_HTTP_DB = join(__dirname, '../data/test-http.db');
 test('INTEGRACIÓN HTTP / SPA / SSE / SEGURIDAD', async (t) => {
   if (existsSync(TEST_HTTP_DB)) rmSync(TEST_HTTP_DB, { force: true });
 
-  const { server, db } = createServer({ dbFile: TEST_HTTP_DB });
+  // Synthetic fixture only verifies HTTP wiring; it is NOT a live USGS acquisition.
+  const usgsFeed = { read: async () => ({
+    dataset: 'USGS_M45_WEEK_GEOJSON', status: 'SOURCE_SNAPSHOT',
+    dataKind: 'HISTORICAL_OBSERVATION', isOfficialAlert: false,
+    observations: [{ id: 'usgs:test', magnitude: 5.2, location: { lat: 40, lon: 1 } }],
+    source: { provider: 'USGS Earthquake Hazards Program' }
+  }) };
+  const eonetFeed = { read: async () => ({
+    dataset: 'NASA_EONET_V3_WILDFIRES', status: 'SOURCE_SNAPSHOT',
+    dataKind: 'CURATED_EVENT_METADATA', isPerimeter: false, isOfficialAlert: false,
+    observations: [{ id: 'eonet:test', title: 'Synthetic wildfire', location: { lat: 42, lon: -5 } }],
+    source: { provider: 'NASA EONET' }
+  }) };
+  const weatherGridFeed = { read: async (region) => ({
+    schema: 'senda.atmosphere.grid/1', status: 'SOURCE_SNAPSHOT', region,
+    dataKind: 'MODEL_FORECAST', isOfficialAlert: false, calibratedBySenda: false,
+    times: [], points: [], source: { provider: 'Open-Meteo' }
+  }) };
+  const terrainGridFeed = { read: async (region) => ({
+    schema: 'senda.terrain.grid/1', region, status: 'SOURCE_SNAPSHOT',
+    dataKind: 'RASTER_DEM_SAMPLES', rows: 33, columns: 33,
+    elevationsM: Array(1089).fill(120), source: { provider: 'Mapzen Terrain Tiles' }
+  }) };
+  const { server, db } = createServer({ dbFile: TEST_HTTP_DB, usgsFeed, eonetFeed, weatherGridFeed, terrainGridFeed });
 
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const port = server.address().port;
@@ -59,6 +82,47 @@ test('INTEGRACIÓN HTTP / SPA / SSE / SEGURIDAD', async (t) => {
     const data = await okRes.json();
     assert.ok(data.token);
     assert.equal(data.user.email, 'test@senda.live');
+  });
+
+  await t.test('5. Endpoint público de observaciones: se mantienen separadas de las alertas', async () => {
+    const res = await fetch(baseUrl + '/api/sources/usgs-earthquakes');
+    assert.equal(res.status, 200);
+    const body = await res.json();
+    assert.equal(body.dataset, 'USGS_M45_WEEK_GEOJSON');
+    assert.equal(body.dataKind, 'HISTORICAL_OBSERVATION');
+    assert.equal(body.isOfficialAlert, false);
+    assert.equal(body.observations[0].magnitude, 5.2);
+  });
+
+  await t.test('6. NASA EONET event metadata stays separate from wildfire predictions and alerts', async () => {
+    const res = await fetch(baseUrl + '/api/sources/eonet-wildfires');
+    assert.equal(res.status, 200);
+    const body = await res.json();
+    assert.equal(body.dataset, 'NASA_EONET_V3_WILDFIRES');
+    assert.equal(body.dataKind, 'CURATED_EVENT_METADATA');
+    assert.equal(body.isPerimeter, false);
+    assert.equal(body.isOfficialAlert, false);
+  });
+
+  await t.test('7. Contrato meteorológico: predicción no equivale a estación ni alerta', async () => {
+    const res = await fetch(baseUrl + '/api/sources/weather-grid?region=valencia');
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.dataKind, 'MODEL_FORECAST');
+    assert.equal(data.calibratedBySenda, false);
+    assert.equal(data.isOfficialAlert, false);
+    const denied = await fetch(baseUrl + '/api/sources/weather-grid?region=private-gps-location');
+    assert.equal(denied.status, 400);
+  });
+
+  await t.test('8. DEM: topografía real separada de alertas y sensores, región fija', async () => {
+    const response = await fetch(baseUrl + '/api/sources/terrain-grid?region=valencia');
+    assert.equal(response.status, 200);
+    const data = await response.json();
+    assert.equal(data.dataKind, 'RASTER_DEM_SAMPLES');
+    assert.equal(data.elevationsM.length, 1089);
+    const unsafe = await fetch(baseUrl + '/api/sources/terrain-grid?region=private-home-location');
+    assert.equal(unsafe.status, 400);
   });
 
   await t.test('4. Consulta de Feed y Adaptadores', async () => {
