@@ -158,6 +158,10 @@ async function exercise(browser, name, viewport) {
   await page.getByRole('slider', { name: 'Altura hipotética de antena' }).fill('60');
   await page.getByRole('slider', { name: 'Distancia máxima por salto' }).fill('20');
   assert.equal(await page.locator('[data-testid="relay-corridor-status"]').count(), 1);
+  await page.getByLabel('Mostrar campo de sombra RF').check();
+  await page.getByRole('img', { name: /Campo de sombra radioeléctrica geométrica/ }).waitFor();
+  assert.equal(await page.getByRole('img', { name: /Campo de sombra radioeléctrica geométrica/ }).locator('rect').count(), 121);
+  await page.getByTestId('rf-shadow-counts').waitFor({ state: 'visible' });
   await page.getByRole('button', { name: 'Cerrar GeoRelay' }).click();
 
   await page.getByRole('slider', { name: 'Línea temporal de pronóstico' }).fill('9');
@@ -218,6 +222,8 @@ async function exercise(browser, name, viewport) {
   await page.locator('[data-testid="senda-rf-geometry-lab"]').waitFor({ state: 'visible' });
   assert.equal(await page.getByRole('img', { name: /Perfil topográfico con rayo de radio/ }).count(), 1);
   assert.equal(await page.locator('[data-testid="relay-corridor-status"]').count(), 1);
+  await page.getByLabel('Mostrar campo de sombra RF').check();
+  assert.equal(await page.getByRole('img', { name: /Campo de sombra radioeléctrica geométrica/ }).locator('rect').count(), 121);
   assert.deepEqual(clientErrors, [], 'Unhandled browser exceptions after offline restart');
 
   await page.screenshot({ path: resolve(output, name + '.png'), fullPage: true });
@@ -227,6 +233,7 @@ async function exercise(browser, name, viewport) {
     injectedMarkupExecuted: false, atmosphere4DRendered: true,
     hourlyTimeNavigation: true, realDemFixtureMesh: true, storedDemAfterOfflineRestart: true,
     offlineTerrainRadioGeometry: true, fresnelCrossSection: true, relaySiteGraph: true,
+    radioShadowField121CellsOffline: true,
     localSnapshotRecoveredAfterFeedLoss: true, offlinePwaRestart: true, fixtureOnly: true };
 }
 
