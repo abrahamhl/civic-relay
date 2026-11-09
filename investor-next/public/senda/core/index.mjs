@@ -62,3 +62,5 @@ export * from './vehicle-doppler-gateway.mjs';
 export * from './civilian-uav-mesh-radar.mjs';
 export * from './acoustic-beamforming-survival.mjs';
 export * from './automotive-multisoftware-link.mjs';
+export * from './zero-overhead-mobile-optimizer.mjs';
+export * from './navigation-multisoftware-hub.mjs';
