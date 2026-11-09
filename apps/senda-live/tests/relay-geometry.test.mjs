@@ -55,7 +55,8 @@ test('flat earth screening with short distances and elevated antennas is positiv
 test('high terrain ridge between two ends produces obstruction and identifies bottleneck', () => {
   const dem = DEM();
   for (let row = 13; row <= 19; row++) {
-    for (let col = 15; col <= 17; col++) dem.elevationsM[row * 33 + col] = 430;
+    // Keep both terminal footprints outside the synthetic ridge; compare the true obstruction at mid-path.
+    for (let col = 16; col <= 16; col++) dem.elevationsM[row * 33 + col] = 430;
   }
   const result = link(dem);
   assert.equal(result.status, 'MODEL_INDICATES_OBSTRUCTION');
