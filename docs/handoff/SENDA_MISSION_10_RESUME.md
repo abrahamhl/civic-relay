@@ -22,7 +22,7 @@ La auditoría independiente previa determinó que, si bien SENDA poseía una arq
 ### 1.2 Resultado Final de la Misión 10/10
 Mediante una ejecución técnica multiagente basada estrictamente en código verificable, derivaciones analíticas, normas internacionales (ITU-R, ISO, RFC, ETSI) y pruebas adversariales reproducibles:
 - **100% de Gaps Resueltos:** Los 12 gaps del registro ([`SENDA_SCIENTIFIC_GAP_REGISTER.md`](file:///c:/Users/2fabr/civic-relay/docs/audits/SENDA_SCIENTIFIC_GAP_REGISTER.md)) han sido solventados y probados.
-- **375/375 Tests Superados en `@senda/core`** (0 fallos).
+- **379/379 Tests Superados en `@senda/core`** (0 fallos).
 - **99/99 Tests Superados en `@senda/live`** (0 fallos).
 - **Compilación Limpia de Frontend:** Cero errores TypeScript y build Vite de producción en 3.54 s.
 - **Paridad Web Garantizada:** Sincronización exacta entre el núcleo de Node.js y la versión empaquetada para navegador.
@@ -33,9 +33,9 @@ Mediante una ejecución técnica multiagente basada estrictamente en código ver
 ## 2. MODERNIZACIÓN TÉCNICA Y LOGROS CIENTÍFICOS
 
 ### 2.1 Telecomunicaciones y Radiofrecuencia (Agente A3)
-- **Atenuación por Lluvia Continua (ITU-R P.838-3):** Se sustituyó la aproximación por tramos por la formulación logarítmica continua oficial para frecuencias de 1 a 40 GHz, resolviendo la discontinuidad a 6 GHz y garantizando un error relativo $< 10^{-4}$ frente a tablas normativas.
+- **Atenuación por Lluvia Continua (ITU-R P.838-3):** Se sustituyó la aproximación por tramos por la formulación logarítmica continua oficial para frecuencias de 1 a 40 GHz, resolviendo la discontinuidad a 6 GHz y garantizando un error relativo $\le 0.1\%$ frente a la Tabla 5 normativa.
 - **Difracción Deygout con Factor Corrector $C$ (ITU-R P.526-15 §4.3):** Unificación del cálculo de difracción sobre múltiples crestas y filos de cuchillo, integrando la corrección empírica $C = 10.0 + 0.042 \times \frac{d_1 \cdot d_2}{d_1 + d_2}$.
-- **Presupuesto de Enlace Exhaustivo (`evaluateRfLinkBudget`):** Cálculo de potencia recibida considerando PIRE legal (ETSI EN 300 220 / ETSI EN 300 328), pérdidas de cableado, espacio libre (ITU-R P.525-4), difracción, absorción gaseosa (ITU-R P.676-13), ruido térmico a 290 K ($N_0 = -174\text{ dBm/Hz}$), figura de ruido del receptor y margen de desvanecimiento con umbral de viabilidad de 10 dB.
+- **Presupuesto de Enlace Exhaustivo (`computeCompleteLinkBudget`):** Cálculo de potencia recibida considerando PIRE legal (ETSI EN 300 220 / ETSI EN 300 328), pérdidas de cableado, espacio libre (ITU-R P.525-4), difracción, absorción gaseosa (ITU-R P.676-13), ruido térmico a 290 K ($N_0 = -174\text{ dBm/Hz}$), figura de ruido del receptor y margen de desvanecimiento con umbral de viabilidad de 10 dB.
 - **Entregable:** [`docs/telecom/SENDA_RF_VALIDATION_MATRIX.md`](file:///c:/Users/2fabr/civic-relay/docs/telecom/SENDA_RF_VALIDATION_MATRIX.md).
 
 ### 2.2 Innovación Core: Physics-Aware Emergency Routing (PAER) (Agente A4)
@@ -59,9 +59,9 @@ Mediante una ejecución técnica multiagente basada estrictamente en código ver
 - **Visualizador 4D ([`Globe4DStudio.tsx`](file:///c:/Users/2fabr/civic-relay/apps/senda-live/web/src/components/Globe4DStudio.tsx)):** Selector explícito entre modo `SCIENTIFIC_CALCULATED` (con telemetría y look-angles en tiempo real) y modo `CINEMATIC_ILLUSTRATIVE` con cartel permanente de advertencia.
 
 ### 2.4 Electroacústica y Baliza de Supervivencia (Agente A7)
-- **Atenuación Atmosférica ISO 9613-1:** Inclusión del coeficiente de atenuación específico a 20 kHz ($\alpha_{\text{atm}} \approx 0.65\text{ dB/m}$ a $20^\circ\text{C}$ y 50% HR) y atenuación por divergencia esférica geométrica ($20 \log_{10}(d)$).
-- **Límites de Hardware COTS:** Incorporación de la respuesta en frecuencia de altavoces/micrófonos de smartphone (caída típica de 25 a 35 dB por encima de 18 kHz) y niveles de ruido ambiental (85 dBA en catástrofes).
-- **Alcances Realistas Certificados:** Delimitación física de alcance a $< 12\text{ m}$ en entornos silenciosos y $< 4\text{ m}$ en escenarios con ruido de fondo de maquinaria o viento, suprimiendo la afirmación de 60 metros.
+- **Atenuación Atmosférica ISO 9613-1:1993:** Ecuación física analítica completa implementada en `computeIso9613AbsorptionDbPerM()` considerando temperatura, humedad relativa y presión atmosférica ($\approx 0.524\text{ dB/m}$ a $20\text{ kHz}$, $20^\circ\text{C}$, 50% HR) y atenuación esférica geométrica ($20 \log_{10}(d)$).
+- **Límites de Hardware COTS y Divulgación:** El estado de inaudibilidad se clasifica estrictamente como `audibilityStatus: 'UNMEASURED'` (`inaudibleHuman: null`). Los transductores COTS presentan distorsión no lineal subarmónica potencialmente audible para niños, jóvenes y animales.
+- **Alcances Realistas Estimados:** Delimitación de alcance a estimaciones del modelo ($< 12\text{ m}$ en silencio y $< 4\text{ m}$ con 85 dBA de ruido), suprimiendo toda afirmación de 60 metros.
 
 ### 2.5 Seguridad, Autorización y DSA (Agente A10)
 - **Aislamiento de Publicaciones en Acontecimientos:** Modificación de `getEvent`, `getPost` y `listStories` para comprobar estrictamente la visibilidad del recurso (`PUBLIC`, `FOLLOWERS`, `PRIVATE`), la relación de suscripción y el filtrado bidireccional de bloqueos.
@@ -70,7 +70,7 @@ Mediante una ejecución técnica multiagente basada estrictamente en código ver
 ### 2.6 Gobernanza, Diligencia e Investor Readiness (Agente A1 / A12)
 - **Erradicación de Auto-Certificaciones:** Sustitución de etiquetas no auditadas (`TIER_1_SOVEREIGN`) por el índice interno auditado `SENDA Internal Resilience Index (SIRI)` y eliminación de métricas sintéticas por defecto (`modelIoU = 0.78`).
 - **Investor Truth Gate ([`SENDA_INVESTOR_TRUTH_GATE.md`](file:///c:/Users/2fabr/civic-relay/docs/funding/SENDA_INVESTOR_TRUTH_GATE.md)):** Desglose claim por claim de todas las afirmaciones del dossier de inversión, vinculándolas a pruebas de código, limitaciones conocidas y nivel de confianza.
-- **Calibración y Procedencia de Datos:** Publicación del linaje de 10 fuentes de datos con hashes SHA-256 ([`SENDA_DATASET_QUALITY_AND_LINEAGE.md`](file:///c:/Users/2fabr/civic-relay/docs/research/SENDA_DATASET_QUALITY_AND_LINEAGE.md)) y del informe cuantitativo de calibración fuera de muestra de propagación de incendios Rothermel con IoU = 0.742 ([`SENDA_CALIBRATION_REPORT.md`](file:///c:/Users/2fabr/civic-relay/docs/research/SENDA_CALIBRATION_REPORT.md)).
+- **Calibración y Procedencia de Datos:** Publicación del linaje de 10 fuentes de datos con 10 fixtures con hashes SHA-256 de 64 caracteres ([`SENDA_DATASET_QUALITY_AND_LINEAGE.md`](file:///c:/Users/2fabr/civic-relay/docs/research/SENDA_DATASET_QUALITY_AND_LINEAGE.md)) y del informe de calibración fuera de muestra Leave-One-Fire-Out (LOFO) sobre 7 tramos de 5 incendios históricos reales (Camp Fire NIST TN 2135, Marshall, Smokehouse, Troublesome, Creek) con 100% de cobertura empírica al 90% nominal ([`SENDA_CALIBRATION_REPORT.md`](file:///c:/Users/2fabr/civic-relay/docs/research/SENDA_CALIBRATION_REPORT.md)).
 
 ---
 
@@ -80,10 +80,10 @@ Mediante una ejecución técnica multiagente basada estrictamente en código ver
 |---|---|---|
 | **Auditoría & Gaps** | [`docs/audits/SENDA_SCIENTIFIC_GAP_REGISTER.md`](file:///c:/Users/2fabr/civic-relay/docs/audits/SENDA_SCIENTIFIC_GAP_REGISTER.md) | Registro de 12 gaps resueltos (P0 a P2) con comandos y evidencias. |
 | **Auditoría & Gaps** | [`docs/audits/SENDA_INDEPENDENT_EQUATION_AUDIT.md`](file:///c:/Users/2fabr/civic-relay/docs/audits/SENDA_INDEPENDENT_EQUATION_AUDIT.md) | Auditoría matemática independiente de las ecuaciones EQ-01 a EQ-11. |
-| **Telecomunicaciones** | [`docs/telecom/SENDA_RF_VALIDATION_MATRIX.md`](file:///c:/Users/2fabr/civic-relay/docs/telecom/SENDA_RF_VALIDATION_MATRIX.md) | Matriz técnica de balance de enlace y límites ETSI en 8 bandas espectrales. |
+| **Telecomunicaciones** | [`docs/telecom/SENDA_RF_VALIDATION_MATRIX.md`](file:///c:/Users/2fabr/civic-relay/docs/telecom/SENDA_RF_VALIDATION_MATRIX.md) | Matriz técnica de balance de enlace y límites ETSI en 8 bandas espectrales con `computeCompleteLinkBudget`. |
 | **Investigación & DTN** | [`docs/research/SENDA_NOVELTY_AND_BASELINE_COMPARISON.md`](file:///c:/Users/2fabr/civic-relay/docs/research/SENDA_NOVELTY_AND_BASELINE_COMPARISON.md) | Paper de novedad y benchmark PAER vs Epidemic, Spray-and-Wait y PRoPHET. |
-| **Investigación & Datos**| [`docs/research/SENDA_DATASET_QUALITY_AND_LINEAGE.md`](file:///c:/Users/2fabr/civic-relay/docs/research/SENDA_DATASET_QUALITY_AND_LINEAGE.md) | Catálogo de linaje de datos, licencias y hashes criptográficos (DS-01 a DS-10). |
-| **Investigación & Calibración**| [`docs/research/SENDA_CALIBRATION_REPORT.md`](file:///c:/Users/2fabr/civic-relay/docs/research/SENDA_CALIBRATION_REPORT.md) | Métricas cuantitativas fuera de muestra para Bejís, Vall d'Ebo y DANA. |
+| **Investigación & Datos**| [`docs/research/SENDA_DATASET_QUALITY_AND_LINEAGE.md`](file:///c:/Users/2fabr/civic-relay/docs/research/SENDA_DATASET_QUALITY_AND_LINEAGE.md) | Catálogo de linaje de datos, licencias y hashes criptográficos SHA-256 completos. |
+| **Investigación & Calibración**| [`docs/research/SENDA_CALIBRATION_REPORT.md`](file:///c:/Users/2fabr/civic-relay/docs/research/SENDA_CALIBRATION_REPORT.md) | Calibración empírica LOFO en 5 incendios históricos (NIST/GOES) e intervalos Student-t. |
 | **Inversión & Verdad** | [`docs/funding/SENDA_INVESTOR_TRUTH_GATE.md`](file:///c:/Users/2fabr/civic-relay/docs/funding/SENDA_INVESTOR_TRUTH_GATE.md) | Matriz de claims auditados para due diligence deep tech y defensa de tesis TRL 4-5. |
 | **Inversión & Dossier**| [`docs/funding/SENDA_INVESTOR_READINESS.md`](file:///c:/Users/2fabr/civic-relay/docs/funding/SENDA_INVESTOR_READINESS.md) | Dossier inversor actualizado y alineado con el Truth Gate. |
 | **Testing & Adversarial**| [`docs/testing/SENDA_ADVERSARIAL_TEST_RESULTS.md`](file:///c:/Users/2fabr/civic-relay/docs/testing/SENDA_ADVERSARIAL_TEST_RESULTS.md) | Informe de pruebas de penetración, XSS, desbordamiento de colas y frente de catástrofe. |
@@ -134,4 +134,4 @@ pnpm --filter @senda/live build
 
 La Misión Científica de Ingeniería 10/10 ha transformado SENDA:
 - De un prototipo con inconsistencias numéricas y asunciones optimistas no justificadas,
-- A una **plataforma científica de grado de investigación y defensa**, con fundamentos físicos contrastados, un algoritmo de enrutamiento ante catástrofes patentable y demostrablemente superior (PAER), cinemática orbital topocéntrica exacta, seguridad robusta y una postura inversora de honestidad irreprochable.
+- A una **plataforma científica de grado de investigación**, con fundamentos físicos contrastados, un algoritmo de enrutamiento ante catástrofes innovador y verificable (PAER), cinemática orbital topocéntrica exacta, seguridad robusta y una postura inversora de honestidad irreprochable.

@@ -18,7 +18,7 @@
 
 ## 1. FUNDAMENTO FÍSICO Y ECUACIÓN DE BALANCE DE ENLACE
 
-Para cualquier enlace radioeléctrico en el sistema SENDA, la potencia recibida $P_{\text{rx}}$ (en dBm) y el margen de desvanecimiento $M_{\text{fade}}$ (en dB) se calculan mediante la formulación física rigurosa implementada en [`telecom-mathematical-physics.mjs`](file:///c:/Users/2fabr/civic-relay/packages/senda/src/telecom-mathematical-physics.mjs#L180-L240):
+Para cualquier enlace radioeléctrico en el sistema SENDA, la potencia recibida $P_{\text{rx}}$ (en dBm) y el margen de desvanecimiento $M_{\text{fade}}$ (en dB) se calculan mediante la función `computeCompleteLinkBudget()` implementada en [`telecom-mathematical-physics.mjs`](file:///c:/Users/2fabr/civic-relay/packages/senda/src/telecom-mathematical-physics.mjs#L406-L496):
 
 $$P_{\text{rx}} = P_{\text{tx}} + G_{\text{tx}} - L_{\text{tx\_loss}} - \text{FSPL} - A_{\text{diff}} - A_{\text{rain}} - A_{\text{gas}} + G_{\text{rx}} - L_{\text{rx\_loss}}$$
 
@@ -27,7 +27,7 @@ $$M_{\text{fade}} = P_{\text{rx}} - S_{\text{rx}}$$
 Donde:
 1. **$P_{\text{tx}}$**: Potencia de transmisión en bornes del transmisor (dBm).
 2. **$G_{\text{tx}}, G_{\text{rx}}$**: Ganancias de antena transmisora y receptora respecto a radiador isótropo (dBi).
-3. **$L_{\text{tx\_loss}}, L_{\text{rx\_loss}}$**: Pérdidas por cableado, conectores y duplexor (dB).
+3. **$L_{\text{tx\_loss}}, L_{\text{rx\_loss}}$**: Pérdidas por cableado coaxial, conectores y duplexor (dB).
 4. **$\text{FSPL}$**: Pérdida básica de propagación en espacio libre (ITU-R P.525-4):
    $$\text{FSPL}(\text{dB}) = 32.44 + 20 \log_{10}(d_{\text{km}}) + 20 \log_{10}(f_{\text{MHz}})$$
 5. **$A_{\text{diff}}$**: Atenuación por difracción en obstáculos topográficos mediante el método Deygout con factor de corrección empírico $C$ (ITU-R P.526-15 §4.3):
@@ -44,8 +44,8 @@ Donde:
 
 ### Criterio de Viabilidad de Enlace
 En misiones de emergencia SENDA, un enlace se declara técnicamente **VIABLE** si y solo si:
-$$M_{\text{fade}} \ge M_{\text{req}} = 10.0\text{ dB}$$
-Cualquier margen $0\text{ dB} \le M_{\text{fade}} < 10\text{ dB}$ se cataloga como **MARGINAL** (alta probabilidad de pérdida de paquetes por multitrayecto o lluvia repentina). Si $M_{\text{fade}} < 0\text{ dB}$, el enlace se marca **BLOQUEADO / INVIABLE**.
+$$M_{\text{fade}} \ge M_{\text{req}} = 10.0\text{ dB} \quad \text{y} \quad \text{isRegulatoryCompliant} = \text{true}$$
+Cualquier margen $0\text{ dB} \le M_{\text{fade}} < 10\text{ dB}$ se cataloga como **MARGINAL**. Si $M_{\text{fade}} < 0\text{ dB}$, el enlace se marca **OUTAGE (Bloqueado / Inviable)**.
 
 ---
 
@@ -55,8 +55,8 @@ Cualquier margen $0\text{ dB} \le M_{\text{fade}} < 10\text{ dB}$ se cataloga co
 |---|---|---|---|---|---|---|---|---|
 | **VHF Satélite (NOAA APT)** | 137.5 MHz | 34 kHz | N/A (Satélite LEO ~5W) | UIT-R Satélite Meteorológico | $-120\text{ dBm}$ (FM analógica) | 0 dBi / 3 dBi (Turnstile) | 3.5 dB | Recepción directa de imágenes de satélites meteorológicos LEO. |
 | **UHF ISM (Telemetry / Voice)** | 433.05–434.79 MHz | 25 kHz | 10 mW ERP (+10 dBm), 10% DC | ETSI EN 300 220-2 (Anexo B) | $-118\text{ dBm}$ (FSK 9.6 kbps) | 2.15 dBi / 2.15 dBi | 5.0 dB | Sensores ambientales remotos, balizas de emergencia COTS. |
-| **LoRa EU868 Standard** | 868.0–868.6 MHz | 125 kHz | 25 mW ERP (+14 dBm), 1% DC | ETSI EN 300 220-2 (Banda g) | $-130\text{ dBm}$ (SF10, CR 4/5) | 2.15 dBi / 3.0 dBi | 4.0 dB | Nodos de campo, balizas de brigadas y pasarelas vehiculares. |
-| **LoRa EU869 High Power** | 869.4–869.65 MHz | 125 kHz | 500 mW ERP (+27 dBm), 10% DC | ETSI EN 300 220-2 (Banda g3) | $-130\text{ dBm}$ (SF10, CR 4/5) | 5.0 dBi / 6.0 dBi | 3.5 dB | Repetidores de cresta, nodos tácticos en torres y mástiles. |
+| **LoRa EU868 Standard** | 868.0–868.6 MHz | 125 kHz | 25 mW ERP (+14 dBm / 16.15 dBm EIRP) | ETSI EN 300 220-2 (Banda g) | $-130\text{ dBm}$ (SF10, CR 4/5) | 2.15 dBi / 3.0 dBi | 4.0 dB | Nodos de campo, balizas de brigadas y pasarelas vehiculares. |
+| **LoRa EU869 High Power** | 869.4–869.65 MHz | 125 kHz | 500 mW ERP (+27 dBm / 29.15 dBm EIRP) | ETSI EN 300 220-2 (Banda g3) | $-130\text{ dBm}$ (SF10, CR 4/5) | 5.0 dBi / 6.0 dBi | 3.5 dB | Repetidores de cresta, nodos tácticos en torres y mástiles. |
 | **L-Band Satélite (Iridium / Globalstar)** | 1616.0–1626.5 MHz | 41.67 kHz | 2 W (+33 dBm pico) | FCC Part 25 / ETSI EN 301 441 | $-116\text{ dBm}$ (QPSK) | 1.5 dBi / 2.0 dBi (Patch) | 4.0 dB | Enlace satelital de socorro cuando colapsa la infraestructura terrestre. |
 | **2.4 GHz Wi-Fi / BLE (IEEE 802.11b/g/n)** | 2412–2472 MHz | 20 MHz | 100 mW EIRP (+20 dBm) | ETSI EN 300 328 | $-85\text{ dBm}$ (OFDM 12 Mbps) | 3.0 dBi / 3.0 dBi | 6.0 dB | Red de área de incidente, intercambio directo P2P entre smartphones. |
 | **5.8 GHz Backbone P2P (IEEE 802.11ac)** | 5725–5875 MHz | 40 MHz | 1 W EIRP (+30 dBm) | ETSI EN 301 893 (Banda C / SRD) | $-78\text{ dBm}$ (256-QAM) | 18 dBi / 18 dBi (Directivas) | 5.0 dB | Troncal de alta capacidad para Puesto de Mando Avanzado (PMA). |
@@ -66,125 +66,116 @@ Cualquier margen $0\text{ dB} \le M_{\text{fade}} < 10\text{ dB}$ se cataloga co
 
 ## 3. CURVAS COMPARATIVAS Y DISCONTINUIDADES RESUELTAS
 
-### 3.1 Atenuación Específica por Lluvia ITU-R P.838-3
-En la versión anterior del repositorio, existía una discontinuidad no física de un **1378%** al cruzar los 6.00 GHz debido a un modelo por tramos tosco. Con la integración de la formulación continua oficial en [`telecom-mathematical-physics.mjs`](file:///c:/Users/2fabr/civic-relay/packages/senda/src/telecom-mathematical-physics.mjs#L110-L165), los valores son estrictamente continuos, diferenciables y conformes a norma para intensidades de lluvia $R \in [1, 150]\text{ mm/h}$:
+### 3.1 Atenuación Específica por Lluvia ITU-R P.838-3 (Polarización Vertical)
+Con la formulación continua normativa en [`telecom-mathematical-physics.mjs`](file:///c:/Users/2fabr/civic-relay/packages/senda/src/telecom-mathematical-physics.mjs#L315-L375), se eliminó la discontinuidad histórica a 6 GHz. Los valores exactos generados por el motor para polarización vertical son:
 
-| Frecuencia | $R = 5\text{ mm/h}$ (Moderada) | $R = 20\text{ mm/h}$ (Fuerte) | $R = 50\text{ mm/h}$ (Torrencial) | $R = 100\text{ mm/h}$ (Extrema) | Estado Numérico |
-|---|---|---|---|---|---|
-| **137.5 MHz** | $< 0.0001\text{ dB/km}$ | $< 0.0001\text{ dB/km}$ | $0.0001\text{ dB/km}$ | $0.0002\text{ dB/km}$ | Despreciable |
-| **433 MHz** | $0.0002\text{ dB/km}$ | $0.0009\text{ dB/km}$ | $0.0028\text{ dB/km}$ | $0.0068\text{ dB/km}$ | Despreciable |
-| **868 MHz** | $0.0011\text{ dB/km}$ | $0.0051\text{ dB/km}$ | $0.0152\text{ dB/km}$ | $0.0357\text{ dB/km}$ | Muy bajo |
-| **1.6 GHz** | $0.0048\text{ dB/km}$ | $0.0232\text{ dB/km}$ | $0.0715\text{ dB/km}$ | $0.1706\text{ dB/km}$ | Bajo |
-| **2.4 GHz** | $0.0135\text{ dB/km}$ | $0.0658\text{ dB/km}$ | $0.2051\text{ dB/km}$ | $0.4932\text{ dB/km}$ | Perceptible a $> 5\text{ km}$ |
-| **5.8 GHz** | $0.1145\text{ dB/km}$ | $0.5824\text{ dB/km}$ | $1.8642\text{ dB/km}$ | $4.5610\text{ dB/km}$ | **Crítico en tormenta DANA** |
-| **10.0 GHz** | $0.4521\text{ dB/km}$ | $2.3120\text{ dB/km}$ | $7.4812\text{ dB/km}$ | $18.324\text{ dB/km}$ | **Bloqueante sin margen** |
+| Frecuencia | $R = 5\text{ mm/h}$ (Moderada) | $R = 20\text{ mm/h}$ (Fuerte) | $R = 50\text{ mm/h}$ (Torrencial) | $R = 100\text{ mm/h}$ (Extrema) | Estado Físico |
+|---|:---:|:---:|:---:|:---:|---|
+| **137.5 MHz** | $< 0.00001\text{ dB/km}$ | $0.00001\text{ dB/km}$ | $0.00002\text{ dB/km}$ | $0.00003\text{ dB/km}$ | Despreciable |
+| **433 MHz** | $0.00002\text{ dB/km}$ | $0.00008\text{ dB/km}$ | $0.00017\text{ dB/km}$ | $0.00030\text{ dB/km}$ | Despreciable |
+| **868 MHz** | $0.00009\text{ dB/km}$ | $0.00030\text{ dB/km}$ | $0.00067\text{ dB/km}$ | $0.00121\text{ dB/km}$ | Inmune a lluvia |
+| **1.6 GHz** | $0.00028\text{ dB/km}$ | $0.00098\text{ dB/km}$ | $0.00225\text{ dB/km}$ | $0.00421\text{ dB/km}$ | Despreciable |
+| **2.4 GHz** | $0.00068\text{ dB/km}$ | $0.00271\text{ dB/km}$ | $0.00675\text{ dB/km}$ | $0.01347\text{ dB/km}$ | Bajo |
+| **5.8 GHz** | $0.00514\text{ dB/km}$ | $0.04623\text{ dB/km}$ | $0.19757\text{ dB/km}$ | $0.59278\text{ dB/km}$ | Apreciable en distancias largas |
+| **10.0 GHz** | $0.07989\text{ dB/km}$ | $0.43088\text{ dB/km}$ | $1.31253\text{ dB/km}$ | $3.04829\text{ dB/km}$ | **Atenuación severa** |
 
-*Verificación:* Evaluada analíticamente en `packages/senda/tests/telecom-mathematical-physics.test.mjs` garantizando error relativo $< 10^{-4}$ respecto a las tablas de referencia UIT-R P.838-3.
+*Verificación de Continuidad:* A $R = 20\text{ mm/h}$, a 5.99 GHz $\gamma_R = 0.05383\text{ dB/km}$; a 6.00 GHz $\gamma_R = 0.05426\text{ dB/km}$; a 6.01 GHz $\gamma_R = 0.05469\text{ dB/km}$. Continuidad diferenciable $\Delta < 0.0005\text{ dB/km}$.
 
 ### 3.2 Difracción en Filo de Cuchillo y Deygout ITU-R P.526-15
-La función de pérdida por difracción en obstáculo aislado $J(v)$ describe una curva asintótica suave sin discontinuidades:
-- $v < -0.7$: Despeje total ($J(v) \approx 0\text{ dB}$, enlace en espacio libre).
-- $v = 0$: Rayo rasante al obstáculo ($J(0) = 6.02\text{ dB}$, pérdida teórica en filo de cuchillo rasante).
-- $v = 1.0$: Obstrucción moderada ($J(1.0) = 13.51\text{ dB}$).
-- $v = 2.0$: Obstrucción profunda ($J(2.0) = 19.34\text{ dB}$).
-- $v = 3.0$: Sombra profunda ($J(3.0) = 22.86\text{ dB}$).
+Valores calculados por `computeKnifeEdgeLossDb(v)`:
+- $v < -0.7$: Despeje total ($J(v) = 0.00\text{ dB}$, espacio libre).
+- $v = 0$: Rayo rasante al obstáculo ($J(0) = 6.03\text{ dB}$).
+- $v = 1.0$: Obstrucción moderada ($J(1.0) = 13.93\text{ dB}$).
+- $v = 2.0$: Obstrucción profunda ($J(2.0) = 19.04\text{ dB}$).
+- $v = 3.0$: Sombra profunda ($J(3.0) = 22.42\text{ dB}$).
 
-Para múltiples obstáculos, el método Deygout calcula el obstáculo principal $M$, genera las pérdidas $J(v_M)$, y suma las pérdidas de los obstáculos secundarios izquierdo y derecho corregidas por el factor $C$:
+Para múltiples obstáculos, el método Deygout aplica la corrección:
 $$C = 10.0 + 0.042 \times \frac{d_1 \cdot d_2}{d_1 + d_2}$$
-evitando la sobreestimación conservadora del método Epstein-Peterson o la subestimación de la suma directa.
 
 ---
 
-## 4. ESCENARIOS TOPOGRÁFICOS DE ENSAYO NUMÉRICO Y CONTRASTE
+## 4. ESCENARIOS TOPOGRÁFICOS DE ENSAYO NUMÉRICO REPRODUCIBLES
 
-### Escenario 1: Incendio de Bejís (Castellón) — Enlace de Cresta Montañosa (LoRa 869 MHz vs 5.8 GHz)
+### Escenario 1: Enlace Sierra de Bejís (Castellón) — Cresta Montañosa (LoRa 869.5 MHz vs 5.8 GHz)
 - **Geometría:** Distancia total $d = 8.5\text{ km}$.
-  - Transmisor: Puesto de Mando (PMA) en Bejís ($h_{\text{tx}} = 800\text{ m}$ s.n.m. + torre $10\text{ m}$).
-  - Receptor: Relé avanzado en Peña Escabia ($h_{\text{rx}} = 1330\text{ m}$ s.n.m. + mástil $6\text{ m}$).
-  - Obstáculo intermedio: Cresta rocosa a $d_1 = 3.5\text{ km}$, $d_2 = 5.0\text{ km}$, intrusión en la línea de vista de $h_c = 15\text{ m}$ sobre el rayo directo ($v \approx 1.15$).
-  - Meteorología: Humo denso, temperatura $38^\circ\text{C}$, sin lluvia ($R = 0\text{ mm/h}$).
+  - Transmisor: Puesto de Mando (PMA) en Bejís ($h_{\text{tx}} = 800\text{ m}$ s.n.m.).
+  - Receptor: Relé en Peña Escabia ($h_{\text{rx}} = 1330\text{ m}$ s.n.m.).
+  - Obstáculo intermedio: Cresta rocosa a $d_1 = 3.5\text{ km}$, $d_2 = 5.0\text{ km}$ ($v \approx 1.15$). Pérdida difracción estimada: LoRa $= 14.2\text{ dB}$, 5.8 GHz $= 21.5\text{ dB}$.
+  - Condiciones: Sin lluvia ($R = 0\text{ mm/h}$), atmósfera estándar.
 
-| Parámetro | LoRa 869.5 MHz (500 mW ERP) | Backbone 5.8 GHz (1 W EIRP) | Justificación Física |
+*Resultados reproducibles con `computeCompleteLinkBudget()`:*
+
+| Parámetro | LoRa 869.5 MHz (Conforme ETSI) | Backbone 5.8 GHz (Conforme ETSI) | Justificación Física |
 |---|---|---|---|
-| Potencia Tx ($P_{\text{tx}}$) | $+27.0\text{ dBm}$ | $+30.0\text{ dBm}$ | Límite ETSI |
-| Ganancias Antenas ($G_{\text{tx}} + G_{\text{rx}}$) | $+11.0\text{ dBi}$ (Directivas dipolo) | $+36.0\text{ dBi}$ (Parabólicas 30cm) | Apertura angular y tamaño COTS |
-| Pérdidas en cables ($L_{\text{tx}} + L_{\text{rx}}$) | $2.0\text{ dB}$ | $3.5\text{ dB}$ | Mayor atenuación de cable a 5.8 GHz |
-| Pérdida Espacio Libre ($\text{FSPL}$) | $109.8\text{ dB}$ | $126.3\text{ dB}$ | $\Delta = +16.5\text{ dB}$ por mayor frecuencia |
-| Pérdida Difracción Deygout ($A_{\text{diff}}$) | $14.2\text{ dB}$ | $21.5\text{ dB}$ | El parámetro $v \propto \sqrt{f}$, mayor sombra en GHz |
-| Atenuación Lluvia / Humo | $0.0\text{ dB}$ | $0.2\text{ dB}$ | Despreciable |
-| Absorción Gaseosa ($A_{\text{gas}}$) | $0.05\text{ dB}$ | $0.25\text{ dB}$ | ITU-R P.676-13 |
-| **Potencia Recibida ($P_{\text{rx}}$)** | **$-88.05\text{ dBm}$** | **$-85.75\text{ dBm}$** | Ambas señales llegan a la antena receptora |
-| Sensibilidad Receptor ($S_{\text{rx}}$) | $-130.0\text{ dBm}$ (SF10) | $-78.0\text{ dBm}$ (MCS7) | Gran diferencia en ancho de banda (125 kHz vs 40 MHz) |
-| **Margen de Desvanecimiento ($M_{\text{fade}}$)** | **$+41.95\text{ dB}$** | **$-7.75\text{ dB}$** | **LoRa viable, 5.8 GHz bloqueado** |
-| **Dictamen de Viabilidad SENDA** | **ENLACE ROBUSTO Y SEGURO** | **BLOQUEADO (Requiere relé en cresta)** | La difracción y alta sensibilidad salvan a LoRa |
+| Potencia Tx ($P_{\text{tx}}$) | $+25.0\text{ dBm}$ (316 mW) | $+13.0\text{ dBm}$ (20 mW conducida) | Ajustada para cumplir límite ETSI |
+| Ganancia Antena Tx ($G_{\text{tx}}$) | $+5.0\text{ dBi}$ | $+18.0\text{ dBi}$ (Directiva) | Antenas COTS |
+| Pérdida Cable Tx ($L_{\text{tx}}$) | $1.0\text{ dB}$ | $1.75\text{ dB}$ | Coaxial y conectores |
+| **PIRE Calculada (EIRP)** | **$29.0\text{ dBm}$** | **$29.25\text{ dBm}$** | Ambas dentro de la ley |
+| **Límite Regulatorio ETSI** | **$29.15\text{ dBm}$** ($500\text{ mW ERP}$) | **$30.0\text{ dBm}$** ($1\text{ W EIRP}$) | Cumplimiento regulatorio estricto |
+| **Conformidad Regulatoria** | **TRUE ✓** | **TRUE ✓** | `isRegulatoryCompliant: true` |
+| Ganancia Antena Rx ($G_{\text{rx}}$) | $+6.0\text{ dBi}$ | $+18.0\text{ dBi}$ | Ganancia en estación receptora |
+| Pérdida Cable Rx ($L_{\text{rx}}$) | $1.0\text{ dB}$ | $1.75\text{ dB}$ | Coaxial receptor |
+| Pérdida Espacio Libre ($\text{FSPL}$) | $109.82\text{ dB}$ | $126.30\text{ dB}$ | Relación $\lambda / 4\pi d$ |
+| Pérdida Difracción ($A_{\text{diff}}$) | $14.20\text{ dB}$ | $21.50\text{ dB}$ | $v \propto \sqrt{f}$, mayor sombra en 5.8 GHz |
+| Absorción Gaseosa ($A_{\text{gas}}$) | $0.09\text{ dB}$ | $0.09\text{ dB}$ | ITU-R P.676-13 |
+| **Pérdida Total de Trayecto** | **$124.11\text{ dB}$** | **$147.89\text{ dB}$** | Atenuación acumulada |
+| **Potencia Recibida ($P_{\text{rx}}$)** | **$-90.11\text{ dBm}$** | **$-102.39\text{ dBm}$** | Potencia en bornes de receptor |
+| Suelo de Ruido Térmico ($N$) | $-117.03\text{ dBm}$ ($B=125\text{ kHz}$) | $-91.98\text{ dBm}$ ($B=40\text{ MHz}$) | Ruido térmico a 290 K + NF 6 dB |
+| Relación Señal/Ruido (SNR) | $+26.92\text{ dB}$ | $-10.41\text{ dB}$ | SNR en el demodulador |
+| Sensibilidad Receptor ($S_{\text{rx}}$) | $-130.00\text{ dBm}$ (SF10) | $-78.00\text{ dBm}$ (MCS7) | Umbral de decodificación |
+| **Margen de Desvanecimiento ($M_{\text{fade}}$)** | **$+39.89\text{ dB}$** | **$-24.39\text{ dB}$** | Margen de disponibilidad |
+| **Estado del Enlace** | **VIABLE ✓** | **OUTAGE (Bloqueado)** | LoRa opera con holgura; 5.8 GHz cortado |
 
 ---
 
-### Escenario 2: DANA de Valencia (Campanar) — Enlace Urbano con Lluvia Extrema (2.4 GHz vs 868 MHz)
-- **Geometría:** Distancia $d = 2.4\text{ km}$ en entorno urbano denso.
-  - Transmisor: Sensor hidrológico en cauce nuevo del río Turia ($h_{\text{tx}} = 3\text{ m}$).
-  - Receptor: Antena comunitaria en azotea de edificio ($h_{\text{rx}} = 45\text{ m}$).
-  - Obstrucciones: Árboles y vano de puente intermedio ($A_{\text{diff}} \approx 8.0\text{ dB}$).
-  - Meteorología: Lluvia convectiva torrencial extrema de $R = 85\text{ mm/h}$.
+### Escenario 2: Enlace Urbano con Lluvia Extrema (Valencia / Campanar)
+- **Geometría:** Distancia $d = 2.4\text{ km}$ en entorno periurbano.
+  - Sensor en cauce nuevo del río ($h_{\text{tx}} = 3\text{ m}$) a estación receptora en azotea ($h_{\text{rx}} = 45\text{ m}$).
+  - Obstrucción parcial: vegetación y vano de puente ($A_{\text{diff}} = 8.0\text{ dB}$ LoRa / $12.4\text{ dB}$ 2.4 GHz).
+  - Lluvia torrencial convectiva extrema: $R = 85\text{ mm/h}$.
 
-| Parámetro | LoRa EU868 (25 mW ERP) | Wi-Fi 2.4 GHz (100 mW EIRP) | Análisis de Resiliencia |
+*Resultados reproducibles con `computeCompleteLinkBudget()`:*
+
+| Parámetro | LoRa EU868 (868.1 MHz) | Wi-Fi 2.4 GHz (2437 MHz / Ch 6) | Dictamen Técnico |
 |---|---|---|---|
-| Potencia Tx ($P_{\text{tx}}$) | $+14.0\text{ dBm}$ | $+20.0\text{ dBm}$ | Máxima potencia legal permitida |
-| Ganancias Antenas ($G_{\text{tx}} + G_{\text{rx}}$) | $+5.15\text{ dBi}$ | $+6.0\text{ dBi}$ | Antenas omnidireccionales estándar |
-| Pérdidas en cableado | $1.0\text{ dB}$ | $2.0\text{ dB}$ | Conectores SMA y tirada coaxial |
-| Espacio Libre ($\text{FSPL}$) | $98.8\text{ dB}$ | $107.6\text{ dB}$ | Relación $\lambda/4\pi d$ |
-| Difracción ($A_{\text{diff}}$) | $8.0\text{ dB}$ | $12.4\text{ dB}$ | Mayor dispersión en 2.4 GHz |
-| Atenuación Lluvia ($85\text{ mm/h} \times 2.4\text{ km}$) | $0.07\text{ dB}$ | $0.98\text{ dB}$ | ITU-R P.838-3 continua |
-| **Potencia Recibida ($P_{\text{rx}}$)** | **$-88.72\text{ dBm}$** | **$-96.98\text{ dBm}$** | Wi-Fi degradado severamente |
-| Sensibilidad Receptor ($S_{\text{rx}}$) | $-130.0\text{ dBm}$ | $-85.0\text{ dBm}$ | Wi-Fi requiere mayor SNR por modulación 64-QAM |
-| **Margen de Desvanecimiento ($M_{\text{fade}}$)** | **$+41.28\text{ dB}$** | **$-11.98\text{ dB}$** | **Wi-Fi totalmente cortado por ruido y pérdidas** |
-| **Dictamen de Viabilidad SENDA** | **OPERATIVO (100% PDR)** | **CAÍDA COMPLETA DEL ENLACE** | SENDA conmuta el tráfico a la malla LoRa DTN |
+| Potencia Tx ($P_{\text{tx}}$) | $+14.0\text{ dBm}$ (25 mW) | $+17.0\text{ dBm}$ (50 mW) | Potencia legal |
+| Ganancia Antenas ($G_{\text{tx}} / G_{\text{rx}}$) | $+2.15\text{ dBi} / +3.0\text{ dBi}$ | $+3.0\text{ dBi} / +3.0\text{ dBi}$ | Omnidireccionales estándar |
+| Pérdidas en cableado ($L_{\text{tx}} / L_{\text{rx}}$) | $0.5\text{ dB} / 0.5\text{ dB}$ | $1.0\text{ dB} / 1.0\text{ dB}$ | Cables coaxiales cortos |
+| **PIRE (EIRP)** | **$15.65\text{ dBm}$** ($\le 16.15\text{ dBm}$) | **$19.00\text{ dBm}$** ($\le 20.00\text{ dBm}$) | **Ambos conformes a ETSI** |
+| Espacio Libre ($\text{FSPL}$) | $98.82\text{ dB}$ | $107.79\text{ dB}$ | Dispersión geométrica |
+| Difracción ($A_{\text{diff}}$) | $8.00\text{ dB}$ | $12.40\text{ dB}$ | Obstrucción urbana |
+| Atenuación Lluvia ($A_{\text{rain}}$) | $0.00\text{ dB}$ ($< 0.002\text{ dB}$) | $0.02\text{ dB}$ | Lluvia $85\text{ mm/h}$ en $2.4\text{ km}$ |
+| Absorción Gaseosa ($A_{\text{gas}}$) | $0.02\text{ dB}$ | $0.02\text{ dB}$ | ITU-R P.676-13 |
+| **Pérdida Total de Trayecto** | **$106.84\text{ dB}$** | **$120.23\text{ dB}$** | Pérdidas acumuladas |
+| **Potencia Recibida ($P_{\text{rx}}$)** | **$-88.70\text{ dBm}$** | **$-99.23\text{ dBm}$** | Señal en antena receptora |
+| Suelo de Ruido Térmico ($N$) | $-117.03\text{ dBm}$ ($125\text{ kHz}$) | $-94.99\text{ dBm}$ ($20\text{ MHz}$) | Ruido térmico |
+| SNR | $+28.33\text{ dB}$ | $-4.24\text{ dB}$ | SNR insuficiente en Wi-Fi |
+| Sensibilidad ($S_{\text{rx}}$) | $-130.00\text{ dBm}$ | $-85.00\text{ dBm}$ | Umbral de recepción |
+| **Margen de Desvanecimiento ($M_{\text{fade}}$)** | **$+41.30\text{ dB}$** | **$-14.23\text{ dB}$** | **LoRa viable, Wi-Fi bloqueado** |
+| **Estado del Enlace** | **VIABLE ✓** | **OUTAGE (Caída completa)** | Tráfico conmutado a malla LoRa |
 
 ---
 
-### Escenario 3: Satélite LEO Meteorológico (137.5 MHz NOAA APT vs L-Band 1.6 GHz Iridium)
-- **Geometría:** Satélite en órbita LEO a $750\text{ km}$ de altitud, elevación sobre el horizonte $\epsilon = 15^\circ$ ($d_{\text{slant}} = 1850\text{ km}$).
-  - Desplazamiento Doppler: $\pm 3.0\text{ kHz}$ en 137.5 MHz; $\pm 37.5\text{ kHz}$ en 1.6 GHz.
-  - Atenuación ionosférica y rotación de Faraday presentes en VHF.
+### Escenario 3: Trayecto Oblicuo de Satélite LEO (137.5 MHz vs 1.6 GHz)
+- **Geometría:** Satélite LEO a altitud $h = 750\text{ km}$, ángulo de elevación topocéntrico $\epsilon = 15^\circ$, distancia oblicua (*slant range*) $d_{\text{slant}} \approx 1850\text{ km}$.
+- **Nota Física Fundamental sobre Absorción Gaseosa:** El modelo horizontal terrestre $A_{\text{gas}} = \gamma \cdot d$ **no debe aplicarse ciegamente a trayectos oblicuos espaciales**, ya que la masa de aire atmosférica está concentrada en los primeros $10\text{ km}$ de altitud (escala barométrica $H \approx 7-8\text{ km}$). La atenuación gaseosa cenital a 137 MHz y 1.6 GHz es inferior a $0.08\text{ dB}$, y al proyectarse por el factor de cosecante $\frac{1}{\sin 15^\circ} \approx 3.86$, no supera los $0.35\text{ dB}$ totales.
 
-| Parámetro | NOAA APT (137.5 MHz) | Iridium SBD (1621.25 MHz) | Consideraciones de Satélite LEO |
+| Parámetro | NOAA APT (137.5 MHz) | Iridium SBD (1621.25 MHz) | Física del Trayecto Oblicuo |
 |---|---|---|---|
-| Potencia Satélite / Terminal ($P_{\text{tx}}$) | $+37.0\text{ dBm}$ (5 W satélite) | $+33.0\text{ dBm}$ (2 W terminal uplink) | Balance de enlace descendente vs ascendente |
-| Ganancia Tx ($G_{\text{tx}}$) | $+4.0\text{ dBi}$ | $+2.0\text{ dBi}$ (Patch) | Diagrama de radiación hemisférico |
-| Ganancia Rx ($G_{\text{rx}}$) | $+3.0\text{ dBi}$ (Turnstile / V-Dipole) | $+24.0\text{ dBi}$ (Array en satélite) | Ganancia de recepción en tierra / espacio |
-| Espacio Libre Slant Range ($1850\text{ km}$) | $140.5\text{ dB}$ | $162.0\text{ dB}$ | Distancia hipotenusa topocéntrica |
-| Absorción Atmosférica + Ionosfera | $1.2\text{ dB}$ | $0.4\text{ dB}$ | Efecto ionosférico crítico en VHF |
-| Margen de Polarización / Desapuntamiento | $3.0\text{ dB}$ | $2.5\text{ dB}$ | Polarización circular RHCP |
-| **Potencia Recibida ($P_{\text{rx}}$)** | **$-100.7\text{ dBm}$** | **$-105.9\text{ dBm}$** | Señal captada en terminal |
-| Sensibilidad Receptor ($S_{\text{rx}}$) | $-120.0\text{ dBm}$ (FM $B=34\text{ kHz}$) | $-116.0\text{ dBm}$ (QPSK $B=41.67\text{ kHz}$) | Relación señal a ruido alcanzable |
-| **Margen de Desvanecimiento ($M_{\text{fade}}$)** | **$+19.3\text{ dB}$** | **$+10.1\text{ dB}$** | **Ambos enlaces viables a $15^\circ$ de elevación** |
-| **Dictamen de Viabilidad SENDA** | **IMAGEN METEOROLÓGICA DECODIFICABLE** | **TELEMETRÍA SATELITAL ENTREGADA** | Requiere seguimiento Doppler en tiempo real |
+| Potencia Tx ($P_{\text{tx}}$) | $+37.0\text{ dBm}$ (5 W satélite) | $+33.0\text{ dBm}$ (2 W terminal uplink) | Potencia de emisión |
+| Ganancia Tx / Rx | $+4.0\text{ dBi} / +3.0\text{ dBi}$ | $+2.0\text{ dBi} / +24.0\text{ dBi}$ | Antenas directivas y parches |
+| Pérdida Espacio Libre Slant ($1850\text{ km}$) | $140.54\text{ dB}$ | $161.99\text{ dB}$ | $\text{FSPL}$ a $1850\text{ km}$ |
+| Absorción Troposférica Oblicua | $0.30\text{ dB}$ | $0.35\text{ dB}$ | Integrada en columna atmosférica |
+| Pérdidas Ionosféricas y Faraday | $1.20\text{ dB}$ | $0.15\text{ dB}$ | Mayor rotación en VHF |
+| Margen Desapuntamiento y Polarización | $2.50\text{ dB}$ | $2.50\text{ dB}$ | Polarización circular RHCP |
+| **Potencia Recibida ($P_{\text{rx}}$)** | **$-100.54\text{ dBm}$** | **$-105.99\text{ dBm}$** | Nivel de señal en antena |
+| Sensibilidad ($S_{\text{rx}}$) | $-120.00\text{ dBm}$ | $-116.00\text{ dBm}$ | Límite del receptor |
+| **Margen de Desvanecimiento ($M_{\text{fade}}$)** | **$+19.46\text{ dB}$** | **$+10.01\text{ dB}$** | **Ambos enlaces viables con margen** |
 
 ---
 
-## 5. MATRIZ CONSOLIDADA DE DECISIÓN DE CAPA FÍSICA EN SENDA
+## 5. REGLA DE AUDITORÍA PERMANENTE EN EL REPOSITORIO
 
-La siguiente matriz rige el conmutador de transporte adaptativo en el núcleo [`physics-aware-emergency-network.mjs`](file:///c:/Users/2fabr/civic-relay/packages/senda/src/physics-aware-emergency-network.mjs#L140-L210):
-
-```mermaid
-flowchart TD
-    A["Requisito de Transmisión de Mensaje"] --> B{"¿Existe Obstáculo NLOS Profundo (>25 dB)?"}
-    B -- "Sí" --> C{"¿Distancia > 15 km?"}
-    C -- "Sí" --> D["Modo L-Band Satélite / DTN Portadores"]
-    C -- "No" --> E["Modo LoRa 869 MHz (500mW, SF10/12)"]
-    B -- "No (LOS o Ligera Difracción)" --> F{"¿Lluvia Convectiva Extrema (>40 mm/h)?"}
-    F -- "Sí" --> G{"¿Frecuencia > 5 GHz?"}
-    G -- "Sí (Severa Atenuación de Lluvia)" --> E
-    G -- "No" --> H["Modo LoRa 868 MHz / UHF"]
-    F -- "No (Clima Despejado / Lluvia Débil)" --> I{"¿Caudal Requerido?"}
-    I -- "Alto (>1 Mbps: Video/Audio)" --> J["Modo 5.8 GHz Backbone / Wi-Fi"]
-    I -- "Bajo (Alertas/Telemetría <10 kbps)" --> H
-```
-
----
-
-## 6. CONCLUSIÓN Y REGLA DE AUDITORÍA PERMANENTE
-
-1. **Ningún enlace se aprueba geométricamente:** Todo cálculo de línea de vista en el visualizador 3D/4D debe estar respaldado por la función `evaluateRfLinkBudget()` de [`telecom-mathematical-physics.mjs`](file:///c:/Users/2fabr/civic-relay/packages/senda/src/telecom-mathematical-physics.mjs).
-2. **Cero discontinuidades:** Las curvas de lluvia ITU-R P.838-3 y difracción ITU-R P.526-15 no presentan saltos artificiales entre bandas adyacentes.
-3. **Respeto a los límites de potencia:** Todas las simulaciones aplican los límites ERP/EIRP estrictos de ETSI EN 300 220-2 y ETSI EN 300 328, impidiendo que el simulador infle artificialmente la cobertura transmitiendo con potencias ilegales.
+1. **Función Canónica de Balance de Enlace:** Toda evaluación debe utilizar la función exportada [`computeCompleteLinkBudget()`](file:///c:/Users/2fabr/civic-relay/packages/senda/src/telecom-mathematical-physics.mjs#L406-L496).
+2. **Conformidad Regulatoria Obligatoria:** Si `isRegulatoryCompliant` es falso (la PIRE supera los límites ETSI/FCC), el enlace no puede marcarse como válido para despliegues reales, impidiendo simulaciones con potencias ficticias ilegales.
+3. **Continuidad Normativa Verificada:** La atenuación por lluvia y difracción en filo de cuchillo no presenta discontinuidades ni asíntotas artificiales.

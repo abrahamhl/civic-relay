@@ -17,12 +17,12 @@
 | **EQ-03** | Presupuesto de enlace y margen | `telecom-mathematical-physics.mjs` | ETSI EN 300 220 / Friis | $P_{\text{tx}}$ [dBm], $L$ [dB], $N_0$ [dBm/Hz] | Cumplimiento regulatorio ERP/EIRP ✓ |
 | **EQ-04** | Umbral de percolación continua | `telecom-mathematical-physics.mjs` | Meester & Roy (1996) | $\eta_c = 4.512$, radio [km], densidad [n/km²] | Analíticamente exacto ✓ |
 | **EQ-05** | Difusión epidémica y latencia DTN | `telecom-mathematical-physics.mjs` | Markov / DTN RFC 4838 | $\lambda$ [contactos/s], $t$ [s], $P90, P99$ [s] | Acotado superior/inferior ✓ |
-| **EQ-06** | Atenuación acústica atmosférica | `acoustic-beamforming-survival.mjs`| ISO 9613-1 | $f$ [Hz], $T$ [°C], $h_r$ [%], $\alpha$ [dB/m] | Coherente con 0,65 dB/m a 20 kHz ✓ |
+| **EQ-06** | Atenuación acústica atmosférica | `acoustic-beamforming-survival.mjs`| ISO 9613-1:1993 eqs. (3)-(5) | $f$ [Hz], $T$ [°C], $h_r$ [%], $\alpha$ [dB/m] | Relajación molecular $O_2$ y $N_2$ exacta ✓ |
 | **EQ-07** | Beamforming Delay-and-Sum | `acoustic-beamforming-survival.mjs`| Electroacústica clásica | $\vec{x}_m$ [m], $\tau_m$ [s], $c = 343\text{ m/s}$ | Factor de array unitario en puntería ✓ |
 | **EQ-08** | Cinemática orbital y look angles | `orbital.mjs` / `orbital-kinematics.mjs` | Kepler + J2 / Vallado (2013) | $r$ [km], $\dot{\rho}$ [km/s], az/el [grados] | $\dot{\rho} = 0$ en cénit verificado ✓ |
 | **EQ-09** | Desplazamiento Doppler relativo | `telecom-mathematical-physics.mjs` | Doppler relativista $v \ll c$ | $f_0$ [Hz], $\dot{\rho}$ [m/s], $\Delta f$ [Hz] | $\Delta f = -f_0 \frac{\dot{\rho}}{c}$ exacto ✓ |
-| **EQ-10** | Propagación de incendios acoplada | `fire-front-robust.mjs` | Rothermel (1972) / Albini | $R$ [m/s], $U$ [m/s], $\theta$ [rad], $M_f$ [%] | Calibrado con Bejís y Vall d'Ebo ✓ |
-| **EQ-11** | Forwarding estocástico PAER | `physics-aware-emergency-network.mjs`| SENDA Deep Tech IP | $U_{\text{PAER}}$ [adim], $t_{\text{impact}}$ [s] | Verificado en simulación discreta ✓ |
+| **EQ-10** | Propagación de incendios acoplada | `fire-front-robust.mjs` / `fire-cases.mjs` | Rothermel (1972) / Albini / NIST | $R$ [km/h], $U_{10}$ [km/h], Student-t | Calibrado con GOES-16 y NIST TN 2135 (LOFO) ✓ |
+| **EQ-11** | Forwarding estocástico PAER | `physics-aware-emergency-network.mjs`| SENDA Deep Tech IP | $U_{\text{PAER}}$ [adim], $t_{\text{impact}}$ [s] | Verificado en simulación discreta (0 pérdidas fuego) ✓ |
 
 ---
 
@@ -50,11 +50,14 @@ Para obstáculos secundarios a izquierda y derecha del obstáculo principal, se 
 $$L_{\text{total}} = J(\nu_P) + C_L J(\nu_L) + C_R J(\nu_R)$$
 - **Comprobación:** Evita la sobrestimación de pérdidas de hasta 14 dB que producía la suma lineal Deygout sin factores de corrección.
 
-### 2.3 Acústica ISO 9613-1 (Atenuación Atmosférica a Frecuencias Ultrasónicas)
-A $20\text{ kHz}$, $20^\circ\text{C}$ y 50 % de humedad relativa, el coeficiente de absorción atmosférica puro es aproximadamente $\alpha_{\text{atm}} \approx 0.65\text{ dB/m}$.
-La presión sonora a distancia $r$ desde un emisor esférico con nivel de potencia acústica $L_W$ es:
-$$L_p(r) = L_W - 20 \log_{10}(r) - 11.0 - \alpha_{\text{atm}} \cdot r$$
-- **Límite Físico Demostrado:** A $r = 10\text{ m}$, la atenuación por divergencia geométrica es de $31\text{ dB}$, sumada a $6.5\text{ dB}$ atmosféricos (pérdida total $37.5\text{ dB}$). Para altavoces de smartphone COTS que generan como máximo $70\text{ dB SPL}$ a 1 m, la señal a 10 m cae a $32.5\text{ dB SPL}$, por debajo del umbral de detección en cualquier escenario de emergencia con ruido ambiental.
+### 2.3 Acústica ISO 9613-1:1993 (Atenuación Atmosférica a Frecuencias Ultrasónicas)
+A diferencia de un ajuste cuadrático fijo, la función `computeIso9613AbsorptionDbPerM()` evalúa las frecuencias de relajación molecular del oxígeno ($f_{r,O}$) y del nitrógeno ($f_{r,N}$), así como la presión de vapor de saturación según el Anexo B:
+$$\alpha_{\text{atm}} = 8.686 f^2 \left( 1.84 \times 10^{-11} \left(\frac{T}{T_0}\right)^{1/2} + \left(\frac{T}{T_0}\right)^{-5/2} \left( 0.01275 \frac{e^{-2239.1/T}}{f_{r,O} + f^2/f_{r,O}} + 0.1068 \frac{e^{-3352.0/T}}{f_{r,N} + f^2/f_{r,N}} \right) \right) \quad [\text{dB/m}]$$
+
+A $20\text{ kHz}$, $20^\circ\text{C}$, 50 % HR y $101.325\text{ kPa}$, el coeficiente es $\alpha_{\text{atm}} \approx 0.524\text{ dB/m}$.
+La presión sonora recibida a distancia $r$ desde un emisor esférico con nivel de emisión $L_{\text{SPL}}(1\text{m})$ es:
+$$L_p(r) = L_{\text{SPL}}(1\text{m}) - 20 \log_{10}(r) - \alpha_{\text{atm}} \cdot r$$
+- **Límites Físicos Demostrados:** A $r = 10\text{ m}$, la atenuación geométrica es de $20\text{ dB}$ y la atmosférica es de $5.24\text{ dB}$ (pérdida total $25.24\text{ dB}$). En teléfonos móviles COTS con emisión limitada a $\sim 60\text{ dB SPL}$ a 1 m, la señal cae a $\sim 34.8\text{ dB SPL}$, siendo indetectable en entornos ruidosos ($> 85\text{ dBA}$). El estado de audibilidad se clasifica estrictamente como `audibilityStatus: 'UNMEASURED'` ante la ausencia de medidas audiométricas clínicas en laboratorio acústico.
 
 ---
 

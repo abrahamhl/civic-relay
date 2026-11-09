@@ -306,30 +306,65 @@ export function computeSentinelGatewayBOM() {
 }
 
 /**
+ * Pure-tone atmospheric absorption coefficient per ISO 9613-1:1993, eqs. (3)-(5),
+ * with saturation vapour pressure from Annex B. Replaces the former fixed
+ * 0.0016·f_kHz² fit, which ignored temperature, humidity and pressure.
+ *
+ * Reference values produced by this implementation (20 °C, 50 % RH, 101.325 kPa):
+ * 1 kHz ≈ 4.7 dB/km, 8 kHz ≈ 105 dB/km, 20 kHz ≈ 524 dB/km.
+ * Validity per ISO 9613-1: 50 Hz–10 kHz nominal, -20…+50 °C, 10…100 % RH; values
+ * above 10 kHz are an extrapolation of the same molecular-relaxation physics.
+ *
+ * @param {number} frequencyHz
+ * @param {number} [tempC=20]
+ * @param {number} [rhPct=50]
+ * @param {number} [pressureKpa=101.325]
+ * @returns {number} attenuation coefficient in dB/m
+ */
+export function computeIso9613AbsorptionDbPerM(frequencyHz, tempC = 20, rhPct = 50, pressureKpa = 101.325) {
+  if (![frequencyHz, tempC, rhPct, pressureKpa].every(Number.isFinite) || frequencyHz <= 0 || rhPct < 0 || pressureKpa <= 0) {
+    throw new TypeError('Invalid ISO 9613-1 input');
+  }
+  const pr = 101.325, T0 = 293.15, T01 = 273.16, T = tempC + 273.15;
+  const pa = pressureKpa / pr;
+  const C = -6.8346 * Math.pow(T01 / T, 1.261) + 4.6151;
+  const h = (rhPct * Math.pow(10, C)) / pa; // molar concentration of water vapour, %
+  const frO = pa * (24 + (4.04e4 * h * (0.02 + h)) / (0.391 + h));
+  const frN = pa * Math.pow(T / T0, -0.5) * (9 + 280 * h * Math.exp(-4.170 * (Math.pow(T / T0, -1 / 3) - 1)));
+  const f2 = frequencyHz * frequencyHz;
+  return 8.686 * f2 * ((1.84e-11 / pa) * Math.sqrt(T / T0) + Math.pow(T / T0, -2.5) * (
+    (0.01275 * Math.exp(-2239.1 / T)) / (frO + f2 / frO) +
+    (0.1068 * Math.exp(-3352.0 / T)) / (frN + f2 / frN)));
+}
+
+/**
  * Computes acoustic path attenuation according to ISO 9613-1 (atmospheric absorption)
  * and geometric spherical spreading for ultrasonic civilian frequencies.
+ *
+ * LIMITATION: the high-frequency noise floor (ambient dBA − 42 dB) and the 60 dB SPL @ 1 m
+ * source level are unmeasured modelling assumptions, not phone measurements.
  *
  * @param {number} distanceM Distance between transmitter and receiver in meters.
  * @param {number} [frequencyHz=20000] Acoustic carrier frequency in Hz.
  * @param {number} [ambientNoiseDba=60] Ambient acoustic noise level in dBA.
  * @param {number} [txSplAt1mDb=60] Transmit sound pressure level at 1 meter in dB SPL (COTS phone).
+ * @param {{ tempC?: number, rhPct?: number, pressureKpa?: number }} [atmosphere] Air state for ISO 9613-1.
  * @returns {{ pathLossDb: number, receivedSplDb: number, estimatedSnrDb: number, isDetectable: boolean, maxReliableDistanceM: number }}
  */
 export function computeUltrasonicAcousticLinkBudget(
   distanceM,
   frequencyHz = 20000,
   ambientNoiseDba = 60,
-  txSplAt1mDb = 60.0
+  txSplAt1mDb = 60.0,
+  atmosphere = {}
 ) {
   const d = Math.max(0.1, distanceM);
   // Spherical spreading divergence loss A_div = 20 * log10(d)
   const aDiv = 20.0 * Math.log10(d);
 
   // ISO 9613-1 atmospheric attenuation coefficient alpha (dB/m)
-  // At 20 °C, 50% RH, 101.325 kPa:
-  // 10 kHz -> ~0.20 dB/m; 20 kHz -> ~0.65 dB/m; 25 kHz -> ~1.05 dB/m
-  const fKhz = frequencyHz / 1000;
-  const alphaAtmDbPerM = 0.0016 * Math.pow(fKhz, 2.0);
+  const { tempC = 20, rhPct = 50, pressureKpa = 101.325 } = atmosphere;
+  const alphaAtmDbPerM = computeIso9613AbsorptionDbPerM(frequencyHz, tempC, rhPct, pressureKpa);
   const aAtm = alphaAtmDbPerM * d;
 
   const totalPathLossDb = +(aDiv + aAtm).toFixed(2);
@@ -400,22 +435,26 @@ export function generateUltrasonicRescueBeacon(coords, seqNumber = 1) {
     markFreqHz: 19500,
     spaceFreqHz: 20500,
     baudRate: 100, // 100 baud for robustness against multipath
-    inaudibleHuman: true, // nominal adult threshold (> 25 years)
+    // No audiometric measurement exists: audibility is UNKNOWN, never asserted as inaudible.
+    inaudibleHuman: null,
+    audibilityStatus: 'UNMEASURED',
     audibilityDisclosures: {
-      adultsOver25: 'NOMINALLY_INAUDIBLE',
+      adultsOver25: 'OFTEN_BELOW_THRESHOLD_BUT_UNMEASURED',
       youthAudibilityRisk: 'AUDIBLE_TO_CHILDREN_AND_TEENAGERS',
       canineFelineRisk: 'DISTRESS_IN_PETS_POSSIBLE',
       hardwareDistortion: 'SUBHARMONIC_BUZZ_IN_LOW_COST_SPEAKERS_DOCUMENTED'
     },
     carrierBand: 'ULTRASONIC_CIVILIAN_SAR',
     payloadHex,
-    rangeLineOfSightM: 60.0, // legacy nominal field for backward compatibility
+    // Former hard-coded 60 m replaced by the ISO 9613-1 model estimate (quiet, 50 dBA). Not a measurement.
+    rangeLineOfSightM: linkQuiet.maxReliableDistanceM,
+    rangeBasis: 'MODEL_ESTIMATE_ISO9613_UNMEASURED_ON_PHONES',
     physicalLimits: {
       maxReliableRangeQuietM: linkQuiet.maxReliableDistanceM,
       maxReliableRangeCatastrophe85dBaM: linkCatastrophe.maxReliableDistanceM,
-      atmosphericAbsorptionDbPerM: 0.64,
+      atmosphericAbsorptionDbPerM: +computeIso9613AbsorptionDbPerM(20000).toFixed(3),
       phoneTransducerCutoffHz: 21000,
-      antiAliasingFilterCutoffHz: 22050 // at 44.1 kHz standard sampling rate
+      nyquistHzAt44k1: 22050 // Nyquist limit; real anti-aliasing filters roll off below this
     }
   };
 }

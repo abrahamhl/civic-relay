@@ -122,11 +122,15 @@ test('BOM de Centinela Gateway COTS: Coste acotado inferior a 15 € y multimoda
   assert.ok(hasEsp32 && hasMems && hasRadar);
 });
 
-test('Kit de Supervivencia: Baliza ultrasónica inaudible y cálculo de vector de evasión', () => {
+test('Kit de Supervivencia: baliza ultrasónica sin afirmaciones no medidas y cálculo de vector de evasión', () => {
   const coords = { lat: 40.4168, lon: -3.7038, altM: 650 };
   const beacon = generateUltrasonicRescueBeacon(coords, 42);
 
-  assert.equal(beacon.inaudibleHuman, true);
+  // Sin audiometría no se puede afirmar inaudibilidad; el alcance es estimación de modelo, nunca 60 m.
+  assert.equal(beacon.inaudibleHuman, null);
+  assert.equal(beacon.audibilityStatus, 'UNMEASURED');
+  assert.ok(beacon.rangeLineOfSightM < 15, `alcance modelado ${beacon.rangeLineOfSightM} m`);
+  assert.equal(beacon.rangeLineOfSightM, beacon.physicalLimits.maxReliableRangeQuietM);
   assert.ok(beacon.centerFreqHz >= 19000);
   assert.ok(beacon.payloadHex.length > 10);
 
