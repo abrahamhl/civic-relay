@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { api } from '../api/client';
+import { renderGeographicTerrain } from './Terrain4DRenderer';
+import { loadTerrainGrid, saveTerrainGrid, validateTerrainSnapshot, type TerrainGridSnapshot } from '../offline/terrain-snapshot';
 import {
   loadPublicWeatherSnapshot, persistPublicWeatherSnapshot, weatherSnapshotExpired,
   type WeatherMetric, type WeatherSnapshot
@@ -163,6 +165,10 @@ export function Atmosphere4DStudio({ onClose }: { onClose: () => void }) {
   const [region, setRegion] = useState('valencia');
   const [snapshot, setSnapshot] = useState<WeatherSnapshot | null>(null);
   const [sourceMode, setSourceMode] = useState('WAITING');
+  const [terrain, setTerrain] = useState<TerrainGridSnapshot | null>(null);
+  const [terrainStatus, setTerrainStatus] = useState('WAITING');
+  const [terrainMode, setTerrainMode] = useState<'FORECAST' | 'TERRAIN'>('TERRAIN');
+  const [verticalExaggeration, setVerticalExaggeration] = useState(3);
   const [loading, setLoading] = useState(true);
   const [frame, setFrame] = useState(0);
   const [metric, setMetric] = useState<WeatherMetric>('temperature_2m');
@@ -205,6 +211,32 @@ export function Atmosphere4DStudio({ onClose }: { onClose: () => void }) {
     return () => { active = false; };
   }, [region]);
 
+  // Terrain is a static georeferenced raster; it can be viewed independently from weather.
+  useEffect(() => {
+    let alive = true;
+    setTerrain(null);
+    setTerrainStatus('LOADING');
+    const obtain = async () => {
+      const local = await loadTerrainGrid(region);
+      if (!alive) return;
+      if (local) { setTerrain(local); setTerrainStatus('OFFLINE_LOCAL_DEM'); }
+      try {
+        const remote: any = await api.getTerrainGrid(region);
+        if (!alive) return;
+        if (validateTerrainSnapshot(remote) && remote.region === region) {
+          setTerrain(remote);
+          const saved = await saveTerrainGrid(remote);
+          if (alive) setTerrainStatus(remote.status === 'STALE_SNAPSHOT' ? 'SERVER_STALE_DEM' :
+            saved ? 'DOWNLOADED_PUBLIC_DEM' : 'DEM_CACHE_UNAVAILABLE');
+        } else if (!local) setTerrainStatus('DEM_SOURCE_UNAVAILABLE');
+      } catch {
+        if (alive) setTerrainStatus(local ? 'OFFLINE_LOCAL_DEM' : 'DEM_SOURCE_UNAVAILABLE');
+      }
+    };
+    void obtain();
+    return () => { alive = false; };
+  }, [region]);
+
   useEffect(() => {
     if (!playing || !snapshot) return;
     const timer = window.setInterval(() => setFrame((current) => (current + 1) % snapshot.times.length), 850);
@@ -212,14 +244,18 @@ export function Atmosphere4DStudio({ onClose }: { onClose: () => void }) {
   }, [playing, snapshot]);
 
   useEffect(() => {
-    if (!canvasRef.current || !snapshot) return;
+    if (!canvasRef.current || (!snapshot && !terrain)) return;
     const canvas = canvasRef.current;
-    const render = () => drawScene(canvas, snapshot, frame, metric, yaw, pitch, zoom);
+    const render = () => {
+      if (terrain && (terrainMode === 'TERRAIN' || !snapshot)) {
+        renderGeographicTerrain(canvas, terrain, snapshot, frame, metric, yaw, pitch, zoom, verticalExaggeration, !!snapshot);
+      } else if (snapshot) drawScene(canvas, snapshot, frame, metric, yaw, pitch, zoom);
+    };
     render();
     const observer = new ResizeObserver(render);
     observer.observe(canvas);
     return () => observer.disconnect();
-  }, [snapshot, frame, metric, yaw, pitch, zoom]);
+  }, [snapshot, terrain, terrainMode, frame, metric, yaw, pitch, zoom, verticalExaggeration]);
 
   const selected = snapshot && snapshot.times[frame] ? new Date(snapshot.times[frame]) : null;
   const middle = snapshot?.points[4];
@@ -249,6 +285,13 @@ export function Atmosphere4DStudio({ onClose }: { onClose: () => void }) {
             {Object.entries(REGION_CENTERS).map(([value, info]) => <option key={value} value={value}>{info.label}</option>)}
           </select>
         </label>
+        <label style={{ fontSize: 12 }}>Superficie
+          <select aria-label="Modo de superficie 3D" value={terrainMode} onChange={(e) => setTerrainMode(e.target.value as 'FORECAST' | 'TERRAIN')}
+            style={{ marginLeft: 6, background: '#18344b', color: 'white', padding: 7, borderRadius: 7 }}>
+            <option value="TERRAIN">Relieve terrestre real (DEM)</option>
+            <option value="FORECAST">Superficie de variable meteorológica</option>
+          </select>
+        </label>
         <label style={{ fontSize: 12 }}>Variable
           <select aria-label="Variable meteorológica" value={metric}
             onChange={(e) => setMetric(e.target.value as WeatherMetric)}
@@ -257,6 +300,10 @@ export function Atmosphere4DStudio({ onClose }: { onClose: () => void }) {
               <option key={key} value={key}>{METRICS[key].name}</option>)}
           </select>
         </label>
+        {terrainMode === 'TERRAIN' && <label style={{ fontSize: 12 }}>Escala vertical ×{verticalExaggeration}
+          <input aria-label="Exageración vertical del terreno" type="range" min="1" max="6" step="1" value={verticalExaggeration}
+            onChange={(e) => setVerticalExaggeration(Number(e.target.value))} style={{ verticalAlign: 'middle', marginLeft: 8 }} />
+        </label>}
         <a href={wazeUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#7dd3fc', padding: 7 }}>
           Navegar a la zona con Waze
         </a>
@@ -269,9 +316,12 @@ export function Atmosphere4DStudio({ onClose }: { onClose: () => void }) {
             : sourceMode === 'SERVER_STALE_SNAPSHOT' ? 'SNAPSHOT PREVIO EN SERVIDOR · proveedor sin actualización'
             : 'MODELO METEOROLÓGICO · ' + sourceMode}
       </div>
+      <div data-testid="terrain-source-status" role="status" aria-live="polite" style={{ fontSize: 12, color: '#9bd9d5' }}>
+        Relieve georreferenciado: {terrain ? terrainStatus + ' · ' + terrain.summary.minElevationM.toFixed(0) + '–' + terrain.summary.maxElevationM.toFixed(0) + ' m' : terrainStatus + ' · sin dato de altitud verificable'}.
+      </div>
       <div style={{ position: 'relative', border: '1px solid #27475e', borderRadius: 12, overflow: 'hidden', minHeight: 270, flex: 1 }}>
-        {snapshot ? (
-          <canvas ref={canvasRef} className="senda-4d-canvas" aria-label="Gráfica tridimensional navegable del modelo meteorológico" role="img" tabIndex={0}
+        {(snapshot || terrain) ? (
+          <canvas ref={canvasRef} className="senda-4d-canvas" aria-label="Visualizador tridimensional navegable de relieve geográfico y modelos meteorológicos" role="img" tabIndex={0}
             onPointerDown={(e) => { pointer.current = { x: e.clientX, y: e.clientY }; e.currentTarget.setPointerCapture(e.pointerId); }}
             onPointerMove={(e) => {
               if (!pointer.current) return;
@@ -296,11 +346,11 @@ export function Atmosphere4DStudio({ onClose }: { onClose: () => void }) {
             <p style={{ fontSize: 13, lineHeight: 1.5 }}>El visor no inventa valores. MET Norway ofrece una fuente meteorológica pública reutilizable con atribución; una vez descargada, la cuadrícula se guarda en este dispositivo para consultarla sin red.</p>
           </div>
         )}
-        {snapshot && <div style={{ position: 'absolute', right: 12, top: 12, fontSize: 11, background: '#081625cc',
+        {(snapshot || terrain) && <div style={{ position: 'absolute', right: 12, top: 12, fontSize: 11, background: '#081625cc',
           padding: 9, borderRadius: 7, textAlign: 'right', pointerEvents: 'none' }}>
-          <div>Modelo: {snapshot.source.model}</div>
-          <div>24 pasos horarios · 9 puntos</div>
-          <div style={{ color: '#7dd3fc' }}>No es radar ni topografía medida</div>
+          <div>{terrain && terrainMode === 'TERRAIN' ? 'Elevación: Mapzen Terrain Tiles' : 'Modelo: ' + (snapshot?.source.model || 'no disponible')}</div>
+          <div>{terrain && terrainMode === 'TERRAIN' ? 'DEM · 33×33 muestras georreferenciadas' : '24 pasos horarios · 9 puntos modelo'}</div>
+          <div style={{ color: '#7dd3fc' }}>{terrain && terrainMode === 'TERRAIN' ? 'Altitud raster · datum vertical sin verificar' : 'No es radar ni relieve terrestre'}</div>
         </div>}
       </div>
       {snapshot && (
@@ -329,11 +379,17 @@ export function Atmosphere4DStudio({ onClose }: { onClose: () => void }) {
           <div style={{ fontSize: 11, color: '#b6cbd9', lineHeight: 1.5 }}>
             Fuente: <a href={snapshot.source.provider === 'MET Norway' ? 'https://api.met.no/weatherapi/locationforecast/2.0/documentation' : 'https://open-meteo.com/en/docs'} target="_blank" rel="noopener noreferrer" style={{ color: '#7dd3fc' }}>{snapshot.source.provider}</a>.
             Descarga: {new Date(snapshot.fetchedAt).toLocaleString('es-ES')}. Huella SHA-256: {snapshot.source.rawSha256?.slice(0, 14)}…
-            La superficie 3D extruye una variable, no representa elevaciones reales. La interpolación visual entre 9 muestras no aumenta precisión espacial.
+            {terrain && terrainMode === 'TERRAIN' ? 'La geometría DEM utiliza elevaciones raster en metros; el color interpola el pronóstico meteorológico sobre ese relieve. El multiplicador vertical es visual.' : 'La superficie 3D extruye una variable, no representa elevaciones reales. La interpolación visual entre 9 muestras no aumenta precisión espacial.'}
             {' '}{lastValid ? 'Las fechas válidas del pronóstico han vencido.' : ''}
           </div>
         </>
       )}
+      {terrain && <div style={{ fontSize: 11, color: '#b8cfdf', lineHeight: 1.5 }}>
+        Relieve: <a href={terrain.source.registryUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#7dd3fc' }}>Mapzen / AWS Terrain Tiles</a>.
+        {' '}Atribuciones de las fuentes originales: <a href={terrain.source.attributionUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#7dd3fc' }}>licencias y créditos de terreno</a>.
+        Fecha de obtención: {new Date(terrain.acquiredAt).toLocaleString('es-ES')}.
+        Vertical datum mixto sin verificación local; solo visualización, no decisiones topográficas críticas. Redistribución de paquetes de terreno pendiente de revisión de licencias.
+      </div>}
       <footer style={{ fontSize: 11, color: '#9bb5c7', borderTop: '1px solid #25445e', paddingTop: 9 }}>
         Capas de sismos y acontecimientos NASA EONET: disponibles en el mapa 2D. RF, estaciones físicas, vídeo y telemetría personal requieren datos específicos verificables; no se mezclan con el pronóstico meteorológico.
         No se accede a GPS ni se registran desplazamientos al utilizar este visor.

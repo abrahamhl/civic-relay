@@ -31,7 +31,12 @@ test('INTEGRACIÓN HTTP / SPA / SSE / SEGURIDAD', async (t) => {
     dataKind: 'MODEL_FORECAST', isOfficialAlert: false, calibratedBySenda: false,
     times: [], points: [], source: { provider: 'Open-Meteo' }
   }) };
-  const { server, db } = createServer({ dbFile: TEST_HTTP_DB, usgsFeed, eonetFeed, weatherGridFeed });
+  const terrainGridFeed = { read: async (region) => ({
+    schema: 'senda.terrain.grid/1', region, status: 'SOURCE_SNAPSHOT',
+    dataKind: 'RASTER_DEM_SAMPLES', rows: 33, columns: 33,
+    elevationsM: Array(1089).fill(120), source: { provider: 'Mapzen Terrain Tiles' }
+  }) };
+  const { server, db } = createServer({ dbFile: TEST_HTTP_DB, usgsFeed, eonetFeed, weatherGridFeed, terrainGridFeed });
 
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const port = server.address().port;
@@ -108,6 +113,16 @@ test('INTEGRACIÓN HTTP / SPA / SSE / SEGURIDAD', async (t) => {
     assert.equal(data.isOfficialAlert, false);
     const denied = await fetch(baseUrl + '/api/sources/weather-grid?region=private-gps-location');
     assert.equal(denied.status, 400);
+  });
+
+  await t.test('8. DEM: topografía real separada de alertas y sensores, región fija', async () => {
+    const response = await fetch(baseUrl + '/api/sources/terrain-grid?region=valencia');
+    assert.equal(response.status, 200);
+    const data = await response.json();
+    assert.equal(data.dataKind, 'RASTER_DEM_SAMPLES');
+    assert.equal(data.elevationsM.length, 1089);
+    const unsafe = await fetch(baseUrl + '/api/sources/terrain-grid?region=private-home-location');
+    assert.equal(unsafe.status, 400);
   });
 
   await t.test('4. Consulta de Feed y Adaptadores', async () => {
