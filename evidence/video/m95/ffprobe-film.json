@@ -1,0 +1,33 @@
+{
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+        {
+            "index": 0,
+            "codec_name": "h264",
+            "profile": "High",
+            "codec_type": "video",
+            "width": 1920,
+            "height": 1080,
+            "pix_fmt": "yuv420p",
+            "r_frame_rate": "25/1",
+            "bit_rate": "659290"
+        },
+        {
+            "index": 1,
+            "codec_name": "aac",
+            "profile": "LC",
+            "codec_type": "audio",
+            "sample_rate": "48000",
+            "channels": 2,
+            "r_frame_rate": "0/0",
+            "bit_rate": "187909"
+        }
+    ],
+    "format": {
+        "filename": "investor-next/public/media/m95/senda-m95-film-en.mp4",
+        "duration": "530.120000",
+        "size": "56540056",
+        "bit_rate": "853241"
+    }
+}

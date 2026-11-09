@@ -1,0 +1,143 @@
+{
+ "note": "SENDA Mission 9.5 · Reel Vertical 9:16 (Inversión Millonaria en Soberanía y Defensa)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "r_def1",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/app/senda-home.tsx",
+    "docs/video/M95_VIDEO_SOURCES.md"
+   ],
+   "visual": {
+    "kind": "kpis",
+    "kpis": [
+     {
+      "v": "DEFENSA",
+      "l": {
+       "es": "Protección de infraestructuras críticas nacionales",
+       "en": "Critical national infrastructure protection",
+       "nl": "Bescherming van kritieke nationale infrastructuur"
+      }
+     },
+     {
+      "v": "100 %",
+      "l": {
+       "es": "Soberanía tecnológica e interoperabilidad europea",
+       "en": "Technological sovereignty and European interoperability",
+       "nl": "Technologische soevereiniteit en Europese interoperabiliteit"
+      }
+     }
+    ]
+   },
+   "title": {
+    "es": "¿Por qué los gobiernos invierten en SENDA?",
+    "en": "Why do governments invest in SENDA?",
+    "nl": "Waarom investeren overheden in SENDA?"
+   },
+   "es": [
+    "La seguridad nacional de un país ya no se defiende solo con blindados, sino con el control soberano del espectro electromagnético.",
+    "Cuando un adversario ataca las comunicaciones, quien mantiene la red de mando mantiene el control territorial."
+   ],
+   "es_say": [
+    "La seguridad nacional de un país ya no se defiende solo con blindados, sino con el control soberano del espectro electromagnético.",
+    "Cuando un adversario ataca las comunicaciones, quien mantiene la red de mando mantiene el control territorial."
+   ],
+   "en": [
+    "National security is no longer defended solely with armoured vehicles: it requires sovereign mastery of the electromagnetic spectrum.",
+    "When an adversary disrupts communications, whoever keeps the command mesh alive maintains territorial control."
+   ],
+   "en_say": [
+    "National security is no longer defended solely with armoured vehicles: it requires sovereign mastery of the electromagnetic spectrum.",
+    "When an adversary disrupts communications, whoever keeps the command mesh alive maintains territorial control."
+   ],
+   "nl": [
+    "Nationale veiligheid wordt niet langer alleen verdedigd met pantserwagens: het vereist soevereine controle over het elektromagnetische spectrum.",
+    "Wanneer een tegenstander telecom uitschakelt, behoudt degene die het commandonetwerk operationeel houdt de controle over het land."
+   ]
+  },
+  {
+   "id": "r_def2",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/cots-rf-tactical.mjs",
+    "apps/senda-live/server/domain/cots-drone-recon.mjs"
+   ],
+   "visual": {
+    "kind": "cots_bom"
+   },
+   "title": {
+    "es": "Despliegue táctico masivo sin costes astronómicos",
+    "en": "Massive tactical deployment without prohibitive costs",
+    "nl": "Massale tactische inzet zonder torenhoge kosten"
+   },
+   "es": [
+    "SENDA reemplaza terminales privativos de miles de euros por módulos comerciales inteligentes de veinticinco euros.",
+    "Un Estado puede dotar a cada patrulla, ambulancia y puesto fronterizo de radar pasivo y enlace resiliente de inmediato."
+   ],
+   "es_say": [
+    "Senda reemplaza terminales privativos de miles de euros por módulos comerciales inteligentes de veinticinco euros.",
+    "Un Estado puede dotar a cada patrulla, ambulancia y puesto fronterizo de radar pasivo y enlace resiliente de inmediato."
+   ],
+   "en": [
+    "SENDA replaces expensive proprietary terminals with twenty-five-euro intelligent commercial modules and open software.",
+    "A sovereign state can equip every patrol, ambulance, and border post with passive radar and resilient communications today."
+   ],
+   "en_say": [
+    "Senda replaces expensive proprietary terminals with twenty-five-euro intelligent commercial modules and open software.",
+    "A sovereign state can equip every patrol, ambulance, and border post with passive radar and resilient communications today."
+   ],
+   "nl": [
+    "SENDA vervangt dure gesloten terminals door intelligente commerciële modules van 25 euro met open software.",
+    "Een soevereine overheid kan elke patrouillewagen, ambulance en grenspost direct uitrusten met passieve radar en noodmesh."
+   ]
+  },
+  {
+   "id": "r_def3",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/app/senda-home.tsx",
+    "docs/video/M95_VIDEO_SOURCES.md"
+   ],
+   "visual": {
+    "kind": "cta"
+   },
+   "title": {
+    "es": "El estándar de resiliencia del siglo veintiuno",
+    "en": "The 21st century benchmark for civil resilience",
+    "nl": "De 21e-eeuwse standaard voor civiele weerbaarheid"
+   },
+   "es": [
+    "Invertir en SENDA es garantizar que tu país nunca se quede a oscuras ni incomunicado ante ninguna amenaza.",
+    "Solicita el dossier técnico institucional en civic-relay-investor punto vercel punto app barra senda."
+   ],
+   "es_say": [
+    "Invertir en Senda es garantizar que tu país nunca se quede a oscuras ni incomunicado ante ninguna amenaza.",
+    "Solicita el dossier técnico institucional en civic guión relay guión investor punto vercel punto app barra senda."
+   ],
+   "en": [
+    "Investing in SENDA ensures your nation never goes dark or disconnected during any crisis.",
+    "Request the institutional sovereign dossier at civic-relay-investor dot vercel dot app slash senda."
+   ],
+   "en_say": [
+    "Investing in Senda ensures your nation never goes dark or disconnected during any crisis.",
+    "Request the institutional sovereign dossier at civic dash relay dash investor dot vercel dot app slash senda."
+   ],
+   "nl": [
+    "Investeren in SENDA garandeert dat uw land nooit in het donker tast of communicatieloos raakt bij calamiteiten.",
+    "Vraag het institutionele soevereine dossier aan op civic-relay-investor punt vercel punt app schuine streep senda."
+   ]
+  }
+ ]
+}

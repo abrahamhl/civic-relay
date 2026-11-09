@@ -1,0 +1,11 @@
+{
+ "core": 266,
+ "coreTotal": 266,
+ "e2e": 49,
+ "e2eTotal": 49,
+ "relay": 3,
+ "android": "no ejecutado aquí (sin JDK; lo ejecuta CI)",
+ "esp32": "no ejecutado aquí (sin g++; lo ejecuta CI)",
+ "sha": "b9b1590",
+ "generatedAt": "2026-11-08T12:08:50.696Z"
+}

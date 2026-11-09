@@ -1,0 +1,31 @@
+# SENDA M95 · Security & Media Headers Verification (`investor-next/vercel.json`)
+
+## 1. Declared Security Headers in `investor-next/vercel.json` (§ 8.4)
+
+Source route: `/(.*)`
+- `X-Content-Type-Options: nosniff`
+- `X-Frame-Options: DENY`
+- `X-XSS-Protection: 1; mode=block`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy: geolocation=(self), camera=(), microphone=(), payment=()`
+- `X-DNS-Prefetch-Control: on`
+- `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload`
+- `Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: https: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.vercel.app https://api.civic-relay.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`
+
+## 2. Declared Media Caching & MIME Headers in `investor-next/vercel.json` (§ 8.4)
+
+- `/media/m95/(.*)`:
+  - `Cache-Control: public, max-age=86400, stale-while-revalidate=604800`
+  - `Accept-Ranges: bytes`
+- `/media/(.*)\.vtt`:
+  - `Content-Type: text/vtt; charset=utf-8`
+  - `Cache-Control: public, max-age=86400, stale-while-revalidate=604800`
+- `/media/(.*)\.mp4`:
+  - `Content-Type: video/mp4`
+  - `Accept-Ranges: bytes`
+  - `Cache-Control: public, max-age=86400, stale-while-revalidate=604800`
+
+## 3. Production & Preview Status
+
+- Remote Vercel deployment: `BLOCKED_EXTERNAL` (no Vercel credentials/token in local environment; Dutch native review `REVIEW_REQUIRED` per § 6.3 / § 12).
+- Local static export (`investor-next/out`) + HTTP Range (`206 Partial Content`) + `text/vtt` + `<video>` track verification executed in headless Chromium (`0` console errors across `/`, `/es/`, `/nl/`).

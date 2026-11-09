@@ -1,0 +1,10 @@
+import { createRequire } from 'node:module';
+import { resolve } from 'node:path';
+const require = createRequire(resolve(process.cwd(), '../../investor-next/package.json'));
+const { chromium } = require('playwright');
+const b = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const p = await b.newPage({ viewport: { width: 640, height: 360 } });
+await p.setContent('<canvas id="c" width="640" height="360"></canvas>');
+const info = await p.evaluate(() => { const gl = document.querySelector('#c').getContext('webgl2'); if (!gl) return 'NO WEBGL'; const dbg = gl.getExtension('WEBGL_debug_renderer_info'); return { version: gl.getParameter(gl.VERSION), renderer: dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER) }; });
+console.log(info);
+await b.close();

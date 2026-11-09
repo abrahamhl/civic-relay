@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Perdido en el monte</title>
+<meta name="description" content="Sin cobertura y sin GPS fiable: SENDA calcula tu posición con los rumbos a aerogeneradores, antenas o campanarios, la mantiene contando pasos y guarda los mapas antes de salir.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/arquitectura">Arquitectura</a> · <a href="/senda/ojo">Satélites</a> · <a href="/senda/triaje">Triaje</a> · <a href="/senda/agua">Riadas</a></p>
+<h1>Perdido en el monte</h1>
+<p class="lead m">Sin cobertura, con el GPS débil en un barranco o con la batería al límite, saber <b>dónde estás</b> lo cambia todo: para pedir ayuda y para que te encuentren. SENDA combina tres técnicas que funcionan <b>sin señal y sin emitir nada</b>: rumbos a marcas conocidas, estima por pasos y mapas guardados antes de salir. Cuando pasa un satélite útil, envía el SOS con esa posición.</p>
+
+<section class="card" data-viz="monte" style="margin-top:14px" aria-labelledby="h-m">
+  <h2 id="h-m">🧭 Tu posición con marcas que ya existen</h2>
+  <div class="g2" style="margin-top:0">
+    <div><canvas id="cv-monte" aria-label="Mapa con dos aerogeneradores, una antena y un campanario; las visuales de la brújula se cruzan en la posición estimada con su elipse de error"></canvas>
+      <div class="row"><label class="m" style="flex:1">Error de la brújula ±<b id="m-sv">2</b>° <input type="range" id="m-sig" min="0" max="6" step="0.5" value="2" aria-label="Error de la brújula en grados"></label></div></div>
+    <div>
+      <p class="m" style="margin-top:0">Los <b>aerogeneradores</b> se ven a kilómetros y de noche llevan <b>luces rojas de balizamiento</b>. Sus coordenadas son públicas, como las de antenas, cumbres y campanarios. Apunta el móvil a dos o tres de ellas: la brújula da el rumbo de cada visual, y donde se cruzan estás tú. SENDA lo calcula por mínimos cuadrados, con su elipse de error, y avisa si las visuales son casi paralelas.</p>
+      <div class="kv" style="grid-template-columns:repeat(2,1fr)"><div><b id="m-err">—</b><span>error real en esta prueba</span></div><div><b id="m-ell">—</b><span>elipse de error (1σ)</span></div><div><b id="m-drift">—</b><span>deriva tras 1,2 km a pasos</span></div><div><b>0</b><span>señales emitidas</span></div></div>
+      <div class="note">Marcas de la demostración inventadas; en producción se usan registros públicos u OpenStreetMap. La brújula marca el norte magnético; en España la declinación es pequeña y se corrige. Los objetos metálicos la desvían: hay que calibrarla.</div>
+    </div>
+  </div>
+</section>
+
+<div class="g2">
+  <section class="card" aria-labelledby="h-t">
+    <h2 id="h-t">🗺️ Mapas guardados antes de salir</h2>
+    <div class="row" style="margin-top:0"><label class="m">Zona <select id="t-zone" aria-label="Zona"><option value="picos">Picos de Europa</option><option value="gredos">Sierra de Gredos</option><option value="irati">Selva de Irati</option><option value="nevada">Sierra Nevada</option></select></label>
+      <label class="m">Detalle <select id="t-z" aria-label="Nivel de detalle"><option value="14">medio (z14)</option><option value="15" selected>alto (z15)</option><option value="16">senderos (z16)</option></select></label></div>
+    <div class="kv" style="grid-template-columns:repeat(2,1fr)"><div><b id="t-n">—</b><span>teselas</span></div><div><b id="t-mb">—</b><span>en el móvil (≈ 20 KB por tesela)</span></div></div>
+    <p class="m" style="font-size:14px">SENDA calcula el tamaño exacto con el estándar de teselas XYZ. En producción conviene usar paquetes propios generados con datos abiertos: OpenStreetMap con su licencia, o las bases del Instituto Geográfico Nacional. Los servidores públicos de teselas de OpenStreetMap <b>no permiten descargas masivas</b>.</p>
+  </section>
+  <section class="card" aria-labelledby="h-s">
+    <h2 id="h-s">🛰️ Satélites: SOS e imágenes del tiempo</h2>
+    <p class="m" style="margin-top:0"><b>SOS por satélite.</b> Algunos móviles recientes lo traen según el modelo y el operador; también existen módulos Iridium. SENDA calcula las <a href="/senda/ojo">ventanas de paso</a> y envía el SOS (menos de 100 bytes) cuando hay un satélite útil encima.</p>
+    <p class="m"><b>Imágenes meteorológicas con antena casera.</b> Con un receptor de radio por USB (~30 €) y una antena casera de 137 MHz se podían recibir imágenes de los satélites NOAA. <b>Eso terminó en 2025:</b> NOAA dio de baja el NOAA-18 en junio y el NOAA-19 y el NOAA-15 en agosto. Queda la serie rusa Meteor-M, con transmisión digital LRPT y estado irregular según los informes de radioaficionados. SENDA importará esas imágenes desde software abierto cuando se verifique que funcionan (hoja de ruta).</p>
+    <p class="src">Fuente: <a href="https://www.ospo.noaa.gov/Operations/POES/status.html">NOAA OSPO · estado POES</a>.</p>
+  </section>
+</div>
+</main>
+<script type="module">
+import { $, C, canvas, text, rr, run, clamp, ease, FILM } from '/senda/kit.mjs';
+import { resection, monteScenario, localFrame, deadReckon, stepLengthM, tilePack } from '/senda/core/geo-offline.mjs';
+const fmt = (x, d = 0) => x.toFixed(d).replace('.', ',');
+const sc = monteScenario(), F = localFrame(sc.me.lat, sc.me.lon), marks = sc.marks.map((m) => ({ ...m, ...F.toXY(m.lat, m.lon) }));
+const S = { sigma: 2 }; window.SENDA_MONTE = S;
+const NOISE = [0.75, -0.9, 0.5, -0.6]; // fracciones fijas de sigma (deterministas)
+function solve() {
+  const obs = marks.slice(0, 3).map((m, i) => ({ lat: m.lat, lon: m.lon, bearingDeg: m.trueBearing + NOISE[i] * S.sigma, sigmaDeg: Math.max(0.5, S.sigma) }));
+  const r = resection(obs), p = F.toXY(r.lat, r.lon); S.fix = { ...r, ...p, err: Math.hypot(p.x, p.y), obs };
+  $('#m-err').textContent = `${fmt(S.fix.err)} m`; $('#m-ell').textContent = `${fmt(r.errMajorM)} × ${fmt(r.errMinorM)} m`; $('#m-sv').textContent = fmt(S.sigma, 1);
+}
+solve(); $('#m-sig').oninput = (e) => { S.sigma = +e.target.value; solve(); };
+// ruta a pie y estima por pasos con sesgo de rumbo (+3°) y de paso (+5 %)
+const TRUE = []; { let x = 0, y = 0; const legs = [[20, 400], [75, 350], [130, 450]]; TRUE.push({ x, y }); for (const [h, d] of legs) for (let k = 0; k < d / 10; k++) { x += 10 * Math.sin((h * Math.PI) / 180); y += 10 * Math.cos((h * Math.PI) / 180); TRUE.push({ x, y }); } }
+const L = stepLengthM(1.7), headings = []; for (let i = 1; i < TRUE.length; i++) { const dx = TRUE[i].x - TRUE[i - 1].x, dy = TRUE[i].y - TRUE[i - 1].y, h = (Math.atan2(dx, dy) * 180) / Math.PI, n = Math.round(Math.hypot(dx, dy) / L); for (let k = 0; k < n; k++) headings.push(h + 3); }
+const PDR = deadReckon({ x: 0, y: 0 }, headings, L * 1.05), drift = Math.hypot(PDR.at(-1).x - TRUE.at(-1).x, PDR.at(-1).y - TRUE.at(-1).y);
+$('#m-drift').textContent = `${fmt(drift)} m`; S.drift = drift;
+
+const g = canvas($('#cv-monte')), W = 640, H = 600, SC = 0.085, MX = (x) => 320 + x * SC, MY = (y) => 330 - y * SC;
+function terrain() { for (let k = 0; k < 9; k++) { g.strokeStyle = `rgba(80,120,90,${0.18 + k * 0.03})`; g.lineWidth = 1; g.beginPath(); for (let a = 0; a <= 6.3; a += 0.1) { const r = 40 + k * 32 + 12 * Math.sin(a * 3 + k), x = 250 + Math.cos(a) * r * 1.4, y = 260 + Math.sin(a) * r; a ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); } }
+function turbine(x, y, t, lit) { g.strokeStyle = C.t; g.lineWidth = 2; g.beginPath(); g.moveTo(x, y); g.lineTo(x, y - 30); g.stroke(); for (let k = 0; k < 3; k++) { const a = t * 2.4 + (k * 2 * Math.PI) / 3; g.beginPath(); g.moveTo(x, y - 30); g.lineTo(x + Math.cos(a) * 16, y - 30 + Math.sin(a) * 16); g.stroke(); } if (lit) { g.fillStyle = C.r; g.beginPath(); g.arc(x, y - 33, 4, 0, 7); g.fill(); } }
+function drawMonte(t) {
+  const P = 22, lt = t % P; g.fillStyle = '#0a1612'; g.fillRect(0, 0, W, H); terrain();
+  const blink = Math.floor(t * 1.5) % 2 === 0;
+  marks.forEach((m) => { const x = MX(m.x), y = MY(m.y); if (m.kind === 'Aerogenerador') turbine(x, y, t, blink); else if (m.kind === 'Campanario') { g.fillStyle = C.a; g.fillRect(x - 5, y - 22, 10, 22); g.beginPath(); g.moveTo(x - 7, y - 22); g.lineTo(x, y - 34); g.lineTo(x + 7, y - 22); g.fill(); } else { g.strokeStyle = C.v; g.lineWidth = 2; g.beginPath(); g.moveTo(x - 8, y); g.lineTo(x, y - 32); g.lineTo(x + 8, y); g.moveTo(x - 5, y - 12); g.lineTo(x + 5, y - 12); g.stroke(); } text(g, `${m.kind} ${m.id}`, Math.min(x, 570), y + 16, { c: C.m, f: '11px Inter,system-ui', al: 'center' }); });
+  const nShow = Math.min(3, Math.floor(lt / 2.2));
+  S.fix.obs.slice(0, nShow).forEach((o, i) => { const m = marks[i], th = (o.bearingDeg * Math.PI) / 180, p = ease((lt - i * 2.2) / 1.4), len = 4200 * p; g.strokeStyle = [C.i, C.e, C.v][i]; g.lineWidth = 2; g.beginPath(); g.moveTo(MX(m.x), MY(m.y)); g.lineTo(MX(m.x - Math.sin(th) * len), MY(m.y - Math.cos(th) * len)); g.stroke(); const right = MX(m.x) > 480; text(g, `rumbo ${fmt(o.bearingDeg, 1)}°`, MX(m.x) + (right ? -10 : 10), MY(m.y) - 40, { c: [C.i, C.e, C.v][i], f: '700 12px Inter,system-ui', al: right ? 'right' : 'left' }); });
+  if (lt > 6.8) {
+    const p = ease((lt - 6.8) / 0.8); g.globalAlpha = p; g.fillStyle = 'rgba(255,119,86,.22)'; g.beginPath(); g.ellipse(MX(S.fix.x), MY(S.fix.y), Math.max(4, S.fix.errMajorM * SC), Math.max(3, S.fix.errMinorM * SC), 0.6, 0, 7); g.fill();
+    g.fillStyle = C.c; g.beginPath(); g.arc(MX(S.fix.x), MY(S.fix.y), 6, 0, 7); g.fill(); g.strokeStyle = C.t; g.lineWidth = 1.5; g.beginPath(); g.arc(MX(0), MY(0), 4, 0, 7); g.stroke();
+    text(g, `Estás aquí · ${S.fix.lat.toFixed(4)}, ${S.fix.lon.toFixed(4)}`, MX(S.fix.x) + 12, MY(S.fix.y) + 22, { c: C.t, f: '700 12px Inter,system-ui' }); g.globalAlpha = 1;
+  }
+  if (lt > 9) { // estima por pasos desde el fijo
+    const f = clamp((lt - 9) / 11), n = Math.floor(f * (PDR.length - 1)), nt = Math.floor(f * (TRUE.length - 1));
+    g.strokeStyle = C.t; g.setLineDash([3, 4]); g.lineWidth = 1.5; g.beginPath(); TRUE.slice(0, nt + 1).forEach((q, i) => (i ? g.lineTo(MX(q.x), MY(q.y)) : g.moveTo(MX(q.x), MY(q.y)))); g.stroke(); g.setLineDash([]);
+    g.strokeStyle = C.a; g.lineWidth = 2.5; g.beginPath(); PDR.slice(0, n + 1).forEach((q, i) => (i ? g.lineTo(MX(q.x), MY(q.y)) : g.moveTo(MX(q.x), MY(q.y)))); g.stroke();
+    const e = Math.hypot(PDR[n].x - TRUE[nt].x, PDR[n].y - TRUE[nt].y);
+    text(g, `A pasos: ${Math.round(n * L)} m recorridos · deriva ${fmt(e)} m`, 20, 560, { c: C.a, f: '700 13px Inter,system-ui' });
+    text(g, 'Línea blanca: camino real · ámbar: estimado contando pasos (nueva visual = posición corregida)', 20, 580, { c: C.m, f: '11px Inter,system-ui' });
+  }
+  text(g, lt < 6.8 ? `Visual ${nShow}/3: apunta el móvil a cada marca` : lt < 9 ? 'Las tres visuales se cruzan: posición calculada sin señal' : 'Sigues caminando: la posición se mantiene contando pasos', 20, 26, { c: C.t, f: '800 14px Inter,system-ui' });
+  text(g, `Error real ${fmt(S.fix.err)} m · elipse ${fmt(S.fix.errMajorM)} × ${fmt(S.fix.errMinorM)} m · escala: 1 km = ${Math.round(1000 * SC)} px`, 20, 46, { c: C.m, f: '12px Inter,system-ui' });
+}
+const ZONES = { picos: { minLat: 43.1, minLon: -5.0, maxLat: 43.3, maxLon: -4.6 }, gredos: { minLat: 40.2, minLon: -5.4, maxLat: 40.4, maxLon: -4.9 }, irati: { minLat: 42.95, minLon: -1.25, maxLat: 43.05, maxLon: -1.0 }, nevada: { minLat: 36.95, minLon: -3.5, maxLat: 37.15, maxLon: -3.0 } };
+function tiles() { const r = tilePack(ZONES[$('#t-zone').value], 8, +$('#t-z').value); $('#t-n').textContent = r.tiles.toLocaleString('es-ES'); $('#t-mb').textContent = `${fmt(r.mb, 0)} MB`; S.tiles = r; }
+$('#t-zone').onchange = tiles; $('#t-z').onchange = tiles; tiles();
+run({ monte: drawMonte });
+</script>
+</body></html>

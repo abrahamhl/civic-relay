@@ -4,7 +4,7 @@ import '../../globals.css';
 
 const inter=Inter({subsets:['latin'],display:'swap',variable:'--font-inter'});
 export const metadata: Metadata={
-  metadataBase:new URL('https://civic-relay-investor.vercel.app'),
+  metadataBase:new URL(process.env.SITE_URL||'https://civic-relay-investor.vercel.app'), // SITE_URL: dominio propio (p. ej. Hostinger)
   robots:{index:true,follow:true}
 };
 export default async function LocalizedRootLayout({children,params}:{children:React.ReactNode;params:Promise<{locale:string}>}){

@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+.venv/
 
 # TypeScript incremental build info (not reproducible input)
 *.tsbuildinfo
@@ -31,6 +32,10 @@ coverage/
 # Temporary
 *.tmp
 .cache/
+*.db
+*.sqlite
+*.sqlite3
+apps/senda-live/data/*.db
 
 .vercel
 .env*
@@ -38,4 +43,13 @@ docs/internal/
 
 .archive/
 next-env.d.ts
+
+# Local M95 high-bitrate renders (>100 MB master MP4; SHA-256 indexed in evidence/video/m95/SHA256SUMS.txt)
+investor-next/public/media/m95/*.mp4
+*.patch
+evidence/senda/**/release-manifest.json
+
+
+__pycache__/
+*.pyc
 

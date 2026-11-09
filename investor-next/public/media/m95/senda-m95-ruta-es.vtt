@@ -1,0 +1,93 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:12.077
+En España murieron 1.119 personas en vías interurbanas en 2025. La mayoría, en carreteras de un carril por sentido, con poco tráfico y poca cobertura.
+
+2
+00:00:12.427 --> 00:00:23.627
+SENDA va contigo en el viaje: avisa de lo que no ves, pide ayuda aunque no haya red y te guía si te paras a ayudar. Nunca sustituye tu atención ni el 112.
+
+3
+00:00:25.227 --> 00:00:36.001
+Niebla, 120 km/h y 1,2 segundos entre coches. Cada conductor reacciona a las luces del de delante y el retraso se suma: cinco coches chocan en cadena.
+
+4
+00:00:36.351 --> 00:00:48.084
+Con SENDA, el móvil del primero detecta la frenada por la velocidad del GPS y avisa a todos a la vez. Solo choca el que va pegado justo detrás: eso solo lo arregla la distancia de seguridad.
+
+5
+00:00:49.684 --> 00:00:59.967
+Un accidente de noche en 18 kilómetros sin ninguna red. El móvil del coche accidentado anuncia el SOS y cualquier coche con SENDA que pase se lo lleva.
+
+6
+00:01:00.317 --> 00:01:10.237
+Con solo uno de cada diez coches, el aviso sale en unos siete minutos. Y los que vienen de frente avisan a quienes van hacia el accidente.
+
+7
+00:01:11.837 --> 00:01:18.535
+El GPS funciona sin Internet. Lo que falta es saber qué decir: carretera, punto kilométrico y sentido.
+
+8
+00:01:18.885 --> 00:01:29.104
+SENDA lo calcula sin red, añade la referencia visible más cercana, como un aerogenerador, y sigue tu posición dentro de un túnel.
+
+9
+00:01:30.704 --> 00:01:39.109
+Quien se para puede coordinar la escena con la conducta de la DGT: proteger, avisar y socorrer. Cada tarea la confirma otra persona.
+
+10
+00:01:39.459 --> 00:01:47.843
+Cuando llega la Guardia Civil, asume el mando y recibe el resumen. Las acciones confirmadas suman puntos cívicos en un registro que no se puede alterar.
+
+11
+00:01:49.443 --> 00:01:57.699
+El primero en saberlo es el móvil de quien se equivoca: tres posiciones seguidas contra el sentido de la calzada bastan para avisarle.
+
+12
+00:01:58.049 --> 00:02:04.172
+Los que vienen de frente reciben el tiempo que falta para cruzarse y qué hacer: carril derecho y reducir.
+
+13
+00:02:05.772 --> 00:02:11.767
+El final de una retención crece hacia atrás. Con la teoría de tráfico, SENDA calcula a qué velocidad.
+
+14
+00:02:12.117 --> 00:02:17.493
+Así te avisa de dónde estará la cola cuando llegues, no de dónde estaba, y reduces mucho antes.
+
+15
+00:02:19.093 --> 00:02:25.322
+SENDA usa solo cámaras públicas publicadas para reutilizarse, y solo para medir el estado de la vía, nunca a las personas.
+
+16
+00:02:25.672 --> 00:02:36.445
+Con un objeto oscuro a distancia conocida calcula la visibilidad en metros y la velocidad para poder parar dentro de lo que se ve. Esta imagen es sintética, para comprobar el método.
+
+17
+00:02:38.045 --> 00:02:46.216
+El 112 y la información de tráfico en DATEX II son comunes en toda la Unión Europea. Por eso el mismo núcleo sirve en Países Bajos.
+
+18
+00:02:46.566 --> 00:02:53.158
+Allí, una cruz roja sobre el carril significa carril cerrado. SENDA lo lee de los datos abiertos y te lo dice en neerlandés.
+
+19
+00:02:54.758 --> 00:03:06.235
+Radares, paneles y estaciones de aforo no son radios que podamos usar: cada uno habla con la DGT por un canal cerrado. Detectar radares, además, está prohibido.
+
+20
+00:03:06.585 --> 00:03:15.567
+SENDA suma lo que la DGT publica. Por ejemplo, las medidas de las estaciones de aforo dicen dónde empieza la cola y a qué velocidad crece.
+
+21
+00:03:17.167 --> 00:03:22.969
+Todo lo que has visto lo calcula el mismo núcleo de la app, con pruebas automáticas que se ejecutan sin red.
+
+22
+00:03:23.319 --> 00:03:31.277
+Falta lo más importante: ensayos en carretera real, la app nativa para el aviso entre coches y los convenios con la DGT.
+
+23
+00:03:32.877 --> 00:03:37.250
+SENDA: el canal que queda cuando falla todo lo demás. Pruébalo en la web.

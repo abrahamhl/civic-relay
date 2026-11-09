@@ -1,0 +1,186 @@
+{
+ "note": "SENDA · Telediario Especial de Innovación: Radar Acústico Táctico, Detección de Fibra Óptica, Centinelas COTS y Supervivencia Civil",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "brk_1",
+   "claim": "OBSERVED",
+   "source": [
+    "docs/research/SENDA_CIVILIAN_MESH_RADAR_AND_DRONE_COUNTERMEASURES_2026.md",
+    "packages/senda/src/civilian-uav-mesh-radar.mjs"
+   ],
+   "visual": {
+    "kind": "broadcast"
+   },
+   "title": {
+    "es": "Boletín Especial: El Fin del Silencio de los Drones Hostiles",
+    "en": "Special Broadcast: The End of Radio-Silent Drone Invisibility",
+    "nl": "Speciaal Bulletin: Het Einde van Radiostille Drone-Onzichtbaarheid"
+   },
+   "es": [
+    "Edición especial de información tecnológica y seguridad soberana.",
+    "En los escenarios de conflicto y catástrofes de dos mil veintiséis, los drones de ataque guiados por fibra óptica eluden el cien por cien de los radares militares convencionales al emitir cero radiación electromagnética.",
+    "Frente a este desafío crítico, la ingeniería de SENDA ha desarrollado un avance histórico: la primera Malla Centinela Civil capaz de detectar y triangular drones hostiles combinando la acústica de rotores con las microperturbaciones en rúteres y teléfonos móviles."
+   ],
+   "es_say": [
+    "Edición especial de información tecnológica y seguridad soberana.",
+    "En los escenarios de conflicto y catástrofes de dos mil veintiséis, los drones de ataque guiados por fibra óptica eluden el cien por cien de los radares militares convencionales al emitir cero radiación electromagnética.",
+    "Frente a este desafío crítico, la ingeniería de Senda ha desarrollado un avance histórico: la primera Malla Centinela Civil capaz de detectar y triangular drones hostiles combinando la acústica de rotores con las microperturbaciones en rúteres y teléfonos móviles."
+   ],
+   "en": [
+    "Special technology and sovereign security broadcast.",
+    "In 2026 crisis and conflict theaters, fiber-optic guided strike drones bypass one hundred percent of military RF jammers by emitting zero electromagnetic radiation.",
+    "Against this critical threat, SENDA has delivered a landmark breakthrough: the first Civilian Sentinel Mesh capable of detecting and triangulating hostile drones by fusing rotor aerodynamics with domestic Wi-Fi perturbations."
+   ],
+   "en_say": [
+    "Special technology and sovereign security broadcast.",
+    "In twenty twenty-six crisis and conflict theaters, fiber-optic guided strike drones bypass one hundred percent of military R F jammers by emitting zero electromagnetic radiation.",
+    "Against this critical threat, Senda has delivered a landmark breakthrough: the first Civilian Sentinel Mesh capable of detecting and triangulating hostile drones by fusing rotor aerodynamics with domestic Wi-Fi perturbations."
+   ],
+   "nl": [
+    "Speciaal informatiebulletin over technologie en soevereine veiligheid.",
+    "In crisissituaties en conflictgebieden van 2026 omzeilen glasvezelgeleide drones honderd procent van militaire stoorzenders door nul elektromagnetische straling uit te zenden.",
+    "Tegen deze dreiging heeft SENDA een historische doorbraak bereikt: het eerste civiele sentinel-netwerk dat vijandige drones lokaliseert via rotoraërodynamica en Wi-Fi-verstoringen."
+   ]
+  },
+  {
+   "id": "brk_2",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/civilian-uav-mesh-radar.mjs",
+    "packages/senda/src/acoustic-beamforming-survival.mjs"
+   ],
+   "visual": {
+    "kind": "arch3d"
+   },
+   "title": {
+    "es": "Matemática Ondulatoria: Triangulación TDoA y Microfonía Directiva",
+    "en": "Wave Mathematics: TDoA Multilateration & Directional Acoustics",
+    "nl": "Golfwiskunde: TDoA-multilateratie en directionele akoestiek"
+   },
+   "es": [
+    "El núcleo matemático de SENDA transforma cualquier conjunto de cuatro teléfonos inteligentes en un radar acústico de alta precisión.",
+    "Mediante la correlación cruzada generalizada de fase, la red calcula las diferencias de tiempo de llegada y resuelve la posición tridimensional del dron con precisión submétrica.",
+    "Al incorporar cápsulas cardioides, hipercardioides y tubos de interferencia, el sistema enfoca el sonido en el espacio, eliminando el ruido urbano y multiplicando la sensibilidad en más de dieciocho decibelios."
+   ],
+   "es_say": [
+    "El núcleo matemático de Senda transforma cualquier conjunto de cuatro teléfonos inteligentes en un radar acústico de alta precisión.",
+    "Mediante la correlación cruzada generalizada de fase, la red calcula las diferencias de tiempo de llegada y resuelve la posición tridimensional del dron con precisión submétrica.",
+    "Al incorporar cápsulas cardioides, hipercardioides y tubos de interferencia, el sistema enfoca el sonido en el espacio, eliminando el ruido urbano y multiplicando la sensibilidad en más de dieciocho decibelios."
+   ],
+   "en": [
+    "SENDA's mathematical engine transforms any cluster of four smartphones into a high-precision acoustic radar.",
+    "Using generalized phase cross-correlation, the mesh computes time-difference-of-arrival hyperbolas and recovers the 3D coordinates of the drone with sub-meter accuracy.",
+    "By adding directional cardioid, hypercardioid and shotgun microphones, the system focuses sound across 3D space, rejecting urban noise and boosting SNR by over eighteen decibels."
+   ],
+   "en_say": [
+    "Senda's mathematical engine transforms any cluster of four smartphones into a high-precision acoustic radar.",
+    "Using generalized phase cross-correlation, the mesh computes time-difference-of-arrival hyperbolas and recovers the 3D coordinates of the drone with sub-meter accuracy.",
+    "By adding directional cardioid, hypercardioid and shotgun microphones, the system focuses sound across 3D space, rejecting urban noise and boosting S N R by over eighteen decibels."
+   ],
+   "nl": [
+    "De wiskundige kern van SENDA transformeert elke groep van vier smartphones in een uiterst precieze akoestische radar.",
+    "Via gegeneraliseerde fase-kruiscorrelatie berekent het netwerk aankomsttijdverschillen en herstelt het de driedimensionale positie met submeterprecisie.",
+    "Door directionele cardioïde en shotgun-microfoons te integreren, filtert het systeem stadsgeluid weg en verhoogt het de signaal-ruisverhouding met meer dan achttien decibel."
+   ]
+  },
+  {
+   "id": "brk_3",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/acoustic-beamforming-survival.mjs",
+    "investor-next/app/acoustic-sentinel-survival-lab.tsx"
+   ],
+   "visual": {
+    "kind": "cots_bom"
+   },
+   "title": {
+    "es": "Cámara Acústica y Centinelas COTS por Menos de Doce Euros",
+    "en": "Acoustic Camera & COTS Gateways for Under Twelve Euros",
+    "nl": "Akoestische Camera & COTS Gateways voor Minder dan Twaalf Euro"
+   },
+   "es": [
+    "La tecnología de cámara acústica computacional de SENDA permite a los ciudadanos ver literalmente el sonido del dron sobre el visor de la cámara de su móvil.",
+    "Además, hemos diseñado la arquitectura física de un nodo centinela reproducible por solo once euros con setenta céntimos en componentes comerciales.",
+    "Con un microcontrolador ESP treinta y dos S tres, cuatro micrófonos digitales en matriz y un radar Doppler de veinticuatro gigahercios, cada centinela vigila tejados y perímetros durante más de noventa horas seguidas con una simple batería portátil."
+   ],
+   "es_say": [
+    "La tecnología de cámara acústica computacional de Senda permite a los ciudadanos ver literalmente el sonido del dron sobre el visor de la cámara de su móvil.",
+    "Además, hemos diseñado la arquitectura física de un nodo centinela reproducible por solo once euros con setenta céntimos en componentes comerciales.",
+    "Con un microcontrolador E S P treinta y dos S tres, cuatro micrófonos digitales en matriz y un radar Doppler de veinticuatro gigahercios, cada centinela vigila tejados y perímetros durante más de noventa horas seguidas con una simple batería portátil."
+   ],
+   "en": [
+    "SENDA's acoustic camera technology allows citizens to literally see the drone's sound overlaid on their mobile phone screen.",
+    "Furthermore, we engineered the physical BOM of a sentinel gateway reproducible for just eleven euros and seventy cents using commercial off-the-shelf components.",
+    "With an ESP32-S3 microcontroller, a 4-channel digital microphone array and a 24 gigahertz Doppler radar, each sentinel guards rooftops for over ninety continuous hours on a basic power bank."
+   ],
+   "en_say": [
+    "Senda's acoustic camera technology allows citizens to literally see the drone's sound overlaid on their mobile phone screen.",
+    "Furthermore, we engineered the physical B O M of a sentinel gateway reproducible for just eleven euros and seventy cents using commercial off-the-shelf components.",
+    "With an E S P thirty-two S three microcontroller, a 4-channel digital microphone array and a twenty-four gigahertz Doppler radar, each sentinel guards rooftops for over ninety continuous hours on a basic power bank."
+   ],
+   "nl": [
+    "De akoestische mediatechnologie van SENDA stelt burgers in staat het geluid van de drone live te visualiseren op hun telefoonscherm.",
+    "Bovendien hebben we de fysieke architectuur ontworpen van een sentinel-knooppunt voor slechts elf euro en zeventig cent aan commerciële onderdelen.",
+    "Met een ESP32-S3 microchip, vier digitale microfoons en een 24 gigahertz Doppler-radar bewaakt elke sentinel daken gedurende meer dan negentig aaneengesloten uren."
+   ]
+  },
+  {
+   "id": "brk_4",
+   "claim": "OBSERVED",
+   "source": [
+    "packages/senda/src/acoustic-beamforming-survival.mjs",
+    "investor-next/app/civilian-radar-defense-lab.tsx"
+   ],
+   "visual": {
+    "kind": "drone3d"
+   },
+   "title": {
+    "es": "Kit Digital de Supervivencia: Protección Civil y Rescate Inaudible",
+    "en": "Digital Survival Kit: Civil Defense & Inaudible Rescue Beacons",
+    "nl": "Digitale Overlevingskit: Burgerbescherming & Onhoorbare Reddingsbakens"
+   },
+   "es": [
+    "Para garantizar la supervivencia civil ante ataques o derrumbes, SENDA incorpora un kit digital cien por cien desconectado.",
+    "Calcula de forma instantánea el vector de evacuación seguro hacia zonas apantalladas topográficamente y activa una baliza de socorro ultrasónica a veinte mil hercios.",
+    "Esta baliza es totalmente inaudible para el oído humano pero descodificable por drones de salvamento y otros teléfonos móviles a sesenta metros, permitiendo rescatar a civiles sepultados sin alertar a fuerzas hostiles.",
+    "SENDA democratiza la resiliencia ciudadana y la soberanía tecnológica, consolidándose como la plataforma de protección civil más avanzada del mundo."
+   ],
+   "es_say": [
+    "Para garantizar la supervivencia civil ante ataques o derrumbes, Senda incorpora un kit digital cien por cien desconectado.",
+    "Calcula de forma instantánea el vector de evacuación seguro hacia zonas apantalladas topográficamente y activa una baliza de socorro ultrasónica a veinte mil hercios.",
+    "Esta baliza es totalmente inaudible para el oído humano pero descodificable por drones de salvamento y otros teléfonos móviles a sesenta metros, permitiendo rescatar a civiles sepultados sin alertar a fuerzas hostiles.",
+    "Senda democratiza la resiliencia ciudadana y la soberanía tecnológica, consolidándose como la plataforma de protección civil más avanzada del mundo."
+   ],
+   "en": [
+    "To safeguard civilian survival during strikes or collapses, SENDA embeds a 100% offline digital survival kit.",
+    "It instantly computes the safe evacuation vector towards topographically shielded zones and triggers an ultrasonic rescue beacon at twenty thousand hertz.",
+    "This beacon is completely inaudible to human ears but decodable by SAR rescue drones and civilian phones sixty meters away, rescuing trapped survivors without revealing their location.",
+    "SENDA democratizes civilian resilience and sovereign defense, establishing itself as the most rigorous civil protection software on earth."
+   ],
+   "en_say": [
+    "To safeguard civilian survival during strikes or collapses, Senda embeds a one hundred percent offline digital survival kit.",
+    "It instantly computes the safe evacuation vector towards topographically shielded zones and triggers an ultrasonic rescue beacon at twenty thousand hertz.",
+    "This beacon is completely inaudible to human ears but decodable by S A R rescue drones and civilian phones sixty meters away, rescuing trapped survivors without revealing their location.",
+    "Senda democratizes civilian resilience and sovereign defense, establishing itself as the most rigorous civil protection software on earth."
+   ],
+   "nl": [
+    "Om de overleving van burgers bij aanvallen of instortingen te waarborgen, bevat SENDA een honderd procent offline digitale overlevingskit.",
+    "Het berekent direct de veilige evacuatievector en activeert een ultrasoon noodsignaal op twintigduizend hertz.",
+    "Dit signaal is onhoorbaar voor mensen maar decodeerbaar door reddingsdrones en telefoons op zestig meter afstand.",
+    "SENDA democratiseert burgerweerbaarheid en technologische soevereiniteit als 's werelds meest geavanceerde beschermingsplatform."
+   ]
+  }
+ ]
+}

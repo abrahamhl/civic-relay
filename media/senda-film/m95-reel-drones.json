@@ -1,0 +1,125 @@
+{
+ "note": "SENDA Mission 9.5 · Reel Vertical 9:16 (Rastreo de Drones y Pilotos por 25€ con ASTM F3411)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "r_dr1",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/cots-rf-tactical.mjs",
+    "apps/senda-live/server/domain/cots-drone-recon.mjs"
+   ],
+   "visual": {
+    "kind": "cots_bom"
+   },
+   "title": {
+    "es": "Caza de drones por veinticinco euros",
+    "en": "Hunting rogue drones for twenty-five euros",
+    "nl": "Drones opsporen voor vijfentwintig euro"
+   },
+   "es": [
+    "¿Sabías que puedes construir un radar de interceptación de drones por menos de veinticinco euros?",
+    "Con un chip ESP32, un receptor de radio y unos centímetros de hilo de cobre, SENDA sintoniza las señales aéreas en tiempo real."
+   ],
+   "es_say": [
+    "¿Sabías que puedes construir un radar de interceptación de drones por menos de veinticinco euros?",
+    "Con un chip E S P treinta y dos, un receptor de radio y unos centímetros de hilo de cobre, Senda sintoniza las señales aéreas en tiempo real."
+   ],
+   "en": [
+    "Did you know you can build a tactical counter-drone sensor for under twenty-five euros?",
+    "With an ESP32 chip, a low-cost radio receiver, and copper wire, SENDA captures live airspace broadcasts instantly."
+   ],
+   "en_say": [
+    "Did you know you can build a tactical counter-drone sensor for under twenty-five euros?",
+    "With an E S P thirty-two chip, a low-cost radio receiver, and copper wire, Senda captures live airspace broadcasts instantly."
+   ],
+   "nl": [
+    "Wist u dat u een tactische drone-detector kunt bouwen voor minder dan vijfentwintig euro?",
+    "Met een ESP32 chip, een voordelige radio-ontvanger en wat koperdraad vangt SENDA live signalen op in het luchtruim."
+   ]
+  },
+  {
+   "id": "r_dr2",
+   "claim": "OBSERVED",
+   "source": [
+    "packages/senda/src/cots-rf-tactical.mjs",
+    "apps/senda-live/web/src/components/Globe4DStudio.tsx"
+   ],
+   "visual": {
+    "kind": "drone3d"
+   },
+   "title": {
+    "es": "Localizando la posición exacta del piloto en tierra",
+    "en": "Pinpointing the pilot ground location in real time",
+    "nl": "De exacte locatie van de piloot op de grond traceren"
+   },
+   "es": [
+    "El estándar internacional ASTM F3411 transmite la telemetría del dron y también la posición de la estación del piloto.",
+    "SENDA decodifica el paquete, traza un vector directo en el mapa tridimensional y muestra dónde está escondido quien maneja la nave."
+   ],
+   "es_say": [
+    "El estándar internacional A S T M F treinta y cuatro once transmite la telemetría del dron y también la posición de la estación del piloto.",
+    "Senda decodifica el paquete, traza un vector directo en el mapa tridimensional y muestra dónde está escondido quien maneja la nave."
+   ],
+   "en": [
+    "The ASTM F3411 international standard broadcasts both drone telemetry and the ground operator coordinates.",
+    "SENDA decodes the frame, draws a vector across the 3D terrain, and reveals the exact coordinates of the remote pilot."
+   ],
+   "en_say": [
+    "The A S T M F thirty-four eleven international standard broadcasts both drone telemetry and the ground operator coordinates.",
+    "Senda decodes the frame, draws a vector across the 3D terrain, and reveals the exact coordinates of the remote pilot."
+   ],
+   "nl": [
+    "De internationale ASTM F3411 norm verzendt drone-telemetrie én de grondcoördinaten van de bestuurder.",
+    "SENDA decodeert het pakket, projecteert een directe vector op de 3D-kaart en toont precies waar de piloot zich bevindt."
+   ]
+  },
+  {
+   "id": "r_dr3",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/app/senda-home.tsx",
+    "docs/video/M95_VIDEO_SOURCES.md"
+   ],
+   "visual": {
+    "kind": "cta"
+   },
+   "title": {
+    "es": "Protección del espacio aéreo accesible para todos",
+    "en": "Accessible airspace protection for all responders",
+    "nl": "Toegankelijke luchtruimbewaking voor alle hulpdiensten"
+   },
+   "es": [
+    "Seguridad civil real, sin secretos comerciales y al alcance de cualquier cuerpo de bomberos, policía o comunidad.",
+    "Explora los esquemas de antena y la demo interactiva en civic-relay-investor punto vercel punto app barra senda."
+   ],
+   "es_say": [
+    "Seguridad civil real, sin secretos comerciales y al alcance de cualquier cuerpo de bomberos, policía o comunidad.",
+    "Explora los esquemas de antena y la demo interactiva en civic guión relay guión investor punto vercel punto app barra senda."
+   ],
+   "en": [
+    "True civil protection, without closed vendor locks, accessible to every fire crew, police officer, or community group.",
+    "Explore the antenna schematics and interactive demo at civic-relay-investor dot vercel dot app slash senda."
+   ],
+   "en_say": [
+    "True civil protection, without closed vendor locks, accessible to every fire crew, police officer, or community group.",
+    "Explore the antenna schematics and interactive demo at civic dash relay dash investor dot vercel dot app slash senda."
+   ],
+   "nl": [
+    "Echte civiele bescherming, zonder gesloten systemen, binnen handbereik van brandweer, politie en burgerwachten.",
+    "Bekijk de antenneschema's en de interactieve demo op civic-relay-investor punt vercel punt app schuine streep senda."
+   ]
+  }
+ ]
+}

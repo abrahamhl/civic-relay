@@ -1,0 +1,104 @@
+{
+ "note": "SENDA · Reel Vertical 9:16: Radar Centinela de 11€, Detección de Drones de Fibra Óptica y Kit de Supervivencia",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.98
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.98
+  }
+ },
+ "scenes": [
+  {
+   "id": "rel_1",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/acoustic-beamforming-survival.mjs",
+    "docs/research/SENDA_ACOUSTIC_BEAMFORMING_AND_SURVIVAL_KIT_2026.md"
+   ],
+   "visual": {
+    "kind": "drone3d"
+   },
+   "title": {
+    "es": "Tu Móvil es un Radar Táctico de Drones",
+    "en": "Your Smartphone is a Tactical Drone Radar",
+    "nl": "Je Smartphone is een Tactische Droneradar"
+   },
+   "es": [
+    "¿Sabías que tu propio teléfono y un sensor de once euros pueden detectar un dron silencioso a trescientos metros?",
+    "Los drones guiados por fibra óptica no emiten radio, pero sus hélices perturban el aire y modulan las ondas Wi-Fi domésticas.",
+    "SENDA une cuatro teléfonos en la calle para calcular la posición exacta del dron con matemática de ondas y sin red celular."
+   ],
+   "es_say": [
+    "¿Sabías que tu propio teléfono y un sensor de once euros pueden detectar un dron silencioso a trescientos metros?",
+    "Los drones guiados por fibra óptica no emiten radio, pero sus hélices perturban el aire y modulan las ondas Wi-Fi domésticas.",
+    "Senda une cuatro teléfonos en la calle para calcular la posición exacta del dron con matemática de ondas y sin red celular."
+   ],
+   "en": [
+    "Did you know your phone and an eleven-euro sensor can detect a silent drone three hundred meters away?",
+    "Fiber-optic drones emit zero radio, but their blades perturb the air and modulate ambient domestic Wi-Fi signals.",
+    "SENDA connects four phones on any street to calculate the drone's 3D position with wave physics and zero cellular coverage."
+   ],
+   "en_say": [
+    "Did you know your phone and an eleven-euro sensor can detect a silent drone three hundred meters away?",
+    "Fiber-optic drones emit zero radio, but their blades perturb the air and modulate ambient domestic Wi-Fi signals.",
+    "Senda connects four phones on any street to calculate the drone's 3D position with wave physics and zero cellular coverage."
+   ],
+   "nl": [
+    "Wist je dat jouw telefoon en een sensor van elf euro een stille drone op driehonderd meter afstand kunnen detecteren?",
+    "Glasvezeldrones zenden geen radiosignalen uit, maar hun propellers verstoren de lucht en moduleren lokale Wi-Fi-netwerken.",
+    "SENDA verbindt vier telefoons om met golfwiskunde de exacte positie van de drone te bepalen zonder mobiel bereik."
+   ]
+  },
+  {
+   "id": "rel_2",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/app/acoustic-sentinel-survival-lab.tsx",
+    "packages/senda/src/acoustic-beamforming-survival.mjs"
+   ],
+   "visual": {
+    "kind": "cots_bom"
+   },
+   "title": {
+    "es": "Kit de Supervivencia: Rescate Inaudible y Ruta Segura",
+    "en": "Survival Kit: Inaudible Rescue & Silent Escape",
+    "nl": "Overlevingskit: Onhoorbare Redding & Veilige Route"
+   },
+   "es": [
+    "Si hay peligro inminente, el kit digital de supervivencia te guía por rutas protegidas evitando la visión de la cámara enemiga.",
+    "Y si quedas atrapado, activa una baliza de socorro ultrasónica a veinte mil hercios.",
+    "Es totalmente inaudible para el oído humano pero los equipos de rescate la captan a sesenta metros.",
+    "Seguridad civil real, accesible para todos y disponible ahora en SENDA."
+   ],
+   "es_say": [
+    "Si hay peligro inminente, el kit digital de supervivencia te guía por rutas protegidas evitando la visión de la cámara enemiga.",
+    "Y si quedas atrapado, activa una baliza de socorro ultrasónica a veinte mil hercios.",
+    "Es totalmente inaudible para el oído humano pero los equipos de rescate la captan a sesenta metros.",
+    "Seguridad civil real, accesible para todos y disponible ahora en Senda."
+   ],
+   "en": [
+    "If imminent danger strikes, the digital survival kit guides you through safe paths avoiding the enemy drone camera line-of-sight.",
+    "And if you are trapped under rubble, it triggers an ultrasonic rescue beacon at twenty thousand hertz.",
+    "It is completely inaudible to human ears, but rescue teams pick it up sixty meters away.",
+    "True civilian resilience, accessible to everyone, and available now on SENDA."
+   ],
+   "en_say": [
+    "If imminent danger strikes, the digital survival kit guides you through safe paths avoiding the enemy drone camera line-of-sight.",
+    "And if you are trapped under rubble, it triggers an ultrasonic rescue beacon at twenty thousand hertz.",
+    "It is completely inaudible to human ears, but rescue teams pick it up sixty meters away.",
+    "True civilian resilience, accessible to everyone, and available now on Senda."
+   ],
+   "nl": [
+    "Bij dreigend gevaar leidt de digitale overlevingskit je via veilige routes weg van vijandige camera's.",
+    "En als je vastzit onder puin, activeert het een ultrasoon noodsignaal op twintigduizend hertz.",
+    "Het is onhoorbaar voor mensen, maar reddingsteams vangen het signaal op zestig meter afstand op.",
+    "Echte civiele veiligheid, voor iedereen toegankelijk en nu beschikbaar op SENDA."
+   ]
+  }
+ ]
+}

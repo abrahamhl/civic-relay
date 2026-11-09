@@ -1,0 +1,21 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:04.312
+Veiligheid is geen belofte. Het is een keten die je kunt controleren.
+
+2
+00:00:04.662 --> 00:00:09.057
+Berichten zijn end-to-end versleuteld. Ontvangstbewijzen worden ondertekend in een hash-keten.
+
+3
+00:00:09.407 --> 00:00:12.905
+De identiteitssleutel is aan de kaart gebonden en wordt versleuteld ge?xporteerd.
+
+4
+00:00:13.255 --> 00:00:19.207
+De kern heeft meer dan tweehonderdzestig automatische tests, en het custodieprotocol heeft een eigen suite.
+
+5
+00:00:19.557 --> 00:00:26.619
+Dat bewijst dat de code doet wat de tests controleren. Het bewijst geen veldprestaties, en geen externe audit heeft het gecertificeerd.

@@ -1,0 +1,109 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:09.901
+Esto es lo nuevo de SENDA. El mismo núcleo funciona en un móvil, en un ordenador, en el servidor de un organismo y a bordo de un dron o de un vehículo de emergencias.
+
+2
+00:00:10.251 --> 00:00:25.441
+Cada integración declara su permiso. Lo pasivo es legal desde hoy: datos abiertos, emisiones públicas y marcas visibles como los aerogeneradores. Lo que requiere convenio queda preparado. Y lo prohibido, como entrar en sistemas ajenos, no se hace nunca.
+
+3
+00:00:25.791 --> 00:00:32.553
+Así SENDA aprovecha todo lo disponible desde el primer día y está lista para crecer cuando se concedan accesos.
+
+4
+00:00:34.153 --> 00:00:40.895
+Bajo los escombros, una persona da golpes. Cinco móviles alrededor los oyen, cada uno en un instante distinto.
+
+5
+00:00:41.245 --> 00:00:50.994
+Primero, un pitido de sincronía corrige los relojes de los móviles, que nunca coinciden. Después, con las diferencias de llegada, SENDA calcula de dónde vino el golpe.
+
+6
+00:00:51.344 --> 00:01:00.133
+En esta simulación, el error es de unos diez centímetros; sin sincronía, serían metros. En escombros reales el resultado será una zona, no un punto.
+
+7
+00:01:01.733 --> 00:01:09.499
+Los detectores de víctimas de avalancha guían con pitidos. SENDA hace lo mismo con la baliza Bluetooth del móvil de una persona atrapada.
+
+8
+00:01:09.849 --> 00:01:20.046
+Filtra la intensidad de la señal, estima la distancia con un margen honesto, porque los muros y los cuerpos atenúan, y acelera los pitidos a medida que el rescatador se acerca.
+
+9
+00:01:21.646 --> 00:01:28.963
+Al respirar, el pecho se mueve unos milímetros. Dos placas Wi-Fi de pocos euros notan cómo cambia la señal entre ellas.
+
+10
+00:01:29.313 --> 00:01:38.337
+SENDA elige las frecuencias más sensibles, filtra y busca el ritmo de la respiración: aquí, catorce por minuto. Con la habitación vacía, no detecta nada.
+
+11
+00:01:38.687 --> 00:01:45.727
+Está validado en condiciones controladas. A través de muros todavía no hay validación independiente, y así lo decimos.
+
+12
+00:01:47.327 --> 00:01:54.815
+En la DANA de Valencia y en el valle del Ahr, la lluvia extrema cayó aguas arriba, y en muchos pueblos que se inundaron apenas llovía.
+
+13
+00:01:55.165 --> 00:02:02.973
+SENDA convierte la lluvia en caudal con hidrología clásica, tiene en cuenta los embalses y vigila la velocidad de subida aguas arriba.
+
+14
+00:02:03.323 --> 00:02:12.369
+En este escenario sintético, el aviso sale dos horas y media antes de que se desborde el primer pueblo, donde solo han caído tres litros por metro cuadrado.
+
+15
+00:02:13.969 --> 00:02:22.950
+La velocidad de un maremoto depende de la profundidad del mar: en alta mar va a unos setecientos kilómetros por hora, y cerca de la costa se frena y crece.
+
+16
+00:02:23.300 --> 00:02:33.561
+SENDA calcula cuándo llega a cada costa y lo compara con lo que tarda cada persona en ponerse a salvo. Con poco margen, subir a una tercera planta salva más que huir lejos.
+
+17
+00:02:35.161 --> 00:02:44.335
+En una catástrofe, el primero en llegar suele ser un vecino. SENDA le guía con el método internacional de triaje: camina, respira, circulación y responde.
+
+18
+00:02:44.685 --> 00:02:55.266
+Le dice qué hacer mientras llega la ayuda y qué servicio hace falta, con el 112 siempre primero, y prepara un parte que cabe en un SMS. Nunca declara a nadie fallecido.
+
+19
+00:02:56.866 --> 00:03:04.333
+Sin cobertura, los aerogeneradores siguen ahí: se ven a kilómetros y de noche llevan luces rojas. Sus coordenadas son públicas.
+
+20
+00:03:04.683 --> 00:03:13.109
+Apunta el móvil a dos o tres marcas conocidas: la brújula da el rumbo y SENDA calcula tu posición con su margen de error, sin emitir nada.
+
+21
+00:03:13.459 --> 00:03:19.027
+Después la mantiene contando pasos, y envía el SOS por satélite cuando pasa uno útil.
+
+22
+00:03:20.627 --> 00:03:29.289
+Tras un terremoto hay decenas de edificios y muy pocos drones. SENDA ordena las casas para volar lo mínimo y parte la ruta según la batería.
+
+23
+00:03:29.639 --> 00:03:39.772
+En cada casa, el dron rodea la fachada, escucha el Bluetooth y hace una pasada térmica. El resultado es un tablero de prioridad: personas probables por daño del edificio.
+
+24
+00:03:41.372 --> 00:03:52.039
+Todo esto se comprueba por máquina en cada cambio: ciento cuarenta y seis pruebas del núcleo y treinta y siete comprobaciones en navegadores reales, casi todas con la red cortada.
+
+25
+00:03:52.389 --> 00:04:01.711
+Lo que falta, lo decimos: ensayos con dispositivos físicos, una auditoría de seguridad independiente y los primeros pilotos con equipos de emergencia.
+
+26
+00:04:03.311 --> 00:04:09.306
+Todas estas pantallas funcionan ya en la web, sin instalar nada y sin red después de la primera visita.
+
+27
+00:04:09.656 --> 00:04:12.088
+SENDA: para que ningún mensaje se pierda.

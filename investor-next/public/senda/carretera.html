@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Ruta protectora</title>
+<meta name="description" content="SENDA en la carretera: aviso de frenada brusca a los coches que no la ven, SOS sin cobertura que viaja con los coches que pasan, punto kilométrico sin red, coordinador de escena con conducta PAS y puntos cívicos.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/arquitectura">Arquitectura</a> · <a href="/senda/triaje">Triaje</a> · <a href="/senda/reserva">Batería de Internet</a> · <a href="/senda/incidente">Incidente ferroviario</a></p>
+<h1>Ruta protectora</h1>
+<p class="lead m">Cuando sales de viaje, SENDA va contigo como un copiloto que vigila. Si el coche de delante frena de golpe, <b>avisa a los de detrás que no lo ven</b>. Si hay un choque, <b>lo detecta, pregunta si estás bien y pide ayuda</b> con la carretera, el punto kilométrico y el sentido, aunque no haya cobertura: el aviso lo llevan los coches que pasan. Y si te paras a ayudar, te guía para <b>coordinar la escena</b> hasta que llegan los servicios de emergencia. Nunca sustituye tu atención, la distancia de seguridad, el eCall del coche ni el 112.</p>
+
+<section class="card" style="margin-top:12px" aria-labelledby="h-vid-ruta">
+  <h2 id="h-vid-ruta">▶ Vídeo: Ruta protectora, cámaras, Países Bajos y DGT (Mission 9.5 · 1080p)</h2>
+  <p class="m" style="margin-top:0">Grabado fotograma a fotograma desde las propias páginas de la app, con el núcleo real: frenada en cadena, SOS sin cobertura, punto kilométrico, escena PAS, sentido contrario, final de retención, visibilidad en cámaras, señalización neerlandesa y datos de la DGT.</p>
+  <div class="g2" style="margin-top:8px">
+    <div>
+      <p class="m" style="margin:0 0 6px"><b>Mission 9.5 Master · English voice</b> (subtítulos ES · EN · NL)</p>
+      <video controls preload="metadata" playsinline poster="/media/m95/senda-m95-ruta-poster.jpg" style="width:100%;border-radius:12px;background:#000" aria-label="SENDA Protective Route Mission 9.5 video">
+        <source src="/media/m95/senda-m95-ruta-en.mp4" type="video/mp4">
+        <track kind="subtitles" srclang="es" label="Español" src="/media/m95/senda-m95-ruta-es.vtt" default>
+        <track kind="subtitles" srclang="en" label="English" src="/media/m95/senda-m95-ruta-en.vtt">
+        <track kind="subtitles" srclang="nl" label="Nederlands" src="/media/m95/senda-m95-ruta-nl.vtt">
+      </video>
+    </div>
+    <div>
+      <p class="m" style="margin:0 0 6px"><b>Archivo v5 · Voz en español</b> (subtítulos en español)</p>
+      <video controls preload="none" playsinline poster="/media/senda-ruta-poster-es.jpg" style="width:100%;border-radius:12px;background:#000" aria-label="Vídeo de Ruta protectora de SENDA en español">
+        <source src="/media/senda-ruta-es.mp4" type="video/mp4"><track kind="subtitles" srclang="es" label="Español" src="/media/senda-ruta-es.vtt" default>
+      </video>
+    </div>
+  </div>
+</section>
+
+<section class="card" data-viz="cadena" style="margin-top:14px" aria-labelledby="h-c">
+  <h2 id="h-c">🚗 Frenada brusca: el aviso que llega antes que las luces</h2>
+  <div class="g2" style="margin-top:0">
+    <div><canvas id="cv-cad" aria-label="Dos columnas de seis coches a 120 km/h con niebla: arriba sin SENDA, cada conductor reacciona a las luces del de delante y se produce un choque en cadena; abajo con SENDA, el aviso llega a todos a la vez"></canvas>
+      <div class="row"><label class="m" style="flex:1">Separación entre coches: <b id="c-gv">1,2</b> s <input type="range" id="c-g" min="0.8" max="2.5" step="0.1" value="1.2" aria-label="Separación en segundos"></label>
+        <label class="m" style="flex:1">Coches con SENDA: <b id="c-pv">100</b> % <input type="range" id="c-p" min="0" max="100" step="20" value="100" aria-label="Porcentaje de coches con SENDA"></label></div></div>
+    <div>
+      <div class="kv" style="grid-template-columns:repeat(2,1fr)"><div><b id="c-no">—</b><span>coches que chocan sin SENDA</span></div><div><b id="c-si">—</b><span>coches que chocan con SENDA</span></div><div><b id="c-gain">—</b><span>antes empieza a frenar el quinto coche</span></div><div><b id="c-cl">—</b><span>de hueco real entre coches</span></div></div>
+      <p class="m" style="font-size:14px">Con niebla, una curva o un camión delante, cada conductor solo ve las luces de freno del coche que lleva delante, y su reacción (~1,25 s) <b>se suma</b> coche a coche: el quinto empieza a frenar más de 6 s después que el primero. El móvil del primero detecta la frenada por la velocidad del GPS y emite una <b>trama de 24 bytes</b> por Bluetooth; cada móvil decide si le afecta (mismo sentido, delante, su carril) y calcula la deceleración que necesitaría para parar. Por encima de 3,4 m/s² dice «¡Frena!».</p>
+      <div class="note"><b>Lo que no hace:</b> al coche de justo delante lo ves antes que cualquier radio, así que quien va pegado detrás no gana nada; eso solo lo arregla la distancia de seguridad. Con 2 s de separación nadie choca, con o sin SENDA. Su valor está en los coches que <b>no ves</b>, y crece con la proporción de coches que lo llevan: por eso tiene sentido empezar por flotas (camiones, autobuses, furgonetas).</div>
+      <div class="tw"><table><thead><tr><th>Coche</th><th>Empieza a frenar</th><th>Por</th><th>Resultado</th></tr></thead><tbody id="c-tb"></tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<section class="card" data-viz="sos" style="margin-top:14px" aria-labelledby="h-s">
+  <h2 id="h-s">📡 Sin cobertura: el SOS viaja con los coches que pasan</h2>
+  <div class="g2" style="margin-top:0">
+    <div><canvas id="cv-sos" aria-label="Carretera de montaña de 24 km sin cobertura en el tramo central; un coche accidentado emite su SOS; los coches con SENDA que pasan lo recogen, lo entregan al llegar a la zona con cobertura y avisan a los que se acercan al accidente"></canvas>
+      <div class="row"><label class="m" style="flex:1">Coches con SENDA: <b id="s-pv">10</b> % <input type="range" id="s-p" min="0" max="30" step="1" value="10" aria-label="Porcentaje de coches con SENDA"></label>
+        <label class="m" style="flex:1">Tráfico: <b id="s-fv">300</b> coches/h por sentido <input type="range" id="s-f" min="60" max="600" step="20" value="300" aria-label="Coches por hora en cada sentido"></label></div></div>
+    <div>
+      <div class="kv" style="grid-template-columns:repeat(2,1fr)"><div><b id="s-sos">—</b><span>hasta que el SOS sale de la zona sin cobertura</span></div><div><b id="s-w">—</b><span>de los que se acercan con SENDA, avisados antes de verlo</span></div><div><b id="s-m">—</b><span>de antelación (mediana)</span></div><div><b id="s-c">—</b><span>probabilidad de oírse al cruzarse</span></div></div>
+      <p class="m" style="font-size:14px">De noche, en una carretera de un carril por sentido, sin cobertura en 18 km: el móvil del coche accidentado anuncia el SOS. Al cruzarse a 160 km/h relativos, dos móviles están 2,7 s a menos de 60 m: con un anuncio cada 0,1 s se oyen casi siempre. Quien lo recoge lo entrega en cuanto tiene cobertura, y los coches que vienen de frente, que ya han pasado el accidente, <b>avisan a los que van hacia él</b>: el tráfico contrario es el mensajero.</p>
+      <div class="note">El 112 funciona con la red de <b>cualquier operador</b>, no solo con la tuya: «sin cobertura» aquí significa sin ninguna red. Quien lleva el SOS no lo reenvía al 112 por su cuenta: su móvil le avisa al recuperar señal («llevas un SOS de un accidente en la N-000, PK 127») y llama él. La entrega directa a los centros 112 requiere <span class="chip todo">convenio</span>. Simulación determinista con llegadas de Poisson; parámetros de radio <b>pendientes de medir</b> entre coches reales.</div>
+      <div class="tw"><table><thead><tr><th>Minuto</th><th>Qué pasa</th></tr></thead><tbody id="s-tb"></tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<div class="g2">
+  <section class="card" data-viz="pk" aria-labelledby="h-k">
+    <h2 id="h-k">📍 Dónde estás, en el idioma del 112</h2>
+    <canvas id="cv-pk" aria-label="Carretera de montaña con hitos kilométricos y aerogeneradores; un coche avanza, atraviesa un túnel sin GPS y su posición se describe con carretera, punto kilométrico, sentido y la referencia visible más cercana"></canvas>
+    <p class="m" style="font-size:14px">El GPS funciona sin Internet; lo que falta sin red es saber <b>qué decir</b>. El 112 y la Guardia Civil de Tráfico localizan por <b>carretera, punto kilométrico y sentido</b>. SENDA lo calcula sin red con la geometría de la vía y los hitos guardados en el paquete de la ruta, y añade la referencia visible más cercana (un aerogenerador, una antena, una ermita) con su lado. En un túnel sigue por estima a lo largo de la vía.</p>
+    <p class="m" style="font-size:13px"><b>SMS listo (≤ 160 caracteres):</b> <code id="k-sms">—</code></p>
+    <p class="src">Carretera, hitos y aerogeneradores de esta demostración son <b>inventados</b>. En producción: Red de Transporte del IGN/CNIG (CC BY 4.0) y OpenStreetMap (hitos <code>highway=milestone</code>, aerogeneradores <code>generator:source=wind</code>); cobertura de PK en la red estatal <b>pendiente de verificar</b>.</p>
+  </section>
+  <section class="card" data-viz="escena" aria-labelledby="h-e">
+    <h2 id="h-e">🦺 Te paras a ayudar: coordinar hasta que llegan</h2>
+    <canvas id="cv-esc" aria-label="Escena de un accidente con dos coches y tres personas que ayudan; la lista Proteger, Avisar y Socorrer se va completando, cada acción la confirma otra persona y al llegar la Guardia Civil se le traspasa la escena y se anotan los puntos cívicos"></canvas>
+    <p class="m" style="font-size:14px">Quien se para puede abrir la escena y <b>coordinar</b> la conducta <b>PAS</b> que enseña la DGT: <b>Proteger</b> (V16, chaleco, salir de la calzada), <b>Avisar</b> (el 112 con el guion que prepara SENDA) y <b>Socorrer</b> (triaje sin mover a nadie). Reparte tareas entre quienes ayudan; cada acción la confirma otra persona. Cuando llega un servicio con <b>credencial verificada</b>, asume el mando y recibe el resumen.</p>
+    <p class="m" style="font-size:13px" id="e-script"></p>
+  </section>
+</div>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-p">
+  <h2 id="h-p">🏅 Puntos cívicos</h2>
+  <div class="g2" style="margin-top:0">
+    <div><p class="m" style="margin-top:0">Ayudar en un accidente es un deber (art. 195 del Código Penal) y, además, merece reconocimiento. Cada acción confirmada suma puntos en un <b>libro encadenado por huellas SHA-256</b>: si alguien cambia un asiento, la cadena se rompe y se nota.</p>
+      <ul class="m" id="p-rules" style="font-size:14px"></ul>
+      <div class="note"><b>Decisión tuya, pendiente:</b> qué reconocen los puntos (diploma municipal, descuento en el seguro con convenio, prioridad en formación de primeros auxilios…) y si habrá clasificación pública. Por defecto no la hay, para no premiar la prisa.</div></div>
+    <div class="tw"><table><thead><tr><th>Quién</th><th>Acción</th><th>Puntos</th><th>Huella</th></tr></thead><tbody id="p-tb"></tbody></table><p class="m" id="p-ok" style="font-size:13px"></p></div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-t">
+  <h2 id="h-t">📱 Pruébalo en este teléfono</h2>
+  <p class="m" style="margin-top:0">Esto no es una simulación: usa el GPS y el acelerómetro de tu móvil y ejecuta el mismo detector. Nada sale del teléfono. <b>Úsalo como pasajero:</b> con el coche en marcha, el conductor no toca el móvil.</p>
+  <div class="row"><button class="p" id="t-go">▶ Activar sensores</button><button id="t-say">🔊 Oír el aviso</button><button id="t-brake">Simular frenada</button></div>
+  <div class="kv" id="t-kv"><div><b id="t-v">—</b><span>velocidad (GPS)</span></div><div><b id="t-d">—</b><span>deceleración (ventana 1,5 s)</span></div><div><b id="t-g">—</b><span>pico de aceleración</span></div><div><b id="t-st">—</b><span>estado del detector</span></div></div>
+  <p class="m" id="t-msg" style="font-size:14px" aria-live="polite"></p>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-w">
+  <h2 id="h-w">🧭 Waze, Google Maps y la DGT: qué se puede de verdad</h2>
+  <div class="g2" style="margin-top:0">
+    <div>
+      <p class="m" style="margin-top:0">Ni Waze ni Google Maps tienen una forma pública de que otra app lea tu ruta o sus alertas. Lo honesto es: <b>abrir la ruta en tu navegador favorito</b> con sus enlaces oficiales, mientras SENDA vigila en paralelo; y hacer llegar los avisos confirmados de SENDA a <b>todos</b> los navegadores por el canal oficial: la plataforma <b>DGT 3.0</b>, que ya les envía las balizas V16, o el programa de socios de Waze a través de un organismo público.</p>
+      <div class="row"><a class="btn p" id="w-waze" target="_blank" rel="noopener">Abrir en Waze</a><a class="btn" id="w-gm" target="_blank" rel="noopener">Abrir en Google Maps</a></div>
+      <p class="m" style="font-size:12px">Destino de ejemplo: Puerta del Sol, Madrid. En la app, el destino es el tuyo.</p>
+      <div class="tw"><table><thead><tr><th>Integración</th><th>Acceso</th></tr></thead><tbody id="w-tb"></tbody></table></div>
+    </div>
+    <div>
+      <h3 style="margin-top:0">Mapas de la ruta: un pasillo, no un rectángulo</h3>
+      <p class="m">Waze no tiene mapas sin conexión que puedas descargar y Google Maps los descarga por <b>rectángulos</b>, sin tráfico ni rutas alternativas sin red. SENDA guarda un <b>pasillo</b> alrededor de tu ruta con todos los niveles de detalle, más los PK, las incidencias de la DGT al salir y las referencias visibles.</p>
+      <label class="m">Anchura del pasillo: <b id="w-bv">2</b> km a cada lado <input type="range" id="w-b" min="1" max="6" step="1" value="2" aria-label="Anchura del pasillo en kilómetros"></label>
+      <div class="kv" style="grid-template-columns:repeat(2,1fr)"><div><b id="w-c">—</b><span>pasillo Madrid–Valencia</span></div><div><b id="w-r">—</b><span>rectángulo que lo contiene</span></div></div>
+      <div style="height:14px;background:#13212c;border-radius:7px;overflow:hidden;margin-top:8px"><div id="w-bar" style="height:100%;background:#91d7e8;width:6%"></div></div>
+      <p class="m" style="font-size:12px">Trazado aproximado por puntos de paso de la A-3 (ilustrativo); niveles de zoom 6 a 15; 20 KB por tesela de media (supuesto).</p>
+    </div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-r">
+  <h2 id="h-r">⚠️ Avisos de carretera de un toque</h2>
+  <p class="m" style="margin-top:0">Un toque (o la voz, siempre del copiloto o con el coche parado) y SENDA rellena carretera, PK, sentido y hora. El aviso viaja en la misma trama de 24 bytes. Cada «sigue ahí» lo refuerza y cada «ya no está» lo debilita; sin confirmaciones, se apaga solo según el tipo (un animal suelto en 10 min, el hielo en 2 h).</p>
+  <div class="row" id="r-btns"></div>
+  <div class="g2"><div><p class="m" style="font-size:13px"><b>Trama (hex):</b> <code id="r-hex">—</code></p><p class="m" style="font-size:13px" id="r-bel"></p></div>
+    <div><p class="m" style="font-size:13px"><b>Para Waze (CIFS), solo con convenio y tras confirmar:</b></p><pre id="r-cifs" style="font-size:11px;white-space:pre-wrap;margin:0"></pre></div></div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-v">
+  <h2 id="h-v">🔶 Baliza V16 + SENDA: la baliza dice dónde, SENDA dice qué pasa</h2>
+  <div class="g2" style="margin-top:0">
+    <div><p class="m" style="margin-top:0">Desde el 1-1-2026, cada coche detenido en la vía lleva una V16 conectada: con su propia tarjeta SIM envía su posición a DGT 3.0 (cada 100 s, según los fabricantes) y la DGT la pasa a los paneles y a los navegadores. Es una red de balizas que <b>siempre</b> marca dónde hay un vehículo parado. Pero solo dice eso: no sabe si es una avería o un choque, si hay heridos, si alguien está atrapado ni quién coordina.</p>
+      <p class="m">SENDA lo completa cruzando cada baliza con los informes de SENDA cercanos en espacio (250 m) y tiempo (15 min). Una baliza con un choque detectado y un atrapado sube a <b>prioridad máxima</b>. Un choque sin baliza recibe el aviso «enciéndela». Sin cobertura, la V16 es solo una luz; el aviso de SENDA, con «V16 encendida aquí», viaja con los coches que pasan.</p>
+      <div class="note">SENDA <b>nunca</b> usa la SIM ni la radio de la baliza: es un dispositivo homologado y cerrado. Recibir las balizas de DGT 3.0 y enviarle a la DGT el «qué pasa» requiere <span class="chip todo">convenio</span>. Frecuencia de envío y conectividad según fabricantes y prensa, pendientes de confirmar en la norma.</div></div>
+    <div class="tw"><table><thead><tr><th>Baliza o informe</th><th>Qué es</th><th>Fuentes</th><th>Prioridad</th></tr></thead><tbody id="v-tb"></tbody></table><p class="src">Datos de ejemplo, inventados para la demostración. Código: <code>v16Fusion</code> en <code>drive-cases.mjs</code>.</p></div>
+  </div>
+</section>
+
+<div class="g2">
+  <section class="card" data-viz="retencion" aria-labelledby="h-q">
+    <h2 id="h-q">🚦 Final de retención: dónde estará la cola cuando llegues</h2>
+    <canvas id="cv-q" aria-label="Diagrama espacio-tiempo: trayectorias de coches que llegan a una retención cuyo final crece hacia atrás; un coche con SENDA reduce antes y llega sin frenazo"></canvas>
+    <p class="m" style="font-size:14px">El final de una cola no está quieto: <b>crece hacia atrás</b>. Con la teoría de tráfico de Lighthill-Whitham-Richards, su velocidad es w = Δq/Δk, la diferencia de caudal entre la diferencia de densidad. Llegan 1.800 coches/h a 100 km/h y salen 1.200 coches/h a 20 km/h, así que la cola avanza hacia ti a 14,3 km/h. SENDA calcula dónde te la vas a encontrar, no dónde estaba, y te avisa de reducir mucho antes. Los datos salen de las velocidades de los móviles SENDA y de los detectores que publican la DGT y NDW.</p>
+  </section>
+  <section class="card" data-viz="kamikaze" aria-labelledby="h-k2">
+    <h2 id="h-k2">⛔ Un coche en sentido contrario por tu calzada</h2>
+    <canvas id="cv-kz" aria-label="Autovía de dos carriles: un coche entra en sentido contrario; su propio móvil lo detecta y le avisa, emite el aviso y el coche que viene de frente se aparta al carril derecho y reduce"></canvas>
+    <p class="m" style="font-size:14px">Son unos 130 accidentes al año en España, según la prensa citando datos antiguos, y casi siempre por despiste en un acceso o una rotonda, no por intención. El primero en saberlo es <b>el propio móvil de quien se equivoca</b>: tres posiciones seguidas contra el sentido de una calzada de sentido único bastan para avisarle al momento («¡Vas en sentido contrario!») y emitir el peligro. Los que vienen de frente reciben el tiempo hasta cruzarse: a 120 y 90 km/h, 800 m son 14 s.</p>
+  </section>
+</div>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-z">
+  <h2 id="h-z">🧭 Todas las situaciones al volante</h2>
+  <div class="g3" style="margin-top:0">
+    <div><h3>Niebla</h3><label class="m">Visibilidad <b id="z-vv">60</b> m <input type="range" id="z-v" min="20" max="300" step="5" value="60" aria-label="Visibilidad en metros"></label><p class="m" id="z-vo"></p></div>
+    <div><h3>Firme</h3><label class="m">Estado <select id="z-mu" aria-label="Estado del firme"><option value="seco">Seco</option><option value="mojado">Mojado</option><option value="nieve">Nieve</option><option value="hielo">Hielo</option></select></label> <label class="m">a <b id="z-sv">100</b> km/h <input type="range" id="z-s" min="30" max="130" step="5" value="100" aria-label="Velocidad en km/h"></label><p class="m" id="z-so"></p></div>
+    <div><h3>Agua en la calzada</h3><label class="m">Profundidad <b id="z-dv">20</b> cm <input type="range" id="z-d" min="0" max="80" step="5" value="20" aria-label="Profundidad del agua en centímetros"></label><p class="m" id="z-do"></p></div>
+  </div>
+  <div class="tw"><table><thead><tr><th>Situación</th><th>Qué la detecta</th><th>Qué hace SENDA</th><th>Datos</th><th>Estado</th><th>Acceso</th></tr></thead><tbody id="z-tb"></tbody></table></div>
+  <p class="src">Rozamiento: valores típicos de manual (seco 0,7, mojado 0,4, nieve 0,2, hielo 0,1). Curvas: modelo de masa puntual de AASHTO, v² = g·R·(e + f). Agua: campaña «Turn Around, Don't Drown» del servicio meteorológico de EE. UU. (15 cm: pérdida de control; 30 cm en movimiento: arrastra la mayoría de coches; 60 cm: todoterrenos). Código: <code>drive-cases.mjs</code>.</p>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-f">
+  <h2 id="h-f">📚 Datos y límites</h2>
+  <ul class="m" style="font-size:14px">
+    <li><b>1.119 fallecidos</b> en vías interurbanas en 2025 (DGT, datos a 24 h); en 2024, 1.154, y el <b>72 %</b> en vías convencionales.</li>
+    <li>Desde el <b>1-1-2026</b> la única preseñalización válida es la <b>baliza V16 conectada</b>, que envía su posición a DGT 3.0; la DGT ya la reenvía a los navegadores.</li>
+    <li>El <b>eCall</b> (llamada automática al 112 con un mensaje de 140 bytes) es obligatorio en los modelos homologados desde el <b>31-3-2018</b>; con una edad media del parque de <b>14,6 años</b> (ANFAC 2025), buena parte de los coches que circulan no lo llevan (inferencia). SENDA no lo sustituye: lo complementa en coches sin él y añade lo que el eCall no hace (avisar a los de detrás, coordinar la escena).</li>
+    <li>Las incidencias de la DGT son <b>datos abiertos</b> en DATEX II (Punto de Acceso Nacional).</li>
+    <li>Umbrales de frenada y choque <b>pendientes de calibrar</b> con datos reales; tiempos de reacción de referencia (0,7–1,5 s según lo esperado que sea el aviso) de la literatura de factores humanos.</li>
+  </ul>
+  <p class="src">Fuentes: <a href="https://www.dgt.es/comunicacion/notas-de-prensa/20260108-2025-finaliza-1119-fallecidos-en-siniestros-de-trafico-en-vias-interurbanas">DGT, balance 2025</a> · <a href="https://www.dgt.es/export/sites/web-DGT/.galleries/downloads/dgt-en-cifras/24h/Informe-Siniestralidad_Cierre-2024_v10_FINAL.pdf">DGT, cierre 2024</a> · <a href="https://www.interior.gob.es/opencms/es/detalle/articulo/DGT-3.0-ya-envia-a-los-navegadores-la-ubicacion-de-los-vehiculos-averiados-en-carretera-que-utilizan-la-V-16-conectada/">Interior: DGT 3.0 y la V16 en los navegadores</a> · <a href="https://nap.dgt.es/en/dataset/incidencias-dgt-datex2-v3-7">NAP DGT, incidencias DATEX II</a> · <a href="https://www.km77.com/glosario/ecall">eCall</a> (Reglamento (UE) 2015/758) · <a href="https://www.autofacil.es/alerta-en-seguridad-y-emisiones-la-edad-media-del-coche-espanol-ya-roza-los-15-anos/">ANFAC, edad media 14,6 años</a> · <a href="https://developers.google.com/waze/api">Waze, enlaces profundos</a> · <a href="https://developers.google.com/waze/data-feed/overview">Waze, feed de socios (CIFS)</a> · <a href="https://support.google.com/waze/partners/answer/10618477">Waze for Cities</a> · <a href="https://developers.google.com/maps/documentation/urls/get-started">Google Maps URLs</a> · <a href="https://sede.dgt.gob.es/export/sites/dgt/.galleries/permisos-de-conducir/certificacion-aptitud-profesores-formacion-vial/2026/MANUAL-IX-Primeros-auxilios.pdf">DGT, manual de primeros auxilios (PAS)</a> · <a href="https://www.boe.es/buscar/act.php?id=BOE-A-1995-25444">Código Penal, art. 195</a> · <a href="https://novelbits.io/maximum-data-bluetooth-advertising-packet-ble/">tamaño de un anuncio Bluetooth LE</a> · deceleración de 3,4 m/s²: AASHTO, <i>A Policy on Geometric Design of Highways and Streets</i> · tiempos de reacción: M. Green (2000), <i>Transportation Human Factors</i> 2(3). · <a href="https://bandaancha.eu/articulos/que-datos-envian-dgt-nuevas-balizas-10464">qué datos envía la V16</a> · <a href="https://www.motorpasion.com/seguridad/racc-infotransit-app-que-detecta-kamikazes-10-segundos-avisa-peligro-al-resto-conductores">RACC: aviso de conductores en sentido contrario</a> · <a href="https://okdiario.com/espana/kamikazes-provocan-media-130-accidentes-anuales-30-muertes-8060245">cifras de conducción en sentido contrario</a> · <a href="https://weather.gov/shv/awarenessweek_flood_tadd">NWS, «Turn Around, Don't Drown»</a>. Código: <code>road-guard.mjs</code>, <code>drive-cases.mjs</code>, <code>rail-incident.mjs</code>, <code>triage.mjs</code>.</p>
+</section>
+</main>
+<script type="module">
+import { $, C, canvas, text, rr, run, clamp, ease, FILM, LANG, tr, drawCar, drawRoad, drawImpact, drawPerson, carColor } from '/senda/kit.mjs';
+import { brakeChain, alertGain, roadScenario, contactProbability, demoRoad, pointAt, roadLocate, roadDeadReckon, describePosition, landmarksAlong, roadSosText, call112Script, createScene, sceneAct, sceneBrief, civicLedger, verifyLedger, CIVIC_RULES, PAS, corridorTiles, ROUTE_MAD_VLC, navLinks, REPORT_KINDS, encodeHazard, reportBelief, toCifs, detectHardBrake, brakeAdvice } from '/senda/core/road-guard.mjs';
+import { INTEGRATIONS, ACCESS } from '/senda/core/platforms.mjs';
+import { DRIVE_CASES, MU, stoppingDistance, safeSpeedForVisibility, floodedRoad, v16Fusion, shockwaveKmh, wrongWayMeet } from '/senda/core/drive-cases.mjs';
+import { startTriage } from '/senda/core/triage.mjs';
+const fmt = (x, d = 0) => (LANG === 'en' ? x.toFixed(d) : x.toFixed(d).replace('.', ','));
+const S = { gapS: 1.2, share: 1, sShare: 0.1, flow: 300, buffer: 2 }; window.SENDA_CARRETERA = S;
+
+function trTimeline(s) {
+  if (LANG !== 'en' || !s) return s;
+  return s
+    .replace(/Accidente en el km ([\d.,]+) \(sin cobertura\)/g, 'Crash at km $1 (no coverage)')
+    .replace(/Coche #?(\d+) \(([^)]+)\) recoge el SOS al pasar/g, 'Car $1 ($2) picks up the SOS as it passes')
+    .replace(/Coche #?(\d+) recoge el SOS al pasar por el accidente/g, 'Car $1 picks up the SOS when passing the crash')
+    .replace(/Coche #?(\d+) entrega el SOS al entrar en cobertura \(km ([\d.,]+)\)/g, 'Car $1 delivers SOS upon reaching coverage (km $2)')
+    .replace(/Coche #?(\d+) entra en cobertura y entrega el SOS/g, 'Car $1 enters coverage and delivers the SOS')
+    .replace(/Coche #?(\d+), que va hacia el accidente, avisado por el coche #?(\d+) a ([\d.,]+) km/g, 'Car $1, heading towards the crash, warned by car $2 at $3 km')
+    .replace(/Coche #?(\d+) \(([^)]+)\) avisa al coche #?(\d+) a ([\d.,]+) m del accidente/g, 'Car $1 ($2) warns oncoming car $3 at $4 m from crash')
+    .replace(/(\d+),(\d+)/g, '$1.$2')
+    .replace(/hacia el Puerto/g, 'towards Pass')
+    .replace(/hacia el Valle/g, 'towards Valley');
+}
+
+function trPosText(s) {
+  if (LANG !== 'en' || !s) return s;
+  return s
+    .replace(/(\d+),(\d+)/g, '$1.$2')
+    .replace(/sentido creciente/g, 'increasing PK direction')
+    .replace(/sentido decreciente/g, 'decreasing PK direction')
+    .replace(/\(hacia ([^)]+)\)/g, '(towards $1)')
+    .replace(/(\d+) m antes de la /g, '$1 m before the ')
+    .replace(/(\d+) m antes del /g, '$1 m before the ')
+    .replace(/(\d+) m después de la /g, '$1 m after the ')
+    .replace(/(\d+) m después del /g, '$1 m after the ')
+    .replace(/\(a la izquierda\)/g, '(on the left)')
+    .replace(/\(a la derecha\)/g, '(on the right)')
+    .replace(/a (\d+) m al ([NSEO]+) de la /g, '$1 m $2 of ')
+    .replace(/a (\d+) m al ([NSEO]+) del /g, '$1 m $2 of ')
+    .replace(/antena de telefonía/g, 'mobile mast')
+    .replace(/aerogenerador/g, 'wind turbine')
+    .replace(/ermita de San Roque|ermita/g, 'chapel')
+    .replace(/viaducto delbarranco|viaducto del barranco|viaducto/g, 'viaduct')
+    .replace(/subestación eléctrica|subestación/g, 'substation')
+    .replace(/torre de vigilancia/g, 'watchtower');
+}
+
+function trSceneLog(s) {
+  if (LANG !== 'en' || !s) return s;
+  return s
+    .replace(/\bproteger\b/g, 'protect')
+    .replace(/\bavisar\b/g, 'alert')
+    .replace(/\bsocorrer\b/g, 'help')
+    .replace(/se une a la escena/g, 'joins the scene')
+    .replace(/asigna «proteger» a/g, 'assigns "protect" to')
+    .replace(/asigna «avisar» a/g, 'assigns "alert" to')
+    .replace(/asigna «socorrer» a/g, 'assigns "help" to')
+    .replace(/completa «proteger»/g, 'completes "protect"')
+    .replace(/completa «avisar»/g, 'completes "alert"')
+    .replace(/completa «socorrer»/g, 'completes "help"')
+    .replace(/confirma «proteger»/g, 'confirms "protect"')
+    .replace(/confirma «avisar»/g, 'confirms "alert"')
+    .replace(/confirma «socorrer»/g, 'confirms "help"')
+    .replace(/llama al 112/g, 'calls 112')
+    .replace(/triaje de /g, 'triage ')
+    .replace(/ROJO/g, 'RED')
+    .replace(/AMARILLO/g, 'YELLOW')
+    .replace(/VERDE/g, 'GREEN');
+}
+
+// ---------- 1) Columna de coches
+const mask = (p) => Array.from({ length: 6 }, (_, i) => p > 0 && (i === 0 || ((i * 37) % 100) / 100 < p));
+function chain() {
+  S.no = brakeChain({ gapS: S.gapS, traceEvery: 0.05 }); S.si = brakeChain({ gapS: S.gapS, senda: mask(S.share), traceEvery: 0.05 });
+  $('#c-no').textContent = S.no.collisions; $('#c-si').textContent = S.si.collisions; $('#c-cl').textContent = `${fmt(S.no.clearanceM)} m`;
+  const g5 = S.no.cars[5].brakeAtS - S.si.cars[5].brakeAtS; $('#c-gain').textContent = `${fmt(g5, 1)} s · ${Math.round(g5 * 33.3)} m`;
+  $('#c-tb').innerHTML = S.si.cars.map((c, i) => `<tr><td>${i ? i + 1 + 'º' : '1º (frena)'}${c.senda ? ' 📡' : ''}</td><td>${fmt(c.brakeAtS, 2)} s <span class="m">(sin: ${fmt(S.no.cars[i].brakeAtS, 2)})</span></td><td>${c.via}</td><td>${c.collided ? `💥 ${c.impactKmh} km/h` : '✅ para'} <span class="m">(sin: ${S.no.cars[i].collided ? `💥 ${S.no.cars[i].impactKmh}` : '✅'})</span></td></tr>`).join('');
+}
+$('#c-g').oninput = (e) => { S.gapS = +e.target.value; $('#c-gv').textContent = fmt(S.gapS, 1); chain(); };
+$('#c-p').oninput = (e) => { S.share = +e.target.value / 100; $('#c-pv').textContent = e.target.value; chain(); };
+chain();
+const gc = canvas($('#cv-cad'));
+function lane(g, res, y0, label, t) {
+  const trc = res.trace, f = trc[Math.min(trc.length - 1, Math.floor(t / 0.05))], X = (x) => 40 + ((x + 250) / 330) * 560;
+  drawRoad(g, 20, y0, 600, 76, { lanes: 2, offset: (f.x[0] + 250) * 1.7 });
+  text(g, label, 20, y0 - 10, { c: C.t, f: '800 14px Inter,system-ui' });
+  for (let i = 5; i >= 0; i--) {
+    const sd = res.cars[i].senda, brk = f.braking[i], hit = f.hit[i], x = X(f.x[i]) - 15, y = y0 + 57 + (hit ? (i % 2 ? -12 : 0) : 0);
+    drawCar(g, x, y, { len: 30, color: i ? carColor(i + 1) : '#c9a227', braking: brk, hit, lights: true });
+    if (sd) { g.fillStyle = C.i; g.beginPath(); g.arc(x, y - 14, 3, 0, 7); g.fill(); }
+    if (hit) drawImpact(g, x + 15, y - 2, 8);
+    text(g, `${i + 1}`, x, y + 22, { c: hit ? C.r : C.m, f: '700 10px Inter,system-ui', al: 'center' });
+  }
+  if (res.cars[0].senda && t > 0.05 && t < 1.6) { g.save(); g.beginPath(); g.rect(20, y0, 600, 76); g.clip(); for (let k = 0; k < 3; k++) { const r = ((t + k * 0.15) / 0.5) * 120; g.strokeStyle = `rgba(145,215,232,${clamp(1 - t / 1.6) * 0.8})`; g.lineWidth = 2; g.beginPath(); g.arc(X(f.x[0]) - 15, y0 + 57, r, 0, 7); g.stroke(); } g.restore(); g.lineWidth = 1; }
+  const statusTxt = res.collisions
+    ? tr(`${res.collisions} choque${res.collisions > 1 ? 's' : ''} · peor a ${res.worstImpactKmh} km/h`, `${res.collisions} crash${res.collisions > 1 ? 'es' : ''} · worst at ${res.worstImpactKmh} km/h`)
+    : tr('Todos paran a tiempo', 'All stop in time');
+  text(g, statusTxt, 620, y0 - 10, { c: res.collisions ? C.r : C.e, f: '700 13px Inter,system-ui', al: 'right' });
+}
+function drawCad(t) {
+  const g = gc, P = 12, lt = t % P, st = clamp(lt - 0.8, 0, 9);
+  g.fillStyle = C.bg; g.fillRect(0, 0, 640, 600);
+  text(g, tr(`Niebla · 120 km/h · ${fmt(S.gapS, 1)} s entre coches · el 1º frena a fondo`, `Fog · 120 km/h · ${fmt(S.gapS, 1)} s headway · car 1 brakes hard`), 20, 30, { c: C.t, f: '800 15px Inter,system-ui' });
+  text(g, `t = ${fmt(st, 1)} s`, 620, 30, { c: C.a, f: '800 15px Inter,system-ui', al: 'right' });
+  lane(g, S.no, 90, tr('Sin SENDA: cada uno reacciona a las luces del de delante', 'Without SENDA: each driver reacts to the brake lights ahead'), st);
+  lane(g, S.si, 230, tr(`Con SENDA (${Math.round(S.share * 100)} % de coches): el aviso llega a todos`, `With SENDA (${Math.round(S.share * 100)}% of cars): alert reaches everyone at once`), st);
+  // cronograma de inicio de frenada
+  const gx = (s) => 120 + (s / 7) * 480;
+  g.strokeStyle = C.l; g.strokeRect(120, 360, 480, 160); text(g, tr('Cuándo empieza a frenar cada coche', 'When each car starts braking'), 20, 352, { c: C.m, f: '12px Inter,system-ui' });
+  for (let i = 0; i < 6; i++) {
+    const y = 378 + i * 25; text(g, tr(`${i + 1}º`, `#${i + 1}`), 108, y + 4, { c: C.m, f: '12px Inter,system-ui', al: 'right' });
+    const a = S.no.cars[i].brakeAtS, b = S.si.cars[i].brakeAtS;
+    g.fillStyle = 'rgba(255,91,110,.85)'; if (a <= st) { g.beginPath(); g.arc(gx(a), y, 6, 0, 7); g.fill(); }
+    g.fillStyle = C.i; if (b <= st) { g.beginPath(); g.arc(gx(b), y, 6, 0, 7); g.fill(); }
+    if (a <= st && b <= st && a - b > 0.2) { g.strokeStyle = 'rgba(52,211,153,.7)'; g.lineWidth = 3; g.beginPath(); g.moveTo(gx(b) + 7, y); g.lineTo(gx(a) - 7, y); g.stroke(); g.lineWidth = 1; }
+  }
+  [0, 1, 2, 3, 4, 5, 6, 7].forEach((s) => text(g, `${s} s`, gx(s), 538, { c: C.m, f: '11px Inter,system-ui', al: 'center' }));
+  g.fillStyle = 'rgba(255,91,110,.85)'; g.beginPath(); g.arc(130, 566, 6, 0, 7); g.fill(); text(g, tr('sin SENDA', 'without SENDA'), 142, 570, { c: C.m, f: '12px Inter,system-ui' });
+  g.fillStyle = C.i; g.beginPath(); g.arc(240, 566, 6, 0, 7); g.fill(); text(g, tr('con SENDA', 'with SENDA'), 252, 570, { c: C.m, f: '12px Inter,system-ui' });
+  g.fillStyle = 'rgba(52,211,153,.8)'; g.fillRect(350, 563, 26, 4); text(g, tr('tiempo ganado', 'time gained'), 384, 570, { c: C.m, f: '12px Inter,system-ui' });
+}
+
+// ---------- 2) SOS sin cobertura
+function sos() {
+  S.road = roadScenario({ share: S.sShare, flowVehH: S.flow });
+  const r = S.road, cp = contactProbability({ rangeM: 60, relSpeedMs: 2 * 80 / 3.6 });
+  $('#s-sos').textContent = r.sosDeliveredMin == null ? 'no sale' : `${fmt(r.sosDeliveredMin, 1)} min`;
+  $('#s-w').textContent = r.approachingSenda ? `${r.warnedBeyondSight} de ${r.approachingSenda}` : '—';
+  $('#s-m').textContent = r.medianWarnM == null ? '—' : r.medianWarnM >= 1000 ? `${fmt(r.medianWarnM / 1000, 1)} km` : `${r.medianWarnM} m`;
+  $('#s-c').textContent = `${fmt(cp.p * 100, 1)} %`;
+  $('#s-tb').innerHTML = r.timeline.slice(0, 7).map((e) => `<tr><td>${fmt(e.t / 60, 1)}</td><td>${e.what}</td></tr>`).join('') || '<tr><td>—</td><td>Sin coches con SENDA, nadie recoge el SOS</td></tr>';
+}
+$('#s-p').oninput = (e) => { S.sShare = +e.target.value / 100; $('#s-pv').textContent = e.target.value; sos(); };
+$('#s-f').oninput = (e) => { S.flow = +e.target.value; $('#s-fv').textContent = e.target.value; sos(); };
+sos();
+const gs = canvas($('#cv-sos'));
+function drawSos(t) {
+  const g = gs, P = 24, lt = t % P, simS = clamp(lt / 17) * 12 * 60, r = S.road, X = (x) => 20 + (x / 24000) * 600;
+  g.fillStyle = '#081109'; g.fillRect(0, 0, 640, 600);
+  text(g, tr('Carretera de montaña, de noche · sin cobertura entre el km 3 y el 21', 'Mountain road at night · no coverage between km 3 and km 21'), 20, 30, { c: C.t, f: '800 14px Inter,system-ui' });
+  text(g, tr(`minuto ${fmt(simS / 60, 1)}`, `min ${fmt(simS / 60, 1)}`), 620, 30, { c: C.a, f: '800 15px Inter,system-ui', al: 'right' });
+  for (const [a, b] of r.params.coverage) { g.fillStyle = 'rgba(52,211,153,.12)'; g.fillRect(X(a * 1000), 60, X(b * 1000) - X(a * 1000), 300); text(g, tr('cobertura', 'coverage'), (X(a * 1000) + X(b * 1000)) / 2, 80, { c: C.e, f: '700 11px Inter,system-ui', al: 'center' }); }
+  text(g, tr('sin ninguna red', 'no network coverage'), 320, 80, { c: C.g, f: '700 12px Inter,system-ui', al: 'center' });
+  g.fillStyle = '#1a2620'; g.fillRect(20, 170, 600, 90); g.setLineDash([10, 10]); g.strokeStyle = '#4b5d52'; g.beginPath(); g.moveTo(20, 215); g.lineTo(620, 215); g.stroke(); g.setLineDash([]);
+  text(g, tr('← sentido Valle', '← towards Valley'), 24, 162, { c: C.m, f: '11px Inter,system-ui' }); text(g, tr('sentido Puerto →', 'towards Pass →'), 616, 282, { c: C.m, f: '11px Inter,system-ui', al: 'right' });
+  const wx = X(r.params.accidentKm * 1000); drawImpact(g, wx, 238, 9); text(g, tr('accidente', 'crash'), wx, 300, { c: C.r, f: '800 12px Inter,system-ui', al: 'center' });
+  if (simS > 0) { const k = (simS % 2) / 2; g.strokeStyle = `rgba(255,91,110,${1 - k})`; g.beginPath(); g.arc(wx, 238, 6 + k * 22, 0, 7); g.stroke(); }
+  for (const p of r.positions(simS)) {
+    const y = p.dir === 1 ? 238 : 192, x = X(p.x);
+    g.fillStyle = !p.senda ? 'rgba(160,170,175,.35)' : p.delivered ? C.e : p.informed ? C.a : C.i;
+    g.beginPath(); g.arc(x, y, p.senda ? 4.5 : 2.5, 0, 7); g.fill();
+  }
+  // leyenda y cifras
+  const items = [[C.i, tr('con SENDA', 'with SENDA')], [C.a, tr('lleva el SOS / avisado', 'carries SOS / warned')], [C.e, tr('SOS entregado', 'SOS delivered')], ['rgba(160,170,175,.6)', tr('sin SENDA', 'no SENDA')]];
+  items.forEach(([c, l], i) => { g.fillStyle = c; g.beginPath(); g.arc(30 + i * 150, 330, 5, 0, 7); g.fill(); text(g, l, 40 + i * 150, 334, { c: C.m, f: '11px Inter,system-ui' }); });
+  g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 380, 600, 200, 12); g.fill(); g.strokeStyle = C.l; g.stroke();
+  const ev = r.timeline.filter((e) => e.t <= simS).slice(-5);
+  const hdrTxt = r.sosDeliveredMin != null && simS / 60 >= r.sosDeliveredMin
+    ? tr(`SOS fuera de la zona sin red a los ${fmt(r.sosDeliveredMin, 1)} min`, `SOS exits the dead zone at ${fmt(r.sosDeliveredMin, 1)} min`)
+    : r.sosDeliveredMin == null
+      ? tr('Sin coches con SENDA el SOS no sale de aquí', 'Without SENDA cars, the SOS cannot leave the dead zone')
+      : tr('El SOS viaja con los coches que pasan…', 'The SOS rides with passing cars…');
+  text(g, hdrTxt, 34, 406, { c: r.sosDeliveredMin != null && simS / 60 >= r.sosDeliveredMin ? C.e : C.t, f: '800 14px Inter,system-ui' });
+  ev.forEach((e, i) => {
+    const wTxt = trTimeline(e.what);
+    text(g, `${fmt(e.t / 60, 1)} min · ${wTxt.length > 78 ? wTxt.slice(0, 78) + '…' : wTxt}`, 34, 432 + i * 22, { c: i === ev.length - 1 ? C.t : C.m, f: '12px Inter,system-ui' });
+  });
+  text(g, tr(`${r.cars} coches simulados · ${r.sendaCars} con SENDA (${Math.round(r.params.share * 100)} %) · ${r.params.flowVehH} coches/h por sentido · 80 km/h`, `${r.cars} simulated cars · ${r.sendaCars} with SENDA (${Math.round(r.params.share * 100)}%) · ${r.params.flowVehH} veh/h per direction · 80 km/h`), 34, 566, { c: C.g, f: '11px Inter,system-ui' });
+}
+
+// ---------- 3) PK sin red
+const D = demoRoad(), gk = canvas($('#cv-pk')), ll = D.road.points, lats = ll.map((p) => p.lat), lons = ll.map((p) => p.lon);
+const box = { a: Math.min(...lats), b: Math.max(...lats), c: Math.min(...lons), d: Math.max(...lons) }, kx = Math.cos((40.98 * Math.PI) / 180);
+const sc = Math.min(560 / ((box.d - box.c) * kx), 360 / (box.b - box.a)), K = (p) => ({ x: 40 + (p.lon - box.c) * kx * sc + (560 - (box.d - box.c) * kx * sc) / 2, y: 410 - (p.lat - box.a) * sc });
+const TUNNEL = [9000, 10600], LMK = landmarksAlong(D.road, D.landmarks);
+function drawPk(t) {
+  const g = gk, P = 22, lt = t % P, s = clamp(lt / 20) * (D.lengthM - 200) + 100, inT = s > TUNNEL[0] && s < TUNNEL[1];
+  g.fillStyle = '#0b1310'; g.fillRect(0, 0, 640, 600);
+  g.strokeStyle = '#59646b'; g.lineWidth = 7; g.beginPath(); ll.forEach((p, i) => { const q = K(p); i ? g.lineTo(q.x, q.y) : g.moveTo(q.x, q.y); }); g.stroke();
+  g.strokeStyle = '#2b2f33'; g.lineWidth = 9; g.beginPath(); for (let u = TUNNEL[0]; u <= TUNNEL[1]; u += 100) { const q = K(pointAt(D.road, u)); u === TUNNEL[0] ? g.moveTo(q.x, q.y) : g.lineTo(q.x, q.y); } g.stroke(); g.lineWidth = 1;
+  const tq = K(pointAt(D.road, (TUNNEL[0] + TUNNEL[1]) / 2)); text(g, tr('túnel (sin GPS)', 'tunnel (no GPS)'), tq.x - 22, tq.y + 4, { c: C.m, f: '11px Inter,system-ui', al: 'right' });
+  for (const m of D.road.milestones) { const q = K(m); g.fillStyle = '#e5e7eb'; g.fillRect(q.x - 2, q.y - 2, 4, 4); if (m.km % 2 === 0) text(g, `${m.km}`, q.x - 6, q.y - 6, { c: C.g, f: '10px Inter,system-ui', al: 'right' }); }
+  for (const l of LMK) { const q = K(l); g.strokeStyle = C.i; g.lineWidth = 2; if (l.kind === 'aerogenerador') { g.beginPath(); g.moveTo(q.x, q.y + 12); g.lineTo(q.x, q.y - 6); g.stroke(); for (let k = 0; k < 3; k++) { const a = lt * 2 + (k * 2 * Math.PI) / 3; g.beginPath(); g.moveTo(q.x, q.y - 6); g.lineTo(q.x + 11 * Math.cos(a), q.y - 6 + 11 * Math.sin(a)); g.stroke(); } } else { g.beginPath(); g.arc(q.x, q.y, 6, 0, 7); g.stroke(); } g.lineWidth = 1; text(g, trPosText(l.name.replace(/^(el|la) /, '')), q.x + 12, q.y + 16, { c: C.i, f: '11px Inter,system-ui' }); }
+  let fix, label;
+  if (inT) { const dr = roadDeadReckon(D.road, { s: TUNNEL[0], dir: 1, speedMs: 22, t: 0 }, (s - TUNNEL[0]) / 22); fix = { ...dr, headingDeg: 40 }; label = tr('sin GPS: posición por estima a lo largo de la vía', 'no GPS: dead-reckoning along the road'); }
+  else { fix = { ...pointAt(D.road, s), headingDeg: 40 }; label = tr('GPS sin Internet (funciona igual)', 'GPS without Internet (works offline)'); }
+  const pos = describePosition({ lat: fix.lat, lon: fix.lon, headingDeg: 40 }, D.road, D.landmarks), q = K(fix);
+  g.fillStyle = inT ? C.a : C.c; g.beginPath(); g.arc(q.x, q.y, 8, 0, 7); g.fill(); if (inT) { g.strokeStyle = C.a; g.setLineDash([3, 3]); g.beginPath(); g.arc(q.x, q.y, 16, 0, 7); g.stroke(); g.setLineDash([]); }
+  S.pk = pos; if (lt > 0) $('#k-sms').textContent = roadSosText({ where: pos.text.replace(/ \(hacia.*\)/, ''), lat: fix.lat, lon: fix.lon, vehicles: 2, people: 3, trapped: 1, hhmm: '23:41' });
+  g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 456, 600, 128, 12); g.fill(); g.strokeStyle = C.l; g.stroke();
+  text(g, trPosText(pos.text), 34, 484, { c: C.t, f: '800 16px Inter,system-ui' });
+  text(g, pos.landmark ? trPosText(`${pos.full.split(' · ')[1]}`) : '', 34, 510, { c: C.i, f: '13px Inter,system-ui' });
+  text(g, label, 34, 536, { c: inT ? C.a : C.e, f: '700 12px Inter,system-ui' });
+  text(g, tr('Esto es lo que pregunta el 112: carretera, punto kilométrico y sentido.', 'What 112 needs: road, kilometre point and direction.'), 34, 562, { c: C.m, f: '12px Inter,system-ui' });
+  text(g, tr('Carretera de demostración (inventada)', 'INVENTED ROAD · demo'), 20, 30, { c: C.t, f: '800 14px Inter,system-ui' });
+}
+
+// ---------- 4) Escena y puntos cívicos
+const ana = { userId: 'Ana', trust: 'VOLUNTEER_UNVERIFIED', coordinator: true }, gcv = { userId: 'GC', trust: 'VERIFIED_INSTITUTIONAL', orgKind: 'POLICE', unit: 'Guardia Civil de Tráfico', coordinator: true };
+const SCRIPT = [[15, 'Luis', 'JOIN'], [20, 'Marta', 'JOIN'], [30, 'Ana', 'ASSIGN', { task: 'proteger', to: 'Luis' }], [32, 'Ana', 'ASSIGN', { task: 'avisar', to: 'Ana' }], [34, 'Ana', 'ASSIGN', { task: 'socorrer', to: 'Marta' }], [60, 'Luis', 'DONE', { task: 'proteger' }], [70, 'Ana', 'CALL112'], [75, 'Marta', 'CONFIRM', { task: 'proteger' }],
+  [120, 'Marta', 'TRIAGE', { victim: 'V1', result: startTriage({ walks: false, breathes: true, rr: 34 }) }], [140, 'Ana', 'DONE', { task: 'avisar' }], [150, 'Luis', 'CONFIRM', { task: 'avisar' }], [160, 'Marta', 'TRIAGE', { victim: 'V2', result: startTriage({ walks: false, breathes: true, rr: 18, radialPulse: true, obeys: true }) }], [200, 'Marta', 'TRIAGE', { victim: 'V3', result: startTriage({ walks: true }) }], [230, 'Marta', 'DONE', { task: 'socorrer' }], [240, 'Ana', 'CONFIRM', { task: 'socorrer' }], [900, 'GC', 'HANDOVER', { actor: gcv }]];
+const sceneAt = (T) => { const sc = createScene({ id: 'acc-N000-127', at: 0, where: 'N-000 PK 127,5 sentido creciente', coordinator: ana }); for (const [t, who, action, o = {}] of SCRIPT) if (t <= T) sceneAct(sc, { t, who, action, ...o }); return sc; };
+const FULL = sceneAt(1e9);
+civicLedger(FULL).then(async (L) => { S.ledger = L; S.ledgerOk = await verifyLedger(L.entries); $('#p-tb').innerHTML = L.entries.map((e) => `<tr><td>${e.who}</td><td>${e.why}</td><td><b>${e.points}</b></td><td><code>${e.hash.slice(0, 10)}…</code></td></tr>`).join(''); $('#p-ok').textContent = S.ledgerOk ? `✓ Cadena verificada en este navegador: ${L.entries.length} asientos, ${Object.entries(L.totals).map(([w, p]) => `${w} ${p}`).join(' · ')}.` : 'La cadena no verifica.'; });
+$('#p-rules').innerHTML = CIVIC_RULES.map((r) => `<li>${r}</li>`).join('');
+$('#e-script').innerHTML = `<b>Guion para el 112:</b> «${call112Script({ where: 'la N-000, punto kilométrico 127, sentido creciente', vehicles: 2, people: 3, trapped: 1, counts: { ROJO: 1, AMARILLO: 1, VERDE: 1 } })}»`;
+const ge = canvas($('#cv-esc'));
+const mapT = (lt) => (lt < 14 ? (lt / 14) * 260 : lt < 17 ? 260 + ((lt - 14) / 3) * 640 : 900 + Math.min(60, (lt - 17) * 20));
+const PAS_EN = [
+  { step: 'P', title: 'Protect', item: 'Reflective vest before stepping out & V16 beacon on roof' },
+  { step: 'A', title: 'Alert', item: 'Call 112 with road, PK, direction, vehicles & casualties' },
+  { step: 'S', title: 'Help', item: 'Guided START triage · never remove helmet or move casualties' },
+];
+function drawEsc(t) {
+  const g = ge, P = 24, lt = t % P, T = mapT(lt), sc = sceneAt(T), mm = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  g.fillStyle = C.bg; g.fillRect(0, 0, 640, 600);
+  // escena esquemática
+  drawRoad(g, 20, 50, 600, 124, { lanes: 2, shoulder: 0.1 }); g.fillStyle = '#8a8f93'; g.fillRect(20, 176, 600, 4); g.fillStyle = '#5d6e78'; for (let x = 30; x < 620; x += 40) g.fillRect(x, 174, 3, 9); text(g, tr('guardarraíl', 'guardrail'), 610, 196, { c: C.g, f: '10px Inter,system-ui', al: 'right' });
+  drawCar(g, 327, 128, { len: 56, color: '#d9dee2', hit: true }); drawCar(g, 380, 108, { len: 56, ang: -0.5, color: '#7a1f24', hit: true }); drawImpact(g, 356, 118, 7);
+  const v16 = sc.tasks[0].doneAt != null; if (v16 && Math.floor(lt * 3) % 2) { g.fillStyle = '#ffb020'; g.beginPath(); g.arc(327, 86, 7, 0, 7); g.fill(); g.fillStyle = 'rgba(255,176,32,.25)'; g.beginPath(); g.arc(327, 86, 22, 0, 7); g.fill(); }
+  const people = [['Ana', 470, 210], ['Luis', 520, 210], ['Marta', 400, 210]].filter(([n]) => sc.participants.includes(n));
+  for (const [n, x, y] of people) { drawPerson(g, x, y, sc.coordinator.userId === n ? C.c : C.a); text(g, n + (sc.coordinator.userId === n ? tr(' · coordina', ' · coord.') : ''), x, y + 28, { c: C.t, f: '11px Inter,system-ui', al: 'center' }); }
+  if (sc.handover) { drawCar(g, 155, 92, { len: 60, color: '#e9e6df', lights: true }); g.fillStyle = '#1f4fbf'; g.fillRect(140, 88, 30, 8); if (Math.floor(lt * 4) % 2) { g.fillStyle = 'rgba(96,165,250,.5)'; g.beginPath(); g.arc(155, 92, 22, 0, 7); g.fill(); } text(g, 'Guardia Civil', 155, 150, { c: '#93c5fd', f: '700 11px Inter,system-ui', al: 'center' }); }
+  sc.victims.forEach((v, i) => { g.fillStyle = { ROJO: C.r, AMARILLO: C.a, VERDE: C.e }[v.cat] ?? C.g; rr(g, 250 + i * 28, 136, 20, 20, 4); g.fill(); text(g, v.id, 260 + i * 28, 150, { c: '#0b141c', f: '800 9px Inter,system-ui', al: 'center' }); });
+  text(g, tr(`Escena abierta por Ana · ${mm(T)} desde el accidente`, `Scene opened by Ana · ${mm(T)} since crash`), 20, 34, { c: C.t, f: '800 14px Inter,system-ui' });
+  // lista PAS
+  PAS.forEach((p, i) => {
+    const k = sc.tasks[i], y = 250 + i * 64, done = k.doneAt != null, ok = k.confirmedBy.length > 0;
+    const pEn = PAS_EN[i];
+    g.fillStyle = done ? 'rgba(52,211,153,.12)' : 'rgba(255,255,255,.03)'; rr(g, 20, y, 600, 56, 10); g.fill(); g.strokeStyle = done ? C.e : C.l; g.stroke();
+    g.fillStyle = done ? C.e : C.g; g.beginPath(); g.arc(46, y + 28, 15, 0, 7); g.fill(); text(g, p.step, 46, y + 33, { c: '#0b141c', f: '800 14px Inter,system-ui', al: 'center' });
+    text(g, `${LANG === 'en' ? pEn.title : p.title}${k.assignee ? ' · ' + k.assignee : ''}`, 72, y + 22, { c: C.t, f: '800 13px Inter,system-ui' });
+    text(g, LANG === 'en' ? pEn.item : p.items[i === 1 ? 0 : i === 2 ? 2 : 0], 72, y + 42, { c: C.m, f: '11px Inter,system-ui' });
+    const stTxt = done
+      ? `${mm(k.doneAt)} ${ok ? tr('✓ confirmado por ', '✓ confirmed by ') + k.confirmedBy.join(', ') : tr('· sin confirmar', '· unconfirmed')}`
+      : tr('pendiente', 'pending');
+    text(g, stTxt, 608, y + 22, { c: ok ? C.e : done ? C.a : C.g, f: '700 11px Inter,system-ui', al: 'right' });
+  });
+  g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 448, 600, 136, 12); g.fill(); g.strokeStyle = sc.handover ? C.e : C.l; g.stroke();
+  if (sc.handover) {
+    text(g, tr(`Traspaso a la Guardia Civil de Tráfico (${mm(sc.handover.at)})`, `Command handover to Guardia Civil (${mm(sc.handover.at)})`), 34, 474, { c: C.e, f: '800 14px Inter,system-ui' });
+    const b = LANG === 'en'
+      ? 'N-000 PK 127.5 · PAS 3/3 confirmed · 112 called · Triage: 1 RED, 1 YELLOW, 1 GREEN'
+      : sceneBrief(sc).text;
+    text(g, b.length > 92 ? b.slice(0, 92) + '…' : b, 34, 498, { c: C.t, f: '12px Inter,system-ui' });
+    if (S.ledger && lt > 18) {
+      text(g, tr(`Puntos cívicos: ${Object.entries(S.ledger.totals).map(([w, p]) => `${w} ${p}`).join(' · ')}`, `Civic points: ${Object.entries(S.ledger.totals).map(([w, p]) => `${w} ${p}`).join(' · ')}`), 34, 526, { c: C.a, f: '800 13px Inter,system-ui' });
+      text(g, tr(`${S.ledger.entries.length} asientos encadenados por SHA-256 ${S.ledgerOk ? '· cadena verificada' : ''}`, `${S.ledger.entries.length} SHA-256 hash-chained entries ${S.ledgerOk ? '· chain verified' : ''}`), 34, 550, { c: C.m, f: '12px Inter,system-ui' });
+    }
+  } else {
+    sc.log.slice(-4).forEach((e, i, a) => text(g, `${mm(e.t)} · ${e.who} ${trSceneLog(e.what)}`, 34, 474 + i * 24, { c: i === a.length - 1 ? C.t : C.m, f: '12px Inter,system-ui' }));
+    if (sc.calls.length) text(g, tr('112 avisado con carretera, PK y sentido', '112 alerted with road, PK and direction'), 606, 570, { c: C.e, f: '700 12px Inter,system-ui', al: 'right' });
+  }
+}
+
+// ---------- 5) Sensores reales
+const live = { gps: [], peak: 0 };
+function liveState() { const now = live.gps.at(-1)?.t ?? 0, w = live.gps.filter((f) => f.t >= now - 10), d = detectHardBrake(w, { minSpeedMs: 30 / 3.6 }); $('#t-d').textContent = `${fmt(Math.max(0, d.decelMs2), 1)} m/s²`; $('#t-st').textContent = { NONE: 'vigilando', HARD_BRAKE: '⚠️ frenada brusca', IMPACT_LIKE: '💥 posible golpe' }[d.state]; S.live = d; return d; }
+$('#t-go').onclick = async () => {
+  try { if (typeof DeviceMotionEvent?.requestPermission === 'function') await DeviceMotionEvent.requestPermission(); } catch {}
+  addEventListener('devicemotion', (e) => { const a = e.accelerationIncludingGravity; if (!a) return; const g = Math.abs(Math.hypot(a.x ?? 0, a.y ?? 0, a.z ?? 0) - 9.80665) / 9.80665; live.peak = Math.max(live.peak * 0.995, g); $('#t-g').textContent = `${fmt(live.peak, 2)} g`; });
+  if (!navigator.geolocation) { $('#t-msg').textContent = 'Este navegador no da acceso al GPS.'; return; }
+  navigator.geolocation.watchPosition((p) => { const v = p.coords.speed; if (v == null) { $('#t-v').textContent = 'sin velocidad'; return; } live.gps.push({ t: p.timestamp / 1000, speed: v }); live.gps = live.gps.slice(-60); $('#t-v').textContent = `${Math.round(v * 3.6)} km/h`; const d = liveState(); if (d.state === 'HARD_BRAKE') navigator.vibrate?.(200); }, (e) => { $('#t-msg').textContent = `GPS: ${e.message}`; }, { enableHighAccuracy: true, maximumAge: 0 });
+  $('#t-msg').textContent = 'Sensores activos. La velocidad aparece cuando el GPS se mueve (en el coche, tren o bici).';
+};
+const say = (s) => { try { const u = new SpeechSynthesisUtterance(s); u.lang = 'es-ES'; u.rate = 1.05; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch {} navigator.vibrate?.([200, 80, 200]); };
+$('#t-say').onclick = () => say(brakeAdvice({ vMs: 33.3, distM: 200 }).say);
+$('#t-brake').onclick = () => { const t0 = Date.now() / 1000; live.gps = Array.from({ length: 9 }, (_, k) => ({ t: t0 + k, speed: Math.max(0, k < 2 ? 33.3 : 33.3 - 7 * (k - 2)) })); $('#t-v').textContent = '120 → 0 km/h'; const d = liveState(); $('#t-msg').textContent = `Serie de prueba (120 km/h, 7 m/s²): el detector dice «${$('#t-st').textContent}» con ${fmt(d.decelMs2, 1)} m/s².`; if (d.state === 'HARD_BRAKE') say('Frenada brusca detectada. Avisando a los de detrás.'); };
+
+// ---------- 6) Waze, Google Maps, DGT y pasillo
+const L = navLinks({ lat: 40.4169, lon: -3.7035 }); $('#w-waze').href = L.waze; $('#w-gm').href = L.google;
+$('#w-tb').innerHTML = ['nav-enlaces', 'dgt-nap', 'dgt30', 'waze-cifs', 'leer-navegadores'].map((id) => INTEGRATIONS.find((i) => i.id === id)).map((i) => `<tr><td>${i.what}${i.note ? `<br><span class="m" style="font-size:12px">${i.note}</span>` : ''}</td><td><span class="chip ${i.access === 'PASIVO' ? 'ok' : i.access === 'CONVENIO' ? 'todo' : 'no'}">${i.access}</span></td></tr>`).join('');
+function corridor() { const c = corridorTiles(ROUTE_MAD_VLC, { bufferKm: S.buffer }); S.corridor = c; $('#w-c').textContent = `${fmt(c.corridorMB, 0)} MB`; $('#w-r').textContent = `${fmt(c.rectMB, 0)} MB`; $('#w-bar').style.width = `${Math.max(1, c.ratio * 100)}%`; }
+$('#w-b').oninput = (e) => { S.buffer = +e.target.value; $('#w-bv').textContent = e.target.value; corridor(); }; corridor();
+
+// ---------- 7) Avisos de un toque
+$('#r-btns').innerHTML = Object.entries(REPORT_KINDS).map(([k, v]) => `<button data-k="${k}">${v.label}</button>`).join('');
+$('#r-btns').onclick = (e) => {
+  const k = e.target.dataset.k; if (!k) return; const R = REPORT_KINDS[k], p = S.pk ?? { pk: 127.5 }, now = Math.floor(Date.now() / 1000);
+  const fr = encodeHazard({ type: R.type, t: now, lat: 40.95, lon: -2.36, headingDeg: 40, speedMs: 0, id: (now * 2654435761) >>> 0 });
+  $('#r-hex').textContent = [...fr].map((b) => b.toString(16).padStart(2, '0')).join(' ');
+  const votes = [{ atMin: 0, present: true }, { atMin: 3, present: true }];
+  const b = [0, 10, 30, 60].map((m) => [m, reportBelief(votes, m + 3, { hlMin: R.hlMin })]);
+  $('#r-bel').innerHTML = `<b>${R.label}</b> con dos avisos: ${b.map(([m, x]) => `a los ${m} min ${Math.round(x.p * 100)} % (${x.state.toLowerCase()})`).join(' · ')}.`;
+  $('#r-cifs').textContent = JSON.stringify(toCifs({ id: now, kind: k, lat: 40.95, lon: -2.36, roadId: 'N-000', sentido: 'creciente', startIso: new Date(now * 1000).toISOString() }), null, 1);
+  S.report = k;
+};
+
+
+// ---------- 8) V16 + SENDA
+const V16DEMO = v16Fusion([{ id: 'V16-A', lat: 40.2, lon: -3.3, t: 1000 }, { id: 'V16-B', lat: 40.5, lon: -3.6, t: 1100 }, { id: 'V16-C', lat: 39.9, lon: -2.5, t: 1200 }],
+  [{ id: 'S-1', lat: 40.2005, lon: -3.3004, t: 1040, kind: 'CRASH', injured: 2, trapped: 1, coordinator: 'Ana' }, { id: 'S-2', lat: 39.9003, lon: -2.5002, t: 1250, kind: 'BREAKDOWN' }, { id: 'S-3', lat: 41.0, lon: -3.0, t: 900, kind: 'CRASH', injured: 1 }]);
+S.v16 = V16DEMO;
+$('#v-tb').innerHTML = [...V16DEMO.incidents.map((i) => `<tr><td>${i.v16}</td><td><b>${{ ACCIDENTE: 'Accidente', AVERIA: 'Avería', VEHICULO_DETENIDO: 'Vehículo detenido (¿qué pasa?)' }[i.kind]}</b>${i.injured ? ` · ${i.injured} heridos` : ''}${i.trapped ? ` · ${i.trapped} atrapado` : ''}${i.coordinator ? ` · coordina ${i.coordinator}` : ''}</td><td>${i.sources.join(' + ')}</td><td>${'🔴'.repeat(i.priority) || '⚪'}</td></tr>`), ...V16DEMO.orphans.map((o) => `<tr><td>${o.report}</td><td><b>Accidente sin baliza</b> · ${o.say}</td><td>SENDA</td><td>🔴</td></tr>`)].join('');
+
+// ---------- 9) Retención (Lighthill-Whitham-Richards)
+const LWR = { qUp: 1800, vUp: 100, qDown: 1200, vDown: 20, x0: 4200 }; LWR.w = shockwaveKmh(LWR); S.lwr = LWR;
+const gq = canvas($('#cv-q'));
+function drawQ(t) {
+  const g = gq, P = 16, lt = t % P, T = 240, tNow = clamp(lt / 13) * T, X = (s) => 70 + (s / T) * 540, Y = (m) => 520 - (m / 6000) * 460;
+  const vU = LWR.vUp / 3.6, vD = LWR.vDown / 3.6, w = LWR.w / 3.6, shock = (s) => LWR.x0 + w * s;
+  g.fillStyle = C.bg; g.fillRect(0, 0, 640, 600);
+  g.strokeStyle = C.l; g.strokeRect(70, 60, 540, 460);
+  for (let m = 0; m <= 6000; m += 1000) text(g, `${m / 1000} km`, 62, Y(m) + 4, { c: C.m, f: '11px Inter,system-ui', al: 'right' });
+  for (let s = 0; s <= T; s += 60) text(g, `${s / 60} min`, X(s), 540, { c: C.m, f: '11px Inter,system-ui', al: 'center' });
+  g.fillStyle = 'rgba(255,91,110,.10)'; g.beginPath(); g.moveTo(X(0), Y(LWR.x0)); g.lineTo(X(T), Y(shock(T))); g.lineTo(X(T), Y(6000)); g.lineTo(X(0), Y(6000)); g.closePath(); g.fill();
+  g.strokeStyle = C.r; g.lineWidth = 3; g.beginPath(); g.moveTo(X(0), Y(LWR.x0)); g.lineTo(X(Math.min(tNow, T)), Y(shock(Math.min(tNow, T)))); g.stroke(); g.lineWidth = 1;
+  // trayectorias: entran cada 8 s desde 0 m; libres hasta la onda de choque, luego despacio
+  for (let k = -20; k < 30; k++) {
+    const t0 = k * 8, senda = k === 6; let s = Math.max(0, t0), y = t0 < 0 ? -t0 * vU : 0, met = false, warned = false;
+    g.strokeStyle = senda ? C.i : 'rgba(207,216,220,.45)'; g.lineWidth = senda ? 3 : 1.2; g.beginPath(); g.moveTo(X(s), Y(y));
+    for (; s <= Math.min(tNow, T); s += 1) {
+      if (!met && y >= shock(s)) met = true;
+      const dist = shock(s) - y; if (senda && !met && dist < 1500) warned = true;
+      const v = met ? vD : senda && warned ? Math.max(vD, vU - (1500 - dist) * 0.012) : vU; y += v; g.lineTo(X(s), Y(Math.min(6000, y)));
+    }
+    g.stroke(); g.lineWidth = 1;
+    if (senda && warned) { const xe = X(Math.min(tNow, T)), right = xe > 470; text(g, tr('aviso SENDA: reduce', 'SENDA alert: slow down'), right ? xe - 8 : xe + 6, Y(Math.min(6000, y)) + (right ? 18 : -4), { c: C.i, f: '700 12px Inter,system-ui', al: right ? 'right' : 'left' }); }
+  }
+  const wVal = LANG === 'en' ? String(Math.abs(LWR.w)) : String(Math.abs(LWR.w)).replace('.', ',');
+  text(g, tr(`Final de la retención: crece hacia atrás a ${wVal} km/h`, `End of queue: grows backwards at ${wVal} km/h (LWR shockwave)`), 70, 40, { c: C.r, f: '800 14px Inter,system-ui' });
+  text(g, tr('distancia en la carretera ↑ · tiempo →', 'distance along road ↑ · time →'), 610, 562, { c: C.m, f: '11px Inter,system-ui', al: 'right' });
+  text(g, `w = Δq/Δk = (${LWR.qDown} − ${LWR.qUp}) / (${LWR.qDown / LWR.vDown} − ${LWR.qUp / LWR.vUp}) veh/km`, 70, 580, { c: C.g, f: '12px Inter,system-ui' });
+}
+
+// ---------- 10) Sentido contrario
+const gk2 = canvas($('#cv-kz'));
+function drawKz(t) {
+  const g = gk2, P = 14, lt = t % P, d0 = 1500, vMe = 120 / 3.6, vK = 90 / 3.6, alertAt = 3, reactS = 1.5;
+  const tt = Math.min(lt, 11), meAlert = tt > alertAt + reactS, myV = (s) => (s > alertAt + reactS ? Math.max(80 / 3.6, vMe - 2.5 * (s - alertAt - reactS)) : vMe);
+  let yMe = 0; for (let s = 0; s < tt; s += 0.05) yMe += myV(s) * 0.05; const yK = d0 - vK * tt, gap = Math.max(0, yK - yMe);
+  const view = (m) => 560 - ((m - yMe + 100) / 1700) * 540, laneMe = meAlert ? clamp((tt - alertAt - reactS) / 3) : 0;
+  g.fillStyle = '#16231b'; g.fillRect(0, 0, 640, 600); drawRoad(g, 220, 0, 200, 600, { lanes: 2, vertical: true, offset: yMe * 0.33 });
+  g.fillStyle = '#5d6e78'; g.fillRect(205, 0, 6, 600); text(g, tr('mediana', 'median'), 200, 590, { c: C.g, f: '10px Inter,system-ui', al: 'right' });
+  text(g, tr('↑ sentido de la calzada', '↑ carriageway direction'), 430, 590, { c: C.m, f: '11px Inter,system-ui' });
+  const xMe = 270 + laneMe * 100; drawCar(g, xMe, view(yMe), { len: 46, ang: -Math.PI / 2, color: '#91d7e8', lights: true, braking: meAlert && myV(tt) > 80 / 3.6 + 0.1 }); text(g, tr('Tú', 'You'), xMe, view(yMe) + 42, { c: C.i, f: '800 12px Inter,system-ui', al: 'center' });
+  const yk = view(yK); if (yk > -50) { drawCar(g, 270, yk, { len: 46, ang: Math.PI / 2, color: '#c94b56', lights: true }); text(g, tr('en sentido contrario', 'wrong-way driver'), 250, yk + 4, { c: C.r, f: '700 12px Inter,system-ui', al: 'right' }); }
+  g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 20, 600, 96, 12); g.fill(); g.strokeStyle = tt > alertAt ? C.r : C.l; g.stroke();
+  const m = wrongWayMeet({ distM: gap, vMeMs: myV(tt), vOtherMs: vK });
+  const topLine = tt < alertAt
+    ? tr('Un coche entra por la salida de la autovía…', 'A car enters the motorway via the exit ramp…')
+    : tr(`Su móvil: «¡Vas en sentido contrario!» · el tuyo: «${m.say.split(':')[0]}»`, 'Their phone: "Wrong way!" · Yours: "Oncoming wrong-way vehicle"');
+  const midLine = tt < alertAt
+    ? tr('Tres posiciones seguidas contra el sentido bastan para detectarlo', 'Three consecutive positions against carriageway flow trigger the alert')
+    : tr(`Os separan ${Math.round(gap)} m · ${String(m.tS).replace('.', ',')} s para cruzaros · carril derecho y a 80 km/h`, `${Math.round(gap)} m apart · ${m.tS.toFixed(1)} s before meeting · keep right & slow to 80 km/h`);
+  text(g, topLine, 34, 50, { c: tt < alertAt ? C.t : C.r, f: '800 13px Inter,system-ui' });
+  text(g, midLine, 34, 76, { c: C.m, f: '12px Inter,system-ui' });
+  text(g, tr('Velocidades de ejemplo: tú a 120 km/h, el otro a 90 km/h', 'Example speeds: you at 120 km/h, oncoming vehicle at 90 km/h'), 34, 100, { c: C.g, f: '11px Inter,system-ui' });
+}
+
+// ---------- 11) Calculadoras
+$('#z-tb').innerHTML = DRIVE_CASES.map((c) => `<tr><td><b>${c.name}</b></td><td>${c.signal}</td><td>${c.action}</td><td class="m">${c.source}</td><td><span class="chip ${c.status === 'HECHO' ? 'ok' : c.status === 'PENDIENTE' ? 'todo' : 'sim'}">${c.status}</span></td><td><span class="chip ${c.access === 'PASIVO' ? 'ok' : 'todo'}">${c.access}</span></td></tr>`).join('');
+const calc = () => {
+  const v = +$('#z-v').value, a = safeSpeedForVisibility(v), b = safeSpeedForVisibility(v, { mu: MU.mojado }); $('#z-vv').textContent = v; $('#z-vo').innerHTML = `Para parar dentro de lo que ves: <b>${a.kmh} km/h</b> en seco, <b>${b.kmh} km/h</b> en mojado.`;
+  const sp = +$('#z-s').value, mu = MU[$('#z-mu').value], d = stoppingDistance(sp / 3.6, { mu }); $('#z-sv').textContent = sp; $('#z-so').innerHTML = `Distancia de parada: <b>${d.totalM} m</b> (${d.reactM} reaccionando + ${d.brakeM} frenando).`;
+  const dp = +$('#z-d').value, f = floodedRoad({ depthCm: dp }); $('#z-dv').textContent = dp; $('#z-do').innerHTML = `<b>${f.say}</b>`;
+  S.calc = { vis: a.kmh, stop: d.totalM, flood: f.level };
+};
+['#z-v', '#z-s', '#z-mu', '#z-d'].forEach((id) => ($(id).oninput = calc)); calc();
+
+run({ cadena: drawCad, sos: drawSos, pk: drawPk, escena: drawEsc, retencion: drawQ, kamikaze: drawKz });
+</script>
+</body></html>

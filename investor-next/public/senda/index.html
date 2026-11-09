@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SENDA Campo — mensajes de emergencia sin Internet</title>
+<meta name="description" content="SENDA: Sistema de Enrutamiento de Emergencia por canales alternativos. Mensajes cifrados que viajan sin Internet: por sonido, por archivo o de teléfono en teléfono.">
+<meta name="theme-color" content="#05090c">
+<link rel="manifest" href="/senda/manifest.webmanifest">
+<link rel="icon" href="/senda/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/senda/icon.svg">
+<link rel="stylesheet" href="/senda/app.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img src="/senda/icon.svg" alt="" width="28" height="28"><div><b>SENDA</b><small>Campo</small></div></div>
+  <div class="status"><a class="pill" href="/senda/llamada" aria-label="Llamada sin Internet">📞 Llamar</a><a class="pill" href="/senda/red" aria-label="Red SENDA: satélites, LoRa y drones">🛰️ Red</a><span id="net" class="pill">…</span><span id="sw" class="pill">…</span></div>
+</header>
+
+<main id="main">
+  <section id="onboard" class="view" hidden>
+    <h1>Mensajes que encuentran camino</h1>
+    <p class="lead">SENDA funciona <b>sin Internet, sin cobertura y sin servidores</b>. Tus mensajes viajan cifrados por <b>sonido</b> entre teléfonos, en <b>archivos</b> (Quick Share, AirDrop, Bluetooth) o de mano en mano a través de otros teléfonos con SENDA.</p>
+    <label>Tu nombre (visible para tus contactos)<input aria-label="Ej. Abraham" id="ob-name" maxlength="40" autocomplete="name" placeholder="Ej. Abraham"></label>
+    <label class="check"><input type="checkbox" id="ob-relay" checked> Preautorizo que mi teléfono transporte mensajes cifrados de otras personas cuando haya una emergencia declarada (sin poder leerlos).</label>
+    <button id="ob-go" class="primary">Crear mi identidad cifrada</button>
+    <p class="fine">Tus claves se generan y se guardan solo en este teléfono. Nadie más las tiene.</p>
+  </section>
+
+  <section id="home" class="view" hidden>
+    <div class="card me"><div><small>Tú</small><h2 id="me-name"></h2><code id="me-fp"></code></div></div>
+    <div class="card easy" id="easy" aria-labelledby="easy-title"><h3 id="easy-title">Modo fácil</h3>
+      <div class="easy-btns"><button data-quick="OK" class="q q-ok">✅ Estoy bien</button><button data-quick="NEED_HELP" class="q q-help">🆘 Necesito ayuda</button><button data-quick="TRAPPED" class="q q-trap">🧱 Estoy atrapado</button></div>
+      <p class="fine">Un toque: tu estado y tu posición salen cifrados a tus contactos por todos los caminos (sonido, archivo, vecinos, SMS, satélite si tu móvil lo tiene).</p>
+      <label class="check"><input type="checkbox" id="easy-only"> Vista sencilla: solo estos botones y letra grande</label></div>
+    <button id="sos" class="sos">SOS</button>
+    <p class="fine center">Envía tu posición y «necesito ayuda» a tus contactos de emergencia por todos los caminos disponibles.</p>
+    <div class="card" id="trip-card"><h3>🚆 Modo viaje</h3>
+      <p class="fine">Si el tren o el autobús sufre un accidente, SENDA lo detecta (impacto + parada brusca o vuelco), te pregunta si estás bien y, si no respondes, avisa solo a tus contactos y a quien coordine.</p>
+      <div class="row"><input aria-label="Tren o línea (opcional)" id="trip-train" placeholder="Tren o línea (opcional)" style="flex:2"><input aria-label="Coche" id="trip-coach" placeholder="Coche" inputmode="numeric" style="max-width:96px"><button id="trip-toggle" class="primary">Activar</button></div>
+      <p id="trip-state" class="fine"></p></div>
+    <div class="grid3">
+      <div class="stat"><b id="st-inbox">0</b><small>recibidos</small></div>
+      <div class="stat"><b id="st-carry">0</b><small>transportando</small></div>
+      <div class="stat"><b id="st-contacts">0</b><small>contactos</small></div>
+    </div>
+    <div class="card"><h3>Cómo llega tu mensaje</h3>
+      <ol class="how"><li><b>Sonido</b>: acerca dos teléfonos y pulsa «Emitir» en uno y «Escuchar» en otro. No necesita red ni Bluetooth.</li>
+      <li><b>Archivo .senda</b>: compártelo por Quick Share, AirDrop o Bluetooth; funcionan sin Internet.</li>
+      <li><b>De mano en mano</b>: cada teléfono con SENDA lleva los mensajes cifrados de otros hasta encontrarse con el destinatario o con alguien que tenga conexión.</li>
+      <li><b>SMS</b>: si los datos no van pero el SMS sí, envía el mensaje cifrado como texto.</li></ol></div>
+  </section>
+
+  <section id="contacts" class="view" hidden>
+    <h2>Contactos</h2>
+    <div class="card"><h3>Mi tarjeta</h3>
+      <div class="row"><button data-act="card-sound">🔊 Emitir por sonido</button><button data-act="card-copy">📋 Copiar código</button><button data-act="card-file">📤 Compartir archivo</button></div></div>
+    <div class="card"><h3>Añadir contacto</h3>
+      <div class="row"><button data-act="listen">🎙️ Escuchar</button><button data-act="paste">📥 Pegar código</button><label class="btn">📂 Importar<input type="file" id="card-file" accept=".sendacard,.senda,.txt,application/json" hidden></label></div></div>
+    <ul id="contact-list" class="list"></ul>
+  </section>
+
+  <section id="messages" class="view" hidden>
+    <h2>Mensajes</h2>
+    <div class="card compose">
+      <select id="to" aria-label="Destinatario"></select>
+      <textarea aria-label="Escribe un mensaje (máx. 400 caracteres)" id="body" maxlength="400" rows="3" placeholder="Escribe un mensaje (máx. 400 caracteres)"></textarea>
+      <div class="row"><select id="prio" aria-label="Prioridad"><option value="3">Familia</option><option value="2">Coordinación</option><option value="0">SOS</option></select><button id="send" class="primary">Cifrar y poner en camino</button></div>
+    </div>
+    <h3>Recibidos</h3><ul id="inbox" class="list"></ul>
+    <h3>En camino (cifrados, este teléfono los transporta)</h3><ul id="carry" class="list"></ul>
+  </section>
+
+  <section id="transfer" class="view" hidden>
+    <h2>Transferir</h2>
+    <div class="card"><h3>🔊 Sonido · sin ninguna red</h3>
+      <p class="fine">Pon los teléfonos a menos de un metro, con el volumen alto. Un mensaje tarda unos 30 segundos.</p>
+      <div class="row"><button data-act="emit" class="primary">Emitir lo urgente</button><button data-act="listen">Escuchar</button></div>
+      <canvas id="scope" width="600" height="80"></canvas><p id="audio-status" class="fine"></p></div>
+    <div class="card"><h3>📦 Paquete .senda · Quick Share / AirDrop / Bluetooth / USB</h3>
+      <div class="row"><button data-act="bundle-share" class="primary">Compartir paquete</button><label class="btn">Importar paquete<input type="file" id="bundle-file" accept=".senda,application/json" hidden></label></div></div>
+    <div class="card"><h3>🌐 Relé por Internet (cuando haya conexión)</h3>
+      <div class="row"><input aria-label="https://rele.ejemplo.es" id="relay-url" placeholder="https://rele.ejemplo.es" style="flex:1"><button data-co="relay-sync">Sincronizar</button></div>
+      <p class="fine">El relé no puede leer nada: solo ve a quién va cada sobre cifrado. Lo puede operar tu ayuntamiento o protección civil.</p></div>
+    <div class="card"><h3>✉️ Texto / SMS</h3>
+      <div class="row"><button data-act="sms">Enviar como SMS</button><button data-act="text-copy">Copiar como texto</button><button data-act="paste">Pegar texto recibido</button></div></div>
+  </section>
+
+  <section id="zone" class="view" hidden>
+    <h2>Zona de emergencia</h2>
+    <div class="card"><h3>🏠 Mi edificio</h3><p class="fine">Opcional y solo en este teléfono. Permite recibir alertas dirigidas a tu edificio y planta.</p>
+      <div class="row"><input aria-label="Edificio (código o dirección)" id="pf-building" placeholder="Edificio (código o dirección)" style="flex:2"><input aria-label="Planta" id="pf-floor" type="number" min="0" max="200" placeholder="Planta" style="max-width:96px"><input aria-label="Puerta" id="pf-unit" placeholder="Puerta" style="max-width:96px"></div>
+      <label class="check"><input type="checkbox" id="pf-remote"> Permito que coordinadores <b>verificados</b> activen en este teléfono sirena, destellos, baliza y envío de batería/posición durante una emergencia declarada.</label>
+      <p class="fine">Id de tu baliza (SENDA Android / ESP32): <code id="pf-beacon">—</code></p>
+      <h3 style="margin-top:12px">Organismos de confianza</h3><ul id="anchor-list" class="list"></ul><button data-co="anchor-add">Importar código de organismo</button>
+      <h3 style="margin-top:12px">Alertas recibidas</h3><ul id="cmd-log" class="list"></ul></div>
+    <div class="card"><h3>🚨 Incidentes recibidos</h3><p class="fine">Informes de accidente que te han llegado (cifrados, solo tú los lees), fusionados por tren y coche.</p><pre id="incidents" class="brief">Sin informes.</pre>
+      <p><a href="/senda/incidente">Panel de coordinación · accidente con dos trenes</a><br><a href="/senda/edificios">Gemelo digital de edificios afectados (3D, routers, alertas por planta, visión por capas)</a><br><a href="/senda/via">Vigilancia ferroviaria (circuitos de vía, geometría con móviles, velocidad, muros con lluvia)</a><br><a href="/senda/incendio">Incendio forestal: avisar antes de que caiga la antena</a><br><a href="/senda/fuego">Seguimiento de incendio: torres, móviles, satélite, meteorología y coches</a><br><a href="/senda/fuego3d">Incendio en 3D con datos reales: masa de aire, viento, pluma, cámaras y coches</a><br><a href="/senda/referencias">Incendios de referencia: 14 casos reales, 7 reconstruidos con satélite GOES, entrenamiento y validación</a><br><a href="/senda/evacuacion">Coches, cámaras de tráfico y fuego: cuándo avisar, qué cerrar, atascos y bloqueos (Caltrans, TfL, GOES)</a><br><a href="/senda/ojo">Ojo de SENDA: satélites, casos reales y módulos</a><br><a href="/senda/llamada">Llamada sin Internet (voz y chat cifrados, arranque por sonido)</a><br><a href="/senda/dron">Censo radio con dron: personas por planta</a><br><a href="/senda/arquitectura">Arquitectura del sistema y escenarios</a><br><a href="/senda/reserva">Batería de Internet: reserva, vecinos y puntos de rebote</a><br><a href="/senda/triaje">Triaje para cualquiera</a><br><a href="/senda/sentidos">Sentidos ampliados: ver sonidos, oír radio, ver respiración</a><br><a href="/senda/agua">Riadas y maremotos</a><br><a href="/senda/monte">Perdido en el monte</a><br><a href="/senda/barrido">Dron casa por casa</a><br><a href="/senda/carretera">Ruta protectora: frenadas, SOS sin cobertura y coordinar un accidente</a><br><a href="/senda/camaras">Cámaras públicas: visibilidad y nieve, nunca personas</a><br><a href="/senda/paises">España y Países Bajos: DATEX II y señales de carril</a><br><a href="/senda/dgt">Infraestructura de la DGT: qué se suma y qué no</a><br><a href="/senda/trafico">Visión de tráfico con vídeo real</a><br><a href="/senda/vehiculos">Coches conectados y fusión de posición</a></p></div>
+    <div class="card"><h3>Modo relé</h3><p id="relay-state" class="big"></p>
+      <label class="check"><input type="checkbox" id="relay-consent"> Preautorizo transportar mensajes cifrados de otros en zonas declaradas.</label></div>
+    <div class="card"><h3>Alertas y sismos</h3><p class="fine">Con red, SENDA descarga los sismos del USGS y los guarda para usarlos sin conexión.</p>
+      <button data-act="feeds">Actualizar fuentes</button><ul id="zones" class="list"></ul></div>
+  </section>
+</main>
+
+  <section id="coord" class="view" hidden>
+    <h2>Coordinar</h2>
+    <div class="card"><h3>🪪 Credencial</h3><p id="co-status" class="warn"></p>
+      <div class="row"><button data-co="request">Copiar mi solicitud</button><button data-co="cred-import">Importar credencial</button><a class="btn" href="/senda/organismo">Soy un organismo</a></div>
+      <p class="fine">Tu clave nunca sale del teléfono: el organismo firma tu solicitud y te devuelve la credencial.</p></div>
+    <div class="card"><h3>📣 Alerta dirigida</h3>
+      <div class="row"><input aria-label="Edificio (ej. B14)" id="co-building" placeholder="Edificio (ej. B14)" style="flex:1"><input aria-label="Plantas (ej. 1-4,6)" id="co-floors" placeholder="Plantas (ej. 1-4,6)" style="flex:1"></div>
+      <textarea aria-label="Mensaje para las personas de esas plantas" id="co-msg" rows="2" placeholder="Mensaje para las personas de esas plantas">Bomberos en la fachada este. Si puedes, pulsa «Estoy atrapado».</textarea>
+      <div class="row" id="co-actions"><label class="check"><input type="checkbox" value="SIREN" checked> Sirena</label><label class="check"><input type="checkbox" value="FLASH"> Destellos</label><label class="check"><input type="checkbox" value="REPORT_STATUS" checked> Batería y posición</label><label class="check"><input type="checkbox" value="BLE_BEACON" checked> Baliza BLE (Android)</label><label class="check"><input type="checkbox" value="WIFI_SCAN"> Barrido Wi-Fi (Android)</label></div>
+      <button data-co="send-alert" class="primary">Firmar y poner en camino</button><p id="co-sent" class="fine"></p></div>
+    <div class="card"><h3>📊 Respuestas por edificio y planta</h3><table id="co-board" class="board"></table>
+      <p class="fine"><a href="/senda/edificios">Abrir el gemelo 3D</a></p></div>
+    <div class="card"><h3>📶 Barrido Wi-Fi (SENDA Android, ESP32 o dron)</h3>
+      <div class="row"><input aria-label="Ancho m" id="sv-w" type="number" placeholder="Ancho m" style="max-width:110px"><input aria-label="Fondo m" id="sv-d" type="number" placeholder="Fondo m" style="max-width:110px"><input aria-label="Plantas" id="sv-levels" type="number" placeholder="Plantas" style="max-width:110px"><label class="btn">Importar barrido<input type="file" id="sv-file" accept=".jsonl,.json,.txt" hidden></label></div>
+      <div id="sv-out"></div></div>
+  </section>
+
+<nav class="tabs" id="tabs" hidden>
+  <button data-tab="home">Inicio</button><button data-tab="contacts">Contactos</button><button data-tab="messages">Mensajes</button><button data-tab="transfer">Transferir</button><button data-tab="zone">Zona</button><button data-tab="coord">Coordinar</button>
+</nav>
+<div id="crash" hidden role="alertdialog" aria-labelledby="crash-title"><div class="crash-box">
+  <h2 id="crash-title">¿Estás bien?</h2><p id="crash-why" class="fine"></p>
+  <div id="crash-count" class="count">30</div><p class="fine">Si no respondes, SENDA avisará automáticamente.</p>
+  <div id="crash-opts" class="opts"></div>
+  <label>Heridos cerca de ti <input id="crash-near" type="number" min="0" max="50" value="0" inputmode="numeric"></label>
+</div></div>
+<div id="alert" hidden role="alertdialog" aria-labelledby="alert-title"><div class="crash-box alert-box">
+  <p class="fine">ALERTA DE COORDINACIÓN</p><h2 id="alert-title">⚠️ <span id="alert-msg"></span></h2><p id="alert-issuer" class="ok"></p>
+  <ul id="alert-plan" class="fine plan"></ul>
+  <a id="alert-native" class="btn primary" hidden>📶 Activar baliza / barrido con SENDA Android</a>
+  <div id="alert-count" class="count">60</div><p class="fine">Si no respondes, SENDA avisará de que tu teléfono está activo.</p>
+  <div id="alert-opts" class="opts"></div>
+</div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<dialog id="dlg"><form method="dialog"><p id="dlg-text"></p><textarea id="dlg-input" rows="4" aria-labelledby="dlg-text"></textarea><menu><button value="cancel">Cancelar</button><button value="ok" class="primary">Aceptar</button></menu></form></dialog>
+<script type="module" src="/senda/app.mjs"></script>
+</body>
+</html>

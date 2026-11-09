@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:03.032
+Als het netwerk uitvalt, mag het bericht niet sterven.
+
+2
+00:00:03.382 --> 00:00:17.334
+Op 28 april 2025 viel het Spaanse mobiele netwerk niet uit toen de stroom wegviel, maar toen de accu's van de zendmasten leeg raakten. Binnen enkele uren daalde het aandeel gebruikers met een stabiele verbinding van negentig naar veertig procent.
+
+3
+00:00:18.934 --> 00:00:29.195
+Wat nog niemand doet: SENDA splitst elk bericht met Reed-Solomon-codering en verdeelt de fragmenten over verschillende dragers. Een paar willekeurige fragmenten zijn genoeg om het te herstellen.
+
+4
+00:00:29.545 --> 00:00:45.161
+Met satelliet, LoRa, sms en buren haalt een SOS een afleverkans van negenennegentig procent, exact berekend. In de live test werden honderdzevenennegentig van de tweehonderd berichten byte voor byte hersteld terwijl dragers willekeurig wegvielen.
+
+5
+00:00:46.761 --> 00:00:56.553
+Alleen een coördinator met een door de eigen organisatie ondertekend bewijs kan iets op je telefoon activeren, en alleen als jij dat hebt toegestaan en er een noodsituatie is afgekondigd.
+
+6
+00:00:58.153 --> 00:01:01.460
+Probeer het nu, zonder iets te installeren, op het adres in beeld.

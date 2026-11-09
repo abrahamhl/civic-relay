@@ -1,0 +1,291 @@
+{
+ "note": "SENDA Mission 9.5 · Especial Informativo Telediario (ES/EN/NL)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "bc_intro",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/public/senda/dgt.html",
+    "docs/video/M95_VIDEO_SOURCES.md"
+   ],
+   "visual": {
+    "kind": "broadcast"
+   },
+   "title": {
+    "es": "Especial informativo: cuando cae la infraestructura convencional",
+    "en": "Breaking news special: when conventional infrastructure fails",
+    "nl": "Speciaal nieuwsbulletin: wanneer conventionele infrastructuur uitvalt"
+   },
+   "es": [
+    "Especial informativo. Veinte once hora universal. Cuando las torres de telefonía y los centros de mando pierden el suministro eléctrico, la respuesta no puede depender de un servidor central.",
+    "Presentamos la investigación completa sobre SENDA, la plataforma cibernética y geoespacial que mantiene activas las telecomunicaciones de emergencia y la soberanía del territorio."
+   ],
+   "es_say": [
+    "Especial informativo. Veinte once hora universal. Cuando las torres de telefonía y los centros de mando pierden el suministro eléctrico, la respuesta no puede depender de un servidor central.",
+    "Presentamos la investigación completa sobre Senda, la plataforma cibernética y geoespacial que mantiene activas las telecomunicaciones de emergencia y la soberanía del territorio."
+   ],
+   "en": [
+    "Breaking news special. Twenty-eleven universal time. When cellular masts and command centres lose power, emergency response cannot rely on a centralised server.",
+    "We present the full investigation into SENDA, the cybernetic and geospatial platform that preserves emergency communications and sovereign territorial defence."
+   ],
+   "en_say": [
+    "Breaking news special. Twenty-eleven universal time. When cellular masts and command centres lose power, emergency response cannot rely on a centralised server.",
+    "We present the full investigation into Senda, the cybernetic and geospatial platform that preserves emergency communications and sovereign territorial defence."
+   ],
+   "nl": [
+    "Speciaal nieuwsbulletin. Twintig uur elf universele tijd. Wanneer zendmasten en commandocentra de stroom verliezen, kan de noodrespons niet afhangen van een centrale server.",
+    "Wij presenteren het volledige onderzoek naar SENDA, het cybernetische en geo-spatiële platform dat noodcommunicatie en soevereine gebiedsbescherming in stand houdt."
+   ]
+  },
+  {
+   "id": "bc_disasters",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/public/senda/evacuacion.html",
+    "investor-next/public/senda/referencias.html"
+   ],
+   "visual": {
+    "kind": "shots",
+    "crop": "top",
+    "images": [
+     "e2e-06-flood.png"
+    ]
+   },
+   "title": {
+    "es": "Hechos reales: Valencia, Bejís y la autopista A-12 en los Países Bajos",
+    "en": "Ground truth: Valencia, Bejís and the Dutch A-12 highway",
+    "nl": "Historische feiten: Valencia, Bejís en de Nederlandse A-12 snelweg"
+   },
+   "es": [
+    "Los datos no mienten. En la catástrofe de Valencia de octubre de dos mil veinticuatro, el colapso de las antenas dejó aislados a cientos de miles de ciudadanos en plena inundación.",
+    "En los incendios de Bejís y en la densa niebla de la autopista A-12 en Arnhem, la falta de comunicaciones directas multiplicó el riesgo. SENDA nace para cerrar esta brecha crítica."
+   ],
+   "es_say": [
+    "Los datos no mienten. En la catástrofe de Valencia de octubre de dos mil veinticuatro, el colapso de las antenas dejó aislados a cientos de miles de ciudadanos en plena inundación.",
+    "En los incendios de Bejís y en la densa niebla de la autopista A-12 en Arnhem, la falta de comunicaciones directas multiplicó el riesgo. Senda nace para cerrar esta brecha crítica."
+   ],
+   "en": [
+    "The data speaks clearly. In the Valencia disaster of October twenty twenty-four, mast collapses left hundreds of thousands isolated in rising floodwaters.",
+    "In the Bejís wildfire and the sudden fog of the A-12 highway in Arnhem, the absence of direct communications multiplied the danger. SENDA was built to solve this critical gap."
+   ],
+   "en_say": [
+    "The data speaks clearly. In the Valencia disaster of October twenty twenty-four, mast collapses left hundreds of thousands isolated in rising floodwaters.",
+    "In the Bejís wildfire and the sudden fog of the A-12 highway in Arnhem, the absence of direct communications multiplied the danger. Senda was built to solve this critical gap."
+   ],
+   "nl": [
+    "De data spreken voor zich. Bij de ramp in Valencia in oktober 2024 zorgde het uitvallen van zendmasten ervoor dat honderdduizenden mensen geïsoleerd raakten tijdens de overstromingen.",
+    "Bij de natuurbrand in Bejís en de plotselinge mist op de snelweg A-12 bij Arnhem vergrootte het ontbreken van directe communicatie het gevaar. SENDA is ontworpen om deze kloof te dichten."
+   ]
+  },
+  {
+   "id": "bc_mesh",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/multichannel.mjs",
+    "packages/senda/src/dtn.mjs"
+   ],
+   "visual": {
+    "kind": "hub"
+   },
+   "title": {
+    "es": "Malla cibernética táctica y espectro legal sin licencia",
+    "en": "Tactical cybernetic mesh and license-free spectrum",
+    "nl": "Tactisch cybernetisch mesh-netwerk en vergunningsvrij spectrum"
+   },
+   "es": [
+    "Operando de forma transparente en las bandas de uso común de cuatrocientos treinta y tres y ochocientos sesenta y ocho megahercios, Bluetooth y dos con cuatro gigahercios, SENDA teje una malla resiliente.",
+    "Cada vehículo, teléfono y nodo comunitario almacena y reenvía paquetes cifrados bajo el estándar europeo DATEX II y los protocolos de protección civil, garantizando alcance sin internet."
+   ],
+   "es_say": [
+    "Operando de forma transparente en las bandas de uso común de cuatrocientos treinta y tres y ochocientos sesenta y ocho megahercios, Blutuz y dos con cuatro gigahercios, Senda teje una malla resiliente.",
+    "Cada vehículo, teléfono y nodo comunitario almacena y reenvía paquetes cifrados bajo el estándar europeo Datex dos y los protocolos de protección civil, garantizando alcance sin internet."
+   ],
+   "en": [
+    "Operating seamlessly across license-free bands at four hundred thirty-three and eight hundred sixty-eight megahertz, Bluetooth and two point four gigahertz, SENDA forms a resilient ad-hoc mesh.",
+    "Every vehicle, phone, and community node stores and forwards encrypted packets compliant with the European DATEX II standard and civil protection guidelines, ensuring reach without internet."
+   ],
+   "en_say": [
+    "Operating seamlessly across license-free bands at four hundred thirty-three and eight hundred sixty-eight megahertz, Bluetooth and two point four gigahertz, Senda forms a resilient ad-hoc mesh.",
+    "Every vehicle, phone, and community node stores and forwards encrypted packets compliant with the European Datex two standard and civil protection guidelines, ensuring reach without internet."
+   ],
+   "nl": [
+    "Door naadloos te opereren in vergunningsvrije banden op 433 en 868 megahertz, Bluetooth en 2,4 gigahertz, bouwt SENDA een veerkrachtig ad-hoc mesh-netwerk.",
+    "Elk voertuig, elke telefoon en elk buurtnoodstation bewaart en stuurt versleutelde pakketten door conform de Europese DATEX II norm, waardoor bereik zonder internet gegarandeerd is."
+   ]
+  },
+  {
+   "id": "bc_math",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/uav-mesh.mjs",
+    "packages/senda/src/cots-rf-tactical.mjs"
+   ],
+   "visual": {
+    "kind": "math_grid"
+   },
+   "title": {
+    "es": "Matemática de vanguardia: propagación 3D, autovalor de Fiedler y radar pasivo",
+    "en": "Cutting-edge mathematics: 3D propagation, Fiedler eigenvalue and passive radar",
+    "nl": "Geavanceerde wiskunde: 3D-propagatie, Fiedler eigenwaarde en passieve radar"
+   },
+   "es": [
+    "La solidez del sistema se basa en cálculos rigurosos: el modelo aire tierra de Al-Hourani, la difracción sobre relieve de Deygout y la conectividad algebraica lambda dos del laplaciano de grafos.",
+    "Además, mediante la función de ambigüedad cruzada de radar biestático pasivo, la red detecta ecos Doppler de aeronaves y obstáculos aprovechando las emisiones comerciales ya existentes en el aire."
+   ],
+   "es_say": [
+    "La solidez del sistema se basa en cálculos rigurosos: el modelo aire tierra de Al-Hourani, la difracción sobre relieve de Deygout y la conectividad algebraica lambda dos del laplaciano de grafos.",
+    "Además, mediante la función de ambigüedad cruzada de radar biestático pasivo, la red detecta ecos Doppler de aeronaves y obstáculos aprovechando las emisiones comerciales ya existentes en el aire."
+   ],
+   "en": [
+    "System resilience rests on proven mathematics: the Al-Hourani air-to-ground model, Deygout terrain diffraction, and the graph Laplacian lambda-two Fiedler eigenvalue.",
+    "Furthermore, through the cross-ambiguity function of passive bistatic radar, the network detects aircraft Doppler reflections using ambient commercial broadcasts already present in the atmosphere."
+   ],
+   "en_say": [
+    "System resilience rests on proven mathematics: the Al-Hourani air-to-ground model, Deygout terrain diffraction, and the graph Laplacian lambda-two Fiedler eigenvalue.",
+    "Furthermore, through the cross-ambiguity function of passive bistatic radar, the network detects aircraft Doppler reflections using ambient commercial broadcasts already present in the atmosphere."
+   ],
+   "nl": [
+    "De robuustheid van het systeem steunt op bewezen wiskunde: het Al-Hourani lucht-naar-grond model, Deygout terreindiffractie en de lambda-twee Fiedler eigenwaarde van de graaf-Laplaciaan.",
+    "Bovendien detecteert het netwerk via de kruis-ambiguïteitsfunctie van passieve bistatische radar Doppler-reflecties van drones met behulp van reeds aanwezige publieke radiosignalen."
+   ]
+  },
+  {
+   "id": "bc_cots",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/cots-rf-tactical.mjs",
+    "apps/senda-live/server/domain/cots-drone-recon.mjs"
+   ],
+   "visual": {
+    "kind": "cots_bom"
+   },
+   "title": {
+    "es": "Módulos accesibles por menos de veinticinco euros y rastreo de drones",
+    "en": "Accessible modules under twenty-five euros and drone tracking",
+    "nl": "Toegankelijke hardware onder vijfentwintig euro en drone-opsporing"
+   },
+   "es": [
+    "Cualquier puesto de mando o comunidad puede montar un sensor táctico con microcontroladores ESP32 y receptores de radio de bajo coste por menos de veinticinco euros.",
+    "Con antenas de hilo de cobre y el decodificador del estándar ASTM F3411, SENDA no solo detecta drones en vuelo, sino que localiza las coordenadas exactas de su piloto en tierra."
+   ],
+   "es_say": [
+    "Cualquier puesto de mando o comunidad puede montar un sensor táctico con microcontroladores E S P treinta y dos y receptores de radio de bajo coste por menos de veinticinco euros.",
+    "Con antenas de hilo de cobre y el decodificador del estándar A S T M F treinta y cuatro once, Senda no solo detecta drones en vuelo, sino que localiza las coordenadas exactas de su piloto en tierra."
+   ],
+   "en": [
+    "Any command post or community group can assemble a tactical sensor using ESP32 microcontrollers and low-cost radio receivers for under twenty-five euros.",
+    "Using copper-wire antennas and the ASTM F3411 decoder, SENDA tracks unauthorized drones in flight and reveals the exact ground coordinates of their remote pilot."
+   ],
+   "en_say": [
+    "Any command post or community group can assemble a tactical sensor using E S P thirty-two microcontrollers and low-cost radio receivers for under twenty-five euros.",
+    "Using copper-wire antennas and the A S T M F thirty-four eleven decoder, Senda tracks unauthorized drones in flight and reveals the exact ground coordinates of their remote pilot."
+   ],
+   "nl": [
+    "Elke commandopost of burgerwacht kan een tactische sensor bouwen met ESP32 microcontrollers en betaalbare radio-ontvangers voor minder dan vijfentwintig euro.",
+    "Met koperdraad-antennes en de ASTM F3411 decoder volgt SENDA drones in de lucht en traceert het tegelijkertijd de exacte grondcoördinaten van de piloot."
+   ]
+  },
+  {
+   "id": "bc_roles",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/app/senda-home.tsx",
+    "apps/senda-live/server/api.mjs"
+   ],
+   "visual": {
+    "kind": "kpis",
+    "kpis": [
+     {
+      "v": "3 MODOS",
+      "l": {
+       "es": "Inversión · Desarrollo · Ciudadano",
+       "en": "Investor · Developer · Citizen",
+       "nl": "Belegger · Ontwikkelaar · Burger"
+      }
+     },
+     {
+      "v": "100 %",
+      "l": {
+       "es": "Autónomo sin internet y verificado",
+       "en": "Autonomous without internet and verified",
+       "nl": "Autonoom zonder internet en geverifieerd"
+      }
+     }
+    ]
+   },
+   "title": {
+    "es": "Tres modos integrados: inversión soberana, ingeniería abierta y seguridad ciudadana",
+    "en": "Three integrated modes: sovereign investment, open engineering and citizen safety",
+    "nl": "Drie geïntegreerde modi: soevereine investering, open engineering en burgerveiligheid"
+   },
+   "es": [
+    "El modo inversionista aporta a los gobiernos un activo soberano de alto valor estratégico para la defensa civil y la resiliencia nacional frente a apagones y catástrofes.",
+    "El modo desarrollador ofrece una arquitectura modular con setenta y cuatro módulos sincronizados, y el modo ciudadano entrega una aplicación que funciona sin internet desde el primer segundo."
+   ],
+   "es_say": [
+    "El modo inversionista aporta a los gobiernos un activo soberano de alto valor estratégico para la defensa civil y la resiliencia nacional frente a apagones y catástrofes.",
+    "El modo desarrollador ofrece una arquitectura modular con setenta y cuatro módulos sincronizados, y el modo ciudadano entrega una aplicación que funciona sin internet desde el primer segundo."
+   ],
+   "en": [
+    "Investor mode provides governments with a high-value sovereign asset for civil defence, national resilience, and disaster preparedness.",
+    "Developer mode provides an open modular architecture across seventy-four verified packages, while citizen mode delivers an emergency application working offline from the very first second."
+   ],
+   "en_say": [
+    "Investor mode provides governments with a high-value sovereign asset for civil defence, national resilience, and disaster preparedness.",
+    "Developer mode provides an open modular architecture across seventy-four verified packages, while citizen mode delivers an emergency application working offline from the very first second."
+   ],
+   "nl": [
+    "De beleggersmodus biedt overheden een strategisch soeverein instrument voor civiele bescherming, nationale weerbaarheid en rampenbestrijding.",
+    "De ontwikkelaarsmodus biedt een open modulaire architectuur met vierenzeventig geverifieerde pakketten, terwijl de burgermodus een app levert die direct offline functioneert."
+   ]
+  },
+  {
+   "id": "bc_outro",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/public/senda/dgt.html",
+    "investor-next/app/senda-home.tsx"
+   ],
+   "visual": {
+    "kind": "cta"
+   },
+   "title": {
+    "es": "La red que nunca se apaga",
+    "en": "The network that never shuts down",
+    "nl": "Het netwerk dat nooit uitvalt"
+   },
+   "es": [
+    "SENDA no es una promesa futura: es un despliegue operativo en tiempo real, con cálculos validados y tecnología abierta para proteger vidas en cualquier territorio.",
+    "Visita la plataforma interactiva y accede al gemelo digital en civic-relay-investor punto vercel punto app barra senda."
+   ],
+   "es_say": [
+    "Senda no es una promesa futura: es un despliegue operativo en tiempo real, con cálculos validados y tecnología abierta para proteger vidas en cualquier territorio.",
+    "Visita la plataforma interactiva y accede al gemelo digital en civic guión relay guión investor punto vercel punto app barra senda."
+   ],
+   "en": [
+    "SENDA is not a future promise: it is an operational real-time deployment, verified with strict mathematics and open technology to protect lives everywhere.",
+    "Explore the interactive platform and inspect the digital twin at civic-relay-investor dot vercel dot app slash senda."
+   ],
+   "en_say": [
+    "Senda is not a future promise: it is an operational real-time deployment, verified with strict mathematics and open technology to protect lives everywhere.",
+    "Explore the interactive platform and inspect the digital twin at civic dash relay dash investor dot vercel dot app slash senda."
+   ],
+   "nl": [
+    "SENDA is geen toekomstige belofte: het is een operationeel platform, geverifieerd met exacte wiskunde en open technologie om levens te beschermen in elk gebied.",
+    "Verken het interactieve platform en bekijk de digitale tweeling op civic-relay-investor punt vercel punt app schuine streep senda."
+   ]
+  }
+ ]
+}

@@ -4,6 +4,9 @@ import CrisisStory from './crisis-story';
 import CoordinationLab from './coordination-lab';
 import EvidenceBoard from './evidence-board';
 import TelecomAndRfRadarSuite from './telecom-rf-radar-suite';
+import VehicularDopplerLab from './vehicular-doppler-lab';
+import CivilianRadarDefenseLab from './civilian-radar-defense-lab';
+import AcousticSentinelSurvivalLab from './acoustic-sentinel-survival-lab';
 import LiveHardwareAndDealRoomConsole from './live-hardware-console';
 import SectorIntelligenceConsole from './sector-intelligence-console';
 import {HyperFramesCinemaDeck} from './hyperframes-cinema-deck';
@@ -12,6 +15,8 @@ import {WhatItDoes,SystemExplained,DeveloperBlueprint} from './system-explained'
 import {routingPitch} from './routing-pitch';
 import {getCopy,type Locale} from './copy';
 import ResponsiveHeader from './responsive-header';
+import SendaHome from './senda-home';
+import AudienceFilter from './audience-filter';
 import LanguageDocument from './language-document';
 import MasterVision from './master-vision';
 
@@ -46,11 +51,12 @@ const thirtySecondThesis:Record<Locale,{
   ctaSimulate:'Simular una emergencia',
   ctaExploreMap:'Explorar el mapa interactivo',
   ctaEvidence:'Ver qué funciona de verdad',
-  surfacesTitle:'TRES SUPERFICIES COMPLEMENTARIAS (DIVULGACIÓN PROGRESIVA)',
+  surfacesTitle:'CUATRO SUPERFICIES COMPLEMENTARIAS (DIVULGACIÓN PROGRESIVA)',
   surfaces:[
    {id:'surface-discover',tag:'A · DESCUBRIR',name:'Historia y Resumen en 30s',desc:'Qué problema resuelve, para quién y con qué límites honestos, sin necesidad de jerga 3GPP/CSI/CAP.',targetAnchor:'#what-oep-does',routeHref:'/es/'},
    {id:'surface-explore',tag:'B · EXPLORAR / MISSION CONTROL',name:'Globo 3D + Sector Intelligence CCTV',desc:'Globo 3D con selección raycast, sectores (El Tiemblo, Valencia, Arnhem), conos FOV estimados y cámaras públicas/demo.',targetAnchor:'#sector-intelligence',routeHref:'/es/mission-control/'},
-   {id:'surface-science',tag:'C · INVESTIGAR / SCIENCE & LAB',name:'Motor Determinista, Criptografía y Evidencia',desc:'Cola Store-and-Forward, firmas reales WebCrypto ECDSA P-256, laboratorio Android Nearby y matriz científica.',targetAnchor:'#routing-lab',routeHref:'/es/science/'}
+   {id:'surface-science',tag:'C · INVESTIGAR / SCIENCE & LAB',name:'Motor Determinista, Criptografía y Evidencia',desc:'Cola Store-and-Forward, firmas reales WebCrypto ECDSA P-256, laboratorio Android Nearby y matriz científica.',targetAnchor:'#routing-lab',routeHref:'/es/science/'},
+   {id:'surface-command',tag:'D · MANDO / PANEL MULTICANAL',name:'Activaciones, Rutas Mesh y Presupuesto RF',desc:'Escenarios de apagón, cobertura por canal, rutas con coste, trilateración y enlace RF. Ejercicio sintético sin radios ni dispatch real.',targetAnchor:'#telecom-rf-radar-suite',routeHref:'/es/mando/'}
   ],
   eightScenes:[
    {num:'01',tag:'DESASTRE',summary:'Incendio o apagón inutiliza una antena; la cobertura del sector cambia.',targetAnchor:'#story',badge:'SYNTHETIC SIMULATION'},
@@ -71,11 +77,12 @@ const thirtySecondThesis:Record<Locale,{
   ctaSimulate:'Simulate an emergency',
   ctaExploreMap:'Explore interactive map',
   ctaEvidence:'See what works today',
-  surfacesTitle:'THREE COMPLEMENTARY SURFACES (PROGRESSIVE DISCLOSURE)',
+  surfacesTitle:'FOUR COMPLEMENTARY SURFACES (PROGRESSIVE DISCLOSURE)',
   surfaces:[
    {id:'surface-discover',tag:'A · DISCOVER',name:'30-Second Story & Primer',desc:'What problem it solves, for whom, and with what explicit boundaries—no 3GPP/CSI/CAP jargon required.',targetAnchor:'#what-oep-does',routeHref:'/'},
    {id:'surface-explore',tag:'B · EXPLORE / MISSION CONTROL',name:'3D Globe + Sector Intelligence CCTV',desc:'3D Globe with raycast object selection, sectors (El Tiemblo, Valencia, Arnhem), estimated FOV cones, and public/demo cameras.',targetAnchor:'#sector-intelligence',routeHref:'/mission-control/'},
-   {id:'surface-science',tag:'C · INVESTIGATE / SCIENCE & LAB',name:'Deterministic Engine, Crypto & Evidence',desc:'Store-and-Forward queue, real WebCrypto ECDSA P-256 signatures, Android Nearby lab source, and scientific truth matrix.',targetAnchor:'#routing-lab',routeHref:'/science/'}
+   {id:'surface-science',tag:'C · INVESTIGATE / SCIENCE & LAB',name:'Deterministic Engine, Crypto & Evidence',desc:'Store-and-Forward queue, real WebCrypto ECDSA P-256 signatures, Android Nearby lab source, and scientific truth matrix.',targetAnchor:'#routing-lab',routeHref:'/science/'},
+   {id:'surface-command',tag:'D · COMMAND / MULTICHANNEL PANEL',name:'Activations, Mesh Routes & RF Budget',desc:'Blackout scenarios, per-channel coverage, costed routes, trilateration and RF link budgets. Synthetic exercise with no radios or real dispatch.',targetAnchor:'#telecom-rf-radar-suite',routeHref:'/mando/'}
   ],
   eightScenes:[
    {num:'01',tag:'DISASTER',summary:'Wildfire or blackout disables a tower; sector coverage map updates immediately.',targetAnchor:'#story',badge:'SYNTHETIC SIMULATION'},
@@ -96,11 +103,12 @@ const thirtySecondThesis:Record<Locale,{
   ctaSimulate:'Simuleer een noodgeval',
   ctaExploreMap:'Verken interactieve kaart',
   ctaEvidence:'Bekijk wat echt werkt',
-  surfacesTitle:'DRIE COMPLEMENTAIRE OPPERVLAKKEN (PROGRESSIEVE ONTSLUITING)',
+  surfacesTitle:'VIER COMPLEMENTAIRE OPPERVLAKKEN (PROGRESSIEVE ONTSLUITING)',
   surfaces:[
    {id:'surface-discover',tag:'A · ONTDEKKEN',name:'Verhaal & Overzicht in 30s',desc:'Welk probleem het oplost, voor wie en met welke eerlijke grenzen—zonder 3GPP/CSI/CAP-jargon.',targetAnchor:'#what-oep-does',routeHref:'/nl/'},
    {id:'surface-explore',tag:'B · VERKENNEN / MISSION CONTROL',name:'3D-Globe + Sector Intelligence CCTV',desc:'3D-globe met raycast-selectie, sectoren (El Tiemblo, Valencia, Arnhem), geschatte FOV-kegels en openbare/demo-camera’s.',targetAnchor:'#sector-intelligence',routeHref:'/nl/mission-control/'},
-   {id:'surface-science',tag:'C · ONDERZOEKEN / SCIENCE & LAB',name:'Deterministische Engine, Crypto & Bewijs',desc:'Store-and-Forward wachtrij, echte WebCrypto ECDSA P-256-handtekeningen, Android Nearby-lab en wetenschappelijke matrix.',targetAnchor:'#routing-lab',routeHref:'/nl/science/'}
+   {id:'surface-science',tag:'C · ONDERZOEKEN / SCIENCE & LAB',name:'Deterministische Engine, Crypto & Bewijs',desc:'Store-and-Forward wachtrij, echte WebCrypto ECDSA P-256-handtekeningen, Android Nearby-lab en wetenschappelijke matrix.',targetAnchor:'#routing-lab',routeHref:'/nl/science/'},
+   {id:'surface-command',tag:'D · COMMANDO / MULTIKANAAL PANEEL',name:'Activaties, Mesh-Routes & RF-Budget',desc:'Blackoutscenario’s, dekking per kanaal, routes met kosten, trilateratie en RF-linkbudgetten. Synthetische oefening zonder radio’s of echte dispatch.',targetAnchor:'#telecom-rf-radar-suite',routeHref:'/nl/mando/'}
   ],
   eightScenes:[
    {num:'01',tag:'RAMP',summary:'Natuurbrand of stroomuitval schakelt een mast uit; sectordekking verandert direct.',targetAnchor:'#story',badge:'SYNTHETIC SIMULATION'},
@@ -123,7 +131,9 @@ export default function InvestorPage({locale}:{locale:Locale}){
   <LanguageDocument locale={locale}/>
   <div className="global-grid" aria-hidden="true"/>
   <ResponsiveHeader locale={locale}/>
-  <section id="hero-30s" className="hero container">
+  <AudienceFilter locale={locale}/>
+  <div data-for="citizen coord eng inv"><SendaHome locale={locale}/></div>
+  <div data-for="citizen coord eng inv"><section id="hero-30s" className="hero container">
    <div className="hero-copy">
     <div className="eyebrow"><span className="eyebrow-line"/>{t.hero.eyebrow}</div>
     <h1>{t.hero.first}<br/><span className="heading-muted">{t.hero.middle}</span><br/><span className="heading-urgent">{t.hero.last}</span></h1>
@@ -157,11 +167,11 @@ export default function InvestorPage({locale}:{locale:Locale}){
     <div className="proof-rail"><div><span className="proof-circle"/>{t.hero.proof}</div><div>{t.hero.gap}</div><div className="prototype-warning">{t.hero.note}</div></div>
    </div>
    <MissionControl locale={locale}/>
-  </section>
+  </section></div>
 
-  <MasterVision locale={locale}/>
-  {/* Three Complementary Surfaces Switcher (A: Discover / B: Explore Mission Control / C: Investigate Science) */}
-  <section className="container apple-surfaces-section" aria-label={th.surfacesTitle} data-testid="three-surfaces-switcher">
+  <div data-for="coord eng inv"><MasterVision locale={locale}/></div>
+  {/* Complementary Surfaces Switcher (A: Discover / B: Explore Mission Control / C: Investigate Science / D: Command Panel) */}
+  <div data-for="citizen coord inv"><section className="container apple-surfaces-section" aria-label={th.surfacesTitle} data-testid="three-surfaces-switcher">
    <div className="apple-bento-surfaces">
     <div className="apple-bento-surfaces-head">
      <p className="eyebrow" style={{margin:0,color:'#91d7e8'}}>{th.surfacesTitle}</p>
@@ -183,10 +193,10 @@ export default function InvestorPage({locale}:{locale:Locale}){
      )}
     </div>
    </div>
-  </section>
+  </section></div>
 
   {/* 8-Scene Causal Journey Overview Strip (Section 4 of PROMPT_MASTER.md) */}
-  <section className="container apple-scenes-section" aria-label="Eight-scene causal product journey" data-testid="eight-scene-journey-bar">
+  <div data-for="citizen coord"><section className="container apple-scenes-section" aria-label="Eight-scene causal product journey" data-testid="eight-scene-journey-bar">
    <div className="apple-bento-scenes-grid">
     {th.eightScenes.map(sc=>
      <a key={sc.num} href={sc.targetAnchor} data-testid={`scene-card-${sc.num}`} className="apple-bento-scene-card">
@@ -199,7 +209,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
      </a>
     )}
    </div>
-  </section>
+  </section></div>
 
   <aside role="note" className="container apple-truth-note">
    <strong>{locale==='es'?'ESTADO REAL · PROTOTIPO DE INVESTIGACIÓN':locale==='nl'?'WERKELIJKE STATUS · ONDERZOEKSPROTOTYPE':'ACTUAL STATUS · RESEARCH PROTOTYPE'}</strong>
@@ -212,19 +222,22 @@ export default function InvestorPage({locale}:{locale:Locale}){
    </div>
   </nav>
   <div className="container">
-   <HyperFramesCinemaDeck locale={locale}/>
+   <div data-for="citizen inv"><HyperFramesCinemaDeck locale={locale}/></div>
   </div>
-  <WhatItDoes locale={locale}/>
-  <SectorIntelligenceConsole locale={locale}/>
-  <TelecomAndRfRadarSuite locale={locale}/>
-  <LiveHardwareAndDealRoomConsole locale={locale}/>
-  <CrisisStory locale={locale}/>
-  <ScrollExperience locale={locale}/>
-  <SystemExplained locale={locale}/>
-  <CoordinationLab locale={locale}/>
-  <DeveloperBlueprint locale={locale}/>
-  <EvidenceBoard locale={locale}/>
-  <section id="solution" className="product-section container">
+  <div data-for="citizen coord"><WhatItDoes locale={locale}/></div>
+  <div data-for="coord eng"><SectorIntelligenceConsole locale={locale}/></div>
+  <div data-for="eng"><TelecomAndRfRadarSuite locale={locale}/></div>
+  <div data-for="eng"><VehicularDopplerLab locale={locale}/></div>
+  <div data-for="eng coord"><CivilianRadarDefenseLab locale={locale}/></div>
+  <div data-for="eng coord citizen"><AcousticSentinelSurvivalLab locale={locale}/></div>
+  <div data-for="eng inv"><LiveHardwareAndDealRoomConsole locale={locale}/></div>
+  <div data-for="citizen coord"><CrisisStory locale={locale}/></div>
+  <div data-for="citizen"><ScrollExperience locale={locale}/></div>
+  <div data-for="coord eng"><SystemExplained locale={locale}/></div>
+  <div data-for="coord eng"><CoordinationLab locale={locale}/></div>
+  <div data-for="eng"><DeveloperBlueprint locale={locale}/></div>
+  <div data-for="eng inv"><EvidenceBoard locale={locale}/></div>
+  <div data-for="citizen coord eng inv"><section id="solution" className="product-section container">
    <div className="product-title-block">
     <div><p className="eyebrow">{t.solution.eyebrow}</p><h2>{pitch.title}</h2><p className="product-subhead">{pitch.lead}</p></div>
     <p className="product-explainer">{pitch.why}</p>
@@ -234,23 +247,23 @@ export default function InvestorPage({locale}:{locale:Locale}){
    <div className="product-claim"><span className="product-claim-icon">!</span><span>{t.solution.limits}</span></div>
    <div className="audience-head">{t.solution.forTitle}</div>
    <div className="audience-grid">{t.solution.audiences.map(item=><article className="audience-card" key={item.tag}><span>{item.tag}</span><h3>{item.title}</h3><p>{item.body}</p></article>)}</div>
-  </section>
-  <section id="investment" className="invest-section"><div className="container">
+  </section></div>
+  <div data-for="inv"><section id="investment" className="invest-section"><div className="container">
    <div className="section-heading invest-head"><div><p className="eyebrow">{t.invest.eyebrow}</p><h2>{t.invest.title}</h2></div><p>{pitch.invest}</p></div>
    <div className="invest-cards">{t.invest.cards.map(item=><article key={item.index} className="invest-card"><div className="invest-index"><span>{item.index} / 03</span><span>↗</span></div><h3>{item.title}</h3><p>{item.body}</p></article>)}</div>
    <div className="capital-grid"><article className="capital-model"><span>OPEN SOURCE / SERVICE-LED</span><h3>{t.invest.modelTitle}</h3><p>{t.invest.model}</p></article><article className="capital-request"><span>VALIDATED MILESTONES / NEXT FUNDING</span><h3>{t.invest.valueTitle}</h3><ol>{t.invest.value.map((item,i)=><li key={item}><b>0{i+1}</b><span>{item}</span></li>)}</ol></article></div>
    <p className="invest-validation"><strong>EVIDENCE FIRST — </strong>{t.invest.validation}</p>
-  </div></section>
-  <section id="roadmap" className="roadmap-band"><div className="container roadmap-inner">
+  </div></section></div>
+  <div data-for="inv coord"><section id="roadmap" className="roadmap-band"><div className="container roadmap-inner">
    <div className="roadmap-intro"><p className="eyebrow">{t.roadmap.eyebrow}</p><h2>{t.roadmap.title}</h2><p>{t.roadmap.lead}</p><a className="text-cta" href={dossier} target="_blank" rel="noopener noreferrer">{t.roadmap.link} ↗</a></div>
    <div className="roadmap-steps">{t.roadmap.steps.map((item,i)=><article className="roadmap-step" key={item.stage}><span className="step-number">0{i+1}</span><div><div className="step-top"><span>{item.stage}</span><b className={i===0?'status-demonstrated':''}>{item.status}</b></div><h3>{item.title}</h3><p>{item.body}</p></div></article>)}</div>
-  </div></section>
-  <section className="closing container" id="partner">
+  </div></section></div>
+  <div data-for="inv coord"><section className="closing container" id="partner">
    <div><p className="eyebrow">{t.closing.eyebrow}</p><h2>{t.closing.title}</h2><p>{pitch.closing}</p>
     <div className="funding-line"><span>{t.closing.fundingTitle}</span><strong>{t.closing.call}</strong><small>{t.closing.deadline}</small><small>{t.closing.noGuarantee}</small></div>
    </div>
    <div className="closing-actions"><a className="button-primary" href={contact} target="_blank" rel="noopener noreferrer">{t.closing.contact} <span>↗</span></a><a className="button-outline" href={funding} target="_blank" rel="noopener noreferrer">{t.closing.funding} <span>↗</span></a><a className="text-cta" href={source} target="_blank" rel="noopener noreferrer">{t.closing.source} ↗</a></div>
-  </section>
+  </section></div>
   <footer className="footer"><div className="container footer-inner"><span className="footer-brand">Civic Relay · OEP — Offline Emergency Protocol <small>© 2026</small></span><span>{t.footer}</span><a href="#top">↑ TOP</a></div></footer>
   <AppleLivingNav locale={locale}/>
  </main>;

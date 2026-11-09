@@ -1,0 +1,41 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:03.032
+When the network falls, the message shouldn't die.
+
+2
+00:00:03.382 --> 00:00:17.334
+On the twenty-eighth of April, twenty twenty-five, Spain's mobile network didn't fail when the power went out. It failed when the batteries in the masts ran dry. Within hours, users with a stable connection dropped from ninety to forty percent.
+
+3
+00:00:18.934 --> 00:00:22.603
+This is SENDA: emergency routing over alternative channels.
+
+4
+00:00:22.953 --> 00:00:36.457
+It isn't another messaging app. It's the layer that coordinates everything that can carry a message: nearby phones, sound, direct-to-phone satellite, LoRa, Iridium, amateur radio, drones, and whatever network is still standing.
+
+5
+00:00:38.057 --> 00:00:46.207
+Now SENDA can also call. Two phones on the same Wi-Fi, or on one phone's hotspot, talk with no Internet, no carrier and no server.
+
+6
+00:00:46.557 --> 00:00:56.007
+The trick is the setup: what normally needed a server, about two thousand characters, SENDA shrinks to about ninety bytes and sends it by sound in under nine seconds.
+
+7
+00:00:57.607 --> 00:01:07.399
+Only a coordinator holding a credential signed by their agency can trigger anything on your phone, and only if you authorised it and an emergency has been declared.
+
+8
+00:01:07.749 --> 00:01:15.835
+A trapped person presses one button, the reply travels encrypted from neighbour to neighbour, and the coordinator sees it on a floor-by-floor board.
+
+9
+00:01:17.435 --> 00:01:27.547
+SENDA is for citizens, coordinators, police and emergency services, public administrations, and anyone who wants to invest in making sure no message is lost.
+
+10
+00:01:27.897 --> 00:01:31.203
+Try it now, with nothing to install, at the address on screen.

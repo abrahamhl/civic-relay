@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Arquitectura del sistema</title>
+<meta name="description" content="Cómo funciona SENDA por dentro: sensores y radios, portadores, núcleo en el teléfono, aplicaciones y destinos. Escenarios animados y estado real de cada pieza.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--v:#b79cff;--g:#7d8f99}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.55 Inter,system-ui,sans-serif}
+main{max-width:1280px;margin:0 auto;padding:20px 16px 60px}h1{font-size:30px;margin:4px 0}h2{font-size:19px;margin:0 0 8px}h3{font-size:15px;margin:0 0 6px}.m{color:var(--m)}a{color:var(--i)}
+.lead{max-width:920px}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}.stats span{background:var(--p);border:1px solid var(--l);border-radius:999px;padding:4px 12px;font-size:13px}.stats b{color:var(--e)}
+.sc{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 10px}
+button{font:inherit;min-height:44px;padding:8px 14px;border-radius:10px;border:1px solid var(--l);background:#0f1d27;color:var(--t);cursor:pointer;font-weight:700}
+.sc button[aria-pressed=true]{background:var(--c);border-color:var(--c);color:#140804}
+.wrap{position:relative;background:var(--p);border:1px solid var(--l);border-radius:16px;padding:14px}
+.dia{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;position:relative;z-index:1}
+@media(max-width:900px){.dia{grid-template-columns:1fr;gap:18px}.col .nodes{display:flex;flex-wrap:wrap;gap:6px}.col .node{flex:1 1 140px}}
+.col h3{font-size:13px;margin:0;color:var(--i);text-transform:uppercase;letter-spacing:.04em}.col .sub{font-size:12px;color:var(--m);margin:0 0 8px;min-height:2.6em}
+.nodes{display:grid;gap:7px}
+.node{position:relative;text-align:left;min-height:44px;padding:7px 10px 7px 14px;border-radius:10px;border:1px solid var(--l);background:#0a1620;font-weight:600;font-size:13px;line-height:1.3;transition:opacity .25s,border-color .25s,box-shadow .25s}
+.node::before{content:"";position:absolute;left:5px;top:9px;bottom:9px;width:3px;border-radius:2px;background:var(--st)}
+.node .new{font-size:10px;font-weight:800;color:#140804;background:var(--c);border-radius:4px;padding:0 4px;margin-left:4px;vertical-align:1px}
+.dia.focus .node{color:#5d6e78;border-color:#15232d}.dia.focus .node::before{opacity:.4}.dia.focus .node.on{color:var(--t);border-color:var(--l)}.dia.focus .node.on::before{opacity:1}.dia.focus .node.cur{color:var(--t);border-color:var(--c);box-shadow:0 0 0 2px #ff775655,0 0 18px #ff775644}
+.node.sel{border-color:var(--i)}
+svg.edges{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.now{position:sticky;top:0;z-index:3;display:flex;gap:8px;align-items:center;background:#0b141cf2;border:1px solid var(--l);border-radius:12px;padding:8px 10px;margin-bottom:12px;backdrop-filter:blur(6px)}
+.now p{margin:0;flex:1;font-size:14px}.now b{color:var(--c)}.now button{min-width:44px;padding:6px 10px}
+.below{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-top:14px}@media(max-width:900px){.below{grid-template-columns:1fr}}
+.card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:16px;min-width:0}
+.story ol{margin:0;padding-left:22px}.story li{padding:4px 0;color:var(--m)}.story li.done{color:var(--t)}.story li.cur{color:var(--t);font-weight:700}.story li.cur::marker{color:var(--c)}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chip{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid currentColor}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--m);margin-top:10px}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+code{font-size:12.5px;color:var(--i)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{padding:8px 6px;border-bottom:1px solid var(--l);text-align:left;vertical-align:top}th{color:var(--m);font-size:12px;font-weight:600}
+.tw{overflow-x:auto}
+.inv{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}@media(max-width:900px){.inv{grid-template-columns:1fr}}
+.inv b.k{display:block;font-size:22px;color:var(--e)}
+select{font:inherit;min-height:44px;padding:8px 12px;border-radius:10px;border:1px solid var(--l);background:#0f1d27;color:var(--t);font-weight:700}
+#pb-av label{background:#0f1d27;border:1px solid var(--l);border-radius:999px;padding:6px 12px;cursor:pointer}
+.note{border-left:3px solid var(--a);padding:8px 12px;background:#0f1a22;border-radius:6px;font-size:14px;margin-top:12px}
+</style>
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/llamada">Llamada</a> · <a href="/senda/dron">Dron</a> · <a href="/senda/ojo">Ojo</a> · <a href="/senda/estado">Verificación</a></p>
+<h1>Arquitectura de SENDA</h1>
+<p class="lead m">SENDA convierte <b>cualquier cosa que mida algo o mueva bytes</b> —el micrófono, el barómetro o el Bluetooth de un teléfono, un dron, una pasarela LoRa, un satélite— en piezas de un mismo canal de emergencia. Todo se decide <b>dentro del propio teléfono</b>, sin servidor: si cae Internet, el sistema sigue funcionando. Elige un escenario y avanza paso a paso, o pulsa cualquier pieza para ver qué hace, en qué estado está y dónde probarla.</p>
+<div class="stats" id="stats" aria-live="polite"></div>
+<section class="card" style="margin-top:12px" aria-labelledby="h-vid">
+  <h2 id="h-vid">? V?deo completo: SENDA ? M95 (8,8 min ? audio EN ? subt?tulos ES / EN / NL)</h2>
+  <p class="m" style="margin-top:0">Grabado fotograma a fotograma desde las propias p?ginas de la app (1080p, 25 fps), con el n?cleo real: 22 escenas desde la llamada al 112 primero, el mensaje de 47 bytes, malla de salto en salto, ver los sonidos, o?r la radio, ver la respiraci?n, riadas, maremoto, triaje, monte, dron casa por casa y validaci?n honesta (266/266 pruebas de n?cleo, 13/13 PCI, 49/49 E2E). Las situaciones de emergencia son simulaciones calculadas desde el n?cleo real; SENDA nunca sustituye al 112, ES-Alert, NL-Alert ni eCall.</p>
+  <video controls preload="metadata" playsinline poster="/media/m95/senda-m95-film-poster.jpg" style="width:100%;border-radius:12px;background:#000" aria-label="V?deo completo de presentaci?n de SENDA M95">
+    <source src="/media/m95/senda-m95-film-en.mp4" type="video/mp4">
+    <track kind="subtitles" srclang="es" label="Espa?ol" src="/media/m95/senda-m95-film-es.vtt" default>
+    <track kind="subtitles" srclang="en" label="English" src="/media/m95/senda-m95-film-en.vtt">
+    <track kind="subtitles" srclang="nl" label="Nederlands" src="/media/m95/senda-m95-film-nl.vtt">
+  </video>
+  <details style="margin-top:10px">
+    <summary style="cursor:pointer;color:var(--i)">Cortes breves (90s / 60s / 30s), vertical 9:16 y archivo en espa?ol (v5)</summary>
+    <p class="m" style="margin:8px 0 4px">Cortes ejecutivos M95: <a href="/media/m95/senda-m95-90s-en.mp4">90 s</a> ? <a href="/media/m95/senda-m95-60s-en.mp4">60 s</a> ? <a href="/media/m95/senda-m95-30s-en.mp4">30 s</a> ? <a href="/media/m95/senda-m95-vertical-45s-en.mp4">Vertical 45 s (9:16)</a></p>
+    <video controls preload="none" playsinline poster="/media/senda-capacidades-poster-es.jpg" style="width:100%;border-radius:12px;background:#000;margin-top:6px" aria-label="V?deo de las nuevas capacidades de SENDA (archivo v5 en espa?ol)">
+      <source src="/media/senda-capacidades-es.mp4" type="video/mp4"><track kind="subtitles" srclang="es" label="Espa?ol" src="/media/senda-capacidades-es.vtt" default>
+    </video>
+  </details>
+</section>
+<section class="card" style="margin-top:12px" aria-labelledby="h-vid-ruta">
+  <h2 id="h-vid-ruta">? V?deo: en la carretera ? M95 (3,6 min ? audio y r?tulos EN ? subt?tulos ES / EN / NL)</h2>
+  <p class="m" style="margin-top:0">Ruta protectora, c?maras p?blicas, Pa?ses Bajos y la DGT, grabado desde las p?ginas de la app con el n?cleo real: frenada en cadena, SOS sin cobertura, punto kilom?trico sin red, escena PAS, coche en sentido contrario, final de la cola, visibilidad en una c?mara, cruz roja neerlandesa y estaciones de aforo. Las situaciones de tr?fico son simulaciones, la imagen de c?mara es sint?tica y la carretera de demostraci?n, inventada. SENDA nunca sustituye al 112.</p>
+  <video controls preload="metadata" playsinline poster="/media/m95/senda-m95-ruta-poster.jpg" style="width:100%;border-radius:12px;background:#000" aria-label="V?deo de SENDA en la carretera M95">
+    <source src="/media/m95/senda-m95-ruta-en.mp4" type="video/mp4">
+    <track kind="subtitles" srclang="es" label="Espa?ol" src="/media/m95/senda-m95-ruta-es.vtt" default>
+    <track kind="subtitles" srclang="en" label="English" src="/media/m95/senda-m95-ruta-en.vtt">
+    <track kind="subtitles" srclang="nl" label="Nederlands" src="/media/m95/senda-m95-ruta-nl.vtt">
+  </video>
+  <details style="margin-top:10px">
+    <summary style="cursor:pointer;color:var(--i)">Simulaciones explicadas (15?40 s) y versi?n locutada en espa?ol (archivo v5)</summary>
+    <p class="m" style="margin:8px 0 4px">C?psulas de simulaci?n M95: <a href="/media/m95/senda-m95-sim-braking-en.mp4">Frenada en cadena</a> ? <a href="/media/m95/senda-m95-sim-sos-en.mp4">SOS en baliza</a> ? <a href="/media/m95/senda-m95-sim-wrongway-en.mp4">Sentido contrario</a> ? <a href="/media/m95/senda-m95-sim-queue-en.mp4">Cola de retenci?n</a> ? <a href="/media/m95/senda-m95-sim-visibility-en.mp4">Visibilidad en c?mara</a> ? <a href="/media/m95/senda-m95-sim-proof-en.mp4">Pruebas y l?mites</a></p>
+    <video controls preload="none" playsinline poster="/media/senda-ruta-poster-es.jpg" style="width:100%;border-radius:12px;background:#000;margin-top:6px" aria-label="V?deo de SENDA en la carretera (archivo v5 en espa?ol)">
+      <source src="/media/senda-ruta-es.mp4" type="video/mp4"><track kind="subtitles" srclang="es" label="Espa?ol" src="/media/senda-ruta-es.vtt" default>
+    </video>
+  </details>
+</section>
+
+<div class="sc" role="group" aria-label="Escenarios" id="sc"></div>
+<div class="wrap" id="wrap">
+  <svg class="edges" id="edges" aria-hidden="true"></svg>
+  <div class="now" aria-live="polite"><button id="nprev" aria-label="Paso anterior">◀</button><p id="now"></p><button id="nnext" aria-label="Paso siguiente">▶</button></div>
+  <div class="dia focus" id="dia"></div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div class="below">
+  <section class="card story" aria-labelledby="h-story">
+    <h2 id="h-story">Escenario</h2>
+    <p class="m" id="sc-intro" style="margin-top:0"></p>
+    <ol id="steps"></ol>
+    <div class="ctl"><button id="prev" aria-label="Paso anterior">◀</button><button id="next" aria-label="Paso siguiente">▶ Siguiente</button><button id="auto">⏵ Reproducir</button><button id="all">Ver todo el sistema</button></div>
+  </section>
+  <aside class="card" aria-labelledby="h-node" id="detail">
+    <h2 id="h-node">Pulsa una pieza</h2>
+    <div id="node-body" class="m">Cada pieza indica su estado real: <b>probada en navegador</b> (pruebas extremo a extremo en Chromium), <b>probada en simulación</b>, ya en la <b>app Android</b>, <b>requiere app nativa</b> u <b>hoja de ruta</b>.</div>
+  </aside>
+</div>
+
+<section style="margin-top:22px" aria-labelledby="h-new">
+  <h2 id="h-new">Tecnología nueva de esta versión</h2>
+  <p class="m" style="margin:0">Dos piezas que no conocemos en ningún sistema de emergencias (pendiente de una búsqueda formal de anterioridad y patentes), medidas con el código real:</p>
+  <div class="inv">
+    <div class="card"><h3>📞 Llamadas sin Internet con código por sonido</h3><b class="k">80–110 bytes · 8–10 s</b><p class="m">WebRTC ya funciona dentro de una red local, pero necesitaba un servidor para arrancar. SENDA comprime el arranque ~20 veces y lo transmite por el altavoz. Probado en Chromium: conexión cifrada, voz Opus y chat, <b>cero peticiones de red</b>. <a href="/senda/llamada">Probar</a></p></div>
+    <div class="card"><h3>📡 Censo radio por planta con dron</h3><b class="k">719/720 · 95 %</b><p class="m">Teléfonos exactos por planta en 719 de 720 plantas simuladas pese a la rotación de direcciones Bluetooth, e intervalo de personas que contiene la verdad en el 95 % de los casos. Solo recuentos, sin identificadores. <a href="/senda/dron">Ver</a></p></div>
+    <div class="card"><h3>🧩 Una sola trama para todo</h3><b class="k">web = Android = ESP32</b><p class="m">El mismo sobre cifrado y la misma trama viajan por sonido, Bluetooth, LoRa, archivo, mula o satélite, con fragmentos k-de-n que llegan aunque fallen portadores. Paridad comprobada por pruebas en los tres entornos.</p></div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-plat">
+  <h2 id="h-plat">Plataformas, permisos y planes por escenario</h2>
+  <p class="m" style="margin-top:0">El mismo núcleo corre en un móvil, un ordenador, un servidor, el ordenador de a bordo de un dron o de un vehículo. Cada integración externa declara su <b>modo de acceso</b>: <span class="chip" style="color:#34d399">PASIVO</span> legal hoy sin pedir permiso (datos abiertos, recepción de emisiones públicas, marcas visibles), <span class="chip" style="color:#fbbf24">CONVENIO</span> preparado pero solo con acuerdo o licencia, <span class="chip" style="color:#ff5b6e">NUNCA</span> fuera de alcance por diseño: interrogar o controlar sistemas ajenos, interceptar o emitir sin licencia. Así SENDA aprovecha todo lo disponible desde el primer día y queda listo para cuando se concedan accesos.</p>
+  <div class="tw"><table><thead><tr><th>Plataforma</th><th>Cómo corre SENDA</th><th>Papeles</th><th>Estado</th></tr></thead><tbody id="pl-tb"></tbody></table></div>
+  <h3 style="margin-top:16px">Planificador: ¿qué cubrimos con lo que tenemos?</h3>
+  <div class="row" style="margin-top:0"><label class="m">Escenario <select id="pb-sel" aria-label="Escenario"></select></label></div>
+  <div class="row" id="pb-av" style="margin-top:6px"></div>
+  <div id="pb-out"></div>
+  <h3 style="margin-top:16px">Integraciones y su modo de acceso</h3>
+  <div class="tw"><table><thead><tr><th>Integración</th><th>Modo</th><th>Nota</th></tr></thead><tbody id="in-tb"></tbody></table></div>
+  <h3 style="margin-top:16px">Lecciones de catástrofes reales que guían el diseño</h3>
+  <div class="tw"><table><thead><tr><th>Dónde y cuándo</th><th>Qué pasó</th><th>Lección para SENDA</th><th>Módulos</th></tr></thead><tbody id="ev-tb"></tbody></table></div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-phys">
+  <h2 id="h-phys">Del plano al mundo físico: qué se puede desplegar</h2>
+  <p class="m" style="margin-top:0">La arquitectura no depende de hardware nuevo: usa lo que ya existe y añade piezas baratas y abiertas. Esto es lo que hay construido y lo que falta para llevarlo a la calle.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Pieza física</th><th>Qué hace</th><th>Qué existe hoy</th><th>Qué falta</th></tr></thead>
+    <tbody>
+      <tr><td><b>📱 Cualquier móvil</b></td><td>SOS, mensajes, llamadas, cadena de voz y sonido</td><td>App web instalable que abre sin red (12 pantallas en la prueba automática)</td><td>Ensayo con teléfonos físicos en un edificio real: alcance del punto de acceso por planta</td></tr>
+      <tr><td><b>🤖 Móvil Android con la app nativa</b></td><td>Baliza Bluetooth, escucha de balizas, barrido Wi-Fi</td><td><code>apps/senda-android</code>: baliza y barrido, solo con el toque del usuario</td><td>Wi-Fi Aware/Direct para llamar sin ninguna red; publicación en tiendas</td></tr>
+      <tr><td><b>📡 Accesorio ESP32</b></td><td>Barrido de routers y balizas desde un mástil o un dron</td><td><code>hardware/esp32-survey</code>, con la misma trama que la web y Android y probado con vectores comunes</td><td>Montaje en dron y ensayo de campo del censo con ocupación conocida</td></tr>
+      <tr><td><b>📶 Pasarela de barrio LoRa</b></td><td>Mantener el canal cuando cae la red móvil</td><td>Planificación de portadores y de la colocación de pasarelas en el núcleo</td><td>Prototipo físico con radio LoRa y batería</td></tr>
+      <tr><td><b>🚁 Dron con punto de acceso</b></td><td>Reconectar una planta aislada de la cadena de voz; transportar mensajes como mula</td><td>Plan de misión, mula y aviso de aislamiento en el núcleo</td><td>Integración con un operador de drones autorizado</td></tr>
+      <tr><td><b>🖥️ Relé del organismo</b></td><td>Puente con Internet cuando lo hay, sin poder leer el contenido</td><td><code>packages/senda-relay</code> en Docker, con pruebas</td><td>Despliegue piloto en un organismo</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-mx">
+  <h2 id="h-mx">Qué sensores y radios del teléfono usa SENDA</h2>
+  <p class="m" style="margin-top:0">Un Android normal lleva una decena de sensores y radios. Esta es la lista honesta: qué aporta cada uno, con qué interfaz pública, qué permiso exige y en qué estado está en SENDA.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Sensor o radio</th><th>Para qué lo usa SENDA</th><th>Interfaz y permiso</th><th>Estado</th></tr></thead>
+    <tbody id="mx"></tbody>
+  </table></div>
+  <div class="note">Nada se enciende sin que la persona lo pulse, nunca se interceptan comunicaciones ajenas y SENDA es un canal secundario: <b>no sustituye al 112 ni a ES-Alert</b>, les acerca casos que no podían llegar.</div>
+  <p class="m" style="font-size:12.5px">Fuentes: alertas sísmicas con acelerómetros de Android, Allen et al., <i>Science</i> (2025) <a href="https://rallen.berkeley.edu/pub/2025AllenBarski/AllenEtAl-AndroidEarthquakeAlerts-Science-2025.pdf">PDF</a> y <a href="https://research.google/blog/android-earthquake-alerts-a-global-system-for-early-warning/">Google Research</a> · Wi-Fi Aware: <a href="https://developer.android.com/develop/connectivity/wifi/wifi-aware">Android Developers</a> · límite de 200 Hz en sensores de movimiento desde Android 12: <a href="https://android.googlesource.com/platform/frameworks/native/+/af91a91c5c">AOSP</a> · lectura de códigos QR en el navegador: <a href="https://developer.chrome.com/docs/capabilities/shape-detection">Chrome Developers</a> · Wi-Fi RTT: <a href="https://source.android.com/docs/core/connect/wifi-rtt">AOSP</a>.</p>
+</section>
+</main>
+<script type="module">
+const $ = (s) => document.querySelector(s);
+const ST = {
+  web: ['Probado en navegador', '#34d399'], sim: ['Probado en simulación', '#fbbf24'], android: ['En la app Android', '#91d7e8'],
+  native: ['Requiere app nativa', '#b79cff'], road: ['Hoja de ruta', '#7d8f99'],
+};
+const LAYERS = [
+  ['sens', '1 · Sensores y radios', 'lo que ya llevan teléfonos, drones y sensores'],
+  ['port', '2 · Portadores', 'por dónde viajan los bytes'],
+  ['core', '3 · Núcleo SENDA', 'dentro del teléfono, sin servidor'],
+  ['app', '4 · Aplicaciones', 'lo que ve cada persona'],
+  ['dest', '5 · Destinos', 'quién recibe'],
+];
+const N = [
+  ['mic', 'sens', 'Micrófono y altavoz', 'web', 'Módem acústico: datos por sonido entre teléfonos (16 tonos entre 2 y 5 kHz, corrección de errores y CRC). También escucha de golpes y voces.', 'acoustic-modem.mjs', '/senda'],
+  ['acc', 'sens', 'Acelerómetro', 'sim', 'Detección sísmica cooperativa: muchos teléfonos quietos que notan la onda P a la vez. Mismo principio que Android Earthquake Alerts, con algoritmo propio.', 'seismic.mjs'],
+  ['baro', 'sens', 'Barómetro', 'sim', 'Planta de la persona por barometría diferencial frente a un teléfono de referencia a pie de calle.', 'sensor-fabric.mjs'],
+  ['gnss', 'sens', 'GNSS y velocidad', 'web', 'Posición del SOS sin Internet. La velocidad Doppler detecta frenadas bruscas y, junto al acelerómetro, choques (un coche no frena a más de ~1 g).', 'road-guard.mjs · rail-incident.mjs', '/senda/carretera'],
+  ['mag', 'sens', 'Brújula y orientación', 'web', 'El móvil como alidada: rumbo a una columna de humo o a una marca visible con la brújula y la orientación (W3C DeviceOrientation). ±8° supuesto; los rumbos incoherentes se descartan.', 'fire-watch.mjs · geo-offline.mjs', '/senda/fuego', 1],
+  ['cam', 'sens', 'Cámara y flash', 'web', 'Visión por capas sobre la cámara (contornos, mapa de calor, topografía). Siguiente: leer códigos QR de llamada con la cámara y baliza óptica con el flash.', 'vision-layers.mjs', '/senda/edificios'],
+  ['ble', 'sens', 'Bluetooth LE', 'android', 'Baliza y escáner: localización por intensidad y censo por planta. La app Android ya emite la baliza SENDA; el accesorio ESP32 escanea.', 'beacon.mjs · rf-census.mjs', '/senda/dron'],
+  ['wifi', 'sens', 'Wi-Fi: RTT, CSI y Aware', 'native', 'Distancia a puntos de acceso (RTT), presencia y respiración a través de paredes (CSI, investigación) y enlace directo sin router (Aware).', 'through-wall.mjs · sensor-fabric.mjs'],
+  ['drone', 'sens', 'Drones', 'sim', 'Escáner radio, cámara, térmica e identificación remota, con vuelo por anillos junto a la fachada.', 'drone.mjs', '/senda/dron'],
+  ['acc-ext', 'sens', 'Accesorios: térmica, radar, receptor de radio', 'road', 'Cámara térmica para móvil, radar de 60 GHz para constantes vitales a pocos metros y receptor de radio por USB (aviones, barcos, satélites meteorológicos). Solo recepción.', 'sensor-fabric.mjs', '/senda/sentidos'],
+  ['ext', 'sens', 'Datos que ya existen', 'web', 'Satélites de incendios, sismógrafos, circuitos de vía y avisos oficiales, siempre con su procedencia.', 'feeds.mjs · rail-watch.mjs'],
+  ['b-sound', 'port', 'Sonido', 'web', '≈ 160 bit/s brutos: un SOS o un código de llamada en menos de 10 segundos, sin red, SIM ni Bluetooth.', 'acoustic-modem.mjs'],
+  ['b-lan', 'port', 'Wi-Fi local o punto de acceso', 'web', 'WebRTC sin Internet: voz Opus y datos cifrados (DTLS-SRTP) entre teléfonos de la misma red local, aunque esa red no tenga salida.', 'sdp-compact.mjs', '/senda/llamada'],
+  ['b-ble', 'port', 'Bluetooth y Wi-Fi Direct/Aware', 'native', 'Teléfono a teléfono sin ninguna red. Solo desde la app nativa Android (el navegador no da acceso).', 'ladder.mjs'],
+  ['b-file', 'port', 'Archivo, texto o papel', 'web', 'El mensaje cifrado viaja como archivo .senda o código de texto por cualquier medio que funcione.', 'bundle.mjs', '/senda'],
+  ['b-mule', 'port', 'Mula: llevar y reenviar', 'web', 'Un tercer teléfono o un dron transporta mensajes que no puede leer; el recibo del destinatario borra la copia.', 'bundle.mjs · drone.mjs', '/senda'],
+  ['b-lora', 'port', 'LoRa y pasarelas ESP32', 'sim', 'Pasarelas de barrio de bajo coste con la misma trama SENDA (código C++ idéntico a web y Android).', 'bearers.mjs', '/senda/red'],
+  ['b-sat', 'port', 'Satélite', 'sim', 'Ventanas de paso calculadas (Kepler + J2) para enviar cuando hay un satélite útil encima, por el nivel de acceso disponible.', 'orbital.mjs · satellites.mjs', '/senda/ojo'],
+  ['c-env', 'core', 'Sobre cifrado', 'web', 'Cifrado de extremo a extremo con WebCrypto estándar, idéntico en navegador, service worker, Node, Android y ESP32.', 'envelope.mjs'],
+  ['c-route', 'core', 'Enrutador y escalera', 'web', 'Decide por dónde salir: Bluetooth, Wi-Fi, SMS o esperar 4 minutos al satélite (enrutamiento por grafo de contactos, como en las redes de la NASA).', 'router.mjs · ladder.mjs'],
+  ['c-multi', 'core', 'Multi-portador k-de-n', 'web', 'Parte el mensaje en fragmentos Reed-Solomon y los reparte por varios portadores: llega aunque fallen algunos.', 'erasure.mjs · bearers.mjs'],
+  ['c-call', 'core', 'Señalización compacta', 'web', 'Reduce la descripción de una llamada WebRTC de ~2 KB a 80–110 bytes para que quepa por sonido o en un código corto.', 'sdp-compact.mjs', '/senda/llamada', 1],
+  ['c-mesh', 'core', 'Malla de voz', 'web', 'Si dos personas no se alcanzan, los teléfonos intermedios reenvían voz y chat. Árbol con los saltos mínimos, turno de palabra (1 flujo por enlace) y nunca repite quien tiene poca batería.', 'voice-mesh.mjs', '/senda/llamada', 1],
+  ['c-census', 'core', 'Censo radio por planta', 'sim', 'Concurrencia de direcciones aleatorias → teléfonos por planta; inferencia bayesiana exacta → personas con intervalo del 90 %.', 'rf-census.mjs', '/senda/dron', 1],
+  ['c-fusion', 'core', 'Fusión de evidencias', 'sim', 'Probabilidad de que haya una persona por vivienda, uniendo SOS, radio, térmica y golpes, y la siguiente medida más útil.', 'occupancy.mjs · sensor-fabric.mjs', '/senda/edificios'],
+  ['c-water', 'core', 'Riadas y maremotos', 'sim', 'Hidrograma de Nash, embalses y alarma por subida aguas arriba (horas de margen donde no llueve); tiempo de llegada de un maremoto con √(g·h).', 'flood-watch.mjs', '/senda/agua', 1],
+  ['c-triage', 'core', 'Triaje para cualquiera', 'web', 'START para múltiples víctimas, RCP si es una sola, qué hacer ya, a qué servicio avisar y parte de 160 caracteres.', 'triage.mjs', '/senda/triaje', 1],
+  ['c-geo', 'core', 'Posición sin cobertura', 'sim', 'Resección con rumbos a aerogeneradores, antenas o campanarios, estima por pasos y mapas guardados. Sin emitir nada.', 'geo-offline.mjs', '/senda/monte', 1],
+  ['c-senses', 'core', 'Sentidos ampliados', 'sim', 'Ver los sonidos (golpes localizados con varios móviles), oír la radio (modo detector de avalancha) y ver la respiración por Wi-Fi.', 'senses.mjs · through-wall.mjs', '/senda/sentidos', 1],
+  ['c-sweep', 'core', 'Dron casa por casa', 'sim', 'Ruta optimizada con cambios de batería y tablero de prioridad: personas probables × daño EMS-98.', 'house-sweep.mjs', '/senda/barrido', 1],
+  ['c-reserve', 'core', 'Batería de Internet', 'web', 'Reserva de red en el teléfono: mochila 0/1 por valor y frescura, recarga en ventanas cortas y cola de intenciones. Usa el almacenamiento persistente real del navegador.', 'net-reserve.mjs', '/senda/reserva', 1],
+  ['c-swarm', 'core', 'Biblioteca de vecinos', 'web', 'Paquete común repartido en fragmentos Reed-Solomon entre vecinos; inventario con filtros de Bloom y piezas nombradas por su huella SHA-256.', 'swarm-cache.mjs', '/senda/reserva', 1],
+  ['c-rebote', 'core', 'Puntos de rebote', 'sim', 'Huellas de cobertura + mapa abierto de antenas + supervivencia sin luz + Tobler: adónde ir para que salga el mensaje.', 'coverage-memory.mjs', '/senda/reserva', 1],
+  ['c-road', 'core', 'Ruta protectora', 'sim', 'Frenada brusca delante → aviso de 24 bytes a los de detrás con la deceleración que necesitan; choque → SOS con carretera, PK y sentido calculados sin red, que llevan los coches que pasan; coordinador de escena con conducta PAS y puntos cívicos encadenados por SHA-256.', 'road-guard.mjs', '/senda/carretera', 1],
+  ['c-drive', 'core', 'Situaciones al volante', 'sim', 'Sentido contrario, final de retención (Lighthill-Whitham-Richards), niebla y firme (velocidad para parar dentro de lo que se ve), curvas (AASHTO), fatiga, motoristas, agua en la calzada y baliza V16 + SENDA.', 'drive-cases.mjs', '/senda/carretera', 1],
+  ['c-datex', 'core', 'DATEX II europeo', 'sim', 'Lector de la información de tráfico de cualquier Punto de Acceso Nacional (DGT, NDW…), conversión a avisos SENDA, pasillo de la ruta y señales de carril neerlandesas (rood kruis).', 'datex2.mjs', '/senda/paises', 1],
+  ['c-cams', 'core', 'Cámaras públicas', 'sim', 'Solo cámaras publicadas para reutilizarse: visibilidad en metros por canal oscuro y Koschmieder, nieve en la calzada; nunca personas ni matrículas.', 'cameras.mjs', '/senda/camaras', 1],
+  ['c-dgt', 'core', 'Infraestructura de la DGT', 'sim', 'Radares, paneles, cámaras, aforos, postes SOS y V16: ninguno es una pasarela de radio; SENDA usa lo que la DGT publica (aforos → cola, paneles → avisos, radares → límite) y DGT 3.0 por convenio. Nunca detectar radares.', 'dgt-infra.mjs', '/senda/dgt', 1],
+  ['c-vehicle', 'core', 'Coches conectados y fusión', 'sim', 'Fuentes con base legal (Ley de Datos de la UE, DFRS, OBD-II), eventos del coche → avisos, k-anonimato, velocidad por tramo (Kalman) y posición con GNSS, vía, aerogeneradores, Wi-Fi y otros coches (de ~10 m a ~1-2 m).', 'vehicle-link.mjs', '/senda/vehiculos', 1],
+  ['c-vision', 'core', 'Visión de tráfico', 'web', 'Detección y seguimiento de vehículos en vídeo real (YOLOX Apache 2.0 + ByteTrack) en el relé: conteo por sentido, distancia, tiempo hasta alcanzarlo y contactos de la calzada contraria. Solo números.', 'packages/senda-vision', '/senda/trafico', 1],
+  ['c-fire', 'core', 'Seguimiento de incendio', 'sim', 'Columna situada cruzando rumbos de torres, cámaras y móviles (con elipse de error); perímetro, FRP y avance entre pasadas de satélite; 30-30-30, HDW, Fosberg e ISI; intensidad de Byram y clase de ataque; criticidad; carreteras a cortar y avisos a los coches.', 'fire-watch.mjs', '/senda/fuego', 1],
+  ['c-atmos', 'core', 'Masa de aire y viento 3D', 'sim', 'Perfiles reales del modelo (GFS), densidad, θ, estabilidad y Haines; viento 3D con conservación de masa sobre el terreno (WindNinja); pluma de Briggs que aspira aire; estelas y descargas de aviones; humo y pavesas; coches, móviles y cámaras como estación meteorológica (interpolación óptima, OBD-II, rueda libre, Kalman).', 'atmos3d.mjs', '/senda/fuego3d', 1],
+  ['c-field', 'core', 'Propagación, conjunto y cámaras 3D', 'sim', 'Llegada del fuego sobre el terreno real con viento variable, conjunto Monte Carlo, validación contra la cicatriz de Sentinel-2 y asimilación; óptica de cámaras con oclusión del relieve, triangulación 3D de la columna y calor desde su altura.', 'fire-field.mjs · utm.mjs', '/senda/fuego3d', 1],
+  ['c-cases', 'core', 'Incendios de referencia', 'sim', 'Base de incendios reales con fuentes; progresión medida con el satélite GOES y el viento HRRR; velocidad del frente por tramos; validación dejando fuera un incendio entero; regla del 10 % calibrada (sesgo y dispersión reales) para los conjuntos y los avisos.', 'fire-cases.mjs', '/senda/referencias', 1],
+  ['c-traffic', 'core', 'Coches, cámaras y fuego', 'sim', 'Modelo de tráfico por celdas (Daganzo) con humo y salidas escalonadas; filtro de Kalman por conjuntos que asimila cámaras oficiales y coches sonda y estima la capacidad oculta de los cuellos de botella; despeje, exposición, cierres y umbral dinámico de aviso.', 'traffic-fusion.mjs', '/senda/evacuacion', 1],
+  ['c-plat', 'core', 'Plataformas y permisos', 'web', 'Dónde corre SENDA y con qué modo de acceso: pasivo (legal hoy), convenio o nunca. Planes por escenario con lo que haya disponible.', 'platforms.mjs', '/senda/arquitectura', 1],
+  ['c-hazard', 'core', 'Peligros', 'sim', 'Sismo, frente de incendio y antenas que caerán, vigilancia de vía y previsión de apagón de comunicaciones.', 'seismic · wildfire · rail-watch · blackout', '/senda/incendio'],
+  ['a-campo', 'app', 'SENDA Campo', 'web', 'App que funciona sin conexión: SOS, mensajes cifrados, tarjetas de contacto, envío por sonido, archivo y mula.', 'app.mjs', '/senda'],
+  ['a-call', 'app', 'Llamada sin Internet', 'web', 'Voz y chat cifrados entre dos teléfonos; el arranque viaja por sonido o como código corto.', 'llamada', '/senda/llamada', 1],
+  ['a-dron', 'app', 'Censo con dron', 'sim', 'Personas por planta con su margen, la línea de tiempo de direcciones y la probabilidad de cada recuento.', 'dron', '/senda/dron', 1],
+  ['a-edif', 'app', 'Edificios', 'sim', 'Gemelo digital de edificios afectados con prioridad por vivienda y capas de cámara.', 'edificios', '/senda/edificios'],
+  ['a-ojo', 'app', 'Ojo de SENDA', 'web', 'Globo 3D con satélites, casos y módulos activos.', 'ojo', '/senda/ojo'],
+  ['a-fire', 'app', 'Incendio', 'sim', 'Frente de llama, antenas que caerán y avisos que deben salir antes.', 'incendio', '/senda/incendio'],
+  ['a-via', 'app', 'Vía', 'sim', 'Vigilancia ferroviaria con datos que ya existen.', 'via', '/senda/via'],
+  ['a-agua', 'app', 'Riadas y maremotos', 'sim', 'Aviso por subida aguas arriba y evacuación vertical.', 'agua', '/senda/agua', 1],
+  ['a-triaje', 'app', 'Triaje', 'web', 'Asistente paso a paso, escena y parte por SMS o satélite.', 'triaje', '/senda/triaje', 1],
+  ['a-monte', 'app', 'Monte', 'sim', 'Posición por marcas, pasos, mapas y satélites.', 'monte', '/senda/monte', 1],
+  ['a-sentidos', 'app', 'Sentidos', 'sim', 'Escucha coral, modo detector y respiración Wi-Fi.', 'sentidos', '/senda/sentidos', 1],
+  ['a-barrido', 'app', 'Casa por casa', 'sim', 'Barrido con dron y prioridad para equipos.', 'barrido', '/senda/barrido', 1],
+  ['a-reserva', 'app', 'Batería de Internet', 'web', 'Reserva, biblioteca de vecinos y puntos de rebote.', 'reserva', '/senda/reserva', 1],
+  ['a-carretera', 'app', 'Carretera', 'sim', 'Copiloto que vigila: avisos de frenada, SOS sin cobertura, avisos de un toque y coordinación de la escena hasta que llegan.', 'carretera', '/senda/carretera', 1],
+  ['a-camaras', 'app', 'Cámaras', 'sim', 'Visibilidad medida en cámaras públicas y avisos de niebla a los que se acercan.', 'camaras', '/senda/camaras', 1],
+  ['a-paises', 'app', 'España y Países Bajos', 'sim', 'Perfil de cada país, lector DATEX II y señales de carril en neerlandés.', 'paises', '/senda/paises', 1],
+  ['a-dgt', 'app', 'Infraestructura DGT', 'sim', 'Equipo por equipo: qué se suma, cómo y qué no; cola desde las estaciones de aforo y paneles leídos sin red.', 'dgt', '/senda/dgt', 1],
+  ['a-trafico', 'app', 'Visión de tráfico', 'web', 'Vídeos reales anotados con sus métricas.', 'trafico', '/senda/trafico', 1],
+  ['a-vehiculos', 'app', 'Coches conectados', 'sim', 'Fuentes, fusión de posición, velocidad por tramo, privacidad y arquitectura del backend.', 'vehiculos', '/senda/vehiculos', 1],
+  ['a-fuego', 'app', 'Seguimiento de incendio', 'sim', 'Mapa operativo con rumbos, satélite, perímetro, meteorología, criticidad y carreteras; prueba con la brújula del móvil.', 'fuego', '/senda/fuego', 1],
+  ['a-fuego3d', 'app', 'Incendio en 3D', 'sim', 'Terreno y satélite reales, viento 3D, pluma, cámaras y coches; vista cenital, inclinada u horizontal con gestos.', 'fuego3d', '/senda/fuego3d', 1],
+  ['a-referencias', 'app', 'Incendios de referencia', 'sim', '14 incendios reales, 7 reconstruidos con satélite; lo que se aprende y lo que no.', 'referencias', '/senda/referencias', 1],
+  ['a-evacuacion', 'app', 'Coches, cámaras y fuego', 'sim', 'Cuándo avisar, qué tramo cerrar y cómo ver un atasco o un bloqueo minutos antes, con cámaras reales de Caltrans y TfL.', 'evacuacion', '/senda/evacuacion', 1],
+  ['a-coord', 'app', 'Coordinación', 'sim', 'Panel del incidente para quien coordina: casos, prioridades y órdenes verificadas.', 'incidente', '/senda/incidente'],
+  ['d-person', 'dest', 'Familia y vecinos', 'web', 'Mensajes y llamadas entre personas, sin Internet.'],
+  ['d-rescue', 'dest', 'Equipos de rescate', 'sim', 'Reciben la prioridad por planta y vivienda y la posición de cada SOS.'],
+  ['d-112', 'dest', '112 y salas de mando', 'road', 'Interoperabilidad por formatos abiertos de emergencias y registro de auditoría a prueba de manipulación. Requiere convenio.', 'interop.mjs'],
+  ['d-org', 'dest', 'Organismos', 'road', 'Protección Civil, gestores ferroviarios, extinción: anclas de confianza y credenciales. Cada integración requiere convenio.', 'organismo', '/senda/organismo'],
+].map(([id, layer, name, st, desc, mod, page, isNew]) => ({ id, layer, name, st, desc, mod, page, isNew: !!isNew }));
+const byId = Object.fromEntries(N.map((n) => [n.id, n]));
+const SCEN = [
+  { id: 'llamada', name: '📞 Llamada sin Internet', intro: 'Ana y Luis están en el mismo edificio, sin cobertura ni Internet. Uno activa su punto de acceso o ambos se conectan al router que aún tiene corriente.', steps: [
+    ['a-call', 'Ana pulsa «Crear llamada» en SENDA.'],
+    ['c-call', 'El núcleo reduce la descripción de la llamada (≈ 2 KB) a unos 90 bytes: claves, huella del certificado y direcciones locales.'],
+    ['mic', 'El altavoz de Ana emite el código; el micrófono de Luis lo escucha.'],
+    ['b-sound', 'En 8–10 segundos de tonos el código llega sin errores. Luis responde igual.'],
+    ['b-lan', 'Con los dos códigos, los teléfonos se conectan directamente por la red local: voz Opus y chat cifrados.'],
+    ['d-person', 'Hablan. Ningún servidor ha intervenido. Sin Wi-Fi común, la app Android usará Wi-Fi Aware o Direct.'],
+  ] },
+  { id: 'atrapado', name: '🏚️ Atrapada tras un sismo', intro: 'Un terremoto daña un edificio. María queda atrapada en la 3.ª planta; la red móvil está saturada.', steps: [
+    ['acc', 'Los acelerómetros de muchos teléfonos notan la onda P a la vez: el sismo se confirma por consenso.'],
+    ['c-hazard', 'El núcleo estima el sismo y activa el modo de emergencia en la zona.'],
+    ['baro', 'María pulsa SOS. El barómetro estima su planta frente a un teléfono a pie de calle.'],
+    ['c-env', 'El SOS (posición, planta, estado) se cifra de extremo a extremo.'],
+    ['c-multi', 'Se divide en fragmentos k-de-n y se reparte por todos los portadores disponibles.'],
+    ['b-mule', 'Un vecino que sale del edificio lleva los fragmentos sin poder leerlos.'],
+    ['c-fusion', 'El SOS se une al censo radio y a la térmica: la vivienda de María sube en prioridad.'],
+    ['a-coord', 'Coordinación ve la prioridad por vivienda con la evidencia de cada una.'],
+    ['d-rescue', 'El equipo de rescate recibe planta y puerta. Solo la confirmación oficial declara víctimas.'],
+  ] },
+  { id: 'dron', name: '🚁 Censo con dron', intro: 'El edificio es inestable y nadie puede entrar. La dirección de la emergencia autoriza un vuelo.', steps: [
+    ['drone', 'El dron sube por anillos junto a la fachada, planta a planta, tres pasadas.'],
+    ['ble', 'Su escáner Bluetooth oye los anuncios de teléfonos y relojes, sin conectar ni leer contenido.'],
+    ['c-census', 'El núcleo deduce teléfonos por planta y personas con un intervalo del 90 %.'],
+    ['c-fusion', 'El recuento entra como evidencia junto a los SOS y la térmica.'],
+    ['a-dron', 'Coordinación ve personas por planta con su margen. Ningún identificador sale del módulo.'],
+    ['d-rescue', 'Se prioriza la planta con más personas probables y peor daño.'],
+  ] },
+  { id: 'sat', name: '🛰️ SOS por satélite', intro: 'Pedro se ha caído en un barranco sin cobertura ni nadie cerca.', steps: [
+    ['gnss', 'El GNSS del teléfono da su posición.'],
+    ['c-env', 'Su SOS cifrado ocupa menos de 100 bytes.'],
+    ['c-route', 'No hay Bluetooth ni Wi-Fi a su alcance: el enrutador calcula cuándo pasa el próximo satélite útil.'],
+    ['b-sat', 'El mensaje sale en esa ventana de paso, por el nivel de acceso satelital disponible.'],
+    ['a-ojo', 'El caso aparece en el Ojo de SENDA con la constelación que lo transportó.'],
+    ['d-112', 'Coordinación lo deriva al 112: SENDA le acerca un caso que no habría llegado.'],
+  ] },
+  { id: 'fuego', name: '🔥 Incendio', intro: 'Un incendio forestal avanza hacia un valle con tres pueblos y cuatro antenas.', steps: [
+    ['ext', 'Detecciones satelitales de puntos calientes y viento, de fuentes públicas.'],
+    ['c-hazard', 'El núcleo calcula cuándo llegará el frente a cada punto y qué antenas caerán antes.'],
+    ['a-fire', 'El panel muestra qué zonas quedarán sin cobertura y cuándo.'],
+    ['c-route', 'Antes de que caigan, se preparan rutas alternativas: LoRa, mula, satélite.'],
+    ['b-lora', 'Las pasarelas de barrio mantienen el canal cuando cae la red móvil.'],
+    ['d-org', 'Protección Civil decide las alertas; SENDA le da margen de tiempo.'],
+  ] },
+  { id: 'm501', name: '🔥 Incendio desde la carretera', intro: 'Caso real del 23-07-2026: un coche arde en la calzada de la M-501, junto al monte, con calor, sequedad y viento. Reconstrucción ilustrativa del método.', steps: [
+    ['gnss', 'El teléfono del conductor sabe dónde está sin red: M-501, km 57.'],
+    ['c-fire', 'Coche en llamas junto a vegetación seca con 30-30-30: riesgo alto. El aviso al 112 sale con el punto kilométrico.'],
+    ['mag', 'Conductores y vecinos marcan la columna con la brújula, y las torres dan su rumbo. Los rumbos incoherentes se descartan.'],
+    ['ext', 'Pasa el satélite (FIRMS): perímetro, potencia radiativa y avance medido entre dos pasadas.'],
+    ['c-road', 'Los tramos que alcanzará el fuego se convierten en tramas de 24 bytes para los coches que se acercan.'],
+    ['a-fuego', 'El mapa operativo junta rumbos, perímetro, meteorología, criticidad y carreteras.'],
+    ['d-112', 'El 112 y el centro de mando reciben avisos CAP con la criticidad y sus fuentes. Deciden ellos.'],
+  ] },
+  { id: 'fuego3d', name: '🌪️ Masa de aire y 3D', intro: 'El mismo incendio con datos reales: terreno Copernicus, Sentinel-2 y el modelo GFS del 23-07-2026.', steps: [
+    ['ext', 'Llegan el perfil vertical del modelo meteorológico y las imágenes de satélite de la zona (se guardan para trabajar sin red).'],
+    ['c-atmos', 'El núcleo calcula densidad, estabilidad y Haines, y el viento 3D sobre el relieve conservando la masa; la pluma aspira aire.'],
+    ['gnss', 'Coches y móviles de la zona aportan presión, temperatura y viento a lo largo de su carretera: una estación meteorológica de zona.'],
+    ['cam', 'Las cámaras triangulan la columna aunque el relieve tape la base; su altura da la potencia del fuego.'],
+    ['c-field', 'Conjunto de simulaciones sobre el terreno real; la primera cicatriz o el primer foco corrigen el sesgo del viento.'],
+    ['a-fuego3d', 'Todo se ve en 3D: cenital, inclinado u horizontal, con capas y en el tiempo.'],
+    ['d-112', 'El centro de mando recibe probabilidades y carreteras afectadas con sus fuentes; decide él.'],
+  ] },
+  { id: 'evacuacion', name: '🚗 Coches, cámaras y fuego', intro: 'Eaton, 7 de enero de 2025: el fuego nace a las 18:18 en el cañón; Altadena oeste recibió la orden después de las 03:00.', steps: [
+    ['ext', 'El satélite GOES ve el foco a las 18:31 y cada 10 minutos después; el modelo HRRR da el viento del momento.'],
+    ['c-cases', 'La base de referencia da la velocidad esperada del frente y su P90 reales, aprendidos de incendios anteriores.'],
+    ['cam', 'Las cámaras oficiales de tráfico cuentan coches y miden la ocupación en los corredores de salida.'],
+    ['gnss', 'Los coches sonda aportan la velocidad real de cada tramo.'],
+    ['c-traffic', 'El modelo de celdas calcula el despeje; el filtro de Kalman detecta atascos aguas abajo y bloqueos; se calcula el umbral de aviso y la hora de cierre de cada tramo.'],
+    ['a-evacuacion', 'El panel muestra cuándo avisar a cada barrio y qué tramos cerrar, con sus fuentes.'],
+    ['d-112', 'El 112 y la autoridad de tráfico reciben la propuesta (CAP y DATEX II). Deciden ellos.'],
+  ] },
+  { id: 'malla', name: '🎙️ Cadena de voz', intro: 'Ana está en la 4.ª planta; el equipo de rescate, en la calle. Ningún punto de acceso cubre los dos extremos.', steps: [
+    ['a-call', 'Ana mantiene pulsado «hablar»: pide el turno de palabra, como en un walkie-talkie.'],
+    ['c-mesh', 'SENDA elige el árbol de repetidores por la escalera. Marta, con un 12 % de batería, participa pero no repite.'],
+    ['b-lan', 'La voz salta de teléfono en teléfono por la red local, como mucho 6 saltos. Cada enlace lleva un solo flujo.'],
+    ['d-rescue', 'El equipo la oye y responde. Si un repetidor se queda sin batería, SENDA avisa de quién queda aislado y pide un dron con punto de acceso.'],
+  ] },
+  { id: 'riada', name: '🌧️ Riada (patrón DANA)', intro: 'Tormenta estacionaria en la cabecera de una rambla; en el pueblo de abajo casi no llueve.', steps: [
+    ['ext', 'Lluvia, caudales y embalses de fuentes públicas o por convenio (AEMET, SAIH).'],
+    ['c-water', 'El núcleo convierte la lluvia en caudal y detecta la subida rápida aguas arriba.'],
+    ['a-agua', 'Aviso con horas de margen al pueblo donde no llueve, por todos los canales.'],
+    ['c-multi', 'El aviso se reparte por portadores distintos: llega aunque caiga la red.'],
+    ['d-org', 'Protección Civil decide la alerta oficial; SENDA le da el margen.'],
+  ] },
+  { id: 'monte', name: '🧭 Perdido en el monte', intro: 'Sin cobertura, de noche, en un barranco. Hay aerogeneradores en la sierra.', steps: [
+    ['cam', 'La cámara y la brújula apuntan a las luces rojas de dos aerogeneradores y a una antena.'],
+    ['c-geo', 'La resección calcula la posición y su elipse de error sin emitir nada.'],
+    ['c-route', 'El enrutador espera al próximo satélite útil.'],
+    ['b-sat', 'El SOS sale con la posición: menos de 100 bytes.'],
+    ['d-112', 'Guardia Civil (rescate de montaña) recibe el caso a través del 112.'],
+  ] },
+  { id: 'victimas', name: '🩹 Múltiples víctimas', intro: 'Un autobús volcado en una carretera sin cobertura. Llegan dos vecinos antes que nadie.', steps: [
+    ['a-triaje', 'Cada vecino sigue el asistente: camina, respira, circulación, responde.'],
+    ['c-triage', 'Recuento por colores, qué hacer ya y qué servicios hacen falta.'],
+    ['b-sound', 'El parte de 160 caracteres pasa por sonido al móvil de un conductor que sale de la zona.'],
+    ['b-mule', 'Ese móvil lo lleva hasta donde hay cobertura.'],
+    ['d-rescue', 'Sanitarios y bomberos llegan sabiendo cuántos rojos hay y dónde.'],
+  ] },
+  { id: 'sinred', name: '🔋 Tres días sin red', intro: 'Un apagón largo deja la comarca sin red móvil. Los vecinos tenían SENDA instalada.', steps: [
+    ['c-reserve', 'Antes, con Wi-Fi y cargando, cada móvil llenó su reserva: mapas, albergues, hospitales, primeros auxilios y documentos.'],
+    ['a-reserva', 'Sin red, la app responde desde la reserva como si fuera la red; lo nuevo se encola como intención.'],
+    ['c-swarm', 'Lo que no cabe en un móvil se reconstruye con fragmentos de los vecinos por la red local.'],
+    ['c-rebote', 'Las huellas de cobertura y las antenas que aún aguantan dicen adónde ir para que salga el mensaje.'],
+    ['b-sat', 'Si no hay rebote cerca, sale por el próximo satélite útil: SOS primero.'],
+    ['d-person', 'La familia recibe el «estoy bien» y la reserva se refresca en esa misma ventana.'],
+  ] },
+  { id: 'carretera', name: '🚗 Accidente de carretera', intro: 'Noche y niebla en una carretera de montaña sin cobertura. Varios coches llevan SENDA.', steps: [
+    ['gnss', 'La velocidad del GPS (sin Internet) detecta una frenada de 7 m/s² a 120 km/h.'],
+    ['c-road', 'El móvil decide al momento: frenada brusca, no un bache ni una caída del teléfono.'],
+    ['b-ble', 'Emite una trama de 24 bytes; los coches de detrás calculan si les afecta y dicen «¡Frena!».'],
+    ['acc', 'Más adelante, un choque: impacto, parada en un segundo y nadie responde a la cuenta atrás.'],
+    ['b-mule', 'Sin ninguna red, el SOS con carretera, PK y sentido lo recogen los coches que pasan en los dos sentidos.'],
+    ['a-carretera', 'Una conductora se para y coordina la escena: Proteger, Avisar, Socorrer, con tareas confirmadas.'],
+    ['d-112', 'El 112 recibe el aviso con el PK exacto; la Guardia Civil de Tráfico asume la escena al llegar.'],
+  ] },
+  { id: 'nl', name: '🇳🇱 Países Bajos', intro: 'Lluvia de noche en una autopista neerlandesa. Hay un rescate dos kilómetros más adelante.', steps: [
+    ['ext', 'NDW publica en DATEX II el accidente y la cruz roja sobre el carril izquierdo.'],
+    ['c-datex', 'SENDA lo lee con el mismo lector que usa para la DGT y se queda con lo que afecta a tu ruta.'],
+    ['a-paises', 'Aviso hablado en neerlandés: «Over 600 meter. Rood kruis op rijstrook 1: voeg in naar rechts».'],
+    ['c-drive', 'La cola crece hacia atrás: SENDA calcula dónde te la encontrarás y te pide reducir antes.'],
+    ['b-ble', 'Los coches con SENDA se pasan el aviso de frenada.'],
+    ['d-112', 'Si hay un choque, el 112 es el mismo número: SENDA manda el parte con la posición.'],
+  ] },
+  { id: 'via', name: '🚆 Vía de tren', intro: 'Prevención, no solo respuesta: patrones que precedieron a accidentes documentados.', steps: [
+    ['ext', 'Datos que ya existen: circuitos de vía, detectores en vía y registros de marcha.'],
+    ['c-hazard', 'La vigilancia de vía detecta escalones anómalos y patrones de riesgo.'],
+    ['a-via', 'El panel muestra el aviso con la evidencia que lo justifica.'],
+    ['d-org', 'El gestor de la infraestructura decide. Requiere convenio y sus datos.'],
+  ] },
+];
+const S = { sc: 0, step: 0, all: false, sel: null, timer: null, anim: null };
+window.SENDA_ARQ = S;
+
+// ---- construcción
+$('#dia').innerHTML = LAYERS.map(([id, name, sub]) => `<div class="col"><h3>${name}</h3><p class="sub">${sub}</p><div class="nodes">${N.filter((n) => n.layer === id).map((n) => `<button class="node" data-id="${n.id}" style="--st:${ST[n.st][1]}" aria-label="${n.name}: ${ST[n.st][0]}">${n.name}${n.isNew ? '<span class="new">NUEVO</span>' : ''}</button>`).join('')}</div></div>`).join('');
+$('#legend').innerHTML = Object.values(ST).map(([l, c]) => `<span><i style="background:${c}"></i>${l}</span>`).join('') + '<span><i style="background:var(--c)"></i>paso actual del escenario</span>';
+$('#sc').innerHTML = SCEN.map((s, i) => `<button data-i="${i}" aria-pressed="${i === 0}">${s.name}</button>`).join('');
+
+const center = (id) => { const w = $('#wrap').getBoundingClientRect(), r = document.querySelector(`.node[data-id="${id}"]`).getBoundingClientRect(); return { x: r.left - w.left + r.width / 2, y: r.top - w.top + r.height / 2, l: r.left - w.left, r: r.right - w.left, t: r.top - w.top, b: r.bottom - w.top }; };
+function curve(a, b) {
+  const A = center(a), B = center(b), horiz = Math.abs(A.x - B.x) > Math.abs(A.y - B.y) * 0.6;
+  if (horiz) { const [x1, x2] = A.x < B.x ? [A.r, B.l] : [A.l, B.r], dx = (x2 - x1) * 0.5; return `M${x1},${A.y} C${x1 + dx},${A.y} ${x2 - dx},${B.y} ${x2},${B.y}`; }
+  const [y1, y2] = A.y < B.y ? [A.b, B.t] : [A.t, B.b], dy = (y2 - y1) * 0.5; return `M${A.x},${y1} C${A.x},${y1 + dy} ${B.x},${y2 - dy} ${B.x},${y2}`;
+}
+function edgesFor() {
+  if (S.all) { const set = new Set(); SCEN.forEach((s) => s.steps.forEach((st, i) => i && set.add(`${s.steps[i - 1][0]}>${st[0]}`))); return [...set].map((k) => [...k.split('>'), 'all']); }
+  const st = SCEN[S.sc].steps; return st.slice(1).map((x, i) => [st[i][0], x[0], i + 1 <= S.step ? (i + 1 === S.step ? 'cur' : 'done') : 'todo']);
+}
+function render() {
+  const sc = SCEN[S.sc], svg = $('#edges');
+  document.querySelectorAll('#sc button').forEach((b) => b.setAttribute('aria-pressed', String(!S.all && +b.dataset.i === S.sc)));
+  const onIds = new Set(S.all ? [] : sc.steps.slice(0, S.step + 1).map((x) => x[0]));
+  $('#dia').classList.toggle('focus', !S.all);
+  document.querySelectorAll('.node').forEach((b) => { b.classList.toggle('on', onIds.has(b.dataset.id)); b.classList.toggle('cur', !S.all && b.dataset.id === sc.steps[S.step][0]); b.classList.toggle('sel', b.dataset.id === S.sel); });
+  const col = { cur: '#ff7756', done: '#91d7e8', todo: '#2a3f4d', all: '#91d7e855' };
+  svg.innerHTML = `<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#91d7e8"/></marker><marker id="arc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#ff7756"/></marker></defs>` +
+    edgesFor().map(([a, b, k]) => `<path d="${curve(a, b)}" fill="none" stroke="${col[k]}" stroke-width="${k === 'cur' ? 3 : k === 'todo' ? 1.2 : 2}" ${k === 'todo' ? 'stroke-dasharray="4 4"' : ''} ${k === 'cur' ? 'marker-end="url(#arc)" id="curpath"' : k === 'done' ? 'marker-end="url(#ar)"' : ''}/>`).join('') + '<circle id="pkt" r="6" fill="#ff7756" opacity="0"/>';
+  $('#sc-intro').textContent = S.all ? 'Todas las conexiones que recorren los escenarios. Pulsa un escenario para seguirlo paso a paso.' : sc.intro;
+  $('#h-story').textContent = S.all ? 'Todo el sistema' : sc.name.replace(/^\S+\s/, '');
+  $('#steps').innerHTML = S.all ? '' : sc.steps.map(([id, t], i) => `<li class="${i < S.step ? 'done' : i === S.step ? 'cur' : ''}"><b>${byId[id].name}.</b> ${t}</li>`).join('');
+  $('#prev').disabled = $('#nprev').disabled = S.all || S.step === 0; $('#next').disabled = $('#nnext').disabled = S.all || S.step === sc.steps.length - 1;
+  $('#now').innerHTML = S.all ? 'Vista de todo el sistema: elige un escenario para seguirlo.' : `<b>Paso ${S.step + 1}/${sc.steps.length} · ${byId[sc.steps[S.step][0]].name}.</b> ${sc.steps[S.step][1]}`;
+  animate();
+}
+function animate() {
+  cancelAnimationFrame(S.anim); const p = $('#curpath'), c = $('#pkt'); if (!p || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const L = p.getTotalLength(), t0 = performance.now();
+  const f = (ts) => { const k = Math.min(1, (ts - t0) / 900), pt = p.getPointAtLength(L * (1 - Math.pow(1 - k, 2))); c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y); c.setAttribute('opacity', k < 1 ? 1 : 0); if (k < 1) S.anim = requestAnimationFrame(f); };
+  S.anim = requestAnimationFrame(f);
+}
+function showNode(id) {
+  const n = byId[id]; S.sel = id;
+  const inSc = SCEN.filter((s) => s.steps.some((x) => x[0] === id)).map((s) => s.name);
+  $('#h-node').textContent = n.name;
+  $('#node-body').innerHTML = `<p style="margin:0 0 8px"><span class="chip" style="color:${ST[n.st][1]}">${ST[n.st][0]}</span>${n.isNew ? ' <span class="chip" style="color:var(--c)">nuevo</span>' : ''}</p><p style="color:var(--t);margin:0 0 8px">${n.desc ?? ''}</p>${n.mod ? `<p style="margin:0 0 6px">Código: <code>${n.mod}</code></p>` : ''}${inSc.length ? `<p style="margin:0 0 6px">Aparece en: ${inSc.join(' · ')}</p>` : ''}${n.page ? `<p style="margin:0"><a href="${n.page}">Abrir ${n.page} →</a></p>` : ''}`;
+  render();
+}
+const go = (d) => { const L = SCEN[S.sc].steps.length; S.step = Math.max(0, Math.min(L - 1, S.step + d)); S.all = false; render(); };
+const stopAuto = () => { clearInterval(S.timer); S.timer = null; $('#auto').textContent = '⏵ Reproducir'; };
+$('#sc').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; stopAuto(); S.sc = +b.dataset.i; S.step = 0; S.all = false; render(); };
+$('#prev').onclick = $('#nprev').onclick = () => { stopAuto(); go(-1); }; $('#next').onclick = $('#nnext').onclick = () => { stopAuto(); go(1); };
+$('#all').onclick = () => { stopAuto(); S.all = true; render(); };
+$('#auto').onclick = () => { if (S.timer) return stopAuto(); if (S.all || S.step === SCEN[S.sc].steps.length - 1) { S.step = -1; S.all = false; } $('#auto').textContent = '⏸ Pausa'; go(1); S.timer = setInterval(() => { if (S.step >= SCEN[S.sc].steps.length - 1) return stopAuto(); go(1); }, 2600); };
+$('#dia').onclick = (e) => { const b = e.target.closest('.node'); if (b) showNode(b.dataset.id); };
+addEventListener('resize', () => render());
+render();
+
+// ---- matriz de sensores (con estado del sistema)
+const MX = [
+  ['Acelerómetro', 'Sismo por consenso de muchos teléfonos (onda P); impactos', 'SensorManager · sin permiso; por encima de 200 Hz, HIGH_SAMPLING_RATE_SENSORS (Android 12+)', 'sim'],
+  ['Barómetro', 'Planta de la persona (barometría diferencial)', 'Sensor.TYPE_PRESSURE · sin permiso', 'sim'],
+  ['GNSS y velocidad', 'Posición del SOS; frenazos o impactos (hoja de ruta)', 'Geolocation API / LocationManager · ubicación', 'web'],
+  ['Micrófono y altavoz', 'Módem acústico (mensajes y códigos de llamada); escucha de golpes', 'getUserMedia / AudioRecord · micrófono', 'web'],
+  ['Cámara y flash', 'Visión por capas; leer el código de llamada en QR (siguiente paso)', 'getUserMedia, BarcodeDetector (Chrome Android con Google Play Services) · cámara', 'web'],
+  ['Bluetooth LE', 'Baliza SENDA, localización por intensidad, censo por planta', 'BluetoothLeAdvertiser / Scanner · BLUETOOTH_ADVERTISE / SCAN (Android 12+)', 'android'],
+  ['Wi-Fi local + WebRTC', 'Llamadas y chat cifrados sin Internet', 'RTCPeerConnection · micrófono', 'web'],
+  ['Wi-Fi Aware (NAN)', 'Enlace directo teléfono a teléfono sin router', 'WifiAwareManager (Android 8+, si el hardware lo admite) · NEARBY_WIFI_DEVICES (Android 13+)', 'native'],
+  ['Wi-Fi Direct', 'Enlace directo con más compatibilidad', 'WifiP2pManager · dispositivos Wi-Fi cercanos', 'native'],
+  ['Wi-Fi RTT', 'Distancia a puntos de acceso compatibles (planta y vivienda)', 'WifiRttManager · permisos de ubicación según versión', 'road'],
+  ['UWB', 'Distancia precisa entre dos teléfonos con UWB', 'androidx.core.uwb · UWB_RANGING', 'road'],
+  ['NFC', 'Intercambio de tarjetas de contacto al acercar teléfonos', 'NfcAdapter · NFC', 'road'],
+  ['Infrarrojos', 'Descartado como canal: pocos modelos llevan emisor y casi ninguno receptor. La vía óptica útil es pantalla o flash → cámara', 'ConsumerIrManager · TRANSMIT_IR', 'road'],
+  ['Satélite directo al móvil', 'SOS donde el modelo y el operador lo ofrezcan; disponibilidad en España pendiente de verificar', 'Depende del fabricante y del operador', 'road'],
+];
+$('#mx').innerHTML = MX.map(([s, u, api, st]) => `<tr><td><b>${s}</b></td><td>${u}</td><td class="m">${api}</td><td><span class="chip" style="color:${ST[st][1]}">${ST[st][0]}</span></td></tr>`).join('');
+// ---- plataformas, permisos y planes (núcleo real: platforms.mjs)
+import('/senda/core/platforms.mjs').then(({ PLATFORMS, INTEGRATIONS, PLAYBOOKS, EVENTS, ROLES, planDeployment }) => {
+  const STC = { HECHO: ['hecho', '#34d399'], PARCIAL: ['parcial', '#91d7e8'], SIMULADO: ['simulado', '#fbbf24'], CONVENIO: ['convenio', '#fbbf24'], HOJA_DE_RUTA: ['hoja de ruta', '#7d8f99'] };
+  const ACC = { PASIVO: '#34d399', CONVENIO: '#fbbf24', NUNCA: '#ff5b6e' };
+  $('#pl-tb').innerHTML = PLATFORMS.map((p) => `<tr><td><b>${p.name}</b></td><td class="m">${p.runtime}${p.note ? ` · ${p.note}` : ''}</td><td>${p.roles.join(', ')}</td><td><span class="chip" style="color:${STC[p.status][1]}">${STC[p.status][0]}</span></td></tr>`).join('');
+  $('#in-tb').innerHTML = INTEGRATIONS.map((i) => `<tr><td>${i.what}</td><td><span class="chip" style="color:${ACC[i.access]}">${i.access}</span></td><td class="m">${i.note ?? ''}</td></tr>`).join('');
+  $('#ev-tb').innerHTML = EVENTS.map((e) => `<tr><td><b>${e.where}</b><br><span class="m">${e.when}</span></td><td>${e.what}${e.toll ? `<br><span class="m">${e.toll}</span>` : ''}</td><td>${e.lesson}</td><td><code>${e.modules.join(', ')}</code></td></tr>`).join('');
+  $('#pb-sel').innerHTML = Object.entries(PLAYBOOKS).map(([k, v]) => `<option value="${k}">${v.name}</option>`).join('');
+  const avail = new Set(['movil-web', 'pc']);
+  $('#pb-av').innerHTML = PLATFORMS.map((p) => `<label class="m" style="font-size:13px"><input type="checkbox" value="${p.id}" ${avail.has(p.id) ? 'checked' : ''}> ${p.name}</label>`).join('');
+  const draw = () => {
+    const plan = planDeployment($('#pb-sel').value, [...avail]); window.SENDA_ARQ.plan = plan;
+    $('#pb-out').innerHTML = `${plan.guard ? `<div class="note">${plan.guard}</div>` : ''}<div class="tw"><table><thead><tr><th>Fase</th><th>Qué hace SENDA</th><th>Cobertura con lo disponible</th></tr></thead><tbody>${plan.phases.map((ph) => `<tr><td><b>${ph.t}</b></td><td>${ph.do}<br><code>${ph.modules.join(', ')}</code></td><td>${ph.need.map((r) => ph.cover[r].length ? `<span class="chip" style="color:#34d399">${ROLES[r]}</span> <span class="m">${ph.cover[r].join(', ')}</span>` : `<span class="chip" style="color:#ff5b6e">falta: ${ROLES[r]}</span>`).join('<br>')}</td></tr>`).join('')}</tbody></table></div>
+      <p class="m">${plan.gaps.length ? `Para cubrirlo todo faltan: <b>${plan.gaps.map((r) => ROLES[r]).join(', ')}</b>. Marca más plataformas para ver qué lo resuelve.` : '✅ Todas las fases quedan cubiertas con lo disponible.'}</p>`;
+  };
+  $('#pb-sel').onchange = draw; $('#pb-av').onchange = (e) => { e.target.checked ? avail.add(e.target.value) : avail.delete(e.target.value); draw(); }; draw();
+});
+fetch('/senda/estado.json').then((r) => r.json()).then((j) => { $('#stats').innerHTML = `<span><b>${j.core}/${j.coreTotal}</b> pruebas del núcleo</span><span><b>${j.e2e}/${j.e2eTotal}</b> pruebas extremo a extremo en Chromium</span><span><b>${N.length}</b> piezas · <b>${SCEN.length}</b> escenarios</span><span>versión <code>${j.sha}</code></span>`; }).catch(() => { $('#stats').innerHTML = `<span><b>${N.length}</b> piezas · <b>${SCEN.length}</b> escenarios</span>`; });
+</script>
+</body></html>

@@ -4,9 +4,10 @@ permissions:
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, 'mission/**', 'feat/**', 'fix/**' ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, 'mission/**', 'feat/**', 'fix/**' ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -14,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [22.x, 24.x]
 
     steps:
     - uses: actions/checkout@v4

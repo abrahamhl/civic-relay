@@ -1,0 +1,413 @@
+{
+  "kind": "DETERMINISTIC_SIMULATION",
+  "calibration": {
+    "wellSpecified": {
+      "runs": 200,
+      "misspecified": false,
+      "engine": {
+        "n": 6400,
+        "brier": 0.1071,
+        "table": [
+          {
+            "bin": "0-0.1",
+            "n": 497,
+            "predicted": 0.053923033451726284,
+            "observed": 0.05030181086519115
+          },
+          {
+            "bin": "0.1-0.2",
+            "n": 373,
+            "predicted": 0.14514066877783932,
+            "observed": 0.15013404825737264
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 543,
+            "predicted": 0.24743858978725952,
+            "observed": 0.2136279926335175
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 486,
+            "predicted": 0.3469599342705728,
+            "observed": 0.28600823045267487
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 402,
+            "predicted": 0.44904119843671403,
+            "observed": 0.3333333333333333
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 306,
+            "predicted": 0.5495003867163561,
+            "observed": 0.47058823529411764
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 328,
+            "predicted": 0.6519446292755683,
+            "observed": 0.774390243902439
+          },
+          {
+            "bin": "0.7-0.8",
+            "n": 346,
+            "predicted": 0.7514597634060948,
+            "observed": 0.8728323699421965
+          },
+          {
+            "bin": "0.8-0.9",
+            "n": 697,
+            "predicted": 0.8515544217768963,
+            "observed": 0.836441893830703
+          },
+          {
+            "bin": "0.9-1",
+            "n": 2422,
+            "predicted": 0.9812648861916585,
+            "observed": 0.9781172584640793
+          }
+        ]
+      },
+      "baseline": {
+        "n": 6400,
+        "brier": 0.1235,
+        "table": [
+          {
+            "bin": "0-0.1",
+            "n": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": "0.1-0.2",
+            "n": 2194,
+            "predicted": 0.19999999999999254,
+            "observed": 0.2014585232452142
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": "0.7-0.8",
+            "n": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": "0.8-0.9",
+            "n": 2059,
+            "predicted": 0.7999999999999712,
+            "observed": 0.7994171928120447
+          },
+          {
+            "bin": "0.9-1",
+            "n": 2147,
+            "predicted": 0.950000000000032,
+            "observed": 0.9473684210526315
+          }
+        ]
+      },
+      "badge98": {
+        "n": 1149,
+        "observedRate": 1
+      },
+      "lowerBoundAtLeast90": {
+        "n": 1892,
+        "observedRate": 0.991
+      },
+      "brierImprovementPct": 13,
+      "disclaimer": "Calibración en simulación: demuestra coherencia interna del motor y robustez a parámetros erróneos, no exactitud de campo."
+    },
+    "misspecified": {
+      "runs": 200,
+      "misspecified": true,
+      "engine": {
+        "n": 6400,
+        "brier": 0.158,
+        "table": [
+          {
+            "bin": "0-0.1",
+            "n": 587,
+            "predicted": 0.053272990725245245,
+            "observed": 0.131175468483816
+          },
+          {
+            "bin": "0.1-0.2",
+            "n": 398,
+            "predicted": 0.14598987052048634,
+            "observed": 0.27386934673366836
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 590,
+            "predicted": 0.24915033373065007,
+            "observed": 0.3559322033898305
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 460,
+            "predicted": 0.3492658454468056,
+            "observed": 0.3760869565217391
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 475,
+            "predicted": 0.45086972179052387,
+            "observed": 0.45473684210526316
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 359,
+            "predicted": 0.547449054755512,
+            "observed": 0.5376044568245125
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 351,
+            "predicted": 0.6529425167062098,
+            "observed": 0.7521367521367521
+          },
+          {
+            "bin": "0.7-0.8",
+            "n": 380,
+            "predicted": 0.7511752118617768,
+            "observed": 0.7552631578947369
+          },
+          {
+            "bin": "0.8-0.9",
+            "n": 793,
+            "predicted": 0.8536674108261791,
+            "observed": 0.7540983606557377
+          },
+          {
+            "bin": "0.9-1",
+            "n": 2007,
+            "predicted": 0.9724867647772785,
+            "observed": 0.942700548081714
+          }
+        ]
+      },
+      "baseline": {
+        "n": 6400,
+        "brier": 0.1787,
+        "table": [
+          {
+            "bin": "0-0.1",
+            "n": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": "0.1-0.2",
+            "n": 2156,
+            "predicted": 0.1999999999999926,
+            "observed": 0.29267161410018555
+          },
+          {
+            "bin": "0.2-0.3",
+            "n": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": "0.3-0.4",
+            "n": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": "0.4-0.5",
+            "n": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": "0.5-0.6",
+            "n": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": "0.6-0.7",
+            "n": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": "0.7-0.8",
+            "n": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": "0.8-0.9",
+            "n": 2112,
+            "predicted": 0.7999999999999707,
+            "observed": 0.7140151515151515
+          },
+          {
+            "bin": "0.9-1",
+            "n": 2132,
+            "predicted": 0.9500000000000319,
+            "observed": 0.8818011257035647
+          }
+        ]
+      },
+      "badge98": {
+        "n": 619,
+        "observedRate": 1
+      },
+      "lowerBoundAtLeast90": {
+        "n": 1312,
+        "observedRate": 0.976
+      },
+      "brierImprovementPct": 12,
+      "disclaimer": "Calibración en simulación: demuestra coherencia interna del motor y robustez a parámetros erróneos, no exactitud de campo."
+    }
+  },
+  "building14": {
+    "summary": {
+      "cells": 60,
+      "expectedCellsWithPeople": 32.78,
+      "byClass": {
+        "IMPROBABLE": 25,
+        "PROBABLE": 30,
+        "POSIBLE": 4,
+        "CONFIRMADO_POR_RESPUESTA": 1
+      },
+      "badge98": 1
+    },
+    "top": [
+      {
+        "id": "3B",
+        "p": 0.999,
+        "lo": 0.991,
+        "hi": 1,
+        "cls": "CONFIRMADO_POR_RESPUESTA",
+        "families": [
+          "RESPONSE",
+          "BODY_RF"
+        ],
+        "badge98": true,
+        "priority": 0.999
+      },
+      {
+        "id": "2B",
+        "p": 0.849,
+        "lo": 0.754,
+        "hi": 0.946,
+        "cls": "PROBABLE",
+        "families": [
+          "BODY_RF"
+        ],
+        "badge98": false,
+        "priority": 0.849
+      },
+      {
+        "id": "4B",
+        "p": 0.819,
+        "lo": 0.683,
+        "hi": 0.939,
+        "cls": "PROBABLE",
+        "families": [
+          "BODY_RF"
+        ],
+        "badge98": false,
+        "priority": 0.819
+      },
+      {
+        "id": "4D",
+        "p": 0.649,
+        "lo": 0.476,
+        "hi": 0.789,
+        "cls": "PROBABLE",
+        "families": [
+          "PHONE_RF",
+          "BODY_RF",
+          "ACOUSTIC"
+        ],
+        "badge98": false,
+        "priority": 0.649
+      },
+      {
+        "id": "3D",
+        "p": 0.523,
+        "lo": 0.182,
+        "hi": 0.739,
+        "cls": "POSIBLE",
+        "families": [
+          "PHONE_RF",
+          "BODY_RF",
+          "ACOUSTIC"
+        ],
+        "badge98": false,
+        "priority": 0.523
+      },
+      {
+        "id": "2D",
+        "p": 0.411,
+        "lo": 0.141,
+        "hi": 0.669,
+        "cls": "POSIBLE",
+        "families": [
+          "PHONE_RF",
+          "BODY_RF",
+          "ACOUSTIC"
+        ],
+        "badge98": false,
+        "priority": 0.411
+      },
+      {
+        "id": "4A",
+        "p": 0.313,
+        "lo": 0.115,
+        "hi": 0.65,
+        "cls": "POSIBLE",
+        "families": [
+          "PHONE_RF"
+        ],
+        "badge98": false,
+        "priority": 0.313
+      },
+      {
+        "id": "3A",
+        "p": 0.279,
+        "lo": 0.136,
+        "hi": 0.446,
+        "cls": "POSIBLE",
+        "families": [],
+        "badge98": false,
+        "priority": 0.279
+      }
+    ]
+  }
+}

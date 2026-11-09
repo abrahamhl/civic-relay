@@ -1,0 +1,125 @@
+{
+ "note": "SENDA Mission 9.5 · Modo Desarrollador 60s (Arquitectura Abierta, APIs y Física Matemática)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "dev_s1",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/uav-mesh.mjs",
+    "investor-next/public/senda/core/uav-mesh.mjs"
+   ],
+   "visual": {
+    "kind": "math_grid"
+   },
+   "title": {
+    "es": "Modo Desarrollador: Física matemática y propagación real",
+    "en": "Developer Mode: Mathematical physics and real propagation",
+    "nl": "Ontwikkelaarsmodus: Mathematische fysica en reële propagatie"
+   },
+   "es": [
+    "Para los ingenieros que exigen rigor, SENDA no es una caja negra: implementa formulaciones físicas contrastadas como Al-Hourani para enlaces aéreos y difracción de Deygout.",
+    "La conectividad de enjambres de drones se evalúa en tiempo real calculando el segundo autovalor del laplaciano de grafos, garantizando que la red móvil nunca sufra particiones."
+   ],
+   "es_say": [
+    "Para los ingenieros que exigen rigor, Senda no es una caja negra: implementa formulaciones físicas contrastadas como Al-Hourani para enlaces aéreos y difracción de Deygout.",
+    "La conectividad de enjambres de drones se evalúa en tiempo real calculando el segundo autovalor del laplaciano de grafos, garantizando que la red móvil nunca sufra particiones."
+   ],
+   "en": [
+    "For engineers who demand technical rigor, SENDA is not a black box: it implements verified physical equations like Al-Hourani air-to-ground links and Deygout diffraction.",
+    "UAV swarm connectivity is evaluated in real time by calculating the second eigenvalue of the graph Laplacian, mathematically proving that the mobile mesh remains fully connected."
+   ],
+   "en_say": [
+    "For engineers who demand technical rigor, Senda is not a black box: it implements verified physical equations like Al-Hourani air-to-ground links and Deygout diffraction.",
+    "UAV swarm connectivity is evaluated in real time by calculating the second eigenvalue of the graph Laplacian, mathematically proving that the mobile mesh remains fully connected."
+   ],
+   "nl": [
+    "Voor ingenieurs die technische nauwkeurigheid eisen, is SENDA geen zwarte doos: het implementeert getoetste fysische modellen zoals Al-Hourani en Deygout diffractie.",
+    "De connectiviteit van drone-zwermen wordt real-time bewaakt door de tweede eigenwaarde van de graaf-Laplaciaan te berekenen, wat garandeert dat het netwerk verbonden blijft."
+   ]
+  },
+  {
+   "id": "dev_s2",
+   "claim": "OBSERVED",
+   "source": [
+    "packages/senda/src/cots-rf-tactical.mjs",
+    "apps/senda-live/server/domain/cots-drone-recon.mjs"
+   ],
+   "visual": {
+    "kind": "drone3d"
+   },
+   "title": {
+    "es": "Decodificación ASTM F3411, telemetría y misiones PX4",
+    "en": "ASTM F3411 decoding, live telemetry and PX4 missions",
+    "nl": "ASTM F3411 decodering, telemetrie en PX4 missies"
+   },
+   "es": [
+    "El subsistema de radiofrecuencia decodifica tramas del estándar ASTM F3411 en Bluetooth y wifi, extrayendo posición, vector de velocidad y la ubicación precisa del piloto.",
+    "Los operadores pueden exportar planes de vuelo compatibles con PX4 y QGroundControl con un solo clic, integrando drones de rescate en mallas de comunicaciones activas."
+   ],
+   "es_say": [
+    "El subsistema de radiofrecuencia decodifica tramas del estándar A S T M F treinta y cuatro once en Blutuz y uifi, extrayendo posición, vector de velocidad y la ubicación precisa del piloto.",
+    "Los operadores pueden exportar planes de vuelo compatibles con P X cuatro y Q Ground Control con un solo clic, integrando drones de rescate en mallas de comunicaciones activas."
+   ],
+   "en": [
+    "The radiofrequency subsystem decodes ASTM F3411 frames across Bluetooth and Wi-Fi, extracting vehicle coordinates, velocity vectors, and the pilot ground control station location.",
+    "Operators can export flight plans compatible with PX4 and QGroundControl in one click, embedding emergency UAVs as airborne communication relays instantly."
+   ],
+   "en_say": [
+    "The radiofrequency subsystem decodes A S T M F thirty-four eleven frames across Bluetooth and Wi-Fi, extracting vehicle coordinates, velocity vectors, and the pilot ground control station location.",
+    "Operators can export flight plans compatible with P X four and Q Ground Control in one click, embedding emergency U A V s as airborne communication relays instantly."
+   ],
+   "nl": [
+    "Het radiosubsysteem decodeert ASTM F3411 frames via Bluetooth en wifi en achterhaalt positie, snelheidsvectoren en de exacte locatie van de piloot op de grond.",
+    "Hulpverleners kunnen met één klik vluchtplannen exporteren voor PX4 en QGroundControl, waardoor reddingsdrones direct fungeren als vliegende zendstations."
+   ]
+  },
+  {
+   "id": "dev_s3",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/public/senda/core/",
+    "packages/senda/src/index.mjs"
+   ],
+   "visual": {
+    "kind": "arch3d"
+   },
+   "title": {
+    "es": "Setenta y cuatro módulos sincronizados y cobertura de pruebas total",
+    "en": "Seventy-four synchronized modules and complete test coverage",
+    "nl": "Vierenzeventig gesynchroniseerde modules en complete testdekking"
+   },
+   "es": [
+    "Toda la lógica de SENDA está desacoplada en setenta y cuatro módulos puros sin dependencias circulares, testeados con cientos de pruebas unitarias automatizadas.",
+    "Tanto si programas en TypeScript, Python o firmware para microcontroladores, la API mantiene consistencia matemática estricta para construir sobre cimientos firmes."
+   ],
+   "es_say": [
+    "Toda la lógica de Senda está desacoplada en setenta y cuatro módulos puros sin dependencias circulares, testeados con cientos de pruebas unitarias automatizadas.",
+    "Tanto si programas en TypeScript, Python o firmware para microcontroladores, la A P I mantiene consistencia matemática estricta para construir sobre cimientos firmes."
+   ],
+   "en": [
+    "Every SENDA subsystem is decoupled into seventy-four zero-dependency core modules, verified by hundreds of automated tests running on every change.",
+    "Whether developing in TypeScript, Python, or embedded firmware, the API preserves strict mathematical parity so you build on rock-solid foundations."
+   ],
+   "en_say": [
+    "Every Senda subsystem is decoupled into seventy-four zero-dependency core modules, verified by hundreds of automated tests running on every change.",
+    "Whether developing in TypeScript, Python, or embedded firmware, the A P I preserves strict mathematical parity so you build on rock-solid foundations."
+   ],
+   "nl": [
+    "Alle logica van SENDA is ondergebracht in vierenzeventig zuivere modules zonder externe ballast, gevalideerd door honderden geautomatiseerde unittests.",
+    "Of u nu bouwt in TypeScript, Python of microcontrollercode, de API handhaaft strikte mathematische consistentie voor maximale betrouwbaarheid."
+   ]
+  }
+ ]
+}

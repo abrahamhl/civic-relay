@@ -1,0 +1,131 @@
+name: SENDA LIVE · Terrain DEM + RF Relay Geometry scientific QA
+on:
+  push:
+    branches:
+      - 'feat/senda-usgs-map-evidence-*'
+      - 'feat/senda-atmosphere4d-offline-*'
+      - 'feat/senda-terrain-mesh-georef-*'
+      - 'feat/senda-relay-terrain-physics-*'
+      - 'feat/senda-osint-gdacs-*'
+      - 'feat/senda-master-integration-*'
+  pull_request:
+    branches:
+      - 'feat/senda-social-live-*'
+      - 'feat/senda-usgs-map-evidence-*'
+      - 'feat/senda-atmosphere4d-offline-*'
+      - 'feat/senda-terrain-mesh-georef-*'
+      - master
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  usgs-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Offline deterministic upstream adapter tests
+        run: node --test apps/senda-live/tests/usgs-earthquakes.test.mjs apps/senda-live/tests/eonet-wildfires.test.mjs apps/senda-live/tests/gdacs-osint.test.mjs apps/senda-live/tests/weather-grid.test.mjs apps/senda-live/tests/metno-weather-grid.test.mjs apps/senda-live/tests/terrain-grid.test.mjs apps/senda-live/tests/relay-geometry.test.mjs
+      - name: Install locked dependencies
+        run: |
+          corepack enable
+          corepack pnpm install --frozen-lockfile
+      - name: SENDA LIVE API and feature tests
+        run: corepack pnpm --filter @senda/live test
+      - name: Web type checks
+        run: corepack pnpm --filter @senda/live type-check
+      - name: Vite production build
+        run: corepack pnpm --filter @senda/live build
+      - name: Optional live NASA EONET research receipt
+        continue-on-error: true
+        run: node apps/senda-live/scripts/capture-eonet-research.mjs
+      - name: Archive NASA catalog acquisition receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: senda-eonet-catalog-research
+          path: evidence/senda/eonet/latest-catalog-acquisition.json
+          if-no-files-found: warn
+          retention-days: 14
+      # MET Norway permits commercial reuse with attribution, but requires a well-behaved
+      # client. Trigger exactly once with [metno-live-check], NOT on every CI change.
+      - name: One-off MET Norway 9-point scientific source acquisition
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[metno-live-check]')
+        continue-on-error: true
+        run: node apps/senda-live/scripts/capture-metno-research.mjs valencia
+      - name: Upload one-off MET Norway acquisition receipt
+        if: always() && github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[metno-live-check]')
+        uses: actions/upload-artifact@v4
+        with:
+          name: senda-metno-source-receipt
+          path: evidence/senda/metno/latest-acquisition.json
+          if-no-files-found: warn
+          retention-days: 14
+
+
+
+      # Source-dependent Mapzen credit terms. Only one deliberate acquisition,
+      # never an every-commit network operation and never user position data.
+      - name: One-off Mapzen AWS DEM acquisition
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[terrain-live-check]')
+        continue-on-error: true
+        run: node apps/senda-live/scripts/capture-terrain-research.mjs valencia
+      - name: Archive Mapzen terrain acquisition evidence
+        if: always() && github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[terrain-live-check]')
+        uses: actions/upload-artifact@v4
+        with:
+          name: senda-terrain-source-receipt
+          path: evidence/senda/terrain/latest-terrain-acquisition.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      # One deliberate independent end-to-end mathematical run on actual raster.
+      # Not field RF measurements; avoid duplicate tile downloads on each commit.
+      - name: One-off real DEM -> Fresnel -> relay corridor evidence
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[relay-live-check]')
+        continue-on-error: true
+        run: node apps/senda-live/scripts/capture-relay-geometry-research.mjs
+      - name: Upload real DEM radio geometry research receipt
+        if: always() && github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[relay-live-check]')
+        uses: actions/upload-artifact@v4
+        with:
+          name: senda-rf-geometry-real-dem
+          path: evidence/senda/rf/real-dem-link-screening.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  chromium-map-qa:
+    name: Real browser geospatial QA (desktop + mobile)
+    needs: usgs-live
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install locked frontend dependencies
+        run: |
+          corepack enable
+          corepack pnpm install --frozen-lockfile
+          corepack pnpm --filter @senda/live build
+      - name: Install pinned Chromium browser
+        run: |
+          npx --yes playwright@1.63.0 install --with-deps chromium
+          npm install --no-save --prefix /tmp/senda-pw playwright@1.63.0
+      - name: Execute map security and layer interactions in Chromium
+        run: |
+          HOST=127.0.0.1 PORT=3011 DATABASE_FILE="$RUNNER_TEMP/senda-live-qa.db" node --disable-warning=ExperimentalWarning apps/senda-live/server/index.mjs > "$RUNNER_TEMP/senda-live-server.log" 2>&1 &
+          for i in $(seq 1 30); do if curl -fsS http://127.0.0.1:3011/ >/dev/null; then break; fi; sleep 1; done
+          SENDA_MAP_QA_URL=http://127.0.0.1:3011 SENDA_PLAYWRIGHT_MODULE=file:///tmp/senda-pw/node_modules/playwright/index.mjs node apps/senda-live/scripts/qa-geospatial-map.mjs
+      - name: Upload browser evidence (screenshots and results)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: senda-map-chromium-qa
+          path: evidence/senda/geospatial-qa/
+          if-no-files-found: warn
+          retention-days: 14

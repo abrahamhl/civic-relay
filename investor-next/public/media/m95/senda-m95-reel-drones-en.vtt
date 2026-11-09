@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:05.251
+Did you know you can build a tactical counter-drone sensor for under twenty-five euros?
+
+2
+00:00:05.601 --> 00:00:13.430
+With an ESP32 chip, a low-cost radio receiver, and copper wire, SENDA captures live airspace broadcasts instantly.
+
+3
+00:00:15.030 --> 00:00:23.137
+The ASTM F3411 international standard broadcasts both drone telemetry and the ground operator coordinates.
+
+4
+00:00:23.487 --> 00:00:30.889
+SENDA decodes the frame, draws a vector across the 3D terrain, and reveals the exact coordinates of the remote pilot.
+
+5
+00:00:32.489 --> 00:00:39.380
+True civil protection, without closed vendor locks, accessible to every fire crew, police officer, or community group.
+
+6
+00:00:39.730 --> 00:00:47.261
+Explore the antenna schematics and interactive demo at civic-relay-investor dot vercel dot app slash senda.
