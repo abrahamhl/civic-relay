@@ -1,15 +1,17 @@
-name: SENDA LIVE · Terrain DEM + Atmosphere 4D verified maps
+name: SENDA LIVE · Terrain DEM + RF Relay Geometry scientific QA
 on:
   push:
     branches:
       - 'feat/senda-usgs-map-evidence-*'
       - 'feat/senda-atmosphere4d-offline-*'
       - 'feat/senda-terrain-mesh-georef-*'
+      - 'feat/senda-relay-terrain-physics-*'
   pull_request:
     branches:
       - 'feat/senda-social-live-*'
       - 'feat/senda-usgs-map-evidence-*'
       - 'feat/senda-atmosphere4d-offline-*'
+      - 'feat/senda-terrain-mesh-georef-*'
       - master
   workflow_dispatch:
 permissions:
@@ -24,7 +26,7 @@ jobs:
         with:
           node-version: '22'
       - name: Offline deterministic upstream adapter tests
-        run: node --test apps/senda-live/tests/usgs-earthquakes.test.mjs apps/senda-live/tests/eonet-wildfires.test.mjs apps/senda-live/tests/weather-grid.test.mjs apps/senda-live/tests/metno-weather-grid.test.mjs apps/senda-live/tests/terrain-grid.test.mjs
+        run: node --test apps/senda-live/tests/usgs-earthquakes.test.mjs apps/senda-live/tests/eonet-wildfires.test.mjs apps/senda-live/tests/weather-grid.test.mjs apps/senda-live/tests/metno-weather-grid.test.mjs apps/senda-live/tests/terrain-grid.test.mjs apps/senda-live/tests/relay-geometry.test.mjs
       - name: Install locked dependencies
         run: |
           corepack enable
