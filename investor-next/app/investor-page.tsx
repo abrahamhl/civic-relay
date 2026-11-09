@@ -6,6 +6,7 @@ import EvidenceBoard from './evidence-board';
 import TelecomAndRfRadarSuite from './telecom-rf-radar-suite';
 import VehicularDopplerLab from './vehicular-doppler-lab';
 import CivilianRadarDefenseLab from './civilian-radar-defense-lab';
+import AcousticSentinelSurvivalLab from './acoustic-sentinel-survival-lab';
 import LiveHardwareAndDealRoomConsole from './live-hardware-console';
 import SectorIntelligenceConsole from './sector-intelligence-console';
 import {HyperFramesCinemaDeck} from './hyperframes-cinema-deck';
@@ -228,6 +229,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
   <div data-for="eng"><TelecomAndRfRadarSuite locale={locale}/></div>
   <div data-for="eng"><VehicularDopplerLab locale={locale}/></div>
   <div data-for="eng coord"><CivilianRadarDefenseLab locale={locale}/></div>
+  <div data-for="eng coord citizen"><AcousticSentinelSurvivalLab locale={locale}/></div>
   <div data-for="eng inv"><LiveHardwareAndDealRoomConsole locale={locale}/></div>
   <div data-for="citizen coord"><CrisisStory locale={locale}/></div>
   <div data-for="citizen"><ScrollExperience locale={locale}/></div>
