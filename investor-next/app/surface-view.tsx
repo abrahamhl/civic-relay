@@ -2,6 +2,7 @@ import MissionControl from './mission-control';
 import SectorIntelligenceConsole from './sector-intelligence-console';
 import CoordinationLab from './coordination-lab';
 import TelecomAndRfRadarSuite from './telecom-rf-radar-suite';
+import ScientificTheoremsLab from './scientific-theorems-lab';
 import LiveHardwareAndDealRoomConsole from './live-hardware-console';
 import EvidenceBoard from './evidence-board';
 import CommandSurface from './command-surface';
@@ -32,7 +33,7 @@ export default function SurfaceView({
         'Demostración interactiva central de Civic Relay / OEP: globo 3D con selección raycast, sectores piloto (El Tiemblo, Valencia, Arnhem), cámaras viales autorizadas o sintéticas con control anti-SSRF y traza causal de decisiones.',
       sciTitle: 'SUPERFICIE C · LABORATORIO CIENTÍFICO, CRIPTOGRAFÍA Y EVIDENCIA',
       sciLead:
-        'Entorno técnico reproducible para ingenieros, auditores e instituciones: cola Store-and-Forward determinista, firmas WebCrypto ECDSA P-256 reales, modelos RF/NTN acotados y matriz de verdad científica.',
+        'Entorno técnico reproducible para ingenieros, auditores e instituciones: cinco teoremas de física matemática, cola Store-and-Forward determinista, firmas WebCrypto ECDSA P-256 reales, modelos RF/NTN acotados y matriz de verdad científica.',
       mandoNav: 'D · Mando / Panel Multicanal',
       mandoTitle: 'SUPERFICIE D · SENDA MANDO · PANEL MULTICANAL DE ACTIVACIONES',
       mandoLead:
@@ -47,7 +48,7 @@ export default function SurfaceView({
         'Core interactive demonstration of Civic Relay / OEP: 3D globe with raycast object selection, pilot sectors (El Tiemblo, Valencia, Arnhem), authorized/synthetic camera sources with anti-SSRF guardrails, and causal decision trace.',
       sciTitle: 'SURFACE C · SCIENTIFIC LABORATORY, CRYPTOGRAPHY & EVIDENCE',
       sciLead:
-        'Reproducible technical surface for engineers, auditors, and institutions: deterministic Store-and-Forward queue, real WebCrypto ECDSA P-256 signatures, bounded RF/NTN models, and scientific truth matrix.',
+        'Reproducible technical surface for engineers, auditors, and institutions: five mathematical physics theorems, deterministic Store-and-Forward queue, real WebCrypto ECDSA P-256 signatures, bounded RF/NTN models, and scientific truth matrix.',
       mandoNav: 'D · Command / Multichannel Panel',
       mandoTitle: 'SURFACE D · SENDA COMMAND · MULTICHANNEL ACTIVATION PANEL',
       mandoLead:
@@ -62,7 +63,7 @@ export default function SurfaceView({
         'Centrale interactieve demonstratie van Civic Relay / OEP: 3D-globe met raycast-selectie, pilotsectoren (El Tiemblo, Valencia, Arnhem), geautoriseerde/synthetische camerabronnen en causale beslissingstracering.',
       sciTitle: 'OPPERVLAK C · WETENSCHAPPELIJK LAB, CRYPTOGRAFIE & BEWIJS',
       sciLead:
-        'Reproduceerbare technische omgeving voor ingenieurs en instellingen: deterministische Store-and-Forward wachtrij, echte WebCrypto ECDSA P-256-handtekeningen en wetenschappelijke bewijsmatrix.',
+        'Reproduceerbare technische omgeving voor ingenieurs en instellingen: vijf stellingen van mathematische fysica, deterministische Store-and-Forward wachtrij, echte WebCrypto ECDSA P-256-handtekeningen en wetenschappelijke bewijsmatrix.',
       mandoNav: 'D · Commando / Multikanaal Paneel',
       mandoTitle: 'OPPERVLAK D · SENDA COMMANDO · MULTIKANAAL ACTIVATIEPANEEL',
       mandoLead:
@@ -140,6 +141,9 @@ export default function SurfaceView({
         </>
       ) : surface === 'SCIENCE' ? (
         <>
+          <div className="container">
+            <ScientificTheoremsLab locale={locale} />
+          </div>
           <SystemExplained locale={locale} />
           <CoordinationLab locale={locale} />
           <TelecomAndRfRadarSuite locale={locale} />
