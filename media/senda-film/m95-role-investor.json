@@ -1,0 +1,143 @@
+{
+ "note": "SENDA Mission 9.5 · Modo Inversionista 60s (Soberanía, Defensa y Escalabilidad COTS)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "inv_s1",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/app/senda-home.tsx",
+    "docs/video/M95_VIDEO_SOURCES.md"
+   ],
+   "visual": {
+    "kind": "kpis",
+    "kpis": [
+     {
+      "v": "SOBERANÍA",
+      "l": {
+       "es": "Resiliencia crítica estatal sin dependencia exterior",
+       "en": "Critical state resilience without foreign dependency",
+       "nl": "Kritieke staatsweerbaarheid zonder buitenlandse afhankelijkheid"
+      }
+     },
+     {
+      "v": "< 25 €",
+      "l": {
+       "es": "Coste por nodo táctico desplegable a escala masiva",
+       "en": "Cost per tactical node deployable at mass scale",
+       "nl": "Kosten per tactische node inzetbaar op massale schaal"
+      }
+     }
+    ]
+   },
+   "title": {
+    "es": "Modo Inversionista: Soberanía nacional y defensa estratégica",
+    "en": "Investor Mode: Sovereign defence and strategic resilience",
+    "nl": "Beleggersmodus: Nationale soevereiniteit en strategische defensie"
+   },
+   "es": [
+    "Los gobiernos y fuerzas de seguridad afrontan un escenario de guerra híbrida y catástrofes climáticas donde la infraestructura convencional puede ser desconectada.",
+    "SENDA transforma este riesgo en soberanía operativa: una red táctica ad-hoc que garantiza el mando y control sin depender de satélites o infraestructuras extranjeras."
+   ],
+   "es_say": [
+    "Los gobiernos y fuerzas de seguridad afrontan un escenario de guerra híbrida y catástrofes climáticas donde la infraestructura convencional puede ser desconectada.",
+    "Senda transforma este riesgo en soberanía operativa: una red táctica ad-hoc que garantiza el mando y control sin depender de satélites o infraestructuras extranjeras."
+   ],
+   "en": [
+    "Governments and defence forces face hybrid warfare threats and climate emergencies where conventional telecommunications can be disabled in seconds.",
+    "SENDA converts this vulnerability into sovereign autonomy: an ad-hoc tactical network securing command and control without reliance on foreign infrastructure."
+   ],
+   "en_say": [
+    "Governments and defence forces face hybrid warfare threats and climate emergencies where conventional telecommunications can be disabled in seconds.",
+    "Senda converts this vulnerability into sovereign autonomy: an ad-hoc tactical network securing command and control without reliance on foreign infrastructure."
+   ],
+   "nl": [
+    "Overheden en veiligheidsdiensten worden geconfronteerd met hybride dreigingen en klimaatrampen waarbij conventionele telecom binnen seconden kan uitvallen.",
+    "SENDA transformeert deze kwetsbaarheid in soevereine autonomie: een tactisch ad-hoc netwerk dat bevelvoering veiligstelt zonder afhankelijkheid van buitenlandse systemen."
+   ]
+  },
+  {
+   "id": "inv_s2",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/cots-rf-tactical.mjs",
+    "apps/senda-live/server/domain/cots-drone-recon.mjs"
+   ],
+   "visual": {
+    "kind": "cots_bom"
+   },
+   "title": {
+    "es": "Economía de escala disruptiva y propiedad intelectual",
+    "en": "Disruptive unit economics and proprietary algorithms",
+    "nl": "Disruptieve schaalvoordelen en intellectueel eigendom"
+   },
+   "es": [
+    "Frente a sistemas militares de cientos de miles de euros, SENDA corre sobre componentes comerciales de menos de veinticinco euros con algoritmos propietarios.",
+    "Esto permite desplegar miles de receptores de radio, radares pasivos y sensores de detección de drones por una fracción ínfima del presupuesto estatal de defensa."
+   ],
+   "es_say": [
+    "Frente a sistemas militares de cientos de miles de euros, Senda corre sobre componentes comerciales de menos de veinticinco euros con algoritmos propietarios.",
+    "Esto permite desplegar miles de receptores de radio, radares pasivos y sensores de detección de drones por una fracción ínfima del presupuesto estatal de defensa."
+   ],
+   "en": [
+    "While legacy military radios cost tens of thousands of euros, SENDA executes over accessible hardware under twenty-five euros combined with advanced algorithms.",
+    "This architecture enables the deployment of thousands of passive sensors, mesh nodes, and counter-drone detectors at a fraction of traditional procurement costs."
+   ],
+   "en_say": [
+    "While legacy military radios cost tens of thousands of euros, Senda executes over accessible hardware under twenty-five euros combined with advanced algorithms.",
+    "This architecture enables the deployment of thousands of passive sensors, mesh nodes, and counter-drone detectors at a fraction of traditional procurement costs."
+   ],
+   "nl": [
+    "Waar conventionele militaire radio's tienduizenden euro's kosten, draait SENDA op commerciële chips onder de 25 euro met gepatenteerde wiskundige algoritmen.",
+    "Dit maakt het mogelijk om duizenden passieve radars, sensoren en drone-detectoren in te zetten tegen een fractie van de traditionele overheidsbudgetten."
+   ]
+  },
+  {
+   "id": "inv_s3",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/app/senda-home.tsx",
+    "docs/video/M95_VIDEO_SOURCES.md"
+   ],
+   "visual": {
+    "kind": "cta"
+   },
+   "title": {
+    "es": "Oportunidad de mercado e interoperabilidad europea",
+    "en": "Market opportunity and European interoperability",
+    "nl": "Marktkans en Europese interoperabiliteit"
+   },
+   "es": [
+    "Con pleno cumplimiento de las directivas europeas de protección civil y el estándar de tráfico DATEX II, SENDA está preparada para adopción institucional inmediata.",
+    "Una inversión estratégica que une software de alto rendimiento, modelos matemáticos demostrados y una ventaja tecnológica diferencial para cualquier Estado."
+   ],
+   "es_say": [
+    "Con pleno cumplimiento de las directivas europeas de protección civil y el estándar de tráfico Datex dos, Senda está preparada para adopción institucional inmediata.",
+    "Una inversión estratégica que une software de alto rendimiento, modelos matemáticos demostrados y una ventaja tecnológica diferencial para cualquier Estado."
+   ],
+   "en": [
+    "Fully aligned with European civil protection directives and the DATEX II standard, SENDA is ready for immediate sovereign and institutional procurement.",
+    "A strategic investment merging high-performance software, verified mathematical science, and unmatched technological resilience for sovereign nations."
+   ],
+   "en_say": [
+    "Fully aligned with European civil protection directives and the Datex two standard, Senda is ready for immediate sovereign and institutional procurement.",
+    "A strategic investment merging high-performance software, verified mathematical science, and unmatched technological resilience for sovereign nations."
+   ],
+   "nl": [
+    "Volledig conform de Europese richtlijnen voor civiele bescherming en de DATEX II norm is SENDA klaar voor directe overheids- en defensieaanbestedingen.",
+    "Een strategische investering die krachtige software combineert met bewezen wiskunde en een technologisch voordeel voor elke soevereine staat."
+   ]
+  }
+ ]
+}

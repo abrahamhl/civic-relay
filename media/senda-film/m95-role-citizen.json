@@ -1,0 +1,125 @@
+{
+ "note": "SENDA Mission 9.5 · Modo Ciudadano 60s (PWA 100% Offline, Saltos Vehiculares y Evacuación)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "cit_s1",
+   "claim": "OBSERVED",
+   "source": [
+    "apps/senda-live/web/src/App.tsx",
+    "docs/video/M95_VIDEO_SOURCES.md"
+   ],
+   "visual": {
+    "kind": "offline"
+   },
+   "title": {
+    "es": "Modo Ciudadano: Sin cobertura móvil y sin internet",
+    "en": "Citizen Mode: Zero cellular coverage and zero internet",
+    "nl": "Burgermodus: Geen mobiel bereik en geen internet"
+   },
+   "es": [
+    "Cuando una tormenta o un fallo eléctrico apaga las torres de telecomunicación, la aplicación de SENDA continúa funcionando en tu navegador sin requerir descargas ni conexión.",
+    "Todo mensaje de socorro o estado se cifra en tu dispositivo y se transmite mediante ultrasonidos y radio de corto alcance hacia los teléfonos de quienes estén cerca."
+   ],
+   "es_say": [
+    "Cuando una tormenta o un fallo eléctrico apaga las torres de telecomunicación, la aplicación de Senda continúa funcionando en tu navegador sin requerir descargas ni conexión.",
+    "Todo mensaje de socorro o estado se cifra en tu dispositivo y se transmite mediante ultrasonidos y radio de corto alcance hacia los teléfonos de quienes estén cerca."
+   ],
+   "en": [
+    "When a severe storm or power outage knocks out cellular antennas, SENDA continues running inside your mobile browser without requiring app store downloads or internet access.",
+    "Every emergency SOS and safety status is encrypted on your device and relayed using acoustic soundwaves and short-range radio to nearby neighbours."
+   ],
+   "en_say": [
+    "When a severe storm or power outage knocks out cellular antennas, Senda continues running inside your mobile browser without requiring app store downloads or internet access.",
+    "Every emergency S O S and safety status is encrypted on your device and relayed using acoustic soundwaves and short-range radio to nearby neighbours."
+   ],
+   "nl": [
+    "Wanneer een zware storm of stroomstoring zendmasten platlegt, blijft SENDA direct werken in uw mobiele browser zonder app-download of internetverbinding.",
+    "Elk noodbericht en elke status wordt lokaal op uw toestel versleuteld en verzonden via geluidsgolven en kortebereik-radio naar mensen in de buurt."
+   ]
+  },
+  {
+   "id": "cit_s2",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/dtn.mjs",
+    "investor-next/public/senda/core/dtn.mjs"
+   ],
+   "visual": {
+    "kind": "fragments"
+   },
+   "title": {
+    "es": "Saltos de coche a coche y rutas de evacuación seguras",
+    "en": "Car-to-car hops and safe evacuation routes",
+    "nl": "Voertuighops en veilige evacuatieroutes"
+   },
+   "es": [
+    "Los coches en movimiento y los caminantes actúan como mensajeros que transportan la información en saltos sucesivos hasta alcanzar un punto con enlace exterior.",
+    "Al mismo tiempo, el mapa tridimensional calcula rutas de evacuación seguras evitando zonas inundables y frentes de fuego gracias a modelos topográficos de alta resolución."
+   ],
+   "es_say": [
+    "Los coches en movimiento y los caminantes actúan como mensajeros que transportan la información en saltos sucesivos hasta alcanzar un punto con enlace exterior.",
+    "Al mismo tiempo, el mapa tridimensional calcula rutas de evacuación seguras evitando zonas inundables y frentes de fuego gracias a modelos topográficos de alta resolución."
+   ],
+   "en": [
+    "Moving vehicles and pedestrians serve as data couriers, advancing emergency messages hop-by-hop across miles until reaching a gateway with external connectivity.",
+    "Simultaneously, the 3D elevation map computes safe evacuation corridors, steering families away from flood basins and fire fronts using high-resolution terrain models."
+   ],
+   "en_say": [
+    "Moving vehicles and pedestrians serve as data couriers, advancing emergency messages hop-by-hop across miles until reaching a gateway with external connectivity.",
+    "Simultaneously, the 3D elevation map computes safe evacuation corridors, steering families away from flood basins and fire fronts using high-resolution terrain models."
+   ],
+   "nl": [
+    "Rijdende auto's en voetgangers fungeren als digitale koeriers die noodberichten sprong voor sprong kilometers ver doorgeven tot een werkende gateway wordt bereikt.",
+    "Tegelijkertijd berekent de 3D-hoogtekaart veilige evacuatieroutes die overstromingsgeulen en vuurhaarden omzeilen met behulp van nauwkeurige terreinmodellen."
+   ]
+  },
+  {
+   "id": "cit_s3",
+   "claim": "OBSERVED",
+   "source": [
+    "apps/senda-live/web/src/App.tsx",
+    "investor-next/public/senda/dgt.html"
+   ],
+   "visual": {
+    "kind": "easy"
+   },
+   "title": {
+    "es": "Tres botones claros para salvar vidas",
+    "en": "Three clear buttons to protect lives",
+    "nl": "Drie duidelijke knoppen om levens te beschermen"
+   },
+   "es": [
+    "En situaciones de pánico no hay tiempo para interfaces confusas. SENDA ofrece tres botones directos: estoy a salvo, necesito ayuda o estoy atrapado con mi posición precisa.",
+    "Una herramienta pública, accesible y humana que garantiza que ninguna voz quede aislada en el momento más oscuro de una emergencia."
+   ],
+   "es_say": [
+    "En situaciones de pánico no hay tiempo para interfaces confusas. Senda ofrece tres botones directos: estoy a salvo, necesito ayuda o estoy atrapado con mi posición precisa.",
+    "Una herramienta pública, accesible y humana que garantiza que ninguna voz quede aislada en el momento más oscuro de una emergencia."
+   ],
+   "en": [
+    "During critical emergencies, there is no time for complex menus. SENDA provides three immediate buttons: I'm safe, I need help, or I'm trapped with your exact coordinates.",
+    "A public, accessible, and humane utility ensuring that no citizen remains unheard in the darkest hour of a catastrophe."
+   ],
+   "en_say": [
+    "During critical emergencies, there is no time for complex menus. Senda provides three immediate buttons: I'm safe, I need help, or I'm trapped with your exact coordinates.",
+    "A public, accessible, and humane utility ensuring that no citizen remains unheard in the darkest hour of a catastrophe."
+   ],
+   "nl": [
+    "Tijdens panieksituaties is er geen tijd voor ingewikkelde menu's. SENDA biedt drie directe opties: ik ben veilig, ik heb hulp nodig, of ik zit vast met exacte coördinaten.",
+    "Een publieke, toegankelijke en humane voorziening die waarborgt dat geen enkele burger geïsoleerd raakt op het meest kritieke moment."
+   ]
+  }
+ ]
+}

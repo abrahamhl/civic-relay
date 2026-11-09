@@ -1,0 +1,125 @@
+{
+ "note": "SENDA Mission 9.5 · Reel Vertical 9:16 (Fórmulas Matemáticas que Salvan Vidas)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "r_m1",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/uav-mesh.mjs",
+    "investor-next/public/senda/core/uav-mesh.mjs"
+   ],
+   "visual": {
+    "kind": "math_grid"
+   },
+   "title": {
+    "es": "Las matemáticas detrás de la supervivencia",
+    "en": "The mathematics powering emergency survival",
+    "nl": "De wiskunde achter noodoverleving"
+   },
+   "es": [
+    "Detrás de cada vida salvada en una emergencia no hay azar, hay matemáticas rigurosas y física aplicada.",
+    "El modelo de Al-Hourani predice la probabilidad exacta de línea de vista para que los drones vuelen a la altura óptima de cobertura."
+   ],
+   "es_say": [
+    "Detrás de cada vida salvada en una emergencia no hay azar, hay matemáticas rigurosas y física aplicada.",
+    "El modelo de Al-Hourani predice la probabilidad exacta de línea de vista para que los drones vuelen a la altura óptima de cobertura."
+   ],
+   "en": [
+    "Behind every life saved during a disaster, there is no guesswork: only rigorous mathematics and applied physics.",
+    "The Al-Hourani model calculates the exact probability of line-of-sight so drones hover at the optimal altitude for radio coverage."
+   ],
+   "en_say": [
+    "Behind every life saved during a disaster, there is no guesswork: only rigorous mathematics and applied physics.",
+    "The Al-Hourani model calculates the exact probability of line-of-sight so drones hover at the optimal altitude for radio coverage."
+   ],
+   "nl": [
+    "Achter elk gered leven bij een ramp schuilt geen toeval: enkel exacte wiskunde en toegepaste fysica.",
+    "Het Al-Hourani model berekent de exacte zichtlijn-waarschijnlijkheid zodat drones op de optimale hoogte zweven voor radiobereik."
+   ]
+  },
+  {
+   "id": "r_m2",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/uav-mesh.mjs",
+    "packages/senda/src/cots-rf-tactical.mjs"
+   ],
+   "visual": {
+    "kind": "math_grid"
+   },
+   "title": {
+    "es": "Autovalor de Fiedler y difracción de Deygout",
+    "en": "Fiedler eigenvalue and Deygout diffraction",
+    "nl": "Fiedler eigenwaarde en Deygout diffractie"
+   },
+   "es": [
+    "El autovalor lambda dos del laplaciano asegura que la malla de socorro nunca se fracture en islas aisladas.",
+    "Y la difracción de filo de cuchillo de Deygout calcula cómo las ondas de radio sortean colinas y edificios en Valencia y Bejís."
+   ],
+   "es_say": [
+    "El autovalor lambda dos del laplaciano asegura que la malla de socorro nunca se fracture en islas aisladas.",
+    "Y la difracción de filo de cuchillo de Deygout calcula cómo las ondas de radio sortean colinas y edificios en Valencia y Bejís."
+   ],
+   "en": [
+    "The lambda-two Fiedler eigenvalue mathematically guarantees the emergency mesh never splinters into isolated partitions.",
+    "Meanwhile, Deygout knife-edge diffraction computes how radio waves bend over mountain ridges and buildings in Valencia and Bejís."
+   ],
+   "en_say": [
+    "The lambda-two Fiedler eigenvalue mathematically guarantees the emergency mesh never splinters into isolated partitions.",
+    "Meanwhile, Deygout knife-edge diffraction computes how radio waves bend over mountain ridges and buildings in Valencia and Bejís."
+   ],
+   "nl": [
+    "De lambda-twee Fiedler eigenwaarde garandeert wiskundig dat het noodnetwerk nooit uiteenvalt in geïsoleerde eilandjes.",
+    "Ondertussen berekent Deygout mesrand-diffractie hoe radiogolven over heuvels en gebouwen buigen in Valencia en Bejís."
+   ]
+  },
+  {
+   "id": "r_m3",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/app/senda-home.tsx",
+    "docs/video/M95_VIDEO_SOURCES.md"
+   ],
+   "visual": {
+    "kind": "cta"
+   },
+   "title": {
+    "es": "Ciencia real al servicio de la sociedad",
+    "en": "Real science in service of humanity",
+    "nl": "Echte wetenschap ten dienste van de samenleving"
+   },
+   "es": [
+    "Ciencia demostrable, código abierto y tecnología disponible para cuando más se necesita.",
+    "Comprueba todos los cálculos en vivo en civic-relay-investor punto vercel punto app barra senda."
+   ],
+   "es_say": [
+    "Ciencia demostrable, código abierto y tecnología disponible para cuando más se necesita.",
+    "Comprueba todos los cálculos en vivo en civic guión relay guión investor punto vercel punto app barra senda."
+   ],
+   "en": [
+    "Verifiable science, open codebase, and reliable technology available when every second counts.",
+    "Inspect the mathematical live computations at civic-relay-investor dot vercel dot app slash senda."
+   ],
+   "en_say": [
+    "Verifiable science, open codebase, and reliable technology available when every second counts.",
+    "Inspect the mathematical live computations at civic dash relay dash investor dot vercel dot app slash senda."
+   ],
+   "nl": [
+    "Verifieerbare wetenschap, open source code en betrouwbare technologie wanneer elke seconde telt.",
+    "Bekijk de live wiskundige berekeningen op civic-relay-investor punt vercel punt app schuine streep senda."
+   ]
+  }
+ ]
+}

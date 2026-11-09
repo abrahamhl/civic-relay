@@ -1,0 +1,143 @@
+{
+ "note": "SENDA Mission 9.5 · Reel Vertical 9:16 (Apagón Black-Sky y Malla Acústica)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "r_bs1",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/public/senda/dgt.html",
+    "docs/video/M95_VIDEO_SOURCES.md"
+   ],
+   "visual": {
+    "kind": "kpis",
+    "kpis": [
+     {
+      "v": "0 % RED",
+      "l": {
+       "es": "Apagón total de antenas y centros de datos",
+       "en": "Total blackout of cellular masts and data centres",
+       "nl": "Totale uitval van zendmasten en datacenters"
+      }
+     },
+     {
+      "v": "SENDA ACTIVA",
+      "l": {
+       "es": "Malla directa de dispositivo a dispositivo",
+       "en": "Direct device-to-device mesh operational",
+       "nl": "Direct toestel-naar-toestel netwerk operationeel"
+      }
+     }
+    ]
+   },
+   "title": {
+    "es": "¿Qué pasa si cae toda la red eléctrica y móvil?",
+    "en": "What happens when the entire electrical and mobile grid collapses?",
+    "nl": "Wat gebeurt er als het complete stroom- en telecomnetwerk uitvalt?"
+   },
+   "es": [
+    "Imaginen este escenario: la red eléctrica cae y en pocas horas las baterías de las antenas móviles se agotan por completo.",
+    "El noventa y nueve por ciento de las aplicaciones dejan de funcionar. SENDA no depende de internet ni de servidores centrales."
+   ],
+   "es_say": [
+    "Imaginen este escenario: la red eléctrica cae y en pocas horas las baterías de las antenas móviles se agotan por completo.",
+    "El noventa y nueve por ciento de las aplicaciones dejan de funcionar. Senda no depende de internet ni de servidores centrales."
+   ],
+   "en": [
+    "Imagine this reality: the power grid trips, and within hours backup batteries at cellular towers run completely dry.",
+    "Ninety-nine percent of apps go dark instantly. SENDA requires no internet and no central servers to communicate."
+   ],
+   "en_say": [
+    "Imagine this reality: the power grid trips, and within hours backup batteries at cellular towers run completely dry.",
+    "Ninety-nine percent of apps go dark instantly. Senda requires no internet and no central servers to communicate."
+   ],
+   "nl": [
+    "Stel u voor: het elektriciteitsnet valt uit en binnen enkele uren zijn de noodaccu's van zendmasten volledig leeg.",
+    "Negennegentig procent van alle apps stopt direct. SENDA heeft geen internet en geen centrale servers nodig om te functioneren."
+   ]
+  },
+  {
+   "id": "r_bs2",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/voice-call.mjs",
+    "packages/senda/src/acoustic-modem.mjs"
+   ],
+   "visual": {
+    "kind": "call"
+   },
+   "title": {
+    "es": "Llamadas de voz y datos por sonido",
+    "en": "Voice calls and data over sound",
+    "nl": "Spraak en data via geluidssignalen"
+   },
+   "es": [
+    "Mediante modulación acústica de dieciséis tonos entre dos y cinco kilohercios, los teléfonos se conectan directamente por sonido.",
+    "Un paquete de señalización se comprime a setenta y dos bytes, permitiendo establecer llamadas de voz directas y cifradas en cualquier refugio."
+   ],
+   "es_say": [
+    "Mediante modulación acústica de dieciséis tonos entre dos y cinco kilohercios, los teléfonos se conectan directamente por sonido.",
+    "Un paquete de señalización se comprime a setenta y dos bytes, permitiendo establecer llamadas de voz directas y cifradas en cualquier refugio."
+   ],
+   "en": [
+    "Using sixteen acoustic tones between two and five kilohertz, mobile phones handshake directly through airborne soundwaves.",
+    "A call signaling packet is compressed into seventy-two bytes, enabling encrypted direct voice calls inside any blackout shelter."
+   ],
+   "en_say": [
+    "Using sixteen acoustic tones between two and five kilohertz, mobile phones handshake directly through airborne soundwaves.",
+    "A call signaling packet is compressed into seventy-two bytes, enabling encrypted direct voice calls inside any blackout shelter."
+   ],
+   "nl": [
+    "Via zestien akoestische tonen tussen twee en vijf kilohertz verbinden telefoons zich rechtstreeks via geluidsgolven.",
+    "Een verbindingspakket wordt gecomprimeerd tot 72 bytes, wat versleutelde spraakverbindingen mogelijk maakt in elke schuilkelder."
+   ]
+  },
+  {
+   "id": "r_bs3",
+   "claim": "OBSERVED",
+   "source": [
+    "apps/senda-live/web/src/App.tsx",
+    "investor-next/app/senda-home.tsx"
+   ],
+   "visual": {
+    "kind": "cta"
+   },
+   "title": {
+    "es": "La red que sobrevive a cualquier tormenta",
+    "en": "The network that survives any storm",
+    "nl": "Het netwerk dat elke storm overleeft"
+   },
+   "es": [
+    "Cuando la civilización se queda a oscuras, el mensaje no muere. Abre SENDA en tu navegador y mantén a tu comunidad conectada.",
+    "Descubre la plataforma interactiva en civic-relay-investor punto vercel punto app barra senda."
+   ],
+   "es_say": [
+    "Cuando la civilización se queda a oscuras, el mensaje no muere. Abre Senda en tu navegador y mantén a tu comunidad conectada.",
+    "Descubre la plataforma interactiva en civic guión relay guión investor punto vercel punto app barra senda."
+   ],
+   "en": [
+    "When civilization goes dark, your emergency message survives. Open SENDA in your mobile browser and keep your community linked.",
+    "Explore the interactive platform at civic-relay-investor dot vercel dot app slash senda."
+   ],
+   "en_say": [
+    "When civilization goes dark, your emergency message survives. Open Senda in your mobile browser and keep your community linked.",
+    "Explore the interactive platform at civic dash relay dash investor dot vercel dot app slash senda."
+   ],
+   "nl": [
+    "Wanneer de stroom uitvalt, overleeft uw noodbericht. Open SENDA in uw browser en houd uw buurt verbonden.",
+    "Verken het interactieve platform op civic-relay-investor punt vercel punt app schuine streep senda."
+   ]
+  }
+ ]
+}

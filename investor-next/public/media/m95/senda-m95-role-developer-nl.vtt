@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:10.989
+Voor ingenieurs die technische nauwkeurigheid eisen, is SENDA geen zwarte doos: het implementeert getoetste fysische modellen zoals Al-Hourani en Deygout diffractie.
+
+2
+00:00:11.339 --> 00:00:23.265
+De connectiviteit van drone-zwermen wordt real-time bewaakt door de tweede eigenwaarde van de graaf-Laplaciaan te berekenen, wat garandeert dat het netwerk verbonden blijft.
+
+3
+00:00:24.865 --> 00:00:37.665
+Het radiosubsysteem decodeert ASTM F3411 frames via Bluetooth en wifi en achterhaalt positie, snelheidsvectoren en de exacte locatie van de piloot op de grond.
+
+4
+00:00:38.015 --> 00:00:48.980
+Hulpverleners kunnen met één klik vluchtplannen exporteren voor PX4 en QGroundControl, waardoor reddingsdrones direct fungeren als vliegende zendstations.
+
+5
+00:00:50.580 --> 00:00:59.988
+Alle logica van SENDA is ondergebracht in vierenzeventig zuivere modules zonder externe ballast, gevalideerd door honderden geautomatiseerde unittests.
+
+6
+00:01:00.338 --> 00:01:09.447
+Of u nu bouwt in TypeScript, Python of microcontrollercode, de API handhaaft strikte mathematische consistentie voor maximale betrouwbaarheid.

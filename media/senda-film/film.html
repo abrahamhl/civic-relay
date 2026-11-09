@@ -327,7 +327,7 @@ function visualHTML(sc, idx) {
         return `<div class="desk f${i}"><div class="bar"><i></i><i></i><i></i></div><div class="crop" style="height:${Math.round((y1 - y0) * sc2)}px"><img src="${img(f.f)}" style="top:${-Math.round(y0 * sc2)}px"></div></div>`;
       }
       if (/e2e-(06|08|12)/.test(f)) {
-        const [y0, y1] = v.crop ? CROPS[v.crop] : [0, /06/.test(f) ? 1000 : 900]; const sc2 = 636 / 1280;
+        const [y0, y1] = (v.crop && CROPS[v.crop]) ? CROPS[v.crop] : [0, /06/.test(f) ? 1000 : 900]; const sc2 = 636 / 1280;
         return `<div class="desk f${i}"><div class="bar"><i></i><i></i><i></i></div><div class="crop" style="height:${Math.round((y1 - y0) * sc2)}px"><img src="${img(f)}" style="top:${-Math.round(y0 * sc2)}px"></div></div>`;
       }
       const tall = /e2e-11/.test(f);
@@ -344,7 +344,7 @@ function visualHTML(sc, idx) {
     const src = v.src.includes('lang=') ? v.src : v.src + (v.src.includes('?') ? '&' : '?') + 'lang=' + LANG;
     return `<iframe class="pg" src="${src}" width="640" height="600" title="${T(sc.title)}"></iframe>`;
   }
-  if (v.kind === 'call' || v.kind === 'howsim') return '<canvas class="c2d" width="640" height="600"></canvas>';
+  if (['call', 'howsim', 'broadcast', 'math_grid', 'cots_bom', 'pbr_radar', 'drone_hunt'].includes(v.kind)) return '<canvas class="c2d" width="640" height="600"></canvas>';
   if (v.kind === 'offline') return dg('No Internet · from second one', 'end-to-end encrypted', 'Every phone carries messages it cannot read.',
     `<div class="off-grid d2">
       <div class="mock"><div class="mock-top"><span>SENDA</span><span class="pill red">OFFLINE</span></div><div class="mock-body"><div class="bubble out">SOS · 4th floor · 3 people</div><div class="sealed"><span class="lock">AES-256-GCM</span><b>Sealed message</b><span>Only the recipient can open it.</span></div><div class="wave"><i></i><i></i><i></i><i></i></div><div class="mock-note">Sent by sound · no server</div></div></div>

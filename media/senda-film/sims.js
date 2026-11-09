@@ -280,6 +280,316 @@
     }
   }
 
+  // ---------------------------------------------------------------- 5) ESPECIAL INFORMATIVO TELEDIARIO
+  function drawBroadcast(cv, lt, d, cue) {
+    if (!cv) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (cv.width !== Math.round(640 * dpr)) { cv.width = Math.round(640 * dpr); cv.height = Math.round(600 * dpr); }
+    const g = cv.getContext('2d'), W = 640, H = 600;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+
+    g.fillStyle = '#060d13'; rr(g, 0, 0, W, H, 16); g.fill();
+    g.strokeStyle = '#162836'; g.lineWidth = 1;
+    for (let x = 20; x < W; x += 32) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
+    for (let y = 20; y < H; y += 32) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
+
+    g.fillStyle = '#0b1924'; rr(g, 10, 10, W - 20, 44, 8); g.fill();
+    g.strokeStyle = '#223c50'; g.stroke();
+
+    const blink = Math.sin(lt * 5) > 0;
+    g.fillStyle = blink ? '#ff4d4d' : '#881111';
+    rr(g, 22, 20, 110, 24, 6); g.fill();
+    g.fillStyle = '#ffffff'; g.font = '800 11px ui-monospace,monospace';
+    g.fillText(tr('● EN DIRECTO', '● LIVE NEWS'), 32, 36);
+
+    const utcSec = Math.floor(lt) % 60;
+    const secStr = utcSec < 10 ? '0' + utcSec : '' + utcSec;
+    g.fillStyle = C.i; g.font = '700 13px ui-monospace,monospace';
+    g.fillText(`20:11:${secStr} UTC · SENDA NET`, 146, 37);
+
+    g.fillStyle = C.e; g.font = '700 11px ui-monospace,monospace';
+    g.textAlign = 'right';
+    g.fillText(tr('DEFENSA CIVIL Y TÁCTICA', 'CIVIL DEFENCE & TACTICAL'), W - 24, 37);
+    g.textAlign = 'left';
+
+    g.fillStyle = '#102230'; rr(g, 10, 62, W - 20, 52, 8); g.fill();
+    g.fillStyle = C.c; g.fillRect(10, 62, 6, 52);
+    g.fillStyle = C.t; g.font = '800 17px Inter,system-ui';
+    g.fillText(tr('ESPECIAL INFORMATIVO: ALERTA TÁCTICA Y SOBERANÍA', 'SPECIAL REPORT: TACTICAL ALERT & RESILIENCE'), 26, 92);
+    g.fillStyle = C.m; g.font = '12px Inter,system-ui';
+    g.fillText(tr('Monitor geoespacial 4D · Red mallada autónoma en tiempo real', '4D Geospatial Monitor · Autonomous Real-Time Mesh'), 26, 108);
+
+    const pW = 295, pH = 230, py = 124;
+    g.fillStyle = '#08141f'; rr(g, 16, py, pW, pH, 10); g.fill();
+    g.strokeStyle = '#223c50'; g.stroke();
+    g.fillStyle = C.i; g.font = '700 11px ui-monospace,monospace';
+    g.fillText(tr('MAPA DEM 3D · HISTÓRICO DE ALERTAS', '3D DEM MAP · HISTORIC DISASTERS'), 28, py + 22);
+
+    g.strokeStyle = '#1a374b'; g.lineWidth = 1.5;
+    for (let i = 0; i < 5; i++) {
+      g.beginPath();
+      for (let x = 24; x < 24 + pW - 16; x += 20) {
+        const y = py + 80 + i * 26 + Math.sin((x + lt * 25) * 0.03 + i) * 12;
+        if (x === 24) g.moveTo(x, y); else g.lineTo(x, y);
+      }
+      g.stroke();
+    }
+    const incs = [
+      { n: tr('Valencia DANA A-3', 'Valencia DANA A-3'), x: 80, y: py + 90, c: '#ff5b6e' },
+      { n: tr('Bejís Incendio', 'Bejís Firestorm'), x: 200, y: py + 140, c: '#fbbf24' },
+      { n: tr('A-12 Arnhem Niebla', 'A-12 Arnhem Fog'), x: 140, y: py + 190, c: '#91d7e8' }
+    ];
+    incs.forEach(inc => {
+      const pulse = Math.abs(Math.sin(lt * 3 + inc.x));
+      g.fillStyle = inc.c; g.beginPath(); g.arc(inc.x, inc.y, 5 + pulse * 4, 0, 7); g.fill();
+      g.fillStyle = '#ffffff'; g.font = '700 10px Inter,system-ui';
+      g.fillText(inc.n, inc.x + 12, inc.y + 4);
+    });
+
+    const rx = 328;
+    g.fillStyle = '#08141f'; rr(g, rx, py, pW, pH, 10); g.fill();
+    g.strokeStyle = '#223c50'; g.stroke();
+    g.fillStyle = C.i; g.font = '700 11px ui-monospace,monospace';
+    g.fillText(tr('ESPECTRO ELECTROMAGNÉTICO ISM & SAT', 'ELECTROMAGNETIC SPECTRUM ISM & SAT'), rx + 12, py + 22);
+
+    const bands = [
+      { f: '433 MHz', p: 0.8 }, { f: '868 MHz LoRa', p: 0.95 },
+      { f: '2.4 GHz BLE', p: 0.7 }, { f: 'QO-100 Sat', p: 0.85 }
+    ];
+    bands.forEach((b, idx) => {
+      const by = py + 42 + idx * 44;
+      g.fillStyle = '#0f2433'; rr(g, rx + 12, by, pW - 24, 34, 6); g.fill();
+      g.fillStyle = C.t; g.font = '700 11px Inter,system-ui';
+      g.fillText(b.f, rx + 20, by + 18);
+      const wBar = (pW - 130) * b.p * (0.8 + 0.2 * Math.sin(lt * 4 + idx));
+      g.fillStyle = C.e; rr(g, rx + 100, by + 10, wBar, 14, 4); g.fill();
+      g.fillStyle = C.i; g.font = '9px ui-monospace,monospace';
+      g.fillText('LINK OK', rx + pW - 60, by + 21);
+    });
+
+    const ky = 366;
+    const kpis = [
+      { v: '1 428', l: tr('Nodos Malla Activos', 'Active Mesh Nodes') },
+      { v: '99.4 %', l: tr('Probabilidad Entrega', 'Delivery Probability') },
+      { v: '< 25 €', l: tr('Coste Hardware COTS', 'COTS Hardware Cost') },
+      { v: '0 SRV', l: tr('Servidores Centrales', 'Central Servers Needed') }
+    ];
+    kpis.forEach((k, i) => {
+      const kx = 16 + i * 153;
+      g.fillStyle = '#0b1924'; rr(g, kx, ky, 145, 96, 8); g.fill();
+      g.strokeStyle = '#20394a'; g.stroke();
+      g.fillStyle = i === 1 ? C.e : i === 2 ? C.a : C.i;
+      g.font = '800 24px Inter,system-ui';
+      g.fillText(k.v, kx + 14, ky + 38);
+      g.fillStyle = C.m; g.font = '11px Inter,system-ui';
+      g.fillText(k.l, kx + 14, ky + 64);
+      g.fillStyle = C.t; g.font = '700 9px ui-monospace,monospace';
+      g.fillText('CALCULATED', kx + 14, ky + 84);
+    });
+
+    const ty = 478;
+    g.fillStyle = '#ff7756'; rr(g, 10, ty, 105, 30, 6); g.fill();
+    g.fillStyle = '#05090c'; g.font = '800 11px ui-monospace,monospace';
+    g.fillText(tr('ÚLTIMA HORA', 'BREAKING'), 20, ty + 20);
+
+    g.fillStyle = '#071018'; rr(g, 120, ty, W - 130, 30, 6); g.fill();
+    g.strokeStyle = '#223c50'; g.stroke();
+
+    const tickerText = tr(
+      '»» ALERTA TEMPRANA ACTIVA EN CORREDORES ESTRATÉGICOS · MALLA VEHICULAR DTN POR BLUETOOTH Y SONIDO · DEFENSA CIVIL SIN DEPENDENCIA DE RED MÓVIL · SOBERANÍA Y COBERTURA TERRITORIAL TOTAL ««',
+      '»» EARLY WARNING ACTIVE IN STRATEGIC CORRIDORS · VEHICULAR DTN MESH VIA BLUETOOTH & SOUND · CIVIL DEFENCE OPERATING WITH ZERO CELLULAR MASTS · TOTAL SOVEREIGN TERRITORIAL RESILIENCE ««'
+    );
+    g.save();
+    g.beginPath(); rr(g, 125, ty, W - 140, 30, 4); g.clip();
+    const tOffset = ((lt * 65) % 1400);
+    g.fillStyle = C.t; g.font = '600 12px Inter,system-ui';
+    g.fillText(tickerText, 130 - tOffset, ty + 20);
+    g.fillText(tickerText, 130 - tOffset + 1400, ty + 20);
+    g.restore();
+
+    g.fillStyle = C.m; g.font = '11px ui-monospace,monospace';
+    g.fillText(tr('MARCO LEGAL: ESPECTRO ISM LIBRE · ASTM F3411 · DATEX II · DIRECTIVAS UE DE PROTECCIÓN CIVIL', 'LEGAL FRAMEWORK: LICENSE-FREE ISM · ASTM F3411 · DATEX II · EU CIVIL PROTECTION DIRECTIVES'), 16, 540);
+  }
+
+  // ---------------------------------------------------------------- 6) MATEMÁTICA Y FÍSICA AVANZADA
+  function drawMathGrid(cv, lt, d, cue) {
+    if (!cv) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (cv.width !== Math.round(640 * dpr)) { cv.width = Math.round(640 * dpr); cv.height = Math.round(600 * dpr); }
+    const g = cv.getContext('2d'), W = 640, H = 600;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+
+    g.fillStyle = '#07111a'; rr(g, 0, 0, W, H, 16); g.fill();
+    g.strokeStyle = '#1b2d3d'; g.lineWidth = 1;
+    for (let x = 16; x < W; x += 32) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
+    for (let y = 16; y < H; y += 32) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
+
+    const qw = 295, qh = 245;
+    const quads = [
+      { x: 16, y: 16, t: '1 · AL-HOURANI 3D A2G', c: C.i, eq: 'P_LoS(θ) = 1 / (1 + a·exp(-b(θ - a)))', sub: tr('Probabilidad de vista y altura óptima dron', 'LoS probability and optimal UAV altitude') },
+      { x: 328, y: 16, t: '2 · AUTOVALOR DE FIEDLER λ₂(L)', c: C.e, eq: 'L = D - A,  λ₂(L) = 0.482 > 0', sub: tr('Conectividad algebraica del enjambre', 'Swarm algebraic connectivity proof') },
+      { x: 16, y: 275, t: '3 · DIFRACCIÓN DEYGOUT P.526', c: C.a, eq: 'ν = h · √[ 2(d₁ + d₂) / (λ d₁ d₂) ]', sub: tr('Atenuación sobre relieve DEM real', 'Multi-knife-edge diffraction loss') },
+      { x: 328, y: 275, t: '4 · RADAR PASIVO BIESTÁTICO (CAF)', c: C.c, eq: 'S(τ, fd) = ∫ s_surv(t) s_ref*(t-τ) e^(-j2πfd t) dt', sub: tr('Detección Doppler con radio comercial', 'Passive Doppler detection with DVB-T/FM') }
+    ];
+
+    quads.forEach((q, idx) => {
+      g.fillStyle = '#0a1722'; rr(g, q.x, q.y, qw, qh, 12); g.fill();
+      g.strokeStyle = '#223c50'; g.stroke();
+
+      g.fillStyle = q.c; g.font = '800 12px ui-monospace,monospace';
+      g.fillText(q.t, q.x + 14, q.y + 26);
+
+      g.fillStyle = '#ffffff'; g.font = '700 12px ui-monospace,monospace';
+      g.fillText(q.eq, q.x + 14, q.y + 50);
+
+      g.fillStyle = C.m; g.font = '11px Inter,system-ui';
+      g.fillText(q.sub, q.x + 14, q.y + 70);
+
+      if (idx === 0) {
+        g.strokeStyle = q.c; g.lineWidth = 2.5; g.beginPath();
+        for (let th = 0; th <= 90; th += 3) {
+          const p = 1 / (1 + 9.61 * Math.exp(-0.16 * (th - 9.61)));
+          const gx = q.x + 24 + (th / 90) * (qw - 48);
+          const gy = q.y + qh - 24 - p * (qh - 110);
+          if (th === 0) g.moveTo(gx, gy); else g.lineTo(gx, gy);
+        }
+        g.stroke();
+        const optX = q.x + 24 + (45 / 90) * (qw - 48);
+        const optY = q.y + qh - 24 - 0.98 * (qh - 110);
+        g.fillStyle = '#ff7756'; g.beginPath(); g.arc(optX, optY, 5, 0, 7); g.fill();
+        g.fillText('h* = 84 m', optX + 10, optY - 2);
+      } else if (idx === 1) {
+        const nodes = [
+          { x: q.x + 70, y: q.y + 130 }, { x: q.x + 150, y: q.y + 110 }, { x: q.x + 230, y: q.y + 130 },
+          { x: q.x + 80, y: q.y + 195 }, { x: q.x + 160, y: q.y + 210 }, { x: q.x + 225, y: q.y + 190 }
+        ];
+        g.strokeStyle = 'rgba(52,211,153,0.4)'; g.lineWidth = 2;
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            if ((i + j) % 2 === 0 || (i + j) % 3 === 0) {
+              g.beginPath(); g.moveTo(nodes[i].x, nodes[i].y); g.lineTo(nodes[j].x, nodes[j].y); g.stroke();
+            }
+          }
+        }
+        nodes.forEach((n, ni) => {
+          g.fillStyle = ni === 0 ? C.c : C.e;
+          g.beginPath(); g.arc(n.x, n.y, 7, 0, 7); g.fill();
+        });
+        g.fillStyle = C.e; g.font = '700 11px ui-monospace,monospace';
+        g.fillText('λ₂ = 0.482 > 0 (CONEXIÓN ROBUSTA)', q.x + 24, q.y + qh - 14);
+      } else if (idx === 2) {
+        g.strokeStyle = '#324a5e'; g.lineWidth = 2;
+        g.beginPath(); g.moveTo(q.x + 20, q.y + qh - 20);
+        g.lineTo(q.x + 90, q.y + 135); g.lineTo(q.x + 140, q.y + qh - 20);
+        g.lineTo(q.x + 200, q.y + 120); g.lineTo(q.x + qw - 20, q.y + qh - 20);
+        g.stroke();
+        g.strokeStyle = q.c; g.lineWidth = 1.5; g.setLineDash([4, 4]);
+        g.beginPath(); g.moveTo(q.x + 20, q.y + qh - 30);
+        g.lineTo(q.x + 90, q.y + 130); g.lineTo(q.x + 200, q.y + 115);
+        g.lineTo(q.x + qw - 20, q.y + qh - 30);
+        g.stroke(); g.setLineDash([]);
+        g.fillStyle = q.c; g.font = '700 11px ui-monospace,monospace';
+        g.fillText('L_deygout = 18.4 dB', q.x + 24, q.y + qh - 14);
+      } else if (idx === 3) {
+        const mx = q.x + 24, my = q.y + 100, mw = qw - 48, mh = qh - 130;
+        g.fillStyle = '#08121a'; g.fillRect(mx, my, mw, mh);
+        for (let ix = 0; ix < mw; ix += 6) {
+          for (let iy = 0; iy < mh; iy += 6) {
+            const dist = Math.hypot(ix - mw * 0.6, iy - mh * 0.4);
+            const val = Math.max(0, 1 - dist / 35);
+            g.fillStyle = val > 0.4 ? `rgba(255,119,86,${val})` : `rgba(20,50,75,${0.2 + val * 0.5})`;
+            g.fillRect(mx + ix, my + iy, 5, 5);
+          }
+        }
+        g.fillStyle = C.c; g.font = '700 10px ui-monospace,monospace';
+        g.fillText('BLIP: τ=3.8µs, fd=-85Hz (54 km/h)', mx, my + mh + 16);
+      }
+    });
+
+    g.fillStyle = C.m; g.font = '11px ui-monospace,monospace';
+    g.fillText(tr('PARIDAD MATEMÁTICA EN 74 MÓDULOS DE NÚCLEO (TYPESCRIPT + PYTHON + C++)', 'MATHEMATICAL PARITY ACROSS 74 CORE MODULES (TYPESCRIPT + PYTHON + C++)'), 16, 560);
+  }
+
+  // ---------------------------------------------------------------- 7) HARDWARE COTS < 25 € Y ANTENAS
+  function drawCotsBom(cv, lt, d, cue) {
+    if (!cv) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (cv.width !== Math.round(640 * dpr)) { cv.width = Math.round(640 * dpr); cv.height = Math.round(600 * dpr); }
+    const g = cv.getContext('2d'), W = 640, H = 600;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+
+    g.fillStyle = '#081119'; rr(g, 0, 0, W, H, 16); g.fill();
+
+    g.fillStyle = C.c; g.font = '800 14px ui-monospace,monospace';
+    g.fillText(tr('LISTA DE MATERIALES COTS (ALIEXPRESS) · COSTE < 25 €', 'TACTICAL COTS BOM (OFF-THE-SHELF) · COST < 25 €'), 20, 36);
+    g.fillStyle = C.m; g.font = '12px Inter,system-ui';
+    g.fillText(tr('Componentes comerciales universales accesibles para cualquier país u operador', 'Universal commercial parts accessible to any nation or responder'), 20, 56);
+
+    const items = [
+      { name: 'ESP32-S3 Dual-Core Xtensa LX7', specs: 'Wi-Fi 4 + BLE 5 Mesh · 240 MHz · USB OTG', price: '3,80 €', icon: '⚡' },
+      { name: 'RTL-SDR v4 R828D Tuner', specs: '100 kHz - 1.7 GHz · HF Direct Sampling · TCXO', price: '14,20 €', icon: '📡' },
+      { name: 'nRF52840 USB Multi-Protocol Dongle', specs: 'Thread · Zigbee · Bluetooth 5.4 · 802.15.4', price: '4,10 €', icon: '📶' },
+      { name: 'Hilo de Cobre Esmaltado & Conectores', specs: 'Antenas QFH, Yagi 3 el., Bi-Quad y Monopolo', price: '1,90 €', icon: '📐' }
+    ];
+
+    items.forEach((it, idx) => {
+      const iy = 80 + idx * 72;
+      g.fillStyle = '#0d1e2b'; rr(g, 20, iy, W - 40, 62, 10); g.fill();
+      g.strokeStyle = '#223c50'; g.stroke();
+
+      g.fillStyle = C.i; g.font = '22px Inter,system-ui';
+      g.fillText(it.icon, 34, iy + 40);
+
+      g.fillStyle = C.t; g.font = '700 14px Inter,system-ui';
+      g.fillText(it.name, 72, iy + 26);
+
+      g.fillStyle = C.m; g.font = '11px Inter,system-ui';
+      g.fillText(it.specs, 72, iy + 48);
+
+      g.fillStyle = C.e; g.font = '800 18px ui-monospace,monospace';
+      g.textAlign = 'right';
+      g.fillText(it.price, W - 36, iy + 38);
+      g.textAlign = 'left';
+    });
+
+    const by = 385;
+    g.fillStyle = '#0f2738'; rr(g, 20, by, W - 40, 68, 10); g.fill();
+    g.strokeStyle = C.e; g.lineWidth = 1.5; g.stroke(); g.lineWidth = 1;
+
+    g.fillStyle = C.t; g.font = '800 16px Inter,system-ui';
+    g.fillText(tr('TOTAL NODO TÁCTICO COMPLETO:', 'TOTAL COMPLETE TACTICAL NODE:'), 36, by + 32);
+    g.fillStyle = C.m; g.font = '12px Inter,system-ui';
+    g.fillText(tr('Receptor SDR + Malla BLE/Wi-Fi + Decodificador ASTM F3411', 'SDR Receiver + BLE/Wi-Fi Mesh + ASTM F3411 Decoder'), 36, by + 52);
+
+    g.fillStyle = C.e; g.font = '900 28px ui-monospace,monospace';
+    g.textAlign = 'right';
+    g.fillText('24,00 €', W - 36, by + 44);
+    g.textAlign = 'left';
+
+    const ay = 468;
+    g.fillStyle = '#0b1924'; rr(g, 20, ay, W - 40, 105, 10); g.fill();
+    g.strokeStyle = '#20394a'; g.stroke();
+
+    g.fillStyle = C.a; g.font = '700 11px ui-monospace,monospace';
+    g.fillText(tr('CORTE DE ANTENAS ARTESANALES (CÁLCULO EXACTO)', 'DIY ANTENNA CUTTING BLUEPRINT (EXACT SIZING)'), 36, ay + 24);
+
+    const ants = [
+      { t: 'Monopolo 868 MHz', l: '8.2 cm (λ/4)' },
+      { t: 'Dipolo 433 MHz', l: '16.4 cm (λ/2)' },
+      { t: 'Yagi 3-el. 868', l: 'Dir 15.2 / Ref 17.1' },
+      { t: 'QFH Satelital', l: 'Hélice cuadrifilar' }
+    ];
+    ants.forEach((a, i) => {
+      const ax = 36 + i * 144;
+      g.fillStyle = C.t; g.font = '700 12px Inter,system-ui';
+      g.fillText(a.t, ax, ay + 52);
+      g.fillStyle = C.i; g.font = '11px ui-monospace,monospace';
+      g.fillText(a.l, ax, ay + 72);
+      g.fillStyle = C.e; g.font = '600 10px ui-monospace,monospace';
+      g.fillText(tr('✓ Cero herramientas caras', '✓ Zero expensive tools'), ax, ay + 90);
+    });
+  }
+
   window.SIMS = {
     init,
     full: (kind) => kind === 'drone3d' || kind === 'arch3d',
@@ -287,6 +597,9 @@
     draw(kind, el, lt, d, cue) {
       if (kind === 'call') drawCall(el.querySelector('canvas.c2d'), lt, d, cue);
       else if (kind === 'howsim') drawHow(el.querySelector('canvas.c2d'), lt, d, cue);
+      else if (kind === 'broadcast') drawBroadcast(el.querySelector('canvas.c2d'), lt, d, cue);
+      else if (kind === 'math_grid') drawMathGrid(el.querySelector('canvas.c2d'), lt, d, cue);
+      else if (kind === 'cots_bom') drawCotsBom(el.querySelector('canvas.c2d'), lt, d, cue);
       else if (kind === 'drone3d') drawDrone(el.querySelector('.hud'), lt, d, cue);
       else if (kind === 'arch3d') drawArch(el.querySelector('.hud'), lt, d, cue);
     },

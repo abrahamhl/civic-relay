@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:05.251
+Wist u dat u een tactische drone-detector kunt bouwen voor minder dan vijfentwintig euro?
+
+2
+00:00:05.601 --> 00:00:13.430
+Met een ESP32 chip, een voordelige radio-ontvanger en wat koperdraad vangt SENDA live signalen op in het luchtruim.
+
+3
+00:00:15.030 --> 00:00:23.137
+De internationale ASTM F3411 norm verzendt drone-telemetrie én de grondcoördinaten van de bestuurder.
+
+4
+00:00:23.487 --> 00:00:30.889
+SENDA decodeert het pakket, projecteert een directe vector op de 3D-kaart en toont precies waar de piloot zich bevindt.
+
+5
+00:00:32.489 --> 00:00:39.380
+Echte civiele bescherming, zonder gesloten systemen, binnen handbereik van brandweer, politie en burgerwachten.
+
+6
+00:00:39.730 --> 00:00:47.261
+Bekijk de antenneschema's en de interactieve demo op civic-relay-investor punt vercel punt app schuine streep senda.
