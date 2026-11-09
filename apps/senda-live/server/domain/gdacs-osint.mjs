@@ -30,8 +30,8 @@ export function buildGdacsUrl(now = Date.now()) {
   if (!Number.isFinite(now)) throw new Error('GDACS_BAD_CLOCK');
   const url = new URL(GDACS_API);
   const date = (t) => new Date(t).toISOString().slice(0, 10);
-  url.searchParams.set('fromdate', date(now - 14 * DAY));
-  url.searchParams.set('todate', date(now));
+  url.searchParams.set('fromDate', date(now - 14 * DAY));
+  url.searchParams.set('toDate', date(now));
   url.searchParams.set('eventlist', 'EQ,WF,FL,TC,VO,DR');
   // Source caps response to 100; no fake pagination or unsupported "limit".
   return url.toString();
