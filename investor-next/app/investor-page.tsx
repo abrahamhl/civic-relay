@@ -4,6 +4,7 @@ import CrisisStory from './crisis-story';
 import CoordinationLab from './coordination-lab';
 import EvidenceBoard from './evidence-board';
 import TelecomAndRfRadarSuite from './telecom-rf-radar-suite';
+import VehicularDopplerLab from './vehicular-doppler-lab';
 import LiveHardwareAndDealRoomConsole from './live-hardware-console';
 import SectorIntelligenceConsole from './sector-intelligence-console';
 import {HyperFramesCinemaDeck} from './hyperframes-cinema-deck';
@@ -224,6 +225,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
   <div data-for="citizen coord"><WhatItDoes locale={locale}/></div>
   <div data-for="coord eng"><SectorIntelligenceConsole locale={locale}/></div>
   <div data-for="eng"><TelecomAndRfRadarSuite locale={locale}/></div>
+  <div data-for="eng"><VehicularDopplerLab locale={locale}/></div>
   <div data-for="eng inv"><LiveHardwareAndDealRoomConsole locale={locale}/></div>
   <div data-for="citizen coord"><CrisisStory locale={locale}/></div>
   <div data-for="citizen"><ScrollExperience locale={locale}/></div>

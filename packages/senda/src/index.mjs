@@ -58,3 +58,4 @@ export * from './government-resilience-harness.mjs';
 export * from './uav-tactical-science.mjs';
 export * from './cots-rf-tactical.mjs';
 export * from './scientific-theorems-physics.mjs';
+export * from './vehicle-doppler-gateway.mjs';

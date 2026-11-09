@@ -3,6 +3,7 @@ import SectorIntelligenceConsole from './sector-intelligence-console';
 import CoordinationLab from './coordination-lab';
 import TelecomAndRfRadarSuite from './telecom-rf-radar-suite';
 import ScientificTheoremsLab from './scientific-theorems-lab';
+import VehicularDopplerLab from './vehicular-doppler-lab';
 import LiveHardwareAndDealRoomConsole from './live-hardware-console';
 import EvidenceBoard from './evidence-board';
 import CommandSurface from './command-surface';
@@ -143,6 +144,7 @@ export default function SurfaceView({
         <>
           <div className="container">
             <ScientificTheoremsLab locale={locale} />
+            <VehicularDopplerLab locale={locale} />
           </div>
           <SystemExplained locale={locale} />
           <CoordinationLab locale={locale} />
