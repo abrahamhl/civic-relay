@@ -25,6 +25,13 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
   const [showSatellites, setShowSatellites] = useState<boolean>(true);
   const [showObservations, setShowObservations] = useState<boolean>(true);
   const [showUavTactical, setShowUavTactical] = useState<boolean>(true);
+  const [showCotsDrones, setShowCotsDrones] = useState<boolean>(true);
+  const [showCotsModal, setShowCotsModal] = useState<boolean>(false);
+  const [cotsDetections, setCotsDetections] = useState<any[]>([]);
+  const [cotsCatalog, setCotsCatalog] = useState<any | null>(null);
+  const [hexInput, setHexInput] = useState<string>('01123135383146343558323230393030303100000000000000');
+  const [decodedOutput, setDecodedOutput] = useState<any | null>(null);
+  const [isDecodingHex, setIsDecodingHex] = useState<boolean>(false);
 
   // UAV Tactical Science & Photogrammetry State
   const [uavScenario, setUavScenario] = useState<string>('WILDFIRE_PERIMETER_SURVEY');
@@ -59,6 +66,7 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
   const fresnelMeshRef = useRef<THREE.Mesh | null>(null);
   const satellitesGroupRef = useRef<THREE.Group | null>(null);
   const uavGroupRef = useRef<THREE.Group | null>(null);
+  const cotsGroupRef = useRef<THREE.Group | null>(null);
 
   // Mouse Orbit State
   const isDraggingRef = useRef(false);
@@ -78,7 +86,9 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
       api.getUsgsEarthquakes(),
       api.getReconciledIntelligence(),
       api.getMobilityIncidents(),
-    ]).then(([terrainRes, weatherRes, effisRes, aemetRes, usgsRes, reconRes, mobRes]) => {
+      api.getCotsDroneDetections(),
+      api.getCotsHardwareCatalog(),
+    ]).then(([terrainRes, weatherRes, effisRes, aemetRes, usgsRes, reconRes, mobRes, cotsDronesRes, cotsCatRes]) => {
       if (!active) return;
       if (terrainRes.status === 'fulfilled' && terrainRes.value?.status !== 'UNAVAILABLE') {
         setTerrain(terrainRes.value);
@@ -100,6 +110,12 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
       }
       if (mobRes.status === 'fulfilled' && Array.isArray(mobRes.value?.incidents)) {
         setMobilityIncidents(mobRes.value.incidents);
+      }
+      if (cotsDronesRes.status === 'fulfilled' && Array.isArray(cotsDronesRes.value?.drones)) {
+        setCotsDetections(cotsDronesRes.value.drones);
+      }
+      if (cotsCatRes.status === 'fulfilled' && cotsCatRes.value) {
+        setCotsCatalog(cotsCatRes.value);
       }
       setStatusMessage('Plataforma 4D lista · Datos verificados por SHA-256');
     });
@@ -177,6 +193,19 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
     a.download = `senda-flight-path-${uavScenario.toLowerCase()}.geojson`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleDecodeHex = async () => {
+    if (!hexInput.trim()) return;
+    setIsDecodingHex(true);
+    try {
+      const res = await api.decodeCotsRemoteId(hexInput.trim());
+      setDecodedOutput(res);
+    } catch (err: any) {
+      setDecodedOutput({ error: err.message || 'Error decodificando trama' });
+    } finally {
+      setIsDecodingHex(false);
+    }
   };
 
   // 2. Playback timer
@@ -426,6 +455,12 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
       uavGroupRef.current = null;
     }
 
+    if (cotsGroupRef.current) {
+      scene.remove(cotsGroupRef.current);
+      cotsGroupRef.current.clear();
+      cotsGroupRef.current = null;
+    }
+
     if (mode === 'TERRAIN_DEM' && terrain) {
       const nx = terrain.columns;
       const ny = terrain.rows;
@@ -593,8 +628,80 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
         scene.add(uavGroup);
         uavGroupRef.current = uavGroup;
       }
+
+      // 8. Add COTS Drone Reconnaissance & Rogue Pilot Localization in 3D
+      if (showCotsDrones && cotsDetections.length > 0) {
+        const cotsGroup = new THREE.Group();
+        const { west, east, south, north } = terrain.bounds;
+        const spanLon = Math.max(0.0001, east - west);
+        const spanLat = Math.max(0.0001, north - south);
+
+        cotsDetections.forEach((d) => {
+          if (!d.latitude || !d.longitude) return;
+          const normX = ((d.longitude - west) / spanLon) * 3.0 - 1.5;
+          const normZ = ((north - d.latitude) / spanLat) * 3.0 - 1.5;
+          const droneAlt = 0.45 * (exaggeration / 3) + 0.18;
+          const dronePos = new THREE.Vector3(normX, droneAlt, normZ);
+
+          const isRogue = d.classification === 'UNAUTHORIZED_ROGUE';
+          const isPbr = d.rfSource === 'PASSIVE_BISTATIC_RADAR_CAF';
+          const droneColor = isRogue ? 0xef4444 : (isPbr ? 0xf59e0b : 0x10b981);
+
+          // Drone 3D body
+          const bodyGeo = isPbr
+            ? new THREE.SphereGeometry(0.035, 8, 8)
+            : new THREE.OctahedronGeometry(0.04, 0);
+          const bodyMat = new THREE.MeshStandardMaterial({
+            color: droneColor,
+            wireframe: isPbr,
+            emissive: droneColor,
+            emissiveIntensity: 0.4,
+          });
+          const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+          bodyMesh.position.copy(dronePos);
+          cotsGroup.add(bodyMesh);
+
+          // Radar / Detection ring around drone
+          const ringGeo = new THREE.RingGeometry(0.06, 0.08, 16);
+          ringGeo.rotateX(-Math.PI / 2);
+          const ringMat = new THREE.MeshBasicMaterial({ color: droneColor, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
+          const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+          ringMesh.position.set(normX, droneAlt - 0.02, normZ);
+          cotsGroup.add(ringMesh);
+
+          // If pilot/GCS coordinates are decoded from ASTM F3411 System Message:
+          if (d.pilot?.latitude && d.pilot?.longitude) {
+            const pilotX = ((d.pilot.longitude - west) / spanLon) * 3.0 - 1.5;
+            const pilotZ = ((north - d.pilot.latitude) / spanLat) * 3.0 - 1.5;
+            const pilotY = 0.45 * (exaggeration / 3) * 0.15; // on surface
+            const pilotPos = new THREE.Vector3(pilotX, pilotY, pilotZ);
+
+            // Pilot beacon marker (cylinder beacon)
+            const beaconGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.08, 8);
+            const beaconMat = new THREE.MeshBasicMaterial({ color: isRogue ? 0xdc2626 : 0x059669 });
+            const beaconMesh = new THREE.Mesh(beaconGeo, beaconMat);
+            beaconMesh.position.set(pilotX, pilotY + 0.04, pilotZ);
+            cotsGroup.add(beaconMesh);
+
+            // Dashed tether line linking rogue drone to pilot ground location
+            const tetherPts = [dronePos, pilotPos];
+            const tetherGeo = new THREE.BufferGeometry().setFromPoints(tetherPts);
+            const tetherMat = new THREE.LineDashedMaterial({
+              color: isRogue ? 0xef4444 : 0x10b981,
+              dashSize: 0.05,
+              gapSize: 0.03,
+            });
+            const tetherLine = new THREE.Line(tetherGeo, tetherMat);
+            tetherLine.computeLineDistances();
+            cotsGroup.add(tetherLine);
+          }
+        });
+
+        scene.add(cotsGroup);
+        cotsGroupRef.current = cotsGroup;
+      }
     }
-  }, [mode, terrain, exaggeration, showFresnel, showParticles, showUavTactical, uavPlan, mastHeightM, rfFrequencyMHz]);
+  }, [mode, terrain, exaggeration, showFresnel, showParticles, showUavTactical, showCotsDrones, cotsDetections, uavPlan, mastHeightM, rfFrequencyMHz]);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: '620px', background: '#050d1a', color: '#f1f5f9', display: 'flex', flexDirection: 'column', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
@@ -667,6 +774,30 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
               <span>Drones Tácticos & Malla:</span>
               <input type="checkbox" checked={showUavTactical} onChange={(e) => setShowUavTactical(e.target.checked)} />
             </label>
+
+            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+              <span>Detección Drones COTS & Radar:</span>
+              <input type="checkbox" checked={showCotsDrones} onChange={(e) => setShowCotsDrones(e.target.checked)} />
+            </label>
+
+            <button
+              type="button"
+              onClick={() => setShowCotsModal(true)}
+              style={{
+                marginTop: '0.4rem',
+                width: '100%',
+                padding: '0.35rem 0.6rem',
+                borderRadius: 6,
+                border: '1px solid #38bdf8',
+                background: 'rgba(56, 189, 248, 0.12)',
+                color: '#7dd3fc',
+                fontWeight: 700,
+                fontSize: '0.72rem',
+                cursor: 'pointer',
+              }}
+            >
+              🛠 Kit COTS AliExpress & Antenas (&lt;25€)
+            </button>
           </div>
 
           {mode === 'TERRAIN_DEM' && (
@@ -866,6 +997,12 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
               <span>Modelo MET Norway:</span>
               <span style={{ fontWeight: 700, color: '#94a3b8' }}>9 puntos × 24h</span>
             </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>Drones COTS (OpenDroneID/PBR):</span>
+              <span style={{ fontWeight: 700, color: cotsDetections.some((d) => d.classification === 'UNAUTHORIZED_ROGUE') ? '#ef4444' : '#10b981' }}>
+                {cotsDetections.length} activos ({cotsDetections.filter((d) => d.classification === 'UNAUTHORIZED_ROGUE').length} no aut.)
+              </span>
+            </div>
           </div>
 
           <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid #1e3a5f' }}>
@@ -960,6 +1097,146 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
           {statusMessage}
         </div>
       </div>
+
+      {/* COTS Hardware & Antenna Cutting Guide Modal */}
+      {showCotsModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(3, 7, 18, 0.85)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ maxWidth: '840px', width: '100%', maxHeight: '90vh', overflowY: 'auto', background: '#091829', border: '1px solid #1e3a5f', borderRadius: 16, padding: '1.5rem', color: '#f1f5f9', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e3a5f', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#38bdf8' }}>
+                  🛠 HARDWARE COTS TÁCTICO & GUÍA DE CORTE DE ANTENAS (&lt;25€)
+                </h3>
+                <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
+                  Ingeniería soberana para defensa y emergencias: rastreo de drones, radar pasivo e imágenes satelitales con componentes de AliExpress.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCotsModal(false)}
+                style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#94a3b8', fontSize: '1.2rem', width: '32px', height: '32px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Bill of Materials */}
+            <div style={{ marginBottom: '1.25rem' }}>
+              <div style={{ fontWeight: 800, color: '#34d399', fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+                1. LISTA DE MATERIALES COTS (BOM ALIEXPRESS / FERRETERÍA)
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+                {cotsCatalog?.hardwareComponents ? (
+                  cotsCatalog.hardwareComponents.map((item: any) => (
+                    <div key={item.id} style={{ background: '#0f2744', border: '1px solid #1e3a5f', borderRadius: 8, padding: '0.75rem' }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#7dd3fc' }}>{item.name}</div>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.2rem' }}>{item.role}</div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', paddingTop: '0.4rem', borderTop: '1px solid rgba(30, 58, 95, 0.5)', fontSize: '0.75rem' }}>
+                        <span style={{ color: '#64748b' }}>{item.store}</span>
+                        <span style={{ fontWeight: 800, color: '#34d399' }}>{item.unitCostEur.toFixed(2)} €</span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Cargando catálogo COTS...</div>
+                )}
+              </div>
+              <div style={{ marginTop: '0.5rem', textAlign: 'right', fontSize: '0.78rem', color: '#6ee7b7', fontWeight: 700 }}>
+                Coste total estación táctica completa: ~33.70 €
+              </div>
+            </div>
+
+            {/* Precision Antenna Cutting Guides */}
+            <div style={{ marginBottom: '1.25rem' }}>
+              <div style={{ fontWeight: 800, color: '#38bdf8', fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+                2. GUÍA DE CORTE MILIMÉTRICO DE ANTENAS SINTETIZADAS (KRAUS / BALANIS)
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                {cotsCatalog?.antennas ? (
+                  cotsCatalog.antennas.map((ant: any) => (
+                    <div key={ant.bandId} style={{ background: '#0f2744', border: '1px solid #1e3a5f', borderRadius: 8, padding: '0.75rem', fontSize: '0.75rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 800, color: '#f1f5f9' }}>{ant.label}</span>
+                        <span style={{ padding: '0.15rem 0.45rem', borderRadius: 4, background: '#1e3a5f', color: '#7dd3fc', fontWeight: 700, fontSize: '0.68rem' }}>
+                          {ant.design?.antennaType}
+                        </span>
+                      </div>
+                      <div style={{ color: '#94a3b8', fontSize: '0.7rem', margin: '0.25rem 0' }}>{ant.application}</div>
+                      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '0.35rem', color: '#e2e8f0', fontFamily: 'monospace' }}>
+                        {ant.design?.drivenElementLengthMm && (
+                          <div>Longitud irradiante: <strong style={{ color: '#34d399' }}>{ant.design.drivenElementLengthMm} mm</strong></div>
+                        )}
+                        {ant.design?.loopSideLengthMm && (
+                          <div>Lado del rombo: <strong style={{ color: '#34d399' }}>{ant.design.loopSideLengthMm} mm</strong></div>
+                        )}
+                        {ant.design?.outerLoopHeightMm && (
+                          <div>Altura bucle QFH: <strong style={{ color: '#34d399' }}>{ant.design.outerLoopHeightMm} mm</strong></div>
+                        )}
+                        {ant.design?.elementsMm && (
+                          <div>Elementos Yagi: <strong style={{ color: '#34d399' }}>{ant.design.elementsMm.length} elementos</strong> (Ref: {ant.design.elementsMm[0]?.lengthMm}mm, Dip: {ant.design.elementsMm[1]?.lengthMm}mm)</div>
+                        )}
+                        {ant.design?.expectedGainDbi && (
+                          <div>Ganancia directiva: <strong style={{ color: '#38bdf8' }}>+{ant.design.expectedGainDbi} dBi</strong></div>
+                        )}
+                        {ant.design?.materials && (
+                          <div style={{ color: '#64748b' }}>Material: {ant.design.materials.copperWireGauge} ({ant.design.materials.supportStructure})</div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Cargando recetas de antenas...</div>
+                )}
+              </div>
+            </div>
+
+            {/* Remote ID Frame Decoder Laboratory */}
+            <div style={{ background: '#0a192f', border: '1px solid #1e3a5f', borderRadius: 8, padding: '0.85rem' }}>
+              <div style={{ fontWeight: 800, color: '#f59e0b', fontSize: '0.82rem', marginBottom: '0.35rem' }}>
+                3. LABORATORIO DE DECODIFICACIÓN REMOTA OPENDRONEID (ASTM F3411)
+              </div>
+              <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginBottom: '0.5rem' }}>
+                Introduce la trama en crudo capturada por el sniffer promiscuo ESP32 o receptor SDR para extraer telemetría y geolocalizar al piloto:
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input
+                  type="text"
+                  value={hexInput}
+                  onChange={(e) => setHexInput(e.target.value)}
+                  placeholder="Cadena hexadecimal de 25 bytes (50 caracteres hex)"
+                  style={{ flex: 1, padding: '0.4rem', borderRadius: 6, background: '#071322', border: '1px solid #1e3a5f', color: '#38bdf8', fontFamily: 'monospace', fontSize: '0.75rem' }}
+                />
+                <button
+                  type="button"
+                  onClick={handleDecodeHex}
+                  disabled={isDecodingHex}
+                  style={{ padding: '0.4rem 0.8rem', borderRadius: 6, border: 'none', background: '#0284c7', color: '#fff', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer' }}
+                >
+                  {isDecodingHex ? 'Decodificando...' : 'Decodificar ASTM'}
+                </button>
+              </div>
+
+              {decodedOutput && (
+                <div style={{ marginTop: '0.6rem', padding: '0.6rem', borderRadius: 6, background: '#071322', border: '1px solid #334155', fontFamily: 'monospace', fontSize: '0.72rem', color: '#a7f3d0' }}>
+                  <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
+                    {JSON.stringify(decodedOutput, null, 2)}
+                  </pre>
+                </div>
+              )}
+            </div>
+
+            <div style={{ marginTop: '1.25rem', textAlign: 'right' }}>
+              <button
+                type="button"
+                onClick={() => setShowCotsModal(false)}
+                style={{ padding: '0.5rem 1.25rem', borderRadius: 8, border: 'none', background: '#1e3a5f', color: '#fff', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}
+              >
+                Cerrar Panel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -185,7 +185,14 @@ export const api = {
   },
   async evaluateUavSwarm(data: any) {
     return request('/api/uav/swarm-evaluation', { method: 'POST', body: JSON.stringify(data) });
-  }
+  },
+
+  // COTS Tactical RF & Drone Reconnaissance
+  async getCotsHardwareCatalog() { return request('/api/cots/antennas'); },
+  async decodeCotsRemoteId(payload: string) {
+    return request('/api/cots/remote-id/decode', { method: 'POST', body: JSON.stringify({ payload }) });
+  },
+  async getCotsDroneDetections() { return request('/api/cots/drone-detections'); },
 };
 
 /**

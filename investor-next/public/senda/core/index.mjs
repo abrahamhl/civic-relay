@@ -56,3 +56,4 @@ export * from './scientific-evaluation.mjs';
 export * from './telecom-mathematical-physics.mjs';
 export * from './government-resilience-harness.mjs';
 export * from './uav-tactical-science.mjs';
+export * from './cots-rf-tactical.mjs';

@@ -29,6 +29,7 @@ import {
   evaluateTacticalSwarmMission,
   UAV_CAMERA_PRESETS,
 } from './domain/uav-tactical-planner.mjs';
+import { createCotsDroneReconManager } from './domain/cots-drone-recon.mjs';
 
 export function createApiHandler({
   db, auth, social, events, emergency, messaging, moderation, admin, rt,
@@ -40,6 +41,7 @@ export function createApiHandler({
   effisFeed = createCopernicusEffisFeed(),
   aemetFeed = createAemetCapFeed(),
   mobilityFeed = createDatexMobilityFeed(),
+  cotsManager = createCotsDroneReconManager(),
 }) {
   const router = createRouter();
   const rateLimiter = createRateLimiter();
@@ -650,6 +652,29 @@ export function createApiHandler({
     } catch (err) {
       throw bad(err.message || 'INVALID_SWARM_PAYLOAD');
     }
+  });
+
+  /* ------------------- COTS TACTICAL RF & DRONE RECON ------------------- */
+  router.get('/api/cots/antennas', (req, res) => {
+    const catalog = cotsManager.getHardwareCatalogAndAntennas();
+    sendJson(res, 200, catalog);
+  });
+
+  router.post('/api/cots/remote-id/decode', async (req, res) => {
+    const body = await readJson(req);
+    const payload = body.payload || body.hex;
+    if (!payload) throw bad('PAYLOAD_OR_HEX_REQUIRED');
+    try {
+      const result = cotsManager.ingestRemoteIdPayload(payload);
+      sendJson(res, 200, result);
+    } catch (err) {
+      throw bad(err.message || 'INVALID_REMOTE_ID_PAYLOAD');
+    }
+  });
+
+  router.get('/api/cots/drone-detections', (req, res) => {
+    const detections = cotsManager.getActiveTracks();
+    sendJson(res, 200, { drones: detections });
   });
 
   /* ------------------- ADAPTERS & METADATA ------------------- */
