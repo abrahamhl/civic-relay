@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import type { TerrainGridSnapshot } from '../offline/terrain-snapshot';
 import {
   RELAY_PRESETS, RELAY_SITES, relaySiteCoordinates, analyzeTerrainLink,
+  computeRadioShadowField,
   estimateEqualMastHeight, planRelayCorridor, type RelayGeometryResult
 } from '../science/relay-geometry.mjs';
 
@@ -66,6 +67,7 @@ export function GeoRelayPlanner({ terrain }: { terrain: TerrainGridSnapshot }) {
   const [mastHeightM, setMastHeightM] = useState(35);
   const [maxHopKm, setMaxHopKm] = useState(15);
   const [graphView, setGraphView] = useState(true);
+  const [showShadowField, setShowShadowField] = useState(false);
   const from = useMemo(() => relaySiteCoordinates(terrain, fromSite), [terrain, fromSite]);
   const to = useMemo(() => relaySiteCoordinates(terrain, toSite), [terrain, toSite]);
   const analysis = useMemo(() => {
@@ -82,6 +84,10 @@ export function GeoRelayPlanner({ terrain }: { terrain: TerrainGridSnapshot }) {
     startSite: fromSite, endSite: toSite === fromSite ? 'E' : toSite,
     frequencyMHz, mastHeightM, maxHopKm
   }), [terrain, fromSite, toSite, frequencyMHz, mastHeightM, maxHopKm]);
+  const shadow = useMemo(() => showShadowField ? computeRadioShadowField(terrain, {
+    originSite: fromSite, frequencyMHz, transmitterHeightM: mastHeightM,
+    receiverHeightM: 15, gridSize: 11, maxRangeKm: Math.max(10, maxHopKm),
+  }) : null, [terrain, showShadowField, fromSite, frequencyMHz, mastHeightM, maxHopKm]);
   const tone = analysis ? statusTone[analysis.status] : MUTED;
   const inputStyle: React.CSSProperties = {
     background: '#0b2639', border: '1px solid #476277', borderRadius: 8,
@@ -188,6 +194,48 @@ export function GeoRelayPlanner({ terrain }: { terrain: TerrainGridSnapshot }) {
               ? 'CADENA HIPOTÉTICA: ' + graph.candidateSiteIds.join(' → ') + ' · ' + graph.hopCount + ' saltos geométricos'
               : 'No se ha encontrado una cadena geométrica con estos supuestos.'}
           </div>
+        </>}
+      </div>
+      <div style={{ display: 'grid', gap: 9, borderTop: '1px solid #35516a', paddingTop: 12 }}>
+        <label style={{ ...labelStyle, justifyContent: 'space-between' }}>
+          <span>Mapa de sombra geométrica RF · origen {fromSite} · receptor hipotético 15 m</span>
+          <input type="checkbox" aria-label="Mostrar campo de sombra RF" checked={showShadowField}
+            onChange={(e) => setShowShadowField(e.target.checked)} />
+        </label>
+        {shadow && <>
+          <svg viewBox="0 0 350 350" role="img" aria-label="Campo de sombra radioeléctrica geométrica basado en DEM"
+            style={{ width: '100%', maxWidth: 420, borderRadius: 10, background: '#061827', margin: '0 auto' }}>
+            <text x="175" y="19" textAnchor="middle" fill="#a5deff" fontSize="12">N ↑ · proyección local sobre DEM</text>
+            {shadow.cells.map((cell) => {
+              const n = shadow.gridSize, unit = 306 / n;
+              const color = cell.status === 'MODEL_INDICATES_CLEARANCE' ? '#16a34a' :
+                cell.status === 'MODEL_INDICATES_OBSTRUCTION' ? '#e11d48' :
+                cell.status === 'MARGINAL_OR_UNRESOLVED' ? '#f59e0b' : '#334155';
+              return <rect key={cell.row + '-' + cell.col} x={22 + cell.col * unit}
+                y={25 + cell.row * unit} width={unit - .8} height={unit - .8}
+                fill={color} opacity=".85" stroke="#0a2230" strokeWidth=".5">
+                <title>{cell.status} · {cell.distanceM} m · margen Fresnel {cell.minFresnelClearanceM ?? 'N/A'} m</title>
+              </rect>;
+            })}
+            {RELAY_SITES.filter((site) => site.id === fromSite).map((site) => (
+              <g key={site.id}>
+                <circle cx={22 + site.u * 306} cy={25 + site.v * 306} r="6" fill="#fff" stroke="#102a43" strokeWidth="2" />
+                <text x={22 + site.u * 306 + 10} y={25 + site.v * 306 - 4} fill="#fff" fontSize="12">TX {site.id}</text>
+              </g>
+            ))}
+            <text x="175" y="346" textAnchor="middle" fill="#a5bfd1" fontSize="10">
+              Cribado matemático, NO señal medida ni cobertura garantizada
+            </text>
+          </svg>
+          <div data-testid="rf-shadow-counts" style={{ fontSize: 12, display: 'flex', gap: 15, flexWrap: 'wrap' }}>
+            <span style={{ color: '#34d399' }}>Despejes estimados: {shadow.summary.modelClear}</span>
+            <span style={{ color: '#fb7185' }}>Bloqueos estimados: {shadow.summary.modelObstructed}</span>
+            <span style={{ color: '#fbbf24' }}>No resueltos: {shadow.summary.modelUncertain}</span>
+          </div>
+          <p style={{ margin: 0, fontSize: 11, color: MUTED }}>
+            Malla 11 × 11, campo calculado sobre relieve público; los colores NO predicen recepción de señal, velocidad, operador ni cobertura de emergencia.
+            El rango actual sirve solo como límite de distancia. Cada celda necesita validación topográfica y radio real.
+          </p>
         </>}
       </div>
       <footer style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>
