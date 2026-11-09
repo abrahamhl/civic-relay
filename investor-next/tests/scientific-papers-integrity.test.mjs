@@ -23,7 +23,8 @@ const REQUIRED_RENDERS = [
   'public/media/renders/render-merkle-rfc6962-proof.svg',
   'public/media/renders/render-v16-reflex-latency.svg',
   'public/media/renders/render-cots-gateway-hardware.svg',
-  'public/media/renders/render-senda-4d-globe.svg'
+  'public/media/renders/render-senda-4d-globe.svg',
+  'public/media/renders/render-rail-safety-topology.svg'
 ];
 
 test('Scientific Papers Suite: All 5 research papers and index portal exist and are well-formed', () => {
@@ -51,13 +52,14 @@ test('Scientific Papers Index Portal links to all individual papers and all vect
   assert.ok(indexHtml.includes('paper-v16-c-its.html'), 'Index does not link to paper-v16-c-its.html');
   assert.ok(indexHtml.includes('/senda/paper.html'), 'Index does not link to /senda/paper.html');
 
-  // Verify all 6 vector renders are referenced
+  // Verify all 7 vector renders are referenced
   assert.ok(indexHtml.includes('render-paer-mesh-topology.svg'), 'Index missing render-paer-mesh-topology.svg');
   assert.ok(indexHtml.includes('render-itu-p838-rain-curve.svg'), 'Index missing render-itu-p838-rain-curve.svg');
   assert.ok(indexHtml.includes('render-merkle-rfc6962-proof.svg'), 'Index missing render-merkle-rfc6962-proof.svg');
   assert.ok(indexHtml.includes('render-v16-reflex-latency.svg'), 'Index missing render-v16-reflex-latency.svg');
   assert.ok(indexHtml.includes('render-cots-gateway-hardware.svg'), 'Index missing render-cots-gateway-hardware.svg');
   assert.ok(indexHtml.includes('render-senda-4d-globe.svg'), 'Index missing render-senda-4d-globe.svg');
+  assert.ok(indexHtml.includes('render-rail-safety-topology.svg'), 'Index missing render-rail-safety-topology.svg');
 });
 
 test('Architectural Vector Renders: All 6 SVG renders are valid and non-empty', () => {

@@ -64,3 +64,5 @@ export * from './acoustic-beamforming-survival.mjs';
 export * from './automotive-multisoftware-link.mjs';
 export * from './zero-overhead-mobile-optimizer.mjs';
 export * from './navigation-multisoftware-hub.mjs';
+export * from './rail-incident.mjs';
+export * from './rail-advanced-safety.mjs';

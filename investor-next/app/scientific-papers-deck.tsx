@@ -250,6 +250,13 @@ export default function ScientificPapersDeck({ locale }: { locale: Locale }) {
       desc: 'Propagación orbital exacta con TLEs auténticos, conos de elevación azimutal y telemetría multi-fuente sin falsos positivos.',
       svgPath: '/media/renders/render-senda-4d-globe.svg',
       formulaPreview: 'r(t) = a·(1 - e²) / [1 + e·cos(ν)]'
+    },
+    {
+      id: 'r7',
+      title: 'Topología C-ITS y Prevención Ferroviaria Avanzada',
+      desc: 'Auditoría de enclavamiento (Tempi/Balasore), pandeo térmico de carril (Kerr), ondas guiadas a 5.100 m/s y C-ITS en pasos a nivel.',
+      svgPath: '/media/renders/render-rail-safety-topology.svg',
+      formulaPreview: 'P = E·A·α·ΔT || c_guía = 5.100 m/s'
     }
   ], []);
 

@@ -13,6 +13,7 @@ import { HyperFramesCinemaDeck } from './hyperframes-cinema-deck';
 import { SystemExplained, DeveloperBlueprint } from './system-explained';
 import LanguageDocument from './language-document';
 import ScientificPapersDeck from './scientific-papers-deck';
+import RailSafetyLab from './rail-safety-lab';
 import { labels, locales, type Locale } from './copy';
 
 export default function SurfaceView({
@@ -153,6 +154,7 @@ export default function SurfaceView({
         <>
           <div className="container">
             <ScientificPapersDeck locale={locale} />
+            <RailSafetyLab locale={locale} />
             <ScientificTheoremsLab locale={locale} />
             <VehicularDopplerLab locale={locale} />
             <CivilianRadarDefenseLab locale={locale} />
