@@ -4,6 +4,7 @@ import CoordinationLab from './coordination-lab';
 import TelecomAndRfRadarSuite from './telecom-rf-radar-suite';
 import ScientificTheoremsLab from './scientific-theorems-lab';
 import VehicularDopplerLab from './vehicular-doppler-lab';
+import CivilianRadarDefenseLab from './civilian-radar-defense-lab';
 import LiveHardwareAndDealRoomConsole from './live-hardware-console';
 import EvidenceBoard from './evidence-board';
 import CommandSurface from './command-surface';
@@ -145,6 +146,7 @@ export default function SurfaceView({
           <div className="container">
             <ScientificTheoremsLab locale={locale} />
             <VehicularDopplerLab locale={locale} />
+            <CivilianRadarDefenseLab locale={locale} />
           </div>
           <SystemExplained locale={locale} />
           <CoordinationLab locale={locale} />

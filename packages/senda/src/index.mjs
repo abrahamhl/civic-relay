@@ -59,3 +59,4 @@ export * from './uav-tactical-science.mjs';
 export * from './cots-rf-tactical.mjs';
 export * from './scientific-theorems-physics.mjs';
 export * from './vehicle-doppler-gateway.mjs';
+export * from './civilian-uav-mesh-radar.mjs';
