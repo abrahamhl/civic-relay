@@ -42,8 +42,7 @@ export function validateGeometryTerrain(grid) {
       b.north <= b.south || b.east <= b.west) throw Error('INVALID_TERRAIN_BOUNDS');
   return true;
 }
-export function terrainAt(grid, lat, lon) {
-  validateGeometryTerrain(grid);
+function terrainAtChecked(grid, lat, lon) {
   const { north, south, west, east } = grid.bounds;
   if (!finite(lat, south, north) || !finite(lon, west, east)) throw Error('LOCATION_OUTSIDE_DEM');
   const x = clamp((lon - west) / (east - west) * 32, 0, 32);
@@ -53,6 +52,13 @@ export function terrainAt(grid, lat, lon) {
   const z = (r, c) => grid.elevationsM[r * 33 + c];
   return (1 - dy) * ((1 - dx) * z(row, col) + dx * z(row, col + 1)) +
     dy * ((1 - dx) * z(row + 1, col) + dx * z(row + 1, col + 1));
+}
+
+// Public entrypoint rejects malformed/stale structures before any sample is used.
+// Internal paths validate once per analysis, not once per point (performance and battery).
+export function terrainAt(grid, lat, lon) {
+  validateGeometryTerrain(grid);
+  return terrainAtChecked(grid, lat, lon);
 }
 export function relaySiteCoordinates(terrain, siteId) {
   validateGeometryTerrain(terrain);
@@ -81,7 +87,7 @@ export function fresnelRadiusM(frequencyMHz, distanceFromA, distanceFromB) {
 function validEndpoint(terrain, candidate, label) {
   if (!candidate || !finite(candidate.lat, -85, 85) || !finite(candidate.lon, -180, 180) ||
       !finite(candidate.antennaHeightM, 1, 160)) throw Error('INVALID_' + label + '_TERMINAL');
-  const elev = terrainAt(terrain, candidate.lat, candidate.lon);
+  const elev = terrainAtChecked(terrain, candidate.lat, candidate.lon);
   return { lat: candidate.lat, lon: candidate.lon, antennaHeightM: candidate.antennaHeightM,
     groundElevationM: elev, tipElevationM: elev + candidate.antennaHeightM };
 }
@@ -91,12 +97,11 @@ function validEndpoint(terrain, candidate, label) {
  * Uses a spherical Earth bulge d1*d2/(2*k*R), relative DEM heights,
  * and 60% F1 screening criterion. This is a geometric risk indicator only.
  */
-export function analyzeTerrainLink(terrain, {
+function analyzeTerrainLinkChecked(terrain, {
   from, to, frequencyMHz = 2400, kFactor = 4 / 3,
   fresnelFraction = 0.6, decisionBufferM = DECISION_BUFFER_M,
   samples = 65,
 } = {}) {
-  validateGeometryTerrain(terrain);
   const a = validEndpoint(terrain, from, 'FROM');
   const b = validEndpoint(terrain, to, 'TO');
   if (!finite(frequencyMHz, 100, 10000) || !finite(kFactor, 0.65, 2.5) ||
@@ -112,7 +117,7 @@ export function analyzeTerrainLink(terrain, {
     const t = i / (samples - 1), d1 = t * D, d2 = D - d1;
     const lat = a.lat + (b.lat - a.lat) * t;
     const lon = a.lon + (b.lon - a.lon) * t;
-    const groundM = terrainAt(terrain, lat, lon);
+    const groundM = terrainAtChecked(terrain, lat, lon);
     const earthBulgeM = d1 * d2 / (2 * kFactor * EARTH_RADIUS_M);
     const radioAxisM = (1 - t) * a.tipElevationM + t * b.tipElevationM - earthBulgeM;
     const f1 = Math.sqrt(lambda * d1 * d2 / D);
@@ -172,13 +177,19 @@ export function analyzeTerrainLink(terrain, {
   };
 }
 
+export function analyzeTerrainLink(terrain, options = {}) {
+  validateGeometryTerrain(terrain);
+  return analyzeTerrainLinkChecked(terrain, options);
+}
+
 /** Binary search assumes equal mast heights at both ends, not a real deployment approval. */
 export function estimateEqualMastHeight(terrain, {
   from, to, frequencyMHz = 2400, kFactor = 4 / 3,
   minMastM = 2, maxMastM = 120, decisionBufferM = DECISION_BUFFER_M,
 } = {}) {
   if (!finite(minMastM, 1, 160) || !finite(maxMastM, minMastM, 160)) throw Error('INVALID_MAST_LIMITS');
-  const compute = (m) => analyzeTerrainLink(terrain, {
+  validateGeometryTerrain(terrain);
+  const compute = (m) => analyzeTerrainLinkChecked(terrain, {
     from: { ...from, antennaHeightM: m }, to: { ...to, antennaHeightM: m },
     frequencyMHz, kFactor, decisionBufferM,
   });
@@ -193,9 +204,11 @@ export function estimateEqualMastHeight(terrain, {
     if (compute(m).minFresnelClearanceM >= decisionBufferM) high = m;
     else low = m;
   }
-  return { requiredHeightM: Math.ceil(high * 10) / 10,
+  const roundedHeightM = Math.ceil(high * 10) / 10;
+  return { requiredHeightM: roundedHeightM,
     status: 'GEOMETRIC_HEIGHT_ESTIMATE_ONLY', maxMastM,
-    limitingClearanceM: compute(high).minFresnelClearanceM, fieldVerified: false };
+    // Report the displayed mast height, not the unrounded search result.
+    limitingClearanceM: compute(roundedHeightM).minFresnelClearanceM, fieldVerified: false };
 }
 
 /**
@@ -219,7 +232,7 @@ export function planRelayCorridor(terrain, {
     for (let j = i + 1; j < RELAY_SITES.length; j++) {
       const from = sitePosition.get(RELAY_SITES[i].id), to = sitePosition.get(RELAY_SITES[j].id);
       if (greatCircleDistanceM(from, to) > maxHopKm * 1000) continue;
-      const screening = analyzeTerrainLink(terrain, {
+      const screening = analyzeTerrainLinkChecked(terrain, {
         from: { ...from, antennaHeightM: mastHeightM },
         to: { ...to, antennaHeightM: mastHeightM },
         frequencyMHz, decisionBufferM,
@@ -299,7 +312,7 @@ export function computeRadioShadowField(terrain, {
         status = 'EXCLUDED_BY_USER_DISTANCE_LIMIT';
         summary.excludedDistance++;
       } else {
-        const result = analyzeTerrainLink(terrain, {
+        const result = analyzeTerrainLinkChecked(terrain, {
           from: { ...origin, antennaHeightM: transmitterHeightM },
           to: { lat, lon, antennaHeightM: receiverHeightM },
           frequencyMHz, kFactor, samples: 33
