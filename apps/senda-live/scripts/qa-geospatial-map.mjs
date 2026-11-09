@@ -175,6 +175,7 @@ async function exercise(browser, name, viewport) {
   }, null, { timeout: 8_000 });
   await page.getByRole('button', { name: 'Volver al mapa 2D' }).click();
   await page.route('**/api/sources/weather-grid*', (route) => route.abort('internetdisconnected'));
+  await page.route('**/api/sources/terrain-grid*', (route) => route.abort('internetdisconnected'));
   await page.getByRole('button', { name: 'Abrir Atmosphere 4D' }).click();
   await page.getByText(/SNAPSHOT LOCAL/).waitFor({ timeout: 10_000 });
   assert.equal(await page.locator('canvas.senda-4d-canvas').count(), 1, 'Offline cache surface missing');
@@ -201,7 +202,7 @@ async function exercise(browser, name, viewport) {
   await page.getByRole('button', { name: 'Abrir Atmosphere 4D' }).click();
   await page.locator('canvas.senda-4d-canvas').waitFor({ state: 'visible', timeout: 12_000 });
   await page.getByText(/SNAPSHOT LOCAL/).waitFor({ timeout: 12_000 });
-  await page.getByTestId('terrain-source-status').getByText(/OFFLINE_LOCAL_DEM/).waitFor({ timeout: 12_000 });
+  await page.waitForFunction(() => document.querySelector('[data-testid="terrain-source-status"]')?.textContent?.includes('OFFLINE_LOCAL_DEM'), null, { timeout: 12_000 });
 
   assert.ok(await page.locator('canvas.senda-4d-canvas').evaluate((el) => el.width > 200));
   assert.deepEqual(clientErrors, [], 'Unhandled browser exceptions after offline restart');
