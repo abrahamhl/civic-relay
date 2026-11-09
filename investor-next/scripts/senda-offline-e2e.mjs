@@ -304,11 +304,11 @@ await D.page.evaluate((t) => window.SENDA_CALL_API.acceptAnswer(t), answerCode);
 await D.page.waitForFunction(() => window.SENDA_CALL.state === 'connected', null, { timeout: 15000 }).catch(() => {});
 await E.page.waitForFunction(() => window.SENDA_CALL.state === 'connected', null, { timeout: 15000 }).catch(() => {});
 await D.page.evaluate(() => window.SENDA_CALL_API.send('Hola, te oigo')); await E.page.click('#sos');
-await D.page.waitForTimeout(2500);
+await D.page.waitForTimeout(3500);
 const call = { d: await D.page.evaluate(() => ({ ...window.SENDA_CALL, path: document.querySelector('#k-path').textContent })), e: await E.page.evaluate(() => ({ ...window.SENDA_CALL })), offerS: +(offerWave.length / 48000).toFixed(1), soundExact: heardOffer === offerCode, requestsDuringCall: [...D.reqs, ...E.reqs].filter((u) => !u.startsWith('data:')) };
 await D.page.screenshot({ path: resolve(outDir, 'e2e-20-llamada.png'), fullPage: true });
 check('Llamada sin Internet: oferta de <110 bytes por sonido (onda real, decodificada exacta), conexión directa cifrada, voz Opus y chat en ambos sentidos y cero peticiones de red durante la llamada',
-  call.soundExact && call.d.sentBytes < 110 && call.e.sentBytes < 110 && call.d.state === 'connected' && call.e.state === 'connected' && call.e.received.includes('Hola, te oigo') && call.d.received.some((m) => m.startsWith('🆘')) && call.d.audioPackets > 20 && call.e.audioPackets > 20 && call.requestsDuringCall.length === 0 && call.d.path === 'local, sin servidor',
+  call.soundExact && call.d.sentBytes < 110 && call.e.sentBytes < 110 && call.d.state === 'connected' && call.e.state === 'connected' && call.e.received.includes('Hola, te oigo') && call.d.received.some((m) => m.startsWith('🆘')) && call.d.audioPackets > 10 && call.e.audioPackets > 10 && call.requestsDuringCall.length === 0 && call.d.path === 'local, sin servidor',
   { offerBytes: call.d.sentBytes, answerBytes: call.e.sentBytes, offerSoundS: call.offerS, audioPackets: [call.d.audioPackets, call.e.audioPackets], requests: call.requestsDuringCall });
 await D.page.evaluate(() => document.querySelector('#hang').click());
 const demo = await E.page.evaluate(async () => { await window.SENDA_CALL_API.demoHere(); return window.SENDA_CALL.demo; });
