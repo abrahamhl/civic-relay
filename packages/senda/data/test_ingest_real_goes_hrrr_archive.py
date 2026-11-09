@@ -1,3 +1,4 @@
+import contextlib
 """Actual archived NOAA-derived files from repo only. No synthetic weather/fire rows."""
 import pathlib,sqlite3,tempfile,unittest
 from ingest_real_goes_hrrr_archive import ingest_archived_real_goes_hrrr
@@ -18,7 +19,7 @@ class RealNoaaArchiveTest(unittest.TestCase):
    self.assertEqual(second["goes_pixel_observations"],0)
    self.assertEqual(second["hrrr_forecast_values"],0)
    self.assertEqual(second["total_research_observations"],13651)
-   with sqlite3.connect(db) as cx:
+   with contextlib.closing(sqlite3.connect(db)) as cx:
     self.assertEqual(cx.execute("select count(*) from observation_batches where origin_type='MEASURED'").fetchone()[0],7)
     self.assertEqual(cx.execute("select count(*) from observation_batches where origin_type='FORECAST'").fetchone()[0],7)
     self.assertEqual(cx.execute("select count(*) from observations where allow_model_fusion=1").fetchone()[0],0)

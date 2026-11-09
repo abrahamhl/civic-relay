@@ -1,3 +1,4 @@
+import contextlib
 """Only real archived footage summaries from the repository. No synthetic observations."""
 import pathlib
 import sqlite3
@@ -21,7 +22,7 @@ class RecordedCameraTest(unittest.TestCase):
             second=store_recorded(db)
             self.assertEqual(second["observations_inserted"],0)
             self.assertEqual(second["current_total_observations"],57)
-            with sqlite3.connect(db) as cx:
+            with contextlib.closing(sqlite3.connect(db)) as cx:
                 self.assertEqual(cx.execute("SELECT count(*) FROM observation_batches").fetchone()[0],2)
                 self.assertEqual(cx.execute("SELECT count(*) FROM sensors WHERE operational_permission=1").fetchone()[0],0)
                 self.assertEqual(cx.execute("SELECT count(*) FROM observations WHERE calibration_id IS NOT NULL").fetchone()[0],0)

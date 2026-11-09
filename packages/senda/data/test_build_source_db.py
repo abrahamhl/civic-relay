@@ -1,3 +1,4 @@
+import contextlib
 """Offline tests for the evidence registry, no network or user data."""
 import importlib.util
 import pathlib
@@ -20,7 +21,7 @@ class RegistryTest(unittest.TestCase):
             self.assertEqual(first["observations"], 0)
             self.assertEqual(second["sources"], first["sources"])
             self.assertEqual(second["permitted_to_ingest"], 0)
-            with sqlite3.connect(path) as cx:
+            with contextlib.closing(sqlite3.connect(path)) as cx:
                 self.assertEqual(cx.execute("SELECT COUNT(*) FROM sources WHERE video_permission=0").fetchone()[0] >= 3, True)
                 self.assertEqual(cx.execute("SELECT COUNT(*) FROM observation_batches").fetchone()[0], 0)
                 self.assertEqual(cx.execute("SELECT COUNT(*) FROM experiment_runs").fetchone()[0], 0)
@@ -38,7 +39,7 @@ class RegistryTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = pathlib.Path(tmp) / "evidence.sqlite"
             module.create_database(path)
-            with sqlite3.connect(path) as cx:
+            with contextlib.closing(sqlite3.connect(path)) as cx:
                 cx.execute("PRAGMA foreign_keys=ON")
                 with self.assertRaises(sqlite3.IntegrityError):
                     cx.execute("INSERT INTO sensors(sensor_id,source_id,modality) VALUES(?,?,?)",
