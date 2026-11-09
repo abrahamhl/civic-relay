@@ -257,3 +257,78 @@ export function planRelayCorridor(terrain, {
     actualStationsKnown: false,
   };
 }
+
+
+/**
+ * Hypothetical RF shadow FIELD: one DEM-derived line/Fresnel screening per cell.
+ *
+ * This may look like a coverage map but is NOT a coverage map. It shows where a
+ * specified abstract antenna could have a geometrically unobstructed profile
+ * through the sparse DEM, without modeling actual received power, clutter or
+ * authorization. Cells are not real-world measured radio coverage samples.
+ */
+export function computeRadioShadowField(terrain, {
+  originSite = 'A', frequencyMHz = 2400,
+  transmitterHeightM = 35, receiverHeightM = 15,
+  gridSize = 11, maxRangeKm = 35, kFactor = 4 / 3,
+} = {}) {
+  validateGeometryTerrain(terrain);
+  if (!Number.isInteger(gridSize) || gridSize < 7 || gridSize > 15 ||
+      !finite(transmitterHeightM, 1, 160) ||
+      !finite(receiverHeightM, 1, 160) ||
+      !finite(maxRangeKm, 1, 100) || !finite(kFactor, .65, 2.5) ||
+      !finite(frequencyMHz, 100, 10000)) throw Error('INVALID_RADIO_SHADOW_OPTIONS');
+  const origin = relaySiteCoordinates(terrain, originSite);
+  const { north, south, west, east } = terrain.bounds;
+  const cells = [];
+  const summary = {
+    modelClear: 0, modelObstructed: 0,
+    modelUncertain: 0, excludedDistance: 0, coincident: 0
+  };
+  for (let row = 0; row < gridSize; row++) {
+    for (let col = 0; col < gridSize; col++) {
+      const lat = north + (south - north) * row / (gridSize - 1);
+      const lon = west + (east - west) * col / (gridSize - 1);
+      const distanceM = greatCircleDistanceM(origin, { lat, lon });
+      let status;
+      let clearanceM = null;
+      if (distanceM < 100) {
+        status = 'COINCIDENT_SAMPLE';
+        summary.coincident++;
+      } else if (distanceM > maxRangeKm * 1000) {
+        status = 'EXCLUDED_BY_USER_DISTANCE_LIMIT';
+        summary.excludedDistance++;
+      } else {
+        const result = analyzeTerrainLink(terrain, {
+          from: { ...origin, antennaHeightM: transmitterHeightM },
+          to: { lat, lon, antennaHeightM: receiverHeightM },
+          frequencyMHz, kFactor, samples: 33
+        });
+        status = result.status;
+        clearanceM = result.minFresnelClearanceM;
+        if (status === 'MODEL_INDICATES_CLEARANCE') summary.modelClear++;
+        else if (status === 'MODEL_INDICATES_OBSTRUCTION') summary.modelObstructed++;
+        else summary.modelUncertain++;
+      }
+      cells.push({
+        row, col, lat: Number(lat.toFixed(6)), lon: Number(lon.toFixed(6)),
+        distanceM: Math.round(distanceM), status,
+        minFresnelClearanceM: clearanceM
+      });
+    }
+  }
+  return {
+    schema: 'senda.rf.terrain-shadow-field/1',
+    dataKind: 'HYPOTHETICAL_GEOMETRIC_VISIBILITY',
+    sourceRegion: terrain.region,
+    sourceDataset: terrain.source?.dataset ?? 'UNSPECIFIED_DEM',
+    originSite, origin: { lat: origin.lat, lon: origin.lon },
+    frequencyMHz, transmitterHeightM, receiverHeightM,
+    gridSize, maxRangeKm, kFactor,
+    cellSize: { approxWidthM: terrain.georeference?.approximateWidthM / (gridSize - 1) || null,
+      approxHeightM: terrain.georeference?.approximateHeightM / (gridSize - 1) || null },
+    summary, cells,
+    measuredCoverage: false, diffractionModeled: false,
+    hypotheticalEquipment: true, fieldValidated: false,
+  };
+}
