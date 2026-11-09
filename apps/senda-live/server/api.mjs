@@ -18,6 +18,8 @@ import { createEonetWildfireFeed } from './domain/eonet-wildfires.mjs';
 import { createWeatherGridFeed, WEATHER_REGIONS } from './domain/weather-grid.mjs';
 import { createMetNorwayGridFeed } from './domain/metno-weather-grid.mjs';
 import { createTerrainGridFeed } from './domain/terrain-grid.mjs';
+import { createGdacsFeed } from './domain/gdacs-osint.mjs';
+import { correlateGdacsCatalogs } from './domain/osint-catalog-correlation.mjs';
 
 export function createApiHandler({
   db, auth, social, events, emergency, messaging, moderation, admin, rt,
@@ -25,6 +27,7 @@ export function createApiHandler({
   eonetFeed = createEonetWildfireFeed(),
   weatherGridFeed = process.env.SENDA_WEATHER_PROVIDER === 'openmeteo' ? createWeatherGridFeed() : createMetNorwayGridFeed(),
   terrainGridFeed = createTerrainGridFeed(),
+  gdacsFeed = createGdacsFeed(),
 }) {
   const router = createRouter();
   const rateLimiter = createRateLimiter();
@@ -533,6 +536,29 @@ export function createApiHandler({
     if (!Object.hasOwn(WEATHER_REGIONS, region)) return sendJson(res, 400, { error: 'INVALID_TERRAIN_REGION' });
     const snapshot = await terrainGridFeed.read(region);
     sendJson(res, snapshot.status === 'UNAVAILABLE' ? 503 : 200, snapshot);
+  });
+
+
+  // Public OSINT only: GDACS risk events are not SENDA-issued emergency alerts.
+  router.get('/api/sources/gdacs-disasters', async (req, res) => {
+    const snapshot = await gdacsFeed.read();
+    sendJson(res, snapshot.status === 'UNAVAILABLE' ? 503 : 200, snapshot);
+  });
+
+  // Independent verification is NOT inferred from two dependent source catalogs.
+  router.get('/api/sources/osint-correlation', async (req, res) => {
+    const [gdacs, usgs, eonet] = await Promise.all([
+      gdacsFeed.read(), usgsFeed.read(), eonetFeed.read()
+    ]);
+    if (gdacs.status === 'UNAVAILABLE') {
+      return sendJson(res, 503, {
+        schema: 'senda.osint.cross-catalog/1', status: 'UNAVAILABLE',
+        observations: [], isSendaAlert: false, sourceIndependenceValidated: false
+      });
+    }
+    const candidates = correlateGdacsCatalogs(gdacs, usgs, eonet);
+    sendJson(res, 200, { ...candidates, status: gdacs.status,
+      fetchedAt: gdacs.fetchedAt, source: gdacs.source });
   });
 
   /* ------------------- ADAPTERS & METADATA ------------------- */
