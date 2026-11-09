@@ -90,6 +90,7 @@ export const api = {
   async getUsgsEarthquakes() { return request('/api/sources/usgs-earthquakes'); },
   async getEonetWildfires() { return request('/api/sources/eonet-wildfires'); },
   async getWeatherGrid(region: string) { return request('/api/sources/weather-grid?region=' + encodeURIComponent(region)); },
+  async getTerrainGrid(region: string) { return request('/api/sources/terrain-grid?region=' + encodeURIComponent(region)); },
 
   // Events
   async getEvents(params: Record<string, string> = {}) {
