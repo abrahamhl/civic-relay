@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { api } from '../api/client';
 import { renderGeographicTerrain } from './Terrain4DRenderer';
+import { GeoRelayPlanner } from './GeoRelayPlanner';
 import { loadTerrainGrid, saveTerrainGrid, validateTerrainSnapshot, type TerrainGridSnapshot } from '../offline/terrain-snapshot';
 import {
   loadPublicWeatherSnapshot, persistPublicWeatherSnapshot, weatherSnapshotExpired,
@@ -169,6 +170,7 @@ export function Atmosphere4DStudio({ onClose }: { onClose: () => void }) {
   const [terrainStatus, setTerrainStatus] = useState('WAITING');
   const [terrainMode, setTerrainMode] = useState<'FORECAST' | 'TERRAIN'>('TERRAIN');
   const [verticalExaggeration, setVerticalExaggeration] = useState(3);
+  const [showGeoRelay, setShowGeoRelay] = useState(false);
   const [loading, setLoading] = useState(true);
   const [frame, setFrame] = useState(0);
   const [metric, setMetric] = useState<WeatherMetric>('temperature_2m');
@@ -304,6 +306,12 @@ export function Atmosphere4DStudio({ onClose }: { onClose: () => void }) {
           <input aria-label="Exageración vertical del terreno" type="range" min="1" max="6" step="1" value={verticalExaggeration}
             onChange={(e) => setVerticalExaggeration(Number(e.target.value))} style={{ verticalAlign: 'middle', marginLeft: 8 }} />
         </label>}
+        {terrain && <button type="button" onClick={() => setShowGeoRelay((v) => !v)}
+          aria-pressed={showGeoRelay} aria-label={showGeoRelay ? 'Cerrar GeoRelay' : 'Abrir GeoRelay'}
+          style={{ background: showGeoRelay ? '#0e7490' : '#133d56', color: '#e0f2fe', border: '1px solid #36a2c6',
+            padding: '8px 12px', borderRadius: 9, fontWeight: 700, cursor: 'pointer', fontSize: 12 }}>
+          {showGeoRelay ? 'Cerrar GeoRelay RF' : 'GeoRelay RF · LOS / Fresnel'}
+        </button>}
         <a href={wazeUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#7dd3fc', padding: 7 }}>
           Navegar a la zona con Waze
         </a>
@@ -384,6 +392,7 @@ export function Atmosphere4DStudio({ onClose }: { onClose: () => void }) {
           </div>
         </>
       )}
+      {terrain && showGeoRelay && <GeoRelayPlanner terrain={terrain} />}
       {terrain && <div style={{ fontSize: 11, color: '#b8cfdf', lineHeight: 1.5 }}>
         Relieve: <a href={terrain.source.registryUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#7dd3fc' }}>Mapzen / AWS Terrain Tiles</a>.
         {' '}Atribuciones de las fuentes originales: <a href={terrain.source.attributionUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#7dd3fc' }}>licencias y créditos de terreno</a>.
