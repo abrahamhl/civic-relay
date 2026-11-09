@@ -63,6 +63,16 @@ export function terrainTileCoverage(region, zoom = TILE_ZOOM) {
   return { bounds, ids };
 }
 
+/** Standard PNG CRC-32 (IEEE). Detects corrupted chunks, not source authenticity. */
+function pngCrc32(bytes) {
+  let crc = 0xffffffff;
+  for (const byte of bytes) {
+    crc ^= byte;
+    for (let i = 0; i < 8; i++) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
 function readPng(buffer) {
   if (!Buffer.isBuffer(buffer) || buffer.length < 65 || buffer.length > MAX_PNG_BYTES ||
       !buffer.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex'))) throw new Error('INVALID_TERRARIUM_PNG');
@@ -71,9 +81,13 @@ function readPng(buffer) {
   while (offset + 12 <= buffer.length) {
     const length = buffer.readUInt32BE(offset); offset += 4;
     if (length > MAX_PNG_BYTES || offset + 8 + length > buffer.length) throw new Error('INVALID_PNG_CHUNKS');
-    const kind = buffer.toString('ascii', offset, offset + 4); offset += 4;
+    const kindBytes = buffer.subarray(offset, offset + 4);
+    const kind = kindBytes.toString('ascii'); offset += 4;
     const chunk = buffer.subarray(offset, offset + length);
-    offset += length + 4; // CRC follows data. Compression/length checks defend against resource exhaustion.
+    if (pngCrc32(Buffer.concat([kindBytes, chunk])) !== buffer.readUInt32BE(offset + length)) {
+      throw new Error('TERRAIN_PNG_CRC_FAILURE');
+    }
+    offset += length + 4;
     if (kind === 'IHDR') {
       if (channels || length !== 13) throw new Error('INVALID_PNG_HEADER');
       width = chunk.readUInt32BE(0); height = chunk.readUInt32BE(4);
