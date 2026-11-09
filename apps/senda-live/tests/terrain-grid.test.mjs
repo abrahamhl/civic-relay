@@ -18,7 +18,7 @@ function chunk(name, data) {
 function pngTile(heightM = 123.25, channels = 3, filter = 0) {
   const encoded = heightM + 32768;
   const rgb = [Math.floor(encoded / 256), Math.floor(encoded) % 256, Math.round((encoded % 1) * 256)];
-  const stride = 256 * channels, bytes = Buffer.alloc(257 * channels * 256 / channels);
+  const bytes = Buffer.alloc((1 + 256 * channels) * 256);
   let p = 0;
   for (let row = 0; row < 256; row++) {
     bytes[p++] = filter;
