@@ -15,6 +15,7 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const usgsLayerRef = useRef<L.FeatureGroup | null>(null);
   const wildfireLayerRef = useRef<L.FeatureGroup | null>(null);
+  const gdacsLayerRef = useRef<L.FeatureGroup | null>(null);
 
   const [filterType, setFilterType] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -24,6 +25,8 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
   const [showWildfires, setShowWildfires] = useState(false);
   const [showAtmosphere4D, setShowAtmosphere4D] = useState(false);
   const [wildfireStatus, setWildfireStatus] = useState('');
+  const [showGdacs, setShowGdacs] = useState(false);
+  const [gdacsStatus, setGdacsStatus] = useState('');
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -235,6 +238,87 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
     };
   }, [showWildfires, showUsgs]);
 
+
+  // GDPR safe: read only public disaster catalogs. No user GPS, no people OSINT.
+  // GDACS risk levels are issuer-specific; NOT official government evacuation orders.
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !showGdacs) {
+      gdacsLayerRef.current?.clearLayers();
+      return;
+    }
+    let active = true;
+    const layer = L.featureGroup().addTo(map);
+    gdacsLayerRef.current = layer;
+    setGdacsStatus('Consultando GDACS y comparando catálogos públicos...');
+    api.getOsintCorrelations().then((result: any) => {
+      if (!active) return;
+      const events = Array.isArray(result.observations) ? result.observations : [];
+      const levelColors: Record<string, string> = {
+        Red: '#dc2626', Orange: '#f59e0b', Green: '#10b981'
+      };
+      for (const e of events) {
+        if (!Number.isFinite(e.location?.lat) || !Number.isFinite(e.location?.lon) ||
+            !Object.prototype.hasOwnProperty.call(levelColors, e.alertLevel)) continue;
+        const marker = L.circleMarker([e.location.lat, e.location.lon], {
+          radius: e.alertLevel === 'Red' ? 10 : 7,
+          color: '#152d42', fillColor: levelColors[e.alertLevel], fillOpacity: .83,
+          weight: 2
+        });
+        const popup = document.createElement('div');
+        popup.style.minWidth = '220px';
+        const title = document.createElement('strong');
+        title.textContent = String(e.title || 'GDACS risk event');
+        popup.append(title);
+        const meta = document.createElement('div');
+        meta.textContent = 'GDACS · ' + String(e.eventType || '') + ' · nivel ' +
+          String(e.alertLevel) + (e.country ? ' · ' + String(e.country) : '');
+        popup.append(meta);
+        const date = document.createElement('div');
+        date.textContent = 'Publicado por GDACS: ' + new Date(e.updatedAt).toLocaleString('es-ES');
+        popup.append(date);
+        const explain = document.createElement('div');
+        explain.style.cssText = 'font-size:11px;color:#475569;margin:6px 0';
+        explain.textContent = 'Punto representativo del catálogo. No es área afectada ni alerta de evacuación de SENDA.';
+        popup.append(explain);
+        const candidates = document.createElement('div');
+        candidates.style.fontSize = '11px';
+        const overlaps = Array.isArray(e.crossCatalogCandidates) ? e.crossCatalogCandidates : [];
+        candidates.textContent = overlaps.length ?
+          'Coincidencias espaciales/temporales candidatas: ' + overlaps.length +
+          '. No es corroboración independiente.' :
+          'Sin coincidencia contrastable en fuentes disponibles (' + String(e.crossCatalogStatus || '') + ').';
+        popup.append(candidates);
+        const link = document.createElement('a');
+        // Never use provider-authored href; allow an exact origin and known report path.
+        try {
+          const url = new URL(String(e.sourceUrl || ''));
+          if (url.protocol === 'https:' && url.hostname === 'www.gdacs.org' && url.pathname === '/report.aspx') {
+            link.href = url.toString();
+            link.rel = 'noopener noreferrer';
+            link.target = '_blank';
+            link.textContent = 'Consultar el reporte original GDACS';
+            popup.append(link);
+          }
+        } catch { /* untrusted URL discarded */ }
+        marker.bindPopup(popup).addTo(layer);
+      }
+      const freshness = result.status === 'STALE_SNAPSHOT'
+        ? 'Copia anterior; origen no actualizado' : result.status === 'CACHED_SNAPSHOT'
+          ? 'Copia reciente del servidor' : 'Fuente pública consultada';
+      setGdacsStatus(events.length + ' eventos GDACS de riesgo (' + freshness + '). ' +
+        (result.source?.rawSha256 ? 'SHA-256: ' + String(result.source.rawSha256).slice(0, 12) + '… ' : '') +
+        'Coincidencias entre catálogos NO equivalen a confirmación independiente ni alertas SENDA.');
+    }).catch(() => {
+      if (active) setGdacsStatus('GDACS no disponible; no se muestran eventos inventados.');
+    });
+    return () => {
+      active = false;
+      layer.remove();
+      if (gdacsLayerRef.current === layer) gdacsLayerRef.current = null;
+    };
+  }, [showGdacs]);
+
   return (
     <div style={{ height: 'calc(100vh - 4rem)', display: 'flex', flexDirection: 'column' }}>
       {/* Map Control Bar */}
@@ -279,6 +363,10 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
           <input type="checkbox" checked={showWildfires} onChange={(e) => setShowWildfires(e.target.checked)} />
           Incendios NASA EONET (catálogo)
         </label>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: '.35rem', fontSize: '.85rem', cursor: 'pointer' }}>
+          <input type="checkbox" checked={showGdacs} onChange={(e) => setShowGdacs(e.target.checked)} />
+          GDACS · inteligencia de desastres
+        </label>
         <button type="button" aria-pressed={showAtmosphere4D}
           onClick={() => setShowAtmosphere4D((value) => !value)}
           style={{ padding: '0.45rem 0.75rem', borderRadius: 9,
@@ -297,6 +385,13 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
         <div role="status" aria-live="polite" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', background: 'var(--bg-secondary)' }}>
           {wildfireStatus}{' '}
           <a href="https://eonet.gsfc.nasa.gov/docs/v3" target="_blank" rel="noopener noreferrer">NASA EONET · metodología</a>.
+        </div>
+      )}
+
+      {showGdacs && (
+        <div data-testid="gdacs-status" role="status" aria-live="polite" style={{ padding: '.4rem 1rem', fontSize: '.8rem', background: 'var(--bg-secondary)' }}>
+          {gdacsStatus}{' '}
+          <a href="https://www.gdacs.org/feed_reference.aspx" target="_blank" rel="noopener noreferrer">Fuente y referencia GDACS</a>
         </div>
       )}
 
