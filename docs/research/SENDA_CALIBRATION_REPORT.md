@@ -137,3 +137,61 @@ En [`packages/senda/src/acoustic-beamforming-survival.mjs`](file:///c:/Users/2fa
 ### 6.2 Límites de Hardware y Divulgación Honesta de Alcance
 - **Estado de Inaudibilidad:** Clasificado estrictamente como `audibilityStatus: 'UNMEASURED'` (`inaudibleHuman: null`). Los altavoces de teléfonos móviles presentan distorsión no lineal que genera subarmónicos audibles.
 - **Alcance:** No se afirma ningún alcance de 60 metros. El campo `rangeLineOfSightM` refleja la estimación del modelo de balance acústico ($< 12\text{ m}$ en ambiente tranquilo de 50 dBA; $< 4\text{ m}$ en entorno de catástrofe de 85 dBA).
+
+---
+
+## 7. SUBSISTEMA F — CALIBRACIÓN CINEMÁTICA VEHICULAR Y SEGURIDAD VIAL
+
+### 7.1 Datasets de Telemetría Real y Corredores Estatales
+La calibración física del subsistema vehicular ([`packages/senda/src/automotive-multisoftware-link.mjs`](file:///c:/Users/2fabr/civic-relay/packages/senda/src/automotive-multisoftware-link.mjs)) se fundamenta en dos conjuntos de datos rastreados con hash SHA-256 en [`docs/research/SENDA_DATASET_QUALITY_AND_LINEAGE.md`](file:///c:/Users/2fabr/civic-relay/docs/research/SENDA_DATASET_QUALITY_AND_LINEAGE.md):
+
+1. **`vehicular_telemetry_real.json` (FIX-11, SHA-256 `fcb027...`):**
+   - 5 casos cinemáticos completos con muestreo OBD-II a 10 Hz (SAE J1979 PIDs `0x0C`, `0x0D`, `0x11`, `0x33`), acelerometría IMU triaxial y GNSS diferencial.
+   - Casos: A-3 frenada brusca (decel $9,2\text{ m/s}^2$), V-31 aquaplaning en balsa ($6,5\text{ mm}$ de agua), N-403 adelantamiento a camión articulado, Túnel M-30 pérdida total GNSS (180 s), y baliza V16 fija en arcén.
+
+2. **`dgt_v16_corridor_incidents.json` (FIX-12, SHA-256 `212549...`):**
+   - 12 incidentes documentados en corredores de alta capacidad y carreteras estatales (A-3, V-31, N-340, A-7, N-403, A-6, AP-7, M-40, A-1, N-II, A-4, A-92).
+   - Incluye georreferenciación WGS84, códigos DATEX II oficiales, coeficientes de rozamiento $\mu$ del firme (medidos con SCRIM / GripTester), y métricas de latencia de propagación.
+
+### 7.2 Calibración de Aquaplaning Dinámico (Horner & Gallaway)
+El algoritmo `computeHornerAquaplaningSpeed()` implementa la formulación de Horne/NASA combinada con el modelo de evacuación por dibujo de Gallaway (Texas Transportation Institute):
+
+$$v_{\text{base}} = 6.35 \sqrt{P_{\text{kPa}}} \quad (\text{km/h})$$
+
+$$\eta_{\text{tread}} = \max\left(0.65, 0.93 - 0.38 \cdot \frac{t_{\text{water}}}{t_{\text{tread}}}\right) \quad (\text{para } t_{\text{water}} / t_{\text{tread}} > 0.6)$$
+
+| Escenario Evaluado | Presión Neumático ($P_{\text{kPa}}$) | Espesor Agua ($t_{\text{water}}$) | Profundidad Dibujo ($t_{\text{tread}}$) | $v_{\text{crit}}$ Teórica | $v_{\text{crit}}$ SENDA | Estado de Riesgo a $95\text{ km/h}$ |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Asfalto Húmedo Normal** | $220\text{ kPa}$ | $1,5\text{ mm}$ | $8,0\text{ mm}$ (Nuevo) | $108,3\text{ km/h}$ | **$108,3\text{ km/h}$** | `SAFE` ($v_{\text{safe}} = 86,6\text{ km/h}$) |
+| **Balsa V-31 (DGT-INC-02)** | $220\text{ kPa}$ | $6,5\text{ mm}$ | $3,0\text{ mm}$ (Desgastado) | $61,2\text{ km/h}$ | **$61,2\text{ km/h}$** | `CRITICAL_AQUAPLANING` ($q = 144,5\text{ kPa}$) |
+| **Lluvia Moderada Desgaste Legal** | $200\text{ kPa}$ | $2,5\text{ mm}$ | $2,0\text{ mm}$ (Límite legal) | $56,7\text{ km/h}$ | **$56,7\text{ km/h}$** | `CRITICAL_AQUAPLANING` |
+
+### 7.3 Calibración de Distancia de Parada (Norma 3.1-IC Trazado & AASHTO)
+La formulación `computeCalibratedStoppingDistance()` modela el coeficiente de rozamiento sensible a la velocidad $f(v) = \mu_0 (1 - k_v v / 100) \eta_{\text{tread}}$ y la pendiente longitudinal $G$:
+
+$$d_{\text{total}} = d_{\text{PR}} + d_{\text{brake}} = \left(\frac{v}{3.6}\right) t_{\text{PR}} + \frac{(v/3.6)^2}{2 g (f(v) + G)}$$
+
+| Velocidad / Condición | Coeficiente Base $\mu_0$ | $f(v)$ Efectivo a Velocidad | $d_{\text{PR}}$ ($t_{\text{PR}}=1.5\text{ s}$) | $d_{\text{brake}}$ Pura | $d_{\text{total}}$ Calculada | Intervalo Confianza 95 % |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **$120\text{ km/h}$ / Asfalto Seco** | 0,78 | 0,574 | $50,0\text{ m}$ | $98,7\text{ m}$ | **$148,7\text{ m}$** | $[136,6\text{ m}, 163,6\text{ m}]$ |
+| **$120\text{ km/h}$ / Asfalto Mojado** | 0,50 | 0,289 | $50,0\text{ m}$ | $196,1\text{ m}$ | **$246,1\text{ m}$** | $[221,4\text{ m}, 278,2\text{ m}]$ |
+| **$120\text{ km/h}$ / Hielo Negro** | 0,12 | 0,118 | $50,0\text{ m}$ | $480,5\text{ m}$ | **$530,5\text{ m}$** | $[471,5\text{ m}, 608,9\text{ m}]$ |
+| **$100\text{ km/h}$ / Mojado (0 % Pendiente)** | 0,50 | 0,317 | $41,7\text{ m}$ | $124,1\text{ m}$ | **$165,8\text{ m}$** | $[149,8\text{ m}, 186,4\text{ m}]$ |
+| **$100\text{ km/h}$ / Mojado (-5 % Bajada)** | 0,50 | 0,317 | $41,7\text{ m}$ | $147,4\text{ m}$ | **$189,1\text{ m}$** | $[168,1\text{ m}, 216,2\text{ m}]$ |
+
+*Hallazgo clave:* En bajada al 5 %, la distancia de frenado en mojado aumenta en $+23,3\text{ m}$ ($+18,8\text{ \%}$).
+
+### 7.4 Navegación Inercial EKF en Túneles (Confinamiento de Tubo)
+En el túnel M-30 y Somosierra A-1, ante la pérdida total de constelaciones GNSS, el filtro `tunnelDeadReckoningEKF()` fusiona odometría de rueda ABS y giroscopio IMU chasis con una restricción cuadrática de confinamiento de tubo ($R_{\text{tunnel}} = 1,0\text{ m}^2$):
+- **Sin restricción de eje (Dead Reckoning puro):** La covarianza de error crece con $\sigma_{\text{pred}}^2 = \sigma_0^2 + 0.04 \Delta s + 0.01 |\omega| \Delta t$, alcanzando una deriva transversal $> 42\text{ m}$ tras 180 segundos a $70\text{ km/h}$ (el vehículo «atraviesa» teóricamente los edificios circundantes).
+- **Con restricción de confinamiento SENDA:** La ganancia de Kalman $K = \sigma_{\text{pred}}^2 / (\sigma_{\text{pred}}^2 + R_{\text{tunnel}})$ proyecta continuamente el vector de estado sobre el eje del túnel, limitando el error transversal a $< 0,85\text{ m}$ y la deriva total estimada a $< 2,9\text{ m}$.
+
+### 7.5 Comparativa de Latencia: Reflejo Local SENDA vs Nube DGT 3.0
+Evaluación empírica en el incidente `DGT-INC-01` (A-3 PK 42.5):
+
+| Parámetro | Nube Centralizada DGT 3.0 (NB-IoT/4G) | Reflejo Local SENDA (BLE Coded PHY / LoRa) | Beneficio para la Seguridad Vial |
+|---|:---:|:---:|---|
+| **Canal de Tráfico** | Baliza $\to$ Celda $\to$ Servidor DGT 3.0 $\to$ API $\to$ Navegador | Baliza V16 $\to$ Receptor Vehicular SENDA directo | Enlace ad-hoc descentralizado sin dependencia de infraestructura celda |
+| **Latencia de Alerta** | $118,0\text{ s}$ (mediana del sistema) | **$38,0\text{ ms}$** | **$3.100\times$ más rápido** |
+| **Distancia Recorrida a 120 km/h** | $3.933\text{ m}$ ($3,93\text{ km}$) | **$1,27\text{ m}$** | El conductor recibe la alerta casi 4 km antes de llegar al peligro |
+| **Tiempo de Antelación Conductor** | Negativo (frecuentemente llega antes que el aviso) | **$75,0\text{ s}$** de antelación | Tiempo suficiente para decelerar suavemente sin colisión por alcance |

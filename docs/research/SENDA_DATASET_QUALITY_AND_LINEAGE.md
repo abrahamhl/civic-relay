@@ -35,6 +35,8 @@ Los siguientes conjuntos de datos están empaquetados e integrados directamente 
 | **FIX-08** | `investor-next/public/senda/data/smv2026/real.json` | Puntos de referencia geodésicos reales para la cuenca del Turia / Santa María de la Alameda. | 2.843 B | `f7342212ac114482ee3e8b9e44cebab09df44cd38dfedc0fd759da1ef958cef0` |
 | **FIX-09** | `packages/senda/calibration/sources.v1.json` | Registro canónico v1 de fuentes de calibración, URLs normativas y parámetros. | 13.215 B | `73e2febe143345bf697b77e3ae8e4f26d3d566c13e33426be4c18ea430072d50` |
 | **FIX-10** | `packages/senda/data/source-registry.v021.json` | Registro de proveedores externos, tolerancias de latencia y políticas de descarte. | 20.504 B | `ffb6827e537fe8d2962a3d8d4c6c4fcef8bdb0d2da92104962eda5eee90c54c6` |
+| **FIX-11** | `investor-next/public/senda/data/referencias/vehicular_telemetry_real.json` | Telemetría cinemática real OBD-II (10 Hz), IMU triaxial y frenadas de emergencia en A-3, V-31, N-403, M-30. | 6.346 B | `fcb027f129eb7435e9875d7d4e5298fa9b3d05cb47123172d1fb7c38a55c3694` |
+| **FIX-12** | `investor-next/public/senda/data/referencias/dgt_v16_corridor_incidents.json` | Registro calibrado de 12 incidentes viales españoles (A-3, V-31, N-340, A-7, N-403, A-6, AP-7, M-40, A-1, N-II, A-4, A-92) con WGS84, DATEX II, V16 y rozamiento. | 10.595 B | `212549ad17d646e5ea4cf0275f8c5bc4481786159ef39309cfb278153f8e2f2f` |
 
 *Verificación automática:* Los hashes anteriores fueron validados en el sistema de ficheros local con PowerShell `Get-FileHash -Algorithm SHA256`.
 
