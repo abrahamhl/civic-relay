@@ -2,7 +2,9 @@
   "rewrites": [
     { "source": "/senda", "destination": "/senda/index.html" },
     { "source": "/senda/", "destination": "/senda/index.html" },
-    { "source": "/senda/:page(red|incidente|edificios|organismo|ojo|incendio|via|llamada|dron|arquitectura|reserva|carretera|camaras|paises|dgt|trafico|evacuacion|referencias|fuego3d|fuego|vehiculos|sentidos|agua|triaje|monte|barrido|estado)", "destination": "/senda/:page.html" }
+    { "source": "/senda/papers", "destination": "/senda/papers/index.html" },
+    { "source": "/senda/papers/", "destination": "/senda/papers/index.html" },
+    { "source": "/senda/:page(red|incidente|edificios|organismo|ojo|incendio|via|llamada|dron|arquitectura|reserva|carretera|camaras|paises|dgt|trafico|evacuacion|referencias|fuego3d|fuego|vehiculos|sentidos|agua|triaje|monte|barrido|estado|paper)", "destination": "/senda/:page.html" }
   ],
   "headers": [
     {
@@ -19,10 +21,23 @@
       ]
     },
     {
+      "source": "/media/renders/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" },
+        { "key": "Content-Type", "value": "image/svg+xml" }
+      ]
+    },
+    {
       "source": "/media/m95/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" },
         { "key": "Accept-Ranges", "value": "bytes" }
+      ]
+    },
+    {
+      "source": "/senda/papers/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600, stale-while-revalidate=86400" }
       ]
     },
     {

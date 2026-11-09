@@ -37,7 +37,7 @@ fi
 # Check if vercel CLI is installed
 if ! command -v vercel &> /dev/null; then
     echo -e "${YELLOW}⚠️  Vercel CLI not installed. Installing...${NC}"
-    npm install -g vercel
+    pnpm add -g vercel
 fi
 
 echo -e "${GREEN}✅ Pre-flight checks passed${NC}"

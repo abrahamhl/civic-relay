@@ -12,6 +12,7 @@ import CommandSurface from './command-surface';
 import { HyperFramesCinemaDeck } from './hyperframes-cinema-deck';
 import { SystemExplained, DeveloperBlueprint } from './system-explained';
 import LanguageDocument from './language-document';
+import ScientificPapersDeck from './scientific-papers-deck';
 import { labels, locales, type Locale } from './copy';
 
 export default function SurfaceView({
@@ -40,7 +41,8 @@ export default function SurfaceView({
       mandoNav: 'D · Mando / Panel Multicanal',
       mandoTitle: 'SUPERFICIE D · SENDA MANDO · PANEL MULTICANAL DE ACTIVACIONES',
       mandoLead:
-        'Consola determinista para activaciones, taxonomía, seguimiento de superficie, rutas mesh y presupuestos de enlace. Ejercicio sintético: sin radios, cámaras ni dispatch 112 conectados; el conector de producción de la Consola Mando es privado.'
+        'Consola determinista para activaciones, taxonomía, seguimiento de superficie, rutas mesh y presupuestos de enlace. Ejercicio sintético: sin radios, cámaras ni dispatch 112 conectados; el conector de producción de la Consola Mando es privado.',
+      papersNav: 'E · Papers & Renders ↗'
     },
     en: {
       back: '← Back to Overview (Discover)',
@@ -55,7 +57,8 @@ export default function SurfaceView({
       mandoNav: 'D · Command / Multichannel Panel',
       mandoTitle: 'SURFACE D · SENDA COMMAND · MULTICHANNEL ACTIVATION PANEL',
       mandoLead:
-        'Deterministic console for activations, taxonomy, surface tracking, mesh routes and link budgets. Synthetic exercise: no radios, cameras or 112 dispatch connected; the production SENDA Command console connector is private.'
+        'Deterministic console for activations, taxonomy, surface tracking, mesh routes and link budgets. Synthetic exercise: no radios, cameras or 112 dispatch connected; the production SENDA Command console connector is private.',
+      papersNav: 'E · Papers & Renders ↗'
     },
     nl: {
       back: '← Terug naar Overzicht (Ontdekken)',
@@ -70,7 +73,8 @@ export default function SurfaceView({
       mandoNav: 'D · Commando / Multikanaal Paneel',
       mandoTitle: 'OPPERVLAK D · SENDA COMMANDO · MULTIKANAAL ACTIVATIEPANEEL',
       mandoLead:
-        'Deterministische console voor activaties, taxonomie, oppervlaktetracking, mesh-routes en linkbudgetten. Synthetische oefening: geen radio’s, camera’s of 112-dispatch verbonden; de productieconnector van de SENDA Commando-console is privé.'
+        'Deterministische console voor activaties, taxonomie, oppervlaktetracking, mesh-routes en linkbudgetten. Synthetische oefening: geen radio’s, camera’s of 112-dispatch verbonden; de productieconnector van de SENDA Commando-console is privé.',
+      papersNav: 'E · Papers & Renders ↗'
     }
   }[locale];
   const surfaceTitle =
@@ -100,6 +104,9 @@ export default function SurfaceView({
           </a>
           <a href={mandoHref} aria-current={surface === 'MANDO' ? 'page' : undefined}>
             {titles.mandoNav}
+          </a>
+          <a href="/senda/papers/">
+            {titles.papersNav}
           </a>
         </nav>
         <div className="locale-links" role="group" aria-label="Language">
@@ -145,6 +152,7 @@ export default function SurfaceView({
       ) : surface === 'SCIENCE' ? (
         <>
           <div className="container">
+            <ScientificPapersDeck locale={locale} />
             <ScientificTheoremsLab locale={locale} />
             <VehicularDopplerLab locale={locale} />
             <CivilianRadarDefenseLab locale={locale} />
