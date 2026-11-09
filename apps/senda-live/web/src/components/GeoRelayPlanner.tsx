@@ -94,7 +94,7 @@ export function GeoRelayPlanner({ terrain }: { terrain: TerrainGridSnapshot }) {
     <section data-testid="senda-rf-geometry-lab" aria-label="SENDA GeoRelay - análisis de enlaces sobre terreno"
       style={{ background: '#071b2b', padding: 14, color: TEXT, border: '1px solid #255875', borderRadius: 13, display: 'grid', gap: 12 }}>
       <header>
-        <strong style={{ letterSpacing: '.055em', fontSize: 15 }}>GEOR E L A Y / RADIO SHADOW LAB</strong>
+        <strong style={{ letterSpacing: '.055em', fontSize: 15 }}>GEORELAY / RADIO SHADOW LAB</strong>
         <p style={{ fontSize: 12, color: MUTED, margin: '5px 0 0' }}>
           Alturas DEM + curvatura terrestre + zona de Fresnel · simulación geométrica offline de nodos hipotéticos
         </p>
