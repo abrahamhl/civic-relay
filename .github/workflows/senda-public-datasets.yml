@@ -1,0 +1,47 @@
+name: SENDA Public Research Snapshots
+on:
+  pull_request:
+    branches:
+      - research/senda-v021-evidence-quality-20261106
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-observations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Contract tests without network
+        run: |
+          python -m unittest discover -s packages/senda/data -p 'test_fetch_real_usgs_comcat.py' -v
+          python -m unittest discover -s packages/senda/data -p 'test_fetch_real_digitraffic_tms.py' -v
+      - name: Acquire fixed-window historical USGS ComCat (public research only)
+        id: usgs
+        continue-on-error: true
+        run: |
+          python packages/senda/data/fetch_real_usgs_comcat.py --start 2026-10-01 --end 2026-11-01 --min-magnitude 6 --out "$RUNNER_TEMP/senda-public-observations/usgs"
+      - name: Acquire one current Finnish loop station with source-level timestamps
+        id: digitraffic
+        continue-on-error: true
+        run: |
+          python packages/senda/data/fetch_real_digitraffic_tms.py --station 23001 --out "$RUNNER_TEMP/senda-public-observations/tms"
+      - name: Print honest ingestion outcomes
+        if: always()
+        shell: bash
+        run: |
+          echo "USGS request result: ${{ steps.usgs.outcome }}"
+          echo "Digitraffic request result: ${{ steps.digitraffic.outcome }}"
+          find "$RUNNER_TEMP/senda-public-observations" -maxdepth 2 -type f -printf "%P %s bytes\n" 2>/dev/null || true
+          echo "Not calibrated; no field/operational claims; data are research snapshots."
+      - name: Archive bounded raw responses and derivation for independent review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: senda-research-public-snapshots
+          path: ${{ runner.temp }}/senda-public-observations
+          if-no-files-found: warn
+          retention-days: 30
