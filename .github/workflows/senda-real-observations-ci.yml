@@ -30,7 +30,7 @@ jobs:
       - name: Retrieve real Digitraffic Finnish TMS measurements (CC BY 4.0)
         run: |
           python3 packages/senda/data/fetch_real_digitraffic_tms.py --station 23001 --out "$RUNNER_TEMP/senda-evidence" | tee "$RUNNER_TEMP/senda-evidence/digitraffic-summary.json"
-      - name: Assertions: genuine source URL, data hash, UTC, and no active fusion permissions
+      - name: "Assertions: genuine source URL, data hash, UTC, and no active fusion permissions"
         run: |
           python3 - "$RUNNER_TEMP/senda-evidence" <<'PY'
           import hashlib,json,pathlib,sqlite3,sys
