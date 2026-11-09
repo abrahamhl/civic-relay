@@ -61,3 +61,4 @@ export * from './scientific-theorems-physics.mjs';
 export * from './vehicle-doppler-gateway.mjs';
 export * from './civilian-uav-mesh-radar.mjs';
 export * from './acoustic-beamforming-survival.mjs';
+export * from './automotive-multisoftware-link.mjs';
