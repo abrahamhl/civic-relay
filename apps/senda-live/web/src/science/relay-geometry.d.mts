@@ -66,3 +66,28 @@ export function planRelayCorridor(terrain:TerrainGridSnapshot, options?:{
   startSite?:string;endSite?:string;frequencyMHz?:number;
   mastHeightM?:number;maxHopKm?:number;decisionBufferM?:number;
 }):RelayCorridorResult;
+
+export interface RadioShadowField {
+  schema: 'senda.rf.terrain-shadow-field/1';
+  dataKind: 'HYPOTHETICAL_GEOMETRIC_VISIBILITY';
+  sourceRegion: string; sourceDataset: string;
+  originSite: string; origin: { lat: number; lon: number };
+  frequencyMHz: number; transmitterHeightM: number; receiverHeightM: number;
+  gridSize: number; maxRangeKm: number; kFactor: number;
+  cellSize: { approxWidthM: number|null; approxHeightM: number|null };
+  summary: {
+    modelClear: number; modelObstructed: number;
+    modelUncertain: number; excludedDistance: number; coincident: number;
+  };
+  cells: Array<{
+    row:number;col:number;lat:number;lon:number;distanceM:number;
+    status:RelayGeometryResult['status']|'COINCIDENT_SAMPLE'|'EXCLUDED_BY_USER_DISTANCE_LIMIT';
+    minFresnelClearanceM:number|null;
+  }>;
+  measuredCoverage: false; diffractionModeled: false;
+  hypotheticalEquipment: true; fieldValidated: false;
+}
+export function computeRadioShadowField(terrain: TerrainGridSnapshot, options?: {
+  originSite?:string;frequencyMHz?:number;transmitterHeightM?:number;
+  receiverHeightM?:number;gridSize?:number;maxRangeKm?:number;kFactor?:number;
+}): RadioShadowField;
