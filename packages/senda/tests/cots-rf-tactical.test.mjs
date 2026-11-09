@@ -8,6 +8,9 @@ import {
   calculateInterferometricDoA,
   calculateHomebrewAntennaDesign,
   OPENDRONEID_MSG_TYPES,
+  getSendaHardwareCatalog,
+  computeSendaPackBOM,
+  computeMasterCrateBOM,
 } from '../src/cots-rf-tactical.mjs';
 
 test('Remote ID ASTM F3411: decodes Basic ID message with serial number', () => {
@@ -149,4 +152,49 @@ test('Homebrew Antenna Design: synthesizes exact cutting dimensions for low-cost
   assert.equal(yagi.antennaType, 'YAGI_UDA_5_ELEMENT_BEAM');
   assert.equal(yagi.elementsMm.length, 5);
   assert.ok(yagi.expectedGainDbi >= 10.0);
+});
+
+test('SENDA COTS Hardware: 12-Pack Catalog completeness, physical rigor and budget compliance', () => {
+  const catalog = getSendaHardwareCatalog();
+  assert.equal(catalog.length, 12, 'Catalog must contain exactly 12 COTS packs');
+
+  for (let i = 1; i <= 12; i++) {
+    const packId = `PACK_${i}`;
+    const bom = computeSendaPackBOM(packId);
+
+    assert.equal(bom.packId, packId);
+    assert.ok(bom.name.length > 5);
+    assert.ok(bom.domain.length > 5);
+    assert.ok(bom.physics.length > 10);
+    assert.ok(bom.totalCostEur > 0);
+    assert.ok(bom.totalCostEur <= bom.targetBudgetEur, `${packId} exceeds target budget: ${bom.totalCostEur} > ${bom.targetBudgetEur}`);
+    assert.equal(bom.isWithinBudget, true);
+    assert.ok(bom.items.length >= 3, `${packId} must contain at least 3 BOM components`);
+
+    for (const item of bom.items) {
+      assert.ok(item.part.length > 2);
+      assert.ok(item.unitPriceEur > 0);
+      assert.ok(item.qty >= 1);
+    }
+  }
+});
+
+test('SENDA COTS Hardware: Master Tactical Crates (EDC, Brigada, Territorial) budget and contents', () => {
+  const edc = computeMasterCrateBOM('EDC_PERSONAL');
+  assert.equal(edc.crateType, 'EDC_PERSONAL');
+  assert.equal(edc.packs.length, 3);
+  assert.ok(edc.totalCostEur <= 15.0, `EDC kit cost ${edc.totalCostEur} must be <= 15.0 EUR`);
+  assert.equal(edc.isWithinBudget, true);
+
+  const brigada = computeMasterCrateBOM('BRIGADA_FORESTAL');
+  assert.equal(brigada.crateType, 'BRIGADA_FORESTAL');
+  assert.equal(brigada.packs.length, 5);
+  assert.ok(brigada.totalCostEur <= 90.0, `Brigada kit cost ${brigada.totalCostEur} must be <= 90.0 EUR`);
+  assert.equal(brigada.isWithinBudget, true);
+
+  const territorial = computeMasterCrateBOM('TERRITORIAL_MUNICIPAL');
+  assert.equal(territorial.crateType, 'TERRITORIAL_MUNICIPAL');
+  assert.equal(territorial.packs.length, 8);
+  assert.ok(territorial.totalCostEur <= 165.0, `Territorial kit cost ${territorial.totalCostEur} must be <= 165.0 EUR`);
+  assert.equal(territorial.isWithinBudget, true);
 });

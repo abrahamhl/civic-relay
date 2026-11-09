@@ -406,3 +406,264 @@ export function calculateHomebrewAntennaDesign(targetFrequencyHz, antennaType = 
       throw new TypeError(`Unknown antenna type: ${antennaType}`);
   }
 }
+
+// ---------------------------------------------------------------------------
+// 5. SENDA COTS RESILIENCY PACKS CATALOG & BILL OF MATERIALS (BOM)
+// ---------------------------------------------------------------------------
+
+export const SENDA_COTS_HARDWARE_CATALOG = Object.freeze([
+  {
+    id: 'PACK_1',
+    name: 'Centinela Táctico Radar 24 GHz + Acústico 3D',
+    domain: 'TACTICAL_DRONE_DETECTION',
+    physics: 'Doppler FMCW 24 GHz + TDoA Delay-and-Sum 3D + Bernoulli downwash',
+    targetBudgetEur: 15.0,
+    items: [
+      { part: 'ESP32-S3 DevKit N16R8', unitPriceEur: 3.80, qty: 1 },
+      { part: 'Radar HLK-LD2410B FMCW 24 GHz', unitPriceEur: 3.10, qty: 1 },
+      { part: 'Micrófono MEMS I2S INMP441', unitPriceEur: 0.80, qty: 4 },
+      { part: 'Barómetro BMP280 I2C', unitPriceEur: 0.90, qty: 1 },
+      { part: 'Caja Estanca IP65 100x68', unitPriceEur: 1.50, qty: 1 },
+    ],
+  },
+  {
+    id: 'PACK_2',
+    name: 'Micro-Sismógrafo e Infrasonidos DANA',
+    domain: 'HYDROLOGICAL_EARLY_WARNING',
+    physics: 'Onda barométrica infrasónica 0.05-2 Hz + Vibración sísmica fluvial',
+    targetBudgetEur: 6.0,
+    items: [
+      { part: 'ESP32-C3 SuperMini', unitPriceEur: 1.80, qty: 1 },
+      { part: 'Microbarómetro DPS310 0.02 Pa', unitPriceEur: 1.40, qty: 1 },
+      { part: 'Acelerómetro LIS3DHTR', unitPriceEur: 0.90, qty: 1 },
+      { part: 'Buzzer Piezo Pasivo 3V', unitPriceEur: 0.50, qty: 1 },
+    ],
+  },
+  {
+    id: 'PACK_3',
+    name: 'Repetidor LoRa DTN Solar Autónomo',
+    domain: 'LONG_RANGE_DTN_TELECOM',
+    physics: 'Chirp Spread Spectrum CSS SF10-12 + ETSI g3 500mW ERP',
+    targetBudgetEur: 22.0,
+    items: [
+      { part: 'Heltec WiFi LoRa 32 V3 SX1262', unitPriceEur: 12.20, qty: 1 },
+      { part: 'Antena Fibra Vidrio 868 MHz 5.8 dBi', unitPriceEur: 2.80, qty: 1 },
+      { part: 'Panel Solar Monocristalino 5V 2W', unitPriceEur: 1.40, qty: 1 },
+      { part: 'Batería 18650 Li-Ion 2600 mAh', unitPriceEur: 1.40, qty: 1 },
+    ],
+  },
+  {
+    id: 'PACK_4',
+    name: 'Sniffer Pasivo RF 8 GHz + Detector Arco',
+    domain: 'ELECTRONIC_WARFARE_PASSIVE',
+    physics: 'Radiometría logarítmica 70 dB rango sin oscilador local (0 dBm)',
+    targetBudgetEur: 9.0,
+    items: [
+      { part: 'ESP32-C3 SuperMini', unitPriceEur: 1.80, qty: 1 },
+      { part: 'Detector Logarítmico AD8318 8 GHz', unitPriceEur: 3.60, qty: 1 },
+      { part: 'Antena Log-Periódica PCB 0.6-10 GHz', unitPriceEur: 1.50, qty: 1 },
+    ],
+  },
+  {
+    id: 'PACK_5',
+    name: 'Baliza Infrarroja Anti-Humo NIR 850/940 nm',
+    domain: 'SEARCH_AND_RESCUE_OPTICAL',
+    physics: 'Dispersión Mie reducida 65% en ventana NIR + Modulación estroboscópica',
+    targetBudgetEur: 5.0,
+    items: [
+      { part: 'ESP32-C3 SuperMini / ATtiny', unitPriceEur: 1.80, qty: 1 },
+      { part: '2x LEDs Alta Potencia 3W NIR 850/940nm', unitPriceEur: 0.90, qty: 1 },
+      { part: 'Driver MOSFET AO3400', unitPriceEur: 0.40, qty: 1 },
+      { part: 'Portapilas 18650 con interruptor', unitPriceEur: 0.30, qty: 1 },
+    ],
+  },
+  {
+    id: 'PACK_6',
+    name: 'Radar Bio-Médico UWB Vida bajo Escombros',
+    domain: 'USAR_CONFINED_SPACE_LIFE_DETECTION',
+    physics: 'Reflectometría de pulso ultracorto UWB ToF sub-ns + Fase torácica',
+    targetBudgetEur: 15.0,
+    items: [
+      { part: 'ESP32-UWB con Decawave DWM1000', unitPriceEur: 8.90, qty: 1 },
+      { part: 'Antena Planar Microstrip UWB 3-7 GHz', unitPriceEur: 1.20, qty: 1 },
+      { part: 'Pantalla OLED 0.96 I2C', unitPriceEur: 1.20, qty: 1 },
+      { part: 'Carcasa de mano ergonómica ABS', unitPriceEur: 0.60, qty: 1 },
+    ],
+  },
+  {
+    id: 'PACK_7',
+    name: 'Termografía Radiométrica LWIR Anti-Humo',
+    domain: 'THERMAL_NIGHT_SAR_FIREFIGHTING',
+    physics: 'Radiometría Planck LWIR 8-14 µm + Dispersión Rayleigh mínima en hollín',
+    targetBudgetEur: 25.0,
+    items: [
+      { part: 'Sensor Térmico MLX90640 (32x24 px)', unitPriceEur: 14.80, qty: 1 },
+      { part: 'ESP32-S3 Mini N8R2', unitPriceEur: 3.20, qty: 1 },
+      { part: 'Pantalla LCD IPS 1.14 ST7789 SPI', unitPriceEur: 1.40, qty: 1 },
+    ],
+  },
+  {
+    id: 'PACK_8',
+    name: 'Sniffer Químico Pirólisis Pre-Llama',
+    domain: 'EARLY_WILDFIRE_DETECTION',
+    physics: 'Quimiorresistencia MOS Wolkenstein/Freundlich (H2, CO) pre-ignición',
+    targetBudgetEur: 8.0,
+    items: [
+      { part: 'Sensor Digital VOC Sensirion SGP40', unitPriceEur: 2.90, qty: 1 },
+      { part: 'Sensor Analógico MQ-135 CO/Humo', unitPriceEur: 0.90, qty: 1 },
+      { part: 'ESP32-C3 SuperMini', unitPriceEur: 1.80, qty: 1 },
+      { part: 'Buzzer Piezo 3V', unitPriceEur: 0.60, qty: 1 },
+    ],
+  },
+  {
+    id: 'PACK_9',
+    name: 'Sonda TDR Humedad Combustible FDFM',
+    domain: 'FOREST_FUEL_IGNITION_RISK',
+    physics: 'Permitividad dieléctrica compleja Maxwell 1.5 MHz + Modelo Rothermel FDFM',
+    targetBudgetEur: 5.0,
+    items: [
+      { part: 'Sensor Capacitivo de Suelo v2.0', unitPriceEur: 0.70, qty: 1 },
+      { part: 'ESP32-C3 SuperMini con ADC', unitPriceEur: 1.80, qty: 1 },
+      { part: 'Varillas Inoxidables AISI 316 (100 mm)', unitPriceEur: 0.60, qty: 1 },
+    ],
+  },
+  {
+    id: 'PACK_10',
+    name: 'Magnetómetro Geofísico de Deslizamientos',
+    domain: 'GEOLOGICAL_LANDSLIDE_WARNING',
+    physics: 'Piezomagnetismo tectónico en rocas ferromagnéticas + Inclinometría',
+    targetBudgetEur: 6.0,
+    items: [
+      { part: 'Magnetómetro Triaxial QMC5883L 0.2 µT', unitPriceEur: 1.10, qty: 1 },
+      { part: 'Acelerómetro LIS3DHTR 16-bit', unitPriceEur: 0.90, qty: 1 },
+      { part: 'ESP32-C3 SuperMini', unitPriceEur: 1.80, qty: 1 },
+    ],
+  },
+  {
+    id: 'PACK_11',
+    name: 'Boya Fluvial DTN "Pato Táctico"',
+    domain: 'RAPID_FLOOD_RIVER_TRACKING',
+    physics: 'Flotabilidad de Arquímedes + Cinemática fluvial Saint-Venant + LoRa',
+    targetBudgetEur: 18.0,
+    items: [
+      { part: 'Heltec WiFi LoRa 32 V3 SX1262', unitPriceEur: 11.20, qty: 1 },
+      { part: 'Sensor Sumergible DS18B20 Inox', unitPriceEur: 0.90, qty: 1 },
+      { part: 'Acelerómetro 6 DOF MPU6050', unitPriceEur: 0.90, qty: 1 },
+      { part: 'Esfera Estanca IP68 90mm con plomo', unitPriceEur: 1.20, qty: 1 },
+    ],
+  },
+  {
+    id: 'PACK_12',
+    name: 'Generador Termoeléctrico Seebeck Supervivencia',
+    domain: 'EXTREME_SURVIVAL_ENERGY_HARVESTING',
+    physics: 'Efecto termoeléctrico Seebeck en Bi2Te3 + Elevador DC-DC LTC3108',
+    targetBudgetEur: 7.0,
+    items: [
+      { part: 'Célula Seebeck SP1848-27145', unitPriceEur: 2.30, qty: 1 },
+      { part: 'Elevador Ultra-Bajo Voltaje LTC3108', unitPriceEur: 1.40, qty: 1 },
+      { part: 'Disipador Aluminio 40x40 con pad', unitPriceEur: 1.00, qty: 1 },
+    ],
+  },
+]);
+
+export function getSendaHardwareCatalog() {
+  return SENDA_COTS_HARDWARE_CATALOG;
+}
+
+export function computeSendaPackBOM(packId) {
+  const pack = SENDA_COTS_HARDWARE_CATALOG.find((p) => p.id === packId);
+  if (!pack) {
+    throw new TypeError(`Unknown SENDA Hardware Pack ID: ${packId}`);
+  }
+  const totalCostEur = pack.items.reduce((sum, item) => sum + item.unitPriceEur * item.qty, 0);
+  return {
+    packId: pack.id,
+    name: pack.name,
+    domain: pack.domain,
+    physics: pack.physics,
+    targetBudgetEur: pack.targetBudgetEur,
+    totalCostEur: +totalCostEur.toFixed(2),
+    isWithinBudget: totalCostEur <= pack.targetBudgetEur,
+    items: pack.items,
+  };
+}
+
+export function computeMasterCrateBOM(crateType) {
+  switch (crateType) {
+    case 'EDC_PERSONAL': {
+      const p4 = computeSendaPackBOM('PACK_4');
+      const p5 = computeSendaPackBOM('PACK_5');
+      const p9 = computeSendaPackBOM('PACK_9');
+      const totalCostEur = +(p4.totalCostEur + p5.totalCostEur + p9.totalCostEur).toFixed(2);
+      return {
+        crateType,
+        name: 'Kit EDC Personal de Supervivencia Individual',
+        packs: [p4, p5, p9],
+        totalCostEur,
+        targetLimitEur: 15.0,
+        isWithinBudget: totalCostEur <= 15.0,
+      };
+    }
+    case 'BRIGADA_FORESTAL': {
+      const p1 = computeSendaPackBOM('PACK_1');
+      const p2 = computeSendaPackBOM('PACK_2');
+      const p3 = computeSendaPackBOM('PACK_3');
+      const p7 = computeSendaPackBOM('PACK_7');
+      const p8 = computeSendaPackBOM('PACK_8');
+      const totalCostEur = +(p1.totalCostEur * 2 + p2.totalCostEur * 2 + p3.totalCostEur + p7.totalCostEur + p8.totalCostEur * 2).toFixed(2);
+      return {
+        crateType,
+        name: 'Kit Táctico de Brigada Forestal / Protección Civil',
+        packs: [
+          { ...p1, qty: 2 },
+          { ...p2, qty: 2 },
+          { ...p3, qty: 1 },
+          { ...p7, qty: 1 },
+          { ...p8, qty: 2 },
+        ],
+        totalCostEur,
+        targetLimitEur: 90.0,
+        isWithinBudget: totalCostEur <= 90.0,
+      };
+    }
+    case 'TERRITORIAL_MUNICIPAL': {
+      const p1 = computeSendaPackBOM('PACK_1');
+      const p2 = computeSendaPackBOM('PACK_2');
+      const p3 = computeSendaPackBOM('PACK_3');
+      const p4 = computeSendaPackBOM('PACK_4');
+      const p5 = computeSendaPackBOM('PACK_5');
+      const p9 = computeSendaPackBOM('PACK_9');
+      const p11 = computeSendaPackBOM('PACK_11');
+      const p12 = computeSendaPackBOM('PACK_12');
+      const totalCostEur = +(
+        p1.totalCostEur * 4 +
+        p2.totalCostEur * 4 +
+        p3.totalCostEur * 3 +
+        p4.totalCostEur * 1 +
+        p5.totalCostEur * 3 +
+        p9.totalCostEur * 1 +
+        p11.totalCostEur * 1 +
+        p12.totalCostEur * 1
+      ).toFixed(2);
+      return {
+        crateType,
+        name: 'Master Territorial Resiliency Crate (Comarca/Municipio)',
+        packs: [
+          { ...p1, qty: 4 },
+          { ...p2, qty: 4 },
+          { ...p3, qty: 3 },
+          { ...p4, qty: 1 },
+          { ...p5, qty: 3 },
+          { ...p9, qty: 1 },
+          { ...p11, qty: 1 },
+          { ...p12, qty: 1 },
+        ],
+        totalCostEur,
+        targetLimitEur: 165.0,
+        isWithinBudget: totalCostEur <= 165.0,
+      };
+    }
+    default:
+      throw new TypeError(`Unknown crate type: ${crateType}`);
+  }
+}
