@@ -24,6 +24,6 @@ jobs:
           URL: https://espressif.github.io/arduino-esp32/package_esp32_index.json
         run: |
           arduino-cli core update-index --additional-urls "$URL"
-          arduino-cli core install esp32:esp32@3.0.7 --additional-urls "$URL"
+          for i in 1 2 3; do arduino-cli core install esp32:esp32@3.0.7 --additional-urls "$URL" && break || sleep 15; done
       - name: Compilar firmware (Wi-Fi + BLE caben solo en la partición huge_app)
         run: arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=huge_app --warnings default hardware/esp32-survey
