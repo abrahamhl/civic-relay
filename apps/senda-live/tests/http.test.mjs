@@ -36,7 +36,22 @@ test('INTEGRACIÓN HTTP / SPA / SSE / SEGURIDAD', async (t) => {
     dataKind: 'RASTER_DEM_SAMPLES', rows: 33, columns: 33,
     elevationsM: Array(1089).fill(120), source: { provider: 'Mapzen Terrain Tiles' }
   }) };
-  const { server, db } = createServer({ dbFile: TEST_HTTP_DB, usgsFeed, eonetFeed, weatherGridFeed, terrainGridFeed });
+    const effisFeed = { read: async () => ({
+    schema: 'senda.osint.copernicus-effis/1', dataset: 'COPERNICUS_EMS_EFFIS_ACTIVE_FIRES',
+    status: 'ACTIVE_SNAPSHOT', observations: [{ id: 'effis:test', location: { lat: 39.5, lon: -0.4 }, fireRadiativePowerMW: 45 }],
+    source: { provider: 'Copernicus EFFIS', rawSha256: 'effis_hash' }
+  }) };
+  const aemetFeed = { read: async () => ({
+    schema: 'senda.osint.official-warnings-cap/1', dataset: 'AEMET_METEOALARM_OFFICIAL_WARNINGS',
+    status: 'ACTIVE_SNAPSHOT', warnings: [{ id: 'warn:test', severity: 'SEVERE', capIdentifier: 'test' }],
+    source: { provider: 'AEMET', rawSha256: 'aemet_hash' }
+  }) };
+  const gdacsFeed = { read: async () => ({
+    schema: 'senda.osint.gdacs/1', dataset: 'GDACS_PUBLIC_DISASTER_EVENTS',
+    status: 'ACTIVE_SNAPSHOT', observations: [{ id: 'gdacs:test', eventType: 'EQ', location: { lat: 40, lon: 1 }, severity: 5.2 }],
+    source: { provider: 'GDACS', rawSha256: 'gdacs_hash' }
+  }) };
+  const { server, db } = createServer({ dbFile: TEST_HTTP_DB, usgsFeed, eonetFeed, weatherGridFeed, terrainGridFeed, gdacsFeed, effisFeed, aemetFeed });
 
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const port = server.address().port;
@@ -264,5 +279,29 @@ test('INTEGRACIÓN HTTP / SPA / SSE / SEGURIDAD', async (t) => {
     assert.equal(listRes.status, 200);
     const listData = await listRes.json();
     assert.equal(listData.messages[0].securityLevel, 'SERVER_STORED_PLAINTEXT');
+  });
+
+  await t.test('7. P0-OSINT: Endpoints oficiales Copernicus EFFIS, AEMET CAP y Reconciled Multi-Hazard Intelligence', async () => {
+    // 1. GET /api/sources/copernicus-effis
+    const effisRes = await fetch(`${baseUrl}/api/sources/copernicus-effis`);
+    assert.equal(effisRes.status, 200);
+    const effisData = await effisRes.json();
+    assert.equal(effisData.schema, 'senda.osint.copernicus-effis/1');
+    assert.ok(Array.isArray(effisData.observations));
+
+    // 2. GET /api/sources/aemet-warnings
+    const aemetRes = await fetch(`${baseUrl}/api/sources/aemet-warnings`);
+    assert.equal(aemetRes.status, 200);
+    const aemetData = await aemetRes.json();
+    assert.equal(aemetData.schema, 'senda.osint.official-warnings-cap/1');
+    assert.ok(Array.isArray(aemetData.warnings));
+
+    // 3. GET /api/sources/reconciled-intelligence
+    const reconRes = await fetch(`${baseUrl}/api/sources/reconciled-intelligence`);
+    assert.equal(reconRes.status, 200);
+    const reconData = await reconRes.json();
+    assert.equal(reconData.schema, 'senda.osint.reconciled-intelligence/1');
+    assert.ok(reconData.receipt);
+    assert.equal(reconData.receipt.rootSha256.length, 64);
   });
 });

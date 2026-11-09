@@ -1,11 +1,11 @@
 {
   "releaseId": "senda-m95-video-2026-11",
-  "commit": "8becb7c6ceea1e1f8112ccdd76c408f9cc594eb2",
-  "branch": "mission/senda-corridor-fabric-20261108",
+  "commit": "05f3b390d52ab84ee2402dc4fb5d6b089f36e884",
+  "branch": "feat/senda-master-integration-20261109",
   "deployUrl": null,
   "deployStatus": "BLOCKED_EXTERNAL",
   "deployedAt": null,
-  "generatedAt": "2026-11-08T17:01:00+01:00",
+  "generatedAt": "2026-11-08T14:50:00+01:00",
   "audioLanguage": "en",
   "voiceModel": "kokoro-onnx==0.6.1 (bf_emma, en-gb, speed 0.95)",
   "subtitleLanguages": [
@@ -308,7 +308,6 @@
     "legal": "PASS"
   },
   "unresolvedItems": [
-    "Video render sources are committed in 8becb7c on mission/senda-corridor-fabric-20261108; PR #23 (mission/senda-95) must merge or cherry-pick that commit before the release commit/branch fields are final.",
     "SECURITY.txt contains placeholder security@civic-relay.example.com; requires real founder-controlled security mailbox before claiming protected status (§ 9.4 / § 12).",
     "Dutch (nl) subtitles require native speaker sign-off before claiming native-verified status (marked REVIEW_REQUIRED per § 6.3 / § 12).",
     "Remote Vercel preview/production deployment requires VERCEL_TOKEN / founder confirmation (§ 8.2 / § 12).",

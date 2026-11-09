@@ -20,6 +20,9 @@ import { createMetNorwayGridFeed } from './domain/metno-weather-grid.mjs';
 import { createTerrainGridFeed } from './domain/terrain-grid.mjs';
 import { createGdacsFeed } from './domain/gdacs-osint.mjs';
 import { correlateGdacsCatalogs } from './domain/osint-catalog-correlation.mjs';
+import { createCopernicusEffisFeed } from './domain/copernicus-effis.mjs';
+import { createAemetCapFeed } from './domain/aemet-cap.mjs';
+import { reconcileMultiHazardFeeds } from './domain/spatial-reconciliation-engine.mjs';
 
 export function createApiHandler({
   db, auth, social, events, emergency, messaging, moderation, admin, rt,
@@ -28,6 +31,8 @@ export function createApiHandler({
   weatherGridFeed = process.env.SENDA_WEATHER_PROVIDER === 'openmeteo' ? createWeatherGridFeed() : createMetNorwayGridFeed(),
   terrainGridFeed = createTerrainGridFeed(),
   gdacsFeed = createGdacsFeed(),
+  effisFeed = createCopernicusEffisFeed(),
+  aemetFeed = createAemetCapFeed(),
 }) {
   const router = createRouter();
   const rateLimiter = createRateLimiter();
@@ -538,6 +543,33 @@ export function createApiHandler({
     sendJson(res, snapshot.status === 'UNAVAILABLE' ? 503 : 200, snapshot);
   });
 
+
+  // Copernicus EMS / EFFIS active thermal anomalies
+  router.get('/api/sources/copernicus-effis', async (req, res) => {
+    const snapshot = await effisFeed.read();
+    sendJson(res, snapshot.status === 'UNAVAILABLE' ? 503 : 200, snapshot);
+  });
+
+  // AEMET / Meteoalarm official severe weather warnings (CAP)
+  router.get('/api/sources/aemet-warnings', async (req, res) => {
+    const snapshot = await aemetFeed.read();
+    sendJson(res, snapshot.status === 'UNAVAILABLE' ? 503 : 200, snapshot);
+  });
+
+  // Reconciled multi-hazard intelligence engine with Merkle receipt
+  router.get('/api/sources/reconciled-intelligence', async (req, res) => {
+    const [gdacs, usgs, eonet, effis, cap] = await Promise.all([
+      gdacsFeed.read(), usgsFeed.read(), eonetFeed.read(), effisFeed.read(), aemetFeed.read()
+    ]);
+    const reconciled = reconcileMultiHazardFeeds({
+      gdacsFeed: gdacs,
+      usgsFeed: usgs,
+      eonetFeed: eonet,
+      effisFeed: effis,
+      capFeed: cap,
+    });
+    sendJson(res, 200, reconciled);
+  });
 
   // Public OSINT only: GDACS risk events are not SENDA-issued emergency alerts.
   router.get('/api/sources/gdacs-disasters', async (req, res) => {

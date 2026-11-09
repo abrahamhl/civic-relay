@@ -4,7 +4,7 @@
  */
 
 const DB_NAME = 'senda_live_offline_db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 export interface QueuedItem {
   id: string;
@@ -28,6 +28,9 @@ function openDb(): Promise<IDBDatabase> {
       }
       if (!db.objectStoreNames.contains('cached_events')) {
         db.createObjectStore('cached_events', { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains('cached_sources')) {
+        db.createObjectStore('cached_sources', { keyPath: 'key' });
       }
     };
     req.onsuccess = () => resolve(req.result);
@@ -91,6 +94,26 @@ export async function getCachedFeed(): Promise<any[]> {
     const tx = db.transaction('cached_feed', 'readonly');
     const req = tx.objectStore('cached_feed').getAll();
     req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+export async function cacheSourceData(key: string, data: any): Promise<void> {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('cached_sources', 'readwrite');
+    tx.objectStore('cached_sources').put({ key, data, cachedAt: Date.now() });
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+export async function getCachedSourceData(key: string): Promise<any | null> {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('cached_sources', 'readonly');
+    const req = tx.objectStore('cached_sources').get(key);
+    req.onsuccess = () => resolve(req.result ? req.result.data : null);
     req.onerror = () => reject(req.error);
   });
 }

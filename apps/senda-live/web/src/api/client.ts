@@ -2,7 +2,13 @@
  * Cliente API HTTP y SSE para SENDA LIVE.
  * Gestiona cabeceras de seguridad CSRF (X-Senda-Request), reconexión en tiempo real y offline fallback.
  */
-import { enqueueOfflineItem, cacheFeedPosts, getCachedFeed } from '../offline/storage';
+import {
+  enqueueOfflineItem,
+  cacheFeedPosts,
+  getCachedFeed,
+  cacheSourceData,
+  getCachedSourceData
+} from '../offline/storage';
 
 export class ApiError extends Error {
   code: string;
@@ -41,12 +47,28 @@ async function request(path: string, options: RequestInit = {}): Promise<any> {
     return await res.text();
   } catch (err: any) {
     // Si falla por red (offline) y es una mutación, encolar según el tipo
-    if (!navigator.onLine && ['POST', 'PUT', 'PATCH'].includes(method)) {
+    if (typeof navigator !== 'undefined' && !navigator.onLine && ['POST', 'PUT', 'PATCH'].includes(method)) {
       if (path === '/api/posts' && options.body) {
         const payload = JSON.parse(options.body as string);
         const queued = await enqueueOfflineItem('POST', payload);
         return { post: { ...payload, id: queued.id, moderationState: 'QUEUED_OFFLINE', createdAt: Date.now() } };
       }
+    }
+    throw err;
+  }
+}
+
+async function requestWithOfflineCache(path: string, cacheKey: string): Promise<any> {
+  try {
+    const res = await request(path);
+    if (res && typeof window !== 'undefined' && 'indexedDB' in window) {
+      cacheSourceData(cacheKey, res).catch(() => {});
+    }
+    return res;
+  } catch (err) {
+    if (typeof window !== 'undefined' && 'indexedDB' in window && !navigator.onLine) {
+      const cached = await getCachedSourceData(cacheKey);
+      if (cached) return { ...cached, offlineCached: true };
     }
     throw err;
   }
@@ -86,13 +108,16 @@ export const api = {
   async getComments(id: string) { return request(`/api/posts/${id}/comments`); },
   async getStories() { return request('/api/stories'); },
 
-  // Public scientific source records (separate from SENDA emergency alerts).
-  async getUsgsEarthquakes() { return request('/api/sources/usgs-earthquakes'); },
-  async getEonetWildfires() { return request('/api/sources/eonet-wildfires'); },
-  async getGdacsDisasters() { return request('/api/sources/gdacs-disasters'); },
-  async getOsintCorrelations() { return request('/api/sources/osint-correlation'); },
-  async getWeatherGrid(region: string) { return request('/api/sources/weather-grid?region=' + encodeURIComponent(region)); },
-  async getTerrainGrid(region: string) { return request('/api/sources/terrain-grid?region=' + encodeURIComponent(region)); },
+  // Public scientific source records (separate from SENDA emergency alerts) with IndexedDB offline resilience.
+  async getUsgsEarthquakes() { return requestWithOfflineCache('/api/sources/usgs-earthquakes', 'usgs_earthquakes'); },
+  async getEonetWildfires() { return requestWithOfflineCache('/api/sources/eonet-wildfires', 'eonet_wildfires'); },
+  async getGdacsDisasters() { return requestWithOfflineCache('/api/sources/gdacs-disasters', 'gdacs_disasters'); },
+  async getOsintCorrelations() { return requestWithOfflineCache('/api/sources/osint-correlation', 'osint_correlations'); },
+  async getWeatherGrid(region: string) { return requestWithOfflineCache('/api/sources/weather-grid?region=' + encodeURIComponent(region), `weather_grid_${region}`); },
+  async getTerrainGrid(region: string) { return requestWithOfflineCache('/api/sources/terrain-grid?region=' + encodeURIComponent(region), `terrain_grid_${region}`); },
+  async getCopernicusEffis() { return requestWithOfflineCache('/api/sources/copernicus-effis', 'copernicus_effis'); },
+  async getAemetWarnings() { return requestWithOfflineCache('/api/sources/aemet-warnings', 'aemet_warnings'); },
+  async getReconciledIntelligence() { return requestWithOfflineCache('/api/sources/reconciled-intelligence', 'reconciled_intelligence'); },
 
   // Events
   async getEvents(params: Record<string, string> = {}) {

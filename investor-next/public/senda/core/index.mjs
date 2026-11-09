@@ -52,3 +52,4 @@ export * from './traffic-fusion.mjs';
 export * from './corridor-fabric.mjs';
 export * from './sovereign-mesh-kit.mjs';
 export * from './scenario-engine.mjs';
+export * from './scientific-evaluation.mjs';

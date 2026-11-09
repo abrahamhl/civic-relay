@@ -3,6 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { api } from '../api/client';
 import { Atmosphere4DStudio } from './Atmosphere4DStudio';
+import { Globe4DStudio } from './Globe4DStudio';
 
 interface Props {
   events: any[];
@@ -24,6 +25,7 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
   const [usgsStatus, setUsgsStatus] = useState('');
   const [showWildfires, setShowWildfires] = useState(false);
   const [showAtmosphere4D, setShowAtmosphere4D] = useState(false);
+  const [showGlobe4D, setShowGlobe4D] = useState(false);
   const [wildfireStatus, setWildfireStatus] = useState('');
   const [showGdacs, setShowGdacs] = useState(false);
   const [gdacsStatus, setGdacsStatus] = useState('');
@@ -396,6 +398,12 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
             border: '1px solid #2563eb', background: showAtmosphere4D ? '#1d4ed8' : '#e0f2fe', color: showAtmosphere4D ? 'white' : '#0c4a6e', cursor: 'pointer', fontWeight: 700 }}>
           {showAtmosphere4D ? 'Cerrar visor 4D' : 'Abrir Atmosphere 4D'}
         </button>
+        <button type="button" aria-pressed={showGlobe4D}
+          onClick={() => setShowGlobe4D((value) => !value)}
+          style={{ padding: '0.45rem 0.75rem', borderRadius: 9,
+            border: '1px solid #0284c7', background: showGlobe4D ? '#0369a1' : '#f0f9ff', color: showGlobe4D ? 'white' : '#0369a1', cursor: 'pointer', fontWeight: 700 }}>
+          {showGlobe4D ? 'Cerrar Globo 4D' : 'Globo 4D & Satélites'}
+        </button>
       </div>
       {showUsgs && (
         <div role="status" aria-live="polite" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', background: 'var(--bg-secondary)' }}>
@@ -424,6 +432,11 @@ export const MapView: React.FC<Props> = ({ events, onSelectEvent }) => {
         {showAtmosphere4D && (
           <div style={{ position: 'absolute', inset: 0, overflowY: 'auto', zIndex: 800, background: '#081625' }}>
             <Atmosphere4DStudio onClose={() => setShowAtmosphere4D(false)} />
+          </div>
+        )}
+        {showGlobe4D && (
+          <div style={{ position: 'absolute', inset: 0, overflowY: 'auto', zIndex: 850, background: '#050d1a' }}>
+            <Globe4DStudio onClose={() => setShowGlobe4D(false)} />
           </div>
         )}
       </div>
