@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  analyzeTerrainLink, estimateEqualMastHeight, fresnelRadiusM,
+  analyzeTerrainLink, computeRadioShadowField, estimateEqualMastHeight, fresnelRadiusM,
   greatCircleDistanceM, planRelayCorridor, relaySiteCoordinates,
   terrainAt, validateGeometryTerrain, RELAY_SITES,
 } from '../web/src/science/relay-geometry.mjs';
@@ -135,4 +135,40 @@ test('all outputs preserve source DEM provenance and declare limitations rather 
   assert.equal(r.assumptions.decisionBufferMeaning, 'HEURISTIC_NOT_CALIBRATED_UNCERTAINTY');
   assert.equal(r.assumptions.diffraction, 'NOT_MODELED');
   assert.equal(r.assumptions.obstacles, 'BUILDINGS_TREES_CLUTTER_NOT_INCLUDED');
+});
+
+
+test('offline radio shadow grid contains only derived DEM screening, not measured coverage', () => {
+  const map = computeRadioShadowField(DEM(), {
+    originSite: 'A', frequencyMHz: 2400,
+    transmitterHeightM: 100, receiverHeightM: 75,
+    gridSize: 11, maxRangeKm: 40
+  });
+  assert.equal(map.schema, 'senda.rf.terrain-shadow-field/1');
+  assert.equal(map.dataKind, 'HYPOTHETICAL_GEOMETRIC_VISIBILITY');
+  assert.equal(map.cells.length, 121);
+  assert.equal(Object.values(map.summary).reduce((a, b) => a + b, 0), 121);
+  assert.ok(map.summary.modelClear > 50);
+  assert.equal(map.measuredCoverage, false);
+  assert.equal(map.fieldValidated, false);
+  assert.equal(map.diffractionModeled, false);
+  assert.ok(map.cells.every((c) => Number.isFinite(c.lat) && Number.isFinite(c.lon)));
+});
+
+test('radio shadow field finds more geometrically shadowed sectors behind a synthetic ridge', () => {
+  const flat = DEM(), ridge = DEM();
+  for (let row = 0; row < 33; row++) ridge.elevationsM[row * 33 + 16] = 850;
+  const options = { originSite: 'A', frequencyMHz: 2400,
+    transmitterHeightM: 60, receiverHeightM: 30,
+    gridSize: 9, maxRangeKm: 40 };
+  const baseline = computeRadioShadowField(flat, options);
+  const obstructed = computeRadioShadowField(ridge, options);
+  assert.ok(obstructed.summary.modelObstructed > baseline.summary.modelObstructed);
+  assert.equal(obstructed.cells.length, 81);
+});
+
+test('radio shadow rejects invalid grid sizes and arbitrary user-origin points', () => {
+  assert.throws(() => computeRadioShadowField(DEM(), { gridSize: 100 }), /INVALID_RADIO_SHADOW_OPTIONS/);
+  assert.throws(() => computeRadioShadowField(DEM(), { originSite: 'my-phone' }), /UNKNOWN_RELAY_SITE/);
+  assert.throws(() => computeRadioShadowField(DEM(), { frequencyMHz: -1 }), /INVALID_RADIO_SHADOW_OPTIONS/);
 });
