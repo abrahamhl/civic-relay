@@ -8,12 +8,20 @@ import {
 
 const NOW = Date.parse('2026-11-09T09:00:00Z');
 
+function crc32(bytes) {
+  let crc = 0xffffffff;
+  for (const b of bytes) {
+    crc ^= b;
+    for (let i = 0; i < 8; i++) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
 function chunk(name, data) {
-  // The production decoder verifies structure and uncompressed extent; fixture CRC
-  // is intentionally zero because CRC integrity is not yet a source authenticity proof.
   const len = Buffer.alloc(4), crc = Buffer.alloc(4);
   len.writeUInt32BE(data.length, 0);
-  return Buffer.concat([len, Buffer.from(name), data, crc]);
+  const payload = Buffer.concat([Buffer.from(name), data]);
+  crc.writeUInt32BE(crc32(payload), 0);
+  return Buffer.concat([len, payload, crc]);
 }
 function pngTile(heightM = 123.25, channels = 3, filter = 0) {
   const encoded = heightM + 32768;
@@ -87,6 +95,9 @@ test('real georeferenced terrain mesh uses sampled DEM altitudes, not atmospheri
 
 test('finite bounds and truncation block invalid tiles and oversized responses', async () => {
   assert.throws(() => decodeTerrariumPng(Buffer.from('not a png')), /INVALID_TERRARIUM_PNG/);
+  const corrupted = pngTile(123.25);
+  corrupted[32] ^= 1;
+  assert.throws(() => decodeTerrariumPng(corrupted), /TERRAIN_PNG_CRC_FAILURE/);
   assert.throws(() => terrariumMeters(decodeTerrariumPng(pngTile()), 256, 0), /BAD_ELEVATION_PIXEL/);
   const feed = createTerrainGridFeed({ clock: () => NOW, fetcher: async () =>
     new Response('bad', { status: 200, headers: { 'content-length': '99999999' } }) });
