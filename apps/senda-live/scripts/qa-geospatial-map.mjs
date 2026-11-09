@@ -68,6 +68,28 @@ const weather = {
   })
 };
 
+const terrainFixture = {
+  schema: 'senda.terrain.grid/1', region: 'valencia',
+  status: 'SOURCE_SNAPSHOT', dataKind: 'RASTER_DEM_SAMPLES',
+  acquiredAt: new Date().toISOString(),
+  rows: 33, columns: 33,
+  bounds: { north: 39.5899, south: 39.3499, west: -0.5563, east: -0.1963 },
+  georeference: { crs: 'EPSG:4326', tileMatrix: 'EPSG:3857 / XYZ', horizontalUnit: 'm', verticalUnit: 'm',
+    verticalDatum: 'MIXED_SOURCE_NOT_VALIDATED', approximateWidthM: 30_900, approximateHeightM: 26_700 },
+  elevationsM: Array.from({ length: 33 * 33 }, (_, index) =>
+    Math.round(75 + Math.sin((index % 33) / 6) * 35 + Math.cos(Math.floor(index / 33) / 5) * 22)),
+  summary: { minElevationM: 18, maxElevationM: 132, rangeM: 114 },
+  source: {
+    provider: 'Mapzen Terrain Tiles / AWS Open Data', dataset: 'MAPZEN_AWS_TERRARIUM',
+    registryUrl: 'https://registry.opendata.aws/terrain-tiles/',
+    attributionUrl: 'https://github.com/tilezen/joerd/blob/master/docs/attribution.md',
+    attribution: 'Terrain Tiles by Mapzen and underlying terrain providers',
+    license: 'SOURCE_DEPENDENT_ATTRIBUTION', offlineRedistributionReviewRequired: true,
+    rawTileSha256: [{ tile: '10/510/390', sha256: 'a'.repeat(64) }],
+    tileCount: 1, tileZoom: 10,
+  }
+};
+
 async function exercise(browser, name, viewport) {
   const page = await browser.newPage({ viewport, deviceScaleFactor: 1 });
   await page.addInitScript(() => { window.__injected = 0; });
@@ -86,6 +108,7 @@ async function exercise(browser, name, viewport) {
     else if (path === '/api/sources/usgs-earthquakes') obj = usgs;
     else if (path === '/api/sources/eonet-wildfires') obj = eonet;
     else if (path === '/api/sources/weather-grid') obj = weather;
+    else if (path === '/api/sources/terrain-grid') obj = terrainFixture;
     if (path === '/api/realtime/stream') return route.abort();
     return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(obj) });
   });
@@ -121,6 +144,13 @@ async function exercise(browser, name, viewport) {
     (el) => ({ w: el.width, h: el.height })
   );
   assert.ok(canvasSize.w > 200 && canvasSize.h > 200, '4D canvas has a valid drawing buffer');
+  await page.getByText(/DOWNLOADED_PUBLIC_DEM/).waitFor({ timeout: 12_000 });
+  await page.getByLabel('Modo de superficie 3D').selectOption('TERRAIN');
+  assert.equal(await page.getByRole('slider', { name: 'Exageración vertical del terreno' }).count(), 1);
+  await page.getByRole('slider', { name: 'Exageración vertical del terreno' }).fill('5');
+  assert.equal(await page.getByText(/DEM · 33×33 muestras georreferenciadas/).count(), 1);
+  assert.ok(await page.locator('canvas.senda-4d-canvas').evaluate((el) => el.width > 200));
+
   await page.getByRole('slider', { name: 'Línea temporal de pronóstico' }).fill('9');
   assert.match(await page.getByText(/Centro del grid/).innerText(), /Centro del grid/);
   await page.getByLabel('Variable meteorológica').selectOption('wind_speed_10m');
@@ -171,6 +201,8 @@ async function exercise(browser, name, viewport) {
   await page.getByRole('button', { name: 'Abrir Atmosphere 4D' }).click();
   await page.locator('canvas.senda-4d-canvas').waitFor({ state: 'visible', timeout: 12_000 });
   await page.getByText(/SNAPSHOT LOCAL/).waitFor({ timeout: 12_000 });
+  await page.getByTestId('terrain-source-status').getByText(/OFFLINE_LOCAL_DEM/).waitFor({ timeout: 12_000 });
+
   assert.ok(await page.locator('canvas.senda-4d-canvas').evaluate((el) => el.width > 200));
   assert.deepEqual(clientErrors, [], 'Unhandled browser exceptions after offline restart');
 
@@ -179,7 +211,8 @@ async function exercise(browser, name, viewport) {
   return { viewport, status: 'PASS', visibleGeospatialMarkers: markers,
     sourceKinds: ['HISTORICAL_OBSERVATION', 'CURATED_EVENT_METADATA'],
     injectedMarkupExecuted: false, atmosphere4DRendered: true,
-    hourlyTimeNavigation: true, localSnapshotRecoveredAfterFeedLoss: true, offlinePwaRestart: true, fixtureOnly: true };
+    hourlyTimeNavigation: true, realDemFixtureMesh: true, storedDemAfterOfflineRestart: true,
+    localSnapshotRecoveredAfterFeedLoss: true, offlinePwaRestart: true, fixtureOnly: true };
 }
 
 const browser = await chromium.launch({ headless: true });
@@ -192,7 +225,7 @@ const report = {
   schema: 'senda.browser-geospatial-qa/1',
   testedAt: new Date().toISOString(),
   codeType: 'CHROMIUM_REAL_BROWSER_WITH_SYNTHETIC_SOURCE_FIXTURES',
-  notProven: ['NASA/USGS upstream live in browser', 'real Open-Meteo forecast in browser', 'physical radio', 'wildfire forecast calibration', 'offline OSM tiles'],
+  notProven: ['NASA/USGS upstream live in browser', 'real Open-Meteo forecast in browser', 'physical radio', 'wildfire forecast calibration', 'offline OSM tiles', 'live Mapzen PNG acquisition in browser'],
   results,
 };
 writeFileSync(resolve(output, 'report.json'), JSON.stringify(report, null, 2) + '\n');
