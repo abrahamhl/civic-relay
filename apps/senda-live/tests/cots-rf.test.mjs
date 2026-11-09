@@ -27,9 +27,25 @@ test('COTS Drone Recon Domain: coordinates distance, bearing and antenna recipes
   assert.ok(catalog.totalBomCostEur < 35, 'Total hardware BOM must be under 35€');
   assert.equal(catalog.antennas.length, 5);
 
-  const active = manager.getActiveTracks();
-  assert.equal(active.length, 3, 'Synthetic scenario must provide 3 active radar/drone tracks');
-  const rogue = active.find((d) => d.classification === 'UNAUTHORIZED_ROGUE');
+  // P0-01 Verification: When no receiver hardware is active, default must be empty and NO_LIVE_DETECTIONS
+  const liveDefault = manager.getActiveTracks();
+  assert.equal(liveDefault.length, 0, 'No live detections should be reported when no receiver is active');
+  
+  const status = manager.getDetectionStatus();
+  assert.equal(status.status, 'NO_LIVE_DETECTIONS');
+  assert.equal(status.hasHardwareReceiver, false);
+  assert.equal(status.trackCount, 0);
+
+  // Simulation mode must be explicitly requested and clearly marked
+  const syntheticTracks = manager.getActiveTracks({ includeSynthetic: true });
+  assert.equal(syntheticTracks.length, 3, 'Explicit simulation must provide 3 tactical demo tracks');
+  for (const track of syntheticTracks) {
+    assert.equal(track.isSimulated, true, 'Synthetic track must be explicitly marked isSimulated=true');
+    assert.equal(track.evidenceLevel, 'SYNTHETIC_SIMULATION');
+    assert.ok(track.simulationNotice.includes('NO PHYSICAL HARDWARE CONNECTED'));
+  }
+
+  const rogue = syntheticTracks.find((d) => d.classification === 'UNAUTHORIZED_ROGUE');
   assert.ok(rogue);
   assert.ok(rogue.pilot);
   assert.ok(rogue.distanceToPilotM > 400);
@@ -54,17 +70,29 @@ test('COTS Drone Recon API: antenna recipes, Remote ID decoding and live drone d
     assert.ok(noaaAntenna);
     assert.equal(noaaAntenna.design.antennaType, 'QUADRIFILAR_HELIX_QFH');
 
-    // 2. GET /api/cots/drone-detections
+    // 2. GET /api/cots/drone-detections (Default: no hardware attached)
     const detectionsRes = await fetch(`${baseUrl}/api/cots/drone-detections`);
     assert.equal(detectionsRes.status, 200);
     const detectionsData = await detectionsRes.json();
-    assert.ok(Array.isArray(detectionsData.drones));
-    assert.equal(detectionsData.drones.length, 3);
-    const pbrTarget = detectionsData.drones.find((d) => d.rfSource === 'PASSIVE_BISTATIC_RADAR_CAF');
+    assert.equal(detectionsData.status, 'NO_LIVE_DETECTIONS');
+    assert.equal(detectionsData.hasHardwareReceiver, false);
+    assert.equal(detectionsData.isSimulated, false);
+    assert.deepEqual(detectionsData.drones, []);
+
+    // 2b. GET /api/cots/drone-detections?mode=simulation
+    const simRes = await fetch(`${baseUrl}/api/cots/drone-detections?mode=simulation`);
+    assert.equal(simRes.status, 200);
+    const simData = await simRes.json();
+    assert.equal(simData.status, 'SIMULATED_SCENARIO');
+    assert.equal(simData.isSimulated, true);
+    assert.equal(simData.drones.length, 3);
+    const pbrTarget = simData.drones.find((d) => d.rfSource === 'PASSIVE_BISTATIC_RADAR_CAF');
     assert.ok(pbrTarget);
     assert.equal(pbrTarget.operationalStatus, 'RADAR_CONTACT');
+    assert.equal(pbrTarget.isSimulated, true);
+    assert.equal(pbrTarget.evidenceLevel, 'SYNTHETIC_SIMULATION');
 
-    // 3. POST /api/cots/remote-id/decode
+    // 3. POST /api/cots/remote-id/decode (Ingest real field packet)
     // Synthesize Basic ID hex string: Type 0x01 (Type 0, ver 1), 0x12 (serial, multirotor), "1581F45X22090001"
     const raw = new Uint8Array(25);
     raw[0] = 0x01;
@@ -86,6 +114,18 @@ test('COTS Drone Recon API: antenna recipes, Remote ID decoding and live drone d
     assert.equal(decodeData.decoded.messageType, 'BASIC_ID');
     assert.equal(decodeData.decoded.uavId, serial);
     assert.equal(decodeData.track.serialNumber, serial);
+    assert.equal(decodeData.track.evidenceLevel, 'FIELD_MEASURED');
+    assert.equal(decodeData.track.isSimulated, false);
+
+    // 4. GET /api/cots/drone-detections after hardware ingestion
+    const liveAfterIngestRes = await fetch(`${baseUrl}/api/cots/drone-detections`);
+    assert.equal(liveAfterIngestRes.status, 200);
+    const liveAfterIngestData = await liveAfterIngestRes.json();
+    assert.equal(liveAfterIngestData.status, 'LIVE_TRACKS_ACTIVE');
+    assert.equal(liveAfterIngestData.hasHardwareReceiver, true);
+    assert.equal(liveAfterIngestData.isSimulated, false);
+    assert.equal(liveAfterIngestData.drones.length, 1);
+    assert.equal(liveAfterIngestData.drones[0].uavId, serial);
   } finally {
     await new Promise((resolve) => server.close(resolve));
     db.close();

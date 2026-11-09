@@ -364,6 +364,9 @@ export function computeRainAttenuation(frequencyGhz, rainRateMmHr, polarization 
     specificAttenuationDbPerKm,
     k: Math.round(k * 1e7) / 1e7,
     alpha: Math.round(alpha * 10000) / 10000,
+    modelStandard: 'ITU-R P.838-3',
+    frequencyValidityRangeGhz: [1, 100],
+    sub1GhzContinuity: 'RAYLEIGH_FREQUENCY_SQUARED_SCALING',
     pathAttenuationDb: (distanceKm) => {
       if (!finite(distanceKm, 0)) return 0;
       // Effective path length factor d_eff = d / (1 + d / d_0) per ITU-R P.530-18

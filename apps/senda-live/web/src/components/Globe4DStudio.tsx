@@ -11,6 +11,7 @@ import {
   type LookAnglesResult,
   type ParsedTle
 } from '../science/orbital-kinematics.mjs';
+import { computeGlobeSourceHealth } from '../science/globe-source-health.mjs';
 
 interface Props {
   onClose?: () => void;
@@ -22,6 +23,8 @@ type LayerMode = 'GLOBE' | 'TERRAIN_DEM';
 export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valencia' }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<LayerMode>('GLOBE');
+  const [sourceHealth, setSourceHealth] = useState<any | null>(null);
+  const [showSourceHealthModal, setShowSourceHealthModal] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playSpeed, setPlaySpeed] = useState<number>(1);
   const [timeStep, setTimeStep] = useState<number>(0); // 0 to 23 hours
@@ -100,8 +103,9 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
       api.getMobilityIncidents(),
       api.getCotsDroneDetections(),
       api.getCotsHardwareCatalog(),
-    ]).then(([terrainRes, weatherRes, effisRes, aemetRes, usgsRes, reconRes, mobRes, cotsDronesRes, cotsCatRes]) => {
+    ]).then((settled) => {
       if (!active) return;
+      const [terrainRes, weatherRes, effisRes, aemetRes, usgsRes, reconRes, mobRes, cotsDronesRes, cotsCatRes] = settled;
       if (terrainRes.status === 'fulfilled' && terrainRes.value?.status !== 'UNAVAILABLE') {
         setTerrain(terrainRes.value);
       }
@@ -126,10 +130,13 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
       if (cotsDronesRes.status === 'fulfilled' && Array.isArray(cotsDronesRes.value?.drones)) {
         setCotsDetections(cotsDronesRes.value.drones);
       }
-      if (cotsCatRes.status === 'fulfilled' && cotsCatRes.value) {
+      if (cotsCatRes.status === 'fulfilled' && cotsCatRes.value && cotsCatRes.value?.status !== 'UNAVAILABLE') {
         setCotsCatalog(cotsCatRes.value);
       }
-      setStatusMessage('Plataforma 4D lista · Datos verificados por SHA-256');
+
+      const health = computeGlobeSourceHealth(settled);
+      setSourceHealth(health);
+      setStatusMessage(health.statusMessage);
     });
 
     return () => { active = false; };
@@ -854,9 +861,22 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
           <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem', borderRadius: 6, background: '#1e3a5f', color: '#93c5fd', fontWeight: 700 }}>
             {mode === 'GLOBE' ? 'VISTA GLOBAL ORBITAL (WGS84)' : 'RELIEVE DEM REAL (MAPZEN/AWS)'}
           </span>
-          <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem', borderRadius: 6, background: '#14532d', color: '#86efac', fontWeight: 700 }}>
-            CIENCIA AUDITADA
-          </span>
+          <button
+            type="button"
+            onClick={() => setShowSourceHealthModal(true)}
+            style={{
+              fontSize: '0.7rem',
+              padding: '0.2rem 0.6rem',
+              borderRadius: 6,
+              border: 'none',
+              cursor: 'pointer',
+              background: !sourceHealth || sourceHealth.availableCount === 0 ? '#7f1d1d' : sourceHealth.failedCount > 0 ? '#854d0e' : '#14532d',
+              color: !sourceHealth || sourceHealth.availableCount === 0 ? '#fca5a5' : sourceHealth.failedCount > 0 ? '#fef08a' : '#86efac',
+              fontWeight: 800,
+            }}
+          >
+            {sourceHealth?.badgeText || 'VERIFICANDO FUENTES...'}
+          </button>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -1435,6 +1455,70 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
                 type="button"
                 onClick={() => setShowCotsModal(false)}
                 style={{ padding: '0.5rem 1.25rem', borderRadius: 8, border: 'none', background: '#1e3a5f', color: '#fff', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}
+              >
+                Cerrar Panel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Source Health Modal (Ticket P0-06) */}
+      {showSourceHealthModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(3, 7, 18, 0.85)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ maxWidth: '640px', width: '100%', maxHeight: '85vh', overflowY: 'auto', background: '#091829', border: '1px solid #1e3a5f', borderRadius: 16, padding: '1.5rem', color: '#f1f5f9', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e3a5f', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#38bdf8' }}>
+                  ESTADO Y VERIFICACIÓN DE FUENTES PÚBLICAS (9/9)
+                </h3>
+                <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
+                  Auditoría independiente por fuente. Ninguna fuente no disponible es reportada como verificada.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSourceHealthModal(false)}
+                style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#94a3b8', fontSize: '1.2rem', width: '32px', height: '32px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                ×
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {sourceHealth?.sources ? (
+                sourceHealth.sources.map((s: any) => (
+                  <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', borderRadius: 8, background: '#0f2744', border: '1px solid #1e3a5f' }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#f1f5f9' }}>{s.name}</div>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.1rem' }}>{s.detail}</div>
+                    </div>
+                    <span
+                      style={{
+                        padding: '0.2rem 0.5rem',
+                        borderRadius: 6,
+                        fontSize: '0.68rem',
+                        fontWeight: 800,
+                        background: s.status === 'VERIFIED' ? '#14532d' : s.status === 'AVAILABLE' ? '#0369a1' : '#7f1d1d',
+                        color: s.status === 'VERIFIED' ? '#86efac' : s.status === 'AVAILABLE' ? '#7dd3fc' : '#fca5a5',
+                      }}
+                    >
+                      {s.status}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div style={{ fontSize: '0.8rem', color: '#94a3b8', textAlign: 'center', padding: '1rem' }}>
+                  Consultando fuentes de emergencia...
+                </div>
+              )}
+            </div>
+
+            <div style={{ marginTop: '1.25rem', textAlign: 'right' }}>
+              <button
+                type="button"
+                onClick={() => setShowSourceHealthModal(false)}
+                style={{ padding: '0.45rem 1.25rem', borderRadius: 8, border: 'none', background: '#1e3a5f', color: '#fff', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}
               >
                 Cerrar Panel
               </button>

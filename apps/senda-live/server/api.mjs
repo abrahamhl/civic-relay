@@ -77,15 +77,33 @@ export function createApiHandler({
   router.post('/api/auth/register', async (req, res, { ip }) => {
     const body = await readJson(req);
     const { token, user } = auth.register(body, { ip });
-    res.setHeader('Set-Cookie', serializeCookie(COOKIE_NAME, token, { maxAge: 30 * 86400, sameSite: 'Lax' }));
-    sendJson(res, 201, { user, token });
+    const isProd = process.env.NODE_ENV === 'production' || req.headers['x-forwarded-proto'] === 'https' || process.env.SENDA_FORCE_SECURE_AUTH === '1';
+    res.setHeader('Set-Cookie', serializeCookie(COOKIE_NAME, token, {
+      maxAge: 30 * 86400,
+      sameSite: 'Lax',
+      httpOnly: true,
+      secure: isProd,
+      path: '/',
+    }));
+    const resBody = { user };
+    if (!isProd) resBody.token = token;
+    sendJson(res, 201, resBody);
   });
 
   router.post('/api/auth/login', async (req, res, { ip }) => {
     const body = await readJson(req);
     const { token, user } = auth.login(body, { ip });
-    res.setHeader('Set-Cookie', serializeCookie(COOKIE_NAME, token, { maxAge: 30 * 86400, sameSite: 'Lax' }));
-    sendJson(res, 200, { user, token });
+    const isProd = process.env.NODE_ENV === 'production' || req.headers['x-forwarded-proto'] === 'https' || process.env.SENDA_FORCE_SECURE_AUTH === '1';
+    res.setHeader('Set-Cookie', serializeCookie(COOKIE_NAME, token, {
+      maxAge: 30 * 86400,
+      sameSite: 'Lax',
+      httpOnly: true,
+      secure: isProd,
+      path: '/',
+    }));
+    const resBody = { user };
+    if (!isProd) resBody.token = token;
+    sendJson(res, 200, resBody);
   });
 
   router.post('/api/auth/logout', async (req, res, { ip }) => {
@@ -200,7 +218,8 @@ export function createApiHandler({
   });
 
   router.get('/api/posts/:id/comments', (req, res, { params }) => {
-    const comments = social.listComments(params.id);
+    const s = getSession(req);
+    const comments = social.listComments(params.id, s?.userId);
     sendJson(res, 200, { comments });
   });
 
@@ -673,9 +692,29 @@ export function createApiHandler({
     }
   });
 
-  router.get('/api/cots/drone-detections', (req, res) => {
-    const detections = cotsManager.getActiveTracks();
-    sendJson(res, 200, { drones: detections });
+  router.get('/api/cots/drone-detections', (req, res, { query }) => {
+    const isSimMode = query?.mode === 'simulation' || query?.synthetic === 'true';
+    const status = cotsManager.getDetectionStatus();
+
+    if (isSimMode) {
+      const syntheticDrones = cotsManager.getSyntheticTacticalScenario();
+      sendJson(res, 200, {
+        status: 'SIMULATED_SCENARIO',
+        hasHardwareReceiver: false,
+        isSimulated: true,
+        simulationNotice: 'SCENARIO_DEMO_ONLY - NO PHYSICAL HARDWARE CONNECTED',
+        drones: syntheticDrones,
+      });
+      return;
+    }
+
+    const detections = cotsManager.getActiveTracks({ includeSynthetic: false });
+    sendJson(res, 200, {
+      status: status.status,
+      hasHardwareReceiver: status.hasHardwareReceiver,
+      isSimulated: false,
+      drones: detections,
+    });
   });
 
   /* ------------------- ADAPTERS & METADATA ------------------- */

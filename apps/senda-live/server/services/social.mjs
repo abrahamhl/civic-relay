@@ -157,20 +157,25 @@ export function createSocialService(db, { rt, notifier, events, audit, fetcher }
     m.provider, m.canonical_url, m.external_id, m.title AS media_title, m.author_name, m.author_url, m.site_name, m.thumbnail_url, m.embed_kind, m.embed_src, m.adapter_status
     FROM posts p JOIN profiles pr ON pr.user_id = p.author_id LEFT JOIN external_media_refs m ON m.id = p.media_ref_id`;
 
+  function assertPostAccess(post, viewerId) {
+    if (!post || post.deleted_at !== null) throw notFound('POST_NOT_FOUND');
+    if (post.moderation_state === 'REMOVED' && post.author_id !== viewerId) throw notFound('POST_NOT_FOUND');
+    if (post.visibility === 'PRIVATE' && post.author_id !== viewerId) throw notFound('POST_NOT_FOUND');
+    if (post.visibility === 'FOLLOWERS' && post.author_id !== viewerId) {
+      if (!viewerId) throw notFound('POST_NOT_FOUND');
+      const isFollowing = Boolean(db.get("SELECT 1 FROM follows WHERE follower_id = ? AND target_type = 'USER' AND target_id = ?", viewerId, post.author_id));
+      if (!isFollowing) throw notFound('POST_NOT_FOUND');
+    }
+    if (viewerId && post.author_id !== viewerId) {
+      const isBlocked = Boolean(db.get("SELECT 1 FROM blocks WHERE (blocker_id = ? AND blocked_id = ?) OR (blocker_id = ? AND blocked_id = ?)", viewerId, post.author_id, post.author_id, viewerId));
+      if (isBlocked) throw notFound('POST_NOT_FOUND');
+    }
+  }
+
   function getPost(id, viewerId = null) {
     const r = db.get(`${BASE_SELECT} WHERE p.id = ? AND p.deleted_at IS NULL`, id);
     if (!r) throw notFound('POST_NOT_FOUND');
-    if (r.visibility === 'PRIVATE' && r.author_id !== viewerId) throw notFound('POST_NOT_FOUND');
-    if (r.moderation_state === 'REMOVED' && r.author_id !== viewerId) throw notFound('POST_NOT_FOUND');
-    if (r.visibility === 'FOLLOWERS' && r.author_id !== viewerId) {
-      if (!viewerId) throw notFound('POST_NOT_FOUND');
-      const isFollowing = Boolean(db.get("SELECT 1 FROM follows WHERE follower_id = ? AND target_type = 'USER' AND target_id = ?", viewerId, r.author_id));
-      if (!isFollowing) throw notFound('POST_NOT_FOUND');
-    }
-    if (viewerId && r.author_id !== viewerId) {
-      const isBlocked = Boolean(db.get("SELECT 1 FROM blocks WHERE (blocker_id = ? AND blocked_id = ?) OR (blocker_id = ? AND blocked_id = ?)", viewerId, r.author_id, r.author_id, viewerId));
-      if (isBlocked) throw notFound('POST_NOT_FOUND');
-    }
+    assertPostAccess(r, viewerId);
     return hydratePosts([r], viewerId)[0];
   }
 
@@ -179,11 +184,16 @@ export function createSocialService(db, { rt, notifier, events, audit, fetcher }
     const lim = Math.min(50, Math.max(1, Number(limit) || 20));
     const cur = decodeCursor(cursor);
     const params = [];
-    const where = ["p.deleted_at IS NULL", "p.moderation_state != 'REMOVED'", "(p.visibility = 'PUBLIC' OR p.author_id = ?)"];
-    params.push(viewerId ?? '');
+    const where = ["p.deleted_at IS NULL", "p.moderation_state != 'REMOVED'"];
     if (viewerId) {
+      where.push(`(p.visibility = 'PUBLIC' OR p.author_id = ? OR (p.visibility = 'FOLLOWERS' AND p.author_id IN (SELECT target_id FROM follows WHERE follower_id = ? AND target_type = 'USER')))`);
+      params.push(viewerId, viewerId);
       where.push('p.author_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?)');
       params.push(viewerId);
+      where.push('p.author_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?)');
+      params.push(viewerId);
+    } else {
+      where.push("p.visibility = 'PUBLIC'");
     }
     if (category) { where.push('p.category = ?'); params.push(category); }
     if (cleanTab === 'following') {
@@ -222,8 +232,9 @@ export function createSocialService(db, { rt, notifier, events, audit, fetcher }
 
   /** Reacción a una publicación. Invariante TEST C: NO suscribe al evento ni envía avisos de evento. */
   function toggleReaction(userId, postId) {
-    const p = db.get('SELECT id, author_id FROM posts WHERE id = ? AND deleted_at IS NULL', postId);
+    const p = db.get('SELECT * FROM posts WHERE id = ? AND deleted_at IS NULL', postId);
     if (!p) throw notFound('POST_NOT_FOUND');
+    assertPostAccess(p, userId);
     const existing = db.get('SELECT 1 FROM reactions WHERE post_id = ? AND user_id = ?', postId, userId);
     if (existing) db.run('DELETE FROM reactions WHERE post_id = ? AND user_id = ?', postId, userId);
     else db.run('INSERT INTO reactions(post_id, user_id, kind, created_at) VALUES (?,?,?,?)', postId, userId, 'LIKE', Date.now());
@@ -232,8 +243,9 @@ export function createSocialService(db, { rt, notifier, events, audit, fetcher }
   }
 
   function toggleSave(userId, postId) {
-    const p = db.get('SELECT id FROM posts WHERE id = ? AND deleted_at IS NULL', postId);
+    const p = db.get('SELECT * FROM posts WHERE id = ? AND deleted_at IS NULL', postId);
     if (!p) throw notFound('POST_NOT_FOUND');
+    assertPostAccess(p, userId);
     const existing = db.get('SELECT 1 FROM saves WHERE post_id = ? AND user_id = ?', postId, userId);
     if (existing) db.run('DELETE FROM saves WHERE post_id = ? AND user_id = ?', postId, userId);
     else db.run('INSERT INTO saves(post_id, user_id, created_at) VALUES (?,?,?)', postId, userId, Date.now());
@@ -241,8 +253,9 @@ export function createSocialService(db, { rt, notifier, events, audit, fetcher }
   }
 
   function addComment(userId, postId, body) {
-    const p = db.get('SELECT id, author_id, title FROM posts WHERE id = ? AND deleted_at IS NULL', postId);
+    const p = db.get('SELECT * FROM posts WHERE id = ? AND deleted_at IS NULL', postId);
     if (!p) throw notFound('POST_NOT_FOUND');
+    assertPostAccess(p, userId);
     const text = str(body.body, { field: 'body', min: 1, max: 1000, required: true });
     const id = newId(), now = Date.now();
     db.run('INSERT INTO comments(id, post_id, author_id, body, created_at) VALUES (?,?,?,?,?)', id, postId, userId, text, now);
@@ -250,10 +263,13 @@ export function createSocialService(db, { rt, notifier, events, audit, fetcher }
       notifier.notify(p.author_id, { kind: 'COMMENT_ON_POST', category: 'SOCIAL', refType: 'POST', refId: postId,
         reason: 'Alguien comentó tu publicación', payload: { commentId: id, preview: text.slice(0, 140) }, dedupeKey: `comment:${id}` });
     }
-    return listComments(postId).find((c) => c.id === id);
+    return listComments(postId, userId).find((c) => c.id === id);
   }
 
-  function listComments(postId) {
+  function listComments(postId, viewerId = null) {
+    const p = db.get('SELECT * FROM posts WHERE id = ? AND deleted_at IS NULL', postId);
+    if (!p) throw notFound('POST_NOT_FOUND');
+    assertPostAccess(p, viewerId);
     return db.all(`SELECT c.id, c.post_id, c.author_id, c.body, c.created_at, p.handle, p.display_name
       FROM comments c JOIN profiles p ON p.user_id = c.author_id WHERE c.post_id = ? AND c.deleted_at IS NULL ORDER BY c.created_at ASC LIMIT 200`, postId)
       .map((r) => ({ id: r.id, postId: r.post_id, body: r.body, createdAt: r.created_at, author: { id: r.author_id, handle: r.handle, displayName: r.display_name } }));
@@ -265,22 +281,21 @@ export function createSocialService(db, { rt, notifier, events, audit, fetcher }
       WHERE s.expires_at > ? ORDER BY s.created_at DESC LIMIT 60`, now);
 
     return rows.filter((s) => {
-      // Check user blocks
+      // Check user mutual blocks
       if (viewerId && s.author_id !== viewerId) {
         const isBlocked = Boolean(db.get("SELECT 1 FROM blocks WHERE (blocker_id = ? AND blocked_id = ?) OR (blocker_id = ? AND blocked_id = ?)", viewerId, s.author_id, s.author_id, viewerId));
         if (isBlocked) return false;
       }
       // If story is linked to a post, ensure viewer is authorized to see that post
       if (s.post_id) {
-        const p = db.get("SELECT author_id, visibility, moderation_state FROM posts WHERE id = ? AND deleted_at IS NULL", s.post_id);
-        if (p) {
-          if (p.moderation_state === 'REMOVED' && p.author_id !== viewerId) return false;
-          if (p.visibility === 'PRIVATE' && p.author_id !== viewerId) return false;
-          if (p.visibility === 'FOLLOWERS' && p.author_id !== viewerId) {
-            if (!viewerId) return false;
-            const isFollowing = Boolean(db.get("SELECT 1 FROM follows WHERE follower_id = ? AND target_type = 'USER' AND target_id = ?", viewerId, p.author_id));
-            if (!isFollowing) return false;
-          }
+        const p = db.get("SELECT author_id, visibility, moderation_state, deleted_at FROM posts WHERE id = ?", s.post_id);
+        if (!p || p.deleted_at !== null) return false;
+        if (p.moderation_state === 'REMOVED' && p.author_id !== viewerId) return false;
+        if (p.visibility === 'PRIVATE' && p.author_id !== viewerId) return false;
+        if (p.visibility === 'FOLLOWERS' && p.author_id !== viewerId) {
+          if (!viewerId) return false;
+          const isFollowing = Boolean(db.get("SELECT 1 FROM follows WHERE follower_id = ? AND target_type = 'USER' AND target_id = ?", viewerId, p.author_id));
+          if (!isFollowing) return false;
         }
       }
       return true;

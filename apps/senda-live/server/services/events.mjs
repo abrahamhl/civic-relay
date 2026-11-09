@@ -81,6 +81,16 @@ export function createEventService(db, { rt, notifier, audit }) {
     if (!ev) throw notFound('EVENT_NOT_FOUND');
     const post = db.get('SELECT * FROM posts WHERE id = ? AND deleted_at IS NULL', postId);
     if (!post) throw notFound('POST_NOT_FOUND');
+    if (post.moderation_state === 'REMOVED' && post.author_id !== userId) throw notFound('POST_NOT_FOUND');
+    if (post.visibility === 'PRIVATE' && post.author_id !== userId) throw notFound('POST_NOT_FOUND');
+    if (post.visibility === 'FOLLOWERS' && post.author_id !== userId) {
+      const isFollowing = Boolean(db.get("SELECT 1 FROM follows WHERE follower_id = ? AND target_type = 'USER' AND target_id = ?", userId, post.author_id));
+      if (!isFollowing) throw notFound('POST_NOT_FOUND');
+    }
+    if (post.author_id !== userId) {
+      const isBlocked = Boolean(db.get("SELECT 1 FROM blocks WHERE (blocker_id = ? AND blocked_id = ?) OR (blocker_id = ? AND blocked_id = ?)", userId, post.author_id, post.author_id, userId));
+      if (isBlocked) throw notFound('POST_NOT_FOUND');
+    }
     const rel = oneOf(relation, ['REPORTS', 'UPDATES', 'CONTRADICTS'], 'relation', 'REPORTS');
     const now = Date.now();
     const media = post.media_ref_id ? db.get('SELECT * FROM external_media_refs WHERE id = ?', post.media_ref_id) : null;
@@ -225,8 +235,11 @@ export function createEventService(db, { rt, notifier, audit }) {
       return true;
     }).map(({ author_id, visibility, moderation_state, ...safePost }) => safePost);
 
-    const sources = db.all('SELECT id, source_kind, independence_key, post_id, alert_id, created_at FROM event_sources WHERE event_id = ? ORDER BY created_at', ev.id);
+    const visiblePostIds = new Set(posts.map((p) => p.id));
+    const sources = db.all('SELECT id, source_kind, independence_key, post_id, alert_id, created_at FROM event_sources WHERE event_id = ? ORDER BY created_at', ev.id)
+      .filter((s) => !s.post_id || visiblePostIds.has(s.post_id));
     const evidence = db.all('SELECT id, post_id, original_url, external_id, acquired_at, author_ref, metadata, report_hash, prev_hash FROM event_evidence WHERE event_id = ? ORDER BY created_at', ev.id)
+      .filter((e) => !e.post_id || visiblePostIds.has(e.post_id))
       .map((e) => ({ ...e, metadata: JSON.parse(e.metadata) }));
     const observations = db.all(`SELECT o.id, o.text, o.lat_coarse, o.lon_coarse, o.observed_at, o.report_hash, o.created_at, p.handle, p.display_name
       FROM event_observations o JOIN profiles p ON p.user_id = o.author_id WHERE o.event_id = ? ORDER BY o.created_at DESC`, ev.id);
@@ -271,7 +284,10 @@ export function createEventService(db, { rt, notifier, audit }) {
       id: e.id, slug: e.slug, title: e.title, type: e.type, status: e.status,
       location: e.lat !== null ? { lat: e.lat, lon: e.lon, bbox: e.bbox ? JSON.parse(e.bbox) : null, label: e.place_label } : (e.place_label ? { label: e.place_label } : null),
       startedAt: e.started_at, updatedAt: e.updated_at,
-      postCount: db.get('SELECT COUNT(*) AS c FROM event_posts WHERE event_id = ?', e.id).c,
+      postCount: db.get(`SELECT COUNT(*) AS c FROM event_posts ep JOIN posts p ON p.id = ep.post_id
+        WHERE ep.event_id = ? AND p.deleted_at IS NULL AND p.moderation_state != 'REMOVED'
+        AND (p.visibility = 'PUBLIC' OR p.author_id = ? OR (p.visibility = 'FOLLOWERS' AND ? != '' AND p.author_id IN (SELECT target_id FROM follows WHERE follower_id = ? AND target_type = 'USER')))`,
+        e.id, viewerId || '', viewerId || '', viewerId || '').c,
       independentSourceCount: db.get("SELECT COUNT(DISTINCT independence_key) AS c FROM event_sources WHERE event_id = ? AND source_kind != 'OFFICIAL'", e.id).c,
       viewerFollows: viewerId ? Boolean(db.get('SELECT 1 FROM event_subscriptions WHERE event_id = ? AND user_id = ?', e.id, viewerId)) : false,
     }));
@@ -280,7 +296,7 @@ export function createEventService(db, { rt, notifier, audit }) {
   /** Propuestas automáticas de agrupación de publicaciones recientes (siempre etiquetadas HYPOTHESIS). */
   function intelligenceCandidates() {
     const posts = db.all(`SELECT id, title, body, category, lat_coarse AS lat, lon_coarse AS lon, created_at AS createdAt, occurred_at AS occurredAt
-      FROM posts WHERE deleted_at IS NULL AND moderation_state = 'VISIBLE' ORDER BY created_at DESC LIMIT 100`);
+      FROM posts WHERE deleted_at IS NULL AND moderation_state = 'VISIBLE' AND visibility = 'PUBLIC' ORDER BY created_at DESC LIMIT 100`);
     return { kind: 'HYPOTHESIS', generatedAt: Date.now(), clusters: proposeClusters(posts) };
   }
 

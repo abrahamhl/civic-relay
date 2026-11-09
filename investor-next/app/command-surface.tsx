@@ -965,7 +965,7 @@ export default function CommandSurface({ locale }: { locale: Locale }) {
     return { ...trilaterate2D(anchors), anchors };
   }, [scenario, selectedPosition]);
 
-  const fusedErrorM = distanceM(fix, selectedPosition);
+  const fusedErrorM = fix.x !== null && fix.y !== null ? distanceM({ x: fix.x, y: fix.y }, selectedPosition) : null;
   const routePoints = route.ok
     ? [
         { x: selected.x, y: selected.y },
@@ -1473,28 +1473,28 @@ export default function CommandSurface({ locale }: { locale: Locale }) {
                   </g>
                 ) : null}
 
-                {layers.tracks
+                {layers.tracks && fix.status === 'DETERMINED' && fix.x !== null && fix.y !== null
                   ? fix.anchors.map(anchor => (
                       <line
                         key={`fix-${anchor.id}`}
                         x1={anchor.x}
                         y1={anchor.y}
-                        x2={fix.x}
-                        y2={fix.y}
+                        x2={fix.x!}
+                        y2={fix.y!}
                         stroke="#f0abfc"
                         strokeOpacity=".32"
                         strokeDasharray="3 5"
                       />
                     ))
                   : null}
-                {layers.tracks ? (
+                {layers.tracks && fix.status === 'DETERMINED' && fix.x !== null && fix.y !== null && fix.ellipseMajorM !== null ? (
                   <g>
                     <ellipse
                       cx={fix.x}
                       cy={fix.y}
                       rx={Math.max(1, fix.ellipseMajorM / 10)}
-                      ry={Math.max(0.5, fix.ellipseMinorM / 10)}
-                      transform={`rotate(${fix.angleDeg} ${fix.x} ${fix.y})`}
+                      ry={Math.max(0.5, (fix.ellipseMinorM ?? fix.ellipseMajorM) / 10)}
+                      transform={`rotate(${fix.angleDeg ?? 0} ${fix.x} ${fix.y})`}
                       fill="#f0abfc"
                       fillOpacity=".04"
                       stroke="#f0abfc"
@@ -1538,10 +1538,10 @@ export default function CommandSurface({ locale }: { locale: Locale }) {
                 <strong>{selected.id} · {t.kindNames[selected.kind]}</strong>
                 <small>{selectedGeo.lat.toFixed(4)}, {selectedGeo.lon.toFixed(4)}</small>
                 <small>
-                  {t.map.fused}: {fix.x.toFixed(0)}, {fix.y.toFixed(0)} · {t.map.error}: {formatNumber(fusedErrorM, locale)} m · {t.map.gdop}: {formatNumber(fix.gdop, locale, 2)}
+                  {t.map.fused}: {fix.status === 'UNDERDETERMINED' || fix.x === null || fix.y === null ? 'N/A' : `${fix.x.toFixed(0)}, ${fix.y.toFixed(0)}`} · {t.map.error}: {fusedErrorM !== null ? `${formatNumber(fusedErrorM, locale)} m` : 'N/A'} · {t.map.gdop}: {fix.gdop !== null ? formatNumber(fix.gdop, locale, 2) : 'N/A'}
                 </small>
                 <small>
-                  {t.map.ellipse}: ± {formatNumber(fix.ellipseMajorM, locale)} m · {t.map.lastSeen}: {formatTime(time)} · {route.ok ? `${t.feed.target} ${route.targetId}` : SCENARIOS[scenario].gatewayOnline ? t.feed.noRoute : t.map.gatewayDown}
+                  {t.map.ellipse}: {fix.ellipseMajorM !== null ? `± ${formatNumber(fix.ellipseMajorM, locale)} m` : 'N/A'} · {t.map.lastSeen}: {formatTime(time)} · {route.ok ? `${t.feed.target} ${route.targetId}` : SCENARIOS[scenario].gatewayOnline ? t.feed.noRoute : t.map.gatewayDown}
                 </small>
               </div>
               <div className="cmd-map-legend">{t.map.legend} · {t.map.heatLegend}</div>

@@ -204,6 +204,8 @@ export class CotsDroneReconManager {
         firstSeen: now,
       };
       existing.lastSeen = now;
+      existing.evidenceLevel = 'FIELD_MEASURED';
+      existing.isSimulated = false;
       this.droneTracks.set(uavId, existing);
       return { decoded, track: existing };
     }
@@ -221,6 +223,8 @@ export class CotsDroneReconManager {
       existing.speedVerticalMs = decoded.speedVerticalMs;
       existing.trackHeadingDeg = decoded.trackHeadingDeg;
       existing.lastSeen = now;
+      existing.evidenceLevel = 'FIELD_MEASURED';
+      existing.isSimulated = false;
 
       if (existing.pilot?.latitude && existing.latitude) {
         existing.distanceToPilotM = calculateHaversineDistanceM(
@@ -267,6 +271,9 @@ export class CotsDroneReconManager {
         );
       }
 
+      existing.lastSeen = now;
+      existing.evidenceLevel = 'FIELD_MEASURED';
+      existing.isSimulated = false;
       this.droneTracks.set(key, existing);
       return { decoded, track: existing };
     }
@@ -276,13 +283,31 @@ export class CotsDroneReconManager {
 
   /**
    * Returns active tactical drone detections and radar echoes.
+   * By default, returns ONLY live field-intercepted tracks.
+   * If no receiver hardware is active, returns an empty array.
+   *
+   * @param {object} [options]
+   * @param {boolean} [options.includeSynthetic=false] Explicitly allow returning simulated demo tracks.
+   * @returns {Array<object>}
    */
-  getActiveTracks() {
-    // If no live tracks currently cached, generate synthetic emergency scenario for realistic demonstration
+  getActiveTracks({ includeSynthetic = false } = {}) {
     if (this.droneTracks.size === 0) {
-      return this.getSyntheticTacticalScenario();
+      return includeSynthetic ? this.getSyntheticTacticalScenario() : [];
     }
     return Array.from(this.droneTracks.values());
+  }
+
+  /**
+   * Returns real-time receiver connection and track ingestion status.
+   */
+  getDetectionStatus() {
+    const hasHardware = this.droneTracks.size > 0;
+    return {
+      status: hasHardware ? 'LIVE_TRACKS_ACTIVE' : 'NO_LIVE_DETECTIONS',
+      hasHardwareReceiver: hasHardware,
+      trackCount: this.droneTracks.size,
+      mode: hasHardware ? 'HARDWARE_FIELD_RECON' : 'STANDBY_WAITING_HARDWARE',
+    };
   }
 
   /**
@@ -290,6 +315,8 @@ export class CotsDroneReconManager {
    *  - 1 Authorized Civil Protection search drone (DJI Matrice 300) with pilot on site.
    *  - 1 Rogue / Non-authorized drone hovering in restricted airspace with pilot located 580m away.
    *  - 1 Passive Bistatic Radar (PBR) stealth echo detection (non-emitting target).
+   *
+   * ALL tracks generated here are strictly labeled as SYNTHETIC_SIMULATION.
    */
   getSyntheticTacticalScenario() {
     const now = new Date().toISOString();
@@ -317,6 +344,10 @@ export class CotsDroneReconManager {
       lastSeen: now,
       rfSource: 'ESP32_WIFI_NAN_REMOTE_ID',
       signalStrengthDbm: -68,
+      isSimulated: true,
+      evidenceLevel: 'SYNTHETIC_SIMULATION',
+      simulationNotice: 'SCENARIO_DEMO_ONLY - NO PHYSICAL HARDWARE CONNECTED',
+      syntheticScenarioTag: 'DRILL_VALENCIA_ZERO_ZONE',
     };
 
     const rogueDrone = {
@@ -342,6 +373,10 @@ export class CotsDroneReconManager {
       lastSeen: now,
       rfSource: 'NRF52840_BLE_CODED_PHY',
       signalStrengthDbm: -82,
+      isSimulated: true,
+      evidenceLevel: 'SYNTHETIC_SIMULATION',
+      simulationNotice: 'SCENARIO_DEMO_ONLY - NO PHYSICAL HARDWARE CONNECTED',
+      syntheticScenarioTag: 'DRILL_VALENCIA_ZERO_ZONE',
     };
 
     const pbrEchoTarget = {
@@ -362,6 +397,10 @@ export class CotsDroneReconManager {
       receiver: 'RTL-SDR v4 Dongle COTS (<15€)',
       lastSeen: now,
       rfSource: 'PASSIVE_BISTATIC_RADAR_CAF',
+      isSimulated: true,
+      evidenceLevel: 'SYNTHETIC_SIMULATION',
+      simulationNotice: 'SCENARIO_DEMO_ONLY - NO PHYSICAL HARDWARE CONNECTED',
+      syntheticScenarioTag: 'DRILL_VALENCIA_ZERO_ZONE',
     };
 
     return [authorizedDrone, rogueDrone, pbrEchoTarget];
