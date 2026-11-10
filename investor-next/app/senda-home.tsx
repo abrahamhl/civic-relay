@@ -21,13 +21,8 @@ const C = {
     broadcastNote: 'Investigación especial basada en hechos y telemetría de la DANA de Valencia (octubre 2024), el incendio de Bejís y el accidente múltiple de la A-12 en los Países Bajos. Malla cibernética en bandas libres ISM (433/868 MHz y 2,4 GHz), cálculo de propagación 3D de Al-Hourani, autovalor de Fiedler λ₂(L), radar pasivo biestático y sensores COTS por menos de 25 € con decodificación de drones y pilotos ASTM F3411. Cumplimiento pleno de directivas de protección civil y el estándar europeo DATEX II.',
     broadcastVoiceEs: 'Locución en Español (ef_dora)',
     broadcastVoiceEn: 'Locución en Inglés (bf_emma)',
-    breakthroughT: 'Gran Telediario de Innovación: Radar Acústico Táctico, Detección de Fibra Óptica y Centinelas COTS',
-    breakthroughMeta: '07:30 UTC · Telediario Especial · Locución Femenina (ef_dora) · Subtítulos ES / EN / NL',
-    breakthroughNote: 'Investigación técnica sobre la detección pasiva de drones por fibra óptica sin radio (0 dBm RF), triangulación acústica TDoA con teléfonos móviles, microfonía cardioide/shotgun y nodo centinela de 11,70 € en hardware COTS.',
     rolesT: 'Suite de Demostración por Rol',
     rolesLead: 'SENDA conecta la estrategia soberana de los Estados, el rigor matemático de los ingenieros y la sencillez vital que necesita la ciudadanía en una emergencia.',
-    roleInvT: 'Modo Inversionista & Defensa (60 s)',
-    roleInvDesc: 'Soberanía nacional, contratos de protección civil y defensa, escalabilidad masiva con hardware comercial de 24 € y retorno estratégico sobre algoritmos propietarios.',
     roleDevT: 'Modo Desarrollador & Ingeniería (60 s)',
     roleDevDesc: 'Física matemática 3D Al-Hourani, conectividad algebraica λ₂(L), planes PX4, radar pasivo CAF y paridad en 74 módulos de núcleo de código abierto.',
     roleCitT: 'Modo Ciudadano & Evacuación (60 s)',
@@ -36,14 +31,12 @@ const C = {
     reelsLead: 'Píldoras audiovisuales en alta resolución y formato vertical para divulgación en TikTok, Instagram Reels, YouTube Shorts y X.',
     reel1T: 'Apagón Black-Sky',
     reel1Desc: 'Qué ocurre cuando cae toda la red eléctrica y cómo SENDA mantiene las llamadas vivas por sonido.',
-    reel2T: 'Caza de Drones por 25 €',
-    reel2Desc: 'Construyendo un sensor táctico con AliExpress y decodificando la posición del piloto con ASTM F3411.',
     reel3T: 'Matemáticas que Salvan Vidas',
     reel3Desc: 'Al-Hourani, autovalor de Fiedler, difracción de Deygout y radar pasivo sobre Valencia y Bejís.',
-    reel4T: 'Soberanía y Defensa Nacional',
-    reel4Desc: 'Por qué los gobiernos invierten en redes tácticas ad-hoc para proteger sus infraestructuras críticas.',
-    reel5T: 'Centinela 11 € y Supervivencia Civil',
-    reel5Desc: 'Detección de drones de fibra óptica, vector de evasión silencioso y baliza ultrasónica de socorro.',
+    promoT: 'Película completa 2026: por qué existe SENDA, cómo funciona y qué está probado',
+    promoNote: 'Unos 12 minutos. El origen del proyecto, los accidentes en España que lo motivan (Angrois, incendios de la sierra oeste, DANA, apagón, Adamuz y Gelida), el hueco que nadie cubre y todas las funciones civiles. Cada simulación la calcula fotograma a fotograma el mismo núcleo que pasan las pruebas automáticas. Locución en español; versión en inglés con subtítulos ES / EN / NL.',
+    promoAltEs: 'Versión en español (MP4)',
+    promoAltEn: 'Versión en inglés (MP4)',
     filmT: 'La película: qué es SENDA y qué ya funciona',
     filmNote: 'Locución original en inglés (bf_emma) y en español (ef_dora); subtítulos sincronizados en español, inglés y neerlandés. Todas las simulaciones y los renders 3D los calcula fotograma a fotograma el mismo código que ejecuta la app. Integración complementaria con el 112 bajo estándares abiertos CAP 1.2 y directivas de protección civil.',
     filmAlt: 'Cortes ejecutivos (90 s · 60 s · 30 s · vertical 9:16) y archivo doblado al español',
@@ -112,13 +105,8 @@ const C = {
     broadcastNote: 'Special investigation grounded in ground truth and telemetry from the Valencia 2024 DANA floods, the Bejís wildfire, and the Dutch A-12 highway fog collision. Tactical mesh over license-free ISM spectrum (433/868 MHz & 2.4 GHz), 3D Al-Hourani propagation physics, graph Laplacian λ₂(L) Fiedler eigenvalue, passive bistatic radar and COTS hardware under 25 € with ASTM F3411 rogue drone and pilot interception. Fully aligned with EU civil protection directives and DATEX II.',
     broadcastVoiceEs: 'Spanish Narration (ef_dora)',
     broadcastVoiceEn: 'English Narration (bf_emma)',
-    breakthroughT: 'Special Innovation Broadcast: Tactical Acoustic Radar, Fiber-Optic Detection & COTS Sentinels',
-    breakthroughMeta: '07:30 UTC · Broadcast News Format · Female Narration (ef_dora) · Subtitles ES / EN / NL',
-    breakthroughNote: 'Technical investigation on passive detection of radio-silent fiber-optic drones (0 dBm RF), acoustic TDoA smartphone multilateration, cardioid/shotgun beamforming, and 11.70 € COTS sentinel nodes.',
     rolesT: 'Role Demonstration Suite',
     rolesLead: 'SENDA unites sovereign state resilience, rigorous mathematical physics, and direct simplicity for citizens facing a blackout.',
-    roleInvT: 'Investor & Sovereign Defence Mode (60 s)',
-    roleInvDesc: 'Sovereign resilience, civil protection and defence procurement, mass scalability with accessible 24 € COTS modules and multi-million value on proprietary algorithms.',
     roleDevT: 'Developer & Engineering Mode (60 s)',
     roleDevDesc: '3D Al-Hourani physics, λ₂(L) algebraic connectivity, PX4 flight plans, passive bistatic radar and parity across 74 open-source core modules.',
     roleCitT: 'Citizen & Evacuation Mode (60 s)',
@@ -127,14 +115,12 @@ const C = {
     reelsLead: 'High-resolution vertical media clips optimized for TikTok, Instagram Reels, YouTube Shorts and X.',
     reel1T: 'Black-Sky Grid Failure',
     reel1Desc: 'What happens when the entire electrical and cellular grid fails, and how SENDA preserves direct voice calls over sound.',
-    reel2T: 'Hunting Drones for 25 €',
-    reel2Desc: 'Building a tactical sensor with AliExpress chips and decoding the remote pilot ground location via ASTM F3411.',
     reel3T: 'Mathematics Saving Lives',
     reel3Desc: 'Al-Hourani, Fiedler eigenvalue, Deygout knife-edge diffraction, and passive bistatic radar over real catastrophe scenes.',
-    reel4T: 'Sovereign National Defence',
-    reel4Desc: 'Why governments and defence forces invest in sovereign ad-hoc meshes to protect critical territory.',
-    reel5T: '11 € Sentinel & Civil Survival',
-    reel5Desc: 'Detection of silent fiber-optic drones, silent evasion vector and inaudible ultrasonic rescue beacon.',
+    promoT: 'The full 2026 film: why SENDA exists, how it works and what is proven',
+    promoNote: 'About 12 minutes. The origin of the project, the Spanish accidents behind it (Angrois, western-sierra wildfires, Valencia floods, blackout, Adamuz and Gelida), the gap nobody covers and every civil feature. Each simulation is computed frame by frame by the same core the automated tests run. English narration with ES / EN / NL subtitles; Spanish-narrated version available.',
+    promoAltEs: 'Spanish version (MP4)',
+    promoAltEn: 'English version (MP4)',
     filmT: 'The film: what SENDA is and what already works',
     filmNote: 'Original English narration (bf_emma) and Spanish narration (ef_dora); synchronised subtitles in Spanish, English and Dutch. Every simulation and 3D render is computed frame by frame by the same code the app runs. Complementary integration with emergency services under CAP 1.2 open standards and EU civil protection directives.',
     filmAlt: 'Executive short cuts (90 s · 60 s · 30 s · 9:16 vertical) and Spanish-voiced archive',
@@ -203,13 +189,8 @@ const C = {
     broadcastNote: 'Speciaal onderzoek gebaseerd op feiten en telemetrie van de DANA-overstromingen in Valencia (oktober 2024), de bosbrand in Bejís en het kettingongeval op de A-12 in Nederland. Cybernetisch meshnetwerk in vergunningsvrije ISM-banden (433/868 MHz en 2,4 GHz), 3D Al-Hourani-voortplantingsfysica, Fiedler-eigenwaarde λ₂(L), passieve bistatische radar en COTS-hardware onder 25 € met ASTM F3411-decodering van drones en piloten. Volledig in overeenstemming met EU-richtlijnen voor civiele bescherming en de Europese DATEX II-standaard.',
     broadcastVoiceEs: 'Spaanse Voice-over (ef_dora)',
     broadcastVoiceEn: 'Engelse Voice-over (bf_emma)',
-    breakthroughT: 'Speciaal Innovatiebulletin: Tactische Akoestische Radar, Glasvezeldetectie & COTS Sentinels',
-    breakthroughMeta: '07:30 UTC · Nieuwsbulletin-formaat · Vrouwelijke Stem (ef_dora) · Ondertitels ES / EN / NL',
-    breakthroughNote: 'Technisch onderzoek naar passieve detectie van radiostille glasvezeldrones (0 dBm RF), TDoA-smartphone multilateratie, directionele microfoons en COTS sentinel-knooppunten van 11,70 €.',
     rolesT: 'Demonstratiesuite per Rol',
     rolesLead: 'SENDA verbindt soevereine overheidsweerbaarheid, strikte mathematische fysica en directe eenvoud voor burgers in nood.',
-    roleInvT: 'Investeerders- & Defensiemodus (60 s)',
-    roleInvDesc: 'Nationale soevereiniteit, overheidscontracten voor civiele bescherming en defensie, massale schaalbaarheid met COTS-hardware van 24 € en strategisch rendement op gepatenteerde algoritmen.',
     roleDevT: 'Ontwikkelaars- & Ingenieursmodus (60 s)',
     roleDevDesc: '3D Al-Hourani-fysica, algebraïsche connectiviteit λ₂(L), PX4-vluchtplannen, passieve bistatische CAF-radar en pariteit over 74 opensource-kernmodules.',
     roleCitT: 'Burgers- & Evacuatiemodus (60 s)',
@@ -218,14 +199,12 @@ const C = {
     reelsLead: 'Audiovisuele snippets in hoge resolutie en verticaal formaat voor verspreiding op TikTok, Instagram Reels, YouTube Shorts en X.',
     reel1T: 'Black-Sky Stroomuitval',
     reel1Desc: 'Wat er gebeurt als het gehele stroom- en mobiele netwerk uitvalt, en hoe SENDA spraakoproepen in stand houdt via geluid.',
-    reel2T: 'Dronejacht voor 25 €',
-    reel2Desc: 'Een tactische sensor bouwen met AliExpress-chips en de positie van de piloot decoderen via ASTM F3411.',
     reel3T: 'Wiskunde die Levens Redt',
     reel3Desc: 'Al-Hourani, Fiedler-eigenwaarde, Deygout-meskantdiffractie en passieve radar boven Valencia en Bejís.',
-    reel4T: 'Soevereine Nationale Defensie',
-    reel4Desc: 'Waarom overheden en defensiediensten investeren in soevereine ad-hocnetwerken om kritieke infrastructuur te beschermen.',
-    reel5T: '11 € Sentinel & Burgeroverleving',
-    reel5Desc: 'Detectie van stille glasvezeldrones, stille uitwijkingsvector en onhoorbaar ultrasoon reddingsbaken.',
+    promoT: 'De volledige film 2026: waarom SENDA bestaat, hoe het werkt en wat bewezen is',
+    promoNote: 'Ongeveer 12 minuten. De oorsprong van het project, de Spaanse ongevallen erachter (Angrois, bosbranden in de westelijke sierra, overstromingen in Valencia, stroomstoring, Adamuz en Gelida), het gat dat niemand dekt en alle civiele functies. Elke simulatie wordt beeld voor beeld berekend door dezelfde kern die de automatische tests draaien. Engelse voice-over met ES / EN / NL-ondertitels.',
+    promoAltEs: 'Spaanse versie (MP4)',
+    promoAltEn: 'Engelse versie (MP4)',
     filmT: 'De film: wat SENDA is en wat al werkt',
     filmNote: 'Originele Engelse voice-over (bf_emma) en Spaanse voice-over (ef_dora); gesynchroniseerde ondertiteling in het Spaans, Engels en Nederlands. Elke simulatie en 3D-render wordt beeld voor beeld berekend door dezelfde code die de app draait. Aanvullende integratie met meldkamer 112 onder open CAP 1.2-standaarden en EU-richtlijnen voor civiele bescherming.',
     filmAlt: 'Korte versies (90 s · 60 s · 30 s · 9:16 verticaal) en Spaans ingesproken archief',
@@ -329,29 +308,6 @@ export default function SendaHome({ locale }: { locale: Locale }) {
           <a href="/media/m95/senda-m95-broadcast-special-en.mp4">{c.broadcastVoiceEn} (MP4)</a>
         </p>
 
-        {/* NUEVO GRAN TELEDIARIO DE INNOVACIÓN */}
-        <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px dashed rgba(255,255,255,0.2)' }}>
-          <div className="sh-broadcast-head">
-            <span className="sh-broadcast-badge" style={{ background: '#0284c7', borderColor: '#38bdf8' }}><i aria-hidden="true"/> BREAKTHROUGH 2026 · RADAR CIVIL ANTIDRÓN</span>
-            <span className="sh-broadcast-meta">{c.breakthroughMeta}</span>
-          </div>
-          <h2 className="sh-h2" style={{ marginTop: '6px' }}>{c.breakthroughT}</h2>
-          <video
-            id="senda-m95-session-breakthrough-video"
-            controls
-            preload="metadata"
-            playsInline
-            poster="/media/m95/senda-m95-session-breakthrough-poster.jpg"
-            aria-label={c.breakthroughT}
-          >
-            <source src="/media/m95/senda-m95-session-breakthrough-es.mp4" type="video/mp4"/>
-            <track kind="subtitles" srcLang="es" label="Español" src="/media/m95/senda-m95-session-breakthrough-es.vtt" default={locale === 'es'}/>
-          </video>
-          <p className="sh-note">{c.breakthroughNote}</p>
-          <p className="sh-note">
-            <a href="/media/m95/senda-m95-session-breakthrough-es.mp4" download>Descargar Vídeo Completo Telediario Especial de Innovación (MP4)</a>
-          </p>
-        </div>
       </div>
 
       {/* DEMOSTRACIÓN POR ROL / ROLE DEMONSTRATION SUITE */}
@@ -359,22 +315,6 @@ export default function SendaHome({ locale }: { locale: Locale }) {
         <h2 className="sh-h2">{c.rolesT}</h2>
         <p className="sh-lead">{c.rolesLead}</p>
         <div className="sh-roles-grid">
-          <article className="sh-role-card">
-            <h3>{c.roleInvT}</h3>
-            <video
-              controls
-              preload="metadata"
-              playsInline
-              poster="/media/m95/senda-m95-role-investor-poster.jpg"
-              aria-label={c.roleInvT}
-            >
-              <source src={`/media/m95/senda-m95-role-investor-${locale === 'es' ? 'es' : 'en'}.mp4`} type="video/mp4"/>
-              <track kind="subtitles" srcLang="es" label="Español" src="/media/m95/senda-m95-role-investor-es.vtt" default={locale === 'es'}/>
-              <track kind="subtitles" srcLang="en" label="English" src="/media/m95/senda-m95-role-investor-en.vtt" default={locale === 'en'}/>
-              <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/m95/senda-m95-role-investor-nl.vtt" default={locale === 'nl'}/>
-            </video>
-            <p>{c.roleInvDesc}</p>
-          </article>
           <article className="sh-role-card">
             <h3>{c.roleDevT}</h3>
             <video
@@ -432,22 +372,6 @@ export default function SendaHome({ locale }: { locale: Locale }) {
             <p>{c.reel1Desc}</p>
           </article>
           <article className="sh-reel-card">
-            <h4>{c.reel2T}</h4>
-            <video
-              controls
-              preload="metadata"
-              playsInline
-              poster="/media/m95/senda-m95-reel-drones-poster.jpg"
-              aria-label={c.reel2T}
-            >
-              <source src={`/media/m95/senda-m95-reel-drones-${locale === 'es' ? 'es' : 'en'}.mp4`} type="video/mp4"/>
-              <track kind="subtitles" srcLang="es" label="Español" src="/media/m95/senda-m95-reel-drones-es.vtt" default={locale === 'es'}/>
-              <track kind="subtitles" srcLang="en" label="English" src="/media/m95/senda-m95-reel-drones-en.vtt" default={locale === 'en'}/>
-              <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/m95/senda-m95-reel-drones-nl.vtt" default={locale === 'nl'}/>
-            </video>
-            <p>{c.reel2Desc}</p>
-          </article>
-          <article className="sh-reel-card">
             <h4>{c.reel3T}</h4>
             <video
               controls
@@ -463,40 +387,34 @@ export default function SendaHome({ locale }: { locale: Locale }) {
             </video>
             <p>{c.reel3Desc}</p>
           </article>
-          <article className="sh-reel-card">
-            <h4>{c.reel4T}</h4>
-            <video
-              controls
-              preload="metadata"
-              playsInline
-              poster="/media/m95/senda-m95-reel-defense-poster.jpg"
-              aria-label={c.reel4T}
-            >
-              <source src={`/media/m95/senda-m95-reel-defense-${locale === 'es' ? 'es' : 'en'}.mp4`} type="video/mp4"/>
-              <track kind="subtitles" srcLang="es" label="Español" src="/media/m95/senda-m95-reel-defense-es.vtt" default={locale === 'es'}/>
-              <track kind="subtitles" srcLang="en" label="English" src="/media/m95/senda-m95-reel-defense-en.vtt" default={locale === 'en'}/>
-              <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/m95/senda-m95-reel-defense-nl.vtt" default={locale === 'nl'}/>
-            </video>
-            <p>{c.reel4Desc}</p>
-          </article>
-          <article className="sh-reel-card">
-            <h4>{c.reel5T}</h4>
-            <video
-              controls
-              preload="metadata"
-              playsInline
-              poster="/media/m95/senda-m95-reel-sentinel-survival-poster.jpg"
-              aria-label={c.reel5T}
-            >
-              <source src="/media/m95/senda-m95-reel-sentinel-survival-es.mp4" type="video/mp4"/>
-              <track kind="subtitles" srcLang="es" label="Español" src="/media/m95/senda-m95-reel-sentinel-survival-es.vtt" default={locale === 'es'}/>
-            </video>
-            <p>{c.reel5Desc}</p>
-            <p style={{ marginTop: '0.4rem', fontSize: '0.8rem' }}>
-              <a href="/media/m95/senda-m95-reel-sentinel-survival-es.mp4" download>Descargar Reel 9:16 (MP4)</a>
-            </p>
-          </article>
         </div>
+      </div>
+
+      <div className="sh-film" id="promo">
+        <h2>{c.promoT}</h2>
+        <video
+          id="senda-m96-promo-video"
+          controls
+          preload="metadata"
+          playsInline
+          poster="/media/m96/senda-m96-promo-poster.jpg"
+          aria-label={c.promoT}
+        >
+          <source src={`/media/m96/senda-m96-promo-${locale === 'es' ? 'es' : 'en'}.mp4`} type="video/mp4"/>
+          {locale === 'es' ? (
+            <track kind="subtitles" srcLang="es" label="Español" src="/media/m96/senda-m96-promo-es-voz-es.vtt" default/>
+          ) : (
+            <>
+              <track kind="subtitles" srcLang="es" label="Español" src="/media/m96/senda-m96-promo-es.vtt"/>
+              <track kind="subtitles" srcLang="en" label="English" src="/media/m96/senda-m96-promo-en.vtt" default={locale === 'en'}/>
+              <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/m96/senda-m96-promo-nl.vtt" default={locale === 'nl'}/>
+            </>
+          )}
+        </video>
+        <p className="sh-note">{c.promoNote}</p>
+        <p className="sh-note">
+          <a href="/media/m96/senda-m96-promo-es.mp4">{c.promoAltEs}</a> · <a href="/media/m96/senda-m96-promo-en.mp4">{c.promoAltEn}</a>
+        </p>
       </div>
 
       <div className="sh-film" id="film">

@@ -1,0 +1,93 @@
+{
+  "module": "packages/senda/src/delivery-assurance.mjs",
+  "generatedAt": "2026-11-10T02:29:04.706Z",
+  "lengthBytes": 380,
+  "available": [
+    "PHONE_MESH",
+    "CELL_DATA",
+    "SMS",
+    "MESHTASTIC",
+    "IRIDIUM_SBD",
+    "RELAY_INTERNET"
+  ],
+  "scenarios": {
+    "NORMAL": 0.25,
+    "GRID_DOWN": 0.35,
+    "STORM": 0.2,
+    "GRID_DOWN_STORM": 0.2
+  },
+  "claim": "SIMULATED",
+  "note": "Probabilidades de canal = valores de planificación de bearers.mjs; efectos de los estados de peligro = hipótesis declaradas. Comparación justa: ambos planes se evalúan con el mismo modelo de fallos correlacionados.",
+  "independentPlanner": {
+    "claimed": 0.9949,
+    "actual": 0.9609,
+    "fragments": 6,
+    "k": 1,
+    "costEUR": 0,
+    "byState": [
+      {
+        "name": "NORMAL",
+        "pDelivery": 0.9949
+      },
+      {
+        "name": "GRID_DOWN",
+        "pDelivery": 0.9563
+      },
+      {
+        "name": "STORM",
+        "pDelivery": 0.979
+      },
+      {
+        "name": "GRID_DOWN_STORM",
+        "pDelivery": 0.9087
+      }
+    ]
+  },
+  "assuredPlanner": [
+    {
+      "budget": "0 €",
+      "pDelivery": 0.9898,
+      "failureRate": 0.0102,
+      "fragments": 22,
+      "k": 3,
+      "costEUR": 0,
+      "worstState": {
+        "name": "GRID_DOWN_STORM",
+        "pDelivery": 0.9761
+      },
+      "failureReductionVsIndependent": 3.8,
+      "plannerMs": 4219,
+      "certificateSha256": "00cecd2576e051ec0625bb1580787a3e998fe0c126f91323c3a2b8971f6b0dfb"
+    },
+    {
+      "budget": "sin límite",
+      "pDelivery": 0.9999,
+      "failureRate": 0.0001,
+      "fragments": 23,
+      "k": 4,
+      "costEUR": 3,
+      "worstState": {
+        "name": "GRID_DOWN_STORM",
+        "pDelivery": 0.9998
+      },
+      "failureReductionVsIndependent": 592.4,
+      "plannerMs": 1991,
+      "certificateSha256": "1dd4ed5205ef5d5a2e632745d9a51fb1efccac45f306154354052f9ce09d0934"
+    },
+    {
+      "budget": "0 €, mismos 6 fragmentos",
+      "pDelivery": 0.9609,
+      "failureRate": 0.0391,
+      "fragments": 6,
+      "k": 1,
+      "costEUR": 0,
+      "worstState": {
+        "name": "GRID_DOWN_STORM",
+        "pDelivery": 0.9087
+      },
+      "failureReductionVsIndependent": 1,
+      "plannerMs": 392,
+      "certificateSha256": "626a14094fac86e50bdaf27f66981a66a48c045f8eaa2de2184bbd83bd717bf4"
+    }
+  ]
+}

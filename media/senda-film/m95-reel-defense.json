@@ -71,7 +71,7 @@
    "id": "r_def2",
    "claim": "CALCULATED",
    "source": [
-    "packages/senda/src/cots-rf-tactical.mjs",
+    "packages/senda/src/defense/cots-rf-tactical.mjs",
     "apps/senda-live/server/domain/cots-drone-recon.mjs"
    ],
    "visual": {

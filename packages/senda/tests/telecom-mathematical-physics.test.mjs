@@ -100,3 +100,25 @@ test('Satellite Doppler: orbital velocity, shift and PLL loop bandwidth', () => 
   // At 45° elevation, Doppler shift is around 6-7 kHz -> exceeds 5 kHz COTS limit
   assert.equal(typeof sat.isNarrowbandCotsFeasible, 'boolean');
 });
+
+test('DTN: closed-form logistic percentiles match numerical integration of the SIS ODE', () => {
+  const N = 200, lambda = 0.5, ttl = 12, loss = 0.01;
+  const res = computeDtnEpidemicSpreading(N, lambda, ttl, loss);
+  const beta = lambda / (N - 1), mu = 1 / ttl + loss;
+  let I = 1, t = 0, t50 = null;
+  const dt = 1e-3;
+  while (t < 200 && t50 === null) {
+    const f = (x) => beta * x * (N - x) - mu * x;
+    const k1 = f(I), k2 = f(I + (dt * k1) / 2), k3 = f(I + (dt * k2) / 2), k4 = f(I + dt * k3);
+    I += (dt * (k1 + 2 * k2 + 2 * k3 + k4)) / 6;
+    t += dt;
+    if (I >= 0.5 * N) t50 = t;
+  }
+  assert.ok(Math.abs(res.t50Hours - t50) < 0.02, `t50 ${res.t50Hours} vs ODE ${t50}`);
+  assert.ok(res.saturationFraction < 1, 'losses cap the reachable fraction below N');
+});
+
+test('Rain: ITU-R P.838-3 tabulated node is reproduced exactly (10 GHz, H)', () => {
+  const r = computeRainAttenuation(10, 50, 'H');
+  assert.ok(Math.abs(r.specificAttenuationDbPerKm - 0.01217 * 50 ** 1.2571) < 1e-3);
+});

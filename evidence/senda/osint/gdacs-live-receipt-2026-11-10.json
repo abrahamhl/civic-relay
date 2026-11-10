@@ -1,0 +1,56 @@
+{
+  "schema": "senda.evidence.source-receipt/1",
+  "source_id": "GDACS_EVENTS_SEARCH",
+  "status": "SOURCE_SNAPSHOT",
+  "fetched_at": "2026-11-10T02:53:13.782Z",
+  "request_url_page1": "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?fromDate=2026-10-27&toDate=2026-11-10&eventlist=EQ%2CWF%2CFL%2CTC%2CVO%2CDR&alertlevel=green%3Borange%3Bred&pageSize=100&pageNumber=1",
+  "docs": "https://www.gdacs.org/gdacsapi/swagger/index.html",
+  "terms": "https://www.gdacs.org/documents/2025/GDACS_Terms_of_use_Mar_25.pdf",
+  "pages": {
+    "fetched": 5,
+    "pageSize": 100,
+    "maxPages": 5,
+    "exhausted": false,
+    "pageSha256": [
+      "72a48deecf515801a7bf6d7a25d22765878227e1a4d9adad04b947f534977fd9",
+      "751527922f2993033188b41922e67ec67210a5878557d4ed5098ab4d0227cc69",
+      "2a3ab4d90e03dece96f42da6801a5b6e51a9f23477973c977064fac1f743e7c7",
+      "f0c34a05a6c79f67a4b6284db8b821f383609fc5adb66af32e3959282be2beb8",
+      "1c043187c6ed031aee664166d5836a78a32d2a96ed14817d23d59d6d1c13d724"
+    ]
+  },
+  "set_sha256": "8eb1fe1a1deeacfc545b862e55a8b55a685568b41aadfb87920ee52e0935eeae",
+  "source_records_accepted": 472,
+  "duplicate_records_across_pages": 26,
+  "rejected_records": 2,
+  "displayed": 100,
+  "result_limit_reached": true,
+  "displayed_by_type_alert": {
+    "TC/Red": 1,
+    "DR/Orange": 3,
+    "TC/Green": 2,
+    "EQ/Green": 3,
+    "WF/Green": 91
+  },
+  "displayed_by_declared_upstream": {
+    "JTWC": 2,
+    "GDO": 3,
+    "NOAA": 1,
+    "NEIC": 3,
+    "GWIS": 91
+  },
+  "elapsed_ms": 5071,
+  "truth": {
+    "dataKind": "PUBLIC_SOURCE_RISK_ASSESSMENT",
+    "isSendaEmergencyWarning": false,
+    "note": "Provider risk assessments; points are representative, not affected areas; no independent corroboration claimed."
+  },
+  "contract_findings_2026_11_10": [
+    "Without alertlevel the API omits Green events",
+    "No results -> HTTP 204 empty body",
+    "pageSize max 100; paging repeats records across pages",
+    "EQ episodeid has 7 digits",
+    "properties.source declares upstream (NEIC, GWIS, GLOFAS, GDO, JTWC, NOAA, RSMC, NCAL SS)",
+    "Node built-in fetch needs NODE_USE_ENV_PROXY=1 behind an HTTPS proxy"
+  ]
+}

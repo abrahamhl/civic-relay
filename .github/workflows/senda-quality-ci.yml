@@ -22,7 +22,7 @@ jobs:
           node --check packages/senda/src/observation-quality.mjs
           node --check packages/senda/scripts/referencias-real.mjs
       - name: Quality gate and all core regression tests
-        run: node --test packages/senda/tests/*.test.mjs
+        run: node --test packages/senda/tests/*.test.mjs packages/senda/tests/defense/*.test.mjs
       - name: Python camera-flow syntax (without network or inference)
         run: python3 -m py_compile packages/senda-vision/camera_flow.py
       - name: SQLite normalized evidence registry tests (offline)

@@ -77,15 +77,22 @@ test('Theorem 3 (Deygout Multi-Obstacle vs Epstein-Peterson): corrects double-di
   assert.equal(res.mainObstacleIndex, 1, 'Obstacle at 2500m must be identified as main obstacle');
   assert.ok(res.obstacles[1].isMain, 'Obstacle 1 must have isMain=true');
   assert.ok(res.lossDeygoutDb > 20 && res.lossDeygoutDb < 30, `Deygout loss ${res.lossDeygoutDb} dB must be reasonable`);
-  assert.ok(res.lossEpsteinPetersonDb > res.lossDeygoutDb, 'Epstein-Peterson must overestimate loss compared to Deygout');
-  assert.ok(res.epsteinOverestimationDb >= 1.0, 'Epstein-Peterson overestimation should be at least 1.0 dB');
+  // Epstein-Peterson under-estimates and Deygout over-estimates for close edges: they bracket the true loss.
+  assert.ok(res.lossEpsteinPetersonDb <= res.lossDeygoutDb, 'Epstein-Peterson must not exceed 3-edge Deygout');
+  assert.ok(Math.abs(res.epsteinOverestimationDb - (res.lossEpsteinPetersonDb - res.lossDeygoutDb)) < 0.02);
 });
 
 test('Theorem 4 (Passive Bistatic Radar CRLB): bounds range and velocity estimation for micro-drones', () => {
   // DVB-T broadcast: B = 7.61 MHz, CIT = 0.25s, SNR = 15 dB, fc = 650 MHz
   const res = computePassiveRadarCrlb(7.61e6, 0.25, 15, 650e6);
-  assert.ok(res.sigmaRangeM > 0.2 && res.sigmaRangeM < 1.0, `Range accuracy ${res.sigmaRangeM}m must be sub-meter (< 1m)`);
-  assert.ok(res.sigmaVelocityMps > 0.005 && res.sigmaVelocityMps < 0.05, `Velocity accuracy ${res.sigmaVelocityMps}m/s must be high resolution`);
+  // Closed form with Gabor RMS bandwidth B/(2√3): σ_τ = sqrt(3 / (2π² B² SNR)).
+  const snr = 10 ** 1.5;
+  const sigmaTau = Math.sqrt(3 / (2 * Math.PI ** 2 * 7.61e6 ** 2 * snr));
+  assert.ok(Math.abs(res.sigmaRangeM - 299792458 * sigmaTau) < 0.01, `σ_R ${res.sigmaRangeM} m`);
+  assert.ok(res.sigmaRangeM > 2 && res.sigmaRangeM < 3.5, 'DVB-T at 15 dB gives metre-level (not sub-metre) bistatic range accuracy');
+  const sigmaF = Math.sqrt(3 / (2 * Math.PI ** 2 * 0.25 ** 2 * snr));
+  assert.ok(Math.abs(res.sigmaVelocityMps - (299792458 / 650e6) * sigmaF) < 0.001, 'bistatic range-rate σ = λ·σ_f');
+  assert.equal(res.sigmaMonostaticSpeedMps, Math.round((res.sigmaVelocityMps / 2) * 1000) / 1000);
   assert.ok(res.crlbTimeVarianceSec2 > 0);
   assert.ok(res.crlbDopplerVarianceHz2 > 0);
 });
@@ -99,4 +106,24 @@ test('Theorem 5 (Near-Ultrasound Acoustic Capacity): guarantees call setup in 85
   assert.ok(res.shannonCapacityBps > 2000, `Shannon capacity ${res.shannonCapacityBps} bps exceeds required baud rate`);
   assert.ok(res.transmissionTimeSec < 2.0, `Transmission time ${res.transmissionTimeSec}s is under 2 seconds`);
   assert.ok(res.packetErrorRate <= 1e-6, 'Reed-Solomon RS(104, 80) guarantees P_FER < 1e-6');
+});
+
+test('Theorem 5 (PHY): M-FSK SER and RS block error follow closed forms', async () => {
+  const { mfskNoncoherentSer, rsBlockErrorRate } = await import('../src/scientific-theorems-physics.mjs');
+  // Binary non-coherent FSK: P = ½·exp(−Es/2N0)
+  for (const es of [1, 4, 10]) assert.ok(Math.abs(mfskNoncoherentSer(2, es) - 0.5 * Math.exp(-es / 2)) < 1e-12);
+  assert.ok(mfskNoncoherentSer(16, 0) > 0.9, 'no energy → near-random symbols');
+  // n=3, t=1, p=0.1 → P(≥2 errors) = 3·0.01·0.9 + 0.001 = 0.028
+  assert.ok(Math.abs(rsBlockErrorRate(3, 1, 0.1) - 0.028) < 1e-12);
+  // Error rate must grow monotonically with distance (falling SNR)
+  const per = [1, 5, 8, 12].map((d) => computeAcousticNearUltrasoundBudget(d, 85, 80).packetErrorRate);
+  for (let i = 1; i < per.length; i++) assert.ok(per[i] >= per[i - 1]);
+});
+
+test('Theorem 2 (Jacobi): path graph spectrum equals 2 − 2cos(kπ/n) and large graphs converge', () => {
+  const n = 12;
+  const A = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => (Math.abs(i - j) === 1 ? 1 : 0)));
+  const res = computeGraphLaplacianSpectrum(A);
+  const expected = Array.from({ length: n }, (_, k) => 2 - 2 * Math.cos((k * Math.PI) / n)).sort((a, b) => a - b);
+  expected.forEach((e, k) => assert.ok(Math.abs(res.eigenvalues[k] - e) < 1e-3, `λ_${k}`));
 });

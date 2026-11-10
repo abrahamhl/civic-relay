@@ -20,7 +20,7 @@ function resolveScriptPath(input) {
 
 const scriptPath = resolveScriptPath(rawName);
 const name = path.basename(scriptPath, '.json');
-const isM95 = name.startsWith('m95-');
+const isM95 = /^m9[5-9]-/.test(name); // guiones de release (m95, m96…): ES/EN/NL obligatorios
 
 const doc = JSON.parse(fs.readFileSync(scriptPath, 'utf8'));
 const errs = [];

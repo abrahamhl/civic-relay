@@ -17,7 +17,7 @@
    "id": "rel_1",
    "claim": "CALCULATED",
    "source": [
-    "packages/senda/src/acoustic-beamforming-survival.mjs",
+    "packages/senda/src/defense/acoustic-beamforming-survival.mjs",
     "docs/research/SENDA_ACOUSTIC_BEAMFORMING_AND_SURVIVAL_KIT_2026.md"
    ],
    "visual": {
@@ -59,7 +59,7 @@
    "claim": "OBSERVED",
    "source": [
     "investor-next/app/acoustic-sentinel-survival-lab.tsx",
-    "packages/senda/src/acoustic-beamforming-survival.mjs"
+    "packages/senda/src/defense/acoustic-beamforming-survival.mjs"
    ],
    "visual": {
     "kind": "cots_bom"

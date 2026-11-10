@@ -1,0 +1,289 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:03.309
+SENDA ontstond uit een heel concrete ervaring.
+
+2
+00:00:03.659 --> 00:00:10.785
+Tijdens een bosbrand, en later tijdens de stroomstoring, probeerde de maker, Abraham, zijn familie te bereiken. Het was onmogelijk.
+
+3
+00:00:11.135 --> 00:00:18.004
+Als dat ieder van ons overkomt, overkomt het ook iemand die vastzit en op hulp wacht. Deze film legt uit hoe we dat oplossen.
+
+4
+00:00:19.604 --> 00:00:22.057
+Spanje heeft deze lessen op de harde manier geleerd.
+
+5
+00:00:22.407 --> 00:00:32.519
+In Angrois, in tweeduizenddertien, een bocht zonder continue snelheidsbewaking. Bij de bosbranden in de westelijke sierra hing de communicatie af van internet.
+
+6
+00:00:32.869 --> 00:00:45.072
+Bij de overstromingen in Valencia kwam de massale waarschuwing op telefoons pas om elf over acht ’s avonds. Bij de stroomstoring van april tweeduizendvijfentwintig viel het mobiele netwerk uit toen de mastaccu’s leeg raakten.
+
+7
+00:00:45.422 --> 00:00:53.443
+En in januari tweeduizendzesentwintig, in Adamuz, duurde het ongeveer vijfenveertig minuten voordat de hulpdiensten wisten dat er een tweede trein was.
+
+8
+00:00:53.793 --> 00:01:03.073
+Twee dagen later, in Gelida, trof de storm een muur naast het spoor, en machinisten hadden gewaarschuwd. De oorzaken worden nog officieel onderzocht.
+
+9
+00:01:04.673 --> 00:01:09.281
+Het probleem is geen gebrek aan technologie. Het is dat niets gecoördineerd is.
+
+10
+00:01:09.631 --> 00:01:21.258
+De hele officiële alarmketen hangt af van het mobiele netwerk, precies het netwerk dat binnen enkele uren na een stroomstoring uitvalt. En commandosystemen verbinden hulpverleners met elkaar, niet met de persoon die vastzit.
+
+11
+00:01:21.608 --> 00:01:29.352
+Intussen heeft elke telefoon bluetooth, wifi, een luidspreker, een microfoon en steeds vaker satelliet. SENDA laat ze samenwerken.
+
+12
+00:01:30.952 --> 00:01:34.621
+Dit is SENDA: noodroutering via alternatieve kanalen.
+
+13
+00:01:34.971 --> 00:01:48.497
+Het is geen zoveelste berichtenapp. Het is de laag die alles coördineert wat een bericht kan vervoeren: telefoons in de buurt, geluid, satelliet rechtstreeks naar de telefoon, LoRa, Iridium, zendamateurs, drones en wat er nog van het netwerk overeind staat.
+
+14
+00:01:50.097 --> 00:02:02.939
+Het werkt vanaf de eerste seconde zonder internet. Berichten zijn end-to-end versleuteld en reizen via geluid tussen twee telefoons, in een bestand of van hand tot hand: elke telefoon met SENDA vervoert berichten die hij zelf niet kan lezen.
+
+15
+00:02:03.289 --> 00:02:09.113
+Zodra de ontvanger het krijgt, wist zijn onvervalsbare ontvangstbewijs de kopieën die nog onderweg zijn.
+
+16
+00:02:10.713 --> 00:02:18.884
+Nu kan SENDA ook bellen. Twee telefoons op hetzelfde wifi-netwerk, of op de hotspot van een van beide, praten zonder internet, zonder provider en zonder server.
+
+17
+00:02:19.234 --> 00:02:28.685
+De truc zit in de opbouw: wat normaal een server nodig had, zo'n tweeduizend tekens, brengt SENDA terug tot ongeveer negentig bytes en stuurt het in minder dan negen seconden via geluid.
+
+18
+00:02:29.035 --> 00:02:41.621
+Daarna reizen spraak en chat versleuteld rechtstreeks tussen de twee. En als jullie elkaar niet bereiken, geeft een derde telefoon op de trap de stem door: in de test hoorde de derde telefoon via de tweede precies de toon van de eerste.
+
+19
+00:02:43.221 --> 00:02:53.483
+Wat nog niemand doet: SENDA splitst elk bericht met Reed-Solomon-codering en verdeelt de fragmenten over verschillende dragers. Een paar willekeurige fragmenten zijn genoeg om het te herstellen.
+
+20
+00:02:53.833 --> 00:03:09.449
+Met satelliet, LoRa, sms en buren haalt een SOS een afleverkans van negenennegentig procent, exact berekend. In de live test werden honderdzevenennegentig van de tweehonderd berichten byte voor byte hersteld terwijl dragers willekeurig wegvielen.
+
+21
+00:03:11.049 --> 00:03:28.201
+Elk satellietnetwerk is ingedeeld naar toegangsniveau: wat je telefoon al heeft, wat een module zoals Iridium nodig heeft, amateurnetwerken zoals QO-100, waar de wet versleuteling verbiedt en SENDA alleen ondertekende openbare statussen verstuurt, en overheidsnetwerken, waarvoor een overeenkomst nodig is.
+
+22
+00:03:28.551 --> 00:03:33.649
+Wat nog in ontwikkeling is, zoals de waarschuwingsdienst van Galileo, wordt zo aangeduid.
+
+23
+00:03:35.249 --> 00:03:50.204
+Het SENDA-oog berekent in realtime waar elke satelliet is: de Iridium-constellatie in een lage baan voor korte berichten, Galileo in een middelhoge baan voor positie en opsporing en redding, en de geostationaire QO-100 voor zendamateurs.
+
+24
+00:03:50.554 --> 00:04:02.031
+De echte Spaanse gevallen staan op de wereldbol. Kies er een, en SENDA zoekt de zichtbare satelliet, berekent elevatie, afstand en vertraging, en tekent de route van het alarm tot de 112-meldkamer.
+
+25
+00:04:03.631 --> 00:04:11.525
+SENDA voorspelt ook de black-out. Het modelleert hoe lang elke mast op accu volhoudt en berekent wanneer en waar mensen hun dekking verliezen.
+
+26
+00:04:11.875 --> 00:04:23.907
+Daarna bepaalt het waar gateways moeten komen voordat het gebeurt, met een algoritme met wiskundige garantie. In de teststad bereiken vijf gateways tweeënzeventig procent van de mensen die zonder dekking zouden vallen.
+
+27
+00:04:25.507 --> 00:04:32.781
+Bij een treinongeval detecteert elke telefoon de klap, vraagt of alles goed is en slaat zelf alarm als je niet antwoordt.
+
+28
+00:04:33.131 --> 00:04:50.838
+Door de meldingen samen te voegen onderscheidt het paneel de twee treinen in vierendertig seconden simulatie. In Adamuz duurde het volgens de gepubliceerde tijdlijn ongeveer vijfenveertig minuten om de tweede trein te herkennen. En alles wordt geëxporteerd in CAP, het formaat dat meldkamers al lezen.
+
+29
+00:04:52.438 --> 00:05:03.297
+Volgens een door Adif betwist rapport van de Guardia Civil registreerde het spoorstroomcircuit in Adamuz zo'n tweeëntwintig uur vooraf een spanningsdaling, zonder alarm, omdat die boven de drempel bleef.
+
+30
+00:05:03.647 --> 00:05:19.028
+SENDA vergelijkt elk circuit met zijn eigen geschiedenis en stelt een inspectie voor. Daarbij komen spoorgeometrie gemeten met telefoons van reizigers, bochten zonder snelheidsbewaking en muren bij zware regen. De data zijn synthetisch; het officiële onderzoek beslist.
+
+31
+00:05:20.628 --> 00:05:28.735
+In een beschadigd gebouw lokaliseert SENDA routers per verdieping met inspecties te voet of per drone, en stuurt waarschuwingen alleen naar de getroffen verdiepingen.
+
+32
+00:05:29.085 --> 00:05:33.799
+Wie niet antwoordt, staat als vermist, onbevestigd, nooit als slachtoffer.
+
+33
+00:05:35.399 --> 00:05:45.170
+Als niemand een gebouw in kan, vliegt een drone verdieping per verdieping langs de gevel en luistert naar de Bluetooth-signalen van telefoons, zonder verbinding te maken of iets te lezen.
+
+34
+00:05:45.520 --> 00:05:57.275
+Signalen tellen misleidt: elke telefoon wisselt om de paar minuten van adres. SENDA telt hoeveel er tegelijk actief zijn en leidt daaruit het exacte aantal telefoons per verdieping af.
+
+35
+00:05:57.625 --> 00:06:11.150
+Daarna berekent het hoeveel mensen er zijn, met een eerlijke marge. In zevenhonderdtwintig gesimuleerde verdiepingen bevatte die marge in vijfennegentig procent van de gevallen het echte aantal. Er komen alleen getallen uit, nooit identiteiten.
+
+36
+00:06:12.750 --> 00:06:26.041
+Geen camera kijkt door een muur. SENDA doet iets nuttigers: het combineert het antwoord van elke persoon, het signaal van de telefoon, ademhaling gedetecteerd via wifi en kloppen, en berekent een kans per woning, met foutmarge.
+
+37
+00:06:26.391 --> 00:06:36.908
+Het zegt alleen achtennegentig procent als twee onafhankelijke bronnen overeenkomen; in tweehonderd simulaties klopte het elke keer. En het tekent het in lagen over de camera.
+
+38
+00:06:38.508 --> 00:06:45.079
+Bij een natuurbrand berekent SENDA hoe het vuur zich verspreidt met wind en helling, en kruist dat met de gsm-masten.
+
+39
+00:06:45.429 --> 00:06:56.778
+In dit scenario brandt de mast van een dorp honderdzeven minuten vóór de waarschuwingsdeadline af. Het alarm moet eerder uit, of via buren, LoRa en satelliet zodra de dekking weg is.
+
+40
+00:06:58.378 --> 00:07:09.151
+Mist, 120 km/u en 1,2 seconde tussen auto's. Elke bestuurder reageert op de remlichten voor zich en de vertraging telt op: vijf auto's botsen op elkaar.
+
+41
+00:07:09.501 --> 00:07:21.235
+Met SENDA detecteert de eerste telefoon het harde remmen via de GPS-snelheid en waarschuwt iedereen tegelijk. Alleen wie direct bumperkleeft botst nog: dat lost alleen volgafstand op.
+
+42
+00:07:22.835 --> 00:07:33.117
+Een nachtelijk ongeval op 18 kilometer zonder enig bereik. De telefoon in de verongelukte auto zendt een SOS uit en elke passerende auto met SENDA neemt het mee.
+
+43
+00:07:33.467 --> 00:07:43.387
+In deze simulatie, met slechts één op de tien auto's met SENDA, komt de melding in ongeveer zeven minuten naar buiten. En tegenliggers waarschuwen wie op het ongeval afrijdt.
+
+44
+00:07:44.987 --> 00:07:53.243
+De eerste die het weet is de telefoon van de spookrijder zelf: drie opeenvolgende posities tegen de rijrichting in volstaan om hem te waarschuwen.
+
+45
+00:07:53.593 --> 00:07:59.716
+Tegenliggers krijgen de tijd tot de kruising en wat ze moeten doen: rechts houden en afremmen.
+
+46
+00:08:01.316 --> 00:08:07.545
+SENDA gebruikt alleen openbare verkeerscamera's die zijn vrijgegeven voor hergebruik, en alleen om de wegcondities te meten, nooit personen.
+
+47
+00:08:07.895 --> 00:08:18.669
+Met een donker referentiepunt op bekende afstand berekent het het zicht in meters en de snelheid om binnen het zicht te kunnen stoppen. Dit is een synthetisch beeld, gemaakt om de methode te testen.
+
+48
+00:08:20.269 --> 00:08:30.061
+Alleen een coördinator met een door de eigen organisatie ondertekend bewijs kan iets op je telefoon activeren, en alleen als jij dat hebt toegestaan en er een noodsituatie is afgekondigd.
+
+49
+00:08:30.411 --> 00:08:38.496
+Een ingesloten persoon drukt op één knop, het antwoord reist versleuteld van buur naar buur en de coördinator ziet het op een overzicht per verdieping.
+
+50
+00:08:40.096 --> 00:08:45.024
+Voor wie het nodig heeft: de eenvoudige modus met drie grote knoppen. Ik ben veilig, ik heb hulp nodig, ik zit vast.
+
+51
+00:08:45.374 --> 00:08:49.641
+En elk scherm doorstaat bij elke wijziging een automatische toegankelijkheidscontrole.
+
+52
+00:08:51.241 --> 00:09:02.803
+Zo is SENDA van binnen opgebouwd, in vijf lagen. Onderaan alles wat meet of data verplaatst: microfoon, versnellingsmeter, barometer, Bluetooth, wifi, drones en satellieten.
+
+53
+00:09:03.153 --> 00:09:15.356
+Daarboven de dragers: geluid, lokaal netwerk, koeriers, LoRa en satelliet. In het midden de kern, die in de telefoon zelf draait: hij versleutelt, kiest de route, knipt berichten op en combineert het bewijs.
+
+54
+00:09:15.706 --> 00:09:26.437
+En bovenaan de apps en de ontvangers: familie, reddingsteams, 112 en de organisaties. Elk onderdeel toont op de website zijn echte status: getest, gesimuleerd of nog te doen.
+
+55
+00:09:28.037 --> 00:09:30.981
+Onder dit alles zit natuurkunde, geen beloften.
+
+56
+00:09:31.331 --> 00:09:42.445
+Bij een stortbui van vijftig millimeter per uur verliest de band van achthonderdachtenzestig megahertz bijna niets; de band van achtentwintig gigahertz verliest ongeveer zeven decibel per kilometer.
+
+57
+00:09:42.795 --> 00:09:52.331
+Diffractie over bergen wordt begrensd door twee klassieke methoden, en de geluidsverbinding wordt berekend met de echte foutkans: ze werkt over enkele meters, en dat zeggen we.
+
+58
+00:09:52.681 --> 00:09:58.740
+Elk getal komt uit gepubliceerde modellen en wordt in de automatische tests getoetst aan analytische oplossingen.
+
+59
+00:10:00.340 --> 00:10:08.724
+Niets van wat je hebt gezien is met de hand geanimeerd. Elke simulatie in deze film wordt beeld voor beeld berekend door dezelfde code die op de telefoon draait.
+
+60
+00:10:09.074 --> 00:10:15.666
+Die code test zichzelf bij elke wijziging, en de getallen die je hier ziet zijn dezelfde als die uit de automatische tests komen.
+
+61
+00:10:16.016 --> 00:10:26.384
+Daarom kun je de website openen, op dezelfde knoppen drukken en dezelfde resultaten krijgen. Voor wie het gebruikt komt alles neer op één tik: bellen, hulp vragen of laten weten dat het goed gaat.
+
+62
+00:10:27.984 --> 00:10:39.227
+En het is klaar voor uitrol: een zelf gehoste relay in Docker die de organisatie zelf beheert, een Android-app voor een Bluetooth-baken en wifi-scans, en een goedkoop accessoire voor drones en masten.
+
+63
+00:10:39.577 --> 00:10:44.910
+Dezelfde formaten worden in drie programmeertalen getest, zodat er tussen de onderdelen niets breekt.
+
+64
+00:10:46.510 --> 00:10:56.409
+Alles wordt bij elke wijziging automatisch geverifieerd: driehonderdvijftig kerntests en negenenveertig end-to-end controles in echte browsers, bijna allemaal zonder netwerk.
+
+65
+00:10:56.759 --> 00:11:05.569
+Wat nog ontbreekt, zeggen we eerlijk: veldpilots met fysieke telefoons en reddingsteams, een onafhankelijke beveiligingsaudit en certificering voor openbare aanbesteding.
+
+66
+00:11:07.169 --> 00:11:10.881
+Veiligheid is geen belofte. Het is een keten die je kunt controleren.
+
+67
+00:11:11.231 --> 00:11:15.626
+Berichten zijn end-to-end versleuteld. Ontvangstbewijzen worden ondertekend in een hash-keten.
+
+68
+00:11:15.976 --> 00:11:19.475
+De identiteitssleutel is aan de kaart gebonden en wordt versleuteld geëxporteerd.
+
+69
+00:11:19.825 --> 00:11:25.478
+De kern heeft driehonderdvijftig automatische tests, en het custodieprotocol heeft een eigen suite.
+
+70
+00:11:25.828 --> 00:11:32.911
+Dat bewijst dat de code doet wat de tests controleren. Het bewijst geen veldprestaties, en geen externe audit heeft het gecertificeerd.
+
+71
+00:11:34.511 --> 00:11:44.623
+SENDA is er voor burgers, coördinatoren, politie en hulpdiensten, overheden en iedereen die wil investeren in het idee dat geen enkel bericht verloren gaat.
+
+72
+00:11:44.973 --> 00:11:48.279
+Probeer het nu, zonder iets te installeren, op het adres in beeld.

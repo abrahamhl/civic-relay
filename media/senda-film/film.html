@@ -5,6 +5,7 @@
 <title>SENDA · película M95</title>
 <script src="/senda/vendor/three-0.158.0.min.js"></script>
 <script src="sims.js"></script>
+<script src="film-i18n.js"></script>
 <!--
   Película SENDA v5 / M95 · 1280×720 @ 1.5x DPR (1920×1080) o 720×1280 @ 1.5x DPR (1080×1920 vertical).
   Escenas «call», «drone3d», «arch3d» y «howsim» calculadas con el núcleo real (sims.js).
@@ -237,6 +238,19 @@ body.vertical #brand{left:40px;bottom:18px;font-size:12px}
 .easy.trap{background:var(--c);color:#1c0804;border-color:#ff9a86}
 .easy-foot{display:flex;align-items:center;gap:8px;font:600 11px ui-monospace,monospace;color:var(--m)}
 .easy-foot b{color:var(--e)}
+/* Escena «spainmap»: accidentes en España que motivan SENDA */
+.smap{display:flex;flex-direction:column;gap:8px}
+.smap svg{width:596px;height:282px}
+.smap .land{fill:#0b1a24;stroke:#2b4656;stroke-width:1.4}
+.smap .ev circle.dot{fill:#ff7756}
+.smap .ev circle.ring{fill:none;stroke:#ff7756;stroke-width:1.5}
+.smap .ev.bo circle.dot{fill:#fbbf24}.smap .ev.bo circle.ring{stroke:#fbbf24}
+.smap .ev text{fill:#f2f4f4;font:600 11px Inter,system-ui,sans-serif;paint-order:stroke;stroke:#05090c;stroke-width:3px}
+.smap-list{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.smap-list .dg-card{padding:6px 9px}
+.smap-list .dg-card span{font-size:10.5px;margin-top:1px}
+.smap-list .dg-card b{font-size:13px}.smap-list .dg-card em{font-style:normal;color:#ff7756;font:600 11px ui-monospace,monospace;margin-right:6px}
+.smap-foot{font-size:11px;color:var(--m);margin-top:4px}
 </style>
 </head>
 <body>
@@ -345,6 +359,15 @@ function visualHTML(sc, idx) {
     return `<iframe class="pg" src="${src}" width="640" height="600" title="${T(sc.title)}"></iframe>`;
   }
   if (['call', 'howsim', 'broadcast', 'math_grid', 'cots_bom', 'pbr_radar', 'drone_hunt'].includes(v.kind)) return '<canvas class="c2d" width="640" height="600"></canvas>';
+  if (v.kind === 'spainmap') {
+    const P = (lon, lat) => [(128 + (lon + 9.6) * 0.76 * 34).toFixed(1), ((44.1 - lat) * 34).toFixed(1)];
+    const outline = [[-9.3,43.0],[-8.0,43.7],[-7.0,43.55],[-5.8,43.6],[-4.5,43.4],[-3.0,43.4],[-1.8,43.4],[-1.4,43.0],[0,42.7],[1.5,42.5],[3.2,42.4],[3.2,41.9],[2.2,41.4],[1.0,41.0],[0.5,40.6],[0.0,40.0],[-0.3,39.5],[0.2,38.8],[-0.5,38.3],[-0.8,37.6],[-1.6,37.3],[-2.2,36.7],[-4.4,36.7],[-5.6,36.0],[-6.3,36.8],[-7.4,37.2],[-7.0,38.0],[-7.3,38.9],[-7.0,39.6],[-6.9,40.2],[-6.8,41.0],[-6.2,41.6],[-6.6,41.95],[-8.2,41.9],[-8.9,42.1]].map(([a,b]) => P(a,b).join(',')).join(' ');
+    const evs = v.events.map((e, i) => { const [x, y] = P(e.lon, e.lat); const lx = e.labelLeft ? -9 : 9;
+      const label = e.wide ? "" : `<text x="${+x + lx}" y="${+y + (e.labelBelow ? 18 : -9)}" text-anchor="${e.labelLeft ? 'end' : 'start'}">${T(e.place)}</text>`;
+      return `<g class="ev k${i}${e.wide ? ' bo' : ''}"><circle class="ring" cx="${x}" cy="${y}" r="${e.wide ? 60 : 9}"/><circle class="dot" cx="${x}" cy="${y}" r="${e.wide ? 4 : 5}"/>${label}</g>`; }).join('');
+    const cards = v.events.map((e, i) => `<div class="dg-card k${i}"><b><em>${T(e.date)}</em>${T(e.place)}</b><span>${T(e.lesson)}</span></div>`).join('');
+    return `<div class="diag"><div class="dg-head d0"><span class="dg-kick">${T(v.kick)}</span><span class="dg-tag">${T(v.tag)}</span></div><div class="smap d1"><svg viewBox="0 0 596 282" aria-hidden="true"><polygon class="land" points="${outline}"/>${evs}</svg><div class="smap-list">${cards}</div></div><div class="smap-foot d3">${T(v.foot)}</div></div>`;
+  }
   if (v.kind === 'offline') return dg('No Internet · from second one', 'end-to-end encrypted', 'Every phone carries messages it cannot read.',
     `<div class="off-grid d2">
       <div class="mock"><div class="mock-top"><span>SENDA</span><span class="pill red">OFFLINE</span></div><div class="mock-body"><div class="bubble out">SOS · 4th floor · 3 people</div><div class="sealed"><span class="lock">AES-256-GCM</span><b>Sealed message</b><span>Only the recipient can open it.</span></div><div class="wave"><i></i><i></i><i></i><i></i></div><div class="mock-note">Sent by sound · no server</div></div></div>
@@ -503,6 +526,7 @@ window.seek = (t) => {
     SIMS.draw(SCRIPT.scenes[i].visual.kind, el, slt, d, cue);
     const pg = el.querySelector('iframe.pg'); if (pg) pg.contentWindow?.SENDA_VIZ?.seek(Math.max(0, slt - 0.3));
     const url = el.querySelector('.url'); if (url) { const p = ease((slt - Math.min(1.5, cue(1))) / 0.7); url.style.opacity = p; }
+    el.querySelectorAll('.smap .ev').forEach((g, j) => { const r = g.querySelector('circle.ring'); if (!r) return; const base = g.classList.contains('bo') ? 60 : 9; const ph = (slt * 0.9 + j * 0.17) % 1; r.setAttribute('r', (base * (0.6 + 0.6 * ph)).toFixed(1)); r.style.opacity = String(1 - ph); });
     const hub = el.querySelector('.hub');
     if (hub) {
       const nodes = [...hub.querySelectorAll('.node:not(.core)')]; const svg = hub.querySelector('svg');
@@ -547,6 +571,7 @@ window.seek = (t) => {
   window.__NEED_DRONE = SCRIPT.scenes.some((sc, i) => sceneInSlice(i) && sc.visual?.kind === 'drone3d');
   window.__NEED_ARCH = SCRIPT.scenes.some((sc, i) => sceneInSlice(i) && sc.visual?.kind === 'arch3d');
   build();
+  window.localizeDiagrams?.(document.getElementById('stage'), LANG);
   await SIMS.init();
   SCRIPT.scenes.forEach((sc, i) => {
     if (!sceneInSlice(i)) return;

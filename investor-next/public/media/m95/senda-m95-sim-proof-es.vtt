@@ -10,12 +10,12 @@ Los mensajes van cifrados de extremo a extremo. Los recibos se firman en una cad
 
 3
 00:00:09.407 --> 00:00:12.905
-La clave de identidad est? ligada a la tarjeta y se exporta cifrada.
+La clave de identidad está ligada a la tarjeta y se exporta cifrada.
 
 4
 00:00:13.255 --> 00:00:19.207
-El n?cleo tiene m?s de doscientas sesenta pruebas autom?ticas, y el protocolo de custodia tiene su propia bater?a.
+El núcleo tiene más de doscientas sesenta pruebas automáticas, y el protocolo de custodia tiene su propia batería.
 
 5
 00:00:19.557 --> 00:00:26.619
-Eso demuestra que el c?digo hace lo que comprueban las pruebas. No demuestra su comportamiento en campo, y ninguna auditor?a externa lo ha certificado todav?a.
+Eso demuestra que el código hace lo que comprueban las pruebas. No demuestra su comportamiento en campo, y ninguna auditoría externa lo ha certificado todavía.

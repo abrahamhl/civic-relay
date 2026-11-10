@@ -1,0 +1,9 @@
+{
+  "schema": "senda.evidence-ledger/1",
+  "updated_at": "2026-11-10T02:53:52Z",
+  "entries": [
+    { "id": "GDACS_LIVE_2026_11_10", "status": "LIVE_FETCHED", "artifact": "evidence/senda/osint/gdacs-live-receipt-2026-11-10.json", "fixture": "apps/senda-live/tests/fixtures/gdacs-live-2026-11-10-page1.json", "fixture_sha256": "68b8193e4159b73492606654b94a51ee30d3a7cc368a6025901b07f51f903e4a", "claim": "DATO_REAL_CAPTURADO", "not_proven": "Accuracy of provider assessments; independence from upstream sources" },
+    { "id": "DELIVERY_ASSURANCE_BENCH", "status": "SIMULATED", "artifact": "evidence/senda/delivery-assurance.json", "claim": "SIMULADO", "not_proven": "Field delivery rates; hazard-state effects are planning hypotheses" },
+    { "id": "M96_FILM", "status": "RENDERED", "artifact": "investor-next/public/media/m96/SHA256SUMS.txt", "claim": "VERIFICADO_POR_CODIGO", "not_proven": "Audience comprehension testing" }
+  ]
+}

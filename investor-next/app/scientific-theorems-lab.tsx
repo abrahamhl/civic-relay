@@ -2,6 +2,14 @@
 import { useMemo, useState } from 'react';
 import type { Locale } from './copy';
 import './scientific-theorems-lab.css';
+// Single source of truth: the same tested core that runs offline (packages/senda/src, synced by sync-web).
+import {
+  solveOptimalElevationAngleDeg,
+  computeGraphLaplacianSpectrum,
+  computeDeygoutMultiObstacleDiffraction,
+  computePassiveRadarCrlb,
+  computeAcousticNearUltrasoundBudget,
+} from '../public/senda/core/scientific-theorems-physics.mjs';
 
 interface TheoremDef {
   id: string;
@@ -38,7 +46,7 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
       es: {
         badge: 'LABORATORIO DE FÍSICA MATEMÁTICA Y TELECOMUNICACIONES AVANZADAS',
         title: 'Calibración Científica: La Física y los Teoremas que Hacen Único a SENDA',
-        lead: 'Validación analítica rigurosa frente a catástrofes reales (DANA de Valencia, Bejís, A-12 Arnhem). Selecciona cualquiera de los cinco teoremas para experimentar con las simulaciones, espectros, ondas y parámetros de propagación electromagnética y acústica.',
+        lead: 'Modelos analíticos publicados (Al-Hourani, Fiedler, ITU-R P.526, Cramér-Rao, ISO 9613-1) aplicados a escenarios inspirados en emergencias reales (DANA de Valencia, Bejís, A-12 Arnhem). Son cotas y estimaciones de diseño, pendientes de calibración en campo. Selecciona cualquiera de los cinco teoremas para experimentar con las simulaciones, espectros, ondas y parámetros de propagación electromagnética y acústica.',
         tabs: [
           { id: 'T1_A2G', tag: 'TEOREMA 1', title: 'Física A2G y Altitud Óptima', shortDesc: 'Al-Hourani / ITU-R P.1410' },
           { id: 'T2_FIEDLER', tag: 'TEOREMA 2', title: 'Conectividad Espectral λ₂(L)', shortDesc: 'Autovector de Fiedler' },
@@ -56,7 +64,7 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
       en: {
         badge: 'ADVANCED MATHEMATICAL PHYSICS & TELECOM RESEARCH LAB',
         title: 'Scientific Calibration: The Mathematical Physics Making SENDA Unique',
-        lead: 'Rigorous analytical validation grounded in documented catastrophic events (Valencia DANA floods, Bejís wildfire, A-12 Arnhem collision). Explore interactive waveforms, spectra, and propagation bounds across the five core theorems.',
+        lead: 'Published analytical models (Al-Hourani, Fiedler, ITU-R P.526, Cramér-Rao, ISO 9613-1) applied to scenarios inspired by real emergencies (Valencia DANA floods, Bejís wildfire, A-12 Arnhem). These are design bounds and estimates, pending field calibration. Explore interactive waveforms, spectra, and propagation bounds across the five core theorems.',
         tabs: [
           { id: 'T1_A2G', tag: 'THEOREM 1', title: 'A2G Physics & Optimal Altitude', shortDesc: 'Al-Hourani / ITU-R P.1410' },
           { id: 'T2_FIEDLER', tag: 'THEOREM 2', title: 'Spectral Connectivity λ₂(L)', shortDesc: 'Fiedler Eigenvector Gradient' },
@@ -74,7 +82,7 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
       nl: {
         badge: 'GEAVANCEERD MATHEMATISCHE FYSICA & TELECOM LABORATORIUM',
         title: 'Wetenschappelijke Kalibratie: De Fysica en Stellingen die SENDA Uniek Maken',
-        lead: 'Strikte analytische validatie gebaseerd op echte rampen (Valencia DANA, natuurbrand Bejís, A-12 kettingongeval). Experimenteer met interactieve golfvormen, spectra en propagatiemodellen over de vijf kernstellingen.',
+        lead: 'Gepubliceerde analytische modellen (Al-Hourani, Fiedler, ITU-R P.526, Cramér-Rao, ISO 9613-1) toegepast op scenario’s geïnspireerd door echte rampen (Valencia DANA, natuurbrand Bejís, A-12). Ontwerpgrenzen en schattingen, nog te kalibreren in het veld. Experimenteer met interactieve golfvormen, spectra en propagatiemodellen over de vijf kernstellingen.',
         tabs: [
           { id: 'T1_A2G', tag: 'STELLING 1', title: 'A2G-Fysica & Optimale Hoogte', shortDesc: 'Al-Hourani / ITU-R P.1410' },
           { id: 'T2_FIEDLER', tag: 'STELLING 2', title: 'Spectrale Connectiviteit λ₂(L)', shortDesc: 'Fiedler-Eigenvector' },
@@ -92,7 +100,7 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
     }[locale] ?? {
       badge: 'ADVANCED MATHEMATICAL PHYSICS & TELECOM RESEARCH LAB',
       title: 'Scientific Calibration: The Mathematical Physics Making SENDA Unique',
-      lead: 'Rigorous analytical validation grounded in documented catastrophic events.',
+      lead: 'Published analytical models applied to emergency scenarios; design bounds pending field calibration.',
       tabs: [],
       tableT: '',
       thArea: '',
@@ -106,12 +114,12 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
   // Calculations for Theorem 1
   const a2gCalculations = useMemo(() => {
     const envs = {
-      SUBURBAN: { a: 4.88, b: 0.43, etaLos: 0.1, etaNlos: 21.0, thetaOpt: 20.34 },
-      URBAN: { a: 9.61, b: 0.16, etaLos: 1.0, etaNlos: 20.0, thetaOpt: 42.44 },
-      DENSE_URBAN: { a: 12.08, b: 0.11, etaLos: 1.6, etaNlos: 23.0, thetaOpt: 54.62 },
-      CANYON_RUBBLE: { a: 27.23, b: 0.08, etaLos: 2.3, etaNlos: 34.0, thetaOpt: 75.52 },
+      SUBURBAN: { a: 4.88, b: 0.43, etaLos: 0.1, etaNlos: 21.0 },
+      URBAN: { a: 9.61, b: 0.16, etaLos: 1.0, etaNlos: 20.0 },
+      DENSE_URBAN: { a: 12.08, b: 0.11, etaLos: 1.6, etaNlos: 23.0 },
+      CANYON_RUBBLE: { a: 27.23, b: 0.08, etaLos: 2.3, etaNlos: 34.0 },
     };
-    const cur = envs[envType];
+    const cur = { ...envs[envType], thetaOpt: solveOptimalElevationAngleDeg(envType) };
     const optAltitudeM = Math.round(radiusM * Math.tan((cur.thetaOpt * Math.PI) / 180));
 
     // Current elevation
@@ -141,78 +149,62 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
     };
   }, [envType, radiusM, hoverAltitudeM]);
 
-  // Calculations for Theorem 2
+  // Calculations for Theorem 2 — real Laplacian spectrum of two 4-node clusters joined by a
+  // weak 0.05 link, with or without a drone relay node bridging them.
   const fiedlerCalculations = useMemo(() => {
-    const fiedlerDisconnected = 0.052;
-    const fiedlerBridged = 0.842;
-    const cheegerBound = droneBridgeInjected ? fiedlerBridged / 2 : fiedlerDisconnected / 2;
+    const n = droneBridgeInjected ? 9 : 8;
+    const A: number[][] = Array.from({ length: n }, () => Array(n).fill(0));
+    const link = (i: number, j: number, w: number) => { A[i][j] = w; A[j][i] = w; };
+    for (const base of [0, 4]) for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) link(base + i, base + j, 1);
+    link(3, 4, 0.05);
+    if (droneBridgeInjected) { link(8, 1, 0.8); link(8, 2, 0.8); link(8, 5, 0.8); link(8, 6, 0.8); }
+    const res = computeGraphLaplacianSpectrum(A);
+    const lambda2 = res.fiedlerValue;
+    const healthy = lambda2 >= 0.5;
     return {
-      lambda2: droneBridgeInjected ? fiedlerBridged : fiedlerDisconnected,
-      cheegerBound: Math.round(cheegerBound * 1000) / 1000,
-      status: droneBridgeInjected ? 'HIPER-RESILIENTE (Sin cuello de botella)' : 'VULNERABLE (Corte inminente)',
-      statusColor: droneBridgeInjected ? '#34d399' : '#ff5b6e',
+      lambda2: Math.round(lambda2 * 1000) / 1000,
+      cheegerBound: Math.round((lambda2 / 2) * 1000) / 1000,
+      status: healthy ? 'ROBUSTA (sin cuello de botella dominante)' : 'VULNERABLE (cuello de botella)',
+      statusColor: healthy ? '#34d399' : '#ff5b6e',
     };
   }, [droneBridgeInjected]);
 
-  // Calculations for Theorem 3
+  // Calculations for Theorem 3 — 5 km, 868 MHz, Tx/Rx at 100 m, adjustable main ridge.
   const deygoutCalculations = useMemo(() => {
-    const losHeight = 100;
-    const hEff = ridgeHeightM - losHeight;
-    const wavelength = 299792458 / 868e6;
-    const nu = hEff * Math.sqrt((2.0 * 5000) / (wavelength * 2500 * 2500));
-    const inner = Math.sqrt((nu - 0.1) * (nu - 0.1) + 1.0) + nu - 0.1;
-    const mainLoss = 6.9 + 20.0 * Math.log10(Math.max(1e-6, inner));
-
-    const rightLoss = 4.72;
-    const deygoutLoss = mainLoss + rightLoss * 0.7071;
-    const epsteinLoss = mainLoss + rightLoss;
-    const overestimationDb = epsteinLoss - deygoutLoss;
-
+    const res = computeDeygoutMultiObstacleDiffraction(
+      [
+        { distanceM: 1200, elevationM: 95 },
+        { distanceM: 2500, elevationM: ridgeHeightM },
+        { distanceM: 3800, elevationM: 120 },
+      ],
+      100, 100, 5000, 868e6,
+    );
+    const main = res.obstacles[res.mainObstacleIndex] ?? res.obstacles[1];
     return {
-      nu: Math.round(nu * 100) / 100,
-      deygoutLossDb: Math.round(deygoutLoss * 10) / 10,
-      epsteinLossDb: Math.round(epsteinLoss * 10) / 10,
-      overestimationDb: Math.round(overestimationDb * 10) / 10,
+      nu: main.nu ?? 0,
+      deygoutLossDb: Math.round(res.lossDeygoutDb * 10) / 10,
+      epsteinLossDb: Math.round(res.lossEpsteinPetersonDb * 10) / 10,
+      bracketDb: Math.round(Math.abs(res.epsteinOverestimationDb) * 10) / 10,
     };
   }, [ridgeHeightM]);
 
   // Calculations for Theorem 4
   const pbrCalculations = useMemo(() => {
-    const B = radarBandwidthMhz * 1e6;
-    const snrLin = Math.pow(10, radarSnrDb / 10);
-    const betaRms = (Math.PI * B) / Math.sqrt(3.0);
-    const tRms = (Math.PI * integrationTimeSec) / Math.sqrt(3.0);
-
-    const sigmaTau = 1.0 / (Math.sqrt(8.0) * Math.PI * betaRms * Math.sqrt(snrLin));
-    const sigmaRangeM = 299792458 * sigmaTau;
-
-    const lambda = 299792458 / 650e6;
-    const sigmaFd = 1.0 / (Math.sqrt(8.0) * Math.PI * tRms * Math.sqrt(snrLin));
-    const sigmaVelMps = (lambda / 2.0) * sigmaFd;
-
-    return {
-      sigmaRangeM: Math.round(sigmaRangeM * 100) / 100,
-      sigmaVelMps: Math.round(sigmaVelMps * 1000) / 1000,
-    };
+    const res = computePassiveRadarCrlb(radarBandwidthMhz * 1e6, integrationTimeSec, radarSnrDb, 650e6);
+    return { sigmaRangeM: res.sigmaRangeM, sigmaVelMps: res.sigmaVelocityMps };
   }, [radarBandwidthMhz, integrationTimeSec, radarSnrDb]);
 
   // Calculations for Theorem 5
   const acousticCalculations = useMemo(() => {
-    const alphaAtm = 0.58;
-    const r0 = 0.1;
-    const rxSpl = 82.0 - 20 * Math.log10(Math.max(1.0, acousticDistM / r0)) - alphaAtm * acousticDistM;
-    const hfNoise = Math.max(20.0, ambientNoiseDba - 42.0);
-    const snrDb = rxSpl - hfNoise;
-    const snrLin = Math.pow(10, snrDb / 10);
-    const capacityBps = 2000 * Math.log2(1.0 + Math.max(0.01, snrLin));
-    const txTimeSec = (104 * 8) / 500.0;
-
+    const res = computeAcousticNearUltrasoundBudget(acousticDistM, ambientNoiseDba, 80);
+    const per = res.packetErrorRate;
     return {
-      rxSplDb: Math.round(rxSpl * 10) / 10,
-      hfNoiseDb: Math.round(hfNoise * 10) / 10,
-      snrDb: Math.round(snrDb * 10) / 10,
-      capacityBps: Math.round(capacityBps),
-      txTimeSec: Math.round(txTimeSec * 100) / 100,
+      rxSplDb: Math.round(res.receivedSplDb * 10) / 10,
+      hfNoiseDb: Math.round(res.hfNoiseFloorSplDb * 10) / 10,
+      snrDb: Math.round(res.snrDb * 10) / 10,
+      capacityBps: res.shannonCapacityBps,
+      txTimeSec: res.transmissionTimeSec,
+      perLabel: per < 1e-9 ? '< 10⁻⁹' : per >= 0.5 ? '≈ 1 (enlace caído)' : per.toExponential(1),
     };
   }, [acousticDistM, ambientNoiseDba]);
 
@@ -255,7 +247,7 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
               {activeTab === 'T4_PBR' && 'RENDER 4 · SUPERFICIE AMBIGÜEDAD CAF DE RADAR PASIVO'}
               {activeTab === 'T5_ACOUSTIC' && 'RENDER 5 · ESPECTRO Y OSCILOSCOPIO ULTRA-ACÚSTICO (18-20 kHz)'}
             </span>
-            <span style={{ color: '#34d399' }}>64-BIT PRECISION</span>
+            <span style={{ color: '#34d399' }}>MOTOR @senda/core (mismo código que los tests)</span>
           </div>
 
           {/* SVG Diagram based on active tab */}
@@ -487,10 +479,10 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
               <>
                 <h4>📐 CASCADA DE DIFRACCIÓN ITU-R P.526</h4>
                 <div className="stl-formula-box">
-                  L_Deygout = J(ν_m) + J(ν_s1)·√(d_s1/d_m) + J(ν_s2)·√((D - d_s2)/(D - d_m))
+                  L_Deygout = J(ν_p) + J(ν_t) + J(ν_r), &nbsp; J(ν) = 6.9 + 20·log₁₀(√((ν−0.1)²+1) + ν − 0.1)
                 </div>
                 <p className="stl-formula-desc">
-                  Elimina el error de doble sombra sistemático de Epstein-Peterson escalando geométricamente los obstáculos secundarios.
+                  Construcción de 3 aristas con curvatura terrestre k = 4/3. Epstein-Peterson tiende a infraestimar y Deygout a sobrestimar con crestas próximas: juntos acotan la pérdida real.
                 </p>
               </>
             )}
@@ -498,10 +490,10 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
               <>
                 <h4>📐 LÍMITE INFERIOR DE CRAMÉR-RAO (CRLB)</h4>
                 <div className="stl-formula-box">
-                  σ_R ≥ c / [2√2·π·β_rms·√SNR], &nbsp; σ_v ≥ λ√3 / [4π²·T_int·√SNR]
+                  σ_R ≥ c / [2√2·π·β_rms·√SNR], &nbsp; β_rms = B/(2√3); &nbsp; σ_ṙ ≥ λ / [2√2·π·T_rms·√SNR], &nbsp; T_rms = T/(2√3)
                 </div>
                 <p className="stl-formula-desc">
-                  Resolución física límite en radar pasivo. Con DVB-T de 7.61 MHz, se logra precisión submétrica en distancia para micro-drones.
+                  Cota teórica (Kay, 1993) sobre el rango biestático con la SNR del pico de la CAF. Con DVB-T de 7,61 MHz y 15 dB la precisión es de orden métrico; la resolución (c/B) es de unos 39 m.
                 </p>
               </>
             )}
@@ -512,7 +504,7 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
                   C = B · log₂(1 + SNR), &nbsp; L_p(r) = 82 - 20·log₁₀(r/0.1) - α_atm·r
                 </div>
                 <p className="stl-formula-desc">
-                  Atenuación atmosférica ISO 9613-1 combinada con decaimiento de ruido natural en 18–20 kHz para garantizar handshakes sin radio.
+                  16-FSK no coherente (125 baudios, 500 bit/s) + RS(104,80). Hipótesis declaradas: altavoz 82 dB SPL a 0,1 m y ruido en banda = dBA ambiente − 42 dB (a medir en campo).
                 </p>
               </>
             )}
@@ -658,8 +650,8 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
                   <span>{deygoutCalculations.epsteinLossDb} dB</span>
                 </div>
                 <div className="stl-kpi-card" style={{ gridColumn: 'span 2' }}>
-                  <b>Error Evitado (Margen Térmico Ganado)</b>
-                  <span className="highlight">+{deygoutCalculations.overestimationDb} dB recuperados</span>
+                  <b>Horquilla entre métodos</b>
+                  <span className="highlight">{deygoutCalculations.bracketDb} dB</span>
                 </div>
               </>
             )}
@@ -671,13 +663,13 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
                   <span className="highlight">{pbrCalculations.sigmaRangeM} m</span>
                 </div>
                 <div className="stl-kpi-card">
-                  <b>Precisión Doppler σ_v</b>
+                  <b>Precisión velocidad biestática σ_ṙ</b>
                   <span>{pbrCalculations.sigmaVelMps} m/s</span>
                 </div>
                 <div className="stl-kpi-card" style={{ gridColumn: 'span 2' }}>
                   <b>Modo Detección</b>
                   <span className="highlight" style={{ fontSize: 13 }}>
-                    SILENCIOSO / ANTI-EW (SDR COTS 25 €)
+                    PASIVO (receptor SDR COTS)
                   </span>
                 </div>
               </>
@@ -699,7 +691,7 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
                 </div>
                 <div className="stl-kpi-card">
                   <b>Tasa Error Trama</b>
-                  <span className="highlight">&lt; 10⁻⁷ (RS 104,80)</span>
+                  <span className="highlight">{acousticCalculations.perLabel} (RS 104,80)</span>
                 </div>
               </>
             )}
@@ -725,7 +717,7 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
               <td>Bloqueo urbano por edificios</td>
               <td><code>tan(θ*) = K·b·P(1-P)</code></td>
               <td>Valencia DANA / Al-Hourani</td>
-              <td style={{ color: '#34d399' }}>Δh* &lt; 0.1 m (Newton)</td>
+              <td style={{ color: '#34d399' }}>Raíz numérica (Newton); modelo estadístico sin calibrar en campo</td>
             </tr>
             <tr>
               <td><b>Topología Espectral</b></td>
@@ -737,23 +729,23 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
             <tr>
               <td><b>Difracción Orogáfica</b></td>
               <td>Crestas montañosas encadenadas</td>
-              <td><code>L = J_m + ∑J_s·√(d_s/d_m)</code></td>
-              <td>Incendio Bejís vs Epstein-Peterson</td>
-              <td style={{ color: '#34d399' }}>Evita error +7.5 dB</td>
+              <td><code>L = J(ν_p) + J(ν_t) + J(ν_r)</code></td>
+              <td>Perfil tipo Bejís · Deygout vs Epstein-Peterson</td>
+              <td style={{ color: '#34d399' }}>Horquilla entre métodos (cota superior/inferior)</td>
             </tr>
             <tr>
               <td><b>Radar Pasivo PBR</b></td>
               <td>Localización pasiva de drones</td>
               <td><code>CAF S(τ, f_d) + CRLB</code></td>
               <td>DVB-T comercial / Micro-UAV</td>
-              <td style={{ color: '#34d399' }}>σ_R = 0.43 m · σ_v = 0.014 m/s</td>
+              <td style={{ color: '#34d399' }}>Cota CRLB: σ_R ≈ 2,7 m · σ_ṙ ≈ 0,13 m/s (DVB-T, 15 dB, 0,25 s)</td>
             </tr>
             <tr>
               <td><b>Enlace Acústico</b></td>
               <td>Llamadas en apagón total</td>
               <td><code>C = B·log₂(1+SNR) (19 kHz)</code></td>
               <td>Ruido extremo tormenta 85 dBA</td>
-              <td style={{ color: '#34d399' }}>P_FER &lt; 10⁻⁷ · 1.66 s</td>
+              <td style={{ color: '#34d399' }}>P_FER calculada (16-FSK + RS) · 1,66 s; enlace útil a pocos metros</td>
             </tr>
           </tbody>
         </table>

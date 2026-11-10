@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: '22'
       - name: Núcleo SENDA (cifrado, módem acústico, DTN, enrutador, zonas, rescate)
-        run: node --test packages/senda/tests/*.test.mjs
+        run: node --test packages/senda/tests/*.test.mjs packages/senda/tests/defense/*.test.mjs
       - name: Relé por Internet (Node, sin dependencias)
         run: node --test packages/senda-relay/tests/*.test.mjs
       - name: Imagen Docker del relé (construye, arranca sin privilegios, sincroniza y persiste)

@@ -41,6 +41,7 @@ export function correlateGdacsCatalogs(gdacs, usgs, eonet) {
     const rule = OSINT_RULES[e.eventType];
     const other = sources[e.eventType];
     const candidates = [];
+    const sameUpstream = Boolean(rule && Array.isArray(e.sameUpstreamCatalogs) && e.sameUpstreamCatalogs.includes(rule.catalog));
     if (rule && other && !['UNAVAILABLE', 'STALE_SNAPSHOT'].includes(other.status) &&
         !['UNAVAILABLE', 'STALE_SNAPSHOT'].includes(gdacs.status)) {
       for (const ref of other.observations.slice(0, 200)) {
@@ -54,7 +55,8 @@ export function correlateGdacsCatalogs(gdacs, usgs, eonet) {
           distanceKm: Math.round(d * 100) / 100,
           timeDifferenceMinutes: Math.round(t),
           referenceUrl: typeof ref.url === 'string' ? ref.url : null,
-          relation: 'SPATIOTEMPORAL_CANDIDATE_ONLY',
+          // Si GDACS declara ese mismo catálogo como origen, la coincidencia es el MISMO dato.
+          relation: sameUpstream ? 'SAME_UPSTREAM_RECORD' : 'SPATIOTEMPORAL_CANDIDATE_ONLY',
           isIndependentVerification: false
         });
       }
@@ -67,8 +69,9 @@ export function correlateGdacsCatalogs(gdacs, usgs, eonet) {
       crossCatalogStatus: rule ? (!other || ['UNAVAILABLE', 'STALE_SNAPSHOT'].includes(other.status) ||
         ['UNAVAILABLE', 'STALE_SNAPSHOT'].includes(gdacs.status) ?
         'COMPARISON_SOURCE_UNAVAILABLE_OR_STALE' :
-        candidates.length ? 'PROXIMITY_CANDIDATE_NOT_VERIFIED' : 'NO_NEARBY_CATALOG_CANDIDATE') :
+        candidates.length ? (sameUpstream ? 'SAME_UPSTREAM_NOT_CORROBORATION' : 'PROXIMITY_CANDIDATE_NOT_VERIFIED') : 'NO_NEARBY_CATALOG_CANDIDATE') :
         'NOT_COMPARABLE_BY_AVAILABLE_SOURCES',
+      sourceDependency: e.sourceDependency ?? 'SOURCE_DEPENDENCY_UNKNOWN',
       independentlyVerified: false,
       isSendaAlert: false,
     };

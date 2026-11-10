@@ -7,7 +7,7 @@ import {
   computeAerialPhotogrammetryParams,
   computeAntiJammingMargin,
   A2G_ENVIRONMENTS,
-} from '@senda/core';
+} from '@senda/core/defense';
 import { toUtm, fromUtm } from '../../../../packages/senda/src/utm.mjs';
 
 /**

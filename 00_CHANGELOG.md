@@ -1,5 +1,121 @@
 # Changelog
 
+## SENDA v0.28 · 10-11-2026 · Modo administrador / 112 (activación de área) y guía de prueba real
+
+**Entrada (fundador):**
+- Poder probar SENDA hoy con otra persona sin SIM ni Internet, sabiendo canal y formato.
+- Una reserva de 1 GB.
+- Un modo administrador tipo 112 que active SENDA en una zona, vea toda la superficie (satélites, meteorología, cámaras, coches, sensores), fusione y ordene evacuar un edificio.
+
+**Procesamiento:**
+- **Nuevo `packages/senda/src/area-activation.mjs`:**
+  - Registro de 16 fuentes de la superficie, cada una con su vía legal: abierta, con clave, emisión pública, teléfono SENDA con consentimiento o convenio.
+  - `scanSurface`: inventario del perímetro con distancias, frescura, k-anonimato de teléfonos y huecos declarados.
+  - `authorizeSurfaceRequest`: rechaza con motivo legal lo intrusivo (controlar coches ajenos, leer equipos por radio, cámaras privadas, rastrear personas), pide convenio o clave cuando toca y solo admite órdenes con credencial institucional.
+  - `fuseHazardEvidence`: fusión en log-odds que cuenta una sola vez las fuentes del mismo linaje.
+  - `evacuationDecision`: tiempo de llegada del peligro frente al tiempo de salida, decisión y orden firmable para `remote-command.mjs`.
+- **Nueva guía `docs/field/PRUEBA_CON_TU_HERMANO.md`:** qué funciona hoy sin SIM (sonido, código, chat y voz por Wi-Fi local), qué necesita app nativa (Bluetooth), qué necesita un nodo LoRa (kilómetros) y qué no es físicamente posible (comunicar a distancia sin ningún puente).
+- **Reserva de 1 GB:** ya existía (`net-reserve.mjs`, `/senda/reserva`). Se explica su límite físico (un giga guardado no crea cobertura) y las tres vías reales para convertir la reserva en conexión.
+
+**Validación:** núcleo 396/396 (5 tests nuevos).
+
+**Siguiente paso de mayor impacto:** puente SENDA ↔ Meshtastic por Web Bluetooth, para probar a kilómetros sin SIM con dos nodos LoRa de ~30–40 €.
+
+— Claude Code
+
+## SENDA v0.27 · 10-11-2026 · Exposición de personas y avisos adaptados a la densidad real
+
+**Entrada (fundador):** usar cuánta gente y cuántos vehículos hay en cada zona, como el tráfico de Google Maps o Waze, para que las alertas tengan en cuenta el tráfico real y se reduzcan los tiempos. Conseguir el máximo de datasets de población.
+
+**Procesamiento:**
+- **Nuevo `packages/senda/src/exposure.mjs`**:
+  - Proyección EPSG:3035 exacta.
+  - Residentes por radio sobre la rejilla oficial GISCO 2021.
+  - Exposición en tramo por la relación fundamental del tráfico y densidad a partir de la ocupación.
+  - Lectores de Digitraffic TMS e Informo Madrid.
+  - Plan de aviso adaptativo: zona de peligro con onda de choque LWR, alcance exacto de la cadena de radio en un proceso de Poisson 1D, saltos y retardos calculados en vez de fijos.
+  - Priorización por personas afectadas esperadas.
+- **Datos reales:**
+  - Extracto español de la rejilla Eurostat de 1 km² (111.170 celdas, 47,21 M habitantes) con su procedencia.
+  - Recibo en vivo de Digitraffic y Madrid: 988 estaciones y sentidos; la política fija de 3 saltos se queda corta en el 41 %.
+- **Errores detectados y corregidos durante el desarrollo:**
+  - La métrica «alcanzar a todos» bajaba al subir la penetración. Se sustituyó por la fracción esperada alcanzada, que sí crece.
+  - Una cuadratura sesgada (13 puntos) se corrigió hasta coincidir con Monte Carlo.
+- **Bloqueo registrado:** el servidor del MITMA (movilidad con teléfonos) rechaza el acceso automatizado. No se ha eludido.
+- **Documentación:** `docs/science/EXPOSURE_AND_ADAPTIVE_WARNINGS.md`.
+
+**Validación:** núcleo 391/391.
+
+— Claude Code
+
+## SENDA v0.26 · 10-11-2026 · Motor de Garantía de Entrega: fallos correlacionados, física, aprendizaje bayesiano y decisión certificada
+
+**Entrada (fundador):** hacer la parte física, científica y de computación más avanzada, difícil de replicar e innovadora.
+
+**Procesamiento:**
+- **Nuevo `packages/senda/src/delivery-assurance.mjs`**, exportado desde `@senda/core`:
+  - Probabilidad exacta de entrega con fallos de causa común (mezcla de estados de peligro + Poisson-binomial agrupada).
+  - Física de lluvia (P.838-3) más Nakagami-m convertida en fiabilidad por canal.
+  - Posterior Beta-Binomial alimentado por recibos, con planificación por cota inferior creíble.
+  - Optimizador multiarranque con movimientos de bloque, búsqueda local iterada y reducción por simetría exacta.
+  - Certificado SHA-256 canónico de cada plan.
+- **Auditoría del planificador existente:** promete un 99,49 % y entrega un 96,09 % con fallos correlacionados. El motor nuevo da un 98,98 % a 0 € (3,8× menos fallos) y un 99,99 % con 3 € de Iridium; en el peor estado (apagón + tormenta), 90,9 % → 97,6 % → 99,98 %. El precio es más tiempo de aire (22 fragmentos frente a 6), declarado.
+- **Durante el desarrollo, los tests contra el óptimo exacto destaparon** que el primer optimizador voraz se quedaba hasta 32 puntos por debajo del óptimo. Se corrigió con movimientos de bloque y búsqueda local iterada hasta lograr el óptimo exacto en 60 de 60 instancias.
+- **Corrección del pipeline de vídeo:** `render.mjs` leía las cifras de pruebas de un esquema antiguo de `estado.json` y mostraba 266 en lugar de 350. Las dos películas M96 se volvieron a renderizar.
+- **Documentación:** `docs/science/DELIVERY_ASSURANCE.md`. Evidencia reproducible en `evidence/senda/delivery-assurance.json`.
+
+**Validación:** `node --test packages/senda/tests/*.test.mjs packages/senda/tests/defense/*.test.mjs` → 382/382.
+
+— Claude Code
+
+## SENDA v0.25 · 10-11-2026 · Bóveda de defensa aislada y película promocional completa M96
+
+**Entrada (fundador):**
+- Mantener la parte militar tal cual, pero categorizada y aislada en una bóveda aparte, en el código y en la web.
+- Película promocional completa: qué resuelve SENDA, los accidentes en España que lo motivan, cómo funciona y todas sus funciones, reutilizando y actualizando el material ya publicado.
+
+**Procesamiento:**
+- **Bóveda de código (`packages/senda/src/defense/`, `@senda/core/defense`):** `civilian-uav-mesh-radar`, `uav-tactical-science`, `cots-rf-tactical` y `acoustic-beamforming-survival` se mueven sin cambios de contenido. El índice civil deja de reexportarlos. Los tests pasan a `tests/defense/` y se añade `vault-isolation.test.mjs`: ninguna función de defensa se filtra al índice civil y ningún módulo civil importa de la bóveda. `sync-web` publica en `public/senda/core/defense/`, la paridad lo verifica y el CI ejecuta la bóveda.
+- **Bóveda web (`/defense`, `/es/defense`, `/nl/defense`, `noindex`):** aviso de doble uso y marco UE (Reglamentos 2021/821, 2019/945 y 2019/947). Contiene los laboratorios antidrón y el material audiovisual de defensa (telediario de radar antidrón, vídeo del modo inversionista y defensa, reels de drones, defensa y centinela), retirados de la portada y de /science. `check:locales` comprueba que nada de defensa aparece en las superficies civiles.
+- **Película M96 (`media/senda-film/m96-promo.json`, generada por `build-m96-promo.mjs`):** 29 escenas, unos 12 min. Escenas nuevas: origen del proyecto, mapa animado de accidentes en España (escena `spainmap`), el hueco que nadie cubre y física con cotas honestas. Se reciclan 21 escenas de M95 y 4 de la ruta. Locución ES (`ef_dora`) y EN (`bf_emma`) con subtítulos ES/EN/NL. Fuentes en `docs/video/M96_PROMO_SOURCES.md`.
+- **Calidad del material existente:** los diagramas de la película se traducen al español (`film-i18n.js`); antes salían en inglés en la versión española. Se reparan los acentos corrompidos (`n?cleo`, `m?s`…) en `m95-film.json`, `m95-sim-proof.json` y sus VTT publicados. `estado.json` se regenera ejecutando las pruebas (núcleo civil 350/350, antes decía 266).
+
+**Validación:** ver el PR #31.
+
+— Claude Code
+
+## SENDA v0.24 · 10-11-2026 · Auditoría científica: corrección de errores físicos y de afirmaciones públicas antes de financiación
+
+**Entrada (fundador):**
+- Cerrar las brechas del handoff de Antigravity (misión 10) y todo lo que no esté al nivel exigible para pedir financiación esta semana.
+- Nota: la rama `feat/senda-scientific-mission-10-20261109` (HEAD `1391a5e`, `rail-advanced-safety.mjs`, cierres P0) **no está en GitHub ni en producción**; esta entrada audita y corrige lo que sí está publicado (`feat/senda-master-integration-20261109`, `62d2b74`).
+
+**Procesamiento:**
+- **`telecom-mathematical-physics.mjs`:**
+  - DTN epidémico: la tasa de contactos es por nodo (β = λ/(N−1)); se añade la capacidad de carga del modelo SIS (I* = N − μ/β). Los percentiles inalcanzables devuelven `Infinity` en lugar de un tiempo ficticio. Validado contra la integración RK4 de la EDO.
+  - Deygout: motor compartido de 3 aristas con curvatura terrestre k = 4/3 y umbral J(ν) a −0,78. Se elimina un comentario que anunciaba una corrección que no se aplicaba.
+  - Lluvia ITU-R P.838-3: tabla de coeficientes 1–40 GHz con interpolación log-log en lugar de 5 escalones (antes sobrestimaba un 50 % a 12 GHz).
+  - PLL LEO: ancho de banda derivado de θ_e = 2π·Ḟ/ω_n² en lugar de una regla sin fuente.
+- **`scientific-theorems-physics.mjs`:**
+  - Cota de Cramér-Rao del radar pasivo: el ancho de banda RMS era πB/√3 en vez de B/(2√3) y subestimaba σ en un factor 2π. Con DVB-T a 15 dB, **σ_R pasa de "0,43 m submétrico" a 2,7 m**. La velocidad se reporta como biestática (λ·σ_f).
+  - Enlace acústico: la tasa de error de trama pasa de un escalón (1e-7 si SNR > 0) a 16-FSK no coherente (125 baudios, coherente con 2 kHz) más RS(104,80) exacta. Se declaran las hipótesis.
+  - Jacobi: converge por tolerancia (antes se cortaba en 150 rotaciones) y simetriza la matriz.
+  - Deygout frente a Epstein-Peterson: se elimina el factor √(d/D) inventado. EP se calcula de verdad; ahora ambos se acotan entre sí.
+  - Se aclara que los "Teoremas" son resultados publicados y que `CANYON_RUBBLE` es un proxy no validado.
+- **Otros:** subcardioide Q = 2,06 (antes 1,43); componente sobre la bisectriz en el Doppler biestático; límite de 120 m de la categoría abierta de EASA; el estroboscopio deja de declararse "sin riesgo ocular" y queda como hipótesis sin ensayo.
+- **Web (`scientific-theorems-lab.tsx`):** usa el núcleo probado (`public/senda/core`) en lugar de constantes fijas (λ₂ = 0,052/0,842, pérdida de 4,72 dB, θ* tabulado). Se corrigen los textos: "precisión submétrica", "P_FER < 10⁻⁷" y "validación frente a catástrofes reales" pasan a "modelos analíticos pendientes de calibración".
+
+**Validación:**
+- `node --test packages/senda/tests/*.test.mjs`: `370/370` pass (4 tests nuevos contra soluciones analíticas).
+- `node --test packages/senda/tests-adversarial/*.test.mjs`: `11/11` pass.
+- `node --test investor-next/tests/*.test.mjs`: `108/108` pass; `npm run type-check`: 0 errores; `npm run build`: 14 páginas; `check:locales`: pass.
+
+**Pendiente (decisión del fundador):**
+- Módulo de señuelos Open Drone ID y estroboscopio anti-dron (`civilian-uav-mesh-radar.mjs` + `civilian-radar-defense-lab.tsx`, publicado en la página de inversores): emitir Remote ID falso no es legal en la UE y compromete la elegibilidad en convocatorias civiles.
+- Push de la misión 10 de Antigravity para auditar `rail-advanced-safety.mjs`.
+
+— Claude Code · auditoría científica
+
 ## SENDA v0.23 · 08-11-2026 · Suite de vídeos finales de presentación M95 (V1–V5, 1080p, voz en inglés `bf_emma`, subtítulos ES/EN/NL y evidencia de release)
 
 **Entrada (fundador):**
