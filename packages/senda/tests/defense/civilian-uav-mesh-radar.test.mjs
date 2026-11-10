@@ -7,7 +7,7 @@ import {
   detectFiberOpticSilentDrone,
   generatePhantomUavDecoys,
   computeOpticalCameraDisruptionParams,
-} from '../src/civilian-uav-mesh-radar.mjs';
+} from '../../src/defense/civilian-uav-mesh-radar.mjs';
 
 test('Firma Acústica de Rotores: cálculo exacto de BPF y armónicos', () => {
   const bpf = computeBladePassingFrequency(5400, 3);

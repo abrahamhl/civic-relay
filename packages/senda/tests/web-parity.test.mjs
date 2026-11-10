@@ -12,6 +12,10 @@ test('la app web usa EXACTAMENTE el núcleo probado (sin copias divergentes)', (
     assert.ok(existsSync(resolve(web, 'core', f)), `falta core/${f} en la app; ejecuta pnpm --filter @senda/core sync-web`);
     assert.equal(readFileSync(resolve(web, 'core', f), 'utf8'), readFileSync(resolve(src, f), 'utf8'), `core/${f} difiere del núcleo probado`);
   }
+  for (const f of readdirSync(resolve(src, 'defense')).filter((x) => x.endsWith('.mjs'))) {
+    assert.equal(readFileSync(resolve(web, 'core/defense', f), 'utf8'), readFileSync(resolve(src, 'defense', f), 'utf8'), `core/defense/${f} difiere de la bóveda`);
+    if (f !== 'index.mjs') assert.ok(!existsSync(resolve(web, 'core', f)), `core/${f}: módulo de defensa fuera de la bóveda`);
+  }
 });
 
 test('el service worker precarga todos los módulos que la app importa', () => {

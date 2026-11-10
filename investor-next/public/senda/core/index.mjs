@@ -55,9 +55,6 @@ export * from './scenario-engine.mjs';
 export * from './scientific-evaluation.mjs';
 export * from './telecom-mathematical-physics.mjs';
 export * from './government-resilience-harness.mjs';
-export * from './uav-tactical-science.mjs';
-export * from './cots-rf-tactical.mjs';
 export * from './scientific-theorems-physics.mjs';
 export * from './vehicle-doppler-gateway.mjs';
-export * from './civilian-uav-mesh-radar.mjs';
-export * from './acoustic-beamforming-survival.mjs';
+// Defensa y doble uso: aislado en './defense/index.mjs' (importar '@senda/core/defense'), nunca desde aquí.

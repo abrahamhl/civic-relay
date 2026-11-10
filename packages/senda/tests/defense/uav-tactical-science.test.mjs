@@ -8,7 +8,7 @@ import {
   computeAerialPhotogrammetryParams,
   computeAntiJammingMargin,
   A2G_ENVIRONMENTS,
-} from '../src/uav-tactical-science.mjs';
+} from '../../src/defense/uav-tactical-science.mjs';
 
 test('A2G LoS Probability: higher altitude yields higher LoS probability per Al-Hourani sigmoid', () => {
   // Ground distance 1000m (1 km) in Urban environment

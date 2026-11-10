@@ -8,7 +8,7 @@ import {
   calculateInterferometricDoA,
   calculateHomebrewAntennaDesign,
   OPENDRONEID_MSG_TYPES,
-} from '../src/cots-rf-tactical.mjs';
+} from '../../src/defense/cots-rf-tactical.mjs';
 
 test('Remote ID ASTM F3411: decodes Basic ID message with serial number', () => {
   // Construct a synthetic ASTM F3411 Basic ID message (25 bytes)

@@ -10,7 +10,7 @@ import {
   generateUltrasonicRescueBeacon,
   calculateTacticalSurvivalVector,
   POLAR_PATTERNS
-} from '../src/acoustic-beamforming-survival.mjs';
+} from '../../src/defense/acoustic-beamforming-survival.mjs';
 
 test('Patrones polares: Cardioide e Hipercardioide cumplen la teoría electroacústica', () => {
   // On-axis (theta = 0)

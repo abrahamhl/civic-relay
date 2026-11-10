@@ -1,6 +1,6 @@
 'use client';
 import { useMemo, useState, useEffect } from 'react';
-import type { Locale } from './copy';
+import type { Locale } from '../copy';
 import './civilian-radar-defense-lab.css';
 
 export default function CivilianRadarDefenseLab({ locale }: { locale: Locale }) {

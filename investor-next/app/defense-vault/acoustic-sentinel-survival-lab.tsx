@@ -1,6 +1,6 @@
 'use client';
 import { useMemo, useState, useEffect } from 'react';
-import type { Locale } from './copy';
+import type { Locale } from '../copy';
 import './acoustic-sentinel-survival-lab.css';
 
 export default function AcousticSentinelSurvivalLab({ locale }: { locale: Locale }) {

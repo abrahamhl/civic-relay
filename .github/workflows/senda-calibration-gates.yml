@@ -24,4 +24,4 @@ jobs:
       - name: Verify USGS event schema and reject invalid data
         run: python3 -m unittest discover -s packages/senda/data -p 'test_fetch_real_usgs_comcat.py' -v
       - name: Run existing SENDA core tests
-        run: node --test packages/senda/tests/*.test.mjs
+        run: node --test packages/senda/tests/*.test.mjs packages/senda/tests/defense/*.test.mjs

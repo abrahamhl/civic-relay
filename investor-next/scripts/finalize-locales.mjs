@@ -13,7 +13,8 @@ for(const locale of ['es','nl']){
     [`out/${locale}.html`,`out/${locale}/index.html`],
     [`out/${locale}/mission-control.html`,`out/${locale}/mission-control/index.html`],
     [`out/${locale}/science.html`,`out/${locale}/science/index.html`],
-    [`out/${locale}/mando.html`,`out/${locale}/mando/index.html`]
+    [`out/${locale}/mando.html`,`out/${locale}/mando/index.html`],
+    [`out/${locale}/defense.html`,`out/${locale}/defense/index.html`]
   ];
   for(const group of candidates){
     const file=group.find(existsSync);

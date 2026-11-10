@@ -46,3 +46,28 @@ for(const {locale,paths,words} of surfaceChecks){
   assert.ok(html.includes('mando-2.2.0'),`${locale} /mando: missing model version`);
   console.log(`PASS ${locale.toUpperCase()} /mando: command surface, calibrated model, KPIs, canonical and i18n routes`);
 }
+
+// Bóveda de defensa: existe en los 3 idiomas, no se indexa y no aparece en las superficies civiles.
+const vault=[
+  {locale:'en',paths:['out/defense.html','out/defense/index.html'],words:['DEFENCE VAULT','2021/821']},
+  {locale:'es',paths:['out/es/defense.html','out/es/defense/index.html'],words:['BÓVEDA DE DEFENSA','2021/821']},
+  {locale:'nl',paths:['out/nl/defense.html','out/nl/defense/index.html'],words:['DEFENSIEKLUIS','2021/821']}
+];
+for(const {locale,paths,words} of vault){
+  const file=paths.find(existsSync);
+  assert.ok(file,`Missing prerendered output for ${locale} /defense`);
+  const html=readFileSync(file,'utf8');
+  for(const word of words){assert.ok(html.includes(word),`${locale} /defense: missing ${word}`);}
+  assert.match(html,/<meta[^>]*name="robots"[^>]*noindex/i,`${locale} /defense: must be noindex`);
+  assert.ok(html.includes('data-classification="DUAL_USE_DEFENSE"'),`${locale} /defense: missing vault classification`);
+  assert.match(html,new RegExp('<html[^>]*lang="'+locale+'"','i'),`${locale} /defense: HTML language is incorrect`);
+  console.log(`PASS ${locale.toUpperCase()} /defense: vault isolated, noindex, i18n`);
+}
+const civil=['out/index.html','out/es.html','out/es/index.html','out/nl.html','out/nl/index.html','out/science.html','out/science/index.html','out/es/science.html','out/es/science/index.html','out/nl/science.html','out/nl/science/index.html'].filter(existsSync);
+for(const file of civil){
+  const html=readFileSync(file,'utf8');
+  for(const marker of ['reel-defense','session-breakthrough','role-investor','reel-drones','reel-sentinel-survival','ASTM F3411 Ghost']){
+    assert.ok(!html.includes(marker),`${file}: defence content "${marker}" leaked outside the vault`);
+  }
+}
+console.log(`PASS civil surfaces (${civil.length} files): no defence content outside the vault`);

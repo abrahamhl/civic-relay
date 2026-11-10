@@ -7,10 +7,12 @@
   "main": "./src/index.mjs",
   "exports": {
     ".": "./src/index.mjs",
+    "./defense": "./src/defense/index.mjs",
     "./src/*": "./src/*"
   },
   "scripts": {
-    "test": "node --test tests/*.test.mjs",
+    "test": "node --test tests/*.test.mjs tests/defense/*.test.mjs",
+    "test:defense": "node --test tests/defense/*.test.mjs",
     "test:adversarial": "node --test tests-adversarial/*.test.mjs",
     "evidence": "node scripts/run-scenarios.mjs",
     "evidence-dtn-field": "node scripts/dtn-field-sim.mjs",
