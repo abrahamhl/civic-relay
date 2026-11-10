@@ -54,8 +54,9 @@ function getEstadoNumbers() {
   if (fs.existsSync(estadoPath)) {
     try {
       const est = JSON.parse(fs.readFileSync(estadoPath, 'utf8'));
-      core = est.tests?.core?.passed || core;
-      e2e = est.tests?.e2e?.passed || e2e;
+      // estado.json (build-status-page.mjs) guarda { core, e2e } en la raíz; se acepta también el formato antiguo.
+      core = est.tests?.core?.passed ?? est.core ?? core;
+      e2e = est.tests?.e2e?.passed ?? est.e2e ?? e2e;
     } catch {}
   }
   return { core, e2e, pci };
