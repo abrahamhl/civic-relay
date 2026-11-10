@@ -1,5 +1,30 @@
 # Changelog
 
+## SENDA v0.27 · 10-11-2026 · Exposición de personas y avisos adaptados a la densidad real
+
+**Entrada (fundador):** usar cuánta gente y cuántos vehículos hay en cada zona, como el tráfico de Google Maps o Waze, para que las alertas tengan en cuenta el tráfico real y se reduzcan los tiempos. Conseguir el máximo de datasets de población.
+
+**Procesamiento:**
+- **Nuevo `packages/senda/src/exposure.mjs`**:
+  - Proyección EPSG:3035 exacta.
+  - Residentes por radio sobre la rejilla oficial GISCO 2021.
+  - Exposición en tramo por la relación fundamental del tráfico y densidad a partir de la ocupación.
+  - Lectores de Digitraffic TMS e Informo Madrid.
+  - Plan de aviso adaptativo: zona de peligro con onda de choque LWR, alcance exacto de la cadena de radio en un proceso de Poisson 1D, saltos y retardos calculados en vez de fijos.
+  - Priorización por personas afectadas esperadas.
+- **Datos reales:**
+  - Extracto español de la rejilla Eurostat de 1 km² (111.170 celdas, 47,21 M habitantes) con su procedencia.
+  - Recibo en vivo de Digitraffic y Madrid: 988 estaciones y sentidos; la política fija de 3 saltos se queda corta en el 41 %.
+- **Errores detectados y corregidos durante el desarrollo:**
+  - La métrica «alcanzar a todos» bajaba al subir la penetración. Se sustituyó por la fracción esperada alcanzada, que sí crece.
+  - Una cuadratura sesgada (13 puntos) se corrigió hasta coincidir con Monte Carlo.
+- **Bloqueo registrado:** el servidor del MITMA (movilidad con teléfonos) rechaza el acceso automatizado. No se ha eludido.
+- **Documentación:** `docs/science/EXPOSURE_AND_ADAPTIVE_WARNINGS.md`.
+
+**Validación:** núcleo 391/391.
+
+— Claude Code
+
 ## SENDA v0.26 · 10-11-2026 · Motor de Garantía de Entrega: fallos correlacionados, física, aprendizaje bayesiano y decisión certificada
 
 **Entrada (fundador):** hacer la parte física, científica y de computación más avanzada, difícil de replicar e innovadora.
