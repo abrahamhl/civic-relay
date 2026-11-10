@@ -65,4 +65,8 @@ export * from './navigation-multisoftware-hub.mjs';
 export * from './zero-overhead-mobile-optimizer.mjs';
 export * from './reliability-store.mjs';
 export * from './copernicus-ems.mjs';
+export * from './copernicus-cdse.mjs';
+export * from './nasa-firms.mjs';
+export * from './calibration-diagram.mjs';
+export * from './source-evidence.mjs';
 // Defensa y doble uso: aislado en './defense/index.mjs' (importar '@senda/core/defense'), nunca desde aquí.

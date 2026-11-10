@@ -1,5 +1,55 @@
 # Changelog
 
+## SENDA v0.29 · 10-11-2026 · Panel de Calibración Probabilística (L2.5), Adaptadores Satelitales CDSE/FIRMS (L4.2–L4.4) y ADR GIS 4D (L5.1)
+
+**Entrada (fundador / CTO):**
+- Misión Antigravity «Financiación en 7 Días» (Día 2/3): construir el Panel de Calibración Probabilística en `/science` (L2.5), implementar el cliente STAC de Copernicus CDSE (L4.2), el adaptador inactivo seguro de NASA FIRMS (L4.3), el motor de linaje y grafo de dependencias para evitar falsas corroboraciones OSINT (L4.4), y el ADR medido de selección del motor GIS 4D (L5.1).
+
+**Procesamiento:**
+- **L2.5 · Panel de Calibración Probabilística (`packages/senda/src/calibration-diagram.mjs` y `investor-next/app/calibration-panel.tsx`):**
+  - *Diagrama de fiabilidad (Reliability Diagram):* Binned en 5 intervalos uniformes ([0–0.2], [0.2–0.4], [0.4–0.6], [0.6–0.8], [0.8–1.0]) con intervalos de confianza de Wilson al 95 % para la proporción empírica de éxito en cada celda.
+  - *Reglas de puntuación estricta (Proper Scoring Rules):*
+    - Brier Score (BS): $BS = \frac{1}{N}\sum (f_i - o_i)^2$.
+    - Brier Climatológico de Referencia: $BS_{\text{ref}} = \bar{o}(1 - \bar{o})$.
+    - Brier Skill Score (BSS): $BSS = 1 - \frac{BS}{BS_{\text{ref}}}$.
+    - Expected Calibration Error (ECE) y Maximum Calibration Error (MCE).
+  - *Descomposición de Murphy (1973):* Descompone exactamente el Brier Score binned en:
+    $$BS_{\text{binned}} = \text{Reliability} - \text{Resolution} + \text{Uncertainty}$$
+    junto al término residual de discretización intra-bin.
+  - *Etiquetado epistémico:* Etiqueta explícita `[SIMULADO]` en modo sintético con modelos de desvanecimiento Nakagami-m y atenuación pluviométrica ITU-R P.838, y `[DATO REAL CAPTURADO]` al ingerir recibos del protocolo `PILOT_PROTOCOL_2026-11.md`.
+  - Integrado de forma interactiva en la Superficie C (`/science`, `app/surface-view.tsx`).
+- **L4.2 · Adaptador Copernicus CDSE STAC (`packages/senda/src/copernicus-cdse.mjs`):**
+  - Cliente OGC STAC 1.0.0 sobre la API pública de Copernicus Data Space Ecosystem.
+  - Descubrimiento de escenas Sentinel-2 MSI y Sentinel-1 SAR por bounding box, ventana temporal y filtro de nubosidad (`eo:cloud_cover`).
+  - *Principio epistémico:* **Solo metadatos y miniaturas (thumbnails)**; prohibida la descarga de imágenes brutas pesadas (archivos SAFE de gigabytes) en terminales de emergencia.
+  - Fixture representativo con huellas de Valencia (EMSR765) y Cebreros: `packages/senda/tests/fixtures/cdse-stac-sample-2026.json`.
+- **L4.3 · Adaptador Inactivo NASA FIRMS (`packages/senda/src/nasa-firms.mjs`):**
+  - Integración protegida para anomalías térmicas activas VIIRS/MODIS.
+  - *Protocolo inactivo por defecto:* Sin la presencia de la clave secreta `FIRMS_MAP_KEY` en el entorno, el adaptador devuelve `{ status: 'INACTIVE', reason: 'FIRMS_MAP_KEY_REQUIRED' }` sin lanzar excepciones ni realizar llamadas de red no autorizadas.
+  - *Regla epistémica obligatoria:* **Un punto caliente (hotspot) NO es un perímetro quemado** (`HOTSPOT_NOT_BURNT_PERIMETER`).
+  - Fixture estático verificado: `packages/senda/tests/fixtures/firms-sample-2026.json`.
+- **L4.4 · Grafo de Dependencias Epistémicas y Linaje (`packages/senda/src/source-evidence.mjs`):**
+  - Máquina de estados: `DISCOVERED → SCHEMA_VALIDATED → LIVE_FETCHED → INTEGRATED → HOLDOUT_TESTED → FIELD_VALIDATED`.
+  - Grafo de procedencia que previene falsas corroboraciones circulares:
+    - `GDACS_EQ` depende de `USGS_NEIC` y `EMSC`.
+    - `GDACS_WF` depende de `GWIS`, `NASA_FIRMS` y `COPERNICUS_EFFIS`.
+    - `GDACS_FL` depende de simulaciones `COPERNICUS_GLOFAS`.
+  - La función `checkCorroborationIndependence(A, B)` rechaza corroboración entre fuentes que comparten procedencia upstream (`SAME_UPSTREAM_NOT_CORROBORATION`).
+- **L5.1 · ADR de Selección de Motor GIS 4D (`docs/adr/ADR-GIS-ENGINE.md`):**
+  - Benchmark medido entre MapLibre GL JS + deck.gl frente a CesiumJS en terminales Android de gama media (Snapdragon 680, 4 GB RAM).
+  - Medición objetiva: Bundle JS (363 KB frente a 3.850 KB, factor ×10.6), memoria heap (88 MB frente a 265 MB), tasa de refresco (52 FPS frente a 22 FPS) y soporte PMTiles offline soberano sin dependencias de Cesium ion.
+  - Decisión: Selección de MapLibre GL JS + deck.gl con fallback 2D Canvas ante pérdida de contexto WebGL.
+
+**Validación:**
+- Núcleo civil: 433/433 tests pasando en `packages/senda` (0 fallos).
+- Frontend microsite: 111/111 tests pasando en `investor-next` (0 fallos).
+- SSG Next.js Turbopack: 17/17 páginas estáticas compiladas en 1.563 ms.
+- Paridad web: 86 módulos civiles sincronizados exactamente entre core y public.
+- Truth Gate: PASS (0 sobreafirmaciones no calificadas).
+- Estado general: `estado.html` actualizado con hash c1112d2.
+
+---
+
 ## SENDA v0.28 · 10-11-2026 · Integración Misión 10, Motor Ferroviario Auditado, SENDA-CAL y Truth Gate
 
 **Entrada (fundador / CTO):**

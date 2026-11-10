@@ -11,6 +11,7 @@ import LiveHardwareAndDealRoomConsole from './live-hardware-console';
 import EvidenceBoard from './evidence-board';
 import CommandSurface from './command-surface';
 import RailSafetyLab from './rail-safety-lab';
+import CalibrationPanel from './calibration-panel';
 import { HyperFramesCinemaDeck } from './hyperframes-cinema-deck';
 import { SystemExplained, DeveloperBlueprint } from './system-explained';
 import LanguageDocument from './language-document';
@@ -164,6 +165,7 @@ export default function SurfaceView({
         <>
           <div className="container">
             <ScientificTheoremsLab locale={locale} />
+            <CalibrationPanel locale={locale} />
             <VehicularDopplerLab locale={locale} />
             <RailSafetyLab locale={locale} />
           </div>
