@@ -1,5 +1,21 @@
 # Changelog
 
+## SENDA v0.25 · 10-11-2026 · Bóveda de defensa aislada y película promocional completa M96
+
+**Entrada (fundador):**
+- Mantener la parte militar tal cual, pero categorizada y aislada en una bóveda aparte, en el código y en la web.
+- Película promocional completa: qué resuelve SENDA, los accidentes en España que lo motivan, cómo funciona y todas sus funciones, reutilizando y actualizando el material ya publicado.
+
+**Procesamiento:**
+- **Bóveda de código (`packages/senda/src/defense/`, `@senda/core/defense`):** `civilian-uav-mesh-radar`, `uav-tactical-science`, `cots-rf-tactical` y `acoustic-beamforming-survival` se mueven sin cambios de contenido. El índice civil deja de reexportarlos. Los tests pasan a `tests/defense/` y se añade `vault-isolation.test.mjs`: ninguna función de defensa se filtra al índice civil y ningún módulo civil importa de la bóveda. `sync-web` publica en `public/senda/core/defense/`, la paridad lo verifica y el CI ejecuta la bóveda.
+- **Bóveda web (`/defense`, `/es/defense`, `/nl/defense`, `noindex`):** aviso de doble uso y marco UE (Reglamentos 2021/821, 2019/945 y 2019/947). Contiene los laboratorios antidrón y el material audiovisual de defensa (telediario de radar antidrón, vídeo del modo inversionista y defensa, reels de drones, defensa y centinela), retirados de la portada y de /science. `check:locales` comprueba que nada de defensa aparece en las superficies civiles.
+- **Película M96 (`media/senda-film/m96-promo.json`, generada por `build-m96-promo.mjs`):** 29 escenas, unos 12 min. Escenas nuevas: origen del proyecto, mapa animado de accidentes en España (escena `spainmap`), el hueco que nadie cubre y física con cotas honestas. Se reciclan 21 escenas de M95 y 4 de la ruta. Locución ES (`ef_dora`) y EN (`bf_emma`) con subtítulos ES/EN/NL. Fuentes en `docs/video/M96_PROMO_SOURCES.md`.
+- **Calidad del material existente:** los diagramas de la película se traducen al español (`film-i18n.js`); antes salían en inglés en la versión española. Se reparan los acentos corrompidos (`n?cleo`, `m?s`…) en `m95-film.json`, `m95-sim-proof.json` y sus VTT publicados. `estado.json` se regenera ejecutando las pruebas (núcleo civil 350/350, antes decía 266).
+
+**Validación:** ver el PR #31.
+
+— Claude Code
+
 ## SENDA v0.24 · 10-11-2026 · Auditoría científica: corrección de errores físicos y de afirmaciones públicas antes de financiación
 
 **Entrada (fundador):**

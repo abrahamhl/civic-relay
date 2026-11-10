@@ -33,6 +33,10 @@ const C = {
     reel1Desc: 'Qué ocurre cuando cae toda la red eléctrica y cómo SENDA mantiene las llamadas vivas por sonido.',
     reel3T: 'Matemáticas que Salvan Vidas',
     reel3Desc: 'Al-Hourani, autovalor de Fiedler, difracción de Deygout y radar pasivo sobre Valencia y Bejís.',
+    promoT: 'Película completa 2026: por qué existe SENDA, cómo funciona y qué está probado',
+    promoNote: 'Unos 12 minutos. El origen del proyecto, los accidentes en España que lo motivan (Angrois, incendios de la sierra oeste, DANA, apagón, Adamuz y Gelida), el hueco que nadie cubre y todas las funciones civiles. Cada simulación la calcula fotograma a fotograma el mismo núcleo que pasan las pruebas automáticas. Locución en español; versión en inglés con subtítulos ES / EN / NL.',
+    promoAltEs: 'Versión en español (MP4)',
+    promoAltEn: 'Versión en inglés (MP4)',
     filmT: 'La película: qué es SENDA y qué ya funciona',
     filmNote: 'Locución original en inglés (bf_emma) y en español (ef_dora); subtítulos sincronizados en español, inglés y neerlandés. Todas las simulaciones y los renders 3D los calcula fotograma a fotograma el mismo código que ejecuta la app. Integración complementaria con el 112 bajo estándares abiertos CAP 1.2 y directivas de protección civil.',
     filmAlt: 'Cortes ejecutivos (90 s · 60 s · 30 s · vertical 9:16) y archivo doblado al español',
@@ -113,6 +117,10 @@ const C = {
     reel1Desc: 'What happens when the entire electrical and cellular grid fails, and how SENDA preserves direct voice calls over sound.',
     reel3T: 'Mathematics Saving Lives',
     reel3Desc: 'Al-Hourani, Fiedler eigenvalue, Deygout knife-edge diffraction, and passive bistatic radar over real catastrophe scenes.',
+    promoT: 'The full 2026 film: why SENDA exists, how it works and what is proven',
+    promoNote: 'About 12 minutes. The origin of the project, the Spanish accidents behind it (Angrois, western-sierra wildfires, Valencia floods, blackout, Adamuz and Gelida), the gap nobody covers and every civil feature. Each simulation is computed frame by frame by the same core the automated tests run. English narration with ES / EN / NL subtitles; Spanish-narrated version available.',
+    promoAltEs: 'Spanish version (MP4)',
+    promoAltEn: 'English version (MP4)',
     filmT: 'The film: what SENDA is and what already works',
     filmNote: 'Original English narration (bf_emma) and Spanish narration (ef_dora); synchronised subtitles in Spanish, English and Dutch. Every simulation and 3D render is computed frame by frame by the same code the app runs. Complementary integration with emergency services under CAP 1.2 open standards and EU civil protection directives.',
     filmAlt: 'Executive short cuts (90 s · 60 s · 30 s · 9:16 vertical) and Spanish-voiced archive',
@@ -193,6 +201,10 @@ const C = {
     reel1Desc: 'Wat er gebeurt als het gehele stroom- en mobiele netwerk uitvalt, en hoe SENDA spraakoproepen in stand houdt via geluid.',
     reel3T: 'Wiskunde die Levens Redt',
     reel3Desc: 'Al-Hourani, Fiedler-eigenwaarde, Deygout-meskantdiffractie en passieve radar boven Valencia en Bejís.',
+    promoT: 'De volledige film 2026: waarom SENDA bestaat, hoe het werkt en wat bewezen is',
+    promoNote: 'Ongeveer 12 minuten. De oorsprong van het project, de Spaanse ongevallen erachter (Angrois, bosbranden in de westelijke sierra, overstromingen in Valencia, stroomstoring, Adamuz en Gelida), het gat dat niemand dekt en alle civiele functies. Elke simulatie wordt beeld voor beeld berekend door dezelfde kern die de automatische tests draaien. Engelse voice-over met ES / EN / NL-ondertitels.',
+    promoAltEs: 'Spaanse versie (MP4)',
+    promoAltEn: 'Engelse versie (MP4)',
     filmT: 'De film: wat SENDA is en wat al werkt',
     filmNote: 'Originele Engelse voice-over (bf_emma) en Spaanse voice-over (ef_dora); gesynchroniseerde ondertiteling in het Spaans, Engels en Nederlands. Elke simulatie en 3D-render wordt beeld voor beeld berekend door dezelfde code die de app draait. Aanvullende integratie met meldkamer 112 onder open CAP 1.2-standaarden en EU-richtlijnen voor civiele bescherming.',
     filmAlt: 'Korte versies (90 s · 60 s · 30 s · 9:16 verticaal) en Spaans ingesproken archief',
@@ -376,6 +388,33 @@ export default function SendaHome({ locale }: { locale: Locale }) {
             <p>{c.reel3Desc}</p>
           </article>
         </div>
+      </div>
+
+      <div className="sh-film" id="promo">
+        <h2>{c.promoT}</h2>
+        <video
+          id="senda-m96-promo-video"
+          controls
+          preload="metadata"
+          playsInline
+          poster="/media/m96/senda-m96-promo-poster.jpg"
+          aria-label={c.promoT}
+        >
+          <source src={`/media/m96/senda-m96-promo-${locale === 'es' ? 'es' : 'en'}.mp4`} type="video/mp4"/>
+          {locale === 'es' ? (
+            <track kind="subtitles" srcLang="es" label="Español" src="/media/m96/senda-m96-promo-es-voz-es.vtt" default/>
+          ) : (
+            <>
+              <track kind="subtitles" srcLang="es" label="Español" src="/media/m96/senda-m96-promo-es.vtt"/>
+              <track kind="subtitles" srcLang="en" label="English" src="/media/m96/senda-m96-promo-en.vtt" default={locale === 'en'}/>
+              <track kind="subtitles" srcLang="nl" label="Nederlands" src="/media/m96/senda-m96-promo-nl.vtt" default={locale === 'nl'}/>
+            </>
+          )}
+        </video>
+        <p className="sh-note">{c.promoNote}</p>
+        <p className="sh-note">
+          <a href="/media/m96/senda-m96-promo-es.mp4">{c.promoAltEs}</a> · <a href="/media/m96/senda-m96-promo-en.mp4">{c.promoAltEn}</a>
+        </p>
       </div>
 
       <div className="sh-film" id="film">
