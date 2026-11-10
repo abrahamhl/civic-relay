@@ -18,7 +18,7 @@
    "claim": "OBSERVED",
    "source": [
     "docs/research/SENDA_CIVILIAN_MESH_RADAR_AND_DRONE_COUNTERMEASURES_2026.md",
-    "packages/senda/src/civilian-uav-mesh-radar.mjs"
+    "packages/senda/src/defense/civilian-uav-mesh-radar.mjs"
    ],
    "visual": {
     "kind": "broadcast"
@@ -58,8 +58,8 @@
    "id": "brk_2",
    "claim": "CALCULATED",
    "source": [
-    "packages/senda/src/civilian-uav-mesh-radar.mjs",
-    "packages/senda/src/acoustic-beamforming-survival.mjs"
+    "packages/senda/src/defense/civilian-uav-mesh-radar.mjs",
+    "packages/senda/src/defense/acoustic-beamforming-survival.mjs"
    ],
    "visual": {
     "kind": "arch3d"
@@ -99,7 +99,7 @@
    "id": "brk_3",
    "claim": "CALCULATED",
    "source": [
-    "packages/senda/src/acoustic-beamforming-survival.mjs",
+    "packages/senda/src/defense/acoustic-beamforming-survival.mjs",
     "investor-next/app/acoustic-sentinel-survival-lab.tsx"
    ],
    "visual": {
@@ -140,7 +140,7 @@
    "id": "brk_4",
    "claim": "OBSERVED",
    "source": [
-    "packages/senda/src/acoustic-beamforming-survival.mjs",
+    "packages/senda/src/defense/acoustic-beamforming-survival.mjs",
     "investor-next/app/civilian-radar-defense-lab.tsx"
    ],
    "visual": {

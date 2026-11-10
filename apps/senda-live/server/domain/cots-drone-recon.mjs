@@ -16,7 +16,7 @@ import {
   calculateHomebrewAntennaDesign,
   calculateInterferometricDoA,
   OPENDRONEID_MSG_TYPES,
-} from '@senda/core';
+} from '@senda/core/defense';
 
 export const COTS_HARDWARE_CATALOG = Object.freeze([
   {

@@ -130,7 +130,7 @@
    "claim": "CALCULATED",
    "source": [
     "packages/senda/src/uav-mesh.mjs",
-    "packages/senda/src/cots-rf-tactical.mjs"
+    "packages/senda/src/defense/cots-rf-tactical.mjs"
    ],
    "visual": {
     "kind": "math_grid"
@@ -165,7 +165,7 @@
    "id": "bc_cots",
    "claim": "CALCULATED",
    "source": [
-    "packages/senda/src/cots-rf-tactical.mjs",
+    "packages/senda/src/defense/cots-rf-tactical.mjs",
     "apps/senda-live/server/domain/cots-drone-recon.mjs"
    ],
    "visual": {

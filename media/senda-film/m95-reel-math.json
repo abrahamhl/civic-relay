@@ -54,7 +54,7 @@
    "claim": "CALCULATED",
    "source": [
     "packages/senda/src/uav-mesh.mjs",
-    "packages/senda/src/cots-rf-tactical.mjs"
+    "packages/senda/src/defense/cots-rf-tactical.mjs"
    ],
    "visual": {
     "kind": "math_grid"

@@ -53,7 +53,7 @@
    "id": "dev_s2",
    "claim": "OBSERVED",
    "source": [
-    "packages/senda/src/cots-rf-tactical.mjs",
+    "packages/senda/src/defense/cots-rf-tactical.mjs",
     "apps/senda-live/server/domain/cots-drone-recon.mjs"
    ],
    "visual": {
