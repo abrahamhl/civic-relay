@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="100%" height="100%" style="background:#070b14;font-family:system-ui,-apple-system,sans-serif;">
+  <defs>
+    <linearGradient id="grid-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e1726" />
+      <stop offset="100%" stop-color="#050811" />
+    </linearGradient>
+    <linearGradient id="fire-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff3344" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#ff8800" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="#ffcc00" stop-opacity="0.1" />
+    </linearGradient>
+    <linearGradient id="beam-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="100%" stop-color="#4facfe" />
+    </linearGradient>
+    <linearGradient id="beam-green" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#34d399" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Grid -->
+  <rect width="1000" height="600" fill="url(#grid-grad)" />
+  <g opacity="0.12" stroke="#38bdf8" stroke-width="0.75">
+    <path d="M 0,100 L 1000,100 M 0,200 L 1000,200 M 0,300 L 1000,300 M 0,400 L 1000,400 M 0,500 L 1000,500" />
+    <path d="M 100,0 L 100,600 M 200,0 L 200,600 M 300,0 L 300,600 M 400,0 L 400,600 M 500,0 L 500,600 M 600,0 L 600,600 M 700,0 L 700,600 M 800,0 L 800,600 M 900,0 L 900,600" />
+  </g>
+
+  <!-- Title Badge -->
+  <g transform="translate(40, 40)">
+    <rect width="440" height="42" rx="8" fill="#0f172a" stroke="#1e293b" />
+    <circle cx="24" cy="21" r="6" fill="#10b981" filter="url(#glow)" />
+    <text x="42" y="26" fill="#f8fafc" font-size="14" font-weight="700" letter-spacing="1">SENDA · PAER MESH PROTOCOL TOPOLOGY</text>
+  </g>
+  <text x="40" y="105" fill="#94a3b8" font-size="12">Encaminamiento Oportunista Consciente de Física y Frentes de Peligro Térmico (TRL 4-5)</text>
+
+  <!-- Fire Threat Hazard Zone (Avoided by PAER) -->
+  <path d="M 280,240 Q 380,200 480,280 Q 520,380 430,460 Q 320,490 260,420 Z" fill="url(#fire-grad)" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,4" />
+  <g transform="translate(330, 340)">
+    <circle cx="0" cy="0" r="28" fill="#450a0a" stroke="#dc2626" stroke-width="1.5" />
+    <text x="0" y="5" fill="#fca5a5" font-size="20" text-anchor="middle">🔥</text>
+    <text x="0" y="44" fill="#f87171" font-size="11" font-weight="700" text-anchor="middle">FRENTE TÉRMICO ACTIVO</text>
+    <text x="0" y="58" fill="#cbd5e1" font-size="9" text-anchor="middle">P_surv = 0.00 · Nodos Destruidos</text>
+  </g>
+
+  <!-- Burned Node (Discarded by PAER) -->
+  <g transform="translate(420, 290)">
+    <circle cx="0" cy="0" r="14" fill="#1f2937" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3,3" />
+    <text x="0" y="4" fill="#9ca3af" font-size="11" text-anchor="middle">✕</text>
+    <text x="20" y="4" fill="#f87171" font-size="10">Nodo calcinado (Evitado por PAER)</text>
+  </g>
+
+  <!-- Epidemic Packet Loss Trail (Red dotted) -->
+  <path d="M 160,380 L 420,290" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,4" opacity="0.6" />
+  <text x="270" y="325" fill="#f87171" font-size="9" transform="rotate(-18, 270, 325)">Epidemic/PRoPHET: 6 paquetes perdidos</text>
+
+  <!-- PAER Optimal Route Links (Cyan & Green Neon) -->
+  <!-- Hop 1: SOS Source -> Vehicle Relay 1 -->
+  <path d="M 160,380 Q 180,260 250,180" fill="none" stroke="url(#beam-cyan)" stroke-width="3.5" filter="url(#glow)" />
+  <!-- Hop 2: Vehicle Relay 1 -> Drone Airborne Relay -->
+  <path d="M 250,180 Q 420,120 540,160" fill="none" stroke="url(#beam-cyan)" stroke-width="3.5" filter="url(#glow)" />
+  <!-- Hop 3: Drone -> LoRa Gateway -->
+  <path d="M 540,160 Q 680,200 780,260" fill="none" stroke="url(#beam-green)" stroke-width="3.5" filter="url(#glow)" />
+  <!-- Hop 4: LoRa Gateway -> Command Center / Satellite -->
+  <path d="M 780,260 L 890,380" fill="none" stroke="url(#beam-green)" stroke-width="3.5" filter="url(#glow)" />
+
+  <!-- Satellite Uplink -->
+  <path d="M 780,260 L 820,90" fill="none" stroke="#a78bfa" stroke-width="2" stroke-dasharray="5,5" />
+
+  <!-- NODES -->
+  <!-- Node A: SOS Source (Smartphone) -->
+  <g transform="translate(160, 380)">
+    <circle cx="0" cy="0" r="22" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5" filter="url(#glow)" />
+    <text x="0" y="5" fill="#38bdf8" font-size="14" text-anchor="middle">📱</text>
+    <rect x="-65" y="30" width="130" height="34" rx="4" fill="#0b1329" stroke="#1e293b" />
+    <text x="0" y="44" fill="#f8fafc" font-size="10" font-weight="700" text-anchor="middle">NODO ORIGEN SOS</text>
+    <text x="0" y="56" fill="#38bdf8" font-size="9" text-anchor="middle">BLE 5.0 Coded PHY</text>
+  </g>
+
+  <!-- Node B: Vehicle DGT V16 Relay -->
+  <g transform="translate(250, 180)">
+    <circle cx="0" cy="0" r="22" fill="#0f172a" stroke="#00f2fe" stroke-width="2.5" filter="url(#glow)" />
+    <text x="0" y="5" fill="#00f2fe" font-size="14" text-anchor="middle">🚗</text>
+    <rect x="-70" y="-50" width="140" height="34" rx="4" fill="#0b1329" stroke="#1e293b" />
+    <text x="0" y="-36" fill="#f8fafc" font-size="10" font-weight="700" text-anchor="middle">RELE VEHÍCULO / V16</text>
+    <text x="0" y="-24" fill="#34d399" font-size="9" text-anchor="middle">Latencia Reflejo: 38 ms</text>
+  </g>
+
+  <!-- Node C: Tactical Drone Tethered Relay -->
+  <g transform="translate(540, 160)">
+    <circle cx="0" cy="0" r="24" fill="#0f172a" stroke="#10b981" stroke-width="2.5" filter="url(#glow)" />
+    <text x="0" y="5" fill="#10b981" font-size="16" text-anchor="middle">🛸</text>
+    <rect x="-75" y="-52" width="150" height="34" rx="4" fill="#0b1329" stroke="#1e293b" />
+    <text x="0" y="-38" fill="#f8fafc" font-size="10" font-weight="700" text-anchor="middle">DRON REPETIDOR A2G</text>
+    <text x="0" y="-26" fill="#10b981" font-size="9" text-anchor="middle">Altitud Óptima: 915 m</text>
+  </g>
+
+  <!-- Node D: Centinela COTS Gateway (<15€) -->
+  <g transform="translate(780, 260)">
+    <circle cx="0" cy="0" r="24" fill="#0f172a" stroke="#34d399" stroke-width="2.5" filter="url(#glow)" />
+    <text x="0" y="5" fill="#34d399" font-size="16" text-anchor="middle">📡</text>
+    <rect x="-75" y="32" width="150" height="34" rx="4" fill="#0b1329" stroke="#1e293b" />
+    <text x="0" y="46" fill="#f8fafc" font-size="10" font-weight="700" text-anchor="middle">PASARELA COTS LORA</text>
+    <text x="0" y="58" fill="#34d399" font-size="9" text-anchor="middle">ESP32 + SX1262 (868 MHz)</text>
+  </g>
+
+  <!-- Node E: Satellite LEO -->
+  <g transform="translate(820, 90)">
+    <circle cx="0" cy="0" r="18" fill="#1e1b4b" stroke="#a78bfa" stroke-width="2" />
+    <text x="0" y="5" fill="#a78bfa" font-size="13" text-anchor="middle">🛰️</text>
+    <text x="28" y="2" fill="#c4b5fd" font-size="10" font-weight="700">SATÉLITE LEO (SGP4 J2)</text>
+    <text x="28" y="16" fill="#94a3b8" font-size="8.5">Efemérides TLE Sentinel-3A</text>
+  </g>
+
+  <!-- Node F: Command Surface Hub -->
+  <g transform="translate(890, 380)">
+    <circle cx="0" cy="0" r="24" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5" filter="url(#glow)" />
+    <text x="0" y="5" fill="#38bdf8" font-size="16" text-anchor="middle">🏢</text>
+    <rect x="-80" y="32" width="160" height="34" rx="4" fill="#0b1329" stroke="#1e293b" />
+    <text x="0" y="46" fill="#f8fafc" font-size="10" font-weight="700" text-anchor="middle">CENTRO DE MANDO 112</text>
+    <text x="0" y="58" fill="#38bdf8" font-size="9" text-anchor="middle">Recibo Merkle RFC 6962</text>
+  </g>
+
+  <!-- KPI Metrics Banner -->
+  <g transform="translate(40, 520)">
+    <rect width="920" height="52" rx="6" fill="#0b1329" stroke="#1e293b" />
+    <text x="30" y="22" fill="#94a3b8" font-size="9" font-weight="700">PAER BENCHMARK PDR</text>
+    <text x="30" y="42" fill="#10b981" font-size="16" font-weight="800">100%</text>
+
+    <text x="230" y="22" fill="#94a3b8" font-size="9" font-weight="700">SOBRECARGA TX VS EPIDEMIC</text>
+    <text x="230" y="42" fill="#38bdf8" font-size="16" font-weight="800">-31% (29 vs 42)</text>
+
+    <text x="470" y="22" fill="#94a3b8" font-size="9" font-weight="700">PAQUETES PERDIDOS EN INCENDIO</text>
+    <text x="470" y="42" fill="#34d399" font-size="16" font-weight="800">0 (vs 6 quemados)</text>
+
+    <text x="730" y="22" fill="#94a3b8" font-size="9" font-weight="700">ESTÁNDAR CRIPTOGRÁFICO</text>
+    <text x="730" y="42" fill="#a78bfa" font-size="16" font-weight="800">Ed25519 + RFC 6962</text>
+  </g>
+</svg>

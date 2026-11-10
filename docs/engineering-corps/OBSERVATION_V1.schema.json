@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://senda.example/schemas/observation-v1.json",
+  "$comment": "Draft only; do not publish example URL as live source.",
+  "title": "SENDA normalized observation v1",
+  "type": "object",
+  "required": [
+    "id",
+    "schema",
+    "kind",
+    "eventTimeUtc",
+    "ingestedAtUtc",
+    "evidenceLevel",
+    "source",
+    "payload"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "schema": {
+      "const": "senda.observation/v1"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "ROAD_INCIDENT",
+        "WEATHER_FORECAST",
+        "OFFICIAL_WARNING",
+        "FIRE_THERMAL_POINT",
+        "EARTHQUAKE",
+        "CAMERA_EVENT",
+        "RF_MEASUREMENT",
+        "DTN_RECEIPT",
+        "DRONE_REMOTE_ID",
+        "USER_REPORT",
+        "OTHER"
+      ]
+    },
+    "eventTimeUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ingestedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "evidenceLevel": {
+      "type": "string",
+      "enum": [
+        "LIVE_VERIFIED",
+        "FIELD_MEASURED",
+        "LAB_VERIFIED",
+        "RECORDED_REAL_SAMPLE",
+        "MODEL_FORECAST",
+        "SYNTHETIC",
+        "STALE",
+        "UNAVAILABLE",
+        "PARTNER_REQUIRED",
+        "HARDWARE_REQUIRED"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "provider",
+        "rightsStatus",
+        "acquisitionStatus",
+        "upstreamDependencyGroup"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "uri": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rightsStatus": {
+          "type": "string"
+        },
+        "acquisitionStatus": {
+          "type": "string"
+        },
+        "upstreamDependencyGroup": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rawSha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "signatureVerificationStatus": {
+          "type": "string",
+          "enum": [
+            "VERIFIED",
+            "FAILED",
+            "UNAVAILABLE",
+            "NOT_APPLICABLE"
+          ]
+        }
+      }
+    },
+    "geo": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "lon": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "crs": {
+          "type": "string"
+        },
+        "accuracyM": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "privacyCoarsened": {
+          "type": "boolean"
+        }
+      }
+    },
+    "payload": {
+      "type": "object"
+    },
+    "uncertainty": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string"
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "units": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "calibrationStatus": {
+          "type": "string",
+          "enum": [
+            "CALIBRATED_HOLDOUT",
+            "UNCALIBRATED",
+            "NOT_APPLICABLE"
+          ]
+        }
+      }
+    },
+    "simulationRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "review": {
+      "type": "string",
+      "enum": [
+        "UNREVIEWED",
+        "CORROBORATED",
+        "DISPUTED",
+        "RETRACTED",
+        "OFFICIAL"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

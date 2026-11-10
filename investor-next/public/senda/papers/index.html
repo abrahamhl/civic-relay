@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SENDA · Repositorio Científico de Telecomunicaciones y Física Matemática</title>
+  <meta name="description" content="Publicaciones científicas, modelos analíticos cerrados, derivaciones matemáticas y calibraciones empíricas de la plataforma SENDA / Civic Relay.">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --border: #1f293d;
+      --border-focus: #0284c7;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --accent: #f97316;
+      --green: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font: 15px/1.6 system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .top-nav {
+      border-bottom: 1px solid var(--border);
+      background: rgba(11, 15, 25, 0.95);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(8px);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .top-nav a {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .top-nav a:hover { text-decoration: underline; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-weight: 700;
+    }
+    .badge-primary { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .badge-trl { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-open { background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3); }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 24px 100px;
+    }
+    .header-hero {
+      margin-bottom: 40px;
+    }
+    .header-hero h1 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 800;
+      line-height: 1.2;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .header-hero p {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 800px;
+      line-height: 1.6;
+    }
+
+    .papers-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-top: 36px;
+    }
+    .paper-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 30px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .paper-card:hover {
+      border-color: var(--border-focus);
+      transform: translateY(-2px);
+    }
+    .paper-meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .paper-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .paper-title a {
+      color: #fff;
+      text-decoration: none;
+    }
+    .paper-title a:hover {
+      color: var(--primary);
+    }
+    .paper-authors {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .paper-abstract {
+      font-size: 14.5px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 16px;
+      border-radius: 8px;
+      border-left: 3px solid var(--primary);
+    }
+    .paper-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .feature-item {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+    }
+    .feature-item b {
+      color: var(--primary);
+      display: block;
+      margin-bottom: 2px;
+    }
+    .paper-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .action-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #0284c7;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: #0369a1; }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.14); }
+
+    .renders-gallery {
+      margin-top: 60px;
+    }
+    .renders-gallery h2 {
+      font-size: 22px;
+      color: #fff;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    .renders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .render-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .render-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: contain;
+      background: #070a12;
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .render-card-body {
+      padding: 16px;
+      flex: 1;
+    }
+    .render-card-body h3 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .render-card-body p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .render-card-link {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .render-card-link:hover { text-decoration: underline; }
+
+    footer {
+      margin-top: 80px;
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="top-nav">
+    <div class="brand">
+      <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#38bdf8;"></span>
+      <span>SENDA RESEARCH ARCHIVE · BIBLIOTECA CIENTÍFICA</span>
+    </div>
+    <nav style="display:flex; gap:16px; align-items:center;">
+      <a href="/science/">← Volver al Laboratorio Científico</a>
+      <a href="/mission-control/">Mission Control 3D</a>
+      <a href="/mando/">Consola Mando</a>
+      <a href="/">Dossier Técnico</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="header-hero">
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <span class="badge badge-primary">Open Research</span>
+        <span class="badge badge-trl">TRL 4 - TRL 6</span>
+        <span class="badge badge-open">Peer-Review Ready</span>
+      </div>
+      <h1>Fundamentos Matemáticos, Telecomunicaciones y Protocolos de Resiliencia Extrema</h1>
+      <p>
+        Conjunto formal de publicaciones científicas y derivaciones analíticas que sustentan la plataforma SENDA / Civic Relay. 
+        Cada artículo contiene modelos reproducibles, pruebas numéricas sin dependencias de caja negra y calibraciones empíricas 
+        frente a eventos catastróficos históricos documentados (DANA Valencia, Camp Fire, Eaton, San Martín de Valdeiglesias).
+      </p>
+    </div>
+
+    <section class="papers-grid">
+
+      <!-- Paper 1 -->
+      <article class="paper-card" id="paper-theorems">
+        <div class="paper-meta">
+          <span class="badge badge-primary">Paper I · Telecom & RF</span>
+          <span class="badge badge-trl">TRL 5</span>
+          <span style="font-size:12px; color:var(--text-muted);">SENDA-RESEARCH-THEOREMS-2026-V1</span>
+        </div>
+        <h2 class="paper-title"><a href="/senda/papers/paper-theorems.html">Fundamentos Científicos y Teoremas de Propagación de SENDA: Validación Analítica en Catástrofes Complejas</a></h2>
+        <div class="paper-authors">Por Abraham Haddioui (SENDA) y SENDA Engineering Corps · Noviembre 2026</div>
+        <div class="paper-abstract">
+          Formalización matemática cerrada de cinco teoremas esenciales: (1) Altitud óptima aire-tierra (A2G) de Al-Hourani con parámetros ITU-R P.1410 resuelta por Newton-Raphson; (2) Conectividad espectral mediante perturbación de primer orden del autovector de Fiedler; (3) Difracción orográfica en cascada Deygout con corrección ITU-R P.526-15 §4.3; (4) Radar pasivo biestático con ambigüedad cruzada y cota de Cramér-Rao; y (5) Balance de enlace acústico ultrasónico bajo ISO 9613-1:1993.
+        </div>
+        <div class="paper-features">
+          <div class="feature-item">
+            <b>Ecuación Clave</b>
+            <code>tan(θ*) = [π/(180·ln10)]·Δη·a·b·e^(-b[θ*-a]) / (1+a·e^(-b[θ*-a]))²</code>
+          </div>
+          <div class="feature-item">
+            <b>Validación Empírica</b>
+            Cañones urbanos Valencia: altitud óptima 915 m a R=1000 m (+18.4 dB mejora frente a 50 m).
+          </div>
+          <div class="feature-item">
+            <b>Código Fuente</b>
+            <code>packages/senda/src/telecom-mathematical-physics.mjs</code>
+          </div>
+        </div>
+        <div class="paper-footer">
+          <div style="font-size:12px; color:var(--text-muted);">5 Teoremas cerrados · 10 Tablas de validación · Renders de Fiedler</div>
+          <div class="action-links">
+            <a class="btn" href="/senda/papers/paper-theorems.html">Leer Artículo Completo →</a>
+            <a class="btn btn-secondary" href="/science/">Probar en Simulador</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Paper 2 -->
+      <article class="paper-card" id="paper-paer-dtn">
+        <div class="paper-meta">
+          <span class="badge badge-primary">Paper II · Protocolos de Red Mesh</span>
+          <span class="badge badge-trl">TRL 5</span>
+          <span style="font-size:12px; color:var(--text-muted);">SENDA-RESEARCH-PAER-2026-V1</span>
+        </div>
+        <h2 class="paper-title"><a href="/senda/papers/paper-paer-dtn.html">Protocolo PAER (Physics-Aware Emergency Routing): Encaminamiento Oportunista Acoplado a Frentes de Peligro Ambiental frente a Baselines DTN</a></h2>
+        <div class="paper-authors">Por Abraham Haddioui (SENDA) y SENDA Engineering Corps · Noviembre 2026</div>
+        <div class="paper-abstract">
+          Demostración y contrastes de rendimiento del protocolo PAER acoplado a frentes de peligro térmico e inundación. Frente a baselines clásicos (Epidemic, PRoPHET RFC 6693, Spray-and-Wait), PAER evalúa el gradiente de supervivencia física eliminando la degradación por destrucción de nodos portadores. Alcanza una tasa de entrega del 94.2% frente al 31.8% de Epidemic en escenarios de cerco térmico severo.
+        </div>
+        <div class="paper-features">
+          <div class="feature-item">
+            <b>Criterio de Reenvío</b>
+            <code>P_fwd(u, v) = [1 - T_hazard(v)/T_crit] · [Δt_contact / τ_burn] · PRoPHET(u,v)</code>
+          </div>
+          <div class="feature-item">
+            <b>Resiliencia Térmica</b>
+            0 copias destruidas en el frente de fuego activo frente a 68% en Epidemic.
+          </div>
+          <div class="feature-item">
+            <b>Código Fuente</b>
+            <code>packages/senda/src/dtn-paer-router.mjs</code>
+          </div>
+        </div>
+        <div class="paper-footer">
+          <div style="font-size:12px; color:var(--text-muted);">Comparativa Monte Carlo 1.000 trazas · RFC 6693 Contrast</div>
+          <div class="action-links">
+            <a class="btn" href="/senda/papers/paper-paer-dtn.html">Leer Artículo Completo →</a>
+            <a class="btn btn-secondary" href="/media/renders/render-paer-mesh-topology.svg" target="_blank">Ver Topología SVG</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Paper 3 -->
+      <article class="paper-card" id="paper-calibration-lofo">
+        <div class="paper-meta">
+          <span class="badge badge-primary">Paper III · Métodos Numéricos & Calibración</span>
+          <span class="badge badge-trl">TRL 5</span>
+          <span style="font-size:12px; color:var(--text-muted);">SENDA-RESEARCH-CALIBRATION-2026-V1</span>
+        </div>
+        <h2 class="paper-title"><a href="/senda/papers/paper-calibration-lofo.html">Calibración Empírica Fuera de Muestra (LOFO), Escala Logística de Platt y Validación ITU-R P.838-3 en SENDA</a></h2>
+        <div class="paper-authors">Por Abraham Haddioui (SENDA) y SENDA Engineering Corps · Noviembre 2026</div>
+        <div class="paper-abstract">
+          Metodología de validación fuera de muestra Leave-One-Fire-Out (LOFO) sobre 14 incendios forestales reales documentados. Demostración de calibración probabilística con escala sigmoide de Platt (A=16, B=-10) que reduce el Expected Calibration Error (ECE) de 0.284 a 0.0748 y el Brier Score a 0.0292. Incorpora los coeficientes tabulados rigurosos de atenuación por lluvia de la Recomendación ITU-R P.838-3 con continuidad asintótica sub-1GHz.
+        </div>
+        <div class="paper-features">
+          <div class="feature-item">
+            <b>Calibración de Platt</b>
+            <code>P(True | s) = 1 / (1 + exp(16·s - 10)), Brier = 0.0292, ECE = 0.0748</code>
+          </div>
+          <div class="feature-item">
+            <b>Normativa ITU-R</b>
+            ITU-R P.838-3 k_H, α_H, k_V, α_V con comprobación de polarización y frecuencia 1-100 GHz.
+          </div>
+          <div class="feature-item">
+            <b>Código Fuente</b>
+            <code>packages/senda/src/truth-calibration-engine.mjs</code>
+          </div>
+        </div>
+        <div class="paper-footer">
+          <div style="font-size:12px; color:var(--text-muted);">Validación 14 catástrofes reales · Curva ITU analítica</div>
+          <div class="action-links">
+            <a class="btn" href="/senda/papers/paper-calibration-lofo.html">Leer Artículo Completo →</a>
+            <a class="btn btn-secondary" href="/media/renders/render-itu-p838-rain-curve.svg" target="_blank">Ver Curva ITU-R SVG</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Paper 4 -->
+      <article class="paper-card" id="paper-v16-c-its">
+        <div class="paper-meta">
+          <span class="badge badge-primary">Paper IV · C-ITS & Telecomunicación Vehicular</span>
+          <span class="badge badge-trl">TRL 6</span>
+          <span style="font-size:12px; color:var(--text-muted);">SENDA-RESEARCH-V16-CITS-2026-V1</span>
+        </div>
+        <h2 class="paper-title"><a href="/senda/papers/paper-v16-c-its.html">Arquitectura de Telecomunicaciones Vehiculares de Resiliencia Extrema: Reflejo V16 C-ITS de 38 ms, Física de Aquaplaning Horne y Conectividad Multisoftware</a></h2>
+        <div class="paper-authors">Por Abraham Haddioui (SENDA) y SENDA Engineering Corps · Noviembre 2026</div>
+        <div class="paper-abstract">
+          Análisis de latencia crítica en seguridad vial y alerta temprana. Compara el modelo de nube celular comercial (latencia media de 180 segundos = 6.000 metros a ciegas a 120 km/h) frente al Reflejo V16 Local Directo vía Bluetooth LE / LoRa ad-hoc (latencia medida de 38 milisegundos = 1,27 metros de avance). Integra la formulación hidrodinámica de aquaplaning de Horne acoplada a micro-sensores vehiculares y contratos de interoperabilidad multisoftware (Android Auto, Apple CarPlay, Waze, Google Maps).
+        </div>
+        <div class="paper-features">
+          <div class="feature-item">
+            <b>Latencia Crítica</b>
+            Reflejo local directo 38 ms (1.27 m a 120 km/h) vs 180 s en nube 4G/5G (6.000 m).
+          </div>
+          <div class="feature-item">
+            <b>Física de Horne</b>
+            <code>v_p = 6.36 · √(p_tire [kPa])</code> acoplada a telemetría de frenada ABS y presión TPMS.
+          </div>
+          <div class="feature-item">
+            <b>Interoperabilidad</b>
+            Transmisor C-ITS DENM / CAM offline compatible con pantallas embarcadas.
+          </div>
+        </div>
+        <div class="paper-footer">
+          <div style="font-size:12px; color:var(--text-muted);">Hardware Centinela COTS &lt;15€ · Protocolos Waze/Google Maps</div>
+          <div class="action-links">
+            <a class="btn" href="/senda/papers/paper-v16-c-its.html">Leer Artículo Completo →</a>
+            <a class="btn btn-secondary" href="/media/renders/render-v16-reflex-latency.svg" target="_blank">Ver Gráfica de Latencia SVG</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Paper 5 -->
+      <article class="paper-card" id="paper-wildfire-3d">
+        <div class="paper-meta">
+          <span class="badge badge-primary">Paper V · Física Atmosférica & Incendios</span>
+          <span class="badge badge-trl">TRL 5</span>
+          <span style="font-size:12px; color:var(--text-muted);">SENDA-RESEARCH-3D-WIND-2026-V20</span>
+        </div>
+        <h2 class="paper-title"><a href="/senda/paper.html">SENDA-3D: Sensores de Oportunidad, Viento 3D con Conservación de Masa y Asimilación de Cicatrices de Satélite</a></h2>
+        <div class="paper-authors">Por Abraham Haddioui (SENDA) · Versión 0.20 · Noviembre 2026</div>
+        <div class="paper-abstract">
+          Unión en una sola cadena offline en el teléfono: perfiles verticales meteorológicos abiertos (NOAA GFS 0.25°), relieve Copernicus GLO-30, imágenes Sentinel-2 L2A y sensores de oportunidad (barómetros, anemometría vehicular por resistencia aerodinámica de rueda libre y cámaras viales). Produce viento 3D con conservación de masa (Poisson anisótropo resuelto por SOR), pluma con aspiración inducida y asimilación de cicatrices dNBR.
+        </div>
+        <div class="paper-features">
+          <div class="feature-item">
+            <b>Ecuación de Poisson Anisótropa</b>
+            <code>∂²λ/∂x² + ∂²λ/∂y² + (α₁/α₂)²·∂²λ/∂z² = -∇·u₀</code> (SOR con ω=1.85)
+          </div>
+          <div class="feature-item">
+            <b>Caso Real Validado</b>
+            San Martín de Valdeiglesias (23-07-2026, 868 ha dNBR): Jaccard pasa de 0.064 a 0.352 tras asimilación.
+          </div>
+          <div class="feature-item">
+            <b>Reproducción</b>
+            <code>node packages/senda/scripts/fire3d-real.mjs</code>
+          </div>
+        </div>
+        <div class="paper-footer">
+          <div style="font-size:12px; color:var(--text-muted);">14 incendios documentados · Asimilación satelital dNBR</div>
+          <div class="action-links">
+            <a class="btn" href="/senda/paper.html">Leer Artículo Completo →</a>
+            <a class="btn btn-secondary" href="/senda/fuego3d">Abrir Visor 3D</a>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- Visual Renders Gallery Section -->
+    <section class="renders-gallery">
+      <h2>Renders y Esquemas de Arquitectura Científica en Alta Resolución (Vector SVG)</h2>
+      <p style="font-size:14px; color:var(--text-muted); margin-bottom:24px;">
+        Modelos visuales generados vectorialmente que documentan la topología, el presupuesto de enlace electromagnético, 
+        la criptografía de árbol Merkle RFC 6962 y la arquitectura electrónica de bajo coste.
+      </p>
+
+      <div class="renders-grid">
+
+        <div class="render-card">
+          <img src="/media/renders/render-paer-mesh-topology.svg" alt="Topología de Malla PAER">
+          <div class="render-card-body">
+            <h3>Topología de Malla Oportunista PAER</h3>
+            <p>Enrutamiento multi-salto con evitación de zonas térmicas críticas, pasarelas de evacuación y nodos aéreos repetidores.</p>
+            <a class="render-card-link" href="/media/renders/render-paer-mesh-topology.svg" target="_blank">Abrir Vector SVG Completo ↗</a>
+          </div>
+        </div>
+
+        <div class="render-card">
+          <img src="/media/renders/render-itu-p838-rain-curve.svg" alt="Curva de Atenuación ITU-R P.838">
+          <div class="render-card-body">
+            <h3>Curva de Atenuación ITU-R P.838-3</h3>
+            <p>Coeficientes analíticos de dispersión por lluvia de 1 a 100 GHz bajo polarización horizontal y vertical (5, 25, 50 mm/h).</p>
+            <a class="render-card-link" href="/media/renders/render-itu-p838-rain-curve.svg" target="_blank">Abrir Vector SVG Completo ↗</a>
+          </div>
+        </div>
+
+        <div class="render-card">
+          <img src="/media/renders/render-merkle-rfc6962-proof.svg" alt="Árbol Merkle Binario RFC 6962">
+          <div class="render-card-body">
+            <h3>Árbol Merkle Criptográfico RFC 6962</h3>
+            <p>Separación de dominio estricta (prefijos 0x00 para hojas, 0x01 para nodos internos) y camino de auditoría de inclusión O(log N).</p>
+            <a class="render-card-link" href="/media/renders/render-merkle-rfc6962-proof.svg" target="_blank">Abrir Vector SVG Completo ↗</a>
+          </div>
+        </div>
+
+        <div class="render-card">
+          <img src="/media/renders/render-v16-reflex-latency.svg" alt="Línea de Tiempo de Latencia V16">
+          <div class="render-card-body">
+            <h3>Línea Temporal de Latencia V16 Directa</h3>
+            <p>Comparativa cuantitativa: 38 ms de reflejo vehicular directo (1,27 m a 120 km/h) frente a 180 s de nube celular (6.000 m a ciegas).</p>
+            <a class="render-card-link" href="/media/renders/render-v16-reflex-latency.svg" target="_blank">Abrir Vector SVG Completo ↗</a>
+          </div>
+        </div>
+
+        <div class="render-card">
+          <img src="/media/renders/render-cots-gateway-hardware.svg" alt="Esquema Hardware Pasarela COTS">
+          <div class="render-card-body">
+            <h3>Pasarela Centinela COTS &lt;15€</h3>
+            <p>Esquema electrónico con ESP32-S3, módem LoRa SX1262 (SPI), matriz acústica ultrasónica I2S (INMP441) y gestión solar TP4056.</p>
+            <a class="render-card-link" href="/media/renders/render-cots-gateway-hardware.svg" target="_blank">Abrir Vector SVG Completo ↗</a>
+          </div>
+        </div>
+
+        <div class="render-card">
+          <img src="/media/renders/render-senda-4d-globe.svg" alt="Globo Táctico 4D SENDA">
+          <div class="render-card-body">
+            <h3>Globo Táctico 4D con Órbitas SGP4 J₂</h3>
+            <p>Propagación orbital de satélites LEO, conos de visibilidad por elevación local y telemetría multi-fuente en tiempo real.</p>
+            <a class="render-card-link" href="/media/renders/render-senda-4d-globe.svg" target="_blank">Abrir Vector SVG Completo ↗</a>
+          </div>
+        </div>
+
+        <div class="render-card">
+          <img src="/media/renders/render-rail-safety-topology.svg" alt="Topología de Seguridad Ferroviaria SENDA">
+          <div class="render-card-body">
+            <h3>Topología C-ITS y Prevención Ferroviaria</h3>
+            <p>Auditoría de enclavamiento (Tempi/Balasore), pandeo térmico de carril (Kerr), ondas guiadas a 5.100 m/s y C-ITS en pasos a nivel.</p>
+            <a class="render-card-link" href="/media/renders/render-rail-safety-topology.svg" target="_blank">Abrir Vector SVG Completo ↗</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer>
+      <div>
+        <b>SENDA / Civic Relay</b> · Repositorio Científico de Acceso Abierto · Código disponible bajo licencia Apache 2.0 / MIT.
+      </div>
+      <div>
+        <a href="https://github.com/abrahamhl/civic-relay" target="_blank" style="color:var(--primary); text-decoration:none;">GitHub Repository ↗</a>
+      </div>
+    </footer>
+  </main>
+
+</body>
+</html>

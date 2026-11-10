@@ -1,6 +1,42 @@
 # Changelog
 
-## SENDA v0.27 · 10-11-2026 · Exposición de personas y avisos adaptados a la densidad real
+## SENDA v0.28 · 10-11-2026 · Integración Misión 10, Motor Ferroviario Auditado, SENDA-CAL y Truth Gate
+
+**Entrada (fundador / CTO):**
+- Misión Antigravity «Financiación en 7 Días» (Día 1): publicar y rebasar rama de Misión 10 sobre PR #31, corregir auditoría del motor ferroviario (pandeo lateral, TTC en alcance, atenuación Lamb, MAC en baliza, duty cycle LoRa, límites SIL-4) y arrancar L1 (staging/truth gate) y L2 (SENDA-CAL / DeliveryReceipt v1).
+
+**Procesamiento:**
+- **Publicación de Misión 10 en GitHub:**
+  - Rama remota publicada: `origin/feat/senda-scientific-mission-10-20261109` (commit `1391a5e`).
+- **Auditoría física y matemática de `packages/senda/src/rail-advanced-safety.mjs`:**
+  - *Pandeo térmico de carril (Kerr/Kish & CWR-SAFE):* Inercia lateral horizontal $I_z = 5,12 \times 10^{-6}\text{ m}^4$ ($512\text{ cm}^4$) sobre carril UIC 60E1 (se rechaza la vertical de $3.038\text{ cm}^4$ que sobrestimaba $P_{\text{crit}} \times 2,44$). $\Delta T$ respecto a temperatura neutra de fijación. Reducción por radio de curva $R$ conforme a Kish & Samavedam (DOT/FRA/ORD-99/11) o declaración explícita `SOLO_VIA_RECTA`.
+  - *Interlocking y TTC:* Se discrimina choque frontal ($v_{\text{rel}} = v_1 + v_2$) de colisión por alcance en el mismo sentido ($v_{\text{rel}} = v_1 - v_2$, $\infty$ si $v_1 \le v_2$). Criterio estricto de distancia de parada $d_{\text{safe}} = \sum(v \cdot t_r + v^2 / 2a)$.
+  - *Seguridad funcional (EN 50126/50128/50129):* El sistema actúa fuera de la cadena vital SIL-4. Se sustituye «frenado autónomo» por «propuesta de aviso de frenado de emergencia al gestor / cabina».
+  - *Ondas guiadas de Lamb en acero:* Velocidad de grupo $c_g = 5.100\text{ m/s}$ (modo longitudinal). Alcance acotado a $\sim 1,2\text{ km}$ para rotura completa; aviso de inoperancia de PZT de 40 kHz de aire en acero por desajuste de impedancia (46 MRayl frente a 400 Rayl).
+  - *Baliza OEP-RAIL v2 (28 Bytes autenticados):* Payload binario con HMAC-SHA256 truncado a 4 bytes (32 bits), contador secuencial anti-replay y CRC-16-CCITT.
+  - *LoRa 868 MHz y duty cycle:* Tiempo en el aire SF12 de 28 B $\approx 1,32\text{ s}$ $\implies$ intervalo mínimo normativo entre emisiones de $132\text{ s}$ (límite 1% ETSI EN 300 220-1).
+  - *C-ITS:* Etiquetado explícito como ITS-G5 5,9 GHz simulado en banco con 38 ms de latencia nominal.
+- **SENDA-CAL · Almacén de Fiabilidad Empírica (`packages/senda/src/reliability-store.mjs`):**
+  - Contrato `DeliveryReceipt v1` anónimo (sin PII, resolución espacial H3 res 7, hash SHA-256 canónico).
+  - Modelo jerárquico Beta-Binomial con Empirical Bayes Shrinkage hacia el prior global del canal.
+  - Factor de olvido exponencial configurable para canales no estacionarios.
+  - CRDT basado en suma conmutativa y asociativa de contadores para sincronización P2P offline sin servidor central.
+  - Test secuencial de Wald (SPRT) para detección temprana de caída/degradación de canal.
+- **Truth Gate (`scripts/claims-lint.mjs`):**
+  - Auditoría estática que bloquea sobreafirmaciones sin calificar («submétrico», «100% infalible», «certificado oficial no concedido»).
+- **Laboratorio Web y UI (`investor-next/app/rail-safety-lab.tsx`):**
+  - Actualizado con las formulaciones auditadas y montado en Surface C (`/science`).
+  - Next.js Turbopack SSG prerenderiza 17/17 páginas sin errores.
+
+**Validación:**
+- Núcleo civil: 399/399 tests pasando en `packages/senda`.
+- Tests de defensa: 2/2 tests pasando en `tests/defense/`.
+- Frontend microsite: 108/108 tests pasando en `investor-next`.
+- Claims lint: PASS (0 sobreafirmaciones no calificadas).
+- Type check: 0 errores TypeScript (`tsc --noEmit`).
+
+---
+
 
 **Entrada (fundador):** usar cuánta gente y cuántos vehículos hay en cada zona, como el tráfico de Google Maps o Waze, para que las alertas tengan en cuenta el tráfico real y se reduzcan los tiempos. Conseguir el máximo de datasets de población.
 

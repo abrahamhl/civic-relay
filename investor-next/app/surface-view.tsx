@@ -10,6 +10,7 @@ import DefenseVaultMedia from './defense-vault/defense-vault-media';
 import LiveHardwareAndDealRoomConsole from './live-hardware-console';
 import EvidenceBoard from './evidence-board';
 import CommandSurface from './command-surface';
+import RailSafetyLab from './rail-safety-lab';
 import { HyperFramesCinemaDeck } from './hyperframes-cinema-deck';
 import { SystemExplained, DeveloperBlueprint } from './system-explained';
 import LanguageDocument from './language-document';
@@ -164,6 +165,7 @@ export default function SurfaceView({
           <div className="container">
             <ScientificTheoremsLab locale={locale} />
             <VehicularDopplerLab locale={locale} />
+            <RailSafetyLab locale={locale} />
           </div>
           <SystemExplained locale={locale} />
           <CoordinationLab locale={locale} />
