@@ -57,4 +57,5 @@ export * from './telecom-mathematical-physics.mjs';
 export * from './government-resilience-harness.mjs';
 export * from './scientific-theorems-physics.mjs';
 export * from './vehicle-doppler-gateway.mjs';
+export * from './delivery-assurance.mjs';
 // Defensa y doble uso: aislado en './defense/index.mjs' (importar '@senda/core/defense'), nunca desde aquí.

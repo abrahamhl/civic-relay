@@ -1,5 +1,25 @@
 # Changelog
 
+## SENDA v0.26 · 10-11-2026 · Motor de Garantía de Entrega: fallos correlacionados, física, aprendizaje bayesiano y decisión certificada
+
+**Entrada (fundador):** hacer la parte física, científica y de computación más avanzada, difícil de replicar e innovadora.
+
+**Procesamiento:**
+- **Nuevo `packages/senda/src/delivery-assurance.mjs`**, exportado desde `@senda/core`:
+  - Probabilidad exacta de entrega con fallos de causa común (mezcla de estados de peligro + Poisson-binomial agrupada).
+  - Física de lluvia (P.838-3) más Nakagami-m convertida en fiabilidad por canal.
+  - Posterior Beta-Binomial alimentado por recibos, con planificación por cota inferior creíble.
+  - Optimizador multiarranque con movimientos de bloque, búsqueda local iterada y reducción por simetría exacta.
+  - Certificado SHA-256 canónico de cada plan.
+- **Auditoría del planificador existente:** promete un 99,49 % y entrega un 96,09 % con fallos correlacionados. El motor nuevo da un 98,98 % a 0 € (3,8× menos fallos) y un 99,99 % con 3 € de Iridium; en el peor estado (apagón + tormenta), 90,9 % → 97,6 % → 99,98 %. El precio es más tiempo de aire (22 fragmentos frente a 6), declarado.
+- **Durante el desarrollo, los tests contra el óptimo exacto destaparon** que el primer optimizador voraz se quedaba hasta 32 puntos por debajo del óptimo. Se corrigió con movimientos de bloque y búsqueda local iterada hasta lograr el óptimo exacto en 60 de 60 instancias.
+- **Corrección del pipeline de vídeo:** `render.mjs` leía las cifras de pruebas de un esquema antiguo de `estado.json` y mostraba 266 en lugar de 350. Las dos películas M96 se volvieron a renderizar.
+- **Documentación:** `docs/science/DELIVERY_ASSURANCE.md`. Evidencia reproducible en `evidence/senda/delivery-assurance.json`.
+
+**Validación:** `node --test packages/senda/tests/*.test.mjs packages/senda/tests/defense/*.test.mjs` → 382/382.
+
+— Claude Code
+
 ## SENDA v0.25 · 10-11-2026 · Bóveda de defensa aislada y película promocional completa M96
 
 **Entrada (fundador):**
