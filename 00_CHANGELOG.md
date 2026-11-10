@@ -1,5 +1,28 @@
 # Changelog
 
+## SENDA v0.28 · 10-11-2026 · Modo administrador / 112 (activación de área) y guía de prueba real
+
+**Entrada (fundador):**
+- Poder probar SENDA hoy con otra persona sin SIM ni Internet, sabiendo canal y formato.
+- Una reserva de 1 GB.
+- Un modo administrador tipo 112 que active SENDA en una zona, vea toda la superficie (satélites, meteorología, cámaras, coches, sensores), fusione y ordene evacuar un edificio.
+
+**Procesamiento:**
+- **Nuevo `packages/senda/src/area-activation.mjs`:**
+  - Registro de 16 fuentes de la superficie, cada una con su vía legal: abierta, con clave, emisión pública, teléfono SENDA con consentimiento o convenio.
+  - `scanSurface`: inventario del perímetro con distancias, frescura, k-anonimato de teléfonos y huecos declarados.
+  - `authorizeSurfaceRequest`: rechaza con motivo legal lo intrusivo (controlar coches ajenos, leer equipos por radio, cámaras privadas, rastrear personas), pide convenio o clave cuando toca y solo admite órdenes con credencial institucional.
+  - `fuseHazardEvidence`: fusión en log-odds que cuenta una sola vez las fuentes del mismo linaje.
+  - `evacuationDecision`: tiempo de llegada del peligro frente al tiempo de salida, decisión y orden firmable para `remote-command.mjs`.
+- **Nueva guía `docs/field/PRUEBA_CON_TU_HERMANO.md`:** qué funciona hoy sin SIM (sonido, código, chat y voz por Wi-Fi local), qué necesita app nativa (Bluetooth), qué necesita un nodo LoRa (kilómetros) y qué no es físicamente posible (comunicar a distancia sin ningún puente).
+- **Reserva de 1 GB:** ya existía (`net-reserve.mjs`, `/senda/reserva`). Se explica su límite físico (un giga guardado no crea cobertura) y las tres vías reales para convertir la reserva en conexión.
+
+**Validación:** núcleo 396/396 (5 tests nuevos).
+
+**Siguiente paso de mayor impacto:** puente SENDA ↔ Meshtastic por Web Bluetooth, para probar a kilómetros sin SIM con dos nodos LoRa de ~30–40 €.
+
+— Claude Code
+
 ## SENDA v0.27 · 10-11-2026 · Exposición de personas y avisos adaptados a la densidad real
 
 **Entrada (fundador):** usar cuánta gente y cuántos vehículos hay en cada zona, como el tráfico de Google Maps o Waze, para que las alertas tengan en cuenta el tráfico real y se reduzcan los tiempos. Conseguir el máximo de datasets de población.

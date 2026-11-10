@@ -59,4 +59,5 @@ export * from './scientific-theorems-physics.mjs';
 export * from './vehicle-doppler-gateway.mjs';
 export * from './delivery-assurance.mjs';
 export * from './exposure.mjs';
+export * from './area-activation.mjs';
 // Defensa y doble uso: aislado en './defense/index.mjs' (importar '@senda/core/defense'), nunca desde aquí.
