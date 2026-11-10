@@ -210,3 +210,37 @@ test('ReliabilityStore: Serialización toJSON y reconstrucción fromJSON', () =>
   assert.equal(orig.mean, rest.mean);
   assert.equal(restored.decayFactor, 0.98);
 });
+
+test('Integración con planAssuredDelivery: los recibos del ReliabilityStore alimentan la optimización', async () => {
+  const { planAssuredDelivery } = await import('../src/delivery-assurance.mjs');
+  const store = new ReliabilityStore();
+  const zone = '873908280ffffff';
+
+  // Ingestar 40 éxitos en MESHTASTIC en esa zona
+  for (let i = 0; i < 40; i++) {
+    store.ingestReceipt(createDeliveryReceipt({
+      bearerId: 'MESHTASTIC',
+      zoneH3: zone,
+      sentAt: 1000 + i * 10,
+      ackedAt: 1500,
+      outcome: 'DELIVERED'
+    }));
+  }
+
+  // Planificar sin almacén vs con almacén
+  const available = [
+    { id: 'MESHTASTIC', messages: 5 },
+    { id: 'PHONE_MESH', messages: 3 }
+  ];
+
+  const planBase = planAssuredDelivery(200, available, { effort: 'fast' });
+  const planWithStore = planAssuredDelivery(200, available, {
+    reliabilityStore: store,
+    zoneH3: zone,
+    effort: 'fast'
+  });
+
+  assert.equal(planWithStore.feasible, true);
+  assert.ok(planWithStore.learned['MESHTASTIC'].observations > planBase.learned['MESHTASTIC'].observations);
+  assert.ok(planWithStore.learned['MESHTASTIC'].lowerCredible >= planBase.learned['MESHTASTIC'].lowerCredible);
+});

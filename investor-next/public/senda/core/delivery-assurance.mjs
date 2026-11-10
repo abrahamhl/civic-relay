@@ -416,7 +416,7 @@ export function greedyAllocation(slots, n, k, scenarios) {
 export function planAssuredDelivery(lengthBytes, available, opts = {}) {
   const {
     scenarios = { NORMAL: { ...DEFAULT_HAZARDS.NORMAL, prob: 0.25 }, GRID_DOWN: { ...DEFAULT_HAZARDS.GRID_DOWN, prob: 0.35 }, STORM: { ...DEFAULT_HAZARDS.STORM, prob: 0.2 }, GRID_DOWN_STORM: { ...DEFAULT_HAZARDS.GRID_DOWN_STORM, prob: 0.2 } },
-    receipts = {}, credibility = 0.9, reliability = 'lower', maxFragments = 64, minGain = 1e-5, effort = 'thorough', budgetEUR = Infinity, publicCleartext = false, maxShards = 40,
+    receipts = {}, reliabilityStore = null, zoneH3 = '*', hazardState = 'NORMAL', credibility = 0.9, reliability = 'lower', maxFragments = 64, minGain = 1e-5, effort = 'thorough', budgetEUR = Infinity, publicCleartext = false, maxShards = 40,
   } = opts;
   if (!(Number.isInteger(lengthBytes) && lengthBytes > 0)) throw new RangeError('lengthBytes entero > 0');
 
@@ -426,7 +426,18 @@ export function planAssuredDelivery(lengthBytes, available, opts = {}) {
     const def = BEARERS[a.id];
     if (!def) continue;
     if (!def.encryptionAllowed && !publicCleartext) continue;
-    const r = receipts[a.id] ?? {};
+    let r = receipts[a.id] ?? {};
+    if (reliabilityStore && typeof reliabilityStore.getReliability === 'function') {
+      const rel = reliabilityStore.getReliability(a.id, zoneH3, hazardState);
+      if (rel.sampleCount > 0) {
+        const priorAlpha = reliabilityStore.channelPriors?.[a.id]?.alpha ?? 10;
+        const priorBeta = reliabilityStore.channelPriors?.[a.id]?.beta ?? 2;
+        r = {
+          successes: (r.successes || 0) + Math.max(0, Math.round(rel.alpha - priorAlpha)),
+          failures: (r.failures || 0) + Math.max(0, Math.round(rel.beta - priorBeta))
+        };
+      }
+    }
     const post = posteriorReliability({ p0: def.p, successes: r.successes ?? 0, failures: r.failures ?? 0, credibility });
     learned[a.id] = { prior: def.p, mean: +post.mean.toFixed(4), lowerCredible: +post.lower.toFixed(4), observations: post.observations };
     usable.push({ id: a.id, ...def, p: reliability === 'mean' ? post.mean : post.lower, messages: a.messages ?? def.perWindow ?? 1 });

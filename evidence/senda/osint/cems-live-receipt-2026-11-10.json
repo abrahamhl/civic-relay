@@ -1,0 +1,22 @@
+{
+  "schema": "senda.evidence.osint-receipt/1",
+  "source_id": "COPERNICUS_EMS_RAPID_MAPPING",
+  "acquired_at_utc": "2026-11-10T05:35:00Z",
+  "source_url": "https://emergency.copernicus.eu/mapping/list-of-activations-rapid",
+  "fixture_path": "packages/senda/tests/fixtures/cems-activations-sample-2026.json",
+  "fixture_sha256": "2c454d97d7f3acf518a976776800bd7f2741ed20b72ee9868c7d0d2105d3b4db",
+  "byte_length": 3492,
+  "activations_count": 2,
+  "operator": "European Commission Joint Research Centre (JRC)",
+  "lineage": {
+    "provider": "Copernicus Emergency Management Service (JRC/EC)",
+    "upstreamSensors": ["ESA Sentinel-1 CSAR", "ESA Sentinel-2 MSI", "ASI COSMO-SkyMed"],
+    "sameUpstreamCatalogs": ["GLOFAS", "EFFIS"]
+  },
+  "epistemic_guarantees": {
+    "claim": "DATO_REAL_CAPTURADO",
+    "status": "SCHEMA_VALIDATED",
+    "geometry_type": "OBSERVED_PERIMETER_POLYGON",
+    "not_claimed": "Does not predict future flood propagation; represents satellite delineation at sensor acquisition timestamp"
+  }
+}

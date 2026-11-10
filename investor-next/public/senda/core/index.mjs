@@ -64,4 +64,5 @@ export * from './automotive-multisoftware-link.mjs';
 export * from './navigation-multisoftware-hub.mjs';
 export * from './zero-overhead-mobile-optimizer.mjs';
 export * from './reliability-store.mjs';
+export * from './copernicus-ems.mjs';
 // Defensa y doble uso: aislado en './defense/index.mjs' (importar '@senda/core/defense'), nunca desde aquí.

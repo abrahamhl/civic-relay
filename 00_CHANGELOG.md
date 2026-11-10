@@ -22,14 +22,26 @@
   - Factor de olvido exponencial configurable para canales no estacionarios.
   - CRDT basado en suma conmutativa y asociativa de contadores para sincronización P2P offline sin servidor central.
   - Test secuencial de Wald (SPRT) para detección temprana de caída/degradación de canal.
+  - Integración nativa con `planAssuredDelivery` en `delivery-assurance.mjs`: los recibos empíricos modulan dinámicamente el reparto $k$-de-$n$.
+- **Adaptador Copernicus EMS Rapid Mapping (`packages/senda/src/copernicus-ems.mjs`):**
+  - Segregación epistémica estricta entre ACTIVATION (declaración administrativa), CARTOGRAPHIC_PRODUCT (delineación o gradación satelital) y OBSERVED_PERIMETER (polígono real de inundación o cicatriz de fuego).
+  - Fixture real con la activación EMSR765 (DANA Valencia) y EMSR740 (incendio Cebreros), con hash SHA-256 canónico y recibo en `evidence/senda/osint/cems-live-receipt-2026-11-10.json`.
+  - Linaje declarado: ESA Sentinel-1 CSAR / Sentinel-2 MSI y catálogos upstream GLOFAS / EFFIS.
+- **Protocolo de Ensayos Físicos de Campo (`docs/field/PILOT_PROTOCOL_2026-11.md`):**
+  - Matriz experimental con 5 escenarios (interior LOS 2 m, tabique 5 m, muros de carga 10 m, exterior 30 m y modo avión total).
+  - SOP de captura y exportación anónima para 3 terminales Android y 2 nodos LoRa SX1262.
 - **Truth Gate (`scripts/claims-lint.mjs`):**
   - Auditoría estática que bloquea sobreafirmaciones sin calificar («submétrico», «100% infalible», «certificado oficial no concedido»).
+- **Prueba Offline E2E en Chromium Real (Playwright):**
+  - `investor-next/scripts/senda-offline-e2e.mjs` ejecutado con éxito: 49/49 verificaciones pasando y 37 capturas actualizadas sin red en `evidence/senda/`.
 - **Laboratorio Web y UI (`investor-next/app/rail-safety-lab.tsx`):**
   - Actualizado con las formulaciones auditadas y montado en Surface C (`/science`).
   - Next.js Turbopack SSG prerenderiza 17/17 páginas sin errores.
 
 **Validación:**
-- Núcleo civil: 399/399 tests pasando en `packages/senda`.
+- Núcleo civil: 410/410 tests pasando en `packages/senda`.
+- E2E sin red: 49/49 checks pasando en Chromium real (`offline-e2e.json`).
+- Relé: 3/3 tests pasando.
 - Tests de defensa: 2/2 tests pasando en `tests/defense/`.
 - Frontend microsite: 108/108 tests pasando en `investor-next`.
 - Claims lint: PASS (0 sobreafirmaciones no calificadas).
