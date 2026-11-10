@@ -81,5 +81,6 @@ test('Generación de Señuelos Virtuales ASTM F3411 y Desorientación Óptica', 
 
   const optical = computeOpticalCameraDisruptionParams(60, 0.001);
   assert.ok(optical.primaryStrobeFreqHz > 100, 'Frecuencia estroboscópica anti-obturador activa');
-  assert.equal(optical.civilianSafetyRating, 'SEGURO_NO_LASER_SIN_RIESGO_OCULAR');
+  assert.equal(optical.civilianSafetyRating, 'NO_LASER_NO_VALIDADO_RIESGO_FOTOSENSIBILIDAD');
+  assert.equal(optical.validationStatus, 'HIPOTESIS_SIN_ENSAYO');
 });

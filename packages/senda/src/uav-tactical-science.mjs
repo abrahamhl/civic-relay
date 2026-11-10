@@ -126,7 +126,8 @@ export function computeOptimalElevationAngleDeg(env) {
 /**
  * Determines the optimal UAV hovering altitude (h_opt) that maximizes the ground coverage radius
  * for a maximum allowable link path loss (e.g. 105 dB for LoRa, 80 dB for Wi-Fi), subject to
- * tactical emergency airspace operational ceiling constraints (defaults to 300m AGL per UME / EASA Specific Category).
+ * tactical emergency airspace operational ceiling constraints (default 300 m AGL is a configurable planning value: EASA 'open' category is limited to 120 m;
+ * higher operations need a 'specific'-category authorisation or state/emergency exemption).
  *
  * Grounded in Al-Hourani, Kandeepan & Lardner (IEEE WCL 2014) "Optimal LAP Altitude for Maximum Coverage".
  *

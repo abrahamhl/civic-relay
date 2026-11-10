@@ -10,9 +10,10 @@
 
 export const SPEED_OF_SOUND_AIR_20C = 343.0; // m/s at 20 °C, 1013.25 hPa
 
+// Directivity factor of a first-order pattern (1−α)+α·cosθ: Q = 3 / (3(1−α)² + α²); DI = 10·log10(Q).
 export const POLAR_PATTERNS = Object.freeze({
   OMNI: { alpha: 0.0, name: 'Omnidirectional', directivityFactorQ: 1.0, diDb: 0.0 },
-  SUBCARDIOID: { alpha: 0.33, name: 'Subcardioid (Wide)', directivityFactorQ: 1.43, diDb: 1.55 },
+  SUBCARDIOID: { alpha: 0.33, name: 'Subcardioid (Wide)', directivityFactorQ: 2.06, diDb: 3.14 },
   CARDIOID: { alpha: 0.5, name: 'Cardioid', directivityFactorQ: 3.0, diDb: 4.77 },
   SUPERCARDIOID: { alpha: 0.634, name: 'Supercardioid', directivityFactorQ: 3.73, diDb: 5.72 },
   HYPERCARDIOID: { alpha: 0.75, name: 'Hypercardioid', directivityFactorQ: 4.0, diDb: 6.02 },

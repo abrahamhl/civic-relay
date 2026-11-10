@@ -301,7 +301,11 @@ export function computeOpticalCameraDisruptionParams(targetDroneFps = 60, shutte
     primaryStrobeFreqHz: recommendedStrobeHz,
     secondaryStrobeFreqHz: secondaryStrobeHz,
     disruptionType: 'ROLLING_SHUTTER_ALIASING_BANDING',
-    civilianSafetyRating: 'SEGURO_NO_LASER_SIN_RIESGO_OCULAR',
-    operationalEffect: 'Provoca bandas de saturación oscura cíclica en el sensor óptico del dron que impiden el rastreo neuronal de blancos.',
+    // Sin láser, pero NO validado: la luz pulsada puede afectar a personas fotosensibles (bandas
+    // 3–30 Hz), los flashes de móvil no garantizan estas frecuencias y el efecto sobre el
+    // seguimiento visual del dron es una HIPÓTESIS sin ensayo. No usar como medida de protección.
+    civilianSafetyRating: 'NO_LASER_NO_VALIDADO_RIESGO_FOTOSENSIBILIDAD',
+    validationStatus: 'HIPOTESIS_SIN_ENSAYO',
+    operationalEffect: 'Hipótesis: bandas de aliasing por obturador rodante en el sensor CMOS. Efecto real sobre el seguimiento de blancos sin demostrar.',
   };
 }

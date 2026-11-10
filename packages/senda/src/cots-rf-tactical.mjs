@@ -167,6 +167,9 @@ export function calculateBistaticRange(delaySec, baselineDistanceM) {
  * @param {number} dopplerShiftHz Measured Doppler shift in Hz.
  * @param {number} carrierFrequencyHz Carrier frequency in Hz (e.g. 100 MHz for FM, 600 MHz for DVB-T).
  * @param {number} bistaticAngleDeg Angle between transmitter-to-target and receiver-to-target vectors.
+ * Full relation: f_d = (2v/λ)·cos(δ)·cos(β/2), δ = angle between target velocity and the bistatic
+ * bisector. Only the bisector component v·cos(δ) is observable from one Tx-Rx pair; that is what
+ * `radialVelocityMs` returns.
  * @returns {{ radialVelocityMs: number, radialVelocityKmh: number, wavelengthM: number }}
  */
 export function calculateBistaticDopplerVelocity(dopplerShiftHz, carrierFrequencyHz, bistaticAngleDeg = 30) {

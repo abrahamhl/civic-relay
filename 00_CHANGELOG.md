@@ -1,5 +1,37 @@
 # Changelog
 
+## SENDA v0.24 · 10-11-2026 · Auditoría científica: corrección de errores físicos y de afirmaciones públicas antes de financiación
+
+**Entrada (fundador):**
+- Cerrar las brechas del handoff de Antigravity (misión 10) y todo lo que no esté al nivel exigible para pedir financiación esta semana.
+- Nota: la rama `feat/senda-scientific-mission-10-20261109` (HEAD `1391a5e`, `rail-advanced-safety.mjs`, cierres P0) **no está en GitHub ni en producción**; esta entrada audita y corrige lo que sí está publicado (`feat/senda-master-integration-20261109`, `62d2b74`).
+
+**Procesamiento:**
+- **`telecom-mathematical-physics.mjs`:**
+  - DTN epidémico: la tasa de contactos es por nodo (β = λ/(N−1)); se añade la capacidad de carga del modelo SIS (I* = N − μ/β). Los percentiles inalcanzables devuelven `Infinity` en lugar de un tiempo ficticio. Validado contra la integración RK4 de la EDO.
+  - Deygout: motor compartido de 3 aristas con curvatura terrestre k = 4/3 y umbral J(ν) a −0,78. Se elimina un comentario que anunciaba una corrección que no se aplicaba.
+  - Lluvia ITU-R P.838-3: tabla de coeficientes 1–40 GHz con interpolación log-log en lugar de 5 escalones (antes sobrestimaba un 50 % a 12 GHz).
+  - PLL LEO: ancho de banda derivado de θ_e = 2π·Ḟ/ω_n² en lugar de una regla sin fuente.
+- **`scientific-theorems-physics.mjs`:**
+  - Cota de Cramér-Rao del radar pasivo: el ancho de banda RMS era πB/√3 en vez de B/(2√3) y subestimaba σ en un factor 2π. Con DVB-T a 15 dB, **σ_R pasa de "0,43 m submétrico" a 2,7 m**. La velocidad se reporta como biestática (λ·σ_f).
+  - Enlace acústico: la tasa de error de trama pasa de un escalón (1e-7 si SNR > 0) a 16-FSK no coherente (125 baudios, coherente con 2 kHz) más RS(104,80) exacta. Se declaran las hipótesis.
+  - Jacobi: converge por tolerancia (antes se cortaba en 150 rotaciones) y simetriza la matriz.
+  - Deygout frente a Epstein-Peterson: se elimina el factor √(d/D) inventado. EP se calcula de verdad; ahora ambos se acotan entre sí.
+  - Se aclara que los "Teoremas" son resultados publicados y que `CANYON_RUBBLE` es un proxy no validado.
+- **Otros:** subcardioide Q = 2,06 (antes 1,43); componente sobre la bisectriz en el Doppler biestático; límite de 120 m de la categoría abierta de EASA; el estroboscopio deja de declararse "sin riesgo ocular" y queda como hipótesis sin ensayo.
+- **Web (`scientific-theorems-lab.tsx`):** usa el núcleo probado (`public/senda/core`) en lugar de constantes fijas (λ₂ = 0,052/0,842, pérdida de 4,72 dB, θ* tabulado). Se corrigen los textos: "precisión submétrica", "P_FER < 10⁻⁷" y "validación frente a catástrofes reales" pasan a "modelos analíticos pendientes de calibración".
+
+**Validación:**
+- `node --test packages/senda/tests/*.test.mjs`: `370/370` pass (4 tests nuevos contra soluciones analíticas).
+- `node --test packages/senda/tests-adversarial/*.test.mjs`: `11/11` pass.
+- `node --test investor-next/tests/*.test.mjs`: `108/108` pass; `npm run type-check`: 0 errores; `npm run build`: 14 páginas; `check:locales`: pass.
+
+**Pendiente (decisión del fundador):**
+- Módulo de señuelos Open Drone ID y estroboscopio anti-dron (`civilian-uav-mesh-radar.mjs` + `civilian-radar-defense-lab.tsx`, publicado en la página de inversores): emitir Remote ID falso no es legal en la UE y compromete la elegibilidad en convocatorias civiles.
+- Push de la misión 10 de Antigravity para auditar `rail-advanced-safety.mjs`.
+
+— Claude Code · auditoría científica
+
 ## SENDA v0.23 · 08-11-2026 · Suite de vídeos finales de presentación M95 (V1–V5, 1080p, voz en inglés `bf_emma`, subtítulos ES/EN/NL y evidencia de release)
 
 **Entrada (fundador):**
