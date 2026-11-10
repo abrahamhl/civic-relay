@@ -776,12 +776,12 @@
     "nl": "Machinaal geverifieerd. Eerlijk over wat ontbreekt."
    },
    "es": [
-    "Todo se verifica autom?ticamente en cada cambio: doscientas sesenta y seis pruebas del n?cleo y cuarenta y nueve comprobaciones de principio a fin en navegadores reales, casi todas con la red cortada.",
-    "Lo que falta, lo decimos: pilotos de campo con tel?fonos f?sicos y equipos de rescate, auditor?a de seguridad independiente y certificaci?n para compra p?blica."
+    "Todo se verifica automáticamente en cada cambio: doscientas sesenta y seis pruebas del núcleo y cuarenta y nueve comprobaciones de principio a fin en navegadores reales, casi todas con la red cortada.",
+    "Lo que falta, lo decimos: pilotos de campo con teléfonos físicos y equipos de rescate, auditoría de seguridad independiente y certificación para compra pública."
    ],
    "es_say": [
-    "Todo se verifica autom?ticamente en cada cambio: doscientas sesenta y seis pruebas del n?cleo y cuarenta y nueve comprobaciones de principio a fin en navegadores reales, casi todas con la red cortada.",
-    "Lo que falta, lo decimos: pilotos de campo con tel?fonos f?sicos y equipos de rescate, auditor?a de seguridad independiente y certificaci?n para compra p?blica."
+    "Todo se verifica automáticamente en cada cambio: doscientas sesenta y seis pruebas del núcleo y cuarenta y nueve comprobaciones de principio a fin en navegadores reales, casi todas con la red cortada.",
+    "Lo que falta, lo decimos: pilotos de campo con teléfonos físicos y equipos de rescate, auditoría de seguridad independiente y certificación para compra pública."
    ],
    "en": [
     "Everything is machine-verified on every change: two hundred and sixty-six core tests, and forty-nine end-to-end checks in real browsers, almost all with the network cut.",
@@ -811,7 +811,7 @@
      {
       "v": "266",
       "l": {
-       "es": "pruebas del n?cleo, ejecutadas sin red",
+       "es": "pruebas del núcleo, ejecutadas sin red",
        "en": "core tests, run offline",
        "nl": "kerntests, offline uitgevoerd"
       }
@@ -827,7 +827,7 @@
      {
       "v": "0",
       "l": {
-       "es": "auditor?as externas completadas",
+       "es": "auditorías externas completadas",
        "en": "external audits completed",
        "nl": "voltooide externe audits"
       }
@@ -856,21 +856,21 @@
    "es": [
     "La seguridad no es una promesa. Es una cadena que se puede inspeccionar.",
     "Los mensajes van cifrados de extremo a extremo. Los recibos se firman en una cadena de hashes.",
-    "La clave de identidad est? ligada a la tarjeta y se exporta cifrada.",
-    "El n?cleo tiene m?s de doscientas sesenta pruebas autom?ticas, y el protocolo de custodia tiene su propia bater?a.",
-    "Eso demuestra que el c?digo hace lo que comprueban las pruebas. No demuestra su comportamiento en campo, y ninguna auditor?a externa lo ha certificado todav?a."
+    "La clave de identidad está ligada a la tarjeta y se exporta cifrada.",
+    "El núcleo tiene más de doscientas sesenta pruebas automáticas, y el protocolo de custodia tiene su propia batería.",
+    "Eso demuestra que el código hace lo que comprueban las pruebas. No demuestra su comportamiento en campo, y ninguna auditoría externa lo ha certificado todavía."
    ],
    "es_say": [
     "La seguridad no es una promesa. Es una cadena que se puede inspeccionar.",
     "Los mensajes van cifrados de extremo a extremo. Los recibos se firman en una cadena de hashes.",
-    "La clave de identidad est? ligada a la tarjeta y se exporta cifrada.",
-    "El n?cleo tiene m?s de doscientas sesenta pruebas autom?ticas, y el protocolo de custodia tiene su propia bater?a.",
-    "Eso demuestra que el c?digo hace lo que comprueban las pruebas. No demuestra su comportamiento en campo, y ninguna auditor?a externa lo ha certificado todav?a."
+    "La clave de identidad está ligada a la tarjeta y se exporta cifrada.",
+    "El núcleo tiene más de doscientas sesenta pruebas automáticas, y el protocolo de custodia tiene su propia batería.",
+    "Eso demuestra que el código hace lo que comprueban las pruebas. No demuestra su comportamiento en campo, y ninguna auditoría externa lo ha certificado todavía."
    ],
    "nl": [
     "Veiligheid is geen belofte. Het is een keten die je kunt controleren.",
     "Berichten zijn end-to-end versleuteld. Ontvangstbewijzen worden ondertekend in een hash-keten.",
-    "De identiteitssleutel is aan de kaart gebonden en wordt versleuteld ge?xporteerd.",
+    "De identiteitssleutel is aan de kaart gebonden en wordt versleuteld geëxporteerd.",
     "De kern heeft meer dan tweehonderdzestig automatische tests, en het custodieprotocol heeft een eigen suite.",
     "Dat bewijst dat de code doet wat de tests controleren. Het bewijst geen veldprestaties, en geen externe audit heeft het gecertificeerd."
    ]

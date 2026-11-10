@@ -72,7 +72,7 @@ def main():
             for extra in ("es", "nl"):
                 if all(extra in sc for sc in doc["scenes"]):
                     sub_langs.append(extra)
-                elif NAME.startswith("m95-"):
+                elif NAME.startswith(("m95-", "m96-")):
                     raise SystemExit(f"[FATAL] Falta idioma '{extra}' en alguna escena de {NAME}.json")
         else:
             sub_langs = [lang]
