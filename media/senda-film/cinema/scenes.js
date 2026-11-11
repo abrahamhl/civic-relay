@@ -137,10 +137,11 @@ function rail() {
     const l1 = label('TRAIN 1', '#f2f4f4', 34, 'emergency services on scene'); l1.position.set(-2, 14, -14); scene.add(l1);
     const l2 = label('TRAIN 2', '#ff7756', 34, 'unknown for ≈ 45 min'); l2.position.set(4, 14, 160); scene.add(l2);
     const mark = points([4, 5, 160], C.coral, 26); scene.add(mark);
-    return { scene, camera: cam(42), blue, l1, l2, mark };
+    return { scene, camera: cam(42), blue, work, l1, l2, mark };
   });
   return { scene: W.scene, camera: W.camera, bloom: [0.95, 0.65, 0.6], update(lt, d, cue) {
     if (cache.trainx) { const X = cache.trainx; [X.phones, X.node, X.nodeL, X.capT, X.room, X.roomL, ...X.ups].forEach((o) => { o.visible = false; }); }
+    tint(W.work, 1);
     const a = W.blue.geometry.attributes.color; for (let i = 0; i < 5; i++) { const k = Math.sin(lt * 11 + i * 2.1) > 0.2 ? 1 : 0.05; a.array[i * 3] = 0.24 * k; a.array[i * 3 + 1] = 0.48 * k; a.array[i * 3 + 2] = k; } a.needsUpdate = true;
     const tr = smooth(cue(1) - 0.5, cue(2) + 1.6, lt);
     fly(W.camera, [{ p: [-30, 7, -78], l: [-2, 4, -10] }, { p: [-22, 9, -20], l: [0, 4, 40] }, { p: [-13, 6, 70], l: [3, 4, 150] }, { p: [-16, 10, 118], l: [4, 4, 162] }], smooth(0, 1, lt / d * 0.35 + tr * 0.65));
@@ -431,7 +432,7 @@ function train() {
     return { phones, who, node, nodeL, ups, capT, room, roomL, n: who.length };
   });
   const objs = [X.phones, X.node, X.nodeL, X.capT, X.room, X.roomL, ...X.ups];
-  return { scene: W.scene, camera: W.camera, bloom: [1.0, 0.65, 0.55], update(lt, d, cue) {
+  return { scene: W.scene, camera: W.camera, bloom: [0.7, 0.5, 0.75], update(lt, d, cue) {
     R0.update(0, 1, () => 0); W.l1.material.opacity = 0; W.l2.material.opacity = 0; tint(W.mark, 0); objs.forEach((o) => { o.visible = true; });
     const imp = smooth(cue(1) - 0.2, cue(1) + 0.2, lt), ask = lt > cue(2) && lt < cue(4), fuse = smooth(cue(4), cue(4) + 2, lt), t2 = lt > cue(5);
     const a = X.phones.geometry.attributes.color;
@@ -446,7 +447,8 @@ function train() {
     X.node.scale.setScalar(Math.max(0.001, fuse)); X.node.rotation.set(lt * 0.4, lt * 0.6, 0); X.nodeL.material.opacity = smooth(cue(5), cue(5) + 0.6, lt);
     W.l2.material.opacity = t2 ? 1 : 0; tint(W.mark, t2 ? 0.5 + 0.5 * Math.sin(lt * 4) : 0);
     X.capT.geometry.setDrawRange(0, Math.floor(smooth(cue(7), cue(7) + 1.8, lt) * 201)); X.roomL.material.opacity = smooth(cue(7) + 0.8, cue(7) + 1.6, lt);
-    fly(W.camera, [{ p: [-14, 6, -60], l: [-2, 3, -10] }, { p: [-16, 5, 0], l: [0, 3, 30] }, { p: [-60, 40, 40], l: [-10, 10, 90] }, { p: [-110, 60, 150], l: [-40, 20, 140] }], lt / d);
+    tint(W.blue, 0.08); tint(W.work, 0.12);
+    fly(W.camera, [{ p: [-30, 12, -70], l: [-2, 3, -10] }, { p: [-34, 14, 0], l: [0, 3, 40] }, { p: [-75, 46, 10], l: [-25, 24, 100] }, { p: [-30, 70, 40], l: [-90, 18, 200] }], lt / d);
   } };
 }
 
