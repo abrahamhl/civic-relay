@@ -36,9 +36,10 @@ export function tint(p, k, color) { const a = p.geometry.attributes.color, c = c
 export function label(text, color = '#f2f4f4', scale = 10, sub = '') {
   const c = document.createElement('canvas'); c.width = 768; c.height = 160;
   const g = c.getContext('2d');
-  g.font = '700 58px "JetBrains Mono", monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  let fs = 58; g.font = `700 ${fs}px "JetBrains Mono", monospace`; while (g.measureText(text).width > 740 && fs > 20) { fs -= 2; g.font = `700 ${fs}px "JetBrains Mono", monospace`; }
+  g.textAlign = 'center'; g.textBaseline = 'middle';
   g.shadowColor = 'rgba(0,0,0,.9)'; g.shadowBlur = 14; g.fillStyle = color; g.fillText(text, 384, sub ? 58 : 80);
-  if (sub) { g.font = '500 34px Inter, sans-serif'; g.fillStyle = '#a9bcc5'; g.fillText(sub, 384, 120); }
+  if (sub) { let ss = 34; g.font = `500 ${ss}px Inter, sans-serif`; while (g.measureText(sub).width > 740 && ss > 16) { ss -= 2; g.font = `500 ${ss}px Inter, sans-serif`; } g.fillStyle = '#a9bcc5'; g.fillText(sub, 384, 120); }
   const tex = new T.CanvasTexture(c); tex.colorSpace = T.SRGBColorSpace;
   const s = new T.Sprite(new T.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false, fog: false, toneMapped: false }));
   s.scale.set(scale, scale * 160 / 768, 1); s.renderOrder = 10; return s;
@@ -95,7 +96,7 @@ export function makeCity({ seed = 7, half = 150, block = 24, street = 9, hmin = 
 
 export function night(scene, fogColor = 0x04080d, density = 0.0042) {
   scene.background = new T.Color(fogColor); scene.fog = new T.FogExp2(fogColor, density);
-  scene.add(new T.HemisphereLight(0x6f93bd, 0x10151c, 1.1));
+  scene.add(new T.HemisphereLight(0x8fb0d4, 0x18202a, 1.4));
   const moon = new T.DirectionalLight(0x9ec4ff, 0.55); moon.position.set(-80, 140, 60); scene.add(moon);
   return moon;
 }

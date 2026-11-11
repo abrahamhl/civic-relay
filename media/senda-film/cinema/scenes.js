@@ -140,6 +140,7 @@ function rail() {
     return { scene, camera: cam(42), blue, l1, l2, mark };
   });
   return { scene: W.scene, camera: W.camera, bloom: [0.95, 0.65, 0.6], update(lt, d, cue) {
+    if (cache.trainx) { const X = cache.trainx; [X.phones, X.node, X.nodeL, X.capT, X.room, X.roomL, ...X.ups].forEach((o) => { o.visible = false; }); }
     const a = W.blue.geometry.attributes.color; for (let i = 0; i < 5; i++) { const k = Math.sin(lt * 11 + i * 2.1) > 0.2 ? 1 : 0.05; a.array[i * 3] = 0.24 * k; a.array[i * 3 + 1] = 0.48 * k; a.array[i * 3 + 2] = k; } a.needsUpdate = true;
     const tr = smooth(cue(1) - 0.5, cue(2) + 1.6, lt);
     fly(W.camera, [{ p: [-30, 7, -78], l: [-2, 4, -10] }, { p: [-22, 9, -20], l: [0, 4, 40] }, { p: [-13, 6, 70], l: [3, 4, 150] }, { p: [-16, 10, 118], l: [4, 4, 162] }], smooth(0, 1, lt / d * 0.35 + tr * 0.65));
@@ -286,7 +287,7 @@ function road() {
       const body = new T.Mesh(new T.BoxGeometry(1.86, 0.72, LEN), new T.MeshStandardMaterial({ color: col, metalness: 0.75, roughness: 0.32 })); body.position.y = 0.66; g.add(body);
       const cab = new T.Mesh(new T.BoxGeometry(1.62, 0.6, 2.3), new T.MeshStandardMaterial({ color: 0x0a0f14, metalness: 0.9, roughness: 0.15 })); cab.position.set(0, 1.28, -0.25); g.add(cab);
       g.position.x = lanes[i]; scene.add(g); return g; });
-    const tail = points(new Float32Array(N * 6), 0xff1a1a, 2.4, { fog: true }), head = points(new Float32Array(N * 6), 0xfff1d6, 2.6, { fog: true }), ring = points(new Float32Array(N * 3), C.ice, 7), bang = points(new Float32Array(N * 3), 0xffc27a, 18, { fog: true });
+    const tail = points(new Float32Array(N * 6), 0xff1a1a, 0.8, { fog: true }), head = points(new Float32Array(N * 6), 0xfff1d6, 0.9, { fog: true }), ring = points(new Float32Array(N * 3), C.ice, 3), bang = points(new Float32Array(N * 3), 0xffc27a, 7, { fog: true });
     scene.add(tail, head, ring, bang);
     return { scene, camera: cam(46), cars, tail, head, ring, bang, runA, runB, N, LEN };
   });
@@ -301,6 +302,8 @@ function road() {
       rp[i * 3] = g.position.x; rp[i * 3 + 1] = 2.6; rp[i * 3 + 2] = z; const w = B && i > 0 ? clamp(1 - Math.abs(tau - run.bt[i] - 0.35) / 0.9) : 0; setPoint(W.ring, i, 0.57 * w, 0.84 * w, 0.91 * w);
       bp[i * 3] = g.position.x; bp[i * 3 + 1] = 1; bp[i * 3 + 2] = z + W.LEN / 2; const f = hit ? clamp(1 - since / 0.35) : 0; setPoint(W.bang, i, f, f * 0.76, f * 0.48); }
     for (const p of [W.tail, W.head, W.ring, W.bang]) p.geometry.attributes.position.needsUpdate = true;
+    if (!W.sos) { W.sos = points([0, 0, 0], C.red, 5, { fog: true }); W.sosR = new T.Mesh(new T.RingGeometry(0.95, 1, 64), new T.MeshBasicMaterial({ color: C.red, transparent: true, opacity: 0, side: T.DoubleSide, depthWrite: false, blending: T.AdditiveBlending })); W.sosR.rotation.x = -Math.PI / 2; W.scene.add(W.sos, W.sosR); }
+    { const on = lt > cue(5), ph = (lt * 0.8) % 1; W.sos.visible = W.sosR.visible = on; W.sos.position.set(W.cars[1].position.x, 2.4, W.cars[1].position.z); W.sosR.position.set(W.cars[1].position.x, 0.3, W.cars[1].position.z); W.sosR.scale.setScalar(2 + ph * 40); W.sosR.material.opacity = on ? (1 - ph) * 0.8 : 0; tint(W.sos, Math.sin(lt * 6) > 0 ? 1 : 0.3); }
     const zc = s.x[3], k = B ? smooth(cue(3), d, lt) : smooth(0, cue(3), lt);
     if (!B) fly(W.camera, [{ p: [3.4, 1.7, zc - 13], l: [0, 1.0, zc + 25] }, { p: [5.6, 2.3, zc - 9], l: [0, 1, zc + 22] }, { p: [7.5, 3.0, zc - 5], l: [0, 0.9, zc + 18] }], k);
     else fly(W.camera, [{ p: [-6, 3.2, zc - 17], l: [0, 1, zc + 30] }, { p: [-5.6, 2.3, zc - 9], l: [0, 1, zc + 36] }, { p: [-5, 2.0, zc + 5], l: [0, 1, zc + 44] }], k);
@@ -332,7 +335,7 @@ function fire() {
     const lt2 = label('TOWN', '#fbbf24', 44, 'warning deadline T+3h26'); lt2.position.set(74, ty + 20, 58); scene.add(lt2);
     return { scene, camera: cam(40), geo, fgeo, base, fcol, arr, n, P, emb, eidx, NE, tMast: arr[mi], tTown: arr[ti], beacon, dome, lm, lt2, wind };
   });
-  return { scene: W.scene, camera: W.camera, bloom: [1.25, 0.8, 0.5], update(lt, d, cue) {
+  return { scene: W.scene, camera: W.camera, exposure: 1.2, bloom: [1.25, 0.8, 0.5], update(lt, d, cue) {
     // el frente alcanza la antena en T+1h39 (cuando se narra) y la escena acaba antes de llegar al pueblo
     const tm = cue(2) + 1.6, front = lt < tm ? W.tMast * Math.pow(clamp(lt / tm), 1.25) : mix(W.tMast, W.tTown * 0.9, smooth(tm, d + 3, lt));
     const col = W.geo.attributes.color.array;
@@ -411,4 +414,40 @@ function science() { const W = waveWorld(); return { scene: W.scene, camera: W.c
 function fields() { const W = waveWorld(); return { scene: W.scene, camera: W.camera, bloom: [0.8, 0.6, 0.5], update(lt) { W.corps.visible = false; waveUpdate(W, lt + 40, 0.9, 0.3); } }; }
 function proof() { const W = waveWorld(); return { scene: W.scene, camera: W.camera, bloom: [0.95, 0.6, 0.45], update(lt, d, cue) { waveUpdate(W, lt + 80, 0.6, 0.2); W.corps.visible = true; W.corps.rotation.set(0.3, lt * 0.22, 0); W.corps.scale.setScalar(0.55 + 0.6 * ease((lt - cue(3) + 1.5) / 1.6)); } }; }
 
-export const BUILD = { blackout, flood, rail, gap, title, mesh, bearers, orbit, road, fire, building, science, fields, proof, cta };
+
+// ───────────────────────── Tren a bordo: impacto, «¿estás bien?», fusión y CAP (v18)
+function train() {
+  const R0 = rail(); // asegura el mundo ferroviario
+  const W = once('rail'), X = once('trainx', () => {
+    const coaches = [[-2.9, -44, 1], [-2.9, -18, 1], [-1.6, 7.5, 1], [0.6, 31, 1], [2.9, 186, 2], [3.4, 161, 2], [5.6, 137, 2]];
+    const ph = [], who = []; coaches.forEach(([x, z, t], c) => { for (let i = 0; i < 26; i++) { ph.push(x + (hash(i, c) - 0.5) * 2, 2.6 + hash(i, c + 9) * 1.2, z + (hash(i, c + 4) - 0.5) * 21); who.push(t); } });
+    const phones = points(ph, C.ice, 3.2); W.scene.add(phones);
+    const node = new T.Mesh(new T.IcosahedronGeometry(2.2, 1), new T.MeshStandardMaterial({ color: 0x10202a, emissive: C.amber, emissiveIntensity: 0.6, flatShading: true })); node.position.set(-30, 34, 80); W.scene.add(node);
+    const nodeL = label('FUSION · 2 TRAINS · 7 COACHES', '#fbbf24', 40); nodeL.position.set(-30, 44, 80); W.scene.add(nodeL);
+    const ups = [[-2.9, -30], [0, 20], [4, 160]].map(([x, z]) => { const c = new T.CatmullRomCurve3([new T.Vector3(x, 4, z), new T.Vector3((x - 30) / 2, 26, (z + 80) / 2), new T.Vector3(-30, 34, 80)]); const p = points(c.getSpacedPoints(160).flatMap((v) => [v.x, v.y, v.z]), C.amber, 1.4); p.geometry.setDrawRange(0, 0); W.scene.add(p); return p; });
+    const cap = new T.CatmullRomCurve3([new T.Vector3(-30, 34, 80), new T.Vector3(-80, 60, 160), new T.Vector3(-140, 20, 260)]); const capT = points(cap.getSpacedPoints(200).flatMap((v) => [v.x, v.y, v.z]), C.green, 2); capT.geometry.setDrawRange(0, 0); W.scene.add(capT);
+    const room = new T.Mesh(new T.BoxGeometry(16, 10, 12), new T.MeshStandardMaterial({ color: 0x1b2a38, emissive: C.green, emissiveIntensity: 0.25 })); room.position.set(-140, 5, 260); W.scene.add(room);
+    const roomL = label('112 CONTROL ROOM · CAP', '#34d399', 46); roomL.position.set(-140, 22, 260); W.scene.add(roomL);
+    return { phones, who, node, nodeL, ups, capT, room, roomL, n: who.length };
+  });
+  const objs = [X.phones, X.node, X.nodeL, X.capT, X.room, X.roomL, ...X.ups];
+  return { scene: W.scene, camera: W.camera, bloom: [1.0, 0.65, 0.55], update(lt, d, cue) {
+    R0.update(0, 1, () => 0); W.l1.material.opacity = 0; W.l2.material.opacity = 0; tint(W.mark, 0); objs.forEach((o) => { o.visible = true; });
+    const imp = smooth(cue(1) - 0.2, cue(1) + 0.2, lt), ask = lt > cue(2) && lt < cue(4), fuse = smooth(cue(4), cue(4) + 2, lt), t2 = lt > cue(5);
+    const a = X.phones.geometry.attributes.color;
+    for (let i = 0; i < X.n; i++) { const quiet = hash(i, 3) < 0.25; let r = 0.57, g = 0.84, b = 0.91, k = 0.6;
+      if (imp > 0) { r = 1; g = 0.25; b = 0.3; k = imp; }
+      if (ask) { r = 0.98; g = 0.75; b = 0.14; k = 0.5 + 0.5 * Math.sin(lt * 6 + i); }
+      if (lt >= cue(4)) { if (quiet) { r = 1; g = 0.36; b = 0.43; } else { r = 0.2; g = 0.83; b = 0.6; } k = 0.9; }
+      if (t2 && X.who[i] === 2) k = 0.6 + 0.4 * Math.sin(lt * 8);
+      a.array[i * 3] = r * k; a.array[i * 3 + 1] = g * k; a.array[i * 3 + 2] = b * k; }
+    a.needsUpdate = true;
+    X.ups.forEach((p, i) => p.geometry.setDrawRange(0, Math.floor(clamp(fuse * 1.3 - i * 0.15) * 161)));
+    X.node.scale.setScalar(Math.max(0.001, fuse)); X.node.rotation.set(lt * 0.4, lt * 0.6, 0); X.nodeL.material.opacity = smooth(cue(5), cue(5) + 0.6, lt);
+    W.l2.material.opacity = t2 ? 1 : 0; tint(W.mark, t2 ? 0.5 + 0.5 * Math.sin(lt * 4) : 0);
+    X.capT.geometry.setDrawRange(0, Math.floor(smooth(cue(7), cue(7) + 1.8, lt) * 201)); X.roomL.material.opacity = smooth(cue(7) + 0.8, cue(7) + 1.6, lt);
+    fly(W.camera, [{ p: [-14, 6, -60], l: [-2, 3, -10] }, { p: [-16, 5, 0], l: [0, 3, 30] }, { p: [-60, 40, 40], l: [-10, 10, 90] }, { p: [-110, 60, 150], l: [-40, 20, 140] }], lt / d);
+  } };
+}
+
+export const BUILD = { blackout, flood, rail, train, gap, title, mesh, bearers, orbit, road, fire, building, science, fields, proof, cta };

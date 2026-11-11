@@ -1,5 +1,22 @@
 # Changelog
 
+## SENDA · 11-11-2026 · Película de inversores v2: explicación completa en escenas 3D
+
+**Entrada (fundador):**
+- La v1 «no tiene sustancia»: hay que explicar por qué pasó cada suceso, cómo funciona SENDA, los protocolos y la física, cómo probarlo, la coordinación con emergencias, las integraciones, los sensores, las fuentes de datos y los módulos de hardware. Sin diapositivas: escenas 3D animadas, más luminosas.
+
+**Procesamiento:**
+- Guion nuevo de 28 escenas y 12:31 (`build-investor-film.mjs`). Las cifras de física se calculan con el núcleo al construirlo (P.838-3, filo de cuchillo, longitudes de onda, Reed-Solomon 6-de-10 real) y falla si no coinciden.
+- 14 escenas 3D nuevas en `cinema/scenes2.js`: valle con crecida, móvil 3D con pantallas reales de la app, dos móviles (sonido, punto de acceso, LoRa), reserva de red, lluvia frente a longitud de onda, difracción sobre una cresta, mapa de Europa con rutas, previsión del apagón, PAS en carretera, terremoto con ondas P y S, zona y orden firmada, red y fuentes, integraciones y módulos. Más la escena de tren a bordo y la fase SOS de carretera en `cinema/scenes.js`.
+- Motor: mapa de entorno de estudio (RoomEnvironment), sombras, exposición por escena y rótulos mínimos (sin paneles de texto).
+
+**Validación:**
+- `node validate.mjs investor-film en` sin errores; 28 fotogramas de control revisados y corregidos (exposición, destellos, encuadres).
+
+**Límites:** sin metraje real (red bloqueada y regla 6), 3D de tiempo real sin GPU, módulos de radar/sismógrafo/repetidor solo diseñados, pantallas de la app en español, sin neerlandés. Detalle en `docs/video/INVESTOR_FILM.md`.
+
+— Firma: Claude Code (sesión cloud), 11-11-2026.
+
 ## SENDA · 11-11-2026 · Película de presentación a inversores (motor 3D `cinema`)
 
 **Entrada (fundador):**

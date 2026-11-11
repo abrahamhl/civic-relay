@@ -86,6 +86,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { BUILD } from './cinema/scenes.js';
+import { BUILD2, setRenderer, env } from './cinema/scenes2.js';
 
 const Q = new URLSearchParams(location.search);
 const NAME = Q.get('script') || 'investor-film', LANG = Q.get('lang') || 'en';
@@ -96,20 +97,17 @@ const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt
 const L = (o) => (typeof o === 'string' ? o : o?.[LANG] ?? o?.en ?? '');
 const TAG = { OBSERVED: ['OBSERVED', 'PUBLISHED RECORD · 3D VISUALISATION'], SIMULATED: ['SIMULATION', 'ILLUSTRATIVE 3D · FIGURES FROM THE SENDA CORE'], CALCULATED: ['CALCULATED', 'APP CORE · 3D VISUALISATION'] };
 const STAT_CUE = { blackout: 3, flood: 2, rail: 1, bearers: 4, fire: 3, building: 4 };
-const STAT_COL = { blackout: '#ff5b6e', flood: '#fbbf24', rail: '#ff7756', bearers: '#34d399', fire: '#ff7756', building: '#91d7e8' };
+const STAT_COL = { blackout: '#ff5b6e', valley: '#fbbf24', rail: '#ff7756', train: '#34d399', bearers: '#34d399', europe: '#34d399', forecast: '#34d399', road: '#91d7e8', fire: '#ff7756', building: '#91d7e8' };
 const ICON = ['<path d="M8 60 26 6h12l18 54M32 8v10M32 26v10M32 44v12"/>', '<path d="M18 58 26 6M46 58 38 6M22 20h20M20 34h24M17 48h30"/>', '<path d="M32 58c-12 0-18-8-18-17 0-10 8-14 10-24 6 4 8 9 8 13 3-3 4-8 4-12 8 6 14 14 14 23 0 9-6 17-18 17z"/>', '<path d="M6 38c6-5 10-5 16 0s10 5 16 0 10-5 16 0M6 50c6-5 10-5 16 0s10 5 16 0 10-5 16 0M22 26V10h20v16"/>', '<path d="M14 58V8h36v50M24 18h4M36 18h4M24 30h4M36 30h4M24 42h4M36 42h4M8 58h48"/>', '<path d="M36 4 14 36h16l-4 24 24-34H34z"/>'];
 
 function overlay(sc) {
   const v = sc.visual, k = v.kind;
   const lt = `<div class="lt" data-a="lt"><div class="k">${esc(TAG[sc.claim][0])}</div><h1>${esc(L(sc.title))}</h1></div>`;
-  const stat = v.stat ? `<div class="stat" data-c="${STAT_CUE[k] ?? 1}"><b style="color:${STAT_COL[k] || '#fff'}">${esc(v.stat)}</b><span>${esc(L(v.statLabel))}</span></div>` : '';
-  if (k === 'gap') return `<div class="big s" data-x="0,1">The problem is not a lack of technology.</div><div class="big" data-x="1,2">Nothing is <span style="color:var(--c)">coordinated</span>.</div><div class="big s" style="top:120px" data-x="2,4">Every official alert depends on the mobile network.</div><div class="big" style="top:200px;font-size:54px" data-x="3,4">Exactly the one that fails.</div><div class="big s" style="top:60px" data-c="4">Yet every phone already carries</div><div class="chips">${['Bluetooth', 'Wi-Fi', 'Speaker', 'Microphone', 'Satellite'].map((c, i) => `<span class="chip" data-c="4" data-d="${(0.5 + i * 0.5).toFixed(1)}">${c}</span>`).join('')}</div>`;
+  const stat = v.stat ? `<div class="stat" data-c="${v.statCue ?? 1}"><b style="color:${STAT_COL[k] || '#fff'}">${esc(v.stat)}</b><span>${esc(L(v.statLabel))}</span></div>` : '';
   if (k === 'title') return `<div class="tagline" data-c="1">${esc(L(sc.title))}</div>`;
-  if (k === 'orbit') return lt + `<div class="note">ORBIT RADII NOT TO SCALE</div><div class="legend">${[['#91d7e8', 'Already on your phone', 'direct-to-phone satellite', 1, 0], ['#fbbf24', 'Needs a module', 'Iridium short messages · Galileo position', 1, 0.9], ['#ff7756', 'Amateur · QO-100', 'no encryption allowed: signed public status only', 2, -0.4], ['#a9bcc5', 'Government networks', 'require an agreement', 2, 0.5]].map(([c, a, b, cu, d]) => `<div data-c="${cu}" data-d="${d}"><i style="background:${c}"></i><span>${a}<small>${b}</small></span></div>`).join('')}</div>`;
-  if (k === 'road') return `<div class="phase" data-x="0,3" style="color:var(--r);border-color:rgba(255,91,110,.5)">WITHOUT SENDA · EACH DRIVER REACTS TO THE BRAKE LIGHTS AHEAD</div><div class="phase" data-c="3" style="color:var(--i);border-color:rgba(145,215,232,.5)">WITH SENDA · EVERY PHONE WARNED AT ONCE</div>` + `<div class="lt" data-a="lt"><div class="k">${esc(TAG[sc.claim][0])}</div><h1>${esc(L(sc.title))}</h1></div><div class="stat" data-x="2,3"><b style="color:var(--r)">5 cars</b><span>crash in a chain · model result</span></div><div class="stat" data-c="5"><b style="color:var(--i)">1 car</b><span>the tailgater still crashes · model result</span></div>`;
-  if (k === 'science') return `<div class="panel" style="left:54px;top:46px;width:500px" data-c="1"><h3>ITU-R P.838-3 · rain at 50 mm/h</h3><p>868 MHz barely loses anything<br>28 GHz loses ≈ 7 dB/km</p></div><div class="panel" style="left:54px;top:186px;width:500px" data-c="1" data-d="1.4"><h3>Diffraction over mountains</h3><p>Bracketed by two classic methods</p></div><div class="panel" style="left:54px;top:296px;width:500px" data-c="1" data-d="2.8"><h3>Sound link</h3><p>Computed with its real error rate</p><small>works over a few metres — and we say so</small></div><div class="bars"><div class="panel" style="position:relative" data-c="3"><h3>Delivery assurance · correlated failures · simulated</h3><div style="height:14px"></div>${v.bars.map((b, i) => `<div class="bar" data-c="${i === 2 ? 5 : 4}" data-d="${i === 1 ? 2.2 : 0.2}"><div class="l"><span>${esc(L(b.l))}</span><b style="color:${['#a9bcc5', '#ff5b6e', '#34d399'][i]}">${b.v.toFixed(2)} %</b></div><div class="tr"><i data-w="${((b.v - 90) * 10).toFixed(1)}" style="background:${['#a9bcc5', '#ff5b6e', '#34d399'][i]}"></i></div></div>`).join('')}<small>scale 90–100 % · docs/science/DELIVERY_ASSURANCE.md</small></div></div>`;
-  if (k === 'fields') return `<div class="tiles">${v.fields.map((f, i) => `<div class="tile" data-c="1" data-d="${(i * 0.42).toFixed(2)}"><svg viewBox="0 0 64 64">${ICON[i]}</svg><span>${esc(L(f))}</span></div>`).join('')}</div><div class="aud">${['Citizens', 'Coordinators', 'Emergency services', 'Public administrations'].map((c, i) => `<span class="chip" data-c="2" data-d="${(i * 0.5).toFixed(1)}">${c}</span>`).join('')}</div><div class="ban" data-c="3">SENDA never replaces <b>112</b></div>`;
-  if (k === 'proof') return `<div class="nums"><div class="num" data-c="1"><b data-n="${v.core}" style="color:var(--e)">0</b><span>core tests passing</span></div><div class="num" data-c="2"><b data-n="${v.e2e}" style="color:var(--i)">0</b><span>end-to-end checks · network cut</span></div><div class="num" data-c="3"><b data-n="${v.agents}" style="color:var(--c)">0</b><span>specialised AI agents · ${v.skills} skills</span></div></div><div class="miss"><h3 data-c="5">NOT DONE YET — AND WE SAY SO</h3>${v.missing.map((m, i) => `<div data-c="${i < 2 ? 6 : 7}" data-d="${i === 1 ? 1.6 : 0}"><i></i>${esc(L(m))}</div>`).join('')}</div>`;
+  if (k === 'road') return `<div class="phase" data-x="1,3" style="color:var(--r);border-color:rgba(255,91,110,.5)">WITHOUT SENDA</div><div class="phase" data-x="3,5" style="color:var(--i);border-color:rgba(145,215,232,.5)">WITH SENDA · EVERY PHONE WARNED AT ONCE</div><div class="phase" data-c="5" style="color:var(--r);border-color:rgba(255,91,110,.5)">NO COVERAGE · THE SOS RIDES WITH PASSING CARS</div>` + lt + stat;
+  if (k === 'orbit') return lt + `<div class="note">ORBIT RADII NOT TO SCALE</div>`;
+  if (k === 'proof') return `<div class="nums"><div class="num" data-c="0"><b data-n="${v.core}" style="color:var(--e)">0</b><span>core tests passing</span></div><div class="num" data-c="1"><b data-n="${v.e2e}" style="color:var(--i)">0</b><span>end-to-end checks · network cut</span></div><div class="num" data-c="2"><b data-n="${v.agents}" style="color:var(--c)">0</b><span>specialised AI agents</span></div></div>` + lt;
   if (k === 'cta') return `<div class="url" data-c="1"><em>${esc(L(sc.title))}</em><b>${esc(v.url)}</b><span>${esc(v.repo)} · MIT licence</span></div>`;
   return lt + stat;
 }
@@ -121,6 +119,10 @@ const canvas = document.getElementById('gl');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(1); renderer.setSize(1280, 536, false);
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.5;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace;
+setRenderer(renderer);
+const TEX = {}; const loader = new THREE.TextureLoader();
+await Promise.all([...new Set(SCRIPT.scenes.flatMap((sc) => sc.visual.screens || []))].map(async (f) => { const t = await loader.loadAsync(`assets/${f}`); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; TEX[f] = t; }));
 const composer = new EffectComposer(renderer);
 const rp = new RenderPass(new THREE.Scene(), new THREE.PerspectiveCamera());
 const bloom = new UnrealBloomPass(new THREE.Vector2(640, 268), 1, 0.7, 0.6);
@@ -142,7 +144,9 @@ composer.addPass(rp); composer.addPass(bloom); composer.addPass(fin); composer.a
 const ov = document.getElementById('ov');
 ov.innerHTML = SCRIPT.scenes.map((sc, i) => `<section class="sc" id="sc${i}">${overlay(sc)}</section>`).join('');
 const EL = [...ov.querySelectorAll('.sc')];
-const INST = SCRIPT.scenes.map((sc) => BUILD[sc.visual.kind]());
+const ALL = { ...BUILD, ...BUILD2 };
+const INST = SCRIPT.scenes.map((sc) => { const f = ALL[sc.visual.kind]; if (!f) throw new Error(`escena sin motor: ${sc.visual.kind}`); return f(sc.visual, TEX); });
+
 const show = (n, p, dy = 14) => { n.style.opacity = p.toFixed(3); n.style.transform = `translateY(${((1 - p) * dy).toFixed(1)}px)`; };
 const TR = 0.5; // semiduración de la transición entre escenas (s)
 
@@ -153,6 +157,7 @@ window.seek = (t) => {
   const cue = (k) => s.lines[Math.min(k, s.lines.length - 1)].start - s.start;
   inst.update(lt, d, cue);
   rp.scene = inst.scene; rp.camera = inst.camera;
+  renderer.toneMappingExposure = inst.exposure ?? 1.5;
   const [bs, br, bt] = inst.bloom || [1, 0.7, 0.6]; bloom.strength = bs; bloom.radius = br; bloom.threshold = bt;
   const edge = Math.min(i > 0 ? lt : 9, i < TL.scenes.length - 1 ? d - lt : 9);
   fin.uniforms.uTr.value = Math.pow(clamp(1 - edge / TR), 1.6); fin.uniforms.uT.value = Math.floor(t * 25) * 0.04;
