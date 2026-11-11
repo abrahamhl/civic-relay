@@ -1,0 +1,691 @@
+{
+ "note": "SENDA · película de presentación a inversores (motor 3D cinema.html). Generado por build-investor-film.mjs; no editar a mano.",
+ "counts": {
+  "core": 433,
+  "e2e": 49,
+  "agents": 43,
+  "skills": 21,
+  "estadoSha": "c1112d2"
+ },
+ "voices": {
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.93
+  }
+ },
+ "scenes": [
+  {
+   "id": "f01",
+   "claim": "OBSERVED",
+   "visual": {
+    "kind": "blackout",
+    "stat": "90 % → 40 %",
+    "statLabel": {
+     "en": "users with a stable connection",
+     "es": "usuarios con conexión estable"
+    }
+   },
+   "title": {
+    "en": "28 April 2025 · Iberian blackout",
+    "es": "28 de abril de 2025 · Apagón ibérico"
+   },
+   "en": [
+    "April, twenty twenty-five. The Iberian peninsula loses power.",
+    "The mobile network does not fall with the lights.",
+    "It falls hours later, when the batteries in the masts run dry.",
+    "Stable connections drop from ninety percent to forty."
+   ],
+   "es": [
+    "Abril de 2025. La península ibérica se queda sin luz.",
+    "La red móvil no cae al irse la luz.",
+    "Cae horas después, cuando se agotan las baterías de las antenas.",
+    "Las conexiones estables bajan del noventa al cuarenta por ciento."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "April, twenty twenty-five. The Iberian peninsula loses power.",
+    "The mobile network does not fall with the lights.",
+    "It falls hours later, when the batteries in the masts run dry.",
+    "Stable connections drop from ninety percent to forty."
+   ]
+  },
+  {
+   "id": "f02",
+   "claim": "OBSERVED",
+   "visual": {
+    "kind": "flood",
+    "stat": "20:11",
+    "statLabel": {
+     "en": "ES-Alert reaches phones",
+     "es": "llega el ES-Alert a los móviles"
+    }
+   },
+   "title": {
+    "en": "29 October 2024 · Valencia floods",
+    "es": "29 de octubre de 2024 · DANA de Valencia"
+   },
+   "en": [
+    "October, twenty twenty-four. The Valencia floods.",
+    "The mass alert reaches phones",
+    "at eleven minutes past eight in the evening."
+   ],
+   "es": [
+    "Octubre de 2024. La DANA de Valencia.",
+    "La alerta masiva llega a los móviles",
+    "a las ocho y once de la tarde."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "October, twenty twenty-four. The Valencia floods.",
+    "The mass alert reaches phones",
+    "at eleven minutes past eight in the evening."
+   ]
+  },
+  {
+   "id": "f03",
+   "claim": "OBSERVED",
+   "visual": {
+    "kind": "rail",
+    "stat": "≈ 45 min",
+    "statLabel": {
+     "en": "to recognise the second train · published timeline",
+     "es": "para reconocer el segundo tren · cronología publicada"
+    }
+   },
+   "title": {
+    "en": "January 2026 · Adamuz",
+    "es": "Enero de 2026 · Adamuz"
+   },
+   "en": [
+    "January, twenty twenty-six. Adamuz.",
+    "Emergency services take around forty-five minutes",
+    "to learn there is a second train.",
+    "The causes remain under official investigation."
+   ],
+   "es": [
+    "Enero de 2026. Adamuz.",
+    "Los servicios de emergencia tardan unos cuarenta y cinco minutos",
+    "en saber que hay un segundo tren.",
+    "Las causas siguen bajo investigación oficial."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "January, twenty twenty-six. Adamuz.",
+    "Emergency services take around forty-five minutes",
+    "to learn there is a second train.",
+    "The causes remain under official investigation."
+   ]
+  },
+  {
+   "id": "f04",
+   "claim": "OBSERVED",
+   "visual": {
+    "kind": "gap"
+   },
+   "title": {
+    "en": "The gap nobody covers",
+    "es": "El hueco que nadie cubre"
+   },
+   "en": [
+    "The problem is not a lack of technology.",
+    "It is that nothing is coordinated.",
+    "The whole official alert chain depends on the mobile network:",
+    "exactly the one that fails.",
+    "Yet every phone carries Bluetooth, Wi-Fi, a speaker, a microphone",
+    "and, increasingly, satellite."
+   ],
+   "es": [
+    "El problema no es la falta de tecnología.",
+    "Es que nada está coordinado.",
+    "Toda la cadena oficial de alerta depende de la red móvil:",
+    "justo la que falla.",
+    "Y cada móvil lleva Bluetooth, wifi, altavoz, micrófono",
+    "y, cada vez más, satélite."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "The problem is not a lack of technology.",
+    "It is that nothing is coordinated.",
+    "The whole official alert chain depends on the mobile network:",
+    "exactly the one that fails.",
+    "Yet every phone carries Bluetooth, why-fye, a speaker, a microphone",
+    "and, increasingly, satellite."
+   ]
+  },
+  {
+   "id": "f05",
+   "claim": "CALCULATED",
+   "visual": {
+    "kind": "title"
+   },
+   "title": {
+    "en": "Emergency routing over every channel left standing",
+    "es": "Enrutamiento de emergencia por todo canal que siga en pie"
+   },
+   "en": [
+    "This is SENDA.",
+    "The layer that coordinates everything that can still carry a message."
+   ],
+   "es": [
+    "Esto es SENDA.",
+    "La capa que coordina todo lo que aún puede llevar un mensaje."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "This is Senda.",
+    "The layer that coordinates everything that can still carry a message."
+   ]
+  },
+  {
+   "id": "f06",
+   "claim": "CALCULATED",
+   "visual": {
+    "kind": "mesh"
+   },
+   "title": {
+    "en": "No Internet needed, from second one",
+    "es": "Sin Internet, desde el primer segundo"
+   },
+   "en": [
+    "It works without Internet, from the very first second.",
+    "Messages are encrypted end to end, and travel from phone to phone.",
+    "Every phone carries messages it cannot read.",
+    "And a signed receipt erases the copies still travelling."
+   ],
+   "es": [
+    "Funciona sin Internet, desde el primer segundo.",
+    "Los mensajes van cifrados de extremo a extremo, de móvil a móvil.",
+    "Cada móvil transporta mensajes que no puede leer.",
+    "Y un recibo firmado borra las copias que siguen viajando."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "It works without Internet, from the very first second.",
+    "Messages are encrypted end to end, and travel from phone to phone.",
+    "Every phone carries messages it cannot read.",
+    "And a signed receipt erases the copies still travelling."
+   ]
+  },
+  {
+   "id": "f07",
+   "claim": "CALCULATED",
+   "visual": {
+    "kind": "bearers",
+    "stat": "197 / 200",
+    "statLabel": {
+     "en": "messages rebuilt byte for byte · live trial",
+     "es": "mensajes reconstruidos byte a byte · prueba en vivo"
+    }
+   },
+   "title": {
+    "en": "One message, many paths at once",
+    "es": "Un mensaje, muchos caminos a la vez"
+   },
+   "en": [
+    "SENDA splits every message with Reed-Solomon coding,",
+    "and spreads the fragments across different bearers:",
+    "satellite, LoRa, drones and neighbours.",
+    "Any few of them arriving is enough to rebuild it.",
+    "In the live trial, one hundred and ninety-seven of two hundred messages",
+    "were rebuilt, byte for byte, while bearers were dropped at random."
+   ],
+   "es": [
+    "SENDA divide cada mensaje con codificación Reed-Solomon",
+    "y reparte los fragmentos por portadores distintos:",
+    "satélite, LoRa, drones y vecinos.",
+    "Basta con que lleguen unos pocos para reconstruirlo.",
+    "En la prueba en vivo, ciento noventa y siete de doscientos mensajes",
+    "se reconstruyeron byte a byte mientras caían portadores al azar."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "Senda splits every message with Reed-Solomon coding,",
+    "and spreads the fragments across different bearers:",
+    "satellite, LOR-ah, drones and neighbours.",
+    "Any few of them arriving is enough to rebuild it.",
+    "In the live trial, one hundred and ninety-seven of two hundred messages",
+    "were rebuilt, byte for byte, while bearers were dropped at random."
+   ]
+  },
+  {
+   "id": "f08",
+   "claim": "OBSERVED",
+   "visual": {
+    "kind": "orbit"
+   },
+   "title": {
+    "en": "Every satellite network, by access level",
+    "es": "Toda la red satelital, por nivel de acceso"
+   },
+   "en": [
+    "Every satellite network is classed by access level:",
+    "what your phone already has, what needs a module,",
+    "and what requires an agreement.",
+    "Anything still under development is labelled as such."
+   ],
+   "es": [
+    "Cada red de satélites se clasifica por nivel de acceso:",
+    "lo que tu móvil ya tiene, lo que necesita un módulo",
+    "y lo que exige un acuerdo.",
+    "Lo que sigue en desarrollo se etiqueta como tal."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "Every satellite network is classed by access level:",
+    "what your phone already has, what needs a module,",
+    "and what requires an agreement.",
+    "Anything still under development is labelled as such."
+   ]
+  },
+  {
+   "id": "f09",
+   "claim": "SIMULATED",
+   "visual": {
+    "kind": "road"
+   },
+   "title": {
+    "en": "Roads · the braking you cannot see",
+    "es": "Carretera · la frenada que no ves"
+   },
+   "en": [
+    "On the road: fog, one hundred and twenty kilometres an hour,",
+    "and one point two seconds between cars.",
+    "The delays add up, and five cars crash in a chain.",
+    "With SENDA, the first phone detects the braking",
+    "and warns everyone at once.",
+    "Only a safe distance fixes the rest.",
+    "This is a model, not a field test."
+   ],
+   "es": [
+    "En carretera: niebla, ciento veinte kilómetros por hora",
+    "y uno coma dos segundos entre coches.",
+    "Los retrasos se suman y cinco coches chocan en cadena.",
+    "Con SENDA, el primer móvil detecta la frenada",
+    "y avisa a todos a la vez.",
+    "El resto solo lo arregla la distancia de seguridad.",
+    "Es un modelo, no una prueba de campo."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "On the road: fog, one hundred and twenty kilometres an hour,",
+    "and one point two seconds between cars.",
+    "The delays add up, and five cars crash in a chain.",
+    "With Senda, the first phone detects the braking",
+    "and warns everyone at once.",
+    "Only a safe distance fixes the rest.",
+    "This is a model, not a field test."
+   ]
+  },
+  {
+   "id": "f10",
+   "claim": "SIMULATED",
+   "visual": {
+    "kind": "fire",
+    "stat": "107 min",
+    "statLabel": {
+     "en": "of warning margin lost · simulated scenario",
+     "es": "de margen de aviso perdido · escenario simulado"
+    }
+   },
+   "title": {
+    "en": "Wildfires · warn before the mast burns",
+    "es": "Incendios · avisar antes de que arda la antena"
+   },
+   "en": [
+    "In a wildfire, SENDA computes how the fire spreads with wind and slope,",
+    "and crosses it with the phone masts.",
+    "In this scenario, a town's mast burns",
+    "one hundred and seven minutes before its warning deadline.",
+    "So the alert must leave earlier, or travel by other paths."
+   ],
+   "es": [
+    "En un incendio, SENDA calcula cómo avanza el fuego con viento y pendiente",
+    "y lo cruza con las antenas de telefonía.",
+    "En este escenario, la antena de un pueblo arde",
+    "ciento siete minutos antes de su límite de aviso.",
+    "Así que la alerta debe salir antes, o viajar por otros caminos."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "In a wildfire, Senda computes how the fire spreads with wind and slope,",
+    "and crosses it with the phone masts.",
+    "In this scenario, a town's mast burns",
+    "one hundred and seven minutes before its warning deadline.",
+    "So the alert must leave earlier, or travel by other paths."
+   ]
+  },
+  {
+   "id": "f11",
+   "claim": "SIMULATED",
+   "visual": {
+    "kind": "building",
+    "stat": "95 %",
+    "statLabel": {
+     "en": "interval coverage · 720 simulated floors",
+     "es": "cobertura del intervalo · 720 plantas simuladas"
+    }
+   },
+   "title": {
+    "en": "Buildings · counting people per floor, from outside",
+    "es": "Edificios · contar personas por planta, desde fuera"
+   },
+   "en": [
+    "When nobody can enter a building, a drone climbs the façade, floor by floor,",
+    "listening to the Bluetooth signals that phones emit, without connecting to them.",
+    "Only numbers come out. Never identities.",
+    "Across seven hundred and twenty simulated floors,",
+    "the margin held the real figure ninety-five percent of the time."
+   ],
+   "es": [
+    "Cuando nadie puede entrar en un edificio, un dron sube la fachada, planta a planta,",
+    "escuchando las señales Bluetooth de los móviles, sin conectarse a ellos.",
+    "Solo salen números. Nunca identidades.",
+    "En setecientas veinte plantas simuladas,",
+    "el margen contuvo la cifra real el noventa y cinco por ciento de las veces."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "When nobody can enter a building, a drone climbs the facade, floor by floor,",
+    "listening to the Bluetooth signals that phones emit, without connecting to them.",
+    "Only numbers come out. Never identities.",
+    "Across seven hundred and twenty simulated floors,",
+    "the margin held the real figure ninety-five percent of the time."
+   ]
+  },
+  {
+   "id": "f12",
+   "claim": "SIMULATED",
+   "visual": {
+    "kind": "science",
+    "bars": [
+     {
+      "v": 99.49,
+      "l": {
+       "en": "naive plan · promised",
+       "es": "plan ingenuo · prometido"
+      }
+     },
+     {
+      "v": 96.09,
+      "l": {
+       "en": "naive plan · delivered",
+       "es": "plan ingenuo · entregado"
+      }
+     },
+     {
+      "v": 98.98,
+      "l": {
+       "en": "SENDA engine · delivered, €0",
+       "es": "motor SENDA · entregado, 0 €"
+      }
+     }
+    ]
+   },
+   "title": {
+    "en": "Physics underneath, not promises",
+    "es": "Debajo hay física, no promesas"
+   },
+   "en": [
+    "Underneath all of this there is physics, not promises.",
+    "Rain attenuation, mountain diffraction, the error rate of the sound link:",
+    "every figure comes from published models, checked against analytical solutions.",
+    "And our delivery engine models the failures that happen together.",
+    "Where a naive plan promises 99.5 %, and delivers 96 %,",
+    "ours delivers 99 %, in simulation, at no extra cost."
+   ],
+   "es": [
+    "Debajo de todo esto hay física, no promesas.",
+    "Atenuación por lluvia, difracción en montaña, tasa de error del enlace sonoro:",
+    "cada cifra sale de modelos publicados y se comprueba con soluciones analíticas.",
+    "Y nuestro motor de entrega modela los fallos que ocurren a la vez.",
+    "Donde un plan ingenuo promete un 99,5 % y entrega un 96 %,",
+    "el nuestro entrega un 99 %, en simulación, sin coste añadido."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "Underneath all of this there is physics, not promises.",
+    "Rain attenuation, mountain diffraction, the error rate of the sound link:",
+    "every figure comes from published models, checked against analytical solutions.",
+    "And our delivery engine models the failures that happen together.",
+    "Where a naive plan promises ninety-nine point five percent, and delivers ninety-six percent,",
+    "ours delivers ninety-nine percent, in simulation, at no extra cost."
+   ]
+  },
+  {
+   "id": "f13",
+   "claim": "CALCULATED",
+   "visual": {
+    "kind": "fields",
+    "fields": [
+     {
+      "en": "Roads",
+      "es": "Carreteras"
+     },
+     {
+      "en": "Railways",
+      "es": "Ferrocarril"
+     },
+     {
+      "en": "Wildfires",
+      "es": "Incendios"
+     },
+     {
+      "en": "Floods",
+      "es": "Inundaciones"
+     },
+     {
+      "en": "Buildings",
+      "es": "Edificios"
+     },
+     {
+      "en": "Blackouts",
+      "es": "Apagones"
+     }
+    ]
+   },
+   "title": {
+    "en": "One core, many fields",
+    "es": "Un núcleo, muchos campos"
+   },
+   "en": [
+    "One core, many fields:",
+    "roads, railways, wildfires, floods, buildings and blackouts.",
+    "For citizens, coordinators, emergency services and public administrations.",
+    "And it never replaces 112."
+   ],
+   "es": [
+    "Un núcleo, muchos campos:",
+    "carreteras, ferrocarril, incendios, inundaciones, edificios y apagones.",
+    "Para la ciudadanía, los coordinadores, las emergencias y las administraciones.",
+    "Y nunca sustituye al 112."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "One core, many fields:",
+    "roads, railways, wildfires, floods, buildings and blackouts.",
+    "For citizens, coordinators, emergency services and public administrations.",
+    "And it never replaces one one two."
+   ]
+  },
+  {
+   "id": "f14",
+   "claim": "OBSERVED",
+   "visual": {
+    "kind": "proof",
+    "core": 433,
+    "e2e": 49,
+    "agents": 43,
+    "skills": 21,
+    "missing": [
+     {
+      "en": "Field pilots with physical phones and rescue teams",
+      "es": "Pilotos de campo con móviles físicos y equipos de rescate"
+     },
+     {
+      "en": "Independent security audit",
+      "es": "Auditoría de seguridad independiente"
+     },
+     {
+      "en": "Certification for public procurement",
+      "es": "Certificación para compra pública"
+     }
+    ]
+   },
+   "title": {
+    "en": "Machine-verified. Honest about what is missing.",
+    "es": "Verificado por máquina. Honesto con lo que falta."
+   },
+   "en": [
+    "Everything is machine-verified on every change:",
+    "433 core tests,",
+    "and 49 end-to-end checks, almost all with the network cut.",
+    "Behind it, an engineering corps of 43 specialised AI agents,",
+    "with one rule: never invent.",
+    "What is missing, we say:",
+    "field pilots with physical phones, an independent security audit,",
+    "and certification for public procurement."
+   ],
+   "es": [
+    "Todo se verifica por máquina en cada cambio:",
+    "433 pruebas del núcleo",
+    "y 49 comprobaciones de extremo a extremo, casi todas sin red.",
+    "Detrás, un cuerpo de ingeniería de 43 agentes de IA especializados",
+    "con una regla: no inventar.",
+    "Lo que falta, lo decimos:",
+    "pilotos de campo con móviles físicos, una auditoría de seguridad independiente",
+    "y la certificación para compra pública."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "Everything is machine-verified on every change:",
+    "four hundred and thirty-three core tests,",
+    "and forty-nine end-to-end checks, almost all with the network cut.",
+    "Behind it, an engineering corps of forty-three specialised A I agents,",
+    "with one rule: never invent.",
+    "What is missing, we say:",
+    "field pilots with physical phones, an independent security audit,",
+    "and certification for public procurement."
+   ]
+  },
+  {
+   "id": "f15",
+   "claim": "OBSERVED",
+   "visual": {
+    "kind": "cta",
+    "url": "civic-relay-investor.vercel.app/senda",
+    "repo": "github.com/abrahamhl/civic-relay"
+   },
+   "title": {
+    "en": "So that no message is lost",
+    "es": "Para que ningún mensaje se pierda"
+   },
+   "en": [
+    "SENDA.",
+    "For anyone who wants to invest in making sure no message is lost.",
+    "Try it now, with nothing to install, at the address on screen."
+   ],
+   "es": [
+    "SENDA.",
+    "Para quien quiera invertir en que ningún mensaje se pierda.",
+    "Pruébalo ahora, sin instalar nada, en la dirección que ves en pantalla."
+   ],
+   "source": [
+    "media/senda-film/m96-promo.json",
+    "media/senda-film/m95-film.json",
+    "docs/video/M96_PROMO_SOURCES.md",
+    "docs/science/DELIVERY_ASSURANCE.md",
+    "investor-next/public/senda/estado.json"
+   ],
+   "en_say": [
+    "Senda.",
+    "For anyone who wants to invest in making sure no message is lost.",
+    "Try it now, with nothing to install, at the address on screen."
+   ]
+  }
+ ]
+}

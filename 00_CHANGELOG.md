@@ -1,5 +1,26 @@
 # Changelog
 
+## SENDA · 11-11-2026 · Película de presentación a inversores (motor 3D `cinema`)
+
+**Entrada (fundador):**
+- Vídeo oficial para búsqueda de inversores: narración inglesa con voz femenina, música techno tranquila, simulaciones 3D, subtítulos en español e inglés, y explicación del problema, el planteamiento, la ciencia y el potencial multicampo.
+
+**Procesamiento:**
+- `media/senda-film/build-investor-film.mjs` genera `investor-film.json` (15 escenas). Solo reutiliza afirmaciones de guiones ya verificados (M95/M96) y de `docs/science/DELIVERY_ASSURANCE.md`; lee las cifras de pruebas de `estado.json` y cuenta los agentes en `.opencode/agents`. Falla cerrado si no coinciden o si un subtítulo no cabe en 2×42.
+- Motor nuevo `media/senda-film/cinema.html` + `cinema/scenes.js` + `cinema/lib.js`: three.js r158 con bloom, grano, viñeta, formato 2.39:1 y transiciones con barrido radial; determinista (`seek(t)`).
+- `media/senda-film/music-techno.py`: banda sonora original generada por código (118 BPM), sin muestras de terceros.
+- `media/senda-film/render-cinema.mjs`: grabación 1080p, mezcla a −16 LUFS, pistas de subtítulos es/en y `.vtt`.
+
+**Validación:**
+- `node validate.mjs investor-film en` sin errores; `check-vtt.mjs` sobre los VTT es/en; fotogramas de control revisados en las 15 escenas.
+
+**Límites declarados (`docs/video/INVESTOR_FILM.md`):**
+- Sin metraje real (entorno sin acceso a vídeo con licencia; regla 6 del prompt maestro). Las escenas de hechos publicados son visualizaciones 3D rotuladas como tales.
+- 3D de tiempo real, no fotorrealista. Escenas simuladas ilustrativas: no ejecutan `packages/senda`.
+- Sin subtítulos en neerlandés: no publicar en producción sin añadirlos. Vídeo no integrado en la web ni desplegado.
+
+— Firma: Claude Code (sesión cloud), 11-11-2026.
+
 ## SENDA v0.29 · 10-11-2026 · Panel de Calibración Probabilística (L2.5), Adaptadores Satelitales CDSE/FIRMS (L4.2–L4.4) y ADR GIS 4D (L5.1)
 
 **Entrada (fundador / CTO):**
