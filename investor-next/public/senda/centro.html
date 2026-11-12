@@ -102,6 +102,9 @@ input[type=range]{width:100%;accent-color:var(--i)}
 .ops-row b{font:700 16px var(--mono);text-align:center}.ops-row span.c{text-align:center}
 .reasons{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.reasons span{font:600 11px var(--mono);padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
 .reasons span.ok{color:var(--e);border-color:rgba(62,224,161,.4)}.reasons span.no{color:var(--a);border-color:rgba(251,191,36,.35)}.reasons span.bad{color:var(--r);border-color:rgba(255,91,110,.45)}
+.learn{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:10px}.learn .t{border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(255,255,255,.02)}
+.learn .t b{display:block;margin-bottom:6px}.lr{display:grid;grid-template-columns:96px 1fr 92px;gap:8px;align-items:center;font:12px var(--mono);padding:3px 0}
+.lr .tr{height:8px;border-radius:5px;background:rgba(255,255,255,.06);position:relative;overflow:hidden}.lr .tr i{position:absolute;inset:0 auto 0 0;border-radius:5px}.lr .tr u{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--m)}
 .chain{font:12px var(--mono);color:var(--m);word-break:break-all;margin-top:8px}.chain b{color:var(--e)}
 .rowb{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 footer{padding:0 22px 30px;max-width:1600px;margin:0 auto;color:var(--d);font-size:12px}
@@ -156,6 +159,7 @@ footer{padding:0 22px 30px;max-width:1600px;margin:0 auto;color:var(--d);font-si
       <p class="muted" style="margin:0">El organismo (ancla de confianza) acredita al coordinador; el coordinador firma una orden para la zona en riesgo; cada teléfono la verifica (firma, credencial, rol, consentimiento, zona, repetición, caducidad) y responde por los canales que siguen vivos. Sale un parte CAP 1.2 para el 112 y una auditoría encadenada. <span class="mono">incident-ops.mjs</span></p>
       <div class="rowb"><button class="btn p" id="ops-go">Emitir orden firmada a la zona en riesgo</button><button class="btn" id="ops-forge">Probar una orden falsificada</button></div>
       <div id="ops-out"></div>
+      <div id="learn-out"></div>
     </section>
   </div>
 
@@ -183,7 +187,8 @@ import { encodeShards, decodeShards, createReassembler } from '/senda/core/erasu
 import { generateIdentity, sealMessage, openMessage, packEnvelope, relayView } from '/senda/core/envelope.mjs';
 import { modulate, demodulate } from '/senda/core/acoustic-modem.mjs';
 import { computeRainAttenuation } from '/senda/core/telecom-mathematical-physics.mjs';
-import { setupAgency, simulatePopulation, issueZoneOrder, deliverOrder, collectResponses, situationReport, STATUS_MODEL } from '/senda/core/incident-ops.mjs';
+import { setupAgency, simulatePopulation, issueZoneOrder, deliverOrder, collectResponses, situationReport, learnFromDelivery, STATUS_MODEL } from '/senda/core/incident-ops.mjs';
+import { ReliabilityStore, priorsFromCatalog } from '/senda/core/reliability-store.mjs';
 import { createOrganization, issueCredential } from '/senda/core/roles.mjs';
 import { signCommand, keyThumb } from '/senda/core/remote-command.mjs';
 
@@ -195,7 +200,7 @@ const hex = (b, n = 24) => [...b.slice(0, n)].map((x) => x.toString(16).padStart
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ================= 1 · ARRANQUE: autocomprobación real ================= */
-const ID = {}, OPS = { ctx: null, phones: [], n: 0 };
+const ID = {}, OPS = { ctx: null, phones: [], n: 0, store: null };
 const STEPS = [
   ['Identidad cifrada', 'ECDH + ECDSA P-256 en WebCrypto', async () => { ID.centro = await generateIdentity(); ID.vecino = await generateIdentity(); ID.relay = await generateIdentity(); return 'claves de centro, vecino y relé'; }],
   ['Sellado de extremo a extremo', 'sobre ECDH + AES-GCM firmado', async () => { const now = Date.now(), e = await sealMessage({ sender: ID.centro, recipient: ID.vecino.publicIdentity, body: 'prueba', priority: 0, ttlS: 60, now, kind: 'OFFICIAL_ALERT' }); const o = await openMessage({ recipient: ID.vecino, envelope: e, now }); let leak = true; try { await openMessage({ recipient: ID.relay, envelope: e, now }); } catch { leak = false; } if (!JSON.stringify(o).includes('prueba') || leak) throw new Error('fallo de cifrado'); return `${packEnvelope(e).length} B · el relé no puede abrirlo`; }],
@@ -203,7 +208,7 @@ const STEPS = [
   ['Módem acústico', 'MFSK-16 · modular y demodular', async () => { const p = Uint8Array.from({ length: 32 }, (_, i) => (i * 29) & 255), b = demodulate(modulate(p)), got = b?.payload ?? b; if (!got || got.length !== 32 || !got.every((v, i) => v === p[i])) throw new Error('el módem no recupera la trama'); return '32 B ida y vuelta por audio'; }],
   ['Física de enlaces', 'ITU-R P.838-3 a 50 mm/h', async () => { const a = computeRainAttenuation(0.868, 50).specificAttenuationDbPerKm, b = computeRainAttenuation(28, 50).specificAttenuationDbPerKm; return `868 MHz ${a.toFixed(4)} · 28 GHz ${b.toFixed(1)} dB/km`; }],
   ['Modelo de incendio', 'llegada del fuego por celda', async () => { compute(); return `${G.w}×${G.h} celdas de ${G.cellM} m`; }],
-  ['Organismo y coordinador', 'ancla de confianza + credencial ligada a la clave', async () => { OPS.ctx = await setupAgency({ now: Date.now() }); OPS.phones = simulatePopulation(L.towns, { perTown: 60, seed: 2026 }); return `${OPS.ctx.org.name} · ${OPS.phones.length} teléfonos sintéticos en ${L.towns.length} pueblos`; }],
+  ['Organismo y coordinador', 'ancla de confianza + credencial ligada a la clave', async () => { OPS.ctx = await setupAgency({ now: Date.now() }); OPS.store = new ReliabilityStore({ nodeId: 'centro-mando', channelPriors: priorsFromCatalog(BEARERS) }); OPS.phones = simulatePopulation(L.towns, { perTown: 60, seed: 2026 }); return `${OPS.ctx.org.name} · ${OPS.phones.length} teléfonos sintéticos en ${L.towns.length} pueblos`; }],
 ];
 async function boot() {
   $('#steps').innerHTML = STEPS.map(([a, b], i) => `<div class="step" id="s${i}"><span class="dot"></span><div><b>${a}</b><small>${b}</small></div><em></em></div>`).join('');
@@ -354,11 +359,31 @@ function renderPhone() {
 
 /* ================= 6b · OPERACIÓN: orden firmada → teléfonos → cuadro → CAP + auditoría ================= */
 // Probabilidad de que la orden llegue a un teléfono por los canales vivos de SU pueblo (independencia entre canales: cota optimista declarada)
-function pDeliverFor(ph) {
-  const cs = channelState(), myTowersUp = L.towers.filter((t) => t.serves.includes(ph.townId) && S.now < S.lossAt[t.id]).length;
-  let miss = 1;
-  for (const c of cs) { if (!c.alive) continue; const p = BEARERS[c.id].family === 'TERRESTRIAL' ? (myTowersUp ? c.p : 0) : c.p; miss *= 1 - p; }
-  return 1 - miss;
+// Canales vivos para un teléfono de un pueblo: los terrestres solo si sigue en pie una antena que sirva a ESE pueblo
+function channelsFor(ph) {
+  const myTowersUp = L.towers.filter((t) => t.serves.includes(ph.townId) && S.now < S.lossAt[t.id]).length;
+  return channelState().filter((c) => c.alive).map((c) => ({ id: c.id, p: BEARERS[c.id].family === 'TERRESTRIAL' ? (myTowersUp ? c.p : 0) : c.p }));
+}
+function pDeliverFor(ph) { let miss = 1; for (const c of channelsFor(ph)) miss *= 1 - c.p; return 1 - miss; }
+// Lo aprendido en cada pueblo frente a lo que dice el catálogo, y el plan de la siguiente orden con ello
+const SHORT = { CELL_DATA: 'Datos móviles', SMS: 'SMS', PHONE_MESH: 'Malla móviles', MESHTASTIC: 'LoRa', SAT_D2C_SMS: 'Satélite D2C', IRIDIUM_SBD: 'Iridium', DRONE_MULE: 'Dron' };
+function renderLearning(zone, L1) {
+  const st = OPS.store, avail = SHOWN.map((id) => ({ id }));
+  const tiles = zone.map((z) => {
+    const nm = L.towns.find((t) => t.id === z).name, rows = SHOWN.filter((id) => L1.summary[z]?.[id]).map((id) => {
+      const r = st.getReliability(id, z, 'WILDFIRE'), cat = BEARERS[id].p, col = r.mean > 0.6 ? 'var(--e)' : r.mean > 0.3 ? 'var(--a)' : 'var(--r)';
+      return `<div class="lr"><span>${esc(SHORT[id] ?? id)}</span><span class="tr"><i style="width:${(100 * r.mean).toFixed(1)}%;background:${col}"></i><u style="left:${(100 * cat).toFixed(1)}%" title="catálogo"></u></span><span>${(100 * r.mean).toFixed(0)} % <small style="color:var(--m)">n=${r.sampleCount}</small></span></div>`;
+    }).join('');
+    const before = planAssuredDelivery(220, avail, { scenarios: { X: { prob: 1 } }, effort: 'fast', budgetEUR: 0 });
+    const after = planAssuredDelivery(220, avail, { scenarios: { X: { prob: 1 } }, effort: 'fast', budgetEUR: 0, reliabilityStore: st, zoneH3: z, hazardState: 'WILDFIRE' });
+    const used = [...new Set((after.messages ?? []).filter((m) => m.pPlanned > 0.02).map((m) => BEARERS[m.id].label.replace(/ \(.*\)/, '')))];
+    return `<div class="t"><b>${esc(nm)}</b>${rows}<p class="muted" style="margin:8px 0 0;font-size:12px">Siguiente orden aquí: plan con ${after.k} de ${after.n} fragmentos por ${esc(used.join(', ') || '—')} · probabilidad prevista ${(100 * (after.pDelivery ?? 0)).toFixed(1)} % con lo aprendido, ${(100 * (before.pDelivery ?? 0)).toFixed(1)} % solo con catálogo <small>(envíos tratados como independientes: cota optimista)</small></p></div>`;
+  }).join('');
+  const j = st.toJSON(), cells = Object.keys(j.cells).length;
+  $('#learn-out').innerHTML = `<h3 style="margin:18px 0 2px;font-size:15px">Aprendizaje de la red <span class="tag live">SENDA-CAL</span></h3>
+    <p class="muted" style="margin:0">Cada intento por canal deja un recibo sin datos personales (canal, pueblo, peligro, llegó o no). Barra = fiabilidad aprendida; marca gris = valor de catálogo. ${L1.receipts} recibos nuevos · ${cells} celdas canal×pueblo · nodo <span class="mono">${esc(st.nodeId)}</span>. Dos puestos se sincronizan sin servidor y repetir la sincronización no cuenta dos veces (CRDT idempotente).</p>
+    <div class="learn">${tiles}</div><div class="rowb"><button class="btn" id="dl-learn">Exportar aprendizaje (JSON)</button></div>`;
+  $('#dl-learn').onclick = () => dl('senda-aprendizaje.json', JSON.stringify(j, null, 1), 'application/json');
 }
 const LABEL = { ACCEPTED: 'acepta y actúa', NOT_DELIVERED: 'no le llega', NO_OWNER_CONSENT: 'sin consentimiento del dueño', NO_DECLARED_ZONE: 'fuera de la zona', REPLAY: 'repetición', EXPIRED: 'caducada', BAD_SIGNATURE: 'firma alterada', CREDENTIAL_UNKNOWN_ORG: 'organismo desconocido', KEY_NOT_BOUND_TO_CREDENTIAL: 'clave no ligada', NOT_A_COORDINATOR: 'no es coordinador' };
 const reasonsHtml = (r) => `<div class="reasons">${Object.entries(r).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<span class="${k === 'ACCEPTED' ? 'ok' : /CREDENTIAL|KEY|SIGNATURE|REPLAY|EXPIRED|COORDINATOR/.test(k) ? 'bad' : 'no'}">${v} · ${LABEL[k] ?? k}</span>`).join('')}</div>`;
@@ -370,8 +395,9 @@ async function runOrder() {
     const names = zone.map((id) => L.towns.find((t) => t.id === id).name), now = Date.now(); OPS.n++;
     out.innerHTML = '<p class="muted">Firmando y repartiendo…</p>';
     const cmd = await issueZoneOrder(OPS.ctx, { zone, message: `Evacuación preventiva de ${names.join(' y ')}: salid hacia el norte. Responded en SENDA.`, now, actions: ['SIREN', 'REPORT_STATUS', 'BLE_BEACON'] });
-    const d = await deliverOrder(OPS.ctx, cmd, OPS.phones, { now, pDeliver: pDeliverFor, seed: 100 + OPS.n });
+    const d = await deliverOrder(OPS.ctx, cmd, OPS.phones, { now, channelsOf: channelsFor, seed: 100 + OPS.n });
     const c = await collectResponses(OPS.ctx, cmd, OPS.phones, d, { now, pReturn: pDeliverFor, seed: 200 + OPS.n });
+    const L1 = await learnFromDelivery(OPS.ctx, OPS.store, cmd, d, { now, hazardState: 'WILDFIRE' });
     const rep = await situationReport(OPS.ctx, cmd, c.board, { now: now + 600_000, areaDesc: names.join(', ') });
     const per = {}; for (const r of c.responses) { const p = (per[r.townId] ??= { SAFE: 0, NEED_HELP: 0, TRAPPED: 0, NO_RESPONSE: 0, AWAY: 0 }); p[r.status]++; }
     const rows = zone.map((id) => { const p = per[id] ?? {}, nm = L.towns.find((t) => t.id === id).name; return `<div class="ops-row"><span>${esc(nm)}</span><b style="color:var(--e)">${p.SAFE ?? 0}</b><b style="color:var(--a)">${p.NEED_HELP ?? 0}</b><b style="color:var(--r)">${p.TRAPPED ?? 0}</b><b style="color:var(--m)">${p.NO_RESPONSE ?? 0}</b></div>`; }).join('');
@@ -382,7 +408,8 @@ async function runOrder() {
       <div class="rowb"><button class="btn" id="dl-cap">Descargar parte CAP 1.2</button><button class="btn" id="dl-audit">Descargar auditoría</button></div>`;
     $('#dl-cap').onclick = () => dl(`senda-parte-${cmd.id.slice(0, 8)}.xml`, rep.cap, 'application/xml');
     $('#dl-audit').onclick = () => dl(`senda-auditoria-${cmd.id.slice(0, 8)}.json`, JSON.stringify(rep.audit, null, 1), 'application/json');
-    window.SENDA_CENTRO.lastOps = { reasons: d.reasons, totals: c.board.totals, auditOk: rep.auditCheck.ok, cap: rep.cap };
+    renderLearning(zone, L1);
+    window.SENDA_CENTRO.lastOps = { reasons: d.reasons, totals: c.board.totals, auditOk: rep.auditCheck.ok, cap: rep.cap, learned: L1.summary, audit: rep.audit.map((e) => e.action) };
   } catch (e) { out.innerHTML = `<p style="color:var(--r)">${esc(e.message)}</p>`; }
   btn.disabled = false;
 }

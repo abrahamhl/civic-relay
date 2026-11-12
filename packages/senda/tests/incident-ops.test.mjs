@@ -114,3 +114,39 @@ test('auditoría: alterar una entrada rompe la cadena', async () => {
 test('las hipótesis de respuesta suman 1', () => {
   assert.ok(Math.abs(Object.values(STATUS_MODEL).reduce((a, b) => a + b, 0) - 1) < 1e-12);
 });
+
+test('aprendizaje: una operación enseña la fiabilidad real por canal y pueblo; el plan siguiente la usa', async () => {
+  const { ReliabilityStore, priorsFromCatalog } = await import('../src/reliability-store.mjs');
+  const { BEARERS } = await import('../src/bearers.mjs');
+  const { planAssuredDelivery } = await import('../src/delivery-assurance.mjs');
+  const { learnFromDelivery } = await import('../src/incident-ops.mjs');
+  // verdad oculta de la simulación: en A cayó la antena (SMS y datos = 0); en B todo funciona
+  const TRUTH = { A: { SMS: 0, CELL_DATA: 0, PHONE_MESH: 0.6, MESHTASTIC: 0.75 }, B: { SMS: 0.55, CELL_DATA: 0.5, PHONE_MESH: 0.6, MESHTASTIC: 0.75 } };
+  const ops = await setupAgency({ now: NOW });
+  const phones = simulatePopulation(TOWNS.slice(0, 2), { perTown: 60, seed: 3 });
+  const cmd = await issueZoneOrder(ops, { zone: ['A', 'B'], message: 'x', now: NOW });
+  const d = await deliverOrder(ops, cmd, phones, { now: NOW, channelsOf: (ph) => Object.entries(TRUTH[ph.townId]).map(([id, p]) => ({ id, p })), seed: 5 });
+  const store = new ReliabilityStore({ nodeId: 'centro', channelPriors: priorsFromCatalog(BEARERS) });
+  const L = await learnFromDelivery(ops, store, cmd, d, { now: NOW });
+  assert.equal(L.receipts, 120 * 4);
+  const smsA = store.getReliability('SMS', 'A', 'WILDFIRE'), smsB = store.getReliability('SMS', 'B', 'WILDFIRE');
+  assert.equal(smsA.sampleCount, 60);
+  assert.ok(smsA.mean < 0.05 && smsB.mean > 0.4, `SMS en A ${smsA.mean} (sin antena) frente a B ${smsB.mean}`);
+  const avail = Object.keys(TRUTH.A).map((id) => ({ id }));
+  const plan = (z) => planAssuredDelivery(220, avail, { scenarios: { X: { prob: 1 } }, effort: 'fast', budgetEUR: 0, reliabilityStore: store, zoneH3: z, hazardState: 'WILDFIRE' });
+  const pSms = (p) => p.messages.find((m) => m.id === 'SMS')?.pPlanned ?? 0;
+  const A = plan('A'), B = plan('B');
+  assert.ok(A.learned.SMS.mean < 0.1 && B.learned.SMS.mean > 0.4, 'el planificador ve lo aprendido en cada pueblo');
+  assert.ok(pSms(A) < 0.02 && pSms(B) > 0.3, `el plan de A ya no cuenta con el SMS (${pSms(A)}); el de B sí (${pSms(B)})`);
+  // reaprender la misma entrega (p. ej. los recibos llegan otra vez por otro canal) no cambia nada
+  await learnFromDelivery(ops, store, cmd, d, { now: NOW });
+  assert.equal(store.getReliability('SMS', 'A', 'WILDFIRE').sampleCount, 60);
+  // dos puestos que vieron la mitad cada uno, fusionados sin servidor, saben lo mismo que uno que lo vio todo
+  const half = (keep) => ({ results: d.results.filter((_, i) => i % 2 === keep) });
+  const pri = priorsFromCatalog(BEARERS), p1 = new ReliabilityStore({ nodeId: 'puesto-1', channelPriors: pri }), p2 = new ReliabilityStore({ nodeId: 'puesto-2', channelPriors: pri });
+  await learnFromDelivery(ops, p1, cmd, half(0), { now: NOW }); await learnFromDelivery(ops, p2, cmd, half(1), { now: NOW });
+  const m = p1.merge(p2);
+  for (const z of ['A', 'B']) for (const id of Object.keys(TRUTH.A)) assert.deepEqual(m.getReliability(id, z, 'WILDFIRE'), store.getReliability(id, z, 'WILDFIRE'));
+  assert.equal((await verifyAuditLog(ops.audit.entries())).ok, true);
+  assert.ok(ops.audit.entries().some((e) => e.action === 'RELIABILITY_LEARNED'));
+});

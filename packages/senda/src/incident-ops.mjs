@@ -7,7 +7,8 @@
  *
  * Flujo: setupAgency → issueZoneOrder → deliverOrder (cada teléfono la recibe según los canales vivos
  * y la verifica: firma, credencial, rol, consentimiento, zona, repetición, caducidad) → collectResponses
- * (las respuestas vuelven por los mismos canales) → situationReport (cuadro + CAP + auditoría).
+ * (las respuestas vuelven por los mismos canales) → learnFromDelivery (los acuses por canal enseñan la
+ * fiabilidad real de cada canal en cada zona) → situationReport (cuadro + CAP + auditoría).
  *
  * La población de teléfonos es SINTÉTICA y reproducible con semilla (simulatePopulation); los
  * porcentajes de consentimiento y de respuesta son HIPÓTESIS declaradas en STATUS_MODEL, no datos.
@@ -16,6 +17,7 @@
 import { createOrganization, issueCredential } from './roles.mjs';
 import { signCommand, evaluateCommand, keyThumb, buildResidentResponse, aggregateResponses } from './remote-command.mjs';
 import { toCap, createAuditLog, verifyAuditLog } from './interop.mjs';
+import { createDeliveryReceipt } from './reliability-store.mjs';
 
 const subtle = globalThis.crypto.subtle;
 
@@ -70,16 +72,20 @@ export async function issueZoneOrder(ops, { zone, actions = ['SIREN', 'REPORT_ST
  * Entrega la orden a cada teléfono y la evalúa EN el teléfono (evaluateCommand).
  * `pDeliver(phone)` = probabilidad de que le llegue por los canales vivos de su zona (el Centro la calcula
  * con la física de cada canal y las antenas en pie). Devuelve el resultado por teléfono y el recuento.
+ * Si se da `channelsOf(phone)` → [{id, p}], cada canal se intenta por separado (llega si llega por alguno) y
+ * el resultado guarda qué canales llegaron: es lo que el emisor ve como acuses y lo que alimenta el aprendizaje.
  */
-export async function deliverOrder(ops, cmd, phones, { now, pDeliver = () => 0.95, seed = 7 } = {}) {
+export async function deliverOrder(ops, cmd, phones, { now, pDeliver = () => 0.95, channelsOf = null, seed = 7 } = {}) {
   const R = rng(seed), zone = new Set(cmd.target?.zone ?? []), out = [], reasons = {};
   for (const ph of phones) {
-    const delivered = R() < pDeliver(ph);
-    if (!delivered) { out.push({ phone: ph.id, townId: ph.townId, delivered: false }); reasons.NOT_DELIVERED = (reasons.NOT_DELIVERED ?? 0) + 1; continue; }
+    let delivered, channels;
+    if (channelsOf) { channels = {}; for (const c of channelsOf(ph)) channels[c.id] = R() < c.p; delivered = Object.values(channels).some(Boolean); }
+    else delivered = R() < pDeliver(ph);
+    if (!delivered) { out.push({ phone: ph.id, townId: ph.townId, delivered: false, ...(channels ? { channels } : {}) }); reasons.NOT_DELIVERED = (reasons.NOT_DELIVERED ?? 0) + 1; continue; }
     const seen = ops.seen.get(ph.id) ?? new Set(); ops.seen.set(ph.id, seen);
     const v = await evaluateCommand(cmd, { anchors: ops.anchors, consent: { remoteCommands: ph.consent }, inDeclaredZone: zone.has(ph.townId), battery: ph.battery, radios: ph.radios, me: { buildingId: ph.buildingId, floor: ph.floor }, seen, now });
     const key = v.accepted ? 'ACCEPTED' : v.reason; reasons[key] = (reasons[key] ?? 0) + 1;
-    out.push({ phone: ph.id, townId: ph.townId, delivered: true, accepted: v.accepted, reason: v.reason ?? null, plan: v.plan ?? [] });
+    out.push({ phone: ph.id, townId: ph.townId, delivered: true, accepted: v.accepted, reason: v.reason ?? null, plan: v.plan ?? [], ...(channels ? { channels } : {}) });
   }
   await ops.audit.append({ at: now, actor: 'SENDA', action: 'ORDER_DELIVERY', data: { id: cmd.id, phones: phones.length, ...reasons } });
   return { results: out, reasons };
@@ -102,6 +108,27 @@ export async function collectResponses(ops, cmd, phones, delivery, { now, pRetur
   const board = aggregateResponses(responses, { alerts: [cmd], now: now + 600_000 });
   await ops.audit.append({ at: now + 600_000, actor: 'SENDA', action: 'RESPONSES_AGGREGATED', data: { id: cmd.id, responses: responses.length, lostOnReturn, totals: board.totals } });
   return { responses, board, lostOnReturn };
+}
+
+/**
+ * Aprendizaje de la operación (SENDA-CAL): cada intento por canal es un recibo sin datos personales
+ * (canal, zona, estado de peligro, llegó o no) que entra en el almacén de fiabilidad de este nodo.
+ * Así la siguiente orden se planifica con lo que de verdad pasó en ESA zona, no con el catálogo.
+ * Devuelve el resumen por zona y canal { zone: { channel: {ok, tried} } } y lo deja en la auditoría.
+ */
+export async function learnFromDelivery(ops, store, cmd, delivery, { now, hazardState = 'WILDFIRE', zoneOf = (r) => r.townId, k = 1 } = {}) {
+  if (!Number.isFinite(now)) throw new TypeError('now obligatorio');
+  const summary = {}; let receipts = 0;
+  for (const r of delivery.results) {
+    if (!r.channels) continue;
+    const z = zoneOf(r);
+    for (const [id, ok] of Object.entries(r.channels)) {
+      store.ingestReceipt(createDeliveryReceipt({ bearerId: id, zoneH3: z, hazardState, sentAt: now, ackedAt: ok ? now + 1 : null, outcome: ok ? 'DELIVERED' : 'EXPIRED', k, nonce: `${cmd.id}|${r.phone}|${id}` }));
+      const c = ((summary[z] ??= {})[id] ??= { ok: 0, tried: 0 }); c.tried++; if (ok) c.ok++; receipts++;
+    }
+  }
+  await ops.audit.append({ at: now, actor: 'SENDA', action: 'RELIABILITY_LEARNED', data: { id: cmd.id, receipts, node: store.nodeId, hazardState } });
+  return { summary, receipts };
 }
 
 /** Parte de situación en CAP 1.2 (ámbito restringido, para la sala 112) + cierre de auditoría. */

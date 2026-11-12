@@ -1,5 +1,25 @@
 # Changelog
 
+## SENDA · 12-11-2026 · Desarrollo: app Android real, Centro de Control, operación de incidente y aprendizaje de la red
+
+**Entrada (fundador):**
+- «Necesito implementaciones en el código, funcionalidades, desarrollo»: app de verdad (no navegador), panel de control dinámico, todo lo que se dice verificado con pruebas.
+
+**Procesamiento:**
+- **App Android autónoma**: `AppActivity` sirve la app web completa desde `assets/` con origen HTTPS propio (`OfflineAssets`, 23 comprobaciones JVM: sin `..`, sin otros orígenes, sin `file://`). Sin permiso de Internet. La CI verifica que el APK lleva la app y el núcleo.
+- **Centro de Control** (`/senda/centro`): autodiagnóstico real al arrancar, incendio + lluvia + caída de antenas en el tiempo, canales con física (P.838-3), plan con fallos correlacionados, envío real cifrado y troceado, móvil del residente.
+- **Operación de incidente** (`incident-ops.mjs`, 10 pruebas): organismo → credencial ligada a la clave → orden firmada a la zona → cada teléfono la verifica → respuestas → cuadro → parte CAP 1.2 + auditoría encadenada. Rechaza órdenes falsificadas, robadas, alteradas, repetidas y caducadas.
+- **Aprendizaje de la red (SENDA-CAL) conectado**: cada intento por canal deja un recibo anónimo; el almacén aprende la fiabilidad por canal y pueblo y el planificador la usa en la orden siguiente (`learnFromDelivery`, `priorsFromCatalog`). Visible en el Centro.
+- **Corregidos 3 fallos reales de `reliability-store.mjs`**: (1) la fusión «CRDT» sumaba contadores y no era idempotente (sincronizar dos veces duplicaba la evidencia) → ahora un registro por nodo, gana la mayor secuencia; (2) importaba `node:crypto` y no funcionaba en la app → SHA-256 puro; (3) recibos distintos en el mismo milisegundo tenían el mismo hash → `nonce` por intento, y `recordedAt` fuera del hash.
+- `scripts/prove.mjs` + `scripts/film-claims.mjs`: 19 afirmaciones de la película medidas contra el núcleo (nueva: `learning-crdt`, escena v24).
+
+**Validación:**
+- `node scripts/prove.mjs --full`: 466/466 pruebas del núcleo, 19/19 afirmaciones. Centro probado en Chromium sin errores de consola.
+
+**Límites:** población de teléfonos y fiabilidades «verdaderas» de la simulación son sintéticas y declaradas; el plan trata los envíos como independientes (cota optimista). La escena v24 dice «recibos **firmados**»: los recibos de aprendizaje llevan hash, no firma (anonimato) — corregir la palabra en el próximo montaje.
+
+— Firma: Claude Code (sesión cloud), 12-11-2026.
+
 ## SENDA · 11-11-2026 · Película de inversores v2: explicación completa en escenas 3D
 
 **Entrada (fundador):**

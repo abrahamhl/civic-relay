@@ -110,6 +110,23 @@ export const CLAIMS = [
     const a = d.independentPlanner, b = d.assuredPlanner.find((x) => x.costEUR === 0);
     return { value: `ingenuo promete ${a.claimed} y entrega ${a.actual} · motor a 0 € entrega ${b.pDelivery} (${b.k} de ${b.fragments}; ${d.claim})`, ok: a.claimed === 0.9949 && a.actual === 0.9609 && b.pDelivery > 0.985 };
   } },
+  { id: 'learning-crdt', scene: 'v24', claim: 'los recibos de entrega enseñan qué canal funciona en cada zona y se combinan entre nodos sin servidor (sin contar dos veces)', async measure() {
+    const io = await core('incident-ops.mjs'), rs = await core('reliability-store.mjs'), { BEARERS } = await core('bearers.mjs'), NOW = 1_800_000_000_000;
+    const TRUTH = { A: { SMS: 0, PHONE_MESH: 0.6, MESHTASTIC: 0.75 }, B: { SMS: 0.55, PHONE_MESH: 0.6, MESHTASTIC: 0.75 } };
+    const ops = await io.setupAgency({ now: NOW }), phones = io.simulatePopulation([{ id: 'A' }, { id: 'B' }], { perTown: 60, seed: 3 });
+    const cmd = await io.issueZoneOrder(ops, { zone: ['A', 'B'], message: 'x', now: NOW });
+    const d = await io.deliverOrder(ops, cmd, phones, { now: NOW, channelsOf: (ph) => Object.entries(TRUTH[ph.townId]).map(([id, p]) => ({ id, p })), seed: 5 });
+    const pri = rs.priorsFromCatalog(BEARERS), mk = (n) => new rs.ReliabilityStore({ nodeId: n, channelPriors: pri });
+    const all = mk('uno'), p1 = mk('p1'), p2 = mk('p2');
+    await io.learnFromDelivery(ops, all, cmd, d, { now: NOW });
+    await io.learnFromDelivery(ops, p1, cmd, { results: d.results.filter((_, i) => i % 2 === 0) }, { now: NOW });
+    await io.learnFromDelivery(ops, p2, cmd, { results: d.results.filter((_, i) => i % 2 === 1) }, { now: NOW });
+    const m = p1.merge(p2), mm = m.merge(p2).merge(p1);
+    const g = (s, id, z) => s.getReliability(id, z, 'WILDFIRE');
+    const same = ['A', 'B'].every((z) => Object.keys(TRUTH.A).every((id) => JSON.stringify(g(m, id, z)) === JSON.stringify(g(all, id, z)) && JSON.stringify(g(mm, id, z)) === JSON.stringify(g(m, id, z))));
+    const a = g(all, 'SMS', 'A').mean, b = g(all, 'SMS', 'B').mean;
+    return { value: `SMS aprendido: ${(100 * a).toFixed(1)} % en el pueblo sin antena, ${(100 * b).toFixed(1)} % en el otro (catálogo ${Math.round(100 * BEARERS.SMS.p)} %) · 2 nodos fusionados = 1 nodo con todo; fusionar otra vez no cambia nada: ${same}`, ok: a < 0.05 && b > 0.4 && same };
+  } },
   { id: 'reserve-1gb', scene: 'v11', claim: 'reserva de 1 GB elegida con mochila 0/1 exacta y frescura', async measure() {
     const r = await core('net-reserve.mjs'), items = r.reserveCatalog({ hazards: ['flood', 'wildfire'] }), plan = r.planReserve(items, 1024);
     // exactitud: comparar con fuerza bruta sobre los 14 primeros elementos con presupuesto 300 MB
