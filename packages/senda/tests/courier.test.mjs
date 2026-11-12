@@ -57,3 +57,14 @@ test('simulación ES→NL (hipótesis declaradas, semilla fija): cada vía mejor
   assert.ok(sat.byHour[1].senda > 0.9 && sat.byHour[1].waitForNetwork < 0.01, 'satélite en ambos lados: llega en la primera hora');
   assert.deepEqual(run(['LORAWAN_PUBLIC'], ['LORAWAN_PUBLIC']), lora, 'reproducible');
 });
+
+test('apagón regional: lo que depende de infraestructura ajena cae; el satélite de aparato a aparato no', async () => {
+  const A = await createPairingKeys(), B = await createPairingKeys(), pair = await derivePairing(A, B.publicJwk);
+  const bytes = (await sealCompact(pair, 'Estoy bien, sin red. Llamo cuando vuelva.')).length;
+  const run = (f, t, bo) => simulateCourier(planCourier({ envelopeBytes: bytes, from: { country: 'ES', has: f, blackout: bo }, to: { country: 'NL', has: t } }), { seed: 5 });
+  const loraNormal = run(['LORAWAN_PUBLIC'], ['LORAWAN_PUBLIC'], false), loraBlack = run(['LORAWAN_PUBLIC'], ['LORAWAN_PUBLIC'], true);
+  assert.ok(loraBlack.byHour[6].senda < loraNormal.byHour[6].senda, 'con apagón la pasarela LoRaWAN de tu zona probablemente no tiene luz');
+  const sat = run(['SAT_MESSENGER'], ['SAT_MESSENGER'], true);
+  assert.ok(sat.byHour[1].senda > 0.9, 'mensajero satelital en cada lado: llega igual con apagón');
+  assert.equal(COURIER_LEGS.SAT_PHONE_NATIVE.pAvail.ES, 0, 'mensajes por satélite del móvil: no disponibles en España hoy');
+});

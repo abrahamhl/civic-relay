@@ -72,3 +72,4 @@ export * from './source-evidence.mjs';
 // Defensa y doble uso: aislado en './defense/index.mjs' (importar '@senda/core/defense'), nunca desde aquí.
 export * from './vigia.mjs';
 export * from './courier.mjs';
+export * from './hazard-reports.mjs';

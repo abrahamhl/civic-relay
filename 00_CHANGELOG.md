@@ -1,5 +1,21 @@
 # Changelog
 
+## SENDA · 12-11-2026 · Mensaje sin red entre países, avisos ciudadanos con triaje 112 e investigación de compras públicas
+
+**Entrada (fundador):** cómo llega un mensaje a su hermano en Holanda sin red y sin nadie con SENDA en medio; red de avisos ciudadanos que alivie el 112 sin emitir avisos sin confirmación oficial; qué software compran los organismos (ES/NL/UE); cámaras y fuentes públicas.
+
+**Procesamiento:**
+- `courier.mjs`: emparejamiento previo (ECDH P-256 + HKDF) y mensaje compacto AES-256-GCM con 25 B de sobrecarga (74 B un mensaje corto); primera milla, buzones redundantes en Internet y última milla; fragmentos Reed-Solomon que cambian de forma en cada salto, nunca de contenido; tiempo en el aire LoRa (Semtech AN1200.13) y uso justo de TTN; apagón regional por lado; vías prohibidas (redes Find My) y en claro (APRS) excluidas por código.
+- `envelope.mjs`: `sealMessage` rechaza una prioridad no válida (antes creaba un sobre que nadie podía abrir).
+- `hazard-reports.mjs`: nivel del agua por toques en la foto, velocidad de subida por mínimos cuadrados, agrupación de reportes en incidentes, contraste con reputación, sensores y fuentes oficiales, zona de reconocimiento previa, cola priorizada para el 112. Aviso público solo con confirmación oficial; si hay riesgo vital, siempre «llama al 112».
+- `docs/research/`: compras de software de emergencias ES/NL/UE, vías reales de mensaje sin red ES↔NL, cámaras y fuentes de ríos y fuego.
+
+**Validación:** suite 492/492.
+
+**Límites:** las disponibilidades por país de LoRaWAN/Meshtastic/Wi-Fi son hipótesis. Los agentes no pudieron abrir las páginas oficiales (bloqueo de red): cifras de búsqueda con confianza media. `bearers.SAT_D2C_SMS` no está disponible en ES ni NL (Orange Francia funciona sobre Skylo) y lo usa la afirmación «199/200» de la película: pendiente de decisión.
+
+— Firma: Claude Code (sesión cloud), 12-11-2026.
+
 ## SENDA · 12-11-2026 · SENDA Vigía: consenso físico entre sensores baratos
 
 **Entrada (fundador):** producto nuevo y revolucionario con infraestructura mínima y módulos baratos (térmicas, micrófonos, cámaras, dashcams), con un camino claro hacia inversores.

@@ -46,13 +46,13 @@ export const LORAWAN_OVERHEAD = 13;
  */
 export const COURIER_LEGS = Object.freeze({
   QUEUE_CELL: { label: 'Cola en el móvil hasta que vuelva cualquier cobertura', dir: 'BOTH', hardware: null, mtu: 1 << 16, status: 'VERIFIED_BEHAVIOUR', note: 'Siempre activa: es la vía de referencia («esperar a que vuelva la red»).' },
-  SENDA_NEIGHBOUR: { label: 'Vecino con SENDA (Bluetooth/Wi-Fi) que tenga Internet o lo encuentre', dir: 'BOTH', hardware: null, mtu: 4096, status: 'HYPOTHESIS', pAvail: { ES: 0.15, NL: 0.15 }, meanWaitMin: 90, perDay: 500, note: 'Crece con la adopción; hoy casi nula.' },
-  OPEN_WIFI: { label: 'Wi-Fi público abierto que siga con Internet (biblioteca, estación)', dir: 'BOTH', hardware: null, mtu: 1 << 16, status: 'HYPOTHESIS', pAvail: { ES: 0.2, NL: 0.25 }, meanWaitMin: 240, perDay: 10_000, note: 'Hay que desplazarse; en un apagón regional muchas caen.' },
-  LORAWAN_PUBLIC: { label: 'Módulo LoRaWAN propio (Bluetooth al móvil) → pasarela comunitaria (The Things Network/Helium)', dir: 'BOTH', hardware: 'Módulo LoRaWAN EU868 con Bluetooth (p. ej. placa ESP32 + SX1262)', mtu: 51, status: 'HYPOTHESIS', pAvail: { ES: 0.35, NL: 0.85 }, sf: { ES: 12, NL: 9 }, airtimeBudgetMsDay: 30_000, downlinksPerDay: 10, meanWaitMin: 2, note: 'Las pasarelas están hechas para llevar datos de cualquier dispositivo registrado: uso previsto, no abuso. Límite de uso justo de TTN: 30 s de aire de subida y 10 bajadas al día por dispositivo.' },
-  MESHTASTIC_MQTT: { label: 'Nodo Meshtastic propio → nodo público con pasarela a Internet (MQTT)', dir: 'BOTH', hardware: 'Nodo Meshtastic (ESP32/nRF52 + SX1262)', mtu: 200, status: 'HYPOTHESIS', pAvail: { ES: 0.3, NL: 0.45 }, meanWaitMin: 20, perDay: 200, note: 'Depende de que algún nodo de la zona publique por MQTT.' },
-  SAT_MESSENGER: { label: 'Mensajero satelital de bolsillo (Garmin inReach, ZOLEO, Motorola Defy…)', dir: 'BOTH', hardware: 'Mensajero satelital con suscripción', mtu: 116, text: true, status: 'VERIFY_PENDING', pAvail: { ES: 0.97, NL: 0.97 }, meanWaitMin: 10, perDay: 40, costPerMsgEUR: null, note: 'Funciona sin ninguna infraestructura terrestre con cielo despejado. Coste por plan: a verificar.' },
-  IRIDIUM_SBD: { label: 'Módem Iridium SBD (RockBLOCK)', dir: 'BOTH', hardware: 'RockBLOCK 9603 + antena', mtu: 324, status: 'VERIFY_PENDING', pAvail: { ES: 0.97, NL: 0.97 }, meanWaitMin: 5, perDay: 100, costPerMsgEUR: null, note: '340 B por mensaje de subida, 270 de bajada; coste por crédito a verificar.' },
-  SAT_PHONE_NATIVE: { label: 'Mensajes por satélite del propio móvil (iPhone/Android compatibles)', dir: 'BOTH', hardware: 'Móvil compatible', mtu: 116, text: true, status: 'VERIFY_PENDING', pAvail: { ES: 0, NL: 0 }, meanWaitMin: 5, perDay: 50, note: 'Disponibilidad por país pendiente de verificar: a 0 hasta confirmarla con fuente.' },
+  SENDA_NEIGHBOUR: { label: 'Vecino con SENDA (Bluetooth/Wi-Fi) que tenga Internet o lo encuentre', dir: 'BOTH', hardware: null, mtu: 4096, status: 'HYPOTHESIS', infra: true, pAvail: { ES: 0.15, NL: 0.15 }, meanWaitMin: 90, perDay: 500, note: 'Crece con la adopción; hoy casi nula.' },
+  OPEN_WIFI: { label: 'Wi-Fi público abierto que siga con Internet (biblioteca, estación)', dir: 'BOTH', hardware: null, mtu: 1 << 16, status: 'HYPOTHESIS', infra: true, pAvail: { ES: 0.2, NL: 0.25 }, meanWaitMin: 240, perDay: 10_000, note: 'Hay que desplazarse; en un apagón regional muchas caen.' },
+  LORAWAN_PUBLIC: { label: 'Módulo LoRaWAN propio (Bluetooth al móvil) → pasarela comunitaria (The Things Network/Helium)', dir: 'BOTH', hardware: 'Módulo LoRaWAN EU868 con Bluetooth (p. ej. placa ESP32 + SX1262)', mtu: 51, status: 'HYPOTHESIS', infra: true, pAvail: { ES: 0.35, NL: 0.85 }, sf: { ES: 12, NL: 9 }, airtimeBudgetMsDay: 30_000, downlinksPerDay: 10, meanWaitMin: 2, note: 'Las pasarelas están hechas para llevar datos de cualquier dispositivo registrado: uso previsto, no abuso. Límite de uso justo de TTN: 30 s de aire de subida y 10 bajadas al día por dispositivo.' },
+  MESHTASTIC_MQTT: { label: 'Nodo Meshtastic propio → nodo público con pasarela a Internet (MQTT)', dir: 'BOTH', hardware: 'Nodo Meshtastic (ESP32/nRF52 + SX1262)', mtu: 200, status: 'HYPOTHESIS', infra: true, pAvail: { ES: 0.3, NL: 0.45 }, meanWaitMin: 20, perDay: 200, note: 'Depende de que algún nodo de la zona publique por MQTT; la bajada desde el servidor público viene desactivada por defecto: hace falta un servidor (broker) compartido por los dos lados con bajada activa.' },
+  SAT_MESSENGER: { label: 'Mensajero satelital de bolsillo (Garmin inReach, ZOLEO, Motorola Defy…)', dir: 'BOTH', hardware: 'Mensajero satelital con suscripción', mtu: 116, text: true, status: 'VERIFIED', pAvail: { ES: 0.97, NL: 0.97 }, meanWaitMin: 10, perDay: 40, costPerMsgEUR: null, note: 'Red Iridium, de aparato a aparato (~160 caracteres), sin ninguna infraestructura terrestre con cielo despejado. ZOLEO se lanzó en Europa con planes de 20–60 €/mes (2022); precio actual de Garmin en € no encontrado. Ver docs/research/MENSAJE_SIN_RED_ES_NL_2026-11.md.' },
+  IRIDIUM_SBD: { label: 'Módem Iridium SBD (RockBLOCK)', dir: 'BOTH', hardware: 'RockBLOCK 9603 + antena', mtu: 324, status: 'VERIFIED', pAvail: { ES: 0.97, NL: 0.97 }, meanWaitMin: 5, perDay: 100, costPerMsgEUR: null, note: '340 B de subida, 270 de bajada; 1 crédito por 50 B (0,077–0,16 £ por crédito, línea 13 £/mes, página sin fecha). Entrega directa de RockBLOCK a RockBLOCK con el prefijo «RB» + número de serie: 324 B útiles por prudencia.' },
+  SAT_PHONE_NATIVE: { label: 'Mensajes por satélite del propio móvil (iPhone/Android compatibles)', dir: 'BOTH', hardware: 'Móvil compatible', mtu: 116, text: true, status: 'NOT_AVAILABLE_ES_NL', pAvail: { ES: 0, NL: 0 }, meanWaitMin: 5, perDay: 50, note: 'Mensajes normales por satélite del móvil: no disponibles en ES ni NL (Apple: solo EE. UU., Canadá, México y Japón; SMS directo por satélite: Orange en Francia; en España solo un piloto de MasOrange y Starlink en Valladolid). El SOS por satélite sí existe en ES y NL, pero solo para emergencias reales.' },
   VEHICLE_MULE: { label: 'Coche o autobús con SENDA que lo lleva hasta donde haya cobertura', dir: 'FIRST', hardware: null, mtu: 1 << 16, status: 'HYPOTHESIS', pAvail: { ES: 0.25, NL: 0.25 }, meanWaitMin: 180, perDay: 10_000, note: 'Útil dentro de la zona del apagón; no cruza países por sí solo.' },
   SOUND_HOP: { label: 'Sonido entre dos móviles a ~1 m', dir: 'LOCAL', hardware: null, mtu: 4096, status: 'VERIFIED_CODE', note: 'Solo un salto local (pasar el mensaje a quien sí tenga una vía). Nunca para larga distancia.' },
   APRS: { label: 'APRS (radioaficionado)', dir: 'BOTH', hardware: 'Equipo VHF + licencia', mtu: 46, status: 'EXCLUDED_PRIVATE', note: 'Prohibido cifrar en bandas de aficionado: no sirve para un mensaje privado.' },
@@ -65,6 +65,13 @@ export const DROPS = Object.freeze({
   EMAIL: { label: 'Correo del destinatario (adjunto cifrado)', pUp: 0.99 },
   NOSTR: { label: 'Relés públicos Nostr (3)', pUp: 0.995 },
 });
+
+/**
+ * En un apagón regional cae la infraestructura de terceros (pasarelas, Wi-Fi, Internet del vecino): en el
+ * apagón ibérico de abril de 2025 las baterías de las antenas móviles duraron unas 4–6 h. Factor sobre
+ * `pAvail` de las vías con `infra: true` (HIPÓTESIS).
+ */
+export const BLACKOUT_INFRA_FACTOR = 0.15;
 
 const USABLE = (leg, side) => leg && !['PROHIBITED', 'EXCLUDED_PRIVATE'].includes(leg.status) && (leg.dir === 'BOTH' || leg.dir === side);
 
@@ -113,7 +120,7 @@ export function simulateCourier(plan, { runs = 2000, seed = 1, restoreH = { from
     for (const id of plan.first) {
       const L = COURIER_LEGS[id];
       if (id === 'QUEUE_CELL') { for (let i = 0; i < plan.n; i++) atNet.push(restFrom); continue; }
-      if (!(R() < (L.pAvail?.[plan.from.country] ?? 0))) continue;
+      if (!(R() < (L.pAvail?.[plan.from.country] ?? 0) * (L.infra && plan.from.blackout ? BLACKOUT_INFRA_FACTOR : 1))) continue;
       const cap = plan.capacity.first[id], perFrame = Math.max(1, Math.floor(L.mtu / plan.shardBytes));
       let t = expo(R, L.meanWaitMin / 60);
       for (let i = 0; i < plan.n; i += perFrame) { const day = Math.floor((i / perFrame) / cap); for (let j = 0; j < perFrame; j++) atNet.push(t + day * 24); t += expo(R, (L.meanWaitMin / 60) / 4); }
@@ -128,7 +135,7 @@ export function simulateCourier(plan, { runs = 2000, seed = 1, restoreH = { from
     for (const id of plan.last) {
       const L = COURIER_LEGS[id];
       if (id === 'QUEUE_CELL') { if (distinct.length >= plan.k) best = Math.min(best, Math.max(restTo, distinct[plan.k - 1])); continue; }
-      if (!(R() < (L.pAvail?.[plan.to.country] ?? 0))) continue;
+      if (!(R() < (L.pAvail?.[plan.to.country] ?? 0) * (L.infra && plan.to.blackout ? BLACKOUT_INFRA_FACTOR : 1))) continue;
       const cap = plan.capacity.last[id], perFrame = Math.max(1, Math.floor(L.mtu / plan.shardBytes));
       let t = expo(R, L.meanWaitMin / 60), got = 0, done = Infinity;
       for (let i = 0; i < distinct.length && got < plan.k; i += perFrame) {
