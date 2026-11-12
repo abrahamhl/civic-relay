@@ -7,7 +7,7 @@ Regla de base: `CLAUDE.md` §1 (nada inventado; simulaciones declaradas).
 |---|---|---|---|
 | 0 | Auditoría de veracidad: quitar valores inventados y etiquetar simulaciones | ✅ (seguir vigilando) | courier: sin valores por defecto sin fuente, escenario de ejemplo etiquetado; película: «simulación», 198/200 con portadores disponibles en España, «recibos anónimos»; guía de hardware marcada como no verificada; evaluaciones con `basis` |
 | 1 | Mensaje al hermano sin red ES→NL (multivía, satélite, cola, pasarelas legales) | ✅ | `courier.mjs` + pruebas; pantalla `/senda/mensaje` probada en Chromium con dos móviles (emparejar, número de seguridad, 1 línea de 147 caracteres, repetición, alteración, mensaje largo con una línea perdida y desordenado) |
-| 2 | Red de avisos ciudadanos (zonas, ver y reportar peligros, medir el río) | 🔧 | `hazard-reports.mjs` + pruebas; pantalla `/senda/avisos` probada (medida 2,00→2,25 m = 2,50 cm/min; consejo 112; agrupación). Falta: envío real de reportes entre móviles y al organismo |
+| 2 | Red de avisos ciudadanos (zonas, ver y reportar peligros, medir el río) | ✅ (falta red automática) | `/senda/avisos`: medida por foto, reporte firmado Ed25519 en una línea de 160 caracteres que viaja por cualquier vía y se importa verificado (probado con 4 móviles: 3 nuevos, 1 repetido, 1 falsificado rechazado). Pendiente: difusión automática por malla/LoRa y conexión con organismo (convenio) |
 | 3 | Aliviar el 112: agrupar, contrastar fuentes públicas, priorizar por gravedad | 🔧 | `triageQueue`, `assessIncident`; falta conexión con fuentes reales |
 | 4 | Aviso a la población solo con confirmación oficial; zona de reconocimiento previa | ✅ | regla `canPublicWarn` + `reconZone`, con pruebas |
 | 5 | Cámaras públicas cercanas (Madrid, DGT) para ciudadanos y emergencias | ⏳ | datasets abiertos identificados (`docs/research/FUENTES_CAMARAS_RIOS_FUEGO_2026-11.md`); conector pendiente; la red de la sesión bloquea los dominios |
@@ -25,5 +25,6 @@ Regla de base: `CLAUDE.md` §1 (nada inventado; simulaciones declaradas).
 | Fecha y hora (UTC) | Revisado | Avance | Problemas |
 |---|---|---|---|
 | 2026-11-12 23:4x | Lista creada | Regla de veracidad en `CLAUDE.md` | — |
+| 2026-11-13 01:0x | Punto 2 | Reportes firmados que viajan entre móviles | Mi comentario decía 121 caracteres con P-256: era falso (204); cambiado a Ed25519 = 160 exactos y probado |
 | 2026-11-13 00:4x | Punto 2 | Pantalla de avisos | Detectadas y quitadas 3 frases que prometían integración con el 112 o envío por red que aún no existen |
 | 2026-11-13 00:2x | Puntos 0, 1, 13 | Auditoría de veracidad; pantalla de mensaje sin red; guion corregido | La prueba de navegador leía el resultado antes de tiempo (fallo de la prueba, no de la app): corregido |

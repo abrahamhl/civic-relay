@@ -152,3 +152,56 @@ export function citizenAdvice(kind, assessed) {
   if (assessed && assessed.reporters >= 3) return { call112: false, text: `Ya lo han reportado ${assessed.reporters} personas en SENDA y está agrupado como un solo incidente. Llama al 112 si ves personas en peligro.` };
   return { call112: false, text: 'Reporte enviado. Si ves personas en peligro, llama al 112.' };
 }
+
+/* ───────────── 6. Reporte compacto y firmado para viajar por cualquier vía ─────────────
+ * 20 B de datos + 32 B de clave pública Ed25519 + 64 B de firma = 116 B → una línea «SND3 …» de exactamente
+ * 160 caracteres (un SMS o un mensaje de mensajero satelital). Ed25519: Node, Chrome 113+, Safari 17+, Firefox 129+. Sin nombre ni teléfono: el autor es la huella de una clave
+ * de reportes del propio móvil (seudónimo), lo justo para contar personas distintas y aprender
+ * reputación, y para que nadie pueda fabricar reportes en nombre de otro móvil.
+ * Formato: ver(1) tipo(1) lat·1e5(4) lon·1e5(4) minutos desde 2020(4) atrapados(1) heridos(1)
+ *          subida cm/min·100 (int16, 0x7fff = sin medida)(2) error·100 (uint16)(2) | clave pública (32) | firma (64)
+ */
+const KIND_IDS = Object.keys(HAZARD_KINDS);
+const EPOCH_MIN = Date.UTC(2020, 0, 1) / 60_000;
+const sub = globalThis.crypto.subtle;
+const b64u = (u8) => btoa(String.fromCharCode(...u8)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64u = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4)), (c) => c.charCodeAt(0));
+
+export async function createReporterKeys() {
+  const k = await sub.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
+  return { privateKey: k.privateKey, publicRaw: new Uint8Array(await sub.exportKey('raw', k.publicKey)) };
+}
+
+function packBody(r) {
+  const b = new Uint8Array(20), v = new DataView(b.buffer);
+  const kid = KIND_IDS.indexOf(r.kind); if (kid < 0) throw new Error(`tipo desconocido: ${r.kind}`);
+  b[0] = 1; b[1] = kid; v.setInt32(2, Math.round(r.lat * 1e5)); v.setInt32(6, Math.round(r.lon * 1e5));
+  v.setUint32(10, Math.round(r.at / 60_000 - EPOCH_MIN)); b[14] = Math.min(255, r.people?.trapped ?? 0); b[15] = Math.min(255, r.people?.injured ?? 0);
+  const rise = r.measurement?.rise; v.setInt16(16, rise ? Math.max(-32767, Math.min(32766, Math.round(rise.cmPerMin * 100))) : 0x7fff); v.setUint16(18, rise?.stdErr != null ? Math.min(65535, Math.round(rise.stdErr * 100)) : 65535);
+  return b;
+}
+
+/** Línea de texto firmada lista para cualquier vía. */
+export async function encodeReport(r, keys) {
+  const body = packBody(r), sig = new Uint8Array(await sub.sign({ name: 'Ed25519' }, keys.privateKey, body));
+  const out = new Uint8Array(body.length + 32 + 64); out.set(body); out.set(keys.publicRaw, body.length); out.set(sig, body.length + 32);
+  return 'SND3 ' + b64u(out);
+}
+
+/** Lee y verifica todas las líneas SND3 de un texto. Devuelve reportes válidos y cuántas se rechazaron. */
+export async function decodeReports(text) {
+  const ok = [], rejected = [];
+  for (const m of String(text).matchAll(/SND3 ([A-Za-z0-9_-]+)/g)) {
+    try {
+      const u = unb64u(m[1]); if (u.length !== 116 || u[0] !== 1) throw new Error('formato');
+      const body = u.subarray(0, 20), pub = u.subarray(20, 52), sig = u.subarray(52);
+      const key = await sub.importKey('raw', pub, { name: 'Ed25519' }, false, ['verify']);
+      if (!(await sub.verify({ name: 'Ed25519' }, key, sig, body))) throw new Error('firma');
+      const v = new DataView(body.buffer, body.byteOffset), riseRaw = v.getInt16(16), se = v.getUint16(18);
+      const deviceId = 'k' + b64u(new Uint8Array(await sub.digest('SHA-256', pub)).subarray(0, 9));
+      ok.push({ kind: KIND_IDS[body[1]], lat: v.getInt32(2) / 1e5, lon: v.getInt32(6) / 1e5, at: (v.getUint32(10) + EPOCH_MIN) * 60_000, people: { trapped: body[14], injured: body[15] },
+        ...(riseRaw !== 0x7fff ? { measurement: { rise: { cmPerMin: riseRaw / 100, stdErr: se === 65535 ? null : se / 100 } } } : {}), deviceId, signed: true });
+    } catch (e) { rejected.push(e.message); }
+  }
+  return { reports: ok, rejected };
+}

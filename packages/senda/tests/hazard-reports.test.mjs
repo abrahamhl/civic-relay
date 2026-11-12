@@ -71,3 +71,21 @@ test('cola del 112: una persona atrapada pasa delante de 40 reportes de una call
 test('distancia: 1° de latitud ≈ 111,2 km', () => {
   assert.ok(Math.abs(distanceM({ lat: 40, lon: -3 }, { lat: 41, lon: -3 }) - 111_195) < 5);
 });
+
+test('reporte firmado: cabe en una línea de SMS, se verifica y no se puede falsificar ni atribuir a otro móvil', async () => {
+  const { createReporterKeys, encodeReport, decodeReports } = await import('../src/hazard-reports.mjs');
+  const k1 = await createReporterKeys(), k2 = await createReporterKeys();
+  const r = { kind: 'RIVER_RISING', lat: 39.42691, lon: -0.41742, at: Date.UTC(2026, 10, 13, 0, 40), people: { trapped: 0, injured: 1 }, measurement: { rise: { cmPerMin: 2.5, stdErr: 0.12 } } };
+  const line = await encodeReport(r, k1);
+  assert.equal(line.length, 160, `${line.length} caracteres`);
+  const { reports, rejected } = await decodeReports(`Reenviado:\n${line}\n${await encodeReport({ ...r, kind: 'SMOKE' }, k2)}`);
+  assert.equal(rejected.length, 0); assert.equal(reports.length, 2);
+  assert.deepEqual({ ...reports[0], deviceId: undefined, signed: undefined }, { ...r, deviceId: undefined, signed: undefined });
+  assert.notEqual(reports[0].deviceId, reports[1].deviceId);
+  // alterar la posición rompe la firma
+  const u = line.slice(5), bad = 'SND3 ' + u.slice(0, 6) + (u[6] === 'A' ? 'B' : 'A') + u.slice(7);
+  assert.equal((await decodeReports(bad)).rejected[0], 'firma');
+  // el mismo móvil reenviando 5 veces sigue contando como una persona
+  const many = (await decodeReports(Array(5).fill(line).join('\n'))).reports;
+  assert.equal(new Set(many.map((x) => x.deviceId)).size, 1);
+});

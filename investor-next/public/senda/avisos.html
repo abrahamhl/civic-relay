@@ -53,26 +53,37 @@ input,select{font:inherit;background:#071018;color:var(--t);border:1px solid var
 
 <section class="card" style="margin-top:14px">
   <h2>3 · Qué está pasando en la zona</h2>
+  <h3 style="font-size:15px;margin:0 0 6px">Reportes recibidos</h3>
+  <textarea id="paste" rows="3" style="width:100%;font:13px ui-monospace,monospace;background:#071018;color:var(--t);border:1px solid var(--l);border-radius:10px;padding:10px" placeholder="Pega aquí líneas SND3 que te hayan llegado (pueden venir mezcladas con otro texto)"></textarea>
+  <div class="row"><button class="g" id="import">Añadir reportes recibidos</button><span class="m" id="imp"></span></div>
   <div class="row"><button id="demo">Cargar ejemplo (SIMULACIÓN)</button><button id="clear">Borrar mis datos</button><span class="m" id="qsum"></span></div>
   <div id="incs"><p class="m">Aún no hay reportes. Los reportes de otros vecinos llegarán por la red SENDA (en desarrollo); en esta demo puedes cargar un ejemplo simulado.</p></div>
   <p class="note">Cómo se decide el estado: cada persona distinta suma (si un mismo móvil repite, cuenta una vez; quien ha dado falsas alarmas cuenta menos), una medida de subida suma, un sensor que cuadra suma y un aforo oficial que <i>no</i> sube resta. Las razones de verosimilitud son <b>hipótesis sin calibrar</b> (código: <code>hazard-reports.mjs</code>, <code>EVIDENCE_LR</code>). Estados: rumor → corroborado → reconocimiento previo (se piden datos a cámaras públicas, sensores y vecinos) → oficial.</p>
 </section>
 </main>
 <script type="module">
-import { HAZARD_KINDS, levelFromTaps, riseRate, clusterReports, assessIncident, triageQueue, citizenAdvice } from '/senda/core/hazard-reports.mjs';
+import { HAZARD_KINDS, levelFromTaps, riseRate, clusterReports, assessIncident, triageQueue, citizenAdvice, createReporterKeys, encodeReport, decodeReports } from '/senda/core/hazard-reports.mjs';
 const $ = (s) => document.querySelector(s), esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
 const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* sin almacenamiento */ } };
+const db = await new Promise((ok) => { const r = indexedDB.open('senda-avisos', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => ok(r.result); r.onerror = () => ok(null); });
+const idbGet = (k) => new Promise((ok) => { if (!db) return ok(undefined); const r = db.transaction('kv').objectStore('kv').get(k); r.onsuccess = () => ok(r.result); r.onerror = () => ok(undefined); });
+const idbPut = (k, v) => new Promise((ok) => { if (!db) return ok(); const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = ok; t.onerror = ok; });
+let keys = null; try { keys = await idbGet('keys'); if (!keys) { keys = await createReporterKeys(); await idbPut('keys', keys); } } catch { keys = null; /* navegador sin Ed25519: se puede reportar en local, no compartir firmado */ }
 let device = load('senda-avisos-device', null); if (!device) { device = 'yo-' + crypto.randomUUID().slice(0, 8); store('senda-avisos-device', device); }
 let reports = load('senda-avisos-reports', []), series = load('senda-avisos-series', []), kind = null, pos = null;
 
 $('#kinds').innerHTML = Object.entries(HAZARD_KINDS).map(([k, v]) => `<button data-k="${k}">${v.life ? '🚨 ' : ''}${esc(v.label)}</button>`).join('');
 for (const b of $('#kinds').children) b.onclick = () => { kind = b.dataset.k; for (const x of $('#kinds').children) x.classList.toggle('on', x === b); const a = citizenAdvice(kind, null); $('#advice').innerHTML = a.call112 ? `<div class="call">${esc(a.text)} <a href="tel:112" style="color:#fff">Llamar al 112</a></div>` : ''; $('#send').disabled = !pos; };
 $('#geo').onclick = () => navigator.geolocation?.getCurrentPosition((p) => { pos = { lat: p.coords.latitude, lon: p.coords.longitude, accM: p.coords.accuracy }; $('#pos').textContent = `${pos.lat.toFixed(5)}, ${pos.lon.toFixed(5)} (±${Math.round(pos.accM)} m)`; $('#send').disabled = !kind; }, (e) => { $('#pos').textContent = 'sin permiso de ubicación: ' + e.message; }, { enableHighAccuracy: true, timeout: 15000 });
-$('#send').onclick = () => {
+$('#send').onclick = async () => {
   const r = { kind, lat: pos.lat, lon: pos.lon, at: Date.now(), deviceId: device, people: { trapped: +$('#trapped').value || 0, injured: +$('#injured').value || 0 } };
   const rise = riseRate(series); if (rise && HAZARD_KINDS[kind].family === 'WATER') r.measurement = { rise, levelM: series.at(-1)?.levelM };
-  reports.push(r); store('senda-avisos-reports', reports); $('#sent').textContent = 'Reporte guardado en este móvil. (Su envío por la red SENDA a otros móviles y al organismo es el siguiente paso de desarrollo.)'; render();
+  reports.push(r); store('senda-avisos-reports', reports); render();
+  if (!keys) { $('#sent').textContent = 'Reporte guardado en este móvil. Este navegador no permite firmarlo para compartirlo.'; return; }
+  const line = await encodeReport(r, keys);
+  $('#sent').innerHTML = `Reporte guardado y firmado. Compártelo por cualquier vía (grupo del barrio, SMS, mensajero satelital); quien lo reciba lo pega en «Reportes recibidos»:<br><code style="word-break:break-all;font-size:12px">${esc(line)}</code><br><button id="cp">Copiar</button>${navigator.share ? ' <button id="sh">Compartir…</button>' : ''}`;
+  $('#cp').onclick = () => navigator.clipboard?.writeText(line); if ($('#sh')) $('#sh').onclick = () => navigator.share({ text: line }).catch(() => {});
 };
 
 /* medida por toques */
@@ -115,6 +126,13 @@ $('#demo').onclick = () => {
   for (let i = 0; i < 12; i++) reports.push({ kind: i % 2 ? 'RIVER_RISING' : 'STREET_FLOODED', ...d(80 + i * 15, i), at: now - (12 - i) * 120_000, deviceId: 'sim-' + (i % 9), simulated: true, ...(i === 5 ? { measurement: { rise: { cmPerMin: 1.4, stdErr: 0.2 } } } : {}) });
   reports.push({ kind: 'PERSON_TRAPPED', ...d(1500, 2), at: now - 300_000, deviceId: 'sim-t', simulated: true, people: { trapped: 2, injured: 0 } });
   store('senda-avisos-reports', reports); render();
+};
+$('#import').onclick = async () => {
+  const { reports: got, rejected } = await decodeReports($('#paste').value);
+  const key = (r) => `${r.deviceId}|${r.kind}|${r.at}|${r.lat}|${r.lon}`, have = new Set(reports.map(key)); let added = 0;
+  for (const r of got) if (!have.has(key(r))) { reports.push(r); have.add(key(r)); added++; }
+  store('senda-avisos-reports', reports); render();
+  $('#imp').textContent = `${added} nuevo(s) · ${got.length - added} repetido(s)${rejected.length ? ` · ${rejected.length} rechazado(s) (firma o formato no válidos)` : ''}`;
 };
 $('#clear').onclick = () => { reports = []; series = []; store('senda-avisos-reports', reports); store('senda-avisos-series', series); render(); $('#series').textContent = ''; };
 draw(); render();
