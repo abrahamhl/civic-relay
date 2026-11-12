@@ -98,6 +98,12 @@ input[type=range]{width:100%;accent-color:var(--i)}
 .bigbtn{border-radius:16px;padding:14px;font:700 15px var(--font);text-align:center;border:1px solid}
 .bigbtn.g{border-color:rgba(62,224,161,.5);background:rgba(62,224,161,.12)}.bigbtn.y{border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.12)}.bigbtn.r{border-color:rgba(255,91,110,.55);background:rgba(255,91,110,.12)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media (max-width:1300px){.grid2{grid-template-columns:1fr}}
+.ops-row{display:grid;grid-template-columns:1.2fr repeat(4,minmax(54px,.5fr));gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}.ops-row.h{color:var(--m);font:700 11px var(--font);letter-spacing:.1em;text-transform:uppercase}
+.ops-row b{font:700 16px var(--mono);text-align:center}.ops-row span.c{text-align:center}
+.reasons{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.reasons span{font:600 11px var(--mono);padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.reasons span.ok{color:var(--e);border-color:rgba(62,224,161,.4)}.reasons span.no{color:var(--a);border-color:rgba(251,191,36,.35)}.reasons span.bad{color:var(--r);border-color:rgba(255,91,110,.45)}
+.chain{font:12px var(--mono);color:var(--m);word-break:break-all;margin-top:8px}.chain b{color:var(--e)}
+.rowb{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 footer{padding:0 22px 30px;max-width:1600px;margin:0 auto;color:var(--d);font-size:12px}
 </style>
 </head>
@@ -145,6 +151,12 @@ footer{padding:0 22px 30px;max-width:1600px;margin:0 auto;color:var(--d);font-si
         <p class="muted" id="pdel-note" style="margin:0">Plan con fallos correlacionados (<span class="mono">delivery-assurance.mjs</span>), recalculado cuando cae una antena o cambia la lluvia.</p>
       </section>
     </div>
+    <section class="card" id="ops">
+      <h2>Operación · orden firmada a la población <span class="tag live">CRIPTOGRAFÍA REAL · POBLACIÓN SINTÉTICA</span></h2>
+      <p class="muted" style="margin:0">El organismo (ancla de confianza) acredita al coordinador; el coordinador firma una orden para la zona en riesgo; cada teléfono la verifica (firma, credencial, rol, consentimiento, zona, repetición, caducidad) y responde por los canales que siguen vivos. Sale un parte CAP 1.2 para el 112 y una auditoría encadenada. <span class="mono">incident-ops.mjs</span></p>
+      <div class="rowb"><button class="btn p" id="ops-go">Emitir orden firmada a la zona en riesgo</button><button class="btn" id="ops-forge">Probar una orden falsificada</button></div>
+      <div id="ops-out"></div>
+    </section>
   </div>
 
   <div class="col">
@@ -171,6 +183,9 @@ import { encodeShards, decodeShards, createReassembler } from '/senda/core/erasu
 import { generateIdentity, sealMessage, openMessage, packEnvelope, relayView } from '/senda/core/envelope.mjs';
 import { modulate, demodulate } from '/senda/core/acoustic-modem.mjs';
 import { computeRainAttenuation } from '/senda/core/telecom-mathematical-physics.mjs';
+import { setupAgency, simulatePopulation, issueZoneOrder, deliverOrder, collectResponses, situationReport, STATUS_MODEL } from '/senda/core/incident-ops.mjs';
+import { createOrganization, issueCredential } from '/senda/core/roles.mjs';
+import { signCommand, keyThumb } from '/senda/core/remote-command.mjs';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -180,7 +195,7 @@ const hex = (b, n = 24) => [...b.slice(0, n)].map((x) => x.toString(16).padStart
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ================= 1 · ARRANQUE: autocomprobación real ================= */
-const ID = {};
+const ID = {}, OPS = { ctx: null, phones: [], n: 0 };
 const STEPS = [
   ['Identidad cifrada', 'ECDH + ECDSA P-256 en WebCrypto', async () => { ID.centro = await generateIdentity(); ID.vecino = await generateIdentity(); ID.relay = await generateIdentity(); return 'claves de centro, vecino y relé'; }],
   ['Sellado de extremo a extremo', 'sobre ECDH + AES-GCM firmado', async () => { const now = Date.now(), e = await sealMessage({ sender: ID.centro, recipient: ID.vecino.publicIdentity, body: 'prueba', priority: 0, ttlS: 60, now, kind: 'OFFICIAL_ALERT' }); const o = await openMessage({ recipient: ID.vecino, envelope: e, now }); let leak = true; try { await openMessage({ recipient: ID.relay, envelope: e, now }); } catch { leak = false; } if (!JSON.stringify(o).includes('prueba') || leak) throw new Error('fallo de cifrado'); return `${packEnvelope(e).length} B · el relé no puede abrirlo`; }],
@@ -188,6 +203,7 @@ const STEPS = [
   ['Módem acústico', 'MFSK-16 · modular y demodular', async () => { const p = Uint8Array.from({ length: 32 }, (_, i) => (i * 29) & 255), b = demodulate(modulate(p)), got = b?.payload ?? b; if (!got || got.length !== 32 || !got.every((v, i) => v === p[i])) throw new Error('el módem no recupera la trama'); return '32 B ida y vuelta por audio'; }],
   ['Física de enlaces', 'ITU-R P.838-3 a 50 mm/h', async () => { const a = computeRainAttenuation(0.868, 50).specificAttenuationDbPerKm, b = computeRainAttenuation(28, 50).specificAttenuationDbPerKm; return `868 MHz ${a.toFixed(4)} · 28 GHz ${b.toFixed(1)} dB/km`; }],
   ['Modelo de incendio', 'llegada del fuego por celda', async () => { compute(); return `${G.w}×${G.h} celdas de ${G.cellM} m`; }],
+  ['Organismo y coordinador', 'ancla de confianza + credencial ligada a la clave', async () => { OPS.ctx = await setupAgency({ now: Date.now() }); OPS.phones = simulatePopulation(L.towns, { perTown: 60, seed: 2026 }); return `${OPS.ctx.org.name} · ${OPS.phones.length} teléfonos sintéticos en ${L.towns.length} pueblos`; }],
 ];
 async function boot() {
   $('#steps').innerHTML = STEPS.map(([a, b], i) => `<div class="step" id="s${i}"><span class="dot"></span><div><b>${a}</b><small>${b}</small></div><em></em></div>`).join('');
@@ -336,6 +352,50 @@ function renderPhone() {
   $('#scr').innerHTML = head + alert + '<div class="bigbtn g">✓ Estoy bien</div><div class="bigbtn y">Necesito ayuda</div><div class="bigbtn r">Estoy atrapado</div>';
 }
 
+/* ================= 6b · OPERACIÓN: orden firmada → teléfonos → cuadro → CAP + auditoría ================= */
+// Probabilidad de que la orden llegue a un teléfono por los canales vivos de SU pueblo (independencia entre canales: cota optimista declarada)
+function pDeliverFor(ph) {
+  const cs = channelState(), myTowersUp = L.towers.filter((t) => t.serves.includes(ph.townId) && S.now < S.lossAt[t.id]).length;
+  let miss = 1;
+  for (const c of cs) { if (!c.alive) continue; const p = BEARERS[c.id].family === 'TERRESTRIAL' ? (myTowersUp ? c.p : 0) : c.p; miss *= 1 - p; }
+  return 1 - miss;
+}
+const LABEL = { ACCEPTED: 'acepta y actúa', NOT_DELIVERED: 'no le llega', NO_OWNER_CONSENT: 'sin consentimiento del dueño', NO_DECLARED_ZONE: 'fuera de la zona', REPLAY: 'repetición', EXPIRED: 'caducada', BAD_SIGNATURE: 'firma alterada', CREDENTIAL_UNKNOWN_ORG: 'organismo desconocido', KEY_NOT_BOUND_TO_CREDENTIAL: 'clave no ligada', NOT_A_COORDINATOR: 'no es coordinador' };
+const reasonsHtml = (r) => `<div class="reasons">${Object.entries(r).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<span class="${k === 'ACCEPTED' ? 'ok' : /CREDENTIAL|KEY|SIGNATURE|REPLAY|EXPIRED|COORDINATOR/.test(k) ? 'bad' : 'no'}">${v} · ${LABEL[k] ?? k}</span>`).join('')}</div>`;
+const dl = (name, text, type) => { const u = URL.createObjectURL(new Blob([text], { type })); const a = document.createElement('a'); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 2000); };
+async function runOrder() {
+  const btn = $('#ops-go'); btn.disabled = true; const out = $('#ops-out'), t0 = performance.now();
+  try {
+    const risk = S.assets.filter((a) => Number.isFinite(a.arrivalMin) && S.now < a.arrivalMin), zone = (risk.length ? risk : S.assets.slice(0, 1)).map((a) => a.id);
+    const names = zone.map((id) => L.towns.find((t) => t.id === id).name), now = Date.now(); OPS.n++;
+    out.innerHTML = '<p class="muted">Firmando y repartiendo…</p>';
+    const cmd = await issueZoneOrder(OPS.ctx, { zone, message: `Evacuación preventiva de ${names.join(' y ')}: salid hacia el norte. Responded en SENDA.`, now, actions: ['SIREN', 'REPORT_STATUS', 'BLE_BEACON'] });
+    const d = await deliverOrder(OPS.ctx, cmd, OPS.phones, { now, pDeliver: pDeliverFor, seed: 100 + OPS.n });
+    const c = await collectResponses(OPS.ctx, cmd, OPS.phones, d, { now, pReturn: pDeliverFor, seed: 200 + OPS.n });
+    const rep = await situationReport(OPS.ctx, cmd, c.board, { now: now + 600_000, areaDesc: names.join(', ') });
+    const per = {}; for (const r of c.responses) { const p = (per[r.townId] ??= { SAFE: 0, NEED_HELP: 0, TRAPPED: 0, NO_RESPONSE: 0, AWAY: 0 }); p[r.status]++; }
+    const rows = zone.map((id) => { const p = per[id] ?? {}, nm = L.towns.find((t) => t.id === id).name; return `<div class="ops-row"><span>${esc(nm)}</span><b style="color:var(--e)">${p.SAFE ?? 0}</b><b style="color:var(--a)">${p.NEED_HELP ?? 0}</b><b style="color:var(--r)">${p.TRAPPED ?? 0}</b><b style="color:var(--m)">${p.NO_RESPONSE ?? 0}</b></div>`; }).join('');
+    out.innerHTML = `<p class="muted" style="margin:14px 0 4px">Orden <span class="mono">${esc(cmd.id.slice(0, 10))}…</span> firmada por ${esc(OPS.ctx.credential.role)} (${esc(OPS.ctx.org.name)}) para ${esc(names.join(', '))} · ${OPS.phones.length} teléfonos evaluados en ${Math.round(performance.now() - t0)} ms</p>${reasonsHtml(d.reasons)}
+      <div class="ops-row h"><span>Pueblo</span><span class="c">a salvo</span><span class="c">ayuda</span><span class="c">atrapados</span><span class="c">sin resp.</span></div>${rows}
+      <p class="muted" style="margin:8px 0 0">${c.responses.length} respuestas recibidas · ${c.lostOnReturn} perdidas a la vuelta. «Sin respuesta» = teléfono activo cuyo dueño no contesta; nunca se cuenta como víctima. Estados según hipótesis declaradas (${Object.entries(STATUS_MODEL).map(([k, v]) => `${k} ${Math.round(v * 100)} %`).join(', ')}).</p>
+      <div class="chain">Auditoría: ${rep.audit.length} entradas · cadena <b>${rep.auditCheck.ok ? 'verificada' : 'ROTA en ' + rep.auditCheck.brokenAt}</b> · cabeza ${rep.auditCheck.head?.slice(0, 24)}… · CAP SHA-256 ${rep.capSha256.slice(0, 24)}…</div>
+      <div class="rowb"><button class="btn" id="dl-cap">Descargar parte CAP 1.2</button><button class="btn" id="dl-audit">Descargar auditoría</button></div>`;
+    $('#dl-cap').onclick = () => dl(`senda-parte-${cmd.id.slice(0, 8)}.xml`, rep.cap, 'application/xml');
+    $('#dl-audit').onclick = () => dl(`senda-auditoria-${cmd.id.slice(0, 8)}.json`, JSON.stringify(rep.audit, null, 1), 'application/json');
+    window.SENDA_CENTRO.lastOps = { reasons: d.reasons, totals: c.board.totals, auditOk: rep.auditCheck.ok, cap: rep.cap };
+  } catch (e) { out.innerHTML = `<p style="color:var(--r)">${esc(e.message)}</p>`; }
+  btn.disabled = false;
+}
+async function runForged() {
+  const out = $('#ops-out'), now = Date.now();
+  const rogue = await createOrganization({ id: 'IMPOSTOR', name: 'Organismo falso', kind: 'CIVIL_PROTECTION' }), keys = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
+  const cred = await issueCredential(rogue, { subject: await keyThumb(await crypto.subtle.exportKey('jwk', keys.publicKey)), role: 'COORDINADOR_INCIDENTE', unit: 'x', validFrom: now - 1, validUntil: now + 3600_000 });
+  const zone = L.towns.map((t) => t.id), forged = await signCommand({ issuerKeys: keys, credential: cred, target: { zone }, actions: ['SIREN'], message: 'Evacuad ya (falso)', now, kind: 'ALERT' });
+  const d = await deliverOrder(OPS.ctx, forged, OPS.phones, { now, pDeliver: () => 1, seed: 9 });
+  out.innerHTML = `<p class="muted" style="margin:14px 0 4px">Orden firmada por un «organismo» que los teléfonos no tienen como ancla de confianza, enviada a todos:</p>${reasonsHtml(d.reasons)}<p class="muted" style="margin:0">${d.reasons.ACCEPTED ? '⚠ algún teléfono la aceptó' : 'Ningún teléfono la ejecuta: sin ancla de confianza no hay orden.'}</p>`;
+  window.SENDA_CENTRO.lastForged = d.reasons;
+}
+
 /* ================= 7 · BUCLE ================= */
 let last = 0;
 function frame(ts) {
@@ -351,6 +411,7 @@ $('#play').onclick = () => { S.playing = !S.playing; $('#play').textContent = S.
 $('#reset').onclick = () => { S.now = 0; phoneState = null; $('#pipe').innerHTML = ''; panels(); };
 $('#speed').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.speed = +b.dataset.v; for (const x of $('#speed').children) x.classList.toggle('on', x === b); };
 $('#send').onclick = sendAlert;
+$('#ops-go').onclick = runOrder; $('#ops-forge').onclick = runForged;
 window.SENDA_CENTRO = S;
 boot();
 </script>
