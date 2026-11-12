@@ -147,8 +147,8 @@ export function triageQueue(assessed, clusters) {
 /** Lo que ve quien reporta. Si hay riesgo para la vida, SIEMPRE se le dice que llame al 112. */
 export function citizenAdvice(kind, assessed) {
   const k = HAZARD_KINDS[kind];
-  if (k.life) return { call112: true, text: 'Hay riesgo para la vida: llama al 112 ahora. Tu reporte con posición y medida ya va adjunto para el operador.' };
+  if (k.life) return { call112: true, text: 'Hay riesgo para la vida: llama al 112 ahora. Dile tu posición; tu reporte queda guardado en SENDA (la conexión directa con la sala 112 necesita un convenio con el organismo).' };
   if (assessed?.state === 'OFFICIAL') return { call112: false, text: `El organismo ya lo gestiona (${assessed.official.source}). Llama al 112 si cambia o hay personas en peligro.` };
-  if (assessed && assessed.reporters >= 3) return { call112: false, text: `Ya lo han reportado ${assessed.reporters} personas y está en la cola del centro de emergencias. Llama al 112 si ves personas en peligro.` };
+  if (assessed && assessed.reporters >= 3) return { call112: false, text: `Ya lo han reportado ${assessed.reporters} personas en SENDA y está agrupado como un solo incidente. Llama al 112 si ves personas en peligro.` };
   return { call112: false, text: 'Reporte enviado. Si ves personas en peligro, llama al 112.' };
 }
