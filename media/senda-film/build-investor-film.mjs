@@ -278,7 +278,10 @@ const scenes = [
 ];
 
 // ── Voz: números y siglas tal y como se pronuncian
-const N2W = [[/\b433\b/g, 'four hundred and thirty-three'], [/\b49\b/g, 'forty-nine'], [/\b43\b/g, 'forty-three'], [/\b197\b/g, 'one hundred and ninety-seven'], [/\b200\b/g, 'two hundred']];
+const W1 = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+const W10 = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+const numWords = (n) => (n < 20 ? W1[n] : n < 100 ? W10[Math.floor(n / 10)] + (n % 10 ? `-${W1[n % 10]}` : '') : n < 1000 ? `${W1[Math.floor(n / 100)]} hundred${n % 100 ? ` and ${numWords(n % 100)}` : ''}` : die(`número sin locución: ${n}`));
+const N2W = [[/\b(\d{1,3})\b(?![.,]\d)/g, (_, d) => numWords(+d)]];
 const SAY = [...N2W, [/\bSENDA\b/g, 'Senda'], [/\bLoRa\b/g, 'LOR-ah'], [/\bWi-Fi\b/g, 'why-fye'], [/\bAI\b/g, 'A I'], [/\bSOS\b/g, 'S O S'], [/\bGPS\b/g, 'G P S'], [/\bESP32\b/g, 'E S P thirty-two'], [/\bDGT\b/g, 'D G T'], [/\b112\b/g, 'one one two']];
 const fits = (s) => s.length <= 42 || s.split(' ').some((_, i, w) => i && w.slice(0, i).join(' ').length <= 42 && w.slice(i).join(' ').length <= 42);
 const bad = scenes.flatMap((sc) => sc.lines.flatMap((l) => ['en', 'es'].filter((lang) => !fits(l[lang])).map((lang) => `${sc.id} ${lang} (${l[lang].length}): «${l[lang]}»`)));

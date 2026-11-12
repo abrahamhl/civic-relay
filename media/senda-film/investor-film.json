@@ -1,10 +1,10 @@
 {
  "note": "SENDA · película de presentación a inversores v2 (motor 3D cinema.html). Generado por build-investor-film.mjs; no editar a mano.",
  "counts": {
-  "core": 433,
+  "core": 451,
   "e2e": 49,
   "agents": 43,
-  "estadoSha": "c1112d2"
+  "estadoSha": "99666d4"
  },
  "physics": {
   "rain868DbKm": 0.0006,
@@ -1037,12 +1037,12 @@
    },
    "visual": {
     "kind": "proof",
-    "core": 433,
+    "core": 451,
     "e2e": 49,
     "agents": 43
    },
    "en": [
-    "Every change is checked by machine: 433 core tests,",
+    "Every change is checked by machine: 451 core tests,",
     "and 49 end-to-end checks, almost all with the network cut.",
     "Built with an engineering corps of 43 specialised AI agents,",
     "independent red teams, and one rule: never invent.",
@@ -1051,7 +1051,7 @@
     "Next: a pilot with civil protection, a gateway to 112, and a mobile operator."
    ],
    "es": [
-    "Cada cambio se comprueba por máquina: 433 pruebas del núcleo",
+    "Cada cambio se comprueba por máquina: 451 pruebas del núcleo",
     "y 49 comprobaciones de extremo a extremo, casi todas sin red.",
     "Construido con un cuerpo de ingeniería de 43 agentes de IA especializados",
     "equipos rojos independientes y una regla: no inventar.",
@@ -1060,7 +1060,7 @@
     "Siguiente: un piloto con protección civil, una pasarela al 112 y un operador móvil."
    ],
    "en_say": [
-    "Every change is checked by machine: four hundred and thirty-three core tests,",
+    "Every change is checked by machine: four hundred and fifty-one core tests,",
     "and forty-nine end-to-end checks, almost all with the network cut.",
     "Built with an engineering corps of forty-three specialised A I agents,",
     "independent red teams, and one rule: never invent.",
