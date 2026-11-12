@@ -1,6 +1,6 @@
 /* SENDA Campo · service worker (raíz, alcance /senda): la app entera queda instalada en el teléfono y abre sin red.
    Está en la raíz porque el sitio usa URL limpias (/senda sin barra final). */
-const VERSION = 'senda-campo-v24';
+const VERSION = 'senda-campo-v25';
 const ASSETS = [
   '/senda', '/senda/app.css', '/senda/app.mjs', '/senda/db.mjs', '/senda/audio.mjs', '/senda/icon.svg', '/senda/manifest.webmanifest',
   '/senda/core/b64.mjs', '/senda/core/envelope.mjs', '/senda/core/bundle.mjs', '/senda/core/acoustic-modem.mjs', '/senda/core/zones.mjs', '/senda/core/feeds.mjs',
@@ -12,7 +12,7 @@ const ASSETS = [
   '/senda/llamada', '/senda/core/sdp-compact.mjs', '/senda/dron', '/senda/core/rf-census.mjs', '/senda/arquitectura', '/senda/estado.json', '/senda/core/voice-mesh.mjs',
   '/senda/kit.mjs', '/senda/kit.css', '/senda/sentidos', '/senda/agua', '/senda/triaje', '/senda/monte', '/senda/barrido', '/senda/core/platforms.mjs', '/senda/core/flood-watch.mjs', '/senda/core/triage.mjs', '/senda/core/geo-offline.mjs', '/senda/core/senses.mjs', '/senda/core/house-sweep.mjs', '/senda/core/through-wall.mjs', '/senda/reserva', '/senda/core/net-reserve.mjs', '/senda/core/swarm-cache.mjs', '/senda/core/coverage-memory.mjs',
   '/senda/carretera', '/senda/core/road-guard.mjs',
-  '/senda/centro', '/senda/core/incident-ops.mjs', '/senda/core/reliability-store.mjs', '/senda/core/corridor-connectors.mjs', '/senda/core/delivery-assurance.mjs', '/senda/core/telecom-mathematical-physics.mjs',
+  '/senda/centro', '/senda/mensaje', '/senda/core/courier.mjs', '/senda/core/hazard-reports.mjs', '/senda/core/vigia.mjs', '/senda/core/incident-ops.mjs', '/senda/core/reliability-store.mjs', '/senda/core/corridor-connectors.mjs', '/senda/core/delivery-assurance.mjs', '/senda/core/telecom-mathematical-physics.mjs',
   '/senda/camaras', '/senda/paises', '/senda/core/drive-cases.mjs', '/senda/core/datex2.mjs', '/senda/core/cameras.mjs',
   '/senda/dgt', '/senda/core/dgt-infra.mjs',
   '/senda/trafico', '/senda/vehiculos', '/senda/core/vehicle-link.mjs', '/media/vision/dashcam.json', '/media/vision/fixed.json',

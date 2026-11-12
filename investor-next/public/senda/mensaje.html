@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Mensaje sin red</title>
+<meta name="description" content="Mensajes cifrados a un contacto emparejado que viajan como texto corto por cualquier vía: mensajero satelital, SMS, LoRa o en mano.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 Inter,system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 60px}h1{font-size:30px;margin:4px 0}h2{font-size:18px;margin:0 0 8px}.m{color:var(--m)}a{color:var(--i)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:16px;min-width:0}
+button{font:inherit;min-height:48px;padding:10px 16px;border-radius:12px;border:1px solid var(--l);background:#0f1d27;color:var(--t);cursor:pointer;font-weight:700}
+button.p{background:var(--c);border-color:var(--c);color:#140804}button.g{background:var(--e);border-color:var(--e);color:#03140d}
+textarea,input[type=text],select{width:100%;font:14px ui-monospace,monospace;background:#071018;color:var(--t);border:1px solid var(--l);border-radius:10px;padding:10px}
+.code{font:600 13px ui-monospace,monospace;word-break:break-all;background:#071018;border:1px dashed var(--i);border-radius:10px;padding:10px;color:var(--i)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.note{border-left:3px solid var(--a);padding:6px 10px;background:#0f1a22;border-radius:6px;font-size:13px;margin-top:10px}
+.ok{color:var(--e)}.bad{color:var(--r)}.big{font:800 22px ui-monospace,monospace;letter-spacing:.08em}
+.frame{display:flex;gap:8px;align-items:center;margin-top:8px}.frame code{flex:1;min-width:0;word-break:break-all;font-size:12px;background:#071018;border:1px solid var(--l);border-radius:8px;padding:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px;border-bottom:1px solid var(--l);text-align:left;vertical-align:top}th{color:var(--m);font-weight:600}
+.msg{background:#071018;border:1px solid var(--e);border-radius:10px;padding:12px;margin-top:10px;overflow-wrap:anywhere}
+</style>
+</head>
+<body><main>
+<p><a href="/senda">← SENDA</a></p>
+<h1>Mensaje sin red</h1>
+<p class="m">Para alguien que está lejos (por ejemplo, tu hermano en otro país). El mensaje se cifra en tu móvil y se convierte en una o varias líneas de texto cortas. Esas líneas pueden viajar por <b>cualquier</b> vía que tengáis: un mensajero satelital, un SMS cuando haya algo de cobertura, un nodo LoRa o un papel. Quien lleva el texto no puede leerlo ni cambiarlo sin que se note.</p>
+
+<div class="grid">
+  <section class="card">
+    <h2>1 · Emparejaos una vez (antes de la emergencia)</h2>
+    <p class="m">Pásale este código a la persona por cualquier medio y pega aquí el suyo. Después, comparad por teléfono o en persona el <b>número de seguridad</b>: si coincide en los dos móviles, nadie se ha colado en medio.</p>
+    <div class="code" id="mycode">generando…</div>
+    <div class="row"><button id="copy-code">Copiar mi código</button></div>
+    <div class="row"><input type="text" id="peer-name" placeholder="Nombre (p. ej. Hermano)"><textarea id="peer-code" rows="3" placeholder="Pega aquí su código SP1.…"></textarea><button class="g" id="add">Emparejar</button></div>
+    <div id="pair-out"></div>
+  </section>
+  <section class="card">
+    <h2>Contactos emparejados</h2>
+    <table><thead><tr><th>Nombre</th><th>Número de seguridad</th><th>Enviados</th></tr></thead><tbody id="contacts"><tr><td colspan="3" class="m">Ninguno todavía.</td></tr></tbody></table>
+  </section>
+</div>
+
+<div class="grid">
+  <section class="card">
+    <h2>2 · Escribir</h2>
+    <select id="to"></select>
+    <textarea id="text" rows="3" maxlength="400" style="margin-top:8px" placeholder="Estoy bien. Sin red en casa. Llamo cuando vuelva."></textarea>
+    <div class="row"><button class="p" id="seal">Cifrar y preparar</button><span class="m" id="seal-info"></span></div>
+    <div id="frames"></div>
+  </section>
+  <section class="card">
+    <h2>3 · Recibir</h2>
+    <p class="m">Pega todo lo que te haya llegado (puede venir mezclado con otro texto o por varias vías; el orden da igual).</p>
+    <textarea id="inbox" rows="5" placeholder="SND2 …"></textarea>
+    <div class="row"><button class="g" id="open">Abrir</button></div>
+    <div id="opened"></div>
+  </section>
+</div>
+
+<section class="card" style="margin-top:14px">
+  <h2>Qué vía usar cuando no hay red (datos con fuente)</h2>
+  <table>
+    <thead><tr><th>Vía</th><th>Funciona con apagón en los dos lados</th><th>Qué hace falta</th></tr></thead>
+    <tbody>
+      <tr><td>Mensajero satelital (Garmin inReach, ZOLEO) en cada lado</td><td class="ok">Sí, de aparato a aparato</td><td>Un aparato y una suscripción por persona; cielo despejado. Pega las líneas SND2 como texto.</td></tr>
+      <tr><td>Módem Iridium SBD (RockBLOCK) en cada lado</td><td class="ok">Sí, entrega directa entre módems</td><td>Módulo, antena y crédito; integración por Bluetooth o cable.</td></tr>
+      <tr><td>LoRaWAN comunitario (The Things Network) o Meshtastic con pasarela</td><td class="bad">Solo si las pasarelas siguen con luz e Internet</td><td>Un nodo LoRa por persona. En un apagón largo no hay que contar con ellas.</td></tr>
+      <tr><td>SMS / datos cuando vuelva algo de cobertura</td><td class="bad">No</td><td>Nada: SENDA deja el mensaje en cola.</td></tr>
+      <tr><td>Mensajes por satélite del propio móvil</td><td class="bad">No disponible hoy en España ni en Países Bajos</td><td>El SOS por satélite sí existe en ambos, pero solo para emergencias.</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Fuente: <code>docs/research/MENSAJE_SIN_RED_ES_NL_2026-11.md</code> (búsqueda web del 12-11-2026; algunas páginas oficiales no se pudieron abrir y están marcadas así). SENDA no usa redes ajenas que no ofrecen ese servicio (p. ej. las redes de localización de Apple o Google): sería saltarse sus condiciones de uso.</p>
+</section>
+
+<section class="card" style="margin-top:14px">
+  <h2>Cómo funciona</h2>
+  <p>Al emparejaros, cada móvil combina su clave privada con la pública del otro (ECDH P-256 + HKDF): los dos obtienen la misma clave AES-256 sin que viaje nunca. Cada mensaje añade solo 25 bytes (versión, pareja, número de secuencia y sello de autenticidad GCM): un mensaje corto cabe en <b>una sola línea de texto de 160 caracteres</b>, lo que admite un SMS o un mensajero satelital. Si el mensaje es largo, se parte en trozos Reed-Solomon y basta con que lleguen <i>k</i> cualesquiera. Un mensaje repetido, alterado o de otra pareja se rechaza.</p>
+  <p class="m">Código: <code>packages/senda/src/courier.mjs</code> · pruebas: <code>packages/senda/tests/courier.test.mjs</code>.</p>
+</section>
+</main>
+<script type="module">
+import { createPairingKeys, derivePairing, sealCompact, openCompact } from '/senda/core/courier.mjs';
+import { encodeShards, packShard, createReassembler, SHARD_HEADER } from '/senda/core/erasure.mjs';
+const $ = (s) => document.querySelector(s), esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const b64u = (u8) => btoa(String.fromCharCode(...u8)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64u = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4)), (c) => c.charCodeAt(0));
+const PREFIX = 'SND2 ', MAX_CHARS = 160, SHARD_DATA = Math.floor(((MAX_CHARS - PREFIX.length) * 3) / 4) - SHARD_HEADER;
+
+/* almacenamiento local (IndexedDB): la clave privada nunca sale del móvil */
+const db = await new Promise((ok, ko) => { const r = indexedDB.open('senda-mensaje', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error); });
+const get = (k) => new Promise((ok) => { const r = db.transaction('kv').objectStore('kv').get(k); r.onsuccess = () => ok(r.result); r.onerror = () => ok(undefined); });
+const put = (k, v) => new Promise((ok) => { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = ok; });
+
+let mine = await get('mine');
+if (!mine) { mine = await createPairingKeys(); await put('mine', mine); }
+let contacts = (await get('contacts')) ?? [];
+const codeOf = (jwk) => `SP1.${jwk.x}.${jwk.y}`;
+const jwkOf = (code) => { const m = /^SP1\.([A-Za-z0-9_-]{43})\.([A-Za-z0-9_-]{43})$/.exec(code.trim()); if (!m) throw new Error('código no válido'); return { kty: 'EC', crv: 'P-256', x: m[1], y: m[2], ext: true }; };
+async function safetyNumber(a, b) {
+  const h = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode([codeOf(a), codeOf(b)].sort().join('|'))));
+  return [0, 1, 2].map((i) => String(((h[i * 3] << 16) | (h[i * 3 + 1] << 8) | h[i * 3 + 2]) % 10000).padStart(4, '0')).join(' ');
+}
+async function pairFor(c) { const p = await derivePairing(mine, c.peer); p.seq = c.seq; p.seen = new Set(c.seen); return p; }
+async function save() { await put('contacts', contacts); render(); }
+function render() {
+  $('#mycode').textContent = codeOf(mine.publicJwk);
+  $('#contacts').innerHTML = contacts.length ? contacts.map((c) => `<tr><td>${esc(c.name)}</td><td class="big">${c.safety}</td><td>${c.seq}</td></tr>`).join('') : '<tr><td colspan="3" class="m">Ninguno todavía.</td></tr>';
+  $('#to').innerHTML = contacts.map((c, i) => `<option value="${i}">${esc(c.name)}</option>`).join('') || '<option>Primero empareja un contacto</option>';
+}
+render();
+$('#copy-code').onclick = () => navigator.clipboard?.writeText(codeOf(mine.publicJwk));
+$('#add').onclick = async () => {
+  try {
+    const peer = jwkOf($('#peer-code').value), name = $('#peer-name').value.trim() || 'Contacto';
+    if (peer.x === mine.publicJwk.x) throw new Error('ese es tu propio código');
+    await derivePairing(mine, peer); // valida la clave
+    const safety = await safetyNumber(mine.publicJwk, peer);
+    contacts = contacts.filter((c) => c.peer.x !== peer.x).concat([{ name, peer, seq: 0, seen: [], safety }]);
+    await save();
+    $('#pair-out').innerHTML = `<p class="ok">Emparejado con ${esc(name)}. Número de seguridad: <span class="big">${safety}</span> — comprobad que el otro móvil muestra el mismo.</p>`;
+  } catch (e) { $('#pair-out').innerHTML = `<p class="bad">${esc(e.message)}</p>`; }
+};
+$('#seal').onclick = async () => {
+  const c = contacts[+$('#to').value]; if (!c) return;
+  const text = $('#text').value.trim(); if (!text) return;
+  const pair = await pairFor(c), msg = await sealCompact(pair, text); c.seq = pair.seq; await save();
+  const k = Math.ceil(msg.length / SHARD_DATA), n = k === 1 ? 1 : Math.min(255, Math.ceil(k * 1.5));
+  const enc = encodeShards(msg, k, n), id = crypto.getRandomValues(new Uint8Array(8));
+  const lines = enc.shards.map((d, i) => PREFIX + b64u(packShard({ id, k, n, len: msg.length, index: i, data: d })));
+  $('#seal-info').textContent = `${msg.length} B cifrados · ${n} línea${n > 1 ? 's' : ''}${k > 1 ? ` (basta con ${k} cualesquiera)` : ''}`;
+  $('#frames').innerHTML = lines.map((l, i) => `<div class="frame"><code>${esc(l)}</code><button data-i="${i}">Copiar</button></div>`).join('') + `<div class="row">${navigator.share ? '<button id="share">Compartir…</button>' : ''}<span class="m">Pega cada línea en la app del mensajero satelital, en un SMS o donde puedas. Cada línea tiene ${Math.max(...lines.map((l) => l.length))} caracteres como máximo.</span></div>`;
+  for (const b of $('#frames').querySelectorAll('button[data-i]')) b.onclick = () => navigator.clipboard?.writeText(lines[+b.dataset.i]);
+  if ($('#share')) $('#share').onclick = () => navigator.share({ text: lines.join('\n') }).catch(() => {});
+};
+$('#open').onclick = async () => {
+  const tokens = [...$('#inbox').value.matchAll(/SND2 ([A-Za-z0-9_-]+)/g)].map((m) => m[1]);
+  const re = createReassembler(); let out = null;
+  for (const t of tokens) { try { out = re.add(unb64u(t), 'texto') ?? out; } catch { /* línea dañada: se ignora */ } }
+  if (!out) { const p = re.pending()[0]; $('#opened').innerHTML = `<p class="bad">${tokens.length ? `Faltan trozos: tengo ${p?.have ?? 0} de ${p?.need ?? '?'}.` : 'No encuentro ninguna línea SND2.'}</p>`; return; }
+  const reasons = [];
+  for (const c of contacts) {
+    const pair = await pairFor(c), r = await openCompact(pair, out.data); reasons.push(r.reason);
+    if (r.ok) { c.seen = [...pair.seen]; await save(); $('#opened').innerHTML = `<div class="msg"><b>De ${esc(c.name)}</b> <span class="m">· mensaje nº ${r.seq} · autenticidad verificada</span><p style="margin:6px 0 0;font-size:17px">${esc(r.text)}</p></div>`; return; }
+    if (r.reason === 'REPLAY') { $('#opened').innerHTML = `<p class="m">Este mensaje de ${esc(c.name)} ya lo habías abierto.</p>`; return; }
+    if (r.reason === 'BAD_TAG') { $('#opened').innerHTML = `<p class="bad">El mensaje de ${esc(c.name)} llegó alterado: no se muestra.</p>`; return; }
+  }
+  $('#opened').innerHTML = `<p class="bad">No es de ningún contacto emparejado, o llegó dañado (${esc(reasons.join(', ') || 'sin contactos')}).</p>`;
+};
+</script>
+</body>
+</html>
