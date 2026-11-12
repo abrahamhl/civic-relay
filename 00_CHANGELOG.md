@@ -1,5 +1,19 @@
 # Changelog
 
+## SENDA · 12-11-2026 · SENDA Vigía: consenso físico entre sensores baratos
+
+**Entrada (fundador):** producto nuevo y revolucionario con infraestructura mínima y módulos baratos (térmicas, micrófonos, cámaras, dashcams), con un camino claro hacia inversores.
+
+**Procesamiento:**
+- `packages/senda/src/vigia.mjs`: focos térmicos en fotogramas de 32×24 (MLX90640), rumbo por columna, cruce de rumbos, consenso tipo RANSAC entre rumbos y tiempos de llegada acústicos con velocidad del sonido según la temperatura, detección de nodos incoherentes, confianza aprendida por nodo, suceso firmado (ECDSA P-256) sin imagen ni audio, CAP 1.2 y balance energético.
+- `docs/product/SENDA_VIGIA_2026-11-12.md`: producto, nodos, modelo de negocio y camino a inversores.
+
+**Validación:** `tests/vigia.test.mjs`, 12 pruebas. Monte Carlo con semilla fija: 498/500 confirmados, nodo mentiroso detectado 488/500, p95 20,4 m, falso consenso 0,2 %. Suite completa: 478/478.
+
+**Límites:** solo simulación geométrica; hardware sin montar ni medir; precios sin cotizar. Choques de exportación previos en `index.mjs` (ocultos en silencio): `TEXT_PREFIX`, `ACCESS`, `parseFirmsCsv`, `satVapHpa`.
+
+— Firma: Claude Code (sesión cloud), 12-11-2026.
+
 ## SENDA · 12-11-2026 · Desarrollo: app Android real, Centro de Control, operación de incidente y aprendizaje de la red
 
 **Entrada (fundador):**
