@@ -109,10 +109,10 @@ const scenes = [
     L('Reed-Solomon coding adds spare ones: send ten, and any six rebuild it exactly.', 'Reed-Solomon añade repuestos: envías diez y seis cualesquiera lo rehacen.'),
     L('They leave at once by satellite, LoRa radio, drones and neighbours.', 'Salen a la vez por satélite, radio LoRa, drones y vecinos.', 'They leave at once by satellite, LOR-ah radio, drones and neighbours.'),
     L('If a path dies, the others are enough.', 'Si un camino muere, los demás bastan.'),
-    L(`In 200 sends with bearers dropped at random, ${MBN} were rebuilt.`, `En 200 envíos perdiendo portadores al azar, se rehicieron ${MBN}.`, `In two hundred sends with bearers dropped at random, ${MBN === 199 ? 'one hundred and ninety-nine' : MBN === 198 ? 'one hundred and ninety-eight' : MBN === 200 ? 'all of them' : die('MBN sin locución')} were rebuilt.`),
+    L(`In a simulation of 200 sends with bearers dropped at random, ${MBN} were rebuilt.`, `En una simulación de 200 envíos perdiendo portadores al azar, se rehicieron ${MBN}.`, `In a simulation of two hundred sends with bearers dropped at random, ${MBN === 199 ? 'one hundred and ninety-nine' : MBN === 198 ? 'one hundred and ninety-eight' : MBN === 200 ? 'all of them' : die('MBN sin locución')} were rebuilt.`),
     L('Which paths to use is decided by Contact Graph Routing, from space networking:', 'Qué caminos usar lo decide Contact Graph Routing, de las redes espaciales:'),
     L('the earliest arrival over every chain of contacts, several routes in parallel.', 'la llegada más temprana por toda cadena de contactos, varias rutas en paralelo.'),
-  ], { stat: `${MBN} / 200`, statCue: 4, statLabel: T('messages rebuilt · seeded test run', 'mensajes reconstruidos · ejecución con semilla') }),
+  ], { stat: `${MBN} / 200`, statCue: 4, statLabel: T('messages rebuilt · simulation, seeded', 'mensajes reconstruidos · simulación con semilla') }),
   S('v09', 'europe', 'SIMULATED', T('Arnhem → San Martín de Valdeiglesias', 'Arnhem → San Martín de Valdeiglesias'), [
     L('A real question: I live in the Netherlands.', 'Una pregunta real: vivo en Países Bajos.'),
     L('My brother is in Spain, and his mast is down.', 'Mi hermano está en España y su antena ha caído.'),
@@ -240,7 +240,7 @@ const scenes = [
   S('v24', 'network', 'CALCULATED', T('More people, stronger network', 'Más personas, red más fuerte'), [
     L('Like other decentralised networks, SENDA does not depend on a central server.', 'Como otras redes descentralizadas, SENDA no depende de un servidor central.'),
     L('Every phone is a node: the more people use it, the denser the mesh.', 'Cada móvil es un nodo: cuanta más gente lo usa, más densa es la malla.'),
-    L('Signed delivery receipts teach the network which channels really work, area by area,', 'Los recibos de entrega firmados enseñan a la red qué canales funcionan en cada zona,'),
+    L('Anonymous delivery receipts teach the network which channels work, area by area,', 'Los recibos de entrega anónimos enseñan a la red qué canales funcionan en cada zona,'),
     L('and those counts merge between phones without any central server.', 'y esos recuentos se combinan entre móviles sin servidor central.'),
     L('It reads open sources too: USGS and GDACS for disasters, Copernicus imagery,', 'También lee fuentes abiertas: USGS y GDACS para desastres, imágenes de Copernicus,', 'It reads open sources too: U S G S and G D A C S for disasters, Copernicus imagery,'),
     L('MET Norway weather, and traffic from the DGT and the Dutch NDW in DATEX II.', 'meteorología de MET Norway y tráfico de la DGT y el NDW holandés en DATEX II.', 'MET Norway weather, and traffic from the D G T and the Dutch N D W in DATEX two.'),

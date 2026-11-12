@@ -31,9 +31,9 @@ export const CLAIMS = [
     let five = false; try { e.decodeShards(all.slice(0, 5), { k: 6, len: enc.len }); five = true; } catch {}
     return { value: `${ok}/${N} subconjuntos aleatorios de 6 reconstruyen; con 5: ${five ? 'reconstruye (ERROR)' : 'rechaza'}`, ok: ok === N && !five };
   } },
-  { id: 'multibearer-run', scene: 'v08', claim: 'ejecución de 200 mensajes con portadores perdidos al azar (semilla fija)', async measure() {
+  { id: 'multibearer-run', scene: 'v08', claim: 'SIMULACIÓN: 200 mensajes con portadores perdidos al azar según sus probabilidades de planificación (sin medir en campo), solo con portadores disponibles en España; semilla fija', async measure() {
     const B = await core('bearers.mjs'), E = await core('erasure.mjs');
-    const plan = B.planMultiBearer(380, ['SAT_D2C_SMS', 'MESHTASTIC', 'SMS', 'PHONE_MESH'].map((id) => ({ id })), { target: 0.99 });
+    const plan = B.planMultiBearer(380, ['IRIDIUM_SBD', 'MESHTASTIC', 'SMS', 'PHONE_MESH'].map((id) => ({ id })), { target: 0.99 });
     const R = mulberry(2026); let ok = 0; const N = 200;
     for (let t = 0; t < N; t++) {
       const msg = Uint8Array.from({ length: 380 }, () => Math.floor(R() * 256)), frames = B.shardForPlan(msg, plan, Uint8Array.from({ length: 8 }, () => Math.floor(R() * 256))), ra = E.createReassembler(); let out = null;

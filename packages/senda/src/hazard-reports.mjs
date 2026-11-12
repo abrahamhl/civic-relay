@@ -113,7 +113,7 @@ export function assessIncident(inc, { reputation = {}, official = [], sensors = 
   const sev = Math.max(...inc.reports.map((r) => HAZARD_KINDS[r.kind].severity));
   const life = inc.reports.some((r) => HAZARD_KINDS[r.kind].life || (r.people?.trapped ?? 0) > 0);
   const state = off ? 'OFFICIAL' : p >= 0.8 && (sev >= 0.6 || life) ? 'RECON' : p >= 0.8 || devices.size >= 3 ? 'CORROBORATED' : 'RUMOR';
-  return { id: inc.id, family: inc.family, pReal: +p.toFixed(3), state, severity: sev, lifeRisk: life, reporters: devices.size, reports: inc.reports.length, why,
+  return { basis: 'MODEL_UNCALIBRATED_LR', id: inc.id, family: inc.family, pReal: +p.toFixed(3), state, severity: sev, lifeRisk: life, reporters: devices.size, reports: inc.reports.length, why,
     canPublicWarn: Boolean(off), // regla dura: sin organismo oficial no hay aviso a la población
     official: off ? { source: off.source, ref: off.ref ?? null } : null };
 }

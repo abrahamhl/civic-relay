@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { loraAirtimeMs, COURIER_LEGS, planCourier, simulateCourier, carry, createPairingKeys, derivePairing, sealCompact, openCompact, legCapacityPerDay } from '../src/courier.mjs';
+import { EXAMPLE_SCENARIO as SC, loraAirtimeMs, COURIER_LEGS, planCourier, simulateCourier, carry, createPairingKeys, derivePairing, sealCompact, openCompact, legCapacityPerDay } from '../src/courier.mjs';
 import { generateIdentity, sealMessage, packEnvelope, unpackEnvelope, openMessage } from '../src/envelope.mjs';
 
 test('LoRa: tiempo en el aire según Semtech AN1200.13 (51 B de carga LoRaWAN = 64 B PHY)', () => {
@@ -8,8 +8,9 @@ test('LoRa: tiempo en el aire según Semtech AN1200.13 (51 B de carga LoRaWAN = 
   assert.equal(+loraAirtimeMs(64, 9).toFixed(1), 390.1);
   assert.equal(+loraAirtimeMs(64, 12).toFixed(1), 2793.5);
   // uso justo de 30 s/día: 10 tramas a SF12, 76 a SF9
-  assert.equal(legCapacityPerDay('LORAWAN_PUBLIC', 'ES', 'FIRST'), 10);
-  assert.equal(legCapacityPerDay('LORAWAN_PUBLIC', 'NL', 'FIRST'), 76);
+  assert.equal(legCapacityPerDay('LORAWAN_PUBLIC', 'ES', 'FIRST', { sf: 12 }), 10);
+  assert.equal(legCapacityPerDay('LORAWAN_PUBLIC', 'NL', 'FIRST', { sf: 9 }), 76);
+  assert.throws(() => legCapacityPerDay('LORAWAN_PUBLIC', 'ES', 'FIRST'), /SF/, 'sin SF no se inventa uno');
 });
 
 test('nunca se usa una vía prohibida ni una que obliga a enviar en claro', () => {
@@ -47,10 +48,10 @@ test('extremo a extremo: el sobre firmado viaja troceado por LoRaWAN, satélite 
   assert.equal(o.body, 'Estoy bien. Abraham');
 });
 
-test('simulación ES→NL (hipótesis declaradas, semilla fija): cada vía mejora frente a esperar a que vuelva la red', async () => {
+test('simulación ES→NL con el ESCENARIO DE EJEMPLO (sin fuente, solo mecanismo; semilla fija): cada vía mejora frente a esperar a que vuelva la red', async () => {
   const A = await createPairingKeys(), B = await createPairingKeys(), pair = await derivePairing(A, B.publicJwk);
   const bytes = (await sealCompact(pair, 'Estoy bien, sin red. Llamo cuando vuelva. Abraham')).length;
-  const run = (f, t) => simulateCourier(planCourier({ envelopeBytes: bytes, from: { country: 'ES', has: f }, to: { country: 'NL', has: t } }), { seed: 3 });
+  const run = (f, t) => simulateCourier(planCourier({ envelopeBytes: bytes, from: { country: 'ES', has: f }, to: { country: 'NL', has: t }, scenario: SC }), { seed: 3, scenario: SC });
   const phone = run([], []), lora = run(['LORAWAN_PUBLIC'], ['LORAWAN_PUBLIC']), sat = run(['SAT_MESSENGER'], ['SAT_MESSENGER']);
   assert.equal(phone.medianH.senda, phone.medianH.waitForNetwork, 'solo con el móvil no hay magia: se espera a la red');
   assert.ok(lora.medianH.senda < lora.medianH.waitForNetwork / 2, `LoRaWAN ${lora.medianH.senda} h frente a ${lora.medianH.waitForNetwork} h`);
@@ -61,10 +62,24 @@ test('simulación ES→NL (hipótesis declaradas, semilla fija): cada vía mejor
 test('apagón regional: lo que depende de infraestructura ajena cae; el satélite de aparato a aparato no', async () => {
   const A = await createPairingKeys(), B = await createPairingKeys(), pair = await derivePairing(A, B.publicJwk);
   const bytes = (await sealCompact(pair, 'Estoy bien, sin red. Llamo cuando vuelva.')).length;
-  const run = (f, t, bo) => simulateCourier(planCourier({ envelopeBytes: bytes, from: { country: 'ES', has: f, blackout: bo }, to: { country: 'NL', has: t } }), { seed: 5 });
+  const run = (f, t, bo) => simulateCourier(planCourier({ envelopeBytes: bytes, from: { country: 'ES', has: f, blackout: bo }, to: { country: 'NL', has: t }, scenario: SC }), { seed: 5, scenario: SC });
   const loraNormal = run(['LORAWAN_PUBLIC'], ['LORAWAN_PUBLIC'], false), loraBlack = run(['LORAWAN_PUBLIC'], ['LORAWAN_PUBLIC'], true);
   assert.ok(loraBlack.byHour[6].senda < loraNormal.byHour[6].senda, 'con apagón la pasarela LoRaWAN de tu zona probablemente no tiene luz');
   const sat = run(['SAT_MESSENGER'], ['SAT_MESSENGER'], true);
   assert.ok(sat.byHour[1].senda > 0.9, 'mensajero satelital en cada lado: llega igual con apagón');
-  assert.equal(COURIER_LEGS.SAT_PHONE_NATIVE.pAvail.ES, 0, 'mensajes por satélite del móvil: no disponibles en España hoy');
+  assert.equal(COURIER_LEGS.SAT_PHONE_NATIVE.availableIn.ES, false, 'mensajes por satélite del móvil: no disponibles en España hoy (fuente: docs/research/MENSAJE_SIN_RED_ES_NL_2026-11.md)');
+});
+
+test('sin escenario declarado no hay simulación, y el resultado dice que es simulación', () => {
+  const p = planCourier({ envelopeBytes: 80, from: { country: 'ES', has: ['SAT_MESSENGER'] }, to: { country: 'NL', has: [] } });
+  assert.throws(() => simulateCourier(p, {}), /escenario declarado/);
+  const q = planCourier({ envelopeBytes: 80, from: { country: 'ES', has: ['SAT_MESSENGER'] }, to: { country: 'NL', has: [] }, scenario: SC });
+  const r = simulateCourier(q, { scenario: SC, runs: 50 });
+  assert.equal(r.basis, 'SIMULATION'); assert.equal(r.scenarioBasis, 'EXAMPLE_ASSUMPTIONS_NOT_SOURCED');
+  for (const L of Object.values(COURIER_LEGS)) { assert.equal(L.pAvail, undefined); assert.equal(L.meanWaitMin, undefined); }
+});
+
+test('una vía que no existe en ese país no se planifica nunca', () => {
+  const p = planCourier({ envelopeBytes: 80, from: { country: 'ES', has: ['SAT_PHONE_NATIVE'] }, to: { country: 'NL', has: ['SAT_PHONE_NATIVE'] } });
+  assert.ok(!p.first.includes('SAT_PHONE_NATIVE') && !p.last.includes('SAT_PHONE_NATIVE'));
 });
