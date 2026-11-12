@@ -223,7 +223,8 @@
     "In an emergency, three big buttons: I'm safe, I need help, I'm trapped.",
     "Your message is encrypted on your own phone, in about three hundred bytes.",
     "Only the person it is meant for can read it.",
-    "For Bluetooth between phones, there is also a native Android app."
+    "On Android it is also a real app, with everything inside.",
+    "No browser, and no network needed even to start it."
    ],
    "es": [
     "No hace falta tienda de apps. Abres una dirección web una vez, con conexión.",
@@ -231,7 +232,8 @@
     "En una emergencia, tres botones: estoy bien, necesito ayuda, estoy atrapado.",
     "Tu mensaje se cifra en tu propio móvil, en unos trescientos bytes.",
     "Solo puede leerlo la persona a quien va dirigido.",
-    "Para Bluetooth entre móviles hay además una app nativa de Android."
+    "En Android es además una app de verdad, con todo dentro.",
+    "Sin navegador y sin red, ni siquiera para arrancarla."
    ],
    "en_say": [
     "You don't need an app store. You open a web address once, with a connection.",
@@ -239,7 +241,8 @@
     "In an emergency, three big buttons: I'm safe, I need help, I'm trapped.",
     "Your message is encrypted on your own phone, in about three hundred bytes.",
     "Only the person it is meant for can read it.",
-    "For Bluetooth between phones, there is also a native Android app."
+    "On Android it is also a real app, with everything inside.",
+    "No browser, and no network needed even to start it."
    ]
   },
   {
@@ -289,11 +292,11 @@
    },
    "visual": {
     "kind": "bearers",
-    "stat": "197 / 200",
+    "stat": "199 / 200",
     "statCue": 4,
     "statLabel": {
-     "en": "messages rebuilt · live trial",
-     "es": "mensajes reconstruidos · prueba en vivo"
+     "en": "messages rebuilt · seeded test run",
+     "es": "mensajes reconstruidos · ejecución con semilla"
     }
    },
    "en": [
@@ -301,7 +304,7 @@
     "Reed-Solomon coding adds spare ones: send ten, and any six rebuild it exactly.",
     "They leave at once by satellite, LoRa radio, drones and neighbours.",
     "If a path dies, the others are enough.",
-    "Live trial: 197 of 200 messages rebuilt while bearers were dropped at random.",
+    "In 200 sends with bearers dropped at random, 199 were rebuilt.",
     "Which paths to use is decided by Contact Graph Routing, from space networking:",
     "the earliest arrival over every chain of contacts, several routes in parallel."
    ],
@@ -310,7 +313,7 @@
     "Reed-Solomon añade repuestos: envías diez y seis cualesquiera lo rehacen.",
     "Salen a la vez por satélite, radio LoRa, drones y vecinos.",
     "Si un camino muere, los demás bastan.",
-    "En vivo: 197 de 200 mensajes rehechos mientras caían portadores al azar.",
+    "En 200 envíos perdiendo portadores al azar, se rehicieron 199.",
     "Qué caminos usar lo decide Contact Graph Routing, de las redes espaciales:",
     "la llegada más temprana por toda cadena de contactos, varias rutas en paralelo."
    ],
@@ -319,7 +322,7 @@
     "Reed-Solomon coding adds spare ones: send ten, and any six rebuild it exactly.",
     "They leave at once by satellite, LOR-ah radio, drones and neighbours.",
     "If a path dies, the others are enough.",
-    "Live trial: one hundred and ninety-seven of two hundred messages rebuilt, while bearers were dropped at random.",
+    "In two hundred sends with bearers dropped at random, one hundred and ninety-nine were rebuilt.",
     "Which paths to use is decided by Contact Graph Routing, from space networking:",
     "the earliest arrival over every chain of contacts, several routes in parallel."
    ]
@@ -388,7 +391,7 @@
    "en": [
     "You can test it today with someone at home.",
     "Install it, switch on airplane mode, and send a message by sound:",
-    "one metre apart, it arrives in about ten seconds.",
+    "one metre apart, a short message takes about thirty seconds.",
     "Or open a hotspot with no SIM: chat and voice calls, no Internet, no server.",
     "With two LoRa nodes of about thirty to forty euros, the range becomes kilometres.",
     "Across countries, physics needs a bridge somewhere. SENDA's job is to find it."
@@ -396,7 +399,7 @@
    "es": [
     "Puedes probarlo hoy con alguien en casa.",
     "Instálalo, activa el modo avión y envía un mensaje por sonido:",
-    "a un metro, llega en unos diez segundos.",
+    "a un metro, un mensaje corto tarda unos treinta segundos.",
     "O abre un punto de acceso sin SIM: chat y llamadas, sin Internet ni servidor.",
     "Con dos nodos LoRa de 30 a 40 euros, el alcance pasa a ser de kilómetros.",
     "Entre países, la física necesita un puente en algún sitio. SENDA lo encuentra."
@@ -404,7 +407,7 @@
    "en_say": [
     "You can test it today with someone at home.",
     "Install it, switch on airplane mode, and send a message by sound:",
-    "one metre apart, it arrives in about ten seconds.",
+    "one metre apart, a short message takes about thirty seconds.",
     "Or open a hotspot with no SIM: chat and voice calls, no Internet, no server.",
     "With two LOR-ah nodes of about thirty to forty euros, the range becomes kilometres.",
     "Across countries, physics needs a bridge somewhere. Senda's job is to find it."
@@ -687,7 +690,7 @@
     "that silence is itself vital information for rescuers.",
     "SENDA fuses hundreds of reports: how many trains, which coaches, how many trapped.",
     "In simulation, the second train is identified in thirty to forty seconds,",
-    "even with only five percent of passengers using it.",
+    "with a quarter of passengers; with one in twenty, under a minute.",
     "The summary goes out in CAP, the format 112 control rooms already read."
    ],
    "es": [
@@ -697,7 +700,7 @@
     "ese silencio ya es un dato vital para el rescate.",
     "SENDA fusiona cientos de avisos: cuántos trenes, qué coches, cuántos atrapados.",
     "En simulación, el segundo tren se identifica en 30 a 40 segundos,",
-    "aunque solo lo use el 5 % de los pasajeros.",
+    "con un cuarto de los pasajeros; con uno de cada veinte, en menos de un minuto.",
     "El resumen sale en CAP, el formato que ya leen las salas del 112."
    ],
    "en_say": [
@@ -707,7 +710,7 @@
     "that silence is itself vital information for rescuers.",
     "Senda fuses hundreds of reports: how many trains, which coaches, how many trapped.",
     "In simulation, the second train is identified in thirty to forty seconds,",
-    "even with only five percent of passengers using it.",
+    "with a quarter of passengers; with one in twenty, under a minute.",
     "The summary goes out in C A P, the format one one two control rooms already read."
    ]
   },

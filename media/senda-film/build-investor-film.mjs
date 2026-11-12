@@ -29,6 +29,11 @@ check(Math.round(r28) === 7, `28 GHz pierde ${r28} dB/km (la voz dice «unos sie
 check(Math.round(knife) === 22, `cresta de 60 m: ${knife} dB (la voz dice «unos veintidós»)`);
 const lam868 = 299792458 / 868e6, lam28 = 299792458 / 28e9;
 check(Math.round(lam868 * 100) === 35 && Math.round(lam28 * 100) === 1, `longitudes de onda ${lam868} / ${lam28}`);
+// Todas las afirmaciones numéricas se comprueban con scripts/film-claims.mjs (las mismas que scripts/prove.mjs)
+const { runClaims } = await import(pathToFileURL(path.join(repoRoot, 'scripts', 'film-claims.mjs')).href);
+const claimRes = await runClaims();
+for (const c of claimRes) if (!c.ok) die(`afirmación no verificada (${c.id}): ${c.value}`);
+const MB = claimRes.find((c) => c.id === 'multibearer-run'), MBN = +MB.value.split('/')[0];
 const erasure = await core('erasure.mjs');
 { // demostración real del ejemplo «diez fragmentos, seis cualesquiera»
   const msg = new TextEncoder().encode('SOS · planta 3 · dos personas atrapadas');
@@ -87,7 +92,8 @@ const scenes = [
     L("In an emergency, three big buttons: I'm safe, I need help, I'm trapped.", 'En una emergencia, tres botones: estoy bien, necesito ayuda, estoy atrapado.'),
     L('Your message is encrypted on your own phone, in about three hundred bytes.', 'Tu mensaje se cifra en tu propio móvil, en unos trescientos bytes.'),
     L('Only the person it is meant for can read it.', 'Solo puede leerlo la persona a quien va dirigido.'),
-    L('For Bluetooth between phones, there is also a native Android app.', 'Para Bluetooth entre móviles hay además una app nativa de Android.'),
+    L('On Android it is also a real app, with everything inside.', 'En Android es además una app de verdad, con todo dentro.'),
+    L('No browser, and no network needed even to start it.', 'Sin navegador y sin red, ni siquiera para arrancarla.'),
   ], { screens: ['e2e-13-modo-facil.png', 'e2e-01-offline-home.png'] }),
   S('v07', 'mesh', 'CALCULATED', T('Phone to phone · store, carry, forward', 'De móvil a móvil · guardar, llevar, reenviar'), [
     L('Without a network, every phone running SENDA becomes a relay.', 'Sin red, cada móvil con SENDA se convierte en un relé.'),
@@ -103,10 +109,10 @@ const scenes = [
     L('Reed-Solomon coding adds spare ones: send ten, and any six rebuild it exactly.', 'Reed-Solomon añade repuestos: envías diez y seis cualesquiera lo rehacen.'),
     L('They leave at once by satellite, LoRa radio, drones and neighbours.', 'Salen a la vez por satélite, radio LoRa, drones y vecinos.', 'They leave at once by satellite, LOR-ah radio, drones and neighbours.'),
     L('If a path dies, the others are enough.', 'Si un camino muere, los demás bastan.'),
-    L('Live trial: 197 of 200 messages rebuilt while bearers were dropped at random.', 'En vivo: 197 de 200 mensajes rehechos mientras caían portadores al azar.', 'Live trial: one hundred and ninety-seven of two hundred messages rebuilt, while bearers were dropped at random.'),
+    L(`In 200 sends with bearers dropped at random, ${MBN} were rebuilt.`, `En 200 envíos perdiendo portadores al azar, se rehicieron ${MBN}.`, `In two hundred sends with bearers dropped at random, ${MBN === 199 ? 'one hundred and ninety-nine' : MBN === 198 ? 'one hundred and ninety-eight' : MBN === 200 ? 'all of them' : die('MBN sin locución')} were rebuilt.`),
     L('Which paths to use is decided by Contact Graph Routing, from space networking:', 'Qué caminos usar lo decide Contact Graph Routing, de las redes espaciales:'),
     L('the earliest arrival over every chain of contacts, several routes in parallel.', 'la llegada más temprana por toda cadena de contactos, varias rutas en paralelo.'),
-  ], { stat: '197 / 200', statCue: 4, statLabel: T('messages rebuilt · live trial', 'mensajes reconstruidos · prueba en vivo') }),
+  ], { stat: `${MBN} / 200`, statCue: 4, statLabel: T('messages rebuilt · seeded test run', 'mensajes reconstruidos · ejecución con semilla') }),
   S('v09', 'europe', 'SIMULATED', T('Arnhem → San Martín de Valdeiglesias', 'Arnhem → San Martín de Valdeiglesias'), [
     L('A real question: I live in the Netherlands.', 'Una pregunta real: vivo en Países Bajos.'),
     L('My brother is in Spain, and his mast is down.', 'Mi hermano está en España y su antena ha caído.'),
@@ -120,7 +126,7 @@ const scenes = [
   S('v10', 'twophones', 'OBSERVED', T('Try it today, with someone at home', 'Pruébalo hoy, con alguien en casa'), [
     L('You can test it today with someone at home.', 'Puedes probarlo hoy con alguien en casa.'),
     L('Install it, switch on airplane mode, and send a message by sound:', 'Instálalo, activa el modo avión y envía un mensaje por sonido:'),
-    L('one metre apart, it arrives in about ten seconds.', 'a un metro, llega en unos diez segundos.'),
+    L('one metre apart, a short message takes about thirty seconds.', 'a un metro, un mensaje corto tarda unos treinta segundos.'),
     L('Or open a hotspot with no SIM: chat and voice calls, no Internet, no server.', 'O abre un punto de acceso sin SIM: chat y llamadas, sin Internet ni servidor.'),
     L('With two LoRa nodes of about thirty to forty euros, the range becomes kilometres.', 'Con dos nodos LoRa de 30 a 40 euros, el alcance pasa a ser de kilómetros.', 'With two LOR-ah nodes of about thirty to forty euros, the range becomes kilometres.'),
     L("Across countries, physics needs a bridge somewhere. SENDA's job is to find it.", 'Entre países, la física necesita un puente en algún sitio. SENDA lo encuentra.'),
@@ -185,7 +191,7 @@ const scenes = [
     L('that silence is itself vital information for rescuers.', 'ese silencio ya es un dato vital para el rescate.'),
     L('SENDA fuses hundreds of reports: how many trains, which coaches, how many trapped.', 'SENDA fusiona cientos de avisos: cuántos trenes, qué coches, cuántos atrapados.'),
     L('In simulation, the second train is identified in thirty to forty seconds,', 'En simulación, el segundo tren se identifica en 30 a 40 segundos,'),
-    L('even with only five percent of passengers using it.', 'aunque solo lo use el 5 % de los pasajeros.'),
+    L('with a quarter of passengers; with one in twenty, under a minute.', 'con un cuarto de los pasajeros; con uno de cada veinte, en menos de un minuto.'),
     L('The summary goes out in CAP, the format 112 control rooms already read.', 'El resumen sale en CAP, el formato que ya leen las salas del 112.', 'The summary goes out in C A P, the format one one two control rooms already read.'),
   ], { stat: '30–40 s', statCue: 5, statLabel: T('to identify the second train · simulation', 'en identificar el segundo tren · simulación') }),
   S('v19', 'quake', 'SIMULATED', T('Earthquakes · seconds of warning', 'Terremotos · segundos de aviso'), [

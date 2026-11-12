@@ -16,13 +16,18 @@
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="false"/>
     <uses-feature android:name="android.hardware.wifi" android:required="false"/>
     <!-- Sin INTERNET: esta app no envía nada por red; el barrido se entrega a la web con «Compartir». -->
-    <application android:label="SENDA Android" android:allowBackup="false" android:usesCleartextTraffic="false"
+    <application android:label="SENDA" android:allowBackup="false" android:usesCleartextTraffic="false"
         android:theme="@android:style/Theme.Material.NoActionBar">
-        <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop">
+        <!-- La app: la web SENDA completa empaquetada dentro del APK (sin navegador ni red). -->
+        <activity android:name=".AppActivity" android:exported="true" android:launchMode="singleTask"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <!-- Pantalla de radios: baliza BLE, escucha y barrido Wi-Fi, siempre con el toque del usuario. -->
+        <activity android:name=".MainActivity" android:label="Radios SENDA" android:exported="true" android:launchMode="singleTop">
             <!-- Abierta desde una alerta firmada de la web: senda://accion?a=BLE_BEACON,…&id=… -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
