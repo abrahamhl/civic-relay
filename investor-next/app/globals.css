@@ -1055,3 +1055,62 @@
     padding-right: 0.35rem;
   }
 }
+
+
+/* 2026-11-13 · Responsive containment — correct the cause instead of masking it with body overflow:hidden. */
+.site-root .hero {
+  grid-template-columns: minmax(0, .94fr) minmax(0, 1.06fr);
+  min-width: 0;
+}
+.site-root .hero > *,
+.site-root .apple-bento-surfaces-grid > *,
+.site-root .apple-bento-scenes-grid > *,
+.site-root .hf-cinema-section,
+.site-root .mission-console,
+.site-root .oep-system-layout > *,
+.site-root .product-title-block > *,
+.site-root .pipeline-grid > *,
+.site-root .invest-cards > *,
+.site-root .capital-grid > * {
+  min-width: 0;
+}
+.site-root .hero h1 {
+  margin-right: 0;
+  white-space: normal;
+  font-size: clamp(3.1rem, 5.55vw, 6.2rem);
+  overflow-wrap: anywhere;
+}
+.site-root .hero-copy,
+.site-root .apple-bento-thesis,
+.site-root .apple-bento-surface-card,
+.site-root .apple-bento-scene-card,
+.site-root .apple-thesis-title,
+.site-root .apple-thesis-subtitle,
+.site-root .oep-system-chapter {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.site-root .apple-bento-surfaces-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+}
+.site-root .apple-bento-scenes-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 215px), 1fr));
+}
+.site-root :is(img,video,iframe,canvas) { max-width: 100%; }
+.site-root pre { max-width: 100%; overflow-x: auto; }
+.site-root .button-primary, .site-root .button-outline { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 1200px) {
+  .site-root .hero { grid-template-columns: minmax(0,1fr); gap: clamp(25px,4vw,50px); }
+  .site-root .hero-copy { max-width: 850px; }
+  .site-root .mission-console { max-width: 850px; margin-inline: auto; transform: none; }
+}
+@media (max-width: 600px) {
+  .site-root .container { padding-inline: clamp(16px, 5.4vw, 22px); }
+  .site-root .hero { padding-top: clamp(38px, 8vw, 66px); }
+  .site-root .hero h1 { font-size: clamp(2.75rem, 10.3vw, 4.15rem); line-height: 1.02; letter-spacing: -.065em; }
+  .site-root .hero-actions { align-items: stretch; }
+  .site-root .hero-actions > a { flex: 1 1 100%; justify-content: space-between; }
+  .site-root .apple-bento-thesis { min-width: 0; }
+  .site-root .apple-loop-strip { flex-wrap: wrap; max-width: 100%; }
+  .site-root .globe-floating { max-width: calc(100% - 24px); min-width: 0; }
+}
