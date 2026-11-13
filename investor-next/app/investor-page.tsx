@@ -14,6 +14,7 @@ import {getCopy,type Locale} from './copy';
 import ResponsiveHeader from './responsive-header';
 import LanguageDocument from './language-document';
 import MasterVision from './master-vision';
+import EditorialScience from './editorial-science';
 
 const source='https://github.com/abrahamhl/civic-relay';
 
@@ -159,6 +160,7 @@ export default function InvestorPage({locale}:{locale:Locale}){
    <MissionControl locale={locale}/>
   </section>
 
+  <EditorialScience locale={locale}/>
   <MasterVision locale={locale}/>
   {/* Three Complementary Surfaces Switcher (A: Discover / B: Explore Mission Control / C: Investigate Science) */}
   <section className="container apple-surfaces-section" aria-label={th.surfacesTitle} data-testid="three-surfaces-switcher">

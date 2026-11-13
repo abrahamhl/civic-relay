@@ -285,9 +285,25 @@ try{
    eightStage:document.body.innerText.includes('EMERGENCY EVENT → ZONE → HUMAN STATUS → CONSENT → MESSAGE → NETWORK PATH → ACK → EVIDENCE'),
    obsoleteLinks:[...document.querySelectorAll('a[href]')].map(a=>a.href).filter(h=>/^https?:\/\/(?:civic-relay\.vercel\.app|civic-relay-pi\.vercel\.app|abrahamhl\.github\.io\/civic-relay)/i.test(h))
   }));
-  const pass=Boolean(response?.status()===200&&obs.lang===trial.locale&&obs.headings.some(x=>x.includes(trial.text))&&obs.canonical?.startsWith('https://civic-relay-investor.vercel.app')&&obs.disclaimers>0&&obs.eightStage&&obs.obsoleteLinks.length===0&&pageErrors.length===0&&task.verified);
-  const record={id:trial.id,kind:'REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER',sha:process.env.GITHUB_SHA||'LOCAL',timestamp_utc:new Date().toISOString(),locale:trial.locale,viewport:trial.viewport,role:trial.role,roleTask:task,steps:['Open static release in Chromium','Verify DOM language and localized heading','Inspect canonical and simulation disclaimer','Check architecture and stale external links','Inspect pageerror events'],expected:{http:200,htmlLang:trial.locale,canonicalHost:'civic-relay-investor.vercel.app',noPageErrors:true},observed:{http:response?.status(),...obs,pageErrors,consoleErrors},verdict:pass?'PASS':'FAIL'};
+  const editorial=await page.evaluate(()=>{
+    const section=document.querySelector('#visual-engineering');
+    const cards=[...document.querySelectorAll('#visual-engineering .ev-card')];
+    const diagrams=[...document.querySelectorAll('#visual-engineering svg[role="img"]')];
+    const width=document.documentElement.clientWidth;
+    const problems=[section,...cards,...diagrams].filter(Boolean).flatMap(el=>{
+      const rect=el.getBoundingClientRect();
+      const overflow=el.scrollWidth>el.clientWidth+2;
+      return (overflow||rect.left < -2||rect.right>width+2)?[{
+        element:el.tagName.toLowerCase(),className:typeof el.className==='string'?el.className:'',
+        scrollWidth:el.scrollWidth,clientWidth:el.clientWidth,left:rect.left,right:rect.right
+      }]:[];
+    });
+    return {cards:cards.length,diagrams:diagrams.length,width,problems,caption:section?.textContent.includes('Fresnel')||false};
+  });
+  const pass=Boolean(editorial.cards===3&&editorial.diagrams===3&&editorial.problems.length===0&&response?.status()===200&&obs.lang===trial.locale&&obs.headings.some(x=>x.includes(trial.text))&&obs.canonical?.startsWith('https://civic-relay-investor.vercel.app')&&obs.disclaimers>0&&obs.eightStage&&obs.obsoleteLinks.length===0&&pageErrors.length===0&&task.verified);
+  const record={id:trial.id,kind:'REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER',sha:process.env.GITHUB_SHA||'LOCAL',timestamp_utc:new Date().toISOString(),locale:trial.locale,viewport:trial.viewport,role:trial.role,roleTask:task,steps:['Open static release in Chromium','Verify DOM language and localized heading','Inspect canonical and simulation disclaimer','Check architecture and stale external links','Inspect pageerror events'],expected:{http:200,htmlLang:trial.locale,canonicalHost:'civic-relay-investor.vercel.app',noPageErrors:true},observed:{http:response?.status(),...obs,editorial,pageErrors,consoleErrors},verdict:pass?'PASS':'FAIL'};
   await page.screenshot({path:join(evidenceDir,trial.id+'-'+trial.locale+'.png'),fullPage:false});
+  if(['P11','P12','P15'].includes(trial.id)) await page.locator('#visual-engineering').screenshot({path:join(evidenceDir,trial.id+'-editorial.png')});
   writeFileSync(join(evidenceDir,trial.id+'-'+trial.locale+'.json'),JSON.stringify(record,null,2));
   log.push(record);
   console.log(record.verdict,trial.id,trial.locale,JSON.stringify({lang:obs.lang,errors:pageErrors.length,canonical:obs.canonical}));
