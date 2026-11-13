@@ -1,10 +1,15 @@
 package eu.senda.field;
 
 import android.app.Activity;
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
+import android.webkit.PermissionRequest;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -28,6 +33,10 @@ import java.util.Collections;
  */
 public final class AppActivity extends Activity {
     private WebView web;
+    private static final int REQ_MIC = 41, REQ_GEO = 42;
+    private PermissionRequest pendingMic;
+    private GeolocationPermissions.Callback pendingGeo;
+    private String pendingGeoOrigin;
 
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
@@ -39,7 +48,9 @@ public final class AppActivity extends Activity {
         s.setAllowContentAccess(false);        // sin content://
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         s.setMediaPlaybackRequiresUserGesture(true);
+        s.setGeolocationEnabled(true);         // «Usar mi posición» en avisos: solo con permiso del usuario
         web.setWebViewClient(new Client());
+        web.setWebChromeClient(new Chrome());
         web.addJavascriptInterface(new Bridge(), "SendaNative");
         setContentView(web);
         if (b != null) web.restoreState(b); else web.loadUrl(OfflineAssets.START);
@@ -61,6 +72,34 @@ public final class AppActivity extends Activity {
         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(uri), this, MainActivity.class);
         runOnUiThread(() -> startActivity(i));
         return true;
+    }
+
+    /**
+     * Permisos del visor: solo para páginas de la propia app y solo tras el diálogo de Android.
+     * Micrófono: lo usa «Escuchar por sonido» (módem acústico). Ubicación: «Usar mi posición».
+     */
+    private final class Chrome extends WebChromeClient {
+        @Override public void onPermissionRequest(PermissionRequest req) {
+            boolean onlyAudio = req.getResources().length == 1 && PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(req.getResources()[0]);
+            if (!onlyAudio || !OfflineAssets.isInApp(req.getOrigin().toString())) { req.deny(); return; }
+            if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) { req.grant(req.getResources()); return; }
+            pendingMic = req;
+            requestPermissions(new String[] { Manifest.permission.RECORD_AUDIO }, REQ_MIC);
+        }
+
+        @Override public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback cb) {
+            if (!OfflineAssets.isInApp(origin)) { cb.invoke(origin, false, false); return; }
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) { cb.invoke(origin, true, false); return; }
+            pendingGeo = cb; pendingGeoOrigin = origin;
+            requestPermissions(new String[] { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }, REQ_GEO);
+        }
+    }
+
+    @Override public void onRequestPermissionsResult(int code, String[] perms, int[] results) {
+        super.onRequestPermissionsResult(code, perms, results);
+        boolean ok = results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED;
+        if (code == REQ_MIC && pendingMic != null) { if (ok) pendingMic.grant(pendingMic.getResources()); else pendingMic.deny(); pendingMic = null; }
+        if (code == REQ_GEO && pendingGeo != null) { pendingGeo.invoke(pendingGeoOrigin, ok, false); pendingGeo = null; pendingGeoOrigin = null; }
     }
 
     private final class Client extends WebViewClient {
