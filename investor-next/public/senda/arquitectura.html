@@ -449,7 +449,7 @@ const MX = [
   ['UWB', 'Distancia precisa entre dos teléfonos con UWB', 'androidx.core.uwb · UWB_RANGING', 'road'],
   ['NFC', 'Intercambio de tarjetas de contacto al acercar teléfonos', 'NfcAdapter · NFC', 'road'],
   ['Infrarrojos', 'Descartado como canal: pocos modelos llevan emisor y casi ninguno receptor. La vía óptica útil es pantalla o flash → cámara', 'ConsumerIrManager · TRANSMIT_IR', 'road'],
-  ['Satélite directo al móvil', 'SOS donde el modelo y el operador lo ofrezcan; disponibilidad en España pendiente de verificar', 'Depende del fabricante y del operador', 'road'],
+  ['Satélite directo al móvil', 'Solo SOS de emergencia (Apple en España desde 2023 y en Países Bajos; Pixel lista ES y NL); los mensajes normales por satélite no están disponibles en ES ni NL. Fuente: docs/research/MENSAJE_SIN_RED_ES_NL_2026-11.md', 'Depende del fabricante y del operador', 'road'],
 ];
 $('#mx').innerHTML = MX.map(([s, u, api, st]) => `<tr><td><b>${s}</b></td><td>${u}</td><td class="m">${api}</td><td><span class="chip" style="color:${ST[st][1]}">${ST[st][0]}</span></td></tr>`).join('');
 // ---- plataformas, permisos y planes (núcleo real: platforms.mjs)
