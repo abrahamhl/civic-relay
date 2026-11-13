@@ -1,5 +1,32 @@
 # Changelog
 
+## SENDA · 13-11-2026 · Regla de veracidad, pantallas reales, revisión horaria y grabaciones de la app
+
+**Entrada (fundador):** no inventar nada nunca; simulaciones siempre declaradas; revisar cada hora los compromisos uno por uno; producto funcional y útil para la ciudadanía y los organismos.
+
+**Procesamiento:**
+- `CLAUDE.md`: regla permanente de veracidad. `docs/CUMPLIMIENTO.md`: lista de compromisos y registro de revisiones horarias.
+- Auditoría de veracidad:
+  - `courier.mjs`: sin valores por defecto sin fuente; los valores de ejemplo van en un escenario explícito y marcado.
+  - Película v5: «simulación de 200 envíos… 198», «recibos anónimos» y 496 pruebas. El guion comprueba el recuento contra una ejecución real.
+  - Portada web (ES/EN/NL) y otras páginas corregidas: satélite directo al móvil, «telemetría», «cumplimiento pleno», precios sin fuente, contenido de la bóveda, k-anonimato no implementado.
+  - Página de estado regenerada, con la fecha de la evidencia guardada.
+  - Guía de hardware marcada como no verificada.
+- `/senda/mensaje`: emparejamiento con número de seguridad; mensaje cifrado en una línea de 160 caracteres que acepta un SMS o un mensajero satelital; paso por sonido.
+- `/senda/avisos`: medida del río por toques en una foto; reporte firmado Ed25519 de 160 caracteres; importación verificada; paso por sonido; parte CAP 1.2 restringido.
+- Centro: cola de reportes ciudadanos (verifica, descarta repetidos y falsos, prioriza, exporta CAP).
+- Android: permiso de micrófono y permisos del visor solo para páginas de la app tras el diálogo del sistema; la CI comprueba las pantallas nuevas dentro del APK.
+- Núcleo: nombres ocultos por `export *` expuestos con nombre propio y prueba contra choques nuevos.
+- `investor-next/scripts/senda-screens-e2e.mjs`: 14 comprobaciones en Chromium con varios móviles. La CI de navegador ahora se ejecuta también en PR hacia la rama de financiación (antes nunca lo hacía en este PR).
+- `docs/DEMO_INVERSORES_2026-11.md`: guion de 15 minutos solo con lo probado y lo que no hay que afirmar.
+- Grabaciones reales de la app: avisos → Centro (22 s), mensaje sin red con dos móviles (14 s) e incendio 3D (42 s), con rótulos de lo que es de prueba.
+
+**Validación:** núcleo 498/498; 19/19 afirmaciones de la película; 14/14 de las pantallas nuevas y 49 de la suite sin red en la CI (ejecución nº 30 del flujo SENDA, éxito); APK compilado en la CI.
+
+**Límites:** fuentes abiertas (cámaras de Madrid, DGT, AEMET, Rijkswaterstaat) inaccesibles desde la sesión; sonido probado decodificando la señal generada, no por el aire; sin pruebas de campo; bóveda de defensa (señuelos de Remote ID, destellos contra cámaras) pendiente de revisión jurídica; contradicción NLnet entre documentos pendiente de decisión.
+
+— Firma: Claude Code (sesión cloud), 13-11-2026.
+
 ## SENDA · 12-11-2026 · Mensaje sin red entre países, avisos ciudadanos con triaje 112 e investigación de compras públicas
 
 **Entrada (fundador):** cómo llega un mensaje a su hermano en Holanda sin red y sin nadie con SENDA en medio; red de avisos ciudadanos que alivie el 112 sin emitir avisos sin confirmación oficial; qué software compran los organismos (ES/NL/UE); cámaras y fuentes públicas.
