@@ -304,7 +304,11 @@ await D.page.evaluate((t) => window.SENDA_CALL_API.acceptAnswer(t), answerCode);
 await D.page.waitForFunction(() => window.SENDA_CALL.state === 'connected', null, { timeout: 15000 }).catch(() => {});
 await E.page.waitForFunction(() => window.SENDA_CALL.state === 'connected', null, { timeout: 15000 }).catch(() => {});
 await D.page.evaluate(() => window.SENDA_CALL_API.send('Hola, te oigo')); await E.page.click('#sos');
-await D.page.waitForTimeout(3500);
+// Esperar a que lleguen el chat y la voz (antes: 3,5 s fijos, insuficientes a veces en la CI). Las aserciones no cambian.
+await Promise.all([
+  E.page.waitForFunction(() => window.SENDA_CALL.received?.includes('Hola, te oigo') && window.SENDA_CALL.audioPackets > 0, null, { timeout: 15000 }).catch(() => {}),
+  D.page.waitForFunction(() => window.SENDA_CALL.received?.some((m) => m.startsWith('🆘')) && window.SENDA_CALL.audioPackets > 0, null, { timeout: 15000 }).catch(() => {}),
+]);
 const call = { d: await D.page.evaluate(() => ({ ...window.SENDA_CALL, path: document.querySelector('#k-path').textContent })), e: await E.page.evaluate(() => ({ ...window.SENDA_CALL })), offerS: +(offerWave.length / 48000).toFixed(1), soundExact: heardOffer === offerCode, requestsDuringCall: [...D.reqs, ...E.reqs].filter((u) => !u.startsWith('data:')) };
 await D.page.screenshot({ path: resolve(outDir, 'e2e-20-llamada.png'), fullPage: true });
 check('Llamada sin Internet: oferta de <110 bytes por sonido (onda real, decodificada exacta), conexión directa cifrada, voz Opus y chat en ambos sentidos y cero peticiones de red durante la llamada',
