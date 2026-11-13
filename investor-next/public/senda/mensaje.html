@@ -56,7 +56,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px;borde
     <h2>3 · Recibir</h2>
     <p class="m">Pega todo lo que te haya llegado (puede venir mezclado con otro texto o por varias vías; el orden da igual).</p>
     <textarea id="inbox" rows="5" placeholder="SND2 …"></textarea>
-    <div class="row"><button class="g" id="open">Abrir</button></div>
+    <div class="row"><button class="g" id="open">Abrir</button><button id="hear">👂 Escuchar por sonido</button></div>
     <div id="opened"></div>
   </section>
 </div>
@@ -85,6 +85,8 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px;borde
 <script type="module">
 import { createPairingKeys, derivePairing, sealCompact, openCompact } from '/senda/core/courier.mjs';
 import { encodeShards, packShard, createReassembler, SHARD_HEADER } from '/senda/core/erasure.mjs';
+import { emit, listen } from '/senda/audio.mjs';
+import { airtimeSeconds } from '/senda/core/acoustic-modem.mjs';
 const $ = (s) => document.querySelector(s), esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const b64u = (u8) => btoa(String.fromCharCode(...u8)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const unb64u = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4)), (c) => c.charCodeAt(0));
@@ -134,7 +136,17 @@ $('#seal').onclick = async () => {
   $('#seal-info').textContent = `${msg.length} B cifrados · ${n} línea${n > 1 ? 's' : ''}${k > 1 ? ` (basta con ${k} cualesquiera)` : ''}`;
   $('#frames').innerHTML = lines.map((l, i) => `<div class="frame"><code>${esc(l)}</code><button data-i="${i}">Copiar</button></div>`).join('') + `<div class="row">${navigator.share ? '<button id="share">Compartir…</button>' : ''}<span class="m">Pega cada línea en la app del mensajero satelital, en un SMS o donde puedas. Cada línea tiene ${Math.max(...lines.map((l) => l.length))} caracteres como máximo.</span></div>`;
   for (const b of $('#frames').querySelectorAll('button[data-i]')) b.onclick = () => navigator.clipboard?.writeText(lines[+b.dataset.i]);
+  const totalS = lines.reduce((t, l) => t + airtimeSeconds(unb64u(l.slice(5)).length), 0);
+  $('#frames').insertAdjacentHTML('beforeend', `<div class="row"><button id="snd">🔊 Pasar por sonido a un móvil cercano (${Math.ceil(totalS)} s, a ~1 m)</button><span class="m">Útil para dárselas a quien tenga el mensajero satelital: él solo ve texto cifrado.</span></div>`);
+  $('#snd').onclick = async () => { const b = $('#snd'); b.disabled = true; try { for (let i = 0; i < lines.length; i++) { b.textContent = `🔊 Emitiendo ${i + 1}/${lines.length}…`; await emit(unb64u(lines[i].slice(5))); } b.textContent = '✓ Emitido'; } catch (e) { b.textContent = 'No se pudo emitir: ' + e.message; } };
   if ($('#share')) $('#share').onclick = () => navigator.share({ text: lines.join('\n') }).catch(() => {});
+};
+window.SENDA_MENSAJE = { addBytes: (bytes) => { $('#inbox').value += `\n${PREFIX}${b64u(bytes)}`; } };
+$('#hear').onclick = async () => {
+  const b = $('#hear'); b.disabled = true; b.textContent = '👂 Escuchando 90 s… acerca el otro móvil';
+  try { const l = await listen({ maxS: 90, onPayload: (bytes) => window.SENDA_MENSAJE.addBytes(bytes) }); const n = await l.done; b.textContent = n ? `✓ ${n} línea(s) oída(s): pulsa Abrir` : 'No se oyó nada'; }
+  catch (e) { b.textContent = 'Sin micrófono: ' + e.message; }
+  b.disabled = false;
 };
 $('#open').onclick = async () => {
   const tokens = [...$('#inbox').value.matchAll(/SND2 ([A-Za-z0-9_-]+)/g)].map((m) => m[1]);
