@@ -59,7 +59,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <p><a class="btn" href="/senda">Abrir SENDA Campo</a></p>
 <div class="kpis">
  <div class="k"><b>${unit.pass}/${unit.total}</b>pruebas del núcleo superadas</div>
- <div class="k"><b>${e2e.passed}/${e2e.total}</b>comprobaciones de extremo a extremo con la red cortada (Chromium real)</div>
+ <div class="k"><b>${e2e.passed}/${e2e.total}</b>comprobaciones de extremo a extremo con la red cortada (Chromium real) · ejecución guardada del ${esc(String(e2e.at).slice(0, 10))}, no se repite al generar esta página</div>
  <div class="k"><b>${sc.s01.plan.etaMinutes} min</b>entrega en el escenario Arnhem → San Martín, frente a ${sc.s01.plan.whatsappBaselineMinutes} min esperando a que vuelva la antena</div>
  <div class="k"><b>0</b>dependencias externas en el núcleo (WebCrypto estándar)</div>
  <div class="k"><b>${relay.pass}/${relay.total}</b>pruebas del relé por Internet (ciego al contenido, Docker)</div>
