@@ -18,6 +18,14 @@ const estado = JSON.parse(fs.readFileSync(path.join(repoRoot, 'investor-next', '
 const tests = { core: estado.core, e2e: estado.e2e };
 if (!Number.isInteger(tests.core) || !Number.isInteger(tests.e2e)) die('estado.json sin core/e2e');
 if (estado.coreTotal != null && estado.coreTotal !== tests.core) die(`núcleo ${tests.core}/${estado.coreTotal}: hay pruebas en rojo`);
+// La película no puede citar un recuento viejo: se ejecuta la suite ahora y debe coincidir con estado.json.
+{
+  const { execSync } = await import('node:child_process');
+  const tap = execSync('node --test --test-reporter=tap packages/senda/tests/*.test.mjs', { cwd: repoRoot, encoding: 'utf8', maxBuffer: 64 << 20, shell: '/bin/bash' });
+  const pass = +(/^# pass (\d+)/m.exec(tap)?.[1] ?? NaN), fail = +(/^# fail (\d+)/m.exec(tap)?.[1] ?? NaN);
+  if (fail !== 0) die(`la suite tiene ${fail} pruebas en rojo`);
+  if (pass !== tests.core) die(`estado.json dice ${tests.core} pruebas del núcleo y ahora pasan ${pass}: regenera la página de estado (packages/senda/scripts/build-status-page.mjs)`);
+}
 const agents = fs.readdirSync(path.join(repoRoot, '.opencode', 'agents')).filter((f) => f.endsWith('.md')).length;
 const phys = await core('telecom-mathematical-physics.mjs');
 const rain = (g) => phys.computeRainAttenuation(g, 50).specificAttenuationDbPerKm;
