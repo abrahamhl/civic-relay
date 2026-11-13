@@ -1,0 +1,115 @@
+/* SENDA editorial science layer — diagrams, not synthetic product photography. */
+.ev-section {
+  position: relative;
+  background: #f4f5f3;
+  color: #172326;
+  padding-block: clamp(64px, 8vw, 118px);
+  border-block: 1px solid #dce0df;
+}
+.ev-section .ev-container { min-width: 0; }
+.ev-header { max-width: 900px; margin-bottom: clamp(28px, 4vw, 55px); }
+.ev-eyebrow, .ev-index {
+  color: #506569;
+  font: 700 11px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: .075em;
+}
+.ev-header h2 {
+  max-width: 800px;
+  margin: 12px 0 18px;
+  font-size: clamp(2.25rem, 5.2vw, 4.75rem);
+  letter-spacing: -.063em;
+  line-height: 1.04;
+  font-weight: 750;
+  text-wrap: balance;
+}
+.ev-header > p:last-child {
+  margin: 0;
+  max-width: 780px;
+  color: #4d5c5f;
+  font-size: clamp(1rem, 1.42vw, 1.2rem);
+  line-height: 1.65;
+}
+.ev-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.ev-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  border: 1px solid #d6dcd9;
+  border-radius: 9px;
+  overflow: hidden;
+  background: #fff;
+}
+.ev-figure {
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 360 / 205;
+  border-bottom: 1px solid #e3e7e5;
+  background: #f5f6f5;
+}
+.ev-diagram { display: block; width: 100%; height: 100%; }
+.ev-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: clamp(20px, 2.5vw, 31px); }
+.ev-card h3 {
+  margin: 12px 0 14px;
+  font-size: clamp(1.33rem, 2vw, 1.85rem);
+  line-height: 1.16;
+  letter-spacing: -.04em;
+  font-weight: 720;
+  overflow-wrap: anywhere;
+}
+.ev-card-body > p {
+  margin: 0 0 23px;
+  color: #4b5a5c;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.ev-formula {
+  display: block;
+  min-width: 0;
+  padding: 14px 12px;
+  border-block: 1px solid #e2e6e4;
+  background: #f8f9f7;
+  color: #294947;
+  font: 600 clamp(.72rem, 1.1vw, .88rem)/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.ev-limitation {
+  margin: 13px 0 24px;
+  color: #667579;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.ev-action {
+  display: inline-flex;
+  gap: 15px;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  min-height: 44px;
+  width: fit-content;
+  max-width: 100%;
+  color: #184a47;
+  font-size: 13px;
+  font-weight: 750;
+  border-bottom: 1px solid #a7bcb6;
+  overflow-wrap: anywhere;
+}
+.ev-action:hover, .ev-action:focus-visible { border-color: currentColor; color: #142a2b; }
+.ev-footnote { margin: 17px 0 0; color: #5c6c6e; font-size: 12px; line-height: 1.6; }
+
+@media (max-width: 1050px) {
+  .ev-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .ev-card:last-child { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0,.85fr) minmax(0,1.15fr); }
+  .ev-card:last-child .ev-figure { height: 100%; aspect-ratio: auto; border-bottom: 0; border-right: 1px solid #e3e7e5; }
+}
+@media (max-width: 650px) {
+  .ev-grid { grid-template-columns: minmax(0, 1fr); }
+  .ev-card:last-child { display: flex; grid-column: auto; }
+  .ev-card:last-child .ev-figure { height: auto; aspect-ratio: 360 / 205; border-right: 0; border-bottom: 1px solid #e3e7e5; }
+  .ev-header h2 { font-size: clamp(2.15rem, 9vw, 3.6rem); }
+  .ev-card-body { padding: 21px; }
+}
