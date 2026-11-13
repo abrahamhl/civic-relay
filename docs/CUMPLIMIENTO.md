@@ -12,7 +12,7 @@ Regla de base: `CLAUDE.md` §1 (nada inventado; simulaciones declaradas).
 | 4 | Aviso a la población solo con confirmación oficial; zona de reconocimiento previa | ✅ | regla `canPublicWarn` + `reconZone`, con pruebas |
 | 5 | Cámaras públicas cercanas (Madrid, DGT) para ciudadanos y emergencias | ⏳ | datasets abiertos identificados (`docs/research/FUENTES_CAMARAS_RIOS_FUEGO_2026-11.md`); conector pendiente; la red de la sesión bloquea los dominios |
 | 6 | «Nube termográfica» del fuego: expansión, densidad, combustible por satélite | ⏳ | fuentes: EFFIS, MFE25, FIRMS; integrar en el modelo de fuego |
-| 7 | Conexión multisoftware / interoperabilidad (CAP, EMSI, DATEX II) | 🔧 | existentes en `interop.mjs`; ampliar |
+| 7 | Conexión multisoftware / interoperabilidad (CAP, EMSI, DATEX II) | 🔧 | `incidentToCap`: incidente ciudadano → CAP 1.2 restringido (nunca público), descargable desde `/senda/avisos`; marcado como ejercicio hasta que exista un convenio con un organismo. Pendiente: EMSI, DATEX II de cámaras |
 | 8 | Módulos COTS (térmica, micrófonos, cámaras, dashcam): Vigía | ✅ | `vigia.mjs` (consenso físico) + pruebas; precios sin verificar |
 | 9 | Compras públicas ES/NL/UE: qué funciones pagan los organismos | ✅ | `docs/research/COMPRAS_SOFTWARE_EMERGENCIAS_ES_NL_UE_2026-11.md` (confianza media) |
 | 10 | Drones (trayectorias) y bóveda de defensa: estado real y presentación aparte | ⏳ | revisar `drone.mjs` y `defense/` |
@@ -25,6 +25,7 @@ Regla de base: `CLAUDE.md` §1 (nada inventado; simulaciones declaradas).
 | Fecha y hora (UTC) | Revisado | Avance | Problemas |
 |---|---|---|---|
 | 2026-11-12 23:4x | Lista creada | Regla de veracidad en `CLAUDE.md` | — |
+| 2026-11-13 00:4x (revisión 1) | Todos | 495/495; quitada una afirmación sin fuente (versiones de navegador para Ed25519); CAP 1.2 restringido para incidentes | El contenedor se reinició (render + pruebas sin memoria): render relanzado con menos procesos |
 | 2026-11-13 01:0x | Punto 2 | Reportes firmados que viajan entre móviles | Mi comentario decía 121 caracteres con P-256: era falso (204); cambiado a Ed25519 = 160 exactos y probado |
 | 2026-11-13 00:4x | Punto 2 | Pantalla de avisos | Detectadas y quitadas 3 frases que prometían integración con el 112 o envío por red que aún no existen |
 | 2026-11-13 00:2x | Puntos 0, 1, 13 | Auditoría de veracidad; pantalla de mensaje sin red; guion corregido | La prueba de navegador leía el resultado antes de tiempo (fallo de la prueba, no de la app): corregido |

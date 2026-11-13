@@ -62,7 +62,7 @@ input,select{font:inherit;background:#071018;color:var(--t);border:1px solid var
 </section>
 </main>
 <script type="module">
-import { HAZARD_KINDS, levelFromTaps, riseRate, clusterReports, assessIncident, triageQueue, citizenAdvice, createReporterKeys, encodeReport, decodeReports } from '/senda/core/hazard-reports.mjs';
+import { HAZARD_KINDS, levelFromTaps, riseRate, clusterReports, assessIncident, triageQueue, citizenAdvice, incidentToCap, createReporterKeys, encodeReport, decodeReports } from '/senda/core/hazard-reports.mjs';
 const $ = (s) => document.querySelector(s), esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
 const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* sin almacenamiento */ } };
@@ -119,7 +119,12 @@ function render() {
       <div class="m">${a.reporters} persona(s) · ${a.reports} reporte(s) · prioridad ${a.score} · probabilidad de que sea real ${a.pReal >= 0.99 ? '≥ 99' : (100 * a.pReal).toFixed(0)} % (modelo sin calibrar)${a.trapped ? ` · <b style="color:var(--r)">${a.trapped} atrapada(s)</b>` : ''}</div>
       <div class="m">${esc(a.why.join(' · '))}</div>
       <div>${esc(citizenAdvice(c.reports[0].kind, a).text)}</div>
-      ${a.canPublicWarn ? '' : '<div class="m">Sin confirmación oficial: no se avisa a la población.</div>'}</div>`; }).join('');
+      ${a.canPublicWarn ? '' : '<div class="m">Sin confirmación oficial: no se avisa a la población.</div>'}
+      <div class="row"><button data-cap="${a.id}">Parte CAP 1.2 para la sala (restringido)</button></div></div>`; }).join('');
+  for (const b of $('#incs').querySelectorAll('button[data-cap]')) b.onclick = () => {
+    const a = q.queue.find((x) => x.id === b.dataset.cap), c = cl.find((x) => x.id === a.id), xml = incidentToCap(a, c, { now: Date.now(), exercise: true });
+    const u = URL.createObjectURL(new Blob([xml], { type: 'application/xml' })), l = document.createElement('a'); l.href = u; l.download = `senda-${a.id}.cap.xml`; l.click(); setTimeout(() => URL.revokeObjectURL(u), 2000);
+  };
 }
 $('#demo').onclick = () => {
   const base = pos ?? { lat: 39.4269, lon: -0.4174 }, now = Date.now(), d = (m, a) => ({ lat: base.lat + (m * Math.cos(a)) / 111_320, lon: base.lon + (m * Math.sin(a)) / (111_320 * Math.cos((base.lat * Math.PI) / 180)) });

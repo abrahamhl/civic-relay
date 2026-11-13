@@ -18,6 +18,8 @@
  *     certeza. Nunca se disuade de llamar al 112 cuando hay riesgo para la vida.
  */
 
+import { toCap } from './interop.mjs';
+
 const R_EARTH = 6_371_000;
 export function distanceM(a, b) {
   const t = Math.PI / 180, dLa = (b.lat - a.lat) * t, dLo = (b.lon - a.lon) * t;
@@ -155,7 +157,7 @@ export function citizenAdvice(kind, assessed) {
 
 /* ───────────── 6. Reporte compacto y firmado para viajar por cualquier vía ─────────────
  * 20 B de datos + 32 B de clave pública Ed25519 + 64 B de firma = 116 B → una línea «SND3 …» de exactamente
- * 160 caracteres (un SMS o un mensaje de mensajero satelital). Ed25519: Node, Chrome 113+, Safari 17+, Firefox 129+. Sin nombre ni teléfono: el autor es la huella de una clave
+ * 160 caracteres (un SMS o un mensaje de mensajero satelital). Ed25519 comprobado en Node 22 y en el Chromium de las pruebas; versiones mínimas de cada navegador: no verificadas. Sin nombre ni teléfono: el autor es la huella de una clave
  * de reportes del propio móvil (seudónimo), lo justo para contar personas distintas y aprender
  * reputación, y para que nadie pueda fabricar reportes en nombre de otro móvil.
  * Formato: ver(1) tipo(1) lat·1e5(4) lon·1e5(4) minutos desde 2020(4) atrapados(1) heridos(1)
@@ -204,4 +206,26 @@ export async function decodeReports(text) {
     } catch (e) { rejected.push(e.message); }
   }
   return { reports: ok, rejected };
+}
+
+/* ───────────── 7. Exportar un incidente a CAP 1.2 para la sala de emergencias ───────────── */
+const FAMILY_CAP = { WATER: 'Met', FIRE: 'Fire', ROAD: 'Transport', STRUCTURE: 'Rescue' };
+/**
+ * CAP 1.2 con ámbito RESTRINGIDO (para el organismo, no para la población). Certeza según el estado:
+ * OFFICIAL → Observed; RECON/CORROBORATED → Likely; RUMOR → Possible. Nunca sale como aviso público:
+ * la difusión a la población la decide y la firma el organismo con sus propios sistemas.
+ */
+export function incidentToCap(assessed, cluster, { sender = 'senda@organismo.example', now, exercise = true } = {}) {
+  if (!Number.isFinite(now)) throw new TypeError('now obligatorio');
+  const certainty = assessed.state === 'OFFICIAL' ? 'Observed' : assessed.state === 'RUMOR' ? 'Possible' : 'Likely';
+  const severity = assessed.lifeRisk ? 'Extreme' : assessed.severity >= 0.6 ? 'Severe' : 'Moderate';
+  const rise = cluster.reports.map((r) => r.measurement?.rise?.cmPerMin).filter((x) => Number.isFinite(x));
+  const kinds = [...new Set(cluster.reports.map((r) => HAZARD_KINDS[r.kind].label))];
+  const radiusKm = Math.max(0.1, Math.max(...cluster.reports.map((r) => distanceM(cluster.center, r))) / 1000);
+  return toCap({ identifier: `SENDA-REP-${assessed.id}-${cluster.firstAt}`, sender, sent: now, status: exercise ? 'Exercise' : 'Actual', msgType: 'Alert', scope: 'Restricted',
+    info: { category: FAMILY_CAP[cluster.family] ?? 'Other', event: `Reportes ciudadanos: ${kinds.join(', ')}`, urgency: assessed.lifeRisk ? 'Immediate' : 'Expected', severity, certainty,
+      headline: `${assessed.reporters} persona(s) distinta(s), ${assessed.reports} reporte(s) · estado ${assessed.state}`,
+      description: `Agrupado por SENDA a partir de reportes firmados de móviles (seudónimos). Probabilidad del modelo ${assessed.pReal} (razones de verosimilitud sin calibrar). Motivos: ${assessed.why.join('; ')}. SENDA no ha avisado a la población.`,
+      parameters: [['SENDA_STATE', assessed.state], ['SENDA_REPORTERS', assessed.reporters], ['SENDA_TRAPPED', assessed.trapped ?? 0], ['SENDA_INJURED', assessed.injured ?? 0], ...(rise.length ? [['SENDA_RISE_CM_MIN_MAX', Math.max(...rise).toFixed(2)]] : []), ['SENDA_MODEL_BASIS', assessed.basis]],
+      area: { areaDesc: 'Zona de los reportes', circle: { center: { lat: +cluster.center.lat.toFixed(5), lon: +cluster.center.lon.toFixed(5) }, radiusKm: +radiusKm.toFixed(2) } } } });
 }

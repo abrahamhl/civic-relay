@@ -89,3 +89,21 @@ test('reporte firmado: cabe en una línea de SMS, se verifica y no se puede fals
   const many = (await decodeReports(Array(5).fill(line).join('\n'))).reports;
   assert.equal(new Set(many.map((x) => x.deviceId)).size, 1);
 });
+
+test('CAP 1.2 para la sala: restringido, nunca público; certeza según estado; parámetros del cuadro', async () => {
+  const { incidentToCap } = await import('../src/hazard-reports.mjs');
+  const reps = Array.from({ length: 4 }, (_, i) => ({ kind: 'STREET_FLOODED', ...off(30, 1, 0), at: T0 + i * 60_000, deviceId: `c${i}`, ...(i === 2 ? { measurement: { rise: { cmPerMin: 1.3, stdErr: 0.1 } } } : {}) }));
+  reps.push({ kind: 'PERSON_TRAPPED', ...off(3000, 0, 1), at: T0, deviceId: 'z', people: { trapped: 1 } });
+  const cl = clusterReports(reps), q = triageQueue(cl.map((c) => assessIncident(c)), cl);
+  const water = q.queue.find((a) => a.family === 'WATER'), c = cl.find((x) => x.id === water.id);
+  const cap = incidentToCap(water, c, { now: T0 + 600_000 });
+  assert.match(cap, /<scope>Restricted<\/scope>/); assert.doesNotMatch(cap, /<scope>Public/);
+  assert.match(cap, /<status>Exercise<\/status>/);
+  assert.match(cap, /<certainty>Likely<\/certainty>/);
+  assert.match(cap, /<valueName>SENDA_RISE_CM_MIN_MAX<\/valueName><value>1.30<\/value>/);
+  assert.match(cap, /SENDA no ha avisado a la población/);
+  const tr = q.queue.find((a) => a.family === 'STRUCTURE'), ct = cl.find((x) => x.id === tr.id);
+  const capT = incidentToCap(tr, ct, { now: T0 });
+  assert.match(capT, /<severity>Extreme<\/severity>/); assert.match(capT, /<certainty>Possible<\/certainty>/);
+  assert.match(capT, /<valueName>SENDA_TRAPPED<\/valueName><value>1<\/value>/);
+});
