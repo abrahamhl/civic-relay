@@ -25,6 +25,7 @@ Regla de base: `CLAUDE.md` §1 (nada inventado; simulaciones declaradas).
 | Fecha y hora (UTC) | Revisado | Avance | Problemas |
 |---|---|---|---|
 | 2026-11-12 23:4x | Lista creada | Regla de veracidad en `CLAUDE.md` | — |
+| 2026-11-13 18:36 (revisión 18) | Calidad del núcleo | 498/498. Corregido el fallo de nombres ocultos en el índice (TEXT_PREFIX, ACCESS, parseFirmsCsv, satVapHpa): expuestos con nombre propio y prueba que falla ante cualquier choque nuevo. La CI de navegador ya corre en este PR (ejecución nº 30, éxito) | — |
 | 2026-11-13 17:36 (revisión 17) | Calidad | 496/496. Nuevo `investor-next/scripts/senda-screens-e2e.mjs` (14 comprobaciones en Chromium con varios móviles: mensaje, avisos, sonido, Centro y CAP), 14/14 en local y añadido a la CI | El sonido se verifica decodificando la señal generada, no por altavoz/micrófono reales (lo dice la evidencia) |
 | 2026-11-13 16:44 (revisión 16) | Punto 11 | 496/496. Grabación real del incendio 3D (terreno, Sentinel-2 y GFS reales; frente rotulado como modelo sin validar) | Primer intento con encuadre cortado y rótulo truncado: corregido antes de entregar |
 | 2026-11-13 15:42 (revisión 15) | Punto 11 | 496/496. Grabación real del mensaje sin red (dos móviles, emparejar → cifrar → una línea → abrir con autenticidad) | Revisión con ~1 h de retraso del programador de tareas |
