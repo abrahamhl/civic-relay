@@ -55,13 +55,15 @@ input,select{font:inherit;background:#071018;color:var(--t);border:1px solid var
   <h2>3 · Qué está pasando en la zona</h2>
   <h3 style="font-size:15px;margin:0 0 6px">Reportes recibidos</h3>
   <textarea id="paste" rows="3" style="width:100%;font:13px ui-monospace,monospace;background:#071018;color:var(--t);border:1px solid var(--l);border-radius:10px;padding:10px" placeholder="Pega aquí líneas SND3 que te hayan llegado (pueden venir mezcladas con otro texto)"></textarea>
-  <div class="row"><button class="g" id="import">Añadir reportes recibidos</button><span class="m" id="imp"></span></div>
+  <div class="row"><button class="g" id="import">Añadir reportes recibidos</button><button id="hear">👂 Escuchar reportes por sonido</button><span class="m" id="imp"></span></div>
   <div class="row"><button id="demo">Cargar ejemplo (SIMULACIÓN)</button><button id="clear">Borrar mis datos</button><span class="m" id="qsum"></span></div>
   <div id="incs"><p class="m">Aún no hay reportes. Los reportes de otros vecinos llegarán por la red SENDA (en desarrollo); en esta demo puedes cargar un ejemplo simulado.</p></div>
   <p class="note">Cómo se decide el estado: cada persona distinta suma (si un mismo móvil repite, cuenta una vez; quien ha dado falsas alarmas cuenta menos), una medida de subida suma, un sensor que cuadra suma y un aforo oficial que <i>no</i> sube resta. Las razones de verosimilitud son <b>hipótesis sin calibrar</b> (código: <code>hazard-reports.mjs</code>, <code>EVIDENCE_LR</code>). Estados: rumor → corroborado → reconocimiento previo (se piden datos a cámaras públicas, sensores y vecinos) → oficial.</p>
 </section>
 </main>
 <script type="module">
+import { emit, listen } from '/senda/audio.mjs';
+import { airtimeSeconds } from '/senda/core/acoustic-modem.mjs';
 import { HAZARD_KINDS, levelFromTaps, riseRate, clusterReports, assessIncident, triageQueue, citizenAdvice, incidentToCap, createReporterKeys, encodeReport, decodeReports } from '/senda/core/hazard-reports.mjs';
 const $ = (s) => document.querySelector(s), esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
@@ -83,6 +85,8 @@ $('#send').onclick = async () => {
   if (!keys) { $('#sent').textContent = 'Reporte guardado en este móvil. Este navegador no permite firmarlo para compartirlo.'; return; }
   const line = await encodeReport(r, keys);
   $('#sent').innerHTML = `Reporte guardado y firmado. Compártelo por cualquier vía (grupo del barrio, SMS, mensajero satelital); quien lo reciba lo pega en «Reportes recibidos»:<br><code style="word-break:break-all;font-size:12px">${esc(line)}</code><br><button id="cp">Copiar</button>${navigator.share ? ' <button id="sh">Compartir…</button>' : ''}`;
+  $('#sent').insertAdjacentHTML('beforeend', ` <button id="snd">🔊 Pasar por sonido (${airtimeSeconds(116).toFixed(0)} s, a ~1 m)</button>`);
+  $('#snd').onclick = async () => { const b = $('#snd'); b.disabled = true; b.textContent = '🔊 Emitiendo…'; try { await emit(unb64u(line.slice(5))); b.textContent = '✓ Emitido'; } catch (e) { b.textContent = 'No se pudo emitir: ' + e.message; } };
   $('#cp').onclick = () => navigator.clipboard?.writeText(line); if ($('#sh')) $('#sh').onclick = () => navigator.share({ text: line }).catch(() => {});
 };
 
@@ -132,12 +136,22 @@ $('#demo').onclick = () => {
   reports.push({ kind: 'PERSON_TRAPPED', ...d(1500, 2), at: now - 300_000, deviceId: 'sim-t', simulated: true, people: { trapped: 2, injured: 0 } });
   store('senda-avisos-reports', reports); render();
 };
-$('#import').onclick = async () => {
-  const { reports: got, rejected } = await decodeReports($('#paste').value);
+const b64u = (u8) => btoa(String.fromCharCode(...u8)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64u = (t) => Uint8Array.from(atob(t.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((t.length + 3) % 4)), (c) => c.charCodeAt(0));
+async function ingest(text) {
+  const { reports: got, rejected } = await decodeReports(text);
   const key = (r) => `${r.deviceId}|${r.kind}|${r.at}|${r.lat}|${r.lon}`, have = new Set(reports.map(key)); let added = 0;
   for (const r of got) if (!have.has(key(r))) { reports.push(r); have.add(key(r)); added++; }
   store('senda-avisos-reports', reports); render();
   $('#imp').textContent = `${added} nuevo(s) · ${got.length - added} repetido(s)${rejected.length ? ` · ${rejected.length} rechazado(s) (firma o formato no válidos)` : ''}`;
+}
+$('#import').onclick = () => ingest($('#paste').value);
+window.SENDA_AVISOS = { ingestBytes: (bytes) => ingest('SND3 ' + b64u(bytes)) };
+$('#hear').onclick = async () => {
+  const b = $('#hear'); b.disabled = true; b.textContent = '👂 Escuchando 60 s… acerca el otro móvil';
+  try { const l = await listen({ maxS: 60, onPayload: (bytes) => window.SENDA_AVISOS.ingestBytes(bytes) }); const n = await l.done; b.textContent = n ? `✓ ${n} reporte(s) oído(s)` : 'No se oyó ningún reporte'; }
+  catch (e) { b.textContent = 'Sin micrófono: ' + e.message; }
+  b.disabled = false;
 };
 $('#clear').onclick = () => { reports = []; series = []; store('senda-avisos-reports', reports); store('senda-avisos-series', series); render(); $('#series').textContent = ''; };
 draw(); render();
