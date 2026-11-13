@@ -40,7 +40,7 @@ const copy: Record<Locale, EditorialCopy> = {
   }
 };
 
-function FresnelFigure() {
+function FresnelFigure({ locale: _locale }: { locale: Locale }) {
   return <svg className="ev-diagram" viewBox="0 0 360 205" role="img" aria-label="Geometric Fresnel ellipsoid above a terrain cross-section">
     <rect width="360" height="205" fill="#f5f6f5" />
     <path d="M16 170 L54 156 L92 172 L137 148 L177 163 L208 130 L244 145 L284 119 L344 143" fill="none" stroke="#aab1b4" strokeWidth="1.8"/>
@@ -55,24 +55,26 @@ function FresnelFigure() {
   </svg>;
 }
 
-function QueueFigure() {
+function QueueFigure({ locale }: { locale: Locale }) {
+  const labels = { es: ['ORIGEN','CUSTODIA','DESTINO','ACK: PENDIENTE'], en: ['SOURCE','CUSTODY','TARGET','ACK: PENDING'], nl: ['BRON','BEWARING','DOEL','ACK: WACHT'] }[locale];
   return <svg className="ev-diagram" viewBox="0 0 360 205" role="img" aria-label="Three nodes and an explicitly queued message pending end-to-end acknowledgment">
     <rect width="360" height="205" fill="#f5f6f5"/>
     <g fill="none" stroke="#a5aeb0" strokeWidth="1.4"><path d="M74 94 H174" strokeDasharray="5 5"/><path d="M201 94 H293" strokeDasharray="5 5"/></g>
     <g fill="#fff" stroke="#394a4b" strokeWidth="1.6"><circle cx="60" cy="94" r="23"/><circle cx="187" cy="94" r="23"/><circle cx="309" cy="94" r="23"/></g>
     <g fill="#233d3b"><circle cx="60" cy="94" r="5"/><circle cx="187" cy="94" r="5"/><circle cx="309" cy="94" r="5"/></g>
-    <g fill="#526165" fontSize="10" fontFamily="system-ui, sans-serif" textAnchor="middle"><text x="60" y="132">ORIGEN</text><text x="187" y="132">CUSTODIA</text><text x="309" y="132">DESTINO</text></g>
+    <g fill="#526165" fontSize="10" fontFamily="system-ui, sans-serif" textAnchor="middle"><text x="60" y="132">{labels[0]}</text><text x="187" y="132">{labels[1]}</text><text x="309" y="132">{labels[2]}</text></g>
     <path d="M125 84 L137 104 M137 84 L125 104" stroke="#a76252" strokeWidth="2" strokeLinecap="round"/>
     <rect x="159" y="23" width="56" height="31" rx="5" fill="#e2e9e7" stroke="#8fa49d"/>
     <path d="M166 32 H208 M166 38 H202 M166 44 H195" stroke="#678179" strokeWidth="1.5" strokeLinecap="round"/>
     <path d="M187 54 V68" stroke="#678179" strokeDasharray="3 3"/>
     <rect x="225" y="146" width="110" height="25" rx="3" fill="none" stroke="#b4bdbe"/>
-    <text x="280" y="162" fill="#586366" fontSize="9.5" textAnchor="middle" fontFamily="system-ui, sans-serif">ACK: PENDIENTE</text>
+    <text x="280" y="162" fill="#586366" fontSize="9.5" textAnchor="middle" fontFamily="system-ui, sans-serif">{labels[3]}</text>
     <path d="M187 145 H267" stroke="#bcc3c4" strokeDasharray="3 4"/>
   </svg>;
 }
 
-function SatelliteFigure() {
+function SatelliteFigure({ locale }: { locale: Locale }) {
+  const labels = { es: ['HORIZONTE','ÓRBITA'], en: ['HORIZON','ORBIT'], nl: ['HORIZON','BAAN'] }[locale];
   return <svg className="ev-diagram" viewBox="0 0 360 205" role="img" aria-label="Illustrative satellite orbital arc, ground horizon and elevation angle">
     <rect width="360" height="205" fill="#f5f6f5"/>
     <path d="M20 182 Q180 133 340 182" fill="none" stroke="#526d75" strokeWidth="2"/>
@@ -84,7 +86,7 @@ function SatelliteFigure() {
     <path d="M180 159 H300" stroke="#94a7ac" strokeWidth="1.2"/>
     <path d="M209 159 A29 29 0 0 0 187 131" fill="none" stroke="#a1765d" strokeWidth="2"/>
     <circle cx="180" cy="159" r="4" fill="#305c61"/>
-    <g fontSize="10" fill="#536468" fontFamily="system-ui, sans-serif"><text x="200" y="143">α</text><text x="24" y="155">HORIZONTE</text><text x="235" y="18">ÓRBITA</text></g>
+    <g fontSize="10" fill="#536468" fontFamily="system-ui, sans-serif"><text x="200" y="143">α</text><text x="24" y="155">{labels[0]}</text><text x="235" y="18">{labels[1]}</text></g>
     <path d="M180 159 V181" stroke="#718a90" strokeWidth="1"/>
   </svg>;
 }
@@ -104,7 +106,7 @@ export default function EditorialScience({ locale }: { locale: Locale }) {
         {t.cards.map((card,index)=>{
           const Figure = diagrams[index];
           return <article className="ev-card" key={card.eyebrow}>
-            <div className="ev-figure"><Figure/></div>
+            <div className="ev-figure"><Figure locale={locale}/></div>
             <div className="ev-card-body">
               <span className="ev-index">{card.eyebrow}</span>
               <h3>{card.title}</h3>
