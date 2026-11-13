@@ -1114,3 +1114,43 @@
   .site-root .apple-loop-strip { flex-wrap: wrap; max-width: 100%; }
   .site-root .globe-floating { max-width: calc(100% - 24px); min-width: 0; }
 }
+
+
+/* Editorial restraint: remove speculative sci-fi lighting from primary reading surfaces.
+   The actual lab displays remain interactive and retain their evidence labels. */
+.site-root { background: #091116; }
+.site-root .global-grid { opacity: .22; }
+.site-root .topbar.oep-responsive-header {
+  background: rgba(9,17,22,.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: none;
+}
+.site-root .apple-bento-thesis,
+.site-root .apple-bento-surfaces,
+.site-root .apple-bento-surface-card,
+.site-root .apple-bento-scene-card {
+  background: #101b21;
+  border-color: #31414a;
+  border-radius: 12px;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.site-root .apple-bento-surface-card:hover,
+.site-root .apple-bento-scene-card:hover {
+  background: #16252c;
+  border-color: #82989c;
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+.site-root .apple-thesis-quote {
+  background: #0a1318;
+  border-radius: 5px;
+  border-left-color: #91a8a4;
+}
+.site-root .mission-console {
+  background: #0b151a;
+  box-shadow: none;
+}
+.site-root .apple-bento-tag { border-radius: 5px; }
