@@ -18,7 +18,7 @@ Regla de base: `CLAUDE.md` §1 (nada inventado; simulaciones declaradas).
 | 10 | Drones (trayectorias) y bóveda de defensa: estado real y presentación aparte | 🔧 revisado | **Civil** (`drone.mjs`): Remote ID ASTM F3411 (codificar/decodificar, «validar con capturas reales» según su propio encabezado), misión de barrido de fachadas y dron mula. **Bóveda** (`src/defense/`, 4 módulos, 22 pruebas, aislada del índice civil por prueba): radar acústico TDoA, A2G/enjambres, radar pasivo y Remote ID, cámara acústica. ⚠️ Contiene generación de **señuelos de Remote ID falsos** y **destellos para cegar cámaras de drones**: emitir identificaciones falsas o interferir aeronaves puede ser ilegal en la UE y en España; requiere revisión jurídica antes de presentarlo a nadie. 6 cifras de precio en € sin fuente en la bóveda |
 | 11 | Renders/visualizaciones de las funciones (ver a través del humo, etc.) | ⏳ | tras las pantallas |
 | 12 | App sencilla para la ciudadanía y para los organismos | 🔧 | app Android + Centro; añadir correo y avisos |
-| 13 | Película: corregir afirmaciones (199/200 con canal no disponible en ES/NL; «recibos firmados») | 🔧 | guion corregido y verificado (19/19); render en curso |
+| 13 | Película: corregir afirmaciones (199/200 con canal no disponible en ES/NL; «recibos firmados») | ✅ | v4 renderizada y entregada (12:35, 292 MB): «simulación de 200 envíos… 198», «recibos anónimos»; subtítulos comprobados |
 
 ## Registro de revisiones horarias
 
