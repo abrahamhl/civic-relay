@@ -5,7 +5,7 @@ on:
   push:
     branches: [ master, fix/senda-dtn-receipt-quarantine-20261107 ]
   pull_request:
-    branches: [ master, fix/senda-dtn-receipt-quarantine-20261107 ]
+    branches: [ master, fix/senda-dtn-receipt-quarantine-20261107, feat/senda-funding-mission-day1 ]
   workflow_dispatch:
 jobs:
   senda:
