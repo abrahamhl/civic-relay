@@ -25,6 +25,7 @@ Regla de base: `CLAUDE.md` §1 (nada inventado; simulaciones declaradas).
 | Fecha y hora (UTC) | Revisado | Avance | Problemas |
 |---|---|---|---|
 | 2026-11-12 23:4x | Lista creada | Regla de veracidad en `CLAUDE.md` | — |
+| 2026-11-13 20:36 (revisión 20) | CI | 498/498. Fallo de la CI (48/49, «Llamada sin Internet») causado por una espera fija de 3,5 s en la prueba: sustituida por esperar a que lleguen chat y voz (mismas aserciones); 49/49 en local y CI en verde en f5fa3b7 | — |
 | 2026-11-13 19:36 (revisión 19) | Documentación | 498/498. Registro de cambios de hoy añadido a `00_CHANGELOG.md` (entrada, procesamiento, validación y límites) | — |
 | 2026-11-13 18:36 (revisión 18) | Calidad del núcleo | 498/498. Corregido el fallo de nombres ocultos en el índice (TEXT_PREFIX, ACCESS, parseFirmsCsv, satVapHpa): expuestos con nombre propio y prueba que falla ante cualquier choque nuevo. La CI de navegador ya corre en este PR (ejecución nº 30, éxito) | — |
 | 2026-11-13 17:36 (revisión 17) | Calidad | 496/496. Nuevo `investor-next/scripts/senda-screens-e2e.mjs` (14 comprobaciones en Chromium con varios móviles: mensaje, avisos, sonido, Centro y CAP), 14/14 en local y añadido a la CI | El sonido se verifica decodificando la señal generada, no por altavoz/micrófono reales (lo dice la evidencia) |
