@@ -17,7 +17,7 @@ Regla de base: `CLAUDE.md` §1 (nada inventado; simulaciones declaradas).
 | 9 | Compras públicas ES/NL/UE: qué funciones pagan los organismos | ✅ | `docs/research/COMPRAS_SOFTWARE_EMERGENCIAS_ES_NL_UE_2026-11.md` (confianza media) |
 | 10 | Drones (trayectorias) y bóveda de defensa: estado real y presentación aparte | 🔧 revisado | **Civil** (`drone.mjs`): Remote ID ASTM F3411 (codificar/decodificar, «validar con capturas reales» según su propio encabezado), misión de barrido de fachadas y dron mula. **Bóveda** (`src/defense/`, 4 módulos, 22 pruebas, aislada del índice civil por prueba): radar acústico TDoA, A2G/enjambres, radar pasivo y Remote ID, cámara acústica. ⚠️ Contiene generación de **señuelos de Remote ID falsos** y **destellos para cegar cámaras de drones**: emitir identificaciones falsas o interferir aeronaves puede ser ilegal en la UE y en España; requiere revisión jurídica antes de presentarlo a nadie. 6 cifras de precio en € sin fuente en la bóveda |
 | 11 | Renders/visualizaciones de las funciones (ver a través del humo, etc.) | ⏳ | tras las pantallas |
-| 12 | App sencilla para la ciudadanía y para los organismos | 🔧 | app Android + Centro; añadir correo y avisos |
+| 12 | App sencilla para la ciudadanía y para los organismos | 🔧 | Ciudadanía: `/senda/mensaje`, `/senda/avisos`. Organismo: el Centro importa reportes firmados SND3 → verifica, agrupa, prioriza y exporta CAP (probado con 4 móviles: 5 válidas, 1 repetida, 1 falsa rechazada, atrapados primero). Pendiente: difusión automática por malla/LoRa |
 | 13 | Película: corregir afirmaciones (199/200 con canal no disponible en ES/NL; «recibos firmados») | ✅ | v4 renderizada y entregada (12:35, 292 MB): «simulación de 200 envíos… 198», «recibos anónimos»; subtítulos comprobados |
 
 ## Registro de revisiones horarias
@@ -25,6 +25,7 @@ Regla de base: `CLAUDE.md` §1 (nada inventado; simulaciones declaradas).
 | Fecha y hora (UTC) | Revisado | Avance | Problemas |
 |---|---|---|---|
 | 2026-11-12 23:4x | Lista creada | Regla de veracidad en `CLAUDE.md` | — |
+| 2026-11-13 03:35 (revisión 4) | Todos | 496/496; cola de reportes ciudadanos en el Centro (flujo ciudadano → organismo de punta a punta) | Las fuentes abiertas (datos.madrid.es, nap.dgt.es, AEMET, Rijkswaterstaat) siguen inaccesibles desde la sesión. Quitada la palabra «malla» de una pantalla porque esa difusión aún no existe |
 | 2026-11-13 02:35 (revisión 3) | Todos | 496/496; película v4 entregada; punto 6 revisado contra la app (ya implementado, con límites declarados) | Sin cifras nuevas sin fuente en la hora. Combustible real y validación independiente siguen bloqueados por datos |
 | 2026-11-13 01:35 (revisión 2) | Todos | 496/496; sin trabajo nuevo de código en la hora (render en curso, 69 %); revisado el punto 10 (drones y bóveda) | Riesgo legal detectado en la bóveda (señuelos de Remote ID, destellos contra cámaras): no se amplía ni se presenta sin revisión jurídica |
 | 2026-11-13 00:4x (revisión 1) | Todos | 495/495; quitada una afirmación sin fuente (versiones de navegador para Ed25519); CAP 1.2 restringido para incidentes | El contenedor se reinició (render + pruebas sin memoria): render relanzado con menos procesos |

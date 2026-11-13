@@ -154,6 +154,13 @@ footer{padding:0 22px 30px;max-width:1600px;margin:0 auto;color:var(--d);font-si
         <p class="muted" id="pdel-note" style="margin:0">Plan con fallos correlacionados (<span class="mono">delivery-assurance.mjs</span>), recalculado cuando cae una antena o cambia la lluvia.</p>
       </section>
     </div>
+    <section class="card" id="citizen">
+      <h2>Reportes ciudadanos · cola para la sala <span class="tag live">FIRMADOS · SIN DATOS PERSONALES</span></h2>
+      <p class="muted" style="margin:0">Pega las líneas <span class="mono">SND3</span> que lleguen de los móviles (por SMS, mensajero satelital o grupos de mensajería; la difusión automática por malla está en desarrollo). Se verifican las firmas, se agrupan en incidentes, se contrastan y se ordenan por gravedad. Ningún aviso a la población sale de aquí. <span class="mono">hazard-reports.mjs</span></p>
+      <textarea id="cit-in" rows="3" style="width:100%;margin-top:10px;font:12px var(--mono);background:rgba(0,0,0,.35);color:inherit;border:1px solid var(--line);border-radius:10px;padding:10px" placeholder="SND3 …"></textarea>
+      <div class="rowb"><button class="btn p" id="cit-go">Verificar y priorizar</button></div>
+      <div id="cit-out"></div>
+    </section>
     <section class="card" id="ops">
       <h2>Operación · orden firmada a la población <span class="tag live">CRIPTOGRAFÍA REAL · POBLACIÓN SINTÉTICA</span></h2>
       <p class="muted" style="margin:0">El organismo (ancla de confianza) acredita al coordinador; el coordinador firma una orden para la zona en riesgo; cada teléfono la verifica (firma, credencial, rol, consentimiento, zona, repetición, caducidad) y responde por los canales que siguen vivos. Sale un parte CAP 1.2 para el 112 y una auditoría encadenada. <span class="mono">incident-ops.mjs</span></p>
@@ -189,6 +196,7 @@ import { modulate, demodulate } from '/senda/core/acoustic-modem.mjs';
 import { computeRainAttenuation } from '/senda/core/telecom-mathematical-physics.mjs';
 import { setupAgency, simulatePopulation, issueZoneOrder, deliverOrder, collectResponses, situationReport, learnFromDelivery, STATUS_MODEL } from '/senda/core/incident-ops.mjs';
 import { ReliabilityStore, priorsFromCatalog } from '/senda/core/reliability-store.mjs';
+import { decodeReports, clusterReports, assessIncident, triageQueue, incidentToCap, HAZARD_KINDS } from '/senda/core/hazard-reports.mjs';
 import { createOrganization, issueCredential } from '/senda/core/roles.mjs';
 import { signCommand, keyThumb } from '/senda/core/remote-command.mjs';
 
@@ -439,6 +447,18 @@ $('#reset').onclick = () => { S.now = 0; phoneState = null; $('#pipe').innerHTML
 $('#speed').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.speed = +b.dataset.v; for (const x of $('#speed').children) x.classList.toggle('on', x === b); };
 $('#send').onclick = sendAlert;
 $('#ops-go').onclick = runOrder; $('#ops-forge').onclick = runForged;
+$('#cit-go').onclick = async () => {
+  const out = $('#cit-out'), { reports, rejected } = await decodeReports($('#cit-in').value);
+  if (!reports.length) { out.innerHTML = `<p class="muted">Ninguna línea válida${rejected.length ? ` (${rejected.length} rechazada(s): firma o formato)` : ''}.</p>`; return; }
+  const seen = new Set(), uniq = reports.filter((r) => { const k = `${r.deviceId}|${r.kind}|${r.at}|${r.lat}|${r.lon}`; if (seen.has(k)) return false; seen.add(k); return true; });
+  const cl = clusterReports(uniq), q = triageQueue(cl.map((c) => assessIncident(c)), cl);
+  out.innerHTML = `<p class="muted" style="margin:12px 0 4px">${reports.length} líneas válidas (${reports.length - uniq.length} repetidas) · ${rejected.length} rechazadas · ${q.incidents} incidente(s)</p>
+    <div class="ops-row h"><span>Incidente</span><span class="c">estado</span><span class="c">personas</span><span class="c">atrapados</span><span class="c">CAP</span></div>` +
+    q.queue.map((a) => { const c = cl.find((x) => x.id === a.id); return `<div class="ops-row"><span>${esc(HAZARD_KINDS[c.reports[0].kind].label)}<br><small class="muted">${esc(a.why.join(' · '))}</small></span><b>${a.state}</b><b>${a.reporters}</b><b style="color:${a.trapped ? 'var(--r)' : 'var(--m)'}">${a.trapped}</b><span class="c"><button class="btn" data-cap="${a.id}">XML</button></span></div>`; }).join('') +
+    `<p class="muted" style="margin:8px 0 0">Probabilidades del modelo con razones de verosimilitud sin calibrar. Parte CAP 1.2 restringido y marcado como ejercicio hasta que exista convenio.</p>`;
+  for (const b of out.querySelectorAll('button[data-cap]')) b.onclick = () => { const a = q.queue.find((x) => x.id === b.dataset.cap), c = cl.find((x) => x.id === a.id); dl(`senda-${a.id}.cap.xml`, incidentToCap(a, c, { now: Date.now(), exercise: true }), 'application/xml'); };
+  window.SENDA_CENTRO.lastCitizen = { valid: reports.length, rejected: rejected.length, incidents: q.incidents, top: q.queue[0]?.family };
+};
 window.SENDA_CENTRO = S;
 boot();
 </script>
