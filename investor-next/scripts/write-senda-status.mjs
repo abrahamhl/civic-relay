@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { spawnSync, execFileSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -8,6 +8,7 @@ const project = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const root = resolve(project, '..');
 const run = (directory, extra = []) => {
   const files = readdirSync(resolve(root, directory)).filter(f => f.endsWith('.test.mjs')).sort().map(f => resolve(root, directory, f));
+  if (files.length === 0) throw new Error(`No release tests found in ${directory}; check .vercelignore`);
   const result = spawnSync(process.execPath, ['--test', '--test-reporter=tap', ...files, ...extra], { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   const count = key => Number(result.stdout?.match(new RegExp(`^# ${key} (\\d+)`, 'm'))?.[1] ?? NaN);
   const evidence = { tests: count('tests'), pass: count('pass'), fail: count('fail'), skipped: count('skipped'), exitCode: result.status };
