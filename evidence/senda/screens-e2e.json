@@ -1,0 +1,74 @@
+{
+ "kind": "senda-screens-e2e",
+ "at": "2026-11-13T17:37:31.217Z",
+ "durationS": 29,
+ "passed": 14,
+ "total": 14,
+ "results": [
+  {
+   "name": "mensaje: el número de seguridad coincide en los dos móviles",
+   "ok": true
+  },
+  {
+   "name": "mensaje: un mensaje corto cabe en una línea de ≤ 160 caracteres",
+   "ok": true,
+   "chars": 125
+  },
+  {
+   "name": "mensaje: se abre con autenticidad verificada",
+   "ok": true
+  },
+  {
+   "name": "mensaje: el repetido se detecta",
+   "ok": true
+  },
+  {
+   "name": "mensaje: el alterado no se muestra",
+   "ok": true
+  },
+  {
+   "name": "mensaje: el largo se rehace sin la primera línea y desordenado",
+   "ok": true,
+   "lines": 8
+  },
+  {
+   "name": "mensaje: pasa por sonido de un móvil a otro y se abre",
+   "ok": true
+  },
+  {
+   "name": "avisos: cada reporte firmado ocupa exactamente 160 caracteres",
+   "ok": true
+  },
+  {
+   "name": "avisos: 2 nuevos, 1 repetido y 1 falsificado rechazado",
+   "ok": true,
+   "imp": "2 nuevo(s) · 1 repetido(s) · 1 rechazado(s) (firma o formato no válidos)"
+  },
+  {
+   "name": "avisos: dos vecinos de la misma calle forman un solo incidente",
+   "ok": true
+  },
+  {
+   "name": "avisos: un reporte pasa por sonido y entra verificado",
+   "ok": true
+  },
+  {
+   "name": "centro: 4 líneas válidas, 1 rechazada, 2 incidentes y atrapados primero",
+   "ok": true,
+   "valid": 4,
+   "rejected": 1,
+   "incidents": 2,
+   "top": "STRUCTURE"
+  },
+  {
+   "name": "centro: el parte CAP 1.2 es restringido y de ejercicio",
+   "ok": true
+  },
+  {
+   "name": "sin errores de JavaScript en las páginas",
+   "ok": true,
+   "errors": []
+  }
+ ],
+ "note": "Ubicación del navegador fija; sonido verificado decodificando la señal generada (no por altavoz y micrófono reales)."
+}

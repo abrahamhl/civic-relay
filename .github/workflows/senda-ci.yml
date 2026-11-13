@@ -38,6 +38,8 @@ jobs:
         run: npx --yes playwright@1.63.0 install --with-deps chromium && npm i --no-save --prefix /tmp/pw playwright@1.63.0
       - name: App SENDA Campo extremo a extremo con la red cortada
         run: NODE_PATH=/tmp/pw/node_modules node investor-next/scripts/senda-offline-e2e.mjs
+      - name: Pantallas Mensaje, Avisos y cola del Centro (varios móviles en Chromium)
+        run: NODE_PATH=/tmp/pw/node_modules node investor-next/scripts/senda-screens-e2e.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
