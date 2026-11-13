@@ -11,7 +11,7 @@ Regla de base: `CLAUDE.md` §1 (nada inventado; simulaciones declaradas).
 | 3 | Aliviar el 112: agrupar, contrastar fuentes públicas, priorizar por gravedad | 🔧 | `triageQueue`, `assessIncident`; falta conexión con fuentes reales |
 | 4 | Aviso a la población solo con confirmación oficial; zona de reconocimiento previa | ✅ | regla `canPublicWarn` + `reconZone`, con pruebas |
 | 5 | Cámaras públicas cercanas (Madrid, DGT) para ciudadanos y emergencias | ⏳ | datasets abiertos identificados (`docs/research/FUENTES_CAMARAS_RIOS_FUEGO_2026-11.md`); conector pendiente; la red de la sesión bloquea los dominios |
-| 6 | «Nube termográfica» del fuego: expansión, densidad, combustible por satélite | ⏳ | fuentes: EFFIS, MFE25, FIRMS; integrar en el modelo de fuego |
+| 6 | «Nube termográfica» del fuego: expansión, densidad, combustible por satélite | 🔧 revisado | Ya existe y funciona (probado en Chromium sin errores): `/senda/fuego3d` con terreno Copernicus 30 m, Sentinel-2, meteorología GFS del 23-07-2026, densidad del aire, pluma de Briggs, viento 3D con conservación de masa, humo y pavesas (`atmos3d.mjs`). Declara que sin calibrar el modelo es peor que un círculo y que el ajuste no es validación independiente. Falta: mapas de combustible reales (MFE25/EFFIS; red de la sesión bloqueada) y validar con otro incendio |
 | 7 | Conexión multisoftware / interoperabilidad (CAP, EMSI, DATEX II) | 🔧 | `incidentToCap`: incidente ciudadano → CAP 1.2 restringido (nunca público), descargable desde `/senda/avisos`; marcado como ejercicio hasta que exista un convenio con un organismo. Pendiente: EMSI, DATEX II de cámaras |
 | 8 | Módulos COTS (térmica, micrófonos, cámaras, dashcam): Vigía | ✅ | `vigia.mjs` (consenso físico) + pruebas; precios sin verificar |
 | 9 | Compras públicas ES/NL/UE: qué funciones pagan los organismos | ✅ | `docs/research/COMPRAS_SOFTWARE_EMERGENCIAS_ES_NL_UE_2026-11.md` (confianza media) |
@@ -25,6 +25,7 @@ Regla de base: `CLAUDE.md` §1 (nada inventado; simulaciones declaradas).
 | Fecha y hora (UTC) | Revisado | Avance | Problemas |
 |---|---|---|---|
 | 2026-11-12 23:4x | Lista creada | Regla de veracidad en `CLAUDE.md` | — |
+| 2026-11-13 02:35 (revisión 3) | Todos | 496/496; película v4 entregada; punto 6 revisado contra la app (ya implementado, con límites declarados) | Sin cifras nuevas sin fuente en la hora. Combustible real y validación independiente siguen bloqueados por datos |
 | 2026-11-13 01:35 (revisión 2) | Todos | 496/496; sin trabajo nuevo de código en la hora (render en curso, 69 %); revisado el punto 10 (drones y bóveda) | Riesgo legal detectado en la bóveda (señuelos de Remote ID, destellos contra cámaras): no se amplía ni se presenta sin revisión jurídica |
 | 2026-11-13 00:4x (revisión 1) | Todos | 495/495; quitada una afirmación sin fuente (versiones de navegador para Ed25519); CAP 1.2 restringido para incidentes | El contenedor se reinició (render + pruebas sin memoria): render relanzado con menos procesos |
 | 2026-11-13 01:0x | Punto 2 | Reportes firmados que viajan entre móviles | Mi comentario decía 121 caracteres con P-256: era falso (204); cambiado a Ed25519 = 160 exactos y probado |
