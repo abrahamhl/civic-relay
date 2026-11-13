@@ -15,7 +15,7 @@ Regla de base: `CLAUDE.md` §1 (nada inventado; simulaciones declaradas).
 | 7 | Conexión multisoftware / interoperabilidad (CAP, EMSI, DATEX II) | 🔧 | `incidentToCap`: incidente ciudadano → CAP 1.2 restringido (nunca público), descargable desde `/senda/avisos`; marcado como ejercicio hasta que exista un convenio con un organismo. Pendiente: EMSI, DATEX II de cámaras |
 | 8 | Módulos COTS (térmica, micrófonos, cámaras, dashcam): Vigía | ✅ | `vigia.mjs` (consenso físico) + pruebas; precios sin verificar |
 | 9 | Compras públicas ES/NL/UE: qué funciones pagan los organismos | ✅ | `docs/research/COMPRAS_SOFTWARE_EMERGENCIAS_ES_NL_UE_2026-11.md` (confianza media) |
-| 10 | Drones (trayectorias) y bóveda de defensa: estado real y presentación aparte | ⏳ | revisar `drone.mjs` y `defense/` |
+| 10 | Drones (trayectorias) y bóveda de defensa: estado real y presentación aparte | 🔧 revisado | **Civil** (`drone.mjs`): Remote ID ASTM F3411 (codificar/decodificar, «validar con capturas reales» según su propio encabezado), misión de barrido de fachadas y dron mula. **Bóveda** (`src/defense/`, 4 módulos, 22 pruebas, aislada del índice civil por prueba): radar acústico TDoA, A2G/enjambres, radar pasivo y Remote ID, cámara acústica. ⚠️ Contiene generación de **señuelos de Remote ID falsos** y **destellos para cegar cámaras de drones**: emitir identificaciones falsas o interferir aeronaves puede ser ilegal en la UE y en España; requiere revisión jurídica antes de presentarlo a nadie. 6 cifras de precio en € sin fuente en la bóveda |
 | 11 | Renders/visualizaciones de las funciones (ver a través del humo, etc.) | ⏳ | tras las pantallas |
 | 12 | App sencilla para la ciudadanía y para los organismos | 🔧 | app Android + Centro; añadir correo y avisos |
 | 13 | Película: corregir afirmaciones (199/200 con canal no disponible en ES/NL; «recibos firmados») | 🔧 | guion corregido y verificado (19/19); render en curso |
@@ -25,6 +25,7 @@ Regla de base: `CLAUDE.md` §1 (nada inventado; simulaciones declaradas).
 | Fecha y hora (UTC) | Revisado | Avance | Problemas |
 |---|---|---|---|
 | 2026-11-12 23:4x | Lista creada | Regla de veracidad en `CLAUDE.md` | — |
+| 2026-11-13 01:35 (revisión 2) | Todos | 496/496; sin trabajo nuevo de código en la hora (render en curso, 69 %); revisado el punto 10 (drones y bóveda) | Riesgo legal detectado en la bóveda (señuelos de Remote ID, destellos contra cámaras): no se amplía ni se presenta sin revisión jurídica |
 | 2026-11-13 00:4x (revisión 1) | Todos | 495/495; quitada una afirmación sin fuente (versiones de navegador para Ed25519); CAP 1.2 restringido para incidentes | El contenedor se reinició (render + pruebas sin memoria): render relanzado con menos procesos |
 | 2026-11-13 01:0x | Punto 2 | Reportes firmados que viajan entre móviles | Mi comentario decía 121 caracteres con P-256: era falso (204); cambiado a Ed25519 = 160 exactos y probado |
 | 2026-11-13 00:4x | Punto 2 | Pantalla de avisos | Detectadas y quitadas 3 frases que prometían integración con el 112 o envío por red que aún no existen |
