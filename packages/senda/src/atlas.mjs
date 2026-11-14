@@ -11,7 +11,7 @@
  *  - CITIZEN_SIGNED_UNVERIFIED: reporte ciudadano con firma válida; la firma prueba quién, no que sea cierto.
  *  - SIMULATION: generado para demostrar; siempre se muestra como simulación.
  * La envolvente de detecciones NO es el perímetro quemado: es el polígono convexo de píxeles de satélite
- * (2–6 km por píxel en GOES), útil para ver dirección y ritmo, no para cartografía.
+ * (2 km en el nadir según la especificación de NOAA ABI; 3,9 × 6,3 km en el Camp Fire según referencias.json), útil para ver dirección y ritmo, no para cartografía.
  */
 
 const R = 6_371_008.8; // radio medio terrestre (m), IUGG

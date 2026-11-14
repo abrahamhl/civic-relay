@@ -13,7 +13,7 @@
 
 **Validación:** 506/506 en el núcleo (8 pruebas nuevas del atlas con datos GOES reales); 18/18 en `senda-screens-e2e.mjs` (4 comprobaciones nuevas); 19/19 afirmaciones con `scripts/prove.mjs`.
 
-**Límites:** la envolvente agrupa píxeles de 2–6 km, así que no es el perímetro quemado. Las cámaras son de una captura de 2026 y no grabaron los incendios. La base cartográfica es 1:110m, solo de contexto. Las fuentes en tiempo real (FIRMS, ACLED, GDELT) aún no están conectadas: la red de la sesión las bloquea.
+**Límites:** la envolvente agrupa píxeles de varios km (3,9 × 6,3 km en el Camp Fire, según referencias.json), así que no es el perímetro quemado. Las cámaras son de una captura de 2026 y no grabaron los incendios. La base cartográfica es 1:110m, solo de contexto. Las fuentes en tiempo real (FIRMS, ACLED, GDELT) aún no están conectadas: la red de la sesión las bloquea.
 
 — Claude Code (sesión cloud)
 
