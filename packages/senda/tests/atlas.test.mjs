@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { haversineM, pointInPolygon, inArea, ringAreaKm2, convexHull, makeEvent, filterEvents, timeline, areaStats, growth, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports } from '../src/atlas.mjs';
+import { haversineM, pointInPolygon, inArea, ringAreaKm2, convexHull, makeEvent, filterEvents, timeline, areaStats, growth, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromGdacs, GDACS_TYPES } from '../src/atlas.mjs';
 import { createReporterKeys, encodeReport, decodeReports } from '../src/hazard-reports.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -76,4 +76,14 @@ test('reportes ciudadanos firmados entran como «firmado, no verificado» y se e
   assert.deepEqual(gj.features[0].geometry.coordinates, [-0.41, 39.44]);
   const poly = gj.features[1].geometry.coordinates[0];
   assert.deepEqual(poly[0], poly.at(-1));
+});
+
+test('GDACS real: cada alerta lleva fuente oficial, tipo conocido y coordenadas; procedencia con SHA-256 por página', () => {
+  const snap = ref('gdacs_eventos.json');
+  assert.ok(snap.paginas.length >= 1 && snap.paginas.every((p) => /^[0-9a-f]{64}$/.test(p.sha256) && p.url.startsWith('https://www.gdacs.org/')));
+  const ev = eventsFromGdacs(snap);
+  assert.equal(ev.length, snap.total);
+  assert.ok(ev.every((e) => e.basis === 'OFFICIAL_ALERT' && /GDACS/.test(e.source) && GDACS_TYPES[e.kind.slice(6)]));
+  const bins = timeline(ev, { binMs: 86_400_000 });
+  assert.equal(bins.reduce((s, b) => s + b.n, 0), ev.length);
 });

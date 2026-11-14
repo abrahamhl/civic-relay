@@ -8,6 +8,7 @@
  * Reglas de veracidad (CLAUDE.md §1): cada evento lleva `source` y `basis`. Los valores de `basis` son:
  *  - MEASURED_SATELLITE: detección de satélite descargada de una fuente pública (p. ej. NOAA GOES-R FDC).
  *  - MEASURED_CAMERA: recuento hecho en el repo sobre vídeo público de cámaras de tráfico.
+ *  - OFFICIAL_ALERT: alerta publicada por un sistema oficial (p. ej. GDACS de la ONU y la Comisión Europea), sin modificar.
  *  - CITIZEN_SIGNED_UNVERIFIED: reporte ciudadano con firma válida; la firma prueba quién, no que sea cierto.
  *  - SIMULATION: generado para demostrar; siempre se muestra como simulación.
  * La envolvente de detecciones NO es el perímetro quemado: es el polígono convexo de píxeles de satélite
@@ -17,7 +18,7 @@
 const R = 6_371_008.8; // radio medio terrestre (m), IUGG
 const rad = (d) => (d * Math.PI) / 180;
 
-export const ATLAS_BASIS = Object.freeze(['MEASURED_SATELLITE', 'MEASURED_CAMERA', 'CITIZEN_SIGNED_UNVERIFIED', 'SIMULATION']);
+export const ATLAS_BASIS = Object.freeze(['MEASURED_SATELLITE', 'MEASURED_CAMERA', 'OFFICIAL_ALERT', 'CITIZEN_SIGNED_UNVERIFIED', 'SIMULATION']);
 
 /** Distancia de círculo máximo (haversine) en metros entre {lat,lon}. */
 export function haversineM(a, b) {
@@ -165,4 +166,14 @@ export function eventsFromCameras(tfl, caltrans) {
 /** Reportes ciudadanos ya verificados (salida de decodeReports de hazard-reports.mjs). */
 export function eventsFromReports(reports) {
   return reports.map((r) => makeEvent({ id: `rep:${r.deviceId ?? ''}:${r.kind}:${r.at}`, t: r.at, lat: r.lat, lon: r.lon, kind: r.kind, value: r.people?.trapped || null, unit: r.people?.trapped ? 'atrapados' : null, group: 'ciudadanos', label: r.kind, source: r.simulated ? 'Reporte de demostración generado en la app' : 'Reporte ciudadano firmado (Ed25519)', basis: r.simulated ? 'SIMULATION' : 'CITIZEN_SIGNED_UNVERIFIED' }));
+}
+
+/** Tipos de evento de GDACS (glosario de GDACS). */
+export const GDACS_TYPES = Object.freeze({ EQ: 'Terremoto', TC: 'Ciclón tropical', FL: 'Inundación', VO: 'Volcán', DR: 'Sequía', WF: 'Incendio forestal' });
+
+/** Alertas GDACS descargadas con scripts/datos-reales/gdacs_snapshot.mjs (gdacs_eventos.json). */
+export function eventsFromGdacs(snap) {
+  const src = `GDACS (ONU + Comisión Europea/JRC) · descarga real del ${String(snap.descargadoUTC).slice(0, 10)}`;
+  return (snap.eventos ?? []).map((e) => makeEvent({ id: `gdacs:${e.type}:${e.id}`, t: e.from, lat: e.lat, lon: e.lon, kind: `GDACS_${e.type}`, value: e.severity, unit: e.severityUnit,
+    group: 'world', label: `${e.name} · alerta ${e.alert}${e.severityText ? ` · ${e.severityText}` : ''}`, source: src, basis: 'OFFICIAL_ALERT' }));
 }

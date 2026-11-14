@@ -115,6 +115,9 @@ try {
   const [gdl] = await Promise.all([a.waitForEvent('download'), a.click('#gj')]);
   const gj = JSON.parse(await readFile(await gdl.path(), 'utf8'));
   check('atlas: el GeoJSON exportado lleva fuente y base en cada punto', gj.features.length > 1 && gj.features.filter((f) => f.geometry.type === 'Point' && !f.properties.role).every((f) => f.properties.source && f.properties.basis), { features: gj.features.length });
+  await a.evaluate(() => window.SENDA_ATLAS.setCase('world'));
+  const w = await a.evaluate(() => window.SENDA_ATLAS.last);
+  check('atlas: capa mundial con alertas reales de GDACS (descarga oficial con SHA-256 por página)', w.case === 'world' && w.total > 100, { total: w.total });
   const d = await (await actx.newPage()); d.on('pageerror', (e) => errors.push(`demo: ${e.message}`));
   await d.goto(base + '/demo'); await d.click('#run'); await d.waitForFunction(() => window.SENDA_DEMO?.done || window.SENDA_DEMO?.error, null, { timeout: 30_000 });
   const demo = await d.evaluate(() => window.SENDA_DEMO);

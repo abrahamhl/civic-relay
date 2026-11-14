@@ -34,6 +34,7 @@ input[type=range]{width:100%}
 <section class="card">
   <div class="row" style="margin-top:0">
     <select id="case" aria-label="Caso"></select>
+    <select id="gtype" aria-label="Tipo de alerta" hidden><option value="">Todos los tipos</option></select>
     <button id="mCircle" title="Pulsa el centro y arrastra para fijar el radio">◯ Zona circular</button>
     <button id="mPoly" title="Pulsa los vértices; pulsa el primero (o Cerrar) para terminar">⬠ Polígono</button>
     <button id="close" hidden>Cerrar polígono</button>
@@ -41,8 +42,9 @@ input[type=range]{width:100%}
     <button id="fit">⤢ Encuadrar</button>
   </div>
   <canvas id="map" aria-label="Mapa"></canvas>
-  <div class="lg"><span><i style="background:#ff3b30"></i>detección de fuego reciente</span><span><i style="background:#8a3a1c"></i>detección anterior</span><span><i style="background:var(--i);border-radius:2px"></i>cámara (captura de 2026)</span><span><i style="background:var(--v)"></i>reporte ciudadano</span><span><i style="background:transparent;border:2px dashed var(--a)"></i>envolvente de detecciones</span></div>
-  <div class="row"><button id="play" class="p">▶ Reproducir</button><select id="speed" aria-label="Velocidad"><option value="1800">×30 min/s</option><option value="3600" selected>×1 h/s</option><option value="10800">×3 h/s</option></select>
+  <div class="lg" id="lgf"><span><i style="background:#ff3b30"></i>detección de fuego reciente</span><span><i style="background:#8a3a1c"></i>detección anterior</span><span><i style="background:var(--i);border-radius:2px"></i>cámara (captura de 2026)</span><span><i style="background:var(--v)"></i>reporte ciudadano</span><span><i style="background:transparent;border:2px dashed var(--a)"></i>envolvente de detecciones</span></div>
+  <div class="lg" id="lgw" hidden><span><i style="background:#ff7756"></i>terremoto</span><span><i style="background:#ff3b30"></i>incendio forestal</span><span><i style="background:#4aa8ff"></i>inundación</span><span><i style="background:#b79cff"></i>ciclón</span><span><i style="background:#fbbf24"></i>volcán</span><span><i style="background:#c9a26b"></i>sequía</span><span><i style="background:transparent;border:2px solid var(--r)"></i>alerta roja</span><span><i style="background:transparent;border:2px solid var(--a)"></i>alerta naranja</span><span>· toca un punto para ver el informe oficial</span></div>
+  <div class="row"><button id="play" class="p">▶ Reproducir</button><select id="speed" aria-label="Velocidad"><option value="1800">×30 min/s</option><option value="3600" selected>×1 h/s</option><option value="10800">×3 h/s</option><option value="86400">×1 día/s</option></select>
     <select id="win" aria-label="Qué mostrar"><option value="0">Acumulado</option><option value="3600000">Última hora</option><option value="10800000">Últimas 3 h</option></select>
     <span id="clock">—</span></div>
   <canvas id="tl" aria-label="Línea de tiempo"></canvas>
@@ -50,6 +52,7 @@ input[type=range]{width:100%}
 </section>
 
 <aside class="card">
+  <div id="pick" class="note" hidden></div>
   <h2>En la zona seleccionada</h2>
   <div class="k" id="stats"></div>
   <canvas id="spark" style="width:100%;height:90px;margin-top:10px;display:block"></canvas>
@@ -64,26 +67,31 @@ input[type=range]{width:100%}
 </div>
 
 <script type="module">
-import { haversineM, inArea, filterEvents, timeline, areaStats, growth, convexHull, ringAreaKm2, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports } from '/senda/core/atlas.mjs';
+import { haversineM, inArea, filterEvents, timeline, areaStats, growth, convexHull, ringAreaKm2, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromGdacs, GDACS_TYPES } from '/senda/core/atlas.mjs';
 const $ = (s) => document.querySelector(s);
-const CASES = { camp: 'Camp Fire · Paradise, California (2018)', palisades: 'Palisades · Los Ángeles (2025)', eaton: 'Eaton · Altadena (2025)', marshall: 'Marshall · Colorado (2021)', smokehouse: 'Smokehouse Creek · Texas (2024)', troublesome: 'East Troublesome · Colorado (2020)', creek: 'Creek · California (2020)', london: 'Londres · cámaras de tráfico (captura 2026)', mine: 'Mis reportes (pantalla Avisos)' };
+const CASES = { world: 'Mundo · alertas GDACS de los últimos 30 días (descarga real)', camp: 'Camp Fire · Paradise, California (2018)', palisades: 'Palisades · Los Ángeles (2025)', eaton: 'Eaton · Altadena (2025)', marshall: 'Marshall · Colorado (2021)', smokehouse: 'Smokehouse Creek · Texas (2024)', troublesome: 'East Troublesome · Colorado (2020)', creek: 'Creek · California (2020)', london: 'Londres · cámaras de tráfico (captura 2026)', mine: 'Mis reportes (pantalla Avisos)' };
 const [goes, tfl, refs, land] = await Promise.all(['/senda/data/referencias/goes_casos.json', '/senda/data/referencias/tfl_camaras.json', '/senda/data/referencias/referencias.json', '/geo/land-110m.json'].map((u) => fetch(u).then((r) => r.json())));
+let gdacs = null; try { gdacs = await fetch('/senda/data/referencias/gdacs_eventos.json').then((r) => r.json()); } catch { gdacs = null; }
+const world = gdacs ? eventsFromGdacs(gdacs) : [];
+const GCOL = { EQ: '#ff7756', WF: '#ff3b30', FL: '#4aa8ff', TC: '#b79cff', VO: '#fbbf24', DR: '#c9a26b' };
 const fire = eventsFromGoes(goes), cams = eventsFromCameras(tfl, refs.caltrans);
 let mine = []; try { mine = eventsFromReports(JSON.parse(localStorage.getItem('senda-avisos-reports')) ?? []); } catch { mine = []; }
 for (const [k, v] of Object.entries(CASES)) $('#case').insertAdjacentHTML('beforeend', `<option value="${k}">${v}</option>`);
 
 /* Estado (también en el enlace: #caso=…&t=…&zona=…) */
-const S = { case: 'camp', t: null, area: null, mode: null, draft: [], view: null, play: false, win: 0 };
+const S = { gtype: '', case: 'camp', t: null, area: null, mode: null, draft: [], view: null, play: false, win: 0 };
 const H = new URLSearchParams(location.hash.slice(1));
 if (CASES[H.get('caso')]) S.case = H.get('caso');
 try { if (H.get('zona')) S.area = JSON.parse(atob(H.get('zona'))); } catch { S.area = null; }
 $('#case').value = S.case;
-const timed = () => S.case === 'london' ? [] : S.case === 'mine' ? mine : fire.filter((e) => e.group === S.case);
+const timed = () => S.case === 'world' ? world.filter((e) => !S.gtype || e.kind === 'GDACS_' + S.gtype) : S.case === 'london' ? [] : S.case === 'mine' ? mine : fire.filter((e) => e.group === S.case);
 const statics = () => S.case === 'london' ? cams.filter((e) => e.group === 'london') : S.case === 'mine' ? [] : cams.filter((e) => e.group === S.case);
 let ev = [], t0 = 0, t1 = 1, bins = [], BIN = 600_000;
 function loadCase(keepT) {
   ev = timed().sort((a, b) => a.t - b.t);
   t0 = ev.length ? ev[0].t : Date.now(); t1 = ev.length ? ev.at(-1).t : t0 + 1;
+  // Mundo: la línea de tiempo cubre la ventana descargada; lo que empezó antes (p. ej. sequías en curso) se muestra siempre
+  if (S.case === 'world' && gdacs?.ventana) t0 = Math.max(t0, Date.parse(gdacs.ventana.desde + 'T00:00:00Z'));
   BIN = Math.max(600_000, Math.ceil((t1 - t0) / 60 / 600_000) * 600_000);
   bins = ev.length ? timeline(ev, { binMs: BIN, from: t0, to: t1 }) : [];
   if (!keepT || S.t == null) S.t = t1;
@@ -124,8 +132,11 @@ function draw() {
   for (const e of vis) {
     const [x, y] = proj(e), age = (S.t - e.t) / 3_600_000;
     if (e.kind === 'FIRE_HOTSPOT') { const f = Math.max(0, 1 - age / 3); g.fillStyle = `rgb(${Math.round(138 + 117 * f)},${Math.round(58 + f)},${Math.round(28 + 20 * f)})`; g.globalAlpha = 0.35 + 0.65 * f; }
+    else if (e.basis === 'OFFICIAL_ALERT') { g.fillStyle = GCOL[e.kind.slice(6)] ?? '#9fb2bc'; g.globalAlpha = Math.max(0.35, 1 - age / (24 * 30)); }
     else { g.fillStyle = e.basis === 'SIMULATION' ? '#fbbf24' : '#b79cff'; g.globalAlpha = 1; }
-    g.beginPath(); g.arc(x, y, e.kind === 'FIRE_HOTSPOT' ? rad : 6, 0, 7); g.fill(); g.globalAlpha = 1;
+    const big = /alerta (Red|Orange)/.exec(e.label ?? '');
+    g.beginPath(); g.arc(x, y, e.kind === 'FIRE_HOTSPOT' ? rad : big ? 7 : 3.5, 0, 7); g.fill(); g.globalAlpha = 1;
+    if (big) { g.strokeStyle = big[1] === 'Red' ? '#ff5b6e' : '#fbbf24'; g.lineWidth = 2.5; g.beginPath(); g.arc(x, y, 11, 0, 7); g.stroke(); }
   }
   // Cámaras (sin línea de tiempo)
   for (const c of statics()) { const [x, y] = proj(c), inA = S.area && inArea(c, S.area); g.fillStyle = inA ? '#34d399' : '#91d7e8'; g.fillRect(x - 5, y - 5, 10, 10); if (S.view.s > 300) { g.fillStyle = '#9fb2bc'; g.font = '11px Inter,sans-serif'; g.fillText(c.label, x + 8, y + 4); } }
@@ -135,6 +146,7 @@ function draw() {
   if (A?.type === 'polygon' || S.draft.length) { const ring = A?.type === 'polygon' ? A.ring : S.draft; g.beginPath(); ring.forEach(([lat, lon], i) => { const [x, y] = proj({ lat, lon }); i ? g.lineTo(x, y) : g.moveTo(x, y); }); if (A) { g.closePath(); g.fill(); } g.stroke(); for (const [lat, lon] of S.draft) { const [x, y] = proj({ lat, lon }); g.beginPath(); g.arc(x, y, 4, 0, 7); g.fillStyle = '#91d7e8'; g.fill(); } }
   drawTimeline(); panel();
 }
+const isFire = () => !!goes.casos[S.case];
 const visible = () => filterEvents(ev, { from: S.win ? S.t - S.win : -Infinity, to: S.t });
 
 /* ───── Línea de tiempo con histograma ───── */
@@ -163,22 +175,23 @@ function panel() {
   rows.push(['Zona', S.area ? (S.area.type === 'circle' ? `círculo de ${(S.area.radiusM / 1000).toFixed(1)} km` : `polígono de ${ringAreaKm2(S.area.ring).toFixed(1)} km²`) : 'todo el caso']);
   if (ev.length) {
     rows.push(['Eventos hasta este instante', `${st.n} de ${ev.length}`]);
-    if (st.n) { rows.push(['Primero en la zona', fmt(st.first)]); rows.push(['…tras la primera detección', hm(st.first - t0)]); rows.push(['Último en la zona', fmt(st.last)]); }
+    if (st.n) { rows.push(['Primero en la zona', fmt(st.first)]); if (isFire()) rows.push(['…tras la primera detección', hm(st.first - t0)]); rows.push(['Último en la zona', fmt(st.last)]); }
+    if (S.case === 'world' && st.n) { for (const [k, n] of Object.entries(st.byKind).sort((a, b) => b[1] - a[1])) rows.push([GDACS_TYPES[k.slice(6)] ?? k, String(n)]); const hi = inside.filter((e) => /alerta (Red|Orange)/.test(e.label ?? '')); rows.push(['Alertas naranja o roja', String(hi.length)]); }
     const frp = st.valueSum['FIRE_HOTSPOT:MW']; if (frp) rows.push(['Suma de FRP (potencia radiativa)', `${Math.round(frp).toLocaleString('es')} MW·pasada`]);
-    const hull = convexHull(upTo.filter((e) => e.kind === 'FIRE_HOTSPOT')); if (hull.length >= 3) rows.push(['Envolvente total hasta ahora', `${ringAreaKm2(hull).toFixed(0)} km²`]);
-    if (upTo.length) rows.push(['Alcance desde el origen', `${(Math.max(...upTo.map((e) => haversineM(ev[0], e))) / 1000).toFixed(1)} km`]);
+    const hull = isFire() ? convexHull(upTo.filter((e) => e.kind === 'FIRE_HOTSPOT')) : []; if (hull.length >= 3) rows.push(['Envolvente total hasta ahora', `${ringAreaKm2(hull).toFixed(0)} km²`]);
+    if (upTo.length && isFire()) rows.push(['Alcance desde el origen', `${(Math.max(...upTo.map((e) => haversineM(ev[0], e))) / 1000).toFixed(1)} km`]);
   }
   rows.push(['Cámaras públicas que cubren la zona', String(cIn.length)]);
   $('#stats').innerHTML = rows.map(([a, b]) => `<span class="m">${a}</span><b>${b}</b>`).join('');
   // Crecimiento (todo el caso) con el instante marcado
   const sp = $('#spark'), r = Math.min(2, devicePixelRatio || 1), b = sp.getBoundingClientRect(); sp.width = b.width * r; sp.height = b.height * r; const sg = sp.getContext('2d'); sg.setTransform(r, 0, 0, r, 0, 0); sg.clearRect(0, 0, b.width, b.height);
-  const gr = ev.length > 2 && S.case !== 'mine' ? growth(ev, { binMs: BIN }) : [];
+  const gr = ev.length > 2 && isFire() ? growth(ev, { binMs: BIN }) : [];
   if (gr.length > 1) { const mx = Math.max(...gr.map((x) => x.hullKm2), 1); sg.strokeStyle = '#fbbf24'; sg.lineWidth = 2; sg.beginPath(); gr.forEach((x, i) => { const px = (i / (gr.length - 1)) * b.width, py = b.height - 4 - (x.hullKm2 / mx) * (b.height - 10); i ? sg.lineTo(px, py) : sg.moveTo(px, py); }); sg.stroke(); const cx = ((S.t - t0) / (t1 - t0 || 1)) * b.width; sg.fillStyle = '#ff7756'; sg.fillRect(cx - 1, 0, 2, b.height);
     const hrs = (gr.at(-1).t - gr[0].t) / 3_600_000;
     $('#sparkLbl').textContent = `Envolvente de detecciones a lo largo del caso: hasta ${Math.round(mx)} km²; alcance final ${gr.at(-1).reachKm.toFixed(1)} km en ${hrs.toFixed(1)} h. Calculado con los píxeles GOES: un píxel mide varios km, así que los saltos de un cubo a otro no son velocidades reales del frente.`; }
   else $('#sparkLbl').textContent = '';
   const srcs = new Map(); for (const e of [...ev, ...statics()]) srcs.set(e.source, e.basis);
-  $('#src').innerHTML = [...srcs].map(([s, bz]) => `<div>· ${s} <span class="tag" style="${bz === 'SIMULATION' ? 'color:var(--a);border-color:var(--a)' : ''}">${bz === 'SIMULATION' ? 'SIMULACIÓN' : bz === 'CITIZEN_SIGNED_UNVERIFIED' ? 'firmado, sin verificar' : 'medido'}</span></div>`).join('') + '<div>· Base: Natural Earth 1:110m (0,1°, solo contexto)</div>' + (S.case === 'mine' && !ev.length ? '<div>No hay reportes guardados en este navegador: créalos en <a href="/senda/avisos">Avisos</a>.</div>' : '');
+  $('#src').innerHTML = [...srcs].map(([s, bz]) => `<div>· ${s} <span class="tag" style="${bz === 'SIMULATION' ? 'color:var(--a);border-color:var(--a)' : ''}">${bz === 'SIMULATION' ? 'SIMULACIÓN' : bz === 'CITIZEN_SIGNED_UNVERIFIED' ? 'firmado, sin verificar' : bz === 'OFFICIAL_ALERT' ? 'alerta oficial' : 'medido'}</span></div>`).join('') + '<div>· Base: Natural Earth 1:110m (0,1°, solo contexto)</div>' + (S.case === 'mine' && !ev.length ? '<div>No hay reportes guardados en este navegador: créalos en <a href="/senda/avisos">Avisos</a>.</div>' : '');
   last = { case: S.case, t: S.t, total: ev.length, inside: st.n, first: st.first, camerasInside: cIn.length, area: S.area };
   window.SENDA_ATLAS.last = last;
 }
@@ -197,7 +210,20 @@ cv.addEventListener('pointermove', (e) => {
   if (drag.kind === 'pan') { const k = Math.cos(S.view.lat * Math.PI / 180); S.view = { ...drag.v, lon: drag.v.lon - (x - drag.x) / (k * drag.v.s), lat: drag.v.lat + (y - drag.y) / drag.v.s }; draw(); }
   else { S.area = { type: 'circle', center: drag.c, radiusM: Math.max(200, haversineM(drag.c, unproj(x, y))) }; draw(); }
 });
-cv.addEventListener('pointerup', () => { if (drag?.kind === 'circle') { setMode(null); saveHash(); } drag = null; });
+cv.addEventListener('pointerup', (e) => {
+  if (drag?.kind === 'circle') { setMode(null); saveHash(); }
+  else if (drag?.kind === 'pan') { const [x, y] = pos(e); if (Math.hypot(x - drag.x, y - drag.y) < 4) pick(x, y); }
+  drag = null;
+});
+// Tocar un punto: qué es, cuándo, fuente y enlace al informe oficial si lo hay
+function pick(x, y) {
+  let best = null, bd = 12; for (const ev2 of [...visible(), ...statics()]) { const [px, py] = proj(ev2), dd = Math.hypot(px - x, py - y); if (dd < bd) { bd = dd; best = ev2; } }
+  const el = $('#pick'); if (!best) { el.hidden = true; return; }
+  const rep = best.id.startsWith('gdacs:') ? gdacs.eventos.find((g2) => `gdacs:${g2.type}:${g2.id}` === best.id)?.report : null;
+  el.hidden = false; el.innerHTML = `<b>${esc(best.label ?? best.kind)}</b><br>${fmt(best.t)}${best.value != null ? ` · ${best.value} ${esc(best.unit ?? '')}` : ''}<br><span class="m">${esc(best.source)}</span>${rep ? `<br><a href="${esc(rep)}" target="_blank" rel="noopener">Informe oficial en GDACS ↗</a>` : ''}`;
+  window.SENDA_ATLAS.picked = best.id;
+}
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 cv.addEventListener('wheel', (e) => { e.preventDefault(); const [x, y] = pos(e), before = unproj(x, y); S.view.s *= e.deltaY < 0 ? 1.25 : 0.8; const after = unproj(x, y); S.view.lat += before.lat - after.lat; S.view.lon += before.lon - after.lon; draw(); }, { passive: false });
 function setMode(m) { S.mode = m; $('#mCircle').classList.toggle('on', m === 'circle'); $('#mPoly').classList.toggle('on', m === 'poly'); cv.style.cursor = m ? 'crosshair' : 'grab'; if (m !== 'poly') { S.draft = []; $('#close').hidden = true; } }
 function closePoly() { if (S.draft.length >= 3) S.area = { type: 'polygon', ring: S.draft }; setMode(null); saveHash(); draw(); }
@@ -206,7 +232,10 @@ $('#mPoly').onclick = () => { setMode(S.mode === 'poly' ? null : 'poly'); };
 $('#close').onclick = closePoly;
 $('#clearArea').onclick = () => { S.area = null; setMode(null); saveHash(); draw(); };
 $('#fit').onclick = () => { fit(); draw(); };
-$('#case').onchange = () => { S.case = $('#case').value; S.area = null; setMode(null); saveHash(); loadCase(false); };
+for (const [k, v] of Object.entries(GDACS_TYPES)) $('#gtype').insertAdjacentHTML('beforeend', `<option value="${k}">${v} (${world.filter((e) => e.kind === 'GDACS_' + k).length})</option>`);
+const legend = () => { $('#lgw').hidden = S.case !== 'world'; $('#lgf').hidden = S.case === 'world'; $('#gtype').hidden = S.case !== 'world'; if (S.case === 'world' && +$('#speed').value < 86400) $('#speed').value = '86400'; };
+$('#gtype').onchange = () => { S.gtype = $('#gtype').value; loadCase(true); };
+$('#case').onchange = () => { S.case = $('#case').value; legend(); S.area = null; setMode(null); saveHash(); loadCase(false); };
 $('#win').onchange = () => { S.win = +$('#win').value; draw(); };
 $('#t').oninput = () => { S.t = t0 + ($('#t').value / 1000) * (t1 - t0); draw(); };
 const scrub = (e) => { const b = tc.getBoundingClientRect(); S.t = t0 + Math.max(0, Math.min(1, (e.clientX - b.left) / b.width)) * (t1 - t0); draw(); };
@@ -226,6 +255,7 @@ $('#link').onclick = async () => { saveHash(); const u = location.href + `&t=${M
 
 window.SENDA_ATLAS = { setCase: (c) => { $('#case').value = c; $('#case').onchange(); }, setArea: (a) => { S.area = a; saveHash(); draw(); }, setTime: (t) => { S.t = t; draw(); }, range: () => ({ t0, t1 }), last: null };
 addEventListener('resize', () => { size(); draw(); });
+legend();
 size(); loadCase(false);
 if (H.get('t') && Number.isFinite(+H.get('t'))) { S.t = Math.max(t0, Math.min(t1, +H.get('t'))); draw(); }
 document.body.dataset.ready = '1';
