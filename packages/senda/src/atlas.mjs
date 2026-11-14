@@ -191,3 +191,16 @@ export function eventsFromDgt(snap) {
       label: `${r.road ?? 'vía sin nombre'} · ${DGT_CAUSES[cause]}${r.detail ? ` (${r.detail})` : ''}`, source: src, basis: 'OFFICIAL_ALERT' });
   });
 }
+
+/** Tipos de situación DATEX II que publica NDW (Países Bajos), en castellano llano. */
+export const NDW_TYPES = Object.freeze({ RoadOrCarriagewayOrLaneManagement: 'Cierre o gestión de carril', SpeedManagement: 'Limitación de velocidad', ReroutingManagement: 'Desvío',
+  VehicleObstruction: 'Vehículo detenido u obstáculo', Accident: 'Accidente', GeneralObstruction: 'Obstrucción', GeneralNetworkManagement: 'Gestión de la red', other: 'Otras' });
+
+/** Situaciones reales de NDW descargadas con scripts/datos-reales/ndw_situaciones_snapshot.mjs (ndw_situaciones.json). */
+export function eventsFromNdw(snap) {
+  const src = `NDW (Países Bajos) · DATEX II actueel_beeld, publicación del ${String(snap.publicacionNDW ?? snap.descargadoUTC).slice(0, 16).replace('T', ' ')} UTC`;
+  return (snap.situaciones ?? []).filter((r) => r.start || r.created).map((r) => {
+    const type = NDW_TYPES[r.type] ? r.type : 'other';
+    return makeEvent({ id: `ndw:${r.id}`, t: r.start ?? r.created, lat: r.lat, lon: r.lon, kind: `NDW_${type}`, group: 'nl', label: `${r.road ? r.road + ' · ' : ''}${NDW_TYPES[type]}`, source: src, basis: 'OFFICIAL_ALERT' });
+  });
+}

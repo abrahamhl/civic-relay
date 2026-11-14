@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { haversineM, pointInPolygon, inArea, ringAreaKm2, convexHull, makeEvent, filterEvents, timeline, areaStats, growth, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromGdacs, GDACS_TYPES, eventsFromDgt, DGT_CAUSES } from '../src/atlas.mjs';
+import { haversineM, pointInPolygon, inArea, ringAreaKm2, convexHull, makeEvent, filterEvents, timeline, areaStats, growth, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromGdacs, GDACS_TYPES, eventsFromDgt, DGT_CAUSES, eventsFromNdw, NDW_TYPES } from '../src/atlas.mjs';
 import { parseDatex2 } from '../src/datex2.mjs';
 import { createReporterKeys, encodeReport, decodeReports } from '../src/hazard-reports.mjs';
 
@@ -109,4 +109,13 @@ test('lector DATEX II: entiende el perfil real de la DGT (v3.7) con namespaces l
   </sit:situationRecord></sit:situation></d2:payload>`;
   const [r] = parseDatex2(xml); // fragmento recortado de un registro real (id 18811074) de la publicación de la DGT del 14-11-2026
   assert.equal(r.road, 'N-400'); assert.equal(r.lat, 39.994446); assert.equal(r.subtypes.causeType[0], 'roadMaintenance');
+});
+
+test('NDW real (Países Bajos): situaciones leídas con el mismo lector DATEX II, dentro de los Países Bajos', () => {
+  const snap = ref('ndw_situaciones.json');
+  assert.match(snap.url, /^https:\/\/opendata\.ndw\.nu\//); assert.match(snap.sha256Gz, /^[0-9a-f]{64}$/);
+  assert.match(snap.licencia, /no verificada/);
+  const ev = eventsFromNdw(snap);
+  assert.ok(ev.length > 0 && ev.every((e) => e.basis === 'OFFICIAL_ALERT' && NDW_TYPES[e.kind.slice(4)]));
+  assert.ok(ev.every((e) => e.lat > 50.6 && e.lat < 53.7 && e.lon > 3.2 && e.lon < 7.3), 'todas dentro de los Países Bajos');
 });
