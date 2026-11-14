@@ -127,11 +127,11 @@ Servir la demo estática desde `apps/web/dist`. La API y el servicio reales **no
 - [`docs/investor/TRL_AND_VALIDATION_ROADMAP.md`](docs/investor/TRL_AND_VALIDATION_ROADMAP.md) – evaluación TRL y hoja de ruta M0–M4
 - [`docs/investor/PILOT_PROPOSAL.md`](docs/investor/PILOT_PROPOSAL.md) – propuesta de piloto controlado de 12 semanas
 - [`docs/investor/FUNDING_OPPORTUNITIES.md`](docs/investor/FUNDING_OPPORTUNITIES.md) – convocatorias verificadas UE / Países Bajos (Horizon Europe Cluster 3, NLnet/NGI, RVO WBSO/MIT)
-- [`docs/investor/FINANCIAL_SCENARIOS.md`](docs/investor/FINANCIAL_SCENARIOS.md) – escenarios financieros (€50k / €180k / €400k)
+- [`docs/investor/FINANCIAL_SCENARIOS.md`](docs/investor/FINANCIAL_SCENARIOS.md) – escenarios financieros **ilustrativos**, no previsiones (€50k / €180k / €400k)
 - [`docs/security/THREAT_MODEL.md`](docs/security/THREAT_MODEL.md) – modelo de amenazas y controles implementados
 - [`docs/security/DEPENDENCY_AND_LICENSE_AUDIT.md`](docs/security/DEPENDENCY_AND_LICENSE_AUDIT.md) – auditoría de dependencias y licencias (MIT)
 - [`docs/security/DATA_AND_CONSENT_BOUNDARIES.md`](docs/security/DATA_AND_CONSENT_BOUNDARIES.md) – privacidad, consentimiento opt-in y purga local
-- [`docs/audits/SIX_ORACLE_INDEPENDENT_REVIEWS_2026.md`](docs/audits/SIX_ORACLE_INDEPENDENT_REVIEWS_2026.md) – revisión independiente de 6 perspectivas de ingeniería
+- [`docs/audits/SIX_ORACLE_INDEPENDENT_REVIEWS_2026.md`](docs/audits/SIX_ORACLE_INDEPENDENT_REVIEWS_2026.md) – revisión en 6 perspectivas de ingeniería **hecha por asistentes de IA en distintos roles**: no es una auditoría independiente humana
 - [`docs/audits/INVESTOR_READINESS_STATUS.md`](docs/audits/INVESTOR_READINESS_STATUS.md) – estado integral de preparación e invariantes verificados
 - [`docs/audits/HUMAN_ACTION_REQUIRED.md`](docs/audits/HUMAN_ACTION_REQUIRED.md) – protocolo físico pendiente con 2 teléfonos Android (`PHYSICAL_TEST_PENDING`)
 - [`docs/AUDITORIAS_INVERSION_PUBLICA.md`](docs/AUDITORIAS_INVERSION_PUBLICA.md) – cinco auditorías técnicas y delegaciones de responsabilidad
