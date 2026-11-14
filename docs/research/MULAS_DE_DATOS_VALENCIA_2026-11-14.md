@@ -39,6 +39,22 @@ Si cae la red móvil, ¿qué fracción de la flota de autobuses tendría que lle
 - **La copia única se hunde** porque una ruta con *k* transbordos solo sobrevive con probabilidad *qᵏ*. Las copias en todos los autobuses encuentran alternativas, y con la mitad de la flota multiplican la entrega por unas 10 veces en el plazo de 120 min.
 - **Muestra pequeña con el plazo de 60 min:** solo 8 de las 40 parejas son posibles incluso con toda la flota.
 
+## ¿Cuántos buzones y dónde? (flota completa, entrega buzón→buzón, el mensaje solo baja o cambia de autobús donde hay buzón)
+
+| Buzones | Por cobertura (MCLP voraz, ≤ 400 m): cubre · entrega ≤ 2 h | En transbordos (más líneas): cubre · entrega ≤ 2 h |
+|---|---|---|
+| 25 | 42 % · 4,5 % | 14 % · 31 % |
+| 50 | 68 % · 7,3 % | 21 % · **63 %** |
+| 100 | 91 % · 10,4 % | 35 % · **83 %** |
+| 200 | 100 % · 14,1 % | 55 % · 85 % |
+| 400 | 100 % · 14,1 % (el voraz se detiene al cubrirlo todo) | 74 % · 95 % |
+| 1152 (todas) | 100 % · 97 % | — |
+
+- **Hallazgo:** colocar buzones solo por **cobertura geográfica**, aunque sea casi óptima (garantía ≥ 1 − 1/e), deja los **transbordos** sin buzón, y el mensaje no puede cambiar de autobús. En las paradas donde se cruzan más líneas la entrega se multiplica por unas 8 veces con 100 buzones, aunque se cubren menos barrios a pie. Lo que sale de aquí es un **plan mixto** (transbordos + cobertura), todavía no calculado.
+- **Precauciones:**
+  - las parejas buzón→buzón se sortean entre los buzones de cada plan, así que las muestras no son idénticas entre planes;
+  - es cobertura de paradas, no de personas (no hay datos de población).
+
 ## Lectura para SENDA
 
 - La estrategia por defecto del canal offline debe ser **multicopia** (epidémica o con un límite de copias), **no copia única**.

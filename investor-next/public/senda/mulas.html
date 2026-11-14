@@ -36,6 +36,7 @@
     <div class="hd">Entrega según la flota equipada (40 parejas, 30 flotas al azar)</div>
     <div id="chart" style="padding:8px 12px"></div>
     <div class="note" id="chartNote"></div>
+    <div class="hd">¿Cuántos buzones y dónde? (flota completa)</div><div id="box" style="padding:6px 12px"></div><div class="note" id="boxNote"></div>
     <div class="hd">Hipótesis (por eso es simulación)</div><ul class="h" id="hyp"></ul>
     <div class="hd">Fuente</div><div class="note" id="src"></div>
   </div>
@@ -90,7 +91,13 @@ function chart() {
 }
 $('#hyp').innerHTML = D.hipotesis.map((h) => `<li>${esc(h)}</li>`).join('');
 $('#src').innerHTML = `GTFS de la EMT de València · ${esc(D.fuente.licencia)} · SHA-256 del ZIP <span style="font-family:var(--mono)">${esc(D.fuente.sha256Zip.slice(0, 16))}…</span> · ${N.toLocaleString('es')} conexiones de ${conns.nTrips} viajes entre las 07:00 y las 11:00. ${esc(D.metodo)}`;
-size(); chart(); run(); document.body.dataset.ready = '1';
+function boxes() {
+  const B = D.buzones; if (!B) return; const C = B.resultados.filter((r) => r.K <= 400), H = B.transbordos.resultados, pc = (x) => (x == null ? '—' : (100 * x).toFixed(0) + ' %');
+  $('#box').innerHTML = `<table style="width:100%;border-collapse:collapse;font:11.5px var(--mono)"><tr style="color:var(--m)"><th style="text-align:left">Buzones</th><th>Por cobertura<br>cubre · entrega ≤2 h</th><th>En transbordos<br>cubre · entrega ≤2 h</th></tr>${C.map((c, i) => `<tr><td>${c.K}</td><td style="text-align:center">${pc(c.cobertura400m)} · ${pc(c.entrega120)}</td><td style="text-align:center;color:#3ddc97">${pc(H[i]?.cobertura400m)} · ${pc(H[i]?.entrega120)}</td></tr>`).join('')}<tr><td>todas (${B.resultados.at(-1).K})</td><td colspan="2" style="text-align:center">100 % · ${pc(B.resultados.at(-1).entrega120)}</td></tr></table>`;
+  $('#boxNote').textContent = 'Poner buzones solo para cubrir barrios (cobertura máxima voraz) deja los transbordos sin buzón y el mensaje no puede cambiar de autobús. Ponerlos en las paradas donde se cruzan más líneas multiplica la entrega, pero cubre menos barrios a pie: hace falta un plan mixto. Cobertura de paradas, no de personas (sin datos de población). Simulación.';
+  window.SENDA_MULAS_BOX = { cover100: C.find((c) => c.K === 100)?.entrega120, hubs100: H.find((h) => h.K === 100)?.entrega120 };
+}
+size(); chart(); boxes(); run(); document.body.dataset.ready = '1';
 </script>
 </body>
 </html>

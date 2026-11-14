@@ -75,9 +75,10 @@ const INF = 0x7fffffff;
 /**
  * Connection Scan Algorithm: llegada más temprana desde `source` saliendo en `t0`.
  * up(tripIndex) → false si ese autobús NO lleva nodo SENDA (no transporta datos).
+ * hub(stop) → true si la parada tiene buzón SENDA (si se omite, se supone buzón en todas).
  * Devuelve arrival[stop] (INF si no se llega) y lastConn[stop] para reconstruir la ruta.
  */
-export function csa(conns, source, t0, { up = () => true } = {}) {
+export function csa(conns, source, t0, { up = () => true, hub = null } = {}) {
   const { dep, arr, from, to, trip, nStops, nTrips } = conns;
   const T = new Int32Array(nStops).fill(INF), onTrip = new Uint8Array(nTrips), last = new Int32Array(nStops).fill(-1), enter = new Int32Array(nTrips).fill(-1);
   T[source] = t0;
@@ -87,7 +88,8 @@ export function csa(conns, source, t0, { up = () => true } = {}) {
     if (onTrip[tr] || T[from[i]] <= dep[i]) {
       if (!up(tr)) continue;
       if (!onTrip[tr]) { onTrip[tr] = 1; enter[tr] = i; }
-      if (arr[i] < T[to[i]]) { T[to[i]] = arr[i]; last[to[i]] = i; }
+      // Con buzones (hub): el mensaje solo puede bajar o cambiar de autobús en paradas con buzón
+      if ((!hub || hub(to[i])) && arr[i] < T[to[i]]) { T[to[i]] = arr[i]; last[to[i]] = i; }
     }
   }
   return { arrival: T, last, enter };
@@ -134,4 +136,45 @@ export function adoptionStudy(conns, pairs, t0, { qs = [0.1, 0.25, 0.5, 0.75, 1]
     out.push({ q, trials: n, epidemic: n ? epi / n : null, singleCopy: n ? single / n : null, epidemicP50Min: delays.length ? delays[delays.length >> 1] : null });
   }
   return { deadlineMin, runs, pairs: base.length, feasibleWithFullFleet: base.filter((b) => b.full !== INF && (b.full - t0) / 60 <= deadlineMin).length, results: out, basis: 'SIMULATION' };
+}
+
+/** Distancia de círculo máximo en metros. */
+export const distM = (a, b) => { const r = Math.PI / 180, dφ = (b.lat - a.lat) * r, dλ = (b.lon - a.lon) * r, x = Math.sin(dφ / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dλ / 2) ** 2; return 12742000 * Math.asin(Math.sqrt(x)); };
+
+/**
+ * Dónde poner K buzones SENDA: cobertura máxima (MCLP, Church y ReVelle 1974) con el algoritmo voraz, que garantiza al
+ * menos (1 − 1/e) ≈ 63 % del óptimo por ser la cobertura submodular (Nemhauser, Wolsey y Fisher 1978).
+ * Una parada queda «servida» si hay un buzón a ≤ radiusM a pie. pts: [{lat, lon}]. Devuelve el orden de elección y la
+ * cobertura acumulada (fracción de paradas servidas). Es una cobertura geométrica: no usa población (no medida aquí).
+ */
+export function placeBoxes(pts, K, { radiusM = 400 } = {}) {
+  const n = pts.length, near = pts.map((p) => { const out = []; for (let j = 0; j < n; j++) if (distM(p, pts[j]) <= radiusM) out.push(j); return out; });
+  const covered = new Uint8Array(n), chosen = [], curve = []; let total = 0;
+  for (let k = 0; k < K; k++) {
+    let best = -1, gain = 0; for (let i = 0; i < n; i++) { let g = 0; for (const j of near[i]) if (!covered[j]) g++; if (g > gain) { gain = g; best = i; } }
+    if (best < 0) break; chosen.push(best); for (const j of near[best]) if (!covered[j]) { covered[j] = 1; total++; } curve.push(total / n);
+  }
+  return { chosen, coverage: curve, radiusM, guarantee: '≥ (1 − 1/e) del óptimo (voraz sobre función submodular)' };
+}
+
+/** Entrega buzón→buzón con flota completa: fracción de parejas de buzones conectadas en ≤ deadlineMin. */
+export function boxNetworkDelivery(conns, boxes, t0, { deadlineMin = 120, maxPairs = 400, seed = 7 } = {}) {
+  const set = new Uint8Array(conns.nStops); for (const b of boxes) set[b] = 1;
+  const R = rng(seed), pairs = []; for (let k = 0; k < maxPairs && boxes.length > 1; k++) { const a = boxes[Math.floor(R() * boxes.length)], b = boxes[Math.floor(R() * boxes.length)]; if (a !== b) pairs.push([a, b]); }
+  let ok = 0; const d = [];
+  const bySrc = new Map(); for (const [a, b] of pairs) (bySrc.get(a) ?? bySrc.set(a, []).get(a)).push(b);
+  for (const [a, bs] of bySrc) { const T = csa(conns, a, t0, { hub: (s) => set[s] === 1 }).arrival; for (const b of bs) if (T[b] !== INF && (T[b] - t0) / 60 <= deadlineMin) { ok++; d.push((T[b] - t0) / 60); } }
+  d.sort((x, y) => x - y);
+  return { pairs: pairs.length, delivered: pairs.length ? ok / pairs.length : null, p50Min: d.length ? d[d.length >> 1] : null, basis: 'SIMULATION' };
+}
+
+/**
+ * Colocación CONSCIENTE DE TRANSBORDOS: ordena las paradas por número de líneas distintas que pasan (puntos de
+ * intercambio), desempatando por número de pasos. Idea análoga al reenvío por centralidad en DTN (BUBBLE Rap, Hui,
+ * Crowcroft y Yoneki 2008). tripRoute[tripIndex] → id de línea.
+ */
+export function hubRanking(conns, tripRoute) {
+  const routes = Array.from({ length: conns.nStops }, () => new Set()), passes = new Int32Array(conns.nStops);
+  for (let i = 0; i < conns.dep.length; i++) { for (const s of [conns.from[i], conns.to[i]]) { routes[s].add(tripRoute[conns.trip[i]]); passes[s]++; } }
+  return [...routes.keys()].sort((a, b) => routes[b].size - routes[a].size || passes[b] - passes[a]).map((s) => ({ stop: s, lines: routes[s].size, passes: passes[s] }));
 }

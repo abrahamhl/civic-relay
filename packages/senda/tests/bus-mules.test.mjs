@@ -49,3 +49,20 @@ test('resultado REAL (GTFS EMT València): procedencia, hipótesis declaradas y 
   }
   assert.ok(d.adopcion120.feasibleWithFullFleet >= 30);
 });
+
+test('buzones: sin buzón en el transbordo el mensaje no puede cambiar de autobús; cobertura voraz creciente', async () => {
+  const { placeBoxes } = await import('../src/bus-mules.mjs');
+  const c = buildConnections(toy(), { date: '20261116' });
+  assert.equal(csa(c, 0, hms('08:00:00'), { hub: (s) => s !== 1 }).arrival[3], 0x7fffffff, 'sin buzón en B no hay transbordo a la línea 2');
+  assert.equal(csa(c, 0, hms('08:00:00'), { hub: () => true }).arrival[3], hms('08:30:00'));
+  const pts = [{ lat: 39.47, lon: -0.376 }, { lat: 39.4701, lon: -0.3761 }, { lat: 39.48, lon: -0.36 }];
+  const r = placeBoxes(pts, 2, { radiusM: 400 }); assert.deepEqual(r.chosen.length, 2); assert.equal(r.coverage.at(-1), 1); assert.ok(r.coverage[0] >= 2 / 3);
+});
+
+test('buzones en València (real, simulación): colocarlos en transbordos entrega más que colocarlos solo por cobertura', () => {
+  const d = JSON.parse(readFileSync(new URL('../../../investor-next/public/senda/data/mulas/valencia.json', import.meta.url)));
+  const c = d.buzones.resultados.find((r) => r.K === 100), h = d.buzones.transbordos.resultados.find((r) => r.K === 100);
+  assert.ok(h.entrega120 > c.entrega120, `transbordos ${h.entrega120} > cobertura ${c.entrega120}`);
+  assert.ok(c.cobertura400m > h.cobertura400m, 'pero la cobertura geográfica gana en cobertura: hay un compromiso');
+  assert.match(d.buzones.metodo, /1 − 1\/e/);
+});
