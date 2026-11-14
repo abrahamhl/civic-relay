@@ -1,0 +1,109 @@
+{
+  "schema": "BUYER_ARENA_PERSONA_EVIDENCE_V1",
+  "actor_id": "P06",
+  "legacy_id": "06-volunteer-es",
+  "disclosure": "AUTOMATED SYNTHETIC ROLE — NOT A RECRUITED HUMAN TESTER",
+  "target_url": "https://civic-relay-investor.vercel.app",
+  "target_commit": "c18c6ac936c8b3c6560997b113e46b50cab51302",
+  "checks": [
+    {
+      "id": "http-response",
+      "pass": true,
+      "critical": true,
+      "expected": "HTTP 200 on language entry route",
+      "observation": "HTTP 200 at https://civic-relay-investor.vercel.app/es",
+      "suggested_fix": "Fix the deployed language route and monitor availability."
+    },
+    {
+      "id": "visible-hero",
+      "pass": true,
+      "critical": true,
+      "expected": "Hero heading > 15 chars visible above fold",
+      "observation": "CUANDO LA\nRED\nSE APAGA.",
+      "suggested_fix": "Restore a readable hero heading."
+    },
+    {
+      "id": "six-sections",
+      "pass": true,
+      "critical": true,
+      "expected": "All 6 architectural anchor sections exist in DOM",
+      "observation": "Missing section anchors: none",
+      "suggested_fix": "Keep all six chapter navigation targets present in the deployed site."
+    },
+    {
+      "id": "chapter-navigation",
+      "pass": true,
+      "critical": true,
+      "expected": "6 sticky navigation chapter links present",
+      "observation": "Chapter anchor count 6",
+      "suggested_fix": "Restore navigation for all six major sections."
+    },
+    {
+      "id": "truthful-simulation-label",
+      "pass": true,
+      "critical": true,
+      "expected": "Explicit simulation-only disclaimer visible in body copy",
+      "observation": "Visible synthetic/non-operational disclaimer present: true",
+      "suggested_fix": "Put a clear research-only safety statement near the first interaction."
+    },
+    {
+      "id": "no-global-mobile-overflow",
+      "pass": true,
+      "critical": false,
+      "expected": "scrollWidth <= innerWidth + 3",
+      "observation": "{\"scroll\":768,\"window\":768}",
+      "suggested_fix": "Correct global horizontal overflow at this viewport; keep chapter strip locally scrollable."
+    },
+    {
+      "id": "real-slider-mutates-model",
+      "pass": true,
+      "critical": true,
+      "expected": "Changing virtual devices slider from 60 to 20 updates deterministic model state",
+      "observation": "Devices input 60 -> 20; displayed 20",
+      "suggested_fix": "Bind the control to real calculated state, not a decorative slider."
+    },
+    {
+      "id": "store-forward-sandbox-enqueue",
+      "pass": true,
+      "critical": true,
+      "expected": "Clicking GENERATE SYNTHETIC SOS creates EXERCISE_0001 in queue",
+      "observation": "Store & Forward sandbox state: ESTADO DE LA COLA EXERCISE_0001 ACK_SYNTHETIC 1 attempt(s) · SIMULATED_ONLY",
+      "suggested_fix": "Ensure Store & Forward sandbox dispatches and displays synthetic message status."
+    },
+    {
+      "id": "synthetic-json-download",
+      "pass": true,
+      "critical": true,
+      "expected": "Downloads JSON with kind=OEP_SYNTHETIC_EVIDENCE_EXPORT and NOT_PHYSICALLY_TESTED warning",
+      "observation": "Downloaded oep-simulation-seed-20261020.json with OEP_SYNTHETIC_EVIDENCE_EXPORT; simulation warning present",
+      "suggested_fix": "Export verifiable seeded inputs AND prominently label results synthetic."
+    }
+  ],
+  "downloaded_scenario_export": {
+    "file": "actors/06-volunteer-es-synthetic-evidence.json",
+    "kind": "OEP_SYNTHETIC_EVIDENCE_EXPORT",
+    "warning": "SIMULATION_ONLY_NOT_PHYSICALLY_TESTED_NOT_AN_EMERGENCY_SERVICE",
+    "seed": 20261020,
+    "summary": {
+      "totalDevices": 20,
+      "participating": 16,
+      "permissioned": 15,
+      "humanSafe": 10,
+      "humanSOS": 3,
+      "humanUnknown": 3,
+      "noContact": 4,
+      "modelledMessages": 13,
+      "syntheticAcks": 12,
+      "queued": 1,
+      "cellularOnlyAcks": 1,
+      "simulatedLocalGatewayAcks": 11,
+      "energyProfile": "ALERT"
+    }
+  },
+  "console_errors": [],
+  "page_errors": [],
+  "network_origins": [
+    "https://civic-relay-investor.vercel.app"
+  ],
+  "screenshot": "screenshots/06-volunteer-es.png"
+}

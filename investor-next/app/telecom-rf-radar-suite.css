@@ -1,0 +1,539 @@
+.oep-telecom-suite {
+  padding: 5.5rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    radial-gradient(circle at 14% 12%, rgba(255, 107, 74, 0.09), transparent 36%),
+    radial-gradient(circle at 86% 28%, rgba(56, 189, 248, 0.09), transparent 40%),
+    linear-gradient(180deg, rgba(8, 12, 18, 0.96) 0%, rgba(5, 8, 13, 0.99) 100%);
+}
+
+.oep-ts-header {
+  max-width: 880px;
+  margin-bottom: 2.5rem;
+}
+
+.oep-ts-header h2 {
+  font-size: clamp(1.85rem, 3.4vw, 2.85rem);
+  line-height: 1.08;
+  margin: 0.5rem 0 1rem;
+  letter-spacing: -0.02em;
+}
+
+.oep-ts-header p {
+  color: rgba(235, 241, 250, 0.82);
+  font-size: 1.04rem;
+  line-height: 1.6;
+}
+
+.oep-ts-auth-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 2.5rem;
+  border-radius: 10px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(14, 28, 46, 0.65);
+  color: #e2f1ff;
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+.oep-ts-auth-badge {
+  flex-shrink: 0;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.2);
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  color: #7dd3fc;
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* Case Tabs */
+.oep-ts-block {
+  margin-bottom: 3.5rem;
+  padding: 1.75rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(12, 17, 26, 0.82);
+}
+
+.oep-ts-block-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.oep-ts-block-head h3 {
+  font-size: 1.4rem;
+  margin: 0.25rem 0 0;
+}
+
+.oep-ts-case-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 1.5rem;
+}
+
+.oep-ts-case-tab {
+  text-align: left;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  color: #dce6f2;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.oep-ts-case-tab:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+  background: rgba(56, 189, 248, 0.07);
+}
+
+.oep-ts-case-tab.is-active {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.14);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.3);
+}
+
+.oep-ts-case-tab small {
+  display: block;
+  font-family: monospace;
+  font-size: 0.72rem;
+  color: #7dd3fc;
+  margin-bottom: 0.25rem;
+}
+
+.oep-ts-case-tab strong {
+  display: block;
+  font-size: 0.92rem;
+  line-height: 1.3;
+}
+
+.oep-ts-vs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.oep-ts-vs-card {
+  padding: 1.35rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.oep-ts-vs-card.is-today {
+  background: linear-gradient(180deg, rgba(64, 18, 22, 0.42) 0%, rgba(24, 12, 16, 0.65) 100%);
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+.oep-ts-vs-card.is-oep {
+  background: linear-gradient(180deg, rgba(12, 48, 42, 0.48) 0%, rgba(10, 24, 32, 0.72) 100%);
+  border-color: rgba(52, 211, 153, 0.42);
+}
+
+.oep-ts-vs-tag {
+  display: inline-block;
+  padding: 0.22rem 0.6rem;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.74rem;
+  font-weight: 700;
+  margin-bottom: 0.65rem;
+}
+
+.is-today .oep-ts-vs-tag {
+  background: rgba(248, 113, 113, 0.18);
+  color: #fca5a5;
+}
+
+.is-oep .oep-ts-vs-tag {
+  background: rgba(52, 211, 153, 0.18);
+  color: #6ee7b7;
+}
+
+.oep-ts-vs-card h4 {
+  margin: 0 0 0.75rem;
+  font-size: 1.12rem;
+}
+
+.oep-ts-vs-list {
+  margin: 0 0 1.1rem;
+  padding-left: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.91rem;
+  line-height: 1.48;
+  color: rgba(235, 242, 250, 0.88);
+}
+
+.oep-ts-vs-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.oep-ts-vs-metrics div span {
+  display: block;
+  font-size: 0.72rem;
+  color: rgba(200, 214, 230, 0.72);
+  text-transform: uppercase;
+}
+
+.oep-ts-vs-metrics div strong {
+  font-family: monospace;
+  font-size: 1.02rem;
+}
+
+.oep-ts-load-btn {
+  margin-top: 1rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(52, 211, 153, 0.55);
+  background: rgba(16, 185, 129, 0.18);
+  color: #a7f3d0;
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.oep-ts-load-btn:hover {
+  background: rgba(16, 185, 129, 0.28);
+}
+
+/* Function Showcase */
+.oep-ts-fn-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.oep-ts-fn-card {
+  padding: 1.2rem;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.025);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.oep-ts-fn-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: monospace;
+  font-size: 0.73rem;
+}
+
+.oep-ts-fn-status {
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(52, 211, 153, 0.16);
+  color: #6ee7b7;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.oep-ts-fn-card h4 {
+  margin: 0.35rem 0;
+  font-size: 1.04rem;
+}
+
+.oep-ts-fn-problem,
+.oep-ts-fn-solution {
+  font-size: 0.86rem;
+  line-height: 1.45;
+  margin: 0.25rem 0;
+}
+
+.oep-ts-fn-auth {
+  padding: 0.55rem 0.7rem;
+  border-radius: 7px;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #fde68a;
+}
+
+/* Satellite + Zone Telemetry Console */
+.oep-ts-infra-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.oep-ts-panel {
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(6, 10, 16, 0.72);
+}
+
+.oep-ts-panel h4 {
+  margin: 0 0 0.9rem;
+  font-size: 1.05rem;
+  color: #7dd3fc;
+}
+
+.oep-ts-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1.1rem;
+}
+
+.oep-ts-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  color: rgba(226, 236, 248, 0.88);
+}
+
+.oep-ts-controls select,
+.oep-ts-controls input[type="range"] {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  background: #0d1522;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.oep-ts-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.oep-ts-kpi {
+  padding: 0.6rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.oep-ts-kpi span {
+  display: block;
+  font-size: 0.68rem;
+  color: rgba(190, 206, 224, 0.72);
+  text-transform: uppercase;
+}
+
+.oep-ts-kpi strong {
+  font-family: monospace;
+  font-size: 0.95rem;
+  color: #f8fafc;
+}
+
+.oep-ts-hex-box {
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: #05080d;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  font-family: monospace;
+  font-size: 0.76rem;
+  color: #38bdf8;
+  word-break: break-all;
+  line-height: 1.5;
+}
+
+/* 3x3 Sector Grid */
+.oep-ts-sector-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.oep-ts-sector-btn {
+  padding: 0.65rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.03);
+  color: #e2e8f0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.oep-ts-sector-btn.is-selected {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+}
+
+.oep-ts-sector-btn small {
+  display: block;
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.oep-ts-sector-btn strong {
+  display: block;
+  font-family: monospace;
+  font-size: 0.88rem;
+  margin: 0.15rem 0;
+}
+
+.oep-ts-sector-detail {
+  padding: 0.8rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+
+/* Through-Wall RF & Wi-Fi CSI Radar + AR Camera */
+.oep-ts-radar-layout {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 1.5rem;
+}
+
+.oep-ts-viewport-wrap {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  background: #04070c;
+  min-height: 390px;
+}
+
+.oep-ts-camera-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.58;
+  filter: contrast(1.15) saturate(1.2);
+}
+
+.oep-ts-radar-canvas {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 390px;
+  z-index: 2;
+}
+
+.oep-ts-hud-topbar {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.75rem;
+  right: 0.75rem;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  pointer-events: none;
+  font-family: monospace;
+  font-size: 0.72rem;
+}
+
+.oep-ts-hud-pill {
+  padding: 0.22rem 0.55rem;
+  border-radius: 4px;
+  background: rgba(4, 9, 16, 0.82);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  color: #7dd3fc;
+}
+
+.oep-ts-band-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.75rem 0;
+}
+
+.oep-ts-band-toggles label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-family: monospace;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.oep-ts-ar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.oep-ts-ar-btn {
+  padding: 0.6rem 0.95rem;
+  border-radius: 8px;
+  border: 1px solid #38bdf8;
+  background: rgba(56, 189, 248, 0.16);
+  color: #e0f2fe;
+  font-family: monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.oep-ts-ar-btn.is-live {
+  border-color: #f43f5e;
+  background: rgba(244, 63, 94, 0.22);
+  color: #fecdd3;
+}
+
+.oep-ts-target-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
+.oep-ts-target-card {
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.81rem;
+}
+
+.oep-ts-target-card.is-detected {
+  border-color: rgba(52, 211, 153, 0.45);
+}
+
+.oep-ts-target-card.is-blocked {
+  opacity: 0.6;
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+@media (max-width: 860px) {
+  .oep-ts-radar-layout {
+    grid-template-columns: 1fr;
+  }
+  .oep-ts-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
