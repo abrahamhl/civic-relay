@@ -8,7 +8,7 @@
 <link rel="icon" href="/senda/icon.svg">
 <style>
 :root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e;--v:#b79cff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 Inter,system-ui,sans-serif}
+[hidden]{display:none!important}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 Inter,system-ui,sans-serif}
 main{max-width:1280px;margin:0 auto;padding:16px 16px 60px}h1{font-size:28px;margin:4px 0}h2{font-size:16px;margin:0 0 8px}.m{color:var(--m)}a{color:var(--i)}
 .lay{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;margin-top:12px}@media(max-width:960px){.lay{grid-template-columns:1fr}}
 .card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:14px;min-width:0}
@@ -44,6 +44,7 @@ input[type=range]{width:100%}
   <canvas id="map" aria-label="Mapa"></canvas>
   <div class="lg" id="lgf"><span><i style="background:#ff3b30"></i>detección de fuego reciente</span><span><i style="background:#8a3a1c"></i>detección anterior</span><span><i style="background:var(--i);border-radius:2px"></i>cámara (captura de 2026)</span><span><i style="background:var(--v)"></i>reporte ciudadano</span><span><i style="background:transparent;border:2px dashed var(--a)"></i>envolvente de detecciones</span></div>
   <div class="lg" id="lgw" hidden><span><i style="background:#ff7756"></i>terremoto</span><span><i style="background:#ff3b30"></i>incendio forestal</span><span><i style="background:#4aa8ff"></i>inundación</span><span><i style="background:#b79cff"></i>ciclón</span><span><i style="background:#fbbf24"></i>volcán</span><span><i style="background:#c9a26b"></i>sequía</span><span><i style="background:transparent;border:2px solid var(--r)"></i>alerta roja</span><span><i style="background:transparent;border:2px solid var(--a)"></i>alerta naranja</span><span>· toca un punto para ver el informe oficial</span></div>
+  <div class="lg" id="lgs" hidden><span><i style="background:#fbbf24"></i>obras</span><span><i style="background:#ff3b30"></i>accidente</span><span><i style="background:#ff7756"></i>vehículo u obstáculo</span><span><i style="background:#4aa8ff"></i>obstáculo natural</span><span><i style="background:#91d7e8"></i>meteorología</span><span><i style="background:#c9a26b"></i>daño en la vía</span><span><i style="background:#9fb2bc"></i>cierre de carril</span><span>· toca un punto: carretera y causa según la DGT</span></div>
   <div class="row"><button id="play" class="p">▶ Reproducir</button><select id="speed" aria-label="Velocidad"><option value="1800">×30 min/s</option><option value="3600" selected>×1 h/s</option><option value="10800">×3 h/s</option><option value="86400">×1 día/s</option></select>
     <select id="win" aria-label="Qué mostrar"><option value="0">Acumulado</option><option value="3600000">Última hora</option><option value="10800000">Últimas 3 h</option></select>
     <span id="clock">—</span></div>
@@ -67,12 +68,16 @@ input[type=range]{width:100%}
 </div>
 
 <script type="module">
-import { haversineM, inArea, filterEvents, timeline, areaStats, growth, convexHull, ringAreaKm2, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromGdacs, GDACS_TYPES } from '/senda/core/atlas.mjs';
+import { haversineM, inArea, filterEvents, timeline, areaStats, growth, convexHull, ringAreaKm2, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromGdacs, GDACS_TYPES, eventsFromDgt, DGT_CAUSES } from '/senda/core/atlas.mjs';
 const $ = (s) => document.querySelector(s);
-const CASES = { world: 'Mundo · alertas GDACS de los últimos 30 días (descarga real)', camp: 'Camp Fire · Paradise, California (2018)', palisades: 'Palisades · Los Ángeles (2025)', eaton: 'Eaton · Altadena (2025)', marshall: 'Marshall · Colorado (2021)', smokehouse: 'Smokehouse Creek · Texas (2024)', troublesome: 'East Troublesome · Colorado (2020)', creek: 'Creek · California (2020)', london: 'Londres · cámaras de tráfico (captura 2026)', mine: 'Mis reportes (pantalla Avisos)' };
+const CASES = { spain: 'España · incidencias activas de la DGT (descarga real)', world: 'Mundo · alertas GDACS de los últimos 30 días (descarga real)', camp: 'Camp Fire · Paradise, California (2018)', palisades: 'Palisades · Los Ángeles (2025)', eaton: 'Eaton · Altadena (2025)', marshall: 'Marshall · Colorado (2021)', smokehouse: 'Smokehouse Creek · Texas (2024)', troublesome: 'East Troublesome · Colorado (2020)', creek: 'Creek · California (2020)', london: 'Londres · cámaras de tráfico (captura 2026)', mine: 'Mis reportes (pantalla Avisos)' };
 const [goes, tfl, refs, land] = await Promise.all(['/senda/data/referencias/goes_casos.json', '/senda/data/referencias/tfl_camaras.json', '/senda/data/referencias/referencias.json', '/geo/land-110m.json'].map((u) => fetch(u).then((r) => r.json())));
 let gdacs = null; try { gdacs = await fetch('/senda/data/referencias/gdacs_eventos.json').then((r) => r.json()); } catch { gdacs = null; }
 const world = gdacs ? eventsFromGdacs(gdacs) : [];
+let dgt = null; try { dgt = await fetch('/senda/data/referencias/dgt_incidencias.json').then((r) => r.json()); } catch { dgt = null; }
+const spain = dgt ? eventsFromDgt(dgt) : [];
+const DCOL = { roadMaintenance: '#fbbf24', accident: '#ff3b30', vehicleObstruction: '#ff7756', environmentalObstruction: '#4aa8ff', obstruction: '#b79cff', infrastructureDamageObstruction: '#c9a26b', roadOrCarriagewayOrLaneManagement: '#9fb2bc', poorEnvironment: '#91d7e8', other: '#5d6e78' };
+const FILTERS = { world: { prefix: 'GDACS_', names: GDACS_TYPES, all: () => world }, spain: { prefix: 'DGT_', names: DGT_CAUSES, all: () => spain } };
 const GCOL = { EQ: '#ff7756', WF: '#ff3b30', FL: '#4aa8ff', TC: '#b79cff', VO: '#fbbf24', DR: '#c9a26b' };
 const fire = eventsFromGoes(goes), cams = eventsFromCameras(tfl, refs.caltrans);
 let mine = []; try { mine = eventsFromReports(JSON.parse(localStorage.getItem('senda-avisos-reports')) ?? []); } catch { mine = []; }
@@ -84,7 +89,7 @@ const H = new URLSearchParams(location.hash.slice(1));
 if (CASES[H.get('caso')]) S.case = H.get('caso');
 try { if (H.get('zona')) S.area = JSON.parse(atob(H.get('zona'))); } catch { S.area = null; }
 $('#case').value = S.case;
-const timed = () => S.case === 'world' ? world.filter((e) => !S.gtype || e.kind === 'GDACS_' + S.gtype) : S.case === 'london' ? [] : S.case === 'mine' ? mine : fire.filter((e) => e.group === S.case);
+const timed = () => FILTERS[S.case] ? FILTERS[S.case].all().filter((e) => !S.gtype || e.kind === FILTERS[S.case].prefix + S.gtype) : S.case === 'london' ? [] : S.case === 'mine' ? mine : fire.filter((e) => e.group === S.case);
 const statics = () => S.case === 'london' ? cams.filter((e) => e.group === 'london') : S.case === 'mine' ? [] : cams.filter((e) => e.group === S.case);
 let ev = [], t0 = 0, t1 = 1, bins = [], BIN = 600_000;
 function loadCase(keepT) {
@@ -92,6 +97,7 @@ function loadCase(keepT) {
   t0 = ev.length ? ev[0].t : Date.now(); t1 = ev.length ? ev.at(-1).t : t0 + 1;
   // Mundo: la línea de tiempo cubre la ventana descargada; lo que empezó antes (p. ej. sequías en curso) se muestra siempre
   if (S.case === 'world' && gdacs?.ventana) t0 = Math.max(t0, Date.parse(gdacs.ventana.desde + 'T00:00:00Z'));
+  if (S.case === 'spain') t0 = Math.max(t0, t1 - 7 * 86_400_000); // España: última semana; las obras largas anteriores se muestran siempre
   BIN = Math.max(600_000, Math.ceil((t1 - t0) / 60 / 600_000) * 600_000);
   bins = ev.length ? timeline(ev, { binMs: BIN, from: t0, to: t1 }) : [];
   if (!keepT || S.t == null) S.t = t1;
@@ -132,6 +138,7 @@ function draw() {
   for (const e of vis) {
     const [x, y] = proj(e), age = (S.t - e.t) / 3_600_000;
     if (e.kind === 'FIRE_HOTSPOT') { const f = Math.max(0, 1 - age / 3); g.fillStyle = `rgb(${Math.round(138 + 117 * f)},${Math.round(58 + f)},${Math.round(28 + 20 * f)})`; g.globalAlpha = 0.35 + 0.65 * f; }
+    else if (e.basis === 'OFFICIAL_ALERT' && e.kind.startsWith('DGT_')) { g.fillStyle = DCOL[e.kind.slice(4)] ?? '#9fb2bc'; g.globalAlpha = 0.9; }
     else if (e.basis === 'OFFICIAL_ALERT') { g.fillStyle = GCOL[e.kind.slice(6)] ?? '#9fb2bc'; g.globalAlpha = Math.max(0.35, 1 - age / (24 * 30)); }
     else { g.fillStyle = e.basis === 'SIMULATION' ? '#fbbf24' : '#b79cff'; g.globalAlpha = 1; }
     const big = /alerta (Red|Orange)/.exec(e.label ?? '');
@@ -176,7 +183,8 @@ function panel() {
   if (ev.length) {
     rows.push(['Eventos hasta este instante', `${st.n} de ${ev.length}`]);
     if (st.n) { rows.push(['Primero en la zona', fmt(st.first)]); if (isFire()) rows.push(['…tras la primera detección', hm(st.first - t0)]); rows.push(['Último en la zona', fmt(st.last)]); }
-    if (S.case === 'world' && st.n) { for (const [k, n] of Object.entries(st.byKind).sort((a, b) => b[1] - a[1])) rows.push([GDACS_TYPES[k.slice(6)] ?? k, String(n)]); const hi = inside.filter((e) => /alerta (Red|Orange)/.test(e.label ?? '')); rows.push(['Alertas naranja o roja', String(hi.length)]); }
+    if (FILTERS[S.case] && st.n) { const F = FILTERS[S.case]; for (const [k, n] of Object.entries(st.byKind).sort((a, b) => b[1] - a[1])) rows.push([F.names[k.slice(F.prefix.length)] ?? k, String(n)]); }
+    if (S.case === 'world' && st.n) { const hi = inside.filter((e) => /alerta (Red|Orange)/.test(e.label ?? '')); rows.push(['Alertas naranja o roja', String(hi.length)]); }
     const frp = st.valueSum['FIRE_HOTSPOT:MW']; if (frp) rows.push(['Suma de FRP (potencia radiativa)', `${Math.round(frp).toLocaleString('es')} MW·pasada`]);
     const hull = isFire() ? convexHull(upTo.filter((e) => e.kind === 'FIRE_HOTSPOT')) : []; if (hull.length >= 3) rows.push(['Envolvente total hasta ahora', `${ringAreaKm2(hull).toFixed(0)} km²`]);
     if (upTo.length && isFire()) rows.push(['Alcance desde el origen', `${(Math.max(...upTo.map((e) => haversineM(ev[0], e))) / 1000).toFixed(1)} km`]);
@@ -191,7 +199,7 @@ function panel() {
     $('#sparkLbl').textContent = `Envolvente de detecciones a lo largo del caso: hasta ${Math.round(mx)} km²; alcance final ${gr.at(-1).reachKm.toFixed(1)} km en ${hrs.toFixed(1)} h. Calculado con los píxeles GOES: un píxel mide varios km, así que los saltos de un cubo a otro no son velocidades reales del frente.`; }
   else $('#sparkLbl').textContent = '';
   const srcs = new Map(); for (const e of [...ev, ...statics()]) srcs.set(e.source, e.basis);
-  $('#src').innerHTML = [...srcs].map(([s, bz]) => `<div>· ${s} <span class="tag" style="${bz === 'SIMULATION' ? 'color:var(--a);border-color:var(--a)' : ''}">${bz === 'SIMULATION' ? 'SIMULACIÓN' : bz === 'CITIZEN_SIGNED_UNVERIFIED' ? 'firmado, sin verificar' : bz === 'OFFICIAL_ALERT' ? 'alerta oficial' : 'medido'}</span></div>`).join('') + '<div>· Base: Natural Earth 1:110m (0,1°, solo contexto)</div>' + (S.case === 'mine' && !ev.length ? '<div>No hay reportes guardados en este navegador: créalos en <a href="/senda/avisos">Avisos</a>.</div>' : '');
+  $('#src').innerHTML = [...srcs].map(([s, bz]) => `<div>· ${s} <span class="tag" style="${bz === 'SIMULATION' ? 'color:var(--a);border-color:var(--a)' : ''}">${bz === 'SIMULATION' ? 'SIMULACIÓN' : bz === 'CITIZEN_SIGNED_UNVERIFIED' ? 'firmado, sin verificar' : bz === 'OFFICIAL_ALERT' ? 'alerta oficial' : 'medido'}</span></div>`).join('') + '<div>· Base: Natural Earth 1:110m (0,1°, solo contexto)</div>' + (S.case === 'spain' ? '<div>· Cataluña y el País Vasco gestionan su propio tráfico (Servei Català de Trànsit y Gobierno Vasco): sus incidencias no salen en este fichero de la DGT. Licencia CC BY.</div>' : '') + (S.case === 'mine' && !ev.length ? '<div>No hay reportes guardados en este navegador: créalos en <a href="/senda/avisos">Avisos</a>.</div>' : '');
   last = { case: S.case, t: S.t, total: ev.length, inside: st.n, first: st.first, camerasInside: cIn.length, area: S.area };
   window.SENDA_ATLAS.last = last;
 }
@@ -232,8 +240,8 @@ $('#mPoly').onclick = () => { setMode(S.mode === 'poly' ? null : 'poly'); };
 $('#close').onclick = closePoly;
 $('#clearArea').onclick = () => { S.area = null; setMode(null); saveHash(); draw(); };
 $('#fit').onclick = () => { fit(); draw(); };
-for (const [k, v] of Object.entries(GDACS_TYPES)) $('#gtype').insertAdjacentHTML('beforeend', `<option value="${k}">${v} (${world.filter((e) => e.kind === 'GDACS_' + k).length})</option>`);
-const legend = () => { $('#lgw').hidden = S.case !== 'world'; $('#lgf').hidden = S.case === 'world'; $('#gtype').hidden = S.case !== 'world'; if (S.case === 'world' && +$('#speed').value < 86400) $('#speed').value = '86400'; };
+const fillFilter = () => { const F = FILTERS[S.case]; $('#gtype').innerHTML = '<option value="">Todos los tipos</option>'; S.gtype = ''; if (!F) return; for (const [k, v] of Object.entries(F.names)) { const n = F.all().filter((e) => e.kind === F.prefix + k).length; if (n) $('#gtype').insertAdjacentHTML('beforeend', `<option value="${k}">${v} (${n})</option>`); } };
+const legend = () => { $('#lgw').hidden = S.case !== 'world'; $('#lgs').hidden = S.case !== 'spain'; $('#lgf').hidden = !!FILTERS[S.case]; $('#gtype').hidden = !FILTERS[S.case]; fillFilter(); if (FILTERS[S.case] && +$('#speed').value < 10800) $('#speed').value = S.case === 'world' ? '86400' : '10800'; };
 $('#gtype').onchange = () => { S.gtype = $('#gtype').value; loadCase(true); };
 $('#case').onchange = () => { S.case = $('#case').value; legend(); S.area = null; setMode(null); saveHash(); loadCase(false); };
 $('#win').onchange = () => { S.win = +$('#win').value; draw(); };

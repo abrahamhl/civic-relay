@@ -1,6 +1,6 @@
 /* SENDA Campo · service worker (raíz, alcance /senda): la app entera queda instalada en el teléfono y abre sin red.
    Está en la raíz porque el sitio usa URL limpias (/senda sin barra final). */
-const VERSION = 'senda-campo-v28';
+const VERSION = 'senda-campo-v29';
 const ASSETS = [
   '/senda', '/senda/app.css', '/senda/app.mjs', '/senda/db.mjs', '/senda/audio.mjs', '/senda/icon.svg', '/senda/manifest.webmanifest',
   '/senda/core/b64.mjs', '/senda/core/envelope.mjs', '/senda/core/bundle.mjs', '/senda/core/acoustic-modem.mjs', '/senda/core/zones.mjs', '/senda/core/feeds.mjs',
@@ -19,7 +19,7 @@ const ASSETS = [
   '/senda/fuego', '/senda/core/fire-watch.mjs',
   '/senda/fuego3d', '/senda/paper', '/senda/core/atmos3d.mjs', '/senda/core/fire-field.mjs', '/senda/core/utm.mjs',
   '/senda/referencias', '/senda/evacuacion', '/senda/core/fire-cases.mjs', '/senda/core/traffic-fusion.mjs',
-  '/senda/data/referencias/referencias.json', '/senda/data/referencias/goes_casos.json', '/senda/data/referencias/tfl_camaras.json', '/senda/data/referencias/gdacs_eventos.json',
+  '/senda/data/referencias/referencias.json', '/senda/data/referencias/goes_casos.json', '/senda/data/referencias/tfl_camaras.json', '/senda/data/referencias/gdacs_eventos.json', '/senda/data/referencias/dgt_incidencias.json',
   '/senda/data/referencias/tfl_03752.jpg', '/senda/data/referencias/tfl_06590.jpg', '/senda/data/referencias/tfl_03850.jpg', '/senda/data/referencias/tfl_02158.jpg',
   '/senda/data/smv2026/real.json', '/senda/data/smv2026/gfs_20260723_12z.json', '/senda/data/smv2026/gfs_sinoptico.json', '/senda/data/smv2026/fire3d.json', '/senda/data/smv2026/dem_100m.bin', '/senda/data/smv2026/fuel_100m.bin', '/senda/data/smv2026/burn_100m.bin', '/senda/data/smv2026/prob_roi.bin', '/senda/data/smv2026/arrival_roi.bin', '/senda/data/smv2026/dnbr_d0808.png', '/senda/data/smv2026/tci_pre.jpg', '/senda/data/smv2026/tci_d0724.jpg', '/senda/data/smv2026/tci_d0729.jpg', '/senda/data/smv2026/tci_d0808.jpg',
 ];

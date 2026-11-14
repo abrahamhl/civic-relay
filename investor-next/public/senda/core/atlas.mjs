@@ -177,3 +177,17 @@ export function eventsFromGdacs(snap) {
   return (snap.eventos ?? []).map((e) => makeEvent({ id: `gdacs:${e.type}:${e.id}`, t: e.from, lat: e.lat, lon: e.lon, kind: `GDACS_${e.type}`, value: e.severity, unit: e.severityUnit,
     group: 'world', label: `${e.name} · alerta ${e.alert}${e.severityText ? ` · ${e.severityText}` : ''}`, source: src, basis: 'OFFICIAL_ALERT' }));
 }
+
+/** Causas DATEX II que publica la DGT, en castellano llano. */
+export const DGT_CAUSES = Object.freeze({ roadMaintenance: 'Obras', accident: 'Accidente', vehicleObstruction: 'Vehículo detenido u obstáculo', environmentalObstruction: 'Obstáculo natural (agua, desprendimiento…)',
+  obstruction: 'Obstrucción', infrastructureDamageObstruction: 'Daño en la infraestructura', roadOrCarriagewayOrLaneManagement: 'Cierre o gestión de carril', poorEnvironment: 'Meteorología o mala visibilidad', other: 'Otras' });
+
+/** Incidencias reales de la DGT descargadas con scripts/datos-reales/dgt_incidencias_snapshot.mjs (dgt_incidencias.json). */
+export function eventsFromDgt(snap) {
+  const src = `DGT · Punto de Acceso Nacional (DATEX II), publicación del ${String(snap.publicacionDGT ?? snap.descargadoUTC).slice(0, 16).replace('T', ' ')}`;
+  return (snap.incidencias ?? []).filter((r) => r.start || r.created).map((r) => {
+    const cause = DGT_CAUSES[r.cause] ? r.cause : 'other';
+    return makeEvent({ id: `dgt:${r.id}`, t: r.start ?? r.created, lat: r.lat, lon: r.lon, kind: `DGT_${cause}`, group: 'spain',
+      label: `${r.road ?? 'vía sin nombre'} · ${DGT_CAUSES[cause]}${r.detail ? ` (${r.detail})` : ''}`, source: src, basis: 'OFFICIAL_ALERT' });
+  });
+}

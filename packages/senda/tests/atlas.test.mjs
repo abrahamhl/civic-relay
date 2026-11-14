@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { haversineM, pointInPolygon, inArea, ringAreaKm2, convexHull, makeEvent, filterEvents, timeline, areaStats, growth, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromGdacs, GDACS_TYPES } from '../src/atlas.mjs';
+import { haversineM, pointInPolygon, inArea, ringAreaKm2, convexHull, makeEvent, filterEvents, timeline, areaStats, growth, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromGdacs, GDACS_TYPES, eventsFromDgt, DGT_CAUSES } from '../src/atlas.mjs';
+import { parseDatex2 } from '../src/datex2.mjs';
 import { createReporterKeys, encodeReport, decodeReports } from '../src/hazard-reports.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -86,4 +87,26 @@ test('GDACS real: cada alerta lleva fuente oficial, tipo conocido y coordenadas;
   assert.ok(ev.every((e) => e.basis === 'OFFICIAL_ALERT' && /GDACS/.test(e.source) && GDACS_TYPES[e.kind.slice(6)]));
   const bins = timeline(ev, { binMs: 86_400_000 });
   assert.equal(bins.reduce((s, b) => s + b.n, 0), ev.length);
+});
+
+test('DGT real: incidencias de nap.dgt.es leídas con el lector DATEX II del núcleo, con fuente oficial', () => {
+  const snap = ref('dgt_incidencias.json');
+  assert.match(snap.url, /^https:\/\/nap\.dgt\.es\//); assert.match(snap.sha256Xml, /^[0-9a-f]{64}$/);
+  const ev = eventsFromDgt(snap);
+  assert.ok(ev.length > 0 && ev.length <= snap.total);
+  assert.ok(ev.every((e) => e.basis === 'OFFICIAL_ALERT' && /DGT/.test(e.source) && DGT_CAUSES[e.kind.slice(4)]));
+  assert.ok(ev.every((e) => e.lat > 27 && e.lat < 44.5 && e.lon > -18.5 && e.lon < 4.5), 'todas dentro de España (con Canarias)');
+});
+
+test('lector DATEX II: entiende el perfil real de la DGT (v3.7) con namespaces levelC', () => {
+  const xml = `<d2:payload xmlns:com="http://levelC/schema/3/common" xmlns:loc="http://levelC/schema/3/locationReferencing" xmlns:d2="http://levelC/schema/3/d2Payload" xmlns:sit="http://levelC/schema/3/situation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="sit:SituationPublication">
+  <sit:situation id="1"><sit:situationRecord xsi:type="sit:RoadOrCarriagewayOrLaneManagement" id="18811074" version="2">
+  <sit:situationRecordCreationTime>2025-12-12T08:11:34.000+01:00</sit:situationRecordCreationTime>
+  <sit:validity><com:validityStatus>active</com:validityStatus><com:validityTimeSpecification><com:overallStartTime>2025-12-12T08:05:19.000+01:00</com:overallStartTime></com:validityTimeSpecification></sit:validity>
+  <sit:cause><sit:causeType>roadMaintenance</sit:causeType></sit:cause>
+  <sit:locationReference xsi:type="loc:SingleRoadLinearLocation"><loc:supplementaryPositionalDescription><loc:roadInformation><loc:roadName>N-400</loc:roadName></loc:roadInformation></loc:supplementaryPositionalDescription>
+  <loc:tpegLinearLocation><loc:to xsi:type="loc:TpegNonJunctionPoint"><loc:pointCoordinates><loc:latitude>39.994446</loc:latitude><loc:longitude>-3.6054852</loc:longitude></loc:pointCoordinates></loc:to></loc:tpegLinearLocation></sit:locationReference>
+  </sit:situationRecord></sit:situation></d2:payload>`;
+  const [r] = parseDatex2(xml); // fragmento recortado de un registro real (id 18811074) de la publicación de la DGT del 14-11-2026
+  assert.equal(r.road, 'N-400'); assert.equal(r.lat, 39.994446); assert.equal(r.subtypes.causeType[0], 'roadMaintenance');
 });

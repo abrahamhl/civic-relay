@@ -118,6 +118,9 @@ try {
   await a.evaluate(() => window.SENDA_ATLAS.setCase('world'));
   const w = await a.evaluate(() => window.SENDA_ATLAS.last);
   check('atlas: capa mundial con alertas reales de GDACS (descarga oficial con SHA-256 por página)', w.case === 'world' && w.total > 100, { total: w.total });
+  await a.evaluate(() => window.SENDA_ATLAS.setCase('spain'));
+  const es = await a.evaluate(() => window.SENDA_ATLAS.last);
+  check('atlas: capa España con incidencias reales de la DGT leídas por el lector DATEX II del núcleo', es.case === 'spain' && es.total > 50, { total: es.total });
   const d = await (await actx.newPage()); d.on('pageerror', (e) => errors.push(`demo: ${e.message}`));
   await d.goto(base + '/demo'); await d.click('#run'); await d.waitForFunction(() => window.SENDA_DEMO?.done || window.SENDA_DEMO?.error, null, { timeout: 30_000 });
   const demo = await d.evaluate(() => window.SENDA_DEMO);
