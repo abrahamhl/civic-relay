@@ -4,12 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/write-release-proof.mjs && next build && node scripts/finalize-locales.mjs",
+    "build": "node scripts/write-release-proof.mjs && node scripts/research/build-research.mjs && next build && node scripts/finalize-locales.mjs && node scripts/research/verify-export.mjs",
     "start": "next start",
     "type-check": "tsc --noEmit",
     "check:locales": "node test-locales.mjs",
+    "check:research": "node scripts/research/verify-export.mjs",
     "smoke:deploy": "node scripts/smoke-deploy.mjs",
-    "check:domain": "node scripts/check-canonical-domain.mjs"
+    "check:domain": "node scripts/check-canonical-domain.mjs",
+    "research:build": "node scripts/research/build-research.mjs",
+    "research:data": "node scripts/research/paper2-tables.mjs && node scripts/research/cross-runtime.mjs",
+    "research:pdf": "node scripts/research/build-research.mjs && node scripts/research/build-pdfs.mjs && node scripts/research/build-research.mjs"
   },
   "dependencies": {
     "next": "16.4.2",
@@ -21,7 +25,9 @@
     "@types/node": "22.15.3",
     "@types/react": "19.2.0",
     "@types/react-dom": "19.2.0",
-    "typescript": "5.8.3",
-    "@types/three": "0.180.0"
+    "@types/three": "0.180.0",
+    "katex": "^0.19.1",
+    "marked": "^18.1.3",
+    "typescript": "5.8.3"
   }
 }

@@ -1,0 +1,218 @@
+{
+  "generatedAtUTC": "2026-11-06T20:37:48.756Z",
+  "baseURL": "http://127.0.0.1:5174/",
+  "browser": "153.0.8010.12",
+  "durationMs": 7349,
+  "steps": [
+    {
+      "step": "boot",
+      "brand": "SENDA COMMAND CENTER",
+      "title": "SENDA Command Center"
+    },
+    {
+      "step": "01-overview",
+      "screenshot": "evidence\\senda-command-center\\01-overview.png"
+    },
+    {
+      "step": "header-chips",
+      "chips": [
+        "OFFLINE SNAPSHOT",
+        "Fuentes\n24/24\ndocumentadas",
+        "Cámaras reales\n25",
+        "Tests\n232/232 core",
+        "Último dato\n2026-11-06T00:31Z"
+      ]
+    },
+    {
+      "step": "map-markers",
+      "markers": 25
+    },
+    {
+      "step": "select-camera",
+      "selectedName": "Strand/Lancaster Place"
+    },
+    {
+      "step": "02-camera-selected",
+      "screenshot": "evidence\\senda-command-center\\02-camera-selected.png"
+    },
+    {
+      "step": "filter-tfl",
+      "tflMarkers": 12
+    },
+    {
+      "step": "03-tfl-only",
+      "screenshot": "evidence\\senda-command-center\\03-tfl-only.png"
+    },
+    {
+      "step": "twin-3d",
+      "canvasCount": 1,
+      "fallbackVisible": 0,
+      "pageErrors": 0
+    },
+    {
+      "step": "04-twin-3d",
+      "screenshot": "evidence\\senda-command-center\\04-twin-3d.png"
+    },
+    {
+      "step": "rf-lab",
+      "rfStatuses": [
+        "REQUIRED",
+        "PROHIBITED",
+        "PROHIBITED",
+        "NOT_IMPLEMENTED",
+        "PROHIBITED",
+        "SIMULATION_ONLY",
+        "ARCHITECTURE_VIEWER_ONLY",
+        "NOT_AVAILABLE_NO_HARDWARE",
+        "NOT_AVAILABLE_NO_HARDWARE",
+        "NOT_AVAILABLE_NO_HARDWARE"
+      ],
+      "mentionsNoHardware": true
+    },
+    {
+      "step": "rf-probe",
+      "probeNotice": "NOT_AVAILABLE_NO_HARDWARE · no se detecta radar UWB/mmWave ni SDR autorizado"
+    },
+    {
+      "step": "rf-legal-gates",
+      "gateStatuses": [
+        "REQUIRED",
+        "PROHIBITED",
+        "PROHIBITED",
+        "NOT_IMPLEMENTED",
+        "PROHIBITED",
+        "SIMULATION_ONLY",
+        "ARCHITECTURE_VIEWER_ONLY",
+        "NOT_AVAILABLE_NO_HARDWARE",
+        "NOT_AVAILABLE_NO_HARDWARE",
+        "NOT_AVAILABLE_NO_HARDWARE"
+      ]
+    },
+    {
+      "step": "rf-heatmap",
+      "heatRects": 279,
+      "simChip": "SIMULATOR · 2 sensores · 30×18 celdas"
+    },
+    {
+      "step": "05-rf-lab",
+      "screenshot": "evidence\\senda-command-center\\05-rf-lab.png"
+    },
+    {
+      "step": "meteorology",
+      "stats": [
+        "15.0 °C",
+        "28.0 °C",
+        "28.0 °C",
+        "5",
+        "2397.13 µg/m³",
+        "39 m",
+        "23 m",
+        "0.197"
+      ],
+      "reliabilityDots": 10,
+      "mentionsModel": true,
+      "mentionsSimulator": true
+    },
+    {
+      "step": "05b-meteorology",
+      "screenshot": "evidence\\senda-command-center\\05b-meteorology.png"
+    },
+    {
+      "step": "access-directory",
+      "stats": [
+        "8",
+        "22",
+        "45%",
+        "1"
+      ],
+      "mentionsSimulator": true
+    },
+    {
+      "step": "access-users",
+      "userRows": 22,
+      "filteredRows": 1
+    },
+    {
+      "step": "access-matrix",
+      "matrixRows": 19,
+      "grantedMarks": 48
+    },
+    {
+      "step": "access-checker",
+      "deniedBefore": 11,
+      "deniedAfter": 0
+    },
+    {
+      "step": "05c-access",
+      "screenshot": "evidence\\senda-command-center\\05c-access.png"
+    },
+    {
+      "step": "simulation",
+      "labelled": true,
+      "bars": 19
+    },
+    {
+      "step": "06-simulation",
+      "screenshot": "evidence\\senda-command-center\\06-simulation.png"
+    },
+    {
+      "step": "evidence",
+      "shaCount": 4
+    },
+    {
+      "step": "07-evidence",
+      "screenshot": "evidence\\senda-command-center\\07-evidence.png"
+    },
+    {
+      "step": "camera-intelligence",
+      "cameraRows": 25
+    },
+    {
+      "step": "08-camera-intelligence",
+      "screenshot": "evidence\\senda-command-center\\08-camera-intelligence.png"
+    },
+    {
+      "step": "live-sources",
+      "sourceRows": 24
+    },
+    {
+      "step": "09-live-sources",
+      "screenshot": "evidence\\senda-command-center\\09-live-sources.png"
+    },
+    {
+      "step": "secure-manifest",
+      "manifestNotice": "PASS. 4 archivos recomputados con SHA-256 sobre los bytes que renderiza la interfaz."
+    },
+    {
+      "step": "secure-sign",
+      "verified": true
+    },
+    {
+      "step": "secure-tamper",
+      "rejected": "REJECTED. PAYLOAD_TAMPERED · SIGNATURE_INVALID"
+    },
+    {
+      "step": "secure-outbox",
+      "queuedText": "COLA\n1 pendientes\nACUSES\n0\nESTADO\nEncolado · MESSAGE_ACCEPTED"
+    },
+    {
+      "step": "secure-ack",
+      "ackedText": "COLA\n0 pendientes\nACUSES\n1\nESTADO\nAcuse explícito del par registrado"
+    },
+    {
+      "step": "11-secure-link",
+      "screenshot": "evidence\\senda-command-center\\11-secure-link.png"
+    },
+    {
+      "step": "offline-reload",
+      "ok": true,
+      "blockedExternal": true
+    },
+    {
+      "step": "10-offline",
+      "screenshot": "evidence\\senda-command-center\\10-offline.png"
+    }
+  ],
+  "consoleErrors": [],
+  "pageErrors": []
+}

@@ -1,0 +1,103 @@
+{
+  "schema": "senda-inference-priors/1",
+  "id": "senda-inference-priors",
+  "version": "1.0.0",
+  "provenance": "EXERCISE_RANGE_PRIORS",
+  "updated": "2026-11-07",
+  "note": "Rangos declarados de ejercicio, no mediciones de campo. Cada valor debe sustituirse por evidencia de ensayo antes de cualquier afirmación operativa. La capa Beta-Binomial aprende de observaciones locales y estrecha estos priors sin tocar el sello.",
+  "bearers": {
+    "PHONE_MESH": {
+      "label": "Phone mesh (BLE / Wi-Fi Direct / sound)",
+      "family": "PROXIMITY",
+      "successAlpha": 2.4,
+      "successBeta": 1.6,
+      "latencyS": 600
+    },
+    "CELL_DATA": {
+      "label": "Cellular data (if a cell survives)",
+      "family": "TERRESTRIAL",
+      "successAlpha": 2,
+      "successBeta": 2,
+      "latencyS": 2
+    },
+    "SMS": {
+      "label": "SMS (2G / weak signal)",
+      "family": "TERRESTRIAL",
+      "successAlpha": 2.2,
+      "successBeta": 1.8,
+      "latencyS": 15
+    },
+    "SAT_D2C_SMS": {
+      "label": "Satellite direct-to-cell SMS",
+      "family": "SATELLITE",
+      "successAlpha": 2.8,
+      "successBeta": 1.2,
+      "latencyS": 120
+    },
+    "MESHTASTIC": {
+      "label": "LoRa Meshtastic 868 MHz",
+      "family": "LORA",
+      "successAlpha": 3,
+      "successBeta": 1,
+      "latencyS": 30
+    },
+    "IRIDIUM_SBD": {
+      "label": "Iridium SBD (RockBLOCK)",
+      "family": "SATELLITE",
+      "successAlpha": 3.6,
+      "successBeta": 0.4,
+      "latencyS": 60
+    },
+    "DRONE_MULE": {
+      "label": "Drone mule (store and forward)",
+      "family": "AERIAL",
+      "successAlpha": 3.2,
+      "successBeta": 0.8,
+      "latencyS": 900
+    },
+    "RELAY_INTERNET": {
+      "label": "Neighbour SENDA relay over Internet",
+      "family": "BACKBONE",
+      "successAlpha": 2.4,
+      "successBeta": 1.6,
+      "latencyS": 5
+    }
+  },
+  "erasure": {
+    "k": 8,
+    "n": 12
+  },
+  "dtn": {
+    "contactRatePerHour": 0.2,
+    "copies": 3
+  },
+  "ranging": {
+    "txPowerDbm": 0,
+    "rssiDbm": -70,
+    "pathLossExponent": 3,
+    "sigmaDb": 6,
+    "referenceDistanceM": 1,
+    "referenceLossDb": 40
+  },
+  "epidemic": {
+    "population": 1000,
+    "contactsPerDay": 8,
+    "beta": 0.15,
+    "latencyDays": 3,
+    "infectiousDays": 5,
+    "days": 90
+  },
+  "methods": [
+    "Beta-Binomial conjugate update: Gelman et al., Bayesian Data Analysis.",
+    "Exact binomial tail and Poisson-binomial DP: Wang (1993); Chen & Liu (1997).",
+    "Erasure k-of-n over GF(2^8): Reed-Solomon / Cauchy construction.",
+    "Delay-tolerant delivery: Vahdat & Becker (2000); Spyropoulos et al. (2005).",
+    "Log-distance path loss and Cramer-Rao bound: Rappaport; Kay (1993).",
+    "Adaptive ODE integration: Dormand & Prince (1980)."
+  ],
+  "integrity": {
+    "algorithm": "SHA-256",
+    "digest": "f8b5c53514a03c917efb6e6fb49f18b0a8fe9b8a551bec66eeb2406c1fcc8ca3",
+    "canonical": "sorted-keys/no-whitespace/excludes-integrity"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "@senda/command-center",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "SENDA Command Center - offline-first premium desktop/web console.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "type-check": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs",
+    "sync-evidence": "node scripts/sync-evidence.mjs",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.96.1",
+    "@react-three/fiber": "^8.15.19",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.161.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/three": "^0.161.2",
+    "@vitejs/plugin-react": "^4.3.3",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}

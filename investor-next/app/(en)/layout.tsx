@@ -10,6 +10,7 @@ export const metadata: Metadata={
   openGraph:{title:'OEP — Offline Emergency Protocol | Distributed Emergency Coordination & Adaptive Routing',description:'See how OEP models opt-in safety check-ins, offline message queuing, adaptive paths and receiver receipts. Open-source research MVP; no real disaster routing claimed.',locale:'en_US',type:'website'},
   twitter:{card:'summary_large_image',title:'OEP — Offline Emergency Protocol | Distributed Emergency Coordination & Adaptive Routing',description:'Open-source emergency coordination research: opt-in status, store-and-forward queue, adaptive routing and explicit ACK boundaries.'},
   alternates:{canonical:'/',languages:{en:'/',es:'/es/',nl:'/nl/'}},
+  icons:{icon:[{url:'/icon.svg',type:'image/svg+xml'},{url:'/favicon.ico',sizes:'32x32',type:'image/x-icon'}],shortcut:'/favicon.ico'},
   robots:{index:true,follow:true}
 };
 export default function RootLayout({children}:Readonly<{children:React.ReactNode}>){

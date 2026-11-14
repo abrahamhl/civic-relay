@@ -1,0 +1,40 @@
+{
+  "name": "@senda/pci",
+  "version": "0.1.0",
+  "description": "Proof-Carrying Inference: a checkable evidence envelope for offline numeric claims.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Abraham Haddioui",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.mts",
+      "import": "./src/index.mjs"
+    }
+  },
+  "bin": {
+    "pci": "./bin/pci.mjs"
+  },
+  "files": [
+    "src",
+    "bin",
+    "SPEC.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\"",
+    "verify": "node examples/verify-claim.mjs"
+  },
+  "keywords": [
+    "offline",
+    "provenance",
+    "verification",
+    "emergency",
+    "inference",
+    "sha-256",
+    "ecdsa"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}

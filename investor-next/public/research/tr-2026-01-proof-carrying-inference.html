@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA-TR-2026-01 · Proof-Carrying Inference for Offline Emergency Software</title>
+<meta name="description" content="PCI v0.1 is a small JSON envelope that binds a displayed number to its inputs, method, tolerances, provenance class, limitations and a SHA-256 seal. A verifier checks the structure, digests, display rule and provenance offline; an optional ECDSA P-256 signature adds signer binding. The report states what the envelope proves and what it does not, including a proof that a valid seal does not prove execution, and a cross-runtime result for upper-bound displays.">
+<meta name="author" content="Abraham Haddioui">
+<meta name="citation_title" content="Proof-Carrying Inference for Offline Emergency Software">
+<meta name="citation_author" content="Abraham Haddioui">
+<meta name="citation_publication_date" content="2026/11/07">
+<meta name="citation_technical_report_number" content="SENDA-TR-2026-01">
+<meta name="citation_pdf_url" content="https://civic-relay-investor.vercel.app/research/tr-2026-01-proof-carrying-inference.pdf">
+<meta name="citation_abstract_html_url" content="https://civic-relay-investor.vercel.app/research/tr-2026-01-proof-carrying-inference.html">
+<link rel="canonical" href="https://civic-relay-investor.vercel.app/research/tr-2026-01-proof-carrying-inference.html">
+<link rel="stylesheet" href="/research/katex/katex.min.css">
+<link rel="stylesheet" href="/research/research.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"ScholarlyArticle","headline":"Proof-Carrying Inference for Offline Emergency Software","alternativeHeadline":"A checkable evidence envelope for numerical claims","author":[{"@type":"Person","name":"Abraham Haddioui"}],"datePublished":"2026-11-07","version":"1.0","license":"https://opensource.org/licenses/MIT","abstract":"PCI v0.1 is a small JSON envelope that binds a displayed number to its inputs, method, tolerances, provenance class, limitations and a SHA-256 seal. A verifier checks the structure, digests, display rule and provenance offline; an optional ECDSA P-256 signature adds signer binding. The report states what the envelope proves and what it does not, including a proof that a valid seal does not prove execution, and a cross-runtime result for upper-bound displays.","url":"https://civic-relay-investor.vercel.app/research/tr-2026-01-proof-carrying-inference.html","isPartOf":{"@type":"Periodical","name":"SENDA Technical Reports"},"identifier":"SENDA-TR-2026-01"}</script>
+</head>
+<body>
+<header class="paper-top">
+  <a class="paper-brand" href="/research/">SENDA <span>RESEARCH</span></a>
+  <nav class="paper-top-nav">
+    <a href="/research/">Library</a>
+    <a href="/research/tr-2026-01-proof-carrying-inference.pdf">PDF</a>
+    <a href="/research/source/tr-2026-01-proof-carrying-inference.md">Source</a>
+    <a href="/research/manifest.json">Manifest</a>
+  </nav>
+</header>
+<div class="paper-shell">
+  <aside class="paper-aside">
+    <p class="paper-kicker">SENDA-TR-2026-01</p>
+    <p class="paper-aside-meta">2026-11-07 · v1.0</p>
+    <p class="paper-aside-meta">Technical report · not peer reviewed</p>
+    <p class="paper-aside-meta">MIT</p>
+    <nav class="paper-toc" aria-label="Contents">
+      <a href="#abstract">Abstract</a>
+        <a href="#1-introduction">1. Introduction</a>
+        <a href="#2-requirements">2. Requirements</a>
+        <a href="#3-the-pci-envelope">3. The PCI envelope</a>
+        <a href="#4-display-determinism-across-runtimes">4. Display determinism across runtimes</a>
+        <a href="#5-threat-model">5. Threat model</a>
+        <a href="#6-implementation-and-case-study">6. Implementation and case study</a>
+        <a href="#7-related-work">7. Related work</a>
+        <a href="#8-limitations-and-non-claims">8. Limitations and non-claims</a>
+        <a href="#9-conclusion">9. Conclusion</a>
+        <a href="#availability">Availability</a>
+        <a href="#references">References</a>
+        <a href="#appendix-a-reproduction">Appendix A — Reproduction</a>
+    </nav>
+    <p class="paper-aside-digest">Artifact hashes are listed in <a href="/research/manifest.json">manifest.json</a>.</p>
+  </aside>
+  <main class="paper-main">
+    <p class="paper-kicker">SENDA-TR-2026-01 · TECHNICAL REPORT</p>
+    <h1>Proof-Carrying Inference for Offline Emergency Software</h1>
+    <p class="paper-subtitle">A checkable evidence envelope for numerical claims</p>
+    <p class="paper-meta">Abraham Haddioui · 2026-11-07 · version 1.0</p>
+    <p class="paper-status">Technical report · not peer reviewed · MIT</p>
+    <h2 id="abstract">Abstract</h2>
+<p>Emergency software often presents numbers—delivery probabilities, credible
+intervals, delay bounds, mass-conservation errors—without a portable way to
+check how those numbers were produced. This report specifies <strong>PCI v0.1
+(Proof-Carrying Inference)</strong>, a small JSON envelope that binds a displayed
+number to its inputs, method, tolerances, provenance class, limitations, and a
+SHA-256 seal. A verifier checks four things offline: the structure, the digests,
+the display rule, and the provenance evidence; an optional ECDSA P-256 signature
+adds signer binding. We state what the envelope proves and what it does not. The
+central negative result is simple: a valid seal does not prove that the producer
+executed the declared method. PCI is an evidence format, not a proof of
+computational integrity. We then give a positive result for cross-runtime
+display determinism: if a claim uses an upper-bound display and every observed
+raw value lies below the bound, the rendered text is identical across runtimes
+even when the raw floating-point values differ. We illustrate the format with a
+SEIR integration whose raw mass error differs between Node.js and Chrome while
+the published display remains <code>&lt; 1e-9</code>. The reference implementation is a
+dependency-free MIT-licensed package with 17 tests, a command-line verifier, and
+an optional signature profile.</p>
+<p><strong>Keywords:</strong> offline systems, provenance, verification, numerical software,
+emergency computing, reproducibility.</p>
+<h2 id="1-introduction">1. Introduction</h2>
+<p>A field application may show that a message has a 97.3% chance of delivery
+within twelve hours, or that an adaptive integrator conserves mass to better
+than <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span></span></span>. An operator can act on the number, but a reviewer cannot
+reconstruct it from a screenshot. The inputs, the model version, the tolerance,
+the rounding rule, and the epistemic status of the number are usually scattered
+across code, build logs, and documentation—if they exist at all.</p>
+<p>This report asks a narrower question than “is the model correct?”:</p>
+<blockquote>
+<p>Can a third party check, without network access, that a displayed number is
+the number the producer committed to, and that the producer declared the
+conditions under which it should be read?</p>
+</blockquote>
+<p>PCI answers that question with an envelope, a canonical byte encoding, three
+SHA-256 digests, a display contract, and a provenance class. The design is
+deliberately small enough to reimplement. It is not a consensus protocol, a
+zero-knowledge proof, or a replacement for field trials.</p>
+<p>The contributions are:</p>
+<ol>
+<li>a precise claim model and canonicalization rules for numerical claims;</li>
+<li>a four-level verification procedure with explicit failure semantics;</li>
+<li>a display contract that separates raw floating-point values from the text a
+human sees;</li>
+<li>a cross-runtime determinism result for upper-bound displays;</li>
+<li>an open reference implementation and a documented negative result about what
+sealing does not prove.</li>
+</ol>
+<p>Section 2 states requirements. Section 3 defines the envelope and its integrity
+properties. Section 4 analyzes display determinism. Section 5 gives the threat
+model. Section 6 describes the implementation and case study. Section 7 relates
+the work to existing attestation and provenance formats. Section 8 lists
+limitations and non-claims. Section 9 concludes.</p>
+<h2 id="2-requirements">2. Requirements</h2>
+<p>We derived the following requirements from offline emergency deployments:</p>
+<ul>
+<li><strong>R1 — Offline verification.</strong> Verification must use only the claim and an
+optional public key. No registry, timestamp authority, or network call.</li>
+<li><strong>R2 — Explicit inputs.</strong> Every input that changes the result must be present
+or committed by digest.</li>
+<li><strong>R3 — Explicit method and tolerance.</strong> The claim must name the method and
+declare whether it is exact; numerical methods must expose tolerances.</li>
+<li><strong>R4 — Display contract.</strong> The human-visible text must be recomputable from
+the raw value and a declared rule.</li>
+<li><strong>R5 — Epistemic status.</strong> Exercise priors, simulations, field observations,
+validated observations, and derived claims must be distinguishable.</li>
+<li><strong>R6 — Tamper evidence.</strong> A change to the payload must invalidate the seal
+under a standard collision-resistance assumption.</li>
+<li><strong>R7 — Small surface.</strong> A competent developer should be able to implement a
+verifier from the specification in a day.</li>
+</ul>
+<p>R1 rules out designs that depend on an online transparency log for the base
+check. R4 is the requirement most often missing from provenance systems: a hash
+of a float is not a statement about what a human was shown.</p>
+<h2 id="3-the-pci-envelope">3. The PCI envelope</h2>
+<h3>3.1 Claim tuple</h3>
+<p>A claim is a tuple</p>
+<div class="math-block"><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">ℓ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mclose">)</span><span class="mpunct">,</span></span></span></span></span></div>
+<p>where <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> identifies the model and version, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> is the input object, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span> is the
+method and its tolerances, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span> is the raw result, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span></span></span></span> is the display rule,
+<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span> is the provenance record, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">ℓ</span></span></span></span> is a non-empty list of limitations, and <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span></span></span></span>
+is the reproduction record. The wire format adds a version string, a claim
+identifier, an integrity object, and an optional signature.</p>
+<h3>3.2 Canonical encoding</h3>
+<p>Let <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">κ</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mclose">)</span></span></span></span> be the canonical JSON encoding: NFC-normalized strings, sorted
+object keys, no insignificant whitespace, finite numbers serialized by the
+ECMAScript algorithm, and rejection of non-JSON values. This is close to RFC
+8785 [<a class="cite" href="#ref-rfc8785">1</a>], restricted to the JSON subset PCI needs. Canonicalization makes
+the digest independent of property order and Unicode composition.</p>
+<p>The payload is <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span></span></span></span> with <code>integrity</code> and <code>signature</code> removed. The sealer computes</p>
+<div class="math-block"><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mopen">(</span><span class="mord mathnormal">κ</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">payload</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">))</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mopen">(</span><span class="mord mathnormal">κ</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">))</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mopen">(</span><span class="mord mathnormal">κ</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mclose">))</span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span></span></span></span></span></div>
+<p>where <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span> is SHA-256 [<a class="cite" href="#ref-fips180">2</a>]. The three digests bind the whole claim, the
+inputs, and the result separately. The separate digests make failures
+diagnosable: a changed input invalidates both the payload and input digests,
+while a changed display invalidates the payload and result digests.</p>
+<h3>3.3 Verification predicate</h3>
+<p>A verifier returns a level in <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">4</span><span class="mclose">}</span></span></span></span> and a Boolean. The levels are:</p>
+<ul>
+<li><strong>L0:</strong> structure and types;</li>
+<li><strong>L1:</strong> all three digests;</li>
+<li><strong>L2:</strong> display text equals the text produced by <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mclose">)</span></span></span></span>;</li>
+<li><strong>L3:</strong> provenance requirements;</li>
+<li><strong>L4:</strong> ECDSA P-256 signature, when a public key is supplied.</li>
+</ul>
+<p>A verifier must not report L2 if L1 failed. A signature present without a public
+key produces a warning, not L4.</p>
+<h3>3.4 What the seal proves</h3>
+<p><strong>Proposition 1 (tamper evidence).</strong> Assume SHA-256 is collision-resistant.
+If two claims <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span></span></span></span> and <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span> differ in any payload field, then with overwhelming
+probability <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel"><span class="mrel"><span class="mord katex-vbox"><span class="katex-thinbox"><span class="rlap"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="katex-inner"><span class="mord"><span class="mrel"></span></span></span><span class="katex-fix"></span></span></span></span></span><span class="mspace nobreak"></span><span class="mrel">=</span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>.</p>
+<p>This is the standard reduction: a collision in the payload digest yields a
+SHA-256 collision. The proposition is conditional on the hash assumption and on
+the verifier using the same canonicalization.</p>
+<p><strong>Proposition 2 (display soundness).</strong> If verification reaches L2, then the
+claim’s text is exactly the text generated by the declared rule applied to the
+raw value.</p>
+<p>This is by construction: L2 requires byte-for-byte equality with the expected
+string. It says nothing about whether the rule is a good way to present the
+number.</p>
+<p><strong>Proposition 3 (signature binding).</strong> If the ECDSA verification succeeds, the
+signer possessed the private key corresponding to the supplied public key and
+signed the payload digest.</p>
+<p>This is the standard unforgeability property of ECDSA [<a class="cite" href="#ref-fips186">3</a>]. It does not
+establish that the signer is trustworthy, that the key was not stolen, or that
+the payload is true.</p>
+<h3>3.5 What the seal does not prove</h3>
+<p><strong>Proposition 4 (no execution proof).</strong> A valid PCI claim does not imply that
+the producer executed the declared method.</p>
+<p><em>Proof.</em> A producer can compute any value <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span>, construct a well-formed claim
+with arbitrary inputs and a declared method, and seal it. All verifier checks
+are local functions of the claim and the key. Nothing in the envelope binds the
+claim to an execution trace. Therefore a valid claim is consistent with both
+faithful and fabricated execution. ∎</p>
+<p>This is not a defect to be patched with more hashing. Closing the gap requires
+trusted execution, reproducible builds with independent re-execution, or a
+cryptographic proof system with a cost and trust model that most offline
+emergency deployments cannot carry. PCI chooses the cheaper, narrower claim.</p>
+<h2 id="4-display-determinism-across-runtimes">4. Display determinism across runtimes</h2>
+<h3>4.1 The problem</h3>
+<p>Floating-point results can differ across JavaScript engines because
+transcendental functions such as <code>Math.pow</code> are implementation-approximated, and
+because engines may optimize arithmetic differently. An adaptive integrator
+turns a tiny difference in an error estimate into a different step-size
+trajectory. Hashing the raw float would make the claim runtime-specific and
+fragile. Hashing only the displayed text would hide the raw uncertainty.</p>
+<p>PCI separates the two. The raw value is committed, and the display rule states
+what the human sees. For quantities that are known only up to a bound, the
+correct display is a bound, not a fixed number.</p>
+<p><strong>Definition 1 (display determinism).</strong> Let <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span> be a set of runtimes and let
+<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">ρ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> be the raw value produced by runtime <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7335em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span>. A display rule
+<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span></span></span></span> is deterministic over <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span> if <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">ρ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> is the same string for
+all <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7335em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span>.</p>
+<p><strong>Lemma 1 (upper-bound determinism).</strong> Let <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span></span></span></span> be the rule
+<code>upper-bound</code> with bound <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>, rendering <code>&lt; B</code> when <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span> and <code>≤ B</code> when
+<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span>. If every <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">ρ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> satisfies <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7804em;vertical-align:-0.136em;"></span><span class="mord">0</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8252em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">ρ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span>, then <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span></span></span></span> is
+deterministic over <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span> and renders <code>&lt; B</code>.</p>
+<p><em>Proof.</em> The rule’s output depends only on the predicate <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span> and on the
+constant <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span>, not on the numerical value of <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span></span></span></span>. Every runtime satisfies the
+predicate, so every runtime produces the same string. ∎</p>
+<p>The lemma is deliberately modest. It does not say the raw values are equal; it
+says the published text is a stable contract. The raw values remain in the
+claim for audit.</p>
+<p>For fixed-point displays, a sufficient condition is a shared rounding interval.</p>
+<p><strong>Lemma 2 (fixed-point margin).</strong> Let <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span></span></span></span> be <code>fixed:N</code>. If there exists an
+integer <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> such that both <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span></span></span></span> and <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span> lie strictly inside
+<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">((</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathnormal mtight" style="margin-right:0.109em;">N</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathnormal mtight" style="margin-right:0.109em;">N</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>, then
+<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span class="mord mathrm">toFixed</span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mop"><span class="mord mathrm">toFixed</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span></span></span></span>.</p>
+<p>This follows because <code>toFixed(N)</code> rounds to the nearest multiple of <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8413em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathnormal mtight" style="margin-right:0.109em;">N</span></span></span></span></span></span></span></span></span></span></span></span>;
+the open interval excludes the tie boundaries. In practice a producer should
+require a margin much larger than the observed cross-runtime spread, or use an
+upper bound.</p>
+<h3>4.2 Observed case</h3>
+<p>The SENDA precision lab integrates a four-compartment SEIR model with the
+Dormand–Prince 5(4) pair [<a class="cite" href="#ref-dormand1980">4</a>]. The exact ODE preserves
+<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span>; the numerical trajectory has a mass defect</p>
+<div class="math-block"><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">e</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">∣</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose delimcenter" style="top:0em;">∣</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">.</span></span></span></span></span></div>
+<p>The lab reports <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span class="mop">max</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">e</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span> over daily samples. With population <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1000</span></span></span></span>,
+eight contacts per day, transmission probability <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0528em;">β</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.15</span></span></span></span>, three latent days,
+five infectious days, and ninety simulated days, the observed values were:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Runtime</th>
+<th>Version</th>
+<th align="right">Raw max mass error</th>
+<th>Display</th>
+<th align="right">Accepted steps</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Node.js</td>
+<td>22.22.2</td>
+<td align="right"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.8189894035458565</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span></td>
+<td><code>&lt; 1e-9</code></td>
+<td align="right">233</td>
+</tr>
+<tr>
+<td>Google Chrome (headless)</td>
+<td>156.0.0.0</td>
+<td align="right"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.0231815394945443</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span></td>
+<td><code>&lt; 1e-9</code></td>
+<td align="right">233</td>
+</tr>
+</tbody></table></div>
+<p>The raw values differ by about <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">7.96</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">13</span></span></span></span></span></span></span></span></span></span></span></span>, yet both satisfy
+<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span></span></span>. By Lemma 1 the display is deterministic. The accepted step count
+also agreed in this run, but that is an observation, not a guarantee. A matrix
+of four parameter settings is reported in SENDA-TR-2026-03.</p>
+<p>This example motivates the design: publish the bound that matters to the
+operator, commit the raw value for audit, and do not pretend that a float hash
+is a cross-runtime display contract.</p>
+<h2 id="5-threat-model">5. Threat model</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Threat</th>
+<th>PCI response</th>
+<th>Residual risk</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Payload modified at rest</td>
+<td>Three SHA-256 digests</td>
+<td>Hash collision; canonicalization bug</td>
+</tr>
+<tr>
+<td>Inputs swapped between claims</td>
+<td>Input digest and claim ID</td>
+<td>Producer fabricates inputs</td>
+</tr>
+<tr>
+<td>Display edited in a screenshot</td>
+<td>Display rule and text check</td>
+<td>Screenshot can omit the claim</td>
+</tr>
+<tr>
+<td>Prior presented as field data</td>
+<td>Provenance class and source digest</td>
+<td>Source itself may be bad</td>
+</tr>
+<tr>
+<td>Claim replayed in another context</td>
+<td>Claim ID and model binding</td>
+<td>No context field in v0.1</td>
+</tr>
+<tr>
+<td>Signature forged</td>
+<td>ECDSA P-256</td>
+<td>Key theft; weak key management</td>
+</tr>
+<tr>
+<td>Compromised runtime</td>
+<td>None</td>
+<td>Producer can lie before sealing</td>
+</tr>
+<tr>
+<td>Verifier bug</td>
+<td>Test vectors and independent implementations</td>
+<td>Implementation diversity is immature</td>
+</tr>
+</tbody></table></div>
+<p>The threat model is intentionally local. PCI is useful when the adversary can
+modify files or messages but does not control the verifier and cannot break the
+hash or signature. It is not useful against a compromised device that is
+authorized to produce claims.</p>
+<h2 id="6-implementation-and-case-study">6. Implementation and case study</h2>
+<p>The reference implementation is <code>@senda/pci</code> 0.1.0, MIT-licensed, with no runtime
+dependencies. It uses Web Crypto for SHA-256 and ECDSA. The public API includes
+<code>canonicalize</code>, <code>sealClaim</code>, <code>verifyClaim</code>, <code>generateKeyPair</code>, <code>signClaim</code>,
+<code>verifyClaimSignature</code>, and <code>claimSetDigest</code>. The command-line verifier supports
+<code>keygen</code>, <code>seal</code>, <code>verify</code>, <code>sign</code>, <code>digest</code>, and <code>set</code>.</p>
+<p>The test suite covers canonicalization, Unicode normalization, non-finite
+rejection, idempotent sealing, input and result tampering, display mismatch,
+scaled percentages, strict and inclusive bounds, integer rules, provenance
+requirements, signature success and failure, claim-set ordering, and a SHA-256
+test vector. At the time of writing, all 17 tests pass under Node.js 22.22.2.</p>
+<p>A reproduced example claim has payload digest</p>
+<pre><code class="language-text">e205f5fbe4b9783bc0496b59601b6285ddd948407532f170898965320dde3af1
+</code></pre>
+<p>and verifies at L4 with a freshly generated P-256 key. Mutating the result to
+<code>1</code> yields two integrity mismatches and exits the verifier with code 1. The
+digest is deterministic across runs because the key is generated outside the
+payload and because sealing excludes <code>integrity</code> and <code>signature</code>.</p>
+<p>The package does <strong>not</strong> claim production readiness. It is a working draft with
+a small API, no key-distribution story, and no independent implementation yet.
+Those are deliberate next-cycle deliverables, not hidden features.</p>
+<h2 id="7-related-work">7. Related work</h2>
+<p>PCI sits between several established lines.</p>
+<p><strong>Provenance.</strong> W3C PROV models entities, activities, and agents [<a class="cite" href="#ref-prov">5</a>]. It is
+expressive but does not define a numeric display contract or a compact offline
+verifier. PCI can be embedded as a PROV entity.</p>
+<p><strong>Supply-chain attestations.</strong> in-toto and SLSA bind artifacts to steps and
+builders [<a class="cite" href="#ref-intoto">6</a>, <a class="cite" href="#ref-slsa">7</a>]. They answer “which build produced this artifact?”
+PCI answers “what does this number mean, and what evidence travels with it?”
+The two are complementary: a PCI claim can be an in-toto subject.</p>
+<p><strong>Content provenance.</strong> C2PA binds assertions to media [<a class="cite" href="#ref-c2pa">8</a>]. PCI targets
+scalar numerical claims and their display, not pixels or signatures over media.</p>
+<p><strong>Research objects.</strong> RO-Crate packages data, code, and metadata [<a class="cite" href="#ref-ro-crate">9</a>].
+PCI claims can be members of an RO-Crate; the manifest in this report is a
+lightweight research object.</p>
+<p><strong>Model and dataset documentation.</strong> Model cards and datasheets describe
+intended use and limitations [<a class="cite" href="#ref-modelcards">10</a>]. PCI makes a specific numerical claim
+checkable; it does not replace model documentation.</p>
+<p><strong>Proof-carrying code and verifiable computation.</strong> Necula’s proof-carrying code
+attaches a machine-checkable proof to code [<a class="cite" href="#ref-pcc">11</a>]. PCI uses “proof” in the
+engineering sense of an evidence bundle, not a formal derivation. Cryptographic
+proof systems could strengthen PCI, but they change the cost and trust model.</p>
+<p><strong>Numerical reproducibility.</strong> Work on reproducible floating-point and
+round-trip formatting is directly relevant. PCI’s contribution is not a new
+rounding algorithm; it is the envelope and the verification contract around the
+display.</p>
+<h2 id="8-limitations-and-non-claims">8. Limitations and non-claims</h2>
+<ul>
+<li>The reference implementation is not independently audited.</li>
+<li>ECDSA key distribution, revocation, and trust anchors are outside v0.1.</li>
+<li>The envelope has no context field binding a claim to a deployment, operator,
+or time window. A signed claim can be replayed.</li>
+<li>Inputs may contain personal data; PCI does not define redaction.</li>
+<li>The provenance class is a declaration, not a verified fact.</li>
+<li>The upper-bound lemma assumes the bound is correct. A wrong bound produces a
+deterministic but false display.</li>
+<li>The package does not prove execution, model validity, or operational fitness.</li>
+<li>The papers are technical reports, not peer-reviewed publications.</li>
+</ul>
+<h2 id="9-conclusion">9. Conclusion</h2>
+<p>PCI makes a small, useful promise: a numerical claim can carry enough evidence
+to be checked offline, and its display can be made stable even when raw floats
+are not. The format is intentionally weaker than a proof of computation and
+stronger than an unsigned screenshot. The next steps are independent
+implementations, adversarial testing, and field provenance—not more claims that
+the seal can do something it cannot.</p>
+<h2 id="availability">Availability</h2>
+<ul>
+<li>Reference implementation: <code>packages/senda-pci</code> in the SENDA repository.</li>
+<li>Specification: <code>packages/senda-pci/SPEC.md</code>.</li>
+<li>Papers and downloads: <code>/research</code> on the SENDA site.</li>
+<li>License: MIT.</li>
+<li>Status: technical report, not peer reviewed.</li>
+</ul>
+<h2 id="references">References</h2>
+<ol class="references">
+<li id="ref-rfc8785"><span class="ref-num">[1]</span> A. Rundgren, B. Jordan, and S. Erdtman. “JSON Canonicalization Scheme (JCS).” RFC 8785, IETF, 2020.</li>
+<li id="ref-fips180"><span class="ref-num">[2]</span> National Institute of Standards and Technology. “Secure Hash Standard (SHS).” FIPS 180-4, 2015.</li>
+<li id="ref-fips186"><span class="ref-num">[3]</span> National Institute of Standards and Technology. “Digital Signature Standard (DSS).” FIPS 186-5, 2023.</li>
+<li id="ref-dormand1980"><span class="ref-num">[4]</span> J. R. Dormand and P. J. Prince. “A family of embedded Runge–Kutta formulae.” Journal of Computational and Applied Mathematics, 6(1):19–26, 1980.</li>
+<li id="ref-prov"><span class="ref-num">[5]</span> W3C. “PROV-Overview: An Overview of the PROV Family of Documents.” W3C Working Group Note, 2013.</li>
+<li id="ref-intoto"><span class="ref-num">[6]</span> S. Torres-Arias, H. Afzali, T. K. Kuppusamy, R. Curtmola, and J. Cappos. “in-toto: Providing farm-to-table guarantees for bits and bytes.” USENIX Security Symposium, 2019.</li>
+<li id="ref-slsa"><span class="ref-num">[7]</span> Open Source Security Foundation. “SLSA: Supply-chain Levels for Software Artifacts.” Specification, 2023–2026.</li>
+<li id="ref-c2pa"><span class="ref-num">[8]</span> Coalition for Content Provenance and Authenticity. “C2PA Technical Specification.” 2024–2026.</li>
+<li id="ref-ro-crate"><span class="ref-num">[9]</span> S. Soiland-Reyes et al. “Packaging research artefacts with RO-Crate.” Data Science, 5(2), 2022.</li>
+<li id="ref-modelcards"><span class="ref-num">[10]</span> M. Mitchell et al. “Model Cards for Model Reporting.” Proceedings of FAT* 2019, pp. 220–229.</li>
+<li id="ref-pcc"><span class="ref-num">[11]</span> G. C. Necula. “Proof-Carrying Code.” Proceedings of POPL 1997, pp. 106–119.</li>
+</ol><h2 id="appendix-a-reproduction">Appendix A — Reproduction</h2>
+<pre><code class="language-bash">cd packages/senda-pci
+node --test &quot;test/*.test.mjs&quot;
+node examples/verify-claim.mjs
+node bin/pci.mjs verify claim.json --public-key public.jwk.json
+</code></pre>
+<p>The SEIR case study is reproduced by:</p>
+<pre><code class="language-bash">node scripts/research/cross-runtime.mjs
+</code></pre>
+<p>The script writes a JSON matrix with raw values, displays, engine versions, and
+a pass/fail summary. It does not contact the network.</p>
+
+    <footer class="paper-footer">
+      <p>SENDA-TR-2026-01 · Proof-Carrying Inference for Offline Emergency Software</p>
+      <p>Published by SENDA. Technical report, not peer reviewed. This document is licensed under MIT.</p>
+      <p><a href="/research/">All reports</a> · <a href="/research/manifest.json">Download manifest</a> · <a href="/">SENDA</a></p>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

@@ -1,5 +1,75 @@
 # Changelog
 
+## SENDA v0.22.1 · 07-11-2026 · Corrección de artefactos HTML y smoke de integridad
+
+**Entrada (fundador):**
+- Continuar y corregir cualquier fallo restante antes de cerrar la entrega.
+
+**Procesamiento:**
+- **Incidencia:** las 3 páginas HTML de los informes devolvían 404 en producción; PDFs, fuentes, BibTeX y datos devolvían 200.
+- **Causa:** Vercel servía la edición sin extensión (clean URL) y no la ruta `.html` generada por el exportador.
+- **Corrección:** rewrite `/research/:slug.html` → `/research/:slug` en `investor-next/vercel.json`, probado primero en preview `dpl_7GcxuwYauibiB9TyKad4u9abCYUK`.
+- **Blindaje:** `smoke-deploy.mjs` ahora descarga las 3 páginas HTML y verifica los 14 archivos del manifiesto (3 HTML, 3 PDFs, 3 Markdown, 3 BibTeX, 2 datos) más el BibTeX agregado, comprueba `Content-Type: text/html`, aviso de revisión por pares, tamaño y SHA-256, y falla ante cualquier 404 o byte alterado.
+
+**Validación:**
+- **Preview:** smoke completo y Playwright 390/1440 en EN/ES/NL; las 3 páginas de informe abren; 0 errores HTTP, de consola o de página.
+- **Producción:** `dpl_EEj1nqZRJgydYY4cNApgnV359JnA` READY y aliaseado; smoke con paridad `a622404…7168`; 14 archivos del manifiesto (1.343.686 bytes) con hashes más el BibTeX agregado; Playwright 390/1440 en los 3 idiomas y los 3 informes, 0 errores.
+
+**Salida:** biblioteca clicable y verificable de extremo a extremo. Los informes siguen sin revisión por pares y no acreditan mediciones físicas.
+
+## SENDA v0.22 · 07-11-2026 · Biblioteca de investigación trilingüe con artefactos verificables
+
+**Entrada (fundador):**
+- Publicar una biblioteca de investigación verificable y trilingüe para inversores, con informes técnicos, PDFs, fuentes, BibTeX, datos y hashes.
+
+**Procesamiento:**
+- **Tres informes** (`investor-next/content/research/papers.json`): inferencia con prueba, colas de borrado y determinismo de visualización; cada uno con HTML, Markdown, BibTeX, PDF y datos cuando aplica.
+- **Rutas** `/research/`, `/es/research/` y `/nl/research/` con componente compartido `research-page.tsx`, metadatos canónicos, hreflang y navegación persistente.
+- **Manifiesto SHA-256** `public/research/manifest.json` con digest de bundle `4c0f0e34…8f839f66`; hashes de HTML, fuentes, BibTeX, PDFs y datos.
+- **Verificador de exportación** `scripts/research/verify-export.mjs` integrado en `npm run build` y `check:research`; comprueba 3 locales, 3 informes, 2 conjuntos de datos, 3 PDFs y el digest.
+- **Localización:** estados, rótulos de sección, resúmenes y navegación en EN/ES/NL; los títulos de los informes se marcan `lang="en"` para evitar guiones neerlandeses incorrectos.
+- **Accesibilidad y móvil:** objetivos táctiles ≥24×24 px en enlaces de manifiesto, pie, cabecera y navegación de informes; cabecera fija con menú visible en 390 px.
+- **Procedencia:** los informes declaran «no revisados por pares»; los resultados son salidas de modelo, no mediciones de campo.
+
+**Validación:**
+- **Build:** 15 páginas estáticas; 123/123 pruebas del sitio; TypeScript limpio; `check:locales`, `check:domain` y `check:research` en verde.
+- **Navegador local:** 390×844 y 1440×900 en EN/ES/NL; 3 tarjetas, 3 PDFs, 0 desbordamiento horizontal, 0 errores de consola/página/HTTP; PDFs y manifiesto verificados.
+- **Producción:** https://civic-relay-investor.vercel.app/research/ (también `/es/research/` y `/nl/research/`); smoke de despliegue con 3 rutas base + 3 rutas de investigación, manifiesto y 3 PDFs; paridad de fuente `a622404…7168`.
+- **Navegador en producción:** 390 px y 1440 px en los tres idiomas; cabecera fija visible, 3 tarjetas y 0 errores.
+
+**Salida:** biblioteca de investigación desplegada y verificable. Los informes siguen sin revisión por pares y no acreditan mediciones físicas.
+
+## SENDA v0.21 · 07-11-2026 · Laboratorio de precisión e inferencia offline con priors sellados
+
+**Entrada (fundador):**
+- Investigar formulaciones matemáticas y renderizado de alta precisión.
+- Refinar el modelo y las bases de datos de inferencias.
+- Desplegar tecnología novedosa pero funcional y de alto valor que haga posible una conexión offline real.
+
+**Procesamiento:**
+- **Núcleo `precision-lab.mjs`** (12 pruebas):
+  - actualización Beta-Binomial conjugada con IC 95 % y cuantiles por bisección;
+  - cola binomial exacta y Poisson-binomial por programación dinámica para erasure k-de-n;
+  - DTN de inter-contacto exponencial con réplicas (Spray-and-Wait) y cuantiles;
+  - rango por RSSI con inversión log-distancia y cota de Cramér-Rao;
+  - SEIR con Dormand-Prince RK45 adaptativo y comprobación de conservación de masa;
+  - libro local de observaciones, exportación y sello SHA-256 canónico.
+- **Base de priors `public/data/inference-priors.v1.json`:** 8 portadores con α/β y latencia declaradas, rangos de ejercicio marcados como tales, digest `f8b5c535…c8ca3` y script de sellado idempotente.
+- **Web `/` (es, en, nl):**
+  - sección `#precision-lab` con 5 canvas conscientes de DPR, 12 deslizadores, insignia de sello verificada en el navegador;
+  - libro en `localStorage` con registrar éxito/fallo, exportar y reiniciar; funciona con la red desactivada;
+  - 5 filas nuevas en el scorecard (13 en total) y enlaces en cabecera y capítulos.
+- **Corrección de hidratación:** la conservación de masa se muestra como cota `< 1e-9` cuando corresponde, para que el render del servidor y el navegador coincidan sin depender del último bit.
+- **Documento:** `docs/research/PRECISION_INFERENCE_MODEL_2026-11-07.md`.
+
+**Validación:**
+- **Pruebas:** 123/123 del sitio, incluidas las 12 del núcleo de precisión.
+- **Build:** 12 páginas estáticas, TypeScript correcto y `html lang` correcto en `es`/`nl`.
+- **Navegador real en producción:** 390 px y 1440 px, DPR 1 y 2; 5 canvas con backing store exacto, 12 deslizadores, registro persistente, tercera observación sin red, exportación y reinicio; 0 errores de consola, 0 errores de página y 0 respuestas 4xx/5xx; tres locales verificados.
+- **Producción:** https://civic-relay-investor.vercel.app/#precision-lab
+
+**Salida:** sección desplegada y documentada; los priors quedan como rangos de ejercicio hasta sustituirlos por evidencia de ensayo.
+
 ## SENDA v0.20 · 06-11-2026 · Incendios de referencia con satélite real y cruce de coches, cámaras de tráfico y fuego
 
 **Entrada (fundador):**

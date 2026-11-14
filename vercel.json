@@ -1,8 +1,8 @@
 {
   "version": 2,
   "name": "civic-relay",
-  "buildCommand": "pnpm build",
-  "outputDirectory": "apps/web/dist",
+  "buildCommand": "pnpm --filter @senda/command-center build",
+  "outputDirectory": "apps/command-center/dist",
   "installCommand": "pnpm install --frozen-lockfile",
   "framework": null,
   "rewrites": [
@@ -45,7 +45,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: https: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.vercel.app https://api.civic-relay.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
         }
       ]
     },
@@ -66,13 +66,6 @@
           "value": "public, max-age=0, must-revalidate"
         }
       ]
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/:path*",
-      "destination": "https://civic-relay-investor.vercel.app/:path*",
-      "permanent": true
     }
   ],
   "env": {

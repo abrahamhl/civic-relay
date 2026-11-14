@@ -32,6 +32,8 @@ tests
 docs
 *.md
 !README.md
+# Research sources are build inputs for the investor site
+!investor-next/content/research/*.md
 
 # Config files not needed
 .editorconfig

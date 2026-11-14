@@ -6,6 +6,10 @@
     {
       "source": "/vision-master.md",
       "destination": "/vision-master.txt"
+    },
+    {
+      "source": "/research/:slug.html",
+      "destination": "/research/:slug"
     }
   ]
 }

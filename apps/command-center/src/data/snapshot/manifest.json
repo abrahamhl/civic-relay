@@ -1,0 +1,39 @@
+{
+  "schema": "senda-command-center-evidence-snapshot/v1",
+  "generatedAtUTC": "2026-11-06T17:23:49.277Z",
+  "note": "Byte-identical copies of repository evidence. SHA-256 binds the UI snapshot to the committed source. This is a snapshot, not a live feed.",
+  "files": [
+    {
+      "id": "source-registry",
+      "role": "Official provider documentation registry (v0.21)",
+      "repositoryPath": "packages/senda/data/source-registry.v021.json",
+      "snapshotPath": "src/data/snapshot/source-registry.json",
+      "bytes": 20504,
+      "sha256": "ffb6827e537fe8d2962a3d8d4c6c4fcef8bdb0d2da92104962eda5eee90c54c6"
+    },
+    {
+      "id": "tfl-cameras",
+      "role": "TfL JamCams recorded-clip derived counts (YOLOX-s + ByteTrack)",
+      "repositoryPath": "investor-next/public/senda/data/referencias/tfl_camaras.json",
+      "snapshotPath": "src/data/snapshot/tfl-cameras.json",
+      "bytes": 4026,
+      "sha256": "2aeea2fc0968c80b4219bd20c8d13b1a0b6ab367aeb30776db159c35a383033a"
+    },
+    {
+      "id": "caltrans-corridors",
+      "role": "Caltrans CCTV recorded-clip derived counts and estimated speeds",
+      "repositoryPath": "investor-next/public/senda/data/referencias/caltrans_corredores.json",
+      "snapshotPath": "src/data/snapshot/caltrans-corridors.json",
+      "bytes": 9734,
+      "sha256": "75586848fc334d10bca45598192c72d5c054584d6200d02a8b05c6b9c53fc2d6"
+    },
+    {
+      "id": "estado",
+      "role": "Last recorded local test status snapshot",
+      "repositoryPath": "investor-next/public/senda/estado.json",
+      "snapshotPath": "src/data/snapshot/estado.json",
+      "bytes": 309,
+      "sha256": "1ac3ba6204366fa3ff61426acb0f935aabfb90dbe4f13140d3a1ad7063cda67c"
+    }
+  ]
+}

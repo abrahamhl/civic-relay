@@ -32,6 +32,11 @@ coverage/
 *.tmp
 .cache/
 
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
 .vercel
 .env*
 docs/internal/
