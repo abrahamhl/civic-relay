@@ -64,6 +64,7 @@ input,select{font:inherit;background:#071018;color:var(--t);border:1px solid var
 <script type="module">
 import { emit, listen } from '/senda/audio.mjs';
 import { airtimeSeconds } from '/senda/core/acoustic-modem.mjs';
+import { glofasUrl, parseGlofasDaily, riverContext, riverContextText } from '/senda/core/river-context.mjs';
 import { HAZARD_KINDS, levelFromTaps, riseRate, clusterReports, assessIncident, triageQueue, citizenAdvice, incidentToCap, createReporterKeys, encodeReport, decodeReports } from '/senda/core/hazard-reports.mjs';
 const $ = (s) => document.querySelector(s), esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
@@ -123,12 +124,25 @@ function render() {
       <div class="m">${a.reporters} persona(s) · ${a.reports} reporte(s) · prioridad ${a.score} · probabilidad de que sea real ${a.pReal >= 0.99 ? '≥ 99' : (100 * a.pReal).toFixed(0)} % (modelo sin calibrar)${a.trapped ? ` · <b style="color:var(--r)">${a.trapped} atrapada(s)</b>` : ''}</div>
       <div class="m">${esc(a.why.join(' · '))}</div>
       <div>${esc(citizenAdvice(c.reports[0].kind, a).text)}</div>
+      ${HAZARD_KINDS[c.reports[0].kind].family === 'WATER' ? `<div class="m glofas" data-lat="${c.center.lat}" data-lon="${c.center.lon}">Caudal previsto (GloFAS): consultando…</div>` : ''}
       ${a.canPublicWarn ? '' : '<div class="m">Sin confirmación oficial: no se avisa a la población.</div>'}
       <div class="row"><button data-cap="${a.id}">Parte CAP 1.2 para la sala (restringido)</button></div></div>`; }).join('');
+  for (const el of $('#incs').querySelectorAll('.glofas')) fillGlofas(el);
   for (const b of $('#incs').querySelectorAll('button[data-cap]')) b.onclick = () => {
     const a = q.queue.find((x) => x.id === b.dataset.cap), c = cl.find((x) => x.id === a.id), xml = incidentToCap(a, c, { now: Date.now(), exercise: true });
     const u = URL.createObjectURL(new Blob([xml], { type: 'application/xml' })), l = document.createElement('a'); l.href = u; l.download = `senda-${a.id}.cap.xml`; l.click(); setTimeout(() => URL.revokeObjectURL(u), 2000);
   };
+}
+/* Contexto hidrológico: GloFAS en directo si hay red; si no, la última foto guardada si el punto está a < 10 km */
+const todayISO = () => new Date().toISOString().slice(0, 10);
+async function fillGlofas(el) {
+  const lat = +el.dataset.lat, lon = +el.dataset.lon; let series = null, origen = '';
+  try { const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 6000); series = parseGlofasDaily(await (await fetch(glofasUrl(lat, lon), { signal: ctl.signal })).json()); clearTimeout(to); origen = 'consulta en directo'; }
+  catch { try { const snap = await (await fetch('/senda/data/referencias/glofas_puntos.json')).json(); const p = snap.puntos.find((q) => Math.hypot((q.lat - lat) * 111, (q.lon - lon) * 111 * Math.cos((lat * Math.PI) / 180)) < 10); if (p) { series = p.serie; origen = `foto guardada del ${snap.descargadoUTC.slice(0, 16).replace('T', ' ')} UTC`; } } catch { /* sin foto */ } }
+  if (!series) { el.textContent = 'Caudal previsto (GloFAS): sin red y sin foto guardada para este punto.'; return; }
+  const days = series.days.map((d) => d.date), day = days.includes(todayISO()) ? todayISO() : days.filter((d) => d <= todayISO()).at(-1);
+  try { const c = riverContext(series, day); el.innerHTML = `<b>Caudal previsto (GloFAS):</b> ${esc(riverContextText(c))} <span class="sim">${esc(origen)}</span><br>${esc(c.lectura)}`; (window.SENDA_AVISOS ??= {}).glofas = c; }
+  catch (e) { el.textContent = 'Caudal previsto (GloFAS): ' + e.message; }
 }
 $('#demo').onclick = () => {
   const base = pos ?? { lat: 39.4269, lon: -0.4174 }, now = Date.now(), d = (m, a) => ({ lat: base.lat + (m * Math.cos(a)) / 111_320, lon: base.lon + (m * Math.sin(a)) / (111_320 * Math.cos((base.lat * Math.PI) / 180)) });
@@ -146,7 +160,7 @@ async function ingest(text) {
   $('#imp').textContent = `${added} nuevo(s) · ${got.length - added} repetido(s)${rejected.length ? ` · ${rejected.length} rechazado(s) (firma o formato no válidos)` : ''}`;
 }
 $('#import').onclick = () => ingest($('#paste').value);
-window.SENDA_AVISOS = { ingestBytes: (bytes) => ingest('SND3 ' + b64u(bytes)) };
+window.SENDA_AVISOS = Object.assign(window.SENDA_AVISOS ?? {}, { ingestBytes: (bytes) => ingest('SND3 ' + b64u(bytes)) });
 $('#hear').onclick = async () => {
   const b = $('#hear'); b.disabled = true; b.textContent = '👂 Escuchando 60 s… acerca el otro móvil';
   try { const l = await listen({ maxS: 60, onPayload: (bytes) => window.SENDA_AVISOS.ingestBytes(bytes) }); const n = await l.done; b.textContent = n ? `✓ ${n} reporte(s) oído(s)` : 'No se oyó ningún reporte'; }

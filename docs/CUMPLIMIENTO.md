@@ -25,6 +25,7 @@ Regla de base: `CLAUDE.md` §1 (nada inventado; simulaciones declaradas).
 | Fecha y hora (UTC) | Revisado | Avance | Problemas |
 |---|---|---|---|
 | 2026-11-12 23:4x | Lista creada | Regla de veracidad en `CLAUDE.md` | — |
+| 2026-11-14 09:1x | Punto 2: ríos (GloFAS) | 518/518; pantallas 22/22. Nuevo `river-context.mjs`: en cada incidente de agua de Avisos sale el **caudal previsto por GloFAS** (Copernicus, vía Open-Meteo). Se consulta en directo y, sin red, se usa la foto guardada (`scripts/datos-reales/glofas_snapshot.mjs`). Ejemplo real para Paiporta: 15,6 m³/s hoy (1,3× la mediana de los 30 días previos), pico de 19,1 el 15-11 y mañana «sube». Se dice expresamente que no es un aviso oficial | Open-Meteo gratis = **solo uso no comercial** (CC BY 4.0); para venderlo, Copernicus CDS o su plan de pago. La celda de GloFAS (~5 km) no es el barranco |
 | 2026-11-14 08:4x | Petición del fundador: CR360 + punto 1 (EFFIS) | 515/515. **conflictradar360.com analizado** a partir de su código público (funciones en el informe). **Validación con el perímetro OFICIAL de EFFIS:**
 - descarga real por WFS (`scripts/datos-reales/effis_snapshot.mjs`), nuevo `burn-validation.mjs` y `packages/senda/scripts/effis-validate.mjs`;
 - la cicatriz Sentinel-2 de SENDA coincide con EFFIS en J 0,554 con 0,2 % de falsa alarma;

@@ -82,6 +82,9 @@ try {
   const imp = await me.textContent('#imp');
   check('avisos: 2 nuevos, 1 repetido y 1 falsificado rechazado', /2 nuevo/.test(imp) && /1 repetido/.test(imp) && /1 rechazado/.test(imp), { imp });
   check('avisos: dos vecinos de la misma calle forman un solo incidente', /2 reportes → 1 incidente/.test(await me.textContent('#qsum')));
+  await me.waitForFunction(() => /GloFAS hoy|sin red y sin foto/.test(document.querySelector('.glofas')?.textContent ?? ''), null, { timeout: 20_000 });
+  const gl = await me.textContent('.glofas');
+  check('avisos: un incidente de agua muestra el caudal previsto por GloFAS (en directo o de la foto guardada) sin presentarlo como aviso', /GloFAS hoy [\d.]+ m³\/s/.test(gl) && /No es un aviso oficial/.test(gl), { gl: gl.slice(0, 200) });
   const sender = await phone('/avisos', { lat: 39.4270 }); await sender.click('#geo'); await sender.waitForFunction(() => /39\./.test(document.querySelector('#pos').textContent));
   await sender.click('#kinds button[data-k="RIVER_RISING"]'); await sender.click('#send'); await sender.waitForSelector('#snd'); await sender.click('#snd');
   await sender.waitForFunction(() => /Emitido|No se pudo/.test(document.querySelector('#snd').textContent), null, { timeout: 60_000 });
