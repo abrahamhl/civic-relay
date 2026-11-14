@@ -50,7 +50,13 @@ Si cae la red móvil, ¿qué fracción de la flota de autobuses tendría que lle
 | 400 | 100 % · 14,1 % (el voraz se detiene al cubrirlo todo) | 74 % · 95 % |
 | 1152 (todas) | 100 % · 97 % | — |
 
-- **Hallazgo:** colocar buzones solo por **cobertura geográfica**, aunque sea casi óptima (garantía ≥ 1 − 1/e), deja los **transbordos** sin buzón, y el mensaje no puede cambiar de autobús. En las paradas donde se cruzan más líneas la entrega se multiplica por unas 8 veces con 100 buzones, aunque se cubren menos barrios a pie. Lo que sale de aquí es un **plan mixto** (transbordos + cobertura), todavía no calculado.
+- **Hallazgo:** colocar buzones solo por **cobertura geográfica**, aunque sea casi óptima (garantía ≥ 1 − 1/e), deja los **transbordos** sin buzón, y el mensaje no puede cambiar de autobús. En las paradas donde se cruzan más líneas la entrega se multiplica por unas 8 veces con 100 buzones, aunque se cubren menos barrios a pie. El **plan mixto**, con la mitad de los buzones en transbordos y la otra mitad completando la cobertura con el voraz, queda en medio:
+  - 50 buzones: cubre el 52 % y entrega el 21 %;
+  - 100 buzones: cubre el 78 % y entrega el 54 %;
+  - 200 buzones: cubre el 97 % y entrega el 66 %;
+  - 302 buzones: cubre el 100 % y entrega el 80 %.
+
+  Es una frontera de compromiso entre cubrir barrios y entregar a tiempo, y cada ayuntamiento elige su punto. Un efecto de la métrica: al añadir buzones en la periferia entran parejas más lejanas, y eso también baja la entrega media.
 - **Precauciones:**
   - las parejas buzón→buzón se sortean entre los buzones de cada plan, así que las muestras no son idénticas entre planes;
   - es cobertura de paradas, no de personas (no hay datos de población).
@@ -71,5 +77,4 @@ Si cae la red móvil, ¿qué fracción de la flota de autobuses tendría que lle
 - No se modela la capacidad del buffer ni la energía.
 - El buzón en cada parada es una hipótesis optimista.
 - Pendiente:
-  - estudiar con cuántos buzones y en qué paradas basta (problema de cobertura);
   - añadir Spray-and-Wait con L copias.

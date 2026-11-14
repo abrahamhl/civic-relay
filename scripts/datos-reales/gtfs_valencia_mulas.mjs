@@ -43,6 +43,9 @@ const cover = (sel) => { const set = new Set(sel); let c = 0; for (const p of pt
 const hubPlan = [25, 50, 100, 200, 400].map((K) => { const sel = hubs.slice(0, K).map((h) => h.stop), d60 = boxNetworkDelivery(conns, sel, T0, { deadlineMin: 60 }), d120 = boxNetworkDelivery(conns, sel, T0, { deadlineMin: 120 });
   return { K, cobertura400m: +cover(sel).toFixed(3), entrega60: d60.delivered, entrega120: d120.delivered, p50Min: d120.p50Min }; });
 for (const b of hubPlan) console.log(`HUBS ${b.K}: cobertura ${(100 * b.cobertura400m).toFixed(1)} % · entrega ≤60 ${(100 * b.entrega60).toFixed(1)} % · ≤120 ${(100 * b.entrega120).toFixed(1)} % · mediana ${b.p50Min?.toFixed(0)} min`);
+const mixPlan = [50, 100, 200, 400].map((K) => { const pre = hubs.slice(0, K / 2).map((h) => h.stop), sel = placeBoxes(pts, K / 2, { radiusM: 400, preselected: pre }).chosen.slice(0, K), d60 = boxNetworkDelivery(conns, sel, T0, { deadlineMin: 60 }), d120 = boxNetworkDelivery(conns, sel, T0, { deadlineMin: 120 });
+  return { K: sel.length, cobertura400m: +cover(sel).toFixed(3), entrega60: d60.delivered, entrega120: d120.delivered, p50Min: d120.p50Min }; });
+for (const b of mixPlan) console.log(`MIXTO ${b.K}: cobertura ${(100 * b.cobertura400m).toFixed(1)} % · entrega ≤60 ${(100 * b.entrega60).toFixed(1)} % · ≤120 ${(100 * b.entrega120).toFixed(1)} % · mediana ${b.p50Min?.toFixed(0)} min`);
 const all = boxNetworkDelivery(conns, stops.map((_, i) => i), T0, { deadlineMin: 120 });
 buzones.push({ K: stops.length, cobertura400m: 1, entrega60: boxNetworkDelivery(conns, stops.map((_, i) => i), T0, { deadlineMin: 60 }).delivered, entrega120: all.delivered, p50Min: all.p50Min });
 for (const b of buzones) console.log(`buzones ${b.K}: cobertura ${(100 * b.cobertura400m).toFixed(1)} % · entrega ≤60 ${(100 * b.entrega60).toFixed(1)} % · ≤120 ${(100 * b.entrega120).toFixed(1)} % · mediana ${b.p50Min?.toFixed(0)} min`);
@@ -55,7 +58,8 @@ const out = { caso: 'Autobuses EMT València como mulas de datos (DTN) si cae la
   paradas: stops.map((s, i) => [s.stop_id, s.stop_name, +(+s.stop_lat).toFixed(5), +(+s.stop_lon).toFixed(5), iso[i] === 0x7fffffff ? null : Math.round((iso[i] - T0) / 60)]),
   adopcion: study, adopcion120: study120,
   buzones: { metodo: 'Cobertura máxima (MCLP, Church y ReVelle 1974) voraz, garantía ≥ (1 − 1/e) del óptimo (Nemhauser et al. 1978); parada servida si hay buzón a ≤ 400 m en línea recta. Entrega buzón→buzón con flota completa; el mensaje solo baja o cambia de autobús donde hay buzón. Sin datos de población: cobertura de paradas, no de personas.', orden: place.chosen.slice(0, 400).map((i) => stops[i].stop_id), resultados: buzones,
-    transbordos: { metodo: 'Paradas ordenadas por líneas distintas que pasan (puntos de intercambio), como el reenvío por centralidad en DTN (BUBBLE Rap, Hui et al. 2008). Cobertura calculada igual (≤ 400 m).', orden: hubs.slice(0, 400).map((h) => ({ stop_id: stops[h.stop].stop_id, lineas: h.lines })), resultados: hubPlan } } };
+    transbordos: { metodo: 'Paradas ordenadas por líneas distintas que pasan (puntos de intercambio), como el reenvío por centralidad en DTN (BUBBLE Rap, Hui et al. 2008). Cobertura calculada igual (≤ 400 m).', orden: hubs.slice(0, 400).map((h) => ({ stop_id: stops[h.stop].stop_id, lineas: h.lines })), resultados: hubPlan },
+    mixto: { metodo: 'La mitad de los buzones en las paradas de más líneas y la otra mitad completando la cobertura a ≤ 400 m con el voraz (MCLP).', resultados: mixPlan } } };
 const D = resolve(dirname(fileURLToPath(import.meta.url)), '../../investor-next/public/senda/data/mulas');
 // Conexiones en binario para que la página recalcule en el navegador: 5 bloques Int32 LE [dep|arr|from|to|trip]
 const N = conns.dep.length, buf = Buffer.alloc(N * 5 * 4); [conns.dep, conns.arr, conns.from, conns.to, conns.trip].forEach((a, k) => Buffer.from(a.buffer, a.byteOffset, a.byteLength).copy(buf, k * N * 4));

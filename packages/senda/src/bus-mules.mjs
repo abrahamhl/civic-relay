@@ -147,10 +147,13 @@ export const distM = (a, b) => { const r = Math.PI / 180, dφ = (b.lat - a.lat) 
  * Una parada queda «servida» si hay un buzón a ≤ radiusM a pie. pts: [{lat, lon}]. Devuelve el orden de elección y la
  * cobertura acumulada (fracción de paradas servidas). Es una cobertura geométrica: no usa población (no medida aquí).
  */
-export function placeBoxes(pts, K, { radiusM = 400 } = {}) {
+export function placeBoxes(pts, K, { radiusM = 400, preselected = [] } = {}) {
   const n = pts.length, near = pts.map((p) => { const out = []; for (let j = 0; j < n; j++) if (distM(p, pts[j]) <= radiusM) out.push(j); return out; });
   const covered = new Uint8Array(n), chosen = [], curve = []; let total = 0;
-  for (let k = 0; k < K; k++) {
+  // Plan mixto: parte de buzones ya fijados (p. ej. transbordos) y completa la cobertura con el voraz
+  for (const i of preselected) { chosen.push(i); for (const j of near[i]) if (!covered[j]) { covered[j] = 1; total++; } curve.push(total / n); }
+  K += preselected.length;
+  for (let k = chosen.length; k < K; k++) {
     let best = -1, gain = 0; for (let i = 0; i < n; i++) { let g = 0; for (const j of near[i]) if (!covered[j]) g++; if (g > gain) { gain = g; best = i; } }
     if (best < 0) break; chosen.push(best); for (const j of near[best]) if (!covered[j]) { covered[j] = 1; total++; } curve.push(total / n);
   }
