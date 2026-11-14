@@ -16,7 +16,7 @@ test('fusión sintética: junta carreteras y GPS del radio, ignora lo lejano y l
   const [s] = fuseSituations([a], pool);
   assert.equal(s.evidence.filter((e) => e.layer === 'roads').length, 1, 'solo la obra a 5,6 km y dentro de 6 h');
   assert.ok(s.facts.some((f) => /integridad GPS en la zona: amarillo/.test(f)), 'GNSS no depende de la hora');
-  assert.equal(s.corroboration, 2); assert.equal(s.severity, 2);
+  assert.equal(s.corroboration, 1, 'solo las carreteras corroboran'); assert.equal(s.context, 1, 'el GPS es contexto'); assert.equal(s.severity, 2);
 });
 
 test('reglas declaradas y gravedad por etiqueta oficial', () => {

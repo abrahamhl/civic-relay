@@ -14,6 +14,11 @@ import { dependencyOf } from './cross-source.mjs';
 
 /** Nombre de fuente de cada capa, para consultar dependencias declaradas (cross-source.mjs). */
 const LAYER_SOURCE = Object.freeze({ quakes: 'USGS' });
+/**
+ * Capas de CONTEXTO: describen el entorno (hay una cámara, el GPS va bien, hay un caudal medido) pero no informan de
+ * un suceso, así que no cuentan como corroboración. Solo corroboran las capas que reportan eventos.
+ */
+export const CONTEXT_LAYERS = Object.freeze(['gnss', 'cameras', 'rivers']);
 
 /** Peso de gravedad del ancla (orden, no probabilidad). */
 export function anchorSeverity(e) {
@@ -45,7 +50,7 @@ export const DEFAULT_RULES = Object.freeze({
 });
 
 const LAYER_OF = (e) => e.basis === 'MEASURED_ADSB' ? 'gnss' : e.basis === 'MEASURED_SEISMIC' ? 'quakes' : e.kind === 'S2_CHANGE' ? 'imagery' : e.kind?.startsWith('GDACS_') ? 'gdacs' : (e.kind?.startsWith('DGT_') || e.kind?.startsWith('NDW_')) ? 'roads'
-  : e.kind === 'FIRE_HOTSPOT' ? 'fire' : e.kind === 'CAMERA_COUNT' ? 'cameras' : e.basis === 'CITIZEN_SIGNED_UNVERIFIED' || e.basis === 'SIMULATION' ? 'citizen' : e.kind === 'RIVER' ? 'rivers' : 'other';
+  : e.kind === 'FIRE_HOTSPOT' ? 'fire' : (e.kind === 'CAMERA_COUNT' || e.kind === 'CAMERA_LIVE') ? 'cameras' : e.basis === 'CITIZEN_SIGNED_UNVERIFIED' || e.basis === 'SIMULATION' ? 'citizen' : e.kind === 'RIVER' ? 'rivers' : 'other';
 
 /** Convierte cada caso de incendio GOES en un ancla «inicio de incendio» (primera detección del satélite). */
 export function fireStartAnchors(fireEvents, names = {}) {
@@ -84,13 +89,14 @@ export function fuseSituations(anchors, pool, { rules = DEFAULT_RULES, perLayer 
       facts.push(`${byLayer.quakes.length} registro(s) sísmico(s) de USGS a ≤ ${rule.radiusKm} km (el más cercano: M ${q.e.value} a ${q.dKm.toFixed(1)} km, ${Math.round(Math.abs(q.e.t - a.t) / 1000)} s de diferencia)${dep && !dep.independent ? ' · no cuenta como corroboración: GDACS toma sus datos sísmicos de USGS' : ''}`); }
     if (byLayer.imagery) facts.push(`${byLayer.imagery.length} detección(es) de cambio en imagen Sentinel-2 antes/después`);
     if (byLayer.gdacs) facts.push(`${byLayer.gdacs.length} otra(s) alerta(s) GDACS cerca`);
-    if (byLayer.cameras) facts.push(`${byLayer.cameras.length} cámara(s) pública(s) en el radio`);
+    if (byLayer.cameras) { const c = [...byLayer.cameras].sort((x, y) => x.dKm - y.dKm)[0]; facts.push(`${byLayer.cameras.length} cámara(s) pública(s) en el radio (la más cercana a ${c.dKm.toFixed(1)} km${c.e.kind === 'CAMERA_LIVE' ? ', con imagen en directo' : ''})`); }
     if (byLayer.citizen) facts.push(`${byLayer.citizen.length} reporte(s) ciudadano(s) cerca`);
     if (byLayer.rivers) facts.push(`caudal GloFAS disponible para ${byLayer.rivers.length} punto(s)`);
     const sources = [...new Set([a.source, ...near.map((n) => n.e.source)])];
     out.push({ id: `sit:${a.id}`, anchor: a, title: a.label, lat: a.lat, lon: a.lon, t: a.t, severity: anchorSeverity(a), rule: { kind: a.kind, ...rule },
-      corroboration: new Set(near.map((n) => n.layer).filter((l) => { const d = LAYER_SOURCE[l] && dependencyOf(a.kind, LAYER_SOURCE[l]); return !(d && !d.independent); })).size, sources, facts,
-      evidence: Object.values(byLayer).flatMap((l) => [...l].sort((x, y) => x.dKm - y.dKm).slice(0, perLayer)).sort((x, y) => x.dKm - y.dKm).map((n) => ({ layer: n.layer, dKm: Math.round(n.dKm * 10) / 10, label: n.e.label, t: n.e.t, source: n.e.source, basis: n.e.basis })) });
+      corroboration: new Set(near.map((n) => n.layer).filter((l) => { if (CONTEXT_LAYERS.includes(l)) return false; const d = LAYER_SOURCE[l] && dependencyOf(a.kind, LAYER_SOURCE[l]); return !(d && !d.independent); })).size,
+      context: new Set(near.map((n) => n.layer).filter((l) => CONTEXT_LAYERS.includes(l))).size, sources, facts,
+      evidence: Object.values(byLayer).flatMap((l) => [...l].sort((x, y) => x.dKm - y.dKm).slice(0, perLayer)).sort((x, y) => x.dKm - y.dKm).map((n) => ({ id: n.e.id, layer: n.layer, dKm: Math.round(n.dKm * 10) / 10, label: n.e.label, t: n.e.t, source: n.e.source, basis: n.e.basis })) });
   }
   // Orden: gravedad del ancla más 1,5 por cada capa distinta que la corrobora (decisión de SENDA, declarada)
   return out.sort((x, y) => (y.severity + 1.5 * y.corroboration) - (x.severity + 1.5 * x.corroboration) || y.t - x.t);

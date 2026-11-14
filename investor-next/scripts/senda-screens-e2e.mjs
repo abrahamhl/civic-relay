@@ -161,6 +161,8 @@ try {
   const co = await actx.newPage(); co.on('pageerror', (e) => errors.push(`consola: ${e.message}`)); await co.goto(base + '/consola'); await co.waitForSelector('body[data-ready]', { timeout: 60_000 });
   const cons = await co.evaluate(async () => { const C = window.SENDA_CONSOLA, seen = []; for (const m of C.modes) { C.setMode(m); seen.push(C.mode); } C.select(0); return { s: C.situations, e: C.elements, seen, sel: C.selected ?? null, steps: C.tourPlan(), conc: window.SENDA_CONCORDANCIA, emsc: window.SENDA_CONCORDANCIA_EMSC }; });
   check('consola: situaciones fusionadas entre fuentes, cinco representaciones del planeta y recorrido preparado', cons.s > 5 && cons.e > 1000 && cons.conc?.independence === 'DEPENDENT' && cons.emsc?.independence === 'PER_EVENT' && cons.emsc.independent > 100 && cons.seen.length === 5 && !!cons.sel && cons.steps >= 3 && /REAL|SIMULACI/.test(await co.textContent('#p-sit')), cons);
+  const live = await co.evaluate(() => { const n = window.SENDA_CONSOLA.situations; for (let k = 0; k < n; k++) { window.SENDA_CONSOLA.select(k, { fly: false }); const im = document.querySelector('#p-sit img.live'); if (im) return im.dataset.src; } return null; });
+  check('consola: una incidencia de la DGT muestra la cámara real más cercana con imagen en directo (como contexto, no como corroboración)', /^https:\/\/etraffic\.dgt\.es\//.test(live ?? '') && /Contexto/.test(await co.textContent('#p-sit')), { live });
   await co.close();
   const vu = await actx.newPage(); vu.on('pageerror', (e) => errors.push(`vuelo: ${e.message}`)); await vu.goto(base + '/vuelo'); await vu.waitForSelector('body[data-ready]', { timeout: 60_000 });
   const vuelo = await vu.evaluate(() => window.SENDA_VUELO);

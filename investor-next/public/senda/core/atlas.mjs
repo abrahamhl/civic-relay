@@ -152,6 +152,16 @@ export function eventsFromGoes(goes, { cases = null } = {}) {
 }
 
 /** Cámaras de tráfico con recuento hecho en el repo (tfl_camaras.json y referencias.caltrans). */
+/**
+ * Inventario real de cámaras de la DGT (dgt_camaras.json). Sin recuento: la imagen es en directo y la sirve la DGT.
+ * t = hora de publicación del inventario. El id es «dgtcam:<id DGT>» para poder recuperar la URL de la imagen.
+ */
+export function eventsFromDgtCameras(snap) {
+  const t = snap.publicacionDGT ?? snap.descargadoUTC;
+  return (snap.camaras ?? []).map((c) => makeEvent({ id: `dgtcam:${c.id}`, t, lat: c.lat, lon: c.lon, kind: 'CAMERA_LIVE', group: 'spain', label: `${c.carretera ?? 'Cámara'}${c.destino ? ` → ${c.destino}` : ''} · cámara DGT`,
+    source: 'DGT · cámaras DATEX II v3.7 (CC BY), imagen en directo', basis: 'MEASURED_CAMERA' }));
+}
+
 export function eventsFromCameras(tfl, caltrans) {
   const out = [];
   for (const c of tfl?.camaras ?? []) out.push(makeEvent({ id: `tfl:${c.camara}`, t: tfl.capturaUTC, lat: c.lat, lon: c.lon, kind: 'CAMERA_COUNT', value: c.cruces, unit: 'vehículos/clip', group: 'london', label: c.nombre, source: 'TfL JamCams (Powered by TfL Open Data) · recuento YOLOX-s en el repo', basis: 'MEASURED_CAMERA' }));

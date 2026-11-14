@@ -74,12 +74,12 @@ table{width:100%;border-collapse:collapse;font-size:11.5px}td,th{padding:4px 8px
 </div>
 
 <script type="module">
-import { eventsFromGdacs, eventsFromDgt, eventsFromNdw, eventsFromGnss, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromUsgs, eventsFromEmsc, eventsFromS2Change, haversineM } from '/senda/core/atlas.mjs';
+import { eventsFromGdacs, eventsFromDgt, eventsFromNdw, eventsFromGnss, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromUsgs, eventsFromEmsc, eventsFromDgtCameras, eventsFromS2Change, haversineM } from '/senda/core/atlas.mjs';
 import { concordance } from '/senda/core/cross-source.mjs';
 import { fuseSituations, fireStartAnchors } from '/senda/core/fusion.mjs';
 const $ = (s) => document.querySelector(s), esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const R = '/senda/data/referencias/', getJ = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
-const [gd, dg, nd, ad, go, tf, rf, us, land, np2, em] = await Promise.all(['gdacs_eventos.json', 'dgt_incidencias.json', 'ndw_situaciones.json', 'adsb_gnss.json', 'goes_casos.json', 'tfl_camaras.json', 'referencias.json', 'usgs_sismos.json'].map((f) => getJ(R + f)).concat(getJ('/geo/land-110m.json'), getJ('/senda/data/nepal2026/nepal_s2.json'), getJ(R + 'emsc_sismos.json')));
+const [gd, dg, nd, ad, go, tf, rf, us, land, np2, em, dc] = await Promise.all(['gdacs_eventos.json', 'dgt_incidencias.json', 'ndw_situaciones.json', 'adsb_gnss.json', 'goes_casos.json', 'tfl_camaras.json', 'referencias.json', 'usgs_sismos.json'].map((f) => getJ(R + f)).concat(getJ('/geo/land-110m.json'), getJ('/senda/data/nepal2026/nepal_s2.json'), getJ(R + 'emsc_sismos.json'), getJ(R + 'dgt_camaras.json')));
 let mine = []; try { mine = eventsFromReports(JSON.parse(localStorage.getItem('senda-avisos-reports')) ?? []); } catch { mine = []; }
 const FIRE_NAMES = { camp: 'Incendio Camp · Paradise, California (2018)', palisades: 'Incendio Palisades · Los Ángeles (2025)', eaton: 'Incendio Eaton · Altadena (2025)', marshall: 'Incendio Marshall · Colorado (2021)', smokehouse: 'Incendio Smokehouse Creek · Texas (2024)', troublesome: 'Incendio East Troublesome · Colorado (2020)', creek: 'Incendio Creek · California (2020)' };
 const L = {
@@ -90,7 +90,7 @@ const L = {
   quakes: { name: 'Sismos y deslizamientos · USGS', color: '#c084fc', ev: us ? eventsFromUsgs(us) : [], on: true },
   imagery: { name: 'Cambio en imagen · Sentinel-2', color: '#ff5b6e', ev: np2 ? eventsFromS2Change(np2) : [], on: true },
   gnss: { name: 'Integridad GPS · ADS-B', color: '#3ddc97', ev: ad ? eventsFromGnss(ad) : [], on: false },
-  cams: { name: 'Cámaras públicas', color: '#3fb6ff', ev: tf && rf ? eventsFromCameras(tf, rf.caltrans) : [], on: true },
+  cams: { name: 'Cámaras públicas', color: '#3fb6ff', ev: [...(tf && rf ? eventsFromCameras(tf, rf.caltrans) : []), ...(dc ? eventsFromDgtCameras({ ...dc, camaras: dc.camaras.filter((c) => c.disponible !== false) }) : [])], on: false },
   citizen: { name: 'Reportes ciudadanos', color: '#a98bff', ev: mine, on: true },
 };
 const GCOL = { GDACS_EQ: '#ff8a3d', GDACS_WF: '#ff4d5e', GDACS_FL: '#3fb6ff', GDACS_TC: '#a98bff', GDACS_VO: '#f5c542', GDACS_DR: '#b08a5a', GNSS_green: '#3ddc97', GNSS_yellow: '#f5c542', GNSS_red: '#ff4d5e' };
@@ -102,6 +102,7 @@ const anchors = [...L.gdacs.ev.filter((e) => /alerta (Red|Orange)/.test(e.label 
   ...L.dgt.ev.filter((e) => e.kind === 'DGT_accident'), ...L.ndw.ev.filter((e) => e.kind === 'NDW_Accident'), ...fireStartAnchors(L.fire.ev, FIRE_NAMES), ...L.citizen.ev,
   ...L.quakes.ev.filter((e) => e.kind === 'USGS_landslide' && e.value >= 5).map((e) => ({ ...e, label: e.id === 'usgs:us7000tbwb' ? 'Colapso glaciar de Langtang Lirung · Nepal (26-08-2026)' : e.label }))];
 const SITS = fuseSituations(anchors, pool);
+const CAMURL = new Map((dc?.camaras ?? []).map((c) => [`dgtcam:${c.id}`, c.url]));
 
 /* ───── Globo 3D (three.js) con cinco representaciones ───── */
 const view = $('#view'), gl = $('#gl'), flat = $('#flat');
@@ -193,7 +194,7 @@ for (const b of document.querySelectorAll('#modes button')) b.onclick = () => se
 function setMode(m) { mode = m; for (const b of document.querySelectorAll('#modes button')) b.classList.toggle('on', b.dataset.m === m); gl.style.display = m === 'plano' ? 'none' : 'block'; flat.style.display = m === 'plano' ? 'block' : 'none'; rebuild(); }
 const SEVC = ['', '#7c8a95', '#ff8a3d', '#ff4d5e'];
 $('#nsit').textContent = SITS.length;
-$('#sits').innerHTML = SITS.slice(0, 60).map((s, i) => `<div class="sit" data-i="${i}"><div class="t"><span class="sev" style="background:${SEVC[s.severity]}"></span>${esc(s.title)}</div><div class="s">${s.corroboration} fuente(s) cruzada(s) · ${new Date(s.t).toISOString().slice(0, 10)}</div></div>`).join('');
+$('#sits').innerHTML = SITS.slice(0, 60).map((s, i) => `<div class="sit" data-i="${i}"><div class="t"><span class="sev" style="background:${SEVC[s.severity]}"></span>${esc(s.title)}</div><div class="s">${s.corroboration} corrobora(n) · ${s.context} contexto · ${new Date(s.t).toISOString().slice(0, 10)}</div></div>`).join('');
 for (const d of document.querySelectorAll('.sit')) d.onclick = () => select(+d.dataset.i);
 for (const b of document.querySelectorAll('.tabs button')) b.onclick = () => tab(b.dataset.t);
 function tab(t) { for (const b of document.querySelectorAll('.tabs button')) b.classList.toggle('on', b.dataset.t === t); for (const p of ['sit', 'wall', 'src']) $(`#p-${p}`).hidden = p !== t; }
@@ -204,10 +205,13 @@ function select(i, { fly = true } = {}) {
   if (fly) { target.lat = s.lat; target.lon = s.lon; target.dist = 1.9; }
   $('#p-sit').innerHTML = `<div class="hd">Situación ${i + 1} de ${SITS.length} <span>${basisTag(s.anchor.basis)}</span></div>
   <div style="padding:10px 10px 0"><div style="font-size:15px;font-weight:600">${esc(s.title)}</div></div>
-  <div class="kv"><span>Inicio</span><b>${new Date(s.t).toISOString().slice(0, 16).replace('T', ' ')} UTC</b><span>Posición</span><b style="font-family:var(--mono)">${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}</b><span>Regla</span><b>${s.rule.radiusKm} km · ±${s.rule.windowH} h</b><span>Fuentes cruzadas</span><b>${s.corroboration}</b></div>
+  <div class="kv"><span>Inicio</span><b>${new Date(s.t).toISOString().slice(0, 16).replace('T', ' ')} UTC</b><span>Posición</span><b style="font-family:var(--mono)">${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}</b><span>Regla</span><b>${s.rule.radiusKm} km · ±${s.rule.windowH} h</b><span>Corroboran</span><b>${s.corroboration} capa(s) con sucesos</b><span>Contexto</span><b>${s.context} capa(s) (cámaras, GPS, caudal)</b></div>
+  ${(() => { const cams = s.evidence.filter((e) => CAMURL.has(e.id)).slice(0, 3); if (!cams.length) return '';
+    return `<div class="hd">Cámaras en directo · DGT · ${cams.length} más cercana(s)</div><div style="display:grid;grid-template-columns:repeat(${cams.length},1fr);gap:4px;padding:6px 10px">${cams.map((c) => `<figure style="margin:0"><img class="live" data-src="${esc(CAMURL.get(c.id))}" alt="Cámara DGT ${esc(c.label)}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border:1px solid var(--l)"><figcaption style="font:10.5px var(--mono);color:var(--m);margin-top:2px">${esc(c.label.split(' · ')[0])} · ${c.dKm} km</figcaption></figure>`).join('')}</div><div style="padding:0 10px 6px;color:var(--m);font-size:11px">Imagen actual servida por la DGT (CC BY), se recarga cada 2 min; no es del momento de la incidencia si esta es antigua. Se usan solo las ${dc?.disponibilidad?.conImagen ?? '—'} de ${dc?.total ?? '—'} cámaras que daban imagen al medirlo (${esc((dc?.disponibilidad?.medidaUTC ?? '').slice(0, 16).replace('T', ' '))} UTC); si una deja de emitir, se ve el aviso de la DGT.</div>`; })()}
   <div class="hd">Lo que dicen los datos</div><ul style="margin:6px 0;padding:0 10px 0 26px">${s.facts.map((f) => `<li>${esc(f)}</li>`).join('') || '<li style="color:var(--m)">Ninguna otra capa aporta datos en el radio.</li>'}</ul>
   <div class="hd">Evidencia (más cercana por capa)</div><table><tr><th>Capa</th><th>Dato</th><th>km</th><th></th></tr>${s.evidence.map((e) => `<tr><td>${e.layer}</td><td>${esc(e.label)}</td><td class="num">${e.dKm}</td><td>${basisTag(e.basis)}</td></tr>`).join('')}</table>
   <div class="hd">Procedencia</div><div style="padding:6px 10px 12px;color:var(--m);font-size:11px">${s.sources.map(esc).join('<br>')}</div>`;
+  for (const im of document.querySelectorAll('#p-sit img.live')) im.src = im.dataset.src + '?t=' + Math.floor(Date.now() / 120000);
   tab('sit'); caption(s); window.SENDA_CONSOLA.selected = s.id;
 }
 function showEvent(e) { $('#p-sit').innerHTML = `<div class="hd">Elemento</div><div class="kv"><span>Dato</span><b>${esc(e.label ?? e.kind)}</b><span>Fecha</span><b>${new Date(e.t).toISOString().slice(0, 16).replace('T', ' ')} UTC</b><span>Fuente</span><b>${esc(e.source)}</b><span>Base</span><b>${basisTag(e.basis)}</b></div>`; tab('sit'); }
@@ -272,6 +276,7 @@ let lastT = performance.now();
 function frame(now = performance.now()) { const dt = Math.min(0.25, (now - lastT) / 1000), k = 1 - Math.exp(-dt * 3.2); lastT = now;
   V.lat += (target.lat - V.lat) * k; let dl = target.lon - V.lon; if (dl > 180) dl -= 360; if (dl < -180) dl += 360; V.lon += dl * k; V.lon = ((V.lon + 540) % 360) - 180; V.dist += (target.dist - V.dist) * k;
   if (!drag && !touring && sel < 0) target.lon += 1.8 * dt; place(); if (mode === 'plano') drawFlat(); else renderer.render(scene, camera); hudInfo(); requestAnimationFrame(frame); }
+setInterval(() => { for (const im of document.querySelectorAll('img.live')) im.src = im.dataset.src + '?t=' + Math.floor(Date.now() / 120000); }, 120000);
 setInterval(() => { $('#clock').textContent = new Date().toISOString().slice(0, 19).replace('T', ' ') + ' UTC'; }, 1000);
 $('#status').innerHTML = `<span class="ok">● SIN SERVIDOR</span><span>${pool.length.toLocaleString('es')} elementos</span><span>${SITS.length} situaciones</span><span>fuentes: GDACS · USGS · Sentinel-2 · DGT · NDW · adsb.lol · NOAA GOES · TfL · Caltrans</span><span style="margin-left:auto">fusion.mjs · cross-source.mjs · atlas.mjs</span>`;
 window.SENDA_CONSOLA = { situations: SITS.length, elements: pool.length, setMode, select, tour, modes: Object.keys(MODES), tourPlan: () => pickTour().length, get mode() { return mode; } };

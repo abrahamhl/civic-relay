@@ -1,9 +1,9 @@
 {
  "kind": "senda-screens-e2e",
- "at": "2026-11-14T13:08:23.958Z",
- "durationS": 50,
- "passed": 32,
- "total": 32,
+ "at": "2026-11-14T13:15:33.842Z",
+ "durationS": 45,
+ "passed": 33,
+ "total": 33,
  "results": [
   {
    "name": "mensaje: el número de seguridad coincide en los dos móviles",
@@ -175,7 +175,7 @@
    "name": "consola: situaciones fusionadas entre fuentes, cinco representaciones del planeta y recorrido preparado",
    "ok": true,
    "s": 56,
-   "e": 17595,
+   "e": 19270,
    "seen": [
     "globo",
     "nocturno",
@@ -198,6 +198,11 @@
     "medianKmIndep": 8.6,
     "independence": "PER_EVENT"
    }
+  },
+  {
+   "name": "consola: una incidencia de la DGT muestra la cámara real más cercana con imagen en directo (como contexto, no como corroboración)",
+   "ok": true,
+   "live": "https://etraffic.dgt.es/camarasEtraffic/754.jpg"
   },
   {
    "name": "sobrevuelo: relieve Copernicus DEM, Sentinel-2 antes/después, señal sísmica real de USGS y ruta calculada sobre el cambio",

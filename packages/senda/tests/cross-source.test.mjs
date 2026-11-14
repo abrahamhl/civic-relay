@@ -64,3 +64,16 @@ test('Copernicus EMS EMSR773 (DANA de Valencia): zonas inundadas reales con áre
   const horta = ev.find((e) => /Horta Sud/.test(e.label)); assert.ok(horta.value > 10, 'Horta Sud con más de 10 km² inundados observados');
   const total = ev.reduce((a, e) => a + e.value, 0); assert.ok(Math.abs(total - sum.sumaInundacionObservada_km2) < 0.05);
 });
+
+test('cámaras DGT reales: inventario con disponibilidad medida y fusión como CONTEXTO (no corroboran)', async () => {
+  const { eventsFromDgtCameras, eventsFromDgt } = await import('../src/atlas.mjs');
+  const snap = ref('referencias/dgt_camaras.json');
+  assert.match(snap.licencia, /Creative Commons Attribution/); assert.ok(snap.total > 1000);
+  assert.equal(snap.disponibilidad.conImagen + snap.disponibilidad.conAvisoNoDisponible + snap.disponibilidad.sinRespuesta, snap.total);
+  const cams = eventsFromDgtCameras({ ...snap, camaras: snap.camaras.filter((c) => c.disponible) });
+  assert.ok(cams.every((c) => c.kind === 'CAMERA_LIVE' && c.basis === 'MEASURED_CAMERA'));
+  const dgt = eventsFromDgt(ref('referencias/dgt_incidencias.json')), anchors = dgt.filter((e) => e.kind === 'DGT_accident');
+  const sits = fuseSituations(anchors, [...dgt, ...cams]), withCam = sits.filter((s) => s.evidence.some((e) => e.id.startsWith('dgtcam:')));
+  assert.ok(withCam.length > 0); assert.ok(withCam.every((s) => s.context >= 1));
+  for (const s of withCam) assert.equal(s.corroboration, new Set(s.evidence.map((e) => e.layer).filter((l) => !['cameras', 'gnss', 'rivers'].includes(l))).size);
+});
