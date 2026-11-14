@@ -1,5 +1,5 @@
 {
- "generadoUTC": "2026-11-14T13:02:18.498Z",
+ "generadoUTC": "2026-11-14T13:41:46.032Z",
  "nota": "Calculado con atlas.dailyBriefing: cada capa usa la hora de su propia descarga como «ahora».",
  "capas": [
   {
@@ -50,26 +50,26 @@
   },
   {
    "id": "paises-bajos-ndw",
-   "hora": "2026-11-14T12:39:17.486Z",
+   "hora": "2026-11-14T13:41:12.540Z",
    "nombre": "Situación del tráfico en Países Bajos (NDW, DATEX II)",
-   "total": 1256,
-   "nuevos": 802,
+   "total": 1238,
+   "nuevos": 549,
    "tiposPrincipales": [
     [
      "Cierre o gestión de carril",
-     887
+     889
     ],
     [
      "Vehículo detenido u obstáculo",
-     131
+     125
     ],
     [
      "Limitación de velocidad",
-     95
+     94
     ]
    ],
    "destacados": [],
-   "fuente": "NDW (Países Bajos) · DATEX II actueel_beeld, publicación del 2026-11-14 12:39 UTC"
+   "fuente": "NDW (Países Bajos) · DATEX II actueel_beeld, publicación del 2026-11-14 13:41 UTC"
   },
   {
    "id": "mundo-usgs",

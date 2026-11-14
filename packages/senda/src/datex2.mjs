@@ -43,6 +43,7 @@ export function parseDatex2(xml) {
       status: firstTag(body, 'validityStatus'), probability: firstTag(body, 'probabilityOfOccurrence'), severity: firstTag(body, 'severity'),
       lat: lats[0] ?? line[0]?.lat ?? null, lon: lons[0] ?? line[0]?.lon ?? null, line,
       road: firstTag(body, 'roadNumber') ?? firstTag(body, 'roadName'), comment: firstTag(body, 'value'), subtypes,
+      publisher: firstTag(/<[\w.-]*:?sourceName\b[\s\S]*?<\/[\w.-]*:?sourceName>/.exec(body)?.[0] ?? '', 'value'), alertCLocation: firstTag(body, 'specificLocation'),
     });
   }
   return out;

@@ -255,7 +255,7 @@ export function eventsFromNdw(snap) {
   const src = `NDW (Países Bajos) · DATEX II actueel_beeld, publicación del ${String(snap.publicacionNDW ?? snap.descargadoUTC).slice(0, 16).replace('T', ' ')} UTC`;
   return (snap.situaciones ?? []).filter((r) => r.start || r.created).map((r) => {
     const type = NDW_TYPES[r.type] ? r.type : 'other';
-    return makeEvent({ id: `ndw:${r.id}`, t: r.start ?? r.created, lat: r.lat, lon: r.lon, kind: `NDW_${type}`, group: 'nl', label: `${r.road ? r.road + ' · ' : ''}${NDW_TYPES[type]}`, source: src, basis: 'OFFICIAL_ALERT' });
+    return makeEvent({ id: `ndw:${r.id}`, t: r.start ?? r.created, lat: r.lat, lon: r.lon, kind: `NDW_${type}`, group: 'nl', label: `${r.road ? r.road + ' · ' : r.publisher && r.publisher !== 'NDW' ? r.publisher + ' · ' : 'Países Bajos · '}${NDW_TYPES[type]}${!r.road && r.alertC ? ` (Alert-C ${r.alertC})` : ''}`, source: src, basis: 'OFFICIAL_ALERT' });
   });
 }
 

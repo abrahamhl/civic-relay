@@ -1,7 +1,7 @@
 {
  "kind": "senda-screens-e2e",
- "at": "2026-11-14T13:15:33.842Z",
- "durationS": 45,
+ "at": "2026-11-14T13:42:59.538Z",
+ "durationS": 48,
  "passed": 33,
  "total": 33,
  "results": [
@@ -123,8 +123,8 @@
     ],
     [
      "Países Bajos · NDW",
-     1256,
-     802
+     1238,
+     549
     ]
    ],
    "roadsN": 15
@@ -132,12 +132,12 @@
   {
    "name": "atlas: capa Países Bajos con situaciones reales de NDW leídas por el mismo lector DATEX II",
    "ok": true,
-   "total": 1256
+   "total": 1238
   },
   {
    "name": "atlas: medir distancias en el mapa y vigilar una zona (se guarda y al volver cuenta las novedades)",
    "ok": true,
-   "mm": 178955.10477581786,
+   "mm": 178826.59711035862,
    "wz": [
     {
      "name": "prueba",
@@ -168,14 +168,14 @@
    "name": "plataforma: catálogo de la API con fuente, licencia y SHA-256 en cada capa, estado de los datos y mapa embebible",
    "ok": true,
    "capas": 6,
-   "elementos": 6005,
+   "elementos": 5987,
    "licencias": true
   },
   {
    "name": "consola: situaciones fusionadas entre fuentes, cinco representaciones del planeta y recorrido preparado",
    "ok": true,
-   "s": 56,
-   "e": 19270,
+   "s": 55,
+   "e": 19252,
    "seen": [
     "globo",
     "nocturno",

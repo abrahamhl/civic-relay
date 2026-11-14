@@ -1,7 +1,7 @@
 {
  "plataforma": "SENDA",
  "version": "v1",
- "generadoUTC": "2026-11-14T13:02:18.498Z",
+ "generadoUTC": "2026-11-14T13:41:46.032Z",
  "aviso": "Fotos de datos reales con su fuente. No son servicios en tiempo real: la hora de cada descarga va en cada capa.",
  "capas": [
   {
@@ -38,16 +38,16 @@
    "id": "paises-bajos-ndw",
    "titulo": "Situación del tráfico en Países Bajos (NDW, DATEX II)",
    "url": "/senda/api/v1/layers/paises-bajos-ndw.geojson",
-   "elementos": 1256,
-   "descargadoUTC": "2026-11-14T12:39:17.486Z",
+   "elementos": 1238,
+   "descargadoUTC": "2026-11-14T13:41:12.540Z",
    "licencia": "CC0 1.0 (condiciones generales de datos abiertos de NDW, https://docs.ndw.nu/algemeen/data-gebruiksvoorwaarden/, leídas el 14-11-2026)",
-   "fuente": "NDW (Países Bajos) · DATEX II actueel_beeld, publicación del 2026-11-14 12:39 UTC",
+   "fuente": "NDW (Países Bajos) · DATEX II actueel_beeld, publicación del 2026-11-14 13:41 UTC",
    "base": [
     "OFFICIAL_ALERT"
    ],
-   "sha256": "666aa557b07db9e4ec54fa04a84907cb36b87c9b1e35086b55335e728770cc72",
+   "sha256": "37c309ba3a07b7499693c8db7d28a8366ad7a928efc3e013bba656f4ad59c256",
    "ficheroOrigen": "/senda/data/referencias/ndw_situaciones.json",
-   "sha256Origen": "286e93f7e7c4d82015660923f693a6863e624bec86fe975f49579229f5ac10a3"
+   "sha256Origen": "b9066630a62ebf1028e23a7fffd94435a56ff73e3bc42c56ed1520ad974c7d55"
   },
   {
    "id": "mundo-usgs",
