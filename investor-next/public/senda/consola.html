@@ -8,6 +8,7 @@
 <link rel="icon" href="/senda/icon.svg">
 <script src="/senda/vendor/three-0.158.0.min.js"></script>
 <style>
+#p-src table{table-layout:fixed;width:100%}#p-src td,#p-src th{overflow-wrap:anywhere}#p-src th:nth-child(2),#p-src td:nth-child(2){width:46px}#p-src th:nth-child(3),#p-src td:nth-child(3){width:86px}
 :root{--bg:#090d11;--p:#0e1318;--p2:#121921;--l:#1d2731;--t:#d5dce2;--m:#7c8a95;--a:#3fb6ff;--o:#ff8a3d;--r:#ff4d5e;--y:#f5c542;--g:#3ddc97;--v:#a98bff;
 --ui:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 *{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--t);font:12.5px/1.45 var(--ui);overflow:hidden}
@@ -73,11 +74,12 @@ table{width:100%;border-collapse:collapse;font-size:11.5px}td,th{padding:4px 8px
 </div>
 
 <script type="module">
-import { eventsFromGdacs, eventsFromDgt, eventsFromNdw, eventsFromGnss, eventsFromGoes, eventsFromCameras, eventsFromReports, haversineM } from '/senda/core/atlas.mjs';
+import { eventsFromGdacs, eventsFromDgt, eventsFromNdw, eventsFromGnss, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromUsgs, eventsFromS2Change, haversineM } from '/senda/core/atlas.mjs';
+import { concordance } from '/senda/core/cross-source.mjs';
 import { fuseSituations, fireStartAnchors } from '/senda/core/fusion.mjs';
 const $ = (s) => document.querySelector(s), esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const R = '/senda/data/referencias/', getJ = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
-const [gd, dg, nd, ad, go, tf, rf, land] = await Promise.all(['gdacs_eventos.json', 'dgt_incidencias.json', 'ndw_situaciones.json', 'adsb_gnss.json', 'goes_casos.json', 'tfl_camaras.json', 'referencias.json'].map((f) => getJ(R + f)).concat(getJ('/geo/land-110m.json')));
+const [gd, dg, nd, ad, go, tf, rf, us, land, np2] = await Promise.all(['gdacs_eventos.json', 'dgt_incidencias.json', 'ndw_situaciones.json', 'adsb_gnss.json', 'goes_casos.json', 'tfl_camaras.json', 'referencias.json', 'usgs_sismos.json'].map((f) => getJ(R + f)).concat(getJ('/geo/land-110m.json'), getJ('/senda/data/nepal2026/nepal_s2.json')));
 let mine = []; try { mine = eventsFromReports(JSON.parse(localStorage.getItem('senda-avisos-reports')) ?? []); } catch { mine = []; }
 const FIRE_NAMES = { camp: 'Incendio Camp · Paradise, California (2018)', palisades: 'Incendio Palisades · Los Ángeles (2025)', eaton: 'Incendio Eaton · Altadena (2025)', marshall: 'Incendio Marshall · Colorado (2021)', smokehouse: 'Incendio Smokehouse Creek · Texas (2024)', troublesome: 'Incendio East Troublesome · Colorado (2020)', creek: 'Incendio Creek · California (2020)' };
 const L = {
@@ -85,6 +87,8 @@ const L = {
   fire: { name: 'Fuego por satélite · GOES', color: '#ff4d5e', ev: go ? eventsFromGoes(go) : [], on: true },
   dgt: { name: 'Carreteras España · DGT', color: '#f5c542', ev: dg ? eventsFromDgt(dg) : [], on: true },
   ndw: { name: 'Carreteras Países Bajos · NDW', color: '#e8d27a', ev: nd ? eventsFromNdw(nd) : [], on: true },
+  quakes: { name: 'Sismos y deslizamientos · USGS', color: '#c084fc', ev: us ? eventsFromUsgs(us) : [], on: true },
+  imagery: { name: 'Cambio en imagen · Sentinel-2', color: '#ff5b6e', ev: np2 ? eventsFromS2Change(np2) : [], on: true },
   gnss: { name: 'Integridad GPS · ADS-B', color: '#3ddc97', ev: ad ? eventsFromGnss(ad) : [], on: false },
   cams: { name: 'Cámaras públicas', color: '#3fb6ff', ev: tf && rf ? eventsFromCameras(tf, rf.caltrans) : [], on: true },
   citizen: { name: 'Reportes ciudadanos', color: '#a98bff', ev: mine, on: true },
@@ -95,7 +99,8 @@ const colorOf = (k, e) => GCOL[e.kind] ?? L[k].color;
 /* ───── Fusión: situaciones a partir de todas las capas ───── */
 const pool = Object.values(L).flatMap((x) => x.ev);
 const anchors = [...L.gdacs.ev.filter((e) => /alerta (Red|Orange)/.test(e.label ?? '')), ...L.gdacs.ev.filter((e) => (e.kind === 'GDACS_WF' || e.kind === 'GDACS_FL') && e.lat > 35 && e.lat < 60 && e.lon > -12 && e.lon < 20),
-  ...L.dgt.ev.filter((e) => e.kind === 'DGT_accident'), ...L.ndw.ev.filter((e) => e.kind === 'NDW_Accident'), ...fireStartAnchors(L.fire.ev, FIRE_NAMES), ...L.citizen.ev];
+  ...L.dgt.ev.filter((e) => e.kind === 'DGT_accident'), ...L.ndw.ev.filter((e) => e.kind === 'NDW_Accident'), ...fireStartAnchors(L.fire.ev, FIRE_NAMES), ...L.citizen.ev,
+  ...L.quakes.ev.filter((e) => e.kind === 'USGS_landslide' && e.value >= 5).map((e) => ({ ...e, label: e.id === 'usgs:us7000tbwb' ? 'Colapso glaciar de Langtang Lirung · Nepal (26-08-2026)' : e.label }))];
 const SITS = fuseSituations(anchors, pool);
 
 /* ───── Globo 3D (three.js) con cinco representaciones ───── */
@@ -192,7 +197,7 @@ $('#sits').innerHTML = SITS.slice(0, 60).map((s, i) => `<div class="sit" data-i=
 for (const d of document.querySelectorAll('.sit')) d.onclick = () => select(+d.dataset.i);
 for (const b of document.querySelectorAll('.tabs button')) b.onclick = () => tab(b.dataset.t);
 function tab(t) { for (const b of document.querySelectorAll('.tabs button')) b.classList.toggle('on', b.dataset.t === t); for (const p of ['sit', 'wall', 'src']) $(`#p-${p}`).hidden = p !== t; }
-const basisTag = (b) => b === 'SIMULATION' ? '<span class="tag sim">SIMULACIÓN</span>' : b === 'CITIZEN_SIGNED_UNVERIFIED' ? '<span class="tag">FIRMADO</span>' : '<span class="tag real">REAL</span>';
+const basisTag = (b) => b === 'MEASURED_SEISMIC' ? '<span class="tag real">REAL · SÍSMICO</span>' : b === 'SIMULATION' ? '<span class="tag sim">SIMULACIÓN</span>' : b === 'CITIZEN_SIGNED_UNVERIFIED' ? '<span class="tag">FIRMADO</span>' : '<span class="tag real">REAL</span>';
 let sel = -1;
 function select(i, { fly = true } = {}) {
   sel = i; const s = SITS[i]; for (const d of document.querySelectorAll('.sit')) d.classList.toggle('sel', +d.dataset.i === i);
@@ -211,10 +216,13 @@ function hudInfo() { $('#hud').textContent = `${MODES[mode].toUpperCase()} · ${
 
 /* Fuentes: catálogo de la plataforma */
 const cat = await getJ('/senda/api/v1/catalog.json');
-$('#p-src').innerHTML = `<div class="hd">Catálogo (API v1)</div><table><tr><th>Capa</th><th>N</th><th>Descarga</th></tr>${(cat?.capas ?? []).map((c) => `<tr><td>${esc(c.titulo)}<br><span style="color:var(--m)">${esc(c.licencia)}</span></td><td class="num">${c.elementos}</td><td class="num">${esc((c.descargadoUTC ?? '').slice(0, 16).replace('T', ' '))}</td></tr>`).join('')}</table><div style="padding:8px 10px;color:var(--m)">Reglas de fusión (radios y ventanas) en <span style="font-family:var(--mono)">fusion.mjs · DEFAULT_RULES</span>: decisiones de SENDA, revisables.</div>`;
+$('#p-src').innerHTML = `<div class="hd">Catálogo (API v1)</div><table><tr><th>Capa</th><th>N</th><th>Descarga</th></tr>${(cat?.capas ?? []).map((c) => `<tr><td>${esc(c.titulo)}<br><span style="color:var(--m)">${esc(c.licencia)}</span></td><td class="num">${c.elementos}</td><td class="num">${esc((c.descargadoUTC ?? '').slice(0, 16).replace('T', ' '))}</td></tr>`).join('')}</table><div style="padding:8px 10px;color:var(--m)">${(() => { const g = L.gdacs.ev.filter((e) => e.kind === 'GDACS_EQ').map((e) => ({ ...e, mag: e.value })), u = L.quakes.ev.filter((e) => e.kind === 'USGS_earthquake').map((e) => ({ ...e, mag: e.value }));
+  if (!g.length || !u.length) return ''; const c = concordance(g, u, { nameA: 'GDACS_EQ', nameB: 'USGS' }); window.SENDA_CONCORDANCIA = { matched: c.matched, shareA: c.shareA, medianKm: c.medianKm, medianAbsS: c.medianAbsS, independence: c.independence };
+  return `<div class="hd">Concordancia GDACS ↔ USGS (sismos)</div><div class="kv"><span>Emparejados</span><b class="num">${c.matched} de ${c.countA} (${(100 * c.shareA).toFixed(1)} %)</b><span>Distancia mediana</span><b class="num">${c.medianKm} km</b><span>Hora</span><b class="num">${c.medianAbsS} s</b><span>Magnitud</span><b class="num">${c.medianAbsMag}</b><span>Relación</span><b>${esc(c.verdictWord)}</b></div><div style="padding:0 10px 8px;color:var(--m)">${esc(c.dependency?.note ?? '')}. Calculado al abrir con <span style="font-family:var(--mono)">cross-source.mjs</span>.</div>`; })()}<div style="padding:8px 10px;color:var(--m)">Reglas de fusión (radios y ventanas) en <span style="font-family:var(--mono)">fusion.mjs · DEFAULT_RULES</span>: decisiones de SENDA, revisables.</div>`;
 
 /* ───── Muro de vídeo: imágenes y repeticiones REALES ───── */
 $('#p-wall').innerHTML = `<div class="wall">
+  <div class="tile big" id="w-np"><img alt="Sentinel-2 Langtang"><img id="w-npm" alt="" style="position:absolute;inset:0;opacity:0;transition:opacity .6s"><span class="rec" id="w-npt">ANTES</span><a href="/senda/vuelo" style="position:absolute;top:5px;right:6px;font:600 10px var(--mono);color:#fff;background:rgba(63,182,255,.85);padding:1px 6px;border-radius:2px;text-decoration:none">SOBREVUELO 3D ▸</a><div class="lb"><b id="w-npd">Langtang · Nepal · Sentinel-2</b>Copernicus Sentinel-2 · colapso del 26-08-2026 (USGS us7000tbwb) · cambio calculado, no mapa oficial</div></div>
   <div class="tile big" id="w-goes"><canvas></canvas><span class="rec">REPETICIÓN</span><div class="lb"><b>Camp Fire · 08-11-2018</b>Detecciones reales NOAA GOES-16, a 1 h por segundo</div></div>
   <div class="tile" id="w-s2"><img alt="Sentinel-2"><div class="lb"><b id="w-s2d">Sentinel-2</b>Copernicus · San Martín de Valdeiglesias 2026</div></div>
   <div class="tile" id="w-tfl"><img alt="Cámara TfL"><div class="lb"><b id="w-tfln">TfL</b>TfL JamCams · captura del 06-11-2026</div></div>
@@ -224,6 +232,10 @@ $('#p-wall').innerHTML = `<div class="wall">
 const S2 = [['tci_pre.jpg', '16-07-2026 · antes'], ['tci_d0724.jpg', '24-07-2026'], ['tci_d0729.jpg', '29-07-2026'], ['tci_d0808.jpg', '08-08-2026']], TFL = (tf?.camaras ?? []).filter((c) => ['00001.02158', '00001.03752', '00001.03850', '00001.06590'].includes(c.camara));
 let wk = 0; setInterval(() => { wk++; const a = S2[wk % 4]; $('#w-s2 img').src = '/senda/data/smv2026/' + a[0]; $('#w-s2d').textContent = 'Sentinel-2 · ' + a[1]; if (TFL.length) { const c = TFL[wk % TFL.length]; $('#w-tfl img').src = `/senda/data/referencias/tfl_${c.camara.split('.')[1]}.jpg`; $('#w-tfln').textContent = c.nombre; } }, 1600);
 $('#w-s2 img').src = '/senda/data/smv2026/' + S2[0][0];
+// Nepal: antes (12-08) → después (26-10) → después con el cambio calculado encima
+const NP = [['tci_pre.jpg', 'ANTES', 'Sentinel-2 · 12-08-2026', 0], ['tci_post2.jpg', 'DESPUÉS', 'Sentinel-2 · 26-10-2026', 0], ['tci_post2.jpg', 'CAMBIO', 'Cambio calculado (NDVI), no mapa oficial', 1]];
+let nk = 0; const npShow = () => { const a = NP[nk % 3]; $('#w-np img').src = '/senda/data/nepal2026/' + a[0]; $('#w-npt').textContent = a[1]; $('#w-npd').textContent = 'Langtang · Nepal · ' + a[2]; $('#w-npm').style.opacity = a[3]; };
+$('#w-npm').src = '/senda/data/nepal2026/cambio_pre_post.png'; npShow(); setInterval(() => { nk++; npShow(); }, 2400);
 $('#w-redl').innerHTML = (L.gdacs.ev.filter((e) => /alerta (Red|Orange)/.test(e.label)).sort((a, b) => (/Red/.test(b.label) - /Red/.test(a.label)) || b.t - a.t).map((e) => `<div><span class="sev" style="background:${/Red/.test(e.label) ? 'var(--r)' : 'var(--o)'}"></span>${esc(e.label)}</div>`).join('')) || '—';
 // Repetición GOES (Camp): dibuja las detecciones reales hasta el instante, a 1 h por segundo de reloj
 const camp = L.fire.ev.filter((e) => e.group === 'camp'), gc = $('#w-goes canvas'); gc.width = 640; gc.height = 360;
@@ -239,14 +251,14 @@ $('#w-app video').play?.().catch(() => {});
 
 /* ───── Recorrido guiado (cinematográfico) ───── */
 const pickTour = () => { const by = (f) => SITS.findIndex(f), out = [];
-  for (const f of [(s) => s.anchor.group === 'camp', (s) => s.anchor.group === 'palisades', (s) => /alerta Red/.test(s.title), (s) => s.anchor.kind === 'DGT_accident' && s.corroboration > 0, (s) => s.anchor.kind === 'GDACS_EQ', (s) => s.anchor.kind === 'NDW_Accident', (s) => s.anchor.kind === 'GDACS_FL']) { const i = by(f); if (i >= 0 && !out.includes(i)) out.push(i); }
+  for (const f of [(s) => s.anchor.kind === 'USGS_landslide', (s) => s.anchor.group === 'camp', (s) => s.anchor.group === 'palisades', (s) => /alerta Red/.test(s.title), (s) => s.anchor.kind === 'DGT_accident' && s.corroboration > 0, (s) => s.anchor.kind === 'GDACS_EQ', (s) => s.anchor.kind === 'NDW_Accident', (s) => s.anchor.kind === 'GDACS_FL']) { const i = by(f); if (i >= 0 && !out.includes(i)) out.push(i); }
   return out; };
 let touring = false;
 async function tour() {
   if (touring) { touring = false; return; } touring = true; $('#tourBtn').textContent = '■ Detener'; const steps = pickTour(); window.SENDA_CONSOLA.tourSteps = steps.length;
   $('#cap').innerHTML = `<h3>SENDA · visión de conjunto</h3><ul><li>${pool.length.toLocaleString('es')} elementos de ${Object.values(L).filter((x) => x.ev.length).length} fuentes, cada uno con su procedencia</li><li>${SITS.length} situaciones fusionadas cruzando capas</li><li>Datos reales fechados; lo simulado se marca</li></ul>`; $('#cap').style.display = 'block';
   target.lat = 25; target.lon = -40; target.dist = 3.6; await sleep(3500);
-  for (const i of steps) { if (!touring) break; select(i); if (SITS[i].anchor.kind === 'FIRE_START') tab('wall'); await sleep(6500); }
+  for (const i of steps) { if (!touring) break; select(i); if (SITS[i].anchor.kind === 'FIRE_START' || SITS[i].anchor.kind === 'USGS_landslide') tab('wall'); await sleep(6500); }
   touring = false; $('#tourBtn').textContent = '▶ Recorrido'; window.SENDA_CONSOLA.tourDone = true;
 }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -258,7 +270,7 @@ function frame(now = performance.now()) { const dt = Math.min(0.25, (now - lastT
   V.lat += (target.lat - V.lat) * k; let dl = target.lon - V.lon; if (dl > 180) dl -= 360; if (dl < -180) dl += 360; V.lon += dl * k; V.lon = ((V.lon + 540) % 360) - 180; V.dist += (target.dist - V.dist) * k;
   if (!drag && !touring && sel < 0) target.lon += 1.8 * dt; place(); if (mode === 'plano') drawFlat(); else renderer.render(scene, camera); hudInfo(); requestAnimationFrame(frame); }
 setInterval(() => { $('#clock').textContent = new Date().toISOString().slice(0, 19).replace('T', ' ') + ' UTC'; }, 1000);
-$('#status').innerHTML = `<span class="ok">● SIN SERVIDOR</span><span>${pool.length.toLocaleString('es')} elementos</span><span>${SITS.length} situaciones</span><span>fuentes: GDACS · DGT · NDW · adsb.lol · NOAA GOES · TfL · Caltrans</span><span style="margin-left:auto">fusion.mjs · atlas.mjs</span>`;
+$('#status').innerHTML = `<span class="ok">● SIN SERVIDOR</span><span>${pool.length.toLocaleString('es')} elementos</span><span>${SITS.length} situaciones</span><span>fuentes: GDACS · USGS · Sentinel-2 · DGT · NDW · adsb.lol · NOAA GOES · TfL · Caltrans</span><span style="margin-left:auto">fusion.mjs · cross-source.mjs · atlas.mjs</span>`;
 window.SENDA_CONSOLA = { situations: SITS.length, elements: pool.length, setMode, select, tour, modes: Object.keys(MODES), tourPlan: () => pickTour().length, get mode() { return mode; } };
 resize(); rebuild(); requestAnimationFrame(frame);
 if (new URLSearchParams(location.search).get('tour') === '1') setTimeout(tour, 800);

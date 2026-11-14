@@ -1,5 +1,5 @@
 {
- "generadoUTC": "2026-11-14T10:46:07.260Z",
+ "generadoUTC": "2026-11-14T12:56:45.037Z",
  "nota": "Calculado con atlas.dailyBriefing: cada capa usa la hora de su propia descarga como «ahora».",
  "capas": [
   {
@@ -50,26 +50,45 @@
   },
   {
    "id": "paises-bajos-ndw",
-   "hora": "2026-11-14T05:37:02.635Z",
+   "hora": "2026-11-14T12:39:17.486Z",
    "nombre": "Situación del tráfico en Países Bajos (NDW, DATEX II)",
-   "total": 1035,
-   "nuevos": 668,
+   "total": 1256,
+   "nuevos": 802,
    "tiposPrincipales": [
     [
      "Cierre o gestión de carril",
-     794
+     887
+    ],
+    [
+     "Vehículo detenido u obstáculo",
+     131
     ],
     [
      "Limitación de velocidad",
-     94
-    ],
-    [
-     "Desvío",
-     78
+     95
     ]
    ],
    "destacados": [],
-   "fuente": "NDW (Países Bajos) · DATEX II actueel_beeld, publicación del 2026-11-14 05:36 UTC"
+   "fuente": "NDW (Países Bajos) · DATEX II actueel_beeld, publicación del 2026-11-14 12:39 UTC"
+  },
+  {
+   "id": "mundo-usgs",
+   "hora": "2026-11-14T12:46:30.720Z",
+   "nombre": "Sismos M ≥ 4,5 y deslizamientos con señal sísmica (USGS ComCat)",
+   "total": 674,
+   "nuevos": 21,
+   "tiposPrincipales": [
+    [
+     "sismo",
+     672
+    ],
+    [
+     "deslizamiento",
+     2
+    ]
+   ],
+   "destacados": [],
+   "fuente": "USGS ComCat · descarga real del 2026-11-14"
   },
   {
    "id": "integridad-gnss",

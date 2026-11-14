@@ -1,7 +1,7 @@
 {
  "plataforma": "SENDA",
  "version": "v1",
- "generadoUTC": "2026-11-14T10:46:07.260Z",
+ "generadoUTC": "2026-11-14T12:56:45.037Z",
  "aviso": "Fotos de datos reales con su fuente. No son servicios en tiempo real: la hora de cada descarga va en cada capa.",
  "capas": [
   {
@@ -38,16 +38,31 @@
    "id": "paises-bajos-ndw",
    "titulo": "Situación del tráfico en Países Bajos (NDW, DATEX II)",
    "url": "/senda/api/v1/layers/paises-bajos-ndw.geojson",
-   "elementos": 1035,
-   "descargadoUTC": "2026-11-14T05:37:02.635Z",
-   "licencia": "Open data según NDW; licencia exacta no verificada desde esta sesión",
-   "fuente": "NDW (Países Bajos) · DATEX II actueel_beeld, publicación del 2026-11-14 05:36 UTC",
+   "elementos": 1256,
+   "descargadoUTC": "2026-11-14T12:39:17.486Z",
+   "licencia": "CC0 1.0 (condiciones generales de datos abiertos de NDW, https://docs.ndw.nu/algemeen/data-gebruiksvoorwaarden/, leídas el 14-11-2026)",
+   "fuente": "NDW (Países Bajos) · DATEX II actueel_beeld, publicación del 2026-11-14 12:39 UTC",
    "base": [
     "OFFICIAL_ALERT"
    ],
-   "sha256": "6494687643968901913aca9274e375c8719434e988f666d9da5153b510d36e28",
+   "sha256": "666aa557b07db9e4ec54fa04a84907cb36b87c9b1e35086b55335e728770cc72",
    "ficheroOrigen": "/senda/data/referencias/ndw_situaciones.json",
-   "sha256Origen": "398ec78d53164b8490769924c70493a9ec61e57a32052053326ca46fa2709b8d"
+   "sha256Origen": "286e93f7e7c4d82015660923f693a6863e624bec86fe975f49579229f5ac10a3"
+  },
+  {
+   "id": "mundo-usgs",
+   "titulo": "Sismos M ≥ 4,5 y deslizamientos con señal sísmica (USGS ComCat)",
+   "url": "/senda/api/v1/layers/mundo-usgs.geojson",
+   "elementos": 674,
+   "descargadoUTC": "2026-11-14T12:46:30.720Z",
+   "licencia": "Obra del Gobierno de EE. UU.: dominio público en EE. UU. (17 U.S.C. §105); se conserva la red de origen de cada evento",
+   "fuente": "USGS ComCat · descarga real del 2026-11-14",
+   "base": [
+    "MEASURED_SEISMIC"
+   ],
+   "sha256": "d88c0c993b336d2e723b0f52d255fbfb9d9c97f260d7fd1a5d24463bb72e850f",
+   "ficheroOrigen": "/senda/data/referencias/usgs_sismos.json",
+   "sha256Origen": "0843018c0ea18283145f04ab77d8447d54e6ae6b52e1c7013bca4e433a25f416"
   },
   {
    "id": "integridad-gnss",

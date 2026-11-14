@@ -1,5 +1,30 @@
 # Changelog
 
+## SENDA · 14-11-2026 · Nepal con datos reales (USGS, Sentinel-2, Copernicus DEM), sobrevuelo 3D y concordancia entre fuentes
+
+**Entrada (fundador):** seguir con la red ampliada; más fuentes, modelos y datos; que SENDA sea un referente de fuentes abiertas; el recorrido de la avalancha de Nepal.
+
+**Procesamiento:**
+- `usgs_sismos_snapshot.mjs`, `eventsFromUsgs` y la base `MEASURED_SEISMIC`. USGS cataloga el colapso de Langtang (26-08-2026 02:52:10 UTC) como **«landslide» M 5,2** (us7000tbwb).
+- `nepal_langtang_s2.py`: imágenes Sentinel-2 de antes y después vía STAC y COG, y cambio NDVI con máscara de nubes y nieve.
+- `nepal_langtang_3d.py`: relieve Copernicus DEM GLO-30 y ruta de mínimo coste sobre el cambio (44,6 km).
+- `/senda/vuelo`: sobrevuelo 3D con antes, después y cambio.
+- Consola:
+  - el recorrido abre con Nepal;
+  - el muro tiene una caja de antes y después;
+  - la pestaña «Fuentes» muestra la concordancia.
+- `cross-source.mjs`: empareja catálogos y declara las dependencias entre fuentes con su referencia. Medido: GDACS reproduce a USGS (537 de 555 sismos, mediana 0 km, 0,5 s y 0 de magnitud). `fusion.mjs` ya no cuenta como corroboración una capa que depende de la fuente del ancla.
+- NDW: licencia CC0 1.0 verificada y datos actualizados. Nueva capa de la API v1: `mundo-usgs`.
+
+**Validación:** 538/538 en el núcleo (5 pruebas nuevas, con datos reales de USGS, GDACS y Sentinel-2); 31/31 en las pruebas de pantallas; vídeo de 100 s grabado de la app.
+
+**Límites:**
+- La máscara de cambio no es un mapa oficial de daños (hay falsos positivos junto a la nieve).
+- No se muestran cifras de víctimas porque las fuentes no coinciden.
+- El dominio público de USGS no se ha leído en su web oficial (respondió 403).
+
+— Claude Code (sesión cloud)
+
 ## SENDA · 14-11-2026 · Consola de situación: fusión de fuentes, globo en cinco representaciones, muro de vídeo y recorrido
 
 **Entrada (fundador):** integrar e innovar en lugar de añadir módulos sueltos; una interfaz que parezca un programa real sin perder el minimalismo; cinco módulos nuevos; cajas con vídeo al estilo de «God's Eye View»; un recorrido de apertura; el planeta en varias representaciones y colores.

@@ -1,9 +1,9 @@
 {
  "kind": "senda-screens-e2e",
- "at": "2026-11-14T11:38:35.647Z",
- "durationS": 43,
- "passed": 30,
- "total": 30,
+ "at": "2026-11-14T12:58:29.238Z",
+ "durationS": 60,
+ "passed": 31,
+ "total": 31,
  "results": [
   {
    "name": "mensaje: el número de seguridad coincide en los dos móviles",
@@ -51,7 +51,7 @@
   {
    "name": "avisos: un incidente de agua muestra el caudal previsto por GloFAS (en directo o de la foto guardada) sin presentarlo como aviso",
    "ok": true,
-   "gl": "Caudal previsto (GloFAS): GloFAS hoy 15.6 m³/s (1.3× la mediana de los 30 días previos); pico previsto 19.1 m³/s el 2026-11-15 (1.6×); mañana sube. consulta en directoCaudal modelado por GloFAS en la "
+   "gl": "Caudal previsto (GloFAS): GloFAS hoy 15.6 m³/s (1.3× la mediana de los 30 días previos); pico previsto 18.7 m³/s el 2026-11-15 (1.6×); mañana sube. consulta en directoCaudal modelado por GloFAS en la "
   },
   {
    "name": "avisos: un reporte pasa por sonido y entra verificado",
@@ -123,8 +123,8 @@
     ],
     [
      "Países Bajos · NDW",
-     1035,
-     668
+     1256,
+     802
     ]
    ],
    "roadsN": 15
@@ -132,12 +132,12 @@
   {
    "name": "atlas: capa Países Bajos con situaciones reales de NDW leídas por el mismo lector DATEX II",
    "ok": true,
-   "total": 1035
+   "total": 1256
   },
   {
    "name": "atlas: medir distancias en el mapa y vigilar una zona (se guarda y al volver cuenta las novedades)",
    "ok": true,
-   "mm": 176241.93311576056,
+   "mm": 178955.10477581786,
    "wz": [
     {
      "name": "prueba",
@@ -162,15 +162,15 @@
   {
    "name": "plataforma: catálogo de la API con fuente, licencia y SHA-256 en cada capa, estado de los datos y mapa embebible",
    "ok": true,
-   "capas": 4,
-   "elementos": 3558,
+   "capas": 5,
+   "elementos": 4453,
    "licencias": true
   },
   {
    "name": "consola: situaciones fusionadas entre fuentes, cinco representaciones del planeta y recorrido preparado",
    "ok": true,
-   "s": 42,
-   "e": 16699,
+   "s": 56,
+   "e": 17595,
    "seen": [
     "globo",
     "nocturno",
@@ -178,8 +178,24 @@
     "columnas",
     "plano"
    ],
-   "sel": "sit:dgt:30008837",
-   "steps": 6
+   "sel": "sit:usgs:us7000tbwb",
+   "steps": 8,
+   "conc": {
+    "matched": 537,
+    "shareA": 0.968,
+    "medianKm": 0,
+    "medianAbsS": 0.5,
+    "independence": "DEPENDENT"
+   }
+  },
+  {
+   "name": "sobrevuelo: relieve Copernicus DEM, Sentinel-2 antes/después, señal sísmica real de USGS y ruta calculada sobre el cambio",
+   "ok": true,
+   "points": 44,
+   "km": 44.6,
+   "demMax": 7207.38916015625,
+   "quake": "us7000tbwb",
+   "done": false
   },
   {
    "name": "demo: cifra en ≤ 160 caracteres, abre, rechaza alterado y repetido, verifica reporte y calcula el atlas",

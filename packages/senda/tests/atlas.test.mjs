@@ -114,7 +114,7 @@ test('lector DATEX II: entiende el perfil real de la DGT (v3.7) con namespaces l
 test('NDW real (Países Bajos): situaciones leídas con el mismo lector DATEX II, dentro de los Países Bajos', () => {
   const snap = ref('ndw_situaciones.json');
   assert.match(snap.url, /^https:\/\/opendata\.ndw\.nu\//); assert.match(snap.sha256Gz, /^[0-9a-f]{64}$/);
-  assert.match(snap.licencia, /no verificada/);
+  assert.match(snap.licencia, /CC0 1\.0/);
   const ev = eventsFromNdw(snap);
   assert.ok(ev.length > 0 && ev.every((e) => e.basis === 'OFFICIAL_ALERT' && NDW_TYPES[e.kind.slice(4)]));
   assert.ok(ev.every((e) => e.lat > 50.6 && e.lat < 53.7 && e.lon > 3.2 && e.lon < 7.3), 'todas dentro de los Países Bajos');

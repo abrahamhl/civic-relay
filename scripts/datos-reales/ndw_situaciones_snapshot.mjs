@@ -22,7 +22,7 @@ const all = parseDatex2(xml), recs = all.filter((r) => Number.isFinite(r.lat) &&
 if (!recs.length) throw new Error('El fichero no trae situaciones con coordenadas: no se escribe nada');
 const out = {
   fuente: 'NDW · Nationaal Dataportaal Wegverkeer (Países Bajos), situación actual DATEX II v3 (actueel_beeld)',
-  licencia: 'Open data según NDW; licencia exacta no verificada desde esta sesión', url: URL_NDW, descargadoUTC: new Date().toISOString(), publicacionNDW: published,
+  licencia: 'CC0 1.0 (condiciones generales de datos abiertos de NDW, https://docs.ndw.nu/algemeen/data-gebruiksvoorwaarden/, leídas el 14-11-2026)', url: URL_NDW, descargadoUTC: new Date().toISOString(), publicacionNDW: published,
   sha256Gz: createHash('sha256').update(gz).digest('hex'), registros: all.length, total: recs.length, lector: 'packages/senda/src/datex2.mjs (parseDatex2)',
   nota: 'Situaciones tal como las publica NDW: tipo DATEX II, inicio, carretera si consta y coordenadas. Sin modificar ni completar.',
   situaciones: recs.map((r) => ({ id: r.id, type: r.type, start: r.start, created: r.created, road: r.road, lat: r.lat, lon: r.lon, probability: r.probability })),

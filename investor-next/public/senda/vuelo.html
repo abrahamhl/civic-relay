@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Sobrevuelo Langtang</title>
+<meta name="description" content="Sobrevuelo 3D con datos reales del colapso glaciar de Langtang Lirung (Nepal, 26-08-2026): relieve Copernicus DEM, Sentinel-2 antes y después, señal sísmica de USGS y ruta calculada sobre el cambio detectado.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#06090c;--p:#0b1015;--l:#1c2730;--t:#e6ebef;--m:#8a99a5;--o:#ff8a3d;--r:#ff5b6e;--c:#3fb6ff;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--t);font:13px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
+.bar{position:fixed;left:0;right:0;top:0;height:34px;display:flex;align-items:center;gap:14px;padding:0 12px;background:rgba(6,9,12,.86);border-bottom:1px solid var(--l);z-index:2}
+.bar b{letter-spacing:.08em}.bar a{color:var(--m);text-decoration:none}.bar a:hover{color:var(--t)}.bar .sp{margin-left:auto;font:12px var(--mono);color:var(--m)}
+.panel{position:fixed;left:12px;top:46px;width:min(380px,calc(100% - 24px));background:rgba(9,13,17,.88);border:1px solid var(--l);border-left:3px solid var(--r);padding:10px 12px;z-index:2}
+.panel h1{font-size:15px;margin:0 0 6px}.kv{display:grid;grid-template-columns:118px 1fr;gap:2px 8px;font-size:12px}.kv span{color:var(--m)}.kv b{font-weight:500;font-family:var(--mono);font-size:11.5px}
+.tag{font:600 9.5px var(--mono);padding:1px 5px;border:1px solid;border-radius:2px;margin-left:4px}.real{color:#3ddc97;border-color:#245c45}.calc{color:var(--c);border-color:#1f4a66}
+.note{color:var(--m);font-size:11px;margin-top:8px}
+.ctl{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;display:flex;gap:4px;z-index:2;background:rgba(9,13,17,.88);border:1px solid var(--l);padding:4px}
+.ctl button{background:transparent;color:var(--t);border:1px solid transparent;padding:5px 10px;font:inherit;cursor:pointer;border-radius:2px}.ctl button.on{border-color:#2b5d80;background:#0e1d29}
+.prog{position:fixed;left:0;bottom:0;height:3px;background:var(--r);z-index:3;width:0}
+.km{position:fixed;right:12px;bottom:16px;font:12px var(--mono);color:var(--m);z-index:2;background:rgba(9,13,17,.88);border:1px solid var(--l);padding:5px 8px}
+@media (max-width:700px){.panel{font-size:12px}.kv{grid-template-columns:100px 1fr}.km{display:none}}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div class="bar"><b>SENDA</b><span style="color:var(--m)">SOBREVUELO</span><a href="/senda/consola">Consola</a><a href="/senda/atlas">Atlas</a><span class="sp" id="clock"></span></div>
+<div class="panel" id="panel"><h1>Colapso glaciar de Langtang Lirung · Nepal</h1><div class="kv" id="kv"></div><div class="note" id="note"></div></div>
+<div class="ctl" id="ctl"><button data-v="pre">Antes · 12-08</button><button data-v="post2" class="on">Después · 26-10</button><button data-v="chg">Cambio</button><button id="fly">■ Detener vuelo</button></div>
+<div class="km" id="km"></div><div class="prog" id="prog"></div>
+<script src="/senda/vendor/three-0.158.0.min.js"></script>
+<script type="module">
+const $ = (s) => document.querySelector(s), esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const D = '/senda/data/nepal2026/', getJ = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+const [S2, T3, US] = await Promise.all([getJ(D + 'nepal_s2.json'), getJ(D + 'nepal_3d.json'), getJ('/senda/data/referencias/usgs_sismos.json')]);
+const q = US?.casos?.find((c) => c.id === 'us7000tbwb');
+const dem = new Uint16Array(await (await fetch(D + T3.dem.fichero)).arrayBuffer()), W = T3.dem.ancho, H = T3.dem.alto, RES = T3.dem.resolucion_m, EX = 1.2; // exageración vertical declarada
+$('#kv').innerHTML = `<span>Señal sísmica</span><b>${q ? `M ${q.mag} ${esc(q.magType)} · tipo «${esc(q.type)}»` : '—'} <span class="tag real">USGS</span></b>
+<span>Hora (UTC)</span><b>${q ? esc(q.t.replace('T', ' ').slice(0, 19)) : '—'}</b><span>Catálogo</span><b>${q ? esc(q.id) : '—'} · ${q ? `${q.lat}, ${q.lon}` : ''}</b>
+<span>Imágenes</span><b>Sentinel-2 ${esc(S2.escenas.pre.fecha)} → ${esc(S2.escenas.post2.fecha)} <span class="tag real">ESA</span></b>
+<span>Relieve</span><b>Copernicus DEM GLO-30 a ${RES} m · ×${EX} vertical</b>
+<span>Ruta del vuelo</span><b>${T3.ruta.longitud_km_aprox} km · ${Math.round(100 * T3.ruta.fraccionSobreCambio)} % sobre cambio <span class="tag calc">CALCULADO</span></b>`;
+$('#note').textContent = 'La máscara roja es una detección espectral de SENDA (caída de NDVI), no un mapa oficial de daños; hay falsos positivos junto a la nieve. La ruta sigue lo detectado, no un trazado oficial. Cifras de víctimas: no se muestran porque las fuentes no coinciden.';
+
+/* Escena */
+const renderer = new THREE.WebGLRenderer({ canvas: $('#gl'), antialias: true, preserveDrawingBuffer: true }); renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0a1118); scene.fog = new THREE.Fog(0x0a1118, 30000, 75000);
+const camera = new THREE.PerspectiveCamera(50, 1, 50, 200000);
+const SX = W * RES, SY = H * RES, geo = new THREE.PlaneGeometry(SX, SY, W - 1, H - 1); geo.rotateX(-Math.PI / 2);
+const pos = geo.attributes.position; for (let i = 0; i < pos.count; i++) pos.setY(i, dem[i] * EX); geo.computeVertexNormals();
+const zAt = (u, v) => { const j = Math.min(W - 1, Math.max(0, Math.round(u * (W - 1)))), i = Math.min(H - 1, Math.max(0, Math.round(v * (H - 1)))); return dem[i * W + j] * EX; };
+const groundAt = (x, z) => { let mx = 0; for (const [dx, dz] of [[0, 0], [600, 0], [-600, 0], [0, 600], [0, -600]]) mx = Math.max(mx, zAt((x + dx) / SX + 0.5, (z + dz) / SY + 0.5)); return mx; };
+const clampAbove = (v, m = 900) => { v.y = Math.max(v.y, groundAt(v.x, v.z) + m); return v; };
+const toXZ = (u, v) => new THREE.Vector3((u - 0.5) * SX, zAt(u, v), (v - 0.5) * SY);
+const load = (src) => new Promise((ok) => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => ok(null); im.src = src; });
+const [imPre, imPost, imChg] = await Promise.all([load(D + 'tci_pre.jpg'), load(D + 'tci_post2.jpg'), load(D + 'cambio_pre_post.png')]);
+const cv = document.createElement('canvas'); cv.width = imPost.width; cv.height = imPost.height; const cg = cv.getContext('2d'), texture = new THREE.CanvasTexture(cv); texture.colorSpace = THREE.SRGBColorSpace; texture.anisotropy = 8;
+let view = 'post2';
+function paint() { cg.drawImage(view === 'pre' ? imPre : imPost, 0, 0, cv.width, cv.height); if (view === 'chg' && imChg) cg.drawImage(imChg, 0, 0, cv.width, cv.height); texture.needsUpdate = true;
+  for (const b of document.querySelectorAll('#ctl button[data-v]')) b.classList.toggle('on', b.dataset.v === view); }
+const terrain = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ map: texture })); scene.add(terrain);
+scene.add(new THREE.HemisphereLight(0xdfeaf5, 0x24303a, 1.15)); const sun = new THREE.DirectionalLight(0xffffff, 1.1); sun.position.set(-30000, 40000, -10000); scene.add(sun);
+// Ruta calculada (línea) y marcador del origen USGS
+const P = T3.ruta.puntos.map((p) => toXZ(p.u, p.v).add(new THREE.Vector3(0, 60, 0)));
+scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(P), new THREE.LineBasicMaterial({ color: 0x3fb6ff, transparent: true, opacity: 0.85 })));
+const ou = S2.origenUSGS, opix = [ou.pixel[0] / (S2.alto ?? H * 3), ou.pixel[1] / (S2.ancho ?? W * 3)], op = toXZ(opix[1], opix[0]);
+const pin = new THREE.Mesh(new THREE.CylinderGeometry(30, 30, 1000, 12), new THREE.MeshBasicMaterial({ color: 0xff5b6e })); pin.position.copy(op).add(new THREE.Vector3(0, 500, 0)); scene.add(pin);
+paint();
+
+/* Vuelo: cámara sobre la curva de la ruta, mirando hacia delante */
+const curve = new THREE.CatmullRomCurve3(P, false, 'centripetal'), DUR = 42; let t0 = performance.now(), flying = true, pausedAt = 0;
+function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize();
+function frame(now) {
+  const k = flying ? Math.min(1, (now - t0) / 1000 / DUR) : pausedAt;
+  const intro = Math.min(1, k / 0.12), f = Math.max(0, (k - 0.12) / 0.88);
+  if (k < 0.12) { // aproximación: de vista general al origen del colapso
+    const a = new THREE.Vector3(0, 26000, 30000), b = curve.getPoint(0).clone().add(new THREE.Vector3(4000, 3800, 3500)); camera.position.lerpVectors(a, b, intro * intro * (3 - 2 * intro)); clampAbove(camera.position, 1800); camera.lookAt(curve.getPoint(0.02));
+  } else {
+    const p = curve.getPoint(Math.min(0.999, f)), ahead = curve.getPoint(Math.min(1, f + 0.06)), dir = ahead.clone().sub(p).setY(0).normalize();
+    const cam = p.clone().sub(dir.clone().multiplyScalar(1700)).add(new THREE.Vector3(0, 4200, 0)); clampAbove(cam, 1800);
+    camera.position.lerp(cam, 0.08); clampAbove(camera.position, 500); camera.lookAt(ahead);
+    const pt = T3.ruta.puntos[Math.min(T3.ruta.puntos.length - 1, Math.round(f * (T3.ruta.puntos.length - 1)))]; $('#km').textContent = `km ${pt.km.toFixed(1)} de ${T3.ruta.longitud_km_aprox} · ${pt.lat.toFixed(3)}, ${pt.lon.toFixed(3)} · ${Math.round(pt.z)} m`;
+    if (flying && view !== 'chg' && f > 0.25 && f < 0.3) { view = 'chg'; paint(); }
+  }
+  $('#prog').style.width = `${100 * k}%`;
+  if (k >= 1 && flying) { flying = false; pausedAt = 1; $('#fly').textContent = '▶ Repetir vuelo'; window.SENDA_VUELO.done = true; }
+  renderer.render(scene, camera); requestAnimationFrame(frame);
+}
+for (const b of document.querySelectorAll('#ctl button[data-v]')) b.onclick = () => { view = b.dataset.v; paint(); };
+$('#fly').onclick = () => { if (flying) { flying = false; pausedAt = Math.min(1, (performance.now() - t0) / 1000 / DUR); $('#fly').textContent = '▶ Seguir vuelo'; } else { t0 = performance.now() - (pausedAt >= 1 ? 0 : pausedAt) * DUR * 1000; flying = true; $('#fly').textContent = '■ Detener vuelo'; } };
+setInterval(() => { $('#clock').textContent = new Date().toISOString().slice(0, 19).replace('T', ' ') + ' UTC'; }, 1000);
+window.SENDA_VUELO = { points: T3.ruta.puntos.length, km: T3.ruta.longitud_km_aprox, demMax: T3.dem.max, quake: q?.id ?? null, setView: (v) => { view = v; paint(); }, done: false };
+requestAnimationFrame(frame); document.body.dataset.ready = '1';
+</script>
+</body>
+</html>

@@ -4,6 +4,17 @@
 
 **Objetivo de diseño** (sin medir aún en campo): que un mensaje llegue cuando la red cae. Para ello SENDA combinaría vecinos con la app (Bluetooth, Wi-Fi Direct), quien tenga Internet por satélite u otro operador, SMS, satélite directo al móvil y pasarelas, y elegiría en cada momento la ruta más rápida. El satélite directo al móvil solo cuenta donde exista: en España no consta lanzamiento comercial de Starlink directo al móvil, y Skylo da SOS y texto en móviles compatibles ([fuentes](docs/research/PLATAFORMAS_AVIACION_SATELITE_2026-11-14.md)). **Probado hoy en navegador:** mensaje cifrado de ≤ 160 caracteres, paso por sonido entre dos móviles y llamada por red local. Bluetooth y Wi-Fi Direct están modelados en el núcleo, pero no validados en dispositivos. Cuando una autoridad declara una zona de emergencia (o la red de teléfonos detecta un sismo corroborado), los teléfonos con SENDA pasan a **modo relé preautorizado**. El núcleo incluye modelos y simulaciones (declaradas como tales) de coordinación de familias e instituciones, de puente para personas atrapadas bajo escombros y de localización con Wi-Fi CSI. No hay validación física.
 
+### 🏔️ Sobrevuelo con datos reales · Langtang, Nepal (`/senda/vuelo`)
+
+![Sobrevuelo 3D del colapso de Langtang con relieve Copernicus y Sentinel-2](docs/media/consola/vuelo-nepal.png)
+
+El sobrevuelo combina datos reales:
+- la señal sísmica del colapso catalogada por USGS ([us7000tbwb](https://earthquake.usgs.gov/earthquakes/eventpage/us7000tbwb), M 5,2, tipo «landslide», 26-08-2026 02:52 UTC);
+- imágenes Sentinel-2 de antes (12-08) y de después (26-10);
+- el relieve Copernicus DEM GLO-30.
+
+Se suman dos elementos calculados por SENDA: un cambio detectado por NDVI, que **no es un mapa oficial de daños**, y una ruta de 44,6 km que sigue ese cambio. Detalles y límites en [docs/research/NEPAL_LANGTANG_2026-08-26.md](docs/research/NEPAL_LANGTANG_2026-08-26.md). Vídeo: [`SENDA-nepal-sobrevuelo.mp4`](investor-next/public/media/senda-demo/SENDA-nepal-sobrevuelo.mp4).
+
 ### 🌍 Consola de situación (`/senda/consola`)
 
 ![SENDA Consola: situación fusionada con evidencia de varias fuentes](docs/media/consola/c-sel.png)

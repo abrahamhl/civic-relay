@@ -156,9 +156,13 @@ try {
   check('plataforma: catálogo de la API con fuente, licencia y SHA-256 en cada capa, estado de los datos y mapa embebible', plat.capas >= 4 && plat.licencias && (await pl.$$('#health tr')).length === plat.capas + 1 && /"basis"/.test(await pl.textContent('#sample')), plat);
   await pl.close();
   const co = await actx.newPage(); co.on('pageerror', (e) => errors.push(`consola: ${e.message}`)); await co.goto(base + '/consola'); await co.waitForSelector('body[data-ready]', { timeout: 60_000 });
-  const cons = await co.evaluate(async () => { const C = window.SENDA_CONSOLA, seen = []; for (const m of C.modes) { C.setMode(m); seen.push(C.mode); } C.select(0); return { s: C.situations, e: C.elements, seen, sel: C.selected ?? null, steps: C.tourPlan() }; });
-  check('consola: situaciones fusionadas entre fuentes, cinco representaciones del planeta y recorrido preparado', cons.s > 5 && cons.e > 1000 && cons.seen.length === 5 && !!cons.sel && cons.steps >= 3 && /REAL|SIMULACI/.test(await co.textContent('#p-sit')), cons);
+  const cons = await co.evaluate(async () => { const C = window.SENDA_CONSOLA, seen = []; for (const m of C.modes) { C.setMode(m); seen.push(C.mode); } C.select(0); return { s: C.situations, e: C.elements, seen, sel: C.selected ?? null, steps: C.tourPlan(), conc: window.SENDA_CONCORDANCIA }; });
+  check('consola: situaciones fusionadas entre fuentes, cinco representaciones del planeta y recorrido preparado', cons.s > 5 && cons.e > 1000 && cons.conc?.independence === 'DEPENDENT' && cons.seen.length === 5 && !!cons.sel && cons.steps >= 3 && /REAL|SIMULACI/.test(await co.textContent('#p-sit')), cons);
   await co.close();
+  const vu = await actx.newPage(); vu.on('pageerror', (e) => errors.push(`vuelo: ${e.message}`)); await vu.goto(base + '/vuelo'); await vu.waitForSelector('body[data-ready]', { timeout: 60_000 });
+  const vuelo = await vu.evaluate(() => window.SENDA_VUELO);
+  check('sobrevuelo: relieve Copernicus DEM, Sentinel-2 antes/después, señal sísmica real de USGS y ruta calculada sobre el cambio', vuelo.quake === 'us7000tbwb' && vuelo.points > 20 && vuelo.km > 20 && vuelo.demMax > 5000 && /no un mapa oficial/.test(await vu.textContent('#note')), vuelo);
+  await vu.close();
   const d = await (await actx.newPage()); d.on('pageerror', (e) => errors.push(`demo: ${e.message}`));
   await d.goto(base + '/demo'); await d.click('#run'); await d.waitForFunction(() => window.SENDA_DEMO?.done || window.SENDA_DEMO?.error, null, { timeout: 30_000 });
   const demo = await d.evaluate(() => window.SENDA_DEMO);

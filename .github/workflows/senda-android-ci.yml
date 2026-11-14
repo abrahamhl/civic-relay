@@ -40,7 +40,7 @@ jobs:
       - name: La app web va dentro del APK
         run: |
           L=$(unzip -l apps/senda-android/app/build/outputs/apk/debug/app-debug.apk)
-          for f in assets/senda/index.html assets/senda/centro.html assets/senda/mensaje.html assets/senda/avisos.html assets/senda/core/courier.mjs assets/senda/core/hazard-reports.mjs assets/senda/core/envelope.mjs assets/senda/atlas.html assets/senda/demo.html assets/senda/plataforma.html assets/senda/consola.html assets/senda/core/fusion.mjs assets/senda/api/v1/catalog.json assets/senda/core/atlas.mjs assets/senda/data/referencias/goes_casos.json assets/geo/land-110m.json; do
+          for f in assets/senda/index.html assets/senda/centro.html assets/senda/mensaje.html assets/senda/avisos.html assets/senda/core/courier.mjs assets/senda/core/hazard-reports.mjs assets/senda/core/envelope.mjs assets/senda/atlas.html assets/senda/demo.html assets/senda/plataforma.html assets/senda/consola.html assets/senda/core/fusion.mjs assets/senda/vuelo.html assets/senda/core/cross-source.mjs assets/senda/data/nepal2026/dem_60m.bin assets/senda/api/v1/catalog.json assets/senda/core/atlas.mjs assets/senda/data/referencias/goes_casos.json assets/geo/land-110m.json; do
             echo "$L" | grep -qF "$f" || { echo "falta $f en el APK"; exit 1; }
           done
       - uses: actions/upload-artifact@v4

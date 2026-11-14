@@ -19,7 +19,7 @@
 const R = 6_371_008.8; // radio medio terrestre (m), IUGG
 const rad = (d) => (d * Math.PI) / 180;
 
-export const ATLAS_BASIS = Object.freeze(['MEASURED_SATELLITE', 'MEASURED_CAMERA', 'MEASURED_ADSB', 'OFFICIAL_ALERT', 'CITIZEN_SIGNED_UNVERIFIED', 'SIMULATION']);
+export const ATLAS_BASIS = Object.freeze(['MEASURED_SATELLITE', 'MEASURED_CAMERA', 'MEASURED_ADSB', 'MEASURED_SEISMIC', 'OFFICIAL_ALERT', 'CITIZEN_SIGNED_UNVERIFIED', 'SIMULATION']);
 
 /** Distancia de círculo máximo (haversine) en metros entre {lat,lon}. */
 export function haversineM(a, b) {
@@ -177,6 +177,30 @@ export function eventsFromGdacs(snap) {
   const src = `GDACS (ONU + Comisión Europea/JRC) · descarga real del ${String(snap.descargadoUTC).slice(0, 10)}`;
   return (snap.eventos ?? []).map((e) => makeEvent({ id: `gdacs:${e.type}:${e.id}`, t: e.from, lat: e.lat, lon: e.lon, kind: `GDACS_${e.type}`, value: e.severity, unit: e.severityUnit,
     group: 'world', label: `${e.name} · alerta ${e.alert}${e.severityText ? ` · ${e.severityText}` : ''}`, source: src, basis: 'OFFICIAL_ALERT' }));
+}
+
+/**
+ * Catálogo real de USGS (usgs_sismos.json, scripts/datos-reales/usgs_sismos_snapshot.mjs): sismos M ≥ 4,5 y casos
+ * pedidos por identificador. El tipo es el de USGS: «earthquake» o «landslide» (señal sísmica de un movimiento de masa).
+ */
+export function eventsFromUsgs(snap, { includeCases = true } = {}) {
+  const src = `USGS ComCat · descarga real del ${String(snap.descargadoUTC).slice(0, 10)}`;
+  const seen = new Set(), all = [...(snap.eventos ?? []), ...(includeCases ? snap.casos ?? [] : [])];
+  return all.filter((e) => !seen.has(e.id) && seen.add(e.id)).map((e) => makeEvent({ id: `usgs:${e.id}`, t: e.t, lat: e.lat, lon: e.lon, kind: `USGS_${e.type}`, value: e.mag, unit: e.magType,
+    group: e.type === 'landslide' ? 'usgs-landslide' : 'usgs', label: `M ${e.mag} ${e.magType} · ${e.type === 'landslide' ? 'deslizamiento (señal sísmica)' : 'sismo'} · ${e.place} · red ${e.net}`, source: src, basis: 'MEASURED_SEISMIC' }));
+}
+
+/**
+ * Cambio detectado entre dos imágenes Sentinel-2 (nepal_s2.json, scripts/datos-reales/nepal_langtang_s2.py).
+ * Un evento en el centroide de la mancha conexa más grande; t = fecha de la escena «antes» (el «después» va en la
+ * etiqueta). Es una detección espectral calculada, no un mapa oficial de daños.
+ */
+export function eventsFromS2Change(snap) {
+  const c = snap?.cambio?.componentePrincipal; if (!c?.centroide) return [];
+  const pre = snap.escenas.pre.fecha, post = snap.escenas[snap.cambio.despues ?? 'post'].fecha, d = (x) => `${x.slice(0, 4)}-${x.slice(4, 6)}-${x.slice(6, 8)}`;
+  return [makeEvent({ id: `s2change:${snap.escenas.pre.escena}`, t: `${d(pre)}T05:00:00Z`, lat: c.centroide[0], lon: c.centroide[1], kind: 'S2_CHANGE', value: c.km2, unit: 'km2',
+    group: 'nepal2026', label: `Cambio Sentinel-2 ${d(pre)} → ${d(post)} · mancha principal ${c.km2} km² (detección espectral, no mapa de daños)`,
+    source: `Copernicus Sentinel-2 L2A (${snap.escenas.pre.escena}, ${snap.escenas[snap.cambio.despues ?? 'post'].escena}) · cálculo de SENDA`, basis: 'MEASURED_SATELLITE' })];
 }
 
 /** Causas DATEX II que publica la DGT, en castellano llano. */
