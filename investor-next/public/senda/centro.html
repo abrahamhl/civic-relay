@@ -161,6 +161,12 @@ footer{padding:0 22px 30px;max-width:1600px;margin:0 auto;color:var(--d);font-si
       <div class="rowb"><button class="btn p" id="cit-go">Verificar y priorizar</button></div>
       <div id="cit-out"></div>
     </section>
+    <section class="card" id="bridge">
+      <h2>Credibilidad por consenso amplio <span class="tag">MÉTODO DE NOTAS DE LA COMUNIDAD · ESCENARIO SIMULADO</span></h2>
+      <p class="muted" style="margin:0">Cuando los vecinos confirman o desmienten un reporte, la mayoría simple se deja arrastrar por un grupo que vota en bloque. El modelo de «consenso amplio» de las Notas de la Comunidad de X (código abierto, Apache-2.0) solo da por confirmado lo que apoyan personas que <b>normalmente discrepan</b>. Aquí, con sus parámetros originales, sobre 20 vecinos <b>simulados</b> en dos grupos. <span class="mono">bridging-trust.mjs</span></p>
+      <div class="rowb"><button class="btn p" id="br-go">Calcular con el escenario simulado</button></div>
+      <div id="br-out"></div>
+    </section>
     <section class="card" id="ops">
       <h2>Operación · orden firmada a la población <span class="tag live">CRIPTOGRAFÍA REAL · POBLACIÓN SINTÉTICA</span></h2>
       <p class="muted" style="margin:0">El organismo (ancla de confianza) acredita al coordinador; el coordinador firma una orden para la zona en riesgo; cada teléfono la verifica (firma, credencial, rol, consentimiento, zona, repetición, caducidad) y responde por los canales que siguen vivos. Sale un parte CAP 1.2 para el 112 y una auditoría encadenada. <span class="mono">incident-ops.mjs</span></p>
@@ -191,6 +197,7 @@ import { syntheticLandscape, arrivalTimes, assessAssets } from '/senda/core/wild
 import { BEARERS, planMultiBearer, shardForPlan, fromBearerFrame, splitShards } from '/senda/core/bearers.mjs';
 import { RADIO_PROFILES, DEFAULT_HAZARDS, linkAvailability, planAssuredDelivery } from '/senda/core/delivery-assurance.mjs';
 import { encodeShards, decodeShards, createReassembler } from '/senda/core/erasure.mjs';
+import { fitBridging, bridgingStatus, majorityStatus, syntheticPolarizedScenario } from '/senda/core/bridging-trust.mjs';
 import { generateIdentity, sealMessage, openMessage, packEnvelope, relayView } from '/senda/core/envelope.mjs';
 import { modulate, demodulate } from '/senda/core/acoustic-modem.mjs';
 import { computeRainAttenuation } from '/senda/core/telecom-mathematical-physics.mjs';
@@ -458,6 +465,14 @@ $('#cit-go').onclick = async () => {
     `<p class="muted" style="margin:8px 0 0">Probabilidades del modelo con razones de verosimilitud sin calibrar. Parte CAP 1.2 restringido y marcado como ejercicio hasta que exista convenio.</p>`;
   for (const b of out.querySelectorAll('button[data-cap]')) b.onclick = () => { const a = q.queue.find((x) => x.id === b.dataset.cap), c = cl.find((x) => x.id === a.id); dl(`senda-${a.id}.cap.xml`, incidentToCap(a, c, { now: Date.now(), exercise: true }), 'application/xml'); };
   window.SENDA_CENTRO.lastCitizen = { valid: reports.length, rejected: rejected.length, incidents: q.incidents, top: q.queue[0]?.family };
+};
+$('#br-go').onclick = () => {
+  const sc = syntheticPolarizedScenario(), st = bridgingStatus(fitBridging(sc.ratings)), maj = majorityStatus(sc.ratings), L = { inundacion: '«Calle inundada» (lo confirman vecinos de los dos grupos)', bulo: '«Puente caído» (lo empuja un solo grupo en bloque)' };
+  const S2 = { CONFIRMADO_CONSENSO_AMPLIO: 'confirmado', SIN_CONSENSO: 'sin consenso', DESMENTIDO: 'desmentido', POCAS_VALORACIONES: 'pocas valoraciones' };
+  $('#br-out').innerHTML = `<div class="ops-row h"><span>Reporte (SIMULACIÓN)</span><span class="c">mayoría simple</span><span class="c">consenso amplio</span><span class="c">intercepto</span><span class="c">factor de grupo</span></div>` +
+    sc.focus.map((id) => `<div class="ops-row"><span>${L[id]}</span><b>${maj[id].status === 'MAYORIA_SI' ? 'sí (' + Math.round(100 * maj[id].share) + ' %)' : 'no'}</b><b style="color:${st[id].status === 'CONFIRMADO_CONSENSO_AMPLIO' ? 'var(--e)' : 'var(--a)'}">${S2[st[id].status]}</b><b>${st[id].intercept.toFixed(2)}</b><b>${st[id].factor.toFixed(2)}</b></div>`).join('') +
+    `<p class="muted" style="margin:8px 0 0">Umbral original: confirmado si intercepto ≥ 0,40 con ≥ 5 valoraciones. Escenario sintético para mostrar el método; con vecinos reales hará falta calibrarlo.</p>`;
+  window.SENDA_CENTRO.lastBridge = Object.fromEntries(sc.focus.map((id) => [id, { majority: maj[id].status, bridging: st[id].status }]));
 };
 window.SENDA_CENTRO = S;
 boot();

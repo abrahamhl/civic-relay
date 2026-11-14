@@ -100,6 +100,8 @@ try {
   await c.waitForFunction(() => window.SENDA_CENTRO.lastCitizen);
   const cit = await c.evaluate(() => window.SENDA_CENTRO.lastCitizen);
   check('centro: 4 líneas válidas, 1 rechazada, 2 incidentes y atrapados primero', cit.valid === 4 && cit.rejected === 1 && cit.incidents === 2 && cit.top === 'STRUCTURE', cit);
+  await c.click('#br-go'); const br = await c.evaluate(() => window.SENDA_CENTRO.lastBridge);
+  check('centro: el consenso amplio confirma lo que apoyan ambos grupos y no lo que empuja uno solo (aunque gane la mayoría)', br.inundacion.bridging === 'CONFIRMADO_CONSENSO_AMPLIO' && br.bulo.majority === 'MAYORIA_SI' && br.bulo.bridging !== 'CONFIRMADO_CONSENSO_AMPLIO', br);
   const [dl] = await Promise.all([c.waitForEvent('download'), c.click('#cit-out button[data-cap]')]);
   const cap = await readFile(await dl.path(), 'utf8');
   check('centro: el parte CAP 1.2 es restringido y de ejercicio', /<scope>Restricted<\/scope>/.test(cap) && /<status>Exercise<\/status>/.test(cap) && !/<scope>Public/.test(cap));
