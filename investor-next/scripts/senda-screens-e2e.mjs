@@ -132,6 +132,16 @@ try {
   await a.evaluate(() => window.SENDA_ATLAS.setCase('nl'));
   const nlv = await a.evaluate(() => window.SENDA_ATLAS.last);
   check('atlas: capa Países Bajos con situaciones reales de NDW leídas por el mismo lector DATEX II', nlv.case === 'nl' && nlv.total > 50, { total: nlv.total });
+  // Medir: tres clics en el mapa dan una distancia > 0
+  await a.click('#mMeasure'); const mb = await a.locator('#map').boundingBox();
+  for (const [fx, fy] of [[0.3, 0.5], [0.5, 0.5], [0.5, 0.7]]) await a.mouse.click(mb.x + mb.width * fx, mb.y + mb.height * fy);
+  const mm = await a.evaluate(() => window.SENDA_ATLAS.measureM); await a.click('#mMeasure');
+  // Vigilar zona: se guarda y al recargar se calculan sus novedades
+  await a.evaluate(() => window.SENDA_ATLAS.setArea({ type: 'circle', center: { lat: 52.37, lon: 4.9 }, radiusM: 30000 }));
+  a.once('dialog', (dl) => dl.accept('prueba')); await a.click('#watch');
+  await a.reload(); await a.waitForSelector('body[data-ready]');
+  const wz = await a.evaluate(() => window.SENDA_ATLAS.watch);
+  check('atlas: medir distancias en el mapa y vigilar una zona (se guarda y al volver cuenta las novedades)', mm > 0 && Array.isArray(wz) && wz.length === 1 && wz[0].n === 0, { mm, wz });
   const d = await (await actx.newPage()); d.on('pageerror', (e) => errors.push(`demo: ${e.message}`));
   await d.goto(base + '/demo'); await d.click('#run'); await d.waitForFunction(() => window.SENDA_DEMO?.done || window.SENDA_DEMO?.error, null, { timeout: 30_000 });
   const demo = await d.evaluate(() => window.SENDA_DEMO);

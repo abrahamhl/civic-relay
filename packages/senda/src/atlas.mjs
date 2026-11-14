@@ -223,3 +223,19 @@ export function roadsInArea(events, area) {
   const out = {}; for (const e of filterEvents(events, { area })) { const road = (e.label ?? '').split(' · ')[0] || 'vía sin nombre'; (out[road] ??= { road, n: 0, tipos: {} }); out[road].n++; const tipo = (e.label ?? '').split(' · ')[1] ?? e.kind; out[road].tipos[tipo] = (out[road].tipos[tipo] ?? 0) + 1; }
   return Object.values(out).sort((a, b) => b.n - a.n);
 }
+
+/** Longitud de un recorrido [{lat,lon},…] en metros (suma de tramos de círculo máximo). */
+export function pathLengthM(points) {
+  let d = 0; for (let k = 1; k < points.length; k++) d += haversineM(points[k - 1], points[k]); return d;
+}
+
+/**
+ * Novedades en una zona vigilada: eventos dentro del área que empezaron después de `since`.
+ * watch = { name, case, area, since }. Devuelve { n, porTipo, ultimos } sin tocar los datos.
+ */
+export function zoneDelta(events, watch, { names = {}, prefix = '' } = {}) {
+  if (!watch?.area || !Number.isFinite(watch.since)) throw new Error('zona vigilada sin área o sin fecha');
+  const nuevos = filterEvents(events, { from: watch.since + 1, area: watch.area }).sort((a, b) => b.t - a.t);
+  const porTipo = {}; for (const e of nuevos) { const k = names[e.kind.slice(prefix.length)] ?? e.kind; porTipo[k] = (porTipo[k] ?? 0) + 1; }
+  return { n: nuevos.length, porTipo, ultimos: nuevos.slice(0, 5).map((e) => ({ t: e.t, label: e.label, source: e.source })) };
+}

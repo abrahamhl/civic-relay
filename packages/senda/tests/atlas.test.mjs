@@ -131,3 +131,13 @@ test('parte del día calculado y carreteras en la zona, con datos reales de la D
   assert.equal(roads.reduce((s, r) => s + r.n, 0), filterEvents(ev, { area: madrid }).length);
   assert.throws(() => dailyBriefing([], {}));
 });
+
+test('medir un recorrido y novedades en una zona vigilada (datos reales de la DGT)', async () => {
+  const { pathLengthM, zoneDelta, eventsFromDgt: dg, DGT_CAUSES: DC } = await import('../src/atlas.mjs');
+  assert.ok(Math.abs(pathLengthM([{ lat: 0, lon: 0 }, { lat: 1, lon: 0 }, { lat: 2, lon: 0 }]) - 2 * 111_195) < 10);
+  assert.equal(pathLengthM([{ lat: 1, lon: 1 }]), 0);
+  const ev = dg(ref('dgt_incidencias.json')), area = { type: 'circle', center: { lat: 40.4168, lon: -3.7038 }, radiusM: 60_000 };
+  const all = zoneDelta(ev, { area, since: 0 }, { names: DC, prefix: 'DGT_' }), none = zoneDelta(ev, { area, since: Date.parse('2100-01-01') });
+  assert.equal(all.n, filterEvents(ev, { area }).length); assert.equal(none.n, 0); assert.ok(all.ultimos.length <= 5);
+  assert.throws(() => zoneDelta(ev, { area }));
+});

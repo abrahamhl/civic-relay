@@ -40,6 +40,9 @@ input[type=range]{width:100%}
     <button id="close" hidden>Cerrar polígono</button>
     <button id="clearArea">✕ Quitar zona</button>
     <button id="fit">⤢ Encuadrar</button>
+    <button id="mMeasure" title="Pulsa puntos en el mapa para medir la distancia del recorrido">📏 Medir</button>
+    <button id="watch" title="Guarda la zona dibujada; al volver, el Atlas te dice qué hay de nuevo dentro">⭐ Vigilar zona</button>
+    <span id="measure" class="m"></span>
   </div>
   <canvas id="map" aria-label="Mapa"></canvas>
   <div class="lg" id="lgf"><span><i style="background:#ff3b30"></i>detección de fuego reciente</span><span><i style="background:#8a3a1c"></i>detección anterior</span><span><i style="background:var(--i);border-radius:2px"></i>cámara (captura de 2026)</span><span><i style="background:var(--v)"></i>reporte ciudadano</span><span><i style="background:transparent;border:2px dashed var(--a)"></i>envolvente de detecciones</span></div>
@@ -59,6 +62,7 @@ input[type=range]{width:100%}
   <div class="k" id="stats"></div>
   <canvas id="spark" style="width:100%;height:90px;margin-top:10px;display:block"></canvas>
   <p class="m" style="font-size:12px;margin:4px 0 0" id="sparkLbl"></p>
+  <div id="watchOut" class="note" style="margin-top:8px"></div>
   <div id="roads" class="m" style="font-size:13px;margin-top:8px"></div>
   <h2 style="margin-top:14px">Parte del día <span class="tag">calculado, no redactado</span></h2>
   <div id="brief" class="m" style="font-size:13px"></div>
@@ -72,7 +76,7 @@ input[type=range]{width:100%}
 </div>
 
 <script type="module">
-import { haversineM, inArea, filterEvents, timeline, areaStats, growth, convexHull, ringAreaKm2, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromGdacs, GDACS_TYPES, eventsFromDgt, DGT_CAUSES, eventsFromNdw, NDW_TYPES, dailyBriefing, roadsInArea } from '/senda/core/atlas.mjs';
+import { haversineM, inArea, filterEvents, timeline, areaStats, growth, convexHull, ringAreaKm2, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromGdacs, GDACS_TYPES, eventsFromDgt, DGT_CAUSES, eventsFromNdw, NDW_TYPES, dailyBriefing, roadsInArea, pathLengthM, zoneDelta } from '/senda/core/atlas.mjs';
 const $ = (s) => document.querySelector(s);
 const CASES = { nl: 'Países Bajos · situaciones de tráfico de NDW (descarga real)', spain: 'España · incidencias activas de la DGT (descarga real)', world: 'Mundo · alertas GDACS de los últimos 30 días (descarga real)', camp: 'Camp Fire · Paradise, California (2018)', palisades: 'Palisades · Los Ángeles (2025)', eaton: 'Eaton · Altadena (2025)', marshall: 'Marshall · Colorado (2021)', smokehouse: 'Smokehouse Creek · Texas (2024)', troublesome: 'East Troublesome · Colorado (2020)', creek: 'Creek · California (2020)', london: 'Londres · cámaras de tráfico (captura 2026)', mine: 'Mis reportes (pantalla Avisos)' };
 const [goes, tfl, refs, land] = await Promise.all(['/senda/data/referencias/goes_casos.json', '/senda/data/referencias/tfl_camaras.json', '/senda/data/referencias/referencias.json', '/geo/land-110m.json'].map((u) => fetch(u).then((r) => r.json())));
@@ -155,6 +159,8 @@ function draw() {
   }
   // Cámaras (sin línea de tiempo)
   for (const c of statics()) { const [x, y] = proj(c), inA = S.area && inArea(c, S.area); g.fillStyle = inA ? '#34d399' : '#91d7e8'; g.fillRect(x - 5, y - 5, 10, 10); if (S.view.s > 300) { g.fillStyle = '#9fb2bc'; g.font = '11px Inter,sans-serif'; g.fillText(c.label, x + 8, y + 4); } }
+  // Medición
+  if (S.measure?.length) { g.strokeStyle = '#fbbf24'; g.lineWidth = 2; g.setLineDash([4, 4]); g.beginPath(); S.measure.forEach((q, k) => { const [x, y] = proj(q); k ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); g.setLineDash([]); for (const q of S.measure) { const [x, y] = proj(q); g.fillStyle = '#fbbf24'; g.beginPath(); g.arc(x, y, 3.5, 0, 7); g.fill(); } }
   // Zona
   const A = S.area; g.strokeStyle = '#91d7e8'; g.lineWidth = 2; g.fillStyle = 'rgba(145,215,232,.08)';
   if (A?.type === 'circle') { const [x, y] = proj(A.center), [x2] = proj({ lat: A.center.lat, lon: A.center.lon + A.radiusM / (111_195 * Math.cos(A.center.lat * Math.PI / 180)) }); g.beginPath(); g.arc(x, y, Math.abs(x2 - x), 0, 7); g.fill(); g.stroke(); }
@@ -221,6 +227,7 @@ let drag = null;
 const pos = (e) => { const b = cv.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
 cv.addEventListener('pointerdown', (e) => {
   cv.setPointerCapture(e.pointerId); const [x, y] = pos(e), p = unproj(x, y);
+  if (S.mode === 'measure') { (S.measure ??= []).push(p); const m = pathLengthM(S.measure); $('#measure').textContent = `${S.measure.length} punto(s) · ${m >= 1000 ? (m / 1000).toFixed(2) + ' km' : Math.round(m) + ' m'} (círculo máximo)`; window.SENDA_ATLAS.measureM = m; draw(); return; }
   if (S.mode === 'circle') drag = { kind: 'circle', c: p };
   else if (S.mode === 'poly') { if (S.draft.length >= 3) { const [fx, fy] = proj({ lat: S.draft[0][0], lon: S.draft[0][1] }); if (Math.hypot(fx - x, fy - y) < 12) return closePoly(); } S.draft.push([p.lat, p.lon]); $('#close').hidden = S.draft.length < 3; draw(); }
   else drag = { kind: 'pan', x, y, v: { ...S.view } };
@@ -245,7 +252,7 @@ function pick(x, y) {
 }
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 cv.addEventListener('wheel', (e) => { e.preventDefault(); const [x, y] = pos(e), before = unproj(x, y); S.view.s *= e.deltaY < 0 ? 1.25 : 0.8; const after = unproj(x, y); S.view.lat += before.lat - after.lat; S.view.lon += before.lon - after.lon; draw(); }, { passive: false });
-function setMode(m) { S.mode = m; $('#mCircle').classList.toggle('on', m === 'circle'); $('#mPoly').classList.toggle('on', m === 'poly'); cv.style.cursor = m ? 'crosshair' : 'grab'; if (m !== 'poly') { S.draft = []; $('#close').hidden = true; } }
+function setMode(m) { S.mode = m; $('#mMeasure').classList.toggle('on', m === 'measure'); if (m === 'measure') { S.measure = []; $('#measure').textContent = 'Pulsa puntos en el mapa…'; } $('#mCircle').classList.toggle('on', m === 'circle'); $('#mPoly').classList.toggle('on', m === 'poly'); cv.style.cursor = m ? 'crosshair' : 'grab'; if (m !== 'poly') { S.draft = []; $('#close').hidden = true; } }
 function closePoly() { if (S.draft.length >= 3) S.area = { type: 'polygon', ring: S.draft }; setMode(null); saveHash(); draw(); }
 $('#mCircle').onclick = () => setMode(S.mode === 'circle' ? null : 'circle');
 $('#mPoly').onclick = () => { setMode(S.mode === 'poly' ? null : 'poly'); };
@@ -284,8 +291,25 @@ addEventListener('resize', () => { size(); draw(); });
   $('#brief').innerHTML = L.map((b) => `<p style="margin:6px 0"><b>${esc(b.nombre)}</b> (foto del ${esc(b.hora.slice(0, 16).replace('T', ' '))} UTC): ${b.total} en total, <b>${b.nuevos}</b> empezaron en las 24 h previas. Más frecuentes: ${b.tiposPrincipales.map(([k, n]) => `${esc(k)} (${n})`).join(', ')}.${b.destacados.length ? `<br>Destacados: ${b.destacados.map((t) => esc(t.length > 90 ? t.slice(0, 88) + '…' : t)).join(' · ')}` : ''}</p>`).join('') || 'Sin capas descargadas.';
   window.SENDA_BRIEF = L;
 }
+// Zonas vigiladas (solo en este navegador): al abrir, novedades dentro de cada zona desde la última visita
+const WKEY = 'senda-atlas-watch', loadW = () => { try { return JSON.parse(localStorage.getItem(WKEY)) ?? []; } catch { return []; } }, saveW = (w) => { try { localStorage.setItem(WKEY, JSON.stringify(w)); } catch { /* sin almacenamiento */ } };
+const layerOf = (c) => ({ world: { ev: world, names: GDACS_TYPES, prefix: 'GDACS_' }, spain: { ev: spain, names: DGT_CAUSES, prefix: 'DGT_' }, nl: { ev: nl, names: NDW_TYPES, prefix: 'NDW_' } }[c]);
+$('#mMeasure').onclick = () => setMode(S.mode === 'measure' ? null : 'measure');
+$('#watch').onclick = () => {
+  const L = layerOf(S.case); if (!S.area || !L) { $('#measure').textContent = 'Dibuja una zona en Mundo, España o Países Bajos para vigilarla.'; return; }
+  const name = (prompt('Nombre de la zona (p. ej. «mi barrio»):', 'mi zona') || 'mi zona').slice(0, 40), w = loadW();
+  const since = Math.max(...L.ev.map((e) => e.t)); w.push({ name, case: S.case, area: S.area, since }); saveW(w);
+  $('#measure').textContent = `Zona «${name}» vigilada: al volver verás lo que haya empezado después de ${new Date(since).toISOString().slice(0, 16).replace('T', ' ')} UTC.`; showWatch();
+};
+function showWatch() {
+  const w = loadW(); if (!w.length) return;
+  const rows = w.map((z) => { const L = layerOf(z.case); if (!L) return null; const d = zoneDelta(L.ev, z, { names: L.names, prefix: L.prefix }); return { z, d }; }).filter(Boolean);
+  window.SENDA_ATLAS.watch = rows.map(({ z, d }) => ({ name: z.name, case: z.case, n: d.n }));
+  $('#watchOut').innerHTML = '<b>Tus zonas vigiladas</b> (guardadas en este navegador):<br>' + rows.map(({ z, d }) => `· ${esc(z.name)} (${esc(CASES[z.case].split(' · ')[0])}): <b>${d.n}</b> novedad(es)${d.n ? ' — ' + Object.entries(d.porTipo).map(([k, n]) => `${esc(k)} ${n}`).join(', ') : ''}`).join('<br>') + '<br><small>Comparado con los datos que tiene ahora la página; para novedades reales hay que actualizar las capas.</small>';
+}
 legend();
 size(); loadCase(false);
+showWatch();
 if (H.get('t') && Number.isFinite(+H.get('t'))) { S.t = Math.max(t0, Math.min(t1, +H.get('t'))); draw(); }
 document.body.dataset.ready = '1';
 </script>
