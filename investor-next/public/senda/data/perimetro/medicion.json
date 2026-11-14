@@ -1,0 +1,1097 @@
+{
+ "generado": "2026-11-14T14:08:36Z",
+ "plan": "plan.json",
+ "separacionMinS": 130,
+ "modelo": {
+  "nombre": "YOLOX-s ONNX (Megvii, Apache 2.0)",
+  "sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+  "umbral": 0.35,
+  "clases": [
+   "coche",
+   "moto",
+   "autobús",
+   "camión"
+  ]
+ },
+ "avisoReferencia": {
+  "url": "https://etraffic.dgt.es/camarasEtraffic/768.jpg",
+  "sha256": "e8703ff5957fa4136be7c39ef1bc8c61d7d2c54a46537791a1fb08467145cdb3"
+ },
+ "fuente": "DGT · imágenes de cámaras (etraffic.dgt.es), inventario DATEX II v3.7 (CC BY)",
+ "privacidad": "solo recuentos agregados de vehículos; sin personas ni matrículas",
+ "camaras": {
+  "1083": {
+   "placeholder": false,
+   "ageS": 233.0,
+   "sha256": [
+    "3d21b55efe4288fa7657c230d726ceb0896ea84d45d0a0fb52618c809a3b4467",
+    "96bdf66adbbee1927418889036efa7cec6b7487e624f073f7318341d14158b0d"
+   ],
+   "bytes": [
+    213057,
+    231901
+   ],
+   "capturas": [
+    "2026-11-14T14:06:17Z",
+    "2026-11-14T14:08:27Z"
+   ],
+   "motion": 0.0156,
+   "identicas": false,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_1083.jpg"
+  },
+  "186956": {
+   "placeholder": false,
+   "ageS": 442.0,
+   "sha256": [
+    "09e8cce17e1f98825e23d6d9a462b852ff2487a3774bd22ad87026d49f4b9376",
+    "09e8cce17e1f98825e23d6d9a462b852ff2487a3774bd22ad87026d49f4b9376"
+   ],
+   "bytes": [
+    191620,
+    191620
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:27Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_186956.jpg"
+  },
+  "178572": {
+   "placeholder": false,
+   "ageS": 382.0,
+   "sha256": [
+    "9bf3f455b7012756fe6f38e466e79d6a4df6eca1f02b487d9d7640286ba594a4",
+    "fe3ceafa81d598024f4ba3f905d1a265afde6dde0a338a8bc04da80d29d80684"
+   ],
+   "bytes": [
+    49339,
+    35949
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:27Z"
+   ],
+   "motion": 0.1497,
+   "identicas": false,
+   "vehicles": 1,
+   "porClase": {
+    "coche": 1
+   },
+   "miniatura": "cam_178572.jpg"
+  },
+  "165886": {
+   "placeholder": false,
+   "ageS": 556.0,
+   "sha256": [
+    "54c465dbcd02f621755611b18ba1c99d8f9ac773ff1ec900cf35c3502bdb8af1",
+    "54c465dbcd02f621755611b18ba1c99d8f9ac773ff1ec900cf35c3502bdb8af1"
+   ],
+   "bytes": [
+    17642,
+    17642
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:27Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_165886.jpg"
+  },
+  "108": {
+   "placeholder": false,
+   "ageS": 307.0,
+   "sha256": [
+    "7da85ab3631656b86a3de73fd5baebd303243c6fe35ef78716ed806b7ad60aa5",
+    "2c5f50ec00879eb59817024dd594c8ad83e23df3c37eca5a00a1284aa15c8d23"
+   ],
+   "bytes": [
+    74898,
+    46757
+   ],
+   "capturas": [
+    "2026-11-14T14:06:17Z",
+    "2026-11-14T14:08:27Z"
+   ],
+   "motion": 0.1317,
+   "identicas": false,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_108.jpg"
+  },
+  "154": {
+   "placeholder": false,
+   "ageS": 742.0,
+   "sha256": [
+    "9943f10c27f2a2f4bd956d8547dcd346ab8ebb850fd76f9bfbab780b4d12643c",
+    "9943f10c27f2a2f4bd956d8547dcd346ab8ebb850fd76f9bfbab780b4d12643c"
+   ],
+   "bytes": [
+    76024,
+    76024
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:27Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 2,
+   "porClase": {
+    "coche": 2
+   },
+   "miniatura": "cam_154.jpg"
+  },
+  "1614": {
+   "placeholder": false,
+   "ageS": 740.0,
+   "sha256": [
+    "f8823edb5bdca5075ab83db051dce325ee5340e7d30484f6bcbc7e13463882c2",
+    "f8823edb5bdca5075ab83db051dce325ee5340e7d30484f6bcbc7e13463882c2"
+   ],
+   "bytes": [
+    61450,
+    61450
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:27Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_1614.jpg"
+  },
+  "156": {
+   "placeholder": false,
+   "ageS": 534.0,
+   "sha256": [
+    "188d2bca84dce292e81308e41c8979987400fedbfd6b8205d2d2ab06ea88eaff",
+    "188d2bca84dce292e81308e41c8979987400fedbfd6b8205d2d2ab06ea88eaff"
+   ],
+   "bytes": [
+    34711,
+    34711
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:27Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 2,
+   "porClase": {
+    "coche": 2
+   },
+   "miniatura": "cam_156.jpg"
+  },
+  "122": {
+   "placeholder": false,
+   "ageS": 277.0,
+   "sha256": [
+    "0ef0468d588393a2b5748fd82d0d79922989da7fb3a24683439bfece4bcafa25",
+    "8de9dba659df03b3a5ae7806244488b26088b22d5215ad8f63736debef87b53b"
+   ],
+   "bytes": [
+    60039,
+    58774
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:27Z"
+   ],
+   "motion": 0.0376,
+   "identicas": false,
+   "vehicles": 2,
+   "porClase": {
+    "coche": 2
+   },
+   "miniatura": "cam_122.jpg"
+  },
+  "790": {
+   "placeholder": false,
+   "ageS": 350.0,
+   "sha256": [
+    "85e22e4d372abfd91da8920ab886d0a440296d5018b2889b61e06e4fa0b3659d",
+    "85e22e4d372abfd91da8920ab886d0a440296d5018b2889b61e06e4fa0b3659d"
+   ],
+   "bytes": [
+    216260,
+    216260
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 3,
+   "porClase": {
+    "coche": 3
+   },
+   "miniatura": "cam_790.jpg"
+  },
+  "1125": {
+   "placeholder": false,
+   "ageS": 360.0,
+   "sha256": [
+    "b19ac2969b2649569784254be0ce086b9a646e38d7f5289da5d5f70e7095c373",
+    "b19ac2969b2649569784254be0ce086b9a646e38d7f5289da5d5f70e7095c373"
+   ],
+   "bytes": [
+    135308,
+    135308
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:27Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 3,
+   "porClase": {
+    "coche": 2,
+    "camión": 1
+   },
+   "miniatura": "cam_1125.jpg"
+  },
+  "939": {
+   "placeholder": false,
+   "ageS": 355.0,
+   "sha256": [
+    "8aea08d728e2c9cb1d2b35e4166cf5d14e4d3c3da9c5f90e18379d3150e78397",
+    "8aea08d728e2c9cb1d2b35e4166cf5d14e4d3c3da9c5f90e18379d3150e78397"
+   ],
+   "bytes": [
+    126640,
+    126640
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 22,
+   "porClase": {
+    "coche": 22
+   },
+   "miniatura": "cam_939.jpg"
+  },
+  "943": {
+   "placeholder": false,
+   "ageS": 355.0,
+   "sha256": [
+    "e39cc485149b9c20238ed37874203533ad332c43032ec5d40575b86a59593011",
+    "3ba5c5bb808b892c348fb3e6abba6c4899b8e81e02f62447df3c8418936a8021"
+   ],
+   "bytes": [
+    171571,
+    163806
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": 0.0242,
+   "identicas": false,
+   "vehicles": 10,
+   "porClase": {
+    "coche": 10
+   },
+   "miniatura": "cam_943.jpg"
+  },
+  "967": {
+   "placeholder": false,
+   "ageS": 377.0,
+   "sha256": [
+    "02d602727ae4553bdba65cb7788c9e056cd1c0b7b24318b001d95c68cac02873",
+    "02d602727ae4553bdba65cb7788c9e056cd1c0b7b24318b001d95c68cac02873"
+   ],
+   "bytes": [
+    73453,
+    73453
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_967.jpg"
+  },
+  "837": {
+   "placeholder": false,
+   "ageS": 386.0,
+   "sha256": [
+    "8784936cc46828baef900b1e051a1a3834e73a928a402efc7941f5817a670ade",
+    "8784936cc46828baef900b1e051a1a3834e73a928a402efc7941f5817a670ade"
+   ],
+   "bytes": [
+    43405,
+    43405
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 6,
+   "porClase": {
+    "coche": 6
+   },
+   "miniatura": "cam_837.jpg"
+  },
+  "825": {
+   "placeholder": false,
+   "ageS": 353.0,
+   "sha256": [
+    "07813189488dc1b6803bf2662919174cbf864517d154c04007f2dd7f50251e5a",
+    "07813189488dc1b6803bf2662919174cbf864517d154c04007f2dd7f50251e5a"
+   ],
+   "bytes": [
+    157100,
+    157100
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 4,
+   "porClase": {
+    "coche": 4
+   },
+   "miniatura": "cam_825.jpg"
+  },
+  "932": {
+   "placeholder": false,
+   "ageS": 348.0,
+   "sha256": [
+    "66be151269c3c4bb0c9ad0b1f22f437db7fafe97c766f220b614a5ae37d57178",
+    "66be151269c3c4bb0c9ad0b1f22f437db7fafe97c766f220b614a5ae37d57178"
+   ],
+   "bytes": [
+    133350,
+    133350
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 9,
+   "porClase": {
+    "coche": 9
+   },
+   "miniatura": "cam_932.jpg"
+  },
+  "1474": {
+   "placeholder": false,
+   "ageS": 659.0,
+   "sha256": [
+    "1d979d441dc3f2dae30ab9334c09ad801e8f978753b465722937d0543adc258f",
+    "1d979d441dc3f2dae30ab9334c09ad801e8f978753b465722937d0543adc258f"
+   ],
+   "bytes": [
+    51823,
+    51823
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 3,
+   "porClase": {
+    "coche": 3
+   },
+   "miniatura": "cam_1474.jpg"
+  },
+  "523": {
+   "placeholder": false,
+   "ageS": 476.0,
+   "sha256": [
+    "54345e86b0ab6dc8a484c9e4663417df8bb43b9c3e402dda6e1b1d69e64df8b8",
+    "54345e86b0ab6dc8a484c9e4663417df8bb43b9c3e402dda6e1b1d69e64df8b8"
+   ],
+   "bytes": [
+    43444,
+    43444
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_523.jpg"
+  },
+  "180": {
+   "placeholder": false,
+   "ageS": 663.0,
+   "sha256": [
+    "026a2fc620b6f05ddcee11d9f2ce0fe10d028c34f56505896a118d439e9774f5",
+    "026a2fc620b6f05ddcee11d9f2ce0fe10d028c34f56505896a118d439e9774f5"
+   ],
+   "bytes": [
+    59218,
+    59218
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_180.jpg"
+  },
+  "169": {
+   "placeholder": false,
+   "ageS": 671.0,
+   "sha256": [
+    "fbcb4e1f234a101c032e658f0e68311230e5811a61c7f88ce972b904e898de78",
+    "fbcb4e1f234a101c032e658f0e68311230e5811a61c7f88ce972b904e898de78"
+   ],
+   "bytes": [
+    68774,
+    68774
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 2,
+   "porClase": {
+    "coche": 2
+   },
+   "miniatura": "cam_169.jpg"
+  },
+  "1607": {
+   "placeholder": false,
+   "ageS": 639.0,
+   "sha256": [
+    "c4ec32774c2b01efa63c248206e62d735eb81764912ba54103a0656cec0d88c3",
+    "c4ec32774c2b01efa63c248206e62d735eb81764912ba54103a0656cec0d88c3"
+   ],
+   "bytes": [
+    45693,
+    45693
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_1607.jpg"
+  },
+  "191": {
+   "placeholder": false,
+   "ageS": 644.0,
+   "sha256": [
+    "d4ac56192ddba154f633d086ac1e9d87b7519a4f6d73b8c55da76171b9aec8ee",
+    "d4ac56192ddba154f633d086ac1e9d87b7519a4f6d73b8c55da76171b9aec8ee"
+   ],
+   "bytes": [
+    44308,
+    44308
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 15,
+   "porClase": {
+    "coche": 15
+   },
+   "miniatura": "cam_191.jpg"
+  },
+  "182": {
+   "placeholder": false,
+   "ageS": 658.0,
+   "sha256": [
+    "f95e5462f62ac7e3ddb593143fb40d356716fc69d4cad9154fda9a415fb6786e",
+    "f95e5462f62ac7e3ddb593143fb40d356716fc69d4cad9154fda9a415fb6786e"
+   ],
+   "bytes": [
+    54098,
+    54098
+   ],
+   "capturas": [
+    "2026-11-14T14:06:18Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_182.jpg"
+  },
+  "181": {
+   "placeholder": false,
+   "ageS": 662.0,
+   "sha256": [
+    "839a5bd2d3e21fed192cd25d03054bf34f658875c6c2f267c8769f3c07cd6b6e",
+    "839a5bd2d3e21fed192cd25d03054bf34f658875c6c2f267c8769f3c07cd6b6e"
+   ],
+   "bytes": [
+    50349,
+    50349
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 6,
+   "porClase": {
+    "coche": 6
+   },
+   "miniatura": "cam_181.jpg"
+  },
+  "178189": {
+   "placeholder": false,
+   "ageS": 385.0,
+   "sha256": [
+    "321689859af88198d4ebdd617d9357244374ecb5080775faf995205a9cdf00b4",
+    "321689859af88198d4ebdd617d9357244374ecb5080775faf995205a9cdf00b4"
+   ],
+   "bytes": [
+    70141,
+    70141
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:28Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_178189.jpg"
+  },
+  "1609": {
+   "placeholder": false,
+   "ageS": 541.0,
+   "sha256": [
+    "de5b24fd34a7738dd9f04d82714425d5727bf2e15bc227bc6f1da676faaae241",
+    "de5b24fd34a7738dd9f04d82714425d5727bf2e15bc227bc6f1da676faaae241"
+   ],
+   "bytes": [
+    43032,
+    43032
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_1609.jpg"
+  },
+  "1610": {
+   "placeholder": false,
+   "ageS": 539.0,
+   "sha256": [
+    "633dc67647783472345b606a5ac3f5231bc8213c35c7ca6f764a869e502ad833",
+    "633dc67647783472345b606a5ac3f5231bc8213c35c7ca6f764a869e502ad833"
+   ],
+   "bytes": [
+    71570,
+    71570
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 1,
+   "porClase": {
+    "coche": 1
+   },
+   "miniatura": "cam_1610.jpg"
+  },
+  "158": {
+   "placeholder": false,
+   "ageS": 708.0,
+   "sha256": [
+    "00f79e1c5d4ec066623b071efa3e3a5b5eb49a8cfac0bd1383bd5beb16180449",
+    "00f79e1c5d4ec066623b071efa3e3a5b5eb49a8cfac0bd1383bd5beb16180449"
+   ],
+   "bytes": [
+    58835,
+    58835
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 1,
+   "porClase": {
+    "coche": 1
+   },
+   "miniatura": "cam_158.jpg"
+  },
+  "934": {
+   "placeholder": false,
+   "ageS": 379.0,
+   "sha256": [
+    "425745ec1d977a1257b8073f0501aff26846eff1576a30d16599cad65504c6ed",
+    "425745ec1d977a1257b8073f0501aff26846eff1576a30d16599cad65504c6ed"
+   ],
+   "bytes": [
+    179082,
+    179082
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 1,
+   "porClase": {
+    "coche": 1
+   },
+   "miniatura": "cam_934.jpg"
+  },
+  "1259": {
+   "placeholder": false,
+   "ageS": 357.0,
+   "sha256": [
+    "b3cd118fd4b9512012874c7702952f3f15f1e7b87a4c4fe7a4ce27e5ef748d9c",
+    "b3cd118fd4b9512012874c7702952f3f15f1e7b87a4c4fe7a4ce27e5ef748d9c"
+   ],
+   "bytes": [
+    189972,
+    189972
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 2,
+   "porClase": {
+    "coche": 2
+   },
+   "miniatura": "cam_1259.jpg"
+  },
+  "828": {
+   "placeholder": false,
+   "ageS": 357.0,
+   "sha256": [
+    "1eece919658e698ab9b0df3707f1ac1a3ae085bbdf2aa36c2a552ea4870cc300",
+    "1eece919658e698ab9b0df3707f1ac1a3ae085bbdf2aa36c2a552ea4870cc300"
+   ],
+   "bytes": [
+    135398,
+    135398
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 7,
+   "porClase": {
+    "coche": 7
+   },
+   "miniatura": "cam_828.jpg"
+  },
+  "821": {
+   "placeholder": false,
+   "ageS": 349.0,
+   "sha256": [
+    "747498ee0120fd7a959abadde2f851614c2d0241040589615e6ff8f515d6f939",
+    "747498ee0120fd7a959abadde2f851614c2d0241040589615e6ff8f515d6f939"
+   ],
+   "bytes": [
+    119915,
+    119915
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 3,
+   "porClase": {
+    "coche": 3
+   },
+   "miniatura": "cam_821.jpg"
+  },
+  "990": {
+   "placeholder": false,
+   "ageS": 365.0,
+   "sha256": [
+    "0d7f71c283dcd9ce42c27dd29b351a4e97938ac089abe152d92171d9c90a628d",
+    "4d857bf645220cd6f81459b6e806a7607d60400b7d28bff65739a562c25ea826"
+   ],
+   "bytes": [
+    138203,
+    159586
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": 0.0848,
+   "identicas": false,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_990.jpg"
+  },
+  "984": {
+   "placeholder": false,
+   "ageS": 384.0,
+   "sha256": [
+    "f9b7e86548f01e002f775cdcc46d8adaccb5681759385ba50076163caae8b19c",
+    "b699967e382c2875a784aeb073122221ee2069b11f235d1308cf5a9bb8d0f9b7"
+   ],
+   "bytes": [
+    72087,
+    121338
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": 0.1278,
+   "identicas": false,
+   "vehicles": 1,
+   "porClase": {
+    "coche": 1
+   },
+   "miniatura": "cam_984.jpg"
+  },
+  "827": {
+   "placeholder": false,
+   "ageS": 348.0,
+   "sha256": [
+    "e68a4413e4f676e64acd03e84edad7b91ef0e36f32523998affa4f6bae1bea99",
+    "e68a4413e4f676e64acd03e84edad7b91ef0e36f32523998affa4f6bae1bea99"
+   ],
+   "bytes": [
+    155741,
+    155741
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 3,
+   "porClase": {
+    "coche": 3
+   },
+   "miniatura": "cam_827.jpg"
+  },
+  "1476": {
+   "placeholder": false,
+   "ageS": 768.0,
+   "sha256": [
+    "c3c2a13abc7b30f394f300d57378f8e4b846ec8addc28ae230d0dd7da3522770",
+    "c3c2a13abc7b30f394f300d57378f8e4b846ec8addc28ae230d0dd7da3522770"
+   ],
+   "bytes": [
+    58075,
+    58075
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 4,
+   "porClase": {
+    "coche": 4
+   },
+   "miniatura": "cam_1476.jpg"
+  },
+  "177393": {
+   "placeholder": false,
+   "ageS": 390.0,
+   "sha256": [
+    "5ac6a874de4d1160a8d5d77273bb648d722f59755a3021fff42a9a0ac896cdc8",
+    "5ac6a874de4d1160a8d5d77273bb648d722f59755a3021fff42a9a0ac896cdc8"
+   ],
+   "bytes": [
+    45637,
+    45637
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_177393.jpg"
+  },
+  "173": {
+   "placeholder": false,
+   "ageS": 546.0,
+   "sha256": [
+    "0ad9b0ba84e209ecdee2adc911746f42aff89028fce4fdba2666483865b50bc7",
+    "0ad9b0ba84e209ecdee2adc911746f42aff89028fce4fdba2666483865b50bc7"
+   ],
+   "bytes": [
+    45642,
+    45642
+   ],
+   "capturas": [
+    "2026-11-14T14:06:20Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 1,
+   "porClase": {
+    "coche": 1
+   },
+   "miniatura": "cam_173.jpg"
+  },
+  "174": {
+   "placeholder": false,
+   "ageS": 766.0,
+   "sha256": [
+    "29f23385856ea1178394e30a14c17067c5fd8c1796b9ffb24e6e4bbb669e73e3",
+    "29f23385856ea1178394e30a14c17067c5fd8c1796b9ffb24e6e4bbb669e73e3"
+   ],
+   "bytes": [
+    59651,
+    59651
+   ],
+   "capturas": [
+    "2026-11-14T14:06:19Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 1,
+   "porClase": {
+    "coche": 1
+   },
+   "miniatura": "cam_174.jpg"
+  },
+  "183": {
+   "placeholder": false,
+   "ageS": 657.0,
+   "sha256": [
+    "d2d53baae77b073199a1eeef8f630b26dfa00d0e2444021ecdea83cd1f3f00b9",
+    "d2d53baae77b073199a1eeef8f630b26dfa00d0e2444021ecdea83cd1f3f00b9"
+   ],
+   "bytes": [
+    56358,
+    56358
+   ],
+   "capturas": [
+    "2026-11-14T14:06:20Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_183.jpg"
+  },
+  "170": {
+   "placeholder": false,
+   "ageS": 476.0,
+   "sha256": [
+    "eba99c2fba9ef03041b5b19d59949e5c714b8ccc374b224ed4928c6a037ed966",
+    "eba99c2fba9ef03041b5b19d59949e5c714b8ccc374b224ed4928c6a037ed966"
+   ],
+   "bytes": [
+    43621,
+    43621
+   ],
+   "capturas": [
+    "2026-11-14T14:06:20Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_170.jpg"
+  },
+  "1089": {
+   "placeholder": false,
+   "ageS": 647.0,
+   "sha256": [
+    "cabad2e5fbef9aa32d172511319bb7cf342ee55d47bd7067a4c084e05ed7de18",
+    "cabad2e5fbef9aa32d172511319bb7cf342ee55d47bd7067a4c084e05ed7de18"
+   ],
+   "bytes": [
+    70470,
+    70470
+   ],
+   "capturas": [
+    "2026-11-14T14:06:20Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 17,
+   "porClase": {
+    "coche": 16,
+    "camión": 1
+   },
+   "miniatura": "cam_1089.jpg"
+  },
+  "146": {
+   "placeholder": false,
+   "ageS": 774.0,
+   "sha256": [
+    "6324f577b675a498c1602ba717de4bef7366111d60f10cd3b4665f0331f36e71",
+    "6324f577b675a498c1602ba717de4bef7366111d60f10cd3b4665f0331f36e71"
+   ],
+   "bytes": [
+    63012,
+    63012
+   ],
+   "capturas": [
+    "2026-11-14T14:06:20Z",
+    "2026-11-14T14:08:30Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 1,
+   "porClase": {
+    "coche": 1
+   },
+   "miniatura": "cam_146.jpg"
+  },
+  "1635": {
+   "placeholder": false,
+   "ageS": 479.0,
+   "sha256": [
+    "ea51d2a43af35e720fdbdb946e4c4864610211f8092effc1fdada70a03fb0ebd",
+    "ea51d2a43af35e720fdbdb946e4c4864610211f8092effc1fdada70a03fb0ebd"
+   ],
+   "bytes": [
+    46812,
+    46812
+   ],
+   "capturas": [
+    "2026-11-14T14:06:20Z",
+    "2026-11-14T14:08:29Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 4,
+   "porClase": {
+    "coche": 4
+   },
+   "miniatura": "cam_1635.jpg"
+  },
+  "1216": {
+   "placeholder": false,
+   "ageS": 497.0,
+   "sha256": [
+    "4a20d7dab6cbfdf8336bdfb6d321980fd4ebce962abbdd67ba91165ac58b5124",
+    "4a20d7dab6cbfdf8336bdfb6d321980fd4ebce962abbdd67ba91165ac58b5124"
+   ],
+   "bytes": [
+    55417,
+    55417
+   ],
+   "capturas": [
+    "2026-11-14T14:06:20Z",
+    "2026-11-14T14:08:30Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 0,
+   "porClase": {},
+   "miniatura": "cam_1216.jpg"
+  },
+  "1217": {
+   "placeholder": false,
+   "ageS": 468.0,
+   "sha256": [
+    "f20335b4761a5d5e95dc9188a5335954cd746f70bda3f10a2f84dd81630e51e7",
+    "f20335b4761a5d5e95dc9188a5335954cd746f70bda3f10a2f84dd81630e51e7"
+   ],
+   "bytes": [
+    42121,
+    42121
+   ],
+   "capturas": [
+    "2026-11-14T14:06:20Z",
+    "2026-11-14T14:08:30Z"
+   ],
+   "motion": null,
+   "identicas": true,
+   "vehicles": 1,
+   "porClase": {
+    "coche": 1
+   },
+   "miniatura": "cam_1217.jpg"
+  },
+  "186117": {
+   "placeholder": false,
+   "ageS": 374.0,
+   "sha256": [
+    "8840971348754d32c115768b74802c257f8904c79339ee5256cc7bfc1c251012",
+    "0bd68b56c08164adbb9a3a02789904d15e036ac4a2659ab11a644b1cb1acc861"
+   ],
+   "bytes": [
+    57741,
+    58407
+   ],
+   "capturas": [
+    "2026-11-14T14:06:20Z",
+    "2026-11-14T14:08:30Z"
+   ],
+   "motion": 0.0326,
+   "identicas": false,
+   "vehicles": 2,
+   "porClase": {
+    "coche": 2
+   },
+   "miniatura": "cam_186117.jpg"
+  }
+ },
+ "notaCadencia": "Medido: la DGT sirve imágenes con 233–774 s de antigüedad (mediana 472 s) pese a declarar max-age=119; 40 de 48 cámaras no renovaron la imagen entre las dos capturas (130 s), así que su movimiento queda sin medir."
+}

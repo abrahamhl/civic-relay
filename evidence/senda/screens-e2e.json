@@ -1,9 +1,9 @@
 {
  "kind": "senda-screens-e2e",
- "at": "2026-11-14T13:42:59.538Z",
- "durationS": 48,
- "passed": 33,
- "total": 33,
+ "at": "2026-11-14T14:23:18.920Z",
+ "durationS": 49,
+ "passed": 35,
+ "total": 35,
  "results": [
   {
    "name": "mensaje: el número de seguridad coincide en los dos móviles",
@@ -105,7 +105,7 @@
   {
    "name": "atlas: capa España con incidencias reales de la DGT leídas por el lector DATEX II del núcleo",
    "ok": true,
-   "total": 609
+   "total": 838
   },
   {
    "name": "atlas: parte del día calculado por capa (sin texto inventado) y carreteras con incidencias en una zona de Madrid",
@@ -118,8 +118,8 @@
     ],
     [
      "España · DGT",
-     609,
-     123
+     838,
+     343
     ],
     [
      "Países Bajos · NDW",
@@ -127,7 +127,7 @@
      549
     ]
    ],
-   "roadsN": 15
+   "roadsN": 36
   },
   {
    "name": "atlas: capa Países Bajos con situaciones reales de NDW leídas por el mismo lector DATEX II",
@@ -168,14 +168,14 @@
    "name": "plataforma: catálogo de la API con fuente, licencia y SHA-256 en cada capa, estado de los datos y mapa embebible",
    "ok": true,
    "capas": 6,
-   "elementos": 5987,
+   "elementos": 6216,
    "licencias": true
   },
   {
    "name": "consola: situaciones fusionadas entre fuentes, cinco representaciones del planeta y recorrido preparado",
    "ok": true,
-   "s": 55,
-   "e": 19252,
+   "s": 66,
+   "e": 19481,
    "seen": [
     "globo",
     "nocturno",
@@ -202,7 +202,23 @@
   {
    "name": "consola: una incidencia de la DGT muestra la cámara real más cercana con imagen en directo (como contexto, no como corroboración)",
    "ok": true,
-   "live": "https://etraffic.dgt.es/camarasEtraffic/754.jpg"
+   "live": "https://etraffic.dgt.es/camarasEtraffic/165886.jpg"
+  },
+  {
+   "name": "consola: cordón de cámaras medido (DGT + YOLOX) por sectores alrededor de un accidente real, sin decir «confirmado»",
+   "ok": true,
+   "live": 3,
+   "blind": 5,
+   "verdict": "TRAFICO_PRESENTE",
+   "statements": [
+    "Comprobable visualmente ahora en 3 de 8 sectores (E, SE, O).",
+    "Sectores ciegos (sin cámara en 15 km): N, NE, S, SO, NO.",
+    "En 2 de 3 cámara(s) vivas de la A-3 hay vehículos o movimiento: indicio de que la vía no está cortada en ese punto (no lo prueba)."
+   ]
+  },
+  {
+   "name": "consola (web estática): la pestaña Comunidad dice con claridad que SENDA LIVE no está conectado y no inventa publicaciones",
+   "ok": true
   },
   {
    "name": "sobrevuelo: relieve Copernicus DEM, Sentinel-2 antes/después, señal sísmica real de USGS y ruta calculada sobre el cambio",

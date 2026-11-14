@@ -1,7 +1,7 @@
 {
  "plataforma": "SENDA",
  "version": "v1",
- "generadoUTC": "2026-11-14T13:41:46.032Z",
+ "generadoUTC": "2026-11-14T14:12:23.573Z",
  "aviso": "Fotos de datos reales con su fuente. No son servicios en tiempo real: la hora de cada descarga va en cada capa.",
  "capas": [
   {
@@ -23,16 +23,16 @@
    "id": "espana-dgt",
    "titulo": "Incidencias activas en carreteras (DGT, DATEX II)",
    "url": "/senda/api/v1/layers/espana-dgt.geojson",
-   "elementos": 609,
-   "descargadoUTC": "2026-11-14T04:36:52.091Z",
+   "elementos": 838,
+   "descargadoUTC": "2026-11-14T14:05:47.613Z",
    "licencia": "Creative Commons Attribution (ficha del conjunto en nap.dgt.es)",
-   "fuente": "DGT · Punto de Acceso Nacional (DATEX II), publicación del 2026-11-14 05:35",
+   "fuente": "DGT · Punto de Acceso Nacional (DATEX II), publicación del 2026-11-14 15:04",
    "base": [
     "OFFICIAL_ALERT"
    ],
-   "sha256": "c005f177e47ecd8ce0a0a836078a301a0e2a7a07754ba7630433026ac2ef973a",
+   "sha256": "e9a208a331e6f85de6d79944e6877c5b0f37213b10225b8178b975d86cd5114b",
    "ficheroOrigen": "/senda/data/referencias/dgt_incidencias.json",
-   "sha256Origen": "100af6f7e5d9e65b5e8f19565879df2659cb032f621894b100e30ac0f8bbae73"
+   "sha256Origen": "aa8afa770920652927a225ade37d4a516cc5109e2734ecdd7a62cbe67ba12df3"
   },
   {
    "id": "paises-bajos-ndw",

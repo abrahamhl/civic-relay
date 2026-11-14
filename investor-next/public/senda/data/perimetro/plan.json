@@ -1,0 +1,1131 @@
+{
+ "generado": "2026-11-14T14:05:47.712Z",
+ "incidenciasDGT": {
+  "publicacion": "2026-11-14T15:04:23.182+01:00",
+  "sha256Xml": "dd1a74ea354508027dd0ff1a97b8b44e319ccbff8ec83771a29a5079bed4f2c1"
+ },
+ "camarasDGT": {
+  "publicacion": "2026-11-14T14:00:01.938+01:00",
+  "sha256Xml": "b0b19eae617c1ce2965fe05cd2ad0e95425b2339f857c52d3b5c22f9cf0a0365"
+ },
+ "radioKm": 15,
+ "casos": [
+  {
+   "id": "30038743",
+   "carretera": "A-68",
+   "inicio": "2026-11-14T14:51:27.000+01:00",
+   "lat": 41.847073,
+   "lon": -1.359096,
+   "cubiertos": 2,
+   "ciegos": [
+    "N",
+    "NE",
+    "E",
+    "SE",
+    "S",
+    "SO"
+   ],
+   "sectores": [
+    {
+     "nombre": "N",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "NE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "E",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "SE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "S",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "SO",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "O",
+     "total": 1,
+     "camara": {
+      "id": "1083",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/1083.jpg",
+      "carretera": "AP-68",
+      "destino": "ZARAGOZA",
+      "dKm": 1.55,
+      "rumbo": 289,
+      "lat": 41.851627,
+      "lon": -1.3767586
+     }
+    },
+    {
+     "nombre": "NO",
+     "total": 2,
+     "camara": {
+      "id": "186956",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/186956.jpg",
+      "carretera": "A-68",
+      "destino": "LOGROÑO",
+      "dKm": 0.51,
+      "rumbo": 296,
+      "lat": 41.849052,
+      "lon": -1.364613
+     }
+    }
+   ]
+  },
+  {
+   "id": "30038757",
+   "carretera": "A-3",
+   "inicio": "2026-11-14T14:50:00.000+01:00",
+   "lat": 39.440247,
+   "lon": -0.8256443,
+   "cubiertos": 3,
+   "ciegos": [
+    "N",
+    "NE",
+    "S",
+    "SO",
+    "NO"
+   ],
+   "sectores": [
+    {
+     "nombre": "N",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "NE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "E",
+     "total": 3,
+     "camara": {
+      "id": "178572",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/178572.jpg",
+      "carretera": "A-3",
+      "destino": null,
+      "dKm": 3.44,
+      "rumbo": 105,
+      "lat": 39.43248,
+      "lon": -0.7868314
+     }
+    },
+    {
+     "nombre": "SE",
+     "total": 2,
+     "camara": {
+      "id": "165886",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/165886.jpg",
+      "carretera": "A-3",
+      "destino": "Valencia",
+      "dKm": 0.85,
+      "rumbo": 150,
+      "lat": 39.43358,
+      "lon": -0.820686
+     }
+    },
+    {
+     "nombre": "S",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "SO",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "O",
+     "total": 2,
+     "camara": {
+      "id": "108",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/108.jpg",
+      "carretera": "A-3",
+      "destino": null,
+      "dKm": 6.85,
+      "rumbo": 285,
+      "lat": 39.455925,
+      "lon": -0.9028528
+     }
+    },
+    {
+     "nombre": "NO",
+     "total": 0,
+     "camara": null
+    }
+   ]
+  },
+  {
+   "id": "30038503",
+   "carretera": "RM-423",
+   "inicio": "2026-11-14T14:37:00.000+01:00",
+   "lat": 38.09587,
+   "lon": -1.0944111,
+   "cubiertos": 4,
+   "ciegos": [
+    "N",
+    "NE",
+    "SE",
+    "NO"
+   ],
+   "sectores": [
+    {
+     "nombre": "N",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "NE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "E",
+     "total": 1,
+     "camara": {
+      "id": "154",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/154.jpg",
+      "carretera": "A-7",
+      "destino": null,
+      "dKm": 3.09,
+      "rumbo": 93,
+      "lat": 38.09419,
+      "lon": -1.0591389
+     }
+    },
+    {
+     "nombre": "SE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "S",
+     "total": 1,
+     "camara": {
+      "id": "1614",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/1614.jpg",
+      "carretera": "A-7",
+      "destino": null,
+      "dKm": 2.25,
+      "rumbo": 171,
+      "lat": 38.075905,
+      "lon": -1.0903667
+     }
+    },
+    {
+     "nombre": "SO",
+     "total": 6,
+     "camara": {
+      "id": "156",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/156.jpg",
+      "carretera": "A-7",
+      "destino": null,
+      "dKm": 5.67,
+      "rumbo": 204,
+      "lat": 38.049145,
+      "lon": -1.1204473
+     }
+    },
+    {
+     "nombre": "O",
+     "total": 3,
+     "camara": {
+      "id": "122",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/122.jpg",
+      "carretera": "MU-32",
+      "destino": null,
+      "dKm": 9.86,
+      "rumbo": 255,
+      "lat": 38.0725,
+      "lon": -1.2030972
+     }
+    },
+    {
+     "nombre": "NO",
+     "total": 0,
+     "camara": null
+    }
+   ]
+  },
+  {
+   "id": "30036699",
+   "carretera": "M-40",
+   "inicio": "2026-11-14T13:42:46.000+01:00",
+   "lat": 40.36065,
+   "lon": -3.7755568,
+   "cubiertos": 8,
+   "ciegos": [],
+   "sectores": [
+    {
+     "nombre": "N",
+     "total": 29,
+     "camara": {
+      "id": "790",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/790.jpg",
+      "carretera": "A-5",
+      "destino": "BADAJOZ",
+      "dKm": 3.67,
+      "rumbo": 5,
+      "lat": 40.393585,
+      "lon": -3.772143
+     }
+    },
+    {
+     "nombre": "NE",
+     "total": 12,
+     "camara": {
+      "id": "1125",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/1125.jpg",
+      "carretera": "A-5",
+      "destino": "MADRID",
+      "dKm": 5.97,
+      "rumbo": 27,
+      "lat": 40.408306,
+      "lon": -3.743097
+     }
+    },
+    {
+     "nombre": "E",
+     "total": 25,
+     "camara": {
+      "id": "939",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/939.jpg",
+      "carretera": "M-45",
+      "destino": null,
+      "dKm": 1.21,
+      "rumbo": 99,
+      "lat": 40.3589,
+      "lon": -3.761481
+     }
+    },
+    {
+     "nombre": "SE",
+     "total": 19,
+     "camara": {
+      "id": "943",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/943.jpg",
+      "carretera": "M-45",
+      "destino": null,
+      "dKm": 2.19,
+      "rumbo": 116,
+      "lat": 40.351933,
+      "lon": -3.752375
+     }
+    },
+    {
+     "nombre": "S",
+     "total": 5,
+     "camara": {
+      "id": "967",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/967.jpg",
+      "carretera": "M-50",
+      "destino": null,
+      "dKm": 6.15,
+      "rumbo": 186,
+      "lat": 40.305683,
+      "lon": -3.783268
+     }
+    },
+    {
+     "nombre": "SO",
+     "total": 2,
+     "camara": {
+      "id": "837",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/837.jpg",
+      "carretera": "A-5",
+      "destino": "MADRID",
+      "dKm": 12.7,
+      "rumbo": 241,
+      "lat": 40.305153,
+      "lon": -3.906496
+     }
+    },
+    {
+     "nombre": "O",
+     "total": 14,
+     "camara": {
+      "id": "825",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/825.jpg",
+      "carretera": "A-5R",
+      "destino": "ALCORCON",
+      "dKm": 1.53,
+      "rumbo": 275,
+      "lat": 40.361763,
+      "lon": -3.793609
+     }
+    },
+    {
+     "nombre": "NO",
+     "total": 19,
+     "camara": {
+      "id": "932",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/932.jpg",
+      "carretera": "M-40",
+      "destino": null,
+      "dKm": 0.34,
+      "rumbo": 305,
+      "lat": 40.362404,
+      "lon": -3.7788806
+     }
+    }
+   ]
+  },
+  {
+   "id": "30036976",
+   "carretera": "V-31",
+   "inicio": "2026-11-14T13:38:00.000+01:00",
+   "lat": 39.432846,
+   "lon": -0.3703433,
+   "cubiertos": 8,
+   "ciegos": [],
+   "sectores": [
+    {
+     "nombre": "N",
+     "total": 1,
+     "camara": {
+      "id": "1474",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/1474.jpg",
+      "carretera": "V-30",
+      "destino": null,
+      "dKm": 0.44,
+      "rumbo": 3,
+      "lat": 39.43676,
+      "lon": -0.3701
+     }
+    },
+    {
+     "nombre": "NE",
+     "total": 9,
+     "camara": {
+      "id": "523",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/523.jpg",
+      "carretera": "V-15",
+      "destino": null,
+      "dKm": 2.87,
+      "rumbo": 64,
+      "lat": 39.44421,
+      "lon": -0.3404
+     }
+    },
+    {
+     "nombre": "E",
+     "total": 3,
+     "camara": {
+      "id": "180",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/180.jpg",
+      "carretera": "V-30",
+      "destino": null,
+      "dKm": 1.12,
+      "rumbo": 80,
+      "lat": 39.434544,
+      "lon": -0.35750556
+     }
+    },
+    {
+     "nombre": "SE",
+     "total": 3,
+     "camara": {
+      "id": "169",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/169.jpg",
+      "carretera": "CV-500",
+      "destino": null,
+      "dKm": 3.99,
+      "rumbo": 134,
+      "lat": 39.407745,
+      "lon": -0.33716112
+     }
+    },
+    {
+     "nombre": "S",
+     "total": 3,
+     "camara": {
+      "id": "1607",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/1607.jpg",
+      "carretera": "V-31",
+      "destino": null,
+      "dKm": 1.11,
+      "rumbo": 196,
+      "lat": 39.42321,
+      "lon": -0.3738361
+     }
+    },
+    {
+     "nombre": "SO",
+     "total": 10,
+     "camara": {
+      "id": "191",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/191.jpg",
+      "carretera": "V-31",
+      "destino": null,
+      "dKm": 5.5,
+      "rumbo": 203,
+      "lat": 39.38743,
+      "lon": -0.39559445
+     }
+    },
+    {
+     "nombre": "O",
+     "total": 6,
+     "camara": {
+      "id": "182",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/182.jpg",
+      "carretera": "V-30",
+      "destino": null,
+      "dKm": 1.75,
+      "rumbo": 290,
+      "lat": 39.43827,
+      "lon": -0.38944444
+     }
+    },
+    {
+     "nombre": "NO",
+     "total": 21,
+     "camara": {
+      "id": "181",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/181.jpg",
+      "carretera": "V-30",
+      "destino": null,
+      "dKm": 0.12,
+      "rumbo": 319,
+      "lat": 39.433647,
+      "lon": -0.37124166
+     }
+    }
+   ]
+  },
+  {
+   "id": "30037026",
+   "carretera": "CV-580",
+   "inicio": "2026-11-14T13:37:00.000+01:00",
+   "lat": 39.21301,
+   "lon": -0.7940178,
+   "cubiertos": 1,
+   "ciegos": [
+    "NE",
+    "E",
+    "SE",
+    "S",
+    "SO",
+    "O",
+    "NO"
+   ],
+   "sectores": [
+    {
+     "nombre": "N",
+     "total": 1,
+     "camara": {
+      "id": "178189",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/178189.jpg",
+      "carretera": "CV-580",
+      "destino": null,
+      "dKm": 9.1,
+      "rumbo": 348,
+      "lat": 39.293182,
+      "lon": -0.815198
+     }
+    },
+    {
+     "nombre": "NE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "E",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "SE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "S",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "SO",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "O",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "NO",
+     "total": 0,
+     "camara": null
+    }
+   ]
+  },
+  {
+   "id": "30036835",
+   "carretera": "CV-81",
+   "inicio": "2026-11-14T13:30:00.000+01:00",
+   "lat": 38.7579,
+   "lon": -0.6189966,
+   "cubiertos": 2,
+   "ciegos": [
+    "E",
+    "SE",
+    "S",
+    "SO",
+    "O",
+    "NO"
+   ],
+   "sectores": [
+    {
+     "nombre": "N",
+     "total": 2,
+     "camara": {
+      "id": "1609",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/1609.jpg",
+      "carretera": "A-7",
+      "destino": null,
+      "dKm": 12.24,
+      "rumbo": 19,
+      "lat": 38.862095,
+      "lon": -0.57335275
+     }
+    },
+    {
+     "nombre": "NE",
+     "total": 2,
+     "camara": {
+      "id": "1610",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/1610.jpg",
+      "carretera": "A-7",
+      "destino": null,
+      "dKm": 9.72,
+      "rumbo": 30,
+      "lat": 38.833843,
+      "lon": -0.56350833
+     }
+    },
+    {
+     "nombre": "E",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "SE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "S",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "SO",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "O",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "NO",
+     "total": 0,
+     "camara": null
+    }
+   ]
+  },
+  {
+   "id": "30036724",
+   "carretera": "CV-821",
+   "inicio": "2026-11-14T13:26:00.000+01:00",
+   "lat": 38.38977,
+   "lon": -0.48892462,
+   "cubiertos": 1,
+   "ciegos": [
+    "N",
+    "NE",
+    "E",
+    "SE",
+    "S",
+    "O",
+    "NO"
+   ],
+   "sectores": [
+    {
+     "nombre": "N",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "NE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "E",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "SE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "S",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "SO",
+     "total": 5,
+     "camara": {
+      "id": "158",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/158.jpg",
+      "carretera": "A-70",
+      "destino": null,
+      "dKm": 7.37,
+      "rumbo": 221,
+      "lat": 38.339863,
+      "lon": -0.5446111
+     }
+    },
+    {
+     "nombre": "O",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "NO",
+     "total": 0,
+     "camara": null
+    }
+   ]
+  },
+  {
+   "id": "30036478",
+   "carretera": "M-40",
+   "inicio": "2026-11-14T13:22:57.000+01:00",
+   "lat": 40.418453,
+   "lon": -3.8264563,
+   "cubiertos": 8,
+   "ciegos": [],
+   "sectores": [
+    {
+     "nombre": "N",
+     "total": 14,
+     "camara": {
+      "id": "934",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/934.jpg",
+      "carretera": "M-503",
+      "destino": null,
+      "dKm": 1.39,
+      "rumbo": 14,
+      "lat": 40.430622,
+      "lon": -3.822585
+     }
+    },
+    {
+     "nombre": "NE",
+     "total": 23,
+     "camara": {
+      "id": "1259",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/1259.jpg",
+      "carretera": "M-503",
+      "destino": null,
+      "dKm": 1.81,
+      "rumbo": 47,
+      "lat": 40.429462,
+      "lon": -3.8106842
+     }
+    },
+    {
+     "nombre": "E",
+     "total": 10,
+     "camara": {
+      "id": "1125",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/1125.jpg",
+      "carretera": "A-5",
+      "destino": "MADRID",
+      "dKm": 7.15,
+      "rumbo": 99,
+      "lat": 40.408306,
+      "lon": -3.743097
+     }
+    },
+    {
+     "nombre": "SE",
+     "total": 21,
+     "camara": {
+      "id": "828",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/828.jpg",
+      "carretera": "M-40",
+      "destino": null,
+      "dKm": 0.56,
+      "rumbo": 134,
+      "lat": 40.414978,
+      "lon": -3.8216674
+     }
+    },
+    {
+     "nombre": "S",
+     "total": 8,
+     "camara": {
+      "id": "821",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/821.jpg",
+      "carretera": "M-40",
+      "destino": null,
+      "dKm": 2.53,
+      "rumbo": 192,
+      "lat": 40.396206,
+      "lon": -3.832566
+     }
+    },
+    {
+     "nombre": "SO",
+     "total": 13,
+     "camara": {
+      "id": "990",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/990.jpg",
+      "carretera": "M-501",
+      "destino": "ROZAS DE PUERTO REAL",
+      "dKm": 2.59,
+      "rumbo": 205,
+      "lat": 40.397274,
+      "lon": -3.839317
+     }
+    },
+    {
+     "nombre": "O",
+     "total": 4,
+     "camara": {
+      "id": "984",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/984.jpg",
+      "carretera": "M-501",
+      "destino": "MADRID",
+      "dKm": 12.56,
+      "rumbo": 251,
+      "lat": 40.381046,
+      "lon": -3.966435
+     }
+    },
+    {
+     "nombre": "NO",
+     "total": 15,
+     "camara": {
+      "id": "827",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/827.jpg",
+      "carretera": "M-40",
+      "destino": null,
+      "dKm": 1.71,
+      "rumbo": 330,
+      "lat": 40.431835,
+      "lon": -3.8364446
+     }
+    }
+   ]
+  },
+  {
+   "id": "30036302",
+   "carretera": "CV-50",
+   "inicio": "2026-11-14T13:12:00.000+01:00",
+   "lat": 39.15002,
+   "lon": -0.44352,
+   "cubiertos": 4,
+   "ciegos": [
+    "NE",
+    "SE",
+    "S",
+    "O"
+   ],
+   "sectores": [
+    {
+     "nombre": "N",
+     "total": 1,
+     "camara": {
+      "id": "1476",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/1476.jpg",
+      "carretera": "A-7",
+      "destino": null,
+      "dKm": 12.13,
+      "rumbo": 352,
+      "lat": 39.25819,
+      "lon": -0.46203333
+     }
+    },
+    {
+     "nombre": "NE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "E",
+     "total": 1,
+     "camara": {
+      "id": "177393",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/177393.jpg",
+      "carretera": "A-38",
+      "destino": null,
+      "dKm": 13.03,
+      "rumbo": 72,
+      "lat": 39.186565,
+      "lon": -0.299942
+     }
+    },
+    {
+     "nombre": "SE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "S",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "SO",
+     "total": 1,
+     "camara": {
+      "id": "173",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/173.jpg",
+      "carretera": "A-7",
+      "destino": null,
+      "dKm": 14.59,
+      "rumbo": 219,
+      "lat": 39.047527,
+      "lon": -0.5491083
+     }
+    },
+    {
+     "nombre": "O",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "NO",
+     "total": 1,
+     "camara": {
+      "id": "174",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/174.jpg",
+      "carretera": "A-7",
+      "destino": null,
+      "dKm": 6.58,
+      "rumbo": 318,
+      "lat": 39.193737,
+      "lon": -0.4949611
+     }
+    }
+   ]
+  },
+  {
+   "id": "30035757",
+   "carretera": "V-31",
+   "inicio": "2026-11-14T12:59:00.000+01:00",
+   "lat": 39.38377,
+   "lon": -0.39800477,
+   "cubiertos": 6,
+   "ciegos": [
+    "SE",
+    "S"
+   ],
+   "sectores": [
+    {
+     "nombre": "N",
+     "total": 18,
+     "camara": {
+      "id": "183",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/183.jpg",
+      "carretera": "V-30",
+      "destino": null,
+      "dKm": 6.03,
+      "rumbo": 1,
+      "lat": 39.43802,
+      "lon": -0.396525
+     }
+    },
+    {
+     "nombre": "NE",
+     "total": 13,
+     "camara": {
+      "id": "191",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/191.jpg",
+      "carretera": "V-31",
+      "destino": null,
+      "dKm": 0.46,
+      "rumbo": 27,
+      "lat": 39.38743,
+      "lon": -0.39559445
+     }
+    },
+    {
+     "nombre": "E",
+     "total": 2,
+     "camara": {
+      "id": "170",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/170.jpg",
+      "carretera": "CV-500",
+      "destino": null,
+      "dKm": 5.48,
+      "rumbo": 83,
+      "lat": 39.389996,
+      "lon": -0.33471945
+     }
+    },
+    {
+     "nombre": "SE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "S",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "SO",
+     "total": 5,
+     "camara": {
+      "id": "1089",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/1089.jpg",
+      "carretera": "V-31",
+      "destino": null,
+      "dKm": 1.47,
+      "rumbo": 235,
+      "lat": 39.376125,
+      "lon": -0.4118889
+     }
+    },
+    {
+     "nombre": "O",
+     "total": 3,
+     "camara": {
+      "id": "146",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/146.jpg",
+      "carretera": "A-7",
+      "destino": null,
+      "dKm": 5.02,
+      "rumbo": 254,
+      "lat": 39.37122,
+      "lon": -0.45416668
+     }
+    },
+    {
+     "nombre": "NO",
+     "total": 5,
+     "camara": {
+      "id": "1635",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/1635.jpg",
+      "carretera": "CV-33",
+      "destino": null,
+      "dKm": 0.74,
+      "rumbo": 323,
+      "lat": 39.389084,
+      "lon": -0.40311667
+     }
+    }
+   ]
+  },
+  {
+   "id": "30035576",
+   "carretera": "CV-10",
+   "inicio": "2026-11-14T12:55:00.000+01:00",
+   "lat": 40.014187,
+   "lon": -0.09270275,
+   "cubiertos": 3,
+   "ciegos": [
+    "N",
+    "NE",
+    "SE",
+    "O",
+    "NO"
+   ],
+   "sectores": [
+    {
+     "nombre": "N",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "NE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "E",
+     "total": 2,
+     "camara": {
+      "id": "1216",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/1216.jpg",
+      "carretera": "AP-7",
+      "destino": null,
+      "dKm": 5.41,
+      "rumbo": 76,
+      "lat": 40.02587,
+      "lon": -0.030975
+     }
+    },
+    {
+     "nombre": "SE",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "S",
+     "total": 4,
+     "camara": {
+      "id": "1217",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/1217.jpg",
+      "carretera": "N-340",
+      "destino": null,
+      "dKm": 3.24,
+      "rumbo": 174,
+      "lat": 39.985252,
+      "lon": -0.088427775
+     }
+    },
+    {
+     "nombre": "SO",
+     "total": 1,
+     "camara": {
+      "id": "186117",
+      "url": "https://etraffic.dgt.es/camarasEtraffic/186117.jpg",
+      "carretera": "AP-7",
+      "destino": null,
+      "dKm": 7.62,
+      "rumbo": 204,
+      "lat": 39.95168,
+      "lon": -0.1295
+     }
+    },
+    {
+     "nombre": "O",
+     "total": 0,
+     "camara": null
+    },
+    {
+     "nombre": "NO",
+     "total": 0,
+     "camara": null
+    }
+   ]
+  }
+ ]
+}

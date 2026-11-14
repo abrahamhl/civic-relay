@@ -27,7 +27,7 @@ const server = createServer(async (req, res) => {
 }).listen(0);
 const base = `http://127.0.0.1:${server.address().port}/senda`;
 const results = [], t0 = Date.now();
-const check = (name, ok, detail = {}) => { results.push({ name, ok: !!ok, ...detail }); console.log(`${ok ? 'PASS' : 'FAIL'} · ${name}`); if (!ok) process.exitCode = 1; };
+const check = (name, ok, detail = {}) => { results.push({ name, ok: !!ok, ...detail }); console.log(`${ok ? "PASS" : "FAIL"} · ${name}`); if (!ok) console.log("  detalle:", JSON.stringify(detail).slice(0, 400)); if (!ok) process.exitCode = 1; };
 
 const browser = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
 const errors = [];
@@ -163,6 +163,10 @@ try {
   check('consola: situaciones fusionadas entre fuentes, cinco representaciones del planeta y recorrido preparado', cons.s > 5 && cons.e > 1000 && cons.conc?.independence === 'DEPENDENT' && cons.emsc?.independence === 'PER_EVENT' && cons.emsc.independent > 100 && cons.seen.length === 5 && !!cons.sel && cons.steps >= 3 && /REAL|SIMULACI/.test(await co.textContent('#p-sit')), cons);
   const live = await co.evaluate(() => { const n = window.SENDA_CONSOLA.situations; for (let k = 0; k < n; k++) { window.SENDA_CONSOLA.select(k, { fly: false }); const im = document.querySelector('#p-sit img.live'); if (im) return im.dataset.src; } return null; });
   check('consola: una incidencia de la DGT muestra la cámara real más cercana con imagen en directo (como contexto, no como corroboración)', /^https:\/\/etraffic\.dgt\.es\//.test(live ?? '') && /Contexto/.test(await co.textContent('#p-sit')), { live });
+  const per = await co.evaluate(() => { const n = window.SENDA_CONSOLA.situations; for (let k = 0; k < n; k++) { window.SENDA_CONSOLA.select(k, { fly: false }); const p = window.SENDA_CONSOLA.lastPerimeter; if (p?.medido) return { ...p, txt: document.querySelector('#p-sit').textContent }; } return null; });
+  check('consola: cordón de cámaras medido (DGT + YOLOX) por sectores alrededor de un accidente real, sin decir «confirmado»', !!per && per.live + per.blind <= 8 && /^Comprobable visualmente/.test(per.statements[0]) && /Cordón de cámaras/.test(per.txt) && per.statements.every((t) => !/confirmad/i.test(t)), per && { live: per.live, blind: per.blind, verdict: per.verdict, statements: per.statements });
+  await co.click('.tabs button[data-t="com"]'); await co.waitForTimeout(600);
+  check('consola (web estática): la pestaña Comunidad dice con claridad que SENDA LIVE no está conectado y no inventa publicaciones', /no está conectado/.test(await co.textContent('#p-com')) && /No se muestran publicaciones de ejemplo/.test(await co.textContent('#p-com')));
   await co.close();
   const vu = await actx.newPage(); vu.on('pageerror', (e) => errors.push(`vuelo: ${e.message}`)); await vu.goto(base + '/vuelo'); await vu.waitForSelector('body[data-ready]', { timeout: 60_000 });
   const vuelo = await vu.evaluate(() => window.SENDA_VUELO);

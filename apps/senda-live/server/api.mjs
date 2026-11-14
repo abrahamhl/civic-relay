@@ -291,6 +291,17 @@ export function createApiHandler({
     sendJson(res, 200, sub);
   });
 
+  router.post('/api/events/:id/camera-evidence', async (req, res, { params, ip }) => {
+    const userId = requireUser(req);
+    const body = await readJson(req);
+    const event = events.addCameraEvidence(userId, params.id, body, { ip });
+    sendJson(res, 201, { event });
+  });
+
+  router.get('/api/events/:id/camera-perimeter', (req, res, { params, query }) => {
+    sendJson(res, 200, events.cameraPerimeter(params.id, { road: query?.road ?? null }));
+  });
+
   router.get('/api/events/intelligence/candidates', (req, res) => {
     const candidates = events.intelligenceCandidates();
     sendJson(res, 200, candidates);

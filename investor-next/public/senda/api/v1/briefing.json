@@ -1,5 +1,5 @@
 {
- "generadoUTC": "2026-11-14T13:41:46.032Z",
+ "generadoUTC": "2026-11-14T14:12:23.573Z",
  "nota": "Calculado con atlas.dailyBriefing: cada capa usa la hora de su propia descarga como «ahora».",
  "capas": [
   {
@@ -27,26 +27,26 @@
   },
   {
    "id": "espana-dgt",
-   "hora": "2026-11-14T04:36:52.091Z",
+   "hora": "2026-11-14T14:05:47.613Z",
    "nombre": "Incidencias activas en carreteras (DGT, DATEX II)",
-   "total": 609,
-   "nuevos": 123,
+   "total": 838,
+   "nuevos": 343,
    "tiposPrincipales": [
     [
      "Obras",
-     438
+     465
     ],
     [
      "Vehículo detenido u obstáculo",
-     48
+     194
     ],
     [
-     "Obstáculo natural (agua, desprendimiento…)",
-     29
+     "Obstrucción",
+     38
     ]
    ],
    "destacados": [],
-   "fuente": "DGT · Punto de Acceso Nacional (DATEX II), publicación del 2026-11-14 05:35"
+   "fuente": "DGT · Punto de Acceso Nacional (DATEX II), publicación del 2026-11-14 15:04"
   },
   {
    "id": "paises-bajos-ndw",
