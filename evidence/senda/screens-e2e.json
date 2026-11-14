@@ -1,9 +1,9 @@
 {
  "kind": "senda-screens-e2e",
- "at": "2026-11-14T14:23:18.920Z",
- "durationS": 49,
- "passed": 35,
- "total": 35,
+ "at": "2026-11-14T16:29:40.660Z",
+ "durationS": 43,
+ "passed": 36,
+ "total": 36,
  "results": [
   {
    "name": "mensaje: el número de seguridad coincide en los dos móviles",
@@ -219,6 +219,26 @@
   {
    "name": "consola (web estática): la pestaña Comunidad dice con claridad que SENDA LIVE no está conectado y no inventa publicaciones",
    "ok": true
+  },
+  {
+   "name": "mulas de datos: CSA en el navegador sobre horarios reales de la EMT; más flota con nodo nunca empeora; marcado como simulación",
+   "ok": true,
+   "m50": {
+    "origin": "2219",
+    "q": 0.5,
+    "reached": 1149,
+    "of": 1151,
+    "p50": 74.63333333333334,
+    "ms": 1.8999999999650754
+   },
+   "m100": {
+    "origin": "2219",
+    "q": 1,
+    "reached": 1151,
+    "of": 1151,
+    "p50": 46.1,
+    "ms": 1.2000000000116415
+   }
   },
   {
    "name": "sobrevuelo: relieve Copernicus DEM, Sentinel-2 antes/después, señal sísmica real de USGS y ruta calculada sobre el cambio",

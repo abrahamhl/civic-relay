@@ -168,6 +168,10 @@ try {
   await co.click('.tabs button[data-t="com"]'); await co.waitForTimeout(600);
   check('consola (web estática): la pestaña Comunidad dice con claridad que SENDA LIVE no está conectado y no inventa publicaciones', /no está conectado/.test(await co.textContent('#p-com')) && /No se muestran publicaciones de ejemplo/.test(await co.textContent('#p-com')));
   await co.close();
+  const mu = await actx.newPage(); mu.on('pageerror', (e) => errors.push(`mulas: ${e.message}`)); await mu.goto(base + '/mulas'); await mu.waitForSelector('body[data-ready]', { timeout: 60_000 });
+  const m50 = await mu.evaluate(() => window.SENDA_MULAS); await mu.evaluate(() => { const q = document.querySelector('#q'); q.value = 100; q.dispatchEvent(new Event('input')); }); const m100 = await mu.evaluate(() => window.SENDA_MULAS);
+  check('mulas de datos: CSA en el navegador sobre horarios reales de la EMT; más flota con nodo nunca empeora; marcado como simulación', m50.of > 1000 && m100.reached >= m50.reached && m100.p50 <= m50.p50 && /SIMULACIÓN/.test(await mu.textContent('body')), { m50, m100 });
+  await mu.close();
   const vu = await actx.newPage(); vu.on('pageerror', (e) => errors.push(`vuelo: ${e.message}`)); await vu.goto(base + '/vuelo'); await vu.waitForSelector('body[data-ready]', { timeout: 60_000 });
   const vuelo = await vu.evaluate(() => window.SENDA_VUELO);
   check('sobrevuelo: relieve Copernicus DEM, Sentinel-2 antes/después, señal sísmica real de USGS y ruta calculada sobre el cambio', vuelo.quake === 'us7000tbwb' && vuelo.points > 20 && vuelo.km > 20 && vuelo.demMax > 5000 && /no un mapa oficial/.test(await vu.textContent('#note')), vuelo);
