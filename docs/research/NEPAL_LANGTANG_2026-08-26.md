@@ -2,6 +2,11 @@
 
 Fecha: 14-11-2026. Autor: Claude Code. Regla de veracidad: `CLAUDE.md` §1.
 
+## Qué dice la prensa (NO lo mide SENDA)
+
+- «Colapso glaciar», en el flanco norte del Langtang Lirung, a unos 5.200 m, y bajada por el Lhende Khola hasta el Bhote Koshi y el Trishuli: es la descripción de [Down To Earth](https://www.downtoearth.org.in/natural-disasters/wake-up-call) y [Himalayan Geographic](https://himalayangeographic.com/2026-himalayan-disaster/). Según esa prensa, USGS registró la señal primero como M 4,4 y la corrigió a 5,2.
+- Lo que SENDA comprueba con datos propios: USGS cataloga el suceso como **«landslide»**, el cambio en Sentinel-2 sigue el valle hacia el Bhote Koshi y la ruta calculada sale del glaciar. No comprobamos que la causa fuera un glaciar: lo usamos como nombre del caso, citando a la prensa.
+
 ## Qué se ha MEDIDO o DESCARGADO con código del repo
 
 | Dato | Valor | Origen | Script |

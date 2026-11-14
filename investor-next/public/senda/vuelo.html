@@ -41,7 +41,7 @@ $('#kv').innerHTML = `<span>Señal sísmica</span><b>${q ? `M ${q.mag} ${esc(q.m
 <span>Imágenes</span><b>Sentinel-2 ${esc(S2.escenas.pre.fecha)} → ${esc(S2.escenas.post2.fecha)} <span class="tag real">ESA</span></b>
 <span>Relieve</span><b>Copernicus DEM GLO-30 a ${RES} m · ×${EX} vertical</b>
 <span>Ruta del vuelo</span><b>${T3.ruta.longitud_km_aprox} km · ${Math.round(100 * T3.ruta.fraccionSobreCambio)} % sobre cambio <span class="tag calc">CALCULADO</span></b>`;
-$('#note').textContent = 'La máscara roja es una detección espectral de SENDA (caída de NDVI), no un mapa oficial de daños; hay falsos positivos junto a la nieve. La ruta sigue lo detectado, no un trazado oficial. Cifras de víctimas: no se muestran porque las fuentes no coinciden.';
+$('#note').textContent = 'La máscara roja es una detección espectral de SENDA (caída de NDVI), no un mapa oficial de daños; hay falsos positivos junto a la nieve. La ruta sigue lo detectado, no un trazado oficial. Cifras de víctimas: no se muestran porque las fuentes no coinciden. «Colapso glaciar» es la descripción de la prensa (Down To Earth, Himalayan Geographic); USGS lo cataloga como «landslide».';
 
 /* Escena */
 const renderer = new THREE.WebGLRenderer({ canvas: $('#gl'), antialias: true, preserveDrawingBuffer: true }); renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
