@@ -119,3 +119,15 @@ test('NDW real (Países Bajos): situaciones leídas con el mismo lector DATEX II
   assert.ok(ev.length > 0 && ev.every((e) => e.basis === 'OFFICIAL_ALERT' && NDW_TYPES[e.kind.slice(4)]));
   assert.ok(ev.every((e) => e.lat > 50.6 && e.lat < 53.7 && e.lon > 3.2 && e.lon < 7.3), 'todas dentro de los Países Bajos');
 });
+
+test('parte del día calculado y carreteras en la zona, con datos reales de la DGT', async () => {
+  const { dailyBriefing, roadsInArea, eventsFromDgt: dg, DGT_CAUSES: DC } = await import('../src/atlas.mjs');
+  const snap = ref('dgt_incidencias.json'), ev = dg(snap), now = Date.parse(snap.descargadoUTC);
+  const [b] = dailyBriefing([{ nombre: 'DGT', events: ev, names: DC, prefix: 'DGT_', destacar: (e) => e.kind === 'DGT_accident' }], { now });
+  assert.equal(b.total, ev.length); assert.ok(b.nuevos <= b.total); assert.ok(b.tiposPrincipales.length > 0);
+  assert.equal(b.destacados.length, Math.min(5, ev.filter((e) => e.kind === 'DGT_accident').length));
+  const madrid = { type: 'circle', center: { lat: 40.4168, lon: -3.7038 }, radiusM: 60_000 };
+  const roads = roadsInArea(ev, madrid);
+  assert.equal(roads.reduce((s, r) => s + r.n, 0), filterEvents(ev, { area: madrid }).length);
+  assert.throws(() => dailyBriefing([], {}));
+});

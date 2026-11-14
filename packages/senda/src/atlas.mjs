@@ -204,3 +204,22 @@ export function eventsFromNdw(snap) {
     return makeEvent({ id: `ndw:${r.id}`, t: r.start ?? r.created, lat: r.lat, lon: r.lon, kind: `NDW_${type}`, group: 'nl', label: `${r.road ? r.road + ' · ' : ''}${NDW_TYPES[type]}`, source: src, basis: 'OFFICIAL_ALERT' });
   });
 }
+
+/**
+ * Parte del día CALCULADO (no redactado por IA): lo que dicen los datos en una ventana de tiempo.
+ * Para cada capa: total, nuevos en las últimas `horas`, tipos más frecuentes y elementos destacados.
+ */
+export function dailyBriefing(layers, { now, horas = 24, top = 3 } = {}) {
+  if (!Number.isFinite(now)) throw new Error('now obligatorio');
+  return layers.map(({ nombre, events, names = {}, prefix = '', destacar = () => false }) => {
+    const recientes = events.filter((e) => e.t > now - horas * 3_600_000 && e.t <= now);
+    const porTipo = {}; for (const e of events) { const k = names[e.kind.slice(prefix.length)] ?? e.kind; porTipo[k] = (porTipo[k] ?? 0) + 1; }
+    return { nombre, total: events.length, nuevos: recientes.length, tiposPrincipales: Object.entries(porTipo).sort((a, b) => b[1] - a[1]).slice(0, top), destacados: events.filter(destacar).slice(0, 5).map((e) => e.label), fuente: [...new Set(events.map((e) => e.source))][0] ?? null };
+  });
+}
+
+/** Carreteras con incidencias dentro de un área (p. ej. cortes de la DGT): agrupa por vía y cuenta por tipo. */
+export function roadsInArea(events, area) {
+  const out = {}; for (const e of filterEvents(events, { area })) { const road = (e.label ?? '').split(' · ')[0] || 'vía sin nombre'; (out[road] ??= { road, n: 0, tipos: {} }); out[road].n++; const tipo = (e.label ?? '').split(' · ')[1] ?? e.kind; out[road].tipos[tipo] = (out[road].tipos[tipo] ?? 0) + 1; }
+  return Object.values(out).sort((a, b) => b.n - a.n);
+}

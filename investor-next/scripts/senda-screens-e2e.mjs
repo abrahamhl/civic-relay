@@ -126,6 +126,9 @@ try {
   await a.evaluate(() => window.SENDA_ATLAS.setCase('spain'));
   const es = await a.evaluate(() => window.SENDA_ATLAS.last);
   check('atlas: capa España con incidencias reales de la DGT leídas por el lector DATEX II del núcleo', es.case === 'spain' && es.total > 50, { total: es.total });
+  await a.evaluate(() => window.SENDA_ATLAS.setArea({ type: 'circle', center: { lat: 40.4168, lon: -3.7038 }, radiusM: 60000 }));
+  const brief = await a.evaluate(() => window.SENDA_BRIEF), roadsN = await a.evaluate(() => window.SENDA_ATLAS.roads);
+  check('atlas: parte del día calculado por capa (sin texto inventado) y carreteras con incidencias en una zona de Madrid', brief.length >= 3 && brief.every((b) => b.total > 0 && b.nuevos <= b.total) && roadsN > 0, { capas: brief.map((b) => [b.nombre, b.total, b.nuevos]), roadsN });
   await a.evaluate(() => window.SENDA_ATLAS.setCase('nl'));
   const nlv = await a.evaluate(() => window.SENDA_ATLAS.last);
   check('atlas: capa Países Bajos con situaciones reales de NDW leídas por el mismo lector DATEX II', nlv.case === 'nl' && nlv.total > 50, { total: nlv.total });

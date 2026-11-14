@@ -59,6 +59,9 @@ input[type=range]{width:100%}
   <div class="k" id="stats"></div>
   <canvas id="spark" style="width:100%;height:90px;margin-top:10px;display:block"></canvas>
   <p class="m" style="font-size:12px;margin:4px 0 0" id="sparkLbl"></p>
+  <div id="roads" class="m" style="font-size:13px;margin-top:8px"></div>
+  <h2 style="margin-top:14px">Parte del día <span class="tag">calculado, no redactado</span></h2>
+  <div id="brief" class="m" style="font-size:13px"></div>
   <h2 style="margin-top:14px">Exportar</h2>
   <div class="row" style="margin-top:0"><button id="gj">GeoJSON</button><button id="csv">CSV</button><button id="link">🔗 Copiar enlace a esta vista</button></div>
   <p class="m" id="exp" style="font-size:13px"></p>
@@ -69,7 +72,7 @@ input[type=range]{width:100%}
 </div>
 
 <script type="module">
-import { haversineM, inArea, filterEvents, timeline, areaStats, growth, convexHull, ringAreaKm2, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromGdacs, GDACS_TYPES, eventsFromDgt, DGT_CAUSES, eventsFromNdw, NDW_TYPES } from '/senda/core/atlas.mjs';
+import { haversineM, inArea, filterEvents, timeline, areaStats, growth, convexHull, ringAreaKm2, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromGdacs, GDACS_TYPES, eventsFromDgt, DGT_CAUSES, eventsFromNdw, NDW_TYPES, dailyBriefing, roadsInArea } from '/senda/core/atlas.mjs';
 const $ = (s) => document.querySelector(s);
 const CASES = { nl: 'Países Bajos · situaciones de tráfico de NDW (descarga real)', spain: 'España · incidencias activas de la DGT (descarga real)', world: 'Mundo · alertas GDACS de los últimos 30 días (descarga real)', camp: 'Camp Fire · Paradise, California (2018)', palisades: 'Palisades · Los Ángeles (2025)', eaton: 'Eaton · Altadena (2025)', marshall: 'Marshall · Colorado (2021)', smokehouse: 'Smokehouse Creek · Texas (2024)', troublesome: 'East Troublesome · Colorado (2020)', creek: 'Creek · California (2020)', london: 'Londres · cámaras de tráfico (captura 2026)', mine: 'Mis reportes (pantalla Avisos)' };
 const [goes, tfl, refs, land] = await Promise.all(['/senda/data/referencias/goes_casos.json', '/senda/data/referencias/tfl_camaras.json', '/senda/data/referencias/referencias.json', '/geo/land-110m.json'].map((u) => fetch(u).then((r) => r.json())));
@@ -196,6 +199,10 @@ function panel() {
   }
   rows.push(['Cámaras públicas que cubren la zona', String(cIn.length)]);
   $('#stats').innerHTML = rows.map(([a, b]) => `<span class="m">${a}</span><b>${b}</b>`).join('');
+  // Carreteras afectadas dentro de la zona (capas de tráfico)
+  const rd = (S.case === 'spain' || S.case === 'nl') && S.area ? roadsInArea(filterEvents(ev, { to: S.t }), S.area) : [];
+  $('#roads').innerHTML = rd.length ? `<b>Carreteras con incidencias en la zona</b> (${rd.length}):<br>` + rd.slice(0, 8).map((r) => `· ${esc(r.road)}: ${Object.entries(r.tipos).map(([k, n]) => `${esc(k)} ×${n}`).join(', ')}`).join('<br>') + (rd.length > 8 ? `<br>… y ${rd.length - 8} más (en la exportación CSV)` : '') : '';
+  if (window.SENDA_ATLAS) window.SENDA_ATLAS.roads = rd.length;
   // Crecimiento (todo el caso) con el instante marcado
   const sp = $('#spark'), r = Math.min(2, devicePixelRatio || 1), b = sp.getBoundingClientRect(); sp.width = b.width * r; sp.height = b.height * r; const sg = sp.getContext('2d'); sg.setTransform(r, 0, 0, r, 0, 0); sg.clearRect(0, 0, b.width, b.height);
   const gr = ev.length > 2 && isFire() ? growth(ev, { binMs: BIN }) : [];
@@ -268,6 +275,15 @@ $('#link').onclick = async () => { saveHash(); const u = location.href + `&t=${M
 
 window.SENDA_ATLAS = { setCase: (c) => { $('#case').value = c; $('#case').onchange(); }, setArea: (a) => { S.area = a; saveHash(); draw(); }, setTime: (t) => { S.t = t; draw(); }, range: () => ({ t0, t1 }), last: null };
 addEventListener('resize', () => { size(); draw(); });
+// Parte del día: cada capa con la hora de SU descarga como «ahora» (no se inventa actualidad)
+{
+  const L = [];
+  if (gdacs) L.push({ ...dailyBriefing([{ nombre: 'Mundo · GDACS', events: world, names: GDACS_TYPES, prefix: 'GDACS_', destacar: (e) => /alerta (Red|Orange)/.test(e.label ?? '') }], { now: Date.parse(gdacs.descargadoUTC) })[0], hora: gdacs.descargadoUTC });
+  if (dgt) L.push({ ...dailyBriefing([{ nombre: 'España · DGT', events: spain, names: DGT_CAUSES, prefix: 'DGT_', destacar: (e) => e.kind === 'DGT_accident' }], { now: Date.parse(dgt.descargadoUTC) })[0], hora: dgt.descargadoUTC });
+  if (ndw) L.push({ ...dailyBriefing([{ nombre: 'Países Bajos · NDW', events: nl, names: NDW_TYPES, prefix: 'NDW_', destacar: (e) => e.kind === 'NDW_Accident' }], { now: Date.parse(ndw.descargadoUTC) })[0], hora: ndw.descargadoUTC });
+  $('#brief').innerHTML = L.map((b) => `<p style="margin:6px 0"><b>${esc(b.nombre)}</b> (foto del ${esc(b.hora.slice(0, 16).replace('T', ' '))} UTC): ${b.total} en total, <b>${b.nuevos}</b> empezaron en las 24 h previas. Más frecuentes: ${b.tiposPrincipales.map(([k, n]) => `${esc(k)} (${n})`).join(', ')}.${b.destacados.length ? `<br>Destacados: ${b.destacados.map((t) => esc(t.length > 90 ? t.slice(0, 88) + '…' : t)).join(' · ')}` : ''}</p>`).join('') || 'Sin capas descargadas.';
+  window.SENDA_BRIEF = L;
+}
 legend();
 size(); loadCase(false);
 if (H.get('t') && Number.isFinite(+H.get('t'))) { S.t = Math.max(t0, Math.min(t1, +H.get('t'))); draw(); }
