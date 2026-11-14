@@ -8,6 +8,7 @@
  * Reglas de veracidad (CLAUDE.md §1): cada evento lleva `source` y `basis`. Los valores de `basis` son:
  *  - MEASURED_SATELLITE: detección de satélite descargada de una fuente pública (p. ej. NOAA GOES-R FDC).
  *  - MEASURED_CAMERA: recuento hecho en el repo sobre vídeo público de cámaras de tráfico.
+ *  - MEASURED_ADSB: precisión GNSS declarada por los propios aviones (ADS-B, adsb.lol, ODbL).
  *  - OFFICIAL_ALERT: alerta publicada por un sistema oficial (p. ej. GDACS de la ONU y la Comisión Europea), sin modificar.
  *  - CITIZEN_SIGNED_UNVERIFIED: reporte ciudadano con firma válida; la firma prueba quién, no que sea cierto.
  *  - SIMULATION: generado para demostrar; siempre se muestra como simulación.
@@ -18,7 +19,7 @@
 const R = 6_371_008.8; // radio medio terrestre (m), IUGG
 const rad = (d) => (d * Math.PI) / 180;
 
-export const ATLAS_BASIS = Object.freeze(['MEASURED_SATELLITE', 'MEASURED_CAMERA', 'OFFICIAL_ALERT', 'CITIZEN_SIGNED_UNVERIFIED', 'SIMULATION']);
+export const ATLAS_BASIS = Object.freeze(['MEASURED_SATELLITE', 'MEASURED_CAMERA', 'MEASURED_ADSB', 'OFFICIAL_ALERT', 'CITIZEN_SIGNED_UNVERIFIED', 'SIMULATION']);
 
 /** Distancia de círculo máximo (haversine) en metros entre {lat,lon}. */
 export function haversineM(a, b) {
@@ -238,4 +239,14 @@ export function zoneDelta(events, watch, { names = {}, prefix = '' } = {}) {
   const nuevos = filterEvents(events, { from: watch.since + 1, area: watch.area }).sort((a, b) => b.t - a.t);
   const porTipo = {}; for (const e of nuevos) { const k = names[e.kind.slice(prefix.length)] ?? e.kind; porTipo[k] = (porTipo[k] ?? 0) + 1; }
   return { n: nuevos.length, porTipo, ultimos: nuevos.slice(0, 5).map((e) => ({ t: e.t, label: e.label, source: e.source })) };
+}
+
+import { gnssCells, FAA_NACP_MIN } from './gnss-integrity.mjs';
+/** Celdas de integridad GNSS (foto de adsb.lol). Un evento por celda: verde, amarillo o rojo según GPSJam. */
+export function eventsFromGnss(snap, { cellDeg = 1 } = {}) {
+  const out = [];
+  for (const z of snap.zonas ?? []) for (const c of gnssCells(z.aviones, { cellDeg, nacpMin: FAA_NACP_MIN.value }))
+    out.push(makeEvent({ id: `gnss:${z.id}:${c.lat},${c.lon}`, t: z.ahoraMs, lat: c.lat, lon: c.lon, kind: `GNSS_${c.level}`, value: Math.round(c.pctBad * 10) / 10, unit: '% con precisión baja', group: 'gnss',
+      label: `${c.n} avión(es) · ${c.bad} con NACp < ${FAA_NACP_MIN.value} · ${c.level === 'green' ? 'verde' : c.level === 'yellow' ? 'amarillo' : 'rojo'}`, source: `adsb.lol (ODbL) · foto del ${String(snap.descargadoUTC).slice(0, 16).replace('T', ' ')} UTC · método GPSJam`, basis: 'MEASURED_ADSB' }));
+  return out;
 }

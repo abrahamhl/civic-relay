@@ -142,6 +142,9 @@ try {
   await a.reload(); await a.waitForSelector('body[data-ready]');
   const wz = await a.evaluate(() => window.SENDA_ATLAS.watch);
   check('atlas: medir distancias en el mapa y vigilar una zona (se guarda y al volver cuenta las novedades)', mm > 0 && Array.isArray(wz) && wz.length === 1 && wz[0].n === 0, { mm, wz });
+  await a.evaluate(() => window.SENDA_ATLAS.setCase('gnss'));
+  const gn = await a.evaluate(() => window.SENDA_ATLAS.last);
+  check('atlas: capa de integridad GNSS con celdas calculadas a partir de ADS-B real (adsb.lol, ODbL)', gn.case === 'gnss' && gn.total > 10, { total: gn.total });
   const d = await (await actx.newPage()); d.on('pageerror', (e) => errors.push(`demo: ${e.message}`));
   await d.goto(base + '/demo'); await d.click('#run'); await d.waitForFunction(() => window.SENDA_DEMO?.done || window.SENDA_DEMO?.error, null, { timeout: 30_000 });
   const demo = await d.evaluate(() => window.SENDA_DEMO);
