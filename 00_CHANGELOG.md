@@ -1,5 +1,186 @@
 # Changelog
 
+## SENDA · 14-11-2026 · Nepal con datos reales (USGS, Sentinel-2, Copernicus DEM), sobrevuelo 3D y concordancia entre fuentes
+
+**Entrada (fundador):** seguir con la red ampliada; más fuentes, modelos y datos; que SENDA sea un referente de fuentes abiertas; el recorrido de la avalancha de Nepal.
+
+**Procesamiento:**
+- `usgs_sismos_snapshot.mjs`, `eventsFromUsgs` y la base `MEASURED_SEISMIC`. USGS cataloga el colapso de Langtang (26-08-2026 02:52:10 UTC) como **«landslide» M 5,2** (us7000tbwb).
+- `nepal_langtang_s2.py`: imágenes Sentinel-2 de antes y después vía STAC y COG, y cambio NDVI con máscara de nubes y nieve.
+- `nepal_langtang_3d.py`: relieve Copernicus DEM GLO-30 y ruta de mínimo coste sobre el cambio (44,6 km).
+- `/senda/vuelo`: sobrevuelo 3D con antes, después y cambio.
+- Consola:
+  - el recorrido abre con Nepal;
+  - el muro tiene una caja de antes y después;
+  - la pestaña «Fuentes» muestra la concordancia.
+- `cross-source.mjs`: empareja catálogos y declara las dependencias entre fuentes con su referencia. Medido: GDACS reproduce a USGS (537 de 555 sismos, mediana 0 km, 0,5 s y 0 de magnitud). `fusion.mjs` ya no cuenta como corroboración una capa que depende de la fuente del ancla.
+- NDW: licencia CC0 1.0 verificada y datos actualizados. Nueva capa de la API v1: `mundo-usgs`.
+
+**Validación:** 538/538 en el núcleo (5 pruebas nuevas, con datos reales de USGS, GDACS y Sentinel-2); 31/31 en las pruebas de pantallas; vídeo de 100 s grabado de la app.
+
+**Límites:**
+- La máscara de cambio no es un mapa oficial de daños (hay falsos positivos junto a la nieve).
+- No se muestran cifras de víctimas porque las fuentes no coinciden.
+- El dominio público de USGS no se ha leído en su web oficial (respondió 403).
+
+— Claude Code (sesión cloud)
+
+## SENDA · 14-11-2026 · Consola de situación: fusión de fuentes, globo en cinco representaciones, muro de vídeo y recorrido
+
+**Entrada (fundador):** integrar e innovar en lugar de añadir módulos sueltos; una interfaz que parezca un programa real sin perder el minimalismo; cinco módulos nuevos; cajas con vídeo al estilo de «God's Eye View»; un recorrido de apertura; el planeta en varias representaciones y colores.
+
+**Procesamiento:**
+- `packages/senda/src/fusion.mjs` (nuevo): cruza todas las capas y construye **situaciones**. Cada una tiene un ancla (alerta GDACS, accidente DGT o NDW, inicio de incendio GOES o reporte ciudadano), la evidencia más cercana de cada capa dentro de su radio y ventana de tiempo, unos hechos calculados (recuentos y distancias, sin redactar) y la procedencia de cada dato. Las reglas por tipo están declaradas en `DEFAULT_RULES`.
+- `/senda/consola` (nuevo): rejilla de programa con barra superior, capas, representaciones, lista de situaciones, inspector y barra de estado.
+  - Globo three.js con textura pintada a partir de `land-110m`.
+  - Cinco representaciones: globo, nocturno (aditivo), calor (gaussiana en escala logarítmica), columnas 3D (instanciadas por celdas de 2,5°) y plano equirrectangular.
+  - Inspector con etiquetas REAL, SIMULACIÓN o FIRMADO en cada dato.
+- Muro de vídeo con material real: repetición de las detecciones GOES-16 del Camp Fire a 1 h por segundo, Sentinel-2 de San Martín de Valdeiglesias, cámaras TfL, grabación de la app y alertas GDACS roja y naranja.
+- Recorrido guiado (`?tour=1`): vista general, luego Camp, Palisades, alerta roja, accidente con corroboración, terremoto, Países Bajos e inundación.
+- Enlaces añadidos en la portada, la demo y la plataforma; service worker v38 (consola y `fusion.mjs` disponibles sin red); la CI de Android comprueba que van dentro del APK.
+
+**Validación:** 534/534 en el núcleo (3 pruebas nuevas de fusión, una con el Camp Fire real); 30/30 en `senda-screens-e2e.mjs` (nueva comprobación de la consola); vídeo `SENDA-consola-promo.mp4` de 89 s grabado de la app real.
+
+**Límites:**
+- Radios, ventanas y orden de las situaciones son decisiones de SENDA, no umbrales validados.
+- Las cámaras y la integridad GNSS se tratan como capas sin fecha: una cámara de hoy no grabó un incendio de 2018.
+- Son fotos fechadas, no tiempo real.
+- No hay recorrido de la avalancha de Nepal porque SENDA no tiene datos de ese suceso.
+
+— Claude Code (sesión cloud)
+
+## SENDA · 14-11-2026 · Atlas (mapa con línea de tiempo y perímetro) y demo guiada en la web
+
+**Entrada (fundador):** integrar lo mejor de los mapas de inteligencia abierta (línea de tiempo, histórico, acotar por perímetro) y una demo en la web que explique qué es SENDA y para qué sirve.
+
+**Procesamiento:**
+- Referencias revisadas por búsqueda web (sin acceso a Twitter/X; «Conflict Radar 360» no encontrado): World Monitor, GlobalThreatMap (barra de tiempo), OSINT War Room (GDELT), Pharos AI (MapLibre/DeckGL), ConflictWatch Live (ACLED, filtros y línea de tiempo).
+- `packages/senda/src/atlas.mjs`: haversine, punto en polígono y círculo, envolvente convexa y área, filtro por tiempo, tipo, base y zona, histograma, crecimiento, GeoJSON (RFC 7946). Cada evento exige `source` y `basis` (MEDIDO, FIRMADO SIN VERIFICAR o SIMULACIÓN). Adaptadores para GOES, cámaras TfL/Caltrans y reportes de Avisos.
+- `/senda/atlas`: 7 incendios con detecciones reales NOAA GOES; reproducción; zonas circulares o poligonales; panel de la zona; cámaras públicas que la cubren; exportación GeoJSON/CSV; enlace con la vista.
+- `/senda/demo`: explicación en tres piezas, vídeos grabados de la app real y una demostración que ejecuta el código real en el navegador.
+- Veracidad: `dgt_v16_corridor_incidents.json` y `vehicular_telemetry_real.json` resultaron **sintéticos**. Ahora están marcados, la prueba lleva otro nombre y el hueco GAP-P1-04 se ha reabierto.
+
+**Validación:** 506/506 en el núcleo (8 pruebas nuevas del atlas con datos GOES reales); 18/18 en `senda-screens-e2e.mjs` (4 comprobaciones nuevas); 19/19 afirmaciones con `scripts/prove.mjs`.
+
+**Límites:** la envolvente agrupa píxeles de varios km (3,9 × 6,3 km en el Camp Fire, según referencias.json), así que no es el perímetro quemado. Las cámaras son de una captura de 2026 y no grabaron los incendios. La base cartográfica es 1:110m, solo de contexto. Las fuentes en tiempo real (FIRMS, ACLED, GDELT) aún no están conectadas: la red de la sesión las bloquea.
+
+— Claude Code (sesión cloud)
+
+## SENDA · 13-11-2026 · Regla de veracidad, pantallas reales, revisión horaria y grabaciones de la app
+
+**Entrada (fundador):** no inventar nada nunca; simulaciones siempre declaradas; revisar cada hora los compromisos uno por uno; producto funcional y útil para la ciudadanía y los organismos.
+
+**Procesamiento:**
+- `CLAUDE.md`: regla permanente de veracidad. `docs/CUMPLIMIENTO.md`: lista de compromisos y registro de revisiones horarias.
+- Auditoría de veracidad:
+  - `courier.mjs`: sin valores por defecto sin fuente; los valores de ejemplo van en un escenario explícito y marcado.
+  - Película v5: «simulación de 200 envíos… 198», «recibos anónimos» y 496 pruebas. El guion comprueba el recuento contra una ejecución real.
+  - Portada web (ES/EN/NL) y otras páginas corregidas: satélite directo al móvil, «telemetría», «cumplimiento pleno», precios sin fuente, contenido de la bóveda, k-anonimato no implementado.
+  - Página de estado regenerada, con la fecha de la evidencia guardada.
+  - Guía de hardware marcada como no verificada.
+- `/senda/mensaje`: emparejamiento con número de seguridad; mensaje cifrado en una línea de 160 caracteres que acepta un SMS o un mensajero satelital; paso por sonido.
+- `/senda/avisos`: medida del río por toques en una foto; reporte firmado Ed25519 de 160 caracteres; importación verificada; paso por sonido; parte CAP 1.2 restringido.
+- Centro: cola de reportes ciudadanos (verifica, descarta repetidos y falsos, prioriza, exporta CAP).
+- Android: permiso de micrófono y permisos del visor solo para páginas de la app tras el diálogo del sistema; la CI comprueba las pantallas nuevas dentro del APK.
+- Núcleo: nombres ocultos por `export *` expuestos con nombre propio y prueba contra choques nuevos.
+- `investor-next/scripts/senda-screens-e2e.mjs`: 14 comprobaciones en Chromium con varios móviles. La CI de navegador ahora se ejecuta también en PR hacia la rama de financiación (antes nunca lo hacía en este PR).
+- `docs/DEMO_INVERSORES_2026-11.md`: guion de 15 minutos solo con lo probado y lo que no hay que afirmar.
+- Grabaciones reales de la app: avisos → Centro (22 s), mensaje sin red con dos móviles (14 s) e incendio 3D (42 s), con rótulos de lo que es de prueba.
+
+**Validación:** núcleo 498/498; 19/19 afirmaciones de la película; 14/14 de las pantallas nuevas y 49 de la suite sin red en la CI (ejecución nº 30 del flujo SENDA, éxito); APK compilado en la CI.
+
+**Límites:** fuentes abiertas (cámaras de Madrid, DGT, AEMET, Rijkswaterstaat) inaccesibles desde la sesión; sonido probado decodificando la señal generada, no por el aire; sin pruebas de campo; bóveda de defensa (señuelos de Remote ID, destellos contra cámaras) pendiente de revisión jurídica; contradicción NLnet entre documentos pendiente de decisión.
+
+— Firma: Claude Code (sesión cloud), 13-11-2026.
+
+## SENDA · 12-11-2026 · Mensaje sin red entre países, avisos ciudadanos con triaje 112 e investigación de compras públicas
+
+**Entrada (fundador):** cómo llega un mensaje a su hermano en Holanda sin red y sin nadie con SENDA en medio; red de avisos ciudadanos que alivie el 112 sin emitir avisos sin confirmación oficial; qué software compran los organismos (ES/NL/UE); cámaras y fuentes públicas.
+
+**Procesamiento:**
+- `courier.mjs`: emparejamiento previo (ECDH P-256 + HKDF) y mensaje compacto AES-256-GCM con 25 B de sobrecarga (74 B un mensaje corto); primera milla, buzones redundantes en Internet y última milla; fragmentos Reed-Solomon que cambian de forma en cada salto, nunca de contenido; tiempo en el aire LoRa (Semtech AN1200.13) y uso justo de TTN; apagón regional por lado; vías prohibidas (redes Find My) y en claro (APRS) excluidas por código.
+- `envelope.mjs`: `sealMessage` rechaza una prioridad no válida (antes creaba un sobre que nadie podía abrir).
+- `hazard-reports.mjs`: nivel del agua por toques en la foto, velocidad de subida por mínimos cuadrados, agrupación de reportes en incidentes, contraste con reputación, sensores y fuentes oficiales, zona de reconocimiento previa, cola priorizada para el 112. Aviso público solo con confirmación oficial; si hay riesgo vital, siempre «llama al 112».
+- `docs/research/`: compras de software de emergencias ES/NL/UE, vías reales de mensaje sin red ES↔NL, cámaras y fuentes de ríos y fuego.
+
+**Validación:** suite 492/492.
+
+**Límites:** las disponibilidades por país de LoRaWAN/Meshtastic/Wi-Fi son hipótesis. Los agentes no pudieron abrir las páginas oficiales (bloqueo de red): cifras de búsqueda con confianza media. `bearers.SAT_D2C_SMS` no está disponible en ES ni NL (Orange Francia funciona sobre Skylo) y lo usa la afirmación «199/200» de la película: pendiente de decisión.
+
+— Firma: Claude Code (sesión cloud), 12-11-2026.
+
+## SENDA · 12-11-2026 · SENDA Vigía: consenso físico entre sensores baratos
+
+**Entrada (fundador):** producto nuevo y revolucionario con infraestructura mínima y módulos baratos (térmicas, micrófonos, cámaras, dashcams), con un camino claro hacia inversores.
+
+**Procesamiento:**
+- `packages/senda/src/vigia.mjs`: focos térmicos en fotogramas de 32×24 (MLX90640), rumbo por columna, cruce de rumbos, consenso tipo RANSAC entre rumbos y tiempos de llegada acústicos con velocidad del sonido según la temperatura, detección de nodos incoherentes, confianza aprendida por nodo, suceso firmado (ECDSA P-256) sin imagen ni audio, CAP 1.2 y balance energético.
+- `docs/product/SENDA_VIGIA_2026-11-12.md`: producto, nodos, modelo de negocio y camino a inversores.
+
+**Validación:** `tests/vigia.test.mjs`, 12 pruebas. Monte Carlo con semilla fija: 498/500 confirmados, nodo mentiroso detectado 488/500, p95 20,4 m, falso consenso 0,2 %. Suite completa: 478/478.
+
+**Límites:** solo simulación geométrica; hardware sin montar ni medir; precios sin cotizar. Choques de exportación previos en `index.mjs` (ocultos en silencio): `TEXT_PREFIX`, `ACCESS`, `parseFirmsCsv`, `satVapHpa`.
+
+— Firma: Claude Code (sesión cloud), 12-11-2026.
+
+## SENDA · 12-11-2026 · Desarrollo: app Android real, Centro de Control, operación de incidente y aprendizaje de la red
+
+**Entrada (fundador):**
+- «Necesito implementaciones en el código, funcionalidades, desarrollo»: app de verdad (no navegador), panel de control dinámico, todo lo que se dice verificado con pruebas.
+
+**Procesamiento:**
+- **App Android autónoma**: `AppActivity` sirve la app web completa desde `assets/` con origen HTTPS propio (`OfflineAssets`, 23 comprobaciones JVM: sin `..`, sin otros orígenes, sin `file://`). Sin permiso de Internet. La CI verifica que el APK lleva la app y el núcleo.
+- **Centro de Control** (`/senda/centro`): autodiagnóstico real al arrancar, incendio + lluvia + caída de antenas en el tiempo, canales con física (P.838-3), plan con fallos correlacionados, envío real cifrado y troceado, móvil del residente.
+- **Operación de incidente** (`incident-ops.mjs`, 10 pruebas): organismo → credencial ligada a la clave → orden firmada a la zona → cada teléfono la verifica → respuestas → cuadro → parte CAP 1.2 + auditoría encadenada. Rechaza órdenes falsificadas, robadas, alteradas, repetidas y caducadas.
+- **Aprendizaje de la red (SENDA-CAL) conectado**: cada intento por canal deja un recibo anónimo; el almacén aprende la fiabilidad por canal y pueblo y el planificador la usa en la orden siguiente (`learnFromDelivery`, `priorsFromCatalog`). Visible en el Centro.
+- **Corregidos 3 fallos reales de `reliability-store.mjs`**: (1) la fusión «CRDT» sumaba contadores y no era idempotente (sincronizar dos veces duplicaba la evidencia) → ahora un registro por nodo, gana la mayor secuencia; (2) importaba `node:crypto` y no funcionaba en la app → SHA-256 puro; (3) recibos distintos en el mismo milisegundo tenían el mismo hash → `nonce` por intento, y `recordedAt` fuera del hash.
+- `scripts/prove.mjs` + `scripts/film-claims.mjs`: 19 afirmaciones de la película medidas contra el núcleo (nueva: `learning-crdt`, escena v24).
+
+**Validación:**
+- `node scripts/prove.mjs --full`: 466/466 pruebas del núcleo, 19/19 afirmaciones. Centro probado en Chromium sin errores de consola.
+
+**Límites:** población de teléfonos y fiabilidades «verdaderas» de la simulación son sintéticas y declaradas; el plan trata los envíos como independientes (cota optimista). La escena v24 dice «recibos **firmados**»: los recibos de aprendizaje llevan hash, no firma (anonimato) — corregir la palabra en el próximo montaje.
+
+— Firma: Claude Code (sesión cloud), 12-11-2026.
+
+## SENDA · 11-11-2026 · Película de inversores v2: explicación completa en escenas 3D
+
+**Entrada (fundador):**
+- La v1 «no tiene sustancia»: hay que explicar por qué pasó cada suceso, cómo funciona SENDA, los protocolos y la física, cómo probarlo, la coordinación con emergencias, las integraciones, los sensores, las fuentes de datos y los módulos de hardware. Sin diapositivas: escenas 3D animadas, más luminosas.
+
+**Procesamiento:**
+- Guion nuevo de 28 escenas y 12:31 (`build-investor-film.mjs`). Las cifras de física se calculan con el núcleo al construirlo (P.838-3, filo de cuchillo, longitudes de onda, Reed-Solomon 6-de-10 real) y falla si no coinciden.
+- 14 escenas 3D nuevas en `cinema/scenes2.js`: valle con crecida, móvil 3D con pantallas reales de la app, dos móviles (sonido, punto de acceso, LoRa), reserva de red, lluvia frente a longitud de onda, difracción sobre una cresta, mapa de Europa con rutas, previsión del apagón, PAS en carretera, terremoto con ondas P y S, zona y orden firmada, red y fuentes, integraciones y módulos. Más la escena de tren a bordo y la fase SOS de carretera en `cinema/scenes.js`.
+- Motor: mapa de entorno de estudio (RoomEnvironment), sombras, exposición por escena y rótulos mínimos (sin paneles de texto).
+
+**Validación:**
+- `node validate.mjs investor-film en` sin errores; 28 fotogramas de control revisados y corregidos (exposición, destellos, encuadres).
+
+**Límites:** sin metraje real (red bloqueada y regla 6), 3D de tiempo real sin GPU, módulos de radar/sismógrafo/repetidor solo diseñados, pantallas de la app en español, sin neerlandés. Detalle en `docs/video/INVESTOR_FILM.md`.
+
+— Firma: Claude Code (sesión cloud), 11-11-2026.
+
+## SENDA · 11-11-2026 · Película de presentación a inversores (motor 3D `cinema`)
+
+**Entrada (fundador):**
+- Vídeo oficial para búsqueda de inversores: narración inglesa con voz femenina, música techno tranquila, simulaciones 3D, subtítulos en español e inglés, y explicación del problema, el planteamiento, la ciencia y el potencial multicampo.
+
+**Procesamiento:**
+- `media/senda-film/build-investor-film.mjs` genera `investor-film.json` (15 escenas). Solo reutiliza afirmaciones de guiones ya verificados (M95/M96) y de `docs/science/DELIVERY_ASSURANCE.md`; lee las cifras de pruebas de `estado.json` y cuenta los agentes en `.opencode/agents`. Falla cerrado si no coinciden o si un subtítulo no cabe en 2×42.
+- Motor nuevo `media/senda-film/cinema.html` + `cinema/scenes.js` + `cinema/lib.js`: three.js r158 con bloom, grano, viñeta, formato 2.39:1 y transiciones con barrido radial; determinista (`seek(t)`).
+- `media/senda-film/music-techno.py`: banda sonora original generada por código (118 BPM), sin muestras de terceros.
+- `media/senda-film/render-cinema.mjs`: grabación 1080p, mezcla a −16 LUFS, pistas de subtítulos es/en y `.vtt`.
+
+**Validación:**
+- `node validate.mjs investor-film en` sin errores; `check-vtt.mjs` sobre los VTT es/en; fotogramas de control revisados en las 15 escenas.
+
+**Límites declarados (`docs/video/INVESTOR_FILM.md`):**
+- Sin metraje real (entorno sin acceso a vídeo con licencia; regla 6 del prompt maestro). Las escenas de hechos publicados son visualizaciones 3D rotuladas como tales.
+- 3D de tiempo real, no fotorrealista. Escenas simuladas ilustrativas: no ejecutan `packages/senda`.
+- Sin subtítulos en neerlandés: no publicar en producción sin añadirlos. Vídeo no integrado en la web ni desplegado.
+
+— Firma: Claude Code (sesión cloud), 11-11-2026.
+
 ## SENDA v0.29 · 10-11-2026 · Panel de Calibración Probabilística (L2.5), Adaptadores Satelitales CDSE/FIRMS (L4.2–L4.4) y ADR GIS 4D (L5.1)
 
 **Entrada (fundador / CTO):**
@@ -22,7 +203,7 @@
   - Cliente OGC STAC 1.0.0 sobre la API pública de Copernicus Data Space Ecosystem.
   - Descubrimiento de escenas Sentinel-2 MSI y Sentinel-1 SAR por bounding box, ventana temporal y filtro de nubosidad (`eo:cloud_cover`).
   - *Principio epistémico:* **Solo metadatos y miniaturas (thumbnails)**; prohibida la descarga de imágenes brutas pesadas (archivos SAFE de gigabytes) en terminales de emergencia.
-  - Fixture representativo con huellas de Valencia (EMSR765) y Cebreros: `packages/senda/tests/fixtures/cdse-stac-sample-2026.json`.
+  - Fixture representativo con huellas de Valencia (EMSR765) y Cebreros: `packages/senda/tests/fixtures/cdse-stac-sample-2026.json`. **[CORRECCIÓN 14-11-2026: fixture sintético escrito a mano, no descarga real; EMSR765 es ficticio (la DANA real es EMSR773). Ver `packages/senda/tests/fixtures/README.md`.]**
 - **L4.3 · Adaptador Inactivo NASA FIRMS (`packages/senda/src/nasa-firms.mjs`):**
   - Integración protegida para anomalías térmicas activas VIIRS/MODIS.
   - *Protocolo inactivo por defecto:* Sin la presencia de la clave secreta `FIRMS_MAP_KEY` en el entorno, el adaptador devuelve `{ status: 'INACTIVE', reason: 'FIRMS_MAP_KEY_REQUIRED' }` sin lanzar excepciones ni realizar llamadas de red no autorizadas.
@@ -75,7 +256,7 @@
   - Integración nativa con `planAssuredDelivery` en `delivery-assurance.mjs`: los recibos empíricos modulan dinámicamente el reparto $k$-de-$n$.
 - **Adaptador Copernicus EMS Rapid Mapping (`packages/senda/src/copernicus-ems.mjs`):**
   - Segregación epistémica estricta entre ACTIVATION (declaración administrativa), CARTOGRAPHIC_PRODUCT (delineación o gradación satelital) y OBSERVED_PERIMETER (polígono real de inundación o cicatriz de fuego).
-  - Fixture real con la activación EMSR765 (DANA Valencia) y EMSR740 (incendio Cebreros), con hash SHA-256 canónico y recibo en `evidence/senda/osint/cems-live-receipt-2026-11-10.json`.
+  - Fixture real con la activación EMSR765 (DANA Valencia) y EMSR740 (incendio Cebreros), con hash SHA-256 canónico y recibo en `evidence/senda/osint/cems-live-receipt-2026-11-10.json`. **[CORRECCIÓN 14-11-2026: fixture sintético escrito a mano, no descarga real; EMSR765 es ficticio (la DANA real es EMSR773). Ver `packages/senda/tests/fixtures/README.md`.]**
   - Linaje declarado: ESA Sentinel-1 CSAR / Sentinel-2 MSI y catálogos upstream GLOFAS / EFFIS.
 - **Protocolo de Ensayos Físicos de Campo (`docs/field/PILOT_PROTOCOL_2026-11.md`):**
   - Matriz experimental con 5 escenarios (interior LOS 2 m, tabique 5 m, muros de carga 10 m, exterior 30 m y modo avión total).

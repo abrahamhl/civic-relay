@@ -70,3 +70,17 @@ export * from './nasa-firms.mjs';
 export * from './calibration-diagram.mjs';
 export * from './source-evidence.mjs';
 // Defensa y doble uso: aislado en './defense/index.mjs' (importar '@senda/core/defense'), nunca desde aquí.
+export * from './vigia.mjs';
+export * from './courier.mjs';
+export * from './hazard-reports.mjs';
+// Nombres repetidos entre módulos: con `export *` JavaScript los oculta en silencio. Se exponen con nombre propio
+// (sin elegir cuál «gana»); tests/index-exports.test.mjs falla si aparece un choque nuevo sin resolver.
+export { TEXT_PREFIX as BEARER_TEXT_PREFIX } from './bearers.mjs';
+export { TEXT_PREFIX as SDP_TEXT_PREFIX } from './sdp-compact.mjs';
+export { ACCESS as SATELLITE_ACCESS } from './satellites.mjs';
+export { ACCESS as SENSOR_ACCESS } from './sensor-fabric.mjs';
+export { ACCESS as PLATFORM_ACCESS } from './platforms.mjs';
+export { parseFirmsCsv as parseFirmsCsvWildfire } from './wildfire.mjs';
+export { parseFirmsCsv as parseFirmsCsvNasa } from './nasa-firms.mjs';
+export { satVapHpa as satVapHpaFireWatch } from './fire-watch.mjs';
+export { satVapHpa as satVapHpaAtmos } from './atmos3d.mjs';

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Autobuses como mulas de datos</title>
+<meta name="description" content="Si cae la red móvil, ¿pueden los autobuses llevar los mensajes? Simulación sobre los horarios reales de la EMT de València (GTFS, CC BY 4.0) con el Connection Scan Algorithm.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#06090c;--p:#0b1015;--l:#1c2730;--t:#e6ebef;--m:#8a99a5;--o:#ff8a3d;--r:#ff5b6e;--c:#3fb6ff;--g:#3ddc97;--a:#f5c542;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--t);font:13px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.app{display:grid;height:100vh;grid-template-rows:34px 1fr;grid-template-columns:1fr 380px;grid-template-areas:"top top" "map side"}
+.top{grid-area:top;display:flex;align-items:center;gap:14px;padding:0 12px;border-bottom:1px solid var(--l);background:#080c10}.top b{letter-spacing:.08em}.top a{color:var(--m);text-decoration:none}.top a:hover{color:var(--t)}
+.map{grid-area:map;position:relative;min-height:0}#cv{width:100%;height:100%;display:block;cursor:crosshair}
+.side{grid-area:side;border-left:1px solid var(--l);overflow:auto;background:var(--p)}
+.hd{font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--m);padding:10px 12px 6px;border-bottom:1px solid var(--l)}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:3px 8px;padding:8px 12px;font-size:12px}.kv span{color:var(--m)}.kv b{font-family:var(--mono);font-weight:500}
+.sim{display:inline-block;font:700 10px var(--mono);color:var(--a);border:1px solid #6b5a1c;padding:1px 6px;border-radius:2px;margin-left:6px}
+.ctl{padding:8px 12px}.ctl input[type=range]{width:100%}.ctl button{background:#0e1d29;color:var(--t);border:1px solid #2b5d80;padding:5px 10px;font:inherit;cursor:pointer;border-radius:2px}
+.note{color:var(--m);font-size:11.5px;padding:6px 12px 10px}ul.h{margin:6px 0;padding:0 12px 0 28px;font-size:12px;color:#c3ccd3}
+.lg{position:absolute;left:12px;bottom:12px;background:rgba(9,13,17,.88);border:1px solid var(--l);padding:6px 8px;font:11px var(--mono);color:var(--m)}
+.lg i{display:inline-block;width:10px;height:10px;margin:0 4px 0 8px;vertical-align:-1px}
+.hud{position:absolute;left:12px;top:10px;font:11px var(--mono);color:var(--m)}
+@media (max-width:860px){.app{grid-template-columns:1fr;grid-template-rows:34px 60vh auto;grid-template-areas:"top" "map" "side"}html,body{height:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><b>SENDA</b><span style="color:var(--m)">MULAS DE DATOS</span><a href="/senda/consola">Consola</a><a href="/senda/vuelo">Sobrevuelo</a><a href="/senda/atlas">Atlas</a><span class="sim">SIMULACIÓN SOBRE HORARIOS REALES</span></div>
+  <div class="map"><canvas id="cv" aria-label="Mapa de paradas de la EMT de València coloreadas por minutos de entrega"></canvas><div class="hud" id="hud"></div><div class="lg" id="lg"></div></div>
+  <div class="side">
+    <div class="hd">Si cae la red móvil, ¿llegan los mensajes en autobús?</div>
+    <div class="note">Cada autobús con un nodo SENDA recoge los mensajes de los buzones de las paradas y los deja en las siguientes, donde otro autobús los sigue llevando. Se calcula con el <b>Connection Scan Algorithm</b> (Dibbelt et al., 2013) sobre los <b>horarios reales</b> de la EMT de València. Toca una parada del mapa para elegir el origen.</div>
+    <div class="kv" id="kv"></div>
+    <div class="ctl"><label for="q">Flota con nodo SENDA: <b id="qv"></b></label><input id="q" type="range" min="5" max="100" step="5" value="50"><button id="re">Otra flota al azar</button></div>
+    <div class="hd">Entrega según la flota equipada (40 parejas, 30 flotas al azar)</div>
+    <div id="chart" style="padding:8px 12px"></div>
+    <div class="note" id="chartNote"></div>
+    <div class="hd">¿Cuántos buzones y dónde? (flota completa)</div><div id="box" style="padding:6px 12px"></div><div class="note" id="boxNote"></div>
+    <div class="hd">Hipótesis (por eso es simulación)</div><ul class="h" id="hyp"></ul>
+    <div class="hd">Fuente</div><div class="note" id="src"></div>
+  </div>
+</div>
+<script type="module">
+import { csa, rng } from '/senda/core/bus-mules.mjs';
+const $ = (s) => document.querySelector(s), esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const D = await fetch('/senda/data/mulas/valencia.json').then((r) => r.json());
+const buf = new Int32Array(await (await fetch('/senda/data/mulas/' + D.binario.fichero)).arrayBuffer()), N = D.binario.n, blk = (k) => buf.subarray(k * N, (k + 1) * N);
+const conns = { dep: blk(0), arr: blk(1), from: blk(2), to: blk(3), trip: blk(4), nStops: D.binario.paradas, nTrips: D.binario.viajes };
+const P = D.paradas, T0 = 8 * 3600, INF = 0x7fffffff;
+let origin = P.findIndex((p) => p[0] === D.origenIsocronas.stop_id), q = 0.5, seed = 1, arrival = null;
+const la = P.map((p) => p[2]), lo = P.map((p) => p[3]), B = { la0: Math.min(...la), la1: Math.max(...la), lo0: Math.min(...lo), lo1: Math.max(...lo) };
+const cv = $('#cv'), g = cv.getContext('2d'); let W = 0, H = 0, S = 1, ox = 0, oy = 0;
+function size() { const r = Math.min(2, devicePixelRatio || 1), b = cv.getBoundingClientRect(); W = b.width; H = b.height; cv.width = W * r; cv.height = H * r; g.setTransform(r, 0, 0, r, 0, 0);
+  const k = Math.cos(39.47 * Math.PI / 180), dx = (B.lo1 - B.lo0) * k, dy = B.la1 - B.la0; S = 0.92 * Math.min(W / dx, H / dy); ox = (W - dx * S) / 2; oy = (H - dy * S) / 2; }
+const px = (i) => [ox + (lo[i] - B.lo0) * Math.cos(39.47 * Math.PI / 180) * S, oy + (B.la1 - la[i]) * S];
+const ramp = (m) => { const t = Math.max(0, Math.min(1, m / 120)); return `hsl(${Math.round(160 - 160 * t)},${70 + 10 * t}%,${55 - 10 * t}%)`; };
+function run() {
+  const rand = rng(1000 * seed + Math.round(q * 100)), up = new Uint8Array(conns.nTrips); for (let i = 0; i < up.length; i++) up[i] = q >= 1 || rand() < q ? 1 : 0;
+  const t = performance.now(); arrival = csa(conns, origin, T0, { up: (tr) => up[tr] === 1 }).arrival; const ms = performance.now() - t;
+  const d = []; for (let s = 0; s < arrival.length; s++) if (s !== origin && arrival[s] !== INF) d.push((arrival[s] - T0) / 60); d.sort((a, b) => a - b);
+  const pct = (p) => (d.length ? d[Math.min(d.length - 1, Math.floor(p * d.length))].toFixed(0) + ' min' : '—'), in60 = d.filter((x) => x <= 60).length;
+  $('#qv').textContent = `${Math.round(q * 100)} % (${up.reduce((a, b) => a + b, 0)} de ${conns.nTrips} viajes)`;
+  $('#kv').innerHTML = `<span>Origen</span><b>${esc(P[origin][1])}</b><span>Salida</span><b>lunes ${D.dia.slice(6, 8)}-${D.dia.slice(4, 6)} · 08:00</b><span>Paradas alcanzadas</span><b>${d.length} de ${P.length - 1} (${(100 * d.length / (P.length - 1)).toFixed(1)} %)</b><span>En ≤ 60 min</span><b>${in60} (${(100 * in60 / (P.length - 1)).toFixed(1)} %)</b><span>Mediana · p90</span><b>${pct(0.5)} · ${pct(0.9)}</b><span>Cálculo en el navegador</span><b>${ms.toFixed(0)} ms · ${N.toLocaleString('es')} conexiones</b>`;
+  window.SENDA_MULAS = { origin: P[origin][0], q, reached: d.length, of: P.length - 1, p50: d.length ? d[d.length >> 1] : null, ms };
+  draw();
+}
+function draw() {
+  g.fillStyle = '#06090c'; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < P.length; i++) { const [x, y] = px(i), a = arrival?.[i]; g.fillStyle = a == null || a === INF ? '#25313b' : ramp((a - T0) / 60); g.beginPath(); g.arc(x, y, 3.2, 0, 7); g.fill(); }
+  const [x, y] = px(origin); g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 8, 0, 7); g.stroke(); g.fillStyle = '#ff8a3d'; g.beginPath(); g.arc(x, y, 4, 0, 7); g.fill();
+  $('#hud').textContent = `${P.length} paradas EMT València · color = minutos hasta recibir el mensaje`;
+}
+$('#lg').innerHTML = [0, 30, 60, 90, 120].map((m) => `<i style="background:${ramp(m)}"></i>${m}${m === 120 ? '+' : ''}`).join('') + '<i style="background:#25313b"></i>no llega';
+cv.addEventListener('click', (e) => { const r = cv.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top; let best = 0, bd = Infinity; for (let i = 0; i < P.length; i++) { const [x, y] = px(i), dd = (x - mx) ** 2 + (y - my) ** 2; if (dd < bd) { bd = dd; best = i; } } origin = best; run(); });
+$('#q').oninput = () => { q = +$('#q').value / 100; run(); }; $('#re').onclick = () => { seed++; run(); };
+addEventListener('resize', () => { size(); draw(); });
+// Curvas de adopción (calculadas por gtfs_valencia_mulas.mjs)
+function chart() {
+  const w = 350, h = 200, L = 34, Bm = 26, sx = (x) => L + x * (w - L - 8), sy = (y) => h - Bm - y * (h - Bm - 8);
+  const line = (rs, k, col, dash) => `<polyline fill="none" stroke="${col}" stroke-width="2" ${dash ? 'stroke-dasharray="4 3"' : ''} points="${rs.map((r) => `${sx(r.q).toFixed(1)},${sy(r[k]).toFixed(1)}`).join(' ')}"/>`;
+  const a = D.adopcion120.results, b = D.adopcion.results;
+  $('#chart').innerHTML = `<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="Curvas de entrega frente a flota equipada">
+  ${[0, 0.25, 0.5, 0.75, 1].map((y) => `<line x1="${L}" x2="${w - 8}" y1="${sy(y)}" y2="${sy(y)}" stroke="#1c2730"/><text x="${L - 4}" y="${sy(y) + 3}" font-size="9" fill="#8a99a5" text-anchor="end" font-family="ui-monospace">${y * 100}%</text>`).join('')}
+  ${[0, 0.25, 0.5, 0.75, 1].map((x) => `<text x="${sx(x)}" y="${h - 10}" font-size="9" fill="#8a99a5" text-anchor="middle" font-family="ui-monospace">${x * 100}%</text>`).join('')}
+  ${line(a, 'epidemic', '#3ddc97', false)}${line(a, 'singleCopy', '#ff5b6e', false)}${line(b, 'epidemic', '#3ddc97', true)}${line(b, 'singleCopy', '#ff5b6e', true)}
+  <text x="${w / 2}" y="${h}" font-size="9" fill="#8a99a5" text-anchor="middle">flota con nodo SENDA</text></svg>
+  <div style="font:11px var(--mono);color:var(--m)"><span style="color:#3ddc97">━ epidémico</span> · <span style="color:#ff5b6e">━ copia única</span> · continuo ≤ 120 min · discontinuo ≤ 60 min</div>`;
+  const r50 = a.find((r) => r.q === 0.5);
+  $('#chartNote').innerHTML = `Con la mitad de la flota y ≤ 120 min: epidémico <b>${(100 * r50.epidemic).toFixed(0)} %</b> frente a copia única <b>${(100 * r50.singleCopy).toFixed(0)} %</b>. Una ruta con k transbordos solo sobrevive con probabilidad q<sup>k</sup>; las copias en todos los autobuses buscan alternativas. Ojo: con ≤ 60 min solo ${D.adopcion.feasibleWithFullFleet} de ${D.adopcion.pairs} parejas son posibles incluso con toda la flota (muestra pequeña).`;
+}
+$('#hyp').innerHTML = D.hipotesis.map((h) => `<li>${esc(h)}</li>`).join('');
+$('#src').innerHTML = `GTFS de la EMT de València · ${esc(D.fuente.licencia)} · SHA-256 del ZIP <span style="font-family:var(--mono)">${esc(D.fuente.sha256Zip.slice(0, 16))}…</span> · ${N.toLocaleString('es')} conexiones de ${conns.nTrips} viajes entre las 07:00 y las 11:00. ${esc(D.metodo)}`;
+function boxes() {
+  const B = D.buzones; if (!B) return; const C = B.resultados.filter((r) => r.K <= 400), H = B.transbordos.resultados, pc = (x) => (x == null ? '—' : (100 * x).toFixed(0) + ' %');
+  $('#box').innerHTML = `<table style="width:100%;border-collapse:collapse;font:11.5px var(--mono)"><tr style="color:var(--m)"><th style="text-align:left">Buzones</th><th>Por cobertura<br>cubre · entrega ≤2 h</th><th>En transbordos<br>cubre · entrega ≤2 h</th><th>Mixto ½ + ½<br>cubre · entrega ≤2 h</th></tr>${C.map((c, i) => { const m = (B.mixto?.resultados ?? []).find((x) => x.K === c.K || (c.K === 400 && x.K > 200)); return `<tr><td>${c.K}</td><td style="text-align:center">${pc(c.cobertura400m)} · ${pc(c.entrega120)}</td><td style="text-align:center;color:#3ddc97">${pc(H[i]?.cobertura400m)} · ${pc(H[i]?.entrega120)}</td><td style="text-align:center;color:#f5c542">${m ? `${pc(m.cobertura400m)} · ${pc(m.entrega120)}${m.K !== c.K ? ` (${m.K})` : ''}` : '—'}</td></tr>`; }).join('')}<tr><td>todas (${B.resultados.at(-1).K})</td><td colspan="3" style="text-align:center">100 % · ${pc(B.resultados.at(-1).entrega120)}</td></tr></table>`;
+  $('#boxNote').textContent = 'Poner buzones solo para cubrir barrios (cobertura máxima voraz) deja los transbordos sin buzón y el mensaje no puede cambiar de autobús. Ponerlos en las paradas donde se cruzan más líneas multiplica la entrega, pero cubre menos barrios a pie. El plan mixto (mitad en transbordos, mitad completando cobertura) queda en medio: cada ayuntamiento elige su punto de equilibrio. Cobertura de paradas, no de personas (sin datos de población). Simulación.';
+  window.SENDA_MULAS_BOX = { cover100: C.find((c) => c.K === 100)?.entrega120, hubs100: H.find((h) => h.K === 100)?.entrega120 };
+}
+size(); chart(); boxes(); run(); document.body.dataset.ready = '1';
+</script>
+</body>
+</html>

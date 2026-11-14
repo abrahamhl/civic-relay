@@ -6,12 +6,13 @@
  * 1. Contrato de recibo firmado `DeliveryReceipt v1` anónimo (sin PII, resolución H3 res 7).
  * 2. Modelo jerárquico Beta-Binomial con Empirical Bayes Shrinkage hacia el prior global.
  * 3. Olvido exponencial configurable para canales no estacionarios.
- * 4. CRDT conmutativo basado en suma de contadores para sincronización P2P offline.
+ * 4. CRDT de estado (un registro por nodo, gana el de mayor secuencia): conmutativo, asociativo e
+ *    IDEMPOTENTE — sincronizar dos veces con el mismo teléfono no duplica la evidencia.
  * 5. Detección de degradación y deriva de canal mediante Wald's SPRT (Sequential Probability Ratio Test).
  * 6. Cálculo de calibración y Brier Score por portadora.
  */
 
-import { createHash, sign, verify } from 'node:crypto';
+import { sha256Hex } from './corridor-connectors.mjs'; // SHA-256 síncrono puro: funciona igual en Node, navegador y APK
 
 export const DEFAULT_CHANNEL_PRIORS = {
   'lora-868': { alpha: 18, beta: 2 },        // Media prior ~90%, concentración 20
@@ -21,6 +22,17 @@ export const DEFAULT_CHANNEL_PRIORS = {
   'satellite-ntn': { alpha: 19.6, beta: 0.4 },// Media prior ~98%, concentración 20
   'cellular-sms': { alpha: 17, beta: 3 }     // Media prior ~85%, concentración 20
 };
+
+/**
+ * Priors a partir de un catálogo de canales { id: { p } } (p. ej. BEARERS), con peso `strength` observaciones
+ * (4 = el mismo que usa planAssuredDelivery). Sin esto, un canal desconocido hereda un prior genérico del 83 %
+ * con peso 12, que tapa la evidencia: 0 de 60 se mostraría como 14 %.
+ */
+export function priorsFromCatalog(catalog, strength = 4) {
+  const out = {};
+  for (const [id, c] of Object.entries(catalog)) if (c && c.p > 0 && c.p < 1) out[id] = { alpha: c.p * strength, beta: (1 - c.p) * strength };
+  return out;
+}
 
 /**
  * Crea y valida un recibo de entrega DeliveryReceipt v1.
@@ -36,6 +48,8 @@ export const DEFAULT_CHANNEL_PRIORS = {
  * @param {number} [params.fragments=1] Fragmentos totales transmitidos
  * @param {number} [params.k=1] Umbral de reconstrucción FEC
  * @param {string} [params.appVersion='v0.22.4'] Versión de software
+ * @param {string} [params.nonce] Identificador único del intento (por defecto aleatorio). Sin él, dos intentos
+ *   iguales en el mismo milisegundo tendrían el mismo hash y uno se descartaría como repetido.
  * @returns {object} Recibo formateado
  */
 export function createDeliveryReceipt({
@@ -47,7 +61,8 @@ export function createDeliveryReceipt({
   outcome,
   fragments = 1,
   k = 1,
-  appVersion = 'v0.22.4'
+  appVersion = 'v0.22.4',
+  nonce = [...globalThis.crypto.getRandomValues(new Uint8Array(8))].map((b) => b.toString(16).padStart(2, '0')).join('')
 }) {
   if (!bearerId || !zoneH3 || !sentAt || !outcome) {
     throw new Error('DeliveryReceipt v1 requiere bearerId, zoneH3, sentAt y outcome');
@@ -66,12 +81,16 @@ export function createDeliveryReceipt({
     fragments: Math.max(1, Number(fragments)),
     k: Math.max(1, Number(k)),
     appVersion,
+    nonce: String(nonce),
     recordedAt: Date.now()
   };
 
   // Huella criptográfica determinista SHA-256 del recibo
-  const canonicalStr = JSON.stringify(receipt, Object.keys(receipt).sort());
-  receipt.receiptHash = createHash('sha256').update(canonicalStr).digest('hex');
+  // recordedAt queda fuera: el hash identifica el intento, no el momento en que se anotó (reenviar el mismo
+  // recibo da el mismo hash y no se cuenta dos veces)
+  const { recordedAt: _r, ...identity } = receipt;
+  const canonicalStr = JSON.stringify(identity, Object.keys(identity).sort());
+  receipt.receiptHash = sha256Hex(canonicalStr);
 
   return receipt;
 }
@@ -87,12 +106,23 @@ export class ReliabilityStore {
    */
   constructor({
     channelPriors = DEFAULT_CHANNEL_PRIORS,
-    decayFactor = 1.0
+    decayFactor = 1.0,
+    nodeId = globalThis.crypto.randomUUID()
   } = {}) {
     this.channelPriors = { ...channelPriors };
     this.decayFactor = Math.min(1.0, Math.max(0.80, decayFactor));
-    // Mapa: `${bearerId}:${zoneH3}:${hazardState}` -> { successes, failures, total, lastUpdated }
+    this.nodeId = String(nodeId);
+    // Vista agregada: `${bearerId}:${zoneH3}:${hazardState}` -> { successes, failures, total, lastUpdated }
     this.observations = new Map();
+    // Libro por nodo: clave -> Map(nodeId -> { s, f, seq, lastUpdated }). Solo cada nodo escribe su registro.
+    this.ledger = new Map();
+    this.seenReceipts = new Set();
+  }
+
+  _recompute(key) {
+    let s = 0, f = 0, last = 0;
+    for (const e of this.ledger.get(key)?.values() ?? []) { s += e.s; f += e.f; last = Math.max(last, e.lastUpdated); }
+    this.observations.set(key, { successes: s, failures: f, total: s + f, lastUpdated: last });
   }
 
   _getKey(bearerId, zoneH3, hazardState = 'NORMAL') {
@@ -108,27 +138,19 @@ export class ReliabilityStore {
       throw new Error('Recibo inválido para ingesta en ReliabilityStore');
     }
 
+    if (receipt.receiptHash) {
+      if (this.seenReceipts.has(receipt.receiptHash)) return false; // el mismo recibo dos veces no es evidencia nueva
+      this.seenReceipts.add(receipt.receiptHash);
+    }
     const key = this._getKey(receipt.bearerId, receipt.zoneH3, receipt.hazardState || 'NORMAL');
-    let cell = this.observations.get(key);
-
-    if (!cell) {
-      cell = { successes: 0, failures: 0, total: 0, lastUpdated: Date.now() };
-      this.observations.set(key, cell);
-    }
-
-    // Aplicar factor de olvido si decayFactor < 1.0
-    if (this.decayFactor < 1.0) {
-      cell.successes *= this.decayFactor;
-      cell.failures *= this.decayFactor;
-    }
-
-    if (receipt.success) {
-      cell.successes += 1;
-    } else {
-      cell.failures += 1;
-    }
-    cell.total = cell.successes + cell.failures;
-    cell.lastUpdated = Date.now();
+    if (!this.ledger.has(key)) this.ledger.set(key, new Map());
+    const mine = this.ledger.get(key).get(this.nodeId) ?? { s: 0, f: 0, seq: 0, lastUpdated: 0 };
+    // Olvido exponencial: solo sobre la evidencia propia (cada nodo envejece la suya)
+    const d = this.decayFactor < 1.0 ? this.decayFactor : 1;
+    const next = { s: mine.s * d + (receipt.success ? 1 : 0), f: mine.f * d + (receipt.success ? 0 : 1), seq: mine.seq + 1, lastUpdated: Number(receipt.ackedAt || receipt.sentAt) };
+    this.ledger.get(key).set(this.nodeId, next);
+    this._recompute(key);
+    return true;
   }
 
   /**
@@ -255,23 +277,17 @@ export class ReliabilityStore {
   merge(otherStore) {
     const merged = new ReliabilityStore({
       channelPriors: this.channelPriors,
-      decayFactor: Math.min(this.decayFactor, otherStore.decayFactor)
+      decayFactor: Math.min(this.decayFactor, otherStore.decayFactor),
+      nodeId: this.nodeId
     });
-
-    const allKeys = new Set([...this.observations.keys(), ...otherStore.observations.keys()]);
-
-    for (const key of allKeys) {
-      const c1 = this.observations.get(key) || { successes: 0, failures: 0, total: 0, lastUpdated: 0 };
-      const c2 = otherStore.observations.get(key) || { successes: 0, failures: 0, total: 0, lastUpdated: 0 };
-
-      merged.observations.set(key, {
-        successes: c1.successes + c2.successes,
-        failures: c1.failures + c2.failures,
-        total: (c1.successes + c2.successes) + (c1.failures + c2.failures),
-        lastUpdated: Math.max(c1.lastUpdated, c2.lastUpdated)
-      });
+    const better = (a, b) => (!a ? b : !b ? a : b.seq > a.seq ? b : a.seq > b.seq ? a : (b.s + b.f > a.s + a.f ? b : a));
+    for (const key of new Set([...this.ledger.keys(), ...otherStore.ledger.keys()])) {
+      const A = this.ledger.get(key) ?? new Map(), B = otherStore.ledger.get(key) ?? new Map(), out = new Map();
+      for (const n of new Set([...A.keys(), ...B.keys()])) out.set(n, { ...better(A.get(n), B.get(n)) });
+      merged.ledger.set(key, out);
+      merged._recompute(key);
     }
-
+    merged.seenReceipts = new Set([...this.seenReceipts, ...otherStore.seenReceipts]);
     return merged;
   }
 
@@ -280,21 +296,23 @@ export class ReliabilityStore {
    */
   toJSON() {
     return {
-      schema: 'senda-reliability-store/v1',
+      schema: 'senda-reliability-store/v2',
+      nodeId: this.nodeId,
       decayFactor: this.decayFactor,
-      cells: Object.fromEntries(this.observations.entries())
+      cells: Object.fromEntries(this.observations.entries()),
+      ledger: Object.fromEntries([...this.ledger].map(([k, m]) => [k, Object.fromEntries(m)]))
     };
   }
 
   /**
-   * Reconstituye el almacén desde un JSON exportado.
+   * Reconstituye el almacén desde un JSON exportado (v2; un v1 sin libro se atribuye a un nodo «legado»).
    */
-  static fromJSON(jsonObj) {
-    const store = new ReliabilityStore({ decayFactor: jsonObj.decayFactor || 1.0 });
-    if (jsonObj.cells) {
-      for (const [key, cell] of Object.entries(jsonObj.cells)) {
-        store.observations.set(key, { ...cell });
-      }
+  static fromJSON(jsonObj, { channelPriors } = {}) {
+    const store = new ReliabilityStore({ decayFactor: jsonObj.decayFactor || 1.0, nodeId: jsonObj.nodeId, ...(channelPriors ? { channelPriors } : {}) });
+    if (jsonObj.ledger) {
+      for (const [key, nodes] of Object.entries(jsonObj.ledger)) { store.ledger.set(key, new Map(Object.entries(nodes).map(([n, e]) => [n, { ...e }]))); store._recompute(key); }
+    } else if (jsonObj.cells) {
+      for (const [key, c] of Object.entries(jsonObj.cells)) { store.ledger.set(key, new Map([[`legacy:${key}`, { s: c.successes, f: c.failures, seq: 1, lastUpdated: c.lastUpdated ?? 0 }]])); store._recompute(key); }
     }
     return store;
   }

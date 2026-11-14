@@ -2,9 +2,9 @@ name: SENDA Android (compilación)
 on:
   push:
     branches: [master]
-    paths: ['apps/senda-android/**', '.github/workflows/senda-android-ci.yml']
+    paths: ['apps/senda-android/**', 'investor-next/public/senda/**', '.github/workflows/senda-android-ci.yml']
   pull_request:
-    paths: ['apps/senda-android/**', '.github/workflows/senda-android-ci.yml']
+    paths: ['apps/senda-android/**', 'investor-next/public/senda/**', '.github/workflows/senda-android-ci.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -22,8 +22,9 @@ jobs:
       - name: Paridad de formatos con la web (baliza, barrido, enlace senda://)
         run: |
           mkdir -p "$RUNNER_TEMP/jvm"
-          javac --release 17 -d "$RUNNER_TEMP/jvm" apps/senda-android/app/src/main/java/eu/senda/field/SendaFormats.java apps/senda-android/app/src/main/java/eu/senda/field/NativeAction.java apps/senda-android/app/src/test/java/eu/senda/field/SendaFormatsTest.java
+          javac --release 17 -d "$RUNNER_TEMP/jvm" apps/senda-android/app/src/main/java/eu/senda/field/SendaFormats.java apps/senda-android/app/src/main/java/eu/senda/field/NativeAction.java apps/senda-android/app/src/main/java/eu/senda/field/OfflineAssets.java apps/senda-android/app/src/test/java/eu/senda/field/SendaFormatsTest.java apps/senda-android/app/src/test/java/eu/senda/field/OfflineAssetsTest.java
           java -cp "$RUNNER_TEMP/jvm" eu.senda.field.SendaFormatsTest
+          java -cp "$RUNNER_TEMP/jvm" eu.senda.field.OfflineAssetsTest
       - uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools'
@@ -36,6 +37,12 @@ jobs:
         working-directory: apps/senda-android
         run: gradle :app:assembleDebug --no-daemon --stacktrace
       - run: test -s apps/senda-android/app/build/outputs/apk/debug/app-debug.apk
+      - name: La app web va dentro del APK
+        run: |
+          L=$(unzip -l apps/senda-android/app/build/outputs/apk/debug/app-debug.apk)
+          for f in assets/senda/index.html assets/senda/centro.html assets/senda/mensaje.html assets/senda/avisos.html assets/senda/core/courier.mjs assets/senda/core/hazard-reports.mjs assets/senda/core/envelope.mjs assets/senda/atlas.html assets/senda/demo.html assets/senda/plataforma.html assets/senda/consola.html assets/senda/core/fusion.mjs assets/senda/vuelo.html assets/senda/mulas.html assets/senda/core/bus-mules.mjs assets/senda/data/mulas/conexiones.bin assets/senda/core/cross-source.mjs assets/senda/data/nepal2026/dem_60m.bin assets/senda/api/v1/catalog.json assets/senda/core/atlas.mjs assets/senda/data/referencias/goes_casos.json assets/geo/land-110m.json; do
+            echo "$L" | grep -qF "$f" || { echo "falta $f en el APK"; exit 1; }
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: senda-android-debug-apk

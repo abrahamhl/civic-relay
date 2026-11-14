@@ -1,0 +1,190 @@
+/**
+ * SENDA · pruebas de extremo a extremo de las pantallas «Mensaje sin red», «Avisos» y la cola de reportes
+ * ciudadanos del Centro, en Chromium real con varios «móviles» (contextos de navegador aislados).
+ *
+ * Qué se comprueba (nada simulado en la criptografía; la ubicación del navegador sí es fija):
+ *  - Mensaje: emparejar → número de seguridad igual en los dos → mensaje corto en 1 línea ≤ 160 caracteres →
+ *    abrir con autenticidad → repetido rechazado → alterado rechazado → mensaje largo con una línea perdida y
+ *    desordenado → por sonido (señal emitida por un móvil, decodificada en otro).
+ *  - Avisos: 3 móviles firman reportes de 160 caracteres → un 4.º importa con duplicado y falsificación →
+ *    agrupa en 1 incidente → paso por sonido.
+ *  - Centro: verifica, descarta repetidos y falsos, prioriza atrapados primero y exporta CAP restringido.
+ *  - Atlas: datos GOES reales, zona de 5 km, filtro por instante y GeoJSON con fuente. Demo guiada: corre el código real.
+ * Escribe evidence/senda/screens-e2e.json. Sale con código ≠ 0 si algo falla.
+ */
+import { createServer } from 'node:http';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { resolve, extname, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+const { chromium } = createRequire(import.meta.url)('playwright');
+
+const here = dirname(fileURLToPath(import.meta.url)), pub = resolve(here, '../public'), outDir = resolve(here, '../../evidence/senda');
+const MIME = { '.html': 'text/html', '.mjs': 'text/javascript', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json' };
+const server = createServer(async (req, res) => {
+  try { let p = resolve(pub, '.' + decodeURIComponent(new URL(req.url, 'http://x').pathname)); if (!p.startsWith(pub)) throw 0; if (!extname(p)) p = p.replace(/\/$/, '') + '.html'; const body = await readFile(p); res.writeHead(200, { 'content-type': MIME[extname(p)] ?? 'application/octet-stream' }); res.end(body); }
+  catch { res.writeHead(404); res.end(); }
+}).listen(0);
+const base = `http://127.0.0.1:${server.address().port}/senda`;
+const results = [], t0 = Date.now();
+const check = (name, ok, detail = {}) => { results.push({ name, ok: !!ok, ...detail }); console.log(`${ok ? "PASS" : "FAIL"} · ${name}`); if (!ok) console.log("  detalle:", JSON.stringify(detail).slice(0, 400)); if (!ok) process.exitCode = 1; };
+
+const browser = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
+const errors = [];
+async function phone(path, { lat = 39.4269, lon = -0.4174 } = {}) {
+  const ctx = await browser.newContext({ viewport: { width: 420, height: 900 }, geolocation: { latitude: lat, longitude: lon }, permissions: ['geolocation'] });
+  await ctx.addInitScript(() => { window.SENDA_TEST = window.SENDA_TEST || {}; });
+  const page = await ctx.newPage(); page.on('pageerror', (e) => errors.push(`${path}: ${e.message}`));
+  await page.goto(base + path); return page;
+}
+const lastEmission = (p) => p.evaluate(() => ({ s: Array.from(window.SENDA_TEST.lastEmission.samples), sr: window.SENDA_TEST.lastEmission.sampleRate }));
+const decodeOn = (p, em) => p.evaluate(async (em) => { const { decodeSamples } = await import('/senda/audio.mjs'); return Array.from(decodeSamples(Float32Array.from(em.s), em.sr)?.payload ?? []); }, em);
+
+try {
+  /* ───── Mensaje sin red ───── */
+  const yo = await phone('/mensaje'), her = await phone('/mensaje');
+  for (const p of [yo, her]) await p.waitForFunction(() => document.querySelector('#mycode').textContent.startsWith('SP1.'));
+  const cy = await yo.textContent('#mycode'), ch = await her.textContent('#mycode');
+  await yo.fill('#peer-name', 'Hermano'); await yo.fill('#peer-code', ch); await yo.click('#add');
+  await her.fill('#peer-name', 'Abraham'); await her.fill('#peer-code', cy); await her.click('#add');
+  await yo.waitForSelector('#pair-out .ok'); await her.waitForSelector('#pair-out .ok');
+  check('mensaje: el número de seguridad coincide en los dos móviles', (await yo.textContent('#contacts .big')) === (await her.textContent('#contacts .big')));
+  const open = async () => { await her.evaluate(() => { document.querySelector('#opened').innerHTML = ''; }); await her.click('#open'); await her.waitForFunction(() => document.querySelector('#opened').textContent.trim().length > 0); return her.textContent('#opened'); };
+  await yo.fill('#text', 'Estoy bien. Sin red en casa. Llamo cuando vuelva.'); await yo.click('#seal'); await yo.waitForSelector('#frames code');
+  const lines = await yo.$$eval('#frames code', (e) => e.map((x) => x.textContent));
+  check('mensaje: un mensaje corto cabe en una línea de ≤ 160 caracteres', lines.length === 1 && lines[0].length <= 160, { chars: lines[0].length });
+  await her.fill('#inbox', 'Recibido:\n' + lines[0]);
+  check('mensaje: se abre con autenticidad verificada', /autenticidad verificada[\s\S]*Estoy bien/.test(await open()));
+  check('mensaje: el repetido se detecta', /ya lo habías abierto/.test(await open()));
+  const l = lines[0], bad = l.slice(0, 40) + (l[40] === 'A' ? 'B' : 'A') + l.slice(41);
+  await her.fill('#inbox', bad); check('mensaje: el alterado no se muestra', !/Estoy bien/.test(await open()));
+  await yo.fill('#text', 'Largo: '.padEnd(380, 'x')); await yo.click('#seal'); await yo.waitForFunction(() => document.querySelectorAll('#frames code').length > 1);
+  const L2 = await yo.$$eval('#frames code', (e) => e.map((x) => x.textContent));
+  await her.fill('#inbox', L2.slice(1).reverse().join('\n'));
+  check('mensaje: el largo se rehace sin la primera línea y desordenado', /autenticidad verificada[\s\S]*Largo:/.test(await open()), { lines: L2.length });
+  await yo.fill('#text', 'Por sonido.'); await yo.click('#seal'); await yo.waitForSelector('#snd'); await yo.click('#snd');
+  await yo.waitForFunction(() => /Emitido|No se pudo/.test(document.querySelector('#snd').textContent), null, { timeout: 90_000 });
+  const bytesM = await decodeOn(her, await lastEmission(yo));
+  await her.fill('#inbox', ''); await her.evaluate((b) => window.SENDA_MENSAJE.addBytes(Uint8Array.from(b)), bytesM);
+  check('mensaje: pasa por sonido de un móvil a otro y se abre', /autenticidad verificada[\s\S]*Por sonido/.test(await open()));
+
+  /* ───── Avisos ───── */
+  const rep = [];
+  for (const [lat, k] of [[39.4269, 'STREET_FLOODED'], [39.4271, 'STREET_FLOODED'], [39.4402, 'PERSON_TRAPPED']]) {
+    const p = await phone('/avisos', { lat }); await p.click('#geo'); await p.waitForFunction(() => /39\./.test(document.querySelector('#pos').textContent));
+    await p.click(`#kinds button[data-k="${k}"]`); if (k === 'PERSON_TRAPPED') await p.fill('#trapped', '2');
+    await p.click('#send'); await p.waitForSelector('#sent code'); rep.push(await p.textContent('#sent code'));
+  }
+  check('avisos: cada reporte firmado ocupa exactamente 160 caracteres', rep.every((x) => x.length === 160));
+  const me = await phone('/avisos');
+  await me.fill('#paste', 'Grupo:\n' + rep.slice(0, 2).join('\n') + '\n' + rep[0] + '\nSND3 ' + rep[1].slice(5, 20) + 'AAAA' + rep[1].slice(24));
+  await me.click('#import'); await me.waitForFunction(() => document.querySelector('#imp').textContent.length > 0);
+  const imp = await me.textContent('#imp');
+  check('avisos: 2 nuevos, 1 repetido y 1 falsificado rechazado', /2 nuevo/.test(imp) && /1 repetido/.test(imp) && /1 rechazado/.test(imp), { imp });
+  check('avisos: dos vecinos de la misma calle forman un solo incidente', /2 reportes → 1 incidente/.test(await me.textContent('#qsum')));
+  await me.waitForFunction(() => /GloFAS hoy|sin red y sin foto/.test(document.querySelector('.glofas')?.textContent ?? ''), null, { timeout: 20_000 });
+  const gl = await me.textContent('.glofas');
+  check('avisos: un incidente de agua muestra el caudal previsto por GloFAS (en directo o de la foto guardada) sin presentarlo como aviso', /GloFAS hoy [\d.]+ m³\/s/.test(gl) && /No es un aviso oficial/.test(gl), { gl: gl.slice(0, 200) });
+  const sender = await phone('/avisos', { lat: 39.4270 }); await sender.click('#geo'); await sender.waitForFunction(() => /39\./.test(document.querySelector('#pos').textContent));
+  await sender.click('#kinds button[data-k="RIVER_RISING"]'); await sender.click('#send'); await sender.waitForSelector('#snd'); await sender.click('#snd');
+  await sender.waitForFunction(() => /Emitido|No se pudo/.test(document.querySelector('#snd').textContent), null, { timeout: 60_000 });
+  const bytesA = await decodeOn(me, await lastEmission(sender));
+  await me.evaluate((b) => window.SENDA_AVISOS.ingestBytes(Uint8Array.from(b)), bytesA);
+  check('avisos: un reporte pasa por sonido y entra verificado', /1 nuevo/.test(await me.textContent('#imp')));
+
+  /* ───── Centro ───── */
+  const cctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, acceptDownloads: true }), c = await cctx.newPage();
+  c.on('pageerror', (e) => errors.push(`centro: ${e.message}`));
+  await c.goto(base + '/centro'); await c.waitForSelector('#boot.done', { timeout: 90_000 });
+  await c.fill('#cit-in', rep.join('\n') + '\n' + rep[0] + '\nSND3 ' + 'A'.repeat(155)); await c.click('#cit-go');
+  await c.waitForFunction(() => window.SENDA_CENTRO.lastCitizen);
+  const cit = await c.evaluate(() => window.SENDA_CENTRO.lastCitizen);
+  check('centro: 4 líneas válidas, 1 rechazada, 2 incidentes y atrapados primero', cit.valid === 4 && cit.rejected === 1 && cit.incidents === 2 && cit.top === 'STRUCTURE', cit);
+  await c.click('#br-go'); const br = await c.evaluate(() => window.SENDA_CENTRO.lastBridge);
+  check('centro: el consenso amplio confirma lo que apoyan ambos grupos y no lo que empuja uno solo (aunque gane la mayoría)', br.inundacion.bridging === 'CONFIRMADO_CONSENSO_AMPLIO' && br.bulo.majority === 'MAYORIA_SI' && br.bulo.bridging !== 'CONFIRMADO_CONSENSO_AMPLIO', br);
+  const [dl] = await Promise.all([c.waitForEvent('download'), c.click('#cit-out button[data-cap]')]);
+  const cap = await readFile(await dl.path(), 'utf8');
+  check('centro: el parte CAP 1.2 es restringido y de ejercicio', /<scope>Restricted<\/scope>/.test(cap) && /<status>Exercise<\/status>/.test(cap) && !/<scope>Public/.test(cap));
+
+  /* ───── Atlas y demo guiada ───── */
+  const actx = await browser.newContext({ viewport: { width: 1280, height: 900 }, acceptDownloads: true }), a = await actx.newPage();
+  a.on('pageerror', (e) => errors.push(`atlas: ${e.message}`));
+  await a.goto(base + '/atlas'); await a.waitForSelector('body[data-ready]');
+  const all = await a.evaluate(() => window.SENDA_ATLAS.last);
+  await a.evaluate(() => window.SENDA_ATLAS.setArea({ type: 'circle', center: { lat: 39.7596, lon: -121.6219 }, radiusM: 5000 }));
+  const zone = await a.evaluate(() => window.SENDA_ATLAS.last);
+  check('atlas: Camp Fire con detecciones GOES reales y zona de 5 km alrededor de Paradise', all.total > 1000 && zone.inside > 0 && zone.inside < all.total && zone.first > Date.parse('2018-11-08T14:57:18Z'), { total: all.total, inside: zone.inside, first: new Date(zone.first).toISOString() });
+  const { t0 } = await a.evaluate(() => window.SENDA_ATLAS.range()); await a.evaluate((t) => window.SENDA_ATLAS.setTime(t), t0);
+  check('atlas: la línea de tiempo filtra por instante', (await a.evaluate(() => window.SENDA_ATLAS.last)).inside === 0);
+  await a.evaluate((t) => window.SENDA_ATLAS.setTime(t), Date.parse('2018-11-08T23:47:18Z'));
+  const [gdl] = await Promise.all([a.waitForEvent('download'), a.click('#gj')]);
+  const gj = JSON.parse(await readFile(await gdl.path(), 'utf8'));
+  check('atlas: el GeoJSON exportado lleva fuente y base en cada punto', gj.features.length > 1 && gj.features.filter((f) => f.geometry.type === 'Point' && !f.properties.role).every((f) => f.properties.source && f.properties.basis), { features: gj.features.length });
+  await a.evaluate(() => window.SENDA_ATLAS.setCase('world'));
+  const w = await a.evaluate(() => window.SENDA_ATLAS.last);
+  check('atlas: capa mundial con alertas reales de GDACS (descarga oficial con SHA-256 por página)', w.case === 'world' && w.total > 100, { total: w.total });
+  await a.evaluate(() => window.SENDA_ATLAS.setCase('spain'));
+  const es = await a.evaluate(() => window.SENDA_ATLAS.last);
+  check('atlas: capa España con incidencias reales de la DGT leídas por el lector DATEX II del núcleo', es.case === 'spain' && es.total > 50, { total: es.total });
+  await a.evaluate(() => window.SENDA_ATLAS.setArea({ type: 'circle', center: { lat: 40.4168, lon: -3.7038 }, radiusM: 60000 }));
+  const brief = await a.evaluate(() => window.SENDA_BRIEF), roadsN = await a.evaluate(() => window.SENDA_ATLAS.roads);
+  check('atlas: parte del día calculado por capa (sin texto inventado) y carreteras con incidencias en una zona de Madrid', brief.length >= 3 && brief.every((b) => b.total > 0 && b.nuevos <= b.total) && roadsN > 0, { capas: brief.map((b) => [b.nombre, b.total, b.nuevos]), roadsN });
+  await a.evaluate(() => window.SENDA_ATLAS.setCase('nl'));
+  const nlv = await a.evaluate(() => window.SENDA_ATLAS.last);
+  check('atlas: capa Países Bajos con situaciones reales de NDW leídas por el mismo lector DATEX II', nlv.case === 'nl' && nlv.total > 50, { total: nlv.total });
+  // Medir: tres clics en el mapa dan una distancia > 0
+  await a.click('#mMeasure'); const mb = await a.locator('#map').boundingBox();
+  for (const [fx, fy] of [[0.3, 0.5], [0.5, 0.5], [0.5, 0.7]]) await a.mouse.click(mb.x + mb.width * fx, mb.y + mb.height * fy);
+  const mm = await a.evaluate(() => window.SENDA_ATLAS.measureM); await a.click('#mMeasure');
+  // Vigilar zona: se guarda y al recargar se calculan sus novedades
+  await a.evaluate(() => window.SENDA_ATLAS.setArea({ type: 'circle', center: { lat: 52.37, lon: 4.9 }, radiusM: 30000 }));
+  a.once('dialog', (dl) => dl.accept('prueba')); await a.click('#watch');
+  await a.reload(); await a.waitForSelector('body[data-ready]');
+  const wz = await a.evaluate(() => window.SENDA_ATLAS.watch);
+  check('atlas: medir distancias en el mapa y vigilar una zona (se guarda y al volver cuenta las novedades)', mm > 0 && Array.isArray(wz) && wz.length === 1 && wz[0].n === 0, { mm, wz });
+  const [zdl] = await Promise.all([a.waitForEvent('download'), a.click('button[data-capz="0"]')]);
+  const zcap = await readFile(await zdl.path(), 'utf8');
+  check('atlas: la zona vigilada exporta un parte CAP 1.2 restringido y de ejercicio con su área', /<scope>Restricted<\/scope>/.test(zcap) && /<status>Exercise<\/status>/.test(zcap) && /<circle>52\.37000,4\.90000 30\.00<\/circle>/.test(zcap));
+  const emb = await actx.newPage(); await emb.goto(base + '/atlas?embed=1#caso=spain'); await emb.waitForSelector('body[data-ready]');
+  check('atlas: modo embebible para webs municipales (solo mapa, enlace a la versión completa)', await emb.evaluate(() => document.body.classList.contains('embed') && getComputedStyle(document.querySelector('aside')).display === 'none' && /atlas#caso=spain/.test(document.querySelector('#openFull').href)));
+  await emb.close();
+  await a.evaluate(() => window.SENDA_ATLAS.setCase('dana'));
+  const dn = await a.evaluate(() => window.SENDA_ATLAS.last);
+  check('atlas: DANA de Valencia con zonas inundadas reales de Copernicus EMS EMSR773 (mapeo oficial, área calculada)', dn.case === 'dana' && dn.total >= 5 && /EMSR773/.test(await a.textContent('#src')), { total: dn.total });
+  await a.evaluate(() => window.SENDA_ATLAS.setCase('gnss'));
+  const gn = await a.evaluate(() => window.SENDA_ATLAS.last);
+  check('atlas: capa de integridad GNSS con celdas calculadas a partir de ADS-B real (adsb.lol, ODbL)', gn.case === 'gnss' && gn.total > 10, { total: gn.total });
+  const pl = await actx.newPage(); pl.on('pageerror', (e) => errors.push(`plataforma: ${e.message}`)); await pl.goto(base + '/plataforma'); await pl.waitForSelector('body[data-ready]');
+  const plat = await pl.evaluate(() => window.SENDA_PLATAFORMA);
+  check('plataforma: catálogo de la API con fuente, licencia y SHA-256 en cada capa, estado de los datos y mapa embebible', plat.capas >= 4 && plat.licencias && (await pl.$$('#health tr')).length === plat.capas + 1 && /"basis"/.test(await pl.textContent('#sample')), plat);
+  await pl.close();
+  const co = await actx.newPage(); co.on('pageerror', (e) => errors.push(`consola: ${e.message}`)); await co.goto(base + '/consola'); await co.waitForSelector('body[data-ready]', { timeout: 60_000 });
+  const cons = await co.evaluate(async () => { const C = window.SENDA_CONSOLA, seen = []; for (const m of C.modes) { C.setMode(m); seen.push(C.mode); } C.select(0); return { s: C.situations, e: C.elements, seen, sel: C.selected ?? null, steps: C.tourPlan(), conc: window.SENDA_CONCORDANCIA, emsc: window.SENDA_CONCORDANCIA_EMSC }; });
+  check('consola: situaciones fusionadas entre fuentes, cinco representaciones del planeta y recorrido preparado', cons.s > 5 && cons.e > 1000 && cons.conc?.independence === 'DEPENDENT' && cons.emsc?.independence === 'PER_EVENT' && cons.emsc.independent > 100 && cons.seen.length === 5 && !!cons.sel && cons.steps >= 3 && /REAL|SIMULACI/.test(await co.textContent('#p-sit')), cons);
+  const live = await co.evaluate(() => { const n = window.SENDA_CONSOLA.situations; for (let k = 0; k < n; k++) { window.SENDA_CONSOLA.select(k, { fly: false }); const im = document.querySelector('#p-sit img.live'); if (im) return im.dataset.src; } return null; });
+  check('consola: una incidencia de la DGT muestra la cámara real más cercana con imagen en directo (como contexto, no como corroboración)', /^https:\/\/etraffic\.dgt\.es\//.test(live ?? '') && /Contexto/.test(await co.textContent('#p-sit')), { live });
+  const per = await co.evaluate(() => { const n = window.SENDA_CONSOLA.situations; for (let k = 0; k < n; k++) { window.SENDA_CONSOLA.select(k, { fly: false }); const p = window.SENDA_CONSOLA.lastPerimeter; if (p?.medido) return { ...p, txt: document.querySelector('#p-sit').textContent }; } return null; });
+  check('consola: cordón de cámaras medido (DGT + YOLOX) por sectores alrededor de un accidente real, sin decir «confirmado»', !!per && per.live + per.blind <= 8 && /^Comprobable visualmente/.test(per.statements[0]) && /Cordón de cámaras/.test(per.txt) && per.statements.every((t) => !/confirmad/i.test(t)), per && { live: per.live, blind: per.blind, verdict: per.verdict, statements: per.statements });
+  await co.click('.tabs button[data-t="com"]'); await co.waitForTimeout(600);
+  check('consola (web estática): la pestaña Comunidad dice con claridad que SENDA LIVE no está conectado y no inventa publicaciones', /no está conectado/.test(await co.textContent('#p-com')) && /No se muestran publicaciones de ejemplo/.test(await co.textContent('#p-com')));
+  await co.close();
+  const mu = await actx.newPage(); mu.on('pageerror', (e) => errors.push(`mulas: ${e.message}`)); await mu.goto(base + '/mulas'); await mu.waitForSelector('body[data-ready]', { timeout: 60_000 });
+  const m50 = await mu.evaluate(() => window.SENDA_MULAS); await mu.evaluate(() => { const q = document.querySelector('#q'); q.value = 100; q.dispatchEvent(new Event('input')); }); const m100 = await mu.evaluate(() => window.SENDA_MULAS);
+  check('mulas de datos: CSA en el navegador sobre horarios reales de la EMT; más flota con nodo nunca empeora; marcado como simulación', m50.of > 1000 && m100.reached >= m50.reached && m100.p50 <= m50.p50 && /SIMULACIÓN/.test(await mu.textContent('body')), { m50, m100 });
+  await mu.close();
+  const vu = await actx.newPage(); vu.on('pageerror', (e) => errors.push(`vuelo: ${e.message}`)); await vu.goto(base + '/vuelo'); await vu.waitForSelector('body[data-ready]', { timeout: 60_000 });
+  const vuelo = await vu.evaluate(() => window.SENDA_VUELO);
+  check('sobrevuelo: relieve Copernicus DEM, Sentinel-2 antes/después, señal sísmica real de USGS y ruta calculada sobre el cambio', vuelo.quake === 'us7000tbwb' && vuelo.points > 20 && vuelo.km > 20 && vuelo.demMax > 5000 && /no un mapa oficial/.test(await vu.textContent('#note')), vuelo);
+  await vu.close();
+  const d = await (await actx.newPage()); d.on('pageerror', (e) => errors.push(`demo: ${e.message}`));
+  await d.goto(base + '/demo'); await d.click('#run'); await d.waitForFunction(() => window.SENDA_DEMO?.done || window.SENDA_DEMO?.error, null, { timeout: 30_000 });
+  const demo = await d.evaluate(() => window.SENDA_DEMO);
+  check('demo: cifra en ≤ 160 caracteres, abre, rechaza alterado y repetido, verifica reporte y calcula el atlas', demo.done && demo.chars <= 160 && demo.opened && demo.tamperRejected && demo.replayRejected && demo.reportChars === 160 && demo.reportVerified && demo.atlas.insideParadise5km > 0, demo);
+} catch (e) { check(`ejecución sin excepciones (${e.message})`, false); }
+
+check('sin errores de JavaScript en las páginas', errors.length === 0, { errors });
+await browser.close(); server.close();
+await mkdir(outDir, { recursive: true });
+const passed = results.filter((r) => r.ok).length;
+await writeFile(resolve(outDir, 'screens-e2e.json'), JSON.stringify({ kind: 'senda-screens-e2e', at: new Date().toISOString(), durationS: Math.round((Date.now() - t0) / 1000), passed, total: results.length, results, note: 'Ubicación del navegador fija; sonido verificado decodificando la señal generada (no por altavoz y micrófono reales).' }, null, 1));
+console.log(`${passed}/${results.length} comprobaciones`);

@@ -1,0 +1,810 @@
+{
+ "codigo": "EMSR773",
+ "nombre": "Flood in Valencia Region, Spain",
+ "motivo": "On 29 October 2024 at 14:30 UTC, an extraordinary rainfall event affected the Valencia region. High water levels in rivers caused flooding in Ribera Alta, Horta, La Plana de Utiel and Letur river. On 31 October 2024, extraordinary precipitation caused flooding in the Castellon Province area. Copernicus EMS Rapid Mapping is requested to provide emergency mapping of flood extent, Monitoring and classification damages emergency mapping.",
+ "horaEvento": "2024-10-29T14:30:00",
+ "horaActivacion": "2024-10-29T16:40:00",
+ "gdacs": "FL1102983",
+ "centroide": "POINT (-0.4359 39.28916)",
+ "estadisticasOficiales": {
+  "Roads [km]": 1125.2,
+  "max_extent": 22638.6,
+  "Built-up  [No]": 7207,
+  "Built-up  [ha]": 221.9,
+  "Population [No.]": 81080,
+  "Event Extent [ha]": 9838.1
+ },
+ "zonas": [
+  {
+   "numero": 1,
+   "nombre": "Valencia province",
+   "productos": [
+    {
+     "tipo": "DEL",
+     "monitorizacion": 4,
+     "imagenes": [
+      {
+       "sensor": "COSMO-SkyMed Second Generation",
+       "hora": "2024-11-08T05:51:00"
+      }
+     ]
+    },
+    {
+     "tipo": "DEL",
+     "monitorizacion": 2,
+     "imagenes": [
+      {
+       "sensor": "Sentinel-2",
+       "hora": "2024-11-05T10:52:00"
+      }
+     ]
+    },
+    {
+     "tipo": "DEL",
+     "monitorizacion": 3,
+     "imagenes": [
+      {
+       "sensor": "Sentinel-1",
+       "hora": "2024-11-06T06:00:00"
+      }
+     ]
+    },
+    {
+     "tipo": "DEL",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Sentinel-2",
+       "hora": "2024-10-31T10:51:00"
+      },
+      {
+       "sensor": "Landsat-8",
+       "hora": "2024-10-30T10:37:00"
+      },
+      {
+       "sensor": "Sentinel-1",
+       "hora": "2024-10-31T18:02:00"
+      }
+     ]
+    },
+    {
+     "tipo": "DEL",
+     "monitorizacion": 1,
+     "imagenes": [
+      {
+       "sensor": "ICEYE",
+       "hora": "2024-11-03T01:51:00"
+      }
+     ]
+    }
+   ],
+   "inundacionObservada_km2": 66.99,
+   "producto": "EMSR773_AOI01_DEL_MONIT04_observedEventA_v1_VT",
+   "imagen": "2024-11-08T05:51:00"
+  },
+  {
+   "numero": 2,
+   "nombre": "Plana de Utiel",
+   "productos": [
+    {
+     "tipo": "DEL",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "GeoEye-1",
+       "hora": "2024-10-31T10:22:00"
+      },
+      {
+       "sensor": "GeoEye-1",
+       "hora": "2024-10-31T10:22:00"
+      }
+     ]
+    }
+   ],
+   "inundacionObservada_km2": 1.73,
+   "producto": "EMSR773_AOI02_DEL_PRODUCT_observedEventA_v1_VT",
+   "imagen": "2024-10-31T10:22:00"
+  },
+  {
+   "numero": 3,
+   "nombre": "Horta Sud",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "GeoEye-1",
+       "hora": "2024-10-31T10:22:00"
+      }
+     ]
+    },
+    {
+     "tipo": "DEL",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "WorldView-2",
+       "hora": "2024-10-31T10:22:00"
+      },
+      {
+       "sensor": "GeoEye-1",
+       "hora": "2024-10-31T10:22:00"
+      }
+     ]
+    }
+   ],
+   "inundacionObservada_km2": 24.07,
+   "producto": "EMSR773_AOI03_DEL_PRODUCT_observedEventA_v1_VT",
+   "imagen": "2024-10-31T10:22:00"
+  },
+  {
+   "numero": 4,
+   "nombre": "Algemesi",
+   "productos": [
+    {
+     "tipo": "DEL",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "GeoEye-1",
+       "hora": "2024-10-31T10:22:00"
+      }
+     ]
+    }
+   ],
+   "inundacionObservada_km2": 11.72,
+   "producto": "EMSR773_AOI04_DEL_PRODUCT_observedEventA_v1_VT",
+   "imagen": "2024-10-31T10:22:00"
+  },
+  {
+   "numero": 5,
+   "nombre": "Letur",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-06T11:09:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 6,
+   "nombre": "Castellon province",
+   "productos": [
+    {
+     "tipo": "DEL",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "TerraSAR-X",
+       "hora": "2024-11-02T06:13:00"
+      }
+     ]
+    },
+    {
+     "tipo": "DEL",
+     "monitorizacion": 1,
+     "imagenes": [
+      {
+       "sensor": "SPOT-6-7",
+       "hora": "2024-11-08T10:28:00"
+      }
+     ]
+    }
+   ],
+   "inundacionObservada_km2": 1.53,
+   "producto": "EMSR773_AOI06_DEL_MONIT01_observedEventA_v1_VT",
+   "imagen": "2024-11-08T10:28:00"
+  },
+  {
+   "numero": 7,
+   "nombre": "Fuenterrobles",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "GeoEye-1",
+       "hora": "2024-10-31T10:28:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 8,
+   "nombre": "Caudete de las Fuentes",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "WorldView-2",
+       "hora": "2024-11-02T10:50:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 9,
+   "nombre": "Chera",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-10-31T10:22:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 10,
+   "nombre": "Cheste",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-10T10:39:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 11,
+   "nombre": "Yatova",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-10T10:39:00"
+      }
+     ]
+    },
+    {
+     "tipo": "DEL",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-11T10:00:00"
+      }
+     ]
+    }
+   ],
+   "inundacionObservada_km2": 0.01,
+   "producto": "EMSR773_AOI11_DEL_PRODUCT_observedEventA_v1_VT",
+   "imagen": "2024-11-11T10:00:00"
+  },
+  {
+   "numero": 12,
+   "nombre": "Godelleta",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-10T10:39:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 13,
+   "nombre": "Monserrat",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-10T10:39:00"
+      },
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-11T13:00:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 14,
+   "nombre": "Alcudia",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-11T11:20:00"
+      },
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-10T10:39:00"
+      }
+     ]
+    },
+    {
+     "tipo": "GRA",
+     "monitorizacion": 1,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-11T13:00:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 15,
+   "nombre": "Alhaurin de la Torre",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "GeoEye-1",
+       "hora": "2024-11-15T11:13:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 16,
+   "nombre": "Benicull de Xuquer",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-11T13:00:00"
+      },
+      {
+       "sensor": "WorldView-3",
+       "hora": "2024-11-15T11:01:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 17,
+   "nombre": "Alzira",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-11T13:00:00"
+      },
+      {
+       "sensor": "GeoEye-1",
+       "hora": "2024-10-31T10:22:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 18,
+   "nombre": "Alginet",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "GeoEye-1",
+       "hora": "2024-10-31T10:22:00"
+      },
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-11T13:00:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 19,
+   "nombre": "Llombai",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "GeoEye-1",
+       "hora": "2024-10-31T10:22:00"
+      },
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-11T10:00:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 20,
+   "nombre": "Montroi",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-11T10:00:00"
+      },
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-09T10:47:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 21,
+   "nombre": "Turis",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-15T11:20:00"
+      },
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-11T13:00:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 22,
+   "nombre": "Bunol",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-11T13:00:00"
+      },
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-11T11:20:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 23,
+   "nombre": "Favara",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-11T13:00:00"
+      },
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-11T11:20:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 24,
+   "nombre": "Cullera",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-11T11:20:00"
+      },
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-11T13:00:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 25,
+   "nombre": "Sueca",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-11T13:00:00"
+      },
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-11T11:20:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 26,
+   "nombre": "Siete Aguas",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-18T12:16:00"
+      },
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-10T10:39:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 27,
+   "nombre": "Requena",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-18T12:16:00"
+      },
+      {
+       "sensor": "GeoEye-1",
+       "hora": "2024-10-31T10:22:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 28,
+   "nombre": "Pedralba",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-18T12:16:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 29,
+   "nombre": "El Mas del Moro",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-18T12:16:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 30,
+   "nombre": "Valencia Sud",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-17T13:21:00"
+      },
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-11T11:12:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 31,
+   "nombre": "Cases Del Riu",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-11T13:00:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 32,
+   "nombre": "Campo Arcis",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-10T10:39:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 33,
+   "nombre": "Sot de Chera",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-11T11:20:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 34,
+   "nombre": "Camporrobles",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Pleiades",
+       "hora": "2024-11-11T11:20:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 35,
+   "nombre": "Alcasser",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-17T13:21:00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "numero": 36,
+   "nombre": "Paterna",
+   "productos": [
+    {
+     "tipo": "GRA",
+     "monitorizacion": 0,
+     "imagenes": [
+      {
+       "sensor": "Plane Imagery",
+       "hora": "2024-11-18T12:16:00"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "informe": "https://storymaps.arcgis.com/stories/9ff57e9320dd440eb2ce8d20e62c92cd",
+ "fuente": "Copernicus Emergency Management Service (CEMS) Rapid Mapping, activación EMSR773",
+ "licencia": "CEMS On-Demand Mapping: acceso libre (reproducción, distribución, adaptación) citando la fuente · https://mapping.emergency.copernicus.eu/terms-and-conditions/",
+ "cita": "Contains modified Copernicus Emergency Management Service information 2024",
+ "descargadoUTC": "2026-11-14T13:05:51.129558+00:00",
+ "procesado": {
+  "simplificacion_grados": 0.0002,
+  "areas": "calculadas por SENDA en EPSG:3035 sobre la geometría ORIGINAL (antes de simplificar)",
+  "capas": "observedEventA de la última versión de cada producto DEL"
+ },
+ "procedencia": [
+  {
+   "url": "https://rapidmapping.emergency.copernicus.eu/backend/dashboard-api/public-activations/?code=EMSR773",
+   "sha256": "5041c86b0fe6fec6e14dfd279eaad055292686bfba10402447aceb23a6f9c730"
+  },
+  {
+   "url": "https://rapidmapping-viewer.s3.eu-west-1.amazonaws.com/EMSR773/AOI01/DEL_MONIT04/EMSR773_AOI01_DEL_MONIT04_observedEventA_v1.json",
+   "sha256": "3a5af8a44ff353a1c7b0a8438100eb438c0ada1216ad6bfda445e90b28ae9797"
+  },
+  {
+   "url": "https://rapidmapping-viewer.s3.eu-west-1.amazonaws.com/EMSR773/AOI02/DEL_PRODUCT/EMSR773_AOI02_DEL_PRODUCT_observedEventA_v1.json",
+   "sha256": "3ba6e105067938b17391d9c976070d57965d2f2221e2ae4416eb575bc796cd75"
+  },
+  {
+   "url": "https://rapidmapping-viewer.s3.eu-west-1.amazonaws.com/EMSR773/AOI03/DEL_PRODUCT/EMSR773_AOI03_DEL_PRODUCT_observedEventA_v1.json",
+   "sha256": "7d2cea68cfe0b6e420f33e7ca1ba6ce4fd6a417fa14d14629edc9b2e374184c1"
+  },
+  {
+   "url": "https://rapidmapping-viewer.s3.eu-west-1.amazonaws.com/EMSR773/AOI04/DEL_PRODUCT/EMSR773_AOI04_DEL_PRODUCT_observedEventA_v1.json",
+   "sha256": "2cb26e55f57a7d4209bfa4b6dda3174e4034564c16907d344da05b07c658c61e"
+  },
+  {
+   "url": "https://rapidmapping-viewer.s3.eu-west-1.amazonaws.com/EMSR773/AOI06/DEL_MONIT01/EMSR773_AOI06_DEL_MONIT01_observedEventA_v1.json",
+   "sha256": "110dc666ffd9c7af5bc0a60724e6518ab74e2efe4c778bab2446ebe7061c0842"
+  },
+  {
+   "url": "https://rapidmapping-viewer.s3.eu-west-1.amazonaws.com/EMSR773/AOI11/DEL_PRODUCT/EMSR773_AOI11_DEL_PRODUCT_observedEventA_v1.json",
+   "sha256": "f43212125988d202c3c50c28b80073b9838b87e6909319580741812c18d19e27"
+  }
+ ],
+ "sumaInundacionObservada_km2": 106.05
+}

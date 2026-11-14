@@ -176,6 +176,8 @@ const headerBytes = (h) => enc.encode(JSON.stringify([h.v, h.id, h.to, h.priorit
  * plaintext firmado; el receptor puede ligarla a la tarjeta de contacto (F-02).
  */
 export async function sealMessage({ sender, recipient, body, priority, ttlS, now, kind = 'PERSONAL', innerVersion = 3 }) {
+  // validar aquí: un sobre con prioridad no válida se crearía bien pero nadie podría abrirlo después
+  if (!Number.isSafeInteger(priority) || priority < 0 || priority > MAX_PRIORITY) throw new RangeError(`prioridad no válida: ${priority}`);
   if (!KINDS.includes(kind)) throw new Error(`Tipo desconocido: ${kind}`);
   if (innerVersion !== 2 && innerVersion !== 3) throw new Error('VERSIÓN_INTERNA_INVÁLIDA');
   const ackSecret = rand(16), idBytes = rand(16);

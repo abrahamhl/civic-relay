@@ -13,7 +13,7 @@ import {
 const FIXTURE_PATH = resolve(import.meta.dirname, 'fixtures/cems-activations-sample-2026.json');
 const rawFixture = JSON.parse(readFileSync(FIXTURE_PATH, 'utf8'));
 
-test('parseCemsActivation: parsea activación EMSR765 DANA Valencia con agregación y linaje', () => {
+test('parseCemsActivation: fixture SINTÉTICO con formato CEMS (EMSR765 es ficticio; la DANA real es EMSR773) con agregación y linaje', () => {
   const activ = parseCemsActivation(rawFixture.activations[0]);
 
   assert.equal(activ.activationCode, 'EMSR765');

@@ -126,6 +126,30 @@ export const EventHubModal: React.FC<Props> = ({ eventId, isOpen, onClose, user 
               </div>
             </div>
 
+            {/* Cámaras públicas aportadas: CONTEXTO, no fuente independiente */}
+            {Array.isArray(eventData.evidence) && eventData.evidence.some((e: any) => e.metadata?.type === 'CAMERA_SIGNAL') && (
+              <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '0.875rem', marginBottom: '1.25rem' }} data-testid="camera-evidence">
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                  Cámaras públicas aportadas · contexto
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '0.5rem' }}>
+                  {eventData.evidence.filter((e: any) => e.metadata?.type === 'CAMERA_SIGNAL').map((e: any) => (
+                    <figure key={e.id} style={{ margin: 0, fontSize: '0.75rem' }}>
+                      <img src={e.original_url} alt={`Cámara ${e.metadata.provider} ${e.metadata.road ?? ''}`} loading="lazy" referrerPolicy="no-referrer"
+                        style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', borderRadius: 4, border: '1px solid var(--border)' }} />
+                      <figcaption style={{ color: 'var(--text-muted)', marginTop: 2 }}>
+                        <strong>{e.metadata.sector ?? '—'}</strong> · {e.metadata.road ?? ''} · {e.metadata.dKm ?? '?'} km<br />
+                        {e.metadata.reading?.note ?? ''}
+                      </figcaption>
+                    </figure>
+                  ))}
+                </div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                  Imagen actual servida por {eventData.evidence.find((e: any) => e.metadata?.type === 'CAMERA_SIGNAL')?.metadata?.provider} ({eventData.evidence.find((e: any) => e.metadata?.type === 'CAMERA_SIGNAL')?.metadata?.licence}); la lectura se midió al aportarla. Las cámaras no cuentan como fuente independiente ni cambian el estado de verificación. Cada aportación queda encadenada por hash.
+                </div>
+              </div>
+            )}
+
             {/* Actualizaciones y Correcciones */}
             {eventData.updates && eventData.updates.length > 0 && (
               <div style={{ marginBottom: '1.25rem' }}>

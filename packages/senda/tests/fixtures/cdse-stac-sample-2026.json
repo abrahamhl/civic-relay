@@ -1,4 +1,6 @@
 {
+  "basis": "SYNTHETIC_FIXTURE_NOT_REAL",
+  "avisoVeracidad": "Escrito a mano por un agente el 10-11-2026 imitando una respuesta STAC de Copernicus Data Space. NO es una descarga real: los identificadores de escena no están verificados. Solo sirve para probar el analizador.",
   "type": "FeatureCollection",
   "stac_version": "1.0.0",
   "stac_extensions": [
@@ -16,16 +18,36 @@
       "stac_version": "1.0.0",
       "id": "S2A_MSIL2A_20261030T105151_N0511_R051_T30SYJ_20261030T144022",
       "collection": "SENTINEL-2",
-      "bbox": [-0.6214, 39.2312, 0.1245, 39.8142],
+      "bbox": [
+        -0.6214,
+        39.2312,
+        0.1245,
+        39.8142
+      ],
       "geometry": {
         "type": "Polygon",
         "coordinates": [
           [
-            [-0.6214, 39.2312],
-            [0.1245, 39.2312],
-            [0.1245, 39.8142],
-            [-0.6214, 39.8142],
-            [-0.6214, 39.2312]
+            [
+              -0.6214,
+              39.2312
+            ],
+            [
+              0.1245,
+              39.2312
+            ],
+            [
+              0.1245,
+              39.8142
+            ],
+            [
+              -0.6214,
+              39.8142
+            ],
+            [
+              -0.6214,
+              39.2312
+            ]
           ]
         ]
       },
@@ -33,7 +55,9 @@
         "datetime": "2026-10-30T10:51:51.024Z",
         "platform": "SENTINEL-2A",
         "constellation": "sentinel-2",
-        "instruments": ["msi"],
+        "instruments": [
+          "msi"
+        ],
         "eo:cloud_cover": 8.42,
         "sat:orbit_state": "descending",
         "sat:relative_orbit": 51,
@@ -58,16 +82,36 @@
       "stac_version": "1.0.0",
       "id": "S2B_MSIL2A_20261028T104939_N0511_R051_T30SYJ_20261028T135510",
       "collection": "SENTINEL-2",
-      "bbox": [-0.6214, 39.2312, 0.1245, 39.8142],
+      "bbox": [
+        -0.6214,
+        39.2312,
+        0.1245,
+        39.8142
+      ],
       "geometry": {
         "type": "Polygon",
         "coordinates": [
           [
-            [-0.6214, 39.2312],
-            [0.1245, 39.2312],
-            [0.1245, 39.8142],
-            [-0.6214, 39.8142],
-            [-0.6214, 39.2312]
+            [
+              -0.6214,
+              39.2312
+            ],
+            [
+              0.1245,
+              39.2312
+            ],
+            [
+              0.1245,
+              39.8142
+            ],
+            [
+              -0.6214,
+              39.8142
+            ],
+            [
+              -0.6214,
+              39.2312
+            ]
           ]
         ]
       },
@@ -75,7 +119,9 @@
         "datetime": "2026-10-28T10:49:39.024Z",
         "platform": "SENTINEL-2B",
         "constellation": "sentinel-2",
-        "instruments": ["msi"],
+        "instruments": [
+          "msi"
+        ],
         "eo:cloud_cover": 74.85,
         "sat:orbit_state": "descending",
         "sat:relative_orbit": 51,
@@ -95,16 +141,36 @@
       "stac_version": "1.0.0",
       "id": "S1A_IW_GRDH_1SDV_20261031T055410_20261031T055435_056345_06E452_891A",
       "collection": "SENTINEL-1",
-      "bbox": [-1.15, 38.85, 0.45, 40.10],
+      "bbox": [
+        -1.15,
+        38.85,
+        0.45,
+        40.1
+      ],
       "geometry": {
         "type": "Polygon",
         "coordinates": [
           [
-            [-1.15, 38.85],
-            [0.45, 38.85],
-            [0.45, 40.10],
-            [-1.15, 40.10],
-            [-1.15, 38.85]
+            [
+              -1.15,
+              38.85
+            ],
+            [
+              0.45,
+              38.85
+            ],
+            [
+              0.45,
+              40.1
+            ],
+            [
+              -1.15,
+              40.1
+            ],
+            [
+              -1.15,
+              38.85
+            ]
           ]
         ]
       },
@@ -112,9 +178,14 @@
         "datetime": "2026-10-31T05:54:10.000Z",
         "platform": "SENTINEL-1A",
         "constellation": "sentinel-1",
-        "instruments": ["c-sar"],
+        "instruments": [
+          "c-sar"
+        ],
         "sar:instrument_mode": "IW",
-        "sar:polarizations": ["VV", "VH"],
+        "sar:polarizations": [
+          "VV",
+          "VH"
+        ],
         "sat:orbit_state": "ascending",
         "processing:level": "Level-1 GRD"
       },

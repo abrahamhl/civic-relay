@@ -1,0 +1,117 @@
+{
+ "generado": "2026-11-14T08:36:36.829Z",
+ "fuentes": {
+  "effis": "EFFIS · European Forest Fire Information System (Copernicus EMS, JRC), área quemada MODIS/VIIRS de la temporada",
+  "effisDescarga": "2026-11-14T08:34:27.032Z",
+  "cicatriz": "Sentinel-2 dNBR procesado por SENDA (burn_100m.bin, 08-08-2026)",
+  "modelo": "arrival_roi.bin (fire-field calibrado con la cicatriz del 24-07)"
+ },
+ "perimetroEFFIS": {
+  "id": "592438",
+  "municipio": "Navas del Rey",
+  "provincia": "Madrid",
+  "inicio": "2026-07-23 13:53:00",
+  "areaHaEFFIS": 19939,
+  "areaHaRasterizada": 19018,
+  "fraccionDentroDelRecuadroSimulado": 0.73535597854664
+ },
+ "coherenciaDatosTodosLosIncendios": {
+  "tp": 24068,
+  "fp": 37,
+  "fn": 19321,
+  "jaccard": 0.5542301846819877,
+  "acierto": 0.5547028048583742,
+  "falsaAlarma": 0.0015349512549263638,
+  "haPredichas": 24105,
+  "haObservadas": 43389,
+  "perimetrosEFFIS": [
+   {
+    "id": "561461",
+    "municipio": "Barraco, El",
+    "inicio": "2026-07-10 12:19:00",
+    "areaHa": 76
+   },
+   {
+    "id": "572494",
+    "municipio": "Fresnedillas de la Oliva",
+    "inicio": "2026-07-25 00:00:00",
+    "areaHa": 3
+   },
+   {
+    "id": "575245",
+    "municipio": "Tiemblo, El",
+    "inicio": "2026-07-24 01:34:00",
+    "areaHa": 19
+   },
+   {
+    "id": "572496",
+    "municipio": "Barraco, El",
+    "inicio": "2026-07-24 12:19:00",
+    "areaHa": 1577
+   },
+   {
+    "id": "592434",
+    "municipio": "San Martín de Valdeiglesias",
+    "inicio": "2026-07-31 13:23:00",
+    "areaHa": 35
+   },
+   {
+    "id": "592438",
+    "municipio": "Navas del Rey",
+    "inicio": "2026-07-23 13:53:00",
+    "areaHa": 19939
+   },
+   {
+    "id": "562592",
+    "municipio": "Navaluenga",
+    "inicio": "2026-07-22 13:36:00",
+    "areaHa": 42458
+   },
+   {
+    "id": "636746",
+    "municipio": "Aldea del Fresno",
+    "inicio": "2026-08-19 12:25:00",
+    "areaHa": 296
+   }
+  ],
+  "lectura": "Cicatriz Sentinel-2 de SENDA frente a la unión de perímetros EFFIS de jul-ago 2026 en la malla: la comparación justa de los datos."
+ },
+ "coherenciaDatos": {
+  "tp": 9874,
+  "fp": 14231,
+  "fn": 9144,
+  "jaccard": 0.2969713374838341,
+  "acierto": 0.5191923440950679,
+  "falsaAlarma": 0.5903754407799212,
+  "haPredichas": 24105,
+  "haObservadas": 19018,
+  "lectura": "Cuánto coincide la cicatriz que SENDA calcula con Sentinel-2 con el perímetro oficial de EFFIS (mismo incendio, procesos independientes)."
+ },
+ "modelo": {
+  "tp": 3935,
+  "fp": 826,
+  "fn": 15083,
+  "jaccard": 0.1982967143721024,
+  "acierto": 0.2069092438742244,
+  "falsaAlarma": 0.173492963663096,
+  "haPredichas": 4761,
+  "haObservadas": 19018,
+  "celdasHuella": 4761
+ },
+ "circuloMismaArea": {
+  "tp": 2174,
+  "fp": 2575,
+  "fn": 16844,
+  "jaccard": 0.10068077617746492,
+  "acierto": 0.11431275633610263,
+  "falsaAlarma": 0.5422194146136029,
+  "haPredichas": 4749,
+  "haObservadas": 19018
+ },
+ "habilidadModeloVsCirculo": 0.10854425837771291,
+ "limites": [
+  "Mismo incendio con el que se calibró el modelo (en otra fecha): no es validación en incendios distintos.",
+  "El modelo solo se simuló dentro de un recuadro y hasta 48 h; el perímetro EFFIS es el final, tras días de incendio y de extinción.",
+  "EFFIS cartografía con MODIS/VIIRS (áreas ≥ ~30 ha); su borde tiene su propio error."
+ ]
+}

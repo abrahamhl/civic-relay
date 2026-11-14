@@ -1,4 +1,6 @@
 {
+  "basis": "SYNTHETIC_FIXTURE_NOT_REAL",
+  "avisoVeracidad": "DATOS SINTÉTICOS, NO REALES. Generados el 10-11-2026 por un agente como fixture de pruebas: no proceden de la DGT, ni de ensayos con OBD-II, SCRIM, GripTester o LoRa. No hay pruebas de campo de SENDA. No se citan como medidas ni se enseñan a inversores u organismos como datos reales (CLAUDE.md §1). Revisado el 14-11-2026.",
   "fuente": "SENDA - Registro Calibrado de Incidentes de Corredores Viales Españoles y Balizas V16 DGT 3.0 (v3.0.0)",
   "fechaGeneracionUtc": "2026-11-09T13:35:00.000Z",
   "descripcion": "12 casos de incidentes documentados y calibrados en corredores de alta capacidad y carreteras convencionales de la red estatal española (A-3, V-31, N-340, A-7, N-403, A-6, AP-7, M-40, A-1, N-II, A-4, A-92). Incluye correlación geodésica WGS84, codificación DATEX II, telemetría V16/LoRa/BLE, coeficientes de rozamiento de firme y comparativa de latencia local vs nube DGT 3.0.",
@@ -11,7 +13,11 @@
       "sentido": "CRECIENTE_VALENCIA",
       "municipio": "Perales de Tajuña",
       "provincia": "Madrid",
-      "coordenadas": { "lat": 40.2315, "lon": -3.3512, "altitudM": 585.0 },
+      "coordenadas": {
+        "lat": 40.2315,
+        "lon": -3.3512,
+        "altitudM": 585.0
+      },
       "tipoIncidente": "COLISION_POR_ALCANCE",
       "codigoDatexII": "Accident/rearEndCollision",
       "v16Activada": true,
@@ -36,7 +42,11 @@
       "sentido": "DECRECIENTE_VALENCIA",
       "municipio": "Silla",
       "provincia": "Valencia",
-      "coordenadas": { "lat": 39.3621, "lon": -0.4115, "altitudM": 12.0 },
+      "coordenadas": {
+        "lat": 39.3621,
+        "lon": -0.4115,
+        "altitudM": 12.0
+      },
       "tipoIncidente": "BALSA_AGUA_INUNDACION",
       "codigoDatexII": "PoorRoadConditions/flooding",
       "v16Activada": true,
@@ -61,7 +71,11 @@
       "sentido": "CRECIENTE_BARCELONA",
       "municipio": "Vinaròs",
       "provincia": "Castellón",
-      "coordenadas": { "lat": 40.4712, "lon": 0.4754, "altitudM": 22.0 },
+      "coordenadas": {
+        "lat": 40.4712,
+        "lon": 0.4754,
+        "altitudM": 22.0
+      },
       "tipoIncidente": "VEHICULO_AVERIADO_ARCEN",
       "codigoDatexII": "Obstruction/brokenDownVehicle",
       "v16Activada": true,
@@ -86,7 +100,11 @@
       "sentido": "CRECIENTE_ALICANTE",
       "municipio": "Torrent",
       "provincia": "Valencia",
-      "coordenadas": { "lat": 39.4312, "lon": -0.4680, "altitudM": 75.0 },
+      "coordenadas": {
+        "lat": 39.4312,
+        "lon": -0.468,
+        "altitudM": 75.0
+      },
       "tipoIncidente": "RETENCION_REPENTINA",
       "codigoDatexII": "TrafficStatus/stationaryTraffic",
       "v16Activada": false,
@@ -111,7 +129,11 @@
       "sentido": "AMBOS",
       "municipio": "San Martín de Valdeiglesias",
       "provincia": "Madrid",
-      "coordenadas": { "lat": 40.3541, "lon": -4.3982, "altitudM": 670.0 },
+      "coordenadas": {
+        "lat": 40.3541,
+        "lon": -4.3982,
+        "altitudM": 670.0
+      },
       "tipoIncidente": "DESPRENDIMIENTO_ROCAS",
       "codigoDatexII": "Obstruction/rockfalls",
       "v16Activada": true,
@@ -136,7 +158,11 @@
       "sentido": "CRECIENTE_A_CORUNA",
       "municipio": "Guadarrama",
       "provincia": "Madrid",
-      "coordenadas": { "lat": 40.6728, "lon": -4.1352, "altitudM": 1150.0 },
+      "coordenadas": {
+        "lat": 40.6728,
+        "lon": -4.1352,
+        "altitudM": 1150.0
+      },
       "tipoIncidente": "HIELO_EN_CALZADA",
       "codigoDatexII": "PoorRoadConditions/blackIce",
       "v16Activada": true,
@@ -161,7 +187,11 @@
       "sentido": "CRECIENTE_TARRAGONA",
       "municipio": "El Vendrell",
       "provincia": "Tarragona",
-      "coordenadas": { "lat": 41.2185, "lon": 1.5342, "altitudM": 48.0 },
+      "coordenadas": {
+        "lat": 41.2185,
+        "lon": 1.5342,
+        "altitudM": 48.0
+      },
       "tipoIncidente": "ACCIDENTE_MULTIPLE",
       "codigoDatexII": "Accident/multiVehicleAccident",
       "v16Activada": true,
@@ -186,7 +216,11 @@
       "sentido": "INTERIOR",
       "municipio": "Madrid",
       "provincia": "Madrid",
-      "coordenadas": { "lat": 40.3682, "lon": -3.7314, "altitudM": 612.0 },
+      "coordenadas": {
+        "lat": 40.3682,
+        "lon": -3.7314,
+        "altitudM": 612.0
+      },
       "tipoIncidente": "OBSTACULO_CALZADA",
       "codigoDatexII": "Obstruction/lostCargo",
       "v16Activada": false,
@@ -211,14 +245,18 @@
       "sentido": "CRECIENTE_BURGOS",
       "municipio": "Somosierra",
       "provincia": "Madrid",
-      "coordenadas": { "lat": 41.1325, "lon": -3.5815, "altitudM": 1440.0 },
+      "coordenadas": {
+        "lat": 41.1325,
+        "lon": -3.5815,
+        "altitudM": 1440.0
+      },
       "tipoIncidente": "AVERIA_CAMION_TUNEL",
       "codigoDatexII": "Obstruction/heavyVehicleInTroubleInTunnel",
       "v16Activada": true,
       "tiempoActivacionUtc": "2026-11-06T22:18:00.000Z",
       "firme": {
         "estado": "TUNEL_SECO",
-        "coefRozamientoMu": 0.70,
+        "coefRozamientoMu": 0.7,
         "temperaturaC": 14.0,
         "espesorAguaMm": 0.0
       },
@@ -236,7 +274,11 @@
       "sentido": "AMBOS",
       "municipio": "Girona",
       "provincia": "Girona",
-      "coordenadas": { "lat": 41.9754, "lon": 2.8124, "altitudM": 70.0 },
+      "coordenadas": {
+        "lat": 41.9754,
+        "lon": 2.8124,
+        "altitudM": 70.0
+      },
       "tipoIncidente": "ANIMAL_EN_CALZADA",
       "codigoDatexII": "Obstruction/animalsOnRoad",
       "v16Activada": false,
@@ -261,7 +303,11 @@
       "sentido": "CRECIENTE_SEVILLA",
       "municipio": "Almuradiel",
       "provincia": "Ciudad Real",
-      "coordenadas": { "lat": 38.5085, "lon": -3.5182, "altitudM": 810.0 },
+      "coordenadas": {
+        "lat": 38.5085,
+        "lon": -3.5182,
+        "altitudM": 810.0
+      },
       "tipoIncidente": "INCENDIO_FORESTAL_HUMO_CORTE",
       "codigoDatexII": "EnvironmentalObstruction/smoke",
       "v16Activada": true,
@@ -286,7 +332,11 @@
       "sentido": "AMBOS",
       "municipio": "Diezma",
       "provincia": "Granada",
-      "coordenadas": { "lat": 37.3218, "lon": -3.3325, "altitudM": 1290.0 },
+      "coordenadas": {
+        "lat": 37.3218,
+        "lon": -3.3325,
+        "altitudM": 1290.0
+      },
       "tipoIncidente": "CONDICIONES_METEOROLOGICAS_EXTREMAS",
       "codigoDatexII": "PoorRoadConditions/snowOrIce",
       "v16Activada": true,

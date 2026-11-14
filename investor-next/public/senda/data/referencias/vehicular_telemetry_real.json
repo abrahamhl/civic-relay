@@ -1,4 +1,6 @@
 {
+  "basis": "SYNTHETIC_FIXTURE_NOT_REAL",
+  "avisoVeracidad": "DATOS SINTÉTICOS, NO REALES. Generados el 10-11-2026 por un agente como fixture de pruebas: no proceden de la DGT, ni de ensayos con OBD-II, SCRIM, GripTester o LoRa. No hay pruebas de campo de SENDA. No se citan como medidas ni se enseñan a inversores u organismos como datos reales (CLAUDE.md §1). Revisado el 14-11-2026.",
   "fuente": "SENDA Vehicular Telemetry & Sensor Fusion Calibration Benchmark (v3.0.0)",
   "fechaGeneracionUtc": "2026-11-09T13:30:00.000Z",
   "descripcion": "10 series cinemáticas y telemétricas de alta fidelidad capturadas en pruebas de campo y bancos de ensayo instrumentados con OBD-II (SAE J1979 10 Hz), IMU triaxial (100 Hz), GNSS diferencial y balizas de carretera en corredores españoles (A-3, N-403, V-31, M-30).",
@@ -21,12 +23,72 @@
       "condicionFirme": "SECO",
       "frecuenciaHz": 10,
       "puntos": [
-        { "tSec": 0.0, "speedKmh": 120.0, "rpm": 2450, "throttlePct": 38.0, "brakePedal": 0, "axMs2": 0.1, "ayMs2": 0.0, "baroKpa": 98.4, "tempExtC": 21.0 },
-        { "tSec": 0.5, "speedKmh": 118.5, "rpm": 2410, "throttlePct": 0.0, "brakePedal": 0, "axMs2": -0.8, "ayMs2": 0.1, "baroKpa": 98.4, "tempExtC": 21.0 },
-        { "tSec": 1.0, "speedKmh": 102.0, "rpm": 2100, "throttlePct": 0.0, "brakePedal": 1, "axMs2": -8.5, "ayMs2": 0.2, "baroKpa": 98.4, "tempExtC": 21.0 },
-        { "tSec": 1.5, "speedKmh": 68.0, "rpm": 1400, "throttlePct": 0.0, "brakePedal": 1, "axMs2": -9.2, "ayMs2": 0.1, "baroKpa": 98.4, "tempExtC": 21.0 },
-        { "tSec": 2.0, "speedKmh": 32.0, "rpm": 950, "throttlePct": 0.0, "brakePedal": 1, "axMs2": -8.8, "ayMs2": 0.0, "baroKpa": 98.4, "tempExtC": 21.0 },
-        { "tSec": 2.5, "speedKmh": 0.0, "rpm": 800, "throttlePct": 0.0, "brakePedal": 1, "axMs2": -3.5, "ayMs2": 0.0, "baroKpa": 98.4, "tempExtC": 21.0 }
+        {
+          "tSec": 0.0,
+          "speedKmh": 120.0,
+          "rpm": 2450,
+          "throttlePct": 38.0,
+          "brakePedal": 0,
+          "axMs2": 0.1,
+          "ayMs2": 0.0,
+          "baroKpa": 98.4,
+          "tempExtC": 21.0
+        },
+        {
+          "tSec": 0.5,
+          "speedKmh": 118.5,
+          "rpm": 2410,
+          "throttlePct": 0.0,
+          "brakePedal": 0,
+          "axMs2": -0.8,
+          "ayMs2": 0.1,
+          "baroKpa": 98.4,
+          "tempExtC": 21.0
+        },
+        {
+          "tSec": 1.0,
+          "speedKmh": 102.0,
+          "rpm": 2100,
+          "throttlePct": 0.0,
+          "brakePedal": 1,
+          "axMs2": -8.5,
+          "ayMs2": 0.2,
+          "baroKpa": 98.4,
+          "tempExtC": 21.0
+        },
+        {
+          "tSec": 1.5,
+          "speedKmh": 68.0,
+          "rpm": 1400,
+          "throttlePct": 0.0,
+          "brakePedal": 1,
+          "axMs2": -9.2,
+          "ayMs2": 0.1,
+          "baroKpa": 98.4,
+          "tempExtC": 21.0
+        },
+        {
+          "tSec": 2.0,
+          "speedKmh": 32.0,
+          "rpm": 950,
+          "throttlePct": 0.0,
+          "brakePedal": 1,
+          "axMs2": -8.8,
+          "ayMs2": 0.0,
+          "baroKpa": 98.4,
+          "tempExtC": 21.0
+        },
+        {
+          "tSec": 2.5,
+          "speedKmh": 0.0,
+          "rpm": 800,
+          "throttlePct": 0.0,
+          "brakePedal": 1,
+          "axMs2": -3.5,
+          "ayMs2": 0.0,
+          "baroKpa": 98.4,
+          "tempExtC": 21.0
+        }
       ],
       "eventoEsperado": "HARD_BRAKING",
       "decelPicoMs2": 9.2,
@@ -39,11 +101,61 @@
       "condicionFirme": "BALSA_AGUA_LLUVIA",
       "frecuenciaHz": 10,
       "puntos": [
-        { "tSec": 0.0, "speedKmh": 95.0, "rpm": 2100, "throttlePct": 25.0, "brakePedal": 0, "axMs2": 0.0, "ayMs2": 0.1, "baroKpa": 101.2, "tempExtC": 14.5 },
-        { "tSec": 0.5, "speedKmh": 94.0, "rpm": 2550, "throttlePct": 25.0, "brakePedal": 0, "axMs2": -0.2, "ayMs2": 1.4, "baroKpa": 101.2, "tempExtC": 14.2 },
-        { "tSec": 1.0, "speedKmh": 91.0, "rpm": 2800, "throttlePct": 10.0, "brakePedal": 0, "axMs2": -0.5, "ayMs2": 2.8, "baroKpa": 101.2, "tempExtC": 14.0 },
-        { "tSec": 1.5, "speedKmh": 82.0, "rpm": 1800, "throttlePct": 0.0, "brakePedal": 1, "axMs2": -3.2, "ayMs2": 1.1, "baroKpa": 101.2, "tempExtC": 14.0 },
-        { "tSec": 2.0, "speedKmh": 70.0, "rpm": 1500, "throttlePct": 0.0, "brakePedal": 1, "axMs2": -3.8, "ayMs2": 0.3, "baroKpa": 101.2, "tempExtC": 14.0 }
+        {
+          "tSec": 0.0,
+          "speedKmh": 95.0,
+          "rpm": 2100,
+          "throttlePct": 25.0,
+          "brakePedal": 0,
+          "axMs2": 0.0,
+          "ayMs2": 0.1,
+          "baroKpa": 101.2,
+          "tempExtC": 14.5
+        },
+        {
+          "tSec": 0.5,
+          "speedKmh": 94.0,
+          "rpm": 2550,
+          "throttlePct": 25.0,
+          "brakePedal": 0,
+          "axMs2": -0.2,
+          "ayMs2": 1.4,
+          "baroKpa": 101.2,
+          "tempExtC": 14.2
+        },
+        {
+          "tSec": 1.0,
+          "speedKmh": 91.0,
+          "rpm": 2800,
+          "throttlePct": 10.0,
+          "brakePedal": 0,
+          "axMs2": -0.5,
+          "ayMs2": 2.8,
+          "baroKpa": 101.2,
+          "tempExtC": 14.0
+        },
+        {
+          "tSec": 1.5,
+          "speedKmh": 82.0,
+          "rpm": 1800,
+          "throttlePct": 0.0,
+          "brakePedal": 1,
+          "axMs2": -3.2,
+          "ayMs2": 1.1,
+          "baroKpa": 101.2,
+          "tempExtC": 14.0
+        },
+        {
+          "tSec": 2.0,
+          "speedKmh": 70.0,
+          "rpm": 1500,
+          "throttlePct": 0.0,
+          "brakePedal": 1,
+          "axMs2": -3.8,
+          "ayMs2": 0.3,
+          "baroKpa": 101.2,
+          "tempExtC": 14.0
+        }
       ],
       "eventoEsperado": "AQUAPLANING_TRACTION_LOSS",
       "decelPicoMs2": 3.8,
@@ -56,11 +168,61 @@
       "condicionFirme": "SECO",
       "frecuenciaHz": 10,
       "puntos": [
-        { "tSec": 0.0, "speedKmh": 70.0, "rpm": 1600, "throttlePct": 18.0, "brakePedal": 0, "axMs2": 0.0, "ayMs2": 0.0, "baroKpa": 94.1, "tempExtC": 18.0 },
-        { "tSec": 1.0, "speedKmh": 85.0, "rpm": 2400, "throttlePct": 85.0, "brakePedal": 0, "axMs2": 2.5, "ayMs2": 0.8, "baroKpa": 94.1, "tempExtC": 18.0 },
-        { "tSec": 2.0, "speedKmh": 102.0, "rpm": 3200, "throttlePct": 90.0, "brakePedal": 0, "axMs2": 2.8, "ayMs2": 0.2, "baroKpa": 94.1, "tempExtC": 18.0 },
-        { "tSec": 3.0, "speedKmh": 110.0, "rpm": 3500, "throttlePct": 50.0, "brakePedal": 0, "axMs2": 1.1, "ayMs2": -0.7, "baroKpa": 94.1, "tempExtC": 18.0 },
-        { "tSec": 4.0, "speedKmh": 100.0, "rpm": 2600, "throttlePct": 25.0, "brakePedal": 0, "axMs2": -0.8, "ayMs2": 0.0, "baroKpa": 94.1, "tempExtC": 18.0 }
+        {
+          "tSec": 0.0,
+          "speedKmh": 70.0,
+          "rpm": 1600,
+          "throttlePct": 18.0,
+          "brakePedal": 0,
+          "axMs2": 0.0,
+          "ayMs2": 0.0,
+          "baroKpa": 94.1,
+          "tempExtC": 18.0
+        },
+        {
+          "tSec": 1.0,
+          "speedKmh": 85.0,
+          "rpm": 2400,
+          "throttlePct": 85.0,
+          "brakePedal": 0,
+          "axMs2": 2.5,
+          "ayMs2": 0.8,
+          "baroKpa": 94.1,
+          "tempExtC": 18.0
+        },
+        {
+          "tSec": 2.0,
+          "speedKmh": 102.0,
+          "rpm": 3200,
+          "throttlePct": 90.0,
+          "brakePedal": 0,
+          "axMs2": 2.8,
+          "ayMs2": 0.2,
+          "baroKpa": 94.1,
+          "tempExtC": 18.0
+        },
+        {
+          "tSec": 3.0,
+          "speedKmh": 110.0,
+          "rpm": 3500,
+          "throttlePct": 50.0,
+          "brakePedal": 0,
+          "axMs2": 1.1,
+          "ayMs2": -0.7,
+          "baroKpa": 94.1,
+          "tempExtC": 18.0
+        },
+        {
+          "tSec": 4.0,
+          "speedKmh": 100.0,
+          "rpm": 2600,
+          "throttlePct": 25.0,
+          "brakePedal": 0,
+          "axMs2": -0.8,
+          "ayMs2": 0.0,
+          "baroKpa": 94.1,
+          "tempExtC": 18.0
+        }
       ],
       "eventoEsperado": "OVERTAKING_MANEUVER",
       "distanciaRequeridaM": 215.0,
@@ -73,10 +235,50 @@
       "condicionFirme": "TUNEL_SECO",
       "frecuenciaHz": 10,
       "puntos": [
-        { "tSec": 0.0, "speedKmh": 70.0, "rpm": 5200, "throttlePct": 20.0, "brakePedal": 0, "axMs2": 0.0, "ayMs2": 0.0, "baroKpa": 95.8, "tempExtC": 23.0 },
-        { "tSec": 5.0, "speedKmh": 68.0, "rpm": 5100, "throttlePct": 18.0, "brakePedal": 0, "axMs2": -0.1, "ayMs2": 0.2, "baroKpa": 96.1, "tempExtC": 24.0 },
-        { "tSec": 10.0, "speedKmh": 70.0, "rpm": 5250, "throttlePct": 22.0, "brakePedal": 0, "axMs2": 0.1, "ayMs2": -0.3, "baroKpa": 96.3, "tempExtC": 24.5 },
-        { "tSec": 15.0, "speedKmh": 69.0, "rpm": 5180, "throttlePct": 19.0, "brakePedal": 0, "axMs2": 0.0, "ayMs2": 0.1, "baroKpa": 96.4, "tempExtC": 25.0 }
+        {
+          "tSec": 0.0,
+          "speedKmh": 70.0,
+          "rpm": 5200,
+          "throttlePct": 20.0,
+          "brakePedal": 0,
+          "axMs2": 0.0,
+          "ayMs2": 0.0,
+          "baroKpa": 95.8,
+          "tempExtC": 23.0
+        },
+        {
+          "tSec": 5.0,
+          "speedKmh": 68.0,
+          "rpm": 5100,
+          "throttlePct": 18.0,
+          "brakePedal": 0,
+          "axMs2": -0.1,
+          "ayMs2": 0.2,
+          "baroKpa": 96.1,
+          "tempExtC": 24.0
+        },
+        {
+          "tSec": 10.0,
+          "speedKmh": 70.0,
+          "rpm": 5250,
+          "throttlePct": 22.0,
+          "brakePedal": 0,
+          "axMs2": 0.1,
+          "ayMs2": -0.3,
+          "baroKpa": 96.3,
+          "tempExtC": 24.5
+        },
+        {
+          "tSec": 15.0,
+          "speedKmh": 69.0,
+          "rpm": 5180,
+          "throttlePct": 19.0,
+          "brakePedal": 0,
+          "axMs2": 0.0,
+          "ayMs2": 0.1,
+          "baroKpa": 96.4,
+          "tempExtC": 25.0
+        }
       ],
       "eventoEsperado": "GNSS_DENIED_TUNNEL_EKF",
       "derivaEstimacionMaxM": 4.8
@@ -88,7 +290,17 @@
       "condicionFirme": "SECO",
       "frecuenciaHz": 1,
       "puntos": [
-        { "tSec": 0.0, "speedKmh": 0.0, "rpm": 0, "throttlePct": 0.0, "brakePedal": 1, "axMs2": 0.0, "ayMs2": 0.0, "baroKpa": 101.3, "tempExtC": 19.0 }
+        {
+          "tSec": 0.0,
+          "speedKmh": 0.0,
+          "rpm": 0,
+          "throttlePct": 0.0,
+          "brakePedal": 1,
+          "axMs2": 0.0,
+          "ayMs2": 0.0,
+          "baroKpa": 101.3,
+          "tempExtC": 19.0
+        }
       ],
       "eventoEsperado": "V16_STATIONARY_HAZARD",
       "tiempoAvisoLocalMs": 42.0,

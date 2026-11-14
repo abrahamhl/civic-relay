@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Avisos de peligro</title>
+<meta name="description" content="Reporta un peligro con posición y medida, mide la subida de un río con una foto y mira qué está pasando en tu zona sin colapsar el 112.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 Inter,system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 60px}h1{font-size:30px;margin:4px 0}h2{font-size:18px;margin:0 0 8px}.m{color:var(--m)}a{color:var(--i)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:16px;min-width:0}
+button{font:inherit;min-height:48px;padding:10px 16px;border-radius:12px;border:1px solid var(--l);background:#0f1d27;color:var(--t);cursor:pointer;font-weight:700}
+button.p{background:var(--c);border-color:var(--c);color:#140804}button.g{background:var(--e);border-color:var(--e);color:#03140d}button.on{outline:2px solid var(--i)}
+input,select{font:inherit;background:#071018;color:var(--t);border:1px solid var(--l);border-radius:10px;padding:10px;min-height:44px}
+.kinds{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.kinds button{min-height:56px;font-size:14px;text-align:left}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.note{border-left:3px solid var(--a);padding:6px 10px;background:#0f1a22;border-radius:6px;font-size:13px;margin-top:10px}
+.call{border:2px solid var(--r);background:#2a0b10;border-radius:12px;padding:12px;margin-top:10px;font-weight:700}
+#cv{width:100%;border-radius:10px;background:#071018;touch-action:none;display:block;margin-top:8px}
+.inc{border:1px solid var(--l);border-radius:12px;padding:10px;margin-top:8px}.inc b{font-size:15px}.st{display:inline-block;font:700 11px ui-monospace,monospace;padding:3px 8px;border-radius:999px;border:1px solid var(--l);margin-left:6px}
+.st.RUMOR{color:var(--m)}.st.CORROBORATED{color:var(--a);border-color:var(--a)}.st.RECON{color:var(--c);border-color:var(--c)}.st.OFFICIAL{color:var(--e);border-color:var(--e)}
+.sim{font:700 11px ui-monospace,monospace;color:var(--a)}
+</style>
+</head>
+<body><main>
+<p><a href="/senda">← SENDA</a></p>
+<h1>Avisos de peligro</h1>
+<p class="m">¿Ves que el río sube, humo o una carretera cortada? Repórtalo con posición y, si puedes hacerlo seguro, con una medida. Los reportes del mismo sitio se agrupan en <b>un solo incidente</b> para el centro de emergencias, que lo contrasta con fuentes oficiales. <b>Ningún aviso a la población sale de aquí</b>: lo emite el organismo oficial.</p>
+
+<div class="grid">
+<section class="card">
+  <h2>1 · ¿Qué ves?</h2>
+  <div class="kinds" id="kinds"></div>
+  <div id="advice"></div>
+  <div class="row"><button id="geo">📍 Usar mi posición</button><span class="m" id="pos">sin posición</span></div>
+  <div class="row"><label class="m">Personas atrapadas <input type="number" id="trapped" min="0" max="99" value="0" style="width:80px"></label><label class="m">Heridas <input type="number" id="injured" min="0" max="99" value="0" style="width:80px"></label></div>
+  <div class="row"><button class="p" id="send" disabled>Enviar reporte</button><span class="m" id="sent"></span></div>
+</section>
+
+<section class="card">
+  <h2>2 · Medir el nivel del agua con una foto</h2>
+  <p class="m">Haz una foto donde se vean la línea del agua y dos marcas de altura conocida (escalones, una regla de aforo, juntas de un pilar). Toca en este orden: <b>marca alta</b>, <b>marca baja</b>, <b>línea del agua</b>. Repite cada pocos minutos desde el mismo sitio: sale la velocidad de subida.</p>
+  <div class="row"><input type="file" id="photo" accept="image/*" capture="environment"><label class="m">Altura marca alta (m) <input type="number" id="hTop" step="0.01" value="3" style="width:90px"></label><label class="m">Marca baja (m) <input type="number" id="hBot" step="0.01" value="1" style="width:90px"></label></div>
+  <canvas id="cv" width="640" height="420"></canvas>
+  <div class="row"><span id="tapinfo" class="m">Carga una foto.</span></div>
+  <div id="series" class="m"></div>
+  <p class="note">La foto <b>no sale del móvil</b>: el reporte solo guarda la medida y la hora. La medida es geometría (interpolación entre dos marcas del mismo plano vertical), no una estimación de IA; su precisión depende de que las marcas estén en el mismo plano que el agua.</p>
+</section>
+</div>
+
+<section class="card" style="margin-top:14px">
+  <h2>3 · Qué está pasando en la zona</h2>
+  <h3 style="font-size:15px;margin:0 0 6px">Reportes recibidos</h3>
+  <textarea id="paste" rows="3" style="width:100%;font:13px ui-monospace,monospace;background:#071018;color:var(--t);border:1px solid var(--l);border-radius:10px;padding:10px" placeholder="Pega aquí líneas SND3 que te hayan llegado (pueden venir mezcladas con otro texto)"></textarea>
+  <div class="row"><button class="g" id="import">Añadir reportes recibidos</button><button id="hear">👂 Escuchar reportes por sonido</button><span class="m" id="imp"></span></div>
+  <div class="row"><button id="demo">Cargar ejemplo (SIMULACIÓN)</button><button id="clear">Borrar mis datos</button><span class="m" id="qsum"></span></div>
+  <div id="incs"><p class="m">Aún no hay reportes. Los reportes de otros vecinos llegarán por la red SENDA (en desarrollo); en esta demo puedes cargar un ejemplo simulado.</p></div>
+  <p class="note">Cómo se decide el estado: cada persona distinta suma (si un mismo móvil repite, cuenta una vez; quien ha dado falsas alarmas cuenta menos), una medida de subida suma, un sensor que cuadra suma y un aforo oficial que <i>no</i> sube resta. Las razones de verosimilitud son <b>hipótesis sin calibrar</b> (código: <code>hazard-reports.mjs</code>, <code>EVIDENCE_LR</code>). Estados: rumor → corroborado → reconocimiento previo (se piden datos a cámaras públicas, sensores y vecinos) → oficial.</p>
+</section>
+</main>
+<script type="module">
+import { emit, listen } from '/senda/audio.mjs';
+import { airtimeSeconds } from '/senda/core/acoustic-modem.mjs';
+import { glofasUrl, parseGlofasDaily, riverContext, riverContextText } from '/senda/core/river-context.mjs';
+import { HAZARD_KINDS, levelFromTaps, riseRate, clusterReports, assessIncident, triageQueue, citizenAdvice, incidentToCap, createReporterKeys, encodeReport, decodeReports } from '/senda/core/hazard-reports.mjs';
+const $ = (s) => document.querySelector(s), esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
+const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* sin almacenamiento */ } };
+const db = await new Promise((ok) => { const r = indexedDB.open('senda-avisos', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => ok(r.result); r.onerror = () => ok(null); });
+const idbGet = (k) => new Promise((ok) => { if (!db) return ok(undefined); const r = db.transaction('kv').objectStore('kv').get(k); r.onsuccess = () => ok(r.result); r.onerror = () => ok(undefined); });
+const idbPut = (k, v) => new Promise((ok) => { if (!db) return ok(); const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = ok; t.onerror = ok; });
+let keys = null; try { keys = await idbGet('keys'); if (!keys) { keys = await createReporterKeys(); await idbPut('keys', keys); } } catch { keys = null; /* navegador sin Ed25519: se puede reportar en local, no compartir firmado */ }
+let device = load('senda-avisos-device', null); if (!device) { device = 'yo-' + crypto.randomUUID().slice(0, 8); store('senda-avisos-device', device); }
+let reports = load('senda-avisos-reports', []), series = load('senda-avisos-series', []), kind = null, pos = null;
+
+$('#kinds').innerHTML = Object.entries(HAZARD_KINDS).map(([k, v]) => `<button data-k="${k}">${v.life ? '🚨 ' : ''}${esc(v.label)}</button>`).join('');
+for (const b of $('#kinds').children) b.onclick = () => { kind = b.dataset.k; for (const x of $('#kinds').children) x.classList.toggle('on', x === b); const a = citizenAdvice(kind, null); $('#advice').innerHTML = a.call112 ? `<div class="call">${esc(a.text)} <a href="tel:112" style="color:#fff">Llamar al 112</a></div>` : ''; $('#send').disabled = !pos; };
+$('#geo').onclick = () => navigator.geolocation?.getCurrentPosition((p) => { pos = { lat: p.coords.latitude, lon: p.coords.longitude, accM: p.coords.accuracy }; $('#pos').textContent = `${pos.lat.toFixed(5)}, ${pos.lon.toFixed(5)} (±${Math.round(pos.accM)} m)`; $('#send').disabled = !kind; }, (e) => { $('#pos').textContent = 'sin permiso de ubicación: ' + e.message; }, { enableHighAccuracy: true, timeout: 15000 });
+$('#send').onclick = async () => {
+  const r = { kind, lat: pos.lat, lon: pos.lon, at: Date.now(), deviceId: device, people: { trapped: +$('#trapped').value || 0, injured: +$('#injured').value || 0 } };
+  const rise = riseRate(series); if (rise && HAZARD_KINDS[kind].family === 'WATER') r.measurement = { rise, levelM: series.at(-1)?.levelM };
+  reports.push(r); store('senda-avisos-reports', reports); render();
+  if (!keys) { $('#sent').textContent = 'Reporte guardado en este móvil. Este navegador no permite firmarlo para compartirlo.'; return; }
+  const line = await encodeReport(r, keys);
+  $('#sent').innerHTML = `Reporte guardado y firmado. Compártelo por cualquier vía (grupo del barrio, SMS, mensajero satelital); quien lo reciba lo pega en «Reportes recibidos»:<br><code style="word-break:break-all;font-size:12px">${esc(line)}</code><br><button id="cp">Copiar</button>${navigator.share ? ' <button id="sh">Compartir…</button>' : ''}`;
+  $('#sent').insertAdjacentHTML('beforeend', ` <button id="snd">🔊 Pasar por sonido (${airtimeSeconds(116).toFixed(0)} s, a ~1 m)</button>`);
+  $('#snd').onclick = async () => { const b = $('#snd'); b.disabled = true; b.textContent = '🔊 Emitiendo…'; try { await emit(unb64u(line.slice(5))); b.textContent = '✓ Emitido'; } catch (e) { b.textContent = 'No se pudo emitir: ' + e.message; } };
+  $('#cp').onclick = () => navigator.clipboard?.writeText(line); if ($('#sh')) $('#sh').onclick = () => navigator.share({ text: line }).catch(() => {});
+};
+
+/* medida por toques */
+const cv = $('#cv'), g = cv.getContext('2d'); let img = null, taps = [];
+function draw() {
+  g.fillStyle = '#071018'; g.fillRect(0, 0, cv.width, cv.height);
+  if (img) { const s = Math.min(cv.width / img.width, cv.height / img.height); g.drawImage(img, 0, 0, img.width * s, img.height * s); }
+  const col = ['#fbbf24', '#fbbf24', '#38bdf8'], lab = ['marca alta', 'marca baja', 'agua'];
+  taps.forEach((t, i) => { g.strokeStyle = col[i]; g.lineWidth = 2; g.beginPath(); g.moveTo(0, t.y); g.lineTo(cv.width, t.y); g.stroke(); g.fillStyle = col[i]; g.font = '600 14px system-ui'; g.fillText(lab[i], 8, t.y - 6); });
+}
+$('#photo').onchange = (e) => { const f = e.target.files[0]; if (!f) return; const u = URL.createObjectURL(f); img = new Image(); img.onload = () => { cv.height = Math.round(cv.width * Math.min(1.4, img.height / img.width)); taps = []; draw(); $('#tapinfo').textContent = 'Toca la marca alta.'; }; img.src = u; };
+cv.addEventListener('pointerdown', (e) => {
+  if (!img) return; const r = cv.getBoundingClientRect(), y = ((e.clientY - r.top) / r.height) * cv.height;
+  taps.push({ y }); if (taps.length > 3) taps = [{ y }]; draw();
+  const next = ['Toca la marca baja.', 'Toca la línea del agua.'];
+  if (taps.length < 3) { $('#tapinfo').textContent = next[taps.length - 1]; return; }
+  try {
+    const levelM = levelFromTaps({ refTop: { row: taps[0].y, heightM: +$('#hTop').value }, refBottom: { row: taps[1].y, heightM: +$('#hBot').value }, waterRow: taps[2].y });
+    series.push({ at: Date.now(), levelM }); store('senda-avisos-series', series);
+    const rr = riseRate(series);
+    $('#tapinfo').innerHTML = `Nivel: <b>${levelM.toFixed(2)} m</b> sobre la marca de referencia.`;
+    $('#series').innerHTML = `${series.length} medida(s). ${rr ? `Subida: <b>${rr.cmPerMin.toFixed(2)} cm/min</b>${rr.stdErr != null ? ` (error típico ${rr.stdErr.toFixed(2)})` : ''}.` : 'Haz otra medida dentro de unos minutos para calcular la velocidad de subida.'}`;
+  } catch (err) { $('#tapinfo').textContent = err.message + ' Vuelve a tocar en orden.'; taps = []; }
+});
+
+/* incidentes de la zona */
+function render() {
+  if (!reports.length) { $('#incs').innerHTML = '<p class="m">Aún no hay reportes.</p>'; $('#qsum').textContent = ''; return; }
+  const cl = clusterReports(reports), as = cl.map((c) => assessIncident(c)), q = triageQueue(as, cl);
+  $('#qsum').textContent = `${q.totalReports} reportes → ${q.incidents} incidente(s) priorizados para el centro de emergencias`;
+  $('#incs').innerHTML = q.queue.map((a) => { const c = cl.find((x) => x.id === a.id), sim = c.reports.some((r) => r.simulated);
+    return `<div class="inc"><b>${esc(HAZARD_KINDS[c.reports[0].kind].label)}</b><span class="st ${a.state}">${a.state}</span>${sim ? ' <span class="sim">SIMULACIÓN</span>' : ''}
+      <div class="m">${a.reporters} persona(s) · ${a.reports} reporte(s) · prioridad ${a.score} · probabilidad de que sea real ${a.pReal >= 0.99 ? '≥ 99' : (100 * a.pReal).toFixed(0)} % (modelo sin calibrar)${a.trapped ? ` · <b style="color:var(--r)">${a.trapped} atrapada(s)</b>` : ''}</div>
+      <div class="m">${esc(a.why.join(' · '))}</div>
+      <div>${esc(citizenAdvice(c.reports[0].kind, a).text)}</div>
+      ${HAZARD_KINDS[c.reports[0].kind].family === 'WATER' ? `<div class="m glofas" data-lat="${c.center.lat}" data-lon="${c.center.lon}">Caudal previsto (GloFAS): consultando…</div>` : ''}
+      ${a.canPublicWarn ? '' : '<div class="m">Sin confirmación oficial: no se avisa a la población.</div>'}
+      <div class="row"><button data-cap="${a.id}">Parte CAP 1.2 para la sala (restringido)</button></div></div>`; }).join('');
+  for (const el of $('#incs').querySelectorAll('.glofas')) fillGlofas(el);
+  for (const b of $('#incs').querySelectorAll('button[data-cap]')) b.onclick = () => {
+    const a = q.queue.find((x) => x.id === b.dataset.cap), c = cl.find((x) => x.id === a.id), xml = incidentToCap(a, c, { now: Date.now(), exercise: true });
+    const u = URL.createObjectURL(new Blob([xml], { type: 'application/xml' })), l = document.createElement('a'); l.href = u; l.download = `senda-${a.id}.cap.xml`; l.click(); setTimeout(() => URL.revokeObjectURL(u), 2000);
+  };
+}
+/* Contexto hidrológico: GloFAS en directo si hay red; si no, la última foto guardada si el punto está a < 10 km */
+const todayISO = () => new Date().toISOString().slice(0, 10);
+async function fillGlofas(el) {
+  const lat = +el.dataset.lat, lon = +el.dataset.lon; let series = null, origen = '';
+  try { const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 6000); series = parseGlofasDaily(await (await fetch(glofasUrl(lat, lon), { signal: ctl.signal })).json()); clearTimeout(to); origen = 'consulta en directo'; }
+  catch { try { const snap = await (await fetch('/senda/data/referencias/glofas_puntos.json')).json(); const p = snap.puntos.find((q) => Math.hypot((q.lat - lat) * 111, (q.lon - lon) * 111 * Math.cos((lat * Math.PI) / 180)) < 10); if (p) { series = p.serie; origen = `foto guardada del ${snap.descargadoUTC.slice(0, 16).replace('T', ' ')} UTC`; } } catch { /* sin foto */ } }
+  if (!series) { el.textContent = 'Caudal previsto (GloFAS): sin red y sin foto guardada para este punto.'; return; }
+  const days = series.days.map((d) => d.date), day = days.includes(todayISO()) ? todayISO() : days.filter((d) => d <= todayISO()).at(-1);
+  try { const c = riverContext(series, day); el.innerHTML = `<b>Caudal previsto (GloFAS):</b> ${esc(riverContextText(c))} <span class="sim">${esc(origen)}</span><br>${esc(c.lectura)}`; (window.SENDA_AVISOS ??= {}).glofas = c; }
+  catch (e) { el.textContent = 'Caudal previsto (GloFAS): ' + e.message; }
+}
+$('#demo').onclick = () => {
+  const base = pos ?? { lat: 39.4269, lon: -0.4174 }, now = Date.now(), d = (m, a) => ({ lat: base.lat + (m * Math.cos(a)) / 111_320, lon: base.lon + (m * Math.sin(a)) / (111_320 * Math.cos((base.lat * Math.PI) / 180)) });
+  for (let i = 0; i < 12; i++) reports.push({ kind: i % 2 ? 'RIVER_RISING' : 'STREET_FLOODED', ...d(80 + i * 15, i), at: now - (12 - i) * 120_000, deviceId: 'sim-' + (i % 9), simulated: true, ...(i === 5 ? { measurement: { rise: { cmPerMin: 1.4, stdErr: 0.2 } } } : {}) });
+  reports.push({ kind: 'PERSON_TRAPPED', ...d(1500, 2), at: now - 300_000, deviceId: 'sim-t', simulated: true, people: { trapped: 2, injured: 0 } });
+  store('senda-avisos-reports', reports); render();
+};
+const b64u = (u8) => btoa(String.fromCharCode(...u8)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64u = (t) => Uint8Array.from(atob(t.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((t.length + 3) % 4)), (c) => c.charCodeAt(0));
+async function ingest(text) {
+  const { reports: got, rejected } = await decodeReports(text);
+  const key = (r) => `${r.deviceId}|${r.kind}|${r.at}|${r.lat}|${r.lon}`, have = new Set(reports.map(key)); let added = 0;
+  for (const r of got) if (!have.has(key(r))) { reports.push(r); have.add(key(r)); added++; }
+  store('senda-avisos-reports', reports); render();
+  $('#imp').textContent = `${added} nuevo(s) · ${got.length - added} repetido(s)${rejected.length ? ` · ${rejected.length} rechazado(s) (firma o formato no válidos)` : ''}`;
+}
+$('#import').onclick = () => ingest($('#paste').value);
+window.SENDA_AVISOS = Object.assign(window.SENDA_AVISOS ?? {}, { ingestBytes: (bytes) => ingest('SND3 ' + b64u(bytes)) });
+$('#hear').onclick = async () => {
+  const b = $('#hear'); b.disabled = true; b.textContent = '👂 Escuchando 60 s… acerca el otro móvil';
+  try { const l = await listen({ maxS: 60, onPayload: (bytes) => window.SENDA_AVISOS.ingestBytes(bytes) }); const n = await l.done; b.textContent = n ? `✓ ${n} reporte(s) oído(s)` : 'No se oyó ningún reporte'; }
+  catch (e) { b.textContent = 'Sin micrófono: ' + e.message; }
+  b.disabled = false;
+};
+$('#clear').onclick = () => { reports = []; series = []; store('senda-avisos-reports', reports); store('senda-avisos-series', series); render(); $('#series').textContent = ''; };
+draw(); render();
+</script>
+</body>
+</html>

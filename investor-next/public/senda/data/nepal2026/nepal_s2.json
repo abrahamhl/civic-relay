@@ -1,0 +1,75 @@
+{
+ "caso": "Colapso glaciar de Langtang Lirung y crecida del Bhote Koshi, Nepal, 26-08-2026",
+ "fuente": "Copernicus Sentinel-2 L2A (ESA) vía AWS sentinel-cogs; búsqueda STAC en earth-search.aws.element84.com",
+ "licencia": "Datos Copernicus Sentinel: uso libre con atribución (aviso legal de Copernicus)",
+ "aoi_wgs84": [
+  85.28,
+  28.12,
+  85.62,
+  28.36
+ ],
+ "imagen_bounds_wgs84": [
+  85.27554,
+  28.11556,
+  85.62349,
+  28.36401
+ ],
+ "origenUSGS": {
+  "id": "us7000tbwb",
+  "lat": 28.271,
+  "lon": 85.515,
+  "pixel": [
+   509,
+   1167
+  ]
+ },
+ "crs": "EPSG:32645",
+ "resolucion_m": 20,
+ "ancho": 1690,
+ "alto": 1355,
+ "bounds_utm": [
+  331000.0,
+  3111200.0,
+  364800.0,
+  3138300.0
+ ],
+ "escenas": {
+  "pre": {
+   "escena": "S2C_45RUM_20260812_0_L2A",
+   "fecha": "20260812",
+   "tci": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/45/R/UM/2026/8/S2C_45RUM_20260812_0_L2A/TCI.tif",
+   "pixelesDespejados": 0.867
+  },
+  "post": {
+   "escena": "S2C_45RUM_20260928_0_L2A",
+   "fecha": "20260928",
+   "tci": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/45/R/UM/2026/9/S2C_45RUM_20260928_0_L2A/TCI.tif",
+   "pixelesDespejados": 0.342
+  },
+  "post2": {
+   "escena": "S2B_45RUM_20261026_0_L2A",
+   "fecha": "20261026",
+   "tci": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/45/R/UM/2026/10/S2B_45RUM_20261026_0_L2A/TCI.tif",
+   "pixelesDespejados": 0.753
+  }
+ },
+ "cambio": {
+  "metodo": "NDVI del 12-08 − NDVI del 26-10 > 0,3 y NDVI después < 0,15, solo en píxeles despejados (SCL) en ambas fechas",
+  "km2": 18.02,
+  "km2_bruto_sin_filtrar": 25.08,
+  "filtro": "se descartan manchas < 0,05 km²",
+  "componentePrincipal": {
+   "criterio": "mancha conexa más grande",
+   "centroide": [
+    28.31616,
+    85.49569
+   ],
+   "km2": 2.49,
+   "distanciaAlOrigenUSGS_m": 3607,
+   "extension_km": 3.8
+  },
+  "despues": "post2",
+  "km2_comparables": 649.9,
+  "aviso": "Detección espectral calculada por este script. No es un mapa oficial de daños: incluye cualquier pérdida de vegetación entre fechas (cultivos, deslizamientos menores) y excluye lo que tapan nubes, sombras o nieve. Revisado a ojo: el cauce arrasado del Lhende Khola y el Bhote Koshi sale de forma continua, pero también hay falsos positivos dispersos junto al límite de la nieve (cambio estacional entre agosto y octubre), así que los km² totales NO son la superficie afectada."
+ }
+}

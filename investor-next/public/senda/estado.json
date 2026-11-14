@@ -1,11 +1,11 @@
 {
- "core": 433,
- "coreTotal": 433,
+ "core": 506,
+ "coreTotal": 506,
  "e2e": 49,
  "e2eTotal": 49,
  "relay": 3,
- "android": "no ejecutado aquí (sin JDK; lo ejecuta CI)",
- "esp32": "no ejecutado aquí (sin g++; lo ejecuta CI)",
- "sha": "c1112d2",
- "generatedAt": "2026-11-10T05:02:08.526Z"
+ "android": "14 invariantes de formato SENDA (paridad web / Android / ESP32).",
+ "esp32": "trama SENDA en C++ idéntica a web y Android (3 vectores + CRC)",
+ "sha": "89ee438",
+ "generatedAt": "2026-11-14T02:38:08.982Z"
 }

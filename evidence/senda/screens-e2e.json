@@ -1,0 +1,275 @@
+{
+ "kind": "senda-screens-e2e",
+ "at": "2026-11-14T16:34:25.263Z",
+ "durationS": 46,
+ "passed": 36,
+ "total": 36,
+ "results": [
+  {
+   "name": "mensaje: el número de seguridad coincide en los dos móviles",
+   "ok": true
+  },
+  {
+   "name": "mensaje: un mensaje corto cabe en una línea de ≤ 160 caracteres",
+   "ok": true,
+   "chars": 125
+  },
+  {
+   "name": "mensaje: se abre con autenticidad verificada",
+   "ok": true
+  },
+  {
+   "name": "mensaje: el repetido se detecta",
+   "ok": true
+  },
+  {
+   "name": "mensaje: el alterado no se muestra",
+   "ok": true
+  },
+  {
+   "name": "mensaje: el largo se rehace sin la primera línea y desordenado",
+   "ok": true,
+   "lines": 8
+  },
+  {
+   "name": "mensaje: pasa por sonido de un móvil a otro y se abre",
+   "ok": true
+  },
+  {
+   "name": "avisos: cada reporte firmado ocupa exactamente 160 caracteres",
+   "ok": true
+  },
+  {
+   "name": "avisos: 2 nuevos, 1 repetido y 1 falsificado rechazado",
+   "ok": true,
+   "imp": "2 nuevo(s) · 1 repetido(s) · 1 rechazado(s) (firma o formato no válidos)"
+  },
+  {
+   "name": "avisos: dos vecinos de la misma calle forman un solo incidente",
+   "ok": true
+  },
+  {
+   "name": "avisos: un incidente de agua muestra el caudal previsto por GloFAS (en directo o de la foto guardada) sin presentarlo como aviso",
+   "ok": true,
+   "gl": "Caudal previsto (GloFAS): GloFAS hoy 15.6 m³/s (1.3× la mediana de los 30 días previos); pico previsto 18.7 m³/s el 2026-11-15 (1.6×); mañana sube. consulta en directoCaudal modelado por GloFAS en la "
+  },
+  {
+   "name": "avisos: un reporte pasa por sonido y entra verificado",
+   "ok": true
+  },
+  {
+   "name": "centro: 4 líneas válidas, 1 rechazada, 2 incidentes y atrapados primero",
+   "ok": true,
+   "valid": 4,
+   "rejected": 1,
+   "incidents": 2,
+   "top": "STRUCTURE"
+  },
+  {
+   "name": "centro: el consenso amplio confirma lo que apoyan ambos grupos y no lo que empuja uno solo (aunque gane la mayoría)",
+   "ok": true,
+   "inundacion": {
+    "majority": "MAYORIA_SI",
+    "bridging": "CONFIRMADO_CONSENSO_AMPLIO"
+   },
+   "bulo": {
+    "majority": "MAYORIA_SI",
+    "bridging": "SIN_CONSENSO"
+   }
+  },
+  {
+   "name": "centro: el parte CAP 1.2 es restringido y de ejercicio",
+   "ok": true
+  },
+  {
+   "name": "atlas: Camp Fire con detecciones GOES reales y zona de 5 km alrededor de Paradise",
+   "ok": true,
+   "total": 1045,
+   "inside": 258,
+   "first": "2018-11-08T16:17:18.000Z"
+  },
+  {
+   "name": "atlas: la línea de tiempo filtra por instante",
+   "ok": true
+  },
+  {
+   "name": "atlas: el GeoJSON exportado lleva fuente y base en cada punto",
+   "ok": true,
+   "features": 259
+  },
+  {
+   "name": "atlas: capa mundial con alertas reales de GDACS (descarga oficial con SHA-256 por página)",
+   "ok": true,
+   "total": 1720
+  },
+  {
+   "name": "atlas: capa España con incidencias reales de la DGT leídas por el lector DATEX II del núcleo",
+   "ok": true,
+   "total": 838
+  },
+  {
+   "name": "atlas: parte del día calculado por capa (sin texto inventado) y carreteras con incidencias en una zona de Madrid",
+   "ok": true,
+   "capas": [
+    [
+     "Mundo · GDACS",
+     1720,
+     22
+    ],
+    [
+     "España · DGT",
+     838,
+     343
+    ],
+    [
+     "Países Bajos · NDW",
+     1238,
+     549
+    ]
+   ],
+   "roadsN": 36
+  },
+  {
+   "name": "atlas: capa Países Bajos con situaciones reales de NDW leídas por el mismo lector DATEX II",
+   "ok": true,
+   "total": 1238
+  },
+  {
+   "name": "atlas: medir distancias en el mapa y vigilar una zona (se guarda y al volver cuenta las novedades)",
+   "ok": true,
+   "mm": 178826.59711035862,
+   "wz": [
+    {
+     "name": "prueba",
+     "case": "nl",
+     "n": 0
+    }
+   ]
+  },
+  {
+   "name": "atlas: la zona vigilada exporta un parte CAP 1.2 restringido y de ejercicio con su área",
+   "ok": true
+  },
+  {
+   "name": "atlas: modo embebible para webs municipales (solo mapa, enlace a la versión completa)",
+   "ok": true
+  },
+  {
+   "name": "atlas: DANA de Valencia con zonas inundadas reales de Copernicus EMS EMSR773 (mapeo oficial, área calculada)",
+   "ok": true,
+   "total": 6
+  },
+  {
+   "name": "atlas: capa de integridad GNSS con celdas calculadas a partir de ADS-B real (adsb.lol, ODbL)",
+   "ok": true,
+   "total": 194
+  },
+  {
+   "name": "plataforma: catálogo de la API con fuente, licencia y SHA-256 en cada capa, estado de los datos y mapa embebible",
+   "ok": true,
+   "capas": 6,
+   "elementos": 6216,
+   "licencias": true
+  },
+  {
+   "name": "consola: situaciones fusionadas entre fuentes, cinco representaciones del planeta y recorrido preparado",
+   "ok": true,
+   "s": 66,
+   "e": 19481,
+   "seen": [
+    "globo",
+    "nocturno",
+    "calor",
+    "columnas",
+    "plano"
+   ],
+   "sel": "sit:usgs:us7000tbwb",
+   "steps": 8,
+   "conc": {
+    "matched": 537,
+    "shareA": 0.968,
+    "medianKm": 0,
+    "medianAbsS": 0.5,
+    "independence": "DEPENDENT"
+   },
+   "emsc": {
+    "matched": 662,
+    "independent": 475,
+    "medianKmIndep": 8.6,
+    "independence": "PER_EVENT"
+   }
+  },
+  {
+   "name": "consola: una incidencia de la DGT muestra la cámara real más cercana con imagen en directo (como contexto, no como corroboración)",
+   "ok": true,
+   "live": "https://etraffic.dgt.es/camarasEtraffic/165886.jpg"
+  },
+  {
+   "name": "consola: cordón de cámaras medido (DGT + YOLOX) por sectores alrededor de un accidente real, sin decir «confirmado»",
+   "ok": true,
+   "live": 3,
+   "blind": 5,
+   "verdict": "TRAFICO_PRESENTE",
+   "statements": [
+    "Comprobable visualmente ahora en 3 de 8 sectores (E, SE, O).",
+    "Sectores ciegos (sin cámara en 15 km): N, NE, S, SO, NO.",
+    "En 2 de 3 cámara(s) vivas de la A-3 hay vehículos o movimiento: indicio de que la vía no está cortada en ese punto (no lo prueba)."
+   ]
+  },
+  {
+   "name": "consola (web estática): la pestaña Comunidad dice con claridad que SENDA LIVE no está conectado y no inventa publicaciones",
+   "ok": true
+  },
+  {
+   "name": "mulas de datos: CSA en el navegador sobre horarios reales de la EMT; más flota con nodo nunca empeora; marcado como simulación",
+   "ok": true,
+   "m50": {
+    "origin": "2219",
+    "q": 0.5,
+    "reached": 1149,
+    "of": 1151,
+    "p50": 74.63333333333334,
+    "ms": 7.400000000023283
+   },
+   "m100": {
+    "origin": "2219",
+    "q": 1,
+    "reached": 1151,
+    "of": 1151,
+    "p50": 46.1,
+    "ms": 1.3000000000465661
+   }
+  },
+  {
+   "name": "sobrevuelo: relieve Copernicus DEM, Sentinel-2 antes/después, señal sísmica real de USGS y ruta calculada sobre el cambio",
+   "ok": true,
+   "points": 44,
+   "km": 44.6,
+   "demMax": 7207.38916015625,
+   "quake": "us7000tbwb",
+   "done": false
+  },
+  {
+   "name": "demo: cifra en ≤ 160 caracteres, abre, rechaza alterado y repetido, verifica reporte y calcula el atlas",
+   "ok": true,
+   "chars": 99,
+   "opened": true,
+   "tamperRejected": true,
+   "replayRejected": true,
+   "reportChars": 160,
+   "reportVerified": true,
+   "atlas": {
+    "detections": 1045,
+    "insideParadise5km": 258,
+    "minutesToParadise": 80
+   },
+   "done": true
+  },
+  {
+   "name": "sin errores de JavaScript en las páginas",
+   "ok": true,
+   "errors": []
+  }
+ ],
+ "note": "Ubicación del navegador fija; sonido verificado decodificando la señal generada (no por altavoz y micrófono reales)."
+}

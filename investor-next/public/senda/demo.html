@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Demo guiada</title>
+<meta name="description" content="Qué es SENDA y para qué sirve, demostrado en tu navegador con el código real: mensajes cifrados sin red, reportes ciudadanos firmados y un atlas de incendios con datos de satélite.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:16px/1.55 Inter,system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 70px}h1{font-size:34px;line-height:1.15;margin:6px 0 10px}h2{font-size:22px;margin:34px 0 10px}h3{font-size:17px;margin:0 0 6px}.m{color:var(--m)}a{color:var(--i)}
+.card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:16px;min-width:0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}@media(max-width:860px){.g2,.g3{grid-template-columns:1fr}}
+button,.btn{font:inherit;display:inline-block;text-decoration:none;min-height:48px;padding:11px 18px;border-radius:12px;border:1px solid var(--l);background:#0f1d27;color:var(--t);cursor:pointer;font-weight:700}
+.p{background:var(--c)!important;border-color:var(--c)!important;color:#140804!important}
+video{width:100%;border-radius:10px;background:#000;display:block;margin:8px 0}
+ol#log{padding-left:22px;margin:12px 0 0}ol#log li{margin:6px 0}ol#log code{word-break:break-all;font-size:12px;color:var(--i)}
+.ok{color:var(--e);font-weight:700}.bad{color:var(--r);font-weight:700}
+.note{border-left:3px solid var(--a);padding:8px 12px;background:#0f1a22;border-radius:6px;font-size:14px;margin-top:10px}
+.step{font:700 12px ui-monospace,monospace;color:var(--c);letter-spacing:.06em}
+ul.no li{margin:4px 0}
+</style>
+</head>
+<body><main>
+<p><a href="/senda">← SENDA</a></p>
+<p class="step">DEMO GUIADA · 3 MINUTOS</p>
+<h1>SENDA mantiene la información de una emergencia en movimiento cuando la red falla o se satura.</h1>
+<p class="m" style="font-size:18px">Hace tres cosas: <b>(1)</b> te permite mandar un mensaje cifrado a tu gente aunque no haya datos, <b>(2)</b> convierte lo que ven los vecinos en reportes firmados y agrupados que una sala de emergencias puede usar sin colapsar el 112, y <b>(3)</b> pone en un mapa con línea de tiempo lo que pasó, dónde y cuándo, con la fuente de cada dato.</p>
+
+<section class="card" style="margin-top:18px">
+  <h3>▶ Pruébalo aquí mismo: el código real de SENDA corriendo en tu navegador</h3>
+  <p class="m" style="margin:0">Sin instalar nada y sin servidor: claves, cifrado y firmas se generan ahora en este dispositivo (WebCrypto). Pulsa y lee paso a paso.</p>
+  <p style="margin:12px 0 0"><button class="p" id="run">Ejecutar la demostración</button></p>
+  <ol id="log"></ol>
+</section>
+
+<h2>Las tres piezas, una a una</h2>
+<div class="g3">
+  <section class="card">
+    <p class="step">1 · MENSAJE SIN RED</p>
+    <h3>Tú en Madrid, tu hermano en Países Bajos</h3>
+    <p class="m">Se emparejan una vez y comparan un número de seguridad. Desde ahí, un mensaje corto cabe en <b>una línea de 160 caracteres</b> que puede viajar por SMS, por un mensajero satelital o por sonido de un móvil a otro. Si alguien la altera o la repite, se rechaza.</p>
+    <video controls preload="metadata" src="/media/senda-demo/SENDA-demo-real-mensaje-sin-red.mp4"></video>
+    <a class="btn" href="/senda/mensaje">Abrir Mensaje</a>
+    <p class="note">Entre países hace falta <b>una vía real</b>: SMS cuando hay cobertura mínima o un mensajero satelital en cada lado. El satélite directo al móvil <b>no está disponible hoy</b> en España ni en Países Bajos.</p>
+  </section>
+  <section class="card">
+    <p class="step">2 · AVISOS → SALA</p>
+    <h3>De mil llamadas a un incidente ordenado</h3>
+    <p class="m">Cada vecino reporta «calle inundada» o «persona atrapada» con su posición en una línea firmada de 160 caracteres. La sala pega las líneas: SENDA <b>verifica las firmas</b>, descarta repetidos y falsos, agrupa por sitio, pone <b>primero a los atrapados</b> y exporta un parte <b>CAP 1.2</b>.</p>
+    <video controls preload="metadata" src="/media/senda-demo/SENDA-demo-real-avisos-centro.mp4"></video>
+    <a class="btn" href="/senda/avisos">Abrir Avisos</a> <a class="btn" href="/senda/centro">Abrir Centro</a>
+    <p class="note"><b>SENDA nunca avisa a la población</b>: eso lo decide y lo firma el organismo oficial. No hay todavía convenio con ninguna sala 112; el CAP sale marcado como ejercicio.</p>
+  </section>
+  <section class="card">
+    <p class="step">3 · ATLAS</p>
+    <h3>Qué pasó, dónde y cuándo</h3>
+    <p class="m">Mapa con <b>línea de tiempo y reproducción</b>, sobre detecciones reales del satélite NOAA GOES en 7 incendios y las <b>alertas mundiales de GDACS</b> (ONU y Comisión Europea) de los últimos 30 días, descargadas de la fuente oficial. Dibujas una zona (un pueblo) y te dice <b>cuándo entró el fuego</b>, cuánta potencia se detectó y qué cámaras públicas la cubren. Exporta GeoJSON o CSV y comparte la vista con un enlace.</p>
+    <video controls preload="metadata" src="/media/senda-demo/SENDA-demo-real-atlas.mp4"></video>
+    <a class="btn" href="/senda/atlas">Abrir Atlas</a> <a class="btn" href="/senda/fuego3d">Incendio 3D</a>
+    <p class="note">El vídeo es una grabación de esta misma página. En «Incendio 3D», con terreno y meteorología reales: sin calibrar, el modelo de propagación <b>no predice mejor que un círculo</b>: el valor está en ordenar datos reales, no en adivinar.</p>
+  </section>
+</div>
+
+<h2>¿Para quién es?</h2>
+<div class="g2">
+  <section class="card"><h3>Ciudadanos</h3><p class="m" style="margin:0">Una app que funciona sin conexión: mensaje cifrado a la familia, reporte de un peligro en un toque y consejo claro («si hay riesgo para la vida, llama al 112»). Gratis y de código abierto.</p></section>
+  <section class="card"><h3>Organismos (protección civil, ayuntamientos, salas 112)</h3><p class="m" style="margin:0">Una cola de reportes verificados y priorizados, un atlas con historial y perímetros, y exportación en estándares que ya usan (CAP 1.2, GeoJSON). Es un <b>complemento</b> de sus sistemas, no un sustituto.</p></section>
+</div>
+
+<h2>Lo que todavía NO está demostrado</h2>
+<ul class="no m">
+  <li>No se ha probado en campo con teléfonos y radios reales: es el siguiente hito (protocolo de piloto escrito).</li>
+  <li>No hay convenio con ninguna sala 112 ni con ningún organismo.</li>
+  <li>Las probabilidades de entrega por canal salen de catálogo y simulación, no de medidas de campo.</li>
+  <li>El paso por sonido está verificado decodificando la señal generada, no todavía con altavoz y micrófono en una sala ruidosa.</li>
+</ul>
+<p class="m">Estado de las pruebas automáticas, a la vista: <a href="/senda/estado">/senda/estado</a>.</p>
+<p class="m">SENDA como plataforma (canales, API de datos abiertos, mapa embebible): <a href="/senda/plataforma">/senda/plataforma</a>. Consola de situación con globo, fusión de fuentes y muro de vídeo: <a href="/senda/consola">/senda/consola</a>.</p>
+
+<script type="module">
+import { createPairingKeys, derivePairing, sealCompact, openCompact } from '/senda/core/courier.mjs';
+import { createReporterKeys, encodeReport, decodeReports } from '/senda/core/hazard-reports.mjs';
+import { eventsFromGoes, filterEvents, areaStats } from '/senda/core/atlas.mjs';
+import { b64 } from '/senda/core/b64.mjs';
+const $ = (s) => document.querySelector(s), log = $('#log');
+const step = (html) => { log.insertAdjacentHTML('beforeend', `<li>${html}</li>`); return new Promise((r) => setTimeout(r, 450)); };
+const b64u = (u) => b64(u).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const out = {};
+$('#run').onclick = async () => {
+  $('#run').disabled = true; log.innerHTML = '';
+  try {
+    const ana = await createPairingKeys(), leo = await createPairingKeys();
+    await step('Se crean dos móviles, <b>Ana</b> (Madrid) y <b>Leo</b> (Utrecht), cada uno con su clave privada, que nunca sale del aparato.');
+    const pa = await derivePairing(ana, leo.publicJwk), pl = await derivePairing(leo, ana.publicJwk);
+    await step('Se emparejan intercambiando solo su parte pública: los dos derivan <b>la misma clave secreta</b> sin enviarla nunca (ECDH P-256 + HKDF).');
+    const text = 'Estoy bien. Sin red en casa. Llamo cuando vuelva.';
+    const sealed = await sealCompact(pa, text), line = b64u(sealed);
+    out.chars = line.length;
+    await step(`Ana cifra «${esc(text)}» → <b>${sealed.length} bytes</b>, que en texto son <b>${line.length} caracteres</b> (caben en un SMS de 160):<br><code>${line}</code>`);
+    const o1 = await openCompact(pl, sealed);
+    out.opened = o1.ok;
+    await step(o1.ok ? `<span class="ok">✔ Leo lo abre:</span> «${esc(o1.text)}». Solo él podía.` : `<span class="bad">✘ ${o1.reason}</span>`);
+    const bad = sealed.slice(); bad[12] ^= 1;
+    const o2 = await openCompact(pl, bad);
+    out.tamperRejected = !o2.ok;
+    await step(o2.ok ? '<span class="bad">✘ se aceptó un mensaje alterado</span>' : '<span class="ok">✔ Un atacante cambia un solo bit → rechazado</span> (la etiqueta de autenticidad no cuadra).');
+    const o3 = await openCompact(pl, sealed);
+    out.replayRejected = !o3.ok && o3.reason === 'REPLAY';
+    await step(out.replayRejected ? '<span class="ok">✔ Alguien reenvía el mismo mensaje → rechazado</span> como repetido.' : '<span class="bad">✘ el repetido no se detectó</span>');
+    let keys = null; try { keys = await createReporterKeys(); } catch { keys = null; }
+    if (keys) {
+      const rep = await encodeReport({ kind: 'PERSON_TRAPPED', lat: 39.4269, lon: -0.4174, at: Date.now(), people: { trapped: 2, injured: 0 } }, keys);
+      out.reportChars = rep.length;
+      await step(`Un vecino de Paiporta reporta <b>«persona atrapada, 2»</b> con su posición. Firmado (Ed25519) ocupa <b>${rep.length} caracteres</b>:<br><code>${rep}</code>`);
+      const forged = rep.slice(0, 30) + (rep[30] === 'A' ? 'B' : 'A') + rep.slice(31);
+      const d = await decodeReports(rep + '\n' + forged);
+      out.reportVerified = d.reports.length === 1 && d.rejected.length === 1;
+      await step(out.reportVerified ? `<span class="ok">✔ La sala verifica la firma</span> (${d.reports[0].people.trapped} atrapados en ${d.reports[0].lat.toFixed(4)}, ${d.reports[0].lon.toFixed(4)}) y <span class="ok">rechaza la copia falsificada</span>. Lo prioriza, pero <b>no avisa a la población</b>: eso es del organismo oficial.` : '<span class="bad">✘ fallo al verificar</span>');
+    } else await step('<span class="m">Este navegador no admite firmas Ed25519; el paso del reporte firmado se omite (funciona en Chrome, Edge, Firefox y Safari recientes).</span>');
+    const goes = await fetch('/senda/data/referencias/goes_casos.json').then((r) => r.json());
+    const ev = eventsFromGoes(goes, { cases: ['camp'] }), t0 = Math.min(...ev.map((e) => e.t));
+    const st = areaStats(filterEvents(ev, { area: { type: 'circle', center: { lat: 39.7596, lon: -121.6219 }, radiusM: 5000 } }));
+    const mins = Math.round((st.first - t0) / 60_000);
+    out.atlas = { detections: ev.length, insideParadise5km: st.n, minutesToParadise: mins };
+    await step(`Atlas con datos reales del satélite NOAA GOES-16 (Camp Fire, 2018): ${ev.length} detecciones. Dentro de un radio de 5 km de Paradise la primera aparece <b>${Math.floor(mins / 60)} h ${String(mins % 60).padStart(2, '0')} min</b> después de la primera detección del incendio. Calculado ahora mismo con el código del Atlas. <a href="/senda/atlas#caso=camp">Ábrelo y dibuja tu propia zona →</a>`);
+    out.done = true;
+  } catch (e) { await step(`<span class="bad">Error: ${esc(e.message)}</span>`); out.error = e.message; }
+  window.SENDA_DEMO = out; $('#run').disabled = false; $('#run').textContent = 'Repetir';
+};
+</script>
+</main></body>
+</html>

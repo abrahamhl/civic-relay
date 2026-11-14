@@ -244,3 +244,40 @@ test('Integración con planAssuredDelivery: los recibos del ReliabilityStore ali
   assert.ok(planWithStore.learned['MESHTASTIC'].observations > planBase.learned['MESHTASTIC'].observations);
   assert.ok(planWithStore.learned['MESHTASTIC'].lowerCredible >= planBase.learned['MESHTASTIC'].lowerCredible);
 });
+
+test('ReliabilityStore: sincronizar dos veces con el mismo nodo NO duplica la evidencia (idempotencia del CRDT)', () => {
+  const a = new ReliabilityStore({ nodeId: 'A' }), b = new ReliabilityStore({ nodeId: 'B' });
+  const r = (ok, i) => createDeliveryReceipt({ bearerId: 'SMS', zoneH3: 'z', sentAt: 1000 + i, ackedAt: ok ? 1001 + i : null, outcome: ok ? 'DELIVERED' : 'EXPIRED', nonce: `n${i}` });
+  for (let i = 0; i < 6; i++) a.ingestReceipt(r(true, i));
+  for (let i = 6; i < 10; i++) b.ingestReceipt(r(false, i));
+  const once = a.merge(b), twice = once.merge(b).merge(a).merge(once);
+  assert.equal(once.getReliability('SMS', 'z').sampleCount, 10);
+  assert.deepEqual(twice.getReliability('SMS', 'z'), once.getReliability('SMS', 'z'), 'A∪B∪B∪A = A∪B');
+  assert.deepEqual(a.merge(a).getReliability('SMS', 'z'), a.getReliability('SMS', 'z'), 'A∪A = A');
+  // un nodo que sigue aprendiendo: gana su registro más reciente, sin sumar el viejo
+  a.ingestReceipt(r(true, 50));
+  assert.equal(once.merge(a).getReliability('SMS', 'z').sampleCount, 11);
+});
+
+test('ReliabilityStore: el mismo recibo recibido dos veces cuenta una vez; recibos distintos en el mismo milisegundo cuentan todos', () => {
+  const s = new ReliabilityStore({ nodeId: 'x' });
+  const rec = createDeliveryReceipt({ bearerId: 'SMS', zoneH3: 'z', sentAt: 5, ackedAt: 6, outcome: 'DELIVERED' });
+  assert.equal(s.ingestReceipt(rec), true);
+  assert.equal(s.ingestReceipt({ ...rec }), false);
+  for (let i = 0; i < 20; i++) s.ingestReceipt(createDeliveryReceipt({ bearerId: 'SMS', zoneH3: 'z', sentAt: 5, ackedAt: 6, outcome: 'DELIVERED' }));
+  assert.equal(s.getReliability('SMS', 'z').sampleCount, 21);
+});
+
+test('ReliabilityStore: v2 sobrevive a toJSON/fromJSON con su libro por nodo y se puede seguir fusionando', () => {
+  const a = new ReliabilityStore({ nodeId: 'A' });
+  for (let i = 0; i < 4; i++) a.ingestReceipt(createDeliveryReceipt({ bearerId: 'MESHTASTIC', zoneH3: 'z', sentAt: 1 + i, ackedAt: 2 + i, outcome: 'DELIVERED', nonce: `m${i}` }));
+  const back = ReliabilityStore.fromJSON(JSON.parse(JSON.stringify(a.toJSON())));
+  assert.equal(back.nodeId, 'A');
+  assert.deepEqual(back.merge(a).getReliability('MESHTASTIC', 'z'), a.getReliability('MESHTASTIC', 'z'));
+});
+
+test('reliability-store no depende de Node (se ejecuta igual en la app)', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const src = await readFile(new URL('../src/reliability-store.mjs', import.meta.url), 'utf8');
+  assert.doesNotMatch(src, /from 'node:/);
+});
