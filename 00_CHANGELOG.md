@@ -154,7 +154,7 @@
   - Cliente OGC STAC 1.0.0 sobre la API pública de Copernicus Data Space Ecosystem.
   - Descubrimiento de escenas Sentinel-2 MSI y Sentinel-1 SAR por bounding box, ventana temporal y filtro de nubosidad (`eo:cloud_cover`).
   - *Principio epistémico:* **Solo metadatos y miniaturas (thumbnails)**; prohibida la descarga de imágenes brutas pesadas (archivos SAFE de gigabytes) en terminales de emergencia.
-  - Fixture representativo con huellas de Valencia (EMSR765) y Cebreros: `packages/senda/tests/fixtures/cdse-stac-sample-2026.json`.
+  - Fixture representativo con huellas de Valencia (EMSR765) y Cebreros: `packages/senda/tests/fixtures/cdse-stac-sample-2026.json`. **[CORRECCIÓN 14-11-2026: fixture sintético escrito a mano, no descarga real; EMSR765 es ficticio (la DANA real es EMSR773). Ver `packages/senda/tests/fixtures/README.md`.]**
 - **L4.3 · Adaptador Inactivo NASA FIRMS (`packages/senda/src/nasa-firms.mjs`):**
   - Integración protegida para anomalías térmicas activas VIIRS/MODIS.
   - *Protocolo inactivo por defecto:* Sin la presencia de la clave secreta `FIRMS_MAP_KEY` en el entorno, el adaptador devuelve `{ status: 'INACTIVE', reason: 'FIRMS_MAP_KEY_REQUIRED' }` sin lanzar excepciones ni realizar llamadas de red no autorizadas.
@@ -207,7 +207,7 @@
   - Integración nativa con `planAssuredDelivery` en `delivery-assurance.mjs`: los recibos empíricos modulan dinámicamente el reparto $k$-de-$n$.
 - **Adaptador Copernicus EMS Rapid Mapping (`packages/senda/src/copernicus-ems.mjs`):**
   - Segregación epistémica estricta entre ACTIVATION (declaración administrativa), CARTOGRAPHIC_PRODUCT (delineación o gradación satelital) y OBSERVED_PERIMETER (polígono real de inundación o cicatriz de fuego).
-  - Fixture real con la activación EMSR765 (DANA Valencia) y EMSR740 (incendio Cebreros), con hash SHA-256 canónico y recibo en `evidence/senda/osint/cems-live-receipt-2026-11-10.json`.
+  - Fixture real con la activación EMSR765 (DANA Valencia) y EMSR740 (incendio Cebreros), con hash SHA-256 canónico y recibo en `evidence/senda/osint/cems-live-receipt-2026-11-10.json`. **[CORRECCIÓN 14-11-2026: fixture sintético escrito a mano, no descarga real; EMSR765 es ficticio (la DANA real es EMSR773). Ver `packages/senda/tests/fixtures/README.md`.]**
   - Linaje declarado: ESA Sentinel-1 CSAR / Sentinel-2 MSI y catálogos upstream GLOFAS / EFFIS.
 - **Protocolo de Ensayos Físicos de Campo (`docs/field/PILOT_PROTOCOL_2026-11.md`):**
   - Matriz experimental con 5 escenarios (interior LOS 2 m, tabique 5 m, muros de carga 10 m, exterior 30 m y modo avión total).

@@ -6,6 +6,6 @@
  "relay": 3,
  "android": "14 invariantes de formato SENDA (paridad web / Android / ESP32).",
  "esp32": "trama SENDA en C++ idéntica a web y Android (3 vectores + CRC)",
- "sha": "86a63de",
- "generatedAt": "2026-11-14T01:06:14.242Z"
+ "sha": "89ee438",
+ "generatedAt": "2026-11-14T02:38:08.982Z"
 }

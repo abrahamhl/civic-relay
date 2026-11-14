@@ -1,4 +1,6 @@
 {
+  "basis": "SYNTHETIC_FIXTURE_NOT_REAL",
+  "avisoVeracidad": "CORRECCIÓN 14-11-2026: este «recibo» no corresponde a ninguna descarga real. El fixture se escribió a mano; EMSR765 no es la activación de la DANA (es EMSR773). El hash ya no coincide porque el fixture lleva ahora este mismo aviso.",
   "schema": "senda.evidence.osint-receipt/1",
   "source_id": "COPERNICUS_EMS_RAPID_MAPPING",
   "acquired_at_utc": "2026-11-10T05:35:00Z",
@@ -10,8 +12,15 @@
   "operator": "European Commission Joint Research Centre (JRC)",
   "lineage": {
     "provider": "Copernicus Emergency Management Service (JRC/EC)",
-    "upstreamSensors": ["ESA Sentinel-1 CSAR", "ESA Sentinel-2 MSI", "ASI COSMO-SkyMed"],
-    "sameUpstreamCatalogs": ["GLOFAS", "EFFIS"]
+    "upstreamSensors": [
+      "ESA Sentinel-1 CSAR",
+      "ESA Sentinel-2 MSI",
+      "ASI COSMO-SkyMed"
+    ],
+    "sameUpstreamCatalogs": [
+      "GLOFAS",
+      "EFFIS"
+    ]
   },
   "epistemic_guarantees": {
     "claim": "DATO_REAL_CAPTURADO",
