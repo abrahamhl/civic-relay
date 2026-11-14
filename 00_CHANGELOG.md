@@ -1,5 +1,29 @@
 # Changelog
 
+## SENDA · 14-11-2026 · Consola de situación: fusión de fuentes, globo en cinco representaciones, muro de vídeo y recorrido
+
+**Entrada (fundador):** integrar e innovar en lugar de añadir módulos sueltos; una interfaz que parezca un programa real sin perder el minimalismo; cinco módulos nuevos; cajas con vídeo al estilo de «God's Eye View»; un recorrido de apertura; el planeta en varias representaciones y colores.
+
+**Procesamiento:**
+- `packages/senda/src/fusion.mjs` (nuevo): cruza todas las capas y construye **situaciones**. Cada una tiene un ancla (alerta GDACS, accidente DGT o NDW, inicio de incendio GOES o reporte ciudadano), la evidencia más cercana de cada capa dentro de su radio y ventana de tiempo, unos hechos calculados (recuentos y distancias, sin redactar) y la procedencia de cada dato. Las reglas por tipo están declaradas en `DEFAULT_RULES`.
+- `/senda/consola` (nuevo): rejilla de programa con barra superior, capas, representaciones, lista de situaciones, inspector y barra de estado.
+  - Globo three.js con textura pintada a partir de `land-110m`.
+  - Cinco representaciones: globo, nocturno (aditivo), calor (gaussiana en escala logarítmica), columnas 3D (instanciadas por celdas de 2,5°) y plano equirrectangular.
+  - Inspector con etiquetas REAL, SIMULACIÓN o FIRMADO en cada dato.
+- Muro de vídeo con material real: repetición de las detecciones GOES-16 del Camp Fire a 1 h por segundo, Sentinel-2 de San Martín de Valdeiglesias, cámaras TfL, grabación de la app y alertas GDACS roja y naranja.
+- Recorrido guiado (`?tour=1`): vista general, luego Camp, Palisades, alerta roja, accidente con corroboración, terremoto, Países Bajos e inundación.
+- Enlaces añadidos en la portada, la demo y la plataforma; service worker v38 (consola y `fusion.mjs` disponibles sin red); la CI de Android comprueba que van dentro del APK.
+
+**Validación:** 534/534 en el núcleo (3 pruebas nuevas de fusión, una con el Camp Fire real); 30/30 en `senda-screens-e2e.mjs` (nueva comprobación de la consola); vídeo `SENDA-consola-promo.mp4` de 89 s grabado de la app real.
+
+**Límites:**
+- Radios, ventanas y orden de las situaciones son decisiones de SENDA, no umbrales validados.
+- Las cámaras y la integridad GNSS se tratan como capas sin fecha: una cámara de hoy no grabó un incendio de 2018.
+- Son fotos fechadas, no tiempo real.
+- No hay recorrido de la avalancha de Nepal porque SENDA no tiene datos de ese suceso.
+
+— Claude Code (sesión cloud)
+
 ## SENDA · 14-11-2026 · Atlas (mapa con línea de tiempo y perímetro) y demo guiada en la web
 
 **Entrada (fundador):** integrar lo mejor de los mapas de inteligencia abierta (línea de tiempo, histórico, acotar por perímetro) y una demo en la web que explique qué es SENDA y para qué sirve.

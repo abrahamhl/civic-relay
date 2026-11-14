@@ -4,6 +4,16 @@
 
 SENDA hace llegar un mensaje **antes que WhatsApp** cuando la red cae: combina vecinos con la app (Bluetooth, Wi-Fi Direct), quien tenga Internet por satélite u otro operador, SMS, satélites directos al móvil y gateways, y elige en cada momento la ruta más rápida. Cuando una autoridad declara una zona de emergencia (o la red de teléfonos detecta un sismo corroborado), los teléfonos con SENDA pasan a **modo relé preautorizado**. Incluye coordinación de familias e instituciones (policía, bomberos, protección civil), puente para personas atrapadas bajo escombros y localización de víctimas con realidad aumentada y Wi-Fi CSI.
 
+### 🌍 Consola de situación (`/senda/consola`)
+
+![SENDA Consola: situación fusionada con evidencia de varias fuentes](docs/media/consola/c-sel.png)
+
+| Calor | Columnas 3D | Plano | Muro de vídeo |
+|---|---|---|---|
+| ![calor](docs/media/consola/c-calor.png) | ![columnas](docs/media/consola/c-columnas.png) | ![plano](docs/media/consola/c-plano.png) | ![muro](docs/media/consola/c-muro.png) |
+
+En la consola se ven 16.699 elementos reales y fechados, con su fuente y licencia: GDACS, DGT, NDW, ADS-B (adsb.lol), NOAA GOES-16, TfL y Caltrans. El motor `fusion.mjs` los cruza y forma situaciones: cada una tiene un ancla y la evidencia de las demás capas, con su procedencia. Lo simulado lleva la etiqueta SIMULACIÓN. Son fotos de datos, no tiempo real. Vídeo de la consola: [`SENDA-consola-promo.mp4`](investor-next/public/media/senda-demo/SENDA-consola-promo.mp4) (89 s, grabado de la app real).
+
 - **Empieza aquí:** [`entrega/LEEME_PRIMERO.md`](entrega/LEEME_PRIMERO.md) (carpeta autocontenida: web para Hostinger, zips y guía) · traspaso para otra IA: [docs/handoff/HANDOFF_COMPLETO_2026-11-05.md](docs/handoff/HANDOFF_COMPLETO_2026-11-05.md) · financiación: [docs/financiacion/RONDA_FINANCIACION_2026-11-05.md](docs/financiacion/RONDA_FINANCIACION_2026-11-05.md) · paper: [docs/paper/SENDA_FUEGO3D_paper.md](docs/paper/SENDA_FUEGO3D_paper.md) · v0.20, incendios de referencia y coches + cámaras + fuego: [docs/research/REFERENCIAS_COCHES_CAMARAS_2026-11-06.md](docs/research/REFERENCIAS_COCHES_CAMARAS_2026-11-06.md)
 - **Visión vigente:** [docs/product/SENDA_VISION_2026-11-04.md](docs/product/SENDA_VISION_2026-11-04.md)
 - **Núcleo:** [`packages/senda`](packages/senda) — `pnpm --filter @senda/core test` · `pnpm --filter @senda/core evidence`

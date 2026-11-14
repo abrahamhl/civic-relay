@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Consola</title>
+<meta name="description" content="Consola de situación de SENDA: globo 3D con cinco formas de representar los datos, situaciones fusionadas de todas las fuentes, muro de vídeo con imágenes reales y recorrido guiado.">
+<link rel="icon" href="/senda/icon.svg">
+<script src="/senda/vendor/three-0.158.0.min.js"></script>
+<style>
+:root{--bg:#090d11;--p:#0e1318;--p2:#121921;--l:#1d2731;--t:#d5dce2;--m:#7c8a95;--a:#3fb6ff;--o:#ff8a3d;--r:#ff4d5e;--y:#f5c542;--g:#3ddc97;--v:#a98bff;
+--ui:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--t);font:12.5px/1.45 var(--ui);overflow:hidden}
+a{color:var(--a);text-decoration:none}button{font:inherit;color:var(--t);background:var(--p2);border:1px solid var(--l);border-radius:2px;padding:4px 9px;cursor:pointer}button:hover{border-color:#2c3a47}button.on{background:#13304a;border-color:var(--a);color:#fff}
+.app{display:grid;height:100vh;grid-template-rows:34px 1fr 22px;grid-template-columns:262px 1fr 356px;grid-template-areas:"top top top" "left view right" "status status status"}
+.top{grid-area:top;display:flex;align-items:center;gap:14px;padding:0 10px;border-bottom:1px solid var(--l);background:var(--p)}
+.brand{font-weight:700;letter-spacing:.18em;font-size:12px}.brand b{color:var(--o)}.menu{display:flex;gap:2px}.menu button{border:0;background:transparent;color:var(--m)}.menu button.on,.menu button:hover{color:#fff;background:var(--p2)}
+.clock{margin-left:auto;font:11.5px var(--mono);color:var(--m)}
+.left{grid-area:left;border-right:1px solid var(--l);background:var(--p);overflow:auto}.right{grid-area:right;border-left:1px solid var(--l);background:var(--p);display:flex;flex-direction:column;min-height:0}
+.hd{font:600 10.5px var(--ui);text-transform:uppercase;letter-spacing:.08em;color:var(--m);padding:9px 10px 6px;border-bottom:1px solid var(--l);display:flex;justify-content:space-between;align-items:center}
+.row{display:flex;align-items:center;gap:8px;padding:5px 10px;border-bottom:1px solid #141c23;cursor:pointer}.row:hover{background:var(--p2)}.row .n{margin-left:auto;font:11px var(--mono);color:var(--m)}
+.sw{width:9px;height:9px;border-radius:1px;flex:none}.chk{width:13px;height:13px;border:1px solid #3a4956;border-radius:2px;flex:none;display:grid;place-items:center;font-size:9px}.chk.on{background:var(--a);border-color:var(--a);color:#03131f}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:8px 10px}
+.sit{padding:7px 10px;border-bottom:1px solid #141c23;cursor:pointer}.sit:hover,.sit.sel{background:#101c27}.sit .t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sit .s{color:var(--m);font-size:11.5px}
+.sev{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.view{grid-area:view;position:relative;min-width:0;min-height:0;background:#05080b}#gl,#flat{position:absolute;inset:0;width:100%;height:100%;display:block}#flat{display:none}
+.hud{position:absolute;left:10px;top:8px;font:11px var(--mono);color:var(--m);pointer-events:none}.hudr{position:absolute;right:10px;top:8px;display:flex;gap:4px}
+.cap{position:absolute;left:14px;bottom:14px;max-width:min(640px,80%);background:rgba(9,13,17,.86);border:1px solid var(--l);border-left:3px solid var(--o);padding:10px 12px;display:none}
+.cap h3{margin:0 0 4px;font-size:15px}.cap ul{margin:4px 0 0;padding-left:16px;color:#c3ccd3}.cap .src{color:var(--m);font-size:11px;margin-top:6px}
+.tabs{display:flex;border-bottom:1px solid var(--l)}.tabs button{border:0;border-right:1px solid var(--l);background:transparent;color:var(--m);padding:8px 12px;border-radius:0}.tabs button.on{color:#fff;background:var(--p2);box-shadow:inset 0 -2px 0 var(--a)}
+.pane{overflow:auto;flex:1;min-height:0}.kv{display:grid;grid-template-columns:110px 1fr;gap:3px 8px;padding:8px 10px;font-size:12px}.kv span{color:var(--m)}
+table{width:100%;border-collapse:collapse;font-size:11.5px}td,th{padding:4px 8px;border-bottom:1px solid #141c23;text-align:left;vertical-align:top}th{color:var(--m);font-weight:600}td.num{font-family:var(--mono);white-space:nowrap}
+.tag{font:600 9.5px var(--mono);padding:1px 5px;border:1px solid var(--l);border-radius:2px;color:var(--m)}.tag.real{color:var(--g);border-color:#1f5a43}.tag.sim{color:var(--y);border-color:#5a4a1a}
+.wall{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--l)}.tile{background:#06090c;position:relative;aspect-ratio:16/10;overflow:hidden;cursor:pointer}.tile.big{grid-column:span 2}
+.tile canvas,.tile img,.tile video{width:100%;height:100%;object-fit:cover;display:block}.tile .lb{position:absolute;left:0;right:0;bottom:0;padding:4px 6px;background:linear-gradient(transparent,rgba(0,0,0,.85));font-size:10.5px}.tile .lb b{display:block;font-size:11px}
+.tile .rec{position:absolute;top:5px;left:6px;font:600 9.5px var(--mono);color:#fff;background:rgba(255,77,94,.85);padding:1px 5px;border-radius:2px}
+.list{font-size:11px;padding:6px 8px;height:calc(100% - 40px);overflow:hidden}.list div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:2px 0;border-bottom:1px solid #121a21}
+.status{grid-area:status;display:flex;gap:16px;align-items:center;padding:0 10px;border-top:1px solid var(--l);background:var(--p);font:11px var(--mono);color:var(--m)}.status .ok{color:var(--g)}
+@media (max-width:900px){body{overflow:auto}.app{height:auto;grid-template-columns:1fr;grid-template-rows:34px 60vh auto auto 22px;grid-template-areas:"top" "view" "right" "left" "status"}.right{max-height:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><b>■</b> SENDA <span style="color:var(--m);font-weight:400;letter-spacing:.06em">CONSOLA</span></div>
+    <nav class="menu"><button id="tourBtn">▶ Recorrido</button><a href="/senda/atlas"><button>Atlas</button></a><a href="/senda/centro"><button>Centro</button></a><a href="/senda/plataforma"><button>API y datos</button></a><a href="/senda/demo"><button>Qué es SENDA</button></a></nav>
+    <div class="clock" id="clock">—</div>
+  </header>
+
+  <aside class="left">
+    <div class="hd">Capas <span id="nev"></span></div>
+    <div id="layers"></div>
+    <div class="hd">Representación</div>
+    <div class="modes" id="modes"></div>
+    <div class="hd">Situaciones fusionadas <span id="nsit"></span></div>
+    <div id="sits"></div>
+  </aside>
+
+  <main class="view" id="view">
+    <canvas id="gl" aria-label="Globo"></canvas><canvas id="flat" aria-label="Mapa plano"></canvas>
+    <div class="hud" id="hud"></div>
+    <div class="cap" id="cap"></div>
+  </main>
+
+  <aside class="right">
+    <div class="tabs"><button data-t="sit" class="on">Situación</button><button data-t="wall">Muro</button><button data-t="src">Fuentes</button></div>
+    <div class="pane" id="p-sit"><div style="padding:12px;color:var(--m)">Elige una situación a la izquierda, toca un punto del globo o pulsa ▶ Recorrido.</div></div>
+    <div class="pane" id="p-wall" hidden></div>
+    <div class="pane" id="p-src" hidden></div>
+  </aside>
+
+  <footer class="status" id="status">cargando datos…</footer>
+</div>
+
+<script type="module">
+import { eventsFromGdacs, eventsFromDgt, eventsFromNdw, eventsFromGnss, eventsFromGoes, eventsFromCameras, eventsFromReports, haversineM } from '/senda/core/atlas.mjs';
+import { fuseSituations, fireStartAnchors } from '/senda/core/fusion.mjs';
+const $ = (s) => document.querySelector(s), esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const R = '/senda/data/referencias/', getJ = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+const [gd, dg, nd, ad, go, tf, rf, land] = await Promise.all(['gdacs_eventos.json', 'dgt_incidencias.json', 'ndw_situaciones.json', 'adsb_gnss.json', 'goes_casos.json', 'tfl_camaras.json', 'referencias.json'].map((f) => getJ(R + f)).concat(getJ('/geo/land-110m.json')));
+let mine = []; try { mine = eventsFromReports(JSON.parse(localStorage.getItem('senda-avisos-reports')) ?? []); } catch { mine = []; }
+const FIRE_NAMES = { camp: 'Incendio Camp · Paradise, California (2018)', palisades: 'Incendio Palisades · Los Ángeles (2025)', eaton: 'Incendio Eaton · Altadena (2025)', marshall: 'Incendio Marshall · Colorado (2021)', smokehouse: 'Incendio Smokehouse Creek · Texas (2024)', troublesome: 'Incendio East Troublesome · Colorado (2020)', creek: 'Incendio Creek · California (2020)' };
+const L = {
+  gdacs: { name: 'Alertas mundiales · GDACS', color: '#ff8a3d', ev: gd ? eventsFromGdacs(gd) : [], on: true },
+  fire: { name: 'Fuego por satélite · GOES', color: '#ff4d5e', ev: go ? eventsFromGoes(go) : [], on: true },
+  dgt: { name: 'Carreteras España · DGT', color: '#f5c542', ev: dg ? eventsFromDgt(dg) : [], on: true },
+  ndw: { name: 'Carreteras Países Bajos · NDW', color: '#e8d27a', ev: nd ? eventsFromNdw(nd) : [], on: true },
+  gnss: { name: 'Integridad GPS · ADS-B', color: '#3ddc97', ev: ad ? eventsFromGnss(ad) : [], on: false },
+  cams: { name: 'Cámaras públicas', color: '#3fb6ff', ev: tf && rf ? eventsFromCameras(tf, rf.caltrans) : [], on: true },
+  citizen: { name: 'Reportes ciudadanos', color: '#a98bff', ev: mine, on: true },
+};
+const GCOL = { GDACS_EQ: '#ff8a3d', GDACS_WF: '#ff4d5e', GDACS_FL: '#3fb6ff', GDACS_TC: '#a98bff', GDACS_VO: '#f5c542', GDACS_DR: '#b08a5a', GNSS_green: '#3ddc97', GNSS_yellow: '#f5c542', GNSS_red: '#ff4d5e' };
+const colorOf = (k, e) => GCOL[e.kind] ?? L[k].color;
+
+/* ───── Fusión: situaciones a partir de todas las capas ───── */
+const pool = Object.values(L).flatMap((x) => x.ev);
+const anchors = [...L.gdacs.ev.filter((e) => /alerta (Red|Orange)/.test(e.label ?? '')), ...L.gdacs.ev.filter((e) => (e.kind === 'GDACS_WF' || e.kind === 'GDACS_FL') && e.lat > 35 && e.lat < 60 && e.lon > -12 && e.lon < 20),
+  ...L.dgt.ev.filter((e) => e.kind === 'DGT_accident'), ...L.ndw.ev.filter((e) => e.kind === 'NDW_Accident'), ...fireStartAnchors(L.fire.ev, FIRE_NAMES), ...L.citizen.ev];
+const SITS = fuseSituations(anchors, pool);
+
+/* ───── Globo 3D (three.js) con cinco representaciones ───── */
+const view = $('#view'), gl = $('#gl'), flat = $('#flat');
+const renderer = new THREE.WebGLRenderer({ canvas: gl, antialias: true, preserveDrawingBuffer: true }); renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(38, 1, 0.01, 50);
+const V = { lat: 38, lon: -8, dist: 3.4 }, target = { ...V };
+const xyz = (lat, lon, r = 1) => { const p = ((90 - lat) * Math.PI) / 180, t = ((lon + 180) * Math.PI) / 180; return new THREE.Vector3(-r * Math.sin(p) * Math.cos(t), r * Math.cos(p), r * Math.sin(p) * Math.sin(t)); };
+const tex = document.createElement('canvas'); tex.width = 2048; tex.height = 1024; const tg = tex.getContext('2d'), earthTex = new THREE.CanvasTexture(tex); earthTex.colorSpace = THREE.SRGBColorSpace;
+const earth = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 64), new THREE.MeshBasicMaterial({ map: earthTex })); scene.add(earth);
+const atmo = new THREE.Mesh(new THREE.SphereGeometry(1.035, 64, 32), new THREE.MeshBasicMaterial({ color: 0x3fb6ff, transparent: true, opacity: 0.06, side: THREE.BackSide })); scene.add(atmo);
+const dot = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.45, 'rgba(255,255,255,.95)'); gr.addColorStop(0.6, 'rgba(255,255,255,.25)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
+const ptsGeo = new THREE.BufferGeometry(), ptsMat = new THREE.PointsMaterial({ size: 0.02, map: dot, alphaTest: 0.02, vertexColors: true, transparent: true, opacity: 1, sizeAttenuation: true, depthWrite: false });
+const pts = new THREE.Points(ptsGeo, ptsMat); scene.add(pts);
+let cols = null; // columnas (InstancedMesh)
+const MODES = { globo: 'Globo', nocturno: 'Nocturno', calor: 'Calor', columnas: 'Columnas 3D', plano: 'Plano' };
+let mode = 'globo', visible = [];
+
+function paintEarth() {
+  const night = mode === 'nocturno', W = tex.width, H = tex.height;
+  tg.fillStyle = night ? '#020406' : '#0a1620'; tg.fillRect(0, 0, W, H);
+  tg.strokeStyle = night ? 'rgba(63,182,255,.07)' : 'rgba(120,150,170,.12)'; tg.lineWidth = 1;
+  for (let lo = -180; lo <= 180; lo += 15) { const x = ((lo + 180) / 360) * W; tg.beginPath(); tg.moveTo(x, 0); tg.lineTo(x, H); tg.stroke(); }
+  for (let la = -75; la <= 75; la += 15) { const y = ((90 - la) / 180) * H; tg.beginPath(); tg.moveTo(0, y); tg.lineTo(W, y); tg.stroke(); }
+  tg.fillStyle = night ? '#0b1117' : '#1b2a35'; tg.strokeStyle = night ? '#16222c' : '#2f4352';
+  for (const ring of land?.rings ?? []) { tg.beginPath(); for (let i = 0; i < ring.length; i += 2) { const x = ((ring[i] + 180) / 360) * W, y = ((90 - ring[i + 1]) / 180) * H; i ? tg.lineTo(x, y) : tg.moveTo(x, y); } tg.closePath(); tg.fill(); tg.stroke(); }
+  if (mode === 'calor') heat(tg, W, H);
+  earthTex.needsUpdate = true;
+}
+// Calor: densidad gaussiana de los eventos visibles, paleta tipo «inferno»
+function heat(g, W, H) {
+  const w = 512, h = 256, a = new Float32Array(w * h), K = 6;
+  for (const e of visible) { const cx = Math.floor(((e.lon + 180) / 360) * w), cy = Math.floor(((90 - e.lat) / 180) * h);
+    for (let dy = -K; dy <= K; dy++) for (let dx = -K; dx <= K; dx++) { const x = (cx + dx + w) % w, y = cy + dy; if (y < 0 || y >= h) continue; a[y * w + x] += Math.exp(-(dx * dx + dy * dy) / 9); } }
+  let mx = 0; for (const v of a) mx = Math.max(mx, v); if (!mx) return;
+  const c = document.createElement('canvas'); c.width = w; c.height = h; const cg = c.getContext('2d'), im = cg.createImageData(w, h);
+  const ramp = (t) => [Math.min(255, 40 + 600 * t), Math.min(255, 400 * t * t), Math.min(255, 60 + 120 * Math.sin(Math.PI * t) - 40 * t)];
+  const lmx = Math.log1p(mx); for (let k = 0; k < a.length; k++) { const t = Math.log1p(a[k]) / lmx; if (t < 0.03) continue; const [r, gg, b] = ramp(t); im.data.set([r, gg, Math.max(0, b), Math.min(235, 60 + 255 * t)], k * 4); }
+  cg.putImageData(im, 0, 0); g.globalCompositeOperation = 'lighter'; g.drawImage(c, 0, 0, W, H); g.globalCompositeOperation = 'source-over';
+}
+function rebuild() {
+  visible = Object.entries(L).filter(([, x]) => x.on).flatMap(([k, x]) => x.ev.map((e) => ({ ...e, layer: k })));
+  const pos = new Float32Array(visible.length * 3), col = new Float32Array(visible.length * 3), c = new THREE.Color();
+  visible.forEach((e, i) => { const v = xyz(e.lat, e.lon, 1.004); pos.set([v.x, v.y, v.z], i * 3); c.set(colorOf(e.layer, e)); col.set([c.r, c.g, c.b], i * 3); });
+  ptsGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); ptsGeo.setAttribute('color', new THREE.BufferAttribute(col, 3)); ptsGeo.computeBoundingSphere();
+  ptsMat.blending = mode === 'nocturno' ? THREE.AdditiveBlending : THREE.NormalBlending; ptsMat.size = (mode === 'nocturno' ? 0.03 : 0.022) * Math.min(1, V.dist / 2.6);
+  pts.visible = mode === 'globo' || mode === 'nocturno';
+  if (cols) { scene.remove(cols); cols.geometry.dispose(); cols = null; }
+  if (mode === 'columnas') {
+    const bins = new Map(), S = 2.5; for (const e of visible) { const k = `${Math.floor(e.lat / S)}:${Math.floor(e.lon / S)}`; const b = bins.get(k) ?? { lat: (Math.floor(e.lat / S) + 0.5) * S, lon: (Math.floor(e.lon / S) + 0.5) * S, n: 0, col: colorOf(e.layer, e) }; b.n++; bins.set(k, b); }
+    const arr = [...bins.values()], mx = Math.max(...arr.map((b) => b.n), 1), geo = new THREE.CylinderGeometry(0.0045, 0.0045, 1, 6).rotateX(Math.PI / 2); geo.translate(0, 0, 0.5);
+    cols = new THREE.InstancedMesh(geo, new THREE.MeshBasicMaterial({ vertexColors: false }), arr.length); const m = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(), cc = new THREE.Color();
+    arr.forEach((b, i) => { const p = xyz(b.lat, b.lon, 1), hgt = 0.008 + 0.16 * Math.log1p(b.n) / Math.log1p(mx); q.setFromUnitVectors(new THREE.Vector3(0, 0, 1), p.clone().normalize()); s.set(1, 1, hgt); m.compose(p, q, s); cols.setMatrixAt(i, m); cols.setColorAt(i, cc.set(b.col)); });
+    scene.add(cols);
+  }
+  paintEarth(); hudInfo(); if (mode === 'plano') drawFlat();
+  $('#nev').textContent = visible.length.toLocaleString('es');
+}
+function place() { const p = xyz(V.lat, V.lon, V.dist); camera.position.copy(p); camera.up.set(0, 1, 0); camera.lookAt(0, 0, 0); }
+function resize() { const w = view.clientWidth, h = view.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); flat.width = w * 2; flat.height = h * 2; if (mode === 'plano') drawFlat(); }
+addEventListener('resize', resize);
+
+/* Plano: equirectangular en 2D, con los mismos datos */
+function drawFlat() {
+  const g = flat.getContext('2d'), W = flat.width, H = flat.height; g.setTransform(1, 0, 0, 1, 0, 0);
+  const s = Math.min(W / 360, H / 180) * (3.4 / V.dist) * 1.1, cx = W / 2 - V.lon * s, cy = H / 2 + V.lat * s, P = (lat, lon) => [cx + lon * s, cy - lat * s];
+  g.fillStyle = '#05080b'; g.fillRect(0, 0, W, H); g.fillStyle = '#16222c'; g.strokeStyle = '#26394a';
+  for (const ring of land?.rings ?? []) { g.beginPath(); for (let i = 0; i < ring.length; i += 2) { const [x, y] = P(ring[i + 1], ring[i]); i ? g.lineTo(x, y) : g.moveTo(x, y); } g.closePath(); g.fill(); g.stroke(); }
+  for (const e of visible) { const [x, y] = P(e.lat, e.lon); g.fillStyle = colorOf(e.layer, e); g.globalAlpha = 0.85; g.fillRect(x - 2, y - 2, 4, 4); } g.globalAlpha = 1;
+}
+
+/* Interacción: arrastrar gira, rueda acerca, clic selecciona */
+let drag = null;
+view.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, lat: target.lat, lon: target.lon, moved: false }; view.setPointerCapture(e.pointerId); });
+view.addEventListener('pointermove', (e) => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.hypot(dx, dy) > 3) drag.moved = true; const k = 0.25 * V.dist / 3.4; target.lon = drag.lon - dx * k; target.lat = Math.max(-80, Math.min(80, drag.lat + dy * k)); });
+view.addEventListener('pointerup', (e) => { if (drag && !drag.moved) pick(e); drag = null; });
+view.addEventListener('wheel', (e) => { e.preventDefault(); target.dist = Math.max(1.25, Math.min(6, target.dist * (e.deltaY > 0 ? 1.12 : 0.89))); }, { passive: false });
+function pick(e) {
+  const r = view.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, camDir = camera.position.clone().normalize(); let best = null, bd = 10;
+  for (const ev of visible) { const v = xyz(ev.lat, ev.lon, 1.004); if (mode !== 'plano' && v.clone().normalize().dot(camDir) < 0.1) continue; const p = v.project(camera), x = (p.x + 1) / 2 * r.width, y = (1 - p.y) / 2 * r.height, d = Math.hypot(x - mx, y - my); if (d < bd) { bd = d; best = ev; } }
+  if (!best) return; const near = SITS.findIndex((s) => haversineM(s, best) < 2000 && s.anchor.id === best.id); if (near >= 0) return select(near);
+  showEvent(best);
+}
+
+/* ───── Paneles ───── */
+$('#layers').innerHTML = Object.entries(L).map(([k, x]) => `<div class="row" data-l="${k}"><span class="chk ${x.on ? 'on' : ''}">${x.on ? '✓' : ''}</span><span class="sw" style="background:${x.color}"></span>${esc(x.name)}<span class="n">${x.ev.length.toLocaleString('es')}</span></div>`).join('');
+for (const r of document.querySelectorAll('#layers .row')) r.onclick = () => { const x = L[r.dataset.l]; x.on = !x.on; r.querySelector('.chk').className = 'chk' + (x.on ? ' on' : ''); r.querySelector('.chk').textContent = x.on ? '✓' : ''; rebuild(); };
+$('#modes').innerHTML = Object.entries(MODES).map(([k, n]) => `<button data-m="${k}" class="${k === mode ? 'on' : ''}">${n}</button>`).join('');
+for (const b of document.querySelectorAll('#modes button')) b.onclick = () => setMode(b.dataset.m);
+function setMode(m) { mode = m; for (const b of document.querySelectorAll('#modes button')) b.classList.toggle('on', b.dataset.m === m); gl.style.display = m === 'plano' ? 'none' : 'block'; flat.style.display = m === 'plano' ? 'block' : 'none'; rebuild(); }
+const SEVC = ['', '#7c8a95', '#ff8a3d', '#ff4d5e'];
+$('#nsit').textContent = SITS.length;
+$('#sits').innerHTML = SITS.slice(0, 60).map((s, i) => `<div class="sit" data-i="${i}"><div class="t"><span class="sev" style="background:${SEVC[s.severity]}"></span>${esc(s.title)}</div><div class="s">${s.corroboration} fuente(s) cruzada(s) · ${new Date(s.t).toISOString().slice(0, 10)}</div></div>`).join('');
+for (const d of document.querySelectorAll('.sit')) d.onclick = () => select(+d.dataset.i);
+for (const b of document.querySelectorAll('.tabs button')) b.onclick = () => tab(b.dataset.t);
+function tab(t) { for (const b of document.querySelectorAll('.tabs button')) b.classList.toggle('on', b.dataset.t === t); for (const p of ['sit', 'wall', 'src']) $(`#p-${p}`).hidden = p !== t; }
+const basisTag = (b) => b === 'SIMULATION' ? '<span class="tag sim">SIMULACIÓN</span>' : b === 'CITIZEN_SIGNED_UNVERIFIED' ? '<span class="tag">FIRMADO</span>' : '<span class="tag real">REAL</span>';
+let sel = -1;
+function select(i, { fly = true } = {}) {
+  sel = i; const s = SITS[i]; for (const d of document.querySelectorAll('.sit')) d.classList.toggle('sel', +d.dataset.i === i);
+  if (fly) { target.lat = s.lat; target.lon = s.lon; target.dist = 1.9; }
+  $('#p-sit').innerHTML = `<div class="hd">Situación ${i + 1} de ${SITS.length} <span>${basisTag(s.anchor.basis)}</span></div>
+  <div style="padding:10px 10px 0"><div style="font-size:15px;font-weight:600">${esc(s.title)}</div></div>
+  <div class="kv"><span>Inicio</span><b>${new Date(s.t).toISOString().slice(0, 16).replace('T', ' ')} UTC</b><span>Posición</span><b style="font-family:var(--mono)">${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}</b><span>Regla</span><b>${s.rule.radiusKm} km · ±${s.rule.windowH} h</b><span>Fuentes cruzadas</span><b>${s.corroboration}</b></div>
+  <div class="hd">Lo que dicen los datos</div><ul style="margin:6px 0;padding:0 10px 0 26px">${s.facts.map((f) => `<li>${esc(f)}</li>`).join('') || '<li style="color:var(--m)">Ninguna otra capa aporta datos en el radio.</li>'}</ul>
+  <div class="hd">Evidencia (más cercana por capa)</div><table><tr><th>Capa</th><th>Dato</th><th>km</th><th></th></tr>${s.evidence.map((e) => `<tr><td>${e.layer}</td><td>${esc(e.label)}</td><td class="num">${e.dKm}</td><td>${basisTag(e.basis)}</td></tr>`).join('')}</table>
+  <div class="hd">Procedencia</div><div style="padding:6px 10px 12px;color:var(--m);font-size:11px">${s.sources.map(esc).join('<br>')}</div>`;
+  tab('sit'); caption(s); window.SENDA_CONSOLA.selected = s.id;
+}
+function showEvent(e) { $('#p-sit').innerHTML = `<div class="hd">Elemento</div><div class="kv"><span>Dato</span><b>${esc(e.label ?? e.kind)}</b><span>Fecha</span><b>${new Date(e.t).toISOString().slice(0, 16).replace('T', ' ')} UTC</b><span>Fuente</span><b>${esc(e.source)}</b><span>Base</span><b>${basisTag(e.basis)}</b></div>`; tab('sit'); }
+function caption(s) { const c = $('#cap'); c.innerHTML = `<h3>${esc(s.title)}</h3><ul>${s.facts.slice(0, 4).map((f) => `<li>${esc(f)}</li>`).join('')}</ul><div class="src">${esc(s.sources.slice(0, 2).join(' · '))}</div>`; c.style.display = 'block'; }
+function hudInfo() { $('#hud').textContent = `${MODES[mode].toUpperCase()} · ${visible.length.toLocaleString('es')} elementos · ${V.lat.toFixed(1)}°, ${V.lon.toFixed(1)}°`; }
+
+/* Fuentes: catálogo de la plataforma */
+const cat = await getJ('/senda/api/v1/catalog.json');
+$('#p-src').innerHTML = `<div class="hd">Catálogo (API v1)</div><table><tr><th>Capa</th><th>N</th><th>Descarga</th></tr>${(cat?.capas ?? []).map((c) => `<tr><td>${esc(c.titulo)}<br><span style="color:var(--m)">${esc(c.licencia)}</span></td><td class="num">${c.elementos}</td><td class="num">${esc((c.descargadoUTC ?? '').slice(0, 16).replace('T', ' '))}</td></tr>`).join('')}</table><div style="padding:8px 10px;color:var(--m)">Reglas de fusión (radios y ventanas) en <span style="font-family:var(--mono)">fusion.mjs · DEFAULT_RULES</span>: decisiones de SENDA, revisables.</div>`;
+
+/* ───── Muro de vídeo: imágenes y repeticiones REALES ───── */
+$('#p-wall').innerHTML = `<div class="wall">
+  <div class="tile big" id="w-goes"><canvas></canvas><span class="rec">REPETICIÓN</span><div class="lb"><b>Camp Fire · 08-11-2018</b>Detecciones reales NOAA GOES-16, a 1 h por segundo</div></div>
+  <div class="tile" id="w-s2"><img alt="Sentinel-2"><div class="lb"><b id="w-s2d">Sentinel-2</b>Copernicus · San Martín de Valdeiglesias 2026</div></div>
+  <div class="tile" id="w-tfl"><img alt="Cámara TfL"><div class="lb"><b id="w-tfln">TfL</b>TfL JamCams · captura del 06-11-2026</div></div>
+  <div class="tile" id="w-app"><video muted loop playsinline preload="none" src="/media/senda-demo/SENDA-demo-real-incendio-3d.mp4"></video><span class="rec">GRABACIÓN</span><div class="lb"><b>Incendio en 3D</b>Grabación de la app real (terreno y meteo reales)</div></div>
+  <div class="tile" id="w-red"><div class="list" id="w-redl"></div><div class="lb"><b>GDACS · alertas roja y naranja</b>Descarga del ${esc((gd?.descargadoUTC ?? '').slice(0, 10))}</div></div>
+</div>`;
+const S2 = [['tci_pre.jpg', '16-07-2026 · antes'], ['tci_d0724.jpg', '24-07-2026'], ['tci_d0729.jpg', '29-07-2026'], ['tci_d0808.jpg', '08-08-2026']], TFL = (tf?.camaras ?? []).filter((c) => ['00001.02158', '00001.03752', '00001.03850', '00001.06590'].includes(c.camara));
+let wk = 0; setInterval(() => { wk++; const a = S2[wk % 4]; $('#w-s2 img').src = '/senda/data/smv2026/' + a[0]; $('#w-s2d').textContent = 'Sentinel-2 · ' + a[1]; if (TFL.length) { const c = TFL[wk % TFL.length]; $('#w-tfl img').src = `/senda/data/referencias/tfl_${c.camara.split('.')[1]}.jpg`; $('#w-tfln').textContent = c.nombre; } }, 1600);
+$('#w-s2 img').src = '/senda/data/smv2026/' + S2[0][0];
+$('#w-redl').innerHTML = (L.gdacs.ev.filter((e) => /alerta (Red|Orange)/.test(e.label)).sort((a, b) => (/Red/.test(b.label) - /Red/.test(a.label)) || b.t - a.t).map((e) => `<div><span class="sev" style="background:${/Red/.test(e.label) ? 'var(--r)' : 'var(--o)'}"></span>${esc(e.label)}</div>`).join('')) || '—';
+// Repetición GOES (Camp): dibuja las detecciones reales hasta el instante, a 1 h por segundo de reloj
+const camp = L.fire.ev.filter((e) => e.group === 'camp'), gc = $('#w-goes canvas'); gc.width = 640; gc.height = 360;
+const cb = { la0: Math.min(...camp.map((e) => e.lat)) - 0.05, la1: Math.max(...camp.map((e) => e.lat)) + 0.05, lo0: Math.min(...camp.map((e) => e.lon)) - 0.08, lo1: Math.max(...camp.map((e) => e.lon)) + 0.08 }, c0 = Math.min(...camp.map((e) => e.t)), c1 = Math.max(...camp.map((e) => e.t));
+let gt = c0, glast = performance.now();
+function goesFrame(now) { const g = gc.getContext('2d'); gt += (now - glast) * 3600; glast = now; if (gt > c1 + 1800e3) gt = c0;
+  g.fillStyle = '#06090c'; g.fillRect(0, 0, 640, 360); g.strokeStyle = '#13202a'; for (let i = 0; i < 640; i += 40) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 360); g.stroke(); } for (let j = 0; j < 360; j += 40) { g.beginPath(); g.moveTo(0, j); g.lineTo(640, j); g.stroke(); }
+  for (const e of camp) { if (e.t > gt) continue; const age = (gt - e.t) / 3_600_000, x = ((e.lon - cb.lo0) / (cb.lo1 - cb.lo0)) * 640, y = ((cb.la1 - e.lat) / (cb.la1 - cb.la0)) * 360, f = Math.max(0, 1 - age / 3); g.fillStyle = `rgba(${150 + 105 * f},${60 + 60 * f},40,${0.35 + 0.65 * f})`; g.fillRect(x - 4, y - 4, 8, 8); }
+  g.fillStyle = '#d5dce2'; g.font = '600 15px ui-monospace,monospace'; g.textAlign = 'right'; g.fillText(new Date(Math.min(gt, c1)).toISOString().slice(0, 16).replace('T', ' ') + ' UTC', 600, 26); g.textAlign = 'left';
+  requestAnimationFrame(goesFrame); }
+if (camp.length) requestAnimationFrame(goesFrame);
+$('#w-app video').play?.().catch(() => {});
+
+/* ───── Recorrido guiado (cinematográfico) ───── */
+const pickTour = () => { const by = (f) => SITS.findIndex(f), out = [];
+  for (const f of [(s) => s.anchor.group === 'camp', (s) => s.anchor.group === 'palisades', (s) => /alerta Red/.test(s.title), (s) => s.anchor.kind === 'DGT_accident' && s.corroboration > 0, (s) => s.anchor.kind === 'GDACS_EQ', (s) => s.anchor.kind === 'NDW_Accident', (s) => s.anchor.kind === 'GDACS_FL']) { const i = by(f); if (i >= 0 && !out.includes(i)) out.push(i); }
+  return out; };
+let touring = false;
+async function tour() {
+  if (touring) { touring = false; return; } touring = true; $('#tourBtn').textContent = '■ Detener'; const steps = pickTour(); window.SENDA_CONSOLA.tourSteps = steps.length;
+  $('#cap').innerHTML = `<h3>SENDA · visión de conjunto</h3><ul><li>${pool.length.toLocaleString('es')} elementos de ${Object.values(L).filter((x) => x.ev.length).length} fuentes, cada uno con su procedencia</li><li>${SITS.length} situaciones fusionadas cruzando capas</li><li>Datos reales fechados; lo simulado se marca</li></ul>`; $('#cap').style.display = 'block';
+  target.lat = 25; target.lon = -40; target.dist = 3.6; await sleep(3500);
+  for (const i of steps) { if (!touring) break; select(i); if (SITS[i].anchor.kind === 'FIRE_START') tab('wall'); await sleep(6500); }
+  touring = false; $('#tourBtn').textContent = '▶ Recorrido'; window.SENDA_CONSOLA.tourDone = true;
+}
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+$('#tourBtn').onclick = tour;
+
+/* Bucle */
+let lastT = performance.now();
+function frame(now = performance.now()) { const dt = Math.min(0.25, (now - lastT) / 1000), k = 1 - Math.exp(-dt * 3.2); lastT = now;
+  V.lat += (target.lat - V.lat) * k; let dl = target.lon - V.lon; if (dl > 180) dl -= 360; if (dl < -180) dl += 360; V.lon += dl * k; V.lon = ((V.lon + 540) % 360) - 180; V.dist += (target.dist - V.dist) * k;
+  if (!drag && !touring && sel < 0) target.lon += 1.8 * dt; place(); if (mode === 'plano') drawFlat(); else renderer.render(scene, camera); hudInfo(); requestAnimationFrame(frame); }
+setInterval(() => { $('#clock').textContent = new Date().toISOString().slice(0, 19).replace('T', ' ') + ' UTC'; }, 1000);
+$('#status').innerHTML = `<span class="ok">● SIN SERVIDOR</span><span>${pool.length.toLocaleString('es')} elementos</span><span>${SITS.length} situaciones</span><span>fuentes: GDACS · DGT · NDW · adsb.lol · NOAA GOES · TfL · Caltrans</span><span style="margin-left:auto">fusion.mjs · atlas.mjs</span>`;
+window.SENDA_CONSOLA = { situations: SITS.length, elements: pool.length, setMode, select, tour, modes: Object.keys(MODES), tourPlan: () => pickTour().length, get mode() { return mode; } };
+resize(); rebuild(); requestAnimationFrame(frame);
+if (new URLSearchParams(location.search).get('tour') === '1') setTimeout(tour, 800);
+document.body.dataset.ready = '1';
+</script>
+</body>
+</html>

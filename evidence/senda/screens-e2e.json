@@ -1,9 +1,9 @@
 {
  "kind": "senda-screens-e2e",
- "at": "2026-11-14T01:01:59.720Z",
- "durationS": 35,
- "passed": 18,
- "total": 18,
+ "at": "2026-11-14T11:38:35.647Z",
+ "durationS": 43,
+ "passed": 30,
+ "total": 30,
  "results": [
   {
    "name": "mensaje: el número de seguridad coincide en los dos móviles",
@@ -49,6 +49,11 @@
    "ok": true
   },
   {
+   "name": "avisos: un incidente de agua muestra el caudal previsto por GloFAS (en directo o de la foto guardada) sin presentarlo como aviso",
+   "ok": true,
+   "gl": "Caudal previsto (GloFAS): GloFAS hoy 15.6 m³/s (1.3× la mediana de los 30 días previos); pico previsto 19.1 m³/s el 2026-11-15 (1.6×); mañana sube. consulta en directoCaudal modelado por GloFAS en la "
+  },
+  {
    "name": "avisos: un reporte pasa por sonido y entra verificado",
    "ok": true
   },
@@ -59,6 +64,18 @@
    "rejected": 1,
    "incidents": 2,
    "top": "STRUCTURE"
+  },
+  {
+   "name": "centro: el consenso amplio confirma lo que apoyan ambos grupos y no lo que empuja uno solo (aunque gane la mayoría)",
+   "ok": true,
+   "inundacion": {
+    "majority": "MAYORIA_SI",
+    "bridging": "CONFIRMADO_CONSENSO_AMPLIO"
+   },
+   "bulo": {
+    "majority": "MAYORIA_SI",
+    "bridging": "SIN_CONSENSO"
+   }
   },
   {
    "name": "centro: el parte CAP 1.2 es restringido y de ejercicio",
@@ -79,6 +96,90 @@
    "name": "atlas: el GeoJSON exportado lleva fuente y base en cada punto",
    "ok": true,
    "features": 259
+  },
+  {
+   "name": "atlas: capa mundial con alertas reales de GDACS (descarga oficial con SHA-256 por página)",
+   "ok": true,
+   "total": 1720
+  },
+  {
+   "name": "atlas: capa España con incidencias reales de la DGT leídas por el lector DATEX II del núcleo",
+   "ok": true,
+   "total": 609
+  },
+  {
+   "name": "atlas: parte del día calculado por capa (sin texto inventado) y carreteras con incidencias en una zona de Madrid",
+   "ok": true,
+   "capas": [
+    [
+     "Mundo · GDACS",
+     1720,
+     22
+    ],
+    [
+     "España · DGT",
+     609,
+     123
+    ],
+    [
+     "Países Bajos · NDW",
+     1035,
+     668
+    ]
+   ],
+   "roadsN": 15
+  },
+  {
+   "name": "atlas: capa Países Bajos con situaciones reales de NDW leídas por el mismo lector DATEX II",
+   "ok": true,
+   "total": 1035
+  },
+  {
+   "name": "atlas: medir distancias en el mapa y vigilar una zona (se guarda y al volver cuenta las novedades)",
+   "ok": true,
+   "mm": 176241.93311576056,
+   "wz": [
+    {
+     "name": "prueba",
+     "case": "nl",
+     "n": 0
+    }
+   ]
+  },
+  {
+   "name": "atlas: la zona vigilada exporta un parte CAP 1.2 restringido y de ejercicio con su área",
+   "ok": true
+  },
+  {
+   "name": "atlas: modo embebible para webs municipales (solo mapa, enlace a la versión completa)",
+   "ok": true
+  },
+  {
+   "name": "atlas: capa de integridad GNSS con celdas calculadas a partir de ADS-B real (adsb.lol, ODbL)",
+   "ok": true,
+   "total": 194
+  },
+  {
+   "name": "plataforma: catálogo de la API con fuente, licencia y SHA-256 en cada capa, estado de los datos y mapa embebible",
+   "ok": true,
+   "capas": 4,
+   "elementos": 3558,
+   "licencias": true
+  },
+  {
+   "name": "consola: situaciones fusionadas entre fuentes, cinco representaciones del planeta y recorrido preparado",
+   "ok": true,
+   "s": 42,
+   "e": 16699,
+   "seen": [
+    "globo",
+    "nocturno",
+    "calor",
+    "columnas",
+    "plano"
+   ],
+   "sel": "sit:dgt:30008837",
+   "steps": 6
   },
   {
    "name": "demo: cifra en ≤ 160 caracteres, abre, rechaza alterado y repetido, verifica reporte y calcula el atlas",
