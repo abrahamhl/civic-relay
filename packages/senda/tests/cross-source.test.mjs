@@ -42,3 +42,14 @@ test('fusión: USGS cerca de una alerta sísmica de GDACS se cita pero NO suma c
   const [sit] = fuseSituations([anchor], [q]);
   assert.equal(sit.corroboration, 0); assert.ok(sit.facts.some((f) => /no cuenta como corroboración/.test(f)));
 });
+
+test('USGS ↔ EMSC: dependencia evento a evento por agencia autora (NEIC = copia; resto = independiente)', async () => {
+  const { eventsFromEmsc } = await import('../src/atlas.mjs');
+  const u = eventsFromUsgs(ref('referencias/usgs_sismos.json'), { includeCases: false }).map((e) => ({ ...e, mag: e.value }));
+  const m = eventsFromEmsc(ref('referencias/emsc_sismos.json')).map((e) => ({ ...e, mag: e.value, auth: e.group.slice(5) }));
+  const c = concordance(u, m, { nameA: 'USGS', nameB: 'EMSC', radiusKm: 100, windowS: 120 });
+  assert.equal(c.independence, 'PER_EVENT');
+  const neic = c.pairs.filter((p) => p.b.auth === 'NEIC');
+  assert.ok(neic.length > 50); assert.ok(neic.every((p) => p.dKm < 1), 'las soluciones NEIC en EMSC coinciden con USGS');
+  assert.ok(c.independentSubset.matched > 200); assert.ok(c.independentSubset.medianKm > 1, 'las soluciones de otras agencias difieren de verdad');
+});

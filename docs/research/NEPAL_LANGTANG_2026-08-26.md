@@ -27,6 +27,19 @@ Fecha: 14-11-2026. Autor: Claude Code. Regla de veracidad: `CLAUDE.md` §1.
 - Interpretación: GDACS reproduce la solución de USGS. GDACS declara que toma parámetros sísmicos de USGS NEIC, EMSC, GEOFON y redes asociadas, y usa ShakeMaps de USGS ([GDACS, modelo EQ](https://gdacs.org/Knowledge/models_EQ.aspx); [De Groeve et al. 2006](https://www.idl.iscram.org/files/degroeve/2006/429_DeGroeve_etal2006.pdf)).
 - Por eso SENDA lo trata como **concordancia, no como confirmación independiente**, y el motor de fusión no suma USGS como corroboración de una alerta sísmica de GDACS.
 
+## Concordancia USGS ↔ EMSC (segundo catálogo, dependencia evento a evento)
+
+- Datos: EMSC-CSEM SeismicPortal, 1552 sismos M ≥ 4,0 en 31 días, con licencia **CC BY 4.0** ([condiciones](https://www.seismicportal.eu/terms.html), leídas el 14-11).
+- EMSC publica para cada sismo la **agencia autora** de su solución. De esos 1552, 426 son de NEIC, es decir, de USGS.
+- Resultados con `concordance` (100 km, 120 s):
+  - 662 de los 672 sismos de USGS tienen pareja en EMSC.
+  - **Pares con solución de NEIC (187): mediana de 0,00 km.** Es la misma solución copiada, así que no cuentan.
+  - **Pares con solución de otra agencia (475): mediana de 8,6 km y 0,6 s.** Son soluciones distintas, con lo que **475 de 672 sismos de USGS (70,7 %) tienen confirmación independiente**.
+
+## NASA EONET: por qué no se añade como fuente nueva
+
+En los últimos 30 días, 850 de sus 904 eventos citan **GDACS** como fuente; el resto son IRWIN, JTWC, NATICE, NOAA NHC, BYU y EO. Sumarlo como «otra fuente» duplicaría GDACS. Queda pendiente integrar solo los eventos que no proceden de GDACS (54).
+
 ## Licencias
 
 - **USGS:** obra del Gobierno de EE. UU. Varias fuentes secundarias indican que es de dominio público en EE. UU. (17 U.S.C. §105). La página de USGS sobre derechos de autor devolvió 403 desde la sesión: **no leída directamente**.

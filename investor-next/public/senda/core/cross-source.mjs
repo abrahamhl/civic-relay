@@ -20,7 +20,13 @@ export const SOURCE_DEPENDENCIES = Object.freeze({
   'GDACS_EQ|USGS': Object.freeze({ independent: false,
     note: 'GDACS toma parámetros sísmicos de USGS NEIC, EMSC, GEOFON y redes asociadas, y usa ShakeMaps de USGS',
     refs: Object.freeze(['https://gdacs.org/Knowledge/models_EQ.aspx', 'https://www.idl.iscram.org/files/degroeve/2006/429_DeGroeve_etal2006.pdf']) }),
+  'EMSC|USGS': Object.freeze({ independent: 'PER_EVENT',
+    note: 'EMSC publica para cada sismo la agencia autora de la solución (auth); cuando es NEIC/US la solución es la de USGS y no es independiente',
+    dependentAuthorities: Object.freeze(['NEIC', 'US', 'USGS']), refs: Object.freeze(['https://www.seismicportal.eu/fdsn-wsevent.html']) }),
 });
+
+/** ¿Un evento de EMSC (u otra fuente con agencia autora) reproduce la solución de la otra fuente? */
+export function eventDependsOn(dep, ev) { return dep?.independent === 'PER_EVENT' ? dep.dependentAuthorities.includes(String(ev.auth ?? '').toUpperCase()) : dep ? !dep.independent : false; }
 
 /** Relación declarada entre dos fuentes (en cualquier orden); `null` si no está declarada (= no verificada). */
 export function dependencyOf(a, b) { return SOURCE_DEPENDENCIES[`${a}|${b}`] ?? SOURCE_DEPENDENCIES[`${b}|${a}`] ?? null; }
@@ -60,6 +66,7 @@ export function concordance(A, B, { nameA, nameB, radiusKm = 100, windowS = 120 
   const inWin = (e) => e.t >= t0 && e.t <= t1, a = A.filter(inWin), b = B.filter(inWin);
   const { pairs, onlyA, onlyB } = matchEvents(a, b, { radiusKm, windowS });
   const dep = dependencyOf(nameA, nameB);
+  const indep = dep?.independent === 'PER_EVENT' ? pairs.filter((p) => !eventDependsOn(dep, p.a) && !eventDependsOn(dep, p.b)) : null;
   const r = (x, d = 1) => (x == null ? null : Math.round(x * 10 ** d) / 10 ** d);
   return {
     sources: [nameA, nameB], window: { from: new Date(t0).toISOString(), to: new Date(t1).toISOString() }, params: { radiusKm, windowS },
@@ -68,7 +75,9 @@ export function concordance(A, B, { nameA, nameB, radiusKm = 100, windowS = 120 
     medianKm: r(median(pairs.map((p) => p.dKm))), medianAbsS: r(median(pairs.map((p) => Math.abs(p.dtS)))),
     medianAbsMag: r(median(pairs.filter((p) => p.dMag != null).map((p) => Math.abs(p.dMag))), 2),
     onlyA, onlyB, pairs,
-    independence: dep ? (dep.independent ? 'INDEPENDENT' : 'DEPENDENT') : 'NOT_VERIFIED', dependency: dep,
-    verdictWord: dep?.independent ? 'confirmación independiente' : 'concordancia (no es confirmación independiente)',
+    independence: !dep ? 'NOT_VERIFIED' : dep.independent === 'PER_EVENT' ? 'PER_EVENT' : dep.independent ? 'INDEPENDENT' : 'DEPENDENT', dependency: dep,
+    independentSubset: indep && { matched: indep.length, medianKm: r(median(indep.map((p) => p.dKm))), medianAbsS: r(median(indep.map((p) => Math.abs(p.dtS)))),
+      medianAbsMag: r(median(indep.filter((p) => p.dMag != null).map((p) => Math.abs(p.dMag))), 2) },
+    verdictWord: dep?.independent === true ? 'confirmación independiente' : dep?.independent === 'PER_EVENT' ? 'confirmación independiente solo en los pares con solución de otra agencia' : 'concordancia (no es confirmación independiente)',
   };
 }

@@ -1,5 +1,5 @@
 {
- "generadoUTC": "2026-11-14T12:56:45.037Z",
+ "generadoUTC": "2026-11-14T13:02:18.498Z",
  "nota": "Calculado con atlas.dailyBriefing: cada capa usa la hora de su propia descarga como «ahora».",
  "capas": [
   {
@@ -89,6 +89,21 @@
    ],
    "destacados": [],
    "fuente": "USGS ComCat · descarga real del 2026-11-14"
+  },
+  {
+   "id": "mundo-emsc",
+   "hora": "2026-11-14T13:01:36.347Z",
+   "nombre": "Sismos M ≥ 4,0 con agencia autora de cada solución (EMSC-CSEM)",
+   "total": 1552,
+   "nuevos": 38,
+   "tiposPrincipales": [
+    [
+     "sismo",
+     1552
+    ]
+   ],
+   "destacados": [],
+   "fuente": "EMSC-CSEM SeismicPortal (CC BY 4.0) · descarga real del 2026-11-14"
   },
   {
    "id": "integridad-gnss",

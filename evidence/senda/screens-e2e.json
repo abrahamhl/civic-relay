@@ -1,7 +1,7 @@
 {
  "kind": "senda-screens-e2e",
- "at": "2026-11-14T12:58:29.238Z",
- "durationS": 60,
+ "at": "2026-11-14T13:03:55.900Z",
+ "durationS": 49,
  "passed": 31,
  "total": 31,
  "results": [
@@ -162,8 +162,8 @@
   {
    "name": "plataforma: catálogo de la API con fuente, licencia y SHA-256 en cada capa, estado de los datos y mapa embebible",
    "ok": true,
-   "capas": 5,
-   "elementos": 4453,
+   "capas": 6,
+   "elementos": 6005,
    "licencias": true
   },
   {
@@ -186,6 +186,12 @@
     "medianKm": 0,
     "medianAbsS": 0.5,
     "independence": "DEPENDENT"
+   },
+   "emsc": {
+    "matched": 662,
+    "independent": 475,
+    "medianKmIndep": 8.6,
+    "independence": "PER_EVENT"
    }
   },
   {

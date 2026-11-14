@@ -1,7 +1,7 @@
 {
  "plataforma": "SENDA",
  "version": "v1",
- "generadoUTC": "2026-11-14T12:56:45.037Z",
+ "generadoUTC": "2026-11-14T13:02:18.498Z",
  "aviso": "Fotos de datos reales con su fuente. No son servicios en tiempo real: la hora de cada descarga va en cada capa.",
  "capas": [
   {
@@ -63,6 +63,21 @@
    "sha256": "d88c0c993b336d2e723b0f52d255fbfb9d9c97f260d7fd1a5d24463bb72e850f",
    "ficheroOrigen": "/senda/data/referencias/usgs_sismos.json",
    "sha256Origen": "0843018c0ea18283145f04ab77d8447d54e6ae6b52e1c7013bca4e433a25f416"
+  },
+  {
+   "id": "mundo-emsc",
+   "titulo": "Sismos M ≥ 4,0 con agencia autora de cada solución (EMSC-CSEM)",
+   "url": "/senda/api/v1/layers/mundo-emsc.geojson",
+   "elementos": 1552,
+   "descargadoUTC": "2026-11-14T13:01:36.347Z",
+   "licencia": "CC BY 4.0 · crédito: EMSC-CSEM SeismicPortal (https://www.seismicportal.eu/terms.html)",
+   "fuente": "EMSC-CSEM SeismicPortal (CC BY 4.0) · descarga real del 2026-11-14",
+   "base": [
+    "MEASURED_SEISMIC"
+   ],
+   "sha256": "4194dad84796e3990143dbe22bae7551b8fe740bbe192a718d824b1059ff76c9",
+   "ficheroOrigen": "/senda/data/referencias/emsc_sismos.json",
+   "sha256Origen": "7b7f10daa8e8f3391ff203a02754b17fae5705fc4f7a7346891e905f5f5e798f"
   },
   {
    "id": "integridad-gnss",

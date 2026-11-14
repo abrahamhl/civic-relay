@@ -13,18 +13,19 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { eventsFromGdacs, eventsFromDgt, eventsFromNdw, eventsFromGnss, eventsFromUsgs, toGeoJSON, dailyBriefing, GDACS_TYPES, DGT_CAUSES, NDW_TYPES } from '../src/atlas.mjs';
+import { eventsFromGdacs, eventsFromDgt, eventsFromNdw, eventsFromGnss, eventsFromUsgs, eventsFromEmsc, toGeoJSON, dailyBriefing, GDACS_TYPES, DGT_CAUSES, NDW_TYPES } from '../src/atlas.mjs';
 
 const PUB = resolve(dirname(fileURLToPath(import.meta.url)), '../../../investor-next/public'), REF = resolve(PUB, 'senda/data/referencias'), OUT = resolve(PUB, 'senda/api/v1');
 const j = (f) => JSON.parse(readFileSync(resolve(REF, f), 'utf8'));
 const sha = (s) => createHash('sha256').update(s).digest('hex');
-const gdacs = j('gdacs_eventos.json'), dgt = j('dgt_incidencias.json'), ndw = j('ndw_situaciones.json'), adsb = j('adsb_gnss.json'), usgs = j('usgs_sismos.json');
+const gdacs = j('gdacs_eventos.json'), dgt = j('dgt_incidencias.json'), ndw = j('ndw_situaciones.json'), adsb = j('adsb_gnss.json'), usgs = j('usgs_sismos.json'), emsc = j('emsc_sismos.json');
 
 const LAYERS = [
   { id: 'mundo-gdacs', titulo: 'Alertas mundiales de desastres (GDACS)', ev: eventsFromGdacs(gdacs), descargadoUTC: gdacs.descargadoUTC, fichero: 'gdacs_eventos.json', licencia: 'Condiciones de uso de GDACS (https://www.gdacs.org/About/termsofuse.aspx)', names: GDACS_TYPES, prefix: 'GDACS_' },
   { id: 'espana-dgt', titulo: 'Incidencias activas en carreteras (DGT, DATEX II)', ev: eventsFromDgt(dgt), descargadoUTC: dgt.descargadoUTC, fichero: 'dgt_incidencias.json', licencia: dgt.licencia, names: DGT_CAUSES, prefix: 'DGT_' },
   { id: 'paises-bajos-ndw', titulo: 'Situación del tráfico en Países Bajos (NDW, DATEX II)', ev: eventsFromNdw(ndw), descargadoUTC: ndw.descargadoUTC, fichero: 'ndw_situaciones.json', licencia: ndw.licencia, names: NDW_TYPES, prefix: 'NDW_' },
   { id: 'mundo-usgs', titulo: 'Sismos M ≥ 4,5 y deslizamientos con señal sísmica (USGS ComCat)', ev: eventsFromUsgs(usgs), descargadoUTC: usgs.descargadoUTC, fichero: 'usgs_sismos.json', licencia: usgs.licencia, names: { earthquake: 'sismo', landslide: 'deslizamiento' }, prefix: 'USGS_' },
+  { id: 'mundo-emsc', titulo: 'Sismos M ≥ 4,0 con agencia autora de cada solución (EMSC-CSEM)', ev: eventsFromEmsc(emsc), descargadoUTC: emsc.descargadoUTC, fichero: 'emsc_sismos.json', licencia: emsc.licencia, names: { earthquake: 'sismo' }, prefix: 'EMSC_' },
   { id: 'integridad-gnss', titulo: 'Integridad GNSS desde ADS-B (método GPSJam)', ev: eventsFromGnss(adsb), descargadoUTC: adsb.descargadoUTC, fichero: 'adsb_gnss.json', licencia: 'ODbL 1.0 (© adsb.lol); esta capa derivada también es ODbL 1.0', names: { green: 'verde', yellow: 'amarillo', red: 'rojo' }, prefix: 'GNSS_' },
 ];
 

@@ -190,6 +190,13 @@ export function eventsFromUsgs(snap, { includeCases = true } = {}) {
     group: e.type === 'landslide' ? 'usgs-landslide' : 'usgs', label: `M ${e.mag} ${e.magType} · ${e.type === 'landslide' ? 'deslizamiento (señal sísmica)' : 'sismo'} · ${e.place} · red ${e.net}`, source: src, basis: 'MEASURED_SEISMIC' }));
 }
 
+/** Catálogo real de EMSC-CSEM (emsc_sismos.json). La agencia autora de cada solución va en el grupo («emsc:NEIC»…). */
+export function eventsFromEmsc(snap) {
+  const src = `EMSC-CSEM SeismicPortal (CC BY 4.0) · descarga real del ${String(snap.descargadoUTC).slice(0, 10)}`;
+  return (snap.eventos ?? []).map((e) => makeEvent({ id: `emsc:${e.id}`, t: e.t, lat: e.lat, lon: e.lon, kind: 'EMSC_earthquake', value: e.mag, unit: e.magType,
+    group: `emsc:${e.auth}`, label: `M ${e.mag} ${e.magType} · ${e.region} · solución de ${e.auth}`, source: src, basis: 'MEASURED_SEISMIC' }));
+}
+
 /**
  * Cambio detectado entre dos imágenes Sentinel-2 (nepal_s2.json, scripts/datos-reales/nepal_langtang_s2.py).
  * Un evento en el centroide de la mancha conexa más grande; t = fecha de la escena «antes» (el «después» va en la
