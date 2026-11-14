@@ -23,6 +23,8 @@ input[type=range]{width:100%}
 .tag{font:700 11px ui-monospace,monospace;padding:2px 7px;border-radius:999px;border:1px solid var(--l)}
 .lg{display:flex;flex-wrap:wrap;gap:10px;font-size:13px;color:var(--m);margin-top:6px}.lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
 #clock{font:700 18px ui-monospace,monospace}
+body.embed main{padding:8px}body.embed .card{border:0;padding:6px}body.embed h1,body.embed main>p,body.embed aside,body.embed .lay>section>.row:first-child,body.embed .lg,body.embed #tl{display:none}body.embed .lay{display:block;margin:0}
+#embedbar{display:none;font-size:12px;color:var(--m);margin-top:6px}body.embed #embedbar{display:block}
 </style>
 </head>
 <body><main>
@@ -45,6 +47,7 @@ input[type=range]{width:100%}
     <span id="measure" class="m"></span>
   </div>
   <canvas id="map" aria-label="Mapa"></canvas>
+  <div id="embedbar">Datos con fuente · <a id="openFull" target="_blank" rel="noopener">Abrir en SENDA Atlas ↗</a></div>
   <div class="lg" id="lgf"><span><i style="background:#ff3b30"></i>detección de fuego reciente</span><span><i style="background:#8a3a1c"></i>detección anterior</span><span><i style="background:var(--i);border-radius:2px"></i>cámara (captura de 2026)</span><span><i style="background:var(--v)"></i>reporte ciudadano</span><span><i style="background:transparent;border:2px dashed var(--a)"></i>envolvente de detecciones</span></div>
   <div class="lg" id="lgw" hidden><span><i style="background:#ff7756"></i>terremoto</span><span><i style="background:#ff3b30"></i>incendio forestal</span><span><i style="background:#4aa8ff"></i>inundación</span><span><i style="background:#b79cff"></i>ciclón</span><span><i style="background:#fbbf24"></i>volcán</span><span><i style="background:#c9a26b"></i>sequía</span><span><i style="background:transparent;border:2px solid var(--r)"></i>alerta roja</span><span><i style="background:transparent;border:2px solid var(--a)"></i>alerta naranja</span><span>· toca un punto para ver el informe oficial</span></div>
   <div class="lg" id="lgs" hidden><span><i style="background:#fbbf24"></i>obras</span><span><i style="background:#ff3b30"></i>accidente</span><span><i style="background:#ff7756"></i>vehículo u obstáculo</span><span><i style="background:#4aa8ff"></i>obstáculo natural</span><span><i style="background:#91d7e8"></i>meteorología</span><span><i style="background:#c9a26b"></i>daño en la vía</span><span><i style="background:#9fb2bc"></i>cierre de carril</span><span>· toca un punto: carretera y causa según la DGT</span></div>
@@ -77,7 +80,7 @@ input[type=range]{width:100%}
 </div>
 
 <script type="module">
-import { haversineM, inArea, filterEvents, timeline, areaStats, growth, convexHull, ringAreaKm2, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromGdacs, GDACS_TYPES, eventsFromDgt, DGT_CAUSES, eventsFromNdw, NDW_TYPES, dailyBriefing, roadsInArea, pathLengthM, zoneDelta, eventsFromGnss } from '/senda/core/atlas.mjs';
+import { haversineM, inArea, filterEvents, timeline, areaStats, growth, convexHull, ringAreaKm2, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports, eventsFromGdacs, GDACS_TYPES, eventsFromDgt, DGT_CAUSES, eventsFromNdw, NDW_TYPES, dailyBriefing, roadsInArea, pathLengthM, zoneDelta, eventsFromGnss, zoneDigestToCap } from '/senda/core/atlas.mjs';
 const $ = (s) => document.querySelector(s);
 const CASES = { gnss: 'Integridad GPS/GNSS · precisión declarada por los aviones (ADS-B, foto real)', nl: 'Países Bajos · situaciones de tráfico de NDW (descarga real)', spain: 'España · incidencias activas de la DGT (descarga real)', world: 'Mundo · alertas GDACS de los últimos 30 días (descarga real)', camp: 'Camp Fire · Paradise, California (2018)', palisades: 'Palisades · Los Ángeles (2025)', eaton: 'Eaton · Altadena (2025)', marshall: 'Marshall · Colorado (2021)', smokehouse: 'Smokehouse Creek · Texas (2024)', troublesome: 'East Troublesome · Colorado (2020)', creek: 'Creek · California (2020)', london: 'Londres · cámaras de tráfico (captura 2026)', mine: 'Mis reportes (pantalla Avisos)' };
 const [goes, tfl, refs, land] = await Promise.all(['/senda/data/referencias/goes_casos.json', '/senda/data/referencias/tfl_camaras.json', '/senda/data/referencias/referencias.json', '/geo/land-110m.json'].map((u) => fetch(u).then((r) => r.json())));
@@ -310,8 +313,10 @@ function showWatch() {
   const w = loadW(); if (!w.length) return;
   const rows = w.map((z) => { const L = layerOf(z.case); if (!L) return null; const d = zoneDelta(L.ev, z, { names: L.names, prefix: L.prefix }); return { z, d }; }).filter(Boolean);
   window.SENDA_ATLAS.watch = rows.map(({ z, d }) => ({ name: z.name, case: z.case, n: d.n }));
-  $('#watchOut').innerHTML = '<b>Tus zonas vigiladas</b> (guardadas en este navegador):<br>' + rows.map(({ z, d }) => `· ${esc(z.name)} (${esc(CASES[z.case].split(' · ')[0])}): <b>${d.n}</b> novedad(es)${d.n ? ' — ' + Object.entries(d.porTipo).map(([k, n]) => `${esc(k)} ${n}`).join(', ') : ''}`).join('<br>') + '<br><small>Comparado con los datos que tiene ahora la página; para novedades reales hay que actualizar las capas.</small>';
+  setTimeout(() => { for (const b of document.querySelectorAll('button[data-capz]')) b.onclick = () => { const { z, d } = rows[+b.dataset.capz], xml = zoneDigestToCap(d, z, { now: Date.now() }); window.SENDA_ATLAS.lastCap = xml; download(`senda-zona-${z.name.replace(/[^\w-]+/g, '_')}.cap.xml`, xml, 'application/xml'); }; }, 0);
+  $('#watchOut').innerHTML = '<b>Tus zonas vigiladas</b> (guardadas en este navegador):<br>' + rows.map(({ z, d }, k) => `· ${esc(z.name)} (${esc(CASES[z.case].split(' · ')[0])}): <b>${d.n}</b> novedad(es)${d.n ? ' — ' + Object.entries(d.porTipo).map(([kk, n]) => `${esc(kk)} ${n}`).join(', ') : ''} <button data-capz="${k}" title="Parte CAP 1.2 restringido para el organismo">CAP</button>`).join('<br>') + '<br><small>Comparado con los datos que tiene ahora la página; para novedades reales hay que actualizar las capas.</small>';
 }
+if (new URLSearchParams(location.search).get('embed') === '1') { document.body.classList.add('embed'); $('#openFull').href = location.pathname + location.hash; }
 legend();
 size(); loadCase(false);
 showWatch();

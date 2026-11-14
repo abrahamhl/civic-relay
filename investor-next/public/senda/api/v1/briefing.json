@@ -1,0 +1,90 @@
+{
+ "generadoUTC": "2026-11-14T10:46:07.260Z",
+ "nota": "Calculado con atlas.dailyBriefing: cada capa usa la hora de su propia descarga como «ahora».",
+ "capas": [
+  {
+   "id": "mundo-gdacs",
+   "hora": "2026-11-14T03:43:47.208Z",
+   "nombre": "Alertas mundiales de desastres (GDACS)",
+   "total": 1720,
+   "nuevos": 22,
+   "tiposPrincipales": [
+    [
+     "Incendio forestal",
+     1070
+    ],
+    [
+     "Terremoto",
+     561
+    ],
+    [
+     "Inundación",
+     60
+    ]
+   ],
+   "destacados": [],
+   "fuente": "GDACS (ONU + Comisión Europea/JRC) · descarga real del 2026-11-14"
+  },
+  {
+   "id": "espana-dgt",
+   "hora": "2026-11-14T04:36:52.091Z",
+   "nombre": "Incidencias activas en carreteras (DGT, DATEX II)",
+   "total": 609,
+   "nuevos": 123,
+   "tiposPrincipales": [
+    [
+     "Obras",
+     438
+    ],
+    [
+     "Vehículo detenido u obstáculo",
+     48
+    ],
+    [
+     "Obstáculo natural (agua, desprendimiento…)",
+     29
+    ]
+   ],
+   "destacados": [],
+   "fuente": "DGT · Punto de Acceso Nacional (DATEX II), publicación del 2026-11-14 05:35"
+  },
+  {
+   "id": "paises-bajos-ndw",
+   "hora": "2026-11-14T05:37:02.635Z",
+   "nombre": "Situación del tráfico en Países Bajos (NDW, DATEX II)",
+   "total": 1035,
+   "nuevos": 668,
+   "tiposPrincipales": [
+    [
+     "Cierre o gestión de carril",
+     794
+    ],
+    [
+     "Limitación de velocidad",
+     94
+    ],
+    [
+     "Desvío",
+     78
+    ]
+   ],
+   "destacados": [],
+   "fuente": "NDW (Países Bajos) · DATEX II actueel_beeld, publicación del 2026-11-14 05:36 UTC"
+  },
+  {
+   "id": "integridad-gnss",
+   "hora": "2026-11-14T10:38:13.789Z",
+   "nombre": "Integridad GNSS desde ADS-B (método GPSJam)",
+   "total": 194,
+   "nuevos": 0,
+   "tiposPrincipales": [
+    [
+     "verde",
+     194
+    ]
+   ],
+   "destacados": [],
+   "fuente": "adsb.lol (ODbL) · foto del 2026-11-14 10:38 UTC · método GPSJam"
+  }
+ ]
+}

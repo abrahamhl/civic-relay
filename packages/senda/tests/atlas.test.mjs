@@ -141,3 +141,14 @@ test('medir un recorrido y novedades en una zona vigilada (datos reales de la DG
   assert.equal(all.n, filterEvents(ev, { area }).length); assert.equal(none.n, 0); assert.ok(all.ultimos.length <= 5);
   assert.throws(() => zoneDelta(ev, { area }));
 });
+
+test('parte CAP 1.2 de una zona vigilada: restringido, de ejercicio, con área y fuentes (DGT real)', async () => {
+  const { zoneDelta, zoneDigestToCap, eventsFromDgt: dg, DGT_CAUSES: DC } = await import('../src/atlas.mjs');
+  const ev = dg(ref('dgt_incidencias.json')), watch = { name: 'Madrid <60 km>', area: { type: 'circle', center: { lat: 40.4168, lon: -3.7038 }, radiusM: 60_000 }, since: 0 };
+  const xml = zoneDigestToCap(zoneDelta(ev, watch, { names: DC, prefix: 'DGT_' }), watch, { now: Date.parse('2026-11-14T10:00:00Z') });
+  assert.match(xml, /<scope>Restricted<\/scope>/); assert.match(xml, /<status>Exercise<\/status>/); assert.doesNotMatch(xml, /<scope>Public/);
+  assert.match(xml, /<circle>40\.41680,-3\.70380 60\.00<\/circle>/); assert.match(xml, /Madrid &lt;60 km&gt;/); assert.match(xml, /DGT/);
+  const poly = zoneDigestToCap({ n: 0, porTipo: {}, ultimos: [] }, { area: { type: 'polygon', ring: [[1, 2], [1, 3], [2, 3]] }, since: 0 }, { now: 0 });
+  assert.match(poly, /<polygon>1\.00000,2\.00000 1\.00000,3\.00000 2\.00000,3\.00000 1\.00000,2\.00000<\/polygon>/);
+  assert.throws(() => zoneDigestToCap({ n: 0, porTipo: {}, ultimos: [] }, watch, {}));
+});

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Plataforma</title>
+<meta name="description" content="SENDA como plataforma: canales, API de datos abiertos con fuente y licencia, estado de cada fuente, mapa embebible y modelo de acceso para quien aporta pasarelas.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.55 Inter,system-ui,sans-serif}
+main{max-width:1150px;margin:0 auto;padding:20px 16px 70px}h1{font-size:32px;margin:6px 0 8px}h2{font-size:20px;margin:30px 0 10px}.m{color:var(--m)}a{color:var(--i)}
+.card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:16px;min-width:0}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:860px){.g3,.g2{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--l);vertical-align:top}th{color:var(--m);font-weight:600}
+code,pre{font:12px ui-monospace,monospace;color:var(--i)}pre{background:#071018;border:1px solid var(--l);border-radius:10px;padding:10px;overflow:auto;white-space:pre-wrap;word-break:break-all}
+.tag{font:700 11px ui-monospace,monospace;padding:2px 7px;border-radius:999px;border:1px solid var(--l)}.ok{color:var(--e)}.old{color:var(--a)}
+.note{border-left:3px solid var(--a);padding:8px 12px;background:#0f1a22;border-radius:6px;font-size:14px;margin-top:10px}
+iframe{width:100%;height:420px;border:1px solid var(--l);border-radius:12px;background:#071018}
+</style>
+</head>
+<body><main>
+<p><a href="/senda">← SENDA</a> · <a href="/senda/demo">Demo guiada</a> · <a href="/senda/atlas">Atlas</a></p>
+<h1>SENDA como plataforma</h1>
+<p class="m" style="font-size:17px">Una misma base de datos y de código, con varios canales: la app ciudadana que funciona sin red, el Centro para organismos, el Atlas, una API de datos abiertos con fuente y licencia en cada elemento, un mapa embebible para webs municipales y partes CAP 1.2 para las salas. Inspirado en el modelo de las grandes plataformas de seguimiento (Flightradar24, FlightAware, MarineTraffic): quien aporta datos con su propio receptor recibe acceso ampliado.</p>
+
+<video controls preload="metadata" src="/media/senda-demo/SENDA-plataforma-promo.mp4" style="width:100%;border-radius:12px;background:#000;margin-top:8px"></video>
+<p class="m" style="font-size:13px;margin:4px 0 0">Vídeo de 82 s grabado de la app real; los rótulos dicen qué es dato real y qué es simulación.</p>
+<h2>Canales</h2>
+<div class="g3">
+  <div class="card"><b>📱 App ciudadana</b><p class="m" style="margin:6px 0 0">Web instalable y APK de Android, sin red: <a href="/senda/mensaje">mensaje cifrado</a>, <a href="/senda/avisos">avisos firmados</a> con caudal GloFAS, llamada sin Internet.</p></div>
+  <div class="card"><b>🖥️ Centro para organismos</b><p class="m" style="margin:6px 0 0"><a href="/senda/centro">Cola de reportes</a> verificados y priorizados, credibilidad por consenso amplio, órdenes firmadas y CAP 1.2.</p></div>
+  <div class="card"><b>🗺️ Atlas</b><p class="m" style="margin:6px 0 0"><a href="/senda/atlas">Mapa con línea de tiempo</a>: GDACS, DGT, NDW, integridad GNSS e incendios GOES; zonas vigiladas, medición, parte del día.</p></div>
+  <div class="card"><b>🔌 API de datos abiertos</b><p class="m" style="margin:6px 0 0">Ficheros estáticos versionados (<code>/senda/api/v1</code>) con catálogo, GeoJSON por capa, parte del día y contrato <a href="/senda/api/v1/openapi.json">OpenAPI 3.1</a>.</p></div>
+  <div class="card"><b>🧩 Mapa embebible</b><p class="m" style="margin:6px 0 0">Una línea de HTML para que un ayuntamiento muestre la capa de su zona en su web, con enlace a la versión completa.</p></div>
+  <div class="card"><b>📤 Partes CAP 1.2</b><p class="m" style="margin:6px 0 0">Incidentes y novedades de zona en el estándar que usan los sistemas de alerta. Ámbito restringido y de ejercicio hasta que exista convenio.</p></div>
+</div>
+
+<h2>Estado de los datos <span class="tag">calculado al abrir esta página</span></h2>
+<p class="m" style="margin-top:0">Cada capa con su fuente, licencia, hora de descarga, antigüedad y huella SHA-256 (el mismo dato que publica la API). Nada en tiempo real: son fotos fechadas.</p>
+<div class="card" style="overflow:auto"><table id="health"><tr><th>Capa</th><th>Elementos</th><th>Descarga (UTC)</th><th>Antigüedad</th><th>Licencia</th><th>SHA-256</th></tr></table></div>
+
+<h2>API de datos abiertos</h2>
+<div class="g2">
+  <div class="card"><b>Catálogo</b><pre>GET /senda/api/v1/catalog.json
+GET /senda/api/v1/layers/{id}.geojson
+GET /senda/api/v1/briefing.json
+GET /senda/api/v1/openapi.json</pre><p class="m" style="margin:0">Cada Feature lleva <code>source</code> y <code>basis</code> (MEASURED_*, OFFICIAL_ALERT, CITIZEN_SIGNED_UNVERIFIED o SIMULATION).</p></div>
+  <div class="card"><b>Ejemplo real</b> <span class="m">(primer elemento de la capa de la DGT)</span><pre id="sample">cargando…</pre></div>
+</div>
+
+<h2>Mapa embebible</h2>
+<div class="card"><p class="m" style="margin-top:0">Copia esta línea en cualquier web:</p><pre id="snippet"></pre><iframe id="embed" title="SENDA Atlas embebido" loading="lazy"></iframe></div>
+
+<h2>Modelo de acceso propuesto <span class="tag">propuesta, sin precios</span></h2>
+<div class="card" style="overflow:auto"><table>
+<tr><th>Nivel</th><th>Para quién</th><th>Qué incluye</th></tr>
+<tr><td><b>Ciudadano</b></td><td>Cualquiera</td><td>App sin red, mensaje cifrado, avisos firmados, Atlas y API pública. Gratis.</td></tr>
+<tr><td><b>Contribuidor</b></td><td>Quien aloja una pasarela o nodo Vigía de SENDA</td><td>Acceso de organismo mientras su nodo aporte datos, como el plan Contributor de Flightradar24 o los planes de MarineTraffic para estaciones AIS.</td></tr>
+<tr><td><b>Organismo</b></td><td>Ayuntamientos, protección civil, salas 112</td><td>Centro, zonas vigiladas con CAP, órdenes firmadas, auditoría, soporte e integración.</td></tr>
+<tr><td><b>Datos comerciales</b></td><td>Empresas</td><td>Uso comercial de la API respetando la licencia de cada fuente (p. ej. ODbL obliga a compartir igual; Open-Meteo gratis solo no comercial).</td></tr>
+</table>
+<div class="note">Referencias verificadas. Flightradar24 activa un plan Contributor gratuito al empezar a aportar datos y mantiene el plan Business solo mientras se comparten datos (<a href="https://www.flightradar24.com/premium/">FR24</a>, <a href="https://www.flightradar24.com/blog/inside-flightradar24/important-information-about-the-new-flightradar24-for-existing-premium-subscribers/">blog</a>). FlightAware da 10 $ de crédito mensual en su API a quien aporta datos frente a 5 $ al resto (<a href="https://flightaware.com/aeroapi">AeroAPI</a>). MarineTraffic regala sus planes Professional a quien tiene estación AIS (<a href="https://support.marinetraffic.com/en/articles/9553011-the-new-station-owners-free-subscription-plans-is-here">MarineTraffic</a>). Los precios de SENDA no están fijados.</div></div>
+
+<script type="module">
+const $ = (s) => document.querySelector(s), esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const cat = await fetch('/senda/api/v1/catalog.json').then((r) => r.json());
+const age = (iso) => { if (!iso) return '—'; const h = (Date.now() - Date.parse(iso)) / 3_600_000; return h < 48 ? `${h.toFixed(1)} h` : `${(h / 24).toFixed(1)} días`; };
+$('#health').insertAdjacentHTML('beforeend', cat.capas.map((c) => `<tr><td><b>${esc(c.titulo)}</b><br><a href="${esc(c.url)}">${esc(c.id)}.geojson</a></td><td>${c.elementos.toLocaleString('es')}</td><td>${esc((c.descargadoUTC ?? '—').slice(0, 16).replace('T', ' '))}</td><td class="${c.descargadoUTC && Date.now() - Date.parse(c.descargadoUTC) < 86_400_000 ? 'ok' : 'old'}">${age(c.descargadoUTC)}</td><td class="m">${esc(c.licencia)}</td><td><code>${esc(c.sha256.slice(0, 12))}…</code></td></tr>`).join(''));
+const dgt = await fetch(cat.capas.find((c) => c.id === 'espana-dgt').url).then((r) => r.json());
+$('#sample').textContent = JSON.stringify(dgt.features[0], null, 1);
+const src = `${location.origin}/senda/atlas?embed=1#caso=spain`;
+$('#snippet').textContent = `<iframe src="${src}" width="100%" height="420" style="border:0" title="SENDA Atlas"></iframe>`;
+$('#embed').src = '/senda/atlas?embed=1#caso=spain';
+window.SENDA_PLATAFORMA = { capas: cat.capas.length, elementos: cat.capas.reduce((s, c) => s + c.elementos, 0), licencias: cat.capas.every((c) => c.licencia && c.fuente && /^[0-9a-f]{64}$/.test(c.sha256)) };
+document.body.dataset.ready = '1';
+</script>
+</main></body>
+</html>

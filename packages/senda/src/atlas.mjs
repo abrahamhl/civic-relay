@@ -250,3 +250,30 @@ export function eventsFromGnss(snap, { cellDeg = 1 } = {}) {
       label: `${c.n} avión(es) · ${c.bad} con NACp < ${FAA_NACP_MIN.value} · ${c.level === 'green' ? 'verde' : c.level === 'yellow' ? 'amarillo' : 'rojo'}`, source: `adsb.lol (ODbL) · foto del ${String(snap.descargadoUTC).slice(0, 16).replace('T', ' ')} UTC · método GPSJam`, basis: 'MEASURED_ADSB' }));
   return out;
 }
+
+const xmlEsc = (s) => String(s).replace(/[<>&'"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
+/**
+ * Parte CAP 1.2 de las novedades de una zona vigilada, para el organismo: ámbito RESTRINGIDO y estado de
+ * ejercicio por defecto (nunca un aviso a la población). El área se expresa como círculo (lat,lon radio_km) o polígono.
+ */
+export function zoneDigestToCap(digest, watch, { now, sender = 'senda@organismo.example', exercise = true, id } = {}) {
+  if (!Number.isFinite(now)) throw new Error('now obligatorio');
+  if (!watch?.area) throw new Error('zona sin área');
+  const A = watch.area, area = A.type === 'circle' ? `<circle>${A.center.lat.toFixed(5)},${A.center.lon.toFixed(5)} ${(A.radiusM / 1000).toFixed(2)}</circle>`
+    : `<polygon>${[...A.ring, A.ring[0]].map(([lat, lon]) => `${lat.toFixed(5)},${lon.toFixed(5)}`).join(' ')}</polygon>`;
+  const sent = new Date(now).toISOString().replace(/\.\d{3}Z$/, '+00:00'), ident = id ?? `senda-zona-${now}`;
+  const resumen = Object.entries(digest.porTipo).map(([k, n]) => `${k}: ${n}`).join('; ') || 'sin novedades';
+  const fuentes = [...new Set(digest.ultimos.map((u) => u.source))].join(' | ');
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>${xmlEsc(ident)}</identifier><sender>${xmlEsc(sender)}</sender><sent>${sent}</sent>
+  <status>${exercise ? 'Exercise' : 'Actual'}</status><msgType>Alert</msgType><scope>Restricted</scope><restriction>Solo para el organismo: resumen de datos, no es un aviso a la población</restriction>
+  <info><language>es-ES</language><category>Other</category><event>${xmlEsc(`Novedades en zona vigilada: ${watch.name ?? 'zona'}`)}</event>
+    <urgency>Unknown</urgency><severity>Unknown</severity><certainty>Unknown</certainty>
+    <headline>${xmlEsc(`${digest.n} novedad(es) desde ${new Date(watch.since).toISOString().slice(0, 16)} UTC`)}</headline>
+    <description>${xmlEsc(resumen)}</description><instruction>Contrastar con las fuentes oficiales antes de actuar.</instruction>
+    <parameter><valueName>fuentes</valueName><value>${xmlEsc(fuentes)}</value></parameter>
+    <area><areaDesc>${xmlEsc(watch.name ?? 'zona vigilada')}</areaDesc>${area}</area>
+  </info>
+</alert>`;
+}

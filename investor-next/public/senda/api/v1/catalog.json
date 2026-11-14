@@ -1,0 +1,68 @@
+{
+ "plataforma": "SENDA",
+ "version": "v1",
+ "generadoUTC": "2026-11-14T10:46:07.260Z",
+ "aviso": "Fotos de datos reales con su fuente. No son servicios en tiempo real: la hora de cada descarga va en cada capa.",
+ "capas": [
+  {
+   "id": "mundo-gdacs",
+   "titulo": "Alertas mundiales de desastres (GDACS)",
+   "url": "/senda/api/v1/layers/mundo-gdacs.geojson",
+   "elementos": 1720,
+   "descargadoUTC": "2026-11-14T03:43:47.208Z",
+   "licencia": "Condiciones de uso de GDACS (https://www.gdacs.org/About/termsofuse.aspx)",
+   "fuente": "GDACS (ONU + Comisión Europea/JRC) · descarga real del 2026-11-14",
+   "base": [
+    "OFFICIAL_ALERT"
+   ],
+   "sha256": "878acc61316dda7da01ed0e2967afd8169162a7bd5feec1688ab3be5918ebcfa",
+   "ficheroOrigen": "/senda/data/referencias/gdacs_eventos.json",
+   "sha256Origen": "b8306eb75d7a75968c9e98e7e05180793d3b3f4ca1ccbe2c33da1ffe24be56ec"
+  },
+  {
+   "id": "espana-dgt",
+   "titulo": "Incidencias activas en carreteras (DGT, DATEX II)",
+   "url": "/senda/api/v1/layers/espana-dgt.geojson",
+   "elementos": 609,
+   "descargadoUTC": "2026-11-14T04:36:52.091Z",
+   "licencia": "Creative Commons Attribution (ficha del conjunto en nap.dgt.es)",
+   "fuente": "DGT · Punto de Acceso Nacional (DATEX II), publicación del 2026-11-14 05:35",
+   "base": [
+    "OFFICIAL_ALERT"
+   ],
+   "sha256": "c005f177e47ecd8ce0a0a836078a301a0e2a7a07754ba7630433026ac2ef973a",
+   "ficheroOrigen": "/senda/data/referencias/dgt_incidencias.json",
+   "sha256Origen": "100af6f7e5d9e65b5e8f19565879df2659cb032f621894b100e30ac0f8bbae73"
+  },
+  {
+   "id": "paises-bajos-ndw",
+   "titulo": "Situación del tráfico en Países Bajos (NDW, DATEX II)",
+   "url": "/senda/api/v1/layers/paises-bajos-ndw.geojson",
+   "elementos": 1035,
+   "descargadoUTC": "2026-11-14T05:37:02.635Z",
+   "licencia": "Open data según NDW; licencia exacta no verificada desde esta sesión",
+   "fuente": "NDW (Países Bajos) · DATEX II actueel_beeld, publicación del 2026-11-14 05:36 UTC",
+   "base": [
+    "OFFICIAL_ALERT"
+   ],
+   "sha256": "6494687643968901913aca9274e375c8719434e988f666d9da5153b510d36e28",
+   "ficheroOrigen": "/senda/data/referencias/ndw_situaciones.json",
+   "sha256Origen": "398ec78d53164b8490769924c70493a9ec61e57a32052053326ca46fa2709b8d"
+  },
+  {
+   "id": "integridad-gnss",
+   "titulo": "Integridad GNSS desde ADS-B (método GPSJam)",
+   "url": "/senda/api/v1/layers/integridad-gnss.geojson",
+   "elementos": 194,
+   "descargadoUTC": "2026-11-14T10:38:13.789Z",
+   "licencia": "ODbL 1.0 (© adsb.lol); esta capa derivada también es ODbL 1.0",
+   "fuente": "adsb.lol (ODbL) · foto del 2026-11-14 10:38 UTC · método GPSJam",
+   "base": [
+    "MEASURED_ADSB"
+   ],
+   "sha256": "a057432a15d9f6d2f0a503dce5f62ccee4a1899569ef8c99bc27be5a251ffd99",
+   "ficheroOrigen": "/senda/data/referencias/adsb_gnss.json",
+   "sha256Origen": "b9beffc0282f4f3eac2f5b6b156880b1fb6b69b77290d4349acd5813a1d1673c"
+  }
+ ]
+}
