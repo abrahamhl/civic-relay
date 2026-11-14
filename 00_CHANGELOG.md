@@ -1,5 +1,22 @@
 # Changelog
 
+## SENDA · 14-11-2026 · Atlas (mapa con línea de tiempo y perímetro) y demo guiada en la web
+
+**Entrada (fundador):** integrar lo mejor de los mapas de inteligencia abierta (línea de tiempo, histórico, acotar por perímetro) y una demo en la web que explique qué es SENDA y para qué sirve.
+
+**Procesamiento:**
+- Referencias revisadas por búsqueda web (sin acceso a Twitter/X; «Conflict Radar 360» no encontrado): World Monitor, GlobalThreatMap (barra de tiempo), OSINT War Room (GDELT), Pharos AI (MapLibre/DeckGL), ConflictWatch Live (ACLED, filtros y línea de tiempo).
+- `packages/senda/src/atlas.mjs`: haversine, punto en polígono y círculo, envolvente convexa y área, filtro por tiempo, tipo, base y zona, histograma, crecimiento, GeoJSON (RFC 7946). Cada evento exige `source` y `basis` (MEDIDO, FIRMADO SIN VERIFICAR o SIMULACIÓN). Adaptadores para GOES, cámaras TfL/Caltrans y reportes de Avisos.
+- `/senda/atlas`: 7 incendios con detecciones reales NOAA GOES; reproducción; zonas circulares o poligonales; panel de la zona; cámaras públicas que la cubren; exportación GeoJSON/CSV; enlace con la vista.
+- `/senda/demo`: explicación en tres piezas, vídeos grabados de la app real y una demostración que ejecuta el código real en el navegador.
+- Veracidad: `dgt_v16_corridor_incidents.json` y `vehicular_telemetry_real.json` resultaron **sintéticos**. Ahora están marcados, la prueba lleva otro nombre y el hueco GAP-P1-04 se ha reabierto.
+
+**Validación:** 506/506 en el núcleo (8 pruebas nuevas del atlas con datos GOES reales); 18/18 en `senda-screens-e2e.mjs` (4 comprobaciones nuevas); 19/19 afirmaciones con `scripts/prove.mjs`.
+
+**Límites:** la envolvente agrupa píxeles de 2–6 km, así que no es el perímetro quemado. Las cámaras son de una captura de 2026 y no grabaron los incendios. La base cartográfica es 1:110m, solo de contexto. Las fuentes en tiempo real (FIRMS, ACLED, GDELT) aún no están conectadas: la red de la sesión las bloquea.
+
+— Claude Code (sesión cloud)
+
 ## SENDA · 13-11-2026 · Regla de veracidad, pantallas reales, revisión horaria y grabaciones de la app
 
 **Entrada (fundador):** no inventar nada nunca; simulaciones siempre declaradas; revisar cada hora los compromisos uno por uno; producto funcional y útil para la ciudadanía y los organismos.

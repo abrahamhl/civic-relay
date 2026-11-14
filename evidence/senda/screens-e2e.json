@@ -1,9 +1,9 @@
 {
  "kind": "senda-screens-e2e",
- "at": "2026-11-13T17:37:31.217Z",
- "durationS": 29,
- "passed": 14,
- "total": 14,
+ "at": "2026-11-14T01:01:59.720Z",
+ "durationS": 35,
+ "passed": 18,
+ "total": 18,
  "results": [
   {
    "name": "mensaje: el número de seguridad coincide en los dos móviles",
@@ -63,6 +63,38 @@
   {
    "name": "centro: el parte CAP 1.2 es restringido y de ejercicio",
    "ok": true
+  },
+  {
+   "name": "atlas: Camp Fire con detecciones GOES reales y zona de 5 km alrededor de Paradise",
+   "ok": true,
+   "total": 1045,
+   "inside": 258,
+   "first": "2018-11-08T16:17:18.000Z"
+  },
+  {
+   "name": "atlas: la línea de tiempo filtra por instante",
+   "ok": true
+  },
+  {
+   "name": "atlas: el GeoJSON exportado lleva fuente y base en cada punto",
+   "ok": true,
+   "features": 259
+  },
+  {
+   "name": "demo: cifra en ≤ 160 caracteres, abre, rechaza alterado y repetido, verifica reporte y calcula el atlas",
+   "ok": true,
+   "chars": 99,
+   "opened": true,
+   "tamperRejected": true,
+   "replayRejected": true,
+   "reportChars": 160,
+   "reportVerified": true,
+   "atlas": {
+    "detections": 1045,
+    "insideParadise5km": 258,
+    "minutesToParadise": 80
+   },
+   "done": true
   },
   {
    "name": "sin errores de JavaScript en las páginas",

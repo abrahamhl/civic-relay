@@ -363,8 +363,8 @@ test('Distancia de Parada Calibrada: Norma 3.1-IC Trazado, rozamiento dependient
   assert.ok(downhillStop.brakingDistanceM > flatStop.brakingDistanceM);
 });
 
-test('Validación Experimental con Datasets Reales: contrastación contra telemetría OBD-II e incidentes DGT', () => {
-  // Carga de los datasets auténticos
+test('Fixtures SINTÉTICOS (no reales) de telemetría OBD-II e incidentes DGT: coherencia interna', () => {
+  // Fixtures sintéticos: generados para pruebas, NO son medidas ni incidentes reales (ver avisoVeracidad)
   const telemetryPath = path.resolve(__dirname, '../../../investor-next/public/senda/data/referencias/vehicular_telemetry_real.json');
   const incidentsPath = path.resolve(__dirname, '../../../investor-next/public/senda/data/referencias/dgt_v16_corridor_incidents.json');
 
@@ -373,6 +373,8 @@ test('Validación Experimental con Datasets Reales: contrastación contra teleme
 
   const telemetryData = JSON.parse(fs.readFileSync(telemetryPath, 'utf8'));
   const incidentsData = JSON.parse(fs.readFileSync(incidentsPath, 'utf8'));
+  assert.equal(telemetryData.basis, 'SYNTHETIC_FIXTURE_NOT_REAL');
+  assert.equal(incidentsData.basis, 'SYNTHETIC_FIXTURE_NOT_REAL');
 
   // 1. Verificación de casos cinemáticos reales
   assert.equal(telemetryData.casos.length, 5);

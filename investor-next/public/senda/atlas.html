@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Atlas</title>
+<meta name="description" content="Mapa de eventos con línea de tiempo, reproducción y perímetro: detecciones reales de satélite, cámaras y reportes ciudadanos, con su fuente.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e;--v:#b79cff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 Inter,system-ui,sans-serif}
+main{max-width:1280px;margin:0 auto;padding:16px 16px 60px}h1{font-size:28px;margin:4px 0}h2{font-size:16px;margin:0 0 8px}.m{color:var(--m)}a{color:var(--i)}
+.lay{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;margin-top:12px}@media(max-width:960px){.lay{grid-template-columns:1fr}}
+.card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:14px;min-width:0}
+button,select{font:inherit;min-height:42px;padding:8px 12px;border-radius:10px;border:1px solid var(--l);background:#0f1d27;color:var(--t);cursor:pointer;font-weight:700}
+button.on{outline:2px solid var(--i);background:#14303d}button.p{background:var(--c);border-color:var(--c);color:#140804}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+#map{width:100%;aspect-ratio:16/10;display:block;border-radius:10px;background:#071018;touch-action:none;cursor:grab}
+#tl{width:100%;height:84px;display:block;border-radius:8px;background:#071018;cursor:pointer;touch-action:none;margin-top:8px}
+input[type=range]{width:100%}
+.k{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:14px}.k b{text-align:right;font-variant-numeric:tabular-nums}
+.note{border-left:3px solid var(--a);padding:6px 10px;background:#0f1a22;border-radius:6px;font-size:13px;margin-top:10px}
+.tag{font:700 11px ui-monospace,monospace;padding:2px 7px;border-radius:999px;border:1px solid var(--l)}
+.lg{display:flex;flex-wrap:wrap;gap:10px;font-size:13px;color:var(--m);margin-top:6px}.lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+#clock{font:700 18px ui-monospace,monospace}
+</style>
+</head>
+<body><main>
+<p><a href="/senda">← SENDA</a> · <a href="/senda/demo">¿Qué es SENDA? (demo guiada)</a></p>
+<h1>Atlas · qué pasó, dónde y cuándo</h1>
+<p class="m">Elige un caso, dale a ▶ y mira cómo avanza. Dibuja una zona (un pueblo, una carretera) y el Atlas te dice <b>cuándo entró el fuego</b>, cuántas detecciones hubo dentro y qué cámaras la vigilan hoy. Cada punto lleva su <b>fuente</b>; lo que es simulación se marca como tal.</p>
+
+<div class="lay">
+<section class="card">
+  <div class="row" style="margin-top:0">
+    <select id="case" aria-label="Caso"></select>
+    <button id="mCircle" title="Pulsa el centro y arrastra para fijar el radio">◯ Zona circular</button>
+    <button id="mPoly" title="Pulsa los vértices; pulsa el primero (o Cerrar) para terminar">⬠ Polígono</button>
+    <button id="close" hidden>Cerrar polígono</button>
+    <button id="clearArea">✕ Quitar zona</button>
+    <button id="fit">⤢ Encuadrar</button>
+  </div>
+  <canvas id="map" aria-label="Mapa"></canvas>
+  <div class="lg"><span><i style="background:#ff3b30"></i>detección de fuego reciente</span><span><i style="background:#8a3a1c"></i>detección anterior</span><span><i style="background:var(--i);border-radius:2px"></i>cámara (captura de 2026)</span><span><i style="background:var(--v)"></i>reporte ciudadano</span><span><i style="background:transparent;border:2px dashed var(--a)"></i>envolvente de detecciones</span></div>
+  <div class="row"><button id="play" class="p">▶ Reproducir</button><select id="speed" aria-label="Velocidad"><option value="1800">×30 min/s</option><option value="3600" selected>×1 h/s</option><option value="10800">×3 h/s</option></select>
+    <select id="win" aria-label="Qué mostrar"><option value="0">Acumulado</option><option value="3600000">Última hora</option><option value="10800000">Últimas 3 h</option></select>
+    <span id="clock">—</span></div>
+  <canvas id="tl" aria-label="Línea de tiempo"></canvas>
+  <input type="range" id="t" min="0" max="1000" value="1000" aria-label="Instante">
+</section>
+
+<aside class="card">
+  <h2>En la zona seleccionada</h2>
+  <div class="k" id="stats"></div>
+  <canvas id="spark" style="width:100%;height:90px;margin-top:10px;display:block"></canvas>
+  <p class="m" style="font-size:12px;margin:4px 0 0" id="sparkLbl"></p>
+  <h2 style="margin-top:14px">Exportar</h2>
+  <div class="row" style="margin-top:0"><button id="gj">GeoJSON</button><button id="csv">CSV</button><button id="link">🔗 Copiar enlace a esta vista</button></div>
+  <p class="m" id="exp" style="font-size:13px"></p>
+  <h2 style="margin-top:14px">Fuentes de esta vista</h2>
+  <div id="src" class="m" style="font-size:13px"></div>
+  <div class="note">La <b>envolvente</b> es el polígono convexo de los píxeles de satélite (2–6 km cada uno): sirve para ver <b>dirección y ritmo</b>, no es el perímetro quemado oficial. Las cámaras son de una captura de noviembre de 2026, <b>no</b> grabaron el incendio: muestran qué sensores públicos cubren hoy esa zona.</div>
+</aside>
+</div>
+
+<script type="module">
+import { haversineM, inArea, filterEvents, timeline, areaStats, growth, convexHull, ringAreaKm2, toGeoJSON, eventsFromGoes, eventsFromCameras, eventsFromReports } from '/senda/core/atlas.mjs';
+const $ = (s) => document.querySelector(s);
+const CASES = { camp: 'Camp Fire · Paradise, California (2018)', palisades: 'Palisades · Los Ángeles (2025)', eaton: 'Eaton · Altadena (2025)', marshall: 'Marshall · Colorado (2021)', smokehouse: 'Smokehouse Creek · Texas (2024)', troublesome: 'East Troublesome · Colorado (2020)', creek: 'Creek · California (2020)', london: 'Londres · cámaras de tráfico (captura 2026)', mine: 'Mis reportes (pantalla Avisos)' };
+const [goes, tfl, refs, land] = await Promise.all(['/senda/data/referencias/goes_casos.json', '/senda/data/referencias/tfl_camaras.json', '/senda/data/referencias/referencias.json', '/geo/land-110m.json'].map((u) => fetch(u).then((r) => r.json())));
+const fire = eventsFromGoes(goes), cams = eventsFromCameras(tfl, refs.caltrans);
+let mine = []; try { mine = eventsFromReports(JSON.parse(localStorage.getItem('senda-avisos-reports')) ?? []); } catch { mine = []; }
+for (const [k, v] of Object.entries(CASES)) $('#case').insertAdjacentHTML('beforeend', `<option value="${k}">${v}</option>`);
+
+/* Estado (también en el enlace: #caso=…&t=…&zona=…) */
+const S = { case: 'camp', t: null, area: null, mode: null, draft: [], view: null, play: false, win: 0 };
+const H = new URLSearchParams(location.hash.slice(1));
+if (CASES[H.get('caso')]) S.case = H.get('caso');
+try { if (H.get('zona')) S.area = JSON.parse(atob(H.get('zona'))); } catch { S.area = null; }
+$('#case').value = S.case;
+const timed = () => S.case === 'london' ? [] : S.case === 'mine' ? mine : fire.filter((e) => e.group === S.case);
+const statics = () => S.case === 'london' ? cams.filter((e) => e.group === 'london') : S.case === 'mine' ? [] : cams.filter((e) => e.group === S.case);
+let ev = [], t0 = 0, t1 = 1, bins = [], BIN = 600_000;
+function loadCase(keepT) {
+  ev = timed().sort((a, b) => a.t - b.t);
+  t0 = ev.length ? ev[0].t : Date.now(); t1 = ev.length ? ev.at(-1).t : t0 + 1;
+  BIN = Math.max(600_000, Math.ceil((t1 - t0) / 60 / 600_000) * 600_000);
+  bins = ev.length ? timeline(ev, { binMs: BIN, from: t0, to: t1 }) : [];
+  if (!keepT || S.t == null) S.t = t1;
+  fit(); draw();
+}
+
+/* ───── Mapa (proyección equirectangular local; suficiente a escala de comarca) ───── */
+const cv = $('#map'), g = cv.getContext('2d'); let W = 0, Hh = 0;
+function size() { const r = Math.min(2, devicePixelRatio || 1), b = cv.getBoundingClientRect(); W = b.width; Hh = b.height; cv.width = W * r; cv.height = Hh * r; g.setTransform(r, 0, 0, r, 0, 0); }
+const proj = (p) => { const v = S.view; return [W / 2 + (p.lon - v.lon) * Math.cos(v.lat * Math.PI / 180) * v.s, Hh / 2 - (p.lat - v.lat) * v.s]; };
+const unproj = (x, y) => { const v = S.view; return { lat: v.lat - (y - Hh / 2) / v.s, lon: v.lon + (x - W / 2) / (Math.cos(v.lat * Math.PI / 180) * v.s) }; };
+function fit() {
+  const pts = [...ev, ...statics()]; if (!pts.length) { S.view = { lat: 40.4, lon: -3.7, s: 40 }; return; }
+  const la = pts.map((p) => p.lat), lo = pts.map((p) => p.lon), lat = (Math.min(...la) + Math.max(...la)) / 2, lon = (Math.min(...lo) + Math.max(...lo)) / 2;
+  const dLat = Math.max(0.05, Math.max(...la) - Math.min(...la)), dLon = Math.max(0.05, Math.max(...lo) - Math.min(...lo)) * Math.cos(lat * Math.PI / 180);
+  S.view = { lat, lon, s: 0.8 * Math.min(W / dLon, Hh / dLat) };
+}
+function niceStep(deg) { for (const s of [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20]) if (s >= deg) return s; return 30; }
+function draw() {
+  if (!S.view) return; g.clearRect(0, 0, W, Hh);
+  // Base: tierra Natural Earth 1:110m (contexto) y retícula con grados
+  g.fillStyle = '#0f1c24'; g.strokeStyle = '#26404f'; g.lineWidth = 1;
+  for (const ring of land.rings) { g.beginPath(); for (let i = 0; i < ring.length; i += 2) { const [x, y] = proj({ lon: ring[i], lat: ring[i + 1] }); i ? g.lineTo(x, y) : g.moveTo(x, y); } g.closePath(); g.fill(); g.stroke(); }
+  const tl = unproj(0, 0), br = unproj(W, Hh), st = niceStep((br.lon - tl.lon) / 6);
+  g.strokeStyle = '#16262f'; g.fillStyle = '#5d6e78'; g.font = '11px ui-monospace,monospace';
+  for (let lo = Math.ceil(tl.lon / st) * st; lo < br.lon; lo += st) { const [x] = proj({ lat: 0, lon: lo }); g.beginPath(); g.moveTo(x, 0); g.lineTo(x, Hh); g.stroke(); g.fillText(lo.toFixed(st < 0.1 ? 2 : 1) + '°', x + 3, Hh - 6); }
+  for (let la = Math.ceil(br.lat / st) * st; la < tl.lat; la += st) { const [, y] = proj({ lat: la, lon: 0 }); g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); g.fillText(la.toFixed(st < 0.1 ? 2 : 1) + '°', 4, y - 3); }
+  // Escala
+  const kmPerPx = 111.195 / S.view.s, km = [0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000].find((k) => k / kmPerPx > 70) ?? 1000, px = km / kmPerPx;
+  g.fillStyle = '#f2f4f4'; g.fillRect(W - px - 16, Hh - 22, px, 3); g.font = '12px Inter,sans-serif'; g.fillText(`${km} km`, W - px - 16, Hh - 28);
+
+  const vis = visible();
+  // Envolvente de todo lo detectado hasta el instante
+  const hull = convexHull(ev.filter((e) => e.t <= S.t && e.kind === 'FIRE_HOTSPOT'));
+  if (hull.length >= 3) { g.beginPath(); hull.forEach(([lat, lon], i) => { const [x, y] = proj({ lat, lon }); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.closePath(); g.fillStyle = 'rgba(251,191,36,.07)'; g.fill(); g.setLineDash([6, 5]); g.strokeStyle = '#fbbf24'; g.lineWidth = 1.5; g.stroke(); g.setLineDash([]); }
+  // Eventos con fecha: color por antigüedad respecto al instante
+  const rad = Math.max(2.5, Math.min(7, S.view.s * 0.012));
+  for (const e of vis) {
+    const [x, y] = proj(e), age = (S.t - e.t) / 3_600_000;
+    if (e.kind === 'FIRE_HOTSPOT') { const f = Math.max(0, 1 - age / 3); g.fillStyle = `rgb(${Math.round(138 + 117 * f)},${Math.round(58 + f)},${Math.round(28 + 20 * f)})`; g.globalAlpha = 0.35 + 0.65 * f; }
+    else { g.fillStyle = e.basis === 'SIMULATION' ? '#fbbf24' : '#b79cff'; g.globalAlpha = 1; }
+    g.beginPath(); g.arc(x, y, e.kind === 'FIRE_HOTSPOT' ? rad : 6, 0, 7); g.fill(); g.globalAlpha = 1;
+  }
+  // Cámaras (sin línea de tiempo)
+  for (const c of statics()) { const [x, y] = proj(c), inA = S.area && inArea(c, S.area); g.fillStyle = inA ? '#34d399' : '#91d7e8'; g.fillRect(x - 5, y - 5, 10, 10); if (S.view.s > 300) { g.fillStyle = '#9fb2bc'; g.font = '11px Inter,sans-serif'; g.fillText(c.label, x + 8, y + 4); } }
+  // Zona
+  const A = S.area; g.strokeStyle = '#91d7e8'; g.lineWidth = 2; g.fillStyle = 'rgba(145,215,232,.08)';
+  if (A?.type === 'circle') { const [x, y] = proj(A.center), [x2] = proj({ lat: A.center.lat, lon: A.center.lon + A.radiusM / (111_195 * Math.cos(A.center.lat * Math.PI / 180)) }); g.beginPath(); g.arc(x, y, Math.abs(x2 - x), 0, 7); g.fill(); g.stroke(); }
+  if (A?.type === 'polygon' || S.draft.length) { const ring = A?.type === 'polygon' ? A.ring : S.draft; g.beginPath(); ring.forEach(([lat, lon], i) => { const [x, y] = proj({ lat, lon }); i ? g.lineTo(x, y) : g.moveTo(x, y); }); if (A) { g.closePath(); g.fill(); } g.stroke(); for (const [lat, lon] of S.draft) { const [x, y] = proj({ lat, lon }); g.beginPath(); g.arc(x, y, 4, 0, 7); g.fillStyle = '#91d7e8'; g.fill(); } }
+  drawTimeline(); panel();
+}
+const visible = () => filterEvents(ev, { from: S.win ? S.t - S.win : -Infinity, to: S.t });
+
+/* ───── Línea de tiempo con histograma ───── */
+const tc = $('#tl'), tg = tc.getContext('2d');
+function drawTimeline() {
+  const r = Math.min(2, devicePixelRatio || 1), b = tc.getBoundingClientRect(); tc.width = b.width * r; tc.height = b.height * r; tg.setTransform(r, 0, 0, r, 0, 0);
+  const w = b.width, h = b.height; tg.clearRect(0, 0, w, h);
+  if (!bins.length) { tg.fillStyle = '#9fb2bc'; tg.font = '13px Inter,sans-serif'; tg.fillText(S.case === 'london' ? 'Captura puntual: sin línea de tiempo.' : 'Sin eventos con fecha en este caso.', 10, 30); return; }
+  const inside = S.area ? new Set(filterEvents(ev, { area: S.area }).map((e) => e.id)) : null;
+  const ib = inside ? timeline(ev.filter((e) => inside.has(e.id)), { binMs: BIN, from: t0, to: t1 }) : null;
+  const mx = Math.max(...bins.map((x) => x.n), 1), bw = w / bins.length;
+  bins.forEach((x, i) => { const bh = (x.n / mx) * (h - 22); tg.fillStyle = x.t0 <= S.t ? '#7a3a22' : '#2a3a44'; tg.fillRect(i * bw + 1, h - 16 - bh, bw - 2, bh); if (ib) { const ih = (ib[i].n / mx) * (h - 22); tg.fillStyle = '#91d7e8'; tg.fillRect(i * bw + 1, h - 16 - ih, bw - 2, ih); } });
+  const cx = ((S.t - t0) / (t1 - t0 || 1)) * w; tg.fillStyle = '#ff7756'; tg.fillRect(cx - 1, 0, 2, h - 14);
+  tg.fillStyle = '#9fb2bc'; tg.font = '11px ui-monospace,monospace'; tg.fillText(fmt(t0), 2, h - 3); tg.textAlign = 'right'; tg.fillText(fmt(t1), w - 2, h - 3); tg.textAlign = 'left';
+}
+const fmt = (t) => new Date(t).toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
+const hm = (ms) => { const m = Math.round(ms / 60_000); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')} min`; };
+
+/* ───── Panel de la zona ───── */
+let last = null;
+function panel() {
+  $('#clock').textContent = ev.length ? fmt(S.t) : '';
+  $('#t').value = Math.round(((S.t - t0) / (t1 - t0 || 1)) * 1000);
+  const upTo = filterEvents(ev, { to: S.t }), inside = filterEvents(upTo, { area: S.area }), st = areaStats(inside), cIn = statics().filter((c) => !S.area || inArea(c, S.area));
+  const rows = [];
+  rows.push(['Zona', S.area ? (S.area.type === 'circle' ? `círculo de ${(S.area.radiusM / 1000).toFixed(1)} km` : `polígono de ${ringAreaKm2(S.area.ring).toFixed(1)} km²`) : 'todo el caso']);
+  if (ev.length) {
+    rows.push(['Eventos hasta este instante', `${st.n} de ${ev.length}`]);
+    if (st.n) { rows.push(['Primero en la zona', fmt(st.first)]); rows.push(['…tras la primera detección', hm(st.first - t0)]); rows.push(['Último en la zona', fmt(st.last)]); }
+    const frp = st.valueSum['FIRE_HOTSPOT:MW']; if (frp) rows.push(['Suma de FRP (potencia radiativa)', `${Math.round(frp).toLocaleString('es')} MW·pasada`]);
+    const hull = convexHull(upTo.filter((e) => e.kind === 'FIRE_HOTSPOT')); if (hull.length >= 3) rows.push(['Envolvente total hasta ahora', `${ringAreaKm2(hull).toFixed(0)} km²`]);
+    if (upTo.length) rows.push(['Alcance desde el origen', `${(Math.max(...upTo.map((e) => haversineM(ev[0], e))) / 1000).toFixed(1)} km`]);
+  }
+  rows.push(['Cámaras públicas que cubren la zona', String(cIn.length)]);
+  $('#stats').innerHTML = rows.map(([a, b]) => `<span class="m">${a}</span><b>${b}</b>`).join('');
+  // Crecimiento (todo el caso) con el instante marcado
+  const sp = $('#spark'), r = Math.min(2, devicePixelRatio || 1), b = sp.getBoundingClientRect(); sp.width = b.width * r; sp.height = b.height * r; const sg = sp.getContext('2d'); sg.setTransform(r, 0, 0, r, 0, 0); sg.clearRect(0, 0, b.width, b.height);
+  const gr = ev.length > 2 && S.case !== 'mine' ? growth(ev, { binMs: BIN }) : [];
+  if (gr.length > 1) { const mx = Math.max(...gr.map((x) => x.hullKm2), 1); sg.strokeStyle = '#fbbf24'; sg.lineWidth = 2; sg.beginPath(); gr.forEach((x, i) => { const px = (i / (gr.length - 1)) * b.width, py = b.height - 4 - (x.hullKm2 / mx) * (b.height - 10); i ? sg.lineTo(px, py) : sg.moveTo(px, py); }); sg.stroke(); const cx = ((S.t - t0) / (t1 - t0 || 1)) * b.width; sg.fillStyle = '#ff7756'; sg.fillRect(cx - 1, 0, 2, b.height);
+    const hrs = (gr.at(-1).t - gr[0].t) / 3_600_000;
+    $('#sparkLbl').textContent = `Envolvente de detecciones a lo largo del caso: hasta ${Math.round(mx)} km²; alcance final ${gr.at(-1).reachKm.toFixed(1)} km en ${hrs.toFixed(1)} h. Calculado con los píxeles GOES: un píxel mide varios km, así que los saltos de un cubo a otro no son velocidades reales del frente.`; }
+  else $('#sparkLbl').textContent = '';
+  const srcs = new Map(); for (const e of [...ev, ...statics()]) srcs.set(e.source, e.basis);
+  $('#src').innerHTML = [...srcs].map(([s, bz]) => `<div>· ${s} <span class="tag" style="${bz === 'SIMULATION' ? 'color:var(--a);border-color:var(--a)' : ''}">${bz === 'SIMULATION' ? 'SIMULACIÓN' : bz === 'CITIZEN_SIGNED_UNVERIFIED' ? 'firmado, sin verificar' : 'medido'}</span></div>`).join('') + '<div>· Base: Natural Earth 1:110m (0,1°, solo contexto)</div>' + (S.case === 'mine' && !ev.length ? '<div>No hay reportes guardados en este navegador: créalos en <a href="/senda/avisos">Avisos</a>.</div>' : '');
+  last = { case: S.case, t: S.t, total: ev.length, inside: st.n, first: st.first, camerasInside: cIn.length, area: S.area };
+  window.SENDA_ATLAS.last = last;
+}
+
+/* ───── Interacción ───── */
+let drag = null;
+const pos = (e) => { const b = cv.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
+cv.addEventListener('pointerdown', (e) => {
+  cv.setPointerCapture(e.pointerId); const [x, y] = pos(e), p = unproj(x, y);
+  if (S.mode === 'circle') drag = { kind: 'circle', c: p };
+  else if (S.mode === 'poly') { if (S.draft.length >= 3) { const [fx, fy] = proj({ lat: S.draft[0][0], lon: S.draft[0][1] }); if (Math.hypot(fx - x, fy - y) < 12) return closePoly(); } S.draft.push([p.lat, p.lon]); $('#close').hidden = S.draft.length < 3; draw(); }
+  else drag = { kind: 'pan', x, y, v: { ...S.view } };
+});
+cv.addEventListener('pointermove', (e) => {
+  if (!drag) return; const [x, y] = pos(e);
+  if (drag.kind === 'pan') { const k = Math.cos(S.view.lat * Math.PI / 180); S.view = { ...drag.v, lon: drag.v.lon - (x - drag.x) / (k * drag.v.s), lat: drag.v.lat + (y - drag.y) / drag.v.s }; draw(); }
+  else { S.area = { type: 'circle', center: drag.c, radiusM: Math.max(200, haversineM(drag.c, unproj(x, y))) }; draw(); }
+});
+cv.addEventListener('pointerup', () => { if (drag?.kind === 'circle') { setMode(null); saveHash(); } drag = null; });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); const [x, y] = pos(e), before = unproj(x, y); S.view.s *= e.deltaY < 0 ? 1.25 : 0.8; const after = unproj(x, y); S.view.lat += before.lat - after.lat; S.view.lon += before.lon - after.lon; draw(); }, { passive: false });
+function setMode(m) { S.mode = m; $('#mCircle').classList.toggle('on', m === 'circle'); $('#mPoly').classList.toggle('on', m === 'poly'); cv.style.cursor = m ? 'crosshair' : 'grab'; if (m !== 'poly') { S.draft = []; $('#close').hidden = true; } }
+function closePoly() { if (S.draft.length >= 3) S.area = { type: 'polygon', ring: S.draft }; setMode(null); saveHash(); draw(); }
+$('#mCircle').onclick = () => setMode(S.mode === 'circle' ? null : 'circle');
+$('#mPoly').onclick = () => { setMode(S.mode === 'poly' ? null : 'poly'); };
+$('#close').onclick = closePoly;
+$('#clearArea').onclick = () => { S.area = null; setMode(null); saveHash(); draw(); };
+$('#fit').onclick = () => { fit(); draw(); };
+$('#case').onchange = () => { S.case = $('#case').value; S.area = null; setMode(null); saveHash(); loadCase(false); };
+$('#win').onchange = () => { S.win = +$('#win').value; draw(); };
+$('#t').oninput = () => { S.t = t0 + ($('#t').value / 1000) * (t1 - t0); draw(); };
+const scrub = (e) => { const b = tc.getBoundingClientRect(); S.t = t0 + Math.max(0, Math.min(1, (e.clientX - b.left) / b.width)) * (t1 - t0); draw(); };
+tc.addEventListener('pointerdown', (e) => { tc.setPointerCapture(e.pointerId); scrub(e); tc.onpointermove = scrub; }); tc.addEventListener('pointerup', () => { tc.onpointermove = null; });
+let raf = 0, lastF = 0;
+function tick(now) { if (!S.play) return; const dt = lastF ? (now - lastF) / 1000 : 0; lastF = now; S.t = Math.min(t1, S.t + dt * +$('#speed').value * 1000); draw(); if (S.t >= t1) return stop(); raf = requestAnimationFrame(tick); }
+function stop() { S.play = false; lastF = 0; $('#play').textContent = '▶ Reproducir'; cancelAnimationFrame(raf); }
+$('#play').onclick = () => { if (S.play) return stop(); if (!ev.length) return; if (S.t >= t1) S.t = t0; S.play = true; $('#play').textContent = '⏸ Pausa'; raf = requestAnimationFrame(tick); };
+
+/* ───── Exportar y compartir ───── */
+const download = (name, text, type) => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); };
+const exported = () => [...filterEvents(ev, { to: S.t, area: S.area }), ...statics().filter((c) => !S.area || inArea(c, S.area))];
+$('#gj').onclick = () => { const x = exported(); download(`senda-atlas-${S.case}.geojson`, JSON.stringify(toGeoJSON(x, { area: S.area, title: `SENDA Atlas · ${CASES[S.case]}` })), 'application/geo+json'); $('#exp').textContent = `${x.length} elementos exportados, cada uno con su fuente y su base.`; };
+$('#csv').onclick = () => { const x = exported(), q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`; download(`senda-atlas-${S.case}.csv`, 'time_utc,lat,lon,kind,value,unit,label,source,basis\n' + x.map((e) => [new Date(e.t).toISOString(), e.lat, e.lon, e.kind, e.value, e.unit, e.label, e.source, e.basis].map(q).join(',')).join('\n'), 'text/csv'); $('#exp').textContent = `${x.length} filas exportadas.`; };
+function saveHash() { const h = new URLSearchParams({ caso: S.case }); if (S.area) h.set('zona', btoa(JSON.stringify(S.area))); history.replaceState(null, '', '#' + h); }
+$('#link').onclick = async () => { saveHash(); const u = location.href + `&t=${Math.round(S.t)}`; try { await navigator.clipboard.writeText(u); $('#exp').textContent = 'Enlace copiado: abre exactamente esta vista, con la zona dibujada.'; } catch { $('#exp').textContent = u; } };
+
+window.SENDA_ATLAS = { setCase: (c) => { $('#case').value = c; $('#case').onchange(); }, setArea: (a) => { S.area = a; saveHash(); draw(); }, setTime: (t) => { S.t = t; draw(); }, range: () => ({ t0, t1 }), last: null };
+addEventListener('resize', () => { size(); draw(); });
+size(); loadCase(false);
+if (H.get('t') && Number.isFinite(+H.get('t'))) { S.t = Math.max(t0, Math.min(t1, +H.get('t'))); draw(); }
+document.body.dataset.ready = '1';
+</script>
+</main></body>
+</html>

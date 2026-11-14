@@ -9,6 +9,7 @@
  *  - Avisos: 3 móviles firman reportes de 160 caracteres → un 4.º importa con duplicado y falsificación →
  *    agrupa en 1 incidente → paso por sonido.
  *  - Centro: verifica, descarta repetidos y falsos, prioriza atrapados primero y exporta CAP restringido.
+ *  - Atlas: datos GOES reales, zona de 5 km, filtro por instante y GeoJSON con fuente. Demo guiada: corre el código real.
  * Escribe evidence/senda/screens-e2e.json. Sale con código ≠ 0 si algo falla.
  */
 import { createServer } from 'node:http';
@@ -99,6 +100,25 @@ try {
   const [dl] = await Promise.all([c.waitForEvent('download'), c.click('#cit-out button[data-cap]')]);
   const cap = await readFile(await dl.path(), 'utf8');
   check('centro: el parte CAP 1.2 es restringido y de ejercicio', /<scope>Restricted<\/scope>/.test(cap) && /<status>Exercise<\/status>/.test(cap) && !/<scope>Public/.test(cap));
+
+  /* ───── Atlas y demo guiada ───── */
+  const actx = await browser.newContext({ viewport: { width: 1280, height: 900 }, acceptDownloads: true }), a = await actx.newPage();
+  a.on('pageerror', (e) => errors.push(`atlas: ${e.message}`));
+  await a.goto(base + '/atlas'); await a.waitForSelector('body[data-ready]');
+  const all = await a.evaluate(() => window.SENDA_ATLAS.last);
+  await a.evaluate(() => window.SENDA_ATLAS.setArea({ type: 'circle', center: { lat: 39.7596, lon: -121.6219 }, radiusM: 5000 }));
+  const zone = await a.evaluate(() => window.SENDA_ATLAS.last);
+  check('atlas: Camp Fire con detecciones GOES reales y zona de 5 km alrededor de Paradise', all.total > 1000 && zone.inside > 0 && zone.inside < all.total && zone.first > Date.parse('2018-11-08T14:57:18Z'), { total: all.total, inside: zone.inside, first: new Date(zone.first).toISOString() });
+  const { t0 } = await a.evaluate(() => window.SENDA_ATLAS.range()); await a.evaluate((t) => window.SENDA_ATLAS.setTime(t), t0);
+  check('atlas: la línea de tiempo filtra por instante', (await a.evaluate(() => window.SENDA_ATLAS.last)).inside === 0);
+  await a.evaluate((t) => window.SENDA_ATLAS.setTime(t), Date.parse('2018-11-08T23:47:18Z'));
+  const [gdl] = await Promise.all([a.waitForEvent('download'), a.click('#gj')]);
+  const gj = JSON.parse(await readFile(await gdl.path(), 'utf8'));
+  check('atlas: el GeoJSON exportado lleva fuente y base en cada punto', gj.features.length > 1 && gj.features.filter((f) => f.geometry.type === 'Point' && !f.properties.role).every((f) => f.properties.source && f.properties.basis), { features: gj.features.length });
+  const d = await (await actx.newPage()); d.on('pageerror', (e) => errors.push(`demo: ${e.message}`));
+  await d.goto(base + '/demo'); await d.click('#run'); await d.waitForFunction(() => window.SENDA_DEMO?.done || window.SENDA_DEMO?.error, null, { timeout: 30_000 });
+  const demo = await d.evaluate(() => window.SENDA_DEMO);
+  check('demo: cifra en ≤ 160 caracteres, abre, rechaza alterado y repetido, verifica reporte y calcula el atlas', demo.done && demo.chars <= 160 && demo.opened && demo.tamperRejected && demo.replayRejected && demo.reportChars === 160 && demo.reportVerified && demo.atlas.insideParadise5km > 0, demo);
 } catch (e) { check(`ejecución sin excepciones (${e.message})`, false); }
 
 check('sin errores de JavaScript en las páginas', errors.length === 0, { errors });
