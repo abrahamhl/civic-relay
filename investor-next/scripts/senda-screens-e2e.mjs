@@ -148,6 +148,9 @@ try {
   const emb = await actx.newPage(); await emb.goto(base + '/atlas?embed=1#caso=spain'); await emb.waitForSelector('body[data-ready]');
   check('atlas: modo embebible para webs municipales (solo mapa, enlace a la versión completa)', await emb.evaluate(() => document.body.classList.contains('embed') && getComputedStyle(document.querySelector('aside')).display === 'none' && /atlas#caso=spain/.test(document.querySelector('#openFull').href)));
   await emb.close();
+  await a.evaluate(() => window.SENDA_ATLAS.setCase('dana'));
+  const dn = await a.evaluate(() => window.SENDA_ATLAS.last);
+  check('atlas: DANA de Valencia con zonas inundadas reales de Copernicus EMS EMSR773 (mapeo oficial, área calculada)', dn.case === 'dana' && dn.total >= 5 && /EMSR773/.test(await a.textContent('#src')), { total: dn.total });
   await a.evaluate(() => window.SENDA_ATLAS.setCase('gnss'));
   const gn = await a.evaluate(() => window.SENDA_ATLAS.last);
   check('atlas: capa de integridad GNSS con celdas calculadas a partir de ADS-B real (adsb.lol, ODbL)', gn.case === 'gnss' && gn.total > 10, { total: gn.total });

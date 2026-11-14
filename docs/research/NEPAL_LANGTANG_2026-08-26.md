@@ -45,3 +45,11 @@ En los últimos 30 días, 850 de sus 904 eventos citan **GDACS** como fuente; el
 - **USGS:** obra del Gobierno de EE. UU. Varias fuentes secundarias indican que es de dominio público en EE. UU. (17 U.S.C. §105). La página de USGS sobre derechos de autor devolvió 403 desde la sesión: **no leída directamente**.
 - **Sentinel-2 y Copernicus DEM:** licencia de datos Copernicus, uso libre con atribución. DEM © DLR e.V. 2010-2014 y © Airbus Defence and Space GmbH 2014-2018.
 - **NDW:** CC0 1.0, verificada el 14-11 en sus [condiciones](https://docs.ndw.nu/algemeen/data-gebruiksvoorwaarden/).
+
+## Anexo: DANA de Valencia, Copernicus EMS EMSR773 (datos reales que sustituyen al fixture inventado)
+
+- Ficha pública de la activación (dashboard-api de rapidmapping.emergency.copernicus.eu): evento del 29-10-2024 a las 14:30 UTC, activación a las 16:40, 36 zonas de interés y 44 productos. GDACS FL1102983.
+- Estadísticas **oficiales** tal como las publica la activación: extensión del evento 9.838,1 ha, 81.080 personas en la zona afectada, 1.125,2 km de carreteras, 7.207 edificios (221,9 ha).
+- Capas «observedEventA» de la última versión de cada producto DEL: 6 zonas con inundación observada. **Superficie calculada por SENDA** en EPSG:3035 sobre la geometría original: 106,05 km² en total, de ellos 24,07 km² en Horta Sud. La diferencia con la cifra oficial (98,38 km²) **no está explicada**: la activación no dice qué versiones suma, y el solape entre zonas es solo de 0,17 km².
+- Licencia: acceso libre, con reproducción, distribución y adaptación, citando la fuente ([condiciones de CEMS](https://mapping.emergency.copernicus.eu/terms-and-conditions/)). Cita: «Contains modified Copernicus Emergency Management Service information 2024».
+- En el Atlas: caso «DANA Valencia» (`/senda/atlas#caso=dana`).

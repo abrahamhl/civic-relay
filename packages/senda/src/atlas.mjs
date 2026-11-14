@@ -19,7 +19,7 @@
 const R = 6_371_008.8; // radio medio terrestre (m), IUGG
 const rad = (d) => (d * Math.PI) / 180;
 
-export const ATLAS_BASIS = Object.freeze(['MEASURED_SATELLITE', 'MEASURED_CAMERA', 'MEASURED_ADSB', 'MEASURED_SEISMIC', 'OFFICIAL_ALERT', 'CITIZEN_SIGNED_UNVERIFIED', 'SIMULATION']);
+export const ATLAS_BASIS = Object.freeze(['MEASURED_SATELLITE', 'MEASURED_CAMERA', 'MEASURED_ADSB', 'MEASURED_SEISMIC', 'OFFICIAL_MAPPING', 'OFFICIAL_ALERT', 'CITIZEN_SIGNED_UNVERIFIED', 'SIMULATION']);
 
 /** Distancia de círculo máximo (haversine) en metros entre {lat,lon}. */
 export function haversineM(a, b) {
@@ -188,6 +188,18 @@ export function eventsFromUsgs(snap, { includeCases = true } = {}) {
   const seen = new Set(), all = [...(snap.eventos ?? []), ...(includeCases ? snap.casos ?? [] : [])];
   return all.filter((e) => !seen.has(e.id) && seen.add(e.id)).map((e) => makeEvent({ id: `usgs:${e.id}`, t: e.t, lat: e.lat, lon: e.lon, kind: `USGS_${e.type}`, value: e.mag, unit: e.magType,
     group: e.type === 'landslide' ? 'usgs-landslide' : 'usgs', label: `M ${e.mag} ${e.magType} · ${e.type === 'landslide' ? 'deslizamiento (señal sísmica)' : 'sismo'} · ${e.place} · red ${e.net}`, source: src, basis: 'MEASURED_SEISMIC' }));
+}
+
+/**
+ * Zonas inundadas observadas por Copernicus EMS Rapid Mapping (emsr773_inundacion.geojson,
+ * scripts/datos-reales/cems_emsr773_snapshot.py). Un evento por zona de interés en el centro de su geometría;
+ * t = hora de la imagen del producto. La superficie (km²) la calcula SENDA en EPSG:3035 sobre la geometría original.
+ */
+export function eventsFromCems(fc, code = 'EMSR773') {
+  const pts = (g) => (g.type === 'Polygon' ? g.coordinates[0] : g.type === 'MultiPolygon' ? g.coordinates.flatMap((p) => p[0]) : []);
+  return (fc.features ?? []).filter((f) => f.properties?.imagen).map((f) => { const P = pts(f.geometry), lon = P.reduce((a, q) => a + q[0], 0) / P.length, lat = P.reduce((a, q) => a + q[1], 0) / P.length;
+    return makeEvent({ id: `cems:${code}:AOI${f.properties.aoi}`, t: f.properties.imagen + 'Z', lat, lon, kind: 'CEMS_flood', value: f.properties.km2, unit: 'km2', group: code,
+      label: `${code} · ${f.properties.nombre} · ${f.properties.km2} km² de inundación observada`, source: `Copernicus EMS Rapid Mapping ${code} (${f.properties.producto})`, basis: 'OFFICIAL_MAPPING' }); });
 }
 
 /** Catálogo real de EMSC-CSEM (emsc_sismos.json). La agencia autora de cada solución va en el grupo («emsc:NEIC»…). */

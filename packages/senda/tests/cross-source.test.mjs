@@ -53,3 +53,14 @@ test('USGS ↔ EMSC: dependencia evento a evento por agencia autora (NEIC = copi
   assert.ok(neic.length > 50); assert.ok(neic.every((p) => p.dKm < 1), 'las soluciones NEIC en EMSC coinciden con USGS');
   assert.ok(c.independentSubset.matched > 200); assert.ok(c.independentSubset.medianKm > 1, 'las soluciones de otras agencias difieren de verdad');
 });
+
+test('Copernicus EMS EMSR773 (DANA de Valencia): zonas inundadas reales con área calculada y procedencia', async () => {
+  const { eventsFromCems } = await import('../src/atlas.mjs');
+  const fc = ref('dana2024/emsr773_inundacion.geojson'), sum = ref('dana2024/emsr773.json');
+  assert.equal(sum.codigo, 'EMSR773'); assert.equal(sum.horaEvento, '2024-10-29T14:30:00'); assert.match(sum.licencia, /terms-and-conditions/);
+  assert.ok(sum.procedencia.every((p) => /^[0-9a-f]{64}$/.test(p.sha256)));
+  const ev = eventsFromCems(fc);
+  assert.ok(ev.length >= 5); assert.ok(ev.every((e) => e.basis === 'OFFICIAL_MAPPING' && e.unit === 'km2'));
+  const horta = ev.find((e) => /Horta Sud/.test(e.label)); assert.ok(horta.value > 10, 'Horta Sud con más de 10 km² inundados observados');
+  const total = ev.reduce((a, e) => a + e.value, 0); assert.ok(Math.abs(total - sum.sumaInundacionObservada_km2) < 0.05);
+});

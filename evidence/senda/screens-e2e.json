@@ -1,9 +1,9 @@
 {
  "kind": "senda-screens-e2e",
- "at": "2026-11-14T13:03:55.900Z",
- "durationS": 49,
- "passed": 31,
- "total": 31,
+ "at": "2026-11-14T13:08:23.958Z",
+ "durationS": 50,
+ "passed": 32,
+ "total": 32,
  "results": [
   {
    "name": "mensaje: el número de seguridad coincide en los dos móviles",
@@ -153,6 +153,11 @@
   {
    "name": "atlas: modo embebible para webs municipales (solo mapa, enlace a la versión completa)",
    "ok": true
+  },
+  {
+   "name": "atlas: DANA de Valencia con zonas inundadas reales de Copernicus EMS EMSR773 (mapeo oficial, área calculada)",
+   "ok": true,
+   "total": 6
   },
   {
    "name": "atlas: capa de integridad GNSS con celdas calculadas a partir de ADS-B real (adsb.lol, ODbL)",
