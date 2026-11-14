@@ -30,7 +30,7 @@ const server = createServer(async (req, res) => {
 const base = process.env.SENDA_BASE_URL || `http://127.0.0.1:${server.address().port}/senda`;
 
 const results = []; const t0 = Date.now();
-const check = (name, ok, detail = {}) => { results.push({ name, ok: !!ok, ...detail }); console.log(`${ok ? 'PASS' : 'FAIL'} · ${name}`); if (!ok) process.exitCode = 1; };
+const check = (name, ok, detail = {}) => { results.push({ name, ok: !!ok, ...detail }); console.log(`${ok ? 'PASS' : 'FAIL'} · ${name}`); if (!ok) { process.exitCode = 1; try { console.log('  detalle: ' + JSON.stringify(detail).slice(0, 2000)); } catch { /* detalle no serializable */ } } };
 
 const browser = await chromium.launch({ args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 async function phone(label, name) {
@@ -301,8 +301,9 @@ const offerWave = await D.page.evaluate(async (t) => { const m = await import('/
 const heardOffer = await E.page.evaluate(async (arr) => { const m = await import('/senda/core/acoustic-modem.mjs'), s = await import('/senda/core/sdp-compact.mjs'); const r = m.demodulate(Float32Array.from(arr), { sampleRate: 48000 }); return r && s.callToText(r.payload); }, offerWave);
 const answerCode = await E.page.evaluate((t) => window.SENDA_CALL_API.acceptOffer(t), heardOffer);
 await D.page.evaluate((t) => window.SENDA_CALL_API.acceptAnswer(t), answerCode);
-await D.page.waitForFunction(() => window.SENDA_CALL.state === 'connected', null, { timeout: 15000 }).catch(() => {});
-await E.page.waitForFunction(() => window.SENDA_CALL.state === 'connected', null, { timeout: 15000 }).catch(() => {});
+// 30 s: en la CI compartida la conexión WebRTC local a veces tarda más de 15 s (fallo intermitente del 14-11). Las aserciones no cambian.
+await D.page.waitForFunction(() => window.SENDA_CALL.state === 'connected' && document.querySelector('#k-path')?.textContent === 'local, sin servidor', null, { timeout: 30000 }).catch(() => {});
+await E.page.waitForFunction(() => window.SENDA_CALL.state === 'connected', null, { timeout: 30000 }).catch(() => {});
 await D.page.evaluate(() => window.SENDA_CALL_API.send('Hola, te oigo')); await E.page.click('#sos');
 // Esperar a que lleguen el chat y la voz (antes: 3,5 s fijos, insuficientes a veces en la CI). Las aserciones no cambian.
 await Promise.all([
@@ -313,7 +314,8 @@ const call = { d: await D.page.evaluate(() => ({ ...window.SENDA_CALL, path: doc
 await D.page.screenshot({ path: resolve(outDir, 'e2e-20-llamada.png'), fullPage: true });
 check('Llamada sin Internet: oferta de <110 bytes por sonido (onda real, decodificada exacta), conexión directa cifrada, voz Opus y chat en ambos sentidos y cero peticiones de red durante la llamada',
   call.soundExact && call.d.sentBytes < 110 && call.e.sentBytes < 110 && call.d.state === 'connected' && call.e.state === 'connected' && call.e.received.includes('Hola, te oigo') && call.d.received.some((m) => m.startsWith('🆘')) && call.d.audioPackets > 0 && call.e.audioPackets > 0 && call.requestsDuringCall.length === 0 && call.d.path === 'local, sin servidor',
-  { offerBytes: call.d.sentBytes, answerBytes: call.e.sentBytes, offerSoundS: call.offerS, audioPackets: [call.d.audioPackets, call.e.audioPackets], requests: call.requestsDuringCall });
+  { offerBytes: call.d.sentBytes, answerBytes: call.e.sentBytes, offerSoundS: call.offerS, audioPackets: [call.d.audioPackets, call.e.audioPackets], requests: call.requestsDuringCall,
+    diag: { soundExact: call.soundExact, states: [call.d.state, call.e.state], path: call.d.path, chatE: call.e.received?.includes('Hola, te oigo'), sosD: call.d.received?.some((m) => m.startsWith('🆘')) } });
 await D.page.evaluate(() => document.querySelector('#hang').click());
 const demo = await E.page.evaluate(async () => { await window.SENDA_CALL_API.demoHere(); return window.SENDA_CALL.demo; });
 check('Llamada de prueba en un solo dispositivo (sin micrófono): dos conexiones reales A↔B con el código por forma de onda, mensaje y audio recibidos', demo.connected && demo.message?.includes('3.ª planta') && demo.audioPackets > 10, demo);
