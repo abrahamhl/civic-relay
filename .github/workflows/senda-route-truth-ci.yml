@@ -1,0 +1,23 @@
+name: SENDA route-truth research gate
+on:
+  pull_request:
+    paths:
+      - 'experimental/senda-route-truth/**'
+      - '.github/workflows/senda-route-truth-ci.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experimental/senda-route-truth/**'
+      - '.github/workflows/senda-route-truth-ci.yml'
+permissions:
+  contents: read
+jobs:
+  research-invariants:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify synthetic route safety invariants
+        run: node --test experimental/senda-route-truth/route-truth.test.mjs
