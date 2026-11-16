@@ -19,5 +19,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify synthetic route safety invariants
-        run: node --test experimental/senda-route-truth/route-truth.test.mjs
+      - name: Verify route authorization and two-handset software isolation
+        run: node --test experimental/senda-route-truth/*.test.mjs
