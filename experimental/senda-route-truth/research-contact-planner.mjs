@@ -7,7 +7,7 @@
 const LIVE_ROLES = new Set(['SENDER','RECEIVER','RELAY','GATEWAY']);
 export function planHypotheticalContacts({nodes,contacts,source,destination,startMs,
   deadlineMs,payloadBytes,maxHops=5,minLowerBound=0,maxEnergyMj=Number.MAX_SAFE_INTEGER}={}) {
-  if(!Array.isArray(nodes)||!Array.isArray(contacts)||typeof source!=='string'||
+  if(!Array.isArray(nodes)||!Array.isArray(contacts)||nodes.length>256||contacts.length>4000||typeof source!=='string'||
    typeof destination!=='string'||!Number.isSafeInteger(startMs)||startMs<0||
    !Number.isSafeInteger(deadlineMs)||deadlineMs<=startMs||
    !Number.isSafeInteger(payloadBytes)||payloadBytes<1||payloadBytes>65536||
@@ -44,11 +44,11 @@ export function planHypotheticalContacts({nodes,contacts,source,destination,star
     adjacency.get(c.from).push(c);
   }
   for(const arr of adjacency.values())arr.sort((a,b)=>a.startMs-b.startMs||a.to.localeCompare(b.to));
-  let considered=0,best=null, truncated=false;
+  let considered=0,expanded=0,best=null, truncated=false;
   const score=x=>[x.bound,-x.arrivalMs,-x.energyMj,-x.path.length];
   const superior=(a,b)=>!b||score(a).some((x,i)=>x!==score(b)[i]&&score(a).slice(0,i).every((v,j)=>v===score(b)[j])&&x>score(b)[i]);
   function traverse(node,arrivalMs,path,schedule,failSum,energyMj){
-    if(considered>=10000){truncated=true;return;}
+    if(++expanded>100000||considered>=10000){truncated=true;return;}
     if(node===destination){
       considered++;
       const bound=Math.max(0,1-failSum);
