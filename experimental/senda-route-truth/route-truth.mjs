@@ -21,8 +21,10 @@ export function assessModelRoute({ nodes, links, source, destination, maxHops = 
   });
   if (!byId.has(source) || !byId.has(destination)) return result(false, 'UNKNOWN_ENDPOINT', []);
   if (source === destination) return result(false, 'SAME_ENDPOINT_NOT_DELIVERY', []);
+  // Unknown or misspelled roles must not silently become active repeaters.
+  const ACTIVE_ROLES = new Set(['SENDER', 'RECEIVER', 'RELAY']);
   const usable = node => node && node.consent === true && node.powered === true &&
-    node.radioEnabled === true && node.role !== 'PASSIVE' && node.role !== 'OBSERVATION_ONLY';
+    node.radioEnabled === true && ACTIVE_ROLES.has(node.role);
   if (!usable(byId.get(source)) || !usable(byId.get(destination))) {
     return result(false, 'ENDPOINT_NOT_AUTHORIZED_OR_UNAVAILABLE', []);
   }
