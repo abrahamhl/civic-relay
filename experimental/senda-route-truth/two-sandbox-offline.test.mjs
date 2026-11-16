@@ -109,16 +109,22 @@ test('SENDA: two separate offline handset processes; honest synthetic receipt ga
       assert.equal((await a.command('dispatch','LAB_EXPIRED_05')).status,'EXPIRED');
       evidence.push({case:'consent_revocation_expiry',status:'PASS',neverDelivered:true});
     });
-    await t.test('restart exposes actual P0 persistence gap, not simulated recovery',async()=>{
+    await t.test('restart restores durable synthetic queue before simulated transport recovers',async()=>{
       await a.command('enqueue',envelope('LAB_RESTART_06'));
       assert.equal((await a.command('inspect','LAB_RESTART_06')).status,'QUEUED');
-      a.child.kill();
+      a.child.kill('SIGKILL');
       await new Promise(resolve=>a.child.once('exit',resolve));
       a=node('A',A,handle);
       await a.ready;
       const after=await a.command('inspect','LAB_RESTART_06');
-      assert.equal(after,null,'Current in-memory engine must not be misrepresented as durable');
-      evidence.push({case:'restart_queue_loss',status:'OBSERVED_LIMITATION',before:'QUEUED',after:'MISSING',severity:'P0_FOR_OFFLINE_DURABILITY'});
+      assert.equal(after.status,'QUEUED','Lab queue must survive SIGKILL and process restart');
+      await b.command('setReceiptMode','VALID');
+      await a.command('setLink',true);
+      const replay=await a.command('dispatch','LAB_RESTART_06');
+      assert.equal(replay.status,'ACK_SYNTHETIC');
+      assert.equal(replay.hasPayload,false);
+      assert.equal((await b.command('ledger')).filter(x=>x.messageId==='LAB_RESTART_06').length,1);
+      evidence.push({case:'restart_queue_recovery',status:'PASS',before:'QUEUED',after:'QUEUED',simulatedFinalAck:'ACK_SYNTHETIC',hardwareValidated:false});
     });
     const savePath=process.env.SENDA_EVIDENCE_FILE;
     if(savePath)writeFileSync(savePath,JSON.stringify({source:'real SENDA code; synthetic IPC transport',runAt:new Date().toISOString(),repoSHA:'b0337fbb541bd4ed98d0b78b1e65ee95d6f6a4e8',processModel:'two OS processes; distinct working dirs; no Android/RF; network namespace isolation not claimed',evidence},null,2));
