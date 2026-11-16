@@ -1,17 +1,21 @@
 /** A test-only two-process handset substitute. No Bluetooth/Wi-Fi/Android/IPC production transport. */
 import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { createStoreForwardEngine } from '../../investor-next/lib/store-forward.mjs';
+import { createDurableLabQueue } from './durable-lab-queue.mjs';
 
 const role = process.argv[2];
 if (!['A', 'B'].includes(role) || !process.send) throw Error('Test-only IPC worker');
 const ledgerFile = join(process.cwd(), 'receiver-ledger.json');
-let clock = 100000;
+// Controlled deterministic clock fixture is restored across process restart.
+// This is NOT trusted real-world time / secure monotonic clock recovery.
+const persistedClockFile = join(process.cwd(), 'senda-synthetic-queue.json');
+let clock = existsSync(persistedClockFile)
+  ? JSON.parse(readFileSync(persistedClockFile,'utf8')).document.lastSeenAt : 100000;
 let connected = false;
 let receiptMode = 'VALID';
 let txSeq = 0;
 const pendingTx = new Map();
-const engine = role === 'A' ? createStoreForwardEngine({now:()=>clock,retryMs:1000}) : null;
+const engine = role === 'A' ? createDurableLabQueue({directory:process.cwd(),now:()=>clock,retryMs:1000}) : null;
 if (engine) {
   engine.registerAdapter({
     id: 'IPC_LAB', kind: 'SIMULATOR_ADAPTER', evidence: 'SIMULATED',
@@ -34,7 +38,6 @@ async function command(action, data) {
     if (action === 'inspect') return engine.inspect(data);
     if (action === 'revoke') return engine.revoke(data);
     if (action === 'advance') {clock += data; return {clock};}
-    if (action === 'audit') return engine.audit();
   } else {
     if (action === 'setReceiptMode') {receiptMode=data;return {receiptMode};}
     if (action === 'ledger') return ledger();
@@ -49,7 +52,8 @@ process.on('message',async m=>{
   }
   if (m.kind === 'WIRE_IN' && role === 'B') {
     const list=ledger();
-    list.push({messageId:m.envelope.id, provenance:m.envelope.provenance, receiver:'SANDBOX_B'});
+    if (!list.some(x=>x.messageId===m.envelope.id))
+      list.push({messageId:m.envelope.id, provenance:m.envelope.provenance, receiver:'SANDBOX_B'});
     writeFileSync(ledgerFile,JSON.stringify(list,null,2));
     const accepted={accepted:true};
     if(receiptMode==='VALID')accepted.receipt={kind:'SIMULATED_RECEIVER_RECEIPT',messageId:m.envelope.id,transportId:'IPC_LAB'};
