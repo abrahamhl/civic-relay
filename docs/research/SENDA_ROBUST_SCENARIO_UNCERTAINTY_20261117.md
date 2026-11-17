@@ -110,3 +110,38 @@ Se toma el máximo de estas cotas inferiores. Para <=10 grupos se enumeran todos
 **Limitación:** la cota requiere que p_i sean límites marginales genuinos. Sin medidas reales no se convierten en probabilidades de campo, incluso si las matemáticas están correctamente demostradas. Ninguna transmisión en vivo, 112 ni acceso por satélite queda habilitado por este algoritmo. La ganancia científica sería **calibrar las cotas por dependencia física real** y probar reducción de sobreconfianza, no atribuir originalidad a Boole/Fréchet ni a las desigualdades de esperanza.
 
 Referencia conceptual adicional: IETF RFC 6414 (Shared Risk Link Group); IETF BPv7 no estandariza política de ruta. El siguiente contrato científico debe registrar riesgos comunes de suministro eléctrico, emplazamiento, operador y dispositivo sin asumirlos independientes.
+
+
+## H12 · Frecuencias de desastres con incertidumbre de muestreo
+
+Implementado en `packages/senda/src/scenario-frequency-evidence.mjs`, sincronizado de forma idéntica con la versión web offline, y probado en `packages/senda/tests/scenario-frequency-evidence.test.mjs`.
+
+- La unidad estadística es un **episodio identificable**, no cada paquete, teléfono ni reporte. El módulo rechaza claves repetidas y exige identificador de fuente y SHA-256 bien formados. **No verifica la autenticidad del contenido ni la independencia real entre episodios**.
+- Se exige un inventario cerrado de etiquetas declaradas `scenarioIds`, incluyendo `UNKNOWN`: las incidencias sin clasificación registrada no desaparecen del denominador. La categoría UNKNOWN **no garantiza** que incidentes nunca observados estén representados.
+- Con `n` episodios *IID* y `m` categorías, por Hoeffding y cota de la unión se obtiene simultáneamente con confianza al menos `1-alpha`:
+  `|q_s - n_s/n| <= sqrt(log(2m/alpha)/(2n))` para cada categoría `s`.
+- Para `n=100`, `m=3`, `alpha=0.05`, la semiamplitud es aproximadamente **0,1547**. Si `UNKNOWN` no apareció en esa muestra, su cota superior sigue siendo aproximadamente **15,47 %**, no cero. Es una cota conservadora, no un pronóstico.
+- `attachConservativeResearchHazards` convierte `UNKNOWN` en un estado donde ningún portador tiene éxito garantizado: los factores de cada familia registrada son cero. El resultado puede alimentar `auditAssuranceAgainstUncertainHazards` **en modo laboratorio**, sin transmitir ni abrir permisos.
+
+**Hipótesis falsable H12:** episodios efectivamente independientes y representativos permiten intervalos calibrados que cubran frecuencias de etiquetas en regiones/temporadas retenidas, con una incertidumbre útil para decidir. Debe refutarse si hay infraobservación, selección de incidentes, tormentas correlacionadas, cambios de red o deriva estacional. Para crisis que comparten una misma tormenta, hacer bloques por **evento meteorológico causal**, no por municipio afectado, antes de afirmar cobertura.
+
+**Limitación metodológica:** este módulo devuelve siempre `representativeOfFutureDisastersVerified:false`, `independenceOfIncidentsVerified:false`, `mayAuthorizeOperationalRouting:false`. La confianza matemática es condicional a las hipótesis, no procede de un ensayo físico.
+
+## H13 · Topología SRLG: reconocer puntos de fallo físicos compartidos
+
+Implementado en `packages/senda/src/shared-risk-topology.mjs` y prueba `shared-risk-topology.test.mjs`, con copia exacta en la web offline.
+
+- Los **enlaces** informan identificadores de dominio de riesgo (energía, torre, gateway, backhaul, emplazamiento, operador, versión de firmware, puente). Las **rutas** declaran qué enlaces usan, presupuesto de coste/energía y consentimiento/autorización **solo declarados**.
+- Se audita si dos rutas comparten un enlace literal o un `SRLG:<dominio>`; **no basta que el canal sea distinto**. Por ejemplo SMS y datos móviles podrían compartir antena y suministro eléctrico. Si una ruta carece de inventario, el riesgo `UNKNOWN_TOPOLOGY` es comodín y se considera compartido con **todas las rutas**.
+- Solo se selecciona una pareja con **disyunción SRLG declarada**, presupuestos satisfechos y permisos declarados. Aun así, el resultado `DECLARED_DISJOINT_RESEARCH_PAIR` mantiene `physicalIndependenceValidated:false`, `successEventsIndependentValidated:false`, `mayMultiplyReliabilities:false`, `mayTransmit:false`.
+- La disyunción declarada **no autoriza** calcular éxito combinado por independencia. La cota inferior de H11-D sigue siendo aplicable hasta que haya evidencia empírica de dependencia condicional y se descarten dominios ocultos.
+
+**Hipótesis falsable H13:** identificar dominadores físicos compartidos reduce planes redundantes y falsos supuestos de diversidad de rutas frente a selección basada únicamente en portador. Se debe comparar en escenarios medidos de fallo de suministro/gateway y publicar cuántos dominios reales quedaron sin identificar.
+
+Fuentes oficiales: [IETF RFC 6414 §3.1.10](https://www.rfc-editor.org/rfc/rfc6414.html) para SRLG; [IETF RFC 8001](https://www.rfc-editor.org/rfc/rfc8001.html) sobre recopilación de información de SRLG; [RFC 9171](https://www.rfc-editor.org/rfc/rfc9171.html) para el límite de garantías DTN.
+
+## Bloqueo de certificación / continuidad para Claude
+
+**No traspasar a emergencias reales ni fusionar con `master` hasta cerrar**: (a) PR #32 de Claude, (b) PR #39 de autorización CAP y reportes, (c) PR #42 de H11–H13; (d) ensayo con al menos 2 Android y 2 radios autorizadas, sin enlaces de terceros no consentidos; (e) mapa de procedencia y licencias; (f) pruebas de reloj, pérdida, apagón, duplicación y latencia p95; (g) evaluación independiente de seguridad, privacidad y compatibilidad de la institución.
+
+**Potencial diferenciador defendible:** auditoría conjunta de incertidumbre de frecuencia de desastres, dependencia entre retransmisiones y puntos de fallo comunes. **No reclamar teoría inédita**: la innovación vendible sería integración, evidencia de campo, trazabilidad y ventaja medida frente a baselines de enrutamiento, no atribuirse Hoeffding, Fréchet o SRLG como descubrimientos propios.
