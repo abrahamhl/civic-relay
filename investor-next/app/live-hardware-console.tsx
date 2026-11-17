@@ -100,7 +100,8 @@ const consoleCopy = {
     hwTitle: '2. Telemetría Real del Hardware de Tu Dispositivo + Escáner Acústico/Ultrasónico FFT en Vivo',
     micBtnStart: 'ACTIVAR ESCÁNER ESPECTRAL ACÚSTICO / ULTRASÓNICO FFT EN VIVO (WEBAUDIO REAL)',
     micBtnStop: 'DETENER ESCÁNER ACÚSTICO FFT',
-    orbTitle: '3. Efemérides Orbitales Satelitales en Tiempo Real (Sincronizadas con Reloj UTC Actual)',
+    orbTitle: '3. Geometría orbital ilustrativa (simulación, no efemérides reales)',
+    orbDisclosure: 'MODELO SINTÉTICO · La hora UTC es real, pero los datos son ilustrativos. No se emplean efemérides TLE/OMM ni se comprueba visibilidad, cobertura, acceso autorizado o envío por satélite.',
     dealTitle: 'Oportunidades de financiación: estado y requisitos oficiales',
     dealLead: 'Se han contrastado las fechas de NLnet Restack y Horizon SSRI-04. Las otras seis opciones son líneas exploratorias, no financiación verificada. NLnet prohíbe la redacción de solicitudes mediante IA generativa; revisa su política antes de presentar.',
     copyPromptBtn: 'COPIAR CHECKLIST DE VERIFICACIÓN (NO SOLICITUD)',
@@ -118,7 +119,8 @@ const consoleCopy = {
     hwTitle: '2. Real Device Hardware Telemetry + Live WebAudio FFT Acoustic/Ultrasonic Scanner',
     micBtnStart: 'START LIVE FFT ACOUSTIC / ULTRASONIC SPECTRUM SCANNER (REAL WEBAUDIO)',
     micBtnStop: 'STOP FFT ACOUSTIC SCANNER',
-    orbTitle: '3. Real-Time Satellite Orbital Ephemerides (Synchronized to Live UTC Clock)',
+    orbTitle: '3. Illustrative Orbital Geometry (Synthetic Model, Not Live Ephemerides)',
+    orbDisclosure: 'SYNTHETIC MODEL · The UTC clock is real, but these values are illustrative. No TLE/OMM ephemerides or verified visibility, coverage, authorized service, or satellite transmission.',
     dealTitle: 'Funding pathways: official calls and unverified leads',
     dealLead: 'The NLnet Restack and Horizon SSRI-04 deadlines have been cross-checked. Six other pathways are exploratory, not verified available funding. NLnet prohibits generative AI writing grant applications; review its current policy before applying.',
     copyPromptBtn: 'COPY DUE-DILIGENCE CHECKLIST (NOT AN APPLICATION)',
@@ -136,7 +138,8 @@ const consoleCopy = {
     hwTitle: '2. Echte Apparaathardware-Telemetrie + Live WebAudio FFT Akoestische Scanner',
     micBtnStart: 'START LIVE FFT AKOESTISCHE / ULTRASONE SPECTRUMSCANNER (ECHTE WEBAUDIO)',
     micBtnStop: 'STOP FFT AKOESTISCHE SCANNER',
-    orbTitle: '3. Realtime Satelliet-Ephemeriden (Gesynchroniseerd met Live UTC-Klok)',
+    orbTitle: '3. Illustratieve baangeometrie (synthetisch model, geen echte efemeriden)',
+    orbDisclosure: 'SYNTHETISCH MODEL · De UTC-klok is echt, maar de waarden zijn illustratief. Geen TLE/OMM-efemeriden en geen verificatie van zichtbaarheid, dekking, toegang of satellietverbinding.',
     dealTitle: 'Financieringsmogelijkheden: officiële oproepen en onbevestigde opties',
     dealLead: 'De deadlines voor NLnet Restack en Horizon SSRI-04 zijn gecontroleerd. Zes andere opties zijn verkennend en niet als open subsidie bevestigd. NLnet verbiedt generatieve AI bij het schrijven van aanvragen; lees hun actuele beleid.',
     copyPromptBtn: 'KOPIEER DUE-DILIGENCE-CHECKLIST (GEEN AANVRAAG)',
@@ -620,11 +623,12 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
           </div>
         </div>
 
-        {/* PANEL 3: REAL-TIME SATELLITE ORBITAL EPHEMERIDES */}
+        {/* PANEL 3: SYNTHETIC ORBITAL SHELL GEOMETRY, NOT SATELLITE AVAILABILITY */}
         <div className="oep-ts-block">
           <div className="oep-ts-block-head">
             <div>
               <h4>{c.orbTitle}</h4>
+              <p role="note" data-testid="orbital-synthetic-disclosure" style={{ color: '#fcd34d', fontSize: '0.85rem', marginTop: '0.45rem', maxWidth: '58ch' }}>{c.orbDisclosure}</p>
             </div>
             <span style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#7dd3fc' }}>
               UTC CLOCK: {new Date(utcNow).toISOString()}
@@ -635,15 +639,15 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
               <div className="oep-ts-fn-card" key={orb.id}>
                 <div className="oep-ts-fn-top">
                   <span>{orb.id}</span>
-                  <span className="oep-ts-fn-status">EL {orb.elevationDeg}° · AZ {orb.azimuthDeg}°</span>
+                  <span className="oep-ts-fn-status">MODEL EL {orb.elevationDeg}° · AZ {orb.azimuthDeg}°</span>
                 </div>
                 <strong style={{ fontSize: '0.92rem' }}>{orb.name}</strong>
                 <div style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#cbd5e1' }}>
                   <div>
-                    Slant Range: <strong>{orb.slantRangeKm} km</strong> · FSPL: <strong>{orb.fsplDb} dB</strong>
+                    Modeled Slant Range: <strong>{orb.slantRangeKm} km</strong> · Modeled FSPL: <strong>{orb.fsplDb} dB</strong>
                   </div>
                   <div>
-                    Live Doppler: <strong>{orb.dopplerShiftHz >= 0 ? `+${orb.dopplerShiftHz}` : orb.dopplerShiftHz} Hz</strong> ·
+                    Modeled Doppler: <strong>{orb.dopplerShiftHz >= 0 ? `+${orb.dopplerShiftHz}` : orb.dopplerShiftHz} Hz</strong> ·
                     Sub-Point: {orb.subLatDeg}°, {orb.subLonDeg}°
                   </div>
                 </div>

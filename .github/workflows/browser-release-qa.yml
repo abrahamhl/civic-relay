@@ -30,6 +30,9 @@ jobs:
         run: |
           npm run build
           npm run check:locales
+      - name: Prevent false orbital-availability claims in investor UI
+        working-directory: investor-next
+        run: node --test tests/orbital-synthetic-truth.test.mjs
       - name: Install pinned Playwright in CI only
         working-directory: investor-next
         run: |
