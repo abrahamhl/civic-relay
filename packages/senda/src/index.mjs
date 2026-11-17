@@ -75,6 +75,7 @@ export * from './courier.mjs';
 export * from './hazard-reports.mjs';
 export * from './evidence-contract.mjs';
 export * from './routing-canonical.mjs';
+export * from './transport-telemetry.mjs';
 // Nombres repetidos entre módulos: con `export *` JavaScript los oculta en silencio. Se exponen con nombre propio
 // (sin elegir cuál «gana»); tests/index-exports.test.mjs falla si aparece un choque nuevo sin resolver.
 export { TEXT_PREFIX as BEARER_TEXT_PREFIX } from './bearers.mjs';
