@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="100%" height="100%" style="background:#070b14;font-family:system-ui,-apple-system,sans-serif;">
+  <defs>
+    <linearGradient id="grid-grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e1726" />
+      <stop offset="100%" stop-color="#050811" />
+    </linearGradient>
+    <filter id="glow4" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1000" height="600" fill="url(#grid-grad4)" />
+
+  <!-- Title Badge -->
+  <g transform="translate(40, 35)">
+    <rect width="520" height="42" rx="8" fill="#0f172a" stroke="#1e293b" />
+    <circle cx="24" cy="21" r="6" fill="#10b981" filter="url(#glow4)" />
+    <text x="42" y="26" fill="#f8fafc" font-size="14" font-weight="700" letter-spacing="1">BALIZAS V16 DGT 3.0 · LATENCIA DIRECTA VS CENTRALIZADA</text>
+  </g>
+  <text x="40" y="98" fill="#94a3b8" font-size="12">Análisis de Seguridad Vial a 120 km/h (33.3 m/s) en Autovía · Choque por Alcance en Cola de Retención</text>
+
+  <!-- Comparison Bars Area -->
+
+  <!-- Top Scenario: Standard DGT 3.0 Cloud Ingestion (180 s) -->
+  <g transform="translate(60, 130)">
+    <rect width="880" height="180" rx="8" fill="#0f172a" stroke="#ef4444" stroke-width="1.5" />
+    <rect x="0" y="0" width="880" height="32" rx="8" fill="#450a0a" />
+    <text x="20" y="21" fill="#fca5a5" font-size="12" font-weight="800">❌ ARQUITECTURA IOT CLOUD CLÁSICA (4G / NB-IoT CONCENTRADO)</text>
+
+    <!-- Timeline Track -->
+    <line x1="40" y1="90" x2="840" y2="90" stroke="#7f1d1d" stroke-width="6" stroke-linecap="round" />
+    <line x1="40" y1="90" x2="840" y2="90" stroke="#ef4444" stroke-width="4" stroke-dasharray="12,8" />
+
+    <!-- Step 1: Accident (0s) -->
+    <g transform="translate(40, 90)">
+      <circle cx="0" cy="0" r="14" fill="#991b1b" stroke="#fca5a5" stroke-width="2" />
+      <text x="0" y="4" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">0s</text>
+      <text x="0" y="30" fill="#fca5a5" font-size="10" font-weight="700" text-anchor="middle">Incidente V16</text>
+      <text x="0" y="44" fill="#94a3b8" font-size="8.5" text-anchor="middle">Activación baliza</text>
+    </g>
+
+    <!-- Step 2: Cellular connect (15s) -->
+    <g transform="translate(180, 90)">
+      <circle cx="0" cy="0" r="10" fill="#1e293b" stroke="#ef4444" stroke-width="1.5" />
+      <text x="0" y="3" fill="#cbd5e1" font-size="8" text-anchor="middle">15s</text>
+      <text x="0" y="26" fill="#cbd5e1" font-size="9" text-anchor="middle">Registro NB-IoT</text>
+    </g>
+
+    <!-- Step 3: Cloud Ingest & DGT Broker (60s) -->
+    <g transform="translate(360, 90)">
+      <circle cx="0" cy="0" r="10" fill="#1e293b" stroke="#ef4444" stroke-width="1.5" />
+      <text x="0" y="3" fill="#cbd5e1" font-size="8" text-anchor="middle">60s</text>
+      <text x="0" y="26" fill="#cbd5e1" font-size="9" text-anchor="middle">Ingesta en Nube</text>
+    </g>
+
+    <!-- Step 4: Dispatch & Provider API (120s) -->
+    <g transform="translate(560, 90)">
+      <circle cx="0" cy="0" r="10" fill="#1e293b" stroke="#ef4444" stroke-width="1.5" />
+      <text x="0" y="3" fill="#cbd5e1" font-size="8" text-anchor="middle">120s</text>
+      <text x="0" y="26" fill="#cbd5e1" font-size="9" text-anchor="middle">Broker DGT 3.0</text>
+    </g>
+
+    <!-- Step 5: End User App Receives (180s) -->
+    <g transform="translate(820, 90)">
+      <circle cx="0" cy="0" r="16" fill="#7f1d1d" stroke="#ef4444" stroke-width="2.5" />
+      <text x="0" y="4" fill="#fff" font-size="9" font-weight="800" text-anchor="middle">180s</text>
+      <text x="0" y="30" fill="#f87171" font-size="10" font-weight="700" text-anchor="middle">Aviso en Pantalla</text>
+    </g>
+
+    <!-- Danger Metric Callout -->
+    <rect x="520" y="125" width="340" height="42" rx="4" fill="#2d0607" stroke="#ef4444" />
+    <text x="535" y="142" fill="#f87171" font-size="11" font-weight="800">DISTANCIA RECORRIDA A CIEGAS:</text>
+    <text x="535" y="157" fill="#fca5a5" font-size="12" font-weight="700">6.000 metros (6,0 km a 120 km/h) 💥</text>
+  </g>
+
+  <!-- Bottom Scenario: SENDA v16ZeroLatencyReflex (38 ms) -->
+  <g transform="translate(60, 335)">
+    <rect width="880" height="180" rx="8" fill="#0f172a" stroke="#10b981" stroke-width="2" filter="url(#glow4)" />
+    <rect x="0" y="0" width="880" height="32" rx="8" fill="#064e3b" />
+    <text x="20" y="21" fill="#ecfdf5" font-size="12" font-weight="800">✅ REFLEJO VEHICULAR DIRECTO SENDA (BLUETOOTH 5.0 CODED PHY + LORA)</text>
+
+    <!-- Timeline Track -->
+    <line x1="40" y1="90" x2="840" y2="90" stroke="#065f46" stroke-width="6" stroke-linecap="round" />
+    <line x1="40" y1="90" x2="220" y2="90" stroke="#10b981" stroke-width="6" />
+
+    <!-- Step 1: Accident (0 ms) -->
+    <g transform="translate(40, 90)">
+      <circle cx="0" cy="0" r="14" fill="#065f46" stroke="#34d399" stroke-width="2" />
+      <text x="0" y="4" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">0 ms</text>
+      <text x="0" y="30" fill="#34d399" font-size="10" font-weight="700" text-anchor="middle">Incidente V16</text>
+      <text x="0" y="44" fill="#cbd5e1" font-size="8.5" text-anchor="middle">Radiobaliza activa</text>
+    </g>
+
+    <!-- Step 2: Direct BLE Packet Broadcast (18 ms) -->
+    <g transform="translate(130, 90)">
+      <circle cx="0" cy="0" r="11" fill="#0f172a" stroke="#34d399" stroke-width="1.5" />
+      <text x="0" y="3" fill="#a7f3d0" font-size="8" text-anchor="middle">18 ms</text>
+      <text x="0" y="26" fill="#a7f3d0" font-size="9" text-anchor="middle">Trama PDU BLE LR</text>
+    </g>
+
+    <!-- Step 3: Vehicle Displays Warning (38 ms) -->
+    <g transform="translate(220, 90)">
+      <circle cx="0" cy="0" r="16" fill="#047857" stroke="#34d399" stroke-width="2.5" />
+      <text x="0" y="4" fill="#fff" font-size="9" font-weight="800" text-anchor="middle">38 ms</text>
+      <text x="0" y="30" fill="#34d399" font-size="10" font-weight="700" text-anchor="middle">Aviso en Pantalla</text>
+      <text x="0" y="44" fill="#a7f3d0" font-size="8.5" text-anchor="middle">Frenada anticipada</text>
+    </g>
+
+    <!-- Safe Metric Callout -->
+    <rect x="360" y="60" width="500" height="65" rx="6" fill="#064e3b" stroke="#34d399" />
+    <text x="380" y="85" fill="#a7f3d0" font-size="11" font-weight="800">DESPLAZAMIENTO DURANTE EL AVISO:</text>
+    <text x="380" y="108" fill="#ffffff" font-size="17" font-weight="800">1,27 metros (vs 6.000 m en nube) · 3,8 km de anticipación</text>
+  </g>
+
+  <!-- Bottom Comparison Summary -->
+  <g transform="translate(60, 540)">
+    <text x="0" y="16" fill="#38bdf8" font-size="12" font-weight="700">COMPATIBILIDAD PLENA:</text>
+    <text x="175" y="16" fill="#cbd5e1" font-size="12">Funciona en paralelo a DGT 3.0 sin interferir. Cumple Norma 3.1-IC de trazado y distancias de parada de seguridad.</text>
+  </g>
+</svg>

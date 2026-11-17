@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:06.083
+¿Sabías que puedes construir un radar de interceptación de drones por menos de veinticinco euros?
+
+2
+00:00:06.433 --> 00:00:15.243
+Con un chip ESP32, un receptor de radio y unos centímetros de hilo de cobre, SENDA sintoniza las señales aéreas en tiempo real.
+
+3
+00:00:16.843 --> 00:00:25.206
+El estándar internacional ASTM F3411 transmite la telemetría del dron y también la posición de la estación del piloto.
+
+4
+00:00:25.556 --> 00:00:32.980
+SENDA decodifica el paquete, traza un vector directo en el mapa tridimensional y muestra dónde está escondido quien maneja la nave.
+
+5
+00:00:34.580 --> 00:00:41.193
+Seguridad civil real, sin secretos comerciales y al alcance de cualquier cuerpo de bomberos, policía o comunidad.
+
+6
+00:00:41.543 --> 00:00:48.882
+Explora los esquemas de antena y la demo interactiva en civic-relay-investor punto vercel punto app barra senda.

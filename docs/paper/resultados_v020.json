@@ -1,0 +1,9804 @@
+{
+ "version": "v0.20",
+ "generado": "2026-11-06",
+ "fuentes": {
+  "nistTn2135": {
+   "t": "NIST TN 2135 · A Case Study of the Camp Fire – Fire Progression Timeline (2021)",
+   "url": "https://nvlpubs.nist.gov/nistpubs/TechnicalNotes/NIST.TN.2135.pdf"
+  },
+  "nistTn2252": {
+   "t": "NIST TN 2252 (suplemento) · Camp Fire: evacuación, atascos y atrapamientos",
+   "url": "https://nvlpubs.nist.gov/nistpubs/TechnicalNotes/NIST.TN.2252sup.pdf"
+  },
+  "nistEscape": {
+   "t": "NIST ESCAPE · consideraciones de evacuación y refugio en incendios de interfaz",
+   "url": "https://escape.nist.gov/evacuation3AddressingFailuresEgresslearnmore1"
+  },
+  "nistCamp4m5": {
+   "t": "NIST · CAMP 4, módulo 5 (evacuación): cierre de Skyway y atrapamientos",
+   "url": "https://www.nist.gov/document/camp-4-module-5-presentation-slides"
+  },
+  "nistCamp4": {
+   "t": "NIST · CAMP 4, presentaciones de los módulos (2024)",
+   "url": "https://www.nist.gov/document/camp-4-module-1-presentation-slides"
+  },
+  "skywayLanes": {
+   "t": "The Week · la vía principal de Paradise se redujo de 4 a 2 carriles (2014)",
+   "url": "https://theweek.com/speedreads/808817/despite-warnings-main-evacuation-route-paradise-narrowed-by-2-lanes"
+  },
+  "cruzAlexander2019": {
+   "t": "Cruz y Alexander (2019) · La regla del 10 %, Annals of Forest Science 76:44",
+   "url": "https://doi.org/10.1007/s13595-019-0829-8"
+  },
+  "cruz2012": {
+   "t": "Cruz et al. (2012) · Anatomía del incendio de Kilmore East (Black Saturday), Forest Ecology and Management 284",
+   "url": "https://doi.org/10.1016/j.foreco.2012.02.035"
+  },
+  "eatonWiki": {
+   "t": "Eaton Fire · cronología con fuentes primarias",
+   "url": "https://en.wikipedia.org/wiki/Eaton_Fire"
+  },
+  "eatonLaTimes": {
+   "t": "Fire Engineering / LA Times · el fuego avanzaba hacia Altadena oeste horas antes de la orden",
+   "url": "https://www.fireengineering.com/firefighting/wildland-firefighting/report-eaton-fire-marched-toward-west-altadena-hours-before-official-accounts"
+  },
+  "marshallWiki": {
+   "t": "Marshall Fire · resumen con fuentes del condado de Boulder",
+   "url": "https://en.wikipedia.org/wiki/Marshall_Fire"
+  },
+  "marshallHomes": {
+   "t": "Colorado Newsline · 1.084 viviendas destruidas",
+   "url": "https://coloradonewsline.com/briefs/1084-homes-louisville-superior-destroyed-marshall-fire-updated-tally/"
+  },
+  "smokehouseWiki": {
+   "t": "Smokehouse Creek Fire · cifras del Texas A&M Forest Service",
+   "url": "https://en.wikipedia.org/wiki/Smokehouse_Creek_Fire"
+  },
+  "smokehouseDallas": {
+   "t": "Dallas News · 100 % contenido tras más de un millón de acres",
+   "url": "https://dallasnews.com/news/texas/2024/03/17/largest-wildfire-in-texas-history-100-contained-after-burning-more-than-1-million-acres"
+  },
+  "palisadesCalfire": {
+   "t": "CAL FIRE · Palisades Fire",
+   "url": "https://www.fire.ca.gov/incidents/2025/1/7/palisades-fire"
+  },
+  "eatonCalfire": {
+   "t": "CAL FIRE · Eaton Fire",
+   "url": "https://www.fire.ca.gov/incidents/2025/1/7/eaton-fire"
+  },
+  "campCalfire": {
+   "t": "CAL FIRE · Camp Fire",
+   "url": "https://www.fire.ca.gov/incidents/2018/11/8/camp-fire"
+  },
+  "kincadeFt2025": {
+   "t": "Fire Technology (2025) · revisión: en Kincade 2019 los evacuados iban ≈ 3,5 km/h más lentos y la capacidad cayó ≈ 5 %",
+   "url": "https://link.springer.com/article/10.1007/s10694-025-01813-y"
+  },
+  "intini2022": {
+   "t": "Intini et al. (2022) · humo y visibilidad en la evacuación por carretera (WUI-NITY), IJDRR",
+   "url": "https://iris.unisalento.it/handle/11587/488606"
+  },
+  "lahainaArxiv": {
+   "t": "arXiv 2603.29055 (2026) · ley de conservación escalar de la evacuación de Lahaina",
+   "url": "https://arxiv.org/html/2603.29055v1"
+  },
+  "goes": {
+   "t": "NOAA GOES-R ABI L2 Fire Detection (FDC), AWS Open Data",
+   "url": "https://registry.opendata.aws/noaa-goes/"
+  },
+  "hrrr": {
+   "t": "NOAA HRRR 3 km, AWS Open Data",
+   "url": "https://registry.opendata.aws/noaa-hrrr-pds/"
+  },
+  "miteco": {
+   "t": "MITECO · estadística de grandes incendios forestales",
+   "url": "https://www.miteco.gob.es/es/biodiversidad/temas/incendios-forestales/estadisticas-incendios.html"
+  }
+ },
+ "base": [
+  {
+   "id": "camp-2018",
+   "nombre": "Camp Fire",
+   "pais": "EE. UU. · California",
+   "fecha": "2018-11-08",
+   "combustible": "pinar y matorral; núcleo urbano (Paradise)",
+   "satelite": "goes16",
+   "hechos": [
+    {
+     "k": "superficie",
+     "v": "153.336 acres (62.053 ha)",
+     "src": "campCalfire",
+     "verificado": true
+    },
+    {
+     "k": "muertes",
+     "v": "85",
+     "src": "campCalfire",
+     "verificado": true
+    },
+    {
+     "k": "estructuras destruidas",
+     "v": "18.804",
+     "src": "campCalfire",
+     "verificado": true
+    },
+    {
+     "k": "propagación",
+     "v": "≈ 7 millas en 90 min (≈ 7,5 km/h); pavesas ≈ 40 min por delante del frente",
+     "src": "nistCamp4",
+     "verificado": false,
+     "nota": "cifra de una presentación de NIST; pendiente de verificar en la TN 2135"
+    },
+    {
+     "k": "carreteras",
+     "v": "a las 08:30 el fuego alcanzó el tráfico en Pentz Rd y en la parte alta de Skyway; desde las 10:00 Skyway cerrado al sur para civiles",
+     "src": "nistCamp4m5",
+     "verificado": true
+    },
+    {
+     "k": "atasco",
+     "v": "el atasco de Chico y el valle remontó Skyway hasta Paradise; varios atrapamientos de evacuados",
+     "src": "nistEscape",
+     "verificado": true
+    },
+    {
+     "k": "vía",
+     "v": "Skyway reducida de 4 a 2 carriles en 2014",
+     "src": "skywayLanes",
+     "verificado": true
+    },
+    {
+     "k": "población evacuada",
+     "v": "≈ 40.000 personas en las comunidades afectadas",
+     "src": "nistTn2252",
+     "verificado": true
+    }
+   ],
+   "leccion": "La capacidad la decide el cuello de botella aguas abajo (Chico), no la salida del pueblo: SENDA debe vigilar el final de la ruta y avisar antes de que el atasco remonte hacia el fuego."
+  },
+  {
+   "id": "palisades-2025",
+   "nombre": "Palisades Fire",
+   "pais": "EE. UU. · California",
+   "fecha": "2025-01-07",
+   "combustible": "chaparral costero e interfaz urbana",
+   "satelite": "goes18",
+   "hechos": [
+    {
+     "k": "superficie",
+     "v": "23.448 acres",
+     "src": "palisadesCalfire",
+     "verificado": true
+    },
+    {
+     "k": "estructuras destruidas",
+     "v": "6.837",
+     "src": "palisadesCalfire",
+     "verificado": true
+    },
+    {
+     "k": "muertes",
+     "v": "12",
+     "src": "palisadesCalfire",
+     "verificado": false,
+     "nota": "cifra que varía entre fuentes"
+    },
+    {
+     "k": "carreteras",
+     "v": "≈ 30 coches abandonados en Palisades Dr y Sunset Blvd apartados con excavadora para abrir paso",
+     "src": "palisadesCalfire",
+     "verificado": false,
+     "nota": "documentado en prensa; pendiente de verificar en un informe oficial"
+    },
+    {
+     "k": "viento",
+     "v": "rachas de 60–100 mph (Santa Ana)",
+     "src": "palisadesCalfire",
+     "verificado": false
+    }
+   ],
+   "leccion": "Una sola vía de salida colapsa cuando los conductores abandonan el coche: medir velocidad de sondas y conteos de cámara detecta el bloqueo minutos antes y permite abrir alternativas o carriles contrarios."
+  },
+  {
+   "id": "eaton-2025",
+   "nombre": "Eaton Fire",
+   "pais": "EE. UU. · California",
+   "fecha": "2025-01-07",
+   "combustible": "chaparral y barrios de Altadena",
+   "satelite": "goes18",
+   "hechos": [
+    {
+     "k": "superficie",
+     "v": "14.021 acres",
+     "src": "eatonCalfire",
+     "verificado": true
+    },
+    {
+     "k": "estructuras destruidas",
+     "v": "9.418",
+     "src": "eatonCalfire",
+     "verificado": true
+    },
+    {
+     "k": "muertes",
+     "v": "17–19",
+     "src": "eatonWiki",
+     "verificado": false,
+     "nota": "la cifra cambió con el tiempo"
+    },
+    {
+     "k": "ignición",
+     "v": "≈ 18:18 hora local (02:18 UTC del 8)",
+     "src": "eatonWiki",
+     "verificado": true
+    },
+    {
+     "k": "avance inicial",
+     "v": "≈ 10 acres a las 18:26; pavesas a ≈ 1 milla a las 18:33; > 1.000 acres a las 00:07",
+     "src": "eatonWiki",
+     "verificado": true
+    },
+    {
+     "k": "aviso",
+     "v": "Altadena oeste recibió la orden después de las 03:00, aunque el fuego avanzaba hacia allí desde ≈ 21:30",
+     "src": "eatonLaTimes",
+     "verificado": true
+    }
+   ],
+   "leccion": "El fallo fue de umbral de aviso, no de datos: con el frente medido por satélite y el viento del modelo, un umbral dinámico habría avisado horas antes."
+  },
+  {
+   "id": "marshall-2021",
+   "nombre": "Marshall Fire",
+   "pais": "EE. UU. · Colorado",
+   "fecha": "2021-12-30",
+   "combustible": "pasto seco y urbanizaciones",
+   "satelite": "goes16",
+   "hechos": [
+    {
+     "k": "superficie",
+     "v": "≈ 6.026 acres (2.439 ha)",
+     "src": "marshallWiki",
+     "verificado": true
+    },
+    {
+     "k": "viviendas destruidas",
+     "v": "1.084",
+     "src": "marshallHomes",
+     "verificado": true
+    },
+    {
+     "k": "muertes",
+     "v": "2",
+     "src": "marshallWiki",
+     "verificado": true
+    },
+    {
+     "k": "viento",
+     "v": "rachas de 100–115 mph",
+     "src": "marshallWiki",
+     "verificado": true
+    },
+    {
+     "k": "ignición",
+     "v": "≈ 11:00 hora local",
+     "src": "marshallWiki",
+     "verificado": true
+    }
+   ],
+   "leccion": "En pasto con viento extremo el frente supera la regla del 10 %: los priores de SENDA distinguen tipo de combustible."
+  },
+  {
+   "id": "smokehouse-2024",
+   "nombre": "Smokehouse Creek Fire",
+   "pais": "EE. UU. · Texas",
+   "fecha": "2024-02-26",
+   "combustible": "pastizal",
+   "satelite": "goes16",
+   "hechos": [
+    {
+     "k": "superficie",
+     "v": "1.058.482 acres (≈ 428.000 ha), el mayor de Texas",
+     "src": "smokehouseWiki",
+     "verificado": true
+    },
+    {
+     "k": "ignición",
+     "v": "14:20 hora local según InciWeb; señal térmica en GOES-18 ya a las 12:56",
+     "src": "smokehouseWiki",
+     "verificado": true
+    },
+    {
+     "k": "causa",
+     "v": "líneas eléctricas, según los investigadores del estado",
+     "src": "smokehouseWiki",
+     "verificado": true
+    },
+    {
+     "k": "contención",
+     "v": "100 % a mediados de marzo de 2024",
+     "src": "smokehouseDallas",
+     "verificado": true
+    }
+   ],
+   "leccion": "El satélite vio el foco antes que el aviso oficial: SENDA escucha GOES/MTG y lo cruza con el móvil y la cámara para confirmar en minutos."
+  },
+  {
+   "id": "troublesome-2020",
+   "nombre": "East Troublesome Fire",
+   "pais": "EE. UU. · Colorado",
+   "fecha": "2020-10-21",
+   "combustible": "conífera con mortalidad por escarabajo",
+   "satelite": "goes16",
+   "hechos": [
+    {
+     "k": "superficie",
+     "v": "≈ 193.800 acres",
+     "src": null,
+     "verificado": false,
+     "nota": "cifra conocida; pendiente de verificar con InciWeb"
+    },
+    {
+     "k": "carrera",
+     "v": "gran carrera hacia el este la tarde y noche del 21 al 22-10-2020",
+     "src": null,
+     "verificado": false
+    }
+   ],
+   "leccion": "Una carrera nocturna de conífera seca: SENDA mantiene la vigilancia de noche con satélite, cuando las cámaras ven poco."
+  },
+  {
+   "id": "creek-2020",
+   "nombre": "Creek Fire",
+   "pais": "EE. UU. · California",
+   "fecha": "2020-09-04",
+   "combustible": "conífera de Sierra Nevada",
+   "satelite": "goes16",
+   "hechos": [
+    {
+     "k": "superficie",
+     "v": "≈ 379.900 acres",
+     "src": null,
+     "verificado": false,
+     "nota": "pendiente de verificar con CAL FIRE"
+    },
+    {
+     "k": "evacuación",
+     "v": "campistas aislados en Mammoth Pool rescatados por helicóptero",
+     "src": null,
+     "verificado": false
+    }
+   ],
+   "leccion": "Cuando la única carretera queda cortada, la salida es aérea: SENDA marca los grupos aislados y su posición para los medios aéreos."
+  },
+  {
+   "id": "pedrogao-2017",
+   "nombre": "Pedrógão Grande",
+   "pais": "Portugal",
+   "fecha": "2017-06-17",
+   "combustible": "eucalipto y pino",
+   "satelite": null,
+   "hechos": [
+    {
+     "k": "muertes",
+     "v": "66, de ellas 47 en la carretera EN-236-1 o cerca",
+     "src": null,
+     "verificado": false,
+     "nota": "cifras del informe de la Comisión Técnica Independiente; pendiente de verificar el enlace primario"
+    },
+    {
+     "k": "carreteras",
+     "v": "la EN-236-1 no se cerró a tiempo y muchos conductores quedaron atrapados por el fuego",
+     "src": null,
+     "verificado": false
+    }
+   ],
+   "leccion": "Cerrar a tiempo es tan importante como evacuar: SENDA cruza la llegada del fuego con la ocupación de cada tramo y propone el cierre antes de que entren coches."
+  },
+  {
+   "id": "mati-2018",
+   "nombre": "Mati (Ática)",
+   "pais": "Grecia",
+   "fecha": "2018-07-23",
+   "combustible": "pinar mediterráneo y urbanización",
+   "satelite": null,
+   "hechos": [
+    {
+     "k": "muertes",
+     "v": "≈ 100 (varía entre 102 y 104 según la fuente)",
+     "src": null,
+     "verificado": false
+    },
+    {
+     "k": "carreteras",
+     "v": "calles estrechas sin salida; coches atrapados camino de la costa",
+     "src": null,
+     "verificado": false
+    }
+   ],
+   "leccion": "Sin rutas alternativas, la orden debe llegar antes: el umbral depende del tiempo de despeje, no solo de la distancia al fuego."
+  },
+  {
+   "id": "kilmore-2009",
+   "nombre": "Kilmore East (Black Saturday)",
+   "pais": "Australia",
+   "fecha": "2009-02-07",
+   "combustible": "eucalipto",
+   "satelite": null,
+   "hechos": [
+    {
+     "k": "propagación",
+     "v": "velocidades sostenidas por encima de 5 km/h y pavesas a decenas de kilómetros",
+     "src": "cruz2012",
+     "verificado": false,
+     "nota": "pendiente de verificar las cifras exactas en el artículo"
+    }
+   ],
+   "leccion": "El salto de pavesas adelanta el peligro al frente: el umbral de aviso suma la distancia de pavesas (P90) a la del frente."
+  },
+  {
+   "id": "lahaina-2023",
+   "nombre": "Lahaina",
+   "pais": "EE. UU. · Hawái",
+   "fecha": "2023-08-08",
+   "combustible": "pasto invasor y núcleo urbano",
+   "satelite": null,
+   "hechos": [
+    {
+     "k": "muertes",
+     "v": "≈ 100",
+     "src": null,
+     "verificado": false
+    },
+    {
+     "k": "tráfico",
+     "v": "un modelo de conservación escalar halla una transición de fase en la capacidad del carril de salida: una vez colapsada, optimizar rutas aporta poco",
+     "src": "lahainaArxiv",
+     "verificado": true
+    }
+   ],
+   "leccion": "La capacidad de la salida manda: SENDA calcula el tiempo de despeje con un modelo de celdas y adelanta la orden mientras la vía aún fluye."
+  },
+  {
+   "id": "culebra-2022",
+   "nombre": "Sierra de la Culebra",
+   "pais": "España · Zamora",
+   "fecha": "2022-06-15",
+   "combustible": "matorral y pinar",
+   "satelite": null,
+   "hechos": [
+    {
+     "k": "superficie",
+     "v": "24.737,95 ha",
+     "src": "miteco",
+     "verificado": false,
+     "nota": "cifra de MITECO recogida en búsqueda; pendiente de verificar el informe"
+    },
+    {
+     "k": "muertes",
+     "v": "4 (incluidos los incendios de julio en la zona)",
+     "src": null,
+     "verificado": false
+    }
+   ],
+   "leccion": "Caso español para calibrar cuando haya perímetros oficiales por hora; hoy no entra en el entrenamiento."
+  },
+  {
+   "id": "smv-2026",
+   "nombre": "San Martín de Valdeiglesias / Almorox",
+   "pais": "España · Madrid",
+   "fecha": "2026-07-23",
+   "combustible": "pasto, matorral y pinar",
+   "satelite": "sentinel2",
+   "hechos": [
+    {
+     "k": "datos",
+     "v": "DEM Copernicus, cicatriz Sentinel-2 (dNBR, 24-07 a 08-08) y GFS, descargados de verdad",
+     "src": null,
+     "verificado": true
+    }
+   ],
+   "leccion": "Caso propio de SENDA: la cicatriz real valida el modelo; sirve de contraste fuera de muestra para lo aprendido en EE. UU."
+  },
+  {
+   "id": "kincade-2019",
+   "nombre": "Kincade (evacuación)",
+   "pais": "EE. UU. · California",
+   "fecha": "2019-10-23",
+   "combustible": "—",
+   "satelite": null,
+   "hechos": [
+    {
+     "k": "tráfico",
+     "v": "evacuados ≈ 3,5 km/h más lentos que el tráfico habitual; capacidad ≈ 5 % menor",
+     "src": "kincadeFt2025",
+     "verificado": false,
+     "nota": "cifra citada en una revisión; pendiente de verificar en el estudio original"
+    }
+   ],
+   "leccion": "Durante una evacuación la vía rinde algo menos de lo normal: el modelo de tráfico de SENDA lo incorpora como prior."
+  }
+ ],
+ "progresion": {
+  "camp": {
+   "ref": "camp-2018",
+   "sat": "GOES-16",
+   "combustible": "matorral/bosque",
+   "primeraDeteccion": "2018-11-08T14:57:18Z",
+   "origen": [
+    39.8125,
+    -121.4385
+   ],
+   "dirDeg": 224.9,
+   "dirFuente": "sotavento HRRR",
+   "pixelKm": [
+    3.87,
+    6.25
+   ],
+   "tramos": [
+    {
+     "tramo": 1,
+     "t0Min": 0,
+     "t1Min": 90,
+     "horas": 1.5,
+     "avanceKm": 13.06,
+     "rosKmh": 8.02,
+     "resolucionKmh": 3.28,
+     "u10Kmh": 36.3,
+     "gustKmh": 74.9,
+     "rh": 25.8,
+     "resuelto": true
+    },
+    {
+     "tramo": 2,
+     "t0Min": 100,
+     "t1Min": 200,
+     "horas": 1.67,
+     "avanceKm": 3.3,
+     "rosKmh": 2.23,
+     "resolucionKmh": 2.95,
+     "u10Kmh": 39.3,
+     "gustKmh": 84.1,
+     "rh": 21.6,
+     "resuelto": false
+    },
+    {
+     "tramo": 3,
+     "t0Min": 210,
+     "t1Min": 530,
+     "horas": 5.33,
+     "avanceKm": 5.32,
+     "rosKmh": 0.85,
+     "resolucionKmh": 0.92,
+     "u10Kmh": 31.1,
+     "gustKmh": 64,
+     "rh": 9.6,
+     "resuelto": false
+    }
+   ]
+  },
+  "palisades": {
+   "ref": "palisades-2025",
+   "sat": "GOES-18",
+   "combustible": "matorral/bosque",
+   "primeraDeteccion": "2025-01-07T18:31:17Z",
+   "origen": [
+    34.0764,
+    -118.5468
+   ],
+   "dirDeg": 212.9,
+   "dirFuente": "sotavento HRRR",
+   "pixelKm": [
+    2.26,
+    2.72
+   ],
+   "tramos": [
+    {
+     "tramo": 1,
+     "t0Min": 0,
+     "t1Min": 480,
+     "horas": 8,
+     "avanceKm": 2.6,
+     "rosKmh": 0.3,
+     "resolucionKmh": 0.31,
+     "u10Kmh": 41.5,
+     "gustKmh": 64.4,
+     "rh": 22.4,
+     "resuelto": false
+    },
+    {
+     "tramo": 2,
+     "t0Min": 490,
+     "t1Min": 820,
+     "horas": 5.5,
+     "avanceKm": 2.6,
+     "rosKmh": 0.37,
+     "resolucionKmh": 0.45,
+     "u10Kmh": 46.6,
+     "gustKmh": 85.5,
+     "rh": 21.6,
+     "resuelto": false
+    },
+    {
+     "tramo": 3,
+     "t0Min": 830,
+     "t1Min": 1100,
+     "horas": 4.5,
+     "avanceKm": 0,
+     "rosKmh": 0,
+     "resolucionKmh": 0.55,
+     "u10Kmh": 44.2,
+     "gustKmh": 84,
+     "rh": 21.1,
+     "resuelto": false
+    }
+   ]
+  },
+  "eaton": {
+   "ref": "eaton-2025",
+   "sat": "GOES-18",
+   "combustible": "matorral/bosque",
+   "primeraDeteccion": "2025-01-08T02:31:17Z",
+   "origen": [
+    34.1885,
+    -118.103
+   ],
+   "dirDeg": 214.7,
+   "dirFuente": "sotavento HRRR",
+   "pixelKm": [
+    2.26,
+    2.74
+   ],
+   "tramos": [
+    {
+     "tramo": 1,
+     "t0Min": 0,
+     "t1Min": 120,
+     "horas": 2,
+     "avanceKm": 0,
+     "rosKmh": 0,
+     "resolucionKmh": 1.24,
+     "u10Kmh": 61.7,
+     "gustKmh": 102.6,
+     "rh": 20.2,
+     "resuelto": false
+    },
+    {
+     "tramo": 2,
+     "t0Min": 130,
+     "t1Min": 520,
+     "horas": 6.5,
+     "avanceKm": 0.13,
+     "rosKmh": 0.02,
+     "resolucionKmh": 0.38,
+     "u10Kmh": 65.1,
+     "gustKmh": 101.2,
+     "rh": 22,
+     "resuelto": false
+    },
+    {
+     "tramo": 3,
+     "t0Min": 530,
+     "t1Min": 620,
+     "horas": 1.5,
+     "avanceKm": 1.36,
+     "rosKmh": 0.79,
+     "resolucionKmh": 1.66,
+     "u10Kmh": 65.4,
+     "gustKmh": 98.9,
+     "rh": 22.1,
+     "resuelto": false
+    }
+   ]
+  },
+  "marshall": {
+   "ref": "marshall-2021",
+   "sat": "GOES-16",
+   "combustible": "pasto",
+   "primeraDeteccion": "2021-12-30T18:41:17Z",
+   "origen": [
+    39.9825,
+    -105.257
+   ],
+   "dirDeg": 86.7,
+   "dirFuente": "sotavento HRRR",
+   "pixelKm": [
+    2.66,
+    6.09
+   ],
+   "tramos": [
+    {
+     "tramo": 1,
+     "t0Min": 0,
+     "t1Min": 100,
+     "horas": 1.67,
+     "avanceKm": 6.47,
+     "rosKmh": 2.92,
+     "resolucionKmh": 2.41,
+     "u10Kmh": 69.1,
+     "gustKmh": 137.4,
+     "rh": 25.1,
+     "resuelto": true
+    },
+    {
+     "tramo": 2,
+     "t0Min": 105,
+     "t1Min": 315,
+     "horas": 3.5,
+     "avanceKm": 0,
+     "rosKmh": 0,
+     "resolucionKmh": 1.15,
+     "u10Kmh": 68.7,
+     "gustKmh": 127.3,
+     "rh": 26.6,
+     "resuelto": false
+    }
+   ]
+  },
+  "smokehouse": {
+   "ref": "smokehouse-2024",
+   "sat": "GOES-16",
+   "combustible": "pasto",
+   "primeraDeteccion": "2024-02-26T19:01:17Z",
+   "origen": [
+    35.8439,
+    -101.4549
+   ],
+   "dirDeg": 79.3,
+   "dirFuente": "sotavento HRRR",
+   "pixelKm": [
+    2.47,
+    2.86
+   ],
+   "tramos": [
+    {
+     "tramo": 1,
+     "t0Min": 0,
+     "t1Min": 310,
+     "horas": 5.17,
+     "avanceKm": 59.29,
+     "rosKmh": 12.39,
+     "resolucionKmh": 0.51,
+     "u10Kmh": 48.1,
+     "gustKmh": 71.6,
+     "rh": 16.4,
+     "resuelto": true
+    },
+    {
+     "tramo": 2,
+     "t0Min": 320,
+     "t1Min": 410,
+     "horas": 1.5,
+     "avanceKm": 14.35,
+     "rosKmh": 10.83,
+     "resolucionKmh": 1.77,
+     "u10Kmh": 31.5,
+     "gustKmh": 47.4,
+     "rh": 19.4,
+     "resuelto": true
+    },
+    {
+     "tramo": 3,
+     "t0Min": 420,
+     "t1Min": 1070,
+     "horas": 10.83,
+     "avanceKm": 0,
+     "rosKmh": 0,
+     "resolucionKmh": 0.25,
+     "u10Kmh": 20.3,
+     "gustKmh": 34.6,
+     "rh": 38.5,
+     "resuelto": false
+    }
+   ]
+  },
+  "troublesome": {
+   "ref": "troublesome-2020",
+   "sat": "GOES-16",
+   "combustible": "matorral/bosque",
+   "primeraDeteccion": "2020-10-21T17:01:16Z",
+   "origen": [
+    40.1903,
+    -106.1293
+   ],
+   "dirDeg": 79.1,
+   "dirFuente": "sotavento HRRR",
+   "pixelKm": [
+    2.7,
+    6.15
+   ],
+   "tramos": [
+    {
+     "tramo": 1,
+     "t0Min": 0,
+     "t1Min": 500,
+     "horas": 8.33,
+     "avanceKm": 12.25,
+     "rosKmh": 1.14,
+     "resolucionKmh": 0.49,
+     "u10Kmh": 29.1,
+     "gustKmh": 55.6,
+     "rh": 24,
+     "resuelto": true
+    },
+    {
+     "tramo": 2,
+     "t0Min": 510,
+     "t1Min": 700,
+     "horas": 3.17,
+     "avanceKm": 11.43,
+     "rosKmh": 4.04,
+     "resolucionKmh": 1.29,
+     "u10Kmh": 19,
+     "gustKmh": 45.3,
+     "rh": 21.5,
+     "resuelto": true
+    },
+    {
+     "tramo": 3,
+     "t0Min": 710,
+     "t1Min": 890,
+     "horas": 3,
+     "avanceKm": 0.8,
+     "rosKmh": 0.25,
+     "resolucionKmh": 1.36,
+     "u10Kmh": 20,
+     "gustKmh": 40.6,
+     "rh": 29.3,
+     "resuelto": false
+    }
+   ]
+  },
+  "creek": {
+   "ref": "creek-2020",
+   "sat": "GOES-16",
+   "combustible": "matorral/bosque",
+   "primeraDeteccion": "2020-09-05T18:01:16Z",
+   "origen": [
+    37.1949,
+    -119.3166
+   ],
+   "dirDeg": 37.6,
+   "dirFuente": "sotavento HRRR",
+   "pixelKm": [
+    3.6,
+    5.88
+   ],
+   "tramos": [
+    {
+     "tramo": 1,
+     "t0Min": 0,
+     "t1Min": 210,
+     "horas": 3.5,
+     "avanceKm": 9.35,
+     "rosKmh": 2.71,
+     "resolucionKmh": 1.31,
+     "u10Kmh": 14.9,
+     "gustKmh": 27.5,
+     "rh": 14.9,
+     "resuelto": true
+    },
+    {
+     "tramo": 2,
+     "t0Min": 220,
+     "t1Min": 320,
+     "horas": 1.67,
+     "avanceKm": 1.1,
+     "rosKmh": 0.3,
+     "resolucionKmh": 2.76,
+     "u10Kmh": 13.6,
+     "gustKmh": 25.1,
+     "rh": 13.5,
+     "resuelto": false
+    },
+    {
+     "tramo": 3,
+     "t0Min": 330,
+     "t1Min": 1069.9833333333333,
+     "horas": 12.33,
+     "avanceKm": 0.84,
+     "rosKmh": 0.1,
+     "resolucionKmh": 0.37,
+     "u10Kmh": 7.1,
+     "gustKmh": 10.7,
+     "rh": 19.3,
+     "resuelto": false
+    }
+   ]
+  }
+ },
+ "entrenamiento": {
+  "puntos": [
+   {
+    "caso": "camp",
+    "combustible": "matorral/bosque",
+    "tramo": 1,
+    "t0Min": 0,
+    "t1Min": 90,
+    "horas": 1.5,
+    "avanceKm": 13.06,
+    "rosKmh": 8.02,
+    "resolucionKmh": 3.28,
+    "u10Kmh": 36.3,
+    "gustKmh": 74.9,
+    "rh": 25.8,
+    "resuelto": true
+   },
+   {
+    "caso": "marshall",
+    "combustible": "pasto",
+    "tramo": 1,
+    "t0Min": 0,
+    "t1Min": 100,
+    "horas": 1.67,
+    "avanceKm": 6.47,
+    "rosKmh": 2.92,
+    "resolucionKmh": 2.41,
+    "u10Kmh": 69.1,
+    "gustKmh": 137.4,
+    "rh": 25.1,
+    "resuelto": true
+   },
+   {
+    "caso": "smokehouse",
+    "combustible": "pasto",
+    "tramo": 1,
+    "t0Min": 0,
+    "t1Min": 310,
+    "horas": 5.17,
+    "avanceKm": 59.29,
+    "rosKmh": 12.39,
+    "resolucionKmh": 0.51,
+    "u10Kmh": 48.1,
+    "gustKmh": 71.6,
+    "rh": 16.4,
+    "resuelto": true
+   },
+   {
+    "caso": "smokehouse",
+    "combustible": "pasto",
+    "tramo": 2,
+    "t0Min": 320,
+    "t1Min": 410,
+    "horas": 1.5,
+    "avanceKm": 14.35,
+    "rosKmh": 10.83,
+    "resolucionKmh": 1.77,
+    "u10Kmh": 31.5,
+    "gustKmh": 47.4,
+    "rh": 19.4,
+    "resuelto": true
+   },
+   {
+    "caso": "troublesome",
+    "combustible": "matorral/bosque",
+    "tramo": 1,
+    "t0Min": 0,
+    "t1Min": 500,
+    "horas": 8.33,
+    "avanceKm": 12.25,
+    "rosKmh": 1.14,
+    "resolucionKmh": 0.49,
+    "u10Kmh": 29.1,
+    "gustKmh": 55.6,
+    "rh": 24,
+    "resuelto": true
+   },
+   {
+    "caso": "troublesome",
+    "combustible": "matorral/bosque",
+    "tramo": 2,
+    "t0Min": 510,
+    "t1Min": 700,
+    "horas": 3.17,
+    "avanceKm": 11.43,
+    "rosKmh": 4.04,
+    "resolucionKmh": 1.29,
+    "u10Kmh": 19,
+    "gustKmh": 45.3,
+    "rh": 21.5,
+    "resuelto": true
+   },
+   {
+    "caso": "creek",
+    "combustible": "matorral/bosque",
+    "tramo": 1,
+    "t0Min": 0,
+    "t1Min": 210,
+    "horas": 3.5,
+    "avanceKm": 9.35,
+    "rosKmh": 2.71,
+    "resolucionKmh": 1.31,
+    "u10Kmh": 14.9,
+    "gustKmh": 27.5,
+    "rh": 14.9,
+    "resuelto": true
+   }
+  ],
+  "loo": {
+   "n": 7,
+   "casos": 5,
+   "scores": {
+    "potencia": {
+     "maeKmh": 5.59,
+     "maeLog": 1.002,
+     "dentroDeX2": 0.43,
+     "sesgoLog": 0.095
+    },
+    "razon-combustible": {
+     "maeKmh": 6.74,
+     "maeLog": 1.228,
+     "dentroDeX2": 0.43,
+     "sesgoLog": -0.204
+    },
+    "bayes-10%": {
+     "maeKmh": 5.29,
+     "maeLog": 0.989,
+     "dentroDeX2": 0.43,
+     "sesgoLog": -0.167
+    },
+    "regla10": {
+     "maeKmh": 4.11,
+     "maeLog": 0.875,
+     "dentroDeX2": 0.14,
+     "sesgoLog": -0.361
+    },
+    "media": {
+     "maeKmh": 4.59,
+     "maeLog": 0.928,
+     "dentroDeX2": 0.57,
+     "sesgoLog": -0.013
+    }
+   },
+   "preds": [
+    {
+     "caso": "camp",
+     "obs": 8.02,
+     "u10Kmh": 36.3,
+     "regla10": 3.63,
+     "media": 4.12,
+     "potencia": 4.39,
+     "razon-combustible": 4.17,
+     "bayes-10%": 4.05
+    },
+    {
+     "caso": "marshall",
+     "obs": 2.92,
+     "u10Kmh": 69.1,
+     "regla10": 6.91,
+     "media": 4.88,
+     "potencia": 14.7,
+     "razon-combustible": 20.56,
+     "bayes-10%": 14.05
+    },
+    {
+     "caso": "smokehouse",
+     "obs": 12.39,
+     "u10Kmh": 48.1,
+     "regla10": 4.81,
+     "media": 3.11,
+     "potencia": 3.27,
+     "razon-combustible": 2.03,
+     "bayes-10%": 4.01
+    },
+    {
+     "caso": "smokehouse",
+     "obs": 10.83,
+     "u10Kmh": 31.5,
+     "regla10": 3.15,
+     "media": 3.11,
+     "potencia": 3.14,
+     "razon-combustible": 1.33,
+     "bayes-10%": 2.63
+    },
+    {
+     "caso": "troublesome",
+     "obs": 1.14,
+     "u10Kmh": 29.1,
+     "regla10": 2.91,
+     "media": 6.11,
+     "potencia": 5.78,
+     "razon-combustible": 5.83,
+     "bayes-10%": 4.22
+    },
+    {
+     "caso": "troublesome",
+     "obs": 4.04,
+     "u10Kmh": 19,
+     "regla10": 1.9,
+     "media": 6.11,
+     "potencia": 5.12,
+     "razon-combustible": 3.81,
+     "bayes-10%": 2.75
+    },
+    {
+     "caso": "creek",
+     "obs": 2.71,
+     "u10Kmh": 14.9,
+     "regla10": 1.49,
+     "media": 4.94,
+     "potencia": 3.9,
+     "razon-combustible": 1.83,
+     "bayes-10%": 1.75
+    }
+   ]
+  },
+  "regla10Calibrada": {
+   "mu": 0.361,
+   "sigma": 0.883,
+   "sigmaPred": 0.944,
+   "n": 7,
+   "factorMediana": 1.43
+  },
+  "cobertura80": {
+   "cobertura": 0.71,
+   "n": 7,
+   "filas": [
+    {
+     "caso": "camp",
+     "obs": 8.02,
+     "lo": 1.07,
+     "mediana": 4.85,
+     "hi": 21.87,
+     "dentro": true
+    },
+    {
+     "caso": "marshall",
+     "obs": 2.92,
+     "lo": 3.58,
+     "mediana": 12.16,
+     "hi": 41.27,
+     "dentro": false
+    },
+    {
+     "caso": "smokehouse",
+     "obs": 12.39,
+     "lo": 1.16,
+     "mediana": 5.16,
+     "hi": 22.89,
+     "dentro": true
+    },
+    {
+     "caso": "smokehouse",
+     "obs": 10.83,
+     "lo": 0.76,
+     "mediana": 3.38,
+     "hi": 14.99,
+     "dentro": true
+    },
+    {
+     "caso": "troublesome",
+     "obs": 1.14,
+     "lo": 1.27,
+     "mediana": 5,
+     "hi": 19.78,
+     "dentro": false
+    },
+    {
+     "caso": "troublesome",
+     "obs": 4.04,
+     "lo": 0.83,
+     "mediana": 3.27,
+     "hi": 12.91,
+     "dentro": true
+    },
+    {
+     "caso": "creek",
+     "obs": 2.71,
+     "lo": 0.44,
+     "mediana": 2.06,
+     "hi": 9.51,
+     "dentro": true
+    }
+   ]
+  },
+  "cobertura90": {
+   "cobertura": 1,
+   "n": 7
+  },
+  "nistCamp": {
+   "documentado": "≈ 7 millas en 90 min ≈ 7,5 km/h (presentación de NIST; pendiente de verificar en la TN 2135)",
+   "medidoGoes": 8.02
+  }
+ },
+ "smv": {
+  "componenteHa": 869,
+  "frenteMaxKm": 6.76,
+  "horasHastaImagen": 20,
+  "rosMediaMinKmh": 0.34,
+  "u10Kmh": 22.6,
+  "prediccion": {
+   "regla10": 2.26,
+   "mediana": 3.24,
+   "p10": 0.83,
+   "p90": 12.64
+  },
+  "nota": "La imagen Sentinel-2 del 24-07 llega ≈ 20 h después de la ignición calibrada (15 UTC del 23-07): la velocidad media incluye la noche y las pausas, así que es una cota inferior de la carrera diurna."
+ },
+ "aproximacion": {
+  "altadenaOeste": {
+   "fire": "eaton",
+   "p": [
+    34.19,
+    -118.155
+   ],
+   "nombre": "Altadena oeste (centro aproximado)",
+   "documentado": "orden de evacuación después de las 03:00 locales (11:00 UTC del 8); el fuego avanzaba hacia allí desde ≈ 21:30 y había llamas visibles poco antes de las 23:00",
+   "ordenUTC": "2025-01-08T11:00:00Z",
+   "tz": -8,
+   "a3km": "2025-01-08T04:51:17Z",
+   "a2km": "2025-01-08T10:11:17Z",
+   "a1km": "2025-01-08T10:11:17Z"
+  },
+  "pentz": {
+   "fire": "camp",
+   "p": [
+    39.77,
+    -121.575
+   ],
+   "nombre": "Pentz Rd / Skyway alta (aprox.)",
+   "documentado": "NIST: a las 08:30 el fuego alcanzó el tráfico en Pentz Rd y en la parte alta de Skyway",
+   "ordenUTC": null,
+   "tz": -8,
+   "a3km": "2018-11-08T16:17:18Z",
+   "a2km": "2018-11-08T16:37:18Z",
+   "a1km": null
+  },
+  "palisadesDr": {
+   "fire": "palisades",
+   "p": [
+    34.0465,
+    -118.5265
+   ],
+   "nombre": "Palisades Dr / Sunset Blvd (aprox.)",
+   "documentado": "coches abandonados en Palisades Dr y Sunset; se apartaron con excavadora",
+   "ordenUTC": null,
+   "tz": -8,
+   "a3km": "2025-01-07T18:31:17Z",
+   "a2km": "2025-01-07T18:41:17Z",
+   "a1km": "2025-01-07T19:11:17Z"
+  }
+ },
+ "eatonDisparo": {
+  "p50": {
+   "t": "2025-01-08T02:31:17Z",
+   "distKm": 4.73,
+   "umbralKm": 5.31,
+   "rosHaciaKmh": 2.97,
+   "anguloDeg": 61,
+   "u10Kmh": 63.6
+  },
+  "p90": {
+   "t": "2025-01-08T02:31:17Z",
+   "distKm": 4.73,
+   "umbralKm": 16.05,
+   "rosHaciaKmh": 11.56,
+   "anguloDeg": 61,
+   "u10Kmh": 63.6
+  },
+  "fijo3km": "2025-01-08T04:51:17Z",
+  "adelantoHorasP50": 8.5,
+  "adelantoHorasP90": 8.5,
+  "adelantoHoras3km": 6.1
+ },
+ "paradise": {
+  "celdas": [
+   {
+    "nombre": "Skyway alta (Magalia)",
+    "lenKm": 2.57,
+    "carriles": 1,
+    "vfKmh": 50,
+    "lat": 39.81,
+    "lon": -121.58,
+    "llegadaFuegoMin": 140,
+    "cierreMin": 123.8
+   },
+   {
+    "nombre": "Skyway alta",
+    "lenKm": 1.87,
+    "carriles": 1,
+    "vfKmh": 50,
+    "lat": 39.79,
+    "lon": -121.595,
+    "llegadaFuegoMin": 160,
+    "cierreMin": 145.5
+   },
+   {
+    "nombre": "Paradise norte",
+    "lenKm": 2.1,
+    "carriles": 1,
+    "vfKmh": 40,
+    "lat": 39.775,
+    "lon": -121.605,
+    "llegadaFuegoMin": 80,
+    "cierreMin": 63.7
+   },
+   {
+    "nombre": "Paradise centro (tramo estrechado en 2014)",
+    "lenKm": 2.1,
+    "carriles": 1,
+    "vfKmh": 40,
+    "lat": 39.76,
+    "lon": -121.62,
+    "llegadaFuegoMin": 80,
+    "cierreMin": 63.7
+   },
+   {
+    "nombre": "Paradise sur",
+    "lenKm": 2.8,
+    "carriles": 2,
+    "vfKmh": 50,
+    "lat": 39.745,
+    "lon": -121.635,
+    "llegadaFuegoMin": 160,
+    "cierreMin": 143.3
+   },
+   {
+    "nombre": "Skyway baja",
+    "lenKm": 3.51,
+    "carriles": 2,
+    "vfKmh": 80,
+    "lat": 39.735,
+    "lon": -121.665,
+    "llegadaFuegoMin": 210,
+    "cierreMin": 194.7
+   },
+   {
+    "nombre": "Skyway baja",
+    "lenKm": 3.86,
+    "carriles": 2,
+    "vfKmh": 80,
+    "lat": 39.728,
+    "lon": -121.705,
+    "llegadaFuegoMin": null,
+    "cierreMin": null
+   },
+   {
+    "nombre": "Entrada a Chico",
+    "lenKm": 3,
+    "carriles": 2,
+    "vfKmh": 60,
+    "lat": 39.725,
+    "lon": -121.75,
+    "llegadaFuegoMin": null,
+    "cierreMin": null
+   }
+  ],
+  "t0": "2018-11-08T14:57:18Z",
+  "supuestos": "Demanda: ≈ 7.000 vehículos por Skyway (la mitad de ≈ 14.700 vehículos de Paradise y Magalia; supuesto). Salida a Chico: 1.800 veh/h por dos carriles, que caen a 900 veh/h cuando se atasca la ciudad (supuesto coherente con el atasco documentado por NIST). Curva de salidas de Rayleigh con τ = 40 min.",
+  "escenarios": {
+   "aviso-al-detectar": {
+    "despejeMin": 430.5,
+    "expuestosVehMin": 375166,
+    "maxAtrapados": 3194,
+    "desviados": 0,
+    "serie": [
+     {
+      "tMin": 0,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 5,
+      "exited": 0,
+      "onRoad": 108,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 10,
+      "exited": 7,
+      "onRoad": 388,
+      "waiting": 29,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 15,
+      "exited": 55,
+      "onRoad": 643,
+      "waiting": 221,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 20,
+      "exited": 178,
+      "onRoad": 830,
+      "waiting": 540,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 25,
+      "exited": 328,
+      "onRoad": 994,
+      "waiting": 942,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       54
+      ]
+     },
+     {
+      "tMin": 30,
+      "exited": 478,
+      "onRoad": 1148,
+      "waiting": 1386,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       75,
+       28
+      ]
+     },
+     {
+      "tMin": 35,
+      "exited": 628,
+      "onRoad": 1297,
+      "waiting": 1820,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       74,
+       51,
+       19
+      ]
+     },
+     {
+      "tMin": 40,
+      "exited": 778,
+      "onRoad": 1442,
+      "waiting": 2205,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       48,
+       61,
+       36,
+       16
+      ]
+     },
+     {
+      "tMin": 45,
+      "exited": 928,
+      "onRoad": 1579,
+      "waiting": 2518,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       43,
+       48,
+       28,
+       14
+      ]
+     },
+     {
+      "tMin": 50,
+      "exited": 1078,
+      "onRoad": 1671,
+      "waiting": 2784,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       43,
+       38,
+       22,
+       13
+      ]
+     },
+     {
+      "tMin": 55,
+      "exited": 1228,
+      "onRoad": 1743,
+      "waiting": 2972,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       45,
+       31,
+       19,
+       12
+      ]
+     },
+     {
+      "tMin": 60,
+      "exited": 1378,
+      "onRoad": 1797,
+      "waiting": 3087,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       49,
+       26,
+       17,
+       12
+      ]
+     },
+     {
+      "tMin": 65,
+      "exited": 1453,
+      "onRoad": 1911,
+      "waiting": 3137,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       22,
+       14,
+       8
+      ]
+     },
+     {
+      "tMin": 70,
+      "exited": 1528,
+      "onRoad": 2012,
+      "waiting": 3133,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       18,
+       12,
+       6
+      ]
+     },
+     {
+      "tMin": 75,
+      "exited": 1603,
+      "onRoad": 2104,
+      "waiting": 3085,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       16,
+       10,
+       6
+      ]
+     },
+     {
+      "tMin": 80,
+      "exited": 1678,
+      "onRoad": 2189,
+      "waiting": 3005,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       13,
+       8,
+       5
+      ]
+     },
+     {
+      "tMin": 85,
+      "exited": 1753,
+      "onRoad": 2270,
+      "waiting": 2900,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       11,
+       7,
+       5
+      ]
+     },
+     {
+      "tMin": 90,
+      "exited": 1828,
+      "onRoad": 2349,
+      "waiting": 2778,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       10,
+       6,
+       4
+      ]
+     },
+     {
+      "tMin": 95,
+      "exited": 1903,
+      "onRoad": 2426,
+      "waiting": 2646,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       45,
+       8,
+       6,
+       4
+      ]
+     },
+     {
+      "tMin": 100,
+      "exited": 1978,
+      "onRoad": 2502,
+      "waiting": 2506,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       36,
+       7,
+       5,
+       4
+      ]
+     },
+     {
+      "tMin": 105,
+      "exited": 2053,
+      "onRoad": 2578,
+      "waiting": 2362,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       28,
+       7,
+       5,
+       4
+      ]
+     },
+     {
+      "tMin": 110,
+      "exited": 2128,
+      "onRoad": 2653,
+      "waiting": 2215,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       21,
+       6,
+       5,
+       4
+      ]
+     },
+     {
+      "tMin": 115,
+      "exited": 2203,
+      "onRoad": 2724,
+      "waiting": 2071,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       16,
+       6,
+       5,
+       4
+      ]
+     },
+     {
+      "tMin": 120,
+      "exited": 2278,
+      "onRoad": 2725,
+      "waiting": 1996,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       11,
+       5,
+       5,
+       4
+      ]
+     },
+     {
+      "tMin": 125,
+      "exited": 2353,
+      "onRoad": 2785,
+      "waiting": 1861,
+      "speed": [
+       50,
+       50,
+       40,
+       35,
+       8,
+       5,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 130,
+      "exited": 2428,
+      "onRoad": 2844,
+      "waiting": 1727,
+      "speed": [
+       50,
+       50,
+       40,
+       26,
+       7,
+       5,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 135,
+      "exited": 2503,
+      "onRoad": 2890,
+      "waiting": 1607,
+      "speed": [
+       50,
+       50,
+       40,
+       20,
+       6,
+       5,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 140,
+      "exited": 2578,
+      "onRoad": 2922,
+      "waiting": 1500,
+      "speed": [
+       50,
+       50,
+       40,
+       16,
+       5,
+       5,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 145,
+      "exited": 2653,
+      "onRoad": 2944,
+      "waiting": 1403,
+      "speed": [
+       50,
+       50,
+       40,
+       14,
+       5,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 150,
+      "exited": 2728,
+      "onRoad": 2959,
+      "waiting": 1313,
+      "speed": [
+       50,
+       50,
+       40,
+       13,
+       5,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 155,
+      "exited": 2803,
+      "onRoad": 2969,
+      "waiting": 1228,
+      "speed": [
+       50,
+       50,
+       40,
+       12,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 160,
+      "exited": 2878,
+      "onRoad": 2976,
+      "waiting": 1146,
+      "speed": [
+       50,
+       50,
+       40,
+       11,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 165,
+      "exited": 2953,
+      "onRoad": 2981,
+      "waiting": 1066,
+      "speed": [
+       50,
+       50,
+       40,
+       11,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 170,
+      "exited": 3028,
+      "onRoad": 2984,
+      "waiting": 988,
+      "speed": [
+       50,
+       50,
+       40,
+       11,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 175,
+      "exited": 3103,
+      "onRoad": 2987,
+      "waiting": 910,
+      "speed": [
+       50,
+       50,
+       40,
+       11,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 180,
+      "exited": 3178,
+      "onRoad": 2988,
+      "waiting": 833,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 185,
+      "exited": 3253,
+      "onRoad": 2990,
+      "waiting": 757,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 190,
+      "exited": 3328,
+      "onRoad": 2990,
+      "waiting": 681,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 195,
+      "exited": 3403,
+      "onRoad": 2991,
+      "waiting": 606,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 200,
+      "exited": 3478,
+      "onRoad": 2992,
+      "waiting": 530,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 205,
+      "exited": 3553,
+      "onRoad": 2992,
+      "waiting": 455,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 210,
+      "exited": 3628,
+      "onRoad": 2992,
+      "waiting": 380,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 215,
+      "exited": 3703,
+      "onRoad": 2992,
+      "waiting": 305,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 220,
+      "exited": 3778,
+      "onRoad": 2992,
+      "waiting": 230,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 225,
+      "exited": 3853,
+      "onRoad": 2992,
+      "waiting": 154,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 230,
+      "exited": 3928,
+      "onRoad": 2992,
+      "waiting": 79,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 235,
+      "exited": 4003,
+      "onRoad": 2993,
+      "waiting": 4,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 240,
+      "exited": 4078,
+      "onRoad": 2922,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       29,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 245,
+      "exited": 4153,
+      "onRoad": 2847,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 250,
+      "exited": 4228,
+      "onRoad": 2772,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       6,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 255,
+      "exited": 4303,
+      "onRoad": 2697,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       9,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 260,
+      "exited": 4378,
+      "onRoad": 2622,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       14,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 265,
+      "exited": 4453,
+      "onRoad": 2547,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       21,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 270,
+      "exited": 4528,
+      "onRoad": 2472,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       32,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 275,
+      "exited": 4603,
+      "onRoad": 2397,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 280,
+      "exited": 4678,
+      "onRoad": 2322,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 285,
+      "exited": 4753,
+      "onRoad": 2247,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 290,
+      "exited": 4828,
+      "onRoad": 2172,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       5,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 295,
+      "exited": 4903,
+      "onRoad": 2097,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       8,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 300,
+      "exited": 4978,
+      "onRoad": 2022,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       11,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 305,
+      "exited": 5053,
+      "onRoad": 1947,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       15,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 310,
+      "exited": 5128,
+      "onRoad": 1872,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       20,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 315,
+      "exited": 5203,
+      "onRoad": 1797,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       28,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 320,
+      "exited": 5278,
+      "onRoad": 1722,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       41,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 325,
+      "exited": 5353,
+      "onRoad": 1647,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       64,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 330,
+      "exited": 5428,
+      "onRoad": 1572,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 335,
+      "exited": 5503,
+      "onRoad": 1497,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 340,
+      "exited": 5578,
+      "onRoad": 1422,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       5,
+       4
+      ]
+     },
+     {
+      "tMin": 345,
+      "exited": 5653,
+      "onRoad": 1347,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       8,
+       4
+      ]
+     },
+     {
+      "tMin": 350,
+      "exited": 5728,
+      "onRoad": 1272,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       10,
+       4
+      ]
+     },
+     {
+      "tMin": 355,
+      "exited": 5803,
+      "onRoad": 1197,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       14,
+       4
+      ]
+     },
+     {
+      "tMin": 360,
+      "exited": 5878,
+      "onRoad": 1122,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       19,
+       4
+      ]
+     },
+     {
+      "tMin": 365,
+      "exited": 5953,
+      "onRoad": 1047,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       25,
+       4
+      ]
+     },
+     {
+      "tMin": 370,
+      "exited": 6028,
+      "onRoad": 972,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       35,
+       4
+      ]
+     },
+     {
+      "tMin": 375,
+      "exited": 6103,
+      "onRoad": 897,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       50,
+       4
+      ]
+     },
+     {
+      "tMin": 380,
+      "exited": 6178,
+      "onRoad": 822,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       77,
+       4
+      ]
+     },
+     {
+      "tMin": 385,
+      "exited": 6253,
+      "onRoad": 747,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       4
+      ]
+     },
+     {
+      "tMin": 390,
+      "exited": 6328,
+      "onRoad": 672,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       4
+      ]
+     },
+     {
+      "tMin": 395,
+      "exited": 6403,
+      "onRoad": 597,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       6
+      ]
+     },
+     {
+      "tMin": 400,
+      "exited": 6478,
+      "onRoad": 522,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       9
+      ]
+     },
+     {
+      "tMin": 405,
+      "exited": 6553,
+      "onRoad": 447,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       14
+      ]
+     },
+     {
+      "tMin": 410,
+      "exited": 6628,
+      "onRoad": 372,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       20
+      ]
+     },
+     {
+      "tMin": 415,
+      "exited": 6703,
+      "onRoad": 297,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       29
+      ]
+     },
+     {
+      "tMin": 420,
+      "exited": 6778,
+      "onRoad": 222,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       45
+      ]
+     },
+     {
+      "tMin": 425,
+      "exited": 6853,
+      "onRoad": 147,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 430,
+      "exited": 6928,
+      "onRoad": 72,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 435,
+      "exited": 6986,
+      "onRoad": 14,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 440,
+      "exited": 6998,
+      "onRoad": 2,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 445,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 450,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 455,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 460,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 465,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 470,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 475,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 480,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 485,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 490,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 495,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 500,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 505,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 510,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 515,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 520,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 525,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 530,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 535,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 540,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 545,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 550,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 555,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 560,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 565,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 570,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 575,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 580,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 585,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 590,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 595,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 600,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     }
+    ]
+   },
+   "aviso-60min": {
+    "despejeMin": 533.5,
+    "expuestosVehMin": 771733,
+    "maxAtrapados": 3498,
+    "desviados": 0,
+    "serie": [
+     {
+      "tMin": 0,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 5,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 10,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 15,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 20,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 25,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 30,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 35,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 40,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 45,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 50,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 55,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 60,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 65,
+      "exited": 0,
+      "onRoad": 108,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 70,
+      "exited": 7,
+      "onRoad": 388,
+      "waiting": 29,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 75,
+      "exited": 54,
+      "onRoad": 643,
+      "waiting": 221,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 80,
+      "exited": 129,
+      "onRoad": 879,
+      "waiting": 540,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 85,
+      "exited": 204,
+      "onRoad": 1118,
+      "waiting": 942,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       27
+      ]
+     },
+     {
+      "tMin": 90,
+      "exited": 279,
+      "onRoad": 1346,
+      "waiting": 1386,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       79,
+       53,
+       14
+      ]
+     },
+     {
+      "tMin": 95,
+      "exited": 354,
+      "onRoad": 1570,
+      "waiting": 1820,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       48,
+       62,
+       32,
+       9
+      ]
+     },
+     {
+      "tMin": 100,
+      "exited": 429,
+      "onRoad": 1786,
+      "waiting": 2210,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       43,
+       45,
+       21,
+       7
+      ]
+     },
+     {
+      "tMin": 105,
+      "exited": 504,
+      "onRoad": 1987,
+      "waiting": 2534,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       37,
+       32,
+       15,
+       6
+      ]
+     },
+     {
+      "tMin": 110,
+      "exited": 579,
+      "onRoad": 2155,
+      "waiting": 2798,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       30,
+       24,
+       11,
+       5
+      ]
+     },
+     {
+      "tMin": 115,
+      "exited": 654,
+      "onRoad": 2308,
+      "waiting": 2981,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       24,
+       18,
+       9,
+       5
+      ]
+     },
+     {
+      "tMin": 120,
+      "exited": 729,
+      "onRoad": 2440,
+      "waiting": 3093,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       19,
+       14,
+       8,
+       5
+      ]
+     },
+     {
+      "tMin": 125,
+      "exited": 804,
+      "onRoad": 2550,
+      "waiting": 3146,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       15,
+       11,
+       7,
+       4
+      ]
+     },
+     {
+      "tMin": 130,
+      "exited": 879,
+      "onRoad": 2642,
+      "waiting": 3151,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       13,
+       10,
+       6,
+       4
+      ]
+     },
+     {
+      "tMin": 135,
+      "exited": 954,
+      "onRoad": 2718,
+      "waiting": 3120,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       11,
+       8,
+       5,
+       4
+      ]
+     },
+     {
+      "tMin": 140,
+      "exited": 1029,
+      "onRoad": 2786,
+      "waiting": 3057,
+      "speed": [
+       50,
+       50,
+       39,
+       36,
+       9,
+       7,
+       5,
+       4
+      ]
+     },
+     {
+      "tMin": 145,
+      "exited": 1104,
+      "onRoad": 2853,
+      "waiting": 2966,
+      "speed": [
+       50,
+       50,
+       36,
+       30,
+       8,
+       6,
+       5,
+       4
+      ]
+     },
+     {
+      "tMin": 150,
+      "exited": 1179,
+      "onRoad": 2915,
+      "waiting": 2861,
+      "speed": [
+       50,
+       50,
+       31,
+       25,
+       7,
+       6,
+       5,
+       4
+      ]
+     },
+     {
+      "tMin": 155,
+      "exited": 1254,
+      "onRoad": 2970,
+      "waiting": 2751,
+      "speed": [
+       50,
+       50,
+       26,
+       21,
+       6,
+       5,
+       5,
+       4
+      ]
+     },
+     {
+      "tMin": 160,
+      "exited": 1329,
+      "onRoad": 3015,
+      "waiting": 2642,
+      "speed": [
+       50,
+       50,
+       22,
+       18,
+       6,
+       5,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 165,
+      "exited": 1404,
+      "onRoad": 3052,
+      "waiting": 2536,
+      "speed": [
+       50,
+       50,
+       19,
+       16,
+       5,
+       5,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 170,
+      "exited": 1479,
+      "onRoad": 3082,
+      "waiting": 2435,
+      "speed": [
+       50,
+       50,
+       17,
+       14,
+       5,
+       5,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 175,
+      "exited": 1554,
+      "onRoad": 3106,
+      "waiting": 2338,
+      "speed": [
+       50,
+       50,
+       15,
+       13,
+       5,
+       5,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 180,
+      "exited": 1629,
+      "onRoad": 3124,
+      "waiting": 2246,
+      "speed": [
+       50,
+       50,
+       14,
+       12,
+       5,
+       5,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 185,
+      "exited": 1704,
+      "onRoad": 3138,
+      "waiting": 2158,
+      "speed": [
+       50,
+       50,
+       13,
+       12,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 190,
+      "exited": 1779,
+      "onRoad": 3069,
+      "waiting": 2151,
+      "speed": [
+       50,
+       50,
+       39,
+       11,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 195,
+      "exited": 1854,
+      "onRoad": 3002,
+      "waiting": 2144,
+      "speed": [
+       50,
+       50,
+       40,
+       11,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 200,
+      "exited": 1929,
+      "onRoad": 2986,
+      "waiting": 2085,
+      "speed": [
+       50,
+       50,
+       40,
+       11,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 205,
+      "exited": 2004,
+      "onRoad": 2986,
+      "waiting": 2010,
+      "speed": [
+       50,
+       50,
+       40,
+       11,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 210,
+      "exited": 2079,
+      "onRoad": 2987,
+      "waiting": 1934,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 215,
+      "exited": 2154,
+      "onRoad": 2988,
+      "waiting": 1857,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 220,
+      "exited": 2229,
+      "onRoad": 2990,
+      "waiting": 1781,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 225,
+      "exited": 2304,
+      "onRoad": 2990,
+      "waiting": 1705,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 230,
+      "exited": 2379,
+      "onRoad": 2991,
+      "waiting": 1630,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 235,
+      "exited": 2454,
+      "onRoad": 2991,
+      "waiting": 1554,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 240,
+      "exited": 2529,
+      "onRoad": 2992,
+      "waiting": 1479,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 245,
+      "exited": 2604,
+      "onRoad": 2992,
+      "waiting": 1404,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 250,
+      "exited": 2679,
+      "onRoad": 2992,
+      "waiting": 1329,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 255,
+      "exited": 2754,
+      "onRoad": 2992,
+      "waiting": 1253,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 260,
+      "exited": 2829,
+      "onRoad": 2992,
+      "waiting": 1178,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 265,
+      "exited": 2904,
+      "onRoad": 2992,
+      "waiting": 1103,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 270,
+      "exited": 2979,
+      "onRoad": 2993,
+      "waiting": 1028,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 275,
+      "exited": 3054,
+      "onRoad": 2993,
+      "waiting": 953,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 280,
+      "exited": 3129,
+      "onRoad": 2993,
+      "waiting": 878,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 285,
+      "exited": 3204,
+      "onRoad": 2993,
+      "waiting": 803,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 290,
+      "exited": 3279,
+      "onRoad": 2993,
+      "waiting": 728,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 295,
+      "exited": 3354,
+      "onRoad": 2993,
+      "waiting": 653,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 300,
+      "exited": 3429,
+      "onRoad": 2993,
+      "waiting": 578,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 305,
+      "exited": 3504,
+      "onRoad": 2993,
+      "waiting": 503,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 310,
+      "exited": 3579,
+      "onRoad": 2993,
+      "waiting": 428,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 315,
+      "exited": 3654,
+      "onRoad": 2993,
+      "waiting": 353,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 320,
+      "exited": 3729,
+      "onRoad": 2993,
+      "waiting": 278,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 325,
+      "exited": 3804,
+      "onRoad": 2993,
+      "waiting": 203,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 330,
+      "exited": 3879,
+      "onRoad": 2993,
+      "waiting": 128,
+      "speed": [
+       50,
+       50,
+       40,
+       10,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 335,
+      "exited": 3954,
+      "onRoad": 2966,
+      "waiting": 79,
+      "speed": [
+       50,
+       50,
+       40,
+       15,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 340,
+      "exited": 4029,
+      "onRoad": 2891,
+      "waiting": 79,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 345,
+      "exited": 4104,
+      "onRoad": 2826,
+      "waiting": 70,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 350,
+      "exited": 4179,
+      "onRoad": 2809,
+      "waiting": 11,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       4,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 355,
+      "exited": 4254,
+      "onRoad": 2746,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       7,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 360,
+      "exited": 4329,
+      "onRoad": 2671,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       11,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 365,
+      "exited": 4404,
+      "onRoad": 2596,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       16,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 370,
+      "exited": 4479,
+      "onRoad": 2521,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       24,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 375,
+      "exited": 4554,
+      "onRoad": 2446,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       37,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 380,
+      "exited": 4629,
+      "onRoad": 2371,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 385,
+      "exited": 4704,
+      "onRoad": 2296,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 390,
+      "exited": 4779,
+      "onRoad": 2221,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       4,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 395,
+      "exited": 4854,
+      "onRoad": 2146,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       6,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 400,
+      "exited": 4929,
+      "onRoad": 2071,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       9,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 405,
+      "exited": 5004,
+      "onRoad": 1996,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       12,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 410,
+      "exited": 5079,
+      "onRoad": 1921,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       17,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 415,
+      "exited": 5154,
+      "onRoad": 1846,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       23,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 420,
+      "exited": 5229,
+      "onRoad": 1771,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       32,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 425,
+      "exited": 5304,
+      "onRoad": 1696,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       47,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 430,
+      "exited": 5379,
+      "onRoad": 1621,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       77,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 435,
+      "exited": 5454,
+      "onRoad": 1546,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 440,
+      "exited": 5529,
+      "onRoad": 1471,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       4,
+       4
+      ]
+     },
+     {
+      "tMin": 445,
+      "exited": 5604,
+      "onRoad": 1396,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       6,
+       4
+      ]
+     },
+     {
+      "tMin": 450,
+      "exited": 5679,
+      "onRoad": 1321,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       8,
+       4
+      ]
+     },
+     {
+      "tMin": 455,
+      "exited": 5754,
+      "onRoad": 1246,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       11,
+       4
+      ]
+     },
+     {
+      "tMin": 460,
+      "exited": 5829,
+      "onRoad": 1171,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       15,
+       4
+      ]
+     },
+     {
+      "tMin": 465,
+      "exited": 5904,
+      "onRoad": 1096,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       21,
+       4
+      ]
+     },
+     {
+      "tMin": 470,
+      "exited": 5979,
+      "onRoad": 1021,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       28,
+       4
+      ]
+     },
+     {
+      "tMin": 475,
+      "exited": 6054,
+      "onRoad": 946,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       39,
+       4
+      ]
+     },
+     {
+      "tMin": 480,
+      "exited": 6129,
+      "onRoad": 871,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       57,
+       4
+      ]
+     },
+     {
+      "tMin": 485,
+      "exited": 6204,
+      "onRoad": 796,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       4
+      ]
+     },
+     {
+      "tMin": 490,
+      "exited": 6279,
+      "onRoad": 721,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       4
+      ]
+     },
+     {
+      "tMin": 495,
+      "exited": 6354,
+      "onRoad": 646,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       5
+      ]
+     },
+     {
+      "tMin": 500,
+      "exited": 6429,
+      "onRoad": 571,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       7
+      ]
+     },
+     {
+      "tMin": 505,
+      "exited": 6504,
+      "onRoad": 496,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       11
+      ]
+     },
+     {
+      "tMin": 510,
+      "exited": 6579,
+      "onRoad": 421,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       16
+      ]
+     },
+     {
+      "tMin": 515,
+      "exited": 6654,
+      "onRoad": 346,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       23
+      ]
+     },
+     {
+      "tMin": 520,
+      "exited": 6729,
+      "onRoad": 271,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       34
+      ]
+     },
+     {
+      "tMin": 525,
+      "exited": 6804,
+      "onRoad": 196,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       54
+      ]
+     },
+     {
+      "tMin": 530,
+      "exited": 6879,
+      "onRoad": 121,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 535,
+      "exited": 6954,
+      "onRoad": 46,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 540,
+      "exited": 6993,
+      "onRoad": 7,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 545,
+      "exited": 6999,
+      "onRoad": 1,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 550,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 555,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 560,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 565,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 570,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 575,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 580,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 585,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 590,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 595,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 600,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     }
+    ]
+   },
+   "contraflujo-al-detectar": {
+    "despejeMin": 429.5,
+    "expuestosVehMin": 13739,
+    "maxAtrapados": 1172,
+    "desviados": 0,
+    "serie": [
+     {
+      "tMin": 0,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 5,
+      "exited": 0,
+      "onRoad": 108,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 10,
+      "exited": 7,
+      "onRoad": 417,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 15,
+      "exited": 56,
+      "onRoad": 841,
+      "waiting": 21,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 20,
+      "exited": 188,
+      "onRoad": 1211,
+      "waiting": 150,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 25,
+      "exited": 338,
+      "onRoad": 1545,
+      "waiting": 381,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 30,
+      "exited": 488,
+      "onRoad": 1865,
+      "waiting": 659,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       31
+      ]
+     },
+     {
+      "tMin": 35,
+      "exited": 638,
+      "onRoad": 2171,
+      "waiting": 936,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       16
+      ]
+     },
+     {
+      "tMin": 40,
+      "exited": 788,
+      "onRoad": 2460,
+      "waiting": 1177,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       64,
+       10
+      ]
+     },
+     {
+      "tMin": 45,
+      "exited": 938,
+      "onRoad": 2726,
+      "waiting": 1361,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       39,
+       7
+      ]
+     },
+     {
+      "tMin": 50,
+      "exited": 1088,
+      "onRoad": 2971,
+      "waiting": 1474,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       24,
+       6
+      ]
+     },
+     {
+      "tMin": 55,
+      "exited": 1238,
+      "onRoad": 3194,
+      "waiting": 1512,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       16,
+       5
+      ]
+     },
+     {
+      "tMin": 60,
+      "exited": 1388,
+      "onRoad": 3325,
+      "waiting": 1550,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       12,
+       5
+      ]
+     },
+     {
+      "tMin": 65,
+      "exited": 1463,
+      "onRoad": 3555,
+      "waiting": 1483,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       69,
+       9,
+       4
+      ]
+     },
+     {
+      "tMin": 70,
+      "exited": 1538,
+      "onRoad": 3783,
+      "waiting": 1352,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       49,
+       7,
+       3
+      ]
+     },
+     {
+      "tMin": 75,
+      "exited": 1613,
+      "onRoad": 4007,
+      "waiting": 1172,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       34,
+       5,
+       2
+      ]
+     },
+     {
+      "tMin": 80,
+      "exited": 1688,
+      "onRoad": 4230,
+      "waiting": 954,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       24,
+       4,
+       2
+      ]
+     },
+     {
+      "tMin": 85,
+      "exited": 1763,
+      "onRoad": 4451,
+      "waiting": 709,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       17,
+       4,
+       2
+      ]
+     },
+     {
+      "tMin": 90,
+      "exited": 1838,
+      "onRoad": 4673,
+      "waiting": 445,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       11,
+       3,
+       2
+      ]
+     },
+     {
+      "tMin": 95,
+      "exited": 1913,
+      "onRoad": 4895,
+      "waiting": 167,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       8,
+       3,
+       2
+      ]
+     },
+     {
+      "tMin": 100,
+      "exited": 1988,
+      "onRoad": 4999,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       6,
+       3,
+       2
+      ]
+     },
+     {
+      "tMin": 105,
+      "exited": 2063,
+      "onRoad": 4930,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       5,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 110,
+      "exited": 2138,
+      "onRoad": 4859,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       4,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 115,
+      "exited": 2213,
+      "onRoad": 4785,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       4,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 120,
+      "exited": 2288,
+      "onRoad": 4711,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       5,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 125,
+      "exited": 2363,
+      "onRoad": 4637,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       6,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 130,
+      "exited": 2438,
+      "onRoad": 4562,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       7,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 135,
+      "exited": 2513,
+      "onRoad": 4487,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       9,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 140,
+      "exited": 2588,
+      "onRoad": 4412,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       11,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 145,
+      "exited": 2663,
+      "onRoad": 4337,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       12,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 150,
+      "exited": 2738,
+      "onRoad": 4262,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       15,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 155,
+      "exited": 2813,
+      "onRoad": 4187,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       17,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 160,
+      "exited": 2888,
+      "onRoad": 4112,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       20,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 165,
+      "exited": 2963,
+      "onRoad": 4037,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       24,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 170,
+      "exited": 3038,
+      "onRoad": 3962,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       28,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 175,
+      "exited": 3113,
+      "onRoad": 3887,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       34,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 180,
+      "exited": 3188,
+      "onRoad": 3812,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       41,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 185,
+      "exited": 3263,
+      "onRoad": 3737,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       50,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 190,
+      "exited": 3338,
+      "onRoad": 3662,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       64,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 195,
+      "exited": 3413,
+      "onRoad": 3587,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 200,
+      "exited": 3488,
+      "onRoad": 3512,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 205,
+      "exited": 3563,
+      "onRoad": 3437,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 210,
+      "exited": 3638,
+      "onRoad": 3362,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 215,
+      "exited": 3713,
+      "onRoad": 3287,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       2,
+       2
+      ]
+     },
+     {
+      "tMin": 220,
+      "exited": 3788,
+      "onRoad": 3212,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       3,
+       2
+      ]
+     },
+     {
+      "tMin": 225,
+      "exited": 3863,
+      "onRoad": 3137,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       3,
+       2
+      ]
+     },
+     {
+      "tMin": 230,
+      "exited": 3938,
+      "onRoad": 3062,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       4,
+       2
+      ]
+     },
+     {
+      "tMin": 235,
+      "exited": 4013,
+      "onRoad": 2987,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       5,
+       2
+      ]
+     },
+     {
+      "tMin": 240,
+      "exited": 4088,
+      "onRoad": 2912,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       6,
+       2
+      ]
+     },
+     {
+      "tMin": 245,
+      "exited": 4163,
+      "onRoad": 2837,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       8,
+       2
+      ]
+     },
+     {
+      "tMin": 250,
+      "exited": 4238,
+      "onRoad": 2762,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       9,
+       2
+      ]
+     },
+     {
+      "tMin": 255,
+      "exited": 4313,
+      "onRoad": 2687,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       11,
+       2
+      ]
+     },
+     {
+      "tMin": 260,
+      "exited": 4388,
+      "onRoad": 2612,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       12,
+       2
+      ]
+     },
+     {
+      "tMin": 265,
+      "exited": 4463,
+      "onRoad": 2537,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       14,
+       2
+      ]
+     },
+     {
+      "tMin": 270,
+      "exited": 4538,
+      "onRoad": 2462,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       16,
+       2
+      ]
+     },
+     {
+      "tMin": 275,
+      "exited": 4613,
+      "onRoad": 2387,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       19,
+       2
+      ]
+     },
+     {
+      "tMin": 280,
+      "exited": 4688,
+      "onRoad": 2312,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       22,
+       2
+      ]
+     },
+     {
+      "tMin": 285,
+      "exited": 4763,
+      "onRoad": 2237,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       26,
+       2
+      ]
+     },
+     {
+      "tMin": 290,
+      "exited": 4838,
+      "onRoad": 2162,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       30,
+       2
+      ]
+     },
+     {
+      "tMin": 295,
+      "exited": 4913,
+      "onRoad": 2087,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       36,
+       2
+      ]
+     },
+     {
+      "tMin": 300,
+      "exited": 4988,
+      "onRoad": 2012,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       42,
+       2
+      ]
+     },
+     {
+      "tMin": 305,
+      "exited": 5063,
+      "onRoad": 1937,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       51,
+       2
+      ]
+     },
+     {
+      "tMin": 310,
+      "exited": 5138,
+      "onRoad": 1862,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       63,
+       2
+      ]
+     },
+     {
+      "tMin": 315,
+      "exited": 5213,
+      "onRoad": 1787,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       2
+      ]
+     },
+     {
+      "tMin": 320,
+      "exited": 5288,
+      "onRoad": 1712,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       2
+      ]
+     },
+     {
+      "tMin": 325,
+      "exited": 5363,
+      "onRoad": 1637,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       2
+      ]
+     },
+     {
+      "tMin": 330,
+      "exited": 5438,
+      "onRoad": 1562,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       2
+      ]
+     },
+     {
+      "tMin": 335,
+      "exited": 5513,
+      "onRoad": 1487,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       2
+      ]
+     },
+     {
+      "tMin": 340,
+      "exited": 5588,
+      "onRoad": 1412,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       2
+      ]
+     },
+     {
+      "tMin": 345,
+      "exited": 5663,
+      "onRoad": 1337,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       3
+      ]
+     },
+     {
+      "tMin": 350,
+      "exited": 5738,
+      "onRoad": 1262,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       5
+      ]
+     },
+     {
+      "tMin": 355,
+      "exited": 5813,
+      "onRoad": 1187,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       6
+      ]
+     },
+     {
+      "tMin": 360,
+      "exited": 5888,
+      "onRoad": 1112,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       8
+      ]
+     },
+     {
+      "tMin": 365,
+      "exited": 5963,
+      "onRoad": 1037,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       9
+      ]
+     },
+     {
+      "tMin": 370,
+      "exited": 6038,
+      "onRoad": 962,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       12
+      ]
+     },
+     {
+      "tMin": 375,
+      "exited": 6113,
+      "onRoad": 887,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       14
+      ]
+     },
+     {
+      "tMin": 380,
+      "exited": 6188,
+      "onRoad": 812,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       17
+      ]
+     },
+     {
+      "tMin": 385,
+      "exited": 6263,
+      "onRoad": 737,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       20
+      ]
+     },
+     {
+      "tMin": 390,
+      "exited": 6338,
+      "onRoad": 662,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       25
+      ]
+     },
+     {
+      "tMin": 395,
+      "exited": 6413,
+      "onRoad": 587,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       30
+      ]
+     },
+     {
+      "tMin": 400,
+      "exited": 6488,
+      "onRoad": 512,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       37
+      ]
+     },
+     {
+      "tMin": 405,
+      "exited": 6563,
+      "onRoad": 437,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       46
+      ]
+     },
+     {
+      "tMin": 410,
+      "exited": 6638,
+      "onRoad": 362,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 415,
+      "exited": 6713,
+      "onRoad": 287,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 420,
+      "exited": 6788,
+      "onRoad": 212,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 425,
+      "exited": 6863,
+      "onRoad": 137,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 430,
+      "exited": 6938,
+      "onRoad": 62,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 435,
+      "exited": 6989,
+      "onRoad": 11,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 440,
+      "exited": 6998,
+      "onRoad": 2,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 445,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 450,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 455,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 460,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 465,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 470,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 475,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 480,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 485,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 490,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 495,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 500,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 505,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 510,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 515,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 520,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 525,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 530,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 535,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 540,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 545,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 550,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 555,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 560,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 565,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 570,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 575,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 580,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 585,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 590,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 595,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 600,
+      "exited": 7000,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     }
+    ]
+   },
+   "cierres-senda": {
+    "despejeMin": 183,
+    "expuestosVehMin": 2,
+    "maxAtrapados": 1,
+    "desviados": 3708,
+    "serie": [
+     {
+      "tMin": 0,
+      "exited": 0,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 5,
+      "exited": 0,
+      "onRoad": 108,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 10,
+      "exited": 7,
+      "onRoad": 388,
+      "waiting": 29,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 15,
+      "exited": 55,
+      "onRoad": 643,
+      "waiting": 221,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 20,
+      "exited": 178,
+      "onRoad": 830,
+      "waiting": 540,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 25,
+      "exited": 328,
+      "onRoad": 994,
+      "waiting": 942,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       54
+      ]
+     },
+     {
+      "tMin": 30,
+      "exited": 478,
+      "onRoad": 1148,
+      "waiting": 1386,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       75,
+       28
+      ]
+     },
+     {
+      "tMin": 35,
+      "exited": 628,
+      "onRoad": 1297,
+      "waiting": 1820,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       74,
+       51,
+       19
+      ]
+     },
+     {
+      "tMin": 40,
+      "exited": 778,
+      "onRoad": 1442,
+      "waiting": 2205,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       48,
+       61,
+       36,
+       16
+      ]
+     },
+     {
+      "tMin": 45,
+      "exited": 928,
+      "onRoad": 1579,
+      "waiting": 2518,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       43,
+       48,
+       28,
+       14
+      ]
+     },
+     {
+      "tMin": 50,
+      "exited": 1078,
+      "onRoad": 1671,
+      "waiting": 2784,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       43,
+       38,
+       22,
+       13
+      ]
+     },
+     {
+      "tMin": 55,
+      "exited": 1228,
+      "onRoad": 1743,
+      "waiting": 2972,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       45,
+       31,
+       19,
+       12
+      ]
+     },
+     {
+      "tMin": 60,
+      "exited": 1378,
+      "onRoad": 1797,
+      "waiting": 3087,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       49,
+       26,
+       17,
+       12
+      ]
+     },
+     {
+      "tMin": 65,
+      "exited": 1453,
+      "onRoad": 1827,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       22,
+       14,
+       8
+      ]
+     },
+     {
+      "tMin": 70,
+      "exited": 1528,
+      "onRoad": 1732,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       20,
+       12,
+       6
+      ]
+     },
+     {
+      "tMin": 75,
+      "exited": 1603,
+      "onRoad": 1666,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       26,
+       10,
+       6
+      ]
+     },
+     {
+      "tMin": 80,
+      "exited": 1678,
+      "onRoad": 1600,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       40,
+       8,
+       5
+      ]
+     },
+     {
+      "tMin": 85,
+      "exited": 1753,
+      "onRoad": 1531,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       73,
+       7,
+       5
+      ]
+     },
+     {
+      "tMin": 90,
+      "exited": 1828,
+      "onRoad": 1460,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       6,
+       4
+      ]
+     },
+     {
+      "tMin": 95,
+      "exited": 1903,
+      "onRoad": 1387,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       7,
+       4
+      ]
+     },
+     {
+      "tMin": 100,
+      "exited": 1978,
+      "onRoad": 1313,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       9,
+       4
+      ]
+     },
+     {
+      "tMin": 105,
+      "exited": 2053,
+      "onRoad": 1238,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       12,
+       4
+      ]
+     },
+     {
+      "tMin": 110,
+      "exited": 2128,
+      "onRoad": 1163,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       16,
+       4
+      ]
+     },
+     {
+      "tMin": 115,
+      "exited": 2203,
+      "onRoad": 1088,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       21,
+       4
+      ]
+     },
+     {
+      "tMin": 120,
+      "exited": 2278,
+      "onRoad": 1013,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       29,
+       4
+      ]
+     },
+     {
+      "tMin": 125,
+      "exited": 2353,
+      "onRoad": 938,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       40,
+       4
+      ]
+     },
+     {
+      "tMin": 130,
+      "exited": 2428,
+      "onRoad": 863,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       60,
+       4
+      ]
+     },
+     {
+      "tMin": 135,
+      "exited": 2503,
+      "onRoad": 788,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       4
+      ]
+     },
+     {
+      "tMin": 140,
+      "exited": 2578,
+      "onRoad": 713,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       4
+      ]
+     },
+     {
+      "tMin": 145,
+      "exited": 2653,
+      "onRoad": 638,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       5
+      ]
+     },
+     {
+      "tMin": 150,
+      "exited": 2728,
+      "onRoad": 563,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       7
+      ]
+     },
+     {
+      "tMin": 155,
+      "exited": 2803,
+      "onRoad": 488,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       11
+      ]
+     },
+     {
+      "tMin": 160,
+      "exited": 2878,
+      "onRoad": 413,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       16
+      ]
+     },
+     {
+      "tMin": 165,
+      "exited": 2953,
+      "onRoad": 338,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       24
+      ]
+     },
+     {
+      "tMin": 170,
+      "exited": 3028,
+      "onRoad": 263,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       35
+      ]
+     },
+     {
+      "tMin": 175,
+      "exited": 3103,
+      "onRoad": 188,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       57
+      ]
+     },
+     {
+      "tMin": 180,
+      "exited": 3178,
+      "onRoad": 113,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 185,
+      "exited": 3253,
+      "onRoad": 38,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 190,
+      "exited": 3285,
+      "onRoad": 6,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 195,
+      "exited": 3291,
+      "onRoad": 1,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 200,
+      "exited": 3291,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 205,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 210,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 215,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 220,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 225,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 230,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 235,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 240,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 245,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 250,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 255,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 260,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 265,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 270,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 275,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 280,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 285,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 290,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 295,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 300,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 305,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 310,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 315,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 320,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 325,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 330,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 335,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 340,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 345,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 350,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 355,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 360,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 365,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 370,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 375,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 380,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 385,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 390,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 395,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 400,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 405,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 410,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 415,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 420,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 425,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 430,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 435,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 440,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 445,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 450,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 455,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 460,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 465,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 470,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 475,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 480,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 485,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 490,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 495,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 500,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 505,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 510,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 515,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 520,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 525,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 530,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 535,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 540,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 545,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 550,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 555,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 560,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 565,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 570,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 575,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 580,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 585,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 590,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 595,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     },
+     {
+      "tMin": 600,
+      "exited": 3292,
+      "onRoad": 0,
+      "waiting": 0,
+      "speed": [
+       50,
+       50,
+       40,
+       40,
+       50,
+       80,
+       80,
+       60
+      ]
+     }
+    ]
+   }
+  },
+  "ultimoAvisoSeguroMin": {
+   "ok": true,
+   "warnMin": -122.3
+  },
+  "ultimoAvisoSeguroContraflujoMin": {
+   "ok": true,
+   "warnMin": -53.4
+  }
+ },
+ "gemelos": {
+  "atascoChico": {
+   "deteccion": {
+    "tMin": 52,
+    "cap": [
+     0.432
+    ],
+    "sd": [
+     0.042
+    ],
+    "verdad": [
+     0.3
+    ]
+   },
+   "convergencia": {
+    "tMin": 56,
+    "cap": [
+     0.319
+    ],
+    "sd": [
+     0.029
+    ],
+    "verdad": [
+     0.3
+    ]
+   }
+  },
+  "palisadesBloqueo": {
+   "deteccion": {
+    "tMin": 58,
+    "cap": [
+     0.616,
+     0.147,
+     0.797
+    ],
+    "sd": [
+     0.074,
+     0.03,
+     0.076
+    ],
+    "verdad": [
+     1,
+     0.05,
+     1
+    ]
+   }
+  }
+ },
+ "caltrans": {
+  "fuente": "Caltrans CCTV (cwwp2.dot.ca.gov, catálogos D3 y D7; vídeo HLS de wzmedia.dot.ca.gov). Capturado el 05-11-2026 hacia las 17:15 PST (hora punta de la tarde). Recuento con YOLOX-s + ByteTrack en la sesión; no se guarda ninguna imagen ni se identifica a nadie. Velocidad aproximada con el tamaño del vehículo como escala (≈ ±30 %).",
+  "captura": "2026-11-05T17:15",
+  "camaras": [
+   {
+    "zona": "camp",
+    "id": "Hwy 32 at Main St Chico",
+    "ruta": "SR-32",
+    "lat": 39.725615,
+    "lon": -121.834856,
+    "sentido": "West",
+    "imagenEnDirecto": "https://cwwp2.dot.ca.gov/data/d3/cctv/image/hwy32atmainstchico/hwy32atmainstchico.jpg",
+    "video": {
+     "durS": 50,
+     "cruces": {
+      "baja": 16,
+      "sube": 0
+     },
+     "flujoVehH": 1153,
+     "mediaEnImagen": 10.16,
+     "maxEnImagen": 13,
+     "seguidos": 61,
+     "velMedianaMovKmh": 24.6,
+     "fraccionParados": 0.49
+    },
+    "serie": [
+     1,
+     0,
+     2,
+     6,
+     2,
+     1,
+     6,
+     0,
+     2,
+     6,
+     8,
+     10,
+     6
+    ],
+    "estado": "en servicio",
+    "fuegoHistorico": {
+     "distMinKm": 11.5,
+     "a5km": null,
+     "a3km": null
+    }
+   },
+   {
+    "zona": "camp",
+    "id": "Hwy 99 at Neal",
+    "ruta": "SR-99",
+    "lat": 39.6622,
+    "lon": -121.74011,
+    "sentido": null,
+    "imagenEnDirecto": "https://cwwp2.dot.ca.gov/data/d3/cctv/image/hwy99atneal/hwy99atneal.jpg",
+    "video": {
+     "durS": 48.4,
+     "cruces": {
+      "baja": 5,
+      "sube": 11
+     },
+     "flujoVehH": 1189,
+     "mediaEnImagen": 6.19,
+     "maxEnImagen": 13,
+     "seguidos": 100,
+     "velMedianaMovKmh": 12.8,
+     "fraccionParados": 0.02
+    },
+    "serie": [
+     0,
+     8,
+     2,
+     1,
+     1,
+     3,
+     0,
+     0,
+     0,
+     3,
+     0,
+     8,
+     5
+    ],
+    "estado": "en servicio",
+    "fuegoHistorico": {
+     "distMinKm": 5.9,
+     "a5km": null,
+     "a3km": null
+    }
+   },
+   {
+    "zona": "camp",
+    "id": "Hwy 99 at Skyway 1",
+    "ruta": "SR-99",
+    "lat": 39.715094,
+    "lon": -121.800321,
+    "sentido": null,
+    "imagenEnDirecto": "https://cwwp2.dot.ca.gov/data/d3/cctv/image/hwy99atskyway1/hwy99atskyway1.jpg",
+    "video": {
+     "durS": 50,
+     "cruces": {
+      "baja": 4,
+      "sube": 5
+     },
+     "flujoVehH": 648,
+     "mediaEnImagen": 1.56,
+     "maxEnImagen": 6,
+     "seguidos": 75,
+     "velMedianaMovKmh": 33.2,
+     "fraccionParados": 0
+    },
+    "serie": [
+     0,
+     1,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     1,
+     0,
+     2,
+     4
+    ],
+    "estado": "en servicio",
+    "fuegoHistorico": {
+     "distMinKm": 9.1,
+     "a5km": null,
+     "a3km": null
+    }
+   },
+   {
+    "zona": "camp",
+    "id": "Skyway_BUT99_NB_1",
+    "ruta": "SR-99",
+    "lat": 39.707638,
+    "lon": -121.792755,
+    "sentido": null,
+    "imagenEnDirecto": "https://cwwp2.dot.ca.gov/data/d3/cctv/image/skywaybut99nb1/skywaybut99nb1.jpg",
+    "video": null,
+    "serie": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "estado": "fuera de servicio (el operador sirve «Temporarily Unavailable»)",
+    "fuegoHistorico": {
+     "distMinKm": 9,
+     "a5km": null,
+     "a3km": null
+    }
+   },
+   {
+    "zona": "camp",
+    "id": "Hwy 99 at Hwy 32 1",
+    "ruta": "SR-99",
+    "lat": 39.737174,
+    "lon": -121.820189,
+    "sentido": null,
+    "imagenEnDirecto": "https://cwwp2.dot.ca.gov/data/d3/cctv/image/hwy99athwy321/hwy99athwy321.jpg",
+    "video": {
+     "durS": 60,
+     "cruces": {
+      "baja": 8,
+      "sube": 42
+     },
+     "flujoVehH": 3000,
+     "mediaEnImagen": 2.54,
+     "maxEnImagen": 7,
+     "seguidos": 115,
+     "velMedianaMovKmh": 45.1,
+     "fraccionParados": 0
+    },
+    "serie": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     9,
+     1,
+     0,
+     0,
+     2,
+     2,
+     2,
+     1
+    ],
+    "estado": "en servicio",
+    "fuegoHistorico": {
+     "distMinKm": 10,
+     "a5km": null,
+     "a3km": null
+    }
+   },
+   {
+    "zona": "palisades",
+    "id": "I-10 : (101) Mcclure West",
+    "ruta": "I-10",
+    "lat": 34.0115,
+    "lon": -118.4962,
+    "sentido": "East",
+    "imagenEnDirecto": "https://cwwp2.dot.ca.gov/data/d7/cctv/image/i10101mcclurewest/i10101mcclurewest.jpg",
+    "video": {
+     "durS": 69.7,
+     "cruces": {
+      "baja": 3,
+      "sube": 0
+     },
+     "flujoVehH": 155,
+     "mediaEnImagen": 2.59,
+     "maxEnImagen": 8,
+     "seguidos": 95,
+     "velMedianaMovKmh": 16.9,
+     "fraccionParados": 0.12
+    },
+    "serie": [
+     5,
+     3,
+     7,
+     9,
+     9,
+     1,
+     2,
+     4,
+     7,
+     4,
+     9,
+     5,
+     1
+    ],
+    "estado": "en servicio",
+    "fuegoHistorico": {
+     "distMinKm": 3.5,
+     "a5km": "2025-01-07T19:11:17Z",
+     "a3km": null
+    }
+   },
+   {
+    "zona": "palisades",
+    "id": "SR-1 : (236) Topanga Canyon Rd",
+    "ruta": "SR-1",
+    "lat": 34.040222,
+    "lon": -118.579389,
+    "sentido": "South",
+    "imagenEnDirecto": "https://cwwp2.dot.ca.gov/data/d7/cctv/image/sr1236topangacanyonrd/sr1236topangacanyonrd.jpg",
+    "video": null,
+    "serie": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "estado": "fuera de servicio (el operador sirve «Temporarily Unavailable»)",
+    "fuegoHistorico": {
+     "distMinKm": 2.6,
+     "a5km": "2025-01-07T18:31:17Z",
+     "a3km": "2025-01-07T19:11:17Z"
+    }
+   },
+   {
+    "zona": "palisades",
+    "id": "I-405 : (367) Santa Monica Blvd",
+    "ruta": "I-405",
+    "lat": 34.04647,
+    "lon": -118.44664,
+    "sentido": "South",
+    "imagenEnDirecto": "https://cwwp2.dot.ca.gov/data/d7/cctv/image/i405367santamonicablvd/i405367santamonicablvd.jpg",
+    "video": null,
+    "serie": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "estado": "fuera de servicio (el operador sirve «Temporarily Unavailable»)",
+    "fuegoHistorico": {
+     "distMinKm": 3.5,
+     "a5km": "2025-01-08T02:51:17Z",
+     "a3km": null
+    }
+   },
+   {
+    "zona": "palisades",
+    "id": "SR-1 : (245) Bay Club Dr",
+    "ruta": "SR-1",
+    "lat": 34.039495,
+    "lon": -118.545745,
+    "sentido": "South",
+    "imagenEnDirecto": "https://cwwp2.dot.ca.gov/data/d7/cctv/image/sr1245bayclubdr/sr1245bayclubdr.jpg",
+    "video": {
+     "durS": 49.1,
+     "cruces": {
+      "baja": 0,
+      "sube": 0
+     },
+     "flujoVehH": 0,
+     "mediaEnImagen": 0,
+     "maxEnImagen": 1,
+     "seguidos": 1,
+     "velMedianaMovKmh": null,
+     "fraccionParados": null
+    },
+    "serie": [
+     0,
+     0,
+     2,
+     1,
+     1,
+     4,
+     0,
+     2,
+     0,
+     3,
+     5,
+     2,
+     2
+    ],
+    "estado": "en servicio",
+    "fuegoHistorico": {
+     "distMinKm": 1.3,
+     "a5km": "2025-01-07T18:31:17Z",
+     "a3km": "2025-01-07T18:31:17Z"
+    }
+   },
+   {
+    "zona": "eaton",
+    "id": "I-210 : (448) Marengo",
+    "ruta": "I-210",
+    "lat": 34.15136,
+    "lon": -118.14626,
+    "sentido": "East",
+    "imagenEnDirecto": "https://cwwp2.dot.ca.gov/data/d7/cctv/image/i210448marengo/i210448marengo.jpg",
+    "video": null,
+    "serie": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "estado": "fuera de servicio (el operador sirve «Temporarily Unavailable»)",
+    "fuegoHistorico": {
+     "distMinKm": 2.7,
+     "a5km": "2025-01-08T02:31:17Z",
+     "a3km": "2025-01-08T10:11:17Z"
+    }
+   },
+   {
+    "zona": "eaton",
+    "id": "I-210 : (449) Lake Ave",
+    "ruta": "I-210",
+    "lat": 34.1515,
+    "lon": -118.13393,
+    "sentido": "East",
+    "imagenEnDirecto": "https://cwwp2.dot.ca.gov/data/d7/cctv/image/i210449lakeave/i210449lakeave.jpg",
+    "video": {
+     "durS": 38.6,
+     "cruces": {
+      "baja": 33,
+      "sube": 1
+     },
+     "flujoVehH": 3173,
+     "mediaEnImagen": 6.1,
+     "maxEnImagen": 12,
+     "seguidos": 76,
+     "velMedianaMovKmh": 13.5,
+     "fraccionParados": 0
+    },
+    "serie": [
+     15,
+     16,
+     15,
+     11,
+     17,
+     14,
+     17,
+     21,
+     20,
+     24,
+     24,
+     17,
+     15
+    ],
+    "estado": "en servicio",
+    "fuegoHistorico": {
+     "distMinKm": 2.7,
+     "a5km": "2025-01-08T02:31:17Z",
+     "a3km": "2025-01-08T10:11:17Z"
+    }
+   },
+   {
+    "zona": "eaton",
+    "id": "SR-134 : (668) Orange Grove",
+    "ruta": "SR-134",
+    "lat": 34.147,
+    "lon": -118.1595,
+    "sentido": "East",
+    "imagenEnDirecto": "https://cwwp2.dot.ca.gov/data/d7/cctv/image/sr134668orangegrove/sr134668orangegrove.jpg",
+    "video": null,
+    "serie": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "estado": "fuera de servicio (el operador sirve «Temporarily Unavailable»)",
+    "fuegoHistorico": {
+     "distMinKm": 3.1,
+     "a5km": "2025-01-08T10:11:17Z",
+     "a3km": "2025-01-08T12:41:17Z"
+    }
+   },
+   {
+    "zona": "eaton",
+    "id": "I-210 : (754) Hill-Maple",
+    "ruta": "I-210",
+    "lat": 34.1543,
+    "lon": -118.1306,
+    "sentido": "West",
+    "imagenEnDirecto": "https://cwwp2.dot.ca.gov/data/d7/cctv/image/i210754hillmaple/i210754hillmaple.jpg",
+    "video": null,
+    "serie": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "estado": "fuera de servicio (el operador sirve «Temporarily Unavailable»)",
+    "fuegoHistorico": {
+     "distMinKm": 2.3,
+     "a5km": "2025-01-08T02:31:17Z",
+     "a3km": "2025-01-08T10:11:17Z"
+    }
+   }
+  ]
+ },
+ "camaras": {
+  "fuente": "TfL JamCams (Powered by TfL Open Data), clips de ≈ 10 s descargados del bucket público el 06-11-2026 a las 00:31 hora de Londres (de noche). Detección YOLOX-s (Apache 2.0) + ByteTrack; sin identificar personas ni matrículas.",
+  "captura": "2026-11-06T00:31Z",
+  "total": {
+   "cruces": 21,
+   "segundos": 125.2,
+   "porHora": 604
+  },
+  "ruido": [
+   {
+    "camara": "00001.01441",
+    "nombre": "Stamford Hill/Dunsmure Road",
+    "meanInFrame": 1.08,
+    "sdInFrame": 1.04,
+    "ratePerMin": 5.49,
+    "rateSdPerMin": 5.49
+   },
+   {
+    "camara": "00001.02158",
+    "nombre": "Romford Rd / Carlton Rd",
+    "meanInFrame": 1.3,
+    "sdInFrame": 1.14,
+    "ratePerMin": 11.45,
+    "rateSdPerMin": 8.1
+   },
+   {
+    "camara": "00001.02425",
+    "nombre": "A12 Eastern Avenue/A125 North St",
+    "meanInFrame": 1.17,
+    "sdInFrame": 1.08,
+    "ratePerMin": 0,
+    "rateSdPerMin": 5.79
+   },
+   {
+    "camara": "00001.03612",
+    "nombre": "St Georges Rd/Hayles St",
+    "meanInFrame": 1.99,
+    "sdInFrame": 1.41,
+    "ratePerMin": 0,
+    "rateSdPerMin": 5.56
+   },
+   {
+    "camara": "00001.03752",
+    "nombre": "Catford One Way/Rushey Green",
+    "meanInFrame": 2.18,
+    "sdInFrame": 1.48,
+    "ratePerMin": 33.83,
+    "rateSdPerMin": 13.81
+   },
+   {
+    "camara": "00001.03850",
+    "nombre": "Walworth Rd/Heygate St",
+    "meanInFrame": 2.47,
+    "sdInFrame": 1.57,
+    "ratePerMin": 0,
+    "rateSdPerMin": 5.45
+   },
+   {
+    "camara": "00001.04333",
+    "nombre": "Camberwell New Rd/Foxley Rd",
+    "meanInFrame": 0.71,
+    "sdInFrame": 0.84,
+    "ratePerMin": 11.49,
+    "rateSdPerMin": 8.13
+   },
+   {
+    "camara": "00001.04516",
+    "nombre": "A23 Streatham H Rd/Greyhound Ln",
+    "meanInFrame": 1.18,
+    "sdInFrame": 1.09,
+    "ratePerMin": 5.49,
+    "rateSdPerMin": 5.49
+   },
+   {
+    "camara": "00001.04573",
+    "nombre": "Brighton Rd A23 Coulsdon Bypass",
+    "meanInFrame": 0,
+    "sdInFrame": 0.5,
+    "ratePerMin": 0,
+    "rateSdPerMin": 6.05
+   },
+   {
+    "camara": "00001.04650",
+    "nombre": "A3 Clapham Cmon Southside/Long Rd",
+    "meanInFrame": 0.73,
+    "sdInFrame": 0.85,
+    "ratePerMin": 18.22,
+    "rateSdPerMin": 10.52
+   },
+   {
+    "camara": "00001.05832",
+    "nombre": "Fulham BWay Wst of Harwood Rd",
+    "meanInFrame": 0.75,
+    "sdInFrame": 0.87,
+    "ratePerMin": 12.71,
+    "rateSdPerMin": 8.99
+   },
+   {
+    "camara": "00001.06590",
+    "nombre": "Strand/Lancaster Place",
+    "meanInFrame": 7.36,
+    "sdInFrame": 2.71,
+    "ratePerMin": 23.17,
+    "rateSdPerMin": 11.58
+   }
+  ]
+ }
+}

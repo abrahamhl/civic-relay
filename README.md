@@ -1,3 +1,37 @@
+# SENDA — Sistema de Enrutamiento de Emergencia por canales alternativos
+
+*(antes Civic Relay / OEP)* · **Si existe un camino hasta tu gente, SENDA lo encuentra.**
+
+**Objetivo de diseño** (sin medir aún en campo): que un mensaje llegue cuando la red cae. Para ello SENDA combinaría vecinos con la app (Bluetooth, Wi-Fi Direct), quien tenga Internet por satélite u otro operador, SMS, satélite directo al móvil y pasarelas, y elegiría en cada momento la ruta más rápida. El satélite directo al móvil solo cuenta donde exista: en España no consta lanzamiento comercial de Starlink directo al móvil, y Skylo da SOS y texto en móviles compatibles ([fuentes](docs/research/PLATAFORMAS_AVIACION_SATELITE_2026-11-14.md)). **Probado hoy en navegador:** mensaje cifrado de ≤ 160 caracteres, paso por sonido entre dos móviles y llamada por red local. Bluetooth y Wi-Fi Direct están modelados en el núcleo, pero no validados en dispositivos. Cuando una autoridad declara una zona de emergencia (o la red de teléfonos detecta un sismo corroborado), los teléfonos con SENDA pasan a **modo relé preautorizado**. El núcleo incluye modelos y simulaciones (declaradas como tales) de coordinación de familias e instituciones, de puente para personas atrapadas bajo escombros y de localización con Wi-Fi CSI. No hay validación física.
+
+### 🏔️ Sobrevuelo con datos reales · Langtang, Nepal (`/senda/vuelo`)
+
+![Sobrevuelo 3D del colapso de Langtang con relieve Copernicus y Sentinel-2](docs/media/consola/vuelo-nepal.png)
+
+El sobrevuelo combina datos reales:
+- la señal sísmica del colapso catalogada por USGS ([us7000tbwb](https://earthquake.usgs.gov/earthquakes/eventpage/us7000tbwb), M 5,2, tipo «landslide», 26-08-2026 02:52 UTC);
+- imágenes Sentinel-2 de antes (12-08) y de después (26-10);
+- el relieve Copernicus DEM GLO-30.
+
+Se suman dos elementos calculados por SENDA: un cambio detectado por NDVI, que **no es un mapa oficial de daños**, y una ruta de 44,6 km que sigue ese cambio. Detalles y límites en [docs/research/NEPAL_LANGTANG_2026-08-26.md](docs/research/NEPAL_LANGTANG_2026-08-26.md). Vídeo: [`SENDA-nepal-sobrevuelo.mp4`](investor-next/public/media/senda-demo/SENDA-nepal-sobrevuelo.mp4).
+
+### 🌍 Consola de situación (`/senda/consola`)
+
+![SENDA Consola: situación fusionada con evidencia de varias fuentes](docs/media/consola/c-sel.png)
+
+| Calor | Columnas 3D | Plano | Muro de vídeo |
+|---|---|---|---|
+| ![calor](docs/media/consola/c-calor.png) | ![columnas](docs/media/consola/c-columnas.png) | ![plano](docs/media/consola/c-plano.png) | ![muro](docs/media/consola/c-muro.png) |
+
+En la consola se ven 16.699 elementos reales y fechados, con su fuente y licencia: GDACS, DGT, NDW, ADS-B (adsb.lol), NOAA GOES-16, TfL y Caltrans. El motor `fusion.mjs` los cruza y forma situaciones: cada una tiene un ancla y la evidencia de las demás capas, con su procedencia. Lo simulado lleva la etiqueta SIMULACIÓN. Son fotos de datos, no tiempo real. Vídeo de la consola: [`SENDA-consola-promo.mp4`](investor-next/public/media/senda-demo/SENDA-consola-promo.mp4) (89 s, grabado de la app real).
+
+- **Empieza aquí:** [`entrega/LEEME_PRIMERO.md`](entrega/LEEME_PRIMERO.md) (carpeta autocontenida: web para Hostinger, zips y guía) · traspaso para otra IA: [docs/handoff/HANDOFF_COMPLETO_2026-11-05.md](docs/handoff/HANDOFF_COMPLETO_2026-11-05.md) · financiación: [docs/financiacion/RONDA_FINANCIACION_2026-11-05.md](docs/financiacion/RONDA_FINANCIACION_2026-11-05.md) · paper: [docs/paper/SENDA_FUEGO3D_paper.md](docs/paper/SENDA_FUEGO3D_paper.md) · v0.20, incendios de referencia y coches + cámaras + fuego: [docs/research/REFERENCIAS_COCHES_CAMARAS_2026-11-06.md](docs/research/REFERENCIAS_COCHES_CAMARAS_2026-11-06.md)
+- **Visión vigente:** [docs/product/SENDA_VISION_2026-11-04.md](docs/product/SENDA_VISION_2026-11-04.md)
+- **Núcleo:** [`packages/senda`](packages/senda) — `pnpm --filter @senda/core test` · `pnpm --filter @senda/core evidence`
+- **Evidencia de escenarios:** [`evidence/senda/scenarios.json`](evidence/senda/scenarios.json)
+
+---
+
 # OEP / Civic Relay — Offline Emergency Protocol
 
 **Plataforma europea modular de anticipación de riesgos, continuidad de comunicaciones y coordinación de personas, equipos e infraestructuras.** Civic Relay persigue esta visión mediante OEP, adaptadores autorizados y una cadena de evidencia que distingue observación, predicción, custodia y confirmación. El software actual es un laboratorio de investigación; el programa completo requiere validación física y socios.
@@ -13,6 +47,20 @@
 > **Fuente verificable:** [estado del CTO](docs/audits/LATEST_ENGINEERING_STATUS.md), [registro de evidencias](docs/investor/EVIDENCE_REGISTER.md) y [PR #8 (fiabilidad experimental)](https://github.com/abrahamhl/civic-relay/pull/8). Verificar SHA y CI exactos antes de enviar un dossier.
 
 ---
+
+### 🌊📡💧 Tres motores sobre datos reales (17-11-2026)
+
+Los tres se calculan en el navegador y cada cifra sale de ejecutar el código del repositorio sobre los ficheros de `investor-next/public/senda/data/`.
+
+| Motor | Qué responde | Datos | Naturaleza del resultado |
+|---|---|---|---|
+| **Aislamiento por inundación** (`/senda/aislamiento`) | Qué cruces secos se quedan sin camino a un hospital, centro de salud, bomberos o policía | Agua observada por Copernicus EMS (EMSR773, 30 y 31-10-2024) y calles de OpenStreetMap | Cálculo sobre datos observados; la regla de corte es un escenario declarado |
+| **Planificador de radio** (`/senda/radio`) | Dónde poner repetidores de baja potencia si cae la red móvil | Copernicus DEM GLO-30 de la cuenca del Poyo | **Modelo** (espacio libre + ITU-R P.526); no es una medida de campo |
+| **Agua en Países Bajos** (`/senda/agua-nl`) | Qué estaciones suben y cuánto tarda la onda de una a otra | 25 estaciones de Rijkswaterstaat: 28 días de medidas y previsión oficial | Medido; las reglas de atención son de SENDA, no alarmas oficiales |
+
+![Aislamiento por inundación en l'Horta Sud](docs/media/nuevos/aislamiento-horta-sud.png)
+
+Límites: el satélite no delimitó agua dentro de los cascos urbanos densos, así que el aislamiento se queda corto ahí; el plan de radio es terreno desnudo y necesita medida de campo; el agua es una foto fija del 17-11-2026 sin umbrales oficiales. Detalle y fuentes en `docs/propuesta/PROPUESTA_GOBIERNOS_ES_NL_2026-11.md` y `docs/financiacion/RUTAS_FINANCIACION_ES_NL_UE_2026-11.md`.
 
 ## Transparencia del uso de inteligencia artificial
 
@@ -104,11 +152,11 @@ Servir la demo estática desde `apps/web/dist`. La API y el servicio reales **no
 - [`docs/investor/TRL_AND_VALIDATION_ROADMAP.md`](docs/investor/TRL_AND_VALIDATION_ROADMAP.md) – evaluación TRL y hoja de ruta M0–M4
 - [`docs/investor/PILOT_PROPOSAL.md`](docs/investor/PILOT_PROPOSAL.md) – propuesta de piloto controlado de 12 semanas
 - [`docs/investor/FUNDING_OPPORTUNITIES.md`](docs/investor/FUNDING_OPPORTUNITIES.md) – convocatorias verificadas UE / Países Bajos (Horizon Europe Cluster 3, NLnet/NGI, RVO WBSO/MIT)
-- [`docs/investor/FINANCIAL_SCENARIOS.md`](docs/investor/FINANCIAL_SCENARIOS.md) – escenarios financieros (€50k / €180k / €400k)
+- [`docs/investor/FINANCIAL_SCENARIOS.md`](docs/investor/FINANCIAL_SCENARIOS.md) – escenarios financieros **ilustrativos**, no previsiones (€50k / €180k / €400k)
 - [`docs/security/THREAT_MODEL.md`](docs/security/THREAT_MODEL.md) – modelo de amenazas y controles implementados
 - [`docs/security/DEPENDENCY_AND_LICENSE_AUDIT.md`](docs/security/DEPENDENCY_AND_LICENSE_AUDIT.md) – auditoría de dependencias y licencias (MIT)
 - [`docs/security/DATA_AND_CONSENT_BOUNDARIES.md`](docs/security/DATA_AND_CONSENT_BOUNDARIES.md) – privacidad, consentimiento opt-in y purga local
-- [`docs/audits/SIX_ORACLE_INDEPENDENT_REVIEWS_2026.md`](docs/audits/SIX_ORACLE_INDEPENDENT_REVIEWS_2026.md) – revisión independiente de 6 perspectivas de ingeniería
+- [`docs/audits/SIX_ORACLE_INDEPENDENT_REVIEWS_2026.md`](docs/audits/SIX_ORACLE_INDEPENDENT_REVIEWS_2026.md) – revisión en 6 perspectivas de ingeniería **hecha por asistentes de IA en distintos roles**: no es una auditoría independiente humana
 - [`docs/audits/INVESTOR_READINESS_STATUS.md`](docs/audits/INVESTOR_READINESS_STATUS.md) – estado integral de preparación e invariantes verificados
 - [`docs/audits/HUMAN_ACTION_REQUIRED.md`](docs/audits/HUMAN_ACTION_REQUIRED.md) – protocolo físico pendiente con 2 teléfonos Android (`PHYSICAL_TEST_PENDING`)
 - [`docs/AUDITORIAS_INVERSION_PUBLICA.md`](docs/AUDITORIAS_INVERSION_PUBLICA.md) – cinco auditorías técnicas y delegaciones de responsabilidad

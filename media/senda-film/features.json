@@ -1,0 +1,222 @@
+{
+ "note": "SENDA · vídeo de capacidades v0.12 (español). Las escenas «page» se graban desde las propias páginas de la app (?film=1) con el núcleo real.",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "f0",
+   "visual": {
+    "kind": "arch3d"
+   },
+   "title": {
+    "es": "Una arquitectura, cualquier plataforma"
+   },
+   "es": [
+    "Esto es lo nuevo de SENDA. El mismo núcleo funciona en un móvil, en un ordenador, en el servidor de un organismo y a bordo de un dron o de un vehículo de emergencias.",
+    "Cada integración declara su permiso. Lo pasivo es legal desde hoy: datos abiertos, emisiones públicas y marcas visibles como los aerogeneradores. Lo que requiere convenio queda preparado. Y lo prohibido, como entrar en sistemas ajenos, no se hace nunca.",
+    "Así SENDA aprovecha todo lo disponible desde el primer día y está lista para crecer cuando se concedan accesos."
+   ],
+   "es_say": [
+    "Esto es lo nuevo de Senda. El mismo núcleo funciona en un móvil, en un ordenador, en el servidor de un organismo y a bordo de un dron o de un vehículo de emergencias.",
+    "Cada integración declara su permiso. Lo pasivo es legal desde hoy: datos abiertos, emisiones públicas y marcas visibles como los aerogeneradores. Lo que requiere convenio queda preparado. Y lo prohibido, como entrar en sistemas ajenos, no se hace nunca.",
+    "Así Senda aprovecha todo lo disponible desde el primer día y está lista para crecer cuando se concedan accesos."
+   ]
+  },
+  {
+   "id": "f1",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/sentidos?film=1&viz=coral"
+   },
+   "title": {
+    "es": "Ver los sonidos"
+   },
+   "es": [
+    "Bajo los escombros, una persona da golpes. Cinco móviles alrededor los oyen, cada uno en un instante distinto.",
+    "Primero, un pitido de sincronía corrige los relojes de los móviles, que nunca coinciden. Después, con las diferencias de llegada, SENDA calcula de dónde vino el golpe.",
+    "En esta simulación, el error es de unos diez centímetros; sin sincronía, serían metros. En escombros reales el resultado será una zona, no un punto."
+   ],
+   "es_say": [
+    "Bajo los escombros, una persona da golpes. Cinco móviles alrededor los oyen, cada uno en un instante distinto.",
+    "Primero, un pitido de sincronía corrige los relojes de los móviles, que nunca coinciden. Después, con las diferencias de llegada, Senda calcula de dónde vino el golpe.",
+    "En esta simulación, el error es de unos diez centímetros; sin sincronía, serían metros. En escombros reales el resultado será una zona, no un punto."
+   ]
+  },
+  {
+   "id": "f2",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/sentidos?film=1&viz=arva"
+   },
+   "title": {
+    "es": "Oír la radio"
+   },
+   "es": [
+    "Los detectores de víctimas de avalancha guían con pitidos. SENDA hace lo mismo con la baliza Bluetooth del móvil de una persona atrapada.",
+    "Filtra la intensidad de la señal, estima la distancia con un margen honesto, porque los muros y los cuerpos atenúan, y acelera los pitidos a medida que el rescatador se acerca."
+   ],
+   "es_say": [
+    "Los detectores de víctimas de avalancha guían con pitidos. Senda hace lo mismo con la baliza Blutuz del móvil de una persona atrapada.",
+    "Filtra la intensidad de la señal, estima la distancia con un margen honesto, porque los muros y los cuerpos atenúan, y acelera los pitidos a medida que el rescatador se acerca."
+   ]
+  },
+  {
+   "id": "f3",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/sentidos?film=1&viz=respira"
+   },
+   "title": {
+    "es": "Ver la respiración"
+   },
+   "es": [
+    "Al respirar, el pecho se mueve unos milímetros. Dos placas Wi-Fi de pocos euros notan cómo cambia la señal entre ellas.",
+    "SENDA elige las frecuencias más sensibles, filtra y busca el ritmo de la respiración: aquí, catorce por minuto. Con la habitación vacía, no detecta nada.",
+    "Está validado en condiciones controladas. A través de muros todavía no hay validación independiente, y así lo decimos."
+   ],
+   "es_say": [
+    "Al respirar, el pecho se mueve unos milímetros. Dos placas uifi de pocos euros notan cómo cambia la señal entre ellas.",
+    "Senda elige las frecuencias más sensibles, filtra y busca el ritmo de la respiración: aquí, catorce por minuto. Con la habitación vacía, no detecta nada.",
+    "Está validado en condiciones controladas. A través de muros todavía no hay validación independiente, y así lo decimos."
+   ]
+  },
+  {
+   "id": "f4",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/agua?film=1&viz=riada"
+   },
+   "title": {
+    "es": "El agua que viene de donde no estás"
+   },
+   "es": [
+    "En la DANA de Valencia y en el valle del Ahr, la lluvia extrema cayó aguas arriba, y en muchos pueblos que se inundaron apenas llovía.",
+    "SENDA convierte la lluvia en caudal con hidrología clásica, tiene en cuenta los embalses y vigila la velocidad de subida aguas arriba.",
+    "En este escenario sintético, el aviso sale dos horas y media antes de que se desborde el primer pueblo, donde solo han caído tres litros por metro cuadrado."
+   ],
+   "es_say": [
+    "En la dana de Valencia y en el valle del Ahr, la lluvia extrema cayó aguas arriba, y en muchos pueblos que se inundaron apenas llovía.",
+    "Senda convierte la lluvia en caudal con hidrología clásica, tiene en cuenta los embalses y vigila la velocidad de subida aguas arriba.",
+    "En este escenario sintético, el aviso sale dos horas y media antes de que se desborde el primer pueblo, donde solo han caído tres litros por metro cuadrado."
+   ]
+  },
+  {
+   "id": "f5",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/agua?film=1&viz=maremoto"
+   },
+   "title": {
+    "es": "Maremoto: subir antes que huir"
+   },
+   "es": [
+    "La velocidad de un maremoto depende de la profundidad del mar: en alta mar va a unos setecientos kilómetros por hora, y cerca de la costa se frena y crece.",
+    "SENDA calcula cuándo llega a cada costa y lo compara con lo que tarda cada persona en ponerse a salvo. Con poco margen, subir a una tercera planta salva más que huir lejos."
+   ],
+   "es_say": [
+    "La velocidad de un maremoto depende de la profundidad del mar: en alta mar va a unos setecientos kilómetros por hora, y cerca de la costa se frena y crece.",
+    "Senda calcula cuándo llega a cada costa y lo compara con lo que tarda cada persona en ponerse a salvo. Con poco margen, subir a una tercera planta salva más que huir lejos."
+   ]
+  },
+  {
+   "id": "f6",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/triaje?film=1&viz=triaje"
+   },
+   "title": {
+    "es": "Triaje para cualquiera"
+   },
+   "es": [
+    "En una catástrofe, el primero en llegar suele ser un vecino. SENDA le guía con el método internacional de triaje: camina, respira, circulación y responde.",
+    "Le dice qué hacer mientras llega la ayuda y qué servicio hace falta, con el 112 siempre primero, y prepara un parte que cabe en un SMS. Nunca declara a nadie fallecido."
+   ],
+   "es_say": [
+    "En una catástrofe, el primero en llegar suele ser un vecino. Senda le guía con el método internacional de triaje: camina, respira, circulación y responde.",
+    "Le dice qué hacer mientras llega la ayuda y qué servicio hace falta, con el uno uno dos siempre primero, y prepara un parte que cabe en un ese eme ese. Nunca declara a nadie fallecido."
+   ]
+  },
+  {
+   "id": "f7",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/monte?film=1&viz=monte"
+   },
+   "title": {
+    "es": "Perdido en el monte"
+   },
+   "es": [
+    "Sin cobertura, los aerogeneradores siguen ahí: se ven a kilómetros y de noche llevan luces rojas. Sus coordenadas son públicas.",
+    "Apunta el móvil a dos o tres marcas conocidas: la brújula da el rumbo y SENDA calcula tu posición con su margen de error, sin emitir nada.",
+    "Después la mantiene contando pasos, y envía el SOS por satélite cuando pasa uno útil."
+   ],
+   "es_say": [
+    "Sin cobertura, los aerogeneradores siguen ahí: se ven a kilómetros y de noche llevan luces rojas. Sus coordenadas son públicas.",
+    "Apunta el móvil a dos o tres marcas conocidas: la brújula da el rumbo y Senda calcula tu posición con su margen de error, sin emitir nada.",
+    "Después la mantiene contando pasos, y envía el ese o ese por satélite cuando pasa uno útil."
+   ]
+  },
+  {
+   "id": "f8",
+   "visual": {
+    "kind": "page",
+    "src": "/senda/barrido?film=1&viz=barrido"
+   },
+   "title": {
+    "es": "Dron casa por casa"
+   },
+   "es": [
+    "Tras un terremoto hay decenas de edificios y muy pocos drones. SENDA ordena las casas para volar lo mínimo y parte la ruta según la batería.",
+    "En cada casa, el dron rodea la fachada, escucha el Bluetooth y hace una pasada térmica. El resultado es un tablero de prioridad: personas probables por daño del edificio."
+   ],
+   "es_say": [
+    "Tras un terremoto hay decenas de edificios y muy pocos drones. Senda ordena las casas para volar lo mínimo y parte la ruta según la batería.",
+    "En cada casa, el dron rodea la fachada, escucha el Blutuz y hace una pasada térmica. El resultado es un tablero de prioridad: personas probables por daño del edificio."
+   ]
+  },
+  {
+   "id": "f9",
+   "visual": {
+    "kind": "verify"
+   },
+   "title": {
+    "es": "Lo que ya funciona y lo que falta"
+   },
+   "es": [
+    "Todo esto se comprueba por máquina en cada cambio: ciento cuarenta y seis pruebas del núcleo y treinta y siete comprobaciones en navegadores reales, casi todas con la red cortada.",
+    "Lo que falta, lo decimos: ensayos con dispositivos físicos, una auditoría de seguridad independiente y los primeros pilotos con equipos de emergencia."
+   ],
+   "es_say": [
+    "Todo esto se comprueba por máquina en cada cambio: ciento cuarenta y seis pruebas del núcleo y treinta y siete comprobaciones en navegadores reales, casi todas con la red cortada.",
+    "Lo que falta, lo decimos: ensayos con dispositivos físicos, una auditoría de seguridad independiente y los primeros pilotos con equipos de emergencia."
+   ]
+  },
+  {
+   "id": "f10",
+   "visual": {
+    "kind": "cta"
+   },
+   "title": {
+    "es": "Pruébalo en la web"
+   },
+   "es": [
+    "Todas estas pantallas funcionan ya en la web, sin instalar nada y sin red después de la primera visita.",
+    "SENDA: para que ningún mensaje se pierda."
+   ],
+   "es_say": [
+    "Todas estas pantallas funcionan ya en la web, sin instalar nada y sin red después de la primera visita.",
+    "Senda: para que ningún mensaje se pierda."
+   ]
+  }
+ ]
+}

@@ -1,5 +1,7 @@
 # Six Independent Specialist Reviews — OEP / Civic Relay (21 October 2026)
 
+> **Nota de veracidad (14-11-2026, `CLAUDE.md` §1):** los «especialistas independientes» de este documento son roles simulados por asistentes de IA, no personas ni una firma auditora. Sus conclusiones apuntan a código y pruebas que se pueden inspeccionar, pero **no equivalen a una auditoría independiente** y no deben presentarse así a inversores.
+
 > **Execution Contract:** Five independent domain specialist evaluations followed by the Principal Engineering Integrator synthesis (`Oracle 6`). Every finding is tied to inspectable repository code, automated test runs, or real Playwright Chromium browser evidence.
 
 ---

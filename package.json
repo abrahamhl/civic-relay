@@ -10,7 +10,8 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "pnpm -r type-check",
-    "type-check": "pnpm -r type-check"
+    "type-check": "pnpm -r type-check",
+    "manifest": "node scripts/release-manifest.mjs"
   },
   "keywords": [
     "crisis",

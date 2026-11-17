@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Riadas y maremotos</title>
+<meta name="description" content="El agua que viene de donde no estás: SENDA vigila la subida aguas arriba para avisar horas antes a pueblos donde apenas llueve, y calcula cuándo llega un maremoto a cada costa.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/arquitectura">Arquitectura</a> · <a href="/senda/incendio">Incendio</a> · <a href="/senda/sentidos">Sentidos</a> · <a href="/senda/monte">Monte</a></p>
+<h1>Riadas y maremotos: el agua que viene de donde no estás</h1>
+<p class="lead m">En la DANA de octubre de 2024 en Valencia (224 fallecidos según el último recuento oficial publicado) y en el valle del Ahr en 2021 (134 fallecidos allí, 190 en Alemania), la lluvia extrema cayó <b>aguas arriba</b>. En muchos pueblos que se inundaron apenas llovía. Un umbral fijo en el propio pueblo avisa tarde; <b>la velocidad de subida aguas arriba avisa horas antes</b>. SENDA lo calcula en el móvil con hidrología clásica y lo reparte por todos los canales, también sin cobertura.</p>
+
+<section class="card" data-viz="riada" style="margin-top:14px" aria-labelledby="h-r">
+  <h2 id="h-r">🌧️ Riada: aviso por la subida aguas arriba</h2>
+  <div class="g2" style="margin-top:0">
+    <div><canvas id="cv-riada" aria-label="Esquema de una cuenca con tormenta en cabecera, embalse en un afluente y dos pueblos aguas abajo, con el hidrograma y las alarmas"></canvas>
+      <div class="row"><label class="m">Hora <input type="range" id="r-t" min="0" max="24" step="0.1" value="12" aria-label="Hora del escenario"></label><button id="r-play" class="p">▶ Reproducir</button></div></div>
+    <div>
+      <div class="kv" style="grid-template-columns:repeat(2,1fr)" id="r-kv"></div>
+      <p class="m" style="font-size:14px">Cómo calcula, todo en el teléfono:</p>
+      <ol class="m" style="font-size:14px;padding-left:20px;margin:0">
+        <li><b>Lluvia → caudal:</b> hidrograma unitario de Nash, una cascada de embalses lineales que conserva el volumen (1 mm sobre 1 km² son 1000 m³).</li>
+        <li><b>Embalse:</b> balance de volumen; si se llena, vierte el exceso.</li>
+        <li><b>Río abajo:</b> retardo de la onda hasta cada pueblo.</li>
+        <li><b>Alarma por subida:</b> si el caudal aguas arriba sube muy deprisa y, a ese ritmo, superará el nivel de desbordamiento, el aviso sale ya, horas antes de que el agua llegue.</li>
+      </ol>
+      <div class="note">Escenario <b>sintético</b>, inspirado en el patrón documentado (tormenta estacionaria en la cabecera, poca lluvia en los pueblos). No reproduce ninguna cuenca real. Datos reales previstos: AEMET OpenData (clave gratuita) y SAIH de cada confederación (acceso por verificar o por convenio).</div>
+    </div>
+  </div>
+</section>
+
+<section class="card" data-viz="maremoto" style="margin-top:14px" aria-labelledby="h-m">
+  <h2 id="h-m">🌊 Maremoto: cuánto tarda y adónde subir</h2>
+  <div class="g2" style="margin-top:0">
+    <div><canvas id="cv-mar" aria-label="Golfo de Cádiz con la onda del maremoto avanzando desde el suroeste del cabo de San Vicente y los minutos de llegada a cada costa"></canvas></div>
+    <div><p class="m" style="margin-top:0">La velocidad de un maremoto depende solo de la profundidad del mar: <b>c = √(g·h)</b>. A 4000 m de profundidad va a unos 700 km/h; cerca de la costa se frena y crece. SENDA suma los tramos del perfil de profundidad hasta cada costa y compara el tiempo de llegada con lo que tarda cada persona en ponerse a salvo.</p>
+      <div class="tw"><table><thead><tr><th>Costa</th><th>Llega en</th></tr></thead><tbody id="m-tb"></tbody></table></div>
+      <div class="tw" style="margin-top:10px"><table><thead><tr><th>Persona</th><th>Alejarse a una cota segura</th><th>Subir a una 3.ª planta o más</th></tr></thead><tbody id="m-pp"></tbody></table></div>
+      <div class="note">Lección: con poco margen, <b>subir en vertical</b> a un edificio sólido cercano salva más que huir lejos. Fuente sísmica de 1755 (suroeste del cabo de San Vicente) como referencia; los perfiles de profundidad son ilustrativos.</div></div>
+  </div>
+</section>
+<p class="src">Fuentes: cifra de la DANA según el Centro de Integración de Datos, recogida por la prensa; Ahr: Natural Hazards and Earth System Sciences (2025); AEMET OpenData (clave gratuita). Código: <code>flood-watch.mjs</code>.</p>
+</main>
+<script type="module">
+import { $, C, canvas, text, rr, run, clamp, ease, FILM } from '/senda/kit.mjs';
+import { floodScenario, tsunamiScenario, tsunamiSpeed } from '/senda/core/flood-watch.mjs';
+const fmt = (x, d = 0) => x.toFixed(d).replace('.', ',');
+const S = floodScenario(), T = tsunamiScenario(), W = 640, H = 600, hhmm = (min) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(Math.round(min % 60)).padStart(2, '0')}`;
+window.SENDA_AGUA = { result: S.result, up: S.up, coasts: T.coasts.map((c) => ({ id: c.id, etaMin: c.etaMin })), people: T.people };
+$('#r-kv').innerHTML = S.result.map((r) => `<div><b>${Math.floor(r.leadMin / 60)} h ${r.leadMin % 60} min</b><span>de margen en ${r.name} (allí solo caen ${fmt(r.localRainMm, 0)} mm)</span></div>`).join('') + `<div><b>${S.headTotalMm} mm</b><span>en 5 h en la cabecera</span></div><div><b>${hhmm(S.up.riseMin)}</b><span>salta la alarma por subida (el umbral, a las ${hhmm(S.up.thresholdMin)})</span></div>`;
+$('#m-tb').innerHTML = T.coasts.map((c) => `<tr><td>${c.name}</td><td><b>${fmt(c.etaMin, 0)} min</b></td></tr>`).join('');
+$('#m-pp').innerHTML = T.people.map((p) => `<tr><td>${p.who}</td><td>${fmt(p.highGroundMin, 0)} min</td><td><b>${fmt(p.verticalMin, 0)} min</b></td></tr>`).join('');
+
+let playing = true, manual = null;
+$('#r-t').oninput = (e) => { manual = +e.target.value; playing = false; $('#r-play').textContent = '▶ Reproducir'; };
+$('#r-play').onclick = () => { playing = !playing; manual = playing ? null : manual; $('#r-play').textContent = playing ? '❚❚ Pausa' : '▶ Reproducir'; };
+$('#r-play').textContent = '❚❚ Pausa';
+
+const gr = canvas($('#cv-riada'));
+const series = [{ s: S.gaugeUp, c: C.i, n: 'Aforo de cabecera' }, { s: S.towns[0].series, c: C.c, n: S.towns[0].name }, { s: S.towns[1].series, c: C.a, n: S.towns[1].name }];
+function drawRiada(t) {
+  const g = gr, hours = FILM ? clamp((t / 22) * 24, 0, 24) : manual ?? (t * 1.2) % 24, i = Math.min(S.gaugeUp.length - 1, Math.round((hours * 60) / S.dtMin)), min = hours * 60;
+  if (!FILM && manual == null) $('#r-t').value = hours.toFixed(1);
+  g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
+  // ---- esquema de la cuenca (arriba)
+  g.fillStyle = '#132a1f'; g.beginPath(); g.moveTo(20, 40); g.lineTo(250, 30); g.lineTo(300, 160); g.lineTo(40, 200); g.closePath(); g.fill();
+  g.fillStyle = '#1a2b22'; g.beginPath(); g.moveTo(330, 40); g.lineTo(560, 50); g.lineTo(520, 170); g.lineTo(360, 160); g.closePath(); g.fill();
+  text(g, 'Cabecera (300 km²)', 30, 58, { c: C.m, f: '12px Inter,system-ui' }); text(g, 'Afluente (420 km²)', 400, 68, { c: C.m, f: '12px Inter,system-ui' });
+  const rainAt = (arr) => arr[Math.min(arr.length - 1, i)] * (60 / S.dtMin);
+  for (const [cx, arr, w] of [[150, S.rain.head, 200], [450, S.rain.trib, 150], [560, S.rain.town, 60]]) {
+    const mmh = rainAt(arr); if (mmh > 0.5) { g.fillStyle = 'rgba(160,180,200,.85)'; g.beginPath(); g.ellipse(cx, 80, w / 2, 22, 0, 0, 7); g.fill(); g.strokeStyle = 'rgba(145,215,232,.7)'; g.lineWidth = 1.5; for (let k = 0; k < Math.min(30, mmh / 2); k++) { const x = cx - w / 2 + ((k * 37 + t * 60) % w), y = 100 + ((k * 23 + t * 140) % 60); g.beginPath(); g.moveTo(x, y); g.lineTo(x - 3, y + 9); g.stroke(); } text(g, `${fmt(mmh)} mm/h`, cx, 76, { c: '#05090c', f: '800 12px Inter,system-ui', al: 'center' }); }
+  }
+  const q = (s) => s[Math.min(s.length - 1, i)], wq = (v) => 2 + Math.min(14, v / 160);
+  g.strokeStyle = '#2f6f8f'; g.lineCap = 'round';
+  g.lineWidth = wq(q(S.gaugeUp)); g.beginPath(); g.moveTo(170, 170); g.quadraticCurveTo(220, 230, 240, 260); g.stroke();
+  g.lineWidth = wq(q(S.dam.outflow)); g.beginPath(); g.moveTo(450, 180); g.quadraticCurveTo(420, 230, 400, 262); g.stroke();
+  g.lineWidth = wq(q(S.towns[0].series)); g.beginPath(); g.moveTo(240, 260); g.lineTo(400, 262); g.stroke();
+  g.lineWidth = wq(q(S.towns[1].series)); g.beginPath(); g.moveTo(400, 262); g.lineTo(600, 265); g.stroke(); g.lineCap = 'butt';
+  // embalse
+  const fill = S.dam.fill[Math.min(S.dam.fill.length - 1, i)];
+  g.fillStyle = '#0f1d27'; g.fillRect(430, 170, 46, 26); g.fillStyle = fill >= 0.999 ? C.r : '#2f6f8f'; g.fillRect(430, 196 - 26 * fill, 46, 26 * fill); g.strokeStyle = C.m; g.strokeRect(430, 170, 46, 26);
+  text(g, `Embalse ${Math.round(fill * 100)} %${fill >= 0.999 ? ' · vierte' : ''}`, 482, 188, { c: fill >= 0.999 ? C.r : C.m, f: '11px Inter,system-ui' });
+  // aforo y pueblos
+  const alarmOn = min >= S.up.riseMin;
+  g.fillStyle = alarmOn ? C.e : C.l; g.beginPath(); g.arc(240, 260, 9, 0, 7); g.fill(); text(g, 'Aforo', 240, 288, { c: C.t, f: '700 12px Inter,system-ui', al: 'center' });
+  if (alarmOn) { const ph = (t * 1.5) % 1; g.strokeStyle = `rgba(52,211,153,${1 - ph})`; g.lineWidth = 2; g.beginPath(); g.arc(240, 260, 12 + ph * 28, 0, 7); g.stroke(); }
+  S.towns.forEach((tw, k) => { const x = k ? 600 : 400, over = min >= tw.thresholdMin; g.fillStyle = over ? C.r : alarmOn ? C.a : '#1d2c37'; rr(g, x - 26, 274, 52, 26, 6); g.fill(); text(g, k ? 'Pueblo B' : 'Pueblo A', x, 291, { c: '#05090c', f: '800 12px Inter,system-ui', al: 'center' }); text(g, over ? 'inundado' : alarmOn ? 'avisado' : 'sin aviso', x, 316, { c: over ? C.r : alarmOn ? C.a : C.m, f: '700 11px Inter,system-ui', al: 'center' }); });
+  // ---- hidrograma (abajo)
+  const x0 = 50, x1 = 620, y0 = 560, y1 = 350, maxQ = 2600, X = (m) => x0 + (m / (24 * 60)) * (x1 - x0), Y = (v) => y0 - (v / maxQ) * (y0 - y1);
+  g.strokeStyle = C.l; g.strokeRect(x0, y1, x1 - x0, y0 - y1);
+  for (let h = 0; h <= 24; h += 6) text(g, `${String(h).padStart(2, '0')}:00`, X(h * 60), y0 + 16, { c: C.m, f: '11px Inter,system-ui', al: 'center' });
+  text(g, 'Caudal (m³/s)', x0, y1 - 8, { c: C.m, f: '12px Inter,system-ui' });
+  g.setLineDash([5, 4]); g.strokeStyle = 'rgba(255,91,110,.6)'; g.beginPath(); g.moveTo(x0, Y(450)); g.lineTo(x1, Y(450)); g.stroke(); g.setLineDash([]); text(g, 'desborda el cauce del pueblo A', x1 - 4, Y(450) - 5, { c: C.r, f: '11px Inter,system-ui', al: 'right' });
+  series.forEach(({ s, c }) => { g.strokeStyle = c; g.lineWidth = 2.5; g.beginPath(); for (let k = 0; k <= Math.min(i, s.length - 1); k++) { const xx = X(k * S.dtMin), yy = Y(s[k]); k ? g.lineTo(xx, yy) : g.moveTo(xx, yy); } g.stroke(); });
+  series.forEach(({ c, n }, k) => { g.fillStyle = c; g.fillRect(x0 + 8 + k * 190, y1 + 10, 10, 10); text(g, n, x0 + 22 + k * 190, y1 + 19, { c: C.t, f: '11px Inter,system-ui' }); });
+  if (alarmOn) { g.strokeStyle = C.e; g.lineWidth = 2; g.beginPath(); g.moveTo(X(S.up.riseMin), y1); g.lineTo(X(S.up.riseMin), y0); g.stroke(); text(g, `${hhmm(S.up.riseMin)} alarma por subida`, X(S.up.riseMin) - 4, y1 + 40, { c: C.e, f: '700 12px Inter,system-ui', al: 'right' }); }
+  S.towns.forEach((tw, k) => { if (min >= tw.thresholdMin) { g.strokeStyle = k ? C.a : C.c; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(X(tw.thresholdMin), y1); g.lineTo(X(tw.thresholdMin), y0); g.stroke(); g.setLineDash([]); text(g, `${k ? 'B' : 'A'} se inunda ${hhmm(tw.thresholdMin)}`, X(tw.thresholdMin) + 4, y1 + 56 + k * 16, { c: k ? C.a : C.c, f: '700 11px Inter,system-ui' }); } });
+  g.strokeStyle = C.t; g.lineWidth = 1; g.beginPath(); g.moveTo(X(min), y1); g.lineTo(X(min), y0); g.stroke();
+  text(g, `${hhmm(min)} · en los pueblos: ${fmt(S.rain.town.slice(0, i + 1).reduce((a, b) => a + b, 0), 1)} mm caídos`, 20, 24, { c: C.t, f: '700 14px Inter,system-ui' });
+}
+
+const gm = canvas($('#cv-mar'));
+// esquema del golfo: costas como polilíneas (coordenadas ilustrativas en km)
+const KX = (x) => 30 + (x / 420) * 580, KY = (y) => 570 - (y / 400) * 520, SRC = { x: 70, y: 120 };
+const COAST = [[150, 400], [175, 300], [190, 230], [200, 205], [260, 215], [300, 225], [330, 240], [365, 225], [385, 205], [395, 160], [405, 120], [420, 100]];
+const AT = { faro: [200, 208], huelva: [300, 226], cadiz: [385, 200] };
+function drawMar(t) {
+  const g = gm, lt = FILM ? t : t % 16, minNow = clamp(lt / 12) * 70;
+  g.fillStyle = '#071a2a'; g.fillRect(0, 0, W, H);
+  // batimetría ilustrativa: tonos por profundidad
+  for (let k = 0; k < 6; k++) { g.fillStyle = `rgba(12,40,70,${0.15 + k * 0.08})`; g.beginPath(); g.ellipse(KX(SRC.x), KY(SRC.y), 80 + k * 70, 60 + k * 55, -0.4, 0, 7); g.fill(); }
+  const r0 = minNow * 6; g.strokeStyle = 'rgba(145,215,232,.5)'; g.lineWidth = 2; for (let k = 0; k < 3; k++) { const r = r0 - k * 18; if (r > 0) { g.beginPath(); g.ellipse(KX(SRC.x), KY(SRC.y), r, r * 0.85, -0.4, 0, 7); g.stroke(); } }
+  g.fillStyle = '#20301f'; g.beginPath(); g.moveTo(KX(COAST[0][0]), KY(COAST[0][1])); COAST.forEach(([x, y]) => g.lineTo(KX(x), KY(y))); g.lineTo(KX(420), KY(400)); g.closePath(); g.fill();
+  g.strokeStyle = '#3d5a3a'; g.lineWidth = 1.5; g.beginPath(); COAST.forEach(([x, y], k) => (k ? g.lineTo(KX(x), KY(y)) : g.moveTo(KX(x), KY(y)))); g.stroke();
+  text(g, 'PORTUGAL', KX(205), KY(300), { c: C.m, f: '700 12px Inter,system-ui' }); text(g, 'ESPAÑA', KX(330), KY(320), { c: C.m, f: '700 12px Inter,system-ui' }); text(g, 'Golfo de Cádiz', KX(250), KY(140), { c: '#5a7a99', f: '12px Inter,system-ui' });
+  T.coasts.forEach((c) => { const [x, y] = AT[c.id], f = clamp(minNow / c.etaMin), px = SRC.x + (x - SRC.x) * f, py = SRC.y + (y - SRC.y) * f;
+    g.strokeStyle = 'rgba(145,215,232,.3)'; g.setLineDash([4, 5]); g.beginPath(); g.moveTo(KX(SRC.x), KY(SRC.y)); g.lineTo(KX(x), KY(y)); g.stroke(); g.setLineDash([]);
+    g.fillStyle = f >= 1 ? C.r : C.i; g.beginPath(); g.arc(KX(px), KY(py), 6, 0, 7); g.fill();
+    const OFF = { faro: [-150, 6], huelva: [-70, -50], cadiz: [-118, 22] }[c.id], bx2 = KX(x) + OFF[0], by2 = KY(y) + OFF[1];
+    g.fillStyle = f >= 1 ? C.r : '#0b141c'; rr(g, bx2, by2, 134, 34, 8); g.fill(); g.strokeStyle = f >= 1 ? C.r : C.l; g.stroke();
+    text(g, c.name, bx2 + 8, by2 + 14, { c: f >= 1 ? '#05090c' : C.t, f: '700 11px Inter,system-ui' }); text(g, f >= 1 ? 'llega ahora' : `llega en ${Math.ceil(c.etaMin - minNow)} min`, bx2 + 8, by2 + 28, { c: f >= 1 ? '#05090c' : C.a, f: '700 11px Inter,system-ui' }); });
+  g.fillStyle = C.c; g.beginPath(); g.arc(KX(SRC.x), KY(SRC.y), 8, 0, 7); g.fill(); text(g, 'Sismo submarino', KX(SRC.x) + 12, KY(SRC.y) + 4, { c: C.c, f: '700 12px Inter,system-ui' });
+  text(g, `Minuto ${Math.floor(minNow)} tras el terremoto`, 20, 26, { c: C.t, f: '800 15px Inter,system-ui' });
+  text(g, `Velocidad: ${Math.round(tsunamiSpeed(3800) * 3.6)} km/h en alta mar · ${Math.round(tsunamiSpeed(15) * 3.6)} km/h a 15 m de fondo`, 20, 46, { c: C.m, f: '12px Inter,system-ui' });
+  const P = T.people, bx = 20, by = 500;
+  g.fillStyle = 'rgba(11,20,28,.92)'; rr(g, bx, by - 30, 600, 115, 12); g.fill(); g.strokeStyle = C.l; g.stroke();
+  text(g, 'Ponerse a salvo frente a la llegada a Cádiz', bx + 14, by - 10, { c: C.c, f: '700 12px Inter,system-ui' });
+  const cad = T.coasts.find((c) => c.id === 'cadiz').etaMin, SX = (m) => bx + 170 + (m / 70) * 410;
+  P.forEach((p, k) => { const y = by + 12 + k * 34; text(g, p.who, bx + 14, y + 4, { c: C.t, f: '12px Inter,system-ui' }); g.fillStyle = 'rgba(52,211,153,.85)'; g.fillRect(SX(0), y - 10, SX(p.verticalMin) - SX(0), 8); g.fillStyle = 'rgba(251,191,36,.7)'; g.fillRect(SX(0), y, SX(p.highGroundMin) - SX(0), 8); });
+  g.strokeStyle = C.r; g.lineWidth = 2; g.beginPath(); g.moveTo(SX(cad), by - 4); g.lineTo(SX(cad), by + 74); g.stroke(); text(g, `llega ${fmt(cad)} min`, SX(cad) - 4, by + 84, { c: C.r, f: '700 11px Inter,system-ui', al: 'right' });
+  text(g, '■ subir a 3.ª planta   ■ alejarse a cota segura', bx + 170, by + 84, { c: C.m, f: '11px Inter,system-ui' });
+}
+run({ riada: (t) => { if (playing || FILM) drawRiada(t); else drawRiada(0); }, maremoto: drawMar });
+</script>
+</body></html>

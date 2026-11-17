@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Censo radioeléctrico con dron</title>
+<meta name="description" content="¿Cuántas personas puede haber en cada planta de un edificio dañado? Un dron escucha las señales Bluetooth que emiten los teléfonos y SENDA las convierte en un recuento por planta, sin identificar a nadie.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--v:#b79cff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.55 Inter,system-ui,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:20px 16px 60px}h1{font-size:30px;margin:4px 0}h2{font-size:18px;margin:0 0 8px}h3{font-size:15px;margin:0 0 6px}.m{color:var(--m)}a{color:var(--i)}
+.lead{max-width:880px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}@media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpis div{background:var(--p);border:1px solid var(--l);border-radius:12px;padding:10px 12px}.kpis b{display:block;font-size:24px}.kpis span{font-size:12px;color:var(--m)}
+.g2{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:14px}@media(max-width:900px){.g2{grid-template-columns:1fr}}
+.card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:16px;min-width:0}
+canvas{width:100%;display:block;border-radius:10px;background:#071018}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+button,select{font:inherit;min-height:44px;padding:8px 14px;border-radius:10px;border:1px solid var(--l);background:#0f1d27;color:var(--t);cursor:pointer;font-weight:700}
+button.p{background:var(--c);border-color:var(--c);color:#140804}
+input[type=range]{flex:1 1 200px;accent-color:var(--c)}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:7px 6px;white-space:nowrap;border-bottom:1px solid var(--l);text-align:right}th:first-child,td:first-child{text-align:left}th{color:var(--m);font-weight:600;font-size:12px}
+tbody tr{cursor:pointer}tbody tr:hover{background:#0f1d27}tr.sel{background:#12323f}tfoot td{font-weight:800;border-bottom:0}
+.naive{color:#ff9a86;text-decoration:line-through;text-decoration-color:#ff9a8688}
+.chip{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid}.ok{color:var(--e);border-color:var(--e)}.sim{color:var(--a);border-color:var(--a)}.todo{color:var(--m);border-color:var(--m)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}@media(max-width:900px){.steps{grid-template-columns:1fr}}
+.steps .n{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#12323f;color:var(--i);font-weight:800;margin-right:6px}
+.plat{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}@media(max-width:900px){.plat{grid-template-columns:1fr}}
+.plat .card p{margin:6px 0 0;font-size:14px}
+.note{border-left:3px solid var(--a);padding:8px 12px;background:#0f1a22;border-radius:6px;font-size:14px;margin-top:12px}
+.cap{font-size:13px;color:var(--m);margin:8px 0 0}
+</style>
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/arquitectura">Arquitectura</a> · <a href="/senda/edificios">Edificios</a> · <a href="/senda/llamada">Llamada sin Internet</a> · <a href="/senda/red">Red y satélites</a></p>
+<h1>Censo radioeléctrico con dron</h1>
+<p class="lead m">Tras un terremoto o una explosión, la primera pregunta de un equipo de rescate es <b>¿cuántas personas puede haber en cada planta?</b> Los teléfonos, relojes y auriculares anuncian su presencia por Bluetooth aunque nadie los toque. Un dron que sube planta a planta junto a la fachada <b>escucha esos anuncios sin entrar</b>, y SENDA los convierte en un recuento por planta con un margen honesto, <b>sin identificar a nadie</b>. La simulación de abajo usa el algoritmo real del núcleo (<code>rf-census.mjs</code>, 8 pruebas automáticas).</p>
+
+<div class="kpis" aria-live="polite">
+  <div><b id="k-people">—</b><span>personas estimadas (intervalo 90 %)</span></div>
+  <div><b id="k-phones">—</b><span>teléfonos distintos deducidos</span></div>
+  <div><b id="k-addr" class="naive">—</b><span>direcciones Bluetooth oídas: contar así engaña</span></div>
+  <div><b id="k-time">—</b><span>tiempo de misión</span></div>
+</div>
+
+<div class="g2">
+  <section class="card" aria-labelledby="h-fac">
+    <h2 id="h-fac">Fachada: el dron escucha planta a planta</h2>
+    <canvas id="facade" width="640" height="540" role="img" aria-label="Alzado del edificio de 6 plantas con el dron recorriendo la fachada y la estimación de personas en cada planta"></canvas>
+    <div class="row"><button class="p" id="play">▶ Volar la misión</button><input type="range" id="t" min="0" max="2400" step="5" aria-label="Tiempo de misión"></div>
+    <div class="row">
+      <label class="m">Edificio <select id="seed"><option value="9">Simulación A</option><option value="3">Simulación B</option><option value="21">Simulación C</option></select></label>
+      <label class="m">Los móviles cambian de dirección cada <select id="rot"><option value="900">15 min</option><option value="600">10 min</option><option value="300">5 min</option></select></label>
+      <label class="m"><input type="checkbox" id="truth" checked> Mostrar la verdad simulada</label>
+    </div>
+  </section>
+  <section class="card" aria-labelledby="h-tab">
+    <h2 id="h-tab">Resultado por planta</h2>
+    <table><thead><tr><th>Planta</th><th>Direcciones</th><th>Teléfonos</th><th>Personas (90 %)</th><th class="tr">Verdad*</th></tr></thead><tbody id="tb"></tbody><tfoot><tr id="tf"></tr></tfoot></table>
+    <p class="cap">Pulsa una planta para ver debajo cómo se calcula. «Direcciones» es lo que daría contar señales distintas: con la rotación de direcciones, <b>cuenta 3 o 4 veces de más</b>. *La verdad solo existe en la simulación; en una misión real nadie la conoce.</p>
+    <div class="note"><b>Planta sin teléfonos ≠ planta vacía.</b> La radio solo ve dispositivos: quien no lleva móvil (un niño, una persona mayor, alguien que lo perdió) es invisible. Por eso una planta con 0 teléfonos se muestra como «0, quizá 1» y nunca se descarta sin otras evidencias (térmica, golpes, vecinos).</div>
+  </section>
+</div>
+
+<div class="g2">
+  <section class="card" aria-labelledby="h-tl">
+    <h2 id="h-tl">Por qué no basta con contar · <span id="tl-floor">planta 1</span></h2>
+    <canvas id="timeline" width="640" height="300" role="img" aria-label="Línea de tiempo de las direcciones Bluetooth de la planta seleccionada"></canvas>
+    <p class="cap" id="tl-cap"></p>
+  </section>
+  <section class="card" aria-labelledby="h-post">
+    <h2 id="h-post">De teléfonos a personas</h2>
+    <canvas id="post" width="560" height="300" role="img" aria-label="Probabilidad de cada número de personas en la planta seleccionada"></canvas>
+    <p class="cap" id="post-cap"></p>
+  </section>
+</div>
+
+<section class="steps" aria-label="Cómo funciona">
+  <div class="card"><h3><span class="n">1</span>Escuchar sin conectar</h3><p class="m">El dron (o un mástil, o un accesorio ESP32 de 10 €) lleva un escáner Bluetooth LE pasivo. Solo recoge los <b>anuncios públicos</b> que cualquier dispositivo emite a su alrededor: nunca se conecta, nunca lee contenido. Cada dirección se guarda como un <b>hash con sal</b> que se destruye al terminar la misión.</p></div>
+  <div class="card"><h3><span class="n">2</span>Planta y concurrencia</h3><p class="m">A cada altura el dron oye su planta fuerte (≈ −62 dBm) y las vecinas débiles (≈ −79 dBm): cada señal se asigna a la planta donde su intensidad mediana es mayor, y las que solo se oyen débiles se descartan porque también se oyen fuertes desde su propia planta. Los móviles cambian de dirección cada pocos minutos, pero <b>un dispositivo solo usa una dirección a la vez</b>: el número mínimo de teléfonos es el máximo de direcciones activas simultáneamente dentro de cada familia de dispositivos.</p></div>
+  <div class="card"><h3><span class="n">3</span>Personas con margen honesto</h3><p class="m">Cada persona lleva 0, 1 o 2 teléfonos (hipótesis de partida: 12 % ninguno, 8 % dos; <b>pendiente de calibrar</b> con datos reales). SENDA calcula la probabilidad exacta de cada número de personas dado el número de teléfonos y publica la mediana y el intervalo del 90 %. En 720 plantas simuladas el intervalo contiene la verdad en el <b>95 %</b> de los casos.</p></div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-plat">
+  <h2 id="h-plat">El dron como plataforma de sensores de SENDA</h2>
+  <p class="m" style="margin:0">El censo radio es una capa más. Todas desembocan en el mismo motor de fusión de evidencias que prioriza el rescate por vivienda (<a href="/senda/edificios">Edificios</a>).</p>
+  <div class="plat">
+    <div class="card"><h3>📡 Radio Bluetooth → personas por planta</h3><span class="chip sim">algoritmo probado en simulación</span><p class="m">Este módulo. Siguiente paso: ensayo de campo con escáner real y edificio de prueba con ocupación conocida.</p></div>
+    <div class="card"><h3>📷 Cámara → modelo 3D de la fachada</h3><span class="chip ok">ruta de vuelo: hecha</span><p class="m">La misión en anillos por planta ya se genera (<code>facadeMission</code>). La reconstrucción 3D por fotogrametría se hará con software abierto (p. ej. OpenDroneMap): <b>pendiente de integrar</b>.</p></div>
+    <div class="card"><h3>🌡️ Térmica → calor detrás de huecos</h3><span class="chip todo">requiere cámara radiométrica</span><p class="m">Entra como evidencia en el motor de fusión. Útil de noche y en humo ligero; no atraviesa muros.</p></div>
+    <div class="card"><h3>🛰️ Identificación remota → qué drones vuelan</h3><span class="chip ok">decodificador hecho</span><p class="m">SENDA lee los mensajes Open Drone ID para que coordinación vea cada dron y su piloto en el mapa y evite conflictos de espacio aéreo.</p></div>
+    <div class="card"><h3>📦 Mula de datos → mensajes entre zonas aisladas</h3><span class="chip sim">planificación hecha</span><p class="m">El dron recoge mensajes cifrados SENDA en una zona sin cobertura y los entrega en otra (<code>muleSortie</code> calcula autonomía y reserva). Vuelo real pendiente.</p></div>
+    <div class="card"><h3>📞 Llamada a través del dron</h3><span class="chip todo">hoja de ruta</span><p class="m">Un dron con punto de acceso Wi-Fi permitiría <a href="/senda/llamada">llamadas sin Internet</a> entre un atrapado y el equipo de fuera, con el mismo código corto por sonido.</p></div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-law">
+  <h2 id="h-law">Privacidad, ley y límites</h2>
+  <ul class="m" style="margin:0;padding-left:20px">
+    <li><b>Solo recuentos.</b> La salida del módulo no contiene identificadores (lo comprueba una prueba automática). La sal de los hashes se destruye al acabar la misión.</li>
+    <li><b>Dato personal.</b> Las direcciones de dispositivos pueden considerarse datos personales (RGPD). Base jurídica prevista: interés vital o misión de interés público en emergencia, con evaluación de impacto (EIPD) previa. <b>Pendiente de validación jurídica.</b></li>
+    <li><b>Vuelo.</b> Solo con autorización de la autoridad que dirige la emergencia y conforme a la normativa de drones (AESA).</li>
+    <li><b>Límites.</b> Muros de hormigón y escombros atenúan la señal; un móvil sin batería es invisible; los valores de intensidad del simulador son ilustrativos. Es una evidencia para priorizar, nunca para declarar a nadie víctima ni descartar una planta.</li>
+    <li><b>Estado del arte.</b> Contar personas con direcciones aleatorias es un campo de investigación activo (p. ej. arXiv:2112.02161, arXiv:2507.03873). Lo propio de SENDA es combinarlo con el vuelo por plantas, la cota por concurrencia y el intervalo bayesiano exacto, todo dentro del teléfono y sin servidor.</li>
+  </ul>
+</section>
+</main>
+<script type="module">
+import { rfCensus, rfCensusScenario, peopleFromPhones } from '/senda/core/rf-census.mjs';
+const $ = (s) => document.querySelector(s);
+const PASS = 900, PASS_ON = 600, PASSES = 3, T = (PASSES - 1) * PASS + PASS_ON, FLOORS = 6;
+const C = { c: '#ff7756', i: '#91d7e8', e: '#34d399', a: '#fbbf24', v: '#b79cff', m: '#9fb2bc', l: '#203240', t: '#f2f4f4' };
+const FPC = { 'apple-phone': '#91d7e8', 'google-phone': '#34d399', 'samsung-phone': '#fbbf24', 'watch-a': '#b79cff', 'buds-b': '#d9a2ff' };
+const name = (f) => (f === 0 ? 'Planta baja' : `Planta ${f}`);
+const S = { sc: null, t: T, playing: false, sel: 1, r: null, last: 0 };
+window.SENDA_DRON = S;
+
+function fit(cv) { const r = devicePixelRatio || 1, w = cv.width, h = cv.height; if (!cv.dataset.w) { cv.dataset.w = w; cv.dataset.h = h; cv.style.aspectRatio = `${w}/${h}`; cv.width = w * r; cv.height = h * r; } const g = cv.getContext('2d'); g.setTransform(r, 0, 0, r, 0, 0); return [g, +cv.dataset.w, +cv.dataset.h]; }
+function build() { S.sc = rfCensusScenario({ seed: +$('#seed').value, rotateS: +$('#rot').value }); compute(); }
+function compute() {
+  const obs = S.sc.obs; let lo = 0, hi = obs.length; while (lo < hi) { const m = (lo + hi) >> 1; if (obs[m].t <= S.t) lo = m + 1; else hi = m; }
+  S.r = rfCensus(obs.slice(0, lo), S.sc.building, { explain: true }); S.nObs = lo; draw();
+}
+const fmtT = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+function dronePos(t) { const p = Math.floor(t / PASS), w = t - p * PASS; if (p >= PASSES || w >= PASS_ON) return { pass: Math.min(p, PASSES - 1), floor: null }; const x = w / (PASS_ON / FLOORS); return { pass: p, floor: Math.floor(x), frac: x % 1 }; }
+
+function drawFacade() {
+  const [g, W, H] = fit($('#facade')), r = S.r, truth = $('#truth').checked;
+  g.clearRect(0, 0, W, H); g.fillStyle = '#071018'; g.fillRect(0, 0, W, H);
+  const gy = H - 44, fh = 72, x0 = 200, x1 = 440;
+  g.fillStyle = '#0d1a22'; g.fillRect(0, gy, W, H - gy); g.strokeStyle = C.l; g.beginPath(); g.moveTo(0, gy); g.lineTo(W, gy); g.stroke();
+  for (let f = 0; f < FLOORS; f++) {
+    const y = gy - (f + 1) * fh, fl = r.floors[f], mid = fl.people.mid;
+    g.fillStyle = '#101c25'; g.fillRect(x0, y, x1 - x0, fh);
+    g.fillStyle = `rgba(255,119,86,${mid ? Math.min(0.75, 0.16 + mid * 0.07) : 0})`; g.fillRect(x0, y, x1 - x0, fh);
+    for (let k = 0; k < 6; k++) { g.fillStyle = '#05090c'; g.fillRect(x0 + 14 + k * 38, y + 18, 22, 32); }
+    g.strokeStyle = f === S.sel ? C.i : C.l; g.lineWidth = f === S.sel ? 2.5 : 1; g.strokeRect(x0 + 0.5, y + 0.5, x1 - x0 - 1, fh - 1); g.lineWidth = 1;
+    g.fillStyle = C.m; g.font = '600 12px Inter,system-ui,sans-serif'; g.textAlign = 'right'; g.fillText(name(f), x0 - 10, y + fh / 2 + 4);
+    g.textAlign = 'left'; g.fillStyle = C.t; g.font = '800 17px Inter,system-ui,sans-serif';
+    g.fillText(fl.phones.lo === 0 ? '0 · quizá 1' : `≈ ${mid}`, x1 + 12, y + fh / 2 - 2);
+    g.fillStyle = C.m; g.font = '12px Inter,system-ui,sans-serif'; g.fillText(`${fl.people.lo}–${fl.people.hi} personas`, x1 + 12, y + fh / 2 + 15);
+    if (truth) { g.fillStyle = C.e; g.fillText(`verdad ${S.sc.truth[f]}`, x1 + 12, y + fh / 2 + 30); }
+  }
+  g.fillStyle = '#16232d'; g.fillRect(x0 - 8, gy - FLOORS * fh - 10, x1 - x0 + 16, 10);
+  // dron y anuncios Bluetooth recientes
+  const d = dronePos(S.t);
+  let dx, dy;
+  if (d.floor == null) { dx = x1 + 70; dy = gy - FLOORS * fh - 40; }
+  else { const ang = 2 * Math.PI * d.frac; dx = (x0 + x1) / 2 + Math.cos(ang) * ((x1 - x0) / 2 + 40); dy = gy - (d.floor + 0.5) * fh - 6 + Math.sin(ang) * 6; }
+  const recent = S.sc.obs.slice(Math.max(0, S.nObs - 400), S.nObs).filter((o) => o.t > S.t - 8 && o.cls !== 'iot');
+  for (const o of recent) {
+    let h = 0; for (const ch of o.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    const strong = o.rssi > -71, py = gy - (o.floor + 0.5) * fh + ((h >> 8) % 40) - 20, px = x0 + 12 + (h % (x1 - x0 - 24));
+    g.globalAlpha = strong ? 0.9 : 0.35; g.fillStyle = FPC[o.fp] ?? C.m; g.beginPath(); g.arc(px, py, strong ? 3.2 : 2, 0, 7); g.fill();
+    if (strong) { g.strokeStyle = FPC[o.fp] ?? C.m; g.globalAlpha = 0.18; g.beginPath(); g.moveTo(px, py); g.lineTo(dx, dy); g.stroke(); }
+  }
+  g.globalAlpha = 1;
+  if (d.floor != null) for (let k = 1; k <= 3; k++) { const rr = ((S.t * 9 + k * 22) % 66) + 6; g.strokeStyle = `rgba(145,215,232,${0.5 - rr / 150})`; g.beginPath(); g.arc(dx, dy, rr, 0, 7); g.stroke(); }
+  g.strokeStyle = C.t; g.fillStyle = C.t; g.lineWidth = 2;
+  g.beginPath(); g.moveTo(dx - 15, dy - 9); g.lineTo(dx + 15, dy + 9); g.moveTo(dx + 15, dy - 9); g.lineTo(dx - 15, dy + 9); g.stroke();
+  for (const [ox, oy] of [[-15, -9], [15, -9], [-15, 9], [15, 9]]) { g.beginPath(); g.ellipse(dx + ox, dy + oy, 8, 2.5, 0, 0, 7); g.stroke(); }
+  g.fillRect(dx - 5, dy - 4, 10, 8); g.lineWidth = 1;
+  g.fillStyle = C.t; g.font = '700 13px Inter,system-ui,sans-serif'; g.textAlign = 'left';
+  const status = d.floor == null ? (S.t >= T ? 'Misión completa · 3 pasadas' : `Pausa entre pasadas: los móviles cambian de dirección`) : `Pasada ${d.pass + 1}/3 · ${name(d.floor).toLowerCase()}`;
+  g.fillText(status, 12, 22); g.fillStyle = C.m; g.font = '12px Inter,system-ui,sans-serif'; g.fillText(`t = ${fmtT(S.t)} · ${S.nObs} lecturas`, 12, 40);
+  const lg = [['iPhone', 'apple-phone'], ['Pixel', 'google-phone'], ['Galaxy', 'samsung-phone'], ['reloj/auric.', 'watch-a']];
+  lg.forEach(([l, k], i) => { g.fillStyle = FPC[k]; g.beginPath(); g.arc(18 + i * 92, H - 18, 4, 0, 7); g.fill(); g.fillStyle = C.m; g.fillText(l, 27 + i * 92, H - 14); });
+}
+
+function lanes(intervals) { const ends = [], out = []; for (const [a, b] of intervals) { let k = ends.findIndex((e) => e < a); if (k < 0) { k = ends.length; ends.push(b); } else ends[k] = b; out.push(k); } return { lane: out, n: ends.length }; }
+function drawTimeline() {
+  const [g, W, H] = fit($('#timeline')), f = S.r.floors[S.sel], L = 92, R = W - 12, top = 26, bot = H - 26, X = (t) => L + (t / T) * (R - L);
+  g.fillStyle = '#071018'; g.fillRect(0, 0, W, H);
+  for (let p = 0; p < PASSES; p++) for (const ff of [S.sel - 1, S.sel, S.sel + 1]) { if (ff < 0 || ff >= FLOORS) continue; const a = p * PASS + (ff / FLOORS) * PASS_ON; g.fillStyle = ff === S.sel ? 'rgba(145,215,232,.10)' : 'rgba(145,215,232,.04)'; g.fillRect(X(a), top - 6, X(a + PASS_ON / FLOORS) - X(a), bot - top + 6); }
+  const groups = f.groups.filter((x) => x.cls !== 'iot').sort((a, b) => (a.cls === b.cls ? a.fp.localeCompare(b.fp) : a.cls === 'phone' ? -1 : 1));
+  const rows = groups.map((gr) => ({ gr, ...lanes(gr.intervals) })), nRows = rows.reduce((s, x) => s + x.n, 0) || 1, rh = Math.min(22, (bot - top) / nRows);
+  let y = top; g.font = '11px Inter,system-ui,sans-serif';
+  for (const { gr, lane, n } of rows) {
+    const col = FPC[gr.fp] ?? C.m;
+    g.fillStyle = C.m; g.textAlign = 'right'; g.fillText(`${gr.fp.replace('-phone', '').replace('-a', '').replace('-b', '')} ×${gr.min}`, L - 8, y + Math.min(rh * n, 22) / 2 + 4);
+    gr.intervals.forEach(([a, b], i) => { g.fillStyle = col; g.globalAlpha = i % 2 ? 0.55 : 0.95; g.fillRect(X(a), y + lane[i] * rh + 2, Math.max(3, X(b) - X(a)), rh - 4); });
+    g.globalAlpha = 1; y += n * rh; g.strokeStyle = C.l; g.beginPath(); g.moveTo(L, y); g.lineTo(R, y); g.stroke();
+  }
+  g.strokeStyle = C.c; g.beginPath(); g.moveTo(X(S.t), top - 8); g.lineTo(X(S.t), bot); g.stroke();
+  g.fillStyle = C.m; g.textAlign = 'center'; for (let m = 0; m <= 40; m += 10) g.fillText(`${m} min`, X(m * 60), H - 8);
+  g.textAlign = 'left'; g.fillStyle = C.t; g.font = '600 12px Inter,system-ui,sans-serif'; g.fillText('Cada fila es un dispositivo; cada segmento, una dirección aleatoria distinta', L, 16);
+  $('#tl-floor').textContent = name(S.sel).toLowerCase();
+  const wear = groups.filter((x) => x.cls !== 'phone').reduce((s, x) => s + x.min, 0);
+  $('#tl-cap').innerHTML = `En ${name(S.sel).toLowerCase()} se oyeron <b>${f.addresses} direcciones distintas</b>. Agrupadas por familia de dispositivo, nunca hay más de <b>${f.phones.lo} teléfonos</b> activos a la vez${wear ? ` (y ${wear} relojes/auriculares, que no suman personas)` : ''}: ese máximo simultáneo es el número mínimo de teléfonos. Las franjas azules marcan cuándo el dron pasaba por esta planta y sus vecinas.`;
+}
+function drawPost() {
+  const [g, W, H] = fit($('#post')), f = S.r.floors[S.sel], m = f.phones.lo, pp = peopleFromPhones(m), post = pp.post, truth = $('#truth').checked;
+  let n = post.length; while (n > m + 3 && post[n - 1] < 0.002) n--;
+  const L = 40, R = W - 10, top = 44, bot = H - 30, bw = (R - L) / n, mx = Math.max(...post.slice(0, n));
+  g.fillStyle = '#071018'; g.fillRect(0, 0, W, H); g.font = '11px Inter,system-ui,sans-serif';
+  for (let k = 0; k < n; k++) {
+    const h = (post[k] / mx) * (bot - top), inside = k >= pp.lo && k <= pp.hi;
+    g.fillStyle = inside ? C.c : '#3a4a55'; g.fillRect(L + k * bw + 2, bot - h, bw - 4, h);
+    if (k === pp.mid) { g.strokeStyle = C.t; g.lineWidth = 2; g.strokeRect(L + k * bw + 1, bot - h - 1, bw - 2, h + 2); g.lineWidth = 1; }
+    g.fillStyle = C.m; g.textAlign = 'center'; g.fillText(String(k), L + k * bw + bw / 2, H - 12);
+    if (post[k] > 0.04) { g.fillStyle = C.t; g.fillText(`${Math.round(post[k] * 100)} %`, L + k * bw + bw / 2, bot - h - 5); }
+  }
+  if (truth) { const k = S.sc.truth[S.sel]; if (k < n) { g.strokeStyle = C.e; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(L + k * bw + bw / 2, top - 6); g.lineTo(L + k * bw + bw / 2, bot); g.stroke(); g.setLineDash([]); g.fillStyle = C.e; g.fillText('verdad', L + k * bw + bw / 2, top - 10); } }
+  g.textAlign = 'left'; g.fillStyle = C.t; g.font = '600 12px Inter,system-ui,sans-serif'; g.fillText(`Probabilidad de cada número de personas con ${m} teléfono${m === 1 ? '' : 's'}`, L, 16);
+  $('#post-cap').innerHTML = m === 0
+    ? `Sin teléfonos, lo más probable es que la planta esté vacía (${Math.round(pp.pEmpty * 100)} %), pero queda un ${100 - Math.round(pp.pEmpty * 100)} % de que haya alguien sin móvil. Por eso no se descarta.`
+    : `Con ${m} teléfono${m === 1 ? '' : 's'}, lo más probable son <b>${pp.mid} personas</b>; el intervalo del 90 % (en naranja) va de <b>${pp.lo} a ${pp.hi}</b>. Supuesto de partida: 12 % de personas sin móvil y 8 % con dos (pendiente de calibrar).`;
+}
+function drawTable() {
+  const r = S.r, truth = $('#truth').checked;
+  $('#tb').innerHTML = r.floors.slice().reverse().map((f) => `<tr data-f="${f.floor}" class="${f.floor === S.sel ? 'sel' : ''}"><td>${name(f.floor)}</td><td class="naive">${f.addresses}</td><td>${f.phones.lo}</td><td><b>${f.phones.lo === 0 ? '0 · quizá 1' : f.people.mid}</b> <span class="m">(${f.people.lo}–${f.people.hi})</span></td><td class="tr" style="color:var(--e)">${truth ? S.sc.truth[f.floor] : '·'}</td></tr>`).join('');
+  const ph = r.floors.reduce((s, f) => s + f.phones.lo, 0), addr = r.floors.reduce((s, f) => s + f.addresses, 0);
+  $('#tf').innerHTML = `<td>Edificio</td><td class="naive">${addr}</td><td>${ph}</td><td>${r.total.mid} <span class="m">(${r.total.lo}–${r.total.hi})</span></td><td class="tr" style="color:var(--e)">${truth ? S.sc.truth.reduce((a, b) => a + b, 0) : '·'}</td>`;
+  document.querySelectorAll('.tr').forEach((e) => (e.style.opacity = truth ? 1 : 0.3));
+  $('#k-people').textContent = `${r.total.mid} (${r.total.lo}–${r.total.hi})`; $('#k-phones').textContent = ph; $('#k-addr').textContent = addr; $('#k-time').textContent = `${fmtT(S.t)} / ${fmtT(T)}`;
+  $('#t').value = S.t;
+}
+function draw() { drawFacade(); drawTimeline(); drawPost(); drawTable(); }
+function loop(ts) { if (!S.playing) return; const dt = S.last ? (ts - S.last) / 1000 : 0; S.last = ts; S.t = Math.min(T, S.t + dt * 60); compute(); if (S.t >= T) { S.playing = false; $('#play').textContent = '▶ Volar la misión'; return; } requestAnimationFrame(loop); }
+$('#play').onclick = () => { if (S.playing) { S.playing = false; $('#play').textContent = '▶ Continuar'; return; } if (S.t >= T) S.t = 0; S.playing = true; S.last = 0; $('#play').textContent = '❚❚ Pausa'; requestAnimationFrame(loop); };
+$('#t').oninput = (e) => { S.t = +e.target.value; compute(); };
+$('#seed').onchange = build; $('#rot').onchange = build; $('#truth').onchange = draw;
+$('#tb').onclick = (e) => { const tr = e.target.closest('tr'); if (tr) { S.sel = +tr.dataset.f; draw(); } };
+$('#facade').onclick = (e) => { const b = e.target.getBoundingClientRect(), y = ((e.clientY - b.top) / b.height) * 540, f = Math.floor((540 - 44 - y) / 72); if (f >= 0 && f < FLOORS) { S.sel = f; draw(); } };
+build();
+</script>
+</body></html>

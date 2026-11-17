@@ -1,0 +1,294 @@
+/* Laboratorio Científico y Teoremas Físicos de SENDA */
+.stl-suite {
+  background: #060c12;
+  border: 1px solid #1a2f3f;
+  border-radius: 20px;
+  padding: 28px;
+  margin: 32px 0;
+  color: #f2f4f4;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.stl-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 800 11px ui-monospace, monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+
+.stl-title {
+  font-size: clamp(22px, 2.8vw, 34px);
+  line-height: 1.15;
+  margin: 0 0 12px;
+  color: #f8fafc;
+}
+
+.stl-lead {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #94a3b8;
+  max-width: 900px;
+  margin: 0 0 24px;
+}
+
+/* Selector de Teoremas */
+.stl-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.stl-tab-btn {
+  background: #0b1722;
+  border: 1px solid #203547;
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #cbd5e1;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stl-tab-btn:hover {
+  border-color: #38bdf8;
+  background: #0f2233;
+}
+
+.stl-tab-btn.active {
+  background: #0369a1;
+  border-color: #38bdf8;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+}
+
+.stl-tab-tag {
+  font: 700 10px ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* Área de Laboratorio Interactivo */
+.stl-stage {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 24px;
+  background: #07111a;
+  border: 1px solid #1e3a4d;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+@media (max-width: 960px) {
+  .stl-tabs {
+    grid-template-columns: 1fr 1fr;
+  }
+  .stl-stage {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .stl-tabs {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Lienzo de Simulación y Gráficos */
+.stl-canvas-box {
+  background: #02070b;
+  border: 1px solid #162a39;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+
+.stl-canvas-box svg,
+.stl-canvas-box canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  background: #04090e;
+}
+
+.stl-canvas-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stl-canvas-head span {
+  font: 700 12px ui-monospace, monospace;
+  color: #38bdf8;
+  letter-spacing: 0.08em;
+}
+
+/* Controles de Parámetros */
+.stl-ctrl-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stl-formula-card {
+  background: #0a1724;
+  border: 1px solid #1e384e;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.stl-formula-card h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stl-formula-box {
+  font: 500 13px/1.5 'KaTeX_Main', 'Times New Roman', serif;
+  background: #04090e;
+  border: 1px solid #162a39;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #e2e8f0;
+  overflow-x: auto;
+  margin-bottom: 8px;
+}
+
+.stl-formula-desc {
+  font-size: 12px;
+  line-height: 1.45;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.stl-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #0a1724;
+  border: 1px solid #1e384e;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.stl-input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stl-input-row label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #cbd5e1;
+  display: flex;
+  justify-content: space-between;
+}
+
+.stl-input-row label span {
+  font: 700 12px ui-monospace, monospace;
+  color: #34d399;
+}
+
+.stl-input-row input[type='range'] {
+  width: 100%;
+  accent-color: #38bdf8;
+}
+
+.stl-input-row select {
+  background: #04090e;
+  border: 1px solid #203547;
+  color: #f8fafc;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+}
+
+/* Cuadrícula de Métricas Calibradas */
+.stl-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.stl-kpi-card {
+  background: #040a10;
+  border: 1px solid #193144;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.stl-kpi-card b {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.stl-kpi-card span {
+  font: 700 20px ui-monospace, monospace;
+  color: #38bdf8;
+}
+
+.stl-kpi-card span.highlight {
+  color: #34d399;
+}
+
+/* Tabla Científica */
+.stl-table-wrap {
+  margin-top: 24px;
+  overflow-x: auto;
+  border: 1px solid #1a2f3f;
+  border-radius: 14px;
+  background: #04090e;
+}
+
+.stl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.stl-table th,
+.stl-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #152432;
+}
+
+.stl-table th {
+  background: #091520;
+  color: #38bdf8;
+  font: 700 11px ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.stl-table tr:hover td {
+  background: #0a1b2a;
+}

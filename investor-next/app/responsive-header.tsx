@@ -76,11 +76,11 @@ export default function ResponsiveHeader({ locale }: { locale: Locale }) {
 
   return (
     <header ref={headerRef} className="topbar container oep-responsive-header" data-testid="responsive-header">
-      <a className="wordmark oep-brand" href="#top" aria-label="Civic Relay — Offline Emergency Protocol">
+      <a className="wordmark oep-brand" href="#top" aria-label="SENDA — Sistema de Enrutamiento de Emergencia (antes Civic Relay · OEP)">
         <span className="mark-symbol" aria-hidden="true"><span/><span/><span/></span>
         <span className="oep-brand-copy">
-          <strong>Civic Relay</strong>
-          <span className="oep-brand-subtitle">Offline Emergency Protocol</span>
+          <strong>SENDA</strong>
+          <span className="oep-brand-subtitle">Civic Relay · OEP</span>
         </span>
       </a>
 

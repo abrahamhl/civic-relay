@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SENDA · Paper IV: C-ITS Vehicular y Reflejo V16 Directo</title>
+  <style>
+    body { font: 15px/1.65 Georgia, 'Times New Roman', serif; color: #1e293b; background: #fff; margin: 0; }
+    main { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+    .nav-bar { font: 13px system-ui, sans-serif; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; }
+    .nav-bar a { color: #0284c7; text-decoration: none; margin-right: 12px; }
+    .nav-bar a:hover { text-decoration: underline; }
+    h1 { font-size: 26px; line-height: 1.25; color: #0f172a; margin-bottom: 12px; }
+    .meta-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px 18px; margin: 16px 0 24px; font: 13px/1.6 system-ui, sans-serif; }
+    h2 { font-size: 19px; margin-top: 36px; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 6px; color: #0f172a; }
+    h3 { font-size: 16px; margin-top: 24px; color: #1e293b; }
+    .abstract { font-style: italic; background: #f1f5f9; padding: 16px 20px; border-left: 4px solid #f59e0b; border-radius: 0 4px 4px 0; margin: 20px 0; }
+    .eq { font-family: 'Cambria Math', 'STIX Two Math', serif; font-size: 16px; text-align: center; margin: 18px 0; background: #fcfcfd; padding: 12px; border: 1px solid #f1f5f9; border-radius: 4px; overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; font: 13px/1.4 system-ui, sans-serif; margin: 16px 0; display: block; overflow-x: auto; }
+    th, td { border: 1px solid #cbd5e1; padding: 6px 10px; text-align: left; }
+    th { background: #f1f5f9; font-weight: 600; }
+    code { font-size: 12.5px; background: #f1f5f9; padding: 2px 5px; border-radius: 3px; font-family: Consolas, monospace; }
+    .render-box { text-align: center; margin: 24px 0; }
+    .render-box img { max-width: 100%; height: auto; border: 1px solid #cbd5e1; border-radius: 6px; }
+    .render-cap { font: 12px system-ui, sans-serif; color: #64748b; margin-top: 6px; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="nav-bar">
+    <a href="/senda/papers/">← Índice de Papers Científicos</a>
+    <a href="/senda/papers/paper-theorems.html">Paper I: Teoremas</a>
+    <a href="/senda/papers/paper-paer-dtn.html">Paper II: PAER DTN</a>
+    <a href="/senda/papers/paper-calibration-lofo.html">Paper III: Calibración</a>
+    <a href="/science/">Laboratorio Interactivo</a>
+  </div>
+
+  <h1>Arquitectura de Telecomunicaciones Vehiculares de Resiliencia Extrema: Reflejo V16 C-ITS de 38 ms, Física de Aquaplaning Horne y Conectividad Multisoftware</h1>
+  <div class="meta-box">
+    <b>Autoría:</b> SENDA Automotive &amp; C-ITS Engineering Unit.<br>
+    <b>Identificador:</b> SENDA-RESEARCH-VEHICULAR-2026-V1 · <b>Fecha:</b> 2026-11-09 · <b>Madurez:</b> TRL 4-5.<br>
+    <b>Reproducción en código:</b> <code>packages/senda/src/automotive-multisoftware-link.mjs</code> · <b>Tests:</b> <code>automotive-multisoftware-link.test.mjs</code>.
+  </div>
+
+  <div class="abstract">
+    <b>Resumen.</b> La obligatoriedad de las balizas conectadas DGT 3.0 (Real Decreto 159/2021) en España a partir de 2026 introduce un avance decisivo en seguridad vial. Sin embargo, su arquitectura centralizada basada en redes celulares terrestres (NB-IoT/4G) genera una latencia típica de 100 a 180 segundos entre la activación y la notificación en otros vehículos, lo que a 120 km/h representa más de 3.5 km de avance a ciegas. Presentamos el módulo de reflejo vehicular directo de SENDA, que emplea Bluetooth 5.0 Coded PHY y LoRa para emitir avisos peer-to-peer en <b>38 ms</b>, permitiendo frenadas anticipadas a <b>3.8 km del obstáculo</b>. Asimismo, se formulan los modelos físicos de aquaplaning dinámico de Horne y distancias de parada de la Norma 3.1-IC, integrados con un hub multisoftware compatible con Google Maps, Waze, Apple Maps y navegadores satelitales NMEA 0183.
+  </div>
+
+  <h2>1. El Problema de la Latencia en Balizas Conectadas Nube</h2>
+  <p>En autopistas y autovías con velocidad de diseño de 120 km/h (33.33 m/s), una retención imprevista o un vehículo averiado detenido en la calzada requiere una reacción en fracciones de segundo. El pipeline estándar de DGT 3.0 comprende:</p>
+  <ol>
+    <li>Activación magnética de la baliza: 0 s.</li>
+    <li>Conexión y sincronización de red NB-IoT: 15–30 s.</li>
+    <li>Transmisión del paquete MQTT/HTTP al servidor del fabricante: 5–10 s.</li>
+    <li>Ingesta y validación en la plataforma central DGT 3.0: 30–60 s.</li>
+    <li>Distribución a los proveedores de mapas y apps de terceros: 60–90 s.</li>
+  </ol>
+  <p>Tiempo total acumulado: <b>100 a 180 segundos</b>. Durante este intervalo, un vehículo que circula a 120 km/h recorre entre <b>3.3 y 6.0 kilómetros</b> sin tener constancia del peligro, colisionando fatalmente con la cola de retención en curvas o visibilidad reducida.</p>
+
+  <div class="render-box">
+    <img src="/media/renders/render-v16-reflex-latency.svg" alt="Comparativa de Latencia V16">
+    <div class="render-cap">Figura 1: Comparación entre la ingesta centralizada en nube de 180 s (6 km a ciegas) y el reflejo vehicular directo SENDA de 38 ms (1.27 m de avance).</div>
+  </div>
+
+  <h2>2. El Reflejo Local Directo de SENDA (38 ms)</h2>
+  <p>SENDA no sustituye la notificación oficial a DGT 3.0, sino que la complementa mediante un canal de emisión local en paralelo:</p>
+  <div class="eq">T_total = T_tx_ble(18 ms) + T_rx_decode(12 ms) + T_hmi_render(8 ms) = 38 ms</div>
+  <p>A 120 km/h, el vehículo recorre únicamente <b>1.27 metros</b> durante la recepción y despliegue del aviso en el salpicadero o pantalla Android Auto / CarPlay, proporcionando una ventana de anticipación orográfica superior a <b>3.8 kilómetros</b> mediante repetidores oportunistas entre vehículos adyacentes.</p>
+
+  <h2>3. Modelos de Física Vial Integrados</h2>
+  <h3>3.1 Velocidad Crítica de Aquaplaning Dinámico (Horne)</h3>
+  <p>La velocidad mínima a la que un neumático pierde totalmente el contacto con el pavimento mojado se calcula según la ecuación empírica de Horne (1968), adaptada con la formulación de Gallaway para película de agua <i>w_d ≥ 2.5 mm</i>:</p>
+  <div class="eq">v_aq = 6.35 · √( p_psi ) &emsp; [km/h]</div>
+  <p>Para una presión de inflado estándar de 32 psi (2.2 bar), la velocidad crítica de aquaplaning es de <b>35.9 m/s (129.3 km/h)</b>. Si los sensores de presión (TPMS) reportan baja presión (26 psi), la velocidad crítica cae a <b>116.6 km/h</b>, activando el aviso preventivo de deceleración antes de la zona encharcada.</p>
+
+  <h3>3.2 Distancia de Parada Calibrada (Norma 3.1-IC España)</h3>
+  <p>La distancia de parada reglamentaria <i>D_p</i> en función de la velocidad <i>v</i>, el tiempo de percepción-reacción <i>t_p = 2.0 s</i> y la rasante <i>i</i>:</p>
+  <div class="eq">D_p = [ v · t_p / 3.6 ] + [ v² / ( 254 · (f_l ± i) ) ]</div>
+  <p>donde <i>f_l</i> es el coeficiente de rozamiento longitudinal neumático-calzada medido con cáscara mojada.</p>
+
+  <h2>4. Conectividad Multisoftware sin Scraping</h2>
+  <p>SENDA no compite con las aplicaciones de navegación existentes; las dota de capacidad de resiliencia mediante tres interfaces autorizadas:</p>
+  <ul>
+    <li><b>Universal Navigation Links:</b> Generación determinista de URI Intents nativos para Google Maps (<code>google.navigation:q=</code>), Waze (<code>waze://?ll=</code>), Apple Maps (<code>maps://?daddr=</code>), OsmAnd, Sygic y HERE WeGo.</li>
+    <li><b>Multiplexor NMEA 0183:</b> Inyección de sentencias <code>$GPGGA</code>, <code>$GPRMC</code> y <code>$GPVTG</code> con suma de comprobación XOR exacta para sobreescritura de posición simulada (Mock Location) en navegadores GPS de cabina.</li>
+    <li><b>Waze for Cities CIFS GeoJSON:</b> Alimentador estructurado conforme a la especificación oficial de Connected Citizens Program (CCP) para incidentes viales.</li>
+  </ul>
+</main>
+</body>
+</html>

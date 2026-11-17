@@ -1,0 +1,271 @@
+/* Laboratorio de Prevención y Seguridad Ferroviaria SENDA */
+.rsl-suite {
+  background: #060c14;
+  border: 1px solid #1a2f45;
+  border-radius: 20px;
+  padding: 28px;
+  margin: 32px 0;
+  color: #f1f5f9;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+}
+
+.rsl-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 800 11px ui-monospace, monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+
+.rsl-title {
+  font-size: clamp(22px, 2.8vw, 34px);
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0 0 12px;
+  color: #f8fafc;
+}
+
+.rsl-lead {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #94a3b8;
+  max-width: 920px;
+  margin: 0 0 24px;
+}
+
+/* Tabs */
+.rsl-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.rsl-tab-btn {
+  background: #091422;
+  border: 1px solid #1c3248;
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #cbd5e1;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rsl-tab-btn:hover {
+  background: #112236;
+  border-color: #38bdf8;
+  color: #fff;
+}
+
+.rsl-tab-btn.active {
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+}
+
+.rsl-tab-tag {
+  font: 800 10px ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* Stage Layout */
+.rsl-stage {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 900px) {
+  .rsl-stage {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rsl-canvas-box {
+  background: #040810;
+  border: 1px solid #162a3d;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.rsl-canvas-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: 700 11px ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  color: #7dd3fc;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #162a3d;
+  margin-bottom: 14px;
+}
+
+.rsl-canvas-svg {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  background: #02050a;
+}
+
+/* Controls Box */
+.rsl-controls-box {
+  background: #091422;
+  border: 1px solid #1c3248;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rsl-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rsl-control-group label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.rsl-control-group label span {
+  color: #38bdf8;
+  font-family: ui-monospace, monospace;
+}
+
+.rsl-control-group input[type='range'] {
+  width: 100%;
+  accent-color: #38bdf8;
+  cursor: pointer;
+}
+
+.rsl-select {
+  background: #040810;
+  border: 1px solid #20354a;
+  color: #f1f5f9;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+/* KPI Banner */
+.rsl-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.rsl-kpi-card {
+  background: #050d18;
+  border: 1px solid #1a2f44;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rsl-kpi-card b {
+  font-size: 11px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rsl-kpi-val {
+  font-size: 17px;
+  font-weight: 800;
+  color: #f8fafc;
+  font-family: ui-monospace, monospace;
+}
+
+.rsl-kpi-val.highlight {
+  color: #38bdf8;
+}
+
+.rsl-kpi-val.danger {
+  color: #ef4444;
+}
+
+.rsl-kpi-val.safe {
+  color: #34d399;
+}
+
+/* Verdict Banner */
+.rsl-verdict-banner {
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.rsl-verdict-banner.danger {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+}
+
+.rsl-verdict-banner.warning {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid #f59e0b;
+  color: #fcd34d;
+}
+
+.rsl-verdict-banner.safe {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid #10b981;
+  color: #6ee7b7;
+}
+
+/* Footer callout */
+.rsl-footer-callout {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #08111d;
+  border: 1px solid #1a2f45;
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.rsl-footer-callout a {
+  color: #38bdf8;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.rsl-footer-callout a:hover {
+  text-decoration: underline;
+}

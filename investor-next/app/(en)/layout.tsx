@@ -4,7 +4,7 @@ import '../globals.css';
 
 const inter=Inter({subsets:['latin'],display:'swap',variable:'--font-inter'});
 export const metadata: Metadata={
-  metadataBase:new URL('https://civic-relay-investor.vercel.app'),
+  metadataBase:new URL(process.env.SITE_URL||'https://civic-relay-investor.vercel.app'), // SITE_URL: dominio propio (p. ej. Hostinger)
   title:'OEP — Offline Emergency Protocol | Distributed Emergency Coordination & Adaptive Multi-Network Routing',
   description:'OEP researches the opt-in flow consent → SAFE/SOS → bounded local queue → adaptive multi-network routing → receiver ACK. Reproducible 3D simulation, Next.js architecture and experimental Android lab. Not a live emergency service.',
   openGraph:{title:'OEP — Offline Emergency Protocol | Distributed Emergency Coordination & Adaptive Routing',description:'See how OEP models opt-in safety check-ins, offline message queuing, adaptive paths and receiver receipts. Open-source research MVP; no real disaster routing claimed.',locale:'en_US',type:'website'},

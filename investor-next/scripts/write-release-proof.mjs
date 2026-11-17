@@ -27,7 +27,7 @@ const evidence={
  sourceSha:sha.toLowerCase(),
  workingTree,
  sourceScope:workingTree==='MODIFIED'?'BASE_COMMIT_WITH_LOCAL_CHANGES':'COMMIT_ID_NOT_DEPLOYMENT_PROOF',
- canonical:'https://civic-relay-investor.vercel.app',
+ canonical:process.env.SITE_URL||'https://civic-relay-investor.vercel.app',
  nextVersion:manifest.dependencies.next,
  commitSource:'SOURCE_BUILD_ID_ONLY_NOT_A_SIGNED_ATTESTATION',
  physicalValidation:'NOT_PERFORMED',

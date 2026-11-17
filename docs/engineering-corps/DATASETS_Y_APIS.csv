@@ -1,0 +1,31 @@
+source,official_url,access_level_candidate,skill,rights_warning,purpose
+NDW Open Data DATEX II,https://opendata.ndw.nu/,public portal,road-cits,Open Data; verify current license per dataset,"traffic, closures, SRTI, bridge, speed"
+DGT NAP,https://nap.dgt.es/,check registration/dataset,road-cits,published data rights per feed,"events, DATEX, traffic, V16 services"
+Waze for Cities,https://support.google.com/waze/partners/answer/10618477,PARTNER_REQUIRED,interoperable-apis,partner terms and approved polygon,"closures, incidents feed, not global public API"
+Google Routes API,https://developers.google.com/maps/documentation/routes/,API_KEY_BILLABLE,interoperable-apis,"usage, caching and attribution terms",navigation and traffic estimates
+OpenStreetMap,https://www.openstreetmap.org/copyright,public with attribution,gis-digital-twin,"ODbL, tile policy",routing/geometries via self-hosted extracts
+SUMO,https://sumo.dlr.de/docs/,public software,road-cits,EPL-2.0 conditions,microsimulation traffic baseline
+USGS Earthquake,https://earthquake.usgs.gov/fdsnws/event/1/,public API,osint-corroboration,check attribution and rate,seismic catalog
+NASA EONET,https://eonet.gsfc.nasa.gov/docs/v3,public API,osint-corroboration,source attribution; not perimeters,disaster event catalogs
+NASA FIRMS,https://firms.modaps.eosdis.nasa.gov/,account/API key may be required,osint-corroboration,license and attribution per product,thermal detections
+EFFIS,https://effis.jrc.ec.europa.eu/,"published data, verify endpoint",osint-corroboration,Copernicus attribution and data restrictions,active thermal / risk products
+GDACS,https://www.gdacs.org/,public feeds,osint-corroboration,verify provenance and dependencies,event alerts and response layers
+AEMET OpenData,https://opendata.aemet.es/,API key often required,osint-corroboration,RISP terms and attribution,official warnings and weather
+Meteoalarm,https://www.meteoalarm.org/,partner/feed requirements vary,osint-corroboration,licensing and attribution,European severe weather warnings
+MET Norway,https://api.met.no/doc/,public API with User Agent rules,fluids-fire-flood,CC BY 4.0 and request policy,model forecasts; not observations
+Copernicus Data Space,https://documentation.dataspace.copernicus.eu/,public registration and APIs,gis-digital-twin,license and data freshness,Sentinel imagery and derived products
+AWS Terrain Tiles,https://registry.opendata.aws/terrain-tiles/,open bucket,gis-digital-twin,source-dependent attribution,Terrain DEM Terrarium
+AHN NL,https://www.ahn.nl/,public portal,gis-digital-twin,verify dataset license,Dutch terrain cross validation
+NIST FDS,https://pages.nist.gov/fds-smv/,open software,fluids-fire-flood,"NIST public domain, dependency terms",fire heat/smoke model reference
+OpenFOAM,https://www.openfoam.com/,open software,fluids-fire-flood,license per distribution,CFD fluids and thermal
+SGP4/CelesTrak,https://celestrak.org/,public orbital datasets,satellite-gnss,"attribution, epoch and freshness",TLE/OMM and orbit verification
+Galileo OSNMA,https://www.gsc-europa.eu/,"documentation open, receiver needed",satellite-gnss,hardware and official test vectors,GNSS message authentication
+ITU-R P.526-16,https://www.itu.int/rec/R-REC-P.526,standard,rf-spectrum,respect text and copyright,diffraction propagation
+ITU-R P.838-3,https://www.itu.int/rec/R-REC-P.838,standard,rf-spectrum,respect text and copyright,rain attenuation
+BPv7/BPSec,https://www.rfc-editor.org/rfc/rfc9171,open RFC,dtn-bpv7,IETF RFC conditions,"store and forward, cryptographic security"
+PX4 SITL,https://docs.px4.io/main/en/simulation/,open software,robotics-drones,no physical flight without operator,autopilot simulations and sensors
+ROS 2,https://docs.ros.org/,open software,robotics-drones,DDS security,robotic middleware
+ONVIF,https://www.onvif.org/,devices/rights required,cameras-vision,OWNED_CAMERA_ONLY or agreement,IP camera standard
+MediaMTX,https://mediamtx.org/,open software,cameras-vision,stream rights; privacy,RTSP/WebRTC/HLS relay
+OpenTelemetry,https://opentelemetry.io/docs/,open software,observability-reliability,data minimization,logs and metrics
+OWASP ASVS,https://owasp.org/www-project-application-security-verification-standard/,open guidance,defensive-cryptography,not a certification,web security checklists

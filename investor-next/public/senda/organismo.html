@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Organismo — anclas de confianza y credenciales</title>
+<meta name="description" content="Herramienta para organismos (protección civil, bomberos, policía, sanidad): crear su ancla de confianza y firmar credenciales de coordinador. La clave privada no sale del equipo.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/app.css">
+</head>
+<body>
+<header class="top"><div class="brand"><img src="/senda/icon.svg" alt="" width="28" height="28"><div><b>SENDA</b><small>Organismo</small></div></div><a class="pill" href="/senda">App</a></header>
+<main>
+  <h1>Organismo emisor</h1>
+  <p class="lead">Crea la <b>ancla de confianza</b> de tu organismo y firma las <b>credenciales</b> de tus coordinadores. Solo las alertas firmadas con estas credenciales activan sirenas, balizas o informes en los teléfonos de la ciudadanía que lo hayan permitido.</p>
+  <div class="card" id="create"><h3>1 · Crear organismo</h3>
+    <label>Identificador<input id="o-id" placeholder="es-proteccion-civil-murcia"></label>
+    <label>Nombre<input id="o-name" placeholder="Protección Civil de Murcia"></label>
+    <label>Tipo<select id="o-kind"><option value="CIVIL_PROTECTION">Protección civil</option><option value="FIRE">Bomberos</option><option value="POLICE">Policía</option><option value="HEALTH">Sanidad</option><option value="MILITARY_EMERGENCY_UNIT">Unidad militar de emergencias</option><option value="NGO">ONG</option></select></label>
+    <button id="o-create" class="primary">Crear claves del organismo</button>
+    <p class="fine">La clave privada se guarda solo en este equipo (IndexedDB). En producción: módulo HSM o tarjeta del organismo.</p></div>
+  <div class="card" id="org" hidden><h3>2 · Ancla pública (publícala)</h3><p id="o-info"></p>
+    <textarea id="o-anchor" rows="3" readonly aria-label="Código de ancla pública del organismo"></textarea><button id="o-copy">Copiar ancla</button>
+    <p class="fine">La ciudadanía la importa en SENDA › Zona › Organismos de confianza (web, QR, bando municipal).</p></div>
+  <div class="card" id="issue" hidden><h3>3 · Firmar credencial de coordinador</h3>
+    <label>Solicitud del coordinador<textarea id="i-req" rows="2" placeholder="SENDA-SOLICITUD:…"></textarea></label>
+    <div class="row"><label style="flex:1">Rol<select id="i-role"><option>COORDINADOR</option><option>JEFE_INCIDENTE</option><option>MANDO</option><option>AGENTE</option></select></label><label style="flex:1">Unidad<input id="i-unit" placeholder="CECOPAL / Parque 3"></label><label style="max-width:120px">Días<input id="i-days" type="number" value="30" min="1" max="365"></label></div>
+    <button id="i-sign" class="primary">Firmar credencial</button>
+    <textarea id="i-out" rows="3" readonly aria-label="Credencial firmada"></textarea><button id="i-copy">Copiar credencial</button></div>
+</main>
+<div id="toast" role="status"></div>
+<script type="module">
+import { createOrganization, exportOrganization, importOrganization, issueCredential, encodeCode, decodeCode, CODE } from '/senda/core/roles.mjs';
+import * as kv from '/senda/db.mjs';
+const $ = (s) => document.querySelector(s);
+const toast = (t) => { const el = $('#toast'); el.textContent = t; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 3000); };
+let org = null;
+async function show() {
+  const saved = await kv.get('organization'); if (!saved) return;
+  org = await importOrganization(saved);
+  $('#create').hidden = true; $('#org').hidden = $('#issue').hidden = false;
+  $('#o-info').textContent = `${org.name} · ${org.kind} · ${org.id}`;
+  $('#o-anchor').value = encodeCode(CODE.ANCHOR, org.anchor);
+}
+$('#o-create').onclick = async () => {
+  const id = $('#o-id').value.trim(), name = $('#o-name').value.trim(); if (!id || !name) return toast('Identificador y nombre obligatorios');
+  const o = await createOrganization({ id, name, kind: $('#o-kind').value });
+  await kv.set('organization', await exportOrganization(o)); await show(); toast('Organismo creado');
+};
+$('#i-sign').onclick = async () => {
+  try {
+    const req = decodeCode(CODE.REQUEST, $('#i-req').value);
+    const t = Date.now(), days = Math.max(1, Math.min(365, +$('#i-days').value || 30));
+    const cred = await issueCredential(org, { subject: req.thumb, role: $('#i-role').value, unit: $('#i-unit').value.trim() || '—', validFrom: t, validUntil: t + days * 86400_000 });
+    cred.holderName = req.name;
+    $('#i-out').value = encodeCode(CODE.CREDENTIAL, cred); toast(`Credencial firmada para ${req.name}`);
+  } catch (e) { toast(e.message); }
+};
+const cp = (el) => async () => { try { await navigator.clipboard.writeText($(el).value); toast('Copiado'); } catch { $(el).select(); } };
+$('#o-copy').onclick = cp('#o-anchor'); $('#i-copy').onclick = cp('#i-out');
+window.SENDA_ORG = { ready: show(), anchor: () => $('#o-anchor').value, sign: async (reqCode, role = 'JEFE_INCIDENTE', unit = 'Parque 3') => { $('#i-req').value = reqCode; $('#i-role').value = role; $('#i-unit').value = unit; await $('#i-sign').onclick(); return $('#i-out').value; } };
+</script>
+</body></html>

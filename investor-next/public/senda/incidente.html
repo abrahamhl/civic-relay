@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Panel de coordinación — incidente ferroviario</title>
+<meta name="description" content="Simulación en vivo: cuánto tarda SENDA en saber que hay dos trenes implicados, qué coches priorizar y dónde hay personas atrapadas.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.45 Inter,system-ui,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:22px 16px 60px}h1{font-size:30px;margin:4px 0}h2{font-size:18px;margin:0 0 8px}.m{color:var(--m)}a{color:var(--i)}
+.grid{display:grid;grid-template-columns:1.35fr 1fr;gap:14px}@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:14px}
+canvas{width:100%;height:auto;border-radius:10px;background:#071018;border:1px solid var(--l)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}@media(max-width:700px){.kpis{grid-template-columns:1fr 1fr}}
+.k{background:var(--p);border:1px solid var(--l);border-radius:12px;padding:12px}.k b{display:block;font-size:28px}.k.good b{color:var(--e)}.k.bad b{color:var(--r)}
+input[type=range]{width:100%}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+button{min-height:40px;padding:8px 14px;border-radius:10px;border:1px solid var(--l);background:#0f1d27;color:var(--t);font:inherit;cursor:pointer}button.p{background:var(--c);color:#140804;border-color:var(--c);font-weight:800}
+.site{border-left:4px solid var(--c);padding:8px 10px;margin:8px 0;background:#081219;border-radius:8px}.site.b{border-color:var(--i)}
+.alert{padding:8px 10px;border-radius:8px;margin:6px 0;font-size:14px}.alert.CRITICAL{background:rgba(255,91,110,.15);border:1px solid var(--r)}.alert.HIGH{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.5)}
+.bar{height:16px;border-radius:8px;background:var(--e)}.bar.ref{background:var(--r)}.legend span{display:inline-flex;align-items:center;gap:6px;margin-right:14px;font-size:13px;color:var(--m)}.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+code{font:12px ui-monospace,monospace;color:var(--i)}
+</style>
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/red">Red y satélites</a> · <a href="/senda/estado">Verificación</a></p>
+<h1>Panel de coordinación · accidente con dos trenes</h1>
+<p class="m">Configuración tipo Adamuz: un tren descarrila e invade la vía contigua y otro, en sentido contrario, lo embiste 20 s después. Cada punto es un teléfono con SENDA que <b>detecta el impacto por sí solo</b>, pregunta «¿estás bien?» y, si nadie responde, informa. Los informes viajan por cobertura propia o por Bluetooth hasta un compañero con señal. <b>Simulación sintética con los algoritmos reales</b>; no reproduce datos del accidente.</p>
+
+<div class="kpis">
+  <div class="k good"><b id="k-first">–</b>primer emplazamiento conocido</div>
+  <div class="k good"><b id="k-second">–</b>segundo tren identificado</div>
+  <div class="k bad"><b>~45 min</b>segundo tren reconocido en Adamuz (cronología publicada)</div>
+  <div class="k"><b id="k-phones">–</b>teléfonos con SENDA (adopción <span id="k-adop"></span>)</div>
+</div>
+
+<div class="card"><div class="row"><button class="p" id="play">▶ Reproducir</button><label class="m">Segundo <b id="tlabel">0</b></label><input type="range" id="t" aria-label="Segundo de la simulación" min="0" max="300" value="0" style="flex:1"></div>
+<div class="row" style="margin-top:8px"><label class="m">Adopción <select id="adoption"><option value="0.05">5 %</option><option value="0.1">10 %</option><option value="0.25" selected>25 %</option><option value="0.5">50 %</option></select></label>
+<label class="m">Cobertura móvil <select id="coverage"><option value="0.2">20 %</option><option value="0.55" selected>55 %</option><option value="0.9">90 %</option></select></label>
+<label class="m">Semilla <input id="seed" type="number" value="18" style="width:80px"></label><button id="rerun">Recalcular</button></div></div>
+
+<div class="grid" style="margin-top:14px">
+  <div class="card"><h2>Mapa del incidente</h2><canvas id="map" width="900" height="620"></canvas>
+    <div class="legend"><span><i class="dot" style="background:#3a5260"></i>teléfono (aún sin informe)</span><span><i class="dot" style="background:#ff5b6e"></i>atrapado / grave</span><span><i class="dot" style="background:#fbbf24"></i>sin respuesta</span><span><i class="dot" style="background:#91d7e8"></i>necesita ayuda / ayuda a otros</span></div></div>
+  <div class="card"><h2>Imagen operativa (fusión en tiempo real)</h2><div id="alerts"></div><div id="sites"></div>
+    <h2 style="margin-top:14px">Para el 112 (texto, cabe en un SMS largo)</h2><pre id="brief" style="white-space:pre-wrap;font:12px ui-monospace,monospace;color:#91d7e8"></pre></div>
+</div>
+
+<div class="card" style="margin-top:14px"><h2>Enviar a la sala 112 (CAP 1.2 + auditoría)</h2>
+  <p class="m">Cada emplazamiento fusionado sale como alerta <b>CAP 1.2</b> (el formato abierto que ya consumen las plataformas 112, EU-Alert y Meteoalarm) y queda en un <b>registro de auditoría encadenado</b> (SHA-256) que delata cualquier alteración posterior.</p>
+  <button class="p" id="cap">Exportar CAP de los emplazamientos</button> <span id="cap-st" class="m"></span><pre id="cap-out" style="white-space:pre-wrap;max-height:240px;overflow:auto;font:12px ui-monospace,monospace;color:#91d7e8"></pre></div>
+<div class="card" style="margin-top:14px"><h2>Tiempo hasta saber que hay un segundo tren</h2>
+  <p class="m">SENDA <b id="cmp-s"></b></p><div class="bar" id="bar-s" style="width:1%"></div>
+  <p class="m">Referencia publicada (Adamuz): ~45 min</p><div class="bar ref" style="width:100%"></div>
+  <p class="m" style="margin-top:10px">Fuente de la referencia: cronología publicada del accidente de Adamuz (18-01-2026) basada en registros del 112; debe contrastarse con la investigación oficial. SENDA no sustituye al 112: le añade la imagen agregada de los teléfonos de los pasajeros.</p></div>
+</main>
+<script type="module">
+import { simulateTwoTrainIncident } from '/senda/core/rail-scenario.mjs';
+import { fuseIncidentReports, emergencyBrief } from '/senda/core/rail-incident.mjs';
+import { railIncidentToCap, createAuditLog, verifyAuditLog } from '/senda/core/interop.mjs';
+const $ = (s) => document.querySelector(s);
+let sim, playing = null;
+function run() {
+  sim = simulateTwoTrainIncident({ seed: +$('#seed').value, adoption: +$('#adoption').value, coverage: +$('#coverage').value });
+  $('#k-first').textContent = sim.firstSiteKnownS != null ? sim.firstSiteKnownS + ' s' : 'n/d';
+  $('#k-second').textContent = sim.secondTrainKnownS != null ? sim.secondTrainKnownS + ' s' : 'no detectado';
+  $('#k-phones').textContent = sim.phonesWithSenda; $('#k-adop').textContent = Math.round(+$('#adoption').value * 100) + ' %';
+  $('#cmp-s').textContent = sim.secondTrainKnownS != null ? `${sim.secondTrainKnownS} s (≈${sim.improvementFactor}× más rápido)` : 'no lo detecta con estos parámetros';
+  $('#bar-s').style.width = sim.secondTrainKnownS != null ? Math.max(0.4, 100 * sim.secondTrainKnownS / 2700) + '%' : '0';
+  window.SENDA_PANEL = { sim };
+  draw(+$('#t').value);
+}
+const COL = { TRAPPED: '#ff5b6e', INJURED_SERIOUS: '#ff5b6e', NO_RESPONSE: '#fbbf24', NEED_HELP: '#91d7e8', HELPING_OTHERS: '#91d7e8' };
+function draw(t) {
+  $('#tlabel').textContent = t;
+  const cv = $('#map'), g = cv.getContext('2d'), W = cv.width, H = cv.height;
+  const pts = sim.phones; const lats = pts.map((p) => p.lat), lons = pts.map((p) => p.lon);
+  const la0 = Math.min(...lats) - 0.0006, la1 = Math.max(...lats) + 0.0006, lo0 = Math.min(...lons) - 0.0008, lo1 = Math.max(...lons) + 0.0008;
+  const X = (lon) => 30 + (lon - lo0) / (lo1 - lo0) * (W - 60), Y = (lat) => H - 30 - (lat - la0) / (la1 - la0) * (H - 60);
+  g.fillStyle = '#071018'; g.fillRect(0, 0, W, H);
+  g.strokeStyle = 'rgba(145,215,232,.25)'; g.lineWidth = 2; g.setLineDash([10, 8]);
+  for (const tr of sim.trains) { const a = tr.heading * Math.PI / 180, L = 0.004; g.beginPath(); g.moveTo(X(tr.origin.lon - Math.sin(a) * L), Y(tr.origin.lat - Math.cos(a) * L)); g.lineTo(X(tr.origin.lon + Math.sin(a) * L), Y(tr.origin.lat + Math.cos(a) * L)); g.stroke(); }
+  g.setLineDash([]);
+  for (const p of pts) { g.fillStyle = '#3a5260'; g.beginPath(); g.arc(X(p.lon), Y(p.lat), 4, 0, 6.3); g.fill(); }
+  const arrived = sim.reports.filter((r) => r.arrivesAt <= t);
+  for (const r of arrived) { g.fillStyle = COL[r.status] ?? '#91d7e8'; g.beginPath(); g.arc(X(r.lon), Y(r.lat), 6, 0, 6.3); g.fill(); }
+  const fused = fuseIncidentReports(arrived.map((r) => ({ ...r, reporterId: r.lat + ':' + r.lon + ':' + r.arrivesAt, at: r.arrivesAt, headingDeg: r.train === 'A' ? 45 : 225, nearbyInjured: 0 })), { now: t });
+  for (const s of fused.sites) { g.strokeStyle = s.headingDeg < 135 ? '#ff7756' : '#91d7e8'; g.lineWidth = 3; g.beginPath(); g.arc(X(s.center.lon), Y(s.center.lat), 26 + Math.min(80, s.extentM / 4), 0, 6.3); g.stroke(); g.fillStyle = '#f2f4f4'; g.font = '700 16px Inter'; g.fillText(`Sitio ${s.site}`, X(s.center.lon) + 30, Y(s.center.lat) - 30); }
+  $('#alerts').innerHTML = fused.alerts.slice(0, 6).map((a) => `<div class="alert ${a.level}">${a.level === 'CRITICAL' ? '⚠️ ' : ''}${a.text}</div>`).join('') || '<p class="m">Esperando informes…</p>';
+  $('#sites').innerHTML = fused.sites.map((s) => `<div class="site ${s.headingDeg < 135 ? '' : 'b'}"><b>Sitio ${s.site}</b> · ${s.train} · ${s.reports} informes · ±${s.extentM} m<br><span class="m">atrapados ${s.counts.TRAPPED} · graves ${s.counts.INJURED_SERIOUS} · sin respuesta ${s.counts.NO_RESPONSE} · necesita ayuda ${s.counts.NEED_HELP}</span><br><span class="m">Coches prioritarios: ${s.coachesByPriority.slice(0, 3).map((k) => `<b>${k.coach}</b> (${k.trapped} atrap., ${k.noResponse} s/resp.)`).join(' · ') || '–'}</span></div>`).join('');
+  $('#brief').textContent = emergencyBrief(fused) || '—';
+}
+$('#t').oninput = (e) => draw(+e.target.value);
+$('#rerun').onclick = run; ['#adoption', '#coverage'].forEach((s) => ($(s).onchange = run));
+$('#play').onclick = () => { if (playing) { clearInterval(playing); playing = null; $('#play').textContent = '▶ Reproducir'; return; } $('#t').value = 0; $('#play').textContent = '⏸ Pausa'; playing = setInterval(() => { const v = Math.min(300, +$('#t').value + 1); $('#t').value = v; draw(v); if (v >= 300) { clearInterval(playing); playing = null; $('#play').textContent = '▶ Reproducir'; } }, 60); };
+run(); $('#t').value = 120; draw(120);
+
+const audit = createAuditLog();
+document.querySelector('#cap').onclick = async () => {
+  const now = Date.now(); const caps = sim.final.sites.map((site) => railIncidentToCap(site, { now }));
+  for (const [i, c] of caps.entries()) await audit.append({ at: now + i, actor: 'panel-coordinacion', action: 'CAP_EXPORTED', data: { site: sim.final.sites[i].site, bytes: c.length } });
+  const v = await verifyAuditLog(audit.entries());
+  document.querySelector('#cap-out').textContent = caps.join('\n\n');
+  document.querySelector('#cap-st').textContent = `${caps.length} alerta(s) CAP · auditoría ${v.ok ? 'íntegra ✔ (' + v.length + ' entradas)' : 'ROTA'}`;
+  const blob = new Blob([caps.join('\n')], { type: 'application/xml' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'senda-incidente-cap.xml'; a.click();
+  window.SENDA_PANEL.cap = { count: caps.length, auditOk: v.ok, xml: caps[0] };
+};
+</script>
+</body></html>

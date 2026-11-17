@@ -1,0 +1,115 @@
+{
+ "fuente": "Contiene datos modificados de Copernicus Sentinel (2026), procesados por SENDA; Copernicus DEM GLO-30 © DLR e.V. 2010-2014 y © Airbus Defence and Space GmbH 2014-2018, proporcionado en el marco de COPERNICUS por la Unión Europea y la ESA",
+ "escenas": {
+  "pre": "7/S2A_30TUK_20260716_1_L2A",
+  "d0724": "7/S2C_30TUK_20260724_0_L2A",
+  "d0729": "7/S2B_30TUK_20260729_0_L2A",
+  "d0808": "8/S2B_30TUK_20260808_0_L2A"
+ },
+ "calibracion": "reflectancia = DN × 1e-4 sin desfase: comprobado empíricamente (agua del embalse con DN ≈ 450); los metadatos raster:bands indican −0,1, que daría reflectancias negativas",
+ "malla": {
+  "crs": "EPSG:32630",
+  "x0": 362000.0,
+  "y1": 4482300.0,
+  "res": 20,
+  "w": 1900,
+  "h": 1695
+ },
+ "clases": {
+  "baja": [
+   0.1,
+   0.27
+  ],
+  "moderada-baja": [
+   0.27,
+   0.44
+  ],
+  "moderada-alta": [
+   0.44,
+   0.66
+  ],
+  "alta": [
+   0.66,
+   9
+  ]
+ },
+ "fechas": {
+  "d0724": {
+   "ha_moderada_o_mas": 6204.9,
+   "ha_incluida_baja": 8054.5,
+   "por_clase_ha": {
+    "moderada-baja": 2080.4,
+    "moderada-alta": 2308.1,
+    "alta": 1493.3
+   },
+   "componentes_50ha": 12,
+   "pixeles_validos_pct": 96.3
+  },
+  "d0729": {
+   "ha_moderada_o_mas": 23393.6,
+   "ha_incluida_baja": 30459.7,
+   "por_clase_ha": {
+    "moderada-baja": 8441.6,
+    "moderada-alta": 8690.3,
+    "alta": 4821.0
+   },
+   "componentes_50ha": 29,
+   "pixeles_validos_pct": 98.8
+  },
+  "d0808": {
+   "ha_moderada_o_mas": 23912.2,
+   "ha_incluida_baja": 31307.3,
+   "por_clase_ha": {
+    "moderada-baja": 9080.4,
+    "moderada-alta": 8796.2,
+    "alta": 4582.1
+   },
+   "componentes_50ha": 25,
+   "pixeles_validos_pct": 98.9
+  }
+ },
+ "dem": {
+  "res": 100,
+  "w": 380,
+  "h": 339,
+  "min": 422.54998779296875,
+  "max": 1952.8216552734375,
+  "fichero": "dem_100m.bin (Int16 LE, m)"
+ },
+ "combustible": {
+  "fichero": "fuel_100m.bin (Uint8: 0 agua, 1 pasto, 2 matorral, 3 arbolado, 4 sin vegetación o urbano)",
+  "regla": "NDVI previo (16-07-2026): <0,15 sin vegetación; <0,32 pasto seco; <0,5 matorral; ≥0,5 arbolado; agua por SCL",
+  "pct": {
+   "0": 0.9,
+   "1": 24.9,
+   "2": 42.1,
+   "3": 30.9,
+   "4": 1.3
+  }
+ },
+ "esquinas_lonlat": [
+  [
+   -4.628109,
+   40.47993
+  ],
+  [
+   -4.179896,
+   40.485376
+  ],
+  [
+   -4.17459,
+   40.180026
+  ],
+  [
+   -4.620788,
+   40.174638
+  ]
+ ],
+ "quemado_100m": {
+  "fichero": "burn_100m.bin (Uint8, bits: 0 = 24-07, 1 = 29-07, 2 = 08-08; gravedad moderada-baja o más)"
+ },
+ "meteo": {
+  "fichero": "gfs_20260723_12z.json (perfiles 0,25°, 1000-500 hPa + superficie) y gfs_sinoptico.json (presión a nivel del mar, viento a 10 m y T a 2 m)",
+  "fuente": "NOAA GFS 0.25° (NCEP), run 2026-07-23 12Z, AWS Open Data (noaa-gfs-bdp-pds); dominio público"
+ }
+}

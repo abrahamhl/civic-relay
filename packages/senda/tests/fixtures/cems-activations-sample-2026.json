@@ -1,0 +1,192 @@
+{
+  "basis": "SYNTHETIC_FIXTURE_NOT_REAL",
+  "avisoVeracidad": "Escrito a mano por un agente el 10-11-2026 imitando el formato de Copernicus EMS. NO es una descarga real: el código EMSR765 es incorrecto (la activación real de la DANA de Valencia de octubre de 2024 es EMSR773) y los perímetros y áreas son inventados. Solo sirve para probar el analizador.",
+  "schema": "copernicus-ems-rapid-mapping/v1",
+  "generated_at": "2026-11-10T05:35:00Z",
+  "provenance": {
+    "source_url": "https://emergency.copernicus.eu/mapping/list-of-activations-rapid",
+    "operator": "European Commission Joint Research Centre (JRC)",
+    "license": "Copernicus Open Access / Legal Notice (European Union)"
+  },
+  "activations": [
+    {
+      "activation_code": "EMSR765",
+      "name": "Flood in Comunidad Valenciana, Spain",
+      "event_type": "FL",
+      "country_code": "ES",
+      "activation_time_utc": "2024-10-30T10:15:00Z",
+      "status": "CLOSED",
+      "centroid": [
+        -0.3763,
+        39.4699
+      ],
+      "aois": [
+        {
+          "aoi_id": "AOI01",
+          "name": "Valencia South / Paiporta",
+          "bbox": [
+            -0.52,
+            39.38,
+            -0.32,
+            39.48
+          ],
+          "products": [
+            {
+              "product_id": "EMSR765_AOI01_DEL_PRODUCT_r1_v1",
+              "product_type": "DELINEATION",
+              "publication_time_utc": "2024-10-31T04:22:00Z",
+              "satellite_sensor": "Sentinel-1 CSAR",
+              "sensor_mode": "IW GRDH",
+              "spatial_resolution_m": 10.0,
+              "observed_perimeters": [
+                {
+                  "perimeter_id": "PERIM_01",
+                  "class": "FLOODED_AREA",
+                  "area_ha": 4120.5,
+                  "observation_time_utc": "2024-10-30T18:04:00Z",
+                  "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                      [
+                        [
+                          -0.435,
+                          39.412
+                        ],
+                        [
+                          -0.41,
+                          39.425
+                        ],
+                        [
+                          -0.395,
+                          39.418
+                        ],
+                        [
+                          -0.388,
+                          39.395
+                        ],
+                        [
+                          -0.42,
+                          39.389
+                        ],
+                        [
+                          -0.435,
+                          39.412
+                        ]
+                      ]
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "product_id": "EMSR765_AOI01_GRA_PRODUCT_r1_v1",
+              "product_type": "GRADING",
+              "publication_time_utc": "2024-10-31T12:45:00Z",
+              "satellite_sensor": "COSMO-SkyMed",
+              "spatial_resolution_m": 3.0,
+              "observed_perimeters": [
+                {
+                  "perimeter_id": "PERIM_02",
+                  "class": "SUBMERGED_INFRASTRUCTURE",
+                  "area_ha": 890.2,
+                  "observation_time_utc": "2024-10-31T06:12:00Z",
+                  "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                      [
+                        [
+                          -0.42,
+                          39.41
+                        ],
+                        [
+                          -0.405,
+                          39.418
+                        ],
+                        [
+                          -0.4,
+                          39.405
+                        ],
+                        [
+                          -0.42,
+                          39.41
+                        ]
+                      ]
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "activation_code": "EMSR740",
+      "name": "Wildfire in Castilla y Leon, Spain",
+      "event_type": "WF",
+      "country_code": "ES",
+      "activation_time_utc": "2024-08-15T14:30:00Z",
+      "status": "CLOSED",
+      "centroid": [
+        -4.5,
+        40.5
+      ],
+      "aois": [
+        {
+          "aoi_id": "AOI01",
+          "name": "Cebreros / El Tiemblo",
+          "bbox": [
+            -4.6,
+            40.4,
+            -4.4,
+            40.6
+          ],
+          "products": [
+            {
+              "product_id": "EMSR740_AOI01_DEL_PRODUCT_r1_v1",
+              "product_type": "DELINEATION",
+              "publication_time_utc": "2024-08-16T08:15:00Z",
+              "satellite_sensor": "Sentinel-2 MSI",
+              "spatial_resolution_m": 10.0,
+              "observed_perimeters": [
+                {
+                  "perimeter_id": "PERIM_BURN_01",
+                  "class": "BURNT_AREA",
+                  "area_ha": 1420.0,
+                  "observation_time_utc": "2024-08-15T17:40:00Z",
+                  "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                      [
+                        [
+                          -4.52,
+                          40.48
+                        ],
+                        [
+                          -4.47,
+                          40.51
+                        ],
+                        [
+                          -4.45,
+                          40.49
+                        ],
+                        [
+                          -4.5,
+                          40.46
+                        ],
+                        [
+                          -4.52,
+                          40.48
+                        ]
+                      ]
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

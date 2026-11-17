@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Visión de tráfico</title>
+<meta name="description" content="Prueba con vídeo real: detección y seguimiento de vehículos (YOLOX + ByteTrack) en una cámara fija y en una cámara a bordo; conteo por sentido, distancia, tiempo hasta alcanzarlo y contactos de la calzada contraria, convertidos en datos de SENDA.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/vehiculos">Coches conectados</a> · <a href="/senda/camaras">Cámaras públicas</a> · <a href="/senda/carretera">Ruta protectora</a> · <a href="/senda/arquitectura">Arquitectura</a></p>
+<h1>Visión de tráfico, con vídeo real</h1>
+<p class="lead m">Esto no es una animación: son <b>vídeos reales</b> procesados fotograma a fotograma con un detector de vehículos de código abierto y un seguidor. De la imagen solo salen <b>números</b>: cuántos vehículos cruzan y en qué sentido, a qué distancia va el de delante, si te acercas y cuántos coches se cruzan contigo en la calzada contraria, que son los que llevarían el SOS de SENDA. Nunca se identifican personas ni matrículas.</p>
+
+<section class="card" data-viz="abordo" style="margin-top:14px" aria-labelledby="h-a">
+  <h2 id="h-a">🚘 El coche como sensor: cámara a bordo en autovía</h2>
+  <div class="g2" style="margin-top:0">
+    <div>
+      <video id="v-dash" src="/media/vision/dashcam.mp4" poster="/media/vision/dashcam-poster.jpg" controls muted loop playsinline preload="metadata" style="width:100%;border-radius:10px;background:#000" aria-label="Vídeo real de autovía con los vehículos detectados, su distancia estimada y la calzada contraria"></video>
+      <canvas id="cv-a" style="margin-top:10px" aria-label="Serie temporal del vídeo: vehículos a la vista, vehículos de la calzada contraria cruzados y momentos en que te acercas a otro vehículo"></canvas>
+    </div>
+    <div>
+      <div class="kv" id="a-kv" style="grid-template-columns:repeat(2,1fr)"></div>
+      <p class="m" style="font-size:14px">Con el móvil en el soporte, SENDA ve lo mismo que el conductor. Del vídeo saca tres cosas útiles:</p>
+      <ul class="m" style="font-size:14px">
+        <li><b>Tiempo hasta alcanzar al de delante</b>, sin calibrar: TTC = h / (dh/dt), con h la altura de la caja. Por debajo de 4 s en tu carril, «¡Frena!».</li>
+        <li><b>Distancia estimada</b> con la altura típica de un turismo (1,45 m) y una cámara de ~65°: orientativa, ±30 %.</li>
+        <li><b>Vehículos de la calzada contraria</b>: cada uno es un <b>contacto</b> que llevaría el SOS de SENDA sin cobertura. Aquí, 15 por minuto.</li>
+      </ul>
+      <div class="note">Del teléfono solo salen avisos y recuentos anónimos, nunca la imagen. Para publicarse, un recuento necesita al menos 5 fuentes distintas en la misma celda de vía y franja de tiempo (k-anonimato). El carril propio se ha marcado a mano para este vídeo; en el producto se detectarían las líneas.</div>
+    </div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-f">
+  <h2 id="h-f">📹 Cámara fija: cuántos pasan y en qué sentido</h2>
+  <div class="g2" style="margin-top:0">
+    <video src="/media/vision/fixed.mp4" poster="/media/vision/fixed-poster.jpg" controls muted loop playsinline preload="metadata" style="width:100%;border-radius:10px;background:#000" aria-label="Vídeo real de una cámara fija con los vehículos seguidos y la línea de conteo"></video>
+    <div>
+      <div class="kv" id="f-kv" style="grid-template-columns:repeat(2,1fr)"></div>
+      <p class="m" style="font-size:14px">Cada vehículo recibe un número de seguimiento temporal y anónimo. Cuenta cuando su centro cruza la línea, con su sentido. El ritmo por minuto y la ocupación se convierten en una medida como la de una estación de aforo (DATEX II). Con ella, el núcleo calcula dónde empieza una retención y a qué velocidad crece.</p>
+      <div class="note">Este vídeo de prueba es un aparcamiento con poco tráfico: 1 vehículo en 30 s. Es el dato real, y así se presenta. Con una cámara de la DGT o de Open Data Euskadi, el mismo proceso daría el caudal de una autovía. La imagen se analiza en el relé del organismo y se descarta: solo salen números.</div>
+    </div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-c">
+  <h2 id="h-c">🔗 Cómo se conecta todo</h2>
+  <div class="tw"><table><thead><tr><th>De dónde</th><th>Qué hace</th><th>Qué sale</th><th>A quién llega</th></tr></thead><tbody>
+    <tr><td><b>Cámara pública</b> (DGT, Euskadi, Cataluña)</td><td>El relé descarga la imagen, detecta y sigue vehículos (YOLOX + ByteTrack) y la descarta</td><td>Caudal por sentido, ocupación, visibilidad</td><td>Núcleo: retención, onda de choque y niebla → avisos a teléfonos y coches</td></tr>
+    <tr><td><b>Móvil en el soporte</b></td><td>Detecta en el propio teléfono, sin enviar la imagen</td><td>«¡Frena!» local y recuentos anónimos (k ≥ 5)</td><td>Coches de detrás (trama de 24 bytes) y el relé</td></tr>
+    <tr><td><b>Coche conectado</b> (Ley de Datos, DFRS)</td><td>Eventos del coche: ABS, airbag, luces de emergencia, frenada</td><td>Avisos con su confianza</td><td>Núcleo → fusión con lo anterior (ver <a href="/senda/vehiculos">Coches conectados</a>)</td></tr>
+    <tr><td><b>SENDA</b></td><td>Fusiona por tramo de vía y por tiempo</td><td>DATEX II, CAP y tramas de aviso</td><td>Teléfonos, coches, DGT 3.0 y Waze (por convenio), 112 (CAP)</td></tr>
+  </tbody></table></div>
+  <p class="src">Detector: <a href="https://github.com/Megvii-BaseDetection/YOLOX">YOLOX</a> (Apache 2.0), en ONNX Runtime y sin PyTorch. Seguimiento: <a href="https://github.com/roboflow/supervision">supervision</a> (ByteTrack, MIT). Vídeos: <a href="https://github.com/intel-iot-devkit/sample-videos">Intel IoT DevKit sample-videos</a> (CC BY 4.0) y <a href="https://github.com/udacity/CarND-Vehicle-Detection">Udacity CarND-Vehicle-Detection</a> (MIT). Ultralytics YOLO queda descartado para el producto por su licencia AGPL-3.0. Código: <code>packages/senda-vision/</code> (Python) y <code>vehicle-link.mjs</code>. Pendiente: correr el detector directamente en el navegador con ONNX Runtime Web.</p>
+</section>
+</main>
+<script type="module">
+import { $, C, canvas, text, rr, run, clamp, FILM } from '/senda/kit.mjs';
+import { cameraToMeasured, dashcamToProbe } from '/senda/core/vehicle-link.mjs';
+const fmt = (x, d = 0) => (x == null ? '—' : x.toFixed(d).replace('.', ','));
+const S = {}; window.SENDA_TRAFICO = S;
+const [dash, fixed] = await Promise.all(['/media/vision/dashcam.json', '/media/vision/fixed.json'].map((u) => fetch(u).then((r) => r.json())));
+S.dash = { tracked: dash.vehiclesTracked, oncomingPerMin: dash.oncomingPerMin, probe: dashcamToProbe(dash) }; S.fixed = { total: fixed.total, perMinute: fixed.perMinute, measured: cameraToMeasured(fixed) };
+$('#a-kv').innerHTML = `<div><b>${dash.vehiclesTracked}</b><span>vehículos seguidos en ${fmt(dash.durationS)} s</span></div><div><b>${fmt(dash.oncomingPerMin, 0)}/min</b><span>contactos de la calzada contraria</span></div><div><b>${fmt(dash.meanVisible, 1)}</b><span>vehículos a la vista de media</span></div><div><b>${S.dash.probe.alerts.length}</b><span>avisos «¡Frena!» (no hubo nadie delante en tu carril)</span></div>`;
+$('#f-kv').innerHTML = `<div><b>${fixed.total}</b><span>vehículo(s) cruzan en ${fmt(fixed.durationS)} s</span></div><div><b>${fmt(fixed.perMinute, 1)}/min</b><span>ritmo (≈ ${S.fixed.measured.flowVehH} veh/h)</span></div><div><b>↑ ${fixed.counts.sube} · ↓ ${fixed.counts.baja}</b><span>por sentido</span></div><div><b>${fmt(fixed.procSeconds, 0)} s</b><span>de proceso en CPU para ${fixed.frames} fotogramas</span></div>`;
+const ga = canvas($('#cv-a'), 640, 260);
+function drawA(t) {
+  const g = ga, ser = dash.series, T = dash.durationS, X = (s) => 50 + (s / T) * 570, now = FILM ? clamp(t / 16) * T : (($('#v-dash').currentTime || 0) % T);
+  g.fillStyle = C.bg; g.fillRect(0, 0, 640, 260); g.strokeStyle = C.l; g.strokeRect(50, 20, 570, 180);
+  const maxN = Math.max(3, ...ser.map((s) => s.n)), Y = (n) => 200 - (n / maxN) * 170;
+  g.strokeStyle = C.i; g.lineWidth = 2; g.beginPath(); ser.forEach((s, k) => (k ? g.lineTo(X(s.t), Y(s.n)) : g.moveTo(X(s.t), Y(s.n)))); g.stroke(); g.lineWidth = 1;
+  for (const s of ser) if (s.nearTtcS) { g.fillStyle = 'rgba(251,191,36,.85)'; g.fillRect(X(s.t) - 1, 196, 3, 6); }
+  g.strokeStyle = C.c; g.beginPath(); g.moveTo(X(now), 20); g.lineTo(X(now), 200); g.stroke();
+  [0, 10, 20, 30].forEach((s) => s <= T && text(g, `${s} s`, X(s), 218, { c: C.m, f: '11px Inter,system-ui', al: 'center' }));
+  for (let n = 0; n <= maxN; n++) text(g, `${n}`, 42, Y(n) + 4, { c: C.g, f: '10px Inter,system-ui', al: 'right' });
+  text(g, 'vehículos a la vista (línea) · momentos en que te acercas a otro vehículo (marcas)', 50, 244, { c: C.m, f: '12px Inter,system-ui' });
+  text(g, 'Serie medida en el vídeo real', 50, 14, { c: C.t, f: '700 12px Inter,system-ui' });
+}
+run({ abordo: drawA });
+</script>
+</body></html>

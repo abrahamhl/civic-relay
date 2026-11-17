@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Seguimiento de incendio</title>
+<meta name="description" content="Seguir un incendio forestal con todo lo que lo ve: torres y cámaras de vigilancia, la brújula del móvil, satélites (NASA FIRMS), meteorología del incendio (30-30-30, HDW, Fosberg, ISI), intensidad y criticidad, carreteras a cortar y avisos a los coches. Caso real: San Martín de Valdeiglesias, 23-07-2026.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+<style>
+.lg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--m);margin-top:8px}.lg i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.crit{font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.c-vigilancia{color:var(--e)}.c-alerta{color:var(--a)}.c-emergencia{color:#ff9a3d}.c-extrema{color:var(--r)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.cl{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;font-size:14px}.cl output{font-weight:700;min-width:64px;text-align:right}
+ol.tl{padding-left:20px;margin:6px 0}ol.tl li{margin:4px 0}
+</style>
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/incendio">Frente de llama</a> · <a href="/senda/ojo">Ojo de SENDA</a> · <a href="/senda/camaras">Cámaras públicas</a> · <a href="/senda/carretera">Ruta protectora</a> · <a href="/senda/arquitectura">Arquitectura</a></p>
+<h1>Seguir un incendio con todo lo que lo ve</h1>
+<p class="lead m">Un incendio lo ven a la vez muchas fuentes: las <b>torres y cámaras de vigilancia</b>, los <b>conductores y vecinos</b> que miran la columna, los <b>satélites</b> que pasan cada pocas horas y las <b>estaciones meteorológicas</b>. SENDA junta lo que cada una sabe y responde cinco preguntas: <b>dónde está</b>, <b>cuánto ocupa y a qué velocidad avanza</b>, <b>qué tiempo hace en el fuego</b>, <b>cómo de grave es</b> y <b>qué carreteras y pueblos alcanzará, y cuándo</b>. Con esas respuestas avisa a los teléfonos y a los coches de la zona, y propone los avisos al 112.</p>
+
+<section class="card" data-viz="mapa" style="margin-top:14px" aria-labelledby="h-m">
+  <h2 id="h-m">🗺️ Mapa operativo: San Martín de Valdeiglesias, 23-07-2026</h2>
+  <p class="m" style="font-size:14px;margin-top:0">Reconstrucción <b>ilustrativa</b> sobre la geografía real del caso. El inicio, junto al km 57 de la M-501, y las carreteras y los pueblos son reales. La forma del frente, el viento, las torres, los móviles y los focos de satélite son <b>inventados</b> para mostrar el método. No son datos del incendio real.</p>
+  <canvas id="cv-m" aria-label="Mapa del incendio: el frente avanza hacia el este desde el km 57 de la M-501; rumbos de dos torres, una cámara y cuatro móviles cruzándose sobre la columna; focos de satélite y perímetro; la M-501 cortada entre Pelayos de la Presa y San Martín, con los coches avisados detenidos antes del tramo"></canvas>
+  <div class="row"><button id="play" class="p" aria-pressed="true">⏸ Pausa</button><label for="t" class="m" style="font-size:13px">Minuto</label><input id="t" type="range" min="0" max="240" step="1" value="0" aria-label="Minuto desde el inicio del incendio"><b id="t-l" style="min-width:110px">15:00 · 0 min</b></div>
+  <div class="lg"><span><i style="background:#ff7a1a"></i>frente activo</span><span><i style="background:#3a1a12"></i>área quemada</span><span><i style="background:#ffd23f"></i>foco de satélite (375 m)</span><span><i style="background:#91d7e8"></i>rumbo de torre o cámara</span><span><i style="background:#fbbf24"></i>rumbo de móvil</span><span><i style="background:#ff5b6e"></i>descartado o tramo a cortar</span><span><i style="background:#ffffff;opacity:.6"></i>perímetro por satélite</span><span>Relieve y vegetación esquemáticos (no reales); vehículos no a escala</span></div>
+  <div class="kv" id="m-kv" style="margin-top:12px"></div>
+</section>
+
+<div class="g2">
+  <section class="card" aria-labelledby="h-c">
+    <h2 id="h-c">🚨 Criticidad y qué hacer</h2>
+    <p class="m" style="font-size:13px;margin:0">Estado tras la segunda pasada de satélite (18:30, minuto 210).</p>
+    <div id="c-lv" class="crit"></div>
+    <ul id="c-rs" class="m" style="font-size:14px;margin:6px 0"></ul>
+    <div class="tw"><table><thead><tr><th>Carretera</th><th>El fuego llega</th><th>Tramo</th><th>Propuesta</th></tr></thead><tbody id="c-rd"></tbody></table></div>
+    <div class="tw" style="margin-top:8px"><table><thead><tr><th>Pueblo</th><th>El fuego podría llegar</th></tr></thead><tbody id="c-tw"></tbody></table></div>
+    <p class="src">Estimación con el modelo elíptico y el viento medio. No incluye rachas, cambios de viento ni focos secundarios, que pueden adelantar mucho la llegada. Contra el viento el fuego avanza muy despacio, pero eso no hace segura la zona.</p>
+    <div class="note">Criterio de SENDA para ordenar los avisos. La <b>situación operativa</b> oficial (0 a 3) la declara la dirección del plan INFOMA, según la Directriz básica (RD 893/2013). SENDA no dirige la extinción: propone datos y avisos al centro de mando.</div>
+  </section>
+  <section class="card" aria-labelledby="h-w">
+    <h2 id="h-w">🌡️ Meteorología del incendio, con tus números</h2>
+    <div class="cl">
+      <label for="w-t">Temperatura</label><input id="w-t" type="range" min="5" max="46" value="38"><output id="o-t"></output>
+      <label for="w-h">Humedad relativa</label><input id="w-h" type="range" min="5" max="95" value="15"><output id="o-h"></output>
+      <label for="w-v">Viento medio</label><input id="w-v" type="range" min="0" max="70" value="32"><output id="o-v"></output>
+      <label for="w-f">FFMC (EFFIS/AEMET)</label><input id="w-f" type="range" min="60" max="99" value="94"><output id="o-f"></output>
+      <label for="w-r">Velocidad del frente</label><input id="w-r" type="range" min="0.5" max="60" step="0.5" value="25"><output id="o-r"></output>
+      <label for="w-u">Combustible</label><select id="w-u"><option value="pasto">Pasto</option><option value="matorral" selected>Matorral</option><option value="arbolado">Arbolado</option></select><span></span>
+    </div>
+    <div class="chips" id="w-30"></div>
+    <div class="kv" id="w-kv" style="grid-template-columns:repeat(3,1fr)"></div>
+    <p class="m" style="font-size:13px" id="w-at"></p>
+    <p class="src">Regla 30-30-30: más de 30 °C, menos de 30 % de humedad y más de 30 km/h de viento. En 2007-2016 la cumplieron 72 de 196 grandes incendios en España, y el viento fue el factor más decisivo (<a href="https://www.xataka.com/magnet/espana-no-hay-verano-incendios-forestales-tampoco-que-no-se-hable-temible-regla-30-30-30">análisis de Civio citado por Xataka</a>). Déficit de presión de vapor: Magnus (Alduchov y Eskridge, 1996). HDW: déficit de vapor × viento (Srock et al., 2018), aquí con valores de superficie. Fosberg (1978) con la humedad de equilibrio de Simard (1968). ISI del sistema canadiense FWI (Van Wagner, 1987). Intensidad de Byram y longitud de llama (Byram, 1959). Clase de ataque según Andrews y Rothermel (1982). Cargas de combustible orientativas.</p>
+  </section>
+</div>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-p">
+  <h2 id="h-p">🧭 Prueba con tu móvil: marca la columna de humo</h2>
+  <div class="g2" style="margin-top:0">
+    <div>
+      <p class="m" style="font-size:14px;margin-top:0">Apunta la cámara trasera hacia la base de la columna y pulsa <b>Marcar</b>. El teléfono calcula el rumbo con la brújula y la orientación (fórmula de la especificación W3C DeviceOrientation) y lo junta con tu posición y la hora. La foto <b>no sale del teléfono</b>. Al relé solo iría el número, con tu posición redondeada a ~100 m.</p>
+      <div class="row"><button id="p-on" class="p">Usar mi brújula</button><button id="p-mk" disabled>Marcar humo</button></div>
+      <div class="row"><label for="p-man" class="m" style="font-size:13px">o escribe un rumbo (°)</label><input id="p-man" type="number" min="0" max="359" value="75" style="min-height:44px;width:90px;border-radius:10px;border:1px solid var(--l);background:#0f1d27;color:var(--t);padding:6px"><button id="p-add">Usar este rumbo</button></div>
+      <p id="p-st" class="m" style="font-size:14px" aria-live="polite">Brújula sin activar.</p>
+    </div>
+    <div>
+      <pre id="p-out" style="background:#071018;border:1px solid var(--l);border-radius:10px;padding:10px;font-size:12.5px;white-space:pre-wrap;min-height:150px;margin:0" aria-label="Observación que enviaría el teléfono"></pre>
+      <div class="note">La brújula del móvil se desvía cerca de metales e imanes, por ejemplo dentro de un coche. Por eso pesa 8 veces menos que una torre (±8° frente a ±1°). Además, SENDA descarta los rumbos que no casan con el resto: en el mapa, el móvil con la brújula descalibrada (28° de error) queda fuera.</div>
+    </div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-r">
+  <h2 id="h-r">📰 El caso real, con sus fuentes</h2>
+  <div class="g2" style="margin-top:0">
+    <div><ul id="r-facts" style="font-size:14px;margin:0;padding-left:18px"></ul></div>
+    <div>
+      <h3>Lo que SENDA habría aportado (reconstrucción ilustrativa)</h3>
+      <ol class="tl m" style="font-size:14px">
+        <li><b>Minuto 0.</b> Un coche arde en la calzada junto al monte, con calor, sequedad y viento: riesgo alto. El aviso al 112 sale con el punto kilométrico, también sin cobertura, por los coches que pasan.</li>
+        <li><b>Minutos 2-12.</b> Conductores y vecinos marcan la columna con la brújula. Las torres dan su rumbo.</li>
+        <li><b>Minuto 20.</b> Cinco rumbos válidos sitúan la columna con una elipse de ±130 m. La M-501 se avisa a los coches que se acercan.</li>
+        <li><b>Minuto 90.</b> Primera pasada de satélite: perímetro y potencia radiativa.</li>
+        <li><b>Minuto 210.</b> Segunda pasada: avance medido de 25 m/min hacia el este. Pelayos de la Presa, primer pueblo expuesto. Se propone cortar la M-501 entre los km 51 y 57.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-cm">
+  <h2 id="h-cm">🔎 La web de la Comunidad de Madrid con fuegos y cámaras</h2>
+  <p class="m" style="font-size:14px;margin-top:0">Buscamos la página que recuerdas, con los fuegos en directo, muchas cámaras localizadas y las comunicaciones con Protección Civil. Esto es lo que se puede verificar hoy:</p>
+  <ul class="m" style="font-size:14px">
+    <li><b>ASEM 112 de la Comunidad de Madrid</b> publica una página por incendio, con el estado, los cortes de carretera, los confinamientos y las evacuaciones. Por ejemplo, la del <a href="https://www.comunidad.madrid/seguridad-emergencias-asem-112/incendio-forestal-almorox-ifalmorox-villa-prado-julio-2026">incendio de Almorox y Villa del Prado (julio de 2026)</a>. SENDA la integra en modo <span class="chip ok">PASIVO</span>: la cita y enlaza, no la reescribe.</li>
+    <li><b>Torres y cámaras del plan INFOMA.</b> Hay entre 33 y 38 puestos fijos, según el año y la fuente, y 4 cámaras de videovigilancia (<a href="https://www.comunidad.madrid/node/69737">Comunidad de Madrid</a>). Sus imágenes van a los operadores y al puesto de mando, no al público. SENDA las integra por <span class="chip sim">CONVENIO</span> y solo recibe el rumbo y la hora.</li>
+    <li><b>Las comunicaciones de la policía y Protección Civil</b> van cifradas, por TETRA. Escucharlas o difundirlas vulneraría el secreto de las comunicaciones. SENDA no lo hace <span class="chip no">NUNCA</span>. Sí integra lo que esos servicios publican: cuentas oficiales, avisos CAP y ES-Alert recibidos.</li>
+    <li>No hemos encontrado un visor público oficial de esas cámaras. <b>Si nos pasas la dirección</b>, comprobamos quién la publica y con qué licencia, y la añadimos como fuente PASIVO o por CONVENIO.</li>
+  </ul>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-s">
+  <h2 id="h-s">🔌 Fuentes y modo de acceso</h2>
+  <div class="tw"><table><thead><tr><th>Fuente</th><th>Qué aporta</th><th>Latencia</th><th>Base legal</th><th>Acceso</th></tr></thead><tbody id="s-tb"></tbody></table></div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-a">
+  <h2 id="h-a">🔗 Cómo se conecta: satélites, móviles, torres y coches</h2>
+  <div class="tw"><table><thead><tr><th>Entra</th><th>Se calcula en</th><th>Sale</th><th>Llega a</th></tr></thead><tbody>
+    <tr><td><b>Satélites</b>: FIRMS (VIIRS/MODIS), Meteosat, Sentinel-2, EFFIS</td><td>Relé SENDA, que descarga y cachea para la zona</td><td>Perímetro, área, FRP y avance por pasada</td><td>Núcleo en cada teléfono, también sin red (paquete de zona)</td></tr>
+    <tr><td><b>Móvil</b>: brújula, GPS, cámara (local) y barómetro</td><td>El propio teléfono</td><td>Rumbo, hora y posición redondeada</td><td>Malla de teléfonos → relé → fusión de rumbos</td></tr>
+    <tr><td><b>Torres y cámaras</b> (convenio)</td><td>Puesto de vigilancia</td><td>Rumbo y hora</td><td>Fusión de rumbos con elipse de error</td></tr>
+    <tr><td><b>Meteorología</b>: AEMET y estaciones</td><td>Núcleo (<code>fire-watch.mjs</code>)</td><td>30-30-30, HDW, Fosberg, ISI, humedad del combustible</td><td>Criticidad y previsión del frente</td></tr>
+    <tr><td><b>Coches</b> (Ley de Datos, DFRS)</td><td>Núcleo + ruta protectora</td><td>Tramos a cortar, tramas HAZARD.FIRE de 24 bytes, velocidad segura con humo</td><td>Coches que se acercan (por radio o por los de delante) y DGT 3.0 por convenio</td></tr>
+    <tr><td><b>Todo lo anterior</b></td><td>SENDA</td><td>Avisos CAP con la criticidad y las fuentes</td><td>112 y centro de mando, como canal secundario: nunca sustituye a ES-Alert</td></tr>
+  </tbody></table></div>
+  <p class="src">Código: <code>packages/senda/src/fire-watch.mjs</code> (9 pruebas), junto a <code>wildfire.mjs</code> (frente por tiempo mínimo de llegada) y <code>road-guard.mjs</code> (tramas a los coches). Mapa con trazados simplificados y cascos urbanos aproximados (±1 km).</p>
+</section>
+</main>
+<script type="module">
+import { $, C, canvas, text, run, clamp, FILM, drawCar } from '/senda/kit.mjs';
+import { fireScenario, fireWatch, hotspotPerimeter, fireWeather, fireBehavior, FIRE_SOURCES, CASE_SMV_2026, compassHeading, phoneSighting, bearingFix, etaToPoint, roadThreats } from '/senda/core/fire-watch.mjs';
+import { localFrame } from '/senda/core/geo-offline.mjs';
+const fmt = (x, d = 0) => (x == null || !Number.isFinite(x) ? '—' : x.toFixed(d).replace('.', ','));
+const fmtMin = (m) => (!Number.isFinite(m) ? 'más de 2 días' : m === 0 ? 'ya alcanzado' : m < 90 ? `${Math.round(m)} min` : m < 2880 ? `${fmt(m / 60, 1)} h` : 'más de 2 días');
+const S = {}; window.SENDA_FUEGO = S;
+const sc = fireScenario({ seed: 7 }), all = fireWatch(sc, { people: 240 });
+const [per1, per2] = all.perimeters, prior = 20; // m/min a priori (modelo) antes de la 2.ª pasada
+const fixF = localFrame(sc.smokeTruth.lat, sc.smokeTruth.lon), fq = fixF.toXY(all.fix.lat, all.fix.lon);
+S.fix = { errM: Math.round(Math.hypot(fq.x, fq.y)), majorM: all.fix.majorM, rejected: all.fix.rejected.map((r) => r.id), used: all.fix.used.length };
+S.areaHa = per2.areaHa; S.ros = all.progress.rosMMin; S.level = all.criticality.level; S.score = all.criticality.score; S.roads = all.roads.map((r) => ({ id: r.id, action: r.action, section: r.section }));
+S.alerts = all.carAlerts.length; S.firstTown = all.towns[0].name;
+
+// ---------------------------------------------------------------- Mapa
+const W = 960, H = 820, K = 0.058, MF = localFrame(40.364, -4.335), P = (p) => { const q = MF.toXY(p.lat, p.lon); return { x: W / 2 + q.x * K, y: H / 2 - q.y * K }; };
+const gm = canvas($('#cv-m'), W, H);
+const base = document.createElement('canvas'); base.width = W; base.height = H;
+(function drawBase() {
+  const g = base.getContext('2d'), sw = 320, sh = Math.round((sw * H) / W), small = document.createElement('canvas'); small.width = sw; small.height = sh;
+  let s = 11; const tab = new Float32Array(64 * 64).map(() => { s = (s * 16807) % 2147483647; return s / 2147483647; });
+  const vn = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf), at = (i, j) => tab[((j & 63) * 64) + (i & 63)]; const a = at(xi, yi), b = at(xi + 1, yi), c = at(xi, yi + 1), d = at(xi + 1, yi + 1); return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; };
+  const fbm = (x, y) => { let t = 0, f = 1, a = 0.5; for (let o = 0; o < 5; o++) { t += a * vn(x * f, y * f); f *= 2; a *= 0.5; } return t; };
+  const img = small.getContext('2d').createImageData(sw, sh), sc0 = 0.028;
+  for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++) {
+    const h = fbm(x * sc0, y * sc0), veg = fbm(x * sc0 * 2.3 + 40, y * sc0 * 2.3 + 17), sh0 = Math.max(0.55, Math.min(1.35, 1 + (fbm((x - 1) * sc0, (y - 1) * sc0) - fbm((x + 1) * sc0, (y + 1) * sc0)) * 9));
+    const k = Math.max(0, Math.min(1, (veg - 0.42) * 3.2)), r = (78 * (1 - k) + 26 * k) * sh0 * (0.75 + h * 0.4), gg = (72 * (1 - k) + 44 * k) * sh0 * (0.75 + h * 0.4), bb = (48 * (1 - k) + 32 * k) * sh0 * (0.75 + h * 0.4), i = (y * sw + x) * 4;
+    img.data[i] = r * 0.62; img.data[i + 1] = gg * 0.62; img.data[i + 2] = bb * 0.62; img.data[i + 3] = 255;
+  }
+  small.getContext('2d').putImageData(img, 0, 0); g.imageSmoothingQuality = 'high'; g.drawImage(small, 0, 0, W, H);
+  g.strokeStyle = 'rgba(200,210,215,.10)'; g.lineWidth = 1; g.font = '10px Inter,system-ui'; g.fillStyle = 'rgba(200,210,215,.6)';
+  for (let lon = -4.42; lon <= -4.24; lon += 0.04) { const a = P({ lat: 40.2, lon }), b = P({ lat: 40.5, lon }); g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke(); g.fillText(`${Math.abs(lon).toFixed(2)}° O`, a.x + 3, H - 6); }
+  for (let lat = 40.32; lat <= 40.42; lat += 0.04) { const a = P({ lat, lon: -4.6 }), b = P({ lat, lon: -4.1 }); g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke(); g.fillText(`${lat.toFixed(2)}° N`, 4, a.y - 3); }
+  for (const t of sc.towns) { const p = P(t); const gr = g.createRadialGradient(p.x, p.y, 2, p.x, p.y, 34); gr.addColorStop(0, 'rgba(215,212,205,.55)'); gr.addColorStop(1, 'rgba(215,212,205,0)'); g.fillStyle = gr; g.beginPath(); g.arc(p.x, p.y, 34, 0, 7); g.fill(); }
+  for (const r of sc.roads) for (const [w, c] of [[8, '#14191c'], [5, r.id === 'N-403' ? '#e8c35a' : '#e4e7ea']]) { g.strokeStyle = c; g.lineWidth = w; g.lineJoin = g.lineCap = 'round'; g.beginPath(); r.path.forEach((v, i) => { const p = P(v); i ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y); }); g.stroke(); }
+  for (const r of sc.roads) { const p = P(r.path[r.id === 'N-403' ? 1 : 1]); g.fillStyle = r.id === 'N-403' ? '#c0392b' : '#1f5fa8'; g.fillRect(p.x - 22, p.y - 9, 44, 18); g.fillStyle = '#fff'; g.font = '700 11px Inter,system-ui'; g.textAlign = 'center'; g.fillText(r.name, p.x, p.y + 4); g.textAlign = 'left'; }
+  const sb = { x: 24, y: H - 30 }; g.fillStyle = '#e4e7ea'; g.fillRect(sb.x, sb.y, 2000 * K, 4); g.font = '11px Inter,system-ui'; g.fillText('2 km', sb.x, sb.y - 6);
+  g.font = '700 14px Inter,system-ui'; g.fillText('N', W - 34, 104); g.beginPath(); g.moveTo(W - 30, 110); g.lineTo(W - 36, 128); g.lineTo(W - 24, 128); g.closePath(); g.fill();
+})();
+const onMap = (p) => p.x >= 0 && p.x <= W && p.y >= 0 && p.y <= H;
+function edgeMark(g, p, name, c) { const cx = W / 2, cy = H / 2, dx = p.x - cx, dy = p.y - cy, k = Math.min((W / 2 - 18) / Math.abs(dx || 1e-6), (H / 2 - 18) / Math.abs(dy || 1e-6)), x = cx + dx * k, y = cy + dy * k, a = Math.atan2(dy, dx); g.save(); g.translate(x, y); g.rotate(a); g.fillStyle = c; g.beginPath(); g.moveTo(10, 0); g.lineTo(-6, -7); g.lineTo(-6, 7); g.closePath(); g.fill(); g.restore(); label(g, name, Math.min(W - 150, Math.max(10, x - 40)), y + (y > H / 2 ? -12 : 22), { c, f: '600 11px Inter,system-ui' }); }
+const polyPath = (g, pts) => { g.beginPath(); pts.forEach((v, i) => { const p = P(v); i ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y); }); g.closePath(); };
+const label = (g, s, x, y, o = {}) => { g.save(); g.font = o.f || '600 12px Inter,system-ui'; const w = g.measureText(s).width; if (o.left) x -= w; x = Math.max(6, Math.min(W - w - 6, x)); g.lineWidth = 4; g.strokeStyle = 'rgba(5,9,12,.85)'; g.strokeText(s, x, y); g.fillStyle = o.c || C.t; g.fillText(s, x, y); g.restore(); };
+const cars = []; for (const r of sc.roads) for (let k = 0; k < 7; k++) cars.push({ road: r, off: k / 7, dir: k % 2 ? 1 : -1, i: cars.length });
+const pathLen = (r) => { let L = 0; for (let i = 1; i < r.path.length; i++) { const a = P(r.path[i - 1]), b = P(r.path[i]); L += Math.hypot(b.x - a.x, b.y - a.y); } return L; };
+function along(r, s) { let acc = 0; for (let i = 1; i < r.path.length; i++) { const a = P(r.path[i - 1]), b = P(r.path[i]), L = Math.hypot(b.x - a.x, b.y - a.y); if (acc + L >= s) { const u = (s - acc) / L; return { x: a.x + (b.x - a.x) * u, y: a.y + (b.y - a.y) * u, ang: Math.atan2(b.y - a.y, b.x - a.x) }; } acc += L; } const a = P(r.path[r.path.length - 2]), b = P(r.path[r.path.length - 1]); return { x: b.x, y: b.y, ang: Math.atan2(b.y - a.y, b.x - a.x) }; }
+const m501 = sc.roads.find((r) => r.id === 'M-501'), L501 = pathLen(m501);
+const sOfPk = (pk) => ((pk - m501.pk0) * 1000 * K);
+const clock = (t) => { const m = 15 * 60 + Math.round(t); return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
+const memo = new Map();
+function stateAt(t) {
+  const key = Math.floor(t / 2); if (memo.has(key)) return memo.get(key);
+  const v = stateAt0(key * 2); memo.set(key, v); return v;
+}
+function stateAt0(t) {
+  const sat = t >= 210 ? per2 : t >= 90 ? per1 : null, ros = t >= 210 ? all.progress.rosMMin : prior, fixOn = t >= sc.tSight;
+  const now = hotspotPerimeter(sc.ellipseAt(Math.max(1, t)).map((p) => ({ ...p, instrument: 'VIIRS', scanKm: 0.05, trackKm: 0.05 })), { origin: sc.ignition });
+  const opts = { rosHeadMMin: ros, spreadToDeg: t >= 210 ? all.progress.headingDeg : sc.spreadToDeg, windKmh: sc.windKmh, from: sc.ignition };
+  const cut = fixOn ? roadThreats(sc.roads, now, opts).find((r) => r.id === 'M-501' && r.action === 'cortar')?.section ?? null : null;
+  return { sat, ros, fixOn, cut, towns: sc.towns.map((tw) => ({ ...tw, eta: etaToPoint(now, tw, opts) })), measured: t >= 210 };
+}
+function drawM(tt) {
+  const t = FILM ? clamp(tt / 16) * 240 : st.t, g = gm, E = sc.ellipseAt(Math.max(0.5, t)), sp = (sc.spreadToDeg * Math.PI) / 180;
+  g.drawImage(base, 0, 0);
+  // humo hacia donde sopla el viento
+  if (t > 3) { const head = P(E[0]); for (let k = 0; k < 9; k++) { const d = (40 + k * 70) * Math.min(1, t / 60), x = head.x + Math.sin(sp) * d, y = head.y - Math.cos(sp) * d - k * 5, r = 26 + k * 20; const gr = g.createRadialGradient(x, y, 2, x, y, r); gr.addColorStop(0, `rgba(170,170,165,${0.22 - k * 0.018})`); gr.addColorStop(1, 'rgba(170,170,165,0)'); g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); } }
+  // área quemada y frente
+  g.save(); polyPath(g, E); const c = P(sc.ignition), grd = g.createRadialGradient(c.x, c.y, 2, c.x, c.y, Math.max(20, E.length && Math.hypot(P(E[0]).x - c.x, P(E[0]).y - c.y))); grd.addColorStop(0, '#1a0c08'); grd.addColorStop(1, '#4a1d10'); g.fillStyle = grd; g.fill();
+  g.shadowColor = '#ff6a00'; g.shadowBlur = 14; g.strokeStyle = '#ff7a1a'; g.lineWidth = 2.6; g.stroke(); g.restore();
+  // focos de satélite y perímetro
+  const s = stateAt(t);
+  for (const ps of sc.passes) if (t >= ps.tMin) for (const p of ps.points) { const q = P(p), w = 375 * K; g.fillStyle = p.frp > 20 ? 'rgba(255,80,30,.62)' : 'rgba(255,210,63,.55)'; g.fillRect(q.x - w / 2, q.y - w / 2, w, w); g.strokeStyle = 'rgba(30,10,0,.55)'; g.lineWidth = 1; g.strokeRect(q.x - w / 2, q.y - w / 2, w, w); }
+  if (s.sat) { g.save(); g.setLineDash([6, 5]); g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineWidth = 1.5; polyPath(g, s.sat.hull); g.stroke(); g.restore(); }
+  if (s.measured) for (const [h, a] of [[60, 0.6], [120, 0.35]]) { const Ef = sc.ellipseAt(210 + h * (all.progress.rosMMin / sc.rosHeadMMin)); g.save(); g.setLineDash([3, 6]); g.strokeStyle = `rgba(255,154,61,${a})`; polyPath(g, Ef); g.stroke(); g.restore(); const hp = P(Ef[0]); label(g, `+${h / 60} h`, hp.x + 6, hp.y + 4, { c: '#ff9a3d', f: '600 11px Inter,system-ui' }); }
+  // rumbos
+  for (const o of sc.sightings) {
+    if (t < o.t) continue;
+    const a = P(o), rej = all.fix.rejected.some((r) => r.id === o.id), az = (o.azDeg * Math.PI) / 180, len = 14000 * K;
+    g.save(); g.strokeStyle = rej ? 'rgba(255,91,110,.8)' : o.kind === 'movil' ? 'rgba(251,191,36,.75)' : 'rgba(145,215,232,.85)'; g.lineWidth = o.kind === 'movil' ? 1.2 : 1.8; if (rej) g.setLineDash([5, 4]);
+    g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(a.x + Math.sin(az) * len, a.y - Math.cos(az) * len); g.stroke(); g.restore();
+    if (!onMap(a)) { edgeMark(g, a, o.label.replace(' (ilustrativa)', ''), rej ? '#ff8f9c' : o.kind === 'movil' ? C.a : C.i); continue; }
+    g.fillStyle = o.kind === 'movil' ? C.a : C.i; g.beginPath(); o.kind === 'movil' ? g.arc(a.x, a.y, 4.5, 0, 7) : g.rect(a.x - 6, a.y - 6, 12, 12); g.fill(); g.strokeStyle = '#05090c'; g.lineWidth = 1.5; g.stroke();
+    if (o.kind !== 'movil') label(g, o.label.replace(' (ilustrativa)', ''), a.x + 9, a.y - 8, { c: C.i, f: '600 11px Inter,system-ui' });
+  }
+  if (s.fixOn) { const f = P(all.fix), k = 2.45 * K; g.save(); g.translate(f.x, f.y); g.rotate((-all.fix.angleDeg * Math.PI) / 180); g.strokeStyle = '#fff'; g.lineWidth = 1.5; g.beginPath(); g.ellipse(0, 0, Math.max(3, all.fix.majorM * k), Math.max(2, all.fix.minorM * k), 0, 0, 7); g.stroke(); g.restore(); g.fillStyle = '#fff'; g.beginPath(); g.arc(f.x, f.y, 2.5, 0, 7); g.fill(); label(g, `columna ±${Math.round(all.fix.majorM)} m`, f.x + 10, f.y + 18, { f: '700 11px Inter,system-ui' }); }
+  // tramo a cortar y coches
+  const cutSec = s.cut, cutOn = !!cutSec;
+  if (cutOn) { g.save(); g.strokeStyle = 'rgba(255,91,110,.9)'; g.lineWidth = 5; g.beginPath(); for (let x = sOfPk(cutSec.pkFrom); x <= sOfPk(cutSec.pkTo); x += 4) { const p = along(m501, x); x === sOfPk(cutSec.pkFrom) ? g.moveTo(p.x, p.y) : g.lineTo(p.x, p.y); } g.stroke(); g.restore(); const p = along(m501, (sOfPk(cutSec.pkFrom) + sOfPk(cutSec.pkTo)) / 2); label(g, `M-501 cortada · km ${fmt(cutSec.pkFrom, 0)}–${fmt(cutSec.pkTo, 0)}`, p.x - 70, p.y + 74, { c: '#ff8f9c', f: '700 13px Inter,system-ui' }); }
+  for (const cr of cars) {
+    const L = cr.road === m501 ? L501 : pathLen(cr.road); let sPos = ((cr.off * L + cr.dir * t * 9) % L + L) % L;
+    let stopped = false;
+    if (cutOn && cr.road === m501 && cutSec) { const a = sOfPk(cutSec.pkFrom) - 14, b = sOfPk(cutSec.pkTo) + 14; if (sPos > a - 30 && sPos < b + 30) { sPos = cr.dir > 0 ? Math.min(sPos, a - 6 - (cr.i % 3) * 12) : Math.max(sPos, b + 6 + (cr.i % 3) * 12); stopped = true; } }
+    const p = along(cr.road, sPos); drawCar(g, p.x, p.y, { len: 14, ang: p.ang + (cr.dir < 0 ? Math.PI : 0), color: ['#d9dee2', '#7a1f24', '#1f3f6b', '#9aa4ab'][cr.i % 4], braking: stopped, lights: stopped });
+    if (stopped && cr.i % 3 === 0) label(g, '⚠ fuego', p.x - 18, p.y - 10, { c: '#ffb3bd', f: '700 10px Inter,system-ui' });
+  }
+  // pueblos
+  for (const tw of s.towns) { const p = P(tw); if (!onMap(p)) continue; g.fillStyle = '#e6e9ec'; g.beginPath(); g.arc(p.x, p.y, 3.5, 0, 7); g.fill(); const lf = tw.lon < sc.ignition.lon + 0.005; label(g, tw.name, lf ? p.x - 8 : p.x + 7, p.y - 6, { left: lf }); if (tw.eta < 600) label(g, tw.eta === 0 ? 'alcanzado' : `≈ ${fmtMin(tw.eta)}${s.measured ? '' : ' (previsto)'}`, lf ? p.x - 8 : p.x + 7, p.y + 9, { left: lf, c: tw.eta < 60 ? '#ff8f9c' : '#ffcf7a', f: '700 11px Inter,system-ui' }); }
+  const ig = P(sc.ignition); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(ig.x, ig.y - 7); g.lineTo(ig.x + 6, ig.y + 5); g.lineTo(ig.x - 6, ig.y + 5); g.closePath(); g.fill(); label(g, 'Inicio: coche en llamas · M-501 km 57', ig.x - 120, ig.y + 52, { f: '700 12px Inter,system-ui' });
+  // cartela
+  g.fillStyle = 'rgba(5,9,12,.82)'; g.fillRect(W - 352, 12, 340, 64); text(g, `${clock(t)} · minuto ${Math.round(t)}`, W - 340, 36, { f: '700 16px Inter,system-ui' });
+  text(g, t < sc.tSight ? 'Llegan rumbos de torres y móviles…' : t < 90 ? 'Columna situada · esperando al satélite' : t < 210 ? 'Primera pasada: perímetro y FRP' : `Avance medido: ${fmt(all.progress.rosMMin, 0)} m/min hacia el este`, W - 340, 58, { c: C.m, f: '13px Inter,system-ui' });
+  if (!FILM) kpis(t, s);
+}
+let lastK = -1;
+function kpis(t, s) {
+  const k = t < sc.tSight ? 0 : t < 90 ? 1 : t < 210 ? 2 : 3; if (k === lastK) return; lastK = k;
+  $('#m-kv').innerHTML = `<div><b>${k ? `±${Math.round(all.fix.majorM)} m` : '—'}</b><span>posición de la columna (1σ), ${all.fix.used.length} rumbos válidos</span></div>`
+    + `<div><b>${k >= 2 ? `${s.sat.areaHa} ha` : '—'}</b><span>área por satélite (cota superior)</span></div>`
+    + `<div><b>${k >= 3 ? `${fmt(all.progress.rosMMin, 0)} m/min` : `${prior} m/min*`}</b><span>${k >= 3 ? 'avance medido entre pasadas' : '*previsto por el modelo, sin medir'}</span></div>`
+    + `<div><b>${k >= 2 ? `${fmt(s.sat.frpMW, 0)} MW` : '—'}</b><span>potencia radiativa (FRP)</span></div>`;
+}
+const st = { t: 0, playing: !FILM };
+$('#t').addEventListener('input', (e) => { st.t = +e.target.value; st.playing = false; $('#play').textContent = '▶ Seguir'; $('#play').setAttribute('aria-pressed', 'false'); });
+$('#play').addEventListener('click', () => { st.playing = !st.playing; $('#play').textContent = st.playing ? '⏸ Pausa' : '▶ Seguir'; $('#play').setAttribute('aria-pressed', String(st.playing)); });
+let lastTs = performance.now();
+function tick(ts) { const dt = Math.min(0.1, (ts - lastTs) / 1000); lastTs = ts; if (st.playing) { st.t = (st.t + dt * 8) % 241; $('#t').value = Math.round(st.t); } $('#t-l').textContent = `${clock(st.t)} · ${Math.round(st.t)} min`; requestAnimationFrame(tick); }
+if (!FILM) requestAnimationFrame(tick);
+run({ mapa: drawM });
+
+// ---------------------------------------------------------------- Criticidad, carreteras y pueblos
+const cr = all.criticality; $('#c-lv').innerHTML = `<span class="c-${cr.level}">${cr.level}</span> <span class="m" style="font-size:15px;text-transform:none;letter-spacing:0">· ${cr.score}/100</span>`;
+$('#c-rs').innerHTML = cr.reasons.map((r) => `<li>${r}</li>`).join('');
+const act = { cortar: '<span class="chip no">cortar ya</span>', avisar: '<span class="chip sim">avisar a los coches</span>', vigilar: '<span class="chip ok">vigilar</span>' };
+$('#c-rd').innerHTML = all.roads.map((r) => `<tr><td><b>${r.name}</b></td><td>${fmtMin(r.etaMin)}</td><td>${r.section ? `km ${fmt(r.section.pkFrom, 1)} – ${fmt(r.section.pkTo, 1)}` : '—'}</td><td>${act[r.action]}</td></tr>`).join('');
+$('#c-tw').innerHTML = all.towns.slice(0, 5).map((t) => `<tr><td>${t.name}</td><td>${fmtMin(t.etaMin)}</td></tr>`).join('');
+
+// ---------------------------------------------------------------- Calculadora
+const ids = ['t', 'h', 'v', 'f', 'r'], unit = { t: ' °C', h: ' %', v: ' km/h', f: '', r: ' m/min' };
+function calc() {
+  const v = Object.fromEntries(ids.map((k) => [k, +$(`#w-${k}`).value]));
+  ids.forEach((k) => ($(`#o-${k}`).textContent = `${String(v[k]).replace('.', ',')}${unit[k]}`));
+  const w = fireWeather({ tempC: v.t, rh: v.h, windKmh: v.v, ffmc: v.f }), b = fireBehavior({ rosMMin: v.r, fuel: $('#w-u').value });
+  const ch = (ok, s) => `<span class="chip ${ok ? 'no' : 'ok'}">${s}</span>`;
+  $('#w-30').innerHTML = ch(w.rule30.temp, `> 30 °C ${w.rule30.temp ? 'sí' : 'no'}`) + ch(w.rule30.rh, `< 30 % ${w.rule30.rh ? 'sí' : 'no'}`) + ch(w.rule30.wind, `> 30 km/h ${w.rule30.wind ? 'sí' : 'no'}`) + `<span class="chip ${w.rule30.count === 3 ? 'no' : w.rule30.count ? 'sim' : 'ok'}">30-30-30: ${w.rule30.count}/3</span>`;
+  $('#w-kv').innerHTML = `<div><b>${fmt(w.vpdHpa, 1)} hPa</b><span>déficit de vapor</span></div><div><b>${w.hdw}</b><span>HDW (hPa·m/s)</span></div><div><b>${w.ffwi}</b><span>índice de Fosberg</span></div>`
+    + `<div><b>${fmt(w.deadFuelMoisturePct, 1)} %</b><span>humedad del combustible muerto</span></div><div><b>${fmt(w.isi, 1)}</b><span>ISI (propagación inicial)</span></div><div><b>${b.flameM.toString().replace('.', ',')} m</b><span>llama · ${b.intensityKWm.toLocaleString('es-ES')} kW/m</span></div>`;
+  $('#w-at').innerHTML = `<b>Clase ${b.attack.k}:</b> ${b.attack.label}.`;
+  S.calc = { rule30: w.rule30.count, hdw: w.hdw, ffwi: w.ffwi, isi: w.isi, flameM: b.flameM, attack: b.attack.k };
+}
+[...ids.map((k) => `#w-${k}`), '#w-u'].forEach((s) => $(s).addEventListener('input', calc)); calc();
+
+// ---------------------------------------------------------------- Brújula del móvil
+let head = null, pos = null;
+const show = (o) => { $('#p-out').textContent = JSON.stringify(o, null, 2); S.sighting = o; };
+function sight(az, src) {
+  const lat = pos ? +pos.latitude.toFixed(3) : null, lon = pos ? +pos.longitude.toFixed(3) : null;
+  const o = phoneSighting({ lat, lon, headingDeg: az, accuracyM: pos ? Math.round(pos.accuracy) : null, t: Math.round(Date.now() / 1000) });
+  show({ tipo: 'avistamiento de humo', rumbo: `${o.azDeg.toFixed(1)}° (${src})`, errorTipico: `±${o.sdDeg}°`, posicion: lat == null ? 'sin GPS en este dispositivo' : `${lat}, ${lon} (redondeada)`, hora: new Date(o.t * 1000).toISOString(), foto: 'se queda en el teléfono', modo: 'PASIVO, con tu toque' });
+}
+$('#p-on').addEventListener('click', async () => {
+  try { if (typeof DeviceOrientationEvent !== 'undefined' && DeviceOrientationEvent.requestPermission) { const r = await DeviceOrientationEvent.requestPermission(); if (r !== 'granted') throw new Error('permiso denegado'); } } catch (e) { $('#p-st').textContent = `Brújula no disponible: ${e.message}`; return; }
+  const on = (e) => { const h = e.webkitCompassHeading ?? (e.absolute || e.type === 'deviceorientationabsolute' ? compassHeading(e.alpha, e.beta, e.gamma) : null); if (h != null && Number.isFinite(h)) { head = h; $('#p-st').textContent = `Rumbo de la cámara: ${h.toFixed(0)}°. Apunta a la base de la columna y pulsa Marcar.`; $('#p-mk').disabled = false; } };
+  addEventListener('deviceorientationabsolute', on); addEventListener('deviceorientation', on);
+  navigator.geolocation?.getCurrentPosition((p) => { pos = p.coords; }, () => {}, { enableHighAccuracy: true, timeout: 8000 });
+  setTimeout(() => { if (head == null) $('#p-st').textContent = 'Este dispositivo no da brújula (en un ordenador es lo normal). Puedes escribir el rumbo a mano.'; }, 2500);
+});
+$('#p-mk').addEventListener('click', () => head != null && sight(head, 'brújula'));
+$('#p-add').addEventListener('click', () => sight(+$('#p-man').value || 0, 'a mano'));
+show({ ejemplo: 'así sale una observación', ...{ rumbo: '75,0° (a mano)', errorTipico: '±8°', posicion: '40.361, -4.336 (redondeada)', foto: 'se queda en el teléfono' } });
+
+// ---------------------------------------------------------------- Caso real y fuentes
+$('#r-facts').innerHTML = [...CASE_SMV_2026.facts, ...CASE_SMV_2026.context].map((f) => `<li style="margin:5px 0">${f.text} <a href="${f.src}" class="src">[fuente]</a></li>`).join('');
+const chip = { PASIVO: 'ok', CONVENIO: 'sim', NUNCA: 'no' };
+$('#s-tb').innerHTML = FIRE_SOURCES.map((s) => `<tr><td>${s.url ? `<a href="${s.url}">${s.name}</a>` : s.name}</td><td>${s.gives}</td><td>${s.latency}</td><td>${s.legal}</td><td><span class="chip ${chip[s.access]}">${s.access}</span></td></tr>`).join('');
+</script>
+</body></html>

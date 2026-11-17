@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Triaje para cualquiera</title>
+<meta name="description" content="Cuando el primero en llegar es un vecino: SENDA guía el triaje con un método internacional, dice qué hacer mientras llega la ayuda y avisa al servicio adecuado con un parte que cabe en un SMS.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+<style>
+.q{font-size:20px;font-weight:800;margin:6px 0 10px}.big{min-height:64px;font-size:18px;flex:1 1 160px}
+.res{border-radius:14px;padding:14px 16px;color:#05090c;margin-top:10px}.res b{font-size:22px;display:block}
+ol.steps{padding-left:20px}ol.steps li{margin:6px 0}
+.sms{font:600 14px ui-monospace,monospace;background:#071018;border:1px dashed var(--i);border-radius:10px;padding:10px;color:var(--i);word-break:break-word}
+.vict{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.vict span{padding:4px 10px;border-radius:999px;font-weight:800;color:#05090c;font-size:13px}
+</style>
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/arquitectura">Arquitectura</a> · <a href="/senda/llamada">Llamada sin Internet</a> · <a href="/senda/monte">Monte</a></p>
+<h1>Triaje para cualquiera</h1>
+<p class="lead m">En una catástrofe, el primero en llegar suele ser un vecino, no un médico. SENDA le guía con <b>START</b>, el método internacional de triaje para múltiples víctimas. Son cuatro comprobaciones en menos de un minuto por persona: camina, respira, circulación y responde. Además le dice <b>qué hacer mientras llega la ayuda</b>, indica qué servicio hace falta y prepara un <b>parte que cabe en un SMS</b> o en un mensaje por satélite. El 112 va siempre primero. Funciona sin red.</p>
+
+<div class="g2">
+  <section class="card" aria-labelledby="h-w">
+    <h2 id="h-w">Paso a paso</h2>
+    <div class="row" style="margin-top:0"><button id="m-mci" class="on">Varias víctimas</button><button id="m-one">Una sola víctima</button></div>
+    <div id="wiz" style="margin-top:12px"></div>
+    <div id="out"></div>
+  </section>
+  <section class="card" data-viz="triaje" aria-labelledby="h-v">
+    <h2 id="h-v">Cómo decide (START)</h2>
+    <canvas id="cv-tri" aria-label="Árbol de decisión del triaje START con cuatro víctimas recorriéndolo y el recuento por colores"></canvas>
+  </section>
+</div>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-s">
+  <h2 id="h-s">La escena y el parte</h2>
+  <p class="m" style="margin-top:0">Cada víctima triada se suma al recuento. El parte no lleva nombres: colores, posición, planta, necesidades y servicios. Cabe en un SMS (160 caracteres), en un mensaje por satélite y en unos segundos de sonido.</p>
+  <div class="vict" id="vict"></div>
+  <div class="row"><button id="geo">📍 Usar mi posición</button><label class="m">Planta <select id="floor" aria-label="Planta"><option value="">—</option><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label><button id="clear">Vaciar escena</button></div>
+  <div class="sms" id="sms" style="margin-top:10px" aria-live="polite">—</div>
+  <div class="kv" id="sizes"></div>
+  <div class="note">SENDA <b>no es un producto sanitario</b> y no sustituye a los profesionales. Nunca declara a nadie fallecido; eso lo confirma un profesional. Las indicaciones de RCP siguen las recomendaciones del Consejo Europeo de Resucitación (2021): 100–120 compresiones por minuto y 5–6 cm de profundidad.</div>
+</section>
+</main>
+<script type="module">
+import { $, C, canvas, text, rr, run, clamp, ease, FILM } from '/senda/kit.mjs';
+import { startTriage, firstAid, routeFor, tally, compactReport, CATEGORIES } from '/senda/core/triage.mjs';
+import { airtimeSeconds } from '/senda/core/acoustic-modem.mjs';
+const S = { mci: true, o: {}, flags: {}, step: 0, victims: [], pos: { lat: 39.4521, lon: -0.4302, accM: 25, demo: true } };
+window.SENDA_TRIAJE = S;
+const QS = [
+  { k: 'walks', q: '¿Puede caminar por sí misma?', a: [['Sí', true], ['No', false]] },
+  { k: 'breathes', q: '¿Respira?', hint: 'Mira si el pecho se mueve, durante unos segundos.', a: [['Sí', true], ['No', false]] },
+  { k: 'breathesAfterAirway', q: 'Inclina su cabeza hacia atrás y eleva el mentón. ¿Respira ahora?', a: [['Sí', true], ['No', false]], when: (o) => o.breathes === false },
+  { k: 'rr', q: 'Cuenta sus respiraciones durante 15 segundos.', a: [['7 o menos', 20], ['Más de 7', 36]], when: (o) => o.breathes !== false },
+  { k: 'radialPulse', q: '¿Notas el pulso en su muñeca?', a: [['Sí', true], ['No', false]], when: (o) => o.breathes !== false && o.rr <= 30 },
+  { k: 'capRefillS', q: 'Aprieta una uña 2 segundos y suelta. ¿Recupera el color enseguida?', a: [['Sí, en menos de 2 s', 1], ['No, tarda más', 3]], when: (o) => o.breathes !== false && o.rr <= 30 && o.radialPulse },
+  { k: 'obeys', q: 'Pídele: «aprieta mi mano». ¿Lo hace?', a: [['Sí', true], ['No', false]], when: (o) => o.breathes !== false && o.rr <= 30 && o.radialPulse && o.capRefillS <= 2 },
+];
+const done = (o) => o.walks || (o.breathes === false && o.breathesAfterAirway !== undefined) || o.rr > 30 || o.radialPulse === false || o.capRefillS > 2 || o.obeys !== undefined;
+function wizard() {
+  const o = S.o; if (done(o)) return result();
+  const q = QS.find((x) => o[x.k] === undefined && (!x.when || x.when(o)));
+  $('#wiz').innerHTML = `<div class="q">${q.q}</div>${q.hint ? `<p class="m" style="margin:0 0 8px">${q.hint}</p>` : ''}<div class="row">${q.a.map(([l], i) => `<button class="big ${i ? '' : 'p'}" data-i="${i}">${l}</button>`).join('')}</div>`;
+  $('#wiz').querySelectorAll('button').forEach((b) => (b.onclick = () => { o[q.k] = q.a[+b.dataset.i][1]; wizard(); }));
+  $('#out').innerHTML = '';
+}
+function result() {
+  const r = startTriage(S.o, { mci: S.mci }); S.last = r;
+  $('#wiz').innerHTML = `<div class="res" style="background:${r.color}"><b>${r.cat === 'SIN_RESPIRACION' ? 'Sin respiración tras abrir la vía aérea' : r.label}</b>${r.why}</div>
+  <p class="m" style="margin:12px 0 4px">¿Observas algo más?</p>
+  <div class="row" style="margin-top:0">${[['bleeding', 'Sangra mucho'], ['trapped', 'Está atrapada'], ['unconsciousBreathing', 'No responde pero respira']].map(([k, l]) => `<label class="m"><input type="checkbox" data-f="${k}" ${S.flags[k] ? 'checked' : ''}> ${l}</label>`).join('')}</div>`;
+  $('#wiz').querySelectorAll('input').forEach((c) => (c.onchange = () => { S.flags[c.dataset.f] = c.checked; result(); }));
+  const steps = firstAid(r, S.flags), svc = routeFor({ medical: true, trapped: S.flags.trapped });
+  $('#out').innerHTML = `<h3 style="margin-top:14px">Qué hacer ahora</h3><ol class="steps">${steps.map((x) => `<li>${x}</li>`).join('') || '<li>Vigílala y repite la valoración si cambia.</li>'}</ol>
+  <p class="m">Servicios: <b>${svc.join(' → ')}</b></p><div class="row"><button class="p" id="add">➕ Añadir a la escena y siguiente víctima</button><button id="again">Repetir</button></div>`;
+  $('#add').onclick = () => { S.victims.push({ ...r, flags: { ...S.flags } }); S.o = {}; S.flags = {}; wizard(); scene(); };
+  $('#again').onclick = () => { S.o = {}; S.flags = {}; wizard(); };
+}
+function scene() {
+  const t = tally(S.victims), needs = [], tr = S.victims.filter((v) => v.flags.trapped).length, bl = S.victims.filter((v) => v.flags.bleeding).length;
+  if (tr) needs.push(`atrapados ${tr}`); if (bl) needs.push(`hemorragia ${bl}`);
+  $('#vict').innerHTML = S.victims.map((v, i) => `<span style="background:${v.color}">${i + 1} · ${v.cat === 'SIN_RESPIRACION' ? 'sin resp.' : v.cat.toLowerCase()}</span>`).join('') || '<span class="m" style="color:var(--m)">Aún no hay víctimas en la escena.</span>';
+  const now = new Date(), hhmm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  const msg = compactReport({ counts: t, lat: S.pos.lat, lon: S.pos.lon, accM: S.pos.accM, floor: $('#floor').value === '' ? null : +$('#floor').value, needs, services: routeFor({ medical: true, trapped: tr > 0 }), hhmm });
+  const bytes = new TextEncoder().encode(msg).length; S.msg = msg;
+  $('#sms').textContent = msg + (S.pos.demo ? '   (posición de ejemplo)' : '');
+  $('#sizes').innerHTML = `<div><b>${msg.length}/160</b><span>caracteres: cabe en un SMS</span></div><div><b>${bytes} B</b><span>por satélite (Iridium, hasta 340 B)</span></div><div><b>${airtimeSeconds(bytes).toFixed(0)} s</b><span>por sonido entre móviles</span></div><div><b>${S.victims.length}</b><span>víctimas en la escena</span></div>`;
+}
+$('#m-mci').onclick = () => { S.mci = true; $('#m-mci').classList.add('on'); $('#m-one').classList.remove('on'); S.o = {}; wizard(); };
+$('#m-one').onclick = () => { S.mci = false; $('#m-one').classList.add('on'); $('#m-mci').classList.remove('on'); S.o = {}; wizard(); };
+$('#geo').onclick = () => navigator.geolocation?.getCurrentPosition((p) => { S.pos = { lat: p.coords.latitude, lon: p.coords.longitude, accM: p.coords.accuracy, demo: false }; scene(); }, () => {}, { enableHighAccuracy: true, timeout: 15000 });
+$('#floor').onchange = scene; $('#clear').onclick = () => { S.victims = []; scene(); };
+wizard(); scene();
+
+// ---------- animación del árbol START (para entender el método; también se graba en vídeo)
+const g = canvas($('#cv-tri')), W = 640, H = 600;
+const N = { walk: [320, 60, '¿Camina?'], breathe: [320, 150, '¿Respira?'], airway: [130, 240, 'Abrir vía aérea · ¿respira?'], rr: [400, 240, '¿Más de 30 por minuto?'], perf: [430, 330, '¿Pulso en muñeca y uña < 2 s?'], obeys: [430, 420, '¿Obedece órdenes?'] };
+const OUT = { VERDE: [560, 60], ROJO1: [70, 330], SIN: [230, 330], ROJO2: [585, 240], ROJO3: [585, 330], ROJO4: [585, 420], AMARILLO: [430, 500] };
+const VICT = [
+  { o: { walks: true }, path: ['walk', 'VERDE'] },
+  { o: { walks: false, breathes: true, rr: 36 }, path: ['walk', 'breathe', 'rr', 'ROJO2'] },
+  { o: { walks: false, breathes: true, rr: 20, radialPulse: true, capRefillS: 1, obeys: true }, path: ['walk', 'breathe', 'rr', 'perf', 'obeys', 'AMARILLO'] },
+  { o: { walks: false, breathes: false, breathesAfterAirway: true }, path: ['walk', 'breathe', 'airway', 'ROJO1'] },
+  { o: { walks: false, breathes: true, rr: 22, radialPulse: false }, path: ['walk', 'breathe', 'rr', 'perf', 'ROJO3'] },
+];
+VICT.forEach((v) => (v.res = startTriage(v.o)));
+const at = (k) => (N[k] ? N[k] : OUT[k]);
+const colOf = (k) => (k.startsWith('ROJO') ? C.r : k === 'VERDE' ? C.e : k === 'AMARILLO' ? C.a : k === 'SIN' ? '#7d8f99' : C.l);
+function drawTree(t) {
+  const per = 4.4, P = VICT.length * per + 6, lt = t % P, vi = Math.min(VICT.length - 1, Math.floor(lt / per)), vl = lt - vi * per;
+  g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
+  const edges = [['walk', 'VERDE', 'sí'], ['walk', 'breathe', 'no'], ['breathe', 'airway', 'no'], ['breathe', 'rr', 'sí'], ['airway', 'ROJO1', 'sí'], ['airway', 'SIN', 'no'], ['rr', 'ROJO2', 'sí'], ['rr', 'perf', 'no'], ['perf', 'ROJO3', 'no'], ['perf', 'obeys', 'sí'], ['obeys', 'ROJO4', 'no'], ['obeys', 'AMARILLO', 'sí']];
+  const cur = lt < VICT.length * per ? VICT[vi] : null, k = cur ? Math.min(cur.path.length - 1, Math.floor(vl / 0.75)) : -1;
+  for (const [a, b, l] of edges) { const A = at(a), B = at(b), on = cur && cur.path.indexOf(a) >= 0 && cur.path.indexOf(b) === cur.path.indexOf(a) + 1 && cur.path.indexOf(b) <= k; g.strokeStyle = on ? C.c : '#2a3f4d'; g.lineWidth = on ? 3 : 1.5; g.beginPath(); g.moveTo(A[0], A[1]); g.lineTo(B[0], B[1]); g.stroke(); text(g, l, (A[0] + B[0]) / 2 + 6, (A[1] + B[1]) / 2 - 4, { c: C.m, f: '11px Inter,system-ui' }); }
+  for (const [key, [x, y, label]] of Object.entries(N)) { const on = cur && cur.path.slice(0, k + 1).includes(key); g.font = '700 12px Inter,system-ui'; const w = g.measureText(label).width + 22; g.fillStyle = on ? '#1b3a48' : '#0f1d27'; rr(g, x - w / 2, y - 16, w, 32, 10); g.fill(); g.strokeStyle = on ? C.c : C.l; g.lineWidth = on ? 2 : 1; g.stroke(); text(g, label, x, y + 4, { c: C.t, f: '700 12px Inter,system-ui', al: 'center' }); }
+  for (const [key, [x, y]] of Object.entries(OUT)) { const name = key.startsWith('ROJO') ? 'ROJO' : key === 'SIN' ? 'SIN RESP.' : key; const on = cur && cur.path[k] === key; g.fillStyle = colOf(key); g.globalAlpha = on ? 1 : 0.55; rr(g, x - 40, y - 14, 80, 28, 14); g.fill(); g.globalAlpha = 1; text(g, name, x, y + 4, { c: '#05090c', f: '800 11px Inter,system-ui', al: 'center' }); }
+  if (cur) { const p = cur.path, a = at(p[Math.max(0, k - 1)]), b = at(p[k]), f = ease((vl % 0.75) / 0.6), x = k ? a[0] + (b[0] - a[0]) * f : b[0], y = k ? a[1] + (b[1] - a[1]) * f : b[1]; g.fillStyle = C.c; g.beginPath(); g.arc(x, y - 26, 9, 0, 7); g.fill(); text(g, `${vi + 1}`, x, y - 22, { c: '#05090c', f: '800 11px Inter,system-ui', al: 'center' }); text(g, `Víctima ${vi + 1}`, 20, 28, { c: C.t, f: '800 15px Inter,system-ui' }); }
+  const shown = cur ? VICT.slice(0, vi + (k === cur.path.length - 1 ? 1 : 0)) : VICT, tl = tally(shown.map((v) => v.res));
+  g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 530, 600, 56, 12); g.fill(); g.strokeStyle = C.l; g.stroke();
+  [['ROJO', C.r], ['AMARILLO', C.a], ['VERDE', C.e]].forEach(([c, col], i) => { g.fillStyle = col; rr(g, 34 + i * 120, 546, 24, 24, 6); g.fill(); text(g, `${c.toLowerCase()} ${tl[c]}`, 66 + i * 120, 563, { c: C.t, f: '700 13px Inter,system-ui' }); });
+  if (!cur) { const m = compactReport({ counts: tl, lat: 39.4521, lon: -0.4302, accM: 8, floor: 3, needs: ['atrapados 1'], services: routeFor({ medical: true, trapped: true }), hhmm: '18:42' }); g.fillStyle = 'rgba(145,215,232,.12)'; rr(g, 20, 470, 600, 50, 10); g.fill(); text(g, m.slice(0, 74), 30, 490, { c: C.i, f: '600 11px ui-monospace,monospace' }); text(g, m.slice(74), 30, 508, { c: C.i, f: '600 11px ui-monospace,monospace' }); text(g, `Parte listo: ${m.length}/160 caracteres`, 400, 563, { c: C.e, f: '700 12px Inter,system-ui' }); }
+}
+run({ triaje: drawTree });
+</script>
+</body></html>

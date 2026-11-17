@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:03.032
+Cuando cae la red, el mensaje no debería morir.
+
+2
+00:00:03.382 --> 00:00:17.334
+El veintiocho de abril de dos mil veinticinco, la red móvil no cayó al irse la luz: cayó cuando se agotaron las baterías de las antenas. En pocas horas, los usuarios con conexión estable pasaron del noventa al cuarenta por ciento.
+
+3
+00:00:18.934 --> 00:00:29.195
+Lo que nadie hace todavía: SENDA trocea cada mensaje con codificación Reed-Solomon y reparte los fragmentos entre portadores distintos. Basta con que lleguen unos cuantos, cualesquiera, para reconstruirlo.
+
+4
+00:00:29.545 --> 00:00:45.161
+Con satélite, LoRa, SMS y vecinos, un SOS alcanza un noventa y nueve por ciento de probabilidad de entrega, calculada de forma exacta. En la prueba real, ciento noventa y siete de doscientos mensajes se reconstruyeron byte a byte, perdiendo portadores al azar.
+
+5
+00:00:46.761 --> 00:00:56.553
+Solo un coordinador con credencial firmada por su organismo puede activar algo en tu teléfono, y solo si tú lo autorizaste y hay una emergencia declarada.
+
+6
+00:00:58.153 --> 00:01:01.460
+Pruébalo ahora, sin instalar nada, en la dirección que ves en pantalla.

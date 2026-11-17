@@ -1,0 +1,54 @@
+{
+ "note": "SENDA Mission 9.5 · Simulación explicada: SOS diferido DTN en 18 km sin red (r2)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "r2",
+   "claim": "SIMULATED",
+   "source": [
+    "investor-next/public/senda/carretera.html",
+    "packages/senda/src/road.mjs"
+   ],
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=sos"
+   },
+   "title": {
+    "es": "Sin cobertura, el SOS viaja con los coches",
+    "en": "No coverage: the SOS rides with the cars",
+    "nl": "Geen bereik: de SOS reist met de auto's mee"
+   },
+   "es": [
+    "Un accidente de noche en 18 kilómetros sin ninguna red. El móvil del coche accidentado anuncia el SOS y cualquier coche con SENDA que pase se lo lleva.",
+    "Con solo uno de cada diez coches, el aviso sale en unos siete minutos. Y los que vienen de frente avisan a quienes van hacia el accidente."
+   ],
+   "es_say": [
+    "Un accidente de noche en dieciocho kilómetros sin ninguna red. El móvil del coche accidentado anuncia el SOS y cualquier coche con Senda que pase se lo lleva.",
+    "Con solo uno de cada diez coches, el aviso sale en unos siete minutos. Y los que vienen de frente avisan a quienes van hacia el accidente."
+   ],
+   "en": [
+    "A night-time crash on 18 kilometres of road with no network at all. The crashed car's phone broadcasts the SOS, and any passing car with SENDA picks it up and carries it.",
+    "In this simulation, with only one car in ten running SENDA, the alert gets out in about seven minutes. And oncoming cars warn the drivers heading towards the crash."
+   ],
+   "en_say": [
+    "A night-time crash on eighteen kilometres of road with no network at all. The crashed car's phone broadcasts the S O S, and any passing car with Senda picks it up and carries it.",
+    "In this simulation, with only one car in ten running Senda, the alert gets out in about seven minutes. And oncoming cars warn the drivers heading towards the crash."
+   ],
+   "nl": [
+    "Een nachtelijk ongeval op 18 kilometer zonder enig bereik. De telefoon in de verongelukte auto zendt een SOS uit en elke passerende auto met SENDA neemt het mee.",
+    "In deze simulatie, met slechts één op de tien auto's met SENDA, komt de melding in ongeveer zeven minuten naar buiten. En tegenliggers waarschuwen wie op het ongeval afrijdt."
+   ]
+  }
+ ]
+}
