@@ -14,6 +14,7 @@ on:
       - 'packages/senda/tests/shared-risk-topology.test.mjs'
       - 'packages/senda/tests/dependency-agnostic-shards.test.mjs'
       - 'packages/senda/scripts/verify-robust-lp.py'
+      - 'packages/senda/scripts/verify-dependence-bounds.py'
       - 'packages/senda/tests/robust-scenario-risk.test.mjs'
       - 'packages/senda/tests/robust-assurance-audit.test.mjs'
       - '.github/workflows/senda-robust-risk-ci.yml'
@@ -62,10 +63,14 @@ jobs:
         run: python -m pip install --disable-pip-version-check scipy==1.17.0
       - name: Prove finite box-simplex solver agrees with unrelated HiGHS implementation
         run: python packages/senda/scripts/verify-robust-lp.py
+      - name: Adversarial joint LP oracle for arbitrary packet dependence
+        run: python packages/senda/scripts/verify-dependence-bounds.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: senda-independent-lp-research-evidence
-          path: evidence/senda/research/robust-risk-lp-crosscheck.json
+          path: |
+            evidence/senda/research/robust-risk-lp-crosscheck.json
+            evidence/senda/research/dependency-agnostic-joint-lp-crosscheck.json
           retention-days: 30
           if-no-files-found: warn
