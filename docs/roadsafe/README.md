@@ -11,6 +11,7 @@ Capa federada de prevención de colisiones secundarias y coordinación de asiste
 | 3 | [../../evidence/roadsafe/ROADSAFE_RESULTS.md](../../evidence/roadsafe/ROADSAFE_RESULTS.md) | Resultados reproducibles (A–E, barridos, controles negativos, H-ROAD-2/3) |
 | 4 | [04_HYPOTHESES.md](04_HYPOTHESES.md) | H-ROAD-1/2/3 preregistradas |
 | 5 | [05_PILOT_AND_FUNDING.md](05_PILOT_AND_FUNDING.md) | TRL, piloto ES→NL, costes, acuerdos pendientes |
+| 6 | [06_CASUISTRY_RISK_AND_CONCLUSIONS.md](06_CASUISTRY_RISK_AND_CONCLUSIONS.md) | Evidencia con fuentes, 8 mecanismos, probabilidades por circunstancia, conclusiones |
 
 ## Código
 
@@ -24,7 +25,11 @@ Capa federada de prevención de colisiones secundarias y coordinación de asiste
 | `roadsafe-emergency-gateway.mjs` | Expediente 112, nunca llamada automática |
 | `roadsafe-delivery.mjs` | Estados de entrega y política de canales |
 | `roadsafe-interop.mjs` | CIFS, DATEX II, deep links, DENM/SRTI, registro de capacidades |
-| `roadsafe-accident-sim.mjs` | Simulador contrafactual del caso |
+| `roadsafe-accident-sim.mjs` | Simulador contrafactual del caso + ranking de circunstancias |
+| `roadsafe-evidence.mjs` | Registro de evidencia (fuente, grado, transferencia) y casuística |
+| `roadsafe-risk-factors.mjs` | Índice de riesgo explicable (física + factores con evidencia) |
+| `roadsafe-priority.mjs` | Priorización explicable de incidentes |
+| `roadsafe-zone.mjs` | Plan dinámico de señalización de zona y cola |
 | `investor-next/public/senda/roadsafe.html` | Consola ciudadano / operador / científico |
 
 ## Reproducir

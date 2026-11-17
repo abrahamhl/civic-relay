@@ -1458,6 +1458,200 @@
         }
       ],
       "note": "Banco de pruebas contractual (simulado). Mide si el orquestador afirma más de lo que el proveedor confirmó."
+    },
+    "circumstances": {
+      "n": 3000,
+      "seed": 2026,
+      "rows": [
+        {
+          "key": "WET_CLOSE",
+          "label": "Mojado + 0,8 s",
+          "pA": 0.7003,
+          "ciA": [
+            0.6837,
+            0.7165
+          ],
+          "pSecA": 0.499,
+          "impactP95A": 32.9,
+          "pD": 0.5387,
+          "ciD": [
+            0.5208,
+            0.5564
+          ],
+          "relativeToBase": 19.62
+        },
+        {
+          "key": "NIGHT_FOG_HEAVY",
+          "label": "Noche + niebla + pesado",
+          "pA": 0.5777,
+          "ciA": [
+            0.5599,
+            0.5952
+          ],
+          "pSecA": 0.4523,
+          "impactP95A": 63.4,
+          "pD": 0.4713,
+          "ciD": [
+            0.4535,
+            0.4892
+          ],
+          "relativeToBase": 16.18
+        },
+        {
+          "key": "WET_NIGHT",
+          "label": "Mojado + noche",
+          "pA": 0.5233,
+          "ciA": [
+            0.5054,
+            0.5412
+          ],
+          "pSecA": 0.3063,
+          "impactP95A": 38.9,
+          "pD": 0.398,
+          "ciD": [
+            0.3806,
+            0.4156
+          ],
+          "relativeToBase": 14.66
+        },
+        {
+          "key": "WET",
+          "label": "Calzada mojada (μ 0,45)",
+          "pA": 0.305,
+          "ciA": [
+            0.2888,
+            0.3217
+          ],
+          "pSecA": 0.15,
+          "impactP95A": 36.4,
+          "pD": 0.2337,
+          "ciD": [
+            0.2189,
+            0.2491
+          ],
+          "relativeToBase": 8.54
+        },
+        {
+          "key": "HEAVY",
+          "label": "Seguidor pesado (12 t, frenada 55–70 %)",
+          "pA": 0.231,
+          "ciA": [
+            0.2163,
+            0.2464
+          ],
+          "pSecA": 0.1473,
+          "impactP95A": 42.6,
+          "pD": 0.1783,
+          "ciD": [
+            0.165,
+            0.1924
+          ],
+          "relativeToBase": 6.47
+        },
+        {
+          "key": "FOG",
+          "label": "Niebla densa (40 m)",
+          "pA": 0.1537,
+          "ciA": [
+            0.1412,
+            0.167
+          ],
+          "pSecA": 0.0787,
+          "impactP95A": 64.9,
+          "pD": 0.1217,
+          "ciD": [
+            0.1105,
+            0.1339
+          ],
+          "relativeToBase": 4.31
+        },
+        {
+          "key": "CLOSE",
+          "label": "Distancia temporal 0,8 s",
+          "pA": 0.1137,
+          "ciA": [
+            0.1028,
+            0.1255
+          ],
+          "pSecA": 0.063,
+          "impactP95A": 45.6,
+          "pD": 0.0903,
+          "ciD": [
+            0.0806,
+            0.1011
+          ],
+          "relativeToBase": 3.18
+        },
+        {
+          "key": "NIGHT",
+          "label": "Noche (+0,2–0,5 s de reacción)",
+          "pA": 0.095,
+          "ciA": [
+            0.085,
+            0.106
+          ],
+          "pSecA": 0.0417,
+          "impactP95A": 48,
+          "pD": 0.0737,
+          "ciD": [
+            0.0649,
+            0.0836
+          ],
+          "relativeToBase": 2.66
+        },
+        {
+          "key": "BASE",
+          "label": "Base (seco, día, 250 m de visibilidad)",
+          "pA": 0.0357,
+          "ciA": [
+            0.0296,
+            0.0429
+          ],
+          "pSecA": 0.018,
+          "impactP95A": 50.8,
+          "pD": 0.0267,
+          "ciD": [
+            0.0215,
+            0.0331
+          ],
+          "relativeToBase": 1
+        },
+        {
+          "key": "FAST",
+          "label": "Velocidad 120 km/h",
+          "pA": 0.02,
+          "ciA": [
+            0.0156,
+            0.0257
+          ],
+          "pSecA": 0.013,
+          "impactP95A": 52.7,
+          "pD": 0.015,
+          "ciD": [
+            0.0112,
+            0.02
+          ],
+          "relativeToBase": 0.56
+        },
+        {
+          "key": "SAFE_GAP",
+          "label": "Distancia temporal 2 s (recomendada)",
+          "pA": 0.005,
+          "ciA": [
+            0.003,
+            0.0082
+          ],
+          "pSecA": 0.0013,
+          "impactP95A": 69.6,
+          "pD": 0.003,
+          "ciD": [
+            0.0016,
+            0.0057
+          ],
+          "relativeToBase": 0.14
+        }
+      ],
+      "disclaimer": "Probabilidades SIMULADAS condicionadas a parámetros declarados; ordenan circunstancias, no estiman tasas reales."
     }
   }
 }

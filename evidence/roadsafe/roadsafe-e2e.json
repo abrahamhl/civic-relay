@@ -1,8 +1,8 @@
 {
   "schema": "senda-roadsafe-e2e/1",
   "browser": "chromium (playwright)",
-  "at": "2026-11-17T23:16:15.616Z",
-  "passed": 30,
+  "at": "2026-11-17T23:43:17.249Z",
+  "passed": 38,
   "failed": 0,
   "results": [
     {
@@ -15,9 +15,13 @@
       "ok": true
     },
     {
+      "name": "movil: autoevaluación — heridos/atrapados ⇒ CRITICAL con instrucción 112",
+      "ok": true
+    },
+    {
       "name": "movil: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-bf9219e70b7fbf6f · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-ea2bc38111c894fe · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -27,7 +31,7 @@
     {
       "name": "movil: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-bf9219e70b7fbf6f · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-ea2bc38111c894fe · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: idioma en",
@@ -58,9 +62,30 @@
       "svcO": "ServicioEstadoReferenciaMarcasTOW · GRUA-SIMPARTNER_ACKNOWLEDGEDGRUA-SIM-SIM-1—TAXI · TAXI-2-SIMTRANSPORT_ACCEPTED—ACK_SIN_REFERENCIA, DELAYEDTAXI · TAXI-SIMON_SCENE_REPORTEDTAXI-SIM-SIM-1—"
     },
     {
+      "name": "movil: priorización — el «atrapado» sin verificar va primero con VERIFICAR",
+      "ok": true,
+      "prio": [
+        "1M-40 · «atrapado» sin verificarVERIFICAR · DATOS_INCOMPLETO",
+        "2N-000 PK 127 · alcanceELEVATEDcolisión secundaria / escalad",
+        "3AP-7 PK 300 · carril ocupado, nocheSLA_SUPERADOCRITICALnive",
+        "4A-3 PK 41,2 · avería arcénMONITORnivel MONITOR (índice 5) ·"
+      ]
+    },
+    {
+      "name": "movil: zona — el aviso anticipado crece con la cola y los paneles son propuestas",
+      "ok": true,
+      "a20": 1567,
+      "a50": 2861
+    },
+    {
       "name": "movil: científico — 5 escenarios con IC y acuse de visualización 0",
       "ok": true,
       "sres": "A · Sin alertas digitales4.1 %\n   \n   cobertura efectiva 0.0 % · taxi→furgoneta 1.5 % · avisos tardíos suprimidos/mostrados 0/0 · acuse de visualización 0B · V16 informativa (sin asumir entrega al conductor)4.1 %\n   \n   cobertura efectiva 0.0 % · taxi→furgoneta 1.5 % · avisos tardíos suprimidos/most"
+    },
+    {
+      "name": "movil: científico — ranking de 11 circunstancias, 2 s la más segura",
+      "ok": true,
+      "last": "Distancia temporal 2 s (recomendada)0.5 %×0.130.4 %45.6 km/h"
     },
     {
       "name": "movil: sin desbordamiento horizontal",
@@ -91,9 +116,13 @@
       "ok": true
     },
     {
+      "name": "escritorio: autoevaluación — heridos/atrapados ⇒ CRITICAL con instrucción 112",
+      "ok": true
+    },
+    {
       "name": "escritorio: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-ceca07d997e3c1a8 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-e2beff9537f8a9e3 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -103,7 +132,7 @@
     {
       "name": "escritorio: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-ceca07d997e3c1a8 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-e2beff9537f8a9e3 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: idioma en",
@@ -134,9 +163,30 @@
       "svcO": "ServicioEstadoReferenciaMarcasTOW · GRUA-SIMPARTNER_ACKNOWLEDGEDGRUA-SIM-SIM-1—TAXI · TAXI-2-SIMTRANSPORT_ACCEPTED—ACK_SIN_REFERENCIA, DELAYEDTAXI · TAXI-SIMON_SCENE_REPORTEDTAXI-SIM-SIM-1—"
     },
     {
+      "name": "escritorio: priorización — el «atrapado» sin verificar va primero con VERIFICAR",
+      "ok": true,
+      "prio": [
+        "1M-40 · «atrapado» sin verificarVERIFICAR · DATOS_INCOMPLETO",
+        "2N-000 PK 127 · alcanceELEVATEDcolisión secundaria / escalad",
+        "3AP-7 PK 300 · carril ocupado, nocheSLA_SUPERADOCRITICALnive",
+        "4A-3 PK 41,2 · avería arcénMONITORnivel MONITOR (índice 5) ·"
+      ]
+    },
+    {
+      "name": "escritorio: zona — el aviso anticipado crece con la cola y los paneles son propuestas",
+      "ok": true,
+      "a20": 1567,
+      "a50": 2861
+    },
+    {
       "name": "escritorio: científico — 5 escenarios con IC y acuse de visualización 0",
       "ok": true,
       "sres": "A · Sin alertas digitales4.1 %\n   \n   cobertura efectiva 0.0 % · taxi→furgoneta 1.5 % · avisos tardíos suprimidos/mostrados 0/0 · acuse de visualización 0B · V16 informativa (sin asumir entrega al conductor)4.1 %\n   \n   cobertura efectiva 0.0 % · taxi→furgoneta 1.5 % · avisos tardíos suprimidos/most"
+    },
+    {
+      "name": "escritorio: científico — ranking de 11 circunstancias, 2 s la más segura",
+      "ok": true,
+      "last": "Distancia temporal 2 s (recomendada)0.5 %×0.130.4 %45.6 km/h"
     },
     {
       "name": "escritorio: sin desbordamiento horizontal",

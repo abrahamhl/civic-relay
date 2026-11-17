@@ -1,5 +1,13 @@
 # Changelog
 
+## SENDA RoadSafe · 17-11-2026 (II) · Casuística con evidencia, priorización, señalización dinámica de zona y probabilidades por circunstancia
+
+**Entrada (fundador):** estudiar la casuística de accidentes y las probabilidades según las circunstancias, concluir y desarrollar el software para priorizar, coordinar, prevenir y señalizar zonas de accidente.
+
+**Procesamiento:** `roadsafe-evidence.mjs` (11 hallazgos con fuente y grado, 8 mecanismos), `roadsafe-risk-factors.mjs`, `roadsafe-priority.mjs`, `roadsafe-zone.mjs` (áreas TIM, cola LWR, banda de aviso útil, paneles PMV propuestos, CIFS) y `circumstanceGrid` (11 circunstancias). El taxi del simulador tampoco puede superar la adherencia. Consola ampliada. `docs/roadsafe/06_CASUISTRY_RISK_AND_CONCLUSIONS.md`.
+
+**Validación:** prevención 6/6 nuevas · E2E Chromium 38/38. Conclusión principal: el riesgo se concentra en el vehículo inmovilizado que espera grúa, con carril ocupado o personas fuera; la distancia de seguridad y la adherencia dominan sobre el aviso digital. — Firma: Claude (Asistente de Orquestación Senior)
+
 ## SENDA RoadSafe · 17-11-2026 · Prevención de colisiones secundarias y coordinación de asistencia verificable (rama `ccr-5123180e-t90iwo`, apilada sobre PR #47 `743c4f5`)
 
 **Entrada (fundador):** caso de investigación anonimizado (avería en arcén con V16, taxi, alcance y empuje); arquitectura federada sin depender de que todos instalen SENDA; corregir P0 viales; investigación y experimentos reproducibles.

@@ -35,6 +35,9 @@ for (const vp of [{ name: 'movil', width: 390, height: 844 }, { name: 'escritori
   check(`${vp.name}: carga sin errores`, errors.length === 0, { errors });
   const tel = await page.getAttribute('#call112', 'href');
   check(`${vp.name}: botón 112 es tel:112 y visible sin abrir expediente`, tel === 'tel:112' && await page.isVisible('#call112'));
+  await page.check('#q-hurt');
+  check(`${vp.name}: autoevaluación — heridos/atrapados ⇒ CRITICAL con instrucción 112`, /CRITICAL/.test(await page.textContent('#c-risk')) && /112/.test(await page.textContent('#c-risk')));
+  await page.uncheck('#q-hurt');
   await page.click('#b-breakdown'); await page.waitForSelector('#c-case b');
   const caseTxt = await page.textContent('#c-case');
   check(`${vp.name}: expediente de avería abierto (UNVERIFIED, sin registro)`, /RS-[0-9a-f]{16}/.test(caseTxt) && /UNVERIFIED/.test(caseTxt), { caseTxt: caseTxt.slice(0, 200) });
@@ -50,10 +53,18 @@ for (const vp of [{ name: 'movil', width: 390, height: 844 }, { name: 'escritori
   check(`${vp.name}: operador — V16/DGT/navegador comparten raíz causal`, (prov.match(/V16_BEACON:V16-001/g) ?? []).length === 4 && (prov.match(/misma raíz: no suma/g) ?? []).length === 3 && /UNVERIFIED|CORROBORATED/.test(conf), { prov: prov.slice(0, 300), conf });
   check(`${vp.name}: operador — auditoría encadenada ✓`, /✓/.test(audit), { audit });
   check(`${vp.name}: operador — 202 sin referencia se queda en TRANSPORT_ACCEPTED`, /TRANSPORT_ACCEPTED/.test(svcO) && /ACK_SIN_REFERENCIA/.test(svcO), { svcO: svcO.slice(0, 400) });
+  const prio = await page.$$eval('#o-prio tbody tr', (rs) => rs.map((r) => r.textContent));
+  check(`${vp.name}: priorización — el «atrapado» sin verificar va primero con VERIFICAR`, prio.length === 4 && /atrapado/.test(prio[0]) && /VERIFICAR/.test(prio[0]), { prio: prio.map((x) => x.slice(0, 60)) });
+  const q20 = await page.textContent('#z-info'); await page.fill('#z-min', '50'); await page.dispatchEvent('#z-min', 'input'); const q50 = await page.textContent('#z-info');
+  const len = (t) => +(t.match(/ADVANCE_WARNING (\d+) m/) ?? [])[1];
+  check(`${vp.name}: zona — el aviso anticipado crece con la cola y los paneles son propuestas`, len(q50) > len(q20) && /propuesta, requiere aprobación/.test(q50), { a20: len(q20), a50: len(q50) });
   await page.screenshot({ path: resolve(outDir, `roadsafe-operador-${vp.name}.png`), fullPage: true });
   await page.click('#tab-s'); await page.click('#s-run'); await page.waitForSelector('#s-res .bar');
   const sres = await page.textContent('#s-res'), srisk = await page.textContent('#s-risk');
   check(`${vp.name}: científico — 5 escenarios con IC y acuse de visualización 0`, (sres.match(/%/g) ?? []).length >= 10 && /acuse de visualización 0/.test(sres) && /d_stop/.test(srisk), { sres: sres.slice(0, 300) });
+  await page.click('#s-circ'); await page.waitForSelector('#s-circ-t tbody tr');
+  const circ = await page.$$eval('#s-circ-t tbody tr', (rs) => rs.map((r) => r.textContent));
+  check(`${vp.name}: científico — ranking de 11 circunstancias, 2 s la más segura`, circ.length === 11 && /2 s/.test(circ.at(-1)), { last: circ.at(-1) });
   await page.screenshot({ path: resolve(outDir, `roadsafe-cientifico-${vp.name}.png`), fullPage: true });
   const overflow = await page.evaluate(() => [...document.querySelectorAll('[role=tabpanel]')].map((p) => { p.hidden = false; return document.documentElement.scrollWidth - document.documentElement.clientWidth; }));
   check(`${vp.name}: sin desbordamiento horizontal`, overflow.every((x) => x <= 1), { overflow });

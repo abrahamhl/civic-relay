@@ -10,7 +10,7 @@
 .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.tabs button[aria-selected=true]{background:var(--i);border-color:var(--i);color:#04121a}
 .big{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}@media(max-width:520px){.big{grid-template-columns:1fr}}
 .big button{min-height:64px;font-size:17px;text-align:left}.big a.call{display:flex;align-items:center;justify-content:center;min-height:64px;border-radius:10px;background:var(--r);color:#1a0306;font-weight:800;font-size:19px;text-decoration:none}
-.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid var(--l);background:#071018}
+.badge{display:inline-block;white-space:nowrap;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid var(--l);background:#071018}
 .b-ok{color:var(--e);border-color:var(--e)}.b-warn{color:var(--a);border-color:var(--a)}.b-bad{color:var(--r);border-color:var(--r)}.b-info{color:var(--i);border-color:var(--i)}
 .ex{background:#2a1f05;border:1px solid var(--a);color:var(--a);border-radius:10px;padding:8px 12px;font-weight:700;font-size:13px}
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--l);vertical-align:top}th{color:var(--m);font-weight:600}
@@ -62,6 +62,18 @@ svg text{font:12px Inter,system-ui,sans-serif}
    </div>
   </div>
  </div>
+
+ <div class="card" style="margin-top:14px"><h2 data-t="cRisk">¿Cómo de expuesta está tu situación?</h2>
+  <div class="row" role="group" aria-label="situación">
+   <label><input type="checkbox" id="q-out"> <span data-t="qOut">Hay personas fuera del vehículo</span></label>
+   <label><input type="checkbox" id="q-lane"> <span data-t="qLane">El vehículo ocupa el carril</span></label>
+   <label><input type="checkbox" id="q-night"> <span data-t="qNight">Es de noche</span></label>
+   <label><input type="checkbox" id="q-wet"> <span data-t="qWet">Llueve o la calzada está mojada</span></label>
+   <label><input type="checkbox" id="q-curve"> <span data-t="qCurve">Curva o cambio de rasante antes</span></label>
+   <label><input type="checkbox" id="q-hurt"> <span data-t="qHurt">Hay heridos, atrapados o fuego</span></label>
+  </div>
+  <div id="c-risk" aria-live="polite" style="margin-top:10px"></div>
+ </div>
 </section>
 
 <!-- ============================================================ OPERADOR -->
@@ -76,6 +88,15 @@ svg text{font:12px Inter,system-ui,sans-serif}
   <div class="card"><h2 data-t="oSvc">Servicios solicitados</h2><div class="tw"><table id="o-svc"><thead><tr><th data-t="thSvc">Servicio</th><th data-t="thState">Estado</th><th data-t="thRef">Referencia</th><th data-t="thFlags">Marcas</th></tr></thead><tbody></tbody></table></div>
    <h3 style="margin-top:12px" data-t="oChan">Canales y entrega</h3><div class="tw"><table id="o-chan"><thead><tr><th>Canal</th><th data-t="thUsable">Uso</th><th data-t="thWhy">Motivo / P inferior</th></tr></thead><tbody></tbody></table></div></div>
   <div class="card"><h2 data-t="oTl">Cronología auditada</h2><ul class="tl" id="o-tl"></ul><p class="m" style="font-size:12px" id="o-audit"></p></div>
+ </div>
+
+ <div class="g2">
+  <div class="card"><h2 data-t="oPrio">Priorización de incidentes (ejercicio)</h2><div class="tw"><table id="o-prio"><thead><tr><th>#</th><th>Incidente</th><th data-t="thTier">Nivel</th><th data-t="thWhy2">Por qué</th></tr></thead><tbody></tbody></table></div>
+   <p class="m" style="font-size:12px" data-t="oPrioNote">Orden de atención para coordinación; no sustituye la clasificación del 112. Índice relativo, no probabilidad.</p></div>
+  <div class="card"><h2 data-t="oZone">Plan de señalización de la zona</h2>
+   <label class="s"><span data-t="pMin">Minutos desde el incidente</span><input type="range" id="z-min" min="0" max="60" step="5" value="20"><output id="o-min">20</output></label>
+   <svg id="z-svg" viewBox="0 0 640 150" role="img" aria-label="Áreas de la zona de incidente"></svg>
+   <div id="z-info" class="m" style="font-size:13px"></div></div>
  </div>
 </section>
 
@@ -97,6 +118,11 @@ svg text{font:12px Inter,system-ui,sans-serif}
   <div class="card" aria-live="polite"><h2 data-t="sRes">Contrafactuales A–E · P(alcance) con IC 95 %</h2><div id="s-res" class="m" data-t="sWait">Pulsa «Simular».</div></div>
  </div>
  <div class="card" style="margin-top:14px"><h2 data-t="sRisk">Riesgo de no poder detenerse (Monte Carlo) y decisión de aviso</h2><div id="s-risk" class="m"></div></div>
+
+ <div class="card" style="margin-top:14px"><h2 data-t="sCirc">Probabilidad simulada por circunstancia (A sin aviso · D SENDA)</h2>
+  <div class="row"><button id="s-circ" data-t="sCircRun">Calcular ranking (N=800 por fila)</button></div>
+  <div class="tw"><table id="s-circ-t"><thead><tr><th data-t="thCirc">Circunstancia</th><th>P(A)</th><th>×</th><th>P(D)</th><th data-t="thSev">Impacto p95</th></tr></thead><tbody></tbody></table></div>
+  <p class="m" style="font-size:12px" data-t="sCircNote">Ordena circunstancias con parámetros declarados; no son tasas reales. La velocidad en este modelo actúa sobre la gravedad (p95), no sobre la probabilidad.</p></div>
 </section>
 </main>
 
@@ -106,6 +132,11 @@ import { createDispatchOrchestrator, createContractSimulator, minimalPayload } f
 import { buildEmergencyDossier, createEmergencyGateway } from '/senda/core/roadsafe-emergency-gateway.mjs';
 import { routeChannels, deliveryLabel } from '/senda/core/roadsafe-delivery.mjs';
 import { causalRoot } from '/senda/core/roadsafe-correlation.mjs';
+import { assessIncidentRisk, recommendedActions } from '/senda/core/roadsafe-risk-factors.mjs';
+import { prioritizeIncidents } from '/senda/core/roadsafe-priority.mjs';
+import { planIncidentZone } from '/senda/core/roadsafe-zone.mjs';
+import { demoRoad } from '/senda/core/road-guard.mjs';
+import { circumstanceGrid } from '/senda/core/roadsafe-accident-sim.mjs';
 import { navigationLinks, toCifsIncident, validateCifs } from '/senda/core/roadsafe-interop.mjs';
 import { runExperiment, PARAM_PROVENANCE } from '/senda/core/roadsafe-accident-sim.mjs';
 import { secondaryRiskMC, warningDecision, stoppingDistance, G } from '/senda/core/roadsafe-secondary-risk.mjs';
@@ -114,8 +145,8 @@ const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const I18N = {
  es: {}, // los textos ES están en el HTML
- en: { title: 'RoadSafe · breakdown and rear-end risk', lead: 'A breakdown case with minimal interaction, assistance coordination with real confirmations, and warnings to approaching drivers only through authorised channels. This page is a test bench: it does not contact 112, tow trucks or insurers.', exercise: 'EXERCISE · DGT 3.0, Waze, insurer and 112 integrations are simulated contracts until a signed agreement exists.', tabC: 'Citizen', tabO: 'Operator', tabS: 'Scientist', cNow: 'What to do now (no sign-up, no network)', call: 'Call 112', bBreak: 'I have broken down', bCrash: 'There has been a crash', bShare: 'Share my location', callNote: 'Calling 112 is always yours and always available. When dialling, the phone may send your location (AML) to 112 without going through SENDA.', cCase: 'Your case', cNone: 'No case opened yet.', cAssist: 'Assistance', bTow: 'Request tow (assistance)', bTaxi: 'Request taxi', cNav: 'Open in your navigator', oRun: 'Replay scenario (exercise)', oMap: 'Incident schematic', oProv: 'Provenance and confidence', thSource: 'Source', thRoot: 'Causal root', oSvc: 'Requested services', thSvc: 'Service', thState: 'State', thRef: 'Reference', thFlags: 'Flags', oChan: 'Channels and delivery', thUsable: 'Use', thWhy: 'Reason / lower P', oTl: 'Audited timeline', sParams: 'Parameters (all hypothetical or swept)', pSpeed: 'Speed (km/h)', pHead: 'Time headway (s)', pMu: 'Friction μ (dry 0.8 · wet 0.45)', pSight: 'Visibility (m)', pShare: 'SENDA adoption', pLat: 'Authorised channel latency (s)', pArr: 'Taxi arrival after V16 (s)', sRun: 'Simulate A–E (N=1500, paired)', sExport: 'Export evidence JSON', sDisc: 'Simulation with declared parameters. It does not demonstrate real crash reduction.', sRes: 'Counterfactuals A–E · P(rear-end) with 95% CI', sWait: 'Press “Simulate”.', sRisk: 'Risk of being unable to stop (Monte Carlo) and warning decision' },
- nl: { title: 'RoadSafe · pech en kop-staartrisico', lead: 'Een pechdossier met minimale interactie, hulpcoördinatie met echte bevestigingen en waarschuwingen aan naderende bestuurders alleen via geautoriseerde kanalen. Deze pagina is een testbank: er wordt geen contact gelegd met 112, bergers of verzekeraars.', exercise: 'OEFENING · Koppelingen met DGT 3.0, Waze, verzekeraars en 112 zijn gesimuleerde contracten tot er een ondertekende overeenkomst is.', tabC: 'Burger', tabO: 'Operator', tabS: 'Wetenschap', cNow: 'Wat nu te doen (zonder registratie, zonder netwerk)', call: 'Bel 112', bBreak: 'Ik heb pech', bCrash: 'Er is een ongeval', bShare: 'Deel mijn locatie', callNote: 'Bellen naar 112 is altijd aan jou en altijd beschikbaar. Bij het bellen kan de telefoon je locatie (AML) naar 112 sturen, buiten SENDA om.', cCase: 'Jouw dossier', cNone: 'Nog geen dossier geopend.', cAssist: 'Hulp', bTow: 'Berging aanvragen', bTaxi: 'Taxi aanvragen', cNav: 'Openen in je navigatie', oRun: 'Scenario afspelen (oefening)', oMap: 'Schema van het incident', oProv: 'Herkomst en betrouwbaarheid', thSource: 'Bron', thRoot: 'Causale oorsprong', oSvc: 'Aangevraagde diensten', thSvc: 'Dienst', thState: 'Status', thRef: 'Referentie', thFlags: 'Markeringen', oChan: 'Kanalen en levering', thUsable: 'Gebruik', thWhy: 'Reden / onderste P', oTl: 'Geauditeerde tijdlijn', sParams: 'Parameters (alle hypothetisch of gevarieerd)', pSpeed: 'Snelheid (km/u)', pHead: 'Volgtijd (s)', pMu: 'Wrijving μ (droog 0,8 · nat 0,45)', pSight: 'Zicht (m)', pShare: 'SENDA-adoptie', pLat: 'Latentie geautoriseerd kanaal (s)', pArr: 'Aankomst taxi na V16 (s)', sRun: 'Simuleer A–E (N=1500, gepaard)', sExport: 'Bewijs exporteren (JSON)', sDisc: 'Simulatie met gedeclareerde parameters. Toont geen echte vermindering van ongevallen aan.', sRes: 'Contrafactisch A–E · P(kop-staart) met 95%-BI', sWait: 'Druk op „Simuleer”.', sRisk: 'Risico niet tijdig te kunnen stoppen (Monte Carlo) en waarschuwingsbesluit' },
+ en: { oPrio: 'Incident prioritisation (exercise)', thTier: 'Tier', thWhy2: 'Why', oPrioNote: 'Attention order for coordination; it does not replace 112 triage. Relative index, not probability.', oZone: 'Incident zone signing plan', pMin: 'Minutes since incident', cRisk: 'How exposed is your situation?', qOut: 'People are outside the vehicle', qLane: 'The vehicle is in a lane', qNight: 'It is night', qWet: 'Rain or wet road', qCurve: 'Bend or crest before', qHurt: 'Injured, trapped or fire', sCirc: 'Simulated probability by circumstance (A no warning · D SENDA)', sCircRun: 'Compute ranking (N=800 per row)', thCirc: 'Circumstance', thSev: 'Impact p95', sCircNote: 'Ranks circumstances with declared parameters; not real rates. In this model speed acts on severity (p95), not probability.', title: 'RoadSafe · breakdown and rear-end risk', lead: 'A breakdown case with minimal interaction, assistance coordination with real confirmations, and warnings to approaching drivers only through authorised channels. This page is a test bench: it does not contact 112, tow trucks or insurers.', exercise: 'EXERCISE · DGT 3.0, Waze, insurer and 112 integrations are simulated contracts until a signed agreement exists.', tabC: 'Citizen', tabO: 'Operator', tabS: 'Scientist', cNow: 'What to do now (no sign-up, no network)', call: 'Call 112', bBreak: 'I have broken down', bCrash: 'There has been a crash', bShare: 'Share my location', callNote: 'Calling 112 is always yours and always available. When dialling, the phone may send your location (AML) to 112 without going through SENDA.', cCase: 'Your case', cNone: 'No case opened yet.', cAssist: 'Assistance', bTow: 'Request tow (assistance)', bTaxi: 'Request taxi', cNav: 'Open in your navigator', oRun: 'Replay scenario (exercise)', oMap: 'Incident schematic', oProv: 'Provenance and confidence', thSource: 'Source', thRoot: 'Causal root', oSvc: 'Requested services', thSvc: 'Service', thState: 'State', thRef: 'Reference', thFlags: 'Flags', oChan: 'Channels and delivery', thUsable: 'Use', thWhy: 'Reason / lower P', oTl: 'Audited timeline', sParams: 'Parameters (all hypothetical or swept)', pSpeed: 'Speed (km/h)', pHead: 'Time headway (s)', pMu: 'Friction μ (dry 0.8 · wet 0.45)', pSight: 'Visibility (m)', pShare: 'SENDA adoption', pLat: 'Authorised channel latency (s)', pArr: 'Taxi arrival after V16 (s)', sRun: 'Simulate A–E (N=1500, paired)', sExport: 'Export evidence JSON', sDisc: 'Simulation with declared parameters. It does not demonstrate real crash reduction.', sRes: 'Counterfactuals A–E · P(rear-end) with 95% CI', sWait: 'Press “Simulate”.', sRisk: 'Risk of being unable to stop (Monte Carlo) and warning decision' },
+ nl: { oPrio: 'Prioritering van incidenten (oefening)', thTier: 'Niveau', thWhy2: 'Waarom', oPrioNote: 'Volgorde van aandacht voor coördinatie; vervangt de 112-triage niet. Relatieve index, geen kans.', oZone: 'Signaleringsplan van de incidentzone', pMin: 'Minuten sinds incident', cRisk: 'Hoe blootgesteld is je situatie?', qOut: 'Er staan mensen buiten het voertuig', qLane: 'Het voertuig staat op een rijstrook', qNight: 'Het is nacht', qWet: 'Regen of natte weg', qCurve: 'Bocht of heuveltop ervoor', qHurt: 'Gewonden, beklemd of brand', sCirc: 'Gesimuleerde kans per omstandigheid (A zonder · D SENDA)', sCircRun: 'Rangorde berekenen (N=800 per rij)', thCirc: 'Omstandigheid', thSev: 'Impact p95', sCircNote: 'Rangschikt omstandigheden met gedeclareerde parameters; geen echte cijfers. Snelheid werkt in dit model op de ernst (p95), niet op de kans.', title: 'RoadSafe · pech en kop-staartrisico', lead: 'Een pechdossier met minimale interactie, hulpcoördinatie met echte bevestigingen en waarschuwingen aan naderende bestuurders alleen via geautoriseerde kanalen. Deze pagina is een testbank: er wordt geen contact gelegd met 112, bergers of verzekeraars.', exercise: 'OEFENING · Koppelingen met DGT 3.0, Waze, verzekeraars en 112 zijn gesimuleerde contracten tot er een ondertekende overeenkomst is.', tabC: 'Burger', tabO: 'Operator', tabS: 'Wetenschap', cNow: 'Wat nu te doen (zonder registratie, zonder netwerk)', call: 'Bel 112', bBreak: 'Ik heb pech', bCrash: 'Er is een ongeval', bShare: 'Deel mijn locatie', callNote: 'Bellen naar 112 is altijd aan jou en altijd beschikbaar. Bij het bellen kan de telefoon je locatie (AML) naar 112 sturen, buiten SENDA om.', cCase: 'Jouw dossier', cNone: 'Nog geen dossier geopend.', cAssist: 'Hulp', bTow: 'Berging aanvragen', bTaxi: 'Taxi aanvragen', cNav: 'Openen in je navigatie', oRun: 'Scenario afspelen (oefening)', oMap: 'Schema van het incident', oProv: 'Herkomst en betrouwbaarheid', thSource: 'Bron', thRoot: 'Causale oorsprong', oSvc: 'Aangevraagde diensten', thSvc: 'Dienst', thState: 'Status', thRef: 'Referentie', thFlags: 'Markeringen', oChan: 'Kanalen en levering', thUsable: 'Gebruik', thWhy: 'Reden / onderste P', oTl: 'Geauditeerde tijdlijn', sParams: 'Parameters (alle hypothetisch of gevarieerd)', pSpeed: 'Snelheid (km/u)', pHead: 'Volgtijd (s)', pMu: 'Wrijving μ (droog 0,8 · nat 0,45)', pSight: 'Zicht (m)', pShare: 'SENDA-adoptie', pLat: 'Latentie geautoriseerd kanaal (s)', pArr: 'Aankomst taxi na V16 (s)', sRun: 'Simuleer A–E (N=1500, gepaard)', sExport: 'Bewijs exporteren (JSON)', sDisc: 'Simulatie met gedeclareerde parameters. Toont geen echte vermindering van ongevallen aan.', sRes: 'Contrafactisch A–E · P(kop-staart) met 95%-BI', sWait: 'Druk op „Simuleer”.', sRisk: 'Risico niet tijdig te kunnen stoppen (Monte Carlo) en waarschuwingsbesluit' },
 };
 const STEPS = {
  es: ['Luces de emergencia y baliza V16 encendida (desde la ventanilla).', 'Chaleco puesto antes de bajar; sal por el lado contrario al tráfico.', 'Espera detrás del guardarraíl o fuera de la calzada, nunca entre vehículos.', 'Si hay heridos, fuego o peligro: llama al 112 ya.'],
@@ -132,6 +163,7 @@ function applyLang(l) {
  document.querySelectorAll('.lg').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
  try { localStorage.setItem('rs-lang', lang); } catch {}
  renderCase();
+ if (window.__roadsafeReady) { citizenRisk(); renderZone(); }
 }
 document.querySelectorAll('.lg').forEach((b) => b.addEventListener('click', () => applyLang(b.dataset.lang)));
 // pestañas accesibles (flechas)
@@ -258,7 +290,59 @@ function runSci() {
 $('#s-run').onclick = runSci;
 $('#s-export').onclick = () => { if (!lastEvidence) runSci(); const b = new Blob([JSON.stringify(lastEvidence, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'senda-roadsafe-evidence.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); };
 
+
+// ------------------------------------------------------------ Autoevaluación ciudadana
+const TIER_CLS = { CRITICAL: 'b-bad', HIGH: 'b-warn', ELEVATED: 'b-info', MONITOR: 'b-ok' };
+function citizenRisk() {
+ const q = (id) => $('#' + id).checked;
+ const r = assessIncidentRisk({ peopleOutside: q('q-out'), peopleInLane: q('q-out') && q('q-lane'), laneBlocked: q('q-lane') ? 'PARTIAL' : 'SHOULDER', night: q('q-night'), wet: q('q-wet'), sightM: q('q-curve') ? 90 : 250, v85Kmh: 100, trapped: q('q-hurt'), waitingTow: true });
+ const acts = recommendedActions(r).filter((a) => a.who === 'CIUDADANO');
+ $('#c-risk').innerHTML = `<p><span class="badge ${TIER_CLS[r.tier]}">${esc(r.tier)}</span> ${r.uncertain ? '<span class="m">(' + esc(L('faltan datos: se asume el peor caso', 'missing data: worst case assumed', 'gegevens ontbreken: slechtste geval')) + ')</span>' : ''}</p>
+  <ul class="steps">${acts.map((a) => `<li><b>${esc(a.what)}</b> <span class="m">— ${esc(a.why)}</span></li>`).join('') || `<li>${esc(L('Mantente fuera de la calzada y espera tras la barrera.', 'Stay off the carriageway, behind the barrier.', 'Blijf van de rijbaan, achter de vangrail.'))}</li>`}</ul>`;
+}
+['q-out', 'q-lane', 'q-night', 'q-wet', 'q-curve', 'q-hurt'].forEach((id) => $('#' + id).addEventListener('change', citizenRisk));
+
+// ------------------------------------------------------------ Priorización (ejercicio con 4 incidentes sintéticos)
+function renderPrio() {
+ const now = 1_800_003_000, base = { v85Kmh: 100, sightM: 250, flowVehH: 900, waitingTow: true, queueForming: false, respondersExposed: false, heavyShare: 0.1 };
+ const items = [
+  { id: 'A-3 PK 41,2 · avería arcén', state: 'CORROBORATED', confidenceP: 0.9, detectedAt: now - 900, assistance: { requestedAt: now - 900 }, circumstances: { ...base, laneBlocked: 'SHOULDER', peopleOutside: false, durationMin: 15 } },
+  { id: 'N-000 PK 127 · alcance', state: 'SECONDARY_COLLISION_SUSPECTED', confidenceP: 0.8, detectedAt: now - 120, circumstances: { ...base, laneBlocked: 'PARTIAL', peopleOutside: true, durationMin: 2 } },
+  { id: 'AP-7 PK 300 · carril ocupado, noche', state: 'UNVERIFIED', confidenceP: 0.6, detectedAt: now - 2400, assistance: { requestedAt: now - 2400 }, circumstances: { ...base, laneBlocked: 'FULL', night: true, wet: true, sightM: 120, flowVehH: 2100, queueForming: true, peopleOutside: false, durationMin: 40 } },
+  { id: 'M-40 · «atrapado» sin verificar', state: 'UNVERIFIED', confidenceP: 0.3, detectedAt: now - 60, circumstances: { trapped: true } },
+ ];
+ const p = prioritizeIncidents(items, { now });
+ $('#o-prio tbody').innerHTML = p.order.map((o) => `<tr><td>${o.rank}</td><td>${esc(o.id)}${o.flags.length ? '<br><span class="m">' + esc(o.flags.join(' · ')) + '</span>' : ''}</td><td><span class="badge ${TIER_CLS[o.tier]}">${esc(o.tier)}</span></td><td>${esc(o.why.join(' · '))}</td></tr>`).join('');
+}
+
+// ------------------------------------------------------------ Plan de zona
+const ZROAD = demoRoad().road;
+const ZCOL = { ADVANCE_WARNING: '#fbbf24', TRANSITION: '#ff7756', BUFFER: '#91d7e8', INCIDENT_SPACE: '#ff5b6e', TERMINATION: '#34d399' };
+function renderZone() {
+ const t = +$('#z-min').value; $('#o-min').textContent = t;
+ const plan = planIncidentZone(ZROAD, { s: 14000, dir: 1, laneBlocked: 'FULL', lanes: 2 }, { speedLimitKmh: 100, v85Kmh: 105, flowVehH: 2400, wet: false, night: true, minutesElapsed: t }, { vms: [{ id: 'PMV-118', s: 6500, dir: 1 }, { id: 'PMV-123', s: 10500, dir: 1 }] });
+ const s0 = Math.min(plan.areas[0].from, 14000 - plan.queue.nowM) - 300, s1 = plan.areas.at(-1).to + 100, X = (s) => 20 + ((s - s0) / (s1 - s0)) * 600;
+ const qStart = 14000 - plan.queue.nowM;
+ $('#z-svg').innerHTML = `<rect width="640" height="150" fill="#071018"/><rect x="20" y="60" width="600" height="30" fill="#13212b"/>
+  ${plan.areas.map((a) => `<rect x="${X(a.from)}" y="60" width="${Math.max(2, X(a.to) - X(a.from))}" height="30" fill="${ZCOL[a.id]}" opacity=".75"><title>${a.id} ${a.lengthM} m</title></rect>`).join('')}
+  ${plan.queue.nowM ? `<rect x="${X(qStart)}" y="94" width="${X(14000) - X(qStart)}" height="8" fill="#b79cff"/><text x="${X(qStart)}" y="118" fill="#b79cff">${esc(L('cola', 'queue', 'file'))} ${plan.queue.nowM} m</text>` : ''}
+  ${plan.panels.map((p) => `<line x1="${X(p.s)}" y1="30" x2="${X(p.s)}" y2="60" stroke="#f2f4f4"/><text x="${X(p.s) + 3}" y="26" fill="#f2f4f4">${esc(p.id)}</text>`).join('')}
+  <text x="20" y="140" fill="#9fb2bc">${esc(L('sentido de circulación →', 'traffic direction →', 'rijrichting →'))}</text>`;
+ $('#z-info').innerHTML = `<p>${plan.areas.map((a) => `<span class="badge" style="border-color:${ZCOL[a.id]};color:${ZCOL[a.id]}">${esc(a.id)} ${a.lengthM} m</span>`).join(' ')}</p>
+  <p>${esc(L('Banda de aviso útil a móviles/navegadores', 'Useful warning band for phones/navigators', 'Nuttige waarschuwingsband'))}: ${plan.warnBand.fromUpM}–${plan.warnBand.toUpM} m ${esc(L('antes del primer peligro', 'before the first hazard', 'vóór het eerste gevaar'))}. ${esc(L('Cola', 'Queue', 'File'))}: ${plan.queue.forms ? plan.queue.shockKmh + ' km/h' : '—'}.</p>
+  <p>${plan.panels.map((p) => `<b>${esc(p.id)}</b>: «${esc(p.proposedText.join(' / '))}» <span class="badge b-warn">${esc(L('propuesta, requiere aprobación', 'proposal, needs approval', 'voorstel, goedkeuring nodig'))}</span>`).join('<br>')}</p>
+  <ul class="steps">${plan.responders.map((r) => `<li><b>${esc(r.to)}</b>: ${esc(r.text)}</li>`).join('')}</ul>`;
+}
+$('#z-min').addEventListener('input', renderZone);
+
+// ------------------------------------------------------------ Ranking de circunstancias
+$('#s-circ').onclick = () => {
+ const g = circumstanceGrid({ n: 800, seed: 2026 });
+ $('#s-circ-t tbody').innerHTML = g.rows.map((r) => `<tr><td>${esc(r.label)}</td><td>${(r.pA * 100).toFixed(1)} %</td><td>×${r.relativeToBase}</td><td>${(r.pD * 100).toFixed(1)} %</td><td>${r.impactP95A ?? '—'} km/h</td></tr>`).join('');
+};
+
 applyLang(lang);
+citizenRisk(); renderPrio(); renderZone();
 window.__roadsafeReady = true;
 </script>
 </body>

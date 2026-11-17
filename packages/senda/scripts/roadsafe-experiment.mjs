@@ -7,7 +7,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { runExperiment, PARAM_PROVENANCE, SCENARIOS } from '../src/roadsafe-accident-sim.mjs';
+import { runExperiment, PARAM_PROVENANCE, SCENARIOS, circumstanceGrid } from '../src/roadsafe-accident-sim.mjs';
 import { fuseRoadEvidence } from '../src/roadsafe-correlation.mjs';
 import { rng } from '../src/roadsafe-secondary-risk.mjs';
 import { createDispatchOrchestrator, createContractSimulator } from '../src/roadsafe-dispatch.mjs';
@@ -80,6 +80,7 @@ async function hroad3() {
 }
 E.H_ROAD_3_partial_failures = await hroad3();
 
+E.circumstances = circumstanceGrid({ n: N, seed: 2026 });
 writeFileSync(resolve(outDir, 'roadsafe-experiments.json'), JSON.stringify(results, null, 2));
 
 // Resumen markdown
@@ -99,5 +100,7 @@ L.push('', '## 6. Controles negativos', '', '```json', JSON.stringify(E.negative
 L.push('', '## 7. H-ROAD-2 — doble conteo de fuentes derivadas', '', '```json', JSON.stringify(E.H_ROAD_2_double_counting, null, 2), '```');
 L.push('', '## 8. H-ROAD-3 — fallos parciales de proveedor (banco contractual)', '', '| fallo | estado final | referencia | marcas | «enviada» ingenuo | «en el lugar» contrato |', '|---|---|---|---|---|---|');
 for (const r of E.H_ROAD_3_partial_failures.rows) L.push(`| ${r.faults} | ${r.finalState} | ${r.reference ?? '—'} | ${r.flags.join(', ') || '—'} | ${r.naiveWouldClaimDispatched} | ${r.contractClaimsOnScene} |`);
+L.push('', '## 9. Probabilidad condicionada por circunstancia (simulada; A sin aviso vs D SENDA)', '', '| Circunstancia | P(alcance) A [IC95] | × base | P(empuje) A | impacto p95 km/h | P(alcance) D |', '|---|---|---|---|---|---|');
+for (const r of E.circumstances.rows) L.push(`| ${r.label} | ${r.pA} [${r.ciA.join(', ')}] | ${r.relativeToBase} | ${r.pSecA} | ${r.impactP95A ?? '—'} | ${r.pD} |`);
 writeFileSync(resolve(outDir, 'ROADSAFE_RESULTS.md'), L.join('\n') + '\n');
 console.log(L.join('\n'));

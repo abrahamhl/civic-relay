@@ -60,7 +60,7 @@ export const SCENARIOS = Object.freeze({
 /** Una realización del caso. Devuelve qué pasó y por qué. */
 export function simulateOnce(p, r) {
   const v0 = p.speedKmh / 3.6;
-  const aT = p.taxiDecelMs2, gap = p.gapTaxiVanM;
+  const aT = Math.min(p.taxiDecelMs2, 0.9 * p.mu * G), gap = p.gapTaxiVanM; // el taxi tampoco supera la adherencia
   // Taxi: se detiene en x = -gap; empieza a frenar a d = v²/2a antes.
   const xTaxiStop = -gap, dBrakeT = v0 * v0 / (2 * aT), tBrakeStart = 0; // t=0 inicio de frenada del taxi
   const xTaxi0 = xTaxiStop - dBrakeT;
@@ -113,6 +113,9 @@ export function sampleParams(r, ov = {}) {
     lateWarningPenaltyS: uniform(r, ...P.lateWarningPenaltyS.value),
     acceptance: uniform(r, ...(ov.acceptanceRange ?? P.acceptance.value)),
   };
+  // Circunstancias (HIPÓTESIS declaradas en CIRCUMSTANCES): noche alarga la reacción; seguidor pesado frena peor y pesa más.
+  if (ov.night) out.reactUnexpectedS += uniform(r, 0.2, 0.5);
+  if (ov.heavyFollower) { out.brakeEff = uniform(r, 0.55, 0.7); out.massKg = { ...out.massKg, follower: 12000 }; }
   // Placebo (control negativo): el aviso no puede cambiar ni la reacción ni la velocidad.
   if (ov.placebo) { out.reactExpectedS = out.reactUnexpectedS; out.speedReduction = 0; out.lateWarningPenaltyS = 0; }
   return out;
@@ -169,4 +172,37 @@ export function runExperiment({ n = 3000, seed = 2026, overrides = {}, scenarios
     falseAlarmRate: +(o.falseAlarms / n).toFixed(4), lateWarningsSuppressed: o.lateSuppressed, lateWarningsShown: o.lateShown, messagesPerCase: +(o.messages / n).toFixed(3),
   };
   return { schema: 'senda-roadsafe-accident-experiment/1', seed, n, assistArrivalS: assistArrivalS ?? PARAM_PROVENANCE.assistArrivalS.value, displayRangeM, minLeadS, tMinS, overrides, summary, disclaimer: 'Resultados de simulación con parámetros declarados (PARAM_PROVENANCE). No demuestran reducción real de accidentes.' };
+}
+
+/** Circunstancias barridas y su procedencia (todas las magnitudes son hipótesis o rangos de manual). */
+/**
+ * LIMITACIÓN conocida del modelo: en seguimiento con distancia TEMPORAL constante y deceleraciones
+ * constantes, la probabilidad de alcance apenas depende de la velocidad (todo escala con v); en la realidad
+ * la velocidad actúa por otras vías no modeladas (detección de un vehículo PARADO a distancia, varianza de
+ * velocidades, energía del impacto ∝ v²). Por eso la velocidad se refleja aquí en la GRAVEDAD (p95 de impacto)
+ * y no debe leerse «a más velocidad, menos riesgo».
+ */
+export const CIRCUMSTANCES = Object.freeze({
+  BASE: { label: 'Base (seco, día, 250 m de visibilidad)', ov: {} },
+  WET: { label: 'Calzada mojada (μ 0,45)', ov: { mu: 0.45 }, provenance: 'LITERATURE_RANGE' },
+  NIGHT: { label: 'Noche (+0,2–0,5 s de reacción)', ov: { night: true }, provenance: 'HYPOTHETICAL' },
+  FOG: { label: 'Niebla densa (40 m)', ov: { sightM: 40 }, provenance: 'UNKNOWN_SWEPT' },
+  HEAVY: { label: 'Seguidor pesado (12 t, frenada 55–70 %)', ov: { heavyFollower: true }, provenance: 'HYPOTHETICAL' },
+  FAST: { label: 'Velocidad 120 km/h', ov: { speedKmh: 120 }, provenance: 'UNKNOWN_SWEPT' },
+  CLOSE: { label: 'Distancia temporal 0,8 s', ov: { headwayS: 0.8 }, provenance: 'HYPOTHETICAL' },
+  WET_NIGHT: { label: 'Mojado + noche', ov: { mu: 0.45, night: true } },
+  WET_CLOSE: { label: 'Mojado + 0,8 s', ov: { mu: 0.45, headwayS: 0.8 } },
+  NIGHT_FOG_HEAVY: { label: 'Noche + niebla + pesado', ov: { night: true, sightM: 40, heavyFollower: true } },
+  SAFE_GAP: { label: 'Distancia temporal 2 s (recomendada)', ov: { headwayS: 2.0 } },
+});
+
+/** Probabilidad condicionada (simulada) de alcance y de empuje por circunstancia, A (sin aviso) vs D (SENDA). */
+export function circumstanceGrid({ n = 2000, seed = 2026, keys = Object.keys(CIRCUMSTANCES) } = {}) {
+  const rows = keys.map((k) => {
+    const r = runExperiment({ n, seed, overrides: CIRCUMSTANCES[k].ov, scenarios: ['A_NO_DIGITAL', 'D_SENDA_VERIFIED'] }).summary;
+    return { key: k, label: CIRCUMSTANCES[k].label, pA: r.A_NO_DIGITAL.pCollision, ciA: r.A_NO_DIGITAL.ciCollision, pSecA: r.A_NO_DIGITAL.pSecondaryImpact, impactP95A: r.A_NO_DIGITAL.impactKmhP95, pD: r.D_SENDA_VERIFIED.pCollision, ciD: r.D_SENDA_VERIFIED.ciCollision };
+  });
+  const base = rows.find((r) => r.key === 'BASE')?.pA ?? null;
+  for (const r of rows) r.relativeToBase = base ? +(r.pA / base).toFixed(2) : null;
+  return { n, seed, rows: rows.sort((a, b) => b.pA - a.pA), disclaimer: 'Probabilidades SIMULADAS condicionadas a parámetros declarados; ordenan circunstancias, no estiman tasas reales.' };
 }

@@ -117,3 +117,19 @@ En seguimiento de vehículos la visibilidad solo limita cuando es menor que la s
 | outOfOrder | ON_SCENE_REPORTED | TOW-A-SIM-1 | COMPLETADO_SIN_LLEGADA | true | true |
 | duplicateEvents | ON_SCENE_REPORTED | TOW-A-SIM-1 | — | true | true |
 | neverArrives | PARTNER_ASSIGNED | TOW-A-SIM-1 | DELAYED | true | false |
+
+## 9. Probabilidad condicionada por circunstancia (simulada; A sin aviso vs D SENDA)
+
+| Circunstancia | P(alcance) A [IC95] | × base | P(empuje) A | impacto p95 km/h | P(alcance) D |
+|---|---|---|---|---|---|
+| Mojado + 0,8 s | 0.7003 [0.6837, 0.7165] | 19.62 | 0.499 | 32.9 | 0.5387 |
+| Noche + niebla + pesado | 0.5777 [0.5599, 0.5952] | 16.18 | 0.4523 | 63.4 | 0.4713 |
+| Mojado + noche | 0.5233 [0.5054, 0.5412] | 14.66 | 0.3063 | 38.9 | 0.398 |
+| Calzada mojada (μ 0,45) | 0.305 [0.2888, 0.3217] | 8.54 | 0.15 | 36.4 | 0.2337 |
+| Seguidor pesado (12 t, frenada 55–70 %) | 0.231 [0.2163, 0.2464] | 6.47 | 0.1473 | 42.6 | 0.1783 |
+| Niebla densa (40 m) | 0.1537 [0.1412, 0.167] | 4.31 | 0.0787 | 64.9 | 0.1217 |
+| Distancia temporal 0,8 s | 0.1137 [0.1028, 0.1255] | 3.18 | 0.063 | 45.6 | 0.0903 |
+| Noche (+0,2–0,5 s de reacción) | 0.095 [0.085, 0.106] | 2.66 | 0.0417 | 48 | 0.0737 |
+| Base (seco, día, 250 m de visibilidad) | 0.0357 [0.0296, 0.0429] | 1 | 0.018 | 50.8 | 0.0267 |
+| Velocidad 120 km/h | 0.02 [0.0156, 0.0257] | 0.56 | 0.013 | 52.7 | 0.015 |
+| Distancia temporal 2 s (recomendada) | 0.005 [0.003, 0.0082] | 0.14 | 0.0013 | 69.6 | 0.003 |
