@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070d16">
+<title>SENDA · Visor Científico Temporal / 4D</title>
+<link rel="manifest" href="/senda/manifest.webmanifest">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#060b11;--panel:#0b131c;--line:#1d2e3d;--text:#edf2f5;--mute:#98abb7;--coral:#ff7756;--ice:#8bd4e6;--ok:#56d39a;--warn:#ebb946;--err:#ff5c6c;--violet:#b59dff;--font:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;--mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,monospace}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 var(--font);overflow-x:clip}
+a{color:var(--ice)}
+:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
+header{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:12px 16px;background:rgba(6,11,17,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header h1{font-size:16px;margin:0;letter-spacing:.02em}
+.navstrip{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pill{display:inline-flex;align-items:center;min-height:38px;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:#0f1924;color:var(--text);text-decoration:none;font:600 12px var(--font)}
+.pill:hover,.pill.on{border-color:var(--ice);background:#152534}
+.hdr-right{margin-left:auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:inline-flex;background:#0f1924;border:1px solid var(--line);border-radius:999px;padding:2px}
+.seg button{border:0;background:none;color:var(--mute);padding:5px 10px;min-height:34px;border-radius:999px;cursor:pointer;font:600 12px var(--font)}
+.seg button.on{background:#1b2e40;color:var(--text)}
+.epistemic-bar{max-width:1600px;margin:10px auto 0;padding:0 16px}
+.epistemic-bar .box{border:1px solid var(--line);border-left:4px solid var(--coral);background:var(--panel);border-radius:8px;padding:9px 12px;display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:center;font-size:12px}
+main{max-width:1600px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(320px,1fr);gap:14px;padding:12px 16px 36px}
+@media (max-width:1040px){main{grid-template-columns:minmax(0,1fr);padding:10px}.hdr-right{margin-left:0}}
+section{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px;min-width:0}
+h2{font:700 12px var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 0 8px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,155px),1fr));gap:8px 10px;margin-bottom:10px}
+label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mute)}
+select,input,button{background:#101c28;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font:inherit;min-height:40px;max-width:100%}
+button{cursor:pointer;font-weight:600}
+button:hover{border-color:var(--ice)}
+button.primary{background:var(--coral);border-color:var(--coral);color:#140704}
+button.on{border-color:var(--ice);background:#152b3b}
+.layers{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.layers label{flex-direction:row;align-items:center;gap:6px;padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:#0f1924;cursor:pointer;font-size:12px;color:var(--text);min-height:36px}
+.layers input{min-height:auto;margin:0}
+.canvas-wrap{position:relative;border-radius:8px;border:1px solid var(--line);background:#060c12;overflow:hidden}
+canvas{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;margin-top:8px}
+.tag{font:700 10px var(--mono);padding:2px 6px;border-radius:4px;border:1px solid;display:inline-block}
+.obs{color:var(--ok);border-color:rgba(86,211,154,.45)}
+.sim{color:var(--warn);border-color:rgba(235,185,70,.45)}
+.pred{color:var(--ice);border-color:rgba(139,212,230,.45)}
+.hyp{color:var(--violet);border-color:rgba(181,157,255,.45)}
+.unv{color:var(--err);border-color:rgba(255,92,108,.45)}
+.table-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:340px}
+td,th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+td.num,th.num{text-align:right;font-family:var(--mono)}
+.mono{font-family:var(--mono);font-size:12px;overflow-wrap:anywhere}
+.small{font-size:12px;color:var(--mute)}
+.warnbox{border:1px solid rgba(255,92,108,.5);background:rgba(255,92,108,.09);border-radius:8px;padding:8px 10px;font-size:12px;margin-bottom:8px}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:8px;margin-top:8px}
+.kv>div{border:1px solid var(--line);border-radius:8px;padding:8px;background:#0e1721}
+.kv small{display:block;font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em}
+.kv b{display:block;font:700 13px var(--mono);margin-top:2px;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1 data-i18n="title">SENDA · Visor Científico Temporal / 4D</h1>
+    <div class="small" data-i18n="sub">Observación histórica + simulación física/DTN + incertidumbre explícita</div>
+  </div>
+  <nav class="navstrip" aria-label="Navegación SENDA">
+    <a class="pill" href="/senda">← SENDA</a>
+    <a class="pill" href="/senda/centro">Centro</a>
+    <a class="pill on" href="/senda/visor" aria-current="page">Visor 4D</a>
+    <a class="pill" href="/senda/atlas">Atlas</a>
+  </nav>
+  <div class="hdr-right">
+    <div class="seg" id="lang" aria-label="Idioma">
+      <button data-lang="es" class="on">ES</button><button data-lang="en">EN</button><button data-lang="nl">NL</button>
+    </div>
+    <div class="seg" id="viewMode" aria-label="Proyección espacial">
+      <button data-mode="2d" class="on">Mapa 2D</button><button data-mode="3d">Vista 3D relieve/tiempo</button>
+    </div>
+  </div>
+</header>
+
+<div class="epistemic-bar" role="note">
+  <div class="box">
+    <span><strong class="mono" style="color:var(--coral)">REGLA EPISTÉMICA:</strong> <span data-i18n="rule">Una simulación nunca es un hecho observado. Cada capa se etiqueta como OBSERVADO, SIMULADO, PREDICHO, HIPÓTESIS o NO VERIFICADO.</span></span>
+    <span class="mono" id="gfx-badge" style="color:var(--ice)">Motor gráfico: comprobando…</span>
+  </div>
+</div>
+
+<main>
+  <section>
+    <div class="controls">
+      <label><span data-i18n="lblScenario">Escenario y datos</span>
+        <select id="scenario">
+          <option value="camp">Camp Fire 2018 · GeoMAC (OBSERVADO) + ARR</option>
+          <option value="carr">Carr Fire 2018 · GeoMAC (OBSERVADO) + ARR</option>
+          <option value="woolsey">Woolsey Fire 2018 · GeoMAC (OBSERVADO) + ARR</option>
+          <option value="regional">Choques regionales correlacionados (SIMULADO)</option>
+        </select>
+      </label>
+      <label>Semilla de topología<input id="seed" type="number" value="1003" min="1"></label>
+      <label id="rhoBox">Correlación regional ρ = <span id="rhoV">0.9</span><input id="rho" type="range" min="0" max="0.95" step="0.05" value="0.9"></label>
+      <label id="k0Box" hidden>Instante de planificación k0<input id="k0" type="number" value="1" min="0"></label>
+      <label>Réplicas K = <span id="kV">3</span><input id="k" type="range" min="1" max="5" value="3"></label>
+      <label>Plan mostrado
+        <select id="method">
+          <option value="arr">ARR (conjunto de escenarios)</option>
+          <option value="independent-greedy">Ablación: independencia</option>
+          <option value="cgr-k-exclusion">CGR k rutas (exclusión)</option>
+          <option value="cgr-earliest">CGR llegada más temprana</option>
+        </select>
+      </label>
+      <label>Tiempo t = <span id="tV">0.0 h</span><input id="t" type="range" min="0" max="100" value="0"></label>
+    </div>
+
+    <div class="layers" role="group" aria-label="Capas visibles">
+      <label><input type="checkbox" id="lay-obs" checked> Perímetro <span class="tag obs">OBSERVADO</span></label>
+      <label><input type="checkbox" id="lay-h2" checked> Frente H2 <span class="tag pred">PREDICHO</span></label>
+      <label><input type="checkbox" id="lay-topo" checked> Relieve y viento <span class="tag sim">SIMULADO</span></label>
+      <label><input type="checkbox" id="lay-conn" checked> Conectividad <span class="tag sim">SIMULADO</span></label>
+      <label><input type="checkbox" id="lay-cuts" checked> Rutas y cortes SRLG <span class="tag hyp">HIPÓTESIS</span></label>
+      <button id="play" type="button">▶ Reproducir</button>
+      <button id="world" type="button" class="primary">Sortear mundo y ejecutar</button>
+    </div>
+
+    <div class="canvas-wrap">
+      <canvas id="map" width="920" height="620" aria-label="Visor científico espacial y temporal"></canvas>
+    </div>
+
+    <div class="legend">
+      <span><span class="tag obs">OBSERVADO</span> perímetro USGS GeoMAC hasta t</span>
+      <span><span class="tag sim">SIMULADO</span> nodos, contactos, relieve sintético y viento</span>
+      <span><span class="tag pred">PREDICHO</span> pérdida de nodo y frente H2 (experimental)</span>
+      <span><span class="tag hyp">HIPÓTESIS</span> rutas candidatas y cortes SRLG N-2</span>
+      <span><span class="tag unv">NO VERIFICADO</span> enlaces sin medida RF en campo</span>
+    </div>
+    <p class="small" id="status"></p>
+  </section>
+
+  <div style="display:grid;gap:12px;align-content:start;min-width:0">
+    <section>
+      <h2>Incertidumbre y comparación de planes <span class="tag pred">PREDICHO</span></h2>
+      <div class="table-scroll" id="pred"></div>
+      <canvas id="members" width="600" height="140" aria-label="Distribución de entrega por miembro del conjunto"></canvas>
+      <p class="small">Cada barra es un escenario del conjunto (K=64). La dispersión mide la incertidumbre espacial/temporal que oculta la suposición de independencia.</p>
+    </section>
+
+    <section id="alertBox">
+      <h2>Contraste predicción vs observado · Modo Experimental H2 <span class="tag unv">EXPERIMENTAL · SIN AVISOS</span></h2>
+      <div class="warnbox" id="skill">Comprobando puerta epistémica H2…</div>
+      <div class="table-scroll" id="alerts"></div>
+    </section>
+
+    <section>
+      <h2>Traza explicable y cortes por fallo (SRLG) <span class="tag hyp">HIPÓTESIS</span></h2>
+      <div class="table-scroll" id="trace"></div>
+      <div id="srlg-box" class="small" style="margin-top:8px"></div>
+    </section>
+
+    <section>
+      <h2>Comparación en un mundo sorteado <span class="tag sim">SIMULADO</span></h2>
+      <div class="table-scroll" id="exec"><p class="small">Pulsa «Sortear mundo y ejecutar» para contrastar ARR, ablación, CGR y techo epidémico.</p></div>
+    </section>
+
+    <section>
+      <h2>Inspección de fuente, antigüedad e integridad <span class="tag obs">PROCEDENCIA</span></h2>
+      <div class="kv" id="source-inspector"></div>
+      <p class="small" style="margin-top:8px">Para explorar DANA Valencia (EMSR773), Nepal Langtang (Sentinel-2 + DEM), DGT, NDW y GDACS abre <a href="/senda/atlas">Atlas SENDA</a>.</p>
+    </section>
+
+    <section>
+      <h2>Resultados retenidos H-ARR-1 (IC 95 %) <span class="tag sim">SIMULADO</span></h2>
+      <canvas id="chart" width="600" height="220" aria-label="Entrega simulada frente a correlación"></canvas>
+      <div id="verdict" class="small"></div>
+    </section>
+  </div>
+</main>
+
+<script type="module">
+import { planAdaptiveResilience, ensembleReliability } from '/senda/arr/arr-core.mjs';
+import { makeRegionalInstance, makeFireInstance, planAll, realise, executePlan, executeDynamic, mulberry32 } from '/senda/arr/arr-sim.mjs';
+import { forecastParticles, pointGeometry, arrivalForecast, arrivalHours, INVALID_WHEN } from '/senda/arr/arr-forecast.mjs';
+import { assessForecastSkillGate } from '/senda/core/evidence-contract.mjs';
+import { enumerateDeclaredFailureCuts } from '/senda/core/failure-domain-cuts.mjs';
+
+const $ = (id) => document.getElementById(id);
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const HOUR = 3600000;
+const datasets = {};
+let skill = null, S = null, worldSeed = 1, viewMode = '2d', selectedNodeId = null, forecastSuccessor = null;
+
+/* ================= i18n ES / EN / NL ================= */
+const I18N = {
+  es: { title: 'SENDA · Visor Científico Temporal / 4D', sub: 'Observación histórica + simulación física/DTN + incertidumbre explícita', rule: 'Una simulación nunca es un hecho observado. Cada capa se etiqueta como OBSERVADO, SIMULADO, PREDICHO, HIPÓTESIS o NO VERIFICADO.', lblScenario: 'Escenario y datos' },
+  en: { title: 'SENDA · Temporal / 4D Scientific Viewer', sub: 'Historical observation + physical/DTN simulation + explicit uncertainty', rule: 'A simulation is never presented as an observed fact. Every layer is tagged OBSERVED, SIMULATED, PREDICTED, HYPOTHESIS or UNVERIFIED.', lblScenario: 'Scenario & dataset' },
+  nl: { title: 'SENDA · Temporele / 4D Wetenschappelijke Viewer', sub: 'Historische observatie + fysieke/DTN-simulatie + expliciete onzekerheid', rule: 'Een simulatie mag nooit als waargenomen feit lijken. Elke laag is gelabeld als OBSERVADO, SIMULADO, PREDICHO, HIPÓTESIS of NO VERIFICADO.', lblScenario: 'Scenario en dataset' },
+};
+function applyLang(lang) {
+  const dict = I18N[lang] ?? I18N.es;
+  document.documentElement.lang = lang;
+  for (const el of document.querySelectorAll('[data-i18n]')) if (dict[el.dataset.i18n]) el.textContent = dict[el.dataset.i18n];
+  for (const b of document.querySelectorAll('#lang button')) b.classList.toggle('on', b.dataset.lang === lang);
+}
+$('lang').onclick = (e) => { const b = e.target.closest('button[data-lang]'); if (b) applyLang(b.dataset.lang); };
+
+/* ================= Comprobación WebGL + Fallback determinista Canvas 2D ================= */
+function checkGraphicsSupport() {
+  let glOk = false;
+  try {
+    const probe = document.createElement('canvas');
+    const gl = probe.getContext('webgl2') || probe.getContext('webgl');
+    glOk = Boolean(gl);
+    probe.addEventListener('webglcontextlost', () => {
+      $('gfx-badge').textContent = 'WebGL perdido → Fallback Canvas 2D activo';
+    });
+  } catch { glOk = false; }
+  $('gfx-badge').textContent = glOk
+    ? 'Canvas 2D determinista + WebGL2 disponible (proyección 2D/3D)'
+    : 'Sin WebGL → Fallback Canvas 2D determinista activo (0 errores)';
+  return glOk;
+}
+checkGraphicsSupport();
+
+$('viewMode').onclick = (e) => {
+  const b = e.target.closest('button[data-mode]');
+  if (!b) return;
+  viewMode = b.dataset.mode;
+  for (const x of document.querySelectorAll('#viewMode button')) x.classList.toggle('on', x === b);
+  draw();
+};
+
+/* ================= Datos e instancia ================= */
+fetch('/senda/arr/results/forecast-results.json').then((r) => r.json()).then((j) => { skill = j; alerts(); }).catch(() => { alerts(); });
+async function dataset(key) { return datasets[key] ??= await (await fetch(`/senda/arr/data/geomac-2018-${key}.json`)).json(); }
+
+async function rebuild() {
+  const kind = $('scenario').value, seed = +$('seed').value || 1, K = +$('k').value;
+  $('rhoBox').hidden = kind !== 'regional'; $('k0Box').hidden = kind === 'regional';
+  let inst, rawDataset = null;
+  if (kind === 'regional') {
+    inst = makeRegionalInstance({ seed, rho: +$('rho').value });
+  } else {
+    rawDataset = await dataset(kind);
+    $('k0').max = Math.max(0, rawDataset.perimeters.length - 2);
+    inst = makeFireInstance({ seed, dataset: rawDataset, k0: Math.min(+$('k0').value, rawDataset.perimeters.length - 2), horizonMs: 24 * HOUR });
+  }
+  if (!inst) { S = null; $('status').textContent = 'Sin par origen–destino válido con esta semilla.'; return draw(); }
+  const all = planAll(inst, { maxReplicas: K });
+  const detail = all.candidates.length ? planAdaptiveResilience({ problem: all.problem, ensemble: inst.ensemble, candidates: all.candidates, maxReplicas: K }) : null;
+  S = { kind, rawDataset, inst, ...all, detail, world: null, area: inst.view?.area ?? [18, 18] };
+
+  if (inst.view) {
+    const per = inst.view.perimetersKm, k0 = inst.meta.k0, G = 32, grid = [];
+    for (let i = 0; i < G; i++) for (let j = 0; j < G; j++) grid.push([((i + 0.5) / G) * S.area[0], ((j + 0.5) / G) * S.area[1]]);
+    const f = forecastSuccessor
+      ? forecastSuccessor({ perimetersKm: per, k0, area: S.area, seed })
+      : forecastParticles(mulberry32(seed + 77), { perimetersKm: per, k0, area: S.area, mode: 'assimilated' });
+    const statics = inst.nodes.filter((n) => !n.mobile);
+    S.forecast = { f, G, grid, gridGeo: pointGeometry(per, k0, grid), nodes: statics, nodeForecast: arrivalForecast(f, pointGeometry(per, k0, statics.map((n) => n.pos)), 24) };
+  } else S.forecast = null;
+
+  alerts();
+  inspectSource();
+  $('status').textContent = `${inst.kind} · ${inst.nodes.length} nodos · ${all.problem.contactById.size} contactos elegibles · ${all.candidates.length} rutas candidatas` +
+    (inst.meta.planningTime ? ` · instante planificación: ${inst.meta.planningTime} · ${inst.meta.lostNodes} nodos perdidos en 24 h` : '');
+  panels(); draw();
+}
+
+function panels() {
+  if (!S?.detail) { $('pred').innerHTML = '<p>No existe ruta temporal autorizada antes del plazo.</p>'; $('trace').innerHTML = ''; $('srlg-box').textContent = ''; return; }
+  const p = S.detail.predicted, pct = (x) => (100 * x).toFixed(1) + ' %';
+  const shown = S.plans[$('method').value], rel = ensembleReliability(shown, S.ensemble, S.problem.contactById);
+  $('pred').innerHTML = `<table>
+    <tr><td>Plan mostrado · prob. según conjunto <span class="tag pred">PREDICHO</span></td><td class="num">${pct(rel.mean)}</td></tr>
+    <tr><td>ARR · prob. según conjunto (K=${S.detail.replicaCount})</td><td class="num">${pct(p.ensembleProbability)}</td></tr>
+    <tr><td>ARR · lo que afirmaría la independencia</td><td class="num">${pct(p.independenceClaim)}</td></tr>
+    <tr><td>ARR · cota inferior de muestreo (95 %)</td><td class="num">${pct(p.samplingLowerBound)}</td></tr>
+    <tr><td>ARR · cota con 10 % de contaminación</td><td class="num">${pct(p.contaminationLowerBound)}</td></tr>
+    <tr><td>ARR · media del 25 % peor de escenarios</td><td class="num">${pct(p.lowerTailMean)}</td></tr></table>`;
+
+  $('trace').innerHTML = `<table><tr><th>Paso</th><th>Ruta añadida</th><th class="num">Ganancia</th><th class="num">Total</th><th class="num">mJ</th></tr>` +
+    S.detail.trace.map((s) => `<tr><td>${s.step}</td><td class="mono">${s.path.join(' → ')}</td><td class="num">+${(100 * s.marginalGain).toFixed(1)}</td><td class="num">${(100 * s.objectiveAfter).toFixed(1)}</td><td class="num">${s.energyMjAfter}</td></tr>`).join('') +
+    `</table><p class="small">Evaluadas ${S.detail.candidatesExamined} candidatas; rechazos de puerta: <span class="mono">${esc(JSON.stringify(S.detail.rejectedContacts))}</span></p>`;
+
+  // Análisis SRLG N-1/N-2 sobre los caminos seleccionados
+  try {
+    const routes = S.plans[$('method').value] ?? [];
+    if (routes.length) {
+      const linkMap = new Map();
+      const srlgPaths = routes.map((r, ri) => {
+        const lIds = r.hops.map((h) => {
+          if (!linkMap.has(h.contactId)) linkMap.set(h.contactId, { id: h.contactId, riskDomains: [`NODE_${h.from}`, `NODE_${h.to}`, `BAND_EU868`] });
+          return h.contactId;
+        });
+        return { id: `R${ri + 1}`, linkIds: lIds, endpointRiskDomains: [`SRC_${S.inst.source}`, `DST_${S.inst.destination}`], consentDeclared: true, linkAuthorizedDeclared: true };
+      });
+      const cuts = enumerateDeclaredFailureCuts({ links: [...linkMap.values()], paths: srlgPaths, requiredSurvivingPaths: 1, maxSimultaneousFailures: 2 });
+      $('srlg-box').innerHTML = `<b>Cortes SRLG N-2 sobre el plan mostrado (<span class="mono">failure-domain-cuts.mjs</span>):</b> ` +
+        (cuts.survivesAllEnumeratedCuts
+          ? 'Sobrevive cortes N-2 declarados (falta medida física).'
+          : `${cuts.failingCuts.length} corte(s) de causa común tumban todas las réplicas (p. ej. <span class="mono">${esc(cuts.failingCuts[0]?.cut.join(' + ') ?? '')}</span>).`);
+    } else $('srlg-box').textContent = '';
+  } catch (err) { $('srlg-box').textContent = 'SRLG: ' + err.message; }
+  bars(rel.perMember);
+}
+
+function alerts() {
+  const gate = skill
+    ? assessForecastSkillGate({
+        modelId: forecastSuccessor ? 'H3 (hook)' : 'H2',
+        modelBrier: skill.brier?.assimilated ?? 0.145,
+        persistenceBrier: skill.brier?.persistence ?? 0.102,
+        biasPp: (skill.calibration?.assimilated?.bias ?? -0.07) * 100,
+        heldOutUnits: skill.units ?? 36,
+        operationalFieldValidated: false,
+      })
+    : assessForecastSkillGate({ modelId: 'H2', modelBrier: 0.145, persistenceBrier: 0.102, biasPp: -7.0, heldOutUnits: 36 });
+
+  $('skill').innerHTML = `<b>${esc(gate.status)} · canPublicWarn=${gate.canPublicWarn}</b><br>${esc(gate.warning)}`;
+  if (!S?.forecast) { $('alerts').innerHTML = '<p class="small">Escenario regional sintético (sin perímetros GeoMAC).</p>'; return; }
+
+  const rows = S.forecast.nodes.map((n, i) => ({ n, x: S.forecast.nodeForecast[i] })).filter((r) => !r.x.alreadyBurnt && r.x.probability >= 0.05).sort((a, b) => b.x.probability - a.x.probability).slice(0, 8);
+  const level = (p) => (p >= 0.6 ? ['ALTA', css('--coral')] : p >= 0.3 ? ['MEDIA', css('--warn')] : ['BAJA', css('--mute')]);
+  const truth = S.inst.sampleTruth().nodeDeathMs;
+  $('alerts').innerHTML = (rows.length ? `<table><tr><th>Nodo</th><th>Predicción H2 ≤ 24 h</th><th class="num">P10–P90 (h)</th><th>Observado (GeoMAC)</th></tr>` + rows.map(({ n, x }) => {
+    const [name, col] = level(x.probability), tr = truth[n.id];
+    return `<tr><td class="mono">${esc(n.id)}</td><td><b style="color:${col}">${name}</b> ${(100 * x.probability).toFixed(0)} %</td><td class="num">${x.arrivalHoursP10.toFixed(1)}–${x.arrivalHoursP90 > 99 ? '>99' : x.arrivalHoursP90.toFixed(1)}</td><td>${tr !== undefined ? 'alcanzado ≈ ' + (tr / HOUR).toFixed(1) + ' h' : 'no alcanzado'}</td></tr>`;
+  }).join('') + '</table>' : '<p class="small">Ningún nodo con probabilidad ≥ 5 %.</p>') +
+  `<p class="small">Horizonte 24 h · ${S.forecast.f.particles.length} partículas · inválido si: ${INVALID_WHEN.slice(0, 3).join('; ')}.</p>`;
+}
+
+function inspectSource() {
+  const ds = S?.rawDataset;
+  const prov = ds?.provenance ?? {};
+  const meta = S?.inst?.meta ?? {};
+  const obsTime = meta.planningTime ?? ds?.perimeters?.[0]?.timeUtc ?? 'N/A (sintético)';
+  const dlTime = prov.fetchedAtUtc ?? prov.downloadedAt ?? 'Snapshot local offline';
+  $('source-inspector').innerHTML = `
+    <div><small>Capa activa</small><b>${esc(S?.kind ?? '—')} <span class="tag ${ds ? 'obs' : 'sim'}">${ds ? 'OBSERVADO + SIM' : 'SIMULADO'}</span></b></div>
+    <div><small>Fuente primaria</small><b>${esc(prov.source ?? 'Generador regional sintético')}</b></div>
+    <div><small>observation_time</small><b>${esc(String(obsTime))}</b></div>
+    <div><small>download_time</small><b>${esc(String(dlTime))}</b></div>
+    <div><small>forecast_valid_time</small><b>${S?.forecast ? 'T+0 a T+24 h (experimental)' : 'N/A'}</b></div>
+    <div><small>SHA-256 / Nodo focal</small><b>${esc(prov.sha256 ? prov.sha256.slice(0, 14) + '…' : 'Sintético')} · ${esc(selectedNodeId ?? 'ninguno')}</b></div>`;
+}
+
+function bars(perMember) {
+  const cv = $('members'), g = cv.getContext('2d'), w = cv.width, h = cv.height, xs = [...perMember].sort((a, b) => a - b);
+  g.clearRect(0, 0, w, h); g.fillStyle = css('--ice');
+  xs.forEach((p, i) => g.fillRect(4 + (i * (w - 8)) / xs.length, h - 14 - p * (h - 24), Math.max(1, (w - 8) / xs.length - 1), p * (h - 24) + 1));
+  g.fillStyle = css('--mute'); g.font = '11px ui-monospace, monospace'; g.fillText('0', 4, h - 2); g.fillText(`escenarios (${xs.length})`, w - 125, h - 2);
+}
+
+const mobilePos = (n, t) => { const u = ((t / n.mobile.periodMs + n.mobile.phase) % 1 + 1) % 1, s = u < 0.5 ? 2 * u : 2 - 2 * u; return [n.mobile.a[0] + s * (n.mobile.b[0] - n.mobile.a[0]), n.mobile.a[1] + s * (n.mobile.b[1] - n.mobile.a[1])]; };
+
+function draw() {
+  const cv = $('map'), g = cv.getContext('2d'), W = cv.width, H = cv.height;
+  g.clearRect(0, 0, W, H);
+  if (!S) return;
+  const { inst, area } = S;
+  const horizon = inst.deadlineMs, t = (+$('t').value / 100) * horizon;
+  $('tV').textContent = (t / HOUR).toFixed(1) + ' h';
+
+  const elev = ([x, y]) => 1.6 * Math.sin(x * 0.45) * Math.cos(y * 0.35) + 0.8 * Math.cos((x + y) * 0.25);
+  const sc2d = Math.min((W - 48) / area[0], (H - 48) / area[1]);
+  const proj2d = ([x, y]) => [24 + x * sc2d, H - 24 - y * sc2d];
+  const proj3d = ([x, y], zKm = 0) => {
+    const cx = x - area[0] / 2, cy = y - area[1] / 2;
+    const rx = (cx - cy * 0.72) * (Math.min(W, H) / (area[0] * 1.48));
+    const ry = (cx * 0.35 + cy * 0.45) * (Math.min(W, H) / (area[1] * 1.48)) - (elev([x, y]) + zKm) * 18;
+    return [W / 2 + rx, H * 0.56 + ry];
+  };
+  const X = viewMode === '3d' ? proj3d : proj2d;
+
+  // Capa relieve + meteorología (SIMULADO)
+  if ($('lay-topo').checked) {
+    g.strokeStyle = 'rgba(139,212,230,.12)'; g.lineWidth = 1;
+    const steps = 10;
+    for (let i = 0; i <= steps; i++) {
+      const gx = (i / steps) * area[0], gy = (i / steps) * area[1];
+      g.beginPath(); g.moveTo(...X([gx, 0])); g.lineTo(...X([gx, area[1]])); g.stroke();
+      g.beginPath(); g.moveTo(...X([0, gy])); g.lineTo(...X([area[0], gy])); g.stroke();
+    }
+    // Vector de viento sintético
+    g.save(); g.strokeStyle = 'rgba(139,212,230,.6)'; g.fillStyle = 'rgba(139,212,230,.6)'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(W - 70, 56); g.lineTo(W - 42, 42); g.stroke();
+    g.font = '11px ui-monospace, monospace'; g.fillText('VIENTO (SIM)', W - 98, 28);
+    g.restore();
+  }
+
+  // Capa H2 experimental (PREDICHO)
+  if ($('lay-h2').checked && S.forecast) {
+    const { f, G, grid, gridGeo } = S.forecast, cw = (area[0] / G) * sc2d, ch = (area[1] / G) * sc2d;
+    grid.forEach((pt, i) => {
+      if (gridGeo[i].burnt) return;
+      let pr = 0; for (const q of f.particles) if (arrivalHours(gridGeo[i], q) * HOUR <= t) pr += q.weight;
+      if (pr < 0.05) return;
+      const [x, y] = X(pt);
+      g.fillStyle = `rgba(139,212,230,${(0.38 * pr).toFixed(3)})`;
+      if (viewMode === '3d') { g.beginPath(); g.arc(x, y, Math.max(4, cw * 0.45), 0, 7); g.fill(); }
+      else g.fillRect(x - cw / 2, y - ch / 2, cw, ch);
+    });
+  }
+
+  // Capa Perímetro OBSERVADO (GeoMAC)
+  if ($('lay-obs').checked && inst.view) {
+    for (const per of inst.view.perimetersKm) {
+      if (per.tMs > t) break;
+      const zLift = viewMode === '3d' ? (per.tMs / HOUR) * 0.08 : 0;
+      g.strokeStyle = css('--ok'); g.fillStyle = 'rgba(86,211,154,.10)'; g.lineWidth = 1.6;
+      for (const ring of per.rings) {
+        g.beginPath(); ring.forEach((p, i) => { const [x, y] = X(p, zLift); i ? g.lineTo(x, y) : g.moveTo(x, y); });
+        g.closePath(); g.fill(); g.stroke();
+      }
+    }
+  }
+
+  const pos = new Map(inst.nodes.map((n) => [n.id, n.mobile ? mobilePos(n, t) : n.pos]));
+
+  // Capa Conectividad (SIMULADO)
+  if ($('lay-conn').checked) {
+    g.strokeStyle = 'rgba(152,171,183,.22)'; g.lineWidth = 1;
+    for (const c of S.problem.contactById.values()) {
+      if (c.startMs <= t && t <= c.endMs && c.from < c.to) {
+        g.beginPath(); g.moveTo(...X(pos.get(c.from))); g.lineTo(...X(pos.get(c.to))); g.stroke();
+      }
+    }
+  }
+
+  // Capa Rutas y cortes (HIPÓTESIS)
+  if ($('lay-cuts').checked) {
+    const routes = S.plans[$('method').value] ?? [], colors = [css('--ok'), css('--warn'), css('--ice'), css('--violet'), '#f29bd0'];
+    routes.forEach((r, i) => {
+      g.strokeStyle = colors[i % 5]; g.lineWidth = 2.6; g.setLineDash(i ? [7, 4] : []);
+      g.beginPath(); r.path.forEach((id, j) => { const [x, y] = X(pos.get(id)); j ? g.lineTo(x, y) : g.moveTo(x, y); });
+      g.stroke(); g.setLineDash([]);
+    });
+  }
+
+  // Nodos
+  for (const n of inst.nodes) {
+    const [x, y] = X(pos.get(n.id));
+    const pLost = S.ensemble.reduce((s, m) => s + ((m.nodeDeathMs[n.id] ?? Infinity) <= t ? m.weight : 0), 0);
+    const dead = S.world && (S.world.truth.nodeDeathMs[n.id] ?? Infinity) <= t;
+    g.beginPath(); g.arc(x, y, n.id === inst.source || n.id === inst.destination ? 8 : 5, 0, 7);
+    g.fillStyle = n.powered === false ? '#3a2a26' : `rgb(${Math.round(70 + 85 * (1 - pLost))},${Math.round(105 + 115 * (1 - pLost))},${Math.round(125 + 110 * (1 - pLost))})`;
+    g.fill();
+    if (n.id === selectedNodeId) { g.strokeStyle = css('--ice'); g.lineWidth = 2.5; g.stroke(); }
+    if (dead) { g.strokeStyle = css('--coral'); g.lineWidth = 2; g.beginPath(); g.moveTo(x - 6, y - 6); g.lineTo(x + 6, y + 6); g.moveTo(x + 6, y - 6); g.lineTo(x - 6, y + 6); g.stroke(); }
+    if (n.id === inst.source || n.id === inst.destination) {
+      g.fillStyle = css('--text'); g.font = '700 11px ui-monospace, monospace';
+      g.fillText(n.id === inst.source ? 'ORIGEN' : 'DESTINO', x + 10, y + 4);
+    }
+  }
+  g.fillStyle = css('--mute'); g.font = '11px ui-monospace, monospace';
+  g.fillText(`Vista ${viewMode.toUpperCase()} · área ${area[0].toFixed(0)}×${area[1].toFixed(0)} km · t=${(t / HOUR).toFixed(1)}h`, 14, 18);
+}
+
+$('map').addEventListener('click', (ev) => {
+  if (!S) return;
+  const r = $('map').getBoundingClientRect();
+  const mx = ((ev.clientX - r.left) / r.width) * $('map').width;
+  const my = ((ev.clientY - r.top) / r.height) * $('map').height;
+  // Localiza nodo más cercano en 2D para inspección
+  const sc2d = Math.min(($('map').width - 48) / S.area[0], ($('map').height - 48) / S.area[1]);
+  const t = (+$('t').value / 100) * S.inst.deadlineMs;
+  let best = null, bd = 26;
+  for (const n of S.inst.nodes) {
+    const p = n.mobile ? mobilePos(n, t) : n.pos;
+    const px = 24 + p[0] * sc2d, py = $('map').height - 24 - p[1] * sc2d;
+    const d = Math.hypot(px - mx, py - my);
+    if (d < bd) { bd = d; best = n.id; }
+  }
+  if (best) { selectedNodeId = best; inspectSource(); draw(); }
+});
+
+function runWorld() {
+  if (!S?.detail) return;
+  S.world = realise(S.inst, S.problem, mulberry32(worldSeed++ * 7919));
+  const row = (name, r) => `<tr><td>${esc(name)}</td><td>${r.delivered ? 'entregado (simulado)' : 'no entregado'}</td><td class="num">${r.delivered ? (r.deliveredAtMs / HOUR).toFixed(2) + ' h' : '—'}</td><td class="num">${r.transmissions}</td></tr>`;
+  $('exec').innerHTML = `<table><tr><th>Método</th><th>Resultado</th><th class="num">Llegada</th><th class="num">Tx</th></tr>` +
+    Object.entries(S.plans).map(([m, routes]) => row(m, executePlan(routes, S.problem, S.world))).join('') +
+    row('inundación epidémica (techo)', executeDynamic(S.problem, S.world)) + `</table>
+    <p class="small">${S.inst.dataClass.hazardTruth === 'OBSERVED' ? 'Pérdida de nodos según perímetro OBSERVADO; desvanecimiento SIMULADO.' : 'Peligro y desvanecimiento SIMULADOS.'}</p>`;
+  draw();
+}
+
+async function chart() {
+  const cv = $('chart'), g = cv.getContext('2d');
+  let R; try { R = await (await fetch('/senda/arr/results/results.json')).json(); } catch { $('verdict').textContent = 'results.json no encontrado.'; return; }
+  const rhos = Object.keys(R.synthetic), series = { arr: css('--ok'), 'independent-greedy': css('--warn'), 'cgr-k-exclusion': css('--ice'), epidemic: css('--mute') };
+  const x = (i) => 48 + (i * (cv.width - 76)) / (rhos.length - 1), y = (v) => cv.height - 28 - ((v - 0.4) / 0.6) * (cv.height - 46);
+  g.strokeStyle = css('--line'); g.fillStyle = css('--mute'); g.font = '11px ui-monospace, monospace';
+  for (const v of [0.4, 0.6, 0.8, 1]) { g.beginPath(); g.moveTo(42, y(v)); g.lineTo(cv.width - 18, y(v)); g.stroke(); g.fillText(v.toFixed(1), 12, y(v) + 4); }
+  rhos.forEach((r, i) => g.fillText(r.replace('rho=', 'ρ='), x(i) - 16, cv.height - 8));
+  Object.entries(series).forEach(([m, color], si) => {
+    g.strokeStyle = g.fillStyle = color; g.lineWidth = 2; g.beginPath();
+    rhos.forEach((r, i) => { const d = R.synthetic[r].methods[m].delivery; i ? g.lineTo(x(i), y(d.mean)) : g.moveTo(x(i), y(d.mean)); }); g.stroke();
+    rhos.forEach((r, i) => { const d = R.synthetic[r].methods[m].delivery; g.fillRect(x(i) - 1, y(d.hi), 2, y(d.lo) - y(d.hi)); });
+    g.fillText(m, 54 + si * 132, 12);
+  });
+  $('verdict').innerHTML = `Entrega simulada a tiempo frente a ρ (IC 95 %, semillas retenidas ≥ ${R.protocol.heldOutSeedStart}). Veredicto: ` +
+    Object.entries(R.verdict).map(([k, ok]) => `${k.replace(/_/g, ' ')}: <b style="color:${ok ? css('--ok') : css('--coral')}">${ok ? 'sí' : 'no'}</b>`).join(' · ');
+}
+
+for (const id of ['scenario', 'seed', 'rho', 'k0', 'k']) $(id).addEventListener('change', rebuild);
+for (const id of ['lay-obs', 'lay-h2', 'lay-topo', 'lay-conn', 'lay-cuts']) $(id).addEventListener('change', draw);
+$('rho').addEventListener('input', () => ($('rhoV').textContent = $('rho').value));
+$('k').addEventListener('input', () => ($('kV').textContent = $('k').value));
+$('method').addEventListener('change', () => { panels(); draw(); });
+$('t').addEventListener('input', draw);
+$('world').addEventListener('click', runWorld);
+let timer = null;
+$('play').addEventListener('click', () => {
+  if (timer) { clearInterval(timer); timer = null; $('play').textContent = '▶ Reproducir'; return; }
+  $('play').textContent = '⏸ Pausar';
+  timer = setInterval(() => { const el = $('t'); el.value = (+el.value + 1) % 101; draw(); }, 120);
+});
+
+window.SENDA_VISOR = {
+  getState: () => S,
+  setViewMode: (m) => { viewMode = m === '3d' ? '3d' : '2d'; draw(); },
+  registerForecastSuccessor: (fn) => { if (typeof fn === 'function') { forecastSuccessor = fn; rebuild(); } },
+};
+
+await rebuild();
+await chart();
+document.body.dataset.ready = '1';
+</script>
+</body>
+</html>

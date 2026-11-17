@@ -129,7 +129,8 @@ test('SENDA: two separate offline handset processes; honest synthetic receipt ga
     const savePath=process.env.SENDA_EVIDENCE_FILE;
     if(savePath)writeFileSync(savePath,JSON.stringify({source:'real SENDA code; synthetic IPC transport',runAt:new Date().toISOString(),repoSHA:'b0337fbb541bd4ed98d0b78b1e65ee95d6f6a4e8',processModel:'two OS processes; distinct working dirs; no Android/RF; network namespace isolation not claimed',evidence},null,2));
   } finally {
-    a?.child.kill();b?.child.kill();
-    rmSync(base,{recursive:true,force:true});
+    const waitExit = (h) => h?.child && h.child.exitCode === null ? new Promise((res) => { h.child.once('exit', res); h.child.kill(); setTimeout(res, 200); }) : Promise.resolve();
+    await Promise.all([waitExit(a), waitExit(b)]);
+    rmSync(base,{recursive:true,force:true,maxRetries:5,retryDelay:50});
   }
 });

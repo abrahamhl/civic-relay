@@ -8,11 +8,12 @@
 <link rel="icon" href="/senda/icon.svg">
 <style>
 :root{--bg:#05090c;--p:#0b141c;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e;--v:#b79cff}
-[hidden]{display:none!important}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 Inter,system-ui,sans-serif}
-main{max-width:1280px;margin:0 auto;padding:16px 16px 60px}h1{font-size:28px;margin:4px 0}h2{font-size:16px;margin:0 0 8px}.m{color:var(--m)}a{color:var(--i)}
-.lay{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;margin-top:12px}@media(max-width:960px){.lay{grid-template-columns:1fr}}
+[hidden]{display:none!important}*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
+:focus-visible{outline:2px solid var(--i);outline-offset:2px}
+main{max-width:1280px;margin:0 auto;padding:16px 16px 60px}h1{font-size:clamp(22px,5vw,28px);margin:4px 0}h2{font-size:16px;margin:0 0 8px}.m{color:var(--m)}a{color:var(--i)}
+.lay{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;margin-top:12px}@media(max-width:960px){.lay{grid-template-columns:minmax(0,1fr)}}
 .card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:14px;min-width:0}
-button,select{font:inherit;min-height:42px;padding:8px 12px;border-radius:10px;border:1px solid var(--l);background:#0f1d27;color:var(--t);cursor:pointer;font-weight:700}
+button,select{font:inherit;min-height:42px;padding:8px 12px;border-radius:10px;border:1px solid var(--l);background:#0f1d27;color:var(--t);cursor:pointer;font-weight:700;max-width:100%}
 button.on{outline:2px solid var(--i);background:#14303d}button.p{background:var(--c);border-color:var(--c);color:#140804}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
 #map{width:100%;aspect-ratio:16/10;display:block;border-radius:10px;background:#071018;touch-action:none;cursor:grab}
@@ -28,7 +29,7 @@ body.embed main{padding:8px}body.embed .card{border:0;padding:6px}body.embed h1,
 </style>
 </head>
 <body><main>
-<p><a href="/senda">← SENDA</a> · <a href="/senda/demo">¿Qué es SENDA? (demo guiada)</a></p>
+<p><a href="/senda">← SENDA</a> · <a href="/senda/centro">Centro</a> · <a href="/senda/visor">Visor Científico 4D</a> · <a href="/senda/demo">¿Qué es SENDA? (demo guiada)</a></p>
 <h1>Atlas · qué pasó, dónde y cuándo</h1>
 <p class="m">Elige un caso, dale a ▶ y mira cómo avanza. Dibuja una zona (un pueblo, una carretera) y el Atlas te dice <b>cuándo entró el fuego</b>, cuántas detecciones hubo dentro y qué cámaras la vigilan hoy. Cada punto lleva su <b>fuente</b>; lo que es simulación se marca como tal.</p>
 

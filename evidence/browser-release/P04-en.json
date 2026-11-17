@@ -2,7 +2,7 @@
   "id": "P04",
   "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
   "sha": "LOCAL",
-  "timestamp_utc": "2026-10-24T23:54:18.981Z",
+  "timestamp_utc": "2026-11-17T08:14:27.114Z",
   "locale": "en",
   "viewport": {
     "width": 1440,
@@ -37,12 +37,20 @@
     "lang": "en",
     "title": "OEP — Offline Emergency Protocol | Distributed Emergency Coordination & Adaptive Multi-Network Routing",
     "headings": [
+      "When the network falls, the message finds its way.",
       "WHEN THENETWORKGOES DARK."
     ],
     "canonical": "https://civic-relay-investor.vercel.app/",
-    "disclaimers": 63,
+    "disclaimers": 70,
     "eightStage": true,
     "obsoleteLinks": [],
+    "editorial": {
+      "cards": 3,
+      "diagrams": 3,
+      "width": 1440,
+      "problems": [],
+      "caption": true
+    },
     "pageErrors": [],
     "consoleErrors": []
   },

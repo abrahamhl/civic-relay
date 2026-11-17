@@ -2,7 +2,7 @@
   "id": "P09",
   "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
   "sha": "LOCAL",
-  "timestamp_utc": "2026-10-24T23:54:31.691Z",
+  "timestamp_utc": "2026-11-17T08:14:42.298Z",
   "locale": "es",
   "viewport": {
     "width": 1440,
@@ -43,14 +43,25 @@
     "lang": "es",
     "title": "¿QUÉ ES OEP? | Coordinación de emergencias offline y enrutamiento adaptativo",
     "headings": [
+      "Cuando cae la red, el mensaje sigue su camino.",
       "CUANDO LAREDSE APAGA."
     ],
     "canonical": "https://civic-relay-investor.vercel.app/es/",
-    "disclaimers": 29,
+    "disclaimers": 36,
     "eightStage": true,
     "obsoleteLinks": [],
+    "editorial": {
+      "cards": 3,
+      "diagrams": 3,
+      "width": 1440,
+      "problems": [],
+      "caption": true
+    },
     "pageErrors": [],
-    "consoleErrors": []
+    "consoleErrors": [
+      "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"application/octet-stream\". Strict MIME type checking is enforced for module scripts per HTML spec.",
+      "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"application/octet-stream\". Strict MIME type checking is enforced for module scripts per HTML spec."
+    ]
   },
   "verdict": "PASS"
 }

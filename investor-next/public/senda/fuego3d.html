@@ -99,7 +99,33 @@ const heightAt = (x, y) => { const fi = (x - X0) / DX - 0.5, fj = (Y1 - y) / DX 
 const ign = toUtm(CASE_SMV_2026.ignition.lat, CASE_SMV_2026.ignition.lon, 30), center = fromUtm(CX, CY, 30);
 
 // ---------------------------------------------------------------- Escena
-const canvas = $('#c3'), renderer = new THREE.WebGLRenderer({ canvas, antialias: !LITE, preserveDrawingBuffer: !!FILM });
+const canvas = $('#c3');
+const hasWebGL = (() => {
+  try {
+    const p = document.createElement('canvas');
+    return Boolean(window.THREE && (p.getContext('webgl2') || p.getContext('webgl')));
+  } catch { return false; }
+})();
+if (!hasWebGL) {
+  canvas.width = 920; canvas.height = 560;
+  const g2 = canvas.getContext('2d');
+  const img = g2.createImageData(W, H);
+  for (let i = 0; i < W * H; i++) {
+    const shade = Math.round(40 + ((dem[i] - zMin) / Math.max(1, meta.dem.max - zMin)) * 165);
+    const b = burn[i];
+    if (b) { img.data.set([b & 1 ? 255 : 210, b & 1 ? 120 : 60, 40, 255], i * 4); }
+    else { img.data.set([shade * 0.45, shade * 0.62, shade * 0.55, 255], i * 4); }
+  }
+  const off = document.createElement('canvas'); off.width = W; off.height = H; off.getContext('2d').putImageData(img, 0, 0);
+  g2.imageSmoothingEnabled = false; g2.drawImage(off, 0, 0, canvas.width, canvas.height);
+  g2.fillStyle = 'rgba(5,9,12,.82)'; g2.fillRect(12, 12, 470, 46);
+  g2.fillStyle = '#edf2f5'; g2.font = '600 13px Inter,system-ui,sans-serif';
+  g2.fillText('WebGL no disponible → Fallback Canvas 2D determinista (DEM + cicatrices reales)', 22, 40);
+  $('#status').textContent = 'WebGL no disponible en este dispositivo: renderizado plano 2D del DEM real (100 m) y cicatrices Sentinel-2 sin bloqueo.';
+  S.ok = true; S.fallback2d = true; window.SENDA_VIZ_READY = true;
+} else {
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: !LITE, preserveDrawingBuffer: !!FILM });
+canvas.addEventListener('webglcontextlost', (ev) => { ev.preventDefault(); $('#status').textContent = 'Contexto WebGL perdido: recarga o usa /senda/visor en modo 2D.'; });
 renderer.setPixelRatio(Math.min(LITE ? 1 : 2, devicePixelRatio || 1));
 const scene = new THREE.Scene(); scene.background = new THREE.Color(0xaec2cf); scene.fog = new THREE.Fog(0xaec2cf, 45000, 120000);
 const camera = new THREE.PerspectiveCamera(50, 1, 20, 300000);
@@ -302,6 +328,7 @@ if (FILM) { window.SENDA_VIZ.seek(0); } else requestAnimationFrame(frame);
 S.ok = true; S.grid = `${NX}×${NY}×${NZ}`; S.dem = { w: W, h: H, min: meta.dem.min, max: meta.dem.max }; S.layers = Object.keys(layer).length; S.cams = cams.length; S.cars = cars.length;
 $('#status').textContent = `Listo · terreno ${W}×${H} (100 m) · viento 3D ${S.grid} resuelto en ${cur.ms} ms en este dispositivo · divergencia ${cur.f.divBefore.toExponential(1)} → ${cur.f.divAfter.toExponential(1)} · sin conexión: datos del 23-07-2026 guardados.`;
 window.SENDA_VIZ_READY = true;
+}
 } catch (e) { S.errors.push(String(e?.stack || e)); $('#status').textContent = `Error: ${e.message}`; window.SENDA_VIZ_READY = true; throw e; }
 </script>
 </body></html>

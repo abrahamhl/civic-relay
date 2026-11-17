@@ -26,8 +26,10 @@ function writeAtomic(dir, filename, document) {
     fsyncSync(fd);
     closeSync(fd);fd=undefined;
     renameSync(tmp,join(dir,filename));
-    const dfd = openSync(dir,'r');
-    try { fsyncSync(dfd); } finally { closeSync(dfd); }
+    if (process.platform !== 'win32') {
+      const dfd = openSync(dir,'r');
+      try { fsyncSync(dfd); } finally { closeSync(dfd); }
+    }
   } catch (err) {
     if(fd !== undefined)closeSync(fd);
     try { unlinkSync(tmp); }catch{}
