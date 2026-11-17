@@ -10,6 +10,8 @@ Zero dependencies; Node ≥ 22. Builds on `experimental/senda-route-truth` (PR #
 | `data/geomac-2018-*.json` | OBSERVED fire perimeters (USGS GeoMAC via NIFC Open Data) with provenance and SHA-256 |
 | `experiments/fetch-geomac-perimeters.mjs` | Reproducible ingest of the snapshots above |
 | `experiments/run-experiment.mjs` | Pre-registered experiment H-ARR-1 (`--quick` for a smoke run) |
+| `src/arr-forecast.mjs` | Fire-front arrival forecast with particle assimilation (H2 — rejected: worse than persistence) |
+| `experiments/run-forecast-experiment.mjs` | Pre-registered H2 experiment → `results/FORECAST_RESULTS.md` |
 | `experiments/make-report.mjs` | `results.json` → `results/RESULTS.md` + SVG charts |
 | `tests/` | Unit, invariant, adversarial and differential tests |
 | `viewer/index.html` | Interactive prototype running the same engine in the browser |

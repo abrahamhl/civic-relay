@@ -48,18 +48,21 @@
       <label>Plan mostrado<select id="method"><option value="arr">ARR (conjunto de escenarios)</option><option value="independent-greedy">Ablación: independencia</option><option value="cgr-k-exclusion">CGR k rutas (exclusión)</option><option value="cgr-earliest">CGR llegada más temprana</option></select></label>
       <label>Tiempo t = <span id="tV">0</span> h<input id="t" type="range" min="0" max="100" value="0"></label>
       <button id="world">Sortear un mundo y ejecutar</button>
+      <button id="play">▶ Reproducir tiempo</button>
+      <label id="fieldBox" hidden>Capa de predicción<select id="field"><option value="on">Campo de llegada del frente (PREDICHO)</option><option value="off">Oculto</option></select></label>
     </div>
     <canvas id="map" width="900" height="640" aria-label="Mapa del escenario"></canvas>
     <div class="legend">
       <span><span class="tag obs">OBSERVADO</span> perímetro de incendio (USGS GeoMAC)</span>
       <span><span class="tag sim">SIMULADO</span> nodos, movilidad, ventanas de contacto, desvanecimiento</span>
-      <span><span class="tag pred">PREDICHO</span> prob. de pérdida de cada nodo antes de t según el conjunto</span>
+      <span><span class="tag pred">PREDICHO</span> prob. de pérdida de cada nodo antes de t; sombreado azul = prob. de que el frente haya llegado a esa celda en t</span>
     </div>
     <p class="small" id="status"></p>
   </section>
   <div style="display:grid; gap:12px; align-content:start; min-width:0">
     <section><h2>Predicción del plan e incertidumbre</h2><div id="pred"></div><canvas id="members" width="600" height="150" aria-label="Probabilidad por escenario"></canvas>
       <p class="small">Barras: probabilidad de entrega a tiempo en cada miembro del conjunto (ordenadas). La dispersión es la incertidumbre que la hipótesis de independencia oculta.</p></section>
+    <section id="alertBox" hidden><h2>Avisos predichos por nodo (24 h)</h2><div id="skill" class="small"></div><div id="alerts"></div></section>
     <section><h2>Traza del algoritmo</h2><div id="trace"></div></section>
     <section><h2>Mundo sorteado (una realización)</h2><div id="exec" class="small">Pulsa «Sortear un mundo».</div></section>
     <section><h2>Resultados retenidos (results.json)</h2><canvas id="chart" width="600" height="230" aria-label="Entrega frente a correlación"></canvas><div id="verdict" class="small"></div></section>
@@ -70,7 +73,10 @@ import { planAdaptiveResilience, ensembleReliability } from '../src/arr-core.mjs
 import { makeRegionalInstance, makeFireInstance, planAll, realise, executePlan, executeDynamic, mulberry32 } from '../src/arr-sim.mjs';
 
 const $ = (id) => document.getElementById(id), css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+import { forecastParticles, pointGeometry, arrivalForecast, arrivalHours, INVALID_WHEN } from '../src/arr-forecast.mjs';
 const HOUR = 3600000, datasets = {};
+let skill = null;
+fetch('../results/forecast-results.json').then((r) => r.json()).then((j) => { skill = j; alerts(); }).catch(() => {});
 let S = null, worldSeed = 1;
 
 async function dataset(key) { return datasets[key] ??= await (await fetch(`../data/geomac-2018-${key}.json`)).json(); }
@@ -85,6 +91,15 @@ async function rebuild() {
   const all = planAll(inst, { maxReplicas: K });
   const detail = all.candidates.length ? planAdaptiveResilience({ problem: all.problem, ensemble: inst.ensemble, candidates: all.candidates, maxReplicas: K }) : null;
   S = { inst, ...all, detail, world: null, area: inst.view?.area ?? [18, 18] };
+  $('fieldBox').hidden = $('alertBox').hidden = !inst.view;
+  if (inst.view) { // PREDICTED front arrival: particles assimilate only perimeters up to the planning time
+    const per = inst.view.perimetersKm, k0 = inst.meta.k0, G = 36, grid = [];
+    for (let i = 0; i < G; i++) for (let j = 0; j < G; j++) grid.push([((i + 0.5) / G) * S.area[0], ((j + 0.5) / G) * S.area[1]]);
+    const f = forecastParticles(mulberry32(seed + 77), { perimetersKm: per, k0, area: S.area, mode: 'assimilated' });
+    const statics = inst.nodes.filter((n) => !n.mobile);
+    S.forecast = { f, G, grid, gridGeo: pointGeometry(per, k0, grid), nodes: statics, nodeForecast: arrivalForecast(f, pointGeometry(per, k0, statics.map((n) => n.pos)), 24) };
+  } else S.forecast = null;
+  alerts();
   $('status').textContent = `${inst.kind} · ${inst.nodes.length} nodos · ${all.problem.contactById.size} contactos elegibles · ${all.candidates.length} rutas candidatas` +
     (inst.meta.planningTime ? ` · planificado en ${inst.meta.planningTime} · ${inst.meta.lostNodes} nodos perdidos en el registro (24 h)` : '');
   panels(); draw();
@@ -108,6 +123,17 @@ function panels() {
   bars(rel.perMember);
 }
 
+function alerts() {
+  if (!S?.forecast) return;
+  $('skill').innerHTML = skill ? `<b style="color:${css('--coral')}">Pericia NO demostrada.</b> En ${skill.units} casos retenidos de 3 incendios observados este pronóstico (Brier ${skill.brier.assimilated.toFixed(3)}) fue <b>peor</b> que suponer que el frente no avanza (${skill.brier.persistence.toFixed(3)}); sobrepredice el avance (sesgo ${(100 * skill.calibration.assimilated.bias).toFixed(1)} pp). No usar como aviso a la población.` : 'forecast-results.json no encontrado.';
+  const rows = S.forecast.nodes.map((n, i) => ({ n, x: S.forecast.nodeForecast[i] })).filter((r) => !r.x.alreadyBurnt && r.x.probability >= 0.05).sort((a, b) => b.x.probability - a.x.probability).slice(0, 8);
+  const level = (p) => (p >= 0.6 ? ['ALTA', css('--coral')] : p >= 0.3 ? ['MEDIA', css('--warn')] : ['BAJA', css('--mute')]);
+  $('alerts').innerHTML = (rows.length ? `<table><tr><th>Nodo</th><th>Prob. ≤ 24 h</th><th class="num">Llegada P10–P90 (h)</th><th>Observado</th></tr>` + rows.map(({ n, x }) => {
+    const [name, col] = level(x.probability), truth = S.inst.sampleTruth().nodeDeathMs[n.id];
+    return `<tr><td class="mono">${n.id}</td><td><b style="color:${col}">${name}</b> ${(100 * x.probability).toFixed(0)} %</td><td class="num">${x.arrivalHoursP10.toFixed(1)} – ${x.arrivalHoursP90 > 99 ? '>99' : x.arrivalHoursP90.toFixed(1)}</td><td>${truth !== undefined ? 'alcanzado ≈ ' + (truth / HOUR).toFixed(1) + ' h' : 'no alcanzado'}</td></tr>`; }).join('') + '</table>' : '<p>Ningún nodo con probabilidad ≥ 5 %.</p>') +
+    `<p class="small">Horizonte 24 h · incertidumbre = dispersión de ${S.forecast.f.particles.length} partículas (tamaño efectivo antes de remuestrear ${S.forecast.f.effectiveSampleSize.toFixed(1)}) · dato: último perímetro OBSERVADO en ${S.inst.meta.planningTime}. Deja de ser válido si: ${INVALID_WHEN.slice(0, 3).join('; ')}.</p>`;
+}
+
 function bars(perMember) {
   const cv = $('members'), g = cv.getContext('2d'), w = cv.width, h = cv.height, xs = [...perMember].sort((a, b) => a - b);
   g.clearRect(0, 0, w, h); g.fillStyle = css('--ice');
@@ -127,6 +153,15 @@ function draw() {
     if (per.tMs > t) break;
     g.strokeStyle = css('--coral'); g.fillStyle = 'rgba(255,119,86,.10)'; g.lineWidth = 1.2;
     for (const ring of per.rings) { g.beginPath(); ring.forEach((p, i) => { const [x, y] = X(p); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.closePath(); g.fill(); g.stroke(); }
+  }
+  if (S.forecast && $('field').value === 'on') { // PREDICTED probability that the front has reached each cell by time t
+    const { f, G, grid, gridGeo } = S.forecast, cw = (area[0] / G) * sc, ch = (area[1] / G) * sc;
+    grid.forEach((pt, i) => {
+      if (gridGeo[i].burnt) return;
+      let pr = 0; for (const q of f.particles) if (arrivalHours(gridGeo[i], q) * HOUR <= t) pr += q.weight;
+      if (pr < 0.05) return;
+      const [x, y] = X(pt); g.fillStyle = `rgba(145,215,232,${(0.45 * pr).toFixed(3)})`; g.fillRect(x - cw / 2, y - ch / 2, cw, ch);
+    });
   }
   const pos = new Map(inst.nodes.map((n) => [n.id, n.mobile ? mobilePos(n, t) : n.pos]));
   g.strokeStyle = 'rgba(147,164,173,.25)'; g.lineWidth = 1; // SIMULATED contacts open at t
@@ -187,6 +222,13 @@ $('k').addEventListener('input', () => ($('kV').textContent = $('k').value));
 $('method').addEventListener('change', () => { panels(); draw(); });
 $('t').addEventListener('input', draw);
 $('world').addEventListener('click', runWorld);
+$('field').addEventListener('change', draw);
+let timer = null;
+$('play').addEventListener('click', () => {
+  if (timer) { clearInterval(timer); timer = null; $('play').textContent = '▶ Reproducir tiempo'; return; }
+  $('play').textContent = '⏸ Pausar';
+  timer = setInterval(() => { const el = $('t'); el.value = (+el.value + 1) % 101; draw(); }, 120);
+});
 rebuild(); chart();
 </script>
 </body>

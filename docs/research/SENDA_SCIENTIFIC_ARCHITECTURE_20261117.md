@@ -82,7 +82,7 @@ En ARR esto se traduce en una regla dura ya probada: un contacto con `kind ≠ A
 Contrato de toda predicción: `{valor, horizonte, incertidumbre, fuente y fecha del dato, condiciones de invalidez}`.
 
 - Implementado: pronóstico causal de llegada del frente a cada nodo (`fireForecastEnsemble`): velocidad de cabeza log-normal con mediana tomada **solo** de perímetros anteriores al instante de planificación, rumbo uniforme y excentricidad uniforme. Es un prior deliberadamente simple, no un modelo de propagación (no usa viento, combustible ni pendiente).
-- Siguiente paso (H2): asimilación tipo filtro de partículas — re-ponderar los miembros por la verosimilitud del perímetro observado más reciente y remuestrear; añadir viento HRRR/Open-Meteo como covariable del rumbo. Métrica: Brier/CRPS de la pérdida de nodos en incendios retenidos.
+- H2 ejecutada y **rechazada**: la asimilación tipo filtro de partículas (`arr-forecast.mjs`) reduce el Brier un 22 % sin alcanzar significación, y tanto el prior como el asimilado son **peores que la persistencia** en 34 casos de tres incendios observados. El modelo geométrico no tiene pericia; no debe alimentar avisos. Siguiente alternativa (H2b): viento observado y regla de avance publicada, con la persistencia como línea base obligatoria.
 - Fuentes candidatas con procedencia ya identificada en el repositorio: GOES-R FDC y HRRR (NOAA, dominio público), EFFIS/Copernicus EMS, EONET, MET Norway, USGS. Cada una necesita su ficha de licencia, resolución y latencia antes de entrar en un experimento.
 
 ## 6. Línea D — seguridad ciberfísica (solo primitivas estándar)
@@ -112,7 +112,7 @@ Un paso de satélite predicho solo acredita el peldaño 1. En ARR un contacto sa
 
 ## 8. Simulación y visualización
 
-- `experimental/senda-arr/viewer/index.html`: prototipo aislado que ejecuta **el mismo motor** en el navegador (no reproduce resultados grabados). Mapa con perímetros OBSERVADOS, nodos SIMULADOS coloreados por pérdida PREDICHA, control de tiempo, semilla, ρ, K, método, traza del voraz, distribución por miembro del conjunto y gráfico de resultados retenidos con IC 95 %.
+- `experimental/senda-arr/viewer/index.html`: prototipo aislado que ejecuta **el mismo motor** en el navegador (no reproduce resultados grabados). Mapa con perímetros OBSERVADOS, nodos SIMULADOS coloreados por pérdida PREDICHA, control y reproducción animada del tiempo, campo PREDICHO de llegada del frente, avisos por nodo con horizonte, intervalo P10–P90 y advertencia de pericia no demostrada, semilla, ρ, K, método, traza del voraz, distribución por miembro del conjunto y gráfico de resultados retenidos con IC 95 %.
 - Integración con los visualizadores 4D navegables (ramas huérfanas `apps/senda-live`, `investor-next/public/senda`): **no realizada**; depende de la consolidación de historias (P0 de gobernanza).
 
 ## 9. Riesgos y requisitos de validación física
@@ -136,7 +136,7 @@ Un paso de satélite predicho solo acredita el peldaño 1. En ARR un contacto sa
 
 **P0**
 1. Decidir la consolidación de historias Git (`master` frente a ramas `packages/senda`). Sin ella cada motor nuevo se duplica.
-2. H2: asimilación de perímetros observados en los pesos del conjunto; evaluar calibración en los tres incendios y añadir al menos uno europeo (EFFIS) retenido.
+2. H2b: sustituir el modelo geométrico de propagación (H2 rechazada: peor que la persistencia) por uno con viento observado y regla de avance publicada; mismo protocolo, más un incendio europeo (EFFIS) retenido.
 3. Ensayo físico mínimo (2 Android + 2 LoRa): medir `p` por contacto y sustituir los perfiles hipotéticos.
 4. Restricción dura de tiempo en el aire por nodo (EU868) dentro de ARR.
 

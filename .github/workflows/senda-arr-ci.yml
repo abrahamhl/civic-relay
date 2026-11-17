@@ -23,4 +23,4 @@ jobs:
       - name: Unit, invariant, adversarial and differential tests
         run: node --test experimental/senda-arr/tests/*.test.mjs
       - name: Experiment pipeline smoke run (quick mode, not the reported numbers)
-        run: node experimental/senda-arr/experiments/run-experiment.mjs --quick
+        run: node experimental/senda-arr/experiments/run-experiment.mjs --quick && rm -f experimental/senda-arr/results/results.quick.json

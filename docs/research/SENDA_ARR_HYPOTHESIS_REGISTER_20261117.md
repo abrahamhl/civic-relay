@@ -78,6 +78,20 @@ Problema: réplicas multisalto con fallos de causa común. Lo actual supone inde
 - **Riesgos:** cadencia irregular de perímetros; colapso de pesos.
 - **Valor/PI:** técnica estándar; el valor es el conjunto de casos validados.
 
+**Resultado H2 (ejecutado en esta misma iteración): RECHAZADA.** Código `src/arr-forecast.mjs`, protocolo `experiments/run-forecast-experiment.mjs`, cifras `results/FORECAST_RESULTS.md`. 34 unidades (incendio × instante), 300 puntos cada una, resultado OBSERVADO «el frente llega en ≤ 24 h» (tasa base 5,4 %).
+
+| Pronóstico | Brier | Sesgo |
+|---|---|---|
+| Persistencia (el frente no avanza) | 0,0539 | −5,4 pp |
+| Prior sin asimilar | 0,1214 | +9,6 pp |
+| Asimilado (prerregistrado) | 0,0943 | +6,3 pp |
+
+- Prior − asimilado: 0,0271 [−0,0008; 0,0668]: reducción del 22 %, pero el IC toca el cero → criterio no cumplido.
+- **Ambos conjuntos son peores que la persistencia** (diferencia −0,040 [−0,080; −0,012]). El modelo geométrico de propagación sobrepredice el avance y no tiene pericia demostrada.
+- Defecto encontrado por un test sintético: con el templado prerregistrado el filtro casi no se mueve (tamaño efectivo 346 de 384). Una ejecución **exploratoria post hoc** con templado más débil (`FORECAST_RESULTS.exploratory.md`) mejora en Carr y Woolsey, empeora en Camp y sigue sin batir a la persistencia. No se ajustó más.
+- **Consecuencias:** (1) el sesgo pesimista de ARR en incendios (−7 pp) viene de aquí; (2) este pronóstico **no debe mostrarse como aviso a la población**: el visor lo rotula «pericia no demostrada» junto a cada aviso; (3) la siguiente alternativa no es otro filtro sino otra física.
+- **Alternativa seleccionada (H2b, P0):** modelo con viento observado (reanálisis ERA5/HRRR en la fecha del incendio) y una regla de velocidad de avance publicada (p. ej. la del 10 % de Cruz y Alexander, 2019, ya referenciada en `fire-cases.mjs` de las ramas SENDA), evaluado con el mismo protocolo y la persistencia como línea base obligatoria.
+
 ### H3 — Replanificación por custodio · prioridad 3
 - **Problema:** 10–12 pp de brecha frente al techo epidémico.
 - **Insuficiencia actual:** el plan se fija en origen; una réplica muere con su primer salto fallido.
@@ -120,6 +134,7 @@ Problema: réplicas multisalto con fallos de causa común. Lo actual supone inde
 - Nemhauser, Wolsey y Fisher (1978), *An analysis of approximations for maximizing submodular set functions*, Math. Programming 14.
 - Rockafellar y Uryasev (2000), *Optimization of conditional value-at-risk*, Journal of Risk 2.
 - Spyropoulos, Psounis y Raghavendra (2005), *Spray and Wait*, ACM WDTN.
+- Gordon, Salmond y Smith (1993), *Novel approach to nonlinear/non-Gaussian Bayesian state estimation*, IEE Proc. F 140.
 - Vahdat y Becker (2000), *Epidemic Routing for Partially-Connected Ad Hoc Networks*, Duke CS-2000-06.
 - RFC 9171 (BPv7), RFC 9172 (BPSec); CCSDS Schedule-Aware Bundle Routing (CGR).
 - ITU-R P.526 (difracción), P.1812 (punto-área terrestre), P.618 (Tierra-espacio); ETSI EN 300 220 (SRD, ciclo de trabajo).
@@ -131,5 +146,5 @@ Las referencias bibliográficas se citan de memoria y deben comprobarse contra l
 ## 5. Checkpoint
 
 - Base: `74631c0` (PR #38). Rama: `ccr-ea048c78-86gcio`.
-- Tests: 19 propios + 31 heredados, todos pasan en local.
-- Siguiente experimento: H2 con al menos un incendio europeo retenido.
+- Tests: 22 propios + 31 heredados, todos pasan en local.
+- Siguiente experimento: H2b (viento observado + regla de avance publicada) con la persistencia como línea base y al menos un incendio europeo retenido.

@@ -1,0 +1,699 @@
+{
+ "protocol": {
+  "exploratoryEffectiveProbes": "200",
+  "horizonHours": 24,
+  "pointsPerUnit": 300,
+  "members": 64,
+  "generatedAt": "2026-11-17T07:19:47.324Z"
+ },
+ "units": 34,
+ "meanBaseRate": 0.05392156862745098,
+ "brier": {
+  "persistence": 0.05392156862745098,
+  "prior": 0.12140433517156864,
+  "assimilated": 0.09443627450980394
+ },
+ "priorMinusAssimilated": {
+  "mean": 0.02696806066176471,
+  "lo": -0.0021703622855392133,
+  "hi": 0.06568110447303921,
+  "n": 34
+ },
+ "relativeReduction": 0.22213424770749274,
+ "persistenceMinusAssimilated": {
+  "mean": -0.04051470588235294,
+  "lo": -0.08574048808976716,
+  "hi": -0.013732120289522056,
+  "n": 34
+ },
+ "persistenceMinusPrior": {
+  "mean": -0.06748276654411765,
+  "lo": -0.13542482862285543,
+  "hi": -0.018557200712316185,
+  "n": 34
+ },
+ "perFire": {
+  "camp": {
+   "units": 12,
+   "brier": {
+    "persistence": 0.07305555555555555,
+    "prior": 0.09393751356336806,
+    "assimilated": 0.1091903347439236
+   },
+   "priorMinusAssimilated": {
+    "mean": -0.01525282118055555,
+    "lo": -0.03689900716145833,
+    "hi": 0.005693495008680557,
+    "n": 12
+   }
+  },
+  "carr": {
+   "units": 12,
+   "brier": {
+    "persistence": 0.01333333333333333,
+    "prior": 0.03261515299479167,
+    "assimilated": 0.022219102647569447
+   },
+   "priorMinusAssimilated": {
+    "mean": 0.01039605034722222,
+    "lo": 0.002484673394097224,
+    "hi": 0.01905890570746528,
+    "n": 12
+   }
+  },
+  "woolsey": {
+   "units": 10,
+   "brier": {
+    "persistence": 0.07966666666666666,
+    "prior": 0.26091153971354164,
+    "assimilated": 0.16339200846354165
+   },
+   "priorMinusAssimilated": {
+    "mean": 0.09751953125,
+    "lo": 0.003259847005208336,
+    "hi": 0.20640559895833333,
+    "n": 10
+   }
+  }
+ },
+ "calibration": {
+  "persistence": {
+   "ece": 0.05392156862745098,
+   "bias": -0.05392156862745098,
+   "bins": [
+    {
+     "n": 10200,
+     "predicted": 0,
+     "observed": 0.05392156862745098
+    },
+    {
+     "n": 0,
+     "predicted": 0,
+     "observed": 0
+    },
+    {
+     "n": 0,
+     "predicted": 0,
+     "observed": 0
+    },
+    {
+     "n": 0,
+     "predicted": 0,
+     "observed": 0
+    },
+    {
+     "n": 0,
+     "predicted": 0,
+     "observed": 0
+    },
+    {
+     "n": 0,
+     "predicted": 0,
+     "observed": 0
+    },
+    {
+     "n": 0,
+     "predicted": 0,
+     "observed": 0
+    },
+    {
+     "n": 0,
+     "predicted": 0,
+     "observed": 0
+    },
+    {
+     "n": 0,
+     "predicted": 0,
+     "observed": 0
+    },
+    {
+     "n": 0,
+     "predicted": 0,
+     "observed": 0
+    }
+   ]
+  },
+  "prior": {
+   "ece": 0.13212009803921568,
+   "bias": 0.09612132352941176,
+   "bins": [
+    {
+     "n": 7369,
+     "predicted": 0.01701808250780296,
+     "observed": 0.041932419595603204
+    },
+    {
+     "n": 755,
+     "predicted": 0.14143211920529802,
+     "observed": 0.039735099337748346
+    },
+    {
+     "n": 377,
+     "predicted": 0.24411472148541113,
+     "observed": 0.06896551724137931
+    },
+    {
+     "n": 221,
+     "predicted": 0.3501131221719457,
+     "observed": 0.1085972850678733
+    },
+    {
+     "n": 183,
+     "predicted": 0.4487704918032787,
+     "observed": 0.11475409836065574
+    },
+    {
+     "n": 202,
+     "predicted": 0.5450185643564357,
+     "observed": 0.10396039603960396
+    },
+    {
+     "n": 147,
+     "predicted": 0.6445578231292517,
+     "observed": 0.12244897959183673
+    },
+    {
+     "n": 195,
+     "predicted": 0.7494391025641025,
+     "observed": 0.10256410256410256
+    },
+    {
+     "n": 253,
+     "predicted": 0.8533843873517787,
+     "observed": 0.05928853754940711
+    },
+    {
+     "n": 498,
+     "predicted": 0.9635102911646586,
+     "observed": 0.13253012048192772
+    }
+   ]
+  },
+  "assimilated": {
+   "ece": 0.09849877450980393,
+   "bias": 0.03745404411764706,
+   "bins": [
+    {
+     "n": 8591,
+     "predicted": 0.005665449307414736,
+     "observed": 0.0419043184728204
+    },
+    {
+     "n": 309,
+     "predicted": 0.14436690938511326,
+     "observed": 0.10355987055016182
+    },
+    {
+     "n": 246,
+     "predicted": 0.24352134146341464,
+     "observed": 0.08536585365853659
+    },
+    {
+     "n": 129,
+     "predicted": 0.34508236434108525,
+     "observed": 0.07751937984496124
+    },
+    {
+     "n": 108,
+     "predicted": 0.44126157407407407,
+     "observed": 0.1111111111111111
+    },
+    {
+     "n": 101,
+     "predicted": 0.5454826732673267,
+     "observed": 0.04950495049504951
+    },
+    {
+     "n": 94,
+     "predicted": 0.6507646276595744,
+     "observed": 0.14893617021276595
+    },
+    {
+     "n": 106,
+     "predicted": 0.7545695754716981,
+     "observed": 0.1320754716981132
+    },
+    {
+     "n": 106,
+     "predicted": 0.8549528301886793,
+     "observed": 0.12264150943396226
+    },
+    {
+     "n": 410,
+     "predicted": 0.9751143292682927,
+     "observed": 0.16829268292682928
+    }
+   ]
+  }
+ },
+ "unitsDetail": [
+  {
+   "fire": "camp",
+   "k0": 1,
+   "planningTime": "2018-11-09T00:00:00.000Z",
+   "observedUntil": "2018-11-09T23:13:00.000Z",
+   "baseRate": 0.006666666666666667,
+   "brier": {
+    "persistence": 0.006666666666666667,
+    "prior": 0.08471842447916667,
+    "assimilated": 0.07968587239583333
+   },
+   "ess": 40.44845540341288
+  },
+  {
+   "fire": "camp",
+   "k0": 2,
+   "planningTime": "2018-11-09T19:02:00.000Z",
+   "observedUntil": "2018-11-10T01:04:00.000Z",
+   "baseRate": 0.013333333333333334,
+   "brier": {
+    "persistence": 0.013333333333333334,
+    "prior": 0.10860514322916667,
+    "assimilated": 0.10145589192708333
+   },
+   "ess": 14.445162191546578
+  },
+  {
+   "fire": "camp",
+   "k0": 3,
+   "planningTime": "2018-11-09T23:13:00.000Z",
+   "observedUntil": "2018-11-10T21:10:00.000Z",
+   "baseRate": 0,
+   "brier": {
+    "persistence": 0,
+    "prior": 0.11156087239583333,
+    "assimilated": 0.04329345703125
+   },
+   "ess": 117.31166575840184
+  },
+  {
+   "fire": "camp",
+   "k0": 4,
+   "planningTime": "2018-11-10T01:04:00.000Z",
+   "observedUntil": "2018-11-10T21:10:00.000Z",
+   "baseRate": 0.03,
+   "brier": {
+    "persistence": 0.03,
+    "prior": 0.0802294921875,
+    "assimilated": 0.18114339192708334
+   },
+   "ess": 95.17774374919976
+  },
+  {
+   "fire": "camp",
+   "k0": 5,
+   "planningTime": "2018-11-10T21:10:00.000Z",
+   "observedUntil": "2018-11-11T18:48:00.000Z",
+   "baseRate": 0.15666666666666668,
+   "brier": {
+    "persistence": 0.15666666666666668,
+    "prior": 0.10591959635416667,
+    "assimilated": 0.13544596354166666
+   },
+   "ess": 9.687993503521218
+  },
+  {
+   "fire": "camp",
+   "k0": 6,
+   "planningTime": "2018-11-11T18:48:00.000Z",
+   "observedUntil": "2018-11-12T00:31:00.000Z",
+   "baseRate": 0.043333333333333335,
+   "brier": {
+    "persistence": 0.043333333333333335,
+    "prior": 0.037947591145833334,
+    "assimilated": 0.05820963541666667
+   },
+   "ess": 18.03318068676021
+  },
+  {
+   "fire": "camp",
+   "k0": 7,
+   "planningTime": "2018-11-12T00:31:00.000Z",
+   "observedUntil": "2018-11-12T22:05:00.000Z",
+   "baseRate": 0.18,
+   "brier": {
+    "persistence": 0.18,
+    "prior": 0.15417317708333333,
+    "assimilated": 0.15785319010416668
+   },
+   "ess": 128.06633640224976
+  },
+  {
+   "fire": "camp",
+   "k0": 8,
+   "planningTime": "2018-11-12T22:05:00.000Z",
+   "observedUntil": "2018-11-13T17:50:00.000Z",
+   "baseRate": 0.02666666666666667,
+   "brier": {
+    "persistence": 0.02666666666666667,
+    "prior": 0.021997884114583335,
+    "assimilated": 0.0390478515625
+   },
+   "ess": 55.1424365260901
+  },
+  {
+   "fire": "camp",
+   "k0": 9,
+   "planningTime": "2018-11-13T02:53:00.000Z",
+   "observedUntil": "2018-11-13T17:50:00.000Z",
+   "baseRate": 0.18,
+   "brier": {
+    "persistence": 0.18,
+    "prior": 0.15773356119791668,
+    "assimilated": 0.17622233072916665
+   },
+   "ess": 184.04856077565185
+  },
+  {
+   "fire": "camp",
+   "k0": 10,
+   "planningTime": "2018-11-13T17:50:00.000Z",
+   "observedUntil": "2018-11-14T02:58:00.000Z",
+   "baseRate": 0.056666666666666664,
+   "brier": {
+    "persistence": 0.056666666666666664,
+    "prior": 0.06606363932291667,
+    "assimilated": 0.10264322916666667
+   },
+   "ess": 44.02021960903961
+  },
+  {
+   "fire": "camp",
+   "k0": 11,
+   "planningTime": "2018-11-14T02:58:00.000Z",
+   "observedUntil": "2018-11-14T21:39:00.000Z",
+   "baseRate": 0.18,
+   "brier": {
+    "persistence": 0.18,
+    "prior": 0.14583658854166667,
+    "assimilated": 0.17939127604166666
+   },
+   "ess": 82.73304595251597
+  },
+  {
+   "fire": "camp",
+   "k0": 12,
+   "planningTime": "2018-11-14T21:39:00.000Z",
+   "observedUntil": "2018-11-15T17:43:00.000Z",
+   "baseRate": 0.0033333333333333335,
+   "brier": {
+    "persistence": 0.0033333333333333335,
+    "prior": 0.052464192708333336,
+    "assimilated": 0.055891927083333334
+   },
+   "ess": 96.03040472988259
+  },
+  {
+   "fire": "carr",
+   "k0": 1,
+   "planningTime": "2018-07-23T20:02:00.000Z",
+   "observedUntil": "2018-07-24T10:20:00.000Z",
+   "baseRate": 0,
+   "brier": {
+    "persistence": 0,
+    "prior": 0.023834635416666666,
+    "assimilated": 0.0219189453125
+   },
+   "ess": 360.58312535407373
+  },
+  {
+   "fire": "carr",
+   "k0": 2,
+   "planningTime": "2018-07-24T10:20:00.000Z",
+   "observedUntil": "2018-07-24T22:20:00.000Z",
+   "baseRate": 0,
+   "brier": {
+    "persistence": 0,
+    "prior": 0.0167626953125,
+    "assimilated": 0.0009781901041666667
+   },
+   "ess": 78.31344194418199
+  },
+  {
+   "fire": "carr",
+   "k0": 3,
+   "planningTime": "2018-07-24T22:20:00.000Z",
+   "observedUntil": "2018-07-25T22:00:00.000Z",
+   "baseRate": 0,
+   "brier": {
+    "persistence": 0,
+    "prior": 0.016254069010416667,
+    "assimilated": 0.0035091145833333333
+   },
+   "ess": 177.76260546360731
+  },
+  {
+   "fire": "carr",
+   "k0": 4,
+   "planningTime": "2018-07-25T14:45:00.000Z",
+   "observedUntil": "2018-07-26T02:38:00.000Z",
+   "baseRate": 0.0033333333333333335,
+   "brier": {
+    "persistence": 0.0033333333333333335,
+    "prior": 0.009662272135416667,
+    "assimilated": 0.0085107421875
+   },
+   "ess": 203.3818982140635
+  },
+  {
+   "fire": "carr",
+   "k0": 5,
+   "planningTime": "2018-07-25T22:00:00.000Z",
+   "observedUntil": "2018-07-26T21:00:00.000Z",
+   "baseRate": 0.02666666666666667,
+   "brier": {
+    "persistence": 0.02666666666666667,
+    "prior": 0.02314697265625,
+    "assimilated": 0.024811197916666666
+   },
+   "ess": 288.88039773895014
+  },
+  {
+   "fire": "carr",
+   "k0": 6,
+   "planningTime": "2018-07-25T23:34:00.000Z",
+   "observedUntil": "2018-07-26T21:00:00.000Z",
+   "baseRate": 0.03,
+   "brier": {
+    "persistence": 0.03,
+    "prior": 0.02880126953125,
+    "assimilated": 0.028343098958333333
+   },
+   "ess": 330.2716174853222
+  },
+  {
+   "fire": "carr",
+   "k0": 7,
+   "planningTime": "2018-07-26T02:38:00.000Z",
+   "observedUntil": "2018-07-27T00:34:00.000Z",
+   "baseRate": 0.01,
+   "brier": {
+    "persistence": 0.01,
+    "prior": 0.011088053385416666,
+    "assimilated": 0.008414713541666667
+   },
+   "ess": 300.0620798120165
+  },
+  {
+   "fire": "carr",
+   "k0": 8,
+   "planningTime": "2018-07-26T21:00:00.000Z",
+   "observedUntil": "2018-07-27T07:00:00.000Z",
+   "baseRate": 0.0033333333333333335,
+   "brier": {
+    "persistence": 0.0033333333333333335,
+    "prior": 0.06140055338541667,
+    "assimilated": 0.036138509114583335
+   },
+   "ess": 90.20839861755653
+  },
+  {
+   "fire": "carr",
+   "k0": 9,
+   "planningTime": "2018-07-27T00:34:00.000Z",
+   "observedUntil": "2018-07-27T22:45:00.000Z",
+   "baseRate": 0.01,
+   "brier": {
+    "persistence": 0.01,
+    "prior": 0.06669352213541667,
+    "assimilated": 0.033125813802083334
+   },
+   "ess": 188.8095477081789
+  },
+  {
+   "fire": "carr",
+   "k0": 10,
+   "planningTime": "2018-07-27T07:00:00.000Z",
+   "observedUntil": "2018-07-28T02:45:00.000Z",
+   "baseRate": 0.023333333333333334,
+   "brier": {
+    "persistence": 0.023333333333333334,
+    "prior": 0.06889892578125,
+    "assimilated": 0.02866455078125
+   },
+   "ess": 146.1148304441165
+  },
+  {
+   "fire": "carr",
+   "k0": 11,
+   "planningTime": "2018-07-27T22:45:00.000Z",
+   "observedUntil": "2018-07-28T02:45:00.000Z",
+   "baseRate": 0.04666666666666667,
+   "brier": {
+    "persistence": 0.04666666666666667,
+    "prior": 0.028785807291666667,
+    "assimilated": 0.027212727864583335
+   },
+   "ess": 99.1834543055071
+  },
+  {
+   "fire": "carr",
+   "k0": 12,
+   "planningTime": "2018-07-28T02:45:00.000Z",
+   "observedUntil": "2018-07-28T23:21:00.000Z",
+   "baseRate": 0.006666666666666667,
+   "brier": {
+    "persistence": 0.006666666666666667,
+    "prior": 0.036053059895833336,
+    "assimilated": 0.045001627604166664
+   },
+   "ess": 292.82168363732654
+  },
+  {
+   "fire": "woolsey",
+   "k0": 1,
+   "planningTime": "2018-11-09T18:32:00.000Z",
+   "observedUntil": "2018-11-10T04:05:00.000Z",
+   "baseRate": 0.04,
+   "brier": {
+    "persistence": 0.04,
+    "prior": 0.5575146484375,
+    "assimilated": 0.13799723307291667
+   },
+   "ess": 335.7349839622147
+  },
+  {
+   "fire": "woolsey",
+   "k0": 2,
+   "planningTime": "2018-11-09T21:50:00.000Z",
+   "observedUntil": "2018-11-10T04:05:00.000Z",
+   "baseRate": 0.04,
+   "brier": {
+    "persistence": 0.04,
+    "prior": 0.8081892903645833,
+    "assimilated": 0.6647786458333333
+   },
+   "ess": 14.077901743426489
+  },
+  {
+   "fire": "woolsey",
+   "k0": 4,
+   "planningTime": "2018-11-11T04:49:00.000Z",
+   "observedUntil": "2018-11-11T20:20:00.000Z",
+   "baseRate": 0.09,
+   "brier": {
+    "persistence": 0.09,
+    "prior": 0.6023942057291667,
+    "assimilated": 0.20466715494791668
+   },
+   "ess": 1.0121685896041428
+  },
+  {
+   "fire": "woolsey",
+   "k0": 6,
+   "planningTime": "2018-11-12T21:14:00.000Z",
+   "observedUntil": "2018-11-13T20:46:00.000Z",
+   "baseRate": 0,
+   "brier": {
+    "persistence": 0,
+    "prior": 0.037926432291666666,
+    "assimilated": 0.03624267578125
+   },
+   "ess": 2.387659517322208
+  },
+  {
+   "fire": "woolsey",
+   "k0": 7,
+   "planningTime": "2018-11-12T22:35:00.000Z",
+   "observedUntil": "2018-11-13T20:46:00.000Z",
+   "baseRate": 0.15,
+   "brier": {
+    "persistence": 0.15,
+    "prior": 0.14732584635416668,
+    "assimilated": 0.13661295572916668
+   },
+   "ess": 325.5420640043524
+  },
+  {
+   "fire": "woolsey",
+   "k0": 8,
+   "planningTime": "2018-11-13T00:00:00.000Z",
+   "observedUntil": "2018-11-13T23:16:00.000Z",
+   "baseRate": 0.11,
+   "brier": {
+    "persistence": 0.11,
+    "prior": 0.09933349609375,
+    "assimilated": 0.09526529947916666
+   },
+   "ess": 338.1832250230229
+  },
+  {
+   "fire": "woolsey",
+   "k0": 9,
+   "planningTime": "2018-11-13T20:46:00.000Z",
+   "observedUntil": "2018-11-14T18:54:00.000Z",
+   "baseRate": 0.14666666666666667,
+   "brier": {
+    "persistence": 0.14666666666666667,
+    "prior": 0.14145914713541666,
+    "assimilated": 0.14177815755208334
+   },
+   "ess": 250.30192699591709
+  },
+  {
+   "fire": "woolsey",
+   "k0": 10,
+   "planningTime": "2018-11-13T20:46:00.000Z",
+   "observedUntil": "2018-11-14T18:54:00.000Z",
+   "baseRate": 0.01,
+   "brier": {
+    "persistence": 0.01,
+    "prior": 0.007330729166666667,
+    "assimilated": 0.007017415364583333
+   },
+   "ess": 384
+  },
+  {
+   "fire": "woolsey",
+   "k0": 11,
+   "planningTime": "2018-11-13T23:16:00.000Z",
+   "observedUntil": "2018-11-14T18:54:00.000Z",
+   "baseRate": 0.13,
+   "brier": {
+    "persistence": 0.13,
+    "prior": 0.1265625,
+    "assimilated": 0.12702718098958332
+   },
+   "ess": 381.861871581438
+  },
+  {
+   "fire": "woolsey",
+   "k0": 12,
+   "planningTime": "2018-11-14T18:54:00.000Z",
+   "observedUntil": "2018-11-14T23:40:00.000Z",
+   "baseRate": 0.08,
+   "brier": {
+    "persistence": 0.08,
+    "prior": 0.0810791015625,
+    "assimilated": 0.08253336588541667
+   },
+   "ess": 264.80029577155744
+  }
+ ],
+ "verdict": {
+  "ciLowerAboveZero": false,
+  "reductionAtLeast15pct": true,
+  "h2Accepted": false,
+  "beatsPersistence": false
+ }
+}
