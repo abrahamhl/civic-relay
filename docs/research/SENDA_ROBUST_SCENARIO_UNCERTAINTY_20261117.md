@@ -206,3 +206,30 @@ Esto es una aplicación conservadora de resultados matemáticos establecidos (Ho
 Fuentes: https://www.rfc-editor.org/rfc/rfc6414.html , https://www.rfc-editor.org/rfc/rfc8001.html .
 
 **Afirmaciones expresamente prohibidas:** «N−1 certificado», «comunicaciones garantizadas», «dos tecnologías equivalen a redes independientes», «certificación ENS/RED/CRA obtenida», «acceso satelital confirmado». Ninguna de las implementaciones H11–H15 modifica la política real de transmisión, ni autoriza conexión a 112, redes policiales o satélites.
+
+
+## H16 · Composición arquitectónica: incertidumbre + topología + reconstrucción k-de-n
+
+**Problema de integración:** tener dos rutas estructuralmente distintas no es suficiente para recuperar un mensaje de Reed–Solomon si este requiere dos fragmentos (\`k=2\`) y uno desaparece. H15 cuenta caminos; H11 evalúa probabilidad condicionada de recibir k fragmentos. El acoplamiento correcto exige respetar **qué fragmentos reales dependen de qué ruta física declarada**.
+
+**Motor implementado:** \`packages/senda/src/cross-layer-survivability.mjs\` con espejo de lectura offline, pruebas \`cross-layer-survivability.test.mjs\` y gate de CI Node 22/24.
+
+Entrada de laboratorio:
+- \`links\`, \`paths\` con dominios SRLG y endpoints explícitos de H15.
+- \`states\` del modelo de incertidumbre, opcionalmente generados por la secuencia H12/H14 y \`UNKNOWN\`.
+- \`plans\` de H11 con grupos \`{id, shards, p}\`, umbral \`k\`, costes, energía y permisos **solo declarados**.
+- \`groupPathBindings[planId]\`: lista por posición que asocia cada grupo de fragmentos a una ruta física declarada; un portador puede aparecer más de una vez, sin fingir que comparte independencia.
+
+Para un subconjunto de recursos fallidos \`F\`, se consideran supervivientes solo los grupos cuyos caminos no intersectan \`F\`. El plan es reconstruible bajo ese fallo si:
+
+\`sum_{grupo g: dominios(camino_g) ∩ F = vacío} shards_g >= k\`.
+
+Se enumera F con cardinalidad 1 y 2 sobre los dominios de los caminos ligados al plan. Se calcula \`declaredN1ShardReconstruction\`/\`declaredN2ShardReconstruction\`, cuántos escenarios impiden reconstrucción y el mínimo de fragmentos supervivientes. Se **intersecta** este gate estructural con el resultado \`auditAssuranceAgainstUncertainHazards\` de H11. No se ofrece \`selectedId\` si falla cualquiera de los dos gates, o si hay dependencias físicas incompletas.
+
+**Contraejemplo:** dos radios muy fiables sobre caminos declarativamente disjuntos, un fragmento por radio y \`k=2\`: una sola avería impide reconstruir. En cambio, con \`k=1\`, cualquiera de las dos puede servir frente al fallo individual declarado. Con tres caminos y \`k=1\`, hasta dos fallos individuales pueden ser tolerables si no comparten terminales u otros SRLG.
+
+**Pruebas:** entradas incompletas, rutas inventadas, permisos no acreditados, fragmentos duplicados que comparten gateway, límites de probabilidad, garantías N−1/N−2 y prueba integral **H14 → H12 → H11 → H15 → H16** con escenario UNKNOWN. Todas las salidas conservan \`physicalTestingCompleted:false\`, \`institutionallyAuthenticated:false\`, \`noCommandEmission:true\` y \`mayOperateEmergencyInfrastructure:false\`.
+
+La distinción entre *elegibilidad de laboratorio* y *capacidad de emergencia operativa* es obligatoria. Falta medir enlaces RF autorizados, comprobar permisos de terceros, evaluar relojes y acuses de receptor, y contar con certificación de componente y protocolo acordado por el organismo. Nada de lo anterior es un descubrimiento de una nueva ley matemática; la innovación potencial está en **conectar modelos físicos, incertidumbre y codificación tolerante a fallos de forma verificable**.
+
+**Prueba falsable:** comparar H16 contra escoger el camino de mayor probabilidad nominal con idénticos presupuestos de transmisión/energía y 100+ episodios de laboratorio por falla, registrando los casos donde H16 no aporta mejora o empeora latencia. Modelos de simulación pueden priorizar ensayos, pero nunca sirven por sí solos como resultado de campo.
