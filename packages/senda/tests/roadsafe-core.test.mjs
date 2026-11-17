@@ -60,6 +60,7 @@ test('correlación: calzadas distintas no se fusionan; cerca y misma calzada sí
   const f = fuseRoadEvidence([{ source: 'TRAFFIC_CENTRE_OPERATOR', at: 0, present: true }, { source: 'PROVIDER_STATUS', at: 10, present: false }], { now: 20 });
   assert.equal(f.status, 'DISPUTED');
   assert.equal(causalRoot({ source: 'NAVIGATOR_FROM_DGT30', rootHint: 'B1' }), 'V16_BEACON:B1');
+  assert.equal(causalRoot({ source: 'SENDA_OWNER_DECLARATION', rootHint: 'B1' }), 'V16_BEACON:B1', 'el afectado y su V16 son la misma fuente');
   assert.equal(fuseRoadEvidence([{ source: 'V16_BEACON', at: 100 }], { now: 50 }).status, 'UNKNOWN', 'evidencia del futuro descartada');
   const twins = await twinsFromObservations([v16(), v16({ obsId: 'z', lat: 41 })], { now: 10 }); assert.equal(twins.length, 2);
 });

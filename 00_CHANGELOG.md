@@ -1,5 +1,19 @@
 # Changelog
 
+## SENDA RoadSafe · 17-11-2026 · Prevención de colisiones secundarias y coordinación de asistencia verificable (rama `ccr-5123180e-t90iwo`, apilada sobre PR #47 `743c4f5`)
+
+**Entrada (fundador):** caso de investigación anonimizado (avería en arcén con V16, taxi, alcance y empuje); arquitectura federada sin depender de que todos instalen SENDA; corregir P0 viales; investigación y experimentos reproducibles.
+
+**Procesamiento:**
+- P0-1…P0-6 corregidos en `road-guard.mjs` y `datex2.mjs` (autenticidad/replay/plausibilidad de tramas, calzada contraria, consejo de frenada no imperativo, 112 declarado ≠ confirmado, DATEX II endurecido, supresión conservadora). `toCifs` usaba un tipo inexistente (`CONSTRUCTION`).
+- 9 módulos `roadsafe-*.mjs`: frame-trust, correlation, incident-twin, secondary-risk, dispatch, emergency-gateway, delivery, interop, accident-sim.
+- Consola `/senda/roadsafe` (ciudadano/operador/científico, ES/EN/NL, sin red externa).
+- Documentación `docs/roadsafe/` + `docs/adr/ADR-ROADSAFE-001.md`; evidencia `evidence/roadsafe/`.
+
+**Validación:** núcleo 739/739 (12 nuevas) · adversariales 25/25 (14 nuevas P0) · E2E Chromium 30/30 (móvil y escritorio) · controles negativos NC1–NC4 superados. Resultados de simulación: **no** demuestran reducción real de accidentes.
+
+**Siguiente paso:** decisión del titular sobre alta DGT 3.0 (entorno de pruebas) y convenio con una asistencia/aseguradora para sandbox. — Firma: Claude (Asistente de Orquestación Senior)
+
 ## SENDA · 17-11-2026 · Tres motores nuevos con datos reales (aislamiento por inundación, radio sobre relieve, agua en Países Bajos), rutas de financiación y propuesta para gobiernos
 
 **Entrada (fundador):** cosas más impresionantes; más investigación y ciencia; innovaciones que un gobierno de España pudiera aceptar como candidata y preparadas para Holanda; caminos de financiación reales; más fotos; motores completamente nuevos.

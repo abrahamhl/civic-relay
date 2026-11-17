@@ -45,6 +45,8 @@ export function causalRoot(obs) {
   let s = obs.source, guard = 0;
   while (ROAD_SOURCES[s]?.derivedFrom && guard++ < 8) s = ROAD_SOURCES[s].derivedFrom;
   const device = obs.rootHint ?? null; // p. ej. id de la baliza: V16, DGT 3.0 y navegador comparten raíz
+  // La declaración del propio afectado y la V16 que él mismo activó son la MISMA fuente humana.
+  if (s === 'SENDA_OWNER_DECLARATION' && device) return `V16_BEACON:${device}`;
   // Para fuentes de multitud/pares, cada informante es una raíz distinta (si no hay identidad, cada obs).
   if (['SENDA_CITIZEN_REPORT', 'BLE_PEER_FRAME', 'BLE_PEER_SIGNED'].includes(s)) return `${s}:${obs.reporterId ?? obs.obsId}`;
   return device ? `${s}:${device}` : s;

@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA RoadSafe</title>
+<meta name="description" content="SENDA RoadSafe: expediente de avería, coordinación de asistencia verificable y prevención de colisiones secundarias con fuentes viales autorizadas. Ejercicio y banco de pruebas; no es un servicio de emergencias.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+<style>
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.tabs button[aria-selected=true]{background:var(--i);border-color:var(--i);color:#04121a}
+.big{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}@media(max-width:520px){.big{grid-template-columns:1fr}}
+.big button{min-height:64px;font-size:17px;text-align:left}.big a.call{display:flex;align-items:center;justify-content:center;min-height:64px;border-radius:10px;background:var(--r);color:#1a0306;font-weight:800;font-size:19px;text-decoration:none}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid var(--l);background:#071018}
+.b-ok{color:var(--e);border-color:var(--e)}.b-warn{color:var(--a);border-color:var(--a)}.b-bad{color:var(--r);border-color:var(--r)}.b-info{color:var(--i);border-color:var(--i)}
+.ex{background:#2a1f05;border:1px solid var(--a);color:var(--a);border-radius:10px;padding:8px 12px;font-weight:700;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--l);vertical-align:top}th{color:var(--m);font-weight:600}
+.tl{list-style:none;padding:0;margin:0;font-size:13px}.tl li{padding:6px 0;border-bottom:1px dashed var(--l)}.tl time{color:var(--m);font-variant-numeric:tabular-nums;margin-right:8px}
+.bar{height:10px;border-radius:6px;background:#071018;border:1px solid var(--l);position:relative;overflow:hidden}.bar i{position:absolute;top:0;bottom:0;background:var(--c)}.bar b{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--t)}
+label.s{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;margin:6px 0}label.s span{min-width:210px}label.s output{min-width:60px;font-variant-numeric:tabular-nums;color:var(--i)}
+.steps li{margin:6px 0}.mono{font-family:ui-monospace,Menlo,monospace;font-size:12px;white-space:pre-wrap;word-break:break-word;background:#071018;border:1px solid var(--l);border-radius:10px;padding:10px;max-height:260px;overflow:auto}
+svg text{font:12px Inter,system-ui,sans-serif}
+[hidden]{display:none!important}
+.kv b,td,.tl li{overflow-wrap:anywhere}.tw{overflow-x:auto;max-width:100%}@media(max-width:520px){label.s span{min-width:0;flex:1 1 100%}table{font-size:12px}.badge{font-size:11px;padding:1px 6px}.kv b{font-size:15px}}
+</style>
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA</a> · <a href="/senda/carretera">Ruta protectora</a> · <a href="/senda/centro">Centro</a> · <a href="/senda/visor">Visor</a>
+ · <span role="group" aria-label="Idioma / Language / Taal"><button data-lang="es" class="lg">ES</button> <button data-lang="en" class="lg">EN</button> <button data-lang="nl" class="lg">NL</button></span></p>
+<h1 data-t="title">RoadSafe · avería y riesgo de alcance</h1>
+<p class="lead m" data-t="lead">Un expediente de avería con muy poca interacción, coordinación de asistencia con confirmaciones reales y avisos a quien se acerca solo por canales autorizados. Esta página es un banco de pruebas: no contacta con el 112, grúas ni aseguradoras reales.</p>
+<p class="ex" role="note" data-t="exercise">EJERCICIO · Las integraciones con DGT 3.0, Waze, aseguradoras y 112 aparecen como contratos simulados hasta que exista un acuerdo firmado.</p>
+
+<div class="tabs" role="tablist" aria-label="Vistas">
+ <button role="tab" id="tab-c" aria-controls="p-c" aria-selected="true" data-t="tabC">Ciudadano</button>
+ <button role="tab" id="tab-o" aria-controls="p-o" aria-selected="false" data-t="tabO">Operador</button>
+ <button role="tab" id="tab-s" aria-controls="p-s" aria-selected="false" data-t="tabS">Científico</button>
+</div>
+
+<!-- ============================================================ CIUDADANO -->
+<section id="p-c" role="tabpanel" aria-labelledby="tab-c">
+ <div class="g2">
+  <div class="card">
+   <h2 data-t="cNow">Qué hacer ahora (sin registro, sin red)</h2>
+   <ol class="steps" id="steps"></ol>
+   <div class="big" style="margin-top:12px">
+    <a class="call" href="tel:112" id="call112" data-t="call">Llamar al 112</a>
+    <button id="b-breakdown" class="p" data-t="bBreak">Tengo una avería</button>
+    <button id="b-crash" data-t="bCrash">Ha habido un accidente</button>
+    <button id="b-share" data-t="bShare">Compartir mi ubicación</button>
+   </div>
+   <p class="m" style="font-size:13px" data-t="callNote">La llamada al 112 es siempre tuya y siempre está disponible. Al marcar, el teléfono puede enviar tu ubicación (AML) al 112 sin pasar por SENDA.</p>
+  </div>
+  <div class="card" aria-live="polite">
+   <h2 data-t="cCase">Tu expediente</h2>
+   <div id="c-case" class="m" data-t="cNone">Aún no has abierto ningún expediente.</div>
+   <div id="c-assist" hidden>
+    <h3 style="margin-top:12px" data-t="cAssist">Asistencia</h3>
+    <div class="row"><button id="b-tow" data-t="bTow">Pedir grúa (asistencia)</button><button id="b-taxi" data-t="bTaxi">Pedir taxi</button></div>
+    <ul class="tl" id="c-services"></ul>
+    <h3 style="margin-top:12px" data-t="cNav">Abrir en tu navegador</h3>
+    <div class="row" id="c-nav"></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- ============================================================ OPERADOR -->
+<section id="p-o" role="tabpanel" aria-labelledby="tab-o" hidden>
+ <div class="row"><button id="o-run" class="p" data-t="oRun">Reproducir escenario (ejercicio)</button><span class="m" id="o-clock"></span></div>
+ <div class="g2">
+  <div class="card"><h2 data-t="oMap">Esquema del incidente</h2><svg id="o-map" viewBox="0 0 640 240" role="img" aria-label="Esquema de la vía con el incidente"></svg>
+   <div class="kv" id="o-kv"></div></div>
+  <div class="card"><h2 data-t="oProv">Procedencia y confianza</h2><div class="tw"><table id="o-prov"><thead><tr><th data-t="thSource">Fuente</th><th data-t="thRoot">Raíz causal</th><th>Δ log-odds</th></tr></thead><tbody></tbody></table></div><p class="m" style="font-size:13px" id="o-conf"></p></div>
+ </div>
+ <div class="g2">
+  <div class="card"><h2 data-t="oSvc">Servicios solicitados</h2><div class="tw"><table id="o-svc"><thead><tr><th data-t="thSvc">Servicio</th><th data-t="thState">Estado</th><th data-t="thRef">Referencia</th><th data-t="thFlags">Marcas</th></tr></thead><tbody></tbody></table></div>
+   <h3 style="margin-top:12px" data-t="oChan">Canales y entrega</h3><div class="tw"><table id="o-chan"><thead><tr><th>Canal</th><th data-t="thUsable">Uso</th><th data-t="thWhy">Motivo / P inferior</th></tr></thead><tbody></tbody></table></div></div>
+  <div class="card"><h2 data-t="oTl">Cronología auditada</h2><ul class="tl" id="o-tl"></ul><p class="m" style="font-size:12px" id="o-audit"></p></div>
+ </div>
+</section>
+
+<!-- ============================================================ CIENTÍFICO -->
+<section id="p-s" role="tabpanel" aria-labelledby="tab-s" hidden>
+ <div class="g2">
+  <div class="card">
+   <h2 data-t="sParams">Parámetros (todos hipotéticos o barridos)</h2>
+   <label class="s"><span data-t="pSpeed">Velocidad (km/h)</span><input type="range" id="s-speed" min="60" max="130" value="90"><output id="o-speed">90</output></label>
+   <label class="s"><span data-t="pHead">Distancia temporal (s)</span><input type="range" id="s-head" min="0.5" max="2.5" step="0.1" value="1.2"><output id="o-head">1.2</output></label>
+   <label class="s"><span data-t="pMu">Adherencia μ (seco 0,8 · mojado 0,45)</span><input type="range" id="s-mu" min="0.3" max="0.9" step="0.05" value="0.75"><output id="o-mu">0.75</output></label>
+   <label class="s"><span data-t="pSight">Visibilidad (m)</span><input type="range" id="s-sight" min="20" max="300" step="5" value="250"><output id="o-sight">250</output></label>
+   <label class="s"><span data-t="pShare">Adopción SENDA</span><input type="range" id="s-share" min="0" max="0.6" step="0.01" value="0.1"><output id="o-share">0.1</output></label>
+   <label class="s"><span data-t="pLat">Latencia canal autorizado (s)</span><input type="range" id="s-lat" min="5" max="900" step="5" value="60"><output id="o-lat">60</output></label>
+   <label class="s"><span data-t="pArr">Llegada del taxi tras la V16 (s)</span><input type="range" id="s-arr" min="30" max="2400" step="10" value="600"><output id="o-arr">600</output></label>
+   <div class="row"><button id="s-run" class="p" data-t="sRun">Simular A–E (N=1500, pareado)</button><button id="s-export" data-t="sExport">Exportar evidencia JSON</button></div>
+   <p class="m" style="font-size:13px" data-t="sDisc">Simulación con parámetros declarados. No demuestra reducción real de accidentes.</p>
+  </div>
+  <div class="card" aria-live="polite"><h2 data-t="sRes">Contrafactuales A–E · P(alcance) con IC 95 %</h2><div id="s-res" class="m" data-t="sWait">Pulsa «Simular».</div></div>
+ </div>
+ <div class="card" style="margin-top:14px"><h2 data-t="sRisk">Riesgo de no poder detenerse (Monte Carlo) y decisión de aviso</h2><div id="s-risk" class="m"></div></div>
+</section>
+</main>
+
+<script type="module">
+import { createIncident, observe, transition, publicView, verifyAudit } from '/senda/core/roadsafe-incident-twin.mjs';
+import { createDispatchOrchestrator, createContractSimulator, minimalPayload } from '/senda/core/roadsafe-dispatch.mjs';
+import { buildEmergencyDossier, createEmergencyGateway } from '/senda/core/roadsafe-emergency-gateway.mjs';
+import { routeChannels, deliveryLabel } from '/senda/core/roadsafe-delivery.mjs';
+import { causalRoot } from '/senda/core/roadsafe-correlation.mjs';
+import { navigationLinks, toCifsIncident, validateCifs } from '/senda/core/roadsafe-interop.mjs';
+import { runExperiment, PARAM_PROVENANCE } from '/senda/core/roadsafe-accident-sim.mjs';
+import { secondaryRiskMC, warningDecision, stoppingDistance, G } from '/senda/core/roadsafe-secondary-risk.mjs';
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const I18N = {
+ es: {}, // los textos ES están en el HTML
+ en: { title: 'RoadSafe · breakdown and rear-end risk', lead: 'A breakdown case with minimal interaction, assistance coordination with real confirmations, and warnings to approaching drivers only through authorised channels. This page is a test bench: it does not contact 112, tow trucks or insurers.', exercise: 'EXERCISE · DGT 3.0, Waze, insurer and 112 integrations are simulated contracts until a signed agreement exists.', tabC: 'Citizen', tabO: 'Operator', tabS: 'Scientist', cNow: 'What to do now (no sign-up, no network)', call: 'Call 112', bBreak: 'I have broken down', bCrash: 'There has been a crash', bShare: 'Share my location', callNote: 'Calling 112 is always yours and always available. When dialling, the phone may send your location (AML) to 112 without going through SENDA.', cCase: 'Your case', cNone: 'No case opened yet.', cAssist: 'Assistance', bTow: 'Request tow (assistance)', bTaxi: 'Request taxi', cNav: 'Open in your navigator', oRun: 'Replay scenario (exercise)', oMap: 'Incident schematic', oProv: 'Provenance and confidence', thSource: 'Source', thRoot: 'Causal root', oSvc: 'Requested services', thSvc: 'Service', thState: 'State', thRef: 'Reference', thFlags: 'Flags', oChan: 'Channels and delivery', thUsable: 'Use', thWhy: 'Reason / lower P', oTl: 'Audited timeline', sParams: 'Parameters (all hypothetical or swept)', pSpeed: 'Speed (km/h)', pHead: 'Time headway (s)', pMu: 'Friction μ (dry 0.8 · wet 0.45)', pSight: 'Visibility (m)', pShare: 'SENDA adoption', pLat: 'Authorised channel latency (s)', pArr: 'Taxi arrival after V16 (s)', sRun: 'Simulate A–E (N=1500, paired)', sExport: 'Export evidence JSON', sDisc: 'Simulation with declared parameters. It does not demonstrate real crash reduction.', sRes: 'Counterfactuals A–E · P(rear-end) with 95% CI', sWait: 'Press “Simulate”.', sRisk: 'Risk of being unable to stop (Monte Carlo) and warning decision' },
+ nl: { title: 'RoadSafe · pech en kop-staartrisico', lead: 'Een pechdossier met minimale interactie, hulpcoördinatie met echte bevestigingen en waarschuwingen aan naderende bestuurders alleen via geautoriseerde kanalen. Deze pagina is een testbank: er wordt geen contact gelegd met 112, bergers of verzekeraars.', exercise: 'OEFENING · Koppelingen met DGT 3.0, Waze, verzekeraars en 112 zijn gesimuleerde contracten tot er een ondertekende overeenkomst is.', tabC: 'Burger', tabO: 'Operator', tabS: 'Wetenschap', cNow: 'Wat nu te doen (zonder registratie, zonder netwerk)', call: 'Bel 112', bBreak: 'Ik heb pech', bCrash: 'Er is een ongeval', bShare: 'Deel mijn locatie', callNote: 'Bellen naar 112 is altijd aan jou en altijd beschikbaar. Bij het bellen kan de telefoon je locatie (AML) naar 112 sturen, buiten SENDA om.', cCase: 'Jouw dossier', cNone: 'Nog geen dossier geopend.', cAssist: 'Hulp', bTow: 'Berging aanvragen', bTaxi: 'Taxi aanvragen', cNav: 'Openen in je navigatie', oRun: 'Scenario afspelen (oefening)', oMap: 'Schema van het incident', oProv: 'Herkomst en betrouwbaarheid', thSource: 'Bron', thRoot: 'Causale oorsprong', oSvc: 'Aangevraagde diensten', thSvc: 'Dienst', thState: 'Status', thRef: 'Referentie', thFlags: 'Markeringen', oChan: 'Kanalen en levering', thUsable: 'Gebruik', thWhy: 'Reden / onderste P', oTl: 'Geauditeerde tijdlijn', sParams: 'Parameters (alle hypothetisch of gevarieerd)', pSpeed: 'Snelheid (km/u)', pHead: 'Volgtijd (s)', pMu: 'Wrijving μ (droog 0,8 · nat 0,45)', pSight: 'Zicht (m)', pShare: 'SENDA-adoptie', pLat: 'Latentie geautoriseerd kanaal (s)', pArr: 'Aankomst taxi na V16 (s)', sRun: 'Simuleer A–E (N=1500, gepaard)', sExport: 'Bewijs exporteren (JSON)', sDisc: 'Simulatie met gedeclareerde parameters. Toont geen echte vermindering van ongevallen aan.', sRes: 'Contrafactisch A–E · P(kop-staart) met 95%-BI', sWait: 'Druk op „Simuleer”.', sRisk: 'Risico niet tijdig te kunnen stoppen (Monte Carlo) en waarschuwingsbesluit' },
+};
+const STEPS = {
+ es: ['Luces de emergencia y baliza V16 encendida (desde la ventanilla).', 'Chaleco puesto antes de bajar; sal por el lado contrario al tráfico.', 'Espera detrás del guardarraíl o fuera de la calzada, nunca entre vehículos.', 'Si hay heridos, fuego o peligro: llama al 112 ya.'],
+ en: ['Hazard lights and V16 beacon on (from the window).', 'Put on the vest before getting out; exit on the side away from traffic.', 'Wait behind the barrier or off the carriageway, never between vehicles.', 'If anyone is hurt, there is fire or danger: call 112 now.'],
+ nl: ['Alarmlichten en V16-baken aan (vanuit het raam).', 'Hesje aan vóór het uitstappen; stap uit aan de kant weg van het verkeer.', 'Wacht achter de vangrail of naast de rijbaan, nooit tussen voertuigen.', 'Gewonden, brand of gevaar: bel direct 112.'],
+};
+const ES = {}; document.querySelectorAll('[data-t]').forEach((n) => { ES[n.dataset.t] = n.textContent; });
+let lang = new URLSearchParams(location.search).get('lang') || 'es';
+try { lang = localStorage.getItem('rs-lang') || lang; } catch {}
+function applyLang(l) {
+ lang = I18N[l] ? l : 'es'; document.documentElement.lang = lang;
+ document.querySelectorAll('[data-t]').forEach((n) => { const k = n.dataset.t; n.textContent = lang === 'es' ? ES[k] : (I18N[lang][k] ?? ES[k]); });
+ $('#steps').innerHTML = STEPS[lang].map((s) => `<li>${esc(s)}</li>`).join('');
+ document.querySelectorAll('.lg').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+ try { localStorage.setItem('rs-lang', lang); } catch {}
+ renderCase();
+}
+document.querySelectorAll('.lg').forEach((b) => b.addEventListener('click', () => applyLang(b.dataset.lang)));
+// pestañas accesibles (flechas)
+const tabs = [...document.querySelectorAll('[role=tab]')];
+function sel(t) { tabs.forEach((x) => { const on = x === t; x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1; $('#' + x.getAttribute('aria-controls')).hidden = !on; }); t.focus(); }
+tabs.forEach((t, i) => { t.addEventListener('click', () => sel(t)); t.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') sel(tabs[(i + 1) % tabs.length]); if (e.key === 'ArrowLeft') sel(tabs[(i + tabs.length - 1) % tabs.length]); }); });
+
+// ------------------------------------------------------------ Ciudadano
+const now = () => Math.floor(Date.now() / 1000);
+let inc = null, orch = createDispatchOrchestrator({ incidentId: 'pending' }), pos = null;
+const L = (es, en, nl) => (lang === 'en' ? en : lang === 'nl' ? nl : es);
+async function getPos() {
+ if (pos) return pos;
+ pos = await new Promise((res) => { if (!navigator.geolocation) return res(null); navigator.geolocation.getCurrentPosition((p) => res({ lat: p.coords.latitude, lon: p.coords.longitude, accuracyM: Math.round(p.coords.accuracy) }), () => res(null), { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }); });
+ return pos ?? { lat: 40.2, lon: -3.3, accuracyM: null, demo: true };
+}
+async function openCase(kind) {
+ const p = await getPos();
+ inc = await createIncident({ obsId: 'owner-' + now(), source: 'SENDA_OWNER_DECLARATION', at: now(), lat: p.lat, lon: p.lon, accuracyM: p.accuracyM ?? 50, laneHint: kind === 'BREAKDOWN' ? 'SHOULDER' : undefined }, { now: now(), kind });
+ orch = createDispatchOrchestrator({ incidentId: inc.id });
+ inc._demoPos = !!p.demo;
+ if (kind === 'CRASH') await transition(inc, 'EMERGENCY_ESCALATION_REQUIRED', { actor: { kind: 'OWNER' }, now: now(), reason: 'el usuario declara accidente' });
+ renderCase();
+}
+function renderCase() {
+ if (!inc) return;
+ const v = publicView(inc), esc112 = inc.state === 'EMERGENCY_ESCALATION_REQUIRED';
+ $('#c-case').innerHTML = `<p><b>${esc(v.id)}</b> · <span class="badge ${esc112 ? 'b-bad' : 'b-info'}">${esc(v.state)}</span></p>
+  <p>${esc(v.location.lat.toFixed(5))}, ${esc(v.location.lon.toFixed(5))}${inc._demoPos ? ' · <span class="badge b-warn">' + esc(L('posición de ejemplo (sin GPS)', 'example position (no GPS)', 'voorbeeldpositie (geen GPS)')) + '</span>' : ''}</p>
+  ${esc112 ? `<p style="color:var(--r);font-weight:700">${esc(L('Llama al 112 ahora. SENDA no llama por ti.', 'Call 112 now. SENDA does not call for you.', 'Bel nu 112. SENDA belt niet voor je.'))}</p><p class="mono">${esc(buildEmergencyDossier(v, { now: now() }).script)}</p>` : ''}
+  <p class="m" style="font-size:13px">${esc(L('Confianza', 'Confidence', 'Betrouwbaarheid'))}: ${esc(v.confidence?.status)} · p=${esc(v.confidence?.p)}</p>`;
+ $('#c-assist').hidden = false;
+ const n = navigationLinks(v.location);
+ $('#c-nav').innerHTML = `<a href="${esc(n.waze)}" rel="noopener" target="_blank">Waze</a> · <a href="${esc(n.google)}" rel="noopener" target="_blank">Google Maps</a>`;
+ $('#c-services').innerHTML = [...orch.services.values()].map((s) => `<li><time>${esc(s.kind)}</time> <span class="badge ${s.state.startsWith('ON_SCENE') ? 'b-ok' : s.state === 'FAILED' ? 'b-bad' : 'b-warn'}">${esc(s.state)}</span> ${esc(s.reference ?? '')} ${s.simulated ? '<span class="badge b-warn">SIM</span>' : ''}<br><span class="m">${esc(serviceText(s.state))}</span></li>`).join('');
+}
+const serviceText = (st) => ({ TRANSPORT_ACCEPTED: L('Solicitud recibida técnicamente; el proveedor aún no la ha aceptado.', 'Request technically received; provider has not accepted yet.', 'Verzoek technisch ontvangen; nog niet geaccepteerd.'), PARTNER_ACKNOWLEDGED: L('El proveedor abrió expediente. Aún no hay vehículo asignado.', 'Provider opened a case. No vehicle assigned yet.', 'Dossier geopend. Nog geen voertuig toegewezen.'), FAILED: L('No se pudo contactar. Prueba otra vía o llama a tu aseguradora.', 'Could not reach provider. Try another channel or call your insurer.', 'Niet bereikbaar. Probeer een ander kanaal of bel je verzekeraar.') })[st] ?? '';
+$('#b-breakdown').onclick = () => openCase('BREAKDOWN');
+$('#b-crash').onclick = () => openCase('CRASH');
+$('#b-share').onclick = async () => { const p = await getPos(); const t = `${p.lat.toFixed(5)},${p.lon.toFixed(5)}`; try { if (navigator.share) await navigator.share({ title: 'SENDA', text: t }); else await navigator.clipboard.writeText(t); } catch {} if (!inc) await openCase('BREAKDOWN'); };
+async function ask(kind) {
+ if (!inc) await openCase('BREAKDOWN');
+ if (inc.state !== 'ASSISTANCE_REQUESTED' && !['PARTNER_ACKNOWLEDGED', 'ASSISTANCE_ON_SCENE'].includes(inc.state)) await transition(inc, 'ASSISTANCE_REQUESTED', { actor: { kind: 'OWNER' }, now: now() });
+ const sim = createContractSimulator({ providerId: kind === 'TOW' ? 'ASISTENCIA-SIM' : 'TAXI-SIM', kind });
+ const { payload } = minimalPayload(publicView(inc), { fields: [] });
+ await orch.request(sim, { serviceId: kind + '-' + now(), kind, payload, now: now() });
+ renderCase();
+}
+$('#b-tow').onclick = () => ask('TOW'); $('#b-taxi').onclick = () => ask('TAXI');
+
+// ------------------------------------------------------------ Operador (escenario de ejercicio)
+const SRC_ES = { V16_BEACON: 'Baliza V16', DGT30_V16: 'DGT 3.0 (V16)', NAVIGATOR_FROM_DGT30: 'Navegador ← DGT 3.0', SENDA_OWNER_DECLARATION: 'Afectado (SENDA)', SENDA_CITIZEN_REPORT: 'Conductor (SENDA)', DATEX2_NAP: 'DATEX II NAP', PROVIDER_STATUS: 'Proveedor' };
+async function runOps() {
+ const T0 = 1_800_000_000, steps = [];
+ const o = await createIncident({ obsId: 'v16', source: 'V16_BEACON', rootHint: 'V16-001', at: T0, lat: 40.2001, lon: -3.3002, accuracyM: 6, roadId: 'A-3', dir: 1, pk: 41.2, laneHint: 'SHOULDER' }, { now: T0, kind: 'BREAKDOWN' });
+ await observe(o, { obsId: 'dgt', source: 'DGT30_V16', rootHint: 'V16-001', at: T0 + 40, lat: 40.2001, lon: -3.3002 }, { now: T0 + 41 });
+ await observe(o, { obsId: 'nav', source: 'NAVIGATOR_FROM_DGT30', rootHint: 'V16-001', at: T0 + 90, lat: 40.2001, lon: -3.3002 }, { now: T0 + 91 });
+ await observe(o, { obsId: 'own', source: 'SENDA_OWNER_DECLARATION', rootHint: 'V16-001', at: T0 + 120, lat: 40.2002, lon: -3.3001, accuracyM: 15 }, { now: T0 + 121 });
+ await transition(o, 'ASSISTANCE_REQUESTED', { actor: { kind: 'OWNER' }, now: T0 + 130 });
+ const ord = createDispatchOrchestrator({ incidentId: o.id });
+ const tow = createContractSimulator({ providerId: 'GRUA-SIM', kind: 'TOW', etaS: 1500 }), taxi = createContractSimulator({ providerId: 'TAXI-SIM', kind: 'TAXI', etaS: 900 }), bad = createContractSimulator({ providerId: 'TAXI-2-SIM', kind: 'TAXI', faults: { ackWithoutRef: true } });
+ const r1 = await ord.request(tow, { serviceId: 'grua', kind: 'TOW', payload: {}, now: T0 + 140 });
+ await ord.request(bad, { serviceId: 'taxi-a', kind: 'TAXI', payload: {}, now: T0 + 150 });
+ const r3 = await ord.request(taxi, { serviceId: 'taxi-b', kind: 'TAXI', payload: {}, now: T0 + 480 });
+ await transition(o, 'PARTNER_ACKNOWLEDGED', { actor: { kind: 'PROVIDER', id: 'GRUA-SIM', verified: true }, now: T0 + 141, reference: r1.service.reference });
+ for (const ev of taxi.eventsFor(r3.service.reference, T0 + 480)) ord.updateStatus('taxi-b', { ...ev, authenticated: true });
+ ord.checkDelays(T0 + 900);
+ await transition(o, 'SECONDARY_COLLISION_SUSPECTED', { actor: { kind: 'DEVICE' }, now: T0 + 1395, reason: 'detector de impacto del móvil (ejercicio)' });
+ await transition(o, 'EMERGENCY_ESCALATION_REQUIRED', { actor: { kind: 'OWNER' }, now: T0 + 1400, reason: 'alcance al taxi' });
+ const gw = createEmergencyGateway({ mode: 'TEST' }); const d = gw.register(buildEmergencyDossier(publicView(o), { now: T0 + 1401, scene: { vehicles: 3, v16Active: true } }));
+ gw.escalate(o.id, { now: T0 + 1401, reason: 'alcance', dossier: d }); gw.showToCitizen(d.dossierId, { now: T0 + 1402 });
+ const ch = routeChannels({ available: ['CELLULAR_DATA', 'SMS', 'BLE_PEER', 'DTN_RELAY', 'SATELLITE_SOS', 'DGT30_PLATFORM', 'PARTNER_API'], consents: ['location_share', 'partner_share', 'dtn_carry'], authorizations: ['CONTRACT'] });
+ const pv = publicView(o), cifs = toCifsIncident(pv, { nowMs: (T0 + 1402) * 1000 });
+ // render
+ $('#o-clock').textContent = `T0 = ${new Date(T0 * 1000).toISOString().slice(0, 16)}Z · ${L('ejercicio sintético', 'synthetic exercise', 'synthetische oefening')}`;
+ drawMap(pv);
+ $('#o-kv').innerHTML = [[pv.state, L('estado', 'state', 'status')], [pv.location.roadId + ' PK ' + pv.location.pk, L('ubicación', 'location', 'locatie')], [pv.confidence.independentRoots, L('raíces independientes', 'independent roots', 'onafhankelijke bronnen')], [validateCifs(cifs).valid ? 'CIFS ✓ (no publicado)' : 'CIFS ✗', 'Waze']].map(([a, b]) => `<div><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join('');
+ const used = new Map(o.confidence.contributions.map((c) => [c.root, c]));
+ $('#o-prov tbody').innerHTML = o.observations.map((ob) => { const root = causalRoot(ob), c = used.get(root), counted = c && c.source === ob.source; return `<tr><td>${esc(SRC_ES[ob.source] ?? ob.source)}</td><td><code>${esc(root)}</code></td><td>${counted ? esc(c.dLogOdds) : '<span class="m">' + esc(L('misma raíz: no suma', 'same root: not added', 'zelfde oorsprong: telt niet')) + '</span>'}</td></tr>`; }).join('');
+ $('#o-conf').textContent = `p=${o.confidence.p} · ${o.confidence.status} · ${L('V16, DGT 3.0, navegador y la declaración del afectado comparten raíz: cuentan una vez.', 'V16, DGT 3.0, navigator and the owner declaration share a root: counted once.', 'V16, DGT 3.0, navigatie en de eigen melding delen een oorsprong: één keer geteld.')}`;
+ $('#o-svc tbody').innerHTML = [...ord.services.values()].map((s) => `<tr><td>${esc(s.kind)} · ${esc(s.providerId)}</td><td><span class="badge ${s.state.startsWith('ON_SCENE') ? 'b-ok' : s.state === 'FAILED' ? 'b-bad' : 'b-warn'}">${esc(s.state)}</span></td><td>${esc(s.reference ?? '—')}</td><td>${esc(s.flags.join(', ') || '—')}</td></tr>`).join('');
+ $('#o-chan tbody').innerHTML = [...ch.plan.map((c) => `<tr><td>${esc(c.channel)}</td><td><span class="badge b-ok">✓</span></td><td>P≥${esc(c.pLower)}${c.measured ? '' : ' (prior)'}</td></tr>`), ...ch.rejected.map((c) => `<tr><td>${esc(c.channel)}</td><td><span class="badge b-bad">✗</span></td><td>${esc(c.why)}</td></tr>`)].join('');
+ const fmt = (t) => `+${Math.round((t - T0) / 60)} min`;
+ $('#o-tl').innerHTML = o.audit.filter((a) => a.op !== 'CREATE').map((a) => `<li><time>${esc(fmt(a.at))}</time>${a.op === 'TRANSITION' ? `<b>${esc(a.from)} → ${esc(a.to)}</b> · ${esc(a.actor.kind)}${a.reference ? ' · ref ' + esc(a.reference) : ''}${a.reason ? ' · ' + esc(a.reason) : ''}` : `${esc(a.op)} · ${esc(SRC_ES[a.data?.source] ?? a.data?.source ?? '')}`}</li>`).join('') + gw.log.map((g) => `<li><time>${esc(fmt(g.at))}</time>112 · ${esc(g.op)}</li>`).join('');
+ const v = await verifyAudit(o); $('#o-audit').textContent = `${L('Auditoría encadenada', 'Hash-chained audit', 'Hash-keten audit')}: ${v.ok ? '✓' : '✗'} · ${v.length} · ${v.head.slice(0, 16)}…`;
+}
+function drawMap(pv) {
+ const s = $('#o-map');
+ s.innerHTML = `<rect x="0" y="0" width="640" height="240" fill="#071018"/>
+  <rect x="0" y="60" width="640" height="54" fill="#13212b"/><rect x="0" y="126" width="640" height="54" fill="#13212b"/>
+  <line x1="0" y1="120" x2="640" y2="120" stroke="#5d6e78" stroke-width="3"/><line x1="0" y1="87" x2="640" y2="87" stroke="#9fb2bc" stroke-dasharray="14 12"/><line x1="0" y1="153" x2="640" y2="153" stroke="#9fb2bc" stroke-dasharray="14 12"/>
+  <rect x="0" y="180" width="640" height="16" fill="#0e1a22"/><text x="8" y="56" fill="#9fb2bc">${esc(L('Calzada contraria (sentido decreciente)', 'Opposite carriageway', 'Tegenovergestelde rijbaan'))}</text>
+  <text x="8" y="214" fill="#9fb2bc">${esc(L('Arcén · sentido creciente →', 'Shoulder · increasing direction →', 'Vluchtstrook · oplopende richting →'))}</text>
+  <rect x="470" y="181" width="40" height="14" rx="3" fill="#d9dee2"/><text x="468" y="232" fill="#f2f4f4">${esc(L('furgoneta', 'van', 'bestelbus'))}</text><circle cx="514" cy="188" r="4" fill="#fbbf24"/>
+  <rect x="418" y="172" width="38" height="14" rx="3" fill="#fbbf24"/><text x="400" y="168" fill="#fbbf24">taxi</text>
+  <rect x="330" y="160" width="38" height="14" rx="3" fill="#ff5b6e"/><text x="298" y="156" fill="#ff5b6e">${esc(L('seguidor', 'follower', 'volger'))}</text>
+  <path d="M120 140 L300 140" stroke="#91d7e8" stroke-width="2" marker-end="url(#a)"/><defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#91d7e8"/></marker></defs>
+  <text x="120" y="134" fill="#91d7e8">${esc(L('zona de aviso útil (ventana 4–90 s)', 'useful warning zone (4–90 s window)', 'nuttige waarschuwingszone (4–90 s)'))}</text>`;
+}
+$('#o-run').onclick = runOps;
+
+// ------------------------------------------------------------ Científico
+const ids = ['speed', 'head', 'mu', 'sight', 'share', 'lat', 'arr'];
+ids.forEach((k) => { const i = $('#s-' + k); i.oninput = () => { $('#o-' + k).textContent = i.value; }; });
+let lastEvidence = null;
+function runSci() {
+ const v = Object.fromEntries(ids.map((k) => [k, +$('#s-' + k).value]));
+ const res = runExperiment({ n: 1500, seed: 2026, assistArrivalS: v.arr, overrides: { speedKmh: v.speed, headwayS: v.head, mu: v.mu, sightM: v.sight, shareOverride: { SENDA_APP: v.share }, latencyOverride: { DGT30_NAVIGATOR: v.lat } } });
+ lastEvidence = { ...res, inputs: v, provenance: PARAM_PROVENANCE, exportedAt: new Date().toISOString() };
+ const max = Math.max(0.05, ...Object.values(res.summary).map((s) => s.ciCollision[1]));
+ $('#s-res').innerHTML = Object.values(res.summary).map((s) => `<div style="margin:10px 0"><div style="display:flex;justify-content:space-between;gap:8px;font-size:13px"><span>${esc(s.label)}</span><b>${(s.pCollision * 100).toFixed(1)} %</b></div>
+   <div class="bar" title="IC95 ${s.ciCollision.join('–')}"><i style="left:${(s.ciCollision[0] / max) * 100}%;width:${((s.ciCollision[1] - s.ciCollision[0]) / max) * 100}%;opacity:.45"></i><b style="left:${(s.pCollision / max) * 100}%"></b></div>
+   <div class="m" style="font-size:12px">${esc(L('cobertura efectiva', 'effective coverage', 'effectieve dekking'))} ${(s.effectiveCoverage * 100).toFixed(1)} % · ${esc(L('taxi→furgoneta', 'taxi→van', 'taxi→bus'))} ${(s.pSecondaryImpact * 100).toFixed(1)} % · ${esc(L('avisos tardíos suprimidos/mostrados', 'late warnings suppressed/shown', 'late waarschuwingen onderdrukt/getoond'))} ${s.lateWarningsSuppressed}/${s.lateWarningsShown} · ${esc(L('acuse de visualización', 'display ack', 'weergavebevestiging'))} ${s.confirmedDisplayAck}</div></div>`).join('');
+ // Riesgo de no poder detenerse antes del taxi detenido (percepción visual) y decisión
+ const vMs = v.speed / 3.6, dist = Math.max(10, v.head * vMs);
+ const risk = secondaryRiskMC({ n: 3000, seed: 9, distToHazardM: dist, sightM: v.sight, dist: { vMs: [vMs, 0.05], mu: [v.mu - 0.05, v.mu + 0.05] }, warning: { leadS: 30, pDeliver: 0.9, pAccept: 0.7, speedReduction: [0, 0.1] } });
+ const dec = warningDecision({ trustCeiling: 'WARNING', carriageway: 'SAME', posErrM: 10, timeToHazardS: 30, confidenceP: 0.95, risk });
+ const ds = stoppingDistance({ vMs, reactS: 1.25, aEffMs2: 0.9 * v.mu * G });
+ $('#s-risk').innerHTML = `<p>d_stop (t_r=1,25 s, a=0,9·μ·g) = <b>${ds.toFixed(0)} m</b> · ${esc(L('separación', 'gap', 'afstand'))} ≈ ${dist.toFixed(0)} m</p>
+  <p>P(${esc(L('no se detiene', 'cannot stop', 'stopt niet'))}) ${esc(L('sin aviso', 'no warning', 'zonder waarschuwing'))}: <b>${risk.pFailNoWarning}</b> [${risk.ciNoWarning.join('–')}] · ${esc(L('con aviso', 'with warning', 'met waarschuwing'))}: <b>${risk.pFailWithWarning}</b> [${risk.ciWithWarning.join('–')}]</p>
+  <p>${esc(L('Decisión de la política', 'Policy decision', 'Beleidsbesluit'))}: <span class="badge ${dec.level === 'WARNING' ? 'b-warn' : dec.level === 'SUPPRESS' ? 'b-bad' : 'b-info'}">${esc(dec.level)}</span> — ${esc(dec.why.join('; ') || L('ventana útil, misma calzada, beneficio estimado positivo', 'useful window, same carriageway, positive estimated benefit', 'nuttig venster, zelfde rijbaan, positief geschat voordeel'))}</p>
+  <p class="m" style="font-size:12px">${esc(risk.disclaimer)}</p>`;
+}
+$('#s-run').onclick = runSci;
+$('#s-export').onclick = () => { if (!lastEvidence) runSci(); const b = new Blob([JSON.stringify(lastEvidence, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'senda-roadsafe-evidence.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); };
+
+applyLang(lang);
+window.__roadsafeReady = true;
+</script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+{
+  "schema": "senda-roadsafe-e2e/1",
+  "browser": "chromium (playwright)",
+  "at": "2026-11-17T23:16:15.616Z",
+  "passed": 30,
+  "failed": 0,
+  "results": [
+    {
+      "name": "movil: carga sin errores",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "name": "movil: botón 112 es tel:112 y visible sin abrir expediente",
+      "ok": true
+    },
+    {
+      "name": "movil: expediente de avería abierto (UNVERIFIED, sin registro)",
+      "ok": true,
+      "caseTxt": "RS-bf9219e70b7fbf6f · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+    },
+    {
+      "name": "movil: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
+      "ok": true,
+      "svc": "TOW PARTNER_ACKNOWLEDGED ASISTENCIA-SIM-SIM-1 SIMEl proveedor abrió expediente. Aún no hay vehículo asignado."
+    },
+    {
+      "name": "movil: accidente → escalada con instrucción de llamar (SENDA no llama)",
+      "ok": true,
+      "crash": "RS-bf9219e70b7fbf6f · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+    },
+    {
+      "name": "movil: idioma en",
+      "ok": true
+    },
+    {
+      "name": "movil: idioma nl",
+      "ok": true
+    },
+    {
+      "name": "movil: idioma es",
+      "ok": true
+    },
+    {
+      "name": "movil: operador — V16/DGT/navegador comparten raíz causal",
+      "ok": true,
+      "prov": "FuenteRaíz causalΔ log-oddsBaliza V16V16_BEACON:V16-001misma raíz: no sumaDGT 3.0 (V16)V16_BEACON:V16-001misma raíz: no sumaNavegador ← DGT 3.0V16_BEACON:V16-001misma raíz: no sumaAfectado (SENDA)V16_BEACON:V16-0012.483",
+      "conf": "p=0.7496 · UNVERIFIED · V16, DGT 3.0, navegador y la declaración del afectado comparten raíz: cuentan una vez."
+    },
+    {
+      "name": "movil: operador — auditoría encadenada ✓",
+      "ok": true,
+      "audit": "Auditoría encadenada: ✓ · 10 · f472cb1f6826d1f1…"
+    },
+    {
+      "name": "movil: operador — 202 sin referencia se queda en TRANSPORT_ACCEPTED",
+      "ok": true,
+      "svcO": "ServicioEstadoReferenciaMarcasTOW · GRUA-SIMPARTNER_ACKNOWLEDGEDGRUA-SIM-SIM-1—TAXI · TAXI-2-SIMTRANSPORT_ACCEPTED—ACK_SIN_REFERENCIA, DELAYEDTAXI · TAXI-SIMON_SCENE_REPORTEDTAXI-SIM-SIM-1—"
+    },
+    {
+      "name": "movil: científico — 5 escenarios con IC y acuse de visualización 0",
+      "ok": true,
+      "sres": "A · Sin alertas digitales4.1 %\n   \n   cobertura efectiva 0.0 % · taxi→furgoneta 1.5 % · avisos tardíos suprimidos/mostrados 0/0 · acuse de visualización 0B · V16 informativa (sin asumir entrega al conductor)4.1 %\n   \n   cobertura efectiva 0.0 % · taxi→furgoneta 1.5 % · avisos tardíos suprimidos/most"
+    },
+    {
+      "name": "movil: sin desbordamiento horizontal",
+      "ok": true,
+      "overflow": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "movil: ninguna petición a dominios externos",
+      "ok": true,
+      "external": []
+    },
+    {
+      "name": "movil: sin errores tras la interacción",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "name": "escritorio: carga sin errores",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "name": "escritorio: botón 112 es tel:112 y visible sin abrir expediente",
+      "ok": true
+    },
+    {
+      "name": "escritorio: expediente de avería abierto (UNVERIFIED, sin registro)",
+      "ok": true,
+      "caseTxt": "RS-ceca07d997e3c1a8 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+    },
+    {
+      "name": "escritorio: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
+      "ok": true,
+      "svc": "TOW PARTNER_ACKNOWLEDGED ASISTENCIA-SIM-SIM-1 SIMEl proveedor abrió expediente. Aún no hay vehículo asignado."
+    },
+    {
+      "name": "escritorio: accidente → escalada con instrucción de llamar (SENDA no llama)",
+      "ok": true,
+      "crash": "RS-ceca07d997e3c1a8 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+    },
+    {
+      "name": "escritorio: idioma en",
+      "ok": true
+    },
+    {
+      "name": "escritorio: idioma nl",
+      "ok": true
+    },
+    {
+      "name": "escritorio: idioma es",
+      "ok": true
+    },
+    {
+      "name": "escritorio: operador — V16/DGT/navegador comparten raíz causal",
+      "ok": true,
+      "prov": "FuenteRaíz causalΔ log-oddsBaliza V16V16_BEACON:V16-001misma raíz: no sumaDGT 3.0 (V16)V16_BEACON:V16-001misma raíz: no sumaNavegador ← DGT 3.0V16_BEACON:V16-001misma raíz: no sumaAfectado (SENDA)V16_BEACON:V16-0012.483",
+      "conf": "p=0.7496 · UNVERIFIED · V16, DGT 3.0, navegador y la declaración del afectado comparten raíz: cuentan una vez."
+    },
+    {
+      "name": "escritorio: operador — auditoría encadenada ✓",
+      "ok": true,
+      "audit": "Auditoría encadenada: ✓ · 10 · f472cb1f6826d1f1…"
+    },
+    {
+      "name": "escritorio: operador — 202 sin referencia se queda en TRANSPORT_ACCEPTED",
+      "ok": true,
+      "svcO": "ServicioEstadoReferenciaMarcasTOW · GRUA-SIMPARTNER_ACKNOWLEDGEDGRUA-SIM-SIM-1—TAXI · TAXI-2-SIMTRANSPORT_ACCEPTED—ACK_SIN_REFERENCIA, DELAYEDTAXI · TAXI-SIMON_SCENE_REPORTEDTAXI-SIM-SIM-1—"
+    },
+    {
+      "name": "escritorio: científico — 5 escenarios con IC y acuse de visualización 0",
+      "ok": true,
+      "sres": "A · Sin alertas digitales4.1 %\n   \n   cobertura efectiva 0.0 % · taxi→furgoneta 1.5 % · avisos tardíos suprimidos/mostrados 0/0 · acuse de visualización 0B · V16 informativa (sin asumir entrega al conductor)4.1 %\n   \n   cobertura efectiva 0.0 % · taxi→furgoneta 1.5 % · avisos tardíos suprimidos/most"
+    },
+    {
+      "name": "escritorio: sin desbordamiento horizontal",
+      "ok": true,
+      "overflow": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "escritorio: ninguna petición a dominios externos",
+      "ok": true,
+      "external": []
+    },
+    {
+      "name": "escritorio: sin errores tras la interacción",
+      "ok": true,
+      "errors": []
+    }
+  ]
+}
