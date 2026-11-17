@@ -423,7 +423,7 @@ function drawEsc(t) {
     }
   } else {
     sc.log.slice(-4).forEach((e, i, a) => text(g, `${mm(e.t)} · ${e.who} ${trSceneLog(e.what)}`, 34, 474 + i * 24, { c: i === a.length - 1 ? C.t : C.m, f: '12px Inter,system-ui' }));
-    if (sc.calls.length) text(g, tr('112 avisado con carretera, PK y sentido', '112 alerted with road, PK and direction'), 606, 570, { c: C.e, f: '700 12px Inter,system-ui', al: 'right' });
+    if (sc.calls.length) text(g, tr('Llamada al 112 declarada (sin confirmación externa)', '112 call declared (not externally confirmed)'), 606, 570, { c: C.e, f: '700 12px Inter,system-ui', al: 'right' });
   }
 }
 

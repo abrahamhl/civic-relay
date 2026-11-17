@@ -124,7 +124,8 @@ test('coordinador de escena: PAS, nadie se confirma a sí mismo, traspaso solo a
   const gc = { userId: 'gc-1', trust: 'VERIFIED_INSTITUTIONAL', orgKind: 'POLICE', unit: 'Guardia Civil de Tráfico', coordinator: true };
   assert.equal(sceneAct(sc, { t: 960, who: 'gc-1', action: 'HANDOVER', actor: gc }).ok, true); assert.equal(sc.coordinator.userId, 'gc-1');
   assert.equal(sceneAct(sc, { t: 970, who: 'gc-1', action: 'CONFIRM', task: 'avisar', actor: gc }).ok, true);
-  assert.match(sceneBrief(sc).text, /112 avisado 1:10/);
+  // P0-4 RoadSafe: una llamada declarada no es una llamada recibida.
+  assert.match(sceneBrief(sc).text, /112: llamada declarada 1:10, sin confirmación/); assert.equal(sceneBrief(sc).call112, 'LOGGED_NOT_CONFIRMED');
   const L = await civicLedger(sc);
   assert.equal(L.totals.luis, 10); assert.equal(L.totals.ana, 10 + 5 + 20 + 10);
   assert.ok(await verifyLedger(L.entries));

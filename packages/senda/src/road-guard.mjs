@@ -85,22 +85,39 @@ export function encodeHazard({ type, t, lat, lon, headingDeg = 0, speedMs = 0, d
   return new Uint8Array(b);
 }
 export function decodeHazard(bytes) {
-  if (bytes.length !== HAZARD_BYTES) throw new Error('trama de aviso: tamaño incorrecto');
+  if (!(bytes instanceof Uint8Array) || bytes.length !== HAZARD_BYTES) throw new Error('trama de aviso: tamaño incorrecto');
   const d = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength), v = d.getUint8(0) >> 4;
   if (v !== 1) throw new Error(`trama de aviso: versión ${v} desconocida`);
-  const type = d.getUint8(1);
-  return { v, hops: d.getUint8(0) & 15, type, kind: HAZARD_NAME[type] ?? 'UNKNOWN', t: d.getUint32(2), lat: d.getInt32(6) / 1e7, lon: d.getInt32(10) / 1e7, headingDeg: d.getUint16(14) / 100, speedMs: d.getUint16(16) / 100, decelMs2: d.getUint8(18) / 10, flags: d.getUint8(19), id: d.getUint32(20) };
+  const type = d.getUint8(1), lat = d.getInt32(6) / 1e7, lon = d.getInt32(10) / 1e7, hd = d.getUint16(14);
+  // P0-1 (RoadSafe): coordenadas o rumbo fuera de rango = trama corrupta o manipulada, nunca un aviso.
+  if (!(lat >= -90 && lat <= 90) || !(lon >= -180 && lon <= 180)) throw new Error('trama de aviso: coordenadas fuera de rango');
+  if (hd >= 36000) throw new Error('trama de aviso: rumbo fuera de rango');
+  return { v, hops: d.getUint8(0) & 15, type, kind: HAZARD_NAME[type] ?? 'UNKNOWN', t: d.getUint32(2), lat, lon, headingDeg: hd / 100, speedMs: d.getUint16(16) / 100, decelMs2: d.getUint8(18) / 10, flags: d.getUint8(19), id: d.getUint32(20), authenticated: false };
 }
-/** Un relé reenvía con un salto más; tope de saltos para no inundar. */
-export const relayHazard = (bytes, { maxHops = 3 } = {}) => { const h = decodeHazard(bytes); return h.hops >= maxHops ? null : encodeHazard({ ...h, hops: h.hops + 1 }); };
+/**
+ * Un relé reenvía con un salto más; tope de saltos para no inundar.
+ * P0-1 (RoadSafe): no se reenvían tipos desconocidos ni tramas caducadas o del futuro (si se da `now`).
+ * La trama de 24 bytes NO va autenticada: el relé solo propaga una PISTA; la confianza la decide
+ * `assessHazardFrame` (roadsafe-frame-trust.mjs) en cada receptor.
+ */
+export const relayHazard = (bytes, { maxHops = 3, now = null, maxAgeS = 30, maxFutureS = 2 } = {}) => {
+  const h = decodeHazard(bytes);
+  if (h.kind === 'UNKNOWN' || h.hops >= maxHops) return null;
+  if (now != null && (now - h.t > maxAgeS || h.t - now > maxFutureS)) return null;
+  return encodeHazard({ ...h, hops: h.hops + 1 });
+};
 
 /**
  * ¿Me afecta este aviso? Mismo sentido (rumbo), delante y en mi carril o en mi carretera.
  * Si ambos traen posición sobre la vía (`s` de `roadLocate`, misma carretera y sentido), se usa la
  * distancia por la carretera, válida también en curvas; si no, geometría en línea recta con alcance corto.
  */
-export function hazardRelevance(me, hz, { now, maxAheadM = 2000, straightMaxM = 600, laneM = 12, areaM = 600, headingTolDeg = 35, maxAgeS = 20 } = {}) {
-  const age = (now ?? hz.t) - hz.t;
+export function hazardRelevance(me, hz, { now, maxAheadM = 2000, straightMaxM = 600, laneM = 12, areaM = 600, headingTolDeg = 35, maxAgeS = 20, maxFutureS = 2 } = {}) {
+  // P0-6 (RoadSafe): sin reloj del receptor no se puede juzgar la antigüedad; antes `now` ausente daba edad 0.
+  if (!Number.isFinite(now)) return { relevant: false, why: 'sin reloj del receptor: antigüedad desconocida' };
+  if (!Number.isFinite(hz.t)) return { relevant: false, why: 'aviso sin hora' };
+  const age = now - hz.t;
+  if (age < -maxFutureS) return { relevant: false, why: 'aviso con hora futura (reloj incoherente o repetición)' };
   if (age > (ONE_WAY.has(hz.type) ? maxAgeS : 1800)) return { relevant: false, why: 'aviso caducado' };
   if (me.roadId && hz.roadId && me.roadId === hz.roadId && me.s != null && hz.s != null && me.dir != null) {
     if (ONE_WAY.has(hz.type) && hz.dir !== me.dir) return { relevant: false, why: 'otro sentido de la misma carretera' };
@@ -121,14 +138,22 @@ export function hazardRelevance(me, hz, { now, maxAheadM = 2000, straightMaxM = 
 }
 
 /**
- * Qué decirle al conductor: la deceleración que necesita para parar antes del peligro.
+ * Qué decirle al conductor: la deceleración que necesitaría para parar antes del peligro.
  * El peligro puede seguir moviéndose y frenando: se usa su punto de parada (hipótesis prudente).
+ *
+ * P0-3 (RoadSafe): los umbrales (3,4 m/s² de AASHTO como deceleración «cómoda», 1,5 m/s²) son
+ * HIPÓTESIS DE DISEÑO, no una instrucción de conducción certificada. Por eso el texto DESCRIBE el
+ * peligro (dónde y qué) y no ordena maniobras; `level` es un código interno de prioridad de
+ * presentación. Ningún aviso sustituye a la percepción del conductor ni a un sistema ADAS homologado.
  */
 export function brakeAdvice({ vMs, distM, reactS = 1.5, marginM = 10, hazardSpeedMs = 0, hazardDecelMs2 = 8 }) {
+  if (![vMs, distM, reactS, marginM].every(Number.isFinite) || vMs < 0 || distM < 0) return { aReqMs2: null, level: 'ABSTAIN', say: null, freeM: null, advisoryOnly: true, certified: false, basis: 'ENTRADAS_NO_VALIDAS' };
   const target = distM + (hazardSpeedMs > 0 ? hazardSpeedMs ** 2 / (2 * Math.max(1, hazardDecelMs2)) : 0);
   const free = target - vMs * reactS - marginM, aReq = free <= 0 ? Infinity : vMs ** 2 / (2 * free);
   const level = aReq >= ROAD.aashtoMs2 ? 'FRENA' : aReq >= 1.5 ? 'ATENCION' : 'INFO';
-  return { aReqMs2: Number.isFinite(aReq) ? +aReq.toFixed(2) : Infinity, level, say: level === 'FRENA' ? '¡Frena! Frenada brusca delante' : level === 'ATENCION' ? 'Atención: frenada delante, reduce' : 'Aviso: tráfico frenando más adelante', freeM: Math.round(free) };
+  const m = Math.max(0, Math.round(distM / 50) * 50);
+  const say = level === 'FRENA' ? `Peligro: tráfico detenido a ${m} metros` : level === 'ATENCION' ? `Atención: tráfico frenando a ${m} metros` : 'Aviso: tráfico frenando más adelante';
+  return { aReqMs2: Number.isFinite(aReq) ? +aReq.toFixed(2) : Infinity, level, say, freeM: Math.round(free), advisoryOnly: true, certified: false, basis: 'HIPOTESIS_DISENO_AASHTO_NO_CERTIFICADA' };
 }
 
 /**
@@ -322,13 +347,16 @@ export function navLinks({ lat, lon }) {
 /** Semivida (min) de la creencia en cada aviso sin nuevas confirmaciones. */
 export const REPORT_KINDS = Object.freeze({
   accidente: { label: 'Accidente', type: HAZARD.CRASH, hlMin: 45, cifs: 'ACCIDENT' },
-  parado: { label: 'Vehículo parado', type: HAZARD.STOPPED, hlMin: 20, cifs: 'HAZARD' },
+  parado: { label: 'Vehículo parado', type: HAZARD.STOPPED, hlMin: 20, cifs: 'HAZARD', cifsSubtype: 'HAZARD_ON_ROAD_CAR_STOPPED' },
+  arcen: { label: 'Vehículo parado en el arcén', type: HAZARD.STOPPED, hlMin: 30, cifs: 'HAZARD', cifsSubtype: 'HAZARD_ON_SHOULDER_CAR_STOPPED' },
   obstaculo: { label: 'Objeto en la calzada', type: HAZARD.OBSTACLE, hlMin: 20, cifs: 'HAZARD' },
   animal: { label: 'Animal suelto', type: HAZARD.ANIMAL, hlMin: 10, cifs: 'HAZARD' },
   niebla: { label: 'Niebla', type: HAZARD.FOG, hlMin: 60, cifs: 'HAZARD' },
   hielo: { label: 'Hielo o nieve', type: HAZARD.ICE, hlMin: 120, cifs: 'HAZARD' },
   retencion: { label: 'Retención', type: HAZARD.QUEUE, hlMin: 15, cifs: 'HAZARD' },
-  obras: { label: 'Obras', type: HAZARD.WORKS, hlMin: 1440, cifs: 'CONSTRUCTION' },
+  // CIFS no tiene tipo CONSTRUCTION (tipos válidos: ROAD_CLOSED, ACCIDENT, HAZARD, POLICE, CHIT_CHAT, JAM;
+  // verificado en developers.google.com/waze/data-feed/cifs-specification, 2026-11-17). Obras sin corte → HAZARD.
+  obras: { label: 'Obras', type: HAZARD.WORKS, hlMin: 1440, cifs: 'HAZARD' },
 });
 /**
  * Creencia en que el peligro sigue ahí (log-odds bayesianas). Cada «sigue ahí» suma y cada «ya no está»
@@ -350,7 +378,11 @@ export function reportBelief(votes, nowMin, { prior = 0.5, reliability = 0.8, ve
  */
 export function toCifs({ id, kind, lat, lon, roadId, sentido, startIso, description }) {
   const k = REPORT_KINDS[kind]; if (!k) throw new Error(`aviso desconocido: ${kind}`);
-  return { id: `senda-${id}`, type: k.cifs, polyline: `${lat.toFixed(6)} ${lon.toFixed(6)}`, street: roadId, direction: 'ONE_DIRECTION', starttime: startIso, description: description ?? `${k.label} · ${roadId} sentido ${sentido} · confirmado por SENDA`, reference: 'SENDA', _validated: false };
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) throw new Error('CIFS: coordenadas no válidas');
+  // CIFS pide «yyyy-MM-dd'T'HH:mm:ss+HH:mm» (segundos, con desplazamiento): «Z» → «+00:00», sin milisegundos.
+  const starttime = String(startIso).replace(/\.\d+(?=Z|[+-]\d\d:\d\d$)/, '').replace(/Z$/, '+00:00');
+  const desc = description ?? `${k.label} ${roadId}`;
+  return { id: `senda-${id}`, type: k.cifs, ...(k.cifsSubtype ? { subtype: k.cifsSubtype } : {}), polyline: `${lat.toFixed(6)} ${lon.toFixed(6)}`, street: roadId, direction: 'ONE_DIRECTION', starttime, description: desc.length > 40 ? desc.slice(0, 39) + '…' : desc, _sentido: sentido, _validated: false, _note: 'Requiere convenio de socio Waze (Partner Hub) y validación del feed por Waze antes de cualquier envío.' };
 }
 
 // ---------------------------------------------------------------- 8) SOS en un SMS y guion para el 112
@@ -359,9 +391,9 @@ export function roadSosText({ where, lat, lon, vehicles = 1, people = 1, trapped
   return s.length <= 160 ? s : s.slice(0, 159) + '…';
 }
 /** Lo que hay que decir al 112, en el orden en que lo pregunta el operador. */
-export function call112Script({ where, vehicles = 1, people = 1, trapped = 0, fire = false, dangerous = false, counts = null }) {
+export function call112Script({ where, vehicles = 1, people = 1, trapped = 0, fire = false, dangerous = false, counts = null, v16 = null }) {
   const inj = counts ? Object.entries(counts).filter(([, n]) => n).map(([c, n]) => `${n} ${({ ROJO: 'grave', AMARILLO: 'herido que no camina', VERDE: 'leve', PARADA: 'sin respiración', SIN_RESPIRACION: 'sin respiración' })[c] ?? c}`).join(', ') : null;
-  return [`Accidente de tráfico en ${where}.`, `${vehicles} vehículo${vehicles > 1 ? 's' : ''} y ${people} persona${people > 1 ? 's' : ''}${inj ? `: ${inj}` : ''}.`, trapped ? `${trapped} persona${trapped > 1 ? 's' : ''} atrapada${trapped > 1 ? 's' : ''}.` : 'Nadie atrapado por ahora.', fire ? 'Hay fuego o humo.' : 'Sin fuego.', dangerous ? 'Hay un vehículo de mercancías peligrosas (panel naranja).' : null, 'La zona está señalizada con la baliza V16.'].filter(Boolean).join(' ');
+  return [`Accidente de tráfico en ${where}.`, `${vehicles} vehículo${vehicles > 1 ? 's' : ''} y ${people} persona${people > 1 ? 's' : ''}${inj ? `: ${inj}` : ''}.`, trapped ? `${trapped} persona${trapped > 1 ? 's' : ''} atrapada${trapped > 1 ? 's' : ''}.` : 'Nadie atrapado por ahora.', fire ? 'Hay fuego o humo.' : 'Sin fuego.', dangerous ? 'Hay un vehículo de mercancías peligrosas (panel naranja).' : null, v16 === true ? 'Hay una baliza V16 encendida.' : null].filter(Boolean).join(' ');
 }
 
 // ---------------------------------------------------------------- 9) Coordinador de escena (PAS) y puntos cívicos
@@ -386,7 +418,13 @@ export function createScene({ id, at, where, coordinator }) {
 }
 /**
  * Acciones: JOIN, ASSIGN (solo quien coordina), DONE, CONFIRM, TRIAGE (con resultado de `startTriage`),
- * CALL112, HANDOVER (solo a un actor institucional verificado: asume el mando).
+ * CALL112 (alias de CALL112_LOGGED), CALL112_STARTED, CALL112_CONFIRMED, HANDOVER (solo a un actor
+ * institucional verificado: asume el mando).
+ *
+ * P0-4 (RoadSafe): registrar que alguien dice haber llamado NO es una llamada recibida. Se separan:
+ *   CALL112_LOGGED    → alguien anota que llama o ha llamado (declaración, sin verificación).
+ *   CALL112_STARTED   → el dispositivo abrió el marcador (tel:112); no prueba que se conectara.
+ *   CALL112_CONFIRMED → confirmación EXTERNA: referencia del expediente del 112 o un actor verificado.
  */
 export function sceneAct(scene, { t, who, action, task, to, victim, result, actor }) {
   const err = (m) => ({ ok: false, error: m }), T = (id) => scene.tasks.find((k) => k.id === id);
@@ -397,18 +435,34 @@ export function sceneAct(scene, { t, who, action, task, to, victim, result, acto
     case 'DONE': if (!T(task)) return err('tarea desconocida'); if (T(task).assignee && T(task).assignee !== who) return err('la tarea es de otra persona'); T(task).assignee ??= who; T(task).doneAt = t; break;
     case 'CONFIRM': { if (!T(task)?.doneAt) return err('no hay nada que confirmar'); if (T(task).assignee === who) return err('nadie se confirma a sí mismo'); if (!scene.participants.includes(who) && !actor) return err('solo confirma quien está en la escena'); if (!T(task).confirmedBy.includes(who)) T(task).confirmedBy.push(who); break; }
     case 'TRIAGE': scene.victims.push({ id: victim, by: who, at: t, cat: result.cat }); break;
-    case 'CALL112': scene.calls.push({ who, at: t }); break;
+    case 'CALL112': case 'CALL112_LOGGED': scene.calls.push({ who, at: t, status: 'LOGGED_NOT_CONFIRMED' }); break;
+    case 'CALL112_STARTED': scene.calls.push({ who, at: t, status: 'DIALER_OPENED_NOT_CONFIRMED' }); break;
+    case 'CALL112_CONFIRMED': {
+      const ref = typeof result?.reference === 'string' ? result.reference.trim() : '';
+      if (!ref && actor?.trust !== 'VERIFIED_INSTITUTIONAL') return err('la confirmación del 112 exige referencia de expediente o un actor verificado');
+      scene.calls.push({ who, at: t, status: 'EXTERNALLY_CONFIRMED', reference: ref || null, confirmedBy: actor?.trust === 'VERIFIED_INSTITUTIONAL' ? actor.userId : null }); break;
+    }
     case 'HANDOVER': if (actor?.trust !== 'VERIFIED_INSTITUTIONAL') return err('el traspaso es solo a un servicio con credencial verificada'); scene.handover = { at: t, to: actor.userId, unit: actor.unit ?? null, orgKind: actor.orgKind }; scene.coordinator = actor; break;
     default: return err('acción desconocida');
   }
   scene.log.push({ t, who, what: action === 'HANDOVER' ? `traspasa la escena a ${actor.unit ?? actor.userId}` : `${action.toLowerCase()}${task ? ' ' + task : ''}${to ? ' → ' + to : ''}${victim ? ' ' + victim : ''}` });
   return { ok: true };
 }
+/** Estado más fuerte de las llamadas al 112 registradas en la escena (P0-4). */
+export function callStatus(calls) {
+  if (calls.some((c) => c.status === 'EXTERNALLY_CONFIRMED')) return 'EXTERNALLY_CONFIRMED';
+  if (calls.some((c) => c.status === 'DIALER_OPENED_NOT_CONFIRMED')) return 'DIALER_OPENED_NOT_CONFIRMED';
+  return calls.length ? 'LOGGED_NOT_CONFIRMED' : 'NONE';
+}
+const callSummary = (calls, mm) => {
+  const st = callStatus(calls), first = calls.find((c) => c.status === st);
+  return st === 'EXTERNALLY_CONFIRMED' ? `112 confirmado ${mm(first.at)}${first.reference ? ' (ref. ' + first.reference + ')' : ''}` : st === 'DIALER_OPENED_NOT_CONFIRMED' ? `112: marcador abierto ${mm(first.at)}, sin confirmación` : st === 'LOGGED_NOT_CONFIRMED' ? `112: llamada declarada ${mm(first.at)}, sin confirmación` : '112 NO avisado';
+};
 /** Resumen para quien llega: qué se hizo, cuándo y por quién; recuento de triaje. */
 export function sceneBrief(scene) {
   const counts = tally(scene.victims.map((v) => ({ cat: v.cat }))), mm = (s) => `${Math.floor((s - scene.at) / 60)}:${String(Math.round((s - scene.at) % 60)).padStart(2, '0')}`;
   const done = scene.tasks.filter((k) => k.doneAt).map((k) => `${k.step} ${mm(k.doneAt)}${k.confirmedBy.length ? ' ✓' : ''}`).join(' · ');
-  return { counts, text: `${scene.where} · ${scene.victims.length} víctima(s) triadas · ${Object.entries(counts).filter(([, n]) => n).map(([c, n]) => `${c} ${n}`).join(' ') || 'sin triaje'} · PAS: ${done || 'pendiente'} · 112 ${scene.calls.length ? 'avisado ' + mm(scene.calls[0].at) : 'NO avisado'}` };
+  return { counts, text: `${scene.where} · ${scene.victims.length} víctima(s) triadas · ${Object.entries(counts).filter(([, n]) => n).map(([c, n]) => `${c} ${n}`).join(' ') || 'sin triaje'} · PAS: ${done || 'pendiente'} · ${callSummary(scene.calls, mm)}`, call112: callStatus(scene.calls) };
 }
 
 const sha = async (s) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))].map((x) => x.toString(16).padStart(2, '0')).join('');

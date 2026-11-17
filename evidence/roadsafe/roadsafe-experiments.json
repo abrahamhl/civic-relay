@@ -1,0 +1,1463 @@
+{
+  "schema": "senda-roadsafe-evidence/1",
+  "generatedBy": "packages/senda/scripts/roadsafe-experiment.mjs",
+  "n": 3000,
+  "provenance": {
+    "speedKmh": {
+      "value": [
+        80,
+        100
+      ],
+      "provenance": "UNKNOWN_SWEPT",
+      "note": "Velocidades del caso desconocidas; se barre 70–120 km/h."
+    },
+    "headwayS": {
+      "value": [
+        0.8,
+        2
+      ],
+      "provenance": "HYPOTHETICAL",
+      "note": "Distancia temporal seguidor-taxi; la DGT recomienda ≥2 s; se supone parte del tráfico por debajo."
+    },
+    "reactUnexpectedS": {
+      "value": [
+        1.25,
+        0.35
+      ],
+      "provenance": "LITERATURE_RANGE",
+      "note": "Mediana ≈1,25 s ante evento inesperado (Green, 2000, Transportation Human Factors 2(3)); σ log supuesta."
+    },
+    "reactExpectedS": {
+      "value": [
+        0.75,
+        0.3
+      ],
+      "provenance": "LITERATURE_RANGE",
+      "note": "Mediana ≈0,7–0,75 s cuando el conductor está prevenido (Green, 2000)."
+    },
+    "mu": {
+      "value": [
+        0.7,
+        0.85
+      ],
+      "provenance": "LITERATURE_RANGE",
+      "note": "Adherencia típica asfalto seco; mojado 0,4–0,55. Requiere medida local."
+    },
+    "brakeEff": {
+      "value": [
+        0.85,
+        0.95
+      ],
+      "provenance": "HYPOTHETICAL",
+      "note": "Fracción de μ·g alcanzada en frenada de emergencia con ABS."
+    },
+    "taxiDecelMs2": {
+      "value": [
+        3,
+        5
+      ],
+      "provenance": "HYPOTHETICAL",
+      "note": "Frenada de servicio del taxi para detenerse tras la furgoneta."
+    },
+    "gapTaxiVanM": {
+      "value": [
+        3,
+        10
+      ],
+      "provenance": "HYPOTHETICAL",
+      "note": "Hueco entre taxi detenido y furgoneta."
+    },
+    "sightM": {
+      "value": 250,
+      "provenance": "UNKNOWN_SWEPT",
+      "note": "Visibilidad efectiva (curva, noche, niebla) desconocida; se barre 60–400 m."
+    },
+    "restitution": {
+      "value": 0.1,
+      "provenance": "HYPOTHETICAL",
+      "note": "Coeficiente de restitución en alcances a baja-media velocidad."
+    },
+    "massKg": {
+      "value": {
+        "taxi": 1600,
+        "follower": 1500
+      },
+      "provenance": "HYPOTHETICAL",
+      "note": "Masas típicas de turismo."
+    },
+    "taxiPostBrake": {
+      "value": 0.6,
+      "provenance": "HYPOTHETICAL",
+      "note": "Fracción de μ·g que frena el taxi tras ser golpeado (pie en freno/inercia)."
+    },
+    "channelLatencyS": {
+      "value": null,
+      "provenance": "UNKNOWN_SWEPT",
+      "note": "Latencia V16→DGT 3.0→navegador no publicada; se barre."
+    },
+    "connectedShare": {
+      "value": null,
+      "provenance": "UNKNOWN_SWEPT",
+      "note": "Fracción de conductores cuyo navegador muestra eventos DGT 3.0: desconocida."
+    },
+    "acceptance": {
+      "value": [
+        0.5,
+        0.9
+      ],
+      "provenance": "HYPOTHETICAL",
+      "note": "Probabilidad de que el conductor atienda y actúe sobre el aviso."
+    },
+    "speedReduction": {
+      "value": [
+        0,
+        0.15
+      ],
+      "provenance": "HYPOTHETICAL",
+      "note": "Reducción de velocidad tras aviso aceptado."
+    },
+    "lateWarningPenaltyS": {
+      "value": [
+        0.3,
+        0.8
+      ],
+      "provenance": "HYPOTHETICAL",
+      "note": "Retraso por distracción si el aviso llega dentro de la ventana crítica."
+    },
+    "assistArrivalS": {
+      "value": [
+        300,
+        2400
+      ],
+      "provenance": "UNKNOWN_SWEPT",
+      "note": "Tiempo entre la activación de la V16 y la llegada/frenada del taxi: desconocido."
+    },
+    "displayRangeM": {
+      "value": 1500,
+      "provenance": "HYPOTHETICAL",
+      "note": "Distancia a la que un navegador/app muestra un peligro por delante; depende de cada producto."
+    }
+  },
+  "experiments": {
+    "baseline": {
+      "A_NO_DIGITAL": {
+        "pCollision": 0.0357,
+        "ci": [
+          0.0296,
+          0.0429
+        ],
+        "pSecondary": 0.018,
+        "impactP50": 26.7,
+        "impactP95": 50.8,
+        "coverage": 0,
+        "latencyP50": null,
+        "latencyP95": null,
+        "leadP50": null,
+        "falseAlarmRate": 0,
+        "lateShown": 0,
+        "lateSuppressed": 0,
+        "confirmedDisplayAck": 0,
+        "messagesPerCase": 0
+      },
+      "B_V16_INFORMATIVE": {
+        "pCollision": 0.0357,
+        "ci": [
+          0.0296,
+          0.0429
+        ],
+        "pSecondary": 0.018,
+        "impactP50": 26.7,
+        "impactP95": 50.8,
+        "coverage": 0,
+        "latencyP50": null,
+        "latencyP95": null,
+        "leadP50": null,
+        "falseAlarmRate": 0,
+        "lateShown": 0,
+        "lateSuppressed": 0,
+        "confirmedDisplayAck": 0,
+        "messagesPerCase": 0
+      },
+      "C_AUTHORIZED_ROAD_CHANNEL": {
+        "pCollision": 0.0287,
+        "ci": [
+          0.0233,
+          0.0353
+        ],
+        "pSecondary": 0.015,
+        "impactP50": 26.9,
+        "impactP95": 50.9,
+        "coverage": 0.201,
+        "latencyP50": 61.8,
+        "latencyP95": 235.9,
+        "leadP50": 60.2,
+        "falseAlarmRate": 0,
+        "lateShown": 1,
+        "lateSuppressed": 0,
+        "confirmedDisplayAck": 0,
+        "messagesPerCase": 0.305
+      },
+      "D_SENDA_VERIFIED": {
+        "pCollision": 0.0267,
+        "ci": [
+          0.0215,
+          0.0331
+        ],
+        "pSecondary": 0.014,
+        "impactP50": 26.9,
+        "impactP95": 50.9,
+        "coverage": 0.2433,
+        "latencyP50": 43.3,
+        "latencyP95": 213.1,
+        "leadP50": 60.2,
+        "falseAlarmRate": 0,
+        "lateShown": 0,
+        "lateSuppressed": 1,
+        "confirmedDisplayAck": 0,
+        "messagesPerCase": 0.406
+      },
+      "E_SENDA_DEGRADED": {
+        "pCollision": 0.0303,
+        "ci": [
+          0.0248,
+          0.0371
+        ],
+        "pSecondary": 0.0157,
+        "impactP50": 26.9,
+        "impactP95": 50.9,
+        "coverage": 0.118,
+        "latencyP50": 180.5,
+        "latencyP95": 996.7,
+        "leadP50": 60.3,
+        "falseAlarmRate": 0.049,
+        "lateShown": 0,
+        "lateSuppressed": 2,
+        "confirmedDisplayAck": 0,
+        "messagesPerCase": 0.315
+      }
+    },
+    "visibility": {
+      "25": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.744,
+          "ci": [
+            0.7281,
+            0.7593
+          ],
+          "pSecondary": 0.639,
+          "impactP50": 50,
+          "impactP95": 73.6,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "B_V16_INFORMATIVE": {
+          "pCollision": 0.744,
+          "ci": [
+            0.7281,
+            0.7593
+          ],
+          "pSecondary": 0.639,
+          "impactP50": 50,
+          "impactP95": 73.6,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "C_AUTHORIZED_ROAD_CHANNEL": {
+          "pCollision": 0.7147,
+          "ci": [
+            0.6982,
+            0.7305
+          ],
+          "pSecondary": 0.582,
+          "impactP50": 48.1,
+          "impactP95": 72.4,
+          "coverage": 0.201,
+          "latencyP50": 61.8,
+          "latencyP95": 235.9,
+          "leadP50": 60.2,
+          "falseAlarmRate": 0,
+          "lateShown": 1,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.305
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.706,
+          "ci": [
+            0.6894,
+            0.722
+          ],
+          "pSecondary": 0.567,
+          "impactP50": 47.6,
+          "impactP95": 72.3,
+          "coverage": 0.2433,
+          "latencyP50": 43.3,
+          "latencyP95": 213.1,
+          "leadP50": 60.2,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 1,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.406
+        },
+        "E_SENDA_DEGRADED": {
+          "pCollision": 0.7273,
+          "ci": [
+            0.7111,
+            0.743
+          ],
+          "pSecondary": 0.606,
+          "impactP50": 48.7,
+          "impactP95": 72.7,
+          "coverage": 0.118,
+          "latencyP50": 180.5,
+          "latencyP95": 996.7,
+          "leadP50": 60.3,
+          "falseAlarmRate": 0.049,
+          "lateShown": 0,
+          "lateSuppressed": 2,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.315
+        }
+      },
+      "40": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.1537,
+          "ci": [
+            0.1412,
+            0.167
+          ],
+          "pSecondary": 0.0787,
+          "impactP50": 33.2,
+          "impactP95": 64.9,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "B_V16_INFORMATIVE": {
+          "pCollision": 0.1537,
+          "ci": [
+            0.1412,
+            0.167
+          ],
+          "pSecondary": 0.0787,
+          "impactP50": 33.2,
+          "impactP95": 64.9,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "C_AUTHORIZED_ROAD_CHANNEL": {
+          "pCollision": 0.1273,
+          "ci": [
+            0.1159,
+            0.1397
+          ],
+          "pSecondary": 0.0633,
+          "impactP50": 33.1,
+          "impactP95": 62.6,
+          "coverage": 0.201,
+          "latencyP50": 61.8,
+          "latencyP95": 235.9,
+          "leadP50": 60.2,
+          "falseAlarmRate": 0,
+          "lateShown": 1,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.305
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.1217,
+          "ci": [
+            0.1105,
+            0.1339
+          ],
+          "pSecondary": 0.06,
+          "impactP50": 33.1,
+          "impactP95": 62.6,
+          "coverage": 0.2433,
+          "latencyP50": 43.3,
+          "latencyP95": 213.1,
+          "leadP50": 60.2,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 1,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.406
+        },
+        "E_SENDA_DEGRADED": {
+          "pCollision": 0.1353,
+          "ci": [
+            0.1236,
+            0.148
+          ],
+          "pSecondary": 0.0683,
+          "impactP50": 33.2,
+          "impactP95": 62.6,
+          "coverage": 0.118,
+          "latencyP50": 180.5,
+          "latencyP95": 996.7,
+          "leadP50": 60.3,
+          "falseAlarmRate": 0.049,
+          "lateShown": 0,
+          "lateSuppressed": 2,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.315
+        }
+      },
+      "60": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.0357,
+          "ci": [
+            0.0296,
+            0.0429
+          ],
+          "pSecondary": 0.018,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "B_V16_INFORMATIVE": {
+          "pCollision": 0.0357,
+          "ci": [
+            0.0296,
+            0.0429
+          ],
+          "pSecondary": 0.018,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "C_AUTHORIZED_ROAD_CHANNEL": {
+          "pCollision": 0.0287,
+          "ci": [
+            0.0233,
+            0.0353
+          ],
+          "pSecondary": 0.015,
+          "impactP50": 26.9,
+          "impactP95": 50.9,
+          "coverage": 0.201,
+          "latencyP50": 61.8,
+          "latencyP95": 235.9,
+          "leadP50": 60.2,
+          "falseAlarmRate": 0,
+          "lateShown": 1,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.305
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.0267,
+          "ci": [
+            0.0215,
+            0.0331
+          ],
+          "pSecondary": 0.014,
+          "impactP50": 26.9,
+          "impactP95": 50.9,
+          "coverage": 0.2433,
+          "latencyP50": 43.3,
+          "latencyP95": 213.1,
+          "leadP50": 60.2,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 1,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.406
+        },
+        "E_SENDA_DEGRADED": {
+          "pCollision": 0.0303,
+          "ci": [
+            0.0248,
+            0.0371
+          ],
+          "pSecondary": 0.0157,
+          "impactP50": 26.9,
+          "impactP95": 50.9,
+          "coverage": 0.118,
+          "latencyP50": 180.5,
+          "latencyP95": 996.7,
+          "leadP50": 60.3,
+          "falseAlarmRate": 0.049,
+          "lateShown": 0,
+          "lateSuppressed": 2,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.315
+        }
+      },
+      "100": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.0357,
+          "ci": [
+            0.0296,
+            0.0429
+          ],
+          "pSecondary": 0.018,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "B_V16_INFORMATIVE": {
+          "pCollision": 0.0357,
+          "ci": [
+            0.0296,
+            0.0429
+          ],
+          "pSecondary": 0.018,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "C_AUTHORIZED_ROAD_CHANNEL": {
+          "pCollision": 0.0287,
+          "ci": [
+            0.0233,
+            0.0353
+          ],
+          "pSecondary": 0.015,
+          "impactP50": 26.9,
+          "impactP95": 50.9,
+          "coverage": 0.201,
+          "latencyP50": 61.8,
+          "latencyP95": 235.9,
+          "leadP50": 60.2,
+          "falseAlarmRate": 0,
+          "lateShown": 1,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.305
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.0267,
+          "ci": [
+            0.0215,
+            0.0331
+          ],
+          "pSecondary": 0.014,
+          "impactP50": 26.9,
+          "impactP95": 50.9,
+          "coverage": 0.2433,
+          "latencyP50": 43.3,
+          "latencyP95": 213.1,
+          "leadP50": 60.2,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 1,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.406
+        },
+        "E_SENDA_DEGRADED": {
+          "pCollision": 0.0303,
+          "ci": [
+            0.0248,
+            0.0371
+          ],
+          "pSecondary": 0.0157,
+          "impactP50": 26.9,
+          "impactP95": 50.9,
+          "coverage": 0.118,
+          "latencyP50": 180.5,
+          "latencyP95": 996.7,
+          "leadP50": 60.3,
+          "falseAlarmRate": 0.049,
+          "lateShown": 0,
+          "lateSuppressed": 2,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.315
+        }
+      },
+      "250": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.0357,
+          "ci": [
+            0.0296,
+            0.0429
+          ],
+          "pSecondary": 0.018,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "B_V16_INFORMATIVE": {
+          "pCollision": 0.0357,
+          "ci": [
+            0.0296,
+            0.0429
+          ],
+          "pSecondary": 0.018,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "C_AUTHORIZED_ROAD_CHANNEL": {
+          "pCollision": 0.0287,
+          "ci": [
+            0.0233,
+            0.0353
+          ],
+          "pSecondary": 0.015,
+          "impactP50": 26.9,
+          "impactP95": 50.9,
+          "coverage": 0.201,
+          "latencyP50": 61.8,
+          "latencyP95": 235.9,
+          "leadP50": 60.2,
+          "falseAlarmRate": 0,
+          "lateShown": 1,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.305
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.0267,
+          "ci": [
+            0.0215,
+            0.0331
+          ],
+          "pSecondary": 0.014,
+          "impactP50": 26.9,
+          "impactP95": 50.9,
+          "coverage": 0.2433,
+          "latencyP50": 43.3,
+          "latencyP95": 213.1,
+          "leadP50": 60.2,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 1,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.406
+        },
+        "E_SENDA_DEGRADED": {
+          "pCollision": 0.0303,
+          "ci": [
+            0.0248,
+            0.0371
+          ],
+          "pSecondary": 0.0157,
+          "impactP50": 26.9,
+          "impactP95": 50.9,
+          "coverage": 0.118,
+          "latencyP50": 180.5,
+          "latencyP95": 996.7,
+          "leadP50": 60.3,
+          "falseAlarmRate": 0.049,
+          "lateShown": 0,
+          "lateSuppressed": 2,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.315
+        }
+      }
+    },
+    "headway": {
+      "1": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.07,
+          "ci": [
+            0.0614,
+            0.0797
+          ],
+          "pSecondary": 0.035,
+          "impactP50": 22.4,
+          "impactP95": 47.1,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.0547,
+          "ci": [
+            0.0471,
+            0.0634
+          ],
+          "pSecondary": 0.026,
+          "impactP50": 21.2,
+          "impactP95": 45.7,
+          "coverage": 0.2433,
+          "latencyP50": 43.3,
+          "latencyP95": 213.1,
+          "leadP50": 60.2,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 1,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.406
+        }
+      },
+      "2": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.005,
+          "ci": [
+            0.003,
+            0.0082
+          ],
+          "pSecondary": 0.0013,
+          "impactP50": 33.1,
+          "impactP95": 69.6,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.003,
+          "ci": [
+            0.0016,
+            0.0057
+          ],
+          "pSecondary": 0.001,
+          "impactP50": 31.7,
+          "impactP95": 65,
+          "coverage": 0.2433,
+          "latencyP50": 43.3,
+          "latencyP95": 213.1,
+          "leadP50": 60.2,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 1,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.406
+        }
+      },
+      "0.6": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.1893,
+          "ci": [
+            0.1757,
+            0.2037
+          ],
+          "pSecondary": 0.1093,
+          "impactP50": 20.8,
+          "impactP95": 41.5,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.1503,
+          "ci": [
+            0.138,
+            0.1636
+          ],
+          "pSecondary": 0.0853,
+          "impactP50": 20.7,
+          "impactP95": 41.4,
+          "coverage": 0.2433,
+          "latencyP50": 43.3,
+          "latencyP95": 213.1,
+          "leadP50": 60.2,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 1,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.406
+        }
+      },
+      "1.5": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.0227,
+          "ci": [
+            0.0179,
+            0.0286
+          ],
+          "pSecondary": 0.008,
+          "impactP50": 25.2,
+          "impactP95": 52.4,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.0157,
+          "ci": [
+            0.0118,
+            0.0208
+          ],
+          "pSecondary": 0.0047,
+          "impactP50": 24.5,
+          "impactP95": 50.6,
+          "coverage": 0.2433,
+          "latencyP50": 43.3,
+          "latencyP95": 213.1,
+          "leadP50": 60.2,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 1,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.406
+        }
+      }
+    },
+    "adoption": {
+      "0": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.0357,
+          "ci": [
+            0.0296,
+            0.0429
+          ],
+          "pSecondary": 0.018,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.0357,
+          "ci": [
+            0.0296,
+            0.0429
+          ],
+          "pSecondary": 0.018,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        }
+      },
+      "0.01": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.0357,
+          "ci": [
+            0.0296,
+            0.0429
+          ],
+          "pSecondary": 0.018,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.0357,
+          "ci": [
+            0.0296,
+            0.0429
+          ],
+          "pSecondary": 0.018,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0.007,
+          "latencyP50": 7.4,
+          "latencyP95": 15.7,
+          "leadP50": 61.5,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.01
+        }
+      },
+      "0.05": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.0357,
+          "ci": [
+            0.0296,
+            0.0429
+          ],
+          "pSecondary": 0.018,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.0347,
+          "ci": [
+            0.0287,
+            0.0418
+          ],
+          "pSecondary": 0.0173,
+          "impactP50": 26.7,
+          "impactP95": 49.9,
+          "coverage": 0.0313,
+          "latencyP50": 7.9,
+          "latencyP95": 20.9,
+          "leadP50": 60.8,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.048
+        }
+      },
+      "0.1": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.0357,
+          "ci": [
+            0.0296,
+            0.0429
+          ],
+          "pSecondary": 0.018,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.0333,
+          "ci": [
+            0.0275,
+            0.0404
+          ],
+          "pSecondary": 0.0167,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0.0647,
+          "latencyP50": 7.9,
+          "latencyP95": 21.8,
+          "leadP50": 60.8,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.101
+        }
+      },
+      "0.3": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.0357,
+          "ci": [
+            0.0296,
+            0.0429
+          ],
+          "pSecondary": 0.018,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.0303,
+          "ci": [
+            0.0248,
+            0.0371
+          ],
+          "pSecondary": 0.0153,
+          "impactP50": 26.7,
+          "impactP95": 48.3,
+          "coverage": 0.1937,
+          "latencyP50": 8,
+          "latencyP95": 21,
+          "leadP50": 60.4,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.306
+        }
+      },
+      "0.6": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.0357,
+          "ci": [
+            0.0296,
+            0.0429
+          ],
+          "pSecondary": 0.018,
+          "impactP50": 26.7,
+          "impactP95": 50.8,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "D_SENDA_VERIFIED": {
+          "pCollision": 0.024,
+          "ci": [
+            0.0191,
+            0.0301
+          ],
+          "pSecondary": 0.013,
+          "impactP50": 28.2,
+          "impactP95": 49.9,
+          "coverage": 0.3827,
+          "latencyP50": 7.9,
+          "latencyP95": 20.8,
+          "leadP50": 60.4,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.61
+        }
+      }
+    },
+    "latency": {
+      "5": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.032,
+          "ci": [
+            0.0263,
+            0.0389
+          ],
+          "pSecondary": 0.0127,
+          "impactP50": 22.7,
+          "impactP95": 46,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "C_AUTHORIZED_ROAD_CHANNEL": {
+          "pCollision": 0.026,
+          "ci": [
+            0.0209,
+            0.0323
+          ],
+          "pSecondary": 0.0107,
+          "impactP50": 21.7,
+          "impactP95": 46,
+          "coverage": 0.2067,
+          "latencyP50": 5.2,
+          "latencyP95": 19,
+          "leadP50": 59.9,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.303
+        }
+      },
+      "30": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.032,
+          "ci": [
+            0.0263,
+            0.0389
+          ],
+          "pSecondary": 0.0127,
+          "impactP50": 22.7,
+          "impactP95": 46,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "C_AUTHORIZED_ROAD_CHANNEL": {
+          "pCollision": 0.027,
+          "ci": [
+            0.0218,
+            0.0334
+          ],
+          "pSecondary": 0.0107,
+          "impactP50": 21.1,
+          "impactP95": 43.4,
+          "coverage": 0.1957,
+          "latencyP50": 31.2,
+          "latencyP95": 114,
+          "leadP50": 58.7,
+          "falseAlarmRate": 0,
+          "lateShown": 6,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.303
+        }
+      },
+      "60": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.032,
+          "ci": [
+            0.0263,
+            0.0389
+          ],
+          "pSecondary": 0.0127,
+          "impactP50": 22.7,
+          "impactP95": 46,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "C_AUTHORIZED_ROAD_CHANNEL": {
+          "pCollision": 0.0277,
+          "ci": [
+            0.0224,
+            0.0342
+          ],
+          "pSecondary": 0.0113,
+          "impactP50": 21.7,
+          "impactP95": 43.4,
+          "coverage": 0.1587,
+          "latencyP50": 62.5,
+          "latencyP95": 228.1,
+          "leadP50": 56.8,
+          "falseAlarmRate": 0,
+          "lateShown": 15,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.303
+        }
+      },
+      "120": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.032,
+          "ci": [
+            0.0263,
+            0.0389
+          ],
+          "pSecondary": 0.0127,
+          "impactP50": 22.7,
+          "impactP95": 46,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "C_AUTHORIZED_ROAD_CHANNEL": {
+          "pCollision": 0.0293,
+          "ci": [
+            0.0239,
+            0.036
+          ],
+          "pSecondary": 0.0117,
+          "impactP50": 21.7,
+          "impactP95": 43.4,
+          "coverage": 0.0947,
+          "latencyP50": 125,
+          "latencyP95": 456.1,
+          "leadP50": 51,
+          "falseAlarmRate": 0,
+          "lateShown": 20,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.303
+        }
+      },
+      "300": {
+        "A_NO_DIGITAL": {
+          "pCollision": 0.032,
+          "ci": [
+            0.0263,
+            0.0389
+          ],
+          "pSecondary": 0.0127,
+          "impactP50": 22.7,
+          "impactP95": 46,
+          "coverage": 0,
+          "latencyP50": null,
+          "latencyP95": null,
+          "leadP50": null,
+          "falseAlarmRate": 0,
+          "lateShown": 0,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0
+        },
+        "C_AUTHORIZED_ROAD_CHANNEL": {
+          "pCollision": 0.0317,
+          "ci": [
+            0.026,
+            0.0386
+          ],
+          "pSecondary": 0.0127,
+          "impactP50": 21.7,
+          "impactP95": 44.2,
+          "coverage": 0.0233,
+          "latencyP50": 312.5,
+          "latencyP95": 1140.4,
+          "leadP50": 34.6,
+          "falseAlarmRate": 0,
+          "lateShown": 10,
+          "lateSuppressed": 0,
+          "confirmedDisplayAck": 0,
+          "messagesPerCase": 0.303
+        }
+      }
+    },
+    "negativeControls": {
+      "NC1_zero_adoption_equals_A": {
+        "A": 0.0363,
+        "C": 0.0363,
+        "D": 0.0363,
+        "pass": true
+      },
+      "NC2_placebo_no_effect": {
+        "A": 0.0387,
+        "D": 0.0387,
+        "pass": true
+      },
+      "NC3_latency_beyond_event_no_benefit": {
+        "A": 0.0333,
+        "C": 0.0333,
+        "D": 0.0333,
+        "pass": true
+      },
+      "NC4_late_warning_harm": {
+        "A": 0.0363,
+        "C_noPolicy": 0.112,
+        "D_policy": 0.0363,
+        "lateShownC": 2300,
+        "lateSuppressedD": 2909,
+        "harmObserved": true,
+        "policyAvoidsHarm": true
+      }
+    },
+    "H_ROAD_2_double_counting": {
+      "episodes": 2000,
+      "naive": {
+        "falseCorroborationRate": 1,
+        "sensitivity": 1
+      },
+      "causal": {
+        "falseCorroborationRate": 0,
+        "sensitivity": 0.2092
+      },
+      "note": "Episodios sintéticos con proporciones HIPOTÉTICAS; mide el efecto del doble conteo, no la tasa real de falsas alarmas."
+    },
+    "H_ROAD_3_partial_failures": {
+      "rows": [
+        {
+          "faults": "none",
+          "finalState": "ON_SCENE_REPORTED",
+          "reference": "TOW-A-SIM-1",
+          "flags": [],
+          "applied": 3,
+          "delayAlerts": [],
+          "naiveWouldClaimDispatched": true,
+          "contractClaimsOnScene": true
+        },
+        {
+          "faults": "timeout",
+          "finalState": "FAILED",
+          "reference": null,
+          "flags": [
+            "TIMEOUT"
+          ],
+          "applied": 0,
+          "delayAlerts": [],
+          "naiveWouldClaimDispatched": false,
+          "contractClaimsOnScene": false
+        },
+        {
+          "faults": "http5xx",
+          "finalState": "FAILED",
+          "reference": null,
+          "flags": [
+            "TRANSPORTE_503"
+          ],
+          "applied": 0,
+          "delayAlerts": [],
+          "naiveWouldClaimDispatched": false,
+          "contractClaimsOnScene": false
+        },
+        {
+          "faults": "ackWithoutRef",
+          "finalState": "TRANSPORT_ACCEPTED",
+          "reference": null,
+          "flags": [
+            "ACK_SIN_REFERENCIA",
+            "DELAYED"
+          ],
+          "applied": 0,
+          "delayAlerts": [
+            "SIN_ACK_DE_PROVEEDOR"
+          ],
+          "naiveWouldClaimDispatched": true,
+          "contractClaimsOnScene": false
+        },
+        {
+          "faults": "outOfOrder",
+          "finalState": "ON_SCENE_REPORTED",
+          "reference": "TOW-A-SIM-1",
+          "flags": [
+            "COMPLETADO_SIN_LLEGADA"
+          ],
+          "applied": 3,
+          "delayAlerts": [],
+          "naiveWouldClaimDispatched": true,
+          "contractClaimsOnScene": true
+        },
+        {
+          "faults": "duplicateEvents",
+          "finalState": "ON_SCENE_REPORTED",
+          "reference": "TOW-A-SIM-1",
+          "flags": [],
+          "applied": 3,
+          "delayAlerts": [],
+          "naiveWouldClaimDispatched": true,
+          "contractClaimsOnScene": true
+        },
+        {
+          "faults": "neverArrives",
+          "finalState": "PARTNER_ASSIGNED",
+          "reference": "TOW-A-SIM-1",
+          "flags": [
+            "DELAYED"
+          ],
+          "applied": 1,
+          "delayAlerts": [
+            "SLA_SUPERADO"
+          ],
+          "naiveWouldClaimDispatched": true,
+          "contractClaimsOnScene": false
+        }
+      ],
+      "note": "Banco de pruebas contractual (simulado). Mide si el orquestador afirma más de lo que el proveedor confirmó."
+    }
+  }
+}
