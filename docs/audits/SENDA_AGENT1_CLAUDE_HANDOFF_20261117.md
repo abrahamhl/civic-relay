@@ -39,7 +39,7 @@ python packages/senda/scripts/verify-dependence-bounds.py
 
 ## P0 sin cerrar y ejecución recomendada
 1. **CI exacto de HEAD** de PR #42, ver fallos por job/step, arreglar solo en rama draft. Verificar pruebas nuevas H12/H13 y paridad web.
-2. **Seguridad/identidad:** `assessIncident` sigue aceptando etiquetas `official` de entrada sin verificar cadena de confianza institucional. El CAP ciudadano `Actual` está bloqueado, pero todo permiso de aviso público necesita adaptador de autoridad real y pruebas adversariales.
+2. **Seguridad/identidad:** **CORREGIDO EN LA RAMA #42 (pendiente de merge):** `assessIncident` ya no permite que etiquetas `official` y sensores externos sin autenticar aumenten/reduzcan el score ni conviertan incidentes en oficiales; el CAP ciudadano, ferroviario y el de simulación de agencia se limitan a `Exercise/Restricted/Unknown`. **Sigue faltando** el adaptador de confianza institucional real (claves ancladas fuera de banda, autorización, revocación, retención y auditoría independiente), por lo que no puede difundirse ningún aviso real desde estos módulos.
 3. **Hardware y radios:** dos móviles Android + dos radios LoRa EU868 propios/autorizados; en campo medir PER/latencia p50-p95/consumo/rutas caídas, consentimientos, BLE Nearby, recuperaciones tras SIGKILL y reinicios, relojes GNSS/UTC y duplicados. Acordar escenarios seguros con voluntarios sin enviar llamadas oficiales de emergencia.
 4. **SRLG real:** conseguir inventario verificable de alimentación, backhaul, torre y gateways autorizados; contrastar contra fallos históricos independientes. Nadie puede inferir que dos operadores/radios sean física o estadísticamente independientes por el nombre.
 5. **Calibración H12:** muestrear crisis por *evento causal* independiente; etiquetar UNKNOWN, origen, versiones, licencias, caducidad, holdout por zona/temporada y escenarios omitidos. Validar cobertura de intervalos y Brier, comparar baseline FIFO/contact graph/Claude delivery-assurance vs DRO/SRLG sin dar más aire, energía ni infraestructura a un competidor. Publicar resultados negativos.
@@ -59,3 +59,22 @@ Diseñar y **probar** una capa de asesoramiento que combine:
 Ningún eslabón permite deducir acceso físico, autoridad pública o garantía total. La originalidad potencial requiere comparación sistemática con estado del arte, no bautizar como teorema nuevo una desigualdad conocida.
 
 **No arrancar Agente 2 ni fusionar a `master` mientras Agente 1 permanezca bloqueado por hardware/autorización.**
+
+
+## Suplemento H14 / CAP — cambios de continuidad para Claude
+
+### H14: optional stopping con límites de confianza uniformes en el tiempo
+- Implementado en \`packages/senda/src/anytime-scenario-confidence.mjs\` y prueba \`anytime-scenario-confidence.test.mjs\`, más copia exacta del módulo para navegador.
+- Con m etiquetas y n episodios *causales independientes* IID, usa el presupuesto telescópico \`alpha_n=alpha/[n(n+1)]\` y semianchura \`sqrt(ln(2m*n(n+1)/alpha)/(2n))\`. La validez estadística conjunta para todos los n procede de Hoeffding + union bound. La prueba de 300 trayectorias de laboratorio NO valida el muestreo real.
+- Ref: Howard/Ramdas/McAuliffe/Sekhon, DOI 10.1214/20-AOS1991 (métodos de confidence sequence más sofisticados). No reclamar nuevo teorema.
+
+### P0 institucional: CAP real desde datos de laboratorio bloqueado
+- \`packages/senda/src/hazard-reports.mjs\`: \`official:[]\` y \`sensors:[]\` son notas contextuales, sin alterar odds de un incidente, estado \`OFFICIAL\` ni permiso de publicación. La firma Ed25519 del ciudadano no demuestra una identidad humana independiente. Reportes ciudadanos CAP solo \`Exercise\`, \`Restricted\`, \`certainty Unknown\`.
+- \`packages/senda/src/interop.mjs\`: \`toCap\` usa por defecto \`Exercise + Restricted\`, genera \`<restriction>\` si el scope es Restricted (CAP 1.2), y el adaptador ferroviario nunca marca \`Actual / Observed\`.
+- \`packages/senda/src/incident-ops.mjs\`: \`situationReport(...,{exercise:false})\` ya no eleva una credencial autogenerada de \`setupAgency\` a CAP real; falla cerrado. Los ejercicios producen certeza \`Unknown\`.
+- Tests reforzados: \`untrusted-official-evidence-gate.test.mjs\` y regresiones \`citizen-report-trust-gate.test.mjs\`, \`hazard-reports.test.mjs\`, \`hub-multibearer.test.mjs\`. El primer CI de regresión detectó pruebas heredadas que EXPECTABAN \`OFFICIAL\` o \`Actual\`; las expectativas se corrigieron para requerir confinamiento de simulación.
+- Motor matemático H11-H14 y CAP conservan las versiones \`packages/senda/src\` y \`investor-next/public/senda/core\` byte idénticas. No modificar una sin la otra.
+- **No confundir pruebas sintéticas ni XML CAP correcto con credenciales emitidas por Protección Civil, un certificado CAP, una integración real con 112, radiocomunicaciones propias o un producto listo para emergencias.**
+
+### Próxima ejecución
+Comprobar CI de **HEAD exacto del PR #42** y revisar pruebas fallidas con logs. No asumir verde porque la ejecución sobre \`85ab8025...\` pasara: H14, los cambios CAP y sus pruebas son posteriores. Fusionar dependencia #32→#39→#42 únicamente con revisión humana de licencias/autoridad y ensayos físicos aprobados.
