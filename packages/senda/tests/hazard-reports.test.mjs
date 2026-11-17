@@ -35,7 +35,10 @@ test('escalado: rumor con 1 persona; corroborado con varias; reconocimiento con 
   const many = assessIncident(mk(4, { measurement: { rise: { cmPerMin: 1.1, stdErr: 0.1 } } }));
   assert.equal(many.state, 'RECON'); assert.equal(many.canPublicWarn, false, 'sin organismo no hay aviso público');
   const offc = assessIncident(mk(2), { official: [{ family: 'WATER', source: 'SAIH Júcar', ...off(800), at: T0 }] });
-  assert.equal(offc.state, 'OFFICIAL'); assert.equal(offc.canPublicWarn, true);
+  assert.equal(offc.state, 'OFFICIAL'); // matched public source, NOT authenticated alert authority
+  assert.equal(offc.canPublicWarn, false);
+  assert.equal(offc.publicAlertAuthorityVerified, false);
+  assert.equal(offc.official.authorityVerified, false);
 });
 
 test('el mismo móvil repitiendo 20 veces no vale como 20 personas; un aforo oficial que no sube resta', () => {

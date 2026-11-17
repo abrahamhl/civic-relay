@@ -1,0 +1,29 @@
+name: SENDA independent citizen-report & institutional trust gate
+on:
+  push:
+    branches:
+      - audit/senda-pr32-safety-gates-20261117
+  pull_request:
+    paths:
+      - 'packages/senda/src/hazard-reports.mjs'
+      - 'packages/senda/tests/citizen-report-trust-gate.test.mjs'
+      - '.github/workflows/senda-trust-review-ci.yml'
+permissions:
+  contents: read
+jobs:
+  trust-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run complete SENDA core and adversarial report trust regression
+        run: |
+          node --test packages/senda/tests/*.test.mjs
+          node --test packages/senda/tests-adversarial/*.test.mjs
+      - name: Check research source syntax
+        run: node --check packages/senda/src/hazard-reports.mjs
