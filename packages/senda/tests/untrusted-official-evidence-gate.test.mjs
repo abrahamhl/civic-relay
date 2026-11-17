@@ -65,3 +65,33 @@ test('P0: a future or stale alleged official observation cannot enter the contex
     assert.equal(a.canPublicWarn,false);
   }
 });
+
+
+import {toCap,railIncidentToCap} from '../src/interop.mjs';
+import {situationReport} from '../src/incident-ops.mjs';
+
+test('P0: low-level CAP serializer defaults to restricted exercise and required restriction element',()=>{
+  const xml=toCap({identifier:'LAB-1',sender:'test@example.invalid',sent:T,info:{
+    category:'Rescue',event:'Test-only',urgency:'Unknown',severity:'Unknown',certainty:'Unknown'
+  }});
+  assert.match(xml,/<status>Exercise<\/status>/);
+  assert.match(xml,/<scope>Restricted<\/scope>/);
+  assert.match(xml,/<restriction>Exercise participants only;/);
+  assert.doesNotMatch(xml,/<scope>Public<\/scope>/);
+  const custom=toCap({identifier:'LAB-2',sender:'test@example.invalid',sent:T,
+    status:'Exercise',scope:'Restricted',restriction:'Test <only>',
+    info:{category:'Rescue',event:'Test-only',urgency:'Unknown',severity:'Unknown',certainty:'Unknown'}});
+  assert.match(custom,/<restriction>Test &lt;only&gt;<\/restriction>/);
+});
+test('P0: experimental rail incident never becomes CAP Actual / Observed by omission',()=>{
+  const xml=railIncidentToCap({site:'TEST-SYNTHETIC',center:pos,
+    counts:{TRAPPED:1,INJURED_SERIOUS:2,NO_RESPONSE:5}},{now:T});
+  assert.match(xml,/<status>Exercise<\/status>/);
+  assert.match(xml,/<certainty>Unknown<\/certainty>/);
+  assert.match(xml,/<restriction>Exercise participants only;/);
+  assert.doesNotMatch(xml,/<certainty>Observed<\/certainty>/);
+});
+test('P0: self-issued incident-ops exercise credential cannot request an operational CAP',async()=>{
+  await assert.rejects(situationReport({}, {}, {}, {now:T,exercise:false}),/CAP Actual bloqueado/);
+  await assert.rejects(situationReport({}, {}, {}, {now:T,exercise:'false'}),/CAP Actual bloqueado/);
+});
