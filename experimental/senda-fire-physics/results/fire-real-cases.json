@@ -1,0 +1,734 @@
+{
+  "schema": "senda-fire-real-cases/1",
+  "hypothesis": "H-FIRE-B",
+  "generatedBy": "experimental/senda-fire-physics/experiments/run-fire-real-cases.mjs",
+  "dataset": {
+    "path": "investor-next/public/senda/data/referencias/goes_casos.json",
+    "sha256": "66f23ceaf39d3194b48745cac9a76203e43ca52d2b016ce7e42e725359e17f56",
+    "source": "NOAA GOES-R ABI L2 Fire Detection (FDCC) y NOAA HRRR 3 km (AWS Open Data, dominio público). Descargado por scripts/datos-reales/goes_hrrr_incendio.py"
+  },
+  "protocol": {
+    "horizonH": 3,
+    "gridDxM": 1000,
+    "hotspotRadiusKm": 1,
+    "t0Step": "every horizon, from first detection + 1 h",
+    "causalGate": "HRRR sample used only if validUTC + 60 min <= t0 (assumed latency)",
+    "target": "cumulative GOES hotspot footprint at t0+H (NOT a mapped perimeter)",
+    "comparators": [
+      "LEVEL_SET_UPWIND_HRRR_WIND",
+      "ISOTROPIC_AREA_MATCHED (same predicted area as level-set)",
+      "PERSISTENCE"
+    ],
+    "primaryMetric": "growth CSI on newly observed cells (directional skill, area held equal)",
+    "statisticalUnit": "incident (origins within an incident are NOT independent)",
+    "bootstrap": "10,000 percentile resamples over incident-level means, seed 20261117"
+  },
+  "limitations": [
+    "No DEM / fuel map in archive for US cases: flat terrain + uniform SHRUB fuel (code 2). Only wind-directional skill is tested.",
+    "GOES ABI pixels ~2 km+ ; hotspots suffer omission under smoke/cloud and commission; footprint != perimeter.",
+    "HRRR is a single point time series per incident (no spatial field).",
+    "HRRR availability latency is an assumption (60 min), not a logged publication time.",
+    "Rate of spread is uncalibrated (rosMult=1); area-matched isotropic baseline isolates direction, not magnitude.",
+    "n=6 independent incidents < 10 -> EXPLORATORY only per preregister; no confirmatory claim."
+  ],
+  "perIncident": {
+    "camp": {
+      "role": "DEVELOPMENT_DIAGNOSTIC_ONLY",
+      "satellite": "noaa-goes16",
+      "grid": {
+        "w": 51,
+        "h": 47,
+        "dxM": 1000
+      },
+      "origins": 2,
+      "scored": 2,
+      "abstained": 0,
+      "excludedNoGrowth": 0,
+      "meanGrowthCsi": {
+        "levelSet": 0.04891443167305236,
+        "isotropicAreaMatched": 0.014782054346959917,
+        "persistence": 0
+      },
+      "meanIou": {
+        "levelSet": 0.4248945147679325,
+        "isotropicAreaMatched": 0.3963048848112114,
+        "persistence": 0.5
+      },
+      "originsDetail": [
+        {
+          "t0": "2018-11-08T15:57:18.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2018-11-08T14:00Z",
+          "hrrrAvailableAt": "2018-11-08T15:00:00.000Z",
+          "observedNewCells": 125,
+          "levelSetNewCells": 17,
+          "iou": {
+            "levelSet": 0.2,
+            "isotropicAreaMatched": 0.1566265060240964,
+            "persistence": 0.16666666666666666
+          },
+          "growthCsi": {
+            "levelSet": 0.05185185185185185,
+            "isotropicAreaMatched": 0.0070921985815602835,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2018-11-08T18:57:18.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2018-11-08T17:00Z",
+          "hrrrAvailableAt": "2018-11-08T18:00:00.000Z",
+          "observedNewCells": 30,
+          "levelSetNewCells": 61,
+          "iou": {
+            "levelSet": 0.6497890295358649,
+            "isotropicAreaMatched": 0.6359832635983264,
+            "persistence": 0.8333333333333334
+          },
+          "growthCsi": {
+            "levelSet": 0.04597701149425287,
+            "isotropicAreaMatched": 0.02247191011235955,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        }
+      ]
+    },
+    "palisades": {
+      "role": "EXPLORATORY_EXTERNAL",
+      "satellite": "noaa-goes18",
+      "grid": {
+        "w": 43,
+        "h": 33,
+        "dxM": 1000
+      },
+      "origins": 5,
+      "scored": 5,
+      "abstained": 0,
+      "excludedNoGrowth": 0,
+      "meanGrowthCsi": {
+        "levelSet": 0.016203703703703703,
+        "isotropicAreaMatched": 0.029349495392716102,
+        "persistence": 0
+      },
+      "meanIou": {
+        "levelSet": 0.5924564400267724,
+        "isotropicAreaMatched": 0.6011820861724613,
+        "persistence": 0.8158198140113033
+      },
+      "originsDetail": [
+        {
+          "t0": "2025-01-07T19:31:17.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2025-01-07T18:00Z",
+          "hrrrAvailableAt": "2025-01-07T19:00:00.000Z",
+          "observedNewCells": 4,
+          "levelSetNewCells": 15,
+          "iou": {
+            "levelSet": 0.6346153846153846,
+            "isotropicAreaMatched": 0.6346153846153846,
+            "persistence": 0.8918918918918919
+          },
+          "growthCsi": {
+            "levelSet": 0,
+            "isotropicAreaMatched": 0,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2025-01-07T22:31:17.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2025-01-07T21:00Z",
+          "hrrrAvailableAt": "2025-01-07T22:00:00.000Z",
+          "observedNewCells": 18,
+          "levelSetNewCells": 16,
+          "iou": {
+            "levelSet": 0.5652173913043478,
+            "isotropicAreaMatched": 0.5652173913043478,
+            "persistence": 0.6727272727272727
+          },
+          "growthCsi": {
+            "levelSet": 0.0625,
+            "isotropicAreaMatched": 0.0625,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2025-01-08T01:31:17.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2025-01-08T00:00Z",
+          "hrrrAvailableAt": "2025-01-08T01:00:00.000Z",
+          "observedNewCells": 17,
+          "levelSetNewCells": 28,
+          "iou": {
+            "levelSet": 0.55,
+            "isotropicAreaMatched": 0.5816326530612245,
+            "persistence": 0.7638888888888888
+          },
+          "growthCsi": {
+            "levelSet": 0,
+            "isotropicAreaMatched": 0.046511627906976744,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2025-01-08T04:31:17.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2025-01-08T03:00Z",
+          "hrrrAvailableAt": "2025-01-08T04:00:00.000Z",
+          "observedNewCells": 9,
+          "levelSetNewCells": 38,
+          "iou": {
+            "levelSet": 0.6050420168067226,
+            "isotropicAreaMatched": 0.6050420168067226,
+            "persistence": 0.8888888888888888
+          },
+          "growthCsi": {
+            "levelSet": 0,
+            "isotropicAreaMatched": 0,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2025-01-08T07:31:17.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2025-01-08T06:00Z",
+          "hrrrAvailableAt": "2025-01-08T07:00:00.000Z",
+          "observedNewCells": 13,
+          "levelSetNewCells": 42,
+          "iou": {
+            "levelSet": 0.6074074074074074,
+            "isotropicAreaMatched": 0.6194029850746269,
+            "persistence": 0.8617021276595744
+          },
+          "growthCsi": {
+            "levelSet": 0.018518518518518517,
+            "isotropicAreaMatched": 0.03773584905660377,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        }
+      ]
+    },
+    "eaton": {
+      "role": "EXPLORATORY_EXTERNAL",
+      "satellite": "noaa-goes18",
+      "grid": {
+        "w": 38,
+        "h": 35,
+        "dxM": 1000
+      },
+      "origins": 3,
+      "scored": 3,
+      "abstained": 0,
+      "excludedNoGrowth": 0,
+      "meanGrowthCsi": {
+        "levelSet": 0.03416666666666667,
+        "isotropicAreaMatched": 0.03,
+        "persistence": 0
+      },
+      "meanIou": {
+        "levelSet": 0.6114633463193542,
+        "isotropicAreaMatched": 0.6123887538238021,
+        "persistence": 0.6980569183576701
+      },
+      "originsDetail": [
+        {
+          "t0": "2025-01-08T03:31:17.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2025-01-08T02:00Z",
+          "hrrrAvailableAt": "2025-01-08T03:00:00.000Z",
+          "observedNewCells": 17,
+          "levelSetNewCells": 9,
+          "iou": {
+            "levelSet": 0.5789473684210527,
+            "isotropicAreaMatched": 0.5789473684210527,
+            "persistence": 0.6530612244897959
+          },
+          "growthCsi": {
+            "levelSet": 0.04,
+            "isotropicAreaMatched": 0.04,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2025-01-08T06:31:17.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2025-01-08T05:00Z",
+          "hrrrAvailableAt": "2025-01-08T06:00:00.000Z",
+          "observedNewCells": 25,
+          "levelSetNewCells": 17,
+          "iou": {
+            "levelSet": 0.5384615384615384,
+            "isotropicAreaMatched": 0.5730337078651685,
+            "persistence": 0.6621621621621622
+          },
+          "growthCsi": {
+            "levelSet": 0,
+            "isotropicAreaMatched": 0.05,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2025-01-08T09:31:17.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2025-01-08T08:00Z",
+          "hrrrAvailableAt": "2025-01-08T09:00:00.000Z",
+          "observedNewCells": 21,
+          "levelSetNewCells": 13,
+          "iou": {
+            "levelSet": 0.7169811320754716,
+            "isotropicAreaMatched": 0.6851851851851852,
+            "persistence": 0.7789473684210526
+          },
+          "growthCsi": {
+            "levelSet": 0.0625,
+            "isotropicAreaMatched": 0,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        }
+      ]
+    },
+    "marshall": {
+      "role": "EXPLORATORY_EXTERNAL",
+      "satellite": "noaa-goes16",
+      "grid": {
+        "w": 34,
+        "h": 31,
+        "dxM": 1000
+      },
+      "origins": 1,
+      "scored": 1,
+      "abstained": 0,
+      "excludedNoGrowth": 0,
+      "meanGrowthCsi": {
+        "levelSet": 0.07317073170731707,
+        "isotropicAreaMatched": 0,
+        "persistence": 0
+      },
+      "meanIou": {
+        "levelSet": 0.45714285714285713,
+        "isotropicAreaMatched": 0.3972602739726027,
+        "persistence": 0.5576923076923077
+      },
+      "originsDetail": [
+        {
+          "t0": "2021-12-30T19:41:17.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2021-12-30T18:00Z",
+          "hrrrAvailableAt": "2021-12-30T19:00:00.000Z",
+          "observedNewCells": 23,
+          "levelSetNewCells": 21,
+          "iou": {
+            "levelSet": 0.45714285714285713,
+            "isotropicAreaMatched": 0.3972602739726027,
+            "persistence": 0.5576923076923077
+          },
+          "growthCsi": {
+            "levelSet": 0.07317073170731707,
+            "isotropicAreaMatched": 0,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        }
+      ]
+    },
+    "smokehouse": {
+      "role": "EXPLORATORY_EXTERNAL",
+      "satellite": "noaa-goes16",
+      "grid": {
+        "w": 99,
+        "h": 38,
+        "dxM": 1000
+      },
+      "origins": 5,
+      "scored": 4,
+      "abstained": 0,
+      "excludedNoGrowth": 1,
+      "meanGrowthCsi": {
+        "levelSet": 0.0184778314833714,
+        "isotropicAreaMatched": 0.012536377494456762,
+        "persistence": 0
+      },
+      "meanIou": {
+        "levelSet": 0.5266736113062755,
+        "isotropicAreaMatched": 0.5214465737052143,
+        "persistence": 0.6652029811323069
+      },
+      "originsDetail": [
+        {
+          "t0": "2024-02-26T20:01:17.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2024-02-26T19:00Z",
+          "hrrrAvailableAt": "2024-02-26T20:00:00.000Z",
+          "observedNewCells": 237,
+          "levelSetNewCells": 23,
+          "iou": {
+            "levelSet": 0.18,
+            "isotropicAreaMatched": 0.16831683168316833,
+            "persistence": 0.16549295774647887
+          },
+          "growthCsi": {
+            "levelSet": 0.02766798418972332,
+            "isotropicAreaMatched": 0.015625,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2024-02-26T23:01:17.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2024-02-26T22:00Z",
+          "hrrrAvailableAt": "2024-02-26T23:00:00.000Z",
+          "observedNewCells": 252,
+          "levelSetNewCells": 107,
+          "iou": {
+            "levelSet": 0.46677215189873417,
+            "isotropicAreaMatched": 0.45754716981132076,
+            "persistence": 0.5298507462686567
+          },
+          "growthCsi": {
+            "levelSet": 0.031609195402298854,
+            "isotropicAreaMatched": 0.019886363636363636,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2024-02-27T02:01:17.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2024-02-27T01:00Z",
+          "hrrrAvailableAt": "2024-02-27T02:00:00.000Z",
+          "observedNewCells": 9,
+          "levelSetNewCells": 199,
+          "iou": {
+            "levelSet": 0.7273954116059379,
+            "isotropicAreaMatched": 0.7273954116059379,
+            "persistence": 0.9834862385321101
+          },
+          "growthCsi": {
+            "levelSet": 0.014634146341463415,
+            "isotropicAreaMatched": 0.014634146341463415,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2024-02-27T05:01:17.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2024-02-27T04:00Z",
+          "hrrrAvailableAt": "2024-02-27T05:00:00.000Z",
+          "observedNewCells": 10,
+          "levelSetNewCells": 189,
+          "iou": {
+            "levelSet": 0.7325268817204301,
+            "isotropicAreaMatched": 0.7325268817204301,
+            "persistence": 0.9819819819819819
+          },
+          "growthCsi": {
+            "levelSet": 0,
+            "isotropicAreaMatched": 0,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2024-02-27T08:01:17.000Z",
+          "horizonH": 3,
+          "status": "EXCLUDED",
+          "reason": "NO_OBSERVED_GROWTH",
+          "iouPersistence": 1
+        }
+      ]
+    },
+    "troublesome": {
+      "role": "EXPLORATORY_EXTERNAL",
+      "satellite": "noaa-goes16",
+      "grid": {
+        "w": 75,
+        "h": 60,
+        "dxM": 1000
+      },
+      "origins": 4,
+      "scored": 4,
+      "abstained": 0,
+      "excludedNoGrowth": 0,
+      "meanGrowthCsi": {
+        "levelSet": 0.05031157181110084,
+        "isotropicAreaMatched": 0.011492538922386674,
+        "persistence": 0
+      },
+      "meanIou": {
+        "levelSet": 0.45659328327533444,
+        "isotropicAreaMatched": 0.425551565463483,
+        "persistence": 0.5421288581161986
+      },
+      "originsDetail": [
+        {
+          "t0": "2020-10-21T18:01:16.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2020-10-21T17:00Z",
+          "hrrrAvailableAt": "2020-10-21T18:00:00.000Z",
+          "observedNewCells": 139,
+          "levelSetNewCells": 29,
+          "iou": {
+            "levelSet": 0.27884615384615385,
+            "isotropicAreaMatched": 0.23148148148148148,
+            "persistence": 0.26063829787234044
+          },
+          "growthCsi": {
+            "levelSet": 0.05660377358490566,
+            "isotropicAreaMatched": 0.005988023952095809,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2020-10-21T21:01:16.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2020-10-21T20:00Z",
+          "hrrrAvailableAt": "2020-10-21T21:00:00.000Z",
+          "observedNewCells": 200,
+          "levelSetNewCells": 104,
+          "iou": {
+            "levelSet": 0.4225941422594142,
+            "isotropicAreaMatched": 0.4020618556701031,
+            "persistence": 0.4845360824742268
+          },
+          "growthCsi": {
+            "levelSet": 0.04827586206896552,
+            "isotropicAreaMatched": 0.02356902356902357,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2020-10-22T00:01:16.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2020-10-21T23:00Z",
+          "hrrrAvailableAt": "2020-10-22T00:00:00.000Z",
+          "observedNewCells": 325,
+          "levelSetNewCells": 198,
+          "iou": {
+            "levelSet": 0.4711211778029445,
+            "isotropicAreaMatched": 0.4353591160220994,
+            "persistence": 0.544179523141655
+          },
+          "growthCsi": {
+            "levelSet": 0.05656565656565657,
+            "isotropicAreaMatched": 0.01160541586073501,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2020-10-22T03:01:16.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2020-10-22T02:00Z",
+          "hrrrAvailableAt": "2020-10-22T03:00:00.000Z",
+          "observedNewCells": 98,
+          "levelSetNewCells": 320,
+          "iou": {
+            "levelSet": 0.6538116591928251,
+            "isotropicAreaMatched": 0.633303808680248,
+            "persistence": 0.8791615289765722
+          },
+          "growthCsi": {
+            "levelSet": 0.03980099502487562,
+            "isotropicAreaMatched": 0.004807692307692308,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        }
+      ]
+    },
+    "creek": {
+      "role": "EXPLORATORY_EXTERNAL",
+      "satellite": "noaa-goes16",
+      "grid": {
+        "w": 46,
+        "h": 55,
+        "dxM": 1000
+      },
+      "origins": 5,
+      "scored": 5,
+      "abstained": 0,
+      "excludedNoGrowth": 0,
+      "meanGrowthCsi": {
+        "levelSet": 0.004467281879194631,
+        "isotropicAreaMatched": 0.003125,
+        "persistence": 0
+      },
+      "meanIou": {
+        "levelSet": 0.615003799670841,
+        "isotropicAreaMatched": 0.6141395207577816,
+        "persistence": 0.8353066317436065
+      },
+      "originsDetail": [
+        {
+          "t0": "2020-09-05T19:01:16.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2020-09-05T18:00Z",
+          "hrrrAvailableAt": "2020-09-05T19:00:00.000Z",
+          "observedNewCells": 90,
+          "levelSetNewCells": 40,
+          "iou": {
+            "levelSet": 0.42201834862385323,
+            "isotropicAreaMatched": 0.42201834862385323,
+            "persistence": 0.5
+          },
+          "growthCsi": {
+            "levelSet": 0.015625,
+            "isotropicAreaMatched": 0.015625,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2020-09-05T22:01:16.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2020-09-05T21:00Z",
+          "hrrrAvailableAt": "2020-09-05T22:00:00.000Z",
+          "observedNewCells": 40,
+          "levelSetNewCells": 74,
+          "iou": {
+            "levelSet": 0.6122448979591837,
+            "isotropicAreaMatched": 0.6122448979591837,
+            "persistence": 0.8181818181818182
+          },
+          "growthCsi": {
+            "levelSet": 0,
+            "isotropicAreaMatched": 0,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2020-09-06T01:01:16.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2020-09-06T00:00Z",
+          "hrrrAvailableAt": "2020-09-06T01:00:00.000Z",
+          "observedNewCells": 25,
+          "levelSetNewCells": 125,
+          "iou": {
+            "levelSet": 0.5989159891598916,
+            "isotropicAreaMatched": 0.5945945945945946,
+            "persistence": 0.8979591836734694
+          },
+          "growthCsi": {
+            "levelSet": 0.006711409395973154,
+            "isotropicAreaMatched": 0,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2020-09-06T04:01:16.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2020-09-06T03:00Z",
+          "hrrrAvailableAt": "2020-09-06T04:00:00.000Z",
+          "observedNewCells": 5,
+          "levelSetNewCells": 100,
+          "iou": {
+            "levelSet": 0.7,
+            "isotropicAreaMatched": 0.7,
+            "persistence": 0.98
+          },
+          "growthCsi": {
+            "levelSet": 0,
+            "isotropicAreaMatched": 0,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        },
+        {
+          "t0": "2020-09-06T07:01:16.000Z",
+          "horizonH": 3,
+          "status": "SCORED",
+          "hrrrValidUTC": "2020-09-06T06:00Z",
+          "hrrrAvailableAt": "2020-09-06T07:00:00.000Z",
+          "observedNewCells": 5,
+          "levelSetNewCells": 82,
+          "iou": {
+            "levelSet": 0.7418397626112759,
+            "isotropicAreaMatched": 0.7418397626112759,
+            "persistence": 0.9803921568627451
+          },
+          "growthCsi": {
+            "levelSet": 0,
+            "isotropicAreaMatched": 0,
+            "persistence": 0
+          },
+          "maxObservedCfl": 0.4
+        }
+      ]
+    }
+  },
+  "aggregateExternal": {
+    "incidents": [
+      "palisades",
+      "eaton",
+      "marshall",
+      "smokehouse",
+      "troublesome",
+      "creek"
+    ],
+    "deltaGrowthCsi_levelSet_minus_isotropic": {
+      "mean": 0.018382395906965793,
+      "lo": -0.002249816494009038,
+      "hi": 0.04397336275942112,
+      "n": 6,
+      "iterations": 10000
+    },
+    "deltaIou_levelSet_minus_persistence": {
+      "mean": -0.1424790288853264,
+      "lo": -0.18773520541501246,
+      "hi": -0.09722285235564036,
+      "n": 6,
+      "iterations": 10000
+    },
+    "incidentsLevelSetBeatsIsotropic": "5/6"
+  },
+  "smv2026": {
+    "status": "NOT_EVALUATED",
+    "reason": "Sentinel-2 burn scars (d0724 -> d0729 -> d0808) are 5-10 days apart while the in-repo GFS run covers only 12 h (2026-07-23T12Z..2026-07-24T00Z); no causally matched forcing for that horizon."
+  },
+  "decision": "INCONCLUSIVE_OR_NOT_SUPPORTED",
+  "operationalUse": {
+    "canIssueEvacuationOrder": false,
+    "canPublicWarn": false,
+    "evidenceKind": "PREDICTED"
+  },
+  "runtimeMs": 544
+}
