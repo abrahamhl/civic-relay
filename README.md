@@ -48,6 +48,20 @@ En la consola se ven 16.699 elementos reales y fechados, con su fuente y licenci
 
 ---
 
+### 🌊📡💧 Tres motores sobre datos reales (17-11-2026)
+
+Los tres se calculan en el navegador y cada cifra sale de ejecutar el código del repositorio sobre los ficheros de `investor-next/public/senda/data/`.
+
+| Motor | Qué responde | Datos | Naturaleza del resultado |
+|---|---|---|---|
+| **Aislamiento por inundación** (`/senda/aislamiento`) | Qué cruces secos se quedan sin camino a un hospital, centro de salud, bomberos o policía | Agua observada por Copernicus EMS (EMSR773, 30 y 31-10-2024) y calles de OpenStreetMap | Cálculo sobre datos observados; la regla de corte es un escenario declarado |
+| **Planificador de radio** (`/senda/radio`) | Dónde poner repetidores de baja potencia si cae la red móvil | Copernicus DEM GLO-30 de la cuenca del Poyo | **Modelo** (espacio libre + ITU-R P.526); no es una medida de campo |
+| **Agua en Países Bajos** (`/senda/agua-nl`) | Qué estaciones suben y cuánto tarda la onda de una a otra | 25 estaciones de Rijkswaterstaat: 28 días de medidas y previsión oficial | Medido; las reglas de atención son de SENDA, no alarmas oficiales |
+
+![Aislamiento por inundación en l'Horta Sud](docs/media/nuevos/aislamiento-horta-sud.png)
+
+Límites: el satélite no delimitó agua dentro de los cascos urbanos densos, así que el aislamiento se queda corto ahí; el plan de radio es terreno desnudo y necesita medida de campo; el agua es una foto fija del 17-11-2026 sin umbrales oficiales. Detalle y fuentes en `docs/propuesta/PROPUESTA_GOBIERNOS_ES_NL_2026-11.md` y `docs/financiacion/RUTAS_FINANCIACION_ES_NL_UE_2026-11.md`.
+
 ## Transparencia del uso de inteligencia artificial
 
 Civic Relay incluye desarrollo, documentación y pruebas asistidos por IA generativa (entre otras herramientas, ChatGPT y asistentes de programación). Los cambios generados requieren revisión humana, validación automatizada y atribución transparente; los tests green no reemplazan una auditoría independiente. No se presenta código generado como trabajo puramente humano.
