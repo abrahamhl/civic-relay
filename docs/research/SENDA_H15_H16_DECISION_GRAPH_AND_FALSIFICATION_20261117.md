@@ -65,3 +65,16 @@ P0-08: Para responder emergencias de verdad se necesita validación externa de l
 - IETF RFC 6414 — Shared Risk Link Groups: https://www.rfc-editor.org/rfc/rfc6414.html
 - Howard et al. (2021) Time-uniform nonparametric confidence sequences: https://doi.org/10.1214/20-AOS1991
 - Ningún cumplimiento de BPv7/BPSec/CAP o SRLG debe deducirse por citar sus estándares.
+
+
+## P0 adicional: falsa independencia epistemológica y acreditación de campo autoafirmada
+
+**Auditoría del código fuente \`source-evidence.mjs\`** detectó dos vulnerabilidades semánticas que no aparecen necesariamente como errores de ejecución:
+
+1. Dos fuentes inventadas que no figuraban en el registro \`SOURCE_DEPENDENCY_GRAPH\` producían \`independent:true\`, simplemente porque ambas tenían un conjunto de antecedentes vacío. Esa conclusión **no es una prueba de independencia**. Ahora cualquier identificador ausente devuelve \`independent:false,reason:'UNKNOWN_SOURCE_LINEAGE'\`. Para fuentes presentes la independencia sigue siendo **solo de procedencia declarada**, \`externallyAuthenticated:false\`; no equivale a causalidad independiente validada.
+2. Bastaba indicar \`stage:'FIELD_VALIDATED'\` con una cadena \`fieldTrialReceiptId\` y un \`holdoutScore\` para obtener \`isFieldValidated:true\`, aunque no existía verificación de firma, identidad del evaluador, dato ni ensayo. El nuevo adaptador **no otorga ese estado**: \`requestedStage\` conserva la solicitud, pero \`stage\` efectivo queda \`HOLDOUT_TESTED\`, \`isFieldValidated:false\` y \`fieldReceiptSignatureVerified:false\` hasta desarrollar y desplegar un verificador externo con anclas de confianza autorizadas.
+3. Se valida el digest SHA-256 completo, finitud del holdout y formato mínimo de identificadores. **Formato correcto** sigue sin validar que el hash coincida con los bytes o que los datos estén licenciados; esas validaciones son trabajo futuro independiente.
+
+Pruebas de regresión contra \`UNKNOWN_SOURCE_LINEAGE\`, \`sha256:garbage\`, \`NaN\` y field IDs autoafirmados; sincronización core/browser y seguimiento en CI en los dos Node. Ningún estado de laboratorio da autorización para CAP Actual o comunicaciones de 112.
+
+**Relevancia para financiación:** un repositorio puede tener tests verdes mientras hace afirmaciones semánticas falsas en indicadores clave. Es preferible **rechazar un estado de certificación que no se puede demostrar** antes que mostrar una insignia convincente pero no auditada. La demostración al financiador debe separar: funcionalidad calculada, matemática validada, simulación, field trial verificado por tercero e integración institucional operativa.
