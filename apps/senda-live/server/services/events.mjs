@@ -9,6 +9,7 @@ import { coarsen, parseBbox, bboxAround, pointInPolygon, parsePolygon, polygonBb
 import { computeEventStatus, MANUAL_STATUSES } from '../domain/verification.mjs';
 import { proposeClusters, findContradictions, corroborationQuestions } from '../domain/intelligence.mjs';
 import { can, effectiveRoles } from '../rbac.mjs';
+import { classifyCamera, perimeterAssessment, SIGNAL_RULES } from '@senda/core/src/camera-perimeter.mjs';
 
 export function createEventService(db, { rt, notifier, audit }) {
   function slugFor(title) {
@@ -267,5 +268,55 @@ export function createEventService(db, { rt, notifier, audit }) {
     return { kind: 'HYPOTHESIS', generatedAt: Date.now(), clusters: proposeClusters(posts) };
   }
 
-  return { createEvent, linkPost, addObservation, postUpdate, decideStatus, setSubscription, getEvent, listEvents, recompute, intelligenceCandidates };
+  /**
+   * Evidencia de CÁMARA PÚBLICA (señal medida: antigüedad, movimiento, vehículos). Entra en la cadena de procedencia
+   * (report_hash + prev_hash) pero NO es una fuente independiente: no se añade a event_sources y nunca cambia por sí
+   * sola el estado de verificación. Es contexto e indicio para quien verifica.
+   */
+  function addCameraEvidence(userId, eventId, body, { ip } = {}) {
+    const ev = db.get('SELECT * FROM events WHERE id = ?', eventId);
+    if (!ev) throw notFound('EVENT_NOT_FOUND');
+    const authz = can(db, userId, 'evidence:camera', { bbox: ev.bbox ? JSON.parse(ev.bbox) : null, eventType: ev.type });
+    if (!authz.allowed) { audit({ actorId: userId, action: 'event.camera_evidence', targetType: 'EVENT', targetId: eventId, outcome: 'DENIED', severity: 'SECURITY', reason: authz.reason, ip }); throw forbidden(authz.reason); }
+    const provider = str(body.provider, { field: 'provider', min: 2, max: 40, required: true });
+    const cameraId = str(String(body.cameraId ?? ''), { field: 'cameraId', min: 1, max: 80, required: true });
+    const url = str(body.url, { field: 'url', min: 8, max: 500, required: true });
+    if (!/^https:\/\//.test(url)) throw bad('INVALID_URL', 'La imagen de la cámara debe servirse por https');
+    const licence = str(body.licence, { field: 'licence', min: 3, max: 200, required: true });
+    const sig = body.signal ?? {};
+    const signal = { placeholder: !!sig.placeholder, ageS: num(sig.ageS, { field: 'signal.ageS', min: 0, optional: true }) ?? null, motion: sig.motion == null ? null : num(sig.motion, { field: 'signal.motion', min: 0, max: 1 }),
+      vehicles: sig.vehicles == null ? null : num(sig.vehicles, { field: 'signal.vehicles', min: 0, max: 1000 }), sha256: Array.isArray(sig.sha256) ? sig.sha256.filter((h) => /^[0-9a-f]{64}$/.test(h)).slice(0, 2) : [] };
+    const capturedAt = num(body.capturedAt, { field: 'capturedAt', min: 0, required: true });
+    const meta = { type: 'CAMERA_SIGNAL', provider, licence, sector: body.sector ? str(body.sector, { field: 'sector', max: 8 }) : null, road: body.road ? str(body.road, { field: 'road', max: 40 }) : null,
+      dKm: body.dKm == null ? null : num(body.dKm, { field: 'dKm', min: 0, max: 200 }), lat: body.lat ?? null, lon: body.lon ?? null, signal, reading: classifyCamera(signal), rules: SIGNAL_RULES,
+      method: body.method ? str(body.method, { field: 'method', max: 300 }) : null };
+    const now = Date.now(), id = newId();
+    db.tx(() => {
+      const prev = db.get('SELECT report_hash FROM event_evidence WHERE event_id = ? ORDER BY created_at DESC, rowid DESC LIMIT 1', eventId)?.report_hash ?? null;
+      const reportHash = sha256hex(JSON.stringify({ prev, eventId, provider, cameraId, url, capturedAt, signal }));
+      db.run(`INSERT INTO event_evidence(id, event_id, post_id, original_url, external_id, acquired_at, author_ref, metadata, report_hash, prev_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+        id, eventId, null, url, `${provider.toLowerCase()}cam:${cameraId}`, capturedAt, `sensor:${provider}`, JSON.stringify(meta), reportHash, prev, now);
+      db.run('UPDATE events SET updated_at = ? WHERE id = ?', now, eventId);
+    });
+    audit({ actorId: userId, action: 'event.camera_evidence', targetType: 'EVENT', targetId: eventId, ip });
+    rt.publish('EVENT_UPDATED', { audienceType: 'PUBLIC' }, { eventId, cameraEvidence: true });
+    return getEvent(eventId, userId);
+  }
+
+  /** Cordón de cámaras de un acontecimiento a partir de sus evidencias de cámara (lectura calculada, nunca «confirmado»). */
+  function cameraPerimeter(idOrSlug, { road = null } = {}) {
+    const ev = db.get('SELECT * FROM events WHERE id = ? OR slug = ?', idOrSlug, idOrSlug);
+    if (!ev) throw notFound('EVENT_NOT_FOUND');
+    const rows = db.all('SELECT external_id, original_url, acquired_at, metadata, report_hash FROM event_evidence WHERE event_id = ? ORDER BY created_at', ev.id)
+      .map((r) => ({ ...r, meta: JSON.parse(r.metadata || '{}') })).filter((r) => r.meta.type === 'CAMERA_SIGNAL');
+    const NAMES = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+    const ring = { radiusKm: null, blind: [], sectors: NAMES.map((name) => { const cams = rows.filter((r) => r.meta.sector === name).map((r) => ({ id: r.external_id, carretera: r.meta.road, dKm: r.meta.dKm, url: r.original_url }));
+      return { name, total: cams.length, cams }; }) };
+    ring.blind = ring.sectors.filter((s) => !s.total).map((s) => s.name);
+    const signals = Object.fromEntries(rows.map((r) => [r.external_id, r.meta.signal]));
+    return { eventId: ev.id, cameras: rows.length, assessment: perimeterAssessment(ring, signals, { road }), evidenceHashes: rows.map((r) => r.report_hash),
+      note: 'Las cámaras son contexto e indicio: no cuentan como fuente independiente ni cambian el estado de verificación.' };
+  }
+
+  return { addCameraEvidence, cameraPerimeter, createEvent, linkPost, addObservation, postUpdate, decideStatus, setSubscription, getEvent, listEvents, recompute, intelligenceCandidates };
 }

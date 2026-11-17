@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SENDA · investor film</title>
+<!--
+  Motor cinematográfico determinista (three.js r158 + bloom + grano + viñeta + transiciones con barrido radial).
+  Formato 2.39:1 con bandas; los subtítulos van en la banda inferior. window.seek(t) fija cada fotograma.
+  Parámetros: ?script=investor-film&lang=en&subs=es&t=12.5
+-->
+<script type="importmap">{"imports":{"three":"./cinema/vendor/three.module.min.js","three/addons/":"./cinema/vendor/addons/"}}</script>
+<script src="../promo-video/land.js"></script>
+<style>
+:root{--t:#f2f4f4;--m:#a9bcc5;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--r:#ff5b6e}
+*{box-sizing:border-box}
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:#000;color:var(--t);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+#gl{position:absolute;left:0;top:92px;width:1280px;height:536px}
+#ov{position:absolute;left:0;top:92px;width:1280px;height:536px;overflow:hidden}
+#top{position:absolute;left:0;top:0;width:1280px;height:92px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 54px 16px}
+#brand{font:700 15px Inter;letter-spacing:.42em;color:#fff}#brand i{font-style:normal;color:var(--c)}
+#brand span{font:500 11px "JetBrains Mono",monospace;letter-spacing:.18em;color:#6f838e;margin-left:14px}
+#tag{font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.16em;color:var(--m);display:flex;gap:10px;align-items:center}
+#tag b{padding:5px 10px;border-radius:999px;border:1px solid;font-weight:700}
+#tag .OBSERVED{color:var(--e);border-color:rgba(52,211,153,.5)}#tag .SIMULATED{color:var(--a);border-color:rgba(251,191,36,.5)}#tag .CALCULATED{color:var(--i);border-color:rgba(145,215,232,.5)}
+#sub{position:absolute;left:0;top:628px;width:1280px;height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding-bottom:8px}
+#sub span{font:500 21px/1.25 Inter;color:#fff;text-align:center;max-width:1100px}#sub span+span{font-size:15px;color:#8fa4ae}
+#sub span:empty{display:none}
+#prog{position:absolute;left:0;bottom:0;height:3px;width:0;background:linear-gradient(90deg,var(--c),var(--a))}
+.sc{position:absolute;inset:0;opacity:0}
+.lt{position:absolute;left:54px;bottom:34px;max-width:760px}
+.lt .k{font:700 11px "JetBrains Mono",monospace;letter-spacing:.3em;color:var(--c);text-transform:uppercase;display:flex;align-items:center;gap:12px}
+.lt .k::before{content:"";width:34px;height:2px;background:var(--c)}
+.lt h1{font:700 40px/1.08 "Inter Display",Inter;letter-spacing:-.015em;margin:10px 0 0;text-shadow:0 2px 24px rgba(0,0,0,.9)}
+.stat{position:absolute;right:54px;bottom:34px;text-align:right}
+.stat b{display:block;font:800 86px/1 "Inter Display",Inter;letter-spacing:-.02em;text-shadow:0 4px 40px rgba(0,0,0,.9)}
+.stat span{display:block;font:600 12px "JetBrains Mono",monospace;letter-spacing:.14em;color:var(--m);text-transform:uppercase;margin-top:8px;text-shadow:0 2px 12px #000}
+.big{position:absolute;left:0;right:0;top:150px;text-align:center;font:800 68px/1.05 "Inter Display",Inter;letter-spacing:-.02em;text-shadow:0 4px 50px #000}
+.big.s{top:96px;font:500 30px Inter;color:var(--m);letter-spacing:0}
+.chips{position:absolute;left:0;right:0;bottom:44px;display:flex;justify-content:center;gap:12px}
+.chip{font:600 15px "JetBrains Mono",monospace;padding:10px 18px;border-radius:999px;border:1px solid rgba(145,215,232,.5);color:var(--i);background:rgba(4,10,14,.6)}
+.tagline{position:absolute;left:0;right:0;bottom:70px;text-align:center;font:500 27px Inter;color:#dfe7ea;text-shadow:0 2px 20px #000}
+.legend{position:absolute;left:54px;top:70px;display:flex;flex-direction:column;gap:12px}
+.legend div{display:flex;align-items:center;gap:14px;font:600 19px Inter;text-shadow:0 2px 14px #000}
+.legend i{width:12px;height:12px;border-radius:50%;flex:none}
+.legend small{font:500 12px "JetBrains Mono",monospace;color:var(--m);letter-spacing:.08em;display:block;margin-top:2px}
+.note{position:absolute;right:54px;top:24px;font:600 10px "JetBrains Mono",monospace;letter-spacing:.2em;color:#6f838e}
+.phase{position:absolute;left:54px;top:26px;font:700 13px "JetBrains Mono",monospace;letter-spacing:.24em;padding:8px 14px;border-radius:6px;background:rgba(4,8,12,.7);border:1px solid}
+.panel{position:absolute;background:rgba(4,9,13,.74);border:1px solid rgba(145,215,232,.22);border-radius:16px;padding:20px 22px;backdrop-filter:blur(6px)}
+.panel h3{margin:0 0 4px;font:700 11px "JetBrains Mono",monospace;letter-spacing:.22em;color:var(--c);text-transform:uppercase}
+.panel p{margin:0;font:600 19px/1.25 Inter}.panel small{font:500 12.5px "JetBrains Mono",monospace;color:var(--m)}
+.bars{position:absolute;right:54px;top:58px;width:560px}
+.bar{margin-bottom:22px}.bar .l{display:flex;justify-content:space-between;font:600 15px Inter;margin-bottom:8px}.bar .l b{font:800 26px "Inter Display",Inter}
+.bar .tr{height:14px;border-radius:7px;background:rgba(145,215,232,.12);overflow:hidden}.bar .tr i{display:block;height:100%;border-radius:7px}
+.tiles{position:absolute;left:54px;right:54px;top:54px;display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.tile{height:190px;border-radius:18px;background:rgba(4,9,13,.72);border:1px solid rgba(145,215,232,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.tile svg{width:66px;height:66px;stroke:var(--i);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.tile span{font:700 18px Inter}
+.aud{position:absolute;left:0;right:0;top:284px;display:flex;justify-content:center;gap:12px}
+.ban{position:absolute;left:0;right:0;bottom:36px;text-align:center;font:700 30px "Inter Display",Inter}
+.ban b{color:var(--c)}
+.nums{position:absolute;left:54px;top:40px;display:flex;gap:44px}
+.num b{display:block;font:800 92px/1 "Inter Display",Inter;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.num span{font:600 12px "JetBrains Mono",monospace;letter-spacing:.14em;color:var(--m);text-transform:uppercase}
+.miss{position:absolute;left:54px;bottom:30px;width:620px}
+.miss h3{margin:0 0 12px;font:700 11px "JetBrains Mono",monospace;letter-spacing:.22em;color:var(--a)}
+.miss div{display:flex;gap:14px;align-items:center;font:600 20px Inter;margin-top:10px}
+.miss i{width:18px;height:18px;border:2px solid var(--a);border-radius:4px;flex:none}
+.url{position:absolute;left:0;right:0;bottom:92px;text-align:center}
+.url b{display:inline-block;font:700 27px "JetBrains Mono",monospace;color:var(--i);padding:13px 26px;border:1px solid rgba(145,215,232,.45);border-radius:14px;background:rgba(4,10,14,.7)}
+.url span{display:block;font:500 16px "JetBrains Mono",monospace;color:var(--m);margin-top:14px}
+.url em{display:block;font:600 26px Inter;font-style:normal;margin-bottom:22px}
+</style>
+</head>
+<body>
+<canvas id="gl" width="1280" height="536"></canvas>
+<div id="ov"></div>
+<div id="top"><div id="brand">SEND<i>A</i><span>WHEN THE NETWORK FALLS</span></div><div id="tag"></div></div>
+<div id="sub"><span></span><span></span></div>
+<div id="prog"></div>
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { BUILD } from './cinema/scenes.js';
+import { BUILD2, setRenderer, env } from './cinema/scenes2.js';
+
+const Q = new URLSearchParams(location.search);
+const NAME = Q.get('script') || 'investor-film', LANG = Q.get('lang') || 'en';
+const SUBS = (Q.get('subs') ?? 'es').split(',').filter(Boolean);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const L = (o) => (typeof o === 'string' ? o : o?.[LANG] ?? o?.en ?? '');
+const TAG = { OBSERVED: ['OBSERVED', 'PUBLISHED RECORD · 3D VISUALISATION'], SIMULATED: ['SIMULATION', 'ILLUSTRATIVE 3D · FIGURES FROM THE SENDA CORE'], CALCULATED: ['CALCULATED', 'APP CORE · 3D VISUALISATION'] };
+const STAT_CUE = { blackout: 3, flood: 2, rail: 1, bearers: 4, fire: 3, building: 4 };
+const STAT_COL = { blackout: '#ff5b6e', valley: '#fbbf24', rail: '#ff7756', train: '#34d399', bearers: '#34d399', europe: '#34d399', forecast: '#34d399', road: '#91d7e8', fire: '#ff7756', building: '#91d7e8' };
+const ICON = ['<path d="M8 60 26 6h12l18 54M32 8v10M32 26v10M32 44v12"/>', '<path d="M18 58 26 6M46 58 38 6M22 20h20M20 34h24M17 48h30"/>', '<path d="M32 58c-12 0-18-8-18-17 0-10 8-14 10-24 6 4 8 9 8 13 3-3 4-8 4-12 8 6 14 14 14 23 0 9-6 17-18 17z"/>', '<path d="M6 38c6-5 10-5 16 0s10 5 16 0 10-5 16 0M6 50c6-5 10-5 16 0s10 5 16 0 10-5 16 0M22 26V10h20v16"/>', '<path d="M14 58V8h36v50M24 18h4M36 18h4M24 30h4M36 30h4M24 42h4M36 42h4M8 58h48"/>', '<path d="M36 4 14 36h16l-4 24 24-34H34z"/>'];
+
+function overlay(sc) {
+  const v = sc.visual, k = v.kind;
+  const lt = `<div class="lt" data-a="lt"><div class="k">${esc(TAG[sc.claim][0])}</div><h1>${esc(L(sc.title))}</h1></div>`;
+  const stat = v.stat ? `<div class="stat" data-c="${v.statCue ?? 1}"><b style="color:${STAT_COL[k] || '#fff'}">${esc(v.stat)}</b><span>${esc(L(v.statLabel))}</span></div>` : '';
+  if (k === 'title') return `<div class="tagline" data-c="1">${esc(L(sc.title))}</div>`;
+  if (k === 'road') return `<div class="phase" data-x="1,3" style="color:var(--r);border-color:rgba(255,91,110,.5)">WITHOUT SENDA</div><div class="phase" data-x="3,5" style="color:var(--i);border-color:rgba(145,215,232,.5)">WITH SENDA · EVERY PHONE WARNED AT ONCE</div><div class="phase" data-c="5" style="color:var(--r);border-color:rgba(255,91,110,.5)">NO COVERAGE · THE SOS RIDES WITH PASSING CARS</div>` + lt + stat;
+  if (k === 'orbit') return lt + `<div class="note">ORBIT RADII NOT TO SCALE</div>`;
+  if (k === 'proof') return `<div class="nums"><div class="num" data-c="0"><b data-n="${v.core}" style="color:var(--e)">0</b><span>core tests passing</span></div><div class="num" data-c="1"><b data-n="${v.e2e}" style="color:var(--i)">0</b><span>end-to-end checks · network cut</span></div><div class="num" data-c="2"><b data-n="${v.agents}" style="color:var(--c)">0</b><span>specialised AI agents</span></div></div>` + lt;
+  if (k === 'cta') return `<div class="url" data-c="1"><em>${esc(L(sc.title))}</em><b>${esc(v.url)}</b><span>${esc(v.repo)} · MIT licence</span></div>`;
+  return lt + stat;
+}
+
+const [SCRIPT, TL] = await Promise.all([fetch(`${NAME}.json`).then((r) => r.json()), fetch(`build/timings-${NAME}-${LANG}.json`).then((r) => r.json())]);
+await Promise.all(['800 190px "Inter Display"', '700 58px "JetBrains Mono"', '500 34px Inter', '700 40px Inter'].map((f) => document.fonts.load(f)));
+
+const canvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(1); renderer.setSize(1280, 536, false);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.5;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace;
+setRenderer(renderer);
+const TEX = {}; const loader = new THREE.TextureLoader();
+await Promise.all([...new Set(SCRIPT.scenes.flatMap((sc) => sc.visual.screens || []))].map(async (f) => { const t = await loader.loadAsync(`assets/${f}`); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; TEX[f] = t; }));
+const composer = new EffectComposer(renderer);
+const rp = new RenderPass(new THREE.Scene(), new THREE.PerspectiveCamera());
+const bloom = new UnrealBloomPass(new THREE.Vector2(640, 268), 1, 0.7, 0.6);
+const fin = new ShaderPass({
+  uniforms: { tDiffuse: { value: null }, uT: { value: 0 }, uTr: { value: 0 }, uFade: { value: 0 } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
+  fragmentShader: `uniform sampler2D tDiffuse; uniform float uT,uTr,uFade; varying vec2 vUv;
+    float h(vec2 p){ return fract(sin(dot(p,vec2(12.9898,78.233))+uT*7.13)*43758.5453); }
+    void main(){ vec2 c=vUv-0.5; vec3 col;
+      if(uTr>0.002){ col=vec3(0.0); for(int i=0;i<12;i++){ float f=float(i)/11.0; vec2 uv=0.5+c*(1.0-uTr*0.5*f); float ca=0.004+uTr*0.03*f;
+          col.r+=texture2D(tDiffuse,uv+c*ca).r; col.g+=texture2D(tDiffuse,uv).g; col.b+=texture2D(tDiffuse,uv-c*ca).b; } col/=12.0; col*=1.0+uTr*2.2; col+=vec3(0.9,0.75,0.6)*uTr*uTr*0.35; }
+      else { float ca=0.0018*length(c)*2.0; col=vec3(texture2D(tDiffuse,vUv+c*ca).r,texture2D(tDiffuse,vUv).g,texture2D(tDiffuse,vUv-c*ca).b); }
+      col*=mix(1.0,smoothstep(0.86,0.28,length(c*vec2(1.0,1.25))),0.7);
+      col+= (h(vUv*vec2(1280.0,536.0))-0.5)*0.035;
+      col=mix(col,vec3(0.0),uFade); gl_FragColor=vec4(col,1.0); }`,
+});
+composer.addPass(rp); composer.addPass(bloom); composer.addPass(fin); composer.addPass(new OutputPass());
+
+const ov = document.getElementById('ov');
+ov.innerHTML = SCRIPT.scenes.map((sc, i) => `<section class="sc" id="sc${i}">${overlay(sc)}</section>`).join('');
+const EL = [...ov.querySelectorAll('.sc')];
+const ALL = { ...BUILD, ...BUILD2 };
+const INST = SCRIPT.scenes.map((sc) => { const f = ALL[sc.visual.kind]; if (!f) throw new Error(`escena sin motor: ${sc.visual.kind}`); return f(sc.visual, TEX); });
+
+const show = (n, p, dy = 14) => { n.style.opacity = p.toFixed(3); n.style.transform = `translateY(${((1 - p) * dy).toFixed(1)}px)`; };
+const TR = 0.5; // semiduración de la transición entre escenas (s)
+
+window.seek = (t) => {
+  const total = TL.totalDuration; t = clamp(t, 0, total - 0.001);
+  let i = TL.scenes.findIndex((s) => t >= s.start && t < s.end); if (i < 0) i = TL.scenes.length - 1;
+  const s = TL.scenes[i], sc = SCRIPT.scenes[i], lt = t - s.start, d = s.end - s.start, inst = INST[i];
+  const cue = (k) => s.lines[Math.min(k, s.lines.length - 1)].start - s.start;
+  inst.update(lt, d, cue);
+  rp.scene = inst.scene; rp.camera = inst.camera;
+  renderer.toneMappingExposure = inst.exposure ?? 1.5;
+  const [bs, br, bt] = inst.bloom || [1, 0.7, 0.6]; bloom.strength = bs; bloom.radius = br; bloom.threshold = bt;
+  const edge = Math.min(i > 0 ? lt : 9, i < TL.scenes.length - 1 ? d - lt : 9);
+  fin.uniforms.uTr.value = Math.pow(clamp(1 - edge / TR), 1.6); fin.uniforms.uT.value = Math.floor(t * 25) * 0.04;
+  fin.uniforms.uFade.value = Math.max(1 - clamp(t / 1.6), clamp((t - (total - 1.8)) / 1.6));
+  composer.render();
+  // rótulos
+  EL.forEach((el, j) => { el.style.opacity = j === i ? clamp(Math.min(lt, d - lt) / 0.45).toFixed(3) : 0; el.style.visibility = j === i ? 'visible' : 'hidden'; });
+  const el = EL[i];
+  el.querySelectorAll('[data-a="lt"]').forEach((n) => show(n, Math.min(ease((lt - 0.5) / 0.7), 1 - clamp((lt - Math.min(6.5, d * 0.5)) / 0.6))));
+  el.querySelectorAll('[data-c]').forEach((n) => show(n, ease((lt - cue(+n.dataset.c) - +(n.dataset.d || 0)) / 0.6)));
+  el.querySelectorAll('[data-x]').forEach((n) => { const [a, b] = n.dataset.x.split(',').map(Number); show(n, Math.min(ease((lt - cue(a)) / 0.55), 1 - clamp((lt - cue(b) + 0.35) / 0.35))); });
+  el.querySelectorAll('[data-n]').forEach((n) => { const c = +n.parentElement.dataset.c; n.textContent = Math.round(+n.dataset.n * ease((lt - cue(c)) / 1.3)); });
+  el.querySelectorAll('[data-w]').forEach((n) => { const p = n.closest('[data-c]'); n.style.width = `${(+n.dataset.w * ease((lt - cue(+p.dataset.c) - +(p.dataset.d || 0) - 0.2) / 1.2)).toFixed(1)}%`; });
+  const [a, b] = TAG[sc.claim]; document.getElementById('tag').innerHTML = `<span>${b}</span><b class="${sc.claim}">${a}</b>`;
+  let sub = null; s.lines.forEach((ln, k) => { if (t >= ln.start - 0.05 && t <= ln.end + 0.15) sub = k; });
+  document.querySelectorAll('#sub span').forEach((sp, k) => { sp.textContent = sub != null && SUBS[k] ? (sc[SUBS[k]]?.[sub] ?? '') : ''; });
+  document.getElementById('prog').style.width = `${(t / total * 1280).toFixed(1)}px`;
+};
+window.seek(+(Q.get('t') || 0));
+window.READY = true;
+</script>
+</body>
+</html>

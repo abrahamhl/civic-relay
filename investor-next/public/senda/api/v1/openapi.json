@@ -1,0 +1,58 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "SENDA · API de datos abiertos",
+  "version": "1.0.0",
+  "description": "Ficheros estáticos generados con packages/senda/scripts/build-platform-api.mjs a partir de fotos reales. Cada elemento lleva source y basis. Respeta la licencia de cada capa (catalog.json)."
+ },
+ "paths": {
+  "/senda/api/v1/catalog.json": {
+   "get": {
+    "summary": "Catálogo de capas con fuente, licencia, hora de descarga y SHA-256",
+    "responses": {
+     "200": {
+      "description": "Catálogo"
+     }
+    }
+   }
+  },
+  "/senda/api/v1/layers/{id}.geojson": {
+   "get": {
+    "summary": "Capa en GeoJSON (RFC 7946)",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "enum": [
+        "mundo-gdacs",
+        "espana-dgt",
+        "paises-bajos-ndw",
+        "mundo-usgs",
+        "mundo-emsc",
+        "integridad-gnss"
+       ]
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "FeatureCollection; cada Feature con properties.source y properties.basis"
+     }
+    }
+   }
+  },
+  "/senda/api/v1/briefing.json": {
+   "get": {
+    "summary": "Parte del día calculado por capa",
+    "responses": {
+     "200": {
+      "description": "Parte"
+     }
+    }
+   }
+  }
+ }
+}

@@ -215,7 +215,7 @@ export default function VehicularDopplerLab({ locale }: { locale: Locale }) {
               </div>
               <div className="v-doppler-kpi">
                 <div className="v-doppler-kpi-label">K-Anonimato (DGT)</div>
-                <div className="v-doppler-kpi-val">k ≥ 5 <span className="v-doppler-kpi-unit">garantizado</span></div>
+                <div className="v-doppler-kpi-val">k ≥ 5 <span className="v-doppler-kpi-unit">objetivo · sin implementar</span></div>
               </div>
               <div className="v-doppler-kpi">
                 <div className="v-doppler-kpi-label">Detector IA</div>

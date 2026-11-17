@@ -1,0 +1,98 @@
+{
+ "plataforma": "SENDA",
+ "version": "v1",
+ "generadoUTC": "2026-11-14T14:12:23.573Z",
+ "aviso": "Fotos de datos reales con su fuente. No son servicios en tiempo real: la hora de cada descarga va en cada capa.",
+ "capas": [
+  {
+   "id": "mundo-gdacs",
+   "titulo": "Alertas mundiales de desastres (GDACS)",
+   "url": "/senda/api/v1/layers/mundo-gdacs.geojson",
+   "elementos": 1720,
+   "descargadoUTC": "2026-11-14T03:43:47.208Z",
+   "licencia": "Condiciones de uso de GDACS (https://www.gdacs.org/About/termsofuse.aspx)",
+   "fuente": "GDACS (ONU + Comisión Europea/JRC) · descarga real del 2026-11-14",
+   "base": [
+    "OFFICIAL_ALERT"
+   ],
+   "sha256": "878acc61316dda7da01ed0e2967afd8169162a7bd5feec1688ab3be5918ebcfa",
+   "ficheroOrigen": "/senda/data/referencias/gdacs_eventos.json",
+   "sha256Origen": "b8306eb75d7a75968c9e98e7e05180793d3b3f4ca1ccbe2c33da1ffe24be56ec"
+  },
+  {
+   "id": "espana-dgt",
+   "titulo": "Incidencias activas en carreteras (DGT, DATEX II)",
+   "url": "/senda/api/v1/layers/espana-dgt.geojson",
+   "elementos": 838,
+   "descargadoUTC": "2026-11-14T14:05:47.613Z",
+   "licencia": "Creative Commons Attribution (ficha del conjunto en nap.dgt.es)",
+   "fuente": "DGT · Punto de Acceso Nacional (DATEX II), publicación del 2026-11-14 15:04",
+   "base": [
+    "OFFICIAL_ALERT"
+   ],
+   "sha256": "e9a208a331e6f85de6d79944e6877c5b0f37213b10225b8178b975d86cd5114b",
+   "ficheroOrigen": "/senda/data/referencias/dgt_incidencias.json",
+   "sha256Origen": "aa8afa770920652927a225ade37d4a516cc5109e2734ecdd7a62cbe67ba12df3"
+  },
+  {
+   "id": "paises-bajos-ndw",
+   "titulo": "Situación del tráfico en Países Bajos (NDW, DATEX II)",
+   "url": "/senda/api/v1/layers/paises-bajos-ndw.geojson",
+   "elementos": 1238,
+   "descargadoUTC": "2026-11-14T13:41:12.540Z",
+   "licencia": "CC0 1.0 (condiciones generales de datos abiertos de NDW, https://docs.ndw.nu/algemeen/data-gebruiksvoorwaarden/, leídas el 14-11-2026)",
+   "fuente": "NDW (Países Bajos) · DATEX II actueel_beeld, publicación del 2026-11-14 13:41 UTC",
+   "base": [
+    "OFFICIAL_ALERT"
+   ],
+   "sha256": "37c309ba3a07b7499693c8db7d28a8366ad7a928efc3e013bba656f4ad59c256",
+   "ficheroOrigen": "/senda/data/referencias/ndw_situaciones.json",
+   "sha256Origen": "b9066630a62ebf1028e23a7fffd94435a56ff73e3bc42c56ed1520ad974c7d55"
+  },
+  {
+   "id": "mundo-usgs",
+   "titulo": "Sismos M ≥ 4,5 y deslizamientos con señal sísmica (USGS ComCat)",
+   "url": "/senda/api/v1/layers/mundo-usgs.geojson",
+   "elementos": 674,
+   "descargadoUTC": "2026-11-14T12:46:30.720Z",
+   "licencia": "Obra del Gobierno de EE. UU.: dominio público en EE. UU. (17 U.S.C. §105); se conserva la red de origen de cada evento",
+   "fuente": "USGS ComCat · descarga real del 2026-11-14",
+   "base": [
+    "MEASURED_SEISMIC"
+   ],
+   "sha256": "d88c0c993b336d2e723b0f52d255fbfb9d9c97f260d7fd1a5d24463bb72e850f",
+   "ficheroOrigen": "/senda/data/referencias/usgs_sismos.json",
+   "sha256Origen": "0843018c0ea18283145f04ab77d8447d54e6ae6b52e1c7013bca4e433a25f416"
+  },
+  {
+   "id": "mundo-emsc",
+   "titulo": "Sismos M ≥ 4,0 con agencia autora de cada solución (EMSC-CSEM)",
+   "url": "/senda/api/v1/layers/mundo-emsc.geojson",
+   "elementos": 1552,
+   "descargadoUTC": "2026-11-14T13:01:36.347Z",
+   "licencia": "CC BY 4.0 · crédito: EMSC-CSEM SeismicPortal (https://www.seismicportal.eu/terms.html)",
+   "fuente": "EMSC-CSEM SeismicPortal (CC BY 4.0) · descarga real del 2026-11-14",
+   "base": [
+    "MEASURED_SEISMIC"
+   ],
+   "sha256": "4194dad84796e3990143dbe22bae7551b8fe740bbe192a718d824b1059ff76c9",
+   "ficheroOrigen": "/senda/data/referencias/emsc_sismos.json",
+   "sha256Origen": "7b7f10daa8e8f3391ff203a02754b17fae5705fc4f7a7346891e905f5f5e798f"
+  },
+  {
+   "id": "integridad-gnss",
+   "titulo": "Integridad GNSS desde ADS-B (método GPSJam)",
+   "url": "/senda/api/v1/layers/integridad-gnss.geojson",
+   "elementos": 194,
+   "descargadoUTC": "2026-11-14T10:38:13.789Z",
+   "licencia": "ODbL 1.0 (© adsb.lol); esta capa derivada también es ODbL 1.0",
+   "fuente": "adsb.lol (ODbL) · foto del 2026-11-14 10:38 UTC · método GPSJam",
+   "base": [
+    "MEASURED_ADSB"
+   ],
+   "sha256": "a057432a15d9f6d2f0a503dce5f62ccee4a1899569ef8c99bc27be5a251ffd99",
+   "ficheroOrigen": "/senda/data/referencias/adsb_gnss.json",
+   "sha256Origen": "b9beffc0282f4f3eac2f5b6b156880b1fb6b69b77290d4349acd5813a1d1673c"
+  }
+ ]
+}

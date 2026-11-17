@@ -1,3 +1,5 @@
+> ⚠️ **AVISO DE VERACIDAD (12-11-2026, regla de `CLAUDE.md` §1):** los precios, las «equivalencias militares» y los rendimientos de este documento **no están verificados** con cotizaciones ni medidas. Algunos parecen poco realistas (p. ej. radar UWB a 11,90 €, batería 18650 de 2600 mAh a 1,40 €). **No usar en material para inversores ni para clientes** hasta comprobar cada cifra con al menos 3 cotizaciones y una compra de prueba, y medir el rendimiento en banco o en campo.
+
 # SENDA — GUÍA MAESTRA DE HARDWARE COTS, PACKS DE PROMOCIÓN Y FÍSICA NOVEDOSA DE RESCATE
 
 **Documento:** `docs/hardware/SENDA_COTS_HARDWARE_PACKS_AND_PHYSICS_GUIDE.md`  

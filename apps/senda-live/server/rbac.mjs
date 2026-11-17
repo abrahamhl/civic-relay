@@ -29,6 +29,7 @@ export const PERMISSIONS = Object.freeze({
   'alert:issue': ['INSTITUTIONAL_OPERATOR'],       // + credencial verificada (verifyAuthority)
   'channel:institutional': ['INSTITUTIONAL_OPERATOR', 'ORG_ADMIN'],
   'source:manage': ['TRUST_ANALYST', 'PLATFORM_ADMIN'],
+  'evidence:camera': ['TRUST_ANALYST', 'INSTITUTIONAL_OPERATOR', 'PLATFORM_ADMIN'], // señales medidas de cámaras públicas
   'admin:read': ['PLATFORM_ADMIN', 'SYSTEM_AUDITOR'],
   'admin:write': ['PLATFORM_ADMIN'],
   'audit:read': ['PLATFORM_ADMIN', 'SYSTEM_AUDITOR'],

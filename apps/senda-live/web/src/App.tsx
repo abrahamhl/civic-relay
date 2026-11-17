@@ -46,6 +46,9 @@ export const App: React.FC = () => {
     if (params.get('action') === 'share' || params.get('url')) {
       setShowPublishModal(true);
     }
+    // Enlace directo a un acontecimiento (p. ej. desde la Consola SENDA): ?event=<id o slug>
+    const linkedEvent = params.get('event');
+    if (linkedEvent && /^[A-Za-z0-9_-]{1,80}$/.test(linkedEvent)) setSelectedEventId(linkedEvent);
 
     // Subscribe to SSE realtime events
     const unsubscribe = subscribeRealtime((event) => {

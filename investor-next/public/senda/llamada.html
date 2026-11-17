@@ -143,10 +143,18 @@ function onState(s) {
 }
 async function stats() {
   if (!S.pc || S.pc.connectionState === 'closed') return; let prev = S.prevBytes ?? 0;
-  (await S.pc.getStats()).forEach((r) => {
+  const rep = await S.pc.getStats();
+  // Ruta del par de candidatos SELECCIONADO. Sin servidores STUN/TURN (iceServers: []), «host» y «prflx» (dirección
+  // descubierta por el propio par durante la comprobación, p. ej. cuando el navegador oculta la IP local con mDNS)
+  // son ambas conexión directa en la red local. «srflx» o «relay» solo pueden aparecer si se configura un servidor.
+  const PATH = { host: 'local, sin servidor', prflx: 'local, sin servidor', srflx: 'vía servidor STUN', relay: 'por relé TURN' };
+  let pairId = null; rep.forEach((r) => { if (r.type === 'transport' && r.selectedCandidatePairId) pairId = r.selectedCandidatePairId; });
+  rep.forEach((r) => { if (!pairId && r.type === 'candidate-pair' && r.nominated && r.state === 'succeeded') pairId = r.id; });
+  const local = pairId ? rep.get(rep.get(pairId)?.localCandidateId) : null;
+  if (local?.candidateType) $('#k-path').textContent = PATH[local.candidateType] ?? local.candidateType;
+  rep.forEach((r) => {
     if (r.type === 'candidate-pair' && r.nominated && r.state === 'succeeded') { $('#k-rtt').textContent = r.currentRoundTripTime != null ? `${Math.round(r.currentRoundTripTime * 1000)} ms` : '—'; }
     if (r.type === 'inbound-rtp' && r.kind === 'audio') { $('#k-loss').textContent = `${r.packetsLost ?? 0}`; $('#k-kbps').textContent = `${Math.round(((r.bytesReceived - prev) * 8) / 1000)} kbit/s`; S.prevBytes = r.bytesReceived; window.SENDA_CALL.audioPackets = r.packetsReceived; }
-    if (r.type === 'local-candidate' && r.candidateType) $('#k-path').textContent = r.candidateType === 'host' ? 'local, sin servidor' : r.candidateType;
   });
   const s = Math.floor((Date.now() - S.t0) / 1000); $('#timer').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
   setTimeout(stats, 1000);

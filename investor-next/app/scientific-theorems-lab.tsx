@@ -471,7 +471,7 @@ export default function ScientificTheoremsLab({ locale }: { locale: Locale }) {
                   ∂λ₂(L) / ∂w_ij = (v₂(i) - v₂(j))²
                 </div>
                 <p className="stl-formula-desc">
-                  Perturbación de Fiedler: maximizar la diferencia entre componentes del autovector unitario v₂ garantiza el mayor incremento de resiliencia del enjambre.
+                  Perturbación de Fiedler: añadir el enlace entre los nodos con mayor diferencia en el autovector unitario v₂ maximiza el aumento de λ₂ a primer orden (Δλ₂ ≈ w·(v₂ᵢ − v₂ⱼ)²); es una aproximación, no una garantía.
                 </p>
               </>
             )}
