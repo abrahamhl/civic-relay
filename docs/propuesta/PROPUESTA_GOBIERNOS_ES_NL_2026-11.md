@@ -40,7 +40,7 @@ Todas las cifras salen de ejecutar el código del repositorio sobre los ficheros
 **Planificador de radio · cuenca del Poyo.** Fichero `data/radio/poyo_plan.json`. Es una **predicción con modelo** (espacio libre + difracción ITU-R P.526), sobre terreno desnudo:
 - Desde una azotea en Chiva, el modelo prevé enlace directo con 14 de 22 municipios; con un repetidor en una cima de 1 028 m y otro en Turís, con los 22.
 - Si se añaden 20 dB de pérdida por edificios y arbolado (supuesto, no medido), el enlace directo baja a 2 de 22 y hacen falta 4 repetidores para los 22.
-- Potencia (14 dBm) y sensibilidad (−137 dBm) son valores habituales de norma y de hoja de datos, **no verificados en esta sesión**. Antes de comprar equipos hay que medir en campo.
+- Potencia (14 dBm, 25 mW) y sensibilidad (−137 dBm) coinciden con tablas de CEPT derivadas de ERC 70-03 y con hojas de datos de módulos SX1262 consultadas el 17-11-2026; el texto vigente de la recomendación y la hoja original de Semtech no se han leído. Antes de comprar equipos hay que medir en campo.
 
 **Vigilancia de agua · Países Bajos.** Fichero `data/nl-water/rws_niveles.json`, descargado el 17-11-2026 a las 00:50 UTC:
 - 25 estaciones; 6 con algún motivo de atención según las reglas de SENDA; ninguna en atención alta.
@@ -69,7 +69,7 @@ Las duraciones son una propuesta de quien redacta, no un compromiso de nadie. **
 1. Sociedad constituida y un responsable legal del servicio.
 2. Servidor propio para que las capas se actualicen solas (hoy son fotos fijas de la fecha de descarga).
 3. Auditoría de seguridad independiente y camino hacia ENS / BIO.
-4. Acuerdo de datos con cada organismo y revisión de licencias (la de Rijkswaterstaat no se ha releído en esta sesión).
+4. Acuerdo de datos con cada organismo y revisión de licencias (data.overheid.nl marca Waterinfo como «Publiek domein»; las condiciones del servicio web de Rijkswaterstaat no se han leído).
 5. Validación con un episodio real por parte de quienes lo vivieron.
 
 ## 5. Cómo se financiaría

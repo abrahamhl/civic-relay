@@ -178,7 +178,7 @@ try {
   await ai.close();
   const ra = await actx.newPage(); ra.on('pageerror', (e) => errors.push(`radio: ${e.message}`)); await ra.goto(base + '/radio'); await ra.waitForSelector('body[data-ready]', { timeout: 90_000 });
   const ra0 = await ra.evaluate(() => window.SENDA_RADIO); await ra.evaluate(() => { const x = document.querySelector('#x'); x.value = 20; x.dispatchEvent(new Event('input')); }); const ra20 = await ra.evaluate(() => window.SENDA_RADIO);
-  check('planificador de radio: modelo ITU-R P.526 sobre Copernicus DEM en el navegador; más pérdida nunca mejora el enlace directo; marcado como predicción, no medida', ra0.basis === 'MODEL' && ra0.total === 22 && ra0.covered <= ra0.total && ra20.direct <= ra0.direct && ra20.areaPct <= ra0.areaPct && /NO ES MEDIDA DE CAMPO/.test(await ra.textContent('body')) && /NO verificado en esta sesión/.test(await ra.textContent('#fu')), { ra0, ra20 });
+  check('planificador de radio: modelo ITU-R P.526 sobre Copernicus DEM en el navegador; más pérdida nunca mejora el enlace directo; marcado como predicción, no medida', ra0.basis === 'MODEL' && ra0.total === 22 && ra0.covered <= ra0.total && ra20.direct <= ra0.direct && ra20.areaPct <= ra0.areaPct && /NO ES MEDIDA DE CAMPO/.test(await ra.textContent('body')) && /no leíd[ao]/.test(await ra.textContent('#fu')), { ra0, ra20 });
   await ra.close();
   const ag = await actx.newPage(); ag.on('pageerror', (e) => errors.push(`agua-nl: ${e.message}`)); await ag.goto(base + '/agua-nl'); await ag.waitForSelector('body[data-ready]', { timeout: 60_000 });
   const agua = await ag.evaluate(() => window.SENDA_AGUA_NL);

@@ -5,8 +5,8 @@
  * en cm respecto a NAP. Guarda medias horarias + SHA-256 de cada respuesta cruda.
  * Escribe investor-next/public/senda/data/nl-water/rws_niveles.json. Si la red falla, no escribe.
  * Uso: NODE_USE_ENV_PROXY=1 node scripts/datos-reales/rws_agua_snapshot.mjs
- * Licencia: datos abiertos de Rijkswaterstaat (Ministerie van Infrastructuur en Waterstaat), CC0 según su portal de datos
- * — condición NO releída en esta sesión: comprobar antes de un uso comercial.
+ * Licencia: datos abiertos de Rijkswaterstaat. data.overheid.nl marca «Waterinfo Rijkswateren» como «Publiek domein»
+ * (consultado el 17-11-2026); las condiciones propias del servicio web no se han leído: comprobar antes de un uso comercial.
  */
 import { writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -38,7 +38,7 @@ for (const [rio, codes] of Object.entries(RIOS)) for (const [orden, code] of cod
   console.log(rio, code, pm.length, pf.length, pm.at(-1)?.v);
 }
 const out = { fuente: 'Rijkswaterstaat · WaterWebservices (ddapi20-waterwebservices.rijkswaterstaat.nl)', magnitud: 'WATHTE · altura de agua en cm respecto a NAP', descargadoUTC: now.toISOString(), diasMedidas: DIAS,
-  nota: 'Medias horarias de las medidas de 10 minutos y de la previsión oficial de Rijkswaterstaat. SENDA no produce previsión propia.', licencia: 'Datos abiertos de Rijkswaterstaat; licencia CC0 según su portal — NO releída en esta sesión',
+  nota: 'Medias horarias de las medidas de 10 minutos y de la previsión oficial de Rijkswaterstaat. SENDA no produce previsión propia.', licencia: 'Datos abiertos de Rijkswaterstaat. El catálogo data.overheid.nl marca «Waterinfo Rijkswateren» como «Publiek domein» y otros conjuntos de RWS como CC-0 1.0 (consultado el 17-11-2026); condiciones propias del servicio web no leídas',
   basis: { medidas: 'MEASURED', prevision: 'OFFICIAL_FORECAST' }, consultas, estaciones };
 const dst = resolve(dirname(fileURLToPath(import.meta.url)), '../../investor-next/public/senda/data/nl-water/rws_niveles.json');
 await mkdir(dirname(dst), { recursive: true }); await writeFile(dst, JSON.stringify(out));

@@ -1,7 +1,7 @@
 {
  "basis": "MODEL",
  "caso": "Cuenca del barranco del Poyo (Chiva → l'Horta Sud)",
- "generadoUTC": "2026-11-17T00:47:43Z",
+ "generadoUTC": "2026-11-17T05:37:36Z",
  "escenario": {
   "fMhz": 868,
   "kFactor": 1.3333333333333333,
@@ -16,8 +16,8 @@
   "K": 6,
   "fuentes": {
    "fMhz": "banda ISM europea de 868 MHz (dispositivos de corto alcance)",
-   "txPowerDbm": "14 dBm (25 mW) de p.r.a.: límite habitual de la subbanda 868,0–868,6 MHz (ETSI EN 300 220 / CEPT ERC 70-03) — NO verificado en esta sesión",
-   "sensitivityDbm": "−137 dBm: sensibilidad típica LoRa SF12 a 125 kHz en hoja de datos Semtech SX1262 — NO verificado en esta sesión",
+   "txPowerDbm": "14 dBm (25 mW) de p.r.a. con ciclo de trabajo < 1 % en 868,0–868,6 MHz: coincide con tablas de CEPT derivadas de la Recomendación ERC 70-03, anexo 1 (consultadas el 17-11-2026: docdb.cept.org/download/2369 y efis.cept.org); texto vigente de la recomendación no leído",
+   "sensitivityDbm": "−137 dBm para LoRa SF12 a 125 kHz: coincide con hojas de datos de módulos basados en SX1262 (Seeed Wio-SX1262: −136,73 dBm; Wio-SX1262-LF: −136,5 dBm típico), consultadas el 17-11-2026. Una copia de la hoja de Semtech da −133 dBm en configuración de ahorro de energía; hoja original de Semtech no leída",
    "ganancias": "2,15 dBi = dipolo de media onda (teoría de antenas)",
    "marginDb": "10 dB: margen de desvanecimiento elegido por SENDA",
    "kFactor": "4/3: atmósfera estándar (ITU-R P.453)",
@@ -271,5 +271,5 @@
   "Potencia, ganancias, sensibilidad, margen, alturas y factor k son parámetros declarados por quien simula",
   "El relieve es un modelo digital de superficie remuestreado: obstáculos menores que la celda no existen para el cálculo"
  ],
- "ms": 1344
+ "ms": 1253
 }
