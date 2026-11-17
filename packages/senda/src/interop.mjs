@@ -20,22 +20,31 @@ export const CAP_ENUMS = Object.freeze({
 });
 
 /** Genera CAP 1.2. Valida los enumerados obligatorios (lanza si alguno no es válido). */
-export function toCap({ identifier, sender, sent, status = 'Actual', msgType = 'Alert', scope = 'Public', info }) {
+export function toCap({ identifier, sender, sent, status = 'Exercise', msgType = 'Alert', scope = 'Restricted', restriction = null, info }) {
   for (const [k, v] of Object.entries({ status, msgType, scope })) if (!CAP_ENUMS[k].includes(v)) throw new Error(`CAP ${k} no válido: ${v}`);
   for (const k of ['category', 'urgency', 'severity', 'certainty']) if (!CAP_ENUMS[k].includes(info[k])) throw new Error(`CAP ${k} no válido: ${info[k]}`);
+  // CAP 1.2 requires <restriction> for scope Restricted (OASIS §3.2.1).
+  // A low-level serializer DOES NOT authenticate the sender. All citizen flows
+  // must stay Exercise until a real institutional trust adapter exists.
+  const restrictionText = scope === 'Restricted'
+    ? (typeof restriction === 'string' && restriction.trim() ?
+        restriction.trim() : status === 'Exercise'
+        ? 'Exercise participants only; not a public or operational emergency alert'
+        : 'Intended authorized recipients only; verify issuer authority')
+    : null;
   const area = info.area ?? {};
   const areaXml = `<area><areaDesc>${xml(area.areaDesc ?? 'Zona')}</areaDesc>${area.polygon ? `<polygon>${area.polygon.map(([la, lo]) => `${la},${lo}`).join(' ')}</polygon>` : ''}${area.circle ? `<circle>${area.circle.center.lat},${area.circle.center.lon} ${area.circle.radiusKm}</circle>` : ''}</area>`;
   return `<?xml version="1.0" encoding="UTF-8"?>
-<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2"><identifier>${xml(identifier)}</identifier><sender>${xml(sender)}</sender><sent>${iso(sent)}</sent><status>${status}</status><msgType>${msgType}</msgType><scope>${scope}</scope><info><language>${xml(info.language ?? 'es-ES')}</language><category>${info.category}</category><event>${xml(info.event)}</event><urgency>${info.urgency}</urgency><severity>${info.severity}</severity><certainty>${info.certainty}</certainty>${info.expires ? `<expires>${iso(info.expires)}</expires>` : ''}<senderName>${xml(info.senderName ?? sender)}</senderName><headline>${xml(info.headline ?? info.event)}</headline><description>${xml(info.description ?? '')}</description>${info.instruction ? `<instruction>${xml(info.instruction)}</instruction>` : ''}${(info.parameters ?? []).map(([n, v]) => `<parameter><valueName>${xml(n)}</valueName><value>${xml(v)}</value></parameter>`).join('')}${areaXml}</info></alert>`;
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2"><identifier>${xml(identifier)}</identifier><sender>${xml(sender)}</sender><sent>${iso(sent)}</sent><status>${status}</status><msgType>${msgType}</msgType><scope>${scope}</scope>${restrictionText === null ? '' : `<restriction>${xml(restrictionText)}</restriction>`}<info><language>${xml(info.language ?? 'es-ES')}</language><category>${info.category}</category><event>${xml(info.event)}</event><urgency>${info.urgency}</urgency><severity>${info.severity}</severity><certainty>${info.certainty}</certainty>${info.expires ? `<expires>${iso(info.expires)}</expires>` : ''}<senderName>${xml(info.senderName ?? sender)}</senderName><headline>${xml(info.headline ?? info.event)}</headline><description>${xml(info.description ?? '')}</description>${info.instruction ? `<instruction>${xml(info.instruction)}</instruction>` : ''}${(info.parameters ?? []).map(([n, v]) => `<parameter><valueName>${xml(n)}</valueName><value>${xml(v)}</value></parameter>`).join('')}${areaXml}</info></alert>`;
 }
 
 /** Fusión de incidente ferroviario (rail-incident.fuseReports) → CAP para la sala 112. */
 export function railIncidentToCap(site, { sender = 'senda@organismo.example', now }) {
   const trapped = site.counts?.TRAPPED ?? 0, injured = (site.counts?.INJURED_SERIOUS ?? 0), noResp = site.counts?.NO_RESPONSE ?? 0;
-  return toCap({ identifier: `SENDA-RAIL-${site.site}-${now}`, sender, sent: now, scope: 'Restricted', msgType: 'Alert',
-    info: { category: 'Transport', event: 'Accidente ferroviario', urgency: 'Immediate', severity: 'Extreme', certainty: 'Observed',
+  return toCap({ identifier: `SENDA-RAIL-${site.site}-${now}`, sender, sent: now, status: 'Exercise', scope: 'Restricted', msgType: 'Alert',
+    info: { category: 'Transport', event: 'Accidente ferroviario', urgency: 'Immediate', severity: 'Extreme', certainty: 'Unknown',
       headline: `Accidente ferroviario: ${site.reports ?? 0} informes, ${trapped} atrapados, ${injured} heridos graves, ${noResp} sin respuesta`,
-      description: 'Fusión automática de informes cifrados de pasajeros SENDA (detección de impacto + respuestas). Estado «sin respuesta» no implica víctima.',
+      description: 'EJERCICIO — fusión experimental de informes de pasajeros SENDA. No se ha validado la identidad ni la ocurrencia real; «sin respuesta» no implica víctima.',
       parameters: [['SENDA_SITE', site.site], ['TRAIN', site.train ?? '?'], ['TRAPPED', trapped], ['INJURED_SERIOUS', injured], ['NO_RESPONSE', noResp]],
       area: { areaDesc: `Sitio ${site.site} · tren ${site.train ?? '?'}`, circle: { center: site.center, radiusKm: Math.max(0.2, (site.extentM ?? 300) / 1000) } } } });
 }

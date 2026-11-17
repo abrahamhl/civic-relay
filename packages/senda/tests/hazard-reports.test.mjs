@@ -28,14 +28,15 @@ test('40 reportes del mismo río en 30 min → 1 incidente; un fuego a 5 km es o
   assert.equal(cl.find((c) => c.family === 'WATER').reports.length, 40);
 });
 
-test('escalado: rumor con 1 persona; corroborado con varias; reconocimiento con medida; oficial solo con organismo', () => {
+test('escalado: referencias externas no autenticadas no confieren estado oficial', () => {
   const mk = (n, extra = {}) => clusterReports(Array.from({ length: n }, (_, i) => ({ kind: 'STREET_FLOODED', ...off(50), at: T0 + i * 60_000, deviceId: `p${i}`, ...extra })))[0];
   const one = assessIncident(mk(1));
   assert.equal(one.state, 'RUMOR'); assert.equal(one.canPublicWarn, false);
   const many = assessIncident(mk(4, { measurement: { rise: { cmPerMin: 1.1, stdErr: 0.1 } } }));
   assert.equal(many.state, 'RECON'); assert.equal(many.canPublicWarn, false, 'sin organismo no hay aviso público');
   const offc = assessIncident(mk(2), { official: [{ family: 'WATER', source: 'SAIH Júcar', ...off(800), at: T0 }] });
-  assert.equal(offc.state, 'OFFICIAL'); // matched public source, NOT authenticated alert authority
+  assert.notEqual(offc.state, 'OFFICIAL'); // a source label cannot confer authority
+  assert.equal(offc.pReal, assessIncident(mk(2)).pReal);
   assert.equal(offc.canPublicWarn, false);
   assert.equal(offc.publicAlertAuthorityVerified, false);
   assert.equal(offc.official.authorityVerified, false);
@@ -47,7 +48,7 @@ test('el mismo móvil repitiendo 20 veces no vale como 20 personas; un aforo ofi
   assert.equal(a.reporters, 1); assert.equal(a.state, 'RUMOR');
   const four = clusterReports(Array.from({ length: 4 }, (_, i) => ({ kind: 'RIVER_RISING', ...off(10), at: T0, deviceId: `q${i}` })))[0];
   const contra = assessIncident(four, { sensors: [{ id: 'SAIH-07', family: 'WATER', official: true, agrees: false, ...off(500) }] });
-  assert.ok(contra.pReal < assessIncident(four).pReal);
+  assert.equal(contra.pReal, assessIncident(four).pReal, 'untrusted sensor cannot suppress incident');
   const bad = assessIncident(four, { reputation: { q0: { good: 0, bad: 9 }, q1: { good: 0, bad: 9 }, q2: { good: 0, bad: 9 }, q3: { good: 0, bad: 9 } } });
   assert.ok(bad.pReal < assessIncident(four).pReal, 'reputación aprendida de falsas alarmas pesa menos');
 });
@@ -93,7 +94,7 @@ test('reporte firmado: cabe en una línea de SMS, se verifica y no se puede fals
   assert.equal(new Set(many.map((x) => x.deviceId)).size, 1);
 });
 
-test('CAP 1.2 para la sala: restringido, nunca público; certeza según estado; parámetros del cuadro', async () => {
+test('CAP 1.2 experimental: Restricted Exercise and Unknown certainty, no public alert', async () => {
   const { incidentToCap } = await import('../src/hazard-reports.mjs');
   const reps = Array.from({ length: 4 }, (_, i) => ({ kind: 'STREET_FLOODED', ...off(30, 1, 0), at: T0 + i * 60_000, deviceId: `c${i}`, ...(i === 2 ? { measurement: { rise: { cmPerMin: 1.3, stdErr: 0.1 } } } : {}) }));
   reps.push({ kind: 'PERSON_TRAPPED', ...off(3000, 0, 1), at: T0, deviceId: 'z', people: { trapped: 1 } });
@@ -102,11 +103,11 @@ test('CAP 1.2 para la sala: restringido, nunca público; certeza según estado; 
   const cap = incidentToCap(water, c, { now: T0 + 600_000 });
   assert.match(cap, /<scope>Restricted<\/scope>/); assert.doesNotMatch(cap, /<scope>Public/);
   assert.match(cap, /<status>Exercise<\/status>/);
-  assert.match(cap, /<certainty>Likely<\/certainty>/);
+  assert.match(cap, /<certainty>Unknown<\/certainty>/);
   assert.match(cap, /<valueName>SENDA_RISE_CM_MIN_MAX<\/valueName><value>1.30<\/value>/);
   assert.match(cap, /SENDA no ha avisado a la población/);
   const tr = q.queue.find((a) => a.family === 'STRUCTURE'), ct = cl.find((x) => x.id === tr.id);
   const capT = incidentToCap(tr, ct, { now: T0 });
-  assert.match(capT, /<severity>Extreme<\/severity>/); assert.match(capT, /<certainty>Possible<\/certainty>/);
+  assert.match(capT, /<severity>Extreme<\/severity>/); assert.match(capT, /<certainty>Unknown<\/certainty>/);
   assert.match(capT, /<valueName>SENDA_TRAPPED<\/valueName><value>1<\/value>/);
 });

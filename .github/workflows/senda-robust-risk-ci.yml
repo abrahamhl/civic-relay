@@ -1,0 +1,89 @@
+name: SENDA robust uncertainty shadow research (node 22 and 24)
+on:
+  push:
+    branches:
+      - audit/senda-robust-scenario-uncertainty-20261117
+  pull_request:
+    paths:
+      - 'packages/senda/src/robust-scenario-risk.mjs'
+      - 'packages/senda/src/robust-assurance-audit.mjs'
+      - 'packages/senda/src/dependency-agnostic-shards.mjs'
+      - 'packages/senda/src/scenario-frequency-evidence.mjs'
+      - 'packages/senda/src/shared-risk-topology.mjs'
+      - 'packages/senda/src/anytime-scenario-confidence.mjs'
+      - 'packages/senda/src/failure-domain-cuts.mjs'
+      - 'packages/senda/src/cross-layer-survivability.mjs'
+      - 'packages/senda/tests/cross-layer-survivability.test.mjs'
+      - 'packages/senda/tests/failure-domain-cuts.test.mjs'
+      - 'packages/senda/scripts/verify-failure-cuts.py'
+      - 'packages/senda/tests/anytime-scenario-confidence.test.mjs'
+      - 'packages/senda/src/hazard-reports.mjs'
+      - 'packages/senda/tests/hazard-reports.test.mjs'
+      - 'packages/senda/tests/untrusted-official-evidence-gate.test.mjs'
+      - 'packages/senda/tests/scenario-frequency-evidence.test.mjs'
+      - 'packages/senda/tests/shared-risk-topology.test.mjs'
+      - 'packages/senda/tests/dependency-agnostic-shards.test.mjs'
+      - 'packages/senda/scripts/verify-robust-lp.py'
+      - 'packages/senda/scripts/verify-dependence-bounds.py'
+      - 'packages/senda/tests/robust-scenario-risk.test.mjs'
+      - 'packages/senda/tests/robust-assurance-audit.test.mjs'
+      - '.github/workflows/senda-robust-risk-ci.yml'
+permissions:
+  contents: read
+jobs:
+  shadow-math-and-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22', '24']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Validate finite robust math and fail-closed shadow contract
+        run: |
+          node --check packages/senda/src/robust-scenario-risk.mjs
+          node --check packages/senda/src/robust-assurance-audit.mjs
+          node --test packages/senda/tests/robust-scenario-risk.test.mjs packages/senda/tests/robust-assurance-audit.test.mjs
+      - name: Full SENDA regression for shared delivery-engine interoperability
+        run: |
+          node --test packages/senda/tests/*.test.mjs
+          node --test packages/senda/tests-adversarial/*.test.mjs
+
+  independent-scipy-proof:
+    name: Independent solver HiGHS (250 cases)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned independent optimizer
+        run: python -m pip install --disable-pip-version-check scipy==1.17.0
+      - name: Prove finite box-simplex solver agrees with unrelated HiGHS implementation
+        run: python packages/senda/scripts/verify-robust-lp.py
+      - name: Adversarial joint LP oracle for arbitrary packet dependence
+        run: python packages/senda/scripts/verify-dependence-bounds.py
+      - name: Independent Python N-1/N-2 topology cut oracle
+        run: python packages/senda/scripts/verify-failure-cuts.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: senda-independent-lp-research-evidence
+          path: |
+            evidence/senda/research/robust-risk-lp-crosscheck.json
+            evidence/senda/research/dependency-agnostic-joint-lp-crosscheck.json
+            evidence/senda/research/declared-srlg-cuts-crosscheck.json
+          retention-days: 30
+          if-no-files-found: warn
