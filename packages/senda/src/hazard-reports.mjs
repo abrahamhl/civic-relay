@@ -174,12 +174,33 @@ export async function createReporterKeys() {
   return { privateKey: k.privateKey, publicRaw: new Uint8Array(await sub.exportKey('raw', k.publicKey)) };
 }
 
+// The signed reporter payload is user-generated evidence, not an authenticated emergency notice.
+// Fail closed before narrow integer encoding: DataView silently wraps invalid coordinates/time/counts.
+const REPORT_MIN_AT = Date.UTC(2020, 0, 1);
+const REPORT_MAX_AT = Date.UTC(2100, 0, 1);
 function packBody(r) {
-  const b = new Uint8Array(20), v = new DataView(b.buffer);
+  if (!r || typeof r !== 'object') throw new TypeError('reporte inválido');
   const kid = KIND_IDS.indexOf(r.kind); if (kid < 0) throw new Error(`tipo desconocido: ${r.kind}`);
+  if (!Number.isFinite(r.lat) || r.lat < -90 || r.lat > 90 ||
+      !Number.isFinite(r.lon) || r.lon < -180 || r.lon > 180) throw new RangeError('coordenadas inválidas');
+  if (!Number.isSafeInteger(r.at) || r.at < REPORT_MIN_AT || r.at > REPORT_MAX_AT)
+    throw new RangeError('fecha del reporte fuera del intervalo admitido');
+  const deltaMin = Math.round(r.at / 60_000 - EPOCH_MIN);
+  if (!Number.isSafeInteger(deltaMin) || deltaMin < 0 || deltaMin > 0xFFFFFFFF)
+    throw new RangeError('fecha no representable en formato SND3');
+  const trapped = r.people?.trapped ?? 0, injured = r.people?.injured ?? 0;
+  if (![trapped, injured].every(x => Number.isSafeInteger(x) && x >= 0 && x <= 255))
+    throw new RangeError('recuento de personas no representable');
+  const rise = r.measurement?.rise;
+  if (rise && (!Number.isFinite(rise.cmPerMin) || rise.cmPerMin < -327.67 ||
+      rise.cmPerMin > 327.66 || (rise.stdErr != null &&
+      (!Number.isFinite(rise.stdErr) || rise.stdErr < 0 || rise.stdErr > 655.34))))
+    throw new RangeError('medida de subida no representable');
+  const b = new Uint8Array(20), v = new DataView(b.buffer);
   b[0] = 1; b[1] = kid; v.setInt32(2, Math.round(r.lat * 1e5)); v.setInt32(6, Math.round(r.lon * 1e5));
-  v.setUint32(10, Math.round(r.at / 60_000 - EPOCH_MIN)); b[14] = Math.min(255, r.people?.trapped ?? 0); b[15] = Math.min(255, r.people?.injured ?? 0);
-  const rise = r.measurement?.rise; v.setInt16(16, rise ? Math.max(-32767, Math.min(32766, Math.round(rise.cmPerMin * 100))) : 0x7fff); v.setUint16(18, rise?.stdErr != null ? Math.min(65535, Math.round(rise.stdErr * 100)) : 65535);
+  v.setUint32(10, deltaMin); b[14] = trapped; b[15] = injured;
+  v.setInt16(16, rise ? Math.round(rise.cmPerMin * 100) : 0x7fff);
+  v.setUint16(18, rise?.stdErr != null ? Math.round(rise.stdErr * 100) : 65535);
   return b;
 }
 
@@ -200,8 +221,12 @@ export async function decodeReports(text) {
       const key = await sub.importKey('raw', pub, { name: 'Ed25519' }, false, ['verify']);
       if (!(await sub.verify({ name: 'Ed25519' }, key, sig, body))) throw new Error('firma');
       const v = new DataView(body.buffer, body.byteOffset), riseRaw = v.getInt16(16), se = v.getUint16(18);
+      const lat = v.getInt32(2) / 1e5, lon = v.getInt32(6) / 1e5;
+      const at = (v.getUint32(10) + EPOCH_MIN) * 60_000;
+      if (body[1] >= KIND_IDS.length || Math.abs(lat) > 90 || Math.abs(lon) > 180 ||
+          at < REPORT_MIN_AT || at > REPORT_MAX_AT) throw new Error('contenido de reporte firmado inválido');
       const deviceId = 'k' + b64u(new Uint8Array(await sub.digest('SHA-256', pub)).subarray(0, 9));
-      ok.push({ kind: KIND_IDS[body[1]], lat: v.getInt32(2) / 1e5, lon: v.getInt32(6) / 1e5, at: (v.getUint32(10) + EPOCH_MIN) * 60_000, people: { trapped: body[14], injured: body[15] },
+      ok.push({ kind: KIND_IDS[body[1]], lat, lon, at, people: { trapped: body[14], injured: body[15] },
         ...(riseRaw !== 0x7fff ? { measurement: { rise: { cmPerMin: riseRaw / 100, stdErr: se === 65535 ? null : se / 100 } } } : {}), deviceId, signed: true });
     } catch (e) { rejected.push(e.message); }
   }
@@ -216,13 +241,17 @@ const FAMILY_CAP = { WATER: 'Met', FIRE: 'Fire', ROAD: 'Transport', STRUCTURE: '
  * la difusión a la población la decide y la firma el organismo con sus propios sistemas.
  */
 export function incidentToCap(assessed, cluster, { sender = 'senda@organismo.example', now, exercise = true } = {}) {
+  // A sender string or a caller-provided "official" flag is NOT institutional authorization.
+  // An Actual CAP message must be created only by a separately authenticated official adapter.
+  // Until such an adapter is implemented and field-reviewed, this citizens-to-CAP path is exercise-only.
+  if (exercise !== true) throw new Error('CAP Actual bloqueado: requiere emisor institucional autenticado fuera de este adaptador experimental');
   if (!Number.isFinite(now)) throw new TypeError('now obligatorio');
   const certainty = assessed.state === 'OFFICIAL' ? 'Observed' : assessed.state === 'RUMOR' ? 'Possible' : 'Likely';
   const severity = assessed.lifeRisk ? 'Extreme' : assessed.severity >= 0.6 ? 'Severe' : 'Moderate';
   const rise = cluster.reports.map((r) => r.measurement?.rise?.cmPerMin).filter((x) => Number.isFinite(x));
   const kinds = [...new Set(cluster.reports.map((r) => HAZARD_KINDS[r.kind].label))];
   const radiusKm = Math.max(0.1, Math.max(...cluster.reports.map((r) => distanceM(cluster.center, r))) / 1000);
-  return toCap({ identifier: `SENDA-REP-${assessed.id}-${cluster.firstAt}`, sender, sent: now, status: exercise ? 'Exercise' : 'Actual', msgType: 'Alert', scope: 'Restricted',
+  return toCap({ identifier: `SENDA-REP-${assessed.id}-${cluster.firstAt}`, sender, sent: now, status: 'Exercise', msgType: 'Alert', scope: 'Restricted',
     info: { category: FAMILY_CAP[cluster.family] ?? 'Other', event: `Reportes ciudadanos: ${kinds.join(', ')}`, urgency: assessed.lifeRisk ? 'Immediate' : 'Expected', severity, certainty,
       headline: `${assessed.reporters} persona(s) distinta(s), ${assessed.reports} reporte(s) · estado ${assessed.state}`,
       description: `Agrupado por SENDA a partir de reportes firmados de móviles (seudónimos). Probabilidad del modelo ${assessed.pReal} (razones de verosimilitud sin calibrar). Motivos: ${assessed.why.join('; ')}. SENDA no ha avisado a la población.`,
