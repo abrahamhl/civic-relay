@@ -145,3 +145,38 @@ Fuentes oficiales: [IETF RFC 6414 §3.1.10](https://www.rfc-editor.org/rfc/rfc64
 **No traspasar a emergencias reales ni fusionar con `master` hasta cerrar**: (a) PR #32 de Claude, (b) PR #39 de autorización CAP y reportes, (c) PR #42 de H11–H13; (d) ensayo con al menos 2 Android y 2 radios autorizadas, sin enlaces de terceros no consentidos; (e) mapa de procedencia y licencias; (f) pruebas de reloj, pérdida, apagón, duplicación y latencia p95; (g) evaluación independiente de seguridad, privacidad y compatibilidad de la institución.
 
 **Potencial diferenciador defendible:** auditoría conjunta de incertidumbre de frecuencia de desastres, dependencia entre retransmisiones y puntos de fallo comunes. **No reclamar teoría inédita**: la innovación vendible sería integración, evidencia de campo, trazabilidad y ventaja medida frente a baselines de enrutamiento, no atribuirse Hoeffding, Fréchet o SRLG como descubrimientos propios.
+
+
+## H14 · Intervalos simultáneos válidos durante consultas reiteradas (optional stopping)
+
+**Problema:** H12 calculaba intervalos Hoeffding correctos para un tamaño muestral prefijado. No son suficientes si los responsables observan el panel reiteradamente y se detienen justo cuando aparece una distribución favorable. Esta selección aumenta la probabilidad de haber emitido alguna conclusión falsa.
+
+**Nueva implementación:** \`packages/senda/src/anytime-scenario-confidence.mjs\` y \`packages/senda/tests/anytime-scenario-confidence.test.mjs\`, con copia idéntica para la aplicación offline.
+
+Para m categorías exhaustivas (incluida UNKNOWN) y n episodios causales independientes, bajo una distribución categórica *IID estacionaria*:
+- Hoeffding: \`P(|p_hat_s(n)-p_s| > epsilon_n) <= 2 exp(-2n epsilon_n²)\`.
+- Se reparte alpha entre **todas las categorías y todos los tiempos** usando \`alpha/(m*n*(n+1))\` por categoría y tiempo, porque \`sum_{n>=1} 1/[n(n+1)] = 1\`.
+- Radio secuencial \`epsilon_n = sqrt( ln(2*m*n*(n+1)/alpha)/(2*n) )\`.
+- Resultado: \`P(for all n>=1 and all s, |p_hat_s(n)-p_s|<=epsilon_n) >= 1-alpha\`, **solo si las hipótesis IID y de captura íntegra son verdaderas**.
+
+Esto es una aplicación conservadora de resultados matemáticos establecidos (Hoeffding + Bonferroni/alpha-spending), no una nueva teoría. Alternativas más eficientes de secuencias de confianza se publican en Howard et al., *Annals of Statistics* 49(2), 2021, DOI https://doi.org/10.1214/20-AOS1991. Una contribución propia defendible requerirá demostrar mejora de calibración, tiempos de aviso y coste de recogida frente a estos métodos.
+
+**Pruebas:** caso analítico, identidad telescópica del presupuesto de error, 300 trayectorias categóricas sintéticas con múltiples consultas, validación de bloques causales, manejo de UNKNOWN y conexión conservadora con el planificador Claude. Todos los estados de investigación muestran \`operationalAuthorizationGranted:false\`.
+
+**Hipótesis falsable H14:** supervisar intervalos secuenciales calibrados por episodio causal reduce falsas garantías en un sistema consultado repetidamente. Fallaría con deriva temporal o espacial, categorías incompletas, datos seleccionados, fallos de procedencia y episodios correlacionados. El módulo **no corrige por sí solo** estas causas.
+
+## P0 de veracidad institucional descubierto y corregido en esta rama
+
+**Hallazgo:** \`assessIncident(incident,{official:[...]})\` utilizaba campos suministrados por el llamador para elevar un hecho a estado \`OFFICIAL\`, aumentar las odds sin comprobación de procedencia, y \`sensors:[{official:true,agrees:false}]\` podía suprimir la puntuación aunque el origen no estuviese autenticado. Si se etiquetaba \`OFFICIAL\` mediante otra vía, \`incidentToCap\` daba \`<certainty>Observed</certainty>\`. Las probabilidades reportadas tampoco estaban calibradas en campo, por lo que \`Likely\` no era defendible frente a CAP 1.2.
+
+**Corrección:**
+- Referencias externas y sensores sin firma/autoridad verificada siguen visibles en contexto, pero **no cambian el valor heurístico, ni el estado, ni los permisos de avisos**. El estado oficial se reserva a un adaptador institucional futuro con confianza fuera de banda.
+- \`canPublicWarn=false\`, \`publicAlertAuthorityVerified=false\`, \`modelCalibrationVerified=false\`, \`individualHumanIdentityVerified=false\` y \`sensorMeasurementsAuthenticated=false\` en las evaluaciones del módulo ciudadano.
+- Un informe SND3 de un pseudónimo no demuestra que provenga de una persona distinta. El texto de reporte y CAP ahora habla de seudónimos, no de personas independientes acreditadas.
+- El exportador CAP ciudadano solo emite \`Exercise + Restricted + certainty Unknown\` y **rechaza** \`state OFFICIAL\` o \`exercise:false\`, aunque un llamador haya creado dichos campos. Nunca emite una alerta pública.
+- \`packages/senda/tests/untrusted-official-evidence-gate.test.mjs\` comprueba suplantación de fuente, sensor falso, caducidad y rutas CAP.
+- Los archivos \`packages/senda/src/hazard-reports.mjs\` y \`investor-next/public/senda/core/hazard-reports.mjs\` están sincronizados bit a bit.
+
+**Referencia de formato:** OASIS CAP 1.2 define \`Observed\` como hecho determinado y \`Unknown\` como certeza desconocida; un cálculo heurístico sin certificación del emisor no acredita una observación oficial: https://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2.html .
+
+**Pendiente (bloqueador de piloto):** diseñar un adaptador real de fuente institucional, con claves públicas ancladas fuera del repositorio, rotación, revocación, caducidad, confianza de transportes, control de zonas y permisos de publicación. No introducir \`official:true\` como sustituto de la autenticación. Verificar interfaz y dependencia de todos los actores antes de integrar \`master\`.
