@@ -69,7 +69,7 @@ export function analyzeSharedRiskTopology({links,paths,
     const authorized=a.linkAuthorizedDeclared&&b.linkAuthorizedDeclared;
     const cost=a.costEUR+b.costEUR,energy=a.energyMj+b.energyMj;
     const allowedByBudget=cost<=maxPairCostEUR&&energy<=maxPairEnergyMj;
-    pairs.push({pathIds:[a.id,b.id],sharedDeclaredRisks:[...overlap].sort(),
+    pairs.push({pathIds:[a.id,b.id].sort(),sharedDeclaredRisks:[...overlap].sort(),
       sharedRiskCount:overlap.length,
       linkDisjoint:!overlap.some(x=>x.startsWith('LINK:')),
       fullyDeclaredTopology:complete,
