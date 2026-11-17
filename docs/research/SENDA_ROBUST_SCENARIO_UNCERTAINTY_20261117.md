@@ -79,3 +79,34 @@ No se han integrado gateways, redes ajenas, 112, radio, elementos orbitales o pe
 
 ## Decisión de integración
 Rama aislada basada en PR #39 (seguridad) que, a su vez, depende del PR #32 de Claude. **Nunca mergear directamente a master sin cerrar dependencia, revisar licencias y pasar el gate integral; ningún deploy**. Gate del Agente 1 aún sin pruebas físicas, así que esta labor continúa en línea de investigación, no activación del Agente 2.
+
+
+## H11-D · Segunda incertidumbre: dependencia oculta ENTRE retransmisiones dentro de un escenario
+
+**Problema encontrado:** delivery-assurance.mjs evalúa paquetes como eventos independientes *condicionado al estado*; retransmisiones que atraviesan un mismo gateway o energía pueden fallar a la vez. La mezcla de escenarios no cubre necesariamente esta correlación residual.
+
+Implementación añadida:
+- packages/senda/src/dependency-agnostic-shards.mjs
+- packages/senda/tests/dependency-agnostic-shards.test.mjs
+- El adaptador robust-assurance-audit.mjs sigue calculando el valor puntual condicional con Claude, pero usa esta nueva **cota inferior sin independencia** antes de la incertidumbre de masas de escenarios.
+
+Sean grupos i con r_i fragmentos, evento binario X_i de éxito y una **cota marginal válida** p_i <= P(X_i=1), con umbral k de fragmentos, N=sum_i r_i, μ=sum_i r_i*p_i.
+Sin suponer ninguna independencia, Y=sum_i r_i X_i cumple:
+
+E[Y] >= μ, E[Y] <= (k-1) P(Y<k) + N P(Y>=k).
+
+Por tanto:
+P(Y>=k) >= max(0, (μ-(k-1))/(N-k+1)).
+
+Para todo subconjunto A con sum_A r_i >= k, la coincidencia de éxito de todos los grupos A implica alcanzar k, y por Boole/Fréchet:
+P(Y>=k) >= max(0, 1 - sum_A(1-p_i)).
+
+Se toma el máximo de estas cotas inferiores. Para <=10 grupos se enumeran todos los subconjuntos; entre 11 y 32 se usa un conjunto ganador voraz como **cota válida no óptima**. N<=255. Si únicamente hay cotas marginales inferiores, la **cota superior es 1**, no se aplica incorrectamente Markov a una esperanza inferior. Solo para probabilidades marginales exactas en el modelo (opción explícita) se usa upper<=min(1,μ/k).
+
+**Contraejemplo de marketing:** dos copias con p=.95 sobre el mismo gateway y k=1. La independencia daría 1−(.05)^2=.9975 (99,75 %). Si ambas copias fallan exactamente juntas, la entrega solo es .95; la cota sin dependencia es .95. No se puede afirmar 99,75 % por haber duplicado envíos.
+
+**Pruebas:** casos extremos, 2-de-3, tamaños GF(256), repeticiones completamente correlacionadas, 280 casos aleatorios confrontados con la distribución Poisson-binomial independiente. El resultado independiente debe caer dentro del intervalo sin hipótesis de independencia, nunca fuera.
+
+**Limitación:** la cota requiere que p_i sean límites marginales genuinos. Sin medidas reales no se convierten en probabilidades de campo, incluso si las matemáticas están correctamente demostradas. Ninguna transmisión en vivo, 112 ni acceso por satélite queda habilitado por este algoritmo. La ganancia científica sería **calibrar las cotas por dependencia física real** y probar reducción de sobreconfianza, no atribuir originalidad a Boole/Fréchet ni a las desigualdades de esperanza.
+
+Referencia conceptual adicional: IETF RFC 6414 (Shared Risk Link Group); IETF BPv7 no estandariza política de ruta. El siguiente contrato científico debe registrar riesgos comunes de suministro eléctrico, emplazamiento, operador y dispositivo sin asumirlos independientes.
