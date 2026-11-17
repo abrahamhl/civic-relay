@@ -1,0 +1,26 @@
+name: SENDA ARR research gate
+on:
+  pull_request:
+    paths:
+      - 'experimental/senda-arr/**'
+      - 'experimental/senda-route-truth/**'
+      - '.github/workflows/senda-arr-ci.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experimental/senda-arr/**'
+      - '.github/workflows/senda-arr-ci.yml'
+permissions:
+  contents: read
+jobs:
+  arr-invariants:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Unit, invariant, adversarial and differential tests
+        run: node --test experimental/senda-arr/tests/*.test.mjs
+      - name: Experiment pipeline smoke run (quick mode, not the reported numbers)
+        run: node experimental/senda-arr/experiments/run-experiment.mjs --quick && rm -f experimental/senda-arr/results/results.quick.json

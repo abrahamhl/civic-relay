@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA ARR · laboratorio de rutas resilientes</title>
+<style>
+  :root { --bg:#05090c; --panel:#0a1016; --line:#1c2a35; --text:#f2f4f4; --mute:#93a4ad; --coral:#ff7756; --ice:#91d7e8; --ok:#7bd88f; --warn:#f2c14e; }
+  * { box-sizing: border-box; } [hidden] { display:none !important; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.45 Inter, system-ui, sans-serif; }
+  header { padding:14px 16px 8px; }
+  h1 { font-size:18px; margin:0 0 4px; } h2 { font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--mute); margin:0 0 8px; }
+  .banner { border:1px solid var(--coral); color:var(--coral); padding:6px 10px; border-radius:6px; font:12px ui-monospace, monospace; display:inline-block; }
+  main { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:12px; padding:8px 16px 24px; }
+  @media (max-width: 900px) { main { grid-template-columns:minmax(0,1fr); } }
+  section { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px; min-width:0; }
+  canvas { width:100%; height:auto; display:block; border-radius:6px; background:#060c11; }
+  .controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px 12px; margin-bottom:10px; }
+  label { display:flex; flex-direction:column; gap:3px; font-size:12px; color:var(--mute); }
+  select, input, button { background:#0e1820; color:var(--text); border:1px solid var(--line); border-radius:6px; padding:8px; font:inherit; min-height:40px; }
+  button { cursor:pointer; } button:hover { border-color:var(--ice); }
+  .legend { display:flex; flex-wrap:wrap; gap:6px 14px; font-size:12px; margin-top:8px; }
+  .tag { font:11px ui-monospace, monospace; padding:1px 6px; border-radius:4px; border:1px solid; }
+  .obs { color:var(--coral); } .sim { color:var(--mute); } .pred { color:var(--ice); }
+  table { width:100%; border-collapse:collapse; font-size:12px; } td, th { padding:4px 6px; border-bottom:1px solid var(--line); text-align:left; }
+  td.num, th.num { text-align:right; font-family:ui-monospace, monospace; }
+  .mono { font-family:ui-monospace, monospace; font-size:12px; overflow-wrap:anywhere; }
+  .small { font-size:12px; color:var(--mute); }
+</style>
+</head>
+<body>
+<header>
+  <h1>SENDA Adaptive Resilience Routing · laboratorio</h1>
+  <div class="banner">SOLO MODELO · no se emite radio · una ruta planificada no demuestra entrega</div>
+</header>
+<main>
+  <section>
+    <div class="controls">
+      <label>Escenario<select id="scenario">
+        <option value="regional">Choques regionales (todo SIMULADO)</option>
+        <option value="camp">Camp Fire 2018 · perímetros OBSERVADOS</option>
+        <option value="carr">Carr Fire 2018 · perímetros OBSERVADOS</option>
+        <option value="woolsey">Woolsey Fire 2018 · perímetros OBSERVADOS</option></select></label>
+      <label>Semilla de topología<input id="seed" type="number" value="1003" min="1"></label>
+      <label id="rhoBox">Correlación regional ρ = <span id="rhoV">0.9</span><input id="rho" type="range" min="0" max="0.95" step="0.05" value="0.9"></label>
+      <label id="k0Box" hidden>Instante de planificación (nº de perímetro)<input id="k0" type="number" value="1" min="0"></label>
+      <label>Réplicas K = <span id="kV">3</span><input id="k" type="range" min="1" max="5" value="3"></label>
+      <label>Plan mostrado<select id="method"><option value="arr">ARR (conjunto de escenarios)</option><option value="independent-greedy">Ablación: independencia</option><option value="cgr-k-exclusion">CGR k rutas (exclusión)</option><option value="cgr-earliest">CGR llegada más temprana</option></select></label>
+      <label>Tiempo t = <span id="tV">0</span> h<input id="t" type="range" min="0" max="100" value="0"></label>
+      <button id="world">Sortear un mundo y ejecutar</button>
+      <button id="play">▶ Reproducir tiempo</button>
+      <label id="fieldBox" hidden>Capa de predicción<select id="field"><option value="on">Campo de llegada del frente (PREDICHO)</option><option value="off">Oculto</option></select></label>
+    </div>
+    <canvas id="map" width="900" height="640" aria-label="Mapa del escenario"></canvas>
+    <div class="legend">
+      <span><span class="tag obs">OBSERVADO</span> perímetro de incendio (USGS GeoMAC)</span>
+      <span><span class="tag sim">SIMULADO</span> nodos, movilidad, ventanas de contacto, desvanecimiento</span>
+      <span><span class="tag pred">PREDICHO</span> prob. de pérdida de cada nodo antes de t; sombreado azul = prob. de que el frente haya llegado a esa celda en t</span>
+    </div>
+    <p class="small" id="status"></p>
+  </section>
+  <div style="display:grid; gap:12px; align-content:start; min-width:0">
+    <section><h2>Predicción del plan e incertidumbre</h2><div id="pred"></div><canvas id="members" width="600" height="150" aria-label="Probabilidad por escenario"></canvas>
+      <p class="small">Barras: probabilidad de entrega a tiempo en cada miembro del conjunto (ordenadas). La dispersión es la incertidumbre que la hipótesis de independencia oculta.</p></section>
+    <section id="alertBox" hidden><h2>Avisos predichos por nodo (24 h)</h2><div id="skill" class="small"></div><div id="alerts"></div></section>
+    <section><h2>Traza del algoritmo</h2><div id="trace"></div></section>
+    <section><h2>Mundo sorteado (una realización)</h2><div id="exec" class="small">Pulsa «Sortear un mundo».</div></section>
+    <section><h2>Resultados retenidos (results.json)</h2><canvas id="chart" width="600" height="230" aria-label="Entrega frente a correlación"></canvas><div id="verdict" class="small"></div></section>
+  </div>
+</main>
+<script type="module">
+import { planAdaptiveResilience, ensembleReliability } from '../src/arr-core.mjs';
+import { makeRegionalInstance, makeFireInstance, planAll, realise, executePlan, executeDynamic, mulberry32 } from '../src/arr-sim.mjs';
+
+const $ = (id) => document.getElementById(id), css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+import { forecastParticles, pointGeometry, arrivalForecast, arrivalHours, INVALID_WHEN } from '../src/arr-forecast.mjs';
+const HOUR = 3600000, datasets = {};
+let skill = null;
+fetch('../results/forecast-results.json').then((r) => r.json()).then((j) => { skill = j; alerts(); }).catch(() => {});
+let S = null, worldSeed = 1;
+
+async function dataset(key) { return datasets[key] ??= await (await fetch(`../data/geomac-2018-${key}.json`)).json(); }
+
+async function rebuild() {
+  const kind = $('scenario').value, seed = +$('seed').value || 1, K = +$('k').value;
+  $('rhoBox').hidden = kind !== 'regional'; $('k0Box').hidden = kind === 'regional';
+  let inst;
+  if (kind === 'regional') inst = makeRegionalInstance({ seed, rho: +$('rho').value });
+  else { const d = await dataset(kind); $('k0').max = d.perimeters.length - 2; inst = makeFireInstance({ seed, dataset: d, k0: Math.min(+$('k0').value, d.perimeters.length - 2), horizonMs: 24 * HOUR }); }
+  if (!inst) { S = null; $('status').textContent = 'Sin par origen–destino válido con esta semilla.'; return draw(); }
+  const all = planAll(inst, { maxReplicas: K });
+  const detail = all.candidates.length ? planAdaptiveResilience({ problem: all.problem, ensemble: inst.ensemble, candidates: all.candidates, maxReplicas: K }) : null;
+  S = { inst, ...all, detail, world: null, area: inst.view?.area ?? [18, 18] };
+  $('fieldBox').hidden = $('alertBox').hidden = !inst.view;
+  if (inst.view) { // PREDICTED front arrival: particles assimilate only perimeters up to the planning time
+    const per = inst.view.perimetersKm, k0 = inst.meta.k0, G = 36, grid = [];
+    for (let i = 0; i < G; i++) for (let j = 0; j < G; j++) grid.push([((i + 0.5) / G) * S.area[0], ((j + 0.5) / G) * S.area[1]]);
+    const f = forecastParticles(mulberry32(seed + 77), { perimetersKm: per, k0, area: S.area, mode: 'assimilated' });
+    const statics = inst.nodes.filter((n) => !n.mobile);
+    S.forecast = { f, G, grid, gridGeo: pointGeometry(per, k0, grid), nodes: statics, nodeForecast: arrivalForecast(f, pointGeometry(per, k0, statics.map((n) => n.pos)), 24) };
+  } else S.forecast = null;
+  alerts();
+  $('status').textContent = `${inst.kind} · ${inst.nodes.length} nodos · ${all.problem.contactById.size} contactos elegibles · ${all.candidates.length} rutas candidatas` +
+    (inst.meta.planningTime ? ` · planificado en ${inst.meta.planningTime} · ${inst.meta.lostNodes} nodos perdidos en el registro (24 h)` : '');
+  panels(); draw();
+}
+
+function panels() {
+  if (!S?.detail) { $('pred').innerHTML = '<p>No existe ruta temporal autorizada antes del plazo.</p>'; $('trace').innerHTML = ''; return; }
+  const p = S.detail.predicted, pct = (x) => (100 * x).toFixed(1) + ' %';
+  const shown = S.plans[$('method').value], rel = ensembleReliability(shown, S.ensemble, S.problem.contactById);
+  $('pred').innerHTML = `<table>
+    <tr><td>Plan mostrado · prob. según conjunto <span class="tag pred">PREDICHO</span></td><td class="num">${pct(rel.mean)}</td></tr>
+    <tr><td>ARR · prob. según conjunto</td><td class="num">${pct(p.ensembleProbability)}</td></tr>
+    <tr><td>ARR · lo que afirmaría la independencia</td><td class="num">${pct(p.independenceClaim)}</td></tr>
+    <tr><td>ARR · cota inferior de muestreo (95 %)</td><td class="num">${pct(p.samplingLowerBound)}</td></tr>
+    <tr><td>ARR · cota con 10 % de contaminación</td><td class="num">${pct(p.contaminationLowerBound)}</td></tr>
+    <tr><td>ARR · media del 25 % peor de escenarios</td><td class="num">${pct(p.lowerTailMean)}</td></tr></table>
+    <p class="small">Válido solo si el conjunto representa el peligro real. Condiciones de invalidez: nodos o contactos no medidos, pronóstico sesgado, replanificación en ruta.</p>`;
+  $('trace').innerHTML = `<table><tr><th>Paso</th><th>Ruta añadida</th><th class="num">Ganancia</th><th class="num">Total</th><th class="num">mJ</th></tr>` +
+    S.detail.trace.map((s) => `<tr><td>${s.step}</td><td class="mono">${s.path.join(' → ')}</td><td class="num">+${(100 * s.marginalGain).toFixed(1)}</td><td class="num">${(100 * s.objectiveAfter).toFixed(1)}</td><td class="num">${s.energyMjAfter}</td></tr>`).join('') +
+    `</table><p class="small">Selección voraz sobre ${S.detail.candidatesExamined} candidatas; contactos rechazados por la puerta de autorización: ${JSON.stringify(S.detail.rejectedContacts)}</p>`;
+  bars(rel.perMember);
+}
+
+function alerts() {
+  if (!S?.forecast) return;
+  $('skill').innerHTML = skill ? `<b style="color:${css('--coral')}">Pericia NO demostrada.</b> En ${skill.units} casos retenidos de 3 incendios observados este pronóstico (Brier ${skill.brier.assimilated.toFixed(3)}) fue <b>peor</b> que suponer que el frente no avanza (${skill.brier.persistence.toFixed(3)}); sobrepredice el avance (sesgo ${(100 * skill.calibration.assimilated.bias).toFixed(1)} pp). No usar como aviso a la población.` : 'forecast-results.json no encontrado.';
+  const rows = S.forecast.nodes.map((n, i) => ({ n, x: S.forecast.nodeForecast[i] })).filter((r) => !r.x.alreadyBurnt && r.x.probability >= 0.05).sort((a, b) => b.x.probability - a.x.probability).slice(0, 8);
+  const level = (p) => (p >= 0.6 ? ['ALTA', css('--coral')] : p >= 0.3 ? ['MEDIA', css('--warn')] : ['BAJA', css('--mute')]);
+  $('alerts').innerHTML = (rows.length ? `<table><tr><th>Nodo</th><th>Prob. ≤ 24 h</th><th class="num">Llegada P10–P90 (h)</th><th>Observado</th></tr>` + rows.map(({ n, x }) => {
+    const [name, col] = level(x.probability), truth = S.inst.sampleTruth().nodeDeathMs[n.id];
+    return `<tr><td class="mono">${n.id}</td><td><b style="color:${col}">${name}</b> ${(100 * x.probability).toFixed(0)} %</td><td class="num">${x.arrivalHoursP10.toFixed(1)} – ${x.arrivalHoursP90 > 99 ? '>99' : x.arrivalHoursP90.toFixed(1)}</td><td>${truth !== undefined ? 'alcanzado ≈ ' + (truth / HOUR).toFixed(1) + ' h' : 'no alcanzado'}</td></tr>`; }).join('') + '</table>' : '<p>Ningún nodo con probabilidad ≥ 5 %.</p>') +
+    `<p class="small">Horizonte 24 h · incertidumbre = dispersión de ${S.forecast.f.particles.length} partículas (tamaño efectivo antes de remuestrear ${S.forecast.f.effectiveSampleSize.toFixed(1)}) · dato: último perímetro OBSERVADO en ${S.inst.meta.planningTime}. Deja de ser válido si: ${INVALID_WHEN.slice(0, 3).join('; ')}.</p>`;
+}
+
+function bars(perMember) {
+  const cv = $('members'), g = cv.getContext('2d'), w = cv.width, h = cv.height, xs = [...perMember].sort((a, b) => a - b);
+  g.clearRect(0, 0, w, h); g.fillStyle = css('--ice');
+  xs.forEach((p, i) => g.fillRect(4 + (i * (w - 8)) / xs.length, h - 14 - p * (h - 24), Math.max(1, (w - 8) / xs.length - 1), p * (h - 24) + 1));
+  g.fillStyle = css('--mute'); g.font = '11px ui-monospace, monospace'; g.fillText('0', 4, h - 2); g.fillText(`miembros del conjunto (${xs.length})`, w - 190, h - 2);
+}
+
+function draw() {
+  const cv = $('map'), g = cv.getContext('2d'), W = cv.width, H = cv.height;
+  g.clearRect(0, 0, W, H);
+  if (!S) return;
+  const { inst, area } = S, sc = Math.min((W - 40) / area[0], (H - 40) / area[1]);
+  const X = ([x, y]) => [20 + x * sc, H - 20 - y * sc];
+  const horizon = inst.deadlineMs, t = (+$('t').value / 100) * horizon;
+  $('tV').textContent = (t / HOUR).toFixed(1);
+  if (inst.view) for (const per of inst.view.perimetersKm) { // OBSERVED, only what has been mapped by time t
+    if (per.tMs > t) break;
+    g.strokeStyle = css('--coral'); g.fillStyle = 'rgba(255,119,86,.10)'; g.lineWidth = 1.2;
+    for (const ring of per.rings) { g.beginPath(); ring.forEach((p, i) => { const [x, y] = X(p); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.closePath(); g.fill(); g.stroke(); }
+  }
+  if (S.forecast && $('field').value === 'on') { // PREDICTED probability that the front has reached each cell by time t
+    const { f, G, grid, gridGeo } = S.forecast, cw = (area[0] / G) * sc, ch = (area[1] / G) * sc;
+    grid.forEach((pt, i) => {
+      if (gridGeo[i].burnt) return;
+      let pr = 0; for (const q of f.particles) if (arrivalHours(gridGeo[i], q) * HOUR <= t) pr += q.weight;
+      if (pr < 0.05) return;
+      const [x, y] = X(pt); g.fillStyle = `rgba(145,215,232,${(0.45 * pr).toFixed(3)})`; g.fillRect(x - cw / 2, y - ch / 2, cw, ch);
+    });
+  }
+  const pos = new Map(inst.nodes.map((n) => [n.id, n.mobile ? mobilePos(n, t) : n.pos]));
+  g.strokeStyle = 'rgba(147,164,173,.25)'; g.lineWidth = 1; // SIMULATED contacts open at t
+  for (const c of S.problem.contactById.values()) if (c.startMs <= t && t <= c.endMs && c.from < c.to) { g.beginPath(); g.moveTo(...X(pos.get(c.from))); g.lineTo(...X(pos.get(c.to))); g.stroke(); }
+  const routes = S.plans[$('method').value] ?? [], colors = [css('--ok'), css('--warn'), css('--ice'), '#c79bf2', '#f29bd0'];
+  routes.forEach((r, i) => {
+    g.strokeStyle = colors[i % 5]; g.lineWidth = 2.5; g.setLineDash(i ? [8, 4] : []);
+    g.beginPath(); r.path.forEach((id, j) => { const [x, y] = X(pos.get(id)); j ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); g.setLineDash([]);
+  });
+  for (const n of inst.nodes) {
+    const [x, y] = X(pos.get(n.id));
+    const pLost = S.ensemble.reduce((s, m) => s + ((m.nodeDeathMs[n.id] ?? Infinity) <= t ? m.weight : 0), 0); // PREDICTED
+    const dead = S.world && (S.world.truth.nodeDeathMs[n.id] ?? Infinity) <= t;
+    g.beginPath(); g.arc(x, y, n.id === inst.source || n.id === inst.destination ? 8 : 5, 0, 7);
+    g.fillStyle = n.powered === false ? '#3a2a26' : `rgb(${Math.round(60 + 85 * (1 - pLost))},${Math.round(90 + 125 * (1 - pLost))},${Math.round(110 + 122 * (1 - pLost))})`; g.fill();
+    if (n.mobile) { g.strokeStyle = css('--text'); g.lineWidth = 1; g.stroke(); }
+    if (dead) { g.strokeStyle = css('--coral'); g.lineWidth = 2; g.beginPath(); g.moveTo(x - 6, y - 6); g.lineTo(x + 6, y + 6); g.moveTo(x + 6, y - 6); g.lineTo(x - 6, y + 6); g.stroke(); }
+    if (n.id === inst.source || n.id === inst.destination) { g.fillStyle = css('--text'); g.font = '12px ui-monospace, monospace'; g.fillText(n.id === inst.source ? 'ORIGEN' : 'DESTINO', x + 10, y + 4); }
+  }
+  g.fillStyle = css('--mute'); g.font = '11px ui-monospace, monospace';
+  g.fillText(`área ${area[0].toFixed(0)} × ${area[1].toFixed(0)} km · nodo más oscuro = mayor prob. PREDICHA de pérdida antes de t · ✕ = perdido en el mundo sorteado`, 20, 14);
+}
+function mobilePos(n, t) { const u = ((t / n.mobile.periodMs + n.mobile.phase) % 1 + 1) % 1, s = u < 0.5 ? 2 * u : 2 - 2 * u; return [n.mobile.a[0] + s * (n.mobile.b[0] - n.mobile.a[0]), n.mobile.a[1] + s * (n.mobile.b[1] - n.mobile.a[1])]; }
+
+function runWorld() {
+  if (!S?.detail) return;
+  S.world = realise(S.inst, S.problem, mulberry32(worldSeed++ * 7919));
+  const row = (name, r) => `<tr><td>${name}</td><td>${r.delivered ? 'entregado (simulado)' : 'no entregado'}</td><td class="num">${r.delivered ? (r.deliveredAtMs / HOUR).toFixed(2) + ' h' : '—'}</td><td class="num">${r.transmissions}</td></tr>`;
+  $('exec').innerHTML = `<table><tr><th>Método</th><th>Resultado</th><th class="num">Llegada</th><th class="num">Tx</th></tr>` +
+    Object.entries(S.plans).map(([m, routes]) => row(m, executePlan(routes, S.problem, S.world))).join('') +
+    row('inundación epidémica (techo)', executeDynamic(S.problem, S.world)) + `</table>
+    <p>${S.inst.dataClass.hazardTruth === 'OBSERVED' ? 'Pérdida de nodos tomada de los perímetros OBSERVADOS; desvanecimiento SIMULADO.' : 'Peligro y desvanecimiento SIMULADOS.'} Una realización no es una estadística.</p>`;
+  draw();
+}
+
+async function chart() {
+  const cv = $('chart'), g = cv.getContext('2d');
+  let R; try { R = await (await fetch('../results/results.json')).json(); } catch { $('verdict').textContent = 'results.json no encontrado: ejecuta node experiments/run-experiment.mjs'; return; }
+  const rhos = Object.keys(R.synthetic), series = { arr: css('--ok'), 'independent-greedy': css('--warn'), 'cgr-k-exclusion': css('--ice'), epidemic: css('--mute') };
+  const x = (i) => 50 + (i * (cv.width - 80)) / (rhos.length - 1), y = (v) => cv.height - 30 - (v - 0.4) / 0.6 * (cv.height - 50);
+  g.strokeStyle = css('--line'); g.fillStyle = css('--mute'); g.font = '11px ui-monospace, monospace';
+  for (const v of [0.4, 0.6, 0.8, 1]) { g.beginPath(); g.moveTo(45, y(v)); g.lineTo(cv.width - 20, y(v)); g.stroke(); g.fillText(v.toFixed(1), 14, y(v) + 4); }
+  rhos.forEach((r, i) => g.fillText(r.replace('rho=', 'ρ='), x(i) - 16, cv.height - 10));
+  Object.entries(series).forEach(([m, color], si) => {
+    g.strokeStyle = g.fillStyle = color; g.lineWidth = 2; g.beginPath();
+    rhos.forEach((r, i) => { const d = R.synthetic[r].methods[m].delivery; i ? g.lineTo(x(i), y(d.mean)) : g.moveTo(x(i), y(d.mean)); }); g.stroke();
+    rhos.forEach((r, i) => { const d = R.synthetic[r].methods[m].delivery; g.fillRect(x(i) - 1, y(d.hi), 2, y(d.lo) - y(d.hi)); });
+    g.fillText(m, 60 + si * 135, 12);
+  });
+  const v = R.verdict;
+  $('verdict').innerHTML = `Entrega simulada a tiempo frente a ρ (IC 95 %, semillas retenidas ≥ ${R.protocol.heldOutSeedStart}). Veredicto prerregistrado: ` +
+    Object.entries(v).map(([k, ok]) => `${k.replace(/_/g, ' ')}: <b style="color:${ok ? css('--ok') : css('--coral')}">${ok ? 'sí' : 'no'}</b>`).join(' · ');
+}
+
+for (const id of ['scenario', 'seed', 'rho', 'k0', 'k']) $(id).addEventListener('change', rebuild);
+$('rho').addEventListener('input', () => ($('rhoV').textContent = $('rho').value));
+$('k').addEventListener('input', () => ($('kV').textContent = $('k').value));
+$('method').addEventListener('change', () => { panels(); draw(); });
+$('t').addEventListener('input', draw);
+$('world').addEventListener('click', runWorld);
+$('field').addEventListener('change', draw);
+let timer = null;
+$('play').addEventListener('click', () => {
+  if (timer) { clearInterval(timer); timer = null; $('play').textContent = '▶ Reproducir tiempo'; return; }
+  $('play').textContent = '⏸ Pausar';
+  timer = setInterval(() => { const el = $('t'); el.value = (+el.value + 1) % 101; draw(); }, 120);
+});
+rebuild(); chart();
+</script>
+</body>
+</html>
