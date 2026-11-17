@@ -1,6 +1,6 @@
 # SENDA — Decisiones científicas independientes (2026-11-17)
 
-**Estado:** documento de investigación, no aprobación de lanzamiento. **Rama de origen:** master @ b8360c9bdc30c0264bc4277d35f2c2ab5bce4e40. **Revisión de PR:** #32, #38, #39, #42, #44 a las 08:xx CET del 17-11-2026. Todas en DRAFT/abiertas al consultar. No modifica producción ni incorpora código experimental.
+**Estado:** documento de investigación, no aprobación de lanzamiento. **Rama de origen:** master @ b8360c9bdc30c0264bc4277d35f2c2ab5bce4e40. **Revisión de PR:** #32, #38, #39, #42, #44 el 17-11-2026. Todas en DRAFT/abiertas al consultar. No modifica producción ni incorpora código experimental.
 
 ## 0. Decisión ejecutiva
 
@@ -17,7 +17,7 @@
 | Elemento | HEAD examinado | Base / estado | Evidencia y limitación |
 |---|---|---|---|
 | master | b8360c9bdc30c0264bc4277d35f2c2ab5bce4e40 | rama por defecto | No incluye los motores de los PR en borrador |
-| #44 ARR/H2 | ce9ab69fbae2773f3256659197c9d83937fca9b8 | base audit/senda-agent1-durable-lab-20261117 (#38); draft | ARR research gate y emergency lab CI con success a ese HEAD; investigación y simulación exclusivamente |
+| #44 ARR/H2 | ce9ab69fbae2773f3256659197c9d83937fca9b8 | base audit/senda-agent1-durable-lab-20261117 (#38); draft | ARR research gate y emergency lab CI con success a ese HEAD; el gate ARR solo ejecutó tests y smoke rápido de routing, **no reprodujo en CI el experimento completo H2 ni sus 34 unidades**; simulación exclusivamente |
 | #38 durabilidad | 74631c052605ecca3f8517c6e6327363bf11e126 | base audit/senda-agent1-two-sandbox-20261117; draft | Journal Node con fsync/ACK sintético; Android tiene otro journal, no duplicarlo |
 | #32 expansión | cdabff3ee28422080ac05ec0be252fe385006bd3 | base feat/senda-funding-mission-day1; draft | Android compilado, plataforma amplia aún no integrada a master; una ejecución SENDA estaba in_progress en esta consulta |
 | #39 seguridad | d7ed6bd80a0500f12b71f54c805bee5733291700 | base claude/promotional-video-prompts-p5vzh8; draft | Correcciones CAP/Ed25519; comprobar base exacta de #32 al integrar |
@@ -27,7 +27,7 @@ Comparación GitHub: master...#44 = 26 commits ahead, 0 behind, merge-base b8360
 
 **Dependencias:** rama A: master → #34 → #35 → #38 → #44. Rama B: línea #32 → snapshot de #32 usado por #39 → #39 → #42. Los dos grafos deben auditarse en worktrees separados; no hacer cherry-pick de toda una rama ni fusionar PR.
 
-**CI no equivale a calidad operativa:** workflows verdes en HEAD #44/#42 verifican casos programados. No hay certificado, ensayos RF, homologación ni comprobación de ruta real. El árbol master declara pnpm 9.12.3 y dependencias root i18next ^26.4.2, react-i18next ^17.0.13; el módulo ARR utiliza Node 22 sin dependencias propias nuevas. Antes de cambiar código: comprobar lockfile, versiones concretas y licencias del árbol HEAD relevante.
+**CI no equivale a calidad operativa:** el workflow senda-arr-ci.yml lanza tests y una ejecución quick del experimento de routing, no reproduce las cifras del informe de forecast H2.  workflows verdes en HEAD #44/#42 verifican casos programados. No hay certificado, ensayos RF, homologación ni comprobación de ruta real. El árbol master declara pnpm 9.12.3 y dependencias root i18next ^26.4.2, react-i18next ^17.0.13; el módulo ARR utiliza Node 22 sin dependencias propias nuevas. Antes de cambiar código: comprobar lockfile, versiones concretas y licencias del árbol HEAD relevante.
 
 ## 2. Resultados científicos existentes: interpretaciones defendibles
 
@@ -43,18 +43,18 @@ Escala común: 5 = más favorable. I=impacto en coordinación; V=viabilidad actu
 
 | ID | Línea de investigación | I | V | E | D | C | X | R | Total /5 |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| P1 | Custodia física verificable BLE/Wi-Fi/LoRa y fallos comunes | 5 | 4 | 5 | 4 | 3 | 5 | 4 | 4.43 |
-| P2 | Replanificación robusta por custodio y presupuesto de copias | 5 | 4 | 4 | 5 | 3 | 4 | 3 | 4.12 |
-| P3 | Abstención verificable y límites de confianza en decisiones | 5 | 4 | 4 | 3 | 5 | 5 | 4 | 4.32 |
-| P4 | Fusión de evidencia con procedencia y dependencias | 5 | 3 | 4 | 4 | 3 | 4 | 3 | 3.82 |
+| P1 | Custodia física verificable BLE/Wi-Fi/LoRa y fallos comunes | 5 | 4 | 5 | 4 | 3 | 5 | 4 | 4.46 |
+| P2 | Replanificación robusta por custodio y presupuesto de copias | 5 | 4 | 4 | 5 | 3 | 4 | 3 | 4.20 |
+| P3 | Abstención verificable y límites de confianza en decisiones | 5 | 4 | 4 | 3 | 5 | 5 | 4 | 4.37 |
+| P4 | Fusión de evidencia con procedencia y dependencias | 5 | 3 | 4 | 4 | 3 | 4 | 3 | 3.92 |
 | P5 | Predicción de incendio física causal y calibrada | 5 | 3 | 5 | 4 | 2 | 4 | 2 | 3.86 |
-| P6 | Pantallas científicas offline con fuentes y abstención | 4 | 5 | 4 | 3 | 5 | 5 | 5 | 4.32 |
-| P7 | Auditoría de fallos N−2 y k-de-n con traza medida | 4 | 4 | 5 | 4 | 3 | 4 | 4 | 4.06 |
-| P8 | Descubrimiento/capacidad de contactos con relojes inciertos | 4 | 3 | 4 | 4 | 3 | 4 | 3 | 3.63 |
-| P9 | Geometría de ventanas satelitales sin acceso a servicio | 3 | 3 | 5 | 2 | 3 | 4 | 3 | 3.33 |
+| P6 | Pantallas científicas offline con fuentes y abstención | 4 | 5 | 4 | 3 | 5 | 5 | 5 | 4.37 |
+| P7 | Auditoría de fallos N−2 y k-de-n con traza medida | 4 | 4 | 5 | 4 | 3 | 4 | 4 | 4.04 |
+| P8 | Descubrimiento/capacidad de contactos con relojes inciertos | 4 | 3 | 4 | 4 | 3 | 4 | 3 | 3.67 |
+| P9 | Geometría de ventanas satelitales sin acceso a servicio | 3 | 3 | 5 | 2 | 3 | 4 | 3 | 3.28 |
 | P10 | Recomendación de rutas de evacuación sobre datos inferidos | 5 | 2 | 3 | 3 | 2 | 2 | 1 | 2.90 |
 
-El total está sujeto a revisión aritmética automática en la auditoría documental. La **prioridad operativa** no es solo el total: P3 y P6 son controles obligatorios de presentación/seguridad, pero P1 es el cuello de botella causal para poder calibrar P2 y demostrar capacidad a una entidad financiadora. P5 permanece entre las tres investigaciones porque resuelve un fallo significativo y ofrece una prueba científica independiente con datos públicos; no porque su coste o riesgo actual sean favorables.
+Totales recalculados con las ponderaciones indicadas (suma ponderada de las siete notas, redondeada a dos decimales). La **prioridad operativa** no es solo el total: P3 y P6 son controles obligatorios de presentación/seguridad, pero P1 es el cuello de botella causal para poder calibrar P2 y demostrar capacidad a una entidad financiadora. P5 permanece entre las tres investigaciones porque resuelve un fallo significativo y ofrece una prueba científica independiente con datos públicos; no porque su coste o riesgo actual sean favorables.
 
 ## 4. Seis líneas exigidas: decisiones técnicas
 
