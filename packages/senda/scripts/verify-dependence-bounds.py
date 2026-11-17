@@ -46,11 +46,11 @@ for j,(case,cert) in enumerate(zip(CASES,bounds)):
     states=np.array([[(mask>>i)&1 for i in range(n)] for mask in range(1<<n)],dtype=float)
     success=(states @ w >= case["k"]).astype(float)
     mass=np.ones((1,1<<n))
-    minlp=linprog(success,A_ub=-states.T.T,b_ub=-p,A_eq=mass,b_eq=[1.0],
+    minlp=linprog(success,A_ub=-states.T,b_ub=-p,A_eq=mass,b_eq=[1.0],
                   bounds=(0,None),method="highs")
     if not minlp.success:
         raise RuntimeError(f"min LP failed case {j}: {minlp.message}")
-    maxlp=linprog(-success,A_eq=np.vstack((mass,states.T.T)),
+    maxlp=linprog(-success,A_eq=np.vstack((mass,states.T)),
                   b_eq=np.r_[1.0,p],bounds=(0,None),method="highs")
     if not maxlp.success:
         raise RuntimeError(f"max LP failed case {j}: {maxlp.message}")
