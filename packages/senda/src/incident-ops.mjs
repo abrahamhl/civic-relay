@@ -133,11 +133,14 @@ export async function learnFromDelivery(ops, store, cmd, delivery, { now, hazard
 
 /** Parte de situación en CAP 1.2 (ámbito restringido, para la sala 112) + cierre de auditoría. */
 export async function situationReport(ops, cmd, board, { now, areaDesc, circle = null, sender = 'senda@organismo.example', exercise = true }) {
+  // The agency in this laboratory is self-issued by setupAgency() and does not
+  // provide institution-issued privileges. Never emit an operational CAP here.
+  if (exercise !== true) throw new Error('CAP Actual bloqueado: credenciales de laboratorio no acreditan autoridad institucional');
   const t = board.totals, n = (k) => t[k] ?? 0;
-  const cap = toCap({ identifier: `SENDA-OPS-${cmd.id.replace(/[^A-Za-z0-9]/g, '')}`, sender, sent: now, status: exercise ? 'Exercise' : 'Actual', msgType: 'Alert', scope: 'Restricted',
-    info: { category: 'Fire', event: 'Situación de la población en la zona', urgency: 'Immediate', severity: n('TRAPPED_CONFIRMED') ? 'Extreme' : 'Severe', certainty: 'Observed',
+  const cap = toCap({ identifier: `SENDA-OPS-${cmd.id.replace(/[^A-Za-z0-9]/g, '')}`, sender, sent: now, status: 'Exercise', msgType: 'Alert', scope: 'Restricted',
+    info: { category: 'Fire', event: 'Situación de la población en la zona', urgency: 'Immediate', severity: n('TRAPPED_CONFIRMED') ? 'Extreme' : 'Severe', certainty: 'Unknown',
       headline: `Zona ${cmd.target.zone.join(', ')}: ${n('CONFIRMED_SAFE')} a salvo, ${n('CONFIRMED_NEEDS_HELP')} piden ayuda, ${n('TRAPPED_CONFIRMED')} atrapados, ${n('SIGNAL_NO_RESPONSE')} sin respuesta`,
-      description: 'Respuestas cifradas de teléfonos SENDA a una orden firmada por un coordinador acreditado. «Sin respuesta» indica un teléfono activo cuyo dueño no contesta: nunca implica víctima.',
+      description: 'EJERCICIO: respuestas de móviles simulados ante una credencial SENDA generada en laboratorio; no es identidad institucional acreditada. «Sin respuesta» indica falta de contestación, nunca implica víctima.',
       parameters: [['SENDA_ORDER', cmd.id], ['SAFE', n('CONFIRMED_SAFE')], ['NEED_HELP', n('CONFIRMED_NEEDS_HELP')], ['TRAPPED', n('TRAPPED_CONFIRMED')], ['AWAY', n('NOT_IN_BUILDING')], ['NO_RESPONSE', n('SIGNAL_NO_RESPONSE')]],
       area: circle ? { areaDesc: areaDesc ?? cmd.target.zone.join(', '), circle } : { areaDesc: areaDesc ?? cmd.target.zone.join(', ') } } });
   const capHash = [...new Uint8Array(await subtle.digest('SHA-256', new TextEncoder().encode(cap)))].map((b) => b.toString(16).padStart(2, '0')).join('');
