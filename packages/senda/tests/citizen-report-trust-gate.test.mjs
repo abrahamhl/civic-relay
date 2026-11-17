@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createReporterKeys, encodeReport, decodeReports, incidentToCap } from '../src/hazard-reports.mjs';
+import { createReporterKeys, encodeReport, decodeReports, incidentToCap, clusterReports, assessIncident, citizenAdvice } from '../src/hazard-reports.mjs';
 
 const good = {
   kind: 'STREET_FLOODED', lat: 39.42691, lon: -0.41742,
@@ -64,4 +64,19 @@ test('citizen incident CAP is permanently exercise-only until institutional trus
   assert.doesNotMatch(demo,/<scope>Public<\/scope>/);
   assert.throws(()=>incidentToCap(assessed,cluster,{now:good.at,exercise:false}),/institucional autenticado/);
   assert.throws(()=>incidentToCap(assessed,cluster,{now:good.at,exercise:'false'}),/institucional autenticado/);
+});
+
+test('spoofed official source metadata cannot authorize citizen alert nor claim active official management',()=>{
+  const synthetic=clusterReports([{...good,deviceId:'pseudonym_1'}])[0];
+  const report=assessIncident(synthetic,{official:[{
+    family:'WATER',lat:good.lat,lon:good.lon,at:good.at,source:'UNVERIFIED_OFFICIAL_FIELD'
+  }]});
+  assert.equal(report.state,'OFFICIAL','source-matched annotation remains contextual');
+  assert.equal(report.canPublicWarn,false,'no organizational credential validated');
+  assert.equal(report.publicAlertAuthorityVerified,false);
+  assert.equal(report.official.authorityVerified,false);
+  const advice=citizenAdvice(good.kind,report);
+  assert.doesNotMatch(advice.text,/ya lo gestiona/i);
+  assert.match(advice.text,/no confirma/i);
+  assert.match(advice.text,/112/);
 });
