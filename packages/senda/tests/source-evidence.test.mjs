@@ -133,3 +133,15 @@ test('P0: arbitrary sha256: text, NaN holdout and unsigned field receipt cannot 
   assert.equal(claimed.requestedStage,'FIELD_VALIDATED');
   assert.equal(claimed.fieldReceiptSignatureVerified,false);
 });
+
+
+test('P0: stage taxonomy and lineage graph are immutable to injected fake evidence',()=>{
+  assert.equal(Object.isFrozen(EVIDENCE_STAGES),true);
+  assert.equal(Object.isFrozen(SOURCE_DEPENDENCY_GRAPH),true);
+  assert.equal(Object.isFrozen(SOURCE_DEPENDENCY_GRAPH.USGS_NEIC),true);
+  assert.equal(Object.isFrozen(SOURCE_DEPENDENCY_GRAPH.USGS_NEIC.upstream),true);
+  assert.throws(()=>{SOURCE_DEPENDENCY_GRAPH.INVENTED_FEED={upstream:[]};},TypeError);
+  assert.throws(()=>{SOURCE_DEPENDENCY_GRAPH.USGS_NEIC.upstream.push('FAKE');},TypeError);
+  assert.throws(()=>{EVIDENCE_STAGES.push('CERTIFIED');},TypeError);
+  assert.equal(checkCorroborationIndependence('INVENTED_FEED','USGS_NEIC').independent,false);
+});
