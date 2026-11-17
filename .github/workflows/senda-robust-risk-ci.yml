@@ -12,6 +12,8 @@ on:
       - 'packages/senda/src/shared-risk-topology.mjs'
       - 'packages/senda/src/anytime-scenario-confidence.mjs'
       - 'packages/senda/src/failure-domain-cuts.mjs'
+      - 'packages/senda/src/cross-layer-survivability.mjs'
+      - 'packages/senda/tests/cross-layer-survivability.test.mjs'
       - 'packages/senda/tests/failure-domain-cuts.test.mjs'
       - 'packages/senda/scripts/verify-failure-cuts.py'
       - 'packages/senda/tests/anytime-scenario-confidence.test.mjs'
