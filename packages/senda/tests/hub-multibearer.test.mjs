@@ -124,7 +124,7 @@ test('CAP 1.2: el incidente ferroviario fusionado sale en CAP válido que el pro
   const x = railIncidentToCap(site, { now: Date.UTC(2026, 0, 18, 19, 45) });
   assert.match(x, /^<\?xml/); assert.match(x, /urn:oasis:names:tc:emergency:cap:1\.2/);
   const back = parseCap(x);
-  assert.equal(back.status, 'Actual'); assert.equal(back.severity, 'Extreme'); assert.equal(back.urgency, 'Immediate');
+  assert.equal(back.status, 'Exercise'); assert.equal(back.certainty, 'Unknown'); assert.equal(back.severity, 'Extreme'); assert.equal(back.urgency, 'Immediate');
   assert.ok(back.area.circle && Math.abs(back.area.circle.center.lat - site.center.lat) < 1e-9);
   assert.throws(() => toCap({ identifier: 'x', sender: 's', sent: 0, info: { category: 'Nope', urgency: 'Immediate', severity: 'Minor', certainty: 'Observed', event: 'e' } }), /category/);
   assert.ok(!/[<>]script/i.test(toCap({ identifier: '<script>', sender: 's', sent: 0, info: { category: 'Rescue', urgency: 'Immediate', severity: 'Minor', certainty: 'Observed', event: '<b>' } })));
