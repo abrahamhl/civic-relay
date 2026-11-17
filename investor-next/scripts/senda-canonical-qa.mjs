@@ -76,8 +76,8 @@ check('offline SW: todos los activos declarados en senda-sw.js existen en disco'
 
 const browser = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
 try {
-  /* 2 · Responsividad (360, 390, 768, 1440 px) en Centro, Visor 4D y Atlas */
-  for (const width of [360, 390, 768, 1440]) {
+  /* 2 · Responsividad (320, 360, 390, 768, 1440 px) en Centro, Visor 4D y Atlas */
+  for (const width of [320, 360, 390, 768, 1440]) {
     const ctx = await browser.newContext({ viewport: { width, height: 844 } });
     for (const [slug, waitSel] of [['/centro', '#boot.done'], ['/visor', 'body[data-ready="1"]'], ['/atlas', 'body[data-ready]']]) {
       const p = await ctx.newPage();
@@ -163,7 +163,11 @@ try {
   await v.click('#world');
   await v.waitForFunction(() => /inundación epidémica/.test(document.querySelector('#exec')?.textContent ?? ''));
   const execTxt = await v.textContent('#exec');
+  const abstTxt = await v.textContent('#abstain-contract');
+  const fusTxt = await v.textContent('#fusion-live');
   check('visor 4D: vista 3D + ejecución de mundo compara ARR, ablación, CGR y epidémico', /arr/.test(execTxt) && /cgr-k-exclusion/.test(execTxt));
+  check('visor 4D: muestra contrato P4 ABSTAIN/SIMULATION_OR_EXERCISE_ONLY, DAG H-FUS-1 y H-FIRE-B DATASET_BLOCKED',
+    /ABSTAIN|UNKNOWN/.test(abstTxt) && /SIMULATION_OR_EXERCISE_ONLY/.test(abstTxt) && /canPublicWarn=false/.test(abstTxt) && /DATASET_BLOCKED/.test(fusTxt));
   await vctx.close();
 
   /* 5 · Fallback sin WebGL en /senda/fuego3d */

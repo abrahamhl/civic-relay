@@ -19,7 +19,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Núcleo canónico, paridad sync-web, route-truth y ARR
         run: |
-          node --test packages/senda/tests/*.test.mjs packages/senda/tests/defense/*.test.mjs packages/senda/tests-adversarial/*.test.mjs packages/senda-pci/tests/*.test.mjs experimental/senda-route-truth/*.test.mjs experimental/senda-arr/tests/*.test.mjs
+          node --test packages/senda/tests/*.test.mjs packages/senda/tests/defense/*.test.mjs packages/senda/tests-adversarial/*.test.mjs packages/senda-pci/tests/*.test.mjs experimental/senda-route-truth/*.test.mjs experimental/senda-arr/tests/*.test.mjs experimental/senda-arr-replan/tests/*.test.mjs experimental/senda-fire-physics/tests/*.test.mjs
       - name: Oráculo Python de cortes SRLG N-1/N-2
         run: python3 packages/senda/scripts/verify-failure-cuts.py
       - name: QA navegador canónica (360/390/768/1440px, offline SW, IndexedDB, Visor 4D, fallback sin WebGL)
