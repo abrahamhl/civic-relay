@@ -77,7 +77,9 @@ export function enumerateDeclaredFailureCuts({
       for(const d of link.riskDomains??[])domains.add('SRLG:'+d);
     }
     if(!p.endpointRiskDomains?.length)domains.add('UNKNOWN_TOPOLOGY');
-    for(const d of p.endpointRiskDomains??[])domains.add('ENDPOINT:'+d);
+    // Use the SAME SRLG namespace for link and endpoint failures: a common
+    // power supply can affect both without the prefix hiding their overlap.
+    for(const d of p.endpointRiskDomains??[])domains.add('SRLG:'+d);
     const allowed=p.consentDeclared===true&&p.linkAuthorizedDeclared===true;
     summaries.push({
       id:p.id,allowedByDeclaredPermissions:allowed,
