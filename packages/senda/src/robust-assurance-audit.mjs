@@ -5,7 +5,8 @@
  * Conditional independence WITHIN an outage state is inherited from upstream;
  * actual weather/propagation/shared-hardware correlations must still be measured.
  */
-import {correlatedDeliveryProbability} from './delivery-assurance.mjs';
+import {correlatedDeliveryProbability,bearerSuccessInState} from './delivery-assurance.mjs';
+import {arbitraryDependencyShardBounds} from './dependency-agnostic-shards.mjs';
 import {chooseRobustResearchPlan,validateScenarioEnvelope} from './robust-scenario-risk.mjs';
 
 const unit=x=>typeof x==='number'&&Number.isFinite(x)&&x>=0&&x<=1;
@@ -36,8 +37,13 @@ export function auditAssuranceAgainstUncertainHazards({states,plans,minRobustSuc
       // Reuse upstream once per hazard; isolate it from uncertain prevalence.
       const result=correlatedDeliveryProbability(p.groups,p.k,
         {[s.id]:{...s.hazard,prob:1}});
-      successByState[s.id]={lower:result.pDelivery,upper:result.pDelivery,
-        nominal:result.pDelivery};
+      const marginals=p.groups.map(g=>({...g,p:bearerSuccessInState(g.id,g.p,s.hazard)}));
+      const dependenceSafe=arbitraryDependencyShardBounds(marginals,p.k);
+      // Lower requires only valid marginal bounds; unknown packet dependence is allowed.
+      // Point/nominal is still the upstream conditional-INDEPENDENT model; not a
+      // real-world estimate. Unknown dependence means upper remains 1.
+      successByState[s.id]={lower:dependenceSafe.lowerBound,
+        upper:dependenceSafe.upperBound,nominal:result.pDelivery};
     }
     return {id:p.id,consentDeclared:p.consentDeclared,
       linkAuthorizedDeclared:p.linkAuthorizedDeclared,
@@ -48,6 +54,8 @@ export function auditAssuranceAgainstUncertainHazards({states,plans,minRobustSuc
   return {...summary,mode:'HYPOTHETICAL_SHADOW_MODE',
     upstreamModel:'delivery-assurance.mjs/correlatedDeliveryProbability',
     upstreamConditionalIndependenceAssumed:true,
+    robustConditionalLowerRequiresIndependence:false,
+    robustConditionalLowerMethod:'BOOLE_FRECHET_PLUS_REVERSE_EXPECTATION_BOUND',
     statisticalCalibrationClaim:false,physicalHardwareValidated:false,
     evidenceRequirements:[
       'Enumerate all material common-cause outage states',
