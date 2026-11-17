@@ -9,6 +9,7 @@ const sample=(n=100, distribution={NORMAL:80,GRID_DOWN:15,UNKNOWN:5})=>{
   assert.equal(n,labels.length);
   return labels.map((scenarioId,i)=>({
     incidentKey:'episode-'+String(i).padStart(5,'0'),
+    independentBlockId:'causal-block-'+String(i).padStart(5,'0'),
     scenarioId,sourceId:'official-feed-'+i%3,
     evidenceSha256:'a'.repeat(63)+(i%16).toString(16)
   }));
@@ -40,6 +41,13 @@ test('H12: duplicate evidence for same incident is rejected even if packet count
   const rows=sample();
   rows.push({...rows[0],scenarioId:'GRID_DOWN'});
   assert.throws(()=>buildIncidentFrequencyEnvelope({incidents:rows,scenarioIds:ids}),/repeated|undocumented/);
+});
+test('H12: two distinct municipal incidents from one disaster cannot be counted as independent blocks',()=>{
+  const obs=sample();
+  obs[1]={...obs[1],independentBlockId:obs[0].independentBlockId};
+  assert.throws(()=>buildIncidentFrequencyEnvelope({incidents:obs,scenarioIds:ids}),/repeated|undocumented/);
+  const noBlock=sample(); delete noBlock[2].independentBlockId;
+  assert.throws(()=>buildIncidentFrequencyEnvelope({incidents:noBlock,scenarioIds:ids}));
 });
 test('H12: missing UNKNOWN, missing source hash and unclassified incident fail closed',()=>{
   assert.throws(()=>buildIncidentFrequencyEnvelope({incidents:sample(),scenarioIds:['NORMAL','GRID_DOWN']}),/UNKNOWN/);
