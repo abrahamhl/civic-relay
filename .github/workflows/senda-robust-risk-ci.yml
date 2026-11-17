@@ -1,0 +1,38 @@
+name: SENDA robust uncertainty shadow research (node 22 and 24)
+on:
+  push:
+    branches:
+      - audit/senda-robust-scenario-uncertainty-20261117
+  pull_request:
+    paths:
+      - 'packages/senda/src/robust-scenario-risk.mjs'
+      - 'packages/senda/src/robust-assurance-audit.mjs'
+      - 'packages/senda/tests/robust-scenario-risk.test.mjs'
+      - 'packages/senda/tests/robust-assurance-audit.test.mjs'
+      - '.github/workflows/senda-robust-risk-ci.yml'
+permissions:
+  contents: read
+jobs:
+  shadow-math-and-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22', '24']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Validate finite robust math and fail-closed shadow contract
+        run: |
+          node --check packages/senda/src/robust-scenario-risk.mjs
+          node --check packages/senda/src/robust-assurance-audit.mjs
+          node --test packages/senda/tests/robust-scenario-risk.test.mjs packages/senda/tests/robust-assurance-audit.test.mjs
+      - name: Full SENDA regression for shared delivery-engine interoperability
+        run: |
+          node --test packages/senda/tests/*.test.mjs
+          node --test packages/senda/tests-adversarial/*.test.mjs
