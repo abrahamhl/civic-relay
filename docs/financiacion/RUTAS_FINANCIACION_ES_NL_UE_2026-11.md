@@ -16,7 +16,7 @@ Nada de este documento es una promesa de financiación. SENDA no ha presentado t
 2. **En España, la subvención natural para una empresa nueva es Neotec (CDTI)**, pero la edición 2026 cerró el 14-5-2026. La siguiente sería la de 2027 (fechas no publicadas). Requiere tener la sociedad constituida y un capital mínimo.
 3. **En Países Bajos lo más inmediato es la WBSO** (rebaja fiscal de costes de I+D): para empezar el 1-1-2027 hay que pedirla **antes del 20-12-2026**. Requiere una entidad holandesa con personal en nómina.
 4. **Vender al Estado es una vía distinta de pedir subvención:** la compra pública precomercial (CDTI en España, *Innovation Impact Challenge* de RVO en Países Bajos) paga por desarrollar un prototipo para un organismo concreto. No hemos encontrado ninguna licitación abierta hoy sobre emergencias.
-5. **Calendario político de España:** según una fuente secundaria, hay elecciones generales convocadas para el 29-11-2026. Si es así, hoy **no existe aún un «nuevo gobierno»**; la propuesta debe dirigirse al que salga de las urnas y, mientras tanto, a los órganos técnicos que no cambian (DGPCE, CDTI). **No verificado en BOE.**
+5. **Calendario institucional de España (corregido por auditoría independiente):** las elecciones generales están **convocadas oficialmente para el 29-11-2026** por el [Real Decreto 806/2026, publicado en el BOE del 06-10-2026](https://boe.es/buscar/doc.php?id=BOE-A-2026-20742). A 17-11-2026 el resultado electoral aún no existe; contactar ahora a los equipos técnicos de DGPCE/CDTI y autoridades autonómicas. No atribuir acuerdos institucionales a un gobierno futuro.
 
 ---
 
@@ -39,7 +39,7 @@ Nada de este documento es una promesa de financiación. SENDA no ha presentado t
 | **ENISA** · préstamo participativo (líneas Jóvenes Emprendedores / Emprendedores) | Préstamo sin avales personales | **Las fuentes se contradicen**: 25 000–75 000 € en Jóvenes Emprendedores según la mayoría; otra fuente dice que en 2026 las líneas se unificaron | Ventanilla abierta, según las fuentes | Sociedad constituida y fondos propios (se cita el 50 % del préstamo en la línea joven) | **No verificado** en enisa.es: confirmar líneas e importes vigentes | [El Referente](https://elreferente.es/?p=8457) · [ecosistemastartup](https://ecosistemastartup.com/prestamo-enisa-2026-hasta-15me-sin-ceder-equity/) |
 | **CDTI · Compra Pública Precomercial** | CDTI contrata el desarrollo de prototipos que luego cede a un organismo público | CDTI prevé 75 M€ en 2026 para esta vía (dato de prensa) | Por licitación. **No hemos encontrado ninguna abierta sobre emergencias o protección civil** | Presentarse a una licitación concreta; solvencia técnica | Secundaria para la cifra; oficial para la existencia del instrumento | [CDTI · CPI (PDF)](https://www.cdti.es/sites/default/files/2025-11/cpi_en_cdti_innovacion_castellano.pdf) · [capital-riesgo.es](https://capital-riesgo.es/es/articles/cdti-innovaci-n-destinar-hasta-1-817-millones-en-2026-en-subvenciones-inversi-n-en-capital-riesgo-compra-p-blica-y-pr-stamos-blandos-para-i-d-i-empresarial-transferencia-y-escalado/) |
 
-**Quién decide en España.** La protección civil estatal es competencia del Ministerio del Interior (Real Decreto 207/2024, citado por una fuente secundaria); la gestión de emergencias es sobre todo autonómica. Composición del Gobierno a 17-11-2026: ver [La Moncloa](https://www.lamoncloa.gob.es/gobierno/composiciondelgobierno/paginas/index.aspx). Elecciones del 29-11-2026: dato de [politicaelectoral.com](https://www.politicaelectoral.com/es/espana/instituciones/ministerio-del-interior), **no verificado en BOE**.
+**Quién decide en España.** La protección civil estatal es competencia del Ministerio del Interior (Real Decreto 207/2024, citado por una fuente secundaria); la gestión de emergencias es sobre todo autonómica. Composición del Gobierno a 17-11-2026: ver [La Moncloa](https://www.lamoncloa.gob.es/gobierno/composiciondelgobierno/paginas/index.aspx). Elecciones del 29-11-2026: **verificadas en fuente oficial** [BOE-A-2026-20742](https://boe.es/buscar/doc.php?id=BOE-A-2026-20742); no equivale a disponer de comprador o respaldo político.
 
 ## 4. Países Bajos
 
@@ -68,4 +68,4 @@ Nada de este documento es una promesa de financiación. SENDA no ha presentado t
 - Fechas de Neotec 2027, KAPP 2027 y lotes Kick-Start 2027.
 - MIT holandés y subvenciones regionales (no consultadas).
 - Ayudas autonómicas españolas (IVACE en la Comunitat Valenciana, etc.): no consultadas.
-- Decreto de convocatoria de elecciones en el BOE.
+- ~~Decreto de convocatoria de elecciones en el BOE~~: **verificado**, [Real Decreto 806/2026, artículo 2](https://boe.es/buscar/doc.php?id=BOE-A-2026-20742). Pendiente solo actualizar responsables tras el proceso electoral.
