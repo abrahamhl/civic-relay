@@ -54,7 +54,7 @@ test('decoder rejects a cryptographically valid but structurally impossible citi
   }
 });
 test('citizen incident CAP is permanently exercise-only until institutional trust adapter is implemented',()=>{
-  const assessed={id:'INC-LAB',state:'OFFICIAL',lifeRisk:false,severity:.6,
+  const assessed={id:'INC-LAB',state:'CORROBORATED',lifeRisk:false,severity:.6,
     reporters:1,reports:1,pReal:.6,why:['hypothetical'],basis:'SIMULATED'};
   const cluster={family:'WATER',firstAt:good.at,center:{lat:good.lat,lon:good.lon},
     reports:[good]};
@@ -62,6 +62,7 @@ test('citizen incident CAP is permanently exercise-only until institutional trus
   assert.match(demo,/<status>Exercise<\/status>/);
   assert.match(demo,/<scope>Restricted<\/scope>/);
   assert.doesNotMatch(demo,/<scope>Public<\/scope>/);
+  assert.throws(()=>incidentToCap({...assessed,state:'OFFICIAL'},cluster,{now:good.at}),/sin procedencia autenticada/);
   assert.throws(()=>incidentToCap(assessed,cluster,{now:good.at,exercise:false}),/institucional autenticado/);
   assert.throws(()=>incidentToCap(assessed,cluster,{now:good.at,exercise:'false'}),/institucional autenticado/);
 });
@@ -71,12 +72,14 @@ test('spoofed official source metadata cannot authorize citizen alert nor claim 
   const report=assessIncident(synthetic,{official:[{
     family:'WATER',lat:good.lat,lon:good.lon,at:good.at,source:'UNVERIFIED_OFFICIAL_FIELD'
   }]});
-  assert.equal(report.state,'OFFICIAL','source-matched annotation remains contextual');
+  assert.notEqual(report.state,'OFFICIAL','unverified source cannot grant institutional status');
   assert.equal(report.canPublicWarn,false,'no organizational credential validated');
   assert.equal(report.publicAlertAuthorityVerified,false);
   assert.equal(report.official.authorityVerified,false);
   const advice=citizenAdvice(good.kind,report);
   assert.doesNotMatch(advice.text,/ya lo gestiona/i);
-  assert.match(advice.text,/no confirma/i);
+  assert.equal(report.pReal,assessIncident(synthetic).pReal);
+  const forged=citizenAdvice(good.kind,{state:'OFFICIAL',official:{source:'FAKE'}});
+  assert.match(forged.text,/no confirma/i);
   assert.match(advice.text,/112/);
 });
