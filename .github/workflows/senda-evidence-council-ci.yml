@@ -1,0 +1,39 @@
+name: SENDA H15 Evidence-to-Route Council laboratory
+on:
+  push:
+    branches:
+      - research/senda-h15-evidence-routing-council-20261117
+  pull_request:
+    paths:
+      - 'packages/senda/src/resilience-council.mjs'
+      - 'packages/senda/tests/resilience-council.test.mjs'
+      - 'investor-next/public/senda/core/resilience-council.mjs'
+      - '.github/workflows/senda-evidence-council-ci.yml'
+permissions:
+  contents: read
+jobs:
+  graph-truth-gate:
+    name: Evidence graph / Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22', '24']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Mandatory byte parity with offline browser module
+        run: cmp packages/senda/src/resilience-council.mjs investor-next/public/senda/core/resilience-council.mjs
+      - name: Syntax, H15 council and scenario/physics regressions
+        run: |
+          node --check packages/senda/src/resilience-council.mjs
+          node --test packages/senda/tests/resilience-council.test.mjs
+      - name: All SENDA core and adversarial tests (no physical RF)
+        run: |
+          node --test packages/senda/tests/*.test.mjs
+          node --test packages/senda/tests-adversarial/*.test.mjs
