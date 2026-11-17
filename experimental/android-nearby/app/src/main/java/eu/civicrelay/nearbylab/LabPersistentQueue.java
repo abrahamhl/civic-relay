@@ -18,7 +18,7 @@ import java.util.Map;
  * the backing file completely on purgeAll() (STOP & CLEAR).
  */
 public final class LabPersistentQueue {
-    public enum Status { QUEUED, ACK_VERIFIED, EXPIRED, REVOKED }
+    public enum Status { QUEUED, CUSTODY_ACK, ACK_VERIFIED, EXPIRED, REVOKED, FAILED_EXHAUSTED }
 
     public static final class Record {
         public final String id;
@@ -36,6 +36,11 @@ public final class LabPersistentQueue {
             this.status = status;
             this.payload = payload;
         }
+
+        public boolean isTerminal() {
+            return status == Status.ACK_VERIFIED || status == Status.EXPIRED ||
+                   status == Status.REVOKED || status == Status.FAILED_EXHAUSTED;
+        }
     }
 
     // A research journal, not a general-purpose encrypted emergency message store.
@@ -43,13 +48,24 @@ public final class LabPersistentQueue {
     private static final String LAB_ONLY_PAYLOAD = "SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS";
     private static final int MAX_ENTRIES = 100;
     private static final int MAX_FILE_BYTES = 160000;
+    private static final long BACKWARD_CLOCK_TOLERANCE_MS = 5000L;
     private static final String HEADER = "# OEP LAB PERSISTENT QUEUE V1";
     private final Path storagePath;
+    private final long bootCounter;
     private final LinkedHashMap<String, Record> records = new LinkedHashMap<>();
 
     public LabPersistentQueue(Path storagePath, long nowMs) throws IOException {
+        this(storagePath, nowMs, 0L);
+    }
+
+    public LabPersistentQueue(Path storagePath, long nowMs, long bootCounter) throws IOException {
         this.storagePath = storagePath;
+        this.bootCounter = Math.max(0L, bootCounter);
         loadFromDisk(nowMs);
+    }
+
+    public long bootCounter() {
+        return bootCounter;
     }
 
     public synchronized Record enqueue(String id, String category, String payload, long nowMs, long ttlMs) throws IOException {
@@ -67,7 +83,7 @@ public final class LabPersistentQueue {
         expireDue(nowMs);
         Record existing = records.get(id);
         if (existing != null) {
-            if (existing.status != Status.QUEUED) {
+            if (existing.isTerminal()) {
                 throw new IllegalStateException("Terminal message ID cannot be replayed");
             }
             return existing;
@@ -82,12 +98,38 @@ public final class LabPersistentQueue {
         return created;
     }
 
+    /** Intermediate relay accepted custody; MUST NOT be confused with destination delivery. */
+    public synchronized Record markCustodyAck(String id, long nowMs) throws IOException {
+        expireDue(nowMs);
+        Record r = records.get(id);
+        if (r == null) throw new IllegalArgumentException("Unknown message ID");
+        if (r.isTerminal()) return r;
+        if (r.status == Status.CUSTODY_ACK) return r;
+        Record updated = new Record(r.id, r.category, r.createdAtMs, r.expiresAtMs, Status.CUSTODY_ACK, r.payload);
+        records.put(id, updated);
+        try { persistToDisk(); }
+        catch (IOException ex) { records.put(id, r); throw ex; }
+        return updated;
+    }
+
     public synchronized Record markAckVerified(String id, long nowMs) throws IOException {
         expireDue(nowMs);
         Record r = records.get(id);
         if (r == null) throw new IllegalArgumentException("Unknown message ID");
-        if (r.status != Status.QUEUED) return r;
+        if (r.isTerminal()) return r;
         Record updated = new Record(r.id, r.category, r.createdAtMs, r.expiresAtMs, Status.ACK_VERIFIED, "");
+        records.put(id, updated);
+        try { persistToDisk(); }
+        catch (IOException ex) { records.put(id, r); throw ex; }
+        return updated;
+    }
+
+    public synchronized Record markFailedExhausted(String id, long nowMs) throws IOException {
+        expireDue(nowMs);
+        Record r = records.get(id);
+        if (r == null) throw new IllegalArgumentException("Unknown message ID");
+        if (r.isTerminal()) return r;
+        Record updated = new Record(r.id, r.category, r.createdAtMs, r.expiresAtMs, Status.FAILED_EXHAUSTED, "");
         records.put(id, updated);
         try { persistToDisk(); }
         catch (IOException ex) { records.put(id, r); throw ex; }
@@ -119,7 +161,9 @@ public final class LabPersistentQueue {
         boolean changed = false;
         for (Map.Entry<String, Record> entry : records.entrySet()) {
             Record r = entry.getValue();
-            if (r.status == Status.QUEUED && nowMs >= r.expiresAtMs) {
+            boolean active = (r.status == Status.QUEUED || r.status == Status.CUSTODY_ACK);
+            boolean clockJumpedBackward = nowMs + BACKWARD_CLOCK_TOLERANCE_MS < r.createdAtMs;
+            if (active && (nowMs >= r.expiresAtMs || clockJumpedBackward)) {
                 entry.setValue(new Record(r.id, r.category, r.createdAtMs, r.expiresAtMs, Status.EXPIRED, ""));
                 changed = true;
             }
@@ -152,16 +196,17 @@ public final class LabPersistentQueue {
                 }
                 Status status = Status.valueOf(parts[4]);
                 String rawPayload = parts[5];
-                if (status == Status.QUEUED) {
+                boolean active = (status == Status.QUEUED || status == Status.CUSTODY_ACK);
+                if (active) {
                     if (!LAB_ONLY_PAYLOAD.equals(rawPayload)) {
-                        throw new IllegalArgumentException("Invalid queued lab payload");
+                        throw new IllegalArgumentException("Invalid active lab payload");
                     }
                 } else if (!rawPayload.isEmpty()) {
                     throw new IllegalArgumentException("Terminal lab record contains a payload");
                 }
                 if (records.containsKey(parts[0])) throw new IllegalArgumentException("Duplicate persisted lab ID");
                 records.put(parts[0], new Record(parts[0], parts[1], createdAt, expiresAt,
-                    status, status == Status.QUEUED ? rawPayload : ""));
+                    status, active ? rawPayload : ""));
             }
         } catch (RuntimeException ex) {
             records.clear();
@@ -174,12 +219,13 @@ public final class LabPersistentQueue {
         Path tmp = storagePath.resolveSibling(storagePath.getFileName().toString() + ".tmp");
         StringBuilder sb = new StringBuilder(HEADER).append('\n');
         for (Record r : records.values()) {
+            boolean active = (r.status == Status.QUEUED || r.status == Status.CUSTODY_ACK);
             sb.append(r.id).append('\t')
               .append(r.category).append('\t')
               .append(r.createdAtMs).append('\t')
               .append(r.expiresAtMs).append('\t')
               .append(r.status.name()).append('\t')
-              .append(r.status == Status.QUEUED ? r.payload : "")
+              .append(active ? r.payload : "")
               .append('\n');
         }
         Files.write(tmp, sb.toString().getBytes(StandardCharsets.UTF_8));

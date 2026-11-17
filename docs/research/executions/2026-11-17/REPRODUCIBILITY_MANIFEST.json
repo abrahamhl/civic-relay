@@ -1,0 +1,92 @@
+{
+  "schema": "senda-reproducibility-manifest/1",
+  "date": "2026-11-17",
+  "branch": "research/senda-scientific-iteration-20261117",
+  "baseBranch": "feat/senda-canonical-integration-20261117",
+  "baseCommitSHA": "f68af10c49a64268f723e0e77f95a5f86a366411",
+  "masterSHA": "b8360c9bdc30c0264bc4277d35f2c2ab5bce4e40",
+  "pr45ReferenceSHA": "12157f5ca74f91e5a6a8e79206c25043769a5bef",
+  "runtime": {
+    "os": "win32",
+    "node": "v22.22.2",
+    "pnpm": "9.12.3",
+    "python": "3.12.10",
+    "jdkLocal": false,
+    "scipyLocal": false,
+    "physicalHardwareAttached": false
+  },
+  "closures": [
+    {
+      "task": "A0",
+      "hypothesisDecision": "PASS",
+      "securityGate": "PASS",
+      "physicalGate": "NOT_TESTED",
+      "artifacts": [
+        "docs/research/executions/2026-11-17/GIT_COMPATIBILITY_AUDIT.md",
+        "docs/research/executions/2026-11-17/ADVERSARIAL_REVIEW_A_E.md",
+        "docs/research/executions/2026-11-17/H2_LABEL_AUDIT.md",
+        "docs/research/executions/2026-11-17/INVENTORY_AND_TRACEABILITY.md"
+      ],
+      "negativeFindings": [
+        "canonical-gate failed on PR #46 due to playwright absent in investor-next",
+        "usgs-live failed on PR #46 because node --test ran before pnpm install"
+      ]
+    },
+    {
+      "task": "A1",
+      "hypothesisDecision": "NOT_TESTED",
+      "securityGate": "PASS",
+      "physicalGate": "NOT_TESTED",
+      "artifacts": [
+        "packages/senda/src/transport-telemetry.mjs",
+        "packages/senda/tests/transport-telemetry.test.mjs",
+        "experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/LabPersistentQueue.java",
+        "experimental/android-nearby/app/src/main/java/eu/civicrelay/nearbylab/LabTrialJournal.java"
+      ],
+      "negativeFindings": [
+        "0 physical Android + LoRa RF measurements performed locally; JDK/Gradle absent on host",
+        "BleBeacon COMPANY_ID remains 0xFFFF (test ID only)"
+      ]
+    },
+    {
+      "task": "A2",
+      "hypothesisDecision": "FAIL",
+      "securityGate": "PASS",
+      "physicalGate": "NOT_TESTED",
+      "metrics": [
+        { "name": "H-ARR-R v1 delivery delta vs static", "unit": "pp", "value": -30.83, "evidenceKind": "SIMULATED_ONLY" },
+        { "name": "H-ARR-R v2 delivery vs ARR_STATIC (N=120)", "unit": "pp", "value": 0.0, "ci95": [-2.5, 2.5], "evidenceKind": "SIMULATED_ONLY" },
+        { "name": "H-ARR-R v2 txRatio vs ARR_STATIC", "unit": "ratio", "value": 0.746, "evidenceKind": "SIMULATED_ONLY" },
+        { "name": "H-ARR-R v2 energyRatio vs ARR_STATIC", "unit": "ratio", "value": 0.648, "evidenceKind": "SIMULATED_ONLY" },
+        { "name": "H-ARR-R v2 airtimeRatio vs ARR_STATIC", "unit": "ratio", "value": 0.618, "evidenceKind": "SIMULATED_ONLY" },
+        { "name": "H-ARR-R v2 CPU p95 Node PC", "unit": "ms", "value": 9.37, "evidenceKind": "SIMULATED_ONLY" }
+      ],
+      "negativeFindings": [
+        "Both V1 (-30.83 pp) and V2 (0.0 pp) failed the preregistered >=+2.0 pp raw delivery delta gate over 3-replica ARR_STATIC; V2 achieves Pareto efficiency (-35.2% energy, -38.2% airtime) at equal 94.2% delivery."
+      ]
+    },
+    {
+      "task": "A3",
+      "hypothesisDecision": "INCONCLUSIVE",
+      "securityGate": "PASS",
+      "physicalGate": "NOT_TESTED",
+      "metrics": [
+        { "name": "Synthetic 60m level-set vs persistence Brier", "unit": "brier", "value": 0.0019, "baselineValue": 0.01835, "evidenceKind": "SIMULATED_NUMERICAL_VERIFICATION_ONLY" },
+        { "name": "CFL observed max", "unit": "ratio", "value": 0.4, "evidenceKind": "SIMULATED_NUMERICAL_VERIFICATION_ONLY" }
+      ],
+      "reviewBlockedBy": ["Missing >=10 external wildfires (>=4 test) with causal HRRR/LANDFIRE/EFFIS archives"],
+      "negativeFindings": ["External confirmatory status is DATASET_BLOCKED; H2 remains EXPERIMENTAL_REJECTED (0.0943 vs 0.0539)."]
+    },
+    {
+      "task": "A4",
+      "hypothesisDecision": "PASS",
+      "securityGate": "PASS",
+      "physicalGate": "NOT_TESTED",
+      "metrics": [
+        { "name": "H-ABST-1 unsupported operational claims (1000 cases)", "unit": "count", "value": 0, "evidenceKind": "SIMULATED_ADVERSARIAL" },
+        { "name": "Canonical Chromium QA", "unit": "pass/total", "value": "28/28", "evidenceKind": "REAL_CHROMIUM_AUTOMATED" }
+      ],
+      "reviewBlockedBy": ["Exploratory >=12 human comprehension study pending field session"]
+    }
+  ]
+}

@@ -32,4 +32,8 @@ if (existsSync(arrRoot)) {
     if (existsSync(resolve(arrRoot, 'results', f))) cpSync(resolve(arrRoot, 'results', f), resolve(arrDst, 'results', f));
   }
 }
+const replanJson = resolve(here, '../../../experimental/senda-arr-replan/results/replan-v2-confirmatory.json');
+if (existsSync(replanJson)) cpSync(replanJson, resolve(arrDst, 'results/replan-v2-confirmatory.json'));
+const fireJson = resolve(here, '../../../experimental/senda-fire-physics/results/fire-physics-eval.json');
+if (existsSync(fireJson)) cpSync(fireJson, resolve(arrDst, 'results/fire-physics-eval.json'));
 console.log(`núcleo sincronizado: ${files.length} módulos civiles + ${vault.length} de la bóveda de defensa → ${dst}`);

@@ -1,13 +1,31 @@
 {
-  "ranAt": "2026-11-17T08:17:52.694Z",
-  "pass": 24,
-  "total": 24,
+  "ranAt": "2026-11-17T09:18:02.649Z",
+  "pass": 28,
+  "total": 28,
   "results": [
     {
       "name": "offline SW: todos los activos declarados en senda-sw.js existen en disco",
       "ok": true,
-      "total": 205,
+      "total": 210,
       "missingAssets": []
+    },
+    {
+      "name": "responsive /centro @ 320px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 320,
+      "innerW": 320
+    },
+    {
+      "name": "responsive /visor @ 320px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 320,
+      "innerW": 320
+    },
+    {
+      "name": "responsive /atlas @ 320px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 320,
+      "innerW": 320
     },
     {
       "name": "responsive /centro @ 360px: sin scroll horizontal",
@@ -117,6 +135,10 @@
     },
     {
       "name": "visor 4D: vista 3D + ejecución de mundo compara ARR, ablación, CGR y epidémico",
+      "ok": true
+    },
+    {
+      "name": "visor 4D: muestra contrato P4 ABSTAIN/SIMULATION_OR_EXERCISE_ONLY, DAG H-FUS-1 y H-FIRE-B DATASET_BLOCKED",
       "ok": true
     },
     {

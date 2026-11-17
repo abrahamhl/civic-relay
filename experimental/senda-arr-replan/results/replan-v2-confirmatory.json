@@ -1,0 +1,204 @@
+{
+  "schema": "senda-h-arr-r-v2/1",
+  "evidenceKind": "SIMULATED_ONLY",
+  "generatedAt": "2026-11-17T09:12:47.657Z",
+  "totalIndependentBlocks": 120,
+  "budget": {
+    "maxCopies": 6,
+    "airtimeBudgetMs": 95000,
+    "energyBudgetMj": 2100
+  },
+  "summaryByStrategy": {
+    "WAIT": {
+      "deliveryRate": 0,
+      "meanTx": 0,
+      "meanAirtimeMs": 0,
+      "meanEnergyMj": 0,
+      "p95CpuMs": 0.281,
+      "securityViolations": 0
+    },
+    "CGR_EARLIEST": {
+      "deliveryRate": 0.5833333333333334,
+      "meanTx": 2.308333333333333,
+      "meanAirtimeMs": 22675.875,
+      "meanEnergyMj": 406,
+      "p95CpuMs": 0.307,
+      "securityViolations": 0
+    },
+    "PROPHET_WARM": {
+      "deliveryRate": 0.8166666666666667,
+      "meanTx": 8.491666666666667,
+      "meanAirtimeMs": 82821.43333333333,
+      "meanEnergyMj": 1361.3333333333333,
+      "p95CpuMs": 0.333,
+      "securityViolations": 0
+    },
+    "SPRAY_AND_FOCUS": {
+      "deliveryRate": 0.85,
+      "meanTx": 9.241666666666667,
+      "meanAirtimeMs": 91410.23333333334,
+      "meanEnergyMj": 1447.75,
+      "p95CpuMs": 0.282,
+      "securityViolations": 0
+    },
+    "EPIDEMIC_CAPPED": {
+      "deliveryRate": 0.65,
+      "meanTx": 8.241666666666667,
+      "meanAirtimeMs": 80558.30833333333,
+      "meanEnergyMj": 1313.5833333333333,
+      "p95CpuMs": 0.257,
+      "securityViolations": 0
+    },
+    "ARR_STATIC": {
+      "deliveryRate": 0.9416666666666667,
+      "meanTx": 7.258333333333334,
+      "meanAirtimeMs": 62644,
+      "meanEnergyMj": 1070.6666666666667,
+      "p95CpuMs": 10.264,
+      "securityViolations": 0
+    },
+    "ARR_REPLAN_V2": {
+      "deliveryRate": 0.9416666666666667,
+      "meanTx": 5.416666666666667,
+      "meanAirtimeMs": 38702.48333333333,
+      "meanEnergyMj": 693.8333333333334,
+      "p95CpuMs": 9.365,
+      "securityViolations": 0
+    },
+    "EPIDEMIC_CEILING": {
+      "deliveryRate": 0.9666666666666667,
+      "meanTx": 25.125,
+      "meanAirtimeMs": 254706.45,
+      "meanEnergyMj": 4419.583333333333,
+      "p95CpuMs": 0.325,
+      "securityViolations": 0
+    }
+  },
+  "ablationSummary": {
+    "noReplan": {
+      "deliveryRate": 0.9416666666666667,
+      "meanTx": 6.241666666666666,
+      "meanAirtimeMs": 53878.541666666664,
+      "meanEnergyMj": 920.5833333333334,
+      "p95CpuMs": 10.048,
+      "securityViolations": 0
+    },
+    "noSrlg": {
+      "deliveryRate": 0.9416666666666667,
+      "meanTx": 5.416666666666667,
+      "meanAirtimeMs": 38702.48333333333,
+      "meanEnergyMj": 693.8333333333334,
+      "p95CpuMs": 8.417,
+      "securityViolations": 0
+    },
+    "noHazardUpdate": {
+      "deliveryRate": 0.9416666666666667,
+      "meanTx": 5.366666666666666,
+      "meanAirtimeMs": 37881.35833333333,
+      "meanEnergyMj": 684.5833333333334,
+      "p95CpuMs": 0.671,
+      "securityViolations": 0
+    },
+    "noAckGossip": {
+      "deliveryRate": 0.9416666666666667,
+      "meanTx": 8,
+      "meanAirtimeMs": 58442.55,
+      "meanEnergyMj": 1076.8333333333333,
+      "p95CpuMs": 8.151,
+      "securityViolations": 0
+    },
+    "noGlobalBudget": {
+      "deliveryRate": 0.9416666666666667,
+      "meanTx": 7.816666666666666,
+      "meanAirtimeMs": 60782.48333333333,
+      "meanEnergyMj": 999.1666666666666,
+      "p95CpuMs": 14.39,
+      "securityViolations": 0
+    },
+    "priorOnly": {
+      "deliveryRate": 0.9416666666666667,
+      "meanTx": 5.366666666666666,
+      "meanAirtimeMs": 37881.35833333333,
+      "meanEnergyMj": 684.5833333333334,
+      "p95CpuMs": 0.581,
+      "securityViolations": 0
+    }
+  },
+  "pairedDiffs": {
+    "vsStatic": {
+      "mean": 0,
+      "lo": -0.025,
+      "hi": 0.025,
+      "n": 120
+    },
+    "vsCgr": {
+      "mean": 0.35833333333333334,
+      "lo": 0.275,
+      "hi": 0.45,
+      "n": 120
+    },
+    "vsProphet": {
+      "mean": 0.125,
+      "lo": 0.06666666666666667,
+      "hi": 0.18333333333333332,
+      "n": 120
+    },
+    "vsSprayAndFocus": {
+      "mean": 0.09166666666666666,
+      "lo": 0.041666666666666664,
+      "hi": 0.15,
+      "n": 120
+    },
+    "txRatioVsStatic": {
+      "mean": 0.7687037037037032,
+      "lo": 0.717390873015873,
+      "hi": 0.8278736772486767,
+      "n": 120
+    },
+    "energyRatioVsStatic": {
+      "mean": 0.6914730831505853,
+      "lo": 0.6286935934163549,
+      "hi": 0.764069320781046,
+      "n": 120
+    }
+  },
+  "perFamilyRates": {
+    "MOBILITY_CORRIDOR": {
+      "WAIT": 0,
+      "CGR_EARLIEST": 80,
+      "PROPHET_WARM": 87.5,
+      "SPRAY_AND_FOCUS": 92.5,
+      "EPIDEMIC_CAPPED": 100,
+      "ARR_STATIC": 100,
+      "ARR_REPLAN_V2": 100
+    },
+    "SRLG_CORRELATED_BLACKOUT": {
+      "WAIT": 0,
+      "CGR_EARLIEST": 85,
+      "PROPHET_WARM": 95,
+      "SPRAY_AND_FOCUS": 100,
+      "EPIDEMIC_CAPPED": 95,
+      "ARR_STATIC": 97.5,
+      "ARR_REPLAN_V2": 100
+    },
+    "EU868_CONGESTED_SRD": {
+      "WAIT": 0,
+      "CGR_EARLIEST": 10,
+      "PROPHET_WARM": 62.5,
+      "SPRAY_AND_FOCUS": 62.5,
+      "EPIDEMIC_CAPPED": 0,
+      "ARR_STATIC": 85,
+      "ARR_REPLAN_V2": 82.5
+    }
+  },
+  "gate": {
+    "improvementAtLeast2pp": false,
+    "ciLowerAboveZero": false,
+    "txRatioWithin1_5": true,
+    "energyRatioWithin1_2": true,
+    "zeroSecurityViolations": true,
+    "cpuP95SimulatedNodeMs": 9.365,
+    "androidHardwareCpuMeasured": false
+  },
+  "decision": "REJECTED_OR_INCONCLUSIVE"
+}

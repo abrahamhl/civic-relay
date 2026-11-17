@@ -1,0 +1,47 @@
+{
+  "schema": "senda-h-fire-b/1",
+  "generatedAt": "2026-11-17T09:14:48.632Z",
+  "externalConfirmatoryStatus": "DATASET_BLOCKED",
+  "hypothesisDecision": "INCONCLUSIVE_DATASET_BLOCKED",
+  "reason": "GeoMAC 2018 fires (camp/carr/woolsey) are frozen as DEVELOPMENT_DIAGNOSTIC_ONLY; >=10 independent external wildfires (>=6 train, >=4 test) with causal issue-time NOAA HRRR/LANDFIRE/EFFIS archives are not present in this local environment.",
+  "diagnosticCensoringAudit2018": {
+    "camp": {
+      "splitTag": "DEVELOPMENT_DIAGNOSTIC_ONLY",
+      "units": 12,
+      "points": 3600,
+      "burntConfirmed": 395,
+      "unburntConfirmed": 3188,
+      "censoredAtHorizon": 17,
+      "censoredRate": 0.0047
+    },
+    "carr": {
+      "splitTag": "DEVELOPMENT_DIAGNOSTIC_ONLY",
+      "units": 12,
+      "points": 3600,
+      "burntConfirmed": 82,
+      "unburntConfirmed": 3497,
+      "censoredAtHorizon": 21,
+      "censoredRate": 0.0058
+    },
+    "woolsey": {
+      "splitTag": "DEVELOPMENT_DIAGNOSTIC_ONLY",
+      "units": 12,
+      "points": 3600,
+      "burntConfirmed": 328,
+      "unburntConfirmed": 3193,
+      "censoredAtHorizon": 79,
+      "censoredRate": 0.0219
+    }
+  },
+  "syntheticPhysicalSanityOnly": {
+    "evidenceKind": "SIMULATED_NUMERICAL_VERIFICATION_ONLY",
+    "horizonMin": 60,
+    "unburntCellsEvaluated": 2016,
+    "persistenceBrier": 0.01835,
+    "levelSetBrier": 0.0019,
+    "cflObserved": 0.4
+  },
+  "h2LegacyStatus": "EXPERIMENTAL_REJECTED",
+  "canIssueEvacuationOrder": false,
+  "canPublicWarn": false
+}

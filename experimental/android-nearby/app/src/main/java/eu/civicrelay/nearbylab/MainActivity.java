@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -57,6 +59,8 @@ import java.util.UUID;
 public final class MainActivity extends Activity {
     private static final String SERVICE_ID = "eu.civicrelay.nearbylab";
     private static final Strategy STRATEGY = Strategy.P2P_POINT_TO_POINT;
+    private static final String PREFS_NAME = "oep_lab_prefs";
+    private static final String KEY_BOOT_COUNTER = "boot_counter";
     private static final int REQUEST_PERMISSIONS = 6001;
     private static final int MAX_BYTES = 4096;
     private static final long TTL_MILLIS = 60000L;
@@ -66,12 +70,17 @@ public final class MainActivity extends Activity {
     private volatile boolean connected = false;
     private volatile String connectedPeer = null;
     private volatile long sessionEpoch = 0L;
+    private final String sessionBootId = UUID.randomUUID().toString();
+    private long bootCounter = 1L;
     private String waitingRole = null;
     private final LabDeliveryGuard deliveryGuard = new LabDeliveryGuard();
     private final Set<String> approvedPeers = Collections.synchronizedSet(new HashSet<>());
     private final Map<Long, String> outgoingPayloads = Collections.synchronizedMap(new HashMap<>());
     private volatile long sendStartedElapsed = 0L;
+    private volatile long sendStartedWallMs = 0L;
     private volatile String activeTrialId = null;
+    private volatile String activeChallenge = null;
+    private volatile int activePayloadBytes = 0;
     private final LabTrialJournal journal = new LabTrialJournal();
     // Never reuse a signing identity after STOP, peer disconnect, or consent revocation.
     private volatile LabReceiptSigner receiptSigner = new LabReceiptSigner();
@@ -110,14 +119,19 @@ public final class MainActivity extends Activity {
         addButton(body, "2B. DISCOVER AS LAB SENDER", () -> startRole("DISCOVER"));
         addButton(body, "3. SEND SYNTHETIC TEST MESSAGE", this::sendTest);
         addButton(body, "4. MANUALLY SHARE LAB TRIAL CSV", () -> {
-            if (!userConsented || journal.size() == 0) {
+            if (!userConsented || (journal.size() == 0 && journal.telemetrySize() == 0)) {
                 log("No consented field trial events to export."); return;
             }
             // Explicit system chooser. User controls destination; external copies cannot be revoked.
+            StringBuilder payloadExport = new StringBuilder(journal.csv());
+            if (journal.telemetrySize() > 0) {
+                payloadExport.append("\n# TELEMETRY NDJSON (senda-physical-telemetry/1)\n")
+                    .append(journal.telemetryNdjson());
+            }
             Intent share = new Intent(Intent.ACTION_SEND);
             share.setType("text/plain");
             share.putExtra(Intent.EXTRA_SUBJECT, "OEP anonymous lab trials — not certified");
-            share.putExtra(Intent.EXTRA_TEXT, journal.csv());
+            share.putExtra(Intent.EXTRA_TEXT, payloadExport.toString());
             startActivity(Intent.createChooser(share, "Share synthetic test evidence manually"));
         });
         addButton(body, "OPEN BLUETOOTH SETTINGS", () -> startActivity(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS)));
@@ -138,12 +152,16 @@ public final class MainActivity extends Activity {
 
     /** The queue is a LAB-ONLY crash journal. No automatic transmission on restart. */
     private void initialiseLabQueue() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        bootCounter = prefs.getLong(KEY_BOOT_COUNTER, 0L) + 1L;
+        prefs.edit().putLong(KEY_BOOT_COUNTER, bootCounter).apply();
         try {
-            durableQueue = new LabPersistentQueue(labQueuePath(), System.currentTimeMillis());
+            durableQueue = new LabPersistentQueue(labQueuePath(), System.currentTimeMillis(), bootCounter);
             durableQueueHealthy = true;
             int pending = 0;
             for (LabPersistentQueue.Record record : durableQueue.snapshot(System.currentTimeMillis())) {
-                if (record.status == LabPersistentQueue.Status.QUEUED) pending++;
+                if (record.status == LabPersistentQueue.Status.QUEUED ||
+                    record.status == LabPersistentQueue.Status.CUSTODY_ACK) pending++;
             }
             if (pending > 0) log(pending + " synthetic queued lab record(s) restored from interrupted run. " +
                 "No retry without NEW consent/pairing. STOP & CLEAR removes these local records.");
@@ -171,8 +189,10 @@ public final class MainActivity extends Activity {
     private void settleLabRecord(String id, String outcome) {
         if (durableQueue == null) return;
         try {
-            if ("ACK_RECEIVED".equals(outcome)) durableQueue.markAckVerified(id, System.currentTimeMillis());
-            else durableQueue.revoke(id, System.currentTimeMillis());
+            long now = System.currentTimeMillis();
+            if ("ACK_RECEIVED".equals(outcome)) durableQueue.markAckVerified(id, now);
+            else if ("SEND_FAILED".equals(outcome)) durableQueue.markFailedExhausted(id, now);
+            else durableQueue.revoke(id, now);
         } catch (IOException failure) {
             durableQueueHealthy = false;
             log("P0 STORAGE ERROR: trial result is not durably recorded; no persistence claim.");
@@ -180,6 +200,35 @@ public final class MainActivity extends Activity {
             durableQueueHealthy = false;
             log("P0 STORAGE ERROR: missing lab record; further sends blocked.");
         }
+    }
+
+    private void recordLabTelemetry(String id, String custodyState, boolean destinationAckVerified,
+                                    long elapsedMs, String lossReason) {
+        if (!LabDeliveryGuard.validId(id)) return;
+        long now = System.currentTimeMillis();
+        String nowIso = Instant.ofEpochMilli(now).toString();
+        String nonce = activeChallenge != null && LabDeliveryGuard.validId(activeChallenge)
+            ? activeChallenge : id;
+        String clockStatus = (sendStartedWallMs > 0L && now + 5000L < sendStartedWallMs)
+            ? "WALL_ADJUSTED" : "MONOTONIC_OK";
+        journal.recordTelemetry(
+            id, nowIso, nowIso, sessionBootId,
+            (int) Math.min(Integer.MAX_VALUE, Math.max(0L, bootCounter)),
+            "ANDROID_NEARBY_P2P",
+            userConsented && connected,
+            userConsented,
+            custodyState,
+            destinationAckVerified,
+            nonce,
+            1,
+            Math.max(1, activePayloadBytes),
+            Math.max(0L, elapsedMs),
+            0.0,
+            "UNAVAILABLE",
+            null,
+            clockStatus,
+            lossReason
+        );
     }
 
     private void addButton(LinearLayout parent, String label, Runnable action) {
@@ -237,10 +286,22 @@ public final class MainActivity extends Activity {
             Math.max(0L, SystemClock.elapsedRealtime() - sendStartedElapsed);
         settleLabRecord(id, outcome);
         journal.record(id, outcome, elapsed);
+        if ("ACK_RECEIVED".equals(outcome)) {
+            recordLabTelemetry(id, "DESTINATION_ACK", true, Math.max(0L, elapsed), null);
+        } else if ("SEND_FAILED".equals(outcome)) {
+            recordLabTelemetry(id, "FAILED_EXHAUSTED", false, Math.max(0L, elapsed), "NEARBY_SEND_FAILED");
+        } else if ("EXPIRED".equals(outcome)) {
+            recordLabTelemetry(id, "EXPIRED", false, Math.max(0L, elapsed), "TTL_EXPIRED");
+        } else {
+            recordLabTelemetry(id, "REVOKED", false, Math.max(0L, elapsed), "LINK_DISCONNECTED");
+        }
         if (pendingExpiryTask != null) foregroundTimer.removeCallbacks(pendingExpiryTask);
         pendingExpiryTask = null;
         activeTrialId = null;
+        activeChallenge = null;
+        activePayloadBytes = 0;
         sendStartedElapsed = 0L;
+        sendStartedWallMs = 0L;
         return elapsed;
     }
 
@@ -418,7 +479,11 @@ public final class MainActivity extends Activity {
                 return;
             }
             sendStartedElapsed = SystemClock.elapsedRealtime();
+            sendStartedWallMs = now;
             activeTrialId = id;
+            activeChallenge = challenge;
+            activePayloadBytes = packet.toString().getBytes(StandardCharsets.UTF_8).length;
+            recordLabTelemetry(id, "QUEUED", false, 0L, null);
             armExpiry(id, deadline);
             sendPacket(connectedPeer, packet);
             log("Message submitted to Nearby API; NOT delivered until receiver ACK: " + id);
@@ -528,8 +593,19 @@ public final class MainActivity extends Activity {
                 }
                 log("Nearby payload transfer failed or canceled. Not delivered.");
             } else if (status == PayloadTransferUpdate.Status.SUCCESS) {
-                outgoingPayloads.remove(update.getPayloadId());
-                // Nearby byte-transfer success is NOT an application receiver ACK.
+                String custId = outgoingPayloads.remove(update.getPayloadId());
+                if (custId != null && custId.equals(activeTrialId)) {
+                    try {
+                        if (durableQueue != null) durableQueue.markCustodyAck(custId, System.currentTimeMillis());
+                    } catch (IOException | IllegalArgumentException failure) {
+                        durableQueueHealthy = false;
+                        log("P0 STORAGE ERROR: custody state update failed.");
+                    }
+                    long custElapsed = sendStartedElapsed == 0L ? 0L :
+                        Math.max(0L, SystemClock.elapsedRealtime() - sendStartedElapsed);
+                    recordLabTelemetry(custId, "CUSTODY_ACK", false, custElapsed, null);
+                    log("Nearby byte transfer succeeded = CUSTODY_ACK only; awaiting receiver ECDSA receipt.");
+                }
             }
         }
     };
@@ -564,7 +640,10 @@ public final class MainActivity extends Activity {
         receiptSigner = new LabReceiptSigner(); // New opt-in must establish fresh ephemeral key material.
         outgoingPayloads.clear();
         activeTrialId = null;
+        activeChallenge = null;
+        activePayloadBytes = 0;
         sendStartedElapsed = 0L;
+        sendStartedWallMs = 0L;
         if (pendingExpiryTask != null) foregroundTimer.removeCallbacks(pendingExpiryTask);
         pendingExpiryTask = null;
         journal.clear();
@@ -575,7 +654,7 @@ public final class MainActivity extends Activity {
         try {
             if (durableQueue != null) durableQueue.purgeAll();
             else Files.deleteIfExists(labQueuePath());
-            durableQueue = new LabPersistentQueue(labQueuePath(), System.currentTimeMillis());
+            durableQueue = new LabPersistentQueue(labQueuePath(), System.currentTimeMillis(), bootCounter);
             durableQueueHealthy = true;
             eraseSucceeded = true;
         } catch (IOException error) {

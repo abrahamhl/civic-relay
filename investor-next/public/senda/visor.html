@@ -172,9 +172,16 @@ td.num,th.num{text-align:right;font-family:var(--mono)}
     </section>
 
     <section>
-      <h2>Resultados retenidos H-ARR-1 (IC 95 %) <span class="tag sim">SIMULADO</span></h2>
+      <h2>Resultados retenidos H-ARR-1 y H-ARR-R-v2 <span class="tag sim">SIMULADO</span></h2>
       <canvas id="chart" width="600" height="220" aria-label="Entrega simulada frente a correlación"></canvas>
       <div id="verdict" class="small"></div>
+      <div id="replan-box" class="small" style="margin-top:8px"></div>
+    </section>
+
+    <section>
+      <h2>Contrato de Abstención (P4), Fusión DAG (H-FUS-1) y Física H-FIRE-B <span class="tag unv">NO PRESCRIPTIVO</span></h2>
+      <div class="kv" id="abstain-contract"></div>
+      <div class="small" id="fusion-live" style="margin-top:8px"></div>
     </section>
   </div>
 </main>
@@ -185,6 +192,8 @@ import { makeRegionalInstance, makeFireInstance, planAll, realise, executePlan, 
 import { forecastParticles, pointGeometry, arrivalForecast, arrivalHours, INVALID_WHEN } from '/senda/arr/arr-forecast.mjs';
 import { assessForecastSkillGate } from '/senda/core/evidence-contract.mjs';
 import { enumerateDeclaredFailureCuts } from '/senda/core/failure-domain-cuts.mjs';
+import { fuseCausalEvidenceDag } from '/senda/core/causal-evidence-fusion.mjs';
+import { evaluateAbstentionContract } from '/senda/core/robust-abstention.mjs';
 
 const $ = (id) => document.getElementById(id);
 const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
@@ -505,6 +514,43 @@ async function chart() {
   });
   $('verdict').innerHTML = `Entrega simulada a tiempo frente a ρ (IC 95 %, semillas retenidas ≥ ${R.protocol.heldOutSeedStart}). Veredicto: ` +
     Object.entries(R.verdict).map(([k, ok]) => `${k.replace(/_/g, ' ')}: <b style="color:${ok ? css('--ok') : css('--coral')}">${ok ? 'sí' : 'no'}</b>`).join(' · ');
+
+  try {
+    const [rv2, fphy] = await Promise.all([
+      fetch('/senda/arr/results/replan-v2-confirmatory.json').then((r) => r.json()),
+      fetch('/senda/arr/results/fire-physics-eval.json').then((r) => r.json()),
+    ]);
+    const st = rv2.summaryByStrategy;
+    $('replan-box').innerHTML = `<b>H-ARR-R-v2 (${rv2.totalIndependentBlocks} sesiones):</b> ARR_REPLAN_V2=${(100 * st.ARR_REPLAN_V2.deliveryRate).toFixed(1)}% vs ARR_STATIC=${(100 * st.ARR_STATIC.deliveryRate).toFixed(1)}% (${(100 * rv2.pairedDiffs.vsStatic.mean).toFixed(1)} pp) con <b>${rv2.pairedDiffs.energyRatioVsStatic.mean.toFixed(2)}× energía</b> y <b>${(st.ARR_REPLAN_V2.meanAirtimeMs / st.ARR_STATIC.meanAirtimeMs).toFixed(2)}× airtime</b> · Estado: <b>${esc(rv2.decision)}</b>.`;
+
+    const t0 = Date.now();
+    const fusion = fuseCausalEvidenceDag([
+      { id: 'usgs', sourceId: 'USGS_NEIC', rootEventId: 'ev1', pEvent: 0.72, observedAtUtc: new Date(t0 - 120000).toISOString(), availableAtUtc: new Date(t0 - 60000).toISOString(), rightsApproved: true },
+      { id: 'gdacs', sourceId: 'GDACS_EQ', rootEventId: 'ev1', pEvent: 0.72, observedAtUtc: new Date(t0 - 120000).toISOString(), availableAtUtc: new Date(t0 - 30000).toISOString(), rightsApproved: true },
+      { id: 'firms', sourceId: 'NASA_FIRMS', pEvent: 0.66, observedAtUtc: new Date(t0 - 180000).toISOString(), availableAtUtc: new Date(t0 - 60000).toISOString(), rightsApproved: true },
+    ], { priorProb: 0.25, evaluationTimeMs: t0 });
+
+    const abst = evaluateAbstentionContract({
+      domain: 'FIRE_SPREAD',
+      known: ['Perímetros GeoMAC 2018 (SOLO DIAGNÓSTICO)', 'Gradiente térmico FIRMS'],
+      computed: ['Upwind Level-Set H-FIRE-B (CFL ≤ 0.45)', 'Grafo causal DAG H-FUS-1'],
+      assumed: ['Perfil RF de catálogo no medido en campo', 'Viento sintético hasta descarga HRRR'],
+      unverified: ['Medidas RF físicas 2 Android + 2 LoRa', '>=4 incendios externos test HRRR/LANDFIRE'],
+      validUntilUtc: new Date(t0 + 6 * 3600000).toISOString(),
+      nowUtc: new Date(t0).toISOString(),
+      sources: ['USGS/NIFC GeoMAC', 'NOAA HRRR (PENDIENTE)', 'USDA Rothermel 1972'],
+      datasetBlocked: fphy.externalConfirmatoryStatus === 'DATASET_BLOCKED',
+    });
+
+    $('abstain-contract').innerHTML = `
+      <div><small>Estado P4</small><b>${esc(abst.status)} (${esc(abst.abstainReasons.join(', ') || 'OK')})</b></div>
+      <div><small>Uso permitido</small><b>${esc(abst.usageConstraint)} · canPublicWarn=${abst.canIssuePublicAlert}</b></div>
+      <div><small>Qué se sabe</small><b>${esc(abst.whatIsKnown.join(' · '))}</b></div>
+      <div><small>Qué se supuso</small><b>${esc(abst.whatWasAssumed.join(' · '))}</b></div>
+      <div><small>Falta por comprobar</small><b>${esc(abst.whatNeedsVerification.join(' · '))}</b></div>
+      <div><small>Válido hasta</small><b>${esc(abst.validUntilUtc ?? 'EXPIRADO')}</b></div>`;
+    $('fusion-live').innerHTML = `<b>Fusión Causal DAG (H-FUS-1):</b> ${fusion.independentClusterCount} clústeres independientes (USGS+GDACS agrupados como 1 raíz) → causal=${(100 * fusion.causalProbability).toFixed(1)}% vs Naive Bayes correlacionado=${(100 * fusion.naiveBayesProbability).toFixed(1)}% (sesgo inflado +${(100 * fusion.overconfidenceGap).toFixed(1)} pp evitado). · <b>H-FIRE-B:</b> ${esc(fphy.externalConfirmatoryStatus)} (criterio externo bloqueado hasta HRRR/LANDFIRE).`;
+  } catch (e) { $('fusion-live').textContent = 'P4/DAG: ' + e.message; }
 }
 
 for (const id of ['scenario', 'seed', 'rho', 'k0', 'k']) $(id).addEventListener('change', rebuild);

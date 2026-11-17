@@ -29,8 +29,13 @@ public final class LabTrialJournalTest {
         }
         require(journal.size()==120,"FIFO bounded");
         require(!journal.csv().contains(id+",ACK_RECEIVED"),"Oldest entry is dropped");
+        String nonce="22222222-2222-4222-8222-222222222222";
+        rejects(()->journal.recordTelemetry(id,"2026-11-17T10:00:00Z","2026-11-17T10:00:01Z","boot-1",1,"BLE",true,true,"CUSTODY_ACK",true,nonce,1,160,120,4.5,"HYPOTHETICAL_CATALOG","PWR-1","MONOTONIC_OK",null));
+        journal.recordTelemetry(id,"2026-11-17T10:00:00Z","2026-11-17T10:00:01Z","boot-1",1,"BLE",true,true,"CUSTODY_ACK",false,nonce,1,160,120,4.5,"HYPOTHETICAL_CATALOG","PWR-1","MONOTONIC_OK",null);
+        require(journal.telemetrySize()==1,"Telemetry NDJSON row recorded");
+        require(journal.telemetryNdjson().contains("\"physicalRfVerified\":false"),"Telemetry stays unverified for physical RF");
         journal.clear();
-        require(journal.size()==0,"Consent revocation erases journal rows");
+        require(journal.size()==0&&journal.telemetrySize()==0,"Consent revocation erases journal and telemetry rows");
         require(journal.csv().split("\n").length==2,"Only heading after clear");
         System.out.println("PASS: "+checks+" local JVM journal checks; no field proof implied.");
     }
