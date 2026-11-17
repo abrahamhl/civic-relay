@@ -7,6 +7,8 @@ on:
     paths:
       - 'packages/senda/src/robust-scenario-risk.mjs'
       - 'packages/senda/src/robust-assurance-audit.mjs'
+      - 'packages/senda/src/dependency-agnostic-shards.mjs'
+      - 'packages/senda/tests/dependency-agnostic-shards.test.mjs'
       - 'packages/senda/tests/robust-scenario-risk.test.mjs'
       - 'packages/senda/tests/robust-assurance-audit.test.mjs'
       - '.github/workflows/senda-robust-risk-ci.yml'
