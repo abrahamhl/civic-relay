@@ -250,8 +250,9 @@ export async function decodeReports(text) {
 /* ───────────── 7. Exportar un incidente a CAP 1.2 para la sala de emergencias ───────────── */
 const FAMILY_CAP = { WATER: 'Met', FIRE: 'Fire', ROAD: 'Transport', STRUCTURE: 'Rescue' };
 /**
- * CAP 1.2 con ámbito RESTRINGIDO (para el organismo, no para la población). Certeza según el estado:
- * OFFICIAL → Observed; RECON/CORROBORATED → Likely; RUMOR → Possible. Nunca sale como aviso público:
+ * CAP 1.2 con ámbito RESTRINGIDO (para el organismo, no para la población).
+ * Certeza: siempre Unknown; los ratios heurísticos carecen de calibración de campo.
+ * Este exportador nunca admite OFFICIAL ni Actual. Nunca sale como aviso público:
  * la difusión a la población la decide y la firma el organismo con sus propios sistemas.
  */
 export function incidentToCap(assessed, cluster, { sender = 'senda@organismo.example', now, exercise = true } = {}) {
@@ -260,10 +261,12 @@ export function incidentToCap(assessed, cluster, { sender = 'senda@organismo.exa
   // Until such an adapter is implemented and field-reviewed, this citizens-to-CAP path is exercise-only.
   if (exercise !== true) throw new Error('CAP Actual bloqueado: requiere emisor institucional autenticado fuera de este adaptador experimental');
   if (!Number.isFinite(now)) throw new TypeError('now obligatorio');
-  // This citizen-owned exercise exporter never has authenticated official evidence.
-  // In particular a forged assessed.state='OFFICIAL' must never produce CAP Observed.
-  const certainty = assessed.state === 'OFFICIAL' ? 'Unknown' :
-    assessed.state === 'RUMOR' ? 'Possible' : 'Likely';
+  // This citizen-owned exercise exporter never has authenticated/calibrated
+  // incident evidence. CAP certainty is a standard operational descriptor, NOT
+  // a numeric placeholder for uncalibrated Bayesian likelihood ratios.
+  if (assessed?.state === 'OFFICIAL')
+    throw new Error('CAP de reporte ciudadano: estado OFFICIAL sin procedencia autenticada');
+  const certainty = 'Unknown';
   const severity = assessed.lifeRisk ? 'Extreme' : assessed.severity >= 0.6 ? 'Severe' : 'Moderate';
   const rise = cluster.reports.map((r) => r.measurement?.rise?.cmPerMin).filter((x) => Number.isFinite(x));
   const kinds = [...new Set(cluster.reports.map((r) => HAZARD_KINDS[r.kind].label))];
