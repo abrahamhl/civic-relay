@@ -34,14 +34,15 @@ export function buildIncidentFrequencyEnvelope({incidents,scenarioIds,alpha=0.05
   // Fewer events cannot support even an exploratory frequency estimate.
   if(!Array.isArray(incidents)||incidents.length<30||incidents.length>100000)
     throw new RangeError('30..100000 distinct incident records required');
-  const seen=new Set(), count=Object.fromEntries(scenarioIds.map(x=>[x,0]));
+  const seen=new Set(),causalBlocks=new Set(), count=Object.fromEntries(scenarioIds.map(x=>[x,0]));
   for(const row of incidents){
     if(!row||typeof row!=='object'||!ID.test(row.incidentKey??'')||
-      seen.has(row.incidentKey)||typeof row.scenarioId!=='string'||
+      !ID.test(row.independentBlockId??'')||seen.has(row.incidentKey)||
+      causalBlocks.has(row.independentBlockId)||typeof row.scenarioId!=='string'||
       !OWN(count,row.scenarioId)||typeof row.evidenceSha256!=='string'||
       !SHA.test(row.evidenceSha256)||!ID.test(row.sourceId??''))
       throw new TypeError('invalid, repeated or undocumented incident label');
-    seen.add(row.incidentKey);
+    seen.add(row.incidentKey);causalBlocks.add(row.independentBlockId);
     count[row.scenarioId]++;
   }
   const n=incidents.length,m=scenarioIds.length;
@@ -60,7 +61,8 @@ export function buildIncidentFrequencyEnvelope({incidents,scenarioIds,alpha=0.05
     method:'HOEFFDING_PLUS_UNION_BOUND_IID_CATEGORICAL_EVENTS',
     confidenceStatement:'SIMULTANEOUS_COVERAGE_ONLY_IF_EVENT_LABELS_ARE_IID_AND_COMPLETE',
     sourceHashFormatChecked:true,sourceAuthenticityVerified:false,
-    distinctIncidentKeysChecked:true,independenceOfIncidentsVerified:false,
+    distinctIncidentKeysChecked:true,distinctCausalBlockKeysChecked:true,
+    independenceOfIncidentsVerified:false,
     representativeOfFutureDisastersVerified:false,
     novelMathematicsClaim:false,mayAuthorizeOperationalRouting:false};
 }
