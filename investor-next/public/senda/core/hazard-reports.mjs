@@ -116,8 +116,11 @@ export function assessIncident(inc, { reputation = {}, official = [], sensors = 
   const life = inc.reports.some((r) => HAZARD_KINDS[r.kind].life || (r.people?.trapped ?? 0) > 0);
   const state = off ? 'OFFICIAL' : p >= 0.8 && (sev >= 0.6 || life) ? 'RECON' : p >= 0.8 || devices.size >= 3 ? 'CORROBORATED' : 'RUMOR';
   return { basis: 'MODEL_UNCALIBRATED_LR', id: inc.id, family: inc.family, pReal: +p.toFixed(3), state, severity: sev, lifeRisk: life, reporters: devices.size, reports: inc.reports.length, why,
-    canPublicWarn: Boolean(off), // regla dura: sin organismo oficial no hay aviso a la población
-    official: off ? { source: off.source, ref: off.ref ?? null } : null };
+    // Matching a caller-provided official feed is contextual evidence, NOT proof of publisher authority.
+    // No delegated CAP/112 credentials or signed trust anchor exist in this laboratory adapter.
+    canPublicWarn: false,
+    publicAlertAuthorityVerified: false,
+    official: off ? { source: off.source, ref: off.ref ?? null, authorityVerified: false } : null };
 }
 
 /**
@@ -150,7 +153,7 @@ export function triageQueue(assessed, clusters) {
 export function citizenAdvice(kind, assessed) {
   const k = HAZARD_KINDS[kind];
   if (k.life) return { call112: true, text: 'Hay riesgo para la vida: llama al 112 ahora. Dile tu posición; tu reporte queda guardado en SENDA (la conexión directa con la sala 112 necesita un convenio con el organismo).' };
-  if (assessed?.state === 'OFFICIAL') return { call112: false, text: `El organismo ya lo gestiona (${assessed.official.source}). Llama al 112 si cambia o hay personas en peligro.` };
+  if (assessed?.state === 'OFFICIAL') return { call112: false, text: `SENDA tiene una referencia pública asociada (${assessed.official?.source ?? 'fuente sin validar'}), pero no confirma que un organismo esté gestionando tu caso. Sigue los canales oficiales y llama al 112 si hay personas en peligro.` };
   if (assessed && assessed.reporters >= 3) return { call112: false, text: `Ya lo han reportado ${assessed.reporters} personas en SENDA y está agrupado como un solo incidente. Llama al 112 si ves personas en peligro.` };
   return { call112: false, text: 'Reporte enviado. Si ves personas en peligro, llama al 112.' };
 }
