@@ -30,8 +30,9 @@ node --test packages/senda/tests/robust-scenario-risk.test.mjs packages/senda/te
 node --test packages/senda/tests/*.test.mjs
 node --test packages/senda/tests-adversarial/*.test.mjs
 python packages/senda/scripts/verify-robust-lp.py
+python packages/senda/scripts/verify-dependence-bounds.py
 ```
-- La CI por SHA está en https://github.com/abrahamhl/civic-relay/actions/workflows/senda-robust-risk-ci.yml; matrix Node 22/24, 250 LP por SciPy/HiGHS y pruebas del núcleo.
+- La CI por SHA está en https://github.com/abrahamhl/civic-relay/actions/workflows/senda-robust-risk-ci.yml; matrix Node 22/24, **250 LP de optimización robusta y 160 LP de distribuciones conjuntas adversariales independientes** mediante SciPy/HiGHS y pruebas del núcleo. [Ejecución verde con 0 violaciones y 627+11 tests](https://github.com/abrahamhl/civic-relay/actions/runs/44010379558) en SHA `6ddd4dc2cbb2edb483c2337d070d1a6ee278694e`.
 - **Prueba ya verificada en `ef12c7dbba7253f56e69dd1ac6d3c3a92b2c18d9`:** CI robusta, laboratorio, Android y QA Chromium GREEN; matriz Node 22 informó 608 núcleo + 11 adversariales y optimizador independiente 250 casos. Ese SHA precede H12/H13; revisar **el SHA HEAD actual** al retomar, nunca asumir que un CI verde antiguo cubre cambios recientes.
 - La suite de paridad compara `packages/senda/src/*.mjs` con `investor-next/public/senda/core/*.mjs`: si se edita core, sincronizar exactamente la versión web para evitar fallo de CI. Mejor futuro: generarlo automáticamente en build desde una sola fuente.
 - No se ha hecho ensayo radio real ni prueba 112 ni despliegue autorizado.
