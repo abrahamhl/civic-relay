@@ -102,25 +102,36 @@ export function assessIncident(inc, { reputation = {}, official = [], sensors = 
     const lr = 1 + (EVIDENCE_LR.REPORTER - 1) * 2 * trust; // reputación neutra (0,5) → LR 3; mala → ~1
     logOdds += Math.log(lr);
   }
-  why.push(`${devices.size} persona(s) distinta(s) (${inc.reports.length} reportes)`);
+  // Uniqueness of locally generated keys does NOT establish distinct humans (Sybil risk).
+  why.push(`${devices.size} seudónimo(s)/clave(s) distinta(s) (${inc.reports.length} reportes; identidades no verificadas)`);
   const rates = inc.reports.map((r) => r.measurement?.rise).filter(Boolean);
   if (rates.some((x) => x.cmPerMin > 0.5 && (x.stdErr ?? 1) < x.cmPerMin / 2)) { logOdds += Math.log(EVIDENCE_LR.MEASUREMENT_RISING); why.push('medida de subida coherente'); }
-  for (const s of sensors.filter((s) => s.family === inc.family && distanceM(s, inc.center) <= nearM)) {
-    if (s.agrees) { logOdds += Math.log(EVIDENCE_LR.SENSOR_AGREES); why.push(`sensor ${s.id} cuadra`); }
-    else if (s.official) { logOdds += Math.log(EVIDENCE_LR.OFFICIAL_CONTRADICTS); why.push(`aforo oficial ${s.id} no sube`); }
-  }
-  const off = official.find((o) => o.family === inc.family && distanceM(o, inc.center) <= nearM && o.at >= inc.firstAt - 6 * 3600_000);
-  if (off) { logOdds += Math.log(EVIDENCE_LR.OFFICIAL); why.push(`confirmado por ${off.source}`); }
+  // P0 institutional trust boundary: caller-supplied "official" and sensor "official"
+  // flags are not authority or measurement authentication. They CANNOT change odds,
+  // elevate state, suppress warnings or authorize dissemination. The future verified
+  // source adapter must provide a cryptographically pinned and audited identity.
+  const contextualSensors = sensors.filter((s) => s.family === inc.family &&
+    Number.isFinite(s.lat) && Number.isFinite(s.lon) &&
+    distanceM(s, inc.center) <= nearM);
+  if (contextualSensors.length) why.push(`${contextualSensors.length} lectura(s) externa(s) sin autenticar; excluidas del cálculo`);
+  const off = official.find((o) => o.family === inc.family &&
+    Number.isFinite(o.lat) && Number.isFinite(o.lon) && Number.isFinite(o.at) &&
+    distanceM(o, inc.center) <= nearM &&
+    o.at >= inc.firstAt - 6 * 3600_000 && o.at <= inc.lastAt + 6 * 3600_000);
+  if (off) why.push('referencia externa declarada como oficial, SIN autenticación de autoridad');
   const p = 1 / (1 + Math.exp(-logOdds));
   const sev = Math.max(...inc.reports.map((r) => HAZARD_KINDS[r.kind].severity));
   const life = inc.reports.some((r) => HAZARD_KINDS[r.kind].life || (r.people?.trapped ?? 0) > 0);
-  const state = off ? 'OFFICIAL' : p >= 0.8 && (sev >= 0.6 || life) ? 'RECON' : p >= 0.8 || devices.size >= 3 ? 'CORROBORATED' : 'RUMOR';
+  const state = p >= 0.8 && (sev >= 0.6 || life) ? 'RECON' : p >= 0.8 || devices.size >= 3 ? 'CORROBORATED' : 'RUMOR';
   return { basis: 'MODEL_UNCALIBRATED_LR', id: inc.id, family: inc.family, pReal: +p.toFixed(3), state, severity: sev, lifeRisk: life, reporters: devices.size, reports: inc.reports.length, why,
     // Matching a caller-provided official feed is contextual evidence, NOT proof of publisher authority.
     // No delegated CAP/112 credentials or signed trust anchor exist in this laboratory adapter.
     canPublicWarn: false,
     publicAlertAuthorityVerified: false,
-    official: off ? { source: off.source, ref: off.ref ?? null, authorityVerified: false } : null };
+    modelCalibrationVerified: false,
+    individualHumanIdentityVerified: false,
+    sensorMeasurementsAuthenticated: false,
+    official: off ? { source: String(off.source ?? 'FUENTE_NO_VERIFICADA'), ref: off.ref ?? null, authorityVerified: false, usedForScoring: false } : null };
 }
 
 /**
@@ -249,14 +260,17 @@ export function incidentToCap(assessed, cluster, { sender = 'senda@organismo.exa
   // Until such an adapter is implemented and field-reviewed, this citizens-to-CAP path is exercise-only.
   if (exercise !== true) throw new Error('CAP Actual bloqueado: requiere emisor institucional autenticado fuera de este adaptador experimental');
   if (!Number.isFinite(now)) throw new TypeError('now obligatorio');
-  const certainty = assessed.state === 'OFFICIAL' ? 'Observed' : assessed.state === 'RUMOR' ? 'Possible' : 'Likely';
+  // This citizen-owned exercise exporter never has authenticated official evidence.
+  // In particular a forged assessed.state='OFFICIAL' must never produce CAP Observed.
+  const certainty = assessed.state === 'OFFICIAL' ? 'Unknown' :
+    assessed.state === 'RUMOR' ? 'Possible' : 'Likely';
   const severity = assessed.lifeRisk ? 'Extreme' : assessed.severity >= 0.6 ? 'Severe' : 'Moderate';
   const rise = cluster.reports.map((r) => r.measurement?.rise?.cmPerMin).filter((x) => Number.isFinite(x));
   const kinds = [...new Set(cluster.reports.map((r) => HAZARD_KINDS[r.kind].label))];
   const radiusKm = Math.max(0.1, Math.max(...cluster.reports.map((r) => distanceM(cluster.center, r))) / 1000);
   return toCap({ identifier: `SENDA-REP-${assessed.id}-${cluster.firstAt}`, sender, sent: now, status: 'Exercise', msgType: 'Alert', scope: 'Restricted',
     info: { category: FAMILY_CAP[cluster.family] ?? 'Other', event: `Reportes ciudadanos: ${kinds.join(', ')}`, urgency: assessed.lifeRisk ? 'Immediate' : 'Expected', severity, certainty,
-      headline: `${assessed.reporters} persona(s) distinta(s), ${assessed.reports} reporte(s) · estado ${assessed.state}`,
+      headline: `${assessed.reporters} seudónimo(s) no verificado(s), ${assessed.reports} reporte(s) · estado ${assessed.state}`, 
       description: `Agrupado por SENDA a partir de reportes firmados de móviles (seudónimos). Probabilidad del modelo ${assessed.pReal} (razones de verosimilitud sin calibrar). Motivos: ${assessed.why.join('; ')}. SENDA no ha avisado a la población.`,
       parameters: [['SENDA_STATE', assessed.state], ['SENDA_REPORTERS', assessed.reporters], ['SENDA_TRAPPED', assessed.trapped ?? 0], ['SENDA_INJURED', assessed.injured ?? 0], ...(rise.length ? [['SENDA_RISE_CM_MIN_MAX', Math.max(...rise).toFixed(2)]] : []), ['SENDA_MODEL_BASIS', assessed.basis]],
       area: { areaDesc: 'Zona de los reportes', circle: { center: { lat: +cluster.center.lat.toFixed(5), lon: +cluster.center.lon.toFixed(5) }, radiusKm: +radiusKm.toFixed(2) } } } });
