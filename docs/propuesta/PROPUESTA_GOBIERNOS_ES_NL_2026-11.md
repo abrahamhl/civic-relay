@@ -2,7 +2,7 @@
 
 **Versión:** 17-11-2026 · **Estado:** borrador de trabajo del fundador. No se ha presentado a ningún organismo.
 **A quién va dirigida:** a los órganos técnicos de protección civil y emergencias (en España, Ministerio del Interior y servicios autonómicos; en Países Bajos, Ministerio de Justicia y Seguridad / NCTV, *veiligheidsregio's* y Rijkswaterstaat).
-**Nota sobre España:** una fuente secundaria indica elecciones generales el 29-11-2026 (no verificado en BOE). La propuesta se dirige al Gobierno que resulte, sea cual sea, y a los órganos técnicos permanentes.
+**Nota sobre España:** hay elecciones generales el 29-11-2026 (Real Decreto 806/2026, BOE del 6-10-2026, según medios que lo citan) y las nuevas Cámaras se constituyen el 23-12-2026. Hasta entonces no hay «nuevo gobierno»: la propuesta se dirige al que resulte, sea cual sea, y a los órganos técnicos permanentes.
 
 ---
 
