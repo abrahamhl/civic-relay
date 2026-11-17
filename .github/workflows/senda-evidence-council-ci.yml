@@ -8,6 +8,9 @@ on:
       - 'packages/senda/src/resilience-council.mjs'
       - 'packages/senda/tests/resilience-council.test.mjs'
       - 'packages/senda/src/paired-policy-evaluator.mjs'
+      - 'packages/senda/src/source-evidence.mjs'
+      - 'packages/senda/tests/source-evidence.test.mjs'
+      - 'investor-next/public/senda/core/source-evidence.mjs'
       - 'packages/senda/tests/paired-policy-evaluator.test.mjs'
       - 'investor-next/public/senda/core/paired-policy-evaluator.mjs'
       - 'investor-next/public/senda/core/resilience-council.mjs'
@@ -34,11 +37,13 @@ jobs:
         run: |
           cmp packages/senda/src/resilience-council.mjs investor-next/public/senda/core/resilience-council.mjs
           cmp packages/senda/src/paired-policy-evaluator.mjs investor-next/public/senda/core/paired-policy-evaluator.mjs
+          cmp packages/senda/src/source-evidence.mjs investor-next/public/senda/core/source-evidence.mjs
       - name: Syntax, H15 council and scenario/physics regressions
         run: |
           node --check packages/senda/src/resilience-council.mjs
           node --test packages/senda/tests/resilience-council.test.mjs
           node --test packages/senda/tests/paired-policy-evaluator.test.mjs
+          node --test packages/senda/tests/source-evidence.test.mjs
       - name: All SENDA core and adversarial tests (no physical RF)
         run: |
           node --test packages/senda/tests/*.test.mjs
