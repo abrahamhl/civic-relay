@@ -180,3 +180,29 @@ Esto es una aplicación conservadora de resultados matemáticos establecidos (Ho
 **Referencia de formato:** OASIS CAP 1.2 define \`Observed\` como hecho determinado y \`Unknown\` como certeza desconocida; un cálculo heurístico sin certificación del emisor no acredita una observación oficial: https://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2.html .
 
 **Pendiente (bloqueador de piloto):** diseñar un adaptador real de fuente institucional, con claves públicas ancladas fuera del repositorio, rotación, revocación, caducidad, confianza de transportes, control de zonas y permisos de publicación. No introducir \`official:true\` como sustituto de la autenticación. Verificar interfaz y dependencia de todos los actores antes de integrar \`master\`.
+
+
+## H15 · Cortes deterministas de dominios de fallo (N−1 y N−2)
+
+**Motivación:** H13 comprueba si dos rutas declaradas comparten riesgos. Eso no basta para contestar si **todo** el sistema pierde caminos tras una o dos averías de causa común. Un solo teléfono usado como emisor puede ser un punto único de fallo aunque tenga Bluetooth, LoRa y satélite. RFC 6414 §3.1.10 reconoce SRLG como conjunto de enlaces que comparten un riesgo lógico o físico. RFC 8001 discute la recogida de información SRLG en redes con dominio de gestión; trasladar este concepto a una pila experimental heterogénea exige comprobar la información de cada portador.
+
+**Implementado:** \`packages/senda/src/failure-domain-cuts.mjs\` y \`packages/senda/tests/failure-domain-cuts.test.mjs\`, además de copia idéntica en la app web offline.
+
+**Modelo:** conjunto finito de enlaces \`L\`, rutas declaradas \`P\`, dominios \`D\`. Cada ruta p contiene enlaces \`linkIds\` y dependencias de terminales \`endpointRiskDomains\`; sus dominios incluyen los identificadores de enlace y los SRLG de enlaces/terminales. El mismo nombre físico (por ejemplo \`GRID-X\`) se unifica en la **misma** categoría SRLG independientemente de que esté declarado en un enlace o en un terminal. Sea \`F⊆D\` el conjunto de recursos fallidos, y \`U(F)={p∈P autorizados declarativamente: riesgos(p)∩F=∅}\`. Un conjunto F es un corte bajo el modelo si \`|U(F)| < requiredSurvivingPaths\`. Se enumeran exhaustivamente todos los F con tamaño 1 o 2, hasta un máximo de 64 dominios declarados, 40 caminos y 1024 enlaces de referencia. Complejidad aproximada O(|D|² × |P| × riesgosPorRuta), acotada.
+
+**Salidas:** \`singleDomainCuts\`, \`doubleDomainCuts\`, \`smallestObservedCutSize\`, \`declaredN1Resilience\`, \`declaredN2Resilience\`, \`eligiblePathCount\`, \`excludedPathIds\`, \`pathRiskTable\`, y estado \`SHADOW_TOPOLOGY_RESEARCH_ONLY\`. En la ausencia de cualquier metadato físico aparece un dominio \`UNKNOWN_TOPOLOGY\` que afecta conservadoramente **a todas las rutas**; entonces \`declaredN1Resilience=false\`, aunque en teoría algunas vías pudieran funcionar.
+
+**Ejemplos falsables:**
+- LTE y SMS unidos a \`GRID-A\`, \`TOWER-9\` y una misma batería: esos tres dominios pueden cortar las dos rutas aunque sus portadores sean distintos.
+- Dos rutas que declaran dominios totalmente disjuntos pueden tolerar cualquier fallo individual enumerado, **pero no necesariamente dos simultáneos**.
+- Tres rutas con dominios disjuntos y terminales realmente independientes *según inventario declarado* resisten dos fallos del catálogo, pero el modelo no contempla fallos no inventariados ni demuestra fiabilidad RF.
+
+**Validación:** pruebas adversariales contra inventarios duplicados/incompletos, autorización ausente, recursos transversales, desempate estable, límites de coste computacional y 100 topologías aleatorias confrontadas con un enumerador independiente en las pruebas. Ninguna cota de N−1/N−2 implica más de 0% de disponibilidad verificada en campo: se trata de lógica de conjuntos, no probabilidades calibradas.
+
+**Hipótesis H15:** al descubrir cortes comunes de energía, gateway, torre, proveedor, batería, firmware o puente, se reduce el número de rutas erróneamente clasificadas como redundantes, frente a un sistema que solo contabiliza portadores. Debe probarse contra inventario real autorizado, apagones controlados y telemetría de campo. No automatizar ensayos sobre redes de terceros.
+
+**Valor de producto potencial:** ofrecer a Protección Civil un mapa de **dependencias críticas y cortes** verificable en una infraestructura voluntaria de piloto, con manifest de fuente, titular del equipo, permiso, fecha de inspección, integridad de inventario y plan de mitigación por cada corte. Sin esas pruebas solo sirve como laboratorio.
+
+Fuentes: https://www.rfc-editor.org/rfc/rfc6414.html , https://www.rfc-editor.org/rfc/rfc8001.html .
+
+**Afirmaciones expresamente prohibidas:** «N−1 certificado», «comunicaciones garantizadas», «dos tecnologías equivalen a redes independientes», «certificación ENS/RED/CRA obtenida», «acceso satelital confirmado». Ninguna de las implementaciones H11–H15 modifica la política real de transmisión, ni autoriza conexión a 112, redes policiales o satélites.
