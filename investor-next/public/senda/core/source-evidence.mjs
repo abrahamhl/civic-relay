@@ -13,14 +13,14 @@
  *    Treating GDACS and USGS as two independent confirmations of an earthquake is an epistemic error.
  */
 
-export const EVIDENCE_STAGES = [
+export const EVIDENCE_STAGES = Object.freeze([
   'DISCOVERED',
   'SCHEMA_VALIDATED',
   'LIVE_FETCHED',
   'INTEGRATED',
   'HOLDOUT_TESTED',
   'FIELD_VALIDATED'
-];
+]);
 
 /**
  * Known upstream lineage graph for emergency and hazard feeds.
@@ -82,6 +82,15 @@ export const SOURCE_DEPENDENCY_GRAPH = {
     description: 'Copernicus Data Space Ecosystem STAC discovery.'
   }
 };
+
+// A runtime caller must not be able to register invented independent feeds
+// or mutate a known feed's upstream lineage after the module is imported.
+for (const descriptor of Object.values(SOURCE_DEPENDENCY_GRAPH)) {
+  if (!Array.isArray(descriptor.upstream)) throw new Error('invalid built-in lineage graph');
+  Object.freeze(descriptor.upstream);
+  Object.freeze(descriptor);
+}
+Object.freeze(SOURCE_DEPENDENCY_GRAPH);
 
 /**
  * Checks whether two sources can independently corroborate each other.
