@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Vigilancia del agua en los Países Bajos</title>
+<meta name="description" content="Niveles medidos y previsión oficial de Rijkswaterstaat en 25 estaciones del Rin, el Waal, el IJssel, el Mosa y el delta: tendencia, acierto de la previsión y tiempo de viaje de la onda, calculados en tu navegador. No es un sistema de alarma oficial.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#06090c;--p:#0b1015;--l:#1c2730;--t:#e6ebef;--m:#8a99a5;--o:#ff8a3d;--r:#ff5b6e;--c:#3fb6ff;--g:#3ddc97;--a:#f5c542;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--t);font:13px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.app{display:grid;height:100vh;grid-template-rows:34px 1fr 250px;grid-template-columns:1fr 430px;grid-template-areas:"top top" "map side" "chart side"}
+.top{grid-area:top;display:flex;align-items:center;gap:14px;padding:0 12px;border-bottom:1px solid var(--l);background:#080c10;white-space:nowrap;overflow:hidden}.top b{letter-spacing:.08em}.top a{color:var(--m);text-decoration:none}.top a:hover{color:var(--t)}
+.map{grid-area:map;position:relative;min-height:0}#cv,#ch{width:100%;height:100%;display:block}
+.chart{grid-area:chart;position:relative;border-top:1px solid var(--l);background:var(--p);min-height:0}
+.side{grid-area:side;border-left:1px solid var(--l);overflow:auto;background:var(--p)}
+.hd{font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--m);padding:10px 12px 6px;border-bottom:1px solid var(--l)}
+.big{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--l);border-bottom:1px solid var(--l)}.big div{background:var(--p);padding:9px 12px}.big b{display:block;font:600 20px var(--mono)}.big span{color:var(--m);font-size:11px}
+.tag{display:inline-block;font:700 10px var(--mono);color:var(--a);border:1px solid #6b5a1c;padding:1px 6px;border-radius:2px}
+.note{color:var(--m);font-size:11.5px;padding:6px 12px 10px}
+table{width:100%;border-collapse:collapse;font-size:11.5px}td,th{padding:4px 8px;text-align:left;border-bottom:1px solid #131c23;vertical-align:top}th{color:var(--m);font-weight:500;position:sticky;top:0;background:var(--p)}td.n{font-family:var(--mono);text-align:right;white-space:nowrap}
+tr.s{cursor:pointer}tr.s:hover{background:#0f171e}tr.sel{background:#11202b}
+.st{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+.why{color:var(--m);font-size:11px}
+.hud{position:absolute;left:12px;top:10px;font:11px var(--mono);color:#c3ccd3;background:rgba(9,13,17,.75);padding:2px 6px}
+.lg{position:absolute;left:12px;bottom:10px;font:11px var(--mono);color:var(--m);background:rgba(9,13,17,.85);border:1px solid var(--l);padding:5px 8px}.lg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 4px 0 8px}
+@media (max-width:860px){.app{grid-template-columns:1fr;grid-template-rows:34px 46vh 230px auto;grid-template-areas:"top" "map" "chart" "side"}html,body{height:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><b>SENDA</b><span style="color:var(--m)">AGUA · PAÍSES BAJOS</span><a href="/senda/consola">Consola</a><a href="/senda/aislamiento">Aislamiento</a><a href="/senda/radio">Radio</a><span class="tag">MEDIDO + PREVISIÓN OFICIAL · NO ES UNA ALARMA OFICIAL</span></div>
+  <div class="map"><canvas id="cv" aria-label="Estaciones de nivel de agua de Rijkswaterstaat por estado"></canvas><div class="hud" id="hud">cargando medidas reales…</div>
+    <div class="lg"><i style="background:#ff5b6e"></i>atención alta<i style="background:#ff8a3d"></i>atención<i style="background:#f5c542"></i>vigilar<i style="background:#3ddc97"></i>estable · anillo = con marea</div></div>
+  <div class="chart"><canvas id="ch" aria-label="Nivel medido y previsión oficial de la estación seleccionada"></canvas></div>
+  <div class="side">
+    <div class="hd">Estado de la red · reglas de SENDA</div>
+    <div class="big" id="big"></div>
+    <div class="hd">Estaciones, por orden de atención</div>
+    <table id="tb"></table>
+    <div class="hd">Tiempo de viaje de la onda (medido)</div>
+    <table id="lag"></table>
+    <div class="note">Desfase que mejor casa las variaciones en 24 h de dos estaciones consecutivas. Solo se da si la correlación es ≥ 0,8; los tramos con presas o marea no suelen cumplirlo.</div>
+    <div class="hd">Reglas y límites</div>
+    <div class="note" id="rules"></div>
+    <div class="hd">Fuente</div>
+    <div class="note" id="src"></div>
+  </div>
+</div>
+<script type="module">
+import { assessStation, rankStations, travelLag, WATCH_RULES } from '/senda/core/water-nl.mjs';
+const $ = (id) => document.getElementById(id), d = await (await fetch('/senda/data/nl-water/rws_niveles.json')).json();
+const COL = { ATENCION_ALTA: '#ff5b6e', ATENCION: '#ff8a3d', VIGILAR: '#f5c542', ESTABLE: '#3ddc97', SIN_DATOS: '#5a6772' }, TXT = { ATENCION_ALTA: 'atención alta', ATENCION: 'atención', VIGILAR: 'vigilar', ESTABLE: 'estable', SIN_DATOS: 'sin datos' };
+const S = d.estaciones.map((s) => { const m = s.medidas.map(([t, v]) => ({ t: t * 1000, v })), f = s.prevision.map(([t, v]) => ({ t: t * 1000, v })); return { ...s, m, f, assessment: assessStation({ measured: m, forecast: f }) }; });
+const ranked = rankStations(S), LAG = { maxLagH: 72, minCorr: 0.8, diffH: 24 }, lags = [];
+const by = {}; for (const s of S) (by[s.rio] ??= []).push(s);
+for (const [rio, l] of Object.entries(by)) for (let i = 0; i + 1 < l.length; i++) { const a = l[i], b = l[i + 1], tidal = a.assessment.tidal || b.assessment.tidal; lags.push({ rio, a, b, tidal, ...(tidal ? { lagH: null, corr: null, reliable: false } : travelLag(a.m, b.m, LAG)) }); }
+let sel = ranked[0];
+const fmtT = (t) => new Date(t).toLocaleString('es-ES', { timeZone: 'Europe/Amsterdam', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+function drawMap() {
+  const cv = $('cv'), ctx = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1), r = cv.getBoundingClientRect(); cv.width = r.width * dpr; cv.height = r.height * dpr;
+  const W = 3.8, E = 6.6, So = 50.65, N = 52.75, kx = Math.cos(51.7 * Math.PI / 180), sc = Math.min(cv.width / ((E - W) * kx), cv.height / (N - So)) * 0.94;
+  const X = (lon) => cv.width / 2 + (lon - (W + E) / 2) * kx * sc, Y = (lat) => cv.height / 2 - (lat - (So + N) / 2) * sc;
+  ctx.fillStyle = '#06090c'; ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.strokeStyle = '#10202c'; ctx.lineWidth = 1; ctx.font = `${10 * dpr}px ui-monospace,monospace`; ctx.fillStyle = '#33424d';
+  for (let lon = 4; lon <= 6.5; lon += 0.5) { ctx.beginPath(); ctx.moveTo(X(lon), 0); ctx.lineTo(X(lon), cv.height); ctx.stroke(); ctx.fillText(lon.toFixed(1) + '°E', X(lon) + 3, cv.height - 6 * dpr); }
+  for (let lat = 51; lat <= 52.5; lat += 0.5) { ctx.beginPath(); ctx.moveTo(0, Y(lat)); ctx.lineTo(cv.width, Y(lat)); ctx.stroke(); ctx.fillText(lat.toFixed(1) + '°N', 4, Y(lat) - 3); }
+  for (const l of lags) { ctx.beginPath(); ctx.moveTo(X(l.a.lon), Y(l.a.lat)); ctx.lineTo(X(l.b.lon), Y(l.b.lat)); ctx.strokeStyle = l.reliable ? 'rgba(63,182,255,.9)' : 'rgba(63,182,255,.28)'; ctx.lineWidth = (l.reliable ? 3 : 1.5) * dpr; ctx.stroke();
+    if (l.reliable) { const mx = (X(l.a.lon) + X(l.b.lon)) / 2, my = (Y(l.a.lat) + Y(l.b.lat)) / 2; ctx.fillStyle = '#3fb6ff'; ctx.font = `600 ${11 * dpr}px ui-monospace,monospace`; ctx.fillText(l.lagH + ' h', mx + 6 * dpr, my - 4 * dpr); } }
+  for (const s of S) { const x = X(s.lon), y = Y(s.lat), a = s.assessment; ctx.beginPath(); ctx.arc(x, y, (s === sel ? 9 : 6.5) * dpr, 0, 7); ctx.fillStyle = COL[a.state]; ctx.fill(); ctx.strokeStyle = s === sel ? '#fff' : '#06090c'; ctx.lineWidth = 2 * dpr; ctx.stroke();
+    if (a.tidal) { ctx.beginPath(); ctx.arc(x, y, 11 * dpr, 0, 7); ctx.strokeStyle = 'rgba(138,153,165,.8)'; ctx.lineWidth = dpr; ctx.stroke(); }
+    ctx.font = `${11 * dpr}px system-ui`; ctx.fillStyle = s === sel ? '#fff' : '#aab6bf'; ctx.fillText(s.nombre.split(',')[0], x + 13 * dpr, y + 4 * dpr); }
+  $('hud').textContent = `${S.length} estaciones · ${d.diasMedidas} días de medidas · descargado ${d.descargadoUTC.slice(0, 16).replace('T', ' ')} UTC`;
+}
+
+function drawChart() {
+  const cv = $('ch'), ctx = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1), r = cv.getBoundingClientRect(); cv.width = r.width * dpr; cv.height = r.height * dpr;
+  const a = sel.assessment, t1 = Math.max(sel.m.at(-1)?.t ?? 0, sel.f.at(-1)?.t ?? 0), t0 = t1 - 10 * 864e5, m = sel.m.filter((p) => p.t >= t0), f = sel.f.filter((p) => p.t >= t0), all = [...m, ...f];
+  ctx.fillStyle = '#0b1015'; ctx.fillRect(0, 0, cv.width, cv.height); if (!all.length) return;
+  const lo = Math.min(...all.map((p) => p.v)), hi = Math.max(...all.map((p) => p.v)), pad = Math.max(5, (hi - lo) * 0.12), L = 58 * dpr, R = 14 * dpr, T = 30 * dpr, B = 24 * dpr;
+  const X = (t) => L + ((t - t0) / (t1 - t0)) * (cv.width - L - R), Y = (v) => T + (1 - (v - (lo - pad)) / (hi - lo + 2 * pad)) * (cv.height - T - B);
+  ctx.font = `${10 * dpr}px ui-monospace,monospace`; ctx.strokeStyle = '#18232c'; ctx.fillStyle = '#6f7d88'; ctx.lineWidth = 1;
+  for (let k = 0; k <= 4; k++) { const v = lo - pad + ((hi - lo + 2 * pad) * k) / 4; ctx.beginPath(); ctx.moveTo(L, Y(v)); ctx.lineTo(cv.width - R, Y(v)); ctx.stroke(); ctx.fillText(Math.round(v) + ' cm', 6 * dpr, Y(v) + 3 * dpr); }
+  for (let t = Math.ceil(t0 / 864e5) * 864e5; t <= t1; t += 864e5) { ctx.beginPath(); ctx.moveTo(X(t), T); ctx.lineTo(X(t), cv.height - B); ctx.stroke(); ctx.fillText(new Date(t).toISOString().slice(5, 10), X(t) + 3, cv.height - 8 * dpr); }
+  const line = (pts, color, dash) => { ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.lineTo(X(p.t), Y(p.v)) : ctx.moveTo(X(p.t), Y(p.v)))); ctx.setLineDash(dash); ctx.strokeStyle = color; ctx.lineWidth = 2 * dpr; ctx.stroke(); ctx.setLineDash([]); };
+  line(f, '#f5c542', [5 * dpr, 4 * dpr]); line(m, '#3fb6ff', []);
+  if (a.lastT) { ctx.strokeStyle = '#6f7d88'; ctx.beginPath(); ctx.moveTo(X(a.lastT), T); ctx.lineTo(X(a.lastT), cv.height - B); ctx.stroke(); ctx.fillText('última medida', X(a.lastT) + 4, T + 10 * dpr); }
+  ctx.fillStyle = '#e6ebef'; ctx.font = `600 ${12 * dpr}px system-ui`; ctx.fillText(`${sel.nombre} · ${sel.rio}`, L, 18 * dpr);
+  ctx.font = `${11 * dpr}px ui-monospace,monospace`; ctx.fillStyle = '#3fb6ff'; const w1 = ctx.measureText(`${sel.nombre} · ${sel.rio}`).width;
+  ctx.fillText('— medido (cm NAP)', L + w1 * 1.15 + 20 * dpr, 18 * dpr); ctx.fillStyle = '#f5c542'; ctx.fillText('- - previsión oficial RWS' + (a.forecastCheck.maeCm != null ? ` · diferencia media con lo medido: ${a.forecastCheck.maeCm} cm` : ''), L + w1 * 1.15 + 170 * dpr, 18 * dpr);
+}
+
+function table() {
+  const c = {}; for (const s of S) c[s.assessment.state] = (c[s.assessment.state] ?? 0) + 1;
+  const errs = S.map((s) => s.assessment.forecastCheck?.maeCm).filter((x) => x != null).sort((a, b) => a - b), med = errs.length ? errs[Math.floor(errs.length / 2)] : null;
+  $('big').innerHTML = `<div><b style="color:var(--a)">${(c.ATENCION_ALTA ?? 0) + (c.ATENCION ?? 0) + (c.VIGILAR ?? 0)} de ${S.length}</b><span>estaciones con algún motivo de atención</span></div><div><b>${med ?? '—'} cm</b><span>diferencia típica (mediana) entre la previsión servida y lo medido, últimos 3 días; antelación no conocida</span></div><div><b style="color:var(--c)">${lags.filter((l) => l.reliable).length} de ${lags.length}</b><span>tramos con tiempo de viaje medible</span></div>`;
+  $('tb').innerHTML = '<tr><th>Estación</th><th>cm NAP</th><th>cm/h</th><th>24 h</th><th>Prev.</th></tr>' + ranked.map((s) => { const a = s.assessment; return `<tr class="s${s === sel ? ' sel' : ''}" data-c="${s.codigo}"><td><span class="st" style="background:${COL[a.state]}"></span>${s.nombre}<div class="why">${TXT[a.state]}${a.tidal ? ` · marea ±${a.m2AmplitudeCm} cm` : ''}${a.reasons?.length ? ' · ' + a.reasons.join(' · ') : ''}</div></td><td class="n">${a.lastCm ?? '—'}</td><td class="n">${a.rateCmH ?? '—'}</td><td class="n">${a.change24hCm == null ? '—' : (a.change24hCm > 0 ? '+' : '') + a.change24hCm}</td><td class="n">${a.peak ? Math.round(a.peak.v) + '<div class="why">en ' + a.peak.inH + ' h</div>' : 'sin dato'}</td></tr>`; }).join('');
+  $('lag').innerHTML = '<tr><th>Tramo</th><th>Horas</th><th>Correlación</th></tr>' + lags.map((l) => `<tr><td>${l.a.nombre.split(',')[0]} → ${l.b.nombre.split(',')[0]}<div class="why">${l.rio}</div></td><td class="n">${l.reliable ? l.lagH + ' h' : '—'}</td><td class="n">${l.tidal ? 'con marea: no se calcula' : l.corr ?? '—'}${!l.tidal && !l.reliable ? '<div class="why">no fiable</div>' : ''}</td></tr>`).join('');
+  for (const tr of document.querySelectorAll('tr.s')) tr.onclick = () => { sel = S.find((s) => s.codigo === tr.dataset.c); table(); drawMap(); drawChart(); };
+}
+const R = WATCH_RULES;
+$('rules').innerHTML = `<b>Reglas de SENDA (no son niveles de alarma de Rijkswaterstaat):</b> «sube» si la pendiente de las últimas ${R.windowH} h es ≥ ${R.risingCmH} cm/h; «rápido» si ≥ ${R.fastCmH} cm/h; «alto» si está en el percentil ≥ ${R.highPct} de sus propios ${d.diasMedidas} días; «la previsión sube» si anuncia ≥ ${R.peakRiseCm} cm más. Estaciones con marea (amplitud M2 medida ≥ ${R.tidalMinCm} cm): se quita la marea con una media de 25 h antes de juzgar, y la previsión solo cuenta si supera el máximo medido.<br><br><b>Límites:</b> el percentil es respecto a ${d.diasMedidas} días, no un periodo de retorno. Los umbrales oficiales de cada estación no están integrados. La previsión es la de Rijkswaterstaat; SENDA no hace la suya. Para horas ya pasadas la API sirve valores de previsiones anteriores sin decir con cuánta antelación se emitieron (de ahí los dientes de sierra): la «diferencia con lo medido» no es una nota de acierto a un plazo concreto. Es una foto del momento de la descarga, no un servicio en vivo.`;
+$('src').innerHTML = `${d.fuente}. ${d.magnitud}. ${d.nota}<br>Licencia: ${d.licencia}.<br>${d.consultas.length} respuestas con SHA-256 en el fichero de datos. Motor: <code>water-nl.mjs</code>.`;
+table(); drawMap(); drawChart(); addEventListener('resize', () => { drawMap(); drawChart(); });
+window.SENDA_AGUA_NL = { stations: S.length, states: S.reduce((o, s) => ((o[s.assessment.state] = (o[s.assessment.state] ?? 0) + 1), o), {}), tidal: S.filter((s) => s.assessment.tidal).length, lagsReliable: lags.filter((l) => l.reliable).map((l) => ({ a: l.a.codigo, b: l.b.codigo, h: l.lagH, corr: l.corr })), lags: lags.length, top: ranked[0].codigo, basis: ranked[0].assessment.basis,
+  select: (c) => { sel = S.find((s) => s.codigo === c); table(); drawMap(); drawChart(); } };
+document.body.dataset.ready = '1';
+</script>
+</body>
+</html>

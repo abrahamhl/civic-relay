@@ -1,5 +1,27 @@
 # Changelog
 
+## SENDA · 17-11-2026 · Tres motores nuevos con datos reales (aislamiento por inundación, radio sobre relieve, agua en Países Bajos), rutas de financiación y propuesta para gobiernos
+
+**Entrada (fundador):** cosas más impresionantes; más investigación y ciencia; innovaciones que un gobierno de España pudiera aceptar como candidata y preparadas para Holanda; caminos de financiación reales; más fotos; motores completamente nuevos.
+
+**Procesamiento:**
+- `flood-isolation.mjs` + `/senda/aislamiento`: cruza calles de OpenStreetMap con el agua observada por Copernicus EMS (EMSR773, primer producto, imágenes del 30 y 31-10-2024) y calcula con Dijkstra multi-origen qué cruces secos se quedan sin camino a un servicio. L'Horta Sud: 489,5 de 1 227,3 km de calle dentro del agua observada; 1 326 cruces secos aislados; 9 de 57 servicios en agua.
+- `radio-planner.mjs` + `/senda/radio`: espacio libre + difracción ITU-R P.526 (Deygout) sobre Copernicus DEM GLO-30 de la cuenca del Poyo; colocación voraz de repetidores con malla conexa. Es un modelo, no una medida.
+- `water-nl.mjs` + `/senda/agua-nl`: 25 estaciones de Rijkswaterstaat (28 días de medidas + previsión oficial); tendencia, marea detectada con los datos (M2), tiempo de viaje de la onda por correlación (Lobith → Nijmegen 5 h, r = 0,94).
+- `docs/financiacion/RUTAS_FINANCIACION_ES_NL_UE_2026-11.md`: convocatorias con fuente y fecha de consulta; se distingue fuente oficial de secundaria.
+- `docs/propuesta/PROPUESTA_GOBIERNOS_ES_NL_2026-11.md`: qué es y qué no es, resultados con su origen, piloto por fases sin precio.
+
+**Validación:** 577/577 en el núcleo (26 pruebas nuevas); 39/39 en las pruebas de pantallas (3 nuevas). Caché del service worker v46.
+
+**Límites:**
+- Aislamiento: el satélite no delimitó agua en los cascos urbanos densos, así que el cálculo se queda corto ahí; las calles son las de OSM de hoy; sin calado.
+- Radio: potencia y sensibilidad son valores habituales no verificados en esta sesión; terreno desnudo; sin medida de campo.
+- Agua NL: foto fija del 17-11-2026 00:50 UTC; sin umbrales oficiales; la API no dice con qué antelación se emitió cada valor pasado de la previsión; licencia de RWS no releída.
+- Financiación: varias fechas e importes vienen de webs de terceros; elecciones del 29-11-2026 no verificadas en BOE.
+- Los cinco agentes lanzados el 14-11 se pararon por el límite de uso y solo dejaron el núcleo del primer motor; el resto se hizo en esta sesión sin agentes.
+
+— Claude Code (sesión cloud)
+
 ## SENDA · 14-11-2026 · Nepal con datos reales (USGS, Sentinel-2, Copernicus DEM), sobrevuelo 3D y concordancia entre fuentes
 
 **Entrada (fundador):** seguir con la red ampliada; más fuentes, modelos y datos; que SENDA sea un referente de fuentes abiertas; el recorrido de la avalancha de Nepal.

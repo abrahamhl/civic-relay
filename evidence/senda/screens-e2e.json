@@ -1,9 +1,9 @@
 {
  "kind": "senda-screens-e2e",
- "at": "2026-11-14T16:34:25.263Z",
- "durationS": 46,
- "passed": 36,
- "total": 36,
+ "at": "2026-11-17T00:58:26.186Z",
+ "durationS": 51,
+ "passed": 39,
+ "total": 39,
  "results": [
   {
    "name": "mensaje: el número de seguridad coincide en los dos móviles",
@@ -51,7 +51,7 @@
   {
    "name": "avisos: un incidente de agua muestra el caudal previsto por GloFAS (en directo o de la foto guardada) sin presentarlo como aviso",
    "ok": true,
-   "gl": "Caudal previsto (GloFAS): GloFAS hoy 15.6 m³/s (1.3× la mediana de los 30 días previos); pico previsto 18.7 m³/s el 2026-11-15 (1.6×); mañana sube. consulta en directoCaudal modelado por GloFAS en la "
+   "gl": "Caudal previsto (GloFAS): GloFAS hoy 15.1 m³/s (1.0× la mediana de los 30 días previos); pico previsto 15.1 m³/s el 2026-11-17 (1.0×); mañana baja. consulta en directoCaudal modelado por GloFAS en la "
   },
   {
    "name": "avisos: un reporte pasa por sonido y entra verificado",
@@ -229,7 +229,7 @@
     "reached": 1149,
     "of": 1151,
     "p50": 74.63333333333334,
-    "ms": 7.400000000023283
+    "ms": 4.699999999953434
    },
    "m100": {
     "origin": "2219",
@@ -237,8 +237,152 @@
     "reached": 1151,
     "of": 1151,
     "p50": 46.1,
-    "ms": 1.3000000000465661
+    "ms": 1.8999999999068677
    }
+  },
+  {
+   "name": "aislamiento por inundación: Dijkstra en el navegador sobre calles OSM y agua observada de Copernicus; la regla de corte es un escenario declarado y avisa del límite del satélite",
+   "ok": true,
+   "toca": {
+    "nodes": 49019,
+    "segments": 53575,
+    "streetKm": 1227.3,
+    "wetStreetKm": 489.5,
+    "cutSegments": 19706,
+    "cutBridgeSegments": 141,
+    "nodesInWater": 16919,
+    "nodesIsolated": 1326,
+    "nodesConnected": 29114,
+    "nodesWithoutServiceBefore": 1660,
+    "pctIsolatedOfDryReachable": 4.4,
+    "pctInWaterOfReachable": 35.7,
+    "isolatedPockets": 66,
+    "largestPocketNodes": 650,
+    "meanDistBeforeM": 1062,
+    "meanDistAfterM": 1144,
+    "maxIncreaseM": 3020,
+    "meanTimeBeforeMin": null,
+    "meanTimeAfterMin": null,
+    "services": 57,
+    "servicesInWater": 9,
+    "servicesUsedAfter": 48,
+    "proxy": {
+     "total": 32052,
+     "isolated": 375,
+     "wet": 6218,
+     "connected": 24667,
+     "unreachableBefore": 792
+    }
+   },
+   "mitad": 19470
+  },
+  {
+   "name": "planificador de radio: modelo ITU-R P.526 sobre Copernicus DEM en el navegador; más pérdida nunca mejora el enlace directo; marcado como predicción, no medida",
+   "ok": true,
+   "ra0": {
+    "basis": "MODEL",
+    "K": 6,
+    "extraDb": 0,
+    "covered": 22,
+    "total": 22,
+    "direct": 14,
+    "relays": 3,
+    "links": 2,
+    "areaPct": 92.5,
+    "ms": 1508,
+    "hops": [
+     0,
+     1,
+     2
+    ]
+   },
+   "ra20": {
+    "basis": "MODEL",
+    "K": 6,
+    "extraDb": 20,
+    "covered": 22,
+    "total": 22,
+    "direct": 2,
+    "relays": 4,
+    "links": 3,
+    "areaPct": 73.2,
+    "ms": 1494,
+    "hops": [
+     0,
+     1,
+     2,
+     2
+    ]
+   }
+  },
+  {
+   "name": "agua NL: 25 estaciones reales de Rijkswaterstaat; marea detectada con los datos; tiempos de viaje solo con correlación alta; no se presenta como alarma oficial",
+   "ok": true,
+   "stations": 25,
+   "states": {
+    "ESTABLE": 19,
+    "VIGILAR": 6
+   },
+   "tidal": 6,
+   "lagsReliable": [
+    {
+     "a": "lobith.bovenrijn.tolkamer",
+     "b": "nijmegen.waal",
+     "h": 5,
+     "corr": 0.94
+    },
+    {
+     "a": "nijmegen.waal",
+     "b": "tiel.waal",
+     "h": 8,
+     "corr": 0.85
+    },
+    {
+     "a": "driel.boven",
+     "b": "culemborg",
+     "h": 13,
+     "corr": 0.92
+    },
+    {
+     "a": "doesburg.ijssel",
+     "b": "zutphen.ijssel",
+     "h": 3,
+     "corr": 0.95
+    },
+    {
+     "a": "zutphen.ijssel",
+     "b": "deventer",
+     "h": 2,
+     "corr": 0.9
+    },
+    {
+     "a": "deventer",
+     "b": "olst",
+     "h": 0,
+     "corr": 0.91
+    },
+    {
+     "a": "zwolle.ijssel",
+     "b": "kampen.ijssel",
+     "h": 0,
+     "corr": 0.93
+    },
+    {
+     "a": "venlo",
+     "b": "well",
+     "h": 0,
+     "corr": 0.81
+    },
+    {
+     "a": "gennep",
+     "b": "mook",
+     "h": 0,
+     "corr": 0.89
+    }
+   ],
+   "lags": 20,
+   "top": "lith.beneden",
+   "basis": "MEASURED"
   },
   {
    "name": "sobrevuelo: relieve Copernicus DEM, Sentinel-2 antes/después, señal sísmica real de USGS y ruta calculada sobre el cambio",

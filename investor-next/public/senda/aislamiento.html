@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Aislamiento por inundación</title>
+<meta name="description" content="Qué calles tocan el agua observada por Copernicus y qué zonas secas se quedan sin camino a un hospital, centro de salud, parque de bomberos o comisaría. DANA de Valencia 2024, calles de OpenStreetMap. Cálculo en tu navegador.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#06090c;--p:#0b1015;--l:#1c2730;--t:#e6ebef;--m:#8a99a5;--o:#ff8a3d;--r:#ff5b6e;--c:#3fb6ff;--g:#3ddc97;--a:#f5c542;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--t);font:13px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.app{display:grid;height:100vh;grid-template-rows:34px 1fr;grid-template-columns:1fr 390px;grid-template-areas:"top top" "map side"}
+.top{grid-area:top;display:flex;align-items:center;gap:14px;padding:0 12px;border-bottom:1px solid var(--l);background:#080c10;white-space:nowrap;overflow:hidden}.top b{letter-spacing:.08em}.top a{color:var(--m);text-decoration:none}.top a:hover{color:var(--t)}
+.map{grid-area:map;position:relative;min-height:0;overflow:hidden}#cv{width:100%;height:100%;display:block;cursor:grab}
+.side{grid-area:side;border-left:1px solid var(--l);overflow:auto;background:var(--p)}
+.hd{font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--m);padding:10px 12px 6px;border-bottom:1px solid var(--l)}
+.kv{display:grid;grid-template-columns:1fr auto;gap:3px 8px;padding:8px 12px;font-size:12px}.kv span{color:var(--m)}.kv b{font-family:var(--mono);font-weight:500;text-align:right}
+.big{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--l);border-bottom:1px solid var(--l)}.big div{background:var(--p);padding:10px 12px}.big b{display:block;font:600 22px var(--mono)}.big span{color:var(--m);font-size:11.5px}
+.tag{display:inline-block;font:700 10px var(--mono);color:var(--a);border:1px solid #6b5a1c;padding:1px 6px;border-radius:2px}
+.ctl{padding:8px 12px}.ctl label{display:block;margin:3px 0;cursor:pointer}.note{color:var(--m);font-size:11.5px;padding:6px 12px 10px}
+ul.h{margin:6px 0 10px;padding:0 12px 0 28px;font-size:11.5px;color:#c3ccd3}
+.lg{position:absolute;left:12px;bottom:12px;background:rgba(9,13,17,.9);border:1px solid var(--l);padding:6px 8px;font:11px var(--mono);color:var(--m);max-width:calc(100% - 24px)}
+.lg i{display:inline-block;width:10px;height:10px;margin:0 4px 0 8px;vertical-align:-1px}
+.hud{position:absolute;left:12px;top:10px;font:11px var(--mono);color:var(--m);background:rgba(9,13,17,.7);padding:2px 6px}
+@media (max-width:860px){.app{grid-template-columns:1fr;grid-template-rows:34px 62vh auto;grid-template-areas:"top" "map" "side"}html,body{height:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><b>SENDA</b><span style="color:var(--m)">AISLAMIENTO POR INUNDACIÓN</span><a href="/senda/consola">Consola</a><a href="/senda/radio">Radio</a><a href="/senda/agua-nl">Agua NL</a><a href="/senda/mulas">Mulas</a><span class="tag">CÁLCULO SOBRE DATOS OBSERVADOS · ESCENARIO DECLARADO</span></div>
+  <div class="map"><canvas id="cv" aria-label="Mapa de l'Horta Sud: agua observada, calles cortadas y zonas aisladas"></canvas><div class="hud" id="hud">cargando datos reales…</div>
+    <div class="lg"><i style="background:#1d5d8f"></i>agua observada (Copernicus, 30/31-10-2024)<i style="background:#3fb6ff"></i>tramo cortado<i style="background:#ff5b6e"></i>seco pero AISLADO<i style="background:#4c5a64"></i>con camino a un servicio<i style="background:#3ddc97;border-radius:50%"></i>servicio<i style="background:#f5c542;border-radius:50%"></i>servicio en agua</div></div>
+  <div class="side">
+    <div class="hd">DANA de Valencia · l'Horta Sud</div>
+    <div class="big" id="big"></div>
+    <div class="note" style="color:var(--a);border-bottom:1px solid var(--l)">Ojo: las manchas negras del centro son cascos urbanos donde el satélite no delimitó agua. No significa que estuvieran secos; este cálculo se queda corto ahí.</div>
+    <div class="hd">Regla de corte (escenario, no medida)</div>
+    <div class="ctl" id="esc">
+      <label><input type="radio" name="e" value="0" checked> Un tramo se corta si <b>toca</b> agua observada</label>
+      <label><input type="radio" name="e" value="0.5"> Se corta si <b>más de la mitad</b> está en agua</label>
+      <label><input type="checkbox" id="sw" checked> Un servicio dentro del agua deja de contar</label>
+    </div>
+    <div class="hd">Resultado calculado en este navegador</div>
+    <div class="kv" id="kv"></div>
+    <div class="hd">Servicios</div>
+    <div class="kv" id="sv"></div>
+    <div class="hd">Lo que este cálculo NO sabe</div>
+    <ul class="h" id="hip"></ul>
+    <div class="hd">Fuentes</div>
+    <div class="note" id="src"></div>
+  </div>
+</div>
+<script type="module">
+import { analyzeIsolation, buildWaterIndex } from '/senda/core/flood-isolation.mjs';
+const $ = (id) => document.getElementById(id), cv = $('cv'), ctx = cv.getContext('2d');
+const d = await (await fetch('/senda/data/aislamiento/dana_horta_sud.json')).json();
+const network = { coords: d.red.coords, ways: d.red.ways.map((w) => ({ nodes: w.n, highway: w.hw, bridge: !!w.br, id: w.id })) };
+const [W, S, E, N] = d.bbox, kx = Math.cos(((S + N) / 2) * Math.PI / 180);
+let view = { cx: -0.405, cy: 39.42, z: 1 }, R = null, dpr = 1;
+const fmt = (n) => (n == null ? 'no calculado' : n.toLocaleString('es-ES'));
+
+function scale() { return Math.min(cv.width / ((E - W) * kx), cv.height / (N - S)) * view.z * 1.55; }
+const X = (lon) => cv.width / 2 + (lon - view.cx) * kx * scale(), Y = (lat) => cv.height / 2 - (lat - view.cy) * scale();
+
+function compute() {
+  const wetThreshold = Number(document.querySelector('input[name=e]:checked').value), excludeServicesInWater = $('sw').checked, t = performance.now();
+  R = analyzeIsolation({ network, waterRings: d.agua.anillos, services: d.servicios, options: { wetThreshold, excludeServicesInWater }, proxyPoints: d.edificios.centroides });
+  R.ms = Math.round(performance.now() - t);
+  // estado por edificio para pintarlo
+  const m = R.metrics;
+  $('big').innerHTML = `<div><b style="color:var(--c)">${fmt(m.wetStreetKm)} km</b><span>de calle dentro del agua observada, de ${fmt(m.streetKm)} km</span></div>
+    <div><b style="color:var(--r)">${fmt(m.nodesIsolated)}</b><span>cruces secos sin camino a ningún servicio (${m.pctIsolatedOfDryReachable} % de los secos)</span></div>
+    <div><b style="color:var(--a)">${m.servicesInWater} de ${m.services}</b><span>servicios dentro del agua observada</span></div>
+    <div><b>${fmt(m.proxy.wet)}</b><span>edificios OSM cuyo cruce más cercano está en agua, de ${fmt(m.proxy.total)}</span></div>`;
+  $('kv').innerHTML = [['Tramos cortados', fmt(m.cutSegments) + ' de ' + fmt(m.segments)], ['· de ellos en puente', fmt(m.cutBridgeSegments)], ['Cruces dentro del agua', fmt(m.nodesInWater)],
+    ['Bolsas aisladas', fmt(m.isolatedPockets)], ['Mayor bolsa (cruces)', fmt(m.largestPocketNodes)], ['Edificios OSM en bolsas aisladas', fmt(m.proxy.isolated)],
+    ['Distancia media al servicio, antes', fmt(m.meanDistBeforeM) + ' m'], ['Distancia media, después (quien conserva camino)', fmt(m.meanDistAfterM) + ' m'], ['Mayor rodeo', fmt(m.maxIncreaseM) + ' m'],
+    ['Tiempos', 'no calculados: sin velocidad declarada'], ['Cálculo', R.ms + ' ms en este dispositivo']].map(([a, b]) => `<span>${a}</span><b>${b}</b>`).join('');
+  const by = {}; for (const s of R.services) { (by[s.kind] ??= { n: 0, w: 0 }).n++; if (s.inWater) by[s.kind].w++; }
+  $('sv').innerHTML = Object.entries(by).map(([k, v]) => `<span>${d.tiposServicio[k] ?? k}</span><b>${v.n} · ${v.w} en agua</b>`).join('');
+  $('hip').innerHTML = R.assumptions.map((h) => `<li>${h}</li>`).join('') + `<li><b style="color:var(--a)">${d.agua.limite}</b></li><li>${d.red.nota}</li><li>${d.edificios.nota}</li>`;
+  draw();
+  window.SENDA_AISLAMIENTO = { basis: R.basis, metrics: m, options: R.options, ms: R.ms, assumptions: R.assumptions.length };
+}
+
+function draw() {
+  dpr = Math.min(2, devicePixelRatio || 1); const r = cv.getBoundingClientRect(); cv.width = r.width * dpr; cv.height = r.height * dpr;
+  ctx.fillStyle = '#06090c'; ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.beginPath(); for (const ring of d.agua.anillos) { ring.forEach(([x, y], i) => (i ? ctx.lineTo(X(x), Y(y)) : ctx.moveTo(X(x), Y(y)))); ctx.closePath(); }
+  ctx.fillStyle = 'rgba(29,93,143,.55)'; ctx.fill('evenodd');
+  if (!R) return; const g = R.graph, c = g.coords;
+  const pass = (color, w, test) => { ctx.beginPath(); for (let s = 0; s < g.segA.length; s++) { if (!test(s)) continue; const a = c[g.segA[s]], b = c[g.segB[s]]; ctx.moveTo(X(a[0]), Y(a[1])); ctx.lineTo(X(b[0]), Y(b[1])); } ctx.strokeStyle = color; ctx.lineWidth = w * dpr; ctx.stroke(); };
+  const iso = (s) => R.state[g.segA[s]] === 2 || R.state[g.segB[s]] === 2;
+  pass('#3a454d', 0.7, (s) => !R.blocked[s] && !iso(s));
+  pass('#3fb6ff', 0.8, (s) => R.blocked[s] === 1);
+  pass('#ff5b6e', 1.8, (s) => !R.blocked[s] && iso(s));
+  for (const s of R.services) { ctx.beginPath(); ctx.arc(X(s.lon), Y(s.lat), 4.5 * dpr, 0, 7); ctx.fillStyle = s.inWater ? '#f5c542' : '#3ddc97'; ctx.fill(); ctx.strokeStyle = '#06090c'; ctx.lineWidth = 1.5 * dpr; ctx.stroke(); }
+  $('hud').textContent = `${d.red.coords.length.toLocaleString('es-ES')} cruces · ${g.segA.length.toLocaleString('es-ES')} tramos · arrastra y usa la rueda`;
+}
+
+let drag = null;
+cv.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, cx: view.cx, cy: view.cy }; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', (e) => { if (!drag) return; view.cx = drag.cx - ((e.clientX - drag.x) * dpr) / (kx * scale()); view.cy = drag.cy + ((e.clientY - drag.y) * dpr) / scale(); draw(); });
+cv.addEventListener('pointerup', () => (drag = null));
+cv.addEventListener('wheel', (e) => { e.preventDefault(); view.z = Math.max(0.6, Math.min(14, view.z * (e.deltaY < 0 ? 1.2 : 1 / 1.2))); draw(); }, { passive: false });
+addEventListener('resize', draw);
+$('esc').addEventListener('change', compute);
+$('src').innerHTML = `Agua: ${d.agua.fuente}, producto <code>${d.agua.producto}</code> (${d.agua.imagenes.join(' · ')}). ${d.agua.nota}.<br>Calles, servicios y edificios: ${d.red.fuente}.<br>Datos descargados el ${d.generadoUTC.slice(0, 10)}; ${d.procedencia.length} descargas con SHA-256 en el fichero de datos. Motor: <code>flood-isolation.mjs</code> (Dijkstra multi-origen), el mismo que pasa las pruebas del repositorio.`;
+window.SENDA_AISLAMIENTO_VIEW = (v) => { Object.assign(view, v); draw(); };
+compute(); document.body.dataset.ready = '1';
+</script>
+</body>
+</html>

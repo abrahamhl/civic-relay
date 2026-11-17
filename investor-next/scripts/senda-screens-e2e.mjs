@@ -172,6 +172,18 @@ try {
   const m50 = await mu.evaluate(() => window.SENDA_MULAS); await mu.evaluate(() => { const q = document.querySelector('#q'); q.value = 100; q.dispatchEvent(new Event('input')); }); const m100 = await mu.evaluate(() => window.SENDA_MULAS);
   check('mulas de datos: CSA en el navegador sobre horarios reales de la EMT; más flota con nodo nunca empeora; marcado como simulación', m50.of > 1000 && m100.reached >= m50.reached && m100.p50 <= m50.p50 && /SIMULACIÓN/.test(await mu.textContent('body')), { m50, m100 });
   await mu.close();
+  const ai = await actx.newPage(); ai.on('pageerror', (e) => errors.push(`aislamiento: ${e.message}`)); await ai.goto(base + '/aislamiento'); await ai.waitForSelector('body[data-ready]', { timeout: 90_000 });
+  const ais0 = await ai.evaluate(() => window.SENDA_AISLAMIENTO); await ai.click('input[name=e][value="0.5"]'); const ais5 = await ai.evaluate(() => window.SENDA_AISLAMIENTO);
+  check('aislamiento por inundación: Dijkstra en el navegador sobre calles OSM y agua observada de Copernicus; la regla de corte es un escenario declarado y avisa del límite del satélite', ais0.basis === 'CALCULATED_FROM_OBSERVED_DATA' && ais0.metrics.streetKm > 1000 && ais0.metrics.nodesIsolated > 0 && ais5.metrics.cutSegments <= ais0.metrics.cutSegments && ais5.options.wetThreshold === 0.5 && ais0.metrics.meanTimeBeforeMin === null && /no delimitó agua/.test(await ai.textContent('body')), { toca: ais0.metrics, mitad: ais5.metrics.cutSegments });
+  await ai.close();
+  const ra = await actx.newPage(); ra.on('pageerror', (e) => errors.push(`radio: ${e.message}`)); await ra.goto(base + '/radio'); await ra.waitForSelector('body[data-ready]', { timeout: 90_000 });
+  const ra0 = await ra.evaluate(() => window.SENDA_RADIO); await ra.evaluate(() => { const x = document.querySelector('#x'); x.value = 20; x.dispatchEvent(new Event('input')); }); const ra20 = await ra.evaluate(() => window.SENDA_RADIO);
+  check('planificador de radio: modelo ITU-R P.526 sobre Copernicus DEM en el navegador; más pérdida nunca mejora el enlace directo; marcado como predicción, no medida', ra0.basis === 'MODEL' && ra0.total === 22 && ra0.covered <= ra0.total && ra20.direct <= ra0.direct && ra20.areaPct <= ra0.areaPct && /NO ES MEDIDA DE CAMPO/.test(await ra.textContent('body')) && /NO verificado en esta sesión/.test(await ra.textContent('#fu')), { ra0, ra20 });
+  await ra.close();
+  const ag = await actx.newPage(); ag.on('pageerror', (e) => errors.push(`agua-nl: ${e.message}`)); await ag.goto(base + '/agua-nl'); await ag.waitForSelector('body[data-ready]', { timeout: 60_000 });
+  const agua = await ag.evaluate(() => window.SENDA_AGUA_NL);
+  check('agua NL: 25 estaciones reales de Rijkswaterstaat; marea detectada con los datos; tiempos de viaje solo con correlación alta; no se presenta como alarma oficial', agua.stations === 25 && agua.basis === 'MEASURED' && agua.tidal >= 3 && agua.lagsReliable.length > 0 && agua.lagsReliable.every((l) => l.corr >= 0.8) && /NO ES UNA ALARMA OFICIAL/.test(await ag.textContent('body')) && /no son niveles de alarma de Rijkswaterstaat/.test(await ag.textContent('#rules')), agua);
+  await ag.close();
   const vu = await actx.newPage(); vu.on('pageerror', (e) => errors.push(`vuelo: ${e.message}`)); await vu.goto(base + '/vuelo'); await vu.waitForSelector('body[data-ready]', { timeout: 60_000 });
   const vuelo = await vu.evaluate(() => window.SENDA_VUELO);
   check('sobrevuelo: relieve Copernicus DEM, Sentinel-2 antes/después, señal sísmica real de USGS y ruta calculada sobre el cambio', vuelo.quake === 'us7000tbwb' && vuelo.points > 20 && vuelo.km > 20 && vuelo.demMax > 5000 && /no un mapa oficial/.test(await vu.textContent('#note')), vuelo);

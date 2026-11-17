@@ -1,0 +1,155 @@
+{
+ "caso": "DANA de Valencia · l'Horta Sud",
+ "bbox": [
+  -0.47,
+  39.38,
+  -0.33,
+  39.46
+ ],
+ "basis": "CALCULATED_FROM_OBSERVED_DATA",
+ "generadoUTC": "2026-11-17T00:48:39Z",
+ "entradas": {
+  "agua": "EMSR773_AOI01_DEL_PRODUCT_observedEventA_v1",
+  "imagenes": [
+   "Landsat-8 2024-10-30T10:37",
+   "Sentinel-2 2024-10-31T10:51",
+   "Sentinel-1 2024-10-31T18:02"
+  ],
+  "red": "© colaboradores de OpenStreetMap, ODbL 1.0 · API 0.6",
+  "notaRed": "OpenStreetMap a fecha de descarga (no es el mapa de 2024); sin sendas peatonales ni vías privadas",
+  "servicios": 57,
+  "edificios": 32052
+ },
+ "escenarios": [
+  {
+   "id": "toca",
+   "etiqueta": "Cortado si el tramo toca agua observada",
+   "wetThreshold": 0,
+   "excludeServicesInWater": true,
+   "metricas": {
+    "nodes": 49019,
+    "segments": 53575,
+    "streetKm": 1227.3,
+    "wetStreetKm": 489.5,
+    "cutSegments": 19706,
+    "cutBridgeSegments": 141,
+    "nodesInWater": 16919,
+    "nodesIsolated": 1326,
+    "nodesConnected": 29114,
+    "nodesWithoutServiceBefore": 1660,
+    "pctIsolatedOfDryReachable": 4.4,
+    "pctInWaterOfReachable": 35.7,
+    "isolatedPockets": 66,
+    "largestPocketNodes": 650,
+    "meanDistBeforeM": 1062,
+    "meanDistAfterM": 1144,
+    "maxIncreaseM": 3020,
+    "meanTimeBeforeMin": null,
+    "meanTimeAfterMin": null,
+    "services": 57,
+    "servicesInWater": 9,
+    "servicesUsedAfter": 48,
+    "proxy": {
+     "total": 32052,
+     "isolated": 375,
+     "wet": 6218,
+     "connected": 24667,
+     "unreachableBefore": 792
+    }
+   },
+   "serviciosPorTipo": {
+    "clinic": {
+     "total": 22,
+     "enAgua": 4
+    },
+    "fire_station": {
+     "total": 5,
+     "enAgua": 2
+    },
+    "police": {
+     "total": 18,
+     "enAgua": 3
+    },
+    "hospital": {
+     "total": 12,
+     "enAgua": 0
+    }
+   },
+   "hipotesis": [
+    "H1 agua = extensión observada en una imagen, no máximo ni calado; tramo cortado si fracción mojada > wetThreshold (escenario declarado)",
+    "H2 calles en ambos sentidos (se ignora oneway)",
+    "H3 puentes tratados como cualquier tramo (sin cota del tablero)",
+    "H4 servicio enganchado al nodo más cercano (se informa la distancia)",
+    "H5 servicios dentro del agua excluidos después",
+    "H6 efecto borde: solo calles y servicios del recorte",
+    "H7 sin velocidad declarada: no se calculan tiempos"
+   ],
+   "ms": 679
+  },
+  {
+   "id": "mitad",
+   "etiqueta": "Cortado si más de la mitad del tramo está en agua observada",
+   "wetThreshold": 0.5,
+   "excludeServicesInWater": true,
+   "metricas": {
+    "nodes": 49019,
+    "segments": 53575,
+    "streetKm": 1227.3,
+    "wetStreetKm": 489.5,
+    "cutSegments": 19470,
+    "cutBridgeSegments": 124,
+    "nodesInWater": 16919,
+    "nodesIsolated": 1292,
+    "nodesConnected": 29148,
+    "nodesWithoutServiceBefore": 1660,
+    "pctIsolatedOfDryReachable": 4.2,
+    "pctInWaterOfReachable": 35.7,
+    "isolatedPockets": 46,
+    "largestPocketNodes": 768,
+    "meanDistBeforeM": 1062,
+    "meanDistAfterM": 1144,
+    "maxIncreaseM": 3020,
+    "meanTimeBeforeMin": null,
+    "meanTimeAfterMin": null,
+    "services": 57,
+    "servicesInWater": 9,
+    "servicesUsedAfter": 48,
+    "proxy": {
+     "total": 32052,
+     "isolated": 374,
+     "wet": 6218,
+     "connected": 24668,
+     "unreachableBefore": 792
+    }
+   },
+   "serviciosPorTipo": {
+    "clinic": {
+     "total": 22,
+     "enAgua": 4
+    },
+    "fire_station": {
+     "total": 5,
+     "enAgua": 2
+    },
+    "police": {
+     "total": 18,
+     "enAgua": 3
+    },
+    "hospital": {
+     "total": 12,
+     "enAgua": 0
+    }
+   },
+   "hipotesis": [
+    "H1 agua = extensión observada en una imagen, no máximo ni calado; tramo cortado si fracción mojada > wetThreshold (escenario declarado)",
+    "H2 calles en ambos sentidos (se ignora oneway)",
+    "H3 puentes tratados como cualquier tramo (sin cota del tablero)",
+    "H4 servicio enganchado al nodo más cercano (se informa la distancia)",
+    "H5 servicios dentro del agua excluidos después",
+    "H6 efecto borde: solo calles y servicios del recorte",
+    "H7 sin velocidad declarada: no se calculan tiempos"
+   ],
+   "ms": 606
+  }
+ ]
+}

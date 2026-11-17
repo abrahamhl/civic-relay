@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Planificador de radio sobre relieve real</title>
+<meta name="description" content="Si cae la red móvil, ¿dónde poner repetidores de radio de baja potencia para llevar un aviso de la cabecera del barranco del Poyo a l'Horta Sud? Predicción con modelo de propagación (ITU-R P.526) sobre el relieve Copernicus DEM. No es una medida de campo.">
+<link rel="icon" href="/senda/icon.svg">
+<style>
+:root{--bg:#06090c;--p:#0b1015;--l:#1c2730;--t:#e6ebef;--m:#8a99a5;--o:#ff8a3d;--r:#ff5b6e;--c:#3fb6ff;--g:#3ddc97;--a:#f5c542;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--t);font:13px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.app{display:grid;height:100vh;grid-template-rows:34px 1fr;grid-template-columns:1fr 400px;grid-template-areas:"top top" "map side"}
+.top{grid-area:top;display:flex;align-items:center;gap:14px;padding:0 12px;border-bottom:1px solid var(--l);background:#080c10;white-space:nowrap;overflow:hidden}.top b{letter-spacing:.08em}.top a{color:var(--m);text-decoration:none}.top a:hover{color:var(--t)}
+.map{grid-area:map;position:relative;min-height:0;background:#000;display:flex;align-items:center;justify-content:center}#cv{max-width:100%;max-height:100%;display:block;cursor:crosshair}
+.side{grid-area:side;border-left:1px solid var(--l);overflow:auto;background:var(--p)}
+.hd{font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--m);padding:10px 12px 6px;border-bottom:1px solid var(--l)}
+.kv{display:grid;grid-template-columns:1fr auto;gap:3px 8px;padding:8px 12px;font-size:12px}.kv span{color:var(--m)}.kv b{font-family:var(--mono);font-weight:500;text-align:right}
+.big{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--l);border-bottom:1px solid var(--l)}.big div{background:var(--p);padding:10px 12px}.big b{display:block;font:600 22px var(--mono)}.big span{color:var(--m);font-size:11.5px}
+.tag{display:inline-block;font:700 10px var(--mono);color:var(--a);border:1px solid #6b5a1c;padding:1px 6px;border-radius:2px}
+.ctl{padding:8px 12px}.ctl input[type=range]{width:100%}.ctl label{display:block;color:var(--m);font-size:12px;margin-top:6px}.ctl label b{color:var(--t);font-family:var(--mono)}
+.note{color:var(--m);font-size:11.5px;padding:6px 12px 10px}ul.h{margin:6px 0 10px;padding:0 12px 0 28px;font-size:11.5px;color:#c3ccd3}
+table{width:100%;border-collapse:collapse;font-size:11.5px}td,th{padding:3px 12px;text-align:left;border-bottom:1px solid #131c23}th{color:var(--m);font-weight:500}td.n{font-family:var(--mono);text-align:right}
+.lg{position:absolute;left:12px;bottom:12px;background:rgba(9,13,17,.9);border:1px solid var(--l);padding:6px 8px;font:11px var(--mono);color:var(--m)}
+.lg i{display:inline-block;width:10px;height:10px;margin:0 4px 0 8px;vertical-align:-1px}
+.hud{position:absolute;left:12px;top:10px;font:11px var(--mono);color:#c3ccd3;background:rgba(9,13,17,.75);padding:2px 6px}
+@media (max-width:860px){.app{grid-template-columns:1fr;grid-template-rows:34px 50vh auto;grid-template-areas:"top" "map" "side"}html,body{height:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><b>SENDA</b><span style="color:var(--m)">PLANIFICADOR DE RADIO</span><a href="/senda/consola">Consola</a><a href="/senda/aislamiento">Aislamiento</a><a href="/senda/agua-nl">Agua NL</a><a href="/senda/mulas">Mulas</a><span class="tag">PREDICCIÓN CON MODELO · NO ES MEDIDA DE CAMPO</span></div>
+  <div class="map"><canvas id="cv" aria-label="Relieve de la cuenca del Poyo con la cobertura de radio prevista"></canvas><div class="hud" id="hud">cargando relieve real…</div>
+    <div class="lg"><i style="background:rgba(61,220,151,.6)"></i>cobertura prevista (receptor a 1,5 m)<i style="background:#f5c542;border-radius:50%"></i>repetidor<i style="background:#3ddc97;border-radius:50%"></i>municipio cubierto<i style="background:#ff5b6e;border-radius:50%"></i>sin cubrir<i style="background:#3fb6ff"></i>enlace entre repetidores</div></div>
+  <div class="side">
+    <div class="hd">Un aviso de Chiva a l'Horta Sud, sin red móvil</div>
+    <div class="big" id="big"></div>
+    <div class="hd">Escenario (lo eliges tú)</div>
+    <div class="ctl">
+      <label>Repetidores como máximo: <b id="kv_k"></b></label><input type="range" id="k" min="1" max="8" value="6">
+      <label>Pérdida extra por edificios y arbolado: <b id="kv_x"></b> <span style="color:var(--a)">(supuesto, no medido)</span></label><input type="range" id="x" min="0" max="40" step="5" value="0">
+    </div>
+    <div class="hd">Repetidores elegidos (voraz, malla conexa desde Chiva)</div>
+    <table id="tb"></table>
+    <div class="hd">Balance del enlace</div>
+    <div class="kv" id="kv"></div>
+    <div class="hd">De dónde sale cada parámetro</div>
+    <ul class="h" id="fu"></ul>
+    <div class="hd">Lo que el modelo NO incluye</div>
+    <ul class="h" id="hip"></ul>
+    <div class="hd">Fuentes</div>
+    <div class="note" id="src"></div>
+  </div>
+</div>
+<script type="module">
+import { placeRelays, peakCandidates, mesh, coverage, link, maxPathLossDb, ASSUMPTIONS } from '/senda/core/radio-planner.mjs';
+const $ = (id) => document.getElementById(id), cv = $('cv'), ctx = cv.getContext('2d');
+const [d, ref] = await Promise.all([fetch('/senda/data/radio/poyo.json').then((r) => r.json()), fetch('/senda/data/radio/poyo_plan.json').then((r) => r.json())]);
+const dem = d.dem, E = ref.escenario, towns = d.municipios, SC = 2; cv.width = dem.w * SC; cv.height = dem.h * SC;
+const X = (lon) => ((lon - dem.west) / dem.dx) * SC, Y = (lat) => ((dem.north - lat) / dem.dy) * SC;
+// Sombreado del relieve (una vez)
+const shade = ctx.createImageData(cv.width, cv.height);
+{ const z = (i, j) => dem.data[Math.min(dem.h - 1, Math.max(0, j)) * dem.w + Math.min(dem.w - 1, Math.max(0, i))];
+  for (let y = 0; y < cv.height; y++) for (let x = 0; x < cv.width; x++) { const i = Math.floor(x / SC), j = Math.floor(y / SC), dzx = (z(i + 1, j) - z(i - 1, j)) / 172, dzy = (z(i, j + 1) - z(i, j - 1)) / 222;
+    const l = Math.max(0, Math.min(1, 0.55 + 2.2 * (-dzx * 0.6 - dzy * 0.6) )), e = z(i, j) / dem.max, k = (y * cv.width + x) * 4, v = 18 + 150 * l * (0.45 + 0.55 * e);
+    shade.data[k] = v * 0.78; shade.data[k + 1] = v * 0.86; shade.data[k + 2] = v; shade.data[k + 3] = 255; } }
+const cands = [...towns.map((t) => ({ id: 'azotea ' + t.nombre, lon: t.lon, lat: t.lat, hM: E.azoteaM })), ...peakCandidates(dem, { win: 14, hM: E.mastilM, minProminenceM: 40 })];
+const seed = towns.findIndex((t) => t.nombre === 'Chiva'), demand = towns.map((t) => ({ lon: t.lon, lat: t.lat, hM: E.receptorM })), p = { fMhz: E.fMhz, kFactor: E.kFactor, stepM: 90 };
+
+function run() {
+  const K = +$('k').value, extra = +$('x').value, t0 = performance.now(); $('kv_k').textContent = K; $('kv_x').textContent = extra + ' dB';
+  const radio = { txPowerDbm: E.txPowerDbm, txGainDbi: E.txGainDbi, rxGainDbi: E.rxGainDbi, sensitivityDbm: E.sensitivityDbm, marginDb: E.marginDb + extra };
+  const plan = placeRelays(dem, cands, demand, radio, p, K, { mustConnect: true, seed }), sites = plan.chosen.map((c) => cands[c]), m = mesh(dem, sites, radio, p, { from: 0 });
+  const direct = demand.filter((q) => link(dem, cands[seed], q, radio, p).ok).length;
+  const covs = sites.map((s) => coverage(dem, s, radio, { ...p, stepM: 140 }, { stride: 3, rxHM: E.receptorM }));
+  const w = covs[0].w, h = covs[0].h; let any = 0; const uni = new Uint8Array(w * h); for (const c of covs) for (let i = 0; i < uni.length; i++) if (c.covered[i]) uni[i] = 1; for (const v of uni) any += v;
+  const ms = Math.round(performance.now() - t0), areaPct = Math.round((1000 * any) / uni.length) / 10;
+  ctx.putImageData(shade, 0, 0); ctx.fillStyle = 'rgba(61,220,151,.34)'; const cs = 3 * SC;
+  for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) if (uni[j * w + i]) ctx.fillRect(i * cs - cs / 2, j * cs - cs / 2, cs, cs);
+  ctx.lineWidth = 2; for (const l of m.links) { if (!l.ok) continue; ctx.strokeStyle = 'rgba(63,182,255,.95)'; ctx.beginPath(); ctx.moveTo(X(sites[l.a].lon), Y(sites[l.a].lat)); ctx.lineTo(X(sites[l.b].lon), Y(sites[l.b].lat)); ctx.stroke(); }
+  ctx.font = '600 12px system-ui'; ctx.textBaseline = 'middle';
+  towns.forEach((t, i) => { ctx.beginPath(); ctx.arc(X(t.lon), Y(t.lat), 4.5, 0, 7); ctx.fillStyle = plan.covered[i] ? '#3ddc97' : '#ff5b6e'; ctx.fill(); ctx.strokeStyle = '#06090c'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = 'rgba(6,9,12,.7)'; const tw = ctx.measureText(t.nombre).width; ctx.fillRect(X(t.lon) + 7, Y(t.lat) - 8, tw + 6, 16); ctx.fillStyle = '#e6ebef'; ctx.fillText(t.nombre, X(t.lon) + 10, Y(t.lat)); });
+  sites.forEach((s, i) => { ctx.beginPath(); ctx.arc(X(s.lon), Y(s.lat), 8, 0, 7); ctx.fillStyle = '#f5c542'; ctx.fill(); ctx.strokeStyle = '#06090c'; ctx.lineWidth = 2; ctx.stroke(); ctx.fillStyle = '#06090c'; ctx.textAlign = 'center'; ctx.fillText(String(i + 1), X(s.lon), Y(s.lat) + 0.5); ctx.textAlign = 'left'; });
+  $('big').innerHTML = `<div><b style="color:var(--g)">${plan.coveredWeight} de ${plan.totalWeight}</b><span>municipios con cobertura prevista usando ${sites.length} repetidor(es)</span></div>
+    <div><b>${direct} de ${towns.length}</b><span>llegarían directamente desde la azotea de Chiva, sin repetidores</span></div>
+    <div><b style="color:var(--c)">${m.links.filter((l) => l.ok).length}</b><span>enlaces entre repetidores que cierran</span></div>
+    <div><b>${areaPct} %</b><span>del recorte con cobertura prevista a 1,5 m del suelo</span></div>`;
+  $('tb').innerHTML = '<tr><th>#</th><th>Dónde</th><th>Cota</th><th>Saltos</th><th>+mun.</th></tr>' + sites.map((s, i) => `<tr><td class="n">${i + 1}</td><td>${s.id.startsWith('c') && s.z ? `cima ${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}` : s.id}</td><td class="n">${s.z ? s.z + ' m' : '—'}</td><td class="n">${m.hops[i] ?? '—'}</td><td class="n">${plan.steps[i].gain}</td></tr>`).join('')
+    + (plan.covered.includes(false) ? `<tr><td colspan="5" style="color:var(--r)">Sin cubrir: ${towns.filter((_, i) => !plan.covered[i]).map((t) => t.nombre).join(', ')}</td></tr>` : '');
+  $('kv').innerHTML = [['Frecuencia', E.fMhz + ' MHz'], ['Potencia + ganancias', `${E.txPowerDbm} dBm + ${E.txGainDbi} + ${E.rxGainDbi} dBi`], ['Sensibilidad', E.sensitivityDbm + ' dBm'], ['Margen (incluye la pérdida extra)', radio.marginDb + ' dB'], ['Pérdida máxima admisible', maxPathLossDb(radio).toFixed(1) + ' dB'], ['Candidatos evaluados', cands.length], ['Cálculo', ms + ' ms en este dispositivo']].map(([a, b]) => `<span>${a}</span><b>${b}</b>`).join('');
+  $('hud').textContent = `${dem.w}×${dem.h} celdas de relieve · cotas ${dem.min}–${dem.max} m · ${cands.length} emplazamientos candidatos`;
+  window.SENDA_RADIO = { basis: plan.basis, K, extraDb: extra, covered: plan.coveredWeight, total: plan.totalWeight, direct, relays: sites.length, links: m.links.filter((l) => l.ok).length, areaPct, ms, hops: m.hops };
+}
+$('fu').innerHTML = Object.entries(E.fuentes).map(([k, v]) => `<li><b>${k}</b>: ${v}</li>`).join('');
+$('hip').innerHTML = ASSUMPTIONS.map((h) => `<li>${h}</li>`).join('');
+$('src').innerHTML = `Relieve: ${dem.fuente}. ${dem.licencia}.<br>Municipios: ${d.notaMunicipios}.<br>Modelo: espacio libre + difracción por aristas (ITU-R P.526, método de Deygout) en <code>radio-planner.mjs</code>. La elección de repetidores es un voraz de cobertura máxima. Antes de comprar un solo equipo hay que medir en campo.`;
+$('k').addEventListener('input', run); $('x').addEventListener('input', run);
+run(); document.body.dataset.ready = '1';
+</script>
+</body>
+</html>
