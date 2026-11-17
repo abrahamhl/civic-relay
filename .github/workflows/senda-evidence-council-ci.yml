@@ -7,6 +7,9 @@ on:
     paths:
       - 'packages/senda/src/resilience-council.mjs'
       - 'packages/senda/tests/resilience-council.test.mjs'
+      - 'packages/senda/src/paired-policy-evaluator.mjs'
+      - 'packages/senda/tests/paired-policy-evaluator.test.mjs'
+      - 'investor-next/public/senda/core/paired-policy-evaluator.mjs'
       - 'investor-next/public/senda/core/resilience-council.mjs'
       - '.github/workflows/senda-evidence-council-ci.yml'
 permissions:
@@ -28,11 +31,14 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - name: Mandatory byte parity with offline browser module
-        run: cmp packages/senda/src/resilience-council.mjs investor-next/public/senda/core/resilience-council.mjs
+        run: |
+          cmp packages/senda/src/resilience-council.mjs investor-next/public/senda/core/resilience-council.mjs
+          cmp packages/senda/src/paired-policy-evaluator.mjs investor-next/public/senda/core/paired-policy-evaluator.mjs
       - name: Syntax, H15 council and scenario/physics regressions
         run: |
           node --check packages/senda/src/resilience-council.mjs
           node --test packages/senda/tests/resilience-council.test.mjs
+          node --test packages/senda/tests/paired-policy-evaluator.test.mjs
       - name: All SENDA core and adversarial tests (no physical RF)
         run: |
           node --test packages/senda/tests/*.test.mjs
