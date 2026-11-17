@@ -19,6 +19,7 @@ test('bridges existing common-cause engine, not a duplicated reliability formula
   const r=auditAssuranceAgainstUncertainHazards({states,plans});
   assert.equal(r.upstreamModel,'delivery-assurance.mjs/correlatedDeliveryProbability');
   assert.equal(r.upstreamConditionalIndependenceAssumed,true);
+  assert.equal(r.robustConditionalLowerRequiresIndependence,false);
   assert.equal(r.statisticalCalibrationClaim,false);
   assert.equal(r.physicalHardwareValidated,false);
   assert.equal(r.operationallyAuthorized,false);
@@ -56,7 +57,9 @@ test('synthetic Monte Carlo: correlated worst-case common-power outage matches f
   const normal=1-(1-.72)*(1-.72);
   const outage=1-(1-.72*.85)*(1-.72);
   const expected=.4*normal+.6*outage;
-  assert.ok(Math.abs(lower-expected)<1e-12,String(lower)+' vs '+String(expected));
+  assert.ok(lower<=expected+1e-12,'arbitrary-dependence lower must not exceed conditional-independent model');
+  assert.ok(expected-lower>.1,'shared-gateway dependence must materially widen the risk interval');
+  assert.equal(r.robustConditionalLowerMethod,'BOOLE_FRECHET_PLUS_REVERSE_EXPECTATION_BOUND');
   let seed=20261117;
   const rng=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/2**32;};
   const N=120000;let success=0;
@@ -68,4 +71,15 @@ test('synthetic Monte Carlo: correlated worst-case common-power outage matches f
   }
   const measured=success/N;
   assert.ok(Math.abs(measured-expected)<.006,String(measured)+' vs '+String(expected));
+});
+
+test('repeated high-success copies sharing one bearer are never certified as independent',()=>{
+  const duplicated=[{id:'same_phone',k:1,
+    groups:[{id:'PHONE_MESH',p:.95,shards:1},{id:'PHONE_MESH',p:.95,shards:1}],
+    consentDeclared:true,linkAuthorizedDeclared:true,costEUR:0,energyMj:10}];
+  const r=auditAssuranceAgainstUncertainHazards({states,plans:duplicated});
+  const candidate=r.evaluations[0];
+  assert.ok(candidate.robustLower<candidate.nominalConditional-.05);
+  assert.equal(r.operationallyAuthorized,false);
+  assert.equal(r.statisticalCalibrationClaim,false);
 });
