@@ -3,9 +3,9 @@ permissions:
   contents: read
 on:
   push:
-    branches: [ master, feat/senda-canonical-integration-20261117 ]
+    branches: [ master, feat/senda-canonical-integration-20261117, 'research/senda-*' ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, feat/senda-canonical-integration-20261117 ]
   workflow_dispatch:
 jobs:
   canonical-gate:
@@ -24,9 +24,10 @@ jobs:
         run: python3 packages/senda/scripts/verify-failure-cuts.py
       - name: QA navegador canónica (360/390/768/1440px, offline SW, IndexedDB, Visor 4D, fallback sin WebGL)
         run: |
-          pnpm --dir investor-next install
-          pnpm --dir investor-next exec playwright install --with-deps chromium
-          node investor-next/scripts/senda-canonical-qa.mjs
+          mkdir -p /tmp/pw && printf '{"name":"pw-tmp","private":true}' > /tmp/pw/package.json
+          pnpm --dir /tmp/pw add playwright@1.63.0
+          pnpm --dir /tmp/pw exec playwright install --with-deps chromium
+          NODE_PATH=/tmp/pw/node_modules node investor-next/scripts/senda-canonical-qa.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
