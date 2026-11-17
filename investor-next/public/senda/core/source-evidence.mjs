@@ -103,6 +103,12 @@ export function checkCorroborationIndependence(sourceA, sourceB) {
     };
   }
 
+  // Absence from the declared dependency graph is UNKNOWN, never independent:
+  // two invented feeds with no parents are not two independent measurements.
+  if (!Object.hasOwn(SOURCE_DEPENDENCY_GRAPH,idA) ||
+      !Object.hasOwn(SOURCE_DEPENDENCY_GRAPH,idB))
+    return { independent:false,reason:'UNKNOWN_SOURCE_LINEAGE',
+      declaredGraphOnly:true,externallyAuthenticated:false };
   // Get recursive upstream dependencies for source A and source B
   const lineageA = getFullUpstreamLineage(idA);
   const lineageB = getFullUpstreamLineage(idB);
@@ -143,6 +149,9 @@ export function checkCorroborationIndependence(sourceA, sourceB) {
   return {
     independent: true,
     reason: 'INDEPENDENT_PROVENANCE',
+    // "Independent" applies only to declared upstream metadata, not
+    // independently audited causal isolation or institutional authenticity.
+    declaredGraphOnly:true,externallyAuthenticated:false,
     lineageA: Array.from(lineageA),
     lineageB: Array.from(lineageB)
   };
@@ -183,6 +192,8 @@ export function createSourceEvidence({
   fieldTrialReceiptId = null,
   notes = ''
 } = {}) {
+  if (typeof sourceId !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9_.:/-]{1,159}$/.test(sourceId))
+    throw new TypeError('INVALID_SOURCE_ID');
   const stageIdx = EVIDENCE_STAGES.indexOf(stage);
   if (stageIdx === -1) {
     throw new Error(`INVALID_STAGE: ${stage}. Expected one of: ${EVIDENCE_STAGES.join(', ')}`);
@@ -192,24 +203,33 @@ export function createSourceEvidence({
   if (stageIdx >= 1 && !schemaValid) {
     throw new Error('SCHEMA_VALIDATION_REQUIRED: Cannot advance beyond DISCOVERED without schemaValid = true');
   }
-  if (stageIdx >= 2 && (!rawSha256 || !rawSha256.startsWith('sha256:'))) {
+  if (stageIdx >= 2 && (typeof rawSha256 !== 'string' ||
+      !/^sha256:[a-fA-F0-9]{64}$/.test(rawSha256))) {
     throw new Error('IMMUTABLE_DIGEST_REQUIRED: Cannot advance to LIVE_FETCHED without valid sha256:... digest');
   }
-  if (stageIdx >= 4 && (holdoutScore === null || typeof holdoutScore !== 'number')) {
+  if (stageIdx >= 4 && !Number.isFinite(holdoutScore)) {
     throw new Error('HOLDOUT_SCORE_REQUIRED: Cannot advance to HOLDOUT_TESTED without quantitative holdout score');
   }
-  if (stageIdx >= 5 && !fieldTrialReceiptId) {
+  if (stageIdx >= 5 && (typeof fieldTrialReceiptId !== 'string' ||
+      !/^[a-zA-Z0-9][a-zA-Z0-9_.:/-]{1,159}$/.test(fieldTrialReceiptId))) {
     throw new Error('FIELD_TRIAL_RECEIPT_REQUIRED: Cannot advance to FIELD_VALIDATED without physical field trial receipt');
   }
 
   return {
     sourceId,
-    stage,
+    // A caller-provided receipt ID is NOT a receipt proof. There is no pinned
+    // independent field-trial signer or signature verification in this adapter.
+    // Demote a self-declared FIELD_VALIDATED stage until that verifier exists.
+    stage: stage === 'FIELD_VALIDATED' ? 'HOLDOUT_TESTED' : stage,
+    requestedStage: stage,
     schemaValid,
     rawSha256,
     holdoutScore,
     fieldTrialReceiptId,
-    isFieldValidated: stage === 'FIELD_VALIDATED',
+    isFieldValidated: false,
+    fieldReceiptSignatureVerified: false,
+    sourceAuthenticityVerified: false,
+    sourceRightsIndependentlyAudited: false,
     registeredAtUtc: new Date().toISOString(),
     notes
   };
