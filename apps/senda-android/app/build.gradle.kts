@@ -9,12 +9,24 @@ android {
         versionCode = 1
         versionName = "0.1-campo"
     }
+    // Dos versiones (decisión del fundador, 2026-11-18):
+    //  · base: SIN dependencias externas, solo el SDK de Android. Arranque automático por el Bluetooth del coche.
+    //  · play: además, detección «en vehículo» de Google Play Services (pista débil, confirmada por velocidad).
+    flavorDimensions += "distro"
+    productFlavors {
+        create("base") { dimension = "distro" }
+        create("play") { dimension = "distro"; applicationIdSuffix = ".play"; versionNameSuffix = "-play" }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
 }
-// Sin dependencias externas: solo el SDK de Android (menos superficie de ataque, auditable).
+// Versión base: sin dependencias externas, solo el SDK de Android (menos superficie de ataque, auditable).
+// Versión play: Google Play Services Location, solo para la detección «en vehículo».
+dependencies {
+    "playImplementation"("com.google.android.gms:play-services-location:21.3.0")
+}
 
 // La app web (investor-next/public/senda) se copia dentro del APK en cada compilación: una sola fuente
 // de verdad, la misma que pasa las pruebas del núcleo y de navegador. AppActivity la sirve sin red.
