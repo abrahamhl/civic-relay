@@ -143,7 +143,7 @@ export function correlateCorridorObservations(observations, {
   let rejectedStaleCount = 0;
 
   for (const raw of observations) {
-    const obs = raw.observationId ? raw : normalizeObservation(raw, { nowMs });
+    const obs = normalizeObservation(raw, { nowMs }); // never bypass validation with a caller-supplied ID
     const measuredMs = Date.parse(obs.measuredAtUtc);
     const ageMs = Math.max(0, nowMs - measuredMs);
     if (ageMs > maxWindowMs || obs.freshnessState === 'STALE') {
@@ -234,9 +234,11 @@ export function correlateCorridorObservations(observations, {
 
       let deltaLogOdds = 0;
       if (signalClass === 'INCIDENT_SIGNAL') {
-        incidentSignals += 1;
-        const p = Math.min(0.95, Math.max(0.55, obs.confidence));
-        deltaLogOdds = Math.log(p / (1 - p)) * effectiveWeight;
+        if (Number.isFinite(obs.confidence) && obs.confidence > 0.5 && ['LIVE_VERIFIED', 'RECORDED_REAL_SAMPLE', 'LAB_VERIFIED'].includes(obs.provenance?.verificationState)) {
+          incidentSignals += 1;
+          const p = Math.min(0.95, obs.confidence);
+          deltaLogOdds = Math.log(p / (1 - p)) * effectiveWeight;
+        } // Missing confidence or source verification cannot add incident evidence.
       } else if (signalClass === 'FREE_FLOW_SIGNAL') {
         freeFlowSignals += 1;
         deltaLogOdds = -1.15 * effectiveWeight;
@@ -279,11 +281,10 @@ export function correlateCorridorObservations(observations, {
       abstentionReason = 'POSTERIOR_BELOW_CONFIDENCE_THRESHOLD';
     }
 
-    const combinedUncertaintyRadiusM = Math.round(
-      1 / Math.sqrt(
-        cluster.items.reduce((sum, x) => sum + 1 / Math.pow(Math.max(5, x.location.uncertaintyRadiusM || 25), 2), 0)
-      )
-    );
+    const reportedErrorsM = cluster.items.map(x => x.location.uncertaintyRadiusM);
+    const combinedUncertaintyRadiusM = reportedErrorsM.every(u => Number.isFinite(u) && u > 0)
+      ? Math.round(1 / Math.sqrt(reportedErrorsM.reduce((sum,u) => sum + 1 / Math.pow(Math.max(5,u), 2), 0)))
+      : null; // abstain on location uncertainty rather than inventing precision
 
     const provenanceHashes = cluster.items.map((x) => x.sourcePayloadHash).sort();
     const provenanceMerkleDigest = sha256Hex(provenanceHashes.join('|'));
@@ -302,10 +303,8 @@ export function correlateCorridorObservations(observations, {
       abstained,
       abstentionReason,
       posteriorConfidence: Number(posteriorProb.toFixed(4)),
-      uncertaintyInterval90: [
-        Number(Math.max(0, posteriorProb - 0.12 / Math.sqrt(uniqueFamilies.size)).toFixed(3)),
-        Number(Math.min(1, posteriorProb + 0.12 / Math.sqrt(uniqueFamilies.size)).toFixed(3)),
-      ],
+      uncertaintyInterval90: null, // no calibrated statistical 90% interval exists
+      confidenceMeaning: 'HEURISTIC_SCORE_NOT_CALIBRATED_PROBABILITY',
       corroboratingSources: [...uniqueSources],
       independentSourceFamilies: [...uniqueFamilies],
       observationCount: cluster.items.length,
@@ -825,14 +824,14 @@ export class CorridorTransportFabric {
       type: bearerConfig.type,
       observedCoverage: Boolean(bearerConfig.observedCoverage),
       osCapability: Boolean(bearerConfig.osCapability ?? true),
-      hardwareAvailability: bearerConfig.hardwareAvailability || 'AVAILABLE_IN_SOFTWARE_OR_LOOPBACK',
-      authorizationState: bearerConfig.authorizationState || 'AUTHORIZED',
+      hardwareAvailability: bearerConfig.hardwareAvailability ?? 'UNKNOWN',
+      authorizationState: bearerConfig.authorizationState ?? 'UNVERIFIED',
       realLinkQuality: {
-        packetLossRatio: Number(bearerConfig.realLinkQuality?.packetLossRatio ?? 0.02),
-        latencyMs: Number(bearerConfig.realLinkQuality?.latencyMs ?? 45),
-        throughputKbps: Number(bearerConfig.realLinkQuality?.throughputKbps ?? 250),
+        packetLossRatio: Number.isFinite(bearerConfig.realLinkQuality?.packetLossRatio) ? bearerConfig.realLinkQuality.packetLossRatio : null,
+        latencyMs: Number.isFinite(bearerConfig.realLinkQuality?.latencyMs) ? bearerConfig.realLinkQuality.latencyMs : null,
+        throughputKbps: Number.isFinite(bearerConfig.realLinkQuality?.throughputKbps) ? bearerConfig.realLinkQuality.throughputKbps : null,
       },
-      estimatedFutureAvailability: Number(bearerConfig.estimatedFutureAvailability ?? 0.85),
+      estimatedFutureAvailability: Number.isFinite(bearerConfig.estimatedFutureAvailability) ? bearerConfig.estimatedFutureAvailability : null,
       confirmedTransmissions: 0,
       sharedInfrastructureDeps: bearerConfig.sharedInfrastructureDeps || [],
       isSimulatedOrEmulated: Boolean(bearerConfig.isSimulatedOrEmulated ?? false),
@@ -845,7 +844,7 @@ export class CorridorTransportFabric {
     const b = this.bearers.get(bearerId);
     if (!b) throw new Error(`UNKNOWN_BEARER:${bearerId}`);
     b.observedCoverage = !outage;
-    b.realLinkQuality.packetLossRatio = outage ? 1.0 : 0.02;
+    b.realLinkQuality.packetLossRatio = outage ? 1.0 : null; // require fresh measurement following recovery
     return b;
   }
 
@@ -933,7 +932,12 @@ export class CorridorTransportFabric {
       && b.osCapability
       && b.authorizationState === 'AUTHORIZED'
       && b.hardwareAvailability !== 'BLOCKED_NO_PHYSICAL_HARDWARE'
+      && Number.isFinite(b.realLinkQuality.packetLossRatio)
+      && Number.isFinite(b.estimatedFutureAvailability)
+      && b.realLinkQuality.packetLossRatio >= 0
       && b.realLinkQuality.packetLossRatio < 0.85
+      && b.estimatedFutureAvailability >= 0
+      && b.estimatedFutureAvailability <= 1
     ));
     if (candidates.length === 0) {
       const blockedHw = [...this.bearers.values()].find((b) => b.hardwareAvailability === 'BLOCKED_NO_PHYSICAL_HARDWARE');
