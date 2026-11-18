@@ -18,7 +18,7 @@ Sean `s1 ± ε1` y `s2 ± ε2` dos observaciones fechadas del mismo final de col
 - Distancia requerida bajo parámetros declarados: `D_req,max = m + c_max·(lat_max+react_max) + c_max²/(2 a_min)`. Los extremos del frenado y el movimiento de la frontera son **hipótesis acotadas**; no son instrucciones de conducción.
 - `TIMING_ROBUST_IN_MODEL` únicamente si `d_min >= D_req,max`; `TIMING_TOO_LATE_IN_MODEL` si incluso el caso favorable no alcanza el espacio requerido; en el intervalo intermedio, `TIMING_INDETERMINATE`.
 
-El resultado siempre tiene `canWarnDrivers=false`. Rechaza mapas sin concordancia, calzadas/sentidos incompatibles, envejecimiento, posición solapada, velocidad de cierre no positiva, datos incompletos y overflow. Los límites son **intervalos de contención**, no intervalos estadísticos de confianza. El resultado depende de la hipótesis de velocidad constante de cola y es solo válido en el dominio modelado.
+El resultado siempre tiene `canWarnDrivers=false`. Rechaza mapas sin concordancia, calzadas/sentidos incompatibles, observaciones separadas más que el intervalo admitido, envejecimiento, posición solapada, velocidad de onda fuera de cota física **declarada explícitamente** (`maxAbsWaveSpeedMps`), velocidad de cierre no positiva, datos incompletos y overflow. Los límites son **intervalos de contención**, no intervalos estadísticos de confianza. El resultado depende de la hipótesis de velocidad constante de cola y es solo válido en el dominio modelado.
 
 ### Comprobación teórica LWR
 
@@ -26,7 +26,7 @@ El valor opcional `w_LWR = (q_downstream−q_upstream)/(k_downstream−k_upstrea
 
 ## H-ROAD-COVER-1: fiabilidad sin independencia imaginaria
 
-Para cada ruta/canal autorizado se exige registro de `DESTINATION_ACK`, mismo estrato de medición, cuenta de ensayos, caducidad de evidencia y medición de latencia p95. No se mezclan iOS bloqueado, Android en primer plano, cambios de versión OS, tipos de carretera o diferentes temporadas sin separar estratos. `CUSTODY_ACK` no es entrega al destinatario; un ACK del destinatario no demuestra que la persona haya percibido un aviso.
+Para cada ruta/canal autorizado se exige registro de `DESTINATION_ACK`, mismo estrato de medición, cuenta de ensayos, caducidad de evidencia y medición de latencia p95. No se mezclan iOS bloqueado, Android en primer plano, cambios de versión OS, tipos de carretera o diferentes temporadas sin separar estratos. Incluso sin `requiredStratum`, la mezcla produce `ABSTAIN_MIXED_MEASUREMENT_STRATA`. `CUSTODY_ACK` no es entrega al destinatario; un ACK del destinatario no demuestra que la persona haya percibido un aviso.
 
 Cada proporción de éxitos usa Wilson 95 % **condicionado** a muestreo Bernoulli representativo e independiente, suposición sin validar físicamente. En ausencia de dependencia conjunta, la desigualdad de Fréchet da una banda exploratoria para la unión: `max(P_i) <= P(al menos uno) <= min(1, Σ P_i)`; NO se usa `1−Π(1−P_i)` para garantizar seguridad. El intervalo que mostramos al usar extremos Wilson de canales individuales **no tiene cobertura conjunta del 95 %**. Toda salida se etiqueta `RESEARCH_BOUNDS_ONLY` y `canWarnDrivers=false`.
 
