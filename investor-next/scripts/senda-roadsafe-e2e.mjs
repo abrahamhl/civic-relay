@@ -89,8 +89,17 @@ for (const vp of [{ name: 'movil', width: 390, height: 844 }, { name: 'escritori
   const vout = await page.textContent('#v-out'), ann = await page.$$eval('#v-ann-out li', (l) => l.map((x) => x.textContent)), taxi = await page.textContent('#v-taxi-out');
   check(`${vp.name}: viaje — ruta favorita, paquete offline en KB, comparación por riesgo`, /★/.test(vout) && /KB/.test(vout) && /riesgo\/km/.test(vout), { vout: vout.slice(0, 200) });
   check(`${vp.name}: viaje — megafonía escalonada (≤3 avisos, sin órdenes)`, ann.length >= 2 && ann.length <= 3 && ann.every((a) => /Atención/.test(a) && !/[Ff]rena/.test(a)), { ann });
-  check(`${vp.name}: viaje — taxi se detiene por delante del averiado`, /AHEAD_OF_DISABLED_ON_SHOULDER/.test(taxi));
+  check(`${vp.name}: viaje — sin evaluación del arcén no se recomienda parada del taxi`, /ABSTAIN_UNVERIFIED_SITE/.test(taxi) && /No se propone una parada/.test(taxi) && !/AHEAD_OF_DISABLED_ON_SHOULDER/.test(taxi));
   await page.screenshot({ path: resolve(outDir, `roadsafe-viaje-${vp.name}.png`), fullPage: true });
+  await page.click('#tab-r'); await page.click('#r-run');
+  await page.waitForFunction(() => document.querySelectorAll('#r-horizon tbody tr').length === 2);
+  const roadRows = await page.$eval('#r-horizon tbody tr', (rows) => rows.map(x => x.textContent));
+  const roadChannels = await page.textContent('#r-channels');
+  const roadRelay = await page.textContent('#r-relay');
+  check(`${vp.name}: carretera — primero final de cola, después accidente`, /Final de cola/.test(roadRows[0]) && /Accidente/.test(roadRows[1]), { roadRows });
+  check(`${vp.name}: carretera — no publica ni anuncia sin autorizaciones`, /DGT30/.test(roadChannels) && /WAZE_CIFS/.test(roadChannels) && /Avisos por voz emitidos: 0/.test(await page.textContent('#r-horizon')), {roadChannels});
+  check(`${vp.name}: carretera — BLE se declara solo hipótesis`, /HIPÓTESIS/.test(roadRelay) && /%/.test(roadRelay), {roadRelay});
+  await page.screenshot({ path: resolve(outDir, `roadsafe-carretera-${vp.name}.png`), fullPage: true });
   const overflow = await page.evaluate(() => [...document.querySelectorAll('[role=tabpanel]')].map((p) => { p.hidden = false; return document.documentElement.scrollWidth - document.documentElement.clientWidth; }));
   check(`${vp.name}: sin desbordamiento horizontal`, overflow.every((x) => x <= 1), { overflow });
   check(`${vp.name}: ninguna petición a dominios externos`, external.length === 0, { external });
