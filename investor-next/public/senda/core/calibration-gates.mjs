@@ -28,6 +28,7 @@ export function validateCalibrationRows(rows, registry, { minTestCases = 3, minT
   }
   const seen = new Set();
   const splits = new Map();
+  const sites = new Map();
   const countByEngine = new Map();
   for (const [i, r] of rows.entries()) {
     const prefix = `row[${i}]`;
@@ -75,6 +76,12 @@ export function validateCalibrationRows(rows, registry, { minTestCases = 3, minT
     const key = String(r.engine) + '/' + String(r.case_id);
     if (splits.has(key) && splits.get(key) !== r.fold) errors.push(prefix + ':CASE_LEAKAGE_ACROSS_FOLDS');
     else splits.set(key, r.fold);
+    // A different case_id at the same physical site is not an independent holdout.
+    if (typeof r.site_id === 'string' && r.site_id.trim()) {
+      const siteKey = String(r.engine) + '/' + r.site_id.trim();
+      if (sites.has(siteKey) && sites.get(siteKey) !== r.fold) errors.push(prefix + ':SITE_LEAKAGE_ACROSS_FOLDS');
+      else sites.set(siteKey, r.fold);
+    }
   }
   for (const [engine, v] of countByEngine) {
     if (v.train.length < 1) errors.push(engine + ':NO_TRAIN_REFERENCE');
@@ -118,6 +125,8 @@ function regressionMetrics(train, test) {
   if (intervals.length) {
     metrics.intervalCoverage = mean(intervals.map((r) => +(r.truth >= r.lower && r.truth <= r.upper)));
     metrics.intervalCount = intervals.length;
+    metrics.intervalAvailability = intervals.length / test.length;
+    metrics.intervalCoverageUnconditional = mean(test.map((r) => +(finite(r.lower) && finite(r.upper) && r.truth >= r.lower && r.truth <= r.upper)));
   }
   return metrics;
 }
