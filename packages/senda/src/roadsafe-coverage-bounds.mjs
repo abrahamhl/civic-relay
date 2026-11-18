@@ -59,6 +59,13 @@ export function evaluateCoverageBounds({ channelEvidence, deadlineS, nowMs, minS
       trials:e.trials, deadlineSuccesses:e.deadlineSuccesses, measuredLatencyP95S:e.measuredLatencyP95S,
       samplingInterval95:interval, observedSuccessRate:round(e.deadlineSuccesses/e.trials) });
   }
+  // Pooling dissimilar iOS/Android states, roads or weather is not valid even
+  // if the caller omitted a required stratum. Fail closed on heterogeneity.
+  if (new Set(qualified.map(x => x.measurementStratum)).size > 1) {
+    return { status:'ABSTAIN_MIXED_MEASUREMENT_STRATA',channels:[],canWarnDrivers:false,
+      blocked:[...blocked,...qualified.map(x=>({channelId:x.channelId,reason:'MIXED_STRATA_UNCOMBINABLE'}))],
+      noDeliveryGuarantee:true };
+  }
   const bestLower = qualified.length ? Math.max(...qualified.map(x=>x.samplingInterval95[0])) : null;
   const unionUpper = qualified.length ? Math.min(1, qualified.reduce((sum,x)=>sum+x.samplingInterval95[1],0)) : null;
   // Frechet-Hoeffding: without known dependence max(P_i) <= P(union) <= min(1, sum P_i).
