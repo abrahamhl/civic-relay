@@ -502,6 +502,14 @@ $('#v-det').onclick = () => {
 };
 $('#v-taxi').onclick = () => {
  const p = planServiceStop({ disabledS: 10000, approachSpeedMs: 25, shoulderFreeAheadM: 80, policy: EXAMPLE_SERVICE_STOP_POLICY });
+ if (p.status !== 'HYPOTHETICAL_REVIEW_REQUIRED') {
+   $('#v-taxi-out').textContent = L(
+     'No se propone una parada: falta evaluación vial autorizada. Coordinar un punto seguro con el gestor y el proveedor.',
+     'No stop is recommended: an authorized roadside assessment is missing. Coordinate a safe location with the operator.',
+     'Geen stopadvies: een bevoegde wegbeoordeling ontbreekt. Stem een veilige locatie af met de wegbeheerder.'
+   ) + ' (' + p.status + ')';
+   return;
+ }
  $('#v-taxi-out').innerHTML = `<p><span class="badge b-info">${esc(p.stopPosition)}</span> · ${esc(L('emitir desde', 'broadcast from', 'uitzenden vanaf'))} ${10000 - p.announceFromS} m · ${esc(L('frenar desde', 'brake from', 'remmen vanaf'))} ${10000 - p.brakeStartS} m · ${p.brakeDurationS} s</p><ol class="steps">${p.steps.map((x) => `<li>${esc(x)}</li>`).join('')}</ol><p style="font-size:12px">${esc(p.rationale)} · ${esc(p.provenance)}</p>`;
 };
 
