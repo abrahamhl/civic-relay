@@ -18,6 +18,7 @@ const VERIFICATIONS = new Set([
 ]);
 const CREDIBLE = new Set(['AUTHORITY_VERIFIED', 'PARTNER_ATTESTED']);
 const PRIORITY = { INFO: 1, MODERATE: 2, HIGH: 3, CRITICAL: 4 };
+const TRUST_RANK = { UNVERIFIED: 0, PEER_SIGNATURE_VERIFIED: 1, PARTNER_ATTESTED: 2, AUTHORITY_VERIFIED: 3 };
 const nonempty = (x) => typeof x === 'string' && x.trim().length > 0 && x.length <= 200;
 const finite = (x) => typeof x === 'number' && Number.isFinite(x);
 
@@ -92,13 +93,27 @@ export function fuseRoadReports(reports, { nowMs, maxPositionDifferenceM = 200, 
   }
   const scenes = [];
   for (const group of groups.values()) {
-    const uniqueRoots = new Map();
-    // Keep the freshest occurrence of each original physical root, never count its copies.
+    const uniqueRoots = new Map(), conflictingRootPublishers = new Set();
+    // An attacker cannot overwrite one verified V16/DATEX root by replaying a newer
+    // unsigned relay with the same rootId. Source ownership and trust rank are FIRST.
     for (const e of group) {
       const prev = uniqueRoots.get(e.provenance.rootId);
-      if (!prev || prev.observedAtMs < e.observedAtMs ||
-          (prev.observedAtMs === e.observedAtMs && PRIORITY[e.severity] > PRIORITY[prev.severity]))
+      const rank = TRUST_RANK[e.provenance.verification] ?? -1;
+      const prevRank = prev ? TRUST_RANK[prev.provenance.verification] ?? -1 : -1;
+      if (prev && rank >= 2 && prevRank >= 2 &&
+          e.provenance.publisherId !== prev.provenance.publisherId) {
+        conflictingRootPublishers.add(e.provenance.rootId);
+      }
+      if (!prev || rank > prevRank ||
+          (rank === prevRank && (prev.observedAtMs < e.observedAtMs ||
+          (prev.observedAtMs === e.observedAtMs && PRIORITY[e.severity] > PRIORITY[prev.severity])))) {
         uniqueRoots.set(e.provenance.rootId, e);
+      }
+    }
+    if (conflictingRootPublishers.size > 0) {
+      rejected.push({ incidentKey: group[0].incidentKey, hazardType: group[0].hazardType,
+        reason: 'CONFLICTING_VERIFIED_ROOT_OWNERSHIP', rootCount: conflictingRootPublishers.size });
+      continue;
     }
     const allRoots = [...uniqueRoots.values()];
     // Untrusted copies may not escalate severity, shift an official event or shorten its TTL.

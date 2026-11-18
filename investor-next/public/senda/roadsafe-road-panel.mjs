@@ -2,6 +2,8 @@
 import { fuseRoadReports, buildElectronicHorizon, planRoadAlertDistribution } from './core/roadsafe-road-alert-network.mjs';
 import { createDriverAlertArbiter } from './core/roadsafe-alert-arbiter.mjs';
 import { evaluateOppositeRelay } from './core/roadsafe-opposite-relay.mjs';
+import { projectQueueTailEnvelope } from './core/roadsafe-queue-reachability.mjs';
+import { evaluateCoverageBounds } from './core/roadsafe-coverage-bounds.mjs';
 
 const el = (id) => document.getElementById(id);
 const tr = (es, en, nl) => document.documentElement.lang === 'en' ? en : document.documentElement.lang === 'nl' ? nl : es;
@@ -36,6 +38,42 @@ export function renderRoadLab() {
   // Assumptions are intentionally hard-coded as an educational sensitivity model, NOT sourced field metrics.
   const hypothesis=evaluateOppositeRelay({distanceToHazardM:2500,approachingSpeedMps:25,oppositeSpeedMps:25,oppositeFlowVehPerHour:1200,relayParticipation:adoption/100,sourceReceiveP:0.7,targetReceiveP:0.7,roadSeparationM:18,effectiveRadioRangeM:30,minLeadTimeS:5,eventTtlS:300,analysisHorizonS:300,sourceHasRelay:true,targetHasRelay:true,crossCarriagewayReachable:true});
   el('r-relay').innerHTML='<h3>'+esc(tr('Reenvío BLE contrario','Opposite-direction BLE relay','BLE-relais via tegenliggers'))+'</h3><p>'+esc(tr('Probabilidad condicional del modelo','Conditional model probability','Voorwaardelijke modelkans'))+': <strong>'+(hypothesis.probability===null?'—':(hypothesis.probability*100).toFixed(1)+' %')+'</strong></p><p class="m">'+esc(tr('HIPÓTESIS, NO COBERTURA MEDIDA: llegadas Poisson, 1200 veh/h, velocidades de 90 km/h, alcance eficaz supuesto 30 m y recepción supuesta del 70%. No hay ensayo BLE físico ni acuse de entrega.', 'HYPOTHESIS, NOT MEASURED COVERAGE: Poisson arrivals, 1200 vehicles/h, 90 km/h, assumed 30 m range and 70% reception. No physical BLE trial or destination acknowledgment.', 'HYPOTHESE, GEEN GEMETEN DEKKING: Poisson-aankomsten, 1200 voertuigen/u, 90 km/u, verondersteld 30 m bereik en 70% ontvangst. Geen fysieke BLE-proef of ontvangstbevestiging.'))+'</p>';
+  // Mathematical feasibility demo: two synthetic tail positions ten seconds apart.
+  // No field data, consent, actor integration, or route authorization is inferred.
+  const tailRef = {roadId:'LAB-A12',carriagewayId:'LAB-A12-E',direction:'INCREASING',
+    incidentKey:'cola-demo',mapMatched:true};
+  const envelope=projectQueueTailEnvelope({
+    observations:[{...tailRef,atMs:nowMs-12000,chainageM:122480,uncertaintyM:5},
+      {...tailRef,atMs:nowMs-2000,chainageM:122440,uncertaintyM:5}],
+    driver:{...tailRef,chainageM:121500,uncertaintyM:10},nowMs,
+    constraints:{driverSpeedRangeMps:[Math.max(0,speed/3.6-2),speed/3.6+2],
+      latencyRangeS:[1,4],reactionRangeS:[1,3],decelerationRangeMs2:[2,5],
+      clearanceMarginM:20,maxExtrapolationS:30,maxObservationGapS:30,maxAbsWaveSpeedMps:15}
+  });
+  const coverage=evaluateCoverageBounds({
+    channelEvidence:[{channelId:'LAB-BLE',failureDomain:'PHONE_RADIO',
+      measurementStratum:'SIMULATED_ANDROID_FOREGROUND',receiverAckType:'DESTINATION_ACK',
+      authorizationGranted:true,consentGranted:true,measurementOrigin:'SYNTHETIC',
+      trials:100,deadlineSuccesses:80,testedDeadlineS:10,measuredLatencyP95S:5,
+      observedAtMs:nowMs-1000,validUntilMs:nowMs+100000}],
+    deadlineS:15,nowMs
+  });
+  const label=tr('Modelo experimental de final de cola móvil','Moving queue-tail research model',
+    'Onderzoeksmodel bewegend file-einde');
+  const margin=typeof envelope.robustTimingMarginM==='number'?envelope.robustTimingMarginM.toFixed(0)+' m':'—';
+  const wave=Array.isArray(envelope.waveVelocityRangeMps)?envelope.waveVelocityRangeMps.join(' … ')+' m/s':'—';
+  const distance=Array.isArray(envelope.distanceRangeM)?envelope.distanceRangeM.join(' … ')+' m':'—';
+  el('r-horizon').innerHTML += '<div class="card" style="margin-top:12px"><h3>'+esc(label)+'</h3>'+
+    '<p>'+esc(tr('Velocidad de la onda de cola','Queue shock speed','Fileschokgolfsnelheid'))+': <strong>'+esc(wave)+'</strong> · '+
+    esc(tr('Distancia acotada','Bounded distance','Afstand met bandbreedte'))+': <strong>'+esc(distance)+'</strong></p>'+
+    '<p>'+esc(tr('Margen temporal convertido a distancia','Conservative timing clearance margin','Conservatieve vrije marge'))+': <strong>'+esc(margin)+'</strong></p>'+
+    '<p class="m">'+esc('H-ROAD-RRE-1 · '+(envelope.verdict??envelope.reason??'ABSTAIN'))+'</p>'+
+    '<p class="m">'+esc(tr('Parámetros inventados únicamente para el ensayo. No son valores de normativa ni consejos de frenado.',
+    'Parameters invented for the simulation only. Not legal stopping distances or braking instructions.',
+    'Parameters alleen voor de simulatie, geen wettelijke remweg of rijadvies.'))+'</p>'+
+    '<p class="m">'+esc(tr('Cobertura BLE no validada físicamente:', 'BLE coverage not field validated:',
+    'BLE-dekking niet fysiek gevalideerd:'))+' <strong>'+esc(coverage.status)+'</strong></p></div>';
+
 }
 
 if (el('r-run')) {

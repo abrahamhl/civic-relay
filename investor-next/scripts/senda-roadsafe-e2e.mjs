@@ -99,6 +99,10 @@ for (const vp of [{ name: 'movil', width: 390, height: 844 }, { name: 'escritori
   check(`${vp.name}: carretera — primero final de cola, después accidente`, /Final de cola/.test(roadRows[0]) && /Accidente/.test(roadRows[1]), { roadRows });
   check(`${vp.name}: carretera — no publica ni anuncia sin autorizaciones`, /DGT30/.test(roadChannels) && /WAZE_CIFS/.test(roadChannels) && /Avisos por voz emitidos: 0/.test(await page.textContent('#r-horizon')), {roadChannels});
   check(`${vp.name}: carretera — BLE se declara solo hipótesis`, /HIPÓTESIS/.test(roadRelay) && /%/.test(roadRelay), {roadRelay});
+  const rre = await page.textContent('#r-horizon');
+  check(`${vp.name}: carretera — predicción cinemática conserva incertidumbre y no afirma cobertura física`,
+    /H-ROAD-RRE-1/.test(rre) && /ABSTAIN_NO_CALIBRATED_CHANNEL/.test(rre) &&
+    /m\/s/.test(rre) && !/AUTOMATICALLY_VERIFIED/.test(rre), {text: rre.slice(-650)});
   await page.screenshot({ path: resolve(outDir, `roadsafe-carretera-${vp.name}.png`), fullPage: true });
   const overflow = await page.evaluate(() => [...document.querySelectorAll('[role=tabpanel]')].map((p) => { p.hidden = false; return document.documentElement.scrollWidth - document.documentElement.clientWidth; }));
   check(`${vp.name}: sin desbordamiento horizontal`, overflow.every((x) => x <= 1), { overflow });
