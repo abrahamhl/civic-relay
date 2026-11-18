@@ -99,6 +99,11 @@ for (const vp of [{ name: 'movil', width: 390, height: 844 }, { name: 'escritori
   check(`${vp.name}: carretera — más autorizaciones ⇒ más familias de fallo; sobrevive a caída móvil`, fams(kreinf2) > fams(kreinf1) && /sobrevive/.test(kreinf2), { kreinf1, kreinf2 });
   const khor = await page.$$eval('#k-hor li', (l) => l.map((x) => x.textContent));
   check(`${vp.name}: carretera — horizonte con cola y escena por delante y frase de voz`, khor.length >= 2 && /QUEUE_TAIL/.test(khor[0]) && khor.every((x) => /Atención/.test(x)), { khor });
+  const spk = await page.$$eval('#k-hor [data-k=spk]', (l) => l.length);
+  check(`${vp.name}: carretera — presupuesto de atención: exactamente un aviso se dice ahora`, spk === 1, { spk });
+  const ble = await page.textContent('#k-ble'); await page.fill('#k-pen', '0.4'); await page.dispatchEvent('#k-pen', 'input'); const ble2 = await page.textContent('#k-ble');
+  const reach = (t) => +(t.match(/(\d+) m/) ?? [])[1];
+  check(`${vp.name}: carretera — cadena BLE: más penetración ⇒ más alcance`, reach(ble2) > reach(ble), { ble, ble2 });
   check(`${vp.name}: carretera — tasas reales por 100 M veh-km`, /TM/.test(await page.textContent('#k-exp')));
   const overflow = await page.evaluate(() => [...document.querySelectorAll('[role=tabpanel]')].map((p) => { p.hidden = false; return document.documentElement.scrollWidth - document.documentElement.clientWidth; }));
   check(`${vp.name}: sin desbordamiento horizontal`, overflow.every((x) => x <= 1), { overflow });

@@ -1,5 +1,21 @@
 # Changelog
 
+## SENDA RoadSafe · 18-11-2026 (VI) · La carretera como senda principal: bus de avisos, horizonte, atención e intercambio entre dispositivos
+
+**Entrada (fundador):** trabajo continuado y más ambicioso; priorizar los avisos en carretera y que la carretera sea la senda principal multidispositivo, multisoftware y de refuerzo.
+
+**Procesamiento:**
+- Auditoría del corredor (C1–C6), sin falsas validaciones, sin ubicaciones inventadas y sin secreto por defecto.
+- Bus de avisos: 6 fuentes de entrada, fusión sin doble conteo y refuerzo por familias de fallo.
+- Horizonte electrónico.
+- Tasas GB por 100 M veh-km (AADF × STATS19, cota inferior).
+- Presupuesto de atención: un aviso por turno.
+- Alcance de la cadena BLE.
+- Intercambio entre dispositivos (`roadsafe-gossip.mjs`): papeles consumidor y portador, presupuesto de bytes, umbral de confianza para transportar y recepción que nunca sube la confianza.
+- Documento 11.
+
+**Validación:** núcleo 788/788; adversariales 31/31; Chromium 72/72. Conclusión de modelo, con escenario declarado: con penetración baja, el portador del sentido contrario supera a la cadena del mismo sentido. — Firma: Claude (Asistente de Orquestación Senior)
+
 ## SENDA RoadSafe · 18-11-2026 (V) · Calibración multivariante de gravedad sobre 551 260 accidentes oficiales
 
 **Entrada (fundador):** seguir calibrando e implementando.

@@ -223,6 +223,7 @@ import { detectCrashEvent, syntheticTrace, SYNTHETIC_KINDS, EXAMPLE_DETECTION_CO
 import { severityProbability } from '/senda/core/roadsafe-severity-model.mjs';
 import { makeWarning, createWarningBus, fromDatexHazard, fromFrameAssessment, fromIncidentTwin, planFanOut, v2vUpstreamDelivery } from '/senda/core/roadsafe-warning-bus.mjs';
 import { roadAhead } from '/senda/core/roadsafe-horizon.mjs';
+import { createAttentionPlanner, bleRelayReach } from '/senda/core/roadsafe-attention.mjs';
 import { pointAt, roadLocate, encodeHazard, HAZARD } from '/senda/core/road-guard.mjs';
 import { assessHazardFrame, createFrameSigner, createTrustStore, signHazardCapsule } from '/senda/core/roadsafe-frame-trust.mjs';
 import { navigationLinks, toCifsIncident, validateCifs } from '/senda/core/roadsafe-interop.mjs';
@@ -560,13 +561,18 @@ function renderHorizon() {
  const p0 = pointAt(KROAD, 3000), p1 = pointAt(KROAD, 3030), hdg = (Math.atan2((p1.lon - p0.lon) * Math.cos(p0.lat * Math.PI / 180), p1.lat - p0.lat) * 180 / Math.PI + 360) % 360;
  const r = roadAhead({ ...p0, headingDeg: hdg, speedMs: 25 }, KROAD, KBUS.bus.active(KBUS.t), { now: KBUS.t, horizonM: 2000, horizonS: 120, maxOffRoadM: 30 });
  const VK = { STOPPED_VEHICLE_SHOULDER: 'STOPPED_SHOULDER', STOPPED_VEHICLE_LANE: 'STOPPED_LANE', ACCIDENT: 'ACCIDENT', SECONDARY_COLLISION: 'ACCIDENT', QUEUE_TAIL: 'QUEUE_TAIL', SERVICE_STOPPING: 'SERVICE_STOPPING' };
- $('#k-hor').innerHTML = r.items.map((i) => `<li><time>${i.aheadM} m · ${i.etaS ?? '—'} s</time><b>${esc(i.kind)}</b> <span class="badge ${i.ceiling === 'WARNING' ? 'b-warn' : 'b-info'}">${esc(i.trust)}</span><br><span class="m">«${esc(VK[i.kind] ? phrase({ kind: VK[i.kind], distanceM: i.aheadM, lang }) : i.kind)}»</span></li>`).join('');
- $('#k-hor-meta').textContent = `${L('Posición', 'Position', 'Positie')}: ${r.position.roadId} PK ${r.position.pk} · ${L('horizonte', 'horizon', 'horizon')} ${r.horizonM} m · ${L('descartados', 'dropped', 'verworpen')}: ${r.dropped.length}`;
+ // Presupuesto de atención: política DECLARADA de ejemplo (no medida) → como mucho un aviso por turno.
+ const att = createAttentionPlanner({ tMinS: 8, tMaxS: 600, budgetPerWindow: 3, windowS: 300, minGapS: 20 }).next(r.items, KBUS.t);
+ const tag = (i) => att.speak?.warningId === i.warningId ? `<span class="badge b-warn" data-k="spk">${esc(L('se dice ahora', 'spoken now', 'nu gemeld'))}</span>` : (att.queued ?? []).includes(i.warningId) ? `<span class="badge b-info">${esc(L('en cola', 'queued', 'in wachtrij'))}</span>` : `<span class="badge b-info">${esc((att.reasons.find((x) => x.id === i.warningId)?.why) ?? '—')}</span>`;
+ $('#k-hor').innerHTML = r.items.map((i) => `<li><time>${i.aheadM} m · ${i.etaS ?? '—'} s</time>${tag(i)} <b>${esc(i.kind)}</b> <span class="badge ${i.ceiling === 'WARNING' ? 'b-warn' : 'b-info'}">${esc(i.trust)}</span><br><span class="m">«${esc(VK[i.kind] ? phrase({ kind: VK[i.kind], distanceM: i.aheadM, lang }) : i.kind)}»</span></li>`).join('');
+ $('#k-hor-meta').textContent = `${L('Posición', 'Position', 'Positie')}: ${r.position.roadId} PK ${r.position.pk} · ${L('horizonte', 'horizon', 'horizon')} ${r.horizonM} m · ${L('descartados', 'dropped', 'verworpen')}: ${r.dropped.length} · ${L('presupuesto de atención de ejemplo: 3 avisos / 5 min, 20 s entre avisos (declarado, no medido)', 'example attention budget: 3 warnings / 5 min, 20 s apart (declared, not measured)', 'voorbeeld-aandachtsbudget: 3 meldingen / 5 min, 20 s ertussen (opgegeven, niet gemeten)')}`;
 }
 function renderV2v() {
  const pen = +$('#k-pen').value, opp = +$('#k-opp').value; $('#o-kpen').textContent = pen; $('#o-kopp').textContent = opp;
  const r = v2vUpstreamDelivery({ distanceM: 3000, oppositeFlowVehH: opp, penetration: pen, contactProb: 0.5, vApproachMs: 25, vOppositeMs: 25, horizonS: 300 });
  $('#k-v2v').innerHTML = `<p>P(${esc(L('entregado en 5 min a un conductor con SENDA a 3 km', 'delivered within 5 min to a SENDA driver 3 km away', 'binnen 5 min afgeleverd aan SENDA-bestuurder op 3 km'))}) = <b>${(r.pDeliveredWithinHorizon * 100).toFixed(1)} %</b> · ${esc(L('retardo esperado', 'expected delay', 'verwachte vertraging'))} ${r.expectedDelayS ?? '—'} s</p><p style="font-size:12px">${esc(r.basis)} · ${esc(L('probabilidad de contacto 0,5 y velocidades 90 km/h: escenario declarado, no medido', 'contact probability 0.5 and 90 km/h speeds: declared scenario, not measured', 'contactkans 0,5 en 90 km/u: opgegeven scenario, niet gemeten'))}</p>`;
+ const b = bleRelayReach({ densityVehKm: 25, penetration: pen, rangeM: 200, maxHops: 10, targetM: 3000 });
+ $('#k-v2v').innerHTML += `<p id="k-ble">${esc(L('Cadena BLE del mismo sentido', 'Same-direction BLE chain', 'BLE-keten zelfde richting'))}: ${esc(L('alcance esperado', 'expected reach', 'verwacht bereik'))} <b>${b.expectedReachM} m</b> · P(3 km) = ${(b.pReachTarget * 100).toFixed(1)} %</p><p style="font-size:12px">${esc(b.basis)} · ${esc(L('25 veh/km y 200 m por salto: escenario declarado. Con penetración baja el portador del sentido contrario llega más lejos que la cadena.', '25 veh/km and 200 m per hop: declared scenario. At low penetration the opposite-direction carrier reaches further than the chain.', '25 vtg/km en 200 m per sprong: opgegeven scenario. Bij lage penetratie komt de drager in tegenrichting verder dan de keten.'))}</p>`;
 }
 async function renderExposure() {
  try {
