@@ -20,6 +20,7 @@ Capa federada de prevención de colisiones secundarias y coordinación de asiste
 | 15 | [15_ROBUST_QUEUE_REACHABILITY_RESEARCH.md](15_ROBUST_QUEUE_REACHABILITY_RESEARCH.md) | H-ROAD-RRE-1 / H-ROAD-COVER-1: alcance robusto del final de cola y cotas de cobertura (rama lateral #51) |
 | 16 | [16_CONSOLIDATION_F0.md](16_CONSOLIDATION_F0.md) | Consolidación F0: ramas unidas, decisiones de fusión y módulos paralelos pendientes de unificar |
 | 17 | [17_DRIVE_AUTOSTART_F1.md](17_DRIVE_AUTOSTART_F1.md) | SENDA Drive F1: arranque automático con consentimiento; una máquina de estados con vectores para web, Android (base sin Google y play) e iOS; límites reales por plataforma |
+| 18 | [18_CASE_HGV_SIDESWIPE_SPIN.md](18_CASE_HGV_SIDESWIPE_SPIN.md) | Caso real anonimizado (camión contra turismo, trompo de 180°, coche inmovilizado en el carril rápido): fallo de seguridad corregido en la relevancia de avisos, gemelo con varios carriles; no calibra umbrales |
 | 9 | [09_DIFFERENTIATION_DETECTION_SECURITY.md](09_DIFFERENTIATION_DETECTION_SECURITY.md) | Soluciones existentes, diferenciación, detección de accidentes, blindaje |
 | 8 | [08_COMPANION_WAZE_SENSORS_STRATEGY.md](08_COMPANION_WAZE_SENSORS_STRATEGY.md) | Alcance a todos los conductores, Waze, sensores, física del impacto, emergencia guiada |
 | 6 | [06_CASUISTRY_RISK_AND_CONCLUSIONS.md](06_CASUISTRY_RISK_AND_CONCLUSIONS.md) | Evidencia con fuentes, 8 mecanismos, probabilidades por circunstancia, conclusiones |

@@ -81,7 +81,11 @@ test('P0-2/6: hazardRelevance sin reloj o con hora futura no avisa; misma carret
   const m = { lat: 40.4, lon: -3.7, headingDeg: 0 }, h = { type: HAZARD.CRASH, t: 100, lat: 40.402, lon: -3.7, headingDeg: 0 };
   assert.equal(hazardRelevance(m, h, REL).relevant, false);
   assert.equal(hazardRelevance(m, { ...h, t: 200 }, { ...REL, now: 100 }).relevant, false);
-  assert.equal(hazardRelevance({ ...m, roadId: 'A-3', s: 1000, dir: 1 }, { ...h, roadId: 'A-3', s: 1500, dir: -1 }, { ...REL, now: 101 }).relevant, false);
+  // Sentido del peligro con base fiable (geometría de la vía): el de la otra calzada no avisa.
+  assert.equal(hazardRelevance({ ...m, roadId: 'A-3', s: 1000, dir: 1 }, { ...h, roadId: 'A-3', s: 1500, dir: -1, dirBasis: 'ROAD_GEOMETRY' }, { ...REL, now: 101 }).relevant, false);
+  // Caso real (doc 18): un coche accidentado y girado 180° da un sentido falso; sin base fiable se avisa marcado como incierto.
+  const spun = hazardRelevance({ ...m, roadId: 'A-3', s: 1000, dir: 1 }, { ...h, roadId: 'A-3', s: 1500, dir: -1, speedMs: 0 }, { ...REL, now: 101 });
+  assert.equal(spun.relevant, true); assert.equal(spun.carriagewayUncertain, true);
 });
 
 // ------------------------------------------------------------- P0-3 consejo de frenada

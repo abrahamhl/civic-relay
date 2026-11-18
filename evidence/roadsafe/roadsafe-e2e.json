@@ -1,7 +1,7 @@
 {
   "schema": "senda-roadsafe-e2e/1",
   "browser": "chromium (playwright)",
-  "at": "2026-11-18T19:06:09.390Z",
+  "at": "2026-11-18T19:57:34.185Z",
   "passed": 82,
   "failed": 0,
   "results": [
@@ -34,7 +34,7 @@
     {
       "name": "movil: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-7a60e249a830123a · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-b524568ea74a74d6 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -44,7 +44,7 @@
     {
       "name": "movil: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-7a60e249a830123a · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-b524568ea74a74d6 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: idioma en",
@@ -158,7 +158,7 @@
       "name": "movil: carretera — 4 canales funden en 1 escena (oficial) + cola aparte",
       "ok": true,
       "kbus": [
-        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:fda87c90 · DATEX2:NAP",
+        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:5d240b3e · DATEX2:NAP",
         "QUEUE_TAILUNVERIFIED_HINT1ZONE_MODEL"
       ]
     },
@@ -274,7 +274,7 @@
     {
       "name": "escritorio: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-16a1078e002d6138 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-dc963bc81a88ec54 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -284,7 +284,7 @@
     {
       "name": "escritorio: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-16a1078e002d6138 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-dc963bc81a88ec54 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: idioma en",
@@ -398,7 +398,7 @@
       "name": "escritorio: carretera — 4 canales funden en 1 escena (oficial) + cola aparte",
       "ok": true,
       "kbus": [
-        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:3e5251e2 · DATEX2:NAP",
+        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:ffdf6df0 · DATEX2:NAP",
         "QUEUE_TAILUNVERIFIED_HINT1ZONE_MODEL"
       ]
     },

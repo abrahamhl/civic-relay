@@ -91,6 +91,15 @@ export const HAZARD = Object.freeze({ BRAKE: 1, CRASH: 2, STOPPED: 3, OBSTACLE: 
 const HAZARD_NAME = Object.fromEntries(Object.entries(HAZARD).map(([k, v]) => [v, k]));
 /** Peligros de un solo sentido (mismo carril) frente a peligros de zona (niebla, hielo, animales). */
 const ONE_WAY = new Set([HAZARD.BRAKE, HAZARD.CRASH, HAZARD.STOPPED, HAZARD.OBSTACLE, HAZARD.QUEUE, HAZARD.SOS, HAZARD.LANE_CLOSED]);
+/**
+ * Peligros ESTÁTICOS: un vehículo accidentado o parado puede quedar girado (trompo de 180°, atravesado), así
+ * que su rumbo ACTUAL no dice por qué calzada circulaba. Caso real que lo motivó (declaración de un conductor,
+ * autopista, Bélgica, 2026; docs/roadsafe/18_CASE_HGV_SIDESWIPE_SPIN.md): turismo golpeado por la cabina de un
+ * camión, arrastrado, girado ~180° e inmovilizado en el carril rápido mirando contra el tráfico.
+ */
+const STATIC = new Set([HAZARD.CRASH, HAZARD.STOPPED, HAZARD.OBSTACLE, HAZARD.SOS, HAZARD.LANE_CLOSED]);
+/** Banderas de la trama. TRAVEL_HEADING: el rumbo es el de MARCHA antes del suceso (fiable para la calzada). */
+export const HAZARD_FLAGS = Object.freeze({ TRAVEL_HEADING: 0x80 });
 export const HAZARD_BYTES = 24;
 
 /**
@@ -143,11 +152,27 @@ export const relayHazard = (bytes, opts) => {
  * distancia por la carretera, válida también en curvas; si no, geometría en línea recta con alcance corto.
  */
 /** EJEMPLO DECLARADO de alcances y ventanas de relevancia: fuente no verificada. */
-export const EXAMPLE_RELEVANCE = Object.freeze({ maxAheadM: 2000, straightMaxM: 600, laneM: 12, areaM: 600, headingTolDeg: 35, maxAgeS: 20, zoneMaxAgeS: 1800, maxFutureS: 2, basis: 'EJEMPLO_DECLARADO · fuente no verificada' });
-/** Política DECLARADA: { maxAheadM, straightMaxM, laneM, areaM, headingTolDeg, maxAgeS, zoneMaxAgeS, maxFutureS }; `now` es la hora del receptor. */
+export const EXAMPLE_RELEVANCE = Object.freeze({ maxAheadM: 2000, straightMaxM: 600, laneM: 12, areaM: 600, headingTolDeg: 35, maxAgeS: 20, zoneMaxAgeS: 1800, maxFutureS: 2, stationarySpeedMs: 2, basis: 'EJEMPLO_DECLARADO · fuente no verificada' });
+/**
+ * ¿Se puede usar el rumbo/sentido del peligro para descartarlo como «de la otra calzada»? En un peligro estático
+ * solo si: la trama declara rumbo de MARCHA (HAZARD_FLAGS.TRAVEL_HEADING), el sentido viene de una fuente con
+ * geometría (`dirBasis` ROAD_GEOMETRY u OFFICIAL_FEED), o el emisor aún se mueve (≥ stationarySpeedMs).
+ */
+function directionTrusted(hz, stationarySpeedMs) {
+  if (!STATIC.has(hz.type)) return true;
+  if (((hz.flags ?? 0) & HAZARD_FLAGS.TRAVEL_HEADING) !== 0) return true;
+  if (hz.dirBasis === 'ROAD_GEOMETRY' || hz.dirBasis === 'OFFICIAL_FEED') return true;
+  return Number.isFinite(hz.speedMs) && hz.speedMs >= stationarySpeedMs;
+}
+/**
+ * Política DECLARADA: { maxAheadM, straightMaxM, laneM, areaM, headingTolDeg, maxAgeS, zoneMaxAgeS, maxFutureS, stationarySpeedMs }; `now` es la hora del receptor.
+ * Con un peligro estático de sentido no fiable NO se descarta por rumbo: se avisa con `carriagewayUncertain: true`
+ * (una falsa alarma en la otra calzada es menos grave que callar un coche atravesado en tu carril).
+ */
 export function hazardRelevance(me, hz, opts) {
-  need('hazardRelevance', opts, ['maxAheadM', 'straightMaxM', 'laneM', 'areaM', 'headingTolDeg', 'maxAgeS', 'zoneMaxAgeS', 'maxFutureS']);
-  const { now, maxAheadM, straightMaxM, laneM, areaM, headingTolDeg, maxAgeS, zoneMaxAgeS, maxFutureS } = opts;
+  need('hazardRelevance', opts, ['maxAheadM', 'straightMaxM', 'laneM', 'areaM', 'headingTolDeg', 'maxAgeS', 'zoneMaxAgeS', 'maxFutureS', 'stationarySpeedMs']);
+  const { now, maxAheadM, straightMaxM, laneM, areaM, headingTolDeg, maxAgeS, zoneMaxAgeS, maxFutureS, stationarySpeedMs } = opts;
+  const trusted = directionTrusted(hz, stationarySpeedMs), unsure = trusted ? {} : { carriagewayUncertain: true };
   // P0-6 (RoadSafe): sin reloj del receptor no se puede juzgar la antigüedad; antes `now` ausente daba edad 0.
   if (!Number.isFinite(now)) return { relevant: false, why: 'sin reloj del receptor: antigüedad desconocida' };
   if (!Number.isFinite(hz.t)) return { relevant: false, why: 'aviso sin hora' };
@@ -155,9 +180,9 @@ export function hazardRelevance(me, hz, opts) {
   if (age < -maxFutureS) return { relevant: false, why: 'aviso con hora futura (reloj incoherente o repetición)' };
   if (age > (ONE_WAY.has(hz.type) ? maxAgeS : zoneMaxAgeS)) return { relevant: false, why: 'aviso caducado' };
   if (me.roadId && hz.roadId && me.roadId === hz.roadId && me.s != null && hz.s != null && me.dir != null) {
-    if (ONE_WAY.has(hz.type) && hz.dir !== me.dir) return { relevant: false, why: 'otro sentido de la misma carretera' };
+    if (ONE_WAY.has(hz.type) && trusted && hz.dir !== me.dir) return { relevant: false, why: 'otro sentido de la misma carretera' };
     const ahead = (hz.s - me.s) * me.dir;
-    return ahead > 0 && ahead <= maxAheadM ? { relevant: true, aheadM: Math.round(ahead), why: 'delante en mi carretera y sentido' } : { relevant: false, aheadM: Math.round(ahead), why: ahead <= 0 ? 'detrás de mí' : 'demasiado lejos' };
+    return ahead > 0 && ahead <= maxAheadM ? { relevant: true, aheadM: Math.round(ahead), ...unsure, why: trusted ? 'delante en mi carretera y sentido' : 'delante en mi carretera; vehículo detenido con orientación no fiable (puede estar girado)' } : { relevant: false, aheadM: Math.round(ahead), why: ahead <= 0 ? 'detrás de mí' : 'demasiado lejos' };
   }
   const f = localFrame(me.lat, me.lon), p = f.toXY(hz.lat, hz.lon), h = rad(me.headingDeg ?? 0);
   const along = p.x * Math.sin(h) + p.y * Math.cos(h), cross = Math.abs(p.x * Math.cos(h) - p.y * Math.sin(h));
@@ -165,11 +190,25 @@ export function hazardRelevance(me, hz, opts) {
     const head = hdgDiff(me.headingDeg ?? 0, hz.headingDeg ?? 0) >= 145;
     return head && along > 0 && along <= maxAheadM && cross <= 2 * laneM ? { relevant: true, aheadM: Math.round(along), crossM: Math.round(cross), why: 'vehículo en sentido contrario por tu calzada' } : { relevant: false, aheadM: Math.round(along), why: 'no viene por tu calzada' };
   }
-  if (ONE_WAY.has(hz.type) && hdgDiff(me.headingDeg ?? 0, hz.headingDeg ?? 0) > headingTolDeg) return { relevant: false, aheadM: Math.round(along), why: 'circula en otro sentido' };
+  if (ONE_WAY.has(hz.type) && trusted && hdgDiff(me.headingDeg ?? 0, hz.headingDeg ?? 0) > headingTolDeg) return { relevant: false, aheadM: Math.round(along), why: 'circula en otro sentido' };
   if (along <= 0) return { relevant: false, aheadM: Math.round(along), why: 'detrás de mí' };
   if (along > straightMaxM) return { relevant: false, aheadM: Math.round(along), why: 'lejos para juzgarlo sin la geometría de la vía' };
   if (cross > (ONE_WAY.has(hz.type) ? laneM : areaM)) return { relevant: false, aheadM: Math.round(along), crossM: Math.round(cross), why: 'fuera de mi carril o de mi calzada' };
-  return { relevant: true, aheadM: Math.round(along), crossM: Math.round(cross), why: 'delante, mismo sentido' };
+  return { relevant: true, aheadM: Math.round(along), crossM: Math.round(cross), ...unsure, why: trusted ? 'delante, mismo sentido' : 'delante; vehículo detenido con orientación no fiable (puede estar girado)' };
+}
+
+/**
+ * Rumbo de MARCHA antes del suceso (para la trama de quien sufre el accidente): media circular de los rumbos
+ * GNSS con velocidad ≥ minSpeedMs en la ventana [tEvent − windowS, tEvent). Sin muestras → null (no se inventa).
+ * DECLARADOS: { minSpeedMs, windowS }. Si hay rumbo, codificar la trama con HAZARD_FLAGS.TRAVEL_HEADING.
+ */
+export function travelHeadingBefore(gps, tEvent, opts) {
+  need('travelHeadingBefore', opts, ['minSpeedMs', 'windowS']);
+  if (!Number.isFinite(tEvent)) throw new Error('travelHeadingBefore: «tEvent» debe declararse');
+  const w = gps.filter((f) => f.t < tEvent && f.t >= tEvent - opts.windowS && f.speed >= opts.minSpeedMs && Number.isFinite(f.headingDeg));
+  if (!w.length) return null;
+  const sx = w.reduce((a, f) => a + Math.sin(rad(f.headingDeg)), 0), cy = w.reduce((a, f) => a + Math.cos(rad(f.headingDeg)), 0);
+  return { headingDeg: +((deg(Math.atan2(sx, cy)) + 360) % 360).toFixed(1), samples: w.length };
 }
 
 /**
@@ -470,11 +509,17 @@ export function roadSosText({ where, lat, lon, vehicles = null, people = null, t
 }
 /** Lo que hay que decir al 112, en el orden en que lo pregunta el operador. */
 /** Lo no informado (null) se dice como desconocido: nunca «nadie atrapado» ni «sin fuego» sin que alguien lo declare. */
-export function call112Script({ where, vehicles = null, people = null, trapped = null, fire = null, dangerous = false, counts = null, v16 = null }) {
+export const LANE_SAY = Object.freeze({ LEFT_LANE: 'en el carril izquierdo (rápido)', MIDDLE_LANE: 'en un carril central', RIGHT_LANE: 'en el carril derecho', SHOULDER: 'en el arcén derecho', LEFT_SHOULDER: 'junto a la mediana, a la izquierda' });
+/**
+ * Lo no informado (null) se dice como desconocido: nunca «nadie atrapado» ni «sin fuego» sin que alguien lo declare.
+ * Opcionales DECLARADOS: lane (clave de LANE_SAY) y againstTraffic (el vehículo quedó orientado contra la circulación).
+ */
+export function call112Script({ where, vehicles = null, people = null, trapped = null, fire = null, dangerous = false, counts = null, v16 = null, lane = null, againstTraffic = null }) {
   const inj = counts ? Object.entries(counts).filter(([, n]) => n).map(([c, n]) => `${n} ${({ ROJO: 'grave', AMARILLO: 'herido que no camina', VERDE: 'leve', PARADA: 'sin respiración', SIN_RESPIRACION: 'sin respiración' })[c] ?? c}`).join(', ') : null;
   const veh = Number.isFinite(vehicles) ? `${vehicles} vehículo${vehicles > 1 ? 's' : ''}` : 'Número de vehículos sin confirmar', ppl = Number.isFinite(people) ? `${people} persona${people > 1 ? 's' : ''}` : 'número de personas sin confirmar';
   const trap = !Number.isFinite(trapped) ? 'No se sabe aún si hay personas atrapadas.' : trapped ? `${trapped} persona${trapped > 1 ? 's' : ''} atrapada${trapped > 1 ? 's' : ''}.` : 'Nadie atrapado por ahora.';
-  return [`Accidente de tráfico en ${where}.`, `${veh} y ${ppl}${inj ? `: ${inj}` : ''}.`, trap, fire === true ? 'Hay fuego o humo.' : fire === false ? 'Sin fuego.' : 'Fuego: sin confirmar.', dangerous ? 'Hay un vehículo de mercancías peligrosas (panel naranja).' : null, v16 === true ? 'Hay una baliza V16 encendida.' : null].filter(Boolean).join(' ');
+  const pos = lane && LANE_SAY[lane] ? `Vehículo inmovilizado ${LANE_SAY[lane]}${againstTraffic === true ? ', orientado contra la circulación' : ''}.` : againstTraffic === true ? 'Vehículo inmovilizado orientado contra la circulación.' : null;
+  return [`Accidente de tráfico en ${where}.`, pos, `${veh} y ${ppl}${inj ? `: ${inj}` : ''}.`, trap, fire === true ? 'Hay fuego o humo.' : fire === false ? 'Sin fuego.' : 'Fuego: sin confirmar.', dangerous ? 'Hay un vehículo de mercancías peligrosas (panel naranja).' : null, v16 === true ? 'Hay una baliza V16 encendida.' : null].filter(Boolean).join(' ');
 }
 
 // ---------------------------------------------------------------- 9) Coordinador de escena (PAS) y puntos cívicos

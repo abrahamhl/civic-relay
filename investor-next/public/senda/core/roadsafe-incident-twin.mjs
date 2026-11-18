@@ -88,11 +88,27 @@ export async function createIncident(firstObs, { now, ttlS = 3600, kind = 'BREAK
   return inc;
 }
 
-/** Carril probable: sin pista, distribución vaga; 'SHOULDER' con V16 en arcén es solo una pista, no una medida. */
+/** Posiciones transversales que se pueden declarar. Los carriles de circulación son más peligrosos que los arcenes. */
+export const LANE_HINTS = Object.freeze(['LEFT_LANE', 'MIDDLE_LANE', 'RIGHT_LANE', 'SHOULDER', 'LEFT_SHOULDER']);
+const LIVE_LANES = new Set(['LEFT_LANE', 'MIDDLE_LANE', 'RIGHT_LANE']);
+/**
+ * Carril de UNA pista declarada (p. ej. «estoy en el carril rápido», V16 en el arcén). Es una pista, no una
+ * medida: no se le asigna probabilidad (antes p = 0,6 sin fuente).
+ */
 export function laneBelief(hint) {
-  if (hint === 'SHOULDER') return { mostLikely: 'SHOULDER', p: 0.6, basis: 'PISTA_DECLARADA_NO_MEDIDA' };
-  if (hint === 'RIGHT_LANE') return { mostLikely: 'RIGHT_LANE', p: 0.6, basis: 'PISTA_DECLARADA_NO_MEDIDA' };
+  if (LANE_HINTS.includes(hint)) return { mostLikely: hint, p: null, basis: 'PISTA_DECLARADA_NO_MEDIDA' };
   return { mostLikely: 'UNKNOWN', p: null, basis: 'SIN_DATOS' };
+}
+/**
+ * Un incidente puede tener vehículos en sitios distintos (caso real: camión en el arcén derecho y turismo girado
+ * en el carril rápido). Se guardan TODAS las posiciones declaradas y, para avisar, manda la PEOR: cualquier
+ * carril de circulación ocupado prevalece sobre el arcén.
+ */
+export function occupiedLanes(observations) {
+  const occ = [...new Set(observations.map((o) => o.laneHint).filter((h) => LANE_HINTS.includes(h)))];
+  const live = LANE_HINTS.filter((h) => LIVE_LANES.has(h) && occ.includes(h));
+  const worst = live.length > 1 ? 'MULTIPLE_LANES' : live[0] ?? (occ.includes('SHOULDER') ? 'SHOULDER' : occ.includes('LEFT_SHOULDER') ? 'LEFT_SHOULDER' : 'UNKNOWN');
+  return { occupied: LANE_HINTS.filter((h) => occ.includes(h)), worst, liveLaneBlocked: live.length > 0 };
 }
 
 /** Añade una observación (idempotente por obsId) y recalcula confianza; puede promover o disputar. */
@@ -101,6 +117,9 @@ export async function observe(inc, obs, { now } = {}) {
   if (!Number.isFinite(obs.at) || obs.at > now + 5) return { ok: false, error: 'observación con hora futura o ausente' };
   inc.observations.push({ ...obs, receivedAt: obs.receivedAt ?? now });
   inc.updatedAt = now;
+  const lanes = occupiedLanes(inc.observations);
+  inc.location.lanes = lanes;
+  if (lanes.worst !== 'UNKNOWN') inc.location.lane = { mostLikely: lanes.worst, p: null, basis: 'PEOR_POSICION_DECLARADA' };
   await appendAudit(inc, { at: now, op: 'OBSERVE', actor: { kind: 'SYSTEM' }, data: stripPersonal(obs) });
   inc.confidence = fuseRoadEvidence(inc.observations, { now });
   if (inc.state === 'STALE') await transition(inc, 'UNVERIFIED', { actor: { kind: 'SYSTEM' }, now, reason: 'nueva observación tras caducidad' });
@@ -153,7 +172,7 @@ export async function setAffected(inc, status, { actor, now }) {
 export function publicView(inc) {
   return {
     id: inc.id, kind: inc.kind, state: inc.state, updatedAt: inc.updatedAt,
-    location: { lat: +inc.location.lat.toFixed(5), lon: +inc.location.lon.toFixed(5), roadId: inc.location.roadId, dir: inc.location.dir, pk: inc.location.pk, lane: inc.location.lane.mostLikely },
+    location: { lat: +inc.location.lat.toFixed(5), lon: +inc.location.lon.toFixed(5), roadId: inc.location.roadId, dir: inc.location.dir, pk: inc.location.pk, lane: inc.location.lane.mostLikely, occupiedLanes: inc.location.lanes?.occupied ?? [], liveLaneBlocked: inc.location.lanes?.liveLaneBlocked ?? false },
     confidence: inc.confidence ? { status: inc.confidence.status, p: inc.confidence.p, independentRoots: inc.confidence.independentRoots } : null,
     sources: [...new Set(inc.observations.map((o) => o.source))],
   };
