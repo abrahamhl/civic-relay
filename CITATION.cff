@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "Si usas este software, cítalo como se indica."
+title: "Civic Relay / OEP — Offline Emergency Protocol"
+type: software
+authors:
+  - family-names: Haddioui
+    given-names: Abraham
+repository-code: "https://github.com/abrahamhl/civic-relay"
+url: "https://civic-relay-investor.vercel.app"
+license: MIT
+date-released: "2026-11-05"
+abstract: "Laboratorio de investigación abierto sobre continuidad de comunicaciones y coordinación en emergencias. Desarrollo asistido por IA con revisión humana. No es un servicio de emergencias."
