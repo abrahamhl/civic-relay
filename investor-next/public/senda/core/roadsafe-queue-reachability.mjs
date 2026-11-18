@@ -73,6 +73,8 @@ export function projectQueueTailEnvelope({ observations, driver, nowMs, constrai
   const vLo = ((xB - b.uncertaintyM) - (xA + a.uncertaintyM)) / dt;
   const vHi = ((xB + b.uncertaintyM) - (xA - a.uncertaintyM)) / dt;
   if (![vLo, vHi].every(num)) return abstain('INVALID_VELOCITY_ENVELOPE');
+  if (!positive(c.maxAbsWaveSpeedMps) || Math.abs(vLo) > c.maxAbsWaveSpeedMps ||
+      Math.abs(vHi) > c.maxAbsWaveSpeedMps) return abstain('UNCALIBRATED_OR_IMPLAUSIBLE_WAVE_SPEED');
   if (flowCheck !== null) {
     const w = lwrShockSpeed(flowCheck);
     if (w.status !== 'THEORETICAL_SPEED_ONLY' || !nonneg(maxFlowDisagreementMps))
