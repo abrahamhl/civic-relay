@@ -10,7 +10,7 @@ const b = {...a, atMs:NOW, chainageM:122960};
 const driver = {roadId:'A12',carriagewayId:'A12 EAST',direction:'INCREASING',
   mapMatched:true,chainageM:121500,uncertaintyM:5};
 const constraints = {driverSpeedRangeMps:[24,26],latencyRangeS:[0.3,1],
-  reactionRangeS:[1,2],decelerationRangeMs2:[4,6],clearanceMarginM:10,maxExtrapolationS:20,maxObservationGapS:30};
+  reactionRangeS:[1,2],decelerationRangeMs2:[4,6],clearanceMarginM:10,maxExtrapolationS:20,maxObservationGapS:30,maxAbsWaveSpeedMps:15};
 const evalQ = (o = {}) => projectQueueTailEnvelope({ observations:[a,b],driver,nowMs:NOW,constraints, ...o });
 const field = (extra={})=>({channelId:'BLE-A12',failureDomain:'PHONE_RADIO',measurementStratum:'A12 Android foreground clear',
   receiverAckType:'DESTINATION_ACK',authorizationGranted:true,consentGranted:true,
@@ -173,4 +173,15 @@ test('observation gap cannot silently extrapolate beyond declared temporal valid
 test('overflow and impossible huge numerical ranges abstain rather than claim safety',()=>{
   const huge={...constraints,driverSpeedRangeMps:[1e300,1e300],decelerationRangeMs2:[1,2]};
   assert.equal(evalQ({constraints:huge}).reason,'NUMERICAL_OVERFLOW');
+});
+
+test('unbounded or implausible queue shock speed is not treated as a safe extrapolation',()=>{
+  assert.equal(evalQ({constraints:{...constraints,maxAbsWaveSpeedMps:null}}).reason,'UNCALIBRATED_OR_IMPLAUSIBLE_WAVE_SPEED');
+  assert.equal(evalQ({constraints:{...constraints,maxAbsWaveSpeedMps:2}}).reason,'UNCALIBRATED_OR_IMPLAUSIBLE_WAVE_SPEED');
+});
+test('without explicit stratum, heterogeneous OS telemetry must not be pooled',()=>{
+  const r=evaluateCoverageBounds({channelEvidence:[field(),field({channelId:'IOS-LOCKED',
+    measurementStratum:'iOS locked'})],deadlineS:20,nowMs:NOW});
+  assert.equal(r.status,'ABSTAIN_MIXED_MEASUREMENT_STRATA');
+  assert.equal(r.channels.length,0);
 });
