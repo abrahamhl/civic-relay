@@ -1161,13 +1161,15 @@ export async function runPilotBNeighborhoodLab({
   });
 
   // 2. Puente de eventos Edge / MQTT (sensor adicional del edificio/barrio)
+  const mqttLabToken = globalThis.crypto?.randomUUID(); // ephemeral laboratory-only credential
+  if (!mqttLabToken) throw new Error('SECURE_RANDOM_UNAVAILABLE_FOR_LAB');
   const mqttBridge = createMqttEdgeBridge({
     id: 'EDGE-MQTT-BARRIO-BROKER-01',
-    authorizedTokens: ['edge-token-barrio-lab-01'],
+    authorizedTokens: [mqttLabToken],
     defaultRoadSegmentId: 'BARRIO-ACCESO-NORTE-01',
   });
   const edgeIngested = await mqttBridge.fetchObservation({
-    token: 'edge-token-barrio-lab-01',
+    token: mqttLabToken,
     nowMs,
     eventPayload: {
       schema: EDGE_EVENT_SCHEMA_VERSION,
