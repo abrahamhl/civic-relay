@@ -314,6 +314,7 @@ describe('SENDA Corridor Fabric — Plano C (Fusión Multisensor, Descuento de D
       observationType: 'STATIONARY_VEHICLE_OBSTRUCTION',
       value: { recordType: 'VehicleObstruction' },
       units: 'categorical',
+      provenance: { verificationState: 'LAB_VERIFIED', adapterId: 'EXPLICIT_TEST_FIXTURE' },
       confidence: 0.82,
     }, { nowMs });
 
@@ -325,6 +326,7 @@ describe('SENDA Corridor Fabric — Plano C (Fusión Multisensor, Descuento de D
       observationType: 'DASHCAM_HARD_BRAKING_AND_OBSTRUCTION',
       value: { imuDecelMps2: -4.4 },
       units: 'm/s2',
+      provenance: { verificationState: 'LAB_VERIFIED', adapterId: 'EXPLICIT_TEST_FIXTURE' },
       confidence: 0.85,
     }, { nowMs });
 
@@ -336,6 +338,7 @@ describe('SENDA Corridor Fabric — Plano C (Fusión Multisensor, Descuento de D
       observationType: 'HARD_BRAKING_OBD',
       value: { wheelSpeedKmh: 22 },
       units: 'km/h',
+      provenance: { verificationState: 'LAB_VERIFIED', adapterId: 'EXPLICIT_TEST_FIXTURE' },
       confidence: 0.84,
     }, { nowMs });
 
@@ -360,6 +363,7 @@ describe('SENDA Corridor Fabric — Plano C (Fusión Multisensor, Descuento de D
       observationType: 'STOPPED_VEHICLE_OBSTRUCTION',
       value: 1,
       units: 'boolean',
+      provenance: { verificationState: 'LAB_VERIFIED', adapterId: 'EXPLICIT_TEST_FIXTURE' },
       confidence: 0.62,
     }, { nowMs });
 
@@ -371,6 +375,7 @@ describe('SENDA Corridor Fabric — Plano C (Fusión Multisensor, Descuento de D
       observationType: 'TRAFFIC_SPEED_AND_FLOW',
       value: { averageSpeedKmh: 112, vehicleFlowVehH: 1400 },
       units: 'km/h',
+      provenance: { verificationState: 'LAB_VERIFIED', adapterId: 'EXPLICIT_TEST_FIXTURE' },
       confidence: 0.92,
     }, { nowMs });
 
