@@ -7,6 +7,16 @@ Updated 2026-11-18 — Research software, not a deployed emergency service.
 
 **ES.** SENDA es una plataforma de investigación y prototipado sobre prevención de accidentes y comunicaciones resilientes. Dirigí los escenarios de producto, coordiné desarrollo y auditoría adversarial asistidos por IA y prioricé un problema verificable: *¿puede llegar a tiempo un aviso al conductor que se aproxima a un final de cola móvil?* El sistema modela procedencia de evidencias, consentimiento y permisos, rutas de comunicación alternativas, predicción de colas, incertidumbre de entrega y abstención segura. También incluye interfaces web interactivas y pruebas automatizadas. **No** es un servicio de emergencia homologado ni validado físicamente.
 
+## What I designed, what AI assisted, and how to audit it
+
+This case is not presented as a claim that one person manually wrote every line. The founder supplied and iterated use cases, product priorities, human safety constraints and verification requirements. AI coding/research assistants contributed implementations, tests and analysis over multiple sessions. The auditable professional contribution is **problem decomposition, technical decision-making, orchestration, review discipline and explicit no-go gates**; individual per-line authorship requires the underlying commit/agent record.
+
+- [Technical decisions and algorithms (ES/EN)](TECHNICAL_DECISIONS_ES_EN.md) — causal deduplication, map-matched electronic horizon, moving queue-tail intervals, correlated delivery, alert fatigue and fail-closed permissions, with source files and evidence.
+- [AI orchestration and responsible attribution (ES/EN)](AI_ORCHESTRATION_ES_EN.md) — human leadership vs AI assistance, implementation/review hand-offs, version control, checks and unknown states.
+- [Interview briefing and 3-minute demonstration (ES/EN)](INTERVIEW_BRIEF_ES_EN.md) — grounded ways to explain the project for AI/SaaS/industrial IT employers.
+
+**ES.** Mi aporte profesional es transformar problemas de operaciones reales en requisitos y prototipos verificables; dirigir trabajo con IA no equivale a reclamar autoría humana de todos los cambios. Las ecuaciones LWR, Wilson y Fréchet son anteriores a SENDA. La aportación investigadora propuesta está en su combinación concreta y su evaluación, todavía sin demostración física independiente.
+
 ## Real-world problem → technical work → transferable skill
 
 | Pain point | SENDA prototype | Workplace skill |
