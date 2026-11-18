@@ -74,8 +74,8 @@ Fuentes públicas de orientación:
 - [x] Reenvío en sentido contrario con geometría de encuentro y margen útil.
 - [x] Probabilidades desconocidas no generan falsa confianza.
 - [x] Monte Carlo determinista con intervalo **solo de simulación**.
-- [x] Antisaturación, clasificación por ETA y deduplicación en recepción.
-- [x] Pruebas adversariales locales: **13/13** con Node 22.
+- [x] Antisaturación, clasificación por ETA, deduplicación en recepción y defensa ante eventos malformados.
+- [x] Pruebas adversariales locales: **14/14** con Node 22.
 - [x] Copia exacta de ambos módulos en el core web, para paridad sync-web.
 - [ ] Revisión de CI del PR y comparativa con nuevas fuentes de Claude.
 - [ ] Ensayo físico, UX con usuarios, autorización y validación externa.
