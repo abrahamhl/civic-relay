@@ -1,3 +1,9 @@
+> **For recruiters / Para selección de personal:** [SENDA — 2-minute engineering case study (EN/ES)](docs/career/RECRUITER_CASE_STUDY_ES_EN.md). The latest RoadSafe validation is documented in [`docs/roadsafe/`](docs/roadsafe/README.md). **Research prototype; not a field-tested public warning service.**
+>
+> **Perfil profesional:** [Creative Tech portfolio](https://creative-tech-portfolio.vercel.app/) — AI-assisted product workflows, UX/web delivery, industrial production experience in the Netherlands, Spanish/English and basic Dutch. Interested in remote/hybrid roles **based in Spain** and international B2B teams.
+>
+> **Why this is a technical project, not just a demo / Qué decisiones he dirigido:** [Algorithmic decision record ES/EN](docs/career/TECHNICAL_DECISIONS_ES_EN.md) · [AI orchestration, human/AI attribution and review gates ES/EN](docs/career/AI_ORCHESTRATION_ES_EN.md) · [3-minute interview walkthrough ES/EN](docs/career/INTERVIEW_BRIEF_ES_EN.md). These documents **do not change SENDA's functionality** and explicitly distinguish known mathematics, AI assistance and unverified field performance.
+
 # SENDA — Sistema de Enrutamiento de Emergencia por canales alternativos
 
 *(antes Civic Relay / OEP)* · **Si existe un camino hasta tu gente, SENDA lo encuentra.**
