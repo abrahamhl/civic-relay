@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './TransportStatus.css';
+import type { Locale } from '../i18n';
+import { t } from '../i18n';
 
-const TransportStatus: React.FC = () => {
+const TransportStatus: React.FC<{locale: Locale}> = ({locale}) => {
   const [online, setOnline] = useState(navigator.onLine);
 
   useEffect(() => {
@@ -22,7 +24,7 @@ const TransportStatus: React.FC = () => {
       <div className={`status-indicator ${online ? 'online' : 'offline'}`}>
         <span className="dot"></span>
         <span className="label">
-          {online ? 'IP Transport Available' : 'Offline - Messages Queued'}
+          {t(locale, online ? 'online' : 'offline')}
         </span>
       </div>
     </div>

@@ -156,7 +156,7 @@ function AdvancedSatellite({ position, label, active, delay = 0 }: { position: [
         <Html position={[0, 1, 0]} center className="pointer-events-none">
           <div className={`px-2 py-1 rounded bg-slate-900/80 backdrop-blur border text-xs font-mono tracking-widest flex flex-col items-center ${active ? 'border-green-500/50 text-green-400' : 'border-red-500/50 text-red-400'}`}>
             <span className="font-bold">{label}</span>
-            <span className="text-[8px] opacity-70">{active ? 'UPLINK ACTIVE' : 'NO SIGNAL'}</span>
+            <span className="text-[8px] opacity-70">{active ? 'SIMULATED ROUTE' : 'PATH INACTIVE'}</span>
           </div>
         </Html>
       </group>
@@ -236,9 +236,9 @@ export function SatelliteVisualization() {
       <div className="absolute top-6 left-6 z-20 flex flex-col gap-2 pointer-events-none">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.8)]" />
-          <span className="text-green-400 font-mono text-xs tracking-widest font-bold">SYSTEM ACTIVE</span>
+          <span className="text-green-400 font-mono text-xs tracking-widest font-bold">VISUAL SIMULATION</span>
         </div>
-        <div className="text-slate-400 font-mono text-xs">GLOBAL MESH PROTOCOL v2.1</div>
+        <div className="text-slate-400 font-mono text-xs">CONCEPTUAL TOPOLOGY · NOT LIVE</div>
       </div>
 
       <Canvas camera={{ position: [0, 4, 8], fov: 45 }} gl={{ antialias: true, alpha: false }}>
@@ -282,27 +282,27 @@ export function SatelliteVisualization() {
           <div className="flex items-center gap-4 text-xs font-mono text-white">
             <div className="flex items-center gap-2">
               <div className="w-3 h-0.5 bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
-              <span>SATELLITE UPLINK</span>
+              <span>SATELLITE CONCEPT</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-0.5 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
-              <span>TERRESTRIAL MESH</span>
+              <span>MESH CONCEPT</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-0.5 bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
-              <span>CELLULAR FALLBACK</span>
+              <span>CELLULAR CONCEPT</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)] animate-pulse" />
-              <span>ACTIVE RELAY</span>
+              <span>ILLUSTRATIVE RELAY</span>
             </div>
           </div>
         </div>
 
         <div className="text-right flex flex-col items-end gap-1 font-mono text-[10px] text-slate-500">
-          <div>DATA: AES-256 ENCRYPTED</div>
-          <div>LATENCY: &lt;45ms</div>
-          <div>PACKET LOSS: 0.001%</div>
+          <div>ENCRYPTION: NOT VALIDATED</div>
+          <div>LATENCY: NOT MEASURED</div>
+          <div>DELIVERY: NOT FIELD TESTED</div>
         </div>
       </div>
     </div>

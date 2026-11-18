@@ -1,22 +1,25 @@
 import React from 'react';
 import type { MessageType, Priority } from '@civic-relay/schemas';
 import './EmergencyButtons.css';
+import type { Locale } from '../i18n';
+import { t } from '../i18n';
 
 interface Props {
+  locale: Locale;
   onAction: (type: MessageType, priority: Priority) => void;
 }
 
-const EmergencyButtons: React.FC<Props> = ({ onAction }) => {
+const EmergencyButtons: React.FC<Props> = ({ onAction, locale }) => {
   return (
     <div className="emergency-buttons">
-      <h2>Quick Actions</h2>
+      <h2>{t(locale,'quickActions')}</h2>
       <div className="button-grid">
         <button
           className="emergency-btn safe"
           onClick={() => onAction('SAFE', 'LOW')}
         >
           <span className="icon">✓</span>
-          <span className="label">I'm Safe</span>
+          <span className="label">{t(locale,'safe')}</span>
         </button>
 
         <button
@@ -24,7 +27,7 @@ const EmergencyButtons: React.FC<Props> = ({ onAction }) => {
           onClick={() => onAction('SOS', 'CRITICAL')}
         >
           <span className="icon">🆘</span>
-          <span className="label">I Need Help</span>
+          <span className="label">{t(locale,'sos')}</span>
         </button>
 
         <button
@@ -32,7 +35,7 @@ const EmergencyButtons: React.FC<Props> = ({ onAction }) => {
           onClick={() => onAction('MEDICAL', 'HIGH')}
         >
           <span className="icon">⚕️</span>
-          <span className="label">Medical</span>
+          <span className="label">{t(locale,'medical')}</span>
         </button>
 
         <button
@@ -40,7 +43,7 @@ const EmergencyButtons: React.FC<Props> = ({ onAction }) => {
           onClick={() => onAction('FIRE', 'CRITICAL')}
         >
           <span className="icon">🔥</span>
-          <span className="label">Fire</span>
+          <span className="label">{t(locale,'fire')}</span>
         </button>
 
         <button
@@ -48,7 +51,7 @@ const EmergencyButtons: React.FC<Props> = ({ onAction }) => {
           onClick={() => onAction('INFRASTRUCTURE', 'MEDIUM')}
         >
           <span className="icon">⚠️</span>
-          <span className="label">Infrastructure</span>
+          <span className="label">{t(locale,'infrastructure')}</span>
         </button>
 
         <button
@@ -56,7 +59,7 @@ const EmergencyButtons: React.FC<Props> = ({ onAction }) => {
           onClick={() => onAction('GENERAL_REPORT', 'LOW')}
         >
           <span className="icon">📝</span>
-          <span className="label">General Report</span>
+          <span className="label">{t(locale,'report')}</span>
         </button>
       </div>
     </div>

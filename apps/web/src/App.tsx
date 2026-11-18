@@ -1,53 +1,65 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { createDemoSession } from '@civic-relay/core';
 import type { MessageType, Priority, MessageEnvelope } from '@civic-relay/schemas';
 import { LandingPage } from './components/LandingPage';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
 import EmergencyButtons from './components/EmergencyButtons';
 import TransportStatus from './components/TransportStatus';
 import MessageQueue from './components/MessageQueue';
 import IncidentMap from './components/IncidentMap';
 import { SimulationPanel } from './components/SimulationPanel';
+import { initialLocale, t } from './i18n';
+import type { Locale } from './i18n';
 import './App.css';
 
 const session = createDemoSession();
+// Every transport here is an in-page simulator, NEVER a physical link.
 session.transports.ip.setSimulatedState(true);
 session.transports.mesh.setSimulatedState(true, 3);
 session.transports.cellular.setSimulatedState(false);
 
-session.dispatcher.startPeriodicRetry(10000);
-
-(window as unknown as { civicRelay: unknown }).civicRelay = {
-  dispatcher: session.dispatcher,
-  receiver: session.receiver,
-  transports: session.transports,
-};
-
 function App() {
+  const [locale, setLocale] = useState<Locale>(initialLocale);
   const [showLanding, setShowLanding] = useState(true);
   const [messages, setMessages] = useState<MessageEnvelope[]>([]);
   const [role, setRole] = useState<'citizen' | 'coordinator'>('citizen');
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // Load from IndexedDB on mount to demonstrate offline persistence
-    session.dispatcher.getStore().loadFromStorage().then(() => {
-      setMessages([...session.dispatcher.getStore().getAll()].reverse());
-    });
+    document.documentElement.lang = locale;
+    localStorage.setItem('civic-relay-language', locale);
+    const url = new URL(window.location.href);
+    url.searchParams.set('lang', locale);
+    window.history.replaceState({}, '', url.toString());
+  }, [locale]);
 
-    const interval = setInterval(() => {
-      setMessages([...session.dispatcher.getStore().getAll()].reverse());
-    }, 1000);
-    return () => clearInterval(interval);
+  useEffect(() => {
+    let active = true;
+    const refresh = () => {
+      if (active) setMessages(session.dispatcher.getStore().getAll().reverse());
+    };
+    void session.dispatcher.getStore().loadFromStorage().then(refresh).catch(() => {
+      if (active) setError('Local storage is unavailable; this demo may lose its queue on reload.');
+    });
+    session.dispatcher.startPeriodicRetry(10000);
+    const id = window.setInterval(refresh, 1000);
+    return () => {
+      active = false;
+      clearInterval(id);
+      session.dispatcher.stopPeriodicRetry();
+    };
   }, []);
 
-  const handleEmergencyAction = async (type: MessageType, priority: Priority) => {
+  const sendTestMessage = async (type: MessageType, priority: Priority, body?: string) => {
+    setError('');
     const message = {
       id: crypto.randomUUID(),
       incidentId: null,
       createdAt: new Date().toISOString(),
       priority,
-      origin: 'demo-citizen',
+      origin: role === 'coordinator' ? 'simulated-coordinator' : 'simulated-citizen',
       payloadType: type,
-      payload: { text: `${type} (datos ficticios)` },
+      payload: { text: body ?? `TEST / ${type} — fictional data only` },
       approximateLocation: {
         lat: 40.4168,
         lon: -3.7038,
@@ -58,163 +70,74 @@ function App() {
       verificationState: 'UNVERIFIED' as const,
       deliveryHistory: [],
     };
-    await session.dispatcher.dispatch(message as never);
-  };
-
-  const runInvestorDemo = async () => {
-    const message = {
-      id: crypto.randomUUID(),
-      incidentId: 'INC-2026-VALENCIA',
-      createdAt: new Date().toISOString(),
-      priority: 'CRITICAL',
-      origin: 'UME-COMANDO-CENTRAL',
-      payloadType: 'EVACUATION',
-      payload: { text: 'ATENCIÓN: Unidad Militar de Emergencias. Vías principales bloqueadas. Punto de extracción habilitado en coordenadas marcadas. Mantengan la calma. Red Mesh activa.' },
-      approximateLocation: {
-        lat: 39.4699 + (Math.random() * 0.01 - 0.005),
-        lon: -0.3763 + (Math.random() * 0.01 - 0.005),
-        confidence: 'HIGH' as const,
-        source: 'GPS' as const,
-      },
-      ttl: 7200,
-      verificationState: 'OFFICIAL' as const,
-      deliveryHistory: [],
-    };
-    
-    const store = session.dispatcher.getStore();
-    store.enqueue(message as never);
-    // Simulate mesh delivery hop
-    store.recordDeliveryAttempt(message.id, {
-      transportId: 'meshtastic-web-bt-1',
-      status: 'DELIVERED',
-      timestamp: new Date().toISOString()
-    } as never);
-    
-    setMessages([...store.getAll()].reverse());
-  };
-
-  const dispatchSimulatedMessage = async (type: MessageType, priority: Priority, text: string, deliveryHistory: any[]) => {
-    const message = {
-      id: crypto.randomUUID(),
-      incidentId: null,
-      createdAt: new Date().toISOString(),
-      priority,
-      origin: role === 'coordinator' ? 'demo-coordinator' : 'demo-citizen',
-      payloadType: type,
-      payload: { text },
-      approximateLocation: {
-        lat: 40.4168 + (Math.random() * 0.01 - 0.005),
-        lon: -3.7038 + (Math.random() * 0.01 - 0.005),
-        confidence: 'HIGH' as const,
-        source: 'MANUAL' as const,
-      },
-      ttl: 3600,
-      verificationState: role === 'coordinator' ? 'OFFICIAL' as const : 'UNVERIFIED' as const,
-      deliveryHistory: [],
-    };
-    
-    const store = session.dispatcher.getStore();
-    store.enqueue(message as never);
-    
-    for (const attempt of deliveryHistory) {
-      store.recordDeliveryAttempt(message.id, attempt as never);
+    try {
+      await session.dispatcher.dispatch(message as MessageEnvelope);
+      setMessages(session.dispatcher.getStore().getAll().reverse());
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : String(cause));
     }
-    
-    setMessages([...store.getAll()].reverse());
   };
 
   if (showLanding) {
-    return <LandingPage onEnterApp={() => setShowLanding(false)} />;
+    return <LandingPage locale={locale} onLocaleChange={setLocale} onEnterApp={() => {
+      setShowLanding(false);
+      window.scrollTo(0, 0);
+    }} />;
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setShowLanding(true)}
-                className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
-              >
-                ← Volver
-              </button>
-              <h1 className="text-2xl font-bold">Civic Relay Demo</h1>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <span className="px-4 py-2 bg-white/20 rounded-lg text-sm">
-                {role === 'citizen' ? '👤 Ciudadano' : '🛡️ Coordinador'}
-              </span>
-              <button
-                onClick={() => setRole(role === 'citizen' ? 'coordinator' : 'citizen')}
-                className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
-              >
-                Cambiar Rol
-              </button>
-              <button
-                onClick={runInvestorDemo}
-                className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg font-bold shadow-lg transition-colors"
-                title="Inyectar alerta de la Unidad Militar de Emergencias para demostración técnica"
-              >
-                Simular Rescate Real (Demo Inversores)
-              </button>
-            </div>
+    <div className="min-h-screen bg-slate-100 text-slate-900">
+      <header className="bg-[#081a30] px-5 py-4 text-white shadow-lg">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-4">
+            <button type="button" onClick={() => { setShowLanding(true); window.scrollTo(0,0); }} className="rounded-lg border border-white/20 px-3 py-2 text-sm hover:bg-white/10">← {t(locale,'demoBack')}</button>
+            <h1 className="text-xl font-black">{t(locale,'demoTitle')}</h1>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="rounded-lg bg-white/10 px-3 py-2 text-xs">{t(locale,role === 'citizen' ? 'demoCitizen' : 'demoCoordinator')}</span>
+            <button type="button" onClick={() => setRole(role === 'citizen' ? 'coordinator' : 'citizen')} className="rounded-lg border border-white/20 px-3 py-2 text-sm hover:bg-white/10">{t(locale,'switchRole')}</button>
+            <LanguageSwitcher locale={locale} onChange={setLocale} dark />
           </div>
         </div>
       </header>
 
-      {/* Demo Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left column */}
-          <div className="lg:col-span-1 space-y-6">
-            <SimulationPanel role={role} session={session} dispatchSimulatedMessage={dispatchSimulatedMessage} />
-            
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-bold mb-4 text-slate-900">Estado de Transporte</h2>
-              <TransportStatus />
-            </div>
-
+      <main className="mx-auto max-w-7xl px-5 py-7">
+        <div role="note" className="mb-6 rounded-xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm font-semibold text-amber-950">{t(locale,'demoBanner')}</div>
+        {error && <div role="alert" className="mb-6 rounded-lg border border-red-300 bg-red-50 p-4 text-red-900">{error}</div>}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-1">
+            <SimulationPanel
+              locale={locale}
+              role={role}
+              dispatchSimulatedMessage={(type, priority, body) => sendTestMessage(type, priority, body)}
+            />
+            <section className="rounded-xl bg-white p-6 shadow">
+              <h2 className="mb-4 text-xl font-bold">{t(locale,'demoTransport')}</h2>
+              <TransportStatus locale={locale}/>
+            </section>
             {role === 'citizen' && (
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <h2 className="text-xl font-bold mb-4 text-slate-900">Acciones de Emergencia</h2>
-                <EmergencyButtons onAction={handleEmergencyAction} />
-              </div>
+              <section className="rounded-xl bg-white p-6 shadow">
+                <h2 className="mb-4 text-xl font-bold">{t(locale,'demoActions')}</h2>
+                <EmergencyButtons locale={locale} onAction={sendTestMessage}/>
+              </section>
             )}
           </div>
-
-          {/* Right column */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-bold mb-4 text-slate-900">Cola de Mensajes</h2>
-              <MessageQueue
-                messages={messages}
-              />
-            </div>
-
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-bold mb-4 text-slate-900">Mapa de Incidentes</h2>
-              <IncidentMap messages={messages} />
-            </div>
+          <div className="space-y-6 lg:col-span-2">
+            <section className="rounded-xl bg-white p-6 shadow">
+              <h2 className="mb-4 text-xl font-bold">{t(locale,'demoQueue')}</h2>
+              <MessageQueue locale={locale} messages={messages}/>
+            </section>
+            <section className="rounded-xl bg-white p-6 shadow">
+              <h2 className="mb-4 text-xl font-bold">{t(locale,'demoMap')}</h2>
+              <IncidentMap locale={locale} messages={messages}/>
+            </section>
           </div>
         </div>
-
-        {/* Info banner */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <div className="flex items-start gap-4">
-            <span className="text-3xl">🚀</span>
-            <div>
-              <h3 className="font-bold text-blue-900 mb-2">PWA Offline-First Activado</h3>
-              <p className="text-sm text-blue-800">
-                Esta aplicación ya cuenta con un Service Worker que permite su uso sin conexión y persistencia real mediante IndexedDB. 
-                Si recargas la página o pierdes la conexión, los mensajes no se perderán. Prepara el soporte para el protocolo Meshtastic WebBluetooth.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+        <section className="mt-8 rounded-xl border border-blue-200 bg-blue-50 p-6">
+          <h2 className="mb-2 font-bold text-blue-950">{t(locale,'demoInfoTitle')}</h2>
+          <p className="text-sm leading-6 text-blue-950">{t(locale,'demoInfoBody')}</p>
+        </section>
+      </main>
     </div>
   );
 }

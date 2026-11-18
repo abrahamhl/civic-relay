@@ -1,30 +1,33 @@
 import React from 'react';
 import type { MessageEnvelope } from '@civic-relay/schemas';
 import './MessageQueue.css';
+import type { Locale } from '../i18n';
+import { t } from '../i18n';
 
 interface Props {
+  locale: Locale;
   messages: MessageEnvelope[];
 }
 
-const MessageQueue: React.FC<Props> = ({ messages }) => {
+const MessageQueue: React.FC<Props> = ({ messages, locale }) => {
   const getDeliveryStatus = (message: MessageEnvelope): string => {
     const delivered = message.deliveryHistory.filter(a => a.status === 'DELIVERED');
     if (delivered.length > 0) {
-      return `✓ Delivered via ${delivered.length} path${delivered.length > 1 ? 's' : ''}`;
+      return `✓ ${t(locale,'queuePaths')}: ${delivered.length}`;
     }
     const queued = message.deliveryHistory.filter(a => a.status === 'QUEUED');
     if (queued.length > 0) {
-      return `⏳ Queued`;
+      return `⏳ ${t(locale,'queueQueued')}`;
     }
-    return '⏳ Pending';
+    return `⏳ ${t(locale,'queuePending')}`;
   };
 
   const getVerificationBadge = (state: string): React.ReactNode => {
     const badges: Record<string, { label: string; className: string }> = {
-      UNVERIFIED: { label: 'Unverified', className: 'badge-unverified' },
-      CORROBORATED: { label: 'Corroborated', className: 'badge-corroborated' },
-      OFFICIAL: { label: 'Official', className: 'badge-official' },
-      DISPUTED: { label: 'Disputed', className: 'badge-disputed' },
+      UNVERIFIED: { label: t(locale,'unverified'), className: 'badge-unverified' },
+      CORROBORATED: { label: t(locale,'corroborated'), className: 'badge-corroborated' },
+      OFFICIAL: { label: t(locale,'official'), className: 'badge-official' },
+      DISPUTED: { label: t(locale,'disputed'), className: 'badge-disputed' },
     };
     const badge = badges[state] || badges.UNVERIFIED;
     return <span className={`verification-badge ${badge.className}`}>{badge.label}</span>;
@@ -33,14 +36,14 @@ const MessageQueue: React.FC<Props> = ({ messages }) => {
   if (messages.length === 0) {
     return (
       <div className="message-queue empty">
-        <p>No messages yet. Use the buttons above to report an incident.</p>
+        <p>{t(locale,'queueEmpty')}</p>
       </div>
     );
   }
 
   return (
     <div className="message-queue">
-      <h2>Message History</h2>
+      <h2>{t(locale,'queueHistory')}</h2>
       <div className="message-list">
         {messages.map((msg) => (
           <div key={msg.id} className="message-card">
@@ -61,7 +64,7 @@ const MessageQueue: React.FC<Props> = ({ messages }) => {
             </div>
             {msg.deliveryHistory.length > 0 && (
               <details className="message-details">
-                <summary>Delivery History ({msg.deliveryHistory.length} attempts)</summary>
+                <summary>{t(locale,'queueAttempts')} ({msg.deliveryHistory.length})</summary>
                 <ul>
                   {msg.deliveryHistory.map((attempt, i) => (
                     <li key={i}>
