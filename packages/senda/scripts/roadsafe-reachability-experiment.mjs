@@ -32,7 +32,7 @@ export function experiment({seed=20261118, trials=4000}={}) {
       driver:{...road,chainageM:driverObs,uncertaintyM:5},nowMs:NOW,
       constraints:{driverSpeedRangeMps:[speedMin,speedMax],latencyRangeS:[0.4,5],
         reactionRangeS:[0.7,3],decelerationRangeMs2:[1.7,7.5],
-        clearanceMarginM:margin,maxExtrapolationS:10,maxObservationGapS:30}
+        clearanceMarginM:margin,maxExtrapolationS:10,maxObservationGapS:30,maxAbsWaveSpeedMps:20}
     };
     const r=projectQueueTailEnvelope(input);
     const closure=speed-waveSpeed;
