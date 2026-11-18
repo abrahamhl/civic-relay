@@ -69,6 +69,7 @@ export * from './copernicus-cdse.mjs';
 export * from './nasa-firms.mjs';
 export * from './calibration-diagram.mjs';
 export * from './source-evidence.mjs';
+export * from './area-activation.mjs';
 // Defensa y doble uso: aislado en './defense/index.mjs' (importar '@senda/core/defense'), nunca desde aquí.
 export * from './vigia.mjs';
 export * from './courier.mjs';
@@ -84,6 +85,9 @@ export { TEXT_PREFIX as BEARER_TEXT_PREFIX } from './bearers.mjs';
 export { TEXT_PREFIX as SDP_TEXT_PREFIX } from './sdp-compact.mjs';
 export { ACCESS as SATELLITE_ACCESS } from './satellites.mjs';
 export { ACCESS as SENSOR_ACCESS } from './sensor-fabric.mjs';
+// EVIDENCE_LR existe en dos módulos (consolidación 2026-11-18): versiones con nombre propio.
+export { EVIDENCE_LR as EVIDENCE_LR_AREA } from './area-activation.mjs';
+export { EVIDENCE_LR as EVIDENCE_LR_REPORTS } from './hazard-reports.mjs';
 export { ACCESS as PLATFORM_ACCESS } from './platforms.mjs';
 export { parseFirmsCsv as parseFirmsCsvWildfire } from './wildfire.mjs';
 export { parseFirmsCsv as parseFirmsCsvNasa } from './nasa-firms.mjs';

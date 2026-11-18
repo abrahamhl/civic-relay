@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 // Con `export *`, un nombre exportado por dos módulos desaparece del índice sin error. Esta prueba lo detecta.
-const RESOLVED = new Set(['TEXT_PREFIX', 'ACCESS', 'parseFirmsCsv', 'satVapHpa']); // con alias explícitos en index.mjs
+const RESOLVED = new Set(['TEXT_PREFIX', 'ACCESS', 'parseFirmsCsv', 'satVapHpa', 'EVIDENCE_LR']); // con alias explícitos en index.mjs
 
 test('índice: ningún nombre queda oculto por un choque entre módulos sin resolver', () => {
   const src = (f) => readFileSync(new URL(`../src/${f}`, import.meta.url), 'utf8');
@@ -16,5 +16,5 @@ test('índice: ningún nombre queda oculto por un choque entre módulos sin reso
 
 test('índice: las versiones de los nombres repetidos son accesibles con nombre propio', async () => {
   const m = await import('../src/index.mjs');
-  for (const n of ['BEARER_TEXT_PREFIX', 'SDP_TEXT_PREFIX', 'SATELLITE_ACCESS', 'SENSOR_ACCESS', 'PLATFORM_ACCESS', 'parseFirmsCsvWildfire', 'parseFirmsCsvNasa', 'satVapHpaFireWatch', 'satVapHpaAtmos']) assert.ok(n in m, n);
+  for (const n of ['BEARER_TEXT_PREFIX', 'SDP_TEXT_PREFIX', 'SATELLITE_ACCESS', 'SENSOR_ACCESS', 'PLATFORM_ACCESS', 'parseFirmsCsvWildfire', 'parseFirmsCsvNasa', 'satVapHpaFireWatch', 'satVapHpaAtmos', 'EVIDENCE_LR_AREA', 'EVIDENCE_LR_REPORTS']) assert.ok(n in m, n);
 });
