@@ -101,6 +101,8 @@ for (const vp of [{ name: 'movil', width: 390, height: 844 }, { name: 'escritori
   check(`${vp.name}: carretera — horizonte con cola y escena por delante y frase de voz`, khor.length >= 2 && /QUEUE_TAIL/.test(khor[0]) && khor.every((x) => /Atención/.test(x)), { khor });
   const spk = await page.$$eval('#k-hor [data-k=spk]', (l) => l.length);
   check(`${vp.name}: carretera — presupuesto de atención: exactamente un aviso se dice ahora`, spk === 1, { spk });
+  const urg = await page.$$eval('#k-hor [data-k=urg]', (l) => l.map((x) => x.textContent)), sightTxt = await page.textContent('#k-sight');
+  check(`${vp.name}: carretera — urgencia física (DRAC) por aviso y visibilidad calculada por trazado`, urg.length >= 2 && urg.every((t) => /DRAC/.test(t)) && +(sightTxt.match(/(\d+) m/) ?? [])[1] > 0, { urg, sightTxt });
   const ble = await page.textContent('#k-ble'); await page.fill('#k-pen', '0.4'); await page.dispatchEvent('#k-pen', 'input'); const ble2 = await page.textContent('#k-ble');
   const reach = (t) => +(t.match(/(\d+) m/) ?? [])[1];
   check(`${vp.name}: carretera — cadena BLE: más penetración ⇒ más alcance`, reach(ble2) > reach(ble), { ble, ble2 });

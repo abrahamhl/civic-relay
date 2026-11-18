@@ -224,6 +224,7 @@ import { severityProbability } from '/senda/core/roadsafe-severity-model.mjs';
 import { makeWarning, createWarningBus, fromDatexHazard, fromFrameAssessment, fromIncidentTwin, planFanOut, v2vUpstreamDelivery } from '/senda/core/roadsafe-warning-bus.mjs';
 import { roadAhead } from '/senda/core/roadsafe-horizon.mjs';
 import { createAttentionPlanner, bleRelayReach } from '/senda/core/roadsafe-attention.mjs';
+import { sightDistanceAlong, physicalUrgency, urgencyPhrase } from '/senda/core/roadsafe-drive-physics.mjs';
 import { pointAt, roadLocate, encodeHazard, HAZARD } from '/senda/core/road-guard.mjs';
 import { assessHazardFrame, createFrameSigner, createTrustStore, signHazardCapsule } from '/senda/core/roadsafe-frame-trust.mjs';
 import { navigationLinks, toCifsIncident, validateCifs } from '/senda/core/roadsafe-interop.mjs';
@@ -562,10 +563,14 @@ function renderHorizon() {
  const r = roadAhead({ ...p0, headingDeg: hdg, speedMs: 25 }, KROAD, KBUS.bus.active(KBUS.t), { now: KBUS.t, horizonM: 2000, horizonS: 120, maxOffRoadM: 30 });
  const VK = { STOPPED_VEHICLE_SHOULDER: 'STOPPED_SHOULDER', STOPPED_VEHICLE_LANE: 'STOPPED_LANE', ACCIDENT: 'ACCIDENT', SECONDARY_COLLISION: 'ACCIDENT', QUEUE_TAIL: 'QUEUE_TAIL', SERVICE_STOPPING: 'SERVICE_STOPPING' };
  // Presupuesto de atención: política DECLARADA de ejemplo (no medida) → como mucho un aviso por turno.
+ // Física: visibilidad desde la geometría y deceleración necesaria por aviso (política de EJEMPLO declarada, no medida).
+ const sight = sightDistanceAlong(KROAD, { ...p0, headingDeg: hdg }, { clearanceM: 6, maxM: 1500, stepM: 10 });
+ const PHYS = { reactS: 1.5, marginM: 10, mu: 0.4, comfortDecelMs2: 3, prepareDecelMs2: 1 };
+ r.items = physicalUrgency(r.items, { vMs: 25, sightM: sight.sightM }, PHYS);
  const att = createAttentionPlanner({ tMinS: 8, tMaxS: 600, budgetPerWindow: 3, windowS: 300, minGapS: 20 }).next(r.items, KBUS.t);
  const tag = (i) => att.speak?.warningId === i.warningId ? `<span class="badge b-warn" data-k="spk">${esc(L('se dice ahora', 'spoken now', 'nu gemeld'))}</span>` : (att.queued ?? []).includes(i.warningId) ? `<span class="badge b-info">${esc(L('en cola', 'queued', 'in wachtrij'))}</span>` : `<span class="badge b-info">${esc((att.reasons.find((x) => x.id === i.warningId)?.why) ?? '—')}</span>`;
- $('#k-hor').innerHTML = r.items.map((i) => `<li><time>${i.aheadM} m · ${i.etaS ?? '—'} s</time>${tag(i)} <b>${esc(i.kind)}</b> <span class="badge ${i.ceiling === 'WARNING' ? 'b-warn' : 'b-info'}">${esc(i.trust)}</span><br><span class="m">«${esc(VK[i.kind] ? phrase({ kind: VK[i.kind], distanceM: i.aheadM, lang }) : i.kind)}»</span></li>`).join('');
- $('#k-hor-meta').textContent = `${L('Posición', 'Position', 'Positie')}: ${r.position.roadId} PK ${r.position.pk} · ${L('horizonte', 'horizon', 'horizon')} ${r.horizonM} m · ${L('descartados', 'dropped', 'verworpen')}: ${r.dropped.length} · ${L('presupuesto de atención de ejemplo: 3 avisos / 5 min, 20 s entre avisos (declarado, no medido)', 'example attention budget: 3 warnings / 5 min, 20 s apart (declared, not measured)', 'voorbeeld-aandachtsbudget: 3 meldingen / 5 min, 20 s ertussen (opgegeven, niet gemeten)')}`;
+ $('#k-hor').innerHTML = r.items.map((i) => `<li><time>${i.aheadM} m · ${i.etaS ?? '—'} s</time>${tag(i)} <b>${esc(i.kind)}</b> <span class="badge ${i.ceiling === 'WARNING' ? 'b-warn' : 'b-info'}">${esc(i.trust)}</span> <span class="badge ${i.urgency === 'IMMINENT' || i.urgency === 'BRAKE' ? 'b-bad' : 'b-info'}" data-k="urg">${esc(i.urgency)} · DRAC ${i.dracMs2 ?? '∞'} m/s²${i.hidden ? ' · ' + esc(L('oculto', 'hidden', 'verborgen')) : ''}</span>${urgencyPhrase(i, lang) ? ` <b>${esc(urgencyPhrase(i, lang))}</b>` : ''}<br><span class="m">«${esc(VK[i.kind] ? phrase({ kind: VK[i.kind], distanceM: i.aheadM, lang }) : i.kind)}»</span></li>`).join('');
+ $('#k-hor-meta').innerHTML = `${L('Posición', 'Position', 'Positie')}: ${r.position.roadId} PK ${r.position.pk} · ${L('horizonte', 'horizon', 'horizon')} ${r.horizonM} m · ${L('descartados', 'dropped', 'verworpen')}: ${r.dropped.length} · <span id="k-sight">${L('visibilidad por trazado', 'sight distance from geometry', 'zichtafstand uit tracé')}: ${sight.sightM} m</span> (${L('despeje 6 m, μ 0,4, reacción 1,5 s: ejemplo declarado', 'clearance 6 m, μ 0.4, reaction 1.5 s: declared example', 'vrije ruimte 6 m, μ 0,4, reactie 1,5 s: opgegeven voorbeeld')}) · ${L('presupuesto de atención de ejemplo: 3 avisos / 5 min, 20 s entre avisos (declarado, no medido)', 'example attention budget: 3 warnings / 5 min, 20 s apart (declared, not measured)', 'voorbeeld-aandachtsbudget: 3 meldingen / 5 min, 20 s ertussen (opgegeven, niet gemeten)')}`;
 }
 function renderV2v() {
  const pen = +$('#k-pen').value, opp = +$('#k-opp').value; $('#o-kpen').textContent = pen; $('#o-kopp').textContent = opp;

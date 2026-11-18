@@ -32,18 +32,23 @@ export function createAttentionPlanner(policy) {
       const reasons = [];
       const cands = items.filter((i) => {
         if (!Number.isFinite(i.etaS)) { reasons.push({ id: i.warningId, why: 'sin tiempo de llegada (vehículo parado)' }); return false; }
-        if (i.etaS < policy.tMinS) { reasons.push({ id: i.warningId, why: 'tardío: prioridad a la percepción directa' }); return false; }
+        // tardío ⇒ manda la percepción directa, SALVO que el peligro esté oculto o exija frenar ya
+        if (i.etaS < policy.tMinS && !(i.hidden || i.urgency === 'IMMINENT' || i.urgency === 'BRAKE')) { reasons.push({ id: i.warningId, why: 'tardío: prioridad a la percepción directa' }); return false; }
         if (i.etaS > policy.tMaxS) { reasons.push({ id: i.warningId, why: 'demasiado lejos todavía' }); return false; }
         const said = spoken.filter((s) => s.id === i.warningId);
         if (said.length && said.at(-1).aheadM - i.aheadM < 400) { reasons.push({ id: i.warningId, why: 'ya anunciado a esta distancia' }); return false; }
         return true;
       });
-      const rank = (i) => [i.ceiling === 'WARNING' ? 1 : 0, KIND_PRIORITY[i.kind] ?? 0, -i.etaS];
+      // Urgencia física (roadsafe-drive-physics) manda sobre todo lo demás cuando existe: lo que obliga a frenar va primero.
+      const U = { IMMINENT: 3, BRAKE: 2, PREPARE: 1, INFO: 0 };
+      const rank = (i) => [U[i.urgency] ?? 0, i.hidden ? 1 : 0, i.ceiling === 'WARNING' ? 1 : 0, KIND_PRIORITY[i.kind] ?? 0, -i.etaS];
       cands.sort((a, b) => { const A = rank(a), B = rank(b); for (let k = 0; k < A.length; k++) if (A[k] !== B[k]) return B[k] - A[k]; return 0; });
       const top = cands[0];
       if (!top) return { speak: null, reasons };
       const isContext = top.kind === 'HOTSPOT_CONTEXT';
       const budgetLeft = policy.budgetPerWindow - recent.length;
+      const physical = top.urgency === 'IMMINENT' || top.urgency === 'BRAKE'; // la seguridad no se raciona
+      if (physical) { spoken.push({ id: top.warningId, at: now, aheadM: top.aheadM }); return { speak: top, queued: cands.slice(1).map((c) => c.warningId), reasons, budgetLeft: Math.max(0, budgetLeft - 1), bypass: 'URGENCIA_FISICA' }; }
       if (budgetLeft <= 0) return { speak: null, reasons: [...reasons, { id: top.warningId, why: 'presupuesto de atención agotado en la ventana' }] };
       if (isContext && budgetLeft <= 1) return { speak: null, reasons: [...reasons, { id: top.warningId, why: 'contexto: solo con presupuesto sobrante' }] };
       const urgent = top.ceiling === 'WARNING' && (KIND_PRIORITY[top.kind] ?? 0) >= 6;

@@ -1,5 +1,17 @@
 # Changelog
 
+## SENDA RoadSafe · 18-11-2026 (VII) · Física de la conducción: visibilidad por trazado, DRAC y peligro oculto
+
+**Entrada (fundador):** seguir desarrollando capacidades para evitar accidentes, centradas en la conducción, con ingeniería real.
+
+**Procesamiento:**
+- `roadsafe-drive-physics.mjs`: visibilidad hacia delante calculada con la geometría de la vía, DRAC, velocidad máxima para parar y urgencia física (INFO, PREPARE, BRAKE, IMMINENT, más «oculto tras la curva» con velocidad aconsejada).
+- El planificador de atención prioriza la urgencia física, no la raciona y rescata lo tardío si está oculto.
+- La pestaña Carretera muestra la DRAC y la visibilidad.
+- Documento 12.
+
+**Validación:** núcleo 794/794; adversariales 31/31; Chromium 74/74. Visibilidad numérica frente a la fórmula de la ordenada media: 98/98,2 m, 160/160,3 m y 178/179,0 m. — Firma: Claude (Asistente de Orquestación Senior)
+
 ## SENDA RoadSafe · 18-11-2026 (VI) · La carretera como senda principal: bus de avisos, horizonte, atención e intercambio entre dispositivos
 
 **Entrada (fundador):** trabajo continuado y más ambicioso; priorizar los avisos en carretera y que la carretera sea la senda principal multidispositivo, multisoftware y de refuerzo.

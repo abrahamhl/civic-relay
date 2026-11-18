@@ -14,6 +14,7 @@ Capa federada de prevención de colisiones secundarias y coordinación de asiste
 | 7 | [07_DATASET_ES_DE_NL_BE.md](07_DATASET_ES_DE_NL_BE.md) | Dataset oficial armonizado (652 224 accidentes ES/DE/NL/FR/GB), hallazgos replicados |
 | 10 | [10_SEVERITY_MODEL_CALIBRATION.md](10_SEVERITY_MODEL_CALIBRATION.md) | Modelo multivariante de gravedad (551 260 accidentes, AUC 0,78), OR ajustados, validación por país |
 | 11 | [11_ROAD_BACKBONE_WARNING_BUS.md](11_ROAD_BACKBONE_WARNING_BUS.md) | La carretera como senda principal: bus de avisos, horizonte, presupuesto de atención, cadena BLE frente a portador del sentido contrario, intercambio entre dispositivos blindado |
+| 12 | [12_DRIVING_PHYSICS_SIGHT_URGENCY.md](12_DRIVING_PHYSICS_SIGHT_URGENCY.md) | Conducción: visibilidad calculada por trazado (validada con la ordenada media), deceleración necesaria (DRAC) y peligro oculto tras la curva; la urgencia física manda en la atención |
 | 9 | [09_DIFFERENTIATION_DETECTION_SECURITY.md](09_DIFFERENTIATION_DETECTION_SECURITY.md) | Soluciones existentes, diferenciación, detección de accidentes, blindaje |
 | 8 | [08_COMPANION_WAZE_SENSORS_STRATEGY.md](08_COMPANION_WAZE_SENSORS_STRATEGY.md) | Alcance a todos los conductores, Waze, sensores, física del impacto, emergencia guiada |
 | 6 | [06_CASUISTRY_RISK_AND_CONCLUSIONS.md](06_CASUISTRY_RISK_AND_CONCLUSIONS.md) | Evidencia con fuentes, 8 mecanismos, probabilidades por circunstancia, conclusiones |

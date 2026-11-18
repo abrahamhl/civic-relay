@@ -1,8 +1,8 @@
 {
   "schema": "senda-roadsafe-e2e/1",
   "browser": "chromium (playwright)",
-  "at": "2026-11-18T18:18:19.061Z",
-  "passed": 72,
+  "at": "2026-11-18T18:26:24.189Z",
+  "passed": 74,
   "failed": 0,
   "results": [
     {
@@ -34,7 +34,7 @@
     {
       "name": "movil: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-74879232e9067bad · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-62a54732ec80e6ce · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -44,7 +44,7 @@
     {
       "name": "movil: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-74879232e9067bad · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-e7414af6b0ae8451 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: idioma en",
@@ -158,7 +158,7 @@
       "name": "movil: carretera — 4 canales funden en 1 escena (oficial) + cola aparte",
       "ok": true,
       "kbus": [
-        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:5cc18592 · DATEX2:NAP",
+        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:524c2a27 · DATEX2:NAP",
         "QUEUE_TAILUNVERIFIED_HINT1ZONE_MODEL"
       ]
     },
@@ -172,14 +172,23 @@
       "name": "movil: carretera — horizonte con cola y escena por delante y frase de voz",
       "ok": true,
       "khor": [
-        "900 m · 36 sen cola QUEUE_TAIL UNVERIFIED_HINT«Atención: final de retención a 900 metros. Precaución.»",
-        "1500 m · 60 sse dice ahora ACCIDENT OFFICIAL_FEED«Atención: accidente a 2 kilómetros. Precaución.»"
+        "900 m · 36 sen cola QUEUE_TAIL UNVERIFIED_HINT INFO · DRAC 0.37 m/s²«Atención: final de retención a 900 metros. Precaución.»",
+        "1500 m · 60 sse dice ahora ACCIDENT OFFICIAL_FEED INFO · DRAC 0.22 m/s²«Atención: accidente a 2 kilómetros. Precaución.»"
       ]
     },
     {
       "name": "movil: carretera — presupuesto de atención: exactamente un aviso se dice ahora",
       "ok": true,
       "spk": 1
+    },
+    {
+      "name": "movil: carretera — urgencia física (DRAC) por aviso y visibilidad calculada por trazado",
+      "ok": true,
+      "urg": [
+        "INFO · DRAC 0.37 m/s²",
+        "INFO · DRAC 0.22 m/s²"
+      ],
+      "sightTxt": "visibilidad por trazado: 1230 m"
     },
     {
       "name": "movil: carretera — cadena BLE: más penetración ⇒ más alcance",
@@ -241,7 +250,7 @@
     {
       "name": "escritorio: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-d7d3e508de29798e · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-245b88d730c79293 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -251,7 +260,7 @@
     {
       "name": "escritorio: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-d7d3e508de29798e · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-245b88d730c79293 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: idioma en",
@@ -365,7 +374,7 @@
       "name": "escritorio: carretera — 4 canales funden en 1 escena (oficial) + cola aparte",
       "ok": true,
       "kbus": [
-        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:8d3199a6 · DATEX2:NAP",
+        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:9c9c5738 · DATEX2:NAP",
         "QUEUE_TAILUNVERIFIED_HINT1ZONE_MODEL"
       ]
     },
@@ -379,14 +388,23 @@
       "name": "escritorio: carretera — horizonte con cola y escena por delante y frase de voz",
       "ok": true,
       "khor": [
-        "900 m · 36 sen cola QUEUE_TAIL UNVERIFIED_HINT«Atención: final de retención a 900 metros. Precaución.»",
-        "1500 m · 60 sse dice ahora ACCIDENT OFFICIAL_FEED«Atención: accidente a 2 kilómetros. Precaución.»"
+        "900 m · 36 sen cola QUEUE_TAIL UNVERIFIED_HINT INFO · DRAC 0.37 m/s²«Atención: final de retención a 900 metros. Precaución.»",
+        "1500 m · 60 sse dice ahora ACCIDENT OFFICIAL_FEED INFO · DRAC 0.22 m/s²«Atención: accidente a 2 kilómetros. Precaución.»"
       ]
     },
     {
       "name": "escritorio: carretera — presupuesto de atención: exactamente un aviso se dice ahora",
       "ok": true,
       "spk": 1
+    },
+    {
+      "name": "escritorio: carretera — urgencia física (DRAC) por aviso y visibilidad calculada por trazado",
+      "ok": true,
+      "urg": [
+        "INFO · DRAC 0.37 m/s²",
+        "INFO · DRAC 0.22 m/s²"
+      ],
+      "sightTxt": "visibilidad por trazado: 1230 m"
     },
     {
       "name": "escritorio: carretera — cadena BLE: más penetración ⇒ más alcance",
