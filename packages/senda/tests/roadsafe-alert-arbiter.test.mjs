@@ -49,3 +49,10 @@ test('clock rewind abstains rather than reopening stale cooldown', () => {
   const a = createDriverAlertArbiter(); a.consider([hazard()], opts(130));
   assert.equal(a.consider([hazard()], opts(120)).status, 'ABSTAIN');
 });
+test('malicious prototype-like severity and oversized batches fail closed', () => {
+  const a = createDriverAlertArbiter();
+  const r = a.consider([hazard({ severity: '__proto__' }), hazard({ hazardType: '' })], opts(110));
+  assert.equal(r.screen.length, 0);
+  assert.equal(r.suppressed.length, 2);
+  assert.equal(a.consider(Array.from({ length: 2001 }, () => hazard()), opts(111)).status, 'ABSTAIN');
+});
