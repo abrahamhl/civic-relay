@@ -48,7 +48,7 @@ export function renderRoadLab() {
     driver:{...tailRef,chainageM:121500,uncertaintyM:10},nowMs,
     constraints:{driverSpeedRangeMps:[Math.max(0,speed/3.6-2),speed/3.6+2],
       latencyRangeS:[1,4],reactionRangeS:[1,3],decelerationRangeMs2:[2,5],
-      clearanceMarginM:20,maxExtrapolationS:30,maxObservationGapS:30}
+      clearanceMarginM:20,maxExtrapolationS:30,maxObservationGapS:30,maxAbsWaveSpeedMps:15}
   });
   const coverage=evaluateCoverageBounds({
     channelEvidence:[{channelId:'LAB-BLE',failureDomain:'PHONE_RADIO',
