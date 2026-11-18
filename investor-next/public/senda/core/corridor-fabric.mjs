@@ -143,7 +143,7 @@ export function correlateCorridorObservations(observations, {
   let rejectedStaleCount = 0;
 
   for (const raw of observations) {
-    const obs = raw.observationId ? raw : normalizeObservation(raw, { nowMs });
+    const obs = normalizeObservation(raw, { nowMs }); // never bypass validation with a caller-supplied ID
     const measuredMs = Date.parse(obs.measuredAtUtc);
     const ageMs = Math.max(0, nowMs - measuredMs);
     if (ageMs > maxWindowMs || obs.freshnessState === 'STALE') {
@@ -151,7 +151,7 @@ export function correlateCorridorObservations(observations, {
       continue;
     }
     const timeBucket = Math.floor(measuredMs / 10_000);
-    const dedupKey = `${obs.sourceId}:${obs.observationType}:${obs.sourcePayloadHash}:${timeBucket}`;
+    const dedupKey = `${obs.sourceId}:${obs.observationId}:${obs.observationType}:${obs.sourcePayloadHash}:${timeBucket}`; // one DATEX payload may contain many distinct situation IDs
     if (seenKeys.has(dedupKey)) {
       deduplicatedCount += 1;
       continue;
@@ -210,6 +210,7 @@ export function correlateCorridorObservations(observations, {
     let logOdds = priorLogOdds;
     let incidentSignals = 0;
     let freeFlowSignals = 0;
+    let unqualifiedSignals = 0;
     const explainability = [];
     const uniqueSources = new Set();
     const uniqueFamilies = new Set();
@@ -233,9 +234,13 @@ export function correlateCorridorObservations(observations, {
       const signalClass = classifyObservationSignal(obs);
 
       let deltaLogOdds = 0;
-      if (signalClass === 'INCIDENT_SIGNAL') {
+      const verifiedSource = ['LIVE_VERIFIED', 'RECORDED_REAL_SAMPLE', 'LAB_VERIFIED'].includes(obs.provenance?.verificationState);
+      const hasUsableConfidence = Number.isFinite(obs.confidence) && obs.confidence > 0.5 && obs.confidence <= 1;
+      if (!verifiedSource || !hasUsableConfidence) {
+        unqualifiedSignals += 1; // lack of evidence must NOT become free-flow reassurance
+      } else if (signalClass === 'INCIDENT_SIGNAL') {
         incidentSignals += 1;
-        const p = Math.min(0.95, Math.max(0.55, obs.confidence));
+        const p = Math.min(0.95, obs.confidence);
         deltaLogOdds = Math.log(p / (1 - p)) * effectiveWeight;
       } else if (signalClass === 'FREE_FLOW_SIGNAL') {
         freeFlowSignals += 1;
@@ -265,7 +270,11 @@ export function correlateCorridorObservations(observations, {
     let abstained = false;
     let abstentionReason = null;
 
-    if (hasContradiction && posteriorProb < 0.82) {
+    if (incidentSignals === 0 && freeFlowSignals === 0 && unqualifiedSignals > 0) {
+      decision = 'ABSTAIN_INSUFFICIENT_EVIDENCE';
+      abstained = true;
+      abstentionReason = 'NO_QUALIFIED_SOURCE_WITH_CONFIDENCE';
+    } else if (hasContradiction && posteriorProb < 0.82) {
       decision = 'ABSTAIN_CONTRADICTION';
       abstained = true;
       abstentionReason = 'CONTRADICTORY_SPEED_AND_OBSTRUCTION_SIGNALS';
@@ -279,11 +288,11 @@ export function correlateCorridorObservations(observations, {
       abstentionReason = 'POSTERIOR_BELOW_CONFIDENCE_THRESHOLD';
     }
 
-    const combinedUncertaintyRadiusM = Math.round(
-      1 / Math.sqrt(
-        cluster.items.reduce((sum, x) => sum + 1 / Math.pow(Math.max(5, x.location.uncertaintyRadiusM || 25), 2), 0)
-      )
-    );
+    const reportedErrorsM = cluster.items.map(x => x.location.uncertaintyRadiusM);
+    const combinedUncertaintyRadiusM = reportedErrorsM.every(u => Number.isFinite(u) && u > 0)
+      ? Math.ceil(cluster.items.reduce((maxRadius, x) => Math.max(maxRadius,
+          haversineDistanceM(x.location, cluster.centroid) + x.location.uncertaintyRadiusM), 0))
+      : null; // conservative envelope, NOT an independence-based confidence interval
 
     const provenanceHashes = cluster.items.map((x) => x.sourcePayloadHash).sort();
     const provenanceMerkleDigest = sha256Hex(provenanceHashes.join('|'));
@@ -302,13 +311,12 @@ export function correlateCorridorObservations(observations, {
       abstained,
       abstentionReason,
       posteriorConfidence: Number(posteriorProb.toFixed(4)),
-      uncertaintyInterval90: [
-        Number(Math.max(0, posteriorProb - 0.12 / Math.sqrt(uniqueFamilies.size)).toFixed(3)),
-        Number(Math.min(1, posteriorProb + 0.12 / Math.sqrt(uniqueFamilies.size)).toFixed(3)),
-      ],
+      uncertaintyInterval90: null, // no calibrated statistical 90% interval exists
+      confidenceMeaning: 'HEURISTIC_SCORE_NOT_CALIBRATED_PROBABILITY',
       corroboratingSources: [...uniqueSources],
       independentSourceFamilies: [...uniqueFamilies],
       observationCount: cluster.items.length,
+      unqualifiedSignalCount: unqualifiedSignals,
       explainability,
       provenance: {
         merkleDigestSha256: provenanceMerkleDigest,
@@ -825,14 +833,14 @@ export class CorridorTransportFabric {
       type: bearerConfig.type,
       observedCoverage: Boolean(bearerConfig.observedCoverage),
       osCapability: Boolean(bearerConfig.osCapability ?? true),
-      hardwareAvailability: bearerConfig.hardwareAvailability || 'AVAILABLE_IN_SOFTWARE_OR_LOOPBACK',
-      authorizationState: bearerConfig.authorizationState || 'AUTHORIZED',
+      hardwareAvailability: bearerConfig.hardwareAvailability ?? 'UNKNOWN',
+      authorizationState: bearerConfig.authorizationState ?? 'UNVERIFIED',
       realLinkQuality: {
-        packetLossRatio: Number(bearerConfig.realLinkQuality?.packetLossRatio ?? 0.02),
-        latencyMs: Number(bearerConfig.realLinkQuality?.latencyMs ?? 45),
-        throughputKbps: Number(bearerConfig.realLinkQuality?.throughputKbps ?? 250),
+        packetLossRatio: Number.isFinite(bearerConfig.realLinkQuality?.packetLossRatio) ? bearerConfig.realLinkQuality.packetLossRatio : null,
+        latencyMs: Number.isFinite(bearerConfig.realLinkQuality?.latencyMs) ? bearerConfig.realLinkQuality.latencyMs : null,
+        throughputKbps: Number.isFinite(bearerConfig.realLinkQuality?.throughputKbps) ? bearerConfig.realLinkQuality.throughputKbps : null,
       },
-      estimatedFutureAvailability: Number(bearerConfig.estimatedFutureAvailability ?? 0.85),
+      estimatedFutureAvailability: Number.isFinite(bearerConfig.estimatedFutureAvailability) ? bearerConfig.estimatedFutureAvailability : null,
       confirmedTransmissions: 0,
       sharedInfrastructureDeps: bearerConfig.sharedInfrastructureDeps || [],
       isSimulatedOrEmulated: Boolean(bearerConfig.isSimulatedOrEmulated ?? false),
@@ -845,7 +853,7 @@ export class CorridorTransportFabric {
     const b = this.bearers.get(bearerId);
     if (!b) throw new Error(`UNKNOWN_BEARER:${bearerId}`);
     b.observedCoverage = !outage;
-    b.realLinkQuality.packetLossRatio = outage ? 1.0 : 0.02;
+    b.realLinkQuality.packetLossRatio = outage ? 1.0 : null; // require fresh measurement following recovery
     return b;
   }
 
@@ -933,7 +941,12 @@ export class CorridorTransportFabric {
       && b.osCapability
       && b.authorizationState === 'AUTHORIZED'
       && b.hardwareAvailability !== 'BLOCKED_NO_PHYSICAL_HARDWARE'
+      && Number.isFinite(b.realLinkQuality.packetLossRatio)
+      && Number.isFinite(b.estimatedFutureAvailability)
+      && b.realLinkQuality.packetLossRatio >= 0
       && b.realLinkQuality.packetLossRatio < 0.85
+      && b.estimatedFutureAvailability >= 0
+      && b.estimatedFutureAvailability <= 1
     ));
     if (candidates.length === 0) {
       const blockedHw = [...this.bearers.values()].find((b) => b.hardwareAvailability === 'BLOCKED_NO_PHYSICAL_HARDWARE');
@@ -1042,8 +1055,10 @@ export async function runPilotACorridorA12({
     osCapability: true,
     hardwareAvailability: 'AVAILABLE_IN_SOFTWARE_OR_LOOPBACK',
     authorizationState: 'AUTHORIZED',
+    estimatedFutureAvailability: 0.8, // explicit hypothetical reliability in LAB DEMO ONLY
     realLinkQuality: { packetLossRatio: 0.02, latencyMs: 38, throughputKbps: 12000 },
     sharedInfrastructureDeps: ['INFRA-NL-KPN-CELL-TOWER-ARNHEM-04', 'INFRA-NL-KPN-FIBER-ARNHEM'],
+    isSimulatedOrEmulated: true, // never claim actual LTE/DTN transmissions
   });
   fabric.registerBearer({
     bearerId: 'BEARER-VELPERBROEK-CUSTODY-RELAY',
@@ -1052,8 +1067,10 @@ export async function runPilotACorridorA12({
     osCapability: true,
     hardwareAvailability: 'AVAILABLE_IN_SOFTWARE_OR_LOOPBACK',
     authorizationState: 'AUTHORIZED',
+    estimatedFutureAvailability: 0.8, // explicit hypothetical reliability in LAB DEMO ONLY
     realLinkQuality: { packetLossRatio: 0.01, latencyMs: 18, throughputKbps: 2500 },
     sharedInfrastructureDeps: ['INFRA-LOCAL-BATTERY-PACK-01'],
+    isSimulatedOrEmulated: true, // never claim actual LTE/DTN transmissions
   });
   fabric.registerBearer({
     bearerId: 'BEARER-LORA-EU868-DONGLE',
@@ -1149,13 +1166,15 @@ export async function runPilotBNeighborhoodLab({
   });
 
   // 2. Puente de eventos Edge / MQTT (sensor adicional del edificio/barrio)
+  const mqttLabToken = globalThis.crypto?.randomUUID(); // ephemeral laboratory-only credential
+  if (!mqttLabToken) throw new Error('SECURE_RANDOM_UNAVAILABLE_FOR_LAB');
   const mqttBridge = createMqttEdgeBridge({
     id: 'EDGE-MQTT-BARRIO-BROKER-01',
-    authorizedTokens: ['edge-token-barrio-lab-01'],
+    authorizedTokens: [mqttLabToken],
     defaultRoadSegmentId: 'BARRIO-ACCESO-NORTE-01',
   });
   const edgeIngested = await mqttBridge.fetchObservation({
-    token: 'edge-token-barrio-lab-01',
+    token: mqttLabToken,
     nowMs,
     eventPayload: {
       schema: EDGE_EVENT_SCHEMA_VERSION,
@@ -1195,7 +1214,9 @@ export async function runPilotBNeighborhoodLab({
     osCapability: true,
     hardwareAvailability: 'AVAILABLE_IN_SOFTWARE_OR_LOOPBACK',
     authorizationState: 'AUTHORIZED',
+    estimatedFutureAvailability: 0.8, // explicit hypothetical reliability in LAB DEMO ONLY
     realLinkQuality: { packetLossRatio: 0.01, latencyMs: 25, throughputKbps: 20000 },
+    isSimulatedOrEmulated: true, // never claim actual LTE/DTN transmissions
   });
   fabric.registerBearer({
     bearerId: 'BEARER-BARRIO-P2P-CUSTODY-LOOPBACK',
@@ -1204,6 +1225,7 @@ export async function runPilotBNeighborhoodLab({
     osCapability: true,
     hardwareAvailability: 'AVAILABLE_IN_SOFTWARE_OR_LOOPBACK',
     authorizationState: 'AUTHORIZED',
+    estimatedFutureAvailability: 0.8, // explicit hypothetical reliability in LAB DEMO ONLY
     realLinkQuality: { packetLossRatio: 0.02, latencyMs: 14, throughputKbps: 4200 },
     isSimulatedOrEmulated: true,
   });
