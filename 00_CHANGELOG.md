@@ -1,5 +1,79 @@
 # Changelog
 
+## SENDA RoadSafe · 18-11-2026 (VII) · Física de la conducción: visibilidad por trazado, DRAC y peligro oculto
+
+**Entrada (fundador):** seguir desarrollando capacidades para evitar accidentes, centradas en la conducción, con ingeniería real.
+
+**Procesamiento:**
+- `roadsafe-drive-physics.mjs`: visibilidad hacia delante calculada con la geometría de la vía, DRAC, velocidad máxima para parar y urgencia física (INFO, PREPARE, BRAKE, IMMINENT, más «oculto tras la curva» con velocidad aconsejada).
+- El planificador de atención prioriza la urgencia física, no la raciona y rescata lo tardío si está oculto.
+- La pestaña Carretera muestra la DRAC y la visibilidad.
+- Documento 12.
+
+**Validación:** núcleo 794/794; adversariales 31/31; Chromium 74/74. Visibilidad numérica frente a la fórmula de la ordenada media: 98/98,2 m, 160/160,3 m y 178/179,0 m. — Firma: Claude (Asistente de Orquestación Senior)
+
+## SENDA RoadSafe · 18-11-2026 (VI) · La carretera como senda principal: bus de avisos, horizonte, atención e intercambio entre dispositivos
+
+**Entrada (fundador):** trabajo continuado y más ambicioso; priorizar los avisos en carretera y que la carretera sea la senda principal multidispositivo, multisoftware y de refuerzo.
+
+**Procesamiento:**
+- Auditoría del corredor (C1–C6), sin falsas validaciones, sin ubicaciones inventadas y sin secreto por defecto.
+- Bus de avisos: 6 fuentes de entrada, fusión sin doble conteo y refuerzo por familias de fallo.
+- Horizonte electrónico.
+- Tasas GB por 100 M veh-km (AADF × STATS19, cota inferior).
+- Presupuesto de atención: un aviso por turno.
+- Alcance de la cadena BLE.
+- Intercambio entre dispositivos (`roadsafe-gossip.mjs`): papeles consumidor y portador, presupuesto de bytes, umbral de confianza para transportar y recepción que nunca sube la confianza.
+- Documento 11.
+
+**Validación:** núcleo 788/788; adversariales 31/31; Chromium 72/72. Conclusión de modelo, con escenario declarado: con penetración baja, el portador del sentido contrario supera a la cadena del mismo sentido. — Firma: Claude (Asistente de Orquestación Senior)
+
+## SENDA RoadSafe · 18-11-2026 (V) · Calibración multivariante de gravedad sobre 551 260 accidentes oficiales
+
+**Entrada (fundador):** seguir calibrando e implementando.
+
+**Procesamiento:** `roadsafe-severity-model.mjs` (regresión logística IRLS con efectos fijos por país, IC de Wald, AUC, Brier, calibración por deciles, dejar un país fuera). Resultado: AUC de prueba 0,78; OR ajustados: pesado 4,02, interurbano 3,49, frontal 2,98, peatón 2,56, arcén 1,55, sin alumbrado ×1,54, madrugada 1,49, oscuridad 1,17; mojado 0,87, alcance 0,56. Los factores de gravedad del modelo de riesgo pasan a OR ajustados; nueva calculadora en la consola. Documento 10.
+
+**Validación:** núcleo 768/768; Chromium 60/60; el ajuste recupera coeficientes conocidos en datos sintéticos. Corregido: la tarjeta del modelo se borraba al cambiar de idioma. — Firma: Claude (Asistente de Orquestación Senior)
+
+## SENDA RoadSafe · 18-11-2026 (IV) · Cinco países, arcén ×2 de mortal, detector contra falsas alarmas, blindaje y regla de veracidad aplicada
+
+**Entrada (fundador):** calibrar con más casuística, mejorar la detección de accidentes, más datasets y soluciones existentes, diferenciarnos, cifrar y blindar.
+
+**Procesamiento:** Francia (BAAC, Licence Ouverte) y Gran Bretaña (STATS19, OGL v3) añadidas con códigos verificados en sus diccionarios oficiales → 652 224 accidentes. Hallazgos: arcén OR 2,04 (FR) y 2,44 (GB); oscuridad replicada en 5 países. `roadsafe-crash-detect.mjs` (fusión de evidencias, sesgo de seguridad sin GNSS, nunca llamada automática); `roadsafe-guard.mjs` (AES-GCM+HKDF por incidente, custodia ECDSA, tiempo constante, anti-abuso, difuminado). Regla de `CLAUDE.md` aplicada: simuladores y física exigen escenario declarado y salen como `SIMULATION`; sin tiempo de reacción nocturno inventado; alcance de radio no medido = sin juicio geográfico. Documento 09.
+
+**Validación:** núcleo y adversariales en verde; Chromium 58/58. — Firma: Claude (Asistente de Orquestación Senior)
+
+## SENDA RoadSafe · 18-11-2026 (III) · Dataset oficial ES/DE/NL, compañero de viaje, física del impacto y emergencia guiada
+
+**Entrada (fundador):** gran dataset de accidentes de España, Alemania, Bélgica y Holanda; avisar a todos los conductores «como en el metro»; coordinación, ubicación rápida, teléfonos perdidos, quedarse o salir, implicados; sensores del móvil y del coche, momento angular y zona de peligro; taxi que recoge señalizado; SENDA como compañero de viaje junto a Waze; rutas guardadas sin conexión.
+
+**Procesamiento:** 496 895 accidentes oficiales armonizados (DGT, Unfallatlas, BRON; Bélgica bloqueada por captcha, no eludido) con SHA-256; hallazgo replicado en 3 países: oscuridad OR≈1,5 de desenlace mortal. 11 módulos nuevos (dataset, análisis, guía, ocupantes, ubicación, física, sensores, megafonía, parada de servicio, servicios, rutas). Pestaña «Viaje» en la consola. Documentos 07 y 08.
+
+**Validación:** núcleo y adversariales en verde; E2E Chromium 56/56. Corregidos durante la iteración: PK español perdido por un comentario, id duplicado en la consola, distancia punto-segmento en rutas. — Firma: Claude (Asistente de Orquestación Senior)
+
+## SENDA RoadSafe · 17-11-2026 (II) · Casuística con evidencia, priorización, señalización dinámica de zona y probabilidades por circunstancia
+
+**Entrada (fundador):** estudiar la casuística de accidentes y las probabilidades según las circunstancias, concluir y desarrollar el software para priorizar, coordinar, prevenir y señalizar zonas de accidente.
+
+**Procesamiento:** `roadsafe-evidence.mjs` (11 hallazgos con fuente y grado, 8 mecanismos), `roadsafe-risk-factors.mjs`, `roadsafe-priority.mjs`, `roadsafe-zone.mjs` (áreas TIM, cola LWR, banda de aviso útil, paneles PMV propuestos, CIFS) y `circumstanceGrid` (11 circunstancias). El taxi del simulador tampoco puede superar la adherencia. Consola ampliada. `docs/roadsafe/06_CASUISTRY_RISK_AND_CONCLUSIONS.md`.
+
+**Validación:** prevención 6/6 nuevas · E2E Chromium 38/38. Conclusión principal: el riesgo se concentra en el vehículo inmovilizado que espera grúa, con carril ocupado o personas fuera; la distancia de seguridad y la adherencia dominan sobre el aviso digital. — Firma: Claude (Asistente de Orquestación Senior)
+
+## SENDA RoadSafe · 17-11-2026 · Prevención de colisiones secundarias y coordinación de asistencia verificable (rama `ccr-5123180e-t90iwo`, apilada sobre PR #47 `743c4f5`)
+
+**Entrada (fundador):** caso de investigación anonimizado (avería en arcén con V16, taxi, alcance y empuje); arquitectura federada sin depender de que todos instalen SENDA; corregir P0 viales; investigación y experimentos reproducibles.
+
+**Procesamiento:**
+- P0-1…P0-6 corregidos en `road-guard.mjs` y `datex2.mjs` (autenticidad/replay/plausibilidad de tramas, calzada contraria, consejo de frenada no imperativo, 112 declarado ≠ confirmado, DATEX II endurecido, supresión conservadora). `toCifs` usaba un tipo inexistente (`CONSTRUCTION`).
+- 9 módulos `roadsafe-*.mjs`: frame-trust, correlation, incident-twin, secondary-risk, dispatch, emergency-gateway, delivery, interop, accident-sim.
+- Consola `/senda/roadsafe` (ciudadano/operador/científico, ES/EN/NL, sin red externa).
+- Documentación `docs/roadsafe/` + `docs/adr/ADR-ROADSAFE-001.md`; evidencia `evidence/roadsafe/`.
+
+**Validación:** núcleo 739/739 (12 nuevas) · adversariales 25/25 (14 nuevas P0) · E2E Chromium 30/30 (móvil y escritorio) · controles negativos NC1–NC4 superados. Resultados de simulación: **no** demuestran reducción real de accidentes.
+
+**Siguiente paso:** decisión del titular sobre alta DGT 3.0 (entorno de pruebas) y convenio con una asistencia/aseguradora para sandbox. — Firma: Claude (Asistente de Orquestación Senior)
+
 ## SENDA · 17-11-2026 · Tres motores nuevos con datos reales (aislamiento por inundación, radio sobre relieve, agua en Países Bajos), rutas de financiación y propuesta para gobiernos
 
 **Entrada (fundador):** cosas más impresionantes; más investigación y ciencia; innovaciones que un gobierno de España pudiera aceptar como candidata y preparadas para Holanda; caminos de financiación reales; más fotos; motores completamente nuevos.

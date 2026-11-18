@@ -1,0 +1,124 @@
+{
+  "schema": "senda-roadsafe-dataset-manifest/1",
+  "year": 2024,
+  "builtAt": "2026-11-18T00:53:22.254Z",
+  "sources": {
+    "ES_DGT": {
+      "url": "https://www.dgt.es/export/sites/web-DGT/.galleries/downloads/dgt-en-cifras/publicaciones/Ficheros_microdatos_de_accidentalidad_con_victimas/TABLA_ACCIDENTES_24.XLSX",
+      "file": "es-2024.xlsx",
+      "bytes": 25357990,
+      "sha256": "4c39dbdf3c31fcd0c99a0b9e68fdd7fc017c689cda01546d1d34545a3c64b387"
+    },
+    "ES_DGT_DICT": {
+      "url": "https://www.dgt.es/export/sites/web-DGT/.galleries/downloads/dgt-en-cifras/24h/Diccionario_Tabla_Accidentes.xlsx",
+      "file": "es-dictionary.xlsx",
+      "bytes": 42553,
+      "sha256": "1df06643eff95dd7f3211fca7fad2c95f2d926930d12ca97a345c764995d0ae9"
+    },
+    "DE_UNFALLATLAS": {
+      "url": "https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte2024_EPSG25832_CSV.zip",
+      "file": "de-2024.zip",
+      "bytes": 12681950,
+      "sha256": "4a321fbde7cac6344a6ee1f8926ceb2a585b2adb3bcf301ad4fb85bb9abb4813"
+    },
+    "DE_DSB": {
+      "url": "https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/DSB_Unfallatlas.pdf",
+      "file": "de-DSB_Unfallatlas.pdf",
+      "bytes": 405394,
+      "sha256": "3afe9d303e8c508bd5ff6f0be313eda38abeaaedf889ee5c0c8e468e3011c519"
+    },
+    "FR_CARACT": {
+      "url": null,
+      "file": "fr-caract-2024.csv",
+      "bytes": 6538156,
+      "sha256": "45a69360aeb566f9065e079c5e9840fb1068e71cd4e6fcc34cb9fdcaff04b391"
+    },
+    "FR_LIEUX": {
+      "url": null,
+      "file": "fr-lieux-2024.csv",
+      "bytes": 7070795,
+      "sha256": "a500a44b4efdb18f80de31c2ebde48c682b050667b7b1348671caeec736c8f09"
+    },
+    "FR_VEHICULES": {
+      "url": null,
+      "file": "fr-vehicules-2024.csv",
+      "bytes": 6369908,
+      "sha256": "40261a1d5ac034aa6e8193a97a2f89cae31ef3492b7f3b264122d6e868daff8d"
+    },
+    "FR_USAGERS": {
+      "url": null,
+      "file": "fr-usagers-2024.csv",
+      "bytes": 13843733,
+      "sha256": "4e05cea88d5aa04a16092335310d4a5591e11802a94aaeeff75c6697dfaab5a0"
+    },
+    "FR_DICT": {
+      "url": "https://www.onisr.securite-routiere.gouv.fr/sites/default/files/2024-10/Description%20des%20bases%20de%20donn%C3%A9es%20annuelles.pdf",
+      "file": "fr-description-bases.pdf",
+      "bytes": 897872,
+      "sha256": "8ed3bc135f90cac9b90277e07b7fa25d4a8e0fe8d41cba8d19e0b121c3e4465a"
+    },
+    "UK_COLLISION": {
+      "url": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-collision-2024.csv",
+      "file": "uk-collision-2024.csv",
+      "bytes": 19208488,
+      "sha256": "32a78f4662e309160f37b1ea2b82017e85e07b62a022d680da7140e88706a17c"
+    },
+    "UK_VEHICLE": {
+      "url": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-vehicle-2024.csv",
+      "file": "uk-vehicle-2024.csv",
+      "bytes": 20296911,
+      "sha256": "1a60f65f07a44454bc03c63b35d6741f41c9dfbb05a26753406aef8bff4ae6cd"
+    },
+    "UK_AADF": {
+      "url": "https://storage.googleapis.com/dft-statistics/road-traffic/downloads/data-gov-uk/dft_traffic_counts_aadf.zip",
+      "file": "uk-aadf.zip",
+      "bytes": 19464638,
+      "sha256": "5273cf63da4ca8b317bfe972d8a345e7932db0fff7a7789998a890f0081232b6"
+    },
+    "NL_BRON": {
+      "url": "https://geo.rijkswaterstaat.nl/services/ogc/gdr/verkeersongevallen_nederland/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=ongevallen_2024&outputFormat=csv",
+      "file": "nl-2024.csv",
+      "bytes": 42219285,
+      "sha256": "ca3d3b147e45d7b5c134d15395edc1a690360b3ee5c8db73f765e0779829d980"
+    }
+  },
+  "blocked": {
+    "BE_STATBEL": "Captcha anti-bots en el portal; descarga manual necesaria"
+  },
+  "ingest": {
+    "ES_DGT": {
+      "rows": 101996,
+      "harmonized": 101996,
+      "rejected": 0,
+      "rejectReasons": {}
+    },
+    "DE_UNFALLATLAS": {
+      "rows": 268519,
+      "harmonized": 268519,
+      "rejected": 0,
+      "rejectReasons": {}
+    },
+    "NL_BRON": {
+      "rows": 126380,
+      "harmonized": 126380,
+      "rejected": 0,
+      "rejectReasons": {}
+    },
+    "FR_BAAC": {
+      "rows": 54402,
+      "harmonized": 54402,
+      "rejected": 0,
+      "rejectReasons": {}
+    },
+    "UK_STATS19": {
+      "rows": 100927,
+      "harmonized": 100927,
+      "rejected": 0,
+      "rejectReasons": {}
+    },
+    "BE_STATBEL": {
+      "skipped": "sin fichero manual (portal con captcha)"
+    }
+  },
+  "totalHarmonized": 652224
+}

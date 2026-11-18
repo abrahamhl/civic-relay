@@ -233,7 +233,9 @@ export function correlateCorridorObservations(observations, {
       const signalClass = classifyObservationSignal(obs);
 
       let deltaLogOdds = 0;
-      if (signalClass === 'INCIDENT_SIGNAL') {
+      if (signalClass === 'INCIDENT_SIGNAL' && !Number.isFinite(obs.confidence)) {
+        incidentSignals += 1; // C5: sin confianza declarada la observación cuenta como señal pero no mueve la probabilidad
+      } else if (signalClass === 'INCIDENT_SIGNAL') {
         incidentSignals += 1;
         const p = Math.min(0.95, Math.max(0.55, obs.confidence));
         deltaLogOdds = Math.log(p / (1 - p)) * effectiveWeight;
@@ -281,9 +283,9 @@ export function correlateCorridorObservations(observations, {
 
     const combinedUncertaintyRadiusM = Math.round(
       1 / Math.sqrt(
-        cluster.items.reduce((sum, x) => sum + 1 / Math.pow(Math.max(5, x.location.uncertaintyRadiusM || 25), 2), 0)
+        cluster.items.filter((x) => Number.isFinite(x.location.uncertaintyRadiusM)).reduce((sum, x) => sum + 1 / Math.pow(Math.max(5, x.location.uncertaintyRadiusM), 2), 0)
       )
-    );
+    ); // C5: radios no declarados no se inventan (antes 25 m)
 
     const provenanceHashes = cluster.items.map((x) => x.sourcePayloadHash).sort();
     const provenanceMerkleDigest = sha256Hex(provenanceHashes.join('|'));
@@ -296,12 +298,14 @@ export function correlateCorridorObservations(observations, {
       location: {
         lat: Number(cluster.centroid.lat.toFixed(5)),
         lon: Number(cluster.centroid.lon.toFixed(5)),
-        uncertaintyRadiusM: combinedUncertaintyRadiusM,
+        uncertaintyRadiusM: Number.isFinite(combinedUncertaintyRadiusM) ? combinedUncertaintyRadiusM : null,
       },
+      basis: 'MODEL_UNCALIBRATED (prior y pesos sin calibrar)',
       decision,
       abstained,
       abstentionReason,
       posteriorConfidence: Number(posteriorProb.toFixed(4)),
+      uncertaintyIntervalBasis: 'HEURISTIC_NOT_STATISTICAL — banda orientativa, no es un intervalo de confianza', // C5
       uncertaintyInterval90: [
         Number(Math.max(0, posteriorProb - 0.12 / Math.sqrt(uniqueFamilies.size)).toFixed(3)),
         Number(Math.min(1, posteriorProb + 0.12 / Math.sqrt(uniqueFamilies.size)).toFixed(3)),
@@ -826,7 +830,7 @@ export class CorridorTransportFabric {
       observedCoverage: Boolean(bearerConfig.observedCoverage),
       osCapability: Boolean(bearerConfig.osCapability ?? true),
       hardwareAvailability: bearerConfig.hardwareAvailability || 'AVAILABLE_IN_SOFTWARE_OR_LOOPBACK',
-      authorizationState: bearerConfig.authorizationState || 'AUTHORIZED',
+      authorizationState: bearerConfig.authorizationState || 'UNVERIFIED', // Auditoría RoadSafe C6: antes «AUTHORIZED» por defecto
       realLinkQuality: {
         packetLossRatio: Number(bearerConfig.realLinkQuality?.packetLossRatio ?? 0.02),
         latencyMs: Number(bearerConfig.realLinkQuality?.latencyMs ?? 45),
