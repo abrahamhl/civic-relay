@@ -1,5 +1,13 @@
 # Changelog
 
+## SENDA RoadSafe · 18-11-2026 (III) · Dataset oficial ES/DE/NL, compañero de viaje, física del impacto y emergencia guiada
+
+**Entrada (fundador):** gran dataset de accidentes de España, Alemania, Bélgica y Holanda; avisar a todos los conductores «como en el metro»; coordinación, ubicación rápida, teléfonos perdidos, quedarse o salir, implicados; sensores del móvil y del coche, momento angular y zona de peligro; taxi que recoge señalizado; SENDA como compañero de viaje junto a Waze; rutas guardadas sin conexión.
+
+**Procesamiento:** 496 895 accidentes oficiales armonizados (DGT, Unfallatlas, BRON; Bélgica bloqueada por captcha, no eludido) con SHA-256; hallazgo replicado en 3 países: oscuridad OR≈1,5 de desenlace mortal. 11 módulos nuevos (dataset, análisis, guía, ocupantes, ubicación, física, sensores, megafonía, parada de servicio, servicios, rutas). Pestaña «Viaje» en la consola. Documentos 07 y 08.
+
+**Validación:** núcleo y adversariales en verde; E2E Chromium 56/56. Corregidos durante la iteración: PK español perdido por un comentario, id duplicado en la consola, distancia punto-segmento en rutas. — Firma: Claude (Asistente de Orquestación Senior)
+
 ## SENDA RoadSafe · 17-11-2026 (II) · Casuística con evidencia, priorización, señalización dinámica de zona y probabilidades por circunstancia
 
 **Entrada (fundador):** estudiar la casuística de accidentes y las probabilidades según las circunstancias, concluir y desarrollar el software para priorizar, coordinar, prevenir y señalizar zonas de accidente.

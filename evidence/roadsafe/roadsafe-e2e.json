@@ -1,8 +1,8 @@
 {
   "schema": "senda-roadsafe-e2e/1",
   "browser": "chromium (playwright)",
-  "at": "2026-11-17T23:43:17.249Z",
-  "passed": 38,
+  "at": "2026-11-18T00:06:50.535Z",
+  "passed": 56,
   "failed": 0,
   "results": [
     {
@@ -19,9 +19,22 @@
       "ok": true
     },
     {
+      "name": "movil: emergencia guiada — humo/fuego ⇒ EXIT_NOW_FIRE con 112 primero",
+      "ok": true
+    },
+    {
+      "name": "movil: ubicación — Plus Code y SMS listos",
+      "ok": true
+    },
+    {
+      "name": "movil: ocupantes — 4 personas, 2 sin confirmar, móvil perdido y separado",
+      "ok": true,
+      "occ": "Personas: 4 · OK 2 · ayuda 0 · sin confirmar 2 (Abuela, Bebé)\n  ConductoraRESPONDINGHijoPOSSIBLY_LOSTAbuelaPOSSIBLY_SEPARATEDUn móvil que responde no prueba que su dueño esté bien. Un móvil callado no prueba que su dueño esté herido: puede estar perdido o roto."
+    },
+    {
       "name": "movil: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-ea2bc38111c894fe · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-170b325251b8556b · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -31,7 +44,7 @@
     {
       "name": "movil: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-ea2bc38111c894fe · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-170b325251b8556b · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: idioma en",
@@ -66,9 +79,9 @@
       "ok": true,
       "prio": [
         "1M-40 · «atrapado» sin verificarVERIFICAR · DATOS_INCOMPLETO",
-        "2N-000 PK 127 · alcanceELEVATEDcolisión secundaria / escalad",
+        "2N-000 PK 127 · alcanceDATOS_INCOMPLETOS:DARK_SEVERITYELEVAT",
         "3AP-7 PK 300 · carril ocupado, nocheSLA_SUPERADOCRITICALnive",
-        "4A-3 PK 41,2 · avería arcénMONITORnivel MONITOR (índice 5) ·"
+        "4A-3 PK 41,2 · avería arcénDATOS_INCOMPLETOS:DARK_SEVERITYMO"
       ]
     },
     {
@@ -76,6 +89,16 @@
       "ok": true,
       "a20": 1567,
       "a50": 2861
+    },
+    {
+      "name": "movil: física — Δv, guiñada y probabilidad de invasión de carril",
+      "ok": true,
+      "phys": "Δv taxi 33.4 km/h (HIGH) · ω -2.19 rad/s · alcance p50/p95 10.6/19.6 mSHOULDER_OR_OFFROAD_RIGHT 81 % · LANE_1 100 % · LANE_2 78 % · BEYOND_LEFT 13 %Monte Carlo de impacto plano + deslizamiento; paráme"
+    },
+    {
+      "name": "movil: servicios — posición caducada marcada y el ciudadano solo ve su asignación",
+      "ok": true,
+      "resp": "Propuesta: GC-ATGC-12 ~4 minEl ciudadano solo ve: AMBULANCE · ayuda asignada según el organismoPropuesta para el coordinador del organismo; SENDA no asigna recursos públicos. ETA orientativa sin tráfi"
     },
     {
       "name": "movil: científico — 5 escenarios con IC y acuse de visualización 0",
@@ -88,9 +111,32 @@
       "last": "Distancia temporal 2 s (recomendada)0.5 %×0.130.4 %45.6 km/h"
     },
     {
+      "name": "movil: dataset oficial — ES/DE/NL con OR de oscuridad",
+      "ok": true
+    },
+    {
+      "name": "movil: viaje — ruta favorita, paquete offline en KB, comparación por riesgo",
+      "ok": true,
+      "vout": "★ Casa → trabajo · 22.4 kmAlternativa · 18.3 kmPaquete sin conexión: 0.4 KB (2/400 puntos)casa-trabajo: 22.4 km · riesgo/km 1.78 · alt: 18.3 km · riesgo/km 0Riesgo histórico de accidentes con víctimas"
+    },
+    {
+      "name": "movil: viaje — megafonía escalonada (≤3 avisos, sin órdenes)",
+      "ok": true,
+      "ann": [
+        "DOUBLE_TONE Atención: vehículo de servicio deteniéndose a la derecha a 2 kilómetros. Precaución.",
+        "DOUBLE_TONE Atención: vehículo de servicio deteniéndose a la derecha a 1000 metros. Precaución.",
+        "DOUBLE_TONE Atención: vehículo de servicio deteniéndose a la derecha a 500 metros. Precaución."
+      ]
+    },
+    {
+      "name": "movil: viaje — taxi se detiene por delante del averiado",
+      "ok": true
+    },
+    {
       "name": "movil: sin desbordamiento horizontal",
       "ok": true,
       "overflow": [
+        0,
         0,
         0,
         0
@@ -120,9 +166,22 @@
       "ok": true
     },
     {
+      "name": "escritorio: emergencia guiada — humo/fuego ⇒ EXIT_NOW_FIRE con 112 primero",
+      "ok": true
+    },
+    {
+      "name": "escritorio: ubicación — Plus Code y SMS listos",
+      "ok": true
+    },
+    {
+      "name": "escritorio: ocupantes — 4 personas, 2 sin confirmar, móvil perdido y separado",
+      "ok": true,
+      "occ": "Personas: 4 · OK 2 · ayuda 0 · sin confirmar 2 (Abuela, Bebé)\n  ConductoraRESPONDINGHijoPOSSIBLY_LOSTAbuelaPOSSIBLY_SEPARATEDUn móvil que responde no prueba que su dueño esté bien. Un móvil callado no prueba que su dueño esté herido: puede estar perdido o roto."
+    },
+    {
       "name": "escritorio: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-e2beff9537f8a9e3 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-edb4e3fa24a41341 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -132,7 +191,7 @@
     {
       "name": "escritorio: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-e2beff9537f8a9e3 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-edb4e3fa24a41341 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: idioma en",
@@ -167,9 +226,9 @@
       "ok": true,
       "prio": [
         "1M-40 · «atrapado» sin verificarVERIFICAR · DATOS_INCOMPLETO",
-        "2N-000 PK 127 · alcanceELEVATEDcolisión secundaria / escalad",
+        "2N-000 PK 127 · alcanceDATOS_INCOMPLETOS:DARK_SEVERITYELEVAT",
         "3AP-7 PK 300 · carril ocupado, nocheSLA_SUPERADOCRITICALnive",
-        "4A-3 PK 41,2 · avería arcénMONITORnivel MONITOR (índice 5) ·"
+        "4A-3 PK 41,2 · avería arcénDATOS_INCOMPLETOS:DARK_SEVERITYMO"
       ]
     },
     {
@@ -177,6 +236,16 @@
       "ok": true,
       "a20": 1567,
       "a50": 2861
+    },
+    {
+      "name": "escritorio: física — Δv, guiñada y probabilidad de invasión de carril",
+      "ok": true,
+      "phys": "Δv taxi 33.4 km/h (HIGH) · ω -2.19 rad/s · alcance p50/p95 10.6/19.6 mSHOULDER_OR_OFFROAD_RIGHT 81 % · LANE_1 100 % · LANE_2 78 % · BEYOND_LEFT 13 %Monte Carlo de impacto plano + deslizamiento; paráme"
+    },
+    {
+      "name": "escritorio: servicios — posición caducada marcada y el ciudadano solo ve su asignación",
+      "ok": true,
+      "resp": "Propuesta: GC-ATGC-12 ~4 minEl ciudadano solo ve: AMBULANCE · ayuda asignada según el organismoPropuesta para el coordinador del organismo; SENDA no asigna recursos públicos. ETA orientativa sin tráfi"
     },
     {
       "name": "escritorio: científico — 5 escenarios con IC y acuse de visualización 0",
@@ -189,9 +258,32 @@
       "last": "Distancia temporal 2 s (recomendada)0.5 %×0.130.4 %45.6 km/h"
     },
     {
+      "name": "escritorio: dataset oficial — ES/DE/NL con OR de oscuridad",
+      "ok": true
+    },
+    {
+      "name": "escritorio: viaje — ruta favorita, paquete offline en KB, comparación por riesgo",
+      "ok": true,
+      "vout": "★ Casa → trabajo · 22.4 kmAlternativa · 18.3 kmPaquete sin conexión: 0.4 KB (2/400 puntos)casa-trabajo: 22.4 km · riesgo/km 1.78 · alt: 18.3 km · riesgo/km 0Riesgo histórico de accidentes con víctimas"
+    },
+    {
+      "name": "escritorio: viaje — megafonía escalonada (≤3 avisos, sin órdenes)",
+      "ok": true,
+      "ann": [
+        "DOUBLE_TONE Atención: vehículo de servicio deteniéndose a la derecha a 2 kilómetros. Precaución.",
+        "DOUBLE_TONE Atención: vehículo de servicio deteniéndose a la derecha a 1000 metros. Precaución.",
+        "DOUBLE_TONE Atención: vehículo de servicio deteniéndose a la derecha a 500 metros. Precaución."
+      ]
+    },
+    {
+      "name": "escritorio: viaje — taxi se detiene por delante del averiado",
+      "ok": true
+    },
+    {
       "name": "escritorio: sin desbordamiento horizontal",
       "ok": true,
       "overflow": [
+        0,
         0,
         0,
         0

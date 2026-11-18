@@ -71,6 +71,21 @@ export const EVIDENCE = Object.freeze({
     claim: 'Tiempo de percepción-reacción: ≈0,7–0,75 s prevenido, ≈1,25 s inesperado, ≈1,5 s sorpresa.',
     grade: 'A', access: 'conocimiento previo (no releído hoy)', source: 'Green, M. (2000). Transportation Human Factors 2(3):195–216', url: null, transfer: 'Rangos usados en el simulador.',
   },
+  EMPIRICAL_DARK_SEVERITY: {
+    claim: 'Entre accidentes con víctimas de 2024, la oscuridad se asocia a ≈1,5 veces más odds de desenlace mortal, replicado en tres países: ES OR 1,60 [1,44–1,78], DE 1,55 [1,42–1,70], NL 1,50 [1,24–1,82]. España, oscuridad sin alumbrado vs con alumbrado: OR 3,42 [2,84–4,11].',
+    grade: 'A', value: 1.55, unit: 'OR gravedad condicionada', access: 'microdatos oficiales procesados por SENDA (evidence/roadsafe/dataset/DATASET_REPORT_2024.md)',
+    source: 'DGT microdatos 2024; Unfallatlas 2024 (Statistische Ämter, dl-de/by-2-0); BRON 2024 (Rijkswaterstaat, CC0)', url: 'https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/',
+    transfer: 'Gravedad condicionada (sin exposición): no dice que de noche haya más accidentes, sino que los que hay son más graves.',
+  },
+  EMPIRICAL_WET_SEVERITY: {
+    claim: 'Calzada mojada vs seca: sin diferencia significativa en la proporción de mortales en ninguno de los tres países (ES 0,88; DE 1,02; NL 0,95; IC incluyen 1).',
+    grade: 'A', value: 1, unit: 'OR gravedad condicionada', access: 'microdatos oficiales procesados por SENDA', source: 'DGT, Unfallatlas, BRON 2024', url: null,
+    transfer: 'La lluvia actúa sobre la FRECUENCIA (adherencia, distancia de parada — física) más que sobre la gravedad.',
+  },
+  EMPIRICAL_RURAL_SEVERITY: {
+    claim: 'Interurbano vs urbano: OR de mortal 4,61 [4,15–5,13] (ES) y 3,82 [3,21–4,55] (NL).',
+    grade: 'A', value: 4.2, unit: 'OR gravedad condicionada', access: 'microdatos oficiales procesados por SENDA', source: 'DGT, BRON 2024', url: null, transfer: 'La velocidad de la vía domina la gravedad.',
+  },
   NIGHT_PRT: {
     claim: 'La noche alarga la percepción de un vehículo detenido y reduce la distancia de detección.',
     grade: 'H', access: '—', source: 'Hipótesis de diseño (dirección plausible; magnitud no establecida en las fuentes consultadas)', url: null, transfer: 'Solo para barridos.',

@@ -20,7 +20,7 @@ test('evidencia: cada caso de la casuística cita entradas existentes con grado 
 test('factores: la física integra noche, lluvia y niebla (margen de visibilidad) sin doble conteo', () => {
   const day = sightMargin({ v85Kmh: 100, sightM: 200 }), wetNight = sightMargin({ v85Kmh: 100, sightM: 200, wet: true, night: true });
   assert.ok(day.ratio > 1 && wetNight.ratio < day.ratio);
-  const fog = assessIncidentRisk({ laneBlocked: 'SHOULDER', v85Kmh: 100, visibilityM: 40, durationMin: 5, flowVehH: 800, peopleOutside: false, waitingTow: false, queueForming: false, respondersExposed: false, heavyShare: 0.1 });
+  const fog = assessIncidentRisk({ night: false, laneBlocked: 'SHOULDER', v85Kmh: 100, visibilityM: 40, durationMin: 5, flowVehH: 800, peopleOutside: false, waitingTow: false, queueForming: false, respondersExposed: false, heavyShare: 0.1 });
   assert.ok(fog.drivers.some((d) => d.factor === 'SIGHT_MARGIN' && d.mult === 3));
   assert.equal(fog.uncertain, false);
 });

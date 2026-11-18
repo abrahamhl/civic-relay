@@ -49,6 +49,7 @@ function factors(c) {
   add('WAITING_TOW', 'Vehículo inmovilizado esperando grúa', c.waitingTow ? 1.5 : 1, 1.5, 1, 'TOWING_REQUIRED', 'B', known(c.waitingTow));
   add('QUEUE', 'Cola formándose', c.queueForming ? 1.5 : 1, 1.5, 1, 'TRAFFIC_VOLUME', 'C', known(c.queueForming));
   add('RESPONDERS', 'Intervinientes expuestos sin vehículo de bloqueo', c.respondersExposed ? 1.3 : 1, 1.3, 1, 'RESPONDER_STRUCK_BY_GAP', 'B', known(c.respondersExposed));
+  add('DARK_SEVERITY', 'Oscuridad (gravedad, dato propio ES/DE/NL)', c.night ? (c.unlit ? 2 : 1.55) : 1, 2, 1, 'EMPIRICAL_DARK_SEVERITY', 'A', known(c.night));
   add('HEAVY', 'Proporción de pesados (gravedad)', 1 + Math.min(0.5, c.heavyShare ?? 0), 1.5, 1, 'HEAVY_VEHICLE_SEVERITY', 'B', known(c.heavyShare));
   return { F, sm };
 }

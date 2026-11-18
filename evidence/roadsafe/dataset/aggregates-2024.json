@@ -1,0 +1,2951 @@
+{
+  "schema": "senda-roadsafe-aggregates/1",
+  "year": 2024,
+  "licenses": {
+    "ES_DGT": {
+      "license": "Reutilización según el aviso legal de la DGT / datos.gob.es (verificar condiciones exactas)",
+      "publisher": "Dirección General de Tráfico",
+      "url": "https://www.dgt.es/menusecundario/dgt-en-cifras/dgt-en-cifras-resultados/dgt-en-cifras-detalle/Ficheros-de-microdatos-de-accidentes-con-victimas-2024/"
+    },
+    "DE_UNFALLATLAS": {
+      "license": "Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0)",
+      "publisher": "Statistische Ämter des Bundes und der Länder",
+      "url": "https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/"
+    },
+    "NL_BRON": {
+      "license": "CC0 1.0",
+      "publisher": "Rijkswaterstaat (BRON)",
+      "url": "https://data.overheid.nl/dataset/53580-verkeersongevallen-nederland----ongevallen--rws-"
+    },
+    "BE_STATBEL": {
+      "license": "Open data Statbel (verificar)",
+      "publisher": "Statbel",
+      "url": "https://statbel.fgov.be/en/themes/mobility/traffic/road-accidents"
+    }
+  },
+  "perCountry": {
+    "ES": {
+      "records": 101996,
+      "injury": 101996,
+      "profile": {
+        "nInjury": 101996,
+        "nAll": 101996,
+        "rearEnd": {
+          "k": 17279,
+          "p": 0.1694,
+          "ci": [
+            0.1671,
+            0.1717
+          ]
+        },
+        "stationaryVehicle": {
+          "k": 0,
+          "p": 0,
+          "ci": [
+            0,
+            0
+          ]
+        },
+        "chain": {
+          "k": 1995,
+          "p": 0.0196,
+          "ci": [
+            0.0187,
+            0.0204
+          ]
+        },
+        "visibilityRestrictedByVehicle": {
+          "k": 1130,
+          "p": 0.0111,
+          "ci": [
+            0.0105,
+            0.0117
+          ]
+        },
+        "secondaryOtherAccident": {
+          "k": 0,
+          "p": 0,
+          "basis": "todos los registros (incluye PDO si la fuente los tiene); registro policial, probable infraregistro"
+        },
+        "queueIndicator": 0,
+        "byLightRearStationary": [
+          {
+            "group": "DARK_UNLIT",
+            "n": 1314,
+            "k": 40,
+            "p": 0.0304,
+            "ci": [
+              0.0224,
+              0.0412
+            ]
+          },
+          {
+            "group": "TWILIGHT",
+            "n": 1160,
+            "k": 12,
+            "p": 0.0103,
+            "ci": [
+              0.0059,
+              0.018
+            ]
+          },
+          {
+            "group": "DARK_LIT",
+            "n": 2455,
+            "k": 17,
+            "p": 0.0069,
+            "ci": [
+              0.0043,
+              0.0111
+            ]
+          },
+          {
+            "group": "DAY",
+            "n": 14237,
+            "k": 85,
+            "p": 0.006,
+            "ci": [
+              0.0048,
+              0.0074
+            ]
+          },
+          {
+            "group": "UNKNOWN",
+            "n": 108,
+            "k": 0,
+            "p": 0,
+            "ci": [
+              0,
+              0.0343
+            ]
+          }
+        ],
+        "byHourRearStationary": [
+          {
+            "hour": 0,
+            "n": 186
+          },
+          {
+            "hour": 1,
+            "n": 114
+          },
+          {
+            "hour": 2,
+            "n": 92
+          },
+          {
+            "hour": 3,
+            "n": 61
+          },
+          {
+            "hour": 4,
+            "n": 66
+          },
+          {
+            "hour": 5,
+            "n": 124
+          },
+          {
+            "hour": 6,
+            "n": 330
+          },
+          {
+            "hour": 7,
+            "n": 864
+          },
+          {
+            "hour": 8,
+            "n": 1115
+          },
+          {
+            "hour": 9,
+            "n": 1029
+          },
+          {
+            "hour": 10,
+            "n": 856
+          },
+          {
+            "hour": 11,
+            "n": 1085
+          },
+          {
+            "hour": 12,
+            "n": 1229
+          },
+          {
+            "hour": 13,
+            "n": 1446
+          },
+          {
+            "hour": 14,
+            "n": 1755
+          },
+          {
+            "hour": 15,
+            "n": 1447
+          },
+          {
+            "hour": 16,
+            "n": 1015
+          },
+          {
+            "hour": 17,
+            "n": 1249
+          },
+          {
+            "hour": 18,
+            "n": 1428
+          },
+          {
+            "hour": 19,
+            "n": 1326
+          },
+          {
+            "hour": 20,
+            "n": 997
+          },
+          {
+            "hour": 21,
+            "n": 654
+          },
+          {
+            "hour": 22,
+            "n": 501
+          },
+          {
+            "hour": 23,
+            "n": 305
+          }
+        ]
+      },
+      "severityFactors": {
+        "n": 101996,
+        "fatal": 1656,
+        "darkVsDay": {
+          "table": {
+            "a": 520,
+            "b": 22485,
+            "c": 1035,
+            "d": 71436
+          },
+          "or": 1.596,
+          "ci": [
+            1.435,
+            1.775
+          ],
+          "n": 95476,
+          "significant": true
+        },
+        "darkUnlitVsLit": {
+          "table": {
+            "a": 345,
+            "b": 8224,
+            "c": 175,
+            "d": 14261
+          },
+          "or": 3.419,
+          "ci": [
+            2.844,
+            4.109
+          ],
+          "n": 23005,
+          "significant": true
+        },
+        "wetVsDry": {
+          "table": {
+            "a": 154,
+            "b": 10444,
+            "c": 1449,
+            "d": 85974
+          },
+          "or": 0.875,
+          "ci": [
+            0.74,
+            1.034
+          ],
+          "n": 98021,
+          "significant": false
+        },
+        "fogVsClear": {
+          "table": {
+            "a": 47,
+            "b": 7435,
+            "c": 1495,
+            "d": 83968
+          },
+          "or": 0.355,
+          "ci": [
+            0.265,
+            0.475
+          ],
+          "n": 92945,
+          "significant": true
+        },
+        "rearEndOrStationaryVsOther": {
+          "table": {
+            "a": 154,
+            "b": 19120,
+            "c": 1502,
+            "d": 81185
+          },
+          "or": 0.435,
+          "ci": [
+            0.369,
+            0.514
+          ],
+          "n": 101961,
+          "significant": true
+        },
+        "ruralVsUrban": {
+          "table": {
+            "a": 1173,
+            "b": 34599,
+            "c": 483,
+            "d": 65741
+          },
+          "or": 4.614,
+          "ci": [
+            4.147,
+            5.134
+          ],
+          "n": 101996,
+          "significant": true
+        },
+        "pedestrianInvolved": {
+          "table": {
+            "a": 301,
+            "b": 12190,
+            "c": 1355,
+            "d": 88115
+          },
+          "or": 1.606,
+          "ci": [
+            1.415,
+            1.822
+          ],
+          "n": 101961,
+          "significant": true
+        },
+        "curveVsStraight": {
+          "table": {
+            "a": 463,
+            "b": 9212,
+            "c": 709,
+            "d": 17447
+          },
+          "or": 1.237,
+          "ci": [
+            1.097,
+            1.394
+          ],
+          "n": 27831,
+          "significant": true
+        },
+        "visibilityByVehicle": {
+          "table": {
+            "a": 11,
+            "b": 1119,
+            "c": 1585,
+            "d": 79349
+          },
+          "or": 0.492,
+          "ci": [
+            0.271,
+            0.893
+          ],
+          "n": 82064,
+          "significant": true
+        },
+        "interpretation": "OR > 1: entre accidentes con víctimas, la condición se asocia a mayor proporción de mortales. No mide frecuencia (sin exposición) ni causalidad."
+      },
+      "lightByCollision": [
+        {
+          "group": "HEAD_ON·DARK_UNLIT",
+          "n": 331,
+          "k": 51,
+          "p": 0.1541,
+          "ci": [
+            0.1192,
+            0.1969
+          ]
+        },
+        {
+          "group": "PEDESTRIAN·DARK_UNLIT",
+          "n": 434,
+          "k": 60,
+          "p": 0.1382,
+          "ci": [
+            0.1089,
+            0.1739
+          ]
+        },
+        {
+          "group": "HEAD_ON·DAY",
+          "n": 2337,
+          "k": 174,
+          "p": 0.0745,
+          "ci": [
+            0.0645,
+            0.0858
+          ]
+        },
+        {
+          "group": "RUN_OFF_ROAD·DARK_UNLIT",
+          "n": 3004,
+          "k": 143,
+          "p": 0.0476,
+          "ci": [
+            0.0405,
+            0.0558
+          ]
+        },
+        {
+          "group": "RUN_OFF_ROAD·TWILIGHT",
+          "n": 977,
+          "k": 39,
+          "p": 0.0399,
+          "ci": [
+            0.0293,
+            0.0541
+          ]
+        },
+        {
+          "group": "HEAD_ON·TWILIGHT",
+          "n": 207,
+          "k": 8,
+          "p": 0.0386,
+          "ci": [
+            0.0197,
+            0.0744
+          ]
+        },
+        {
+          "group": "RUN_OFF_ROAD·DARK_LIT",
+          "n": 1759,
+          "k": 64,
+          "p": 0.0364,
+          "ci": [
+            0.0286,
+            0.0462
+          ]
+        },
+        {
+          "group": "RUN_OFF_ROAD·DAY",
+          "n": 10161,
+          "k": 344,
+          "p": 0.0339,
+          "ci": [
+            0.0305,
+            0.0376
+          ]
+        },
+        {
+          "group": "OBSTACLE·DARK_UNLIT",
+          "n": 285,
+          "k": 9,
+          "p": 0.0316,
+          "ci": [
+            0.0167,
+            0.0589
+          ]
+        },
+        {
+          "group": "HEAD_ON·DARK_LIT",
+          "n": 437,
+          "k": 13,
+          "p": 0.0297,
+          "ci": [
+            0.0175,
+            0.0502
+          ]
+        },
+        {
+          "group": "REAR_END·DARK_UNLIT",
+          "n": 1158,
+          "k": 34,
+          "p": 0.0294,
+          "ci": [
+            0.0211,
+            0.0407
+          ]
+        },
+        {
+          "group": "PEDESTRIAN·TWILIGHT",
+          "n": 932,
+          "k": 25,
+          "p": 0.0268,
+          "ci": [
+            0.0182,
+            0.0393
+          ]
+        },
+        {
+          "group": "PEDESTRIAN·DARK_LIT",
+          "n": 2001,
+          "k": 48,
+          "p": 0.024,
+          "ci": [
+            0.0181,
+            0.0317
+          ]
+        },
+        {
+          "group": "PEDESTRIAN·DAY",
+          "n": 9063,
+          "k": 168,
+          "p": 0.0185,
+          "ci": [
+            0.016,
+            0.0215
+          ]
+        },
+        {
+          "group": "SIDE·DARK_UNLIT",
+          "n": 1609,
+          "k": 26,
+          "p": 0.0162,
+          "ci": [
+            0.0111,
+            0.0236
+          ]
+        },
+        {
+          "group": "OBSTACLE·DAY",
+          "n": 1490,
+          "k": 18,
+          "p": 0.0121,
+          "ci": [
+            0.0077,
+            0.019
+          ]
+        },
+        {
+          "group": "ROLLOVER·DARK_UNLIT",
+          "n": 341,
+          "k": 4,
+          "p": 0.0117,
+          "ci": [
+            0.0046,
+            0.0298
+          ]
+        },
+        {
+          "group": "OTHER·DARK_UNLIT",
+          "n": 799,
+          "k": 9,
+          "p": 0.0113,
+          "ci": [
+            0.0059,
+            0.0213
+          ]
+        },
+        {
+          "group": "OBSTACLE·DARK_LIT",
+          "n": 536,
+          "k": 6,
+          "p": 0.0112,
+          "ci": [
+            0.0051,
+            0.0242
+          ]
+        },
+        {
+          "group": "MULTI_VEHICLE_CHAIN·DAY",
+          "n": 1413,
+          "k": 15,
+          "p": 0.0106,
+          "ci": [
+            0.0064,
+            0.0174
+          ]
+        },
+        {
+          "group": "REAR_END·TWILIGHT",
+          "n": 1006,
+          "k": 10,
+          "p": 0.0099,
+          "ci": [
+            0.0054,
+            0.0182
+          ]
+        },
+        {
+          "group": "ROLLOVER·DAY",
+          "n": 2647,
+          "k": 22,
+          "p": 0.0083,
+          "ci": [
+            0.0055,
+            0.0126
+          ]
+        },
+        {
+          "group": "MULTI_VEHICLE_CHAIN·DARK_LIT",
+          "n": 263,
+          "k": 2,
+          "p": 0.0076,
+          "ci": [
+            0.0021,
+            0.0273
+          ]
+        },
+        {
+          "group": "SIDE·DAY",
+          "n": 22849,
+          "k": 162,
+          "p": 0.0071,
+          "ci": [
+            0.0061,
+            0.0083
+          ]
+        },
+        {
+          "group": "REAR_END·DARK_LIT",
+          "n": 2192,
+          "k": 15,
+          "p": 0.0068,
+          "ci": [
+            0.0042,
+            0.0113
+          ]
+        }
+      ],
+      "hotspots": {
+        "cells": 21555,
+        "meanPerCell": 1.616,
+        "variance": 3.346,
+        "prior": {
+          "alpha": 1.511,
+          "beta": 0.935
+        },
+        "top": [
+          {
+            "cell": "C-58@0",
+            "count": 71,
+            "fatal": 1,
+            "severityWeighted": 88,
+            "ebExpected": 37.48,
+            "shrinkage": 0.472,
+            "centroid": null
+          },
+          {
+            "cell": "B-20@10",
+            "count": 40,
+            "fatal": 0,
+            "severityWeighted": 44,
+            "ebExpected": 21.46,
+            "shrinkage": 0.464,
+            "centroid": null
+          },
+          {
+            "cell": "B-20@9",
+            "count": 40,
+            "fatal": 0,
+            "severityWeighted": 40,
+            "ebExpected": 21.46,
+            "shrinkage": 0.464,
+            "centroid": null
+          },
+          {
+            "cell": "B-20@8",
+            "count": 36,
+            "fatal": 0,
+            "severityWeighted": 40,
+            "ebExpected": 19.39,
+            "shrinkage": 0.461,
+            "centroid": null
+          },
+          {
+            "cell": "AP-7@146",
+            "count": 34,
+            "fatal": 0,
+            "severityWeighted": 50,
+            "ebExpected": 18.35,
+            "shrinkage": 0.46,
+            "centroid": null
+          },
+          {
+            "cell": "A-2@606",
+            "count": 33,
+            "fatal": 0,
+            "severityWeighted": 41,
+            "ebExpected": 17.84,
+            "shrinkage": 0.459,
+            "centroid": null
+          },
+          {
+            "cell": "B-10@0",
+            "count": 32,
+            "fatal": 1,
+            "severityWeighted": 41,
+            "ebExpected": 17.32,
+            "shrinkage": 0.459,
+            "centroid": null
+          },
+          {
+            "cell": "B-20@16",
+            "count": 32,
+            "fatal": 0,
+            "severityWeighted": 40,
+            "ebExpected": 17.32,
+            "shrinkage": 0.459,
+            "centroid": null
+          },
+          {
+            "cell": "B-20@11",
+            "count": 31,
+            "fatal": 0,
+            "severityWeighted": 35,
+            "ebExpected": 16.8,
+            "shrinkage": 0.458,
+            "centroid": null
+          },
+          {
+            "cell": "B-20@13",
+            "count": 29,
+            "fatal": 0,
+            "severityWeighted": 29,
+            "ebExpected": 15.77,
+            "shrinkage": 0.456,
+            "centroid": null
+          },
+          {
+            "cell": "A-2@607",
+            "count": 28,
+            "fatal": 1,
+            "severityWeighted": 45,
+            "ebExpected": 15.25,
+            "shrinkage": 0.455,
+            "centroid": null
+          },
+          {
+            "cell": "B-10@6",
+            "count": 27,
+            "fatal": 0,
+            "severityWeighted": 31,
+            "ebExpected": 14.74,
+            "shrinkage": 0.454,
+            "centroid": null
+          },
+          {
+            "cell": "C-31@209",
+            "count": 27,
+            "fatal": 0,
+            "severityWeighted": 31,
+            "ebExpected": 14.74,
+            "shrinkage": 0.454,
+            "centroid": null
+          },
+          {
+            "cell": "C-31@208",
+            "count": 26,
+            "fatal": 0,
+            "severityWeighted": 30,
+            "ebExpected": 14.22,
+            "shrinkage": 0.453,
+            "centroid": null
+          },
+          {
+            "cell": "A-2@608",
+            "count": 26,
+            "fatal": 0,
+            "severityWeighted": 30,
+            "ebExpected": 14.22,
+            "shrinkage": 0.453,
+            "centroid": null
+          },
+          {
+            "cell": "A-2@609",
+            "count": 26,
+            "fatal": 0,
+            "severityWeighted": 30,
+            "ebExpected": 14.22,
+            "shrinkage": 0.453,
+            "centroid": null
+          },
+          {
+            "cell": "B-20@17",
+            "count": 25,
+            "fatal": 0,
+            "severityWeighted": 33,
+            "ebExpected": 13.7,
+            "shrinkage": 0.452,
+            "centroid": null
+          },
+          {
+            "cell": "B-10@8",
+            "count": 25,
+            "fatal": 0,
+            "severityWeighted": 25,
+            "ebExpected": 13.7,
+            "shrinkage": 0.452,
+            "centroid": null
+          },
+          {
+            "cell": "GC-1@6",
+            "count": 25,
+            "fatal": 0,
+            "severityWeighted": 25,
+            "ebExpected": 13.7,
+            "shrinkage": 0.452,
+            "centroid": null
+          },
+          {
+            "cell": "SE-30@14",
+            "count": 24,
+            "fatal": 1,
+            "severityWeighted": 33,
+            "ebExpected": 13.19,
+            "shrinkage": 0.451,
+            "centroid": null
+          },
+          {
+            "cell": "B-20@5",
+            "count": 24,
+            "fatal": 0,
+            "severityWeighted": 32,
+            "ebExpected": 13.19,
+            "shrinkage": 0.451,
+            "centroid": null
+          },
+          {
+            "cell": "Ma-19@3",
+            "count": 24,
+            "fatal": 0,
+            "severityWeighted": 24,
+            "ebExpected": 13.19,
+            "shrinkage": 0.451,
+            "centroid": null
+          },
+          {
+            "cell": "C-58@10",
+            "count": 23,
+            "fatal": 0,
+            "severityWeighted": 27,
+            "ebExpected": 12.67,
+            "shrinkage": 0.449,
+            "centroid": null
+          },
+          {
+            "cell": "B-10@11",
+            "count": 23,
+            "fatal": 0,
+            "severityWeighted": 27,
+            "ebExpected": 12.67,
+            "shrinkage": 0.449,
+            "centroid": null
+          },
+          {
+            "cell": "V-31@11",
+            "count": 23,
+            "fatal": 0,
+            "severityWeighted": 23,
+            "ebExpected": 12.67,
+            "shrinkage": 0.449,
+            "centroid": null
+          }
+        ]
+      },
+      "hotspotsRearStationary": {
+        "cells": 4702,
+        "meanPerCell": 1.916,
+        "variance": 5.52,
+        "prior": {
+          "alpha": 1.019,
+          "beta": 0.532
+        },
+        "top": [
+          {
+            "cell": "C-58@0",
+            "count": 52,
+            "fatal": 0,
+            "severityWeighted": 52,
+            "ebExpected": 34.61,
+            "shrinkage": 0.334,
+            "centroid": null
+          },
+          {
+            "cell": "A-2@606",
+            "count": 31,
+            "fatal": 0,
+            "severityWeighted": 39,
+            "ebExpected": 20.9,
+            "shrinkage": 0.326,
+            "centroid": null
+          },
+          {
+            "cell": "B-30@8",
+            "count": 30,
+            "fatal": 0,
+            "severityWeighted": 34,
+            "ebExpected": 20.25,
+            "shrinkage": 0.325,
+            "centroid": null
+          },
+          {
+            "cell": "V-31@10",
+            "count": 30,
+            "fatal": 0,
+            "severityWeighted": 30,
+            "ebExpected": 20.25,
+            "shrinkage": 0.325,
+            "centroid": null
+          },
+          {
+            "cell": "A-2@608",
+            "count": 27,
+            "fatal": 0,
+            "severityWeighted": 31,
+            "ebExpected": 18.29,
+            "shrinkage": 0.322,
+            "centroid": null
+          },
+          {
+            "cell": "GC-1@6",
+            "count": 26,
+            "fatal": 0,
+            "severityWeighted": 26,
+            "ebExpected": 17.64,
+            "shrinkage": 0.322,
+            "centroid": null
+          },
+          {
+            "cell": "AP-7@146",
+            "count": 25,
+            "fatal": 0,
+            "severityWeighted": 41,
+            "ebExpected": 16.99,
+            "shrinkage": 0.321,
+            "centroid": null
+          },
+          {
+            "cell": "C-32@52",
+            "count": 25,
+            "fatal": 0,
+            "severityWeighted": 29,
+            "ebExpected": 16.99,
+            "shrinkage": 0.321,
+            "centroid": null
+          },
+          {
+            "cell": "C-31@208",
+            "count": 22,
+            "fatal": 0,
+            "severityWeighted": 30,
+            "ebExpected": 15.03,
+            "shrinkage": 0.317,
+            "centroid": null
+          },
+          {
+            "cell": "C-58@4",
+            "count": 19,
+            "fatal": 0,
+            "severityWeighted": 19,
+            "ebExpected": 13.07,
+            "shrinkage": 0.312,
+            "centroid": null
+          },
+          {
+            "cell": "GC-3@8",
+            "count": 19,
+            "fatal": 0,
+            "severityWeighted": 19,
+            "ebExpected": 13.07,
+            "shrinkage": 0.312,
+            "centroid": null
+          },
+          {
+            "cell": "B-30@10",
+            "count": 18,
+            "fatal": 0,
+            "severityWeighted": 18,
+            "ebExpected": 12.42,
+            "shrinkage": 0.31,
+            "centroid": null
+          },
+          {
+            "cell": "C-58@12",
+            "count": 18,
+            "fatal": 0,
+            "severityWeighted": 18,
+            "ebExpected": 12.42,
+            "shrinkage": 0.31,
+            "centroid": null
+          },
+          {
+            "cell": "A-5@12",
+            "count": 17,
+            "fatal": 0,
+            "severityWeighted": 25,
+            "ebExpected": 11.76,
+            "shrinkage": 0.308,
+            "centroid": null
+          },
+          {
+            "cell": "M-40@10",
+            "count": 17,
+            "fatal": 0,
+            "severityWeighted": 25,
+            "ebExpected": 11.76,
+            "shrinkage": 0.308,
+            "centroid": null
+          }
+        ]
+      }
+    },
+    "DE": {
+      "records": 268519,
+      "injury": 268519,
+      "profile": {
+        "nInjury": 268519,
+        "nAll": 268519,
+        "rearEnd": {
+          "k": 42854,
+          "p": 0.1596,
+          "ci": [
+            0.1582,
+            0.161
+          ]
+        },
+        "stationaryVehicle": {
+          "k": 14673,
+          "p": 0.0546,
+          "ci": [
+            0.0538,
+            0.0555
+          ]
+        },
+        "chain": {
+          "k": 0,
+          "p": 0,
+          "ci": [
+            0,
+            0
+          ]
+        },
+        "visibilityRestrictedByVehicle": {
+          "k": 0,
+          "p": 0,
+          "ci": [
+            0,
+            0
+          ]
+        },
+        "secondaryOtherAccident": {
+          "k": 0,
+          "p": 0,
+          "basis": "todos los registros (incluye PDO si la fuente los tiene); registro policial, probable infraregistro"
+        },
+        "queueIndicator": 0,
+        "byLightRearStationary": [
+          {
+            "group": "DARK",
+            "n": 9521,
+            "k": 55,
+            "p": 0.0058,
+            "ci": [
+              0.0044,
+              0.0075
+            ]
+          },
+          {
+            "group": "DAY",
+            "n": 45125,
+            "k": 155,
+            "p": 0.0034,
+            "ci": [
+              0.0029,
+              0.004
+            ]
+          },
+          {
+            "group": "TWILIGHT",
+            "n": 2881,
+            "k": 9,
+            "p": 0.0031,
+            "ci": [
+              0.0016,
+              0.0059
+            ]
+          }
+        ],
+        "byHourRearStationary": [
+          {
+            "hour": 0,
+            "n": 418
+          },
+          {
+            "hour": 1,
+            "n": 297
+          },
+          {
+            "hour": 2,
+            "n": 231
+          },
+          {
+            "hour": 3,
+            "n": 195
+          },
+          {
+            "hour": 4,
+            "n": 211
+          },
+          {
+            "hour": 5,
+            "n": 494
+          },
+          {
+            "hour": 6,
+            "n": 1326
+          },
+          {
+            "hour": 7,
+            "n": 3537
+          },
+          {
+            "hour": 8,
+            "n": 2665
+          },
+          {
+            "hour": 9,
+            "n": 2326
+          },
+          {
+            "hour": 10,
+            "n": 2874
+          },
+          {
+            "hour": 11,
+            "n": 3356
+          },
+          {
+            "hour": 12,
+            "n": 3942
+          },
+          {
+            "hour": 13,
+            "n": 4653
+          },
+          {
+            "hour": 14,
+            "n": 5136
+          },
+          {
+            "hour": 15,
+            "n": 5499
+          },
+          {
+            "hour": 16,
+            "n": 5737
+          },
+          {
+            "hour": 17,
+            "n": 5256
+          },
+          {
+            "hour": 18,
+            "n": 3610
+          },
+          {
+            "hour": 19,
+            "n": 2018
+          },
+          {
+            "hour": 20,
+            "n": 1365
+          },
+          {
+            "hour": 21,
+            "n": 978
+          },
+          {
+            "hour": 22,
+            "n": 828
+          },
+          {
+            "hour": 23,
+            "n": 575
+          }
+        ]
+      },
+      "severityFactors": {
+        "n": 268519,
+        "fatal": 2458,
+        "darkVsDay": {
+          "table": {
+            "a": 660,
+            "b": 51105,
+            "c": 1666,
+            "d": 200491
+          },
+          "or": 1.554,
+          "ci": [
+            1.419,
+            1.702
+          ],
+          "n": 253922,
+          "significant": true
+        },
+        "darkUnlitVsLit": {
+          "table": {
+            "a": 0,
+            "b": 0,
+            "c": 0,
+            "d": 0
+          },
+          "or": 1,
+          "ci": [
+            0.004,
+            255.626
+          ],
+          "n": 0,
+          "significant": false
+        },
+        "wetVsDry": {
+          "table": {
+            "a": 594,
+            "b": 63208,
+            "c": 1830,
+            "d": 198156
+          },
+          "or": 1.018,
+          "ci": [
+            0.927,
+            1.117
+          ],
+          "n": 263788,
+          "significant": false
+        },
+        "fogVsClear": {
+          "table": {
+            "a": 0,
+            "b": 0,
+            "c": 0,
+            "d": 0
+          },
+          "or": 1,
+          "ci": [
+            0.004,
+            255.626
+          ],
+          "n": 0,
+          "significant": false
+        },
+        "rearEndOrStationaryVsOther": {
+          "table": {
+            "a": 219,
+            "b": 57308,
+            "c": 2239,
+            "d": 208753
+          },
+          "or": 0.356,
+          "ci": [
+            0.31,
+            0.409
+          ],
+          "n": 268519,
+          "significant": true
+        },
+        "ruralVsUrban": {
+          "table": {
+            "a": 0,
+            "b": 0,
+            "c": 0,
+            "d": 0
+          },
+          "or": 1,
+          "ci": [
+            0.004,
+            255.626
+          ],
+          "n": 0,
+          "significant": false
+        },
+        "pedestrianInvolved": {
+          "table": {
+            "a": 353,
+            "b": 24194,
+            "c": 2105,
+            "d": 241867
+          },
+          "or": 1.676,
+          "ci": [
+            1.497,
+            1.878
+          ],
+          "n": 268519,
+          "significant": true
+        },
+        "curveVsStraight": {
+          "table": {
+            "a": 0,
+            "b": 0,
+            "c": 0,
+            "d": 0
+          },
+          "or": 1,
+          "ci": [
+            0.004,
+            255.626
+          ],
+          "n": 0,
+          "significant": false
+        },
+        "visibilityByVehicle": {
+          "table": {
+            "a": 0,
+            "b": 0,
+            "c": 0,
+            "d": 0
+          },
+          "or": 1,
+          "ci": [
+            0.004,
+            255.626
+          ],
+          "n": 0,
+          "significant": false
+        },
+        "interpretation": "OR > 1: entre accidentes con víctimas, la condición se asocia a mayor proporción de mortales. No mide frecuencia (sin exposición) ni causalidad."
+      },
+      "lightByCollision": [
+        {
+          "group": "HEAD_ON·TWILIGHT",
+          "n": 1052,
+          "k": 35,
+          "p": 0.0333,
+          "ci": [
+            0.024,
+            0.0459
+          ]
+        },
+        {
+          "group": "PEDESTRIAN·DARK",
+          "n": 5387,
+          "k": 169,
+          "p": 0.0314,
+          "ci": [
+            0.027,
+            0.0364
+          ]
+        },
+        {
+          "group": "HEAD_ON·DAY",
+          "n": 14239,
+          "k": 431,
+          "p": 0.0303,
+          "ci": [
+            0.0276,
+            0.0332
+          ]
+        },
+        {
+          "group": "HEAD_ON·DARK",
+          "n": 3422,
+          "k": 93,
+          "p": 0.0272,
+          "ci": [
+            0.0222,
+            0.0332
+          ]
+        },
+        {
+          "group": "RUN_OFF_ROAD·DARK",
+          "n": 10746,
+          "k": 229,
+          "p": 0.0213,
+          "ci": [
+            0.0187,
+            0.0242
+          ]
+        },
+        {
+          "group": "RUN_OFF_ROAD·TWILIGHT",
+          "n": 2116,
+          "k": 42,
+          "p": 0.0198,
+          "ci": [
+            0.0147,
+            0.0267
+          ]
+        },
+        {
+          "group": "RUN_OFF_ROAD·DAY",
+          "n": 21915,
+          "k": 400,
+          "p": 0.0183,
+          "ci": [
+            0.0166,
+            0.0201
+          ]
+        },
+        {
+          "group": "PEDESTRIAN·TWILIGHT",
+          "n": 1345,
+          "k": 20,
+          "p": 0.0149,
+          "ci": [
+            0.0096,
+            0.0229
+          ]
+        },
+        {
+          "group": "OBSTACLE·DAY",
+          "n": 1492,
+          "k": 16,
+          "p": 0.0107,
+          "ci": [
+            0.0066,
+            0.0173
+          ]
+        },
+        {
+          "group": "PEDESTRIAN·DAY",
+          "n": 14872,
+          "k": 144,
+          "p": 0.0097,
+          "ci": [
+            0.0082,
+            0.0114
+          ]
+        },
+        {
+          "group": "OBSTACLE·DARK",
+          "n": 1233,
+          "k": 10,
+          "p": 0.0081,
+          "ci": [
+            0.0044,
+            0.0149
+          ]
+        },
+        {
+          "group": "OBSTACLE·TWILIGHT",
+          "n": 264,
+          "k": 2,
+          "p": 0.0076,
+          "ci": [
+            0.0021,
+            0.0272
+          ]
+        },
+        {
+          "group": "REAR_END·DARK",
+          "n": 6584,
+          "k": 40,
+          "p": 0.0061,
+          "ci": [
+            0.0045,
+            0.0083
+          ]
+        },
+        {
+          "group": "SIDE·DAY",
+          "n": 68377,
+          "k": 368,
+          "p": 0.0054,
+          "ci": [
+            0.0049,
+            0.006
+          ]
+        },
+        {
+          "group": "STATIONARY_VEHICLE·DARK",
+          "n": 2937,
+          "k": 15,
+          "p": 0.0051,
+          "ci": [
+            0.0031,
+            0.0084
+          ]
+        },
+        {
+          "group": "OTHER·DARK",
+          "n": 8440,
+          "k": 41,
+          "p": 0.0049,
+          "ci": [
+            0.0036,
+            0.0066
+          ]
+        },
+        {
+          "group": "SIDE·DARK",
+          "n": 13016,
+          "k": 63,
+          "p": 0.0048,
+          "ci": [
+            0.0038,
+            0.0062
+          ]
+        },
+        {
+          "group": "SIDE·TWILIGHT",
+          "n": 4570,
+          "k": 20,
+          "p": 0.0044,
+          "ci": [
+            0.0028,
+            0.0068
+          ]
+        },
+        {
+          "group": "OTHER·DAY",
+          "n": 36137,
+          "k": 152,
+          "p": 0.0042,
+          "ci": [
+            0.0036,
+            0.0049
+          ]
+        },
+        {
+          "group": "REAR_END·TWILIGHT",
+          "n": 2192,
+          "k": 9,
+          "p": 0.0041,
+          "ci": [
+            0.0022,
+            0.0078
+          ]
+        },
+        {
+          "group": "REAR_END·DAY",
+          "n": 34078,
+          "k": 122,
+          "p": 0.0036,
+          "ci": [
+            0.003,
+            0.0043
+          ]
+        },
+        {
+          "group": "STATIONARY_VEHICLE·DAY",
+          "n": 11047,
+          "k": 33,
+          "p": 0.003,
+          "ci": [
+            0.0021,
+            0.0042
+          ]
+        },
+        {
+          "group": "OTHER·TWILIGHT",
+          "n": 2369,
+          "k": 4,
+          "p": 0.0017,
+          "ci": [
+            0.0007,
+            0.0043
+          ]
+        },
+        {
+          "group": "STATIONARY_VEHICLE·TWILIGHT",
+          "n": 689,
+          "k": 0,
+          "p": 0,
+          "ci": [
+            0,
+            0.0055
+          ]
+        }
+      ],
+      "hotspots": {
+        "cells": 89811,
+        "meanPerCell": 2.99,
+        "variance": 25.318,
+        "prior": {
+          "alpha": 0.4,
+          "beta": 0.134
+        },
+        "top": [
+          {
+            "cell": "52.52,13.41",
+            "count": 115,
+            "fatal": 1,
+            "severityWeighted": 168,
+            "ebExpected": 101.77,
+            "shrinkage": 0.115,
+            "centroid": {
+              "lat": 52.52418,
+              "lon": 13.41536
+            }
+          },
+          {
+            "cell": "50.93,6.93",
+            "count": 109,
+            "fatal": 1,
+            "severityWeighted": 166,
+            "ebExpected": 96.48,
+            "shrinkage": 0.115,
+            "centroid": {
+              "lat": 50.93513,
+              "lon": 6.93637
+            }
+          },
+          {
+            "cell": "52.49,13.38",
+            "count": 105,
+            "fatal": 0,
+            "severityWeighted": 181,
+            "ebExpected": 92.95,
+            "shrinkage": 0.115,
+            "centroid": {
+              "lat": 52.49515,
+              "lon": 13.38737
+            }
+          },
+          {
+            "cell": "53.55,10.00",
+            "count": 104,
+            "fatal": 0,
+            "severityWeighted": 136,
+            "ebExpected": 92.07,
+            "shrinkage": 0.115,
+            "centroid": {
+              "lat": 53.55346,
+              "lon": 10.0054
+            }
+          },
+          {
+            "cell": "50.93,6.95",
+            "count": 97,
+            "fatal": 0,
+            "severityWeighted": 149,
+            "ebExpected": 85.9,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 50.93501,
+              "lon": 6.95495
+            }
+          },
+          {
+            "cell": "52.37,9.73",
+            "count": 93,
+            "fatal": 0,
+            "severityWeighted": 125,
+            "ebExpected": 82.37,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 52.37562,
+              "lon": 9.73452
+            }
+          },
+          {
+            "cell": "50.11,8.67",
+            "count": 92,
+            "fatal": 1,
+            "severityWeighted": 121,
+            "ebExpected": 81.49,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 50.1147,
+              "lon": 8.67536
+            }
+          },
+          {
+            "cell": "48.13,11.56",
+            "count": 91,
+            "fatal": 0,
+            "severityWeighted": 119,
+            "ebExpected": 80.61,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 48.13543,
+              "lon": 11.56519
+            }
+          },
+          {
+            "cell": "50.11,8.68",
+            "count": 91,
+            "fatal": 0,
+            "severityWeighted": 111,
+            "ebExpected": 80.61,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 50.11476,
+              "lon": 8.68598
+            }
+          },
+          {
+            "cell": "52.51,13.38",
+            "count": 91,
+            "fatal": 0,
+            "severityWeighted": 107,
+            "ebExpected": 80.61,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 52.5157,
+              "lon": 13.38545
+            }
+          },
+          {
+            "cell": "52.52,13.40",
+            "count": 90,
+            "fatal": 0,
+            "severityWeighted": 130,
+            "ebExpected": 79.72,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 52.52547,
+              "lon": 13.40512
+            }
+          },
+          {
+            "cell": "47.99,7.84",
+            "count": 89,
+            "fatal": 0,
+            "severityWeighted": 133,
+            "ebExpected": 78.84,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 47.99525,
+              "lon": 7.84464
+            }
+          },
+          {
+            "cell": "48.13,11.55",
+            "count": 89,
+            "fatal": 0,
+            "severityWeighted": 125,
+            "ebExpected": 78.84,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 48.13645,
+              "lon": 11.55614
+            }
+          },
+          {
+            "cell": "52.50,13.41",
+            "count": 89,
+            "fatal": 0,
+            "severityWeighted": 117,
+            "ebExpected": 78.84,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 52.50409,
+              "lon": 13.41455
+            }
+          },
+          {
+            "cell": "50.93,6.94",
+            "count": 89,
+            "fatal": 0,
+            "severityWeighted": 109,
+            "ebExpected": 78.84,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 50.93391,
+              "lon": 6.94462
+            }
+          },
+          {
+            "cell": "52.49,13.39",
+            "count": 88,
+            "fatal": 1,
+            "severityWeighted": 161,
+            "ebExpected": 77.96,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 52.49524,
+              "lon": 13.39494
+            }
+          },
+          {
+            "cell": "52.50,13.39",
+            "count": 87,
+            "fatal": 0,
+            "severityWeighted": 139,
+            "ebExpected": 77.08,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 52.50662,
+              "lon": 13.394
+            }
+          },
+          {
+            "cell": "48.13,11.58",
+            "count": 87,
+            "fatal": 0,
+            "severityWeighted": 115,
+            "ebExpected": 77.08,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 48.13545,
+              "lon": 11.58457
+            }
+          },
+          {
+            "cell": "49.44,11.08",
+            "count": 83,
+            "fatal": 1,
+            "severityWeighted": 128,
+            "ebExpected": 73.55,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 49.44423,
+              "lon": 11.08443
+            }
+          },
+          {
+            "cell": "51.22,6.79",
+            "count": 82,
+            "fatal": 1,
+            "severityWeighted": 123,
+            "ebExpected": 72.67,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 51.22487,
+              "lon": 6.79425
+            }
+          },
+          {
+            "cell": "51.95,7.63",
+            "count": 81,
+            "fatal": 0,
+            "severityWeighted": 125,
+            "ebExpected": 71.79,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 51.95526,
+              "lon": 7.63527
+            }
+          },
+          {
+            "cell": "50.10,8.66",
+            "count": 80,
+            "fatal": 0,
+            "severityWeighted": 128,
+            "ebExpected": 70.91,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 50.10592,
+              "lon": 8.66483
+            }
+          },
+          {
+            "cell": "52.55,13.38",
+            "count": 80,
+            "fatal": 0,
+            "severityWeighted": 120,
+            "ebExpected": 70.91,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 52.55455,
+              "lon": 13.38422
+            }
+          },
+          {
+            "cell": "48.13,11.57",
+            "count": 80,
+            "fatal": 0,
+            "severityWeighted": 100,
+            "ebExpected": 70.91,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 48.13524,
+              "lon": 11.57538
+            }
+          },
+          {
+            "cell": "52.38,9.73",
+            "count": 80,
+            "fatal": 0,
+            "severityWeighted": 92,
+            "ebExpected": 70.91,
+            "shrinkage": 0.114,
+            "centroid": {
+              "lat": 52.38359,
+              "lon": 9.73552
+            }
+          }
+        ]
+      },
+      "hotspotsRearStationary": {
+        "cells": 20374,
+        "meanPerCell": 2.824,
+        "variance": 17.104,
+        "prior": {
+          "alpha": 0.558,
+          "beta": 0.198
+        },
+        "top": [
+          {
+            "cell": "52.52,13.40",
+            "count": 73,
+            "fatal": 0,
+            "severityWeighted": 93,
+            "ebExpected": 61.42,
+            "shrinkage": 0.159,
+            "centroid": {
+              "lat": 52.5272,
+              "lon": 13.41068
+            }
+          },
+          {
+            "cell": "52.50,13.28",
+            "count": 67,
+            "fatal": 0,
+            "severityWeighted": 87,
+            "ebExpected": 56.41,
+            "shrinkage": 0.158,
+            "centroid": {
+              "lat": 52.5115,
+              "lon": 13.28669
+            }
+          },
+          {
+            "cell": "52.48,13.28",
+            "count": 63,
+            "fatal": 0,
+            "severityWeighted": 87,
+            "ebExpected": 53.07,
+            "shrinkage": 0.158,
+            "centroid": {
+              "lat": 52.49341,
+              "lon": 13.29029
+            }
+          },
+          {
+            "cell": "52.48,13.42",
+            "count": 63,
+            "fatal": 0,
+            "severityWeighted": 71,
+            "ebExpected": 53.07,
+            "shrinkage": 0.158,
+            "centroid": {
+              "lat": 52.48624,
+              "lon": 13.42961
+            }
+          },
+          {
+            "cell": "52.50,13.40",
+            "count": 63,
+            "fatal": 0,
+            "severityWeighted": 67,
+            "ebExpected": 53.07,
+            "shrinkage": 0.158,
+            "centroid": {
+              "lat": 52.50786,
+              "lon": 13.41115
+            }
+          },
+          {
+            "cell": "50.92,6.92",
+            "count": 59,
+            "fatal": 0,
+            "severityWeighted": 71,
+            "ebExpected": 49.73,
+            "shrinkage": 0.157,
+            "centroid": {
+              "lat": 50.93232,
+              "lon": 6.93196
+            }
+          },
+          {
+            "cell": "48.14,11.56",
+            "count": 58,
+            "fatal": 0,
+            "severityWeighted": 62,
+            "ebExpected": 48.89,
+            "shrinkage": 0.157,
+            "centroid": {
+              "lat": 48.14877,
+              "lon": 11.5694
+            }
+          },
+          {
+            "cell": "52.50,13.38",
+            "count": 57,
+            "fatal": 0,
+            "severityWeighted": 69,
+            "ebExpected": 48.06,
+            "shrinkage": 0.157,
+            "centroid": {
+              "lat": 52.51171,
+              "lon": 13.38914
+            }
+          },
+          {
+            "cell": "50.10,8.66",
+            "count": 56,
+            "fatal": 0,
+            "severityWeighted": 72,
+            "ebExpected": 47.22,
+            "shrinkage": 0.157,
+            "centroid": {
+              "lat": 50.1086,
+              "lon": 8.67044
+            }
+          },
+          {
+            "cell": "52.52,13.38",
+            "count": 54,
+            "fatal": 0,
+            "severityWeighted": 62,
+            "ebExpected": 45.55,
+            "shrinkage": 0.156,
+            "centroid": {
+              "lat": 52.53044,
+              "lon": 13.38967
+            }
+          },
+          {
+            "cell": "52.46,13.42",
+            "count": 53,
+            "fatal": 0,
+            "severityWeighted": 57,
+            "ebExpected": 44.72,
+            "shrinkage": 0.156,
+            "centroid": {
+              "lat": 52.47032,
+              "lon": 13.43104
+            }
+          },
+          {
+            "cell": "52.48,13.34",
+            "count": 52,
+            "fatal": 0,
+            "severityWeighted": 76,
+            "ebExpected": 43.88,
+            "shrinkage": 0.156,
+            "centroid": {
+              "lat": 52.48919,
+              "lon": 13.35167
+            }
+          },
+          {
+            "cell": "52.54,13.36",
+            "count": 52,
+            "fatal": 0,
+            "severityWeighted": 60,
+            "ebExpected": 43.88,
+            "shrinkage": 0.156,
+            "centroid": {
+              "lat": 52.55178,
+              "lon": 13.37091
+            }
+          },
+          {
+            "cell": "48.16,11.58",
+            "count": 52,
+            "fatal": 0,
+            "severityWeighted": 56,
+            "ebExpected": 43.88,
+            "shrinkage": 0.156,
+            "centroid": {
+              "lat": 48.17006,
+              "lon": 11.59125
+            }
+          },
+          {
+            "cell": "52.48,13.38",
+            "count": 51,
+            "fatal": 0,
+            "severityWeighted": 63,
+            "ebExpected": 43.05,
+            "shrinkage": 0.156,
+            "centroid": {
+              "lat": 52.49058,
+              "lon": 13.38782
+            }
+          }
+        ]
+      }
+    },
+    "NL": {
+      "records": 126380,
+      "injury": 25416,
+      "profile": {
+        "nInjury": 25416,
+        "nAll": 126380,
+        "rearEnd": {
+          "k": 2809,
+          "p": 0.1105,
+          "ci": [
+            0.1067,
+            0.1144
+          ]
+        },
+        "stationaryVehicle": {
+          "k": 423,
+          "p": 0.0166,
+          "ci": [
+            0.0151,
+            0.0183
+          ]
+        },
+        "chain": {
+          "k": 0,
+          "p": 0,
+          "ci": [
+            0,
+            0.0002
+          ]
+        },
+        "visibilityRestrictedByVehicle": {
+          "k": 0,
+          "p": 0,
+          "ci": [
+            0,
+            0.0002
+          ]
+        },
+        "secondaryOtherAccident": {
+          "k": 184,
+          "p": 0.00146,
+          "basis": "todos los registros (incluye PDO si la fuente los tiene); registro policial, probable infraregistro"
+        },
+        "queueIndicator": 1,
+        "byLightRearStationary": [
+          {
+            "group": "DARK",
+            "n": 599,
+            "k": 10,
+            "p": 0.0167,
+            "ci": [
+              0.0091,
+              0.0305
+            ]
+          },
+          {
+            "group": "TWILIGHT",
+            "n": 167,
+            "k": 2,
+            "p": 0.012,
+            "ci": [
+              0.0033,
+              0.0426
+            ]
+          },
+          {
+            "group": "DAY",
+            "n": 2466,
+            "k": 28,
+            "p": 0.0114,
+            "ci": [
+              0.0079,
+              0.0164
+            ]
+          }
+        ],
+        "byHourRearStationary": []
+      },
+      "severityFactors": {
+        "n": 25416,
+        "fatal": 541,
+        "darkVsDay": {
+          "table": {
+            "a": 147,
+            "b": 4999,
+            "c": 364,
+            "d": 18598
+          },
+          "or": 1.502,
+          "ci": [
+            1.237,
+            1.824
+          ],
+          "n": 24108,
+          "significant": true
+        },
+        "darkUnlitVsLit": {
+          "table": {
+            "a": 0,
+            "b": 0,
+            "c": 0,
+            "d": 0
+          },
+          "or": 1,
+          "ci": [
+            0.004,
+            255.626
+          ],
+          "n": 0,
+          "significant": false
+        },
+        "wetVsDry": {
+          "table": {
+            "a": 145,
+            "b": 6886,
+            "c": 372,
+            "d": 16752
+          },
+          "or": 0.948,
+          "ci": [
+            0.781,
+            1.151
+          ],
+          "n": 24155,
+          "significant": false
+        },
+        "fogVsClear": {
+          "table": {
+            "a": 5,
+            "b": 92,
+            "c": 447,
+            "d": 19929
+          },
+          "or": 2.423,
+          "ci": [
+            0.98,
+            5.989
+          ],
+          "n": 20473,
+          "significant": false
+        },
+        "rearEndOrStationaryVsOther": {
+          "table": {
+            "a": 40,
+            "b": 3192,
+            "c": 409,
+            "d": 15953
+          },
+          "or": 0.489,
+          "ci": [
+            0.352,
+            0.678
+          ],
+          "n": 19594,
+          "significant": true
+        },
+        "ruralVsUrban": {
+          "table": {
+            "a": 307,
+            "b": 6399,
+            "c": 221,
+            "d": 17598
+          },
+          "or": 3.82,
+          "ci": [
+            3.206,
+            4.552
+          ],
+          "n": 24525,
+          "significant": true
+        },
+        "pedestrianInvolved": {
+          "table": {
+            "a": 55,
+            "b": 1527,
+            "c": 394,
+            "d": 17618
+          },
+          "or": 1.611,
+          "ci": [
+            1.209,
+            2.146
+          ],
+          "n": 19594,
+          "significant": true
+        },
+        "curveVsStraight": {
+          "table": {
+            "a": 58,
+            "b": 1848,
+            "c": 472,
+            "d": 21956
+          },
+          "or": 1.46,
+          "ci": [
+            1.107,
+            1.926
+          ],
+          "n": 24334,
+          "significant": true
+        },
+        "visibilityByVehicle": {
+          "table": {
+            "a": 0,
+            "b": 0,
+            "c": 0,
+            "d": 0
+          },
+          "or": 1,
+          "ci": [
+            0.004,
+            255.626
+          ],
+          "n": 0,
+          "significant": false
+        },
+        "interpretation": "OR > 1: entre accidentes con víctimas, la condición se asocia a mayor proporción de mortales. No mide frecuencia (sin exposición) ni causalidad."
+      },
+      "lightByCollision": [
+        {
+          "group": "OBSTACLE·DARK",
+          "n": 772,
+          "k": 58,
+          "p": 0.0751,
+          "ci": [
+            0.0586,
+            0.0959
+          ]
+        },
+        {
+          "group": "PEDESTRIAN·DARK",
+          "n": 384,
+          "k": 17,
+          "p": 0.0443,
+          "ci": [
+            0.0278,
+            0.0697
+          ]
+        },
+        {
+          "group": "HEAD_ON·DAY",
+          "n": 1517,
+          "k": 52,
+          "p": 0.0343,
+          "ci": [
+            0.0262,
+            0.0447
+          ]
+        },
+        {
+          "group": "PEDESTRIAN·DAY",
+          "n": 988,
+          "k": 32,
+          "p": 0.0324,
+          "ci": [
+            0.023,
+            0.0454
+          ]
+        },
+        {
+          "group": "OBSTACLE·DAY",
+          "n": 1248,
+          "k": 37,
+          "p": 0.0296,
+          "ci": [
+            0.0216,
+            0.0406
+          ]
+        },
+        {
+          "group": "HEAD_ON·DARK",
+          "n": 525,
+          "k": 13,
+          "p": 0.0248,
+          "ci": [
+            0.0145,
+            0.0419
+          ]
+        },
+        {
+          "group": "SIDE·TWILIGHT",
+          "n": 483,
+          "k": 12,
+          "p": 0.0248,
+          "ci": [
+            0.0143,
+            0.0429
+          ]
+        },
+        {
+          "group": "UNKNOWN·TWILIGHT",
+          "n": 243,
+          "k": 6,
+          "p": 0.0247,
+          "ci": [
+            0.0114,
+            0.0528
+          ]
+        },
+        {
+          "group": "UNKNOWN·DARK",
+          "n": 1228,
+          "k": 25,
+          "p": 0.0204,
+          "ci": [
+            0.0138,
+            0.0299
+          ]
+        },
+        {
+          "group": "SIDE·DAY",
+          "n": 7370,
+          "k": 140,
+          "p": 0.019,
+          "ci": [
+            0.0161,
+            0.0224
+          ]
+        },
+        {
+          "group": "REAR_END·DARK",
+          "n": 488,
+          "k": 8,
+          "p": 0.0164,
+          "ci": [
+            0.0083,
+            0.032
+          ]
+        },
+        {
+          "group": "SIDE·DARK",
+          "n": 1304,
+          "k": 20,
+          "p": 0.0153,
+          "ci": [
+            0.01,
+            0.0236
+          ]
+        },
+        {
+          "group": "RUN_OFF_ROAD·DAY",
+          "n": 972,
+          "k": 14,
+          "p": 0.0144,
+          "ci": [
+            0.0086,
+            0.024
+          ]
+        },
+        {
+          "group": "UNKNOWN·DAY",
+          "n": 4351,
+          "k": 61,
+          "p": 0.014,
+          "ci": [
+            0.0109,
+            0.018
+          ]
+        },
+        {
+          "group": "RUN_OFF_ROAD·DARK",
+          "n": 322,
+          "k": 4,
+          "p": 0.0124,
+          "ci": [
+            0.0048,
+            0.0315
+          ]
+        },
+        {
+          "group": "REAR_END·DAY",
+          "n": 2171,
+          "k": 26,
+          "p": 0.012,
+          "ci": [
+            0.0082,
+            0.0175
+          ]
+        },
+        {
+          "group": "STATIONARY_VEHICLE·DAY",
+          "n": 295,
+          "k": 2,
+          "p": 0.0068,
+          "ci": [
+            0.0019,
+            0.0244
+          ]
+        }
+      ],
+      "hotspots": {
+        "cells": 19173,
+        "meanPerCell": 6.592,
+        "variance": 134.658,
+        "prior": {
+          "alpha": 0.339,
+          "beta": 0.051
+        },
+        "top": [
+          {
+            "cell": "52.41,4.86",
+            "count": 195,
+            "fatal": 0,
+            "severityWeighted": 57,
+            "ebExpected": 185.78,
+            "shrinkage": 0.047,
+            "centroid": {
+              "lat": 52.41625,
+              "lon": 4.86616
+            }
+          },
+          {
+            "cell": "51.92,4.47",
+            "count": 188,
+            "fatal": 0,
+            "severityWeighted": 127.6,
+            "ebExpected": 179.12,
+            "shrinkage": 0.047,
+            "centroid": {
+              "lat": 51.92407,
+              "lon": 4.4759
+            }
+          },
+          {
+            "cell": "52.06,4.31",
+            "count": 184,
+            "fatal": 0,
+            "severityWeighted": 189.8,
+            "ebExpected": 175.32,
+            "shrinkage": 0.047,
+            "centroid": {
+              "lat": 52.06442,
+              "lon": 4.31504
+            }
+          },
+          {
+            "cell": "52.06,4.30",
+            "count": 178,
+            "fatal": 0,
+            "severityWeighted": 165.2,
+            "ebExpected": 169.61,
+            "shrinkage": 0.047,
+            "centroid": {
+              "lat": 52.06534,
+              "lon": 4.30533
+            }
+          },
+          {
+            "cell": "52.06,4.29",
+            "count": 169,
+            "fatal": 0,
+            "severityWeighted": 145.4,
+            "ebExpected": 161.05,
+            "shrinkage": 0.047,
+            "centroid": {
+              "lat": 52.0652,
+              "lon": 4.29491
+            }
+          },
+          {
+            "cell": "52.06,4.28",
+            "count": 150,
+            "fatal": 1,
+            "severityWeighted": 169.4,
+            "ebExpected": 142.98,
+            "shrinkage": 0.047,
+            "centroid": {
+              "lat": 52.06476,
+              "lon": 4.28488
+            }
+          },
+          {
+            "cell": "52.16,4.48",
+            "count": 144,
+            "fatal": 1,
+            "severityWeighted": 161,
+            "ebExpected": 137.27,
+            "shrinkage": 0.047,
+            "centroid": {
+              "lat": 52.16353,
+              "lon": 4.48463
+            }
+          },
+          {
+            "cell": "52.07,4.31",
+            "count": 141,
+            "fatal": 0,
+            "severityWeighted": 132.6,
+            "ebExpected": 134.42,
+            "shrinkage": 0.047,
+            "centroid": {
+              "lat": 52.07492,
+              "lon": 4.31497
+            }
+          },
+          {
+            "cell": "52.05,4.30",
+            "count": 138,
+            "fatal": 1,
+            "severityWeighted": 132.8,
+            "ebExpected": 131.57,
+            "shrinkage": 0.047,
+            "centroid": {
+              "lat": 52.05597,
+              "lon": 4.3053
+            }
+          },
+          {
+            "cell": "52.16,5.56",
+            "count": 135,
+            "fatal": 0,
+            "severityWeighted": 32.4,
+            "ebExpected": 128.71,
+            "shrinkage": 0.047,
+            "centroid": {
+              "lat": 52.16638,
+              "lon": 5.56505
+            }
+          },
+          {
+            "cell": "52.36,4.88",
+            "count": 130,
+            "fatal": 1,
+            "severityWeighted": 86.2,
+            "ebExpected": 123.96,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 52.36408,
+              "lon": 4.88381
+            }
+          },
+          {
+            "cell": "52.05,5.12",
+            "count": 129,
+            "fatal": 0,
+            "severityWeighted": 33,
+            "ebExpected": 123.01,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 52.05739,
+              "lon": 5.12375
+            }
+          },
+          {
+            "cell": "51.93,4.46",
+            "count": 126,
+            "fatal": 0,
+            "severityWeighted": 68.4,
+            "ebExpected": 120.15,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 51.93654,
+              "lon": 4.4643
+            }
+          },
+          {
+            "cell": "51.91,4.53",
+            "count": 125,
+            "fatal": 1,
+            "severityWeighted": 58.2,
+            "ebExpected": 119.2,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 51.9147,
+              "lon": 4.53559
+            }
+          },
+          {
+            "cell": "52.35,4.84",
+            "count": 123,
+            "fatal": 0,
+            "severityWeighted": 48,
+            "ebExpected": 117.3,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 52.35476,
+              "lon": 4.8435
+            }
+          },
+          {
+            "cell": "51.91,4.44",
+            "count": 122,
+            "fatal": 0,
+            "severityWeighted": 91,
+            "ebExpected": 116.35,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 51.91537,
+              "lon": 4.44496
+            }
+          },
+          {
+            "cell": "51.91,4.46",
+            "count": 119,
+            "fatal": 0,
+            "severityWeighted": 79.6,
+            "ebExpected": 113.5,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 51.91464,
+              "lon": 4.46404
+            }
+          },
+          {
+            "cell": "51.92,4.36",
+            "count": 119,
+            "fatal": 0,
+            "severityWeighted": 49,
+            "ebExpected": 113.5,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 51.92503,
+              "lon": 4.3649
+            }
+          },
+          {
+            "cell": "52.07,4.39",
+            "count": 118,
+            "fatal": 0,
+            "severityWeighted": 61.4,
+            "ebExpected": 112.55,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 52.07416,
+              "lon": 4.39522
+            }
+          },
+          {
+            "cell": "52.05,4.29",
+            "count": 117,
+            "fatal": 0,
+            "severityWeighted": 106.2,
+            "ebExpected": 111.6,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 52.05606,
+              "lon": 4.29491
+            }
+          },
+          {
+            "cell": "52.07,4.32",
+            "count": 116,
+            "fatal": 0,
+            "severityWeighted": 122.2,
+            "ebExpected": 110.64,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 52.07418,
+              "lon": 4.32408
+            }
+          },
+          {
+            "cell": "52.06,4.32",
+            "count": 115,
+            "fatal": 0,
+            "severityWeighted": 116.6,
+            "ebExpected": 109.69,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 52.06534,
+              "lon": 4.32557
+            }
+          },
+          {
+            "cell": "51.88,4.56",
+            "count": 115,
+            "fatal": 0,
+            "severityWeighted": 51.8,
+            "ebExpected": 109.69,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 51.88519,
+              "lon": 4.56425
+            }
+          },
+          {
+            "cell": "51.93,4.45",
+            "count": 115,
+            "fatal": 0,
+            "severityWeighted": 35.6,
+            "ebExpected": 109.69,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 51.93541,
+              "lon": 4.45437
+            }
+          },
+          {
+            "cell": "52.07,4.30",
+            "count": 114,
+            "fatal": 0,
+            "severityWeighted": 111,
+            "ebExpected": 108.74,
+            "shrinkage": 0.046,
+            "centroid": {
+              "lat": 52.07549,
+              "lon": 4.30593
+            }
+          }
+        ]
+      },
+      "hotspotsRearStationary": {
+        "cells": 3990,
+        "meanPerCell": 4.633,
+        "variance": 48.466,
+        "prior": {
+          "alpha": 0.49,
+          "beta": 0.106
+        },
+        "top": [
+          {
+            "cell": "52.06,4.30",
+            "count": 91,
+            "fatal": 0,
+            "severityWeighted": 59.6,
+            "ebExpected": 82.74,
+            "shrinkage": 0.091,
+            "centroid": {
+              "lat": 52.06737,
+              "lon": 4.3113
+            }
+          },
+          {
+            "cell": "52.06,4.28",
+            "count": 86,
+            "fatal": 0,
+            "severityWeighted": 74.8,
+            "ebExpected": 78.22,
+            "shrinkage": 0.09,
+            "centroid": {
+              "lat": 52.06796,
+              "lon": 4.28984
+            }
+          },
+          {
+            "cell": "51.92,4.46",
+            "count": 70,
+            "fatal": 0,
+            "severityWeighted": 33.8,
+            "ebExpected": 63.75,
+            "shrinkage": 0.089,
+            "centroid": {
+              "lat": 51.92846,
+              "lon": 4.47062
+            }
+          },
+          {
+            "cell": "52.06,4.32",
+            "count": 67,
+            "fatal": 0,
+            "severityWeighted": 60.2,
+            "ebExpected": 61.04,
+            "shrinkage": 0.089,
+            "centroid": {
+              "lat": 52.07067,
+              "lon": 4.32923
+            }
+          },
+          {
+            "cell": "52.04,4.28",
+            "count": 67,
+            "fatal": 0,
+            "severityWeighted": 54.8,
+            "ebExpected": 61.04,
+            "shrinkage": 0.089,
+            "centroid": {
+              "lat": 52.05156,
+              "lon": 4.29165
+            }
+          },
+          {
+            "cell": "52.34,4.84",
+            "count": 63,
+            "fatal": 0,
+            "severityWeighted": 18,
+            "ebExpected": 57.42,
+            "shrinkage": 0.089,
+            "centroid": {
+              "lat": 52.3508,
+              "lon": 4.84428
+            }
+          },
+          {
+            "cell": "51.90,4.48",
+            "count": 59,
+            "fatal": 0,
+            "severityWeighted": 33.4,
+            "ebExpected": 53.8,
+            "shrinkage": 0.088,
+            "centroid": {
+              "lat": 51.91137,
+              "lon": 4.48951
+            }
+          },
+          {
+            "cell": "51.88,4.48",
+            "count": 59,
+            "fatal": 0,
+            "severityWeighted": 26.2,
+            "ebExpected": 53.8,
+            "shrinkage": 0.088,
+            "centroid": {
+              "lat": 51.89029,
+              "lon": 4.4906
+            }
+          },
+          {
+            "cell": "52.40,4.86",
+            "count": 57,
+            "fatal": 0,
+            "severityWeighted": 29.4,
+            "ebExpected": 51.99,
+            "shrinkage": 0.088,
+            "centroid": {
+              "lat": 52.41593,
+              "lon": 4.86682
+            }
+          },
+          {
+            "cell": "52.02,4.32",
+            "count": 56,
+            "fatal": 0,
+            "severityWeighted": 54.4,
+            "ebExpected": 51.09,
+            "shrinkage": 0.088,
+            "centroid": {
+              "lat": 52.03187,
+              "lon": 4.32811
+            }
+          },
+          {
+            "cell": "51.90,4.46",
+            "count": 56,
+            "fatal": 0,
+            "severityWeighted": 31,
+            "ebExpected": 51.09,
+            "shrinkage": 0.088,
+            "centroid": {
+              "lat": 51.91256,
+              "lon": 4.46785
+            }
+          },
+          {
+            "cell": "51.92,4.48",
+            "count": 52,
+            "fatal": 0,
+            "severityWeighted": 24.8,
+            "ebExpected": 47.47,
+            "shrinkage": 0.087,
+            "centroid": {
+              "lat": 51.92825,
+              "lon": 4.49147
+            }
+          },
+          {
+            "cell": "51.94,4.52",
+            "count": 50,
+            "fatal": 0,
+            "severityWeighted": 29.8,
+            "ebExpected": 45.66,
+            "shrinkage": 0.087,
+            "centroid": {
+              "lat": 51.94905,
+              "lon": 4.52847
+            }
+          },
+          {
+            "cell": "52.36,4.84",
+            "count": 50,
+            "fatal": 0,
+            "severityWeighted": 28,
+            "ebExpected": 45.66,
+            "shrinkage": 0.087,
+            "centroid": {
+              "lat": 52.37202,
+              "lon": 4.84648
+            }
+          },
+          {
+            "cell": "52.20,6.88",
+            "count": 50,
+            "fatal": 0,
+            "severityWeighted": 17.2,
+            "ebExpected": 45.66,
+            "shrinkage": 0.087,
+            "centroid": {
+              "lat": 52.20871,
+              "lon": 6.89079
+            }
+          }
+        ]
+      }
+    }
+  }
+}
