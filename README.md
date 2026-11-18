@@ -1,3 +1,7 @@
+> **For recruiters / Para selección de personal:** [SENDA — 2-minute engineering case study (EN/ES)](docs/career/RECRUITER_CASE_STUDY_ES_EN.md). The latest RoadSafe validation lives in research [PR #51](https://github.com/abrahamhl/civic-relay/pull/51), not in master. **Research prototype; not a field-tested public warning service.**
+>
+> **Perfil profesional:** [Creative Tech portfolio](https://creative-tech-portfolio.vercel.app/) — AI-assisted product workflows, UX/web delivery, industrial production experience in the Netherlands, Spanish/English and basic Dutch. Interested in remote/hybrid roles **based in Spain** and international B2B teams.
+
 # OEP / Civic Relay — Offline Emergency Protocol
 
 **Plataforma europea modular de anticipación de riesgos, continuidad de comunicaciones y coordinación de personas, equipos e infraestructuras.** Civic Relay persigue esta visión mediante OEP, adaptadores autorizados y una cadena de evidencia que distingue observación, predicción, custodia y confirmación. El software actual es un laboratorio de investigación; el programa completo requiere validación física y socios.
