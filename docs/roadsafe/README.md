@@ -12,6 +12,7 @@ Capa federada de prevención de colisiones secundarias y coordinación de asiste
 | 4 | [04_HYPOTHESES.md](04_HYPOTHESES.md) | H-ROAD-1/2/3 preregistradas |
 | 5 | [05_PILOT_AND_FUNDING.md](05_PILOT_AND_FUNDING.md) | TRL, piloto ES→NL, costes, acuerdos pendientes |
 | 7 | [07_DATASET_ES_DE_NL_BE.md](07_DATASET_ES_DE_NL_BE.md) | Dataset oficial armonizado (652 224 accidentes ES/DE/NL/FR/GB), hallazgos replicados |
+| 10 | [10_SEVERITY_MODEL_CALIBRATION.md](10_SEVERITY_MODEL_CALIBRATION.md) | Modelo multivariante de gravedad (551 260 accidentes, AUC 0,78), OR ajustados, validación por país |
 | 9 | [09_DIFFERENTIATION_DETECTION_SECURITY.md](09_DIFFERENTIATION_DETECTION_SECURITY.md) | Soluciones existentes, diferenciación, detección de accidentes, blindaje |
 | 8 | [08_COMPANION_WAZE_SENSORS_STRATEGY.md](08_COMPANION_WAZE_SENSORS_STRATEGY.md) | Alcance a todos los conductores, Waze, sensores, física del impacto, emergencia guiada |
 | 6 | [06_CASUISTRY_RISK_AND_CONCLUSIONS.md](06_CASUISTRY_RISK_AND_CONCLUSIONS.md) | Evidencia con fuentes, 8 mecanismos, probabilidades por circunstancia, conclusiones |
@@ -45,6 +46,7 @@ Capa federada de prevención de colisiones secundarias y coordinación de asiste
 | `roadsafe-responders.mjs` | Servicios compartidos con autorización |
 | `roadsafe-routes.mjs` | Rutas favoritas, paquete sin conexión, comparación por riesgo |
 | `roadsafe-crash-detect.mjs` | Detección de accidente por fusión de evidencias físicas y de contexto |
+| `roadsafe-severity-model.mjs` | Regresión logística IRLS, AUC/Brier/calibración, dejar un país fuera, probabilidad de gravedad |
 | `roadsafe-guard.mjs` | Cifrado por incidente, custodia firmada, anti-abuso, privacidad |
 | `investor-next/public/senda/roadsafe.html` | Consola ciudadano / operador / científico |
 

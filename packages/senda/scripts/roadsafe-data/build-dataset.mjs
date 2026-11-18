@@ -17,6 +17,7 @@ import { execFileSync } from 'node:child_process';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseCsv, fromDgt, fromUnfallatlas, fromBron, fromStatbel, fromBaac, fromStats19, validateRecord, SOURCES } from '../../src/roadsafe-dataset.mjs';
+import { fitSeverityModel, leaveOneCountryOut } from '../../src/roadsafe-severity-model.mjs';
 import { roadsafeProfile, empiricalSeverityFactors, hotspotsEB, gridCell, roadKmCell, conditionalShare, injuryOnly, stoppedVehicleStudy } from '../../src/roadsafe-dataset-analysis.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url)), root = resolve(here, '../../../..');
@@ -127,8 +128,13 @@ const perCountry = Object.fromEntries(countries.map((c) => {
 writeFileSync(join(OUT, `manifest-${YEAR}.json`), JSON.stringify({ ...manifest, ingest: stats, totalHarmonized: records.length }, null, 2));
 writeFileSync(join(OUT, `aggregates-${YEAR}.json`), JSON.stringify({ schema: 'senda-roadsafe-aggregates/1', year: YEAR, licenses: Object.fromEntries(Object.entries(SOURCES).map(([k, v]) => [k, { license: v.license, publisher: v.publisher, url: v.url }])), perCountry }, null, 2));
 
+// --- modelo de gravedad ajustado (regresión logística multivariante) + validación
+const sev = fitSeverityModel(records, { l2: 1, seed: 2026 }), loco = leaveOneCountryOut(records, { l2: 1 });
+writeFileSync(join(OUT, `severity-model-${YEAR}.json`), JSON.stringify({ ...sev, leaveOneCountryOut: loco }, null, 2));
+
 // --- resumen compacto para la consola web (sin microdatos)
 const webDir = resolve(root, 'investor-next/public/senda/data'); mkdirSync(webDir, { recursive: true });
+writeFileSync(join(webDir, `roadsafe-severity-model-${YEAR}.json`), JSON.stringify({ schema: sev.schema, basis: sev.basis, year: YEAR, model: sev.model, test: { auc: sev.test.auc, brier: sev.test.brier, baseRate: sev.test.baseRate }, coefficients: sev.coefficients, leaveOneCountryOut: loco.rows }));
 writeFileSync(join(webDir, `roadsafe-dataset-summary-${YEAR}.json`), JSON.stringify({ schema: 'senda-roadsafe-dataset-summary/1', year: YEAR, total: records.length, perCountry: Object.fromEntries(Object.entries(perCountry).map(([c, v]) => [c, { records: v.records, injury: v.injury, profile: { rearEnd: v.profile.rearEnd, stationaryVehicle: v.profile.stationaryVehicle, chain: v.profile.chain, visibilityRestrictedByVehicle: v.profile.visibilityRestrictedByVehicle, secondaryOtherAccident: v.profile.secondaryOtherAccident }, stoppedStudy: Object.fromEntries(['stoppedVehicle', 'hardShoulder', 'rearImpact'].map((k) => [k, v.stoppedStudy[k].available ? { n: v.stoppedStudy[k].n, k: v.stoppedStudy[k].k, share: v.stoppedStudy[k].share, fatalShareWhenTrue: v.stoppedStudy[k].fatalShareWhenTrue, orFatalVsRest: { or: v.stoppedStudy[k].orFatalVsRest.or, ci: v.stoppedStudy[k].orFatalVsRest.ci, significant: v.stoppedStudy[k].orFatalVsRest.significant }, orFatalDarkWithinFlag: { or: v.stoppedStudy[k].orFatalDarkWithinFlag.or, ci: v.stoppedStudy[k].orFatalDarkWithinFlag.ci, n: v.stoppedStudy[k].orFatalDarkWithinFlag.n, significant: v.stoppedStudy[k].orFatalDarkWithinFlag.significant }, highSpeedShare: v.stoppedStudy[k].highSpeedShare } : { available: false }])), severityFactors: Object.fromEntries(Object.entries(v.severityFactors).filter(([, o]) => o && o.or).map(([k, o]) => [k, { or: o.or, ci: o.ci, n: o.n, significant: o.significant }])), hotspotsTop: v.hotspots.top.slice(0, 10), hotspotsRearTop: v.hotspotsRearStationary.top.slice(0, 10) }])), licenses: Object.fromEntries(Object.entries(SOURCES).map(([k, x]) => [k, x.license])) }));
 
 // --- informe
@@ -143,6 +149,11 @@ for (const [c, v] of Object.entries(perCountry)) { const s = v.severityFactors; 
 L.push('', '## Vehículo detenido y arcén (caso de investigación)', '', '| País | Bandera | n con dato | Con la condición | % mortal si la tiene | OR mortal vs resto | OR mortal oscuridad dentro | % en vía rápida |', '|---|---|---|---|---|---|---|---|');
 for (const [c, v] of Object.entries(perCountry)) for (const k of ['stoppedVehicle', 'hardShoulder', 'rearImpact']) { const b = v.stoppedStudy[k]; if (!b.available) continue; L.push(`| ${c} | ${k} | ${b.n} | ${b.k} (${(b.share.p * 100).toFixed(2)} %) | ${b.fatalShareWhenTrue ? (b.fatalShareWhenTrue.p * 100).toFixed(2) + ' %' : '—'} | ${orf(b.orFatalVsRest)} | ${orf(b.orFatalDarkWithinFlag)} | ${b.highSpeedShare == null ? '—' : (b.highSpeedShare * 100).toFixed(0) + ' %'} |`); }
 L.push('', '`*` = IC 95 % no incluye 1. OR > 1: mayor proporción de mortales entre los accidentes con víctimas en esa condición.', '');
+L.push('', '## Modelo multivariante de gravedad (OR AJUSTADOS, regresión logística)', '', `Entrenamiento ${sev.nTrain} · prueba ${sev.nTest} · mortales ${sev.events} · AUC prueba **${sev.test.auc}** · Brier ${sev.test.brier} · tasa base ${sev.test.baseRate}. Efectos fijos por país.`, '', '| Variable | OR ajustado [IC 95 %] |', '|---|---|');
+for (const c of sev.coefficients.filter((c) => c.name !== 'intercept')) L.push(`| ${c.name} | ${c.or} [${c.ci.join('–')}]${c.significant ? ' *' : ''} |`);
+L.push('', '**Calibración (deciles de la prueba):** ' + sev.test.calibration.map((b) => `${b.bin}: ${b.predicted}/${b.observed}`).join(' · '), '', '**Dejar un país fuera:**', '', '| País fuera | n | AUC | Predicho medio | Observado |', '|---|---|---|---|---|');
+for (const r of loco.rows) L.push(`| ${r.heldOut} | ${r.n} | ${r.auc} | ${r.meanPredicted} | ${r.observed} |`);
+L.push('');
 for (const [c, v] of Object.entries(perCountry)) {
   L.push(`## Puntos negros con Bayes empírico · ${c}`, '', `Prior Poisson–Gamma: ${JSON.stringify(v.hotspots.prior)} · celdas: ${v.hotspots.cells}`, '', '| Celda | Conteo | Mortales | Esperado EB | Contracción |', '|---|---|---|---|---|');
   for (const h of v.hotspots.top.slice(0, 10)) L.push(`| ${h.cell} | ${h.count} | ${h.fatal} | ${h.ebExpected} | ${h.shrinkage} |`);

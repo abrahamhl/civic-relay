@@ -1,8 +1,8 @@
 {
   "schema": "senda-roadsafe-e2e/1",
   "browser": "chromium (playwright)",
-  "at": "2026-11-18T00:24:45.986Z",
-  "passed": 58,
+  "at": "2026-11-18T00:40:15.062Z",
+  "passed": 60,
   "failed": 0,
   "results": [
     {
@@ -34,7 +34,7 @@
     {
       "name": "movil: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-ab4c61dabd4afcea · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-c77a9f0c37d2f32b · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -44,7 +44,7 @@
     {
       "name": "movil: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-ab4c61dabd4afcea · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-c77a9f0c37d2f32b · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: idioma en",
@@ -79,9 +79,9 @@
       "ok": true,
       "prio": [
         "1M-40 · «atrapado» sin verificarVERIFICAR · DATOS_INCOMPLETO",
-        "2N-000 PK 127 · alcanceDATOS_INCOMPLETOS:DARK_SEVERITYELEVAT",
-        "3AP-7 PK 300 · carril ocupado, nocheSLA_SUPERADOCRITICALnive",
-        "4A-3 PK 41,2 · avería arcénDATOS_INCOMPLETOS:DARK_SEVERITYEL"
+        "2N-000 PK 127 · alcanceDATOS_INCOMPLETOS:DARK_SEVERITY,NIGHT",
+        "3AP-7 PK 300 · carril ocupado, nocheDATOS_INCOMPLETOS:NIGHT_",
+        "4A-3 PK 41,2 · avería arcénDATOS_INCOMPLETOS:DARK_SEVERITY,N"
       ]
     },
     {
@@ -113,6 +113,12 @@
     {
       "name": "movil: dataset oficial — 5 países con OR de oscuridad y arcén",
       "ok": true
+    },
+    {
+      "name": "movil: modelo de gravedad — AUC publicado y vehículo pesado sube la probabilidad",
+      "ok": true,
+      "before": 2.41,
+      "after": 9.02
     },
     {
       "name": "movil: detector — 10 casos sintéticos sin fallos (choque ⇒ preguntar; falsas alarmas ⇒ nada)",
@@ -197,7 +203,7 @@
     {
       "name": "escritorio: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-11ef92303be39f38 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-f56281d04f1c485e · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -207,7 +213,7 @@
     {
       "name": "escritorio: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-11ef92303be39f38 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-f56281d04f1c485e · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: idioma en",
@@ -242,9 +248,9 @@
       "ok": true,
       "prio": [
         "1M-40 · «atrapado» sin verificarVERIFICAR · DATOS_INCOMPLETO",
-        "2N-000 PK 127 · alcanceDATOS_INCOMPLETOS:DARK_SEVERITYELEVAT",
-        "3AP-7 PK 300 · carril ocupado, nocheSLA_SUPERADOCRITICALnive",
-        "4A-3 PK 41,2 · avería arcénDATOS_INCOMPLETOS:DARK_SEVERITYEL"
+        "2N-000 PK 127 · alcanceDATOS_INCOMPLETOS:DARK_SEVERITY,NIGHT",
+        "3AP-7 PK 300 · carril ocupado, nocheDATOS_INCOMPLETOS:NIGHT_",
+        "4A-3 PK 41,2 · avería arcénDATOS_INCOMPLETOS:DARK_SEVERITY,N"
       ]
     },
     {
@@ -276,6 +282,12 @@
     {
       "name": "escritorio: dataset oficial — 5 países con OR de oscuridad y arcén",
       "ok": true
+    },
+    {
+      "name": "escritorio: modelo de gravedad — AUC publicado y vehículo pesado sube la probabilidad",
+      "ok": true,
+      "before": 2.41,
+      "after": 9.02
     },
     {
       "name": "escritorio: detector — 10 casos sintéticos sin fallos (choque ⇒ preguntar; falsas alarmas ⇒ nada)",

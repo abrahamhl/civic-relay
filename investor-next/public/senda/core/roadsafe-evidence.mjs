@@ -82,6 +82,11 @@ export const EVIDENCE = Object.freeze({
     grade: 'A', value: 2.0, unit: 'OR gravedad condicionada', access: 'microdatos oficiales procesados por SENDA', source: 'BAAC 2024 (ONISR); STATS19 2024 (DfT)', url: 'https://www.data.gouv.fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2024',
     transfer: 'Respalda el caso de investigación: un accidente en el arcén es, en proporción, el doble de mortal.',
   },
+  EMPIRICAL_ADJUSTED_SEVERITY_MODEL: {
+    claim: 'Regresión logística multivariante sobre 551 260 accidentes con víctimas (ES/DE/NL/FR/GB 2024, efectos fijos por país): AUC de prueba 0,78. OR ajustados: oscuridad 1,17 [1,10–1,26], sin alumbrado ×1,54 [1,41–1,69], madrugada 0–6 h 1,49 [1,37–1,62], arcén 1,55 [1,13–2,13], interurbano 3,49, vehículo pesado 4,02, frontal 2,98, peatón 2,56, salida de vía 2,03; mojado 0,87 y alcance/cadena 0,56 (menos graves).',
+    grade: 'A', value: null, unit: 'OR ajustados (gravedad condicionada)', access: 'calculado por este código: evidence/roadsafe/dataset/severity-model-2024.json', source: 'DGT, Unfallatlas, BRON, BAAC, STATS19 (2024)', url: null,
+    transfer: 'Dejar un país fuera: AUC 0,61–0,76; los niveles absolutos difieren entre países (definiciones y coberturas) ⇒ usar con efecto fijo del país.',
+  },
   EMPIRICAL_WET_SEVERITY: {
     claim: 'Calzada mojada vs seca: sin diferencia significativa en ES (0,88), DE (1,02), NL (0,95) y FR (0,99); en GB sí (1,22 [1,09–1,36]). Resultado mixto.',
     grade: 'A', value: 1, unit: 'OR gravedad condicionada', access: 'microdatos oficiales procesados por SENDA', source: 'DGT, Unfallatlas, BRON 2024', url: null,

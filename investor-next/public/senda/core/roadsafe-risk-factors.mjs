@@ -50,8 +50,11 @@ function factors(c) {
   add('WAITING_TOW', 'Vehículo inmovilizado esperando grúa', c.waitingTow ? 1.5 : 1, 1.5, 1, 'TOWING_REQUIRED', 'B', known(c.waitingTow));
   add('QUEUE', 'Cola formándose', c.queueForming ? 1.5 : 1, 1.5, 1, 'TRAFFIC_VOLUME', 'C', known(c.queueForming));
   add('RESPONDERS', 'Intervinientes expuestos sin vehículo de bloqueo', c.respondersExposed ? 1.3 : 1, 1.3, 1, 'RESPONDER_STRUCK_BY_GAP', 'B', known(c.respondersExposed));
-  add('DARK_SEVERITY', 'Oscuridad (gravedad; OR medido en ES/DE/NL/FR/GB)', c.night ? (c.unlit ? 2.9 : 1.55) : 1, 2.9, 1, 'EMPIRICAL_DARK_SEVERITY', 'A', known(c.night));
-  add('SHOULDER_SEVERITY', 'Accidente en el arcén (gravedad; OR medido en FR/GB)', c.laneBlocked === 'SHOULDER' ? 2.0 : 1, 2.0, 1, 'EMPIRICAL_SHOULDER_SEVERITY', 'A', known(c.laneBlocked));
+  // OR AJUSTADOS del modelo multivariante (roadsafe-severity-model, 5 países, 2024): oscuridad 1,17; sin alumbrado
+  // ×1,54 adicional; madrugada 0–6 h 1,49; arcén 1,55. Sustituyen a los OR univariantes (confundidos).
+  add('DARK_SEVERITY', 'Oscuridad (gravedad; OR ajustado 5 países)', c.night ? (c.unlit ? 1.17 * 1.54 : 1.17) : 1, 1.17 * 1.54, 1, 'EMPIRICAL_ADJUSTED_SEVERITY_MODEL', 'A', known(c.night));
+  add('NIGHT_HOURS', 'Madrugada 0–6 h (gravedad; OR ajustado)', Number.isFinite(c.hour) ? (c.hour < 6 ? 1.49 : 1) : null, 1.49, 1, 'EMPIRICAL_ADJUSTED_SEVERITY_MODEL', 'A', Number.isFinite(c.hour));
+  add('SHOULDER_SEVERITY', 'Accidente en el arcén (gravedad; OR ajustado 1,55)', c.laneBlocked === 'SHOULDER' ? 1.55 : 1, 1.55, 1, 'EMPIRICAL_ADJUSTED_SEVERITY_MODEL', 'A', known(c.laneBlocked));
   add('HEAVY', 'Proporción de pesados (gravedad)', 1 + Math.min(0.5, c.heavyShare ?? 0), 1.5, 1, 'HEAVY_VEHICLE_SEVERITY', 'B', known(c.heavyShare));
   return { F, sm };
 }
@@ -60,7 +63,7 @@ const index = (P) => Math.round(100 * (1 - Math.exp(-0.02 * P)));
 const TIER = (idx, life, secondary) => (life || idx >= 70 ? 'CRITICAL' : secondary || idx >= 40 ? 'HIGH' : idx >= 15 ? 'ELEVATED' : 'MONITOR');
 
 /** Evalúa un incidente. `c`: circunstancias (cualquier campo puede faltar). */
-export function assessIncidentRisk(c = {}) {
+export function assessIncidentRisk(c = {}, { severityModel = null, severityProbability = null } = {}) {
   const life = [];
   if (c.trapped) life.push('personas atrapadas'); if (c.fire) life.push('fuego o humo');
   if (c.injuries === 'SERIOUS') life.push('heridos graves'); if (c.peopleInLane) life.push('personas en la calzada');
@@ -75,6 +78,7 @@ export function assessIncidentRisk(c = {}) {
     model: RISK_MODEL_VERSION, basis: 'MODEL_UNCALIBRATED_WEIGHTS (dirección con evidencia; magnitudes no calibradas salvo factores empíricos)', index: idxP, indexRange: [idxO, idxP], uncertain: missing.length > 0, missing,
     tier: TIER(idxP, life.length > 0, secondary), tierIfBestCase: TIER(idxO, life.length > 0, secondary),
     lifeRisk: life, secondaryCollision: secondary, drivers, sightMargin: sm,
+    severityIfCrash: severityModel && severityProbability ? severityProbability({ light: c.night ? (c.unlit ? 'DARK_UNLIT' : 'DARK_LIT') : c.night === false ? 'DAY' : 'UNKNOWN', surface: c.wet ? 'WET' : c.wet === false ? 'DRY' : 'UNKNOWN', area: c.rural ? 'RURAL' : c.rural === false ? 'URBAN' : 'UNKNOWN', roadClass: c.roadClass ?? 'UNKNOWN', onHardShoulder: c.laneBlocked === 'SHOULDER', stoppedVehicleInvolved: true, collision: c.collision ?? 'UNKNOWN', involves: { hgv: c.hgvInvolved === true, pedestrian: c.peopleInLane === true }, hour: c.hour ?? null, country: c.country ?? 'ES' }, severityModel) : null,
     note: 'Índice relativo para ordenar y explicar, NO probabilidad de accidente. Magnitudes de los multiplicadores: hipótesis a calibrar.',
   };
 }

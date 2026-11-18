@@ -56,6 +56,51 @@ Generado por `packages/senda/scripts/roadsafe-data/build-dataset.mjs`. Registros
 
 `*` = IC 95 % no incluye 1. OR > 1: mayor proporción de mortales entre los accidentes con víctimas en esa condición.
 
+
+## Modelo multivariante de gravedad (OR AJUSTADOS, regresión logística)
+
+Entrenamiento 440777 · prueba 110483 · mortales 9383 · AUC prueba **0.7817** · Brier 0.01586 · tasa base 0.0168. Efectos fijos por país.
+
+| Variable | OR ajustado [IC 95 %] |
+|---|---|
+| dark | 1.174 [1.096–1.257] * |
+| darkUnlit | 1.544 [1.408–1.693] * |
+| twilight | 1.103 [0.99–1.229] |
+| lightUnknown | 0.329 [0.085–1.269] |
+| wet | 0.867 [0.817–0.919] * |
+| iceSnow | 0.552 [0.424–0.718] * |
+| fog | 0.778 [0.63–0.96] * |
+| rural | 3.492 [3.232–3.774] * |
+| areaUnknown | 0.963 [0.539–1.723] |
+| motorway | 0.703 [0.636–0.777] * |
+| dualCarriageway | 1.198 [1.042–1.378] * |
+| curve | 1.171 [1.085–1.264] * |
+| intersection | 0.751 [0.697–0.81] * |
+| hardShoulder | 1.552 [1.131–2.131] * |
+| stoppedVehicle | 0.583 [0.515–0.661] * |
+| rearEndOrChain | 0.557 [0.503–0.617] * |
+| headOn | 2.98 [2.763–3.214] * |
+| pedestrian | 2.561 [2.363–2.775] * |
+| runOffRoad | 2.034 [1.892–2.187] * |
+| hgv | 4.017 [3.698–4.364] * |
+| night0to6 | 1.491 [1.37–1.623] * |
+| cDE | 0.973 [0.543–1.744] |
+| cNL | 1.707 [1.521–1.916] * |
+| cFR | 2.892 [2.691–3.109] * |
+| cGB | 2.12 [1.182–3.803] * |
+
+**Calibración (deciles de la prueba):** 1: 0.0034/0.0018 · 2: 0.005/0.0027 · 3: 0.0062/0.0051 · 4: 0.0064/0.0045 · 5: 0.0087/0.0092 · 6: 0.0123/0.0161 · 7: 0.0137/0.0138 · 8: 0.0163/0.0157 · 9: 0.023/0.0242 · 10: 0.0753/0.0752
+
+**Dejar un país fuera:**
+
+| País fuera | n | AUC | Predicho medio | Observado |
+|---|---|---|---|---|
+| ES | 101996 | 0.7643 | 0.0433 | 0.0162 |
+| DE | 268519 | 0.7043 | 0.017 | 0.0092 |
+| NL | 25416 | 0.6722 | 0.022 | 0.0213 |
+| FR | 54402 | 0.7273 | 0.0255 | 0.0593 |
+| GB | 100927 | 0.6105 | 0.0066 | 0.0149 |
+
 ## Puntos negros con Bayes empírico · ES
 
 Prior Poisson–Gamma: {"alpha":1.511,"beta":0.935} · celdas: 21555

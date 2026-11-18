@@ -1,5 +1,13 @@
 # Changelog
 
+## SENDA RoadSafe · 18-11-2026 (V) · Calibración multivariante de gravedad sobre 551 260 accidentes oficiales
+
+**Entrada (fundador):** seguir calibrando e implementando.
+
+**Procesamiento:** `roadsafe-severity-model.mjs` (regresión logística IRLS con efectos fijos por país, IC de Wald, AUC, Brier, calibración por deciles, dejar un país fuera). Resultado: AUC de prueba 0,78; OR ajustados: pesado 4,02, interurbano 3,49, frontal 2,98, peatón 2,56, arcén 1,55, sin alumbrado ×1,54, madrugada 1,49, oscuridad 1,17; mojado 0,87, alcance 0,56. Los factores de gravedad del modelo de riesgo pasan a OR ajustados; nueva calculadora en la consola. Documento 10.
+
+**Validación:** núcleo 768/768; Chromium 60/60; el ajuste recupera coeficientes conocidos en datos sintéticos. Corregido: la tarjeta del modelo se borraba al cambiar de idioma. — Firma: Claude (Asistente de Orquestación Senior)
+
 ## SENDA RoadSafe · 18-11-2026 (IV) · Cinco países, arcén ×2 de mortal, detector contra falsas alarmas, blindaje y regla de veracidad aplicada
 
 **Entrada (fundador):** calibrar con más casuística, mejorar la detección de accidentes, más datasets y soluciones existentes, diferenciarnos, cifrar y blindar.

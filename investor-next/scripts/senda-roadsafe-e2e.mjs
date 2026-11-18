@@ -78,6 +78,10 @@ for (const vp of [{ name: 'movil', width: 390, height: 844 }, { name: 'escritori
   check(`${vp.name}: científico — ranking de 11 circunstancias, 2 s la más segura`, circ.length === 11 && /2 s/.test(circ.at(-1)), { last: circ.at(-1) });
   await page.waitForFunction(() => /ES/.test(document.querySelector('#d-out').textContent) && /DE/.test(document.querySelector('#d-out').textContent));
   check(`${vp.name}: dataset oficial — 5 países con OR de oscuridad y arcén`, /GB/.test(await page.textContent('#d-out')) && /FR/.test(await page.textContent('#d-out')) && /\*/.test(await page.textContent('#d-out')));
+  await page.waitForFunction(() => /AUC/.test(document.querySelector('#m-out').textContent));
+  const before = await page.textContent('#m-out'); await page.check('#m-hgv'); await page.waitForTimeout(100); const after = await page.textContent('#m-out');
+  const pct = (t) => +(t.match(/([\d.]+) %/) ?? [])[1];
+  check(`${vp.name}: modelo de gravedad — AUC publicado y vehículo pesado sube la probabilidad`, pct(after) > pct(before) && /hardShoulder/.test(after), { before: pct(before), after: pct(after) });
   await page.screenshot({ path: resolve(outDir, `roadsafe-cientifico-${vp.name}.png`), fullPage: true });
   await page.click('#tab-v'); await page.click('#v-save'); await page.click('#v-ann'); await page.click('#v-taxi'); await page.click('#v-det');
   const det = await page.$$eval('#v-det-t tbody tr', (rs) => rs.map((r) => r.textContent));
