@@ -93,3 +93,13 @@ test('P0: DGT document with no trusted event date or coordinates does not invent
   assert.equal(r.observations.length,0);
   assert.equal(r.publicationTimeUtc,null);
 });
+
+
+test('P0: distinct DATEX situation IDs in the same XML blob must not be deduplicated', () => {
+  const common={sourcePayloadHash:'same-file-sha',confidence:0.85,provenance:{verificationState:'LAB_VERIFIED'}};
+  const first=normalizeObservation(raw({...common,observationId:'situation-1'}),{nowMs:NOW});
+  const second=normalizeObservation(raw({...common,observationId:'situation-2',location:{lat:40.42,lon:-3.7}}),{nowMs:NOW});
+  const result=correlateCorridorObservations([first,second],{nowMs:NOW,maxClusterRadiusM:100});
+  assert.equal(result.deduplicatedCount,0);
+  assert.equal(result.events.length,2);
+});
