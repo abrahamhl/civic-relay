@@ -80,3 +80,16 @@ Fuentes públicas de orientación:
 - [ ] Revisión de CI del PR y comparativa con nuevas fuentes de Claude.
 - [ ] Ensayo físico, UX con usuarios, autorización y validación externa.
 - [ ] Integración efectiva con el bus canónico, HUD, proveedores y destinos externos.
+
+
+## 7. P0 encontrado y corregido: parada de taxi o grúa sin arcén acreditado
+
+La función planServiceStop proponía **30 m detrás de la avería** cuando no detectaba espacio suficiente por delante; no verificaba que existiera un lugar seguro detrás ni la legalidad de la maniobra. Esto era peligroso y estaba relacionado con el caso real de colisión secundaria.
+
+- Si falta una evaluación vial declarada por personal competente, devuelve ABSTAIN_UNVERIFIED_SITE, sin coordenadas ni instrucciones de frenado.
+- Con evaluación declarada pero espacio insuficiente, devuelve NO_VERIFIED_PULLOFF_SPACE en lugar de inventar una posición detrás del averiado.
+- Incluso con evaluación declarada y espacio suficiente, devuelve HYPOTHETICAL_REVIEW_REQUIRED y canGuideDriver=false: cálculo **solo para simulador** sujeto a revisión humana.
+- Se ha modificado el test de parada de asistencia y el control de interfaz del taxi para presentar abstención en vez de mostrar instrucciones peligrosas.
+- **No** se afirma que una declaración booleana sobre la vía sea autenticación ni aprobación reglamentaria; estas deben implementarse en una capa externa confiable.
+
+**Control pendiente:** la batería completa del repositorio y las pruebas de interfaz deben superar los checks de GitHub antes de proponer la integración.
