@@ -89,7 +89,7 @@ for (const vp of [{ name: 'movil', width: 390, height: 844 }, { name: 'escritori
   const vout = await page.textContent('#v-out'), ann = await page.$$eval('#v-ann-out li', (l) => l.map((x) => x.textContent)), taxi = await page.textContent('#v-taxi-out');
   check(`${vp.name}: viaje — ruta favorita, paquete offline en KB, comparación por riesgo`, /★/.test(vout) && /KB/.test(vout) && /riesgo\/km/.test(vout), { vout: vout.slice(0, 200) });
   check(`${vp.name}: viaje — megafonía escalonada (≤3 avisos, sin órdenes)`, ann.length >= 2 && ann.length <= 3 && ann.every((a) => /Atención/.test(a) && !/[Ff]rena/.test(a)), { ann });
-  check(`${vp.name}: viaje — taxi se detiene por delante del averiado`, /AHEAD_OF_DISABLED_ON_SHOULDER/.test(taxi));
+  check(`${vp.name}: viaje — sin evaluación del arcén no se recomienda parada del taxi`, /ABSTAIN_UNVERIFIED_SITE/.test(taxi) && /No se propone una parada/.test(taxi) && !/AHEAD_OF_DISABLED_ON_SHOULDER/.test(taxi));
   await page.screenshot({ path: resolve(outDir, `roadsafe-viaje-${vp.name}.png`), fullPage: true });
   await page.click('#tab-k'); await page.click('#k-run'); await page.waitForSelector('#k-bus tbody tr');
   const kbus = await page.$$eval('#k-bus tbody tr', (rs) => rs.map((r) => r.textContent)), kreinf1 = await page.textContent('#k-reinf');
@@ -107,6 +107,20 @@ for (const vp of [{ name: 'movil', width: 390, height: 844 }, { name: 'escritori
   const reach = (t) => +(t.match(/(\d+) m/) ?? [])[1];
   check(`${vp.name}: carretera — cadena BLE: más penetración ⇒ más alcance`, reach(ble2) > reach(ble), { ble, ble2 });
   check(`${vp.name}: carretera — tasas reales por 100 M veh-km`, /TM/.test(await page.textContent('#k-exp')));
+  // Laboratorio de carretera (rama lateral #49–#51), conservado junto al bus multicanal en la consolidación F0
+  await page.click('#tab-r'); await page.click('#r-run');
+  await page.waitForFunction(() => document.querySelectorAll('#r-horizon tbody tr').length === 2);
+  const roadRows = await page.locator('#r-horizon tbody tr').allTextContents();
+  const roadChannels = await page.textContent('#r-channels');
+  const roadRelay = await page.textContent('#r-relay');
+  check(`${vp.name}: carretera — primero final de cola, después accidente`, /Final de cola/.test(roadRows[0]) && /Accidente/.test(roadRows[1]), { roadRows });
+  check(`${vp.name}: carretera — no publica ni anuncia sin autorizaciones`, /DGT30/.test(roadChannels) && /WAZE_CIFS/.test(roadChannels) && /Avisos por voz emitidos: 0/.test(await page.textContent('#r-horizon')), {roadChannels});
+  check(`${vp.name}: carretera — BLE se declara solo hipótesis`, /HIPÓTESIS/.test(roadRelay) && /%/.test(roadRelay), {roadRelay});
+  const rre = await page.textContent('#r-horizon');
+  check(`${vp.name}: carretera — predicción cinemática conserva incertidumbre y no afirma cobertura física`,
+    /H-ROAD-RRE-1/.test(rre) && /ABSTAIN_NO_CALIBRATED_CHANNEL/.test(rre) &&
+    /m\/s/.test(rre) && !/AUTOMATICALLY_VERIFIED/.test(rre), {text: rre.slice(-650)});
+  await page.screenshot({ path: resolve(outDir, `roadsafe-carretera-${vp.name}.png`), fullPage: true });
   const overflow = await page.evaluate(() => [...document.querySelectorAll('[role=tabpanel]')].map((p) => { p.hidden = false; return document.documentElement.scrollWidth - document.documentElement.clientWidth; }));
   check(`${vp.name}: sin desbordamiento horizontal`, overflow.every((x) => x <= 1), { overflow });
   check(`${vp.name}: ninguna petición a dominios externos`, external.length === 0, { external });

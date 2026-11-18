@@ -15,6 +15,10 @@ Capa federada de prevención de colisiones secundarias y coordinación de asiste
 | 10 | [10_SEVERITY_MODEL_CALIBRATION.md](10_SEVERITY_MODEL_CALIBRATION.md) | Modelo multivariante de gravedad (551 260 accidentes, AUC 0,78), OR ajustados, validación por país |
 | 11 | [11_ROAD_BACKBONE_WARNING_BUS.md](11_ROAD_BACKBONE_WARNING_BUS.md) | La carretera como senda principal: bus de avisos, horizonte, presupuesto de atención, cadena BLE frente a portador del sentido contrario, intercambio entre dispositivos blindado |
 | 12 | [12_DRIVING_PHYSICS_SIGHT_URGENCY.md](12_DRIVING_PHYSICS_SIGHT_URGENCY.md) | Conducción: visibilidad calculada por trazado (validada con la ordenada media), deceleración necesaria (DRAC) y peligro oculto tras la curva; la urgencia física manda en la atención |
+| 13 | [13_BLE_RELAY_HMI_VALIDATION.md](13_BLE_RELAY_HMI_VALIDATION.md) | H-ROAD-BLE-1 / H-ROAD-HMI-1: viabilidad del relé BLE por la calzada contraria y árbitro de atención (rama lateral #49) |
+| 14 | [14_ROAD_ALERT_FABRIC_COVERAGE.md](14_ROAD_ALERT_FABRIC_COVERAGE.md) | Road Alert Fabric: aviso canónico, horizonte y cobertura verificable (rama lateral #50) |
+| 15 | [15_ROBUST_QUEUE_REACHABILITY_RESEARCH.md](15_ROBUST_QUEUE_REACHABILITY_RESEARCH.md) | H-ROAD-RRE-1 / H-ROAD-COVER-1: alcance robusto del final de cola y cotas de cobertura (rama lateral #51) |
+| 16 | [16_CONSOLIDATION_F0.md](16_CONSOLIDATION_F0.md) | Consolidación F0: ramas unidas, decisiones de fusión y módulos paralelos pendientes de unificar |
 | 9 | [09_DIFFERENTIATION_DETECTION_SECURITY.md](09_DIFFERENTIATION_DETECTION_SECURITY.md) | Soluciones existentes, diferenciación, detección de accidentes, blindaje |
 | 8 | [08_COMPANION_WAZE_SENSORS_STRATEGY.md](08_COMPANION_WAZE_SENSORS_STRATEGY.md) | Alcance a todos los conductores, Waze, sensores, física del impacto, emergencia guiada |
 | 6 | [06_CASUISTRY_RISK_AND_CONCLUSIONS.md](06_CASUISTRY_RISK_AND_CONCLUSIONS.md) | Evidencia con fuentes, 8 mecanismos, probabilidades por circunstancia, conclusiones |

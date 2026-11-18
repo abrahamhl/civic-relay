@@ -24,6 +24,10 @@ jobs:
         run: |
           node packages/senda/scripts/roadsafe-experiment.mjs --n 3000 > /dev/null
           node -e "const r=require('./evidence/roadsafe/roadsafe-experiments.json').experiments.negativeControls; const ok=r.NC1_zero_adoption_equals_A.pass&&r.NC2_placebo_no_effect.pass&&r.NC3_latency_beyond_event_no_benefit.pass&&r.NC4_late_warning_harm.policyAvoidsHarm; console.log(JSON.stringify(r)); process.exit(ok?0:1)"
+      - name: H-ROAD-RRE-1 synthetic falsification and deterministic evidence
+        run: |
+          node packages/senda/scripts/roadsafe-reachability-experiment.mjs /tmp/senda-rre-evidence.json
+          diff -u evidence/roadsafe/reachability-synthetic-20261118.json /tmp/senda-rre-evidence.json
       - name: Chromium para E2E
         run: npx --yes playwright@1.63.0 install --with-deps chromium && npm i --no-save --prefix /tmp/pw playwright@1.63.0
       - name: Consola RoadSafe en Chromium (móvil y escritorio, sin red externa)

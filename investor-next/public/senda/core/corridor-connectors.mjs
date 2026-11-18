@@ -784,7 +784,7 @@ export function normalizeObservation(raw, {
     value: raw.value,
     units: raw.units.trim(),
     measurementUncertainty: raw.measurementUncertainty ?? null, // C1: antes «10 %» inventado
-    qualityFlags: Array.isArray(raw.qualityFlags) ? [...raw.qualityFlags] : ['UNVALIDATED'], // C1: antes «VALIDATED» sin validar nada
+    qualityFlags: Array.isArray(raw.qualityFlags) ? [...raw.qualityFlags] : ['VALIDATION_NOT_ESTABLISHED'], // C1: antes «VALIDATED» sin validar nada
     licenseReference: raw.licenseReference || 'UNSPECIFIED_LICENSE',
     provenance: {
       adapterId: raw.provenance?.adapterId || raw.sourceId,
@@ -794,7 +794,7 @@ export function normalizeObservation(raw, {
     },
     modelVersion: raw.modelVersion || 'senda-corridor-ingest/1.0.0',
     sourcePayloadHash,
-    confidence: Number.isFinite(raw.confidence) ? Math.max(0.01, Math.min(0.999, Number(raw.confidence))) : null, // C1: antes 0,85 inventado
+    confidence: Number.isFinite(raw.confidence) && raw.confidence >= 0 && raw.confidence <= 1 ? raw.confidence : null,
     freshnessState,
   };
 }
@@ -822,7 +822,7 @@ function resolveMonibasLocation(siteId) {
   const hm = Number(m[1]) / 10;
   const keys = Object.keys(A12_MONIBAS_LOCATIONS).map(Number).sort((a, b) => Math.abs(a - hm) - Math.abs(b - hm));
   const base = A12_MONIBAS_LOCATIONS[keys[0]];
-  return { ...base, hm };
+  return { ...base, hm, uncertaintyRadiusM: Math.max(100, Math.abs(keys[0] - hm) * 100) };
 }
 
 export function parseNdwDatexPayload(xmlText, {
@@ -1106,7 +1106,7 @@ export function createNdwRoadAdapter({
 export function parseDgtNapXml(xmlText, {
   receivedAtUtc = new Date().toISOString(),
   sourceId = 'DGT-ES-NAP-DATEX2-V36',
-  roadSegmentId = 'ES-N403-PK80-95',
+  roadSegmentId = null,
   nowMs = Date.now(),
   capturedFromFixture = false,
 } = {}) {
@@ -1115,7 +1115,7 @@ export function parseDgtNapXml(xmlText, {
   }
   const payloadHash = sha256Hex(xmlText);
   const pubMatch = xmlText.match(/<(?:[\w]+:)?publicationTime>([^<]+)<\/(?:[\w]+:)?publicationTime>/);
-  const publicationTimeUtc = pubMatch ? pubMatch[1] : receivedAtUtc;
+  const publicationTimeUtc = pubMatch ? pubMatch[1] : null;
   const sitBlocks = [...xmlText.matchAll(/<sit:situation\b[\s\S]*?<\/sit:situation>/g)].map((m) => m[0]);
 
   const observations = [];
@@ -1130,7 +1130,7 @@ export function parseDgtNapXml(xmlText, {
     const muniMatch = block.match(/<lse:municipality>([^<]+)<\/lse:municipality>/);
     const sevMatch = block.match(/<sit:overallSeverity>([^<]+)<\/sit:overallSeverity>/);
 
-    if (!latMatch || !lonMatch) continue;
+    if (!latMatch || !lonMatch || (!timeMatch && !publicationTimeUtc)) continue;
     const statusMatch = block.match(/<(?:[\w]+:)?validityStatus>([^<]+)<\/(?:[\w]+:)?validityStatus>/);
     if (statusMatch && ['suspended', 'inactive'].includes(statusMatch[1].trim())) continue; // C3: registros suspendidos no son incidencias activas
 
@@ -1155,7 +1155,7 @@ export function parseDgtNapXml(xmlText, {
       licenseReference: 'DGT NAP Reutilización Información Sector Público (Ley 37/2007)',
       provenance: {
         adapterId: sourceId,
-        verificationState: capturedFromFixture ? 'RECORDED_REAL_SAMPLE' : 'LIVE_VERIFIED',
+        verificationState: capturedFromFixture ? 'RECORDED_REAL_SAMPLE' : 'OBSERVED_UNVERIFIED',
         upstreamEndpoint: 'https://nap.dgt.es/datex2/v3/dgt/SituationPublication/datex2_v36.xml',
         capturedFromFixture,
       },
@@ -1697,7 +1697,7 @@ export function createMqttEdgeBridge({
       observation: ['EDGE_DETECTION_EVENT', 'ONVIF_PROFILE_M_METADATA', 'ENVIRONMENTAL_ALERT'],
       transport: ['MQTT_LOCAL_BROKER', 'DTN_METADATA_DESCRIPTOR_ONLY'],
     },
-    permissionState: 'OWNER_AUTHORIZED_EDGE_GATEWAY',
+    permissionState: 'AUTHENTICATION_REQUIRED',
     license: 'MIT (SENDA Edge Bridge)',
 
     async authenticate({ token } = {}) {
@@ -1747,13 +1747,13 @@ export function createMqttEdgeBridge({
         observationType: eventPayload.observationType || 'EDGE_OBJECT_ANOMALY',
         value: {
           detectorType: eventPayload.detectorType || 'ONVIF_Profile_M',
-          objectClass: eventPayload.objectClass || 'UNSPECIFIED', // C4: antes «vehicle_stopped» inventado
+          objectClass: eventPayload.objectClass ?? null, // C4: antes «vehicle_stopped» inventado; desconocido = null
           severityScore: Number.isFinite(eventPayload.severityScore) ? Number(eventPayload.severityScore) : null,
           localSnapshotRef: eventPayload.localSnapshotRef || null,
-          localSnapshotSha256: eventPayload.localSnapshotSha256 || payloadHash,
+          localSnapshotSha256: eventPayload.localSnapshotSha256 || null,
         },
         units: eventPayload.units || 'probability_score',
-        measurementUncertainty: eventPayload.measurementUncertainty || { type: 'SCORE_STD', value: 0.08 },
+        measurementUncertainty: eventPayload.measurementUncertainty ?? null,
         qualityFlags: ['EDGE_SCHEMA_V1_VALIDATED', 'DTN_COMPACT_METADATA_ONLY'],
         licenseReference: 'MIT / SENDA Edge Gateway',
         provenance: {
@@ -1764,7 +1764,7 @@ export function createMqttEdgeBridge({
         },
         modelVersion: eventPayload.modelVersion || 'frigate-onvif-edge/1.0',
         sourcePayloadHash: payloadHash,
-        confidence: Number.isFinite(eventPayload.confidence) ? Number(eventPayload.confidence) : null,
+        confidence: Number.isFinite(eventPayload.confidence) && eventPayload.confidence >= 0 && eventPayload.confidence <= 1 ? eventPayload.confidence : null,
       }, { nowMs });
 
       const compactDtnDescriptor = {

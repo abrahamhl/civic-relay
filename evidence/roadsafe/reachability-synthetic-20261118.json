@@ -1,0 +1,24 @@
+{
+  "schema": "senda.h-road-rre-1.synthetic-experiment/1",
+  "seed": 20261118,
+  "kind": "SYNTHETIC_NUMERICAL_FALSIFICATION",
+  "method": "Xorshift32 Monte Carlo; input intervals guaranteed to contain injected truth; constant-speed kinematics",
+  "baseline": "UNVALIDATED_FIXED_DISTANCE_500M",
+  "counts": {
+    "trials": 4000,
+    "acceptedModel": 4000,
+    "abstained": 0,
+    "robustDeclaredAdequate": 1946,
+    "robustFalseAssurance": 0,
+    "fixed500DeclaredAdequate": 2507,
+    "fixed500FalseAssurance": 6,
+    "trueAdequate": 3328,
+    "modelUndetermined": 2008
+  },
+  "assertions": {
+    "robustFalseAssuranceZero": true,
+    "naiveCanBeFalselySafe": true,
+    "noManufacturedFieldClaim": true
+  },
+  "disclaimer": "All cases synthetic. No BLE, road incident, real traffic, reaction time or accident reduction has been measured."
+}

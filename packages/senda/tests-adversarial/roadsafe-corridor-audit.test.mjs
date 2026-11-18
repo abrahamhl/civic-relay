@@ -11,7 +11,7 @@ const raw = { sourceId: 'X', observationType: 'T', units: 'u', value: 1, measure
 
 test('C1: normalizeObservation no afirma validación ni verificación que no ocurrieron, ni inventa confianza o radio', () => {
   const o = normalizeObservation(raw, { nowMs });
-  assert.deepEqual(o.qualityFlags, ['UNVALIDATED']); assert.equal(o.provenance.verificationState, 'UNVERIFIED');
+  assert.deepEqual(o.qualityFlags, ['VALIDATION_NOT_ESTABLISHED']); assert.equal(o.provenance.verificationState, 'UNVERIFIED');
   assert.equal(o.confidence, null); assert.equal(o.location.uncertaintyRadiusM, null); assert.equal(o.measurementUncertainty, null);
 });
 
@@ -37,7 +37,7 @@ test('C4: MQTT — sin token por defecto en el código; tokens cortos rechazados
   const b = createMqttEdgeBridge({ authorizedTokens: ['token-largo-de-pruebas-0001'] });
   await assert.rejects(b.authenticate({ token: 'edge-token-barrio-lab-01' }), /no autorizado/, 'el antiguo token por defecto ya no abre nada');
   const r = await b.fetchObservation({ token: 'token-largo-de-pruebas-0001', eventPayload: { schema: 'senda.edge-event/1.0', measuredAtUtc: '2026-11-18T00:59:30Z', location: { lat: 40, lon: -3 } }, nowMs });
-  assert.equal(r.observation.value.objectClass, 'UNSPECIFIED'); assert.equal(r.observation.value.severityScore, null); assert.equal(r.observation.confidence, null);
+  assert.equal(r.observation.value.objectClass, null); assert.equal(r.observation.value.severityScore, null); assert.equal(r.observation.confidence, null);
 });
 
 test('C5: fusión del corredor — sin confianza declarada no se mueve la probabilidad; la banda se declara heurística', () => {

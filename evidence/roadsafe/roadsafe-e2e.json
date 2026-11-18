@@ -1,8 +1,8 @@
 {
   "schema": "senda-roadsafe-e2e/1",
   "browser": "chromium (playwright)",
-  "at": "2026-11-18T18:37:57.407Z",
-  "passed": 74,
+  "at": "2026-11-18T19:06:09.390Z",
+  "passed": 82,
   "failed": 0,
   "results": [
     {
@@ -34,7 +34,7 @@
     {
       "name": "movil: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-8907c28863827f28 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-7a60e249a830123a · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -44,7 +44,7 @@
     {
       "name": "movil: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-8907c28863827f28 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-7a60e249a830123a · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: idioma en",
@@ -151,14 +151,14 @@
       ]
     },
     {
-      "name": "movil: viaje — taxi se detiene por delante del averiado",
+      "name": "movil: viaje — sin evaluación del arcén no se recomienda parada del taxi",
       "ok": true
     },
     {
       "name": "movil: carretera — 4 canales funden en 1 escena (oficial) + cola aparte",
       "ok": true,
       "kbus": [
-        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:23f5db31 · DATEX2:NAP",
+        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:fda87c90 · DATEX2:NAP",
         "QUEUE_TAILUNVERIFIED_HINT1ZONE_MODEL"
       ]
     },
@@ -201,9 +201,33 @@
       "ok": true
     },
     {
+      "name": "movil: carretera — primero final de cola, después accidente",
+      "ok": true,
+      "roadRows": [
+        "Final de cola900 m35–37 sUNVERIFIED",
+        "Accidente1500 m59–61 sUNVERIFIED"
+      ]
+    },
+    {
+      "name": "movil: carretera — no publica ni anuncia sin autorizaciones",
+      "ok": true,
+      "roadChannels": "Cobertura real y permisosVisualización local posible; sin credenciales, consentimiento ni mediciones de enlace para publicar o retransmitir.Canales bloqueados: 8VOICE · NOT_APPROVED_FOR_DRIVER_OR_PUBLIC_WARNINGSMS · NO_USER_CONSENTBLE_PEER · NO_USER_CONSENTDTN_RELAY · NO_USER_CONSENTDGT30 · NOT_APPROVED_FOR_DRIVER_OR_PUBLIC_WARNINGWAZE_CIFS · NOT_APPROVED_FOR_DRIVER_OR_PUBLIC_WARNINGTAXI_PARTNER · NO_USER_CONSENTINSURER_PARTNER · NO_USER_CONSENT"
+    },
+    {
+      "name": "movil: carretera — BLE se declara solo hipótesis",
+      "ok": true,
+      "roadRelay": "Reenvío BLE contrarioProbabilidad condicional del modelo: 77.0 %HIPÓTESIS, NO COBERTURA MEDIDA: llegadas Poisson, 1200 veh/h, velocidades de 90 km/h, alcance eficaz supuesto 30 m y recepción supuesta del 70%. No hay ensayo BLE físico ni acuse de entrega."
+    },
+    {
+      "name": "movil: carretera — predicción cinemática conserva incertidumbre y no afirma cobertura física",
+      "ok": true,
+      "text": "PeligroDistancia estimadaETAEvidenciaFinal de cola900 m35–37 sUNVERIFIEDAccidente1500 m59–61 sUNVERIFIEDDetrás o descartados: 1 · Avisos por voz emitidos: 0Modelo experimental de final de cola móvilVelocidad de la onda de cola: -5 … -3 m/s · Distancia acotada: 915 … 949 mMargen temporal convertido a distancia: 415 mH-ROAD-RRE-1 · TIMING_ROBUST_IN_MODELParámetros inventados únicamente para el ensayo. No son valores de normativa ni consejos de frenado.Cobertura BLE no validada físicamente: ABSTAIN_NO_CALIBRATED_CHANNEL"
+    },
+    {
       "name": "movil: sin desbordamiento horizontal",
       "ok": true,
       "overflow": [
+        0,
         0,
         0,
         0,
@@ -250,7 +274,7 @@
     {
       "name": "escritorio: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-7894e95ba0e5ce30 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-16a1078e002d6138 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -260,7 +284,7 @@
     {
       "name": "escritorio: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-7894e95ba0e5ce30 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-16a1078e002d6138 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: idioma en",
@@ -367,14 +391,14 @@
       ]
     },
     {
-      "name": "escritorio: viaje — taxi se detiene por delante del averiado",
+      "name": "escritorio: viaje — sin evaluación del arcén no se recomienda parada del taxi",
       "ok": true
     },
     {
       "name": "escritorio: carretera — 4 canales funden en 1 escena (oficial) + cola aparte",
       "ok": true,
       "kbus": [
-        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:984b4b39 · DATEX2:NAP",
+        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:3e5251e2 · DATEX2:NAP",
         "QUEUE_TAILUNVERIFIED_HINT1ZONE_MODEL"
       ]
     },
@@ -417,9 +441,33 @@
       "ok": true
     },
     {
+      "name": "escritorio: carretera — primero final de cola, después accidente",
+      "ok": true,
+      "roadRows": [
+        "Final de cola900 m35–37 sUNVERIFIED",
+        "Accidente1500 m59–61 sUNVERIFIED"
+      ]
+    },
+    {
+      "name": "escritorio: carretera — no publica ni anuncia sin autorizaciones",
+      "ok": true,
+      "roadChannels": "Cobertura real y permisosVisualización local posible; sin credenciales, consentimiento ni mediciones de enlace para publicar o retransmitir.Canales bloqueados: 8VOICE · NOT_APPROVED_FOR_DRIVER_OR_PUBLIC_WARNINGSMS · NO_USER_CONSENTBLE_PEER · NO_USER_CONSENTDTN_RELAY · NO_USER_CONSENTDGT30 · NOT_APPROVED_FOR_DRIVER_OR_PUBLIC_WARNINGWAZE_CIFS · NOT_APPROVED_FOR_DRIVER_OR_PUBLIC_WARNINGTAXI_PARTNER · NO_USER_CONSENTINSURER_PARTNER · NO_USER_CONSENT"
+    },
+    {
+      "name": "escritorio: carretera — BLE se declara solo hipótesis",
+      "ok": true,
+      "roadRelay": "Reenvío BLE contrarioProbabilidad condicional del modelo: 77.0 %HIPÓTESIS, NO COBERTURA MEDIDA: llegadas Poisson, 1200 veh/h, velocidades de 90 km/h, alcance eficaz supuesto 30 m y recepción supuesta del 70%. No hay ensayo BLE físico ni acuse de entrega."
+    },
+    {
+      "name": "escritorio: carretera — predicción cinemática conserva incertidumbre y no afirma cobertura física",
+      "ok": true,
+      "text": "PeligroDistancia estimadaETAEvidenciaFinal de cola900 m35–37 sUNVERIFIEDAccidente1500 m59–61 sUNVERIFIEDDetrás o descartados: 1 · Avisos por voz emitidos: 0Modelo experimental de final de cola móvilVelocidad de la onda de cola: -5 … -3 m/s · Distancia acotada: 915 … 949 mMargen temporal convertido a distancia: 415 mH-ROAD-RRE-1 · TIMING_ROBUST_IN_MODELParámetros inventados únicamente para el ensayo. No son valores de normativa ni consejos de frenado.Cobertura BLE no validada físicamente: ABSTAIN_NO_CALIBRATED_CHANNEL"
+    },
+    {
       "name": "escritorio: sin desbordamiento horizontal",
       "ok": true,
       "overflow": [
+        0,
         0,
         0,
         0,
