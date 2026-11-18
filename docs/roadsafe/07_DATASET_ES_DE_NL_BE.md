@@ -1,6 +1,6 @@
-# RoadSafe · Dataset armonizado de accidentes (España, Alemania, Países Bajos; Bélgica preparado)
+# RoadSafe · Dataset armonizado de accidentes (España, Alemania, Países Bajos, Francia, Gran Bretaña; Bélgica preparado)
 
-**Construido:** 2026-11-17/18 · **Registros armonizados (2024):** 496 895 (ES 101 996 · DE 268 519 · NL 126 380), con **0 rechazados**.
+**Construido:** 2026-11-17/18 · **Registros armonizados (2024):** 652 224 (ES 101 996 · DE 268 519 · NL 126 380 · FR 54 402 · GB 100 927), con **0 rechazados**.
 **Reproducir:** `node packages/senda/scripts/roadsafe-data/build-dataset.mjs --year 2024`. Necesita `python3` + `openpyxl` para el XLSX de la DGT.
 **Informe automático:** [`evidence/roadsafe/dataset/DATASET_REPORT_2024.md`](../../evidence/roadsafe/dataset/DATASET_REPORT_2024.md) · procedencia con SHA-256: `manifest-2024.json`.
 
@@ -11,6 +11,8 @@
 | ES | [DGT · microdatos de accidentes con víctimas 2024](https://www.dgt.es/menusecundario/dgt-en-cifras/dgt-en-cifras-resultados/dgt-en-cifras-detalle/Ficheros-de-microdatos-de-accidentes-con-victimas-2024/) + diccionario | 1 fila = 1 accidente con víctimas; gravedad a 30 días; tipo, firme, iluminación, niebla, visibilidad restringida | carretera + PK + sentido (sin coordenadas) | aviso legal DGT / datos.gob.es (**condiciones exactas por verificar**) | ✅ |
 | DE | [Unfallatlas «Unfallorte» 2024](https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/) + DSB_Unfallatlas.pdf | accidentes con daños personales; Unfallart, Unfalltyp, luz, firme, implicados | WGS84 | Datenlizenz Deutschland – Namensnennung 2.0 | ✅ |
 | NL | [Rijkswaterstaat BRON 2024](https://data.overheid.nl/dataset/53580-verkeersongevallen-nederland----ongevallen--rws-) (WFS `ongevallen_2024`, CSV) | todos los registrados, **incluidos solo daños materiales**; aard ongeval, luz, firme, tiempo, circunstancias temporales | RD New → WGS84 (≈1 m) | CC0 | ✅ |
+| FR | [BAAC (ONISR) 2024](https://www.data.gouv.fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2024), 4 ficheros unidos | accidentes con víctimas; `situ 2` en el arcén, `manv 23` detenido fuera de estacionamiento, `col 2/4` alcance/cadena, choque trasero | WGS84 | Licence Ouverte (Etalab) | ✅ códigos verificados en la «Description des bases» de la ONISR |
+| GB | [STATS19 (DfT) 2024](https://www.data.gov.uk/dataset/cb7ae6f0-4be6-4935-9277-47e5ce24a11f/road-accidents-safety-data), colisiones + vehículos | accidentes con víctimas; maniobra 02/03/04 aparcado/esperando/deteniéndose, ubicación 06 en apartadero o arcén, impacto trasero | WGS84 | OGL v3.0 | ✅ códigos verificados en STATS20 2024. La guía XLSX da 404; `urban_or_rural_area` no se usa (no está en STATS20) |
 | BE | [Statbel](https://statbel.fgov.be/en/themes/mobility/traffic/road-accidents) | accidentes con víctimas | parcial | open data Statbel (verificar) | ⛔ **captcha anti-bots**: no se elude. Adaptador listo para un fichero descargado a mano; el mapeo de columnas está marcado como NO VERIFICADO |
 
 Los códigos de cada fuente se tradujeron con su **diccionario oficial**, leído en esta sesión:
@@ -28,9 +30,10 @@ Los códigos de cada fuente se tradujeron con su **diccionario oficial**, leído
 
 | Hallazgo | ES | DE | NL | Lectura |
 |---|---|---|---|---|
-| Oscuridad vs día (OR de desenlace mortal) | **1,60** [1,44–1,78] | **1,55** [1,42–1,70] | **1,50** [1,24–1,82] | Replicado en 3 países: de noche los accidentes son más graves |
-| De noche sin alumbrado vs con alumbrado | **3,42** [2,84–4,11] | — | — | El alumbrado importa mucho |
-| Mojado vs seco | 0,88 (n.s.) | 1,02 (n.s.) | 0,95 (n.s.) | La lluvia no cambia la gravedad; actúa sobre la frecuencia (física) |
+| Oscuridad vs día (OR de desenlace mortal) | **1,60** [1,44–1,78] | **1,55** [1,42–1,70] | **1,50** [1,24–1,82] | Replicado en **5 países** (FR 1,51 [1,40–1,63]; GB 1,68 [1,51–1,86]) |
+| **Accidente en el arcén vs resto** | — | — | — | **FR 2,04 [1,42–2,94] (11,3 % mortales); GB 2,44 [1,65–3,62]**: doble de mortal |
+| De noche sin alumbrado vs con alumbrado | **3,42** [2,84–4,11] | — | — | FR 4,27; GB 2,95: el alumbrado importa mucho |
+| Mojado vs seco | 0,88 (n.s.) | 1,02 (n.s.) | 0,95 (n.s.) | FR 0,99 (n.s.); GB 1,22 (*). Resultado **mixto** |
 | Interurbano vs urbano | **4,61** | — | **3,82** | La velocidad de la vía domina la gravedad |
 | Curva vs recta | **1,24** | — | **1,46** | |
 | Alcance o vehículo detenido vs otros tipos | 0,44 | 0,36 | 0,49 | En promedio son menos mortales; son **frecuentes** (11–17 % de los accidentes con víctimas) |

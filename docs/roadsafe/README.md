@@ -11,7 +11,8 @@ Capa federada de prevención de colisiones secundarias y coordinación de asiste
 | 3 | [../../evidence/roadsafe/ROADSAFE_RESULTS.md](../../evidence/roadsafe/ROADSAFE_RESULTS.md) | Resultados reproducibles (A–E, barridos, controles negativos, H-ROAD-2/3) |
 | 4 | [04_HYPOTHESES.md](04_HYPOTHESES.md) | H-ROAD-1/2/3 preregistradas |
 | 5 | [05_PILOT_AND_FUNDING.md](05_PILOT_AND_FUNDING.md) | TRL, piloto ES→NL, costes, acuerdos pendientes |
-| 7 | [07_DATASET_ES_DE_NL_BE.md](07_DATASET_ES_DE_NL_BE.md) | Dataset oficial armonizado (496 895 accidentes ES/DE/NL), hallazgos replicados |
+| 7 | [07_DATASET_ES_DE_NL_BE.md](07_DATASET_ES_DE_NL_BE.md) | Dataset oficial armonizado (652 224 accidentes ES/DE/NL/FR/GB), hallazgos replicados |
+| 9 | [09_DIFFERENTIATION_DETECTION_SECURITY.md](09_DIFFERENTIATION_DETECTION_SECURITY.md) | Soluciones existentes, diferenciación, detección de accidentes, blindaje |
 | 8 | [08_COMPANION_WAZE_SENSORS_STRATEGY.md](08_COMPANION_WAZE_SENSORS_STRATEGY.md) | Alcance a todos los conductores, Waze, sensores, física del impacto, emergencia guiada |
 | 6 | [06_CASUISTRY_RISK_AND_CONCLUSIONS.md](06_CASUISTRY_RISK_AND_CONCLUSIONS.md) | Evidencia con fuentes, 8 mecanismos, probabilidades por circunstancia, conclusiones |
 
@@ -43,6 +44,8 @@ Capa federada de prevención de colisiones secundarias y coordinación de asiste
 | `roadsafe-service-stop.mjs` | Parada señalizada de taxi/grúa |
 | `roadsafe-responders.mjs` | Servicios compartidos con autorización |
 | `roadsafe-routes.mjs` | Rutas favoritas, paquete sin conexión, comparación por riesgo |
+| `roadsafe-crash-detect.mjs` | Detección de accidente por fusión de evidencias físicas y de contexto |
+| `roadsafe-guard.mjs` | Cifrado por incidente, custodia firmada, anti-abuso, privacidad |
 | `investor-next/public/senda/roadsafe.html` | Consola ciudadano / operador / científico |
 
 ## Reproducir

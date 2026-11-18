@@ -1,8 +1,8 @@
 {
   "schema": "senda-roadsafe-e2e/1",
   "browser": "chromium (playwright)",
-  "at": "2026-11-18T00:06:50.535Z",
-  "passed": 56,
+  "at": "2026-11-18T00:24:45.986Z",
+  "passed": 58,
   "failed": 0,
   "results": [
     {
@@ -34,7 +34,7 @@
     {
       "name": "movil: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-170b325251b8556b · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-ab4c61dabd4afcea · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -44,7 +44,7 @@
     {
       "name": "movil: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-170b325251b8556b · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-ab4c61dabd4afcea · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: idioma en",
@@ -81,14 +81,14 @@
         "1M-40 · «atrapado» sin verificarVERIFICAR · DATOS_INCOMPLETO",
         "2N-000 PK 127 · alcanceDATOS_INCOMPLETOS:DARK_SEVERITYELEVAT",
         "3AP-7 PK 300 · carril ocupado, nocheSLA_SUPERADOCRITICALnive",
-        "4A-3 PK 41,2 · avería arcénDATOS_INCOMPLETOS:DARK_SEVERITYMO"
+        "4A-3 PK 41,2 · avería arcénDATOS_INCOMPLETOS:DARK_SEVERITYEL"
       ]
     },
     {
       "name": "movil: zona — el aviso anticipado crece con la cola y los paneles son propuestas",
       "ok": true,
       "a20": 1567,
-      "a50": 2861
+      "a50": 2851
     },
     {
       "name": "movil: física — Δv, guiñada y probabilidad de invasión de carril",
@@ -111,8 +111,24 @@
       "last": "Distancia temporal 2 s (recomendada)0.5 %×0.130.4 %45.6 km/h"
     },
     {
-      "name": "movil: dataset oficial — ES/DE/NL con OR de oscuridad",
+      "name": "movil: dataset oficial — 5 países con OR de oscuridad y arcén",
       "ok": true
+    },
+    {
+      "name": "movil: detector — 10 casos sintéticos sin fallos (choque ⇒ preguntar; falsas alarmas ⇒ nada)",
+      "ok": true,
+      "det": [
+        "CRASH_REAR_ENDchoqueCHECK_USER0.3243",
+        "CRASH_LOW_SPEEDchoqueCHECK_USER0.3243",
+        "CRASH_ROLLOVERchoqueCHECK_USER0.5455",
+        "PHONE_DROP_IN_CARnoNO_EVENT0",
+        "POTHOLEnoNO_EVENT0",
+        "HARD_BRAKE_NO_CRASHnoNO_EVENT—",
+        "SKI_FALLnoNO_EVENT0.0001",
+        "ROLLER_COASTERnoNO_EVENT0.0004",
+        "DOOR_SLAM_PARKEDnoNO_EVENT0.004",
+        "CRASH_NO_GNSSchoqueCHECK_USER0.0015"
+      ]
     },
     {
       "name": "movil: viaje — ruta favorita, paquete offline en KB, comparación por riesgo",
@@ -181,7 +197,7 @@
     {
       "name": "escritorio: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-edb4e3fa24a41341 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-11ef92303be39f38 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -191,7 +207,7 @@
     {
       "name": "escritorio: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-edb4e3fa24a41341 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-11ef92303be39f38 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: idioma en",
@@ -228,14 +244,14 @@
         "1M-40 · «atrapado» sin verificarVERIFICAR · DATOS_INCOMPLETO",
         "2N-000 PK 127 · alcanceDATOS_INCOMPLETOS:DARK_SEVERITYELEVAT",
         "3AP-7 PK 300 · carril ocupado, nocheSLA_SUPERADOCRITICALnive",
-        "4A-3 PK 41,2 · avería arcénDATOS_INCOMPLETOS:DARK_SEVERITYMO"
+        "4A-3 PK 41,2 · avería arcénDATOS_INCOMPLETOS:DARK_SEVERITYEL"
       ]
     },
     {
       "name": "escritorio: zona — el aviso anticipado crece con la cola y los paneles son propuestas",
       "ok": true,
       "a20": 1567,
-      "a50": 2861
+      "a50": 2851
     },
     {
       "name": "escritorio: física — Δv, guiñada y probabilidad de invasión de carril",
@@ -258,8 +274,24 @@
       "last": "Distancia temporal 2 s (recomendada)0.5 %×0.130.4 %45.6 km/h"
     },
     {
-      "name": "escritorio: dataset oficial — ES/DE/NL con OR de oscuridad",
+      "name": "escritorio: dataset oficial — 5 países con OR de oscuridad y arcén",
       "ok": true
+    },
+    {
+      "name": "escritorio: detector — 10 casos sintéticos sin fallos (choque ⇒ preguntar; falsas alarmas ⇒ nada)",
+      "ok": true,
+      "det": [
+        "CRASH_REAR_ENDchoqueCHECK_USER0.3243",
+        "CRASH_LOW_SPEEDchoqueCHECK_USER0.3243",
+        "CRASH_ROLLOVERchoqueCHECK_USER0.5455",
+        "PHONE_DROP_IN_CARnoNO_EVENT0",
+        "POTHOLEnoNO_EVENT0",
+        "HARD_BRAKE_NO_CRASHnoNO_EVENT—",
+        "SKI_FALLnoNO_EVENT0.0001",
+        "ROLLER_COASTERnoNO_EVENT0.0004",
+        "DOOR_SLAM_PARKEDnoNO_EVENT0.004",
+        "CRASH_NO_GNSSchoqueCHECK_USER0.0015"
+      ]
     },
     {
       "name": "escritorio: viaje — ruta favorita, paquete offline en KB, comparación por riesgo",

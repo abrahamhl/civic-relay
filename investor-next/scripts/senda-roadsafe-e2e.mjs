@@ -77,9 +77,11 @@ for (const vp of [{ name: 'movil', width: 390, height: 844 }, { name: 'escritori
   const circ = await page.$$eval('#s-circ-t tbody tr', (rs) => rs.map((r) => r.textContent));
   check(`${vp.name}: científico — ranking de 11 circunstancias, 2 s la más segura`, circ.length === 11 && /2 s/.test(circ.at(-1)), { last: circ.at(-1) });
   await page.waitForFunction(() => /ES/.test(document.querySelector('#d-out').textContent) && /DE/.test(document.querySelector('#d-out').textContent));
-  check(`${vp.name}: dataset oficial — ES/DE/NL con OR de oscuridad`, /NL/.test(await page.textContent('#d-out')) && /\*/.test(await page.textContent('#d-out')));
+  check(`${vp.name}: dataset oficial — 5 países con OR de oscuridad y arcén`, /GB/.test(await page.textContent('#d-out')) && /FR/.test(await page.textContent('#d-out')) && /\*/.test(await page.textContent('#d-out')));
   await page.screenshot({ path: resolve(outDir, `roadsafe-cientifico-${vp.name}.png`), fullPage: true });
-  await page.click('#tab-v'); await page.click('#v-save'); await page.click('#v-ann'); await page.click('#v-taxi');
+  await page.click('#tab-v'); await page.click('#v-save'); await page.click('#v-ann'); await page.click('#v-taxi'); await page.click('#v-det');
+  const det = await page.$$eval('#v-det-t tbody tr', (rs) => rs.map((r) => r.textContent));
+  check(`${vp.name}: detector — 10 casos sintéticos sin fallos (choque ⇒ preguntar; falsas alarmas ⇒ nada)`, det.length === 10 && (await page.$$('#v-det-t .b-bad')).length === 0, { det });
   const vout = await page.textContent('#v-out'), ann = await page.$$eval('#v-ann-out li', (l) => l.map((x) => x.textContent)), taxi = await page.textContent('#v-taxi-out');
   check(`${vp.name}: viaje — ruta favorita, paquete offline en KB, comparación por riesgo`, /★/.test(vout) && /KB/.test(vout) && /riesgo\/km/.test(vout), { vout: vout.slice(0, 200) });
   check(`${vp.name}: viaje — megafonía escalonada (≤3 avisos, sin órdenes)`, ann.length >= 2 && ann.length <= 3 && ann.every((a) => /Atención/.test(a) && !/[Ff]rena/.test(a)), { ann });

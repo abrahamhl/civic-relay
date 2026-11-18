@@ -16,8 +16,8 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseCsv, fromDgt, fromUnfallatlas, fromBron, fromStatbel, validateRecord, SOURCES } from '../../src/roadsafe-dataset.mjs';
-import { roadsafeProfile, empiricalSeverityFactors, hotspotsEB, gridCell, roadKmCell, conditionalShare, injuryOnly } from '../../src/roadsafe-dataset-analysis.mjs';
+import { parseCsv, fromDgt, fromUnfallatlas, fromBron, fromStatbel, fromBaac, fromStats19, validateRecord, SOURCES } from '../../src/roadsafe-dataset.mjs';
+import { roadsafeProfile, empiricalSeverityFactors, hotspotsEB, gridCell, roadKmCell, conditionalShare, injuryOnly, stoppedVehicleStudy } from '../../src/roadsafe-dataset-analysis.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url)), root = resolve(here, '../../../..');
 const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > 0 ? process.argv[i + 1] : d; };
@@ -30,6 +30,10 @@ const RAW = {
   ES_DGT_DICT: { file: 'es-dictionary.xlsx', url: 'https://www.dgt.es/export/sites/web-DGT/.galleries/downloads/dgt-en-cifras/24h/Diccionario_Tabla_Accidentes.xlsx' },
   DE_UNFALLATLAS: { file: `de-${YEAR}.zip`, url: `https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/Unfallorte${YEAR}_EPSG25832_CSV.zip` },
   DE_DSB: { file: 'de-DSB_Unfallatlas.pdf', url: 'https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/DSB_Unfallatlas.pdf' },
+  FR_CARACT: { file: `fr-caract-${YEAR}.csv`, url: null }, FR_LIEUX: { file: `fr-lieux-${YEAR}.csv`, url: null }, FR_VEHICULES: { file: `fr-vehicules-${YEAR}.csv`, url: null }, FR_USAGERS: { file: `fr-usagers-${YEAR}.csv`, url: null },
+  FR_DICT: { file: 'fr-description-bases.pdf', url: 'https://www.onisr.securite-routiere.gouv.fr/sites/default/files/2024-10/Description%20des%20bases%20de%20donn%C3%A9es%20annuelles.pdf' },
+  UK_COLLISION: { file: `uk-collision-${YEAR}.csv`, url: `https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-collision-${YEAR}.csv` },
+  UK_VEHICLE: { file: `uk-vehicle-${YEAR}.csv`, url: `https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-vehicle-${YEAR}.csv` },
   NL_BRON: { file: `nl-${YEAR}.csv`, url: `https://geo.rijkswaterstaat.nl/services/ogc/gdr/verkeersongevallen_nederland/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=ongevallen_${YEAR}&outputFormat=csv` },
 };
 const sha = (p) => createHash('sha256').update(readFileSync(p)).digest('hex');
@@ -42,11 +46,22 @@ async function download(url, dst) {
   writeFileSync(dst, buf); return buf.length;
 }
 
+// Las URL de BAAC cambian con cada publicación: se resuelven con la API de data.gouv.fr (conjunto 53698f4ca3a729239d2036df).
+if (FETCH) {
+  try {
+    const d = await (await fetch('https://www.data.gouv.fr/api/1/datasets/53698f4ca3a729239d2036df/')).json();
+    const find = (re) => d.resources.find((r) => re.test(r.title))?.url ?? null;
+    RAW.FR_CARACT.url = find(new RegExp(`^Caract_${YEAR}\\.csv$`, 'i')) ?? find(new RegExp(`caract-${YEAR}`, 'i'));
+    RAW.FR_LIEUX.url = find(new RegExp(`^Lieux_${YEAR}\\.csv$`, 'i')) ?? find(new RegExp(`lieux-${YEAR}`, 'i'));
+    RAW.FR_VEHICULES.url = find(new RegExp(`^Vehicules_${YEAR}\\.csv$`, 'i')) ?? find(new RegExp(`^vehicules-${YEAR}`, 'i'));
+    RAW.FR_USAGERS.url = find(new RegExp(`^Usagers_${YEAR}\\.csv$`, 'i')) ?? find(new RegExp(`usagers-${YEAR}`, 'i'));
+  } catch (e) { console.warn('data.gouv.fr API:', e.message); }
+}
 const manifest = { schema: 'senda-roadsafe-dataset-manifest/1', year: YEAR, builtAt: new Date().toISOString(), sources: {}, blocked: { BE_STATBEL: SOURCES.BE_STATBEL.blocked } };
 for (const [id, r] of Object.entries(RAW)) {
   const p = join(CACHE, r.file);
   try {
-    if (!existsSync(p)) { if (!FETCH) throw new Error('no está en caché y --no-fetch'); console.log(`↓ ${id}`); await download(r.url, p); }
+    if (!existsSync(p)) { if (!FETCH) throw new Error('no está en caché y --no-fetch'); if (!r.url) throw new Error('URL no resuelta'); console.log(`↓ ${id}`); await download(r.url, p); }
     manifest.sources[id] = { url: r.url, file: r.file, bytes: readFileSync(p).length, sha256: sha(p) };
   } catch (e) { manifest.sources[id] = { url: r.url, error: String(e.message) }; console.warn(`✗ ${id}: ${e.message}`); }
 }
@@ -75,6 +90,18 @@ if (manifest.sources.DE_UNFALLATLAS?.sha256) {
   ingest('DE_UNFALLATLAS', parseCsv(readFileSync(f, 'utf8'), { sep: ';' }), fromUnfallatlas);
 }
 if (manifest.sources.NL_BRON?.sha256) ingest('NL_BRON', parseCsv(readFileSync(join(CACHE, RAW.NL_BRON.file), 'utf8'), { sep: ',' }), fromBron);
+// FR: unión por Num_Acc de los 4 ficheros
+if (['FR_CARACT', 'FR_LIEUX', 'FR_VEHICULES', 'FR_USAGERS'].every((k) => manifest.sources[k]?.sha256)) {
+  const rd = (k) => parseCsv(readFileSync(join(CACHE, RAW[k].file), 'utf8'), { sep: ';' });
+  const group = (rows) => { const m = new Map(); for (const r of rows) { const a = m.get(r.Num_Acc) ?? []; a.push(r); m.set(r.Num_Acc, a); } return m; };
+  const L = group(rd('FR_LIEUX')), V = group(rd('FR_VEHICULES')), U = group(rd('FR_USAGERS'));
+  ingest('FR_BAAC', rd('FR_CARACT'), (c) => fromBaac(c, (L.get(c.Num_Acc) ?? [])[0], V.get(c.Num_Acc) ?? [], U.get(c.Num_Acc) ?? []));
+}
+// GB: colisión + vehículos por collision_index
+if (manifest.sources.UK_COLLISION?.sha256 && manifest.sources.UK_VEHICLE?.sha256) {
+  const V = new Map(); for (const v of parseCsv(readFileSync(join(CACHE, RAW.UK_VEHICLE.file), 'utf8'), { sep: ',' })) { const a = V.get(v.collision_index) ?? []; a.push(v); V.set(v.collision_index, a); }
+  ingest('UK_STATS19', parseCsv(readFileSync(join(CACHE, RAW.UK_COLLISION.file), 'utf8'), { sep: ',' }), (c) => fromStats19(c, V.get(c.collision_index) ?? []));
+}
 const beDir = join(CACHE, 'be');
 if (existsSync(beDir)) for (const f of readdirSync(beDir).filter((x) => x.endsWith('.csv') || x.endsWith('.txt'))) ingest(`BE_STATBEL:${f}`, parseCsv(readFileSync(join(beDir, f), 'utf8')), fromStatbel);
 else stats.BE_STATBEL = { skipped: 'sin fichero manual (portal con captcha)' };
@@ -91,7 +118,7 @@ const perCountry = Object.fromEntries(countries.map((c) => {
   const R = by(c);
   return [c, {
     records: R.length, injury: R.filter(injuryOnly).length,
-    profile: roadsafeProfile(R), severityFactors: empiricalSeverityFactors(R),
+    profile: roadsafeProfile(R), severityFactors: empiricalSeverityFactors(R), stoppedStudy: stoppedVehicleStudy(R),
     lightByCollision: conditionalShare(R.filter(injuryOnly), (r) => `${r.collision}·${r.light}`, (r) => r.severity === 'FATAL', { minN: 200 }).slice(0, 25),
     hotspots: c === 'ES' ? hotspotsEB(R.filter((r) => r.area === 'RURAL'), roadKmCell(1), { top: 25 }) : hotspotsEB(R, gridCell(0.01), { top: 25 }),
     hotspotsRearStationary: c === 'ES' ? hotspotsEB(R.filter((r) => ['REAR_END', 'MULTI_VEHICLE_CHAIN'].includes(r.collision) && r.area === 'RURAL'), roadKmCell(2), { top: 15 }) : hotspotsEB(R.filter((r) => ['REAR_END', 'STATIONARY_VEHICLE'].includes(r.collision)), gridCell(0.02), { top: 15 }),
@@ -102,7 +129,7 @@ writeFileSync(join(OUT, `aggregates-${YEAR}.json`), JSON.stringify({ schema: 'se
 
 // --- resumen compacto para la consola web (sin microdatos)
 const webDir = resolve(root, 'investor-next/public/senda/data'); mkdirSync(webDir, { recursive: true });
-writeFileSync(join(webDir, `roadsafe-dataset-summary-${YEAR}.json`), JSON.stringify({ schema: 'senda-roadsafe-dataset-summary/1', year: YEAR, total: records.length, perCountry: Object.fromEntries(Object.entries(perCountry).map(([c, v]) => [c, { records: v.records, injury: v.injury, profile: { rearEnd: v.profile.rearEnd, stationaryVehicle: v.profile.stationaryVehicle, chain: v.profile.chain, visibilityRestrictedByVehicle: v.profile.visibilityRestrictedByVehicle, secondaryOtherAccident: v.profile.secondaryOtherAccident }, severityFactors: Object.fromEntries(Object.entries(v.severityFactors).filter(([, o]) => o && o.or).map(([k, o]) => [k, { or: o.or, ci: o.ci, n: o.n, significant: o.significant }])), hotspotsTop: v.hotspots.top.slice(0, 10), hotspotsRearTop: v.hotspotsRearStationary.top.slice(0, 10) }])), licenses: Object.fromEntries(Object.entries(SOURCES).map(([k, x]) => [k, x.license])) }));
+writeFileSync(join(webDir, `roadsafe-dataset-summary-${YEAR}.json`), JSON.stringify({ schema: 'senda-roadsafe-dataset-summary/1', year: YEAR, total: records.length, perCountry: Object.fromEntries(Object.entries(perCountry).map(([c, v]) => [c, { records: v.records, injury: v.injury, profile: { rearEnd: v.profile.rearEnd, stationaryVehicle: v.profile.stationaryVehicle, chain: v.profile.chain, visibilityRestrictedByVehicle: v.profile.visibilityRestrictedByVehicle, secondaryOtherAccident: v.profile.secondaryOtherAccident }, stoppedStudy: Object.fromEntries(['stoppedVehicle', 'hardShoulder', 'rearImpact'].map((k) => [k, v.stoppedStudy[k].available ? { n: v.stoppedStudy[k].n, k: v.stoppedStudy[k].k, share: v.stoppedStudy[k].share, fatalShareWhenTrue: v.stoppedStudy[k].fatalShareWhenTrue, orFatalVsRest: { or: v.stoppedStudy[k].orFatalVsRest.or, ci: v.stoppedStudy[k].orFatalVsRest.ci, significant: v.stoppedStudy[k].orFatalVsRest.significant }, orFatalDarkWithinFlag: { or: v.stoppedStudy[k].orFatalDarkWithinFlag.or, ci: v.stoppedStudy[k].orFatalDarkWithinFlag.ci, n: v.stoppedStudy[k].orFatalDarkWithinFlag.n, significant: v.stoppedStudy[k].orFatalDarkWithinFlag.significant }, highSpeedShare: v.stoppedStudy[k].highSpeedShare } : { available: false }])), severityFactors: Object.fromEntries(Object.entries(v.severityFactors).filter(([, o]) => o && o.or).map(([k, o]) => [k, { or: o.or, ci: o.ci, n: o.n, significant: o.significant }])), hotspotsTop: v.hotspots.top.slice(0, 10), hotspotsRearTop: v.hotspotsRearStationary.top.slice(0, 10) }])), licenses: Object.fromEntries(Object.entries(SOURCES).map(([k, x]) => [k, x.license])) }));
 
 // --- informe
 const L = [`# Dataset armonizado de accidentes ${YEAR} · informe automático`, '', `Generado por \`packages/senda/scripts/roadsafe-data/build-dataset.mjs\`. Registros armonizados: **${records.length}**.`, '', '> Datos de accidentes ocurridos: las proporciones son **gravedad condicionada** (sin exposición), no riesgo de accidentarse. Definiciones de gravedad y cobertura difieren entre países.', '', '## Fuentes y procedencia', '', '| Fuente | Ficheros | SHA-256 (12) | Ingesta |', '|---|---|---|---|'];
@@ -113,6 +140,8 @@ for (const [c, v] of Object.entries(perCountry)) { const p = v.profile; const f 
 L.push('', '## Factores de gravedad (OR de mortal entre accidentes con víctimas, IC 95 %)', '', '| País | Oscuridad vs día | Sin alumbrado vs alumbrado | Mojado vs seco | Niebla vs despejado | Alcance/detenido vs otros | Interurbano vs urbano | Curva vs recta |', '|---|---|---|---|---|---|---|---|');
 const orf = (o) => (o.n ? `${o.or} [${o.ci.join('–')}]${o.significant ? ' *' : ''}` : '—');
 for (const [c, v] of Object.entries(perCountry)) { const s = v.severityFactors; L.push(`| ${c} | ${orf(s.darkVsDay)} | ${orf(s.darkUnlitVsLit)} | ${orf(s.wetVsDry)} | ${orf(s.fogVsClear)} | ${orf(s.rearEndOrStationaryVsOther)} | ${orf(s.ruralVsUrban)} | ${orf(s.curveVsStraight)} |`); }
+L.push('', '## Vehículo detenido y arcén (caso de investigación)', '', '| País | Bandera | n con dato | Con la condición | % mortal si la tiene | OR mortal vs resto | OR mortal oscuridad dentro | % en vía rápida |', '|---|---|---|---|---|---|---|---|');
+for (const [c, v] of Object.entries(perCountry)) for (const k of ['stoppedVehicle', 'hardShoulder', 'rearImpact']) { const b = v.stoppedStudy[k]; if (!b.available) continue; L.push(`| ${c} | ${k} | ${b.n} | ${b.k} (${(b.share.p * 100).toFixed(2)} %) | ${b.fatalShareWhenTrue ? (b.fatalShareWhenTrue.p * 100).toFixed(2) + ' %' : '—'} | ${orf(b.orFatalVsRest)} | ${orf(b.orFatalDarkWithinFlag)} | ${b.highSpeedShare == null ? '—' : (b.highSpeedShare * 100).toFixed(0) + ' %'} |`); }
 L.push('', '`*` = IC 95 % no incluye 1. OR > 1: mayor proporción de mortales entre los accidentes con víctimas en esa condición.', '');
 for (const [c, v] of Object.entries(perCountry)) {
   L.push(`## Puntos negros con Bayes empírico · ${c}`, '', `Prior Poisson–Gamma: ${JSON.stringify(v.hotspots.prior)} · celdas: ${v.hotspots.cells}`, '', '| Celda | Conteo | Mortales | Esperado EB | Contracción |', '|---|---|---|---|---|');

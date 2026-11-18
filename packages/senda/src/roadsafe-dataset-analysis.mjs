@@ -114,3 +114,26 @@ export function similarCases(records, query, { k = 10, radiusM = 5000 } = {}) {
   }
   return scored.sort((a, b) => b.score - a.score).slice(0, k);
 }
+
+/**
+ * Estudio específico del caso de investigación: accidentes con VEHÍCULO DETENIDO implicado y accidentes
+ * en el ARCÉN / banda de emergencia (donde los códigos de la fuente lo permiten).
+ * Devuelve frecuencias con Wilson y OR de mortal (gravedad condicionada) frente al resto.
+ */
+export function stoppedVehicleStudy(records) {
+  const inj = records.filter(injuryOnly), fatal = (r) => r.severity === 'FATAL', n = inj.length || 1;
+  const withFlag = (k) => inj.filter((r) => r[k] !== null && r[k] !== undefined);
+  const block = (k) => {
+    const base = withFlag(k); if (!base.length) return { available: false };
+    const yes = base.filter((r) => r[k] === true), kk = yes.length;
+    return {
+      available: true, n: base.length, k: kk, share: { p: +(kk / base.length).toFixed(4), ci: wilson(kk, base.length) },
+      fatalShareWhenTrue: yes.length ? { p: +(yes.filter(fatal).length / yes.length).toFixed(4), ci: wilson(yes.filter(fatal).length, yes.length) } : null,
+      orFatalVsRest: oddsRatio(base, (r) => r[k], fatal),
+      orFatalDarkWithinFlag: oddsRatio(yes, (r) => (r.light === 'UNKNOWN' || r.light === 'TWILIGHT' ? null : r.light.startsWith('DARK')), fatal),
+      highSpeedShare: yes.length ? +(yes.filter((r) => ['MOTORWAY', 'DUAL_CARRIAGEWAY'].includes(r.roadClass) || (r.speedLimitKmh ?? 0) >= 90).length / yes.length).toFixed(3) : null,
+      byLight: conditionalShare(yes, 'light', fatal, { minN: 30 }),
+    };
+  };
+  return { nInjury: inj.length, stoppedVehicle: block('stoppedVehicleInvolved'), hardShoulder: block('onHardShoulder'), rearImpact: block('rearImpact'), note: 'Gravedad condicionada entre accidentes con víctimas; sin exposición. Banderas solo donde la fuente las codifica.' };
+}

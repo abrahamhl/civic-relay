@@ -15,6 +15,7 @@
  * Unirse al grupo exige un código del conductor (QR/enlace) — HMAC de grupo, sin servidor.
  */
 
+import { constantTimeEqual } from './roadsafe-guard.mjs';
 const enc = new TextEncoder();
 const subtle = globalThis.crypto.subtle;
 const hex = (b) => [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join('');
@@ -34,7 +35,7 @@ export const inviteCode = (trip) => hmac(trip.secret, `invite:${trip.tripId}`);
 /** Unirse: persona (alias) + dispositivo. El código debe coincidir. Un dispositivo, una persona. */
 export async function joinTrip(trip, { code, alias, deviceId, role = 'PASSENGER', now }) {
   if (now > trip.expiresAt) return { ok: false, error: 'viaje caducado' };
-  if (code !== (await inviteCode(trip))) return { ok: false, error: 'código de invitación no válido' };
+  if (!constantTimeEqual(String(code ?? ''), await inviteCode(trip))) return { ok: false, error: 'código de invitación no válido' };
   if (!alias || !deviceId) return { ok: false, error: 'alias y dispositivo obligatorios' };
   const personId = `P${trip.members.size + 1}`;
   trip.members.set(personId, { personId, alias, role, deviceId, status: 'UNKNOWN', reportedBy: null });
@@ -116,11 +117,12 @@ export async function verifyRing(trip, cmd, { deviceId, now }) {
   const [kind, tripId, target, , exp] = cmd.body.split(':');
   if (kind !== 'ring' || tripId !== trip.tripId || target !== deviceId) return { ok: false, error: 'no es para este dispositivo' };
   if (now > +exp) return { ok: false, error: 'orden caducada' };
-  if (cmd.mac !== (await hmac(trip.secret, cmd.body))) return { ok: false, error: 'firma no válida' };
+  if (!constantTimeEqual(String(cmd.mac ?? ''), await hmac(trip.secret, cmd.body))) return { ok: false, error: 'firma no válida' };
   return { ok: true, action: 'RING_AND_BEACON', note: 'Sonar al máximo, linterna intermitente y anuncio BLE para búsqueda por proximidad.' };
 }
 /** Distancia aproximada por RSSI BLE (modelo log-distancia; muy ruidoso: solo «más cerca / más lejos»). */
-export function rssiDistanceM(rssi, { txPower = -59, n = 2.2 } = {}) {
+export function rssiDistanceM(rssi, { txPower, n } = {}) {
   if (!Number.isFinite(rssi)) return null;
+  if (!Number.isFinite(txPower) || !Number.isFinite(n)) return { metres: null, quality: 'CALIBRACIÓN NO DECLARADA (txPower a 1 m y exponente n se miden por dispositivo)' };
   return { metres: +(10 ** ((txPower - rssi) / (10 * n))).toFixed(1), quality: 'ORIENTATIVA (±50 % o peor)' };
 }

@@ -14,7 +14,7 @@
  *    separaciones de la Tabla 6C-1 2009 — a verificar), (b) 3 × distancia de parada a v85, (c) cola
  *    proyectada + distancia de parada. La cola crece: el aviso se MUEVE con ella.
  *  - Cola: onda de choque LWR con diagrama fundamental triangular; capacidad por carril, densidad de
- *    atasco y velocidad de la onda de congestión son HIPÓTESIS típicas declaradas (QUEUE_PARAMS).
+ *    atasco y velocidad de la onda de congestión son HIPÓTESIS típicas declaradas (EXAMPLE_QUEUE_PARAMS; hay que pasarlos en traffic.queueParams).
  *
  * Salidas: áreas con s (m) sobre la vía, polilíneas en sentido de circulación (requisito CIFS), banda de
  * aviso útil para apps/navegadores (ventana 4–90 s de la política), paneles PMV aguas arriba con texto
@@ -24,14 +24,16 @@ import { pointAt, pkAt } from './road-guard.mjs';
 import { stoppingDistance, G } from './roadsafe-secondary-risk.mjs';
 import { WARNING_POLICY } from './roadsafe-secondary-risk.mjs';
 
-export const QUEUE_PARAMS = Object.freeze({ capacityPerLaneVehH: 1900, jamDensityPerLaneVehKm: 140, congestedWaveKmh: 18, provenance: 'HYPOTHETICAL (valores típicos de manual de ingeniería de tráfico)' });
+/** Parámetros de cola de EJEMPLO (sin fuente verificada): deben declararse; no son valor por defecto. */
+export const EXAMPLE_QUEUE_PARAMS = Object.freeze({ capacityPerLaneVehH: 1900, jamDensityPerLaneVehKm: 140, congestedWaveKmh: 18, provenance: 'HYPOTHETICAL (valores típicos de manual; no verificados)' });
 export const MUTCD_REF = Object.freeze({ openRoadAdvanceM: 457, freewayAdvanceM: 1567, note: 'MUTCD 2009 (Cap. 6C/6I, Tabla 6C-1): referencia extranjera, verificar edición vigente.' });
 
 /**
  * Cola por onda de choque (LWR, triangular). Devuelve velocidad de la onda (km/h, negativa = aguas arriba)
  * y longitud de cola a cada minuto, o 0 si la demanda cabe por los carriles abiertos.
  */
-export function queueProjection({ flowVehH, lanes = 2, lanesOpen = 1, freeKmh = 100, minutes = [5, 10, 20, 30, 45, 60], params = QUEUE_PARAMS } = {}) {
+export function queueProjection({ flowVehH, lanes = 2, lanesOpen = 1, freeKmh = 100, minutes = [5, 10, 20, 30, 45, 60], params = null } = {}) {
+  if (!params) return { forms: null, reason: 'parámetros de cola no declarados (no medidos)', points: [] };
   if (![flowVehH, lanes, lanesOpen, freeKmh].every(Number.isFinite) || lanes <= 0) return { forms: null, reason: 'datos de tráfico insuficientes', points: [] };
   const capOpen = params.capacityPerLaneVehH * Math.max(0, lanesOpen);
   if (flowVehH <= capOpen) return { forms: false, shockKmh: 0, points: minutes.map((t) => ({ t, queueM: 0 })) };
@@ -58,7 +60,7 @@ const along = (road, s0, s1, dir, stepM = 50) => {
 export function planIncidentZone(road, inc, traffic = {}, { vms = [] } = {}) {
   const dir = inc.dir === -1 ? -1 : 1, up = (m) => inc.s - dir * m; // aguas arriba = contra el sentido
   const vLim = traffic.speedLimitKmh ?? 100, v85 = traffic.v85Kmh ?? vLim, v = v85 / 3.6;
-  const mu = traffic.wet ? 0.45 : 0.75, aEm = 0.9 * mu * G, prt = traffic.night ? 1.6 : 1.25;
+  const mu = traffic.wet ? 0.45 : 0.75, aEm = 0.9 * mu * G, prt = 1.25; // μ: rango de manual; reacción: Green (2000). La noche NO altera la reacción (sin fuente)
   const dStop = stoppingDistance({ vMs: v, reactS: prt, aEffMs2: aEm });
   const lanes = inc.lanes ?? 2, laneW = inc.laneWidthM ?? 3.5;
   const blocking = inc.laneBlocked === 'PARTIAL' || inc.laneBlocked === 'FULL';
@@ -66,7 +68,7 @@ export function planIncidentZone(road, inc, traffic = {}, { vms = [] } = {}) {
   const incidentLen = inc.incidentLengthM ?? 30;
   const bufferM = Math.round((v * v) / (2 * aEm));
   const taperM = blocking ? Math.round((laneW * vLim) / 1.609) : 0;
-  const q = queueProjection({ flowVehH: traffic.flowVehH, lanes, lanesOpen, freeKmh: v85 });
+  const q = queueProjection({ flowVehH: traffic.flowVehH, lanes, lanesOpen, freeKmh: v85, params: traffic.queueParams ?? null });
   const tNow = traffic.minutesElapsed ?? 0;
   const queueNowM = q.forms ? Math.round(Math.abs(q.shockKmh) * 1000 * tNow / 60) : 0;
   const ref = vLim >= 100 ? MUTCD_REF.freewayAdvanceM : MUTCD_REF.openRoadAdvanceM;

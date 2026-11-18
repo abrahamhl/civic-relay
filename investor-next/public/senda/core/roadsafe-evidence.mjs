@@ -72,13 +72,18 @@ export const EVIDENCE = Object.freeze({
     grade: 'A', access: 'conocimiento previo (no releído hoy)', source: 'Green, M. (2000). Transportation Human Factors 2(3):195–216', url: null, transfer: 'Rangos usados en el simulador.',
   },
   EMPIRICAL_DARK_SEVERITY: {
-    claim: 'Entre accidentes con víctimas de 2024, la oscuridad se asocia a ≈1,5 veces más odds de desenlace mortal, replicado en tres países: ES OR 1,60 [1,44–1,78], DE 1,55 [1,42–1,70], NL 1,50 [1,24–1,82]. España, oscuridad sin alumbrado vs con alumbrado: OR 3,42 [2,84–4,11].',
+    claim: 'Entre accidentes con víctimas de 2024, la oscuridad se asocia a ≈1,5–1,7 veces más odds de desenlace mortal, replicado en cinco países: ES 1,60 [1,44–1,78], DE 1,55 [1,42–1,70], NL 1,50 [1,24–1,82], FR 1,51 [1,40–1,63], GB 1,68 [1,51–1,86]. Sin alumbrado vs con alumbrado: ES 3,42, FR 4,27, GB 2,95.',
     grade: 'A', value: 1.55, unit: 'OR gravedad condicionada', access: 'microdatos oficiales procesados por SENDA (evidence/roadsafe/dataset/DATASET_REPORT_2024.md)',
-    source: 'DGT microdatos 2024; Unfallatlas 2024 (Statistische Ämter, dl-de/by-2-0); BRON 2024 (Rijkswaterstaat, CC0)', url: 'https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/',
+    source: 'DGT microdatos 2024; Unfallatlas 2024 (dl-de/by-2-0); BRON 2024 (CC0); BAAC 2024 (Licence Ouverte); STATS19 2024 (OGL v3)', url: 'https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/',
     transfer: 'Gravedad condicionada (sin exposición): no dice que de noche haya más accidentes, sino que los que hay son más graves.',
   },
+  EMPIRICAL_SHOULDER_SEVERITY: {
+    claim: 'Accidentes en el arcén / banda de emergencia vs resto: OR de desenlace mortal 2,04 [1,42–2,94] en Francia (situ=2, 291 accidentes, 11,3 % mortales) y 2,44 [1,65–3,62] en Gran Bretaña (lay-by/hard shoulder, 738 accidentes).',
+    grade: 'A', value: 2.0, unit: 'OR gravedad condicionada', access: 'microdatos oficiales procesados por SENDA', source: 'BAAC 2024 (ONISR); STATS19 2024 (DfT)', url: 'https://www.data.gouv.fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2024',
+    transfer: 'Respalda el caso de investigación: un accidente en el arcén es, en proporción, el doble de mortal.',
+  },
   EMPIRICAL_WET_SEVERITY: {
-    claim: 'Calzada mojada vs seca: sin diferencia significativa en la proporción de mortales en ninguno de los tres países (ES 0,88; DE 1,02; NL 0,95; IC incluyen 1).',
+    claim: 'Calzada mojada vs seca: sin diferencia significativa en ES (0,88), DE (1,02), NL (0,95) y FR (0,99); en GB sí (1,22 [1,09–1,36]). Resultado mixto.',
     grade: 'A', value: 1, unit: 'OR gravedad condicionada', access: 'microdatos oficiales procesados por SENDA', source: 'DGT, Unfallatlas, BRON 2024', url: null,
     transfer: 'La lluvia actúa sobre la FRECUENCIA (adherencia, distancia de parada — física) más que sobre la gravedad.',
   },

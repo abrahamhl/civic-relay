@@ -8,7 +8,7 @@ import { createEmergencyGateway, buildEmergencyDossier, call112Action } from '..
 import { createMessage, recordAttempt, advance, routeChannels, deliveryLabel } from '../src/roadsafe-delivery.mjs';
 import { toCifsIncident, validateCifs, cifsXml, toDatex2Situation, navigationLinks, semanticMapping, CAPABILITIES, CAPABILITY_CLASSES } from '../src/roadsafe-interop.mjs';
 import { parseDatex2, toHazards } from '../src/datex2.mjs';
-import { runExperiment, simulateOnce, PARAM_PROVENANCE } from '../src/roadsafe-accident-sim.mjs';
+import { runExperiment, simulateOnce, PARAM_PROVENANCE, EXAMPLE_SCENARIO_CASE_STUDY as SC_EX } from '../src/roadsafe-accident-sim.mjs';
 
 const v16 = (o = {}) => ({ obsId: 'v16-1', source: 'V16_BEACON', rootHint: 'B1', at: 0, lat: 40.2, lon: -3.3, accuracyM: 8, roadId: 'A-3', dir: 1, pk: 41.2, laneHint: 'SHOULDER', ...o });
 const OWNER = { kind: 'OWNER', id: 'fam' }, TOW = { kind: 'PROVIDER', id: 'tow', verified: true }, OPS = { kind: 'OPERATOR', id: 'op', verified: true }, PSAP = { kind: 'EMERGENCY_SERVICE', id: '112', verified: true };
@@ -76,7 +76,8 @@ test('física: distancia de parada, velocidad de impacto, onda de choque, Wilson
 });
 
 test('H-ROAD-1: Monte Carlo reproducible; aviso sin entrega = sin beneficio; política de ventana útil', () => {
-  const base = { n: 2000, seed: 3, distToHazardM: 60, sightM: 60 };
+  const base = { n: 2000, seed: 3, distToHazardM: 60, sightM: 60, dist: { vMs: [25, 0.1], eta: [0.85, 0.95] } }; // escenario de prueba declarado
+  assert.throws(() => secondaryRiskMC({ n: 10, distToHazardM: 60, sightM: 60 }), /declarados/);
   const a = secondaryRiskMC(base), b = secondaryRiskMC(base);
   assert.deepEqual(a, b, 'misma semilla, mismo resultado');
   const none = secondaryRiskMC({ ...base, warning: { leadS: 30, pDeliver: 0, pAccept: 1 } });
@@ -180,16 +181,18 @@ test('interop: CIFS válido para vehículo en arcén, ida y vuelta DATEX II, enl
 });
 
 test('simulador del caso: reproducible, controles negativos y separación de parámetros', () => {
-  const a = runExperiment({ n: 400, seed: 5 }), b = runExperiment({ n: 400, seed: 5 });
+  const a = runExperiment({ scenario: SC_EX, n: 400, seed: 5 }), b = runExperiment({ scenario: SC_EX, n: 400, seed: 5 });
   assert.deepEqual(a, b);
-  const z = runExperiment({ n: 400, seed: 5, overrides: { shareOverride: { SENDA_APP: 0, DGT30_NAVIGATOR: 0 } } }).summary;
+  const z = runExperiment({ scenario: SC_EX, n: 400, seed: 5, overrides: { shareOverride: { SENDA_APP: 0, DGT30_NAVIGATOR: 0 } } }).summary;
   assert.equal(z.D_SENDA_VERIFIED.pCollision, z.A_NO_DIGITAL.pCollision, 'adopción cero = sin efecto');
-  const pl = runExperiment({ n: 400, seed: 5, overrides: { placebo: true } }).summary;
+  const pl = runExperiment({ scenario: SC_EX, n: 400, seed: 5, overrides: { placebo: true } }).summary;
   assert.equal(pl.D_SENDA_VERIFIED.pCollision, pl.A_NO_DIGITAL.pCollision, 'placebo = sin efecto');
   assert.equal(a.summary.B_V16_INFORMATIVE.pCollision, a.summary.A_NO_DIGITAL.pCollision, 'la V16 informativa no se asume entregada al conductor');
   assert.equal(a.summary.D_SENDA_VERIFIED.confirmedDisplayAck, 0);
   assert.ok(Object.values(PARAM_PROVENANCE).every((p) => ['MEASURED', 'LITERATURE_RANGE', 'HYPOTHETICAL', 'UNKNOWN_SWEPT'].includes(p.provenance)));
   assert.ok(!Object.values(PARAM_PROVENANCE).some((p) => p.provenance === 'MEASURED'), 'no hay medidas del caso: nada se etiqueta como medido');
-  const hit = simulateOnce({ speedKmh: 100, headwayS: 0.5, reactUnexpectedS: 1.5, reactExpectedS: 0.7, mu: 0.4, brakeEff: 0.85, taxiDecelMs2: 5, gapTaxiVanM: 3, sightM: 250, restitution: 0.1, massKg: { taxi: 1600, follower: 1500 }, taxiPostBrake: 0.6, speedReduction: 0, lateWarningPenaltyS: 0, warned: false });
+  assert.ok(Object.values(PARAM_PROVENANCE).filter((p) => ['HYPOTHETICAL', 'UNKNOWN_SWEPT'].includes(p.provenance)).every((p) => p.value === null), 'regla de veracidad: sin fuente ⇒ sin valor por defecto');
+  assert.throws(() => runExperiment({ n: 10 }), /escenario declarado/); assert.equal(a.basis, 'SIMULATION');
+  const hit = simulateOnce({ basis: 'SIMULATION_TEST_CASE', speedKmh: 100, headwayS: 0.5, reactUnexpectedS: 1.5, reactExpectedS: 0.7, mu: 0.4, brakeEff: 0.85, taxiDecelMs2: 5, gapTaxiVanM: 3, sightM: 250, restitution: 0.1, massKg: { taxi: 1600, follower: 1500 }, taxiPostBrake: 0.6, speedReduction: 0, lateWarningPenaltyS: 0, warned: false });
   assert.equal(hit.collision, true); assert.equal(hit.secondary, true, 'cadena completa: alcance y empuje contra la furgoneta');
 });

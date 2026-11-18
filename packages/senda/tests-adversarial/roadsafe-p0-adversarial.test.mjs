@@ -29,7 +29,8 @@ test('P0-1: hora futura, trama caducada, sin reloj → rechazo', async () => {
   assert.equal((await assessHazardFrame(frame(), { receiver: me })).trust, 'REJECT_CLOCK');
 });
 test('P0-1: posición inverosímil (a 50 km del receptor) y cinemática imposible → rechazo', async () => {
-  assert.equal((await assessHazardFrame(frame({ lat: 40.85 }), { now: 1001, receiver: me })).trust, 'REJECT_IMPLAUSIBLE');
+  assert.notEqual((await assessHazardFrame(frame({ lat: 40.85, id: 501 }), { now: 1001, receiver: me })).trust, 'REJECT_IMPLAUSIBLE', 'sin alcance de radio medido no se juzga la posición');
+  assert.equal((await assessHazardFrame(frame({ lat: 40.85 }), { now: 1001, receiver: me, policy: { radioRangeM: 400 } })).trust, 'REJECT_IMPLAUSIBLE', 'con alcance declarado (escenario de prueba) sí');
   assert.equal((await assessHazardFrame(frame({ speedMs: 120 }), { now: 1001, receiver: me })).trust, 'REJECT_IMPLAUSIBLE');
   assert.equal((await assessHazardFrame(frame({ decelMs2: 24 }), { now: 1001, receiver: me })).trust, 'REJECT_IMPLAUSIBLE');
 });

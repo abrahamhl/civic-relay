@@ -1,6 +1,6 @@
 # Dataset armonizado de accidentes 2024 · informe automático
 
-Generado por `packages/senda/scripts/roadsafe-data/build-dataset.mjs`. Registros armonizados: **496895**.
+Generado por `packages/senda/scripts/roadsafe-data/build-dataset.mjs`. Registros armonizados: **652224**.
 
 > Datos de accidentes ocurridos: las proporciones son **gravedad condicionada** (sin exposición), no riesgo de accidentarse. Definiciones de gravedad y cobertura difieren entre países.
 
@@ -12,6 +12,13 @@ Generado por `packages/senda/scripts/roadsafe-data/build-dataset.mjs`. Registros
 | ES_DGT_DICT | es-dictionary.xlsx (42553 B) | 1df06643eff9 | — |
 | DE_UNFALLATLAS | de-2024.zip (12681950 B) | 4a321fbde7ca | 268519/268519 |
 | DE_DSB | de-DSB_Unfallatlas.pdf (405394 B) | 3afe9d303e8c | — |
+| FR_CARACT | fr-caract-2024.csv (6538156 B) | 45a69360aeb5 | — |
+| FR_LIEUX | fr-lieux-2024.csv (7070795 B) | a500a44b4efd | — |
+| FR_VEHICULES | fr-vehicules-2024.csv (6369908 B) | 40261a1d5ac0 | — |
+| FR_USAGERS | fr-usagers-2024.csv (13843733 B) | 4e05cea88d5a | — |
+| FR_DICT | fr-description-bases.pdf (897872 B) | 8ed3bc135f90 | — |
+| UK_COLLISION | uk-collision-2024.csv (19208488 B) | 32a78f4662e3 | — |
+| UK_VEHICLE | uk-vehicle-2024.csv (20296911 B) | 1a60f65f07a4 | — |
 | NL_BRON | nl-2024.csv (42219285 B) | ca3d3b147e45 | 126380/126380 |
 | BE_STATBEL | — | — | sin fichero manual (portal con captcha) |
 
@@ -22,6 +29,8 @@ Generado por `packages/senda/scripts/roadsafe-data/build-dataset.mjs`. Registros
 | ES | 101996 | 16.9 % (17279) | 0.0 % (0) | 2.0 % (1995) | 1.1 % (1130) | 0 |
 | DE | 268519 | 16.0 % (42854) | 5.5 % (14673) | 0.0 % (0) | 0.0 % (0) | 0 |
 | NL | 25416 | 11.1 % (2809) | 1.7 % (423) | 0.0 % (0) | 0.0 % (0) | 184 |
+| FR | 54402 | 13.1 % (7108) | 0.0 % (0) | 3.3 % (1819) | 0.0 % (0) | 0 |
+| GB | 100927 | 0.0 % (0) | 0.0 % (0) | 0.0 % (0) | 0.0 % (0) | 0 |
 
 ## Factores de gravedad (OR de mortal entre accidentes con víctimas, IC 95 %)
 
@@ -30,6 +39,20 @@ Generado por `packages/senda/scripts/roadsafe-data/build-dataset.mjs`. Registros
 | ES | 1.596 [1.435–1.775] * | 3.419 [2.844–4.109] * | 0.875 [0.74–1.034] | 0.355 [0.265–0.475] * | 0.435 [0.369–0.514] * | 4.614 [4.147–5.134] * | 1.237 [1.097–1.394] * |
 | DE | 1.554 [1.419–1.702] * | — | 1.018 [0.927–1.117] | — | 0.356 [0.31–0.409] * | — | — |
 | NL | 1.502 [1.237–1.824] * | — | 0.948 [0.781–1.151] | 2.423 [0.98–5.989] | 0.489 [0.352–0.678] * | 3.82 [3.206–4.552] * | 1.46 [1.107–1.926] * |
+| FR | 1.514 [1.403–1.634] * | 4.269 [3.721–4.899] * | 0.992 [0.908–1.084] | 2.553 [1.988–3.278] * | 0.402 [0.352–0.459] * | 3.591 [3.331–3.873] * | 1.852 [1.712–2.002] * |
+| GB | 1.675 [1.51–1.859] * | 2.947 [2.5–3.473] * | 1.215 [1.087–1.359] * | 1.098 [0.545–2.214] | — | — | — |
+
+## Vehículo detenido y arcén (caso de investigación)
+
+| País | Bandera | n con dato | Con la condición | % mortal si la tiene | OR mortal vs resto | OR mortal oscuridad dentro | % en vía rápida |
+|---|---|---|---|---|---|---|---|
+| DE | stoppedVehicle | 268519 | 17313 (6.45 %) | 0.34 % | 0.348 [0.268–0.452] * | 1.793 [1.026–3.131] * | 0 % |
+| FR | stoppedVehicle | 54402 | 3570 (6.56 %) | 3.33 % | 0.53 [0.44–0.638] * | 1.251 [0.85–1.842] | 14 % |
+| FR | hardShoulder | 54397 | 291 (0.53 %) | 11.34 % | 2.04 [1.417–2.935] * | 1.505 [0.704–3.22] | 89 % |
+| FR | rearImpact | 54402 | 12636 (23.23 %) | 2.98 % | 0.42 [0.377–0.469] * | 1.758 [1.412–2.188] * | 32 % |
+| GB | stoppedVehicle | 100927 | 18905 (18.73 %) | 0.83 % | 0.502 [0.425–0.593] * | 1.558 [1.121–2.167] * | 28 % |
+| GB | hardShoulder | 100927 | 738 (0.73 %) | 3.52 % | 2.442 [1.646–3.624] * | 1.673 [0.756–3.702] | 42 % |
+| GB | rearImpact | 100927 | 23978 (23.76 %) | 0.73 % | 0.419 [0.358–0.491] * | 1.576 [1.152–2.156] * | 35 % |
 
 `*` = IC 95 % no incluye 1. OR > 1: mayor proporción de mortales entre los accidentes con víctimas en esa condición.
 
@@ -83,4 +106,38 @@ Prior Poisson–Gamma: {"alpha":0.339,"beta":0.051} · celdas: 19173
 | 52.07,4.31 | 141 | 0 | 134.42 | 0.047 |
 | 52.05,4.30 | 138 | 1 | 131.57 | 0.047 |
 | 52.16,5.56 | 135 | 0 | 128.71 | 0.047 |
+
+## Puntos negros con Bayes empírico · FR
+
+Prior Poisson–Gamma: {"alpha":0.362,"beta":0.172} · celdas: 25904
+
+| Celda | Conteo | Mortales | Esperado EB | Contracción |
+|---|---|---|---|---|
+| 48.86,2.35 | 90 | 0 | 77.08 | 0.144 |
+| 48.86,2.31 | 79 | 1 | 67.7 | 0.143 |
+| 48.86,2.41 | 77 | 0 | 65.99 | 0.143 |
+| 48.85,2.34 | 71 | 0 | 60.88 | 0.143 |
+| 48.88,2.28 | 67 | 0 | 57.46 | 0.142 |
+| 48.82,2.32 | 64 | 1 | 54.9 | 0.142 |
+| 48.88,2.36 | 63 | 0 | 54.05 | 0.142 |
+| 48.87,2.32 | 62 | 1 | 53.2 | 0.142 |
+| 48.87,2.35 | 62 | 0 | 53.2 | 0.142 |
+| 48.86,2.30 | 60 | 0 | 51.49 | 0.142 |
+
+## Puntos negros con Bayes empírico · GB
+
+Prior Poisson–Gamma: {"alpha":0.492,"beta":0.177} · celdas: 36301
+
+| Celda | Conteo | Mortales | Esperado EB | Contracción |
+|---|---|---|---|---|
+| 51.51,-0.13 | 102 | 0 | 87.08 | 0.146 |
+| 51.51,-0.14 | 90 | 1 | 76.89 | 0.146 |
+| 51.51,-0.07 | 85 | 1 | 72.64 | 0.145 |
+| 51.46,-0.12 | 79 | 0 | 67.54 | 0.145 |
+| 51.51,-0.06 | 79 | 0 | 67.54 | 0.145 |
+| 51.58,-0.08 | 74 | 0 | 63.29 | 0.145 |
+| 51.51,-0.15 | 69 | 0 | 59.04 | 0.144 |
+| 51.52,-0.08 | 69 | 0 | 59.04 | 0.144 |
+| 51.50,-0.13 | 64 | 0 | 54.79 | 0.144 |
+| 51.48,-0.13 | 64 | 0 | 54.79 | 0.144 |
 

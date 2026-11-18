@@ -1,5 +1,13 @@
 # Changelog
 
+## SENDA RoadSafe · 18-11-2026 (IV) · Cinco países, arcén ×2 de mortal, detector contra falsas alarmas, blindaje y regla de veracidad aplicada
+
+**Entrada (fundador):** calibrar con más casuística, mejorar la detección de accidentes, más datasets y soluciones existentes, diferenciarnos, cifrar y blindar.
+
+**Procesamiento:** Francia (BAAC, Licence Ouverte) y Gran Bretaña (STATS19, OGL v3) añadidas con códigos verificados en sus diccionarios oficiales → 652 224 accidentes. Hallazgos: arcén OR 2,04 (FR) y 2,44 (GB); oscuridad replicada en 5 países. `roadsafe-crash-detect.mjs` (fusión de evidencias, sesgo de seguridad sin GNSS, nunca llamada automática); `roadsafe-guard.mjs` (AES-GCM+HKDF por incidente, custodia ECDSA, tiempo constante, anti-abuso, difuminado). Regla de `CLAUDE.md` aplicada: simuladores y física exigen escenario declarado y salen como `SIMULATION`; sin tiempo de reacción nocturno inventado; alcance de radio no medido = sin juicio geográfico. Documento 09.
+
+**Validación:** núcleo y adversariales en verde; Chromium 58/58. — Firma: Claude (Asistente de Orquestación Senior)
+
 ## SENDA RoadSafe · 18-11-2026 (III) · Dataset oficial ES/DE/NL, compañero de viaje, física del impacto y emergencia guiada
 
 **Entrada (fundador):** gran dataset de accidentes de España, Alemania, Bélgica y Holanda; avisar a todos los conductores «como en el metro»; coordinación, ubicación rápida, teléfonos perdidos, quedarse o salir, implicados; sensores del móvil y del coche, momento angular y zona de peligro; taxi que recoge señalizado; SENDA como compañero de viaje junto a Waze; rutas guardadas sin conexión.

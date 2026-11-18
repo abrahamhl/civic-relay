@@ -62,8 +62,10 @@ export function wilson(k, n, z = 1.96) {
  * efectiva: el conductor solo empieza a percibir cuando el peligro entra en su campo visual).
  * warning: { leadS (antelación con que llega), pDeliver, pAccept, expectedReactS:[median,σlog], speedReduction:[a,b] }
  */
-export function secondaryRiskMC({ n = 4000, seed = 11, distToHazardM, sightM = 150, dist = {}, warning = null, marginM = 2 } = {}) {
-  const D = { vMs: [25, 0.1], reactS: [1.25, 0.35], mu: [0.7, 0.85], eta: [0.85, 0.95], ...dist };
+export function secondaryRiskMC({ n = 4000, seed = 11, distToHazardM, sightM, dist = {}, warning = null, marginM = 0 } = {}) {
+  // Regla de veracidad: velocidad, visibilidad y eficacia de frenada NO tienen valor por defecto (sin fuente).
+  if (!dist.vMs || !dist.eta || !Number.isFinite(sightM) || !Number.isFinite(distToHazardM)) throw new Error('secondaryRiskMC exige dist.vMs, dist.eta, sightM y distToHazardM declarados');
+  const D = { reactS: [1.25, 0.35], mu: [0.7, 0.85], ...dist }; // reacción (Green 2000) y μ seco: rangos de literatura
   const r = rng(seed);
   let failNo = 0, failW = 0, delivered = 0;
   const impactsNo = [], impactsW = [];
@@ -90,12 +92,12 @@ export function secondaryRiskMC({ n = 4000, seed = 11, distToHazardM, sightM = 1
     pFailWithWarning: +(failW / n).toFixed(4), ciWithWarning: wilson(failW, n),
     absoluteRiskReduction: +((failNo - failW) / n).toFixed(4), deliveredAccepted: +(delivered / n).toFixed(4),
     impactNoP50: q(impactsNo, 0.5), impactNoP95: q(impactsNo, 0.95), impactWP50: q(impactsW, 0.5), impactWP95: q(impactsW, 0.95),
-    disclaimer: 'Simulación con parámetros declarados; no es una medida de eficacia real.',
+    basis: 'SIMULATION', disclaimer: 'Simulación con parámetros declarados; no es una medida de eficacia real.',
   };
 }
 
 /** Umbrales de la política (HIPÓTESIS DE DISEÑO, sustituibles tras validación de factores humanos). */
-export const WARNING_POLICY = Object.freeze({
+export const WARNING_POLICY = Object.freeze({ basis: 'DESIGN_DECISION (umbrales de diseño, no datos)',
   tMinS: 4,              // por debajo: aviso tardío ⇒ riesgo de distracción > beneficio
   tMaxS: 90,             // por encima: solo informativo
   maxPosErrM: 50,        // error de posición máximo para avisar con distancia

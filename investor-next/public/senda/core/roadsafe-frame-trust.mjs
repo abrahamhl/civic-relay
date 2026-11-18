@@ -41,7 +41,7 @@ export const PRESENTATION_CEILING = Object.freeze({ UNVERIFIED_PEER_HINT: 'ADVIS
 export const FRAME_POLICY = Object.freeze({
   maxAgeS: 20,            // aviso de evento puntual (frenada, choque) más viejo que esto no se presenta
   maxFutureS: 2,          // tolerancia de reloj entre emisor y receptor
-  radioRangeM: 400,       // alcance BLE coche-coche supuesto por salto (HIPÓTESIS; medir en campo)
+  radioRangeM: null,      // alcance BLE por salto: NO medido ⇒ sin valor (la comprobación geográfica se omite y se dice)
   maxVehicleSpeedMs: 70,  // 252 km/h: por encima, la trama es implausible
   maxDecelMs2: 15,        // por encima de ~1,5 g es un golpe o un error, no una frenada
   replayTtlS: 120,
@@ -126,11 +126,11 @@ export async function assessHazardFrame(bytes, { now, receiver = null, replayCac
   if (age > P.maxAgeS) { reasons.push(`caducada (${age} s > ${P.maxAgeS} s)`); return res('REJECT_STALE', { hazard: h }); }
   if (h.speedMs > P.maxVehicleSpeedMs) { reasons.push(`velocidad implausible ${h.speedMs} m/s`); return res('REJECT_IMPLAUSIBLE', { hazard: h }); }
   if (h.decelMs2 > P.maxDecelMs2) { reasons.push(`deceleración implausible ${h.decelMs2} m/s²`); return res('REJECT_IMPLAUSIBLE', { hazard: h }); }
-  if (receiver && Number.isFinite(receiver.lat) && Number.isFinite(receiver.lon)) {
+  if (receiver && Number.isFinite(receiver.lat) && Number.isFinite(receiver.lon) && Number.isFinite(P.radioRangeM)) {
     // alcance máximo creíble: radio por salto + lo que el receptor pudo avanzar desde la emisión
     const d = distM(receiver, h), maxD = (h.hops + 1) * P.radioRangeM + Math.max(0, age) * P.maxVehicleSpeedMs;
     if (d > maxD) { reasons.push(`posición implausible: ${Math.round(d)} m > ${Math.round(maxD)} m`); return res('REJECT_IMPLAUSIBLE', { hazard: h, distanceM: Math.round(d) }); }
-  } else reasons.push('sin posición del receptor: plausibilidad geográfica no comprobada');
+  } else reasons.push(Number.isFinite(P.radioRangeM) ? 'sin posición del receptor: plausibilidad geográfica no comprobada' : 'alcance de radio no medido: plausibilidad geográfica no comprobada');
 
   let trust = 'UNVERIFIED_PEER_HINT', keyId = null, role = null;
   if (bytes.length === CAPSULE_BYTES) {

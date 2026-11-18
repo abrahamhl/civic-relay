@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import { EVIDENCE, CASEBOOK, evidenceFor } from '../src/roadsafe-evidence.mjs';
 import { assessIncidentRisk, sightMargin, durationReferenceCurve, recommendedActions } from '../src/roadsafe-risk-factors.mjs';
 import { prioritizeIncidents } from '../src/roadsafe-priority.mjs';
-import { planIncidentZone, queueProjection, zoneCifsPolyline, vmsText } from '../src/roadsafe-zone.mjs';
+import { planIncidentZone, queueProjection, zoneCifsPolyline, vmsText, EXAMPLE_QUEUE_PARAMS as QP } from '../src/roadsafe-zone.mjs';
 import { demoRoad } from '../src/road-guard.mjs';
 import { validateCifs } from '../src/roadsafe-interop.mjs';
-import { circumstanceGrid, CIRCUMSTANCES } from '../src/roadsafe-accident-sim.mjs';
+import { circumstanceGrid, CIRCUMSTANCES, EXAMPLE_SCENARIO_CASE_STUDY as SC_EX } from '../src/roadsafe-accident-sim.mjs';
 
 test('evidencia: cada caso de la casuística cita entradas existentes con grado y fuente', () => {
   const grades = new Set(['A', 'B', 'C', 'E', 'H']);
@@ -58,11 +58,12 @@ test('prioridad: vida > escalada > nivel > índice > espera; baja confianza no r
 });
 
 test('zona: cola por onda de choque, áreas ordenadas aguas arriba, banda de aviso, paneles propuestos, CIFS válido', () => {
-  assert.equal(queueProjection({ flowVehH: 1000, lanes: 2, lanesOpen: 1, freeKmh: 100 }).forms, false);
-  const q = queueProjection({ flowVehH: 2500, lanes: 2, lanesOpen: 1, freeKmh: 100 });
+  assert.equal(queueProjection({ flowVehH: 2500, lanes: 2, lanesOpen: 1, freeKmh: 100 }).forms, null, 'sin parámetros declarados no se calcula');
+  assert.equal(queueProjection({ flowVehH: 1000, lanes: 2, lanesOpen: 1, freeKmh: 100, params: QP }).forms, false);
+  const q = queueProjection({ flowVehH: 2500, lanes: 2, lanesOpen: 1, freeKmh: 100, params: QP });
   assert.equal(q.forms, true); assert.ok(q.shockKmh < 0, 'la cola crece aguas arriba'); assert.ok(q.points[1].queueM > q.points[0].queueM);
   const { road } = demoRoad();
-  const plan = planIncidentZone(road, { s: 12000, dir: 1, laneBlocked: 'PARTIAL', lanes: 2 }, { speedLimitKmh: 100, v85Kmh: 105, flowVehH: 2500, wet: true, night: true, minutesElapsed: 20 }, { vms: [{ id: 'PMV-1', s: 8000, dir: 1 }, { id: 'PMV-otro-sentido', s: 8500, dir: -1 }, { id: 'PMV-pasado', s: 13000, dir: 1 }] });
+  const plan = planIncidentZone(road, { s: 12000, dir: 1, laneBlocked: 'PARTIAL', lanes: 2 }, { speedLimitKmh: 100, v85Kmh: 105, flowVehH: 2500, wet: true, night: true, minutesElapsed: 20, queueParams: QP }, { vms: [{ id: 'PMV-1', s: 8000, dir: 1 }, { id: 'PMV-otro-sentido', s: 8500, dir: -1 }, { id: 'PMV-pasado', s: 13000, dir: 1 }] });
   const ids = plan.areas.map((a) => a.id); assert.deepEqual(ids, ['ADVANCE_WARNING', 'TRANSITION', 'BUFFER', 'INCIDENT_SPACE', 'TERMINATION']);
   for (let i = 1; i < plan.areas.length; i++) assert.ok(plan.areas[i].from >= plan.areas[i - 1].from, 'áreas en sentido de circulación');
   assert.ok(plan.areas[0].lengthM >= plan.queue.nowM + plan.physics.dStopM, 'el aviso cubre la cola actual');
@@ -79,8 +80,8 @@ test('zona: cola por onda de choque, áreas ordenadas aguas arriba, banda de avi
 });
 
 test('circunstancias: ranking reproducible; distancia 2 s es la más segura; mojado+distancia corta la peor', () => {
-  const g = circumstanceGrid({ n: 600, seed: 4 });
-  assert.deepEqual(g, circumstanceGrid({ n: 600, seed: 4 }));
+  const g = circumstanceGrid({ scenario: SC_EX, n: 600, seed: 4 });
+  assert.deepEqual(g, circumstanceGrid({ scenario: SC_EX, n: 600, seed: 4 }));
   assert.equal(g.rows.at(-1).key, 'SAFE_GAP'); assert.ok(['WET_CLOSE', 'NIGHT_FOG_HEAVY', 'WET_NIGHT'].includes(g.rows[0].key));
   assert.ok(g.rows.every((r) => r.pD <= r.pA), 'el aviso no empeora ninguna circunstancia (política activa)');
   assert.ok(Object.keys(CIRCUMSTANCES).length >= 10);

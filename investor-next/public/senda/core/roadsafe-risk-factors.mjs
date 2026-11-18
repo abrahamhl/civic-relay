@@ -18,12 +18,13 @@ import { stoppingDistance, G } from './roadsafe-secondary-risk.mjs';
 
 export const RISK_MODEL_VERSION = 'roadsafe-risk/1';
 const MU = { dry: 0.75, wet: 0.45 };             // rango de manual (requiere medida local)
-const PRT = { day: 1.25, night: 1.6 };            // Green (2000) inesperado; noche = HIPÓTESIS (+0,35 s)
+const PRT = 1.25; // Green (2000), evento inesperado. La noche NO se modela como reacción más lenta (sin fuente):
+                  // actúa mediante el factor empírico DARK_SEVERITY (5 países).
 
 /** Margen de visibilidad físico: >1,5 holgado; <1 no se puede parar a tiempo viendo el peligro. */
 export function sightMargin({ v85Kmh, sightM, wet = false, night = false }) {
   if (!Number.isFinite(v85Kmh) || !Number.isFinite(sightM)) return null;
-  const v = v85Kmh / 3.6, d = stoppingDistance({ vMs: v, reactS: night ? PRT.night : PRT.day, aEffMs2: 0.9 * (wet ? MU.wet : MU.dry) * G });
+  const v = v85Kmh / 3.6, d = stoppingDistance({ vMs: v, reactS: PRT, aEffMs2: 0.9 * (wet ? MU.wet : MU.dry) * G });
   return { ratio: +(sightM / d).toFixed(2), dStopM: Math.round(d), sightM };
 }
 
@@ -49,7 +50,8 @@ function factors(c) {
   add('WAITING_TOW', 'Vehículo inmovilizado esperando grúa', c.waitingTow ? 1.5 : 1, 1.5, 1, 'TOWING_REQUIRED', 'B', known(c.waitingTow));
   add('QUEUE', 'Cola formándose', c.queueForming ? 1.5 : 1, 1.5, 1, 'TRAFFIC_VOLUME', 'C', known(c.queueForming));
   add('RESPONDERS', 'Intervinientes expuestos sin vehículo de bloqueo', c.respondersExposed ? 1.3 : 1, 1.3, 1, 'RESPONDER_STRUCK_BY_GAP', 'B', known(c.respondersExposed));
-  add('DARK_SEVERITY', 'Oscuridad (gravedad, dato propio ES/DE/NL)', c.night ? (c.unlit ? 2 : 1.55) : 1, 2, 1, 'EMPIRICAL_DARK_SEVERITY', 'A', known(c.night));
+  add('DARK_SEVERITY', 'Oscuridad (gravedad; OR medido en ES/DE/NL/FR/GB)', c.night ? (c.unlit ? 2.9 : 1.55) : 1, 2.9, 1, 'EMPIRICAL_DARK_SEVERITY', 'A', known(c.night));
+  add('SHOULDER_SEVERITY', 'Accidente en el arcén (gravedad; OR medido en FR/GB)', c.laneBlocked === 'SHOULDER' ? 2.0 : 1, 2.0, 1, 'EMPIRICAL_SHOULDER_SEVERITY', 'A', known(c.laneBlocked));
   add('HEAVY', 'Proporción de pesados (gravedad)', 1 + Math.min(0.5, c.heavyShare ?? 0), 1.5, 1, 'HEAVY_VEHICLE_SEVERITY', 'B', known(c.heavyShare));
   return { F, sm };
 }
@@ -70,7 +72,7 @@ export function assessIncidentRisk(c = {}) {
   const missing = F.filter((f) => !f.known).map((f) => f.id);
   const drivers = F.filter((f) => f.known && f.mult > 1).sort((a, b) => b.mult - a.mult).map((f) => ({ factor: f.id, label: f.label, mult: +f.mult.toFixed(2), evidence: f.evidence, grade: f.grade }));
   return {
-    model: RISK_MODEL_VERSION, index: idxP, indexRange: [idxO, idxP], uncertain: missing.length > 0, missing,
+    model: RISK_MODEL_VERSION, basis: 'MODEL_UNCALIBRATED_WEIGHTS (dirección con evidencia; magnitudes no calibradas salvo factores empíricos)', index: idxP, indexRange: [idxO, idxP], uncertain: missing.length > 0, missing,
     tier: TIER(idxP, life.length > 0, secondary), tierIfBestCase: TIER(idxO, life.length > 0, secondary),
     lifeRisk: life, secondaryCollision: secondary, drivers, sightMargin: sm,
     note: 'Índice relativo para ordenar y explicar, NO probabilidad de accidente. Magnitudes de los multiplicadores: hipótesis a calibrar.',

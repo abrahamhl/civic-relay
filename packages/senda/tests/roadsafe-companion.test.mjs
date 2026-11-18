@@ -5,10 +5,10 @@ import { oddsRatio, conditionalShare, hotspotsEB, gridCell, roadKmCell, empirica
 import { decideStayOrExit, validateCounts, toDossierScene, SAFETY_QUESTIONS } from '../src/roadsafe-guidance.mjs';
 import { createTrip, inviteCode, joinTrip, addPersonWithoutDevice, heartbeat, startCheckIn, respond, reportFor, situation, ringCommand, verifyRing, rssiDistanceM } from '../src/roadsafe-occupants.mjs';
 import { plusCode, plusCodeCenter, locationPackage } from '../src/roadsafe-location-share.mjs';
-import { planarImpact, postImpactTrajectory, dangerEnvelope, severityBand, triageFromPhysics, VEHICLE_PRESETS } from '../src/roadsafe-crash-physics.mjs';
+import { planarImpact, postImpactTrajectory, dangerEnvelope, severityBand, triageFromPhysics, EXAMPLE_VEHICLES_UNSOURCED as VEHICLE_PRESETS, EXAMPLE_PHYSICS_SCENARIO as PHYS } from '../src/roadsafe-crash-physics.mjs';
 import { decodeObd, obdDecel, estimateMounting, toVehicleFrame, classifyImpulse, pulseDeltaV, predictStop } from '../src/roadsafe-vehicle-sensors.mjs';
 import { createAnnouncer, phrase } from '../src/roadsafe-announcer.mjs';
-import { planServiceStop, serviceStopCapsule, isServiceStop, arrivalObservation } from '../src/roadsafe-service-stop.mjs';
+import { planServiceStop, serviceStopCapsule, isServiceStop, arrivalObservation, EXAMPLE_SERVICE_STOP_POLICY as POL } from '../src/roadsafe-service-stop.mjs';
 import { assessHazardFrame, createFrameSigner, createTrustStore } from '../src/roadsafe-frame-trust.mjs';
 import { decodeHazard } from '../src/road-guard.mjs';
 import { createResponderRegistry } from '../src/roadsafe-responders.mjs';
@@ -85,7 +85,7 @@ test('ocupantes: manifiesto con invitación, comprobación tras choque, persona 
   assert.equal((await verifyRing(trip, ring.cmd, { deviceId: 'dC', now: 220 })).ok, false);
   assert.equal((await verifyRing(trip, { ...ring.cmd, mac: '00' }, { deviceId: 'dB', now: 220 })).ok, false);
   assert.equal((await verifyRing(trip, ring.cmd, { deviceId: 'dB', now: 9999 })).ok, false);
-  assert.ok(rssiDistanceM(-59).metres === 1);
+  assert.equal(rssiDistanceM(-59).metres, null, 'sin calibración declarada no hay distancia'); assert.ok(rssiDistanceM(-59, { txPower: -59, n: 2 }).metres === 1);
 });
 
 test('ubicación: Plus Code coincide con el ejemplo canónico OLC; ida y vuelta; SMS ≤ 160 GSM', () => {
@@ -101,12 +101,14 @@ test('física: conservación exacta del momento lineal y angular; impacto descen
   const r = planarImpact({ ...P.car, pos: { x: -2.25, y: 0.3 }, vel: { x: 25, y: 0 }, omega: 0 }, { ...P.taxi, pos: { x: 2.35, y: 0 }, vel: { x: 0, y: 0 }, omega: 0 }, { p: { x: 0, y: 0.6 }, n: { x: 1, y: 0 } }, { e: 0.1 });
   assert.ok(r.conservation.linearErr < 1e-6 && r.conservation.angularErr < 1e-6);
   assert.ok(Math.abs(r.after[1].omega) > 0.5, 'golpe descentrado ⇒ rotación');
-  const centred = planarImpact({ ...P.car, pos: { x: -2.25, y: 0 }, vel: { x: 25, y: 0 }, omega: 0 }, { ...P.taxi, pos: { x: 2.35, y: 0 }, vel: { x: 0, y: 0 }, omega: 0 }, { p: { x: 0, y: 0 }, n: { x: 1, y: 0 } });
+  const centred = planarImpact({ ...P.car, pos: { x: -2.25, y: 0 }, vel: { x: 25, y: 0 }, omega: 0 }, { ...P.taxi, pos: { x: 2.35, y: 0 }, vel: { x: 0, y: 0 }, omega: 0 }, { p: { x: 0, y: 0 }, n: { x: 1, y: 0 } }, { e: 0.1 });
   assert.ok(Math.abs(centred.after[1].omega) < 1e-9, 'golpe centrado ⇒ sin rotación');
-  assert.equal(planarImpact({ ...P.car, pos: { x: 0, y: 0 }, vel: { x: -1, y: 0 }, omega: 0 }, { ...P.taxi, pos: { x: 5, y: 0 }, vel: { x: 0, y: 0 }, omega: 0 }, { p: { x: 2.5, y: 0 }, n: { x: 1, y: 0 } }).impact, false);
-  const tr = postImpactTrajectory({ ...r.after[1] }, { mu: 0.7 }); const v = Math.hypot(r.after[1].vel.x, r.after[1].vel.y);
+  assert.equal(planarImpact({ ...P.car, pos: { x: 0, y: 0 }, vel: { x: -1, y: 0 }, omega: 0 }, { ...P.taxi, pos: { x: 5, y: 0 }, vel: { x: 0, y: 0 }, omega: 0 }, { p: { x: 2.5, y: 0 }, n: { x: 1, y: 0 } }, { e: 0.1 }).impact, false);
+  assert.throws(() => planarImpact({ ...P.car, pos: { x: 0, y: 0 }, vel: { x: 1, y: 0 }, omega: 0 }, { ...P.taxi, pos: { x: 5, y: 0 }, vel: { x: 0, y: 0 }, omega: 0 }, { p: { x: 2.5, y: 0 }, n: { x: 1, y: 0 } }), /restitución/);
+  const tr = postImpactTrajectory({ ...r.after[1] }, { mu: 0.7, etaPost: 0.6, cOmega: 0.8 }); const v = Math.hypot(r.after[1].vel.x, r.after[1].vel.y);
   assert.ok(Math.abs(tr.travelM - (v * v) / (2 * 0.6 * 0.7 * 9.80665)) < 1.5, 'distancia ≈ v²/(2·η·μ·g)');
-  const env = dangerEnvelope({ striker: P.car, struck: P.taxi, v1: 20, angleDeg: 0, offsetM: 0, y1: 1.75, y2: 1.75 }, { n: 120 });
+  assert.throws(() => dangerEnvelope({ striker: P.car, struck: P.taxi, v1: 20 }), /escenario declarado/);
+  const env = dangerEnvelope({ ...PHYS, striker: P.car, struck: P.taxi, v1: 20, angleDeg: 0, offsetM: 0, y1: 1.75, y2: 1.75 }, { n: 120 });
   assert.ok(env.laneInvasion.find((l) => l.lane === 'LANE_1').p > 0.9); assert.ok(env.restReachM.p95 >= env.restReachM.p50);
   assert.equal(severityBand(8).band, 'HIGH'); assert.equal(severityBand(12).band, 'SEVERE'); assert.equal(triageFromPhysics({ deltaVms: 5, rolledOver: true }).priority, 'LIFE');
 });
@@ -144,9 +146,10 @@ test('megafonía: escalera de distancias, sin repetir, máximo por peligro, sile
 });
 
 test('parada de servicio: plan por delante del averiado, cápsula firmada con banderas, observación de llegada', async () => {
-  const p = planServiceStop({ disabledS: 10_000, approachSpeedMs: 25, shoulderFreeAheadM: 80 });
+  assert.throws(() => planServiceStop({ disabledS: 10_000, approachSpeedMs: 25, shoulderFreeAheadM: 80 }), /política declarada/);
+  const p = planServiceStop({ disabledS: 10_000, approachSpeedMs: 25, shoulderFreeAheadM: 80, policy: POL });
   assert.equal(p.stopPosition, 'AHEAD_OF_DISABLED_ON_SHOULDER'); assert.ok(p.brakeStartS < p.stopS && p.announceFromS < p.brakeStartS);
-  assert.equal(planServiceStop({ disabledS: 10_000, approachSpeedMs: 25, shoulderFreeAheadM: 10 }).stopPosition, 'BEHIND_DISABLED_ON_SHOULDER');
+  assert.equal(planServiceStop({ disabledS: 10_000, approachSpeedMs: 25, shoulderFreeAheadM: 10, policy: POL }).stopPosition, 'BEHIND_DISABLED_ON_SHOULDER');
   const fleet = await createFrameSigner(), store = createTrustStore(); await store.enroll(fleet.publicKey, { role: 'PEER_DEVICE', label: 'flota taxi (ejercicio)' });
   const { capsule, frame } = await serviceStopCapsule(fleet, { t: 1000, lat: 40.2, lon: -3.3, headingDeg: 45, speedMs: 20, incidentShortId: 77, pickup: true });
   assert.equal(isServiceStop(decodeHazard(frame)), true);

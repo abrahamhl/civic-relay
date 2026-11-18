@@ -21,6 +21,8 @@ export const SOURCES = Object.freeze({
   ES_DGT: { country: 'ES', publisher: 'Dirección General de Tráfico', url: 'https://www.dgt.es/menusecundario/dgt-en-cifras/dgt-en-cifras-resultados/dgt-en-cifras-detalle/Ficheros-de-microdatos-de-accidentes-con-victimas-2024/', license: 'Reutilización según el aviso legal de la DGT / datos.gob.es (verificar condiciones exactas)', coverage: 'accidentes con víctimas', coords: false },
   DE_UNFALLATLAS: { country: 'DE', publisher: 'Statistische Ämter des Bundes und der Länder', url: 'https://www.opengeodata.nrw.de/produkte/transport_verkehr/unfallatlas/', license: 'Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0)', coverage: 'accidentes con daños personales', coords: true },
   NL_BRON: { country: 'NL', publisher: 'Rijkswaterstaat (BRON)', url: 'https://data.overheid.nl/dataset/53580-verkeersongevallen-nederland----ongevallen--rws-', license: 'CC0 1.0', coverage: 'todos los registrados (incluye solo daños materiales)', coords: true },
+  FR_BAAC: { country: 'FR', publisher: 'ONISR / Ministère de l’Intérieur (BAAC)', url: 'https://www.data.gouv.fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2024', license: 'Licence Ouverte / Open Licence (Etalab, fr-lo)', coverage: 'accidentes con víctimas', coords: true, dictionary: 'ONISR, «Description des bases de données annuelles» (PDF)' },
+  UK_STATS19: { country: 'GB', publisher: 'Department for Transport (STATS19)', url: 'https://www.data.gov.uk/dataset/cb7ae6f0-4be6-4935-9277-47e5ce24a11f/road-accidents-safety-data', license: 'Open Government Licence v3.0', coverage: 'accidentes con víctimas comunicados a la policía', coords: true, dictionary: 'STATS20 2024 specification (gov.uk); la guía XLSX de datos abiertos devuelve 404 — urban_or_rural_area NO verificado y no se usa' },
   BE_STATBEL: { country: 'BE', publisher: 'Statbel', url: 'https://statbel.fgov.be/en/themes/mobility/traffic/road-accidents', license: 'Open data Statbel (verificar)', coverage: 'accidentes con víctimas', coords: 'parcial', blocked: 'Captcha anti-bots en el portal; descarga manual necesaria' },
 });
 export const ENUMS = Object.freeze({
@@ -70,7 +72,7 @@ export function rdToWgs84(x, y) {
 }
 
 const num = (v) => { if (v === null || v === undefined || v === '') return null; const n = Number(String(v).replace(',', '.')); return Number.isFinite(n) ? n : null; };
-const blank = () => ({ schema: DATASET_SCHEMA, country: null, source: null, sourceId: null, year: null, month: null, weekday: null, hour: null, lat: null, lon: null, coordQuality: 'NONE', road: null, km: null, direction: null, roadClass: 'UNKNOWN', area: 'UNKNOWN', light: 'UNKNOWN', surface: 'UNKNOWN', weather: 'UNKNOWN', fog: null, collision: 'UNKNOWN', severity: 'UNKNOWN', fatalities: null, seriouslyInjured: null, slightlyInjured: null, vehicles: null, involves: {}, speedLimitKmh: null, visibilityRestrictedByVehicle: null, secondaryIndicator: null, intersection: null, curve: null });
+const blank = () => ({ stoppedVehicleInvolved: null, onHardShoulder: null, rearImpact: null, schema: DATASET_SCHEMA, country: null, source: null, sourceId: null, year: null, month: null, weekday: null, hour: null, lat: null, lon: null, coordQuality: 'NONE', road: null, km: null, direction: null, roadClass: 'UNKNOWN', area: 'UNKNOWN', light: 'UNKNOWN', surface: 'UNKNOWN', weather: 'UNKNOWN', fog: null, collision: 'UNKNOWN', severity: 'UNKNOWN', fatalities: null, seriouslyInjured: null, slightlyInjured: null, vehicles: null, involves: {}, speedLimitKmh: null, visibilityRestrictedByVehicle: null, secondaryIndicator: null, intersection: null, curve: null });
 
 // ------------------------------------------------------------------ ES · DGT
 const ES_COLLISION = { 1: 'HEAD_ON', 2: 'SIDE', 3: 'SIDE', 4: 'REAR_END', 5: 'MULTI_VEHICLE_CHAIN', 6: 'OBSTACLE', 7: 'PEDESTRIAN', 8: 'ANIMAL', 9: 'ROLLOVER', 10: 'OTHER', 11: 'RUN_OFF_ROAD', 12: 'RUN_OFF_ROAD', 13: 'RUN_OFF_ROAD', 14: 'RUN_OFF_ROAD', 15: 'RUN_OFF_ROAD', 16: 'RUN_OFF_ROAD', 17: 'RUN_OFF_ROAD', 18: 'RUN_OFF_ROAD', 19: 'RUN_OFF_ROAD', 20: 'OTHER' };
@@ -109,6 +111,7 @@ export function fromUnfallatlas(r) {
   o.severity = { 1: 'FATAL', 2: 'SERIOUS', 3: 'SLIGHT' }[num(r.UKATEGORIE)] ?? 'UNKNOWN';
   o.involves = { bicycle: num(r.IstRad) === 1, car: num(r.IstPKW) === 1, pedestrian: num(r.IstFuss) === 1, motorcycle: num(r.IstKrad) === 1, hgv: num(r.IstGkfz) === 1 };
   o.secondaryIndicator = num(r.UTYP1) === 5 ? 'STATIONARY_TRAFFIC_TYPE' : null; // Unfalltyp 5 = Unfall durch ruhenden Verkehr
+  o.stoppedVehicleInvolved = num(r.UART) === 1 || num(r.UTYP1) === 5; // UART 1: colisión con vehículo que arranca/se detiene/está parado
   return o;
 }
 
@@ -132,6 +135,71 @@ export function fromBron(r) {
   const parties = [r.partij_1_objecttype, r.partij_2_objecttype];
   o.involves = { car: parties.includes('Personenauto'), bicycle: parties.includes('Fiets'), pedestrian: parties.includes('Voetganger'), motorcycle: parties.includes('Motor'), hgv: parties.includes('Vrachtauto') };
   o.road = r.straatnaam || null;
+  return o;
+}
+
+// ------------------------------------------------------------------ FR · BAAC (4 ficheros unidos por Num_Acc)
+const FR_COL = { 1: 'HEAD_ON', 2: 'REAR_END', 3: 'SIDE', 4: 'MULTI_VEHICLE_CHAIN', 5: 'OTHER', 6: 'OTHER', 7: 'RUN_OFF_ROAD' };
+const FR_LIGHT = { 1: 'DAY', 2: 'TWILIGHT', 3: 'DARK_UNLIT', 4: 'DARK_UNLIT', 5: 'DARK_LIT' };
+const FR_SURF = { 1: 'DRY', 2: 'WET', 3: 'WET', 4: 'WET', 5: 'ICE_SNOW', 6: 'OTHER', 7: 'ICE_SNOW', 8: 'OTHER', 9: 'OTHER' };
+const FR_ATM = { 1: 'CLEAR', 2: 'RAIN', 3: 'RAIN', 4: 'SNOW_HAIL', 5: 'FOG', 6: 'WIND', 7: 'OTHER', 8: 'CLEAR', 9: 'OTHER' };
+const FR_CATR = { 1: 'MOTORWAY', 2: 'SINGLE_CARRIAGEWAY', 3: 'SINGLE_CARRIAGEWAY', 4: 'URBAN_STREET' };
+/**
+ * c: fila de caract; l: fila de lieux (primera); vehs: filas de vehicules; users: filas de usagers.
+ * Códigos verificados en ONISR «Description des bases de données annuelles»: col 2 «par l’arrière»,
+ * 4 «en chaîne»; situ 2 «sur bande d’arrêt d’urgence»; manv 23 «arrêté (hors stationnement)»;
+ * obs 1 «véhicule en stationnement»; choc 4–6 arrière; grav 2 tué, 3 hospitalisé, 4 léger.
+ */
+export function fromBaac(c, l = {}, vehs = [], users = []) {
+  const o = blank(); o.country = 'FR'; o.source = 'FR_BAAC'; o.sourceId = String(c.Num_Acc);
+  o.year = num(c.an); o.month = num(c.mois); o.hour = c.hrmn ? num(String(c.hrmn).split(':')[0]) : null;
+  const d = c.an && c.mois && c.jour ? new Date(Date.UTC(+c.an, +c.mois - 1, +c.jour)) : null; o.weekday = d ? ((d.getUTCDay() + 6) % 7) + 1 : null;
+  o.lat = num(c.lat); o.lon = num(c.long); o.coordQuality = o.lat != null && o.lon != null && (o.lat !== 0 || o.lon !== 0) ? 'POINT' : 'NONE';
+  if (o.coordQuality === 'NONE') { o.lat = null; o.lon = null; }
+  o.light = FR_LIGHT[num(c.lum)] ?? 'UNKNOWN'; o.area = { 1: 'RURAL', 2: 'URBAN' }[num(c.agg)] ?? 'UNKNOWN';
+  o.weather = FR_ATM[num(c.atm)] ?? 'UNKNOWN'; o.fog = num(c.atm) === 5 ? true : null; o.collision = FR_COL[num(c.col)] ?? 'UNKNOWN';
+  o.intersection = num(c.int) == null ? null : num(c.int) !== 1;
+  o.roadClass = FR_CATR[num(l.catr)] ?? (num(l.catr) ? 'OTHER' : 'UNKNOWN'); o.surface = FR_SURF[num(l.surf)] ?? 'UNKNOWN';
+  o.curve = num(l.plan) == null || num(l.plan) < 1 ? null : num(l.plan) !== 1; o.speedLimitKmh = num(l.vma) > 0 ? num(l.vma) : null; o.road = l.voie || null;
+  o.onHardShoulder = num(l.situ) == null || num(l.situ) < 0 ? null : num(l.situ) === 2;
+  if (vehs.some((v) => num(v.obsm) === 1)) o.collision = 'PEDESTRIAN';
+  o.stoppedVehicleInvolved = vehs.length ? vehs.some((v) => num(v.manv) === 23 || num(v.obs) === 1) : null;
+  o.rearImpact = vehs.length ? vehs.some((v) => [4, 5, 6].includes(num(v.choc))) : null;
+  o.vehicles = vehs.length || null;
+  const g = users.map((u) => num(u.grav));
+  o.fatalities = g.filter((x) => x === 2).length; o.seriouslyInjured = g.filter((x) => x === 3).length; o.slightlyInjured = g.filter((x) => x === 4).length;
+  o.severity = o.fatalities ? 'FATAL' : o.seriouslyInjured ? 'SERIOUS' : o.slightlyInjured ? 'SLIGHT' : 'UNKNOWN';
+  o.involves = { pedestrian: vehs.some((v) => num(v.obsm) === 1), hgv: vehs.some((v) => [13, 14, 15, 16, 17].includes(num(v.catv))), car: vehs.some((v) => num(v.catv) === 7) };
+  return o;
+}
+
+// ------------------------------------------------------------------ GB · STATS19 (collision + vehicle)
+const UK_LIGHT = { 1: 'DAY', 4: 'DARK_LIT', 5: 'DARK_UNLIT', 6: 'DARK_UNLIT', 7: 'DARK' };
+const UK_SURF = { 1: 'DRY', 2: 'WET', 3: 'ICE_SNOW', 4: 'ICE_SNOW', 5: 'WET' };
+const UK_WEATHER = { 1: 'CLEAR', 2: 'RAIN', 3: 'SNOW_HAIL', 4: 'WIND', 5: 'RAIN', 6: 'SNOW_HAIL', 7: 'FOG', 8: 'OTHER' };
+const UK_ROAD = { 1: 'OTHER', 2: 'URBAN_STREET', 3: 'DUAL_CARRIAGEWAY', 6: 'SINGLE_CARRIAGEWAY', 7: 'RAMP' };
+/**
+ * Códigos verificados en STATS20 (2024): gravedad 1/2/3; luz 1 día, 4–7 oscuridad; firme 1 seco,
+ * 2 mojado, 3 nieve, 4 hielo, 5 inundado; maniobra 02 aparcado, 03 esperando, 04 frenando o deteniéndose;
+ * vía restringida 06 «lay-by / hard shoulder»; primer impacto 2 «back»; tipo de vía 1 rotonda, 2 sentido
+ * único, 3 doble calzada, 6 calzada única, 7 ramal. urban_or_rural_area NO está en STATS20 → no se usa.
+ * El tipo de colisión no existe a nivel de colisión: se deja UNKNOWN y se usan las banderas por vehículo.
+ */
+export function fromStats19(c, vehs = []) {
+  const o = blank(); o.country = 'GB'; o.source = 'UK_STATS19'; o.sourceId = String(c.collision_index);
+  o.year = num(c.collision_year); const [dd, mm] = String(c.date ?? '').split('/'); o.month = num(mm); o.hour = c.time ? num(String(c.time).split(':')[0]) : null;
+  const dow = num(c.day_of_week); o.weekday = dow == null ? null : dow === 1 ? 7 : dow - 1; // STATS19: 1 = domingo
+  o.lat = num(c.latitude); o.lon = num(c.longitude); o.coordQuality = o.lat != null ? 'POINT' : 'NONE';
+  o.severity = { 1: 'FATAL', 2: 'SERIOUS', 3: 'SLIGHT' }[num(c.collision_severity)] ?? 'UNKNOWN';
+  o.light = UK_LIGHT[num(c.light_conditions)] ?? 'UNKNOWN'; o.surface = UK_SURF[num(c.road_surface_conditions)] ?? 'UNKNOWN';
+  o.weather = UK_WEATHER[num(c.weather_conditions)] ?? 'UNKNOWN'; o.fog = num(c.weather_conditions) === 7 ? true : null;
+  o.roadClass = num(c.first_road_class) === 1 ? 'MOTORWAY' : UK_ROAD[num(c.road_type)] ?? 'UNKNOWN';
+  const sl = num(c.speed_limit); o.speedLimitKmh = sl > 0 ? Math.round(sl * 1.609) : null;
+  o.vehicles = num(c.number_of_vehicles);
+  o.stoppedVehicleInvolved = vehs.length ? vehs.some((v) => [2, 3, 4].includes(num(v.vehicle_manoeuvre))) : null;
+  o.onHardShoulder = vehs.length ? vehs.some((v) => num(v.vehicle_location_restricted_lane) === 6) : null;
+  o.rearImpact = vehs.length ? vehs.some((v) => num(v.first_point_of_impact) === 2) : null;
+  o.involves = { car: vehs.some((v) => num(v.vehicle_type) === 9), hgv: vehs.some((v) => [20, 21, 98].includes(num(v.vehicle_type))), motorcycle: vehs.some((v) => [2, 3, 4, 5, 97].includes(num(v.vehicle_type))) };
   return o;
 }
 

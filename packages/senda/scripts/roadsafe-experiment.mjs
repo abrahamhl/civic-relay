@@ -7,7 +7,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { runExperiment, PARAM_PROVENANCE, SCENARIOS, circumstanceGrid } from '../src/roadsafe-accident-sim.mjs';
+import { runExperiment, PARAM_PROVENANCE, SCENARIOS, circumstanceGrid, EXAMPLE_SCENARIO_CASE_STUDY as SC_EX } from '../src/roadsafe-accident-sim.mjs';
 import { fuseRoadEvidence } from '../src/roadsafe-correlation.mjs';
 import { rng } from '../src/roadsafe-secondary-risk.mjs';
 import { createDispatchOrchestrator, createContractSimulator } from '../src/roadsafe-dispatch.mjs';
@@ -21,25 +21,25 @@ const E = results.experiments;
 const pick = (s) => Object.fromEntries(Object.entries(s.summary).map(([k, v]) => [k, { pCollision: v.pCollision, ci: v.ciCollision, pSecondary: v.pSecondaryImpact, impactP50: v.impactKmhP50, impactP95: v.impactKmhP95, coverage: v.effectiveCoverage, latencyP50: v.latencyP50, latencyP95: v.latencyP95, leadP50: v.usefulLeadP50, falseAlarmRate: v.falseAlarmRate, lateShown: v.lateWarningsShown, lateSuppressed: v.lateWarningsSuppressed, confirmedDisplayAck: v.confirmedDisplayAck, messagesPerCase: v.messagesPerCase }]));
 
 // 1) Base A–E
-E.baseline = pick(runExperiment({ n: N, seed: 2026 }));
+E.baseline = pick(runExperiment({ scenario: SC_EX, n: N, seed: 2026 }));
 // 2) Visibilidad
-E.visibility = Object.fromEntries([25, 40, 60, 100, 250].map((sightM) => [sightM, pick(runExperiment({ n: N, seed: 2026, overrides: { sightM } }))]));
+E.visibility = Object.fromEntries([25, 40, 60, 100, 250].map((sightM) => [sightM, pick(runExperiment({ scenario: SC_EX, n: N, seed: 2026, overrides: { sightM } }))]));
 // 3) Distancia temporal
-E.headway = Object.fromEntries([0.6, 1.0, 1.5, 2.0].map((headwayS) => [headwayS, pick(runExperiment({ n: N, seed: 2026, overrides: { headwayS }, scenarios: ['A_NO_DIGITAL', 'D_SENDA_VERIFIED'] }))]));
+E.headway = Object.fromEntries([0.6, 1.0, 1.5, 2.0].map((headwayS) => [headwayS, pick(runExperiment({ scenario: SC_EX, n: N, seed: 2026, overrides: { headwayS }, scenarios: ['A_NO_DIGITAL', 'D_SENDA_VERIFIED'] }))]));
 // 4) Adopción (cuota SENDA y DGT→navegador a 0 para aislar SENDA)
-E.adoption = Object.fromEntries([0, 0.01, 0.05, 0.1, 0.3, 0.6].map((share) => [share, pick(runExperiment({ n: N, seed: 2026, overrides: { sightM: 100, shareOverride: { SENDA_APP: share, DGT30_NAVIGATOR: 0 } }, scenarios: ['A_NO_DIGITAL', 'D_SENDA_VERIFIED'] }))]));
+E.adoption = Object.fromEntries([0, 0.01, 0.05, 0.1, 0.3, 0.6].map((share) => [share, pick(runExperiment({ scenario: SC_EX, n: N, seed: 2026, overrides: { sightM: 100, shareOverride: { SENDA_APP: share, DGT30_NAVIGATOR: 0 } }, scenarios: ['A_NO_DIGITAL', 'D_SENDA_VERIFIED'] }))]));
 // 5) Latencia del canal autorizado (con taxi llegando pronto: 120 s tras la V16)
-E.latency = Object.fromEntries([5, 30, 60, 120, 300].map((lat) => [lat, pick(runExperiment({ n: N, seed: 2026, assistArrivalS: 120, overrides: { sightM: 100, latencyOverride: { DGT30_NAVIGATOR: lat } }, scenarios: ['A_NO_DIGITAL', 'C_AUTHORIZED_ROAD_CHANNEL'] }))]));
+E.latency = Object.fromEntries([5, 30, 60, 120, 300].map((lat) => [lat, pick(runExperiment({ scenario: SC_EX, n: N, seed: 2026, assistArrivalS: 120, overrides: { sightM: 100, latencyOverride: { DGT30_NAVIGATOR: lat } }, scenarios: ['A_NO_DIGITAL', 'C_AUTHORIZED_ROAD_CHANNEL'] }))]));
 // 6) Controles negativos
 const nc = {};
-const nc1 = runExperiment({ n: N, seed: 7, overrides: { shareOverride: { SENDA_APP: 0, DGT30_NAVIGATOR: 0 } } }).summary;
+const nc1 = runExperiment({ scenario: SC_EX, n: N, seed: 7, overrides: { shareOverride: { SENDA_APP: 0, DGT30_NAVIGATOR: 0 } } }).summary;
 nc.NC1_zero_adoption_equals_A = { A: nc1.A_NO_DIGITAL.pCollision, C: nc1.C_AUTHORIZED_ROAD_CHANNEL.pCollision, D: nc1.D_SENDA_VERIFIED.pCollision, pass: nc1.A_NO_DIGITAL.pCollision === nc1.D_SENDA_VERIFIED.pCollision && nc1.A_NO_DIGITAL.pCollision === nc1.C_AUTHORIZED_ROAD_CHANNEL.pCollision };
-const nc2 = runExperiment({ n: N, seed: 7, overrides: { placebo: true } }).summary; // placebo: aviso sin efecto conductual posible
+const nc2 = runExperiment({ scenario: SC_EX, n: N, seed: 7, overrides: { placebo: true } }).summary; // placebo: aviso sin efecto conductual posible
 nc.NC2_placebo_no_effect = { A: nc2.A_NO_DIGITAL.pCollision, D: nc2.D_SENDA_VERIFIED.pCollision, pass: nc2.A_NO_DIGITAL.pCollision === nc2.D_SENDA_VERIFIED.pCollision };
-const nc3 = runExperiment({ n: N, seed: 7, assistArrivalS: 60, overrides: { latencyOverride: { DGT30_NAVIGATOR: 5000, SENDA_APP: 5000 } } }).summary;
+const nc3 = runExperiment({ scenario: SC_EX, n: N, seed: 7, assistArrivalS: 60, overrides: { latencyOverride: { DGT30_NAVIGATOR: 5000, SENDA_APP: 5000 } } }).summary;
 nc.NC3_latency_beyond_event_no_benefit = { A: nc3.A_NO_DIGITAL.pCollision, C: nc3.C_AUTHORIZED_ROAD_CHANNEL.pCollision, D: nc3.D_SENDA_VERIFIED.pCollision, pass: nc3.D_SENDA_VERIFIED.pCollision === nc3.A_NO_DIGITAL.pCollision };
 // NC4: avisos tardíos mostrados sin política ⇒ pueden AUMENTAR el riesgo (distracción)
-const nc4 = runExperiment({ n: N, seed: 7, displayRangeM: 50, overrides: { shareOverride: { DGT30_NAVIGATOR: 0.9, SENDA_APP: 0.9 }, acceptanceRange: [0.9, 0.9] } }).summary; // todos los avisos llegan tarde (< minLead)
+const nc4 = runExperiment({ scenario: SC_EX, n: N, seed: 7, displayRangeM: 50, overrides: { shareOverride: { DGT30_NAVIGATOR: 0.9, SENDA_APP: 0.9 }, acceptanceRange: [0.9, 0.9] } }).summary; // todos los avisos llegan tarde (< minLead)
 nc.NC4_late_warning_harm = { A: nc4.A_NO_DIGITAL.pCollision, C_noPolicy: nc4.C_AUTHORIZED_ROAD_CHANNEL.pCollision, D_policy: nc4.D_SENDA_VERIFIED.pCollision, lateShownC: nc4.C_AUTHORIZED_ROAD_CHANNEL.lateWarningsShown, lateSuppressedD: nc4.D_SENDA_VERIFIED.lateWarningsSuppressed, harmObserved: nc4.C_AUTHORIZED_ROAD_CHANNEL.pCollision > nc4.A_NO_DIGITAL.pCollision, policyAvoidsHarm: nc4.D_SENDA_VERIFIED.pCollision <= nc4.A_NO_DIGITAL.pCollision };
 E.negativeControls = nc;
 
@@ -80,7 +80,7 @@ async function hroad3() {
 }
 E.H_ROAD_3_partial_failures = await hroad3();
 
-E.circumstances = circumstanceGrid({ n: N, seed: 2026 });
+E.circumstances = circumstanceGrid({ scenario: SC_EX, n: N, seed: 2026 });
 writeFileSync(resolve(outDir, 'roadsafe-experiments.json'), JSON.stringify(results, null, 2));
 
 // Resumen markdown

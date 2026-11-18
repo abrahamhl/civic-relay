@@ -17,14 +17,17 @@ import { signHazardCapsule } from './roadsafe-frame-trust.mjs';
 import { WARNING_POLICY } from './roadsafe-secondary-risk.mjs';
 
 export const STOP_FLAGS = Object.freeze({ SERVICE_STOP: 0x01, ASSISTANCE_TO_INCIDENT: 0x02, PASSENGER_PICKUP: 0x04 });
-export const SERVICE_STOP_POLICY = Object.freeze({ comfortDecelMs2: 2.0, maxDecelMs2: 3.0, aheadOfDisabledM: 25, announceLeadS: WARNING_POLICY.tMaxS / 2, provenance: 'HYPOTHETICAL' });
+/** Política de EJEMPLO (hipótesis de diseño sin validar): debe declararse explícitamente. */
+export const EXAMPLE_SERVICE_STOP_POLICY = Object.freeze({ comfortDecelMs2: 2.0, maxDecelMs2: 3.0, aheadOfDisabledM: 25, announceLeadS: WARNING_POLICY.tMaxS / 2, provenance: 'HYPOTHETICAL — validar con DGT y gremio' });
 
 /**
  * Plan de aproximación sobre la vía (s en metros, sentido de circulación creciente).
  * disabledS: posición del averiado; approachSpeedMs: velocidad actual del taxi; shoulderFreeAheadM: arcén libre por delante.
  */
-export function planServiceStop({ disabledS, approachSpeedMs, shoulderFreeAheadM = 60, policy = SERVICE_STOP_POLICY }) {
-  const P = { ...SERVICE_STOP_POLICY, ...policy };
+export function planServiceStop({ disabledS, approachSpeedMs, shoulderFreeAheadM, policy }) {
+  if (!policy?.comfortDecelMs2 || !policy.aheadOfDisabledM || !policy.announceLeadS) throw new Error('planServiceStop exige una política declarada (comfortDecelMs2, aheadOfDisabledM, announceLeadS)');
+  if (!Number.isFinite(shoulderFreeAheadM)) throw new Error('arcén libre por delante no declarado');
+  const P = policy;
   const ahead = shoulderFreeAheadM >= P.aheadOfDisabledM + 10;
   const stopS = ahead ? disabledS + P.aheadOfDisabledM : disabledS - 30;
   const brakeDist = (approachSpeedMs ** 2) / (2 * P.comfortDecelMs2);
@@ -45,9 +48,9 @@ export function planServiceStop({ disabledS, approachSpeedMs, shoulderFreeAheadM
 }
 
 /** Trama y cápsula firmada de parada de servicio (para BLE extendido/GATT/LoRa/app). */
-export async function serviceStopCapsule(signer, { t, lat, lon, headingDeg, speedMs, incidentShortId = 0, pickup = false }) {
+export async function serviceStopCapsule(signer, { t, lat, lon, headingDeg, speedMs, incidentShortId = 0, pickup = false, decelMs2 = 0 }) {
   const flags = STOP_FLAGS.SERVICE_STOP | STOP_FLAGS.ASSISTANCE_TO_INCIDENT | (pickup ? STOP_FLAGS.PASSENGER_PICKUP : 0);
-  const frame = encodeHazard({ type: HAZARD.STOPPED, t, lat, lon, headingDeg, speedMs, decelMs2: SERVICE_STOP_POLICY.comfortDecelMs2, id: incidentShortId >>> 0, flags });
+  const frame = encodeHazard({ type: HAZARD.STOPPED, t, lat, lon, headingDeg, speedMs, decelMs2, id: incidentShortId >>> 0, flags });
   return { frame, capsule: await signHazardCapsule(frame, signer), flags };
 }
 export const isServiceStop = (decoded) => (decoded.flags & STOP_FLAGS.SERVICE_STOP) !== 0;
