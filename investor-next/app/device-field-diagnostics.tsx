@@ -34,7 +34,7 @@ type CameraStatus = "idle" | "requesting" | "active" | "unavailable" | "denied";
 const dictionary: Record<Locale, {
   eyebrow: string; title: string; description: string; inspect: string;
   notMeasured: string; recorded: string; unavailable: string;
-  cameraTitle: string; cameraStart: string; cameraStop: string;
+  cameraTitle: string; cameraStart: string; cameraStop: string; cameraCancel: string;
   cameraDenied: string; cameraIdle: string; cameraActive: string;
   export: string; disclaimer: string; nodeTitle: string; nodeStatus: string;
 }> = {
@@ -89,6 +89,8 @@ export default function DeviceFieldDiagnostics({ locale }: { locale: Locale }) {
   const streamRef = useRef<MediaStream | null>(null);
   const sampleTimerRef = useRef<number | null>(null);
   const samplesRef = useRef(0);
+  const mountedRef = useRef(false);
+  const cameraEpochRef = useRef(0);
 
   const stopTracks = () => {
     if (sampleTimerRef.current !== null) window.clearInterval(sampleTimerRef.current);
@@ -99,9 +101,15 @@ export default function DeviceFieldDiagnostics({ locale }: { locale: Locale }) {
   };
 
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
+      mountedRef.current = false;
+      cameraEpochRef.current += 1;
       if (sampleTimerRef.current !== null) window.clearInterval(sampleTimerRef.current);
+      sampleTimerRef.current = null;
       streamRef.current?.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+      if (videoRef.current) videoRef.current.srcObject = null;
     };
   }, []);
 
@@ -160,6 +168,8 @@ export default function DeviceFieldDiagnostics({ locale }: { locale: Locale }) {
   };
 
   const stopCamera = () => {
+    // Invalidates pending camera permission requests; OS dialogs cannot be closed by web apps.
+    cameraEpochRef.current += 1;
     stopTracks();
     setCameraStatus("idle");
     setCameraMeasurement(null);
@@ -171,9 +181,14 @@ export default function DeviceFieldDiagnostics({ locale }: { locale: Locale }) {
       setCameraStatus("unavailable");
       return;
     }
+    const requestEpoch = ++cameraEpochRef.current;
     setCameraStatus("requesting");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: "environment" } });
+      if (requestEpoch !== cameraEpochRef.current || !mountedRef.current) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
       streamRef.current = stream;
       for (const track of stream.getVideoTracks()) {
         track.onended = () => {
@@ -190,6 +205,10 @@ export default function DeviceFieldDiagnostics({ locale }: { locale: Locale }) {
       }
       video.srcObject = stream;
       await video.play();
+      if (requestEpoch !== cameraEpochRef.current || !mountedRef.current) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
       setCameraStatus("active");
       samplesRef.current = 0;
       const canvas = document.createElement("canvas");
@@ -218,6 +237,7 @@ export default function DeviceFieldDiagnostics({ locale }: { locale: Locale }) {
         }
       }, 600);
     } catch {
+      if (requestEpoch !== cameraEpochRef.current || !mountedRef.current) return;
       stopTracks();
       setCameraStatus("denied");
       setCameraMeasurement(null);
