@@ -147,9 +147,15 @@ test('megafonía: escalera de distancias, sin repetir, máximo por peligro, sile
 
 test('parada de servicio: plan por delante del averiado, cápsula firmada con banderas, observación de llegada', async () => {
   assert.throws(() => planServiceStop({ disabledS: 10_000, approachSpeedMs: 25, shoulderFreeAheadM: 80 }), /política declarada/);
-  const p = planServiceStop({ disabledS: 10_000, approachSpeedMs: 25, shoulderFreeAheadM: 80, policy: POL });
+  const noAssessment = planServiceStop({ disabledS: 10_000, approachSpeedMs: 25, shoulderFreeAheadM: 80, policy: POL });
+  assert.equal(noAssessment.status, 'ABSTAIN_UNVERIFIED_SITE'); assert.equal(noAssessment.stopS, null);
+  const siteAssessment = { verified: true, safePullOffApproved: true };
+  const p = planServiceStop({ disabledS: 10_000, approachSpeedMs: 25, shoulderFreeAheadM: 80, policy: POL, siteAssessment });
+  assert.equal(p.status, 'HYPOTHETICAL_REVIEW_REQUIRED'); assert.equal(p.canGuideDriver, false);
   assert.equal(p.stopPosition, 'AHEAD_OF_DISABLED_ON_SHOULDER'); assert.ok(p.brakeStartS < p.stopS && p.announceFromS < p.brakeStartS);
-  assert.equal(planServiceStop({ disabledS: 10_000, approachSpeedMs: 25, shoulderFreeAheadM: 10, policy: POL }).stopPosition, 'BEHIND_DISABLED_ON_SHOULDER');
+  const noSpace = planServiceStop({ disabledS: 10_000, approachSpeedMs: 25, shoulderFreeAheadM: 10, policy: POL, siteAssessment });
+  assert.equal(noSpace.status, 'NO_VERIFIED_PULLOFF_SPACE'); assert.equal(noSpace.stopS, null);
+  assert.throws(() => planServiceStop({ disabledS: 10_000, approachSpeedMs: -1, shoulderFreeAheadM: 80, policy: POL }), /inválida/);
   const fleet = await createFrameSigner(), store = createTrustStore(); await store.enroll(fleet.publicKey, { role: 'PEER_DEVICE', label: 'flota taxi (ejercicio)' });
   const { capsule, frame } = await serviceStopCapsule(fleet, { t: 1000, lat: 40.2, lon: -3.3, headingDeg: 45, speedMs: 20, incidentShortId: 77, pickup: true });
   assert.equal(isServiceStop(decodeHazard(frame)), true);
