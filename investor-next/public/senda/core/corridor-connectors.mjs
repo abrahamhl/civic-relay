@@ -776,24 +776,25 @@ export function normalizeObservation(raw, {
     location: {
       lat: Number(loc.lat),
       lon: Number(loc.lon),
-      uncertaintyRadiusM: Number.isFinite(loc.uncertaintyRadiusM) ? Math.max(1, Number(loc.uncertaintyRadiusM)) : 25,
+      // Auditoría RoadSafe C1: sin radio declarado ⇒ null (antes 25 m inventados)
+      uncertaintyRadiusM: Number.isFinite(loc.uncertaintyRadiusM) ? Math.max(1, Number(loc.uncertaintyRadiusM)) : null,
     },
     roadSegmentId: raw.roadSegmentId || null,
     observationType: raw.observationType,
     value: raw.value,
     units: raw.units.trim(),
-    measurementUncertainty: raw.measurementUncertainty ?? { type: 'RELATIVE_PCT', value: 10 },
-    qualityFlags: Array.isArray(raw.qualityFlags) ? [...raw.qualityFlags] : ['VALIDATED'],
+    measurementUncertainty: raw.measurementUncertainty ?? null, // C1: antes «10 %» inventado
+    qualityFlags: Array.isArray(raw.qualityFlags) ? [...raw.qualityFlags] : ['UNVALIDATED'], // C1: antes «VALIDATED» sin validar nada
     licenseReference: raw.licenseReference || 'UNSPECIFIED_LICENSE',
     provenance: {
       adapterId: raw.provenance?.adapterId || raw.sourceId,
-      verificationState: raw.provenance?.verificationState || 'LIVE_VERIFIED',
+      verificationState: raw.provenance?.verificationState || 'UNVERIFIED', // C1: antes «LIVE_VERIFIED» por defecto
       upstreamEndpoint: raw.provenance?.upstreamEndpoint || null,
       capturedFromFixture: Boolean(raw.provenance?.capturedFromFixture),
     },
     modelVersion: raw.modelVersion || 'senda-corridor-ingest/1.0.0',
     sourcePayloadHash,
-    confidence: Number.isFinite(raw.confidence) ? Math.max(0.01, Math.min(0.999, Number(raw.confidence))) : 0.85,
+    confidence: Number.isFinite(raw.confidence) ? Math.max(0.01, Math.min(0.999, Number(raw.confidence))) : null, // C1: antes 0,85 inventado
     freshnessState,
   };
 }
@@ -817,7 +818,7 @@ const A12_MONIBAS_LOCATIONS = Object.freeze({
 
 function resolveMonibasLocation(siteId) {
   const m = String(siteId).match(/0121hr[rl](\d{4})/i);
-  if (!m) return { lat: 51.9852, lon: 5.9675, segment: 'NL-A12-HM110-130', hm: 126.0 };
+  if (!m) return null; // C2: antes se colocaba en A12 hm 126 (coordenadas inventadas)
   const hm = Number(m[1]) / 10;
   const keys = Object.keys(A12_MONIBAS_LOCATIONS).map(Number).sort((a, b) => Math.abs(a - hm) - Math.abs(b - hm));
   const base = A12_MONIBAS_LOCATIONS[keys[0]];
@@ -867,7 +868,7 @@ export function parseNdwDatexPayload(xmlText, {
       const lat = Number(latMatch[1]);
       const lon = Number(lonMatch[1]);
       const recordType = typeMatch ? typeMatch[1] : 'GenericSituationRecord';
-      const evidenceLevel = evidenceMatch ? Number(evidenceMatch[1]) : 70;
+      const evidenceLevel = evidenceMatch ? Number(evidenceMatch[1]) : null; // C2: antes 70 inventado
       const measuredAtUtc = timeMatch ? timeMatch[1] : publicationTimeUtc;
 
       observations.push(normalizeObservation({
@@ -885,7 +886,7 @@ export function parseNdwDatexPayload(xmlText, {
         },
         units: 'categorical_incident_state',
         measurementUncertainty: { type: 'POSITION_M', value: 35, persistenceEvidencePct: evidenceLevel },
-        qualityFlags: ['DATEX2_V3_VALIDATED', 'SRTI_SAFETY_MESSAGE'],
+        qualityFlags: ['DATEX2_V3_PARSED_NOT_SCHEMA_VALIDATED', 'SRTI_SAFETY_MESSAGE'], // C2: no hay validación XSD
         licenseReference: 'CC0-1.0 (NDW Open Data)',
         provenance: {
           adapterId: sourceId,
@@ -895,7 +896,7 @@ export function parseNdwDatexPayload(xmlText, {
         },
         modelVersion: 'ndw-datex2-v3-parser/1.0.0',
         sourcePayloadHash: payloadHash,
-        confidence: Math.min(0.96, Math.max(0.55, evidenceLevel / 100)),
+        confidence: evidenceLevel == null ? null : Math.min(0.96, Math.max(0.55, evidenceLevel / 100)),
       }, { nowMs }));
     }
   }
@@ -919,6 +920,7 @@ export function parseNdwDatexPayload(xmlText, {
 
       const siteId = siteMatch[1];
       const loc = resolveMonibasLocation(siteId);
+      if (!loc) { missingDataCount += 1; continue; } // C2: estación no reconocida ⇒ se descarta, no se inventa
       const avgSpeedKmh = speeds.length > 0
         ? Math.round((speeds.reduce((a, b) => a + b, 0) / speeds.length) * 10) / 10
         : null;
@@ -1129,6 +1131,8 @@ export function parseDgtNapXml(xmlText, {
     const sevMatch = block.match(/<sit:overallSeverity>([^<]+)<\/sit:overallSeverity>/);
 
     if (!latMatch || !lonMatch) continue;
+    const statusMatch = block.match(/<(?:[\w]+:)?validityStatus>([^<]+)<\/(?:[\w]+:)?validityStatus>/);
+    if (statusMatch && ['suspended', 'inactive'].includes(statusMatch[1].trim())) continue; // C3: registros suspendidos no son incidencias activas
 
     const recordType = typeMatch ? typeMatch[1] : 'TrafficElement';
     observations.push(normalizeObservation({
@@ -1137,13 +1141,13 @@ export function parseDgtNapXml(xmlText, {
       measuredAtUtc: timeMatch ? timeMatch[1] : publicationTimeUtc,
       receivedAtUtc,
       location: { lat: Number(latMatch[1]), lon: Number(lonMatch[1]), uncertaintyRadiusM: 50 },
-      roadSegmentId: roadMatch ? `ES-${roadMatch[1].replace(/\s+/g, '')}` : roadSegmentId,
+      roadSegmentId: roadMatch ? `ES-${roadMatch[1].replace(/\s+/g, '')}` : null, // C3: antes tramo por defecto inventado
       observationType: `DGT_NAP_${recordType.toUpperCase()}`,
       value: {
         recordType,
         roadName: roadMatch ? roadMatch[1] : 'UNKNOWN',
         municipality: muniMatch ? muniMatch[1] : null,
-        severity: sevMatch ? sevMatch[1] : 'medium',
+        severity: sevMatch ? sevMatch[1] : null, // C3: antes «medium» inventado
       },
       units: 'categorical_incident_state',
       measurementUncertainty: { type: 'POSITION_M', value: 50 },
@@ -1157,7 +1161,7 @@ export function parseDgtNapXml(xmlText, {
       },
       modelVersion: 'dgt-nap-datex2-v36-parser/1.0.0',
       sourcePayloadHash: payloadHash,
-      confidence: 0.88,
+      confidence: null, // C3: antes 0,88 constante sin fuente
     }, { nowMs }));
   }
 
@@ -1675,9 +1679,13 @@ export const MAX_DTN_EVIDENCE_DESCRIPTOR_BYTES = 2048;
 export function createMqttEdgeBridge({
   id = 'EDGE-MQTT-BARRIO-BROKER-01',
   brokerEndpoint = 'mqtt://127.0.0.1:1883/senda/corridor/events',
-  authorizedTokens = ['edge-token-barrio-lab-01'],
+  authorizedTokens = null, // C4: antes había un token por defecto escrito en el código
   defaultRoadSegmentId = 'BARRIO-ACCESO-NORTE-01',
 } = {}) {
+  if (!Array.isArray(authorizedTokens) || authorizedTokens.length === 0 || authorizedTokens.some((t) => typeof t !== 'string' || t.length < 16)) {
+    throw new Error('MQTT_EDGE_CONFIG: authorizedTokens debe declararse (≥ 16 caracteres por token); no hay token por defecto');
+  }
+  const ctEq = (a, b) => { const A = Buffer.from(String(a)), B = Buffer.from(String(b)); let d = A.length ^ B.length; for (let i = 0; i < Math.max(A.length, B.length); i++) d |= (A[i] ?? 0) ^ (B[i] ?? 0); return d === 0; };
   const subscribers = new Set();
   const ingestedEvents = [];
 
@@ -1693,7 +1701,7 @@ export function createMqttEdgeBridge({
     license: 'MIT (SENDA Edge Bridge)',
 
     async authenticate({ token } = {}) {
-      if (!token || !authorizedTokens.includes(token)) {
+      if (!token || !authorizedTokens.some((t) => ctEq(t, token))) {
         const err = new Error('MQTT_EDGE_UNAUTHORIZED: Token de publicación/suscripción no autorizado');
         err.code = 'MQTT_EDGE_UNAUTHORIZED';
         throw err;
@@ -1739,8 +1747,8 @@ export function createMqttEdgeBridge({
         observationType: eventPayload.observationType || 'EDGE_OBJECT_ANOMALY',
         value: {
           detectorType: eventPayload.detectorType || 'ONVIF_Profile_M',
-          objectClass: eventPayload.objectClass || 'vehicle_stopped',
-          severityScore: Number(eventPayload.severityScore ?? 0.82),
+          objectClass: eventPayload.objectClass || 'UNSPECIFIED', // C4: antes «vehicle_stopped» inventado
+          severityScore: Number.isFinite(eventPayload.severityScore) ? Number(eventPayload.severityScore) : null,
           localSnapshotRef: eventPayload.localSnapshotRef || null,
           localSnapshotSha256: eventPayload.localSnapshotSha256 || payloadHash,
         },
@@ -1756,7 +1764,7 @@ export function createMqttEdgeBridge({
         },
         modelVersion: eventPayload.modelVersion || 'frigate-onvif-edge/1.0',
         sourcePayloadHash: payloadHash,
-        confidence: Number(eventPayload.confidence ?? 0.85),
+        confidence: Number.isFinite(eventPayload.confidence) ? Number(eventPayload.confidence) : null,
       }, { nowMs });
 
       const compactDtnDescriptor = {
