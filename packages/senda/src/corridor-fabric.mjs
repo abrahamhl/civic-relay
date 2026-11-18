@@ -210,6 +210,7 @@ export function correlateCorridorObservations(observations, {
     let logOdds = priorLogOdds;
     let incidentSignals = 0;
     let freeFlowSignals = 0;
+    let unqualifiedSignals = 0;
     const explainability = [];
     const uniqueSources = new Set();
     const uniqueFamilies = new Set();
@@ -233,12 +234,14 @@ export function correlateCorridorObservations(observations, {
       const signalClass = classifyObservationSignal(obs);
 
       let deltaLogOdds = 0;
-      if (signalClass === 'INCIDENT_SIGNAL') {
-        if (Number.isFinite(obs.confidence) && obs.confidence > 0.5 && ['LIVE_VERIFIED', 'RECORDED_REAL_SAMPLE', 'LAB_VERIFIED'].includes(obs.provenance?.verificationState)) {
-          incidentSignals += 1;
-          const p = Math.min(0.95, obs.confidence);
-          deltaLogOdds = Math.log(p / (1 - p)) * effectiveWeight;
-        } // Missing confidence or source verification cannot add incident evidence.
+      const verifiedSource = ['LIVE_VERIFIED', 'RECORDED_REAL_SAMPLE', 'LAB_VERIFIED'].includes(obs.provenance?.verificationState);
+      const hasUsableConfidence = Number.isFinite(obs.confidence) && obs.confidence > 0.5 && obs.confidence <= 1;
+      if (!verifiedSource || !hasUsableConfidence) {
+        unqualifiedSignals += 1; // lack of evidence must NOT become free-flow reassurance
+      } else if (signalClass === 'INCIDENT_SIGNAL') {
+        incidentSignals += 1;
+        const p = Math.min(0.95, obs.confidence);
+        deltaLogOdds = Math.log(p / (1 - p)) * effectiveWeight;
       } else if (signalClass === 'FREE_FLOW_SIGNAL') {
         freeFlowSignals += 1;
         deltaLogOdds = -1.15 * effectiveWeight;
@@ -267,7 +270,11 @@ export function correlateCorridorObservations(observations, {
     let abstained = false;
     let abstentionReason = null;
 
-    if (hasContradiction && posteriorProb < 0.82) {
+    if (incidentSignals === 0 && freeFlowSignals === 0 && unqualifiedSignals > 0) {
+      decision = 'ABSTAIN_INSUFFICIENT_EVIDENCE';
+      abstained = true;
+      abstentionReason = 'NO_QUALIFIED_SOURCE_WITH_CONFIDENCE';
+    } else if (hasContradiction && posteriorProb < 0.82) {
       decision = 'ABSTAIN_CONTRADICTION';
       abstained = true;
       abstentionReason = 'CONTRADICTORY_SPEED_AND_OBSTRUCTION_SIGNALS';
@@ -308,6 +315,7 @@ export function correlateCorridorObservations(observations, {
       corroboratingSources: [...uniqueSources],
       independentSourceFamilies: [...uniqueFamilies],
       observationCount: cluster.items.length,
+      unqualifiedSignalCount: unqualifiedSignals,
       explainability,
       provenance: {
         merkleDigestSha256: provenanceMerkleDigest,
