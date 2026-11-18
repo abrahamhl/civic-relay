@@ -146,3 +146,24 @@ test('anonymous critical escalation cannot alter verified high severity', () => 
   assert.equal(scene.rootCount,1);
   assert.equal(scene.receivedRootCount,2);
 });
+
+test('P0: attacker copying official root cannot replace it with newer unsigned event',()=>{
+  const attack=raw({reportId:'forged-newer',observedAtMs:NOW-100,
+    severity:'CRITICAL',road:{...raw().road,chainageM:124000},
+    provenance:{rootId:'original-dgt-1',publisherId:'fake-v16',independenceFamily:'FAKE',verification:'UNVERIFIED'}});
+  const scene=fuse([raw(),attack]).scenes[0];
+  assert.equal(scene.evidence,'OFFICIAL');
+  assert.equal(scene.severity,'HIGH');
+  assert.equal(scene.road.chainageM,123000);
+  assert.equal(scene.rootCount,1);
+});
+test('P0: two verified publishers claiming same root enter quarantine',()=>{
+  const e=raw({reportId:'other-publisher',
+    provenance:{rootId:'original-dgt-1',publisherId:'other-authority',
+      independenceFamily:'OTHER',verification:'PARTNER_ATTESTED',proofId:'other-proof'}});
+  const r=fuse([raw(),e],{acceptedAttestations:{...att,'other-proof':{
+    rootId:'original-dgt-1',publisherId:'other-authority',independenceFamily:'OTHER',
+    verification:'PARTNER_ATTESTED',validUntilMs:NOW+10000}}});
+  assert.equal(r.scenes.length,0);
+  assert.equal(r.rejected[0].reason,'CONFLICTING_VERIFIED_ROOT_OWNERSHIP');
+});
