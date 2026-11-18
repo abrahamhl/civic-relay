@@ -93,7 +93,7 @@ for (const vp of [{ name: 'movil', width: 390, height: 844 }, { name: 'escritori
   await page.screenshot({ path: resolve(outDir, `roadsafe-viaje-${vp.name}.png`), fullPage: true });
   await page.click('#tab-r'); await page.click('#r-run');
   await page.waitForFunction(() => document.querySelectorAll('#r-horizon tbody tr').length === 2);
-  const roadRows = await page.$eval('#r-horizon tbody tr', (rows) => rows.map(x => x.textContent));
+  const roadRows = await page.locator('#r-horizon tbody tr').allTextContents();
   const roadChannels = await page.textContent('#r-channels');
   const roadRelay = await page.textContent('#r-relay');
   check(`${vp.name}: carretera — primero final de cola, después accidente`, /Final de cola/.test(roadRows[0]) && /Accidente/.test(roadRows[1]), { roadRows });
