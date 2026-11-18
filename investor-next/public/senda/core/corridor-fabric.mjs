@@ -1054,8 +1054,10 @@ export async function runPilotACorridorA12({
     osCapability: true,
     hardwareAvailability: 'AVAILABLE_IN_SOFTWARE_OR_LOOPBACK',
     authorizationState: 'AUTHORIZED',
+    estimatedFutureAvailability: 0.8, // explicit hypothetical reliability in LAB DEMO ONLY
     realLinkQuality: { packetLossRatio: 0.02, latencyMs: 38, throughputKbps: 12000 },
     sharedInfrastructureDeps: ['INFRA-NL-KPN-CELL-TOWER-ARNHEM-04', 'INFRA-NL-KPN-FIBER-ARNHEM'],
+    isSimulatedOrEmulated: true, // never claim actual LTE/DTN transmissions
   });
   fabric.registerBearer({
     bearerId: 'BEARER-VELPERBROEK-CUSTODY-RELAY',
@@ -1064,8 +1066,10 @@ export async function runPilotACorridorA12({
     osCapability: true,
     hardwareAvailability: 'AVAILABLE_IN_SOFTWARE_OR_LOOPBACK',
     authorizationState: 'AUTHORIZED',
+    estimatedFutureAvailability: 0.8, // explicit hypothetical reliability in LAB DEMO ONLY
     realLinkQuality: { packetLossRatio: 0.01, latencyMs: 18, throughputKbps: 2500 },
     sharedInfrastructureDeps: ['INFRA-LOCAL-BATTERY-PACK-01'],
+    isSimulatedOrEmulated: true, // never claim actual LTE/DTN transmissions
   });
   fabric.registerBearer({
     bearerId: 'BEARER-LORA-EU868-DONGLE',
@@ -1209,7 +1213,9 @@ export async function runPilotBNeighborhoodLab({
     osCapability: true,
     hardwareAvailability: 'AVAILABLE_IN_SOFTWARE_OR_LOOPBACK',
     authorizationState: 'AUTHORIZED',
+    estimatedFutureAvailability: 0.8, // explicit hypothetical reliability in LAB DEMO ONLY
     realLinkQuality: { packetLossRatio: 0.01, latencyMs: 25, throughputKbps: 20000 },
+    isSimulatedOrEmulated: true, // never claim actual LTE/DTN transmissions
   });
   fabric.registerBearer({
     bearerId: 'BEARER-BARRIO-P2P-CUSTODY-LOOPBACK',
@@ -1218,6 +1224,7 @@ export async function runPilotBNeighborhoodLab({
     osCapability: true,
     hardwareAvailability: 'AVAILABLE_IN_SOFTWARE_OR_LOOPBACK',
     authorizationState: 'AUTHORIZED',
+    estimatedFutureAvailability: 0.8, // explicit hypothetical reliability in LAB DEMO ONLY
     realLinkQuality: { packetLossRatio: 0.02, latencyMs: 14, throughputKbps: 4200 },
     isSimulatedOrEmulated: true,
   });
