@@ -11,7 +11,8 @@ const DEFAULTS = Object.freeze({ minVoiceGapS: 15, emergencyVoiceGapS: 8, sceneR
 
 function eligibility(e, now) {
   if (!e || typeof e.incidentKey !== 'string' || !e.incidentKey.trim() ||
-      typeof e.hazardType !== 'string' || !SEVERITY[e.severity] || !Number.isFinite(e.etaS) ||
+      typeof e.hazardType !== 'string' || !e.hazardType.trim() ||
+      !Object.hasOwn(SEVERITY, e.severity) || !Number.isFinite(e.etaS) ||
       e.etaS < 0 || !Number.isFinite(e.expiresAt) || !Number.isFinite(e.observedAt) ||
       e.observedAt > now || e.expiresAt <= now) return 'INVALID_OR_EXPIRED';
   if (e.carriagewayMatch === false) return 'OPPOSITE_CARRIAGEWAY';
@@ -36,7 +37,7 @@ export function createDriverAlertArbiter(options = {}) {
   let recentVoiceTimes = [], lastVoiceAt = -Infinity, lastNow = -Infinity;
   return {
     consider(candidates, { now, voiceOptIn = false, deploymentApproved = false } = {}) {
-      if (!Number.isFinite(now) || now < lastNow || !Array.isArray(candidates))
+      if (!Number.isFinite(now) || now < lastNow || !Array.isArray(candidates) || candidates.length > 2000)
         return { status: 'ABSTAIN', reason: 'INVALID_OR_BACKWARDS_CLOCK_OR_EVENTS', screen: [], voice: null };
       lastNow = now;
       recentVoiceTimes = recentVoiceTimes.filter((t) => now - t < 60);
