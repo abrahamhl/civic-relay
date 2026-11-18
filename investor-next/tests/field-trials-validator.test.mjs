@@ -64,8 +64,11 @@ test('validator counts late ACKs after TTL as lateOrInvalidAcks, never as valid 
   }
 
   const summary = analyzeFieldTrialsCsv([header, ...rows].join('\n'));
-  assert.equal(summary.status, 'PHYSICALLY_TESTED_M1_COMPLETE');
-  assert.equal(summary.gatePassed, true);
+  // Consolidación 2026-11-18: un CSV autodeclarado deja los datos listos para revisión, nunca certifica la prueba física
+  // (regla posterior «prohibit self-certification from CSV evidence», tests/field-trials-evidence-gate.test.mjs).
+  assert.equal(summary.status, 'FIELD_DATA_REVIEW_REQUIRED');
+  assert.equal(summary.gatePassed, false);
+  assert.equal(summary.dataReadyForReview, true);
   assert.equal(summary.totalTrials, 30);
   assert.equal(summary.validAckSuccesses, 25);
   assert.equal(summary.lateOrInvalidAcks, 3);
