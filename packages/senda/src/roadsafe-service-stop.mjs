@@ -24,25 +24,39 @@ export const EXAMPLE_SERVICE_STOP_POLICY = Object.freeze({ comfortDecelMs2: 2.0,
  * Plan de aproximación sobre la vía (s en metros, sentido de circulación creciente).
  * disabledS: posición del averiado; approachSpeedMs: velocidad actual del taxi; shoulderFreeAheadM: arcén libre por delante.
  */
-export function planServiceStop({ disabledS, approachSpeedMs, shoulderFreeAheadM, policy }) {
-  if (!policy?.comfortDecelMs2 || !policy.aheadOfDisabledM || !policy.announceLeadS) throw new Error('planServiceStop exige una política declarada (comfortDecelMs2, aheadOfDisabledM, announceLeadS)');
-  if (!Number.isFinite(shoulderFreeAheadM)) throw new Error('arcén libre por delante no declarado');
+export function planServiceStop({ disabledS, approachSpeedMs, shoulderFreeAheadM, policy, siteAssessment = null }) {
+  if (!policy || ![policy.comfortDecelMs2, policy.aheadOfDisabledM, policy.announceLeadS].every((x) => Number.isFinite(x) && x > 0))
+    throw new Error('planServiceStop exige una política declarada y positiva (comfortDecelMs2, aheadOfDisabledM, announceLeadS)');
+  if (!Number.isFinite(shoulderFreeAheadM) || shoulderFreeAheadM < 0)
+    throw new Error('arcén libre por delante no declarado o inválido');
+  if (![disabledS, approachSpeedMs].every(Number.isFinite) || approachSpeedMs <= 0)
+    throw new Error('posición o velocidad de aproximación inválida');
   const P = policy;
-  const ahead = shoulderFreeAheadM >= P.aheadOfDisabledM + 10;
-  const stopS = ahead ? disabledS + P.aheadOfDisabledM : disabledS - 30;
-  const brakeDist = (approachSpeedMs ** 2) / (2 * P.comfortDecelMs2);
-  const brakeStartS = stopS - brakeDist, announceS = brakeStartS - approachSpeedMs * P.announceLeadS;
+  const abstain = (status, why) => ({
+    status, stopS: null, brakeStartS: null, announceFromS: null, brakeDurationS: null,
+    stopPosition: 'UNDETERMINED', canGuideDriver: false,
+    steps: ['No se propone lugar de parada sin una valoración autorizada de la vía.',
+      'Contactar con el operador de asistencia y seguir la señalización e instrucciones de la autoridad competente.'],
+    rationale: why, provenance: P.provenance,
+  });
+  // A numeric estimate of free shoulder does NOT prove that it is safe or legal to pull over.
+  if (siteAssessment?.verified !== true || siteAssessment?.safePullOffApproved !== true)
+    return abstain('ABSTAIN_UNVERIFIED_SITE', 'no consta evaluación del arcén por personal competente');
+  if (shoulderFreeAheadM < P.aheadOfDisabledM + 10)
+    return abstain('NO_VERIFIED_PULLOFF_SPACE', 'no existe espacio declarado suficiente por delante; no se inventa una parada por detrás');
+  const stopS = disabledS + P.aheadOfDisabledM;
+  const brakeDist = approachSpeedMs ** 2 / (2 * P.comfortDecelMs2);
+  const brakeStartS = stopS - brakeDist;
+  const announceS = brakeStartS - approachSpeedMs * P.announceLeadS;
   return {
-    stopS: Math.round(stopS), stopPosition: ahead ? 'AHEAD_OF_DISABLED_ON_SHOULDER' : 'BEHIND_DISABLED_ON_SHOULDER',
-    brakeStartS: Math.round(brakeStartS), announceFromS: Math.round(announceS), decelMs2: P.comfortDecelMs2,
-    brakeDurationS: +(approachSpeedMs / P.comfortDecelMs2).toFixed(1),
-    steps: [
-      `Luces de emergencia y emisión SENDA desde ${Math.round(stopS - announceS)} m antes del punto de parada.`,
-      `Deceleración progresiva (≈${P.comfortDecelMs2} m/s²) desde ${Math.round(stopS - brakeStartS)} m antes; sin frenar en el carril.`,
-      ahead ? 'Detenerse en el arcén POR DELANTE del averiado: los ocupantes no cruzan tráfico y el averiado protege al taxi.' : 'Sin espacio por delante: detenerse tras el averiado dejando hueco y con luces de emergencia.',
-      'Los ocupantes suben por el lado contrario al tráfico.',
-    ],
-    rationale: ahead ? 'evita que el taxi quede como último vehículo expuesto (C4/C5)' : 'arcén insuficiente por delante',
+    status: 'HYPOTHETICAL_REVIEW_REQUIRED', canGuideDriver: false,
+    stopS: Math.round(stopS), stopPosition: 'AHEAD_OF_DISABLED_ON_SHOULDER',
+    brakeStartS: Math.round(brakeStartS), announceFromS: Math.round(announceS),
+    decelMs2: P.comfortDecelMs2, brakeDurationS: +(approachSpeedMs / P.comfortDecelMs2).toFixed(1),
+    steps: ['Proyección matemática para simulador, NO instrucciones de conducción.',
+      'El operador competente debe aprobar cualquier plan real de aproximación y estacionamiento.',
+      'Si no hay espacio seguro certificado, buscar un punto autorizado alternativo sin aproximación riesgosa.'],
+    rationale: 'ubicación hipotética basada en parámetros explícitos y evaluación declarada; nunca autorización automática',
     provenance: P.provenance,
   };
 }
