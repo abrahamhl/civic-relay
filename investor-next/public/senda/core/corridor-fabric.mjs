@@ -151,7 +151,7 @@ export function correlateCorridorObservations(observations, {
       continue;
     }
     const timeBucket = Math.floor(measuredMs / 10_000);
-    const dedupKey = `${obs.sourceId}:${obs.observationType}:${obs.sourcePayloadHash}:${timeBucket}`;
+    const dedupKey = `${obs.sourceId}:${obs.observationId}:${obs.observationType}:${obs.sourcePayloadHash}:${timeBucket}`; // one DATEX payload may contain many distinct situation IDs
     if (seenKeys.has(dedupKey)) {
       deduplicatedCount += 1;
       continue;
@@ -290,8 +290,9 @@ export function correlateCorridorObservations(observations, {
 
     const reportedErrorsM = cluster.items.map(x => x.location.uncertaintyRadiusM);
     const combinedUncertaintyRadiusM = reportedErrorsM.every(u => Number.isFinite(u) && u > 0)
-      ? Math.round(1 / Math.sqrt(reportedErrorsM.reduce((sum,u) => sum + 1 / Math.pow(Math.max(5,u), 2), 0)))
-      : null; // abstain on location uncertainty rather than inventing precision
+      ? Math.ceil(cluster.items.reduce((maxRadius, x) => Math.max(maxRadius,
+          haversineDistanceM(x.location, cluster.centroid) + x.location.uncertaintyRadiusM), 0))
+      : null; // conservative envelope, NOT an independence-based confidence interval
 
     const provenanceHashes = cluster.items.map((x) => x.sourcePayloadHash).sort();
     const provenanceMerkleDigest = sha256Hex(provenanceHashes.join('|'));
