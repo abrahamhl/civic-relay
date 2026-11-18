@@ -195,6 +195,8 @@ export function fromStats19(c, vehs = []) {
   o.weather = UK_WEATHER[num(c.weather_conditions)] ?? 'UNKNOWN'; o.fog = num(c.weather_conditions) === 7 ? true : null;
   o.roadClass = num(c.first_road_class) === 1 ? 'MOTORWAY' : UK_ROAD[num(c.road_type)] ?? 'UNKNOWN';
   const sl = num(c.speed_limit); o.speedLimitKmh = sl > 0 ? Math.round(sl * 1.609) : null;
+  const rn = num(c.first_road_number), rc = num(c.first_road_class); // STATS20 1.12: 1 Motorway, 2 A(M), 3 A, 4 B
+  o.road = rn > 0 ? ({ 1: `M${rn}`, 2: `A${rn}(M)`, 3: `A${rn}`, 4: `B${rn}` }[rc] ?? null) : null;
   o.vehicles = num(c.number_of_vehicles);
   o.stoppedVehicleInvolved = vehs.length ? vehs.some((v) => [2, 3, 4].includes(num(v.vehicle_manoeuvre))) : null;
   o.onHardShoulder = vehs.length ? vehs.some((v) => num(v.vehicle_location_restricted_lane) === 6) : null;

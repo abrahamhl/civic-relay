@@ -19,6 +19,7 @@ Generado por `packages/senda/scripts/roadsafe-data/build-dataset.mjs`. Registros
 | FR_DICT | fr-description-bases.pdf (897872 B) | 8ed3bc135f90 | — |
 | UK_COLLISION | uk-collision-2024.csv (19208488 B) | 32a78f4662e3 | — |
 | UK_VEHICLE | uk-vehicle-2024.csv (20296911 B) | 1a60f65f07a4 | — |
+| UK_AADF | uk-aadf.zip (19464638 B) | 5273cf63da4c | — |
 | NL_BRON | nl-2024.csv (42219285 B) | ca3d3b147e45 | 126380/126380 |
 | BE_STATBEL | — | — | sin fichero manual (portal con captcha) |
 
@@ -56,6 +57,32 @@ Generado por `packages/senda/scripts/roadsafe-data/build-dataset.mjs`. Registros
 
 `*` = IC 95 % no incluye 1. OR > 1: mayor proporción de mortales entre los accidentes con víctimas en esa condición.
 
+
+## Exposición GB: tasas por 100 M veh-km (AADF DfT × STATS19)
+
+Tramos aforados 17936 · accidentes GB 100927 · asignados 45289 · sin tramo 14788 · sin vía 40850.
+
+| Categoría | Exposición (100 M veh-km) | Con víctimas /100 M | Mortales /100 M | Arcén /100 M |
+|---|---|---|---|---|
+| PA | 1638.8 | 23.2 | 0.371 | 0.157 |
+| TM | 1116.6 | 2.69 | 0.069 | 0.049 |
+| TA | 749.1 | 5.62 | 0.219 | 0.103 |
+| PM | 10 | 5.51 | 0 | 0 |
+
+Tasa media 15.11 /100 M veh-km · prior EB {"alpha":0.148,"beta":0.0098}
+
+| Tramo (vía) | AADF | Exposición | Accidentes | Tasa bruta | **Tasa EB** |
+|---|---|---|---|---|---|
+| 28465 (A45) | 34564 | 0.6308 | 24 | 38.05 | **37.7** |
+| 92184 (A4180) | 16243 | 0.5277 | 19 | 36.01 | **35.63** |
+| 58231 (A406) | 112905 | 0.5769 | 20 | 34.67 | **34.34** |
+| 56436 (A40) | 57620 | 0.5258 | 17 | 32.33 | **32.02** |
+| 6458 (A41) | 68610 | 0.5259 | 17 | 32.33 | **32.01** |
+| 48610 (A13) | 131432 | 0.5277 | 16 | 30.32 | **30.04** |
+| 81522 (A354) | 30054 | 0.6472 | 19 | 29.36 | **29.14** |
+| 47396 (A625) | 29136 | 0.6168 | 18 | 29.18 | **28.96** |
+| 28440 (M25) | 146626 | 0.5352 | 15 | 28.03 | **27.79** |
+| 56330 (A34) | 51154 | 0.5041 | 14 | 27.77 | **27.53** |
 
 ## Modelo multivariante de gravedad (OR AJUSTADOS, regresión logística)
 

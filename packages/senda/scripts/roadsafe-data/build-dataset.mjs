@@ -18,6 +18,9 @@ import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseCsv, fromDgt, fromUnfallatlas, fromBron, fromStatbel, fromBaac, fromStats19, validateRecord, SOURCES } from '../../src/roadsafe-dataset.mjs';
 import { fitSeverityModel, leaveOneCountryOut } from '../../src/roadsafe-severity-model.mjs';
+import { aadfLink, splitCsvLine, assignToLinks, rateEB, ratesByCategory } from '../../src/roadsafe-exposure.mjs';
+import { createReadStream } from 'node:fs';
+import { createInterface } from 'node:readline';
 import { roadsafeProfile, empiricalSeverityFactors, hotspotsEB, gridCell, roadKmCell, conditionalShare, injuryOnly, stoppedVehicleStudy } from '../../src/roadsafe-dataset-analysis.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url)), root = resolve(here, '../../../..');
@@ -35,6 +38,7 @@ const RAW = {
   FR_DICT: { file: 'fr-description-bases.pdf', url: 'https://www.onisr.securite-routiere.gouv.fr/sites/default/files/2024-10/Description%20des%20bases%20de%20donn%C3%A9es%20annuelles.pdf' },
   UK_COLLISION: { file: `uk-collision-${YEAR}.csv`, url: `https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-collision-${YEAR}.csv` },
   UK_VEHICLE: { file: `uk-vehicle-${YEAR}.csv`, url: `https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-vehicle-${YEAR}.csv` },
+  UK_AADF: { file: 'uk-aadf.zip', url: 'https://storage.googleapis.com/dft-statistics/road-traffic/downloads/data-gov-uk/dft_traffic_counts_aadf.zip' },
   NL_BRON: { file: `nl-${YEAR}.csv`, url: `https://geo.rijkswaterstaat.nl/services/ogc/gdr/verkeersongevallen_nederland/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=ongevallen_${YEAR}&outputFormat=csv` },
 };
 const sha = (p) => createHash('sha256').update(readFileSync(p)).digest('hex');
@@ -132,9 +136,29 @@ writeFileSync(join(OUT, `aggregates-${YEAR}.json`), JSON.stringify({ schema: 'se
 const sev = fitSeverityModel(records, { l2: 1, seed: 2026 }), loco = leaveOneCountryOut(records, { l2: 1 });
 writeFileSync(join(OUT, `severity-model-${YEAR}.json`), JSON.stringify({ ...sev, leaveOneCountryOut: loco }, null, 2));
 
+// --- exposición GB: AADF por tramo (DfT, OGL v3) → tasas por 100 M veh-km
+let exposure = null;
+if (manifest.sources.UK_AADF?.sha256) {
+  const dir = join(CACHE, 'uk-aadf');
+  if (!existsSync(dir)) execFileSync('python3', ['-I', '-c', 'import sys,zipfile;zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])', join(CACHE, RAW.UK_AADF.file), dir]);
+  const csv = join(dir, readdirSync(dir).find((f) => f.endsWith('.csv')));
+  const links = []; let head = null;
+  for await (const line of createInterface({ input: createReadStream(csv), crlfDelay: Infinity })) {
+    if (!head) { head = splitCsvLine(line.replace(/^\uFEFF/, '')); continue; }
+    const v = splitCsvLine(line); if (v[1] !== String(YEAR)) continue;
+    const l = aadfLink(Object.fromEntries(head.map((h, i) => [h, v[i]]))); if (l) links.push(l);
+  }
+  const gb = records.filter((r) => r.country === 'GB');
+  const asg = assignToLinks(gb, links, { slackKm: 1 });
+  exposure = { schema: 'senda-roadsafe-exposure/1', basis: 'CALCULATED — AADF DfT (OGL v3) × STATS19; tramos «Major» con longitud', year: YEAR, linksWithCounts: links.length, gbRecords: gb.length, assigned: asg.assigned, unassigned: asg.unassigned, noRoad: asg.noRoad, slackKm: 1,
+    byCategory: ratesByCategory(links, asg), ebInjury: rateEB(asg.perLink, { countKey: 'n', minExposure100M: 0.5 }), ebKsi: rateEB(asg.perLink, { countKey: 'ksi', minExposure100M: 0.5 }), ebHardShoulder: rateEB(asg.perLink.filter((a) => a.link.category === 'TM' || a.link.road.startsWith('M')), { countKey: 'hardShoulder', minExposure100M: 0.5 }) };
+  writeFileSync(join(OUT, `exposure-gb-${YEAR}.json`), JSON.stringify(exposure, null, 2));
+}
+
 // --- resumen compacto para la consola web (sin microdatos)
 const webDir = resolve(root, 'investor-next/public/senda/data'); mkdirSync(webDir, { recursive: true });
 writeFileSync(join(webDir, `roadsafe-severity-model-${YEAR}.json`), JSON.stringify({ schema: sev.schema, basis: sev.basis, year: YEAR, model: sev.model, test: { auc: sev.test.auc, brier: sev.test.brier, baseRate: sev.test.baseRate }, coefficients: sev.coefficients, leaveOneCountryOut: loco.rows }));
+if (exposure) writeFileSync(join(webDir, `roadsafe-exposure-gb-${YEAR}.json`), JSON.stringify({ schema: exposure.schema, basis: exposure.basis, year: YEAR, assigned: exposure.assigned, unassigned: exposure.unassigned, noRoad: exposure.noRoad, byCategory: exposure.byCategory, meanRate: exposure.ebInjury.meanRatePer100MvehKm, top: exposure.ebInjury.top.slice(0, 10) }));
 writeFileSync(join(webDir, `roadsafe-dataset-summary-${YEAR}.json`), JSON.stringify({ schema: 'senda-roadsafe-dataset-summary/1', year: YEAR, total: records.length, perCountry: Object.fromEntries(Object.entries(perCountry).map(([c, v]) => [c, { records: v.records, injury: v.injury, profile: { rearEnd: v.profile.rearEnd, stationaryVehicle: v.profile.stationaryVehicle, chain: v.profile.chain, visibilityRestrictedByVehicle: v.profile.visibilityRestrictedByVehicle, secondaryOtherAccident: v.profile.secondaryOtherAccident }, stoppedStudy: Object.fromEntries(['stoppedVehicle', 'hardShoulder', 'rearImpact'].map((k) => [k, v.stoppedStudy[k].available ? { n: v.stoppedStudy[k].n, k: v.stoppedStudy[k].k, share: v.stoppedStudy[k].share, fatalShareWhenTrue: v.stoppedStudy[k].fatalShareWhenTrue, orFatalVsRest: { or: v.stoppedStudy[k].orFatalVsRest.or, ci: v.stoppedStudy[k].orFatalVsRest.ci, significant: v.stoppedStudy[k].orFatalVsRest.significant }, orFatalDarkWithinFlag: { or: v.stoppedStudy[k].orFatalDarkWithinFlag.or, ci: v.stoppedStudy[k].orFatalDarkWithinFlag.ci, n: v.stoppedStudy[k].orFatalDarkWithinFlag.n, significant: v.stoppedStudy[k].orFatalDarkWithinFlag.significant }, highSpeedShare: v.stoppedStudy[k].highSpeedShare } : { available: false }])), severityFactors: Object.fromEntries(Object.entries(v.severityFactors).filter(([, o]) => o && o.or).map(([k, o]) => [k, { or: o.or, ci: o.ci, n: o.n, significant: o.significant }])), hotspotsTop: v.hotspots.top.slice(0, 10), hotspotsRearTop: v.hotspotsRearStationary.top.slice(0, 10) }])), licenses: Object.fromEntries(Object.entries(SOURCES).map(([k, x]) => [k, x.license])) }));
 
 // --- informe
@@ -149,6 +173,12 @@ for (const [c, v] of Object.entries(perCountry)) { const s = v.severityFactors; 
 L.push('', '## Vehículo detenido y arcén (caso de investigación)', '', '| País | Bandera | n con dato | Con la condición | % mortal si la tiene | OR mortal vs resto | OR mortal oscuridad dentro | % en vía rápida |', '|---|---|---|---|---|---|---|---|');
 for (const [c, v] of Object.entries(perCountry)) for (const k of ['stoppedVehicle', 'hardShoulder', 'rearImpact']) { const b = v.stoppedStudy[k]; if (!b.available) continue; L.push(`| ${c} | ${k} | ${b.n} | ${b.k} (${(b.share.p * 100).toFixed(2)} %) | ${b.fatalShareWhenTrue ? (b.fatalShareWhenTrue.p * 100).toFixed(2) + ' %' : '—'} | ${orf(b.orFatalVsRest)} | ${orf(b.orFatalDarkWithinFlag)} | ${b.highSpeedShare == null ? '—' : (b.highSpeedShare * 100).toFixed(0) + ' %'} |`); }
 L.push('', '`*` = IC 95 % no incluye 1. OR > 1: mayor proporción de mortales entre los accidentes con víctimas en esa condición.', '');
+if (exposure) {
+  L.push('', '## Exposición GB: tasas por 100 M veh-km (AADF DfT × STATS19)', '', `Tramos aforados ${exposure.linksWithCounts} · accidentes GB ${exposure.gbRecords} · asignados ${exposure.assigned} · sin tramo ${exposure.unassigned} · sin vía ${exposure.noRoad}.`, '', '| Categoría | Exposición (100 M veh-km) | Con víctimas /100 M | Mortales /100 M | Arcén /100 M |', '|---|---|---|---|---|');
+  for (const c of exposure.byCategory) L.push(`| ${c.category} | ${c.exposure100MvehKm} | ${c.injuryRate} | ${c.fatalRate} | ${c.hardShoulderRate} |`);
+  L.push('', `Tasa media ${exposure.ebInjury.meanRatePer100MvehKm} /100 M veh-km · prior EB ${JSON.stringify(exposure.ebInjury.prior)}`, '', '| Tramo (vía) | AADF | Exposición | Accidentes | Tasa bruta | **Tasa EB** |', '|---|---|---|---|---|---|');
+  for (const t of exposure.ebInjury.top.slice(0, 10)) L.push(`| ${t.id} (${t.road}) | ${t.aadf} | ${t.exposure100MvehKm} | ${t.count} | ${t.rawRate} | **${t.ebRate}** |`);
+}
 L.push('', '## Modelo multivariante de gravedad (OR AJUSTADOS, regresión logística)', '', `Entrenamiento ${sev.nTrain} · prueba ${sev.nTest} · mortales ${sev.events} · AUC prueba **${sev.test.auc}** · Brier ${sev.test.brier} · tasa base ${sev.test.baseRate}. Efectos fijos por país.`, '', '| Variable | OR ajustado [IC 95 %] |', '|---|---|');
 for (const c of sev.coefficients.filter((c) => c.name !== 'intercept')) L.push(`| ${c.name} | ${c.or} [${c.ci.join('–')}]${c.significant ? ' *' : ''} |`);
 L.push('', '**Calibración (deciles de la prueba):** ' + sev.test.calibration.map((b) => `${b.bin}: ${b.predicted}/${b.observed}`).join(' · '), '', '**Dejar un país fuera:**', '', '| País fuera | n | AUC | Predicho medio | Observado |', '|---|---|---|---|---|');

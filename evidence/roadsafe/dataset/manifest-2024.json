@@ -1,7 +1,7 @@
 {
   "schema": "senda-roadsafe-dataset-manifest/1",
   "year": 2024,
-  "builtAt": "2026-11-18T00:36:40.414Z",
+  "builtAt": "2026-11-18T00:53:22.254Z",
   "sources": {
     "ES_DGT": {
       "url": "https://www.dgt.es/export/sites/web-DGT/.galleries/downloads/dgt-en-cifras/publicaciones/Ficheros_microdatos_de_accidentalidad_con_victimas/TABLA_ACCIDENTES_24.XLSX",
@@ -68,6 +68,12 @@
       "file": "uk-vehicle-2024.csv",
       "bytes": 20296911,
       "sha256": "1a60f65f07a44454bc03c63b35d6741f41c9dfbb05a26753406aef8bff4ae6cd"
+    },
+    "UK_AADF": {
+      "url": "https://storage.googleapis.com/dft-statistics/road-traffic/downloads/data-gov-uk/dft_traffic_counts_aadf.zip",
+      "file": "uk-aadf.zip",
+      "bytes": 19464638,
+      "sha256": "5273cf63da4ca8b317bfe972d8a345e7932db0fff7a7789998a890f0081232b6"
     },
     "NL_BRON": {
       "url": "https://geo.rijkswaterstaat.nl/services/ogc/gdr/verkeersongevallen_nederland/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=ongevallen_2024&outputFormat=csv",

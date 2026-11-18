@@ -1,8 +1,8 @@
 {
   "schema": "senda-roadsafe-e2e/1",
   "browser": "chromium (playwright)",
-  "at": "2026-11-18T00:40:15.062Z",
-  "passed": 60,
+  "at": "2026-11-18T00:55:37.185Z",
+  "passed": 68,
   "failed": 0,
   "results": [
     {
@@ -34,7 +34,7 @@
     {
       "name": "movil: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-c77a9f0c37d2f32b · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-b15b5f5465474a6e · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -44,7 +44,7 @@
     {
       "name": "movil: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-c77a9f0c37d2f32b · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-b15b5f5465474a6e · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "movil: idioma en",
@@ -155,9 +155,36 @@
       "ok": true
     },
     {
+      "name": "movil: carretera — 4 canales funden en 1 escena (oficial) + cola aparte",
+      "ok": true,
+      "kbus": [
+        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:dce76c88 · DATEX2:NAP",
+        "QUEUE_TAILUNVERIFIED_HINT1ZONE_MODEL"
+      ]
+    },
+    {
+      "name": "movil: carretera — más autorizaciones ⇒ más familias de fallo; sobrevive a caída móvil",
+      "ok": true,
+      "kreinf1": "Refuerzo: 3 familias de fallo · sobrevive a la caída de la red móvil",
+      "kreinf2": "Refuerzo: 5 familias de fallo · sobrevive a la caída de la red móvil"
+    },
+    {
+      "name": "movil: carretera — horizonte con cola y escena por delante y frase de voz",
+      "ok": true,
+      "khor": [
+        "900 m · 36 sQUEUE_TAIL UNVERIFIED_HINT«Atención: final de retención a 900 metros. Precaución.»",
+        "1500 m · 60 sACCIDENT OFFICIAL_FEED«Atención: accidente a 2 kilómetros. Precaución.»"
+      ]
+    },
+    {
+      "name": "movil: carretera — tasas reales por 100 M veh-km",
+      "ok": true
+    },
+    {
       "name": "movil: sin desbordamiento horizontal",
       "ok": true,
       "overflow": [
+        0,
         0,
         0,
         0,
@@ -203,7 +230,7 @@
     {
       "name": "escritorio: expediente de avería abierto (UNVERIFIED, sin registro)",
       "ok": true,
-      "caseTxt": "RS-f56281d04f1c485e · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+      "caseTxt": "RS-091960b1b7f6faa1 · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
@@ -213,7 +240,7 @@
     {
       "name": "escritorio: accidente → escalada con instrucción de llamar (SENDA no llama)",
       "ok": true,
-      "crash": "RS-f56281d04f1c485e · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+      "crash": "RS-091960b1b7f6faa1 · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
     },
     {
       "name": "escritorio: idioma en",
@@ -324,9 +351,36 @@
       "ok": true
     },
     {
+      "name": "escritorio: carretera — 4 canales funden en 1 escena (oficial) + cola aparte",
+      "ok": true,
+      "kbus": [
+        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:cdb645c6 · DATEX2:NAP",
+        "QUEUE_TAILUNVERIFIED_HINT1ZONE_MODEL"
+      ]
+    },
+    {
+      "name": "escritorio: carretera — más autorizaciones ⇒ más familias de fallo; sobrevive a caída móvil",
+      "ok": true,
+      "kreinf1": "Refuerzo: 3 familias de fallo · sobrevive a la caída de la red móvil",
+      "kreinf2": "Refuerzo: 5 familias de fallo · sobrevive a la caída de la red móvil"
+    },
+    {
+      "name": "escritorio: carretera — horizonte con cola y escena por delante y frase de voz",
+      "ok": true,
+      "khor": [
+        "900 m · 36 sQUEUE_TAIL UNVERIFIED_HINT«Atención: final de retención a 900 metros. Precaución.»",
+        "1500 m · 60 sACCIDENT OFFICIAL_FEED«Atención: accidente a 2 kilómetros. Precaución.»"
+      ]
+    },
+    {
+      "name": "escritorio: carretera — tasas reales por 100 M veh-km",
+      "ok": true
+    },
+    {
       "name": "escritorio: sin desbordamiento horizontal",
       "ok": true,
       "overflow": [
+        0,
         0,
         0,
         0,

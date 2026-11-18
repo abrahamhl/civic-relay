@@ -91,6 +91,15 @@ for (const vp of [{ name: 'movil', width: 390, height: 844 }, { name: 'escritori
   check(`${vp.name}: viaje — megafonía escalonada (≤3 avisos, sin órdenes)`, ann.length >= 2 && ann.length <= 3 && ann.every((a) => /Atención/.test(a) && !/[Ff]rena/.test(a)), { ann });
   check(`${vp.name}: viaje — taxi se detiene por delante del averiado`, /AHEAD_OF_DISABLED_ON_SHOULDER/.test(taxi));
   await page.screenshot({ path: resolve(outDir, `roadsafe-viaje-${vp.name}.png`), fullPage: true });
+  await page.click('#tab-k'); await page.click('#k-run'); await page.waitForSelector('#k-bus tbody tr');
+  const kbus = await page.$$eval('#k-bus tbody tr', (rs) => rs.map((r) => r.textContent)), kreinf1 = await page.textContent('#k-reinf');
+  check(`${vp.name}: carretera — 4 canales funden en 1 escena (oficial) + cola aparte`, kbus.length === 2 && kbus.some((t) => /OFFICIAL_FEED/.test(t) && /3/.test(t)), { kbus });
+  await page.check('#k-a-ctr'); await page.check('#k-a-dgt'); const kreinf2 = await page.textContent('#k-reinf');
+  const fams = (t) => +(t.match(/(\d+) familias/) ?? [])[1];
+  check(`${vp.name}: carretera — más autorizaciones ⇒ más familias de fallo; sobrevive a caída móvil`, fams(kreinf2) > fams(kreinf1) && /sobrevive/.test(kreinf2), { kreinf1, kreinf2 });
+  const khor = await page.$$eval('#k-hor li', (l) => l.map((x) => x.textContent));
+  check(`${vp.name}: carretera — horizonte con cola y escena por delante y frase de voz`, khor.length >= 2 && /QUEUE_TAIL/.test(khor[0]) && khor.every((x) => /Atención/.test(x)), { khor });
+  check(`${vp.name}: carretera — tasas reales por 100 M veh-km`, /TM/.test(await page.textContent('#k-exp')));
   const overflow = await page.evaluate(() => [...document.querySelectorAll('[role=tabpanel]')].map((p) => { p.hidden = false; return document.documentElement.scrollWidth - document.documentElement.clientWidth; }));
   check(`${vp.name}: sin desbordamiento horizontal`, overflow.every((x) => x <= 1), { overflow });
   check(`${vp.name}: ninguna petición a dominios externos`, external.length === 0, { external });
