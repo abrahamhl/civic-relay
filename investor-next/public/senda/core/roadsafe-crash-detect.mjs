@@ -14,7 +14,8 @@
  *   evidencias: caída brusca de velocidad del VEHÍCULO (GNSS/OBD) · forma de pulso compatible ·
  *               caída libre previa (en contra) · vehículo detenido después · reanudación de la marcha
  *               (en contra) · sobre una vía conocida (map matching) o lejos de toda vía (en contra) ·
- *               airbag/aviso del coche (si hay contrato) · cambio brusco de orientación
+ *               airbag/aviso del coche (si hay contrato) · cambio brusco de orientación · giro tras el impacto
+ *               (giroscopio; trompo como en el caso real del doc 18)
  *   estados:    NO_EVENT · CHECK_USER (cuenta atrás larga) · LIKELY_CRASH (cuenta atrás corta + expediente)
  *               · ABSTAIN (datos insuficientes: se pregunta al usuario sin afirmar nada)
  *
@@ -23,15 +24,16 @@
  */
 import { G, wilson } from './roadsafe-secondary-risk.mjs';
 
-export const EVIDENCE_KEYS = Object.freeze(['speedDrop', 'pulseShape', 'freeFallBefore', 'stationaryAfter', 'motionResumed', 'onRoad', 'farFromRoad', 'airbagSignal', 'orientationFlip']);
+export const EVIDENCE_KEYS = Object.freeze(['speedDrop', 'pulseShape', 'freeFallBefore', 'stationaryAfter', 'motionResumed', 'onRoad', 'farFromRoad', 'airbagSignal', 'orientationFlip', 'spinAfter']);
 
 /** Configuración de EJEMPLO, SIN CALIBRAR (hipótesis declaradas para verificar el software, no para producción). */
 export const EXAMPLE_DETECTION_CONFIG = Object.freeze({
   basis: 'MODEL_UNCALIBRATED_LR — ejemplo para verificación de software; calibrar con trazas etiquetadas',
   priorOdds: 1 / 2000,
   trigger: { peakG: 4, physicalDecelG: 1.3 },
-  thresholds: { speedDropMs: 4, pulseMinS: 0.03, pulseMaxS: 0.3, freeFallG: 0.3, freeFallS: 0.15, stationaryAfterS: 10, stationaryMs: 1, resumeWithinS: 30, resumeMs: 6, onRoadM: 25, farFromRoadM: 150, flipDeg: 45 },
-  lr: { speedDrop: 40, pulseShape: 3, freeFallBefore: 0.05, stationaryAfter: 4, motionResumed: 0.05, onRoad: 2, farFromRoad: 0.02, airbagSignal: 500, orientationFlip: 2.5 },
+  thresholds: { speedDropMs: 4, pulseMinS: 0.03, pulseMaxS: 0.3, freeFallG: 0.3, freeFallS: 0.15, stationaryAfterS: 10, stationaryMs: 1, resumeWithinS: 30, resumeMs: 6, onRoadM: 25, farFromRoadM: 150, flipDeg: 45, spinDeg: 90, spinWindowS: 3 },
+  // spinAfter (giro tras el impacto, caso real del doc 18): razón de verosimilitud SIN DECLARAR hasta calibrarla.
+  lr: { speedDrop: 40, pulseShape: 3, freeFallBefore: 0.05, stationaryAfter: 4, motionResumed: 0.05, onRoad: 2, farFromRoad: 0.02, airbagSignal: 500, orientationFlip: 2.5, spinAfter: null },
   decision: { checkUserPosterior: 0.05, likelyCrashPosterior: 0.6, minEvidence: 2 },
   countdownS: { CHECK_USER: 30, LIKELY_CRASH: 15 },
 });
@@ -77,6 +79,13 @@ export function detectCrashEvent(trace, config) {
   if (Number.isFinite(trace.distanceToRoadM)) { ev.onRoad = trace.distanceToRoadM <= T.onRoadM; ev.farFromRoad = trace.distanceToRoadM >= T.farFromRoadM; }
   else why.push('sin map matching: no se sabe si estaba en una vía');
   if (trace.airbag === true || trace.airbag === false) ev.airbagSignal = trace.airbag;
+  // Giro tras el impacto (trompo): ángulo total girado = ∫‖ω‖dt en [pico, pico + spinWindowS] con el giroscopio
+  // (°/s). La norma no depende de cómo esté colocado el móvil; es una cota superior del giro en guiñada.
+  const gyro = (trace.gyro ?? []).filter((w) => w.t >= tPeak && w.t <= tPeak + T.spinWindowS).sort((a, b) => a.t - b.t);
+  if (gyro.length >= 2 && Number.isFinite(T.spinDeg) && Number.isFinite(T.spinWindowS)) {
+    let deg = 0; for (let i = 1; i < gyro.length; i++) deg += Math.hypot(gyro[i].x, gyro[i].y, gyro[i].z) * (gyro[i].t - gyro[i - 1].t);
+    ev.spinAfter = deg >= T.spinDeg;
+  }
   // ---- posterior (Bayes con razones de verosimilitud declaradas; solo evidencias presentes cuentan)
   let odds = C.priorOdds; const used = [];
   for (const [k, v] of Object.entries(ev)) {

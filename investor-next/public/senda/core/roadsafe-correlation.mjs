@@ -38,6 +38,10 @@ export const ROAD_SOURCES = Object.freeze({
   BLE_PEER_SIGNED: { label: 'Cápsula BLE firmada por dispositivo inscrito', derivedFrom: null, lrPresent: 4, kind: 'PEER_SIGNED' },
   PROVIDER_STATUS: { label: 'Estado comunicado por proveedor de asistencia', derivedFrom: null, lrPresent: 15, kind: 'PROVIDER' },
   ECALL_PSAP: { label: 'eCall recibido por el 112 (solo si el 112 lo comparte)', derivedFrom: null, lrPresent: 50, kind: 'OFFICIAL' },
+  // Cámaras (vehicle-camera-link.mjs). Fiabilidad SIN CALIBRAR (null): cuentan como avistamiento independiente
+  // por dispositivo o cámara, pero NO mueven la probabilidad hasta calibrarlas con casos etiquetados.
+  VEHICLE_CAMERA_AI: { label: 'Detección automática en cámara de un vehículo (dashcam, TeslaCam, móvil)', derivedFrom: null, lrPresent: null, kind: 'CAMERA_VEHICLE', note: 'Detector + heurística sin validar; una raíz por vehículo.' },
+  PUBLIC_CAMERA_AI: { label: 'Detección automática en cámara pública de tráfico (DGT, Euskadi, Cataluña…)', derivedFrom: null, lrPresent: null, kind: 'CAMERA_PUBLIC', note: 'Imagen periódica; una raíz por cámara.' },
 });
 
 /** Raíz causal de una observación: sigue `derivedFrom` hasta el origen; `rootHint` (p. ej. id de la baliza) separa dispositivos. */
@@ -48,7 +52,7 @@ export function causalRoot(obs) {
   // La declaración del propio afectado y la V16 que él mismo activó son la MISMA fuente humana.
   if (s === 'SENDA_OWNER_DECLARATION' && device) return `V16_BEACON:${device}`;
   // Para fuentes de multitud/pares, cada informante es una raíz distinta (si no hay identidad, cada obs).
-  if (['SENDA_CITIZEN_REPORT', 'BLE_PEER_FRAME', 'BLE_PEER_SIGNED'].includes(s)) return `${s}:${obs.reporterId ?? obs.obsId}`;
+  if (['SENDA_CITIZEN_REPORT', 'BLE_PEER_FRAME', 'BLE_PEER_SIGNED', 'VEHICLE_CAMERA_AI'].includes(s)) return `${s}:${obs.reporterId ?? obs.obsId}`;
   return device ? `${s}:${device}` : s;
 }
 
@@ -99,17 +103,19 @@ export function fuseRoadEvidence(observations, { now, prior = 0.2, hlS = 900, mi
   let L = logit(prior), pos = 0, neg = 0;
   const contributions = [];
   for (const [root, o] of byRoot) {
-    const lr = ROAD_SOURCES[o.source].lrPresent, w = 2 ** (-(now - o.at) / hlS), dl = (o.present === false ? -1 : 1) * w * Math.log(lr);
+    const lr = ROAD_SOURCES[o.source].lrPresent, w = 2 ** (-(now - o.at) / hlS), calibrated = Number.isFinite(lr) && lr > 0;
+    const dl = calibrated ? (o.present === false ? -1 : 1) * w * Math.log(lr) : 0; // sin calibrar: no mueve la probabilidad
     L += dl; if (dl > 0) pos += dl; else neg += -dl;
-    contributions.push({ root, source: o.source, present: o.present !== false, weight: +w.toFixed(3), dLogOdds: +dl.toFixed(3) });
+    contributions.push({ root, source: o.source, present: o.present !== false, weight: +w.toFixed(3), dLogOdds: +dl.toFixed(3), ...(calibrated ? {} : { uncalibrated: true }) });
   }
   const p = sigmoid(L), contradiction = pos + neg > 0 ? Math.min(pos, neg) / Math.max(pos, neg) : 0;
   const officialRoots = [...byRoot.values()].filter((o) => ['OFFICIAL', 'OFFICIAL_RELAY'].includes(ROAD_SOURCES[o.source].kind) && o.present !== false).length;
-  const independentRoots = byRoot.size;
+  const independentRoots = byRoot.size, uncalibratedRoots = contributions.filter((c) => c.uncalibrated).length;
   let status;
   if (contradiction >= contradictionAbstain) status = 'DISPUTED';
-  else if (p >= 0.9 && (independentRoots >= minIndependentRoots || officialRoots >= 1)) status = 'CORROBORATED';
+  // Solo las raíces CALIBRADAS cuentan para corroborar: una detección sin calibrar no infla la confianza.
+  else if (p >= 0.9 && (independentRoots - uncalibratedRoots >= minIndependentRoots || officialRoots >= 1)) status = 'CORROBORATED';
   else if (p <= 0.1) status = 'LIKELY_CLEARED';
   else status = 'UNVERIFIED';
-  return { status, p: +p.toFixed(4), independentRoots, officialRoots, contradiction: +contradiction.toFixed(3), contributions, leakedOrUnknown: leaked, method: naive ? 'NAIVE_BAYES_BASELINE' : 'CAUSAL_ROOT_DEDUP' };
+  return { status, p: +p.toFixed(4), independentRoots, uncalibratedRoots, officialRoots, contradiction: +contradiction.toFixed(3), contributions, leakedOrUnknown: leaked, method: naive ? 'NAIVE_BAYES_BASELINE' : 'CAUSAL_ROOT_DEDUP' };
 }

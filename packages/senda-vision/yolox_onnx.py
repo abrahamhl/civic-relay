@@ -8,6 +8,8 @@ import numpy as np
 import onnxruntime as ort
 
 VEHICLES = {2: "coche", 3: "moto", 5: "autobús", 7: "camión"}
+# Persona en la CALZADA (peligro vial). Solo se cuenta su presencia en la vía: nunca se identifica.
+PERSON = {0: "persona"}
 
 
 class YoloxOnnx:
@@ -21,7 +23,8 @@ class YoloxOnnx:
             grids.append(np.stack((xv, yv), 2).reshape(-1, 2)); strides.append(np.full((n * n, 1), st))
         self.grid, self.stride = np.concatenate(grids).astype(np.float32), np.concatenate(strides).astype(np.float32)
 
-    def __call__(self, bgr, conf=0.35, nms=0.45):
+    def __call__(self, bgr, conf=0.35, nms=0.45, classes=None):
+        classes = VEHICLES if classes is None else classes
         h, w = bgr.shape[:2]; r = min(self.size / h, self.size / w)
         import cv2
         pad = np.full((self.size, self.size, 3), 114, np.uint8)
@@ -29,7 +32,7 @@ class YoloxOnnx:
         out = self.s.run(None, {self.inp: pad.transpose(2, 0, 1)[None].astype(np.float32)})[0][0]
         xy = (out[:, :2] + self.grid) * self.stride; wh = np.exp(out[:, 2:4]) * self.stride
         cls = out[:, 5:]; ids = cls.argmax(1); score = out[:, 4] * cls[np.arange(len(cls)), ids]
-        keep = (score >= conf) & np.isin(ids, list(VEHICLES))
+        keep = (score >= conf) & np.isin(ids, list(classes))
         if not keep.any(): return np.zeros((0, 4), np.float32), np.zeros(0, np.float32), np.zeros(0, int)
         xy, wh, score, ids = xy[keep], wh[keep], score[keep], ids[keep]
         boxes = np.concatenate([xy - wh / 2, xy + wh / 2], 1) / r

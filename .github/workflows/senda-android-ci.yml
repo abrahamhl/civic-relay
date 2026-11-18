@@ -51,6 +51,9 @@ jobs:
           mkdir -p "$RUNNER_TEMP/dex" && unzip -q -o "$APK" 'classes*.dex' -d "$RUNNER_TEMP/dex"
           if grep -a -l "com/google/android/gms" "$RUNNER_TEMP"/dex/classes*.dex; then echo "la versión base no debe contener Google Play Services"; exit 1; fi
           "$AAPT2" dump permissions apps/senda-android/app/build/outputs/apk/play/debug/app-play-debug.apk | grep -q ACTIVITY_RECOGNITION
+          # Android Auto (Car App Library) solo en play; la base no debe declararlo
+          "$AAPT2" dump xmltree --file AndroidManifest.xml apps/senda-android/app/build/outputs/apk/play/debug/app-play-debug.apk | grep -q "androidx.car.app.CarAppService"
+          if "$AAPT2" dump xmltree --file AndroidManifest.xml "$APK" | grep -q "androidx.car.app.CarAppService"; then echo "la base no debe declarar Android Auto"; exit 1; fi
       - name: La app web va dentro del APK
         run: |
           L=$(unzip -l apps/senda-android/app/build/outputs/apk/base/debug/app-base-debug.apk)

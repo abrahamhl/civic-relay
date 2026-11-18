@@ -26,6 +26,8 @@ android {
 // Versión play: Google Play Services Location, solo para la detección «en vehículo».
 dependencies {
     "playImplementation"("com.google.android.gms:play-services-location:21.3.0")
+    // Android Auto / Google integrado: Car App Library (versión estable comprobada en el repositorio Maven de Google).
+    "playImplementation"("androidx.car.app:app:1.7.0")
 }
 
 // La app web (investor-next/public/senda) se copia dentro del APK en cada compilación: una sola fuente
