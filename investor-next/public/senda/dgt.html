@@ -57,14 +57,14 @@
 import { $, C, canvas, text, rr, run, clamp, FILM, LANG, tr, drawCar, drawRoad, carColor } from '/senda/kit.mjs';
 import { DGT_INFRA, speedZoneAdvice, sectionAverage, detectorQueue, vmsToHazard } from '/senda/core/dgt-infra.mjs';
 import { parseMeasured, parseVms, SAMPLE_MEASURED, SAMPLE_VMS } from '/senda/core/datex2.mjs';
-import { queueWarning } from '/senda/core/drive-cases.mjs';
+import { queueWarning, EXAMPLE_QUEUE } from '/senda/core/drive-cases.mjs';
 const S = {}; window.SENDA_DGT = S;
 const CH = { PASIVO: 'ok', CONVENIO: 'todo', NUNCA: 'no' };
 $('#t-tb').innerHTML = DGT_INFRA.map((d) => `<tr><td><b>${d.name}</b></td><td class="m">${d.emits}</td><td>${d.gateway ? '✅ canal oficial' : '❌'}</td><td>${d.senda}</td><td><span class="chip ${CH[d.access]}">${d.access}</span></td><td class="m">${d.legal}</td></tr>`).join('');
 S.gateways = DGT_INFRA.filter((d) => d.gateway).map((d) => d.id);
 
 // ---- aforos
-const sites = parseMeasured(SAMPLE_MEASURED).map((x, i) => ({ ...x, s: i * 1000 })); S.queue = detectorQueue(sites);
+const sites = parseMeasured(SAMPLE_MEASURED).map((x, i) => ({ ...x, s: i * 1000 })); S.queue = detectorQueue(sites, EXAMPLE_QUEUE); // umbral de cola DECLARADO de ejemplo, sin fuente verificada
 $('#d-tail').textContent = `${S.queue.sTail / 1000} km`; $('#d-w').textContent = `${String(Math.abs(S.queue.wKmh)).replace('.', ',')} km/h`;
 $('#d-tb').innerHTML = sites.map((x) => `<tr><td>${x.id}</td><td>${x.flowVehH} veh/h</td><td>${x.speedKmh < 30 ? '🔴' : '🟢'} ${x.speedKmh} km/h</td></tr>`).join('');
 const gd = canvas($('#cv-d'));

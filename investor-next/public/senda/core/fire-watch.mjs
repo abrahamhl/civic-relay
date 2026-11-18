@@ -256,9 +256,9 @@ export function roadThreats(roads, per, opts, { cutMin = 30, warnMin = 180, step
 export function fireRoadAlerts(threats, { t = 0, idBase = 0xF1A0 } = {}) {
   return threats.filter((r) => r.action !== 'vigilar' && r.at).map((r, i) => ({ road: r.name, action: r.action, frame: encodeHazard({ type: HAZARD.FIRE, t, lat: r.at.lat, lon: r.at.lon, flags: r.action === 'cortar' ? 1 : 0, id: idBase + i }) }));
 }
-/** Humo en la vía: con la visibilidad estimada por la cámara (Koschmieder), la velocidad a la que se puede parar. */
-export function smokeRoadAdvice(visM, { surface = 'seco' } = {}) {
-  const v = safeSpeedForVisibility(visM, surface === 'seco' ? {} : { mu: 0.4 });
+/** Humo en la vía: con la visibilidad estimada por la cámara (Koschmieder), la velocidad a la que se puede parar. DECLARADOS: { mu, reactS, marginM }. */
+export function smokeRoadAdvice(visM, driving) {
+  const v = safeSpeedForVisibility(visM, driving);
   return { visM, kmh: v.kmh, text: visM < 50 ? `Humo denso: visibilidad ${Math.round(visM)} m. Sal de la zona si puedes; si no, ${v.kmh} km/h como máximo, con luces de cruce y antiniebla` : `Humo: visibilidad ${Math.round(visM)} m. No pases de ${v.kmh} km/h` };
 }
 /** Un coche ardiendo junto a vegetación seca con 30-30-30 es un posible inicio de incendio: aviso inmediato al 112 (como en la M-501, 23-07-2026). */

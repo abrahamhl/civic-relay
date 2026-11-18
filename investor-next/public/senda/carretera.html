@@ -174,9 +174,11 @@
 </main>
 <script type="module">
 import { $, C, canvas, text, rr, run, clamp, ease, FILM, LANG, tr, drawCar, drawRoad, drawImpact, drawPerson, carColor } from '/senda/kit.mjs';
-import { brakeChain, alertGain, roadScenario, contactProbability, demoRoad, pointAt, roadLocate, roadDeadReckon, describePosition, landmarksAlong, roadSosText, call112Script, createScene, sceneAct, sceneBrief, civicLedger, verifyLedger, CIVIC_RULES, PAS, corridorTiles, ROUTE_MAD_VLC, navLinks, REPORT_KINDS, encodeHazard, reportBelief, toCifs, detectHardBrake, brakeAdvice } from '/senda/core/road-guard.mjs';
+import { brakeChain, alertGain, roadScenario, contactProbability, demoRoad, pointAt, roadLocate, roadDeadReckon, describePosition, landmarksAlong, roadSosText, call112Script, createScene, sceneAct, sceneBrief, civicLedger, verifyLedger, CIVIC_RULES, PAS, corridorTiles, ROUTE_MAD_VLC, navLinks, REPORT_KINDS, encodeHazard, reportBelief, toCifs, detectHardBrake, brakeAdvice, EXAMPLE_BRAKE, EXAMPLE_BRAKE_ADVICE, EXAMPLE_ALERT, EXAMPLE_BRAKE_CHAIN, EXAMPLE_RADIO, EXAMPLE_ROAD_SCENARIO, EXAMPLE_LANDMARKS, EXAMPLE_CORRIDOR, EXAMPLE_BELIEF, EXAMPLE_CIVIC_CAP } from '/senda/core/road-guard.mjs';
 import { INTEGRATIONS, ACCESS } from '/senda/core/platforms.mjs';
-import { DRIVE_CASES, MU, stoppingDistance, safeSpeedForVisibility, floodedRoad, v16Fusion, shockwaveKmh, wrongWayMeet } from '/senda/core/drive-cases.mjs';
+import { DRIVE_CASES, EXAMPLE_MU, EXAMPLE_DRIVER, EXAMPLE_WRONG_WAY, EXAMPLE_V16_FUSION, stoppingDistance, safeSpeedForVisibility, floodedRoad, v16Fusion, shockwaveKmh, wrongWayMeet } from '/senda/core/drive-cases.mjs';
+// Regla de veracidad: los módulos no traen valores por defecto sin fuente. Esta demo DECLARA escenarios de ejemplo (EXAMPLE_*), sin fuente verificada salvo AASHTO 3,4 m/s².
+const DRIVE = (mu) => ({ ...EXAMPLE_DRIVER, mu });
 import { startTriage } from '/senda/core/triage.mjs';
 const fmt = (x, d = 0) => (LANG === 'en' ? x.toFixed(d) : x.toFixed(d).replace('.', ','));
 const S = { gapS: 1.2, share: 1, sShare: 0.1, flow: 300, buffer: 2 }; window.SENDA_CARRETERA = S;
@@ -245,7 +247,7 @@ function trSceneLog(s) {
 // ---------- 1) Columna de coches
 const mask = (p) => Array.from({ length: 6 }, (_, i) => p > 0 && (i === 0 || ((i * 37) % 100) / 100 < p));
 function chain() {
-  S.no = brakeChain({ gapS: S.gapS, traceEvery: 0.05 }); S.si = brakeChain({ gapS: S.gapS, senda: mask(S.share), traceEvery: 0.05 });
+  S.no = brakeChain({ ...EXAMPLE_BRAKE_CHAIN, gapS: S.gapS, traceEvery: 0.05 }); S.si = brakeChain({ ...EXAMPLE_BRAKE_CHAIN, gapS: S.gapS, senda: mask(S.share), traceEvery: 0.05 });
   $('#c-no').textContent = S.no.collisions; $('#c-si').textContent = S.si.collisions; $('#c-cl').textContent = `${fmt(S.no.clearanceM)} m`;
   const g5 = S.no.cars[5].brakeAtS - S.si.cars[5].brakeAtS; $('#c-gain').textContent = `${fmt(g5, 1)} s · ${Math.round(g5 * 33.3)} m`;
   $('#c-tb').innerHTML = S.si.cars.map((c, i) => `<tr><td>${i ? i + 1 + 'º' : '1º (frena)'}${c.senda ? ' 📡' : ''}</td><td>${fmt(c.brakeAtS, 2)} s <span class="m">(sin: ${fmt(S.no.cars[i].brakeAtS, 2)})</span></td><td>${c.via}</td><td>${c.collided ? `💥 ${c.impactKmh} km/h` : '✅ para'} <span class="m">(sin: ${S.no.cars[i].collided ? `💥 ${S.no.cars[i].impactKmh}` : '✅'})</span></td></tr>`).join('');
@@ -296,8 +298,8 @@ function drawCad(t) {
 
 // ---------- 2) SOS sin cobertura
 function sos() {
-  S.road = roadScenario({ share: S.sShare, flowVehH: S.flow });
-  const r = S.road, cp = contactProbability({ rangeM: 60, relSpeedMs: 2 * 80 / 3.6 });
+  S.road = roadScenario({ ...EXAMPLE_ROAD_SCENARIO, share: S.sShare, flowVehH: S.flow });
+  const r = S.road, cp = contactProbability({ ...EXAMPLE_RADIO, rangeM: 60, relSpeedMs: 2 * 80 / 3.6 });
   $('#s-sos').textContent = r.sosDeliveredMin == null ? 'no sale' : `${fmt(r.sosDeliveredMin, 1)} min`;
   $('#s-w').textContent = r.approachingSenda ? `${r.warnedBeyondSight} de ${r.approachingSenda}` : '—';
   $('#s-m').textContent = r.medianWarnM == null ? '—' : r.medianWarnM >= 1000 ? `${fmt(r.medianWarnM / 1000, 1)} km` : `${r.medianWarnM} m`;
@@ -346,7 +348,7 @@ function drawSos(t) {
 const D = demoRoad(), gk = canvas($('#cv-pk')), ll = D.road.points, lats = ll.map((p) => p.lat), lons = ll.map((p) => p.lon);
 const box = { a: Math.min(...lats), b: Math.max(...lats), c: Math.min(...lons), d: Math.max(...lons) }, kx = Math.cos((40.98 * Math.PI) / 180);
 const sc = Math.min(560 / ((box.d - box.c) * kx), 360 / (box.b - box.a)), K = (p) => ({ x: 40 + (p.lon - box.c) * kx * sc + (560 - (box.d - box.c) * kx * sc) / 2, y: 410 - (p.lat - box.a) * sc });
-const TUNNEL = [9000, 10600], LMK = landmarksAlong(D.road, D.landmarks);
+const TUNNEL = [9000, 10600], LMK = landmarksAlong(D.road, D.landmarks, EXAMPLE_LANDMARKS);
 function drawPk(t) {
   const g = gk, P = 22, lt = t % P, s = clamp(lt / 20) * (D.lengthM - 200) + 100, inT = s > TUNNEL[0] && s < TUNNEL[1];
   g.fillStyle = '#0b1310'; g.fillRect(0, 0, 640, 600);
@@ -358,7 +360,7 @@ function drawPk(t) {
   let fix, label;
   if (inT) { const dr = roadDeadReckon(D.road, { s: TUNNEL[0], dir: 1, speedMs: 22, t: 0 }, (s - TUNNEL[0]) / 22); fix = { ...dr, headingDeg: 40 }; label = tr('sin GPS: posición por estima a lo largo de la vía', 'no GPS: dead-reckoning along the road'); }
   else { fix = { ...pointAt(D.road, s), headingDeg: 40 }; label = tr('GPS sin Internet (funciona igual)', 'GPS without Internet (works offline)'); }
-  const pos = describePosition({ lat: fix.lat, lon: fix.lon, headingDeg: 40 }, D.road, D.landmarks), q = K(fix);
+  const pos = describePosition({ lat: fix.lat, lon: fix.lon, headingDeg: 40 }, D.road, D.landmarks, EXAMPLE_LANDMARKS), q = K(fix);
   g.fillStyle = inT ? C.a : C.c; g.beginPath(); g.arc(q.x, q.y, 8, 0, 7); g.fill(); if (inT) { g.strokeStyle = C.a; g.setLineDash([3, 3]); g.beginPath(); g.arc(q.x, q.y, 16, 0, 7); g.stroke(); g.setLineDash([]); }
   S.pk = pos; if (lt > 0) $('#k-sms').textContent = roadSosText({ where: pos.text.replace(/ \(hacia.*\)/, ''), lat: fix.lat, lon: fix.lon, vehicles: 2, people: 3, trapped: 1, hhmm: '23:41' });
   g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 456, 600, 128, 12); g.fill(); g.strokeStyle = C.l; g.stroke();
@@ -375,7 +377,7 @@ const SCRIPT = [[15, 'Luis', 'JOIN'], [20, 'Marta', 'JOIN'], [30, 'Ana', 'ASSIGN
   [120, 'Marta', 'TRIAGE', { victim: 'V1', result: startTriage({ walks: false, breathes: true, rr: 34 }) }], [140, 'Ana', 'DONE', { task: 'avisar' }], [150, 'Luis', 'CONFIRM', { task: 'avisar' }], [160, 'Marta', 'TRIAGE', { victim: 'V2', result: startTriage({ walks: false, breathes: true, rr: 18, radialPulse: true, obeys: true }) }], [200, 'Marta', 'TRIAGE', { victim: 'V3', result: startTriage({ walks: true }) }], [230, 'Marta', 'DONE', { task: 'socorrer' }], [240, 'Ana', 'CONFIRM', { task: 'socorrer' }], [900, 'GC', 'HANDOVER', { actor: gcv }]];
 const sceneAt = (T) => { const sc = createScene({ id: 'acc-N000-127', at: 0, where: 'N-000 PK 127,5 sentido creciente', coordinator: ana }); for (const [t, who, action, o = {}] of SCRIPT) if (t <= T) sceneAct(sc, { t, who, action, ...o }); return sc; };
 const FULL = sceneAt(1e9);
-civicLedger(FULL).then(async (L) => { S.ledger = L; S.ledgerOk = await verifyLedger(L.entries); $('#p-tb').innerHTML = L.entries.map((e) => `<tr><td>${e.who}</td><td>${e.why}</td><td><b>${e.points}</b></td><td><code>${e.hash.slice(0, 10)}…</code></td></tr>`).join(''); $('#p-ok').textContent = S.ledgerOk ? `✓ Cadena verificada en este navegador: ${L.entries.length} asientos, ${Object.entries(L.totals).map(([w, p]) => `${w} ${p}`).join(' · ')}.` : 'La cadena no verifica.'; });
+civicLedger(FULL, EXAMPLE_CIVIC_CAP).then(async (L) => { S.ledger = L; S.ledgerOk = await verifyLedger(L.entries); $('#p-tb').innerHTML = L.entries.map((e) => `<tr><td>${e.who}</td><td>${e.why}</td><td><b>${e.points}</b></td><td><code>${e.hash.slice(0, 10)}…</code></td></tr>`).join(''); $('#p-ok').textContent = S.ledgerOk ? `✓ Cadena verificada en este navegador: ${L.entries.length} asientos, ${Object.entries(L.totals).map(([w, p]) => `${w} ${p}`).join(' · ')}.` : 'La cadena no verifica.'; });
 $('#p-rules').innerHTML = CIVIC_RULES.map((r) => `<li>${r}</li>`).join('');
 $('#e-script').innerHTML = `<b>Guion para el 112:</b> «${call112Script({ where: 'la N-000, punto kilométrico 127, sentido creciente', vehicles: 2, people: 3, trapped: 1, counts: { ROJO: 1, AMARILLO: 1, VERDE: 1 } })}»`;
 const ge = canvas($('#cv-esc'));
@@ -429,7 +431,7 @@ function drawEsc(t) {
 
 // ---------- 5) Sensores reales
 const live = { gps: [], peak: 0 };
-function liveState() { const now = live.gps.at(-1)?.t ?? 0, w = live.gps.filter((f) => f.t >= now - 10), d = detectHardBrake(w, { minSpeedMs: 30 / 3.6 }); $('#t-d').textContent = `${fmt(Math.max(0, d.decelMs2), 1)} m/s²`; $('#t-st').textContent = { NONE: 'vigilando', HARD_BRAKE: '⚠️ frenada brusca', IMPACT_LIKE: '💥 posible golpe' }[d.state]; S.live = d; return d; }
+function liveState() { const now = live.gps.at(-1)?.t ?? 0, w = live.gps.filter((f) => f.t >= now - 10), d = detectHardBrake(w, { ...EXAMPLE_BRAKE, minSpeedMs: 30 / 3.6 }); $('#t-d').textContent = `${fmt(Math.max(0, d.decelMs2), 1)} m/s²`; $('#t-st').textContent = { NONE: 'vigilando', HARD_BRAKE: '⚠️ frenada brusca', IMPACT_LIKE: '💥 posible golpe' }[d.state]; S.live = d; return d; }
 $('#t-go').onclick = async () => {
   try { if (typeof DeviceMotionEvent?.requestPermission === 'function') await DeviceMotionEvent.requestPermission(); } catch {}
   addEventListener('devicemotion', (e) => { const a = e.accelerationIncludingGravity; if (!a) return; const g = Math.abs(Math.hypot(a.x ?? 0, a.y ?? 0, a.z ?? 0) - 9.80665) / 9.80665; live.peak = Math.max(live.peak * 0.995, g); $('#t-g').textContent = `${fmt(live.peak, 2)} g`; });
@@ -438,13 +440,13 @@ $('#t-go').onclick = async () => {
   $('#t-msg').textContent = 'Sensores activos. La velocidad aparece cuando el GPS se mueve (en el coche, tren o bici).';
 };
 const say = (s) => { try { const u = new SpeechSynthesisUtterance(s); u.lang = 'es-ES'; u.rate = 1.05; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch {} navigator.vibrate?.([200, 80, 200]); };
-$('#t-say').onclick = () => say(brakeAdvice({ vMs: 33.3, distM: 200 }).say);
+$('#t-say').onclick = () => say(brakeAdvice({ vMs: 33.3, distM: 200, hazardSpeedMs: 0 }, EXAMPLE_BRAKE_ADVICE).say);
 $('#t-brake').onclick = () => { const t0 = Date.now() / 1000; live.gps = Array.from({ length: 9 }, (_, k) => ({ t: t0 + k, speed: Math.max(0, k < 2 ? 33.3 : 33.3 - 7 * (k - 2)) })); $('#t-v').textContent = '120 → 0 km/h'; const d = liveState(); $('#t-msg').textContent = `Serie de prueba (120 km/h, 7 m/s²): el detector dice «${$('#t-st').textContent}» con ${fmt(d.decelMs2, 1)} m/s².`; if (d.state === 'HARD_BRAKE') say('Frenada brusca detectada. Avisando a los de detrás.'); };
 
 // ---------- 6) Waze, Google Maps, DGT y pasillo
 const L = navLinks({ lat: 40.4169, lon: -3.7035 }); $('#w-waze').href = L.waze; $('#w-gm').href = L.google;
 $('#w-tb').innerHTML = ['nav-enlaces', 'dgt-nap', 'dgt30', 'waze-cifs', 'leer-navegadores'].map((id) => INTEGRATIONS.find((i) => i.id === id)).map((i) => `<tr><td>${i.what}${i.note ? `<br><span class="m" style="font-size:12px">${i.note}</span>` : ''}</td><td><span class="chip ${i.access === 'PASIVO' ? 'ok' : i.access === 'CONVENIO' ? 'todo' : 'no'}">${i.access}</span></td></tr>`).join('');
-function corridor() { const c = corridorTiles(ROUTE_MAD_VLC, { bufferKm: S.buffer }); S.corridor = c; $('#w-c').textContent = `${fmt(c.corridorMB, 0)} MB`; $('#w-r').textContent = `${fmt(c.rectMB, 0)} MB`; $('#w-bar').style.width = `${Math.max(1, c.ratio * 100)}%`; }
+function corridor() { const c = corridorTiles(ROUTE_MAD_VLC, { ...EXAMPLE_CORRIDOR, bufferKm: S.buffer }); S.corridor = c; $('#w-c').textContent = `${fmt(c.corridorMB, 0)} MB`; $('#w-r').textContent = `${fmt(c.rectMB, 0)} MB`; $('#w-bar').style.width = `${Math.max(1, c.ratio * 100)}%`; }
 $('#w-b').oninput = (e) => { S.buffer = +e.target.value; $('#w-bv').textContent = e.target.value; corridor(); }; corridor();
 
 // ---------- 7) Avisos de un toque
@@ -454,7 +456,7 @@ $('#r-btns').onclick = (e) => {
   const fr = encodeHazard({ type: R.type, t: now, lat: 40.95, lon: -2.36, headingDeg: 40, speedMs: 0, id: (now * 2654435761) >>> 0 });
   $('#r-hex').textContent = [...fr].map((b) => b.toString(16).padStart(2, '0')).join(' ');
   const votes = [{ atMin: 0, present: true }, { atMin: 3, present: true }];
-  const b = [0, 10, 30, 60].map((m) => [m, reportBelief(votes, m + 3, { hlMin: R.hlMin })]);
+  const b = [0, 10, 30, 60].map((m) => [m, reportBelief(votes, m + 3, { ...EXAMPLE_BELIEF, hlMin: R.hlMin })]);
   $('#r-bel').innerHTML = `<b>${R.label}</b> con dos avisos: ${b.map(([m, x]) => `a los ${m} min ${Math.round(x.p * 100)} % (${x.state.toLowerCase()})`).join(' · ')}.`;
   $('#r-cifs').textContent = JSON.stringify(toCifs({ id: now, kind: k, lat: 40.95, lon: -2.36, roadId: 'N-000', sentido: 'creciente', startIso: new Date(now * 1000).toISOString() }), null, 1);
   S.report = k;
@@ -463,7 +465,7 @@ $('#r-btns').onclick = (e) => {
 
 // ---------- 8) V16 + SENDA
 const V16DEMO = v16Fusion([{ id: 'V16-A', lat: 40.2, lon: -3.3, t: 1000 }, { id: 'V16-B', lat: 40.5, lon: -3.6, t: 1100 }, { id: 'V16-C', lat: 39.9, lon: -2.5, t: 1200 }],
-  [{ id: 'S-1', lat: 40.2005, lon: -3.3004, t: 1040, kind: 'CRASH', injured: 2, trapped: 1, coordinator: 'Ana' }, { id: 'S-2', lat: 39.9003, lon: -2.5002, t: 1250, kind: 'BREAKDOWN' }, { id: 'S-3', lat: 41.0, lon: -3.0, t: 900, kind: 'CRASH', injured: 1 }]);
+  [{ id: 'S-1', lat: 40.2005, lon: -3.3004, t: 1040, kind: 'CRASH', injured: 2, trapped: 1, coordinator: 'Ana' }, { id: 'S-2', lat: 39.9003, lon: -2.5002, t: 1250, kind: 'BREAKDOWN' }, { id: 'S-3', lat: 41.0, lon: -3.0, t: 900, kind: 'CRASH', injured: 1 }], EXAMPLE_V16_FUSION);
 S.v16 = V16DEMO;
 $('#v-tb').innerHTML = [...V16DEMO.incidents.map((i) => `<tr><td>${i.v16}</td><td><b>${{ ACCIDENTE: 'Accidente', AVERIA: 'Avería', VEHICULO_DETENIDO: 'Vehículo detenido (¿qué pasa?)' }[i.kind]}</b>${i.injured ? ` · ${i.injured} heridos` : ''}${i.trapped ? ` · ${i.trapped} atrapado` : ''}${i.coordinator ? ` · coordina ${i.coordinator}` : ''}</td><td>${i.sources.join(' + ')}</td><td>${'🔴'.repeat(i.priority) || '⚪'}</td></tr>`), ...V16DEMO.orphans.map((o) => `<tr><td>${o.report}</td><td><b>Accidente sin baliza</b> · ${o.say}</td><td>SENDA</td><td>🔴</td></tr>`)].join('');
 
@@ -510,7 +512,7 @@ function drawKz(t) {
   const xMe = 270 + laneMe * 100; drawCar(g, xMe, view(yMe), { len: 46, ang: -Math.PI / 2, color: '#91d7e8', lights: true, braking: meAlert && myV(tt) > 80 / 3.6 + 0.1 }); text(g, tr('Tú', 'You'), xMe, view(yMe) + 42, { c: C.i, f: '800 12px Inter,system-ui', al: 'center' });
   const yk = view(yK); if (yk > -50) { drawCar(g, 270, yk, { len: 46, ang: Math.PI / 2, color: '#c94b56', lights: true }); text(g, tr('en sentido contrario', 'wrong-way driver'), 250, yk + 4, { c: C.r, f: '700 12px Inter,system-ui', al: 'right' }); }
   g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 20, 600, 96, 12); g.fill(); g.strokeStyle = tt > alertAt ? C.r : C.l; g.stroke();
-  const m = wrongWayMeet({ distM: gap, vMeMs: myV(tt), vOtherMs: vK });
+  const m = wrongWayMeet({ distM: gap, vMeMs: myV(tt), vOtherMs: vK }, EXAMPLE_WRONG_WAY);
   const topLine = tt < alertAt
     ? tr('Un coche entra por la salida de la autovía…', 'A car enters the motorway via the exit ramp…')
     : tr(`Su móvil: «¡Vas en sentido contrario!» · el tuyo: «${m.say.split(':')[0]}»`, 'Their phone: "Wrong way!" · Yours: "Oncoming wrong-way vehicle"');
@@ -525,8 +527,8 @@ function drawKz(t) {
 // ---------- 11) Calculadoras
 $('#z-tb').innerHTML = DRIVE_CASES.map((c) => `<tr><td><b>${c.name}</b></td><td>${c.signal}</td><td>${c.action}</td><td class="m">${c.source}</td><td><span class="chip ${c.status === 'HECHO' ? 'ok' : c.status === 'PENDIENTE' ? 'todo' : 'sim'}">${c.status}</span></td><td><span class="chip ${c.access === 'PASIVO' ? 'ok' : 'todo'}">${c.access}</span></td></tr>`).join('');
 const calc = () => {
-  const v = +$('#z-v').value, a = safeSpeedForVisibility(v), b = safeSpeedForVisibility(v, { mu: MU.mojado }); $('#z-vv').textContent = v; $('#z-vo').innerHTML = `Para parar dentro de lo que ves: <b>${a.kmh} km/h</b> en seco, <b>${b.kmh} km/h</b> en mojado.`;
-  const sp = +$('#z-s').value, mu = MU[$('#z-mu').value], d = stoppingDistance(sp / 3.6, { mu }); $('#z-sv').textContent = sp; $('#z-so').innerHTML = `Distancia de parada: <b>${d.totalM} m</b> (${d.reactM} reaccionando + ${d.brakeM} frenando).`;
+  const v = +$('#z-v').value, a = safeSpeedForVisibility(v, DRIVE(EXAMPLE_MU.seco)), b = safeSpeedForVisibility(v, DRIVE(EXAMPLE_MU.mojado)); $('#z-vv').textContent = v; $('#z-vo').innerHTML = `Para parar dentro de lo que ves: <b>${a.kmh} km/h</b> en seco, <b>${b.kmh} km/h</b> en mojado. <small>(rozamiento y reacción de ejemplo declarados, sin fuente verificada)</small>`;
+  const sp = +$('#z-s').value, mu = EXAMPLE_MU[$('#z-mu').value], d = stoppingDistance(sp / 3.6, DRIVE(mu)); $('#z-sv').textContent = sp; $('#z-so').innerHTML = `Distancia de parada: <b>${d.totalM} m</b> (${d.reactM} reaccionando + ${d.brakeM} frenando). <small>(μ = ${mu} y reacción ${EXAMPLE_DRIVER.reactS} s: ejemplo declarado, sin fuente verificada)</small>`;
   const dp = +$('#z-d').value, f = floodedRoad({ depthCm: dp }); $('#z-dv').textContent = dp; $('#z-do').innerHTML = `<b>${f.say}</b>`;
   S.calc = { vis: a.kmh, stop: d.totalM, flood: f.level };
 };

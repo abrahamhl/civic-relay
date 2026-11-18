@@ -47,8 +47,9 @@ export function sectionAverage({ travelledM, elapsedS, limitKmh }) {
  * Estaciones de aforo a lo largo de la vía (ordenadas en el sentido de la marcha): dónde empieza la cola
  * y a qué velocidad crece hacia atrás, con los caudales y velocidades de las estaciones a cada lado.
  */
-export function detectorQueue(sites, { slowKmh = 30 } = {}) {
-  const tail = queueTail(sites.map((x) => ({ s: x.s, vKmh: x.speedKmh })), { slowKmh });
+/** DECLARADO: { slowKmh } (umbral de cola; ver EXAMPLE_QUEUE en drive-cases, sin fuente verificada). */
+export function detectorQueue(sites, opts) {
+  const tail = queueTail(sites.map((x) => ({ s: x.s, vKmh: x.speedKmh })), opts);
   if (!tail) return null;
   const down = sites.find((x) => x.s === tail.sTail), up = sites.filter((x) => x.s < tail.sTail).sort((a, b) => b.s - a.s)[0];
   const w = up && down && up.speedKmh > down.speedKmh ? shockwaveKmh({ qUp: up.flowVehH, vUp: up.speedKmh, qDown: down.flowVehH, vDown: down.speedKmh }) : null;

@@ -10,7 +10,7 @@
  *  5. Puerta de Enlace Orquestadora Multisoftware (AutomotiveMultisoftwareGateway)
  */
 
-import { HAZARD, ROAD, encodeHazard, decodeHazard } from './road-guard.mjs';
+import { HAZARD, encodeHazard, decodeHazard } from './road-guard.mjs';
 import { VEHICLE_SOURCES, SRTI, vehicleEventToHazard } from './vehicle-link.mjs';
 
 function finite(val, min = -Infinity, max = Infinity) {
@@ -98,7 +98,9 @@ export function decodeObdPid(pid, dataBytes) {
  * @param {Array<{tSec: number, speedKmh: number, throttlePct?: number, brakeActive?: boolean, baroKpa?: number}>} telemetrySeries
  * @returns {{ isEmergencyBraking: boolean, decelMs2: number, hazardType: number, confidence: number, adviceText: string }}
  */
-export function analyzeObdKinematics(telemetrySeries = []) {
+export function analyzeObdKinematics(telemetrySeries = [], policy) {
+  // Regla de veracidad: el umbral de frenada de emergencia se DECLARA (antes ROAD.hardBrakeMs2 = 4,5, sin fuente).
+  if (!Number.isFinite(policy?.hardBrakeMs2)) throw new Error('analyzeObdKinematics: «hardBrakeMs2» debe declararse');
   if (telemetrySeries.length < 2) {
     return {
       isEmergencyBraking: false,
@@ -117,7 +119,7 @@ export function analyzeObdKinematics(telemetrySeries = []) {
   const v2 = (p2.speedKmh * 1000) / 3600;
 
   const decelMs2 = (v1 - v2) / dt;
-  const isEmergency = decelMs2 >= ROAD.hardBrakeMs2 && (p2.throttlePct ?? 0) <= 5.0;
+  const isEmergency = decelMs2 >= policy.hardBrakeMs2 && (p2.throttlePct ?? 0) <= 5.0;
   const isImpact = decelMs2 >= 12.0;
 
   let hazardType = HAZARD.BRAKE;
@@ -457,6 +459,7 @@ export class AutomotiveMultisoftwareGateway {
       v2xTransceiverReady: true,
     };
     this.lastKinematics = null;
+    this.obdPolicy = options.obdPolicy ?? null; // DECLARADA por quien crea la pasarela: { hardBrakeMs2 }
     this.activeHazards = [];
   }
 
@@ -464,7 +467,7 @@ export class AutomotiveMultisoftwareGateway {
    * Procesa una ráfaga de telemetría OBD-II proveniente de un dongle Bluetooth/Wi-Fi.
    */
   processObdInput(telemetryPoints = []) {
-    const analysis = analyzeObdKinematics(telemetryPoints);
+    const analysis = analyzeObdKinematics(telemetryPoints, this.obdPolicy);
     this.lastKinematics = analysis;
     this.subsystems.obdConnected = true;
 

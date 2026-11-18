@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DGT_INFRA, speedZoneAdvice, sectionAverage, detectorQueue, vmsToHazard } from '../src/dgt-infra.mjs';
+import { EXAMPLE_QUEUE } from '../src/drive-cases.mjs';
 import { parseMeasured, parseVms, SAMPLE_MEASURED, SAMPLE_VMS } from '../src/datex2.mjs';
 
 test('validación: ningún equipo de la DGT en la vía es una pasarela utilizable; detectar radares y publicar controles móviles es NUNCA', () => {
@@ -20,9 +21,9 @@ test('zona de control publicada y radar de tramo: avisa de reducir y nunca propo
 
 test('estaciones de aforo en DATEX II → final de la retención entre la 3 y la 4 y crece hacia atrás', () => {
   const m = parseMeasured(SAMPLE_MEASURED); assert.equal(m.length, 6); assert.deepEqual([m[3].flowVehH, m[3].speedKmh], [1200, 22]);
-  const q = detectorQueue(m.map((x, i) => ({ ...x, s: i * 1000 })));
+  const q = detectorQueue(m.map((x, i) => ({ ...x, s: i * 1000 })), EXAMPLE_QUEUE);
   assert.deepEqual(q.between, ['EST-3', 'EST-4']); assert.equal(q.sTail, 3000); assert.ok(q.growing && q.wKmh < -10);
-  assert.equal(detectorQueue([{ id: 'a', s: 0, flowVehH: 1500, speedKmh: 100 }]), null);
+  assert.equal(detectorQueue([{ id: 'a', s: 0, flowVehH: 1500, speedKmh: 100 }], EXAMPLE_QUEUE), null);
 });
 
 test('paneles: el texto en español o neerlandés se convierte en aviso SENDA', () => {

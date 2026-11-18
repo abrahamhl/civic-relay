@@ -6,6 +6,8 @@ import {
 } from '../src/fire-watch.mjs';
 import { parseFirmsCsv } from '../src/wildfire.mjs';
 import { HAZARD, decodeHazard } from '../src/road-guard.mjs';
+import { EXAMPLE_MU, EXAMPLE_DRIVER } from '../src/drive-cases.mjs';
+const SMOKE_DRY = { ...EXAMPLE_DRIVER, mu: EXAMPLE_MU.seco }; // escenario DECLARADO, sin fuente verificada
 import { localFrame } from '../src/geo-offline.mjs';
 
 const errM = (a, b) => { const q = localFrame(a.lat, a.lon).toXY(b.lat, b.lon); return Math.hypot(q.x, q.y); };
@@ -89,7 +91,7 @@ test('carreteras y coches: corta la M-501 en el tramo del km 57 y avisa con tram
   const [al] = fireRoadAlerts(r.roads, { t: 1000 }), h = decodeHazard(al.frame);
   assert.equal(al.frame.length, 24); assert.equal(h.type, HAZARD.FIRE); assert.equal(h.flags & 1, 1);
   assert.equal(r.towns[0].name, 'Pelayos de la Presa');
-  assert.ok(smokeRoadAdvice(30).kmh < smokeRoadAdvice(150).kmh);
+  assert.ok(smokeRoadAdvice(30, SMOKE_DRY).kmh < smokeRoadAdvice(150, SMOKE_DRY).kmh);
   assert.equal(vehicleFireIgnitionRisk({ weather: r.weather, vegetationM: 10 }).risk, 'alto');
   assert.equal(vehicleFireIgnitionRisk({ weather: fireWeather({ tempC: 20, rh: 60, windKmh: 5 }), vegetationM: 200 }).notify112, false);
   assert.equal(roadThreats([], r.perimeters[1], { rosHeadMMin: 25, spreadToDeg: 90, windKmh: 32 }).length, 0);

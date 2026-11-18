@@ -5,8 +5,9 @@
  * 72 % murió en vías convencionales, las de un carril por sentido, menos tráfico y peor cobertura):
  *
  *  1. FRENADA BRUSCA: la velocidad del GNSS (Doppler) basta; no depende de cómo esté colocado el móvil.
- *     Un coche no frena a más de ~1 g (≈ 10 m/s²): una caída de velocidad más rápida que eso no es una
- *     frenada, es un golpe (o un dato erróneo) y lo confirma el detector de choque.
+ *     Por encima de cierta deceleración (DECLARADA por quien llama; la cifra «~1 g ≈ 10 m/s²» de las demos no
+ *     tiene fuente verificada) una caída de velocidad no es una frenada, es un golpe o un dato erróneo, y lo
+ *     confirma el detector de choque.
  *  2. CHOQUE: el detector de `rail-incident.mjs` con umbrales de coche + cuenta atrás humana.
  *  3. AVISO AL DE DETRÁS: una trama de 24 bytes (cabe en un anuncio Bluetooth LE clásico, sin
  *     Bluetooth 5) con posición, rumbo, velocidad y deceleración. Quien la recibe decide si le afecta
@@ -37,9 +38,26 @@ import { tally } from './triage.mjs';
 const deg = (r) => (r * 180) / Math.PI, rad = (d) => (d * Math.PI) / 180;
 const hdgDiff = (a, b) => Math.abs((((a - b) % 360) + 540) % 360 - 180);
 const fmt1 = (x) => x.toFixed(1).replace('.', ',');
+/*
+ * REGLA DE VERACIDAD (CLAUDE.md): un parámetro sin fuente no lleva valor por defecto. Cada umbral se DECLARA
+ * al llamar (`need` lanza «x» debe declararse). Los EXAMPLE_* son escenarios de ejemplo DECLARADOS para
+ * demostraciones y pruebas, sin fuente verificada salvo donde el comentario cite una.
+ */
+const need = (name, o, keys) => { for (const k of keys) if (!Number.isFinite(o?.[k])) throw new Error(`${name}: «${k}» debe declararse`); };
 
 // ---------------------------------------------------------------- 1) Frenada brusca
-export const ROAD = Object.freeze({ maxBrakeMs2: 10, hardBrakeMs2: 4.5, aashtoMs2: 3.4 });
+/**
+ * AASHTO, «A Policy on Geometric Design of Highways and Streets» (Green Book), modelo de distancia de
+ * visibilidad de parada desde la edición de 2001: deceleración 3,4 m/s² (11,2 ft/s², la superan ~90 % de los
+ * conductores) y tiempo de percepción-reacción 2,5 s, a partir de Fambro et al. (NCHRP Report 400).
+ * Verificado 2026-11-18 en FHWA (Speed Concepts Informational Guide, cap. 4) y TxDOT Roadway Design Manual.
+ * Es una HIPÓTESIS DE DISEÑO de carreteras, no una instrucción de conducción certificada.
+ */
+export const AASHTO_SSD = Object.freeze({ decelMs2: 3.4, perceptionReactionS: 2.5, source: 'AASHTO Green Book (2001→), SSD; verificado vía FHWA y TxDOT 2026-11-18' });
+/** Constante con fuente: solo la deceleración de AASHTO. Los antiguos `maxBrakeMs2` y `hardBrakeMs2` no tenían fuente → EXAMPLE_BRAKE. */
+export const ROAD = Object.freeze({ aashtoMs2: AASHTO_SSD.decelMs2 });
+/** EJEMPLO DECLARADO (fuente no verificada): umbrales de frenada brusca para demos y pruebas. */
+export const EXAMPLE_BRAKE = Object.freeze({ winS: 1.5, hardMs2: 4.5, maxBrakeMs2: 10, impactMs2: 13, minSpeedMs: 50 / 3.6, basis: 'EJEMPLO_DECLARADO · fuente no verificada' });
 
 /**
  * Frenada brusca a partir de la velocidad GNSS. Ajusta una recta por mínimos cuadrados a la velocidad
@@ -47,7 +65,9 @@ export const ROAD = Object.freeze({ maxBrakeMs2: 10, hardBrakeMs2: 4.5, aashtoMs
  * @param {Array<{t:number, speed:number}>} gps  t en s, speed en m/s
  * @returns {{state:'NONE'|'HARD_BRAKE'|'IMPACT_LIKE', at:number|null, speedMs:number|null, decelMs2:number}}
  */
-export function detectHardBrake(gps, { winS = 1.5, hardMs2 = ROAD.hardBrakeMs2, minSpeedMs = 50 / 3.6, impactMs2 = ROAD.maxBrakeMs2 * 1.3 } = {}) {
+export function detectHardBrake(gps, opts) {
+  need('detectHardBrake', opts, ['winS', 'hardMs2', 'minSpeedMs', 'impactMs2']);
+  const { winS, hardMs2, minSpeedMs, impactMs2 } = opts;
   let best = { state: 'NONE', at: null, speedMs: null, decelMs2: 0 };
   for (let i = 1; i < gps.length; i++) {
     const w = gps.filter((f) => f.t <= gps[i].t && f.t >= gps[i].t - winS);
@@ -61,9 +81,10 @@ export function detectHardBrake(gps, { winS = 1.5, hardMs2 = ROAD.hardBrakeMs2, 
 }
 
 // ---------------------------------------------------------------- 2) Choque de coche
-/** Umbrales de coche (pendientes de calibrar con choques reales). Un coche frena hasta ~10 m/s²; un choque, mucho más. */
-export const CAR_CRASH = Object.freeze({ impactG: 4, speedContextMs: 25 / 3.6, stopMs: 2, crashDecelMs2: 12, tiltDeg: 45 });
-export const detectCarCrash = (input, opts = {}) => detectCrash(input, { ...CAR_CRASH, ...opts });
+/** EJEMPLO DECLARADO de umbrales de choque de coche: pendientes de calibrar con choques reales, fuente no verificada. */
+export const EXAMPLE_CAR_CRASH = Object.freeze({ impactG: 4, speedContextMs: 25 / 3.6, stopMs: 2, crashDecelMs2: 12, tiltDeg: 45 });
+/** DECLARADOS: { impactG, speedContextMs, stopMs, crashDecelMs2, tiltDeg }. */
+export const detectCarCrash = (input, opts) => { need('detectCarCrash', opts, ['impactG', 'speedContextMs', 'stopMs', 'crashDecelMs2', 'tiltDeg']); return detectCrash(input, opts); };
 
 // ---------------------------------------------------------------- 3) Trama de aviso entre coches
 export const HAZARD = Object.freeze({ BRAKE: 1, CRASH: 2, STOPPED: 3, OBSTACLE: 4, ANIMAL: 5, FOG: 6, ICE: 7, QUEUE: 8, WORKS: 9, SOS: 10, LANE_CLOSED: 11, WRONG_WAY: 12, BRIDGE_OPEN: 13, FLOOD: 14, FIRE: 15 });
@@ -73,6 +94,10 @@ const ONE_WAY = new Set([HAZARD.BRAKE, HAZARD.CRASH, HAZARD.STOPPED, HAZARD.OBST
 export const HAZARD_BYTES = 24;
 
 /**
+ * Campos ausentes = 0 en la trama (rumbo, velocidad, deceleración, saltos, banderas, id): es la CODIFICACIÓN de
+ * «no informado» en el formato binario de 24 bytes, no un parámetro físico. Quien recibe no debe leer 0 como
+ * dato medido salvo que el tipo de aviso lo exija.
+ *
  * 24 bytes: versión|saltos, tipo, hora (s), lat·1e7, lon·1e7, rumbo·100, velocidad (cm/s), deceleración·10,
  * banderas, identificador. Con la cabecera de banderas (3) y la de fabricante (4) suma 31: un anuncio BLE clásico.
  */
@@ -100,7 +125,12 @@ export function decodeHazard(bytes) {
  * La trama de 24 bytes NO va autenticada: el relé solo propaga una PISTA; la confianza la decide
  * `assessHazardFrame` (roadsafe-frame-trust.mjs) en cada receptor.
  */
-export const relayHazard = (bytes, { maxHops = 3, now = null, maxAgeS = 30, maxFutureS = 2 } = {}) => {
+/** EJEMPLO DECLARADO de política de relé (saltos y ventanas de tiempo): fuente no verificada. */
+export const EXAMPLE_RELAY = Object.freeze({ maxHops: 3, maxAgeS: 30, maxFutureS: 2, basis: 'EJEMPLO_DECLARADO · fuente no verificada' });
+/** DECLARADOS: { maxHops, maxAgeS, maxFutureS }; `now` opcional (null = no se juzga la antigüedad). */
+export const relayHazard = (bytes, opts) => {
+  need('relayHazard', opts, ['maxHops', 'maxAgeS', 'maxFutureS']);
+  const { maxHops, maxAgeS, maxFutureS } = opts, now = opts.now ?? null;
   const h = decodeHazard(bytes);
   if (h.kind === 'UNKNOWN' || h.hops >= maxHops) return null;
   if (now != null && (now - h.t > maxAgeS || h.t - now > maxFutureS)) return null;
@@ -112,13 +142,18 @@ export const relayHazard = (bytes, { maxHops = 3, now = null, maxAgeS = 30, maxF
  * Si ambos traen posición sobre la vía (`s` de `roadLocate`, misma carretera y sentido), se usa la
  * distancia por la carretera, válida también en curvas; si no, geometría en línea recta con alcance corto.
  */
-export function hazardRelevance(me, hz, { now, maxAheadM = 2000, straightMaxM = 600, laneM = 12, areaM = 600, headingTolDeg = 35, maxAgeS = 20, maxFutureS = 2 } = {}) {
+/** EJEMPLO DECLARADO de alcances y ventanas de relevancia: fuente no verificada. */
+export const EXAMPLE_RELEVANCE = Object.freeze({ maxAheadM: 2000, straightMaxM: 600, laneM: 12, areaM: 600, headingTolDeg: 35, maxAgeS: 20, zoneMaxAgeS: 1800, maxFutureS: 2, basis: 'EJEMPLO_DECLARADO · fuente no verificada' });
+/** Política DECLARADA: { maxAheadM, straightMaxM, laneM, areaM, headingTolDeg, maxAgeS, zoneMaxAgeS, maxFutureS }; `now` es la hora del receptor. */
+export function hazardRelevance(me, hz, opts) {
+  need('hazardRelevance', opts, ['maxAheadM', 'straightMaxM', 'laneM', 'areaM', 'headingTolDeg', 'maxAgeS', 'zoneMaxAgeS', 'maxFutureS']);
+  const { now, maxAheadM, straightMaxM, laneM, areaM, headingTolDeg, maxAgeS, zoneMaxAgeS, maxFutureS } = opts;
   // P0-6 (RoadSafe): sin reloj del receptor no se puede juzgar la antigüedad; antes `now` ausente daba edad 0.
   if (!Number.isFinite(now)) return { relevant: false, why: 'sin reloj del receptor: antigüedad desconocida' };
   if (!Number.isFinite(hz.t)) return { relevant: false, why: 'aviso sin hora' };
   const age = now - hz.t;
   if (age < -maxFutureS) return { relevant: false, why: 'aviso con hora futura (reloj incoherente o repetición)' };
-  if (age > (ONE_WAY.has(hz.type) ? maxAgeS : 1800)) return { relevant: false, why: 'aviso caducado' };
+  if (age > (ONE_WAY.has(hz.type) ? maxAgeS : zoneMaxAgeS)) return { relevant: false, why: 'aviso caducado' };
   if (me.roadId && hz.roadId && me.roadId === hz.roadId && me.s != null && hz.s != null && me.dir != null) {
     if (ONE_WAY.has(hz.type) && hz.dir !== me.dir) return { relevant: false, why: 'otro sentido de la misma carretera' };
     const ahead = (hz.s - me.s) * me.dir;
@@ -141,26 +176,38 @@ export function hazardRelevance(me, hz, { now, maxAheadM = 2000, straightMaxM = 
  * Qué decirle al conductor: la deceleración que necesitaría para parar antes del peligro.
  * El peligro puede seguir moviéndose y frenando: se usa su punto de parada (hipótesis prudente).
  *
- * P0-3 (RoadSafe): los umbrales (3,4 m/s² de AASHTO como deceleración «cómoda», 1,5 m/s²) son
- * HIPÓTESIS DE DISEÑO, no una instrucción de conducción certificada. Por eso el texto DESCRIBE el
+ * P0-3 (RoadSafe): los umbrales son HIPÓTESIS DE DISEÑO DECLARADAS por quien llama (`brakeMs2`, p. ej.
+ * AASHTO_SSD.decelMs2 = 3,4 m/s², citado; `attentionMs2`, sin fuente), no una instrucción de conducción certificada. Por eso el texto DESCRIBE el
  * peligro (dónde y qué) y no ordena maniobras; `level` es un código interno de prioridad de
  * presentación. Ningún aviso sustituye a la percepción del conductor ni a un sistema ADAS homologado.
  */
-export function brakeAdvice({ vMs, distM, reactS = 1.5, marginM = 10, hazardSpeedMs = 0, hazardDecelMs2 = 8 }) {
-  if (![vMs, distM, reactS, marginM].every(Number.isFinite) || vMs < 0 || distM < 0) return { aReqMs2: null, level: 'ABSTAIN', say: null, freeM: null, advisoryOnly: true, certified: false, basis: 'ENTRADAS_NO_VALIDAS' };
+export const EXAMPLE_BRAKE_ADVICE = Object.freeze({ reactS: 1.5, marginM: 10, hazardDecelMs2: 8, attentionMs2: 1.5, brakeMs2: AASHTO_SSD.decelMs2, basis: 'EJEMPLO_DECLARADO · reactS, marginM, hazardDecelMs2 y attentionMs2 sin fuente verificada; brakeMs2 = AASHTO (citado)' });
+/**
+ * Observación: { vMs, distM, hazardSpeedMs } (hazardSpeedMs = 0 si el peligro está parado; debe darse).
+ * Política DECLARADA: { reactS, marginM, hazardDecelMs2, attentionMs2, brakeMs2 }.
+ * Política sin declarar → error; observación no válida → ABSTAIN.
+ */
+export function brakeAdvice({ vMs, distM, hazardSpeedMs }, policy) {
+  need('brakeAdvice', policy, ['reactS', 'marginM', 'hazardDecelMs2', 'attentionMs2', 'brakeMs2']);
+  const { reactS, marginM, hazardDecelMs2 } = policy;
+  if (![vMs, distM, hazardSpeedMs].every(Number.isFinite) || vMs < 0 || distM < 0 || hazardSpeedMs < 0) return { aReqMs2: null, level: 'ABSTAIN', say: null, freeM: null, advisoryOnly: true, certified: false, basis: 'ENTRADAS_NO_VALIDAS' };
   const target = distM + (hazardSpeedMs > 0 ? hazardSpeedMs ** 2 / (2 * Math.max(1, hazardDecelMs2)) : 0);
   const free = target - vMs * reactS - marginM, aReq = free <= 0 ? Infinity : vMs ** 2 / (2 * free);
-  const level = aReq >= ROAD.aashtoMs2 ? 'FRENA' : aReq >= 1.5 ? 'ATENCION' : 'INFO';
+  const level = aReq >= policy.brakeMs2 ? 'FRENA' : aReq >= policy.attentionMs2 ? 'ATENCION' : 'INFO';
   const m = Math.max(0, Math.round(distM / 50) * 50);
   const say = level === 'FRENA' ? `Peligro: tráfico detenido a ${m} metros` : level === 'ATENCION' ? `Atención: tráfico frenando a ${m} metros` : 'Aviso: tráfico frenando más adelante';
-  return { aReqMs2: Number.isFinite(aReq) ? +aReq.toFixed(2) : Infinity, level, say, freeM: Math.round(free), advisoryOnly: true, certified: false, basis: 'HIPOTESIS_DISENO_AASHTO_NO_CERTIFICADA' };
+  return { aReqMs2: Number.isFinite(aReq) ? +aReq.toFixed(2) : Infinity, level, say, freeM: Math.round(free), advisoryOnly: true, certified: false, basis: 'HIPOTESIS_DISENO_DECLARADA_NO_CERTIFICADA' };
 }
 
 /**
  * Cuánto antes empieza a frenar quien va N coches por detrás. Con luces de freno, cada conductor
  * reacciona al de delante (la reacción se acumula: N·t). Con SENDA, el aviso llega a todos a la vez.
  */
-export function alertGain({ carsAhead, vMs, reactS = 1.25, alertReactS = 1.5, latencyS = 0.3, hops = 1 }) {
+export const EXAMPLE_ALERT = Object.freeze({ reactS: 1.25, alertReactS: 1.5, latencyS: 0.3, hops: 1, basis: 'EJEMPLO_DECLARADO · tiempos de reacción y latencia sin fuente verificada' });
+/** DECLARADOS: { reactS, alertReactS, latencyS, hops }. */
+export function alertGain({ carsAhead, vMs }, opts) {
+  need('alertGain', opts, ['reactS', 'alertReactS', 'latencyS', 'hops']);
+  const { reactS, alertReactS, latencyS, hops } = opts;
   const lightsS = carsAhead * reactS, sendaS = hops * latencyS + alertReactS, gainS = Math.max(0, lightsS - sendaS);
   return { lightsS: +lightsS.toFixed(2), sendaS: +sendaS.toFixed(2), gainS: +gainS.toFixed(2), gainM: Math.round(gainS * vMs) };
 }
@@ -170,7 +217,11 @@ export function alertGain({ carsAhead, vMs, reactS = 1.25, alertReactS = 1.5, la
  * `senda[i]` = el coche i lleva SENDA. El aviso del primero llega, salto a salto, por los coches con
  * SENDA que estén a menos de `rangeM`. Devuelve quién empieza a frenar cuándo y quién choca y a qué velocidad.
  */
-export function brakeChain({ n = 6, v0 = 120 / 3.6, gapS = 1.5, carLenM = 4.5, decel = 8, leaderDecel = 9, reactS = 1.25, alertReactS = 1.5, latencyS = 0.3, senda = [], rangeM = 150, dt = 0.005, horizonS = 20, traceEvery = 0 } = {}) {
+export const EXAMPLE_BRAKE_CHAIN = Object.freeze({ n: 6, v0: 120 / 3.6, gapS: 1.5, carLenM: 4.5, decel: 8, leaderDecel: 9, reactS: 1.25, alertReactS: 1.5, latencyS: 0.3, rangeM: 150, dt: 0.005, horizonS: 20, basis: 'EJEMPLO_DECLARADO · escenario de simulación sin fuente verificada' });
+/** DECLARADOS: { n, v0, gapS, carLenM, decel, leaderDecel, reactS, alertReactS, latencyS, rangeM, dt, horizonS }; `senda` (lista) y `traceEvery` (null = sin traza) son opcionales. */
+export function brakeChain(opts) {
+  need('brakeChain', opts, ['n', 'v0', 'gapS', 'carLenM', 'decel', 'leaderDecel', 'reactS', 'alertReactS', 'latencyS', 'rangeM', 'dt', 'horizonS']);
+  const { n, v0, gapS, carLenM, decel, leaderDecel, reactS, alertReactS, latencyS, rangeM, dt, horizonS } = opts, senda = opts.senda ?? [], traceEvery = opts.traceEvery ?? null;
   const x = Array.from({ length: n }, (_, i) => -i * v0 * gapS), v = Array(n).fill(v0);
   // saltos de radio desde el primero, solo por coches con SENDA (búsqueda en anchura sobre posiciones iniciales)
   const hop = Array(n).fill(Infinity);
@@ -196,7 +247,11 @@ export function brakeChain({ n = 6, v0 = 120 / 3.6, gapS = 1.5, carLenM = 4.5, d
 
 // ---------------------------------------------------------------- 4) SOS sin cobertura: los coches que pasan
 /** Probabilidad de que dos móviles se oigan al cruzarse: ventana = 2·alcance / velocidad relativa. */
-export function contactProbability({ rangeM = 60, relSpeedMs, advIntervalS = 0.1, pRx = 0.2 }) {
+export const EXAMPLE_RADIO = Object.freeze({ rangeM: 60, advIntervalS: 0.1, pRx: 0.2, basis: 'EJEMPLO_DECLARADO · alcance, intervalo de anuncio y probabilidad de recepción BLE sin medir' });
+/** DECLARADOS: { rangeM, advIntervalS, pRx } y la observación relSpeedMs. */
+export function contactProbability({ relSpeedMs, ...opts }) {
+  need('contactProbability', opts, ['rangeM', 'advIntervalS', 'pRx']);
+  const { rangeM, advIntervalS, pRx } = opts;
   const windowS = (2 * rangeM) / Math.max(1, relSpeedMs), tries = windowS / advIntervalS;
   return { windowS: +windowS.toFixed(2), p: +(1 - (1 - pRx) ** tries).toFixed(4) };
 }
@@ -204,7 +259,10 @@ export function contactProbability({ rangeM = 60, relSpeedMs, advIntervalS = 0.1
  * Coches con SENDA que pasan junto al accidentado: llegada de Poisson con tasa λ = flujo · cuota · P(contacto).
  * El SOS sale cuando uno de ellos alcanza la cobertura (`travelMin`).
  */
-export function muleDelivery({ flowVehH, share, pContact = 0.95, travelMin, withinMin = 15 }) {
+/** DECLARADOS: { flowVehH, share, pContact, travelMin, withinMin } (ninguno tiene fuente propia en este módulo). */
+export function muleDelivery(opts) {
+  need('muleDelivery', opts, ['flowVehH', 'share', 'pContact', 'travelMin', 'withinMin']);
+  const { flowVehH, share, pContact, travelMin, withinMin } = opts;
   const lam = flowVehH * share * pContact; if (lam <= 0) return { ratePerH: 0, meanMin: Infinity, pWithin: 0 };
   const meanWaitMin = 60 / lam, pWithin = withinMin > travelMin ? 1 - Math.exp((-lam * (withinMin - travelMin)) / 60) : 0;
   return { ratePerH: +lam.toFixed(2), meanWaitMin: +meanWaitMin.toFixed(1), meanMin: +(meanWaitMin + travelMin).toFixed(1), pWithin: +pWithin.toFixed(3) };
@@ -218,7 +276,12 @@ const rng = (seed) => { let s = seed >>> 0; return () => { s = (s + 0x6d2b79f5) 
  * pasa de teléfono a teléfono al cruzarse; los que se acercan al accidente reciben el aviso del tráfico
  * contrario. Devuelve cuándo sale el SOS y con cuánta antelación se enteran los que se acercan.
  */
-export function roadScenario({ seed = 7, lengthKm = 24, accidentKm = 12, flowVehH = 300, share = 0.1, speedKmh = 80, rangeM = 60, pRx = 0.2, advIntervalS = 0.1, coverage = [[0, 3], [21, 24]], durationMin = 30, sightM = 150 } = {}) {
+export const EXAMPLE_ROAD_SCENARIO = Object.freeze({ seed: 7, lengthKm: 24, accidentKm: 12, flowVehH: 300, share: 0.1, speedKmh: 80, rangeM: 60, pRx: 0.2, advIntervalS: 0.1, coverage: Object.freeze([Object.freeze([0, 3]), Object.freeze([21, 24])]), durationMin: 30, sightM: 150, basis: 'EJEMPLO_DECLARADO · escenario sintético, ningún valor medido' });
+/** DECLARADOS: { seed, lengthKm, accidentKm, flowVehH, share, speedKmh, rangeM, pRx, advIntervalS, coverage: [[km, km], …], durationMin, sightM }. */
+export function roadScenario(opts) {
+  need('roadScenario', opts, ['seed', 'lengthKm', 'accidentKm', 'flowVehH', 'share', 'speedKmh', 'rangeM', 'pRx', 'advIntervalS', 'durationMin', 'sightM']);
+  if (!Array.isArray(opts.coverage)) throw new Error('roadScenario: «coverage» debe declararse');
+  const { seed, lengthKm, accidentKm, flowVehH, share, speedKmh, rangeM, pRx, advIntervalS, coverage, durationMin, sightM } = opts;
   const R = rng(seed), v = speedKmh / 3.6, L = lengthKm * 1000, X = accidentKm * 1000, cars = [];
   const pSec = 1 - (1 - pRx) ** (1 / advIntervalS); // probabilidad de oírse en 1 s dentro del alcance
   // tráfico ya presente en t=0 (densidad = flujo/velocidad) y el que entra después, en los dos sentidos
@@ -298,13 +361,18 @@ export function pointAt(road, s) {
 export function roadDeadReckon(road, last, tNow) { const s = last.s + last.dir * last.speedMs * (tNow - last.t); return { s: Math.round(s), ...pointAt(road, s), pk: pkAt(road, s), estimated: true }; }
 
 /** Referencias visibles a lo largo de la ruta (aerogeneradores, antenas, iglesias) con su PK y lado. */
-export function landmarksAlong(road, landmarks, { maxM = 3000 } = {}) {
+/** DECLARADO: { maxM } (separación máxima de la vía para que una referencia cuente). */
+export function landmarksAlong(road, landmarks, opts) {
+  need('landmarksAlong', opts, ['maxM']);
+  const { maxM } = opts;
   const P = prep(road);
   return landmarks.map((l) => { const b = P.proj(P.f.toXY(l.lat, l.lon)); return { ...l, s: Math.round(b.s), offM: Math.round(b.d), side: b.side, pk: pkAt(road, b.s) }; }).filter((l) => l.offM <= maxM).sort((a, b) => a.s - b.s);
 }
 /** Descripción para el 112: carretera, PK, sentido y la referencia visible más cercana con su lado. */
-export function describePosition(fix, road, landmarks = []) {
-  const loc = roadLocate(fix, road), ls = landmarksAlong(road, landmarks);
+export const EXAMPLE_LANDMARKS = Object.freeze({ maxM: 3000, basis: 'EJEMPLO_DECLARADO · fuente no verificada' });
+/** Con referencias, DECLARADO: { maxM } (ver landmarksAlong). */
+export function describePosition(fix, road, landmarks = [], opts = null) {
+  const loc = roadLocate(fix, road), ls = landmarks.length ? landmarksAlong(road, landmarks, opts) : [];
   const near = ls.map((l) => ({ ...l, ds: l.s - loc.s })).sort((a, b) => Math.abs(a.ds) - Math.abs(b.ds))[0];
   if (!near) return { ...loc, landmark: null, full: loc.text };
   const ahead = near.ds * loc.dir > 0, right = near.side * loc.dir < 0, m = Math.abs(near.ds);
@@ -317,7 +385,11 @@ export function describePosition(fix, road, landmarks = []) {
  * Teselas de un pasillo de `bufferKm` alrededor de la ruta frente al rectángulo que la contiene (lo que
  * descargan los mapas sin conexión por áreas). Recuento exacto de teselas únicas por nivel de zoom.
  */
-export function corridorTiles(points, { bufferKm = 2, zMin = 6, zMax = 15, kbPerTile = 20 } = {}) {
+export const EXAMPLE_CORRIDOR = Object.freeze({ bufferKm: 2, zMin: 6, zMax: 15, kbPerTile: 20, basis: 'EJEMPLO_DECLARADO · tamaño medio de tesela (kB) sin medir' });
+/** DECLARADOS: { bufferKm, zMin, zMax, kbPerTile }. */
+export function corridorTiles(points, opts) {
+  need('corridorTiles', opts, ['bufferKm', 'zMin', 'zMax', 'kbPerTile']);
+  const { bufferKm, zMin, zMax, kbPerTile } = opts;
   const tile = (lat, lon, z) => { const n = 2 ** z, φ = rad(lat); return [Math.floor(((lon + 180) / 360) * n), Math.floor(((1 - Math.log(Math.tan(φ) + 1 / Math.cos(φ)) / Math.PI) / 2) * n)]; };
   let corridor = 0, rect = 0; const perZoom = [];
   const lats = points.map((p) => p.lat), lons = points.map((p) => p.lon), lat0 = (Math.min(...lats) + Math.max(...lats)) / 2, dLat = bufferKm / 111.32, dLon = bufferKm / (111.32 * Math.cos(rad(lat0)));
@@ -344,7 +416,7 @@ export function navLinks({ lat, lon }) {
 }
 
 // ---------------------------------------------------------------- 7) Avisos de carretera de un toque
-/** Semivida (min) de la creencia en cada aviso sin nuevas confirmaciones. */
+/** Semivida (min) de la creencia en cada aviso sin nuevas confirmaciones. VALORES DE EJEMPLO DECLARADOS: fuente no verificada. */
 export const REPORT_KINDS = Object.freeze({
   accidente: { label: 'Accidente', type: HAZARD.CRASH, hlMin: 45, cifs: 'ACCIDENT' },
   parado: { label: 'Vehículo parado', type: HAZARD.STOPPED, hlMin: 20, cifs: 'HAZARD', cifsSubtype: 'HAZARD_ON_ROAD_CAR_STOPPED' },
@@ -362,7 +434,11 @@ export const REPORT_KINDS = Object.freeze({
  * Creencia en que el peligro sigue ahí (log-odds bayesianas). Cada «sigue ahí» suma y cada «ya no está»
  * resta logit(fiabilidad), pesados por su frescura; un servicio verificado pesa mucho más.
  */
-export function reportBelief(votes, nowMin, { prior = 0.5, reliability = 0.8, verifiedReliability = 0.99, hlMin = 30 } = {}) {
+export const EXAMPLE_BELIEF = Object.freeze({ prior: 0.5, reliability: 0.8, verifiedReliability: 0.99, hlMin: 30, basis: 'EJEMPLO_DECLARADO · fiabilidades sin medir' });
+/** DECLARADOS: { prior, reliability, verifiedReliability, hlMin }. */
+export function reportBelief(votes, nowMin, opts) {
+  need('reportBelief', opts, ['prior', 'reliability', 'verifiedReliability', 'hlMin']);
+  const { prior, reliability, verifiedReliability, hlMin } = opts;
   const logit = (p) => Math.log(p / (1 - p));
   let L = logit(prior);
   for (const v of votes) { const w = 2 ** (-Math.max(0, nowMin - v.atMin) / hlMin), r = v.verified ? verifiedReliability : reliability; L += (v.present ? 1 : -1) * w * logit(r); }
@@ -386,14 +462,19 @@ export function toCifs({ id, kind, lat, lon, roadId, sentido, startIso, descript
 }
 
 // ---------------------------------------------------------------- 8) SOS en un SMS y guion para el 112
-export function roadSosText({ where, lat, lon, vehicles = 1, people = 1, trapped = 0, fire = false, hhmm, auto = false }) {
-  const s = `SENDA SOS ACCIDENTE ${where} · ${lat.toFixed(5)},${lon.toFixed(5)} · ${vehicles} veh · ${people} pers${trapped ? ` · ${trapped} atrap` : ''}${fire ? ' · FUEGO' : ''} · ${hhmm}${auto ? ' · sin respuesta' : ''}`;
+/** Recuentos no informados (null) se omiten o salen como «?»: nunca se inventa «1 vehículo, 1 persona». */
+export function roadSosText({ where, lat, lon, vehicles = null, people = null, trapped = null, fire = false, hhmm, auto = false }) {
+  const n = (x) => (Number.isFinite(x) ? x : '?');
+  const s = `SENDA SOS ACCIDENTE ${where} · ${lat.toFixed(5)},${lon.toFixed(5)} · ${n(vehicles)} veh · ${n(people)} pers${trapped ? ` · ${trapped} atrap` : ''}${fire ? ' · FUEGO' : ''} · ${hhmm}${auto ? ' · sin respuesta' : ''}`;
   return s.length <= 160 ? s : s.slice(0, 159) + '…';
 }
 /** Lo que hay que decir al 112, en el orden en que lo pregunta el operador. */
-export function call112Script({ where, vehicles = 1, people = 1, trapped = 0, fire = false, dangerous = false, counts = null, v16 = null }) {
+/** Lo no informado (null) se dice como desconocido: nunca «nadie atrapado» ni «sin fuego» sin que alguien lo declare. */
+export function call112Script({ where, vehicles = null, people = null, trapped = null, fire = null, dangerous = false, counts = null, v16 = null }) {
   const inj = counts ? Object.entries(counts).filter(([, n]) => n).map(([c, n]) => `${n} ${({ ROJO: 'grave', AMARILLO: 'herido que no camina', VERDE: 'leve', PARADA: 'sin respiración', SIN_RESPIRACION: 'sin respiración' })[c] ?? c}`).join(', ') : null;
-  return [`Accidente de tráfico en ${where}.`, `${vehicles} vehículo${vehicles > 1 ? 's' : ''} y ${people} persona${people > 1 ? 's' : ''}${inj ? `: ${inj}` : ''}.`, trapped ? `${trapped} persona${trapped > 1 ? 's' : ''} atrapada${trapped > 1 ? 's' : ''}.` : 'Nadie atrapado por ahora.', fire ? 'Hay fuego o humo.' : 'Sin fuego.', dangerous ? 'Hay un vehículo de mercancías peligrosas (panel naranja).' : null, v16 === true ? 'Hay una baliza V16 encendida.' : null].filter(Boolean).join(' ');
+  const veh = Number.isFinite(vehicles) ? `${vehicles} vehículo${vehicles > 1 ? 's' : ''}` : 'Número de vehículos sin confirmar', ppl = Number.isFinite(people) ? `${people} persona${people > 1 ? 's' : ''}` : 'número de personas sin confirmar';
+  const trap = !Number.isFinite(trapped) ? 'No se sabe aún si hay personas atrapadas.' : trapped ? `${trapped} persona${trapped > 1 ? 's' : ''} atrapada${trapped > 1 ? 's' : ''}.` : 'Nadie atrapado por ahora.';
+  return [`Accidente de tráfico en ${where}.`, `${veh} y ${ppl}${inj ? `: ${inj}` : ''}.`, trap, fire === true ? 'Hay fuego o humo.' : fire === false ? 'Sin fuego.' : 'Fuego: sin confirmar.', dangerous ? 'Hay un vehículo de mercancías peligrosas (panel naranja).' : null, v16 === true ? 'Hay una baliza V16 encendida.' : null].filter(Boolean).join(' ');
 }
 
 // ---------------------------------------------------------------- 9) Coordinador de escena (PAS) y puntos cívicos
@@ -402,6 +483,7 @@ export const PAS = Object.freeze([
   { id: 'avisar', step: 'A', title: 'Avisar', items: ['Llamar al 112 con carretera, PK y sentido (SENDA lo dice)', 'Cuántos vehículos y personas, atrapados, fuego, mercancías peligrosas', 'No colgar hasta que lo diga el operador'] },
   { id: 'socorrer', step: 'S', title: 'Socorrer', items: ['No mover a los heridos salvo peligro inmediato (fuego)', 'No quitar el casco a un motorista salvo que no respire', 'Triaje: quién camina, quién respira, quién responde', 'Hablarles y abrigarlos hasta que llegue la ayuda'] },
 ]);
+/** Valores de diseño del juego cívico (decisión de producto, no medida física ni dato con fuente). */
 export const CIVIC_POINTS = Object.freeze({ proteger: 10, avisar: 10, socorrer: 5, triaje: 5, coordinar: 20, traspaso: 10 });
 export const CIVIC_RULES = Object.freeze([
   'Solo cuentan acciones confirmadas por otra persona presente o por el servicio que recibe el traspaso',
@@ -470,7 +552,11 @@ const sha = async (s) => [...new Uint8Array(await crypto.subtle.digest('SHA-256'
  * Libro de puntos cívicos: cada asiento lleva la huella del anterior (cualquier cambio rompe la cadena).
  * Solo puntúa lo confirmado por otra persona o por el servicio que recibe el traspaso.
  */
-export async function civicLedger(scene, { capPerPerson = 50, prev = '0'.repeat(64) } = {}) {
+export const EXAMPLE_CIVIC_CAP = Object.freeze({ capPerPerson: 50, basis: 'EJEMPLO_DECLARADO · tope de producto' });
+/** DECLARADO: { capPerPerson }; `prev` es la huella génesis del libro (64 ceros por convenio del formato). */
+export async function civicLedger(scene, opts) {
+  need('civicLedger', opts, ['capPerPerson']);
+  const { capPerPerson } = opts; let prev = opts.prev ?? '0'.repeat(64);
   const items = [], by = {};
   const add = (who, action, why) => { const pts = Math.max(0, Math.min(CIVIC_POINTS[action], capPerPerson - (by[who] ?? 0))); if (pts) { by[who] = (by[who] ?? 0) + pts; items.push({ who, action, points: pts, why }); } };
   for (const k of scene.tasks) if (k.doneAt && k.assignee && k.confirmedBy.some((c) => c !== k.assignee)) add(k.assignee, k.id, `${k.title} confirmado por ${k.confirmedBy.filter((c) => c !== k.assignee).join(', ')}`);

@@ -4,12 +4,14 @@
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { encodeHazard, decodeHazard, relayHazard, hazardRelevance, brakeAdvice, HAZARD, HAZARD_BYTES, createScene, sceneAct, sceneBrief, call112Script, toCifs } from '../src/road-guard.mjs';
+import { encodeHazard, decodeHazard, relayHazard, hazardRelevance, brakeAdvice, HAZARD, HAZARD_BYTES, createScene, sceneAct, sceneBrief, call112Script, toCifs, EXAMPLE_RELAY, EXAMPLE_RELEVANCE, EXAMPLE_BRAKE_ADVICE } from '../src/road-guard.mjs';
 import { parseDatex2, toHazard, toHazards, corridorPack } from '../src/datex2.mjs';
 import { assessHazardFrame, createReplayCache, createFrameSigner, signHazardCapsule, relayCapsule, createTrustStore, CAPSULE_BYTES } from '../src/roadsafe-frame-trust.mjs';
 import { validateCifs } from '../src/roadsafe-interop.mjs';
 
 const me = { lat: 40.4, lon: -3.7 };
+// Políticas DECLARADAS (regla de veracidad): ejemplos sin fuente verificada.
+const RLY = EXAMPLE_RELAY, REL = EXAMPLE_RELEVANCE, BA = EXAMPLE_BRAKE_ADVICE;
 const frame = (o = {}) => encodeHazard({ type: HAZARD.CRASH, t: 1000, lat: 40.4009, lon: -3.7, headingDeg: 0, speedMs: 0, decelMs2: 0, id: 77, ...o });
 
 // ------------------------------------------------------------- P0-1 autenticidad, replay, plausibilidad
@@ -21,7 +23,7 @@ test('P0-1: repetición (replay) y relé del mismo evento se deduplican', async 
   const cache = createReplayCache();
   assert.equal((await assessHazardFrame(frame(), { now: 1001, receiver: me, replayCache: cache })).trust, 'UNVERIFIED_PEER_HINT');
   assert.equal((await assessHazardFrame(frame(), { now: 1002, receiver: me, replayCache: cache })).trust, 'DUPLICATE');
-  assert.equal((await assessHazardFrame(relayHazard(frame()), { now: 1003, receiver: me, replayCache: cache })).trust, 'DUPLICATE', 'el relé (saltos+1) es el mismo evento');
+  assert.equal((await assessHazardFrame(relayHazard(frame(), RLY), { now: 1003, receiver: me, replayCache: cache })).trust, 'DUPLICATE', 'el relé (saltos+1) es el mismo evento');
 });
 test('P0-1: hora futura, trama caducada, sin reloj → rechazo', async () => {
   assert.equal((await assessHazardFrame(frame({ t: 2000 }), { now: 1000, receiver: me })).trust, 'REJECT_CLOCK');
@@ -39,8 +41,8 @@ test('P0-1: tramas malformadas — tamaño, versión, coordenadas fuera de rango
   const badVer = frame(); badVer[0] = 0x20; assert.equal((await assessHazardFrame(badVer, { now: 1001 })).trust, 'REJECT_MALFORMED');
   const badLat = frame(); new DataView(badLat.buffer).setInt32(6, 1_000_000_000); assert.throws(() => decodeHazard(badLat), /coordenadas/);
   const unk = frame({ type: 200 }); assert.equal((await assessHazardFrame(unk, { now: 1001, receiver: me })).trust, 'REJECT_UNKNOWN_TYPE');
-  assert.equal(relayHazard(unk), null, 'un relé no propaga tipos desconocidos');
-  assert.equal(relayHazard(frame({ t: 100 }), { now: 1000 }), null, 'un relé no propaga tramas caducadas');
+  assert.equal(relayHazard(unk, RLY), null, 'un relé no propaga tipos desconocidos');
+  assert.equal(relayHazard(frame({ t: 100 }), { ...RLY, now: 1000 }), null, 'un relé no propaga tramas caducadas');
   assert.throws(() => decodeHazard([...frame()]), /tamaño/, 'un array normal no es una trama');
 });
 test('P0-1: cápsula firmada — válida, alterada, clave no inscrita, revocada; el relé no rompe la firma', async () => {
@@ -77,18 +79,20 @@ test('P0-2: corridorPack separa la calzada contraria, otra carretera y registros
 });
 test('P0-2/6: hazardRelevance sin reloj o con hora futura no avisa; misma carretera sentido contrario no avisa', () => {
   const m = { lat: 40.4, lon: -3.7, headingDeg: 0 }, h = { type: HAZARD.CRASH, t: 100, lat: 40.402, lon: -3.7, headingDeg: 0 };
-  assert.equal(hazardRelevance(m, h, {}).relevant, false);
-  assert.equal(hazardRelevance(m, { ...h, t: 200 }, { now: 100 }).relevant, false);
-  assert.equal(hazardRelevance({ ...m, roadId: 'A-3', s: 1000, dir: 1 }, { ...h, roadId: 'A-3', s: 1500, dir: -1 }, { now: 101 }).relevant, false);
+  assert.equal(hazardRelevance(m, h, REL).relevant, false);
+  assert.equal(hazardRelevance(m, { ...h, t: 200 }, { ...REL, now: 100 }).relevant, false);
+  assert.equal(hazardRelevance({ ...m, roadId: 'A-3', s: 1000, dir: 1 }, { ...h, roadId: 'A-3', s: 1500, dir: -1 }, { ...REL, now: 101 }).relevant, false);
 });
 
 // ------------------------------------------------------------- P0-3 consejo de frenada
 test('P0-3: brakeAdvice describe, no ordena; declara que no está certificado; abstiene con entradas inválidas', () => {
-  const a = brakeAdvice({ vMs: 33.3, distM: 200 });
+  const a = brakeAdvice({ vMs: 33.3, distM: 200, hazardSpeedMs: 0 }, BA);
   assert.equal(a.level, 'FRENA'); assert.doesNotMatch(a.say, /¡?Frena!?/i); assert.match(a.say, /200 metros/);
   assert.equal(a.certified, false); assert.equal(a.advisoryOnly, true);
-  assert.equal(brakeAdvice({ vMs: NaN, distM: 200 }).level, 'ABSTAIN');
-  assert.equal(brakeAdvice({ vMs: 30, distM: -5 }).level, 'ABSTAIN');
+  assert.equal(brakeAdvice({ vMs: NaN, distM: 200, hazardSpeedMs: 0 }, BA).level, 'ABSTAIN');
+  assert.equal(brakeAdvice({ vMs: 30, distM: -5, hazardSpeedMs: 0 }, BA).level, 'ABSTAIN');
+  assert.equal(brakeAdvice({ vMs: 30, distM: 200 }, BA).level, 'ABSTAIN', 'sin velocidad del peligro no se supone que está parado');
+  assert.throws(() => brakeAdvice({ vMs: 30, distM: 200, hazardSpeedMs: 0 }, { reactS: 1.5 }), /debe declararse/, 'política sin declarar = error, nunca un valor por defecto');
 });
 
 // ------------------------------------------------------------- P0-4 112

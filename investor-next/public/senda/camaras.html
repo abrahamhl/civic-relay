@@ -56,7 +56,9 @@
 <script type="module">
 import { $, C, canvas, text, rr, run, clamp, FILM, LANG, tr } from '/senda/kit.mjs';
 import { CAMERA_SOURCES, fogScene, estimateVisibilityMulti, estimateVisibility } from '/senda/core/cameras.mjs';
-import { safeSpeedForVisibility, MU } from '/senda/core/drive-cases.mjs';
+import { safeSpeedForVisibility, EXAMPLE_MU, EXAMPLE_DRIVER } from '/senda/core/drive-cases.mjs';
+// Escenario DECLARADO (regla de veracidad): rozamiento y reacción de ejemplo, sin fuente verificada.
+const DRY = { ...EXAMPLE_DRIVER, mu: EXAMPLE_MU.seco }, WET = { ...EXAMPLE_DRIVER, mu: EXAMPLE_MU.mojado };
 const fmt = (x, d = 0) => (LANG === 'en' ? x.toFixed(d) : x.toFixed(d).replace('.', ','));
 const S = { vis: 120 }; window.SENDA_CAMARAS = S;
 const CH = { PASIVO: 'ok', CONVENIO: 'todo', NUNCA: 'no' };
@@ -66,7 +68,7 @@ function measure(vis) {
   const sc = fogScene({ visM: vis }), e = estimateVisibilityMulti(sc.rgba, sc.w, sc.h, sc.refs);
   S.scene = sc; S.est = e; S.vis = vis;
   $('#n-est').textContent = `${e.visM} m`; $('#n-err').textContent = `${e.visM >= vis ? '+' : '−'}${fmt(Math.abs(e.visM - vis) / vis * 100)} %`;
-  $('#n-seco').textContent = `${safeSpeedForVisibility(e.visM).kmh} km/h`; $('#n-moj').textContent = `${safeSpeedForVisibility(e.visM, { mu: MU.mojado }).kmh} km/h`;
+  $('#n-seco').textContent = `${safeSpeedForVisibility(e.visM, DRY).kmh} km/h`; $('#n-moj').textContent = `${safeSpeedForVisibility(e.visM, WET).kmh} km/h`;
 }
 $('#n-v').oninput = (e) => { $('#n-vv').textContent = e.target.value; measure(+e.target.value); };
 measure(120);
@@ -83,7 +85,7 @@ function drawN(t) {
   g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 440, 600, 144, 12); g.fill(); const danger = e.visM < 150; g.strokeStyle = danger ? C.a : C.l; g.stroke();
   text(g, tr(`Visibilidad estimada: ${e.visM} m`, `Estimated visibility: ${e.visM} m`), 34, 470, { c: danger ? C.a : C.t, f: '800 18px Inter,system-ui' });
   text(g, tr(`referencia usada: objeto a ${e.distM} m · transmisión t = ${fmt(e.t, 2)} · luz del aire A = ${fmt(e.A, 2)}`, `reference used: dark target at ${e.distM} m · transmission t = ${fmt(e.t, 2)} · airlight A = ${fmt(e.A, 2)}`), 34, 494, { c: C.m, f: '12px Inter,system-ui' });
-  text(g, tr(`Velocidad para parar dentro de lo que se ve: ${safeSpeedForVisibility(e.visM).kmh} km/h en seco · ${safeSpeedForVisibility(e.visM, { mu: MU.mojado }).kmh} en mojado`, `Safe stopping speed within sight: ${safeSpeedForVisibility(e.visM).kmh} km/h dry · ${safeSpeedForVisibility(e.visM, { mu: MU.mojado }).kmh} km/h wet`), 34, 520, { c: C.t, f: '13px Inter,system-ui' });
+  text(g, tr(`Velocidad para parar dentro de lo que se ve: ${safeSpeedForVisibility(e.visM, DRY).kmh} km/h en seco · ${safeSpeedForVisibility(e.visM, WET).kmh} en mojado`, `Safe stopping speed within sight: ${safeSpeedForVisibility(e.visM, DRY).kmh} km/h dry · ${safeSpeedForVisibility(e.visM, WET).kmh} km/h wet`), 34, 520, { c: C.t, f: '13px Inter,system-ui' });
   text(g, danger ? tr('Aviso de niebla, con su velocidad, a los que se acercan a esta cámara', 'Fog alert with safe speed sent to drivers approaching this camera') : tr('Sin aviso: visibilidad suficiente', 'No alert needed: sufficient visibility'), 34, 548, { c: danger ? C.a : C.e, f: '700 13px Inter,system-ui' });
   text(g, tr('I = J·t + A·(1 − t) · t = e^(−β·d) · V = 3,912 / β', 'I = J·t + A·(1 − t) · t = e^(−β·d) · V = 3.912 / β (Koschmieder)'), 34, 572, { c: C.g, f: '12px Inter,system-ui' });
 }
@@ -95,7 +97,7 @@ $('#y-mea').onclick = () => {
   const v = $('#y-vid'); if (!stream || !v.videoWidth) { $('#y-msg').textContent = 'Abre antes la cámara.'; return; }
   const w = 160, h = Math.round((160 * v.videoHeight) / v.videoWidth), c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); x.drawImage(v, 0, 0, w, h);
   const img = x.getImageData(0, 0, w, h), d = +$('#y-d').value || 100, e = estimateVisibility(img.data, w, h, { x: (w >> 1) - 4, y: (h >> 1) - 4, w: 8, h: 8, distM: d });
-  S.live = e; $('#y-msg').textContent = e.t > 0.97 ? `Aire limpio a ${d} m: la visibilidad supera con creces esa distancia (t = ${fmt(e.t, 2)}).` : `Visibilidad estimada: ${e.visM} m (t = ${fmt(e.t, 2)} a ${d} m). Velocidad para parar dentro de lo que ves: ${safeSpeedForVisibility(e.visM).kmh} km/h.`;
+  S.live = e; $('#y-msg').textContent = e.t > 0.97 ? `Aire limpio a ${d} m: la visibilidad supera con creces esa distancia (t = ${fmt(e.t, 2)}).` : `Visibilidad estimada: ${e.visM} m (t = ${fmt(e.t, 2)} a ${d} m). Velocidad para parar dentro de lo que ves: ${safeSpeedForVisibility(e.visM, DRY).kmh} km/h (rozamiento y reacción de ejemplo, sin fuente verificada).`;
 };
 run({ niebla: drawN });
 </script>

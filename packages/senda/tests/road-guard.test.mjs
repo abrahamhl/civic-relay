@@ -4,81 +4,87 @@ import {
   detectHardBrake, detectCarCrash, encodeHazard, decodeHazard, relayHazard, HAZARD, HAZARD_BYTES, hazardRelevance, brakeAdvice, alertGain, brakeChain,
   contactProbability, muleDelivery, roadScenario, roadLocate, pointAt, roadDeadReckon, describePosition, landmarksAlong, demoRoad, corridorTiles, ROUTE_MAD_VLC,
   navLinks, reportBelief, toCifs, roadSosText, call112Script, createScene, sceneAct, sceneBrief, civicLedger, verifyLedger,
+  AASHTO_SSD, ROAD, EXAMPLE_BRAKE, EXAMPLE_CAR_CRASH, EXAMPLE_RELAY, EXAMPLE_RELEVANCE, EXAMPLE_BRAKE_ADVICE, EXAMPLE_ALERT, EXAMPLE_BRAKE_CHAIN,
+  EXAMPLE_RADIO, EXAMPLE_ROAD_SCENARIO, EXAMPLE_LANDMARKS, EXAMPLE_CORRIDOR, EXAMPLE_BELIEF, EXAMPLE_CIVIC_CAP,
 } from '../src/road-guard.mjs';
+
+// Escenarios DECLARADOS (regla de veracidad: los módulos no traen valores por defecto sin fuente).
+const HB = EXAMPLE_BRAKE, REL = EXAMPLE_RELEVANCE, BA = EXAMPLE_BRAKE_ADVICE, BC = EXAMPLE_BRAKE_CHAIN, RS = EXAMPLE_ROAD_SCENARIO;
 import { startTriage } from '../src/triage.mjs';
 
 const series = (v0, a, { hz = 1, s = 8, t0 = 0, until = Infinity } = {}) => Array.from({ length: s * hz + 1 }, (_, k) => { const t = t0 + k / hz; return { t, speed: Math.max(0, t < until ? v0 : v0 - a * (t - until)) }; });
 
 test('frenada brusca por GNSS: 120 km/h a 7 m/s² sí; frenada normal no; caída imposible para unos frenos = golpe', () => {
-  const hard = detectHardBrake(series(33.3, 7, { until: 2 }));
+  const hard = detectHardBrake(series(33.3, 7, { until: 2 }), HB);
   assert.equal(hard.state, 'HARD_BRAKE'); assert.ok(Math.abs(hard.decelMs2 - 7) < 0.6, String(hard.decelMs2));
-  assert.equal(detectHardBrake(series(33.3, 2, { until: 2 })).state, 'NONE');
-  assert.equal(detectHardBrake(series(10, 7, { until: 2 })).state, 'NONE', 'a poca velocidad no se avisa');
+  assert.equal(detectHardBrake(series(33.3, 2, { until: 2 }), HB).state, 'NONE');
+  assert.equal(detectHardBrake(series(10, 7, { until: 2 }), HB).state, 'NONE', 'a poca velocidad no se avisa');
   const gps = [{ t: 0, speed: 25 }, { t: 1, speed: 25 }, { t: 2, speed: 25 }, { t: 3, speed: 0 }, { t: 4, speed: 0 }];
-  assert.equal(detectHardBrake(gps).state, 'IMPACT_LIKE');
+  assert.equal(detectHardBrake(gps, HB).state, 'IMPACT_LIKE');
 });
 
 test('choque de coche: impacto + parada en un segundo desde 90 km/h; frenada fuerte sin golpe no es choque', () => {
   const G = 9.80665, motion = [];
   for (let t = 0; t < 12; t += 0.05) motion.push({ t, ax: 0, ay: Math.abs(t - 5) < 0.06 ? 7 * G : 0, az: G });
   const gps = [0, 1, 2, 3, 4, 5.6, 6, 7, 8, 9, 10, 11].map((t) => ({ t, speed: t < 5 ? 25 : 0 }));
-  assert.match(detectCarCrash({ motion, gps }).state, /CRASH/);
+  assert.match(detectCarCrash({ motion, gps }, EXAMPLE_CAR_CRASH).state, /CRASH/);
   const calm = Array.from({ length: 200 }, (_, k) => ({ t: k * 0.05, ax: 0, ay: 0.4 * G, az: G }));
-  assert.equal(detectCarCrash({ motion: calm, gps: series(25, 8, { s: 9, until: 2 }) }).state, 'HARD_BRAKING');
+  assert.equal(detectCarCrash({ motion: calm, gps: series(25, 8, { s: 9, until: 2 }) }, EXAMPLE_CAR_CRASH).state, 'HARD_BRAKING');
 });
 
 test('trama de aviso: 24 bytes, ida y vuelta exacta, saltos con tope', () => {
   const h = { type: HAZARD.BRAKE, t: 1793000000, lat: 40.123456, lon: -3.654321, headingDeg: 87.5, speedMs: 31.2, decelMs2: 7.4, id: 99 };
   const b = encodeHazard(h); assert.equal(b.length, HAZARD_BYTES); assert.ok(3 + 4 + HAZARD_BYTES <= 31, 'cabe en un anuncio BLE clásico');
   const d = decodeHazard(b); for (const k of ['type', 't', 'lat', 'lon', 'headingDeg', 'speedMs', 'decelMs2', 'id']) assert.ok(Math.abs(d[k] - h[k]) < 1e-6, k);
-  let x = b; for (let i = 0; i < 3; i++) x = relayHazard(x); assert.equal(decodeHazard(x).hops, 3); assert.equal(relayHazard(x), null);
+  let x = b; for (let i = 0; i < 3; i++) x = relayHazard(x, EXAMPLE_RELAY); assert.equal(decodeHazard(x).hops, 3); assert.equal(relayHazard(x, EXAMPLE_RELAY), null);
 });
 
 test('relevancia: delante y en mi sentido sí; detrás, sentido contrario o carril de al lado no', () => {
   const me = { lat: 40, lon: -3, headingDeg: 0 }, at = (dn, de) => ({ lat: 40 + dn / 111320, lon: -3 + de / (111320 * Math.cos((40 * Math.PI) / 180)) });
   const hz = (dn, de, h = 0, type = HAZARD.BRAKE) => ({ ...at(dn, de), headingDeg: h, type, t: 100 });
-  assert.equal(hazardRelevance(me, hz(300, 2), { now: 102 }).relevant, true);
-  assert.equal(hazardRelevance(me, hz(-200, 0), { now: 102 }).relevant, false);
-  assert.equal(hazardRelevance(me, hz(300, 2, 180), { now: 102 }).relevant, false);
-  assert.equal(hazardRelevance(me, hz(300, 30), { now: 102 }).relevant, false);
-  assert.equal(hazardRelevance(me, hz(300, 30, 180, HAZARD.FOG), { now: 102 }).relevant, true, 'la niebla afecta a los dos sentidos');
-  assert.equal(hazardRelevance(me, hz(300, 2), { now: 160 }).relevant, false, 'una frenada de hace un minuto ya no vale');
+  assert.equal(hazardRelevance(me, hz(300, 2), { ...REL, now: 102 }).relevant, true);
+  assert.equal(hazardRelevance(me, hz(-200, 0), { ...REL, now: 102 }).relevant, false);
+  assert.equal(hazardRelevance(me, hz(300, 2, 180), { ...REL, now: 102 }).relevant, false);
+  assert.equal(hazardRelevance(me, hz(300, 30), { ...REL, now: 102 }).relevant, false);
+  assert.equal(hazardRelevance(me, hz(300, 30, 180, HAZARD.FOG), { ...REL, now: 102 }).relevant, true, 'la niebla afecta a los dos sentidos');
+  assert.equal(hazardRelevance(me, hz(300, 2), { ...REL, now: 160 }).relevant, false, 'una frenada de hace un minuto ya no vale');
   const road = { roadId: 'A-4', dir: 1 };
-  assert.equal(hazardRelevance({ ...me, ...road, s: 1000 }, { ...hz(0, 0), ...road, s: 1800 }, { now: 101 }).aheadM, 800);
+  assert.equal(hazardRelevance({ ...me, ...road, s: 1000 }, { ...hz(0, 0), ...road, s: 1800 }, { ...REL, now: 101 }).aheadM, 800);
 });
 
 test('consejo de frenada: deceleración necesaria y nivel (umbral AASHTO 3,4 m/s²)', () => {
-  assert.equal(brakeAdvice({ vMs: 33.3, distM: 200 }).level, 'FRENA');
-  assert.equal(brakeAdvice({ vMs: 33.3, distM: 400 }).level, 'ATENCION');
-  assert.equal(brakeAdvice({ vMs: 33.3, distM: 900 }).level, 'INFO');
-  assert.equal(brakeAdvice({ vMs: 33.3, distM: 40 }).aReqMs2, Infinity);
+  assert.equal(AASHTO_SSD.decelMs2, 3.4); assert.equal(ROAD.aashtoMs2, 3.4); assert.equal(BA.brakeMs2, AASHTO_SSD.decelMs2);
+  assert.equal(brakeAdvice({ vMs: 33.3, distM: 200, hazardSpeedMs: 0 }, BA).level, 'FRENA');
+  assert.equal(brakeAdvice({ vMs: 33.3, distM: 400, hazardSpeedMs: 0 }, BA).level, 'ATENCION');
+  assert.equal(brakeAdvice({ vMs: 33.3, distM: 900, hazardSpeedMs: 0 }, BA).level, 'INFO');
+  assert.equal(brakeAdvice({ vMs: 33.3, distM: 40, hazardSpeedMs: 0 }, BA).aReqMs2, Infinity);
 });
 
 test('ganancia honesta: con el coche de justo delante no hay ganancia; con tres por delante, casi 2 s', () => {
-  assert.equal(alertGain({ carsAhead: 1, vMs: 33.3 }).gainS, 0);
-  const g = alertGain({ carsAhead: 3, vMs: 33.3 }); assert.ok(g.gainS > 1.9 && g.gainM > 60, JSON.stringify(g));
+  assert.equal(alertGain({ carsAhead: 1, vMs: 33.3 }, EXAMPLE_ALERT).gainS, 0);
+  const g = alertGain({ carsAhead: 3, vMs: 33.3 }, EXAMPLE_ALERT); assert.ok(g.gainS > 1.9 && g.gainM > 60, JSON.stringify(g));
 });
 
 test('columna con 1,2 s de separación a 120 km/h: sin SENDA choque en cadena; con SENDA solo el de justo detrás; con 2 s nadie', () => {
-  const no = brakeChain({ gapS: 1.2 }), all = brakeChain({ gapS: 1.2, senda: Array(6).fill(true) });
+  const no = brakeChain({ ...BC, gapS: 1.2 }), all = brakeChain({ ...BC, gapS: 1.2, senda: Array(6).fill(true) });
   assert.equal(no.collisions, 5); assert.equal(all.collisions, 1); assert.ok(all.cars[1].collided, 'el de justo detrás depende de su distancia');
-  assert.equal(brakeChain({ gapS: 2 }).collisions, 0);
-  const mixed = brakeChain({ gapS: 1.2, senda: [1, 0, 1, 0, 1, 1].map(Boolean) });
+  assert.equal(brakeChain({ ...BC, gapS: 2 }).collisions, 0);
+  const mixed = brakeChain({ ...BC, gapS: 1.2, senda: [1, 0, 1, 0, 1, 1].map(Boolean) });
   assert.equal(mixed.cars[3].via, 'luces de freno'); assert.ok(mixed.collisions > all.collisions && mixed.collisions < no.collisions);
 });
 
 test('SOS por los coches que pasan: contacto casi seguro al cruzarse y entrega con cuotas bajas', () => {
-  assert.ok(contactProbability({ rangeM: 60, relSpeedMs: 2 * 80 / 3.6 }).p > 0.99);
+  assert.ok(contactProbability({ ...EXAMPLE_RADIO, rangeM: 60, relSpeedMs: 2 * 80 / 3.6 }).p > 0.99);
   const m = muleDelivery({ flowVehH: 600, share: 0.05, pContact: 0.99, travelMin: 7, withinMin: 20 }); assert.ok(m.pWithin > 0.99 && m.meanMin < 10, JSON.stringify(m));
-  assert.equal(muleDelivery({ flowVehH: 600, share: 0, travelMin: 7 }).meanMin, Infinity);
+  assert.equal(muleDelivery({ flowVehH: 600, share: 0, pContact: 0.95, travelMin: 7, withinMin: 15 }).meanMin, Infinity);
 });
 
 test('carretera sin cobertura: con 10 % de coches con SENDA el SOS sale en minutos y los que se acercan se enteran a kilómetros', () => {
-  const s = roadScenario();
+  const s = roadScenario(RS);
   assert.ok(s.sosDeliveredMin !== null && s.sosDeliveredMin < 10, String(s.sosDeliveredMin));
   assert.ok(s.warned >= s.approachingSenda - 1 && s.medianWarnM > 2000, JSON.stringify({ w: s.warned, a: s.approachingSenda, m: s.medianWarnM }));
-  const none = roadScenario({ share: 0 }); assert.equal(none.sosDeliveredMin, null);
-  assert.ok(roadScenario({ seed: 3 }).sosDeliveredMin < 12, 'otra semilla, mismo orden de magnitud');
+  const none = roadScenario({ ...RS, share: 0 }); assert.equal(none.sosDeliveredMin, null);
+  assert.ok(roadScenario({ ...RS, seed: 3 }).sosDeliveredMin < 12, 'otra semilla, mismo orden de magnitud');
 });
 
 test('PK y sentido sin red, referencia visible y túnel por estima', () => {
@@ -86,21 +92,21 @@ test('PK y sentido sin red, referencia visible y túnel por estima', () => {
   const fix = { ...pointAt(road, 7500), headingDeg: 40 }, loc = roadLocate(fix, road);
   assert.equal(loc.pk, 127.5); assert.equal(loc.sentido, 'creciente'); assert.ok(loc.crossM < 1);
   const back = roadLocate({ ...fix, headingDeg: 220 }, road); assert.equal(back.sentido, 'decreciente');
-  assert.match(describePosition(fix, road, landmarks).full, /PK 127,5 .*300 m después del aerogenerador AE-12 \(a la derecha\)/);
-  assert.equal(landmarksAlong(road, landmarks).length, 4);
+  assert.match(describePosition(fix, road, landmarks, EXAMPLE_LANDMARKS).full, /PK 127,5 .*300 m después del aerogenerador AE-12 \(a la derecha\)/);
+  assert.equal(landmarksAlong(road, landmarks, EXAMPLE_LANDMARKS).length, 4);
   const dr = roadDeadReckon(road, { s: 7500, dir: 1, speedMs: 25, t: 0 }, 20); assert.equal(dr.s, 8000); assert.ok(Math.abs(dr.pk - 128) < 0.01);
 });
 
 test('mapas de la ruta: el pasillo de 2 km pesa menos de una décima parte del rectángulo', () => {
-  const c = corridorTiles(ROUTE_MAD_VLC); assert.ok(c.ratio < 0.1 && c.corridorMB < 100, JSON.stringify({ r: c.ratio, mb: c.corridorMB }));
+  const c = corridorTiles(ROUTE_MAD_VLC, EXAMPLE_CORRIDOR); assert.ok(c.ratio < 0.1 && c.corridorMB < 100, JSON.stringify({ r: c.ratio, mb: c.corridorMB }));
   const l = navLinks({ lat: 40.4169, lon: -3.7035 }); assert.match(l.waze, /^https:\/\/waze\.com\/ul\?ll=40\.4169,-3\.7035&navigate=yes/); assert.match(l.google, /^https:\/\/www\.google\.com\/maps\/dir\/\?api=1&destination=40\.4169,-3\.7035&travelmode=driving$/);
 });
 
 test('avisos de un toque: dos confirmaciones lo confirman, el tiempo y los «ya no está» lo retiran; CIFS solo tras validar', () => {
-  assert.equal(reportBelief([{ atMin: 0, present: true }], 0, { hlMin: 20 }).state, 'PROBABLE');
-  assert.equal(reportBelief([{ atMin: 0, present: true }, { atMin: 2, present: true }], 3, { hlMin: 20 }).state, 'CONFIRMADO');
-  assert.equal(reportBelief([{ atMin: 0, present: true }], 30, { hlMin: 20 }).show, false);
-  assert.equal(reportBelief([{ atMin: 0, present: true }, { atMin: 5, present: false }, { atMin: 6, present: false }], 7, { hlMin: 20 }).show, false);
+  assert.equal(reportBelief([{ atMin: 0, present: true }], 0, { ...EXAMPLE_BELIEF, hlMin: 20 }).state, 'PROBABLE');
+  assert.equal(reportBelief([{ atMin: 0, present: true }, { atMin: 2, present: true }], 3, { ...EXAMPLE_BELIEF, hlMin: 20 }).state, 'CONFIRMADO');
+  assert.equal(reportBelief([{ atMin: 0, present: true }], 30, { ...EXAMPLE_BELIEF, hlMin: 20 }).show, false);
+  assert.equal(reportBelief([{ atMin: 0, present: true }, { atMin: 5, present: false }, { atMin: 6, present: false }], 7, { ...EXAMPLE_BELIEF, hlMin: 20 }).show, false);
   const c = toCifs({ id: 1, kind: 'accidente', lat: 40.9, lon: -2.4, roadId: 'N-000', sentido: 'creciente', startIso: '2026-11-05T22:41:00Z' });
   assert.equal(c.type, 'ACCIDENT'); assert.equal(c._validated, false);
 });
@@ -126,8 +132,21 @@ test('coordinador de escena: PAS, nadie se confirma a sí mismo, traspaso solo a
   assert.equal(sceneAct(sc, { t: 970, who: 'gc-1', action: 'CONFIRM', task: 'avisar', actor: gc }).ok, true);
   // P0-4 RoadSafe: una llamada declarada no es una llamada recibida.
   assert.match(sceneBrief(sc).text, /112: llamada declarada 1:10, sin confirmación/); assert.equal(sceneBrief(sc).call112, 'LOGGED_NOT_CONFIRMED');
-  const L = await civicLedger(sc);
+  const L = await civicLedger(sc, EXAMPLE_CIVIC_CAP);
   assert.equal(L.totals.luis, 10); assert.equal(L.totals.ana, 10 + 5 + 20 + 10);
   assert.ok(await verifyLedger(L.entries));
   const forged = L.entries.map((e) => ({ ...e })); forged[0].points = 999; assert.equal(await verifyLedger(forged), false);
+});
+
+test('veracidad: ningún parámetro sin fuente tiene valor por defecto; lo no informado no se inventa', () => {
+  assert.throws(() => detectHardBrake([], {}), /«winS» debe declararse/);
+  assert.throws(() => brakeAdvice({ vMs: 30, distM: 200, hazardSpeedMs: 0 }), /«reactS» debe declararse/);
+  assert.throws(() => brakeChain({ gapS: 1.2 }), /debe declararse/);
+  assert.throws(() => roadScenario({}), /debe declararse/);
+  assert.throws(() => hazardRelevance({ lat: 40, lon: -3 }, { lat: 40, lon: -3, t: 0 }, { now: 1 }), /debe declararse/);
+  assert.throws(() => corridorTiles(ROUTE_MAD_VLC, { bufferKm: 2 }), /«zMin» debe declararse/);
+  assert.equal(brakeAdvice({ vMs: 30, distM: 200 }, BA).level, 'ABSTAIN', 'sin velocidad del peligro no se supone parado');
+  assert.ok(Object.isFrozen(ROAD) && !('hardBrakeMs2' in ROAD) && !('maxBrakeMs2' in ROAD), 'ROAD solo conserva la cifra con fuente');
+  assert.doesNotMatch(roadSosText({ where: 'N-000', lat: 40, lon: -3, hhmm: '00:00' }), /1 veh · 1 pers/);
+  const sc = call112Script({ where: 'A-3' }); assert.doesNotMatch(sc, /Nadie atrapado|Sin fuego|1 vehículo/); assert.match(sc, /No se sabe aún si hay personas atrapadas/);
 });

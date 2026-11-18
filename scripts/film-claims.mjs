@@ -68,13 +68,13 @@ export const CLAIMS = [
     return { value: `${g.reachedPct} %`, ok: Math.round(g.reachedPct) === 72 };
   } },
   { id: 'brake-chain', scene: 'v16', claim: 'niebla, 120 km/h, 1,2 s: chocan 5; con aviso simultáneo solo el que va pegado', async measure() {
-    const r = await core('road-guard.mjs'), no = r.brakeChain({ gapS: 1.2 }), si = r.brakeChain({ gapS: 1.2, senda: Array(6).fill(true) });
+    const r = await core('road-guard.mjs'), no = r.brakeChain({ ...r.EXAMPLE_BRAKE_CHAIN, gapS: 1.2 }), si = r.brakeChain({ ...r.EXAMPLE_BRAKE_CHAIN, gapS: 1.2, senda: Array(6).fill(true) });
     const a = no.cars.filter((c) => c.collided).length, b = si.cars.filter((c) => c.collided).map((c) => c.i);
-    return { value: `sin aviso ${a} choques · con aviso ${b.length} (coche ${b.join(',')})`, ok: a === 5 && b.length === 1 && b[0] === 1 };
+    return { value: `sin aviso ${a} choques · con aviso ${b.length} (coche ${b.join(',')}) · simulación con escenario declarado EXAMPLE_BRAKE_CHAIN`, ok: a === 5 && b.length === 1 && b[0] === 1 };
   } },
   { id: 'sos-rides-cars', scene: 'v16', claim: 'sin cobertura el SOS sale en ≈ 7 min con 1 de cada 10 coches', async measure() {
-    const r = await core('road-guard.mjs'), s = r.roadScenario();
-    return { value: `${s.sosDeliveredMin} min (cuota ${s.params.share}, ${s.params.flowVehH} veh/h)`, ok: Math.round(s.sosDeliveredMin) === 7 && s.params.share === 0.1 };
+    const r = await core('road-guard.mjs'), s = r.roadScenario(r.EXAMPLE_ROAD_SCENARIO);
+    return { value: `${s.sosDeliveredMin} min (cuota ${s.params.share}, ${s.params.flowVehH} veh/h; simulación con escenario declarado EXAMPLE_ROAD_SCENARIO)`, ok: Math.round(s.sosDeliveredMin) === 7 && s.params.share === 0.1 };
   } },
   { id: 'rail-second-train', scene: 'v18', claim: 'segundo tren en 30–41 s con el 25 % de pasajeros; < 1 min con el 5 %', async measure() {
     const r = await core('rail-scenario.mjs'), q = [], f = [];

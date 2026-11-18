@@ -24,6 +24,9 @@ import {
   v16ZeroLatencyReflex,
   computeCalibratedStoppingDistance,
 } from '../src/automotive-multisoftware-link.mjs';
+import { EXAMPLE_BRAKE } from '../src/road-guard.mjs';
+// Umbral DECLARADO (regla de veracidad): ejemplo sin fuente verificada.
+const OBD_POLICY = { hardBrakeMs2: EXAMPLE_BRAKE.hardMs2 };
 import { HAZARD } from '../src/road-guard.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -69,7 +72,7 @@ test('OBD-II Cinemática: detección de frenada de emergencia asistida por CAN y
     { tSec: 0.0, speedKmh: 100, throttlePct: 35 },
     { tSec: 1.0, speedKmh: 95, throttlePct: 15 },
   ];
-  const gentleResult = analyzeObdKinematics(gentleDrive);
+  const gentleResult = analyzeObdKinematics(gentleDrive, OBD_POLICY);
   assert.equal(gentleResult.isEmergencyBraking, false);
   assert.ok(gentleResult.decelMs2 < 2.0);
 
@@ -78,7 +81,7 @@ test('OBD-II Cinemática: detección de frenada de emergencia asistida por CAN y
     { tSec: 0.0, speedKmh: 120, throttlePct: 40 },
     { tSec: 1.8, speedKmh: 30, throttlePct: 0 },
   ];
-  const hardResult = analyzeObdKinematics(hardBrake);
+  const hardResult = analyzeObdKinematics(hardBrake, OBD_POLICY);
   assert.equal(hardResult.isEmergencyBraking, true);
   assert.ok(hardResult.decelMs2 >= 12.0);
   assert.equal(hardResult.hazardType, HAZARD.CRASH);
@@ -198,7 +201,7 @@ test('Mensajes V2X Cooperativos: generación de tramas ETSI CAM y DENM de aviso 
 });
 
 test('AutomotiveMultisoftwareGateway: orquestación simultánea de OBD, RDS, Pantalla Android y V2X', () => {
-  const gateway = new AutomotiveMultisoftwareGateway({ vehicleId: 'TEST-CAR-01' });
+  const gateway = new AutomotiveMultisoftwareGateway({ vehicleId: 'TEST-CAR-01', obdPolicy: OBD_POLICY });
 
   // 1. Inyección de telemetría OBD-II con frenada severa
   const obdPoints = [
@@ -382,7 +385,7 @@ test('Fixtures SINTÉTICOS (no reales) de telemetría OBD-II e incidentes DGT: c
   // Caso 1: Frenada brusca en A-3
   const caseA3 = telemetryData.casos.find((c) => c.id === 'CASE-01-A3-HARD-BRAKE-AVOIDANCE');
   assert.ok(caseA3 != null);
-  const kinematicsA3 = analyzeObdKinematics(caseA3.puntos);
+  const kinematicsA3 = analyzeObdKinematics(caseA3.puntos, OBD_POLICY);
   assert.equal(kinematicsA3.isEmergencyBraking, true);
   assert.ok(kinematicsA3.decelMs2 >= 8.5);
 
