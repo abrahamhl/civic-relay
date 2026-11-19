@@ -34,20 +34,21 @@ La web es **estática**: HTML, JavaScript, vídeos. No necesita base de datos, P
 
 > Los nombres de los menús de hPanel pueden cambiar con las versiones del panel. Si no encuentras uno, busca «Administrador de archivos» o «SSL» en el buscador del panel.
 
-### Opción B: por FTP (FileZilla)
+### Opción B: por FTP o SFTP (FileZilla / Cyberduck / WinSCP)
 
-1. En **hPanel → Archivos → Cuentas FTP** copia el servidor, el usuario y el puerto (normalmente 21). Si no recuerdas la contraseña, cámbiala allí.
-2. En tu ordenador, crea una carpeta `web` y descomprime en ella **todos** los zips de la web, uno tras otro, en la misma carpeta.
-3. En FileZilla, menú **Servidor → Forzar mostrar archivos ocultos**, para que se suba `.htaccess`.
-4. Conéctate, entra en `public_html` (panel derecho) y arrastra **el contenido** de `web` (no la carpeta) al panel derecho.
+1. En **hPanel → Archivos → Cuentas FTP** (o **Avanzado → Acceso SSH** para SFTP en puerto `65002`) copia el servidor, usuario y puerto (`21` en FTP / `65002` en SFTP). Si no recuerdas la contraseña, cámbiala allí.
+2. En tu ordenador, crea una carpeta `web` y descomprime en ella **todos** los zips de la web (`1-web-hostinger.zip` y los zips de vídeo), uno tras otro, en la misma carpeta.
+3. En FileZilla, menú **Servidor → Forzar mostrar archivos ocultos**, para que se suba `.htaccess` y `.well-known/security.txt`.
+4. Conéctate (recomendado **SFTP** por cifrado de extremo a extremo), entra en `public_html` (panel derecho) y arrastra **el contenido** de `web` (no la carpeta) al panel derecho.
 5. Activa el SSL como en el paso 6 de la opción A.
 
 ### Comprobar que funciona (5 minutos)
 
-1. `https://TU-DOMINIO/` abre la portada para inversores. Comprueba también `/es` y `/nl`.
-2. `https://TU-DOMINIO/senda` abre **SENDA Campo**. A los pocos segundos debe decir «instalada offline».
-3. `https://TU-DOMINIO/senda/fuego` muestra el mapa del incendio, y `/senda/trafico` reproduce los vídeos reales.
-4. **Prueba sin red:** con `/senda` ya abierta una vez, pon el móvil en modo avión y recarga. Debe abrir igual.
+1. `https://TU-DOMINIO/` abre la portada rediseñada de SENDA (inglés). Comprueba también `/es/` (español) y `/nl/` (neerlandés).
+2. Navega por las 6 secciones principales: `/es/product/`, `/es/platform/` (Centro de Control interactivo con barra `⌘K` y demo guiada), `/es/evidence/`, `/es/science/`, `/es/investors/` y `/es/security/`.
+3. `https://TU-DOMINIO/senda` abre **SENDA Campo**. A los pocos segundos debe decir «instalada offline».
+4. `https://TU-DOMINIO/senda/fuego` muestra el mapa del incendio, y `/senda/visor` abre el Visor 4D científico.
+5. **Prueba sin red:** con `/senda` ya abierta una vez, pon el móvil en modo avión y recarga. Debe abrir igual.
 
 | Si ves esto… | Causa probable | Solución |
 |---|---|---|
@@ -83,7 +84,7 @@ Para comprobar el código en tu ordenador hace falta Node 22. Desde la carpeta d
 ```
 node packages/senda/scripts/sync-web.mjs
 node --test packages/senda/tests/*.test.mjs packages/senda-relay/tests/*.test.mjs
-cd investor-next && npm install && npm run build && node test-locales.mjs && node --test tests/*.test.mjs
+cd investor-next && pnpm install && pnpm run build && node test-locales.mjs && node --test tests/*.test.mjs
 node investor-next/scripts/senda-offline-e2e.mjs
 ```
 

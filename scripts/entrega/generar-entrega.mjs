@@ -29,9 +29,9 @@ const sha = (buf) => createHash('sha256').update(buf).digest('hex');
 
 if (process.argv.includes('--build')) {
   console.log(`· Construyendo la web con SITE_URL=${SITE_URL}…`);
-  execSync('npm run build', { cwd: join(ROOT, 'investor-next'), stdio: 'inherit', env: { ...process.env, SITE_URL } });
+  execSync('pnpm run build', { cwd: join(ROOT, 'investor-next'), stdio: 'inherit', env: { ...process.env, SITE_URL } });
 }
-if (!existsSync(join(OUT, 'senda/index.html'))) { console.error('Falta investor-next/out: ejecuta con --build o «cd investor-next && npm run build».'); process.exit(1); }
+if (!existsSync(join(OUT, 'senda/index.html'))) { console.error('Falta investor-next/out: ejecuta con --build o «cd investor-next && pnpm run build».'); process.exit(1); }
 
 // ---------------------------------------------------------------- .htaccess para Apache/LiteSpeed (Hostinger)
 export const HTACCESS = `# SENDA · configuración para Hostinger (LiteSpeed) o Apache. Va en public_html/ junto a index.html.
@@ -120,7 +120,12 @@ const dirty = (() => { try { return sh("git status --porcelain -- . ':!entrega'"
 rmSync(ZIPS, { recursive: true, force: true }); mkdirSync(ZIPS, { recursive: true });
 
 const web = walk(OUT).map((name) => ({ name, path: join(OUT, name) }));
-const big = web.filter((f) => statSync(f.path).size > BIG), small = web.filter((f) => statSync(f.path).size <= BIG);
+const USED_M95 = new Set(['media/m95/senda-m95-60s-en.mp4', 'media/m95/senda-m95-90s-en.mp4']);
+const isOptionalLocalRender = (name) =>
+  (name.startsWith('media/m95/') && name.endsWith('.mp4') && !USED_M95.has(name)) ||
+  (name.startsWith('media/m96/') && name.endsWith('.mp4'));
+const webCore = web.filter((f) => !isOptionalLocalRender(f.name));
+const big = webCore.filter((f) => statSync(f.path).size > BIG), small = webCore.filter((f) => statSync(f.path).size <= BIG);
 const read = (f) => ({ name: f.name, data: readFileSync(f.path) });
 const zips = [];
 function add(file, title, entries, note) {
