@@ -1,0 +1,54 @@
+{
+ "note": "SENDA Mission 9.5 · Simulación explicada: Visibilidad Koschmieder en cámara pública (r7)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "r7",
+   "claim": "SIMULATED",
+   "source": [
+    "investor-next/public/senda/camaras.html",
+    "packages/senda/src/visibility.mjs"
+   ],
+   "visual": {
+    "kind": "page",
+    "src": "/senda/camaras?film=1&viz=niebla"
+   },
+   "title": {
+    "es": "Cuánto se ve, medido en una cámara",
+    "en": "How far you can see, measured by a camera",
+    "nl": "Hoe ver je kunt zien, gemeten met een camera"
+   },
+   "es": [
+    "SENDA usa solo cámaras públicas publicadas para reutilizarse, y solo para medir el estado de la vía, nunca a las personas.",
+    "Con un objeto oscuro a distancia conocida calcula la visibilidad en metros y la velocidad para poder parar dentro de lo que se ve. Esta imagen es sintética, para comprobar el método."
+   ],
+   "es_say": [
+    "Senda usa solo cámaras públicas publicadas para reutilizarse, y solo para medir el estado de la vía, nunca a las personas.",
+    "Con un objeto oscuro a distancia conocida calcula la visibilidad en metros y la velocidad para poder parar dentro de lo que se ve. Esta imagen es sintética, para comprobar el método."
+   ],
+   "en": [
+    "SENDA only uses public cameras released for reuse, and only to measure the state of the road, never people.",
+    "With a dark object at a known distance, it works out the visibility in metres and the speed at which you can stop within what you can see. This is a synthetic image, made to test the method."
+   ],
+   "en_say": [
+    "Senda only uses public cameras released for reuse, and only to measure the state of the road, never people.",
+    "With a dark object at a known distance, it works out the visibility in metres, and the speed at which you can stop within what you can see. This is a synthetic image, made to test the method."
+   ],
+   "nl": [
+    "SENDA gebruikt alleen openbare verkeerscamera's die zijn vrijgegeven voor hergebruik, en alleen om de wegcondities te meten, nooit personen.",
+    "Met een donker referentiepunt op bekende afstand berekent het het zicht in meters en de snelheid om binnen het zicht te kunnen stoppen. Dit is een synthetisch beeld, gemaakt om de methode te testen."
+   ]
+  }
+ ]
+}

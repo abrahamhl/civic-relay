@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Coches conectados</title>
+<meta name="description" content="Coches conectados, teléfonos, cámaras y la infraestructura como una sola red de sensores: base legal (Ley de Datos de la UE, DFRS), fusión de posición de metros a decímetros, velocidad por tramo y privacidad por diseño.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/trafico">Visión de tráfico</a> · <a href="/senda/dgt">Infraestructura DGT</a> · <a href="/senda/carretera">Ruta protectora</a> · <a href="/senda/arquitectura">Arquitectura</a></p>
+<h1>Coches conectados y fusión</h1>
+<p class="lead m">Los coches modernos ya envían datos a sus fabricantes todo el tiempo. Desde el <b>12-09-2025</b>, la <b>Ley de Datos de la UE</b> permite al dueño del coche ordenar que se compartan con el servicio que él elija. Además, fabricantes y autoridades ya intercambian <b>avisos de seguridad generados por los coches</b> (DFRS) en los portales nacionales de tráfico. SENDA los suma a lo que ven los teléfonos, las cámaras y la infraestructura, con una regla: <b>cada dato con su base legal, y nada que identifique a nadie</b>.</p>
+
+<section class="card" data-viz="posicion" style="margin-top:14px" aria-labelledby="h-p">
+  <h2 id="h-p">🎯 Dónde estás, con todo lo que hay alrededor</h2>
+  <div class="g2" style="margin-top:0">
+    <div><canvas id="cv-p" aria-label="Vista cenital de una carretera: la nube de error del GPS se reduce paso a paso al sumar la vía, el rumbo a un aerogenerador, dos puntos Wi-Fi y la distancia al coche de delante"></canvas></div>
+    <div>
+      <div class="tw"><table><thead><tr><th>Se suma</th><th>Error previsto (1σ)</th><th>Error real</th></tr></thead><tbody id="p-tb"></tbody></table></div>
+      <p class="m" style="font-size:14px">Mínimos cuadrados ponderados con medidas de distinto tipo:</p>
+      <ul class="m" style="font-size:14px">
+        <li>la posición del <b>GNSS</b> (±8 m);</li>
+        <li><b>que el coche va sobre la vía</b> (±1,8 m lateral);</li>
+        <li>el <b>rumbo a un aerogenerador</b> visible (±2°);</li>
+        <li>la <b>distancia a dos puntos Wi-Fi</b> con medida de tiempo de vuelo (±1,5 m);</li>
+        <li>la <b>distancia al coche de delante</b> por banda ultraancha (±0,5 m).</li>
+      </ul>
+      <p class="m" style="font-size:14px">Cada medida estrecha la elipse de error. Se mide la ganancia, no se promete.</p>
+      <div class="note">Escenario <b>de ejemplo</b> con puntos inventados y ruido gaussiano de semilla fija: el mismo cálculo se repite con 6 semillas en las pruebas (de ~10 m a menos de 2,5 m en todas). La disponibilidad real de Wi-Fi con tiempo de vuelo y de banda ultraancha entre coches depende del teléfono y del coche.</div>
+    </div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-s">
+  <h2 id="h-s">🔌 Fuentes, con su base legal</h2>
+  <div class="tw"><table><thead><tr><th>Fuente</th><th>Qué aporta</th><th>Base legal</th><th>Latencia</th><th>Acceso</th></tr></thead><tbody id="s-tb"></tbody></table></div>
+</section>
+
+<div class="g2">
+  <section class="card" aria-labelledby="h-v">
+    <h2 id="h-v">📈 Velocidad de un tramo, fusionando fuentes</h2>
+    <p class="m" style="margin-top:0">Cada fuente tiene su precisión y su edad: estación de aforo ±3 km/h, coche conectado ±4, cámara ±6, teléfono ±8, Waze ±10, y más incertidumbre cuanto más viejo es el dato. Un filtro de Kalman las une y dice cuánto pesó cada una.</p>
+    <div class="kv" id="v-kv" style="grid-template-columns:repeat(2,1fr)"></div>
+    <div class="tw"><table><thead><tr><th>Fuente</th><th>Medida</th><th>Peso en la fusión</th></tr></thead><tbody id="v-tb"></tbody></table></div>
+  </section>
+  <section class="card" aria-labelledby="h-g">
+    <h2 id="h-g">🛡️ Privacidad por diseño</h2>
+    <p class="m" style="margin-top:0">Antes de salir del relé, las observaciones se agregan por <b>celda de vía (500 m) y franja de 5 min</b>. Una celda solo se publica si la ven <b>al menos 5 fuentes distintas</b> (k-anonimato). Nunca salen identificadores ni trayectorias.</p>
+    <div class="tw"><table><thead><tr><th>Celda</th><th>Fuentes</th><th>Velocidad media</th><th>¿Se publica?</th></tr></thead><tbody id="g-tb"></tbody></table></div>
+    <div class="note">Seguir un vehículo concreto entre cámaras, leer matrículas o interceptar el eCall del coche es <span class="chip no">NUNCA</span>. SENDA es un canal secundario: el eCall y el 112 siguen siendo el camino oficial.</div>
+  </section>
+</div>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-b">
+  <h2 id="h-b">🏗️ Arquitectura del backend</h2>
+  <div class="g3" style="margin-top:0">
+    <div><h3>1 · Borde</h3><p class="m">Teléfonos (GNSS, acelerómetro, Bluetooth), lector OBD-II del propio coche, app en la pantalla del coche (Android Automotive, pendiente), cámaras analizadas en el relé, balizas V16 (DGT 3.0), ESP32 y satélite.</p></div>
+    <div><h3>2 · Ingesta con base legal</h3><p class="m">Un adaptador por fuente: DATEX II (DGT, NDW y avisos de los coches vía DFRS), Ley de Datos (fabricantes o plataformas multimarca), Waze for Cities y DGT 3.0 por convenio. Cada dato lleva su procedencia y su permiso.</p></div>
+    <div><h3>3 · Puerta de privacidad</h3><p class="m">Pseudónimos rotativos, k-anonimato por celda y franja, retención mínima y nada de imágenes. Registro auditable con huellas encadenadas.</p></div>
+    <div><h3>4 · Fusión</h3><p class="m">Por tramo de vía: velocidad (Kalman), cola y onda de choque, creencia en cada aviso (bayesiana) y posición (mínimos cuadrados). Todo en el mismo núcleo que ya corre en el teléfono.</p></div>
+    <div><h3>5 · Distribución</h3><p class="m">Tramas de 24 bytes por Bluetooth, avisos por el relé, DATEX II al Punto de Acceso Nacional o a DFRS, CAP 1.2 para el 112 y CIFS para Waze, por convenio.</p></div>
+    <div><h3>6 · Gobierno</h3><p class="m">Relé soberano de cada organismo. Consentimientos del titular (Ley de Datos), convenios firmados y auditoría. Lo NUNCA está escrito en el código.</p></div>
+  </div>
+  <p class="src">Documento completo: <code>docs/architecture/BACKEND_VEHICULOS_Y_FUSION_2026-11-05.md</code>. Fuentes: <a href="https://streamlex.eu/news/data-act-vehicle-data-guidance-explained/">Ley de Datos y vehículos</a> · <a href="https://autovista24.autovistagroup.com/news/european-data-act-empowers-users-connected-vehicles/">Autovista: Ley de Datos</a> · <a href="https://ertico.com/what-we-do/innovation-platforms/dfrs">Data for Road Safety (ERTICO)</a> · <a href="https://datex2.eu/user-domains/srti/">SRTI en DATEX II</a> · <a href="https://eur-lex.europa.eu/eli/reg_del/2024/1180/oj">eCall de nueva generación (Reglamento Delegado 2024/1180)</a> · <a href="https://developer.android.com/training/cars/apps">Android for Cars App Library</a>. Código: <code>vehicle-link.mjs</code>.</p>
+</section>
+</main>
+<script type="module">
+import { $, C, canvas, text, rr, run, clamp, FILM, drawCar, drawRoad } from '/senda/kit.mjs';
+import { VEHICLE_SOURCES, fusePosition, positionScenario, fuseSegmentSpeed, privacyGate } from '/senda/core/vehicle-link.mjs';
+import { localFrame } from '/senda/core/geo-offline.mjs';
+const fmt = (x, d = 1) => x.toFixed(d).replace('.', ',');
+const S = {}; window.SENDA_VEHICULOS = S;
+const CH = { PASIVO: 'ok', CONVENIO: 'todo', NUNCA: 'no' };
+$('#s-tb').innerHTML = VEHICLE_SOURCES.map((s) => `<tr><td><b>${s.name}</b>${s.note ? `<br><span class="m" style="font-size:12px">${s.note}</span>` : ''}</td><td>${s.gives}</td><td class="m">${s.legal}</td><td>${s.latency}</td><td><span class="chip ${CH[s.access]}">${s.access}</span></td></tr>`).join('');
+
+// ---- fusión de posición, paso a paso
+const sc = positionScenario(), F = localFrame(sc.truth.lat, sc.truth.lon), err = (p) => { const q = F.toXY(p.lat, p.lon); return Math.hypot(q.x, q.y); };
+const ORDER = [['gnss', 'GNSS'], ['road', '+ sobre la vía'], ['bearing', '+ rumbo al aerogenerador'], ['range1', '+ Wi-Fi con tiempo de vuelo (2 puntos)'], ['range2', '+ coche de delante (banda ultraancha)']];
+const sets = [[0], [0, 5], [0, 5, 1], [0, 5, 1, 2, 3], [0, 5, 1, 2, 3, 4]].map((ix) => fusePosition(ix.map((i) => sc.meas[i])));
+S.steps = sets.map((r) => ({ rms: r.rmsM, err: +err(r).toFixed(2) }));
+$('#p-tb').innerHTML = sets.map((r, i) => `<tr><td>${ORDER[i][1]}</td><td>${fmt(r.rmsM, 2)} m</td><td>${fmt(err(r), 2)} m</td></tr>`).join('');
+const gp = canvas($('#cv-p')), K = 3.2, O = { x: 330, y: 330 }, P = (lat, lon) => { const q = F.toXY(lat, lon); return { x: O.x + q.x * K, y: O.y - q.y * K }; };
+function drawP(t) {
+  const g = gp, P2 = 18, lt = t % P2, step = Math.min(4, Math.floor(lt / 3)), r = sets[step];
+  g.fillStyle = '#16231b'; g.fillRect(0, 0, 640, 600);
+  g.save(); g.translate(O.x + 1 * K, 0); drawRoad(g, -34, 0, 68, 600, { lanes: 2, vertical: true, offset: lt * 30 }); g.restore();
+  const tq = P(sc.labels.turbine.lat, sc.labels.turbine.lon), ang = Math.atan2(tq.y - O.y, tq.x - O.x);
+  if (step >= 2) { g.strokeStyle = 'rgba(145,215,232,.55)'; g.setLineDash([6, 6]); g.beginPath(); g.moveTo(O.x, O.y); g.lineTo(O.x + Math.cos(ang) * 600, O.y + Math.sin(ang) * 600); g.stroke(); g.setLineDash([]); text(g, 'rumbo al aerogenerador (fuera de cuadro)', 26, 40, { c: C.i, f: '12px Inter,system-ui' }); }
+  for (const [lb, k] of [['ap1', 'Wi-Fi 1'], ['ap2', 'Wi-Fi 2']]) { const p = P(sc.labels[lb].lat, sc.labels[lb].lon); g.fillStyle = step >= 3 ? C.v : 'rgba(183,156,255,.35)'; g.beginPath(); g.arc(p.x, p.y, 6, 0, 7); g.fill(); text(g, k, p.x + 9, p.y + 4, { c: C.v, f: '11px Inter,system-ui' }); if (step >= 3) { const m = sc.meas[lb === 'ap1' ? 2 : 3]; g.strokeStyle = 'rgba(183,156,255,.5)'; g.beginPath(); g.arc(p.x, p.y, m.rangeM * K, 0, 7); g.stroke(); } }
+  const cq = P(sc.labels.car.lat, sc.labels.car.lon); drawCar(g, cq.x, cq.y, { len: 15, ang: -Math.PI / 2, color: '#c9c2b4' }); if (step >= 4) { g.strokeStyle = 'rgba(251,191,36,.6)'; g.beginPath(); g.arc(cq.x, cq.y, sc.meas[4].rangeM * K, 0, 7); g.stroke(); }
+  drawCar(g, O.x, O.y, { len: 15, ang: -Math.PI / 2, color: '#91d7e8', lights: true });
+  const gq = P(sc.meas[0].lat, sc.meas[0].lon); g.fillStyle = 'rgba(255,119,86,.12)'; g.beginPath(); g.arc(gq.x, gq.y, 8 * K, 0, 7); g.fill(); g.strokeStyle = 'rgba(255,119,86,.7)'; g.stroke(); g.fillStyle = C.c; g.beginPath(); g.arc(gq.x, gq.y, 4, 0, 7); g.fill(); text(g, 'GNSS', gq.x + 8, gq.y - 8, { c: C.c, f: '700 11px Inter,system-ui' });
+  const rq = P(r.lat, r.lon); g.save(); g.translate(rq.x, rq.y); g.rotate(-(r.angleDeg * Math.PI) / 180); g.fillStyle = 'rgba(52,211,153,.25)'; g.strokeStyle = C.e; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 0, Math.max(2, r.majorM * K), Math.max(2, r.minorM * K), 0, 0, 7); g.fill(); g.stroke(); g.restore(); g.lineWidth = 1;
+  g.fillStyle = C.e; g.beginPath(); g.arc(rq.x, rq.y, 3, 0, 7); g.fill();
+  g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 500, 600, 84, 12); g.fill(); g.strokeStyle = C.l; g.stroke();
+  text(g, `${ORDER[step][1]}`, 34, 528, { c: C.t, f: '800 15px Inter,system-ui' });
+  text(g, `Error previsto ${fmt(r.rmsM, 2)} m · error real ${fmt(err(r), 2)} m (GNSS solo: ${fmt(err(sets[0]), 1)} m)`, 34, 552, { c: C.e, f: '13px Inter,system-ui' });
+  text(g, 'Elipse verde = incertidumbre 1σ · escenario de ejemplo', 34, 572, { c: C.g, f: '11px Inter,system-ui' });
+}
+
+// ---- velocidad de un tramo
+const obs = [{ source: 'telefono', kmh: 62, t: 0 }, { source: 'camaras', kmh: 58, t: 30 }, { source: 'detectores', kmh: 55, t: 60 }, { source: 'waze', kmh: 70, t: 60 }], fs = fuseSegmentSpeed(obs, { nowS: 60 }); S.segment = fs;
+$('#v-kv').innerHTML = `<div><b>${fmt(fs.kmh)} km/h</b><span>velocidad del tramo</span></div><div><b>± ${fmt(fs.sdKmh, 2)}</b><span>incertidumbre (1σ)</span></div>`;
+$('#v-tb').innerHTML = obs.map((o, i) => `<tr><td>${o.source}</td><td>${o.kmh} km/h${o.t < 60 ? ` <span class="m">(hace ${60 - o.t} s)</span>` : ''}</td><td>${Math.round(fs.contrib[i].gain * 100)} %</td></tr>`).join('');
+// ---- puerta de privacidad
+const ob = [...Array.from({ length: 7 }, (_, i) => ({ roadId: 'A-3', s: 1200 + i * 30, t: 100 + i, sourceId: `v${i}`, speedKmh: 40 + i })), { roadId: 'A-3', s: 2600, t: 120, sourceId: 'z1', speedKmh: 90 }, { roadId: 'A-3', s: 2650, t: 130, sourceId: 'z1', speedKmh: 91 }, { roadId: 'A-3', s: 2700, t: 140, sourceId: 'z2', speedKmh: 88 }];
+const pg = privacyGate(ob); S.privacy = { published: pg.published.length, suppressed: pg.suppressedCells };
+$('#g-tb').innerHTML = `${pg.published.map((c) => `<tr><td>A-3 · ${c.fromM}–${c.toM} m</td><td>${c.n}</td><td>${fmt(c.meanKmh)} km/h</td><td><span class="chip ok">sí</span></td></tr>`).join('')}<tr><td>A-3 · 2500–3000 m</td><td>2</td><td>—</td><td><span class="chip no">no (menos de 5)</span></td></tr>`;
+run({ posicion: drawP });
+</script>
+</body></html>

@@ -1,0 +1,138 @@
+{
+ "note": "SENDA Mission 9.5 · Vertical 9:16 45s (s1 + s3b + s13)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "s1",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/public/senda/dgt.html",
+    "docs/video/M95_VIDEO_SOURCES.md"
+   ],
+   "visual": {
+    "kind": "kpis",
+    "kpis": [
+     {
+      "v": "90 % → 40 %",
+      "l": {
+       "es": "usuarios con conexión estable · apagón ibérico 28-04-2025",
+       "en": "users with a stable connection · Iberian blackout 28-04-2025",
+       "nl": "gebruikers met stabiele verbinding · Iberische stroomstoring 28-04-2025"
+      }
+     },
+     {
+      "v": "20:11",
+      "l": {
+       "es": "llega el ES-Alert · DANA de Valencia, 29-10-2024",
+       "en": "ES-Alert arrives · Valencia floods, 29-10-2024",
+       "nl": "ES-Alert komt aan · overstroming Valencia, 29-10-2024"
+      }
+     }
+    ]
+   },
+   "title": {
+    "es": "Cuando cae la red, el mensaje no debería morir.",
+    "en": "When the network falls, the message shouldn't die.",
+    "nl": "Als het netwerk uitvalt, mag het bericht niet sterven."
+   },
+   "es": [
+    "Cuando cae la red, el mensaje no debería morir.",
+    "El veintiocho de abril de dos mil veinticinco, la red móvil no cayó al irse la luz: cayó cuando se agotaron las baterías de las antenas. En pocas horas, los usuarios con conexión estable pasaron del noventa al cuarenta por ciento."
+   ],
+   "es_say": [
+    "Cuando cae la red, el mensaje no debería morir.",
+    "El veintiocho de abril de dos mil veinticinco, la red móvil no cayó al irse la luz: cayó cuando se agotaron las baterías de las antenas. En pocas horas, los usuarios con conexión estable pasaron del noventa al cuarenta por ciento."
+   ],
+   "en": [
+    "When the network falls, the message shouldn't die.",
+    "On the twenty-eighth of April, twenty twenty-five, Spain's mobile network didn't fail when the power went out. It failed when the batteries in the masts ran dry. Within hours, users with a stable connection dropped from ninety to forty percent."
+   ],
+   "en_say": [
+    "When the network falls, the message shouldn't die.",
+    "On the twenty-eighth of April, twenty twenty-five, Spain's mobile network didn't fail when the power went out. It failed when the batteries in the masts ran dry. Within hours, users with a stable connection dropped from ninety to forty percent."
+   ],
+   "nl": [
+    "Als het netwerk uitvalt, mag het bericht niet sterven.",
+    "Op 28 april 2025 viel het Spaanse mobiele netwerk niet uit toen de stroom wegviel, maar toen de accu's van de zendmasten leeg raakten. Binnen enkele uren daalde het aandeel gebruikers met een stabiele verbinding van negentig naar veertig procent."
+   ]
+  },
+  {
+   "id": "s3b",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/voice-call.mjs",
+    "investor-next/public/senda/llamada.html"
+   ],
+   "visual": {
+    "kind": "call"
+   },
+   "title": {
+    "es": "Llamar sin Internet",
+    "en": "Calling without Internet",
+    "nl": "Bellen zonder internet"
+   },
+   "es": [
+    "Ahora SENDA también llama. Dos teléfonos en la misma wifi, o en el punto de acceso de uno de ellos, hablan sin Internet, sin operador y sin servidor.",
+    "El truco está en el arranque: lo que normalmente necesitaba un servidor, unos dos mil caracteres, SENDA lo reduce a unos noventa bytes y lo pasa por sonido en menos de nueve segundos."
+   ],
+   "es_say": [
+    "Ahora Senda también llama. Dos teléfonos en la misma uifi, o en el punto de acceso de uno de ellos, hablan sin Internet, sin operador y sin servidor.",
+    "El truco está en el arranque: lo que normalmente necesitaba un servidor, unos dos mil caracteres, Senda lo reduce a unos noventa bytes y lo pasa por sonido en menos de nueve segundos."
+   ],
+   "en": [
+    "Now SENDA can also call. Two phones on the same Wi-Fi, or on one phone's hotspot, talk with no Internet, no carrier and no server.",
+    "The trick is the setup: what normally needed a server, about two thousand characters, SENDA shrinks to about ninety bytes and sends it by sound in under nine seconds."
+   ],
+   "en_say": [
+    "Now Senda can also call. Two phones on the same Wi-Fi, or on one phone's hotspot, talk with no Internet, no carrier and no server.",
+    "The trick is the setup: what normally needed a server, about two thousand characters, Senda shrinks to about ninety bytes and sends it by sound in under nine seconds."
+   ],
+   "nl": [
+    "Nu kan SENDA ook bellen. Twee telefoons op hetzelfde wifi-netwerk, of op de hotspot van een van beide, praten zonder internet, zonder provider en zonder server.",
+    "De truc zit in de opbouw: wat normaal een server nodig had, zo'n tweeduizend tekens, brengt SENDA terug tot ongeveer negentig bytes en stuurt het in minder dan negen seconden via geluid."
+   ]
+  },
+  {
+   "id": "s13",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/app/senda-home.tsx",
+    "LICENSE"
+   ],
+   "visual": {
+    "kind": "cta"
+   },
+   "title": {
+    "es": "Para que ningún mensaje se pierda",
+    "en": "So that no message is lost",
+    "nl": "Zodat geen enkel bericht verloren gaat"
+   },
+   "es": [
+    "Pruébalo ahora, sin instalar nada, en la dirección que ves en pantalla."
+   ],
+   "es_say": [
+    "Pruébalo ahora, sin instalar nada, en la dirección que ves en pantalla."
+   ],
+   "en": [
+    "Try it now, with nothing to install, at the address on screen."
+   ],
+   "en_say": [
+    "Try it now, with nothing to install, at the address on screen."
+   ],
+   "nl": [
+    "Probeer het nu, zonder iets te installeren, op het adres in beeld."
+   ]
+  }
+ ]
+}

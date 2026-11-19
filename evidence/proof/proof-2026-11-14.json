@@ -1,0 +1,145 @@
+{
+ "format": "senda-proof/1",
+ "gitSha": "86a63dea7f46528d0a579f12d7d0aaabfe5992ed",
+ "gitDirty": true,
+ "node": "v22.23.4",
+ "generatedAt": "2026-11-14T01:06:15.316Z",
+ "note": "Cifras recalculadas con packages/senda/src. Las marcadas SIMULATED en la película proceden de modelos y escenarios sintéticos, no de ensayos de campo.",
+ "claims": [
+  {
+   "id": "rain-p838",
+   "scene": "v12",
+   "claim": "868 MHz casi no pierde; 28 GHz ≈ 7 dB/km a 50 mm/h",
+   "value": "868 MHz 0.0006 dB/km · 28 GHz 7.4 dB/km (fórmula directa 7.4)",
+   "ok": true
+  },
+  {
+   "id": "knife-edge",
+   "scene": "v13",
+   "claim": "cresta de 60 m a mitad de 10 km cuesta ≈ 22 dB a 868 MHz",
+   "value": "22.1 dB (v = 2.89; P.526 directa 22.1 dB)",
+   "ok": true
+  },
+  {
+   "id": "reed-solomon",
+   "scene": "v08",
+   "claim": "envías diez fragmentos y seis cualesquiera lo reconstruyen; con cinco no",
+   "value": "200/200 subconjuntos aleatorios de 6 reconstruyen; con 5: rechaza",
+   "ok": true
+  },
+  {
+   "id": "multibearer-run",
+   "scene": "v08",
+   "claim": "SIMULACIÓN: 200 mensajes con portadores perdidos al azar según sus probabilidades de planificación (sin medir en campo), solo con portadores disponibles en España; semilla fija",
+   "value": "198/200 reconstruidos byte a byte (teoría 99.4 %; 4 de 11)",
+   "ok": true
+  },
+  {
+   "id": "envelope-size",
+   "scene": "v06",
+   "claim": "mensaje cifrado de extremo a extremo en ≈ 300 bytes; un relé no puede leerlo",
+   "value": "324 B; el relé no ve el texto: true; un tercero no lo abre: true; el destinatario sí: true",
+   "ok": true
+  },
+  {
+   "id": "sound-airtime",
+   "scene": "v10",
+   "claim": "por sonido: un mensaje corto ≈ 30 s; el arranque de una llamada < 11 s",
+   "value": "mensaje 324 B → 29.2 s; llamada 110 B → 10.5 s; ida y vuelta modem: true",
+   "ok": true
+  },
+  {
+   "id": "arnhem-san-martin",
+   "scene": "v09",
+   "claim": "SENDA ≈ 4 min frente a WhatsApp 8 h (simulación); sin puentes no finge",
+   "value": "con puentes 4.01 min · WhatsApp 480 min · sin puentes 480.01 min (DELIVERABLE)",
+   "ok": true
+  },
+  {
+   "id": "blackout-gateways",
+   "scene": "v15",
+   "claim": "cinco pasarelas llegan al 72 % de los aislados (ciudad de prueba)",
+   "value": "72.1 %",
+   "ok": true
+  },
+  {
+   "id": "brake-chain",
+   "scene": "v16",
+   "claim": "niebla, 120 km/h, 1,2 s: chocan 5; con aviso simultáneo solo el que va pegado",
+   "value": "sin aviso 5 choques · con aviso 1 (coche 1)",
+   "ok": true
+  },
+  {
+   "id": "sos-rides-cars",
+   "scene": "v16",
+   "claim": "sin cobertura el SOS sale en ≈ 7 min con 1 de cada 10 coches",
+   "value": "7.4 min (cuota 0.1, 300 veh/h)",
+   "ok": true
+  },
+  {
+   "id": "rail-second-train",
+   "scene": "v18",
+   "claim": "segundo tren en 30–41 s con el 25 % de pasajeros; < 1 min con el 5 %",
+   "value": "25 %: 30–41 s (8 semillas) · 5 %: 30–57 s (16 semillas)",
+   "ok": true
+  },
+  {
+   "id": "quake-locate",
+   "scene": "v19",
+   "claim": "14 móviles sitúan el epicentro a ≈ 0,5 km; sin catálogo público no se activa",
+   "value": "14 estaciones · error 0.5 km · solo red: STANDBY · con catálogo: RELAY_ACTIVE",
+   "ok": true
+  },
+  {
+   "id": "flood-lead",
+   "scene": "v20",
+   "claim": "aviso 2 h 30 antes de que se desborde el primer pueblo, con 3 l/m² de lluvia local",
+   "value": "Pueblo del cauce: 150 min de aviso · lluvia local 3 mm · umbral local: 0 min",
+   "ok": true
+  },
+  {
+   "id": "wildfire-mast",
+   "scene": "v21",
+   "claim": "la antena del pueblo arde 107 min antes del límite para avisarlo",
+   "value": "Valdeolmos: antena cae a 98.5 min, límite de aviso 205.9 min → 107.3 min perdidos",
+   "ok": true
+  },
+  {
+   "id": "ble-floors",
+   "scene": "v22",
+   "claim": "en 720 plantas simuladas el margen contiene la cifra real el 95 % de las veces",
+   "value": "686/720 = 95.3 %",
+   "ok": true
+  },
+  {
+   "id": "knock-10cm",
+   "scene": "v22",
+   "claim": "cinco móviles sitúan un golpe a ≈ 10 cm (simulación)",
+   "value": "5 móviles · error 10.3 cm",
+   "ok": true
+  },
+  {
+   "id": "delivery-assurance",
+   "scene": "v12",
+   "claim": "plan ingenuo promete 99,49 % y entrega 96,09 %; el motor entrega ≈ 99 % a 0 €",
+   "value": "ingenuo promete 0.9949 y entrega 0.9609 · motor a 0 € entrega 0.9898 (3 de 22; SIMULATED)",
+   "ok": true
+  },
+  {
+   "id": "learning-crdt",
+   "scene": "v24",
+   "claim": "los recibos de entrega enseñan qué canal funciona en cada zona y se combinan entre nodos sin servidor (sin contar dos veces)",
+   "value": "SMS aprendido: 3.4 % en el pueblo sin antena, 69.1 % en el otro (catálogo 55 %) · 2 nodos fusionados = 1 nodo con todo; fusionar otra vez no cambia nada: true",
+   "ok": true
+  },
+  {
+   "id": "reserve-1gb",
+   "scene": "v11",
+   "claim": "reserva de 1 GB elegida con mochila 0/1 exacta y frescura",
+   "value": "19 contenidos en 754.4 MB · DP 693 = fuerza bruta 693",
+   "ok": true
+  }
+ ],
+ "suite": null,
+ "sha256": "8a42e1485559bbdb7b527df2c0c50aff5ebb837ed6092179a49194e6c05b4d93"
+}

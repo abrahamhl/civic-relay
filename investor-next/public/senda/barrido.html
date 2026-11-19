@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Dron casa por casa</title>
+<meta name="description" content="Tras un terremoto o una riada, un dron barre el barrio casa por casa: ruta optimizada, cambios de batería, censo Bluetooth y térmica, y un tablero de prioridad para los equipos de tierra.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/arquitectura">Arquitectura</a> · <a href="/senda/dron">Censo por planta</a> · <a href="/senda/sentidos">Sentidos</a> · <a href="/senda/edificios">Edificios</a></p>
+<h1>Dron casa por casa</h1>
+<p class="lead m">Después de un terremoto o una riada hay decenas de edificios y muy pocos drones. SENDA hace el plan en el teléfono del operador:
+1) decide el orden de las casas para volar lo mínimo;
+2) parte la ruta en salidas que caben en la batería, con reserva;
+3) en cada casa, el dron da un anillo de fachada por plantas, escucha el Bluetooth (censo por planta) y hace una pasada térmica;
+4) el resultado es un <b>tablero de prioridad</b> para los equipos de tierra: personas probables por daño del edificio.</p>
+
+<section class="card" data-viz="barrido" style="margin-top:14px" aria-labelledby="h-b">
+  <h2 id="h-b">🚁 El barrido, en vivo</h2>
+  <div class="g2" style="margin-top:0">
+    <div><canvas id="cv-bar" aria-label="Barrio con 24 edificios coloreados por daño; el dron recorre la ruta en varias salidas y cada casa visitada muestra las personas probables"></canvas></div>
+    <div>
+      <div class="kv" id="b-kv"></div>
+      <h3 style="margin-top:14px">Tablero de prioridad (primeras 10)</h3>
+      <div class="tw"><table><thead><tr><th>#</th><th>Casa</th><th>Daño</th><th>Teléfonos</th><th>Personas (90 %)</th><th>Térmica</th></tr></thead><tbody id="b-tb"></tbody></table></div>
+      <div class="note">Escenario <b>sintético</b>. El grado de daño (escala europea EMS-98) lo asigna una persona experta mirando el vídeo; el dron no lo inventa. Las personas salen del censo Bluetooth (<code>rf-census.mjs</code>) y la térmica solo sube la confianza. El vuelo requiere la autorización de quien dirige la emergencia.</div>
+    </div>
+  </div>
+</section>
+<section class="card" style="margin-top:14px" aria-labelledby="h-c">
+  <h2 id="h-c">Cómo planifica</h2>
+  <div class="g3" style="margin-top:0">
+    <div><h3>Orden de visita</h3><p class="m">Primero el vecino más cercano y después mejora 2-opt, que deshace los cruces de la ruta. Garantiza recorrer cada casa una vez y no empeorar nunca la ruta inicial.</p></div>
+    <div><h3>Batería</h3><p class="m">Cada salida suma ida, trabajo (unos 40 s por planta) y vuelta a la base, y no pasa del 80 % de la autonomía. Al volver, cambio de batería de 3 minutos.</p></div>
+    <div><h3>Prioridad</h3><p class="m">Personas probables (mediana del intervalo bayesiano) por el peso del daño; la térmica la multiplica por 1,25. Sin daño, prioridad cero, aunque haya gente.</p></div>
+  </div>
+</section>
+</main>
+<script type="module">
+import { $, C, canvas, text, rr, run, clamp, ease, FILM } from '/senda/kit.mjs';
+import { sweepScenario, planSweep, sweepBoard } from '/senda/core/house-sweep.mjs';
+const sc = sweepScenario(), plan = planSweep(sc.houses, { base: sc.base }), board = sweepBoard(sc.houses), byId = Object.fromEntries(sc.houses.map((h) => [h.id, h])), rank = Object.fromEntries(board.map((b, i) => [b.id, i + 1]));
+window.SENDA_BARRIDO = { sorties: plan.sorties, totalS: plan.totalS, top: board.slice(0, 3).map((b) => b.id) };
+const DMG = ['#2a3f4d', '#3b5a4a', '#7a7a3a', '#b36b2c', '#c4433a', '#8f1f2a'];
+$('#b-kv').innerHTML = `<div><b>${sc.houses.length}</b><span>edificios</span></div><div><b>${plan.sorties.length}</b><span>salidas (cambio de batería)</span></div><div><b>${Math.round(plan.totalS / 60)} min</b><span>barrido completo</span></div><div><b>${board[0].id}</b><span>primera casa para los equipos</span></div>`;
+$('#b-tb').innerHTML = board.slice(0, 10).map((b, i) => `<tr><td>${i + 1}</td><td><b>${b.id}</b> · ${b.floors} pl.</td><td>${b.damage}/5</td><td>${b.phones}</td><td><b>${b.people.mid}</b> <span class="m">(${b.people.lo}–${b.people.hi})</span></td><td>${b.thermal ? '🔥' : '—'}</td></tr>`).join('');
+// trayectoria temporal del dron: [t0, t1, from, to, sortie]
+const legs = []; { let t = 0, at = sc.base; plan.sorties.forEach((s, si) => { at = sc.base; for (const id of s.houses) { const h = byId[id], go = Math.hypot(h.x - at.x, h.y - at.y) / 10; legs.push({ t0: t, t1: t + go, a: at, b: h, si, kind: 'vuelo' }); t += go; const w = 30 + 40 * h.floors; legs.push({ t0: t, t1: t + w, a: h, b: h, si, kind: 'trabajo', id }); t += w; at = h; } const back = Math.hypot(at.x - sc.base.x, at.y - sc.base.y) / 10; legs.push({ t0: t, t1: t + back, a: at, b: sc.base, si, kind: 'vuelta' }); t += back; if (si < plan.sorties.length - 1) { legs.push({ t0: t, t1: t + 180, a: sc.base, b: sc.base, si, kind: 'batería' }); t += 180; } }); }
+const g = canvas($('#cv-bar')), W = 640, H = 600, MX = (x) => 30 + (x - 10) * 2.05, MY = (y) => 56 + (y - 10) * 2.05, SCOL = [C.i, C.e, C.a, C.v, C.c];
+function drawBar(t) {
+  const P = 30, lt = FILM ? t : t % (P + 5), simT = clamp(lt / P) * plan.totalS;
+  g.fillStyle = '#0a1117'; g.fillRect(0, 0, W, H);
+  g.strokeStyle = '#18242d'; g.lineWidth = 14; for (let c = 0; c < 7; c++) { g.beginPath(); g.moveTo(MX(37 + c * 45), MY(15)); g.lineTo(MX(37 + c * 45), MY(195)); g.stroke(); } for (let r = 0; r < 5; r++) { g.beginPath(); g.moveTo(MX(15), MY(17 + r * 45)); g.lineTo(MX(320), MY(17 + r * 45)); g.stroke(); }
+  const visited = new Set(legs.filter((l) => l.kind === 'trabajo' && l.t1 <= simT).map((l) => l.id));
+  // ruta ya volada
+  for (const l of legs) { if (l.t0 > simT || l.kind === 'trabajo' || l.kind === 'batería') continue; const f = clamp((simT - l.t0) / Math.max(1e-6, l.t1 - l.t0)); g.strokeStyle = SCOL[l.si % SCOL.length]; g.globalAlpha = 0.7; g.lineWidth = 2; g.beginPath(); g.moveTo(MX(l.a.x), MY(l.a.y)); g.lineTo(MX(l.a.x + (l.b.x - l.a.x) * f), MY(l.a.y + (l.b.y - l.a.y) * f)); g.stroke(); g.globalAlpha = 1; }
+  for (const h of sc.houses) {
+    const v = visited.has(h.id), s = 12 + h.floors * 2.4, b = board.find((x) => x.id === h.id);
+    g.fillStyle = v ? DMG[h.damage] : '#1a2630'; rr(g, MX(h.x) - s, MY(h.y) - s, 2 * s, 2 * s, 4); g.fill(); g.strokeStyle = v && rank[h.id] <= 3 ? C.c : '#2a3f4d'; g.lineWidth = v && rank[h.id] <= 3 ? 3 : 1; g.stroke();
+    text(g, h.id, MX(h.x), MY(h.y) - 1, { c: C.t, f: '700 11px Inter,system-ui', al: 'center' });
+    if (v) { text(g, `${b.people.lo}–${b.people.hi}`, MX(h.x), MY(h.y) + 12, { c: '#f2f4f4', f: '700 10px Inter,system-ui', al: 'center' }); if (h.thermal) text(g, '🔥', MX(h.x) + s - 6, MY(h.y) - s + 10, { f: '11px system-ui', al: 'center' }); if (rank[h.id] <= 3) text(g, `#${rank[h.id]}`, MX(h.x) - s + 2, MY(h.y) - s - 4, { c: C.c, f: '800 12px Inter,system-ui' }); }
+  }
+  g.fillStyle = '#123'; g.strokeStyle = C.e; g.lineWidth = 2; g.beginPath(); g.arc(MX(sc.base.x), MY(sc.base.y), 12, 0, 7); g.fill(); g.stroke(); text(g, 'H', MX(sc.base.x), MY(sc.base.y) + 4, { c: C.e, f: '800 12px Inter,system-ui', al: 'center' });
+  const cur = legs.find((l) => simT >= l.t0 && simT < l.t1) ?? legs.at(-1), f = clamp((simT - cur.t0) / Math.max(1e-6, cur.t1 - cur.t0)), dx = cur.a.x + (cur.b.x - cur.a.x) * f, dy = cur.a.y + (cur.b.y - cur.a.y) * f;
+  if (cur.kind === 'trabajo') { const ph = (lt * 2) % 1; g.strokeStyle = `rgba(145,215,232,${1 - ph})`; g.lineWidth = 2; g.beginPath(); g.arc(MX(dx), MY(dy), 14 + ph * 22, 0, 7); g.stroke(); }
+  g.fillStyle = C.t; g.beginPath(); g.arc(MX(dx) + (cur.kind === 'trabajo' ? Math.cos(lt * 5) * 16 : 0), MY(dy) + (cur.kind === 'trabajo' ? Math.sin(lt * 5) * 16 : 0), 6, 0, 7); g.fill();
+  const mm = Math.floor(simT / 60), label = { vuelo: 'volando a la siguiente casa', trabajo: `casa ${cur.id}: fachada, Bluetooth y térmica`, vuelta: 'vuelve a la base', batería: 'cambio de batería' }[cur.kind];
+  text(g, `Salida ${cur.si + 1}/${plan.sorties.length} · minuto ${mm} · ${label}`, 20, 26, { c: C.t, f: '800 14px Inter,system-ui' });
+  // tablero inferior
+  g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 16, 478, 608, 108, 12); g.fill(); g.strokeStyle = C.l; g.stroke();
+  text(g, 'Prioridad para los equipos de tierra', 30, 500, { c: C.c, f: '700 12px ui-monospace,monospace' });
+  const vis = board.filter((b) => visited.has(b.id)).slice(0, 4);
+  vis.forEach((b, i) => { const x = 30 + i * 148; g.fillStyle = DMG[b.damage]; rr(g, x, 512, 136, 62, 10); g.fill(); text(g, `${i + 1}. Casa ${b.id}`, x + 10, 532, { c: C.t, f: '800 14px Inter,system-ui' }); text(g, `≈ ${b.people.mid} personas (${b.people.lo}–${b.people.hi})`, x + 10, 550, { c: C.t, f: '12px Inter,system-ui' }); text(g, `daño ${b.damage}/5 ${b.thermal ? '· calor 🔥' : ''}`, x + 10, 566, { c: C.t, f: '11px Inter,system-ui' }); });
+  if (!vis.length) text(g, 'Esperando las primeras casas…', 30, 540, { c: C.m, f: '13px Inter,system-ui' });
+  [0, 1, 2, 3, 4, 5].forEach((d) => { g.fillStyle = DMG[d]; g.fillRect(452 + d * 28, 452, 22, 10); }); text(g, 'daño EMS-98: 0 → 5', 452, 446, { c: C.m, f: '11px Inter,system-ui' });
+}
+run({ barrido: drawBar });
+</script>
+</body></html>

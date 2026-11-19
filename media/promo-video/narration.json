@@ -1,0 +1,108 @@
+{
+  "voice": "ef_dora",
+  "lang": "es",
+  "speed": 0.94,
+  "note": "Guion de doblaje. Cada fragmento puede llevar un 'cue' que sincroniza animaciones en film.html (data-cue). Sólo afirmaciones respaldadas en SOURCES.md.",
+  "scenes": [
+    {"id": "s1", "chunks": [
+      {"cue": "h1", "text": "Cuando la red cae, el mensaje no debería morir."},
+      {"cue": "sub", "text": "Esto es Civic Relay, el Offline Emergency Protocol. En los próximos minutos te explico su ingeniería, su arquitectura y, sobre todo, su estado real. Sin adornos."}
+    ]},
+    {"id": "s2", "chunks": [
+      {"text": "Pensemos en un apagón, una inundación o un terremoto."},
+      {"cue": "c1", "text": "Las estaciones base se quedan sin energía, y las aplicaciones de siempre fallan en silencio, agotando la batería en reintentos inútiles."},
+      {"cue": "c2", "text": "No existe una forma estructurada de dejar un estado, a salvo o necesito ayuda, que sobreviva al corte."},
+      {"cue": "c3", "text": "Y los teléfonos cercanos tienen Bluetooth y wifi, pero nada los coordina de forma abierta y con permiso."},
+      {"cue": "c4", "text": "Lo más peligroso es que el silencio se malinterpreta: un teléfono que no responde no es una víctima confirmada."}
+    ]},
+    {"id": "s3", "chunks": [
+      {"text": "Civic Relay es una capa europea, abierta y con consentimiento, para coordinar mensajes cuando la conectividad se degrada."},
+      {"cue": "es", "text": "Es un protocolo agnóstico de transporte, con una cola que almacena y reenvía, caducidad, deduplicación, y confirmaciones que nunca confunden enviado con entregado. Y es cien por cien código abierto."},
+      {"cue": "noes", "text": "Lo que no es: no sustituye al uno uno dos, no es un operador ni una constelación de satélites, y nunca activa radios sin permiso del usuario."}
+    ]},
+    {"id": "s4", "chunks": [
+      {"text": "Todo el diseño parte de tres compromisos."},
+      {"cue": "p1", "text": "Uno: verdad verificable. Una predicción no es una medición, y un satélite visible no garantiza conectividad."},
+      {"cue": "p2", "text": "Dos: continuidad honesta. Si no hay ruta, el sistema lo dice. Nunca promete una entrega que no ha ocurrido."},
+      {"cue": "p3", "text": "Y tres: soberanía gradual, con interfaces abiertas y adaptadores autorizados."}
+    ]},
+    {"id": "s5", "chunks": [
+      {"text": "Así funciona la arquitectura que ya está implementada. Un mensaje recorre ocho etapas, y cada una vive en un módulo concreto del repositorio."},
+      {"cue": "st1", "text": "Primero, el evento: una alerta que, sin verificador de autoridad, falla cerrada."},
+      {"cue": "st2", "text": "La zona, con su polígono y su ventana de validez."},
+      {"cue": "st3", "text": "El estado humano, que sólo registra acciones explícitas."},
+      {"cue": "st4", "text": "El consentimiento, con permisos del sistema y perfil de batería."},
+      {"cue": "st5", "text": "El mensaje, en una cola acotada con caducidad y protección contra repeticiones."},
+      {"cue": "st6", "text": "La ruta, elegida por un algoritmo que evita los nodos con batería crítica."},
+      {"cue": "st7", "text": "La confirmación, que exige el identificador, el par aprobado y un reto aleatorio."},
+      {"cue": "st8", "text": "Y la evidencia, exportada de forma reproducible."},
+      {"cue": "note", "text": "En cola, reenviado sin confirmar y confirmado son estados distintos. Paquete enviado nunca significa persona rescatada."}
+    ]},
+    {"id": "s6", "chunks": [
+      {"text": "Hacia dónde vamos: la arquitectura objetivo separa ocho núcleos con fronteras de confianza."},
+      {"cue": "k1", "text": "En la base, el núcleo de protocolo, el orquestador de transportes y la custodia durable de los mensajes."},
+      {"cue": "k2", "text": "Encima, la situación y la previsión, y un planificador de ventanas satelitales que sólo usará pasarelas autorizadas."},
+      {"cue": "k3", "text": "Después, la confianza institucional, el gemelo digital del territorio y, arriba, las interfaces para familias, voluntarios y centros de coordinación."},
+      {"cue": "lvl", "text": "Cada nivel se valida por separado, y cada confirmación dice exactamente hasta dónde llegó el mensaje."}
+    ]},
+    {"id": "s7", "chunks": [
+      {"text": "Veamos el escenario de referencia."},
+      {"cue": "queued", "text": "Desde Arnhem, en Países Bajos, Abraham escribe a Ismael, en San Martín de Valdeiglesias, que no tiene cobertura. El mensaje se cifra y se guarda en origen."},
+      {"cue": "gateway", "text": "Viaja hasta un gateway autorizado, que confirma la custodia, no la lectura."},
+      {"cue": "pending", "text": "Allí espera, en estado pendiente, mientras el sistema busca una ruta real de recepción."},
+      {"cue": "dest", "text": "Sólo cuando existe esa ruta hasta el dispositivo de Ismael, se emite la confirmación de destino."},
+      {"cue": "neg", "text": "Y si no existe, el mensaje no llega: sigue cifrado en la cola y caduca. La interfaz lo dice con claridad. Es un objetivo de diseño, no una capacidad desplegada."}
+    ]},
+    {"id": "s8", "chunks": [
+      {"text": "Ahora, lo que ya está construido y medido por máquina."},
+      {"cue": "n1", "text": "Noventa y ocho de noventa y ocho pruebas del laboratorio en verde, verificadas de nuevo hoy."},
+      {"cue": "n2", "text": "Ochocientos diez escenarios simulados, sin una sola violación de sus invariantes."},
+      {"cue": "n3", "text": "Quince tareas automatizadas en un navegador real, y veintiséis pruebas del núcleo."},
+      {"cue": "n5", "text": "Seis flujos de integración continua, con inventario de dependencias. Unas veintidós mil líneas de código, una web en tres idiomas, y un documento maestro con veinte módulos."}
+    ]},
+    {"id": "s9", "chunks": [
+      {"text": "El laboratorio Android conecta dos teléfonos con Nearby Connections."},
+      {"cue": "q1", "text": "El usuario confirma el emparejamiento, y cada sesión usa una clave efímera."},
+      {"cue": "q3", "text": "El mensaje se escribe en disco antes de enviarse, y la confirmación del receptor llega firmada y verificada."},
+      {"cue": "q5", "text": "Si algo falla, el sistema se bloquea. Y al pulsar stop, borra los datos y regenera la clave."},
+      {"cue": "ok", "text": "Compila en integración continua y pasa sus pruebas."},
+      {"cue": "pend", "text": "Pero la entrega física entre dos teléfonos todavía no se ha medido. Lo decimos claramente."}
+    ]},
+    {"id": "s10", "chunks": [
+      {"text": "Este es el estado real, fila a fila."},
+      {"cue": "r1", "text": "La simulación, la cola, la política y la web están probadas automáticamente."},
+      {"cue": "r5", "text": "El Android está compilado, pendiente de prueba física. La malla real y el satélite no están validados, y la integración con el uno uno dos no existe."},
+      {"cue": "trl", "text": "Madurez global: nivel tres de preparación tecnológica. Puntuación interna provisional: cincuenta y cuatro sobre cien."},
+      {"cue": "gap", "text": "La validación física vale veinte puntos, y hoy tiene cero. Eso es exactamente lo que financia la siguiente fase."}
+    ]},
+    {"id": "s11", "chunks": [
+      {"text": "La visión completa tiene veinte módulos: del sobre universal a la planificación orbital, los sensores, el gemelo digital o los drones autorizados."},
+      {"cue": "leg", "text": "La ambición no se recorta; se etiqueta. Cada módulo indica si es software existente, simulación, laboratorio o investigación, y si necesita un convenio o un operador."}
+    ]},
+    {"id": "s12", "chunks": [
+      {"text": "La hoja de ruta avanza por puertas, y cada puerta se abre con evidencia, no con pantallas."},
+      {"cue": "g0", "text": "La primera, una sola verdad, ya está hecha. La segunda, protocolo y custodia, está en curso."},
+      {"cue": "g2", "text": "La siguiente es la clave: dos teléfonos físicos, con al menos treinta intentos registrados, incluidos los fallos."},
+      {"cue": "g3", "text": "Después vendrán tres nodos con gateway, la predicción, un operador satelital, un piloto institucional y, por último, las extensiones reguladas."}
+    ]},
+    {"id": "s13", "chunks": [
+      {"text": "Un mismo protocolo abre cuatro conversaciones."},
+      {"cue": "a1", "text": "A los desarrolladores les ofrece un monorepo abierto, reproducible y con contratos claros para nuevos transportes."},
+      {"cue": "a2", "text": "A los clientes, municipios e infraestructuras, auditorías de resiliencia sin depender de un proveedor cerrado."},
+      {"cue": "a3", "text": "A las entidades, pilotos controlados sin tocar tráfico real de emergencias."},
+      {"cue": "a4", "text": "Y a los inversores, un riesgo técnico declarado y medible, donde cada euro compra evidencia."}
+    ]},
+    {"id": "s14", "chunks": [
+      {"text": "Planteamos tres escenarios de financiación, todos ilustrativos."},
+      {"cue": "e1", "text": "Cincuenta mil euros para la validación física con dos teléfonos y una auditoría de seguridad independiente."},
+      {"cue": "e2", "text": "Ciento ochenta mil para un SDK multisalto y un simulacro municipal."},
+      {"cue": "e3", "text": "Y hasta medio millón como paquete de trabajo dentro de un consorcio europeo."},
+      {"cue": "mod", "text": "El núcleo sigue siendo abierto. La sostenibilidad llega con la auditoría de resiliencia y la ingeniería de integración."}
+    ]},
+    {"id": "s15", "chunks": [
+      {"text": "Buscamos socios para convertir evidencia de laboratorio en evidencia de campo."},
+      {"cue": "links", "text": "Encontrarás la web, el código y todas las evidencias en los enlaces que ves en pantalla."},
+      {"cue": "disc", "text": "Civic Relay es un prototipo de investigación. Gracias por tu tiempo."}
+    ]}
+  ]
+}

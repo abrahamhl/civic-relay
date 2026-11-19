@@ -6,6 +6,10 @@
  * - Never fabricates trials: if the CSV has 0 data rows, reports status: PHYSICAL_TEST_PENDING.
  * - Rejects any row where ack_before_ttl=false is counted as a valid success.
  * - Computes honest numerator/denominator, p50/p95 round-trip latency, and battery deltas.
+ * - A CSV alone NEVER certifies physical evidence: with ≥30 trials the status is FIELD_DATA_REVIEW_REQUIRED and
+ *   the gate stays closed until an independent review verifies the physical test (gatePassed=false).
+ * - Rejects duplicated trial_id, missing provenance, invalid booleans, reversed timestamps and contradictory
+ *   ACK/delivery/RTT combinations.
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -71,6 +75,24 @@ function parseCsvLine(line) {
   return result;
 }
 
+/** TTL of the field-trial app (experimental/android-nearby: MainActivity.TTL_MILLIS = LabDeliveryGuard.MAX_TTL_MS = 60000). */
+export const TRIAL_TTL_MS = 60000;
+const BOOLEAN_FIELDS = ['permissions_granted_both', 'consent_confirmed_both', 'auth_digits_verified_both', 'airplane_mode_state', 'internet_connectivity_confirmed_absent', 'endpoint_discovery_success', 'nearby_connection_success', 'transfer_accepted', 'receiver_payload_received', 'application_ack_returned', 'ack_before_ttl'];
+const PROVENANCE_FIELDS = ['trial_id', 'started_at_utc', 'ended_at_utc', 'sender_phone_model', 'receiver_phone_model', 'sender_android_version', 'receiver_android_version', 'tester_signature_or_pseudonym'];
+const UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
+
+function checkRow(row, n) {
+  const id = row.trial_id || '?';
+  for (const f of PROVENANCE_FIELDS) if (!row[f]) throw new Error(`Row ${n} (${id}) missing ${f}`);
+  for (const f of BOOLEAN_FIELDS) if (row[f] !== 'true' && row[f] !== 'false') throw new Error(`Row ${n} (${id}) invalid boolean ${f}=${row[f]}`);
+  const t0 = Date.parse(row.started_at_utc), t1 = Date.parse(row.ended_at_utc);
+  if (!UTC.test(row.started_at_utc) || !UTC.test(row.ended_at_utc) || !(t1 >= t0)) throw new Error(`Row ${n} (${id}) invalid UTC timestamps (format or end before start)`);
+  const ack = row.application_ack_returned === 'true', beforeTtl = row.ack_before_ttl === 'true', rtt = Number(row.round_trip_ms);
+  if (!ack && beforeTtl) throw new Error(`Row ${n} (${id}) ack_before_ttl=true without an ACK`);
+  if (ack && row.receiver_payload_received !== 'true') throw new Error(`Row ${n} (${id}) ACK without receiver delivery`);
+  if (ack && beforeTtl && !(Number.isFinite(rtt) && rtt > 0 && rtt <= TRIAL_TTL_MS)) throw new Error(`Row ${n} (${id}) RTT/TTL contradiction: ACK before TTL needs 0 < round_trip_ms <= ${TRIAL_TTL_MS}`);
+}
+
 function percentile(sortedNumbers, p) {
   if (!sortedNumbers.length) return null;
   const idx = Math.min(sortedNumbers.length - 1, Math.max(0, Math.ceil((p / 100) * sortedNumbers.length) - 1));
@@ -91,18 +113,22 @@ export function analyzeFieldTrialsCsv(csvText) {
   }
 
   const rows = [];
+  const seenTrialIds = new Set();
   for (let i = 1; i < lines.length; i++) {
     const values = parseCsvLine(lines[i]);
     if (values.length !== EXPECTED_HEADERS.length) {
       throw new Error(`Row ${i + 1} has ${values.length} columns; expected ${EXPECTED_HEADERS.length}`);
     }
     const row = Object.fromEntries(EXPECTED_HEADERS.map((h, idx) => [h, values[idx]]));
+    if (row.trial_id && seenTrialIds.has(row.trial_id)) throw new Error(`Row ${i + 1} duplicates trial_id ${row.trial_id}`);
+    seenTrialIds.add(row.trial_id);
     if (/fictitious|synthetic|mock|todo|placeholder/i.test(row.trial_id + ' ' + row.observations)) {
       throw new Error(`Row ${i + 1} (${row.trial_id}) contains synthetic/placeholder markers; only physical trials allowed`);
     }
     if (row.consent_confirmed_both !== 'true') {
       throw new Error(`Row ${i + 1} (${row.trial_id}) missing explicit consent_confirmed_both=true`);
     }
+    checkRow(row, i + 1);
     rows.push(row);
   }
 
@@ -110,6 +136,9 @@ export function analyzeFieldTrialsCsv(csvText) {
     return {
       status: 'PHYSICAL_TEST_PENDING',
       gatePassed: false,
+      dataReadyForReview: false,
+      physicalEvidenceVerified: false,
+      independentReviewVerified: false,
       totalTrials: 0,
       minimumRequiredTrials: 30,
       validAckSuccesses: 0,
@@ -148,11 +177,15 @@ export function analyzeFieldTrialsCsv(csvText) {
 
   rtts.sort((a, b) => a - b);
   const totalTrials = rows.length;
-  const gatePassed = totalTrials >= 30 && validAckSuccesses > 0;
+  // A self-reported CSV can make data READY FOR REVIEW, never certify the physical test.
+  const dataReadyForReview = totalTrials >= 30 && validAckSuccesses > 0;
 
   return {
-    status: gatePassed ? 'PHYSICALLY_TESTED_M1_COMPLETE' : 'PARTIAL_FIELD_DATA_BELOW_30_TRIALS',
-    gatePassed,
+    status: dataReadyForReview ? 'FIELD_DATA_REVIEW_REQUIRED' : 'PARTIAL_FIELD_DATA_BELOW_30_TRIALS',
+    gatePassed: false,
+    dataReadyForReview,
+    physicalEvidenceVerified: false,
+    independentReviewVerified: false,
     totalTrials,
     minimumRequiredTrials: 30,
     validAckSuccesses,

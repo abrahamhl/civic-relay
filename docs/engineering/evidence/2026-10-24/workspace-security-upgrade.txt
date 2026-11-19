@@ -1,0 +1,25 @@
+Scope: all 6 workspace projects
+Progress: resolved 0, reused 1, downloaded 0, added 0
+packages/core                            |  WARN  deprecated @types/libsodium-wrappers-sumo@0.8.2
+Progress: resolved 37, reused 37, downloaded 0, added 0
+Progress: resolved 356, reused 283, downloaded 0, added 0
+Progress: resolved 466, reused 391, downloaded 1, added 0
+Progress: resolved 616, reused 540, downloaded 1, added 0
+ WARN  2 deprecated subdependencies found: glob@11.1.0, three-mesh-bvh@0.7.8
+Packages: +1
++
+Progress: resolved 633, reused 560, downloaded 1, added 1, done
+
+dependencies:
++ i18next 26.4.2
++ react-i18next 17.0.13
+
+ WARN  Issues with peer dependencies found
+apps/web
+├─┬ postprocessing 6.39.5
+│ └── ✕ unmet peer three@">= 0.168.0 < 0.187.0": found 0.161.0
+└─┬ @react-three/postprocessing 3.1.1
+  ├── ✕ unmet peer @react-three/fiber@>=9.7.0: found 8.18.0
+  └── ✕ unmet peer react@^19.0.0: found 18.3.1
+
+Done in 5.9s

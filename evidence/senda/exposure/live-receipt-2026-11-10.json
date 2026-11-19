@@ -1,0 +1,105 @@
+{
+  "schema": "senda.evidence.exposure-live/1",
+  "fetchedAt": "2026-11-10T04:01:21.103Z",
+  "claim": "DATO_REAL_CAPTURADO (tráfico) + CALCULATED (planes)",
+  "sources": {
+    "digitraffic": {
+      "url": "https://tie.digitraffic.fi/api/tms/v1/stations/data",
+      "sha256": "b8ace50e6688dd8fed492a8199636af9c4c5266e486e5f03f0ec30475ed8869b",
+      "bytes": 3445812,
+      "licence": "CC BY 4.0, Fintraffic / digitraffic.fi"
+    },
+    "madrid": {
+      "url": "https://informo.madrid.es/informo/tmadrid/pm.xml",
+      "sha256": "d5e10d9c1ee0be5aafe47ebd8eba6fe188d7ee1e4223e71939c7bbd2e25902f7",
+      "bytes": 1591200,
+      "licence": "Portal de datos abiertos del Ayuntamiento de Madrid (atribución)"
+    }
+  },
+  "digitraffic": {
+    "stationDirectionsWithFlow": 988,
+    "flowVehH": {
+      "p50": 33,
+      "p95": 502,
+      "max": 1718
+    },
+    "dangerZoneM": {
+      "p50": 108.01,
+      "p95": 157.92
+    },
+    "vehiclesAtRisk": {
+      "p50": 0.04,
+      "p95": 0.8
+    },
+    "recommendedMaxHops": {
+      "p50": 3,
+      "p95": 5
+    },
+    "fixedPolicyShortfall": {
+      "stationDirections": 401,
+      "share": 0.41
+    },
+    "top5ByVehiclesAtRisk": [
+      {
+        "stationId": 20035,
+        "direction": 1,
+        "flowVehH": 1718,
+        "speedKmh": 82,
+        "vehiclesAtRisk": 4.37,
+        "dangerZoneM": 208.66,
+        "recommendedMaxHops": 6,
+        "fixedCoverage": 0.58
+      },
+      {
+        "stationId": 23128,
+        "direction": 1,
+        "flowVehH": 1334,
+        "speedKmh": 81,
+        "vehiclesAtRisk": 2.95,
+        "dangerZoneM": 179.1,
+        "recommendedMaxHops": 5,
+        "fixedCoverage": 0.68
+      },
+      {
+        "stationId": 23009,
+        "direction": 2,
+        "flowVehH": 1103,
+        "speedKmh": 98,
+        "vehiclesAtRisk": 2.2,
+        "dangerZoneM": 195.34,
+        "recommendedMaxHops": 6,
+        "fixedCoverage": 0.62
+      },
+      {
+        "stationId": 20035,
+        "direction": 2,
+        "flowVehH": 1042,
+        "speedKmh": 79,
+        "vehiclesAtRisk": 2.05,
+        "dangerZoneM": 155.12,
+        "recommendedMaxHops": 5,
+        "fixedCoverage": 0.78
+      },
+      {
+        "stationId": 20013,
+        "direction": 2,
+        "flowVehH": 999,
+        "speedKmh": 88,
+        "vehiclesAtRisk": 1.91,
+        "dangerZoneM": 168.44,
+        "recommendedMaxHops": 5,
+        "fixedCoverage": 0.72
+      }
+    ],
+    "note": "Hora local de la captura: puede ser madrugada (tráfico bajo). Penetración SENDA supuesta: 10 %."
+  },
+  "madrid": {
+    "detectorsValid": 3152,
+    "withFlowAndOccupancy": 487,
+    "densityVehKmLane": {
+      "p50": 1.54,
+      "p95": 23.08
+    },
+    "note": "Velocidad estimada v = q/k con longitud efectiva supuesta de 6,5 m; NO es una velocidad medida."
+  }
+}

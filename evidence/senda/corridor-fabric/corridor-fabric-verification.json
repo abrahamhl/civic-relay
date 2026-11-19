@@ -1,0 +1,225 @@
+{
+  "schema": "senda.corridor-fabric-verification/1.0",
+  "generatedAtUtc": "2026-11-08T15:21:59.078Z",
+  "inventorySummary": {
+    "totalAssets": 21,
+    "allValid": true,
+    "byHealth": {
+      "LIVE_VERIFIED": 3,
+      "PARTNER_ACCESS_REQUIRED": 2,
+      "RECORDED_REAL_SAMPLE": 1,
+      "LAB_VERIFIED": 8,
+      "CATALOG_ONLY": 3,
+      "PERMISSION_PENDING": 3,
+      "SYNTHETIC": 1
+    }
+  },
+  "researchBenchmarks": {
+    "R1_InformationAwareRouting": {
+      "contribution": "R1_INFORMATION_AWARE_ROUTING",
+      "bandwidthBudgetBytes": 1250,
+      "r1Result": {
+        "sentIds": [
+          "msg-sos-critical",
+          "msg-novel-a12",
+          "msg-redundant-1"
+        ],
+        "usedBytes": 1200,
+        "uniqueSegmentsCovered": 3,
+        "totalInfoGainBits": 4.2327,
+        "sosDelivered": 1
+      },
+      "baselineStaticResult": {
+        "sentIds": [
+          "msg-sos-critical",
+          "msg-redundant-1",
+          "msg-redundant-2"
+        ],
+        "usedBytes": 1200,
+        "uniqueSegmentsCovered": 2,
+        "totalInfoGainBits": 2.3256,
+        "sosDelivered": 1
+      }
+    },
+    "R2_CooperativeCameraSelection": {
+      "selectedCount": 2,
+      "usedBandwidthKbps": 300,
+      "baselineQueryAllBandwidthKbps": 2580,
+      "bandwidthSavedPct": 88.4,
+      "unauthorizedQueriesPrevented": 2
+    },
+    "R3_CorrelatedFailureRouting": {
+      "recommendedDiversityPair": {
+        "primaryRouteId": "ROUTE-FIBER-RELAY-VELPERBROEK",
+        "backupRouteId": "ROUTE-OPPORTUNISTIC-NEARBY-P2P",
+        "sharedDependencies": [],
+        "correlatedJointSurvivalProb": 0.9484,
+        "naiveIndependentSurvivalProb": 0.9485,
+        "optimismBiasError": 0
+      },
+      "naiveBaselinePair": {
+        "primaryRouteId": "ROUTE-FIBER-RELAY-VELPERBROEK",
+        "backupRouteId": "ROUTE-OPPORTUNISTIC-NEARBY-P2P",
+        "sharedDependencies": [],
+        "correlatedJointSurvivalProb": 0.9484,
+        "naiveIndependentSurvivalProb": 0.9485,
+        "optimismBiasError": 0
+      }
+    },
+    "R4_EvidenceCarryingMessages": {
+      "pilotAWireBytes": 1437,
+      "pilotAVerified": true,
+      "pilotACanonicalEvidenceHash": "3d819818445957ee1a7da1ff0d3cbc4276cbccd034a7d1fb532009edff70526a"
+    },
+    "R5_AdaptiveEdgeInference": {
+      "lowBatteryMode": {
+        "policy": {
+          "resolution": "320x240",
+          "fps": 1,
+          "modelTier": "KOSCHMIEDER_DARK_CHANNEL_ONLY",
+          "queryIntervalS": 15,
+          "transmitMode": "COMPACT_DIGEST_ONLY_180B",
+          "computeGflopsPerSec": 0.004,
+          "transmittedBytesPerMin": 720
+        },
+        "baselineFixed1080p30": {
+          "resolution": "1920x1080",
+          "fps": 30,
+          "computeGflopsPerSec": 67.5,
+          "transmittedBytesPerMin": 84000
+        },
+        "savingsVsBaseline": {
+          "computeReductionPct": 100,
+          "bandwidthReductionPct": 99.14
+        }
+      },
+      "criticalSosMode": {
+        "policy": {
+          "resolution": "1280x720",
+          "fps": 15,
+          "modelTier": "YOLOX_S_ONNX_BYTETRACK",
+          "queryIntervalS": 1,
+          "transmitMode": "METADATA_AND_KEYFRAME_HASH",
+          "computeGflopsPerSec": 15,
+          "transmittedBytesPerMin": 25200
+        },
+        "baselineFixed1080p30": {
+          "resolution": "1920x1080",
+          "fps": 30,
+          "computeGflopsPerSec": 67.5,
+          "transmittedBytesPerMin": 84000
+        },
+        "savingsVsBaseline": {
+          "computeReductionPct": 77.8,
+          "bandwidthReductionPct": 70
+        }
+      }
+    }
+  },
+  "pilots": {
+    "pilotA": {
+      "pilotId": "PILOT_A_CORRIDOR_A12_ARNHEM_EDE",
+      "sectorId": "NL-A12-ARNHEM-EDE",
+      "roadSegmentId": "NL-A12-HM110-130",
+      "rwsPublicCamerasClaimed": 0,
+      "decision": "CONFIRMED_MULTISENSOR_INCIDENT",
+      "posteriorConfidence": 0.8898,
+      "corroboratingSources": [
+        "NDW-NL-A12-SRTI-V3",
+        "DASHCAM-A12-REAL-TRACE-01",
+        "OBD-A12-VEHICLE-01"
+      ],
+      "provenanceMerkleDigestSha256": "7fbfa82115566692b21140caf65a8bb26a05dfc20395bba264c279bf5420ef6f",
+      "messageState": "VERIFIED",
+      "messageHistory": [
+        {
+          "state": "QUEUED",
+          "atUtc": "2026-11-08T14:44:30.000Z",
+          "detail": "Mensaje sellado en cola de origen"
+        },
+        {
+          "state": "IN_CUSTODY",
+          "atUtc": "2026-11-08T14:44:31.000Z",
+          "custodyNodeId": "NODE-ANDROID-A12-CARRIER-01",
+          "bearerId": null,
+          "detail": "Backhaul LTE caído; mensaje retenido en almacenamiento local store-and-forward"
+        },
+        {
+          "state": "FORWARDED",
+          "atUtc": "2026-11-08T14:44:32.500Z",
+          "custodyNodeId": "GATEWAY-A12-VELPERBROEK-RELAY",
+          "bearerId": "BEARER-VELPERBROEK-CUSTODY-RELAY",
+          "detail": "Reenviado oportunistamente al gateway de custodia local"
+        },
+        {
+          "state": "RECEIVED",
+          "atUtc": "2026-11-08T14:44:33.200Z",
+          "custodyNodeId": "RECIPIENT-ARNHEM-CONSOLE",
+          "bearerId": "BEARER-VELPERBROEK-CUSTODY-RELAY",
+          "detail": "Entregado al destinatario tras recuperación de ruta"
+        },
+        {
+          "state": "VERIFIED",
+          "atUtc": "2026-11-08T14:44:33.500Z",
+          "custodyNodeId": "RECIPIENT-ARNHEM-CONSOLE",
+          "bearerId": "BEARER-VELPERBROEK-CUSTODY-RELAY",
+          "detail": "Firma ECDSA P-256, evidencia SHA-256 y recibo criptográfico verificados"
+        }
+      ],
+      "receiptVerified": true,
+      "hardwareBlockedBearers": [
+        "BEARER-LORA-EU868-DONGLE"
+      ]
+    },
+    "pilotB": {
+      "pilotId": "PILOT_B_BARRIO_EDIFICIO_LAB",
+      "sectorId": "LAB-BARRIO-EDIFICIO-01",
+      "roadSegmentId": "BARRIO-ACCESO-NORTE-01",
+      "decision": "CONFIRMED_MULTISENSOR_INCIDENT",
+      "posteriorConfidence": 0.8334,
+      "corroboratingSources": [
+        "CAM-LAB-BARRIO-RTSP-01",
+        "NODE-ANDROID-BARRIO-PEER-01"
+      ],
+      "provenanceMerkleDigestSha256": "83e6c4441a5bc5dacca420fed6f1dd508efbd4f42ca481f87a1b1a3a57e6be43",
+      "messageState": "VERIFIED",
+      "messageHistory": [
+        {
+          "state": "QUEUED",
+          "atUtc": "2026-11-08T14:52:00.000Z",
+          "detail": "Mensaje sellado en cola de origen"
+        },
+        {
+          "state": "IN_CUSTODY",
+          "atUtc": "2026-11-08T14:52:00.500Z",
+          "custodyNodeId": "NODE-ANDROID-BARRIO-PEER-01",
+          "bearerId": null,
+          "detail": "Corte de WAN detectado; custodia local en Nodo Móvil A (LAB_EMULATED)"
+        },
+        {
+          "state": "FORWARDED",
+          "atUtc": "2026-11-08T14:52:01.500Z",
+          "custodyNodeId": "NODE-ANDROID-BARRIO-PEER-02",
+          "bearerId": "BEARER-BARRIO-P2P-CUSTODY-LOOPBACK",
+          "detail": "Transferencia store-and-forward de Nodo Móvil A a Nodo Móvil B"
+        },
+        {
+          "state": "RECEIVED",
+          "atUtc": "2026-11-08T14:52:02.200Z",
+          "custodyNodeId": "EDGE-MQTT-BARRIO-BROKER-01",
+          "bearerId": "BEARER-BARRIO-P2P-CUSTODY-LOOPBACK",
+          "detail": "Recibido en pasarela local senda-relay del edificio"
+        },
+        {
+          "state": "VERIFIED",
+          "atUtc": "2026-11-08T14:52:02.600Z",
+          "custodyNodeId": "EDGE-MQTT-BARRIO-BROKER-01",
+          "bearerId": "BEARER-BARRIO-P2P-CUSTODY-LOOPBACK",
+          "detail": "Recibo criptográfico verificado de extremo a extremo tras corte de red"
+        }
+      ],
+      "receiptVerified": true
+    }
+  },
+  "reportDigestSha256": "71185f8a0f683d6cdfa05f1bce4b4021c754eb902dad125c4581261f4cddd7c6"
+}

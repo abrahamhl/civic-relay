@@ -1,0 +1,35 @@
+name: SENDA Canonical Integration QA
+permissions:
+  contents: read
+on:
+  push:
+    branches: [ master, feat/senda-canonical-integration-20261117, 'research/senda-*' ]
+  pull_request:
+    branches: [ master, feat/senda-canonical-integration-20261117 ]
+  workflow_dispatch:
+jobs:
+  canonical-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - name: Núcleo canónico, paridad sync-web, route-truth y ARR
+        run: |
+          node --test packages/senda/tests/*.test.mjs packages/senda/tests/defense/*.test.mjs packages/senda/tests-adversarial/*.test.mjs packages/senda-pci/tests/*.test.mjs experimental/senda-route-truth/*.test.mjs experimental/senda-arr/tests/*.test.mjs experimental/senda-arr-replan/tests/*.test.mjs experimental/senda-fire-physics/tests/*.test.mjs
+      - name: Oráculo Python de cortes SRLG N-1/N-2
+        run: python3 packages/senda/scripts/verify-failure-cuts.py
+      - name: QA navegador canónica (360/390/768/1440px, offline SW, IndexedDB, Visor 4D, fallback sin WebGL)
+        run: |
+          mkdir -p /tmp/pw && printf '{"name":"pw-tmp","private":true}' > /tmp/pw/package.json
+          pnpm --dir /tmp/pw add playwright@1.63.0
+          pnpm --dir /tmp/pw exec playwright install --with-deps chromium
+          NODE_PATH=/tmp/pw/node_modules node investor-next/scripts/senda-canonical-qa.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: senda-canonical-qa-evidence
+          path: evidence/senda/canonical-qa.json

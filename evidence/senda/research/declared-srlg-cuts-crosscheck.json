@@ -1,0 +1,9 @@
+{
+  "algorithmic_claim": "EXACT_FOR_DECLARED_FINITE_TOPOLOGY_ONLY",
+  "checked_failures": "ALL_DECLARED_SINGLE_AND_DOUBLE_DOMAINS",
+  "field_rf_verified": false,
+  "institutional_authority_verified": false,
+  "misclassified_cuts": 0,
+  "status": "PASS_INDEPENDENT_PYTHON_ENUMERATION",
+  "synthetic_topologies": 240
+}

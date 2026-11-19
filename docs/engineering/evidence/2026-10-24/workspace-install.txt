@@ -1,0 +1,33 @@
+Scope: all 6 workspace projects
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +562
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 562, reused 233, downloaded 0, added 0
+
+   ╭───────────────────────────────────────────────────────────────────╮
+   │                                                                   │
+   │                Update available! 9.12.3 → 12.15.0.                │
+   │   Changelog: https://github.com/pnpm/pnpm/releases/tag/v12.15.0   │
+   │         Run "corepack install -g pnpm@12.15.0" to update.         │
+   │                                                                   │
+   │         Follow @pnpmjs for updates: https://x.com/pnpmjs          │
+   │                                                                   │
+   ╰───────────────────────────────────────────────────────────────────╯
+
+Progress: resolved 562, reused 425, downloaded 0, added 0
+Progress: resolved 562, reused 559, downloaded 0, added 68
+Progress: resolved 562, reused 561, downloaded 0, added 208
+Progress: resolved 562, reused 561, downloaded 0, added 303
+Progress: resolved 562, reused 562, downloaded 0, added 525
+Progress: resolved 562, reused 562, downloaded 0, added 554
+Progress: resolved 562, reused 562, downloaded 0, added 557
+Progress: resolved 562, reused 562, downloaded 0, added 560
+Progress: resolved 562, reused 562, downloaded 0, added 561
+Progress: resolved 562, reused 562, downloaded 0, added 562, done
+
+dependencies:
++ i18next 26.4.2
++ react-i18next 17.0.13
+
+Done in 12s

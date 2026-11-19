@@ -1,0 +1,77 @@
+# SENDA Drive · vectores de conformidad del arranque automático. GENERADO por packages/senda/scripts/build-autostart-vectors.mjs: no editar a mano.
+# S <escenario> · P <parámetros declarados> · E <EVENTO> t=<s> [ms=<m/s>] [autoStart=0|1] => <ESTADO> [<ACCIÓN>:<MOTIVO> …]
+S sin_consentimiento_no_arranca
+P confirmSpeedMs=5 confirmWindowS=120 stopSpeedMs=1.5 idleStopS=300 endGraceS=60
+E CAR_LINK_APPEARED t=0 => OFF
+E VEHICLE_HINT_ENTER t=1 => OFF
+E SPEED t=2 ms=20 => OFF
+E TICK t=500 => OFF
+S coche_vinculado_arranca_y_cierra_al_irse
+P confirmSpeedMs=5 confirmWindowS=120 stopSpeedMs=1.5 idleStopS=300 endGraceS=60
+E CONSENT t=0 autoStart=1 => IDLE
+E CAR_LINK_APPEARED t=10 => DRIVING START_SESSION:CAR_LINK
+E SPEED t=20 ms=15 => DRIVING
+E CAR_LINK_GONE t=900 => ENDING
+E TICK t=930 => ENDING
+E TICK t=960 => IDLE STOP_SESSION:ENDED
+S pista_debil_confirmada_por_velocidad
+P confirmSpeedMs=5 confirmWindowS=120 stopSpeedMs=1.5 idleStopS=300 endGraceS=60
+E CONSENT t=0 autoStart=1 => IDLE
+E VEHICLE_HINT_ENTER t=5 => CANDIDATE
+E SPEED t=30 ms=3 => CANDIDATE
+E SPEED t=60 ms=8 => DRIVING START_SESSION:VEHICLE_HINT_CONFIRMED_BY_SPEED
+S pista_debil_caduca_sin_velocidad
+P confirmSpeedMs=5 confirmWindowS=120 stopSpeedMs=1.5 idleStopS=300 endGraceS=60
+E CONSENT t=0 autoStart=1 => IDLE
+E VEHICLE_HINT_ENTER t=5 => CANDIDATE
+E SPEED t=60 ms=2 => CANDIDATE
+E TICK t=126 => IDLE
+E SPEED t=130 ms=20 => IDLE
+S pista_debil_parado_mucho_tiempo_cierra
+P confirmSpeedMs=5 confirmWindowS=120 stopSpeedMs=1.5 idleStopS=300 endGraceS=60
+E CONSENT t=0 autoStart=1 => IDLE
+E VEHICLE_HINT_ENTER t=0 => CANDIDATE
+E SPEED t=10 ms=12 => DRIVING START_SESSION:VEHICLE_HINT_CONFIRMED_BY_SPEED
+E SPEED t=100 ms=0.5 => DRIVING
+E TICK t=309 => DRIVING
+E TICK t=310 => ENDING
+E TICK t=369 => ENDING
+E TICK t=370 => IDLE STOP_SESSION:ENDED
+S atasco_reanuda_antes_de_cerrar
+P confirmSpeedMs=5 confirmWindowS=120 stopSpeedMs=1.5 idleStopS=300 endGraceS=60
+E CONSENT t=0 autoStart=1 => IDLE
+E VEHICLE_HINT_ENTER t=0 => CANDIDATE
+E SPEED t=1 ms=9 => DRIVING START_SESSION:VEHICLE_HINT_CONFIRMED_BY_SPEED
+E TICK t=301 => ENDING
+E SPEED t=320 ms=6 => DRIVING
+E TICK t=400 => DRIVING
+S coche_vinculado_parado_no_cierra_mientras_siga_el_enlace
+P confirmSpeedMs=5 confirmWindowS=120 stopSpeedMs=1.5 idleStopS=300 endGraceS=60
+E CONSENT t=0 autoStart=1 => IDLE
+E CAR_LINK_APPEARED t=0 => DRIVING START_SESSION:CAR_LINK
+E TICK t=300 => DRIVING
+E TICK t=3600 => DRIVING
+E CAR_LINK_GONE t=3700 => ENDING
+E TICK t=3760 => IDLE STOP_SESSION:ENDED
+S usuario_para_y_no_se_rearranca_hasta_salir
+P confirmSpeedMs=5 confirmWindowS=120 stopSpeedMs=1.5 idleStopS=300 endGraceS=60
+E CONSENT t=0 autoStart=1 => IDLE
+E CAR_LINK_APPEARED t=0 => DRIVING START_SESSION:CAR_LINK
+E USER_STOP t=60 => IDLE STOP_SESSION:USER_STOP
+E VEHICLE_HINT_ENTER t=61 => IDLE
+E CAR_LINK_APPEARED t=62 => IDLE
+E CAR_LINK_GONE t=600 => IDLE
+E CAR_LINK_APPEARED t=700 => DRIVING START_SESSION:CAR_LINK
+S retirar_consentimiento_cierra_la_sesion
+P confirmSpeedMs=5 confirmWindowS=120 stopSpeedMs=1.5 idleStopS=300 endGraceS=60
+E CONSENT t=0 autoStart=1 => IDLE
+E CAR_LINK_APPEARED t=5 => DRIVING START_SESSION:CAR_LINK
+E CONSENT t=50 autoStart=0 => OFF STOP_SESSION:CONSENT_REVOKED
+E CAR_LINK_APPEARED t=60 => OFF
+S arranque_manual_sin_consentimiento_automatico
+P confirmSpeedMs=5 confirmWindowS=120 stopSpeedMs=1.5 idleStopS=300 endGraceS=60
+E USER_START t=0 => DRIVING START_SESSION:USER_START
+E TICK t=1000 => DRIVING
+E CAR_LINK_GONE t=1001 => DRIVING
+E USER_STOP t=1100 => OFF STOP_SESSION:USER_STOP
+E CAR_LINK_APPEARED t=1200 => OFF

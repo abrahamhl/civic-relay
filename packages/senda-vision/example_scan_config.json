@@ -1,0 +1,12 @@
+{
+  "_basis": "EJEMPLO DECLARADO, SIN VALIDAR: umbrales de las heurísticas de vehicle_camera_scan.py para probar el software. Calibrar con vídeos etiquetados antes de usarlos para avisar a nadie.",
+  "egoLane": [[0.199, 0.958], [0.469, 0.618], [0.531, 0.618], [0.868, 0.958]],
+  "roadArea": [[0.0, 1.0], [0.40, 0.55], [0.60, 0.55], [1.0, 1.0]],
+  "strideFrames": 3,
+  "minScore": 0.35,
+  "minFrames": 3,
+  "acrossAspect": 2.2,
+  "minBoxHFrac": 0.08,
+  "ttcS": 2.0,
+  "maxSeconds": 60
+}

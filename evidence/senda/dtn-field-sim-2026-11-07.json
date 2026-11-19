@@ -1,0 +1,717 @@
+{
+  "schema": "senda-dtn-field-sim/1",
+  "status": "SIMULATED_VALIDATED",
+  "physicalValidation": "PHYSICAL_TEST_PENDING",
+  "generatedAt": "2026-11-07T17:25:45.656Z",
+  "source": {
+    "script": "packages/senda/scripts/dtn-field-sim.mjs",
+    "commitAtGeneration": "70ae9138db4c84be9384cc910b43af5effad7af5",
+    "worktreeDirty": false,
+    "note": "La evidencia se genera antes de su propio commit; el SHA del commit de evidencia figura en el PR."
+  },
+  "scenario": {
+    "topology": "A(fuente) -> B(mula) -> C(destino)",
+    "transport": "SIMULATED_ONLY",
+    "fragmentation": {
+      "k": 3,
+      "n": 5,
+      "lostPerTrial": 2,
+      "bearers": [
+        "BLE",
+        "LoRa",
+        "SMS",
+        "SAT_D2D_SMS",
+        "ACOUSTIC"
+      ]
+    },
+    "messageKind": "SOS",
+    "ttlS": 86400,
+    "trials": 30,
+    "seed": 357397
+  },
+  "results": {
+    "trials": 30,
+    "delivered": 30,
+    "deliveryRate": 1,
+    "forgedReceiptBlocked": 30,
+    "forgedReceiptBlockedRate": 1,
+    "fragmentReconstructionRate": 1,
+    "restartPreservationRate": 1,
+    "replaySuppressionRate": 1,
+    "receiptPurgeRate": 1,
+    "tamperRejectionRate": 1,
+    "malformedRejectionRate": 1,
+    "latencyS": {
+      "p50": 1259,
+      "p95": 1311,
+      "min": 1205,
+      "max": 1313,
+      "mean": 1260
+    },
+    "packedBytes": {
+      "p50": 347,
+      "p95": 347,
+      "min": 346,
+      "max": 347,
+      "mean": 346.6666666666667
+    },
+    "energy": {
+      "measured": false,
+      "status": "ENERGY_NOT_MEASURED",
+      "reason": "No hay hardware ni medidor; el script solo cuenta bytes simulados."
+    }
+  },
+  "acceptance": {
+    "status": "SIMULATED_VALIDATED",
+    "criteria": {
+      "deliveryRate": 1,
+      "forgedReceiptBlockedRate": 1,
+      "fragmentReconstructionRate": 1,
+      "restartPreservationRate": 1,
+      "replaySuppressionRate": 1,
+      "receiptPurgeRate": 1,
+      "tamperRejectionRate": 1,
+      "malformedRejectionRate": 1
+    }
+  },
+  "perTrial": [
+    {
+      "trial": 0,
+      "seed": 357397,
+      "delivered": true,
+      "latencyS": 1263,
+      "packedBytes": 346,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        4,
+        3
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 1,
+      "seed": 365316,
+      "delivered": true,
+      "latencyS": 1297,
+      "packedBytes": 346,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        4,
+        2
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 2,
+      "seed": 373235,
+      "delivered": true,
+      "latencyS": 1211,
+      "packedBytes": 346,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        3,
+        0
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 3,
+      "seed": 381154,
+      "delivered": true,
+      "latencyS": 1245,
+      "packedBytes": 346,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        4,
+        3
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 4,
+      "seed": 389073,
+      "delivered": true,
+      "latencyS": 1279,
+      "packedBytes": 346,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        0,
+        3
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 5,
+      "seed": 396992,
+      "delivered": true,
+      "latencyS": 1313,
+      "packedBytes": 346,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        4,
+        1
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 6,
+      "seed": 404911,
+      "delivered": true,
+      "latencyS": 1227,
+      "packedBytes": 346,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        4,
+        1
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 7,
+      "seed": 412830,
+      "delivered": true,
+      "latencyS": 1261,
+      "packedBytes": 346,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        2,
+        3
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 8,
+      "seed": 420749,
+      "delivered": true,
+      "latencyS": 1295,
+      "packedBytes": 346,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        2,
+        4
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 9,
+      "seed": 428668,
+      "delivered": true,
+      "latencyS": 1209,
+      "packedBytes": 346,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        3,
+        2
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 10,
+      "seed": 436587,
+      "delivered": true,
+      "latencyS": 1243,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        1,
+        0
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 11,
+      "seed": 444506,
+      "delivered": true,
+      "latencyS": 1277,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        0,
+        4
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 12,
+      "seed": 452425,
+      "delivered": true,
+      "latencyS": 1311,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        0,
+        2
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 13,
+      "seed": 460344,
+      "delivered": true,
+      "latencyS": 1225,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        2,
+        1
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 14,
+      "seed": 468263,
+      "delivered": true,
+      "latencyS": 1259,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        3,
+        4
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 15,
+      "seed": 476182,
+      "delivered": true,
+      "latencyS": 1293,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        4,
+        3
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 16,
+      "seed": 484101,
+      "delivered": true,
+      "latencyS": 1207,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        2,
+        0
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 17,
+      "seed": 492020,
+      "delivered": true,
+      "latencyS": 1241,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        3,
+        2
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 18,
+      "seed": 499939,
+      "delivered": true,
+      "latencyS": 1275,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        1,
+        4
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 19,
+      "seed": 507858,
+      "delivered": true,
+      "latencyS": 1309,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        0,
+        3
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 20,
+      "seed": 515777,
+      "delivered": true,
+      "latencyS": 1223,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        0,
+        4
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 21,
+      "seed": 523696,
+      "delivered": true,
+      "latencyS": 1257,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        2,
+        1
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 22,
+      "seed": 531615,
+      "delivered": true,
+      "latencyS": 1291,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        3,
+        1
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 23,
+      "seed": 539534,
+      "delivered": true,
+      "latencyS": 1205,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        2,
+        0
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 24,
+      "seed": 547453,
+      "delivered": true,
+      "latencyS": 1239,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        4,
+        0
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 25,
+      "seed": 555372,
+      "delivered": true,
+      "latencyS": 1273,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        1,
+        4
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 26,
+      "seed": 563291,
+      "delivered": true,
+      "latencyS": 1307,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        1,
+        0
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 27,
+      "seed": 571210,
+      "delivered": true,
+      "latencyS": 1221,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        4,
+        2
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 28,
+      "seed": 579129,
+      "delivered": true,
+      "latencyS": 1255,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        2,
+        4
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    },
+    {
+      "trial": 29,
+      "seed": 587048,
+      "delivered": true,
+      "latencyS": 1289,
+      "packedBytes": 347,
+      "shardBytesOnAir": 396,
+      "lostShards": [
+        4,
+        1
+      ],
+      "reconstructed": true,
+      "forgedReceiptBlocked": true,
+      "relayIngestStored": true,
+      "restartPreserved": true,
+      "genuineReceiptQuarantined": true,
+      "replaySuppressed": true,
+      "receiptPurged": true,
+      "tamperRejected": true,
+      "malformedRejected": true
+    }
+  ],
+  "limitations": [
+    "No hay radio BLE/Wi-Fi Direct/Nearby/LoRa: los fragmentos se pasan en memoria.",
+    "No hay teléfonos Android ni APK compilada; PHYSICAL_TEST_PENDING.",
+    "Batería y energía no medidas; solo se cuentan bytes.",
+    "Identidades A/B/C reutilizadas entre ensayos; los ids y sobres son únicos por ensayo.",
+    "La mula no verifica la firma del emisor porque la clave pública viaja dentro del cifrado; el destinatario sí la verifica al abrir.",
+    "Este resultado no certifica el sistema ni demuestra validez en campo."
+  ]
+}

@@ -1,0 +1,215 @@
+{
+ "note": "SENDA Mission 9.5 · Corte ejecutivo 90s (s1 + s2 + s3b + s9 + s13)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "s1",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/public/senda/dgt.html",
+    "docs/video/M95_VIDEO_SOURCES.md"
+   ],
+   "visual": {
+    "kind": "kpis",
+    "kpis": [
+     {
+      "v": "90 % → 40 %",
+      "l": {
+       "es": "usuarios con conexión estable · apagón ibérico 28-04-2025",
+       "en": "users with a stable connection · Iberian blackout 28-04-2025",
+       "nl": "gebruikers met stabiele verbinding · Iberische stroomstoring 28-04-2025"
+      }
+     },
+     {
+      "v": "20:11",
+      "l": {
+       "es": "llega el ES-Alert · DANA de Valencia, 29-10-2024",
+       "en": "ES-Alert arrives · Valencia floods, 29-10-2024",
+       "nl": "ES-Alert komt aan · overstroming Valencia, 29-10-2024"
+      }
+     }
+    ]
+   },
+   "title": {
+    "es": "Cuando cae la red, el mensaje no debería morir.",
+    "en": "When the network falls, the message shouldn't die.",
+    "nl": "Als het netwerk uitvalt, mag het bericht niet sterven."
+   },
+   "es": [
+    "Cuando cae la red, el mensaje no debería morir.",
+    "El veintiocho de abril de dos mil veinticinco, la red móvil no cayó al irse la luz: cayó cuando se agotaron las baterías de las antenas. En pocas horas, los usuarios con conexión estable pasaron del noventa al cuarenta por ciento."
+   ],
+   "es_say": [
+    "Cuando cae la red, el mensaje no debería morir.",
+    "El veintiocho de abril de dos mil veinticinco, la red móvil no cayó al irse la luz: cayó cuando se agotaron las baterías de las antenas. En pocas horas, los usuarios con conexión estable pasaron del noventa al cuarenta por ciento."
+   ],
+   "en": [
+    "When the network falls, the message shouldn't die.",
+    "On the twenty-eighth of April, twenty twenty-five, Spain's mobile network didn't fail when the power went out. It failed when the batteries in the masts ran dry. Within hours, users with a stable connection dropped from ninety to forty percent."
+   ],
+   "en_say": [
+    "When the network falls, the message shouldn't die.",
+    "On the twenty-eighth of April, twenty twenty-five, Spain's mobile network didn't fail when the power went out. It failed when the batteries in the masts ran dry. Within hours, users with a stable connection dropped from ninety to forty percent."
+   ],
+   "nl": [
+    "Als het netwerk uitvalt, mag het bericht niet sterven.",
+    "Op 28 april 2025 viel het Spaanse mobiele netwerk niet uit toen de stroom wegviel, maar toen de accu's van de zendmasten leeg raakten. Binnen enkele uren daalde het aandeel gebruikers met een stabiele verbinding van negentig naar veertig procent."
+   ]
+  },
+  {
+   "id": "s2",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/index.mjs",
+    "investor-next/public/senda/arquitectura.html"
+   ],
+   "visual": {
+    "kind": "hub"
+   },
+   "title": {
+    "es": "SENDA: la capa que coordina todo lo que mueva un mensaje",
+    "en": "SENDA: the layer that coordinates everything that can carry a message",
+    "nl": "SENDA: de laag die alles coördineert wat een bericht kan vervoeren"
+   },
+   "es": [
+    "Esto es SENDA, el Sistema de Enrutamiento de Emergencia por canales alternativos.",
+    "No es otra aplicación de mensajería. Es la capa que coordina todo lo que pueda mover un mensaje: teléfonos cercanos, sonido, satélite directo al móvil, LoRa, Iridium, radioaficionados, drones, y la red que quede en pie."
+   ],
+   "es_say": [
+    "Esto es Senda, el Sistema de Enrutamiento de Emergencia por canales alternativos.",
+    "No es otra aplicación de mensajería. Es la capa que coordina todo lo que pueda mover un mensaje: teléfonos cercanos, sonido, satélite directo al móvil, Lora, Iridium, radioaficionados, drones, y la red que quede en pie."
+   ],
+   "en": [
+    "This is SENDA: emergency routing over alternative channels.",
+    "It isn't another messaging app. It's the layer that coordinates everything that can carry a message: nearby phones, sound, direct-to-phone satellite, LoRa, Iridium, amateur radio, drones, and whatever network is still standing."
+   ],
+   "en_say": [
+    "This is Senda: emergency routing over alternative channels.",
+    "It isn't another messaging app. It's the layer that coordinates everything that can carry a message: nearby phones, sound, direct-to-phone satellite, LOR-ah, Iridium, amateur radio, drones, and whatever network is still standing."
+   ],
+   "nl": [
+    "Dit is SENDA: noodroutering via alternatieve kanalen.",
+    "Het is geen zoveelste berichtenapp. Het is de laag die alles coördineert wat een bericht kan vervoeren: telefoons in de buurt, geluid, satelliet rechtstreeks naar de telefoon, LoRa, Iridium, zendamateurs, drones en wat er nog van het netwerk overeind staat."
+   ]
+  },
+  {
+   "id": "s3b",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/voice-call.mjs",
+    "investor-next/public/senda/llamada.html"
+   ],
+   "visual": {
+    "kind": "call"
+   },
+   "title": {
+    "es": "Llamar sin Internet",
+    "en": "Calling without Internet",
+    "nl": "Bellen zonder internet"
+   },
+   "es": [
+    "Ahora SENDA también llama. Dos teléfonos en la misma wifi, o en el punto de acceso de uno de ellos, hablan sin Internet, sin operador y sin servidor.",
+    "El truco está en el arranque: lo que normalmente necesitaba un servidor, unos dos mil caracteres, SENDA lo reduce a unos noventa bytes y lo pasa por sonido en menos de nueve segundos."
+   ],
+   "es_say": [
+    "Ahora Senda también llama. Dos teléfonos en la misma uifi, o en el punto de acceso de uno de ellos, hablan sin Internet, sin operador y sin servidor.",
+    "El truco está en el arranque: lo que normalmente necesitaba un servidor, unos dos mil caracteres, Senda lo reduce a unos noventa bytes y lo pasa por sonido en menos de nueve segundos."
+   ],
+   "en": [
+    "Now SENDA can also call. Two phones on the same Wi-Fi, or on one phone's hotspot, talk with no Internet, no carrier and no server.",
+    "The trick is the setup: what normally needed a server, about two thousand characters, SENDA shrinks to about ninety bytes and sends it by sound in under nine seconds."
+   ],
+   "en_say": [
+    "Now Senda can also call. Two phones on the same Wi-Fi, or on one phone's hotspot, talk with no Internet, no carrier and no server.",
+    "The trick is the setup: what normally needed a server, about two thousand characters, Senda shrinks to about ninety bytes and sends it by sound in under nine seconds."
+   ],
+   "nl": [
+    "Nu kan SENDA ook bellen. Twee telefoons op hetzelfde wifi-netwerk, of op de hotspot van een van beide, praten zonder internet, zonder provider en zonder server.",
+    "De truc zit in de opbouw: wat normaal een server nodig had, zo'n tweeduizend tekens, brengt SENDA terug tot ongeveer negentig bytes en stuurt het in minder dan negen seconden via geluid."
+   ]
+  },
+  {
+   "id": "s9",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/warrant.mjs",
+    "packages/senda/src/pci-envelope.mjs"
+   ],
+   "visual": {
+    "kind": "trust"
+   },
+   "title": {
+    "es": "Confianza: firma, consentimiento y zona",
+    "en": "Trust: signature, consent and zone",
+    "nl": "Vertrouwen: handtekening, toestemming en zone"
+   },
+   "es": [
+    "Solo un coordinador con credencial firmada por su organismo puede activar algo en tu teléfono, y solo si tú lo autorizaste y hay una emergencia declarada.",
+    "La persona atrapada pulsa un botón, su respuesta viaja cifrada de vecino en vecino, y el coordinador la ve en su cuadro por planta."
+   ],
+   "es_say": [
+    "Solo un coordinador con credencial firmada por su organismo puede activar algo en tu teléfono, y solo si tú lo autorizaste y hay una emergencia declarada.",
+    "La persona atrapada pulsa un botón, su respuesta viaja cifrada de vecino en vecino, y el coordinador la ve en su cuadro por planta."
+   ],
+   "en": [
+    "Only a coordinator holding a credential signed by their agency can trigger anything on your phone, and only if you authorised it and an emergency has been declared.",
+    "A trapped person presses one button, the reply travels encrypted from neighbour to neighbour, and the coordinator sees it on a floor-by-floor board."
+   ],
+   "en_say": [
+    "Only a coordinator holding a credential signed by their agency can trigger anything on your phone, and only if you authorised it and an emergency has been declared.",
+    "A trapped person presses one button, the reply travels encrypted from neighbour to neighbour, and the coordinator sees it on a floor-by-floor board."
+   ],
+   "nl": [
+    "Alleen een coördinator met een door de eigen organisatie ondertekend bewijs kan iets op je telefoon activeren, en alleen als jij dat hebt toegestaan en er een noodsituatie is afgekondigd.",
+    "Een ingesloten persoon drukt op één knop, het antwoord reist versleuteld van buur naar buur en de coördinator ziet het op een overzicht per verdieping."
+   ]
+  },
+  {
+   "id": "s13",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/app/senda-home.tsx",
+    "LICENSE"
+   ],
+   "visual": {
+    "kind": "cta"
+   },
+   "title": {
+    "es": "Para que ningún mensaje se pierda",
+    "en": "So that no message is lost",
+    "nl": "Zodat geen enkel bericht verloren gaat"
+   },
+   "es": [
+    "SENDA es para la ciudadanía, los coordinadores, los cuerpos de seguridad y emergencias, las administraciones, y para quien quiera invertir en que ningún mensaje se pierda.",
+    "Pruébalo ahora, sin instalar nada, en la dirección que ves en pantalla."
+   ],
+   "es_say": [
+    "Senda es para la ciudadanía, los coordinadores, los cuerpos de seguridad y emergencias, las administraciones, y para quien quiera invertir en que ningún mensaje se pierda.",
+    "Pruébalo ahora, sin instalar nada, en la dirección que ves en pantalla."
+   ],
+   "en": [
+    "SENDA is for citizens, coordinators, police and emergency services, public administrations, and anyone who wants to invest in making sure no message is lost.",
+    "Try it now, with nothing to install, at the address on screen."
+   ],
+   "en_say": [
+    "Senda is for citizens, coordinators, police and emergency services, public administrations, and anyone who wants to invest in making sure no message is lost.",
+    "Try it now, with nothing to install, at the address on screen."
+   ],
+   "nl": [
+    "SENDA is er voor burgers, coördinatoren, politie en hulpdiensten, overheden en iedereen die wil investeren in het idee dat geen enkel bericht verloren gaat.",
+    "Probeer het nu, zonder iets te installeren, op het adres in beeld."
+   ]
+  }
+ ]
+}

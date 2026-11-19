@@ -35,3 +35,29 @@
 | **Buyer Arena 8-Persona Chromium Audit (`P01`–`P08`)** | `node scripts/civic-relay-review.mjs` | **78 / 78 PASS** (0 failed, 0 critical) | `BROWSER_TESTED` |
 | **Buyer Arena Core CLI & Unit Test Suite** | `pnpm test && node dist/cli/main.js demo --size 10` | **PASS** (All unit & CLI smoke checks green) | `AUTOMATED_TESTED` |
 | **Two-Phone Physical Android Nearby Field Matrix (30 Trials)** | Manual two-handset execution per `PILOT_ACCEPTANCE.md` | **Pending physical execution** (`Issue #5`) | `PHYSICAL_TEST_PENDING` |
+
+---
+
+## 3. Addendum 2026-11-06 - Function Lab, favicon and WCAG target sizes
+
+| Workstream | Scope | Status | Evidence & Artifacts |
+|---|---|---|---|
+| **WS8 - Interactive Function Lab** | Added `#function-lab` section to EN/ES/NL home pages: 7 tabs (alert propagation SIR, Pareto routing, delivery probability, coverage search reduction, energy budget, 1-D Kalman tracking, real WebCrypto ECDSA sign/verify/tamper) plus a capability scorecard that labels radio as `NO_IMPLEMENTADO`. Pure math in `lib/function-lab.mjs`, typed via `lib/function-lab.d.mts`. | `VERIFIED` | `investor-next/app/function-lab.tsx`, `investor-next/lib/function-lab.mjs`, `investor-next/tests/function-lab.test.mjs` |
+| **WS9 - Unit and static-build validation** | Full investor test suite `111 / 111 PASS`; `tsc --noEmit` clean; `check:locales` PASS EN/ES/NL; clean static export with 12 routes. | `VERIFIED` | `node --test tests/*.test.mjs`, `npm run type-check`, `npm run build`, `npm run check:locales` |
+| **WS10 - Favicon and tap targets** | Real `favicon.ico` (701 B) and `icon.svg` served with metadata links; all interactive targets on home and mission control at least 24x24 px including globe fly-to buttons, sector chips, SSRF test buttons, checkboxes and external-source links. | `VERIFIED` | `investor-next/public/favicon.ico`, `investor-next/app/icon.svg`, `investor-next/app/globals.css` |
+| **WS11 - Production deployment and live check** | Deployed `civic-relay-investor` with `vercel deploy --prod --local-config investor-next/vercel.json`. Live: `/`, `/es`, `/nl`, `/mission-control`, `/science` return 200; `#function-lab` present in all three home locales; `/favicon.ico` and `/icon.svg` return 200; Chromium at 390 and 1440 shows `consoleErrors: []`, `pageErrors: []`, horizontal overflow 0, and working ECDSA sign -> verify flow. | `VERIFIED` | Production URL `https://civic-relay-investor.vercel.app` |
+
+Notes: local Python preview reports a 404 for `/senda/ojo` and `ERR_ABORTED` for video preloads; neither reproduces in production. The `__next.*` directories under `out/mission-control` are RSC export artifacts, not pages.
+
+---
+
+## 4. Addendum 2026-11-07 — Trilingual research library
+
+| Workstream | Scope | Status | Evidence & Artifacts |
+|---|---|---|---|
+| **WS12 — Research library** | Added `/research/`, `/es/research/`, and `/nl/research/` with three technical reports (PCI, erasure tails/DTN bounds, display determinism), HTML/Markdown/BibTeX/PDF artifacts, two data files, and a full SHA-256 manifest. Reports explicitly state “not peer reviewed”; results are model outputs, not field measurements. | `VERIFIED` | `investor-next/app/research-page.tsx`, `investor-next/app/research-page.css`, `investor-next/content/research/papers.json`, `investor-next/public/research/manifest.json` |
+| **WS13 — Localization and accessibility** | Localized page status, section eyebrows, abstracts and navigation in EN/ES/NL; English report titles marked `lang="en"` to avoid incorrect Dutch hyphenation; research, manifest, report and footer links meet the 24×24 px target minimum; sticky header keeps the research nav visible at 390 px. | `VERIFIED` | `investor-next/app/research-page.tsx`, `investor-next/app/research-page.css`, `investor-next/public/research/research.css` |
+| **WS14 — Automated verification** | Added `scripts/research/verify-export.mjs`, chained it into `npm run build`, and exposed `npm run check:research`. It verifies three locales, three reports, two datasets, three PDFs and bundle digest `4c0f0e34…8f839f66`. `smoke:deploy` now also checks the three live research routes, all three report HTML pages, the 14 manifest files with byte size and SHA-256, and the aggregate BibTeX. | `VERIFIED` | `investor-next/scripts/research/verify-export.mjs`, `investor-next/scripts/smoke-deploy.mjs` |
+| **WS15 — Production deployment and live check** | Production deployment `dpl_EEj1nqZRJgydYY4cNApgnV359JnA` is `READY` and aliased to `https://civic-relay-investor.vercel.app`. Vercel served the report editions only at clean URLs, so `.html` links initially returned 404; `investor-next/vercel.json` now rewrites `/research/:slug.html` to `/research/:slug`. Live smoke: `/`, `/es`, `/nl`, `/research/`, `/es/research/`, `/nl/research/`, all report HTML, 14 manifest artifacts and aggregate BibTeX return 200; source SHA `a622404c535affac27cf781e832fda6653427168` matches. Browser checks at 390 px and 1440 px across all three locales open all three reports and show 3 cards, 3 PDFs, sticky nav visible, zero horizontal overflow, zero console/page/HTTP errors. | `VERIFIED` | Production URL `https://civic-relay-investor.vercel.app/research/` |
+
+Build evidence: `15` static pages, `123 / 123` site tests, `tsc --noEmit` clean, `check:locales` PASS EN/ES/NL, `check:domain` PASS, `check:research` PASS. `.vercelignore` now re-includes `investor-next/content/research/*.md`, which are build inputs.

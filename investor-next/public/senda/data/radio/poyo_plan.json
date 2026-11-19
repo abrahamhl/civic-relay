@@ -1,0 +1,275 @@
+{
+ "basis": "MODEL",
+ "caso": "Cuenca del barranco del Poyo (Chiva → l'Horta Sud)",
+ "generadoUTC": "2026-11-17T05:37:36Z",
+ "escenario": {
+  "fMhz": 868,
+  "kFactor": 1.3333333333333333,
+  "txPowerDbm": 14,
+  "txGainDbi": 2.15,
+  "rxGainDbi": 2.15,
+  "sensitivityDbm": -137,
+  "marginDb": 10,
+  "mastilM": 6,
+  "receptorM": 1.5,
+  "azoteaM": 15,
+  "K": 6,
+  "fuentes": {
+   "fMhz": "banda ISM europea de 868 MHz (dispositivos de corto alcance)",
+   "txPowerDbm": "14 dBm (25 mW) de p.r.a. con ciclo de trabajo < 1 % en 868,0–868,6 MHz: coincide con tablas de CEPT derivadas de la Recomendación ERC 70-03, anexo 1 (consultadas el 17-11-2026: docdb.cept.org/download/2369 y efis.cept.org); texto vigente de la recomendación no leído",
+   "sensitivityDbm": "−137 dBm para LoRa SF12 a 125 kHz: coincide con hojas de datos de módulos basados en SX1262 (Seeed Wio-SX1262: −136,73 dBm; Wio-SX1262-LF: −136,5 dBm típico), consultadas el 17-11-2026. Una copia de la hoja de Semtech da −133 dBm en configuración de ahorro de energía; hoja original de Semtech no leída",
+   "ganancias": "2,15 dBi = dipolo de media onda (teoría de antenas)",
+   "marginDb": "10 dB: margen de desvanecimiento elegido por SENDA",
+   "kFactor": "4/3: atmósfera estándar (ITU-R P.453)",
+   "alturas": "mástil 6 m en cimas, 15 m en azotea de municipio, receptor a 1,5 m: decisiones de escenario"
+  }
+ },
+ "candidatos": 411,
+ "municipios": 22,
+ "directoDesdeChiva": {
+  "cierran": 14,
+  "de": 22,
+  "detalle": [
+   {
+    "municipio": "Chiva",
+    "dKm": 0,
+    "perdidaDb": 0,
+    "margenDb": 145.3,
+    "cierra": true,
+    "visionDirecta": true
+   },
+   {
+    "municipio": "Cheste",
+    "dKm": 3.7,
+    "perdidaDb": 108.1,
+    "margenDb": 37.2,
+    "cierra": true,
+    "visionDirecta": true
+   },
+   {
+    "municipio": "Buñol",
+    "dKm": 8.7,
+    "perdidaDb": 165.2,
+    "margenDb": -19.9,
+    "cierra": false,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Godelleta",
+    "dKm": 6.4,
+    "perdidaDb": 146.2,
+    "margenDb": -0.9,
+    "cierra": false,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Turís",
+    "dKm": 9.2,
+    "perdidaDb": 167.1,
+    "margenDb": -21.8,
+    "cierra": false,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Torrent",
+    "dKm": 22,
+    "perdidaDb": 139.9,
+    "margenDb": 5.4,
+    "cierra": true,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Paiporta",
+    "dKm": 26.2,
+    "perdidaDb": 142.4,
+    "margenDb": 2.9,
+    "cierra": true,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Picanya",
+    "dKm": 24.6,
+    "perdidaDb": 139.8,
+    "margenDb": 5.5,
+    "cierra": true,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Alaquàs",
+    "dKm": 22.1,
+    "perdidaDb": 141.1,
+    "margenDb": 4.2,
+    "cierra": true,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Aldaia",
+    "dKm": 20.4,
+    "perdidaDb": 138.3,
+    "margenDb": 7,
+    "cierra": true,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Loriguilla",
+    "dKm": 12.7,
+    "perdidaDb": 138.8,
+    "margenDb": 6.5,
+    "cierra": true,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Riba-roja de Túria",
+    "dKm": 15.1,
+    "perdidaDb": 159.9,
+    "margenDb": -14.6,
+    "cierra": false,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Quart de Poblet",
+    "dKm": 23.5,
+    "perdidaDb": 136.4,
+    "margenDb": 8.9,
+    "cierra": true,
+    "visionDirecta": true
+   },
+   {
+    "municipio": "Catarroja",
+    "dKm": 28.1,
+    "perdidaDb": 149.8,
+    "margenDb": -4.5,
+    "cierra": false,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Massanassa",
+    "dKm": 28.1,
+    "perdidaDb": 136,
+    "margenDb": 9.3,
+    "cierra": true,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Alfafar",
+    "dKm": 28.8,
+    "perdidaDb": 140.9,
+    "margenDb": 4.4,
+    "cierra": true,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Benetússer",
+    "dKm": 28.1,
+    "perdidaDb": 145,
+    "margenDb": 0.3,
+    "cierra": true,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Sedaví",
+    "dKm": 29.2,
+    "perdidaDb": 143.5,
+    "margenDb": 1.8,
+    "cierra": true,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Montserrat",
+    "dKm": 16.1,
+    "perdidaDb": 161.7,
+    "margenDb": -16.4,
+    "cierra": false,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Alcàsser",
+    "dKm": 26.2,
+    "perdidaDb": 150.3,
+    "margenDb": -5,
+    "cierra": false,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Picassent",
+    "dKm": 25.2,
+    "perdidaDb": 150.4,
+    "margenDb": -5.1,
+    "cierra": false,
+    "visionDirecta": false
+   },
+   {
+    "municipio": "Xirivella",
+    "dKm": 24.7,
+    "perdidaDb": 132.6,
+    "margenDb": 12.7,
+    "cierra": true,
+    "visionDirecta": false
+   }
+  ]
+ },
+ "plan": {
+  "repetidores": [
+   {
+    "orden": 1,
+    "id": "azotea Chiva",
+    "lon": -0.71783,
+    "lat": 39.47261,
+    "cotaM": null,
+    "mastilM": 15,
+    "saltosDesdeChiva": 0,
+    "municipiosNuevos": 14,
+    "acumuladoPct": 63.6
+   },
+   {
+    "orden": 2,
+    "id": "c26",
+    "lon": -0.835,
+    "lat": 39.541,
+    "cotaM": 1028,
+    "mastilM": 6,
+    "saltosDesdeChiva": 1,
+    "municipiosNuevos": 7,
+    "acumuladoPct": 95.5
+   },
+   {
+    "orden": 3,
+    "id": "azotea Turís",
+    "lon": -0.71049,
+    "lat": 39.38988,
+    "cotaM": null,
+    "mastilM": 15,
+    "saltosDesdeChiva": 2,
+    "municipiosNuevos": 1,
+    "acumuladoPct": 100
+   }
+  ],
+  "municipiosCubiertos": 22,
+  "de": 22,
+  "sinCubrir": [],
+  "enlaces": [
+   {
+    "a": "azotea Chiva",
+    "b": "c26",
+    "km": 12.6,
+    "margenDb": 32.1,
+    "visionDirecta": true
+   },
+   {
+    "a": "c26",
+    "b": "azotea Turís",
+    "km": 19.9,
+    "margenDb": 7.2,
+    "visionDirecta": false
+   }
+  ]
+ },
+ "hipotesis": [
+  "Predicción con modelo de propagación (espacio libre + difracción ITU-R P.526 / Deygout); no es una medida de campo",
+  "Terreno desnudo: sin edificios, vegetación ni interiores → optimista en casco urbano y arbolado",
+  "Sin multitrayecto, interferencias ni límite de ciclo de trabajo de la banda",
+  "Potencia, ganancias, sensibilidad, margen, alturas y factor k son parámetros declarados por quien simula",
+  "El relieve es un modelo digital de superficie remuestreado: obstáculos menores que la celda no existen para el cálculo"
+ ],
+ "ms": 1253
+}

@@ -1,0 +1,489 @@
+{
+  "schema": "senda-roadsafe-e2e/1",
+  "browser": "chromium (playwright)",
+  "at": "2026-11-19T00:14:02.887Z",
+  "passed": 82,
+  "failed": 0,
+  "results": [
+    {
+      "name": "movil: carga sin errores",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "name": "movil: botón 112 es tel:112 y visible sin abrir expediente",
+      "ok": true
+    },
+    {
+      "name": "movil: autoevaluación — heridos/atrapados ⇒ CRITICAL con instrucción 112",
+      "ok": true
+    },
+    {
+      "name": "movil: emergencia guiada — humo/fuego ⇒ EXIT_NOW_FIRE con 112 primero",
+      "ok": true
+    },
+    {
+      "name": "movil: ubicación — Plus Code y SMS listos",
+      "ok": true
+    },
+    {
+      "name": "movil: ocupantes — 4 personas, 2 sin confirmar, móvil perdido y separado",
+      "ok": true,
+      "occ": "Personas: 4 · OK 2 · ayuda 0 · sin confirmar 2 (Abuela, Bebé)\n  ConductoraRESPONDINGHijoPOSSIBLY_LOSTAbuelaPOSSIBLY_SEPARATEDUn móvil que responde no prueba que su dueño esté bien. Un móvil callado no prueba que su dueño esté herido: puede estar perdido o roto."
+    },
+    {
+      "name": "movil: expediente de avería abierto (UNVERIFIED, sin registro)",
+      "ok": true,
+      "caseTxt": "RS-16e66ac08e1d38fc · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+    },
+    {
+      "name": "movil: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
+      "ok": true,
+      "svc": "TOW PARTNER_ACKNOWLEDGED ASISTENCIA-SIM-SIM-1 SIMEl proveedor abrió expediente. Aún no hay vehículo asignado."
+    },
+    {
+      "name": "movil: accidente → escalada con instrucción de llamar (SENDA no llama)",
+      "ok": true,
+      "crash": "RS-16e66ac08e1d38fc · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+    },
+    {
+      "name": "movil: idioma en",
+      "ok": true
+    },
+    {
+      "name": "movil: idioma nl",
+      "ok": true
+    },
+    {
+      "name": "movil: idioma es",
+      "ok": true
+    },
+    {
+      "name": "movil: operador — V16/DGT/navegador comparten raíz causal",
+      "ok": true,
+      "prov": "FuenteRaíz causalΔ log-oddsBaliza V16V16_BEACON:V16-001misma raíz: no sumaDGT 3.0 (V16)V16_BEACON:V16-001misma raíz: no sumaNavegador ← DGT 3.0V16_BEACON:V16-001misma raíz: no sumaAfectado (SENDA)V16_BEACON:V16-0012.483",
+      "conf": "p=0.7496 · UNVERIFIED · V16, DGT 3.0, navegador y la declaración del afectado comparten raíz: cuentan una vez."
+    },
+    {
+      "name": "movil: operador — auditoría encadenada ✓",
+      "ok": true,
+      "audit": "Auditoría encadenada: ✓ · 10 · f472cb1f6826d1f1…"
+    },
+    {
+      "name": "movil: operador — 202 sin referencia se queda en TRANSPORT_ACCEPTED",
+      "ok": true,
+      "svcO": "ServicioEstadoReferenciaMarcasTOW · GRUA-SIMPARTNER_ACKNOWLEDGEDGRUA-SIM-SIM-1—TAXI · TAXI-2-SIMTRANSPORT_ACCEPTED—ACK_SIN_REFERENCIA, DELAYEDTAXI · TAXI-SIMON_SCENE_REPORTEDTAXI-SIM-SIM-1—"
+    },
+    {
+      "name": "movil: priorización — el «atrapado» sin verificar va primero con VERIFICAR",
+      "ok": true,
+      "prio": [
+        "1M-40 · «atrapado» sin verificarVERIFICAR · DATOS_INCOMPLETO",
+        "2N-000 PK 127 · alcanceDATOS_INCOMPLETOS:DARK_SEVERITY,NIGHT",
+        "3AP-7 PK 300 · carril ocupado, nocheDATOS_INCOMPLETOS:NIGHT_",
+        "4A-3 PK 41,2 · avería arcénDATOS_INCOMPLETOS:DARK_SEVERITY,N"
+      ]
+    },
+    {
+      "name": "movil: zona — el aviso anticipado crece con la cola y los paneles son propuestas",
+      "ok": true,
+      "a20": 1567,
+      "a50": 2851
+    },
+    {
+      "name": "movil: física — Δv, guiñada y probabilidad de invasión de carril",
+      "ok": true,
+      "phys": "Δv taxi 33.4 km/h (HIGH) · ω -2.19 rad/s · alcance p50/p95 10.6/19.6 mSHOULDER_OR_OFFROAD_RIGHT 81 % · LANE_1 100 % · LANE_2 78 % · BEYOND_LEFT 13 %Monte Carlo de impacto plano + deslizamiento; paráme"
+    },
+    {
+      "name": "movil: servicios — posición caducada marcada y el ciudadano solo ve su asignación",
+      "ok": true,
+      "resp": "Propuesta: GC-ATGC-12 ~4 minEl ciudadano solo ve: AMBULANCE · ayuda asignada según el organismoPropuesta para el coordinador del organismo; SENDA no asigna recursos públicos. ETA orientativa sin tráfi"
+    },
+    {
+      "name": "movil: científico — 5 escenarios con IC y acuse de visualización 0",
+      "ok": true,
+      "sres": "A · Sin alertas digitales4.1 %\n   \n   cobertura efectiva 0.0 % · taxi→furgoneta 1.5 % · avisos tardíos suprimidos/mostrados 0/0 · acuse de visualización 0B · V16 informativa (sin asumir entrega al conductor)4.1 %\n   \n   cobertura efectiva 0.0 % · taxi→furgoneta 1.5 % · avisos tardíos suprimidos/most"
+    },
+    {
+      "name": "movil: científico — ranking de 11 circunstancias, 2 s la más segura",
+      "ok": true,
+      "last": "Distancia temporal 2 s (recomendada)0.5 %×0.130.4 %45.6 km/h"
+    },
+    {
+      "name": "movil: dataset oficial — 5 países con OR de oscuridad y arcén",
+      "ok": true
+    },
+    {
+      "name": "movil: modelo de gravedad — AUC publicado y vehículo pesado sube la probabilidad",
+      "ok": true,
+      "before": 2.41,
+      "after": 9.02
+    },
+    {
+      "name": "movil: detector — 10 casos sintéticos sin fallos (choque ⇒ preguntar; falsas alarmas ⇒ nada)",
+      "ok": true,
+      "det": [
+        "CRASH_REAR_ENDchoqueCHECK_USER0.3243",
+        "CRASH_LOW_SPEEDchoqueCHECK_USER0.3243",
+        "CRASH_ROLLOVERchoqueCHECK_USER0.5455",
+        "PHONE_DROP_IN_CARnoNO_EVENT0",
+        "POTHOLEnoNO_EVENT0",
+        "HARD_BRAKE_NO_CRASHnoNO_EVENT—",
+        "SKI_FALLnoNO_EVENT0.0001",
+        "ROLLER_COASTERnoNO_EVENT0.0004",
+        "DOOR_SLAM_PARKEDnoNO_EVENT0.004",
+        "CRASH_NO_GNSSchoqueCHECK_USER0.0015"
+      ]
+    },
+    {
+      "name": "movil: viaje — ruta favorita, paquete offline en KB, comparación por riesgo",
+      "ok": true,
+      "vout": "★ Casa → trabajo · 22.4 kmAlternativa · 18.3 kmPaquete sin conexión: 0.4 KB (2/400 puntos)casa-trabajo: 22.4 km · riesgo/km 1.78 · alt: 18.3 km · riesgo/km 0Riesgo histórico de accidentes con víctimas"
+    },
+    {
+      "name": "movil: viaje — megafonía escalonada (≤3 avisos, sin órdenes)",
+      "ok": true,
+      "ann": [
+        "DOUBLE_TONE Atención: vehículo de servicio deteniéndose a la derecha a 2 kilómetros. Precaución.",
+        "DOUBLE_TONE Atención: vehículo de servicio deteniéndose a la derecha a 1000 metros. Precaución.",
+        "DOUBLE_TONE Atención: vehículo de servicio deteniéndose a la derecha a 500 metros. Precaución."
+      ]
+    },
+    {
+      "name": "movil: viaje — sin evaluación del arcén no se recomienda parada del taxi",
+      "ok": true
+    },
+    {
+      "name": "movil: carretera — 4 canales funden en 1 escena (oficial) + cola aparte",
+      "ok": true,
+      "kbus": [
+        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:9da0575d · DATEX2:NAP",
+        "QUEUE_TAILUNVERIFIED_HINT1ZONE_MODEL"
+      ]
+    },
+    {
+      "name": "movil: carretera — más autorizaciones ⇒ más familias de fallo; sobrevive a caída móvil",
+      "ok": true,
+      "kreinf1": "Refuerzo: 3 familias de fallo · sobrevive a la caída de la red móvil",
+      "kreinf2": "Refuerzo: 5 familias de fallo · sobrevive a la caída de la red móvil"
+    },
+    {
+      "name": "movil: carretera — horizonte con cola y escena por delante y frase de voz",
+      "ok": true,
+      "khor": [
+        "900 m · 36 sen cola QUEUE_TAIL UNVERIFIED_HINT INFO · DRAC 0.37 m/s²«Atención: final de retención a 900 metros. Precaución.»",
+        "1500 m · 60 sse dice ahora ACCIDENT OFFICIAL_FEED INFO · DRAC 0.22 m/s²«Atención: accidente a 2 kilómetros. Precaución.»"
+      ]
+    },
+    {
+      "name": "movil: carretera — presupuesto de atención: exactamente un aviso se dice ahora",
+      "ok": true,
+      "spk": 1
+    },
+    {
+      "name": "movil: carretera — urgencia física (DRAC) por aviso y visibilidad calculada por trazado",
+      "ok": true,
+      "urg": [
+        "INFO · DRAC 0.37 m/s²",
+        "INFO · DRAC 0.22 m/s²"
+      ],
+      "sightTxt": "visibilidad por trazado: 1230 m"
+    },
+    {
+      "name": "movil: carretera — cadena BLE: más penetración ⇒ más alcance",
+      "ok": true,
+      "ble": "Cadena BLE del mismo sentido: alcance esperado 30 m · P(3 km) = 0.0 %",
+      "ble2": "Cadena BLE del mismo sentido: alcance esperado 643 m · P(3 km) = 0.0 %"
+    },
+    {
+      "name": "movil: carretera — tasas reales por 100 M veh-km",
+      "ok": true
+    },
+    {
+      "name": "movil: carretera — primero final de cola, después accidente",
+      "ok": true,
+      "roadRows": [
+        "Final de cola900 m35–37 sUNVERIFIED",
+        "Accidente1500 m59–61 sUNVERIFIED"
+      ]
+    },
+    {
+      "name": "movil: carretera — no publica ni anuncia sin autorizaciones",
+      "ok": true,
+      "roadChannels": "Cobertura real y permisosVisualización local posible; sin credenciales, consentimiento ni mediciones de enlace para publicar o retransmitir.Canales bloqueados: 8VOICE · NOT_APPROVED_FOR_DRIVER_OR_PUBLIC_WARNINGSMS · NO_USER_CONSENTBLE_PEER · NO_USER_CONSENTDTN_RELAY · NO_USER_CONSENTDGT30 · NOT_APPROVED_FOR_DRIVER_OR_PUBLIC_WARNINGWAZE_CIFS · NOT_APPROVED_FOR_DRIVER_OR_PUBLIC_WARNINGTAXI_PARTNER · NO_USER_CONSENTINSURER_PARTNER · NO_USER_CONSENT"
+    },
+    {
+      "name": "movil: carretera — BLE se declara solo hipótesis",
+      "ok": true,
+      "roadRelay": "Reenvío BLE contrarioProbabilidad condicional del modelo: 77.0 %HIPÓTESIS, NO COBERTURA MEDIDA: llegadas Poisson, 1200 veh/h, velocidades de 90 km/h, alcance eficaz supuesto 30 m y recepción supuesta del 70%. No hay ensayo BLE físico ni acuse de entrega."
+    },
+    {
+      "name": "movil: carretera — predicción cinemática conserva incertidumbre y no afirma cobertura física",
+      "ok": true,
+      "text": "PeligroDistancia estimadaETAEvidenciaFinal de cola900 m35–37 sUNVERIFIEDAccidente1500 m59–61 sUNVERIFIEDDetrás o descartados: 1 · Avisos por voz emitidos: 0Modelo experimental de final de cola móvilVelocidad de la onda de cola: -5 … -3 m/s · Distancia acotada: 915 … 949 mMargen temporal convertido a distancia: 415 mH-ROAD-RRE-1 · TIMING_ROBUST_IN_MODELParámetros inventados únicamente para el ensayo. No son valores de normativa ni consejos de frenado.Cobertura BLE no validada físicamente: ABSTAIN_NO_CALIBRATED_CHANNEL"
+    },
+    {
+      "name": "movil: sin desbordamiento horizontal",
+      "ok": true,
+      "overflow": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "movil: ninguna petición a dominios externos",
+      "ok": true,
+      "external": []
+    },
+    {
+      "name": "movil: sin errores tras la interacción",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "name": "escritorio: carga sin errores",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "name": "escritorio: botón 112 es tel:112 y visible sin abrir expediente",
+      "ok": true
+    },
+    {
+      "name": "escritorio: autoevaluación — heridos/atrapados ⇒ CRITICAL con instrucción 112",
+      "ok": true
+    },
+    {
+      "name": "escritorio: emergencia guiada — humo/fuego ⇒ EXIT_NOW_FIRE con 112 primero",
+      "ok": true
+    },
+    {
+      "name": "escritorio: ubicación — Plus Code y SMS listos",
+      "ok": true
+    },
+    {
+      "name": "escritorio: ocupantes — 4 personas, 2 sin confirmar, móvil perdido y separado",
+      "ok": true,
+      "occ": "Personas: 4 · OK 2 · ayuda 0 · sin confirmar 2 (Abuela, Bebé)\n  ConductoraRESPONDINGHijoPOSSIBLY_LOSTAbuelaPOSSIBLY_SEPARATEDUn móvil que responde no prueba que su dueño esté bien. Un móvil callado no prueba que su dueño esté herido: puede estar perdido o roto."
+    },
+    {
+      "name": "escritorio: expediente de avería abierto (UNVERIFIED, sin registro)",
+      "ok": true,
+      "caseTxt": "RS-9c5b6198b50e525e · UNVERIFIED\n  40.20010, -3.30020\n  \n  Confianza: UNVERIFIED · p=0.75"
+    },
+    {
+      "name": "escritorio: grúa simulada → PARTNER_ACKNOWLEDGED con SIM, nunca «en camino»",
+      "ok": true,
+      "svc": "TOW PARTNER_ACKNOWLEDGED ASISTENCIA-SIM-SIM-1 SIMEl proveedor abrió expediente. Aún no hay vehículo asignado."
+    },
+    {
+      "name": "escritorio: accidente → escalada con instrucción de llamar (SENDA no llama)",
+      "ok": true,
+      "crash": "RS-9c5b6198b50e525e · EMERGENCY_ESCALATION_REQUIRED\n  40.20010, -3.30020\n  Llama al 112 ahora. SENDA no llama por ti.Incidente de tráfico en carretera sin identificar. Posible colisión por alcance tras la avería. Coordenadas 40.20010, -3.30020.\n  Confianza: UNVERIFIED · p=0.75"
+    },
+    {
+      "name": "escritorio: idioma en",
+      "ok": true
+    },
+    {
+      "name": "escritorio: idioma nl",
+      "ok": true
+    },
+    {
+      "name": "escritorio: idioma es",
+      "ok": true
+    },
+    {
+      "name": "escritorio: operador — V16/DGT/navegador comparten raíz causal",
+      "ok": true,
+      "prov": "FuenteRaíz causalΔ log-oddsBaliza V16V16_BEACON:V16-001misma raíz: no sumaDGT 3.0 (V16)V16_BEACON:V16-001misma raíz: no sumaNavegador ← DGT 3.0V16_BEACON:V16-001misma raíz: no sumaAfectado (SENDA)V16_BEACON:V16-0012.483",
+      "conf": "p=0.7496 · UNVERIFIED · V16, DGT 3.0, navegador y la declaración del afectado comparten raíz: cuentan una vez."
+    },
+    {
+      "name": "escritorio: operador — auditoría encadenada ✓",
+      "ok": true,
+      "audit": "Auditoría encadenada: ✓ · 10 · f472cb1f6826d1f1…"
+    },
+    {
+      "name": "escritorio: operador — 202 sin referencia se queda en TRANSPORT_ACCEPTED",
+      "ok": true,
+      "svcO": "ServicioEstadoReferenciaMarcasTOW · GRUA-SIMPARTNER_ACKNOWLEDGEDGRUA-SIM-SIM-1—TAXI · TAXI-2-SIMTRANSPORT_ACCEPTED—ACK_SIN_REFERENCIA, DELAYEDTAXI · TAXI-SIMON_SCENE_REPORTEDTAXI-SIM-SIM-1—"
+    },
+    {
+      "name": "escritorio: priorización — el «atrapado» sin verificar va primero con VERIFICAR",
+      "ok": true,
+      "prio": [
+        "1M-40 · «atrapado» sin verificarVERIFICAR · DATOS_INCOMPLETO",
+        "2N-000 PK 127 · alcanceDATOS_INCOMPLETOS:DARK_SEVERITY,NIGHT",
+        "3AP-7 PK 300 · carril ocupado, nocheDATOS_INCOMPLETOS:NIGHT_",
+        "4A-3 PK 41,2 · avería arcénDATOS_INCOMPLETOS:DARK_SEVERITY,N"
+      ]
+    },
+    {
+      "name": "escritorio: zona — el aviso anticipado crece con la cola y los paneles son propuestas",
+      "ok": true,
+      "a20": 1567,
+      "a50": 2851
+    },
+    {
+      "name": "escritorio: física — Δv, guiñada y probabilidad de invasión de carril",
+      "ok": true,
+      "phys": "Δv taxi 33.4 km/h (HIGH) · ω -2.19 rad/s · alcance p50/p95 10.6/19.6 mSHOULDER_OR_OFFROAD_RIGHT 81 % · LANE_1 100 % · LANE_2 78 % · BEYOND_LEFT 13 %Monte Carlo de impacto plano + deslizamiento; paráme"
+    },
+    {
+      "name": "escritorio: servicios — posición caducada marcada y el ciudadano solo ve su asignación",
+      "ok": true,
+      "resp": "Propuesta: GC-ATGC-12 ~4 minEl ciudadano solo ve: AMBULANCE · ayuda asignada según el organismoPropuesta para el coordinador del organismo; SENDA no asigna recursos públicos. ETA orientativa sin tráfi"
+    },
+    {
+      "name": "escritorio: científico — 5 escenarios con IC y acuse de visualización 0",
+      "ok": true,
+      "sres": "A · Sin alertas digitales4.1 %\n   \n   cobertura efectiva 0.0 % · taxi→furgoneta 1.5 % · avisos tardíos suprimidos/mostrados 0/0 · acuse de visualización 0B · V16 informativa (sin asumir entrega al conductor)4.1 %\n   \n   cobertura efectiva 0.0 % · taxi→furgoneta 1.5 % · avisos tardíos suprimidos/most"
+    },
+    {
+      "name": "escritorio: científico — ranking de 11 circunstancias, 2 s la más segura",
+      "ok": true,
+      "last": "Distancia temporal 2 s (recomendada)0.5 %×0.130.4 %45.6 km/h"
+    },
+    {
+      "name": "escritorio: dataset oficial — 5 países con OR de oscuridad y arcén",
+      "ok": true
+    },
+    {
+      "name": "escritorio: modelo de gravedad — AUC publicado y vehículo pesado sube la probabilidad",
+      "ok": true,
+      "before": 2.41,
+      "after": 9.02
+    },
+    {
+      "name": "escritorio: detector — 10 casos sintéticos sin fallos (choque ⇒ preguntar; falsas alarmas ⇒ nada)",
+      "ok": true,
+      "det": [
+        "CRASH_REAR_ENDchoqueCHECK_USER0.3243",
+        "CRASH_LOW_SPEEDchoqueCHECK_USER0.3243",
+        "CRASH_ROLLOVERchoqueCHECK_USER0.5455",
+        "PHONE_DROP_IN_CARnoNO_EVENT0",
+        "POTHOLEnoNO_EVENT0",
+        "HARD_BRAKE_NO_CRASHnoNO_EVENT—",
+        "SKI_FALLnoNO_EVENT0.0001",
+        "ROLLER_COASTERnoNO_EVENT0.0004",
+        "DOOR_SLAM_PARKEDnoNO_EVENT0.004",
+        "CRASH_NO_GNSSchoqueCHECK_USER0.0015"
+      ]
+    },
+    {
+      "name": "escritorio: viaje — ruta favorita, paquete offline en KB, comparación por riesgo",
+      "ok": true,
+      "vout": "★ Casa → trabajo · 22.4 kmAlternativa · 18.3 kmPaquete sin conexión: 0.4 KB (2/400 puntos)casa-trabajo: 22.4 km · riesgo/km 1.78 · alt: 18.3 km · riesgo/km 0Riesgo histórico de accidentes con víctimas"
+    },
+    {
+      "name": "escritorio: viaje — megafonía escalonada (≤3 avisos, sin órdenes)",
+      "ok": true,
+      "ann": [
+        "DOUBLE_TONE Atención: vehículo de servicio deteniéndose a la derecha a 2 kilómetros. Precaución.",
+        "DOUBLE_TONE Atención: vehículo de servicio deteniéndose a la derecha a 1000 metros. Precaución.",
+        "DOUBLE_TONE Atención: vehículo de servicio deteniéndose a la derecha a 500 metros. Precaución."
+      ]
+    },
+    {
+      "name": "escritorio: viaje — sin evaluación del arcén no se recomienda parada del taxi",
+      "ok": true
+    },
+    {
+      "name": "escritorio: carretera — 4 canales funden en 1 escena (oficial) + cola aparte",
+      "ok": true,
+      "kbus": [
+        "ACCIDENTOFFICIAL_FEED3TWIN:SENDA_OWNER_DECLARATION · DATEX2:DGT30-V16 · BLE:611ef3ad · DATEX2:NAP",
+        "QUEUE_TAILUNVERIFIED_HINT1ZONE_MODEL"
+      ]
+    },
+    {
+      "name": "escritorio: carretera — más autorizaciones ⇒ más familias de fallo; sobrevive a caída móvil",
+      "ok": true,
+      "kreinf1": "Refuerzo: 3 familias de fallo · sobrevive a la caída de la red móvil",
+      "kreinf2": "Refuerzo: 5 familias de fallo · sobrevive a la caída de la red móvil"
+    },
+    {
+      "name": "escritorio: carretera — horizonte con cola y escena por delante y frase de voz",
+      "ok": true,
+      "khor": [
+        "900 m · 36 sen cola QUEUE_TAIL UNVERIFIED_HINT INFO · DRAC 0.37 m/s²«Atención: final de retención a 900 metros. Precaución.»",
+        "1500 m · 60 sse dice ahora ACCIDENT OFFICIAL_FEED INFO · DRAC 0.22 m/s²«Atención: accidente a 2 kilómetros. Precaución.»"
+      ]
+    },
+    {
+      "name": "escritorio: carretera — presupuesto de atención: exactamente un aviso se dice ahora",
+      "ok": true,
+      "spk": 1
+    },
+    {
+      "name": "escritorio: carretera — urgencia física (DRAC) por aviso y visibilidad calculada por trazado",
+      "ok": true,
+      "urg": [
+        "INFO · DRAC 0.37 m/s²",
+        "INFO · DRAC 0.22 m/s²"
+      ],
+      "sightTxt": "visibilidad por trazado: 1230 m"
+    },
+    {
+      "name": "escritorio: carretera — cadena BLE: más penetración ⇒ más alcance",
+      "ok": true,
+      "ble": "Cadena BLE del mismo sentido: alcance esperado 30 m · P(3 km) = 0.0 %",
+      "ble2": "Cadena BLE del mismo sentido: alcance esperado 643 m · P(3 km) = 0.0 %"
+    },
+    {
+      "name": "escritorio: carretera — tasas reales por 100 M veh-km",
+      "ok": true
+    },
+    {
+      "name": "escritorio: carretera — primero final de cola, después accidente",
+      "ok": true,
+      "roadRows": [
+        "Final de cola900 m35–37 sUNVERIFIED",
+        "Accidente1500 m59–61 sUNVERIFIED"
+      ]
+    },
+    {
+      "name": "escritorio: carretera — no publica ni anuncia sin autorizaciones",
+      "ok": true,
+      "roadChannels": "Cobertura real y permisosVisualización local posible; sin credenciales, consentimiento ni mediciones de enlace para publicar o retransmitir.Canales bloqueados: 8VOICE · NOT_APPROVED_FOR_DRIVER_OR_PUBLIC_WARNINGSMS · NO_USER_CONSENTBLE_PEER · NO_USER_CONSENTDTN_RELAY · NO_USER_CONSENTDGT30 · NOT_APPROVED_FOR_DRIVER_OR_PUBLIC_WARNINGWAZE_CIFS · NOT_APPROVED_FOR_DRIVER_OR_PUBLIC_WARNINGTAXI_PARTNER · NO_USER_CONSENTINSURER_PARTNER · NO_USER_CONSENT"
+    },
+    {
+      "name": "escritorio: carretera — BLE se declara solo hipótesis",
+      "ok": true,
+      "roadRelay": "Reenvío BLE contrarioProbabilidad condicional del modelo: 77.0 %HIPÓTESIS, NO COBERTURA MEDIDA: llegadas Poisson, 1200 veh/h, velocidades de 90 km/h, alcance eficaz supuesto 30 m y recepción supuesta del 70%. No hay ensayo BLE físico ni acuse de entrega."
+    },
+    {
+      "name": "escritorio: carretera — predicción cinemática conserva incertidumbre y no afirma cobertura física",
+      "ok": true,
+      "text": "PeligroDistancia estimadaETAEvidenciaFinal de cola900 m35–37 sUNVERIFIEDAccidente1500 m59–61 sUNVERIFIEDDetrás o descartados: 1 · Avisos por voz emitidos: 0Modelo experimental de final de cola móvilVelocidad de la onda de cola: -5 … -3 m/s · Distancia acotada: 915 … 949 mMargen temporal convertido a distancia: 415 mH-ROAD-RRE-1 · TIMING_ROBUST_IN_MODELParámetros inventados únicamente para el ensayo. No son valores de normativa ni consejos de frenado.Cobertura BLE no validada físicamente: ABSTAIN_NO_CALIBRATED_CHANNEL"
+    },
+    {
+      "name": "escritorio: sin desbordamiento horizontal",
+      "ok": true,
+      "overflow": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "escritorio: ninguna petición a dominios externos",
+      "ok": true,
+      "external": []
+    },
+    {
+      "name": "escritorio: sin errores tras la interacción",
+      "ok": true,
+      "errors": []
+    }
+  ]
+}

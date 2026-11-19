@@ -529,6 +529,7 @@ export default function SectorIntelligenceConsole({ locale }: { locale: Locale }
                 if (firstCam) setSelectedCameraId(firstCam.id);
               }}
               style={{
+                minHeight: '28px',
                 padding: '0.42rem 0.75rem',
                 borderRadius: '0.4rem',
                 fontSize: '0.8rem',
@@ -551,6 +552,7 @@ export default function SectorIntelligenceConsole({ locale }: { locale: Locale }
             aria-pressed={privacyMosaic}
             onClick={() => setPrivacyMosaic(v => !v)}
             style={{
+              minHeight: '28px',
               padding: '0.36rem 0.65rem',
               borderRadius: '0.35rem',
               fontSize: '0.76rem',
@@ -568,6 +570,7 @@ export default function SectorIntelligenceConsole({ locale }: { locale: Locale }
             aria-pressed={operatorRole === 'INSTITUTIONAL_OPERATOR'}
             onClick={() => setOperatorRole(r => (r === 'PUBLIC_VISITOR' ? 'INSTITUTIONAL_OPERATOR' : 'PUBLIC_VISITOR'))}
             style={{
+              minHeight: '28px',
               padding: '0.36rem 0.65rem',
               borderRadius: '0.35rem',
               fontSize: '0.76rem',
@@ -792,6 +795,7 @@ export default function SectorIntelligenceConsole({ locale }: { locale: Locale }
                   aria-pressed={matrixLayout === n}
                   onClick={() => setMatrixLayout(n)}
                   style={{
+                    minHeight: '28px',
                     padding: '0.22rem 0.5rem',
                     borderRadius: '0.28rem',
                     fontSize: '0.72rem',
@@ -818,6 +822,7 @@ export default function SectorIntelligenceConsole({ locale }: { locale: Locale }
                 aria-pressed={stateFilter === st}
                 onClick={() => setStateFilter(st)}
                 style={{
+                  minHeight: '28px',
                   padding: '0.2rem 0.48rem',
                   borderRadius: '0.28rem',
                   fontSize: '0.7rem',
@@ -976,7 +981,7 @@ export default function SectorIntelligenceConsole({ locale }: { locale: Locale }
                   href={selectedCamera.officialSourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#38bdf8', fontWeight: 600, textDecoration: 'underline' }}
+                  style={{ display: 'inline-flex', alignItems: 'center', minHeight: '24px', padding: '0.2rem 0', color: '#38bdf8', fontWeight: 600, textDecoration: 'underline' }}
                 >
                   Abrir fuente oficial externa ↗
                 </a>
@@ -984,7 +989,7 @@ export default function SectorIntelligenceConsole({ locale }: { locale: Locale }
                   href={selectedCamera.termsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#93c5fd', textDecoration: 'underline' }}
+                  style={{ display: 'inline-flex', alignItems: 'center', minHeight: '24px', padding: '0.2rem 0', color: '#93c5fd', textDecoration: 'underline' }}
                 >
                   Condiciones de reutilización / licencia ↗
                 </a>
@@ -1114,7 +1119,7 @@ export default function SectorIntelligenceConsole({ locale }: { locale: Locale }
               type="button"
               data-testid="ssrf-test-loopback"
               onClick={() => setSsrfTestUrl('http://127.0.0.1:8080/private-cam')}
-              style={{ padding: '0.24rem 0.5rem', borderRadius: '0.28rem', background: '#334155', color: '#f8fafc', border: 'none', fontSize: '0.7rem', cursor: 'pointer' }}
+              style={{ minHeight: '28px', padding: '0.24rem 0.5rem', borderRadius: '0.28rem', background: '#334155', color: '#f8fafc', border: 'none', fontSize: '0.7rem', cursor: 'pointer' }}
             >
               Probar bloqueo SSRF (127.0.0.1)
             </button>
@@ -1122,7 +1127,7 @@ export default function SectorIntelligenceConsole({ locale }: { locale: Locale }
               type="button"
               data-testid="ssrf-test-dgt"
               onClick={() => setSsrfTestUrl('https://infocar.dgt.es/etraffic/')}
-              style={{ padding: '0.24rem 0.5rem', borderRadius: '0.28rem', background: '#0369a1', color: '#f8fafc', border: 'none', fontSize: '0.7rem', cursor: 'pointer' }}
+              style={{ minHeight: '28px', padding: '0.24rem 0.5rem', borderRadius: '0.28rem', background: '#0369a1', color: '#f8fafc', border: 'none', fontSize: '0.7rem', cursor: 'pointer' }}
             >
               Probar dominio DGT permitido
             </button>
@@ -1231,7 +1236,7 @@ export default function SectorIntelligenceConsole({ locale }: { locale: Locale }
               href={activePipe.moduleUrl}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: '#38bdf8', textDecoration: 'underline', fontWeight: 600 }}
+              style={{ display: 'inline-flex', alignItems: 'center', minHeight: '24px', padding: '0.2rem 0', color: '#38bdf8', textDecoration: 'underline', fontWeight: 600 }}
             >
               <code>{activePipe.modulePath}</code> ↗
             </a>

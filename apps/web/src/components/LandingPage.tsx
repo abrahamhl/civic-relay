@@ -1,273 +1,111 @@
-import { motion, useTransform, useScroll } from 'framer-motion';
-import { Satellite, Radio, Shield, ChevronRight, Cpu, Menu, Smartphone, Bluetooth, Lock } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { ArrowDown, ArrowRight, Database, Github, Radio, Shield, ShieldAlert } from 'lucide-react';
 import { SatelliteVisualization } from './SatelliteVisualization';
+import { StoryMode } from './StoryMode';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import type { Locale } from '../i18n';
+import { t } from '../i18n';
 
-const SmoothScrollLink = ({ href, children, className }: any) => {
-  const handleClick = (e: any) => {
-    e.preventDefault();
-    const target = document.getElementById(href.replace('#', ''));
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-  return <a href={href} onClick={handleClick} className={className}>{children}</a>;
-};
-
-// SIMULATORS
-
-const MeshNetworkSimulator = () => {
-  const [nodes, setNodes] = useState<{id: number, active: boolean}[]>([
-    {id: 1, active: true}, {id: 2, active: false}, {id: 3, active: true}, {id: 4, active: true}
-  ]);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setNodes(prev => prev.map(n => ({ ...n, active: Math.random() > 0.3 })));
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
-
+export function LandingPage({ onEnterApp, locale, onLocaleChange }: {
+  onEnterApp: () => void;
+  locale: Locale;
+  onLocaleChange: (next: Locale) => void;
+}) {
   return (
-    <div className="bg-black/50 border border-blue-500/30 rounded-2xl p-6 relative overflow-hidden font-mono shadow-inner">
-      <div className="flex items-center gap-2 mb-4 border-b border-white/10 pb-2">
-        <Radio className="w-4 h-4 text-blue-500" />
-        <span className="text-slate-400 text-xs">MESH-ROUTING.SIMULATOR</span>
-      </div>
-      <div className="flex justify-between items-center px-4 h-24">
-        {nodes.map(n => (
-          <div key={n.id} className={`flex flex-col items-center gap-2 ${n.active ? 'text-blue-400 opacity-100' : 'text-slate-600 opacity-50'}`}>
-            <Smartphone className="w-6 h-6" />
-            <span className="text-[10px]">P{n.id}</span>
-          </div>
-        ))}
-      </div>
-      <div className="absolute inset-0 bg-blue-500/5 mix-blend-overlay" />
-    </div>
-  );
-};
-
-const SatelliteUplinkSimulator = () => {
-  const [log, setLog] = useState("");
-  useEffect(() => {
-    const states = [
-      "SEARCHING LEO CONSTELLATION...",
-      "LOCK: SAT-49B (AZ 45°, EL 72°)",
-      "UPLINK ESTABLISHED. 12KB/s",
-      "SENDING BATCH #992...",
-      "ACK RECEIVED."
-    ];
-    let i = 0;
-    const interval = setInterval(() => {
-      setLog(states[i]);
-      i = (i + 1) % states.length;
-    }, 1500);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="bg-black/50 border border-blue-500/30 rounded-2xl p-6 relative overflow-hidden font-mono text-xs shadow-inner flex flex-col justify-between">
-      <div className="flex items-center gap-2 border-b border-white/10 pb-2">
-        <Satellite className="w-4 h-4 text-emerald-500" />
-        <span className="text-slate-400">SAT-COM-LINK</span>
-      </div>
-      <div className="h-16 flex items-center justify-center">
-        <span className="text-emerald-400 animate-pulse text-center">{log}</span>
-      </div>
-    </div>
-  );
-};
-
-export function LandingPage({ onEnterApp }: { onEnterApp: () => void }) {
-  const { scrollY } = useScroll();
-  const yHero = useTransform(scrollY, [0, 800], [0, 150]);
-  const opacityHero = useTransform(scrollY, [0, 400], [1, 0]);
-
-  const [scrolled, setScrolled] = useState(false);
-  
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-[#020617] text-white font-sans selection:bg-blue-500/30 overflow-hidden relative">
-      
-      {/* Premium Fixed Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${scrolled ? 'bg-[#020617]/90 backdrop-blur-xl border-white/5 py-4 shadow-2xl' : 'bg-transparent border-transparent py-6'}`}>
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo(0,0)}>
-            <Shield className="w-6 h-6 text-blue-500 group-hover:text-blue-400 transition-colors" />
-            <span className="font-bold tracking-[0.2em] text-sm text-slate-200">CIVIC RELAY</span>
-          </div>
-          <div className="hidden md:flex items-center gap-10 text-[11px] font-mono tracking-widest text-slate-400">
-            <SmoothScrollLink href="#context" className="hover:text-blue-400 transition-colors">01. EL FALLO</SmoothScrollLink>
-            <SmoothScrollLink href="#mvp" className="hover:text-blue-400 transition-colors">02. EL MVP</SmoothScrollLink>
-            <SmoothScrollLink href="#pitch" className="hover:text-blue-400 transition-colors">03. INVERSIÓN</SmoothScrollLink>
-            <button onClick={onEnterApp} className="px-6 py-2.5 bg-white text-black hover:bg-blue-500 hover:text-white rounded-none font-bold transition-all">
-              SIMULADOR TÁCTICO
-            </button>
-          </div>
-          <div className="md:hidden">
-            <Menu className="w-6 h-6 text-slate-300" />
+    <div className="min-h-screen bg-[#020617] text-white selection:bg-cyan-400/30">
+      <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#020617]/95 px-5 py-3 backdrop-blur-xl" aria-label="Main navigation">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
+          <a href="#top" className="flex items-center gap-3 font-black tracking-[0.13em] text-slate-100"><Shield className="h-6 w-6 text-cyan-400" aria-hidden="true"/> CIVIC RELAY</a>
+          <div className="flex flex-wrap items-center gap-3 text-xs font-semibold md:gap-5">
+            <a href="#story" className="hidden text-slate-300 hover:text-cyan-300 sm:block">{t(locale,'navStory')}</a>
+            <a href="#product" className="hidden text-slate-300 hover:text-cyan-300 sm:block">{t(locale,'navProduct')}</a>
+            <a href="#partners" className="hidden text-slate-300 hover:text-cyan-300 md:block">{t(locale,'navFunding')}</a>
+            <LanguageSwitcher locale={locale} onChange={onLocaleChange} dark />
+            <button type="button" onClick={onEnterApp} className="rounded-lg bg-cyan-400 px-3 py-2 font-bold text-slate-950 hover:bg-cyan-300">{t(locale,'openDemo')}</button>
           </div>
         </div>
       </nav>
 
-      {/* Cinematic Background */}
-      <div className="fixed inset-0 z-0">
-        <SatelliteVisualization />
-      </div>
-
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center pt-20">
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-[#020617]/50 to-[#020617]" />
-        
-        <motion.div 
-          style={{ y: yHero, opacity: opacityHero }}
-          className="relative z-20 text-center max-w-5xl mx-auto px-4 mt-32"
-        >
-          <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-black/50 border border-white/10 rounded-full text-slate-300 text-xs font-mono mb-8 backdrop-blur-md">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-            OFFLINE-FIRST RESILIENCE PROTOCOL
-          </div>
-          
-          <h1 className="text-5xl md:text-8xl font-black mb-6 leading-[0.9] tracking-tighter">
-            Las Torres <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-500">
-              Han Caído.
-            </span>
-          </h1>
-          
-          <p className="text-lg md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
-            Plataforma de comunicación de emergencias peer-to-peer. Cuando las redes celulares colapsan, los ciudadanos se convierten en la red de rescate.
-          </p>
-
-          <SmoothScrollLink href="#context" className="inline-flex items-center justify-center w-14 h-14 rounded-full border border-white/20 hover:bg-white/10 transition-colors">
-            <ChevronRight className="w-6 h-6 rotate-90 text-slate-400" />
-          </SmoothScrollLink>
-        </motion.div>
-      </section>
-
-      {/* Context & Storytelling */}
-      <section id="context" className="relative py-32 px-4 z-20 bg-[#020617]">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-4 mb-12">
-            <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-blue-500/50" />
-            <span className="font-mono text-xs tracking-[0.2em] text-blue-400">01. EL FALLO SISTÉMICO</span>
-            <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-blue-500/50" />
-          </div>
-          
-          <h2 className="text-4xl md:text-5xl font-bold mb-10 tracking-tight leading-tight">
-            Nuestros sistemas de emergencia dependen de antenas que se rompen con el viento.
-          </h2>
-          
-          <div className="space-y-8 text-xl text-slate-400 font-light leading-relaxed">
-            <p>
-              TETRA (Motorola/Airbus) cuesta cientos de millones, pero cuando hay un huracán, inundación o terremoto, las torres celulares y de radio <strong className="text-white font-medium">se quedan sin energía o son destruidas</strong>. Y en el peor momento, nadie puede pedir ayuda.
-            </p>
-            <p>
-              Cada ciudadano tiene en su bolsillo un ordenador hiper-potente con antenas de Bluetooth, Wi-Fi Direct y acceso a satélites LEO (Low Earth Orbit). <strong className="text-white font-medium">¿Por qué seguimos dependiendo de una torre?</strong>
-            </p>
-            <div className="p-8 border-l-4 border-blue-500 bg-white/5 rounded-r-2xl">
-              <p className="text-white italic">
-                "Civic Relay es la evolución natural de la protección civil. Transforma los teléfonos móviles en una red neuronal local (Mesh) que se auto-repara y enruta señales de SOS saltando de móvil en móvil hasta encontrar una salida satelital o IP."
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* The MVP Explained (Simulators) */}
-      <section id="mvp" className="relative py-32 px-4 z-20 border-t border-white/5 bg-slate-950/50">
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-4 mb-16">
-            <span className="font-mono text-xs tracking-[0.2em] text-cyan-400">02. EL PRODUCTO MÍNIMO VIABLE (MVP)</span>
-            <div className="h-[1px] flex-1 bg-gradient-to-r from-cyan-500/50 to-transparent" />
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <main>
+        <section id="top" className="relative isolate flex min-h-[78vh] items-center overflow-hidden px-5 py-24">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_80%_35%,rgba(14,116,144,.27),transparent_42%),radial-gradient(circle_at_10%_85%,rgba(251,146,60,.09),transparent_36%)]" />
+          <div className="absolute right-[8%] top-[16%] -z-10 h-56 w-56 rounded-full border border-cyan-400/10 shadow-[0_0_130px_rgba(34,211,238,.08)] md:h-96 md:w-96" />
+          <div className="mx-auto grid w-full max-w-7xl items-center gap-16 lg:grid-cols-[1.15fr_.85fr]">
             <div>
-              <h2 className="text-4xl font-bold mb-6 tracking-tight">La v1.0 está viva.</h2>
-              <p className="text-lg text-slate-400 mb-8 leading-relaxed">
-                Hemos desarrollado el SDK Core que unifica las vías de transporte (BLE, Wi-Fi Aware, Satélite LEO, IP). Funciona al 100% como un enrutador inteligente (Store & Forward).
-              </p>
-              <ul className="space-y-6">
-                <li className="flex gap-4 items-start">
-                  <div className="mt-1 p-2 rounded bg-blue-500/20"><Bluetooth className="w-5 h-5 text-blue-400" /></div>
-                  <div>
-                    <strong className="block text-white mb-1">1. Mesh Routing Asíncrono</strong>
-                    <span className="text-slate-400 text-sm">Si no hay cobertura, tu SOS se guarda. Si pasas cerca de alguien, se transmite por Bluetooth automáticamente en segundo plano.</span>
-                  </div>
-                </li>
-                <li className="flex gap-4 items-start">
-                  <div className="mt-1 p-2 rounded bg-emerald-500/20"><Satellite className="w-5 h-5 text-emerald-400" /></div>
-                  <div>
-                    <strong className="block text-white mb-1">2. Salto Satelital (LEO)</strong>
-                    <span className="text-slate-400 text-sm">Cuando el paquete salta de teléfono en teléfono y encuentra a un usuario con visión satelital (ej. iPhone 14+), expulsa los SOS acumulados al exterior.</span>
-                  </div>
-                </li>
-                <li className="flex gap-4 items-start">
-                  <div className="mt-1 p-2 rounded bg-purple-500/20"><Lock className="w-5 h-5 text-purple-400" /></div>
-                  <div>
-                    <strong className="block text-white mb-1">3. Deduplicación Criptográfica</strong>
-                    <span className="text-slate-400 text-sm">Mil teléfonos enviando la misma alerta no saturan el ancho de banda; el hash del paquete se colapsa en uno solo en la capa Mesh.</span>
-                  </div>
-                </li>
-              </ul>
-            </div>
-
-            {/* Bento Box Simulators */}
-            <div className="grid gap-4">
-              <MeshNetworkSimulator />
-              <div className="grid grid-cols-2 gap-4">
-                <SatelliteUplinkSimulator />
-                <div className="bg-black/50 border border-white/10 rounded-2xl p-6 backdrop-blur-md">
-                   <h3 className="text-sm font-mono text-slate-400 mb-4 flex items-center gap-2"><Cpu className="w-4 h-4"/> CARGA</h3>
-                   <div className="text-3xl font-light text-white mb-1">12 KB/s</div>
-                   <div className="text-xs text-blue-400 font-mono">Coste Reducido (Deduplicación)</div>
-                </div>
+              <p className="mb-6 font-mono text-xs tracking-[0.19em] text-cyan-300">{t(locale,'heroEyebrow')}</p>
+              <h1 className="max-w-4xl text-5xl font-black leading-[1.04] tracking-[-.05em] md:text-7xl">
+                {t(locale,'heroTitle')} <span className="bg-gradient-to-r from-cyan-400 to-teal-300 bg-clip-text text-transparent">{t(locale,'heroAccent')}</span>
+              </h1>
+              <p className="mt-8 max-w-xl text-lg leading-8 text-slate-300">{t(locale,'heroBody')}</p>
+              <div className="mt-10 flex flex-wrap items-center gap-4">
+                <a href="#story" className="inline-flex items-center gap-3 rounded-lg border border-white/20 px-5 py-3 text-sm font-semibold text-white hover:border-cyan-400/70">{t(locale,'scroll')} <ArrowDown className="h-4 w-4" aria-hidden="true"/></a>
+                <button type="button" onClick={onEnterApp} className="inline-flex items-center gap-3 rounded-lg bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 hover:bg-cyan-300">{t(locale,'openDemo')} <ArrowRight className="h-4 w-4" aria-hidden="true"/></button>
               </div>
             </div>
+            <div className="relative mx-auto w-full max-w-md rounded-[2rem] border border-cyan-300/20 bg-[#09172c] p-8 shadow-[0_0_80px_rgba(8,145,178,.09)]">
+              <div className="mb-6 flex items-center justify-between gap-3 font-mono text-xs text-slate-400"><span>SIMULATION / #001</span><span className="text-orange-300">NO NETWORK</span></div>
+              <Radio className="h-10 w-10 text-orange-300" aria-hidden="true"/>
+              <div className="mt-5 h-3 w-3/4 rounded-full bg-white/30"/><div className="mt-3 h-3 w-1/2 rounded-full bg-white/10"/>
+              <div className="mt-9 rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-5 font-mono text-sm text-cyan-200">LOCAL QUEUE: 1 MESSAGE<br/>DELIVERED: 0<br/>RETRY: WAITING FOR ROUTE</div>
+              <p className="mt-5 text-xs leading-5 text-slate-500">ILLUSTRATIVE UI / NO EMERGENCY DISPATCH</p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Pitch CTA */}
-      <section id="pitch" className="relative py-32 px-4 z-20 bg-[#020617] border-t border-white/10">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="w-24 h-24 mx-auto mb-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-3xl flex items-center justify-center shadow-[0_0_50px_rgba(59,130,246,0.3)] rotate-3">
-             <Shield className="w-12 h-12 text-white -rotate-3" />
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
-            El Fin de la Obsolescencia TETRA.
-          </h2>
-          <p className="text-xl text-slate-400 mb-12 leading-relaxed font-light">
-            Buscamos €500k de capital pre-seed para empaquetar el SDK en un API para gobiernos y entidades de rescate. Mercado objetivo: €2.4B (Europa).
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <button 
-              onClick={onEnterApp}
-              className="px-10 py-5 bg-white text-black rounded-sm text-sm font-bold tracking-widest uppercase hover:bg-blue-500 hover:text-white transition-all w-full sm:w-auto shadow-2xl shadow-blue-500/20"
-            >
-              PROBAR SIMULACIÓN TÁCTICA
-            </button>
-            <a
-              href="mailto:inversores@civic-relay.com"
-              className="px-10 py-5 bg-transparent border border-slate-700 hover:border-slate-400 text-white rounded-sm text-sm font-bold tracking-widest uppercase transition-all w-full sm:w-auto"
-            >
-              SOLICITAR DUE DILIGENCE
-            </a>
-          </div>
+        <div className="relative z-10 border-y border-amber-400/20 bg-amber-400/5 px-5 py-4 text-center text-sm text-amber-100" role="note">
+          <ShieldAlert className="mr-2 inline h-5 w-5" aria-hidden="true"/>{t(locale,'notice')}
         </div>
-      </section>
-      
-      <footer className="py-8 text-center text-xs font-mono text-slate-600 bg-black">
-        © 2026 CIVIC RELAY (RESILIENCE PROTOCOL). PROTECCIÓN CIVIL DISTRIBUIDA.
-      </footer>
+
+        <section id="context" className="bg-[#060c1a] px-5 py-20">
+          <div className="mx-auto max-w-4xl">
+            <p className="font-mono text-xs tracking-widest text-cyan-300">{t(locale,'contextKicker')}</p>
+            <h2 className="mt-5 text-4xl font-bold tracking-tight md:text-5xl">{t(locale,'contextTitle')}</h2>
+            <p className="mt-8 text-lg leading-9 text-slate-400">{t(locale,'contextBody')}</p>
+          </div>
+        </section>
+
+        <StoryMode locale={locale} onEnterApp={onEnterApp} />
+
+        <section id="product" className="relative z-10 bg-[#060d1c] px-5 py-24">
+          <div className="mx-auto max-w-7xl">
+            <p className="font-mono text-xs tracking-widest text-cyan-300">{t(locale,'productKicker')}</p>
+            <h2 className="mt-5 max-w-4xl text-4xl font-bold tracking-tight md:text-5xl">{t(locale,'productTitle')}</h2>
+            <p className="mt-7 max-w-4xl text-lg leading-8 text-slate-400">{t(locale,'productBody')}</p>
+            <div className="mt-12 grid gap-5 md:grid-cols-3">
+              {(['capability1','capability2','capability3'] as const).map((key, i) => {
+                const Icon = i === 0 ? Database : i === 1 ? Radio : Shield;
+                return (
+                  <article key={key} className="rounded-2xl border border-slate-700/70 bg-slate-900/60 p-7">
+                    <Icon className="mb-6 h-8 w-8 text-cyan-300" aria-hidden="true"/>
+                    <h3 className="text-xl font-bold">{t(locale,key)}</h3>
+                    <p className="mt-4 leading-7 text-slate-400">{t(locale,key+'Body')}</p>
+                  </article>
+                );
+              })}
+            </div>
+            <div className="mt-10 rounded-2xl border border-orange-500/20 bg-orange-500/5 p-7">
+              <h3 className="text-xl font-bold text-orange-200">{t(locale,'pendingTitle')}</h3>
+              <p className="mt-2 leading-7 text-slate-400">{t(locale,'pendingBody')}</p>
+            </div>
+            <div className="mt-12">
+              <div className="mb-4 font-mono text-xs tracking-widest text-slate-400">CONCEPTUAL NETWORK TOPOLOGY · NOT LIVE TELEMETRY</div>
+              <SatelliteVisualization />
+            </div>
+          </div>
+        </section>
+
+        <section id="partners" className="relative z-10 bg-[#020617] px-5 py-28 text-center">
+          <div className="mx-auto max-w-3xl">
+            <p className="font-mono text-xs tracking-widest text-cyan-300">{t(locale,'fundingKicker')}</p>
+            <h2 className="mt-5 text-4xl font-bold tracking-tight md:text-6xl">{t(locale,'fundingTitle')}</h2>
+            <p className="mt-7 text-lg leading-8 text-slate-400">{t(locale,'fundingBody')}</p>
+            <div className="mt-10 flex flex-wrap justify-center gap-4">
+              <button type="button" onClick={onEnterApp} className="rounded-xl bg-cyan-400 px-7 py-4 text-sm font-bold text-slate-950 hover:bg-cyan-300">{t(locale,'fundingCTA')}</button>
+              <a href="https://github.com/abrahamhl/civic-relay" rel="noopener noreferrer" target="_blank" className="inline-flex items-center gap-2 rounded-xl border border-slate-600 px-7 py-4 text-sm font-bold hover:border-cyan-400"><Github className="h-4 w-4" aria-hidden="true"/>{t(locale,'fundingGithub')}</a>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer className="border-t border-white/10 bg-black px-5 py-8 text-center font-mono text-xs text-slate-500">{t(locale,'footer')}</footer>
     </div>
   );
 }

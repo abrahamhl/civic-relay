@@ -1,0 +1,152 @@
+[
+    {
+        "Name":  "senda-m95-30s-en.mp4",
+        "SizeMB":  1.92,
+        "DurationS":  33.72,
+        "Resolution":  "1920x1080",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "1c28b22b3161374ab6f21a4b63be999c4f2478e8ceafd53bad7350b8a3a75e6a"
+    },
+    {
+        "Name":  "senda-m95-60s-en.mp4",
+        "SizeMB":  3.61,
+        "DurationS":  62.48,
+        "Resolution":  "1920x1080",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "edeaa687ab0accb3ed94fda0f226494a32b20061f623567cf0006d41333d0bf4"
+    },
+    {
+        "Name":  "senda-m95-90s-en.mp4",
+        "SizeMB":  5.78,
+        "DurationS":  92.24,
+        "Resolution":  "1920x1080",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "18437bdf3187102dd787a30d5d215ed292c512e201196a2483232029303d1efa"
+    },
+    {
+        "Name":  "senda-m95-film-en.mp4",
+        "SizeMB":  53.92,
+        "DurationS":  530.12,
+        "Resolution":  "1920x1080",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "7d53e52cd440fbee03a1639a42aef5b2569d2ade126e8505089818a426d14024"
+    },
+    {
+        "Name":  "senda-m95-ruta-en.mp4",
+        "SizeMB":  22.21,
+        "DurationS":  218.28,
+        "Resolution":  "1920x1080",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "3a13e6fee05ab250c191181dd69426a52e8edd41e44265c74641ef96a20d8b20"
+    },
+    {
+        "Name":  "senda-m95-sim-braking-en.mp4",
+        "SizeMB":  1.9,
+        "DurationS":  24.48,
+        "Resolution":  "1920x1080",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "c1f40f1d0f3c60641d24dab1307f70224af88f7172e798f9b75df9a57d935cd5"
+    },
+    {
+        "Name":  "senda-m95-sim-proof-en.mp4",
+        "SizeMB":  1.26,
+        "DurationS":  27.64,
+        "Resolution":  "1920x1080",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "ec1d3e8ace4c14214dc5b365f63679a4a3f51de2f683309e893b991e31c5a679"
+    },
+    {
+        "Name":  "senda-m95-sim-queue-en.mp4",
+        "SizeMB":  1.45,
+        "DurationS":  19.3,
+        "Resolution":  "1920x1080",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "12d82c5cc59d6cdbc9380ec3d709dd4115c94258a8bc62484bfbb2b2c827cbc2"
+    },
+    {
+        "Name":  "senda-m95-sim-sos-en.mp4",
+        "SizeMB":  1.9,
+        "DurationS":  22.16,
+        "Resolution":  "1920x1080",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "a7d7e0b9828bed1a918770bc0c1b62c57af923608aec26f9793e32b67163d183"
+    },
+    {
+        "Name":  "senda-m95-sim-visibility-en.mp4",
+        "SizeMB":  1.59,
+        "DurationS":  18.96,
+        "Resolution":  "1920x1080",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "887230dfc8a1a4d20ed72193d335484bfc26ed96da380ece627ac0ec623283fc"
+    },
+    {
+        "Name":  "senda-m95-sim-wrongway-en.mp4",
+        "SizeMB":  1.54,
+        "DurationS":  16.36,
+        "Resolution":  "1920x1080",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "aea07ffd8e337111eeca165b7b60f9232c94940ef63805339bef262c925e6fb9"
+    },
+    {
+        "Name":  "senda-m95-vertical-45s-en.mp4",
+        "SizeMB":  2.87,
+        "DurationS":  42.8,
+        "Resolution":  "1080x1920",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "eb8ac1c788e786aa71810052097e6d8ffccea6611241a56af003e07817469931"
+    },
+    {
+        "Name":  "senda-m95-vertical-45s-en-sub-en.mp4",
+        "SizeMB":  3.11,
+        "DurationS":  42.8,
+        "Resolution":  "1080x1920",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "82be00a526235c01dfe75b4fbad62ad927cb85ecf33b5fcf5eac8d9bca4a355a"
+    },
+    {
+        "Name":  "senda-m95-vertical-45s-en-sub-es.mp4",
+        "SizeMB":  3.11,
+        "DurationS":  42.8,
+        "Resolution":  "1080x1920",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "da409d9cee2884b1ceadaffb7aa97842cea8b58db28cc914fbea0d4560e88c2f"
+    },
+    {
+        "Name":  "senda-m95-vertical-45s-en-sub-nl.mp4",
+        "SizeMB":  3.14,
+        "DurationS":  42.8,
+        "Resolution":  "1080x1920",
+        "FPS":  "25/1",
+        "VCodec":  "h264",
+        "ACodec":  "aac",
+        "SHA256":  "cce7cd80d1d250fc4bdb3d958fc8a85fbe7464bfe184931d5df82a95bb0a51e3"
+    }
+]

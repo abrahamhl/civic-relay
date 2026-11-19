@@ -1,0 +1,319 @@
+{
+  "kind": "LOCAL_BUILDING_MISSION_BROWSER_QA",
+  "physicalTrials": 0,
+  "checks": [
+    {
+      "name": "Silence cannot create or send a help request",
+      "passed": true
+    },
+    {
+      "name": "Initial mission is idle",
+      "passed": true
+    },
+    {
+      "name": "Guided journey uses a computed multi-hop path",
+      "passed": true
+    },
+    {
+      "name": "One hop does not create a receipt",
+      "passed": true
+    },
+    {
+      "name": "Only final hop yields a simulated receipt",
+      "passed": true
+    },
+    {
+      "name": "Receipt clears the local payload",
+      "passed": true
+    },
+    {
+      "name": "Destination label reflects the received state",
+      "passed": true
+    },
+    {
+      "name": "Disconnected receiver queues without a receipt",
+      "passed": true
+    },
+    {
+      "name": "Restoring the receiver retries the same message ID",
+      "passed": true
+    },
+    {
+      "name": "Mid-route link loss explains interruption",
+      "passed": true
+    },
+    {
+      "name": "Interrupted flight retains the queued ID without ACK",
+      "passed": true
+    },
+    {
+      "name": "STOP purges message ID and event display",
+      "passed": true
+    },
+    {
+      "name": "No relay permission explains why the message waits",
+      "passed": true
+    },
+    {
+      "name": "Critical battery blocks relay without inventing delivery",
+      "passed": true
+    },
+    {
+      "name": "Changing terminal requires a new explicit response",
+      "passed": true
+    },
+    {
+      "name": "Floor focus filters the keyboard terminal picker",
+      "passed": true
+    },
+    {
+      "name": "Zoom visibly changes the 3D camera",
+      "passed": true
+    },
+    {
+      "name": "Dragging visibly rotates the 3D building",
+      "passed": true
+    },
+    {
+      "name": "No late animation callback resurrects STOP",
+      "passed": true
+    },
+    {
+      "name": "Mobile send returns focus of view to the building",
+      "passed": true
+    },
+    {
+      "name": "Trial exports as a clearly named simulated JSON",
+      "passed": true
+    },
+    {
+      "name": "es: no overflow or clipping at 320px",
+      "passed": true
+    },
+    {
+      "name": "es: no overflow or clipping at 375px",
+      "passed": true
+    },
+    {
+      "name": "es: scoped axe audit at 375px",
+      "passed": true
+    },
+    {
+      "name": "es: no overflow or clipping at 768px",
+      "passed": true
+    },
+    {
+      "name": "es: no overflow or clipping at 1440px",
+      "passed": true
+    },
+    {
+      "name": "es: scoped axe audit at 1440px",
+      "passed": true
+    },
+    {
+      "name": "en: no overflow or clipping at 320px",
+      "passed": true
+    },
+    {
+      "name": "en: no overflow or clipping at 375px",
+      "passed": true
+    },
+    {
+      "name": "en: scoped axe audit at 375px",
+      "passed": true
+    },
+    {
+      "name": "en: no overflow or clipping at 768px",
+      "passed": true
+    },
+    {
+      "name": "en: no overflow or clipping at 1440px",
+      "passed": true
+    },
+    {
+      "name": "en: scoped axe audit at 1440px",
+      "passed": true
+    },
+    {
+      "name": "nl: no overflow or clipping at 320px",
+      "passed": true
+    },
+    {
+      "name": "nl: no overflow or clipping at 375px",
+      "passed": true
+    },
+    {
+      "name": "nl: scoped axe audit at 375px",
+      "passed": true
+    },
+    {
+      "name": "nl: no overflow or clipping at 768px",
+      "passed": true
+    },
+    {
+      "name": "nl: no overflow or clipping at 1440px",
+      "passed": true
+    },
+    {
+      "name": "nl: scoped axe audit at 1440px",
+      "passed": true
+    },
+    {
+      "name": "Injected WebGL loss shows an explicit 2D fallback",
+      "passed": true
+    },
+    {
+      "name": "The full journey remains usable without WebGL",
+      "passed": true
+    },
+    {
+      "name": "No uncaught browser errors",
+      "passed": true
+    }
+  ],
+  "layouts": [
+    {
+      "locale": "es",
+      "width": 320,
+      "scroll": 320,
+      "clipped": []
+    },
+    {
+      "locale": "es",
+      "width": 375,
+      "scroll": 375,
+      "clipped": []
+    },
+    {
+      "locale": "es",
+      "width": 768,
+      "scroll": 768,
+      "clipped": []
+    },
+    {
+      "locale": "es",
+      "width": 1440,
+      "scroll": 1440,
+      "clipped": []
+    },
+    {
+      "locale": "en",
+      "width": 320,
+      "scroll": 320,
+      "clipped": []
+    },
+    {
+      "locale": "en",
+      "width": 375,
+      "scroll": 375,
+      "clipped": []
+    },
+    {
+      "locale": "en",
+      "width": 768,
+      "scroll": 768,
+      "clipped": []
+    },
+    {
+      "locale": "en",
+      "width": 1440,
+      "scroll": 1440,
+      "clipped": []
+    },
+    {
+      "locale": "nl",
+      "width": 320,
+      "scroll": 320,
+      "clipped": []
+    },
+    {
+      "locale": "nl",
+      "width": 375,
+      "scroll": 375,
+      "clipped": []
+    },
+    {
+      "locale": "nl",
+      "width": 768,
+      "scroll": 768,
+      "clipped": []
+    },
+    {
+      "locale": "nl",
+      "width": 1440,
+      "scroll": 1440,
+      "clipped": []
+    }
+  ],
+  "accessibility": [
+    {
+      "locale": "es",
+      "width": 375,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "locale": "es",
+      "width": 1440,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 7
+        }
+      ]
+    },
+    {
+      "locale": "en",
+      "width": 375,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "locale": "en",
+      "width": 1440,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 7
+        }
+      ]
+    },
+    {
+      "locale": "nl",
+      "width": 375,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "locale": "nl",
+      "width": 1440,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 7
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "passed": 42,
+  "failed": []
+}

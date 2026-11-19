@@ -1,0 +1,85 @@
+{
+ "note": "SENDA Mission 9.5 · Simulación explicada: Onda de choque LWR en retención (r6)",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "r6",
+   "claim": "SIMULATED",
+   "source": [
+    "investor-next/public/senda/carretera.html",
+    "packages/senda/src/road.mjs"
+   ],
+   "visual": {
+    "kind": "page",
+    "src": "/senda/carretera?film=1&viz=retencion"
+   },
+   "title": {
+    "es": "El final de la cola se mueve",
+    "en": "The end of the queue moves",
+    "nl": "De staart van de file beweegt"
+   },
+   "es": [
+    "El final de una retención crece hacia atrás. Con la teoría de tráfico, SENDA calcula a qué velocidad.",
+    "Así te avisa de dónde estará la cola cuando llegues, no de dónde estaba, y reduces mucho antes."
+   ],
+   "es_say": [
+    "El final de una retención crece hacia atrás. Con la teoría de tráfico, Senda calcula a qué velocidad.",
+    "Así te avisa de dónde estará la cola cuando llegues, no de dónde estaba, y reduces mucho antes."
+   ],
+   "en": [
+    "The end of a traffic jam grows backwards. Using traffic-flow theory, SENDA calculates how fast.",
+    "So it warns you where the queue will be when you get there, not where it was, and you slow down much earlier."
+   ],
+   "en_say": [
+    "The end of a traffic jam grows backwards. Using traffic-flow theory, Senda calculates how fast.",
+    "So it warns you where the queue will be when you get there, not where it was, and you slow down much earlier."
+   ],
+   "nl": [
+    "De staart van een file groeit achteruit. Met verkeersstroomtheorie berekent SENDA hoe snel die schokgolf beweegt.",
+    "Zo waarschuwt het waar de filestaart zal zijn wanneer jij aankomt, niet waar die was, zodat je veel eerder afremt."
+   ]
+  },
+  {
+   "id": "r11",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/app/senda-home.tsx",
+    "LICENSE"
+   ],
+   "visual": {
+    "kind": "cta"
+   },
+   "title": {
+    "es": "SENDA",
+    "en": "SENDA",
+    "nl": "SENDA"
+   },
+   "es": [
+    "SENDA: el canal que queda cuando falla todo lo demás. Pruébalo en la web."
+   ],
+   "es_say": [
+    "Senda: el canal que queda cuando falla todo lo demás. Pruébalo en la web."
+   ],
+   "en": [
+    "SENDA: the channel that remains when everything else fails. Try it on the web."
+   ],
+   "en_say": [
+    "Senda: the channel that remains when everything else fails. Try it on the web."
+   ],
+   "nl": [
+    "SENDA: het kanaal dat overblijft wanneer al het andere uitvalt. Probeer het op het web."
+   ]
+  }
+ ]
+}

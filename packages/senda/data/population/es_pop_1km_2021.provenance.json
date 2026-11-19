@@ -1,0 +1,14 @@
+{
+  "dataset": "Eurostat GISCO 1 km² population grid (census 2021, TOT_P_2021), Spain extract",
+  "source_url": "https://gisco-services.ec.europa.eu/grid/grid_1km.csv",
+  "source_last_modified": "Thu, 03 Jul 2025 15:35:10 GMT",
+  "retrieved_at_utc": "2026-11-10T03:58:33Z",
+  "crs": "EPSG:3035 (ETRS89-LAEA); x_llc/y_llc = lower-left corner of the 1 km cell",
+  "filter": "CNTR_ID == ES and TOT_P_2021 > 0; population rounded to integer",
+  "cells": 111170,
+  "population_total": 47214191,
+  "sha256_csv": "02f71c31ef07bc2ed23eb1c4a6708c10af479b3304fcb309d36de03dac0fcf91",
+  "licence": "Eurostat reuse policy (Commission Decision 2011/833/EU): reuse allowed with attribution '© European Union, Eurostat/GISCO'.",
+  "meaning": "RESIDENT (night-time) population per cell; NOT present/daytime population",
+  "claim": "DATO_REAL_CAPTURADO"
+}

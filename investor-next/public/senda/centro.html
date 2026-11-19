@@ -1,0 +1,923 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070d16">
+<title>SENDA Centro · panel de control</title>
+<link rel="manifest" href="/senda/manifest.webmanifest">
+<link rel="icon" href="/senda/icon.svg">
+<!--
+  SENDA Centro: centro de coordinación de incidencias. Ejecuta el núcleo probado (/senda/core):
+  wildfire.mjs, delivery-assurance.mjs, routing-canonical.mjs, failure-domain-cuts.mjs,
+  robust-assurance-audit.mjs, evidence-contract.mjs, source-evidence.mjs, hazard-reports.mjs,
+  incident-ops.mjs, roles.mjs, interop.mjs y db.mjs. Paisaje sintético y modelo experimental
+  claramente etiquetados; ningún reporte ciudadano ni simulación genera alertas públicas oficiales.
+-->
+<style>
+:root{--bg:#070d16;--panel:rgba(16,26,40,.82);--line:rgba(148,190,220,.16);--t:#eef4f7;--m:#9db2be;--d:#798d99;--c:#ff7756;--i:#7fe0f0;--e:#3ee0a1;--a:#fbbf24;--r:#ff5b6e;--v:#b49cff;--rad:18px;--font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,"Segoe UI",Roboto,system-ui,sans-serif;--mono:"SF Mono","JetBrains Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--t);font:15px/1.45 var(--font);-webkit-font-smoothing:antialiased;overflow-x:clip}
+body{min-height:100vh;background:radial-gradient(1100px 560px at 80% -10%,rgba(127,224,240,.08),transparent 60%),radial-gradient(900px 500px at -10% 110%,rgba(255,119,86,.06),transparent 60%),var(--bg)}
+a{color:var(--i)}
+.mono{font-family:var(--mono)}
+:focus-visible{outline:2px solid var(--i);outline-offset:2px}
+/* ---------- arranque ---------- */
+#boot{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:var(--bg);transition:opacity .45s ease;padding:16px}
+#boot.done{opacity:0;pointer-events:none}
+.bootbox{width:min(560px,100%)}
+.logo{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.logo svg{width:40px;height:40px;flex:none}
+.logo b{font:700 24px/1 var(--font);letter-spacing:.28em}.logo b i{font-style:normal;color:var(--c)}
+.logo span{display:block;font:500 11px var(--mono);letter-spacing:.16em;color:var(--m);margin-top:4px}
+.step{display:grid;grid-template-columns:22px 1fr auto;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);opacity:.35;transition:opacity .25s}
+.step.run,.step.ok,.step.ko{opacity:1}
+.step .dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--d)}
+.step.run .dot{border-color:var(--i);border-top-color:transparent;animation:spin .8s linear infinite}
+.step.ok .dot{border-color:var(--e);background:var(--e)}
+.step.ko .dot{border-color:var(--r);background:var(--r)}
+.step small{display:block;color:var(--m);font:12px var(--mono)}
+.step em{font:600 12px var(--mono);font-style:normal;color:var(--m)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.step.run .dot{animation:none}}
+.bar{height:4px;border-radius:2px;background:var(--line);margin-top:18px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--i),var(--e));transition:width .25s}
+/* ---------- estructura ---------- */
+header{position:sticky;top:0;z-index:20;display:flex;align-items:center;flex-wrap:wrap;gap:12px 16px;padding:12px 18px;background:rgba(7,13,22,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+header .logo{margin:0;gap:10px}header .logo svg{width:28px;height:28px}header .logo b{font-size:16px}header .logo span{font-size:10px;margin-top:2px}
+.navstrip{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pillnav{display:inline-flex;align-items:center;min-height:40px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--t);text-decoration:none;font:600 12px var(--font)}
+.pillnav:hover,.pillnav.active{border-color:var(--i);background:rgba(127,224,240,.10)}
+.hdr-right{margin-left:auto;display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.clock{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.clock b{font:600 19px var(--mono);letter-spacing:.04em;min-width:84px;text-align:right}
+.btn{appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--t);font:600 13px var(--font);padding:9px 14px;min-height:42px;border-radius:999px;cursor:pointer;transition:background .15s,border-color .15s}
+.btn:hover{background:rgba(255,255,255,.10);border-color:rgba(127,224,240,.45)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.p{background:var(--c);border-color:var(--c);color:#170a06}.btn.p:hover{filter:brightness(1.08)}
+.btn.warn{border-color:rgba(255,91,110,.55);color:#ffd2d8;background:rgba(255,91,110,.12)}
+.seg{display:inline-flex;background:rgba(255,255,255,.05);border-radius:999px;padding:3px;border:1px solid var(--line)}
+.seg button{border:0;background:none;color:var(--m);font:600 12px var(--font);padding:6px 11px;min-height:36px;border-radius:999px;cursor:pointer}.seg button.on{background:rgba(255,255,255,.14);color:var(--t)}
+select,input[type=text]{background:#0b1522;color:var(--t);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-height:42px;font:inherit}
+main{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(320px,1fr);gap:16px;padding:16px 18px 40px;max-width:1600px;margin:0 auto}
+@media (max-width:1100px){main{grid-template-columns:minmax(0,1fr);padding:12px}.hdr-right{margin-left:0}}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--rad);padding:16px;min-width:0}
+.card h2{font:700 13px var(--font);letter-spacing:.12em;text-transform:uppercase;color:var(--m);margin:0 0 10px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.card h2 .tag{margin-left:auto}
+.tag{font:700 10px var(--mono);letter-spacing:.10em;padding:3px 9px;border-radius:999px;border:1px solid;white-space:nowrap}
+.tag.obs{color:var(--e);border-color:rgba(62,224,161,.5)}.tag.sim{color:var(--a);border-color:rgba(251,191,36,.5)}.tag.calc{color:var(--i);border-color:rgba(127,224,240,.45)}.tag.live{color:var(--e);border-color:rgba(62,224,161,.45)}.tag.unv{color:var(--r);border-color:rgba(255,91,110,.55)}
+.banner-guard{margin:12px auto 0;max-width:1600px;padding:0 18px}
+.banner-guard .box{border:1px solid rgba(251,191,36,.45);background:rgba(251,191,36,.08);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--t);display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+/* mapa */
+.mapwrap{position:relative;border-radius:14px;overflow:hidden;background:#0a1420;aspect-ratio:3/2}
+#map{width:100%;height:100%;display:block;cursor:crosshair}
+.hud{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap;max-width:calc(100% - 20px)}
+.chip{font:600 12px var(--font);padding:5px 10px;border-radius:999px;background:rgba(7,13,22,.84);border:1px solid var(--line)}
+.chip b{font-family:var(--mono)}
+.hint{position:absolute;right:10px;bottom:10px;font:12px var(--font);color:var(--m);background:rgba(7,13,22,.8);padding:5px 9px;border-radius:8px}
+.controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:12px}
+@media (max-width:700px){.controls{grid-template-columns:1fr}}
+.ctl label{display:flex;justify-content:space-between;font:600 12px var(--font);color:var(--m);margin-bottom:4px}.ctl label b{color:var(--t);font-family:var(--mono)}
+input[type=range]{width:100%;accent-color:var(--i);min-height:32px}
+/* pueblos */
+.town{display:grid;grid-template-columns:10px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.town:last-child{border:0}
+.town .st{width:10px;height:10px;border-radius:50%}
+.town b{font-weight:650}.town small{display:block;color:var(--m);font-size:12px}
+.town .cd{text-align:right;font:600 13px var(--mono)}.town .cd small{font-family:var(--font)}
+/* canales */
+.bear{display:grid;grid-template-columns:minmax(96px,138px) 1fr 52px;gap:8px;align-items:center;font-size:13px;padding:5px 0}
+.bear .tr{height:8px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden}.bear .tr i{display:block;height:100%;border-radius:4px;transition:width .4s,background .4s}
+.bear .v{text-align:right;font:600 12px var(--mono)}
+.bear.off{opacity:.45}
+.big{display:flex;align-items:baseline;flex-wrap:wrap;gap:10px;margin:6px 0 4px}.big b{font:700 36px/1 var(--font);letter-spacing:-.02em}.big span{color:var(--m);font-size:13px}
+.muted{color:var(--m);font-size:13px}
+/* tubería de envío */
+.pipe{display:grid;gap:8px;margin-top:12px}
+.ph{display:grid;grid-template-columns:28px 1fr;gap:10px;padding:9px 11px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--line);opacity:.4;transition:opacity .25s,border-color .25s}
+.ph.on{opacity:1;border-color:rgba(127,224,240,.35)}.ph.ok{opacity:1;border-color:rgba(62,224,161,.35)}.ph.ko{opacity:1;border-color:rgba(255,91,110,.5)}
+.ph .n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font:700 12px var(--mono);background:rgba(255,255,255,.06)}
+.ph.ok .n{background:var(--e);color:#03140c}.ph.on .n{background:var(--i);color:#03121a}.ph.ko .n{background:var(--r);color:#1a0306}
+.ph b{font-weight:650}.ph small{display:block;color:var(--m);font:12px var(--mono);word-break:break-all;margin-top:2px}
+.shards{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.shards i{width:13px;height:13px;border-radius:3px;background:rgba(255,255,255,.08)}
+.shards i.ok{background:var(--e)}.shards i.lost{background:rgba(255,91,110,.55)}
+/* móvil del vecino */
+.phone{width:min(240px,100%);margin:0 auto;border-radius:34px;padding:10px;background:linear-gradient(160deg,#1d2733,#0c1219);border:1px solid rgba(255,255,255,.12)}
+.scr{border-radius:26px;background:#0a0f16;padding:14px 12px 16px;min-height:380px;display:flex;flex-direction:column;gap:10px}
+.scr .sb{display:flex;justify-content:space-between;font:600 11px var(--font);color:var(--m)}
+.alert{border-radius:14px;padding:11px;background:rgba(255,119,86,.12);border:1px solid rgba(255,119,86,.4)}
+.alert b{display:block;font-size:14px}.alert small{color:var(--m);font-size:11px}
+.alert.ok{background:rgba(62,224,161,.08);border-color:rgba(62,224,161,.35)}
+.bigbtn{border-radius:14px;padding:12px;font:700 14px var(--font);text-align:center;border:1px solid}
+.bigbtn.g{border-color:rgba(62,224,161,.5);background:rgba(62,224,161,.12)}.bigbtn.y{border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.12)}.bigbtn.r{border-color:rgba(255,91,110,.55);background:rgba(255,91,110,.12)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media (max-width:1280px){.grid2{grid-template-columns:1fr}}
+.table-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ops-row{display:grid;grid-template-columns:minmax(150px,1.4fr) repeat(4,minmax(64px,.6fr));gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;min-width:460px}.ops-row.h{color:var(--m);font:700 11px var(--font);letter-spacing:.08em;text-transform:uppercase}
+.ops-row b{font:700 15px var(--mono);text-align:center}.ops-row span.c{text-align:center}
+.reasons{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.reasons span{font:600 11px var(--mono);padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.reasons span.ok{color:var(--e);border-color:rgba(62,224,161,.4)}.reasons span.no{color:var(--a);border-color:rgba(251,191,36,.35)}.reasons span.bad{color:var(--r);border-color:rgba(255,91,110,.45)}
+.learn{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:12px;margin-top:10px}.learn .t{border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(255,255,255,.02)}
+.learn .t b{display:block;margin-bottom:6px}.lr{display:grid;grid-template-columns:90px 1fr 86px;gap:8px;align-items:center;font:12px var(--mono);padding:3px 0}
+.lr .tr{height:8px;border-radius:5px;background:rgba(255,255,255,.06);position:relative;overflow:hidden}.lr .tr i{position:absolute;inset:0 auto 0 0;border-radius:5px}.lr .tr u{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--m)}
+.chain{font:12px var(--mono);color:var(--m);word-break:break-all;margin-top:8px}.chain b{color:var(--e)}
+.rowb{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.kv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px;margin-top:10px}
+.kv-item{border:1px solid var(--line);border-radius:12px;padding:10px;background:rgba(255,255,255,.02)}
+.kv-item small{display:block;color:var(--m);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.kv-item b{display:block;font:700 15px var(--mono);margin-top:3px;overflow-wrap:anywhere}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:440px}
+.tbl th,.tbl td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{color:var(--m);font:700 11px var(--font);text-transform:uppercase;letter-spacing:.06em}
+.wf-pill{display:inline-block;padding:2px 8px;border-radius:999px;font:700 10px var(--mono);border:1px solid var(--line)}
+.tl-item{border-left:2px solid var(--i);padding:4px 0 6px 10px;margin-bottom:6px;font-size:12px}
+.tl-item time{font:600 11px var(--mono);color:var(--m)}
+footer{padding:0 18px 30px;max-width:1600px;margin:0 auto;color:var(--d);font-size:12px}
+@media (max-width:440px){header{padding:10px 12px}main{padding:10px;gap:12px}.card{padding:12px}.btn{padding:8px 12px;font-size:12px}}
+</style>
+</head>
+<body>
+<div id="boot" role="status" aria-live="polite">
+  <div class="bootbox">
+    <div class="logo"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 44 40H4z" fill="none" stroke="#7fe0f0" stroke-width="3" stroke-linejoin="round"/><path d="M14 40 30 12" stroke="#ff7756" stroke-width="3.4" stroke-linecap="round"/></svg><div><b>SEND<i>A</i></b><span>CENTRO · AUTOCOMPROBACIÓN DEL NÚCLEO</span></div></div>
+    <div id="steps"></div>
+    <div class="bar"><i id="bootbar"></i></div>
+    <p class="muted" id="bootnote" style="margin-top:14px">Cada paso ejecuta el código real en este dispositivo, sin red.</p>
+  </div>
+</div>
+
+<header>
+  <div class="logo"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 44 40H4z" fill="none" stroke="#7fe0f0" stroke-width="3" stroke-linejoin="round"/><path d="M14 40 30 12" stroke="#ff7756" stroke-width="3.4" stroke-linecap="round"/></svg><div><b>SEND<i>A</i></b><span data-i18n="subtitle">CENTRO DE COORDINACIÓN</span></div></div>
+  <nav class="navstrip" aria-label="Superficies SENDA">
+    <a class="pillnav" href="/senda">← SENDA</a>
+    <a class="pillnav active" href="/senda/centro" aria-current="page" data-i18n="navCentro">Centro</a>
+    <a class="pillnav" href="/senda/visor" data-i18n="navVisor">Visor 4D</a>
+    <a class="pillnav" href="/senda/atlas">Atlas</a>
+    <a class="pillnav" href="/senda/avisos" data-i18n="navAvisos">Avisos</a>
+    <a class="pillnav" href="/senda/mensaje" data-i18n="navMensaje">Mensaje</a>
+  </nav>
+  <div class="hdr-right">
+    <div class="seg" id="lang" aria-label="Idioma / Language / Taal">
+      <button data-lang="es" class="on">ES</button><button data-lang="en">EN</button><button data-lang="nl">NL</button>
+    </div>
+    <div class="seg" id="speed" aria-label="Velocidad de simulación"><button data-v="2">×2</button><button data-v="8" class="on">×8</button><button data-v="20">×20</button></div>
+    <div class="clock"><button class="btn" id="play" aria-label="Pausar o reanudar">❚❚</button><button class="btn" id="reset" data-i18n="reset">Reiniciar</button><b id="t" aria-live="off">T+0:00</b></div>
+  </div>
+</header>
+
+<div class="banner-guard" role="note">
+  <div class="box">
+    <span><strong class="mono" style="color:var(--a)">ENTORNO DE EJERCICIO Y LABORATORIO</strong> · <span data-i18n="guardText">Los reportes ciudadanos nunca generan alertas institucionales automáticas (`canPublicWarn=false`). CAP 1.2 se exporta únicamente en modo Exercise/Restricted.</span></span>
+    <span class="mono" id="net-badge" style="color:var(--i)">Comprobando estado offline…</span>
+  </div>
+</div>
+
+<main>
+  <div class="col">
+    <!-- 1 & 3 · Mapa principal + zonas geográficas -->
+    <section class="card">
+      <h2><span data-i18n="mapTitle">Situación · incendio forestal y perímetro</span> <span class="tag sim">SIMULADO · CÁLCULO REAL</span></h2>
+      <div class="mapwrap"><canvas id="map" width="1152" height="768" role="img" aria-label="Mapa del incendio, antenas, pueblos y frente de tormenta"></canvas>
+        <div class="hud"><span class="chip">Antenas en pie <b id="h-tw">5/5</b></span><span class="chip">Personas por avisar <b id="h-pop">0</b></span><span class="chip">Lluvia <b id="h-rain">0 mm/h</b></span></div>
+        <div class="hint" data-i18n="mapHint">Pulsa en el mapa para mover el foco</div>
+      </div>
+      <div class="controls">
+        <div class="ctl"><label>Viento <b id="v-wind">30 km/h</b></label><input id="wind" type="range" min="0" max="60" value="30"></div>
+        <div class="ctl"><label>Viento hacia <b id="v-dir">15°</b></label><input id="dir" type="range" min="0" max="359" value="15"></div>
+        <div class="ctl"><label>Tormenta: lluvia máx. <b id="v-rain">50 mm/h</b></label><input id="rain" type="range" min="0" max="100" value="50"></div>
+      </div>
+      <div class="kv-grid" id="zone-summary"></div>
+      <p class="muted" style="margin:10px 0 0">Propagación con viento, pendiente y combustible (<span class="mono">wildfire.mjs</span>). Para inspeccionar perímetros históricos <b>OBSERVADOS</b> (GeoMAC 2018, DANA EMSR773, EFFIS), abre <a href="/senda/visor">Visor Científico Temporal / 4D</a>.</p>
+    </section>
+
+    <div class="grid2">
+      <section class="card">
+        <h2>Pueblos y zonas <span class="tag calc">NÚCLEO</span></h2>
+        <div id="towns"></div>
+      </section>
+      <section class="card">
+        <h2>Canales ahora <span class="tag calc">FÍSICA + MODELO</span></h2>
+        <div id="bears"></div>
+        <div class="big" style="margin-top:14px"><b id="pdel">—</b><span id="pdel-sub">probabilidad de entrega de una alerta de 220 B</span></div>
+        <p class="muted" id="pdel-note" style="margin:0">Plan con fallos correlacionados (<span class="mono">delivery-assurance.mjs</span>), recalculado cuando cae una antena o cambia la lluvia.</p>
+      </section>
+    </div>
+
+    <!-- 4 · Nodos cooperativos, rutas hipotéticas/verificadas y cortes SRLG -->
+    <section class="card" id="coop-routes">
+      <h2>Nodos cooperativos, rutas y cortes SRLG <span class="tag sim">HIPÓTESIS · NO PROBADO EN RF</span></h2>
+      <p class="muted" style="margin:0">Evalúa elegibilidad fail-closed (<span class="mono">assessCanonicalRouteGate</span>), comparativa CGR vs portadores correlacionados y enumeración exacta N-1/N-2 de cortes de causa común (<span class="mono">failure-domain-cuts.mjs</span>). Los reflejos pasivos y nodos sin consentimiento se rechazan.</p>
+      <div class="rowb">
+        <label style="font-size:12px;color:var(--m)">Escenario de topología:
+          <select id="srlg-mode" aria-label="Escenario de topología cooperativa">
+            <option value="shared_power">Red compartiendo alimentación eléctrica (corte común)</option>
+            <option value="disjoint_declared">Rutas con dominios disjuntos declarados (sin prueba física)</option>
+            <option value="passive_blocked">Enlace pasivo / nodo sin consentimiento (rechazo fail-closed)</option>
+          </select>
+        </label>
+        <button class="btn" id="srlg-run">Evaluar rutas y cortes N-2</button>
+      </div>
+      <div id="srlg-out" style="margin-top:10px"></div>
+    </section>
+
+    <!-- 2 · Panel de fuentes, procedencia y calidad -->
+    <section class="card" id="sources-panel">
+      <h2>Fuentes, procedencia y calidad <span class="tag obs">OBSERVADO + LINAJE</span></h2>
+      <p class="muted" style="margin:0">Inspección de capas del catálogo <span class="mono">/senda/api/v1/catalog.json</span> y verificación de independencia causal (<span class="mono">source-evidence.mjs</span>): GDACS deriva de USGS/EMSC/FIRMS/GloFAS y no constituye confirmación independiente.</p>
+      <div class="rowb">
+        <label style="font-size:12px;color:var(--m)">Fuente A:
+          <select id="src-a" aria-label="Fuente A"><option value="GDACS_EQ">GDACS_EQ</option><option value="GDACS_WF">GDACS_WF</option><option value="COPERNICUS_EMS_RAPID">COPERNICUS_EMS_RAPID</option><option value="UNKNOWN_FEED">UNKNOWN_FEED</option></select>
+        </label>
+        <label style="font-size:12px;color:var(--m)">Fuente B:
+          <select id="src-b" aria-label="Fuente B"><option value="USGS_NEIC">USGS_NEIC</option><option value="NASA_FIRMS">NASA_FIRMS</option><option value="EMSC">EMSC</option><option value="CUSTOM_BLOG">CUSTOM_BLOG</option></select>
+        </label>
+        <button class="btn" id="src-check">Comprobar independencia</button>
+      </div>
+      <div id="src-indep" style="margin-top:8px"></div>
+      <div class="table-scroll" id="src-catalog" style="margin-top:10px"></div>
+    </section>
+
+    <!-- 6 · Recepción, confirmación, revisión y cierre de informes ciudadanos -->
+    <section class="card" id="citizen">
+      <h2>Reportes ciudadanos · recepción, revisión y cierre <span class="tag unv">NO VERIFICADO · SIN AVISO PÚBLICO</span></h2>
+      <p class="muted" style="margin:0">Pega líneas <span class="mono">SND3</span> (Ed25519) o carga un lote sintético de ejercicio. Flujo real de sala: <b>Detectar → Comprobar → Clasificar → Coordinar → Cerrar</b>. Los reportes ciudadanos nunca se convierten por sí solos en alertas institucionales autenticadas.</p>
+      <textarea id="cit-in" rows="3" aria-label="Líneas SND3 de reportes ciudadanos" style="width:100%;margin-top:10px;font:12px var(--mono);background:rgba(0,0,0,.35);color:inherit;border:1px solid var(--line);border-radius:10px;padding:10px" placeholder="SND3 …"></textarea>
+      <div class="rowb">
+        <button class="btn p" id="cit-go">Verificar y priorizar</button>
+        <button class="btn" id="cit-sample">Cargar lote de ejemplo (Ed25519 · ejercicio)</button>
+      </div>
+      <div id="cit-out"></div>
+    </section>
+
+    <section class="card" id="bridge">
+      <h2>Credibilidad por consenso amplio <span class="tag sim">SIMULADO</span></h2>
+      <p class="muted" style="margin:0">Modelo de consenso amplio (parámetros de Notas de la Comunidad, Apache-2.0) sobre 20 vecinos <b>simulados</b> en dos grupos. <span class="mono">bridging-trust.mjs</span></p>
+      <div class="rowb"><button class="btn p" id="br-go">Calcular con el escenario simulado</button></div>
+      <div id="br-out" class="table-scroll"></div>
+    </section>
+
+    <!-- 7, 8, 9 · Gestión de roles, autorizaciones, operación firmada y exportación -->
+    <section class="card" id="ops">
+      <h2>Roles, autorizaciones y operación firmada <span class="tag live">ECDSA P-256 · EJERCICIO</span></h2>
+      <p class="muted" style="margin:0">El organismo (ancla de confianza) acredita un rol explícito. Solo un <span class="mono">COORDINADOR_INCIDENTE</span> con credencial anclada puede firmar órdenes de zona. <span class="mono">CAP Actual</span> permanece bloqueado en modo laboratorio.</p>
+      <div class="rowb">
+        <label style="font-size:12px;color:var(--m)">Rol activo en consola:
+          <select id="role-select" aria-label="Rol activo en consola">
+            <option value="COORDINADOR_INCIDENTE">COORDINADOR_INCIDENTE (anclado)</option>
+            <option value="VERIFICADOR_SALA">VERIFICADOR_SALA (solo revisión)</option>
+            <option value="OBSERVADOR">OBSERVADOR (solo lectura)</option>
+            <option value="NO_ANCLADO">IMPOSTOR (clave no anclada)</option>
+          </select>
+        </label>
+        <button class="btn p" id="ops-go">Emitir orden firmada a la zona en riesgo</button>
+        <button class="btn" id="ops-forge">Probar una orden falsificada</button>
+      </div>
+      <div id="role-status" style="margin-top:8px"></div>
+      <div id="ops-out"></div>
+      <div id="learn-out"></div>
+    </section>
+  </div>
+
+  <div class="col">
+    <!-- 1b · Cronología de incidentes y acciones -->
+    <section class="card" id="timeline-card">
+      <h2>Cronología de incidentes y sala <span class="tag calc">TRAZA AUDITORÍA</span></h2>
+      <div id="timeline-log" style="max-height:240px;overflow-y:auto"></div>
+      <div class="chain" id="audit-chain-box">Cadena SHA-256 inicializando…</div>
+      <div class="rowb">
+        <button class="btn" id="dl-evidence-bundle">Exportar paquete de evidencias (JSON)</button>
+      </div>
+    </section>
+
+    <!-- 5 · Estados de conectividad y colas offline (IndexedDB) -->
+    <section class="card" id="offline-card">
+      <h2>Conectividad y cola offline durable <span class="tag live">INDEXEDDB · LOCAL</span></h2>
+      <p class="muted" style="margin:0">Cola persistente en este dispositivo (<span class="mono">db.mjs</span>): deduplicación por ID, caducidad TTL, acuse ACK y <b>revocación de consentimiento</b> (borra la carga útil y retiene tumba <span class="mono">REVOKED</span>).</p>
+      <div class="kv-grid" id="conn-stats"></div>
+      <div class="rowb">
+        <button class="btn" id="q-add">Encolar mensaje de ejercicio</button>
+        <button class="btn" id="q-ttl">Purgar caducados</button>
+      </div>
+      <div class="table-scroll" id="q-list" style="margin-top:10px"></div>
+    </section>
+
+    <section class="card">
+      <h2>Enviar alerta firmada <span class="tag live">CIFRADO REAL · SIMULADO EN CANAL</span></h2>
+      <p class="muted" style="margin:0 0 10px">Sella un aviso de ejercicio para <b id="target">—</b>, lo trocea con Reed-Solomon y lo reconstruye en el destino.</p>
+      <button class="btn p" id="send">Enviar a la zona en riesgo</button>
+      <div class="pipe" id="pipe"></div>
+    </section>
+
+    <section class="card">
+      <h2>Lo que ve el vecino <span class="tag calc">MODO FÁCIL</span></h2>
+      <div class="phone"><div class="scr" id="scr"></div></div>
+      <p class="muted" style="margin:10px 0 0;text-align:center">Tres botones. Ninguna orden no anclada se ejecuta.</p>
+    </section>
+
+    <!-- 10 · Panel de incertidumbre, limitaciones y estado del sistema -->
+    <section class="card" id="limits-card">
+      <h2>Incertidumbre, limitaciones y estado real <span class="tag unv">TRL 3–4 · SIN CAMPO</span></h2>
+      <div id="limits-panel"></div>
+    </section>
+  </div>
+</main>
+<footer>SENDA Centro · el paisaje, los pueblos y las antenas son sintéticos (<span class="mono">syntheticLandscape</span>); los coeficientes de combustible no están calibrados. Ningún resultado de esta página sustituye a un ensayo de campo con dos Android y dos LoRa autorizados ni al 112.</footer>
+
+<script type="module">
+import { syntheticLandscape, arrivalTimes, assessAssets } from '/senda/core/wildfire.mjs';
+import { BEARERS, planMultiBearer, shardForPlan, fromBearerFrame, splitShards } from '/senda/core/bearers.mjs';
+import { RADIO_PROFILES, linkAvailability, planAssuredDelivery } from '/senda/core/delivery-assurance.mjs';
+import { encodeShards, decodeShards, createReassembler } from '/senda/core/erasure.mjs';
+import { fitBridging, bridgingStatus, majorityStatus, syntheticPolarizedScenario } from '/senda/core/bridging-trust.mjs';
+import { generateIdentity, sealMessage, openMessage, packEnvelope, relayView } from '/senda/core/envelope.mjs';
+import { modulate, demodulate } from '/senda/core/acoustic-modem.mjs';
+import { computeRainAttenuation } from '/senda/core/telecom-mathematical-physics.mjs';
+import { setupAgency, simulatePopulation, issueZoneOrder, deliverOrder, collectResponses, situationReport, learnFromDelivery, STATUS_MODEL } from '/senda/core/incident-ops.mjs';
+import { ReliabilityStore, priorsFromCatalog } from '/senda/core/reliability-store.mjs';
+import { decodeReports, encodeReport, createReporterKeys, clusterReports, assessIncident, triageQueue, incidentToCap, HAZARD_KINDS } from '/senda/core/hazard-reports.mjs';
+import { createOrganization, issueCredential } from '/senda/core/roles.mjs';
+import { signCommand, keyThumb } from '/senda/core/remote-command.mjs';
+import { createAuditLog, verifyAuditLog } from '/senda/core/interop.mjs';
+import { assessCanonicalRouteGate, planCanonicalRoute } from '/senda/core/routing-canonical.mjs';
+import { assessForecastSkillGate, summarizeEvidenceLineage } from '/senda/core/evidence-contract.mjs';
+import { auditAssuranceAgainstUncertainHazards } from '/senda/core/robust-assurance-audit.mjs';
+import { enqueueOfflineItem, listOfflineQueue, ackOfflineItem, revokeConsentTombstone, sweepExpiredQueue } from '/senda/db.mjs';
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const hm = (min) => { if (!Number.isFinite(min)) return '—'; const m = Math.max(0, Math.round(min)); return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`; };
+const hex = (b, n = 24) => [...b.slice(0, n)].map((x) => x.toString(16).padStart(2, '0')).join(' ') + (b.length > n ? ' …' : '');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const dl = (name, text, type) => { const u = URL.createObjectURL(new Blob([text], { type })); const a = document.createElement('a'); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 2000); };
+
+/* ================= i18n ligero ES / EN / NL ================= */
+const I18N = {
+  es: {
+    subtitle: 'CENTRO DE COORDINACIÓN',
+    navCentro: 'Centro', navVisor: 'Visor 4D', navAvisos: 'Avisos', navMensaje: 'Mensaje',
+    reset: 'Reiniciar',
+    guardText: 'Los reportes ciudadanos nunca generan alertas institucionales automáticas (canPublicWarn=false). CAP 1.2 se exporta únicamente en modo Exercise/Restricted.',
+    mapTitle: 'Situación · incendio forestal y perímetro',
+    mapHint: 'Pulsa en el mapa para mover el foco',
+  },
+  en: {
+    subtitle: 'COORDINATION CENTRE',
+    navCentro: 'Centre', navVisor: '4D Viewer', navAvisos: 'Reports', navMensaje: 'Message',
+    reset: 'Reset',
+    guardText: 'Citizen reports never become authenticated institutional alerts automatically (canPublicWarn=false). CAP 1.2 exports only in Exercise/Restricted mode.',
+    mapTitle: 'Situation · wildfire and perimeter',
+    mapHint: 'Click map to move ignition',
+  },
+  nl: {
+    subtitle: 'COÖRDINATIECENTRUM',
+    navCentro: 'Centrum', navVisor: '4D-Viewer', navAvisos: 'Meldingen', navMensaje: 'Bericht',
+    reset: 'Herstel',
+    guardText: 'Burgermeldingen worden nooit automatisch officiële waarschuwingen (canPublicWarn=false). CAP 1.2 exporteert alleen in Exercise/Restricted-modus.',
+    mapTitle: 'Situatie · natuurbrand en perimeter',
+    mapHint: 'Klik op de kaart om de haard te verplaatsen',
+  },
+};
+function applyLang(lang) {
+  const dict = I18N[lang] ?? I18N.es;
+  document.documentElement.lang = lang;
+  for (const el of document.querySelectorAll('[data-i18n]')) {
+    const k = el.dataset.i18n;
+    if (dict[k]) el.textContent = dict[k];
+  }
+  for (const b of document.querySelectorAll('#lang button')) b.classList.toggle('on', b.dataset.lang === lang);
+  S.lang = lang;
+}
+$('#lang').onclick = (e) => { const b = e.target.closest('button[data-lang]'); if (b) applyLang(b.dataset.lang); };
+
+/* ================= 1 · ARRANQUE: autocomprobación real ================= */
+const ID = {}, OPS = { ctx: null, phones: [], n: 0, store: null, audit: null, role: 'COORDINADOR_INCIDENTE' };
+const TIMELINE = [];
+const WORKFLOW = new Map(); // incidentId -> { id, label, state, updatedAt, notes }
+
+async function logAudit(actor, action, data) {
+  if (!OPS.audit) return;
+  const entry = await OPS.audit.append({ at: Date.now(), actor, action, data });
+  TIMELINE.unshift({ at: entry.at, actor, action, detail: JSON.stringify(data).slice(0, 140) });
+  if (TIMELINE.length > 40) TIMELINE.length = 40;
+  await renderTimelineAndAudit();
+}
+
+async function renderTimelineAndAudit() {
+  const tl = $('#timeline-log');
+  if (tl) {
+    tl.innerHTML = TIMELINE.length
+      ? TIMELINE.map((e) => `<div class="tl-item"><time>${new Date(e.at).toISOString().slice(11, 19)} UTC</time> · <b>${esc(e.action)}</b> <span class="mono" style="color:var(--m)">(${esc(e.actor)})</span><br><span class="muted">${esc(e.detail)}</span></div>`).join('')
+      : '<p class="muted">Sin acciones registradas aún.</p>';
+  }
+  const box = $('#audit-chain-box');
+  if (box && OPS.audit) {
+    const entries = OPS.audit.entries();
+    const chk = await verifyAuditLog(entries);
+    box.innerHTML = `Cadena auditable: ${entries.length} entrada(s) · integridad <b>${chk.ok ? 'VERIFICADA (SHA-256)' : 'ROTA en ' + chk.brokenAt}</b> · cabeza ${(chk.head ?? '0'.repeat(16)).slice(0, 20)}…`;
+  }
+}
+
+const STEPS = [
+  ['Identidad cifrada', 'ECDH + ECDSA P-256 en WebCrypto', async () => { ID.centro = await generateIdentity(); ID.vecino = await generateIdentity(); ID.relay = await generateIdentity(); return 'claves de centro, vecino y relé'; }],
+  ['Sellado de extremo a extremo', 'sobre ECDH + AES-GCM firmado', async () => { const now = Date.now(), e = await sealMessage({ sender: ID.centro, recipient: ID.vecino.publicIdentity, body: 'prueba', priority: 0, ttlS: 60, now, kind: 'OFFICIAL_ALERT' }); const o = await openMessage({ recipient: ID.vecino, envelope: e, now }); let leak = true; try { await openMessage({ recipient: ID.relay, envelope: e, now }); } catch { leak = false; } if (!JSON.stringify(o).includes('prueba') || leak) throw new Error('fallo de cifrado'); return `${packEnvelope(e).length} B · el relé no puede abrirlo`; }],
+  ['Reed-Solomon 6 de 10', 'GF(256), se pierden 4 fragmentos', async () => { const m = new TextEncoder().encode('Evacuad hacia el norte'), e = encodeShards(m, 6, 10), keep = e.shards.map((data, index) => ({ index, data })).filter((r) => ![1, 4, 7, 9].includes(r.index)), d = decodeShards(keep, { k: 6, len: e.len }); if (new TextDecoder().decode(d) !== 'Evacuad hacia el norte') throw new Error('no reconstruye'); return 'reconstruido byte a byte'; }],
+  ['Módem acústico', 'MFSK-16 · modular y demodular', async () => { const p = Uint8Array.from({ length: 32 }, (_, i) => (i * 29) & 255), b = demodulate(modulate(p)), got = b?.payload ?? b; if (!got || got.length !== 32 || !got.every((v, i) => v === p[i])) throw new Error('el módem no recupera la trama'); return '32 B ida y vuelta por audio'; }],
+  ['Física de enlaces', 'ITU-R P.838-3 a 50 mm/h', async () => { const a = computeRainAttenuation(0.868, 50).specificAttenuationDbPerKm, b = computeRainAttenuation(28, 50).specificAttenuationDbPerKm; return `868 MHz ${a.toFixed(4)} · 28 GHz ${b.toFixed(1)} dB/km`; }],
+  ['Modelo de incendio', 'llegada del fuego por celda', async () => { compute(); return `${G.w}×${G.h} celdas de ${G.cellM} m`; }],
+  ['Organismo, auditoría y cola local', 'ancla ECDSA P-256 + cadena SHA-256 + IndexedDB', async () => {
+    OPS.ctx = await setupAgency({ now: Date.now() });
+    OPS.audit = createAuditLog();
+    OPS.store = new ReliabilityStore({ nodeId: 'centro-mando', channelPriors: priorsFromCatalog(BEARERS) });
+    OPS.phones = simulatePopulation(L.towns, { perTown: 60, seed: 2026 });
+    await logAudit('CENTRO', 'SYSTEM_BOOT_VERIFIED', { org: OPS.ctx.org.id, syntheticPhones: OPS.phones.length });
+    return `${OPS.ctx.org.name} · ${OPS.phones.length} teléfonos sintéticos`;
+  }],
+];
+
+async function boot() {
+  $('#steps').innerHTML = STEPS.map(([a, b], i) => `<div class="step" id="s${i}"><span class="dot"></span><div><b>${a}</b><small>${b}</small></div><em></em></div>`).join('');
+  let fails = 0;
+  for (let i = 0; i < STEPS.length; i++) {
+    const el = $(`#s${i}`); el.className = 'step run'; const t0 = performance.now();
+    try { const r = await STEPS[i][2](); el.className = 'step ok'; el.querySelector('em').textContent = `${Math.round(performance.now() - t0)} ms`; el.querySelector('small').textContent = r; }
+    catch (e) { fails++; el.className = 'step ko'; el.querySelector('small').textContent = e.message; }
+    $('#bootbar').style.width = `${((i + 1) / STEPS.length) * 100}%`;
+    if (!reduced) await sleep(60);
+  }
+  $('#bootnote').textContent = fails ? `${fails} comprobación(es) fallida(s): revisa el núcleo antes de operar.` : 'Núcleo verificado en este dispositivo.';
+  await sleep(fails ? 1800 : 250); $('#boot').classList.add('done'); start();
+}
+
+/* ================= 2 · MODELO: fuego, antenas, tormenta ================= */
+const L = syntheticLandscape(), G = L.grid;
+const S = { lang: 'es', wind: 30, dir: 15, rainMax: 50, ign: { x: 30, y: 20 }, now: 0, speed: 8, playing: true, T: null, assets: [], lossAt: {}, plan: null, planKey: '', workflow: WORKFLOW };
+const at = (x, y) => S.T[Math.max(0, Math.min(G.h - 1, y)) * G.w + Math.max(0, Math.min(G.w - 1, x))];
+function compute() {
+  S.T = arrivalTimes(G, [S.ign], { windKmh: S.wind, windToDeg: S.dir }, { maxMin: 720 });
+  S.assets = assessAssets(G, S.T, L.towns, L.towers);
+  for (const tw of L.towers) { const m = Math.min(...[-1, 0, 1].flatMap((dy) => [-1, 0, 1].map((dx) => at(tw.x + dx, tw.y + dy)))); S.lossAt[tw.id] = Number.isFinite(m) ? m - 10 : Infinity; }
+  S.planKey = '';
+}
+const rainNow = () => S.rainMax * Math.min(1, Math.max(0, (S.now - 120) / 60));
+const towersUp = () => L.towers.filter((t) => S.now < S.lossAt[t.id]);
+
+/* ================= 3 · CANALES y PLAN con fallos correlacionados ================= */
+const SHOWN = ['CELL_DATA', 'SMS', 'PHONE_MESH', 'MESHTASTIC', 'SAT_D2C_SMS', 'IRIDIUM_SBD', 'DRONE_MULE'];
+function channelState() {
+  const up = towersUp().length / L.towers.length, rain = rainNow();
+  return SHOWN.map((id) => {
+    const b = BEARERS[id], phys = RADIO_PROFILES[id] ? linkAvailability(RADIO_PROFILES[id], rain) : { pLink: 1, rainLossDb: 0 };
+    const terr = b.family === 'TERRESTRIAL' ? up : 1, aerial = b.family === 'AERIAL' && rain > 20 ? 0.4 : 1;
+    return { id, label: b.label.replace(/ \(.*\)/, ''), p: b.p * phys.pLink * terr * aerial, rainDb: phys.rainLossDb, alive: terr > 0 };
+  });
+}
+let planTimer = null;
+function schedulePlan() {
+  const up = towersUp().length, rain = Math.round(rainNow() / 5) * 5, key = `${up}|${rain}`;
+  if (key === S.planKey) return; S.planKey = key;
+  $('#pdel').textContent = '…'; clearTimeout(planTimer);
+  planTimer = setTimeout(() => {
+    const avail = channelState().filter((c) => c.alive).map((c) => ({ id: c.id }));
+    const frac = up / L.towers.length, now = { family: { TERRESTRIAL: Math.max(0.0001, frac) }, rainMmH: rain, prob: 1 };
+    const t0 = performance.now(); S.plan = planAssuredDelivery(220, avail, { scenarios: { AHORA: now }, effort: 'fast', budgetEUR: 0 });
+    const ms = Math.round(performance.now() - t0);
+    if (!S.plan.feasible) { $('#pdel').textContent = '0 %'; $('#pdel-sub').textContent = 'sin canal viable'; return; }
+    $('#pdel').textContent = (100 * S.plan.pDelivery).toFixed(2) + ' %'; $('#pdel').style.color = S.plan.pDelivery > 0.99 ? 'var(--e)' : S.plan.pDelivery > 0.9 ? 'var(--a)' : 'var(--r)';
+    $('#pdel-sub').textContent = `alerta de 220 B · ${S.plan.k} de ${S.plan.n} fragmentos · 0 € · ${ms} ms`;
+    renderLimitsPanel();
+  }, 120);
+}
+
+/* ================= 4 · ENVÍO REAL ================= */
+let sending = false;
+async function sendAlert() {
+  if (sending) return; sending = true; $('#send').disabled = true;
+  const pipe = $('#pipe'), town = riskTown(), now = Date.now();
+  const ph = ['Sellar', 'Trocear', 'Repartir por canales', 'Reconstruir', 'Abrir y verificar', 'Recibo'];
+  pipe.innerHTML = ph.map((p, i) => `<div class="ph" id="p${i}"><span class="n">${i + 1}</span><div><b>${p}</b><small></small></div></div>`).join('');
+  const step = async (i, fn) => { const el = $(`#p${i}`); el.className = 'ph on'; await sleep(reduced ? 0 : 250); try { const r = await fn(el); el.className = 'ph ok'; el.querySelector('small').innerHTML = r; return true; } catch (e) { el.className = 'ph ko'; el.querySelector('small').textContent = e.message; return false; } };
+  const body = `EJERCICIO EVACUACIÓN ${town ? town.name.toUpperCase() : ''}: salid hacia el norte por la carretera.`;
+  let env, bytes, plan, frames, out;
+  const ok = await step(0, async () => { env = await sealMessage({ sender: ID.centro, recipient: ID.vecino.publicIdentity, body, priority: 0, ttlS: 3600, now, kind: 'OFFICIAL_ALERT' }); bytes = packEnvelope(env); const rv = relayView(env, now); return `${bytes.length} B cifrados · relé solo ve tipo ${rv.kind}, prioridad ${rv.priority}`; })
+    && await step(1, async () => { const avail = channelState().filter((c) => c.alive).map((c) => ({ id: c.id })); plan = planMultiBearer(bytes.length, avail, { target: 0.99 }); if (!plan.messages) throw new Error('ningún canal viable'); frames = shardForPlan(bytes, plan); return `${plan.k} de ${plan.n} fragmentos · ${frames.length} tramas`; })
+    && await step(2, async (el) => { const st = Object.fromEntries(channelState().map((c) => [c.id, c])), ra = createReassembler(), dots = []; let got = 0, lost = 0;
+      for (const f of frames) { const okF = Math.random() < (st[f.bearer]?.p ?? 0); dots.push(`<i class="${okF ? 'ok' : 'lost'}" title="${esc(f.bearer)}"></i>`); if (!okF) { lost++; continue; } got++; for (const s of splitShards(fromBearerFrame(f.frame))) out = ra.add(s, f.bearer) ?? out; }
+      el.querySelector('div').insertAdjacentHTML('beforeend', `<div class="shards">${dots.join('')}</div>`);
+      return `${got} tramas llegan, ${lost} se pierden`; })
+    && await step(3, async () => { if (!out) throw new Error('no llegaron suficientes fragmentos'); return `${out.data.length} B recompuestos vía ${out.via.join(', ')}`; })
+    && await step(4, async () => { const { unpackEnvelope } = await import('/senda/core/envelope.mjs'); const e2 = unpackEnvelope(out.data); const o = await openMessage({ recipient: ID.vecino, envelope: e2, now, expectedSender: ID.centro }); const txt = o.body ?? o.text ?? JSON.stringify(o); return `firma verificada · «${esc(String(txt).slice(0, 60))}»`; })
+    && await step(5, async () => { showPhoneAlert(town, body); await logAudit('CENTRO', 'EXERCISE_ALERT_ENVELOPE_VERIFIED', { town: town?.name ?? 'N/A' }); return 'recibo sintético registrado; copias purgadas'; });
+  void ok; sending = false; $('#send').disabled = false;
+}
+
+/* ================= 5 · DIBUJO ================= */
+const cv = $('#map'), g = cv.getContext('2d'), SX = cv.width / G.w, SY = cv.height / G.h;
+const FUEL = { 0: [40, 96, 150], 1: [150, 140, 92], 2: [86, 100, 62], 3: [44, 74, 50], 4: [140, 136, 130], 5: [180, 176, 166] };
+const base = document.createElement('canvas'); base.width = cv.width; base.height = cv.height;
+{ const b = base.getContext('2d'), img = b.createImageData(cv.width, cv.height), cl = (v, a, z) => Math.max(a, Math.min(z, v));
+  const A = (arr, x, y) => arr[cl(y, 0, G.h - 1) * G.w + cl(x, 0, G.w - 1)];
+  const bil = (arr, x, y) => { const x0 = Math.floor(x), y0 = Math.floor(y), fx = x - x0, fy = y - y0; return (A(arr, x0, y0) * (1 - fx) + A(arr, x0 + 1, y0) * fx) * (1 - fy) + (A(arr, x0, y0 + 1) * (1 - fx) + A(arr, x0 + 1, y0 + 1) * fx) * fy; };
+  for (let py = 0; py < cv.height; py++) for (let px = 0; px < cv.width; px++) {
+    const x = px / SX - 0.5, y = py / SY - 0.5, e = bil(G.elev, x, y);
+    const dx = (bil(G.elev, x + 0.3, y) - bil(G.elev, x - 0.3, y)) / 60, dy = (bil(G.elev, x, y + 0.3) - bil(G.elev, x, y - 0.3)) / 60;
+    const nl = Math.hypot(dx, dy, 1), sh = cl(((dx * 0.6 + dy * 0.6 + 0.53) / nl) * 1.35, 0.45, 1.25);
+    const x0 = Math.floor(x), y0 = Math.floor(y), fx = x - x0, fy = y - y0, c = [0, 0, 0];
+    for (const [ox, oy, w] of [[0, 0, (1 - fx) * (1 - fy)], [1, 0, fx * (1 - fy)], [0, 1, (1 - fx) * fy], [1, 1, fx * fy]]) { const f = FUEL[A(G.fuel, x0 + ox, y0 + oy)]; c[0] += f[0] * w; c[1] += f[1] * w; c[2] += f[2] * w; }
+    const iso = Math.abs(((e % 50) + 50) % 50 - 25) > 24.2 ? 0.78 : 1, k = sh * iso * 0.74;
+    img.data.set([c[0] * k, c[1] * k, c[2] * k, 255], (py * cv.width + px) * 4);
+  }
+  b.putImageData(img, 0, 0);
+}
+const fireCv = document.createElement('canvas'); fireCv.width = G.w; fireCv.height = G.h; const fg = fireCv.getContext('2d'), fimg = fg.createImageData(G.w, G.h);
+function draw() {
+  g.drawImage(base, 0, 0);
+  const now = S.now, fd = fimg.data;
+  for (let i = 0; i < G.w * G.h; i++) { const t = S.T[i], o = i * 4; if (!(t <= now)) { fd[o + 3] = 0; continue; } const age = now - t, k = age < 20 ? 1 - age / 20 : 0;
+    if (k > 0) { fd[o] = 255; fd[o + 1] = 110 + 120 * k; fd[o + 2] = 30 + 90 * k * k; fd[o + 3] = 235; } else { fd[o] = 22; fd[o + 1] = 18; fd[o + 2] = 16; fd[o + 3] = 185; } }
+  fg.putImageData(fimg, 0, 0); g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(fireCv, 0, 0, cv.width, cv.height);
+  g.globalCompositeOperation = 'lighter'; g.filter = 'blur(8px)'; g.globalAlpha = 0.5; g.drawImage(fireCv, 0, 0, cv.width, cv.height); g.restore();
+  const rain = rainNow();
+  if (rain > 0) { g.save(); g.globalAlpha = Math.min(0.45, rain / 120); g.strokeStyle = '#9fd8ff'; g.lineWidth = 1; g.beginPath(); for (let i = 0; i < 220; i++) { const x = (i * 97 + now * 37) % cv.width, y = (i * 53 + now * 211) % cv.height; g.moveTo(x, y); g.lineTo(x - 6, y + 16); } g.stroke(); g.restore(); }
+  for (const tw of L.towers) { const up = now < S.lossAt[tw.id], x = (tw.x + 0.5) * SX, y = (tw.y + 0.5) * SY;
+    g.beginPath(); g.arc(x, y, 14 * SX, 0, 7); g.fillStyle = up ? 'rgba(127,224,240,.10)' : 'rgba(255,91,110,.08)'; g.fill(); g.strokeStyle = up ? 'rgba(127,224,240,.45)' : 'rgba(255,91,110,.35)'; g.setLineDash(up ? [] : [6, 6]); g.stroke(); g.setLineDash([]);
+    g.fillStyle = up ? '#7fe0f0' : '#ff5b6e'; g.fillRect(x - 3, y - 14, 6, 18); g.font = '600 15px -apple-system,Inter,sans-serif'; g.fillText(tw.id + (up ? '' : ' ✕'), x + 8, y - 4); }
+  for (const tn of L.towns) { const a = S.assets.find((q) => q.id === tn.id), x = (tn.x + 0.5) * SX, y = (tn.y + 0.5) * SY, burnt = Number.isFinite(a?.arrivalMin) && now >= a.arrivalMin;
+    const col = !a || !Number.isFinite(a.arrivalMin) ? '#3ee0a1' : now >= a.deadlineMin ? '#ff5b6e' : now >= a.sendByMin - 30 ? '#fbbf24' : '#7fe0f0';
+    g.beginPath(); g.arc(x, y, 12, 0, 7); g.fillStyle = col; g.globalAlpha = burnt ? 0.5 : 1; g.fill(); g.globalAlpha = 1; g.lineWidth = 3; g.strokeStyle = '#070d16'; g.stroke();
+    g.font = '700 18px -apple-system,Inter,sans-serif'; g.fillStyle = '#fff'; g.fillText(tn.name, x + 16, y + 6); }
+  const ix = (S.ign.x + 0.5) * SX, iy = (S.ign.y + 0.5) * SY; g.beginPath(); g.arc(ix, iy, 7, 0, 7); g.fillStyle = '#ff7756'; g.fill();
+  const r = (S.dir * Math.PI) / 180, wx = cv.width - 70, wy = 70; g.save(); g.translate(wx, wy); g.beginPath(); g.arc(0, 0, 40, 0, 7); g.fillStyle = 'rgba(7,13,22,.72)'; g.fill(); g.rotate(r); g.strokeStyle = '#7fe0f0'; g.lineWidth = 4; g.beginPath(); g.moveTo(0, 24); g.lineTo(0, -24); g.lineTo(-9, -12); g.moveTo(0, -24); g.lineTo(9, -12); g.stroke(); g.restore();
+  g.font = '600 13px -apple-system,Inter,sans-serif'; g.fillStyle = '#9db2be'; g.fillText(`${S.wind} km/h`, wx - 24, wy + 60);
+}
+
+/* ================= 6 · PANELES DE SITUACIÓN ================= */
+function riskTown() { return S.assets.filter((a) => Number.isFinite(a.arrivalMin) && S.now < a.arrivalMin).sort((a, b) => a.sendByMin - b.sendByMin)[0] ?? null; }
+function panels() {
+  $('#t').textContent = 'T+' + hm(S.now);
+  const up = towersUp().length; $('#h-tw').textContent = `${up}/${L.towers.length}`; $('#h-rain').textContent = `${Math.round(rainNow())} mm/h`;
+  const atRiskAssets = S.assets.filter((a) => Number.isFinite(a.arrivalMin) && S.now < a.arrivalMin);
+  $('#h-pop').textContent = atRiskAssets.reduce((s, a) => s + a.population, 0).toLocaleString('es');
+  const burntCells = S.T.reduce((n, v) => n + (v <= S.now ? 1 : 0), 0);
+  const areaKm2 = (burntCells * G.cellM * G.cellM) / 1_000_000;
+  $('#zone-summary').innerHTML = `
+    <div class="kv-item"><small>Perímetro sintético en T+${hm(S.now)}</small><b>${areaKm2.toFixed(2)} km² (${burntCells} celdas)</b></div>
+    <div class="kv-item"><small>Zonas en riesgo (horizonte 12 h)</small><b>${atRiskAssets.length} / ${L.towns.length} pueblos</b></div>
+    <div class="kv-item"><small>Cobertura celular afectada</small><b>${L.towers.length - up} antena(s) caídas</b></div>`;
+  $('#towns').innerHTML = S.assets.map((a) => {
+    if (!Number.isFinite(a.arrivalMin)) return `<div class="town"><span class="st" style="background:var(--e)"></span><div><b>${esc(a.name)}</b><small>${a.population.toLocaleString('es')} hab. · fuera del alcance del fuego en 12 h</small></div><div class="cd" style="color:var(--e)">a salvo</div></div>`;
+    const left = a.sendByMin - S.now, burnt = S.now >= a.arrivalMin, late = S.now >= a.deadlineMin;
+    const col = burnt || late ? 'var(--r)' : left < 30 ? 'var(--a)' : 'var(--i)', how = a.antennaFirst ? 'la antena cae antes: avisar por canales sin red' : 'aviso por red móvil / ejercicio';
+    return `<div class="town"><span class="st" style="background:${col}"></span><div><b>${esc(a.name)}</b><small>${a.population.toLocaleString('es')} hab. · fuego a T+${hm(a.arrivalMin)} · ${how}</small></div><div class="cd" style="color:${col}">${burnt ? 'alcanzado' : late ? 'sin margen' : 'avisar en ' + hm(left)}<small>${a.antennaFirst ? `antena cae T+${hm(a.commsLossMin)}` : ''}</small></div></div>`;
+  }).join('');
+  const cs = channelState(), max = Math.max(...cs.map((c) => c.p), 0.01);
+  $('#bears').innerHTML = cs.map((c) => `<div class="bear ${c.alive ? '' : 'off'}"><span>${esc(c.label)}</span><span class="tr"><i style="width:${(100 * c.p / max).toFixed(1)}%;background:${c.p > 0.6 ? 'var(--e)' : c.p > 0.3 ? 'var(--a)' : 'var(--r)'}"></i></span><span class="v">${(100 * c.p).toFixed(0)} %${c.rainDb > 0.5 ? `<br><small style="color:var(--m)">−${c.rainDb.toFixed(1)} dB</small>` : ''}</span></div>`).join('');
+  const rt = riskTown(); $('#target').textContent = rt ? `${rt.name} (${rt.population.toLocaleString('es')} hab.)` : 'ningún pueblo en riesgo';
+  schedulePlan();
+}
+let phoneState = null;
+function showPhoneAlert(town, body) { phoneState = { town, body, at: S.now }; renderPhone(); }
+function renderPhone() {
+  const rt = riskTown(), sig = towersUp().length ? 'Red' : 'Sin red · SENDA';
+  const head = `<div class="sb"><span>${hm(9 * 60 + S.now)}</span><span>${sig}</span></div>`;
+  const alert = phoneState ? `<div class="alert"><b>⚠ Ejercicio ${esc(phoneState.town?.name ?? '')}</b><small>Firmado en laboratorio · recibido T+${hm(phoneState.at)}</small><p style="margin:6px 0 0;font-size:12px">${esc(phoneState.body)}</p></div>` : rt ? `<div class="alert ok"><b>Sin avisos activos</b><small>Incendio simulado a ${hm(rt.arrivalMin - S.now)} de ${esc(rt.name)}.</small></div>` : `<div class="alert ok"><b>Todo en calma</b><small>SENDA vigila tu zona.</small></div>`;
+  $('#scr').innerHTML = head + alert + '<div class="bigbtn g">✓ Estoy bien</div><div class="bigbtn y">Necesito ayuda</div><div class="bigbtn r">Estoy atrapado</div>';
+}
+
+/* ================= 6b · NODOS COOPERATIVOS Y CORTES SRLG ================= */
+async function evaluateSrlgScenario() {
+  const mode = $('#srlg-mode').value;
+  const nodes = [
+    { id: 'CENTRO', role: 'SENDER', consent: true, powered: true, radioEnabled: true },
+    { id: 'RELE_N1', role: 'RELAY', consent: mode !== 'passive_blocked', powered: true, radioEnabled: true },
+    { id: 'GW_SAT', role: 'GATEWAY', consent: true, powered: true, radioEnabled: true },
+    { id: 'PUEBLO_A', role: 'RECEIVER', consent: true, powered: true, radioEnabled: true },
+  ];
+  const links = mode === 'passive_blocked'
+    ? [
+        { from: 'CENTRO', to: 'RELE_N1', kind: 'PASSIVE_RIS_REFLECTION', authorized: true, enabled: true, dutyCycleAllowed: true },
+        { from: 'RELE_N1', to: 'PUEBLO_A', kind: 'ACTIVE_RADIO', authorized: false, enabled: true, dutyCycleAllowed: true },
+      ]
+    : [
+        { from: 'CENTRO', to: 'RELE_N1', kind: 'ACTIVE_RADIO', authorized: true, enabled: true, dutyCycleAllowed: true },
+        { from: 'RELE_N1', to: 'PUEBLO_A', kind: 'ACTIVE_RADIO', authorized: true, enabled: true, dutyCycleAllowed: true },
+        { from: 'CENTRO', to: 'GW_SAT', kind: 'ACTIVE_RADIO', authorized: true, enabled: true, dutyCycleAllowed: true },
+        { from: 'GW_SAT', to: 'PUEBLO_A', kind: 'ACTIVE_RADIO', authorized: true, enabled: true, dutyCycleAllowed: true },
+      ];
+  const gate = assessCanonicalRouteGate({ nodes, links, source: 'CENTRO', destination: 'PUEBLO_A' });
+
+  const srlgInput = mode === 'disjoint_declared'
+    ? {
+        links: [
+          { id: 'L_LORA', riskDomains: ['TORRE_NORTE', 'BAT_SOLAR'] },
+          { id: 'L_SAT', riskDomains: ['GATEWAY_SUR', 'RED_230V'] },
+        ],
+        paths: [
+          { id: 'RUTA_LORA', linkIds: ['L_LORA'], endpointRiskDomains: ['SRC_UPS'], consentDeclared: true, linkAuthorizedDeclared: true },
+          { id: 'RUTA_SAT', linkIds: ['L_SAT'], endpointRiskDomains: ['DST_BAT'], consentDeclared: true, linkAuthorizedDeclared: true },
+        ],
+        requiredSurvivingPaths: 1,
+        maxSimultaneousFailures: 2,
+      }
+    : {
+        links: [
+          { id: 'L_LORA', riskDomains: ['TORRE_NORTE', 'RED_EL_VALLE'] },
+          { id: 'L_SAT', riskDomains: ['GATEWAY_SUR', 'RED_EL_VALLE'] },
+        ],
+        paths: [
+          { id: 'RUTA_LORA', linkIds: ['L_LORA'], endpointRiskDomains: ['SRC_UPS'], consentDeclared: true, linkAuthorizedDeclared: mode !== 'passive_blocked' },
+          { id: 'RUTA_SAT', linkIds: ['L_SAT'], endpointRiskDomains: ['DST_BAT'], consentDeclared: true, linkAuthorizedDeclared: true },
+        ],
+        requiredSurvivingPaths: 1,
+        maxSimultaneousFailures: 2,
+      };
+  const cutsPlan = await planCanonicalRoute({ engine: 'SRLG_CUTS', srlgInput });
+  const c = cutsPlan.failureCuts;
+  const cutsText = c.failingCuts?.length
+    ? c.failingCuts.slice(0, 3).map((x) => x.cut.join(' + ')).join(' | ')
+    : 'Ninguno en N-2 declarado (pendiente de validar independencia física real)';
+
+  $('#srlg-out').innerHTML = `
+    <div class="kv-grid">
+      <div class="kv-item"><small>Puerta de autorización</small><b style="color:${gate.modelReachable ? 'var(--i)' : 'var(--r)'}">${esc(gate.reason)}</b></div>
+      <div class="kv-item"><small>Ruta hipotética</small><b>${gate.path.length ? esc(gate.path.join(' → ')) : 'BLOQUEADA'}</b></div>
+      <div class="kv-item"><small>Auditoría SRLG N-2</small><b style="color:${c.survivesAllEnumeratedCuts ? 'var(--e)' : 'var(--a)'}">${esc(cutsPlan.status)}</b></div>
+      <div class="kv-item"><small>Cortes que tumban ambas rutas</small><b>${esc(cutsText)}</b></div>
+    </div>
+    <p class="muted" style="margin:8px 0 0">Enlaces rechazados por puerta fail-closed: <span class="mono">${esc(JSON.stringify(gate.rejectedLinks))}</span> · Entrega física verificada: <b>false</b>.</p>`;
+}
+$('#srlg-run').onclick = evaluateSrlgScenario;
+
+/* ================= 6c · FUENTES, PROCEDENCIA Y CALIDAD ================= */
+async function loadCatalogAndLineage() {
+  try {
+    const cat = await fetch('/senda/api/v1/catalog.json').then((r) => r.json());
+    const rows = (cat.capas ?? []).map((c) => `<tr><td><b>${esc(c.id)}</b></td><td>${esc(c.fuente)}</td><td>${esc(c.licencia)}</td><td class="mono">${esc(String(c.sha256).slice(0, 12))}…</td><td><span class="tag obs">OBSERVADO</span></td><td>${c.elementos}</td></tr>`).join('');
+    $('#src-catalog').innerHTML = `<table class="tbl"><thead><tr><th>Capa</th><th>Fuente</th><th>Licencia</th><th>SHA-256</th><th>Clase</th><th>Reg.</th></tr></thead><tbody>${rows}</tbody></table>`;
+  } catch {
+    $('#src-catalog').innerHTML = '<p class="muted">Catálogo local no disponible en esta ruta.</p>';
+  }
+  runSourceCheck();
+}
+function runSourceCheck() {
+  const a = $('#src-a').value, b = $('#src-b').value;
+  const res = summarizeEvidenceLineage([a, b]).pairs[0];
+  $('#src-indep').innerHTML = `<div class="kv-item"><small>${esc(a)} vs ${esc(b)} · grafo inmutable P0</small><b style="color:${res.independent ? 'var(--e)' : 'var(--a)'}">${res.independent ? 'INDEPENDIENTES EN METADATOS' : 'NO INDEPENDIENTES (' + esc(res.reason) + ')'}</b><span class="muted">${esc(res.details ?? 'declaredGraphOnly=true · externallyAuthenticated=false')}</span></div>`;
+}
+$('#src-check').onclick = runSourceCheck;
+
+/* ================= 6d · COLA OFFLINE DURABLE (IndexedDB) ================= */
+async function renderOfflineQueue() {
+  const online = typeof navigator !== 'undefined' ? navigator.onLine : false;
+  const swReady = 'serviceWorker' in navigator && !!(await navigator.serviceWorker.getRegistration().catch(() => null));
+  $('#net-badge').textContent = `${online ? 'RED PRESENTE (simulación local)' : 'MODO OFFLINE ACTIVO'} · SW ${swReady ? 'ACTIVO' : 'NO REGISTRADO'}`;
+  const items = await listOfflineQueue(Date.now());
+  $('#conn-stats').innerHTML = `
+    <div class="kv-item"><small>Conectividad navegador</small><b>${online ? 'ONLINE (no requerido)' : 'OFFLINE'}</b></div>
+    <div class="kv-item"><small>Elementos en cola IndexedDB</small><b>${items.length}</b></div>
+    <div class="kv-item"><small>Pendientes / Tumbas REVOKED</small><b>${items.filter((x) => x.status === 'PENDING').length} / ${items.filter((x) => x.status === 'REVOKED').length}</b></div>`;
+  if (!items.length) {
+    $('#q-list').innerHTML = '<p class="muted">Cola offline vacía. Pulsa «Encolar mensaje de ejercicio» para probar persistencia tras recarga y revocación.</p>';
+    return;
+  }
+  $('#q-list').innerHTML = `<table class="tbl"><thead><tr><th>ID</th><th>Estado</th><th>Carga</th><th>Acciones</th></tr></thead><tbody>` +
+    items.slice().reverse().slice(0, 8).map((it) => `<tr>
+      <td class="mono">${esc(it.id)}</td>
+      <td><span class="wf-pill">${esc(it.status)}</span></td>
+      <td class="mono">${it.payload ? esc(String(it.payload).slice(0, 28)) : '<i>[purgado]</i>'}</td>
+      <td>${it.status === 'PENDING' ? `<button class="btn" data-qack="${esc(it.id)}">ACK</button> <button class="btn warn" data-qrev="${esc(it.id)}">Revocar</button>` : '—'}</td>
+    </tr>`).join('') + '</tbody></table>';
+  for (const b of $('#q-list').querySelectorAll('button[data-qack]')) {
+    b.onclick = async () => { await ackOfflineItem(b.dataset.qack); await logAudit('OPERADOR', 'OFFLINE_ITEM_ACK', { id: b.dataset.qack }); await renderOfflineQueue(); };
+  }
+  for (const b of $('#q-list').querySelectorAll('button[data-qrev]')) {
+    b.onclick = async () => { await revokeConsentTombstone(b.dataset.qrev); await logAudit('CIUDADANO', 'CONSENT_REVOKED_TOMBSTONE', { id: b.dataset.qrev }); await renderOfflineQueue(); };
+  }
+}
+$('#q-add').onclick = async () => {
+  const id = `EX-${Date.now().toString(36).toUpperCase()}`;
+  await enqueueOfflineItem({ id, kind: 'EXERCISE_CHECKIN', payload: `Ejercicio local ${id}`, ttlMs: 120_000, consented: true });
+  await logAudit('CIUDADANO', 'OFFLINE_ITEM_QUEUED', { id });
+  await renderOfflineQueue();
+};
+$('#q-ttl').onclick = async () => {
+  const r = await sweepExpiredQueue(Date.now());
+  await logAudit('SISTEMA', 'OFFLINE_TTL_SWEEP', { expiredCount: r.expiredCount });
+  await renderOfflineQueue();
+};
+window.addEventListener('online', renderOfflineQueue);
+window.addEventListener('offline', renderOfflineQueue);
+
+/* ================= 6e · ROLES Y OPERACIÓN FIRMADA ================= */
+function updateRoleBanner() {
+  OPS.role = $('#role-select').value;
+  const canSign = OPS.role === 'COORDINADOR_INCIDENTE';
+  $('#role-status').innerHTML = `<div class="kv-item"><small>Autorización activa</small><b style="color:${canSign ? 'var(--e)' : 'var(--r)'}">${esc(OPS.role)} · ${canSign ? 'PUEDE FIRMAR EJERCICIOS (CAP Actual bloqueado)' : 'BLOQUEADO FAIL-CLOSED (no firma órdenes)'}</b></div>`;
+}
+$('#role-select').onchange = async () => { updateRoleBanner(); await logAudit('SISTEMA', 'ROLE_SWITCHED', { role: OPS.role }); };
+
+function renderLearning(zone, L1) {
+  const st = OPS.store, avail = SHOWN.map((id) => ({ id }));
+  const tiles = zone.map((z) => {
+    const nm = L.towns.find((t) => t.id === z).name, rows = SHOWN.filter((id) => L1.summary[z]?.[id]).map((id) => {
+      const r = st.getReliability(id, z, 'WILDFIRE'), cat = BEARERS[id].p, col = r.mean > 0.6 ? 'var(--e)' : r.mean > 0.3 ? 'var(--a)' : 'var(--r)';
+      return `<div class="lr"><span>${esc(id)}</span><span class="tr"><i style="width:${(100 * r.mean).toFixed(1)}%;background:${col}"></i><u style="left:${(100 * cat).toFixed(1)}%" title="catálogo"></u></span><span>${(100 * r.mean).toFixed(0)} % <small style="color:var(--m)">n=${r.sampleCount}</small></span></div>`;
+    }).join('');
+    const after = planAssuredDelivery(220, avail, { scenarios: { X: { prob: 1 } }, effort: 'fast', budgetEUR: 0, reliabilityStore: st, zoneH3: z, hazardState: 'WILDFIRE' });
+    return `<div class="t"><b>${esc(nm)}</b>${rows}<p class="muted" style="margin:6px 0 0;font-size:12px">Plan aprendido: ${after.k}/${after.n} fragmentos · p=${(100 * (after.pDelivery ?? 0)).toFixed(1)} % (cota optimista)</p></div>`;
+  }).join('');
+  $('#learn-out').innerHTML = `<h3 style="margin:14px 0 4px;font-size:14px">Aprendizaje SENDA-CAL <span class="tag live">CRDT</span></h3><div class="learn">${tiles}</div><div class="rowb"><button class="btn" id="dl-learn">Exportar aprendizaje (JSON)</button></div>`;
+  $('#dl-learn').onclick = () => dl('senda-aprendizaje.json', JSON.stringify(st.toJSON(), null, 1), 'application/json');
+}
+
+const LABEL = { ACCEPTED: 'acepta y actúa', NOT_DELIVERED: 'no le llega', NO_OWNER_CONSENT: 'sin consentimiento', NO_DECLARED_ZONE: 'fuera de zona', REPLAY: 'repetición', EXPIRED: 'caducada', BAD_SIGNATURE: 'firma alterada', CREDENTIAL_UNKNOWN_ORG: 'organismo desconocido', KEY_NOT_BOUND_TO_CREDENTIAL: 'clave no ligada', NOT_A_COORDINATOR: 'no es coordinador' };
+const reasonsHtml = (r) => `<div class="reasons">${Object.entries(r).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<span class="${k === 'ACCEPTED' ? 'ok' : /CREDENTIAL|KEY|SIGNATURE|REPLAY|EXPIRED|COORDINATOR/.test(k) ? 'bad' : 'no'}">${v} · ${LABEL[k] ?? k}</span>`).join('')}</div>`;
+const channelsFor = (ph) => {
+  const myTowersUp = L.towers.filter((t) => t.serves.includes(ph.townId) && S.now < S.lossAt[t.id]).length;
+  return channelState().filter((c) => c.alive).map((c) => ({ id: c.id, p: BEARERS[c.id].family === 'TERRESTRIAL' ? (myTowersUp ? c.p : 0) : c.p }));
+};
+const pDeliverFor = (ph) => { let miss = 1; for (const c of channelsFor(ph)) miss *= 1 - c.p; return 1 - miss; };
+
+async function runOrder() {
+  const out = $('#ops-out');
+  if (OPS.role !== 'COORDINADOR_INCIDENTE') {
+    await logAudit(OPS.role, 'ORDER_BLOCKED_ROLE_UNAUTHORIZED', { role: OPS.role });
+    out.innerHTML = `<p style="color:var(--r)"><b>BLOQUEADO FAIL-CLOSED:</b> el rol <code>${esc(OPS.role)}</code> no está autorizado para firmar órdenes de zona.</p>`;
+    return;
+  }
+  const btn = $('#ops-go'); btn.disabled = true; const t0 = performance.now();
+  try {
+    const risk = S.assets.filter((a) => Number.isFinite(a.arrivalMin) && S.now < a.arrivalMin), zone = (risk.length ? risk : S.assets.slice(0, 1)).map((a) => a.id);
+    const names = zone.map((id) => L.towns.find((t) => t.id === id).name), now = Date.now(); OPS.n++;
+    const cmd = await issueZoneOrder(OPS.ctx, { zone, message: `Ejercicio preventivo en ${names.join(' y ')}.`, now, actions: ['SIREN', 'REPORT_STATUS', 'BLE_BEACON'] });
+    const d = await deliverOrder(OPS.ctx, cmd, OPS.phones, { now, channelsOf: channelsFor, seed: 100 + OPS.n });
+    const c = await collectResponses(OPS.ctx, cmd, OPS.phones, d, { now, pReturn: pDeliverFor, seed: 200 + OPS.n });
+    const L1 = await learnFromDelivery(OPS.ctx, OPS.store, cmd, d, { now, hazardState: 'WILDFIRE' });
+    const rep = await situationReport(OPS.ctx, cmd, c.board, { now: now + 600_000, areaDesc: names.join(', '), exercise: true });
+    await logAudit(OPS.ctx.credential.subject.slice(0, 12), 'ZONE_ORDER_AND_CAP_EXERCISE', { cmdId: cmd.id, zone, accepted: d.reasons.ACCEPTED ?? 0, capSha256: rep.capSha256.slice(0, 16) });
+    const per = {}; for (const r of c.responses) { const p = (per[r.townId] ??= { SAFE: 0, NEED_HELP: 0, TRAPPED: 0, NO_RESPONSE: 0, AWAY: 0 }); p[r.status]++; }
+    const rows = zone.map((id) => { const p = per[id] ?? {}, nm = L.towns.find((t) => t.id === id).name; return `<div class="ops-row"><span>${esc(nm)}</span><b style="color:var(--e)">${p.SAFE ?? 0}</b><b style="color:var(--a)">${p.NEED_HELP ?? 0}</b><b style="color:var(--r)">${p.TRAPPED ?? 0}</b><b style="color:var(--m)">${p.NO_RESPONSE ?? 0}</b></div>`; }).join('');
+    out.innerHTML = `<p class="muted" style="margin:12px 0 4px">Orden <span class="mono">${esc(cmd.id.slice(0, 10))}…</span> · ${OPS.phones.length} teléfonos evaluados en ${Math.round(performance.now() - t0)} ms</p>${reasonsHtml(d.reasons)}
+      <div class="table-scroll"><div class="ops-row h"><span>Pueblo</span><span class="c">a salvo</span><span class="c">ayuda</span><span class="c">atrapados</span><span class="c">sin resp.</span></div>${rows}</div>
+      <div class="chain">Auditoría de orden: ${rep.audit.length} entradas · cadena <b>${rep.auditCheck.ok ? 'verificada' : 'ROTA'}</b> · CAP SHA-256 ${rep.capSha256.slice(0, 20)}…</div>
+      <div class="rowb"><button class="btn" id="dl-cap">Descargar parte CAP 1.2 (Exercise)</button><button class="btn" id="dl-audit">Descargar auditoría</button></div>`;
+    $('#dl-cap').onclick = () => dl(`senda-parte-${cmd.id.slice(0, 8)}.xml`, rep.cap, 'application/xml');
+    $('#dl-audit').onclick = () => dl(`senda-auditoria-${cmd.id.slice(0, 8)}.json`, JSON.stringify(rep.audit, null, 1), 'application/json');
+    renderLearning(zone, L1);
+    window.SENDA_CENTRO.lastOps = { reasons: d.reasons, totals: c.board.totals, auditOk: rep.auditCheck.ok, cap: rep.cap, learned: L1.summary, audit: rep.audit.map((e) => e.action) };
+  } catch (e) { out.innerHTML = `<p style="color:var(--r)">${esc(e.message)}</p>`; }
+  btn.disabled = false;
+}
+
+async function runForged() {
+  const out = $('#ops-out'), now = Date.now();
+  const rogue = await createOrganization({ id: 'IMPOSTOR', name: 'Organismo falso', kind: 'CIVIL_PROTECTION' }), keys = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
+  const cred = await issueCredential(rogue, { subject: await keyThumb(await crypto.subtle.exportKey('jwk', keys.publicKey)), role: 'COORDINADOR_INCIDENTE', unit: 'x', validFrom: now - 1, validUntil: now + 3600_000 });
+  const zone = L.towns.map((t) => t.id), forged = await signCommand({ issuerKeys: keys, credential: cred, target: { zone }, actions: ['SIREN'], message: 'Evacuad ya (falso)', now, kind: 'ALERT' });
+  const d = await deliverOrder(OPS.ctx, forged, OPS.phones, { now, pDeliver: () => 1, seed: 9 });
+  await logAudit('IMPOSTOR', 'FORGED_ORDER_REJECTED', d.reasons);
+  out.innerHTML = `<p class="muted" style="margin:12px 0 4px">Orden firmada por clave no anclada:</p>${reasonsHtml(d.reasons)}<p class="muted" style="margin:0">${d.reasons.ACCEPTED ? '⚠ aceptada' : 'Ningún teléfono la ejecuta: sin ancla de confianza no hay orden.'}</p>`;
+  window.SENDA_CENTRO.lastForged = d.reasons;
+}
+
+/* ================= 6f · RECEPCIÓN, REVISIÓN Y CIERRE DE REPORTES CIUDADANOS ================= */
+function renderCitizenWorkflow(q, cl, stats) {
+  const out = $('#cit-out');
+  for (const a of q.queue) {
+    if (!WORKFLOW.has(a.id)) {
+      WORKFLOW.set(a.id, { id: a.id, kind: cl.find((x) => x.id === a.id)?.reports[0]?.kind ?? 'UNKNOWN', state: 'DETECTADO', updatedAt: Date.now() });
+    }
+  }
+  out.innerHTML = `<p class="muted" style="margin:12px 0 4px">${stats.valid} líneas válidas (${stats.dups} repetidas) · ${stats.rejected} rechazadas · ${q.incidents} incidente(s) · <b>canPublicWarn=false</b></p>
+    <div class="table-scroll"><div class="ops-row h"><span>Incidente / Flujo</span><span class="c">modelo</span><span class="c">pers.</span><span class="c">atrap.</span><span class="c">CAP / Revisión</span></div>` +
+    q.queue.map((a) => {
+      const c = cl.find((x) => x.id === a.id), wf = WORKFLOW.get(a.id);
+      return `<div class="ops-row">
+        <span><b>${esc(HAZARD_KINDS[c.reports[0].kind].label)}</b> <span class="wf-pill">${esc(wf.state)}</span><br><small class="muted">${esc(a.why.join(' · '))}</small></span>
+        <b>${a.state}</b><b>${a.reporters}</b><b style="color:${a.trapped ? 'var(--r)' : 'var(--m)'}">${a.trapped}</b>
+        <span class="c" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center">
+          <button class="btn" data-cap="${a.id}">XML</button>
+          <button class="btn" data-wf="${a.id}" data-next="COMPROBANDO">Comprobar</button>
+          <button class="btn" data-wf="${a.id}" data-next="CLASIFICADO">Clasificar</button>
+          <button class="btn" data-wf="${a.id}" data-next="CERRADO_EJERCICIO">Cerrar</button>
+        </span>
+      </div>`;
+    }).join('') + `</div>
+    <p class="muted" style="margin:8px 0 0">Razones de verosimilitud sin calibrar. Parte CAP 1.2 restringido y marcado como ejercicio hasta convenio institucional.</p>`;
+
+  for (const b of out.querySelectorAll('button[data-cap]')) {
+    b.onclick = async () => {
+      const a = q.queue.find((x) => x.id === b.dataset.cap), c = cl.find((x) => x.id === a.id);
+      const xml = incidentToCap(a, c, { now: Date.now(), exercise: true });
+      await logAudit(OPS.role, 'CITIZEN_CAP_EXERCISE_EXPORT', { incidentId: a.id });
+      dl(`senda-${a.id}.cap.xml`, xml, 'application/xml');
+    };
+  }
+  for (const b of out.querySelectorAll('button[data-wf]')) {
+    b.onclick = async () => {
+      const wf = WORKFLOW.get(b.dataset.wf);
+      if (wf) {
+        wf.state = b.dataset.next; wf.updatedAt = Date.now();
+        await logAudit(OPS.role, `INCIDENT_${b.dataset.next}`, { incidentId: wf.id });
+        renderCitizenWorkflow(q, cl, stats);
+      }
+    };
+  }
+}
+
+$('#cit-sample').onclick = async () => {
+  const now = Date.now();
+  const k1 = await createReporterKeys(), k2 = await createReporterKeys();
+  const l1 = await encodeReport({ kind: 'STREET_FLOODED', lat: 39.4269, lon: -0.4174, at: now - 120_000, people: { trapped: 0, injured: 0 } }, k1);
+  const l2 = await encodeReport({ kind: 'PERSON_TRAPPED', lat: 39.4402, lon: -0.4190, at: now - 60_000, people: { trapped: 2, injured: 0 } }, k2);
+  $('#cit-in').value = `${l1}\n${l2}`;
+  $('#cit-go').click();
+};
+
+$('#cit-go').onclick = async () => {
+  const out = $('#cit-out'), { reports, rejected } = await decodeReports($('#cit-in').value);
+  if (!reports.length) { out.innerHTML = `<p class="muted">Ninguna línea válida${rejected.length ? ` (${rejected.length} rechazada(s): firma o formato)` : ''}.</p>`; return; }
+  const seen = new Set(), uniq = reports.filter((r) => { const k = `${r.deviceId}|${r.kind}|${r.at}|${r.lat}|${r.lon}`; if (seen.has(k)) return false; seen.add(k); return true; });
+  const cl = clusterReports(uniq), q = triageQueue(cl.map((c) => assessIncident(c)), cl);
+  renderCitizenWorkflow(q, cl, { valid: reports.length, dups: reports.length - uniq.length, rejected: rejected.length });
+  await logAudit(OPS.role, 'CITIZEN_BATCH_TRIAGED', { valid: reports.length, rejected: rejected.length, incidents: q.incidents });
+  window.SENDA_CENTRO.lastCitizen = { valid: reports.length, rejected: rejected.length, incidents: q.incidents, top: q.queue[0]?.family };
+};
+
+/* ================= 6g · INCERTIDUMBRE, LÍMITES Y PAQUETE DE EVIDENCIAS ================= */
+function renderLimitsPanel() {
+  const h2 = assessForecastSkillGate({ modelId: 'H2', modelBrier: 0.145, persistenceBrier: 0.102, biasPp: -7.0, heldOutUnits: 36, operationalFieldValidated: false });
+  const audit = auditAssuranceAgainstUncertainHazards({
+    states: [
+      { id: 'NOMINAL', lowerMass: 0.5, upperMass: 0.9, nominalMass: 0.7, hazard: { family: { TERRESTRIAL: 0.9 }, rainMmH: 5 } },
+      { id: 'TORMENTA_APAGON', lowerMass: 0.1, upperMass: 0.5, nominalMass: 0.3, hazard: { family: { TERRESTRIAL: 0.2 }, rainMmH: Math.max(10, rainNow()) } },
+    ],
+    plans: [
+      { id: 'C_MIXTO', consentDeclared: true, linkAuthorizedDeclared: true, costEUR: 0, energyMj: 40, k: 2, groups: [{ id: 'MESHTASTIC', p: 0.72, shards: 2 }, { id: 'SAT_D2C_SMS', p: 0.65, shards: 1 }] },
+      { id: 'C_SOLO_CELL', consentDeclared: true, linkAuthorizedDeclared: true, costEUR: 0, energyMj: 20, k: 1, groups: [{ id: 'CELL_DATA', p: 0.95, shards: 1 }] },
+    ],
+  });
+  const best = audit.evaluations?.find((e) => e.id === audit.selectedId) ?? audit.evaluations?.[0];
+  const opt = S.plan?.pDelivery != null ? (100 * S.plan.pDelivery).toFixed(1) + ' %' : '—';
+  const rob = best?.robustLower != null ? (100 * best.robustLower).toFixed(1) + ' %' : '—';
+  const nom = best?.nominalConditional != null ? (100 * best.nominalConditional).toFixed(1) + ' %' : '—';
+  window.SENDA_CENTRO.uncertainty = { h2Status: h2.status, optimisticCatalog: opt, robustWorstLower: rob, nominalConditional: nom, selectedId: audit.selectedId };
+  $('#limits-panel').innerHTML = `
+    <div class="kv-grid">
+      <div class="kv-item"><small>Plan catálogo (independencia)</small><b>${opt}</b></div>
+      <div class="kv-item"><small>Cota robusta H11 (peor caso)</small><b style="color:var(--a)">${rob}</b></div>
+      <div class="kv-item"><small>Pronóstico avance H2</small><b style="color:var(--r)">${esc(h2.status)}</b></div>
+      <div class="kv-item"><small>Ensayos físicos 2 Android + 2 LoRa</small><b style="color:var(--r)">0 realizados (pendiente)</b></div>
+    </div>
+    <p class="muted" style="margin:10px 0 0">${esc(h2.warning)} Sin convenio 112 ni certificación CE/RED de campaña.</p>`;
+}
+
+$('#dl-evidence-bundle').onclick = async () => {
+  const entries = OPS.audit ? OPS.audit.entries() : [];
+  const chk = OPS.audit ? await verifyAuditLog(entries) : { ok: false };
+  const bundle = {
+    schema: 'senda-evidence-bundle/v1',
+    generatedAtUtc: new Date().toISOString(),
+    environment: 'EXERCISE_AND_SIMULATION_ONLY',
+    canPublicWarn: false,
+    physicalTrialsCompleted: 0,
+    institutionalAgreements: 0,
+    auditIntegrity: chk,
+    auditEntries: entries,
+    workflowStates: [...WORKFLOW.values()],
+    offlineQueue: await listOfflineQueue(Date.now()),
+    uncertainty: window.SENDA_CENTRO.uncertainty ?? null,
+  };
+  dl(`senda-evidencias-${Date.now()}.json`, JSON.stringify(bundle, null, 2), 'application/json');
+};
+
+/* ================= 7 · BUCLE ================= */
+let last = 0;
+function frame(ts) {
+  const dt = last ? Math.min(0.1, (ts - last) / 1000) : 0; last = ts;
+  if (S.playing) S.now = Math.min(720, S.now + dt * S.speed);
+  draw(); if (Math.floor(ts / 250) !== Math.floor((ts - dt * 1000) / 250)) { panels(); renderPhone(); }
+  requestAnimationFrame(frame);
+}
+function start() {
+  panels(); renderPhone(); updateRoleBanner(); evaluateSrlgScenario(); loadCatalogAndLineage(); renderOfflineQueue(); renderLimitsPanel();
+  requestAnimationFrame(frame);
+}
+cv.addEventListener('click', (e) => { const r = cv.getBoundingClientRect(); S.ign = { x: Math.floor(((e.clientX - r.left) / r.width) * G.w), y: Math.floor(((e.clientY - r.top) / r.height) * G.h) }; S.now = 0; phoneState = null; compute(); panels(); });
+for (const id of ['wind', 'dir', 'rain']) $('#' + id).addEventListener('input', (e) => { const v = +e.target.value; if (id === 'wind') { S.wind = v; $('#v-wind').textContent = v + ' km/h'; } if (id === 'dir') { S.dir = v; $('#v-dir').textContent = v + '°'; } if (id === 'rain') { S.rainMax = v; $('#v-rain').textContent = v + ' mm/h'; S.planKey = ''; } if (id !== 'rain') compute(); panels(); });
+$('#play').onclick = () => { S.playing = !S.playing; $('#play').textContent = S.playing ? '❚❚' : '▶'; };
+$('#reset').onclick = () => { S.now = 0; phoneState = null; $('#pipe').innerHTML = ''; panels(); };
+$('#speed').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.speed = +b.dataset.v; for (const x of $('#speed').children) x.classList.toggle('on', x === b); };
+$('#send').onclick = sendAlert;
+$('#ops-go').onclick = runOrder; $('#ops-forge').onclick = runForged;
+$('#br-go').onclick = () => {
+  const sc = syntheticPolarizedScenario(), st = bridgingStatus(fitBridging(sc.ratings)), maj = majorityStatus(sc.ratings), L2 = { inundacion: '«Calle inundada» (dos grupos)', bulo: '«Puente caído» (un solo grupo)' };
+  const S2 = { CONFIRMADO_CONSENSO_AMPLIO: 'confirmado', SIN_CONSENSO: 'sin consenso', DESMENTIDO: 'desmentido', POCAS_VALORACIONES: 'pocas valoraciones' };
+  $('#br-out').innerHTML = `<div class="ops-row h"><span>Reporte (SIMULACIÓN)</span><span class="c">mayoría</span><span class="c">consenso amplio</span><span class="c">intercepto</span><span class="c">factor</span></div>` +
+    sc.focus.map((id) => `<div class="ops-row"><span>${L2[id]}</span><b>${maj[id].status === 'MAYORIA_SI' ? 'sí (' + Math.round(100 * maj[id].share) + ' %)' : 'no'}</b><b style="color:${st[id].status === 'CONFIRMADO_CONSENSO_AMPLIO' ? 'var(--e)' : 'var(--a)'}">${S2[st[id].status]}</b><b>${st[id].intercept.toFixed(2)}</b><b>${st[id].factor.toFixed(2)}</b></div>`).join('') +
+    `<p class="muted" style="margin:8px 0 0">Umbral original: intercepto ≥ 0,40 con ≥ 5 valoraciones. Escenario sintético.</p>`;
+  window.SENDA_CENTRO.lastBridge = Object.fromEntries(sc.focus.map((id) => [id, { majority: maj[id].status, bridging: st[id].status }]));
+};
+window.SENDA_CENTRO = S;
+boot();
+</script>
+</body>
+</html>

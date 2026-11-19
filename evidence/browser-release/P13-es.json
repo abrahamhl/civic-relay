@@ -2,7 +2,7 @@
   "id": "P13",
   "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
   "sha": "LOCAL",
-  "timestamp_utc": "2026-10-24T23:54:44.153Z",
+  "timestamp_utc": "2026-11-19T00:22:08.485Z",
   "locale": "es",
   "viewport": {
     "width": 320,
@@ -37,14 +37,30 @@
     "lang": "es",
     "title": "¿QUÉ ES OEP? | Coordinación de emergencias offline y enrutamiento adaptativo",
     "headings": [
+      "Cuando cae la red, el mensaje sigue su camino.",
       "CUANDO LAREDSE APAGA."
     ],
     "canonical": "https://civic-relay-investor.vercel.app/es/",
-    "disclaimers": 31,
+    "disclaimers": 39,
     "eightStage": true,
     "obsoleteLinks": [],
+    "editorial": {
+      "cards": 3,
+      "diagrams": 3,
+      "width": 320,
+      "problems": [],
+      "caption": true
+    },
     "pageErrors": [],
-    "consoleErrors": []
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
   },
   "verdict": "PASS"
 }

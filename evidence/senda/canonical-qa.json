@@ -1,0 +1,157 @@
+{
+  "ranAt": "2026-11-17T09:18:02.649Z",
+  "pass": 28,
+  "total": 28,
+  "results": [
+    {
+      "name": "offline SW: todos los activos declarados en senda-sw.js existen en disco",
+      "ok": true,
+      "total": 210,
+      "missingAssets": []
+    },
+    {
+      "name": "responsive /centro @ 320px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 320,
+      "innerW": 320
+    },
+    {
+      "name": "responsive /visor @ 320px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 320,
+      "innerW": 320
+    },
+    {
+      "name": "responsive /atlas @ 320px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 320,
+      "innerW": 320
+    },
+    {
+      "name": "responsive /centro @ 360px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 360,
+      "innerW": 360
+    },
+    {
+      "name": "responsive /visor @ 360px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 360,
+      "innerW": 360
+    },
+    {
+      "name": "responsive /atlas @ 360px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 360,
+      "innerW": 360
+    },
+    {
+      "name": "responsive /centro @ 390px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 390,
+      "innerW": 390
+    },
+    {
+      "name": "responsive /visor @ 390px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 390,
+      "innerW": 390
+    },
+    {
+      "name": "responsive /atlas @ 390px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 390,
+      "innerW": 390
+    },
+    {
+      "name": "responsive /centro @ 768px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 768,
+      "innerW": 768
+    },
+    {
+      "name": "responsive /visor @ 768px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 768,
+      "innerW": 768
+    },
+    {
+      "name": "responsive /atlas @ 768px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 768,
+      "innerW": 768
+    },
+    {
+      "name": "responsive /centro @ 1440px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 1440,
+      "innerW": 1440
+    },
+    {
+      "name": "responsive /visor @ 1440px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 1440,
+      "innerW": 1440
+    },
+    {
+      "name": "responsive /atlas @ 1440px: sin scroll horizontal",
+      "ok": true,
+      "scrollW": 1440,
+      "innerW": 1440
+    },
+    {
+      "name": "centro: cambio de idioma ES/EN/NL operativo",
+      "ok": true,
+      "enSub": "COORDINATION CENTRE",
+      "nlSub": "COÖRDINATIECENTRUM"
+    },
+    {
+      "name": "centro offline IndexedDB: sobrevive recarga y revocación borra carga dejando tumba REVOKED",
+      "ok": true
+    },
+    {
+      "name": "centro SRLG: rechaza enlaces pasivos/sin consentimiento fail-closed",
+      "ok": true
+    },
+    {
+      "name": "centro procedencia: GDACS_EQ + USGS_NEIC detectado como no independiente",
+      "ok": true
+    },
+    {
+      "name": "centro reportes: flujo Detectar→Comprobar→Cerrar sin aviso público automático",
+      "ok": true
+    },
+    {
+      "name": "centro roles: OBSERVADOR bloqueado fail-closed al intentar firmar orden",
+      "ok": true
+    },
+    {
+      "name": "centro auditoría: paquete de evidencias JSON con cadena SHA-256 verificada y canPublicWarn=false",
+      "ok": true
+    },
+    {
+      "name": "visor 4D: muestra puerta H2 EXPERIMENTAL_REJECTED con canPublicWarn=false",
+      "ok": true
+    },
+    {
+      "name": "visor 4D: vista 3D + ejecución de mundo compara ARR, ablación, CGR y epidémico",
+      "ok": true
+    },
+    {
+      "name": "visor 4D: muestra contrato P4 ABSTAIN/SIMULATION_OR_EXERCISE_ONLY, DAG H-FUS-1 y H-FIRE-B DATASET_BLOCKED",
+      "ok": true
+    },
+    {
+      "name": "fuego3d sin WebGL: degrada limpiamente a fallback Canvas 2D sin colapsar",
+      "ok": true,
+      "errors": [],
+      "fallback2d": true
+    },
+    {
+      "name": "cero errores JS no capturados en todas las pantallas y resoluciones",
+      "ok": true,
+      "pageErrors": []
+    }
+  ],
+  "pageErrors": []
+}

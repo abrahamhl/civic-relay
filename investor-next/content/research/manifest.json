@@ -1,0 +1,182 @@
+{
+  "schema": "senda-research-manifest/1",
+  "site": "https://civic-relay-investor.vercel.app",
+  "license": "MIT",
+  "note": "Technical reports, not peer reviewed. Hashes cover the listed files.",
+  "bundleDigest": "4c0f0e3498feac618c2fa2502a59a8545adbc98f75e0bf5f1f1916aa8f839f66",
+  "papers": [
+    {
+      "slug": "tr-2026-01-proof-carrying-inference",
+      "report": "SENDA-TR-2026-01",
+      "title": "Proof-Carrying Inference for Offline Emergency Software",
+      "subtitle": "A checkable evidence envelope for numerical claims",
+      "authors": [
+        "Abraham Haddioui"
+      ],
+      "date": "2026-11-07",
+      "version": "1.0",
+      "status": "Technical report · not peer reviewed",
+      "license": "MIT",
+      "tags": [
+        "verification",
+        "provenance",
+        "offline systems",
+        "emergency software"
+      ],
+      "abstract": {
+        "en": "PCI v0.1 is a small JSON envelope that binds a displayed number to its inputs, method, tolerances, provenance class, limitations and a SHA-256 seal. A verifier checks the structure, digests, display rule and provenance offline; an optional ECDSA P-256 signature adds signer binding. The report states what the envelope proves and what it does not, including a proof that a valid seal does not prove execution, and a cross-runtime result for upper-bound displays.",
+        "es": "PCI v0.1 es un sobre JSON pequeño que vincula un número mostrado con sus entradas, método, tolerancias, clase de procedencia, límites y un sello SHA-256. Un verificador comprueba estructura, digests, regla de visualización y procedencia sin red; una firma ECDSA P-256 opcional añade vinculación de firmante. El informe declara qué prueba el sobre y qué no, incluye una prueba de que un sello válido no prueba ejecución, y un resultado de determinismo entre runtimes para displays de cota superior.",
+        "nl": "PCI v0.1 is een kleine JSON-envelop die een getoond getal bindt aan invoer, methode, toleranties, herkomstklasse, beperkingen en een SHA-256-zegel. Een verifier controleert structuur, digests, weergaveregel en herkomst offline; een optionele ECDSA P-256-handtekening bindt de ondertekenaar. Het rapport zegt wat de envelop bewijst en niet bewijst, inclusief een bewijs dat een geldig zegel geen uitvoering bewijst, en een cross-runtime-resultaat voor bovengrensweergaven."
+      },
+      "html": "/research/tr-2026-01-proof-carrying-inference.html",
+      "pdf": "/research/tr-2026-01-proof-carrying-inference.pdf",
+      "markdown": "/research/source/tr-2026-01-proof-carrying-inference.md",
+      "bibtex": "/research/tr-2026-01-proof-carrying-inference.bib",
+      "files": [
+        {
+          "path": "/research/tr-2026-01-proof-carrying-inference.html",
+          "bytes": 64419,
+          "sha256": "bd59d995894fbb1c0c9ab36244cd7b0689e05bb2012e25790a7f442225970962"
+        },
+        {
+          "path": "/research/source/tr-2026-01-proof-carrying-inference.md",
+          "bytes": 19198,
+          "sha256": "e503955418fff70637647c1a9f273ab452ada131e979fd15f3175cfc9c4f2c0b"
+        },
+        {
+          "path": "/research/tr-2026-01-proof-carrying-inference.bib",
+          "bytes": 593,
+          "sha256": "b10c8b495a69c1da770a015d54a54dcc8721b48557ead98ec96c3d4e652067f2"
+        },
+        {
+          "path": "/research/tr-2026-01-proof-carrying-inference.pdf",
+          "bytes": 329532,
+          "sha256": "c40e27e5f4ad6b679fa67fa3853881abf8eb56608620e81f0c90dec5e9bdd3ec"
+        }
+      ]
+    },
+    {
+      "slug": "tr-2026-02-erasure-tails-dtn-bounds",
+      "report": "SENDA-TR-2026-02",
+      "title": "Exact Erasure Tails and Delay Bounds for Store-Carry-Forward Emergency Messaging",
+      "subtitle": "Binomial and Poisson-binomial tails, exponential delay, and conservative bounds",
+      "authors": [
+        "Abraham Haddioui"
+      ],
+      "date": "2026-11-07",
+      "version": "1.0",
+      "status": "Technical report · not peer reviewed",
+      "license": "MIT",
+      "tags": [
+        "erasure coding",
+        "Poisson-binomial",
+        "delay-tolerant networking",
+        "bounds"
+      ],
+      "abstract": {
+        "en": "Offline messaging couples erasure reconstruction with contact delay. This report derives the exact binomial and Poisson-binomial reconstruction tails, the exponential delay distribution for independent relay copies under Poisson contacts, and Chernoff and Hoeffding bounds. Numerical tables quantify the gap between exact tails and bounds and show why mean received shards is not a success probability. The tables are model outputs, not field measurements.",
+        "es": "La mensajería offline acopla la reconstrucción por borrado con el retardo de contacto. Este informe deriva las colas exactas binomial y Poisson-binomial de reconstrucción, la distribución exponencial del retardo para copias independientes bajo contactos Poisson, y las cotas de Chernoff y Hoeffding. Tablas numéricas cuantifican la brecha entre colas exactas y cotas y muestran por qué la media de fragmentos recibidos no es una probabilidad de éxito. Las tablas son salidas de modelo, no mediciones de campo.",
+        "nl": "Offline berichtgeving koppelt erasure-reconstructie aan contactvertraging. Dit rapport leidt de exacte binomiale en Poisson-binomiale reconstructiestraarten af, de exponentiële vertragingsverdeling voor onafhankelijke relaykopieën onder Poisson-contacten, en de grenzen van Chernoff en Hoeffding. Numerieke tabellen kwantificeren de kloof tussen exacte staarten en grenzen en tonen waarom het gemiddelde aantal ontvangen fragmenten geen succeskans is. De tabellen zijn modeluitvoer, geen veldmetingen."
+      },
+      "html": "/research/tr-2026-02-erasure-tails-dtn-bounds.html",
+      "pdf": "/research/tr-2026-02-erasure-tails-dtn-bounds.pdf",
+      "markdown": "/research/source/tr-2026-02-erasure-tails-dtn-bounds.md",
+      "bibtex": "/research/tr-2026-02-erasure-tails-dtn-bounds.bib",
+      "files": [
+        {
+          "path": "/research/tr-2026-02-erasure-tails-dtn-bounds.html",
+          "bytes": 140749,
+          "sha256": "3e2e972949288414f0840bf1dd3f7b5221496b18bce0c9c2c5fa36f810a6f0fb"
+        },
+        {
+          "path": "/research/source/tr-2026-02-erasure-tails-dtn-bounds.md",
+          "bytes": 14641,
+          "sha256": "30fe0fdfd1ea53b2e5bcbdf605da5ce18b51c1031ccb03710182aefeb997aa08"
+        },
+        {
+          "path": "/research/tr-2026-02-erasure-tails-dtn-bounds.bib",
+          "bytes": 616,
+          "sha256": "7b577c74b3ff7ffd5584faf82e76d6c27d98aaea463717d4163f0d650a3a66d7"
+        },
+        {
+          "path": "/research/tr-2026-02-erasure-tails-dtn-bounds.pdf",
+          "bytes": 326945,
+          "sha256": "4322071a24f8cbacfe1a2a69c39dd54082d9b8e7e7c7abb4d4eb5002264086c0"
+        },
+        {
+          "path": "/research/data/tr-2026-02-erasure-tails-dtn-bounds.json",
+          "bytes": 13608,
+          "sha256": "81c7dfbc62a1bda31107a161d8186bce25da0314e2fa71130f16f9f1fa83574f"
+        }
+      ]
+    },
+    {
+      "slug": "tr-2026-03-display-determinism-ode",
+      "report": "SENDA-TR-2026-03",
+      "title": "Display Determinism Across JavaScript Runtimes for Adaptive ODE Solvers",
+      "subtitle": "The SEIR mass-defect case: raw floats differ, the published bound does not",
+      "authors": [
+        "Abraham Haddioui"
+      ],
+      "date": "2026-11-07",
+      "version": "1.0",
+      "status": "Technical report · not peer reviewed",
+      "license": "MIT",
+      "tags": [
+        "adaptive Runge-Kutta",
+        "SEIR",
+        "floating point",
+        "cross-runtime"
+      ],
+      "abstract": {
+        "en": "The same SEIR Dormand-Prince 5(4) module produced different raw mass-conservation errors in Node.js 22.22.2 and Google Chrome 156.0.0.0 (headless) under four settings, while the accepted step count agreed and the upper-bound display '< 1e-9' was identical. We prove why an upper-bound display is deterministic when all raw values lie below the bound, and show that a twelve-decimal fixed display would have differed. The result is a design rule for numerical claims, not a claim of bit-reproducibility.",
+        "es": "El mismo módulo SEIR Dormand-Prince 5(4) produjo errores brutos de conservación de masa distintos en Node.js 22.22.2 y Google Chrome 156.0.0.0 (headless) bajo cuatro configuraciones, mientras que el número de pasos aceptados coincidió y el display de cota superior '< 1e-9' fue idéntico. Probamos por qué un display de cota superior es determinista cuando todos los valores brutos están por debajo de la cota, y mostramos que un display fijo a doce decimales habría diferido. El resultado es una regla de diseño para afirmaciones numéricas, no una afirmación de reproducibilidad bit a bit.",
+        "nl": "Dezelfde SEIR Dormand-Prince 5(4)-module produceerde verschillende ruwe massabehoudsfouten in Node.js 22.22.2 en Google Chrome 156.0.0.0 (headless) onder vier instellingen, terwijl het aantal geaccepteerde stappen overeenkwam en de bovengrensweergave '< 1e-9' identiek was. We bewijzen waarom een bovengrensweergave deterministisch is wanneer alle ruwe waarden onder de grens liggen, en tonen dat een vaste weergave met twaalf decimalen zou verschillen. Het resultaat is een ontwerpregel voor numerieke claims, geen claim van bit-reproduceerbaarheid."
+      },
+      "html": "/research/tr-2026-03-display-determinism-ode.html",
+      "pdf": "/research/tr-2026-03-display-determinism-ode.pdf",
+      "markdown": "/research/source/tr-2026-03-display-determinism-ode.md",
+      "bibtex": "/research/tr-2026-03-display-determinism-ode.bib",
+      "files": [
+        {
+          "path": "/research/tr-2026-03-display-determinism-ode.html",
+          "bytes": 99054,
+          "sha256": "e5878ab0c360e016525a9ccabf47e65d27e30fd40f7541dc035ac3dc4b780004"
+        },
+        {
+          "path": "/research/source/tr-2026-03-display-determinism-ode.md",
+          "bytes": 13624,
+          "sha256": "00401bba53182c9d43fdec3128ff900e8fedbddb80f5eb755178f43d06d5b005"
+        },
+        {
+          "path": "/research/tr-2026-03-display-determinism-ode.bib",
+          "bytes": 600,
+          "sha256": "71f22b481bd93a78fadfb80447d1fac88105ad3b82ce18ae564b3574fd4836db"
+        },
+        {
+          "path": "/research/tr-2026-03-display-determinism-ode.pdf",
+          "bytes": 313595,
+          "sha256": "23b3362cfd46e27bb5c1e84af20141c26dee3711074909a998395d5c0ea5fa2c"
+        },
+        {
+          "path": "/research/data/tr-2026-03-cross-runtime.json",
+          "bytes": 6512,
+          "sha256": "c38eab2e786c19fe12ffc054e955855d471db3b236527406825644581d0b90c8"
+        }
+      ]
+    }
+  ],
+  "data": [
+    {
+      "path": "/research/data/tr-2026-02-erasure-tails-dtn-bounds.json",
+      "bytes": 13608,
+      "sha256": "81c7dfbc62a1bda31107a161d8186bce25da0314e2fa71130f16f9f1fa83574f"
+    },
+    {
+      "path": "/research/data/tr-2026-03-cross-runtime.json",
+      "bytes": 6512,
+      "sha256": "c38eab2e786c19fe12ffc054e955855d471db3b236527406825644581d0b90c8"
+    }
+  ],
+  "bibtex": "/research/senda-research.bib"
+}

@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:10.989
+For engineers who demand technical rigor, SENDA is not a black box: it implements verified physical equations like Al-Hourani air-to-ground links and Deygout diffraction.
+
+2
+00:00:11.339 --> 00:00:23.265
+UAV swarm connectivity is evaluated in real time by calculating the second eigenvalue of the graph Laplacian, mathematically proving that the mobile mesh remains fully connected.
+
+3
+00:00:24.865 --> 00:00:37.665
+The radiofrequency subsystem decodes ASTM F3411 frames across Bluetooth and Wi-Fi, extracting vehicle coordinates, velocity vectors, and the pilot ground control station location.
+
+4
+00:00:38.015 --> 00:00:48.980
+Operators can export flight plans compatible with PX4 and QGroundControl in one click, embedding emergency UAVs as airborne communication relays instantly.
+
+5
+00:00:50.580 --> 00:00:59.988
+Every SENDA subsystem is decoupled into seventy-four zero-dependency core modules, verified by hundreds of automated tests running on every change.
+
+6
+00:01:00.338 --> 00:01:09.447
+Whether developing in TypeScript, Python, or embedded firmware, the API preserves strict mathematical parity so you build on rock-solid foundations.

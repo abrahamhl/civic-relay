@@ -1,0 +1,231 @@
+{
+ "fuente": "TfL JamCams (Powered by TfL Open Data), clips de ≈ 10 s descargados del bucket público el 06-11-2026 a las 00:31 hora de Londres (de noche). Detección YOLOX-s (Apache 2.0) + ByteTrack; sin identificar personas ni matrículas.",
+ "capturaUTC": "2026-11-06T00:31Z",
+ "camaras": [
+  {
+   "camara": "00001.01441",
+   "durS": 10.92,
+   "cruces": 1,
+   "porSentido": {
+    "baja": 0,
+    "sube": 1
+   },
+   "mediaEnImagen": 1.08,
+   "maxEnImagen": 2,
+   "por5s": [
+    0,
+    1,
+    0
+   ],
+   "nombre": "Stamford Hill/Dunsmure Road",
+   "lat": 51.5702,
+   "lon": -0.07297
+  },
+  {
+   "camara": "00001.02158",
+   "durS": 10.48,
+   "cruces": 2,
+   "porSentido": {
+    "baja": 1,
+    "sube": 1
+   },
+   "mediaEnImagen": 1.3,
+   "maxEnImagen": 3,
+   "por5s": [
+    2,
+    0,
+    0
+   ],
+   "nombre": "Romford Rd / Carlton Rd",
+   "lat": 51.5497,
+   "lon": 0.04485
+  },
+  {
+   "camara": "00001.02425",
+   "durS": 10.36,
+   "cruces": 0,
+   "porSentido": {
+    "baja": 0,
+    "sube": 0
+   },
+   "mediaEnImagen": 1.17,
+   "maxEnImagen": 4,
+   "por5s": [
+    0,
+    0,
+    0
+   ],
+   "nombre": "A12 Eastern Avenue/A125 North St",
+   "lat": 51.5865,
+   "lon": 0.17314
+  },
+  {
+   "camara": "00001.03612",
+   "durS": 10.8,
+   "cruces": 0,
+   "porSentido": {
+    "baja": 0,
+    "sube": 0
+   },
+   "mediaEnImagen": 1.99,
+   "maxEnImagen": 4,
+   "por5s": [
+    0,
+    0,
+    0
+   ],
+   "nombre": "St Georges Rd/Hayles St",
+   "lat": 51.4958,
+   "lon": -0.10358
+  },
+  {
+   "camara": "00001.03752",
+   "durS": 10.64,
+   "cruces": 6,
+   "porSentido": {
+    "baja": 4,
+    "sube": 2
+   },
+   "mediaEnImagen": 2.18,
+   "maxEnImagen": 6,
+   "por5s": [
+    0,
+    6,
+    0
+   ],
+   "nombre": "Catford One Way/Rushey Green",
+   "lat": 51.445,
+   "lon": -0.02012
+  },
+  {
+   "camara": "00001.03850",
+   "durS": 11,
+   "cruces": 0,
+   "porSentido": {
+    "baja": 0,
+    "sube": 0
+   },
+   "mediaEnImagen": 2.47,
+   "maxEnImagen": 5,
+   "por5s": [
+    0,
+    0,
+    0
+   ],
+   "nombre": "Walworth Rd/Heygate St",
+   "lat": 51.4918,
+   "lon": -0.09814
+  },
+  {
+   "camara": "00001.04333",
+   "durS": 10.44,
+   "cruces": 2,
+   "porSentido": {
+    "baja": 2,
+    "sube": 0
+   },
+   "mediaEnImagen": 0.71,
+   "maxEnImagen": 3,
+   "por5s": [
+    1,
+    1,
+    0
+   ],
+   "nombre": "Camberwell New Rd/Foxley Rd",
+   "lat": 51.4799,
+   "lon": -0.10755
+  },
+  {
+   "camara": "00001.04516",
+   "durS": 10.92,
+   "cruces": 1,
+   "porSentido": {
+    "baja": 0,
+    "sube": 1
+   },
+   "mediaEnImagen": 1.18,
+   "maxEnImagen": 4,
+   "por5s": [
+    0,
+    1,
+    0
+   ],
+   "nombre": "A23 Streatham H Rd/Greyhound Ln",
+   "lat": 51.422,
+   "lon": -0.12926
+  },
+  {
+   "camara": "00001.04573",
+   "durS": 9.92,
+   "cruces": 0,
+   "porSentido": {
+    "baja": 0,
+    "sube": 0
+   },
+   "mediaEnImagen": 0,
+   "maxEnImagen": 0,
+   "por5s": [
+    0,
+    0
+   ],
+   "nombre": "Brighton Rd A23 Coulsdon Bypass",
+   "lat": 51.3169,
+   "lon": -0.13864
+  },
+  {
+   "camara": "00001.04650",
+   "durS": 9.88,
+   "cruces": 3,
+   "porSentido": {
+    "baja": 3,
+    "sube": 0
+   },
+   "mediaEnImagen": 0.73,
+   "maxEnImagen": 2,
+   "por5s": [
+    1,
+    2
+   ],
+   "nombre": "A3 Clapham Cmon Southside/Long Rd",
+   "lat": 51.4609,
+   "lon": -0.13953
+  },
+  {
+   "camara": "00001.05832",
+   "durS": 9.44,
+   "cruces": 2,
+   "porSentido": {
+    "baja": 2,
+    "sube": 0
+   },
+   "mediaEnImagen": 0.75,
+   "maxEnImagen": 3,
+   "por5s": [
+    1,
+    1
+   ],
+   "nombre": "Fulham BWay Wst of Harwood Rd",
+   "lat": 51.4802,
+   "lon": -0.19601
+  },
+  {
+   "camara": "00001.06590",
+   "durS": 10.36,
+   "cruces": 4,
+   "porSentido": {
+    "baja": 0,
+    "sube": 4
+   },
+   "mediaEnImagen": 7.36,
+   "maxEnImagen": 12,
+   "por5s": [
+    2,
+    2,
+    0
+   ],
+   "nombre": "Strand/Lancaster Place",
+   "lat": 51.5114,
+   "lon": -0.11924
+  }
+ ]
+}

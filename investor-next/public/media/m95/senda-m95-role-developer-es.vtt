@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:10.584
+Para los ingenieros que exigen rigor, SENDA no es una caja negra: implementa formulaciones físicas contrastadas como Al-Hourani para enlaces aéreos y difracción de Deygout.
+
+2
+00:00:10.934 --> 00:00:21.089
+La conectividad de enjambres de drones se evalúa en tiempo real calculando el segundo autovalor del laplaciano de grafos, garantizando que la red móvil nunca sufra particiones.
+
+3
+00:00:22.689 --> 00:00:34.251
+El subsistema de radiofrecuencia decodifica tramas del estándar ASTM F3411 en Bluetooth y wifi, extrayendo posición, vector de velocidad y la ubicación precisa del piloto.
+
+4
+00:00:34.601 --> 00:00:45.311
+Los operadores pueden exportar planes de vuelo compatibles con PX4 y QGroundControl con un solo clic, integrando drones de rescate en mallas de comunicaciones activas.
+
+5
+00:00:46.911 --> 00:00:56.831
+Toda la lógica de SENDA está desacoplada en setenta y cuatro módulos puros sin dependencias circulares, testeados con cientos de pruebas unitarias automatizadas.
+
+6
+00:00:57.181 --> 00:01:07.186
+Tanto si programas en TypeScript, Python o firmware para microcontroladores, la API mantiene consistencia matemática estricta para construir sobre cimientos firmes.

@@ -78,7 +78,7 @@ export const MessageEnvelopeSchema = z.object({
   priority: z.nativeEnum(Priority),
   origin: z.string().trim().min(1), // userId or deviceId
   payloadType: z.nativeEnum(MessageType),
-  payload: z.record(z.unknown()), // Type-specific payload
+  payload: z.record(z.string(), z.unknown()), // Type-specific payload
   approximateLocation: LocationSchema.nullable(),
   ttl: z.number().int().positive().safe(), // seconds
   verificationState: z.nativeEnum(VerificationState),

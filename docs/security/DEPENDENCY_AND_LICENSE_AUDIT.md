@@ -12,7 +12,7 @@
 
 | Package | Declared Version | Scope | License | Purpose |
 |---|---|---|---|---|
-| `next` | `16.4.2` | dependencies | MIT | Static export (`/`, `/es`, `/nl`) |
+| `next` | `16.4.6` | dependencies | MIT | Static export (`/`, `/es`, `/nl`) |
 | `react` | `19.2.0` | dependencies | MIT | UI rendering |
 | `react-dom` | `19.2.0` | dependencies | MIT | DOM rendering / static HTML |
 | `three` | `0.180.0` | dependencies | MIT | Scroll globe and 3D building scene |
@@ -63,3 +63,16 @@ Note: third-party actions in civic-relay workflows are pinned by tag (`@v4`), no
 The new CI vulnerability gate `npm audit --omit=dev --audit-level=high` flagged `next@16.3.6` as affected by high-severity GitHub advisories (including `GHSA-3w37-wq28-93x7`, `GHSA-mcj8-r9mp-w47p` and `GHSA-cjq9-62q9-8jv4`). The audit recommended `next@16.4.2` as the patched version. We updated the direct pinned dependency to that version. **This is not marked remediated until the same check is green on the final PR SHA.** The workflow also generates a CycloneDX SBOM artefact for the actual installed production dependency graph.
 
 **PR #9 correction:** An exact npm v3 lockfile is now committed at `investor-next/package-lock.json`, recovered from a successful GitHub Actions clean install (70 packages, Next.js 16.4.2). The investor, simulation and Chromium build workflows use `npm ci` to reject manifest/lock inconsistencies and keep transitive resolutions fixed. Verify all exact-head workflows before treating this release as green. The Android Gradle dependency and external JavaScript test tooling still have separate dependency graphs; a website npm lockfile does not pin them.
+
+## Local security remediation — 24 October 2026
+
+Installed-package advisory audits were re-run; these identify vulnerable dependency versions, not proof of exploitation. Investor Next.js upgraded to 16.4.3 with a lockfile (production npm audit now reports zero advisories). The static export has image optimization disabled and does not enable Cache Components; the advisory upgrade is still applied. References: https://github.com/advisories/GHSA-2464-fhr4-w9xw and https://github.com/advisories/GHSA-673q-mjm6-r5xr ; release https://github.com/vercel/next.js/releases/tag/v16.4.3 .
+
+Workspace production audit originally reported 1 critical, 3 high, 3 moderate findings. Patched proxy-addr2.0.8, body-parser1.20.9, qs6.16.0 and source-map-js1.2.2 through exact PNPM overrides; upgraded schemas to Zod4.6.6 with the explicit record key/value signature. PostCSS selector-parser7.1.6 is also pinned; the complete Vite build produces byte-identical CSS before/after that parser upgrade. Final production audits report zero advisories for investor and workspace dependencies; no global security clearance follows from this package-audit result. Relevant primary notices: https://github.com/advisories/GHSA-jqcg-44mw-7w3h , https://github.com/advisories/GHSA-27r3-jxmh-p828 and https://github.com/advisories/GHSA-mrhx-c7xc-m3w5 .
+
+## Consolidation update — 19 November 2026
+
+During the branch consolidation `npm audit --omit=dev` flagged `next` 16.2.0–16.4.4 with two **moderate** advisories
+([GHSA-mfr8-8qww-v76h](https://github.com/advisories/GHSA-mfr8-8qww-v76h), [GHSA-vc7v-qv4w-wrv8](https://github.com/advisories/GHSA-vc7v-qv4w-wrv8):
+cache leaks across root params with `'use cache'`; the static investor export does not use `'use cache'`). Upgraded to the patch
+release `next@16.4.6`; `npm audit --omit=dev` then reported 0 vulnerabilities and the static export built (17 pages).

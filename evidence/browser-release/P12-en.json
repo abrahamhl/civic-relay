@@ -2,7 +2,7 @@
   "id": "P12",
   "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
   "sha": "LOCAL",
-  "timestamp_utc": "2026-10-24T23:54:39.719Z",
+  "timestamp_utc": "2026-11-19T00:22:05.079Z",
   "locale": "en",
   "viewport": {
     "width": 1536,
@@ -33,7 +33,7 @@
             "width": 198,
             "height": 46
           },
-          "primaryCount": 4,
+          "primaryCount": 5,
           "opened": true,
           "closed": true
         }
@@ -59,14 +59,32 @@
     "lang": "en",
     "title": "OEP — Offline Emergency Protocol | Distributed Emergency Coordination & Adaptive Multi-Network Routing",
     "headings": [
+      "When the network falls, the message finds its way.",
       "WHEN THENETWORKGOES DARK."
     ],
     "canonical": "https://civic-relay-investor.vercel.app/",
-    "disclaimers": 63,
+    "disclaimers": 71,
     "eightStage": true,
     "obsoleteLinks": [],
+    "editorial": {
+      "cards": 3,
+      "diagrams": 3,
+      "width": 1536,
+      "problems": [],
+      "caption": true
+    },
     "pageErrors": [],
-    "consoleErrors": []
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"application/octet-stream\". Strict MIME type checking is enforced for module scripts per HTML spec.",
+      "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"application/octet-stream\". Strict MIME type checking is enforced for module scripts per HTML spec."
+    ]
   },
   "verdict": "PASS"
 }

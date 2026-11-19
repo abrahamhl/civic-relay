@@ -1,0 +1,9 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:06.829
+SENDA only uses public cameras released for reuse, and only to measure the state of the road, never people.
+
+2
+00:00:07.179 --> 00:00:17.953
+With a dark object at a known distance, it works out the visibility in metres and the speed at which you can stop within what you can see. This is a synthetic image, made to test the method.

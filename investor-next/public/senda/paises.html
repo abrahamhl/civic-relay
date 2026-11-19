@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · España y Países Bajos</title>
+<meta name="description" content="Cómo se exporta SENDA: el mismo núcleo, el 112 y DATEX II en toda la UE; lo que cambia en Países Bajos (señales de carril, puentes móviles, NL-Alert, cámaras no públicas) y un lector DATEX II que funciona con cualquier país.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/carretera">Ruta protectora</a> · <a href="/senda/camaras">Cámaras</a> · <a href="/senda/arquitectura">Arquitectura</a></p>
+<h1>España → Países Bajos</h1>
+<p class="lead m">El mismo núcleo funciona en cualquier país de la UE porque lo esencial ya es común: el <b>112</b> y la información de tráfico en <b>DATEX II</b>, publicada por obligación en un Punto de Acceso Nacional (Reglamento Delegado (UE) 2022/670). Lo que cambia de un país a otro son las fuentes, el idioma, las señales y las reglas. En Países Bajos destacan tres cosas: los <b>«rood kruis»</b> (cruces rojas) sobre los carriles, más de <b>300 puentes móviles</b> con su estado en tiempo real y unas cámaras de Rijkswaterstaat que <b>no son públicas</b>.</p>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-p">
+  <h2 id="h-p">🗺️ Qué se enchufa en cada país</h2>
+  <div class="row" style="margin-top:0"><label class="m">País <select id="p-sel" aria-label="País"><option value="ES">España</option><option value="NL" selected>Países Bajos</option></select></label></div>
+  <div class="kv" id="p-kv"></div>
+  <div class="tw"><table><thead><tr><th>Pieza de SENDA</th><th>Fuente en el país</th><th>Acceso</th></tr></thead><tbody id="p-tb"></tbody></table></div>
+</section>
+
+<div class="g2">
+  <section class="card" data-viz="msi" aria-labelledby="h-m">
+    <h2 id="h-m">❌ Rood kruis: la cruz roja sobre tu carril</h2>
+    <canvas id="cv-m" aria-label="Autopista neerlandesa de tres carriles con pórticos de señales; el primero muestra una cruz roja sobre el carril izquierdo y 70 en los demás; un coche con SENDA recibe el aviso hablado en neerlandés y en español"></canvas>
+    <div class="row"><label class="m">Idioma del aviso <select id="m-lang" aria-label="Idioma del aviso"><option value="nl">Neerlandés</option><option value="es">Español</option><option value="en">Inglés</option></select></label><button id="m-say">🔊 Oír</button></div>
+    <p class="m" style="font-size:14px">Unas 17.000 señales de carril en la red principal dicen qué carril está cerrado (cruz roja), por dónde pasarse (flechas) y la velocidad obligatoria. Rijkswaterstaat insiste en que el rood kruis <b>nunca está puesto por nada</b>: siempre hay algo detrás (una avería, aceite, un rescate), y saltárselo cuesta al menos 260 €. NDW publica el estado de cada señal. SENDA lo convierte en un aviso hablado, por si no lo ves con lluvia, de noche o detrás de un camión.</p>
+    <p class="src">Formato exacto del feed de señales de NDW: <b>pendiente de mapear</b> (su documentación no es accesible desde este entorno). La lógica del aviso está hecha y probada.</p>
+  </section>
+  <section class="card" aria-labelledby="h-d">
+    <h2 id="h-d">🔤 Un lector DATEX II para toda Europa</h2>
+    <p class="m" style="margin-top:0">Pega aquí una publicación DATEX II (v2 o v3) de cualquier Punto de Acceso Nacional: la DGT, NDW, Francia, Noruega… SENDA la lee <b>en tu navegador</b>, la convierte en sus avisos y se queda con lo que afecta a tu ruta (aquí, Madrid–Valencia de ejemplo).</p>
+    <textarea id="d-x" rows="8" style="width:100%;font:12px ui-monospace,monospace;background:#071018;color:var(--t);border:1px solid var(--l);border-radius:10px;padding:8px" aria-label="Publicación DATEX II en XML"></textarea>
+    <div class="row"><button class="p" id="d-go">Leer</button><button id="d-ej">Cargar ejemplo</button></div>
+    <div class="tw"><table><thead><tr><th>Registro</th><th>Tipo DATEX II</th><th>Aviso SENDA</th><th>En tu ruta</th></tr></thead><tbody id="d-tb"></tbody></table></div>
+    <p class="m" id="d-msg" style="font-size:13px"></p>
+    <p class="src">El ejemplo está <b>construido según la estructura de DATEX II v3</b>: no es una captura real. Las descargas reales las hace el relé del organismo con <code>scripts/datex-pack.mjs --src dgt</code> o <code>--src ndw</code>, porque el navegador no puede leer esos servidores directamente.</p>
+  </section>
+</div>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-l">
+  <h2 id="h-l">🚀 Qué hace falta para un piloto en Países Bajos</h2>
+  <div class="g3" style="margin-top:0">
+    <div><h3>Ya está</h3><ul class="m"><li>Núcleo, app sin conexión y relé, idénticos</li><li>Lector DATEX II</li><li>Avisos de carril en neerlandés</li><li>Portada en neerlandés</li><li>Triaje, carretera y batería de Internet</li></ul></div>
+    <div><h3>Falta (técnico)</h3><ul class="m"><li>Mapear los feeds reales de NDW (incidencias, señales, puentes, obras)</li><li>Traducir la app completa al neerlandés</li><li>App nativa para el aviso entre coches</li><li>Ensayo en un tramo con un socio</li></ul></div>
+    <div><h3>Falta (convenio)</h3><ul class="m"><li>Una región de seguridad («veiligheidsregio») como socio</li><li>Encaje con NL-Alert: SENDA es secundario</li><li>Rijkswaterstaat para las cámaras en emergencias</li><li>Evaluación de impacto de protección de datos (RGPD)</li></ul></div>
+  </div>
+  <p class="src">Fuentes: <a href="https://eur-lex.europa.eu/eli/reg_del/2022/670/oj/eng">Reglamento Delegado (UE) 2022/670</a> · <a href="https://docs.datex2.eu/recommended-profiles/rrp/rtti-670">perfil DATEX II del reglamento</a> · <a href="https://english.ndw.nu/our-data">NDW, datos abiertos</a> · <a href="https://docs.ndw.nu/en/faq/beeldstanden/">NDW, estados de las señales</a> · <a href="https://www.rijkswaterstaat.nl/wegen/wegbeheer/nietvoornix">Rijkswaterstaat, «nietvoorniX»</a> · <a href="https://www.rijkswaterstaat.nl/wegen/wegbeheer/onderzoek/verkeersonderzoek/wat-doet-rijkswaterstaat-met-camerabeelden">Rijkswaterstaat, cámaras</a> · <a href="https://nap.dgt.es/en/dataset/incidencias-dgt-datex2-v3-7">DGT, DATEX II v3.7</a>. Código: <code>datex2.mjs</code>, <code>platforms.mjs</code> (perfiles de país).</p>
+</section>
+</main>
+<script type="module">
+import { $, C, canvas, text, rr, run, clamp, FILM, LANG, tr, drawCar, drawRoad } from '/senda/kit.mjs';
+import { COUNTRIES, countryPlan } from '/senda/core/platforms.mjs';
+import { parseDatex2, toHazards, corridorPack, msiAdvice, SAMPLE_DATEX2 } from '/senda/core/datex2.mjs';
+import { ROUTE_MAD_VLC } from '/senda/core/road-guard.mjs';
+const S = { country: 'NL', lang: 'nl' }; window.SENDA_PAISES = S;
+const CH = { PASIVO: 'ok', CONVENIO: 'todo', NUNCA: 'no', '—': 'todo' };
+function country() {
+  const c = COUNTRIES[S.country], p = countryPlan(S.country); S.plan = p;
+  $('#p-kv').innerHTML = `<div><b>${c.emergency}</b><span>emergencias</span></div><div><b>${c.officialAlert.split(' (')[0]}</b><span>alerta oficial (SENDA es secundario)</span></div><div><b>${c.lang}</b><span>idioma</span></div><div><b>${p.needsConvenio.length}</b><span>piezas que necesitan convenio</span></div>`;
+  $('#p-tb').innerHTML = p.rows.map((r) => `<tr><td>${r.piece}</td><td>${r.source}</td><td><span class="chip ${CH[r.access]}">${r.access}</span></td></tr>`).join('');
+}
+$('#p-sel').onchange = (e) => { S.country = e.target.value; country(); }; country();
+
+// ---- DATEX II
+function readDatex(xml) {
+  const recs = parseDatex2(xml), hz = toHazards(recs), pack = corridorPack(hz, ROUTE_MAD_VLC), inRoute = new Set(pack.hazards.map((h) => h.id));
+  S.datex = { records: recs.length, hazards: hz.length, route: pack.hazards.length };
+  $('#d-tb').innerHTML = recs.map((r) => { const h = hz.find((x) => x.id === r.id); return `<tr><td><code>${r.id}</code></td><td>${r.type}${r.status ? ` <span class="m">(${r.status})</span>` : ''}</td><td>${h ? h.label : '<span class="m">no se avisa</span>'}</td><td>${inRoute.has(r.id) ? `✅ km ${pack.hazards.find((x) => x.id === r.id).alongKm}` : '—'}</td></tr>`; }).join('');
+  $('#d-msg').textContent = `${recs.length} registros · ${hz.length} activos con posición · ${pack.hazards.length} en la ruta → ${pack.bytes} bytes en tramas SENDA para la reserva.`;
+}
+$('#d-ej').onclick = () => { $('#d-x').value = SAMPLE_DATEX2; readDatex(SAMPLE_DATEX2); };
+$('#d-go').onclick = () => { try { readDatex($('#d-x').value); } catch (e) { $('#d-msg').textContent = `No se pudo leer: ${e.message}`; } };
+$('#d-x').value = SAMPLE_DATEX2; readDatex(SAMPLE_DATEX2);
+
+// ---- Señales de carril
+const GANTRIES = [{ s: 1600, lanes: ['X', '70', '70'] }, { s: 2400, lanes: ['X', 'AR', '70'] }, { s: 3200, lanes: ['END', 'END', 'END'] }];
+const say = (t, lang) => { try { const u = new SpeechSynthesisUtterance(t); u.lang = { nl: 'nl-NL', es: 'es-ES', en: 'en-GB' }[lang]; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch {} };
+$('#m-lang').onchange = (e) => { S.lang = e.target.value; };
+$('#m-say').onclick = () => { const a = msiAdvice(GANTRIES, 1000, { lang: S.lang }); S.spoken = a.say; say(a.say, S.lang); };
+const gm = canvas($('#cv-m'));
+function drawM(t) {
+  const g = gm, P = 14, lt = t % P, sMe = 400 + (lt / P) * 2600, Y = (s) => 560 - ((s - sMe + 300) / 2400) * 560;
+  g.fillStyle = '#0d1418'; g.fillRect(0, 0, 640, 600);
+  const lx = [200, 280, 360, 440]; g.fillStyle = '#16231b'; g.fillRect(0, 0, 640, 600); drawRoad(g, 188, 0, 264, 600, { lanes: 3, vertical: true, shoulder: 0.045, offset: -sMe * 0.25 });
+  for (const gt of GANTRIES) { const y = Y(gt.s); if (y < -40 || y > 640) continue; g.fillStyle = '#5b6770'; g.fillRect(190, y - 4, 260, 8);
+    gt.lanes.forEach((v, i) => { const cx = (lx[i] + lx[i + 1]) / 2; g.fillStyle = '#05080a'; rr(g, cx - 24, y - 54, 48, 44, 6); g.fill();
+      if (v === 'X') { g.strokeStyle = '#ff2a2a'; g.lineWidth = 5; g.beginPath(); g.moveTo(cx - 13, y - 45); g.lineTo(cx + 13, y - 19); g.moveTo(cx + 13, y - 45); g.lineTo(cx - 13, y - 19); g.stroke(); }
+      else if (v === 'AR') { g.strokeStyle = '#f5f5f5'; g.lineWidth = 4; g.beginPath(); g.moveTo(cx - 10, y - 44); g.lineTo(cx + 10, y - 24); g.lineTo(cx + 10, y - 34); g.moveTo(cx + 10, y - 24); g.lineTo(cx, y - 24); g.stroke(); }
+      else if (v === 'END') { g.strokeStyle = '#f5f5f5'; g.lineWidth = 2; g.beginPath(); g.arc(cx, y - 32, 13, 0, 7); g.stroke(); g.beginPath(); g.moveTo(cx - 9, y - 23); g.lineTo(cx + 9, y - 41); g.stroke(); }
+      else { g.strokeStyle = '#ff2a2a'; g.lineWidth = 3; g.beginPath(); g.arc(cx, y - 32, 15, 0, 7); g.stroke(); text(g, v, cx, y - 27, { c: '#f5f5f5', f: '800 13px Inter,system-ui', al: 'center' }); }
+    }); g.lineWidth = 1; }
+  const a = msiAdvice(GANTRIES, sMe, { lang: S.lang }), lane = a?.closedLanes.includes(1) && a.atM < 900 ? 1 : 0, cx = (lx[lane] + lx[lane + 1]) / 2;
+  drawCar(g, cx, 540, { len: 50, ang: -Math.PI / 2, color: '#91d7e8', lights: true });
+  g.fillStyle = 'rgba(11,20,28,.95)'; rr(g, 20, 20, 600, 88, 12); g.fill(); g.strokeStyle = a?.closedLanes.length ? C.r : C.l; g.stroke();
+  text(g, a ? a.say : tr('Sin limitaciones por delante', 'No lane restrictions ahead'), 34, 52, { c: a?.closedLanes.length ? C.t : C.e, f: '800 14px Inter,system-ui' });
+  const subLang = LANG === 'en' ? 'en' : 'es';
+  const subAdv = msiAdvice(GANTRIES, sMe, { lang: subLang }); if (S.lang !== subLang && subAdv) text(g, subAdv.say, 34, 78, { c: C.m, f: '12px Inter,system-ui' });
+  text(g, tr('A-snelweg · datos de señales de NDW · aviso hablado de SENDA', 'A-snelweg · NDW open lane-sign data · SENDA spoken warning'), 34, 100, { c: C.g, f: '11px Inter,system-ui' });
+}
+run({ msi: drawM });
+</script>
+</body></html>

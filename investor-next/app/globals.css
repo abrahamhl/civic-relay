@@ -1056,7 +1056,6 @@
   }
 }
 
-
 /* 2026-11-13 · Responsive containment — correct the cause instead of masking it with body overflow:hidden. */
 .site-root .hero {
   grid-template-columns: minmax(0, .94fr) minmax(0, 1.06fr);
@@ -1154,3 +1153,16 @@
   box-shadow: none;
 }
 .site-root .apple-bento-tag { border-radius: 5px; }
+
+/* SENDA · acceso a la app offline-first */
+.senda-banner{width:min(1160px,calc(100% - 32px));margin-inline:auto;display:flex;gap:24px;align-items:center;justify-content:space-between;margin-top:88px;padding:22px 26px;border:1px solid rgba(255,119,86,.45);border-radius:18px;background:linear-gradient(120deg,rgba(255,119,86,.12),rgba(145,215,232,.06))}
+.senda-banner h2{margin:6px 0 6px;font-size:clamp(20px,2.4vw,28px);line-height:1.15}
+.senda-banner p{margin:0;color:#a3b5bf;max-width:760px}
+.senda-tag{font:12px/1 ui-monospace,monospace;letter-spacing:.14em;color:#ff7756}
+.senda-cta{display:flex;flex-direction:column;gap:10px;align-items:flex-end;flex:none}
+.senda-btn{display:inline-flex;min-height:44px;align-items:center;padding:10px 18px;border-radius:12px;background:#ff7756;color:#140804;font-weight:800;text-decoration:none}
+.senda-link{color:#91d7e8;font-size:14px}
+@media (max-width:760px){.senda-banner{flex-direction:column;align-items:flex-start;margin-top:76px}.senda-cta{align-items:flex-start}}
+
+/* WCAG 2.5.8 target size: native checkboxes and radios at least 24x24 */
+input[type="checkbox"],input[type="radio"]{width:24px;height:24px;min-width:24px;min-height:24px;accent-color:#57c7bd}

@@ -1,0 +1,205 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/abrahamhl/civic-relay/blob/master/docs/contracts/senda-terrain-grid-v1.schema.json",
+  "title": "SENDA derived DEM terrain grid v1",
+  "description": "33x33 static geographically sampled DEM elevations. Not a live sensor, emergency warning or survey of buildings.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "region",
+    "status",
+    "dataKind",
+    "acquiredAt",
+    "rows",
+    "columns",
+    "bounds",
+    "elevationsM",
+    "georeference",
+    "source",
+    "summary"
+  ],
+  "properties": {
+    "schema": {
+      "const": "senda.terrain.grid/1"
+    },
+    "region": {
+      "enum": [
+        "valencia",
+        "madrid",
+        "arnhem",
+        "veenendaal"
+      ]
+    },
+    "status": {
+      "enum": [
+        "SOURCE_SNAPSHOT",
+        "CACHED_SNAPSHOT",
+        "STALE_SNAPSHOT"
+      ]
+    },
+    "dataKind": {
+      "const": "RASTER_DEM_SAMPLES"
+    },
+    "acquiredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "rows": {
+      "const": 33
+    },
+    "columns": {
+      "const": 33
+    },
+    "elevationsM": {
+      "type": "array",
+      "minItems": 1089,
+      "maxItems": 1089,
+      "items": {
+        "type": "number",
+        "minimum": -11000,
+        "maximum": 9000
+      }
+    },
+    "bounds": {
+      "type": "object",
+      "required": [
+        "north",
+        "south",
+        "west",
+        "east"
+      ],
+      "properties": {
+        "north": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "south": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "west": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "east": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        }
+      }
+    },
+    "georeference": {
+      "type": "object",
+      "required": [
+        "crs",
+        "tileMatrix",
+        "verticalUnit",
+        "verticalDatum",
+        "approximateWidthM",
+        "approximateHeightM"
+      ],
+      "properties": {
+        "crs": {
+          "const": "EPSG:4326"
+        },
+        "tileMatrix": {
+          "const": "EPSG:3857 / XYZ"
+        },
+        "horizontalUnit": {
+          "const": "m"
+        },
+        "verticalUnit": {
+          "const": "m"
+        },
+        "verticalDatum": {
+          "const": "MIXED_SOURCE_NOT_VALIDATED"
+        },
+        "approximateWidthM": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "approximateHeightM": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "minElevationM",
+        "maxElevationM",
+        "rangeM"
+      ],
+      "properties": {
+        "minElevationM": {
+          "type": "number"
+        },
+        "maxElevationM": {
+          "type": "number"
+        },
+        "rangeM": {
+          "type": "number"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "dataset",
+        "provider",
+        "registryUrl",
+        "attributionUrl",
+        "license",
+        "offlineRedistributionReviewRequired",
+        "rawTileSha256"
+      ],
+      "properties": {
+        "dataset": {
+          "const": "MAPZEN_AWS_TERRARIUM"
+        },
+        "provider": {
+          "const": "Mapzen Terrain Tiles / AWS Open Data"
+        },
+        "registryUrl": {
+          "const": "https://registry.opendata.aws/terrain-tiles/"
+        },
+        "attributionUrl": {
+          "const": "https://github.com/tilezen/joerd/blob/master/docs/attribution.md"
+        },
+        "license": {
+          "const": "SOURCE_DEPENDENT_ATTRIBUTION"
+        },
+        "offlineRedistributionReviewRequired": {
+          "const": true
+        },
+        "rawTileSha256": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "required": [
+              "tile",
+              "sha256"
+            ],
+            "properties": {
+              "tile": {
+                "type": "string",
+                "pattern": "^[0-9]+/[0-9]+/[0-9]+$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

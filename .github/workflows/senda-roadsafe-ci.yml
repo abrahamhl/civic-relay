@@ -1,0 +1,53 @@
+name: SENDA RoadSafe
+permissions:
+  contents: read
+on:
+  push:
+    branches: [ master, ccr-5123180e-t90iwo, 'research/senda-*' ]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  roadsafe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Núcleo SENDA completo (incluye RoadSafe y paridad sync-web)
+        run: node --test packages/senda/tests/*.test.mjs packages/senda/tests/defense/*.test.mjs
+      - name: Pruebas adversariales (P0 RoadSafe incluidos)
+        run: node --test packages/senda/tests-adversarial/*.test.mjs
+      - name: Paridad del núcleo publicado en la web
+        run: node packages/senda/scripts/sync-web.mjs && git diff --exit-code -- investor-next/public/senda/core
+      - name: Experimentos reproducibles y controles negativos
+        run: |
+          node packages/senda/scripts/roadsafe-experiment.mjs --n 3000 > /dev/null
+          node -e "const r=require('./evidence/roadsafe/roadsafe-experiments.json').experiments.negativeControls; const ok=r.NC1_zero_adoption_equals_A.pass&&r.NC2_placebo_no_effect.pass&&r.NC3_latency_beyond_event_no_benefit.pass&&r.NC4_late_warning_harm.policyAvoidsHarm; console.log(JSON.stringify(r)); process.exit(ok?0:1)"
+      - name: H-ROAD-RRE-1 synthetic falsification and deterministic evidence
+        run: |
+          node packages/senda/scripts/roadsafe-reachability-experiment.mjs /tmp/senda-rre-evidence.json
+          diff -u evidence/roadsafe/reachability-synthetic-20261118.json /tmp/senda-rre-evidence.json
+      - name: Chromium para E2E
+        run: npx --yes playwright@1.63.0 install --with-deps chromium && npm i --no-save --prefix /tmp/pw playwright@1.63.0
+      - name: Consola RoadSafe en Chromium (móvil y escritorio, sin red externa)
+        run: NODE_PATH=/tmp/pw/node_modules node investor-next/scripts/senda-roadsafe-e2e.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: roadsafe-evidence
+          path: evidence/roadsafe/
+  vision-calibration-python:
+    name: Visión de cámaras y conversor de calibración (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r packages/senda-vision/requirements.txt pandas pyarrow
+      - name: Escáner TeslaCam/dashcam (detector simulado, vídeos sintéticos)
+        working-directory: packages/senda-vision
+        run: python -m unittest discover -s tests -v
+      - name: Conversor VZCrash → trazas SENDA (parquet sintético)
+        run: python -m unittest packages/senda/calibration/test_vzcrash_to_jsonl.py -v

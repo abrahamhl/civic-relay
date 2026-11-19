@@ -1,0 +1,37 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { PLATFORMS, INTEGRATIONS, PLAYBOOKS, EVENTS, ACCESS, planDeployment } from '../src/platforms.mjs';
+
+test('cada integración declara un modo de acceso válido y lo prohibido queda en NUNCA', () => {
+  for (const i of INTEGRATIONS) assert.ok(Object.keys(ACCESS).includes(i.access), i.id);
+  for (const id of ['scada-ajeno', 'interceptar', 'emitir-sin-licencia']) assert.equal(INTEGRATIONS.find((i) => i.id === id).access, 'NUNCA');
+  assert.equal(INTEGRATIONS.find((i) => i.id === 'eolicos').access, 'PASIVO');
+});
+
+test('plan de terremoto: solo con móviles falta «detectar»; con dron y ESP32 queda cubierto', () => {
+  assert.deepEqual(planDeployment('terremoto', ['movil-web', 'pc']).gaps, ['detectar']);
+  assert.deepEqual(planDeployment('terremoto', ['movil-web', 'android', 'dron', 'esp32', 'pc']).gaps, []);
+});
+
+test('zona de conflicto lleva salvaguarda y los hechos citados tienen lección y módulo', () => {
+  assert.match(planDeployment('conflicto', ['movil-web']).guard, /no se activan/);
+  for (const e of EVENTS) assert.ok(e.lesson && e.modules.length, e.id);
+  assert.ok(Object.keys(PLAYBOOKS).length >= 8 && PLATFORMS.length >= 10);
+});
+
+test('plan de carretera: coche y móvil cubren avisar y localizar; la lectura de Waze/Google queda en NUNCA', () => {
+  const p = planDeployment('carretera', ['coche', 'movil-web']);
+  assert.ok(!p.gaps.includes('avisar') && !p.gaps.includes('localizar'));
+  assert.match(p.guard, /no se toca el móvil/);
+  assert.equal(INTEGRATIONS.find((i) => i.id === 'leer-navegadores').access, 'NUNCA');
+  assert.equal(INTEGRATIONS.find((i) => i.id === 'dgt30').access, 'CONVENIO');
+});
+
+test('exportar a Países Bajos: mismo 112 y DATEX II; las cámaras allí requieren convenio y hay puentes y señales de carril', async () => {
+  const { countryPlan, COUNTRIES } = await import('../src/platforms.mjs');
+  const nl = countryPlan('NL'), es = countryPlan('ES');
+  assert.equal(COUNTRIES.NL.emergency, '112'); assert.match(COUNTRIES.NL.nap, /DATEX II/);
+  assert.ok(nl.needsConvenio.includes('Cámaras') && !es.needsConvenio.includes('Cámaras'));
+  assert.ok(nl.rows.some((r) => /puentes/.test(r.source))); assert.ok(es.needsConvenio.includes('Vehículo detenido'));
+  assert.equal(INTEGRATIONS.find((i) => i.id === 'v16-sim').access, 'NUNCA');
+});

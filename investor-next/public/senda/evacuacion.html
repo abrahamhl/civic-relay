@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Coches, cámaras y fuego</title>
+<meta name="description" content="Cruce de coches, cámaras de tráfico oficiales y fuego: cuándo avisar, qué tramo cerrar y cómo detectar un atasco o un bloqueo minutos antes, con datos reales de GOES, Caltrans y TfL y un modelo de tráfico por celdas con filtro de Kalman.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+<style>
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.tabs button[aria-pressed=true]{background:var(--c);color:#111;border-color:var(--c)}
+.lg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--m);margin-top:8px}.lg i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+.spark{display:inline-block;vertical-align:middle}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:8px}.thumbs figure{margin:0}.thumbs img{width:100%;border-radius:8px;display:block}.thumbs figcaption{font-size:12px;color:var(--m);margin-top:3px}
+</style>
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/referencias">Incendios de referencia</a> · <a href="/senda/camaras">Cámaras públicas</a> · <a href="/senda/trafico">Tráfico</a> · <a href="/senda/fuego">Seguir un incendio</a></p>
+<h1>Coches, cámaras de tráfico y fuego: cruzar los datos para salir a tiempo</h1>
+<p class="lead m">En los grandes incendios con víctimas, el fallo casi nunca fue la falta de datos. Fue la <b>hora del aviso</b>, el <b>atasco aguas abajo</b> y los <b>tramos que nadie cerró</b>: Camp 2018, Eaton 2025, Pedrógão 2017, Mati 2018. SENDA cruza tres cosas: dónde está el fuego (satélite y cámaras), cómo fluye cada tramo (cámaras de tráfico oficiales y coches sonda) y cuánto se tarda en despejar (un modelo de tráfico por celdas).</p>
+<div class="note" id="sum" aria-live="polite">Cargando…</div>
+
+<section class="card" data-viz="eaton" style="margin-top:14px" aria-labelledby="h-e">
+  <h2 id="h-e">⏱️ Eaton 2025: cuándo había que avisar a Altadena oeste</h2>
+  <canvas id="cv-e" aria-label="Distancia del fuego a Altadena oeste medida por el satélite GOES frente a la hora local, con los hechos documentados y los avisos de SENDA"></canvas>
+  <div class="lg"><span><i style="background:#ff7756"></i>distancia del fuego (GOES)</span><span><i style="background:#34d399"></i>aviso de SENDA</span><span><i style="background:#ff5b6e"></i>orden real</span><span><i style="background:#9fb2bc"></i>hechos documentados</span></div>
+  <div class="kv" id="e-kv" style="margin-top:10px"></div>
+  <p class="src">GOES-18 FDC y HRRR (NOAA). Hechos: <a href="https://en.wikipedia.org/wiki/Eaton_Fire">cronología del Eaton Fire</a> y <a href="https://www.fireengineering.com/firefighting/wildland-firefighting/report-eaton-fire-marched-toward-west-altadena-hours-before-official-accounts">Fire Engineering / LA Times</a>. Umbral dinámico de SENDA (Cova 2005; Larsen 2011): distancia = velocidad hacia el lugar × (despeje de 60 min + margen de 15 min) + pavesas (1,6 km, la milla documentada a las 18:33). El punto «Altadena oeste» es aproximado.</p>
+</section>
+
+<section class="card" data-viz="ctm" style="margin-top:14px" aria-labelledby="h-p">
+  <h2 id="h-p">🚗 Camp 2018: Skyway, de Paradise a Chico</h2>
+  <p class="m" style="font-size:14px;margin-top:0">Modelo de transmisión de celdas (Daganzo) con la <b>llegada real del fuego a cada tramo</b> medida por GOES. La demanda y la capacidad de salida son <b>supuestos explícitos</b> (abajo). Cambia la estrategia:</p>
+  <div class="tabs" id="sc" role="group" aria-label="Estrategia de evacuación"></div>
+  <canvas id="cv-p" aria-label="Tramos de Skyway coloreados por velocidad del tráfico y fuego llegando a cada tramo con el paso del tiempo"></canvas>
+  <div class="row"><button id="play" class="p" aria-pressed="true">⏸ Pausa</button><label for="t" class="m" style="font-size:13px">Minuto</label><input id="t" type="range" min="0" max="100" value="0" aria-label="Minuto desde la primera detección del satélite"><output id="t-o" class="m"></output></div>
+  <div class="lg"><span><i style="background:#34d399"></i>fluye</span><span><i style="background:#fbbf24"></i>lento</span><span><i style="background:#ff5b6e"></i>parado</span><span><i style="background:#ff7756;opacity:.5"></i>tramo con fuego</span><span><i style="background:#91d7e8"></i>tramo cerrado por SENDA</span></div>
+  <div class="kv" id="p-kv" style="margin-top:10px"></div>
+  <p class="src" id="p-sup"></p>
+</section>
+
+<div class="g2">
+<section class="card" data-viz="twins" aria-labelledby="h-k">
+  <h2 id="h-k">🔎 Ver el atasco y el bloqueo antes de que lleguen</h2>
+  <div class="tabs" id="tw" role="group" aria-label="Experimento"></div>
+  <canvas id="cv-k" aria-label="Capacidad estimada por el filtro de Kalman frente a la capacidad real a lo largo del tiempo"></canvas>
+  <p class="m" style="font-size:14px" id="k-txt"></p>
+  <p class="src">Filtro de Kalman por conjuntos (40 miembros) sobre el modelo de celdas: asimila densidad y flujo de cámaras y velocidad de coches sonda, y estima a la vez la capacidad oculta de cada cuello de botella. <b>Gemelo simulado</b>: la «verdad» es un escenario del modelo; el ruido de cámara sale de los conteos reales de Londres y Caltrans.</p>
+</section>
+<section class="card" aria-labelledby="h-c">
+  <h2 id="h-c">📹 Cámaras oficiales en los corredores reales</h2>
+  <p class="m" style="font-size:14px;margin-top:0">Cámaras de <b>Caltrans</b> en las rutas de evacuación de Camp, Palisades y Eaton, grabadas y contadas hoy en hora punta. Cada fila cruza el tráfico de hoy con lo cerca que llegó el fuego histórico a esa cámara.</p>
+  <div class="tw"><table><thead><tr><th>Cámara</th><th>Flujo</th><th>En imagen</th><th>Velocidad</th><th>3 h (cada 15 min)</th><th>Fuego histórico</th></tr></thead><tbody id="cal"></tbody></table></div>
+</section>
+</div>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-l">
+  <h2 id="h-l">🇬🇧 Cámaras reales de Londres (TfL JamCams)</h2>
+  <p class="m" style="font-size:14px;margin-top:0">Doce cámaras públicas procesadas de verdad (clips de ≈ 10 s, de noche). Sus conteos fijan el <b>ruido de observación</b> del filtro.</p>
+  <div class="thumbs" id="tfl-img"></div>
+  <div class="tw" style="margin-top:8px"><table><thead><tr><th>Cámara</th><th>Cruces</th><th>Flujo (veh/min)</th><th>En imagen</th><th>Desviación</th></tr></thead><tbody id="tfl"></tbody></table></div>
+  <p class="src">Powered by TfL Open Data. Contiene datos de OS © Crown copyright and database rights. Detección YOLOX-s (Apache 2.0) + ByteTrack; las cajas se dibujan solo sobre vehículos y no se leen matrículas.</p>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-x">
+  <h2 id="h-x">🧭 Qué hace SENDA con todo esto, y qué nunca hace</h2>
+  <div class="g2">
+    <ul class="m" style="font-size:14px">
+      <li><b>Aviso dinámico</b>: distancia de disparo = velocidad del fuego hacia el barrio (P50/P90 calibrados con la <a href="/senda/referencias">base de referencia</a>) × (tiempo de despeje + margen) + pavesas.</li>
+      <li><b>Cierre de tramos</b>: cada tramo deja de admitir coches cuando el fuego llegará antes de lo que se tarda en atravesarlo, con su margen. Los vecinos van por la alternativa.</li>
+      <li><b>Atasco aguas abajo</b>: una cámara que cuenta en la salida basta para estimar la capacidad real del cuello de botella, aunque esté lejos del fuego (Chico en 2018).</li>
+      <li><b>Bloqueo</b> (coches abandonados, accidente): las sondas y la cámara de un cruce localizan la celda bloqueada en minutos.</li>
+      <li>Todo sale como propuesta con fuentes al 112 y a la autoridad de tráfico (CAP, DATEX II). SENDA no ordena evacuaciones ni cierra carreteras.</li>
+    </ul>
+    <ul class="m" style="font-size:14px">
+      <li>❌ Nunca leer matrículas, reconocer caras ni seguir a un vehículo concreto.</li>
+      <li>❌ Nunca usar cámaras privadas sin permiso ni agregadores de datos personales.</li>
+      <li>❌ Nunca detectar radares ni publicar controles.</li>
+      <li>✅ Solo cámaras oficiales con licencia (PASIVO) o cedidas por convenio (CONVENIO), con conteos agregados y anónimos.</li>
+    </ul>
+  </div>
+</section>
+</main>
+<script type="module">
+import { $, C, canvas, text, run, clamp } from '/senda/kit.mjs';
+const S = { ok: false }; window.SENDA_EVAC = S;
+const [R, T] = await Promise.all([fetch('/senda/data/referencias/referencias.json').then((r) => r.json()), fetch('/senda/data/referencias/tfl_camaras.json').then((r) => r.json())]);
+const fmt = (t, tz = -8) => (t ? new Date(Date.parse(t) + tz * 3.6e6).toISOString().slice(11, 16) : '—');
+const ED = R.eatonDisparo, AO = R.aproximacion.altadenaOeste, PA = R.paradise, GM = R.gemelos, CAL = R.caltrans;
+
+// ── Eaton ───────────────────────────────────────────────────────────────────
+const ge = canvas($('#cv-e'), 900, 330);
+const ign = Date.parse('2025-01-08T02:18:00Z'), end = Date.parse('2025-01-08T12:30:00Z');
+const evs = [['2025-01-08T02:18:00Z', 'ignición ≈ 18:18', C.m], ['2025-01-08T05:30:00Z', 'avanza hacia Altadena oeste ≈ 21:30', C.m], ['2025-01-08T07:00:00Z', 'llamas visibles ≈ 23:00', C.m], [AO.ordenUTC, 'orden real (después de las 03:00)', C.r]];
+function drawEaton(t) {
+  const W = 900, H = 330, L = 50, Rr = 20, Tp = 20, B = 46, X = (ms) => L + ((ms - ign) / (end - ign)) * (W - L - Rr), dMax = 6, Y = (d) => Tp + (d / dMax) * (H - Tp - B);
+  ge.fillStyle = C.bg; ge.fillRect(0, 0, W, H);
+  for (let d = 0; d <= dMax; d += 1) { ge.strokeStyle = '#13212b'; ge.beginPath(); ge.moveTo(L, Y(d)); ge.lineTo(W - Rr, Y(d)); ge.stroke(); text(ge, `${d} km`, L - 6, Y(d) + 4, { c: C.m, f: '11px Inter,sans-serif', al: 'right' }); }
+  for (let h = 0; h <= 10; h += 2) { const ms = ign + h * 3.6e6; text(ge, fmt(new Date(ms).toISOString()), X(ms), H - B + 16, { c: C.m, f: '11px Inter,sans-serif', al: 'center' }); }
+  const k = Math.min(1, (t % 12) / 9), lim = ign + k * (end - ign);
+  ge.strokeStyle = C.c; ge.lineWidth = 2.5; ge.beginPath(); let f = true, dot = null;
+  for (const s of AO.serie) { const ms = Date.parse(s.t), y = Y(Math.min(dMax, s.km)); f ? ge.moveTo(X(ms), y) : ge.lineTo(X(ms), y); f = false; if (ms <= lim) dot = [X(ms), y, s.km]; }
+  ge.stroke(); ge.lineWidth = 1;
+  if (dot) { ge.fillStyle = C.c; ge.beginPath(); ge.arc(dot[0], dot[1], 6, 0, 7); ge.fill(); text(ge, `${dot[2].toFixed(1)} km`, dot[0] + 8, dot[1] - 8, { c: C.c, f: '12px Inter,sans-serif' }); }
+  text(ge, 'más cerca ↑', L + 4, Tp - 6, { c: C.m, f: '11px Inter,sans-serif' });
+  for (const [iso, lab, c] of evs) { const x = X(Date.parse(iso)), right = x > W * 0.7; ge.strokeStyle = c; ge.setLineDash([4, 4]); ge.beginPath(); ge.moveTo(x, Tp); ge.lineTo(x, H - B); ge.stroke(); ge.setLineDash([]); text(ge, lab, right ? x - 4 : x + 4, H - B - 6 - (evs.findIndex((e) => e[1] === lab) % 2) * 14, { c, f: '11px Inter,sans-serif', al: right ? 'right' : 'left' }); }
+  for (const [tr, lab] of [[ED.p50, 'aviso SENDA (umbral dinámico)'], [ED.fijo3km ? { t: ED.fijo3km } : null, 'aviso SENDA (umbral fijo 3 km)']]) {
+    if (!tr?.t) continue; const x = X(Date.parse(tr.t)); ge.strokeStyle = C.e; ge.lineWidth = 2; ge.beginPath(); ge.moveTo(x, Tp); ge.lineTo(x, H - B); ge.stroke(); ge.lineWidth = 1;
+    text(ge, `${lab} · ${fmt(tr.t)}`, x + 4, Tp + 12 + (lab.includes('fijo') ? 16 : 0), { c: C.e, f: '12px Inter,sans-serif' });
+  }
+}
+$('#e-kv').innerHTML = [['Fuego a ≤ 3 km (GOES)', `${fmt(AO.a3km)} local`], ['Aviso SENDA dinámico', `${fmt(ED.p50?.t)} · umbral ${ED.p50?.umbralKm} km`], ['Orden real', 'después de las 03:00'], ['Adelanto posible', `${ED.adelantoHorasP50} h (dinámico) · ${ED.adelantoHoras3km} h (3 km)`]].map(([k, v]) => `<div><span class="m">${k}</span><b>${v}</b></div>`).join('');
+
+// ── Paradise / Skyway ─────────────────────────────────────────────────────────
+const SC = { 'aviso-al-detectar': 'Aviso al detectar (GOES)', 'aviso-60min': 'Aviso 60 min tarde', 'contraflujo-al-detectar': 'Contraflujo (todos los carriles hacia abajo)', 'cierres-senda': 'Cierres de SENDA + ruta alternativa' };
+let sc = 'aviso-al-detectar', playing = true, tm = 0;
+$('#sc').innerHTML = Object.entries(SC).map(([k, v]) => `<button data-s="${k}" aria-pressed="${k === sc}">${v}</button>`).join('');
+$('#sc').addEventListener('click', (e) => { const k = e.target.dataset.s; if (!k) return; sc = k; tm = 0; for (const b of $('#sc').children) b.setAttribute('aria-pressed', b.dataset.s === sc); kvP(); });
+$('#play').onclick = () => { playing = !playing; $('#play').textContent = playing ? '⏸ Pausa' : '▶ Seguir'; $('#play').setAttribute('aria-pressed', playing); };
+$('#t').oninput = (e) => { tm = (e.target.value / 100) * 360; playing = false; $('#play').textContent = '▶ Seguir'; };
+const gp = canvas($('#cv-p'), 900, 260), cells = PA.celdas;
+// (*) Paradise centro: tramo estrechado de 4 a 2 carriles en 2014 (fuente en la base de referencia).
+function kvP() {
+  const s = PA.escenarios[sc], safe = PA.ultimoAvisoSeguroMin, safeC = PA.ultimoAvisoSeguroContraflujoMin;
+  $('#p-kv').innerHTML = [['Despeje de Skyway', s.despejeMin ? `${Math.round(s.despejeMin)} min` : '> 10 h'], ['Vehículos·minuto bajo el fuego', s.expuestosVehMin.toLocaleString('es')], ['Máximo atrapado a la vez', s.maxAtrapados.toLocaleString('es')], ['Desviados a la alternativa', s.desviados.toLocaleString('es')], ['Último aviso sin exposición', safe.ok ? `${Math.abs(Math.round(safe.warnMin))} min ${safe.warnMin < 0 ? 'antes' : 'después'} de la 1ª detección` : '—'], ['… con contraflujo', safeC.ok ? `${Math.abs(Math.round(safeC.warnMin))} min ${safeC.warnMin < 0 ? 'antes' : 'después'}` : '—']].map(([k, v]) => `<div><span class="m">${k}</span><b>${v}</b></div>`).join('');
+}
+kvP(); $('#p-sup').innerHTML = `Supuestos: ${PA.supuestos} Trazado de Skyway aproximado (pendiente de verificar con OpenStreetMap). Llegada del fuego: primer píxel de GOES a ≤ 2 km de cada tramo. Hechos de contraste: NIST (atasco desde Chico; a las 08:30 el fuego alcanzó el tráfico en Pentz y Skyway alta; Skyway reducida de 4 a 2 carriles en 2014).`;
+function drawCtm(dt) {
+  const W = 900, H = 260, s = PA.escenarios[sc], ser = s.serie, N = cells.length, x0 = 30, cw = (W - 60) / N;
+  if (playing) tm = (tm + dt * 30) % 360;
+  const row = ser.reduce((b, r) => (Math.abs(r.tMin - tm) < Math.abs(b.tMin - tm) ? r : b), ser[0]);
+  gp.fillStyle = C.bg; gp.fillRect(0, 0, W, H);
+  text(gp, 'Paradise / Magalia (salida)', x0, 22, { c: C.m, f: '12px Inter,sans-serif' }); text(gp, 'Chico →', W - 30, 22, { c: C.m, f: '12px Inter,sans-serif', al: 'right' });
+  cells.forEach((c, i) => {
+    const x = x0 + i * cw, burning = c.llegadaFuegoMin != null && tm >= c.llegadaFuegoMin, closed = sc === 'cierres-senda' && c.cierreMin != null && tm >= c.cierreMin;
+    if (burning) { gp.fillStyle = 'rgba(255,119,86,0.35)'; gp.fillRect(x, 34, cw - 4, 150); }
+    const v = row.speed[i], vf = c.vfKmh, col = v > 0.7 * vf ? C.e : v > 0.3 * vf ? C.a : C.r, lanes = sc.startsWith('contraflujo') ? c.carriles * 2 : c.carriles;
+    for (let l = 0; l < lanes; l++) { gp.fillStyle = col; gp.fillRect(x + 4, 70 + l * 22, cw - 12, 16); }
+    if (closed) { gp.strokeStyle = C.i; gp.lineWidth = 3; gp.strokeRect(x + 2, 64, cw - 8, lanes * 22 + 8); gp.lineWidth = 1; text(gp, 'cerrado', x + cw / 2 - 2, 60, { c: C.i, f: '11px Inter,sans-serif', al: 'center' }); }
+    const nm = c.nombre.replace(' (tramo estrechado en 2014)', '*').replace(' (Magalia)', ' · Magalia').split(' · ');
+    text(gp, nm[0], x + 4, 192, { c: C.t, f: '11px Inter,sans-serif' }); if (nm[1]) text(gp, nm[1], x + 4, 180, { c: C.m, f: '10px Inter,sans-serif' });
+    text(gp, `${v} km/h`, x + 4, 216, { c: col, f: '11px Inter,sans-serif' });
+    text(gp, c.llegadaFuegoMin != null ? `🔥 min ${c.llegadaFuegoMin}` : 'sin fuego', x + 4, 232, { c: C.m, f: '11px Inter,sans-serif' });
+  });
+  text(gp, `min ${Math.round(row.tMin)} · salidos ${row.exited.toLocaleString('es')} · en la vía ${row.onRoad.toLocaleString('es')} · esperando en casa ${row.waiting.toLocaleString('es')}`, x0, H - 8, { c: C.t, f: '13px Inter,sans-serif' });
+  $('#t').value = Math.round((tm / 360) * 100); $('#t-o').textContent = `min ${Math.round(tm)}`;
+}
+
+// ── Gemelos EnKF ──────────────────────────────────────────────────────────────
+const TW = { atascoChico: 'Atasco en Chico (salida al 30 %)', palisadesBloqueo: 'Coches abandonados en Palisades Dr' };
+let tw = 'atascoChico';
+$('#tw').innerHTML = Object.entries(TW).map(([k, v]) => `<button data-k="${k}" aria-pressed="${k === tw}">${v}</button>`).join('');
+$('#tw').addEventListener('click', (e) => { const k = e.target.dataset.k; if (!k) return; tw = k; for (const b of $('#tw').children) b.setAttribute('aria-pressed', b.dataset.k === tw); txtK(); });
+const gk = canvas($('#cv-k'), 460, 300);
+function txtK() {
+  const g = GM[tw], d = g.deteccion;
+  $('#k-txt').innerHTML = tw === 'atascoChico'
+    ? `La capacidad de salida cae al <b>30 %</b> en el minuto 45 (atasco en la ciudad, invisible desde Paradise). Con una cámara de conteo en la salida, dos de densidad y coches sonda, SENDA lo detecta en el <b>minuto ${d?.tMin}</b> (${Math.round(d?.tMin - 45)} min después)${g.convergencia ? ` y lo cuantifica (${g.convergencia.cap[0]}) en el minuto ${g.convergencia.tMin}` : ''}. Ruido de cámara tomado de cámaras reales: ± ${g.ruidoCamara} veh/km.`
+    : `En el minuto 50 coches abandonados reducen la celda 3 al <b>5 %</b>. El filtro vigila tres celdas candidatas y localiza la bloqueada en el <b>minuto ${d?.tMin}</b> (${Math.round(d?.tMin - 50)} min después), con capacidad estimada ${d?.cap?.[1]} frente a ${d?.cap?.[0]} y ${d?.cap?.[2]} en las vecinas.`;
+}
+txtK();
+function drawK() {
+  const W = 460, H = 300, L = 40, Rr = 12, Tp = 16, B = 34, g = GM[tw], tr = g.track, tMax = tr.at(-1).tMin, X = (t) => L + (t / tMax) * (W - L - Rr), Y = (v) => Tp + (1 - v) * (H - Tp - B);
+  gk.fillStyle = C.bg; gk.fillRect(0, 0, W, H);
+  for (const v of [0, 0.25, 0.5, 0.75, 1]) { gk.strokeStyle = '#13212b'; gk.beginPath(); gk.moveTo(L, Y(v)); gk.lineTo(W - Rr, Y(v)); gk.stroke(); text(gk, v.toFixed(2), L - 4, Y(v) + 4, { c: C.m, f: '10px Inter,sans-serif', al: 'right' }); }
+  for (let t = 0; t <= tMax; t += 20) text(gk, `${t}`, X(t), H - B + 14, { c: C.m, f: '10px Inter,sans-serif', al: 'center' });
+  text(gk, 'minuto', W - Rr, H - 4, { c: C.m, f: '10px Inter,sans-serif', al: 'right' }); text(gk, 'factor de capacidad', L, 11, { c: C.m, f: '10px Inter,sans-serif' });
+  const cols = [C.i, C.c, C.v];
+  tr[0].cap.forEach((_, j) => {
+    gk.strokeStyle = cols[j]; gk.lineWidth = 2; gk.beginPath(); tr.forEach((r, i) => (i ? gk.lineTo(X(r.tMin), Y(r.cap[j])) : gk.moveTo(X(r.tMin), Y(r.cap[j])))); gk.stroke();
+    gk.strokeStyle = cols[j]; gk.setLineDash([5, 4]); gk.lineWidth = 1; gk.beginPath(); tr.forEach((r, i) => (i ? gk.lineTo(X(r.tMin), Y(r.verdad[j])) : gk.moveTo(X(r.tMin), Y(r.verdad[j])))); gk.stroke(); gk.setLineDash([]);
+  });
+  const d = g.deteccion; if (d) { gk.strokeStyle = C.e; gk.beginPath(); gk.moveTo(X(d.tMin), Tp); gk.lineTo(X(d.tMin), H - B); gk.stroke(); text(gk, `detectado · min ${d.tMin}`, X(d.tMin) + 4, Tp + 12, { c: C.e, f: '11px Inter,sans-serif' }); }
+  text(gk, tw === 'atascoChico' ? 'continua: estimado · discontinua: real' : 'celdas 2, 3, 4 · continua: estimado · discontinua: real', L + 4, H - B - 6, { c: C.m, f: '10px Inter,sans-serif' });
+}
+let last = 0;
+run({ eaton: drawEaton, ctm: (t) => { const dt = Math.min(0.1, Math.max(0, t - last)); last = t; drawCtm(dt); }, twins: drawK });
+
+// ── Caltrans y TfL ───────────────────────────────────────────────────────────
+const spark = (a0) => { const a = (a0 || []).filter((v) => v != null); if (!a.length) return '<span class="m">sin señal</span>'; const m = Math.max(1, ...a), w = 90, h = 22, pts = a.map((v, i) => `${(i / Math.max(1, a.length - 1)) * w},${h - (v / m) * (h - 2) - 1}`).join(' '); return `<svg class="spark" width="${w}" height="${h}" role="img" aria-label="Vehículos en imagen cada 15 minutos: ${a.join(', ')}"><polyline points="${pts}" fill="none" stroke="#91d7e8" stroke-width="1.5"/></svg>`; };
+const ZN = { camp: 'Camp', palisades: 'Palisades', eaton: 'Eaton' };
+$('#cal').innerHTML = (CAL?.camaras || []).map((c) => `<tr><td><a href="${c.imagenEnDirecto}" rel="noopener">${c.id}</a><br><span class="m">${ZN[c.zona]} · ${c.ruta}${c.estado.startsWith('fuera') ? ' · fuera de servicio' : ''}</span></td><td class="n">${c.video ? `${c.video.flujoVehH.toLocaleString('es')} veh/h` : '—'}</td><td class="n">${c.video ? c.video.mediaEnImagen : '—'}</td><td class="n">${c.video?.velMedianaMovKmh ? `≈ ${c.video.velMedianaMovKmh} km/h` : '—'}</td><td>${spark(c.serie)}</td><td>${c.fuegoHistorico.distMinKm} km${c.fuegoHistorico.a5km ? `<br><span class="m">≤ 5 km a las ${fmt(c.fuegoHistorico.a5km)}</span>` : ''}</td></tr>`).join('') || '<tr><td colspan="6">Sin datos de Caltrans en esta versión.</td></tr>';
+const tfl = R.camaras.ruido;
+$('#tfl').innerHTML = T.camaras.map((c, i) => `<tr><td>${c.nombre ?? c.camara}</td><td class="n">${c.cruces}</td><td class="n">${tfl[i]?.ratePerMin ?? '—'}</td><td class="n">${c.mediaEnImagen}</td><td class="n">± ${tfl[i]?.sdInFrame ?? '—'}</td></tr>`).join('');
+$('#tfl-img').innerHTML = ['03752', '06590', '03850', '02158'].map((id) => { const c = T.camaras.find((x) => x.camara === `00001.${id}`); return `<figure><img src="/senda/data/referencias/tfl_${id}.jpg" alt="Cámara TfL ${c?.nombre ?? id}: calle de Londres de noche con vehículos detectados en recuadros" loading="lazy" width="352" height="288"><figcaption>${c?.nombre ?? id} · ${c?.cruces ?? 0} cruces</figcaption></figure>`; }).join('');
+
+const calN = (CAL?.camaras || []).filter((c) => c.video).length;
+$('#sum').innerHTML = `Datos reales: satélite <b>GOES</b> y modelo <b>HRRR</b> (NOAA) · <b>${CAL?.camaras?.length ?? 0}</b> cámaras de <b>Caltrans</b> en los corredores (${calN} con vídeo analizado) · <b>${T.camaras.length}</b> cámaras de <b>TfL</b>. Modelo: tráfico por celdas y filtro de Kalman. Supuestos y gemelos simulados, marcados donde aparecen.`;
+Object.assign(S, { ok: true, eatonAdelantoH: ED.adelantoHorasP50, eatonAviso: fmt(ED.p50?.t), escenarios: Object.fromEntries(Object.entries(PA.escenarios).map(([k, v]) => [k, { despeje: v.despejeMin, expuestos: v.expuestosVehMin }])), deteccionAtasco: GM.atascoChico.deteccion?.tMin, deteccionBloqueo: GM.palisadesBloqueo.deteccion?.tMin, caltrans: CAL?.camaras?.length ?? 0, caltransVideo: calN, tfl: T.camaras.length, setScenario: (k) => $(`#sc [data-s="${k}"]`).click() });
+</script>
+</body></html>

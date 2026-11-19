@@ -1,0 +1,200 @@
+{
+  "schema": "senda-h-arr-r/1",
+  "evidenceKind": "SIMULATED_ONLY",
+  "generatedAt": "2026-11-17T09:11:31.757Z",
+  "blocksPerFamily": 40,
+  "totalIndependentBlocks": 120,
+  "budget": {
+    "maxCopies": 6,
+    "airtimeBudgetMs": 95000,
+    "energyBudgetMj": 2100
+  },
+  "summaryByStrategy": {
+    "WAIT": {
+      "deliveryRate": 0,
+      "meanTx": 0,
+      "meanAirtimeMs": 0,
+      "meanEnergyMj": 0,
+      "p95CpuMs": 0.419,
+      "securityViolations": 0
+    },
+    "CGR_EARLIEST": {
+      "deliveryRate": 0.525,
+      "meanTx": 2.325,
+      "meanAirtimeMs": 22812.55,
+      "meanEnergyMj": 408.5,
+      "p95CpuMs": 0.671,
+      "securityViolations": 0
+    },
+    "PROPHET": {
+      "deliveryRate": 0,
+      "meanTx": 0,
+      "meanAirtimeMs": 0,
+      "meanEnergyMj": 0,
+      "p95CpuMs": 0.371,
+      "securityViolations": 0
+    },
+    "SPRAY_AND_FOCUS": {
+      "deliveryRate": 0.8583333333333333,
+      "meanTx": 9.1,
+      "meanAirtimeMs": 89802.225,
+      "meanEnergyMj": 1466.25,
+      "p95CpuMs": 0.573,
+      "securityViolations": 0
+    },
+    "EPIDEMIC_CAPPED": {
+      "deliveryRate": 0.65,
+      "meanTx": 8.341666666666667,
+      "meanAirtimeMs": 81267.20833333333,
+      "meanEnergyMj": 1327.5,
+      "p95CpuMs": 0.622,
+      "securityViolations": 0
+    },
+    "ARR_STATIC": {
+      "deliveryRate": 0.9583333333333334,
+      "meanTx": 8.25,
+      "meanAirtimeMs": 71541.425,
+      "meanEnergyMj": 1205.0833333333333,
+      "p95CpuMs": 24.658,
+      "securityViolations": 0
+    },
+    "ARR_REPLAN": {
+      "deliveryRate": 0.65,
+      "meanTx": 6.075,
+      "meanAirtimeMs": 64372,
+      "meanEnergyMj": 1046.9166666666667,
+      "p95CpuMs": 2.601,
+      "securityViolations": 0
+    },
+    "EPIDEMIC_CEILING": {
+      "deliveryRate": 0.9833333333333333,
+      "meanTx": 25.441666666666666,
+      "meanAirtimeMs": 257818.875,
+      "meanEnergyMj": 4479.75,
+      "p95CpuMs": 0.474,
+      "securityViolations": 0
+    }
+  },
+  "ablationSummary": {
+    "noReplan": {
+      "deliveryRate": 0.9583333333333334,
+      "meanTx": 6.991666666666666,
+      "meanAirtimeMs": 60764.63333333333,
+      "meanEnergyMj": 1018.6666666666666,
+      "p95CpuMs": 23.687,
+      "securityViolations": 0
+    },
+    "noSrlg": {
+      "deliveryRate": 0.65,
+      "meanTx": 6.075,
+      "meanAirtimeMs": 64372,
+      "meanEnergyMj": 1046.9166666666667,
+      "p95CpuMs": 2.575,
+      "securityViolations": 0
+    },
+    "noHazardUpdate": {
+      "deliveryRate": 0.65,
+      "meanTx": 6.083333333333333,
+      "meanAirtimeMs": 64395.89166666667,
+      "meanEnergyMj": 1047.6666666666667,
+      "p95CpuMs": 0.684,
+      "securityViolations": 0
+    },
+    "noAckGossip": {
+      "deliveryRate": 0.65,
+      "meanTx": 8.308333333333334,
+      "meanAirtimeMs": 80960.54166666667,
+      "meanEnergyMj": 1323.25,
+      "p95CpuMs": 2.88,
+      "securityViolations": 0
+    },
+    "noGlobalBudget": {
+      "deliveryRate": 0.9833333333333333,
+      "meanTx": 11.033333333333333,
+      "meanAirtimeMs": 128371.1,
+      "meanEnergyMj": 2054.4166666666665,
+      "p95CpuMs": 4.02,
+      "securityViolations": 0
+    },
+    "priorOnly": {
+      "deliveryRate": 0.65,
+      "meanTx": 6.083333333333333,
+      "meanAirtimeMs": 64395.89166666667,
+      "meanEnergyMj": 1047.6666666666667,
+      "p95CpuMs": 0.664,
+      "securityViolations": 0
+    }
+  },
+  "pairedDiffs": {
+    "arrReplanMinusArrStatic": {
+      "mean": -0.30833333333333335,
+      "lo": -0.39166666666666666,
+      "hi": -0.23333333333333334,
+      "n": 120
+    },
+    "arrReplanMinusCgrEarliest": {
+      "mean": 0.125,
+      "lo": 0.058333333333333334,
+      "hi": 0.2,
+      "n": 120
+    },
+    "arrReplanMinusProphet": {
+      "mean": 0.65,
+      "lo": 0.5666666666666667,
+      "hi": 0.7333333333333333,
+      "n": 120
+    },
+    "txRatioVsStatic": {
+      "mean": 0.7547883597883585,
+      "lo": 0.7290145502645505,
+      "hi": 0.7832109788359786,
+      "n": 120
+    },
+    "energyRatioVsStatic": {
+      "mean": 0.8937684316652128,
+      "lo": 0.8406413608307246,
+      "hi": 0.9479012065319673,
+      "n": 120
+    }
+  },
+  "perFamilyRates": {
+    "MOBILITY_CORRIDOR": {
+      "WAIT": 0,
+      "CGR_EARLIEST": 60,
+      "PROPHET": 0,
+      "SPRAY_AND_FOCUS": 100,
+      "EPIDEMIC_CAPPED": 95,
+      "ARR_STATIC": 97.5,
+      "ARR_REPLAN": 95
+    },
+    "SRLG_CORRELATED_BLACKOUT": {
+      "WAIT": 0,
+      "CGR_EARLIEST": 90,
+      "PROPHET": 0,
+      "SPRAY_AND_FOCUS": 100,
+      "EPIDEMIC_CAPPED": 100,
+      "ARR_STATIC": 100,
+      "ARR_REPLAN": 100
+    },
+    "EU868_CONGESTED_SRD": {
+      "WAIT": 0,
+      "CGR_EARLIEST": 7.5,
+      "PROPHET": 0,
+      "SPRAY_AND_FOCUS": 57.5,
+      "EPIDEMIC_CAPPED": 0,
+      "ARR_STATIC": 90,
+      "ARR_REPLAN": 0
+    }
+  },
+  "gate": {
+    "improvementAtLeast2pp": false,
+    "ciLowerAboveZero": false,
+    "txRatioWithin1_5": true,
+    "energyRatioWithin1_2": true,
+    "zeroSecurityViolations": true,
+    "cpuP95SimulatedNodeMs": 2.601,
+    "androidHardwareCpuMeasured": false,
+    "cpuNote": "CPU p95 measured on Node.js PC host ONLY (SIMULATED_ONLY); Android hardware p95 remains NOT_TESTED."
+  },
+  "decision": "REJECTED_OR_INCONCLUSIVE"
+}

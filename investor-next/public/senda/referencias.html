@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SENDA · Incendios de referencia</title>
+<meta name="description" content="Base de referencia de SENDA: 14 incendios reales documentados con fuentes, 7 reconstruidos con el satélite GOES y el modelo HRRR de NOAA, velocidad de avance medida, entrenamiento y validación fuera de muestra frente a la regla del 10 %.">
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/kit.css">
+<style>
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.tabs button[aria-pressed=true]{background:var(--c);color:#111;border-color:var(--c)}
+.lg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--m);margin-top:8px}.lg i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.big{font-size:26px;font-weight:800}.ver{color:var(--e)}.pend{color:var(--a)}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+details summary{cursor:pointer}
+</style>
+</head>
+<body><main>
+<p class="m"><a href="/senda">← SENDA Campo</a> · <a href="/senda/evacuacion">Coches, cámaras y fuego</a> · <a href="/senda/fuego">Seguir un incendio</a> · <a href="/senda/fuego3d">Incendio en 3D</a> · <a href="/senda/paper">Paper</a></p>
+<h1>Incendios de referencia: aprender de lo que ya pasó</h1>
+<p class="lead m">SENDA no se entrena con datos inventados. Esta página reúne <b>incendios reales</b>, cada dato con su fuente. Siete se han <b>reconstruido con el satélite GOES</b> (una imagen cada 5–10 minutos) y con el viento del modelo <b>HRRR</b> de NOAA, descargados de verdad. Con ellos se mide a qué velocidad avanzó cada frente y se comprueba, fuera de muestra, qué regla predice mejor un incendio nuevo.</p>
+<div class="note" id="sum" aria-live="polite">Cargando datos reales…</div>
+
+<section class="card" data-viz="goes" style="margin-top:14px" aria-labelledby="h-g">
+  <h2 id="h-g">🛰️ Lo que vio el satélite, incendio a incendio</h2>
+  <div class="tabs" id="tabs" role="group" aria-label="Elegir incendio"></div>
+  <div class="g2">
+    <div><canvas id="cv-map" aria-label="Detecciones de fuego del satélite GOES coloreadas por hora, con la dirección del viento"></canvas>
+      <div class="row"><button id="play" class="p" aria-pressed="true">⏸ Pausa</button><label for="t" class="m" style="font-size:13px">Hora</label><input id="t" type="range" min="0" max="100" value="100" aria-label="Instante de la reconstrucción"><output id="t-o" class="m"></output></div>
+      <div class="lg"><span><i style="background:#ffd23f"></i>detección reciente</span><span><i style="background:#7a2a18"></i>detección anterior</span><span><i style="background:#91d7e8"></i>viento HRRR (hacia)</span><span><i style="background:#fff"></i>origen</span><span><i style="background:#b79cff"></i>pueblo (aprox.)</span></div></div>
+    <div><canvas id="cv-front" aria-label="Avance del frente en kilómetros frente al tiempo, con los tramos ajustados y la potencia radiativa"></canvas>
+      <div class="lg"><span><i style="background:#ff7756"></i>frente medido</span><span><i style="background:#34d399"></i>tramo ajustado</span><span><i style="background:#5d6e78"></i>potencia radiativa (FRP)</span><span><i style="background:#91d7e8"></i>viento a 10 m</span></div></div>
+  </div>
+  <div class="kv" id="g-kv" style="margin-top:10px"></div>
+  <p class="src">Fuente: NOAA GOES-16/18 ABI L2 Fire Detection (FDC) y NOAA HRRR 3 km, AWS Open Data (dominio público). El frente es el píxel detectado más avanzado a sotavento, acumulado. Los píxeles miden 2–6 km: un frente que avanza menos de un píxel en un tramo no se puede medir y no entra en el entrenamiento. La huella de píxeles <b>sobreestima el área</b>; aquí no se usa como superficie.</p>
+</section>
+
+<div class="g2">
+<section class="card" data-viz="ros" aria-labelledby="h-r">
+  <h2 id="h-r">📈 Velocidad del frente frente al viento</h2>
+  <canvas id="cv-ros" aria-label="Velocidad medida por satélite frente al viento a 10 metros en escala logarítmica, con la regla del 10 % y la banda calibrada"></canvas>
+  <div class="lg"><span><i style="background:#ff7756"></i>matorral / bosque</span><span><i style="background:#fbbf24"></i>pasto</span><span><i style="background:#9fb2bc"></i>regla del 10 %</span><span><i style="background:#34d399"></i>mediana calibrada y banda del 80 %</span></div>
+  <p class="src">Regla del 10 %: Cruz y Alexander (2019), <a href="https://doi.org/10.1007/s13595-019-0829-8">Annals of Forest Science 76:44</a>. Cada punto es un tramo resuelto por GOES con el viento HRRR medio del tramo.</p>
+</section>
+<section class="card" aria-labelledby="h-v">
+  <h2 id="h-v">🧪 Validación dejando fuera un incendio entero</h2>
+  <p class="m" style="font-size:14px;margin-top:0">Se ajusta cada modelo con los demás incendios y se predice el que se dejó fuera. Así se mide lo que importa: acertar en un incendio que el modelo nunca vio.</p>
+  <div class="tw"><table><thead><tr><th>Modelo</th><th>Error medio</th><th>Error log</th><th>Dentro de ×2</th><th>Sesgo</th></tr></thead><tbody id="loo"></tbody></table></div>
+  <div class="note" id="loo-n" style="margin-top:8px"></div>
+</section>
+</div>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-c">
+  <h2 id="h-c">✅ Contraste con lo documentado</h2>
+  <div class="tw"><table><thead><tr><th>Incendio</th><th>Qué se documentó</th><th>Qué mide SENDA con datos reales</th><th>Veredicto</th></tr></thead><tbody id="chk"></tbody></table></div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-b">
+  <h2 id="h-b">📚 La base de referencia (14 incendios)</h2>
+  <p class="m" style="font-size:14px;margin-top:0">Cada hecho lleva su fuente. <span class="ver">● verificado</span> significa que la cifra aparece en la fuente citada; <span class="pend">● pendiente de verificar</span>, que hay que confirmarla en el informe oficial antes de usarla. Las cifras de prensa sirven de contraste, nunca de dato de entrenamiento.</p>
+  <div id="base"></div>
+</section>
+
+<section class="card" style="margin-top:14px" aria-labelledby="h-l">
+  <h2 id="h-l">⚠️ Límites honestos</h2>
+  <ul class="m" style="font-size:14px">
+    <li>Con siete tramos de cinco incendios, ningún modelo aprendido supera aún a la regla publicada en error puntual. Lo que sí se aprende es su <b>sesgo</b> y su <b>dispersión real</b>, y eso es lo que SENDA usa: fija el P90 de los conjuntos y la distancia de aviso.</li>
+    <li>GOES ve píxeles de 2–6 km. Para frentes lentos o en terreno complejo (Palisades, Eaton) hacen falta VIIRS (375 m), perímetros oficiales por hora o cámaras. Es el siguiente paso de la base.</li>
+    <li>El viento HRRR se toma en el punto de la primera detección; en carreras largas (Smokehouse Creek, 75 km) cambia por el camino.</li>
+    <li>Los casos europeos (Pedrógão, Mati, Sierra de la Culebra) aún no tienen datos horarios abiertos accesibles: entran como lecciones, no como puntos de entrenamiento.</li>
+  </ul>
+</section>
+</main>
+<script type="module">
+import { $, C, canvas, text, run, clamp } from '/senda/kit.mjs';
+const S = { ok: false }; window.SENDA_REF = S;
+const [R, G] = await Promise.all([fetch('/senda/data/referencias/referencias.json').then((r) => r.json()), fetch('/senda/data/referencias/goes_casos.json').then((r) => r.json())]);
+const NAMES = { camp: 'Camp 2018', palisades: 'Palisades 2025', eaton: 'Eaton 2025', marshall: 'Marshall 2021', smokehouse: 'Smokehouse Creek 2024', troublesome: 'East Troublesome 2020', creek: 'Creek 2020' };
+const P = R.progresion, E = R.entrenamiento, fires = Object.keys(P);
+let cur = 'camp', playing = true, frac = 1;
+const fmtH = (iso, tz) => new Date(Date.parse(iso) + tz * 3.6e6).toISOString().slice(11, 16);
+// Lugares de contexto (coordenadas aproximadas, solo para orientarse en el mapa).
+const PLACES = { camp: [['Paradise', 39.76, -121.62], ['Chico', 39.73, -121.84], ['Pulga', 39.80, -121.45]], palisades: [['Pacific Palisades', 34.05, -118.53], ['Malibu', 34.03, -118.69]], eaton: [['Altadena oeste', 34.19, -118.155], ['Pasadena', 34.15, -118.14]], marshall: [['Superior', 39.95, -105.17], ['Louisville', 39.98, -105.13]], smokehouse: [['Stinnett', 35.83, -101.44], ['Canadian', 35.91, -100.38]], troublesome: [['Grand Lake', 40.25, -105.82], ['Estes Park', 40.38, -105.52]], creek: [['Shaver Lake', 37.10, -119.32], ['Mammoth Pool', 37.33, -119.33]] };
+const TZ = { camp: -8, palisades: -8, eaton: -8, marshall: -7, smokehouse: -6, troublesome: -6, creek: -7 };
+
+$('#sum').innerHTML = `<b>${R.base.length}</b> incendios en la base · <b>${fires.length}</b> reconstruidos con satélite · <b>${E.puntos.length}</b> tramos medidos de <b>${new Set(E.puntos.map((p) => p.caso)).size}</b> incendios · la regla del 10 % se queda corta un factor <b>×${E.regla10Calibrada.factorMediana}</b> en estas carreras, con dispersión real σ = ${E.regla10Calibrada.sigma} (log).`;
+$('#tabs').innerHTML = fires.map((f) => `<button data-f="${f}" aria-pressed="${f === cur}">${NAMES[f]}</button>`).join('');
+$('#tabs').addEventListener('click', (e) => { const f = e.target.dataset.f; if (!f) return; cur = f; frac = 0; playing = true; $('#play').textContent = '⏸ Pausa'; for (const b of $('#tabs').children) b.setAttribute('aria-pressed', b.dataset.f === cur); kv(); });
+$('#play').onclick = () => { playing = !playing; $('#play').textContent = playing ? '⏸ Pausa' : '▶ Seguir'; $('#play').setAttribute('aria-pressed', playing); };
+$('#t').oninput = (e) => { frac = e.target.value / 100; playing = false; $('#play').textContent = '▶ Seguir'; };
+function kv() {
+  const p = P[cur], segs = p.tramos.map((s) => `${s.rosKmh} km/h${s.resuelto ? '' : ' (bajo resolución)'}`).join(' · ');
+  $('#g-kv').innerHTML = [['Satélite', p.sat], ['Primera detección', `${fmtH(p.primeraDeteccion, TZ[cur])} hora local`], ['Píxel en la zona', `${p.pixelKm[0]} × ${p.pixelKm[1]} km`], ['Dirección a sotavento', `${Math.round(p.dirDeg)}°`], ['Frente máximo', `${p.filas.at(-1).frenteKm} km`], ['Tramos (ROS)', segs]].map(([k, v]) => `<div><span class="m">${k}</span><b>${v}</b></div>`).join('');
+}
+kv();
+
+const gm = canvas($('#cv-map'), 460, 400), gf = canvas($('#cv-front'), 460, 400), gr = canvas($('#cv-ros'), 460, 380);
+function drawMap() {
+  const p = P[cur], fr = G.casos[cur].frames, o = p.origen, all = fr.flatMap((f) => f.det), kx = 111.32 * Math.cos((o[0] * Math.PI) / 180), ky = 110.57;
+  const xy = (d) => [(d[1] - o[1]) * kx, (d[0] - o[0]) * ky];
+  let ext = 6; for (const d of all) { const [x, y] = xy(d); ext = Math.max(ext, Math.abs(x) + 3, Math.abs(y) + 3); }
+  const W = 460, H = 400, sc = Math.min(W, H) / 2 / ext, cx = W / 2, cy = H / 2, X = (x) => cx + x * sc, Y = (y) => cy - y * sc;
+  gm.fillStyle = C.bg; gm.fillRect(0, 0, W, H);
+  gm.strokeStyle = '#13212b'; gm.lineWidth = 1; const step = ext > 40 ? 20 : ext > 15 ? 10 : 5;
+  for (let k = -Math.ceil(ext / step) * step; k <= ext; k += step) { gm.beginPath(); gm.moveTo(X(k), 0); gm.lineTo(X(k), H); gm.moveTo(0, Y(k)); gm.lineTo(W, Y(k)); gm.stroke(); }
+  const n = Math.max(1, Math.round(frac * (fr.length - 1))), pxw = Math.max(3, p.pixelKm[0] * sc * 0.9), pxh = Math.max(3, p.pixelKm[1] * sc * 0.9);
+  for (let k = 0; k <= n; k++) { const age = (n - k) / Math.max(1, n); for (const d of fr[k].det) { const [x, y] = xy(d); gm.fillStyle = k === n ? '#ffd23f' : `rgba(${Math.round(122 + 80 * (1 - age))},${Math.round(42 + 40 * (1 - age))},24,0.55)`; gm.fillRect(X(x) - pxw / 2, Y(y) - pxh / 2, pxw, pxh); } }
+  gm.fillStyle = '#fff'; gm.beginPath(); gm.arc(X(0), Y(0), 4, 0, 7); gm.fill();
+  for (const [nm, la, lo] of PLACES[cur] || []) { const x = X((lo - o[1]) * kx), y = Y((la - o[0]) * ky); if (x < 0 || x > W || y < 0 || y > H) continue; gm.strokeStyle = C.v; gm.lineWidth = 2; gm.beginPath(); gm.arc(x, y, 5, 0, 7); gm.stroke(); gm.lineWidth = 1; gm.font = '600 12px Inter,sans-serif'; gm.lineWidth = 4; gm.strokeStyle = '#05090c'; gm.strokeText(nm, x + 8, y + 4); gm.lineWidth = 1; gm.fillStyle = C.v; gm.fillText(nm, x + 8, y + 4); }
+  const t = fr[n].t, h = p.hrrr, i = Math.max(0, h.findIndex((q) => Date.parse(q.t) > Date.parse(t)) - 1), w = h[i] ?? h[0], wh = G.casos[cur].hrrr[i] ?? G.casos[cur].hrrr[0];
+  const ang = Math.atan2(wh.u10, wh.v10), L = 40; gm.strokeStyle = C.i; gm.lineWidth = 3; gm.beginPath(); gm.moveTo(60, 60); gm.lineTo(60 + Math.sin(ang) * L, 60 - Math.cos(ang) * L); gm.stroke();
+  gm.fillStyle = C.i; gm.beginPath(); gm.arc(60 + Math.sin(ang) * L, 60 - Math.cos(ang) * L, 4, 0, 7); gm.fill();
+  text(gm, `${w.u10Kmh} km/h · racha ${w.rachaKmh}`, 18, 118, { c: C.i, f: '12px Inter,sans-serif' });
+  text(gm, `${NAMES[cur]} · ${fmtH(t, TZ[cur])} local · ${fr[n].det.length} píxeles`, 12, H - 12, { c: C.t, f: '13px Inter,sans-serif' });
+  text(gm, `${step} km`, W - 50, H - 12, { c: C.m, f: '11px Inter,sans-serif' });
+  $('#t-o').textContent = `${fmtH(t, TZ[cur])}`; $('#t').value = Math.round(frac * 100);
+  return n;
+}
+function drawFront(n) {
+  const p = P[cur], rows = p.filas, W = 460, H = 400, L = 46, Rr = 40, T = 20, B = 40, tMax = rows.at(-1).min / 60 || 1, fMax = Math.max(1, ...rows.map((r) => r.frenteKm)) * 1.1, frpMax = Math.max(1, ...rows.map((r) => r.frpMW));
+  const X = (h) => L + (h / tMax) * (W - L - Rr), Y = (k) => H - B - (k / fMax) * (H - T - B);
+  gf.fillStyle = C.bg; gf.fillRect(0, 0, W, H);
+  gf.strokeStyle = '#203240'; gf.beginPath(); gf.moveTo(L, T); gf.lineTo(L, H - B); gf.lineTo(W - Rr, H - B); gf.stroke();
+  for (let k = 0; k <= 4; k++) { const v = (fMax / 4) * k; text(gf, v.toFixed(0), L - 6, Y(v) + 4, { c: C.m, f: '11px Inter,sans-serif', al: 'right' }); }
+  for (let k = 0; k <= 4; k++) { const v = (tMax / 4) * k; text(gf, `${v.toFixed(1)} h`, X(v), H - B + 16, { c: C.m, f: '11px Inter,sans-serif', al: 'center' }); }
+  text(gf, 'km a sotavento', L, 14, { c: C.m, f: '11px Inter,sans-serif' });
+  for (const r of rows) { const bh = (r.frpMW / frpMax) * 50; gf.fillStyle = '#2a3944'; gf.fillRect(X(r.min / 60) - 1.5, H - B - bh, 3, bh); }
+  const h0 = Date.parse(p.primeraDeteccion), uMax = Math.max(...p.hrrr.map((h) => h.u10Kmh)) * 1.2;
+  gf.strokeStyle = C.i; gf.lineWidth = 1.5; gf.beginPath(); let first = true;
+  for (const h of p.hrrr) { const hh = (Date.parse(h.t) - h0) / 3.6e6; if (hh < 0 || hh > tMax) continue; const y = T + (1 - h.u10Kmh / uMax) * (H - T - B); first ? gf.moveTo(X(hh), y) : gf.lineTo(X(hh), y); first = false; }
+  gf.stroke(); text(gf, `viento (máx ${Math.round(uMax / 1.2)} km/h)`, W - Rr, 14, { c: C.i, f: '11px Inter,sans-serif', al: 'right' });
+  gf.strokeStyle = C.c; gf.lineWidth = 2.5; gf.beginPath(); rows.slice(0, n + 1).forEach((r, i) => (i ? gf.lineTo(X(r.min / 60), Y(r.frenteKm)) : gf.moveTo(X(r.min / 60), Y(r.frenteKm)))); gf.stroke();
+  for (const s of p.tramos) {
+    const a = rows.find((r) => r.min === s.t0Min) ?? rows[0], x0 = s.t0Min / 60, x1 = s.t1Min / 60, y0 = a.frenteKm, y1 = y0 + s.rosKmh * (x1 - x0);
+    gf.strokeStyle = s.resuelto ? C.e : '#3d6b5a'; gf.lineWidth = 2; gf.setLineDash(s.resuelto ? [] : [5, 4]); gf.beginPath(); gf.moveTo(X(x0), Y(y0)); gf.lineTo(X(x1), Y(Math.min(fMax, y1))); gf.stroke(); gf.setLineDash([]);
+    text(gf, `${s.rosKmh} km/h`, X((x0 + x1) / 2), Y((y0 + y1) / 2) - 8, { c: s.resuelto ? C.e : C.g, f: '11px Inter,sans-serif', al: 'center' });
+  }
+}
+function drawRos() {
+  const W = 460, H = 380, L = 50, Rr = 16, T = 16, B = 40, lx = (u) => Math.log10(u), u0 = 10, u1 = 100, r0 = 0.3, r1 = 40;
+  const X = (u) => L + ((lx(u) - lx(u0)) / (lx(u1) - lx(u0))) * (W - L - Rr), Y = (r) => H - B - ((Math.log10(r) - Math.log10(r0)) / (Math.log10(r1) - Math.log10(r0))) * (H - T - B);
+  gr.fillStyle = C.bg; gr.fillRect(0, 0, W, H);
+  gr.strokeStyle = '#13212b'; for (const u of [10, 20, 50, 100]) { gr.beginPath(); gr.moveTo(X(u), T); gr.lineTo(X(u), H - B); gr.stroke(); text(gr, `${u}`, X(u), H - B + 16, { c: C.m, f: '11px Inter,sans-serif', al: 'center' }); }
+  for (const r of [0.5, 1, 2, 5, 10, 20]) { gr.beginPath(); gr.moveTo(L, Y(r)); gr.lineTo(W - Rr, Y(r)); gr.stroke(); text(gr, `${r}`, L - 6, Y(r) + 4, { c: C.m, f: '11px Inter,sans-serif', al: 'right' }); }
+  text(gr, 'viento a 10 m (km/h)', W - Rr, H - 6, { c: C.m, f: '11px Inter,sans-serif', al: 'right' }); text(gr, 'velocidad del frente (km/h)', L, 12, { c: C.m, f: '11px Inter,sans-serif' });
+  const c = E.regla10Calibrada, q = 1.5; // banda ≈ 80 % con t de Student (gl = n − 1)
+  gr.fillStyle = 'rgba(52,211,153,0.12)'; gr.beginPath(); gr.moveTo(X(u0), Y(0.1 * u0 * Math.exp(c.mu + q * c.sigmaPred))); gr.lineTo(X(u1), Y(Math.min(r1, 0.1 * u1 * Math.exp(c.mu + q * c.sigmaPred)))); gr.lineTo(X(u1), Y(0.1 * u1 * Math.exp(c.mu - q * c.sigmaPred))); gr.lineTo(X(u0), Y(Math.max(r0, 0.1 * u0 * Math.exp(c.mu - q * c.sigmaPred)))); gr.fill();
+  gr.strokeStyle = C.m; gr.setLineDash([6, 4]); gr.beginPath(); gr.moveTo(X(u0), Y(1)); gr.lineTo(X(u1), Y(10)); gr.stroke(); gr.setLineDash([]);
+  gr.strokeStyle = C.e; gr.lineWidth = 2; gr.beginPath(); gr.moveTo(X(u0), Y(u0 * 0.1 * Math.exp(c.mu))); gr.lineTo(X(u1), Y(u1 * 0.1 * Math.exp(c.mu))); gr.stroke();
+  for (const p of E.puntos) { gr.fillStyle = p.combustible === 'pasto' ? C.a : C.c; gr.beginPath(); gr.arc(X(p.u10Kmh), Y(p.rosKmh), 6, 0, 7); gr.fill(); text(gr, NAMES[p.caso].split(' ')[0], X(p.u10Kmh) + 8, Y(p.rosKmh) + 4, { c: C.t, f: '11px Inter,sans-serif' }); }
+}
+run({ goes: () => { if (playing) { frac += 0.004; if (frac > 1) frac = 0; } const n = drawMap(); drawFront(n); }, ros: drawRos });
+
+const sc = E.loo.scores, LBL = { potencia: 'Ley potencial ROS = a·U^b', 'razon-combustible': 'Razón por combustible', 'bayes-10%': '10 % actualizada por Bayes', regla10: 'Regla del 10 % (publicada)', media: 'Media (siempre lo mismo)' };
+const best = Object.entries(sc).sort((a, b) => a[1].maeKmh - b[1].maeKmh)[0][0];
+$('#loo').innerHTML = Object.entries(sc).map(([k, v]) => `<tr${k === best ? ' style="background:#10241c"' : ''}><td>${LBL[k] ?? k}${k === best ? ' 🏆' : ''}</td><td class="n">${v.maeKmh} km/h</td><td class="n">${v.maeLog}</td><td class="n">${Math.round(v.dentroDeX2 * 100)} %</td><td class="n">${v.sesgoLog > 0 ? '+' : ''}${v.sesgoLog}</td></tr>`).join('');
+$('#loo-n').innerHTML = `Con <b>${E.loo.n}</b> tramos de <b>${E.loo.casos}</b> incendios, la <b>regla publicada</b> gana en error puntual: un ajuste nuevo con tan pocos incendios sobreajusta. Lo aprovechable es la <b>calibración de la incertidumbre</b>: la mediana real es ×${c0()} la regla y el intervalo del 80 % calculado sin ver el incendio cubrió el <b>${Math.round(E.cobertura80.cobertura * 100)} %</b> de los casos (el del 90 %, el ${Math.round(E.cobertura90.cobertura * 100)} %). Ese P90 es el que usan los conjuntos de propagación y la distancia de aviso.`;
+function c0() { return E.regla10Calibrada.factorMediana; }
+
+const fmt = (t, tz = -8) => (t ? new Date(Date.parse(t) + tz * 3.6e6).toISOString().slice(11, 16) : '—');
+const A = R.aproximacion, ED = R.eatonDisparo, smv = R.smv;
+const rows = [
+  ['Camp 2018', 'NIST: ≈ 7 millas en 90 min (≈ 7,5 km/h), en una presentación pendiente de verificar en la TN 2135', `GOES + HRRR: <b>${E.nistCamp.medidoGoes} km/h</b> en los primeros 90 min`, Math.abs(E.nistCamp.medidoGoes - 7.5) < 2.5 ? '✅ coincide' : '⚠️ difiere'],
+  ['Camp 2018', 'NIST: a las <b>08:30</b> el fuego alcanzó el tráfico en Pentz Rd y la parte alta de Skyway', `GOES: a ≤ 3 km a las <b>${fmt(A.pentz.a3km)}</b> y a ≤ 2 km a las <b>${fmt(A.pentz.a2km)}</b>`, '✅ coincide (± 1 píxel)'],
+  ['Eaton 2025', 'Ignición ≈ 18:18; avanzaba hacia Altadena oeste desde ≈ 21:30; orden de evacuación <b>después de las 03:00</b>', `GOES: a ≤ 3 km de Altadena oeste a las <b>${fmt(A.altadenaOeste.a3km)}</b>. Umbral dinámico de SENDA: aviso a las <b>${fmt(ED.p50?.t)}</b>`, `⏱️ SENDA habría avisado <b>${ED.adelantoHorasP50} h</b> antes`],
+  ['Palisades 2025', 'Coches abandonados en Palisades Dr / Sunset; excavadora para abrir paso', `GOES: fuego a ≤ 2 km del cruce a las <b>${fmt(A.palisadesDr.a2km)}</b>`, '🧭 ver <a href="/senda/evacuacion">evacuación</a>'],
+  ['SMV 2026 (España)', `Cicatriz Sentinel-2 del 24-07: componente de ${smv?.componenteHa} ha con frente a ${smv?.frenteMaxKm} km`, `Media mínima ${smv?.rosMediaMinKmh} km/h en 20 h (incluye la noche); predicción calibrada para ${smv?.u10Kmh} km/h de viento: ${smv?.prediccion.mediana} km/h (P10 ${smv?.prediccion.p10} – P90 ${smv?.prediccion.p90})`, '🟢 coherente (cota inferior)'],
+];
+$('#chk').innerHTML = rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('');
+
+const src = (k) => (k && R.fuentes[k] ? ` <a class="src" href="${R.fuentes[k].url}">[${R.fuentes[k].t.split('·')[0].trim()}]</a>` : '');
+$('#base').innerHTML = R.base.map((f) => `<details${['camp-2018', 'eaton-2025'].includes(f.id) ? ' open' : ''}><summary><b>${f.nombre}</b> · ${f.pais} · ${f.fecha} · <span class="m">${f.combustible}</span>${f.satelite?.startsWith('goes') ? ' · 🛰️ GOES' : f.satelite === 'sentinel2' ? ' · 🛰️ Sentinel-2' : ''}</summary>
+  <ul style="font-size:14px;margin:6px 0">${f.hechos.map((h) => `<li><span class="${h.verificado ? 'ver' : 'pend'}">●</span> <b>${h.k}:</b> ${h.v}${src(h.src)}${h.nota ? ` <span class="m">(${h.nota})</span>` : ''}</li>`).join('')}</ul>
+  <p class="m" style="font-size:14px;margin:0 0 10px">💡 ${f.leccion}</p></details>`).join('');
+
+Object.assign(S, { ok: true, casos: R.base.length, reconstruidos: fires.length, puntos: E.puntos.length, mejor: best, cobertura80: E.cobertura80.cobertura, campGoes: E.nistCamp.medidoGoes, pentz: [fmt(A.pentz.a3km), fmt(A.pentz.a2km)], eatonAdelantoH: ED.adelantoHorasP50, select: (f) => $(`#tabs [data-f="${f}"]`).click(), cur: () => cur });
+</script>
+</body></html>

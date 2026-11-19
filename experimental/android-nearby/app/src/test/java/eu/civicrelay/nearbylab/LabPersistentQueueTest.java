@@ -89,7 +89,29 @@ public final class LabPersistentQueueTest {
             recovered.enqueue(ID1, "SOS_EXPLICIT", LAB_PAYLOAD, 2000L, 3000L);
             check(new LabPersistentQueue(file, 2500L).snapshot(2500L).size() == 1,
                 "Clean lab file must recover after explicit CLEAR");
-            recovered.purgeAll();
+            // Verify CUSTODY_ACK persists without closing as final destination delivery
+            String custodyId = "44444444-4444-4444-8444-444444444444";
+            String clockJumpId = "55555555-5555-4555-8555-555555555555";
+            recovered.enqueue(custodyId, "SOS_EXPLICIT", LAB_PAYLOAD, 2000L, 10000L);
+            LabPersistentQueue.Record cust = recovered.markCustodyAck(custodyId, 2100L);
+            check(cust.status == LabPersistentQueue.Status.CUSTODY_ACK && !cust.isTerminal() && LAB_PAYLOAD.equals(cust.payload),
+                "CUSTODY_ACK must remain non-terminal and retain payload");
+            LabPersistentQueue qBoot1 = new LabPersistentQueue(file, 2200L, 1L);
+            check(qBoot1.bootCounter() == 1L && qBoot1.snapshot(2200L).get(1).status == LabPersistentQueue.Status.CUSTODY_ACK,
+                "CUSTODY_ACK must survive restart and NOT be promoted to ACK_VERIFIED");
+            qBoot1.markFailedExhausted(custodyId, 2300L);
+            check(qBoot1.snapshot(2300L).get(1).status == LabPersistentQueue.Status.FAILED_EXHAUSTED &&
+                qBoot1.snapshot(2300L).get(1).payload.isEmpty(),
+                "FAILED_EXHAUSTED must be terminal and wipe payload");
+
+            // Simulate anomalous backward wall-clock jump after reboot -> conservative expiry
+            qBoot1.enqueue(clockJumpId, "SAFE", LAB_PAYLOAD, 50000L, 10000L);
+            LabPersistentQueue qClockBackward = new LabPersistentQueue(file, 10000L, 2L);
+            List<LabPersistentQueue.Record> afterBackward = qClockBackward.snapshot(10000L);
+            LabPersistentQueue.Record backRec = afterBackward.stream().filter(r -> clockJumpId.equals(r.id)).findFirst().orElseThrow();
+            check(backRec.status == LabPersistentQueue.Status.EXPIRED && backRec.payload.isEmpty(),
+                "Backward clock jump across boot must conservatively expire queued message");
+            qClockBackward.purgeAll();
 
             System.out.println("LabPersistentQueueTest PASS (" + assertions + " assertions)");
         } finally {

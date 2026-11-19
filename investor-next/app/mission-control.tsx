@@ -1022,6 +1022,7 @@ export default function MissionControl({ locale }: { locale: Locale }) {
               if (obj) selectObjectAndFly(obj);
             }}
             style={{
+              minHeight: '28px',
               padding: '0.24rem 0.52rem',
               borderRadius: '0.3rem',
               fontSize: '0.72rem',
@@ -1232,7 +1233,7 @@ export default function MissionControl({ locale }: { locale: Locale }) {
           <code style={{ color: '#bae6fd', fontSize: '0.73rem' }}>{selectedObject.metrics}</code>
           <a
             href={selectedObject.actionHref}
-            style={{ color: '#38bdf8', fontWeight: 600, textDecoration: 'underline', fontSize: '0.75rem' }}
+            style={{ display: 'inline-flex', alignItems: 'center', minHeight: '24px', padding: '0.25rem 0', color: '#38bdf8', fontWeight: 600, textDecoration: 'underline', fontSize: '0.75rem' }}
           >
             {selectedObject.actionLabel}
           </a>
@@ -1258,6 +1259,7 @@ export default function MissionControl({ locale }: { locale: Locale }) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.28rem',
+                minHeight: '28px',
                 padding: '0.18rem 0.45rem',
                 borderRadius: '0.28rem',
                 background: layers[key] ? 'rgba(14, 116, 144, 0.28)' : 'rgba(15, 23, 42, 0.5)',
@@ -1270,6 +1272,7 @@ export default function MissionControl({ locale }: { locale: Locale }) {
                 data-testid={`globe-layer-${key}`}
                 checked={layers[key]}
                 onChange={e => setLayers(prev => ({ ...prev, [key]: e.target.checked }))}
+                style={{ width: '24px', height: '24px', accentColor: '#38bdf8' }}
               />
               <span>{ui.layerNames[key]}</span>
             </label>
@@ -1308,6 +1311,8 @@ export default function MissionControl({ locale }: { locale: Locale }) {
                   else if (idx === 4) setScenario('restored');
                 }}
                 style={{
+                  minHeight: '28px',
+                  minWidth: '44px',
                   padding: '0.22rem 0.45rem',
                   borderRadius: '0.25rem',
                   border: timelineStep === idx ? '1px solid #38bdf8' : '1px solid rgba(148,163,184,0.25)',

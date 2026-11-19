@@ -28,7 +28,9 @@ export class Dispatcher {
 
   async dispatch(message: MessageEnvelope): Promise<void> {
     this.store.enqueue(message);
+    await this.store.flushPersistence();
     await this.attemptDelivery(message);
+    await this.store.flushPersistence();
   }
 
   private async attemptDelivery(message: MessageEnvelope): Promise<void> {
@@ -126,6 +128,7 @@ export class Dispatcher {
       for (const message of queued) {
         await this.attemptDelivery(message);
       }
+      await this.store.flushPersistence();
     } finally {
       this.retrying = false;
     }

@@ -2,7 +2,7 @@
   "id": "P11",
   "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
   "sha": "LOCAL",
-  "timestamp_utc": "2026-10-24T23:54:37.258Z",
+  "timestamp_utc": "2026-11-19T00:22:01.725Z",
   "locale": "es",
   "viewport": {
     "width": 320,
@@ -19,7 +19,7 @@
             "left": 0,
             "right": 320,
             "viewport": 320,
-            "actionsRight": 298
+            "actionsRight": 302.734375
           },
           "menuHeight": 44,
           "initiallyClosed": true,
@@ -49,14 +49,32 @@
     "lang": "es",
     "title": "¿QUÉ ES OEP? | Coordinación de emergencias offline y enrutamiento adaptativo",
     "headings": [
+      "Cuando cae la red, el mensaje sigue su camino.",
       "CUANDO LAREDSE APAGA."
     ],
     "canonical": "https://civic-relay-investor.vercel.app/es/",
-    "disclaimers": 31,
+    "disclaimers": 39,
     "eightStage": true,
     "obsoleteLinks": [],
+    "editorial": {
+      "cards": 3,
+      "diagrams": 3,
+      "width": 320,
+      "problems": [],
+      "caption": true
+    },
     "pageErrors": [],
-    "consoleErrors": []
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"application/octet-stream\". Strict MIME type checking is enforced for module scripts per HTML spec.",
+      "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"application/octet-stream\". Strict MIME type checking is enforced for module scripts per HTML spec."
+    ]
   },
   "verdict": "PASS"
 }

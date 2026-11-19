@@ -1,0 +1,59 @@
+# SENDA Drive para iOS. Genera el proyecto con: xcodegen generate (en macOS).
+name: SendaDrive
+options:
+  bundleIdPrefix: eu.senda
+  deploymentTarget:
+    iOS: "16.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    CODE_SIGNING_ALLOWED: "NO"
+    ENABLE_USER_SCRIPT_SANDBOXING: "NO"
+targets:
+  SendaDrive:
+    type: application
+    platform: iOS
+    sources: [Sources]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: eu.senda.drive
+        GENERATE_INFOPLIST_FILE: "NO"
+    info:
+      path: Support/Info.plist
+      properties:
+        CFBundleDisplayName: SENDA Drive
+        CFBundleShortVersionString: "0.1"
+        CFBundleVersion: "1"
+        UILaunchScreen: {}
+        UIBackgroundModes: [location]
+        NSLocationWhenInUseUsageDescription: "SENDA Drive lee la velocidad del GPS para saber si vas conduciendo. No registra ni envía el recorrido."
+        NSLocationAlwaysAndWhenInUseUsageDescription: "Con «Siempre», SENDA puede activarse sola cuando empiezas a conducir, solo si tú lo has activado. No registra ni envía el recorrido."
+        NSMotionUsageDescription: "SENDA usa el sensor de movimiento para saber si vas en coche y activarse sola, solo si tú lo has activado."
+    postCompileScripts:
+      - name: Empaquetar la app web SENDA (sin red, como en Android)
+        basedOnDependencyAnalysis: false
+        script: |
+          DEST="$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/web"
+          mkdir -p "$DEST"
+          rsync -a --delete "$SRCROOT/../../investor-next/public/senda" "$DEST/"
+  SendaDriveTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - Tests
+      - path: ../../packages/senda/conformance/drive-autostart.vectors.txt
+        buildPhase: resources
+    dependencies:
+      - target: SendaDrive
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: eu.senda.drive.tests
+        GENERATE_INFOPLIST_FILE: "YES"
+schemes:
+  SendaDrive:
+    build:
+      targets:
+        SendaDrive: all
+        SendaDriveTests: [test]
+    test:
+      targets: [SendaDriveTests]
