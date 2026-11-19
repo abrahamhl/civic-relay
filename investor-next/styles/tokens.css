@@ -1,0 +1,148 @@
+/* ==========================================================================
+   SENDA Design Tokens — styles/tokens.css
+   Light default + full dark mode (prefers-color-scheme, <meta name="color-scheme">, data-theme)
+   12-column grid · 1200px container · 720px reading width · 4/8px spacing scale
+   One accent color (Signal Blue); traffic light reserved exclusively for evidence/alerts.
+   ========================================================================== */
+
+:root {
+  color-scheme: light dark;
+
+  /* Spacing scale (4/8px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* Layout */
+  --s-container: 1200px;
+  --s-read: 720px;
+  --s-gutter: clamp(16px, 3vw, 32px);
+  --s-header-h: 60px;
+
+  /* Surfaces & radii */
+  --s-radius-xs: 10px;
+  --s-radius-sm: 14px;
+  --s-radius: 22px;
+  --s-radius-lg: 28px;
+
+  /* Typography — single sans family (Inter), weights 400 / 500 / 600 */
+  --s-font: var(--font-inter), "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --s-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --s-fs-display: clamp(44px, 6.4vw, 84px);
+  --s-fs-h1: clamp(38px, 5.2vw, 68px);
+  --s-fs-h2: clamp(30px, 3.8vw, 52px);
+  --s-fs-h3: clamp(20px, 1.8vw, 24px);
+  --s-fs-body: clamp(17px, 1.15vw, 18.5px);
+  --s-fs-small: 14px;
+  --s-fs-micro: 12px;
+
+  /* Motion (200-400ms, smooth easing) */
+  --s-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --s-dur-fast: 200ms;
+  --s-dur: 300ms;
+  --s-dur-slow: 400ms;
+
+  /* Neutral Palette — Light (Default) */
+  --s-bg: #fafafc;
+  --s-bg-elev: #ffffff;
+  --s-bg-sunk: #f2f3f7;
+  --s-bg-invert: #0b0d12;
+  --s-text: #0b0d12;
+  --s-text-2: #434954;
+  --s-text-3: #5d6470;
+  --s-line: rgba(11, 13, 18, 0.09);
+  --s-line-strong: rgba(11, 13, 18, 0.17);
+  --s-glass: rgba(250, 250, 252, 0.78);
+  --s-glass-panel: rgba(255, 255, 255, 0.86);
+  --s-shadow-sm: 0 1px 2px rgba(11, 13, 18, 0.04), 0 1px 1px rgba(11, 13, 18, 0.025);
+  --s-shadow: 0 2px 6px rgba(11, 13, 18, 0.04), 0 12px 32px rgba(11, 13, 18, 0.06);
+  --s-shadow-lg: 0 4px 12px rgba(11, 13, 18, 0.05), 0 28px 68px rgba(11, 13, 18, 0.10);
+
+  /* Single Accent — Signal Blue (AA contrast >= 4.5:1) */
+  --s-accent: #0058cc;
+  --s-accent-hover: #0046a3;
+  --s-accent-soft: rgba(0, 88, 204, 0.09);
+  --s-accent-ink: #ffffff;
+
+  /* Traffic Light — Reserved strictly for Evidence & Alert status */
+  --s-ok: #0e7538;        --s-ok-soft: rgba(14, 117, 56, 0.10);
+  --s-obs: #13684b;       --s-obs-soft: rgba(19, 104, 75, 0.10);
+  --s-warn: #8f5400;      --s-warn-soft: rgba(180, 108, 0, 0.13);
+  --s-crit: #bf2229;      --s-crit-soft: rgba(191, 34, 41, 0.10);
+  --s-sim: #46505e;       --s-sim-soft: rgba(70, 80, 94, 0.11);
+  --s-none: #5a606b;      --s-none-soft: rgba(90, 96, 107, 0.10);
+}
+
+/* Reflect explicit <meta name="color-scheme"> override in CSS */
+:root:has(> head > meta[name="color-scheme"][content="light"]),
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root:has(> head > meta[name="color-scheme"][content="dark"]),
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --s-bg: #090b0f;
+  --s-bg-elev: #12151c;
+  --s-bg-sunk: #0e1117;
+  --s-bg-invert: #f4f6fa;
+  --s-text: #f4f6fa;
+  --s-text-2: #b4bcc8;
+  --s-text-3: #8d96a5;
+  --s-line: rgba(244, 246, 250, 0.09);
+  --s-line-strong: rgba(244, 246, 250, 0.17);
+  --s-glass: rgba(9, 11, 15, 0.78);
+  --s-glass-panel: rgba(18, 21, 28, 0.88);
+  --s-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --s-shadow: 0 2px 6px rgba(0, 0, 0, 0.45), 0 12px 32px rgba(0, 0, 0, 0.40);
+  --s-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.50), 0 28px 68px rgba(0, 0, 0, 0.55);
+  --s-accent: #529dff;
+  --s-accent-hover: #75b3ff;
+  --s-accent-soft: rgba(82, 157, 255, 0.14);
+  --s-accent-ink: #041124;
+  --s-ok: #3fd17d;        --s-ok-soft: rgba(63, 209, 125, 0.14);
+  --s-obs: #5cc99e;       --s-obs-soft: rgba(92, 201, 158, 0.13);
+  --s-warn: #f2b441;      --s-warn-soft: rgba(242, 180, 65, 0.15);
+  --s-crit: #ff7070;      --s-crit-soft: rgba(255, 112, 112, 0.15);
+  --s-sim: #adb7c7;       --s-sim-soft: rgba(173, 183, 199, 0.13);
+  --s-none: #9ca3af;      --s-none-soft: rgba(156, 163, 175, 0.13);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not(:has(> head > meta[name="color-scheme"][content="light"])) {
+    --s-bg: #090b0f;
+    --s-bg-elev: #12151c;
+    --s-bg-sunk: #0e1117;
+    --s-bg-invert: #f4f6fa;
+    --s-text: #f4f6fa;
+    --s-text-2: #b4bcc8;
+    --s-text-3: #8d96a5;
+    --s-line: rgba(244, 246, 250, 0.09);
+    --s-line-strong: rgba(244, 246, 250, 0.17);
+    --s-glass: rgba(9, 11, 15, 0.78);
+    --s-glass-panel: rgba(18, 21, 28, 0.88);
+    --s-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+    --s-shadow: 0 2px 6px rgba(0, 0, 0, 0.45), 0 12px 32px rgba(0, 0, 0, 0.40);
+    --s-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.50), 0 28px 68px rgba(0, 0, 0, 0.55);
+    --s-accent: #529dff;
+    --s-accent-hover: #75b3ff;
+    --s-accent-soft: rgba(82, 157, 255, 0.14);
+    --s-accent-ink: #041124;
+    --s-ok: #3fd17d;        --s-ok-soft: rgba(63, 209, 125, 0.14);
+    --s-obs: #5cc99e;       --s-obs-soft: rgba(92, 201, 158, 0.13);
+    --s-warn: #f2b441;      --s-warn-soft: rgba(242, 180, 65, 0.15);
+    --s-crit: #ff7070;      --s-crit-soft: rgba(255, 112, 112, 0.15);
+    --s-sim: #adb7c7;       --s-sim-soft: rgba(173, 183, 199, 0.13);
+    --s-none: #9ca3af;      --s-none-soft: rgba(156, 163, 175, 0.13);
+  }
+}

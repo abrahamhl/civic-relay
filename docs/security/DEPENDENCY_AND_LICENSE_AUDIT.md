@@ -16,6 +16,8 @@
 | `react` | `19.2.0` | dependencies | MIT | UI rendering |
 | `react-dom` | `19.2.0` | dependencies | MIT | DOM rendering / static HTML |
 | `three` | `0.180.0` | dependencies | MIT | Scroll globe and 3D building scene |
+| `lucide-react` | `1.76.0` | dependencies | ISC | Thin-stroke UI iconography (no emoji icons) |
+| `maplibre-gl` | `6.19.0` | dependencies | BSD-3-Clause | Interactive Control Center geospatial map (lazy-loaded on `/platform/`) |
 | `typescript` | `5.8.3` | devDependencies | Apache-2.0 | `tsc --noEmit` |
 | `@types/node` | `22.15.3` | devDependencies | MIT | Types |
 | `@types/react` | `19.2.0` | devDependencies | MIT | Types |
