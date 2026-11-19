@@ -295,25 +295,25 @@ body:has(.s-shell) {
 .s-btn:active { transform: scale(0.985); }
 .s-btn svg { width: 17px; height: 17px; flex: none; }
 
-.s-btn-primary {
+.s-shell .s-btn-primary {
   background: var(--s-accent);
-  color: var(--s-accent-ink) !important;
+  color: var(--s-accent-ink);
 }
-.s-btn-primary:hover { background: var(--s-accent-hover); }
+.s-shell .s-btn-primary:hover { background: var(--s-accent-hover); }
 
-.s-btn-secondary {
+.s-shell .s-btn-secondary {
   background: var(--s-bg-elev);
   color: var(--s-text);
   border-color: var(--s-line-strong);
 }
-.s-btn-secondary:hover { background: var(--s-bg-sunk); }
+.s-shell .s-btn-secondary:hover { background: var(--s-bg-sunk); }
 
-.s-btn-ghost {
+.s-shell .s-btn-ghost {
   background: transparent;
   color: var(--s-accent);
   padding: 0 10px;
 }
-.s-btn-ghost:hover { color: var(--s-accent-hover); background: var(--s-accent-soft); }
+.s-shell .s-btn-ghost:hover { color: var(--s-accent-hover); background: var(--s-accent-soft); }
 
 .s-btn-sm {
   min-height: 40px;

@@ -841,11 +841,11 @@ export default function ControlCenter({ locale }: { locale: Locale }) {
               {/* Coordinates & Telemetry */}
               <div className="s-card" style={{ padding: 12 }}>
                 <dl className="s-dl" style={{ gridTemplateColumns: '110px 1fr', fontSize: 12.5, gap: '6px 10px' }}>
-                  <dt>Lat / Lon</dt>
+                  <dt>{locale === 'es' ? 'Coordenadas' : locale === 'nl' ? 'Coördinaten' : 'Lat / Lon'}</dt>
                   <dd className="s-mono s-num">
                     {selectedEntity.lat.toFixed(3)}, {selectedEntity.lon.toFixed(3)}
                   </dd>
-                  <dt>Source</dt>
+                  <dt>{locale === 'es' ? 'Fuente' : locale === 'nl' ? 'Bron' : 'Source'}</dt>
                   <dd className="s-mono">{selectedEntity.sourceTag}</dd>
                   {selectedEntity.metrics.map((m) => (
                     <div key={m.label.en} style={{ display: 'contents' }}>

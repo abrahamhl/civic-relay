@@ -166,7 +166,10 @@ function makeScenario(
         metrics: [
           { label: { en: 'SENDA ETA', es: 'ETA SENDA', nl: 'SENDA ETA' }, value: `~${sendaEtaMin} min` },
           { label: { en: 'Cellular baseline', es: 'Línea base móvil', nl: 'Mobiele baseline' }, value: `${baselineEtaMin} min` },
-          { label: { en: 'Human silence rule', es: 'Regla de silencio', nl: 'Stilteregel' }, value: 'UNKNOWN (never casualty)' }
+          {
+            label: { en: 'Silence rule', es: 'Regla de silencio', nl: 'Stilteregel' },
+            value: 'UNKNOWN'
+          }
         ]
       },
       {
@@ -175,8 +178,8 @@ function makeScenario(
         layer: extraLayer,
         priority: 'high',
         timeOffsetMin: 2,
-        lat: lat + dLat * 0.28,
-        lon: lon - dLon * 0.26,
+        lat: lat + dLat * 0.52,
+        lon: lon - dLon * 0.48,
         title: sensorLabel,
         summary: {
           en: 'Corroborating telemetry input checked for upstream feed independence.',
@@ -197,8 +200,8 @@ function makeScenario(
         layer: 'relays',
         priority: 'high',
         timeOffsetMin: Math.min(sendaEtaMin, 15),
-        lat: lat - dLat * 0.14,
-        lon: lon + dLon * 0.24,
+        lat: lat - dLat * 0.24,
+        lon: lon + dLon * 0.44,
         title: routeLabel,
         summary: {
           en: 'Blind E2EE relay path (ECDH P-256 + AES-GCM) racing multipath channels with signed ACK.',
@@ -219,8 +222,8 @@ function makeScenario(
         layer: 'infrastructure',
         priority: 'medium',
         timeOffsetMin: 8,
-        lat: lat + dLat * 0.22,
-        lon: lon + dLon * 0.34,
+        lat: lat + dLat * 0.42,
+        lon: lon + dLon * 0.56,
         title: teamLabel,
         summary: {
           en: 'Accredited coordination unit receiving deduplicated situation summary (secondary channel, non-112).',
@@ -241,8 +244,8 @@ function makeScenario(
         layer: 'coverage',
         priority: 'medium',
         timeOffsetMin: 12,
-        lat: lat - dLat * 0.28,
-        lon: lon - dLon * 0.12,
+        lat: lat - dLat * 0.54,
+        lon: lon - dLon * 0.44,
         title: decisionLabel,
         summary: {
           en: 'Simulated operator decision gated by two-step confirmation and logged in the audit trail.',
@@ -263,8 +266,8 @@ function makeScenario(
         layer: 'infrastructure',
         priority: 'info',
         timeOffsetMin: 4,
-        lat: lat - dLat * 0.32,
-        lon: lon + dLon * 0.16,
+        lat: lat - dLat * 0.58,
+        lon: lon + dLon * 0.32,
         title: {
           en: 'Cellular Tower / Substation Watch',
           es: 'Torre celular / Subestación',

@@ -76,7 +76,7 @@ export default function SiteHeader({
               {LOCALES.map((l) => (
                 <a
                   key={l}
-                  href={localeHref(l, currentSlug === 'design' ? 'design' : currentSlug)}
+                  href={localeHref(l, active === 'design' ? '' : currentSlug)}
                   hrefLang={l}
                   lang={l}
                   aria-current={locale === l ? 'true' : undefined}

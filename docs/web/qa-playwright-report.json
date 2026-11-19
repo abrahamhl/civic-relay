@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-11-19T23:05:09.855Z",
+  "viewports": [
+    390,
+    834,
+    1440
+  ],
+  "pagesChecked": 38,
+  "brokenLinks": [],
+  "overflowFailures": [],
+  "consoleErrors": [],
+  "homeJsGzKb": 166.1,
+  "interactions": {
+    "evidenceBadgeDialog": "PASS",
+    "darkModeToggle": "PASS",
+    "commandPalette": "PASS",
+    "guidedTour6Steps": "PASS",
+    "correlationGraph": "PASS",
+    "twoStepSimulatedActionAudit": "PASS"
+  },
+  "screenshots": [
+    "docs/web/screenshots/home-en-1440-light.png",
+    "docs/web/screenshots/home-en-1440-dark.png",
+    "docs/web/screenshots/platform-es-1440-map.png",
+    "docs/web/screenshots/platform-es-1440-graph.png",
+    "docs/web/screenshots/product-es-1440.png",
+    "docs/web/screenshots/evidence-es-1440.png",
+    "docs/web/screenshots/home-es-390-mobile.png"
+  ]
+}

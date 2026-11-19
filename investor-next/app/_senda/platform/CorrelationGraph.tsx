@@ -143,9 +143,9 @@ export default function CorrelationGraph({
                   width="192"
                   height="68"
                   rx="14"
-                  fill={isSelected ? 'var(--s-accent-soft)' : 'var(--s-bg-sunk)'}
+                  fill="var(--s-bg-elev)"
                   stroke={isSelected ? ringColor : connected ? 'var(--s-accent)' : 'var(--s-line-strong)'}
-                  strokeWidth={isSelected ? 2.4 : 1.2}
+                  strokeWidth={isSelected ? 2.5 : 1.3}
                 />
                 <circle cx="-78" cy="-14" r="4.5" fill={ringColor} />
                 <text x="-66" y="-10" fill="var(--s-text-3)" fontSize="10" fontWeight="600">

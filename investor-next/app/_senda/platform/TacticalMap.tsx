@@ -84,6 +84,9 @@ export default function TacticalMap({
 
         const maplibregl = await import('maplibre-gl');
         if (cancelled) return;
+        if (typeof maplibregl.setWorkerUrl === 'function') {
+          maplibregl.setWorkerUrl('/vendor/maplibre-gl-worker.mjs');
+        }
 
         const features = land.rings
           .filter((ring) => ring.length >= 8)
@@ -294,7 +297,7 @@ export default function TacticalMap({
       >
         <defs>
           <pattern id="cc-grid" width="45" height="45" patternUnits="userSpaceOnUse">
-            <path d="M45 0H0V45" fill="none" stroke="var(--s-text)" strokeOpacity="0.06" strokeWidth="1" />
+            <path d="M45 0H0V45" fill="none" stroke="var(--s-text)" strokeOpacity="0.08" strokeWidth="1" />
           </pattern>
         </defs>
 
@@ -308,12 +311,18 @@ export default function TacticalMap({
               <path
                 key={i}
                 d={d}
-                fill="var(--s-bg-elev)"
-                fillOpacity="0.85"
+                fill="var(--s-accent-soft)"
+                fillOpacity="0.45"
                 stroke="var(--s-line-strong)"
-                strokeWidth={1 / zoomScale}
+                strokeWidth={1.2 / zoomScale}
               />
             ))}
+
+          {/* Topographic reference range rings around anchor */}
+          <g opacity={0.45}>
+            <circle cx={anchorX} cy={anchorY} r={190} fill="none" stroke="var(--s-line-strong)" strokeWidth={1 / zoomScale} strokeDasharray="2 6" />
+            <circle cx={anchorX} cy={anchorY} r={280} fill="none" stroke="var(--s-line-strong)" strokeWidth={1 / zoomScale} strokeDasharray="2 8" />
+          </g>
 
           {/* Coverage / Outage Zone */}
           {layers.coverage && (
