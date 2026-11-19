@@ -1,0 +1,10 @@
+[package]
+name = "oep-air-daemon"
+version = "0.1.0"
+edition = "2021"
+authors = ["Abraham Haddioui <abraham@civic-relay.com>", "Civic Relay Tactical Systems Architecture Team"]
+description = "Embedded DTN Relay and MAVLink Micro-Burst Service for UAS / Tactical Gateways"
+license = "Proprietary / Dual-Use Sovereign Defense License"
+
+[dependencies]
+# Standard library used for networking and timing primitives

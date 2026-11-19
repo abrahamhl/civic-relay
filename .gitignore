@@ -53,3 +53,5 @@ evidence/senda/**/release-manifest.json
 __pycache__/
 *.pyc
 
+target/
+**/target/

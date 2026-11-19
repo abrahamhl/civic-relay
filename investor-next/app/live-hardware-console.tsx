@@ -11,6 +11,7 @@ import {
   type SignedOepRealPacket
 } from '../lib/live-protocol-node.mjs';
 import { energyPolicy } from '../lib/emergency-policy.mjs';
+import { assessPacketVerification } from '../lib/packet-verification-state.mjs';
 
 interface FundingTarget {
   id: string;
@@ -161,6 +162,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
     verifyTimeMs: number;
     webrtcRttMs: number | null;
     transportUsed: string;
+    trustStatus: 'SIGNATURE_INVALID' | 'SIGNATURE_VALID_UNTRUSTED';
   } | null>(null);
   const [durableQueue, setDurableQueue] = useState<SignedOepRealPacket[]>([]);
   const [msgCounter, setMsgCounter] = useState(1);
@@ -293,6 +295,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
         setVerifyState({
           valid: ver.valid,
           reason: ver.reason,
+          trustStatus: ver.valid ? 'SIGNATURE_VALID_UNTRUSTED' : 'SIGNATURE_INVALID',
           verifyTimeMs: ver.verifyTimeMs,
           webrtcRttMs: null,
           transportUsed: 'WEBCRYPTO_ECDSA_P256 + LOCALSTORAGE_PERSISTED'
@@ -308,10 +311,14 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
         const incoming = ev.data as SignedOepRealPacket;
         if (incoming && incoming.protocol === 'OEP_REAL_EXECUTION_V1') {
           const ver = await verifyRealOepPacket(incoming);
-          setLastPacket(incoming);
+          // Un paquete con firma inválida NUNCA entra en la pantalla; uno válido sigue sin estar autenticado
+          // (la clave la aporta el propio emisor): SIGNATURE_VALID_UNTRUSTED.
+          const assessed = assessPacketVerification(incoming, ver);
+          setLastPacket(assessPacketVerification(incoming, ver).packet);
           setVerifyState({
             valid: ver.valid,
             reason: ver.reason,
+            trustStatus: assessed.status,
             verifyTimeMs: ver.verifyTimeMs,
             webrtcRttMs: null,
             transportUsed: 'BROADCAST_CHANNEL_SAME_ORIGIN_CONTEXT_ONLY'
@@ -398,6 +405,7 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
     setVerifyState({
       valid: ver.valid,
       reason: ver.reason,
+      trustStatus: ver.valid ? 'SIGNATURE_VALID_UNTRUSTED' : 'SIGNATURE_INVALID',
       verifyTimeMs: ver.verifyTimeMs,
       webrtcRttMs: rtc.rttMs,
       transportUsed: rtc.delivered ? 'WEBRTC_SAME_PAGE_LOOPBACK + BROADCAST_BUS + LOCALSTORAGE' : 'WEBRTC_LOOPBACK_NOT_CONFIRMED + BROADCAST_BUS + LOCALSTORAGE'
@@ -528,6 +536,11 @@ export default function LiveHardwareAndDealRoomConsole({ locale }: { locale: Loc
               )}
             </div>
 
+            {verifyState && (
+              <div role="status" aria-live="polite" data-testid="packet-trust-status">
+                STATUS: {verifyState.trustStatus} · {verifyState.reason}
+              </div>
+            )}
             {lastPacket && (
               <div className="oep-ts-hex-box" data-testid="live-ecdsa-packet-box">
                 <div style={{ color: '#6ee7b7', fontWeight: 700 }}>
