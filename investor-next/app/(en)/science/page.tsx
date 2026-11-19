@@ -1,15 +1,9 @@
 import type { Metadata } from 'next';
-import SurfaceView from '../../surface-view';
+import SciencePage from '../../_senda/pages/SciencePage';
+import { buildPageMetadata } from '../../_senda/data/metadata';
 
-export const metadata: Metadata = {
-  title: 'Science & Protocol Laboratory | Civic Relay · OEP',
-  description: 'Reproducible Store-and-Forward laboratory, real WebCrypto ECDSA P-256 packet verification, and scientific truth matrix.',
-  alternates: {
-    canonical: '/science/',
-    languages: { en: '/science/', es: '/es/science/', nl: '/nl/science/' }
-  }
-};
+export const metadata: Metadata = buildPageMetadata('en', 'science');
 
-export default function ScienceRoutePage() {
-  return <SurfaceView locale="en" surface="SCIENCE" />;
+export default function ScienceRoute() {
+  return <SciencePage locale="en" />;
 }

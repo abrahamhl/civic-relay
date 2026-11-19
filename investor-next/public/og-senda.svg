@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#090B0F"/>
+  <defs>
+    <pattern id="g" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" stroke="#F4F6FA" stroke-opacity="0.06" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <circle cx="940" cy="180" r="220" fill="#529DFF" fill-opacity="0.12"/>
+  <path d="M120 470 C360 440, 560 220, 820 220 C940 220, 1020 260, 1090 190" stroke="#529DFF" stroke-width="4" stroke-dasharray="10 10"/>
+  <circle cx="120" cy="470" r="10" fill="#FF7070"/>
+  <circle cx="570" cy="278" r="9" fill="#529DFF"/>
+  <circle cx="1090" cy="190" r="10" fill="#3FD17D"/>
+  <rect x="88" y="88" width="248" height="36" rx="18" fill="#12151C" stroke="#529DFF" stroke-opacity="0.45"/>
+  <text x="112" y="111" fill="#529DFF" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" letter-spacing="1.2">RESEARCH LAB · TRL ~3</text>
+  <text x="88" y="218" fill="#F4F6FA" font-family="Inter, system-ui, sans-serif" font-size="76" font-weight="600" letter-spacing="-2.5">SENDA</text>
+  <text x="88" y="294" fill="#B4BCC8" font-family="Inter, system-ui, sans-serif" font-size="30" font-weight="400">Alternative-channel emergency routing</text>
+  <text x="88" y="340" fill="#B4BCC8" font-family="Inter, system-ui, sans-serif" font-size="30" font-weight="400">&amp; operational situational correlation</text>
+  <text x="88" y="544" fill="#8D96A5" font-family="ui-monospace, monospace" font-size="18">https://civic-relay-investor.vercel.app · EN / ES / NL · MIT License</text>
+</svg>

@@ -1,14 +1,40 @@
-import type {Metadata} from 'next';
-import {Inter} from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
+import { Inter } from 'next/font/google';
 import '../../globals.css';
+import { SITE_URL } from '../../_senda/data/types';
 
-const inter=Inter({subsets:['latin'],display:'swap',variable:'--font-inter'});
-export const metadata: Metadata={
-  metadataBase:new URL(process.env.SITE_URL||'https://civic-relay-investor.vercel.app'), // SITE_URL: dominio propio (p. ej. Hostinger)
-  robots:{index:true,follow:true}
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  display: 'swap',
+  variable: '--font-inter'
+});
+
+export const viewport: Viewport = {
+  colorScheme: 'light dark',
+  width: 'device-width',
+  initialScale: 1
 };
-export default async function LocalizedRootLayout({children,params}:{children:React.ReactNode;params:Promise<{locale:string}>}){
-  const {locale}=await params;
-  if(locale!=='es' && locale!=='nl') throw new Error('Unsupported static locale');
-  return <html lang={locale}><body className={inter.variable}>{children}</body></html>;
+
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.SITE_URL || SITE_URL),
+  robots: { index: true, follow: true }
+};
+
+export default async function LocalizedRootLayout({
+  children,
+  params
+}: {
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  if (locale !== 'es' && locale !== 'nl') {
+    throw new Error('Unsupported static locale');
+  }
+  return (
+    <html lang={locale}>
+      <body className={inter.variable}>{children}</body>
+    </html>
+  );
 }

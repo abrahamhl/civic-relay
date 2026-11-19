@@ -1,25 +1,28 @@
 import type { Metadata } from 'next';
-import SurfaceView from '../../../surface-view';
-import type { Locale } from '../../../copy';
+import SciencePage from '../../../_senda/pages/SciencePage';
+import { buildPageMetadata } from '../../../_senda/data/metadata';
+import type { Locale } from '../../../_senda/data/types';
 
 export function generateStaticParams() {
   return [{ locale: 'es' }, { locale: 'nl' }];
 }
 export const dynamicParams = false;
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
   const { locale } = await params;
-  const lang = (locale === 'nl' ? 'nl' : 'es') as Locale;
-  return {
-    title: lang === 'es' ? 'Laboratorio Científico y Evidencia | Civic Relay · OEP' : 'Wetenschappelijk Lab & Bewijs | Civic Relay · OEP',
-    alternates: {
-      canonical: `/${lang}/science/`,
-      languages: { en: '/science/', es: '/es/science/', nl: '/nl/science/' }
-    }
-  };
+  const lang: Locale = locale === 'nl' ? 'nl' : 'es';
+  return buildPageMetadata(lang, 'science');
 }
 
-export default async function LocalizedSciencePage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function LocalizedScience({
+  params
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
-  return <SurfaceView locale={locale === 'nl' ? 'nl' : 'es'} surface="SCIENCE" />;
+  return <SciencePage locale={locale === 'nl' ? 'nl' : 'es'} />;
 }
