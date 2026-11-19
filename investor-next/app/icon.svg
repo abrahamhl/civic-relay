@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SENDA">
+  <rect width="64" height="64" rx="14" fill="#061018"/>
+  <circle cx="32" cy="32" r="19" fill="none" stroke="#57c7bd" stroke-width="3"/>
+  <circle cx="32" cy="32" r="4.5" fill="#f0c46c"/>
+  <path d="M32 8v7M32 49v7M8 32h7M49 32h7" stroke="#7ee8db" stroke-width="3" stroke-linecap="round"/>
+  <path d="M17 47 27 37M47 17 37 27" stroke="#e0846c" stroke-width="3" stroke-linecap="round"/>
+</svg>

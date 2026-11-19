@@ -2,6 +2,8 @@ import MissionControl from './mission-control';
 import ScrollExperience from './scroll-experience';
 import CrisisStory from './crisis-story';
 import CoordinationLab from './coordination-lab';
+import FunctionLab from './function-lab';
+import PrecisionLab from './precision-lab';
 import EvidenceBoard from './evidence-board';
 import TelecomAndRfRadarSuite from './telecom-rf-radar-suite';
 import VehicularDopplerLab from './vehicular-doppler-lab';
@@ -25,9 +27,9 @@ const funding='https://ec.europa.eu/info/funding-tenders/opportunities/portal/sc
 const dossier=source+'/blob/master/docs/README.md';
 const contact=source+'/issues/new?template=pilot-or-grant-partner.yml';
 const chapterNavigation:Record<Locale,Array<{href:string;label:string}>>={
- en:[{href:'#what-oep-does',label:'WHAT IT DOES'},{href:'#architecture',label:'THE 3D STORY'},{href:'#how-it-works',label:'HOW IT WORKS'},{href:'#routing-lab',label:'TRY THE LAB'},{href:'#developer-stack',label:'TECH STACK'},{href:'#evidence',label:'EVIDENCE'}],
- es:[{href:'#what-oep-does',label:'QUÉ HACE'},{href:'#architecture',label:'HISTORIA 3D'},{href:'#how-it-works',label:'CÓMO FUNCIONA'},{href:'#routing-lab',label:'PROBAR LAB'},{href:'#developer-stack',label:'TECNOLOGÍA'},{href:'#evidence',label:'EVIDENCIAS'}],
- nl:[{href:'#what-oep-does',label:'WAT HET DOET'},{href:'#architecture',label:'3D-VERHAAL'},{href:'#how-it-works',label:'WERKING'},{href:'#routing-lab',label:'LAB PROBEREN'},{href:'#developer-stack',label:'TECHNIEK'},{href:'#evidence',label:'BEWIJS'}]
+ en:[{href:'#what-oep-does',label:'WHAT IT DOES'},{href:'#architecture',label:'THE 3D STORY'},{href:'#how-it-works',label:'HOW IT WORKS'},{href:'#routing-lab',label:'TRY THE LAB'},{href:'#function-lab',label:'ALL FUNCTIONS'},{href:'#precision-lab',label:'PRECISION'},{href:'#developer-stack',label:'TECH STACK'},{href:'#evidence',label:'EVIDENCE'}],
+ es:[{href:'#what-oep-does',label:'QUÉ HACE'},{href:'#architecture',label:'HISTORIA 3D'},{href:'#how-it-works',label:'CÓMO FUNCIONA'},{href:'#routing-lab',label:'PROBAR LAB'},{href:'#function-lab',label:'TODAS LAS FUNCIONES'},{href:'#precision-lab',label:'PRECISIÓN'},{href:'#developer-stack',label:'TECNOLOGÍA'},{href:'#evidence',label:'EVIDENCIAS'}],
+ nl:[{href:'#what-oep-does',label:'WAT HET DOET'},{href:'#architecture',label:'3D-VERHAAL'},{href:'#how-it-works',label:'WERKING'},{href:'#routing-lab',label:'LAB PROBEREN'},{href:'#function-lab',label:'ALLE FUNCTIES'},{href:'#precision-lab',label:'PRECISIE'},{href:'#developer-stack',label:'TECHNIEK'},{href:'#evidence',label:'BEWIJS'}]
 };
 
 const thirtySecondThesis:Record<Locale,{
@@ -55,7 +57,8 @@ const thirtySecondThesis:Record<Locale,{
    {id:'surface-discover',tag:'A · DESCUBRIR',name:'Historia y Resumen en 30s',desc:'Qué problema resuelve, para quién y con qué límites honestos, sin necesidad de jerga 3GPP/CSI/CAP.',targetAnchor:'#what-oep-does',routeHref:'/es/'},
    {id:'surface-explore',tag:'B · EXPLORAR / MISSION CONTROL',name:'Globo 3D + Sector Intelligence CCTV',desc:'Globo 3D con selección raycast, sectores (El Tiemblo, Valencia, Arnhem), conos FOV estimados y cámaras públicas/demo.',targetAnchor:'#sector-intelligence',routeHref:'/es/mission-control/'},
    {id:'surface-science',tag:'C · INVESTIGAR / SCIENCE & LAB',name:'Motor Determinista, Criptografía y Evidencia',desc:'Cola Store-and-Forward, firmas reales WebCrypto ECDSA P-256, laboratorio Android Nearby y matriz científica.',targetAnchor:'#routing-lab',routeHref:'/es/science/'},
-   {id:'surface-command',tag:'D · MANDO / PANEL MULTICANAL',name:'Activaciones, Rutas Mesh y Presupuesto RF',desc:'Escenarios de apagón, cobertura por canal, rutas con coste, trilateración y enlace RF. Ejercicio sintético sin radios ni dispatch real.',targetAnchor:'#telecom-rf-radar-suite',routeHref:'/es/mando/'}
+   {id:'surface-command',tag:'D · MANDO / PANEL MULTICANAL',name:'Activaciones, Rutas Mesh y Presupuesto RF',desc:'Escenarios de apagón, cobertura por canal, rutas con coste, trilateración y enlace RF. Ejercicio sintético sin radios ni dispatch real.',targetAnchor:'#telecom-rf-radar-suite',routeHref:'/es/mando/'},
+   {id:'surface-research',tag:'E · BIBLIOTECA DE INVESTIGACIÓN',name:'Informes técnicos y artefactos',desc:'Tres informes técnicos verificables con fuente, BibTeX, PDF, datos y manifiesto SHA-256.',targetAnchor:'#evidence',routeHref:'/es/research/'}
   ],
   eightScenes:[
    {num:'01',tag:'DESASTRE',summary:'Incendio o apagón inutiliza una antena; la cobertura del sector cambia.',targetAnchor:'#story',badge:'SYNTHETIC SIMULATION'},
@@ -81,7 +84,8 @@ const thirtySecondThesis:Record<Locale,{
    {id:'surface-discover',tag:'A · DISCOVER',name:'30-Second Story & Primer',desc:'What problem it solves, for whom, and with what explicit boundaries—no 3GPP/CSI/CAP jargon required.',targetAnchor:'#what-oep-does',routeHref:'/'},
    {id:'surface-explore',tag:'B · EXPLORE / MISSION CONTROL',name:'3D Globe + Sector Intelligence CCTV',desc:'3D Globe with raycast object selection, sectors (El Tiemblo, Valencia, Arnhem), estimated FOV cones, and public/demo cameras.',targetAnchor:'#sector-intelligence',routeHref:'/mission-control/'},
    {id:'surface-science',tag:'C · INVESTIGATE / SCIENCE & LAB',name:'Deterministic Engine, Crypto & Evidence',desc:'Store-and-Forward queue, real WebCrypto ECDSA P-256 signatures, Android Nearby lab source, and scientific truth matrix.',targetAnchor:'#routing-lab',routeHref:'/science/'},
-   {id:'surface-command',tag:'D · COMMAND / MULTICHANNEL PANEL',name:'Activations, Mesh Routes & RF Budget',desc:'Blackout scenarios, per-channel coverage, costed routes, trilateration and RF link budgets. Synthetic exercise with no radios or real dispatch.',targetAnchor:'#telecom-rf-radar-suite',routeHref:'/mando/'}
+   {id:'surface-command',tag:'D · COMMAND / MULTICHANNEL PANEL',name:'Activations, Mesh Routes & RF Budget',desc:'Blackout scenarios, per-channel coverage, costed routes, trilateration and RF link budgets. Synthetic exercise with no radios or real dispatch.',targetAnchor:'#telecom-rf-radar-suite',routeHref:'/mando/'},
+   {id:'surface-research',tag:'E · RESEARCH LIBRARY',name:'Technical reports & artifacts',desc:'Three checkable technical reports with source, BibTeX, PDF, data and a SHA-256 manifest.',targetAnchor:'#evidence',routeHref:'/research/'}
   ],
   eightScenes:[
    {num:'01',tag:'DISASTER',summary:'Wildfire or blackout disables a tower; sector coverage map updates immediately.',targetAnchor:'#story',badge:'SYNTHETIC SIMULATION'},
@@ -107,7 +111,8 @@ const thirtySecondThesis:Record<Locale,{
    {id:'surface-discover',tag:'A · ONTDEKKEN',name:'Verhaal & Overzicht in 30s',desc:'Welk probleem het oplost, voor wie en met welke eerlijke grenzen—zonder 3GPP/CSI/CAP-jargon.',targetAnchor:'#what-oep-does',routeHref:'/nl/'},
    {id:'surface-explore',tag:'B · VERKENNEN / MISSION CONTROL',name:'3D-Globe + Sector Intelligence CCTV',desc:'3D-globe met raycast-selectie, sectoren (El Tiemblo, Valencia, Arnhem), geschatte FOV-kegels en openbare/demo-camera’s.',targetAnchor:'#sector-intelligence',routeHref:'/nl/mission-control/'},
    {id:'surface-science',tag:'C · ONDERZOEKEN / SCIENCE & LAB',name:'Deterministische Engine, Crypto & Bewijs',desc:'Store-and-Forward wachtrij, echte WebCrypto ECDSA P-256-handtekeningen, Android Nearby-lab en wetenschappelijke matrix.',targetAnchor:'#routing-lab',routeHref:'/nl/science/'},
-   {id:'surface-command',tag:'D · COMMANDO / MULTIKANAAL PANEEL',name:'Activaties, Mesh-Routes & RF-Budget',desc:'Blackoutscenario’s, dekking per kanaal, routes met kosten, trilateratie en RF-linkbudgetten. Synthetische oefening zonder radio’s of echte dispatch.',targetAnchor:'#telecom-rf-radar-suite',routeHref:'/nl/mando/'}
+   {id:'surface-command',tag:'D · COMMANDO / MULTIKANAAL PANEEL',name:'Activaties, Mesh-Routes & RF-Budget',desc:'Blackoutscenario’s, dekking per kanaal, routes met kosten, trilateratie en RF-linkbudgetten. Synthetische oefening zonder radio’s of echte dispatch.',targetAnchor:'#telecom-rf-radar-suite',routeHref:'/nl/mando/'},
+   {id:'surface-research',tag:'E · ONDERZOEKSBIBLIOTHEEK',name:'Technische rapporten en artefacten',desc:'Drie controleerbare technische rapporten met bron, BibTeX, PDF, data en een SHA-256-manifest.',targetAnchor:'#evidence',routeHref:'/nl/research/'}
   ],
   eightScenes:[
    {num:'01',tag:'RAMP',summary:'Natuurbrand of stroomuitval schakelt een mast uit; sectordekking verandert direct.',targetAnchor:'#story',badge:'SYNTHETIC SIMULATION'},
@@ -233,6 +238,8 @@ export default function InvestorPage({locale}:{locale:Locale}){
   <div data-for="citizen"><ScrollExperience locale={locale}/></div>
   <div data-for="coord eng"><SystemExplained locale={locale}/></div>
   <div data-for="coord eng"><CoordinationLab locale={locale}/></div>
+  <div data-for="citizen coord eng inv"><FunctionLab locale={locale}/></div>
+  <div data-for="citizen coord eng inv"><PrecisionLab locale={locale}/></div>
   <div data-for="eng"><DeveloperBlueprint locale={locale}/></div>
   <div data-for="eng inv"><EvidenceBoard locale={locale}/></div>
   <div data-for="citizen coord eng inv"><section id="solution" className="product-section container">

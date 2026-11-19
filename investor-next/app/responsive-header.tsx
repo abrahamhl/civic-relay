@@ -13,9 +13,12 @@ const linksByLocale: Record<Locale, Array<{ href: string; label: string }>> = {
     { href: "#telecom-rf-radar-suite", label: "Network research" },
     { href: "#live-hardware-and-funding", label: "Test my device" },
     { href: "#how-it-works", label: "How it works" },
+    { href: "#function-lab", label: "All functions" },
+    { href: "#precision-lab", label: "Precision lab" },
     { href: "#master-vision", label: "Full programme" },
     { href: "#investment", label: "Funding" },
-    { href: "#evidence", label: "Evidence & limits" }
+    { href: "#evidence", label: "Evidence & limits" },
+    { href: "/research/", label: "Research library" }
   ],
   es: [
     { href: "#story", label: "Experiencia" },
@@ -23,9 +26,12 @@ const linksByLocale: Record<Locale, Array<{ href: string; label: string }>> = {
     { href: "#telecom-rf-radar-suite", label: "Investigación de redes" },
     { href: "#live-hardware-and-funding", label: "Probar mi dispositivo" },
     { href: "#how-it-works", label: "Cómo funciona" },
+    { href: "#function-lab", label: "Todas las funciones" },
+    { href: "#precision-lab", label: "Laboratorio de precisión" },
     { href: "#master-vision", label: "Programa completo" },
     { href: "#investment", label: "Financiación" },
-    { href: "#evidence", label: "Evidencias y límites" }
+    { href: "#evidence", label: "Evidencias y límites" },
+    { href: "/es/research/", label: "Biblioteca de investigación" }
   ],
   nl: [
     { href: "#story", label: "De ervaring" },
@@ -33,9 +39,12 @@ const linksByLocale: Record<Locale, Array<{ href: string; label: string }>> = {
     { href: "#telecom-rf-radar-suite", label: "Netwerkonderzoek" },
     { href: "#live-hardware-and-funding", label: "Mijn toestel testen" },
     { href: "#how-it-works", label: "Hoe het werkt" },
+    { href: "#function-lab", label: "Alle functies" },
+    { href: "#precision-lab", label: "Precisielab" },
     { href: "#master-vision", label: "Volledig programma" },
     { href: "#investment", label: "Financiering" },
-    { href: "#evidence", label: "Bewijs en grenzen" }
+    { href: "#evidence", label: "Bewijs en grenzen" },
+    { href: "/nl/research/", label: "Onderzoeksbibliotheek" }
   ]
 };
 const labelsByLocale: Record<Locale, { menu: string; menuNav: string; source: string; home: string }> = {
@@ -52,7 +61,7 @@ export default function ResponsiveHeader({ locale }: { locale: Locale }) {
   const { nav } = getCopy(locale);
   const copy = labelsByLocale[locale];
   const links = linksByLocale[locale];
-  const primary = [0, 1, 3, 7];
+  const primary = [0, 1, 3, 7, 10];
 
   useEffect(() => {
     if (!open) return;

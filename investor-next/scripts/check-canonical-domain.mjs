@@ -21,8 +21,9 @@ const suspect = [
 
 function inspect(full) {
   const rel = relative(root, full).replaceAll('\\', '/');
-  // Historic audit files and recorded browser sessions document old releases as evidence.
-  if (rel.startsWith('docs/audits/') || rel.startsWith('audit/personas/')) return;
+  // Historic audit files, internal execution records and recorded browser sessions
+  // document other projects or old releases as evidence.
+  if (rel.startsWith('docs/audits/') || rel.startsWith('docs/execution/') || rel.startsWith('audit/personas/')) return;
   if (rel === 'investor-next/scripts/check-canonical-domain.mjs') return;
   if (!allowedExtensions.has(extname(rel))) return;
   const text = readFileSync(full, 'utf8');

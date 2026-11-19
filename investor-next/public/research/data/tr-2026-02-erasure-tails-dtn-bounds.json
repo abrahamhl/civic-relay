@@ -1,0 +1,542 @@
+{
+  "schema": "senda-research-data/1",
+  "report": "SENDA-TR-2026-02",
+  "generatedBy": "scripts/research/paper2-tables.mjs",
+  "provenance": "NUMERIC_MODEL_EXERCISE_ONLY",
+  "assumptions": [
+    "A1: shard delivery indicators are independent Bernoulli variables",
+    "A2: the homogeneous case uses one p; the heterogeneous case uses p_i",
+    "A3: contact times are Poisson with rate lambda; copies are independent",
+    "A4: no retransmission and no correlation across copies"
+  ],
+  "doesNotContain": [
+    "field measurements",
+    "radio measurements",
+    "a claim that the model parameters match a real deployment"
+  ],
+  "parameters": {
+    "homogeneous": {
+      "n": 32,
+      "p": 0.2
+    },
+    "heterogeneous": {
+      "n": 32,
+      "probabilities": [
+        0.15,
+        0.16,
+        0.16999999999999998,
+        0.18,
+        0.19,
+        0.2,
+        0.21,
+        0.22,
+        0.22999999999999998,
+        0.24,
+        0.25,
+        0.26,
+        0.27,
+        0.28,
+        0.29000000000000004,
+        0.3,
+        0.31,
+        0.32,
+        0.32999999999999996,
+        0.33999999999999997,
+        0.35,
+        0.36,
+        0.37,
+        0.38,
+        0.39,
+        0.4,
+        0.41000000000000003,
+        0.42000000000000004,
+        0.43000000000000005,
+        0.43999999999999995,
+        0.44999999999999996,
+        0.45999999999999996
+      ]
+    },
+    "delay": {
+      "contactRatePerHour": 0.2
+    },
+    "overhead": {
+      "ratio": 1.5
+    }
+  },
+  "tables": {
+    "homogeneous": [
+      {
+        "k": 8,
+        "n": 32,
+        "p": 0.2,
+        "exact": 0.3017631322168172,
+        "chernoff": 0.7896038592985783,
+        "hoeffding": 0.8521437889662113,
+        "display": {
+          "exact": "0.301763",
+          "chernoff": "0.789604",
+          "hoeffding": "0.852144"
+        },
+        "ratios": {
+          "chernoffOverExact": 2.616634621658311,
+          "hoeffdingOverExact": 2.823883032715689
+        }
+      },
+      {
+        "k": 10,
+        "n": 32,
+        "p": 0.2,
+        "exact": 0.08983239140927471,
+        "chernoff": 0.3234297749824615,
+        "hoeffding": 0.4448580662229412,
+        "display": {
+          "exact": "0.0898324",
+          "chernoff": "0.32343",
+          "hoeffding": "0.444858"
+        },
+        "ratios": {
+          "chernoffOverExact": 3.6003691976641417,
+          "hoeffdingOverExact": 4.95208976677662
+        }
+      },
+      {
+        "k": 12,
+        "n": 32,
+        "p": 0.2,
+        "exact": 0.01671628583067297,
+        "chernoff": 0.07382171463279419,
+        "hoeffding": 0.14085842092104503,
+        "display": {
+          "exact": "0.0167163",
+          "chernoff": "0.0738217",
+          "hoeffding": "0.140858"
+        },
+        "ratios": {
+          "chernoffOverExact": 4.4161553218561025,
+          "hoeffdingOverExact": 8.426418544637574
+        }
+      },
+      {
+        "k": 14,
+        "n": 32,
+        "p": 0.2,
+        "exact": 0.0019524568196091767,
+        "chernoff": 0.009866007017531158,
+        "hoeffding": 0.027051846866350412,
+        "display": {
+          "exact": "0.00195246",
+          "chernoff": "0.00986601",
+          "hoeffding": "0.0270518"
+        },
+        "ratios": {
+          "chernoffOverExact": 5.05312430904671,
+          "hoeffdingOverExact": 13.855285604608342
+        }
+      },
+      {
+        "k": 16,
+        "n": 32,
+        "p": 0.2,
+        "exact": 0.00014359483263857276,
+        "chernoff": 0.0007922816251426431,
+        "hoeffding": 0.0031511115984444414,
+        "display": {
+          "exact": "0.000143595",
+          "chernoff": "0.000792282",
+          "hoeffding": "0.00315111"
+        },
+        "ratios": {
+          "chernoffOverExact": 5.517480055405689,
+          "hoeffdingOverExact": 21.94446374247859
+        }
+      },
+      {
+        "k": 20,
+        "n": 32,
+        "p": 0.2,
+        "exact": 1.8919719000724388e-7,
+        "chernoff": 0.0000011264299718138755,
+        "hoeffding": 0.000009540162873079248,
+        "display": {
+          "exact": "1.89197e-7",
+          "chernoff": "1.12643e-6",
+          "hoeffding": "9.54016e-6"
+        },
+        "ratios": {
+          "chernoffOverExact": 5.953735210183341,
+          "hoeffdingOverExact": 50.42444273466207
+        }
+      }
+    ],
+    "heterogeneous": [
+      {
+        "k": 10,
+        "n": 32,
+        "exact": 0.531163682630941,
+        "display": {
+          "exact": "0.531164"
+        }
+      },
+      {
+        "k": 12,
+        "n": 32,
+        "exact": 0.24376400145217508,
+        "display": {
+          "exact": "0.243764"
+        }
+      },
+      {
+        "k": 14,
+        "n": 32,
+        "exact": 0.07403662564054468,
+        "display": {
+          "exact": "0.0740366"
+        }
+      },
+      {
+        "k": 16,
+        "n": 32,
+        "exact": 0.014428184490340225,
+        "display": {
+          "exact": "0.0144282"
+        }
+      },
+      {
+        "k": 18,
+        "n": 32,
+        "exact": 0.001764549353928708,
+        "display": {
+          "exact": "0.00176455"
+        }
+      },
+      {
+        "k": 20,
+        "n": 32,
+        "exact": 0.0001322070249062383,
+        "display": {
+          "exact": "0.000132207"
+        }
+      }
+    ],
+    "delay": [
+      {
+        "copies": 1,
+        "horizonHours": 6,
+        "probability": 0.698805788087798,
+        "expectedDelayHours": 5,
+        "p50": 3.465735902799726,
+        "p90": 11.512925464970229,
+        "p99": 23.02585092994045,
+        "display": {
+          "probability": "0.698806",
+          "expectedDelayHours": "5.000",
+          "p50": "3.466",
+          "p90": "11.513",
+          "p99": "23.026"
+        }
+      },
+      {
+        "copies": 1,
+        "horizonHours": 12,
+        "probability": 0.9092820467105875,
+        "expectedDelayHours": 5,
+        "p50": 3.465735902799726,
+        "p90": 11.512925464970229,
+        "p99": 23.02585092994045,
+        "display": {
+          "probability": "0.909282",
+          "expectedDelayHours": "5.000",
+          "p50": "3.466",
+          "p90": "11.513",
+          "p99": "23.026"
+        }
+      },
+      {
+        "copies": 1,
+        "horizonHours": 24,
+        "probability": 0.99177025295098,
+        "expectedDelayHours": 5,
+        "p50": 3.465735902799726,
+        "p90": 11.512925464970229,
+        "p99": 23.02585092994045,
+        "display": {
+          "probability": "0.99177",
+          "expectedDelayHours": "5.000",
+          "p50": "3.466",
+          "p90": "11.513",
+          "p99": "23.026"
+        }
+      },
+      {
+        "copies": 1,
+        "horizonHours": 48,
+        "probability": 0.9999322712635091,
+        "expectedDelayHours": 5,
+        "p50": 3.465735902799726,
+        "p90": 11.512925464970229,
+        "p99": 23.02585092994045,
+        "display": {
+          "probability": "0.999932",
+          "expectedDelayHours": "5.000",
+          "p50": "3.466",
+          "p90": "11.513",
+          "p99": "23.026"
+        }
+      },
+      {
+        "copies": 2,
+        "horizonHours": 6,
+        "probability": 0.9092820467105875,
+        "expectedDelayHours": 2.5,
+        "p50": 1.732867951399863,
+        "p90": 5.756462732485114,
+        "p99": 11.512925464970225,
+        "display": {
+          "probability": "0.909282",
+          "expectedDelayHours": "2.500",
+          "p50": "1.733",
+          "p90": "5.756",
+          "p99": "11.513"
+        }
+      },
+      {
+        "copies": 2,
+        "horizonHours": 12,
+        "probability": 0.99177025295098,
+        "expectedDelayHours": 2.5,
+        "p50": 1.732867951399863,
+        "p90": 5.756462732485114,
+        "p99": 11.512925464970225,
+        "display": {
+          "probability": "0.99177",
+          "expectedDelayHours": "2.500",
+          "p50": "1.733",
+          "p90": "5.756",
+          "p99": "11.513"
+        }
+      },
+      {
+        "copies": 2,
+        "horizonHours": 24,
+        "probability": 0.9999322712635091,
+        "expectedDelayHours": 2.5,
+        "p50": 1.732867951399863,
+        "p90": 5.756462732485114,
+        "p99": 11.512925464970225,
+        "display": {
+          "probability": "0.999932",
+          "expectedDelayHours": "2.500",
+          "p50": "1.733",
+          "p90": "5.756",
+          "p99": "11.513"
+        }
+      },
+      {
+        "copies": 2,
+        "horizonHours": 48,
+        "probability": 0.9999999954128183,
+        "expectedDelayHours": 2.5,
+        "p50": 1.732867951399863,
+        "p90": 5.756462732485114,
+        "p99": 11.512925464970225,
+        "display": {
+          "probability": "1",
+          "expectedDelayHours": "2.500",
+          "p50": "1.733",
+          "p90": "5.756",
+          "p99": "11.513"
+        }
+      },
+      {
+        "copies": 3,
+        "horizonHours": 6,
+        "probability": 0.9726762775527075,
+        "expectedDelayHours": 1.6666666666666665,
+        "p50": 1.155245300933242,
+        "p90": 3.8376418216567427,
+        "p99": 7.675283643313482,
+        "display": {
+          "probability": "0.972676",
+          "expectedDelayHours": "1.667",
+          "p50": "1.155",
+          "p90": "3.838",
+          "p99": "7.675"
+        }
+      },
+      {
+        "copies": 3,
+        "horizonHours": 12,
+        "probability": 0.9992534141916233,
+        "expectedDelayHours": 1.6666666666666665,
+        "p50": 1.155245300933242,
+        "p90": 3.8376418216567427,
+        "p99": 7.675283643313482,
+        "display": {
+          "probability": "0.999253",
+          "expectedDelayHours": "1.667",
+          "p50": "1.155",
+          "p90": "3.838",
+          "p99": "7.675"
+        }
+      },
+      {
+        "copies": 3,
+        "horizonHours": 24,
+        "probability": 0.9999994426096307,
+        "expectedDelayHours": 1.6666666666666665,
+        "p50": 1.155245300933242,
+        "p90": 3.8376418216567427,
+        "p99": 7.675283643313482,
+        "display": {
+          "probability": "0.999999",
+          "expectedDelayHours": "1.667",
+          "p50": "1.155",
+          "p90": "3.838",
+          "p99": "7.675"
+        }
+      },
+      {
+        "copies": 3,
+        "horizonHours": 48,
+        "probability": 0.9999999999996894,
+        "expectedDelayHours": 1.6666666666666665,
+        "p50": 1.155245300933242,
+        "p90": 3.8376418216567427,
+        "p99": 7.675283643313482,
+        "display": {
+          "probability": "1",
+          "expectedDelayHours": "1.667",
+          "p50": "1.155",
+          "p90": "3.838",
+          "p99": "7.675"
+        }
+      },
+      {
+        "copies": 5,
+        "horizonHours": 6,
+        "probability": 0.9975212478233336,
+        "expectedDelayHours": 1,
+        "p50": 0.6931471805599453,
+        "p90": 2.302585092994046,
+        "p99": 4.60517018598809,
+        "display": {
+          "probability": "0.997521",
+          "expectedDelayHours": "1.000",
+          "p50": "0.693",
+          "p90": "2.303",
+          "p99": "4.605"
+        }
+      },
+      {
+        "copies": 5,
+        "horizonHours": 12,
+        "probability": 0.9999938557876467,
+        "expectedDelayHours": 1,
+        "p50": 0.6931471805599453,
+        "p90": 2.302585092994046,
+        "p99": 4.60517018598809,
+        "display": {
+          "probability": "0.999994",
+          "expectedDelayHours": "1.000",
+          "p50": "0.693",
+          "p90": "2.303",
+          "p99": "4.605"
+        }
+      },
+      {
+        "copies": 5,
+        "horizonHours": 24,
+        "probability": 0.9999999999622486,
+        "expectedDelayHours": 1,
+        "p50": 0.6931471805599453,
+        "p90": 2.302585092994046,
+        "p99": 4.60517018598809,
+        "display": {
+          "probability": "1",
+          "expectedDelayHours": "1.000",
+          "p50": "0.693",
+          "p90": "2.303",
+          "p99": "4.605"
+        }
+      },
+      {
+        "copies": 5,
+        "horizonHours": 48,
+        "probability": 1,
+        "expectedDelayHours": 1,
+        "p50": 0.6931471805599453,
+        "p90": 2.302585092994046,
+        "p99": 4.60517018598809,
+        "display": {
+          "probability": "1",
+          "expectedDelayHours": "1.000",
+          "p50": "0.693",
+          "p90": "2.303",
+          "p99": "4.605"
+        }
+      }
+    ],
+    "overhead": [
+      {
+        "k": 8,
+        "n": 12,
+        "p": 0.4,
+        "probability": 0.057309921279999856,
+        "expectedReceived": 4.8,
+        "overhead": 1.5,
+        "display": {
+          "probability": "0.0573099",
+          "expectedReceived": "4.8"
+        }
+      },
+      {
+        "k": 8,
+        "n": 12,
+        "p": 0.6,
+        "probability": 0.4381782220799984,
+        "expectedReceived": 7.199999999999998,
+        "overhead": 1.5,
+        "display": {
+          "probability": "0.438178",
+          "expectedReceived": "7.2"
+        }
+      },
+      {
+        "k": 8,
+        "n": 12,
+        "p": 0.8,
+        "probability": 0.9274445004799967,
+        "expectedReceived": 9.6,
+        "overhead": 1.5,
+        "display": {
+          "probability": "0.927445",
+          "expectedReceived": "9.6"
+        }
+      },
+      {
+        "k": 12,
+        "n": 18,
+        "p": 0.6,
+        "probability": 0.37427686039329094,
+        "expectedReceived": 10.799999999999997,
+        "overhead": 1.5,
+        "display": {
+          "probability": "0.374277",
+          "expectedReceived": "10.8"
+        }
+      },
+      {
+        "k": 16,
+        "n": 24,
+        "p": 0.6,
+        "probability": 0.32792225445408296,
+        "expectedReceived": 14.399999999999995,
+        "overhead": 1.5,
+        "display": {
+          "probability": "0.327922",
+          "expectedReceived": "14.4"
+        }
+      }
+    ]
+  }
+}

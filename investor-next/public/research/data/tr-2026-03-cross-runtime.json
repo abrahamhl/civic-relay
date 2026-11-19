@@ -1,0 +1,269 @@
+{
+  "schema": "senda-research-data/1",
+  "report": "SENDA-TR-2026-03",
+  "generatedBy": "scripts/research/cross-runtime.mjs",
+  "provenance": "NUMERIC_MODEL_EXERCISE_ONLY",
+  "engines": {
+    "node": "v22.22.2",
+    "chromium": "156.0.0.0",
+    "chromiumUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+    "chromePath": "C:/Program Files/Google/Chrome/Application/chrome.exe"
+  },
+  "protocol": {
+    "population": 1000,
+    "latencyDays": 3,
+    "days": 90,
+    "tolerances": {
+      "rtol": 1e-7,
+      "atol": 1e-9
+    },
+    "dtMax": 0.5,
+    "settings": [
+      {
+        "label": "default",
+        "contactsPerDay": 8,
+        "beta": 0.15,
+        "infectiousDays": 5
+      },
+      {
+        "label": "dense-high",
+        "contactsPerDay": 16,
+        "beta": 0.5,
+        "infectiousDays": 10
+      },
+      {
+        "label": "sparse-low",
+        "contactsPerDay": 2,
+        "beta": 0.05,
+        "infectiousDays": 2
+      },
+      {
+        "label": "mid",
+        "contactsPerDay": 12,
+        "beta": 0.3,
+        "infectiousDays": 7
+      }
+    ]
+  },
+  "node": [
+    {
+      "maxConservationError": 1.8189894035458565e-12,
+      "steps": 233,
+      "peakInfectious": 314.03125542342997,
+      "peakDay": 22,
+      "attackRate": 0.9974860573069094,
+      "r0": 5.999999999999999,
+      "tolerances": {
+        "rtol": 1e-7,
+        "atol": 1e-9
+      }
+    },
+    {
+      "maxConservationError": 2.5011104298755527e-12,
+      "steps": 338,
+      "peakInfectious": 587.1784838469715,
+      "peakDay": 9,
+      "attackRate": 1,
+      "r0": 80,
+      "tolerances": {
+        "rtol": 1e-7,
+        "atol": 1e-9
+      }
+    },
+    {
+      "maxConservationError": 1.0231815394945443e-12,
+      "steps": 209,
+      "peakInfectious": 1,
+      "peakDay": 0,
+      "attackRate": 0.0012496485891168732,
+      "r0": 0.2,
+      "tolerances": {
+        "rtol": 1e-7,
+        "atol": 1e-9
+      }
+    },
+    {
+      "maxConservationError": 1.0231815394945443e-12,
+      "steps": 325,
+      "peakInfectious": 497.30121713170416,
+      "peakDay": 12,
+      "attackRate": 0.9999999999886372,
+      "r0": 25.2,
+      "tolerances": {
+        "rtol": 1e-7,
+        "atol": 1e-9
+      }
+    }
+  ],
+  "chromium": [
+    {
+      "maxConservationError": 1.0231815394945443e-12,
+      "steps": 233,
+      "peakInfectious": 314.0312554234303,
+      "peakDay": 22,
+      "attackRate": 0.9974860573069094,
+      "r0": 5.999999999999999,
+      "tolerances": {
+        "rtol": 1e-7,
+        "atol": 1e-9
+      }
+    },
+    {
+      "maxConservationError": 1.2505552149377763e-12,
+      "steps": 338,
+      "peakInfectious": 587.178483846973,
+      "peakDay": 9,
+      "attackRate": 1,
+      "r0": 80,
+      "tolerances": {
+        "rtol": 1e-7,
+        "atol": 1e-9
+      }
+    },
+    {
+      "maxConservationError": 1.3642420526593924e-12,
+      "steps": 209,
+      "peakInfectious": 1,
+      "peakDay": 0,
+      "attackRate": 0.0012496485891165322,
+      "r0": 0.2,
+      "tolerances": {
+        "rtol": 1e-7,
+        "atol": 1e-9
+      }
+    },
+    {
+      "maxConservationError": 1.7053025658242404e-12,
+      "steps": 325,
+      "peakInfectious": 497.30121713170456,
+      "peakDay": 12,
+      "attackRate": 0.9999999999886372,
+      "r0": 25.2,
+      "tolerances": {
+        "rtol": 1e-7,
+        "atol": 1e-9
+      }
+    }
+  ],
+  "displays": [
+    {
+      "setting": "default",
+      "node": {
+        "raw": 1.8189894035458565e-12,
+        "upperBound": "< 1e-9",
+        "fixed12": "0.000000000002",
+        "attackPercent": "99.75%"
+      },
+      "chromium": {
+        "raw": 1.0231815394945443e-12,
+        "upperBound": "< 1e-9",
+        "fixed12": "0.000000000001",
+        "attackPercent": "99.75%"
+      },
+      "same": {
+        "raw": false,
+        "upperBound": true,
+        "fixed12": false,
+        "attackPercent": true,
+        "steps": true,
+        "peakInfectious": false,
+        "peakDay": true,
+        "attackRate": true,
+        "r0": true
+      }
+    },
+    {
+      "setting": "dense-high",
+      "node": {
+        "raw": 2.5011104298755527e-12,
+        "upperBound": "< 1e-9",
+        "fixed12": "0.000000000003",
+        "attackPercent": "100.00%"
+      },
+      "chromium": {
+        "raw": 1.2505552149377763e-12,
+        "upperBound": "< 1e-9",
+        "fixed12": "0.000000000001",
+        "attackPercent": "100.00%"
+      },
+      "same": {
+        "raw": false,
+        "upperBound": true,
+        "fixed12": false,
+        "attackPercent": true,
+        "steps": true,
+        "peakInfectious": false,
+        "peakDay": true,
+        "attackRate": true,
+        "r0": true
+      }
+    },
+    {
+      "setting": "sparse-low",
+      "node": {
+        "raw": 1.0231815394945443e-12,
+        "upperBound": "< 1e-9",
+        "fixed12": "0.000000000001",
+        "attackPercent": "0.12%"
+      },
+      "chromium": {
+        "raw": 1.3642420526593924e-12,
+        "upperBound": "< 1e-9",
+        "fixed12": "0.000000000001",
+        "attackPercent": "0.12%"
+      },
+      "same": {
+        "raw": false,
+        "upperBound": true,
+        "fixed12": true,
+        "attackPercent": true,
+        "steps": true,
+        "peakInfectious": true,
+        "peakDay": true,
+        "attackRate": false,
+        "r0": true
+      }
+    },
+    {
+      "setting": "mid",
+      "node": {
+        "raw": 1.0231815394945443e-12,
+        "upperBound": "< 1e-9",
+        "fixed12": "0.000000000001",
+        "attackPercent": "100.00%"
+      },
+      "chromium": {
+        "raw": 1.7053025658242404e-12,
+        "upperBound": "< 1e-9",
+        "fixed12": "0.000000000002",
+        "attackPercent": "100.00%"
+      },
+      "same": {
+        "raw": false,
+        "upperBound": true,
+        "fixed12": false,
+        "attackPercent": true,
+        "steps": true,
+        "peakInfectious": false,
+        "peakDay": true,
+        "attackRate": true,
+        "r0": true
+      }
+    }
+  ],
+  "observations": {
+    "rawErrorsDifferInAllRows": true,
+    "acceptedStepsAgreeInAllRows": true,
+    "upperBoundDisplayAgreesInAllRows": true,
+    "fixed12DisplayAgreesInAllRows": false,
+    "attackPercentAgreesInAllRows": true,
+    "maxRawError": 2.5011104298755527e-12,
+    "upperBound": "1e-9"
+  },
+  "doesNotContain": [
+    "bit-for-bit reproducibility",
+    "field measurements",
+    "a claim that the SEIR parameters are scientifically validated",
+    "a claim that raw floating-point equality holds across engines"
+  ]
+}
