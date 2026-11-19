@@ -2,7 +2,7 @@
   "id": "P01",
   "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
   "sha": "LOCAL",
-  "timestamp_utc": "2026-11-17T08:14:16.090Z",
+  "timestamp_utc": "2026-11-19T00:21:43.955Z",
   "locale": "es",
   "viewport": {
     "width": 390,
@@ -49,7 +49,7 @@
       "CUANDO LAREDSE APAGA."
     ],
     "canonical": "https://civic-relay-investor.vercel.app/es/",
-    "disclaimers": 38,
+    "disclaimers": 39,
     "eightStage": true,
     "obsoleteLinks": [],
     "editorial": {
@@ -60,7 +60,15 @@
       "caption": true
     },
     "pageErrors": [],
-    "consoleErrors": []
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
   },
   "verdict": "PASS"
 }

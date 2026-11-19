@@ -2,7 +2,7 @@
   "id": "P08",
   "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
   "sha": "LOCAL",
-  "timestamp_utc": "2026-11-17T08:14:38.276Z",
+  "timestamp_utc": "2026-11-19T00:21:54.576Z",
   "locale": "nl",
   "viewport": {
     "width": 820,
@@ -44,7 +44,7 @@
       "ALS HETNETWERKUITVALT."
     ],
     "canonical": "https://civic-relay-investor.vercel.app/nl/",
-    "disclaimers": 42,
+    "disclaimers": 43,
     "eightStage": true,
     "obsoleteLinks": [],
     "editorial": {
@@ -55,7 +55,15 @@
       "caption": true
     },
     "pageErrors": [],
-    "consoleErrors": []
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
   },
   "verdict": "PASS"
 }

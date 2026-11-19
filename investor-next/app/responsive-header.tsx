@@ -61,7 +61,7 @@ export default function ResponsiveHeader({ locale }: { locale: Locale }) {
   const { nav } = getCopy(locale);
   const copy = labelsByLocale[locale];
   const links = linksByLocale[locale];
-  const primary = [0, 1, 3, 7, 10];
+  const primary = [0, 1, 3, 9, 10]; // experiencia · … · probar mi dispositivo · evidencias y límites · biblioteca de investigación
 
   useEffect(() => {
     if (!open) return;

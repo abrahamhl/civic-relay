@@ -229,7 +229,7 @@ async function runRoleTask(page,trial,evidenceDir){
    await page.keyboard.press('Escape');
    const closed=await menu.getAttribute('aria-expanded')==='false';
    note('1536px navigation columns, primary links and Escape close',{brandBox,navBox,actionsBox,primaryCount,opened,closed});
-   observations.verified=Boolean(brandBox&&navBox&&actionsBox)&&primaryCount===4&&opened&&closed&&
+   observations.verified=Boolean(brandBox&&navBox&&actionsBox)&&primaryCount===5&&opened&&closed&&
      brandBox.x+brandBox.width<=navBox.x+2&&navBox.x+navBox.width<=actionsBox.x+2&&
      actionsBox.x+actionsBox.width<=1536;
    break;

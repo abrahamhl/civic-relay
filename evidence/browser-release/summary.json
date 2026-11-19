@@ -1,13 +1,13 @@
 {
   "sha": "LOCAL",
-  "completed_at_utc": "2026-11-17T08:15:14.261Z",
+  "completed_at_utc": "2026-11-19T00:22:20.019Z",
   "scope": "FIFTEEN automated Chromium task roles (P01-P15) on synthetic local website including master vision, typed custody, 20-module catalogue, keyboard, mobile and trilingual checks.",
   "runs": [
     {
       "id": "P01",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:14:16.090Z",
+      "timestamp_utc": "2026-11-19T00:21:43.955Z",
       "locale": "es",
       "viewport": {
         "width": 390,
@@ -54,7 +54,7 @@
           "CUANDO LAREDSE APAGA."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/es/",
-        "disclaimers": 38,
+        "disclaimers": 39,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -65,7 +65,15 @@
           "caption": true
         },
         "pageErrors": [],
-        "consoleErrors": []
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ]
       },
       "verdict": "PASS"
     },
@@ -73,7 +81,7 @@
       "id": "P02",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:14:19.175Z",
+      "timestamp_utc": "2026-11-19T00:21:45.650Z",
       "locale": "en",
       "viewport": {
         "width": 1024,
@@ -112,7 +120,7 @@
           "WHEN THENETWORKGOES DARK."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/",
-        "disclaimers": 70,
+        "disclaimers": 71,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -123,7 +131,15 @@
           "caption": true
         },
         "pageErrors": [],
-        "consoleErrors": []
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ]
       },
       "verdict": "PASS"
     },
@@ -131,7 +147,7 @@
       "id": "P03",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:14:22.673Z",
+      "timestamp_utc": "2026-11-19T00:21:47.080Z",
       "locale": "en",
       "viewport": {
         "width": 1280,
@@ -174,7 +190,7 @@
           "WHEN THENETWORKGOES DARK."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/",
-        "disclaimers": 70,
+        "disclaimers": 71,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -185,7 +201,15 @@
           "caption": true
         },
         "pageErrors": [],
-        "consoleErrors": []
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ]
       },
       "verdict": "PASS"
     },
@@ -193,7 +217,7 @@
       "id": "P04",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:14:27.114Z",
+      "timestamp_utc": "2026-11-19T00:21:48.719Z",
       "locale": "en",
       "viewport": {
         "width": 1440,
@@ -232,7 +256,7 @@
           "WHEN THENETWORKGOES DARK."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/",
-        "disclaimers": 70,
+        "disclaimers": 71,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -243,7 +267,15 @@
           "caption": true
         },
         "pageErrors": [],
-        "consoleErrors": []
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ]
       },
       "verdict": "PASS"
     },
@@ -251,7 +283,7 @@
       "id": "P05",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:14:29.428Z",
+      "timestamp_utc": "2026-11-19T00:21:49.972Z",
       "locale": "nl",
       "viewport": {
         "width": 1024,
@@ -290,7 +322,7 @@
           "ALS HETNETWERKUITVALT."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/nl/",
-        "disclaimers": 42,
+        "disclaimers": 43,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -301,7 +333,15 @@
           "caption": true
         },
         "pageErrors": [],
-        "consoleErrors": []
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ]
       },
       "verdict": "PASS"
     },
@@ -309,7 +349,7 @@
       "id": "P06",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:14:32.876Z",
+      "timestamp_utc": "2026-11-19T00:21:52.096Z",
       "locale": "es",
       "viewport": {
         "width": 412,
@@ -352,7 +392,7 @@
           "CUANDO LAREDSE APAGA."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/es/",
-        "disclaimers": 38,
+        "disclaimers": 39,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -363,7 +403,15 @@
           "caption": true
         },
         "pageErrors": [],
-        "consoleErrors": []
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ]
       },
       "verdict": "PASS"
     },
@@ -371,7 +419,7 @@
       "id": "P07",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:14:36.188Z",
+      "timestamp_utc": "2026-11-19T00:21:53.492Z",
       "locale": "en",
       "viewport": {
         "width": 390,
@@ -414,7 +462,7 @@
           "WHEN THENETWORKGOES DARK."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/",
-        "disclaimers": 69,
+        "disclaimers": 70,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -425,7 +473,15 @@
           "caption": true
         },
         "pageErrors": [],
-        "consoleErrors": []
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ]
       },
       "verdict": "PASS"
     },
@@ -433,7 +489,7 @@
       "id": "P08",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:14:38.276Z",
+      "timestamp_utc": "2026-11-19T00:21:54.576Z",
       "locale": "nl",
       "viewport": {
         "width": 820,
@@ -475,7 +531,7 @@
           "ALS HETNETWERKUITVALT."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/nl/",
-        "disclaimers": 42,
+        "disclaimers": 43,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -486,7 +542,15 @@
           "caption": true
         },
         "pageErrors": [],
-        "consoleErrors": []
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ]
       },
       "verdict": "PASS"
     },
@@ -494,7 +558,7 @@
       "id": "P09",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:14:42.298Z",
+      "timestamp_utc": "2026-11-19T00:21:58.291Z",
       "locale": "es",
       "viewport": {
         "width": 1440,
@@ -539,7 +603,7 @@
           "CUANDO LAREDSE APAGA."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/es/",
-        "disclaimers": 36,
+        "disclaimers": 37,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -551,6 +615,13 @@
         },
         "pageErrors": [],
         "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
           "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"application/octet-stream\". Strict MIME type checking is enforced for module scripts per HTML spec.",
           "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"application/octet-stream\". Strict MIME type checking is enforced for module scripts per HTML spec."
         ]
@@ -561,7 +632,7 @@
       "id": "P10",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:14:45.838Z",
+      "timestamp_utc": "2026-11-19T00:22:00.171Z",
       "locale": "es",
       "viewport": {
         "width": 1440,
@@ -603,7 +674,7 @@
           "CUANDO LAREDSE APAGA."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/es/",
-        "disclaimers": 38,
+        "disclaimers": 39,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -614,7 +685,15 @@
           "caption": true
         },
         "pageErrors": [],
-        "consoleErrors": []
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ]
       },
       "verdict": "PASS"
     },
@@ -622,7 +701,7 @@
       "id": "P11",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:14:48.868Z",
+      "timestamp_utc": "2026-11-19T00:22:01.725Z",
       "locale": "es",
       "viewport": {
         "width": 320,
@@ -673,7 +752,7 @@
           "CUANDO LAREDSE APAGA."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/es/",
-        "disclaimers": 38,
+        "disclaimers": 39,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -684,7 +763,17 @@
           "caption": true
         },
         "pageErrors": [],
-        "consoleErrors": []
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"application/octet-stream\". Strict MIME type checking is enforced for module scripts per HTML spec.",
+          "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"application/octet-stream\". Strict MIME type checking is enforced for module scripts per HTML spec."
+        ]
       },
       "verdict": "PASS"
     },
@@ -692,7 +781,7 @@
       "id": "P12",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:14:53.038Z",
+      "timestamp_utc": "2026-11-19T00:22:05.079Z",
       "locale": "en",
       "viewport": {
         "width": 1536,
@@ -723,7 +812,7 @@
                 "width": 198,
                 "height": 46
               },
-              "primaryCount": 4,
+              "primaryCount": 5,
               "opened": true,
               "closed": true
             }
@@ -753,7 +842,7 @@
           "WHEN THENETWORKGOES DARK."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/",
-        "disclaimers": 70,
+        "disclaimers": 71,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -765,6 +854,13 @@
         },
         "pageErrors": [],
         "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
           "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"application/octet-stream\". Strict MIME type checking is enforced for module scripts per HTML spec.",
           "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"application/octet-stream\". Strict MIME type checking is enforced for module scripts per HTML spec."
         ]
@@ -775,7 +871,7 @@
       "id": "P13",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:15:00.384Z",
+      "timestamp_utc": "2026-11-19T00:22:08.485Z",
       "locale": "es",
       "viewport": {
         "width": 320,
@@ -814,7 +910,7 @@
           "CUANDO LAREDSE APAGA."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/es/",
-        "disclaimers": 38,
+        "disclaimers": 39,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -825,7 +921,15 @@
           "caption": true
         },
         "pageErrors": [],
-        "consoleErrors": []
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ]
       },
       "verdict": "PASS"
     },
@@ -833,7 +937,7 @@
       "id": "P14",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:15:08.293Z",
+      "timestamp_utc": "2026-11-19T00:22:15.536Z",
       "locale": "en",
       "viewport": {
         "width": 1440,
@@ -872,7 +976,7 @@
           "WHEN THENETWORKGOES DARK."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/",
-        "disclaimers": 70,
+        "disclaimers": 71,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -883,7 +987,15 @@
           "caption": true
         },
         "pageErrors": [],
-        "consoleErrors": []
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ]
       },
       "verdict": "PASS"
     },
@@ -891,7 +1003,7 @@
       "id": "P15",
       "kind": "REAL_CHROMIUM_AUTOMATED_SMOKE_NOT_HUMAN_USER",
       "sha": "LOCAL",
-      "timestamp_utc": "2026-11-17T08:15:13.805Z",
+      "timestamp_utc": "2026-11-19T00:22:19.672Z",
       "locale": "nl",
       "viewport": {
         "width": 390,
@@ -930,7 +1042,7 @@
           "ALS HETNETWERKUITVALT."
         ],
         "canonical": "https://civic-relay-investor.vercel.app/nl/",
-        "disclaimers": 42,
+        "disclaimers": 43,
         "eightStage": true,
         "obsoleteLinks": [],
         "editorial": {
@@ -941,7 +1053,15 @@
           "caption": true
         },
         "pageErrors": [],
-        "consoleErrors": []
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ]
       },
       "verdict": "PASS"
     }
