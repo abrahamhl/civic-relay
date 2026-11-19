@@ -1,0 +1,716 @@
+{
+ "note": "SENDA Drive · película (motor 3D cinema.html). Generado por build-drive-film.mjs; no editar a mano. Fuentes: docs/video/DRIVE_FILM.md",
+ "counts": {
+  "core": 881,
+  "roadE2E": 82,
+  "roadE2EAt": "2026-11-19T00:14:02.887Z",
+  "autostartScenarios": 10,
+  "autostartSteps": 55
+ },
+ "tagline": {
+  "es": "DRIVE · EL MOTOR DE LA V16",
+  "en": "DRIVE · THE ENGINE FOR THE V16"
+ },
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 1
+  },
+  "en": {
+   "voice": "bf_emma",
+   "lang": "en-gb",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "d01",
+   "claim": "OBSERVED",
+   "title": {
+    "es": "Enero de 2026 · la V16 conectada",
+    "en": "January 2026 · the connected V16"
+   },
+   "visual": {
+    "kind": "beacon",
+    "engine": "aerialBeacon",
+    "stat": "DGT 3.0",
+    "statCue": 1,
+    "statLabel": {
+     "es": "posición de la baliza · fuente: DGT",
+     "en": "beacon position · source: DGT"
+    }
+   },
+   "es": [
+    "Desde enero de 2026, la baliza V16 conectada es obligatoria en España.",
+    "La enciendes y envía tu posición a la plataforma DGT 3.0.",
+    "Tráfico la reenvía a los navegadores conectados.",
+    "Es un gran paso. Pero una luz no sabe lo que ha pasado.",
+    "No sabe si fue un choque, en qué carril estás ni hacia dónde miras.",
+    "Y si nadie puede encenderla, no avisa a nadie."
+   ],
+   "en": [
+    "Since January 2026, the connected V16 beacon is mandatory in Spain.",
+    "Switch it on and it sends your position to the DGT 3.0 platform.",
+    "Traffic forwards it to connected navigation apps.",
+    "It is a big step. But a light does not know what happened.",
+    "It doesn't know if it was a crash, your lane, or which way you face.",
+    "And if nobody can switch it on, it warns no one."
+   ],
+   "es_say": [
+    "Desde enero de dos mil veintiséis, la baliza uve dieciséis conectada es obligatoria en España.",
+    "La enciendes y envía tu posición a la plataforma de ge te tres punto cero.",
+    "Tráfico la reenvía a los navegadores conectados.",
+    "Es un gran paso. Pero una luz no sabe lo que ha pasado.",
+    "No sabe si fue un choque, en qué carril estás ni hacia dónde miras.",
+    "Y si nadie puede encenderla, no avisa a nadie."
+   ],
+   "en_say": [
+    "Since January two thousand and twenty-six, the connected V sixteen beacon is mandatory in Spain.",
+    "Switch it on and it sends your position to the D G T three point oh platform.",
+    "Traffic forwards it to connected navigation apps.",
+    "It is a big step. But a light does not know what happened.",
+    "It doesn't know if it was a crash, your lane, or which way you face.",
+    "And if nobody can switch it on, it warns no one."
+   ]
+  },
+  {
+   "id": "d02",
+   "claim": "CALCULATED",
+   "title": {
+    "es": "SENDA Drive · el motor que le faltaba a la V16",
+    "en": "SENDA Drive · the engine the V16 was missing"
+   },
+   "visual": {
+    "kind": "title",
+    "engine": "backdrop",
+    "plate": "dash",
+    "from": 0,
+    "dim": 0.5
+   },
+   "es": [
+    "Esto es SENDA Drive.",
+    "El motor que convierte la baliza en información para quien viene detrás.",
+    "Va en tu móvil, entiende la carretera y no inventa nada."
+   ],
+   "en": [
+    "This is SENDA Drive.",
+    "The engine that turns the beacon into information for whoever comes behind.",
+    "It lives in your phone, understands the road and invents nothing."
+   ],
+   "es_say": [
+    "Esto es Senda Drive.",
+    "El motor que convierte la baliza en información para quien viene detrás.",
+    "Va en tu móvil, entiende la carretera y no inventa nada."
+   ],
+   "en_say": [
+    "This is Senda Drive.",
+    "The engine that turns the beacon into information for whoever comes behind.",
+    "It lives in your phone, understands the road and invents nothing."
+   ]
+  },
+  {
+   "id": "d03",
+   "claim": "CALCULATED",
+   "title": {
+    "es": "Arranca solo, como un navegador",
+    "en": "It starts by itself, like a navigator"
+   },
+   "visual": {
+    "kind": "autostart",
+    "engine": "autostartHud",
+    "scen": 10,
+    "steps": 55
+   },
+   "es": [
+    "Lo autorizas una vez y vinculas tu coche.",
+    "Al subir, el Bluetooth del coche lo arranca; al bajar, se cierra solo.",
+    "Si solo hay una pista débil, espera a que la velocidad la confirme.",
+    "Sin tu permiso, no arranca nunca.",
+    "Android, con o sin Google, e iPhone usan la misma lógica,",
+    "comprobada con 10 escenarios y 55 pasos comunes."
+   ],
+   "en": [
+    "You authorise it once and pair your car.",
+    "Get in, and the car's Bluetooth starts it; get out, and it closes.",
+    "If there is only a weak hint, it waits for speed to confirm it.",
+    "Without your permission, it never starts.",
+    "Android, with or without Google, and iPhone share the same logic,",
+    "checked against 10 shared scenarios and 55 steps."
+   ],
+   "es_say": [
+    "Lo autorizas una vez y vinculas tu coche.",
+    "Al subir, el blutuz del coche lo arranca; al bajar, se cierra solo.",
+    "Si solo hay una pista débil, espera a que la velocidad la confirme.",
+    "Sin tu permiso, no arranca nunca.",
+    "Android, con o sin Google, e aifon usan la misma lógica,",
+    "comprobada con diez escenarios y cincuenta y cinco pasos comunes."
+   ],
+   "en_say": [
+    "You authorise it once and pair your car.",
+    "Get in, and the car's Bluetooth starts it; get out, and it closes.",
+    "If there is only a weak hint, it waits for speed to confirm it.",
+    "Without your permission, it never starts.",
+    "Android, with or without Google, and iPhone share the same logic,",
+    "checked against ten shared scenarios and fifty-five steps."
+   ]
+  },
+  {
+   "id": "d04",
+   "claim": "SIMULATED",
+   "title": {
+    "es": "La frenada que no ves",
+    "en": "The braking you cannot see"
+   },
+   "visual": {
+    "kind": "road",
+    "engine": "aerialChain",
+    "stat": "5 → 1",
+    "statCue": 4,
+    "statLabel": {
+     "es": "coches que chocan · resultado del modelo",
+     "en": "cars crashing · model result"
+    }
+   },
+   "es": [
+    "Niebla, 120 km/h, 1,2 segundos entre coches.",
+    "Cada conductor reacciona a las luces del de delante.",
+    "Los retrasos se suman: en el modelo, chocan cinco coches.",
+    "Con SENDA, el primer móvil detecta la frenada y avisa a todos a la vez.",
+    "En el modelo solo choca el que iba pegado. Eso solo lo arregla la distancia.",
+    "Sin cobertura, el SOS viaja con los coches que pasan:",
+    "sale en unos siete minutos con uno de cada diez coches. Es una simulación."
+   ],
+   "en": [
+    "Fog, 120 km/h, 1.2 seconds between cars.",
+    "Each driver reacts to the brake lights ahead.",
+    "The delays add up: in the model, five cars crash.",
+    "With SENDA, the first phone detects the braking and warns everyone at once.",
+    "In the model only the tailgater crashes. Only distance fixes that.",
+    "With no coverage, the SOS rides with passing cars:",
+    "out in about seven minutes with one car in ten. It is a simulation."
+   ],
+   "es_say": [
+    "Niebla, ciento veinte por hora, uno coma dos segundos entre coches.",
+    "Cada conductor reacciona a las luces del de delante.",
+    "Los retrasos se suman: en el modelo, chocan cinco coches.",
+    "Con Senda, el primer móvil detecta la frenada y avisa a todos a la vez.",
+    "En el modelo solo choca el que iba pegado. Eso solo lo arregla la distancia.",
+    "Sin cobertura, el ese o ese viaja con los coches que pasan:",
+    "sale en unos siete minutos con uno de cada diez coches. Es una simulación."
+   ],
+   "en_say": [
+    "Fog, a hundred and twenty an hour, one point two seconds between cars.",
+    "Each driver reacts to the brake lights ahead.",
+    "The delays add up: in the model, five cars crash.",
+    "With Senda, the first phone detects the braking and warns everyone at once.",
+    "In the model only the tailgater crashes. Only distance fixes that.",
+    "With no coverage, the S O S rides with passing cars:",
+    "out in about seven minutes with one car in ten. It is a simulation."
+   ]
+  },
+  {
+   "id": "d05",
+   "claim": "SIMULATED",
+   "title": {
+    "es": "Un caso real · camión contra turismo",
+    "en": "A real case · truck against car"
+   },
+   "visual": {
+    "kind": "sideswipe",
+    "engine": "aerialSide"
+   },
+   "es": [
+    "Un caso real, contado por uno de los conductores. Anónimo y sin verificar.",
+    "Autopista en Bélgica. La cabina de un camión golpea el lateral de un turismo.",
+    "Lo arrastra atravesado, lo suelta, y el coche gira media vuelta.",
+    "Queda parado en el carril rápido, mirando contra el tráfico.",
+    "El camión, en el arcén. El peligro real llega ahora: los que vienen detrás."
+   ],
+   "en": [
+    "A real case, told by one of the drivers. Anonymous and unverified.",
+    "A Belgian motorway. A truck's cab strikes the side of a car.",
+    "It drags it sideways, lets go, and the car spins half a turn.",
+    "It stops in the fast lane, facing the traffic.",
+    "The truck, on the shoulder. The real danger comes now: those behind."
+   ],
+   "es_say": [
+    "Un caso real, contado por uno de los conductores. Anónimo y sin verificar.",
+    "Autopista en Bélgica. La cabina de un camión golpea el lateral de un turismo.",
+    "Lo arrastra atravesado, lo suelta, y el coche gira media vuelta.",
+    "Queda parado en el carril rápido, mirando contra el tráfico.",
+    "El camión, en el arcén. El peligro real llega ahora: los que vienen detrás."
+   ],
+   "en_say": [
+    "A real case, told by one of the drivers. Anonymous and unverified.",
+    "A Belgian motorway. A truck's cab strikes the side of a car.",
+    "It drags it sideways, lets go, and the car spins half a turn.",
+    "It stops in the fast lane, facing the traffic.",
+    "The truck, on the shoulder. The real danger comes now: those behind."
+   ]
+  },
+  {
+   "id": "d06",
+   "claim": "CALCULATED",
+   "title": {
+    "es": "Lo que este caso destapó en nuestro código",
+    "en": "What this case exposed in our code"
+   },
+   "visual": {
+    "kind": "relevance",
+    "engine": "aerialRel"
+   },
+   "es": [
+    "Con este caso encontramos un fallo en nuestro propio código.",
+    "Como el coche miraba al revés, se descartaba el aviso: «va en otro sentido».",
+    "Todos los que llegaban por detrás lo habrían ignorado. Ya está corregido.",
+    "Ahora, si el rumbo no es fiable, avisa y marca la calzada como incierta.",
+    "Si el móvil envía el rumbo que llevaba antes del golpe,",
+    "la calzada contraria ya no recibe una falsa alarma."
+   ],
+   "en": [
+    "This case exposed a bug in our own code.",
+    "Because the car faced backwards, the warning was dropped: 'other direction'.",
+    "Everyone arriving behind would have ignored it. It is fixed.",
+    "Now, with no reliable heading, it warns and flags the road side as uncertain.",
+    "If the phone sends the heading it had before the impact,",
+    "the opposite carriageway no longer gets a false alarm."
+   ],
+   "es_say": [
+    "Con este caso encontramos un fallo en nuestro propio código.",
+    "Como el coche miraba al revés, se descartaba el aviso: «va en otro sentido».",
+    "Todos los que llegaban por detrás lo habrían ignorado. Ya está corregido.",
+    "Ahora, si el rumbo no es fiable, avisa y marca la calzada como incierta.",
+    "Si el móvil envía el rumbo que llevaba antes del golpe,",
+    "la calzada contraria ya no recibe una falsa alarma."
+   ],
+   "en_say": [
+    "This case exposed a bug in our own code.",
+    "Because the car faced backwards, the warning was dropped: 'other direction'.",
+    "Everyone arriving behind would have ignored it. It is fixed.",
+    "Now, with no reliable heading, it warns and flags the road side as uncertain.",
+    "If the phone sends the heading it had before the impact,",
+    "the opposite carriageway no longer gets a false alarm."
+   ]
+  },
+  {
+   "id": "d07",
+   "claim": "OBSERVED",
+   "title": {
+    "es": "Qué ves en la pantalla",
+    "en": "What you see on screen"
+   },
+   "visual": {
+    "kind": "screens",
+    "engine": "phoneShot",
+    "plate": "dash",
+    "screens": [
+     "drive-roadsafe-ciudadano.png",
+     "drive-roadsafe-ciudadano.png",
+     "drive-roadsafe-ciudadano.png",
+     "drive-roadsafe-carretera.png"
+    ]
+   },
+   "es": [
+    "En la app, sin registrarte: qué hacer ahora, paso a paso.",
+    "Un botón para llamar al 112, que siempre es tuyo: SENDA no llama sola.",
+    "Un guion para la llamada, con carril y orientación solo si los declaras.",
+    "Y avisos fusionados de varias fuentes, cada uno con su procedencia."
+   ],
+   "en": [
+    "In the app, with no sign-up: what to do now, step by step.",
+    "A button to call 112, always yours: SENDA never calls on its own.",
+    "A script for the call, with lane and direction only if you declare them.",
+    "And warnings fused from several sources, each with its provenance."
+   ],
+   "es_say": [
+    "En la app, sin registrarte: qué hacer ahora, paso a paso.",
+    "Un botón para llamar al uno uno dos, que siempre es tuyo: Senda no llama sola.",
+    "Un guion para la llamada, con carril y orientación solo si los declaras.",
+    "Y avisos fusionados de varias fuentes, cada uno con su procedencia."
+   ],
+   "en_say": [
+    "In the app, with no sign-up: what to do now, step by step.",
+    "A button to call one one two, always yours: Senda never calls on its own.",
+    "A script for the call, with lane and direction only if you declare them.",
+    "And warnings fused from several sources, each with its provenance."
+   ]
+  },
+  {
+   "id": "d08",
+   "claim": "CALCULATED",
+   "title": {
+    "es": "Sentir el golpe con el móvil",
+    "en": "Feeling the impact with the phone"
+   },
+   "visual": {
+    "kind": "impact",
+    "engine": "sensors",
+    "accel": [
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     1,
+     1,
+     1,
+     1,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083,
+     0.083
+    ],
+    "accelSource": "syntheticTrace('CRASH_REAR_END') · roadsafe-crash-detect.mjs · SINTÉTICA"
+   },
+   "es": [
+    "El móvil también siente el golpe: el acelerómetro mide el impulso,",
+    "y el giroscopio, cuánto gira el coche después. Ese trompo fue la pista.",
+    "Cada señal suma o resta evidencia; ninguna decide sola.",
+    "Hoy los pesos son de ejemplo, y el del giro está vacío hasta calibrarlo.",
+    "El arnés de calibración ya existe: entrena y prueba por separado."
+   ],
+   "en": [
+    "The phone feels the impact too: the accelerometer measures the jolt,",
+    "and the gyroscope, how far the car turns afterwards. That spin was the clue.",
+    "Each signal adds or removes evidence; none decides alone.",
+    "Today's weights are examples, and the spin weight stays empty until calibrated.",
+    "The calibration harness is ready: it trains and tests separately."
+   ],
+   "es_say": [
+    "El móvil también siente el golpe: el acelerómetro mide el impulso,",
+    "y el giroscopio, cuánto gira el coche después. Ese trompo fue la pista.",
+    "Cada señal suma o resta evidencia; ninguna decide sola.",
+    "Hoy los pesos son de ejemplo, y el del giro está vacío hasta calibrarlo.",
+    "El arnés de calibración ya existe: entrena y prueba por separado."
+   ],
+   "en_say": [
+    "The phone feels the impact too: the accelerometer measures the jolt,",
+    "and the gyroscope, how far the car turns afterwards. That spin was the clue.",
+    "Each signal adds or removes evidence; none decides alone.",
+    "Today's weights are examples, and the spin weight stays empty until calibrated.",
+    "The calibration harness is ready: it trains and tests separately."
+   ]
+  },
+  {
+   "id": "d09",
+   "claim": "CALCULATED",
+   "title": {
+    "es": "Las cámaras del coche, como sensores",
+    "en": "The car's cameras, as sensors"
+   },
+   "visual": {
+    "kind": "cameras",
+    "engine": "detect"
+   },
+   "es": [
+    "Muchos coches llevan cámaras. Su dueño puede pasar los clips por SENDA.",
+    "Detecta un coche atravesado, otro parado delante o una persona en la vía.",
+    "Y solo comparte el evento: qué, dónde y cuándo. Nunca la imagen.",
+    "Si un evento trae imagen, matrícula o cara, se rechaza.",
+    "Lo que ve el ordenador de un Tesla no está abierto a terceros. No lo fingimos.",
+    "Hasta calibrarlas, las cámaras no suben la confianza: solo se anotan."
+   ],
+   "en": [
+    "Many cars carry cameras. Their owner can run the clips through SENDA.",
+    "It spots a car sideways, one stopped ahead, or a person on the road.",
+    "And it only shares the event: what, where and when. Never the image.",
+    "If an event carries an image, a plate or a face, it is rejected.",
+    "What a Tesla's computer sees is not open to third parties. We don't pretend.",
+    "Until calibrated, cameras do not raise confidence: they are only logged."
+   ],
+   "es_say": [
+    "Muchos coches llevan cámaras. Su dueño puede pasar los clips por Senda.",
+    "Detecta un coche atravesado, otro parado delante o una persona en la vía.",
+    "Y solo comparte el evento: qué, dónde y cuándo. Nunca la imagen.",
+    "Si un evento trae imagen, matrícula o cara, se rechaza.",
+    "Lo que ve el ordenador de un Tesla no está abierto a terceros. No lo fingimos.",
+    "Hasta calibrarlas, las cámaras no suben la confianza: solo se anotan."
+   ],
+   "en_say": [
+    "Many cars carry cameras. Their owner can run the clips through Senda.",
+    "It spots a car sideways, one stopped ahead, or a person on the road.",
+    "And it only shares the event: what, where and when. Never the image.",
+    "If an event carries an image, a plate or a face, it is rejected.",
+    "What a Tesla's computer sees is not open to third parties. We don't pretend.",
+    "Until calibrated, cameras do not raise confidence: they are only logged."
+   ]
+  },
+  {
+   "id": "d10",
+   "claim": "OBSERVED",
+   "title": {
+    "es": "Para quien coordina",
+    "en": "For those who coordinate"
+   },
+   "visual": {
+    "kind": "screens",
+    "engine": "phoneShot",
+    "plate": "harder",
+    "screens": [
+     "drive-roadsafe-operador.png",
+     "drive-roadsafe-operador.png",
+     "drive-roadsafe-lab.png"
+    ]
+   },
+   "es": [
+    "Para el centro de tráfico, un esquema del incidente con su procedencia.",
+    "Las fuentes que se copian entre sí cuentan una sola vez.",
+    "Y un laboratorio para reproducir cada caso, marcado como ejercicio."
+   ],
+   "en": [
+    "For the traffic centre, a map of the incident with its provenance.",
+    "Sources that copy each other count only once.",
+    "And a lab to replay every case, marked as an exercise."
+   ],
+   "es_say": [
+    "Para el centro de tráfico, un esquema del incidente con su procedencia.",
+    "Las fuentes que se copian entre sí cuentan una sola vez.",
+    "Y un laboratorio para reproducir cada caso, marcado como ejercicio."
+   ],
+   "en_say": [
+    "For the traffic centre, a map of the incident with its provenance.",
+    "Sources that copy each other count only once.",
+    "And a lab to replay every case, marked as an exercise."
+   ]
+  },
+  {
+   "id": "d11",
+   "claim": "OBSERVED",
+   "title": {
+    "es": "En el móvil y en el coche",
+    "en": "On the phone and in the car"
+   },
+   "visual": {
+    "kind": "platforms",
+    "engine": "devices"
+   },
+   "es": [
+    "Android en dos versiones: una sin servicios de Google ni Internet,",
+    "y otra con Google y pantalla para Android Auto.",
+    "Android Auto solo admite ciertas categorías: la nuestra aún es provisional.",
+    "Y una app nueva para iPhone, compilada y probada en cada cambio."
+   ],
+   "en": [
+    "Android in two versions: one with no Google services and no Internet,",
+    "and one with Google and an Android Auto screen.",
+    "Android Auto only allows certain categories: ours is still provisional.",
+    "And a new iPhone app, built and tested on every change."
+   ],
+   "es_say": [
+    "Android en dos versiones: una sin servicios de Google ni Internet,",
+    "y otra con Google y pantalla para Android Auto.",
+    "Android Auto solo admite ciertas categorías: la nuestra aún es provisional.",
+    "Y una app nueva para aifon, compilada y probada en cada cambio."
+   ],
+   "en_say": [
+    "Android in two versions: one with no Google services and no Internet,",
+    "and one with Google and an Android Auto screen.",
+    "Android Auto only allows certain categories: ours is still provisional.",
+    "And a new iPhone app, built and tested on every change."
+   ]
+  },
+  {
+   "id": "d12",
+   "claim": "OBSERVED",
+   "title": {
+    "es": "Verificado por máquina · honesto con lo que falta",
+    "en": "Verified by machine · honest about what is missing"
+   },
+   "visual": {
+    "kind": "proof",
+    "engine": "backdrop",
+    "plate": "harder",
+    "from": 300,
+    "dim": 0.32,
+    "core": 881,
+    "e2e": 82,
+    "agents": 55,
+    "labels": {
+     "es": [
+      "pruebas del núcleo",
+      "E2E carretera · Chromium",
+      "pasos de arranque · web, Android, iOS"
+     ],
+     "en": [
+      "core tests passing",
+      "road E2E · Chromium",
+      "autostart steps · web, Android, iOS"
+     ]
+    }
+   },
+   "es": [
+    "Cada cambio se comprueba: 881 pruebas del núcleo,",
+    "82 comprobaciones de la app de carretera en un navegador real,",
+    "y 55 pasos del arranque automático, iguales en todas las plataformas.",
+    "Lo que falta, lo decimos: todavía no hay pruebas de campo,",
+    "el arranque automático no se ha probado en móviles reales,",
+    "y los detectores no están calibrados con datos reales.",
+    "Siguiente paso: un piloto con conductores reales."
+   ],
+   "en": [
+    "Every change is checked: 881 core tests,",
+    "82 checks of the road app in a real browser,",
+    "and 55 automatic-start steps, identical on every platform.",
+    "What is missing, we say: there are no field trials yet,",
+    "automatic start has not been tested on real phones,",
+    "and the detectors are not calibrated with real data.",
+    "Next step: a pilot with real drivers."
+   ],
+   "es_say": [
+    "Cada cambio se comprueba: ochocientos ochenta y uno pruebas del núcleo,",
+    "ochenta y dos comprobaciones de la app de carretera en un navegador real,",
+    "y cincuenta y cinco pasos del arranque automático, iguales en todas las plataformas.",
+    "Lo que falta, lo decimos: todavía no hay pruebas de campo,",
+    "el arranque automático no se ha probado en móviles reales,",
+    "y los detectores no están calibrados con datos reales.",
+    "Siguiente paso: un piloto con conductores reales."
+   ],
+   "en_say": [
+    "Every change is checked: eight hundred and eighty-one core tests,",
+    "eighty-two checks of the road app in a real browser,",
+    "and fifty-five automatic-start steps, identical on every platform.",
+    "What is missing, we say: there are no field trials yet,",
+    "automatic start has not been tested on real phones,",
+    "and the detectors are not calibrated with real data.",
+    "Next step: a pilot with real drivers."
+   ]
+  },
+  {
+   "id": "d13",
+   "claim": "OBSERVED",
+   "title": {
+    "es": "Para que quien viene detrás lo sepa a tiempo",
+    "en": "So that whoever comes behind knows in time"
+   },
+   "visual": {
+    "kind": "cta",
+    "url": "github.com/abrahamhl/civic-relay",
+    "repo": "SENDA Drive"
+   },
+   "es": [
+    "SENDA Drive. Para que quien viene detrás lo sepa a tiempo.",
+    "Código abierto, en la dirección que ves en pantalla."
+   ],
+   "en": [
+    "SENDA Drive. So that whoever comes behind knows in time.",
+    "Open source, at the address on screen."
+   ],
+   "es_say": [
+    "Senda Drive. Para que quien viene detrás lo sepa a tiempo.",
+    "Código abierto, en la dirección que ves en pantalla."
+   ],
+   "en_say": [
+    "Senda Drive. So that whoever comes behind knows in time.",
+    "Open source, at the address on screen."
+   ]
+  }
+ ]
+}

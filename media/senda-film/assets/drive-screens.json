@@ -1,0 +1,70 @@
+{
+ "capturedFrom": "investor-next/public/senda",
+ "viewport": "390x820@2x",
+ "shots": [
+  {
+   "file": "drive-roadsafe-ciudadano.png",
+   "page": "roadsafe.html",
+   "tab": "#tab-c",
+   "panel": "#p-c",
+   "ran": null,
+   "errors": []
+  },
+  {
+   "file": "drive-roadsafe-carretera.png",
+   "page": "roadsafe.html",
+   "tab": "#tab-k",
+   "panel": "#p-k",
+   "ran": "primer botón del panel (escenario de ejercicio)",
+   "errors": []
+  },
+  {
+   "file": "drive-roadsafe-lab.png",
+   "page": "roadsafe.html",
+   "tab": "#tab-r",
+   "panel": "#p-r",
+   "ran": null,
+   "errors": []
+  },
+  {
+   "file": "drive-roadsafe-operador.png",
+   "page": "roadsafe.html",
+   "tab": "#tab-o",
+   "panel": "#p-o",
+   "ran": "primer botón del panel (escenario de ejercicio)",
+   "errors": []
+  },
+  {
+   "file": "drive-roadsafe-viaje.png",
+   "page": "roadsafe.html",
+   "tab": "#tab-v",
+   "panel": "#p-v",
+   "ran": null,
+   "errors": []
+  },
+  {
+   "file": "drive-carretera.png",
+   "page": "carretera.html",
+   "tab": null,
+   "panel": null,
+   "ran": null,
+   "errors": []
+  },
+  {
+   "file": "drive-vehiculos.png",
+   "page": "vehiculos.html",
+   "tab": null,
+   "panel": null,
+   "ran": null,
+   "errors": []
+  },
+  {
+   "file": "drive-camaras.png",
+   "page": "camaras.html",
+   "tab": null,
+   "panel": null,
+   "ran": null,
+   "errors": []
+  }
+ ]
+}
