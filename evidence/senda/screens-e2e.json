@@ -1,7 +1,7 @@
 {
  "kind": "senda-screens-e2e",
- "at": "2026-11-17T08:17:28.226Z",
- "durationS": 53,
+ "at": "2026-11-19T00:15:01.062Z",
+ "durationS": 52,
  "passed": 39,
  "total": 39,
  "results": [
@@ -51,7 +51,7 @@
   {
    "name": "avisos: un incidente de agua muestra el caudal previsto por GloFAS (en directo o de la foto guardada) sin presentarlo como aviso",
    "ok": true,
-   "gl": "Caudal previsto (GloFAS): GloFAS hoy 15.1 m³/s (1.0× la mediana de los 30 días previos); pico previsto 15.1 m³/s el 2026-11-17 (1.0×); mañana baja. consulta en directoCaudal modelado por GloFAS en la "
+   "gl": "Caudal previsto (GloFAS): GloFAS hoy 11.6 m³/s (0.8× la mediana de los 30 días previos); pico previsto 11.6 m³/s el 2026-11-19 (0.8×); mañana baja. foto guardada del 2026-11-14 08:39 UTCCaudal modelad"
   },
   {
    "name": "avisos: un reporte pasa por sonido y entra verificado",
@@ -229,7 +229,7 @@
     "reached": 1149,
     "of": 1151,
     "p50": 74.63333333333334,
-    "ms": 1.700000286102295
+    "ms": 4.5
    },
    "m100": {
     "origin": "2219",
@@ -237,7 +237,7 @@
     "reached": 1151,
     "of": 1151,
     "p50": 46.1,
-    "ms": 1
+    "ms": 1.6999999999534339
    }
   },
   {
@@ -289,7 +289,7 @@
     "relays": 3,
     "links": 2,
     "areaPct": 92.5,
-    "ms": 1428,
+    "ms": 1360,
     "hops": [
      0,
      1,
@@ -306,7 +306,7 @@
     "relays": 4,
     "links": 3,
     "areaPct": 73.2,
-    "ms": 1447,
+    "ms": 1403,
     "hops": [
      0,
      1,

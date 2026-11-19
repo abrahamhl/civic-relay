@@ -2,8 +2,8 @@
   "kind": "REAL_CHROMIUM_AUTOMATED_E2E",
   "target": "local static server (investor-next/public)",
   "network": "OFFLINE (context.setOffline(true) en los 3 contextos tras instalar)",
-  "at": "2026-11-10T04:47:38.049Z",
-  "durationS": 165.6,
+  "at": "2026-11-19T00:16:02.202Z",
+  "durationS": 60.9,
   "passed": 49,
   "total": 49,
   "results": [
@@ -100,9 +100,9 @@
       "ok": true,
       "path": {
         "sat": "Iridium 2-5",
-        "elevationDeg": 24.8,
-        "rangeKm": 1546,
-        "delayMs": 5.16
+        "elevationDeg": 20.2,
+        "rangeKm": 1734,
+        "delayMs": 5.78
       },
       "plan": {
         "k": 6,
@@ -239,7 +239,7 @@
       "name": "Triaje sin red: «no camina, respira, más de 30/min» → ROJO, con indicaciones de hemorragia y un parte de ≤ 160 caracteres que pide el 112 primero",
       "ok": true,
       "cat": "ROJO",
-      "msg": "SENDA TRIAJE R1 A0 V0 | 39.45210,-0.43020 ±25m | hemorragia 1 | 112,Sanitario | 05:45",
+      "msg": "SENDA TRIAJE R1 A0 V0 | 39.45210,-0.43020 ±25m | hemorragia 1 | 112,Sanitario | 00:15",
       "steps": "Qué hacer ahoraPresión directa y firme sobre la herida con lo más limpio que tengas; no la levantes para mirar.Si sangra a chorro en un brazo o una pierna y la presión no basta: torniquete unos 5–7 cm por encima de la herida, aprieta hasta que pare y anota la hora.Si respira mejor sentado, déjale sentado; si no, tumbado con las piernas estiradas.\n  Servicios: 112 → Sanitario➕ Añadir a la escena y siguiente víctimaRepetir"
     },
     {
@@ -527,7 +527,7 @@
           "rumbo": "75.0° (a mano)",
           "errorTipico": "±8°",
           "posicion": "sin GPS en este dispositivo",
-          "hora": "2026-11-10T04:46:02.000Z",
+          "hora": "2026-11-19T00:15:28.000Z",
           "foto": "se queda en el teléfono",
           "modo": "PASIVO, con tu toque"
         }
@@ -541,7 +541,7 @@
         "errors": [],
         "state": {
           "k": 2,
-          "ms": 277,
+          "ms": 206,
           "divBefore": 0.1318294766743978,
           "divAfter": 0.0005385902822017674,
           "plumeTop": 1537.0159725870542,
@@ -604,31 +604,41 @@
     {
       "name": "Llamada sin Internet: oferta de <110 bytes por sonido (onda real, decodificada exacta), conexión directa cifrada, voz Opus y chat en ambos sentidos y cero peticiones de red durante la llamada",
       "ok": true,
-      "offerBytes": 93,
-      "answerBytes": 86,
-      "offerSoundS": 9,
+      "offerBytes": 79,
+      "answerBytes": 72,
+      "offerSoundS": 7.8,
       "audioPackets": [
-        162,
-        156
+        50,
+        50
       ],
-      "requests": []
+      "requests": [],
+      "diag": {
+        "soundExact": true,
+        "states": [
+          "connected",
+          "connected"
+        ],
+        "path": "local, sin servidor",
+        "chatE": true,
+        "sosD": true
+      }
     },
     {
       "name": "Llamada de prueba en un solo dispositivo (sin micrófono): dos conexiones reales A↔B con el código por forma de onda, mensaje y audio recibidos",
       "ok": true,
       "connected": true,
-      "offerBytes": 93,
-      "answerBytes": 86,
-      "connectMs": 919,
+      "offerBytes": 79,
+      "answerBytes": 72,
+      "connectMs": 263,
       "message": "¿Me oyes? Estoy en la 3.ª planta, puerta B",
       "rttMs": 1,
-      "audioPackets": 78
+      "audioPackets": 75
     },
     {
       "name": "Cadena de voz real A → B → C: B reenvía la voz de A (C oye el tono de 440 Hz de A) y el chat; el plan nunca usa como repetidor a quien tiene poca batería y avisa de quién queda aislado",
       "ok": true,
-      "freqAtC": 439,
-      "audioPacketsAtC": 108,
+      "freqAtC": 441,
+      "audioPacketsAtC": 100,
       "relays": [
         "Ana",
         "Iker",
@@ -651,7 +661,7 @@
     {
       "name": "La alerta ofrece abrir SENDA Android con las acciones nativas (baliza BLE) y el id de baliza del teléfono",
       "ok": true,
-      "href": "senda://accion?a=BLE_BEACON&id=641258de1ced96d4&b=B14&f=3&u=B&bat=100&cmd=JFgn6DxJjWurpYQo"
+      "href": "senda://accion?a=BLE_BEACON&id=bc606714dd5f8d98&b=B14&f=3&u=B&bat=100&cmd=m0ot4ND7WbZv0ghH"
     },
     {
       "name": "Un teléfono sin consentimiento de órdenes remotas IGNORA la alerta (y la sigue transportando)",
@@ -693,6 +703,6 @@
       "errors": []
     }
   ],
-  "offlineNetworkAttemptsBlocked": 1,
+  "offlineNetworkAttemptsBlocked": 0,
   "scope": "Tres navegadores Chromium independientes. La onda acústica es la que genera la app emisora, inyectada en la receptora (sin altavoz/micrófono físicos en CI)."
 }
