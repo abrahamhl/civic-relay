@@ -652,6 +652,18 @@ export default function VehicularDopplerLab({ locale }: { locale: Locale }) {
           </div>
         </div>
       )}
+
+      <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', padding: '14px 18px', background: '#0a1420', border: '1px solid #1a2f42', borderRadius: '10px' }}>
+        <span style={{ fontSize: '13px', color: '#94a3b8' }}>
+          Arquitectura formal C-ITS, formulación de aquaplaning de Horne y latencias de telecomunicaciones vehiculares:
+        </span>
+        <a
+          href="/senda/papers/paper-v16-c-its.html"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#38bdf8', textDecoration: 'none', fontWeight: 600, fontSize: '13px' }}
+        >
+          Consultar Paper IV: C-ITS Vehicular y Reflejo V16 de 38 ms ↗
+        </a>
+      </div>
     </div>
   );
 }

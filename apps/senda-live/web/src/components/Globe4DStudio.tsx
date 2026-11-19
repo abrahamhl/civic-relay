@@ -3,6 +3,15 @@ import * as THREE from 'three';
 import { api } from '../api/client';
 import type { TerrainGridSnapshot } from '../offline/terrain-snapshot';
 import type { WeatherSnapshot, WeatherMetric } from '../offline/weather-snapshot';
+import {
+  AUTHENTIC_DATED_TLES,
+  parseTle,
+  propagateKeplerJ2,
+  lookAngles,
+  type LookAnglesResult,
+  type ParsedTle
+} from '../science/orbital-kinematics.mjs';
+import { computeGlobeSourceHealth } from '../science/globe-source-health.mjs';
 
 interface Props {
   onClose?: () => void;
@@ -14,6 +23,8 @@ type LayerMode = 'GLOBE' | 'TERRAIN_DEM';
 export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valencia' }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<LayerMode>('GLOBE');
+  const [sourceHealth, setSourceHealth] = useState<any | null>(null);
+  const [showSourceHealthModal, setShowSourceHealthModal] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playSpeed, setPlaySpeed] = useState<number>(1);
   const [timeStep, setTimeStep] = useState<number>(0); // 0 to 23 hours
@@ -23,6 +34,10 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
   const [showParticles, setShowParticles] = useState<boolean>(true);
   const [showFresnel, setShowFresnel] = useState<boolean>(true);
   const [showSatellites, setShowSatellites] = useState<boolean>(true);
+  const [orbitMode, setOrbitMode] = useState<'SCIENTIFIC_CALCULATED' | 'CINEMATIC_ILLUSTRATIVE'>('SCIENTIFIC_CALCULATED');
+  const [selectedSatKey, setSelectedSatKey] = useState<string>('SENTINEL_3A');
+  const [satTelemetry, setSatTelemetry] = useState<LookAnglesResult | null>(null);
+  const orbitModeRef = useRef<'SCIENTIFIC_CALCULATED' | 'CINEMATIC_ILLUSTRATIVE'>('SCIENTIFIC_CALCULATED');
   const [showObservations, setShowObservations] = useState<boolean>(true);
   const [showUavTactical, setShowUavTactical] = useState<boolean>(true);
   const [showCotsDrones, setShowCotsDrones] = useState<boolean>(true);
@@ -88,8 +103,9 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
       api.getMobilityIncidents(),
       api.getCotsDroneDetections(),
       api.getCotsHardwareCatalog(),
-    ]).then(([terrainRes, weatherRes, effisRes, aemetRes, usgsRes, reconRes, mobRes, cotsDronesRes, cotsCatRes]) => {
+    ]).then((settled) => {
       if (!active) return;
+      const [terrainRes, weatherRes, effisRes, aemetRes, usgsRes, reconRes, mobRes, cotsDronesRes, cotsCatRes] = settled;
       if (terrainRes.status === 'fulfilled' && terrainRes.value?.status !== 'UNAVAILABLE') {
         setTerrain(terrainRes.value);
       }
@@ -114,10 +130,13 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
       if (cotsDronesRes.status === 'fulfilled' && Array.isArray(cotsDronesRes.value?.drones)) {
         setCotsDetections(cotsDronesRes.value.drones);
       }
-      if (cotsCatRes.status === 'fulfilled' && cotsCatRes.value) {
+      if (cotsCatRes.status === 'fulfilled' && cotsCatRes.value && cotsCatRes.value?.status !== 'UNAVAILABLE') {
         setCotsCatalog(cotsCatRes.value);
       }
-      setStatusMessage('Plataforma 4D lista · Datos verificados por SHA-256');
+
+      const health = computeGlobeSourceHealth(settled);
+      setSourceHealth(health);
+      setStatusMessage(health.statusMessage);
     });
 
     return () => { active = false; };
@@ -208,6 +227,92 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
     }
   };
 
+  // Live Satellite Telemetry Updates for selected ground station
+  useEffect(() => {
+    if (!showSatellites) return;
+    const updateTelemetry = () => {
+      const satMeta = AUTHENTIC_DATED_TLES[selectedSatKey as keyof typeof AUTHENTIC_DATED_TLES];
+      if (!satMeta) return;
+      try {
+        const el = parseTle(satMeta.name, satMeta.line1, satMeta.line2);
+        const observer = { lat: 39.4699, lon: -0.3763, altKm: 0.05 }; // Valencia / Iberia Station
+        const t = Date.now() + timeStep * 3600_000;
+        const angles = lookAngles(el, observer, t);
+        setSatTelemetry(angles);
+      } catch (e) {
+        console.warn('Error evaluating look angles:', e);
+      }
+    };
+    updateTelemetry();
+    const timer = setInterval(updateTelemetry, 1000);
+    return () => clearInterval(timer);
+  }, [showSatellites, selectedSatKey, timeStep]);
+
+  // Keep orbit mode ref and rebuild satellites on mode switch
+  useEffect(() => {
+    orbitModeRef.current = orbitMode;
+    const group = satellitesGroupRef.current;
+    if (!group) return;
+    group.clear();
+    if (orbitMode === 'SCIENTIFIC_CALCULATED') {
+      const timeNow = Date.now();
+      for (const [key, t] of Object.entries(AUTHENTIC_DATED_TLES)) {
+        try {
+          const el = parseTle(t.name, t.line1, t.line2);
+          const periodS = 86400 / el.nRevDay;
+          const pts: THREE.Vector3[] = [];
+          const STEPS = 96;
+          for (let i = 0; i <= STEPS; i++) {
+            const tStep = timeNow + (i / STEPS) * periodS * 1000;
+            const eci = propagateKeplerJ2(el, tStep);
+            const s = 1.5 / 6378.137;
+            pts.push(new THREE.Vector3(eci.x * s, eci.z * s, eci.y * s));
+          }
+          const orbitGeo = new THREE.BufferGeometry().setFromPoints(pts);
+          const color = new THREE.Color(t.colorHex);
+          const orbitLine = new THREE.Line(orbitGeo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.45 }));
+          group.add(orbitLine);
+
+          const satMarkerGeo = new THREE.BoxGeometry(0.045, 0.045, 0.09);
+          const satMarkerMat = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.8 });
+          const satMesh = new THREE.Mesh(satMarkerGeo, satMarkerMat);
+          satMesh.userData = { isScientific: true, el, key, meta: t };
+          group.add(satMesh);
+        } catch (err) {
+          console.warn('Error building orbit for', t.name, err);
+        }
+      }
+    } else {
+      const satellites = [
+        { name: 'Sentinel-3 (SLSTR)', r: 1.85, inc: 98.6, speed: 0.008, color: 0x10b981 },
+        { name: 'Terra (MODIS)', r: 1.88, inc: 98.2, speed: 0.007, color: 0xf59e0b },
+        { name: 'Suomi-NPP (VIIRS)', r: 1.92, inc: 98.7, speed: 0.009, color: 0xef4444 },
+        { name: 'Meteosat (MSG)', r: 2.45, inc: 0.0, speed: 0.001, color: 0x38bdf8 },
+      ];
+      satellites.forEach((sat) => {
+        const orbitGeo = new THREE.BufferGeometry();
+        const pts: THREE.Vector3[] = [];
+        const incRad = (sat.inc * Math.PI) / 180;
+        for (let i = 0; i <= 96; i++) {
+          const theta = (i / 96) * Math.PI * 2;
+          const x = sat.r * Math.cos(theta);
+          const y = sat.r * Math.sin(theta) * Math.sin(incRad);
+          const z = sat.r * Math.sin(theta) * Math.cos(incRad);
+          pts.push(new THREE.Vector3(x, y, z));
+        }
+        orbitGeo.setFromPoints(pts);
+        const orbitLine = new THREE.Line(orbitGeo, new THREE.LineBasicMaterial({ color: sat.color, transparent: true, opacity: 0.35 }));
+        group.add(orbitLine);
+
+        const satMarkerGeo = new THREE.BoxGeometry(0.04, 0.04, 0.08);
+        const satMarkerMat = new THREE.MeshBasicMaterial({ color: sat.color });
+        const satMesh = new THREE.Mesh(satMarkerGeo, satMarkerMat);
+        satMesh.userData = { isScientific: false, sat, theta: Math.random() * Math.PI * 2 };
+        group.add(satMesh);
+      });
+    }
+  }, [orbitMode]);
+
   // 2. Playback timer
   useEffect(() => {
     if (!isPlaying) return;
@@ -294,36 +399,69 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
     satellitesGroupRef.current = satGroup;
     globeGroup.add(satGroup);
 
-    // Sentinel / Terra / LEO Satellite Orbits
-    const satellites = [
-      { name: 'Sentinel-3 (SLSTR)', r: 1.85, inc: 98.6, speed: 0.008, color: 0x10b981 },
-      { name: 'Terra (MODIS)', r: 1.88, inc: 98.2, speed: 0.007, color: 0xf59e0b },
-      { name: 'Suomi-NPP (VIIRS)', r: 1.92, inc: 98.7, speed: 0.009, color: 0xef4444 },
-      { name: 'Meteosat (MSG)', r: 2.45, inc: 0.0, speed: 0.001, color: 0x38bdf8 },
-    ];
+    // Setup satellites according to current orbitMode
+    const setupSatellites = (group: THREE.Group, currentMode: 'SCIENTIFIC_CALCULATED' | 'CINEMATIC_ILLUSTRATIVE') => {
+      group.clear();
+      if (currentMode === 'SCIENTIFIC_CALCULATED') {
+        const timeNow = Date.now();
+        for (const [key, t] of Object.entries(AUTHENTIC_DATED_TLES)) {
+          try {
+            const el = parseTle(t.name, t.line1, t.line2);
+            const periodS = 86400 / el.nRevDay;
+            const pts: THREE.Vector3[] = [];
+            const STEPS = 96;
+            for (let i = 0; i <= STEPS; i++) {
+              const tStep = timeNow + (i / STEPS) * periodS * 1000;
+              const eci = propagateKeplerJ2(el, tStep);
+              const s = 1.5 / 6378.137;
+              pts.push(new THREE.Vector3(eci.x * s, eci.z * s, eci.y * s));
+            }
+            const orbitGeo = new THREE.BufferGeometry().setFromPoints(pts);
+            const color = new THREE.Color(t.colorHex);
+            const orbitLine = new THREE.Line(orbitGeo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.45 }));
+            group.add(orbitLine);
 
-    satellites.forEach((sat) => {
-      const orbitGeo = new THREE.BufferGeometry();
-      const pts = [];
-      const incRad = (sat.inc * Math.PI) / 180;
-      for (let i = 0; i <= 96; i++) {
-        const theta = (i / 96) * Math.PI * 2;
-        const x = sat.r * Math.cos(theta);
-        const y = sat.r * Math.sin(theta) * Math.sin(incRad);
-        const z = sat.r * Math.sin(theta) * Math.cos(incRad);
-        pts.push(new THREE.Vector3(x, y, z));
+            const satMarkerGeo = new THREE.BoxGeometry(0.045, 0.045, 0.09);
+            const satMarkerMat = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.8 });
+            const satMesh = new THREE.Mesh(satMarkerGeo, satMarkerMat);
+            satMesh.userData = { isScientific: true, el, key, meta: t };
+            group.add(satMesh);
+          } catch (err) {
+            console.warn('Error building orbit for', t.name, err);
+          }
+        }
+      } else {
+        const satellites = [
+          { name: 'Sentinel-3 (SLSTR)', r: 1.85, inc: 98.6, speed: 0.008, color: 0x10b981 },
+          { name: 'Terra (MODIS)', r: 1.88, inc: 98.2, speed: 0.007, color: 0xf59e0b },
+          { name: 'Suomi-NPP (VIIRS)', r: 1.92, inc: 98.7, speed: 0.009, color: 0xef4444 },
+          { name: 'Meteosat (MSG)', r: 2.45, inc: 0.0, speed: 0.001, color: 0x38bdf8 },
+        ];
+        satellites.forEach((sat) => {
+          const orbitGeo = new THREE.BufferGeometry();
+          const pts: THREE.Vector3[] = [];
+          const incRad = (sat.inc * Math.PI) / 180;
+          for (let i = 0; i <= 96; i++) {
+            const theta = (i / 96) * Math.PI * 2;
+            const x = sat.r * Math.cos(theta);
+            const y = sat.r * Math.sin(theta) * Math.sin(incRad);
+            const z = sat.r * Math.sin(theta) * Math.cos(incRad);
+            pts.push(new THREE.Vector3(x, y, z));
+          }
+          orbitGeo.setFromPoints(pts);
+          const orbitLine = new THREE.Line(orbitGeo, new THREE.LineBasicMaterial({ color: sat.color, transparent: true, opacity: 0.35 }));
+          group.add(orbitLine);
+
+          const satMarkerGeo = new THREE.BoxGeometry(0.04, 0.04, 0.08);
+          const satMarkerMat = new THREE.MeshBasicMaterial({ color: sat.color });
+          const satMesh = new THREE.Mesh(satMarkerGeo, satMarkerMat);
+          satMesh.userData = { isScientific: false, sat, theta: Math.random() * Math.PI * 2 };
+          group.add(satMesh);
+        });
       }
-      orbitGeo.setFromPoints(pts);
-      const orbitLine = new THREE.Line(orbitGeo, new THREE.LineBasicMaterial({ color: sat.color, transparent: true, opacity: 0.35 }));
-      satGroup.add(orbitLine);
+    };
 
-      // Satellite marker
-      const satMarkerGeo = new THREE.BoxGeometry(0.04, 0.04, 0.08);
-      const satMarkerMat = new THREE.MeshBasicMaterial({ color: sat.color });
-      const satMesh = new THREE.Mesh(satMarkerGeo, satMarkerMat);
-      satMesh.userData = { sat, theta: Math.random() * Math.PI * 2 };
-      satGroup.add(satMesh);
-    });
+    setupSatellites(satGroup, orbitModeRef.current);
 
     // Event Listeners for Orbit & Zoom
     const handleMouseDown = (e: MouseEvent) => {
@@ -368,15 +506,24 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
       // Rotate Satellites in Orbits
       if (satGroup && satGroup.children) {
         satGroup.children.forEach((child) => {
-          if (child instanceof THREE.Mesh && child.userData?.sat) {
-            const sat = child.userData.sat;
-            child.userData.theta += sat.speed;
-            const th = child.userData.theta;
-            const inc = (sat.inc * Math.PI) / 180;
-            child.position.x = sat.r * Math.cos(th);
-            child.position.y = sat.r * Math.sin(th) * Math.sin(inc);
-            child.position.z = sat.r * Math.sin(th) * Math.cos(inc);
-            child.rotation.y += 0.02;
+          if (child instanceof THREE.Mesh) {
+            if (child.userData?.isScientific && child.userData?.el) {
+              const el = child.userData.el;
+              const t = Date.now() + timeStep * 3600_000;
+              const eci = propagateKeplerJ2(el, t);
+              const s = 1.5 / 6378.137;
+              child.position.set(eci.x * s, eci.z * s, eci.y * s);
+              child.rotation.y += 0.01;
+            } else if (child.userData?.sat) {
+              const sat = child.userData.sat;
+              child.userData.theta += sat.speed;
+              const th = child.userData.theta;
+              const inc = (sat.inc * Math.PI) / 180;
+              child.position.x = sat.r * Math.cos(th);
+              child.position.y = sat.r * Math.sin(th) * Math.sin(inc);
+              child.position.z = sat.r * Math.sin(th) * Math.cos(inc);
+              child.rotation.y += 0.02;
+            }
           }
         });
       }
@@ -714,9 +861,22 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
           <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem', borderRadius: 6, background: '#1e3a5f', color: '#93c5fd', fontWeight: 700 }}>
             {mode === 'GLOBE' ? 'VISTA GLOBAL ORBITAL (WGS84)' : 'RELIEVE DEM REAL (MAPZEN/AWS)'}
           </span>
-          <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem', borderRadius: 6, background: '#14532d', color: '#86efac', fontWeight: 700 }}>
-            CIENCIA AUDITADA
-          </span>
+          <button
+            type="button"
+            onClick={() => setShowSourceHealthModal(true)}
+            style={{
+              fontSize: '0.7rem',
+              padding: '0.2rem 0.6rem',
+              borderRadius: 6,
+              border: 'none',
+              cursor: 'pointer',
+              background: !sourceHealth || sourceHealth.availableCount === 0 ? '#7f1d1d' : sourceHealth.failedCount > 0 ? '#854d0e' : '#14532d',
+              color: !sourceHealth || sourceHealth.availableCount === 0 ? '#fca5a5' : sourceHealth.failedCount > 0 ? '#fef08a' : '#86efac',
+              fontWeight: 800,
+            }}
+          >
+            {sourceHealth?.badgeText || 'VERIFICANDO FUENTES...'}
+          </button>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -754,6 +914,71 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
               <span>Satélites & Órbitas LEO:</span>
               <input type="checkbox" checked={showSatellites} onChange={(e) => setShowSatellites(e.target.checked)} />
             </label>
+
+            {showSatellites && (
+              <div style={{ padding: '0.4rem', borderRadius: 6, background: '#0a192f', border: '1px solid #1e3a5f', fontSize: '0.72rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                  <span style={{ color: '#94a3b8' }}>Modo orbital:</span>
+                  <select
+                    value={orbitMode}
+                    onChange={(e) => setOrbitMode(e.target.value as any)}
+                    style={{ background: '#0f2744', color: '#7dd3fc', border: '1px solid #38bdf8', borderRadius: 4, padding: '0.15rem 0.3rem', fontSize: '0.68rem', fontWeight: 700 }}
+                  >
+                    <option value="SCIENTIFIC_CALCULATED">Científico (Kepler/J2)</option>
+                    <option value="CINEMATIC_ILLUSTRATIVE">Ilustración Cinematográfica</option>
+                  </select>
+                </div>
+
+                {orbitMode === 'CINEMATIC_ILLUSTRATIVE' ? (
+                  <div style={{ background: 'rgba(245, 158, 11, 0.15)', border: '1px solid rgba(245, 158, 11, 0.4)', borderRadius: 4, padding: '0.3rem', fontSize: '0.65rem', color: '#fcd34d' }}>
+                    ⚠️ <strong>MODO ILUSTRACIÓN CINEMATOGRÁFICA:</strong> Trayectorias y velocidades simplificadas para presentación visual. No apto para cálculo de enlace ni ventanas operativas.
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                      <span style={{ color: '#94a3b8' }}>Satélite:</span>
+                      <select
+                        value={selectedSatKey}
+                        onChange={(e) => setSelectedSatKey(e.target.value)}
+                        style={{ background: '#0f2744', color: '#fff', border: '1px solid #1e3a5f', borderRadius: 4, padding: '0.15rem 0.3rem', fontSize: '0.68rem' }}
+                      >
+                        {Object.entries(AUTHENTIC_DATED_TLES).map(([k, s]) => (
+                          <option key={k} value={k}>{s.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {satTelemetry && (
+                      <div style={{ fontSize: '0.68rem', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '0.15rem', background: 'rgba(16, 185, 129, 0.08)', padding: '0.35rem', borderRadius: 4, border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Visibilidad ({region}):</span>
+                          <span style={{ fontWeight: 800, color: satTelemetry.elevationDeg > 0 ? '#34d399' : '#94a3b8' }}>
+                            {satTelemetry.elevationDeg > 0 ? `LOS (Elev: ${satTelemetry.elevationDeg}°) ✓` : `Bajo horizonte (${satTelemetry.elevationDeg}°)`}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Acimut / Distancia:</span>
+                          <span style={{ fontWeight: 700, color: '#38bdf8' }}>{satTelemetry.azimuthDeg}° / {satTelemetry.rangeKm} km</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Altitud / V. Radial:</span>
+                          <span style={{ fontWeight: 700, color: '#a7f3d0' }}>{satTelemetry.altitudeKm} km / {satTelemetry.rangeRateKmS} km/s</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Doppler L-Band (1.6 GHz):</span>
+                          <span style={{ fontWeight: 700, color: '#f59e0b' }}>
+                            {satTelemetry.computeDopplerShiftHz ? (satTelemetry.computeDopplerShiftHz(1.621e9) / 1000).toFixed(2) : '0'} kHz
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.6rem', color: '#94a3b8', fontStyle: 'italic', marginTop: '0.2rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.2rem' }}>
+                          {satTelemetry.disclaimer}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
               <span>Viento & Partículas GPU:</span>
@@ -1230,6 +1455,70 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
                 type="button"
                 onClick={() => setShowCotsModal(false)}
                 style={{ padding: '0.5rem 1.25rem', borderRadius: 8, border: 'none', background: '#1e3a5f', color: '#fff', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}
+              >
+                Cerrar Panel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Source Health Modal (Ticket P0-06) */}
+      {showSourceHealthModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(3, 7, 18, 0.85)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ maxWidth: '640px', width: '100%', maxHeight: '85vh', overflowY: 'auto', background: '#091829', border: '1px solid #1e3a5f', borderRadius: 16, padding: '1.5rem', color: '#f1f5f9', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e3a5f', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#38bdf8' }}>
+                  ESTADO Y VERIFICACIÓN DE FUENTES PÚBLICAS (9/9)
+                </h3>
+                <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
+                  Auditoría independiente por fuente. Ninguna fuente no disponible es reportada como verificada.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSourceHealthModal(false)}
+                style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#94a3b8', fontSize: '1.2rem', width: '32px', height: '32px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                ×
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {sourceHealth?.sources ? (
+                sourceHealth.sources.map((s: any) => (
+                  <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', borderRadius: 8, background: '#0f2744', border: '1px solid #1e3a5f' }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#f1f5f9' }}>{s.name}</div>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.1rem' }}>{s.detail}</div>
+                    </div>
+                    <span
+                      style={{
+                        padding: '0.2rem 0.5rem',
+                        borderRadius: 6,
+                        fontSize: '0.68rem',
+                        fontWeight: 800,
+                        background: s.status === 'VERIFIED' ? '#14532d' : s.status === 'AVAILABLE' ? '#0369a1' : '#7f1d1d',
+                        color: s.status === 'VERIFIED' ? '#86efac' : s.status === 'AVAILABLE' ? '#7dd3fc' : '#fca5a5',
+                      }}
+                    >
+                      {s.status}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div style={{ fontSize: '0.8rem', color: '#94a3b8', textAlign: 'center', padding: '1rem' }}>
+                  Consultando fuentes de emergencia...
+                </div>
+              )}
+            </div>
+
+            <div style={{ marginTop: '1.25rem', textAlign: 'right' }}>
+              <button
+                type="button"
+                onClick={() => setShowSourceHealthModal(false)}
+                style={{ padding: '0.45rem 1.25rem', borderRadius: 8, border: 'none', background: '#1e3a5f', color: '#fff', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}
               >
                 Cerrar Panel
               </button>

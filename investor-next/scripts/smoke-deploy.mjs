@@ -76,6 +76,30 @@ async function run() {
     results.push({ locale: route.locale, url, status: res.status, bytes: html.length });
     console.log(`PASS [${route.locale.toUpperCase()}] ${url} -> HTTP ${res.status} (${html.length} bytes)`);
   }
+
+  const PAPERS_ROUTES = [
+    '/senda/papers/',
+    '/senda/papers/paper-theorems.html',
+    '/senda/papers/paper-paer-dtn.html',
+    '/senda/papers/paper-calibration-lofo.html',
+    '/senda/papers/paper-v16-c-its.html',
+    '/media/renders/render-paer-mesh-topology.svg',
+    '/media/renders/render-itu-p838-rain-curve.svg',
+    '/media/renders/render-merkle-rfc6962-proof.svg',
+    '/media/renders/render-v16-reflex-latency.svg',
+    '/media/renders/render-cots-gateway-hardware.svg',
+    '/media/renders/render-senda-4d-globe.svg'
+  ];
+
+  for (const pRoute of PAPERS_ROUTES) {
+    const pUrl = `${BASE_URL}${pRoute}`;
+    const pRes = await fetch(pUrl, { redirect: 'follow', signal: AbortSignal.timeout(15000) });
+    assert.equal(pRes.status, 200, `Scientific asset ${pUrl} returned HTTP ${pRes.status}`);
+    const pBody = await pRes.text();
+    assert.ok(pBody.length > 500, `Scientific asset ${pUrl} returned unexpectedly small body (${pBody.length} bytes)`);
+    console.log(`PASS [ASSET] ${pUrl} -> HTTP ${pRes.status} (${pBody.length} bytes)`);
+  }
+
   let observedSha=null;
   if(EXPECTED_SOURCE_SHA){
     const proof=await fetch(BASE_URL+'/release-provenance.json',{

@@ -307,13 +307,112 @@ export function computeSentinelGatewayBOM() {
 }
 
 /**
+ * Pure-tone atmospheric absorption coefficient per ISO 9613-1:1993, eqs. (3)-(5),
+ * with saturation vapour pressure from Annex B. Replaces the former fixed
+ * 0.0016·f_kHz² fit, which ignored temperature, humidity and pressure.
+ *
+ * Reference values produced by this implementation (20 °C, 50 % RH, 101.325 kPa):
+ * 1 kHz ≈ 4.7 dB/km, 8 kHz ≈ 105 dB/km, 20 kHz ≈ 524 dB/km.
+ * Validity per ISO 9613-1: 50 Hz–10 kHz nominal, -20…+50 °C, 10…100 % RH; values
+ * above 10 kHz are an extrapolation of the same molecular-relaxation physics.
+ *
+ * @param {number} frequencyHz
+ * @param {number} [tempC=20]
+ * @param {number} [rhPct=50]
+ * @param {number} [pressureKpa=101.325]
+ * @returns {number} attenuation coefficient in dB/m
+ */
+export function computeIso9613AbsorptionDbPerM(frequencyHz, tempC = 20, rhPct = 50, pressureKpa = 101.325) {
+  if (![frequencyHz, tempC, rhPct, pressureKpa].every(Number.isFinite) || frequencyHz <= 0 || rhPct < 0 || pressureKpa <= 0) {
+    throw new TypeError('Invalid ISO 9613-1 input');
+  }
+  const pr = 101.325, T0 = 293.15, T01 = 273.16, T = tempC + 273.15;
+  const pa = pressureKpa / pr;
+  const C = -6.8346 * Math.pow(T01 / T, 1.261) + 4.6151;
+  const h = (rhPct * Math.pow(10, C)) / pa; // molar concentration of water vapour, %
+  const frO = pa * (24 + (4.04e4 * h * (0.02 + h)) / (0.391 + h));
+  const frN = pa * Math.pow(T / T0, -0.5) * (9 + 280 * h * Math.exp(-4.170 * (Math.pow(T / T0, -1 / 3) - 1)));
+  const f2 = frequencyHz * frequencyHz;
+  return 8.686 * f2 * ((1.84e-11 / pa) * Math.sqrt(T / T0) + Math.pow(T / T0, -2.5) * (
+    (0.01275 * Math.exp(-2239.1 / T)) / (frO + f2 / frO) +
+    (0.1068 * Math.exp(-3352.0 / T)) / (frN + f2 / frN)));
+}
+
+/**
+ * Computes acoustic path attenuation according to ISO 9613-1 (atmospheric absorption)
+ * and geometric spherical spreading for ultrasonic civilian frequencies.
+ *
+ * LIMITATION: the high-frequency noise floor (ambient dBA − 42 dB) and the 60 dB SPL @ 1 m
+ * source level are unmeasured modelling assumptions, not phone measurements.
+ *
+ * @param {number} distanceM Distance between transmitter and receiver in meters.
+ * @param {number} [frequencyHz=20000] Acoustic carrier frequency in Hz.
+ * @param {number} [ambientNoiseDba=60] Ambient acoustic noise level in dBA.
+ * @param {number} [txSplAt1mDb=60] Transmit sound pressure level at 1 meter in dB SPL (COTS phone).
+ * @param {{ tempC?: number, rhPct?: number, pressureKpa?: number }} [atmosphere] Air state for ISO 9613-1.
+ * @returns {{ pathLossDb: number, receivedSplDb: number, estimatedSnrDb: number, isDetectable: boolean, maxReliableDistanceM: number }}
+ */
+export function computeUltrasonicAcousticLinkBudget(
+  distanceM,
+  frequencyHz = 20000,
+  ambientNoiseDba = 60,
+  txSplAt1mDb = 60.0,
+  atmosphere = {}
+) {
+  const d = Math.max(0.1, distanceM);
+  // Spherical spreading divergence loss A_div = 20 * log10(d)
+  const aDiv = 20.0 * Math.log10(d);
+
+  // ISO 9613-1 atmospheric attenuation coefficient alpha (dB/m)
+  const { tempC = 20, rhPct = 50, pressureKpa = 101.325 } = atmosphere;
+  const alphaAtmDbPerM = computeIso9613AbsorptionDbPerM(frequencyHz, tempC, rhPct, pressureKpa);
+  const aAtm = alphaAtmDbPerM * d;
+
+  const totalPathLossDb = +(aDiv + aAtm).toFixed(2);
+  const receivedSplDb = +(txSplAt1mDb - totalPathLossDb).toFixed(2);
+
+  // Environmental acoustic noise rolls off at ~-5 to -6 dB/octave (pink/brown noise profile).
+  // At 20 kHz, background noise in dB SPL is roughly ambientNoiseDba - 42 dB.
+  const hfNoiseFloorSplDb = +(Math.max(25, ambientNoiseDba - 42.0)).toFixed(1);
+  const estimatedSnrDb = +(receivedSplDb - hfNoiseFloorSplDb).toFixed(2);
+
+  // Minimum required SNR for 100 baud non-coherent BFSK detection is ~10 dB
+  const isDetectable = estimatedSnrDb >= 10.0;
+
+  // Max reliable operational distance where SNR >= 10 dB
+  // Solve: txSpl - (20*log10(r) + alpha*r) - noise = 10
+  let maxReliableDistanceM = 0.5;
+  for (let r = 0.5; r <= 80; r += 0.5) {
+    const pl = 20.0 * Math.log10(r) + alphaAtmDbPerM * r;
+    const snr = txSplAt1mDb - pl - hfNoiseFloorSplDb;
+    if (snr >= 10.0) maxReliableDistanceM = r;
+    else break;
+  }
+
+  return {
+    pathLossDb: totalPathLossDb,
+    receivedSplDb,
+    hfNoiseFloorSplDb,
+    estimatedSnrDb,
+    isDetectable,
+    maxReliableDistanceM: +maxReliableDistanceM.toFixed(1),
+    disclaimer: 'PHYSICAL_PROPAGATION_ISO_9613_ESTIMATE_NOT_STANDALONE_CERTIFICATION'
+  };
+}
+
+/**
  * Generates parameters for an Ultrasonic Rescue Beacon (FSK audio modulated at 19.5-20.5 kHz).
- * Completely inaudible to human ears, undetectable by casual hostile ground forces,
- * but picked up by civilian smartphone microphones and SAR drones.
+ * Grounded in ISO 9613-1 atmospheric physics and commercial transducer capabilities.
+ *
+ * NOTE ON AUDIBILITY AND RANGE:
+ * - Nominally inaudible to adults (> 25 years), but can be perceived by children and young adults.
+ * - Non-linearities in low-cost smartphone loudspeakers can produce audible subharmonic distortion.
+ * - Reliable physical line-of-sight range on COTS smartphones is 5-10 meters under moderate ambient noise,
+ *   and drops below 3.5 meters in severe 85 dBA catastrophe environments due to atmospheric absorption (~0.65 dB/m).
  *
  * @param {{ lat: number, lon: number, altM?: number }} coords
  * @param {number} seqNumber
- * @returns {{ centerFreqHz: number, markFreqHz: number, spaceFreqHz: number, baudRate: number, inaudibleHuman: boolean, payloadHex: string }}
+ * @returns {object} Beacon parameters with physical constraints and audibility disclosures.
  */
 export function generateUltrasonicRescueBeacon(coords, seqNumber = 1) {
   // Compress lat/lon to fixed-point 32-bit integers
@@ -328,15 +427,36 @@ export function generateUltrasonicRescueBeacon(coords, seqNumber = 1) {
     altInt.toString(16).padStart(4, '0')
   ].join('');
 
+  // Physical range calculation under quiet (50 dBA) and catastrophe (85 dBA) scenarios
+  const linkQuiet = computeUltrasonicAcousticLinkBudget(5.0, 20000, 50, 60.0);
+  const linkCatastrophe = computeUltrasonicAcousticLinkBudget(3.0, 20000, 85, 60.0);
+
   return {
     centerFreqHz: 20000,
     markFreqHz: 19500,
     spaceFreqHz: 20500,
-    baudRate: 100, // 100 baud for extreme robustness against multipath
-    inaudibleHuman: true,
+    baudRate: 100, // 100 baud for robustness against multipath
+    // No audiometric measurement exists: audibility is UNKNOWN, never asserted as inaudible.
+    inaudibleHuman: null,
+    audibilityStatus: 'UNMEASURED',
+    audibilityDisclosures: {
+      adultsOver25: 'OFTEN_BELOW_THRESHOLD_BUT_UNMEASURED',
+      youthAudibilityRisk: 'AUDIBLE_TO_CHILDREN_AND_TEENAGERS',
+      canineFelineRisk: 'DISTRESS_IN_PETS_POSSIBLE',
+      hardwareDistortion: 'SUBHARMONIC_BUZZ_IN_LOW_COST_SPEAKERS_DOCUMENTED'
+    },
     carrierBand: 'ULTRASONIC_CIVILIAN_SAR',
     payloadHex,
-    rangeLineOfSightM: 60.0
+    // Former hard-coded 60 m replaced by the ISO 9613-1 model estimate (quiet, 50 dBA). Not a measurement.
+    rangeLineOfSightM: linkQuiet.maxReliableDistanceM,
+    rangeBasis: 'MODEL_ESTIMATE_ISO9613_UNMEASURED_ON_PHONES',
+    physicalLimits: {
+      maxReliableRangeQuietM: linkQuiet.maxReliableDistanceM,
+      maxReliableRangeCatastrophe85dBaM: linkCatastrophe.maxReliableDistanceM,
+      atmosphericAbsorptionDbPerM: +computeIso9613AbsorptionDbPerM(20000).toFixed(3),
+      phoneTransducerCutoffHz: 21000,
+      nyquistHzAt44k1: 22050 // Nyquist limit; real anti-aliasing filters roll off below this
+    }
   };
 }
 

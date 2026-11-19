@@ -42,3 +42,27 @@ test('Government Harness: detects bottleneck and degrades score upon road closur
   assert.equal(degraded.pillars.blackSkyResilience.isPercolating, false);
   assert.ok(degraded.pillars.evacuationThroughput.bottleneckIndex >= 0.75);
 });
+
+test('Government Harness: rejects unobserved synthetic precision and asserts accreditation disclaimers', () => {
+  const noEmpiricalData = evaluateGovernmentResilience({
+    sectorId: 'SECTOR_NO_EMPIRICAL_EVAL',
+    activeNodes: 120,
+    areaKm2: 25,
+    effectiveRfRangeM: 1200,
+    roadLanes: 6,
+    activeClosures: 0,
+    zeroCloudCapable: true,
+    merkleChainValid: true,
+    // modelIoU intentionally omitted
+  });
+
+  // Pillar 5 must NOT receive artificial default points when empirical data is missing
+  assert.equal(noEmpiricalData.pillars.empiricalCalibration.score, 0);
+  assert.equal(noEmpiricalData.pillars.empiricalCalibration.status, 'MISSING_OBSERVED_EMPIRICAL_METRICS');
+  assert.equal(noEmpiricalData.pillars.empiricalCalibration.modelIoU, null);
+
+  // Must declare that this is NOT an accredited external certification
+  assert.equal(noEmpiricalData.isExternalAccreditedCertification, false);
+  assert.ok(noEmpiricalData.disclaimer.includes('NOT constitute official certification'));
+});
+

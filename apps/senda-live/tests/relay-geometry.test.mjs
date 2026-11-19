@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   analyzeTerrainLink, computeRadioShadowField, estimateEqualMastHeight, fresnelRadiusM,
   greatCircleDistanceM, planRelayCorridor, relaySiteCoordinates,
-  terrainAt, validateGeometryTerrain, RELAY_SITES,
+  terrainAt, validateGeometryTerrain, RELAY_SITES, computeRadioLinkBudget,
 } from '../web/src/science/relay-geometry.mjs';
 
 const DEM = () => ({
@@ -215,3 +215,29 @@ test('mast-height clearance printed in report corresponds to rounded suggested m
   const reproducible = link(DEM(), estimate.requiredHeightM, 868);
   assert.equal(estimate.limitingClearanceM, reproducible.minFresnelClearanceM);
 });
+
+test('computeRadioLinkBudget computes realistic SNR, fade margins and regulatory status', () => {
+  // 868 MHz LoRa link at 3 km with 0 dB diffraction
+  const budget868 = computeRadioLinkBudget({
+    frequencyMHz: 868,
+    distanceM: 3000,
+    diffractionLossDb: 0,
+    rainRateMmHr: 15,
+  });
+  assert.equal(budget868.schema, 'senda.rf.link-budget/1');
+  assert.equal(budget868.isRegulatoryCompliant, true);
+  assert.equal(budget868.linkStatus, 'VIABLE');
+  assert.ok(budget868.receiver.fadeMarginDb > 10);
+  assert.ok(budget868.pathLoss.freeSpaceLossDb > 95 && budget868.pathLoss.freeSpaceLossDb < 105);
+
+  // 2.4 GHz Wi-Fi link at 2 km with 35 dB obstacle diffraction loss -> OUTAGE
+  const budgetWifi = computeRadioLinkBudget({
+    frequencyMHz: 2400,
+    distanceM: 2000,
+    diffractionLossDb: 35,
+    rainRateMmHr: 0,
+  });
+  assert.equal(budgetWifi.linkStatus, 'OUTAGE');
+  assert.equal(budgetWifi.isViable, false);
+});
+

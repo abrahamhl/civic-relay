@@ -325,6 +325,7 @@ export function computeRainAttenuation(frequencyGhz, rainRateMmHr, polarization 
   const specificAttenuationDbPerKm = Math.round((k * Math.pow(rainRateMmHr, alpha)) * 10000) / 10000;
 
   return {
+    k, alpha, // coeficientes ITU-R P.838-3 interpolados (contrastables con su Tabla 5)
     specificAttenuationDbPerKm,
     pathAttenuationDb: (distanceKm) => {
       if (!finite(distanceKm, 0)) return 0;
@@ -473,5 +474,44 @@ export function computeSatelliteDopplerKinematics(carrierFrequencyHz, orbitAltit
     maxDopplerRateHzPerS: Math.round(maxDopplerRateHzPerS * 100) / 100,
     minPllLoopBandwidthHz,
     isNarrowbandCotsFeasible,
+  };
+}
+
+/**
+ * Presupuesto de enlace completo (portado de la rama scientific-mission-10 en la consolidación del 2026-11-19, con la
+ * regla de veracidad aplicada: sin valores por defecto sin fuente).
+ * DECLARADOS: txPowerDbm, txAntennaGainDbi, txCableLossDb, rxAntennaGainDbi, rxCableLossDb, frequencyHz, distanceM,
+ * diffractionLossDb, rainRateMmHr, polarization, gasSpecificDbPerKm, bandwidthHz, rxNoiseFigureDb, rxSensitivityDbm,
+ * requiredFadeMarginDb.
+ * Límite regulatorio de PIRE solo donde hay norma citada (si no: null, «no verificado»):
+ *  · 868,0–868,6 MHz: 25 mW PRA ≈ 16,15 dBm PIRE · 869,4–869,65 MHz: 500 mW PRA ≈ 29,15 dBm PIRE (ETSI EN 300 220 / ERC/REC 70-03)
+ *  · 2,400–2,4835 GHz: 20 dBm PIRE (ETSI EN 300 328) · 5,15–5,35 GHz: 23 dBm PIRE (ETSI EN 301 893)
+ */
+export function computeCompleteLinkBudget(params) {
+  const keys = ['txPowerDbm', 'txAntennaGainDbi', 'txCableLossDb', 'rxAntennaGainDbi', 'rxCableLossDb', 'frequencyHz', 'distanceM', 'diffractionLossDb', 'rainRateMmHr', 'gasSpecificDbPerKm', 'bandwidthHz', 'rxNoiseFigureDb', 'rxSensitivityDbm', 'requiredFadeMarginDb'];
+  for (const k of keys) if (!Number.isFinite(params?.[k])) throw new TypeError(`computeCompleteLinkBudget: «${k}» debe declararse`);
+  if (params.polarization !== 'V' && params.polarization !== 'H') throw new TypeError('computeCompleteLinkBudget: «polarization» debe declararse (V/H)');
+  const p = params, c = 299792458, freqGhz = p.frequencyHz / 1e9, distanceKm = p.distanceM / 1000;
+  const eirpDbm = p.txPowerDbm + p.txAntennaGainDbi - p.txCableLossDb;
+  const fsplDb = 20 * Math.log10((4 * Math.PI * p.distanceM) / (c / p.frequencyHz));
+  const rainLossDb = computeRainAttenuation(freqGhz, p.rainRateMmHr, p.polarization).pathAttenuationDb(distanceKm);
+  const gasLossDb = p.gasSpecificDbPerKm * distanceKm;
+  const totalPathLossDb = fsplDb + p.diffractionLossDb + rainLossDb + gasLossDb;
+  const rssiDbm = eirpDbm - totalPathLossDb + p.rxAntennaGainDbi - p.rxCableLossDb;
+  const thermalNoiseFloorDbm = -174.0 + 10 * Math.log10(p.bandwidthHz) + p.rxNoiseFigureDb; // kT a 290 K = −174 dBm/Hz
+  const snrDb = rssiDbm - thermalNoiseFloorDbm, fadeMarginDb = rssiDbm - p.rxSensitivityDbm;
+  const linkStatus = fadeMarginDb >= p.requiredFadeMarginDb ? 'VIABLE' : fadeMarginDb >= 0 ? 'MARGINAL' : 'OUTAGE';
+  let regulatoryMaxEirpDbm = null;
+  if (freqGhz >= 0.868 && freqGhz <= 0.8686) regulatoryMaxEirpDbm = 16.15;
+  else if (freqGhz >= 0.8694 && freqGhz <= 0.86965) regulatoryMaxEirpDbm = 29.15;
+  else if (freqGhz >= 2.4 && freqGhz <= 2.4835) regulatoryMaxEirpDbm = 20.0;
+  else if (freqGhz >= 5.15 && freqGhz <= 5.35) regulatoryMaxEirpDbm = 23.0;
+  const r2 = (x) => Math.round(x * 100) / 100;
+  return {
+    eirpDbm: r2(eirpDbm), regulatoryMaxEirpDbm, isRegulatoryCompliant: regulatoryMaxEirpDbm == null ? null : eirpDbm <= regulatoryMaxEirpDbm + 0.1,
+    regulatoryBasis: regulatoryMaxEirpDbm == null ? 'NO_VERIFICADO: banda sin límite citado en este módulo' : 'ETSI (ver comentario)',
+    fsplDb: r2(fsplDb), diffractionLossDb: r2(p.diffractionLossDb), rainLossDb: r2(rainLossDb), gasLossDb: r2(gasLossDb), totalPathLossDb: r2(totalPathLossDb),
+    rssiDbm: r2(rssiDbm), thermalNoiseFloorDbm: r2(thermalNoiseFloorDbm), snrDb: r2(snrDb), fadeMarginDb: r2(fadeMarginDb),
+    requiredFadeMarginDb: p.requiredFadeMarginDb, rxSensitivityDbm: p.rxSensitivityDbm, linkStatus, isViable: linkStatus !== 'OUTAGE',
   };
 }

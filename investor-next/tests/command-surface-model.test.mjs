@@ -75,12 +75,58 @@ test('link probability is capped by planning range and decreases in dense clutte
 });
 
 test('weighted trilateration recovers a consistent fix with uncertainty and GDOP', () => {
+  // P0-02: Geometría insuficiente (0, 1, 2 anclas) debe devolver UNDERDETERMINED con incertidumbre nula
+  const fix0 = trilaterate2D([]);
+  assert.equal(fix0.status, 'UNDERDETERMINED');
+  assert.equal(fix0.x, null);
+  assert.equal(fix0.y, null);
+  assert.equal(fix0.errorM, null);
+  assert.equal(fix0.gdop, null);
+  assert.equal(fix0.ellipseMajorM, null);
+  assert.equal(fix0.anchorCount, 0);
+
+  const fix1 = trilaterate2D([{ id: 'a', x: 0, y: 0, distance: 10, sigma: 1 }]);
+  assert.equal(fix1.status, 'UNDERDETERMINED');
+  assert.equal(fix1.x, null);
+  assert.equal(fix1.y, null);
+  assert.equal(fix1.errorM, null);
+  assert.equal(fix1.gdop, null);
+  assert.equal(fix1.anchorCount, 1);
+
+  const fix2 = trilaterate2D([
+    { id: 'a', x: 0, y: 0, distance: 10, sigma: 1 },
+    { id: 'b', x: 20, y: 0, distance: 10, sigma: 1 }
+  ]);
+  assert.equal(fix2.status, 'UNDERDETERMINED');
+  assert.equal(fix2.x, null);
+  assert.equal(fix2.y, null);
+  assert.equal(fix2.errorM, null);
+  assert.equal(fix2.gdop, null);
+  assert.equal(fix2.anchorCount, 2);
+
+  // P0-02: Colinealidad (3 anclas en la misma recta) debe devolver UNDERDETERMINED con incertidumbre nula
+  const collinearAnchors = [
+    { id: 'a', x: 0, y: 0, distance: 50, sigma: 1 },
+    { id: 'b', x: 50, y: 0, distance: 20, sigma: 1 },
+    { id: 'c', x: 100, y: 0, distance: 50, sigma: 1 }
+  ];
+  const fixCollinear = trilaterate2D(collinearAnchors);
+  assert.equal(fixCollinear.status, 'UNDERDETERMINED');
+  assert.equal(fixCollinear.x, null);
+  assert.equal(fixCollinear.y, null);
+  assert.equal(fixCollinear.errorM, null);
+  assert.equal(fixCollinear.gdop, null);
+  assert.equal(fixCollinear.ellipseMajorM, null);
+  assert.equal(fixCollinear.anchorCount, 3);
+
+  // Geometría válida determinada (3 anclas no colineales)
   const anchors = [
     {id: 'a', x: 0, y: 0, distance: Math.hypot(50, 30), sigma: 1},
     {id: 'b', x: 100, y: 0, distance: Math.hypot(-50, 30), sigma: 1},
     {id: 'c', x: 0, y: 100, distance: Math.hypot(50, -70), sigma: 1}
   ];
   const fix = trilaterate2D(anchors);
+  assert.equal(fix.status, 'DETERMINED');
   assert.ok(Math.abs(fix.x - 50) < 1e-6);
   assert.ok(Math.abs(fix.y - 30) < 1e-6);
   assert.ok(fix.errorM < 1e-6);

@@ -437,25 +437,29 @@ export interface AnchorFix {
   sigma?: number;
 }
 
+export type TrilaterationStatus = 'DETERMINED' | 'UNDERDETERMINED';
+
 export interface TrilaterationResult {
-  x: number;
-  y: number;
-  errorM: number;
-  gdop: number;
-  ellipseMajorM: number;
-  ellipseMinorM: number;
-  angleDeg: number;
+  status: TrilaterationStatus;
+  x: number | null;
+  y: number | null;
+  errorM: number | null;
+  gdop: number | null;
+  ellipseMajorM: number | null;
+  ellipseMinorM: number | null;
+  angleDeg: number | null;
   anchorCount: number;
 }
 
 const EMPTY_FIX: TrilaterationResult = {
-  x: 0,
-  y: 0,
-  errorM: 0,
-  gdop: 0,
-  ellipseMajorM: 0,
-  ellipseMinorM: 0,
-  angleDeg: 0,
+  status: 'UNDERDETERMINED',
+  x: null,
+  y: null,
+  errorM: null,
+  gdop: null,
+  ellipseMajorM: null,
+  ellipseMinorM: null,
+  angleDeg: null,
   anchorCount: 0
 };
 
@@ -466,11 +470,15 @@ function sigmaFor(anchor: AnchorFix): number {
 export function trilaterate2D(anchors: AnchorFix[]): TrilaterationResult {
   if (anchors.length === 0) return EMPTY_FIX;
   if (anchors.length < 3) {
-    const fallback = anchors.reduce((acc, anchor) => ({ x: acc.x + anchor.x, y: acc.y + anchor.y }), { x: 0, y: 0 });
     return {
-      ...EMPTY_FIX,
-      x: fallback.x / anchors.length,
-      y: fallback.y / anchors.length,
+      status: 'UNDERDETERMINED',
+      x: null,
+      y: null,
+      errorM: null,
+      gdop: null,
+      ellipseMajorM: null,
+      ellipseMinorM: null,
+      angleDeg: null,
       anchorCount: anchors.length
     };
   }
@@ -498,12 +506,16 @@ export function trilaterate2D(anchors: AnchorFix[]): TrilaterationResult {
     b2 += weight * dy * rhs;
   }
   const det = a11 * a22 - a12 * a12;
-  if (Math.abs(det) < 1e-9) {
-    const mean = anchors.reduce((acc, anchor) => ({ x: acc.x + anchor.x, y: acc.y + anchor.y }), { x: 0, y: 0 });
+  if (Math.abs(det) < 1e-6) {
     return {
-      ...EMPTY_FIX,
-      x: mean.x / anchors.length,
-      y: mean.y / anchors.length,
+      status: 'UNDERDETERMINED',
+      x: null,
+      y: null,
+      errorM: null,
+      gdop: null,
+      ellipseMajorM: null,
+      ellipseMinorM: null,
+      angleDeg: null,
       anchorCount: anchors.length
     };
   }
@@ -532,24 +544,33 @@ export function trilaterate2D(anchors: AnchorFix[]): TrilaterationResult {
     h22 += rowY * rowY;
   }
   const hDet = h11 * h22 - h12 * h12;
+  if (Math.abs(hDet) < 1e-6) {
+    return {
+      status: 'UNDERDETERMINED',
+      x,
+      y,
+      errorM: residual * 10,
+      gdop: null,
+      ellipseMajorM: null,
+      ellipseMinorM: null,
+      angleDeg: null,
+      anchorCount: anchors.length
+    };
+  }
   const sigmaRef = Math.sqrt(anchors.reduce((sum, anchor) => sum + Math.pow(sigmaFor(anchor), 2), 0) / anchors.length);
-  const covariance =
-    Math.abs(hDet) < 1e-9
-      ? null
-      : {
-          xx: (h22 / hDet) * sigmaRef * sigmaRef,
-          xy: (-h12 / hDet) * sigmaRef * sigmaRef,
-          yy: (h11 / hDet) * sigmaRef * sigmaRef
-        };
-  const gdop = Math.abs(hDet) < 1e-9 ? 0 : Math.sqrt(Math.max(0, (h11 + h22) / hDet));
-  const trace = covariance ? covariance.xx + covariance.yy : 0;
-  const radial = covariance ? Math.sqrt(Math.max(0, Math.pow((covariance.xx - covariance.yy) / 2, 2) + covariance.xy * covariance.xy)) : 0;
+  const covariance = {
+    xx: (h22 / hDet) * sigmaRef * sigmaRef,
+    xy: (-h12 / hDet) * sigmaRef * sigmaRef,
+    yy: (h11 / hDet) * sigmaRef * sigmaRef
+  };
+  const gdop = Math.sqrt(Math.max(0, (h11 + h22) / hDet));
+  const trace = covariance.xx + covariance.yy;
+  const radial = Math.sqrt(Math.max(0, Math.pow((covariance.xx - covariance.yy) / 2, 2) + covariance.xy * covariance.xy));
   const lambdaMajor = Math.max(0, trace / 2 + radial);
   const lambdaMinor = Math.max(0, trace / 2 - radial);
-  const angleDeg = covariance
-    ? (Math.atan2(2 * covariance.xy, covariance.xx - covariance.yy) * 90) / Math.PI
-    : 0;
+  const angleDeg = (Math.atan2(2 * covariance.xy, covariance.xx - covariance.yy) * 90) / Math.PI;
   return {
+    status: 'DETERMINED',
     x,
     y,
     errorM: residual * 10,

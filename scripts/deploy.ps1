@@ -39,7 +39,7 @@ try {
     Write-Host "✅ Vercel CLI found" -ForegroundColor Green
 } catch {
     Write-Host "⚠️  Vercel CLI not installed. Installing..." -ForegroundColor Yellow
-    npm install -g vercel
+    pnpm add -g vercel
 }
 
 Write-Host "✅ Pre-flight checks passed" -ForegroundColor Green

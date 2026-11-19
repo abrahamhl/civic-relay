@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ingestOfficialAlert, relayActivation, createConsentProfile, zoneFromQuake, inZone } from '../src/zones.mjs';
 import { staLtaTriggers, locateEvent } from '../src/seismic.mjs';
-import { parseTle, propagateKeplerJ2, predictPasses, lookAngles } from '../src/orbital.mjs';
+import { parseTle, propagateKeplerJ2, predictPasses, lookAngles, AUTHENTIC_DATED_TLES } from '../src/orbital.mjs';
 import { parseCap, parseUsgs, parseEmsc, parseSatnogsStations, pullAll } from '../src/feeds.mjs';
 import { scenarioQuake } from '../src/scenarios.mjs';
 
@@ -61,8 +61,30 @@ test('geometría: un satélite justo encima tiene elevación ~90°', () => {
   const el = { name: 'X', norad: 1, epoch: 0, inc: 0, raan: 0, ecc: 0, argp: 0, M: 0, nRevDay: 15 };
   // En t=0 está sobre (0°, lon = GMST) → observador ecuatorial en esa longitud.
   const gm = ((280.46061837 + 360.98564736629 * ((0 - Date.UTC(2000, 0, 1, 12)) / 86400000)) % 360 + 360) % 360;
-  const { elevationDeg } = lookAngles(el, { lat: 0, lon: -gm }, 0);
+  const { elevationDeg, azimuthDeg, rangeKm, rangeRateKmS, computeDopplerShiftHz, disclaimer } = lookAngles(el, { lat: 0, lon: -gm }, 0);
   assert.ok(elevationDeg > 89, `${elevationDeg}`);
+  assert.ok(azimuthDeg >= 0 && azimuthDeg <= 360, `acimut ${azimuthDeg}`);
+  assert.ok(rangeKm > 300 && rangeKm < 1000, `distancia ${rangeKm}`);
+  assert.ok(Math.abs(rangeRateKmS) < 2.0, `velocidad radial en cénit cercana a 0: ${rangeRateKmS}`);
+  assert.ok(typeof computeDopplerShiftHz === 'function');
+  const dopplerUhf = computeDopplerShiftHz(437e6);
+  assert.ok(Math.abs(dopplerUhf) < 5000, `desplazamiento Doppler UHF: ${dopplerUhf}`);
+  assert.ok(disclaimer.includes('VENTANA GEOMÉTRICA DE VISIBILIDAD'));
+});
+
+test('catálogo de TLEs auténticos: Sentinel-3A y Terra tienen propagación física coherente', () => {
+  const s3 = parseTle(AUTHENTIC_DATED_TLES.SENTINEL_3A.name, AUTHENTIC_DATED_TLES.SENTINEL_3A.line1, AUTHENTIC_DATED_TLES.SENTINEL_3A.line2);
+  assert.equal(s3.norad, 41335);
+  const r = Math.hypot(...Object.values(propagateKeplerJ2(s3, s3.epoch)));
+  // Sentinel-3 orbita a ~814 km de altitud -> r ≈ 6378 + 814 ≈ 7192 km
+  assert.ok(r > 7100 && r < 7300, `radio orbital Sentinel-3A: ${r}`);
+
+  const valencia = { lat: 39.47, lon: -0.38, altKm: 0.05 };
+  const passes = predictPasses(s3, valencia, { from: s3.epoch, to: s3.epoch + 86400_000 * 2, minElevationDeg: 12, stepS: 15 });
+  assert.ok(passes.length >= 1, `al menos 1 pase sobre Valencia en 48h: ${passes.length}`);
+  const firstPass = passes[0];
+  assert.ok(firstPass.maxElevationDeg >= 12, `elevación máxima: ${firstPass.maxElevationDeg}`);
+  assert.ok(firstPass.azimuthAtMaxDeg >= 0 && firstPass.azimuthAtMaxDeg <= 360);
 });
 
 test('feeds: USGS, EMSC y SatNOGS se normalizan; pullAll tolera fuentes caídas', async () => {

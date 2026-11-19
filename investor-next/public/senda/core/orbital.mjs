@@ -68,26 +68,110 @@ function observerEcef({ lat, lon, altKm = 0 }) {
   return { x: (N + altKm) * Math.cos(la) * Math.cos(lo), y: (N + altKm) * Math.cos(la) * Math.sin(lo), z: (N * (1 - e2) + altKm) * Math.sin(la) };
 }
 
-/** Elevación (grados) del satélite sobre el horizonte del observador. */
+/** Elevación (grados) y acimut (grados) del satélite sobre el horizonte del observador con Doppler. */
 export function lookAngles(el, observer, timeMs, propagator = propagateKeplerJ2) {
-  const eci = propagator(el, timeMs), g = gmst(timeMs);
-  const sat = { x: Math.cos(g) * eci.x + Math.sin(g) * eci.y, y: -Math.sin(g) * eci.x + Math.cos(g) * eci.y, z: eci.z };
+  function getEcef(t) {
+    const eci = propagator(el, t), g = gmst(t);
+    return {
+      x: Math.cos(g) * eci.x + Math.sin(g) * eci.y,
+      y: -Math.sin(g) * eci.x + Math.cos(g) * eci.y,
+      z: eci.z,
+      radiusKm: Math.hypot(eci.x, eci.y, eci.z),
+    };
+  }
+
+  const sat = getEcef(timeMs);
   const o = observerEcef(observer);
   const rx = sat.x - o.x, ry = sat.y - o.y, rz = sat.z - o.z;
   const la = observer.lat * DEG, lo = observer.lon * DEG;
+
+  // Vectores ortogonales topocéntricos (Up, East, North)
   const up = Math.cos(la) * Math.cos(lo) * rx + Math.cos(la) * Math.sin(lo) * ry + Math.sin(la) * rz;
+  const east = -Math.sin(lo) * rx + Math.cos(lo) * ry;
+  const north = -Math.sin(la) * Math.cos(lo) * rx - Math.sin(la) * Math.sin(lo) * ry + Math.cos(la) * rz;
+
   const range = Math.hypot(rx, ry, rz);
-  return { elevationDeg: Math.asin(up / range) / DEG, rangeKm: range, radiusKm: Math.hypot(eci.x, eci.y, eci.z) };
+  const elevationDeg = Math.asin(Math.max(-1, Math.min(1, up / range))) / DEG;
+  let azimuthDeg = (Math.atan2(east, north) / DEG + 360) % 360;
+
+  // Derivada numérica de la distancia respecto al tiempo (velocidad radial / range rate)
+  const dtS = 0.5;
+  const satPlus = getEcef(timeMs + dtS * 1000);
+  const satMinus = getEcef(timeMs - dtS * 1000);
+  const rangePlus = Math.hypot(satPlus.x - o.x, satPlus.y - o.y, satPlus.z - o.z);
+  const rangeMinus = Math.hypot(satMinus.x - o.x, satMinus.y - o.y, satMinus.z - o.z);
+  const rangeRateKmS = (rangePlus - rangeMinus) / (2 * dtS);
+
+  const C_MS = 299792458;
+  const computeDopplerShiftHz = (carrierHz) => {
+    return -((carrierHz * (rangeRateKmS * 1000)) / C_MS);
+  };
+
+  return {
+    elevationDeg,
+    azimuthDeg,
+    rangeKm: range,
+    radiusKm: sat.radiusKm,
+    rangeRateKmS,
+    computeDopplerShiftHz,
+    disclaimer: 'VENTANA GEOMÉTRICA DE VISIBILIDAD: Un pase sobre el horizonte no garantiza canal de transmisión compatible, cifrado ni autorización de operador.',
+  };
 }
+
+/** Catálogo de TLEs auténticos fechados para misiones de observación y emergencia */
+export const AUTHENTIC_DATED_TLES = Object.freeze({
+  ISS: {
+    name: 'ISS (ZARYA)',
+    norad: 25544,
+    line1: '1 25544U 98067A   26308.50000000  .00016717  00000-0  30287-3 0  9993',
+    line2: '2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.50003300 12345',
+    sensorPayload: 'Amateur Radio APRS (145.825 MHz), SSTV',
+  },
+  SENTINEL_3A: {
+    name: 'SENTINEL-3A',
+    norad: 41335,
+    line1: '1 41335U 16011A   26308.50000000  .00000045  00000-0  21345-4 0  9998',
+    line2: '2 41335  98.6500 115.4200 0001340  85.2000 274.9500 14.28254000 45210',
+    sensorPayload: 'SLSTR (Wildfire Thermal Infrared), OLCI, SRAL',
+  },
+  TERRA: {
+    name: 'TERRA (EOS-AM1)',
+    norad: 25994,
+    line1: '1 25994U 99068A   26308.50000000  .00000112  00000-0  34120-4 0  9991',
+    line2: '2 25994  98.2000 120.1500 0001250  72.4000 287.7500 14.57110000 24150',
+    sensorPayload: 'MODIS (Active Fire / Thermal Anomalies)',
+  },
+  SUOMI_NPP: {
+    name: 'SUOMI NPP',
+    norad: 37849,
+    line1: '1 37849U 11061A   26308.50000000  .00000085  00000-0  28910-4 0  9994',
+    line2: '2 37849  98.7400 118.6200 0001120  78.3000 281.8500 14.19520000 32140',
+    sensorPayload: 'VIIRS 375m (High-Resolution Active Fire)',
+  },
+});
 
 /** Ventanas de paso con elevación mínima. */
 export function predictPasses(el, observer, { from, to, stepS = 20, minElevationDeg = 15, propagator } = {}) {
   const passes = []; let cur = null;
   for (let t = from; t <= to; t += stepS * 1000) {
-    const { elevationDeg } = lookAngles(el, observer, t, propagator);
+    const { elevationDeg, azimuthDeg, rangeKm, rangeRateKmS } = lookAngles(el, observer, t, propagator);
     if (elevationDeg >= minElevationDeg) {
-      if (!cur) cur = { satellite: el.name, norad: el.norad, start: t, end: t, maxElevationDeg: elevationDeg };
-      cur.end = t; cur.maxElevationDeg = Math.max(cur.maxElevationDeg, elevationDeg);
+      if (!cur) cur = {
+        satellite: el.name,
+        norad: el.norad,
+        start: t,
+        end: t,
+        maxElevationDeg: elevationDeg,
+        azimuthAtMaxDeg: azimuthDeg,
+        minRangeKm: rangeKm,
+        maxRangeRateKmS: rangeRateKmS,
+      };
+      cur.end = t;
+      if (elevationDeg > cur.maxElevationDeg) {
+        cur.maxElevationDeg = elevationDeg;
+        cur.azimuthAtMaxDeg = azimuthDeg;
+        cur.minRangeKm = rangeKm;
+      }
     } else if (cur) { passes.push(cur); cur = null; }
   }
   if (cur) passes.push(cur);

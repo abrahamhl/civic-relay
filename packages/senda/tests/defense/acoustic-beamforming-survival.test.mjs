@@ -8,6 +8,7 @@ import {
   synthesizeAcousticCameraHeatmap,
   computeSentinelGatewayBOM,
   generateUltrasonicRescueBeacon,
+  computeUltrasonicAcousticLinkBudget,
   calculateTacticalSurvivalVector,
   POLAR_PATTERNS
 } from '../../src/defense/acoustic-beamforming-survival.mjs';
@@ -121,11 +122,15 @@ test('BOM de Centinela Gateway COTS: Coste acotado inferior a 15 € y multimoda
   assert.ok(hasEsp32 && hasMems && hasRadar);
 });
 
-test('Kit de Supervivencia: Baliza ultrasónica inaudible y cálculo de vector de evasión', () => {
+test('Kit de Supervivencia: baliza ultrasónica sin afirmaciones no medidas y cálculo de vector de evasión', () => {
   const coords = { lat: 40.4168, lon: -3.7038, altM: 650 };
   const beacon = generateUltrasonicRescueBeacon(coords, 42);
 
-  assert.equal(beacon.inaudibleHuman, true);
+  // Sin audiometría no se puede afirmar inaudibilidad; el alcance es estimación de modelo, nunca 60 m.
+  assert.equal(beacon.inaudibleHuman, null);
+  assert.equal(beacon.audibilityStatus, 'UNMEASURED');
+  assert.ok(beacon.rangeLineOfSightM < 15, `alcance modelado ${beacon.rangeLineOfSightM} m`);
+  assert.equal(beacon.rangeLineOfSightM, beacon.physicalLimits.maxReliableRangeQuietM);
   assert.ok(beacon.centerFreqHz >= 19000);
   assert.ok(beacon.payloadHex.length > 10);
 
@@ -142,3 +147,19 @@ test('Kit de Supervivencia: Baliza ultrasónica inaudible y cálculo de vector d
   // Azimut de evasión debe apuntar en dirección opuesta (aprox 216.9°)
   assert.ok(survival.recommendedEvasionAzimuthDeg > 180);
 });
+
+test('Presupuesto acústico ISO 9613-1: atenuación atmosférica y límites de alcance real', () => {
+  // A 5 metros en ambiente tranquilo (50 dBA): detectable con margen
+  const budgetQuiet = computeUltrasonicAcousticLinkBudget(5.0, 20000, 50, 60.0);
+  assert.ok(budgetQuiet.pathLossDb > 15 && budgetQuiet.pathLossDb < 25);
+  assert.ok(budgetQuiet.maxReliableDistanceM >= 5.0);
+
+  // A 20 metros: atenuación esférica (26 dB) + atmosférica (13 dB) = ~39 dB loss -> Inaudible / no detectable
+  const budget20m = computeUltrasonicAcousticLinkBudget(20.0, 20000, 50, 60.0);
+  assert.equal(budget20m.isDetectable, false);
+
+  // En escenario de catástrofe severa (85 dBA): el alcance fiable se acota por debajo de 5 metros
+  const budgetCatastrophe = computeUltrasonicAcousticLinkBudget(5.0, 20000, 85, 60.0);
+  assert.ok(budgetCatastrophe.maxReliableDistanceM < 5.0, 'En 85 dBA de ruido el alcance no puede superar 5m en teléfonos COTS');
+});
+
