@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/"/>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/es/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/"/>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/nl/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/"/>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/product/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/product/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/product/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/product/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/es/product/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/product/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/product/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/product/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/nl/product/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/product/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/product/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/product/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/platform/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/platform/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/platform/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/platform/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/es/platform/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/platform/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/platform/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/platform/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/nl/platform/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/platform/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/platform/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/platform/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/evidence/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/evidence/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/evidence/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/evidence/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/es/evidence/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/evidence/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/evidence/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/evidence/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/nl/evidence/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/evidence/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/evidence/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/evidence/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/science/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/science/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/science/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/science/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/es/science/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/science/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/science/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/science/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/nl/science/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/science/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/science/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/science/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/investors/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/investors/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/investors/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/investors/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/es/investors/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/investors/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/investors/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/investors/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/nl/investors/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/investors/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/investors/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/investors/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/security/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/security/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/security/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/security/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/es/security/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/security/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/security/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/security/"/>
+  </url>
+  <url>
+    <loc>https://civic-relay-investor.vercel.app/nl/security/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://civic-relay-investor.vercel.app/security/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://civic-relay-investor.vercel.app/es/security/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://civic-relay-investor.vercel.app/nl/security/"/>
+  </url>
+</urlset>

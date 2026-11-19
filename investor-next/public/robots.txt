@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /defense/
+Disallow: /es/defense/
+Disallow: /nl/defense/
+Disallow: /design/
+
+Sitemap: https://civic-relay-investor.vercel.app/sitemap.xml

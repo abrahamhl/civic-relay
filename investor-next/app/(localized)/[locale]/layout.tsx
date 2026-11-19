@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import '../../globals.css';
-import { SITE_URL } from '../../_senda/data/types';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -17,7 +16,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.SITE_URL || SITE_URL),
+  metadataBase: new URL(process.env.SITE_URL || 'https://civic-relay-investor.vercel.app'),
   robots: { index: true, follow: true }
 };
 

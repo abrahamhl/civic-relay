@@ -16,7 +16,10 @@ export const viewport: Viewport = {
   initialScale: 1
 };
 
-export const metadata: Metadata = buildPageMetadata('en', 'home');
+export const metadata: Metadata = {
+  ...buildPageMetadata('en', 'home'),
+  metadataBase: new URL(process.env.SITE_URL || 'https://civic-relay-investor.vercel.app')
+};
 
 export default function RootLayout({
   children

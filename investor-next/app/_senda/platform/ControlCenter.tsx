@@ -891,7 +891,7 @@ export default function ControlCenter({ locale }: { locale: Locale }) {
                 <div className="s-between">
                   <strong style={{ fontSize: 12.5 }}>{ui.controlsTitle}</strong>
                   <span className="s-badge" data-status="simulated" style={{ minHeight: 22, fontSize: 11 }}>
-                    SIMULACIÓN
+                    {locale === 'es' ? 'SIMULACIÓN' : locale === 'nl' ? 'SIMULATIE' : 'SIMULATION'}
                   </span>
                 </div>
                 <p className="s-micro s-faint" style={{ margin: 0 }}>
@@ -906,8 +906,8 @@ export default function ControlCenter({ locale }: { locale: Locale }) {
                   onClick={() => setPendingAction('declare-zone')}
                   data-testid="cc-act-zone"
                 >
-                  <ShieldAlert size={15} aria-hidden="true" />
-                  <span>{zoneDeclared ? `✓ ${ui.actZone}` : ui.actZone}</span>
+                  {zoneDeclared ? <CheckCircle2 size={15} aria-hidden="true" style={{ color: 'var(--s-ok)' }} /> : <ShieldAlert size={15} aria-hidden="true" />}
+                  <span>{ui.actZone}</span>
                 </button>
 
                 <button
@@ -918,8 +918,8 @@ export default function ControlCenter({ locale }: { locale: Locale }) {
                   onClick={() => setPendingAction('activate-relay')}
                   data-testid="cc-act-relay"
                 >
-                  <Radio size={15} aria-hidden="true" />
-                  <span>{relayActive ? `✓ ${ui.actRelay}` : ui.actRelay}</span>
+                  {relayActive ? <CheckCircle2 size={15} aria-hidden="true" style={{ color: 'var(--s-ok)' }} /> : <Radio size={15} aria-hidden="true" />}
+                  <span>{ui.actRelay}</span>
                 </button>
 
                 <button
@@ -930,8 +930,8 @@ export default function ControlCenter({ locale }: { locale: Locale }) {
                   onClick={() => setPendingAction('assign-team')}
                   data-testid="cc-act-team"
                 >
-                  <Users size={15} aria-hidden="true" />
-                  <span>{teamAssigned ? `✓ ${ui.actTeam}` : ui.actTeam}</span>
+                  {teamAssigned ? <CheckCircle2 size={15} aria-hidden="true" style={{ color: 'var(--s-ok)' }} /> : <Users size={15} aria-hidden="true" />}
+                  <span>{ui.actTeam}</span>
                 </button>
 
                 {pendingAction && (
