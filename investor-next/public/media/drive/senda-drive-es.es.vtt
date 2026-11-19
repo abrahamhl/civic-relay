@@ -1,0 +1,318 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:06.296
+Desde enero de 2026, la baliza V16
+conectada es obligatoria en España.
+
+2
+00:00:06.646 --> 00:00:10.998
+La enciendes y envía tu posición
+a la plataforma DGT 3.0.
+
+3
+00:00:11.348 --> 00:00:14.313
+Tráfico la reenvía a los
+navegadores conectados.
+
+4
+00:00:14.663 --> 00:00:17.714
+Es un gran paso. Pero una
+luz no sabe lo que ha pasado.
+
+5
+00:00:18.064 --> 00:00:21.499
+No sabe si fue un choque, en qué
+carril estás ni hacia dónde miras.
+
+6
+00:00:21.849 --> 00:00:24.494
+Y si nadie puede encenderla,
+no avisa a nadie.
+
+7
+00:00:26.094 --> 00:00:27.438
+Esto es SENDA Drive.
+
+8
+00:00:27.788 --> 00:00:31.671
+El motor que convierte la baliza en
+información para quien viene detrás.
+
+9
+00:00:32.021 --> 00:00:35.242
+Va en tu móvil, entiende la
+carretera y no inventa nada.
+
+10
+00:00:36.842 --> 00:00:39.445
+Lo autorizas una vez y vinculas tu coche.
+
+11
+00:00:39.795 --> 00:00:43.528
+Al subir, el Bluetooth del coche lo
+arranca; al bajar, se cierra solo.
+
+12
+00:00:43.878 --> 00:00:47.505
+Si solo hay una pista débil, espera
+a que la velocidad la confirme.
+
+13
+00:00:47.855 --> 00:00:49.967
+Sin tu permiso, no arranca nunca.
+
+14
+00:00:50.317 --> 00:00:53.581
+Android, con o sin Google, e
+iPhone usan la misma lógica,
+
+15
+00:00:53.931 --> 00:00:57.792
+comprobada con 10 escenarios
+y 55 pasos comunes.
+
+16
+00:00:59.392 --> 00:01:03.189
+Niebla, 120 km/h, 1,2
+segundos entre coches.
+
+17
+00:01:03.539 --> 00:01:06.569
+Cada conductor reacciona a
+las luces del de delante.
+
+18
+00:01:06.919 --> 00:01:10.268
+Los retrasos se suman: en el
+modelo, chocan cinco coches.
+
+19
+00:01:10.618 --> 00:01:14.714
+Con SENDA, el primer móvil detecta
+la frenada y avisa a todos a la vez.
+
+20
+00:01:15.064 --> 00:01:19.395
+En el modelo solo choca el que iba
+pegado. Eso solo lo arregla la distancia.
+
+21
+00:01:19.745 --> 00:01:23.222
+Sin cobertura, el SOS viaja
+con los coches que pasan:
+
+22
+00:01:23.572 --> 00:01:28.031
+sale en unos siete minutos con uno de
+cada diez coches. Es una simulación.
+
+23
+00:01:29.631 --> 00:01:34.132
+Un caso real, contado por uno de los
+conductores. Anónimo y sin verificar.
+
+24
+00:01:34.482 --> 00:01:38.983
+Autopista en Bélgica. La cabina de un
+camión golpea el lateral de un turismo.
+
+25
+00:01:39.333 --> 00:01:43.067
+Lo arrastra atravesado, lo suelta,
+y el coche gira media vuelta.
+
+26
+00:01:43.417 --> 00:01:46.787
+Queda parado en el carril rápido,
+mirando contra el tráfico.
+
+27
+00:01:47.137 --> 00:01:51.404
+El camión, en el arcén. El peligro real
+llega ahora: los que vienen detrás.
+
+28
+00:01:53.004 --> 00:01:56.503
+Con este caso encontramos un
+fallo en nuestro propio código.
+
+29
+00:01:56.853 --> 00:02:01.034
+Como el coche miraba al revés, se
+descartaba el aviso: «va en otro sentido».
+
+30
+00:02:01.384 --> 00:02:05.565
+Todos los que llegaban por detrás lo
+habrían ignorado. Ya está corregido.
+
+31
+00:02:05.915 --> 00:02:09.990
+Ahora, si el rumbo no es fiable, avisa
+y marca la calzada como incierta.
+
+32
+00:02:10.340 --> 00:02:13.348
+Si el móvil envía el rumbo
+que llevaba antes del golpe,
+
+33
+00:02:13.698 --> 00:02:16.941
+la calzada contraria ya no
+recibe una falsa alarma.
+
+34
+00:02:18.541 --> 00:02:21.741
+En la app, sin registrarte:
+qué hacer ahora, paso a paso.
+
+35
+00:02:22.091 --> 00:02:26.421
+Un botón para llamar al 112, que
+siempre es tuyo: SENDA no llama sola.
+
+36
+00:02:26.771 --> 00:02:30.761
+Un guion para la llamada, con carril
+y orientación solo si los declaras.
+
+37
+00:02:31.111 --> 00:02:35.015
+Y avisos fusionados de varias
+fuentes, cada uno con su procedencia.
+
+38
+00:02:36.615 --> 00:02:40.369
+El móvil también siente el golpe:
+el acelerómetro mide el impulso,
+
+39
+00:02:40.719 --> 00:02:44.815
+y el giroscopio, cuánto gira el coche
+después. Ese trompo fue la pista.
+
+40
+00:02:45.165 --> 00:02:48.728
+Cada señal suma o resta
+evidencia; ninguna decide sola.
+
+41
+00:02:49.078 --> 00:02:53.025
+Hoy los pesos son de ejemplo, y el
+del giro está vacío hasta calibrarlo.
+
+42
+00:02:53.375 --> 00:02:57.300
+El arnés de calibración ya existe:
+entrena y prueba por separado.
+
+43
+00:02:58.900 --> 00:03:03.167
+Muchos coches llevan cámaras. Su
+dueño puede pasar los clips por SENDA.
+
+44
+00:03:03.517 --> 00:03:07.783
+Detecta un coche atravesado, otro
+parado delante o una persona en la vía.
+
+45
+00:03:08.133 --> 00:03:11.611
+Y solo comparte el evento: qué,
+dónde y cuándo. Nunca la imagen.
+
+46
+00:03:11.961 --> 00:03:15.246
+Si un evento trae imagen,
+matrícula o cara, se rechaza.
+
+47
+00:03:15.596 --> 00:03:19.841
+Lo que ve el ordenador de un Tesla no
+está abierto a terceros. No lo fingimos.
+
+48
+00:03:20.191 --> 00:03:24.309
+Hasta calibrarlas, las cámaras no
+suben la confianza: solo se anotan.
+
+49
+00:03:25.909 --> 00:03:29.855
+Para el centro de tráfico, un esquema
+del incidente con su procedencia.
+
+50
+00:03:30.205 --> 00:03:33.363
+Las fuentes que se copian
+entre sí cuentan una sola vez.
+
+51
+00:03:33.713 --> 00:03:37.681
+Y un laboratorio para reproducir
+cada caso, marcado como ejercicio.
+
+52
+00:03:39.281 --> 00:03:43.057
+Android en dos versiones: una sin
+servicios de Google ni Internet,
+
+53
+00:03:43.407 --> 00:03:46.159
+y otra con Google y
+pantalla para Android Auto.
+
+54
+00:03:46.509 --> 00:03:50.967
+Android Auto solo admite ciertas
+categorías: la nuestra aún es provisional.
+
+55
+00:03:51.317 --> 00:03:55.051
+Y una app nueva para iPhone,
+compilada y probada en cada cambio.
+
+56
+00:03:56.651 --> 00:04:00.896
+Cada cambio se comprueba:
+881 pruebas del núcleo,
+
+57
+00:04:01.246 --> 00:04:05.406
+82 comprobaciones de la app de
+carretera en un navegador real,
+
+58
+00:04:05.756 --> 00:04:10.705
+y 55 pasos del arranque automático,
+iguales en todas las plataformas.
+
+59
+00:04:11.055 --> 00:04:14.298
+Lo que falta, lo decimos:
+todavía no hay pruebas de campo,
+
+60
+00:04:14.648 --> 00:04:17.891
+el arranque automático no se
+ha probado en móviles reales,
+
+61
+00:04:18.241 --> 00:04:21.462
+y los detectores no están
+calibrados con datos reales.
+
+62
+00:04:21.812 --> 00:04:24.756
+Siguiente paso: un piloto
+con conductores reales.
+
+63
+00:04:26.356 --> 00:04:29.492
+SENDA Drive. Para que quien
+viene detrás lo sepa a tiempo.
+
+64
+00:04:29.842 --> 00:04:32.765
+Código abierto, en la
+dirección que ves en pantalla.

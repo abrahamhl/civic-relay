@@ -15,7 +15,7 @@ import { createRequire } from 'node:module';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..', '..');
 const mediaRoot = path.resolve(__dirname, '..');
-const NAME = process.env.SCRIPT || 'investor-film', lang = 'en';
+const NAME = process.env.SCRIPT || 'investor-film', lang = process.env.LANG_FILM || 'en';
 const FPS = Number(process.env.FPS || 25), JOBS = Number(process.env.JOBS || 4), SUBS = process.env.SUBS ?? 'es';
 const args = process.argv.slice(2), buildDir = path.join(__dirname, 'build');
 
@@ -51,7 +51,7 @@ if (args[0] === '--chunk') {
   const { browser, page, srv } = await openPage();
   const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
     '-vf', 'scale=in_range=full:out_range=tv,format=yuv420p', '-color_range', 'tv', '-c:v', 'libx264', '-profile:v', 'high', '-level', '4.1',
-    '-preset', 'medium', '-crf', '18', '-pix_fmt', 'yuv420p', '-r', String(FPS), path.join(buildDir, `chunk-${NAME}-${w}.mp4`)], { stdio: ['pipe', 'inherit', 'inherit'] });
+    '-preset', 'medium', '-crf', '18', '-pix_fmt', 'yuv420p', '-r', String(FPS), path.join(buildDir, `chunk-${NAME}-${lang}-${w}.mp4`)], { stdio: ['pipe', 'inherit', 'inherit'] });
   const t0 = Date.now();
   for (let f = from; f < to; f++) {
     await page.evaluate((t) => window.seek(t), f / FPS);
@@ -79,7 +79,7 @@ function wrap(text) {
   if (!best) throw new Error(`subtítulo no cabe en 2×42: "${text}"`);
   return best.s;
 }
-const vtt = (sl) => path.join(buildDir, `senda-${NAME}.${sl}.vtt`);
+const vtt = (sl) => path.join(buildDir, lang === 'en' ? `senda-${NAME}.${sl}.vtt` : `senda-${NAME}-${lang}.${sl}.vtt`);
 for (const sl of ['es', 'en']) {
   const out = ['WEBVTT', '']; let n = 1;
   timings.scenes.forEach((s, i) => s.lines.forEach((ln, k) => out.push(String(n++), `${ts(ln.start)} --> ${ts(ln.end)}`, wrap(script.scenes[i][sl][k]), '')));
@@ -87,7 +87,7 @@ for (const sl of ['es', 'en']) {
 }
 
 const duration = timings.totalDuration, totalFrames = Math.ceil(duration * FPS);
-const music = path.join(buildDir, `music-${NAME}.wav`);
+const music = path.join(buildDir, lang === 'en' ? `music-${NAME}.wav` : `music-${NAME}-${lang}.wav`);
 if (!fs.existsSync(music)) {
   const cuts = timings.scenes.map((s) => s.start.toFixed(2)).join(','), drop = timings.scenes.find((s) => s.visual.kind === 'title')?.start ?? 0;
   execFileSync(process.env.PYTHON || 'python3', [path.join(__dirname, 'music-techno.py'), music, String(duration), String(drop), cuts], { stdio: 'inherit' });
@@ -99,14 +99,14 @@ await Promise.all(Array.from({ length: JOBS }, (_, w) => new Promise((resolve, r
   ch.on('close', (c) => (c === 0 ? resolve() : reject(new Error(`proceso ${w} salió con ${c}`))));
 })));
 console.log(`  fotogramas listos en ${((Date.now() - t0) / 60000).toFixed(1)} min`);
-const list = path.join(buildDir, `chunks-${NAME}.txt`);
-fs.writeFileSync(list, Array.from({ length: JOBS }, (_, w) => `file 'chunk-${NAME}-${w}.mp4'`).join('\n') + '\n');
-const out = path.join(buildDir, `senda-${NAME}-en.mp4`);
+const list = path.join(buildDir, `chunks-${NAME}-${lang}.txt`);
+fs.writeFileSync(list, Array.from({ length: JOBS }, (_, w) => `file 'chunk-${NAME}-${lang}-${w}.mp4'`).join('\n') + '\n');
+const out = path.join(buildDir, `senda-${NAME}-${lang}.mp4`);
 execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list,
   '-i', path.join(buildDir, `voice-${NAME}-${lang}.wav`), '-i', music, '-i', vtt('es'), '-i', vtt('en'),
   '-filter_complex', '[1:a]aresample=48000,pan=stereo|c0=c0|c1=c0,asplit=2[v][sc];[2:a]aresample=48000,volume=0.6[m];[m][sc]sidechaincompress=threshold=0.03:ratio=6:attack=20:release=450[md];[v][md]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=11[a]',
   '-map', '0:v', '-map', '[a]', '-map', '3:0', '-map', '4:0', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-ac', '2', '-c:s', 'mov_text',
-  '-metadata:s:a:0', 'language=eng', '-metadata:s:s:0', 'language=spa', '-metadata:s:s:1', 'language=eng', '-movflags', '+faststart', '-t', String(duration), out], { stdio: 'inherit' });
-for (let w = 0; w < JOBS; w++) fs.rmSync(path.join(buildDir, `chunk-${NAME}-${w}.mp4`), { force: true });
+  '-metadata:s:a:0', `language=${lang === 'es' ? 'spa' : 'eng'}`, '-metadata:s:s:0', 'language=spa', '-metadata:s:s:1', 'language=eng', '-movflags', '+faststart', '-t', String(duration), out], { stdio: 'inherit' });
+for (let w = 0; w < JOBS; w++) fs.rmSync(path.join(buildDir, `chunk-${NAME}-${lang}-${w}.mp4`), { force: true });
 fs.rmSync(list, { force: true });
 console.log(`=> ${out} (${(fs.statSync(out).size / 1048576).toFixed(1)} MB)`);
