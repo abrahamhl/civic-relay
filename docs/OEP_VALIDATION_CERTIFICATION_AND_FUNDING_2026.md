@@ -1,9 +1,9 @@
 # OEP — Offline Emergency Protocol
 ## Verified funding, independent validation and certification routes
-**Research date:** 21 October 2026 (historical baseline). **Latest audit:** 15 November 2026; see dated delta at end. **Geography:** EU / Netherlands. **Readiness:** simulated lab + source-only experimental Android (check current CI separately). This is **not** an emergency service or a recognised standard.
+**Research date:** 21 October 2026 (historical baseline). **Latest audit:** 19 November 2026; see dated delta at end. **Geography:** EU / Netherlands. **Readiness:** simulated lab + source-only experimental Android (check current CI separately). This is **not** an emergency service or a recognised standard.
 
 ## Decision in 90 seconds
-**Current decision (15 November):** Horizon Cluster 3 2026 deadlines have passed; do not pursue late applications. Prioritise Innowwide eligibility screening (deadline 1 December 2026), Eurostars-3 Call 12 consortium preparation (opens 17 December 2026), and 2027 Horizon coordinator matching. **Best realistic later funding window:** build an SME-led cross-border consortium for Eurostars-3 call 12 (opens 17 December 2026; deadline 4 March 2027). **Independent evidence:** pursue standards-based interoperability testing via ETSI CTI / Plugtests **after** implementing a relevant interoperable interface. **Certification is NOT available automatically from an open-source repo, standard, CI run, or GitHub badge.**
+**Current decision (19 November):** Horizon Cluster 3 2026 deadlines have passed; do not pursue late applications. Prioritise Innowwide eligibility screening (deadline 1 December 2026), Eurostars-3 Call 12 consortium preparation (opens 17 December 2026), and 2027 Horizon coordinator matching. **Best realistic later funding window:** build an SME-led cross-border consortium for Eurostars-3 call 12 (opens 17 December 2026; deadline 4 March 2027). **Independent evidence:** pursue standards-based interoperability testing via ETSI CTI / Plugtests **after** implementing a relevant interoperable interface. **Certification is NOT available automatically from an open-source repo, standard, CI run, or GitHub badge.**
 
 ## Funding opportunity ledger
 | Priority | Programme/topic | Status as of 21 Oct | Dates | Consortium / eligibility reality | Fit, readiness and next action | Primary source |
@@ -1033,3 +1033,42 @@ The **Commission's SSRI-04 scope explicitly expects EUCCS compatibility, 3GPP Mi
 **Coordinator/contact diligence:** No coordinator accepting OEP was confirmed in this recheck. Institutional RVO contact channel **teamiris@rvo.nl** and named advisers Stijn Greben / Martijn Lammers are independently corroborated by RVO's published Team IRIS contact list: https://www.rvo.nl/subsidies-financiering/edf . This is evidence of a contact channel, **not** of a Horizon consortium invitation. Prepare only; do not send. Suggested request: refer OEP to an identifiable 2027 Cluster 3 coordinator and an accredited wireless/NG112 interoperability lab; clarify Eurostars Dutch applicant eligibility and cofinance. RVO's EDF page establishes contact identity, not suitability of EDF funding for OEP.
 
 **Other pathways:** EIC, UCPM, NCP/EEN, Oost NL, ETSI NG112/MCX, ENISA EUCC, ISO 22320, ISO/IEC 27001 and accredited labs remain subject to the prior matrix; no new programme-specific open call or binding laboratory quote was established in this pass. Their classifications must not be upgraded by inference. No independent two-device Android RF trial, operational safety validation, grant award, EUCC certification or ISO certification was evidenced. CI is not physical interoperability testing. No third-party contact or application submitted.
+
+
+---
+
+## Independent audit — 19 November 2026 (primary-source check)
+
+**Integrity:** historical ledger rows labelled OPEN as of 21 October are archival, NOT current. This section supersedes them for present decisions. No verified OEP legal applicant, signed consortium, independent Android-to-Android field test, certification, grant award, or confirmed 2027 coordinator seat. UNKNOWN means unverified, not zero.
+
+| ID / programme | Current classification | Official dates | Legal applicant / consortium | Grant and own contribution | TRL / validation / fee | Primary evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| Innowwide Call 5 | ACTIVE CONDITIONAL | 1 Oct–**1 Dec 2026 14:00 CET** | Innovative SME incorporated **on or before 1 Dec 2024**, plus independent local counterpart in eligible market outside Europe; OEP applicant and counterpart UNKNOWN | **€60,000** fixed grant; minimum eligible budget **€86,000**; minimum uncovered **€26,000** | TRL minimum 4 per prior programme screening; independent OEP proof UNKNOWN; application fee UNKNOWN | https://www.eurekanetwork.org/programmes-and-calls/innowwide/5th-innowwide-call-for-market-feasibility-projects-autumn-2026/ ; https://www.eurekanetwork.org/programme-resources/innowwide-frequently-asked-questions/ |
+| Eurostars-3 Call 12 | FUTURE | **17 Dec 2026–4 Mar 2027 14:00 CET** | SME-led international R&D consortium, >=2 independent participants from >=2 participating countries; OEP consortium UNKNOWN | NL SMEs **50%** eligible R&D, remainder own/other; national approval required after international approval; OEP amount UNKNOWN | TRL threshold UNKNOWN; measured market-oriented R&D required; fee UNKNOWN | https://www.rvo.nl/subsidies-financiering/eurostars/internationale-aanvraagprocedure ; https://www.rvo.nl/subsidies-regelingen/eurostars |
+| HORIZON-CL3-2027-01-DRS-03 | FUTURE | **5 May–4 Nov 2027** | Horizon IA eligible legal entities and relevant crisis-response partners; exact topic consortium exceptions UNKNOWN | **€9m call / ~€3m per project indicative**, applicant cofunding and OEP award UNKNOWN | Exact topic TRL/validation/fee UNKNOWN; physical evidence still needed | https://ec.europa.eu/info/funding-tenders/opportunities/docs/2021-2027/horizon/wp-call/2026-2027/wp-6-civil-security-for-society_horizon-2026-2027_en.pdf |
+| HORIZON-CL3-2027-01-DRS-04 | FUTURE | **5 May–4 Nov 2027** | Horizon IA, cross-border disaster end-users; actual consortium UNKNOWN | **€8m call / ~€4m per project indicative**; OEP cofunding UNKNOWN | Exact TRL/validation/fee UNKNOWN | same Commission work programme |
+| HORIZON-CL3-2027-01-SSRI-01 | FUTURE | **5 May–4 Nov 2027** | Advanced SME innovation; legal SME applicant and detailed restrictions UNKNOWN | **€4.5m call / ~€1.5m per project indicative**; cofunding UNKNOWN | Exact TRL/validation/fee UNKNOWN | same Commission work programme |
+| HORIZON-CL3-2026-01-SSRI-04 / DRS-03 / SSRI-01 | CLOSED | **5 Nov 2026** | Historical calls; no late submission | No OEP award verified | Not applicable | https://rea.ec.europa.eu/funding-and-grants/horizon-europe-cluster-3-civil-security-society/strengthened-security-research-and-innovation-ssri_en |
+| ETSI NG112 Plugtests 2026 / CTI | NOT A GRANT | **26–29 May 2026**, completed; next applicable date UNKNOWN | Vendor needs relevant NG112 implementation, RoE/NDA; OEP participation UNKNOWN | No grant; cost UNKNOWN | Interoperability exercise, not rescue approval; OEP results UNKNOWN | https://www.etsi.org/events/2631-ng112-plugtests-2026/ ; https://portal.etsi.org/Services/Centre-for-Testing-Interoperability/Downloads/TestReports |
+| ENISA EUCC / ISO/IEC 27001 | CERTIFICATION PATH | Assessment dates UNKNOWN | EUCC ICT target-of-evaluation / accredited CAB; 27001 organisational ISMS and accredited certification body | Not grants; independent assessment cost UNKNOWN | No OEP certification; EUCC is cybersecurity, NOT rescue reliability | https://certification.enisa.europa.eu/browse-topic/eucc_en ; https://www.iso.org/standard/27001 |
+| ISO 22320:2018 | NOT A GRANT | Standard published 2018; OEP review UNKNOWN | Incident-management guidance, no applicant consortium | No grant; standard/assessment cost UNKNOWN | Not product approval | https://www.iso.org/standard/67851.html |
+
+### New verified coordinator prospect — NOT a 2027 invitation
+**STIFTELSEN NORSAR (Norway)** is the **actual coordinator** of Horizon Cluster 3 **TOGETHER**, grant **101226137**, running **1 Nov 2025–31 Oct 2028**; the project studies disaster coordination, interoperable information sharing and pilots. Its official CORDIS entry provides an **organisation contact link**. This is a verified *past/current Horizon coordinator*, NOT evidence of a DRS-03/SSRI-01 2027 proposal or an open OEP partner position. Consortium participation, joining conditions, response and cost: **UNKNOWN**. https://cordis.europa.eu/project/id/101226137
+
+**Related technical/end-user prospect:** EENA is an actual TOGETHER consortium participant, not an OEP partner. Its possible relevance is independent NG112/112 workflows; contact only after human approval and scope validation. Source: same CORDIS record.
+
+### Verified Dutch NCP contact pack — human review only
+- **Stijn Greben**, Horizon Cluster 3 digital/5G/6G NCP; **stijn.greben@rvo.nl**, https://www.rvo.nl/adviseurs/stijn-greben (page last checked by RVO in 2023; reconfirm current assignment before outreach).
+- **Martijn Lammers**, Horizon Cluster 3 NCP; **martijn.lammers@rvo.nl**, https://www.rvo.nl/adviseurs/martijn-lammers (RVO page checked **16 Jan 2026**).
+- **Team IRIS** **teamiris@rvo.nl**, +31 88 042 42 10. Ask for current coordinator matching and Eurostars Dutch SME legal/financial screening.
+
+**Unsent contact brief:** “We are developing OEP, an experimental offline emergency message coordination protocol, currently without independently verified operational field performance. Could you advise on legal SME eligibility and suitable Horizon Cluster 3 DRS-03/SSRI-01 2027 coordinators, Eurostars Call 12 consortium matching, and independent NG112/Android interoperability testing? We can supply source commit, threat model, and a reproducible synthetic two-device test plan. We do not claim operational certification or an established emergency-service integration.”
+
+### Decision and gates
+1. **Before 1 Dec:** confirm SME incorporation date, exact legal registration, independent eligible-country market counterpart, signed scope, credible market feasibility and TRL 4 evidence. If any fail, do not submit Innowwide.
+2. **Before 17 Dec:** obtain NCP review and actual Eurostars consortium prospect, cofunding capacity and physical Android evidence.
+3. **Horizon 2027:** NORSAR/TOGETHER is a real *coordinator lead*, not a committed partner; request a fit check only after human approval.
+4. **Safety:** no CI badge, simulator output, ENISA EUCC assessment or ISO 27001 certificate can be presented as physical rescue-service approval.
+
+**No third-party contact, funding application, certification claim, PR merge, or master modification performed.**
