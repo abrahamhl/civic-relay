@@ -1,0 +1,313 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:06.296
+Since January 2026, the connected
+V16 beacon is mandatory in Spain.
+
+2
+00:00:06.646 --> 00:00:10.998
+Switch it on and it sends your
+position to the DGT 3.0 platform.
+
+3
+00:00:11.348 --> 00:00:14.313
+Traffic forwards it to
+connected navigation apps.
+
+4
+00:00:14.663 --> 00:00:17.714
+It is a big step. But a light
+does not know what happened.
+
+5
+00:00:18.064 --> 00:00:21.499
+It doesn't know if it was a crash,
+your lane, or which way you face.
+
+6
+00:00:21.849 --> 00:00:24.494
+And if nobody can switch
+it on, it warns no one.
+
+7
+00:00:26.094 --> 00:00:27.438
+This is SENDA Drive.
+
+8
+00:00:27.788 --> 00:00:31.671
+The engine that turns the beacon into
+information for whoever comes behind.
+
+9
+00:00:32.021 --> 00:00:35.242
+It lives in your phone, understands
+the road and invents nothing.
+
+10
+00:00:36.842 --> 00:00:39.445
+You authorise it once and pair your car.
+
+11
+00:00:39.795 --> 00:00:43.528
+Get in, and the car's Bluetooth
+starts it; get out, and it closes.
+
+12
+00:00:43.878 --> 00:00:47.505
+If there is only a weak hint, it
+waits for speed to confirm it.
+
+13
+00:00:47.855 --> 00:00:49.967
+Without your permission, it never starts.
+
+14
+00:00:50.317 --> 00:00:53.581
+Android, with or without Google,
+and iPhone share the same logic,
+
+15
+00:00:53.931 --> 00:00:57.792
+checked against 10 shared
+scenarios and 55 steps.
+
+16
+00:00:59.392 --> 00:01:03.189
+Fog, 120 km/h, 1.2 seconds between cars.
+
+17
+00:01:03.539 --> 00:01:06.569
+Each driver reacts to
+the brake lights ahead.
+
+18
+00:01:06.919 --> 00:01:10.268
+The delays add up: in the
+model, five cars crash.
+
+19
+00:01:10.618 --> 00:01:14.714
+With SENDA, the first phone detects
+the braking and warns everyone at once.
+
+20
+00:01:15.064 --> 00:01:19.395
+In the model only the tailgater
+crashes. Only distance fixes that.
+
+21
+00:01:19.745 --> 00:01:23.222
+With no coverage, the SOS
+rides with passing cars:
+
+22
+00:01:23.572 --> 00:01:28.031
+out in about seven minutes with
+one car in ten. It is a simulation.
+
+23
+00:01:29.631 --> 00:01:34.132
+A real case, told by one of the
+drivers. Anonymous and unverified.
+
+24
+00:01:34.482 --> 00:01:38.983
+A Belgian motorway. A truck's
+cab strikes the side of a car.
+
+25
+00:01:39.333 --> 00:01:43.067
+It drags it sideways, lets go,
+and the car spins half a turn.
+
+26
+00:01:43.417 --> 00:01:46.787
+It stops in the fast
+lane, facing the traffic.
+
+27
+00:01:47.137 --> 00:01:51.404
+The truck, on the shoulder. The
+real danger comes now: those behind.
+
+28
+00:01:53.004 --> 00:01:56.503
+This case exposed a bug in our own code.
+
+29
+00:01:56.853 --> 00:02:01.034
+Because the car faced backwards, the
+warning was dropped: 'other direction'.
+
+30
+00:02:01.384 --> 00:02:05.565
+Everyone arriving behind would
+have ignored it. It is fixed.
+
+31
+00:02:05.915 --> 00:02:09.990
+Now, with no reliable heading, it warns
+and flags the road side as uncertain.
+
+32
+00:02:10.340 --> 00:02:13.348
+If the phone sends the heading
+it had before the impact,
+
+33
+00:02:13.698 --> 00:02:16.941
+the opposite carriageway no
+longer gets a false alarm.
+
+34
+00:02:18.541 --> 00:02:21.741
+In the app, with no sign-up:
+what to do now, step by step.
+
+35
+00:02:22.091 --> 00:02:26.421
+A button to call 112, always yours:
+SENDA never calls on its own.
+
+36
+00:02:26.771 --> 00:02:30.761
+A script for the call, with lane and
+direction only if you declare them.
+
+37
+00:02:31.111 --> 00:02:35.015
+And warnings fused from several
+sources, each with its provenance.
+
+38
+00:02:36.615 --> 00:02:40.369
+The phone feels the impact too: the
+accelerometer measures the jolt,
+
+39
+00:02:40.719 --> 00:02:44.815
+and the gyroscope, how far the car turns
+afterwards. That spin was the clue.
+
+40
+00:02:45.165 --> 00:02:48.728
+Each signal adds or removes
+evidence; none decides alone.
+
+41
+00:02:49.078 --> 00:02:53.025
+Today's weights are examples, and the
+spin weight stays empty until calibrated.
+
+42
+00:02:53.375 --> 00:02:57.300
+The calibration harness is ready:
+it trains and tests separately.
+
+43
+00:02:58.900 --> 00:03:03.167
+Many cars carry cameras. Their owner
+can run the clips through SENDA.
+
+44
+00:03:03.517 --> 00:03:07.783
+It spots a car sideways, one stopped
+ahead, or a person on the road.
+
+45
+00:03:08.133 --> 00:03:11.611
+And it only shares the event: what,
+where and when. Never the image.
+
+46
+00:03:11.961 --> 00:03:15.246
+If an event carries an image, a
+plate or a face, it is rejected.
+
+47
+00:03:15.596 --> 00:03:19.841
+What a Tesla's computer sees is not
+open to third parties. We don't pretend.
+
+48
+00:03:20.191 --> 00:03:24.309
+Until calibrated, cameras do not raise
+confidence: they are only logged.
+
+49
+00:03:25.909 --> 00:03:29.855
+For the traffic centre, a map of
+the incident with its provenance.
+
+50
+00:03:30.205 --> 00:03:33.363
+Sources that copy each
+other count only once.
+
+51
+00:03:33.713 --> 00:03:37.681
+And a lab to replay every
+case, marked as an exercise.
+
+52
+00:03:39.281 --> 00:03:43.057
+Android in two versions: one with
+no Google services and no Internet,
+
+53
+00:03:43.407 --> 00:03:46.159
+and one with Google and
+an Android Auto screen.
+
+54
+00:03:46.509 --> 00:03:50.967
+Android Auto only allows certain
+categories: ours is still provisional.
+
+55
+00:03:51.317 --> 00:03:55.051
+And a new iPhone app, built
+and tested on every change.
+
+56
+00:03:56.651 --> 00:04:00.896
+Every change is checked: 881 core tests,
+
+57
+00:04:01.246 --> 00:04:05.406
+82 checks of the road
+app in a real browser,
+
+58
+00:04:05.756 --> 00:04:10.705
+and 55 automatic-start steps,
+identical on every platform.
+
+59
+00:04:11.055 --> 00:04:14.298
+What is missing, we say:
+there are no field trials yet,
+
+60
+00:04:14.648 --> 00:04:17.891
+automatic start has not
+been tested on real phones,
+
+61
+00:04:18.241 --> 00:04:21.462
+and the detectors are not
+calibrated with real data.
+
+62
+00:04:21.812 --> 00:04:24.756
+Next step: a pilot with real drivers.
+
+63
+00:04:26.356 --> 00:04:29.492
+SENDA Drive. So that whoever
+comes behind knows in time.
+
+64
+00:04:29.842 --> 00:04:32.765
+Open source, at the address on screen.
