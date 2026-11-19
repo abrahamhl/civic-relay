@@ -1,0 +1,652 @@
+TAP version 13
+# Subtest: a hung adapter description cannot block dispatch indefinitely
+ok 1 - a hung adapter description cannot block dispatch indefinitely
+  ---
+  duration_ms: 19.2195
+  type: 'test'
+  ...
+# Subtest: a hung send times out without fabricating ACK and releases its lock for retry
+ok 2 - a hung send times out without fabricating ACK and releases its lock for retry
+  ---
+  duration_ms: 46.0963
+  type: 'test'
+  ...
+# Subtest: purge cancels a hung send without letting the old operation unlock a reused ID
+ok 3 - purge cancels a hung send without letting the old operation unlock a reused ID
+  ---
+  duration_ms: 2.835
+  type: 'test'
+  ...
+# Subtest: revocation during a hung description settles promptly and never invokes send
+ok 4 - revocation during a hung description settles promptly and never invokes send
+  ---
+  duration_ms: 0.9886
+  type: 'test'
+  ...
+# Subtest: STOP clears on-screen log and local journal
+ok 5 - STOP clears on-screen log and local journal
+  ---
+  duration_ms: 2.0764
+  type: 'test'
+  ...
+# Subtest: stale session UI callbacks cannot restore cleared logs
+ok 6 - stale session UI callbacks cannot restore cleared logs
+  ---
+  duration_ms: 0.3593
+  type: 'test'
+  ...
+# Subtest: sensor APIs require explicit consent and never invoke a fallback on unsupported browsers
+ok 7 - sensor APIs require explicit consent and never invoke a fallback on unsupported browsers
+  ---
+  duration_ms: 4.7324
+  type: 'test'
+  ...
+# Subtest: camera rejection cannot report DEVICE_CONNECTED or LIVE_MEASUREMENT
+ok 8 - camera rejection cannot report DEVICE_CONNECTED or LIVE_MEASUREMENT
+  ---
+  duration_ms: 0.9125
+  type: 'test'
+  ...
+# Subtest: STOP invalidates pending media grants and stops the late tracks
+ok 9 - STOP invalidates pending media grants and stops the late tracks
+  ---
+  duration_ms: 0.6586
+  type: 'test'
+  ...
+# Subtest: late geolocation success after STOP does not expose coordinates
+ok 10 - late geolocation success after STOP does not expose coordinates
+  ---
+  duration_ms: 0.6854
+  type: 'test'
+  ...
+# Subtest: connectivity metadata does not invent Wi-Fi, RTT, downlink or RSSI
+ok 11 - connectivity metadata does not invent Wi-Fi, RTT, downlink or RSSI
+  ---
+  duration_ms: 0.5186
+  type: 'test'
+  ...
+# Subtest: BLE chooser is service-filtered; permission and stream presence are distinct from measurements
+ok 12 - BLE chooser is service-filtered; permission and stream presence are distinct from measurements
+  ---
+  duration_ms: 1.7653
+  type: 'test'
+  ...
+# Subtest: RF fixtures have provenance and cannot assert live capture or calibrated power
+ok 13 - RF fixtures have provenance and cannot assert live capture or calibrated power
+  ---
+  duration_ms: 1.6668
+  type: 'test'
+  ...
+# Subtest: standard BLE battery read carries measured units and disconnects on STOP
+ok 14 - standard BLE battery read carries measured units and disconnects on STOP
+  ---
+  duration_ms: 0.814
+  type: 'test'
+  ...
+# Subtest: dossier and security docs contain zero fabricated class names, wrong versions or closed-fund claims
+ok 15 - dossier and security docs contain zero fabricated class names, wrong versions or closed-fund claims
+  ---
+  duration_ms: 8.7329
+  type: 'test'
+  ...
+# Subtest: DEPENDENCY_AND_LICENSE_AUDIT.md matches actual investor-next/package.json and Android build.gradle.kts
+ok 16 - DEPENDENCY_AND_LICENSE_AUDIT.md matches actual investor-next/package.json and Android build.gradle.kts
+  ---
+  duration_ms: 1.1001
+  type: 'test'
+  ...
+# Subtest: all Android Java classes including ECDSA LabReceiptSigner and LabPersistentQueue exist on disk
+ok 17 - all Android Java classes including ECDSA LabReceiptSigner and LabPersistentQueue exist on disk
+  ---
+  duration_ms: 2.3244
+  type: 'test'
+  ...
+# Subtest: unified OEP protocol entrypoint exports routing, store-forward, and policy engines
+ok 18 - unified OEP protocol entrypoint exports routing, store-forward, and policy engines
+  ---
+  duration_ms: 1.9476
+  type: 'test'
+  ...
+# Subtest: all capability states map consistently
+ok 19 - all capability states map consistently
+  ---
+  duration_ms: 2.0225
+  type: 'test'
+  ...
+# Subtest: no implicit human harm or location leakage
+ok 20 - no implicit human harm or location leakage
+  ---
+  duration_ms: 3.1293
+  type: 'test'
+  ...
+# Subtest: energy policy does not claim OS-level changes or measured power
+ok 21 - energy policy does not claim OS-level changes or measured power
+  ---
+  duration_ms: 0.5211
+  type: 'test'
+  ...
+# Subtest: unverified or test alerts never activate institutional zone
+ok 22 - unverified or test alerts never activate institutional zone
+  ---
+  duration_ms: 3.0642
+  type: 'test'
+  ...
+# Subtest: low battery increases discovery interval while reducing scan window
+ok 23 - low battery increases discovery interval while reducing scan window
+  ---
+  duration_ms: 0.5726
+  type: 'test'
+  ...
+# Subtest: CAP gate refuses malformed geometry, clocks and unauthenticated cancellations
+ok 24 - CAP gate refuses malformed geometry, clocks and unauthenticated cancellations
+  ---
+  duration_ms: 1.6093
+  type: 'test'
+  ...
+# Subtest: 20..100 nodes and repeatable seed
+ok 25 - 20..100 nodes and repeatable seed
+  ---
+  duration_ms: 14.0872
+  type: 'test'
+  ...
+# Subtest: silence never causes an inferred SOS
+ok 26 - silence never causes an inferred SOS
+  ---
+  duration_ms: 0.8286
+  type: 'test'
+  ...
+# Subtest: no consent means no user messages and no relays
+ok 27 - no consent means no user messages and no relays
+  ---
+  duration_ms: 0.4295
+  type: 'test'
+  ...
+# Subtest: offline without gateway queues every explicit message
+ok 28 - offline without gateway queues every explicit message
+  ---
+  duration_ms: 34.227
+  type: 'test'
+  ...
+# Subtest: critical battery never relays an intermediate device
+ok 29 - critical battery never relays an intermediate device
+  ---
+  duration_ms: 1.4457
+  type: 'test'
+  ...
+# Subtest: simulation never claims institutional authenticity or physical delivery
+ok 30 - simulation never claims institutional authenticity or physical delivery
+  ---
+  duration_ms: 1.0699
+  type: 'test'
+  ...
+# Subtest: no radio plus total outage cannot invent a local route
+ok 31 - no radio plus total outage cannot invent a local route
+  ---
+  duration_ms: 0.6137
+  type: 'test'
+  ...
+# Subtest: offline to online transition and gateway recovery restore synthetic acknowledgments deterministically
+ok 32 - offline to online transition and gateway recovery restore synthetic acknowledgments deterministically
+  ---
+  duration_ms: 14.3967
+  type: 'test'
+  ...
+# Subtest: revoked relay permissions prevent multi-hop local gateway forwarding during cellular outage
+ok 33 - revoked relay permissions prevent multi-hop local gateway forwarding during cellular outage
+  ---
+  duration_ms: 0.9219
+  type: 'test'
+  ...
+# Subtest: blank field_trials_template.csv reports PHYSICAL_TEST_PENDING without fabricating trials
+ok 34 - blank field_trials_template.csv reports PHYSICAL_TEST_PENDING without fabricating trials
+  ---
+  duration_ms: 3.8179
+  type: 'test'
+  ...
+# Subtest: validator counts late ACKs after TTL as lateOrInvalidAcks, never as valid successes, and computes p50/p95
+ok 35 - validator counts late ACKs after TTL as lateOrInvalidAcks, never as valid successes, and computes p50/p95
+  ---
+  duration_ms: 3.2394
+  type: 'test'
+  ...
+# Subtest: validator rejects placeholder/synthetic rows or unconsented rows
+ok 36 - validator rejects placeholder/synthetic rows or unconsented rows
+  ---
+  duration_ms: 1.2095
+  type: 'test'
+  ...
+# Subtest: real WebCrypto ECDSA P-256 key generation, signing, and verification succeed without simulation
+ok 37 - real WebCrypto ECDSA P-256 key generation, signing, and verification succeed without simulation
+  ---
+  duration_ms: 25.3942
+  type: 'test'
+  ...
+# Subtest: real WebCrypto verifier rejects tampered binary CRC-16 frames and forged ECDSA signatures
+ok 38 - real WebCrypto verifier rejects tampered binary CRC-16 frames and forged ECDSA signatures
+  ---
+  duration_ms: 3.0921
+  type: 'test'
+  ...
+# Subtest: illustrative circular shells preserve geometry bounds without claiming satellite observations
+ok 39 - illustrative circular shells preserve geometry bounds without claiming satellite observations
+  ---
+  duration_ms: 5.3844
+  type: 'test'
+  ...
+# Subtest: LiveHardwareAndDealRoomConsole exposes 8 real funding tracks and ChatGPT prompts in EN, ES, and NL
+ok 40 - LiveHardwareAndDealRoomConsole exposes 8 real funding tracks and ChatGPT prompts in EN, ES, and NL
+  ---
+  duration_ms: 1.4343
+  type: 'test'
+  ...
+# Subtest: browser privacy guard: denied microphone never generates fictional acoustic FFT
+ok 41 - browser privacy guard: denied microphone never generates fictional acoustic FFT
+  ---
+  duration_ms: 0.7464
+  type: 'test'
+  ...
+# Subtest: browser privacy guard: stop and unmount release microphone and FFT resources
+ok 42 - browser privacy guard: stop and unmount release microphone and FFT resources
+  ---
+  duration_ms: 0.9755
+  type: 'test'
+  ...
+# Subtest: browser privacy guard: clear invalidates pending signatures and delayed UI updates
+ok 43 - browser privacy guard: clear invalidates pending signatures and delayed UI updates
+  ---
+  duration_ms: 1.04
+  type: 'test'
+  ...
+# Subtest: without RF hardware there are no inferred emitters, persons, CSI bins or confidence scores
+ok 44 - without RF hardware there are no inferred emitters, persons, CSI bins or confidence scores
+  ---
+  duration_ms: 3.0689
+  type: 'test'
+  ...
+# Subtest: RF demonstration is opt-in, labelled synthetic and never identifies people
+ok 45 - RF demonstration is opt-in, labelled synthetic and never identifies people
+  ---
+  duration_ms: 3.8291
+  type: 'test'
+  ...
+# Subtest: orbital illustrations explicitly lack observational elements and do not move with the observer
+ok 46 - orbital illustrations explicitly lack observational elements and do not move with the observer
+  ---
+  duration_ms: 3.5204
+  type: 'test'
+  ...
+# Subtest: public OEP name is consistent across investor languages, metadata and Android lab
+ok 47 - public OEP name is consistent across investor languages, metadata and Android lab
+  ---
+  duration_ms: 5.0847
+  type: 'test'
+  ...
+# Subtest: the evidence board explicitly distinguishes model-only checks from physical deployment
+ok 48 - the evidence board explicitly distinguishes model-only checks from physical deployment
+  ---
+  duration_ms: 0.9544
+  type: 'test'
+  ...
+# Subtest: investor can export complete deterministic synthetic routes with evidence warning
+ok 49 - investor can export complete deterministic synthetic routes with evidence warning
+  ---
+  duration_ms: 0.6415
+  type: 'test'
+  ...
+# Subtest: evidence report executes 810 deterministic synthetic runs, with zero invariant violations
+ok 50 - evidence report executes 810 deterministic synthetic runs, with zero invariant violations
+  ---
+  duration_ms: 817.9679
+  type: 'test'
+  ...
+# Subtest: no invented physical, satellite, official-alert or rescue claims appear in machine report
+ok 51 - no invented physical, satellite, official-alert or rescue claims appear in machine report
+  ---
+  duration_ms: 301.8999
+  type: 'test'
+  ...
+# Subtest: zero consent and isolation cannot generate synthetic messages or ACKs
+ok 52 - zero consent and isolation cannot generate synthetic messages or ACKs
+  ---
+  duration_ms: 295.2742
+  type: 'test'
+  ...
+# Subtest: inbox validates UUID, TTL, status and bounded fields before cryptography
+ok 53 - inbox validates UUID, TTL, status and bounded fields before cryptography
+  ---
+  duration_ms: 11.9197
+  type: 'test'
+  ...
+# Subtest: clear during verification cannot restore content; expired late verification fails
+ok 54 - clear during verification cannot restore content; expired late verification fails
+  ---
+  duration_ms: 4.1837
+  type: 'test'
+  ...
+# Subtest: inbox reserves concurrent IDs and bounds metadata and verification work
+ok 55 - inbox reserves concurrent IDs and bounds metadata and verification work
+  ---
+  duration_ms: 2.395
+  type: 'test'
+  ...
+# Subtest: inbox verifies real ECDSA and never converts self-signed data into trusted identity
+ok 56 - inbox verifies real ECDSA and never converts self-signed data into trusted identity
+  ---
+  duration_ms: 9.5453
+  type: 'test'
+  ...
+# Subtest: signed fields, frame metadata and key fingerprint cannot be silently altered
+ok 57 - signed fields, frame metadata and key fingerprint cannot be silently altered
+  ---
+  duration_ms: 23.4543
+  type: 'test'
+  ...
+# Subtest: invalid ECDSA signature cannot enter the accepted packet view
+ok 58 - invalid ECDSA signature cannot enter the accepted packet view
+  ---
+  duration_ms: 4.4556
+  type: 'test'
+  ...
+# Subtest: CRC mismatch cannot enter the accepted packet view
+ok 59 - CRC mismatch cannot enter the accepted packet view
+  ---
+  duration_ms: 0.3379
+  type: 'test'
+  ...
+# Subtest: malformed or missing verification fails closed
+ok 60 - malformed or missing verification fails closed
+  ---
+  duration_ms: 0.334
+  type: 'test'
+  ...
+# Subtest: valid self-signed packet is displayed as untrusted, not authorized
+ok 61 - valid self-signed packet is displayed as untrusted, not authorized
+  ---
+  duration_ms: 0.4017
+  type: 'test'
+  ...
+# Subtest: BroadcastChannel UI uses assessed packets and renders verification failures
+ok 62 - BroadcastChannel UI uses assessed packets and renders verification failures
+  ---
+  duration_ms: 2.2406
+  type: 'test'
+  ...
+# Subtest: missing compatible route waits the configured full delay
+ok 63 - missing compatible route waits the configured full delay
+  ---
+  duration_ms: 4.3722
+  type: 'test'
+  ...
+# Subtest: route disappears after send failure and does not retry early
+ok 64 - route disappears after send failure and does not retry early
+  ---
+  duration_ms: 3.3004
+  type: 'test'
+  ...
+# Subtest: scenario conservation invariants survive heterogeneous seeded parameter sweeps
+ok 65 - scenario conservation invariants survive heterogeneous seeded parameter sweeps
+  ---
+  duration_ms: 202.1198
+  type: 'test'
+  ...
+# Subtest: no radio, no cellular, no gateway means every explicit message stays queued
+ok 66 - no radio, no cellular, no gateway means every explicit message stays queued
+  ---
+  duration_ms: 0.6678
+  type: 'test'
+  ...
+# Subtest: fake receiver metadata ledger stays bounded after many synthetic deliveries
+ok 67 - fake receiver metadata ledger stays bounded after many synthetic deliveries
+  ---
+  duration_ms: 9.4075
+  type: 'test'
+  ...
+# Subtest: consent, synthetic destinations, bounded retention and payload validated
+ok 68 - consent, synthetic destinations, bounded retention and payload validated
+  ---
+  duration_ms: 1.5086
+  type: 'test'
+  ...
+# Subtest: synthetic ACK is different from transport acceptance and field delivery
+ok 69 - synthetic ACK is different from transport acceptance and field delivery
+  ---
+  duration_ms: 0.7578
+  type: 'test'
+  ...
+# Subtest: fake receipt is explicitly synthetic and clears content after simulated acknowledgment
+ok 70 - fake receipt is explicitly synthetic and clears content after simulated acknowledgment
+  ---
+  duration_ms: 0.9768
+  type: 'test'
+  ...
+# Subtest: offline queue retries after adapter becomes available
+ok 71 - offline queue retries after adapter becomes available
+  ---
+  duration_ms: 0.8549
+  type: 'test'
+  ...
+# Subtest: transport failures do not fabricate receipts; bounded retries clear payload
+ok 72 - transport failures do not fabricate receipts; bounded retries clear payload
+  ---
+  duration_ms: 2.2707
+  type: 'test'
+  ...
+# Subtest: TTL expires even without connectivity; timed-out SOS does not imply rescue
+ok 73 - TTL expires even without connectivity; timed-out SOS does not imply rescue
+  ---
+  duration_ms: 0.6136
+  type: 'test'
+  ...
+# Subtest: same envelope deduplicates, conflicting ID throws, and audit purge erases trace
+ok 74 - same envelope deduplicates, conflicting ID throws, and audit purge erases trace
+  ---
+  duration_ms: 0.7853
+  type: 'test'
+  ...
+# Subtest: critical energy holds non-SOS status messages, but permits explicit SOS
+ok 75 - critical energy holds non-SOS status messages, but permits explicit SOS
+  ---
+  duration_ms: 1.1512
+  type: 'test'
+  ...
+# Subtest: unknown, no contact and institution spoofing are never accepted as exercise messages
+ok 76 - unknown, no contact and institution spoofing are never accepted as exercise messages
+  ---
+  duration_ms: 1.0844
+  type: 'test'
+  ...
+# Subtest: reject adapters without explicit simulation evidence and capacity
+ok 77 - reject adapters without explicit simulation evidence and capacity
+  ---
+  duration_ms: 0.5923
+  type: 'test'
+  ...
+# Subtest: bounded queue fails closed instead of silently dropping SOS messages
+ok 78 - bounded queue fails closed instead of silently dropping SOS messages
+  ---
+  duration_ms: 0.3543
+  type: 'test'
+  ...
+# Subtest: revocation during asynchronous send cannot be resurrected by a late receipt
+ok 79 - revocation during asynchronous send cannot be resurrected by a late receipt
+  ---
+  duration_ms: 0.6949
+  type: 'test'
+  ...
+# Subtest: forged or mismatched receiver receipt cannot become a successful ACK
+ok 80 - forged or mismatched receiver receipt cannot become a successful ACK
+  ---
+  duration_ms: 0.4948
+  type: 'test'
+  ...
+# Subtest: fallback next adapter after failure; no real measurement or delivery claims
+ok 81 - fallback next adapter after failure; no real measurement or delivery claims
+  ---
+  duration_ms: 0.7346
+  type: 'test'
+  ...
+# Subtest: terminal ACK and EXPIRED tombstones reject replay without retaining a duplicate payload
+ok 82 - terminal ACK and EXPIRED tombstones reject replay without retaining a duplicate payload
+  ---
+  duration_ms: 0.663
+  type: 'test'
+  ...
+# Subtest: late success must be ignored if local TTL elapses during adapter send
+ok 83 - late success must be ignored if local TTL elapses during adapter send
+  ---
+  duration_ms: 0.5927
+  type: 'test'
+  ...
+# Subtest: purged message cannot be revived by a late fake receipt
+ok 84 - purged message cannot be revived by a late fake receipt
+  ---
+  duration_ms: 0.6914
+  type: 'test'
+  ...
+# Subtest: synthetic adapter receipt ledger is metadata-only
+ok 85 - synthetic adapter receipt ledger is metadata-only
+  ---
+  duration_ms: 0.5047
+  type: 'test'
+  ...
+# Subtest: non-object payloads (null, array, primitive) are rejected
+ok 86 - non-object payloads (null, array, primitive) are rejected
+  ---
+  duration_ms: 0.4787
+  type: 'test'
+  ...
+# Subtest: concurrent dispatch calls while inFlight do not double-send or double-increment attempts
+ok 87 - concurrent dispatch calls while inFlight do not double-send or double-increment attempts
+  ---
+  duration_ms: 0.4286
+  type: 'test'
+  ...
+# Subtest: cross-adapter receipt spoofing and unaccepted receipts cannot forge ACK_SYNTHETIC
+ok 88 - cross-adapter receipt spoofing and unaccepted receipts cannot forge ACK_SYNTHETIC
+  ---
+  duration_ms: 0.5092
+  type: 'test'
+  ...
+# Subtest: REVOKED and EXHAUSTED tombstones reject message ID replay
+ok 89 - REVOKED and EXHAUSTED tombstones reject message ID replay
+  ---
+  duration_ms: 0.6815
+  type: 'test'
+  ...
+# Subtest: adapter describe() exception is isolated when a secondary healthy adapter is available
+ok 90 - adapter describe() exception is isolated when a secondary healthy adapter is available
+  ---
+  duration_ms: 0.7329
+  type: 'test'
+  ...
+# Subtest: the existing Three.js five-act story is preserved
+ok 91 - the existing Three.js five-act story is preserved
+  ---
+  duration_ms: 3.9576
+  type: 'test'
+  ...
+# Subtest: six decision stages are available in all three site languages
+ok 92 - six decision stages are available in all three site languages
+  ---
+  duration_ms: 1.3978
+  type: 'test'
+  ...
+# Subtest: every actual subsystem code link points to an existing file
+ok 93 - every actual subsystem code link points to an existing file
+  ---
+  duration_ms: 3.155
+  type: 'test'
+  ...
+# Subtest: interactive explainer is keyboard usable, responsive and evidence truthful
+ok 94 - interactive explainer is keyboard usable, responsive and evidence truthful
+  ---
+  duration_ms: 2.874
+  type: 'test'
+  ...
+# Subtest: mobile/investor navigation exposes the whole end-to-end journey in EN ES NL
+ok 95 - mobile/investor navigation exposes the whole end-to-end journey in EN ES NL
+  ---
+  duration_ms: 1.3146
+  type: 'test'
+  ...
+# Subtest: copy accurately says Android is compiled but physical interoperability remains unverified
+ok 96 - copy accurately says Android is compiled but physical interoperability remains unverified
+  ---
+  duration_ms: 0.9907
+  type: 'test'
+  ...
+# Subtest: eight-stage scannable architecture pipeline is present in EN, ES and NL with input, decision, software, output and limitation
+ok 97 - eight-stage scannable architecture pipeline is present in EN, ES and NL with input, decision, software, output and limitation
+  ---
+  duration_ms: 1.1398
+  type: 'test'
+  ...
+# Subtest: 24-byte OEP-NTN compact binary burst frame encodes magic header and deterministic CRC-16-CCITT
+ok 98 - 24-byte OEP-NTN compact binary burst frame encodes magic header and deterministic CRC-16-CCITT
+  ---
+  duration_ms: 3.556
+  type: 'test'
+  ...
+# Subtest: 3GPP NTN satellite link budget computes realistic slant range, FSPL, Doppler shift, and viable burst bitrate
+ok 99 - 3GPP NTN satellite link budget computes realistic slant range, FSPL, Doppler shift, and viable burst bitrate
+  ---
+  duration_ms: 0.992
+  type: 'test'
+  ...
+# Subtest: polygonal 9-sector zone telemetry preserves node accounting and restores connectivity via mesh + NTN bridge
+ok 100 - polygonal 9-sector zone telemetry preserves node accounting and restores connectivity via mesh + NTN bridge
+  ---
+  duration_ms: 1.6707
+  type: 'test'
+  ...
+# Subtest: through-wall Wi-Fi CSI & RF spectral radar models ITU-R P.2040 wall attenuation and 64-subcarrier OFDM tomography
+ok 101 - through-wall Wi-Fi CSI & RF spectral radar models ITU-R P.2040 wall attenuation and 64-subcarrier OFDM tomography
+  ---
+  duration_ms: 4.7128
+  type: 'test'
+  ...
+# Subtest: TelecomAndRfRadarSuite is integrated in investor-page.tsx across EN, ES, and NL
+ok 102 - TelecomAndRfRadarSuite is integrated in investor-page.tsx across EN, ES, and NL
+  ---
+  duration_ms: 1.5474
+  type: 'test'
+  ...
+# Subtest: STOP aborts a hung negotiation and prevents late offer work or sends
+ok 103 - STOP aborts a hung negotiation and prevents late offer work or sends
+  ---
+  duration_ms: 6.3929
+  type: 'test'
+  ...
+# Subtest: unsupported WebRTC never claims successful delivery or fabricates latency
+ok 104 - unsupported WebRTC never claims successful delivery or fabricates latency
+  ---
+  duration_ms: 0.2981
+  type: 'test'
+  ...
+# Subtest: failed negotiation never claims delivery
+ok 105 - failed negotiation never claims delivery
+  ---
+  duration_ms: 0.5121
+  type: 'test'
+  ...
+# Subtest: timeout never claims delivery
+ok 106 - timeout never claims delivery
+  ---
+  duration_ms: 7.5408
+  type: 'test'
+  ...
+# Subtest: only a matching packet received on a local data channel is marked loopback-delivered
+ok 107 - only a matching packet received on a local data channel is marked loopback-delivered
+  ---
+  duration_ms: 1.1487
+  type: 'test'
+  ...
+1..107
+# tests 107
+# suites 0
+# pass 107
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1723.9454

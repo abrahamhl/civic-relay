@@ -1,0 +1,5 @@
+PASS: 15 pure JVM dual-clock timeout invariants (LAB ONLY).
+PASS: 139 deterministic JVM guard checks; simulated lab only.
+LabPersistentQueueTest PASS (13 assertions)
+LabReceiptSignerTest PASS (7 assertions)
+PASS: 12 local JVM journal checks; no field proof implied.

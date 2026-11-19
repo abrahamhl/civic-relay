@@ -1,0 +1,1 @@
+OEP: 810 synthetic runs, 12150 invariant checks, output: C:\dev\_WORKTREES\civic-relay-reality-20261024\docs\engineering\evidence\2026-10-24\synthetic-scenarios.json

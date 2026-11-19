@@ -1,0 +1,32 @@
+
+> civic-relay-investor@0.1.0 build
+> next build && node scripts/fix-export-langs.mjs
+
+▲ Next.js 16.4.3 (Turbopack)
+✓ Running next.config.mjs took 34ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 324ms
+  Running TypeScript ...
+  Finished TypeScript in 4.0s ...
+  Collecting page data using 5 workers ...
+  Generating static pages using 5 workers (0/5) ...
+  Generating static pages using 5 workers (1/5) 
+  Generating static pages using 5 workers (2/5) 
+  Generating static pages using 5 workers (3/5) 
+✓ Generating static pages using 5 workers (5/5) in 1039ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+└   /[locale]
+  ├ ● /es
+  └ ● /nl
+
+
+○  (Static)  prerendered as static content
+●  (SSG)     prerendered as static HTML (uses generateStaticParams)
+
+PASS es: 1 HTML export(s) declare the document language
+PASS nl: 1 HTML export(s) declare the document language

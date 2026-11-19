@@ -1,0 +1,35 @@
+{
+  "kind": "OEP_BUILDING_MISSION_SIMULATED",
+  "physicalDelivery": false,
+  "seed": 20261020,
+  "assumptions": {
+    "devices": 40,
+    "seed": 20261020,
+    "participation": 100,
+    "permissions": 100,
+    "battery": 65,
+    "damaged": 100,
+    "responses": 8,
+    "helpRequests": 2,
+    "bluetooth": true,
+    "wifi": true,
+    "gateway": true
+  },
+  "fictionalResponse": {
+    "sourceId": "NODE-001",
+    "answer": "SAFE"
+  },
+  "trial": {
+    "state": "IDLE",
+    "reason": "CLEARED",
+    "messageId": null,
+    "sourceId": "NODE-001",
+    "path": [],
+    "cursor": 0,
+    "busy": false,
+    "receipt": null,
+    "evidence": "SIMULATED_ONLY",
+    "record": null,
+    "events": []
+  }
+}

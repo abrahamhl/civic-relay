@@ -1,0 +1,13 @@
+{
+  "status": "PHYSICAL_TEST_PENDING",
+  "gatePassed": false,
+  "csvGatePassed": false,
+  "totalTrials": 0,
+  "minimumRequiredTrials": 30,
+  "validAckSuccesses": 0,
+  "lateOrInvalidAcks": 0,
+  "failedOrNoAckTrials": 0,
+  "deliveryRate": null,
+  "p50RoundTripMs": null,
+  "p95RoundTripMs": null
+}

@@ -44,7 +44,7 @@ const dictionary: Record<Locale, {
     description: "Haz una inspección local con las APIs disponibles en este navegador. Las cifras muestran lo que permite medir el sistema; no prueban conexiones entre móviles. El vídeo, si lo autorizas, permanece en tu dispositivo.",
     inspect: "INSPECCIONAR MI DISPOSITIVO", notMeasured: "Sin medir", recorded: "Medido localmente", unavailable: "No disponible",
     cameraTitle: "Prueba de cámara real · análisis local de luz",
-    cameraStart: "Activar cámara con permiso", cameraStop: "Detener cámara",
+    cameraStart: "Activar cámara con permiso", cameraStop: "Detener cámara", cameraCancel: "Cancelar la solicitud de cámara",
     cameraDenied: "Permiso denegado o cámara inaccesible", cameraIdle: "Desactivada · sin capturar", cameraActive: "Vídeo real local · no se envía",
     export: "Exportar evidencias JSON", disclaimer: "No detecta personas a través de paredes ni mide Wi-Fi CSI/RF. No contacta con emergencias ni confirma recepción en otro móvil.",
     nodeTitle: "Estado de nodo offline", nodeStatus: "NO VALIDADO: requiere dos teléfonos y ACK físico medido."
@@ -55,7 +55,7 @@ const dictionary: Record<Locale, {
     description: "Inspect browser-accessible hardware capabilities locally. Values describe actual API readings where available, not phone-to-phone delivery. Permission-based live video stays on your device.",
     inspect: "INSPECT MY DEVICE", notMeasured: "Not measured", recorded: "Measured locally", unavailable: "Unavailable",
     cameraTitle: "Real camera test · local light analysis",
-    cameraStart: "Enable camera with permission", cameraStop: "Stop camera",
+    cameraStart: "Enable camera with permission", cameraStop: "Stop camera", cameraCancel: "Cancel camera request",
     cameraDenied: "Permission denied or camera inaccessible", cameraIdle: "Off · no capture", cameraActive: "Real local video · not uploaded",
     export: "Export JSON evidence", disclaimer: "Cannot detect people through walls or measure Wi-Fi CSI/RF. Does not contact emergency services or verify another phone's receipt.",
     nodeTitle: "Offline node status", nodeStatus: "NOT VERIFIED: two phones and measured physical ACK required."
@@ -66,7 +66,7 @@ const dictionary: Record<Locale, {
     description: "Onderzoek lokaal welke browserfuncties beschikbaar zijn. Werkelijke API-gegevens waar beschikbaar; geen bewijs voor verzending tussen telefoons. Toegestane livevideo blijft op dit toestel.",
     inspect: "CONTROLEER MIJN TOESTEL", notMeasured: "Niet gemeten", recorded: "Lokaal gemeten", unavailable: "Niet beschikbaar",
     cameraTitle: "Echte cameraproef · lokale lichtmeting",
-    cameraStart: "Camera inschakelen met toestemming", cameraStop: "Camera stoppen",
+    cameraStart: "Camera inschakelen met toestemming", cameraStop: "Camera stoppen", cameraCancel: "Cameraverzoek annuleren",
     cameraDenied: "Toestemming geweigerd of camera ontoegankelijk", cameraIdle: "Uit · geen opname", cameraActive: "Echte lokale video · niet geüpload",
     export: "JSON-bewijs exporteren", disclaimer: "Geen detectie door muren of meting van Wi-Fi CSI/RF. Geen contact met hulpdiensten of ontvangstbevestiging op andere telefoon.",
     nodeTitle: "Offline-nodestatus", nodeStatus: "NIET GEVALIDEERD: twee telefoons en een echte, gemeten ACK nodig."
