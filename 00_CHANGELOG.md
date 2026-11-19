@@ -1,5 +1,23 @@
 # Changelog
 
+## SENDA · 19-11-2026 · Rediseño completo de la web pública (`investor-next/`) — Fases 1 a 8 (`feat/web-redesign-20261119`)
+
+**Entrada (fundador):** rediseño integral de `investor-next/` con claridad editorial, Centro de Control interactivo estilo plataforma operativa, `EvidenceBadge` en cada cifra, 3 idiomas (ES/EN/NL), modo claro/oscuro, QA en 390/834/1440 px, Lighthouse ≥ 95 y ZIP listo para Hostinger.
+
+**Procesamiento:**
+- **Fase 1 (Inventario):** creado `docs/web/CONTENT_INVENTORY.md` con destino de cada ruta, componente, vídeo y fuente real/simulada más lista de deuda técnica.
+- **Fase 2 (Sistema de diseño):** creados `investor-next/styles/tokens.css`, `app/_senda/senda.css`, `EvidenceBadge` (5 estados con `<dialog closedby="any">` y fallback Safari), `SiteHeader` (6 ítems, ES/EN/NL, toggle claro/oscuro), `SiteFooter`, `CookieBanner`, `MediaVideo` y catálogo interno `/design/`. Instalados `lucide-react` (sin emojis en UI) y `maplibre-gl`.
+- **Fase 3 (Plantillas):** nuevas páginas trilingües en `/`, `/product/`, `/evidence/`, `/science/`, `/investors/` y `/security/` (más `/es/...` y `/nl/...`), conservando `/mando/`, `/mission-control/` y `/defense/` (`noindex`).
+- **Fase 4 (Centro de Control `/platform/`):** mapa interactivo (MapLibre GL con GeoJSON offline Natural Earth + fallback SVG), 7 capas conmutables, snapshots reales (`GDACS`, `DGT`, `NDW`, `USGS`) etiquetados como `Observado`, cola de eventos por prioridad, ficha de objeto, grafo de correlación (`Evento <-> Sensor <-> Ruta <-> Equipo <-> Decisión`), línea de tiempo `T+00m..T+90m`, barra `⌘K`, 8 escenarios (`S01–S08`), demo guiada de 6 pasos y controles simulados en 2 pasos con auditoría.
+- **Fase 5 (i18n y SEO):** `sitemap.xml`, `robots.txt`, `.well-known/security.txt`, `/og-senda.svg`, JSON-LD (`Organization`, `SoftwareApplication`, `WebSite`), `finalize-locales.mjs`, `test-locales.mjs` y `tests/senda-redesign.test.mjs`.
+- **Fase 6 (QA):** `117/117` tests unitarios en verde; Playwright en 390/834/1440 px (`38` vistas, `0` enlaces rotos, `0` desbordamiento horizontal, `0` errores de consola, `166.1 kB gz` JS inicial en Home); Lighthouse en Home: **Performance 98, Accessibility 100, Best Practices 96, SEO 100** (LCP `1.81 s`, CLS `0`).
+- **Fase 7 (Hostinger ZIP):** regenerada `entrega/` (`entrega/zips/1-web-hostinger.zip`, 634 ficheros, 73,6 MB) con `LEEME_PRIMERO.md` actualizado (File Manager + FTP/SFTP) y verificada extrayendo el ZIP en un servidor estático limpio (12 rutas + `.htaccess` + vídeos = HTTP 200).
+- **Fase 8 (Informe):** publicado `docs/web/REDESIGN_REPORT.md` con capturas y métricas reales.
+
+**Límites:** rama local `feat/web-redesign-20261119` no empujada a `origin` ni fusionada a `master` por falta de credenciales remotas y espera de aprobación. Next.js `16.4.2` reporta aviso de actualización de seguridad pendiente de aprobar. Sin cambios en validación física (`0/30` pruebas).
+
+---
+
 ## SENDA · 17-11-2026 · Tres motores nuevos con datos reales (aislamiento por inundación, radio sobre relieve, agua en Países Bajos), rutas de financiación y propuesta para gobiernos
 
 **Entrada (fundador):** cosas más impresionantes; más investigación y ciencia; innovaciones que un gobierno de España pudiera aceptar como candidata y preparadas para Holanda; caminos de financiación reales; más fotos; motores completamente nuevos.
