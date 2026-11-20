@@ -4,7 +4,7 @@ import { api } from '../api/client';
 import type { TerrainGridSnapshot } from '../offline/terrain-snapshot';
 import type { WeatherSnapshot, WeatherMetric } from '../offline/weather-snapshot';
 import {
-  AUTHENTIC_DATED_TLES,
+  ILLUSTRATIVE_TLES,
   parseTle,
   propagateKeplerJ2,
   lookAngles,
@@ -34,10 +34,10 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
   const [showParticles, setShowParticles] = useState<boolean>(true);
   const [showFresnel, setShowFresnel] = useState<boolean>(true);
   const [showSatellites, setShowSatellites] = useState<boolean>(true);
-  const [orbitMode, setOrbitMode] = useState<'SCIENTIFIC_CALCULATED' | 'CINEMATIC_ILLUSTRATIVE'>('SCIENTIFIC_CALCULATED');
+  const [orbitMode, setOrbitMode] = useState<'KEPLER_J2_ILLUSTRATIVE' | 'CINEMATIC_ILLUSTRATIVE'>('KEPLER_J2_ILLUSTRATIVE');
   const [selectedSatKey, setSelectedSatKey] = useState<string>('SENTINEL_3A');
   const [satTelemetry, setSatTelemetry] = useState<LookAnglesResult | null>(null);
-  const orbitModeRef = useRef<'SCIENTIFIC_CALCULATED' | 'CINEMATIC_ILLUSTRATIVE'>('SCIENTIFIC_CALCULATED');
+  const orbitModeRef = useRef<'KEPLER_J2_ILLUSTRATIVE' | 'CINEMATIC_ILLUSTRATIVE'>('KEPLER_J2_ILLUSTRATIVE');
   const [showObservations, setShowObservations] = useState<boolean>(true);
   const [showUavTactical, setShowUavTactical] = useState<boolean>(true);
   const [showCotsDrones, setShowCotsDrones] = useState<boolean>(true);
@@ -231,7 +231,7 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
   useEffect(() => {
     if (!showSatellites) return;
     const updateTelemetry = () => {
-      const satMeta = AUTHENTIC_DATED_TLES[selectedSatKey as keyof typeof AUTHENTIC_DATED_TLES];
+      const satMeta = ILLUSTRATIVE_TLES[selectedSatKey as keyof typeof ILLUSTRATIVE_TLES];
       if (!satMeta) return;
       try {
         const el = parseTle(satMeta.name, satMeta.line1, satMeta.line2);
@@ -254,9 +254,9 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
     const group = satellitesGroupRef.current;
     if (!group) return;
     group.clear();
-    if (orbitMode === 'SCIENTIFIC_CALCULATED') {
+    if (orbitMode === 'KEPLER_J2_ILLUSTRATIVE') {
       const timeNow = Date.now();
-      for (const [key, t] of Object.entries(AUTHENTIC_DATED_TLES)) {
+      for (const [key, t] of Object.entries(ILLUSTRATIVE_TLES)) {
         try {
           const el = parseTle(t.name, t.line1, t.line2);
           const periodS = 86400 / el.nRevDay;
@@ -400,11 +400,11 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
     globeGroup.add(satGroup);
 
     // Setup satellites according to current orbitMode
-    const setupSatellites = (group: THREE.Group, currentMode: 'SCIENTIFIC_CALCULATED' | 'CINEMATIC_ILLUSTRATIVE') => {
+    const setupSatellites = (group: THREE.Group, currentMode: 'KEPLER_J2_ILLUSTRATIVE' | 'CINEMATIC_ILLUSTRATIVE') => {
       group.clear();
-      if (currentMode === 'SCIENTIFIC_CALCULATED') {
+      if (currentMode === 'KEPLER_J2_ILLUSTRATIVE') {
         const timeNow = Date.now();
-        for (const [key, t] of Object.entries(AUTHENTIC_DATED_TLES)) {
+        for (const [key, t] of Object.entries(ILLUSTRATIVE_TLES)) {
           try {
             const el = parseTle(t.name, t.line1, t.line2);
             const periodS = 86400 / el.nRevDay;
@@ -924,7 +924,7 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
                     onChange={(e) => setOrbitMode(e.target.value as any)}
                     style={{ background: '#0f2744', color: '#7dd3fc', border: '1px solid #38bdf8', borderRadius: 4, padding: '0.15rem 0.3rem', fontSize: '0.68rem', fontWeight: 700 }}
                   >
-                    <option value="SCIENTIFIC_CALCULATED">Científico (Kepler/J2)</option>
+                    <option value="KEPLER_J2_ILLUSTRATIVE">Órbitas ilustrativas (Kepler/J2)</option>
                     <option value="CINEMATIC_ILLUSTRATIVE">Ilustración Cinematográfica</option>
                   </select>
                 </div>
@@ -935,6 +935,9 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
                   </div>
                 ) : (
                   <div>
+                    <div role="note" style={{ background: 'rgba(245, 158, 11, 0.15)', border: '1px solid rgba(245, 158, 11, 0.4)', borderRadius: 4, padding: '0.3rem', fontSize: '0.65rem', color: '#fcd34d', marginBottom: '0.3rem' }}>
+                      ⚠️ <strong>ÓRBITAS ILUSTRATIVAS:</strong> el propagador Kepler/J2 es real, pero los TLE de este catálogo no son efemérides reales (épocas redondeadas, 7 de 8 líneas con suma de control inválida). Elevación, acimut y Doppler muestran el cálculo, no pasos reales.
+                    </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
                       <span style={{ color: '#94a3b8' }}>Satélite:</span>
                       <select
@@ -942,7 +945,7 @@ export const Globe4DStudio: React.FC<Props> = ({ onClose, initialRegion = 'valen
                         onChange={(e) => setSelectedSatKey(e.target.value)}
                         style={{ background: '#0f2744', color: '#fff', border: '1px solid #1e3a5f', borderRadius: 4, padding: '0.15rem 0.3rem', fontSize: '0.68rem' }}
                       >
-                        {Object.entries(AUTHENTIC_DATED_TLES).map(([k, s]) => (
+                        {Object.entries(ILLUSTRATIVE_TLES).map(([k, s]) => (
                           <option key={k} value={k}>{s.name}</option>
                         ))}
                       </select>
