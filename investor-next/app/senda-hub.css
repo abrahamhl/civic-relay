@@ -27,3 +27,28 @@
 @media(max-width:1000px){.hub-start,.hub-videos{grid-template-columns:repeat(2,minmax(0,1fr))}.hub-labs{grid-template-columns:repeat(2,minmax(0,1fr))}.hub-split{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:620px){.hub-start,.hub-videos,.hub-labs{grid-template-columns:minmax(0,1fr)}}
 @media(prefers-reduced-motion:reduce){.hub-img img{transition:none}}
+
+/* Portada con vídeo real de fondo (grabación de la Sala de decisión sobre la DANA) */
+.sh-hero--video{position:relative;overflow:hidden;isolation:isolate;min-height:min(86vh,860px);display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:56px!important}
+.sh-bgvideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;opacity:.42;filter:saturate(.9)}
+.sh-hero--video::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,9,12,.55) 0%,rgba(5,9,12,.25) 40%,rgba(5,9,12,.92) 100%)}
+@media(prefers-reduced-motion:reduce){.sh-bgvideo{display:none}}
+
+/* Aparición progresiva al desplazarse (CSS nativo; sin efecto si el navegador no lo admite) */
+@supports (animation-timeline: view()){
+  @media(prefers-reduced-motion:no-preference){
+    .hub-card,.hub-video,.hub-papers li,.hub h2,.hub-lead{animation:hub-in linear both;animation-timeline:view();animation-range:entry 0% cover 28%}
+    @keyframes hub-in{from{opacity:0;transform:translateY(42px) scale(.985)}to{opacity:1;transform:none}}
+  }
+}
+
+/* Navegación flotante compacta: abajo a la derecha, sin tapar el contenido; oculta en móvil */
+.apple-living-nav-wrap{left:auto!important;right:16px!important;top:auto!important;bottom:16px!important;width:auto!important;max-width:min(560px,calc(100vw - 32px))!important;transform:none!important}
+.apple-living-nav-wrap .apple-living-dock{border-radius:12px!important;background:rgba(10,14,18,.94)!important;backdrop-filter:blur(12px)}
+@media(max-width:1100px){.apple-living-nav-wrap{display:none!important}}
+.sh-hero--video{border-radius:18px;border:1px solid rgba(255,255,255,.08);padding-left:clamp(20px,4vw,48px)!important;padding-right:clamp(20px,4vw,48px)!important;margin-top:24px}
+/* El menú flotante aparece solo tras pasar la portada (no tapa los botones iniciales) */
+@supports (animation-timeline: scroll()){
+  .apple-living-nav-wrap{animation:dock-in linear both;animation-timeline:scroll(root);animation-range:0 900px}
+  @keyframes dock-in{0%,70%{opacity:0;transform:translateY(24px);visibility:hidden}100%{opacity:1;transform:none;visibility:visible}}
+}

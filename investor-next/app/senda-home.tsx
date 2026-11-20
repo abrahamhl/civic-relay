@@ -277,7 +277,8 @@ export default function SendaHome({ locale }: { locale: Locale }) {
   const p = readProof();
   return (
     <section className="senda-home" aria-labelledby="senda-h1" lang={locale}>
-      <div className="sh-hero">
+      <div className="sh-hero sh-hero--video">
+        <video className="sh-bgvideo" src="/media/senda-sala-es.mp4" poster="/media/senda-sala-poster-es.jpg" autoPlay muted loop playsInline preload="metadata" aria-hidden="true" tabIndex={-1} />
         <p className="sh-tag">{c.tag}</p>
         <h1 id="senda-h1">{c.h1}</h1>
         <p className="sh-lead">{c.lead}</p>
