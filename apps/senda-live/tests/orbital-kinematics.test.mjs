@@ -1,31 +1,33 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  AUTHENTIC_DATED_TLES,
+  ILLUSTRATIVE_TLES,
+  TLE_CHECKSUM_VALID,
   parseTle,
   propagateKeplerJ2,
   lookAngles,
 } from '../web/src/science/orbital-kinematics.mjs';
 
-test('Orbital Kinematics P0-07: authentic dated TLEs have valid NORAD IDs and timestamps', () => {
-  const keys = Object.keys(AUTHENTIC_DATED_TLES);
+test('Orbital Kinematics P0-07: illustrative TLEs parse into plausible LEO orbits (not real ephemerides)', () => {
+  const keys = Object.keys(ILLUSTRATIVE_TLES);
   assert.ok(keys.includes('SENTINEL_3A'));
   assert.ok(keys.includes('TERRA'));
   assert.ok(keys.includes('SUOMI_NPP'));
   assert.ok(keys.includes('ISS'));
 
-  for (const [key, t] of Object.entries(AUTHENTIC_DATED_TLES)) {
+  for (const [key, t] of Object.entries(ILLUSTRATIVE_TLES)) {
     const el = parseTle(t.name, t.line1, t.line2);
     assert.equal(el.norad, t.norad);
     assert.ok(el.epoch > Date.parse('2025-01-01T00:00:00Z'));
     assert.ok(el.nRevDay > 14 && el.nRevDay < 16.5, `LEO mean motion should be 14-16 rev/day, got ${el.nRevDay}`);
     assert.ok(el.ecc >= 0 && el.ecc < 0.05, `LEO orbits should be near circular, got ${el.ecc}`);
     assert.ok(el.inc > 0.8 && el.inc < 1.8, `LEO inclination in rad should be realistic, got ${el.inc}`);
+    assert.equal(t.basis, 'ILLUSTRATIVE', `${key} must be declared as illustrative`);
   }
 });
 
 test('Orbital Kinematics P0-07: Kepler J2 propagation computes physically valid ECI coordinates', () => {
-  const s3 = AUTHENTIC_DATED_TLES.SENTINEL_3A;
+  const s3 = ILLUSTRATIVE_TLES.SENTINEL_3A;
   const el = parseTle(s3.name, s3.line1, s3.line2);
 
   const t0 = el.epoch;
@@ -52,7 +54,7 @@ test('Orbital Kinematics P0-07: Kepler J2 propagation computes physically valid 
 });
 
 test('Orbital Kinematics P0-07: topocentric look angles, elevation, azimuth and Doppler shift', () => {
-  const s3 = AUTHENTIC_DATED_TLES.SENTINEL_3A;
+  const s3 = ILLUSTRATIVE_TLES.SENTINEL_3A;
   const el = parseTle(s3.name, s3.line1, s3.line2);
 
   // Ground station in Valencia, Spain (39.4699° N, -0.3763° E, 15m alt)
@@ -71,4 +73,39 @@ test('Orbital Kinematics P0-07: topocentric look angles, elevation, azimuth and 
   assert.ok(Number.isFinite(dopplerHz));
   // Doppler shift at 1.62 GHz in LEO is max ±40 kHz
   assert.ok(Math.abs(dopplerHz) < 50_000, `Doppler shift should be within ±50 kHz, got ${dopplerHz} Hz`);
+});
+
+test('Veracidad: TLE_CHECKSUM_VALID implementa la suma de control estándar', () => {
+  // Líneas reales de la ISS copiadas literalmente de AMSAT nasabare.txt descargado el 20-11-2026
+  // (investor-next/public/senda/data/tle/amsat-nasabare-2026-11-20.txt, commit 1d52e6e;
+  // sha256 del fichero en el .json hermano).
+  const l1 = '1 25544U 98067A   26323.26944508  .00013909  00000-0  25567-3 0  9994';
+  const l2 = '2 25544  51.6317 252.6441 0007411  42.3196 317.8363 15.49482233595794';
+  assert.equal(TLE_CHECKSUM_VALID(l1), true);
+  assert.equal(TLE_CHECKSUM_VALID(l2), true);
+  // Cambiar un solo dígito rompe la suma.
+  assert.equal(TLE_CHECKSUM_VALID(l1.slice(0, 68) + '5'), false);
+  assert.equal(TLE_CHECKSUM_VALID(l2.replace('51.6317', '51.6318')), false);
+  // '-' cuenta 1 y '+' cuenta 0: cambiar el signo del exponente (columna 51) de '-' a '+' resta 1
+  // a la suma, así que la línea solo vuelve a ser válida si el dígito de control baja 1 (4 → 3).
+  assert.equal(l1[50], '-');
+  const plus = l1.slice(0, 50) + '+' + l1.slice(51, 68);
+  assert.equal(TLE_CHECKSUM_VALID(plus + '4'), false);
+  assert.equal(TLE_CHECKSUM_VALID(plus + '3'), true);
+  // Entradas no válidas.
+  assert.equal(TLE_CHECKSUM_VALID(''), false);
+  assert.equal(TLE_CHECKSUM_VALID(undefined), false);
+});
+
+test('Veracidad: los TLE ilustrativos NO pasan la suma de control (no son efemérides reales)', () => {
+  const lines = Object.values(ILLUSTRATIVE_TLES).flatMap((t) => [t.line1, t.line2]);
+  assert.equal(lines.length, 8);
+  const invalid = lines.filter((l) => !TLE_CHECKSUM_VALID(l));
+  // Auditoría del 20-11-2026: 7 de 8 inválidas (solo la línea 2 de TERRA pasa por azar).
+  assert.equal(invalid.length, 7);
+  assert.equal(TLE_CHECKSUM_VALID(ILLUSTRATIVE_TLES.TERRA.line2), true);
+  // Épocas redondeadas: ninguna de las cuatro es una época real con fracción de día medida.
+  for (const t of Object.values(ILLUSTRATIVE_TLES)) {
+    assert.equal(t.line1.slice(18, 32), '26308.50000000');
+  }
 });

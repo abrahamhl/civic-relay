@@ -3,7 +3,8 @@
  *
  * Implements Keplerian orbits with J2 secular perturbations, GMST calculation,
  * topocentric azimuth/elevation (SEZ/ENU frame), range rate (km/s) and Doppler shift
- * for emergency LEO passes (Sentinel-3, Terra MODIS, Suomi-NPP VIIRS, ISS).
+ * for LEO orbits. The propagator is real code; the bundled catalogue is NOT real
+ * ephemeris data (see ILLUSTRATIVE_TLES below).
  */
 
 const MU = 398600.4418; // km^3 / s^2
@@ -14,7 +15,33 @@ const DEG = Math.PI / 180;
 const TWO_PI = 2 * Math.PI;
 const SPEED_OF_LIGHT_MS = 299792458;
 
-export const AUTHENTIC_DATED_TLES = Object.freeze({
+/**
+ * Suma de control TLE estándar: suma de los dígitos de las columnas 1–68, cada '-' cuenta 1,
+ * el resto de caracteres cuenta 0; módulo 10 debe igualar el dígito de la columna 69.
+ * Misma definición que `TLE_CHECKSUM_VALID` del núcleo (`packages/senda/src/orbital.mjs`, rama
+ * claude/pensive-wozniak-tf506e, commit 1d52e6e).
+ */
+export const TLE_CHECKSUM_VALID = (line) => {
+  if (typeof line !== 'string' || line.length < 69) return false;
+  let s = 0;
+  for (const c of line.slice(0, 68)) {
+    if (c >= '0' && c <= '9') s += +c;
+    else if (c === '-') s += 1;
+  }
+  return s % 10 === Number(line[68]);
+};
+
+/**
+ * TLE ILUSTRATIVOS (NO auténticos). Auditoría del 20-11-2026: 7 de sus 8 líneas tienen la suma de
+ * control TLE inválida (solo la línea 2 de TERRA pasa), todas las épocas están redondeadas a
+ * `26308.50000000` y en la línea 2 de la ISS las columnas 64–69 (revolución + control) leen `12345`,
+ * un patrón de relleno. No proceden de NORAD/CelesTrak.
+ * Se conservan porque dan órbitas plausibles (inclinación y altitud aproximadas de cada misión) para
+ * probar y visualizar el propagador Kepler/J2; NUNCA deben usarse para predecir pasos reales ni
+ * presentarse como efemérides. Para datos reales, cargar una instantánea fechada con procedencia
+ * (p. ej. AMSAT nasabare.txt del 20-11-2026, que solo incluye la ISS de estos cuatro) o CelesTrak.
+ */
+export const ILLUSTRATIVE_TLES = Object.freeze({
   SENTINEL_3A: {
     name: 'Sentinel-3A',
     sensorPayload: 'SLSTR (Thermal Wildfire), OLCI, SRAL',
@@ -22,6 +49,7 @@ export const AUTHENTIC_DATED_TLES = Object.freeze({
     line1: '1 41335U 16011A   26308.50000000  .00000045  00000-0  21345-4 0  9998',
     line2: '2 41335  98.6500 115.4200 0001340  85.2000 274.9500 14.28254000 45210',
     colorHex: '#10b981',
+    basis: 'ILLUSTRATIVE',
   },
   TERRA: {
     name: 'Terra (EOS-AM1)',
@@ -30,6 +58,7 @@ export const AUTHENTIC_DATED_TLES = Object.freeze({
     line1: '1 25994U 99068A   26308.50000000  .00000112  00000-0  34120-4 0  9991',
     line2: '2 25994  98.2000 120.1500 0001250  72.4000 287.7500 14.57110000 24150',
     colorHex: '#f59e0b',
+    basis: 'ILLUSTRATIVE',
   },
   SUOMI_NPP: {
     name: 'Suomi-NPP',
@@ -38,6 +67,7 @@ export const AUTHENTIC_DATED_TLES = Object.freeze({
     line1: '1 37849U 11061A   26308.50000000  .00000085  00000-0  28910-4 0  9994',
     line2: '2 37849  98.7400 118.6200 0001120  78.3000 281.8500 14.19520000 32140',
     colorHex: '#ef4444',
+    basis: 'ILLUSTRATIVE',
   },
   ISS: {
     name: 'ISS (ZARYA)',
@@ -46,6 +76,7 @@ export const AUTHENTIC_DATED_TLES = Object.freeze({
     line1: '1 25544U 98067A   26308.50000000  .00016717  00000-0  30287-3 0  9993',
     line2: '2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.50003300 12345',
     colorHex: '#38bdf8',
+    basis: 'ILLUSTRATIVE',
   },
 });
 

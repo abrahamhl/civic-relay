@@ -5,6 +5,8 @@ export interface SatelliteTleRecord {
   line1: string;
   line2: string;
   colorHex: string;
+  /** 'ILLUSTRATIVE' = no son efemérides reales (ver ILLUSTRATIVE_TLES). */
+  basis: 'ILLUSTRATIVE';
 }
 
 export interface ParsedTle {
@@ -37,7 +39,11 @@ export interface LookAnglesResult {
   disclaimer: string;
 }
 
-export declare const AUTHENTIC_DATED_TLES: Record<string, SatelliteTleRecord>;
+/** Suma de control TLE estándar (columnas 1–68, '-' = 1, módulo 10 = columna 69). */
+export declare function TLE_CHECKSUM_VALID(line: string): boolean;
+
+/** TLE ILUSTRATIVOS, NO auténticos (7/8 sumas de control inválidas; auditoría 20-11-2026). */
+export declare const ILLUSTRATIVE_TLES: Readonly<Record<string, SatelliteTleRecord>>;
 
 export declare function parseTle(name: string, line1: string, line2: string): ParsedTle;
 
