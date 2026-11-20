@@ -13,8 +13,11 @@ import { PIPELINE_STAGES, PRODUCT_SCENES } from '../data/product';
 import { SITE_STRINGS } from '../data/i18n';
 import { localeHref, type Locale } from '../data/types';
 
+const LivePacketRaceSim = dynamic(() => import('../components/LivePacketRaceSim'), { ssr: false });
+const LiveSimulatorsBay = dynamic(() => import('../components/LiveSimulatorsBay'), { ssr: false });
 const SensorShowcase = dynamic(() => import('../components/SensorShowcase'), { ssr: false });
 const InteractiveLabsHub = dynamic(() => import('../components/InteractiveLabsHub'), { ssr: false });
+const ActionMissionDock = dynamic(() => import('../components/ActionMissionDock'), { ssr: false });
 
 function SceneVisual({ sceneIndex, locale }: { sceneIndex: number; locale: Locale }) {
   if (sceneIndex === 0) {
@@ -473,11 +476,19 @@ export default function ProductPage({ locale }: { locale: Locale }) {
         <AudienceLens locale={locale} value={audience} onChange={setAudience} />
       </div>
 
-      <LazySection id="sensors" placeholderHeight={640} rootMargin="400px 0px">
+      <LazySection id="simulador-vivo" placeholderHeight={660} rootMargin="240px 0px">
+        <LivePacketRaceSim locale={locale} />
+      </LazySection>
+
+      <LazySection id="simuladores-3d" placeholderHeight={680} rootMargin="240px 0px">
+        <LiveSimulatorsBay locale={locale} />
+      </LazySection>
+
+      <LazySection id="sensors" placeholderHeight={640} rootMargin="240px 0px">
         <SensorShowcase locale={locale} audience={audience} />
       </LazySection>
 
-      <LazySection id="labs" placeholderHeight={680} rootMargin="400px 0px">
+      <LazySection id="labs" placeholderHeight={680} rootMargin="240px 0px">
         <InteractiveLabsHub locale={locale} defaultLab="telecom" id="labs-panel" />
       </LazySection>
 
@@ -504,6 +515,10 @@ export default function ProductPage({ locale }: { locale: Locale }) {
           </div>
         </div>
       </section>
+
+      <LazySection id="entrar-en-senda" placeholderHeight={480} rootMargin="240px 0px">
+        <ActionMissionDock locale={locale} compact />
+      </LazySection>
     </PageShell>
   );
 }

@@ -3,11 +3,6 @@
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import {
-  ArrowRight,
-  Compass,
-  Users,
-  FileSearch,
-  Building2,
   Cpu,
   Orbit,
   Radio,
@@ -24,7 +19,10 @@ import { HOME_COPY } from '../data/home-product';
 import { localeHref, type Locale } from '../data/types';
 
 // Lazy-loaded heavyweight interactive engines: 0 bytes in initial Home JS, instant mount on scroll
+const ScrollBlueprintStage = dynamic(() => import('../components/ScrollBlueprintStage'), { ssr: false });
+const LivePacketRaceSim = dynamic(() => import('../components/LivePacketRaceSim'), { ssr: false });
 const InnovationShowcase = dynamic(() => import('../components/InnovationShowcase'), { ssr: false });
+const LiveSimulatorsBay = dynamic(() => import('../components/LiveSimulatorsBay'), { ssr: false });
 const MissionControlDeck = dynamic(() => import('../components/MissionControlDeck'), { ssr: false });
 const OsintIntelligenceDeck = dynamic(() => import('../components/OsintIntelligenceDeck'), { ssr: false });
 const OrbitalOjoDeck = dynamic(() => import('../components/OrbitalOjoDeck'), { ssr: false });
@@ -32,8 +30,7 @@ const SensorShowcase = dynamic(() => import('../components/SensorShowcase'), { s
 const CrisisAtlas = dynamic(() => import('../components/CrisisAtlas'), { ssr: false });
 const InteractiveLabsHub = dynamic(() => import('../components/InteractiveLabsHub'), { ssr: false });
 const FullCapabilityMatrix = dynamic(() => import('../components/FullCapabilityMatrix'), { ssr: false });
-
-const AUDIENCE_ICONS = [Users, Building2, FileSearch, Compass];
+const ActionMissionDock = dynamic(() => import('../components/ActionMissionDock'), { ssr: false });
 
 export default function HomePage({ locale }: { locale: Locale }) {
   const c = HOME_COPY[locale];
@@ -107,7 +104,7 @@ export default function HomePage({ locale }: { locale: Locale }) {
           </div>
 
           <div className="s-hero-cta" style={{ marginTop: 16 }}>
-            <a href="#mission-3d" className="s-btn s-btn-coral" data-testid="hero-cta-platform">
+            <a href="#simulador-vivo" className="s-btn s-btn-coral" data-testid="hero-cta-platform">
               <Orbit size={17} aria-hidden="true" />
               <span>{quickCtas.sim3d}</span>
             </a>
@@ -119,6 +116,31 @@ export default function HomePage({ locale }: { locale: Locale }) {
               <ShieldCheck size={16} aria-hidden="true" />
               <span>{c.ctaPrimary}</span>
             </a>
+          </div>
+
+          {/* Crisp outcome explainer right below primary CTAs */}
+          <div className="s-hero-cta-hints">
+            <span>
+              {locale === 'es'
+                ? '1. Simulador SOS en vivo + Globo 3D: prueba en 15 s cómo llega un aviso sin cobertura.'
+                : locale === 'nl'
+                ? '1. Live SOS-simulator + 3D Globe: zie in 15 s hoe een noodbericht zonder bereik aankomt.'
+                : '1. Live SOS Simulator + 3D Globe: test in 15 s how an alert routes with zero signal.'}
+            </span>
+            <span>
+              {locale === 'es'
+                ? '2. SENDA Campo (PWA): abre la app real offline en modo avión sin registro ni rastreo.'
+                : locale === 'nl'
+                ? '2. SENDA Veld (PWA): open de echte offline app in vliegtuigmodus zonder account.'
+                : '2. SENDA Field (PWA): launch the real offline airplane-mode app with zero login.'}
+            </span>
+            <span>
+              {locale === 'es'
+                ? '3. Centro de Control: tour guiado de 6 pasos con 16.699 fuentes OSINT y cámaras FOV.'
+                : locale === 'nl'
+                ? '3. Controlecentrum: rondleiding in 6 stappen met 16.699 OSINT-bronnen en FOV-camera’s.'
+                : '3. Control Center: 6-step guided tour with 16,699 OSINT feeds & FOV cameras.'}
+            </span>
           </div>
 
           {/* Integrated Cinema Presentation Film right above the fold (Auto-detect browser lang + ES/EN/NL subtitles) */}
@@ -158,9 +180,24 @@ export default function HomePage({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      {/* 2. INNOVATION ARCHITECTURE: WHAT WE SOLVE, HOW WE DO IT, BREAKTHROUGHS & ALL REAL DEMO VIDEOS */}
-      <LazySection id="innovacion" placeholderHeight={740} rootMargin="160px 0px">
+      {/* 2. SCROLL-BUILT KINETIC ARCHITECTURE STAGE (Sticky Live Blueprint constructs layer-by-layer on scroll) */}
+      <LazySection id="construccion-viva" placeholderHeight={720} rootMargin="140px 0px">
+        <ScrollBlueprintStage locale={locale} />
+      </LazySection>
+
+      {/* 3. HANDS-ON LIVE SOS PACKET RACE SIMULATOR (Pick crisis + cut towers + compare Traditional vs SENDA) */}
+      <LazySection id="simulador-vivo" placeholderHeight={680} rootMargin="220px 0px">
+        <LivePacketRaceSim locale={locale} />
+      </LazySection>
+
+      {/* 4. INNOVATION ARCHITECTURE: WHAT WE SOLVE, HOW WE DO IT, BREAKTHROUGHS & ALL REAL DEMO VIDEOS */}
+      <LazySection id="innovacion" placeholderHeight={740} rootMargin="240px 0px">
         <InnovationShowcase locale={locale} audience={audience} />
+      </LazySection>
+
+      {/* 5. LIVE 3D/4D SIMULATORS BAY (6 Real Embedded SENDA Apps + 7 Interactive Vector Engineering Renders) */}
+      <LazySection id="simuladores-3d" placeholderHeight={700} rootMargin="240px 0px">
+        <LiveSimulatorsBay locale={locale} />
       </LazySection>
 
       {/* 3. LIVE 3D RAYCAST MISSION CONTROL (Earth · Moon · Mars + Satellites + Sectors + Timeline) */}
@@ -237,35 +274,12 @@ export default function HomePage({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      {/* 10. Audience Shortcuts */}
-      <section className="s-section" style={{ paddingBottom: 112 }}>
-        <div className="s-container s-stack-lg">
-          <h2 className="s-h2">{c.audiencesTitle}</h2>
-          <div className="s-grid s-grid-4">
-            {c.audiences.map((aud, idx) => {
-              const Icon = AUDIENCE_ICONS[idx] ?? Compass;
-              return (
-                <a
-                  key={aud.role}
-                  href={localeHref(locale, aud.hrefSlug)}
-                  className="s-card s-card-lift"
-                  style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
-                >
-                  <div className="s-card-icon" style={{ marginBottom: 4 }}>
-                    <Icon aria-hidden="true" />
-                  </div>
-                  <h3 className="s-h3">{aud.role}</h3>
-                  <p style={{ flex: 1 }}>{aud.desc}</p>
-                  <span className="s-row s-small" style={{ color: 'var(--s-accent)', fontWeight: 600, marginTop: 8 }}>
-                    <span>{aud.cta}</span>
-                    <ArrowRight size={15} aria-hidden="true" />
-                  </span>
-                </a>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      {/* 10. High-Clarity Role-Based Mission Entry CTAs ("Know exactly what opens before clicking") */}
+      <div style={{ paddingBottom: 88 }}>
+        <LazySection id="entrar-en-senda" placeholderHeight={520} rootMargin="240px 0px">
+          <ActionMissionDock locale={locale} />
+        </LazySection>
+      </div>
 
       {/* Floating Glass Living Command Dock (scroll % + 1-tap simulator jump bar) */}
       <LivingScrollDock locale={locale} />

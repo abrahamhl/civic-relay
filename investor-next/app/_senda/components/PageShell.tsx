@@ -4,6 +4,7 @@ import LanguageDocument from '../../language-document';
 import SiteHeader from './SiteHeader';
 import SiteFooter from './SiteFooter';
 import CookieBanner from './CookieBanner';
+import ScrollProgressBar from './ScrollProgressBar';
 import { REPO_URL, SITE_URL, type Locale, type NavSection } from '../data/types';
 
 const THEME_INIT_SCRIPT = `(function(){try{var s=localStorage.getItem('color-scheme');var m=document.querySelector('meta[name="color-scheme"]');if(!m){m=document.createElement('meta');m.name='color-scheme';document.head.appendChild(m);}if(s==='light'||s==='dark'){m.content=s;document.documentElement.setAttribute('data-theme',s);}else{m.content='light dark';document.documentElement.removeAttribute('data-theme');}}catch(e){}})();`;
@@ -60,6 +61,7 @@ export default function PageShell({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <LanguageDocument locale={locale} />
+      <ScrollProgressBar />
       <SiteHeader locale={locale} active={active} />
       <main id="main-content" className="s-main">
         {children}

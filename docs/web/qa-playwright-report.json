@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-20T03:30:02.451Z",
+  "generatedAt": "2026-11-20T04:05:36.775Z",
   "viewports": [
     390,
     834,
@@ -9,7 +9,7 @@
   "brokenLinks": [],
   "overflowFailures": [],
   "consoleErrors": [],
-  "homeJsGzKb": 168,
+  "homeJsGzKb": 168.2,
   "interactions": {
     "evidenceBadgeDialog": "PASS",
     "darkModeToggle": "PASS",
@@ -19,7 +19,8 @@
     "commandPalette": "PASS",
     "guidedTour6Steps": "PASS",
     "correlationGraph": "PASS",
-    "twoStepSimulatedActionAudit": "PASS"
+    "twoStepSimulatedActionAudit": "PASS",
+    "kineticBlueprintRaceAnd3dBay": "PASS"
   },
   "screenshots": [
     "docs/web/screenshots/home-en-1440-light.png",
@@ -34,7 +35,10 @@
     "docs/web/screenshots/evidence-es-1440.png",
     "docs/web/screenshots/home-es-390-mobile.png",
     "docs/web/screenshots/home-es-390-video.png",
+    "docs/web/screenshots/home-es-390-blueprint.png",
+    "docs/web/screenshots/home-es-390-race.png",
     "docs/web/screenshots/home-es-390-innovation.png",
+    "docs/web/screenshots/home-es-390-simbay.png",
     "docs/web/screenshots/home-es-390-hyperframes.png",
     "docs/web/screenshots/home-es-390-mission3d.png",
     "docs/web/screenshots/home-es-390-osint.png"

@@ -1,10 +1,10 @@
-6c849e1d06ff8505155fa4620ece16d01a3c00bddf132a235c506e022591026e  zips/1-web-hostinger.zip
+be3b47bfb634497063f9baa6560993d83d72a28c01c2bd1151990c1996c9f58b  zips/1-web-hostinger.zip
 707bc9a5c9b560f19f17ae882d6c4d40af0d60254e7d56bf44b059eb3dd4243e  zips/2-web-videos-m95-simulaciones.zip
 e5619e0b646c46b4648f8c7e7ff8a39781c4dd95f7be2d8884ea26865cf1b9bb  zips/3-web-video-senda-m96-promo-en.zip
 b72c2da3c4e24fb84551a268e9a961882bdcf331bf5745142c22587d562184a3  zips/4-web-video-senda-m96-promo-es.zip
 d94753783f57ef2fe0f806b402a8ac03c92e4bb5b00bfff42f43fb9f73b739bb  zips/5-web-video-senda-film-en.zip
 248074028b8a00d81b1f01fca9b7efed7811140143c600af5ca4c3c2ba23a209  zips/6-web-video-senda-film-es.zip
-f0b7a1b39766aa8049f2dfd476030ea77e20f58ff60ad206da425586e368c4d4  zips/7-codigo-fuente.zip
-acc752f0d367e3c28b5f3d8c9a4c47d7af5642dd85647b7132660ae9a8c8b0d4  zips/8-documentacion.zip
+f70f1ffa5ac704d3f7c9abb29b31b4c461666d2681bacd5f20db66b73ab42930  zips/7-codigo-fuente.zip
+4cc4d5a60c4552d8ca7a81954958c2559c0caced1575124690104957676b2b65  zips/8-documentacion.zip
 f5d0436032a45839db74592c0928fa587c32232e239ee08f106de86e661f3649  zips/9-evidencias.zip
 3f950f1fa0d72bef5ac6cec40171fb9bb78ec9998966474adcd33fafa601d23a  zips/10-vision-python.zip

@@ -12,14 +12,15 @@ interface ChapterLink {
 
 const CHAPTERS: ChapterLink[] = [
   { id: 'hero-cinema', num: '01', label: { es: 'Cinema', en: 'Cinema', nl: 'Cinema' } },
-  { id: 'innovacion', num: '02', label: { es: 'Innovación', en: 'Innovation', nl: 'Innovatie' } },
-  { id: 'mission-3d', num: '03', label: { es: 'Globo 3D', en: '3D Globe', nl: '3D Globe' } },
-  { id: 'osint-cctv', num: '04', label: { es: 'OSINT CCTV', en: 'OSINT CCTV', nl: 'OSINT CCTV' } },
-  { id: 'ojo-satelites', num: '05', label: { es: 'Satélites', en: 'Satellites', nl: 'Satellieten' } },
-  { id: 'sensors', num: '06', label: { es: 'Sensores', en: 'Sensors', nl: 'Sensoren' } },
-  { id: 'crises', num: '07', label: { es: 'Crisis', en: 'Crises', nl: 'Crises' } },
-  { id: 'labs', num: '08', label: { es: '7 Labs', en: '7 Labs', nl: '7 Labs' } },
-  { id: 'all-capabilities', num: '09', label: { es: '38 Módulos', en: '38 Modules', nl: '38 Modules' } }
+  { id: 'construccion-viva', num: '02', label: { es: 'Blueprint', en: 'Blueprint', nl: 'Blueprint' } },
+  { id: 'simulador-vivo', num: '03', label: { es: 'Simulador', en: 'Simulator', nl: 'Simulator' } },
+  { id: 'innovacion', num: '04', label: { es: 'Innovación', en: 'Innovation', nl: 'Innovatie' } },
+  { id: 'simuladores-3d', num: '05', label: { es: '3D / Renders', en: '3D / Renders', nl: '3D / Renders' } },
+  { id: 'mission-3d', num: '06', label: { es: 'Globo 3D', en: '3D Globe', nl: '3D Globe' } },
+  { id: 'osint-cctv', num: '07', label: { es: 'OSINT CCTV', en: 'OSINT CCTV', nl: 'OSINT CCTV' } },
+  { id: 'ojo-satelites', num: '08', label: { es: 'Satélites', en: 'Satellites', nl: 'Satellieten' } },
+  { id: 'labs', num: '09', label: { es: '7 Labs', en: '7 Labs', nl: '7 Labs' } },
+  { id: 'all-capabilities', num: '10', label: { es: '38 Módulos', en: '38 Modules', nl: '38 Modules' } }
 ];
 
 export default function LivingScrollDock({ locale }: { locale: Locale }) {

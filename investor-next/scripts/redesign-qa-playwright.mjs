@@ -371,12 +371,36 @@ async function main() {
     await page.screenshot({ path: resolve(shotsDir, 'home-es-390-video.png') });
     report.screenshots.push('docs/web/screenshots/home-es-390-video.png');
 
+    await page.locator('#construccion-viva').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="scroll-blueprint-stage"]', { timeout: 10000 });
+    await page.locator('[data-testid="blueprint-dot-03"]').click();
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: resolve(shotsDir, 'home-es-390-blueprint.png') });
+    report.screenshots.push('docs/web/screenshots/home-es-390-blueprint.png');
+
+    await page.locator('#simulador-vivo').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="live-packet-race-sim"]', { timeout: 10000 });
+    await page.locator('[data-testid="race-tab-dana"]').click();
+    await page.waitForTimeout(450);
+    await page.screenshot({ path: resolve(shotsDir, 'home-es-390-race.png') });
+    report.screenshots.push('docs/web/screenshots/home-es-390-race.png');
+
     await page.locator('#innovacion').scrollIntoViewIfNeeded();
     await page.waitForSelector('[data-testid="innovation-showcase"]', { timeout: 10000 });
     await page.locator('[data-testid="innov-tab-road-vision"]').click();
     await page.waitForTimeout(250);
     await page.screenshot({ path: resolve(shotsDir, 'home-es-390-innovation.png') });
     report.screenshots.push('docs/web/screenshots/home-es-390-innovation.png');
+
+    await page.locator('#simuladores-3d').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="live-simulators-bay"]', { timeout: 10000 });
+    await page.locator('[data-testid="bay-mode-renders"]').click();
+    await page.waitForSelector('[data-testid="renders-light-table"]', { timeout: 6000 });
+    await page.locator('[data-testid="bay-mode-simulators"]').click();
+    await page.waitForTimeout(250);
+    await page.screenshot({ path: resolve(shotsDir, 'home-es-390-simbay.png') });
+    report.screenshots.push('docs/web/screenshots/home-es-390-simbay.png');
+    report.interactions.kineticBlueprintRaceAnd3dBay = 'PASS';
 
     await page.locator('#ojo-satelites').scrollIntoViewIfNeeded();
     await page.waitForSelector('[data-testid="orbital-ojo-deck"]', { timeout: 10000 });

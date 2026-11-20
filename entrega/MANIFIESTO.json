@@ -1,7 +1,7 @@
 {
   "proyecto": "SENDA",
   "generado": "2026-11-20",
-  "commit": "2531773",
+  "commit": "d72866c",
   "cambiosSinCommit": false,
   "siteUrl": "https://civic-relay-investor.vercel.app",
   "zips": [
@@ -9,9 +9,9 @@
       "file": "1-web-hostinger.zip",
       "title": "Web completa para subir a public_html (sin los vídeos largos ni el pack M95)",
       "note": "Descomprime en public_html. Contiene .htaccess (fichero oculto).",
-      "files": 676,
-      "bytes": 67592052,
-      "sha256": "6c849e1d06ff8505155fa4620ece16d01a3c00bddf132a235c506e022591026e"
+      "files": 683,
+      "bytes": 67699682,
+      "sha256": "be3b47bfb634497063f9baa6560993d83d72a28c01c2bd1151990c1996c9f58b"
     },
     {
       "file": "2-web-videos-m95-simulaciones.zip",
@@ -57,17 +57,17 @@
       "file": "7-codigo-fuente.zip",
       "title": "Código fuente completo (núcleo, relé, web, visión, scripts, pruebas)",
       "note": "Sin los vídeos (van en la web) ni las capturas de evidencias (van aparte).",
-      "files": 1707,
-      "bytes": 49471030,
-      "sha256": "f0b7a1b39766aa8049f2dfd476030ea77e20f58ff60ad206da425586e368c4d4"
+      "files": 1711,
+      "bytes": 49953082,
+      "sha256": "f70f1ffa5ac704d3f7c9abb29b31b4c461666d2681bacd5f20db66b73ab42930"
     },
     {
       "file": "8-documentacion.zip",
       "title": "Documentación: traspaso, arquitectura, financiación, investigación y registro de cambios",
       "note": "Empieza por docs/handoff/HANDOFF_COMPLETO_2026-11-05.md.",
-      "files": 261,
-      "bytes": 15220504,
-      "sha256": "acc752f0d367e3c28b5f3d8c9a4c47d7af5642dd85647b7132660ae9a8c8b0d4"
+      "files": 264,
+      "bytes": 15682837,
+      "sha256": "4cc4d5a60c4552d8ca7a81954958c2559c0caced1575124690104957676b2b65"
     },
     {
       "file": "9-evidencias.zip",

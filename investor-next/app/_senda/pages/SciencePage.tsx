@@ -10,7 +10,9 @@ import LazySection from '../components/LazySection';
 import { ARCHITECTURAL_RENDERS, SCIENCE_MODULES, SCIENCE_PAPERS } from '../data/science';
 import type { Locale } from '../data/types';
 
+const LiveSimulatorsBay = dynamic(() => import('../components/LiveSimulatorsBay'), { ssr: false });
 const InteractiveLabsHub = dynamic(() => import('../components/InteractiveLabsHub'), { ssr: false });
+const ActionMissionDock = dynamic(() => import('../components/ActionMissionDock'), { ssr: false });
 
 export default function SciencePage({ locale }: { locale: Locale }) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -375,9 +377,18 @@ export default function SciencePage({ locale }: { locale: Locale }) {
         </div>
       </section>
 
+      {/* Interactive 7-Render Light-Table & 6 Live 3D Simulators */}
+      <LazySection id="simuladores-3d" placeholderHeight={660} rootMargin="240px 0px">
+        <LiveSimulatorsBay locale={locale} defaultMode="renders" />
+      </LazySection>
+
       {/* Live Scientific Theorems, Calibration & Physics Simulators */}
-      <LazySection id="labs" placeholderHeight={680} rootMargin="400px 0px">
+      <LazySection id="labs" placeholderHeight={680} rootMargin="240px 0px">
         <InteractiveLabsHub locale={locale} defaultLab="theorems" id="science-labs" />
+      </LazySection>
+
+      <LazySection id="entrar-en-senda" placeholderHeight={480} rootMargin="240px 0px">
+        <ActionMissionDock locale={locale} compact />
       </LazySection>
     </PageShell>
   );

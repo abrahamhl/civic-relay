@@ -5,6 +5,7 @@ import { Download, ExternalLink, Send, CheckCircle2, Users, Handshake, Film, Cpu
 import PageShell from '../components/PageShell';
 import EvidenceBadge from '../components/EvidenceBadge';
 import MediaVideo from '../components/MediaVideo';
+import ActionMissionDock from '../components/ActionMissionDock';
 import {
   FUNDING_ENVELOPES,
   INVESTOR_MILESTONES,
@@ -530,6 +531,8 @@ export default function InvestorsPage({ locale }: { locale: Locale }) {
           </div>
         </div>
       </section>
+
+      <ActionMissionDock locale={locale} compact />
     </PageShell>
   );
 }

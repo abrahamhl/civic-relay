@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { ExternalLink, Search } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import EvidenceBadge from '../components/EvidenceBadge';
+import ActionMissionDock from '../components/ActionMissionDock';
 import { EVIDENCE_RECORDS, STATUS_META } from '../data/evidence';
 import type { EvidenceStatus, Locale } from '../data/types';
 
@@ -253,7 +254,7 @@ export default function EvidencePage({ locale }: { locale: Locale }) {
                 <div key={row.label} className="s-bar-row">
                   <span>{row.label}</span>
                   <div className="s-bar-track" aria-hidden="true">
-                    <div className="s-bar-fill" style={{ width: `${row.pct}%`, background: row.color }} />
+                    <div className="s-bar-fill s-bar-scroll" style={{ width: `${row.pct}%`, background: row.color }} />
                   </div>
                   <b className="s-num">{row.val} min</b>
                 </div>
@@ -276,7 +277,7 @@ export default function EvidencePage({ locale }: { locale: Locale }) {
                   </span>
                   <div className="s-bar-track" aria-hidden="true">
                     <div
-                      className="s-bar-fill"
+                      className="s-bar-fill s-bar-scroll"
                       style={{
                         width: `${Math.max(2, s.delivery)}%`,
                         background: s.highlight ? 'var(--s-accent)' : 'var(--s-sim)'
@@ -293,6 +294,8 @@ export default function EvidencePage({ locale }: { locale: Locale }) {
           </article>
         </div>
       </section>
+
+      <ActionMissionDock locale={locale} compact />
     </PageShell>
   );
 }

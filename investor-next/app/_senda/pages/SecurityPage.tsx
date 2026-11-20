@@ -3,6 +3,8 @@
 import { ShieldCheck, Lock, EyeOff, FileWarning, Cpu, ExternalLink } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import EvidenceBadge from '../components/EvidenceBadge';
+import CryptoEnvelopeSim from '../components/CryptoEnvelopeSim';
+import ActionMissionDock from '../components/ActionMissionDock';
 import { REPO_URL, type Locale } from '../data/types';
 
 export default function SecurityPage({ locale }: { locale: Locale }) {
@@ -259,6 +261,10 @@ export default function SecurityPage({ locale }: { locale: Locale }) {
           </article>
         </div>
       </section>
+
+      <CryptoEnvelopeSim locale={locale} />
+
+      <ActionMissionDock locale={locale} compact />
     </PageShell>
   );
 }
