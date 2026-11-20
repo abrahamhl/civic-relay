@@ -104,5 +104,37 @@
         }
       ]
     }
+  ],
+  "redirects": [
+    {
+      "source": "/platform",
+      "destination": "/senda/sala",
+      "permanent": false
+    },
+    {
+      "source": "/platform/",
+      "destination": "/senda/sala",
+      "permanent": false
+    },
+    {
+      "source": "/es/platform",
+      "destination": "/senda/sala",
+      "permanent": false
+    },
+    {
+      "source": "/es/platform/",
+      "destination": "/senda/sala",
+      "permanent": false
+    },
+    {
+      "source": "/nl/platform",
+      "destination": "/senda/sala",
+      "permanent": false
+    },
+    {
+      "source": "/nl/platform/",
+      "destination": "/senda/sala",
+      "permanent": false
+    }
   ]
 }
