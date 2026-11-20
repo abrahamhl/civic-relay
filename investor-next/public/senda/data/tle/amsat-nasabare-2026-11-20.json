@@ -1,0 +1,10 @@
+{
+ "source": "https://www.amsat.org/tle/current/nasabare.txt",
+ "publisher": "AMSAT (Radio Amateur Satellite Corporation)",
+ "downloadedAt": "2026-11-20T08:04:06.644Z",
+ "satellites": 97,
+ "checksumValid": 97,
+ "sha256": "a4e5decd3d75fcfef8840eb8d59a2df488536191d89f21dd5f7975efd060c57f",
+ "licence": "publicación abierta de AMSAT; licencia explícita no encontrada (no verificado)",
+ "accuracy": "Kepler+J2 de orbital.mjs: válido para ventanas de paso cerca de la época; el error crece con los días desde la época"
+}

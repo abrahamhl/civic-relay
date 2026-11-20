@@ -1,4 +1,5 @@
 /** Portada SENDA en el índice (/, /es, /nl): app, todas las funciones, la película y la verificación. */
+import SendaHub from './senda-hub';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import './senda-home.css';
@@ -15,7 +16,7 @@ const C = {
     tag: 'SENDA · Sistema de Enrutamiento de Emergencia por canales alternativos',
     h1: 'Cuando cae la red, el mensaje sigue su camino.',
     lead: 'SENDA es la capa que coordina todo lo que puede mover un mensaje de emergencia: teléfonos cercanos, sonido, LoRa, satélite (con módem o mensajero satelital; el satélite directo al móvil aún no se ofrece en España ni en Países Bajos), drones y la red que quede en pie. Cifrado de extremo a extremo, abre en modo avión y no necesita servidores.',
-    open: 'Abrir SENDA Campo', easy: 'Modo fácil (3 botones)', red: 'Red y satélites', proof: 'Verificación técnica',
+    viaje: 'Cómo llega un mensaje sin cobertura', sala: 'Sala de decisión (DANA real)', explain: 'Entender SENDA en 6 escenas', open: 'Abrir SENDA Campo', easy: 'Modo fácil (3 botones)', red: 'Red y satélites', proof: 'Verificación técnica',
     broadcastT: 'Especial Informativo: La Red de Emergencia que Defiende Vidas y Soberanía',
     broadcastMeta: '20:11 UTC · Formato Telediario · Locución Femenina (bf_emma / ef_dora) · Subtítulos ES / EN / NL',
     broadcastNote: 'Reportaje basado en hechos documentados de la DANA de Valencia (octubre 2024), el incendio de Bejís y el accidente múltiple de la A-12 en los Países Bajos (las fuentes de cada dato están en el repositorio). Las escenas de propagación y de malla son simulaciones calculadas por el núcleo de SENDA y se presentan como tales. SENDA genera formatos estándar (CAP 1.2, DATEX II); no tiene certificaciones oficiales.',
@@ -101,7 +102,7 @@ const C = {
     tag: 'SENDA · Emergency routing over alternative channels',
     h1: 'When the network falls, the message finds its way.',
     lead: 'SENDA is the layer that coordinates everything that can carry an emergency message: nearby phones, sound, LoRa, satellite (via a modem or satellite messenger; direct-to-phone satellite is not yet offered in Spain or the Netherlands), drones and whatever network still stands. End-to-end encrypted, opens in airplane mode and needs no servers.',
-    open: 'Open SENDA Field', easy: 'Easy mode (3 buttons)', red: 'Network & satellites', proof: 'Technical verification',
+    viaje: 'How a message reaches someone with no signal (Spanish)', sala: 'Decision room (real 2024 flood, Spanish)', explain: 'SENDA explained in 6 scenes (Spanish)', open: 'Open SENDA Field', easy: 'Easy mode (3 buttons)', red: 'Network & satellites', proof: 'Technical verification',
     broadcastT: 'Breaking News Special: The Emergency Network Defending Lives and Sovereignty',
     broadcastMeta: '20:11 UTC · Broadcast News Format · Female Narration (bf_emma / ef_dora) · Subtitles ES / EN / NL',
     broadcastNote: 'Report based on documented facts from the Valencia floods (October 2024), the Bejís wildfire and the A-12 pile-up in the Netherlands (sources for each figure are in the repository). Propagation and mesh scenes are simulations computed by the SENDA core and are presented as such. SENDA produces standard formats (CAP 1.2, DATEX II); it holds no official certifications.',
@@ -187,7 +188,7 @@ const C = {
     tag: 'SENDA · Noodroutering via alternatieve kanalen',
     h1: 'Als het netwerk uitvalt, vindt het bericht zijn weg.',
     lead: 'SENDA is de laag die alles coördineert wat een noodbericht kan vervoeren: telefoons in de buurt, geluid, LoRa, satelliet (via een modem of satellietberichtapparaat; satelliet rechtstreeks naar de telefoon wordt in Spanje en Nederland nog niet aangeboden), drones en het netwerk dat nog overeind staat. End-to-end versleuteld, opent in vliegtuigmodus en heeft geen servers nodig.',
-    open: 'SENDA Field openen', easy: 'Eenvoudige modus (3 knoppen)', red: 'Netwerk & satellieten', proof: 'Technische verificatie',
+    viaje: 'Hoe een bericht iemand zonder bereik bereikt (Spaans)', sala: 'Beslissingsruimte (echte overstroming, Spaans)', explain: 'SENDA uitgelegd in 6 scènes (Spaans)', open: 'SENDA Field openen', easy: 'Eenvoudige modus (3 knoppen)', red: 'Netwerk & satellieten', proof: 'Technische verificatie',
     broadcastT: 'Speciale Nieuwsuitzending: Het Noodnetwerk dat Levens en Soevereiniteit Verdedigt',
     broadcastMeta: '20:11 UTC · Journaalformat · Vrouwelijke Voice-over (bf_emma / ef_dora) · Ondertitels ES / EN / NL',
     broadcastNote: 'Reportage gebaseerd op gedocumenteerde feiten over de overstromingen in Valencia (oktober 2024), de bosbrand in Bejís en het kettingongeval op de A-12 in Nederland (bronnen per gegeven staan in de repository). Verspreidings- en meshscènes zijn simulaties berekend door de SENDA-kern en worden ook zo gepresenteerd. SENDA levert standaardformaten (CAP 1.2, DATEX II); het heeft geen officiële certificeringen.',
@@ -276,22 +277,28 @@ export default function SendaHome({ locale }: { locale: Locale }) {
   const p = readProof();
   return (
     <section className="senda-home" aria-labelledby="senda-h1" lang={locale}>
-      <div className="sh-hero">
+      <div className="sh-hero sh-hero--video">
+        <video className="sh-bgvideo" src="/media/senda-sala-es.mp4" poster="/media/senda-sala-poster-es.jpg" autoPlay muted loop playsInline preload="metadata" aria-hidden="true" tabIndex={-1} />
         <p className="sh-tag">{c.tag}</p>
         <h1 id="senda-h1">{c.h1}</h1>
         <p className="sh-lead">{c.lead}</p>
         <div className="sh-cta">
-          <a className="sh-btn" href="/senda">{c.open}</a>
+          <a className="sh-btn" href="/senda/explica">{c.explain}</a>
+          <a className="sh-btn ghost" href="/senda/sala">{c.sala}</a>
+          <a className="sh-btn ghost" href="/senda/viaje">{c.viaje}</a>
+          <a className="sh-btn ghost" href="/senda">{c.open}</a>
           <a className="sh-btn ghost" href="/senda">{c.easy}</a>
           <a className="sh-btn ghost" href="/senda/red">{c.red}</a>
           <a className="sh-link" href="/senda/estado">{c.proof} →</a>
         </div>
       </div>
 
+      <SendaHub locale={locale} />
+
       {/* ESPECIAL INFORMATIVO / BREAKING NEWS SPECIAL */}
       <div className="sh-broadcast" id="telediario">
         <div className="sh-broadcast-head">
-          <span className="sh-broadcast-badge"><i aria-hidden="true"/> EN DIRECTO · LIVE · 20:11 UTC</span>
+          <span className="sh-broadcast-badge"><i aria-hidden="true"/> ESPECIAL SIMULADO · SIMULATED SPECIAL · NO ES EN DIRECTO</span>
           <span className="sh-broadcast-meta">{c.broadcastMeta}</span>
         </div>
         <h2 className="sh-h2" style={{ marginTop: '6px' }}>{c.broadcastT}</h2>

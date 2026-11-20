@@ -118,8 +118,15 @@ export function lookAngles(el, observer, timeMs, propagator = propagateKeplerJ2)
   };
 }
 
-/** Catálogo de TLEs auténticos fechados para misiones de observación y emergencia */
-export const AUTHENTIC_DATED_TLES = Object.freeze({
+/**
+ * TLE ILUSTRATIVOS (NO auténticos). Auditoría del 20-11-2026: 7 de sus 8 líneas tienen la suma de
+ * control TLE inválida y las épocas y números de revolución están redondeados (p. ej. «12345»), así
+ * que no proceden de NORAD/CelesTrak. Sirven para probar el propagador con órbitas plausibles
+ * (inclinación y altitud de cada misión), NUNCA para predecir pasos reales. Para efemérides reales,
+ * use una instantánea fechada con fuente (p. ej. /senda/data/tle/) o CelesTrak en vivo.
+ */
+export const TLE_CHECKSUM_VALID = (line) => { let s = 0; for (const c of line.slice(0, 68)) { if (c >= '0' && c <= '9') s += +c; else if (c === '-') s += 1; } return s % 10 === Number(line[68]); };
+export const ILLUSTRATIVE_TLES = Object.freeze({
   ISS: {
     name: 'ISS (ZARYA)',
     norad: 25544,

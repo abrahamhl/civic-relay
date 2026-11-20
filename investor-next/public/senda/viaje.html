@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SENDA · De Arnhem a San Martín</title>
+<meta name="description" content="Cómo llega un mensaje de alguien con Internet en Arnhem a su hermano sin cobertura en San Martín de Valdeiglesias: cifrado de extremo a extremo, relé, última milla por satélite, vecinos, LoRa o dron, y el mismo mensaje convertido en SMS, radio, sonido y luz. Calculado con el código real de SENDA.">
+<meta name="theme-color" content="#0c0e11">
+<link rel="icon" href="/senda/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/senda/fonts/fonts.css">
+<style>
+:root{--bg:#0c0e11;--p:#13161a;--p2:#181c21;--line:#252a31;--line2:#30363e;--t:#e8eaed;--m:#8f97a1;--d:#646c77;--acc:#f0a73a;--red:#e5484d;--blue:#4f8cff;--ok:#3fb27f}
+*{box-sizing:border-box}html{scroll-behavior:smooth}@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--bg);color:var(--t);font:16px/1.6 "Inter",system-ui,sans-serif;font-feature-settings:"tnum" 1;-webkit-font-smoothing:antialiased}
+a{color:#8fb4ff}:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px}
+.bar{position:sticky;top:0;z-index:20;display:flex;gap:16px;align-items:center;height:54px;padding:0 20px;background:#0c0e11;border-bottom:1px solid var(--line)}
+.bar b{font-weight:650}.bar span{color:var(--m);font-size:14px}.bar nav{margin-left:auto;display:flex;gap:16px;font-size:14px;overflow-x:auto}.bar nav a{color:var(--m);text-decoration:none;white-space:nowrap}.bar nav a:hover{color:var(--t)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.hero{position:relative;min-height:88svh;display:flex;align-items:flex-end;overflow:hidden}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.5) saturate(.9)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0c0e1100 30%,#0c0e11 100%)}
+.hero .wrap{position:relative;z-index:2;padding-bottom:8vh;width:100%}
+h1{font-size:clamp(34px,6vw,76px);line-height:1.02;letter-spacing:-.035em;font-weight:650;margin:0 0 16px;max-width:17ch}
+.lead{font-size:clamp(17px,1.6vw,20px);color:#cfd5da;max-width:62ch;margin:0}
+.credit{position:absolute;right:14px;bottom:10px;z-index:3;font-size:11px;color:#9aa3ad;margin:0}
+.who{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:28px;max-width:720px}
+.who div{background:rgba(19,22,26,.92);padding:14px 16px}.who b{display:block;font-size:17px}.who span{color:var(--m);font-size:14px}
+.step{padding:12vh 0 4vh;border-top:1px solid var(--line)}
+.n{font:600 13px "Inter";color:var(--m);margin:0}
+h2{font-size:clamp(28px,3.8vw,48px);line-height:1.08;letter-spacing:-.03em;font-weight:620;margin:8px 0 14px;max-width:22ch}
+h2 span{color:var(--m)}
+p.t{color:#cfd5da;max-width:66ch;margin:0 0 12px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px;margin-top:26px;align-items:start}
+@media(max-width:900px){.grid2{grid-template-columns:minmax(0,1fr)}.who{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--p);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid #20252b;font-size:14.5px}.row:first-child{border-top:0}.row span{color:var(--m)}.row b{font-weight:600;text-align:right;word-break:break-word}
+button{font:inherit;font-size:14.5px;color:var(--t);background:var(--p2);border:1px solid var(--line2);border-radius:8px;padding:9px 14px;min-height:44px;cursor:pointer}
+button:hover{border-color:#4a525d}button.pri{background:var(--t);color:#0c0e11;border-color:var(--t);font-weight:600}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-top:16px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--p);cursor:pointer;font-size:14.5px}
+.opt input{margin-top:4px;accent-color:var(--ok)}.opt small{display:block;color:var(--m);font-size:13px;margin-top:2px}
+.status{font-size:20px;font-weight:600;margin:14px 0 6px}.status.ok{color:var(--ok)}.status.wait{color:var(--acc)}
+canvas{width:100%;height:auto;display:block;border-radius:10px;background:#0a0c0f;border:1px solid var(--line)}
+.forms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}@media(max-width:900px){.forms{grid-template-columns:minmax(0,1fr)}}
+.form h3{margin:0 0 6px;font-size:16px;font-weight:600}.form p{margin:0 0 8px;color:var(--m);font-size:14px}
+pre{margin:0;max-height:150px;overflow:auto;background:#0a0c0f;border:1px solid var(--line);border-radius:8px;padding:10px;font:12px/1.5 "IBM Plex Mono",monospace;color:#b9c3cc;white-space:pre-wrap;word-break:break-all}
+.light{height:46px;border-radius:8px;background:#111;border:1px solid var(--line);margin-bottom:8px;transition:background .05s}
+.ver{margin-top:18px;padding:14px 16px;border:1px solid #2b5a43;background:#0f1e17;border-radius:10px;font-size:15px}
+table{width:100%;border-collapse:collapse;font-size:14.5px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--m);font-weight:600;font-size:12.5px}
+.st{font-size:13px;font-weight:600}.st.y{color:var(--ok)}.st.p{color:var(--acc)}.st.n{color:var(--m)}
+.vids{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:20px}
+.vids figure{margin:0}.vids video{width:100%;border-radius:10px;background:#000;border:1px solid var(--line)}.vids figcaption{font-size:14px;color:var(--m);margin-top:6px}
+.note{font-size:13px;color:var(--d);margin-top:10px}
+footer{padding:40px 20px;color:var(--d);font-size:13px;text-align:center;border-top:1px solid var(--line);margin-top:10vh}
+</style>
+</head>
+<body>
+<header class="bar"><b>SENDA</b><span>De Arnhem a San Martín</span>
+  <nav aria-label="Secciones"><a href="#cifrar">Cifrar</a><a href="#ultima">Última milla</a><a href="#formas">Cinco formas</a><a href="#offline">Sin conexión</a><a href="#modulos">Módulos</a><a href="#integra">Integraciones</a><a href="#videos">Vídeos</a><a href="/senda/sala">Sala</a><a href="/senda/explica">Explicado</a></nav>
+</header>
+
+<section class="hero">
+  <img src="/senda/data/smv2026/tci_d0724.jpg" alt="Imagen real de satélite Sentinel-2 de San Martín de Valdeiglesias el 24-07-2026, durante el incendio">
+  <div class="wrap">
+    <p class="n">Un caso concreto, contado con el código de SENDA</p>
+    <h1>Tú tienes Internet en Arnhem. Tu hermano, en San Martín, no tiene nada.</h1>
+    <p class="lead">Escribes en SENDA y pulsas enviar. Lo difícil no es la primera parte (tú tienes red): es la <b>última milla</b> hasta un móvil sin cobertura. Esta página la recorre paso a paso, con el cifrado, la elección de camino y el formato reales de la app. Lo que no exista en San Martín no se inventa: si no hay ningún camino, el mensaje espera y te lo dice.</p>
+    <div class="who"><div><b>Remitente · Arnhem (NL)</b><span>51,985 N · 5,899 E · con Internet</span></div><div><b>Destinatario · San Martín de Valdeiglesias (ES)</b><span>40,362 N · 4,398 O · sin cobertura</span></div></div>
+  </div>
+  <p class="credit">Imagen real: contiene datos modificados de Copernicus Sentinel-2 (24-07-2026), incendio de San Martín de Valdeiglesias</p>
+</section>
+
+<section class="step" id="cifrar"><div class="wrap">
+  <p class="n">1 · En tu móvil, en Arnhem</p>
+  <h2>El mensaje se cifra antes de salir. <span>Nadie en el camino puede leerlo.</span></h2>
+  <p class="t">SENDA crea una identidad para cada persona (claves que solo viven en su teléfono). Tu mensaje se cifra con la clave de tu hermano y se firma con la tuya. Cualquier móvil, antena o servidor que lo transporte ve solo lo imprescindible para moverlo: el tipo, la prioridad y la caducidad.</p>
+  <div class="grid2">
+    <div class="panel">
+      <label for="msg" class="n">Tu mensaje</label>
+      <textarea id="msg" rows="3" style="width:100%;margin-top:8px;font:inherit;font-size:15px;background:#0a0c0f;color:var(--t);border:1px solid var(--line2);border-radius:8px;padding:10px" maxlength="240">Estoy bien en Arnhem. ¿Estáis bien? Si no tenéis agua, id al polideportivo. Llámame cuando puedas.</textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="pri" id="seal">Cifrar y firmar</button></div>
+      <div id="sealout" style="margin-top:12px"></div>
+    </div>
+    <div class="panel"><p class="n" style="margin-bottom:8px">Lo que ve un relé por el camino</p><div id="relayview"><p class="note">Pulsa «Cifrar y firmar».</p></div>
+      <p class="note">Calculado aquí con <span class="mono">envelope.mjs</span>: ECDH + AES-GCM para cifrar, ECDSA P-256 para firmar (WebCrypto).</p></div>
+  </div>
+</div></section>
+
+<section class="step" id="ultima"><div class="wrap">
+  <p class="n">2 · Internet lo lleva al relé de SENDA · 3 · y ahí empieza la última milla</p>
+  <h2>¿Qué hay ahora mismo en San Martín? <span>Marca lo que exista de verdad.</span></h2>
+  <p class="t">El relé guarda el mensaje cifrado (no puede leerlo) y busca un camino hasta tu hermano. SENDA no puede inventarse una antena: usa lo que haya. Empieza sin nada marcado: así funciona hoy si nadie cerca tiene SENDA ni equipos.</p>
+  <div class="opts" id="opts"></div>
+  <div class="grid2">
+    <div><canvas id="map" width="900" height="520" aria-label="Recorrido del mensaje desde Arnhem hasta San Martín"></canvas></div>
+    <div class="panel"><div id="planout"></div></div>
+  </div>
+</div></section>
+
+<section class="step" id="formas"><div class="wrap">
+  <p class="n">4 · Transmutación</p>
+  <h2>El mismo mensaje, en cinco formas. <span>La esencia no cambia.</span></h2>
+  <p class="t">Lo que viaja no es «un texto», sino un sobre de bytes cifrados y firmados. Cada camino lo transporta en su propio idioma: caracteres en un SMS, fragmentos en la radio LoRa, tonos en el aire, destellos de luz. Al llegar, los trozos se juntan, la firma se comprueba y tu hermano lee tu mensaje. Si un solo bit cambia, la firma falla y el mensaje se descarta.</p>
+  <div class="forms">
+    <div class="panel form"><h3>Texto SMS (también por satélite al móvil)</h3><p id="f-sms-h">—</p><pre id="f-sms"></pre></div>
+    <div class="panel form"><h3>Radio LoRa 868 MHz</h3><p id="f-lora-h">—</p><pre id="f-lora"></pre></div>
+    <div class="panel form"><h3>Sonido (altavoz → micrófono)</h3><p id="f-snd-h">—</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="f-snd-play">▶ Oír el primer tramo</button></div></div>
+    <div class="panel form"><h3>Luz (linterna o pantalla) · prototipo</h3><p id="f-light-h">—</p><div class="light" id="f-light"></div><button id="f-light-play">▶ Emitir el primer byte</button><p class="note">Codificación Manchester de esta página; aún no está en el núcleo de SENDA.</p></div>
+  </div>
+  <div class="ver" id="verify" aria-live="polite">Cifra un mensaje en el paso 1 para verlo reconstruido.</div>
+</div></section>
+
+<section class="step" id="offline"><div class="wrap">
+  <p class="n">5 · Sin ninguna red</p>
+  <h2>Lo que funciona con cero antenas, cero wifi y cero Internet.</h2>
+  <div class="grid2">
+    <div class="panel"><table><tbody>
+      <tr><td><b>La app abre sin red</b></td><td>Se instala como aplicación web y queda guardada en el teléfono; en Android corre dentro de la app sin conexión.</td></tr>
+      <tr><td><b>Guardar y reenviar</b></td><td>Si no hay camino, el mensaje espera cifrado en el teléfono y sale solo cuando aparece uno.</td></tr>
+      <tr><td><b>De móvil a móvil</b></td><td>Bluetooth y Wi-Fi Direct entre personas con SENDA; cada uno lleva mensajes de otros sin poder leerlos.</td></tr>
+      <tr><td><b>Por el aire</b></td><td>Sonido entre dos teléfonos cercanos (módem acústico real).</td></tr>
+      <tr><td><b>Mulas</b></td><td>Coches, autobuses o drones que pasan recogen y entregan mensajes guardados.</td></tr>
+      <tr><td><b>Acuse de recibo</b></td><td>Solo cuando tu hermano abre el mensaje vuelve un acuse firmado. Sin acuse, SENDA dice «en camino», nunca «entregado».</td></tr>
+    </tbody></table></div>
+    <div class="panel"><p class="n">Límites honestos</p><p class="t" style="font-size:15px">Si en un valle no hay nadie con SENDA, ni satélite compatible, ni radio, ni nadie que pase, el mensaje espera. Ninguna tecnología crea un camino donde no hay ningún emisor. Lo que hace SENDA es usar <b>todos</b> los que existan a la vez y decirte la verdad sobre el estado.</p><p class="note">Las probabilidades de cada camino son de planificación hasta el ensayo de campo con móviles y radios reales.</p></div>
+  </div>
+</div></section>
+
+<section class="step" id="modulos"><div class="wrap">
+  <p class="n">6 · Módulos opcionales</p>
+  <h2>El móvil basta. <span>Estos accesorios amplían el alcance.</span></h2>
+  <p class="t">Lista sacada del propio código (<span class="mono">bearers.mjs</span> y el accesorio ESP32 del repositorio). Precios: no verificados, por eso no se muestran.</p>
+  <div class="panel" style="margin-top:16px;overflow-x:auto"><table id="modt"><thead><tr><th>Módulo</th><th>Qué añade</th><th>Hardware</th><th>Límites legales o técnicos</th></tr></thead><tbody></tbody></table></div>
+</div></section>
+
+<section class="step" id="integra"><div class="wrap">
+  <p class="n">7 · Una capa por encima de lo que ya existe</p>
+  <h2>SENDA no sustituye ninguna app ni red. <span>Habla con ellas.</span></h2>
+  <p class="t">Estado real, sin maquillaje: «formato soportado» significa que el código lee o escribe ese formato; «requiere acuerdo» significa que la conexión real necesita un convenio que hoy no existe.</p>
+  <div class="panel" style="margin-top:16px;overflow-x:auto"><table><thead><tr><th>Sistema</th><th>Qué aporta SENDA</th><th>Estado</th></tr></thead><tbody>
+    <tr><td>Alertas públicas (ES-Alert, EU-Alert)</td><td>Alerta CAP 1.2 que se responde (bien / ayuda / puedo ayudar / veo) y llega también sin antena</td><td><span class="st y">Formato soportado</span> · <span class="st p">emisión real requiere credencial del organismo</span></td></tr>
+    <tr><td>112 y centros de coordinación</td><td>Incidentes CAP 1.2, mapeo EMSI (ISO/TR 22351), cadena de auditoría</td><td><span class="st y">Formato soportado</span> · <span class="st p">requiere acuerdo</span></td></tr>
+    <tr><td>DGT y tráfico (DATEX II)</td><td>Incidencias y cámaras públicas leídas y fusionadas; aviso a quien se acerca</td><td><span class="st y">Datos abiertos leídos</span> · <span class="st p">DGT 3.0 requiere acuerdo</span></td></tr>
+    <tr><td>Waze y Google Maps</td><td>Complemento: aviso cuando no hay datos, punto kilométrico sin red, coche que confirma</td><td><span class="st p">Requiere acuerdo (no verificado ningún contacto)</span></td></tr>
+    <tr><td>Drones (Remote ID UE)</td><td>Ver drones cooperativos en el móvil; dron como mula de mensajes</td><td><span class="st y">Formato ODID soportado</span> · <span class="st p">U-space requiere acuerdo</span></td></tr>
+    <tr><td>Embalses y ríos</td><td>Aviso aguas arriba con aforos y lluvia de cabecera</td><td><span class="st y">Modelo implementado</span> · <span class="st p">datos SAIH en tiempo real: no verificado</span></td></tr>
+    <tr><td>Trenes</td><td>Detección de impacto y aviso al segundo tren (simulación)</td><td><span class="st n">Simulación</span> · <span class="st p">requiere acuerdo</span></td></tr>
+    <tr><td>Sismos (USGS, EMSC)</td><td>Lectura de catálogos públicos; aviso por zona</td><td><span class="st y">Formato soportado</span> · <span class="st n">no predice terremotos</span></td></tr>
+    <tr><td>Sistemas de cuerpos (TETRA, apps propias)</td><td>Capa común de coordinación; cada cuerpo conserva su canal</td><td><span class="st p">Requiere acuerdo con cada cuerpo</span></td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section class="step" id="videos"><div class="wrap">
+  <p class="n">8 · Vídeos</p>
+  <h2>Grabaciones reales de la app y de sus simulaciones.</h2>
+  <div class="vids">
+    <figure><video src="/media/senda-demo/SENDA-demo-real-mensaje-sin-red.mp4" controls preload="none" playsinline></video><figcaption>Mensaje sin red: grabación de la app.</figcaption></figure>
+    <figure><video src="/media/senda-demo/SENDA-demo-real-avisos-centro.mp4" controls preload="none" playsinline></video><figcaption>Avisos desde el centro: grabación de la app.</figcaption></figure>
+    <figure><video src="/media/vision/dashcam.mp4" poster="/media/vision/dashcam-poster.jpg" controls preload="none" playsinline></video><figcaption>Cámara a bordo con vehículos detectados (YOLOX + ByteTrack, vídeo de Udacity, MIT).</figcaption></figure>
+    <figure><video src="/media/senda-demo/SENDA-demo-real-incendio-3d.mp4" controls preload="none" playsinline></video><figcaption>Incendio de San Martín en 3D con datos reales.</figcaption></figure>
+    <figure><video src="/media/senda-sala-es.mp4" poster="/media/senda-sala-poster-es.jpg" controls preload="none" playsinline></video><figcaption>Sala de decisión sobre la DANA real.</figcaption></figure>
+    <figure><video src="/media/senda-explica-es.mp4" poster="/media/senda-explica-poster-es.jpg" controls preload="none" playsinline></video><figcaption>SENDA explicado: recorrido completo.</figcaption></figure>
+  </div>
+  <p class="note">Grabaciones de la aplicación y de simulaciones en el navegador; no son ensayos de campo.</p>
+</div></section>
+
+<footer>SENDA · Esta página ejecuta <span class="mono">envelope.mjs</span>, <span class="mono">bearers.mjs</span>, <span class="mono">erasure.mjs</span> y <span class="mono">acoustic-modem.mjs</span> en tu navegador. Nada se envía a ningún servidor.</footer>
+<script type="module" src="/senda/viaje.mjs"></script>
+</body>
+</html>

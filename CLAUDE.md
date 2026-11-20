@@ -16,3 +16,4 @@
 - Pruebas: `node --test packages/senda/tests/*.test.mjs`; copia web con `node packages/senda/scripts/sync-web.mjs`.
 - Seguimiento de compromisos: `docs/CUMPLIMIENTO.md` (se revisa cada hora mientras haya trabajo abierto). Cada entrada lleva la hora y el hash del commit que la respalda; nunca una hora estimada.
 - La bóveda de defensa queda separada de las superficies civiles.
+- Toda web, página, presentación, vídeo o explicador sigue la skill `.claude/skills/senda-cinematic-web/SKILL.md` (dirección aprobada por el fundador el 20-11-2026; referencia: `/senda/explica`).

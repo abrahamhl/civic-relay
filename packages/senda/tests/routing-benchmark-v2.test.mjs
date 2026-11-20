@@ -19,7 +19,8 @@ test('benchmark v2: esquema, casos independientes y deltas pareados', () => {
     assert.equal(e.schema, 'senda.routing-benchmark/2');
     assert.equal(e.status, 'SIMULATED_BENCHMARK');
     assert.equal(e.notFieldValidation, true);
-    assert.ok(['UNCOMMITTED_BUILD', 'SOURCE_ONLY', 'ARTIFACT_HASHED'].includes(e.source.manifestClaim));
+    // NO_GIT_METADATA: entorno sin .git (compilación en Vercel); el manifiesto no se finge.
+    assert.ok(['UNCOMMITTED_BUILD', 'SOURCE_ONLY', 'ARTIFACT_HASHED', 'NO_GIT_METADATA'].includes(e.source.manifestClaim));
     assert.match(e.source.scriptSha256, /^[0-9a-f]{64}$/);
     assert.equal(e.results.length, e.parameters.scenarios.length * e.parameters.strategies.length);
     const det = e.results.find((r) => r.scenario === 'scheduled-line' && r.strategy === 'earliest');

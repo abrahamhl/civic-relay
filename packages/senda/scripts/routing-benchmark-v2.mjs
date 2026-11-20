@@ -234,7 +234,15 @@ for (const scenario of BENCH_SCENARIO_NAMES) {
   }
 }
 
-const manifest = buildManifest(repo);
+// Sin metadatos de git (p. ej. el entorno de compilación de Vercel no incluye .git) no se finge un
+// manifiesto: se declara NO_GIT_METADATA y solo se registra el commit que el entorno aporte.
+let manifest;
+try { manifest = buildManifest(repo); }
+catch {
+  manifest = { schema: 'senda.release-manifest/unavailable', claim: 'NO_GIT_METADATA',
+    git: { commit: process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.GITHUB_SHA ?? null, tree: null, dirty: null, dirtyPaths: [] },
+    source: { treeSha256: null, fileCount: null, lockfileSha256: null } };
+}
 const sourceModule = resolve(here, '../src/opportunistic-routing.mjs');
 const sourceScript = fileURLToPath(import.meta.url);
 const evidence = {
