@@ -57,7 +57,7 @@ footer{padding:40px 20px;color:var(--d);font-size:13px;text-align:center;border-
 </head>
 <body>
 <header class="bar"><b>SENDA</b><span>De Arnhem a San Martín</span>
-  <nav aria-label="Secciones"><a href="#cifrar">Cifrar</a><a href="#ultima">Última milla</a><a href="#formas">Cinco formas</a><a href="#offline">Sin conexión</a><a href="#modulos">Módulos</a><a href="#integra">Integraciones</a><a href="#videos">Vídeos</a><a href="/senda/sala">Sala</a><a href="/senda/ciclo">Ciclo</a><a href="/senda/simulador">Simulador 3D</a><a href="/senda/explica">Explicado</a></nav>
+  <nav aria-label="Secciones"><a href="#cifrar">Cifrar</a><a href="#ultima">Última milla</a><a href="#desconocido">Sin datos</a><a href="#formas">Cinco formas</a><a href="#offline">Sin conexión</a><a href="#modulos">Módulos</a><a href="#integra">Integraciones</a><a href="#videos">Vídeos</a><a href="/senda/sala">Sala</a><a href="/senda/ciclo">Ciclo</a><a href="/senda/simulador">Simulador 3D</a><a href="/senda/explica">Explicado</a></nav>
 </header>
 
 <section class="hero">
@@ -96,6 +96,26 @@ footer{padding:40px 20px;color:var(--d);font-size:13px;text-align:center;border-
     <div><canvas id="map" width="900" height="520" aria-label="Recorrido del mensaje desde Arnhem hasta San Martín"></canvas></div>
     <div class="panel"><div id="planout"></div></div>
   </div>
+</div></section>
+
+<section class="step" id="desconocido"><div class="wrap">
+  <p class="n">Sin datos, pero no solo</p>
+  <h2>Tu hermano no tiene datos. Alguien a su lado sí. <span>Y no puede leer nada.</span></h2>
+  <p class="t">WhatsApp necesita que <i>tu</i> móvil tenga datos o Wi-Fi. SENDA no: el móvil de tu hermano oye por Bluetooth a otros móviles SENDA cercanos que han aceptado prestar su conexión, reparte el mensaje cifrado en trozos entre ellos y cada uno sube su trozo. Ninguno puede leerlo, saber a quién va ni bloquearlo solo. Pulsa el botón: se ejecuta la criptografía real en tu navegador.</p>
+  <div class="grid2">
+    <div><canvas id="dz-cv" width="900" height="520" aria-label="El móvil sin datos, cuatro vecinos y el buzón"></canvas>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="pri" id="dz-go">Enviar sin datos</button><button id="dz-reset">Reiniciar</button></div></div>
+    <div class="panel"><div id="dz-out"><p class="note" style="margin:0">Cuatro vecinos: dos prestan su conexión (4G y el Wi-Fi del bar), uno no ha dado permiso y otro tiene poca batería.</p></div></div>
+  </div>
+  <div class="grid2" style="margin-top:18px">
+    <div class="panel"><p class="n" style="margin-bottom:6px">Lo que ve el vecino que ayuda (primeros bytes del trozo que lleva)</p><pre id="dz-hex">—</pre></div>
+    <div class="panel"><p class="n" style="margin-bottom:6px">¿Cuánto tarda en encontrar a alguien? (escenario de ejemplo, Poisson espacial)</p>
+      <label style="font-size:14px;color:var(--m)">Habitantes por km²: <b id="dz-dv">60</b></label><input id="dz-d" type="range" min="20" max="8000" step="10" value="60" style="width:100%">
+      <label style="font-size:14px;color:var(--m)">Alcance de radio: <b id="dz-rv">40</b> m</label><input id="dz-r" type="range" min="10" max="200" step="5" value="40" style="width:100%">
+      <div id="dz-math" style="margin-top:6px"></div>
+      <p class="note">Ejemplo declarado, sin fuente: 5 % de las personas con SENDA, datos y permiso; andando a 1,2 m/s; k = 3 de 6 trozos, 2 por vecino, 80 % de entregas bien. Lo decisivo en un pueblo es el alcance: una pasarela fija (bar, ayuntamiento) pesa al cuadrado.</p></div>
+  </div>
+  <p class="note" style="overflow-wrap:anywhere">Código: <span style="font-family:'IBM Plex Mono',monospace">stranger-gateway.mjs</span> (baliza de 18 B, buzón cegado que cambia cada día, sobre exterior, sello de trabajo, recibo de custodia, reparto k-de-n). Informe: docs/research/SENDA_MENSAJERIA_SIN_COBERTURA_2026-11-20.md.</p>
 </div></section>
 
 <section class="step" id="formas"><div class="wrap">
@@ -167,5 +187,6 @@ footer{padding:40px 20px;color:var(--d);font-size:13px;text-align:center;border-
 
 <footer>SENDA · Esta página ejecuta <span class="mono">envelope.mjs</span>, <span class="mono">bearers.mjs</span>, <span class="mono">erasure.mjs</span> y <span class="mono">acoustic-modem.mjs</span> en tu navegador. Nada se envía a ningún servidor.</footer>
 <script type="module" src="/senda/viaje.mjs"></script>
+<script type="module" src="/senda/viaje-desconocido.mjs"></script>
 </body>
 </html>
