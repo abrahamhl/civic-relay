@@ -1,4 +1,5 @@
 /** Portada SENDA en el índice (/, /es, /nl): app, todas las funciones, la película y la verificación. */
+import SendaHub from './senda-hub';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import './senda-home.css';
@@ -291,10 +292,12 @@ export default function SendaHome({ locale }: { locale: Locale }) {
         </div>
       </div>
 
+      <SendaHub locale={locale} />
+
       {/* ESPECIAL INFORMATIVO / BREAKING NEWS SPECIAL */}
       <div className="sh-broadcast" id="telediario">
         <div className="sh-broadcast-head">
-          <span className="sh-broadcast-badge"><i aria-hidden="true"/> EN DIRECTO · LIVE · 20:11 UTC</span>
+          <span className="sh-broadcast-badge"><i aria-hidden="true"/> ESPECIAL SIMULADO · SIMULATED SPECIAL · NO ES EN DIRECTO</span>
           <span className="sh-broadcast-meta">{c.broadcastMeta}</span>
         </div>
         <h2 className="sh-h2" style={{ marginTop: '6px' }}>{c.broadcastT}</h2>
