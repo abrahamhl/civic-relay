@@ -1,5 +1,17 @@
 # Changelog
 
+## SENDA · 20-11-2026 · Plataforma Simulador Aeroespacial Obsidian + Integración total OSINT, Mission Control 3D, Ojo Satélites, 7 Laboratorios y 38 Módulos (`feat/web-redesign-20261119`)
+
+**Entrada (fundador):** elevar radicalmente el nivel hacia una plataforma simulador aeroespacial/Palantir avanzada, corrigiendo la experiencia móvil (390 px), adoptando estética oscura táctica por defecto, reutilizando todos los motores avanzados del diseño anterior (`MissionControl 3D`, `SectorIntelligenceConsole` OSINT CCTV, `Ojo de SENDA`, `HyperFrames`, `CrisisStory`, `CommandSurface 90 KB`, `CoordinationLab`, `LiveHardwareConsole`, `38` módulos y reels verticales 9:16) y desplegándolo en producción.
+
+**Procesamiento:**
+- **Estética Obsidian por defecto (`tokens.css`, `ThemeToggle.tsx`):** modo oscuro aeroespacial `#050a12` con rejilla orbital, acentos cian `#38bdf8` y coral táctico `#d83e18`, manteniendo selector a modo claro en 1 clic.
+- **Móvil 390 px impecable (`CookieBanner.tsx`, `LivingScrollDock.tsx`, `senda.css`):** aviso de privacidad reducido a una micro-píldora no bloqueante, barra flotante viva de navegación por capítulos con `%` de scroll (`01 Cinema`..`08 38 Módulos`), selector de claridad en una fila y endurecimiento responsive `.s-sim-frame` con 0 desbordamiento horizontal en todos los simuladores.
+- **Reintegración completa de motores avanzados en portada:** `MissionControlDeck` (3D raycast Tierra/Luna/Marte + satélites + sectores + timeline), `OsintIntelligenceDeck` (matriz CCTV 1/4/9 + conos FOV + pipeline OSINT de 8 etapas), `OrbitalOjoDeck` (Ojo de SENDA Iridium/Galileo/QO-100 en vivo + HyperFrames 5 actos + historia animada de 7 escenas + globo multipath 3D), `SensorShowcase` (6 sensores del móvil), `CrisisAtlas` (7 crisis reales), `InteractiveLabsHub` (los **7 simuladores**: Telecom/CSI, CommandSurface 90 KB, RailSafety, VehicularDoppler, CoordinationLab 3D, 5 Teoremas, WebCrypto ECDSA + Calibración L2.5) y `FullCapabilityMatrix` (**38 capacidades** + reels verticales 9:16 + biblioteca de películas con autodetección de idioma y subtítulos ES/EN/NL).
+- **Verificación y Producción:** `117/117` tests unitarios, `check:locales` PASS, Playwright 38 vistas (`0` rotos, `0` overflow en 390/834/1440 px incluyendo simuladores montados, `0` errores de consola, JS inicial Home `168 kB gz`), Lighthouse **Performance 98 · Accessibility 100 · Best Practices 100 · SEO 100** (`LCP 1.65 s`, `CLS 0.000`, `TBT 66 ms`), desplegado en vivo en `https://civic-relay-investor.vercel.app` (`dpl_AnkDX9DYyfYRsecWsgxghRAojXjM`) y ZIPs Hostinger actualizados (`90,1 MB`).
+
+---
+
 ## SENDA · 20-11-2026 · Fusión Apple Keynote × Palantir Interactive Showcase + Despliegue en Producción Vercel (`feat/web-redesign-20261119`)
 
 **Entrada (fundador):** fusionar la claridad visual estilo Apple del rediseño con todas las simulaciones interactivas más avanzadas del proyecto anterior (globo 3D con satélites en vivo, radar Wi-Fi CSI, seguridad ferroviaria España, Doppler vehicular, 5 teoremas, calibración L2.5), vídeo de presentación integrado y optimizado para móvil, animaciones interactivas por scroll de cada sensor del móvil, atlas de inspiración y crisis reales (trenes España, riadas Valencia/Indonesia/Nepal, terremotos Venezuela, tráfico, incendios 3D, agua NL) y explicaciones multi-nivel (para cualquier persona, inversor e ingeniería/código).

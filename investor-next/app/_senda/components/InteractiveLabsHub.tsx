@@ -2,17 +2,19 @@
 
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
-import { Car, FlaskConical, Gauge, Satellite, TrainFront } from 'lucide-react';
+import { Building2, Car, FlaskConical, Gauge, Radio, Satellite, TrainFront } from 'lucide-react';
 import type { Locale } from '../data/types';
 
 const TelecomAndRfRadarSuite = dynamic(() => import('../../telecom-rf-radar-suite'), { ssr: false });
+const CommandSurface = dynamic(() => import('../../command-surface'), { ssr: false });
 const RailSafetyLab = dynamic(() => import('../../rail-safety-lab'), { ssr: false });
 const VehicularDopplerLab = dynamic(() => import('../../vehicular-doppler-lab'), { ssr: false });
+const CoordinationLab = dynamic(() => import('../../coordination-lab'), { ssr: false });
 const ScientificTheoremsLab = dynamic(() => import('../../scientific-theorems-lab'), { ssr: false });
 const CalibrationPanel = dynamic(() => import('../../calibration-panel'), { ssr: false });
-const DeviceFieldDiagnostics = dynamic(() => import('../../device-field-diagnostics'), { ssr: false });
+const LiveHardwareAndDealRoomConsole = dynamic(() => import('../../live-hardware-console'), { ssr: false });
 
-export type LabId = 'telecom' | 'rail' | 'doppler' | 'theorems' | 'calibration';
+export type LabId = 'telecom' | 'mando' | 'rail' | 'doppler' | 'building' | 'theorems' | 'calibration';
 
 interface LabTabDef {
   id: LabId;
@@ -27,9 +29,9 @@ const LABS: LabTabDef[] = [
     id: 'telecom',
     icon: Satellite,
     title: {
-      en: 'Satellites 3GPP NTN & Wi-Fi CSI Radar',
+      en: 'Satellites 3GPP NTN & Wi-Fi CSI',
       es: 'Satélites 3GPP NTN y Radar Wi-Fi CSI',
-      nl: '3GPP NTN Satellieten & Wi-Fi CSI Radar'
+      nl: '3GPP NTN Satellieten & Wi-Fi CSI'
     },
     summary: {
       en: 'Adjust LEO/MEO/GEO orbits, elevation angle, 24-byte binary burst frames, 9-sector mesh recovery, and ITU-R P.2040 through-wall 64-subcarrier OFDM tomography live.',
@@ -37,9 +39,28 @@ const LABS: LabTabDef[] = [
       nl: 'Pas LEO/MEO/GEO-banen, elevatiehoek, 24-byte frames, 9-sector herstel en ITU-R P.2040 64-subcarrier OFDM muurtomografie live aan.'
     },
     tryHint: {
-      en: 'Slide orbit elevation or wall material below to watch link budgets and OFDM spectra recalculate live.',
+      en: 'Slide orbit elevation or wall material below to recalculate link budgets and OFDM spectra live.',
       es: 'Mueve los deslizadores de órbita, elevación o tipo de muro para recalcular el balance satelital y el espectro OFDM en vivo.',
       nl: 'Verschuif elevatiehoek of muurmateriaal om linkbudgetten en OFDM-spectra live te herberekenen.'
+    }
+  },
+  {
+    id: 'mando',
+    icon: Radio,
+    title: {
+      en: 'Multichannel Command & Corridor A12',
+      es: 'Mando Multicanal, RF y Corredor A12',
+      nl: 'Multikanaal Commando & A12 Corridor'
+    },
+    summary: {
+      en: 'Full multichannel activation panel: blackout presets, weighted RF trilateration, propagation margins, hop-by-hop mesh routing, and 9-layer A12 Arnhem–Ede Corridor Intelligence.',
+      es: 'Panel completo de activaciones multicanal: escenarios de apagón, trilateración RF ponderada, márgenes de propagación, rutas multisalto y 9 capas del Corredor A12 Arnhem–Ede.',
+      nl: 'Multikanaal activatiepaneel: uitvalscenario’s, gewogen RF-trilateratie, mesh-routes en 9-laags A12 Arnhem–Ede Corridor Intelligence.'
+    },
+    tryHint: {
+      en: 'Switch between activation scenarios, RF link budget, trilateration, and Corridor Intelligence layers.',
+      es: 'Explora activaciones, balance RF, trilateración y las 9 capas de Corridor Intelligence directamente aquí.',
+      nl: 'Wissel tussen activaties, RF-linkbudget, trilateratie en de 9 Corridor Intelligence-lagen.'
     }
   },
   {
@@ -81,6 +102,25 @@ const LABS: LabTabDef[] = [
     }
   },
   {
+    id: 'building',
+    icon: Building2,
+    title: {
+      en: '3D Building Collapse & Routing Lab',
+      es: 'Edificio 3D y Laboratorio de Enrutamiento',
+      nl: '3D Gebouw & Routeringslab'
+    },
+    summary: {
+      en: 'Simulate an earthquake damaging a 5-storey building with 20–100 devices, opt-in permissions, SAFE / SOS / UNKNOWN states, battery limits, and adaptive gateway routing.',
+      es: 'Simula un terremoto en un edificio de 5 plantas con 20–100 dispositivos, permisos opt-in, estados SAFE / SOS / UNKNOWN, cuotas de batería y enrutamiento adaptativo.',
+      nl: 'Simuleer een aardbeving in een gebouw met 5 verdiepingen, 20–100 toestellen, opt-in rechten, SAFE/SOS/UNKNOWN en adaptieve routering.'
+    },
+    tryHint: {
+      en: 'Adjust infrastructure damage %, battery level, and active radios to compare cellular vs SENDA.',
+      es: 'Ajusta % de daño, batería y radios activas para comparar red celular frente a SENDA adaptativo.',
+      nl: 'Pas schadepercentage, accu en actieve radio’s aan om mobiel versus SENDA te vergelijken.'
+    }
+  },
+  {
     id: 'theorems',
     icon: FlaskConical,
     title: {
@@ -103,19 +143,19 @@ const LABS: LabTabDef[] = [
     id: 'calibration',
     icon: Gauge,
     title: {
-      en: 'L2.5 Calibration & Device Sensors',
-      es: 'Calibración L2.5 y Sensores del Móvil',
-      nl: 'L2.5 Kalibratie & Toestelsensoren'
+      en: 'WebCrypto ECDSA, L2.5 & Hardware',
+      es: 'WebCrypto ECDSA, Calibración y Móvil',
+      nl: 'WebCrypto ECDSA, L2.5 & Hardware'
     },
     summary: {
-      en: '5-bin reliability calibration diagram (Brier score, ECE, Murphy decomposition) paired with live user-initiated browser sensor & hardware capability diagnostics.',
-      es: 'Diagrama de fiabilidad en 5 intervalos (Brier score, ECE, descomposición de Murphy) junto al diagnóstico interactivo de sensores reales de tu propio móvil o navegador.',
-      nl: 'Betrouwbaarheidsdiagram (Brier-score, ECE, Murphy-decompositie) samen met live sensordiagnostiek op uw eigen toestel.'
+      en: 'Generate real ECDSA P-256 keys and signed OEP packets in your browser, test local device sensors, and inspect the 5-bin L2.5 reliability calibration diagram.',
+      es: 'Genera claves ECDSA P-256 reales y paquetes OEP firmados en tu navegador, prueba los sensores reales de tu móvil y explora el diagrama de calibración L2.5.',
+      nl: 'Genereer echte ECDSA P-256-sleutels en ondertekende pakketten in uw browser, test sensoren en bekijk L2.5-kalibratie.'
     },
     tryHint: {
-      en: 'Inspect reliability curves and run an optional local sensor check on the device you are holding right now.',
-      es: 'Inspecciona las curvas de calibración y lanza el diagnóstico opcional de sensores en tu propio dispositivo.',
-      nl: 'Bekijk kalibratiecurves en start optioneel de sensordiagnostiek op uw huidige toestel.'
+      en: 'Sign a live cryptographic packet and run an optional sensor diagnostic on your phone or laptop.',
+      es: 'Firma un paquete criptográfico real y ejecuta un diagnóstico opcional de sensores en tu dispositivo.',
+      nl: 'Onderteken een echt cryptografisch pakket en start een optionele sensortest.'
     }
   }
 ];
@@ -134,19 +174,19 @@ export default function InteractiveLabsHub({
 
   const copy = {
     en: {
-      eyebrow: 'INTERACTIVE ENGINEERING SIMULATORS · LIVE EXECUTION IN BROWSER',
-      title: 'Test every physics, satellite, rail, Doppler, and sensor engine live.',
-      lead: 'Select one lab at a time so every control stays crystal clear, fast, and touch-friendly on both mobile and desktop.'
+      eyebrow: '7 LIVE PALANTIR-GRADE SIMULATORS · REAL CODE EXECUTING IN YOUR BROWSER',
+      title: 'Test every satellite, RF, rail, Doppler, 3D building, theorem & crypto engine live.',
+      lead: 'All seven advanced engineering consoles unified into one clean, mobile-ready workbench — one active lab at a time so every slider works cleanly.'
     },
     es: {
-      eyebrow: 'SIMULADORES INTERACTIVOS DE INGENIERÍA · EJECUCIÓN REAL EN TU NAVEGADOR',
-      title: 'Prueba en vivo cada motor de satélites, radar Wi-Fi, trenes, Doppler y teoremas.',
-      lead: 'Elige un laboratorio a la vez para explorar cada simulación con controles claros, rápidos y cómodos tanto en móvil como en ordenador.'
+      eyebrow: '7 SIMULADORES AVANZADOS EN VIVO · CÓDIGO REAL EJECUTÁNDOSE EN TU NAVEGADOR',
+      title: 'Prueba en vivo satélites, mando RF, trenes, Doppler, edificio 3D, teoremas y WebCrypto.',
+      lead: 'Las 7 consolas de ingeniería más avanzadas del proyecto unificadas en un banco de trabajo limpio y adaptado a móvil — un simulador activo cada vez para máxima claridad.'
     },
     nl: {
-      eyebrow: 'INTERACTIEVE ENGINEERING-SIMULATOREN · LIVE IN UW BROWSER',
-      title: 'Test elke satelliet-, radar-, spoor-, Doppler- en sensorengine live.',
-      lead: 'Kies één laboratorium tegelijk zodat elke regelaar overzichtelijk, snel en mobielvriendelijk blijft.'
+      eyebrow: '7 LIVE ENGINEERING-SIMULATOREN · ECHTE CODE IN UW BROWSER',
+      title: 'Test satellieten, RF-commando, spoor, Doppler, 3D-gebouw, stellingen & WebCrypto live.',
+      lead: 'Alle zeven geavanceerde simulatoren verenigd in één overzichtelijke, mobielvriendelijke werkruimte.'
     }
   }[locale];
 
@@ -182,7 +222,6 @@ export default function InteractiveLabsHub({
           })}
         </div>
 
-        {/* Plain-language orientation card before the heavy live console */}
         <div className="s-card s-lab-intro">
           <div className="s-stack" style={{ gap: 6 }}>
             <h3 className="s-h3">{current.title[locale]}</h3>
@@ -193,20 +232,21 @@ export default function InteractiveLabsHub({
           </div>
         </div>
 
-        {/* Contained Palantir Dark-Glass Interactive Simulator Shell */}
         <div
           role="tabpanel"
           aria-labelledby={`lab-tab-${current.id}`}
-          className="s-lab-shell"
+          className="s-lab-shell s-sim-frame"
         >
           {activeLab === 'telecom' && <TelecomAndRfRadarSuite locale={locale} />}
+          {activeLab === 'mando' && <CommandSurface locale={locale} />}
           {activeLab === 'rail' && <RailSafetyLab locale={locale} />}
           {activeLab === 'doppler' && <VehicularDopplerLab locale={locale} />}
+          {activeLab === 'building' && <CoordinationLab locale={locale} />}
           {activeLab === 'theorems' && <ScientificTheoremsLab locale={locale} />}
           {activeLab === 'calibration' && (
-            <div className="s-stack-lg" style={{ padding: 24 }}>
+            <div className="s-stack-lg" style={{ padding: 'clamp(14px, 2.5vw, 24px)' }}>
+              <LiveHardwareAndDealRoomConsole locale={locale} />
               <CalibrationPanel locale={locale} />
-              <DeviceFieldDiagnostics locale={locale} />
             </div>
           )}
         </div>

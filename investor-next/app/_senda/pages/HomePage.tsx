@@ -4,14 +4,14 @@ import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import {
   ArrowRight,
-  Radio,
-  Network,
-  ShieldCheck,
   Compass,
   Users,
   FileSearch,
   Building2,
-  Cpu
+  Cpu,
+  Orbit,
+  Radio,
+  ShieldCheck
 } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import EvidenceBadge from '../components/EvidenceBadge';
@@ -19,23 +19,23 @@ import Reveal from '../components/Reveal';
 import MediaVideo from '../components/MediaVideo';
 import AudienceLens, { type AudienceMode } from '../components/AudienceLens';
 import LazySection from '../components/LazySection';
+import LivingScrollDock from '../components/LivingScrollDock';
 import { HOME_COPY } from '../data/home-product';
-import { SITE_STRINGS } from '../data/i18n';
 import { localeHref, type Locale } from '../data/types';
 
-// Lazy-loaded interactive flagship engines: 0 bytes in initial Home JS, instant mount on scroll
-const ScrollGlobeStage = dynamic(() => import('../components/ScrollGlobeStage'), { ssr: false });
+// Lazy-loaded heavyweight interactive engines: 0 bytes in initial Home JS, instant mount on scroll
+const MissionControlDeck = dynamic(() => import('../components/MissionControlDeck'), { ssr: false });
+const OsintIntelligenceDeck = dynamic(() => import('../components/OsintIntelligenceDeck'), { ssr: false });
+const OrbitalOjoDeck = dynamic(() => import('../components/OrbitalOjoDeck'), { ssr: false });
 const SensorShowcase = dynamic(() => import('../components/SensorShowcase'), { ssr: false });
 const CrisisAtlas = dynamic(() => import('../components/CrisisAtlas'), { ssr: false });
 const InteractiveLabsHub = dynamic(() => import('../components/InteractiveLabsHub'), { ssr: false });
-const ServiceCatalogSection = dynamic(() => import('../components/ServiceCatalogSection'), { ssr: false });
+const FullCapabilityMatrix = dynamic(() => import('../components/FullCapabilityMatrix'), { ssr: false });
 
-const PILLAR_ICONS = [Radio, Network, ShieldCheck];
 const AUDIENCE_ICONS = [Users, Building2, FileSearch, Compass];
 
 export default function HomePage({ locale }: { locale: Locale }) {
   const c = HOME_COPY[locale];
-  const ui = SITE_STRINGS[locale];
   const [audience, setAudience] = useState<AudienceMode>('citizen');
 
   const heroAudienceLead: Record<AudienceMode, Record<Locale, string>> = {
@@ -50,66 +50,78 @@ export default function HomePage({ locale }: { locale: Locale }) {
       nl: c.lead
     },
     engineer: {
-      en: 'Deterministic E2EE store-and-forward (ECDH P-256 + AES-GCM + ECDSA), Contact Graph Routing (ARR_REPLAN_V2, 94.2% delivery / -84% mJ), 24-byte 3GPP NTN satellite bursts, 64-subcarrier OFDM CSI radar, and 16,699-source fusion.',
-      es: 'Almacenar-y-reenviar determinista E2EE (ECDH P-256 + AES-GCM + ECDSA), Contact Graph Routing (ARR_REPLAN_V2, 94,2 % entrega / -84 % mJ), ráfagas 3GPP NTN de 24 bytes, radar CSI OFDM de 64 subportadoras y fusión de 16.699 fuentes.',
-      nl: 'Deterministische E2EE store-and-forward (ECDH P-256 + AES-GCM), Contact Graph Routing (ARR_REPLAN_V2, 94,2% / -84% mJ), 24-byte 3GPP NTN bursts en 64-subcarrier OFDM CSI.'
+      en: '3D WebGL Mission Control, OSINT CCTV 1/4/9 matrix + FOV cones, live Iridium/Galileo/QO-100 constellations, 24-byte 3GPP NTN bursts, 64-subcarrier OFDM CSI wall radar, Contact Graph Routing (94.2% / -84% mJ) & 38 working offline modules.',
+      es: 'Mission Control 3D WebGL, matriz OSINT CCTV 1/4/9 + conos FOV, constelaciones Iridium/Galileo/QO-100 en vivo, ráfagas 3GPP NTN de 24 B, radar Wi-Fi CSI OFDM de 64 subportadoras, CGR (94,2 % / -84 % mJ) y 38 módulos activos.',
+      nl: '3D WebGL Mission Control, OSINT CCTV-matrix + FOV-kegels, live Iridium/Galileo/QO-100 satellieten, 24-byte 3GPP NTN bursts, 64-subcarrier OFDM CSI en 38 werkende modules.'
     }
   };
 
+  const heroStatus = {
+    es: '506/506 PRUEBAS CORE · 38 MÓDULOS · OSINT + SATÉLITES + MALLA SIN RED',
+    en: '506/506 CORE TESTS · 38 LIVE MODULES · OSINT + SATELLITES + OFFLINE MESH',
+    nl: '506/506 KERNTESTS · 38 LIVE MODULES · OSINT + SATELLIETEN + OFFLINE MESH'
+  }[locale];
+
+  const quickCtas = {
+    es: {
+      sim3d: 'Mission Control 3D',
+      fieldApp: 'Abrir SENDA Campo',
+      easyMode: 'Modo fácil (3 botones)'
+    },
+    en: {
+      sim3d: '3D Mission Control',
+      fieldApp: 'Open SENDA Field',
+      easyMode: 'Easy mode (3 buttons)'
+    },
+    nl: {
+      sim3d: '3D Mission Control',
+      fieldApp: 'Open SENDA Veld',
+      easyMode: '3-knoppen modus'
+    }
+  }[locale];
+
   return (
     <PageShell locale={locale} active="home">
-      {/* 1. Hero Keynote — Apple Editorial + Live Presentation Video + Audience Clarity Lens */}
-      <section className="s-hero">
-        <div className="s-container">
+      {/* 1. Aerospace Command Hero — Deep Obsidian + Instant Cinema Film + Audience Clarity Lens */}
+      <section className="s-hero s-hero-command" id="hero-cinema">
+        <div className="s-hero-grid-bg" aria-hidden="true" />
+        <div className="s-container" style={{ position: 'relative', zIndex: 1 }}>
           <div className="s-hero-status">
             <EvidenceBadge locale={locale} evidenceId="EV-CORE-506" compact />
-            <span>{ui.heroPill}</span>
+            <span className="s-mono" style={{ fontSize: 11.5 }}>{heroStatus}</span>
           </div>
 
-          <p className="s-eyebrow" style={{ display: 'block' }}>
-            {c.eyebrow}
-          </p>
-          <h1 className="s-display s-center" style={{ maxWidth: '18ch' }}>
+          <h1 className="s-display s-center" style={{ maxWidth: '18ch', marginTop: 10 }}>
             {c.headline}
           </h1>
-          <p
-            className="s-h3 s-center"
-            style={{ marginTop: 18, color: 'var(--s-accent)', fontWeight: 500 }}
-          >
+          <p className="s-small s-center" style={{ marginTop: 8, color: 'var(--s-accent)', fontWeight: 600 }}>
             {c.tagline}
           </p>
-          <p className="s-lead">{heroAudienceLead[audience][locale]}</p>
+          <p className="s-lead" style={{ marginTop: 10 }}>
+            {heroAudienceLead[audience][locale]}
+          </p>
 
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 22 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 14 }}>
             <AudienceLens locale={locale} value={audience} onChange={setAudience} />
           </div>
 
-          <div className="s-hero-cta">
-            <a
-              href={localeHref(locale, 'platform')}
-              className="s-btn s-btn-primary"
-              data-testid="hero-cta-platform"
-            >
+          <div className="s-hero-cta" style={{ marginTop: 16 }}>
+            <a href="#mission-3d" className="s-btn s-btn-coral" data-testid="hero-cta-platform">
+              <Orbit size={17} aria-hidden="true" />
+              <span>{quickCtas.sim3d}</span>
+            </a>
+            <a href="/senda/" className="s-btn s-btn-primary" data-testid="hero-cta-product">
+              <Radio size={16} aria-hidden="true" />
+              <span>{quickCtas.fieldApp}</span>
+            </a>
+            <a href={localeHref(locale, 'platform')} className="s-btn s-btn-secondary">
+              <ShieldCheck size={16} aria-hidden="true" />
               <span>{c.ctaPrimary}</span>
-              <ArrowRight aria-hidden="true" />
-            </a>
-            <a
-              href="#labs"
-              className="s-btn s-btn-secondary"
-              data-testid="hero-cta-product"
-            >
-              {locale === 'es' ? 'Probar simuladores en vivo' : locale === 'nl' ? 'Start live simulatoren' : 'Try live simulators'}
-            </a>
-            <a
-              href="#sensors"
-              className="s-btn s-btn-ghost"
-            >
-              {locale === 'es' ? 'Sensores del móvil' : locale === 'nl' ? 'Telefoonsensoren' : 'Phone sensors'}
             </a>
           </div>
 
-          {/* Integrated Cinema Presentation Film right in Hero (Auto-detect browser lang + ES/EN/NL subtitles) */}
-          <div style={{ marginTop: 40, textAlign: 'left' }}>
+          {/* Integrated Cinema Presentation Film right above the fold (Auto-detect browser lang + ES/EN/NL subtitles) */}
+          <div style={{ marginTop: 28, textAlign: 'left' }}>
             <MediaVideo
               locale={locale}
               variant="cinema"
@@ -127,14 +139,14 @@ export default function HomePage({ locale }: { locale: Locale }) {
               }}
               title={
                 locale === 'es'
-                  ? 'Presentación oficial SENDA · De un corte total al rescate coordinado por satélite y malla'
+                  ? 'Película oficial SENDA 2026 · Origen, accidentes en España, satélites, OSINT y simulaciones en vivo'
                   : locale === 'nl'
-                  ? 'Officiële SENDA-presentatie · Van totale uitval naar satelliet- en mesh-redding'
-                  : 'Official SENDA Presentation · From total blackout to satellite & mesh rescue'
+                  ? 'Officiële SENDA-film 2026 · Oorsprong, satellieten, OSINT en live simulaties'
+                  : 'Official SENDA Master Film 2026 · Origin, satellites, OSINT & live core simulations'
               }
               caption={
                 locale === 'es'
-                  ? 'Detecta automáticamente el idioma de tu navegador (ES / EN) con subtítulos en Español, Inglés y Neerlandés.'
+                  ? 'Audio automático según tu navegador (ES / EN) con subtítulos en Español, Inglés y Neerlandés.'
                   : locale === 'nl'
                   ? 'Automatische browsertaaldetectie met Spaanse, Engelse en Nederlandse ondertitels.'
                   : 'Automatically matches your browser language with one-tap Spanish, English, and Dutch subtitles.'
@@ -145,57 +157,45 @@ export default function HomePage({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      {/* 2. Live 3D Orbital Satellite & Multipath Scroll Cinema (Three.js — lazy on scroll) */}
-      <LazySection id="orbital-story-wrap" placeholderHeight={640} rootMargin="420px 0px">
-        <ScrollGlobeStage locale={locale} audience={audience} />
+      {/* 2. LIVE 3D RAYCAST MISSION CONTROL (Earth · Moon · Mars + Satellites + Sectors + Timeline) */}
+      <LazySection id="mission-3d" placeholderHeight={680} rootMargin="560px 0px">
+        <MissionControlDeck locale={locale} audience={audience} />
       </LazySection>
 
-      {/* 3. Scroll-Built Smartphone Hardware & Sensor Mockup (Apple Hardware Reveal) */}
-      <LazySection id="sensors" placeholderHeight={720} rootMargin="520px 0px">
+      {/* 3. REAL OSINT & SECTOR INTELLIGENCE CCTV CONSOLE (1/4/9 Matrix + FOV Cones + 8-Stage OSINT Pipeline) */}
+      <LazySection id="osint-cctv" placeholderHeight={720} rootMargin="480px 0px">
+        <OsintIntelligenceDeck locale={locale} audience={audience} />
+      </LazySection>
+
+      {/* 4. LIVE OJO DE SENDA (Iridium · Galileo · QO-100) + HYPERFRAMES 5-ACT CINEMA + 7-SCENE ANIMATED STORY */}
+      <LazySection id="ojo-satelites" placeholderHeight={660} rootMargin="480px 0px">
+        <OrbitalOjoDeck locale={locale} audience={audience} />
+      </LazySection>
+
+      {/* 5. SCROLL-BUILT SMARTPHONE HARDWARE & SENSOR MOCKUP (All 6 Phone Sensors Animated) */}
+      <LazySection id="sensors" placeholderHeight={700} rootMargin="480px 0px">
         <SensorShowcase locale={locale} audience={audience} />
       </LazySection>
 
-      {/* 4. Real-World Inspiration & Multi-Crisis Atlas (Spain Rail, Valencia DANA, Indonesia/Nepal, Venezuela, Traffic, Fire, NL) */}
-      <LazySection id="crises" placeholderHeight={620} rootMargin="520px 0px">
+      {/* 6. REAL-WORLD INSPIRATION & MULTI-CRISIS ATLAS (Spain Rail, Valencia DANA, Indonesia/Nepal, Venezuela, Traffic, Fire, NL) */}
+      <LazySection id="crises" placeholderHeight={620} rootMargin="480px 0px">
         <CrisisAtlas locale={locale} audience={audience} />
       </LazySection>
 
-      {/* 5. Palantir-Grade Interactive Engineering Labs Hub (All 5 Real Working Simulators!) */}
-      <LazySection id="labs" placeholderHeight={680} rootMargin="450px 0px">
+      {/* 7. PALANTIR 7-SIMULATOR ENGINEERING WORKBENCH (NTN/CSI, CommandSurface 90KB, Rail, Doppler, 3D Building, 5 Theorems, WebCrypto/L2.5) */}
+      <LazySection id="labs" placeholderHeight={720} rootMargin="450px 0px">
         <InteractiveLabsHub locale={locale} defaultLab="telecom" id="labs-panel" />
       </LazySection>
 
-      {/* 6. Three Core Engines + Verifiable Metrics */}
-      <section className="s-section">
+      {/* 8. COMPLETE 38-CAPABILITY SENDA MATRIX + 9:16 VERTICAL MOBILE REELS & FULL FILM LIBRARY */}
+      <LazySection id="all-capabilities" placeholderHeight={680} rootMargin="450px 0px">
+        <FullCapabilityMatrix locale={locale} />
+      </LazySection>
+
+      {/* 9. Verified Metrics + Human-Led AI Orchestration & Vibe Coding Craftsmanship */}
+      <section className="s-section s-sunk">
         <div className="s-container s-stack-lg">
-          <Reveal>
-            <div className="s-read">
-              <h2 className="s-h2">{c.pillarsTitle}</h2>
-              <p className="s-lead">{c.pillarsLead}</p>
-            </div>
-          </Reveal>
-
-          <div className="s-grid s-grid-3">
-            {c.pillars.map((pillar, i) => {
-              const Icon = PILLAR_ICONS[i] ?? Radio;
-              return (
-                <Reveal key={pillar.title}>
-                  <article className="s-card s-card-lift" style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}>
-                    <div className="s-between">
-                      <div className="s-card-icon" style={{ marginBottom: 0 }}>
-                        <Icon aria-hidden="true" />
-                      </div>
-                      <EvidenceBadge locale={locale} evidenceId={pillar.evidenceId} />
-                    </div>
-                    <h3 className="s-h3">{pillar.title}</h3>
-                    <p>{pillar.body}</p>
-                  </article>
-                </Reveal>
-              );
-            })}
-          </div>
-
-          <div className="s-grid s-grid-4" style={{ marginTop: 12 }}>
+          <div className="s-grid s-grid-4">
             {c.metrics.map((m) => (
               <Reveal key={m.label}>
                 <div className="s-card s-kpi" style={{ height: '100%' }}>
@@ -210,97 +210,8 @@ export default function HomePage({ locale }: { locale: Locale }) {
               </Reveal>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* 7. Complete Suite of 12 Live Services & Interactive Modules */}
-      <LazySection id="services" placeholderHeight={520} rootMargin="500px 0px">
-        <ServiceCatalogSection locale={locale} title={c.servicesTitle} lead={c.servicesLead} />
-      </LazySection>
-
-      {/* 8. Technical & Broadcast Films (Mobile-Optimized with Auto Browser Language & ES/EN/NL Subtitles) */}
-      <section className="s-section">
-        <div className="s-container s-stack-lg">
-          <Reveal>
-            <div className="s-read">
-              <h2 className="s-h2">{c.flagshipFilmTitle}</h2>
-              <p className="s-lead">{c.flagshipFilmLead}</p>
-            </div>
-          </Reveal>
-
-          <div className="s-grid s-grid-2">
-            <MediaVideo
-              locale={locale}
-              ambientAutoplay
-              src="/media/senda-film-es.mp4"
-              sources={{
-                es: '/media/senda-film-es.mp4',
-                en: '/media/senda-film-en.mp4'
-              }}
-              posters={{
-                es: '/media/senda-film-poster-es.jpg',
-                en: '/media/senda-film-poster-en.jpg'
-              }}
-              subtitles={{
-                es: '/media/senda-film-es.vtt',
-                en: '/media/senda-film-en.vtt',
-                nl: '/media/senda-film-nl.vtt'
-              }}
-              title={
-                locale === 'es'
-                  ? 'Documental técnico SENDA · Del corte de red al rescate coordinado'
-                  : locale === 'nl'
-                  ? 'Technische film SENDA · Van netwerkuitval tot gecoördineerde hulp'
-                  : 'SENDA Technical Film · From cellular blackout to coordinated rescue'
-              }
-              caption={
-                locale === 'es'
-                  ? 'Recorrido integral por mensajería sin red, incendios 3D y fusión de sensores.'
-                  : locale === 'nl'
-                  ? 'Volledige rondleiding door offline berichten, 3D-branden en sensorfusie.'
-                  : 'End-to-end walkthrough of offline routing, 3D wildfire physics, and sensor fusion.'
-              }
-              evidenceId="EV-OFFLINE-49"
-            />
-
-            <MediaVideo
-              locale={locale}
-              ambientAutoplay
-              src="/media/m95/senda-m95-broadcast-special-es.mp4"
-              sources={{
-                es: '/media/m95/senda-m95-broadcast-special-es.mp4',
-                en: '/media/m95/senda-m95-broadcast-special-en.mp4'
-              }}
-              poster="/media/m95/senda-m95-broadcast-special-poster.jpg"
-              subtitles={{
-                es: '/media/m95/senda-m95-broadcast-special-es.vtt',
-                en: '/media/m95/senda-m95-broadcast-special-en.vtt',
-                nl: '/media/m95/senda-m95-broadcast-special-nl.vtt'
-              }}
-              title={
-                locale === 'es'
-                  ? 'Especial Broadcast · Consola de situación y respuesta multicanal'
-                  : locale === 'nl'
-                  ? 'Broadcast Special · Situatieconsole en multikanaal-respons'
-                  : 'Broadcast Special · Situation Console & multi-channel response'
-              }
-              caption={
-                locale === 'es'
-                  ? 'Presentación ejecutiva bilingüe con subtítulos en ES, EN y NL.'
-                  : locale === 'nl'
-                  ? 'Tweetalige presentatie met ES-, EN- en NL-ondertiteling.'
-                  : 'Bilingual executive briefing with ES, EN, and NL subtitles.'
-              }
-              evidenceId="EV-S01-ROUTE"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* 9. Human-Led AI Orchestration & Vibe Coding Craftsmanship */}
-      <section className="s-section s-sunk">
-        <div className="s-container s-stack-lg">
-          <div className="s-read">
+          <div className="s-read" style={{ marginTop: 24 }}>
             <p className="s-eyebrow">
               <Cpu size={15} aria-hidden="true" />
               <span>{c.vibeCoding.eyebrow}</span>
@@ -321,7 +232,7 @@ export default function HomePage({ locale }: { locale: Locale }) {
       </section>
 
       {/* 10. Audience Shortcuts */}
-      <section className="s-section">
+      <section className="s-section" style={{ paddingBottom: 112 }}>
         <div className="s-container s-stack-lg">
           <h2 className="s-h2">{c.audiencesTitle}</h2>
           <div className="s-grid s-grid-4">
@@ -349,6 +260,9 @@ export default function HomePage({ locale }: { locale: Locale }) {
           </div>
         </div>
       </section>
+
+      {/* Floating Glass Living Command Dock (scroll % + 1-tap simulator jump bar) */}
+      <LivingScrollDock locale={locale} />
     </PageShell>
   );
 }

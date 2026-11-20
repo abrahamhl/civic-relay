@@ -27,6 +27,8 @@ export interface MediaVideoProps {
   ambientAutoplay?: boolean;
   /** Visual presentation frame */
   variant?: 'card' | 'cinema';
+  /** Video aspect ratio (16/9 widescreen or 9/16 vertical mobile reel) */
+  aspect?: '16/9' | '9/16';
 }
 
 function detectBrowserLocale(fallback: Locale): Locale {
@@ -63,7 +65,8 @@ export default function MediaVideo({
   loop = false,
   controls = true,
   ambientAutoplay = false,
-  variant = 'card'
+  variant = 'card',
+  aspect = '16/9'
 }: MediaVideoProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -242,7 +245,7 @@ export default function MediaVideo({
 
   return (
     <figure
-      className={`s-media-card${variant === 'cinema' ? ' s-media-cinema' : ''}`}
+      className={`s-media-card${variant === 'cinema' ? ' s-media-cinema' : ''}${aspect === '9/16' ? ' s-media-vertical' : ''}`}
       data-testid="senda-video-card"
       data-detected-lang={detectedLang}
     >

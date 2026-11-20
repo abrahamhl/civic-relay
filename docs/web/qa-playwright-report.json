@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-20T01:55:46.410Z",
+  "generatedAt": "2026-11-20T02:18:42.632Z",
   "viewports": [
     390,
     834,
@@ -9,13 +9,13 @@
   "brokenLinks": [],
   "overflowFailures": [],
   "consoleErrors": [],
-  "homeJsGzKb": 167.6,
+  "homeJsGzKb": 168,
   "interactions": {
     "evidenceBadgeDialog": "PASS",
     "darkModeToggle": "PASS",
     "browserLocalizedVideoAndSubtitles": "PASS",
     "browserLocaleAutoDetectEsAndNl": "PASS",
-    "globeSensorsCrisesAnd5LiveLabs": "PASS",
+    "mission3dOsintOjoSensorsCrises7Labs38Caps": "PASS",
     "commandPalette": "PASS",
     "guidedTour6Steps": "PASS",
     "correlationGraph": "PASS",
@@ -25,12 +25,15 @@
     "docs/web/screenshots/home-en-1440-light.png",
     "docs/web/screenshots/home-en-1440-dark.png",
     "docs/web/screenshots/home-es-1440-globe.png",
+    "docs/web/screenshots/home-es-1440-osint.png",
     "docs/web/screenshots/home-es-1440-sensors.png",
     "docs/web/screenshots/home-es-1440-labs.png",
     "docs/web/screenshots/platform-es-1440-map.png",
     "docs/web/screenshots/platform-es-1440-graph.png",
     "docs/web/screenshots/product-es-1440.png",
     "docs/web/screenshots/evidence-es-1440.png",
-    "docs/web/screenshots/home-es-390-mobile.png"
+    "docs/web/screenshots/home-es-390-mobile.png",
+    "docs/web/screenshots/home-es-390-mission3d.png",
+    "docs/web/screenshots/home-es-390-osint.png"
   ]
 }

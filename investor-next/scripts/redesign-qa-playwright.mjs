@@ -140,14 +140,14 @@ async function main() {
     assert.equal(closedDialogs, 0, 'EvidenceBadge dialog did not close on Escape');
     report.interactions.evidenceBadgeDialog = 'PASS';
 
-    // Test Dark mode toggle
+    // Test Dark-default -> Light mode toggle -> revert to Dark
     await page.locator('[data-testid="theme-toggle"]').click();
     await page.waitForTimeout(350);
     const themeAttr = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
-    assert.equal(themeAttr, 'dark', 'Theme toggle did not switch to dark');
+    assert.equal(themeAttr, 'light', 'Theme toggle did not switch from dark default to light');
     await page.screenshot({ path: resolve(shotsDir, 'home-en-1440-dark.png'), fullPage: false });
     report.screenshots.push('docs/web/screenshots/home-en-1440-dark.png');
-    await page.locator('[data-testid="theme-toggle"]').click(); // revert back to system/light
+    await page.locator('[data-testid="theme-toggle"]').click(); // revert back to dark default
     await page.waitForTimeout(250);
     report.interactions.darkModeToggle = 'PASS';
 
@@ -188,18 +188,30 @@ async function main() {
     await nlCtx.close();
     report.interactions.browserLocaleAutoDetectEsAndNl = 'PASS';
 
-    // Test Audience Clarity Lens + Scroll-Built 3D Orbital Globe + Smartphone Sensor Showcase + Crisis Atlas + Palantir Labs on /es/
+    // Test Audience Clarity Lens + Live 3D Mission Control + OSINT CCTV + Ojo/HyperFrames + Sensors + Crisis Atlas + 7 Live Labs on /es/
     await page.goto(`${baseUrl}/es/`, { waitUntil: 'load' });
     await page.locator('[data-testid="lens-engineer"]').click();
     assert.equal(await page.locator('[data-testid="lens-engineer"]').getAttribute('aria-pressed'), 'true');
     await page.locator('[data-testid="lens-citizen"]').click();
 
-    await page.locator('#orbital-story-wrap').scrollIntoViewIfNeeded();
-    await page.waitForSelector('[data-testid="scroll-globe-stage"]', { timeout: 10000 });
-    await page.locator('[data-testid="globe-act-tab-3"]').click();
-    await page.waitForTimeout(300);
+    await page.locator('#mission-3d').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="mission-control-deck"]', { timeout: 12000 });
+    await page.waitForTimeout(700);
     await page.screenshot({ path: resolve(shotsDir, 'home-es-1440-globe.png'), fullPage: false });
     report.screenshots.push('docs/web/screenshots/home-es-1440-globe.png');
+
+    await page.locator('#osint-cctv').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="osint-intelligence-deck"]', { timeout: 12000 });
+    await page.waitForTimeout(450);
+    await page.screenshot({ path: resolve(shotsDir, 'home-es-1440-osint.png'), fullPage: false });
+    report.screenshots.push('docs/web/screenshots/home-es-1440-osint.png');
+
+    await page.locator('#ojo-satelites').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="orbital-ojo-deck"]', { timeout: 12000 });
+    await page.locator('[data-testid="orbital-tab-hyperframes"]').click();
+    await page.waitForTimeout(350);
+    await page.locator('[data-testid="orbital-tab-ojo"]').click();
+    await page.waitForTimeout(250);
 
     await page.locator('#sensors').scrollIntoViewIfNeeded();
     await page.waitForSelector('[data-testid="sensor-showcase"]', { timeout: 10000 });
@@ -216,17 +228,16 @@ async function main() {
 
     await page.locator('#labs').scrollIntoViewIfNeeded();
     await page.waitForSelector('[data-testid="interactive-labs-hub"]', { timeout: 10000 });
-    await page.locator('[data-testid="lab-tab-rail"]').click();
-    await page.waitForTimeout(450);
-    await page.locator('[data-testid="lab-tab-doppler"]').click();
-    await page.waitForTimeout(450);
-    await page.locator('[data-testid="lab-tab-theorems"]').click();
-    await page.waitForTimeout(450);
-    await page.locator('[data-testid="lab-tab-telecom"]').click();
-    await page.waitForTimeout(450);
+    for (const labId of ['mando', 'rail', 'doppler', 'building', 'theorems', 'telecom']) {
+      await page.locator(`[data-testid="lab-tab-${labId}"]`).click();
+      await page.waitForTimeout(350);
+    }
     await page.screenshot({ path: resolve(shotsDir, 'home-es-1440-labs.png'), fullPage: false });
     report.screenshots.push('docs/web/screenshots/home-es-1440-labs.png');
-    report.interactions.globeSensorsCrisesAnd5LiveLabs = 'PASS';
+
+    await page.locator('#all-capabilities').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="full-capability-matrix"]', { timeout: 10000 });
+    report.interactions.mission3dOsintOjoSensorsCrises7Labs38Caps = 'PASS';
 
     // 2. Check all core routes x 3 viewports + broken internal links
     const routes = [
@@ -351,6 +362,27 @@ async function main() {
     await page.waitForTimeout(400);
     await page.screenshot({ path: resolve(shotsDir, 'home-es-390-mobile.png') });
     report.screenshots.push('docs/web/screenshots/home-es-390-mobile.png');
+
+    // Deep mobile 390px simulator overflow & visual inspection check
+    await page.locator('#mission-3d').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="mission-control-deck"]', { timeout: 12000 });
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: resolve(shotsDir, 'home-es-390-mission3d.png') });
+    report.screenshots.push('docs/web/screenshots/home-es-390-mission3d.png');
+
+    await page.locator('#osint-cctv').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="osint-intelligence-deck"]', { timeout: 12000 });
+    await page.waitForTimeout(400);
+    await page.screenshot({ path: resolve(shotsDir, 'home-es-390-osint.png') });
+    report.screenshots.push('docs/web/screenshots/home-es-390-osint.png');
+
+    const mobileSimOverflow = await page.evaluate(() => ({
+      scrollW: document.documentElement.scrollWidth,
+      innerW: window.innerWidth
+    }));
+    if (mobileSimOverflow.scrollW > mobileSimOverflow.innerW + 2) {
+      report.overflowFailures.push({ path: '/es/#simulators-mounted', width: 390, ...mobileSimOverflow });
+    }
 
     await context.close();
   } finally {

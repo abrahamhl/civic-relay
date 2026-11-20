@@ -1458,13 +1458,29 @@ textarea.s-input {
 
 @media (max-width: 680px) {
   .s-lens-bar {
-    border-radius: 20px;
-    padding: 10px 12px;
+    border-radius: 999px;
+    padding: 4px;
     width: 100%;
+    gap: 4px;
+  }
+  .s-lens-prefix {
+    display: none;
   }
   .s-lens-pills {
     width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+  }
+  .s-lens-pill {
     justify-content: center;
+    padding: 6px 6px;
+    min-height: 36px;
+    font-size: 11px;
+    gap: 4px;
+  }
+  .s-lens-pill svg {
+    display: none;
   }
 }
 
@@ -1944,5 +1960,287 @@ textarea.s-input {
   .s-lab-shell .vdl-suite,
   .s-lab-shell .stl-suite {
     padding: 16px !important;
+  }
+}
+
+/* ============================================================================
+   AEROSPACE COMMAND HERO + LIVING SCROLL DOCK + SLIM PRIVACY PILL +
+   9:16 VERTICAL MOBILE REELS + FULL MOBILE SIMULATOR HARDENING (390px)
+   ============================================================================ */
+
+.s-hero-command {
+  position: relative;
+  overflow: hidden;
+  padding-top: clamp(22px, 4vw, 56px);
+  padding-bottom: clamp(32px, 5vw, 68px);
+  background:
+    radial-gradient(ellipse 80% 55% at 50% -10%, rgba(56, 189, 248, 0.16), transparent 65%),
+    radial-gradient(ellipse 50% 40% at 85% 20%, rgba(255, 115, 78, 0.11), transparent 60%),
+    var(--s-bg);
+}
+
+.s-hero-grid-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(148, 184, 232, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 184, 232, 0.055) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 20%, black 35%, transparent 100%);
+}
+
+.s-btn-coral {
+  background: linear-gradient(135deg, #d83e18, #b3290a);
+  color: #ffffff;
+  border-color: rgba(255, 145, 112, 0.45);
+  box-shadow: 0 8px 26px rgba(216, 62, 24, 0.36);
+}
+
+.s-btn-coral:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* ---------- Slim Non-Blocking Privacy Pill (never blocks mobile hero) ---------- */
+.s-cookie-slim {
+  position: fixed;
+  bottom: 62px;
+  right: 12px;
+  z-index: 54;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100vw - 24px);
+  padding: 5px 8px 5px 12px;
+  border-radius: 999px;
+  background: var(--s-glass-panel);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  backdrop-filter: saturate(180%) blur(16px);
+  border: 1px solid var(--s-line-strong);
+  box-shadow: var(--s-shadow);
+  font-size: 11.5px;
+  color: var(--s-text-2);
+}
+
+.s-cookie-slim-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.s-cookie-slim-btn,
+.s-cookie-slim-btn span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--s-accent);
+  color: var(--s-accent-ink);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  flex: none;
+}
+
+.s-cookie-slim-btn span {
+  padding: 0;
+  background: transparent;
+}
+
+/* ---------- Floating Living Command Dock (Apple Living Nav x Palantir) ---------- */
+.s-living-dock {
+  position: fixed;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  z-index: 56;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(920px, calc(100vw - 20px));
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: rgba(7, 14, 26, 0.86);
+  -webkit-backdrop-filter: saturate(190%) blur(18px);
+  backdrop-filter: saturate(190%) blur(18px);
+  border: 1px solid rgba(125, 211, 252, 0.25);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.58);
+  color: #e2e8f0;
+}
+
+.s-living-pct {
+  display: inline-grid;
+  place-items: center;
+  min-width: 40px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #7dd3fc;
+  font-size: 11px;
+  font-weight: 700;
+  flex: none;
+}
+
+.s-living-track {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.s-living-track::-webkit-scrollbar { display: none; }
+
+.s-living-pill {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.s-living-pill:hover {
+  color: #ffffff;
+  background: rgba(148, 163, 184, 0.14);
+}
+
+.s-living-pill.is-active {
+  background: rgba(255, 115, 78, 0.2);
+  border-color: rgba(255, 115, 78, 0.55);
+  color: #ffb4a1;
+}
+
+.s-living-top {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.8);
+  color: #e2e8f0;
+  cursor: pointer;
+}
+
+/* ---------- Live Ojo de SENDA iframe & 9:16 Vertical Mobile Reels ---------- */
+.s-ojo-iframe {
+  width: 100%;
+  height: clamp(460px, 68vh, 720px);
+  border: 0;
+  display: block;
+  background: #040912;
+}
+
+.s-reels-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 380px));
+  justify-content: center;
+  gap: 24px;
+}
+
+.s-media-vertical .s-video-wrap {
+  aspect-ratio: 9 / 16;
+  max-height: 620px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.s-media-vertical .s-video {
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+  max-height: 620px;
+}
+
+@media (max-width: 780px) {
+  .s-reels-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Deep Mobile Hardening for ALL Embedded Legacy Simulators (390px) ---------- */
+.s-sim-frame {
+  position: relative;
+  max-width: 100%;
+  overflow-x: hidden;
+  color: #e8f0fa;
+}
+
+.s-sim-frame .container {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-inline: clamp(10px, 2.5vw, 24px) !important;
+}
+
+.s-sim-frame section {
+  padding-block: clamp(18px, 3vw, 34px) !important;
+}
+
+.s-sim-frame img,
+.s-sim-frame svg,
+.s-sim-frame canvas,
+.s-sim-frame video,
+.s-sim-frame iframe {
+  max-width: 100% !important;
+}
+
+.s-sim-frame table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 860px) {
+  .s-hero-command {
+    padding-top: 14px;
+  }
+  .s-hero-status {
+    padding: 5px 10px;
+    font-size: 11px;
+    max-width: 100%;
+  }
+  .s-sim-frame .mc-layout,
+  .s-sim-frame .mc-main,
+  .s-sim-frame .mc-grid,
+  .s-sim-frame .si-layout,
+  .s-sim-frame .si-grid,
+  .s-sim-frame .si-cctv-grid,
+  .s-sim-frame .si-pipeline-grid,
+  .s-sim-frame .cs-grid,
+  .s-sim-frame .cs-main,
+  .s-sim-frame .cs-layout,
+  .s-sim-frame .cl-grid,
+  .s-sim-frame .cl-layout,
+  .s-sim-frame .crisis-story-layout,
+  .s-sim-frame .hf-layout,
+  .s-sim-frame .hf-grid {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+  }
+  .s-sim-frame .mc-canvas-wrap,
+  .s-sim-frame .mc-globe-box {
+    min-height: 320px !important;
+    height: 340px !important;
+  }
+  .s-sim-frame .crisis-story-viewport {
+    position: static !important;
+  }
+  .s-ojo-iframe {
+    height: 480px;
   }
 }

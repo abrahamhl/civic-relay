@@ -7,11 +7,6 @@ import type { Locale } from '../data/types';
 
 type Scheme = 'light' | 'dark';
 
-function getSystemScheme(): Scheme {
-  if (typeof window === 'undefined' || !window.matchMedia) return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-
 function readStored(): Scheme | null {
   try {
     const v = localStorage.getItem('color-scheme');
@@ -21,71 +16,50 @@ function readStored(): Scheme | null {
   }
 }
 
-function applyScheme(stored: Scheme | null) {
+function applyScheme(scheme: Scheme) {
   const meta = document.querySelector('meta[name="color-scheme"]');
-  const value = stored ?? 'light dark';
   if (meta) {
-    meta.setAttribute('content', value);
+    meta.setAttribute('content', scheme);
   } else {
     const created = document.createElement('meta');
     created.name = 'color-scheme';
-    created.content = value;
+    created.content = scheme;
     document.head.appendChild(created);
   }
-  if (stored) {
-    document.documentElement.setAttribute('data-theme', stored);
-  } else {
-    document.documentElement.removeAttribute('data-theme');
-  }
+  document.documentElement.setAttribute('data-theme', scheme);
 }
 
 /**
- * Two-state color-scheme toggle per modern-web-guidance (dark-mode-toggle):
- * - Follows OS preference by default (no stored value, meta="light dark").
- * - Toggling selects the opposite of the currently rendered scheme.
- * - If target matches current OS preference, removes stored value instead of pinning.
- * - Never auto-clears stored value when OS preference changes later.
+ * Aerospace dark-default theme switcher with full light-mode support.
  */
 export default function ThemeToggle({ locale }: { locale: Locale }) {
   const ui = SITE_STRINGS[locale];
-  const [rendered, setRendered] = useState<Scheme>('light');
+  const [rendered, setRendered] = useState<Scheme>('dark');
 
   useEffect(() => {
     const sync = () => {
       const stored = readStored();
-      applyScheme(stored);
-      setRendered(stored ?? getSystemScheme());
+      const target: Scheme = stored ?? 'dark';
+      applyScheme(target);
+      setRendered(target);
     };
     sync();
 
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const onMqChange = () => {
-      const stored = readStored();
-      if (!stored) setRendered(getSystemScheme());
-    };
     const onStorage = (e: StorageEvent) => {
       if (e.key === 'color-scheme') sync();
     };
-    mq.addEventListener('change', onMqChange);
     window.addEventListener('storage', onStorage);
-    return () => {
-      mq.removeEventListener('change', onMqChange);
-      window.removeEventListener('storage', onStorage);
-    };
+    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
   const toggle = () => {
     const target: Scheme = rendered === 'dark' ? 'light' : 'dark';
-    const sys = getSystemScheme();
-    let nextStored: Scheme | null = target === sys ? null : target;
     try {
-      if (nextStored) localStorage.setItem('color-scheme', nextStored);
-      else localStorage.removeItem('color-scheme');
+      localStorage.setItem('color-scheme', target);
     } catch {
-      // Storage blocked; still apply for current session
-      nextStored = target;
+      // Ignore storage restriction
     }
-    applyScheme(nextStored);
+    applyScheme(target);
     setRendered(target);
   };
 
