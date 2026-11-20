@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2">
+  <link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
+  <link type="application/atom+xml" rel="self" href="https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-spain"/>
+  <link type="text/html" rel="alternate" href="https://meteoalarm.org"/>
+  <rights>Copyright © 2026 MeteoAlarm.Org. Licensed under terms equivalent to CC BY 4.0, with additional requirements for redistributing outlined in our Terms and Conditions.</rights>
+  <generator>MeteoAlarm Producer Server</generator>
+  <logo>https://feeds.meteoalarm.org/images/logo.svg</logo>
+  <author>
+    <name>meteoalarm.org</name>
+    <uri>https://meteoalarm.org</uri>
+    <email>meteoalarm@geosphere.at</email>
+  </author>
+  <id>tag:meteoalarm.org,2021-02-19:ES</id>
+  <title>MeteoAlarm - Alerting Europe for Extreme Weather</title>
+  <updated>2026-11-20T18:06:32.445353Z</updated>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES215</value>
+    </cap:geocode>
+    <link title="Rias Baixas" href="https://meteoalarm.org?geocode=EMMA_ID:ES215" hreflang="en"/>
+    <cap:areaDesc>Rias Baixas</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-20T17:44:08+00:00</cap:sent>
+    <cap:expires>2026-11-21T06:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-20T17:41:33+00:00</cap:effective>
+    <cap:onset>2026-11-20T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261120174408.713601VIRM210796648</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/0df7428e-3d2e-49a0-96af-43da003d3316"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-20T17:44:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/0df7428e-3d2e-49a0-96af-43da003d3316?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - Rias Baixas</title>
+    <updated>2026-11-20T17:44:08Z</updated>
+  </entry>
+<entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES205</value>
+    </cap:geocode>
+    <link title="Suroeste de A Coruña" href="https://meteoalarm.org?geocode=EMMA_ID:ES205" hreflang="en"/>
+    <cap:areaDesc>Suroeste de A Coruña</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-20T17:44:08+00:00</cap:sent>
+    <cap:expires>2026-11-21T06:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-20T17:41:33+00:00</cap:effective>
+    <cap:onset>2026-11-20T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261120174408.711504VIRM210796648</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/d2aabdf7-e9e0-4848-83fa-f1f82a2f1478"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-20T17:44:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/d2aabdf7-e9e0-4848-83fa-f1f82a2f1478?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - Suroeste de A Coruña</title>
+    <updated>2026-11-20T17:44:08Z</updated>
+  </entry>
+<entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES226</value>
+    </cap:geocode>
+    <link title="Vertiente cantábrica de Navarra" href="https://meteoalarm.org?geocode=EMMA_ID:ES226" hreflang="en"/>
+    <cap:areaDesc>Vertiente cantábrica de Navarra</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-20T17:44:08+00:00</cap:sent>
+    <cap:expires>2026-11-21T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-20T17:41:54+00:00</cap:effective>
+    <cap:onset>2026-11-21T06:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261120174408.743101VIRM212396648</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b396f624-96f6-4f07-9841-37b9ded8088a"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-20T17:44:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b396f624-96f6-4f07-9841-37b9ded8088a?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - Vertiente cantábrica de Navarra</title>
+    <updated>2026-11-20T17:44:08Z</updated>
+  </entry>
+<entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES217</value>
+    </cap:geocode>
+    <link title="Miño de Pontevedra" href="https://meteoalarm.org?geocode=EMMA_ID:ES217" hreflang="en"/>
+    <cap:areaDesc>Miño de Pontevedra</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-20T17:44:08+00:00</cap:sent>
+    <cap:expires>2026-11-21T06:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-20T17:41:33+00:00</cap:effective>
+    <cap:onset>2026-11-20T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261120174408.713603VIRM210796648</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/aa7f1a27-c583-4397-b1f8-6e47bad2e102"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-20T17:44:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/aa7f1a27-c583-4397-b1f8-6e47bad2e102?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - Miño de Pontevedra</title>
+    <updated>2026-11-20T17:44:08Z</updated>
+  </entry>
+<entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES203</value>
+    </cap:geocode>
+    <link title="Oeste de A Coruña" href="https://meteoalarm.org?geocode=EMMA_ID:ES203" hreflang="en"/>
+    <cap:areaDesc>Oeste de A Coruña</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-20T17:44:08+00:00</cap:sent>
+    <cap:expires>2026-11-21T06:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-20T17:41:33+00:00</cap:effective>
+    <cap:onset>2026-11-20T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261120174408.711502VIRM210796648</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/687dd5ea-98aa-414f-b124-506d378f290a"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-20T17:44:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/687dd5ea-98aa-414f-b124-506d378f290a?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - Oeste de A Coruña</title>
+    <updated>2026-11-20T17:44:08Z</updated>
+  </entry>
+<entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES151</value>
+    </cap:geocode>
+    <link title="Sistema Central de Salamanca" href="https://meteoalarm.org?geocode=EMMA_ID:ES151" hreflang="en"/>
+    <cap:areaDesc>Sistema Central de Salamanca</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-20T17:30:10+00:00</cap:sent>
+    <cap:expires>2026-11-21T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-20T17:27:27+00:00</cap:effective>
+    <cap:onset>2026-11-21T05:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261120173010.673702PRP2212395810</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/183be6f6-3525-4b96-8e1b-eef7e700f037"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-20T17:30:10Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/183be6f6-3525-4b96-8e1b-eef7e700f037?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Sistema Central de Salamanca</title>
+    <updated>2026-11-20T17:30:10Z</updated>
+  </entry>
+</feed>

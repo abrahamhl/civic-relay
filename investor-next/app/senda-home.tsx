@@ -47,8 +47,13 @@ const C = {
     rutaAltLang: 'es',
     gapT: 'El hueco que nadie cubre',
     gap: [['90 % → 40 %', 'usuarios con conexión estable en el apagón ibérico del 28-04-2025: la red cayó al agotarse las baterías de las antenas.', 'https://www.laecuaciondigital.com/actualidad/el-apagon-electrico-colapsa-redes-moviles-en-espana-y-portugal-el-28-de-abril/'], ['20:11', 'hora del ES-Alert en la DANA de Valencia (29-10-2024). La alerta oficial depende de la red celular.', 'https://www.eldebate.com/espana/comunidad-valenciana/20251204/principal-tecnico-emergencia-dana-sostiene-alert-retraso-diferenciar-valenciano-catalan_362211.html'], ['2030–2036', 'despliegue previsto del sistema europeo de comunicación crítica (EUCCS) para los intervinientes, no para la ciudadanía.', 'https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en']],
+    radar: 'Radar de avisos en vivo',
     featT: 'Todo lo que hace, ya en la app',
     feats: [
+      ['', 'Radar de avisos en vivo', 'Avisos oficiales de AEMET y MeteoAlarm, terremotos de USGS y EMSC, alertas GDACS y eventos de la NASA en un globo. SENDA detecta los nuevos y calcula a quién despertar alrededor: testigos, pasarelas y ayuda cercana.', '/senda/radar'],
+      ['', 'El ciclo completo', 'Ve, previene, dirige, organiza, alerta, ayuda y gestiona: cada verbo con su demostración, y la malla de conductores que verifican accidentes y ayudan cuando el 112 lo pide.', '/senda/ciclo'],
+      ['', 'Simulador 3D', 'Relieve y satélite reales: fuego con pocos datos, aire por capas, agua que sube, epicentro con seis móviles y vídeo de la progresión.', '/senda/simulador'],
+      ['', 'Sin datos, pero no solo', 'Si tu móvil no tiene datos, otro móvil SENDA cercano con conexión lleva tu mensaje cifrado sin poder leerlo. Criptografía real en el navegador.', '/senda/viaje#desconocido'],
       ['📡', 'Sin Internet', 'Sonido entre móviles, archivo .senda, de mano en mano (DTN) y recibos infalsificables que borran las copias.', '/senda'],
       ['🧩', 'Un mensaje, muchos caminos', 'Fragmentos k-de-n (Reed-Solomon) repartidos entre portadores con probabilidad de entrega exacta.', '/senda/red'],
       ['🛰️', 'Red satelital por nivel de acceso', 'Satélite directo al móvil, Iridium, QO-100, Galileo SAR… con el hardware y la ley de cada uno.', '/senda/red'],
@@ -133,8 +138,13 @@ const C = {
     rutaAltLang: 'es',
     gapT: 'The gap nobody covers',
     gap: [['90% → 40%', 'users with a stable connection during the Iberian blackout of 28-04-2025: the network fell when the masts’ batteries ran out.', 'https://www.laecuaciondigital.com/actualidad/el-apagon-electrico-colapsa-redes-moviles-en-espana-y-portugal-el-28-de-abril/'], ['20:11', 'time of the ES-Alert during the Valencia floods (29-10-2024). Official alerts depend on the cellular network.', 'https://www.eldebate.com/espana/comunidad-valenciana/20251204/principal-tecnico-emergencia-dana-sostiene-alert-retraso-diferenciar-valenciano-catalan_362211.html'], ['2030–2036', 'planned rollout of the EU Critical Communication System (EUCCS), for first responders, not citizens.', 'https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en']],
+    radar: 'Live alert radar',
     featT: 'Everything it does, already in the app',
     feats: [
+      ['', 'Live alert radar', 'Official warnings from AEMET and MeteoAlarm, USGS and EMSC earthquakes, GDACS alerts and NASA events on a globe. SENDA spots the new ones and works out whom to wake nearby: witnesses, gateways and help close by.', '/senda/radar'],
+      ['', 'The full cycle', 'Sees, prevents, directs, organises, alerts, helps and manages: each verb with its demo, and the mesh of drivers who verify crashes and help when 112 asks.', '/senda/ciclo'],
+      ['', '3D simulator', 'Real terrain and satellite: fire from little data, the air in layers, rising water, an epicentre from six phones and a video of the progression.', '/senda/simulador'],
+      ['', 'No data, not alone', 'If your phone has no data, a nearby SENDA phone with a connection carries your encrypted message without being able to read it. Real cryptography in the browser.', '/senda/viaje#desconocido'],
       ['📡', 'No Internet needed', 'Sound between phones, .senda files, hand-to-hand delivery (DTN) and unforgeable receipts that erase copies.', '/senda'],
       ['🧩', 'One message, many paths', 'k-of-n fragments (Reed-Solomon) spread across bearers with an exact delivery probability.', '/senda/red'],
       ['🛰️', 'Satellite network by access level', 'Direct-to-phone, Iridium, QO-100, Galileo SAR… with the hardware and legal limits of each.', '/senda/red'],
@@ -219,8 +229,13 @@ const C = {
     rutaAltLang: 'es',
     gapT: 'Het gat dat niemand dicht',
     gap: [['90% → 40%', 'gebruikers met een stabiele verbinding tijdens de Iberische stroomstoring van 28-04-2025: het netwerk viel uit toen de accu’s van de masten leeg raakten.', 'https://www.laecuaciondigital.com/actualidad/el-apagon-electrico-colapsa-redes-moviles-en-espana-y-portugal-el-28-de-abril/'], ['20:11', 'tijdstip van de ES-Alert bij de overstromingen in Valencia (29-10-2024). Officiële waarschuwingen hangen af van het mobiele netwerk.', 'https://www.eldebate.com/espana/comunidad-valenciana/20251204/principal-tecnico-emergencia-dana-sostiene-alert-retraso-diferenciar-valenciano-catalan_362211.html'], ['2030–2036', 'geplande uitrol van het Europese systeem voor kritieke communicatie (EUCCS), voor hulpverleners, niet voor burgers.', 'https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en']],
+    radar: 'Live waarschuwingsradar',
     featT: 'Alles wat het doet, al in de app',
     feats: [
+      ['', 'Live waarschuwingsradar', 'Officiële waarschuwingen van AEMET en MeteoAlarm, aardbevingen van USGS en EMSC, GDACS-meldingen en NASA-gebeurtenissen op een globe. SENDA ziet de nieuwe en berekent wie in de buurt gewekt wordt: getuigen, gateways en hulp dichtbij.', '/senda/radar'],
+      ['', 'De volledige cyclus', 'Ziet, voorkomt, stuurt, organiseert, waarschuwt, helpt en beheert: elk werkwoord met een demo, en het netwerk van bestuurders die ongevallen bevestigen en helpen als 112 erom vraagt.', '/senda/ciclo'],
+      ['', '3D-simulator', 'Echt terrein en satelliet: brand met weinig gegevens, de lucht in lagen, stijgend water, een epicentrum met zes telefoons en een video van het verloop.', '/senda/simulador'],
+      ['', 'Geen data, niet alleen', 'Heeft je telefoon geen data, dan neemt een SENDA-telefoon in de buurt met verbinding je versleutelde bericht mee zonder het te kunnen lezen. Echte cryptografie in de browser.', '/senda/viaje#desconocido'],
       ['📡', 'Zonder internet', 'Geluid tussen telefoons, .senda-bestanden, van hand tot hand (DTN) en onvervalsbare ontvangstbewijzen die kopieën wissen.', '/senda'],
       ['🧩', 'Eén bericht, vele routes', 'k-van-n-fragmenten (Reed-Solomon) verdeeld over dragers met een exacte afleverkans.', '/senda/red'],
       ['🛰️', 'Satellietnetwerk per toegangsniveau', 'Direct-naar-telefoon, Iridium, QO-100, Galileo SAR… met de hardware en wettelijke grenzen van elk.', '/senda/red'],
@@ -272,6 +287,15 @@ const C = {
   },
 } as const;
 
+/** Imagen real (captura de la propia página) y categoría de cada tarjeta, en el orden de `feats`. */
+const FEAT_IMG = ['radar', 'ciclo', 'simulador', 'desconocido', 'o00-campo', 'o01-red-plan', 'o02-red-sat', 'o03-red-apagon', 'o04-incidente', 'o05-edificios', 'o06-organismo', 'o07-red-drones', 'o08-incidente-112', 'o09-accesible', 'o10-android', 'o11-rele', 'o12-ojo', 'o13-incendio', 'o14-via', 'o15-edificios-plantas', 'o16-llamada', 'o17-dron', 'o18-arquitectura', 'o19-reserva', 'o20-carretera', 'o21-camaras', 'o22-paises', 'o23-dgt', 'o24-trafico', 'o25-evacuacion', 'o26-referencias', 'o27-fuego3d', 'o28-fuego', 'o29-vehiculos', 'o30-sentidos', 'o31-agua', 'o32-triaje', 'o33-monte', 'o34-barrido', 'o35-centro', 'o36-visor', 'o37-ciencia'];
+const FEAT_CAT = ['live', 'platform', 'sim', 'comm', 'comm', 'comm', 'net', 'net', 'road', 'build', 'ops', 'drone', 'ops', 'app', 'dev', 'dev', 'net', 'fire', 'road', 'build', 'comm', 'drone', 'platform', 'comm', 'road', 'road', 'platform', 'road', 'road', 'fire', 'fire', 'fire', 'fire', 'road', 'sense', 'water', 'rescue', 'rescue', 'drone', 'ops', 'sci', 'sci'] as const;
+const CAT_L: Record<string, Record<(typeof FEAT_CAT)[number], string>> = {
+  es: { live: 'En vivo · datos reales', platform: 'Plataforma', sim: 'Simulador', comm: 'Comunicación sin red', net: 'Red y satélites', road: 'Carretera y transporte', build: 'Edificios y rescate', ops: 'Coordinación', drone: 'Drones', app: 'App', dev: 'Código abierto', fire: 'Incendios', sense: 'Sensores', water: 'Agua', rescue: 'Primeros auxilios y rescate', sci: 'Ciencia' },
+  en: { live: 'Live · real data', platform: 'Platform', sim: 'Simulator', comm: 'Messaging without network', net: 'Network and satellites', road: 'Roads and transport', build: 'Buildings and rescue', ops: 'Coordination', drone: 'Drones', app: 'App', dev: 'Open source', fire: 'Wildfire', sense: 'Sensors', water: 'Water', rescue: 'First aid and rescue', sci: 'Science' },
+  nl: { live: 'Live · echte gegevens', platform: 'Platform', sim: 'Simulator', comm: 'Berichten zonder netwerk', net: 'Netwerk en satellieten', road: 'Weg en vervoer', build: 'Gebouwen en redding', ops: 'Coördinatie', drone: 'Drones', app: 'App', dev: 'Open source', fire: 'Bosbranden', sense: 'Sensoren', water: 'Water', rescue: 'EHBO en redding', sci: 'Wetenschap' },
+};
+
 export default function SendaHome({ locale }: { locale: Locale }) {
   const c = C[locale] ?? C.en;
   const p = readProof();
@@ -284,6 +308,7 @@ export default function SendaHome({ locale }: { locale: Locale }) {
         <p className="sh-lead">{c.lead}</p>
         <div className="sh-cta">
           <a className="sh-btn" href="/senda/explica">{c.explain}</a>
+          <a className="sh-btn ghost" href="/senda/radar">{c.radar}</a>
           <a className="sh-btn ghost" href="/senda/sala">{c.sala}</a>
           <a className="sh-btn ghost" href="/senda/viaje">{c.viaje}</a>
           <a className="sh-btn ghost" href="/senda">{c.open}</a>
@@ -502,7 +527,7 @@ export default function SendaHome({ locale }: { locale: Locale }) {
       <div className="sh-gap">{c.gap.map(([v, t, u]) => <a key={v} className="sh-fact" href={u} rel="noopener" target="_blank"><b>{v}</b><span>{t}</span></a>)}</div>
 
       <h2 className="sh-h2">{c.featT}</h2>
-      <div className="sh-feats">{c.feats.map(([i, t, d, h]) => <a key={t} className="sh-feat" href={h}><span aria-hidden="true">{i}</span><b>{t}</b><p>{d}</p></a>)}</div>
+      <div className="sh-cards">{c.feats.map(([, t, d, h], n) => <a key={t} className="hub-card hub-card--big" href={h} {...(h.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}><span className="hub-img"><img src={`/media/feat/${FEAT_IMG[n]}.jpg`} alt="" loading="lazy" width={640} height={400}/></span><span className="hub-tag">{(CAT_L[locale] ?? CAT_L.es)[FEAT_CAT[n]]}</span><strong>{t}</strong><span className="hub-d">{d}</span></a>)}</div>
 
       <h2 className="sh-h2">{c.whoT}</h2>
       <div className="sh-who">{c.who.map(([t, d]) => <div key={t} className="sh-w"><b>{t}</b><p>{d}</p></div>)}</div>

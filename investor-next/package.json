@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/write-release-proof.mjs && node scripts/write-senda-status.mjs && node scripts/research/build-research.mjs && next build && node scripts/finalize-locales.mjs && node scripts/research/verify-export.mjs",
+    "build": "node ../packages/senda/scripts/fetch-alerts.mjs --soft && node scripts/write-release-proof.mjs && node scripts/write-senda-status.mjs && node scripts/research/build-research.mjs && next build && node scripts/finalize-locales.mjs && node scripts/research/verify-export.mjs",
     "start": "next start",
     "type-check": "tsc --noEmit",
     "test": "node --test tests/*.test.mjs",
