@@ -1,0 +1,10 @@
+/* Ajuste común para móvil de las páginas antiguas de /senda (auditoría 20-11-2026: 8 páginas desbordaban a 390 px). */
+@media (max-width: 640px) {
+  body * { min-width: 0; }
+  table { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  code, pre, .mono { white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; }
+  input[type=range], input[type=text], select, textarea { max-width: 100%; }
+  img, canvas, video, svg, iframe { max-width: 100%; }
+  header, main, aside, section, article, .card, .top, .map, .side, .view { max-width: 100%; }
+  [style*="grid-template-columns"] { grid-template-columns: minmax(0, 1fr) !important; }
+}
