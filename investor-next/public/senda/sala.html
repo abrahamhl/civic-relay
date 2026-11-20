@@ -61,7 +61,8 @@ button[aria-pressed=true]{background:#1f2a3b;border-color:var(--blue);color:#dfe
 pre.cap{max-height:170px;overflow:auto;background:#0a0c0f;border:1px solid var(--line);border-radius:6px;padding:8px;font:11px/1.45 "IBM Plex Mono",monospace;color:#b9c3cc;white-space:pre-wrap;word-break:break-all;margin:8px 0 0}
 .hash{font-family:"IBM Plex Mono",monospace;font-size:11px;color:#9fb4c8;word-break:break-all}
 .note{font-size:11.5px;color:var(--d);margin-top:8px}
-@media (max-width:1100px){.grid{grid-template-columns:1fr;height:auto}.col{border:0;border-bottom:1px solid var(--line)}.mapwrap{height:70vh}.bar .inc{display:none}}
+@media (max-width:1100px){.grid{grid-template-columns:minmax(0,1fr);height:auto}.col{border:0;border-bottom:1px solid var(--line)}.mapwrap{height:70vh}.bar .inc{display:none}}
+@media (max-width:700px){.bar{flex-wrap:wrap;height:auto;min-height:52px;padding:8px 12px;gap:8px 12px}.bar .clock{display:none}.bar a{font-size:12px}.grid{height:auto}}
 </style>
 </head>
 <body>
