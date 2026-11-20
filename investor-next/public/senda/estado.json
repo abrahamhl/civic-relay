@@ -1,11 +1,47 @@
 {
- "core": 506,
- "coreTotal": 506,
- "e2e": 49,
- "e2eTotal": 49,
- "relay": 3,
- "android": "14 invariantes de formato SENDA (paridad web / Android / ESP32).",
- "esp32": "trama SENDA en C++ idéntica a web y Android (3 vectores + CRC)",
- "sha": "89ee438",
- "generatedAt": "2026-11-14T02:38:08.982Z"
+  "core": 883,
+  "coreTotal": 883,
+  "defense": 23,
+  "relay": 3,
+  "web": 157,
+  "sha": "5378c9fd166fc632b1b4e280b1b70974eb064c39",
+  "generatedAt": "2026-11-20T15:10:02.648Z",
+  "evidenceKind": "BUILD_EXECUTED_SOFTWARE_TESTS",
+  "suites": {
+    "core": {
+      "tests": 883,
+      "pass": 883,
+      "fail": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    "defense": {
+      "tests": 23,
+      "pass": 23,
+      "fail": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    "relay": {
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    "web": {
+      "tests": 157,
+      "pass": 157,
+      "fail": 0,
+      "skipped": 0,
+      "exitCode": 0
+    }
+  },
+  "historicalE2E": {
+    "passed": 49,
+    "total": 49,
+    "status": "HISTORICAL_NOT_RERUN_BY_THIS_BUILD"
+  },
+  "physicalValidation": "NOT_PERFORMED",
+  "emergencyService": false
 }
