@@ -1,7 +1,7 @@
 {
   "proyecto": "SENDA",
   "generado": "2026-11-20",
-  "commit": "b132087",
+  "commit": "8b66a66",
   "cambiosSinCommit": false,
   "siteUrl": "https://civic-relay-investor.vercel.app",
   "zips": [
@@ -9,9 +9,9 @@
       "file": "1-web-hostinger.zip",
       "title": "Web completa para subir a public_html (sin las dos películas largas)",
       "note": "Descomprime en public_html. Contiene .htaccess (fichero oculto).",
-      "files": 643,
-      "bytes": 94291604,
-      "sha256": "0ac73cb29a9b0e7a513372143b211331948f7e7b8d2ba36fd3b7b70a8d10bdbf"
+      "files": 669,
+      "bytes": 94415372,
+      "sha256": "4fd8783be0944e3255ed650fb503446553fdf031d93b671761e1bb2ef270b456"
     },
     {
       "file": "2-web-video-senda-m96-promo-en.zip",
@@ -49,17 +49,17 @@
       "file": "6-codigo-fuente.zip",
       "title": "Código fuente completo (núcleo, relé, web, visión, scripts, pruebas)",
       "note": "Sin los vídeos (van en la web) ni las capturas de evidencias (van aparte).",
-      "files": 1684,
-      "bytes": 47263500,
-      "sha256": "2bd2522016bbf22cccdcec260bb6bdd6a7329d9c5afbc7ffeccb54d7be3c5042"
+      "files": 1687,
+      "bytes": 47289005,
+      "sha256": "fae6b084e68be6e36669e79a49d835d2c8e15cae33bb6ed44b1ef68c7222f94a"
     },
     {
       "file": "7-documentacion.zip",
       "title": "Documentación: traspaso, arquitectura, financiación, investigación y registro de cambios",
       "note": "Empieza por docs/handoff/HANDOFF_COMPLETO_2026-11-05.md.",
       "files": 255,
-      "bytes": 13090815,
-      "sha256": "308012fe11bba174adce608de927de1ccb86b776facb3195923148856f32db48"
+      "bytes": 13108183,
+      "sha256": "36c4c7f6341d5e04c7d3c15301acafc2449aeb07516da1104b6581452775789e"
     },
     {
       "file": "8-evidencias.zip",

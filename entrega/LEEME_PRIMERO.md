@@ -1,17 +1,17 @@
 # SENDA · Léeme primero
 
-> **Generado el 2026-11-20** desde el commit `b132087`. Dominio de las páginas de inversores: `https://civic-relay-investor.vercel.app`.
+> **Generado el 2026-11-20** desde el commit `8b66a66`. Dominio de las páginas de inversores: `https://civic-relay-investor.vercel.app`.
 > Esta carpeta se entiende **sin haber seguido ninguna conversación**: aquí está todo lo necesario para publicar la web en otro alojamiento, revisar el código y enseñar el proyecto.
 
 ## 1. Qué es esta carpeta
 
 SENDA es un sistema de avisos y comunicación para emergencias que **funciona sin Internet ni cobertura**. Usa los teléfonos, los coches y lo que ya existe: satélites, cámaras públicas y datos abiertos de tráfico y meteorología.
 
-Esta carpeta lo empaqueta en zips. Tamaño total: **378,4 MB**.
+Esta carpeta lo empaqueta en zips. Tamaño total: **378,6 MB**.
 
 | Zip | Qué contiene | Tamaño | Nota |
 |---|---|---|---|
-| `zips/1-web-hostinger.zip` | Web completa para subir a public_html (sin las dos películas largas) | 89,9 MB | Descomprime en public_html. Contiene .htaccess (fichero oculto). |
+| `zips/1-web-hostinger.zip` | Web completa para subir a public_html (sin las dos películas largas) | 90,0 MB | Descomprime en public_html. Contiene .htaccess (fichero oculto). |
 | `zips/2-web-video-senda-m96-promo-en.zip` | Vídeo de la web: media/m96/senda-m96-promo-en.mp4 | 66,7 MB | Descomprime también en public_html: se coloca solo en media/. |
 | `zips/3-web-video-senda-m96-promo-es.zip` | Vídeo de la web: media/m96/senda-m96-promo-es.mp4 | 67,7 MB | Descomprime también en public_html: se coloca solo en media/. |
 | `zips/4-web-video-senda-film-en.zip` | Vídeo de la web: media/senda-film-en.mp4 | 28,1 MB | Descomprime también en public_html: se coloca solo en media/. |
