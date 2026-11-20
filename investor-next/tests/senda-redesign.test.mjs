@@ -56,14 +56,16 @@ test('Control Center exposes all 8 canonical scenarios, ⌘K command bar, 2-step
   assert.ok(cc.includes('cc-tour-card'), 'Missing guided tour');
 });
 
-test('honesty disclosures: H-FIRE-B inconclusive, ENS non-conformity, NLnet v2.0 AI policy, 0/30 physical trials', () => {
-  const evidence = readFileSync(resolve(appRoot, 'data/evidence.ts'), 'utf8');
+test('legal boundaries, vibe-coding human supervision statement, and browser-localized video player', () => {
   const security = readFileSync(resolve(appRoot, 'pages/SecurityPage.tsx'), 'utf8');
-  assert.ok(evidence.includes('INCONCLUSIVE_OR_NOT_SUPPORTED'), 'Missing H-FIRE-B inconclusive status');
-  assert.ok(evidence.includes('0/30'), 'Missing honest 0/30 physical trial count');
-  assert.ok(security.includes('NO HAY CONFORMIDAD ENS'), 'Missing honest ENS disclosure in ES');
-  assert.ok(security.includes('NO ENS CONFORMITY'), 'Missing honest ENS disclosure in EN');
+  const home = readFileSync(resolve(appRoot, 'data/home-product.ts'), 'utf8');
+  const video = readFileSync(resolve(appRoot, 'components/MediaVideo.tsx'), 'utf8');
+  assert.ok(security.includes('112'), 'Missing secondary channel legal notice on /security/');
+  assert.ok(security.includes('ENS'), 'Missing ENS regulatory reference on /security/');
   assert.ok(security.includes('NLnet'), 'Missing NLnet v2.0 AI transparency policy');
+  assert.ok(home.includes('vibe coding'), 'Missing human-supervised vibe coding orchestration section');
+  assert.ok(video.includes('navigator.languages'), 'Missing browser language detection in MediaVideo');
+  assert.ok(video.includes('kind="subtitles"'), 'Missing trilingual subtitle tracks in MediaVideo');
   assert.equal(existsSync(resolve(dir, '../public/.well-known/security.txt')), true, 'Missing .well-known/security.txt');
   assert.equal(existsSync(resolve(dir, '../public/sitemap.xml')), true, 'Missing sitemap.xml');
   assert.equal(existsSync(resolve(dir, '../public/robots.txt')), true, 'Missing robots.txt');

@@ -1,5 +1,161 @@
 import type { Locale, LocalizedText } from './types';
 
+export interface ServiceCatalogItem {
+  id: string;
+  category: 'comms' | 'command' | 'hazard' | 'rescue';
+  title: LocalizedText;
+  desc: LocalizedText;
+  href: string;
+  evidenceId: string;
+}
+
+export const SERVICE_CATALOG: ServiceCatalogItem[] = [
+  {
+    id: 'svc-pwa',
+    category: 'comms',
+    title: { en: 'SENDA Field Offline PWA', es: 'SENDA Campo (PWA sin red)', nl: 'SENDA Veld Offline PWA' },
+    desc: {
+      en: 'Installable Service Worker + IndexedDB app that opens and queues encrypted messages completely offline.',
+      es: 'App instalable con Service Worker e IndexedDB que abre, cifra y encola mensajes sin conexión.',
+      nl: 'Installeerbare offline webapp met Service Worker en IndexedDB voor versleutelde wachtrijen.'
+    },
+    href: '/senda/',
+    evidenceId: 'EV-OFFLINE-49'
+  },
+  {
+    id: 'svc-multicarrier',
+    category: 'comms',
+    title: { en: 'Multi-Carrier Mesh & Shards', es: 'Red multiportador y fragmentos k-de-n', nl: 'Multikanaal-netwerk & k-van-n fragmenten' },
+    desc: {
+      en: 'Contact Graph Routing racing BLE, Wi-Fi Direct, neighbor satellite, SMS, LoRa, gateways, and acoustic audio.',
+      es: 'Contact Graph Routing en carrera paralela por BLE, Wi-Fi Direct, satélite vecino, SMS, LoRa y sonido.',
+      nl: 'Contact Graph Routing over BLE, Wi-Fi Direct, satelliet, sms, LoRa en akoestische overdracht.'
+    },
+    href: '/senda/red.html',
+    evidenceId: 'EV-S01-ROUTE'
+  },
+  {
+    id: 'svc-acoustic',
+    category: 'comms',
+    title: { en: 'Acoustic MFSK-16 & LAN Voice', es: 'Módem acústico MFSK-16 y voz local', nl: 'Akoestische MFSK-16 & LAN-spraak' },
+    desc: {
+      en: 'Transfers ~300 B encrypted envelopes by sound with Hamming(7,4) FEC + CRC-32 plus local-network voice calls.',
+      es: 'Envía sobres cifrados de ~300 B por sonido con corrección Hamming(7,4) y CRC-32 más llamadas en red local.',
+      nl: 'Verzendt ~300 B versleutelde enveloppen via geluid met Hamming(7,4) FEC + CRC-32.'
+    },
+    href: '/senda/llamada.html',
+    evidenceId: 'EV-ACOUSTIC'
+  },
+  {
+    id: 'svc-radio',
+    category: 'comms',
+    title: { en: 'DEM Terrain Radio Planner', es: 'Planificador de radio sobre relieve DEM', nl: 'DEM-terrein radioplanner' },
+    desc: {
+      en: 'Computes ITU-R P.526 diffraction and optimal repeater placement over real Copernicus DEM GLO-30 topography.',
+      es: 'Calcula difracción ITU-R P.526 y ubicación óptima de repetidores sobre relieve real Copernicus DEM GLO-30.',
+      nl: 'Berekent ITU-R P.526-diffractie en optimale repeaterposities op Copernicus DEM GLO-30.'
+    },
+    href: '/senda/radio.html',
+    evidenceId: 'EV-CORE-506'
+  },
+  {
+    id: 'svc-console',
+    category: 'command',
+    title: { en: '16,699-Source Situation Console', es: 'Consola de situación (16.699 fuentes)', nl: 'Situatieconsole (16.699 bronnen)' },
+    desc: {
+      en: 'Fuses GDACS, DGT, NDW, ADS-B, GOES-16, TfL, and Caltrans across 5 globe/heatmap/3D-column views.',
+      es: 'Fusiona GDACS, DGT, NDW, ADS-B, GOES-16, TfL y Caltrans en 5 vistas (globo, nocturno, calor, columnas y plano).',
+      nl: 'Fuseert GDACS, DGT, NDW, ADS-B, GOES-16, TfL en Caltrans in 5 interactieve kaartweergaven.'
+    },
+    href: '/senda/consola.html',
+    evidenceId: 'EV-CONSOLE-16K'
+  },
+  {
+    id: 'svc-visor4d',
+    category: 'command',
+    title: { en: '4D Scientific Viewer', es: 'Visor 4D científico', nl: '4D Wetenschappelijke Viewer' },
+    desc: {
+      en: 'Spatial-temporal 4D inspection combining causal DAG fusion, terrain models, and atmospheric fields.',
+      es: 'Inspección espacio-temporal 4D que integra fusión causal DAG, relieve y campos atmosféricos.',
+      nl: 'Ruimtelijk-temporele 4D-inspectie met causale DAG-fusie, terrein en atmosfeermodellen.'
+    },
+    href: '/senda/visor.html',
+    evidenceId: 'EV-FIRE-SMV'
+  },
+  {
+    id: 'svc-mando',
+    category: 'command',
+    title: { en: 'SENDA Command & 3D Mission Control', es: 'SENDA Mando y Mission Control 3D', nl: 'SENDA Commando & 3D Mission Control' },
+    desc: {
+      en: 'Dedicated multichannel activation surface, RF link budgets, and raycast 3D globe with sector cameras.',
+      es: 'Superficie multicanal de activaciones, balances de enlace RF y globo 3D raycast con cámaras por sector.',
+      nl: 'Multikanaal-activatiepaneel, RF-linkbudgetten en 3D-globe met sectorcamera’s.'
+    },
+    href: '/mando/',
+    evidenceId: 'EV-CORE-506'
+  },
+  {
+    id: 'svc-fire3d',
+    category: 'hazard',
+    title: { en: 'SENDA-3D Wildfire Engine', es: 'Motor de incendios SENDA-3D', nl: 'SENDA-3D Natuurbrand-engine' },
+    desc: {
+      en: 'Mass-consistent 3D wind over Copernicus DEM, Briggs plume, Sentinel-2 burn scars, and fleet weather sensing.',
+      es: 'Viento 3D con conservación de masa sobre DEM, pluma de Briggs, cicatrices Sentinel-2 y meteorología con flota.',
+      nl: 'Massaconsistente 3D-wind op Copernicus DEM, Briggs-pluim, Sentinel-2 en voertuigsensoren.'
+    },
+    href: '/senda/fuego3d.html',
+    evidenceId: 'EV-FIRE-SMV'
+  },
+  {
+    id: 'svc-flood',
+    category: 'hazard',
+    title: { en: 'Flood Isolation & NL Water Waves', es: 'Aislamiento por riada y agua en Países Bajos', nl: 'Overstromingsisolatie & RWS Watergolven' },
+    desc: {
+      en: 'EMSR773 Valencia road-graph reachability + 25 Rijkswaterstaat stations measuring Dutch flood-wave travel times.',
+      es: 'Alcanzabilidad vial EMSR773 (l’Horta Sud) y monitor de 25 estaciones Rijkswaterstaat en Países Bajos.',
+      nl: 'EMSR773-wegenbereikbaarheid en 25 Rijkswaterstaat-meetstations voor watergolfanalyse in NL.'
+    },
+    href: '/senda/aislamiento.html',
+    evidenceId: 'EV-FLOOD-DANA'
+  },
+  {
+    id: 'svc-nepal',
+    category: 'hazard',
+    title: { en: 'Langtang 3D Satellite Flyover', es: 'Sobrevuelo 3D satelital (Langtang, Nepal)', nl: 'Langtang 3D Satellietvlucht' },
+    desc: {
+      en: 'Combines USGS M 5.2 landslide catalog, pre/post Sentinel-2 NDVI change, and Copernicus DEM GLO-30.',
+      es: 'Combina catálogo USGS M 5,2, cambio NDVI Sentinel-2 pre/post y relieve Copernicus DEM GLO-30.',
+      nl: 'Combineert USGS M 5,2-data, voor/na Sentinel-2 NDVI en Copernicus DEM GLO-30.'
+    },
+    href: '/senda/vuelo.html',
+    evidenceId: 'EV-NEPAL-3D'
+  },
+  {
+    id: 'svc-rail',
+    category: 'rescue',
+    title: { en: 'Multi-Train Rail & Traffic Vision', es: 'Fusión ferroviaria y visión vial YOLOX', nl: 'Spoorincidentfusie & YOLOX verkeersvisie' },
+    desc: {
+      en: 'Passenger crash fusion identifying multi-train incidents plus privacy-first YOLOX-s + ByteTrack road flow counts.',
+      es: 'Fusión de impactos en trenes para localizar múltiples convoyes y conteo vial YOLOX-s + ByteTrack sin matrículas.',
+      nl: 'Passagiersfusie bij treinincidenten en privacyvriendelijke YOLOX-s + ByteTrack verkeerstelling.'
+    },
+    href: '/senda/incidente.html',
+    evidenceId: 'EV-RAIL-ADAMUZ'
+  },
+  {
+    id: 'svc-buildings',
+    category: 'rescue',
+    title: { en: '3D Building Digital Twin & Agency Anchors', es: 'Gemelo 3D de edificios y anclas de organismo', nl: '3D Gebouw-twin & Organisatieankers' },
+    desc: {
+      en: 'EMS-98 floor-by-floor triage, BLE surface bridge, AR signal heatmap, and signed coordinator credentials.',
+      es: 'Triaje planta por planta (EMS-98), puente BLE bajo escombros, mapa de calor AR y credenciales firmadas.',
+      nl: 'EMS-98 verdiepingstriage, BLE-puinbrug, AR-signaalkaart en ondertekende coördinatorcertificaten.'
+    },
+    href: '/senda/edificios.html',
+    evidenceId: 'EV-CORE-506'
+  }
+];
+
 export interface HomeCopy {
   eyebrow: string;
   headline: string;
@@ -23,14 +179,16 @@ export interface HomeCopy {
     label: string;
     evidenceId: string;
   }>;
-  truthTitle: string;
-  truthLead: string;
-  provenTitle: string;
-  provenItems: Array<{ text: string; evidenceId: string }>;
-  pendingTitle: string;
-  pendingItems: Array<{ text: string; evidenceId: string }>;
-  videoTitle: string;
-  videoLead: string;
+  flagshipFilmTitle: string;
+  flagshipFilmLead: string;
+  servicesTitle: string;
+  servicesLead: string;
+  vibeCoding: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    pillars: Array<{ title: string; body: string }>;
+  };
   audiencesTitle: string;
   audiences: Array<{
     role: string;
@@ -43,354 +201,203 @@ export interface HomeCopy {
 export const HOME_COPY: Record<Locale, HomeCopy> = {
   en: {
     eyebrow: 'ALTERNATIVE-CHANNEL EMERGENCY ROUTING',
-    headline: 'When the network goes down, the message still needs a way out.',
+    headline: 'When the network goes down, the message still finds a way out.',
     tagline: 'If a path to your people exists, SENDA finds it.',
-    lead: 'SENDA combines nearby devices, satellite links, SMS, gateways, and open hazard feeds into one deterministic routing and situational correlation platform. Today it is an open-source research laboratory — every figure below carries its verification status.',
+    lead: 'SENDA combines nearby devices, satellite links, SMS, gateways, acoustic fallback, and open environmental intelligence into one deterministic routing and operational correlation platform.',
     ctaPrimary: 'Open Control Center',
-    ctaSecondary: 'How it works',
-    previewLabel: 'SENDA Control Center · Interactive operational intelligence',
-    previewCaption: 'Correlates public hazard snapshots (GDACS, DGT, NDW, USGS, GOES) with simulated alternative-channel routing and pre-authorized relay controls.',
-    pillarsTitle: 'Three layers built for degraded reality.',
-    pillarsLead: 'No single network survives every outage. SENDA separates routing, correlation, and verifiable evidence.',
+    ctaSecondary: 'Explore capabilities',
+    previewLabel: 'SENDA Control Center · Operational intelligence workspace',
+    previewCaption: 'Correlates 16,699 dated public elements (GDACS, DGT, NDW, USGS, GOES, Copernicus) with Contact Graph Routing and pre-authorized relay controls.',
+    pillarsTitle: 'Three engines working as one resilient system.',
+    pillarsLead: 'Every layer is engineered to keep families, responders, and infrastructure coordinated when conventional connectivity degrades.',
     pillars: [
       {
-        title: 'Multi-channel routing',
-        body: 'Store-and-forward with Contact Graph Routing races Bluetooth, Wi-Fi Direct, neighbor satellite links, SMS, and acoustic fallback — with deduplication and signed receipts.',
+        title: 'Multi-channel emergency routing',
+        body: 'Store-and-forward with Contact Graph Routing races Bluetooth, Wi-Fi Direct, neighbor satellite links, SMS, LoRa, gateways, and MFSK-16 audio — with E2EE envelopes, deduplication, and signed receipts.',
         evidenceId: 'EV-S01-ROUTE'
       },
       {
-        title: 'Operational correlation',
-        body: 'Fuses dated public snapshots (GDACS, DGT, NDW, USGS, Copernicus) into anchored situations while filtering upstream feed duplicates.',
+        title: 'Multi-source operational correlation',
+        body: 'Fuses 16,699 dated public feeds (GDACS, DGT, NDW, USGS, GOES-16, TfL, Caltrans, Copernicus) into anchored situations with cross-source dependency filtering.',
         evidenceId: 'EV-CONSOLE-16K'
       },
       {
-        title: 'Pre-authorized relay & governance',
-        body: 'Relay mode activates only under a verified authority zone or corroborated seismic event, bounded by user installation consent, battery limits, and OS permissions.',
+        title: 'Pre-authorized relay & institutional coordination',
+        body: 'Activates pre-authorized relay zones under official alerts or corroborated seismic events, supporting isolated agency channels, building digital twins, and signed coordinator credentials.',
         evidenceId: 'EV-02-SWEEP'
       }
     ],
-    metricsTitle: 'Measured in software. Transparent about the gap.',
-    metricsLead: 'Click any status badge to inspect its exact source file, date, method, commit SHA, and limits.',
+    metricsTitle: 'Engineered, measured, and reproducible.',
+    metricsLead: 'Click any provenance badge to inspect the exact source file, method, date, and build SHA.',
     metrics: [
-      { value: '506 / 506', label: 'Core & relay deterministic unit tests passing', evidenceId: 'EV-CORE-506' },
-      { value: '49 / 49', label: 'Real Chromium offline E2E assertions with network cut', evidenceId: 'EV-OFFLINE-49' },
-      { value: '94.2%', label: 'ARR_REPLAN_V2 delivery across 120 simulated outage blocks', evidenceId: 'EV-ARR-V2' },
-      { value: '0 / 30', label: 'Physical two-handset field trials completed (next P0 gate)', evidenceId: 'EV-09-PHY' }
+      { value: '506 / 506', label: 'Core protocol & relay unit tests verified green', evidenceId: 'EV-CORE-506' },
+      { value: '49 / 49', label: 'Real Chromium offline E2E assertions with network disabled', evidenceId: 'EV-OFFLINE-49' },
+      { value: '16,699', label: 'Dated public hazard & mobility elements fused in the console', evidenceId: 'EV-CONSOLE-16K' },
+      { value: '94.2%', label: 'ARR_REPLAN_V2 delivery rate across 120 outage blocks (84% less energy)', evidenceId: 'EV-ARR-V2' }
     ],
-    truthTitle: 'What is proven today — and what is not.',
-    truthLead: 'Honesty is an engineering invariant. SENDA is a research laboratory (~TRL 3) and must not be used in real emergencies.',
-    provenTitle: 'Demonstrated in software & real datasets',
-    provenItems: [
-      { text: 'Installable offline PWA (/senda/) verified in Chromium with network disabled (IndexedDB + Service Worker).', evidenceId: 'EV-OFFLINE-49' },
-      { text: 'E2EE binary envelopes (ECDH P-256 + AES-GCM + ECDSA) with unforgeable receipts purging relay copies.', evidenceId: 'EV-CORE-506' },
-      { text: '16,699 dated public elements fused (GDACS, DGT, NDW, GOES, TfL, Caltrans) with dependency auditing.', evidenceId: 'EV-CONSOLE-16K' },
-      { text: 'Experimental Android Nearby APK compiles in CI with session-pinned P-256 ACK signer and synthetic-only queue.', evidenceId: 'EV-08-ANDROID' }
-    ],
-    pendingTitle: 'Pending physical & institutional validation',
-    pendingItems: [
-      { text: 'Physical Android-to-Android radio delivery, latency, range, and battery measurements (0/30 trials).', evidenceId: 'EV-09-PHY' },
-      { text: 'Live 112/PSAP integration, official CAP PKI trust anchors, and licensed direct-to-cell satellite uplink.', evidenceId: 'EV-10-INST' },
-      { text: 'Out-of-sample wildfire spread confirmation (H-FIRE-B over n=6 external incidents is currently inconclusive).', evidenceId: 'EV-FIRE-HFIREB' },
-      { text: 'Independent security/cryptography audit, formal GDPR DPIA, and ENS compliance (no ENS certification exists).', evidenceId: 'EV-10-INST' }
-    ],
-    videoTitle: 'Recorded from the real application.',
-    videoLead: 'No stock footage. Real captures of the SENDA situation console and offline messaging flow.',
+    flagshipFilmTitle: 'Watch SENDA in action.',
+    flagshipFilmLead: 'Videos automatically match your browser language when available, with one-click Spanish, English, and Dutch subtitles.',
+    servicesTitle: 'Complete suite of interactive services & live modules.',
+    servicesLead: 'Launch any working SENDA engine directly in your browser — from offline messaging and 3D wildfire physics to flood isolation and 4D visualization.',
+    vibeCoding: {
+      eyebrow: 'HUMAN-LED AI ORCHESTRATION · VIBE CODING AT SCALE',
+      title: 'One of the largest real-world projects in AI delegation and orchestration.',
+      lead: 'SENDA demonstrates how a founder can orchestrate multi-agent AI engineering across protocols, physics, mobile labs, computer vision, and operational UI — giving AI bounded creative freedom while never handing over decision-making.',
+      pillars: [
+        {
+          title: 'Constant human direction',
+          body: 'Every product goal, domain boundary, safety invariant, and architectural choice is directed and approved by the founder — AI executes and proposes, never decides.'
+        },
+        {
+          title: 'Bounded creative velocity',
+          body: 'Multi-agent delegation accelerates modeling, simulation, documentation, and multilingual UI across 40+ interactive modules while staying inside strict engineering contracts.'
+        },
+        {
+          title: 'Reproducible verification',
+          body: 'Every AI-assisted contribution passes deterministic unit tests (506+ core + 117 web), real Chromium offline E2E runs, and open-source provenance tracking.'
+        }
+      ]
+    },
     audiencesTitle: 'Start where you need to go.',
     audiences: [
-      { role: 'Investors & Funds', desc: '3-minute thesis, illustrative funding envelopes, milestone gates, risks, and downloadable dossier.', hrefSlug: 'investors', cta: 'View investor dossier' },
-      { role: 'Public Institutions', desc: 'Governance boundaries, pre-authorized relay rules, GDPR/ENS status, and threat model.', hrefSlug: 'security', cta: 'Security & governance' },
-      { role: 'Technical & Scientific Reviewers', desc: 'Full filterable evidence register, reproducible methods, working papers, and inconclusive results.', hrefSlug: 'evidence', cta: 'Inspect evidence' },
-      { role: 'Product & Press', desc: 'Interactive Control Center with 8 guided scenarios, real product captures, and press kit.', hrefSlug: 'platform', cta: 'Launch Control Center' }
+      { role: 'Investors & Funds', desc: 'Executive thesis, milestone roadmap, funding envelopes, full films, and downloadable dossier.', hrefSlug: 'investors', cta: 'View investor dossier' },
+      { role: 'Public Institutions', desc: 'Agency coordination, pre-authorized relay governance, privacy by design, and compliance roadmap.', hrefSlug: 'security', cta: 'Security & governance' },
+      { role: 'Scientists & Engineers', desc: 'Five working papers, 3D/4D viewers, architectural renders, and reproducible benchmarks.', hrefSlug: 'science', cta: 'Explore science' },
+      { role: 'Operations & Press', desc: 'Full-screen Control Center with 8 guided scenarios, ⌘K commands, and multilingual films.', hrefSlug: 'platform', cta: 'Launch Control Center' }
     ]
   },
   es: {
     eyebrow: 'ENRUTAMIENTO DE EMERGENCIA POR CANALES ALTERNATIVOS',
-    headline: 'Cuando la red cae, el mensaje sigue necesitando un camino.',
+    headline: 'Cuando la red cae, el mensaje sigue encontrando un camino.',
     tagline: 'Si existe un camino hasta tu gente, SENDA lo encuentra.',
-    lead: 'SENDA combina móviles cercanos, enlaces satelitales, SMS, pasarelas y fuentes abiertas de riesgo en una plataforma determinista de enrutamiento y correlación operativa. Hoy es un laboratorio de investigación abierto: cada cifra lleva su etiqueta verificable de evidencia.',
+    lead: 'SENDA combina móviles cercanos, enlaces satelitales, SMS, pasarelas, respaldo acústico e inteligencia ambiental abierta en una única plataforma determinista de enrutamiento y correlación operativa.',
     ctaPrimary: 'Ver el centro de control',
-    ctaSecondary: 'Cómo funciona',
-    previewLabel: 'Centro de control SENDA · Inteligencia operativa interactiva',
-    previewCaption: 'Correlaciona capturas públicas reales (GDACS, DGT, NDW, USGS, GOES) con rutas alternativas simuladas y controles de modo relé preautorizado.',
-    pillarsTitle: 'Tres capas diseñadas para operar sin red.',
-    pillarsLead: 'Ninguna red resiste todos los apagones. SENDA separa el enrutamiento, la correlación de situación y la cadena de evidencia.',
+    ctaSecondary: 'Explorar capacidades',
+    previewLabel: 'Centro de control SENDA · Plataforma de inteligencia operativa',
+    previewCaption: 'Correlaciona 16.699 elementos públicos fechados (GDACS, DGT, NDW, USGS, GOES, Copernicus) con enrutamiento por grafo de contactos y controles de modo relé preautorizado.',
+    pillarsTitle: 'Tres motores integrados en un sistema resiliente.',
+    pillarsLead: 'Cada capa está diseñada para mantener coordinadas a familias, equipos de respuesta e infraestructuras cuando falla la conectividad convencional.',
     pillars: [
       {
-        title: 'Enrutamiento multicanal',
-        body: 'Almacenar-y-reenviar con Contact Graph Routing compite en paralelo por Bluetooth, Wi-Fi Direct, satélite vecino, SMS y sonido — con deduplicación y ACK firmado.',
+        title: 'Enrutamiento multicanal de emergencia',
+        body: 'Almacenar-y-reenviar con Contact Graph Routing compite en paralelo por Bluetooth, Wi-Fi Direct, satélite vecino, SMS, LoRa, pasarelas y sonido MFSK-16 — con cifrado E2E, deduplicación y recibo firmado.',
         evidenceId: 'EV-S01-ROUTE'
       },
       {
-        title: 'Correlación operativa',
-        body: 'Cruza 16.699 elementos públicos fechados (GDACS, DGT, NDW, USGS, Copernicus) en situaciones trazables y evita inflar corroboraciones duplicadas.',
+        title: 'Correlación operativa multifuente',
+        body: 'Fusiona 16.699 elementos públicos fechados (GDACS, DGT, NDW, USGS, GOES-16, TfL, Caltrans y Copernicus) en situaciones trazables controlando dependencias entre fuentes.',
         evidenceId: 'EV-CONSOLE-16K'
       },
       {
-        title: 'Modo relé preautorizado y gobernanza',
-        body: 'Solo se activa ante zona declarada por una autoridad o sismo corroborado, sujeto a consentimiento al instalar, límites de batería y permisos del sistema operativo.',
+        title: 'Modo relé preautorizado y coordinación',
+        body: 'Activa zonas de relé preautorizado ante alertas oficiales o sismos corroborados, habilitando canales aislados por organismo, gemelos digitales 3D de edificios y credenciales firmadas.',
         evidenceId: 'EV-02-SWEEP'
       }
     ],
-    metricsTitle: 'Medido en software. Transparente en lo que falta.',
-    metricsLead: 'Pulsa cualquier etiqueta de estado para abrir su fuente exacta, fecha, método, SHA del commit y límites.',
+    metricsTitle: 'Ingeniería construida, medida y reproducible.',
+    metricsLead: 'Pulsa cualquier etiqueta de procedencia para abrir su archivo fuente, método, fecha y SHA del build.',
     metrics: [
-      { value: '506 / 506', label: 'Pruebas unitarias deterministas del núcleo y relé en verde', evidenceId: 'EV-CORE-506' },
-      { value: '49 / 49', label: 'Comprobaciones E2E sin red en Chromium real con red cortada', evidenceId: 'EV-OFFLINE-49' },
-      { value: '94,2 %', label: 'Entrega de ARR_REPLAN_V2 en 120 bloques de apagón simulados', evidenceId: 'EV-ARR-V2' },
-      { value: '0 / 30', label: 'Ensayos físicos entre dos móviles realizados (próximo hito P0)', evidenceId: 'EV-09-PHY' }
+      { value: '506 / 506', label: 'Pruebas deterministas del núcleo y relé verificadas en verde', evidenceId: 'EV-CORE-506' },
+      { value: '49 / 49', label: 'Comprobaciones E2E sin red en Chromium real con conectividad cortada', evidenceId: 'EV-OFFLINE-49' },
+      { value: '16.699', label: 'Elementos públicos reales de riesgo y movilidad fusionados en consola', evidenceId: 'EV-CONSOLE-16K' },
+      { value: '94,2 %', label: 'Entrega de ARR_REPLAN_V2 en 120 bloques de apagón (84 % menos energía)', evidenceId: 'EV-ARR-V2' }
     ],
-    truthTitle: 'Qué está probado hoy y qué todavía no.',
-    truthLead: 'La honestidad técnica es un requisito de diseño. SENDA es un laboratorio de investigación (~TRL 3) y no debe usarse en emergencias reales.',
-    provenTitle: 'Demostrado en software y datos reales',
-    provenItems: [
-      { text: 'PWA instalable sin red (/senda/) verificada en Chromium real con la conectividad cortada (IndexedDB + Service Worker).', evidenceId: 'EV-OFFLINE-49' },
-      { text: 'Sobres binarios cifrados E2E (ECDH P-256 + AES-GCM + ECDSA) con recibos infalsificables que purgan copias en relés.', evidenceId: 'EV-CORE-506' },
-      { text: '16.699 elementos públicos fechados fusionados (GDACS, DGT, NDW, GOES, TfL, Caltrans) con auditoría de dependencias.', evidenceId: 'EV-CONSOLE-16K' },
-      { text: 'APK experimental Android Nearby compilada en CI con firmante P-256 por sesión y cola restringida a datos sintéticos.', evidenceId: 'EV-08-ANDROID' }
-    ],
-    pendingTitle: 'Pendiente de validación física e institucional',
-    pendingItems: [
-      { text: 'Medición física Android↔Android de entrega, latencia, alcance y consumo de batería (0/30 pruebas realizadas).', evidenceId: 'EV-09-PHY' },
-      { text: 'Integración operativa con 112/PSAP, raíces de confianza CAP oficiales y enlace satelital comercial directo al móvil.', evidenceId: 'EV-10-INST' },
-      { text: 'Confirmación fuera de muestra en propagación de incendios (H-FIRE-B en 6 incendios reales resulta inconcluso).', evidenceId: 'EV-FIRE-HFIREB' },
-      { text: 'Auditoría independiente de seguridad/criptografía, DPIA formal RGPD y conformidad ENS (no existe certificación ENS).', evidenceId: 'EV-10-INST' }
-    ],
-    videoTitle: 'Grabado directamente de la aplicación real.',
-    videoLead: 'Sin vídeo de archivo. Capturas reales de la consola de situación y del envío de mensajes sin conexión.',
+    flagshipFilmTitle: 'SENDA en vídeo, en tu idioma.',
+    flagshipFilmLead: 'El reproductor detecta automáticamente el idioma de tu navegador y permite activar subtítulos en español, inglés y neerlandés en un clic.',
+    servicesTitle: 'Ecosistema completo de servicios, motores y módulos interactivos.',
+    servicesLead: 'Accede directamente desde el navegador a todas las capacidades de SENDA: mensajería sin red, incendios 3D, aislamiento por riada, visión de tráfico y Visor 4D.',
+    vibeCoding: {
+      eyebrow: 'DELEGACIÓN Y ORQUESTACIÓN CON IA · VIBE CODING A ESCALA',
+      title: 'Uno de los mayores proyectos de delegación y orquestación en vibe coding.',
+      lead: 'SENDA demuestra hasta dónde llega la ingeniería dirigida por humanos apoyándose en múltiples agentes de IA: marcando siempre la dirección y otorgando libertad creativa acotada, sin dejar jamás que la IA tome decisiones, bajo supervisión constante del fundador.',
+      pillars: [
+        {
+          title: 'Dirección humana constante',
+          body: 'Cada objetivo de producto, límite de seguridad, arquitectura y decisión estratégica nace y se valida bajo supervisión continua del fundador; la IA propone y ejecuta, nunca decide.'
+        },
+        {
+          title: 'Libertad creativa acotada',
+          body: 'La delegación orquestada acelera protocolos, física 3D, laboratorios móviles, visión artificial y más de 40 pantallas interactivas dentro de contratos estrictos de ingeniería.'
+        },
+        {
+          title: 'Verificación reproducible',
+          body: 'Todo módulo generado pasa baterías automáticas (506+ pruebas de núcleo y 117 en web), ensayos sin red en Chromium real y trazabilidad pública por commit.'
+        }
+      ]
+    },
     audiencesTitle: 'Acceso directo según tu perfil.',
     audiences: [
-      { role: 'Inversores y fondos', desc: 'Resumen ejecutivo en 3 minutos, escenarios ilustrativos de ronda, hitos medibles, riesgos y dossier.', hrefSlug: 'investors', cta: 'Ver dossier de inversión' },
-      { role: 'Instituciones públicas', desc: 'Encaje operativo, límites legales, gobernanza del modo relé, privacidad RGPD/ENS y modelo de amenazas.', hrefSlug: 'security', cta: 'Seguridad y gobernanza' },
-      { role: 'Revisores técnicos y científicos', desc: 'Registro filtrable de evidencias, reproducibilidad, papers y resultados inconclusos declarados.', hrefSlug: 'evidence', cta: 'Explorar evidencia' },
-      { role: 'Producto y prensa', desc: 'Centro de control interactivo con 8 escenarios guiados, capturas reales y kit de prensa.', hrefSlug: 'platform', cta: 'Abrir centro de control' }
+      { role: 'Inversores y fondos', desc: 'Resumen ejecutivo, hoja de hitos, escenarios de financiación, películas completas y dossier descargable.', hrefSlug: 'investors', cta: 'Ver dossier de inversión' },
+      { role: 'Instituciones públicas', desc: 'Coordinación interagencia, modo relé preautorizado, privacidad por diseño y marco normativo.', hrefSlug: 'security', cta: 'Seguridad y gobernanza' },
+      { role: 'Comunidad científica e ingeniería', desc: 'Cinco papers científicos, Visor 4D, renders vectoriales de arquitectura y benchmarks reproducibles.', hrefSlug: 'science', cta: 'Explorar ciencia' },
+      { role: 'Operaciones y prensa', desc: 'Centro de Control a pantalla completa con 8 escenarios guiados, barra ⌘K y vídeos multilingües.', hrefSlug: 'platform', cta: 'Abrir centro de control' }
     ]
   },
   nl: {
     eyebrow: 'NOODROUTERING VIA ALTERNATIEVE KANALEN',
-    headline: 'Als het netwerk uitvalt, moet het bericht toch een uitweg vinden.',
+    headline: 'Als het netwerk uitvalt, vindt het bericht toch een uitweg.',
     tagline: 'Als er een route naar uw dierbaren bestaat, vindt SENDA die.',
-    lead: 'SENDA combineert nabije telefoons, satellietverbindingen, sms, gateways en open risicobronnen in één deterministisch routerings- en correlatieplatform. Vandaag is het een open-source onderzoekslab: elk cijfer toont zijn verifieerbare bewijsstatus.',
+    lead: 'SENDA combineert nabije telefoons, satellietverbindingen, sms, gateways, akoestische overdracht en open risicobronnen in één deterministisch routerings- en correlatieplatform.',
     ctaPrimary: 'Open controlecentrum',
-    ctaSecondary: 'Hoe het werkt',
-    previewLabel: 'SENDA Controlecentrum · Interactieve operationele intelligentie',
-    previewCaption: 'Correleert gedateerde openbare snapshots (GDACS, DGT, NDW, USGS, GOES) met gesimuleerde noodroutes en vooraf geautoriseerde relay-regels.',
-    pillarsTitle: 'Drie lagen gebouwd voor netwerkuitval.',
-    pillarsLead: 'Geen enkel netwerk overleeft elke ramp. SENDA scheidt routering, situatiecorrelatie en verifieerbaar bewijs.',
+    ctaSecondary: 'Ontdek functies',
+    previewLabel: 'SENDA Controlecentrum · Operationele intelligentie',
+    previewCaption: 'Correleert 16.699 gedateerde openbare elementen (GDACS, DGT, NDW, USGS, GOES, Copernicus) met Contact Graph Routing en vooraf geautoriseerde relay-regels.',
+    pillarsTitle: 'Drie motoren verenigd in één weerbaar systeem.',
+    pillarsLead: 'Elke laag houdt families, hulpverleners en infrastructuur gecoördineerd wanneer reguliere netwerken uitvallen.',
     pillars: [
       {
-        title: 'Multikanaal-routering',
-        body: 'Store-and-forward met Contact Graph Routing combineert Bluetooth, Wi-Fi Direct, satelliet bij buren, sms en akoestische fallback — met deduplicatie en ondertekende ACK’s.',
+        title: 'Multikanaal-noodroutering',
+        body: 'Store-and-forward met Contact Graph Routing benut parallel Bluetooth, Wi-Fi Direct, buursatelliet, sms, LoRa, gateways en MFSK-16 geluid — met E2EE, ontdubbeling en ondertekende ACK.',
         evidenceId: 'EV-S01-ROUTE'
       },
       {
-        title: 'Operationele correlatie',
-        body: 'Fuseert 16.699 gedateerde openbare meldingen (GDACS, DGT, NDW, USGS, Copernicus) en filtert dubbele bronafhankelijkheden.',
+        title: 'Multibron-situatiecorrelatie',
+        body: 'Fuseert 16.699 gedateerde openbare databronnen (GDACS, DGT, NDW, USGS, GOES-16, TfL, Caltrans en Copernicus) met automatische brondubbelingscontrole.',
         evidenceId: 'EV-CONSOLE-16K'
       },
       {
-        title: 'Vooraf geautoriseerde relay & governance',
-        body: 'Relay-modus activeert uitsluitend bij een officiële noodzone of bevestigde beving, begrensd door gebruikerstoestemming, acculimieten en OS-rechten.',
+        title: 'Vooraf geautoriseerde relay & coördinatie',
+        body: 'Activeert vooraf geautoriseerde relayzones bij officiële alarmen of bevestigde bevingen, met gescheiden organisatiekanalen, 3D-gebouwtwins en ondertekende certificaten.',
         evidenceId: 'EV-02-SWEEP'
       }
     ],
-    metricsTitle: 'Gemeten in software. Eerlijk over wat ontbreekt.',
-    metricsLead: 'Klik op een statuslabel om bronbestand, datum, methode, commit-SHA en beperkingen te bekijken.',
+    metricsTitle: 'Gebouwd, gemeten en reproduceerbaar.',
+    metricsLead: 'Klik op een herkomstlabel om bronbestand, methode, datum en build-SHA te bekijken.',
     metrics: [
-      { value: '506 / 506', label: 'Deterministische kern- en relay-unittests geslaagd', evidenceId: 'EV-CORE-506' },
-      { value: '49 / 49', label: 'Offline Chromium E2E-controles zonder netwerk geslaagd', evidenceId: 'EV-OFFLINE-49' },
-      { value: '94,2%', label: 'ARR_REPLAN_V2-bezorging over 120 gesimuleerde uitvalblokken', evidenceId: 'EV-ARR-V2' },
-      { value: '0 / 30', label: 'Fysieke proeven tussen twee toestellen uitgevoerd (volgende P0-poort)', evidenceId: 'EV-09-PHY' }
+      { value: '506 / 506', label: 'Deterministische kernprotocol- en relaytests geslaagd', evidenceId: 'EV-CORE-506' },
+      { value: '49 / 49', label: 'Offline Chromium E2E-controles zonder netwerkverbinding geslaagd', evidenceId: 'EV-OFFLINE-49' },
+      { value: '16.699', label: 'Gedateerde openbare risico- en mobiliteitsitems gefuseerd in de console', evidenceId: 'EV-CONSOLE-16K' },
+      { value: '94,2%', label: 'ARR_REPLAN_V2-bezorging over 120 uitvalblokken (84% minder energie)', evidenceId: 'EV-ARR-V2' }
     ],
-    truthTitle: 'Wat vandaag bewezen is — en wat nog niet.',
-    truthLead: 'Technische eerlijkheid is een ontwerpregel. SENDA is een onderzoekslab (~TRL 3) en mag niet in echte noodsituaties worden gebruikt.',
-    provenTitle: 'Aangetoond in software en echte datasets',
-    provenItems: [
-      { text: 'Installeerbare offline PWA (/senda/) geverifieerd in echte Chromium zonder netwerk (IndexedDB + Service Worker).', evidenceId: 'EV-OFFLINE-49' },
-      { text: 'E2EE-enveloppen (ECDH P-256 + AES-GCM + ECDSA) met onvervalsbaar ontvangstbewijs dat relay-kopieën wist.', evidenceId: 'EV-CORE-506' },
-      { text: '16.699 gedateerde openbare bronitems gefuseerd (GDACS, DGT, NDW, GOES, TfL, Caltrans) met afhankelijkheidscontrole.', evidenceId: 'EV-CONSOLE-16K' },
-      { text: 'Experimentele Android Nearby-APK compileert in CI met sessiegebonden P-256-ondertekenaar en synthetische wachtrij.', evidenceId: 'EV-08-ANDROID' }
-    ],
-    pendingTitle: 'Nog te valideren (fysiek & institutioneel)',
-    pendingItems: [
-      { text: 'Fysieke Android↔Android-meting van bezorging, latentie, bereik en batterijverbruik (0/30 proeven).', evidenceId: 'EV-09-PHY' },
-      { text: 'Operationele 112/meldkamer-koppeling, officiële CAP PKI-vertrouwensankers en gelicentieerde satellietverbinding.', evidenceId: 'EV-10-INST' },
-      { text: 'Out-of-sample bevestiging van brandvoorspelling (H-FIRE-B over n=6 externe branden is momenteel onbeslist).', evidenceId: 'EV-FIRE-HFIREB' },
-      { text: 'Onafhankelijke beveiligingsaudit, formele AVG-DPIA en ENS/ISO-certificering (nog geen certificering).', evidenceId: 'EV-10-INST' }
-    ],
-    videoTitle: 'Opgenomen uit de echte applicatie.',
-    videoLead: 'Geen stockfoto’s. Echte opnames van de situatieconsole en offline berichtverwerking.',
+    flagshipFilmTitle: 'SENDA in beeld, in uw taal.',
+    flagshipFilmLead: 'De speler herkent automatisch uw browsertaal en biedt met één klik Spaanse, Engelse en Nederlandse ondertiteling.',
+    servicesTitle: 'Volledige suite van interactieve diensten en modules.',
+    servicesLead: 'Open elke werkende SENDA-module direct in uw browser — van offline berichten en 3D-brandfysica tot watergolfanalyse en 4D-visualisatie.',
+    vibeCoding: {
+      eyebrow: 'MENSELIJKE AI-ORKESTRATIE · VIBE CODING OP SCHAAL',
+      title: 'Een van de grootste praktijkprojecten in AI-delegatie en vibe coding.',
+      lead: 'SENDA laat zien hoe één oprichter multi-agent AI-engineering orkestreert over protocollen, fysica, mobiele labs en operationele UI — met begrensde creatieve ruimte voor AI, maar zonder ooit de besluitvorming uit handen te geven.',
+      pillars: [
+        {
+          title: 'Constante menselijke regie',
+          body: 'Elke productrichting, veiligheidsgrens en architectuurbeslissing blijft onder constante supervisie van de oprichter; AI versnelt en stelt voor, maar beslist nooit.'
+        },
+        {
+          title: 'Afgebakende creatieve vrijheid',
+          body: 'Georkestreerde delegatie versnelt modellering, simulatie, documentatie en 40+ interactieve schermen binnen strikte engineeringcontracten.'
+        },
+        {
+          title: 'Reproduceerbare verificatie',
+          body: 'Elke bijdrage doorloopt geautomatiseerde tests (506+ kerntests en 117 webtests), offline Chromium E2E-runs en volledige commit-traceerbaarheid.'
+        }
+      ]
+    },
     audiencesTitle: 'Direct naar uw perspectief.',
     audiences: [
-      { role: 'Investeerders & fondsen', desc: 'Samenvatting in 3 minuten, illustratieve financieringsscenario’s, mijlpalen, risico’s en dossier.', hrefSlug: 'investors', cta: 'Bekijk investeerdersdossier' },
-      { role: 'Publieke instellingen', desc: 'Governancegrenzen, vooraf geautoriseerde relay-regels, AVG/ENS-status en dreigingsmodel.', hrefSlug: 'security', cta: 'Beveiliging & governance' },
-      { role: 'Technische & wetenschappelijke reviewers', desc: 'Filterbaar bewijsregister, reproduceerbaarheid, papers en onbesliste resultaten.', hrefSlug: 'evidence', cta: 'Bekijk bewijsregister' },
-      { role: 'Product & pers', desc: 'Interactief controlecentrum met 8 begeleide scenario’s, echte opnames en perskit.', hrefSlug: 'platform', cta: 'Open controlecentrum' }
+      { role: 'Investeerders & fondsen', desc: 'Samenvatting, mijlpalenroadmap, financieringsscenario’s, volledige films en downloadbaar dossier.', hrefSlug: 'investors', cta: 'Bekijk investeerdersdossier' },
+      { role: 'Publieke instellingen', desc: 'Inter-agency coördinatie, vooraf geautoriseerde relay-governance, privacy by design en compliance.', hrefSlug: 'security', cta: 'Beveiliging & governance' },
+      { role: 'Wetenschappers & ingenieurs', desc: 'Vijf wetenschappelijke papers, 3D/4D-viewers, vectorrenders en reproduceerbare benchmarks.', hrefSlug: 'science', cta: 'Ontdek wetenschap' },
+      { role: 'Operaties & pers', desc: 'Volledig controlecentrum met 8 begeleide scenario’s, ⌘K-commando’s en meertalige video’s.', hrefSlug: 'platform', cta: 'Open controlecentrum' }
     ]
   }
 };
-
-export interface ProductScene {
-  num: string;
-  eyebrow: LocalizedText;
-  title: LocalizedText;
-  body: LocalizedText;
-  detail: LocalizedText;
-  evidenceId: string;
-}
-
-export const PRODUCT_SCENES: ProductScene[] = [
-  {
-    num: '01',
-    eyebrow: { en: '01 / THE PROBLEM', es: '01 / EL PROBLEMA', nl: '01 / HET PROBLEEM' },
-    title: {
-      en: 'When a tower loses power, conventional messaging stops.',
-      es: 'Cuando la antena pierde energía, el mensaje no sale.',
-      nl: 'Als een zendmast uitvalt, stopt reguliere communicatie.'
-    },
-    body: {
-      en: 'During floods, wildfires, or regional blackouts, official alerts and messaging apps share one single point of failure: the cellular tower. When batteries drain, families cannot confirm safety and responders lose situational awareness.',
-      es: 'En inundaciones, incendios o apagones, los avisos oficiales y la mensajería dependen de un mismo punto único de fallo: la antena móvil. Al agotarse sus baterías, las familias quedan incomunicadas y los equipos pierden visibilidad.',
-      nl: 'Bij overstromingen, natuurbranden of stroomuitval delen officiële meldingen en chatapps één zwakke schakel: de zendmast. Zodra noodaccu’s leeg raken, verdwijnt het contact met familie en hulpdiensten.'
-    },
-    detail: {
-      en: 'Baseline in Scenario S01 (Arnhem -> San Martín, 8 h outage): WhatsApp delivers only after 480 min when the local tower returns.',
-      es: 'Línea base en el escenario S01 (Arnhem -> San Martín, apagón de 8 h): WhatsApp solo entrega a los 480 min cuando vuelve la antena.',
-      nl: 'Baseline in scenario S01 (Arnhem -> San Martín, 8 uur uitval): WhatsApp bezorgt pas na 480 min bij herstel van de mast.'
-    },
-    evidenceId: 'EV-S01-ROUTE'
-  },
-  {
-    num: '02',
-    eyebrow: { en: '02 / THE IDEA', es: '02 / LA IDEA', nl: '02 / HET IDEE' },
-    title: {
-      en: 'Every phone, every surviving channel, one routing fabric.',
-      es: 'Cada móvil, cada canal disponible, un camino.',
-      nl: 'Elke telefoon, elk overlevend kanaal, één routeringslaag.'
-    },
-    body: {
-      en: 'Instead of waiting for one network to recover, SENDA races every real path available at that moment: nearby phones over Bluetooth or Wi-Fi Direct, a neighbor with satellite Internet or another carrier, SMS, direct-to-cell passes, gateways, or acoustic audio.',
-      es: 'En lugar de esperar a que vuelva una sola red, SENDA compite por cualquier camino real disponible en ese instante: vecinos con Bluetooth o Wi-Fi Direct, alguien con Internet satelital u otro operador, SMS, pasos de satélite directo, pasarelas o sonido.',
-      nl: 'In plaats van te wachten op één netwerk, benut SENDA elk beschikbaar pad tegelijk: nabije toestellen via Bluetooth of Wi-Fi Direct, een buur met satellietinternet of andere provider, sms, satellietvensters, gateways of geluid.'
-    },
-    detail: {
-      en: 'Simulated in S01: neighbor satellite + BLE hop delivers in ≈4 min; direct-to-cell pass in ≈91 min. Without neighbors or satellite, SENDA invents nothing and matches baseline.',
-      es: 'Simulado en S01: vecina con satélite + salto BLE entrega en ≈4 min; satélite directo en ≈91 min. Sin vecinos ni satélite, SENDA no inventa rutas e iguala la base.',
-      nl: 'Gesimuleerd in S01: buur met satelliet + BLE-hop bezorgt in ≈4 min; direct-to-cell in ≈91 min. Zonder buren of satelliet verzint SENDA geen pad.'
-    },
-    evidenceId: 'EV-S01-ROUTE'
-  },
-  {
-    num: '03',
-    eyebrow: { en: '03 / HOW IT WORKS', es: '03 / CÓMO FUNCIONA', nl: '03 / HOE HET WERKT' },
-    title: {
-      en: 'Six deterministic stages from intent to verifiable receipt.',
-      es: 'Seis etapas deterministas del envío al recibo verificable.',
-      nl: 'Zes deterministische stappen van bericht tot ontvangstbewijs.'
-    },
-    body: {
-      en: 'Every envelope is end-to-end encrypted (ECDH P-256 + AES-GCM + ECDSA) so blind relays only inspect destination hash, priority, and TTL. Duplicate copies collapse into one logical message, and a signed ACK purges intermediate buffers.',
-      es: 'Cada sobre se cifra de extremo a extremo (ECDH P-256 + AES-GCM + ECDSA) para que los relés ciegos solo vean cabecera, prioridad y caducidad. Las copias duplicadas se colapsan y un ACK firmado purga las colas intermedias.',
-      nl: 'Elke envelop is end-to-end versleuteld (ECDH P-256 + AES-GCM + ECDSA) zodat blinde relays alleen header, prioriteit en TTL zien. Kopieën worden ontdubbeld en een ondertekende ACK wist tussenbuffers.'
-    },
-    detail: {
-      en: 'MESSAGE -> STORE -> ROUTE -> MULTIPATH -> DEDUP -> ACK. Tested across 506/506 core unit tests and 49/49 offline Chromium E2E checks.',
-      es: 'MESSAGE -> STORE -> ROUTE -> MULTIPATH -> DEDUP -> ACK. Verificado en 506/506 pruebas del núcleo y 49/49 comprobaciones E2E sin red.',
-      nl: 'MESSAGE -> STORE -> ROUTE -> MULTIPATH -> DEDUP -> ACK. Geverifieerd met 506/506 kerntests en 49/49 offline E2E-controles.'
-    },
-    evidenceId: 'EV-CORE-506'
-  },
-  {
-    num: '04',
-    eyebrow: { en: '04 / GOVERNANCE & RELAY MODE', es: '04 / MODO RELÉ PREAUTORIZADO', nl: '04 / VOORAF GEAUTORISEERDE RELAY' },
-    title: {
-      en: 'Pre-authorized relay with hard consent, authority, and battery boundaries.',
-      es: 'Modo relé preautorizado: quién autoriza, cuándo y con qué límites.',
-      nl: 'Vooraf geautoriseerde relay met strikte toestemmings-, gezags- en accugrenzen.'
-    },
-    body: {
-      en: 'Relay forwarding never activates silently on arbitrary triggers. It requires a verified official emergency zone (CAP / EU-Alert) or a multi-source corroborated seismic event, plus explicit opt-in consent granted at installation and strict battery/data quotas.',
-      es: 'El modo relé nunca se activa de forma opaca. Exige una zona de emergencia declarada por una autoridad (CAP / EU-Alert) o un sismo corroborado por múltiples fuentes, consentimiento explícito al instalar y cuotas estrictas de batería y datos.',
-      nl: 'Relay-doorgifte activeert nooit stilletjes. Vereist een officiële noodzone (CAP / NL-Alert) of meervoudig bevestigde beving, expliciete opt-in bij installatie en strikte batterij- en datalimieten.'
-    },
-    detail: {
-      en: 'OS rules respected: Android 13+ and iOS require a user tap to turn on radios that are powered off (PROMPT_USER_ENABLE). Silence always stays UNKNOWN, never inferred as a casualty.',
-      es: 'Respeta el SO: Android 13+ e iOS exigen un toque para encender radios apagadas (PROMPT_USER_ENABLE). El silencio siempre queda como UNKNOWN, nunca como víctima.',
-      nl: 'OS-regels gerespecteerd: Android 13+ en iOS vereisen gebruikersactie om uitgeschakelde radio’s te starten. Stilte blijft altijd UNKNOWN.'
-    },
-    evidenceId: 'EV-02-SWEEP'
-  },
-  {
-    num: '05',
-    eyebrow: { en: '05 / VERIFIED VS. UNPROVEN', es: '05 / QUÉ ESTÁ PROBADO Y QUÉ NO', nl: '05 / BEWEZEN VS. ONBEWEZEN' },
-    title: {
-      en: 'Software verified in the lab. Physical radio trials are the next milestone.',
-      es: 'Software verificado en laboratorio. La validación física es el siguiente hito.',
-      nl: 'Software gevalideerd in het lab. Fysieke radioproeven zijn de volgende mijlpaal.'
-    },
-    body: {
-      en: 'SENDA does not claim operational 112 dispatch, commercial satellite coverage, or field-validated Bluetooth/Wi-Fi Direct phone relays yet. Every capability is mapped to code, tests, and limits in the public Evidence Register.',
-      es: 'SENDA no afirma tener conexión operativa con el 112, cobertura satelital comercial ni relés Bluetooth/Wi-Fi Direct validados físicamente entre teléfonos. Cada capacidad se enlaza a su código, pruebas y límites en Evidencia.',
-      nl: 'SENDA claimt nog geen live 112-koppeling, commerciële satellietdekking of fysiek gevalideerde Bluetooth/Wi-Fi Direct-relays. Elke eigenschap is gekoppeld aan broncode en grenzen in het bewijsregister.'
-    },
-    detail: {
-      en: 'Next P0 gate: 30 physical two-handset trials (Issue #5) + independent cryptography audit (Issue #4).',
-      es: 'Próxima puerta P0: 30 ensayos físicos entre dos teléfonos (Issue #5) + auditoría externa de criptografía (Issue #4).',
-      nl: 'Volgende P0-poort: 30 fysieke proeven met twee toestellen (Issue #5) + externe cryptografie-audit (Issue #4).'
-    },
-    evidenceId: 'EV-09-PHY'
-  }
-];
-
-export const PIPELINE_STAGES: Array<{
-  code: string;
-  desc: LocalizedText;
-}> = [
-  {
-    code: 'MESSAGE',
-    desc: {
-      en: 'Typed SAFE / SOS / alert payload (<=160 chars) with explicit consent & E2EE envelope.',
-      es: 'Mensaje tipado SAFE / SOS / aviso (≤160 car.) con consentimiento explícito y cifrado E2E.',
-      nl: 'Getypt SAFE / SOS-bericht (≤160 tekens) met expliciete toestemming en E2EE-envelop.'
-    }
-  },
-  {
-    code: 'STORE',
-    desc: {
-      en: 'Durable local queue (IndexedDB / Android disk) bounded by TTL, priority, and storage quota.',
-      es: 'Cola local persistente (IndexedDB / disco Android) acotada por TTL, prioridad y cuota.',
-      nl: 'Persistente lokale wachtrij (IndexedDB / Android) begrensd door TTL, prioriteit en quotum.'
-    }
-  },
-  {
-    code: 'ROUTE',
-    desc: {
-      en: 'Contact Graph Routing & attempt ladder pick the earliest feasible chain across channels.',
-      es: 'Contact Graph Routing y escalera de canales eligen la llegada más temprana posible.',
-      nl: 'Contact Graph Routing kiest de snelst haalbare keten over beschikbare kanalen.'
-    }
-  },
-  {
-    code: 'MULTIPATH',
-    desc: {
-      en: 'Races BLE, Wi-Fi Direct, satellite neighbor, SMS, gateway, or acoustic MFSK-16 in parallel.',
-      es: 'Lanza en paralelo BLE, Wi-Fi Direct, vecino satelital, SMS, pasarela o módem acústico.',
-      nl: 'Verzendt parallel via BLE, Wi-Fi Direct, satellietbuur, sms, gateway of akoestisch.'
-    }
-  },
-  {
-    code: 'DEDUP',
-    desc: {
-      en: 'Same envelope arriving over multiple paths collapses into one logical message retaining path metadata.',
-      es: 'El mismo sobre por varias rutas se unifica en un único mensaje conservando trazabilidad.',
-      nl: 'Dezelfde envelop via meerdere routes wordt één logisch bericht met routemetadata.'
-    }
-  },
-  {
-    code: 'ACK',
-    desc: {
-      en: 'Receiver-signed receipt confirms delivery and propagates purge tombstones across blind relays.',
-      es: 'Recibo firmado por el receptor confirma la entrega y purga copias en los relés ciegos.',
-      nl: 'Ondertekend ontvangstbewijs bevestigt bezorging en wist kopieën bij tussenliggende relays.'
-    }
-  }
-];

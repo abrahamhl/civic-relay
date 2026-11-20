@@ -816,6 +816,59 @@ button.s-badge:hover { filter: brightness(0.95); transform: translateY(-1px); }
   flex-wrap: wrap;
 }
 
+.s-video-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  background: var(--s-bg-sunk);
+  border-bottom: 1px solid var(--s-line);
+}
+
+.s-video-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.s-video-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--s-text-3);
+  margin-right: 2px;
+}
+
+.s-video-pill {
+  min-height: 28px;
+  min-width: 34px;
+  padding: 0 9px;
+  border-radius: 999px;
+  border: 1px solid var(--s-line-strong);
+  background: var(--s-bg-elev);
+  color: var(--s-text-2);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: background var(--s-dur-fast), color var(--s-dur-fast), border-color var(--s-dur-fast);
+}
+
+.s-video-pill:hover {
+  border-color: var(--s-accent);
+  color: var(--s-text);
+}
+
+.s-video-pill[aria-pressed="true"] {
+  background: var(--s-accent);
+  color: var(--s-accent-ink);
+  border-color: var(--s-accent);
+}
+
 /* ---------- Sticky Narrative (Producto 5 scenes) ---------- */
 .s-story {
   display: grid;

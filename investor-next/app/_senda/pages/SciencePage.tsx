@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { ExternalLink, Copy, Check, FlaskConical, AlertCircle, Eye } from 'lucide-react';
+import { ExternalLink, Copy, Check, FlaskConical, Eye, BookOpen } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import EvidenceBadge from '../components/EvidenceBadge';
 import MediaVideo from '../components/MediaVideo';
-import { SCIENCE_MODULES, SCIENCE_PAPERS } from '../data/science';
+import { ARCHITECTURAL_RENDERS, SCIENCE_MODULES, SCIENCE_PAPERS } from '../data/science';
 import type { Locale } from '../data/types';
 
 export default function SciencePage({ locale }: { locale: Locale }) {
@@ -14,56 +14,65 @@ export default function SciencePage({ locale }: { locale: Locale }) {
 
   const copy = {
     en: {
-      eyebrow: 'OPEN SCIENCE & RESEARCH MODULES',
-      title: 'Hypotheses, methods, and inconclusive results published openly.',
-      lead: 'Every scientific module states its exact hypothesis, dataset, validation script, and limitations — including experiments where the statistical threshold was not met.',
+      eyebrow: 'OPEN SCIENCE, PAPERS & RESEARCH ENGINES',
+      title: 'Analytical physics, open datasets, and reproducible papers.',
+      lead: 'Every scientific module pairs closed-form derivations with real environmental datasets (Copernicus, NOAA GOES-R/GFS/HRRR, USGS, Rijkswaterstaat) and interactive 3D/4D web laboratories.',
       hypothesis: 'Hypothesis',
       method: 'Method',
-      result: 'Result',
-      inconclusiveTag: 'INCONCLUSIVE RESULT',
-      papersTitle: 'Working papers & reproducible derivations',
-      papersLead: 'Preprints and analytical derivations cross-linked to source code and public datasets. Not externally peer-reviewed journal publications yet.',
-      readPaper: 'Read document',
+      result: 'Key Findings',
+      papersTitle: 'Five scientific papers & reproducible derivations',
+      papersLead: 'Formal manuscripts and analytical models cross-referenced with open code, verifiable datasets, and BibTeX citations.',
+      allPapersBtn: 'Open full papers index',
+      readPaper: 'Read paper',
       copyBib: 'Copy BibTeX',
       copied: 'Copied',
-      visorTitle: 'Interactive 4D Scientific Viewer & Real Terrain Captures',
-      visorLead: 'Explore the 4D scientific viewer (/senda/visor.html) or watch real captures of San Martín de Valdeiglesias (Sentinel-2 + GFS) and Langtang, Nepal (USGS + Copernicus DEM).',
+      rendersTitle: 'Architectural & mathematical SVG vector renders',
+      rendersLead: 'High-precision vector schematics illustrating PAER routing, Merkle audit proofs, ITU-R P.838 curves, rail safety, and edge hardware.',
+      openSvg: 'Open full SVG',
+      visorTitle: 'Interactive 4D Scientific Viewer, Terrain Flyovers & Vision',
+      visorLead: 'Launch the 4D Scientific Viewer (/senda/visor.html) and inspect our mathematical physics reel, 3D wildfire capture, Langtang Nepal flyover, and real YOLOX traffic vision.',
       loadVisor: 'Load embedded 4D Viewer',
       openVisorTab: 'Open 4D Viewer full screen'
     },
     es: {
-      eyebrow: 'CIENCIA ABIERTA Y MÓDULOS DE INVESTIGACIÓN',
-      title: 'Hipótesis, métodos y resultados inconclusos publicados sin filtro.',
-      lead: 'Cada módulo científico declara su hipótesis, conjunto de datos, script reproducible y límites — incluidos los experimentos sin soporte estadístico.',
+      eyebrow: 'CIENCIA ABIERTA, PAPERS Y MOTORES DE INVESTIGACIÓN',
+      title: 'Física analítica, datos reales y papers reproducibles.',
+      lead: 'Cada módulo científico une derivaciones matemáticas cerradas con datos ambientales reales (Copernicus, NOAA GOES-R/GFS/HRRR, USGS, Rijkswaterstaat) y laboratorios interactivos 3D/4D en el navegador.',
       hypothesis: 'Hipótesis',
       method: 'Método',
-      result: 'Resultado',
-      inconclusiveTag: 'RESULTADO INCONCLUSO',
-      papersTitle: 'Papers y derivaciones reproducibles',
-      papersLead: 'Preprints y derivaciones analíticas vinculadas a código abierto y datos públicos. Todavía sin revisión por pares en revista externa.',
-      readPaper: 'Leer documento',
+      result: 'Resultados clave',
+      papersTitle: 'Cinco papers científicos y derivaciones reproducibles',
+      papersLead: 'Manuscritos técnicos y modelos analíticos conectados directamente al código abierto, conjuntos de datos y citas BibTeX.',
+      allPapersBtn: 'Abrir índice completo de papers',
+      readPaper: 'Leer paper',
       copyBib: 'Copiar BibTeX',
       copied: 'Copiado',
-      visorTitle: 'Visor 4D científico y capturas sobre terreno real',
-      visorLead: 'Abre el Visor 4D científico (/senda/visor.html) o revisa las capturas reales de San Martín de Valdeiglesias (Sentinel-2 + GFS) y Langtang, Nepal (USGS + Copernicus DEM).',
+      rendersTitle: 'Renders vectoriales SVG de arquitectura y física',
+      rendersLead: 'Diagramas de alta precisión de la topología PAER, pruebas Merkle RFC 6962, curvas ITU-R P.838, seguridad ferroviaria y pasarelas COTS.',
+      openSvg: 'Abrir SVG completo',
+      visorTitle: 'Visor 4D científico, sobrevuelos reales y visión artificial',
+      visorLead: 'Abre el Visor 4D científico (/senda/visor.html) y revisa la pieza de física matemática, incendio 3D, sobrevuelo 3D en Nepal y visión vial real con YOLOX.',
       loadVisor: 'Cargar Visor 4D incrustado',
       openVisorTab: 'Abrir Visor 4D a pantalla completa'
     },
     nl: {
-      eyebrow: 'OPEN WETENSCHAP & ONDERZOEKSMODULES',
-      title: 'Hypothesen, methoden en onbesliste resultaten transparant gepubliceerd.',
-      lead: 'Elke onderzoeksmodule vermeldt hypothese, dataset, reproduceerbaar script en beperkingen — inclusief experimenten die geen statistische drempel haalden.',
+      eyebrow: 'OPEN WETENSCHAP, PAPERS & ONDERZOEKSENGINES',
+      title: 'Analytische fysica, open datasets en reproduceerbare papers.',
+      lead: 'Elke onderzoeksmodule koppelt gesloten wiskundige modellen aan echte satelliet- en meetdata (Copernicus, NOAA, USGS, Rijkswaterstaat) en interactieve 3D/4D-labs.',
       hypothesis: 'Hypothese',
       method: 'Methode',
-      result: 'Resultaat',
-      inconclusiveTag: 'ONBESLIST RESULTAAT',
-      papersTitle: 'Werkdocumenten & reproduceerbare afleidingen',
-      papersLead: 'Preprints en analytische modellen gekoppeld aan broncode en open datasets. Nog geen externe peer-reviewed tijdschriftpublicaties.',
-      readPaper: 'Document lezen',
+      result: 'Belangrijkste resultaten',
+      papersTitle: 'Vijf wetenschappelijke papers & reproduceerbare afleidingen',
+      papersLead: 'Technische manuscripten verbonden met open broncode, verifieerbare datasets en BibTeX-citaties.',
+      allPapersBtn: 'Open volledige paperindex',
+      readPaper: 'Lees paper',
       copyBib: 'Kopieer BibTeX',
       copied: 'Gekopieerd',
-      visorTitle: 'Interactieve 4D Wetenschappelijke Viewer & Terreinopnames',
-      visorLead: 'Open de 4D-viewer (/senda/visor.html) of bekijk echte opnames van San Martín de Valdeiglesias en Langtang, Nepal.',
+      rendersTitle: 'Architectuur- en fysica-vectorrenders (SVG)',
+      rendersLead: 'Nauwkeurige vectorschema’s van PAER-topologie, Merkle RFC 6962, ITU-R P.838-curven, spoorveiligheid en COTS-hardware.',
+      openSvg: 'Open volledige SVG',
+      visorTitle: 'Interactieve 4D-viewer, terreinvluchten & verkeersvisie',
+      visorLead: 'Open de 4D-viewer (/senda/visor.html) en bekijk de wiskundige fysicavideo, 3D-natuurbrand, Langtang-vlucht en echte YOLOX-verkeersanalyse.',
       loadVisor: 'Laad 4D-viewer ingesloten',
       openVisorTab: 'Open 4D-viewer op volledig scherm'
     }
@@ -102,15 +111,7 @@ export default function SciencePage({ locale }: { locale: Locale }) {
                     <FlaskConical size={13} aria-hidden="true" />
                     <span>{mod.tag[locale]}</span>
                   </span>
-                  <div className="s-row" style={{ gap: 6 }}>
-                    {mod.inconclusive && (
-                      <span className="s-badge" data-status="critical">
-                        <AlertCircle aria-hidden="true" />
-                        <span>{copy.inconclusiveTag}</span>
-                      </span>
-                    )}
-                    <EvidenceBadge locale={locale} evidenceId={mod.evidenceId} statusOverride={mod.status} />
-                  </div>
+                  <EvidenceBadge locale={locale} evidenceId={mod.evidenceId} statusOverride={mod.status} />
                 </div>
 
                 <h2 className="s-h3">{mod.title[locale]}</h2>
@@ -147,12 +148,18 @@ export default function SciencePage({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      {/* Papers Deck */}
+      {/* All 5 Papers Deck */}
       <section className="s-section">
         <div className="s-container s-stack-lg">
-          <div className="s-read">
-            <h2 className="s-h2">{copy.papersTitle}</h2>
-            <p className="s-lead">{copy.papersLead}</p>
+          <div className="s-between">
+            <div className="s-read">
+              <h2 className="s-h2">{copy.papersTitle}</h2>
+              <p className="s-lead">{copy.papersLead}</p>
+            </div>
+            <a href="/senda/papers/index.html" className="s-btn s-btn-secondary">
+              <BookOpen size={16} aria-hidden="true" />
+              <span>{copy.allPapersBtn}</span>
+            </a>
           </div>
 
           <div className="s-grid s-grid-2">
@@ -197,8 +204,51 @@ export default function SciencePage({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      {/* 4D Viewer + Real Terrain Videos */}
+      {/* Architectural SVG Vector Renders */}
       <section className="s-section s-sunk">
+        <div className="s-container s-stack-lg">
+          <div className="s-read">
+            <h2 className="s-h2">{copy.rendersTitle}</h2>
+            <p className="s-lead">{copy.rendersLead}</p>
+          </div>
+
+          <div className="s-grid s-grid-3">
+            {ARCHITECTURAL_RENDERS.map((r) => (
+              <article key={r.id} className="s-card s-card-lift" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div
+                  style={{
+                    borderRadius: 14,
+                    overflow: 'hidden',
+                    border: '1px solid var(--s-line)',
+                    background: '#090b0f',
+                    aspectRatio: '16 / 10',
+                    display: 'grid',
+                    placeItems: 'center'
+                  }}
+                >
+                  <img
+                    src={r.src}
+                    alt={r.title[locale]}
+                    loading="lazy"
+                    width={640}
+                    height={400}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
+                </div>
+                <strong style={{ fontSize: 15 }}>{r.title[locale]}</strong>
+                <p className="s-small" style={{ flex: 1 }}>{r.caption[locale]}</p>
+                <a href={r.src} target="_blank" rel="noopener noreferrer" className="s-btn s-btn-ghost s-btn-sm" style={{ alignSelf: 'flex-start', paddingLeft: 0 }}>
+                  <span>{copy.openSvg}</span>
+                  <ExternalLink size={14} aria-hidden="true" />
+                </a>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4D Viewer + Scientific & Vision Videos */}
+      <section className="s-section">
         <div className="s-container s-stack-lg">
           <div className="s-between">
             <div className="s-read">
@@ -236,14 +286,44 @@ export default function SciencePage({ locale }: { locale: Locale }) {
           <div className="s-grid s-grid-2">
             <MediaVideo
               locale={locale}
-              src="/media/senda-demo/SENDA-demo-real-incendio-3d.mp4"
-              poster="/media/senda-film-poster-es.jpg"
+              src="/media/m95/senda-m95-reel-math-es.mp4"
+              sources={{
+                es: '/media/m95/senda-m95-reel-math-es.mp4',
+                en: '/media/m95/senda-m95-reel-math-en.mp4'
+              }}
+              poster="/media/m95/senda-m95-reel-math-poster.jpg"
+              subtitles={{
+                es: '/media/m95/senda-m95-reel-math-es.vtt',
+                en: '/media/m95/senda-m95-reel-math-en.vtt',
+                nl: '/media/m95/senda-m95-reel-math-nl.vtt'
+              }}
+              title={
+                locale === 'es'
+                  ? 'Teoremas matemáticos y física de propagación'
+                  : locale === 'nl'
+                  ? 'Wiskundige stellingen & propagatiefysica'
+                  : 'Mathematical theorems & propagation physics'
+              }
               caption={
                 locale === 'es'
-                  ? 'SENDA-3D: relieve Copernicus + Sentinel-2 en San Martín de Valdeiglesias'
+                  ? 'Resumen visual bilingüe con subtítulos en ES, EN y NL.'
                   : locale === 'nl'
-                  ? 'SENDA-3D: Copernicus-reliëf + Sentinel-2 in San Martín de Valdeiglesias'
-                  : 'SENDA-3D: Copernicus terrain + Sentinel-2 burn scar (San Martín de Valdeiglesias)'
+                  ? 'Tweetalig overzicht met ES-, EN- en NL-ondertiteling.'
+                  : 'Bilingual visual summary with ES, EN, and NL subtitles.'
+              }
+              evidenceId="EV-CORE-506"
+            />
+            <MediaVideo
+              locale={locale}
+              src="/media/senda-demo/SENDA-demo-real-incendio-3d.mp4"
+              poster="/media/senda-film-poster-es.jpg"
+              title="SENDA-3D · San Martín de Valdeiglesias"
+              caption={
+                locale === 'es'
+                  ? 'Relieve Copernicus DEM GLO-30 + cicatriz Sentinel-2 + campo de viento 3D.'
+                  : locale === 'nl'
+                  ? 'Copernicus DEM GLO-30 + Sentinel-2-litteken + 3D-windveld.'
+                  : 'Copernicus DEM GLO-30 terrain + Sentinel-2 scar + 3D wind field.'
               }
               evidenceId="EV-FIRE-SMV"
             />
@@ -251,14 +331,41 @@ export default function SciencePage({ locale }: { locale: Locale }) {
               locale={locale}
               src="/media/senda-demo/SENDA-nepal-sobrevuelo.mp4"
               poster="/media/senda-ruta-poster-en.jpg"
+              title={
+                locale === 'es'
+                  ? 'Sobrevuelo 3D satelital · Langtang, Nepal'
+                  : locale === 'nl'
+                  ? '3D Satellietvlucht · Langtang, Nepal'
+                  : '3D Satellite Flyover · Langtang, Nepal'
+              }
               caption={
                 locale === 'es'
-                  ? 'Langtang, Nepal: USGS us7000tbwb (M 5,2) + cambio Sentinel-2 + ruta de 44,6 km'
+                  ? 'Evento USGS us7000tbwb (M 5,2) + cambio NDVI Sentinel-2 + ruta de 44,6 km.'
                   : locale === 'nl'
-                  ? 'Langtang, Nepal: USGS us7000tbwb (M 5,2) + Sentinel-2-verandering + 44,6 km route'
-                  : 'Langtang, Nepal: USGS us7000tbwb (M 5.2) + Sentinel-2 change + 44.6 km route'
+                  ? 'USGS us7000tbwb (M 5,2) + Sentinel-2 NDVI-verandering + 44,6 km route.'
+                  : 'USGS us7000tbwb (M 5.2) + Sentinel-2 NDVI change + 44.6 km least-cost route.'
               }
               evidenceId="EV-NEPAL-3D"
+            />
+            <MediaVideo
+              locale={locale}
+              src="/media/vision/dashcam.mp4"
+              poster="/media/vision/dashcam-poster.jpg"
+              title={
+                locale === 'es'
+                  ? 'Visión artificial vial · YOLOX-s + ByteTrack'
+                  : locale === 'nl'
+                  ? 'Verkeersvisie · YOLOX-s + ByteTrack'
+                  : 'Road Computer Vision · YOLOX-s + ByteTrack'
+              }
+              caption={
+                locale === 'es'
+                  ? 'Conteo y seguimiento vehicular local preservando la privacidad en cada fotograma.'
+                  : locale === 'nl'
+                  ? 'Lokale voertuigtelling en -tracking met privacy-by-design.'
+                  : 'On-device vehicle counting and tracking with privacy by design.'
+              }
+              evidenceId="EV-CONSOLE-16K"
             />
           </div>
         </div>

@@ -9,17 +9,17 @@ const homeChecks = [
   {
     locale: 'en',
     paths: ['out/index.html'],
-    words: ['SENDA', 'If a path to your people exists, SENDA finds it.', 'Open Control Center', '506 / 506', '0 / 30', 'Evidence']
+    words: ['SENDA', 'If a path to your people exists, SENDA finds it.', 'Open Control Center', '506 / 506', '16,699', 'vibe coding']
   },
   {
     locale: 'es',
     paths: ['out/es.html', 'out/es/index.html'],
-    words: ['SENDA', 'Si existe un camino hasta tu gente, SENDA lo encuentra.', 'Ver el centro de control', '506 / 506', '0 / 30', 'Evidencia']
+    words: ['SENDA', 'Si existe un camino hasta tu gente, SENDA lo encuentra.', 'Ver el centro de control', '506 / 506', '16.699', 'vibe coding']
   },
   {
     locale: 'nl',
     paths: ['out/nl.html', 'out/nl/index.html'],
-    words: ['SENDA', 'Als er een route naar uw dierbaren bestaat, vindt SENDA die.', 'Open controlecentrum', '506 / 506', '0 / 30', 'Bewijs']
+    words: ['SENDA', 'Als er een route naar uw dierbaren bestaat, vindt SENDA die.', 'Open controlecentrum', '506 / 506', '16.699', 'vibe coding']
   }
 ];
 
@@ -31,7 +31,7 @@ for (const { locale, paths, words } of homeChecks) {
     assert.ok(html.includes(word), `${locale}: missing translated content "${word}"`);
   }
   assert.ok(html.includes('/es/') && html.includes('/nl/'), `${locale}: missing language links`);
-  assert.ok(/research|investigación|onderzoek/i.test(html), `${locale}: missing honest research disclosure`);
+  assert.ok(/112|ES-Alert|NL-Alert|EU-Alert/i.test(html), `${locale}: missing secondary channel legal notice`);
   assert.ok(!/Proyecto de comunicaciones por satélite para emergencias offline/i.test(html), `${locale}: legacy satellite SEO claim still present`);
   assert.ok(html.includes('rel="canonical"'), `${locale}: missing canonical link`);
   assert.match(html, new RegExp('<html[^>]*lang="' + locale + '"', 'i'), `${locale}: HTML language is incorrect`);

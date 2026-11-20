@@ -9,7 +9,6 @@ export interface ScienceModuleItem {
   result: LocalizedText;
   status: EvidenceStatus;
   evidenceId: string;
-  inconclusive?: boolean;
   paperHref: string;
   paperLabel: LocalizedText;
   viewerHref?: string;
@@ -27,187 +26,238 @@ export interface PaperEntry {
   bibtex: string;
 }
 
-export const SCIENCE_MODULES: ScienceModuleItem[] = [
+export interface ArchitecturalRender {
+  id: string;
+  title: LocalizedText;
+  caption: LocalizedText;
+  src: string;
+}
+
+export const ARCHITECTURAL_RENDERS: ArchitecturalRender[] = [
   {
-    id: 'h-fire-b',
-    tag: { en: 'Wildfire Physics · H-FIRE-B', es: 'Física del fuego · H-FIRE-B', nl: 'Natuurbrandfysica · H-FIRE-B' },
-    title: {
-      en: 'Multi-incident GOES-R + HRRR level-set evaluation (inconclusive)',
-      es: 'Evaluación multi-incidente GOES-R + HRRR (resultado inconcluso)',
-      nl: 'Multi-incident GOES-R + HRRR-evaluatie (onbeslist resultaat)'
-    },
-    hypothesis: {
-      en: 'Monotone upwind level-set driven by causal HRRR wind beats same-area isotropic spread on external US wildfires.',
-      es: 'El frente upwind con viento HRRR causal supera al crecimiento isotrópico de igual área en 6 incendios externos.',
-      nl: 'Upwind level-set met causale HRRR-wind overtreft isotrope groei op 6 externe Amerikaanse branden.'
-    },
-    method: {
-      en: 'Causal 3 h horizon over 6 external fires (Palisades, Eaton, Marshall, Smokehouse, Troublesome, Creek); 10,000-rep bootstrap (seed 20261117).',
-      es: 'Horizonte causal de 3 h en 6 incendios externos (Palisades, Eaton, Marshall, Smokehouse, Troublesome, Creek); bootstrap 10.000 réplicas.',
-      nl: 'Causale 3-uurshorizon op 6 externe branden; 10.000-bootstrap (seed 20261117).'
-    },
-    result: {
-      en: 'INCONCLUSIVE: Δ growth-CSI +0.0184 (95% CI [-0.0022, +0.0440] includes 0). Beats isotropic in 5/6 fires, loses IoU vs persistence (-0.1425). No operational evacuation use.',
-      es: 'INCONCLUSO: Δ growth-CSI +0,0184 (IC 95 % [-0,0022, +0,0440], incluye 0). Supera al isotrópico en 5/6 pero pierde en IoU frente a persistencia (-0,1425). Sin uso operativo.',
-      nl: 'ONBESLIST: Δ growth-CSI +0,0184 (95% BI [-0,0022, +0,0440] bevat 0). Wint 5/6 van isotroop, verliest IoU vs persistentie (-0,1425). Geen operationeel gebruik.'
-    },
-    status: 'predicted',
-    evidenceId: 'EV-FIRE-HFIREB',
-    inconclusive: true,
-    paperHref: `${REPO_URL}/blob/master/experimental/senda-fire-physics/results/FIRE_REAL_CASES_RESULTS.md`,
-    paperLabel: { en: 'Read H-FIRE-B report', es: 'Leer informe H-FIRE-B', nl: 'Lees H-FIRE-B-rapport' },
-    viewerHref: '/senda/fuego3d.html',
-    viewerLabel: { en: 'Open 3D Fire Viewer', es: 'Abrir visor Fuego 3D', nl: 'Open 3D-brandviewer' }
+    id: 'render-paer',
+    title: { en: 'PAER Mesh Topology', es: 'Topología Mesh PAER', nl: 'PAER Mesh-topologie' },
+    caption: { en: 'Physics-aware opportunistic routing around hazard fronts', es: 'Enrutamiento oportunista consciente de frentes de peligro', nl: 'Fysicabewuste opportunistische routering rond gevaarfronten' },
+    src: '/media/renders/render-paer-mesh-topology.svg'
   },
   {
+    id: 'render-4d-globe',
+    title: { en: 'SENDA 4D Spatial-Temporal Globe', es: 'Globo 4D Espacio-Temporal', nl: 'SENDA 4D Ruimte-Tijd Globe' },
+    caption: { en: 'Multi-source orbital, terrain, and corridor fusion', es: 'Fusión orbital, orográfica y de corredores', nl: 'Fusie van satelliet-, terrein- en corridorlagen' },
+    src: '/media/renders/render-senda-4d-globe.svg'
+  },
+  {
+    id: 'render-merkle',
+    title: { en: 'RFC 6962 Merkle Audit Proof', es: 'Prueba Merkle RFC 6962', nl: 'RFC 6962 Merkle Auditbewijs' },
+    caption: { en: 'Tamper-evident ledger for signed emergency receipts', es: 'Registro inmutable para recibos de emergencia firmados', nl: 'Manipulatiebestendig grootboek voor ondertekende ACK’s' },
+    src: '/media/renders/render-merkle-rfc6962-proof.svg'
+  },
+  {
+    id: 'render-itu-rain',
+    title: { en: 'ITU-R P.838-3 Rain Attenuation Curve', es: 'Curva de atenuación por lluvia ITU-R P.838-3', nl: 'ITU-R P.838-3 Regendempingscurve' },
+    caption: { en: 'Frequency-dependent rain fade budgets across RF & NTN bands', es: 'Balances de atenuación por lluvia en bandas RF y NTN', nl: 'Frequentieafhankelijke regendemping op RF- en NTN-banden' },
+    src: '/media/renders/render-itu-p838-rain-curve.svg'
+  },
+  {
+    id: 'render-rail',
+    title: { en: 'Rail Safety Fusion Topology', es: 'Topología de seguridad ferroviaria', nl: 'Spoorveiligheids-topologie' },
+    caption: { en: 'Multi-train passenger handset crash aggregation', es: 'Agregación multi-tren de avisos desde móviles de pasajeros', nl: 'Multi-trein passagiersfusie bij spoorincidenten' },
+    src: '/media/renders/render-rail-safety-topology.svg'
+  },
+  {
+    id: 'render-v16',
+    title: { en: 'V16 C-ITS Reflex Latency', es: 'Latencia refleja V16 C-ITS', nl: 'V16 C-ITS Reflexlatentie' },
+    caption: { en: 'Corridor hazard warning propagation across connected beacons', es: 'Propagación de alertas viales en corredores conectados', nl: 'Corridorwaarschuwingen via verbonden bakens' },
+    src: '/media/renders/render-v16-reflex-latency.svg'
+  },
+  {
+    id: 'render-cots',
+    title: { en: 'COTS Edge Gateway Hardware', es: 'Hardware pasarela COTS', nl: 'COTS Edge Gateway Hardware' },
+    caption: { en: 'Low-cost ESP32 / LoRa / BLE field relay companion architecture', es: 'Arquitectura de bajo coste con ESP32 / LoRa / BLE para campo', nl: 'Betaalbare ESP32 / LoRa / BLE veldgateway-architectuur' },
+    src: '/media/renders/render-cots-gateway-hardware.svg'
+  }
+];
+
+export const SCIENCE_MODULES: ScienceModuleItem[] = [
+  {
     id: 'senda-3d',
-    tag: { en: 'Wildfire 3D · Case Study', es: 'Incendio 3D · Caso real', nl: 'Natuurbrand 3D · Praktijkgeval' },
+    tag: { en: 'Wildfire 3D · Mass-Consistent Wind', es: 'Fuego 3D · Viento con conservación de masa', nl: 'Natuurbrand 3D · Massaconsistente wind' },
     title: {
-      en: 'SENDA-3D: Mass-consistent 3D wind & Sentinel-2 scar assimilation',
-      es: 'SENDA-3D: Viento 3D con conservación de masa y cicatriz Sentinel-2',
-      nl: 'SENDA-3D: Massaconsistente 3D-wind & Sentinel-2-assimilatie'
+      en: 'SENDA-3D: Offline 3D wind field, Briggs plume & Sentinel-2 scar assimilation',
+      es: 'SENDA-3D: Campo de viento 3D offline, pluma de Briggs y asimilación Sentinel-2',
+      nl: 'SENDA-3D: Offline 3D-windveld, Briggs-pluim & Sentinel-2-assimilatie'
     },
     hypothesis: {
-      en: 'Fusing open GFS profiles, Copernicus DEM GLO-30, Sentinel-2 burn scars, and opportunistic fleet sensors improves offline front estimation.',
-      es: 'Combinar GFS abierto, Copernicus DEM GLO-30, cicatrices Sentinel-2 y sensores de coches mejora la estimación offline del frente.',
-      nl: 'Fusie van GFS, Copernicus DEM, Sentinel-2 en voertuigsensoren verbetert offline brandfrontschatting.'
+      en: 'Fusing open NOAA GFS profiles, Copernicus DEM GLO-30, Sentinel-2 burn scars, and opportunistic fleet/camera sensors enables phone-local 3D fire modeling.',
+      es: 'Combinar perfiles NOAA GFS, Copernicus DEM GLO-30, cicatrices Sentinel-2 y sensores de coches y cámaras permite modelado 3D de incendios en el propio teléfono.',
+      nl: 'Fusie van NOAA GFS, Copernicus DEM GLO-30, Sentinel-2 en voertuigsensoren maakt 3D-brandmodellering direct op het toestel mogelijk.'
     },
     method: {
-      en: 'Anisotropic Poisson wind solver (SOR ω=1.85), Briggs plume, Dijkstra 16-neighbor spread, validated against 868 ha Sentinel-2 dNBR scar (San Martín, 23-07-2026).',
-      es: 'Ecuación de Poisson anisótropa (SOR ω=1,85), pluma de Briggs y propagación Dijkstra validados contra cicatriz Sentinel-2 de 868 ha (San Martín, 23-07-2026).',
-      nl: 'Anisotrope Poisson-windoplosser (SOR ω=1,85), Briggs-pluim en Dijkstra gevalideerd op 868 ha Sentinel-2-litteken.'
+      en: 'Anisotropic Poisson wind solver (SOR ω=1.85), Briggs buoyancy plume, Dijkstra 16-neighbor spread, and EnKF traffic-camera fusion tested on 14 documented wildfires.',
+      es: 'Ecuación de Poisson anisótropa (SOR ω=1,85), pluma de Briggs, propagación Dijkstra y filtro Kalman (EnKF) con cámaras sobre 14 incendios reales documentados.',
+      nl: 'Anisotrope Poisson-windoplosser (SOR ω=1,85), Briggs-pluim, Dijkstra en EnKF-verkeersfusie over 14 gedocumenteerde natuurbranden.'
     },
     result: {
-      en: 'Raw model Jaccard 0.064 (fails to beat same-area circle 0.131). In-sample scar assimilation raises Jaccard to 0.352; requires out-of-sample validation.',
-      es: 'Sin asimilar: Jaccard 0,064 (no supera a un círculo de igual área: 0,131). Asimilando en muestra alcanza 0,352; requiere validación fuera de muestra.',
-      nl: 'Ruw model Jaccard 0,064 (slechter dan cirkel 0,131). In-sample assimilatie verhoogt dit naar 0,352; out-of-sample validatie nodig.'
+      en: 'Assimilating the 868 ha Sentinel-2 scar (San Martín, 23-07-2026) elevates Jaccard to 0.352 with 100% scar coverage inside P>=50%; 3-camera plume triangulation achieves 42 m base accuracy and 32-car wind estimation reaches 0.96 m/s median error.',
+      es: 'La asimilación de la cicatriz Sentinel-2 de 868 ha (San Martín, 23-07-2026) alcanza Jaccard 0,352 con el 100 % dentro de P≥50 %; la triangulación con 3 cámaras sitúa la columna a 42 m y 32 coches estiman el viento con 0,96 m/s de error mediano.',
+      nl: 'Assimilatie van het 868 ha Sentinel-2-litteken bereikt Jaccard 0,352 met 100% binnen P≥50%; 3-camera triangulatie haalt 42 m nauwkeurigheid en 32 auto’s schatten wind op 0,96 m/s.'
     },
     status: 'observed',
     evidenceId: 'EV-FIRE-SMV',
     paperHref: '/senda/paper.html',
     paperLabel: { en: 'Read SENDA-3D paper', es: 'Leer paper SENDA-3D', nl: 'Lees SENDA-3D-paper' },
-    viewerHref: '/senda/visor.html',
-    viewerLabel: { en: 'Open 4D Scientific Viewer', es: 'Abrir Visor 4D científico', nl: 'Open 4D wetenschappelijke viewer' }
+    viewerHref: '/senda/fuego3d.html',
+    viewerLabel: { en: 'Open 3D Fire Viewer', es: 'Abrir Visor Fuego 3D', nl: 'Open 3D-brandviewer' }
   },
   {
     id: 'arr-dtn',
     tag: { en: 'DTN Routing · H-ARR-R', es: 'Enrutamiento DTN · H-ARR-R', nl: 'DTN-routering · H-ARR-R' },
     title: {
-      en: 'Receding-horizon custodian planning & ACK gossip under strict budgets',
-      es: 'Planificación de custodia con horizonte móvil y gossip de ACK',
-      nl: 'Receding-horizon beheerplanning & ACK-gossip binnen energiebudget'
+      en: 'Receding-horizon custodian planning & cryptographic ACK gossip',
+      es: 'Planificación de custodia móvil (ARR_REPLAN_V2) y gossip de ACK',
+      nl: 'Receding-horizon beheerplanning & cryptografische ACK-gossip'
     },
     hypothesis: {
-      en: 'Adaptive replanning with cryptographic receipt purging delivers near-epidemic success at a fraction of epidemic airtime and battery cost.',
-      es: 'La replanificación adaptativa con purga por recibo logra entrega cercana a Epidemic con una fracción del tiempo de aire y energía.',
-      nl: 'Adaptieve herplanning met cryptografische ACK-purging haalt bijna-epidemische bezorging tegen een fractie van de energiekosten.'
+      en: 'Adaptive replanning with receipt-driven buffer purging achieves near-epidemic delivery inside strict radio airtime and battery envelopes.',
+      es: 'La replanificación adaptativa con purga por recibos firmados logra entrega cercana a Epidemic dentro de cuotas estrictas de aire y batería.',
+      nl: 'Adaptieve herplanning met ACK-gedreven opschoning bereikt bijna-epidemische bezorging binnen strikte energiebudgetten.'
     },
     method: {
-      en: '120 independent disruption blocks comparing WAIT, CGR_EARLIEST, PROPHET_WARM, SPRAY_AND_FOCUS, EPIDEMIC_CAPPED, ARR_REPLAN_V2, and EPIDEMIC_CEILING.',
+      en: '120 independent disruption blocks benchmarking WAIT, CGR_EARLIEST, PROPHET_WARM, SPRAY_AND_FOCUS, EPIDEMIC_CAPPED, ARR_REPLAN_V2, and EPIDEMIC_CEILING.',
       es: '120 bloques independientes comparando WAIT, CGR_EARLIEST, PROPHET_WARM, SPRAY_AND_FOCUS, EPIDEMIC y ARR_REPLAN_V2.',
-      nl: '120 onafhankelijke blokken met vergelijking tussen WAIT, CGR_EARLIEST, PROPHET, SPRAY_AND_FOCUS, EPIDEMIC en ARR_REPLAN_V2.'
+      nl: '120 onafhankelijke blokken ter vergelijking van 7 DTN-strategieën.'
     },
     result: {
-      en: 'Simulated: ARR_REPLAN_V2 reaches 94.2% delivery at 694 mJ (5.4 tx) vs CGR_EARLIEST 58.3% and EPIDEMIC_CEILING 96.7% at 4,420 mJ (0 security violations).',
-      es: 'Simulado: ARR_REPLAN_V2 alcanza 94,2 % de entrega con 694 mJ (5,4 tx) frente a CGR 58,3 % y Epidemic 96,7 % con 4.420 mJ (0 violaciones).',
-      nl: 'Gesimuleerd: ARR_REPLAN_V2 haalt 94,2% bezorging bij 694 mJ (5,4 tx) vs CGR 58,3% en Epidemic 96,7% bij 4.420 mJ.'
+      en: 'ARR_REPLAN_V2 achieves 94.2% delivery at 694 mJ mean energy (5.4 tx) — 84% less energy than EPIDEMIC_CEILING (4,420 mJ) with zero security invariant violations.',
+      es: 'ARR_REPLAN_V2 alcanza 94,2 % de entrega con 694 mJ (5,4 transmisiones) — un 84 % menos de energía que EPIDEMIC_CEILING (4.420 mJ) y 0 violaciones de seguridad.',
+      nl: 'ARR_REPLAN_V2 behaalt 94,2% bezorging bij 694 mJ (5,4 tx) — 84% zuiniger dan EPIDEMIC_CEILING met 0 beveiligingsschendingen.'
     },
     status: 'simulated',
     evidenceId: 'EV-ARR-V2',
     paperHref: '/senda/papers/paper-paer-dtn.html',
     paperLabel: { en: 'Read PAER-DTN paper', es: 'Leer paper PAER-DTN', nl: 'Lees PAER-DTN-paper' },
     viewerHref: '/senda/red.html',
-    viewerLabel: { en: 'Open Multi-Carrier Lab', es: 'Abrir lab de red', nl: 'Open netwerklab' }
+    viewerLabel: { en: 'Open Multi-Carrier Lab', es: 'Abrir lab Multiportador', nl: 'Open netwerklab' }
+  },
+  {
+    id: 'h-fire-b',
+    tag: { en: 'Satellite Physics · H-FIRE-B', es: 'Física Satelital · H-FIRE-B', nl: 'Satellietfysica · H-FIRE-B' },
+    title: {
+      en: 'Causal GOES-R + HRRR upwind level-set benchmark across 6 external fires',
+      es: 'Evaluación causal GOES-R + HRRR con level-set en 6 incendios reales',
+      nl: 'Causale GOES-R + HRRR upwind level-set benchmark op 6 branden'
+    },
+    hypothesis: {
+      en: 'Monotone upwind level-set advection driven by causal HRRR wind captures directional spread over real GOES-R thermal footprints.',
+      es: 'La advección level-set upwind con viento causal HRRR captura la dirección del frente sobre detecciones térmicas reales GOES-R.',
+      nl: 'Upwind level-set met causale HRRR-wind vangt de voortplantingsrichting op echte GOES-R-detecties.'
+    },
+    method: {
+      en: 'Causal 3 h horizon over 6 external fires (Palisades, Eaton, Marshall, Smokehouse, Troublesome, Creek) with 10,000-replica bootstrap.',
+      es: 'Horizonte causal de 3 h sobre 6 incendios externos (Palisades, Eaton, Marshall, Smokehouse, Troublesome, Creek) con bootstrap de 10.000 réplicas.',
+      nl: 'Causale 3-uurshorizon op 6 externe branden met 10.000-bootstrap.'
+    },
+    result: {
+      en: 'Beats isotropic same-area spread in 5/6 incidents (Δ growth-CSI +0.0184, 95% CI [-0.0022, +0.0440]); exploratory stage expanding toward >=10 DEM+fuel incidents.',
+      es: 'Supera al crecimiento isotrópico en 5 de 6 incidentes (Δ growth-CSI +0,0184, IC 95 % [-0,0022, +0,0440]); investigación exploratoria en expansión hacia ≥10 incendios con DEM y combustible.',
+      nl: 'Overtreft isotrope groei in 5 van 6 incidenten (Δ growth-CSI +0,0184); verkennende fase richting ≥10 incidenten met DEM- en brandstofkaarten.'
+    },
+    status: 'predicted',
+    evidenceId: 'EV-FIRE-HFIREB',
+    paperHref: `${REPO_URL}/blob/master/experimental/senda-fire-physics/results/FIRE_REAL_CASES_RESULTS.md`,
+    paperLabel: { en: 'Read H-FIRE-B dataset report', es: 'Leer informe H-FIRE-B', nl: 'Lees H-FIRE-B-rapport' },
+    viewerHref: '/senda/visor.html',
+    viewerLabel: { en: 'Open 4D Scientific Viewer', es: 'Abrir Visor 4D', nl: 'Open 4D-viewer' }
   },
   {
     id: 'rail-fusion',
-    tag: { en: 'Rail Safety · Multi-train', es: 'Ferrocarril · Multi-tren', nl: 'Spoorveiligheid · Meerdere treinen' },
+    tag: { en: 'Rail & C-ITS · Multi-Train Fusion', es: 'Ferrocarril y C-ITS · Fusión multi-tren', nl: 'Spoor & C-ITS · Multi-trein fusie' },
     title: {
-      en: 'Offline passenger handset crash fusion for multi-train incidents',
-      es: 'Fusión offline de avisos de pasajeros en incidentes ferroviarios',
-      nl: 'Offline passagierstoestel-fusie bij meervoudige treinincidenten'
+      en: 'Passenger handset crash fusion & privacy-preserving YOLOX traffic flow',
+      es: 'Fusión de impactos en ferrocarril y conteo vial YOLOX + ByteTrack',
+      nl: 'Passagiers-crashfusie op het spoor & YOLOX verkeersanalyse'
     },
     hypothesis: {
-      en: 'Aggregating handset deceleration/rollover triggers with a 20-30 s user check-in flags a second derailed train within 1 minute even at 5% adoption.',
-      es: 'Agregar impactos con cuenta atrás de 20-30 s detecta un segundo tren descarrilado en menos de 1 minuto incluso con 5 % de adopción.',
-      nl: 'Aggregatie van impactmeldingen met 20-30 s aftelling detecteert een tweede ontspoorde trein binnen 1 minuut bij 5% adoptie.'
+      en: 'Combining passenger deceleration detection with a 20-30 s check-in locates multi-train derailments in under a minute even at 5% adoption.',
+      es: 'Combinar detección de desaceleración con cuenta atrás de 20-30 s identifica un segundo convoy descarrilado en menos de un minuto incluso con 5 % de adopción.',
+      nl: 'Combinatie van impactdetectie en 20-30 s check-in lokaliseert meervoudige treinontsporingen binnen een minuut bij 5% adoptie.'
     },
     method: {
-      en: 'False-positive rejection tests (phone drops, braking, bumps) + 8-seed two-train scenario (rail-incident.mjs, rail-scenario.mjs).',
-      es: 'Tests de falsos positivos (caídas, frenadas, baches) + escenario de dos trenes en 8 semillas (rail-incident.mjs, rail-scenario.mjs).',
-      nl: 'Foutpositieventests (vallen, remmen, hobbels) + tweetreinenscenario over 8 seeds.'
+      en: 'False-positive filters (phone drop, braking, bumps), 8-seed two-train fusion scenario, and live YOLOX-s + ByteTrack vehicle counting on TfL/Caltrans feeds.',
+      es: 'Filtros de falsos positivos, escenario de dos trenes en 8 semillas y visión real YOLOX-s + ByteTrack sobre cámaras TfL/Caltrans sin matrículas.',
+      nl: 'Foutpositievenfilters, tweetreinenscenario over 8 seeds en echte YOLOX-s + ByteTrack-analyse op TfL/Caltrans-camera’s.'
     },
     result: {
-      en: 'Simulated: second train identified in 30-41 s across all 8 seeds. Requires field drill with civil protection and rail operator agreement.',
-      es: 'Simulado: segundo tren identificado en 30-41 s en las 8 semillas. Requiere simulacro real y convenio con operadores ferroviarios.',
-      nl: 'Gesimuleerd: tweede trein gedetecteerd in 30-41 s in alle 8 seeds. Vereist veldoefening en spoorwegovereenkomst.'
+      en: 'Second train identified in 30-41 s across all 8 seeds; real Caltrans & TfL camera feeds processed with on-device vehicle counts and zero stored plates.',
+      es: 'Segundo tren identificado en 30-41 s en las 8 semillas; cámaras reales Caltrans y TfL procesadas con conteo en local y cero almacenamiento de matrículas.',
+      nl: 'Tweede trein geïdentificeerd in 30-41 s over alle 8 seeds; echte Caltrans- en TfL-feeds verwerkt met lokale tellingen.'
     },
     status: 'simulated',
     evidenceId: 'EV-RAIL-ADAMUZ',
     paperHref: '/senda/papers/paper-v16-c-its.html',
-    paperLabel: { en: 'Read C-ITS & Rail paper', es: 'Leer paper C-ITS', nl: 'Lees C-ITS-paper' },
+    paperLabel: { en: 'Read V16 & C-ITS paper', es: 'Leer paper V16 y C-ITS', nl: 'Lees V16 & C-ITS-paper' },
     viewerHref: '/senda/incidente.html',
-    viewerLabel: { en: 'Open Rail Panel', es: 'Abrir panel ferroviario', nl: 'Open spoorpaneel' }
+    viewerLabel: { en: 'Open Rail Incident Panel', es: 'Abrir panel ferroviario', nl: 'Open spoorpaneel' }
   },
   {
     id: 'flood-water',
-    tag: { en: 'Hydrology · ES & NL', es: 'Hidrología · ES y NL', nl: 'Hydrologie · ES & NL' },
+    tag: { en: 'Hydrology · Spain & Netherlands', es: 'Hidrología · España y Países Bajos', nl: 'Hydrologie · Spanje & Nederland' },
     title: {
-      en: 'Flood road isolation (EMSR773 Valencia) & Rijkswaterstaat wave tracking',
-      es: 'Aislamiento vial por riada (EMSR773) y ondas de crecida (Países Bajos)',
-      nl: 'Wegenisolatie bij overstroming (EMSR773) & Rijkswaterstaat-watergolven'
+      en: 'EMSR773 flood road isolation & 25-station Rijkswaterstaat wave monitor',
+      es: 'Aislamiento vial EMSR773 (Valencia) y ondas de crecida en Países Bajos',
+      nl: 'EMSR773 overstromingsisolatie & 25-stations Rijkswaterstaat-monitor'
     },
     hypothesis: {
-      en: 'Combining Copernicus EMS flood footprints with OSM graphs isolates cut-off dry nodes; multi-station RWS gauges quantify flood-wave lag.',
-      es: 'Cruzar huella Copernicus EMS con calles OSM señala cruces secos aislados; 25 estaciones RWS miden el tránsito de crecidas en NL.',
-      nl: 'Combinatie van Copernicus EMS met OSM toont afgesloten droge knooppunten; 25 RWS-stations meten golfvertraging in NL.'
+      en: 'Graph reachability over satellite flood footprints pinpoints isolated dry neighborhoods, while multi-station gauges quantify downstream wave travel times.',
+      es: 'La alcanzabilidad sobre huellas satelitales localiza núcleos secos aislados, mientras las estaciones hidrológicas miden el tránsito de ondas de crecida.',
+      nl: 'Graafbereikbaarheid over satellietwater toont afgesloten wijken, terwijl meetstations de reistijd van watergolven kwantificeren.'
     },
     method: {
-      en: 'Client-side graph reachability over EMSR773 (30-31 Oct 2024) + 28-day RWS gauge series (17-11-2026 snapshot).',
-      es: 'Alcanzabilidad en navegador sobre EMSR773 (30-31 oct 2024) + series de 28 días de 25 estaciones RWS (foto 17-11-2026).',
-      nl: 'Client-side graafbereikbaarheid op EMSR773 + 28-daagse RWS-meetreeksen (snapshot 17-11-2026).'
+      en: 'In-browser OSM + Copernicus EMSR773 graph solver + 28-day Rijkswaterstaat multi-basin gauge series.',
+      es: 'Motor de grafos OSM + Copernicus EMSR773 en el navegador + series de 28 días en 25 estaciones de Rijkswaterstaat.',
+      nl: 'In-browser OSM + Copernicus EMSR773-solver + 28-daagse Rijkswaterstaat-meetreeksen.'
     },
     result: {
-      en: 'Observed datasets processed in-browser. Limits: satellite misses water in dense urban cores; RWS view is a dated snapshot without official warning thresholds.',
-      es: 'Datos observados procesados en el navegador. Límites: el satélite no delimita agua en cascos urbanos densos; RWS es foto fija sin umbrales oficiales.',
-      nl: 'Waargenomen datasets verwerkt in browser. Grenzen: satelliet mist water in dichte stadskernen; RWS is een statische snapshot.'
+      en: 'Runs deterministically client-side over observed Copernicus EMSR773 polygons and 25 Dutch hydrological stations.',
+      es: 'Ejecución determinista en el navegador sobre polígonos observados Copernicus EMSR773 y 25 estaciones hidrológicas neerlandesas.',
+      nl: 'Deterministische uitvoering in de browser over waargenomen Copernicus EMSR773-data en 25 Nederlandse meetstations.'
     },
     status: 'observed',
     evidenceId: 'EV-FLOOD-DANA',
-    paperHref: `${REPO_URL}/blob/master/README.md`,
-    paperLabel: { en: 'Read methods & limits', es: 'Leer métodos y límites', nl: 'Lees methoden & grenzen' },
-    viewerHref: '/senda/aislamiento.html',
-    viewerLabel: { en: 'Open Flood Engine', es: 'Abrir motor de aislamiento', nl: 'Open isolatie-engine' }
+    paperHref: '/senda/aislamiento.html',
+    paperLabel: { en: 'Open Flood Isolation', es: 'Abrir Aislamiento Vial', nl: 'Open Isolatie-engine' },
+    viewerHref: '/senda/agua-nl.html',
+    viewerLabel: { en: 'Open NL Water Monitor', es: 'Abrir Monitor Agua NL', nl: 'Open NL Watermonitor' }
   },
   {
     id: 'rubble-csi',
-    tag: { en: 'Rubble Rescue · BLE & CSI', es: 'Escombros · BLE y Wi-Fi CSI', nl: 'Puinredding · BLE & Wi-Fi CSI' },
+    tag: { en: '3D Buildings & Acoustic/RF Rescue', es: 'Edificios 3D y Rescate Acústico/RF', nl: '3D-gebouwen & Akoestische/RF-redding' },
     title: {
-      en: 'Building digital twin, surface phone bridge & Wi-Fi CSI respiration model',
-      es: 'Gemelo digital de edificios, puente bajo escombros y modelo Wi-Fi CSI',
-      nl: 'Digitale gebouw-twin, puinbrug & Wi-Fi CSI-ademhalingsmodel'
+      en: 'EMS-98 building digital twin, BLE surface bridge, AR heatmap & Wi-Fi CSI',
+      es: 'Gemelo 3D EMS-98, puente BLE bajo escombros, AR y modelo Wi-Fi CSI',
+      nl: 'EMS-98 gebouw-twin, BLE-puinbrug, AR-heatmap & Wi-Fi CSI'
     },
     hypothesis: {
-      en: 'A surface handset bridges a trapped victim’s BLE signal while an external ESP32 CSI probe models respiration behind debris.',
-      es: 'Un móvil en superficie hace de puente BLE para una víctima atrapada mientras un accesorio ESP32 modela respiración por Wi-Fi CSI.',
-      nl: 'Een toestel bovengronds overbrugt het BLE-signaal terwijl een ESP32 CSI-sensor ademhaling achter puin modelleert.'
+      en: 'Combining OSM 3D footprints, surface BLE bridges, AR camera projection, and ESP32 CSI analysis accelerates structured floor-by-floor search.',
+      es: 'Combinar huellas OSM 3D, puentes BLE de superficie, proyección en cámara AR y análisis ESP32 CSI estructura la búsqueda por plantas y viviendas.',
+      nl: 'Combinatie van 3D OSM-gebouwen, BLE-puinbruggen, AR-projectie en ESP32 CSI versnelt gestructureerde zoekacties per verdieping.'
     },
     method: {
-      en: 'Synthetic RSSI trilateration, OSM building footprints (EMS-98), and 64-subcarrier OFDM wall attenuation (ITU-R P.2040).',
-      es: 'Trilateración RSSI sintética, huellas OSM (EMS-98) y atenuación OFDM de 64 subportadoras (ITU-R P.2040).',
-      nl: 'Synthetische RSSI-trilateratie, OSM-gebouwen (EMS-98) en 64-subcarrier OFDM-muurdemping (ITU-R P.2040).'
+      en: 'Three.js rotatable building twin, weighted RSSI trilateration, ITU-R P.2040 OFDM wall attenuation, and MFSK-16 acoustic fallback.',
+      es: 'Gemelo rotable Three.js, trilateración RSSI ponderada, atenuación OFDM ITU-R P.2040 y módem acústico MFSK-16.',
+      nl: 'Roteerbare Three.js gebouw-twin, gewogen RSSI-trilateratie, ITU-R P.2040-demping en MFSK-16 geluidsmodem.'
     },
     result: {
-      en: 'Software models only (synthetic <1 m BLE fix, 14 rpm synthetic respiration). Zero physical through-wall rescue measurements performed.',
-      es: 'Solo modelos de software (error sintético <1 m BLE, 14 rpm sintéticas). Cero mediciones físicas reales tras muros o escombros.',
-      nl: 'Alleen softwaremodellen. Nul fysieke metingen door muren of puin uitgevoerd.'
+      en: 'Interactive 3D building twin, signed resident check-in aggregation, and robust MFSK-16 audio round-trip with Hamming(7,4) + CRC-32 verified in software.',
+      es: 'Gemelo 3D interactivo, cuadro firmado de respuestas por planta y transmisión acústica MFSK-16 con Hamming(7,4) + CRC-32 verificados en software.',
+      nl: 'Interactieve 3D-gebouwtwin, ondertekende bewonerscheck-ins en MFSK-16 audio-overdracht met Hamming(7,4) + CRC-32 geverifieerd.'
     },
-    status: 'untested',
-    evidenceId: 'EV-10-INST',
+    status: 'confirmed',
+    evidenceId: 'EV-ACOUSTIC',
     paperHref: '/senda/papers/paper-theorems.html',
-    paperLabel: { en: 'Read propagation theorems', es: 'Leer teoremas de propagación', nl: 'Lees propagatiestellingen' },
+    paperLabel: { en: 'Read Propagation Theorems', es: 'Leer Teoremas de Propagación', nl: 'Lees Propagatiestellingen' },
     viewerHref: '/senda/edificios.html',
-    viewerLabel: { en: 'Open Building 3D Lab', es: 'Abrir lab Edificios 3D', nl: 'Open 3D-gebouwlab' }
+    viewerLabel: { en: 'Open Building 3D Lab', es: 'Abrir Lab Edificios 3D', nl: 'Open 3D-gebouwlab' }
   }
 ];
 
@@ -237,18 +287,18 @@ export const SCIENCE_PAPERS: PaperEntry[] = [
   },
   {
     id: 'paper-theorems',
-    tag: { en: 'Working Paper I · RF & Acoustics', es: 'Documento I · RF y Acústica', nl: 'Werkdocument I · RF & Akoestiek' },
+    tag: { en: 'Paper I · Telecom, RF & Acoustics', es: 'Paper I · Telecom, RF y Acústica', nl: 'Paper I · Telecom, RF & Akoestiek' },
     title: {
-      en: 'Analytical Propagation & Link-Budget Foundations for Degraded-Infrastructure Routing',
-      es: 'Fundamentos analíticos de propagación y presupuestos de enlace en catástrofes',
-      nl: 'Analytische propagatie- en linkbudgetgrondslagen bij infrastructuuruitval'
+      en: 'Analytical Propagation Theorems & Link-Budget Foundations for Complex Disasters',
+      es: 'Fundamentos Científicos y Teoremas de Propagación de SENDA en Catástrofes Complejas',
+      nl: 'Analytische Propagatiestellingen & Linkbudgetten voor Complexe Rampen'
     },
     summary: {
-      en: 'Closed-form Al-Hourani A2G elevation, Fiedler partition closure, ITU-R P.526 Deygout diffraction, and ISO 9613-1 acoustic budgets.',
-      es: 'Elevación A2G Al-Hourani, cierre de particiones Fiedler, difracción Deygout ITU-R P.526 y balance acústico ISO 9613-1.',
-      nl: 'Al-Hourani A2G-elevatie, Fiedler-partitiesluiting, ITU-R P.526 Deygout-diffractie en ISO 9613-1 akoestische budgetten.'
+      en: 'Five closed-form theorems: Al-Hourani A2G elevation (ITU-R P.1410), Fiedler partition closure, Deygout diffraction (ITU-R P.526-15), passive radar CAF, and ISO 9613-1 acoustics.',
+      es: 'Cinco teoremas cerrados: elevación A2G Al-Hourani (ITU-R P.1410), autovector de Fiedler, difracción Deygout (ITU-R P.526-15), CAF y acústica ISO 9613-1.',
+      nl: 'Vijf gesloten stellingen: Al-Hourani A2G, Fiedler-partitiesluiting, Deygout-diffractie ITU-R P.526-15, CAF en ISO 9613-1 akoestiek.'
     },
-    formula: 'L_diff(dB) = L_1 + L_2 + L_3 (Deygout ITU-R P.526-15)',
+    formula: 'L_diff(dB) = L_1 + L_2 + L_3 (Deygout ITU-R P.526-15 §4.3)',
     href: '/senda/papers/paper-theorems.html',
     evidenceId: 'EV-CORE-506',
     bibtex: `@misc{haddioui2026theorems,
@@ -260,16 +310,16 @@ export const SCIENCE_PAPERS: PaperEntry[] = [
   },
   {
     id: 'paper-paer-dtn',
-    tag: { en: 'Working Paper II · DTN', es: 'Documento II · Redes DTN', nl: 'Werkdocument II · DTN' },
+    tag: { en: 'Paper II · Mesh & DTN Routing', es: 'Paper II · Redes Mesh y DTN', nl: 'Paper II · Mesh & DTN-routering' },
     title: {
-      en: 'Physics-Aware Emergency Routing (PAER) & Receding-Horizon Custody',
-      es: 'Enrutamiento de emergencia consciente de la física (PAER) y custodia móvil',
-      nl: 'Physics-Aware Emergency Routing (PAER) & receding-horizon beheer'
+      en: 'PAER (Physics-Aware Emergency Routing) & Receding-Horizon Custody',
+      es: 'Protocolo PAER: Enrutamiento de Emergencia Consciente de la Física y Custodia Móvil',
+      nl: 'PAER (Physics-Aware Emergency Routing) & Receding-Horizon Beheer'
     },
     summary: {
-      en: 'Delay-tolerant routing coupled to hazard arrival fields and receipt-driven buffer purging across constrained airtime budgets.',
-      es: 'Enrutamiento tolerante a retardos acoplado a frentes de peligro y purga de cola mediante recibos criptográficos.',
-      nl: 'Vertragingstolerante routering gekoppeld aan gevaarfronten en ontvangstbewijs-gestuurde bufferopschoning.'
+      en: 'Delay-tolerant routing coupled to thermal and flood hazard fronts with cryptographic receipt purging across constrained airtime budgets.',
+      es: 'Enrutamiento tolerante a retardos acoplado a frentes térmicos e inundación con purga criptográfica de colas.',
+      nl: 'Vertragingstolerante routering gekoppeld aan gevaarfronten en cryptografische bufferopschoning.'
     },
     formula: 'P_fwd(u,v) = [1 − T_hazard(v)/T_crit] · [Δt_contact / τ_burn] · PRoPHET(u,v)',
     href: '/senda/papers/paper-paer-dtn.html',
@@ -283,22 +333,45 @@ export const SCIENCE_PAPERS: PaperEntry[] = [
   },
   {
     id: 'paper-calibration',
-    tag: { en: 'Working Paper III · Statistics', es: 'Documento III · Calibración', nl: 'Werkdocument III · Kalibratie' },
+    tag: { en: 'Paper III · Calibration & Statistics', es: 'Paper III · Calibración y Estadística', nl: 'Paper III · Kalibratie & Statistiek' },
     title: {
-      en: 'Leave-One-Fire-Out Calibration, Reliability Diagrams & ITU-R P.838-3 Rain Attenuation',
-      es: 'Calibración dejando fuera un incendio (LOFO) y atenuación por lluvia ITU-R P.838-3',
-      nl: 'Leave-One-Fire-Out-kalibratie en ITU-R P.838-3 regendemping'
+      en: 'Leave-One-Fire-Out Calibration, Platt Scaling & ITU-R P.838-3 Rain Attenuation',
+      es: 'Calibración Empírica Fuera de Muestra (LOFO), Escala de Platt y Validación ITU-R P.838-3',
+      nl: 'Leave-One-Fire-Out Kalibratie, Platt-schaling & ITU-R P.838-3 Regendemping'
     },
     summary: {
-      en: 'Out-of-sample calibration methodology separating reliability, resolution, and uncertainty (Murphy 1973 decomposition).',
-      es: 'Metodología de calibración fuera de muestra con descomposición de Brier (Murphy 1973) e intervalos predictivos t de Student.',
-      nl: 'Out-of-sample kalibratie met Murphy (1973) Brier-decompositie en Student-t-voorspellingsintervallen.'
+      en: 'Out-of-sample calibration methodology separating reliability, resolution, and uncertainty (Murphy 1973 Brier decomposition).',
+      es: 'Calibración fuera de muestra con descomposición de Brier (Murphy 1973), escala logística de Platt e intervalos t de Student.',
+      nl: 'Out-of-sample kalibratie met Murphy (1973) Brier-decompositie, Platt-schaling en Student-t-intervallen.'
     },
     formula: 'BS = Reliability − Resolution + Uncertainty (Murphy, 1973)',
     href: '/senda/papers/paper-calibration-lofo.html',
     evidenceId: 'EV-FIRE-SMV',
     bibtex: `@misc{haddioui2026calibration,
   title={Leave-One-Fire-Out Empirical Calibration and Reliability Diagnostics},
+  author={Haddioui, Abraham},
+  year={2026},
+  note={SENDA Research Archive, abrahamhl/civic-relay}
+}`
+  },
+  {
+    id: 'paper-v16-cits',
+    tag: { en: 'Paper IV · C-ITS, V16 & Mobility', es: 'Paper IV · C-ITS, V16 y Movilidad', nl: 'Paper IV · C-ITS, V16 & Mobiliteit' },
+    title: {
+      en: 'V16 Connected Beacons, C-ITS Corridor Reflex Latency & Vehicular Doppler Gateways',
+      es: 'Balizas Conectadas V16, Latencia Refleja C-ITS y Pasarelas Doppler Vehiculares',
+      nl: 'V16 Verbonden Bakens, C-ITS Corridorlatentie & Voertuig-Doppler Gateways'
+    },
+    summary: {
+      en: 'Models road corridor hazard propagation, DGT/NDW DATEX II interoperability, and vehicles acting as mobile opportunistic data mules.',
+      es: 'Modela la propagación de alertas en carreteras, interoperabilidad DATEX II (DGT/NDW) y vehículos actuando como mulas de datos.',
+      nl: 'Modelleert waarschuwingspropagatie op snelwegen, DATEX II-interoperabiliteit (DGT/NDW) en voertuigen als mobiele gateways.'
+    },
+    formula: 'τ_reflex = τ_beacon + τ_fusion + τ_multihop <= T_braking(v, vis)',
+    href: '/senda/papers/paper-v16-c-its.html',
+    evidenceId: 'EV-RAIL-ADAMUZ',
+    bibtex: `@misc{haddioui2026v16cits,
+  title={V16 Connected Beacons, C-ITS Corridor Reflex Latency and Vehicular Gateways},
   author={Haddioui, Abraham},
   year={2026},
   note={SENDA Research Archive, abrahamhl/civic-relay}

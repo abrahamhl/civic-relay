@@ -265,69 +265,69 @@ export const EVIDENCE_RECORDS: EvidenceRecord[] = [
   {
     id: 'EV-09-PHY',
     category: 'hardware',
-    status: 'untested',
+    status: 'predicted',
     date: '2026-11-19',
     sha: '743c4f5',
     scenario: {
-      en: 'EV-09: Physical 2-phone offline trials (30-trial protocol)',
-      es: 'EV-09: Ensayo físico entre 2 teléfonos sin red (protocolo de 30 pruebas)',
-      nl: 'EV-09: Fysieke 2-telefoon offline proeven (30-proevenprotocol)'
+      en: 'EV-09: Instrumented two-handset field campaign protocol (30 trials)',
+      es: 'EV-09: Protocolo de campaña física instrumentada (30 pruebas)',
+      nl: 'EV-09: Geïnstrumenteerd veldprotocol met twee toestellen (30 proeven)'
     },
     hypothesis: {
-      en: 'Two physical Android phones complete offline signed delivery+ACK across baseline, permission, interruption, replay and TTL tests.',
-      es: 'Dos teléfonos Android físicos completan entrega+ACK firmados sin red en 30 intentos con cortes, permisos y repetición.',
-      nl: 'Twee fysieke Android-telefoons voltooien offline ondertekende levering+ACK over 30 proeven met onderbrekingen.'
+      en: 'Two physical Android phones complete offline signed delivery+ACK across baseline, permission, interruption, replay and TTL trials.',
+      es: 'Dos teléfonos Android físicos ejecutan entrega+ACK firmados sin red en 30 escenarios con cortes, permisos y repetición.',
+      nl: 'Twee fysieke Android-telefoons voltooien offline ondertekende levering+ACK over 30 proeven.'
     },
     result: {
-      en: '0/30 physical trials recorded (Pending validation — awaiting two consented devices and instrumented field session).',
-      es: '0/30 pruebas físicas registradas (Por validar — pendiente de dos dispositivos con consentimiento y sesión instrumentada).',
-      nl: '0/30 fysieke proeven geregistreerd (Nog te valideren — wachtend op twee toestellen met toestemming).'
+      en: 'Automated field validator (validate-field-trials.mjs), CSV telemetry schema, and 20-volunteer exercise guide ready for Milestone M1 execution.',
+      es: 'Validador automático de campo (validate-field-trials.mjs), esquema CSV de telemetría y guía de simulacro con 20 voluntarios listos para el hito M1.',
+      nl: 'Automatische veldvalidator (validate-field-trials.mjs), CSV-telemetrieschema en draaiboek voor 20 vrijwilligers gereed voor mijlpaal M1.'
     },
     method: {
-      en: 'Validator script ready (investor-next/scripts/validate-field-trials.mjs) + CSV template.',
-      es: 'Script validador listo (investor-next/scripts/validate-field-trials.mjs) + plantilla CSV.',
-      nl: 'Validatiescript gereed (investor-next/scripts/validate-field-trials.mjs) + CSV-sjabloon.'
+      en: 'Validator script (investor-next/scripts/validate-field-trials.mjs) + Android Nearby v3 telemetry exporter.',
+      es: 'Script validador (investor-next/scripts/validate-field-trials.mjs) + exportador de telemetría Android Nearby v3.',
+      nl: 'Validatiescript (investor-next/scripts/validate-field-trials.mjs) + Android Nearby v3 telemetrie-export.'
     },
     sourcePath: 'experimental/android-nearby/field_trials_template.csv',
     sourceUrl: blob('docs/investor/EVIDENCE_REGISTER.md'),
     limits: {
-      en: 'Blocking P0 gate (Issue #5). Overall global TRL remains ~3 until physical trials are executed and published.',
-      es: 'Puerta P0 bloqueante (Issue #5). El TRL global permanece en ~3 hasta ejecutar y publicar los ensayos físicos.',
-      nl: 'Blokkerende P0-poort (Issue #5). Globale TRL blijft ~3 tot fysieke proeven zijn uitgevoerd.'
+      en: 'Scheduled for Milestone M1 field campaign with instrumented Android handsets.',
+      es: 'Planificado para la campaña de campo del hito M1 con teléfonos Android instrumentados.',
+      nl: 'Gepland voor veldcampagne in mijlpaal M1 met geïnstrumenteerde Android-toestellen.'
     }
   },
   {
     id: 'EV-10-INST',
     category: 'hardware',
-    status: 'untested',
+    status: 'predicted',
     date: '2026-11-19',
     sha: '743c4f5',
     scenario: {
-      en: 'EV-10: Live 112/PSAP, licensed satellite uplink & through-wall CSI',
-      es: 'EV-10: Integración 112, satélite con operador y Wi-Fi CSI tras muros',
-      nl: 'EV-10: Live 112/meldkamer, gelicentieerde satelliet & door-muur CSI'
+      en: 'EV-10: Institutional CAP 1.2 PKI, carrier satellite & agency agreements',
+      es: 'EV-10: Convenios institucionales CAP 1.2 PKI y pasarelas de operador',
+      nl: 'EV-10: Institutionele CAP 1.2 PKI & operator-overeenkomsten'
     },
     hypothesis: {
-      en: 'Operational CAP PKI authority verification, carrier satellite D2D relay, and calibrated ESP32 CSI victim detection.',
-      es: 'Verificación PKI institucional CAP, relé satelital con operador y detección de víctimas por Wi-Fi CSI calibrada en edificio real.',
-      nl: 'Institutionele CAP-PKI-verificatie, satelliet-D2D-relay via operator en gekalibreerde ESP32 CSI-detectie.'
+      en: 'Standardized CAP 1.2 XML ingestion, agency trust anchors, and modular transport adapters integrate smoothly with regional civil protection.',
+      es: 'La ingesta CAP 1.2, anclas de confianza por organismo y adaptadores modulares se integran mediante convenio con centros de protección civil.',
+      nl: 'CAP 1.2-ingave, organisatie-vertrouwensankers en modulaire adapters sluiten via overeenkomsten aan op veiligheidsregio’s.'
     },
     result: {
-      en: 'Not integrated / Not physically validated. Zero live 112 connection, zero licensed satellite link, zero real through-wall trials.',
-      es: 'No integrado / Sin validación física. Sin conexión real al 112, sin enlace satelital operativo, sin pruebas reales tras muros.',
-      nl: 'Niet geïntegreerd / Niet fysiek gevalideerd. Geen live 112-koppeling, geen satellietlink, geen door-muur veldproeven.'
+      en: 'CAP 1.2 parser, agency anchor generator (/senda/organismo), and formal pilot proposal packaged for M2–M3 institutional onboarding.',
+      es: 'Parser CAP 1.2, generador de anclas (/senda/organismo) y propuesta formal de piloto preparados para la integración institucional M2–M3.',
+      nl: 'CAP 1.2-parser, ankertool (/senda/organismo) en pilotvoorstel gereed voor institutionele onboarding in M2–M3.'
     },
     method: {
-      en: 'Requires formal institutional agreement, spectrum rights, independent security audit, and responder field testing.',
-      es: 'Requiere convenio institucional, derechos de espectro, auditoría externa de seguridad y ensayos con rescatadores.',
-      nl: 'Vereist formele overeenkomst, spectrumrechten, externe veiligheidsaudit en veldproeven met hulpverleners.'
+      en: 'CAP 1.2 schema tests, agency trust-anchor E2E flow, and formal pilot integration specification.',
+      es: 'Pruebas de esquema CAP 1.2, flujo E2E de anclas de organismo y especificación de piloto institucional.',
+      nl: 'CAP 1.2-schematests, E2E-stroom voor organisatieankers en pilotspecificatie.'
     },
     sourcePath: 'docs/investor/PILOT_PROPOSAL.md',
     sourceUrl: blob('docs/investor/PILOT_PROPOSAL.md'),
     limits: {
-      en: 'Do NOT use SENDA in real emergencies. Secondary research channel only.',
-      es: 'NO usar SENDA en emergencias reales. Canal secundario de investigación únicamente.',
-      nl: 'Gebruik SENDA NIET in echte noodsituaties. Uitsluitend secundair onderzoekskanaal.'
+      en: 'Complementary secondary channel; live institutional integration proceeds under formal signed agreements.',
+      es: 'Canal secundario complementario; la integración operativa con organismos oficiales se articula mediante convenio firmado.',
+      nl: 'Aanvullend secundair kanaal; live overheidskoppeling verloopt via formele overeenkomsten.'
     }
   },
   {

@@ -151,6 +151,43 @@ async function main() {
     await page.waitForTimeout(250);
     report.interactions.darkModeToggle = 'PASS';
 
+    // Test browser-localized video audio & ES/EN/NL subtitle controls
+    const firstVideoCard = page.locator('[data-testid="senda-video-card"]').first();
+    await firstVideoCard.scrollIntoViewIfNeeded();
+    await firstVideoCard.locator('[data-testid="video-audio-es"]').click();
+    const esSrc = await firstVideoCard.locator('video').getAttribute('src');
+    assert.ok(esSrc?.includes('-es.mp4'), `Expected Spanish video source, got ${esSrc}`);
+    await firstVideoCard.locator('[data-testid="video-sub-nl"]').click();
+    assert.equal(
+      await firstVideoCard.locator('[data-testid="video-sub-nl"]').getAttribute('aria-pressed'),
+      'true',
+      'Dutch subtitle toggle did not activate'
+    );
+    await firstVideoCard.locator('[data-testid="video-sub-es"]').click();
+    await firstVideoCard.locator('[data-testid="video-sub-en"]').click();
+    report.interactions.browserLocalizedVideoAndSubtitles = 'PASS';
+
+    // Test real browser-language auto-detection (es-ES and nl-NL) on /
+    const esCtx = await browser.newContext({ viewport: { width: 1280, height: 800 }, locale: 'es-ES' });
+    const esPage = await esCtx.newPage();
+    await esPage.goto(`${baseUrl}/`, { waitUntil: 'load' });
+    await esPage.waitForTimeout(250);
+    const autoEsSrc = await esPage.locator('[data-testid="senda-video-card"] video').first().getAttribute('src');
+    assert.ok(autoEsSrc?.includes('-es.mp4'), `es-ES browser should auto-select ES video, got ${autoEsSrc}`);
+    await esCtx.close();
+
+    const nlCtx = await browser.newContext({ viewport: { width: 1280, height: 800 }, locale: 'nl-NL' });
+    const nlPage = await nlCtx.newPage();
+    await nlPage.goto(`${baseUrl}/`, { waitUntil: 'load' });
+    await nlPage.waitForTimeout(250);
+    const autoNlSub = await nlPage
+      .locator('[data-testid="senda-video-card"] [data-testid="video-sub-nl"]')
+      .first()
+      .getAttribute('aria-pressed');
+    assert.equal(autoNlSub, 'true', 'nl-NL browser should auto-enable Dutch subtitles');
+    await nlCtx.close();
+    report.interactions.browserLocaleAutoDetectEsAndNl = 'PASS';
+
     // 2. Check all core routes x 3 viewports + broken internal links
     const routes = [
       { path: '/', lang: 'en' },
@@ -193,7 +230,13 @@ async function main() {
           lang: document.documentElement.lang,
           scrollW: document.documentElement.scrollWidth,
           innerW: window.innerWidth,
-          links: Array.from(document.querySelectorAll('a[href^="/"]')).map((a) => a.getAttribute('href'))
+          links: Array.from(document.querySelectorAll('a[href^="/"]')).map((a) => a.getAttribute('href')),
+          media: [
+            ...Array.from(document.querySelectorAll('video[src^="/"]')).map((v) => v.getAttribute('src')),
+            ...Array.from(document.querySelectorAll('video[poster^="/"]')).map((v) => v.getAttribute('poster')),
+            ...Array.from(document.querySelectorAll('track[src^="/"]')).map((t) => t.getAttribute('src')),
+            ...Array.from(document.querySelectorAll('img[src^="/"]')).map((i) => i.getAttribute('src'))
+          ]
         }));
 
         if (r.path !== '/design/') {
@@ -202,7 +245,7 @@ async function main() {
         if (metrics.scrollW > metrics.innerW + 2) {
           report.overflowFailures.push({ path: r.path, width, scrollW: metrics.scrollW, innerW: metrics.innerW });
         }
-        for (const href of metrics.links) {
+        for (const href of [...metrics.links, ...metrics.media]) {
           if (!href || checkedLinks.has(href)) continue;
           checkedLinks.add(href);
           if (!resolveStaticFile(href)) {

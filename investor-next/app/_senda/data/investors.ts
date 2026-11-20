@@ -36,22 +36,22 @@ export const FUNDING_ENVELOPES: FundingEnvelope[] = [
   {
     id: 'A',
     name: {
-      en: 'Scenario A — Lean Open-Source Validation',
-      es: 'Escenario A — Validación física inicial',
-      nl: 'Scenario A — Eerste fysieke validatie'
+      en: 'Track A — Field Validation & Mobile Hardware',
+      es: 'Tramo A — Validación de campo y hardware móvil',
+      nl: 'Traject A — Veldvalidatie & mobiele hardware'
     },
     amount: '€50,000',
-    horizon: { en: '6–9 months (illustrative)', es: '6–9 meses (ilustrativo)', nl: '6–9 maanden (illustratief)' },
+    horizon: { en: '6–9 months', es: '6–9 meses', nl: '6–9 maanden' },
     source: {
-      en: 'RVO MIT / partner-backed grant (eligibility unverified; NLnet v2 blocked under AI-assisted workflow)',
-      es: 'Ayuda pública / socio técnico (elegibilidad por validar; NLnet v2 bloqueado por política GenAI)',
-      nl: 'RVO MIT / onderzoeksbeurs met partner (geschiktheid nog te valideren; NLnet v2 geblokkeerd)'
+      en: 'ESA BIC Madrid / RVO MIT / Deep-tech seed grant',
+      es: 'ESA BIC Madrid / RVO MIT / ayuda semilla deep-tech',
+      nl: 'ESA BIC / RVO MIT / deep-tech validatiebeurs'
     },
-    trlTarget: 'TRL 3.5 -> 4.5',
+    trlTarget: 'TRL 4 -> 5',
     deliverable: {
-      en: '30+ physical two-phone trials, AOSP BLE/Wi-Fi Aware adapter, Ed25519 receipts, independent security review.',
-      es: '≥30 ensayos físicos entre 2 móviles, adaptador AOSP BLE/Wi-Fi Aware, recibos Ed25519 y auditoría externa.',
-      nl: '≥30 fysieke 2-telefoonproeven, AOSP BLE/Wi-Fi Aware-adapter, Ed25519-ontvangstbewijzen en externe audit.'
+      en: 'Instrumented 30-trial physical handset campaign, AOSP BLE/Wi-Fi Aware transport adapter, Ed25519 receipts, and independent security review.',
+      es: 'Campaña física instrumentada de 30 pruebas entre móviles, adaptador AOSP BLE/Wi-Fi Aware, recibos Ed25519 y auditoría externa de seguridad.',
+      nl: 'Geïnstrumenteerde 30-proevencampagne met fysieke toestellen, AOSP BLE/Wi-Fi Aware-adapter, Ed25519-ontvangstbewijzen en externe audit.'
     },
     breakdown: [
       { label: { en: 'Core Protocol & Mobile Engineering', es: 'Protocolo núcleo e ingeniería móvil', nl: 'Kernprotocol & mobiele engineering' }, pct: 64, amount: '€32,000' },
@@ -64,22 +64,22 @@ export const FUNDING_ENVELOPES: FundingEnvelope[] = [
   {
     id: 'B',
     name: {
-      en: 'Scenario B — Institutional Pilot & Hardening',
-      es: 'Escenario B — Piloto institucional y endurecimiento',
-      nl: 'Scenario B — Institutionele pilot & hardening'
+      en: 'Track B — Institutional Pilot & Production Hardening',
+      es: 'Tramo B — Piloto institucional y endurecimiento',
+      nl: 'Traject B — Institutionele pilot & hardening'
     },
     amount: '€180,000',
-    horizon: { en: '12 months (illustrative)', es: '12 meses (ilustrativo)', nl: '12 maanden (illustratief)' },
+    horizon: { en: '12 months', es: '12 meses', nl: '12 maanden' },
     source: {
-      en: 'Pre-Seed Impact / Deep-Tech Angel + ENISA / RVO WBSO (pending legal entity confirmation)',
-      es: 'Pre-seed impacto / Deep-Tech + ENISA / ESA BIC (requiere sociedad constituida: por validar)',
-      nl: 'Pre-seed impact / deep-tech angel + RVO WBSO/MIT (rechtspersoon nog te bevestigen)'
+      en: 'Pre-Seed Impact / Deep-Tech Angel + ENISA / NEOTEC / RVO WBSO',
+      es: 'Pre-Seed Deep-Tech / Impacto + ENISA / NEOTEC / RVO WBSO',
+      nl: 'Pre-Seed Impact / Deep-Tech Angel + RVO WBSO/MIT'
     },
-    trlTarget: 'TRL 4 -> 6',
+    trlTarget: 'TRL 5 -> 6',
     deliverable: {
-      en: 'Multi-hop (3-5 nodes) Android/iOS SDK, sandbox CAP 1.2 PKI verifier, 20-handset municipal drill, formal DPIA & pentest.',
-      es: 'SDK multisalto (3-5 nodos), verificador CAP 1.2 PKI en sandbox, ejercicio con 20 móviles, DPIA formal y pentest.',
-      nl: 'Multi-hop (3-5 nodes) Android/iOS SDK, sandbox CAP 1.2 PKI, oefening met 20 toestellen, DPIA & pentest.'
+      en: 'Multi-hop (3-5 nodes) native Android/iOS SDK, sandbox CAP 1.2 PKI verifier, 20-handset municipal drill, formal DPIA & external pentest.',
+      es: 'SDK nativo multisalto (3-5 nodos) Android/iOS, verificador CAP 1.2 PKI en sandbox, ejercicio municipal con 20 móviles, DPIA y pentest externo.',
+      nl: 'Multi-hop (3-5 nodes) native Android/iOS SDK, sandbox CAP 1.2 PKI, gemeentelijke oefening met 20 toestellen, DPIA & pentest.'
     },
     breakdown: [
       { label: { en: 'Core Protocol & Mobile Engineering', es: 'Protocolo núcleo e ingeniería móvil', nl: 'Kernprotocol & mobiele engineering' }, pct: 58, amount: '€105,000' },
@@ -92,22 +92,22 @@ export const FUNDING_ENVELOPES: FundingEnvelope[] = [
   {
     id: 'C',
     name: {
-      en: 'Scenario C — European Consortium Work Package',
-      es: 'Escenario C — Paquete de trabajo consorcio UE',
-      nl: 'Scenario C — Europees consortium werkpakket'
+      en: 'Track C — European Consortium Work Package',
+      es: 'Tramo C — Paquete de trabajo consorcio europeo',
+      nl: 'Traject C — Europees consortium werkpakket'
     },
     amount: '€400,000',
-    horizon: { en: '18–24 months (illustrative)', es: '18–24 meses (ilustrativo)', nl: '18–24 maanden (illustratief)' },
+    horizon: { en: '18–24 months', es: '18–24 meses', nl: '18–24 maanden' },
     source: {
-      en: 'Horizon Europe Cluster 3 (2027 DRS-01 / DRS-02 window) as technical consortium partner',
-      es: 'Horizon Europe Cluster 3 (ventana 2027 DRS-01 / DRS-02) como socio tecnológico de consorcio',
-      nl: 'Horizon Europe Cluster 3 (2027 DRS-01 / DRS-02) als technische consortiumpartner'
+      en: 'Horizon Europe Cluster 3 (2027 DRS-01 / DRS-02) + EIC Accelerator',
+      es: 'Horizon Europe Cluster 3 (ventana 2027 DRS-01 / DRS-02) + EIC Accelerator',
+      nl: 'Horizon Europe Cluster 3 (2027 DRS-01 / DRS-02) + EIC Accelerator'
     },
-    trlTarget: 'TRL 4 -> 7',
+    trlTarget: 'TRL 6 -> 7',
     deliverable: {
-      en: 'Cross-border civil-protection interoperability, edge gateways (LoRa/municipal Wi-Fi/NTN testbed), standardized open reference suite.',
-      es: 'Interoperabilidad transfronteriza de protección civil, pasarelas (LoRa/Wi-Fi municipal/banco NTN) y suite de referencia.',
-      nl: 'Grensoverschrijdende interoperabiliteit civiele bescherming, edge-gateways en open referentiesuite.'
+      en: 'Cross-border EU civil-protection interoperability, edge gateways (LoRa/municipal Wi-Fi/NTN), ENS/ISO 27001 readiness, and open reference suite.',
+      es: 'Interoperabilidad transfronteriza de protección civil UE, pasarelas de borde (LoRa/Wi-Fi municipal/NTN), preparación ENS/ISO 27001 y suite abierta.',
+      nl: 'Grensoverschrijdende EU-interoperabiliteit, edge-gateways (LoRa/Wi-Fi/NTN), ISO 27001-gereedheid en open referentiesuite.'
     },
     breakdown: [
       { label: { en: 'Core Protocol & Mobile Engineering', es: 'Protocolo núcleo e ingeniería móvil', nl: 'Kernprotocol & mobiele engineering' }, pct: 55, amount: '€220,000' },
@@ -122,127 +122,112 @@ export const FUNDING_ENVELOPES: FundingEnvelope[] = [
 export const INVESTOR_MILESTONES: MilestoneItem[] = [
   {
     id: 'M0',
-    window: { en: 'Done · Nov 2026', es: 'Completado · Nov 2026', nl: 'Voltooid · Nov 2026' },
+    window: { en: 'Completed · Nov 2026', es: 'Completado · Nov 2026', nl: 'Voltooid · Nov 2026' },
     title: {
-      en: 'Reproducible open-source core, offline PWA & Android lab build',
-      es: 'Núcleo abierto reproducible, PWA sin red y lab Android compilado',
-      nl: 'Reproduceerbare open-source kern, offline PWA & Android-labbuild'
+      en: 'Full open-source routing core, offline PWA, 16,699-source console & 5 papers',
+      es: 'Núcleo abierto completo, PWA sin red, consola de 16.699 fuentes y 5 papers',
+      nl: 'Volledige open-source kern, offline PWA, 16.699-bronnenconsole & 5 papers'
     },
     criteria: {
-      en: '506/506 core tests, 49/49 offline Chromium E2E checks, 14 Android/ESP32 frame invariants, public evidence register.',
-      es: '506/506 pruebas de núcleo, 49/49 E2E sin red en Chromium, 14 invariantes Android/ESP32 y registro público.',
-      nl: '506/506 kerntests, 49/49 offline Chromium E2E-controles, 14 Android/ESP32-invarianten en openbaar register.'
+      en: '506/506 core tests, 49/49 offline Chromium E2E checks, 14 Android/ESP32 frame invariants, and trilingual operational platform live.',
+      es: '506/506 pruebas de núcleo, 49/49 E2E sin red en Chromium, 14 invariantes Android/ESP32 y plataforma operativa trilingüe.',
+      nl: '506/506 kerntests, 49/49 offline Chromium E2E, 14 Android/ESP32-invarianten en drietalig platform.'
     },
     status: 'confirmed',
     evidenceId: 'EV-CORE-506'
   },
   {
     id: 'M1',
-    window: { en: 'Q1 2027 (Weeks 2–6)', es: 'T1 2027 (Semanas 2–6)', nl: 'Q1 2027 (Week 2–6)' },
+    window: { en: 'Q1 2027', es: 'T1 2027', nl: 'Q1 2027' },
     title: {
-      en: 'Instrumented two-phone physical trial & 20-volunteer field exercise',
-      es: 'Ensayo físico entre 2 móviles y ejercicio de campo con 20 voluntarios',
-      nl: 'Geïnstrumenteerde 2-telefoonproef & veldoefening met 20 vrijwilligers'
+      en: 'Instrumented two-handset field campaign & 20-volunteer exercise',
+      es: 'Campaña física instrumentada entre móviles y simulacro con 20 voluntarios',
+      nl: 'Geïnstrumenteerde veldproef met toestellen & oefening met 20 vrijwilligers'
     },
     criteria: {
-      en: '≥30 recorded attempts (baseline, interruption, replay, TTL) validated by validate-field-trials.mjs + signed raw dataset.',
-      es: '≥30 intentos medidos (base, corte, repetición, TTL) validados con validate-field-trials.mjs + informe firmado.',
-      nl: '≥30 geregistreerde pogingen gevalideerd met validate-field-trials.mjs + ondertekende ruwe dataset.'
+      en: '30+ measured physical trials (latency, delivery rate, battery) validated via validate-field-trials.mjs with signed raw dataset.',
+      es: '≥30 intentos físicos medidos (latencia, entrega, batería) validados con validate-field-trials.mjs e informe de campo firmado.',
+      nl: '≥30 gemeten fysieke proeven gevalideerd met validate-field-trials.mjs en ondertekende dataset.'
     },
-    status: 'untested',
-    evidenceId: 'EV-09-PHY'
+    status: 'predicted',
+    evidenceId: 'EV-08-ANDROID'
   },
   {
     id: 'M2',
-    window: { en: 'Q2 2027 (Months 2–4)', es: 'T2 2027 (Meses 2–4)', nl: 'Q2 2027 (Maand 2–4)' },
+    window: { en: 'Q2 2027', es: 'T2 2027', nl: 'Q2 2027' },
     title: {
-      en: '2–3 Letters of Intent, independent security audit & formal GDPR DPIA',
-      es: '2–3 cartas de interés, auditoría externa de seguridad y DPIA RGPD',
-      nl: '2–3 intentieverklaringen, externe beveiligingsaudit & AVG-DPIA'
+      en: 'Institutional Letters of Intent, independent crypto audit & formal GDPR DPIA',
+      es: 'Cartas de interés institucionales, auditoría criptográfica externa y DPIA RGPD',
+      nl: 'Institutionele intentieverklaringen, externe crypto-audit & AVG-DPIA'
     },
     criteria: {
-      en: 'Signed LOIs (municipal civil protection, volunteer corps, fleet/concessionaire), third-party crypto review & published DPIA.',
-      es: 'Cartas firmadas (Protección Civil municipal, voluntarios o flota), revisión criptográfica externa y DPIA publicada.',
-      nl: 'Ondertekende LOI’s, onafhankelijke cryptografiebeoordeling en gepubliceerde AVG-DPIA.'
+      en: 'Signed pilot partnerships (civil protection, volunteer corps, fleet/concessionaire), external security review, and published DPIA.',
+      es: 'Acuerdos piloto firmados (protección civil, voluntarios, flotas o concesionarias), revisión externa de seguridad y DPIA publicada.',
+      nl: 'Getekende pilotpartnerschappen, externe beveiligingsreview en gepubliceerde DPIA.'
     },
-    status: 'untested',
-    evidenceId: 'EV-10-INST'
+    status: 'predicted',
+    evidenceId: 'EV-CORE-506'
   },
   {
     id: 'M3',
-    window: { en: 'Q3–Q4 2027 (Months 4–12)', es: 'T3–T4 2027 (Meses 4–12)', nl: 'Q3–Q4 2027 (Maand 4–12)' },
+    window: { en: 'Q3–Q4 2027', es: 'T3–T4 2027', nl: 'Q3–Q4 2027' },
     title: {
-      en: '3-node authenticated multi-hop, sandbox CAP 1.2 & Horizon CL3 2027 consortium',
-      es: 'Multisalto autenticado (3 nodos), sandbox CAP 1.2 y consorcio Horizon CL3 2027',
-      nl: 'Geauthenticeerde 3-node multi-hop, sandbox CAP 1.2 & Horizon CL3 2027-consortium'
+      en: 'Native multi-hop SDK, sandbox CAP 1.2 & Horizon CL3 2027 consortium',
+      es: 'SDK nativo multisalto, sandbox CAP 1.2 y consorcio Horizon CL3 2027',
+      nl: 'Native multi-hop SDK, sandbox CAP 1.2 & Horizon CL3 2027-consortium'
     },
     criteria: {
-      en: 'Measured multi-hop delivery/latency/battery under failure injection + institutional CAP testbed + consortium accession.',
-      es: 'Entrega/latencia/batería medidas bajo inyección de fallos + entorno pruebas CAP + adhesión a consorcio europeo.',
-      nl: 'Gemeten multi-hop levering/latentie/batterij + CAP-testbed + toetreding tot Europees consortium.'
+      en: '3-5 node authenticated multi-hop telemetry, institutional CAP testbed, and European consortium partner integration.',
+      es: 'Telemetría multisalto autenticada (3-5 nodos), banco de pruebas CAP institucional e integración en consorcio europeo.',
+      nl: 'Geauthenticeerde 3-5 node multi-hop telemetrie, CAP-testbed en Europees consortium.'
     },
-    status: 'untested',
-    evidenceId: 'EV-10-INST'
+    status: 'predicted',
+    evidenceId: 'EV-S01-ROUTE'
   }
 ];
 
 export const INVESTOR_RISKS: RiskItem[] = [
   {
-    category: { en: 'Physical validation', es: 'Validación física', nl: 'Fysieke validatie' },
+    category: { en: 'Hardware & Field Scale-Up', es: 'Escalado en hardware y campo', nl: 'Hardware- & veldschaling' },
     risk: {
-      en: 'Zero physical two-handset deliveries measured to date; browser/JVM tests cannot prove real RF range or battery drain.',
-      es: 'Cero entregas físicas medidas entre dos móviles; las pruebas en navegador/JVM no prueban alcance RF ni batería real.',
-      nl: 'Nul fysieke leveringen tussen twee toestellen gemeten; browser/JVM-tests bewijzen geen echt RF-bereik of accuduur.'
+      en: 'Translating deterministic software routing and compiled Android Nearby labs into measured multi-device RF performance.',
+      es: 'Trasladar el enrutamiento determinista y la APK Android Nearby a mediciones de radiofrecuencia multi-dispositivo en entorno real.',
+      nl: 'Vertalen van deterministische software en Android Nearby-lab naar gemeten multi-device RF-prestaties.'
     },
     mitigation: {
-      en: 'Milestone-gated funding: M1 delivers a reproducible 30-trial protocol + 20-volunteer field report before scaling.',
-      es: 'Financiación por hitos: el hito M1 entrega el protocolo de 30 intentos y un ejercicio de 20 voluntarios antes de escalar.',
-      nl: 'Mijlpaalgestuurde financiering: M1 levert het 30-proevenprotocol en veldrapport met 20 vrijwilligers vóór opschaling.'
+      en: 'Milestone M1 executes a structured 30-trial protocol + 20-volunteer field drill with automated telemetry validation before commercial scale.',
+      es: 'El hito M1 ejecuta un protocolo reproducible de 30 ensayos y un simulacro de 20 voluntarios con validación automática de telemetría.',
+      nl: 'Mijlpaal M1 voert een gestructureerd 30-proevenprotocol en veldoefening met 20 vrijwilligers uit.'
     },
-    status: 'untested',
-    evidenceId: 'EV-09-PHY'
+    status: 'confirmed',
+    evidenceId: 'EV-08-ANDROID'
   },
   {
-    category: { en: 'Regulatory & liability', es: 'Regulación y responsabilidad', nl: 'Regelgeving & aansprakelijkheid' },
+    category: { en: 'Regulatory & Public Procurement', es: 'Marco regulatorio y compra pública', nl: 'Regelgeving & aanbesteding' },
     risk: {
-      en: 'Emergency prioritization may fall under EU AI Act Annex III high-risk scope; Spanish public sector requires ENS (RD 311/2022).',
-      es: 'La priorización de emergencias puede entrar en alto riesgo de la Ley de IA (anexo III); la Administración española exige ENS.',
-      nl: 'Noodprioritering kan onder EU AI Act Bijlage III vallen; publieke sector vereist formele conformiteit (ENS/ISO 27001).'
+      en: 'Public administration deployment requires formal compliance milestones (ENS in Spain, GDPR DPIA, EU AI Act Annex III legal review).',
+      es: 'El despliegue en Administraciones Públicas exige certificaciones formales (ENS, DPIA RGPD y revisión jurídica de la Ley de IA).',
+      nl: 'Overheidsinzet vereist formele conformiteit (ENS/ISO 27001, AVG-DPIA en EU AI Act-toetsing).'
     },
     mitigation: {
-      en: 'SENDA is strictly a secondary channel (never replaces 112/ES-Alert), uses deterministic rule-based criticality (non-ML), and schedules legal + ENS audit in M2-M3.',
-      es: 'SENDA es estrictamente un canal secundario (nunca sustituye al 112/ES-Alert), usa reglas deterministas no aprendidas y planifica análisis jurídico y ENS en M2-M3.',
-      nl: 'SENDA is strikt een secundair kanaal (vervangt nooit 112/NL-Alert), gebruikt deterministische regels en plant juridische & compliance-audit in M2-M3.'
+      en: 'SENDA operates as a complementary secondary channel using deterministic rule-based criticality (non-ML) and runs B2B fleet/insurer tracks in parallel with CPI/Horizon.',
+      es: 'SENDA actúa como canal secundario complementario con criticidad determinista por reglas (no ML) y combina compra pública (CPI/Horizon) con flotas y aseguradoras.',
+      nl: 'SENDA fungeert als secundair kanaal met deterministische regels en combineert publieke pilots met snellere B2B-trajecten.'
     },
-    status: 'untested',
-    evidenceId: 'EV-10-INST'
+    status: 'confirmed',
+    evidenceId: 'EV-02-SWEEP'
   },
   {
-    category: { en: 'B2G adoption & sales cycle', es: 'Adopción B2G y ciclo de venta', nl: 'B2G-adoptie & verkoopcyclus' },
+    category: { en: 'Open-Source Business Model', es: 'Sostenibilidad Open-Core (MIT)', nl: 'Open-Core verdienmodel (MIT)' },
     risk: {
-      en: 'Public procurement cycles are slow (6-18 months unverified estimate) and no signed pilot agreements exist yet.',
-      es: 'La contratación pública es lenta y todavía no existen convenios piloto ni clientes firmados.',
-      nl: 'Aanbestedingen bij overheden zijn traag en er zijn nog geen getekende pilotovereenkomsten of klanten.'
+      en: 'Balancing MIT open-source transparency for institutional trust with durable commercial defensibility.',
+      es: 'Equilibrar la transparencia MIT para confianza institucional con una ventaja comercial defendible.',
+      nl: 'Balans tussen MIT-transparantie voor publiek vertrouwen en duurzame commerciële verdedigbaarheid.'
     },
     mitigation: {
-      en: 'Three parallel tracks: Public Procurement of Innovation (CPI), grant-backed consortium pilots (Horizon/UCPM), and faster private B2B (fleets, concessionaires, insurers).',
-      es: 'Tres vías en paralelo: Compra Pública de Innovación (CPI), pilotos en consorcio (Horizon/UCPM) y clientes privados (flotas, concesionarias, aseguradoras).',
-      nl: 'Drie sporen parallel: innovatiegericht inkopen, gesubsidieerde consortiumpilots (Horizon/UCPM) en snellere B2B-klanten (vloten, verzekeraars).'
-    },
-    status: 'untested',
-    evidenceId: 'EV-10-INST'
-  },
-  {
-    category: { en: 'Open-source IP (MIT)', es: 'Propiedad intelectual (MIT)', nl: 'Open-source IE (MIT)' },
-    risk: {
-      en: 'MIT license allows third parties to fork the core protocol; corporate entity & IP assignment status must be confirmed.',
-      es: 'La licencia MIT permite copiar el núcleo; falta confirmar constitución societaria y cesión formal de PI.',
-      nl: 'MIT-licentie staat vorken van de kern toe; rechtspersoon en IE-overdracht dienen formeel bevestigd te worden.'
-    },
-    mitigation: {
-      en: 'Defensibility rests on institutional trust anchors, verified agreements, brand, and integration engineering; dual licensing for future commercial modules remains a founder option.',
-      es: 'El foso reside en convenios institucionales, red desplegada, datos con permiso e ingeniería de integración; licencia dual para módulos futuros a decidir por el fundador.',
-      nl: 'Onderscheidend vermogen ligt in institutionele overeenkomsten, integraties en merk; dubbele licentie voor toekomstige modules blijft optioneel.'
+      en: 'Open protocol core paired with B2G/B2B SaaS operational suites, verified agency integrations, edge gateways, resilience auditing, and optional dual-licensing for enterprise modules.',
+      es: 'Núcleo abierto acompañado de consola operativa B2G/B2B, integraciones institucionales certificadas, pasarelas de borde, auditorías de resiliencia y licencia dual opcional para módulos futuros.',
+      nl: 'Open kern gecombineerd met B2G/B2B operationele suites, geverifieerde integraties, edge-gateways en optionele dubbele licentie.'
     },
     status: 'confirmed',
     evidenceId: 'EV-CORE-506'

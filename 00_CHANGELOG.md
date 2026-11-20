@@ -1,5 +1,17 @@
 # Changelog
 
+## SENDA · 20-11-2026 · Actualización integral de capacidades, vídeos multilingües con autodetección + subtítulos ES/EN/NL y orquestación en vibe coding (`feat/web-redesign-20261119`)
+
+**Entrada (fundador):** actualizar toda la web rediseñada con un tono enfocado en lo que SENDA sí construye (conservando solo las aclaraciones legales imprescindibles en servicios sensibles), incorporar todos los servicios, funciones, 5 papers científicos, 7 renders SVG y vídeos más completos con detección automática del idioma del navegador y subtítulos en español, inglés y neerlandés, y destacar SENDA como uno de los mayores proyectos de delegación y orquestación en vibe coding bajo dirección humana constante.
+
+**Procesamiento:**
+- **Reproductor `MediaVideo` multilingüe:** detección automática de `navigator.languages` / `navigator.language`, selección automática de pista de vídeo (`es`/`en`), activación automática de subtítulos en neerlandés para navegadores `nl`, controles en 1 clic de idioma y subtítulos (`No`/`ES`/`EN`/`NL`) y `preload="none"` para carga instantánea.
+- **Vídeos completos integrados:** `senda-m96-promo-{en,es}`, `senda-film-{en,es}`, `senda-m95-broadcast-special-{en,es}`, `senda-ruta-{en,es}`, `senda-m95-reel-blacksky-{en,es}`, `senda-m95-reel-math-{en,es}`, `senda-m95-role-citizen-{en,es}`, `senda-m95-role-developer-{en,es}`, demos 3D y `vision/dashcam.mp4` empaquetados también en `scripts/entrega/generar-entrega.mjs`.
+- **Catálogo completo + Ciencia + Vibe Coding:** 12 servicios interactivos filtrables (`SERVICE_CATALOG`), los 5 papers científicos (`/senda/papers/index.html` + fichas), los 7 renders vectoriales SVG (`/media/renders/*.svg`), separación de `data/product.ts` para mantener Home en `167.1 kB gz`, `favicon.ico` propio y sección destacada de delegación y orquestación en vibe coding bajo supervisión humana constante.
+- **Validación:** `tsc --noEmit` (0 errores), `117/117` tests unitarios, `check:locales` + `check:domain` en verde, Playwright (`38` vistas, `0` enlaces/medios rotos, `0` overflow, `0` errores de consola, autodetección `es-ES` y `nl-NL` verificada), Lighthouse Home **99 / 100 / 100 / 100** (LCP `1.66 s`, CLS `0.000`, TBT `77 ms`), y Hostinger ZIPs (`1-web-hostinger.zip` 89,92 MB + 4 ZIPs de películas HD < 68 MB) verificados en extracción limpia (`36/36` ficheros clave).
+
+---
+
 ## SENDA · 19-11-2026 · Rediseño completo de la web pública (`investor-next/`) — Fases 1 a 8 (`feat/web-redesign-20261119`)
 
 **Entrada (fundador):** rediseño integral de `investor-next/` con claridad editorial, Centro de Control interactivo estilo plataforma operativa, `EvidenceBadge` en cada cifra, 3 idiomas (ES/EN/NL), modo claro/oscuro, QA en 390/834/1440 px, Lighthouse ≥ 95 y ZIP listo para Hostinger.

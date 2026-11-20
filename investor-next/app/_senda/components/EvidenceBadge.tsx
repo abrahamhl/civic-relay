@@ -143,7 +143,7 @@ export default function EvidenceBadge({
             <dd>
               <code className="s-mono">{item.sha}</code> · <code className="s-mono">{item.id}</code>
             </dd>
-            <dt>{ui.limits}</dt>
+            <dt>{ui.scope}</dt>
             <dd>{item.limits[locale]}</dd>
           </dl>
 

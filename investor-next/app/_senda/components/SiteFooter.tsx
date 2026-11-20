@@ -136,7 +136,7 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
         <div className="s-footer-base">
           <span className="s-row" style={{ gap: 8 }}>
             <ShieldAlert size={14} aria-hidden="true" />
-            <span>{f.noEmergency}</span>
+            <span>{f.legalNotice}</span>
           </span>
           <span className="s-mono s-num">
             {f.buildLabel}: v0.1.0 · SHA {shaShort}

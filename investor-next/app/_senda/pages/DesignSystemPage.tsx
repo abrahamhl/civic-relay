@@ -63,7 +63,7 @@ export default function DesignSystemPage({ locale = 'es' }: { locale?: Locale })
         <div className="s-container s-stack-lg">
           <h2 className="s-h2">EvidenceBadge (5 estados interactivos)</h2>
           <p className="s-muted s-read">
-            Pulsa cualquier etiqueta para abrir su hoja nativa de procedencia (&lt;dialog closedby=&quot;any&quot;&gt;) con fuente, fecha, método, SHA y límites.
+            Pulsa cualquier etiqueta para abrir su hoja nativa de procedencia (&lt;dialog closedby=&quot;any&quot;&gt;) con fuente, fecha, método, SHA y alcance.
           </p>
           <div className="s-grid s-grid-3">
             {STATUSES.map((st) => {

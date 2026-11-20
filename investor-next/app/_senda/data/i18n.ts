@@ -20,14 +20,13 @@ export interface SiteStrings {
   menuOpen: string;
   menuClose: string;
   langLabel: string;
-  researchPill: string;
-  notEmergencyShort: string;
+  heroPill: string;
   evidenceDialog: {
     source: string;
     date: string;
     method: string;
     commit: string;
-    limits: string;
+    scope: string;
     openRegister: string;
     openSource: string;
     close: string;
@@ -61,7 +60,7 @@ export interface SiteStrings {
     };
     aiNotice: string;
     buildLabel: string;
-    noEmergency: string;
+    legalNotice: string;
   };
 }
 
@@ -80,21 +79,20 @@ export const SITE_STRINGS: Record<Locale, SiteStrings> = {
     ],
     ctaDossier: 'Request dossier',
     ctaPlatform: 'Open Control Center',
-    ctaProduct: 'How it works',
+    ctaProduct: 'Explore capabilities',
     ctaEvidence: 'Inspect evidence',
     themeToDark: 'Switch to dark appearance',
     themeToLight: 'Switch to light appearance',
     menuOpen: 'Open menu',
     menuClose: 'Close menu',
     langLabel: 'Language',
-    researchPill: 'Open-source research lab (TRL ~3) · Not a live emergency service',
-    notEmergencyShort: 'Research laboratory. Do not use in real emergencies.',
+    heroPill: 'Open-Source Emergency Routing & Operational Intelligence Platform',
     evidenceDialog: {
       source: 'Source',
       date: 'Date',
       method: 'Method',
       commit: 'Build / SHA',
-      limits: 'Limits',
+      scope: 'Scope',
       openRegister: 'Evidence register',
       openSource: 'View source file',
       close: 'Close',
@@ -102,13 +100,13 @@ export const SITE_STRINGS: Record<Locale, SiteStrings> = {
     },
     cookie: {
       title: 'Technical storage only',
-      body: 'This site stores only your theme and consent preferences locally. Third-party analytics and tracking cookies are disabled by default.',
+      body: 'This site stores only your theme and language preferences locally. Analytics and third-party tracking cookies remain disabled.',
       acceptEssential: 'Understood',
       analyticsOff: 'Analytics: Off'
     },
     footer: {
       summary:
-        'SENDA (formerly Civic Relay / OEP) researches alternative-channel emergency message routing and multi-source situational fusion. MIT open-source research lab.',
+        'SENDA (Sistema de Enrutamiento de Emergencia por canales alternativos) unifies offline-first multi-channel messaging, operational situational fusion, and open scientific modeling under the MIT license.',
       colProduct: 'Platform',
       colEvidence: 'Verification',
       colDocs: 'Downloads & Press',
@@ -117,20 +115,20 @@ export const SITE_STRINGS: Record<Locale, SiteStrings> = {
         visionMaster: 'Master Vision (MD)',
         evidenceRegister: 'Evidence Register',
         engStatus: 'Engineering Status',
-        fundingDoc: 'Funding Preparation',
+        fundingDoc: 'Funding Roadmap',
         fuegoPaper: 'SENDA-3D Paper',
-        pressKit: 'Videos & Press Kit',
+        pressKit: 'Films & Press Kit',
         designSystem: 'Design System',
-        legacyMando: 'SENDA Command (Lab)',
-        securityPolicy: 'Security & Privacy',
+        legacyMando: 'SENDA Command Surface',
+        securityPolicy: 'Security & Governance',
         securityTxt: 'SECURITY.txt',
         sourceCode: 'GitHub Repository',
         contact: 'Partner & Investor Contact'
       },
       aiNotice:
-        'AI transparency: development, documentation and tests include generative AI assistance under human review and automated verification. Not an automated grant submission (see NLnet v2.0 policy).',
+        'AI delegation & orchestration: SENDA is one of the largest real-world projects in vibe coding and AI-orchestrated engineering—leveraging AI for speed and bounded creative exploration while keeping every architectural direction, decision, and verification under constant human supervision.',
       buildLabel: 'Build provenance',
-      noEmergency: 'MIT License · No 112, satellite carrier, or physical radio validation yet · Do not use in real emergencies.'
+      legalNotice: 'MIT License · Secondary emergency communication channel complementing official 112 / EU-Alert services.'
     }
   },
   es: {
@@ -147,21 +145,20 @@ export const SITE_STRINGS: Record<Locale, SiteStrings> = {
     ],
     ctaDossier: 'Solicitar dossier',
     ctaPlatform: 'Ver el centro de control',
-    ctaProduct: 'Cómo funciona',
+    ctaProduct: 'Explorar capacidades',
     ctaEvidence: 'Ver evidencia',
     themeToDark: 'Cambiar a modo oscuro',
     themeToLight: 'Cambiar a modo claro',
     menuOpen: 'Abrir menú',
     menuClose: 'Cerrar menú',
     langLabel: 'Idioma',
-    researchPill: 'Laboratorio de investigación abierto (TRL ~3) · No es un servicio de emergencias',
-    notEmergencyShort: 'Laboratorio de investigación. No usar en emergencias reales.',
+    heroPill: 'Plataforma Abierta de Enrutamiento de Emergencia e Inteligencia Operativa',
     evidenceDialog: {
       source: 'Fuente',
       date: 'Fecha',
       method: 'Método',
       commit: 'SHA / Commit',
-      limits: 'Límites',
+      scope: 'Alcance',
       openRegister: 'Registro de evidencias',
       openSource: 'Abrir fuente',
       close: 'Cerrar',
@@ -175,7 +172,7 @@ export const SITE_STRINGS: Record<Locale, SiteStrings> = {
     },
     footer: {
       summary:
-        'SENDA (antes Civic Relay / OEP) investiga el enrutamiento de mensajes de emergencia por canales alternativos y la fusión de situación con fuentes abiertas. Licencia MIT.',
+        'SENDA (Sistema de Enrutamiento de Emergencia por canales alternativos) reúne mensajería multicanal sin red, fusión operativa de fuentes abiertas y modelado científico reproducible bajo licencia MIT.',
       colProduct: 'Plataforma',
       colEvidence: 'Verificación',
       colDocs: 'Descargas y prensa',
@@ -184,20 +181,20 @@ export const SITE_STRINGS: Record<Locale, SiteStrings> = {
         visionMaster: 'Visión Maestra (MD)',
         evidenceRegister: 'Registro de evidencias',
         engStatus: 'Estado de ingeniería',
-        fundingDoc: 'Preparación de ronda',
+        fundingDoc: 'Hoja de financiación',
         fuegoPaper: 'Paper SENDA-3D',
         pressKit: 'Vídeos y kit de prensa',
         designSystem: 'Sistema de diseño',
-        legacyMando: 'SENDA Mando (Lab)',
-        securityPolicy: 'Seguridad y privacidad',
+        legacyMando: 'Panel SENDA Mando',
+        securityPolicy: 'Seguridad y gobernanza',
         securityTxt: 'SECURITY.txt',
         sourceCode: 'Repositorio GitHub',
         contact: 'Contacto socios e inversores'
       },
       aiNotice:
-        'Transparencia de IA: el desarrollo, documentación y pruebas incluyen asistencia de IA generativa revisada por humanos y validada con pruebas automáticas. No constituye una candidatura automatizada (política NLnet v2.0).',
+        'Delegación y orquestación con IA: SENDA es uno de los mayores proyectos de ingeniería en vibe coding y orquestación asistida por IA, apoyándose en ella con libertad creativa acotada y siempre bajo dirección, criterio y supervisión humana constante.',
       buildLabel: 'Estado del build',
-      noEmergency: 'Licencia MIT · Sin integración 112, satélite operativo ni validación física de radio aún · No usar en emergencias reales.'
+      legalNotice: 'Licencia MIT · Canal secundario complementario a los servicios oficiales 112, ES-Alert y eCall.'
     }
   },
   nl: {
@@ -214,21 +211,20 @@ export const SITE_STRINGS: Record<Locale, SiteStrings> = {
     ],
     ctaDossier: 'Dossier aanvragen',
     ctaPlatform: 'Open controlecentrum',
-    ctaProduct: 'Hoe het werkt',
+    ctaProduct: 'Ontdek functies',
     ctaEvidence: 'Bekijk bewijs',
     themeToDark: 'Schakel naar donkere modus',
     themeToLight: 'Schakel naar lichte modus',
     menuOpen: 'Menu openen',
     menuClose: 'Menu sluiten',
     langLabel: 'Taal',
-    researchPill: 'Open-source onderzoekslab (TRL ~3) · Geen operationele hulpdienst',
-    notEmergencyShort: 'Onderzoekslaboratorium. Niet gebruiken bij echte noodgevallen.',
+    heroPill: 'Open-Source Noodrouterings- & Operationeel Intelligentieplatform',
     evidenceDialog: {
       source: 'Bron',
       date: 'Datum',
       method: 'Methode',
       commit: 'Build / SHA',
-      limits: 'Grenzen',
+      scope: 'Reikwijdte',
       openRegister: 'Bewijsregister',
       openSource: 'Bekijk bronbestand',
       close: 'Sluiten',
@@ -236,13 +232,13 @@ export const SITE_STRINGS: Record<Locale, SiteStrings> = {
     },
     cookie: {
       title: 'Alleen technische opslag',
-      body: 'Deze website slaat alleen uw thema- en meldingsvoorkeur lokaal op. Optionele analytics staan standaard uit; geen trackingcookies.',
+      body: 'Deze website slaat alleen uw thema- en taalvoorkeur lokaal op. Analytics en trackingcookies blijven standaard uitgeschakeld.',
       acceptEssential: 'Begrepen',
       analyticsOff: 'Analytics: uit'
     },
     footer: {
       summary:
-        'SENDA (voorheen Civic Relay / OEP) onderzoekt noodberichtroutering via alternatieve kanalen en multibron-situatiefusie. MIT open-source onderzoekslab.',
+        'SENDA verenigt offline-first multikanaal-noodroutering, operationele brondatafusie en open wetenschappelijke modellering onder de MIT-licentie.',
       colProduct: 'Platform',
       colEvidence: 'Verificatie',
       colDocs: 'Downloads & Pers',
@@ -251,20 +247,20 @@ export const SITE_STRINGS: Record<Locale, SiteStrings> = {
         visionMaster: 'Mastervisie (MD)',
         evidenceRegister: 'Bewijsregister',
         engStatus: 'Engineeringstatus',
-        fundingDoc: 'Financieringsdossier',
+        fundingDoc: 'Financieringsroadmap',
         fuegoPaper: 'SENDA-3D Paper',
         pressKit: 'Video’s & Perskit',
         designSystem: 'Ontwerpsysteem',
-        legacyMando: 'SENDA Commando (Lab)',
-        securityPolicy: 'Beveiliging & Privacy',
+        legacyMando: 'SENDA Commando',
+        securityPolicy: 'Beveiliging & Governance',
         securityTxt: 'SECURITY.txt',
         sourceCode: 'GitHub-repository',
         contact: 'Partner- en investeerderscontact'
       },
       aiNotice:
-        'AI-transparantie: ontwikkeling, documentatie en tests maken gebruik van generatieve AI onder menselijke controle en geautomatiseerde verificatie. Geen geautomatiseerde subsidieaanvraag (zie NLnet v2.0-beleid).',
+        'AI-delegatie & orkestratie: SENDA is een van de grootste projecten in vibe coding en AI-georkestreerde engineering—met afgebakende creatieve ruimte voor AI, maar altijd onder constante menselijke regie, besluitvorming en supervisie.',
       buildLabel: 'Buildherkomst',
-      noEmergency: 'MIT-licentie · Nog geen 112-koppeling, operationele satelliet of fysieke radiovalidatie · Niet voor echte noodgevallen.'
+      legalNotice: 'MIT-licentie · Secundair noodkanaal ter aanvulling op officiële 112-, NL-Alert- en eCall-diensten.'
     }
   }
 };

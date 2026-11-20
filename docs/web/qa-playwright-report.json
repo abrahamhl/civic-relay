@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-19T23:05:09.855Z",
+  "generatedAt": "2026-11-20T00:31:31.030Z",
   "viewports": [
     390,
     834,
@@ -9,10 +9,12 @@
   "brokenLinks": [],
   "overflowFailures": [],
   "consoleErrors": [],
-  "homeJsGzKb": 166.1,
+  "homeJsGzKb": 167.1,
   "interactions": {
     "evidenceBadgeDialog": "PASS",
     "darkModeToggle": "PASS",
+    "browserLocalizedVideoAndSubtitles": "PASS",
+    "browserLocaleAutoDetectEsAndNl": "PASS",
     "commandPalette": "PASS",
     "guidedTour6Steps": "PASS",
     "correlationGraph": "PASS",

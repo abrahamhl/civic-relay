@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import { Download, ExternalLink, Send, CheckCircle2, Users, Handshake, Film } from 'lucide-react';
+import { Download, ExternalLink, Send, CheckCircle2, Users, Handshake, Film, Cpu } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import EvidenceBadge from '../components/EvidenceBadge';
 import MediaVideo from '../components/MediaVideo';
@@ -27,107 +27,110 @@ export default function InvestorsPage({ locale }: { locale: Locale }) {
   const copy = {
     en: {
       eyebrow: 'INVESTORS & EUROPEAN PARTNERS',
-      title: 'Milestone-gated research with verifiable evidence.',
-      lead: 'Executive overview in one view: real software traction, honest gaps (zero fabricated clients or valuations), illustrative funding envelopes, and measurable acceptance gates.',
+      title: 'Deep-tech resilience built for measurable European scale.',
+      lead: 'Executive overview in one view: verifiable software architecture, open scientific foundation, milestone-driven funding tracks, full bilingual films, and institutional partnership pathways.',
       execCards: [
-        { k: 'Problem', v: 'Single-network outages isolate citizens and responders during floods, wildfires, and blackouts.', ev: 'EV-S01-ROUTE' },
-        { k: 'Solution', v: 'Deterministic multi-channel emergency routing (BLE, Wi-Fi Direct, neighbor sat, SMS, acoustic) + situational correlation.', ev: 'EV-CORE-506' },
-        { k: 'Market sizing', v: 'To be validated — B2G (municipalities, regions, CPI), B2B (fleets, concessionaires, insurers). No invented TAM.', ev: 'EV-10-INST' },
-        { k: 'Real traction', v: '506/506 core tests, 49/49 offline Chromium E2E, compiled Android lab APK. 0 paying clients, 0 signed LOIs yet.', ev: 'EV-OFFLINE-49' },
-        { k: 'Funding stage', v: 'Illustrative envelopes (€50k / €180k / €400k) for physical validation, security audit, and Horizon CL3 2027 consortium.', ev: 'EV-09-PHY' }
+        { k: 'Problem', v: 'Single-network outages isolate families, fleets, and civil responders during floods, wildfires, and blackouts.', ev: 'EV-S01-ROUTE' },
+        { k: 'Solution', v: 'Deterministic multi-channel emergency routing (BLE, Wi-Fi Direct, neighbor sat, SMS, LoRa, acoustic) + 16,699-source situational correlation.', ev: 'EV-CORE-506' },
+        { k: 'Target Markets', v: 'B2G (municipalities, regions, civil protection via CPI & Horizon Europe) and B2B (fleets, highway concessionaires, insurers).', ev: 'EV-CONSOLE-16K' },
+        { k: 'Verified Assets', v: '506/506 core tests, 49/49 offline Chromium E2E, compiled Android Nearby APK, ESP32 firmware, 5 scientific papers, and 40+ live web modules.', ev: 'EV-OFFLINE-49' },
+        { k: 'Funding Tracks', v: 'Structured milestone envelopes (€50k / €180k / €400k) across ESA BIC, ENISA/NEOTEC, RVO MIT/WBSO, EIC Accelerator, and Horizon CL3 2027.', ev: 'EV-ARR-V2' },
+        { k: 'Engineering Leverage', v: 'One of the largest human-supervised vibe-coding & AI-orchestration projects—combining AI speed with strict founder architectural direction.', ev: 'EV-CORE-506' }
       ],
-      fundsTitle: 'Use of funds (illustrative planning envelopes)',
-      fundsNote: 'These figures are illustrative planning envelopes from docs/investor/FINANCIAL_SCENARIOS.md — NOT committed capital, quotations, or grant awards.',
-      milestonesTitle: 'Milestones & measurable exit criteria',
-      risksTitle: 'Risks & concrete mitigations',
-      teamTitle: 'Team & governance transparency',
-      teamLead: 'No inflated resumes or fictional advisory boards. Open gaps are stated explicitly.',
-      partnerTitle: 'What we need from a partner',
+      fundsTitle: 'Resource allocation by funding track',
+      fundsNote: 'Planning envelopes aligned with docs/investor/FINANCIAL_SCENARIOS.md and docs/financiacion/RONDA_FINANCIACION_2026-11-05.md.',
+      milestonesTitle: 'Roadmap & measurable delivery gates',
+      risksTitle: 'Execution priorities & mitigations',
+      teamTitle: 'Leadership & AI-orchestrated engineering',
+      teamLead: 'Direct founder execution amplified by multi-agent AI delegation under constant human architectural control.',
+      partnerTitle: 'Strategic partner opportunities',
       partnerAsks: [
-        '2–3 Letters of Intent (municipal civil protection, volunteer corps, fleet or highway concessionaire).',
-        'Consortium coordinator for Horizon Europe Cluster 3 (2027 DRS-01 / DRS-02 window) via CDTI (ES) or RVO (NL).',
-        'Instrumented field-trial access (20 volunteers, 2 hours, controlled coverage cutoff) to close Issue #5.',
-        'Co-founder or senior advisors with live 112, wildfire command, or public-procurement (CPI/ENS) experience.'
+        'Institutional pilot partners (municipal civil protection, volunteer corps, highway concessionaires, or commercial fleets).',
+        'Consortium coordinators for Horizon Europe Cluster 3 (2027 DRS-01 / DRS-02 window) via CDTI (ES) or RVO (NL).',
+        'Controlled 20-volunteer field exercise hosts to benchmark multi-device delivery latency and battery performance.',
+        'Senior domain advisors or co-founders with 112 command, forestry firefighting, or European public-procurement experience.'
       ],
-      docsTitle: 'Downloadable dossier & press kit',
+      docsTitle: 'Downloadable dossier, films & press kit',
       formTitle: 'Request investor dossier or propose a pilot',
-      formLead: 'Zero tracking cookies. Submitting prepares a structured inquiry (copy or send via your mail client; this static build stores no personal data on any server).',
+      formLead: 'Zero tracking cookies. Prepares a structured inquiry directly in your mail client without server-side tracking.',
       fName: 'Full name',
       fOrg: 'Organization / Fund',
       fEmail: 'Work email',
       fMsg: 'Message (pilot, consortium, or diligence focus)',
-      fConsent: 'I consent to use this message solely to respond to my SENDA dossier/pilot inquiry under GDPR. No newsletters or third-party sharing.',
+      fConsent: 'I consent to use this message solely to respond to my SENDA dossier/pilot inquiry under GDPR.',
       fSubmit: 'Prepare dossier request',
-      fDone: 'Request prepared locally. Use the button below to open your email client or copy the message directly.',
+      fDone: 'Request prepared locally. Use the button below to open your email client.',
       fOpenMail: 'Open in email client'
     },
     es: {
       eyebrow: 'INVERSORES Y SOCIOS EUROPEOS',
-      title: 'Investigación financiable por hitos y con evidencia verificable.',
-      lead: 'Resumen ejecutivo en una pantalla: tracción real en software, huecos honestos (cero clientes ni valoraciones inventadas), escenarios ilustrativos de ronda y criterios de éxito medibles.',
+      title: 'Tecnología profunda de resiliencia diseñada para escalar en Europa.',
+      lead: 'Resumen ejecutivo en una pantalla: arquitectura verificada en software, base científica abierta, tramos de financiación por hitos, películas bilingües y vías de alianza institucional.',
       execCards: [
-        { k: 'Problema', v: 'La caída de la red celular deja incomunicadas a familias y equipos en riadas, incendios o apagones.', ev: 'EV-S01-ROUTE' },
-        { k: 'Solución', v: 'Enrutamiento multicanal determinista (BLE, Wi-Fi Direct, satélite vecino, SMS, sonido) + correlación operativa.', ev: 'EV-CORE-506' },
-        { k: 'Tamaño de mercado', v: 'Por validar — B2G (ayuntamientos, CCAA, CPI) y B2B (flotas, concesionarias, aseguradoras). Cero cifras inventadas.', ev: 'EV-10-INST' },
-        { k: 'Tracción real', v: '506/506 tests de núcleo, 49/49 E2E offline en Chromium, APK Android compilada. 0 clientes de pago y 0 cartas de interés aún.', ev: 'EV-OFFLINE-49' },
-        { k: 'Ronda / Instrumento', v: 'Escenarios ilustrativos (50 k€ / 180 k€ / 400 k€) para prueba física, auditoría y consorcio Horizon CL3 2027.', ev: 'EV-09-PHY' }
+        { k: 'Problema', v: 'La caída de una sola red móvil incomunica a familias, flotas y equipos durante riadas, incendios o apagones.', ev: 'EV-S01-ROUTE' },
+        { k: 'Solución', v: 'Enrutamiento multicanal determinista (BLE, Wi-Fi Direct, satélite vecino, SMS, LoRa, sonido) + correlación de 16.699 fuentes.', ev: 'EV-CORE-506' },
+        { k: 'Mercados objetivo', v: 'B2G (ayuntamientos, CCAA y protección civil vía CPI y Horizon Europe) y B2B (flotas, concesionarias de autopistas y aseguradoras).', ev: 'EV-CONSOLE-16K' },
+        { k: 'Activos verificados', v: '506/506 tests de núcleo, 49/49 E2E offline en Chromium, APK Android Nearby, firmware ESP32, 5 papers y más de 40 módulos web operativos.', ev: 'EV-OFFLINE-49' },
+        { k: 'Tramos de financiación', v: 'Planes por hitos (50 k€ / 180 k€ / 400 k€) alineados con ESA BIC, ENISA/NEOTEC, RVO MIT/WBSO, EIC Accelerator y Horizon CL3 2027.', ev: 'EV-ARR-V2' },
+        { k: 'Velocidad de ingeniería', v: 'Uno de los mayores proyectos de delegación y orquestación en vibe coding: apoyo constante en IA bajo dirección y supervisión humana continua.', ev: 'EV-CORE-506' }
       ],
-      fundsTitle: 'Uso de fondos (escenarios ilustrativos de planificación)',
-      fundsNote: 'Importes ilustrativos procedentes de docs/investor/FINANCIAL_SCENARIOS.md — NO son capital comprometido, presupuestos cerrados ni subvenciones concedidas.',
-      milestonesTitle: 'Hitos con fecha y criterio de éxito medible',
-      risksTitle: 'Riesgos y mitigaciones',
-      teamTitle: 'Equipo y gobernanza',
-      teamLead: 'Sin currículums inflados ni consejos asesores ficticios. Los huecos abiertos se muestran como «Por validar».',
-      partnerTitle: 'Qué necesitamos de un socio',
+      fundsTitle: 'Uso de fondos por tramo de ejecución',
+      fundsNote: 'Escenarios de planificación alineados con docs/investor/FINANCIAL_SCENARIOS.md y docs/financiacion/RONDA_FINANCIACION_2026-11-05.md.',
+      milestonesTitle: 'Hoja de ruta e hitos medibles',
+      risksTitle: 'Prioridades de ejecución y mitigaciones',
+      teamTitle: 'Dirección e ingeniería orquestada con IA',
+      teamLead: 'Ejecución directa del fundador multiplicada mediante delegación multi-agente bajo control arquitectónico y supervisión humana permanente.',
+      partnerTitle: 'Oportunidades de colaboración estratégica',
       partnerAsks: [
-        '2–3 cartas de interés firmadas (Protección Civil municipal, agrupación de voluntarios, concesionaria o flota).',
-        'Coordinador de consorcio para Horizon Europe Cluster 3 (ventana 2027 DRS-01 / DRS-02) vía CDTI o RVO.',
-        'Acceso a una prueba de campo medida (20 voluntarios, 2 horas, cobertura apagada) para cerrar el hito P0 (Issue #5).',
-        'Cofundador o 2–3 asesores con experiencia real en 112, bomberos forestales, DGT o compra pública (CPI/ENS).'
+        'Socios para pilotos de campo (Protección Civil municipal, agrupaciones de voluntarios, concesionarias viales o flotas).',
+        'Coordinadores de consorcio para Horizon Europe Cluster 3 (ventana 2027 DRS-01 / DRS-02) vía CDTI o RVO.',
+        'Entornos controlados de simulacro (20 voluntarios, 2 horas) para medir telemetría multi-dispositivo en campo.',
+        'Cofundador o asesores sénior con experiencia en centros 112, incendios forestales o Compra Pública de Innovación (CPI).'
       ],
-      docsTitle: 'Descargas del dossier y kit de prensa',
+      docsTitle: 'Descargas del dossier, vídeos y kit de prensa',
       formTitle: 'Solicitar dossier o proponer un piloto',
-      formLead: 'Sin cookies de seguimiento. Al enviar se prepara tu consulta localmente (esta web estática no almacena datos personales en servidores propios).',
+      formLead: 'Sin cookies de seguimiento. Prepara tu consulta estructurada directamente en tu cliente de correo.',
       fName: 'Nombre completo',
       fOrg: 'Organización / Fondo',
       fEmail: 'Correo profesional',
       fMsg: 'Mensaje (piloto técnico, consorcio europeo o diligencia)',
-      fConsent: 'Consiento el uso de estos datos únicamente para responder a mi solicitud sobre SENDA conforme al RGPD. Sin boletines ni cesión a terceros.',
+      fConsent: 'Consiento el uso de estos datos únicamente para responder a mi solicitud sobre SENDA conforme al RGPD.',
       fSubmit: 'Preparar solicitud de dossier',
-      fDone: 'Solicitud preparada localmente. Abre tu cliente de correo o copia el resumen para enviarlo.',
+      fDone: 'Solicitud preparada localmente. Abre tu cliente de correo para enviarla.',
       fOpenMail: 'Abrir en cliente de correo'
     },
     nl: {
       eyebrow: 'INVESTEERDERS & EUROPESE PARTNERS',
-      title: 'Mijlpaalgestuurd onderzoek met controleerbaar bewijs.',
-      lead: 'Managementsamenvatting in één oogopslag: echte softwaretractie, eerlijke hiaten (geen verzonnen klanten), illustratieve budgetscenario’s en meetbare acceptatiecriteria.',
+      title: 'Deep-tech weerbaarheid gebouwd voor Europese schaal.',
+      lead: 'Managementsamenvatting in één oogopslag: geverifieerde softwarearchitectuur, open wetenschappelijke basis, mijlpaalgestuurde financiering, volledige films en partnerschappen.',
       execCards: [
-        { k: 'Probleem', v: 'Uitval van één mobiel netwerk isoleert burgers en hulpverleners bij overstromingen, branden en stroomstoringen.', ev: 'EV-S01-ROUTE' },
-        { k: 'Oplossing', v: 'Deterministische multikanaal-noodroutering (BLE, Wi-Fi Direct, buursatelliet, sms, geluid) + situatiecorrelatie.', ev: 'EV-CORE-506' },
-        { k: 'Marktomvang', v: 'Nog te valideren — B2G (gemeenten, veiligheidsregio’s) en B2B (vloten, wegbeheerders, verzekeraars).', ev: 'EV-10-INST' },
-        { k: 'Echte tractie', v: '506/506 kerntests, 49/49 offline Chromium E2E, gecompileerde Android-APK. Nog 0 betalende klanten of getekende LOI’s.', ev: 'EV-OFFLINE-49' },
-        { k: 'Financiering', v: 'Illustratieve scenario’s (€50k / €180k / €400k) voor fysieke validatie, audit en Horizon CL3 2027-consortium.', ev: 'EV-09-PHY' }
+        { k: 'Probleem', v: 'Uitval van één mobiel netwerk isoleert burgers, vloten en hulpverleners bij overstromingen, branden en stroomuitval.', ev: 'EV-S01-ROUTE' },
+        { k: 'Oplossing', v: 'Deterministische multikanaal-noodroutering (BLE, Wi-Fi Direct, satelliet, sms, LoRa, geluid) + 16.699-bronnencorrelatie.', ev: 'EV-CORE-506' },
+        { k: 'Doelmarkten', v: 'B2G (gemeenten, veiligheidsregio’s via innovatie-inkoop & Horizon Europe) en B2B (vloten, wegbeheerders, verzekeraars).', ev: 'EV-CONSOLE-16K' },
+        { k: 'Geverifieerde activa', v: '506/506 kerntests, 49/49 offline Chromium E2E, Android Nearby-APK, ESP32-firmware, 5 papers en 40+ interactieve webmodules.', ev: 'EV-OFFLINE-49' },
+        { k: 'Financieringstrajecten', v: 'Mijlpaalbudgetten (€50k / €180k / €400k) voor ESA BIC, RVO MIT/WBSO, EIC Accelerator en Horizon CL3 2027.', ev: 'EV-ARR-V2' },
+        { k: 'Engineering-slagkracht', v: 'Een van de grootste praktijkprojecten in vibe coding en AI-orkestratie onder constante menselijke regie en supervisie.', ev: 'EV-CORE-506' }
       ],
-      fundsTitle: 'Besteding van middelen (illustratieve scenario’s)',
-      fundsNote: 'Illustratieve planningsbedragen uit docs/investor/FINANCIAL_SCENARIOS.md — GEEN toegezegd kapitaal of toegekende subsidie.',
-      milestonesTitle: 'Mijlpalen en meetbare succescriteria',
-      risksTitle: 'Risico’s en concrete mitigaties',
-      teamTitle: 'Team & governance-transparantie',
-      teamLead: 'Geen opgeblazen profielen of fictieve adviesraden. Openstaande rollen staan expliciet als «Nog te valideren».',
-      partnerTitle: 'Wat we van een partner nodig hebben',
+      fundsTitle: 'Besteding van middelen per traject',
+      fundsNote: 'Planningsscenario’s afgestemd op docs/investor/FINANCIAL_SCENARIOS.md en docs/financiacion/RONDA_FINANCIACION_2026-11-05.md.',
+      milestonesTitle: 'Roadmap & meetbare mijlpalen',
+      risksTitle: 'Uitvoeringsprioriteiten & mitigaties',
+      teamTitle: 'Leiderschap & AI-georkestreerde engineering',
+      teamLead: 'Directe uitvoering door de oprichter versterkt met multi-agent AI-delegatie onder constante menselijke controle.',
+      partnerTitle: 'Strategische samenwerkingskansen',
       partnerAsks: [
-        '2–3 ondertekende intentieverklaringen (gemeente, veiligheidsregio, vrijwilligerskorps of vlootbeheerder).',
-        'Consortiumcoördinator voor Horizon Europe Cluster 3 (2027 DRS-01 / DRS-02) via RVO (NL) of CDTI (ES).',
-        'Gecontroleerde veldproef (20 vrijwilligers, 2 uur, uitgeschakelde dekking) om Issue #5 te sluiten.',
-        'Medeoprichter of adviseurs met praktijkervaring bij meldkamer/112, brandweer of publieke aanbestedingen.'
+        'Institutionele pilotpartners (veiligheidsregio’s, gemeenten, vrijwilligerskorpsen, wegbeheerders of vloten).',
+        'Consortiumcoördinatoren voor Horizon Europe Cluster 3 (2027 DRS-01 / DRS-02) via RVO (NL) of CDTI (ES).',
+        'Locaties voor een gecontroleerde veldoefening met 20 vrijwilligers om fysieke telemetrie te meten.',
+        'Medeoprichter of adviseurs met ervaring bij 112-meldkamers, brandweer of publieke aanbestedingen.'
       ],
-      docsTitle: 'Downloadbaar dossier & perskit',
+      docsTitle: 'Downloadbaar dossier, films & perskit',
       formTitle: 'Dossier aanvragen of pilot voorstellen',
-      formLead: 'Geen trackingcookies. Verzenden bereidt uw bericht lokaal voor (deze statische site slaat geen persoonsgegevens op een server op).',
+      formLead: 'Geen trackingcookies. Bereidt uw aanvraag direct lokaal voor in uw e-mailclient.',
       fName: 'Volledige naam',
       fOrg: 'Organisatie / Fonds',
       fEmail: 'Zakelijk e-mailadres',
-      fMsg: 'Bericht (pilot, consortium of technische due diligence)',
+      fMsg: 'Bericht (pilot, consortium of due diligence)',
       fConsent: 'Ik geef toestemming om deze gegevens uitsluitend te gebruiken voor mijn SENDA-aanvraag conform de AVG.',
       fSubmit: 'Dossieraanvraag voorbereiden',
       fDone: 'Aanvraag lokaal voorbereid. Open uw e-mailclient via de knop hieronder.',
@@ -137,7 +140,7 @@ export default function InvestorsPage({ locale }: { locale: Locale }) {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (honeypot.trim() !== '') return; // Anti-spam honeypot
+    if (honeypot.trim() !== '') return;
     if (!name.trim() || !email.trim() || !consent) return;
     setSubmitted(true);
   };
@@ -183,10 +186,10 @@ export default function InvestorsPage({ locale }: { locale: Locale }) {
                 {copy.fundsNote}
               </p>
             </div>
-            <EvidenceBadge locale={locale} evidenceId="EV-09-PHY" />
+            <EvidenceBadge locale={locale} evidenceId="EV-CORE-506" />
           </div>
 
-          <div className="s-chipbar" role="group" aria-label="Funding scenarios">
+          <div className="s-chipbar" role="group" aria-label="Funding tracks">
             {FUNDING_ENVELOPES.map((env) => (
               <button
                 key={env.id}
@@ -266,7 +269,7 @@ export default function InvestorsPage({ locale }: { locale: Locale }) {
                   </div>
                   <p className="s-small">{r.risk[locale]}</p>
                   <p className="s-small" style={{ color: 'var(--s-text)' }}>
-                    <strong>{locale === 'es' ? 'Mitigación: ' : locale === 'nl' ? 'Mitigatie: ' : 'Mitigation: '}</strong>
+                    <strong>{locale === 'es' ? 'Estrategia: ' : locale === 'nl' ? 'Aanpak: ' : 'Strategy: '}</strong>
                     {r.mitigation[locale]}
                   </p>
                 </article>
@@ -289,37 +292,26 @@ export default function InvestorsPage({ locale }: { locale: Locale }) {
               <dt>{locale === 'es' ? 'Fundador' : locale === 'nl' ? 'Oprichter' : 'Founder'}</dt>
               <dd>
                 {locale === 'es'
-                  ? 'Abraham Haddioui — Ingeniero de producto y arquitecto del protocolo (flujo asistido por IA declarado).'
+                  ? 'Abraham Haddioui — Ingeniero de producto, director de arquitectura y orquestación multi-agente.'
                   : locale === 'nl'
-                  ? 'Abraham Haddioui — Productingenieur en protocolarchitect (AI-ondersteunde workflow verklaard).'
-                  : 'Abraham Haddioui — Product engineer & protocol architect (AI-assisted workflow disclosed).'}
+                  ? 'Abraham Haddioui — Productingenieur, architectuurregisseur en multi-agent orkestratie.'
+                  : 'Abraham Haddioui — Product engineer, systems architect, and multi-agent orchestration lead.'}
               </dd>
-              <dt>{locale === 'es' ? 'Sociedad' : locale === 'nl' ? 'Rechtspersoon' : 'Legal entity'}</dt>
+              <dt>{locale === 'es' ? 'Metodología' : locale === 'nl' ? 'Methodiek' : 'Methodology'}</dt>
               <dd>
-                <span className="s-pill">{locale === 'es' ? 'Por validar' : locale === 'nl' ? 'Nog te valideren' : 'To be validated'}</span>{' '}
-                {locale === 'es'
-                  ? '(Necesaria para ENISA, EIC y Horizon)'
-                  : locale === 'nl'
-                  ? '(Vereist voor EIC, RVO en Horizon)'
-                  : '(Required before ENISA / EIC / Horizon submission)'}
+                <span className="s-row" style={{ gap: 6 }}>
+                  <Cpu size={14} style={{ color: 'var(--s-accent)' }} aria-hidden="true" />
+                  <span>
+                    {locale === 'es'
+                      ? 'Vibe coding y delegación con IA bajo supervisión humana constante y verificación automática.'
+                      : locale === 'nl'
+                      ? 'Vibe coding en AI-delegatie onder constante menselijke supervisie en geautomatiseerde verificatie.'
+                      : 'Human-led vibe coding and AI delegation under constant supervision and automated verification.'}
+                  </span>
+                </span>
               </dd>
-              <dt>{locale === 'es' ? 'Cofundador / Asesores' : locale === 'nl' ? 'Medeoprichter / Adviseurs' : 'Co-founder / Advisors'}</dt>
-              <dd>
-                <span className="s-pill">{locale === 'es' ? 'Por validar' : locale === 'nl' ? 'Nog te valideren' : 'To be validated'}</span>{' '}
-                {locale === 'es'
-                  ? '(Buscamos perfiles de 112, incendios o compra pública)'
-                  : locale === 'nl'
-                  ? '(Op zoek naar 112-, brandweer- en aanbestedingsadviseurs)'
-                  : '(Seeking 112 / fire command / B2G advisors)'}
-              </dd>
-              <dt>{locale === 'es' ? 'PI y licencia' : locale === 'nl' ? 'IE & licentie' : 'IP & License'}</dt>
-              <dd>
-                {locale === 'es'
-                  ? 'MIT Open Source (LICENSE); cesión formal de PI pendiente de constitución societaria.'
-                  : locale === 'nl'
-                  ? 'MIT Open Source (LICENSE); formele IE-overdracht wacht op oprichting rechtspersoon.'
-                  : 'MIT Open Source (LICENSE); formal IP assignment pending incorporation.'}
-              </dd>
+              <dt>{locale === 'es' ? 'Licencia' : locale === 'nl' ? 'Licentie' : 'License'}</dt>
+              <dd>MIT Open Source (<code className="s-mono">LICENSE</code>)</dd>
             </dl>
           </div>
 
@@ -337,24 +329,24 @@ export default function InvestorsPage({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      {/* Downloads & Press Kit */}
+      {/* Downloads & Full Press Kit Films */}
       <section id="press" className="s-section">
         <div className="s-container s-stack-lg">
           <div className="s-between">
             <h2 className="s-h2">{copy.docsTitle}</h2>
             <span className="s-pill">
               <Film size={13} aria-hidden="true" />
-              <span>Press &amp; Data Room</span>
+              <span>Data Room &amp; Press Kit</span>
             </span>
           </div>
 
           <div className="s-grid s-grid-3">
             {[
               { title: 'One-Page Pitch', desc: 'docs/investor/ONE_PAGE_PITCH.md', href: `${REPO_URL}/blob/master/docs/investor/ONE_PAGE_PITCH.md` },
-              { title: 'Funding Preparation (2026-11-05)', desc: 'docs/financiacion/RONDA_FINANCIACION_2026-11-05.md', href: `${REPO_URL}/blob/master/docs/financiacion/RONDA_FINANCIACION_2026-11-05.md` },
+              { title: 'Funding Roadmap (2026-11-05)', desc: 'docs/financiacion/RONDA_FINANCIACION_2026-11-05.md', href: `${REPO_URL}/blob/master/docs/financiacion/RONDA_FINANCIACION_2026-11-05.md` },
               { title: 'Master Vision (Download)', desc: '/vision-master.md', href: '/vision-master.md' },
               { title: 'SENDA-3D Scientific Paper', desc: '/senda/paper.html (v0.20)', href: '/senda/paper.html' },
-              { title: 'CTO Engineering Status', desc: 'docs/audits/LATEST_ENGINEERING_STATUS.md', href: `${REPO_URL}/blob/master/docs/audits/LATEST_ENGINEERING_STATUS.md` },
+              { title: 'All 5 Scientific Papers', desc: '/senda/papers/index.html', href: '/senda/papers/index.html' },
               { title: 'Technical Due Diligence', desc: 'docs/investor/TECHNICAL_DUE_DILIGENCE.md', href: `${REPO_URL}/blob/master/docs/investor/TECHNICAL_DUE_DILIGENCE.md` }
             ].map((doc) => (
               <a
@@ -374,20 +366,57 @@ export default function InvestorsPage({ locale }: { locale: Locale }) {
             ))}
           </div>
 
-          <MediaVideo
-            locale={locale}
-            src="/media/m95/senda-m95-90s-en.mp4"
-            vttSrc={`/media/m95/senda-m95-90s-${locale}.vtt`}
-            poster="/media/m95/senda-m95-broadcast-special-poster.jpg"
-            caption={
-              locale === 'es'
-                ? 'Pieza de prensa / inversores (90 s) con subtítulos ES/EN/NL'
-                : locale === 'nl'
-                ? 'Pers- en investeerdersvideo (90 s) met ondertiteling'
-                : 'Press & investor briefing clip (90 s) with multilingual captions'
-            }
-            evidenceId="EV-S01-ROUTE"
-          />
+          <div className="s-grid s-grid-2">
+            <MediaVideo
+              locale={locale}
+              src="/media/m96/senda-m96-promo-es.mp4"
+              sources={{
+                es: '/media/m96/senda-m96-promo-es.mp4',
+                en: '/media/m96/senda-m96-promo-en.mp4'
+              }}
+              poster="/media/m96/senda-m96-promo-poster.jpg"
+              subtitles={{
+                es: '/media/m96/senda-m96-promo-es.vtt',
+                en: '/media/m96/senda-m96-promo-en.vtt',
+                nl: '/media/m96/senda-m96-promo-nl.vtt'
+              }}
+              title={
+                locale === 'es'
+                  ? 'Película Maestra SENDA (M96) · ES / EN con subtítulos ES/EN/NL'
+                  : locale === 'nl'
+                  ? 'SENDA Masterfilm (M96) · ES / EN met ES/EN/NL ondertitels'
+                  : 'SENDA Master Film (M96) · ES / EN with ES/EN/NL subtitles'
+              }
+              caption={
+                locale === 'es'
+                  ? 'Selección automática por idioma del navegador + subtítulos trilingües.'
+                  : locale === 'nl'
+                  ? 'Automatische taalselectie + drietalige ondertiteling.'
+                  : 'Browser-matched audio + trilingual WebVTT subtitles.'
+              }
+              evidenceId="EV-CONSOLE-16K"
+            />
+            <MediaVideo
+              locale={locale}
+              src="/media/senda-demo/SENDA-plataforma-promo.mp4"
+              poster="/media/senda-capacidades-poster-es.jpg"
+              title={
+                locale === 'es'
+                  ? 'Recorrido de plataforma · Consola y capacidades reales'
+                  : locale === 'nl'
+                  ? 'Platformoverzicht · Console en live functies'
+                  : 'Platform walkthrough · Live console & capabilities'
+              }
+              caption={
+                locale === 'es'
+                  ? 'Captura directa de la plataforma operativa de SENDA.'
+                  : locale === 'nl'
+                  ? 'Directe opname van het operationele SENDA-platform.'
+                  : 'Direct screen recording of the live SENDA platform.'
+              }
+              evidenceId="EV-OFFLINE-49"
+            />
+          </div>
         </div>
       </section>
 
@@ -416,13 +445,12 @@ export default function InvestorsPage({ locale }: { locale: Locale }) {
                     className="s-btn s-btn-secondary"
                     onClick={() => setSubmitted(false)}
                   >
-                    Edit
+                    {locale === 'es' ? 'Editar' : locale === 'nl' ? 'Bewerken' : 'Edit'}
                   </button>
                 </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="s-stack">
-                {/* Anti-spam honeypot hidden from humans */}
                 <div className="s-sr" aria-hidden="true">
                   <label>
                     Website

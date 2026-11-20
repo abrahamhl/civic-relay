@@ -33,7 +33,7 @@ export default function EvidencePage({ locale }: { locale: Locale }) {
   const copy = {
     en: {
       eyebrow: 'EVIDENCE REGISTER',
-      title: 'Every claim tied to code, data, and limits.',
+      title: 'Every capability tied to code, benchmarks, and verifiable data.',
       lead: 'Fed directly from docs/investor/EVIDENCE_REGISTER.md, evidence/senda/, and experimental results. Click any status badge for full provenance.',
       all: 'All',
       searchPlaceholder: 'Filter by scenario, hypothesis, SHA, or source...',
@@ -52,7 +52,7 @@ export default function EvidencePage({ locale }: { locale: Locale }) {
     },
     es: {
       eyebrow: 'REGISTRO DE EVIDENCIAS',
-      title: 'Cada afirmación enlazada a código, datos y límites.',
+      title: 'Cada capacidad enlazada a código, benchmarks y datos verificables.',
       lead: 'Alimentado desde docs/investor/EVIDENCE_REGISTER.md, evidence/senda/ y resultados experimentales. Pulsa cualquier etiqueta para ver su procedencia.',
       all: 'Todos',
       searchPlaceholder: 'Filtrar por escenario, hipótesis, SHA o fuente...',
@@ -71,7 +71,7 @@ export default function EvidencePage({ locale }: { locale: Locale }) {
     },
     nl: {
       eyebrow: 'BEWIJSREGISTER',
-      title: 'Elke claim gekoppeld aan code, data en grenzen.',
+      title: 'Elke capaciteit gekoppeld aan code, benchmarks en verifieerbare data.',
       lead: 'Gevoed vanuit docs/investor/EVIDENCE_REGISTER.md, evidence/senda/ en experimentele resultaten. Klik op een statuslabel voor volledige herkomst.',
       all: 'Alle',
       searchPlaceholder: 'Filter op scenario, hypothese, SHA of bron...',

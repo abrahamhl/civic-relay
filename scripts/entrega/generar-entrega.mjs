@@ -120,10 +120,24 @@ const dirty = (() => { try { return sh("git status --porcelain -- . ':!entrega'"
 rmSync(ZIPS, { recursive: true, force: true }); mkdirSync(ZIPS, { recursive: true });
 
 const web = walk(OUT).map((name) => ({ name, path: join(OUT, name) }));
-const USED_M95 = new Set(['media/m95/senda-m95-60s-en.mp4', 'media/m95/senda-m95-90s-en.mp4']);
+const USED_M95_M96 = new Set([
+  'media/m95/senda-m95-broadcast-special-en.mp4',
+  'media/m95/senda-m95-broadcast-special-es.mp4',
+  'media/m95/senda-m95-reel-blacksky-en.mp4',
+  'media/m95/senda-m95-reel-blacksky-es.mp4',
+  'media/m95/senda-m95-reel-math-en.mp4',
+  'media/m95/senda-m95-reel-math-es.mp4',
+  'media/m95/senda-m95-role-citizen-en.mp4',
+  'media/m95/senda-m95-role-citizen-es.mp4',
+  'media/m95/senda-m95-role-developer-en.mp4',
+  'media/m95/senda-m95-role-developer-es.mp4',
+  'media/m96/senda-m96-promo-en.mp4',
+  'media/m96/senda-m96-promo-es.mp4'
+]);
 const isOptionalLocalRender = (name) =>
-  (name.startsWith('media/m95/') && name.endsWith('.mp4') && !USED_M95.has(name)) ||
-  (name.startsWith('media/m96/') && name.endsWith('.mp4'));
+  (name.startsWith('media/m95/') || name.startsWith('media/m96/')) &&
+  name.endsWith('.mp4') &&
+  !USED_M95_M96.has(name);
 const webCore = web.filter((f) => !isOptionalLocalRender(f.name));
 const big = webCore.filter((f) => statSync(f.path).size > BIG), small = webCore.filter((f) => statSync(f.path).size <= BIG);
 const read = (f) => ({ name: f.name, data: readFileSync(f.path) });
