@@ -1,13 +1,13 @@
 /* SENDA Campo · service worker (raíz, alcance /senda): la app entera queda instalada en el teléfono y abre sin red.
    Está en la raíz porque el sitio usa URL limpias (/senda sin barra final). */
-const VERSION = 'senda-campo-v51';
+const VERSION = 'senda-campo-v52';
 const ASSETS = [
   '/senda', '/senda/app.css', '/senda/app.mjs', '/senda/db.mjs', '/senda/audio.mjs', '/senda/icon.svg', '/senda/manifest.webmanifest',
   '/senda/core/b64.mjs', '/senda/core/envelope.mjs', '/senda/core/bundle.mjs', '/senda/core/acoustic-modem.mjs', '/senda/core/zones.mjs', '/senda/core/feeds.mjs',
   '/senda/core/orbital.mjs', '/senda/core/router.mjs', '/senda/core/channels.mjs', '/senda/core/ladder.mjs', '/senda/core/brand.mjs', '/senda/core/rail-incident.mjs', '/senda/incidente', '/senda/core/rail-scenario.mjs',
   '/senda/edificios', '/senda/vendor/three-0.158.0.min.js', '/senda/core/building-twin.mjs', '/senda/core/building-scenario.mjs', '/senda/core/remote-command.mjs', '/senda/core/rubble.mjs', '/senda/core/roles.mjs',
   '/senda/coord.mjs', '/senda/organismo', '/senda/core/beacon.mjs',
-  '/senda/red', '/senda/explica', '/senda/explica-escenas.mjs', '/senda/explica-vivo.mjs', '/senda/explica-sinestesia.mjs', '/senda/data/tle/amsat-nasabare-2026-11-20.txt', '/senda/estado', '/senda/core/erasure.mjs', '/senda/core/bearers.mjs', '/senda/core/satellites.mjs', '/senda/core/blackout.mjs', '/senda/core/drone.mjs', '/senda/core/interop.mjs',
+  '/senda/red', '/senda/explica', '/senda/explica-escenas.mjs', '/senda/explica-vivo.mjs', '/senda/explica-sinestesia.mjs', '/senda/sala', '/senda/sala.mjs', '/senda/fonts/fonts.css', '/senda/fonts/inter-latin-wght-normal.woff2', '/senda/fonts/ibm-plex-mono-latin-400-normal.woff2', '/senda/data/tle/amsat-nasabare-2026-11-20.txt', '/senda/estado', '/senda/core/erasure.mjs', '/senda/core/bearers.mjs', '/senda/core/satellites.mjs', '/senda/core/blackout.mjs', '/senda/core/drone.mjs', '/senda/core/interop.mjs',
   '/senda/ojo', '/senda/incendio', '/senda/core/wildfire.mjs', '/geo/land-110m.json', '/senda/via', '/senda/core/rail-watch.mjs', '/senda/core/rail-watch-scenario.mjs', '/senda/core/occupancy.mjs', '/senda/core/rescue-scenario.mjs', '/senda/core/vision-layers.mjs', '/senda/core/sensor-fabric.mjs',
   '/senda/llamada', '/senda/core/sdp-compact.mjs', '/senda/dron', '/senda/core/rf-census.mjs', '/senda/arquitectura', '/senda/estado.json', '/senda/core/voice-mesh.mjs',
   '/senda/kit.mjs', '/senda/kit.css', '/senda/sentidos', '/senda/agua', '/senda/triaje', '/senda/monte', '/senda/barrido', '/senda/core/platforms.mjs', '/senda/core/flood-watch.mjs', '/senda/core/triage.mjs', '/senda/core/geo-offline.mjs', '/senda/core/senses.mjs', '/senda/core/house-sweep.mjs', '/senda/core/through-wall.mjs', '/senda/reserva', '/senda/core/net-reserve.mjs', '/senda/core/swarm-cache.mjs', '/senda/core/coverage-memory.mjs',

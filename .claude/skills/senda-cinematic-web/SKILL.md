@@ -33,6 +33,15 @@ Siempre: **coordinar hasta que llegan los servicios de emergencia, y ayudarles a
 - Etiquetas/pastillas en cada línea; emojis como iconografía principal; listas de viñetas como contenido central.
 - Ilustraciones genéricas o imágenes generadas presentadas como fotos.
 
+### Nivel profesional (corrección del fundador, 20-11-2026: «se nota que está hecho con IA»)
+- Tipografía autoalojada: **Inter** (interfaz y titulares, pesos 550–650, no 800) e **IBM Plex Mono** solo para cifras técnicas y huellas (`/senda/fonts/fonts.css`, OFL).
+- Antetítulos en caja normal, gris, sin espaciado ancho ni naranja monoespaciado. Nada de mayúsculas espaciadas como adorno.
+- Etiquetas de veracidad como texto con un cuadrado de color (sin pastilla, sin borde). Botón principal blanco sobre oscuro; esquinas de 6–8 px, no píldoras.
+- Para profesionales (bomberos, 112, Guardia Civil, CNI, integradores) la pieza que convence es **una pantalla de operador**, no un folleto:
+  rejilla densa, datos reales en el mapa, flujo de decisión, procedencia e integridad visibles. Referencia: **`/senda/sala`** (Sala de decisión, DANA real).
+- La tesis siempre explícita: SENDA es la capa de arriba; no toca los sistemas de nadie; prepara la decisión y **una persona la firma**.
+- Antes de diseñar para un sector, revisar `docs/research/AUDITORIA_SECTORES_SALA_2026-11-20.md`.
+
 ## 3. Guía sencilla + ciencia real, a la vez
 - Cada capítulo: **frase llana** (qué problema, para quién) → **pieza viva** que lo demuestra → **detalle científico** desplegable
   (modo «Ciencia»: ecuaciones en MathML, nombre del módulo, supuestos, límites). El conmutador global «Guía / Ciencia» no oculta la verdad: solo la profundidad.

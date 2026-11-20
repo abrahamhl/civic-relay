@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SENDA · Sala de decisión</title>
+<meta name="description" content="Sala de decisión de SENDA sobre la DANA de l'Horta Sud (29-10-2024): agua observada por Copernicus, red viaria, servicios esenciales y el trabajo previo a una alerta (verificar, delimitar, estimar afectados, elegir caminos, redactar CAP 1.2) hecho en segundos y firmado por una persona. Lentes para bomberos, Guardia Civil, sanitarios, protección civil y más.">
+<meta name="theme-color" content="#0c0e11">
+<link rel="icon" href="/senda/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/senda/fonts/fonts.css">
+<style>
+:root{--bg:#0c0e11;--p:#13161a;--p2:#181c21;--line:#252a31;--line2:#30363e;--t:#e6e8eb;--m:#8a929c;--d:#5d6570;--acc:#f0a73a;--red:#e5484d;--blue:#4f8cff;--water:#3d7bf0;--ok:#3fb27f;--road:#3a414b}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--t);font:13.5px/1.45 "Inter",system-ui,sans-serif;font-feature-settings:"tnum" 1,"cv11" 1;-webkit-font-smoothing:antialiased}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px}
+a{color:#8fb4ff}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+button{font:inherit;color:var(--t);background:var(--p2);border:1px solid var(--line2);border-radius:6px;padding:7px 12px;min-height:34px;cursor:pointer}
+button:hover{border-color:#4a525d}button.pri{background:var(--t);color:#0c0e11;border-color:var(--t);font-weight:600}
+button[aria-pressed=true]{background:#1f2a3b;border-color:var(--blue);color:#dfe8ff}
+/* barra superior */
+.bar{display:flex;align-items:center;gap:18px;height:52px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--p)}
+.bar .brand{font-weight:650;letter-spacing:.02em}.bar .brand span{color:var(--m);font-weight:450;margin-left:8px}
+.bar .inc{display:flex;gap:10px;align-items:baseline;color:var(--m)}.bar .inc b{color:var(--t);font-weight:600}
+.bar .sp{flex:1}.ex{font-size:11.5px;color:var(--acc);border:1px solid #6b4a14;padding:3px 8px;border-radius:4px}
+.clock{color:var(--m)}
+/* rejilla principal */
+.grid{display:grid;grid-template-columns:288px minmax(0,1fr) 400px;height:calc(100vh - 52px);min-height:640px}
+.col{border-right:1px solid var(--line);overflow:auto;min-width:0}.col:last-child{border-right:0;border-left:1px solid var(--line)}
+.sec{padding:14px 16px;border-bottom:1px solid var(--line)}
+.h{font-size:11.5px;font-weight:600;color:var(--m);margin:0 0 10px;display:flex;justify-content:space-between;align-items:center}
+.h small{font-weight:450;color:var(--d);text-align:right;max-width:62%;line-height:1.3}
+.lens{display:grid;grid-template-columns:1fr 1fr;gap:6px}.lens button{text-align:left;font-size:12.5px;padding:7px 9px}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.kpi div{background:var(--p);padding:10px}.kpi b{display:block;font-size:20px;font-weight:600;letter-spacing:-.01em}.kpi span{font-size:11.5px;color:var(--m)}
+.src{font-size:11.5px;color:var(--d);margin-top:8px}
+.lyr label{display:flex;align-items:center;gap:8px;padding:5px 0;color:#c9ced4;cursor:pointer}
+.sw{width:10px;height:10px;border-radius:2px;flex:none}
+.feed{list-style:none;margin:0;padding:0}.feed li{padding:8px 0;border-top:1px solid var(--line);font-size:12.5px;color:#c9ced4}.feed li:first-child{border-top:0}
+.feed .t{color:var(--m);font-family:"IBM Plex Mono",monospace;font-size:11.5px;margin-right:6px}
+/* mapa */
+.mapwrap{position:relative;height:100%;min-height:420px;background:#0a0c0f}
+#map{position:absolute;inset:0;width:100%;height:100%;cursor:grab}
+.mapui{position:absolute;left:12px;top:12px;display:flex;gap:6px}
+.legend{position:absolute;left:12px;bottom:34px;max-width:min(330px,60%);background:rgba(19,22,26,.92);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:11.5px;color:#c9ced4;display:grid;gap:4px}
+.legend i{display:inline-block;width:14px;height:3px;margin-right:6px;vertical-align:middle}
+.attr{position:absolute;left:12px;right:12px;bottom:6px;font-size:10.5px;color:var(--d);margin:0}
+.tip{position:absolute;pointer-events:none;background:#1b2027;border:1px solid var(--line2);border-radius:6px;padding:6px 8px;font-size:12px;display:none;max-width:260px}
+.lenscard{position:absolute;right:12px;top:12px;width:min(340px,calc(100% - 24px));background:rgba(19,22,26,.95);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.lenscard h3{margin:0 0 2px;font-size:14px;font-weight:600}.lenscard p{margin:6px 0;color:#c9ced4;font-size:12.5px}
+.lenscard ul{margin:6px 0 0;padding-left:16px;color:#c9ced4;font-size:12.5px}.lenscard li{margin:3px 0}.lenscard li b{color:var(--t)}
+/* flujo de decisión */
+.step{border:1px solid var(--line);border-radius:8px;margin:10px 0;background:var(--p)}
+.step header{display:flex;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}
+.step header .n{width:20px;height:20px;border-radius:50%;border:1px solid var(--line2);display:grid;place-items:center;font-size:11px;color:var(--m);flex:none}
+.step header b{font-weight:600}.step header .st{margin-left:auto;font-size:11.5px;color:var(--m)}
+.step.done header .n{background:var(--ok);border-color:var(--ok);color:#06140d}.step.done header .st{color:var(--ok)}
+.step .body{padding:10px 12px;font-size:12.5px;color:#c9ced4}
+.row{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-top:1px dashed #22272d}.row:first-child{border-top:0}.row span{color:var(--m)}.row b{font-weight:600;text-align:right}
+.pbar{height:6px;background:#1d2228;border-radius:3px;overflow:hidden;margin:6px 0}.pbar i{display:block;height:100%}
+pre.cap{max-height:170px;overflow:auto;background:#0a0c0f;border:1px solid var(--line);border-radius:6px;padding:8px;font:11px/1.45 "IBM Plex Mono",monospace;color:#b9c3cc;white-space:pre-wrap;word-break:break-all;margin:8px 0 0}
+.hash{font-family:"IBM Plex Mono",monospace;font-size:11px;color:#9fb4c8;word-break:break-all}
+.note{font-size:11.5px;color:var(--d);margin-top:8px}
+@media (max-width:1100px){.grid{grid-template-columns:1fr;height:auto}.col{border:0;border-bottom:1px solid var(--line)}.mapwrap{height:70vh}.bar .inc{display:none}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="brand">SENDA<span>Sala de decisión</span></div>
+  <div class="inc"><b>DANA · l'Horta Sud</b><span>29-10-2024 · activación Copernicus EMSR773</span></div>
+  <div class="sp"></div>
+  <span class="ex" title="Nada de esta pantalla emite alertas reales">EJERCICIO</span>
+  <span class="clock mono" id="clock"></span>
+  <a href="/senda/explica" style="font-size:12.5px">Cómo funciona</a>
+</header>
+<main class="grid">
+  <aside class="col" aria-label="Lentes, situación y capas">
+    <section class="sec">
+      <p class="h">Lente <small>la misma verdad, lo que cada uno necesita primero</small></p>
+      <div class="lens" id="lens" role="group" aria-label="Lente por sector"></div>
+    </section>
+    <section class="sec">
+      <p class="h">Situación <small>oficial · calculado</small></p>
+      <div class="kpi">
+        <div><b id="k-pop">—</b><span>personas en la zona del evento (CEMS)</span></div>
+        <div><b id="k-wet">—</b><span>km de calle con agua observada</span></div>
+        <div><b id="k-pock">—</b><span>bolsas aisladas</span></div>
+        <div><b id="k-serv">—</b><span>servicios esenciales con agua</span></div>
+      </div>
+      <p class="src">Copernicus EMS EMSR773 · OpenStreetMap (ODbL) · cálculo SENDA <span class="mono">flood-isolation.mjs</span></p>
+    </section>
+    <section class="sec lyr">
+      <p class="h">Capas</p>
+      <label><input type="checkbox" data-l="water" checked><i class="sw" style="background:var(--water)"></i>Agua observada (Copernicus)</label>
+      <label><input type="checkbox" data-l="roads" checked><i class="sw" style="background:#6b7480"></i>Red viaria (OSM)</label>
+      <label><input type="checkbox" data-l="wetroads"><i class="sw" style="background:var(--acc)"></i>Tramos con agua</label>
+      <label><input type="checkbox" data-l="bridges"><i class="sw" style="background:var(--red)"></i>Puentes con agua</label>
+      <label><input type="checkbox" data-l="build"><i class="sw" style="background:#9aa3ad"></i>Edificios (indicador)</label>
+      <label><input type="checkbox" data-l="serv" checked><i class="sw" style="background:#fff"></i>Servicios esenciales</label>
+    </section>
+    <section class="sec">
+      <p class="h">Cronología real <small>UTC</small></p>
+      <ul class="feed" id="timeline"></ul>
+    </section>
+  </aside>
+
+  <section class="mapwrap" aria-label="Mapa de l'Horta Sud con agua observada y servicios">
+    <canvas id="map" aria-label="Mapa"></canvas>
+    <div class="mapui"><button id="z-in" aria-label="Acercar">+</button><button id="z-out" aria-label="Alejar">−</button><button id="z-fit">Encuadrar</button></div>
+    <div class="lenscard" id="lenscard" aria-live="polite"></div>
+    <div class="legend"><span><i style="background:var(--water)"></i>agua observada</span><span><i style="background:var(--acc)"></i>tramo con agua</span><span><i style="background:var(--red)"></i>puente con agua</span><span>■ hospital · ● centro de salud · ▲ bomberos · ◆ policía (rojo = con agua)</span></div>
+    <div class="tip" id="tip"></div>
+    <p class="attr">Contiene información modificada del Copernicus Emergency Management Service (© Unión Europea, 2024) · © colaboradores de OpenStreetMap (ODbL), red actual, no la de 2024</p>
+  </section>
+
+  <aside class="col" aria-label="Flujo de decisión antes de la alerta">
+    <section class="sec">
+      <p class="h">Antes de alertar <small>SENDA prepara · una persona decide</small></p>
+      <div class="step" id="s1"><header><span class="n">1</span><b>¿Es real?</b><span class="st"></span></header><div class="body"></div></div>
+      <div class="step" id="s2"><header><span class="n">2</span><b>¿Dónde y a quién afecta?</b><span class="st"></span></header><div class="body"></div></div>
+      <div class="step" id="s3"><header><span class="n">3</span><b>¿Qué sigue funcionando?</b><span class="st"></span></header><div class="body"></div></div>
+      <div class="step" id="s4"><header><span class="n">4</span><b>¿Por dónde llegará el aviso?</b><span class="st"></span></header><div class="body"></div></div>
+      <div class="step" id="s5"><header><span class="n">5</span><b>Alerta CAP 1.2</b><span class="st"></span></header><div class="body"></div></div>
+    </section>
+    <section class="sec">
+      <p class="h">Integridad de los datos <small>SHA-256 calculado aquí</small></p>
+      <div id="prov" class="feed"></div>
+    </section>
+  </aside>
+</main>
+<script type="module" src="/senda/sala.mjs"></script>
+</body>
+</html>

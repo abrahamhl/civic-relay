@@ -7,6 +7,7 @@
 <meta name="description" content="SENDA: el ojo que reúne satélites, cámaras públicas y testigos; el camino que lleva cada mensaje por todas las redes que quedan vivas; el mando que coordina a bomberos, Guardia Civil y sanitarios hasta que llega la ayuda. Cada animación ejecuta el código real.">
 <meta name="theme-color" content="#04080b">
 <link rel="icon" href="/senda/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/senda/fonts/fonts.css">
 <link rel="preload" as="image" href="/senda/fotos/dana-coches.jpg">
 <style>
 :root{--bg:#04080b;--ink:#eef3f4;--mute:#93a7b1;--line:rgba(255,255,255,.1);--ember:#ff7756;--mint:#34d399;--sky:#91d7e8;--sun:#fbbf24;--rose:#ff5b6e;--vio:#b79cff}
@@ -126,6 +127,24 @@ body.mode-sci .sci{display:block;animation:sciin .5s ease}@keyframes sciin{from{
 .syn-grid h3{font-size:22px;letter-spacing:-.01em;margin:14px 0 8px}.syn-grid p{color:#c8d3d7;font-size:15.5px;margin:0 0 10px}
 input[type=text]{font:inherit;font-size:15px;min-height:44px;padding:8px 14px;border-radius:12px;border:1px solid var(--line);background:#0a151c;color:var(--ink);flex:1 1 220px;min-width:0}
 
+
+/* Ajuste profesional (20-11-2026): tipografía de interfaz, sin antetítulos espaciados ni pastillas */
+body{font-family:"Inter",system-ui,sans-serif;font-feature-settings:"tnum" 1,"cv11" 1}
+.mono,.hex,.log{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.kicker,.num{font:600 13px/1.4 "Inter",system-ui,sans-serif;letter-spacing:0;text-transform:none;color:var(--mute)}
+.num{color:#b7c3c9}
+.hero h1{font-weight:650;letter-spacing:-.04em}.chapter h2{font-weight:650;letter-spacing:-.035em}.big,.statement{font-weight:600}
+.fact b{font-weight:600}.side .h-xl{font-weight:600}
+.truth{border:0;padding:0;border-radius:0;font:500 12px/1.4 "Inter",system-ui,sans-serif;letter-spacing:0;text-transform:none;display:inline-flex;align-items:center;gap:6px}
+.truth::before{content:"";width:7px;height:7px;background:currentColor;flex:none}
+button{border-radius:8px;font-weight:550}button.go{background:#eef3f4;border-color:#eef3f4;color:#04080b}button.go:hover{background:#fff}
+button.on{background:#1b2732;border-color:#5b7a92;color:#e6eef4}
+.chk{border-radius:8px}
+.cols h3{font:600 13px "Inter",system-ui,sans-serif;letter-spacing:0;text-transform:none}
+.sci-h{font:600 12px "Inter",system-ui,sans-serif;letter-spacing:0;color:var(--sky)}
+.cmp .lab{font:600 12px "Inter",system-ui,sans-serif;letter-spacing:0;border-radius:6px}
+.cam figcaption,.cam::before{font-family:"IBM Plex Mono",monospace}
+.modebtn{border-radius:8px;border-color:#5b6670;color:#d6dde1}
 </style>
 </head>
 <body>
@@ -147,6 +166,7 @@ input[type=text]{font:inherit;font-size:15px;min-height:44px;padding:8px 14px;bo
       <a href="#camino"><b>El camino</b><span>cada mensaje por todas las redes vivas</span></a>
       <a href="#mando"><b>El mando</b><span>todos los cuerpos en un mismo mapa</span></a>
     </div>
+    <p class="rv" style="margin-top:28px"><a href="/senda/sala" style="display:inline-block;background:#eef3f4;color:#04080b;text-decoration:none;font-weight:600;padding:12px 18px;border-radius:8px">Abrir la Sala de decisión · DANA real</a></p>
     <p class="rv" style="margin-top:22px;font-size:14px;color:var(--mute)">Cada capítulo se entiende en una frase. Pulsa <b style="color:var(--ember)">Modo: Guía</b> arriba a la derecha para pasar a <b>Ciencia</b> y ver debajo de cada escena las ecuaciones, los supuestos y el módulo que la calcula.</p>
   </div>
   <p class="credit">Foto real: coches tras la DANA de octubre de 2024 · <a href="https://commons.wikimedia.org/wiki/File:Damaged_cars_after_October_2024_Spain_floods.jpg" rel="noopener">Ellywa, CC BY-SA 4.0</a> · los puntos animados ilustran móviles conectándose</p>
@@ -352,6 +372,7 @@ input[type=text]{font:inherit;font-size:15px;min-height:44px;padding:8px 14px;bo
         <div class="sci"><p class="sci-h">CIENCIA · CANALES FIRMADOS</p><p>Cada unidad tiene un par de claves ECDSA sobre la curva P-256; cada mensaje lleva una firma de 64 bytes que cualquiera puede verificar con la clave pública, y la huella es SHA-256 de esa clave. En la app los mensajes además van cifrados de extremo a extremo (ECDH + AES-GCM): quien los retransmite no puede leerlos.</p><p class="sci-m">Módulo: <span class="mono">WebCrypto · envelope.mjs</span></p></div>
       </div>
     </div>
+    <p class="rv" style="margin-top:24px"><a href="/senda/sala" style="display:inline-block;background:#eef3f4;color:#04080b;text-decoration:none;font-weight:600;padding:12px 18px;border-radius:8px">Ver el mando sobre datos reales: Sala de decisión de la DANA</a></p>
     <p class="m rv" style="max-width:70ch;margin-top:20px;font-size:15px">Interoperabilidad: SENDA ya exporta incidentes y alertas en CAP 1.2, el formato estándar de las alertas públicas, y tiene preparado el mapeo a EMSI (ISO/TR 22351) para el intercambio entre organismos. Conectar con los sistemas actuales de cada cuerpo exige un convenio con cada uno: hoy no hay ninguno firmado.</p>
   </div>
 </section>
