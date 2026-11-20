@@ -1,12 +1,16 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { ExternalLink, Copy, Check, FlaskConical, Eye, BookOpen } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import EvidenceBadge from '../components/EvidenceBadge';
 import MediaVideo from '../components/MediaVideo';
+import LazySection from '../components/LazySection';
 import { ARCHITECTURAL_RENDERS, SCIENCE_MODULES, SCIENCE_PAPERS } from '../data/science';
 import type { Locale } from '../data/types';
+
+const InteractiveLabsHub = dynamic(() => import('../components/InteractiveLabsHub'), { ssr: false });
 
 export default function SciencePage({ locale }: { locale: Locale }) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -370,6 +374,11 @@ export default function SciencePage({ locale }: { locale: Locale }) {
           </div>
         </div>
       </section>
+
+      {/* Live Scientific Theorems, Calibration & Physics Simulators */}
+      <LazySection id="labs" placeholderHeight={680} rootMargin="400px 0px">
+        <InteractiveLabsHub locale={locale} defaultLab="theorems" id="science-labs" />
+      </LazySection>
     </PageShell>
   );
 }

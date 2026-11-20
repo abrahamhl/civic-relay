@@ -1,14 +1,20 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ShieldCheck, CheckCircle2, Radio, Lock, Layers, ExternalLink } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import EvidenceBadge from '../components/EvidenceBadge';
 import MediaVideo from '../components/MediaVideo';
-import { SERVICE_CATALOG } from '../data/home-product';
+import AudienceLens, { type AudienceMode } from '../components/AudienceLens';
+import LazySection from '../components/LazySection';
+import { SERVICE_CATALOG } from '../data/services';
 import { PIPELINE_STAGES, PRODUCT_SCENES } from '../data/product';
 import { SITE_STRINGS } from '../data/i18n';
 import { localeHref, type Locale } from '../data/types';
+
+const SensorShowcase = dynamic(() => import('../components/SensorShowcase'), { ssr: false });
+const InteractiveLabsHub = dynamic(() => import('../components/InteractiveLabsHub'), { ssr: false });
 
 function SceneVisual({ sceneIndex, locale }: { sceneIndex: number; locale: Locale }) {
   if (sceneIndex === 0) {
@@ -187,6 +193,7 @@ function SceneVisual({ sceneIndex, locale }: { sceneIndex: number; locale: Local
 export default function ProductPage({ locale }: { locale: Locale }) {
   const ui = SITE_STRINGS[locale];
   const [activeScene, setActiveScene] = useState(0);
+  const [audience, setAudience] = useState<AudienceMode>('citizen');
   const stepRefs = useRef<Array<HTMLElement | null>>([]);
 
   useEffect(() => {
@@ -460,6 +467,19 @@ export default function ProductPage({ locale }: { locale: Locale }) {
           </div>
         </div>
       </section>
+
+      {/* Smartphone Sensor Hardware Reveal + Live Palantir Engineering Simulators */}
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '16px var(--s-gutter) 0' }}>
+        <AudienceLens locale={locale} value={audience} onChange={setAudience} />
+      </div>
+
+      <LazySection id="sensors" placeholderHeight={640} rootMargin="400px 0px">
+        <SensorShowcase locale={locale} audience={audience} />
+      </LazySection>
+
+      <LazySection id="labs" placeholderHeight={680} rootMargin="400px 0px">
+        <InteractiveLabsHub locale={locale} defaultLab="telecom" id="labs-panel" />
+      </LazySection>
 
       {/* Complete Modules Directory */}
       <section className="s-section">

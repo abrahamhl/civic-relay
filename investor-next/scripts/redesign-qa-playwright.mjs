@@ -188,6 +188,46 @@ async function main() {
     await nlCtx.close();
     report.interactions.browserLocaleAutoDetectEsAndNl = 'PASS';
 
+    // Test Audience Clarity Lens + Scroll-Built 3D Orbital Globe + Smartphone Sensor Showcase + Crisis Atlas + Palantir Labs on /es/
+    await page.goto(`${baseUrl}/es/`, { waitUntil: 'load' });
+    await page.locator('[data-testid="lens-engineer"]').click();
+    assert.equal(await page.locator('[data-testid="lens-engineer"]').getAttribute('aria-pressed'), 'true');
+    await page.locator('[data-testid="lens-citizen"]').click();
+
+    await page.locator('#orbital-story-wrap').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="scroll-globe-stage"]', { timeout: 10000 });
+    await page.locator('[data-testid="globe-act-tab-3"]').click();
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: resolve(shotsDir, 'home-es-1440-globe.png'), fullPage: false });
+    report.screenshots.push('docs/web/screenshots/home-es-1440-globe.png');
+
+    await page.locator('#sensors').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="sensor-showcase"]', { timeout: 10000 });
+    await page.locator('[data-testid="sensor-tab-satellite"]').click();
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: resolve(shotsDir, 'home-es-1440-sensors.png'), fullPage: false });
+    report.screenshots.push('docs/web/screenshots/home-es-1440-sensors.png');
+
+    await page.locator('#crises').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="crisis-atlas"]', { timeout: 10000 });
+    await page.locator('[data-testid="crisis-tab-valencia-dana"]').click();
+    await page.locator('[data-testid="crisis-tab-venezuela-seismic"]').click();
+    await page.locator('[data-testid="crisis-tab-spain-rail"]').click();
+
+    await page.locator('#labs').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="interactive-labs-hub"]', { timeout: 10000 });
+    await page.locator('[data-testid="lab-tab-rail"]').click();
+    await page.waitForTimeout(450);
+    await page.locator('[data-testid="lab-tab-doppler"]').click();
+    await page.waitForTimeout(450);
+    await page.locator('[data-testid="lab-tab-theorems"]').click();
+    await page.waitForTimeout(450);
+    await page.locator('[data-testid="lab-tab-telecom"]').click();
+    await page.waitForTimeout(450);
+    await page.screenshot({ path: resolve(shotsDir, 'home-es-1440-labs.png'), fullPage: false });
+    report.screenshots.push('docs/web/screenshots/home-es-1440-labs.png');
+    report.interactions.globeSensorsCrisesAnd5LiveLabs = 'PASS';
+
     // 2. Check all core routes x 3 viewports + broken internal links
     const routes = [
       { path: '/', lang: 'en' },

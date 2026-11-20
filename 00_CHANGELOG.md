@@ -1,5 +1,20 @@
 # Changelog
 
+## SENDA · 20-11-2026 · Fusión Apple Keynote × Palantir Interactive Showcase + Despliegue en Producción Vercel (`feat/web-redesign-20261119`)
+
+**Entrada (fundador):** fusionar la claridad visual estilo Apple del rediseño con todas las simulaciones interactivas más avanzadas del proyecto anterior (globo 3D con satélites en vivo, radar Wi-Fi CSI, seguridad ferroviaria España, Doppler vehicular, 5 teoremas, calibración L2.5), vídeo de presentación integrado y optimizado para móvil, animaciones interactivas por scroll de cada sensor del móvil, atlas de inspiración y crisis reales (trenes España, riadas Valencia/Indonesia/Nepal, terremotos Venezuela, tráfico, incendios 3D, agua NL) y explicaciones multi-nivel (para cualquier persona, inversor e ingeniería/código).
+
+**Procesamiento:**
+- **Hero Cinema + Vídeo móvil (`MediaVideo.tsx`):** vídeo de presentación `senda-m96-promo` integrado en portada con autodetección de idioma del navegador (`ES`/`EN`), subtítulos `ES`/`EN`/`NL`, previsualización silenciosa al hacer scroll/tocar (pausando fuera de pantalla) y activación de sonido en 1 clic.
+- **Lente de Claridad (`AudienceLens.tsx`):** selector en 1 clic (`Para cualquier persona` / `Visión Inversor` / `Ingeniería y Código`) que adapta en vivo el nivel de detalle en la portada, globo 3D, sensores del móvil y atlas de crisis.
+- **Simulación 3D Orbital por Scroll (`ScrollGlobeStage.tsx`):** globo 3D WebGL (Three.js, lazy-loaded y pausado fuera de pantalla con `content-visibility: auto` + `contentvisibilityautostatechange`) con 2 satélites LEO, 6 estaciones reales (Valencia, Arnhem, Adamuz, Venezuela, Langtang Nepal, Indonesia) y 5 actos interactivos.
+- **Mockup Interactivo de Sensores del Móvil (`SensorShowcase.tsx`):** smartphone vectorial con animaciones SVG de onda P sísmica, malla BLE/Wi-Fi Direct, radar Wi-Fi CSI de 64 subportadoras OFDM, ráfaga satelital 3GPP NTN de 24 bytes, módem acústico MFSK-16 y barómetro + visión local YOLOX.
+- **Atlas de Inspiración y Crisis Reales (`CrisisAtlas.tsx`):** 7 pestañas con scroll horizontal accesible (`tabs`) cubriendo accidentes ferroviarios de España (Adamuz/Gelida), DANA Valencia (EMSR773), riadas/deslizamientos en Indonesia y Nepal (Langtang 3D), terremotos en Venezuela y prevención sísmica, accidentes de tráfico V16/Doppler/YOLOX, incendios 3D y ondas fluviales en Países Bajos (RWS).
+- **Hub de 5 Laboratorios en Vivo (`InteractiveLabsHub.tsx`):** reintegrados en pestañas bajo demanda `TelecomAndRfRadarSuite`, `RailSafetyLab`, `VehicularDopplerLab`, `ScientificTheoremsLab` y `CalibrationPanel` + `DeviceFieldDiagnostics` en Home, `/product/#labs` y `/science/#labs` con endurecimiento móvil para 0 overflow en 390 px.
+- **Validación y Producción Live:** `tsc --noEmit` (0 errores), `117/117` tests unitarios, `check:locales`, Playwright (`38` vistas, `0` enlaces rotos, `0` overflow, `0` errores de consola, JS inicial Home `167.6 kB gz`), Lighthouse Home **98 / 100 / 100 / 100** (LCP `1.80 s`, CLS `0.000`, TBT `66 ms`), desplegado en producción en `https://civic-relay-investor.vercel.app` (y aliases legacy redirigidos con `308`).
+
+---
+
 ## SENDA · 20-11-2026 · Actualización integral de capacidades, vídeos multilingües con autodetección + subtítulos ES/EN/NL y orquestación en vibe coding (`feat/web-redesign-20261119`)
 
 **Entrada (fundador):** actualizar toda la web rediseñada con un tono enfocado en lo que SENDA sí construye (conservando solo las aclaraciones legales imprescindibles en servicios sensibles), incorporar todos los servicios, funciones, 5 papers científicos, 7 renders SVG y vídeos más completos con detección automática del idioma del navegador y subtítulos en español, inglés y neerlandés, y destacar SENDA como uno de los mayores proyectos de delegación y orquestación en vibe coding bajo dirección humana constante.

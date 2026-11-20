@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import {
   ArrowRight,
@@ -10,42 +11,54 @@ import {
   Users,
   FileSearch,
   Building2,
-  Cpu,
-  Layers,
-  ExternalLink
+  Cpu
 } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import EvidenceBadge from '../components/EvidenceBadge';
 import Reveal from '../components/Reveal';
 import MediaVideo from '../components/MediaVideo';
-import { HOME_COPY, SERVICE_CATALOG } from '../data/home-product';
+import AudienceLens, { type AudienceMode } from '../components/AudienceLens';
+import LazySection from '../components/LazySection';
+import { HOME_COPY } from '../data/home-product';
 import { SITE_STRINGS } from '../data/i18n';
 import { localeHref, type Locale } from '../data/types';
+
+// Lazy-loaded interactive flagship engines: 0 bytes in initial Home JS, instant mount on scroll
+const ScrollGlobeStage = dynamic(() => import('../components/ScrollGlobeStage'), { ssr: false });
+const SensorShowcase = dynamic(() => import('../components/SensorShowcase'), { ssr: false });
+const CrisisAtlas = dynamic(() => import('../components/CrisisAtlas'), { ssr: false });
+const InteractiveLabsHub = dynamic(() => import('../components/InteractiveLabsHub'), { ssr: false });
+const ServiceCatalogSection = dynamic(() => import('../components/ServiceCatalogSection'), { ssr: false });
 
 const PILLAR_ICONS = [Radio, Network, ShieldCheck];
 const AUDIENCE_ICONS = [Users, Building2, FileSearch, Compass];
 
-type ServiceFilter = 'all' | 'comms' | 'command' | 'hazard' | 'rescue';
-
 export default function HomePage({ locale }: { locale: Locale }) {
   const c = HOME_COPY[locale];
   const ui = SITE_STRINGS[locale];
-  const [svcFilter, setSvcFilter] = useState<ServiceFilter>('all');
+  const [audience, setAudience] = useState<AudienceMode>('citizen');
 
-  const filterLabels: Record<ServiceFilter, string> = {
-    en: { all: 'All (12)', comms: 'Offline Comms', command: 'Control & 4D', hazard: 'Fire, Flood & Sat', rescue: 'Rail, Road & Rescue' },
-    es: { all: 'Todos (12)', comms: 'Comunicaciones sin red', command: 'Mando y Visor 4D', hazard: 'Fuego, Riada y Satélite', rescue: 'Ferrocarril y Rescate' },
-    nl: { all: 'Alle (12)', comms: 'Offline comms', command: 'Commando & 4D', hazard: 'Brand, Water & Sat', rescue: 'Spoor & Redding' }
-  }[locale];
-
-  const visibleServices =
-    svcFilter === 'all'
-      ? SERVICE_CATALOG
-      : SERVICE_CATALOG.filter((s) => s.category === svcFilter);
+  const heroAudienceLead: Record<AudienceMode, Record<Locale, string>> = {
+    citizen: {
+      en: 'If an earthquake, flood, or train or road accident knocks out cell towers, your phone quietly passes your "I am safe" or "Need help" message across nearby phones and satellites until it reaches your family.',
+      es: 'Si un terremoto, una riada o un accidente de tren o carretera corta la cobertura, tu móvil saca tu aviso de "Estoy bien" o "Necesito ayuda" saltando por teléfonos cercanos y satélites hasta llegar a tu familia.',
+      nl: 'Als een aardbeving, overstroming of ongeval het mobiele netwerk uitschakelt, stuurt uw telefoon uw noodbericht automatisch via nabije toestellen en satellieten naar uw familie.'
+    },
+    investor: {
+      en: c.lead,
+      es: c.lead,
+      nl: c.lead
+    },
+    engineer: {
+      en: 'Deterministic E2EE store-and-forward (ECDH P-256 + AES-GCM + ECDSA), Contact Graph Routing (ARR_REPLAN_V2, 94.2% delivery / -84% mJ), 24-byte 3GPP NTN satellite bursts, 64-subcarrier OFDM CSI radar, and 16,699-source fusion.',
+      es: 'Almacenar-y-reenviar determinista E2EE (ECDH P-256 + AES-GCM + ECDSA), Contact Graph Routing (ARR_REPLAN_V2, 94,2 % entrega / -84 % mJ), ráfagas 3GPP NTN de 24 bytes, radar CSI OFDM de 64 subportadoras y fusión de 16.699 fuentes.',
+      nl: 'Deterministische E2EE store-and-forward (ECDH P-256 + AES-GCM), Contact Graph Routing (ARR_REPLAN_V2, 94,2% / -84% mJ), 24-byte 3GPP NTN bursts en 64-subcarrier OFDM CSI.'
+    }
+  };
 
   return (
     <PageShell locale={locale} active="home">
-      {/* 1. Hero — Clear, confident, solution-first */}
+      {/* 1. Hero Keynote — Apple Editorial + Live Presentation Video + Audience Clarity Lens */}
       <section className="s-hero">
         <div className="s-container">
           <div className="s-hero-status">
@@ -65,7 +78,11 @@ export default function HomePage({ locale }: { locale: Locale }) {
           >
             {c.tagline}
           </p>
-          <p className="s-lead">{c.lead}</p>
+          <p className="s-lead">{heroAudienceLead[audience][locale]}</p>
+
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 22 }}>
+            <AudienceLens locale={locale} value={audience} onChange={setAudience} />
+          </div>
 
           <div className="s-hero-cta">
             <a
@@ -77,164 +94,132 @@ export default function HomePage({ locale }: { locale: Locale }) {
               <ArrowRight aria-hidden="true" />
             </a>
             <a
-              href={localeHref(locale, 'product')}
+              href="#labs"
               className="s-btn s-btn-secondary"
               data-testid="hero-cta-product"
             >
-              {c.ctaSecondary}
+              {locale === 'es' ? 'Probar simuladores en vivo' : locale === 'nl' ? 'Start live simulatoren' : 'Try live simulators'}
             </a>
             <a
-              href={localeHref(locale, 'science')}
+              href="#sensors"
               className="s-btn s-btn-ghost"
             >
-              {ui.nav[3].label}
+              {locale === 'es' ? 'Sensores del móvil' : locale === 'nl' ? 'Telefoonsensoren' : 'Phone sensors'}
             </a>
           </div>
 
-          {/* Product Preview Frame */}
-          <div className="s-frame">
-            <div className="s-frame-bar">
-              <span className="s-frame-dot" />
-              <span className="s-frame-dot" />
-              <span className="s-frame-dot" />
-              <span style={{ marginLeft: 8, fontWeight: 500, color: 'var(--s-text-2)' }}>
-                {c.previewLabel}
-              </span>
-              <span style={{ marginLeft: 'auto' }}>
-                <EvidenceBadge locale={locale} evidenceId="EV-CONSOLE-16K" compact />
-              </span>
-            </div>
-
-            <div style={{ padding: 'clamp(16px, 2.5vw, 28px)' }}>
-              <svg
-                viewBox="0 0 1040 380"
-                role="img"
-                aria-label={c.previewLabel}
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  borderRadius: 16,
-                  background: 'var(--s-bg-sunk)',
-                  border: '1px solid var(--s-line)'
-                }}
-              >
-                <defs>
-                  <pattern id="senda-hero-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path
-                      d="M 40 0 L 0 0 0 40"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeOpacity="0.06"
-                      strokeWidth="1"
-                    />
-                  </pattern>
-                </defs>
-                <rect width="1040" height="380" fill="url(#senda-hero-grid)" />
-
-                <rect x="20" y="20" width="210" height="340" rx="14" fill="var(--s-bg-elev)" stroke="var(--s-line)" />
-                <text x="36" y="48" fill="var(--s-text-3)" fontSize="11" fontWeight="600">
-                  OPERATIONAL SCENARIOS
-                </text>
-                <rect x="34" y="64" width="182" height="54" rx="10" fill="var(--s-accent-soft)" stroke="var(--s-accent)" strokeOpacity="0.4" />
-                <circle cx="48" cy="83" r="4" fill="var(--s-crit)" />
-                <text x="60" y="87" fill="var(--s-text)" fontSize="12" fontWeight="600">S01 · Arnhem -&gt; SMV</text>
-                <text x="48" y="106" fill="var(--s-text-2)" fontSize="11">Blackout 8h · Multi-path 4m</text>
-
-                <rect x="34" y="128" width="182" height="50" rx="10" fill="var(--s-bg-sunk)" />
-                <circle cx="48" cy="147" r="4" fill="var(--s-warn)" />
-                <text x="60" y="151" fill="var(--s-text)" fontSize="12" fontWeight="500">S02 · Wildfire 3D</text>
-                <text x="48" y="168" fill="var(--s-text-3)" fontSize="11">GOES-R + Sentinel-2</text>
-
-                <rect x="34" y="188" width="182" height="50" rx="10" fill="var(--s-bg-sunk)" />
-                <circle cx="48" cy="207" r="4" fill="var(--s-obs)" />
-                <text x="60" y="211" fill="var(--s-text)" fontSize="12" fontWeight="500">S03 · Flood EMSR773</text>
-                <text x="48" y="228" fill="var(--s-text-3)" fontSize="11">l&apos;Horta Sud + RWS NL</text>
-
-                <rect x="34" y="248" width="182" height="50" rx="10" fill="var(--s-bg-sunk)" />
-                <circle cx="48" cy="267" r="4" fill="var(--s-accent)" />
-                <text x="60" y="271" fill="var(--s-text)" fontSize="12" fontWeight="500">S05 · Rubble Bridge</text>
-                <text x="48" y="288" fill="var(--s-text-3)" fontSize="11">BLE Surface Relay</text>
-
-                <path
-                  d="M285 260 C380 230, 445 145, 530 140 C600 136, 650 165, 735 120"
-                  fill="none"
-                  stroke="var(--s-accent)"
-                  strokeWidth="2.5"
-                  className="s-route-anim"
-                />
-                <path
-                  d="M285 260 C410 300, 560 280, 735 120"
-                  fill="none"
-                  stroke="var(--s-ok)"
-                  strokeWidth="2"
-                  strokeDasharray="4 6"
-                  strokeOpacity="0.85"
-                />
-                <path
-                  d="M285 260 Q510 55 735 120"
-                  fill="none"
-                  stroke="var(--s-warn)"
-                  strokeWidth="1.6"
-                  strokeDasharray="3 5"
-                  strokeOpacity="0.75"
-                />
-
-                <circle cx="285" cy="260" r="46" fill="var(--s-crit)" fillOpacity="0.08" stroke="var(--s-crit)" strokeOpacity="0.35" strokeDasharray="4 4" />
-                <circle cx="285" cy="260" r="7" fill="var(--s-crit)" />
-                <text x="242" y="324" fill="var(--s-text)" fontSize="12" fontWeight="600">San Martín (Outage Zone)</text>
-
-                <circle cx="430" cy="186" r="6" fill="var(--s-accent)" />
-                <circle cx="430" cy="186" r="14" fill="var(--s-accent)" fillOpacity="0.16" className="s-pulse" />
-                <text x="392" y="166" fill="var(--s-text-2)" fontSize="11">BLE Neighbor</text>
-
-                <circle cx="555" cy="142" r="6" fill="var(--s-ok)" />
-                <text x="515" y="122" fill="var(--s-text-2)" fontSize="11">Satellite Gateway</text>
-
-                <circle cx="510" cy="70" r="5" fill="var(--s-warn)" />
-                <text x="468" y="54" fill="var(--s-text-2)" fontSize="11">LEO D2D Pass (91m)</text>
-
-                <circle cx="735" cy="120" r="7" fill="var(--s-ok)" />
-                <text x="692" y="100" fill="var(--s-text)" fontSize="12" fontWeight="600">Arnhem · ACK</text>
-
-                <rect x="800" y="20" width="220" height="340" rx="14" fill="var(--s-bg-elev)" stroke="var(--s-line)" />
-                <text x="816" y="48" fill="var(--s-text-3)" fontSize="11" fontWeight="600">
-                  OBJECT INSPECTOR
-                </text>
-                <text x="816" y="76" fill="var(--s-text)" fontSize="14" fontWeight="600">
-                  Route #S01-BLE-SAT
-                </text>
-                <rect x="816" y="88" width="96" height="22" rx="11" fill="var(--s-ok-soft)" />
-                <text x="828" y="103" fill="var(--s-ok)" fontSize="11" fontWeight="600">ACTIVE PATH</text>
-
-                <text x="816" y="138" fill="var(--s-text-3)" fontSize="11">SENDA Multipath ETA</text>
-                <text x="816" y="160" fill="var(--s-text)" fontSize="22" fontWeight="600">~4 min</text>
-
-                <text x="816" y="192" fill="var(--s-text-3)" fontSize="11">Cellular Baseline</text>
-                <text x="816" y="212" fill="var(--s-text-2)" fontSize="16" fontWeight="500">480 min</text>
-
-                <text x="816" y="246" fill="var(--s-text-3)" fontSize="11">Envelope Crypto</text>
-                <text x="816" y="264" fill="var(--s-text-2)" fontSize="12">ECDH P-256 · AES-GCM</text>
-
-                <rect x="816" y="292" width="188" height="34" rx="17" fill="var(--s-accent)" />
-                <text x="848" y="313" fill="var(--s-accent-ink)" fontSize="12" fontWeight="600">Open Control Center</text>
-              </svg>
-
-              <div className="s-between" style={{ marginTop: 16 }}>
-                <p className="s-small s-muted" style={{ margin: 0, maxWidth: 740 }}>
-                  {c.previewCaption}
-                </p>
-                <a href={localeHref(locale, 'platform')} className="s-btn s-btn-secondary s-btn-sm">
-                  <span>{c.ctaPrimary}</span>
-                  <ArrowRight aria-hidden="true" />
-                </a>
-              </div>
-            </div>
+          {/* Integrated Cinema Presentation Film right in Hero (Auto-detect browser lang + ES/EN/NL subtitles) */}
+          <div style={{ marginTop: 40, textAlign: 'left' }}>
+            <MediaVideo
+              locale={locale}
+              variant="cinema"
+              ambientAutoplay
+              src="/media/m96/senda-m96-promo-es.mp4"
+              sources={{
+                es: '/media/m96/senda-m96-promo-es.mp4',
+                en: '/media/m96/senda-m96-promo-en.mp4'
+              }}
+              poster="/media/m96/senda-m96-promo-poster.jpg"
+              subtitles={{
+                es: '/media/m96/senda-m96-promo-es.vtt',
+                en: '/media/m96/senda-m96-promo-en.vtt',
+                nl: '/media/m96/senda-m96-promo-nl.vtt'
+              }}
+              title={
+                locale === 'es'
+                  ? 'Presentación oficial SENDA · De un corte total al rescate coordinado por satélite y malla'
+                  : locale === 'nl'
+                  ? 'Officiële SENDA-presentatie · Van totale uitval naar satelliet- en mesh-redding'
+                  : 'Official SENDA Presentation · From total blackout to satellite & mesh rescue'
+              }
+              caption={
+                locale === 'es'
+                  ? 'Detecta automáticamente el idioma de tu navegador (ES / EN) con subtítulos en Español, Inglés y Neerlandés.'
+                  : locale === 'nl'
+                  ? 'Automatische browsertaaldetectie met Spaanse, Engelse en Nederlandse ondertitels.'
+                  : 'Automatically matches your browser language with one-tap Spanish, English, and Dutch subtitles.'
+              }
+              evidenceId="EV-CONSOLE-16K"
+            />
           </div>
         </div>
       </section>
 
-      {/* 2. Flagship Multilingual Videos (auto-detects browser language + ES/EN/NL subtitles) */}
-      <section className="s-section s-sunk">
+      {/* 2. Live 3D Orbital Satellite & Multipath Scroll Cinema (Three.js — lazy on scroll) */}
+      <LazySection id="orbital-story-wrap" placeholderHeight={640} rootMargin="420px 0px">
+        <ScrollGlobeStage locale={locale} audience={audience} />
+      </LazySection>
+
+      {/* 3. Scroll-Built Smartphone Hardware & Sensor Mockup (Apple Hardware Reveal) */}
+      <LazySection id="sensors" placeholderHeight={720} rootMargin="520px 0px">
+        <SensorShowcase locale={locale} audience={audience} />
+      </LazySection>
+
+      {/* 4. Real-World Inspiration & Multi-Crisis Atlas (Spain Rail, Valencia DANA, Indonesia/Nepal, Venezuela, Traffic, Fire, NL) */}
+      <LazySection id="crises" placeholderHeight={620} rootMargin="520px 0px">
+        <CrisisAtlas locale={locale} audience={audience} />
+      </LazySection>
+
+      {/* 5. Palantir-Grade Interactive Engineering Labs Hub (All 5 Real Working Simulators!) */}
+      <LazySection id="labs" placeholderHeight={680} rootMargin="450px 0px">
+        <InteractiveLabsHub locale={locale} defaultLab="telecom" id="labs-panel" />
+      </LazySection>
+
+      {/* 6. Three Core Engines + Verifiable Metrics */}
+      <section className="s-section">
+        <div className="s-container s-stack-lg">
+          <Reveal>
+            <div className="s-read">
+              <h2 className="s-h2">{c.pillarsTitle}</h2>
+              <p className="s-lead">{c.pillarsLead}</p>
+            </div>
+          </Reveal>
+
+          <div className="s-grid s-grid-3">
+            {c.pillars.map((pillar, i) => {
+              const Icon = PILLAR_ICONS[i] ?? Radio;
+              return (
+                <Reveal key={pillar.title}>
+                  <article className="s-card s-card-lift" style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    <div className="s-between">
+                      <div className="s-card-icon" style={{ marginBottom: 0 }}>
+                        <Icon aria-hidden="true" />
+                      </div>
+                      <EvidenceBadge locale={locale} evidenceId={pillar.evidenceId} />
+                    </div>
+                    <h3 className="s-h3">{pillar.title}</h3>
+                    <p>{pillar.body}</p>
+                  </article>
+                </Reveal>
+              );
+            })}
+          </div>
+
+          <div className="s-grid s-grid-4" style={{ marginTop: 12 }}>
+            {c.metrics.map((m) => (
+              <Reveal key={m.label}>
+                <div className="s-card s-kpi" style={{ height: '100%' }}>
+                  <div>
+                    <EvidenceBadge locale={locale} evidenceId={m.evidenceId} />
+                  </div>
+                  <div className="s-kpi-value s-num" style={{ marginTop: 8 }}>
+                    {m.value}
+                  </div>
+                  <div className="s-kpi-label">{m.label}</div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Complete Suite of 12 Live Services & Interactive Modules */}
+      <LazySection id="services" placeholderHeight={520} rootMargin="500px 0px">
+        <ServiceCatalogSection locale={locale} title={c.servicesTitle} lead={c.servicesLead} />
+      </LazySection>
+
+      {/* 8. Technical & Broadcast Films (Mobile-Optimized with Auto Browser Language & ES/EN/NL Subtitles) */}
+      <section className="s-section">
         <div className="s-container s-stack-lg">
           <Reveal>
             <div className="s-read">
@@ -243,40 +228,10 @@ export default function HomePage({ locale }: { locale: Locale }) {
             </div>
           </Reveal>
 
-          {/* Master Flagship Film (M96 Promo — full-length ES/EN audio + ES/EN/NL VTT) */}
-          <MediaVideo
-            locale={locale}
-            src="/media/m96/senda-m96-promo-es.mp4"
-            sources={{
-              es: '/media/m96/senda-m96-promo-es.mp4',
-              en: '/media/m96/senda-m96-promo-en.mp4'
-            }}
-            poster="/media/m96/senda-m96-promo-poster.jpg"
-            subtitles={{
-              es: '/media/m96/senda-m96-promo-es.vtt',
-              en: '/media/m96/senda-m96-promo-en.vtt',
-              nl: '/media/m96/senda-m96-promo-nl.vtt'
-            }}
-            title={
-              locale === 'es'
-                ? 'Película oficial SENDA · Visión completa, arquitectura y plataforma'
-                : locale === 'nl'
-                ? 'Officiële SENDA-film · Volledige visie, architectuur en platform'
-                : 'Official SENDA Master Film · Complete vision, architecture & platform'
-            }
-            caption={
-              locale === 'es'
-                ? 'Audio automático según tu navegador (ES / EN) con subtítulos activables en Español, Inglés y Neerlandés.'
-                : locale === 'nl'
-                ? 'Automatische taalkeuze op basis van uw browser met Nederlandse, Engelse en Spaanse ondertitels.'
-                : 'Auto-matched to your browser language with switchable Spanish, English, and Dutch subtitles.'
-            }
-            evidenceId="EV-CONSOLE-16K"
-          />
-
           <div className="s-grid s-grid-2">
             <MediaVideo
               locale={locale}
+              ambientAutoplay
               src="/media/senda-film-es.mp4"
               sources={{
                 es: '/media/senda-film-es.mp4',
@@ -310,6 +265,7 @@ export default function HomePage({ locale }: { locale: Locale }) {
 
             <MediaVideo
               locale={locale}
+              ambientAutoplay
               src="/media/m95/senda-m95-broadcast-special-es.mp4"
               sources={{
                 es: '/media/m95/senda-m95-broadcast-special-es.mp4',
@@ -341,120 +297,7 @@ export default function HomePage({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      {/* 3. Three Core Pillars */}
-      <section className="s-section">
-        <div className="s-container s-stack-lg">
-          <Reveal>
-            <div className="s-read">
-              <h2 className="s-h2">{c.pillarsTitle}</h2>
-              <p className="s-lead">{c.pillarsLead}</p>
-            </div>
-          </Reveal>
-
-          <div className="s-grid s-grid-3">
-            {c.pillars.map((pillar, i) => {
-              const Icon = PILLAR_ICONS[i] ?? Radio;
-              return (
-                <Reveal key={pillar.title}>
-                  <article className="s-card s-card-lift" style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}>
-                    <div className="s-between">
-                      <div className="s-card-icon" style={{ marginBottom: 0 }}>
-                        <Icon aria-hidden="true" />
-                      </div>
-                      <EvidenceBadge locale={locale} evidenceId={pillar.evidenceId} />
-                    </div>
-                    <h3 className="s-h3">{pillar.title}</h3>
-                    <p>{pillar.body}</p>
-                  </article>
-                </Reveal>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Verifiable Metrics */}
-      <section className="s-section s-sunk">
-        <div className="s-container s-stack-lg">
-          <Reveal>
-            <div className="s-read">
-              <h2 className="s-h2">{c.metricsTitle}</h2>
-              <p className="s-lead">{c.metricsLead}</p>
-            </div>
-          </Reveal>
-
-          <div className="s-grid s-grid-4">
-            {c.metrics.map((m) => (
-              <Reveal key={m.label}>
-                <div className="s-card s-kpi" style={{ height: '100%' }}>
-                  <div>
-                    <EvidenceBadge locale={locale} evidenceId={m.evidenceId} />
-                  </div>
-                  <div className="s-kpi-value s-num" style={{ marginTop: 8 }}>
-                    {m.value}
-                  </div>
-                  <div className="s-kpi-label">{m.label}</div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Complete Suite of Live Services & Interactive Modules */}
-      <section className="s-section">
-        <div className="s-container s-stack-lg">
-          <div className="s-between">
-            <div className="s-read">
-              <p className="s-eyebrow">
-                <Layers size={15} aria-hidden="true" />
-                <span>SENDA ECOSYSTEM</span>
-              </p>
-              <h2 className="s-h2">{c.servicesTitle}</h2>
-              <p className="s-lead">{c.servicesLead}</p>
-            </div>
-          </div>
-
-          <div className="s-chipbar" role="group" aria-label="Service categories">
-            {(['all', 'comms', 'command', 'hazard', 'rescue'] as ServiceFilter[]).map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                className="s-chip"
-                aria-pressed={svcFilter === cat}
-                onClick={() => setSvcFilter(cat)}
-              >
-                {filterLabels[cat]}
-              </button>
-            ))}
-          </div>
-
-          <div className="s-grid s-grid-3">
-            {visibleServices.map((svc) => (
-              <a
-                key={svc.id}
-                href={svc.href}
-                className="s-card s-card-lift"
-                style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
-              >
-                <div className="s-between">
-                  <strong style={{ fontSize: 16, color: 'var(--s-text)' }}>{svc.title[locale]}</strong>
-                  <ExternalLink size={15} style={{ color: 'var(--s-accent)', flex: 'none' }} aria-hidden="true" />
-                </div>
-                <p style={{ flex: 1 }}>{svc.desc[locale]}</p>
-                <div className="s-between" style={{ paddingTop: 10, borderTop: '1px solid var(--s-line)' }}>
-                  <code className="s-mono s-faint">{svc.href}</code>
-                  <span className="s-micro" style={{ color: 'var(--s-accent)', fontWeight: 600 }}>
-                    {locale === 'es' ? 'Abrir módulo' : locale === 'nl' ? 'Open module' : 'Launch module'}
-                  </span>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 6. Human-Led AI Orchestration & Vibe Coding Craftsmanship */}
+      {/* 9. Human-Led AI Orchestration & Vibe Coding Craftsmanship */}
       <section className="s-section s-sunk">
         <div className="s-container s-stack-lg">
           <div className="s-read">
@@ -477,7 +320,7 @@ export default function HomePage({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      {/* 7. Audience Shortcuts */}
+      {/* 10. Audience Shortcuts */}
       <section className="s-section">
         <div className="s-container s-stack-lg">
           <h2 className="s-h2">{c.audiencesTitle}</h2>

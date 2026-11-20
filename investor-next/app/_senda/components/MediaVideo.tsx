@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Globe, Subtitles } from 'lucide-react';
+import { Globe, Play, Subtitles, Volume2, VolumeX } from 'lucide-react';
 import type { Locale } from '../data/types';
 import EvidenceBadge from './EvidenceBadge';
 
@@ -23,6 +23,10 @@ export interface MediaVideoProps {
   evidenceId?: string;
   loop?: boolean;
   controls?: boolean;
+  /** Enables muted inline auto-preview once the visitor scrolls/interacts, pausing off-screen */
+  ambientAutoplay?: boolean;
+  /** Visual presentation frame */
+  variant?: 'card' | 'cinema';
 }
 
 function detectBrowserLocale(fallback: Locale): Locale {
@@ -57,8 +61,11 @@ export default function MediaVideo({
   title,
   evidenceId,
   loop = false,
-  controls = true
+  controls = true,
+  ambientAutoplay = false,
+  variant = 'card'
 }: MediaVideoProps) {
+  const wrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const availableAudio = (['es', 'en', 'nl'] as Locale[]).filter((l) => Boolean(sources?.[l]));
@@ -76,6 +83,9 @@ export default function MediaVideo({
   const [audioLang, setAudioLang] = useState<Locale>(initialAudio);
   const [detectedLang, setDetectedLang] = useState<Locale>(locale);
   const [activeSub, setActiveSub] = useState<'off' | Locale>('off');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(ambientAutoplay);
+  const [userInteracted, setUserInteracted] = useState(false);
 
   // Auto-detect browser language on mount and match video audio + default subtitles
   useEffect(() => {
@@ -85,10 +95,8 @@ export default function MediaVideo({
     if (sources && availableAudio.length > 0) {
       if (sources[browserLang]) {
         setAudioLang(browserLang);
-        // If native audio matches browser language, keep subtitles optional unless user toggles
         setActiveSub('off');
       } else {
-        // E.g. Dutch browser on ES/EN bilingual video -> play EN audio and auto-enable NL subtitles!
         const fallbackAudio = sources.en ? 'en' : availableAudio[0];
         setAudioLang(fallbackAudio);
         if (availableSubs[browserLang]) {
@@ -96,11 +104,50 @@ export default function MediaVideo({
         }
       }
     } else if (availableSubs[browserLang] && browserLang !== 'es') {
-      // Single-language clip with subtitles available in visitor's browser language
       setActiveSub(browserLang);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale]);
+
+  // Unlock ambient inline preview on first real visitor scroll/pointer/touch (zero cold-load byte penalty)
+  useEffect(() => {
+    if (!ambientAutoplay) return;
+    if (typeof window === 'undefined') return;
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) return;
+
+    const unlock = () => setUserInteracted(true);
+    window.addEventListener('scroll', unlock, { passive: true, once: true });
+    window.addEventListener('pointerdown', unlock, { passive: true, once: true });
+    window.addEventListener('touchstart', unlock, { passive: true, once: true });
+    return () => {
+      window.removeEventListener('scroll', unlock);
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('touchstart', unlock);
+    };
+  }, [ambientAutoplay]);
+
+  // Pause off-screen & auto-play muted inline when visible after visitor gesture
+  useEffect(() => {
+    const el = wrapRef.current;
+    const vid = videoRef.current;
+    if (!el || !vid) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = Boolean(entries[0]?.isIntersecting);
+        if (!visible && !vid.paused) {
+          vid.pause();
+        } else if (visible && ambientAutoplay && userInteracted && isMuted && vid.paused) {
+          vid.muted = true;
+          vid.play().catch(() => {});
+        }
+      },
+      { threshold: 0.35 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [ambientAutoplay, userInteracted, isMuted]);
 
   // Synchronize HTMLMediaElement.textTracks reliably across all browsers
   useEffect(() => {
@@ -146,28 +193,77 @@ export default function MediaVideo({
     }
   };
 
+  const playWithSound = () => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    vid.muted = false;
+    setIsMuted(false);
+    setUserInteracted(true);
+    vid.play().catch(() => {});
+  };
+
+  const toggleMute = () => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    const next = !vid.muted;
+    vid.muted = next;
+    setIsMuted(next);
+  };
+
   const uiLabels = {
-    en: { audio: 'Video', subs: 'Subtitles', off: 'Off', auto: 'Browser' },
-    es: { audio: 'Vídeo', subs: 'Subtítulos', off: 'No', auto: 'Navegador' },
-    nl: { audio: 'Video', subs: 'Ondertitels', off: 'Uit', auto: 'Browser' }
+    en: {
+      audio: 'Video',
+      subs: 'Subtitles',
+      off: 'Off',
+      auto: 'Browser',
+      playFilm: 'Play with sound',
+      unmute: 'Enable sound',
+      mute: 'Mute'
+    },
+    es: {
+      audio: 'Vídeo',
+      subs: 'Subtítulos',
+      off: 'No',
+      auto: 'Navegador',
+      playFilm: 'Reproducir con sonido',
+      unmute: 'Activar sonido',
+      mute: 'Silenciar'
+    },
+    nl: {
+      audio: 'Video',
+      subs: 'Ondertitels',
+      off: 'Uit',
+      auto: 'Browser',
+      playFilm: 'Afspelen met geluid',
+      unmute: 'Geluid aan',
+      mute: 'Dempen'
+    }
   }[locale];
 
   return (
-    <figure className="s-media-card" data-testid="senda-video-card" data-detected-lang={detectedLang}>
-      <div className="s-video-wrap">
+    <figure
+      className={`s-media-card${variant === 'cinema' ? ' s-media-cinema' : ''}`}
+      data-testid="senda-video-card"
+      data-detected-lang={detectedLang}
+    >
+      <div className="s-video-wrap" ref={wrapRef}>
         <video
           ref={videoRef}
           key={resolvedSrc}
           className="s-video"
           src={resolvedSrc}
           poster={resolvedPoster}
-          loop={loop}
+          loop={loop || (ambientAutoplay && isMuted)}
+          muted={isMuted}
           playsInline
           controls={controls}
           preload="none"
           crossOrigin="anonymous"
           width={1280}
           height={720}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onVolumeChange={(e) => setIsMuted(e.currentTarget.muted)}
         >
           {subLangs.map((lang) => (
             <track
@@ -180,6 +276,31 @@ export default function MediaVideo({
             />
           ))}
         </video>
+
+        {!isPlaying && variant === 'cinema' && (
+          <button
+            type="button"
+            className="s-video-cinema-play"
+            onClick={playWithSound}
+          >
+            <span className="s-video-cinema-play-icon">
+              <Play size={22} fill="currentColor" aria-hidden="true" />
+            </span>
+            <span>{uiLabels.playFilm} · {audioLang.toUpperCase()}</span>
+          </button>
+        )}
+
+        {isPlaying && ambientAutoplay && (
+          <button
+            type="button"
+            className="s-video-mute-chip"
+            onClick={toggleMute}
+            aria-label={isMuted ? uiLabels.unmute : uiLabels.mute}
+          >
+            {isMuted ? <VolumeX size={15} aria-hidden="true" /> : <Volume2 size={15} aria-hidden="true" />}
+            <span>{isMuted ? uiLabels.unmute : uiLabels.mute}</span>
+          </button>
+        )}
       </div>
 
       {(availableAudio.length > 1 || subLangs.length > 0) && (
@@ -202,6 +323,9 @@ export default function MediaVideo({
                   {lang.toUpperCase()}
                 </button>
               ))}
+              <span className="s-video-auto-tag">
+                {uiLabels.auto}: {detectedLang.toUpperCase()}
+              </span>
             </div>
           )}
 

@@ -1305,3 +1305,644 @@ textarea.s-input {
 @media (prefers-reduced-motion: reduce) {
   .s-route-anim, .s-pulse { animation: none; }
 }
+
+/* ============================================================================
+   SENDA APPLE KEYNOTE x PALANTIR INTERACTIVE SHOWCASE SYSTEM
+   - Cinema video bezel + floating sound/preview controls
+   - Audience Clarity Lens (Citizen / Investor / Engineer)
+   - Single-row scrollable accessible tablist with edge-fade mask (MWG tabs)
+   - Scroll-driven entry animations (MWG scroll-entry-exit-effects)
+   - 3D Orbital Satellite Scroll Stage (Three.js + content-visibility: auto)
+   - Apple Hardware Smartphone Sensor Mockup
+   - Real-World Crisis Inspiration Atlas
+   - Palantir Interactive Engineering Labs Shell (mobile-hardened)
+   ============================================================================ */
+
+/* ---------- Cinema Video Overlay & Mobile Controls ---------- */
+.s-media-cinema {
+  border-radius: 26px;
+  border: 1px solid var(--s-line-strong);
+  box-shadow: var(--s-shadow-lg);
+  overflow: hidden;
+  background: var(--s-bg-elev);
+}
+
+.s-video-wrap {
+  position: relative;
+  background: #040912;
+}
+
+.s-video-cinema-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 22px 12px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(8, 16, 28, 0.78);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  backdrop-filter: saturate(180%) blur(16px);
+  color: #ffffff;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+  transition: transform 180ms var(--s-ease), background 180ms var(--s-ease);
+  z-index: 3;
+}
+
+.s-video-cinema-play:hover {
+  transform: translate(-50%, -52%) scale(1.03);
+  background: var(--s-accent);
+}
+
+.s-video-cinema-play-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.s-video-mute-chip {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(6, 13, 24, 0.78);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.s-video-auto-tag {
+  font-size: 11px;
+  font-family: var(--s-mono);
+  color: var(--s-text-3);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--s-bg-sunk);
+  border: 1px solid var(--s-line);
+}
+
+/* ---------- Audience Clarity Lens ---------- */
+.s-lens-bar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 14px;
+  padding: 8px 10px 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--s-line-strong);
+  background: var(--s-glass-panel);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  backdrop-filter: saturate(180%) blur(16px);
+  box-shadow: var(--s-shadow);
+  max-width: 100%;
+}
+
+.s-lens-prefix {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--s-text-3);
+  letter-spacing: 0.01em;
+}
+
+.s-lens-pills {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.s-lens-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--s-text-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--s-dur-fast), color var(--s-dur-fast), border-color var(--s-dur-fast);
+}
+
+.s-lens-pill:hover {
+  color: var(--s-text);
+  background: var(--s-bg-sunk);
+}
+
+.s-lens-pill[aria-pressed="true"] {
+  background: var(--s-text);
+  color: var(--s-bg);
+}
+
+@media (max-width: 680px) {
+  .s-lens-bar {
+    border-radius: 20px;
+    padding: 10px 12px;
+    width: 100%;
+  }
+  .s-lens-pills {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ---------- Single-Row Scrollable Accessible Tablist (MWG tabs) ---------- */
+@property --fade-start {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --fade-end {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes s-reveal-fade-start {
+  to { --fade-start: var(--fade-size); }
+}
+
+@keyframes s-hide-fade-end {
+  from { --fade-end: var(--fade-size); }
+}
+
+.s-tabs-scroller {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: inline proximity;
+  scroll-padding-inline: 2.5rem;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--s-line);
+  scrollbar-width: none;
+  max-width: 100%;
+}
+
+.s-tabs-scroller::-webkit-scrollbar { display: none; }
+
+@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
+  .s-tabs-scroller {
+    --fade-size: 2.5rem;
+    mask:
+      linear-gradient(black, black) no-clip subtract,
+      linear-gradient(to right, black, transparent) 0 0 / var(--fade-start) 100% no-repeat no-clip,
+      linear-gradient(to right, transparent, black) 100% 0 / var(--fade-end) 100% no-repeat no-clip;
+    animation: s-reveal-fade-start linear both, s-hide-fade-end linear both;
+    animation-timeline: scroll(self inline);
+    animation-range: 0 var(--fade-size), calc(100% - var(--fade-size)) 100%;
+  }
+}
+
+.s-tab-btn {
+  position: relative;
+  flex: none;
+  scroll-snap-align: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px 12px;
+  border: 0;
+  border-radius: 12px 12px 0 0;
+  background: transparent;
+  color: var(--s-text-2);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--s-dur-fast), background var(--s-dur-fast);
+}
+
+.s-tab-btn:hover {
+  color: var(--s-text);
+  background: var(--s-bg-elev);
+}
+
+.s-tab-btn[aria-selected="true"] {
+  color: var(--s-accent);
+  background: var(--s-accent-soft);
+}
+
+.s-tab-btn[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset: auto 10px 0 10px;
+  border-block-end: 3px solid var(--s-accent);
+  border-radius: 2px;
+}
+
+/* ---------- Scroll-Driven Entry Reveal (MWG scroll-entry-exit-effects) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    @keyframes s-card-rise {
+      from {
+        opacity: 0.45;
+        transform: translateY(22px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .s-scroll-reveal {
+      animation: s-card-rise auto linear both;
+      animation-timeline: view();
+      animation-range: entry 5% entry 48%;
+    }
+  }
+}
+
+/* ---------- 3D Orbital Satellite Scroll Stage ---------- */
+.s-globe-band {
+  background:
+    radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--s-accent) 9%, transparent), transparent 44%),
+    var(--s-bg);
+}
+
+.s-globe-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.s-globe-sticky {
+  position: sticky;
+  top: calc(var(--s-header-h) + 20px);
+}
+
+.s-globe-shell {
+  position: relative;
+  border-radius: 26px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: #050b13;
+  color: #f8fafc;
+  box-shadow: 0 24px 64px rgba(2, 6, 23, 0.34);
+}
+
+.s-globe-canvas {
+  width: 100%;
+  height: clamp(320px, 46vw, 500px);
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 440px;
+}
+
+.s-globe-fallback {
+  height: 360px;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  color: #7dd3fc;
+  font-family: var(--s-mono);
+  font-size: 13px;
+}
+
+.s-globe-hud-top {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.s-globe-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(5, 11, 19, 0.76);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(56, 189, 248, 0.36);
+  color: #e0f2fe;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.s-globe-hud-bottom {
+  padding: 14px 18px 16px;
+  background: linear-gradient(180deg, rgba(5, 11, 19, 0.85), #040912);
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.s-globe-telemetry {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.s-globe-telemetry strong {
+  display: block;
+  font-size: 12.5px;
+  color: #f8fafc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.s-globe-tlabel {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: #7dd3fc;
+  font-family: var(--s-mono);
+  margin-bottom: 2px;
+}
+
+.s-globe-progress {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.2);
+  overflow: hidden;
+}
+
+.s-globe-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #38bdf8, #30d158);
+  transition: width 280ms var(--s-ease);
+}
+
+.s-globe-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.s-globe-step {
+  padding: 20px 22px;
+  border-radius: 20px;
+  border: 1px solid var(--s-line);
+  background: var(--s-bg-elev);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color 180ms var(--s-ease), box-shadow 180ms var(--s-ease), transform 180ms var(--s-ease);
+}
+
+.s-globe-step.is-active {
+  border-color: var(--s-accent);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--s-accent) 14%, transparent);
+}
+
+@media (max-width: 960px) {
+  .s-globe-layout { grid-template-columns: 1fr; }
+  .s-globe-sticky { position: static; }
+  .s-globe-canvas { height: 320px; }
+  .s-globe-telemetry { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---------- Smartphone Hardware Sensor Mockup ---------- */
+.s-sensor-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.s-sensor-sticky {
+  position: sticky;
+  top: calc(var(--s-header-h) + 20px);
+}
+
+.s-phone-stage {
+  border-radius: 28px;
+  border: 1px solid var(--s-line-strong);
+  background: var(--s-bg-elev);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--s-shadow-lg);
+}
+
+.s-phone-svg {
+  width: min(310px, 100%);
+  height: auto;
+  display: block;
+}
+
+.s-phone-foot {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--s-bg-sunk);
+  border: 1px solid var(--s-line);
+}
+
+.s-sensor-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.s-sensor-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 180ms var(--s-ease), box-shadow 180ms var(--s-ease);
+}
+
+.s-sensor-card.is-active {
+  border-color: var(--s-accent);
+  box-shadow: 0 12px 34px color-mix(in srgb, var(--s-accent) 14%, transparent);
+}
+
+@keyframes s-wave-draw {
+  0% { stroke-dashoffset: 320; }
+  100% { stroke-dashoffset: 0; }
+}
+@keyframes s-spin-slow {
+  to { transform: rotate(360deg); }
+}
+@keyframes s-float-y {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.s-anim-wave {
+  stroke-dasharray: 320;
+  animation: s-wave-draw 2.6s ease-in-out infinite;
+}
+.s-anim-dash {
+  stroke-dasharray: 8 8;
+  animation: s-dash 2.2s linear infinite;
+}
+.s-anim-pulse {
+  animation: s-pulse 2.4s ease-in-out infinite;
+}
+.s-anim-spin {
+  animation: s-spin-slow 16s linear infinite;
+}
+.s-anim-float {
+  animation: s-float-y 3.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s-anim-wave, .s-anim-dash, .s-anim-pulse, .s-anim-spin, .s-anim-float {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 960px) {
+  .s-sensor-layout { grid-template-columns: 1fr; }
+  .s-sensor-sticky { position: static; }
+  .s-phone-svg { width: min(260px, 84vw); }
+}
+
+/* ---------- Real-World Crisis Inspiration Atlas ---------- */
+.s-crisis-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 28px;
+  padding: clamp(20px, 3vw, 34px);
+  border-radius: 28px;
+  border: 1px solid var(--s-line-strong);
+  background: var(--s-bg-elev);
+  box-shadow: var(--s-shadow);
+  align-items: center;
+}
+
+.s-crisis-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.s-crisis-kpi {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--s-bg-sunk);
+  border: 1px solid var(--s-line);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.s-crisis-kpi strong {
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  color: var(--s-text);
+  letter-spacing: -0.02em;
+}
+
+.s-crisis-render-frame {
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--s-line);
+  background: #060d18;
+  padding: 12px;
+}
+
+.s-crisis-render-frame img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+}
+
+@media (max-width: 960px) {
+  .s-crisis-stage { grid-template-columns: 1fr; }
+  .s-crisis-kpis { grid-template-columns: 1fr; }
+}
+
+/* ---------- Palantir Interactive Engineering Labs Shell ---------- */
+.s-lazy-band {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 540px;
+}
+
+.s-lab-intro {
+  border-left: 4px solid var(--s-accent);
+  padding: 18px 22px;
+}
+
+.s-lab-shell {
+  border-radius: 26px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: #050b14;
+  color: #f1f5f9;
+  box-shadow: 0 24px 64px rgba(2, 6, 23, 0.34);
+  max-width: 100%;
+}
+
+/* Mobile overflow guard for rich legacy engineering labs inside .s-lab-shell */
+.s-lab-shell .oep-telecom-suite,
+.s-lab-shell .rsl-suite,
+.s-lab-shell .vdl-suite,
+.s-lab-shell .stl-suite {
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  max-width: 100% !important;
+  overflow-x: hidden;
+}
+
+.s-lab-shell .oep-telecom-suite {
+  padding: clamp(18px, 3vw, 34px) clamp(14px, 2.5vw, 28px) !important;
+}
+
+.s-lab-shell pre,
+.s-lab-shell code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 820px) {
+  .s-lab-shell .rsl-stage,
+  .s-lab-shell .vdl-stage,
+  .s-lab-shell .stl-stage,
+  .s-lab-shell .oep-ts-split,
+  .s-lab-shell .oep-ts-grid-2,
+  .s-lab-shell .oep-ts-compare {
+    grid-template-columns: 1fr !important;
+  }
+  .s-lab-shell .rsl-suite,
+  .s-lab-shell .vdl-suite,
+  .s-lab-shell .stl-suite {
+    padding: 16px !important;
+  }
+}
