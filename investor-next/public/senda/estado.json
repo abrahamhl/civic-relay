@@ -1,16 +1,16 @@
 {
-  "core": 903,
-  "coreTotal": 903,
+  "core": 910,
+  "coreTotal": 910,
   "defense": 23,
   "relay": 3,
   "web": 157,
-  "sha": "2f6fcffc8e52f4b7bc22ad13179903db68722e3e",
-  "generatedAt": "2026-11-20T15:38:17.131Z",
+  "sha": "e49a41cfb34f52cae7d330bb592bd44010fb3a71",
+  "generatedAt": "2026-11-20T18:35:42.054Z",
   "evidenceKind": "BUILD_EXECUTED_SOFTWARE_TESTS",
   "suites": {
     "core": {
-      "tests": 903,
-      "pass": 903,
+      "tests": 910,
+      "pass": 910,
       "fail": 0,
       "skipped": 0,
       "exitCode": 0

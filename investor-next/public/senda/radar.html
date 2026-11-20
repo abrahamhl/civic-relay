@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SENDA · Radar de avisos</title>
+<meta name="description" content="Avisos oficiales y eventos naturales del mundo en un globo: AEMET y los servicios de MeteoAlarm, terremotos de USGS y EMSC, alertas GDACS y eventos de NASA EONET. SENDA detecta los nuevos y calcula a quién despertar alrededor: testigos, pasarelas y ayuda cercana.">
+<meta name="theme-color" content="#05070a">
+<link rel="icon" href="/senda/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/senda/fonts/fonts.css">
+<style>
+:root{--bg:#05070a;--p:rgba(12,15,19,.86);--p2:#141920;--line:#222932;--line2:#2f3741;--t:#e9edf0;--m:#8e98a3;--d:#5f6873;--fire:#ff7756;--water:#4f9dff;--quake:#fbbf24;--wind:#b48cff;--ok:#34d399;--red:#ff5b6e}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 "Inter",system-ui,sans-serif;font-feature-settings:"tnum" 1;-webkit-font-smoothing:antialiased;overflow:hidden}
+a{color:#8fb4ff}.mono{font-family:"IBM Plex Mono",monospace}
+#stage{position:fixed;inset:0}
+#gl,#ov{position:absolute;inset:0;width:100%;height:100%;display:block}
+#ov{pointer-events:none}
+body.v-nvg #gl{filter:sepia(1) hue-rotate(60deg) saturate(3.2) brightness(.95) contrast(1.15)}
+body.v-flir #gl{filter:grayscale(1) contrast(1.5) brightness(1.1)}
+body.v-tac #gl{filter:saturate(.35) brightness(.7) contrast(1.25)}
+.top{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;gap:16px;padding:12px 18px;background:linear-gradient(#05070a,rgba(5,7,10,0))}
+.brand{font-weight:650;font-size:17px;white-space:nowrap}.brand span{color:var(--m);font-weight:500;margin-left:6px}
+.live{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--m);white-space:nowrap}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--d)}.dot.on{background:var(--ok);box-shadow:0 0 0 0 rgba(52,211,153,.6);animation:pl 2s infinite}
+@keyframes pl{70%{box-shadow:0 0 0 9px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+.kpis{display:flex;gap:18px;margin-left:auto}.kpis div{text-align:right}.kpis b{display:block;font-size:20px;font-weight:620;line-height:1.1}.kpis span{font-size:12px;color:var(--m)}
+.tnav{display:flex;gap:14px;font-size:13.5px;margin-left:12px}.tnav a{color:var(--m);text-decoration:none;white-space:nowrap}.tnav a:hover{color:var(--t)}
+.side{position:fixed;z-index:5;top:70px;left:16px;width:230px;background:var(--p);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:10px;padding:12px}
+.side h3,.panel h3{font-size:12.5px;font-weight:600;color:var(--m);margin:0 0 8px}
+.fl{display:flex;align-items:center;gap:8px;padding:5px 2px;font-size:14px;cursor:pointer;user-select:none}.fl input{accent-color:#e9edf0}.fl i{width:10px;height:10px;border-radius:2px;display:inline-block}.fl em{margin-left:auto;font-style:normal;color:var(--m);font-size:12.5px}
+.seg{display:flex;border:1px solid var(--line2);border-radius:7px;overflow:hidden;margin:4px 0 10px}.seg button{flex:1;font:inherit;font-size:12.5px;padding:7px 4px;background:transparent;color:var(--m);border:0;border-left:1px solid var(--line2);cursor:pointer;min-height:34px}.seg button:first-child{border-left:0}.seg button.on{background:#e9edf0;color:#05070a;font-weight:600}
+.panel{position:fixed;z-index:5;top:70px;right:16px;bottom:64px;width:360px;background:var(--p);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;overflow:hidden}
+.panel .hd{padding:12px 14px 6px}.list{overflow:auto;flex:1;padding:0 8px 10px}
+.it{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:10px;align-items:start;padding:9px 6px;border-top:1px solid #1b2128;cursor:pointer;border-radius:6px}.it:hover{background:#121820}.it.sel{background:#16202a}
+.it i{width:10px;height:10px;border-radius:50%;margin-top:5px}.it b{display:block;font-weight:560;font-size:14px;line-height:1.3}.it small{color:var(--m);font-size:12.5px}.it time{font-size:12px;color:var(--m);white-space:nowrap}
+.new{color:var(--ok);font-weight:600}
+.det{padding:12px 14px;border-top:1px solid var(--line);max-height:58%;overflow:auto;display:none}.det.show{display:block}
+.det h4{margin:0 0 4px;font-size:16px;font-weight:620;line-height:1.3}.row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-top:1px solid #1b2128;font-size:13.5px}.row span{color:var(--m)}.row b{font-weight:560;text-align:right;overflow-wrap:anywhere}
+button.pri{font:inherit;font-size:14px;font-weight:600;background:#e9edf0;color:#05070a;border:0;border-radius:7px;padding:10px 14px;min-height:42px;cursor:pointer;width:100%;margin-top:10px}
+.tag{font-size:12.5px;color:var(--m)}.tag::before{content:"";display:inline-block;width:8px;height:8px;margin-right:6px;background:var(--quake);vertical-align:0}.tag.sim::before{background:var(--wind)}.tag.real::before{background:var(--ok)}
+.act{margin-top:10px;font-size:13.5px}.act li{margin:3px 0}
+.ticker{position:fixed;z-index:5;left:0;right:0;bottom:0;height:46px;display:flex;align-items:center;background:rgba(5,7,10,.92);border-top:1px solid var(--line);overflow:hidden}
+.ticker .lb{flex:none;display:flex;align-items:center;gap:8px;padding:0 14px;font-size:13px;font-weight:600;border-right:1px solid var(--line);height:100%;background:#05070a;position:relative;z-index:1}
+.tk{display:flex;gap:34px;white-space:nowrap;padding-left:20px;animation:mv 120s linear infinite;font-size:13.5px}.tk span{color:var(--m)}.tk b{font-weight:560;color:var(--t)}
+@keyframes mv{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.views{position:fixed;z-index:5;left:16px;bottom:60px;display:flex;gap:0;border:1px solid var(--line2);border-radius:7px;overflow:hidden;background:var(--p)}
+.views button{font:inherit;font-size:12.5px;padding:8px 10px;background:transparent;color:var(--m);border:0;border-left:1px solid var(--line2);cursor:pointer;min-height:36px}.views button:first-child{border-left:0}.views button.on{background:#e9edf0;color:#05070a;font-weight:600}
+.credit{font-size:11px;line-height:1.45;color:var(--d);margin:10px 0 0}
+.hint{position:fixed;z-index:4;left:50%;top:76px;transform:translateX(-50%);font-size:13px;color:var(--m);background:var(--p);border:1px solid var(--line);border-radius:7px;padding:6px 10px;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.tk{animation:none}.dot.on{animation:none}}
+@media (max-width:1380px){.tnav{display:none}}
+@media (max-width:900px){
+  body{overflow:auto}#stage{position:relative;height:62svh}
+  .top{position:sticky;flex-wrap:wrap;background:#05070a}.kpis{gap:12px}.kpis b{font-size:17px}.tnav{display:none}
+  .side,.panel,.views,.credit,.hint{position:static;width:auto;margin:10px 12px;backdrop-filter:none}
+  .panel{height:auto;max-height:none}.list{max-height:50svh}.views{display:flex;margin:10px 12px}.credit{max-width:none;text-align:left}.hint{display:none}
+  .ticker{position:sticky}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">SENDA <span>Radar de avisos</span></div>
+  <div class="live"><i class="dot" id="dot"></i><span id="livetxt">Cargando…</span></div>
+  <nav class="tnav" aria-label="SENDA"><a href="/senda/ciclo">El ciclo</a><a href="/senda/sala">Sala</a><a href="/senda/simulador">Simulador 3D</a><a href="/senda/viaje#desconocido">Sin datos</a><a href="/">Inicio</a></nav>
+  <div class="kpis"><div><b id="k-act">–</b><span>vigentes</span></div><div><b id="k-fc">–</b><span>previstos</span></div><div><b id="k-obs">–</b><span>observados</span></div><div><b id="k-src">–</b><span>fuentes</span></div></div>
+</header>
+<div id="stage"><canvas id="gl" aria-label="Globo con los avisos"></canvas><canvas id="ov" aria-hidden="true"></canvas></div>
+<div class="hint" id="hint">Arrastra para girar · rueda para acercar · toca un punto para ver el aviso</div>
+<aside class="side" aria-label="Filtros">
+  <h3>Qué mostrar</h3><div id="filters"></div>
+  <h3 style="margin-top:10px">Zona</h3>
+  <div class="seg" id="region"><button data-r="world" class="on">Mundo</button><button data-r="eu">Europa</button><button data-r="es">España</button><button data-r="nl">P. Bajos</button></div>
+  <h3>Ventana</h3>
+  <div class="seg" id="win"><button data-h="6">6 h</button><button data-h="24">24 h</button><button data-h="72" class="on">72 h</button><button data-h="0">Todo</button></div>
+  <p class="credit" id="credit">Fuentes: MeteoAlarm (AEMET y servicios nacionales), USGS, EMSC, GDACS, NASA EONET. Fronteras: Natural Earth (dominio público). Textura de la Tierra: «earth-blue-marble» del paquete three-globe 2.31.0 (MIT); el nombre indica Blue Marble de la NASA, procedencia no verificada en el paquete. Zonas de aviso: paquete «meteoalarm» 0.2.0 (MIT).</p>
+</aside>
+<div class="views" id="views" role="group" aria-label="Modo de visión"><button data-v="" class="on">Normal</button><button data-v="v-nvg">Nocturna</button><button data-v="v-flir">Térmica</button><button data-v="v-tac">Táctica</button></div>
+<section class="panel" aria-label="Avisos">
+  <div class="hd"><h3 id="listh">Avisos</h3></div>
+  <div class="list" id="list"></div>
+  <div class="det" id="det" aria-live="polite"></div>
+</section>
+
+<div class="ticker" aria-label="Últimos avisos"><div class="lb"><i class="dot" id="dot2"></i><span id="tklabel">Últimos</span></div><div class="tk" id="tk"></div></div>
+<script type="module" src="/senda/radar.mjs"></script>
+</body>
+</html>
