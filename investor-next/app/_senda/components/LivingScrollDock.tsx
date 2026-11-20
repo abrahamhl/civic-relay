@@ -12,13 +12,14 @@ interface ChapterLink {
 
 const CHAPTERS: ChapterLink[] = [
   { id: 'hero-cinema', num: '01', label: { es: 'Cinema', en: 'Cinema', nl: 'Cinema' } },
-  { id: 'mission-3d', num: '02', label: { es: 'Globo 3D', en: '3D Globe', nl: '3D Globe' } },
-  { id: 'osint-cctv', num: '03', label: { es: 'OSINT CCTV', en: 'OSINT CCTV', nl: 'OSINT CCTV' } },
-  { id: 'ojo-satelites', num: '04', label: { es: 'Satélites', en: 'Satellites', nl: 'Satellieten' } },
-  { id: 'sensors', num: '05', label: { es: 'Sensores', en: 'Sensors', nl: 'Sensoren' } },
-  { id: 'crises', num: '06', label: { es: 'Crisis Reales', en: 'Real Crises', nl: 'Echte Crises' } },
-  { id: 'labs', num: '07', label: { es: '7 Simuladores', en: '7 Simulators', nl: '7 Simulatoren' } },
-  { id: 'all-capabilities', num: '08', label: { es: '38 Módulos', en: '38 Modules', nl: '38 Modules' } }
+  { id: 'innovacion', num: '02', label: { es: 'Innovación', en: 'Innovation', nl: 'Innovatie' } },
+  { id: 'mission-3d', num: '03', label: { es: 'Globo 3D', en: '3D Globe', nl: '3D Globe' } },
+  { id: 'osint-cctv', num: '04', label: { es: 'OSINT CCTV', en: 'OSINT CCTV', nl: 'OSINT CCTV' } },
+  { id: 'ojo-satelites', num: '05', label: { es: 'Satélites', en: 'Satellites', nl: 'Satellieten' } },
+  { id: 'sensors', num: '06', label: { es: 'Sensores', en: 'Sensors', nl: 'Sensoren' } },
+  { id: 'crises', num: '07', label: { es: 'Crisis', en: 'Crises', nl: 'Crises' } },
+  { id: 'labs', num: '08', label: { es: '7 Labs', en: '7 Labs', nl: '7 Labs' } },
+  { id: 'all-capabilities', num: '09', label: { es: '38 Módulos', en: '38 Modules', nl: '38 Modules' } }
 ];
 
 export default function LivingScrollDock({ locale }: { locale: Locale }) {

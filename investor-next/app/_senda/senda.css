@@ -792,8 +792,10 @@ button.s-badge:hover { filter: brightness(0.95); transform: translateY(-1px); }
 
 .s-video {
   width: 100%;
+  height: auto !important;
   aspect-ratio: 16 / 9;
-  object-fit: cover;
+  object-fit: contain;
+  background: #040912;
   display: block;
 }
 
@@ -2156,15 +2158,146 @@ textarea.s-input {
 
 .s-media-vertical .s-video-wrap {
   aspect-ratio: 9 / 16;
-  max-height: 620px;
+  max-height: 74vh;
   margin: 0 auto;
   width: 100%;
+  background: #040912;
 }
 
 .s-media-vertical .s-video {
+  width: 100%;
+  height: auto !important;
   aspect-ratio: 9 / 16;
-  object-fit: cover;
-  max-height: 620px;
+  object-fit: contain;
+  max-height: 74vh;
+}
+
+/* ---------- Innovation Architecture 4-Block Deterministic Cards ---------- */
+.s-innov-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.s-innov-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 12px 14px;
+  min-height: 68px;
+  border-radius: 16px;
+  border: 1px solid var(--s-line);
+  background: var(--s-bg-elev);
+  color: var(--s-text-2);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--s-dur-fast), background var(--s-dur-fast), color var(--s-dur-fast), transform var(--s-dur-fast);
+}
+
+.s-innov-tab:hover {
+  border-color: var(--s-accent);
+  color: var(--s-text);
+  transform: translateY(-1px);
+}
+
+.s-innov-tab[aria-selected="true"] {
+  border-color: var(--s-accent);
+  background: var(--s-accent-soft);
+  color: var(--s-text);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--s-accent) 40%, transparent);
+}
+
+.s-innov-tab-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--s-accent);
+}
+
+.s-innov-tab-title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+@media (max-width: 820px) {
+  .s-innov-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .s-innov-tab {
+    padding: 10px 11px;
+    min-height: 58px;
+  }
+  .s-innov-tab-title {
+    font-size: 12px;
+  }
+}
+
+.s-innov-panel {
+  border-radius: 26px;
+  border: 1px solid var(--s-line-strong);
+  background: var(--s-bg-elev);
+  padding: clamp(16px, 2.8vw, 32px);
+  box-shadow: var(--s-shadow);
+}
+
+.s-innov-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.s-innov-block {
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--s-bg-sunk);
+  border: 1px solid var(--s-line);
+  border-left: 3px solid var(--s-accent);
+}
+
+.s-innov-block.is-problem { border-left-color: var(--s-coral); }
+.s-innov-block.is-how { border-left-color: var(--s-accent); }
+.s-innov-block.is-innov { border-left-color: var(--s-ok); }
+
+.s-innov-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--s-mono);
+  letter-spacing: 0.06em;
+  color: var(--s-text);
+  margin-bottom: 6px;
+}
+
+.s-innov-block p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--s-text-2);
+}
+
+.s-innov-proof {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 11px 14px;
+  border-radius: 14px;
+  background: var(--s-ok-soft);
+  border: 1px solid color-mix(in srgb, var(--s-ok) 32%, transparent);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--s-text-2);
+}
+
+@media (max-width: 960px) {
+  .s-innov-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 780px) {

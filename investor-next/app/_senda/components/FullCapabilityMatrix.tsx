@@ -273,6 +273,57 @@ export default function FullCapabilityMatrix({ locale }: { locale: Locale }) {
               caption={locale === 'es' ? 'Explicado para cualquier persona: 3 botones claros y envío cifrado sin cobertura.' : locale === 'nl' ? 'Helder voor iedereen: 3 duidelijke knoppen zonder bereik.' : 'Plain human flow: 3 clear buttons and encrypted continuity without coverage.'}
               evidenceId="EV-OFFLINE-49"
             />
+            <MediaVideo
+              locale={locale}
+              src="/media/m95/senda-m95-role-developer-es.mp4"
+              sources={{
+                es: '/media/m95/senda-m95-role-developer-es.mp4',
+                en: '/media/m95/senda-m95-role-developer-en.mp4'
+              }}
+              poster="/media/m95/senda-m95-role-developer-poster.jpg"
+              subtitles={{
+                es: '/media/m95/senda-m95-role-developer-es.vtt',
+                en: '/media/m95/senda-m95-role-developer-en.vtt',
+                nl: '/media/m95/senda-m95-role-developer-nl.vtt'
+              }}
+              title={locale === 'es' ? 'Modo Desarrollador e Ingeniería (60 s)' : locale === 'nl' ? 'Ontwikkelaars- & Engineeringmodus (60 s)' : 'Developer & Engineering Mode (60 s)'}
+              caption={locale === 'es' ? 'Física ITU-R, códigos Reed-Solomon, WebCrypto y pruebas automáticas MIT.' : locale === 'nl' ? 'ITU-R fysica, Reed-Solomon, WebCrypto en open-source tests.' : 'ITU-R propagation, Reed-Solomon shards, WebCrypto, and MIT open tests.'}
+              evidenceId="EV-CORE-506"
+            />
+            <MediaVideo
+              locale={locale}
+              src="/media/m95/senda-m95-60s-en.mp4"
+              poster="/media/m95/senda-m95-film-poster.jpg"
+              subtitles={{
+                es: '/media/m95/senda-m95-60s-es.vtt',
+                en: '/media/m95/senda-m95-60s-en.vtt',
+                nl: '/media/m95/senda-m95-60s-nl.vtt'
+              }}
+              title={locale === 'es' ? 'Corte Ejecutivo 60 s (Subtítulos ES / EN / NL)' : locale === 'nl' ? 'Executive Cut 60 s (ES / EN / NL)' : '60-Second Executive Cut (ES / EN / NL Subtitles)'}
+              caption={locale === 'es' ? 'Resumen de un minuto con simulaciones en vivo para compartir en reuniones.' : locale === 'nl' ? 'Samenvatting van één minuut voor snelle briefings.' : 'One-minute executive briefing with live core simulations.'}
+              evidenceId="EV-CORE-506"
+            />
+            <MediaVideo
+              locale={locale}
+              src="/media/m95/senda-m95-30s-en.mp4"
+              poster="/media/m95/senda-m95-film-poster.jpg"
+              subtitles={{
+                es: '/media/m95/senda-m95-30s-es.vtt',
+                en: '/media/m95/senda-m95-30s-en.vtt',
+                nl: '/media/m95/senda-m95-30s-nl.vtt'
+              }}
+              title={locale === 'es' ? 'Spot Ejecutivo 30 s (Subtítulos ES / EN / NL)' : locale === 'nl' ? 'Executive Spot 30 s (ES / EN / NL)' : '30-Second Executive Spot (ES / EN / NL Subtitles)'}
+              caption={locale === 'es' ? 'Píldora rápida de 30 segundos sobre qué resuelve SENDA.' : locale === 'nl' ? 'Korte 30-seconden pitch over de kernwaarde van SENDA.' : '30-second high-impact overview of what SENDA solves.'}
+              evidenceId="EV-CORE-506"
+            />
+            <MediaVideo
+              locale={locale}
+              src="/media/senda-capacidades-es.mp4"
+              poster="/media/m96/senda-m96-promo-poster.jpg"
+              title={locale === 'es' ? 'Demostración Integral de Capacidades SENDA' : locale === 'nl' ? 'Volledige SENDA Capaciteitendemo' : 'Full SENDA Capabilities Demonstration'}
+              caption={locale === 'es' ? 'Recorrido completo por los módulos civiles en funcionamiento.' : locale === 'nl' ? 'Volledige rondleiding langs alle werkende civiele modules.' : 'Complete walkthrough across working civil capabilities.'}
+              evidenceId="EV-CONSOLE-16K"
+            />
           </div>
         </div>
       </div>

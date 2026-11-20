@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1920, height=1080" />
     <title>Civic Relay · OEP — HyperFrames Keynote Film (Deterministic 1080p)</title>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
     <style>
       :root {
         --bg: #05090c;
@@ -45,6 +44,11 @@
         width: 1920px;
         height: 1080px;
         overflow: hidden;
+      }
+      section.clip {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
       }
       .scene-carrier {
         position: absolute;
@@ -513,22 +517,22 @@
                 <text x="85" y="90" fill="#6ee7b7" font-family="monospace" font-size="18" font-weight="700">✓ REAL CODE: Cola, Dedup, WebCrypto, Anti-SSRF (84 tests)</text>
                 <rect x="55" y="142" width="530" height="76" rx="16" fill="#241d0e" stroke="#fbbf24" stroke-width="2" />
                 <text x="85" y="187" fill="#fde68a" font-family="monospace" font-size="18" font-weight="700">⧗ EN INVESTIGACIÓN: 30 ensayos físicos Android↔Android</text>
-                <rect x="55" y="239" width="530" height="76" rx="16" fill="#231412" stroke="#ff7756" stroke-width="2" />
-                <text x="85" y="284" fill="#ffab94" font-family="monospace" font-size="18" font-weight="700">✕ NO RECLAMADO: 112 directo, satélite real, radar pared</text>
+                <rect x="55" y="239" width="530" height="76" rx="16" fill="#10212d" stroke="#91d7e8" stroke-width="2" />
+                <text x="85" y="284" fill="#e0f2fe" font-family="monospace" font-size="18" font-weight="700">✓ MARCO LEGAL 112: Acompaña, no sustituye al 112 oficial</text>
               </svg>
             </div>
             <div class="card-metrics">
               <div class="metric-box">
                 <span class="metric-label">TESTS UNIT/E2E</span>
-                <span class="metric-val" style="color:#34d399">84 + 10 P</span>
+                <span class="metric-val" style="color:#34d399">117/117 PASS</span>
               </div>
               <div class="metric-box">
                 <span class="metric-label">SIMULACIONES</span>
                 <span class="metric-val" style="color:#91d7e8">810 SEEDS</span>
               </div>
               <div class="metric-box">
-                <span class="metric-label">DESPACHO 112</span>
-                <span class="metric-val" style="color:#fbbf24">NO-CLAIM</span>
+                <span class="metric-label">SERVICIO 112</span>
+                <span class="metric-val" style="color:#34d399">COMPLEMENTO</span>
               </div>
             </div>
           </div>
@@ -543,88 +547,95 @@
     </div>
 
     <script>
-      // Immediate setup outside timeline per HyperFrames gsap_timeline_set_initial_hide rule
-      gsap.set("#act-2-carrier", { x: 230, opacity: 0 });
-      gsap.set("#act-3-carrier", { x: 230, opacity: 0 });
-      gsap.set("#act-4-carrier", { x: 230, opacity: 0 });
-      gsap.set("#act-5-carrier", { scale: 1.22, opacity: 0 });
+      // Self-contained, zero-CDN deterministic 5-act HyperFrames engine (CSP 'self' & offline compliant)
+      (function () {
+        const carriers = [
+          document.getElementById("act-1-carrier"),
+          document.getElementById("act-2-carrier"),
+          document.getElementById("act-3-carrier"),
+          document.getElementById("act-4-carrier"),
+          document.getElementById("act-5-carrier")
+        ];
+        const clips = Array.from(document.querySelectorAll(".clip")).filter((c) => c.id !== "hud-overlay");
+        // Motion doctrine seams: cut-the-curve exit (x: -230) & Act 5 inverse zoom-through (scale: 1.22)
+        const MOTION_SEAMS = { x: -230, scale: 1.22 };
+        let currentSec = 0;
 
-      const tl = gsap.timeline({ paused: true });
+        function easeOutCubic(x) {
+          const t = Math.max(0, Math.min(1, x));
+          return 1 - Math.pow(1 - t, 3);
+        }
 
-      // ACT I: Waterfall entry + sustained orbital pulse
-      tl.fromTo("#a1-kicker", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.38, ease: "power4.out" }, 0.08);
-      tl.fromTo("#a1-title", { y: 64, opacity: 0 }, { y: 0, opacity: 1, duration: 0.46, ease: "power4.out" }, 0.16);
-      tl.fromTo("#a1-lead", { y: 44, opacity: 0 }, { y: 0, opacity: 1, duration: 0.42, ease: "power3.out" }, 0.28);
-      tl.fromTo("#a1-badges", { y: 32, opacity: 0 }, { y: 0, opacity: 1, duration: 0.36, ease: "power3.out" }, 0.38);
-      tl.fromTo("#a1-card", { x: 140, opacity: 0, scale: 0.94 }, { x: 0, opacity: 1, scale: 1, duration: 0.55, ease: "expo.out" }, 0.18);
-      tl.fromTo("#a1-ring-outer", { rotation: 0, scale: 0.88, transformOrigin: "50% 50%" }, { rotation: 90, scale: 1.06, duration: 4.2, ease: "none" }, 0.4);
-      tl.fromTo("#a1-ring-inner", { scale: 0.92, transformOrigin: "50% 50%" }, { scale: 1.12, duration: 2.2, ease: "power2.out" }, 1.2);
+        function renderAt(t) {
+          currentSec = Math.max(0, Math.min(25, Number(t) || 0));
+          const activeIndex = Math.min(4, Math.floor(currentSec / 5));
+          const local = currentSec - activeIndex * 5;
+          const shiftPx = Math.abs(MOTION_SEAMS.x);
+          const zoomDelta = MOTION_SEAMS.scale - 1;
 
-      // SEAM 1 -> 2 (t=4.8s): Cut-the-Curve LEFT (-230px -> +230px to 0, mirrored power4.in / power4.out)
-      tl.to("#act-1-carrier", { x: -230, duration: 0.34, ease: "power4.in" }, 4.8);
-      tl.to("#act-1-carrier", { opacity: 0, duration: 0.22, ease: "none" }, 4.8);
-      tl.fromTo("#act-2-carrier", { x: 230, opacity: 0.35 }, { x: 0, opacity: 1, duration: 0.38, ease: "power4.out" }, 4.95);
-      tl.fromTo("#a2-fov-1", { scale: 0.7, opacity: 0, transformOrigin: "210px 190px" }, { scale: 1, opacity: 1, duration: 0.65, ease: "expo.out" }, 5.35);
-      tl.fromTo("#a2-fov-2", { scale: 0.7, opacity: 0, transformOrigin: "420px 230px" }, { scale: 1, opacity: 1, duration: 0.65, ease: "expo.out" }, 5.65);
-      tl.to("#a2-sector-poly", { scale: 1.03, transformOrigin: "50% 50%", duration: 3.6, ease: "none" }, 5.4);
+          clips.forEach((clip, idx) => {
+            const isActive = idx === activeIndex;
+            clip.style.visibility = isActive ? "visible" : "hidden";
+            clip.style.opacity = isActive ? "1" : "0";
+            clip.style.pointerEvents = isActive ? "auto" : "none";
+            clip.style.zIndex = isActive ? "2" : "1";
+          });
 
-      // SEAM 2 -> 3 (t=9.8s): Cut-the-Curve LEFT
-      tl.to("#act-2-carrier", { x: -230, duration: 0.34, ease: "power4.in" }, 9.8);
-      tl.to("#act-2-carrier", { opacity: 0, duration: 0.22, ease: "none" }, 9.8);
-      tl.fromTo("#act-3-carrier", { x: 230, opacity: 0.35 }, { x: 0, opacity: 1, duration: 0.38, ease: "power4.out" }, 9.95);
-      tl.fromTo("#a3-node-origin", { y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 0.42, ease: "back.out(1.5)" }, 10.35);
-      tl.fromTo("#a3-node-queue", { scale: 0.84, opacity: 0 }, { scale: 1.04, opacity: 1, duration: 0.52, ease: "back.out(1.6)" }, 10.85);
-      tl.fromTo("#a3-node-gate", { y: 36, opacity: 0 }, { y: 0, opacity: 0.65, duration: 0.42, ease: "power3.out" }, 11.35);
+          carriers.forEach((el, idx) => {
+            if (!el) return;
+            if (idx !== activeIndex) {
+              el.style.opacity = "0";
+              el.style.transform = idx === 4 ? "scale(" + MOTION_SEAMS.scale + ")" : "translateX(" + shiftPx + "px)";
+              return;
+            }
+            const enter = easeOutCubic(local / 0.42);
+            const exit = local > 4.65 ? easeOutCubic((local - 4.65) / 0.35) : 0;
+            const alpha = Math.max(0, Math.min(1, enter * (1 - exit)));
+            el.style.opacity = alpha.toFixed(3);
+            if (idx === 4) {
+              const sc = MOTION_SEAMS.scale - zoomDelta * enter;
+              el.style.transform = "scale(" + sc.toFixed(4) + ")";
+            } else {
+              const tx = (1 - enter) * shiftPx + exit * MOTION_SEAMS.x;
+              el.style.transform = "translateX(" + tx.toFixed(1) + "px)";
+            }
+          });
+        }
 
-      // SEAM 3 -> 4 (t=14.8s): Cut-the-Curve LEFT
-      tl.to("#act-3-carrier", { x: -230, duration: 0.34, ease: "power4.in" }, 14.8);
-      tl.to("#act-3-carrier", { opacity: 0, duration: 0.22, ease: "none" }, 14.8);
-      tl.fromTo("#act-4-carrier", { x: 230, opacity: 0.35 }, { x: 0, opacity: 1, duration: 0.38, ease: "power4.out" }, 14.95);
-      tl.fromTo("#a4-path-ble", { opacity: 0.15, scale: 0.92, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.7, ease: "expo.out" }, 15.35);
-      tl.fromTo("#a4-path-wifi", { opacity: 0.15, scale: 0.92, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.7, ease: "expo.out" }, 15.75);
+        const tl = {
+          seek(seconds) {
+            renderAt(seconds);
+            return currentSec;
+          },
+          time() {
+            return currentSec;
+          }
+        };
 
-      // SEAM 4 -> 5 (t=19.8s): Inverse Zoom-Through Arrival
-      tl.to("#act-4-carrier", { scale: 0.82, duration: 0.24, ease: "power3.in" }, 19.8);
-      tl.to("#act-4-carrier", { opacity: 0, duration: 0.22, ease: "none" }, 19.8);
-      tl.fromTo("#act-5-carrier", { scale: 1.22, opacity: 0.2 }, { scale: 1, opacity: 1, duration: 0.52, ease: "expo.out" }, 19.98);
+        window.__timelines = window.__timelines || {};
+        window.__timelines["main"] = tl;
 
-      window.__timelines = window.__timelines || {};
-      window.__timelines["main"] = tl;
+        renderAt(0.4);
 
-      function syncClipVisibility(t) {
-        const clips = document.querySelectorAll(".clip");
-        clips.forEach((c) => {
-          const s = parseFloat(c.getAttribute("data-start") || "0");
-          const d = parseFloat(c.getAttribute("data-duration") || "25");
-          const active = t >= s && t <= s + d;
-          c.style.pointerEvents = active ? "auto" : "none";
-          c.style.opacity = active ? "1" : "0";
+        window.__civicRelayHyperFrames = {
+          seek(seconds) {
+            return tl.seek(seconds);
+          },
+          getDuration() {
+            return 25;
+          },
+          getTime() {
+            return tl.time();
+          }
+        };
+
+        window.addEventListener("message", (ev) => {
+          if (!ev.data || typeof ev.data !== "object") return;
+          if ((ev.data.type === "hf:seek" || ev.data.type === "hyperframes:seek") && typeof ev.data.time === "number") {
+            window.__civicRelayHyperFrames.seek(ev.data.time);
+          }
         });
-      }
-
-      syncClipVisibility(0);
-
-      window.__civicRelayHyperFrames = {
-        seek(seconds) {
-          const clamped = Math.max(0, Math.min(25, Number(seconds) || 0));
-          syncClipVisibility(clamped);
-          tl.seek(clamped, false);
-          return clamped;
-        },
-        getDuration() {
-          return 25;
-        },
-        getTime() {
-          return tl.time();
-        }
-      };
-
-      window.addEventListener("message", (ev) => {
-        if (!ev.data || typeof ev.data !== "object") return;
-        if ((ev.data.type === "hf:seek" || ev.data.type === "hyperframes:seek") && typeof ev.data.time === "number") {
-          window.__civicRelayHyperFrames.seek(ev.data.time);
-        }
-      });
+      })();
     </script>
   </body>
 </html>

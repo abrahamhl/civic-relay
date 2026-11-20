@@ -207,7 +207,7 @@ export function HyperFramesCinemaDeck({ locale = "es" }: { locale?: Locale }) {
     if (!el) return;
     const updateScale = () => {
       const width = el.clientWidth || 1056;
-      setScale(Math.max(0.18, Math.min(1, width / 1920)));
+      setScale(Math.max(0.14, Math.min(1, width / 1920)));
     };
     updateScale();
     if (typeof ResizeObserver !== "undefined") {
@@ -276,7 +276,7 @@ export function HyperFramesCinemaDeck({ locale = "es" }: { locale?: Locale }) {
             {t.engineBadge}
           </span>
           <a
-            href="/hyperframes"
+            href="/hyperframes/index.html"
             target="_blank"
             rel="noreferrer"
             className="hf-raw-link"
@@ -321,7 +321,7 @@ export function HyperFramesCinemaDeck({ locale = "es" }: { locale?: Locale }) {
           >
             <iframe
               ref={iframeRef}
-              src="/hyperframes"
+              src="/hyperframes/index.html"
               title={t.title}
               className="hf-stage-iframe"
               data-testid="hf-stage-iframe"

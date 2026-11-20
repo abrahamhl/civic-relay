@@ -1,25 +1,26 @@
 # SENDA · Léeme primero
 
-> **Generado el 2026-11-20** desde el commit `dc9ba98`. Dominio de las páginas de inversores: `https://civic-relay-investor.vercel.app`.
+> **Generado el 2026-11-20** desde el commit `2531773`. Dominio de las páginas de inversores: `https://civic-relay-investor.vercel.app`.
 > Esta carpeta se entiende **sin haber seguido ninguna conversación**: aquí está todo lo necesario para publicar la web en otro alojamiento, revisar el código y enseñar el proyecto.
 
 ## 1. Qué es esta carpeta
 
 SENDA es un sistema de avisos y comunicación para emergencias que **funciona sin Internet ni cobertura**. Usa los teléfonos, los coches y lo que ya existe: satélites, cámaras públicas y datos abiertos de tráfico y meteorología.
 
-Esta carpeta lo empaqueta en zips. Tamaño total: **381,7 MB**.
+Esta carpeta lo empaqueta en zips. Tamaño total: **406,6 MB**.
 
 | Zip | Qué contiene | Tamaño | Nota |
 |---|---|---|---|
-| `zips/1-web-hostinger.zip` | Web completa para subir a public_html (sin las dos películas largas) | 90,1 MB | Descomprime en public_html. Contiene .htaccess (fichero oculto). |
-| `zips/2-web-video-senda-m96-promo-en.zip` | Vídeo de la web: media/m96/senda-m96-promo-en.mp4 | 66,7 MB | Descomprime también en public_html: se coloca solo en media/. |
-| `zips/3-web-video-senda-m96-promo-es.zip` | Vídeo de la web: media/m96/senda-m96-promo-es.mp4 | 67,7 MB | Descomprime también en public_html: se coloca solo en media/. |
-| `zips/4-web-video-senda-film-en.zip` | Vídeo de la web: media/senda-film-en.mp4 | 28,1 MB | Descomprime también en public_html: se coloca solo en media/. |
-| `zips/5-web-video-senda-film-es.zip` | Vídeo de la web: media/senda-film-es.mp4 | 28,5 MB | Descomprime también en public_html: se coloca solo en media/. |
-| `zips/6-codigo-fuente.zip` | Código fuente completo (núcleo, relé, web, visión, scripts, pruebas) | 46,6 MB | Sin los vídeos (van en la web) ni las capturas de evidencias (van aparte). |
-| `zips/7-documentacion.zip` | Documentación: traspaso, arquitectura, financiación, investigación y registro de cambios | 14,0 MB | Empieza por docs/handoff/HANDOFF_COMPLETO_2026-11-05.md. |
-| `zips/8-evidencias.zip` | Evidencias: resultados de las pruebas de extremo a extremo y capturas | 36,3 MB | offline-e2e.json resume las comprobaciones sin red. |
-| `zips/9-vision-python.zip` | Visión de tráfico en Python (YOLOX + ByteTrack) con los vídeos anotados | 3,7 MB | Modelos y vídeos de origen se descargan con las instrucciones del README (licencias Apache 2.0, MIT y CC BY 4.0). |
+| `zips/1-web-hostinger.zip` | Web completa para subir a public_html (sin los vídeos largos ni el pack M95) | 64,5 MB | Descomprime en public_html. Contiene .htaccess (fichero oculto). |
+| `zips/2-web-videos-m95-simulaciones.zip` | Pack de vídeos M95 (simulaciones viales, reels 9:16, especiales y roles) | 49,5 MB | Descomprime en public_html: se colocan solos en media/m95/. |
+| `zips/3-web-video-senda-m96-promo-en.zip` | Vídeo de la web: media/m96/senda-m96-promo-en.mp4 | 66,7 MB | Descomprime también en public_html: se coloca solo en media/. |
+| `zips/4-web-video-senda-m96-promo-es.zip` | Vídeo de la web: media/m96/senda-m96-promo-es.mp4 | 67,7 MB | Descomprime también en public_html: se coloca solo en media/. |
+| `zips/5-web-video-senda-film-en.zip` | Vídeo de la web: media/senda-film-en.mp4 | 28,1 MB | Descomprime también en public_html: se coloca solo en media/. |
+| `zips/6-web-video-senda-film-es.zip` | Vídeo de la web: media/senda-film-es.mp4 | 28,5 MB | Descomprime también en public_html: se coloca solo en media/. |
+| `zips/7-codigo-fuente.zip` | Código fuente completo (núcleo, relé, web, visión, scripts, pruebas) | 47,2 MB | Sin los vídeos (van en la web) ni las capturas de evidencias (van aparte). |
+| `zips/8-documentacion.zip` | Documentación: traspaso, arquitectura, financiación, investigación y registro de cambios | 14,5 MB | Empieza por docs/handoff/HANDOFF_COMPLETO_2026-11-05.md. |
+| `zips/9-evidencias.zip` | Evidencias: resultados de las pruebas de extremo a extremo y capturas | 36,3 MB | offline-e2e.json resume las comprobaciones sin red. |
+| `zips/10-vision-python.zip` | Visión de tráfico en Python (YOLOX + ByteTrack) con los vídeos anotados | 3,7 MB | Modelos y vídeos de origen se descargan con las instrucciones del README (licencias Apache 2.0, MIT y CC BY 4.0). |
 
 Además:
 - `MANIFIESTO.json`: lista de zips con su tamaño y su huella.
@@ -35,7 +36,7 @@ La web es **estática**: HTML, JavaScript, vídeos. No necesita base de datos, P
 1. Entra en **hPanel → Sitios web → Administrar → Administrador de archivos** y abre la carpeta `public_html`.
 2. Si hay un `default.php` o una web anterior, muévelos a una carpeta de copia.
 3. Pulsa **Subir** y elige `1-web-hostinger.zip`. Cuando termine, pulsa con el botón derecho → **Extraer**, y extrae **en `public_html`**.
-4. Haz lo mismo con los zips de vídeo (`1-web-hostinger.zip`, `2-web-video-senda-m96-promo-en.zip`, `3-web-video-senda-m96-promo-es.zip`, `4-web-video-senda-film-en.zip`, `5-web-video-senda-film-es.zip`). Cada uno se coloca solo en `media/`.
+4. Haz lo mismo con los zips de vídeo (`1-web-hostinger.zip`, `2-web-videos-m95-simulaciones.zip`, `3-web-video-senda-m96-promo-en.zip`, `4-web-video-senda-m96-promo-es.zip`, `5-web-video-senda-film-en.zip`, `6-web-video-senda-film-es.zip`). Cada uno se coloca solo en `media/`.
 5. Activa **«Mostrar archivos ocultos»** y comprueba que existe `public_html/.htaccess`. Sin él, las páginas `/senda/...` dan error 404.
 6. En **Seguridad → SSL**, activa el certificado y **«Forzar HTTPS»**. El modo sin conexión de SENDA **solo funciona con HTTPS**.
 7. Borra los `.zip` del servidor: ya no hacen falta.

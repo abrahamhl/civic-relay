@@ -24,6 +24,7 @@ import { HOME_COPY } from '../data/home-product';
 import { localeHref, type Locale } from '../data/types';
 
 // Lazy-loaded heavyweight interactive engines: 0 bytes in initial Home JS, instant mount on scroll
+const InnovationShowcase = dynamic(() => import('../components/InnovationShowcase'), { ssr: false });
 const MissionControlDeck = dynamic(() => import('../components/MissionControlDeck'), { ssr: false });
 const OsintIntelligenceDeck = dynamic(() => import('../components/OsintIntelligenceDeck'), { ssr: false });
 const OrbitalOjoDeck = dynamic(() => import('../components/OrbitalOjoDeck'), { ssr: false });
@@ -157,38 +158,43 @@ export default function HomePage({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      {/* 2. LIVE 3D RAYCAST MISSION CONTROL (Earth · Moon · Mars + Satellites + Sectors + Timeline) */}
-      <LazySection id="mission-3d" placeholderHeight={680} rootMargin="560px 0px">
+      {/* 2. INNOVATION ARCHITECTURE: WHAT WE SOLVE, HOW WE DO IT, BREAKTHROUGHS & ALL REAL DEMO VIDEOS */}
+      <LazySection id="innovacion" placeholderHeight={740} rootMargin="160px 0px">
+        <InnovationShowcase locale={locale} audience={audience} />
+      </LazySection>
+
+      {/* 3. LIVE 3D RAYCAST MISSION CONTROL (Earth · Moon · Mars + Satellites + Sectors + Timeline) */}
+      <LazySection id="mission-3d" placeholderHeight={680} rootMargin="240px 0px">
         <MissionControlDeck locale={locale} audience={audience} />
       </LazySection>
 
       {/* 3. REAL OSINT & SECTOR INTELLIGENCE CCTV CONSOLE (1/4/9 Matrix + FOV Cones + 8-Stage OSINT Pipeline) */}
-      <LazySection id="osint-cctv" placeholderHeight={720} rootMargin="480px 0px">
+      <LazySection id="osint-cctv" placeholderHeight={720} rootMargin="240px 0px">
         <OsintIntelligenceDeck locale={locale} audience={audience} />
       </LazySection>
 
       {/* 4. LIVE OJO DE SENDA (Iridium · Galileo · QO-100) + HYPERFRAMES 5-ACT CINEMA + 7-SCENE ANIMATED STORY */}
-      <LazySection id="ojo-satelites" placeholderHeight={660} rootMargin="480px 0px">
+      <LazySection id="ojo-satelites" placeholderHeight={660} rootMargin="240px 0px">
         <OrbitalOjoDeck locale={locale} audience={audience} />
       </LazySection>
 
       {/* 5. SCROLL-BUILT SMARTPHONE HARDWARE & SENSOR MOCKUP (All 6 Phone Sensors Animated) */}
-      <LazySection id="sensors" placeholderHeight={700} rootMargin="480px 0px">
+      <LazySection id="sensors" placeholderHeight={700} rootMargin="240px 0px">
         <SensorShowcase locale={locale} audience={audience} />
       </LazySection>
 
       {/* 6. REAL-WORLD INSPIRATION & MULTI-CRISIS ATLAS (Spain Rail, Valencia DANA, Indonesia/Nepal, Venezuela, Traffic, Fire, NL) */}
-      <LazySection id="crises" placeholderHeight={620} rootMargin="480px 0px">
+      <LazySection id="crises" placeholderHeight={620} rootMargin="240px 0px">
         <CrisisAtlas locale={locale} audience={audience} />
       </LazySection>
 
       {/* 7. PALANTIR 7-SIMULATOR ENGINEERING WORKBENCH (NTN/CSI, CommandSurface 90KB, Rail, Doppler, 3D Building, 5 Theorems, WebCrypto/L2.5) */}
-      <LazySection id="labs" placeholderHeight={720} rootMargin="450px 0px">
+      <LazySection id="labs" placeholderHeight={720} rootMargin="240px 0px">
         <InteractiveLabsHub locale={locale} defaultLab="telecom" id="labs-panel" />
       </LazySection>
 
       {/* 8. COMPLETE 38-CAPABILITY SENDA MATRIX + 9:16 VERTICAL MOBILE REELS & FULL FILM LIBRARY */}
-      <LazySection id="all-capabilities" placeholderHeight={680} rootMargin="450px 0px">
+      <LazySection id="all-capabilities" placeholderHeight={680} rootMargin="240px 0px">
         <FullCapabilityMatrix locale={locale} />
       </LazySection>
 

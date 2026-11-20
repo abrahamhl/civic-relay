@@ -121,6 +121,10 @@ rmSync(ZIPS, { recursive: true, force: true }); mkdirSync(ZIPS, { recursive: tru
 
 const web = walk(OUT).map((name) => ({ name, path: join(OUT, name) }));
 const USED_M95_M96 = new Set([
+  'media/m95/senda-m95-30s-en.mp4',
+  'media/m95/senda-m95-60s-en.mp4',
+  'media/m95/senda-m95-90s-en.mp4',
+  'media/m95/senda-m95-vertical-45s-en.mp4',
   'media/m95/senda-m95-broadcast-special-en.mp4',
   'media/m95/senda-m95-broadcast-special-es.mp4',
   'media/m95/senda-m95-reel-blacksky-en.mp4',
@@ -131,6 +135,12 @@ const USED_M95_M96 = new Set([
   'media/m95/senda-m95-role-citizen-es.mp4',
   'media/m95/senda-m95-role-developer-en.mp4',
   'media/m95/senda-m95-role-developer-es.mp4',
+  'media/m95/senda-m95-sim-braking-en.mp4',
+  'media/m95/senda-m95-sim-proof-en.mp4',
+  'media/m95/senda-m95-sim-queue-en.mp4',
+  'media/m95/senda-m95-sim-sos-en.mp4',
+  'media/m95/senda-m95-sim-visibility-en.mp4',
+  'media/m95/senda-m95-sim-wrongway-en.mp4',
   'media/m96/senda-m96-promo-en.mp4',
   'media/m96/senda-m96-promo-es.mp4'
 ]);
@@ -139,18 +149,24 @@ const isOptionalLocalRender = (name) =>
   name.endsWith('.mp4') &&
   !USED_M95_M96.has(name);
 const webCore = web.filter((f) => !isOptionalLocalRender(f.name));
-const big = webCore.filter((f) => statSync(f.path).size > BIG), small = webCore.filter((f) => statSync(f.path).size <= BIG);
+const m95Pack = webCore.filter((f) => f.name.startsWith('media/m95/') && f.name.endsWith('.mp4'));
+const m95Set = new Set(m95Pack.map((f) => f.name));
+const big = webCore.filter((f) => !m95Set.has(f.name) && statSync(f.path).size > BIG);
+const small = webCore.filter((f) => !m95Set.has(f.name) && statSync(f.path).size <= BIG);
 const read = (f) => ({ name: f.name, data: readFileSync(f.path) });
 const zips = [];
 function add(file, title, entries, note) {
   const r = writeZip(join(ZIPS, file), entries), h = sha(readFileSync(join(ZIPS, file)));
   zips.push({ file, title, note, files: r.files, bytes: r.bytes, sha256: h }); console.log(`· ${file}: ${r.files} ficheros, ${mb(r.bytes)}`);
 }
-add('1-web-hostinger.zip', 'Web completa para subir a public_html (sin las dos películas largas)',
+add('1-web-hostinger.zip', 'Web completa para subir a public_html (sin los vídeos largos ni el pack M95)',
   [...small.map(read), { name: '.htaccess', data: Buffer.from(HTACCESS) }, { name: '_next/static/.htaccess', data: Buffer.from(HTACCESS_NEXT_STATIC) }],
   'Descomprime en public_html. Contiene .htaccess (fichero oculto).');
-big.forEach((f, i) => add(`${2 + i}-web-video-${f.name.split('/').pop().replace(/\.[^.]+$/, '')}.zip`, `Vídeo de la web: ${f.name}`, [read(f)], 'Descomprime también en public_html: se coloca solo en media/.'));
-let n = 2 + big.length;
+let n = 2;
+if (m95Pack.length > 0) {
+  add(`${n++}-web-videos-m95-simulaciones.zip`, 'Pack de vídeos M95 (simulaciones viales, reels 9:16, especiales y roles)', m95Pack.map(read), 'Descomprime en public_html: se colocan solos en media/m95/.');
+}
+big.forEach((f) => add(`${n++}-web-video-${f.name.split('/').pop().replace(/\.[^.]+$/, '')}.zip`, `Vídeo de la web: ${f.name}`, [read(f)], 'Descomprime también en public_html: se coloca solo en media/.'));
 
 // Código fuente: lo que está en git, sin vídeos (ya van en la web), sin la propia entrega y sin evidencias
 const tracked = sh('git ls-files -z', { maxBuffer: 64 * 1024 * 1024 }).split('\0').filter(Boolean);

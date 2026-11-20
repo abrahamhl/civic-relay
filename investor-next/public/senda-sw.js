@@ -1,6 +1,6 @@
 /* SENDA Campo · service worker (raíz, alcance /senda): la app entera queda instalada en el teléfono y abre sin red.
    Está en la raíz porque el sitio usa URL limpias (/senda sin barra final). */
-const VERSION = 'senda-campo-v48';
+const VERSION = 'senda-campo-v49';
 const ASSETS = [
   '/senda', '/senda/app.css', '/senda/app.mjs', '/senda/db.mjs', '/senda/audio.mjs', '/senda/icon.svg', '/senda/manifest.webmanifest',
   '/senda/core/b64.mjs', '/senda/core/envelope.mjs', '/senda/core/bundle.mjs', '/senda/core/acoustic-modem.mjs', '/senda/core/zones.mjs', '/senda/core/feeds.mjs',
@@ -25,11 +25,23 @@ const ASSETS = [
   '/senda/data/referencias/tfl_03752.jpg', '/senda/data/referencias/tfl_06590.jpg', '/senda/data/referencias/tfl_03850.jpg', '/senda/data/referencias/tfl_02158.jpg',
   '/senda/data/smv2026/real.json', '/senda/data/smv2026/validacion_effis.json', '/senda/data/smv2026/gfs_20260723_12z.json', '/senda/data/smv2026/gfs_sinoptico.json', '/senda/data/smv2026/fire3d.json', '/senda/data/smv2026/dem_100m.bin', '/senda/data/smv2026/fuel_100m.bin', '/senda/data/smv2026/burn_100m.bin', '/senda/data/smv2026/prob_roi.bin', '/senda/data/smv2026/arrival_roi.bin', '/senda/data/smv2026/dnbr_d0808.png', '/senda/data/smv2026/tci_pre.jpg', '/senda/data/smv2026/tci_d0724.jpg', '/senda/data/smv2026/tci_d0729.jpg', '/senda/data/smv2026/tci_d0808.jpg',
 ];
-self.addEventListener('install', (e) => { e.waitUntil(caches.open(VERSION).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())); });
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(VERSION)
+      .then((c) => Promise.all(ASSETS.map((u) => c.add(u).catch(() => null))))
+      .then(() => self.skipWaiting())
+  );
+});
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== self.location.origin) return; // fuentes externas: directo a la red
+  const isOfflineFieldAsset = url.pathname.startsWith('/senda') || url.pathname.startsWith('/geo/');
+  if (!isOfflineFieldAsset) {
+    // Public site pages (/ , /es/ , /nl/ , /_next/ , /media/): network-first so mobile always gets the latest deploy immediately
+    e.respondWith(fetch(e.request).catch(() => caches.match(e.request, { ignoreSearch: true })));
+    return;
+  }
   e.respondWith(caches.match(e.request, { ignoreSearch: true }).then((hit) => hit || fetch(e.request).then((r) => {
     if (r.ok) { const copy = r.clone(); caches.open(VERSION).then((c) => c.put(e.request, copy)); }
     return r;

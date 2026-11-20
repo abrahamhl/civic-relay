@@ -363,7 +363,35 @@ async function main() {
     await page.screenshot({ path: resolve(shotsDir, 'home-es-390-mobile.png') });
     report.screenshots.push('docs/web/screenshots/home-es-390-mobile.png');
 
-    // Deep mobile 390px simulator overflow & visual inspection check
+    // Deep mobile 390px video aspect ratio (never 720px stretched!) + Innovation + HyperFrames check
+    const mobileVidBox = await page.locator('[data-testid="senda-video-card"] video').first().boundingBox();
+    assert.ok(mobileVidBox && mobileVidBox.width > 280 && mobileVidBox.height < 280, `Mobile 16:9 video stretched! Got ${JSON.stringify(mobileVidBox)}`);
+    await page.locator('[data-testid="senda-video-card"]').first().scrollIntoViewIfNeeded();
+    await page.waitForTimeout(250);
+    await page.screenshot({ path: resolve(shotsDir, 'home-es-390-video.png') });
+    report.screenshots.push('docs/web/screenshots/home-es-390-video.png');
+
+    await page.locator('#innovacion').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="innovation-showcase"]', { timeout: 10000 });
+    await page.locator('[data-testid="innov-tab-road-vision"]').click();
+    await page.waitForTimeout(250);
+    await page.screenshot({ path: resolve(shotsDir, 'home-es-390-innovation.png') });
+    report.screenshots.push('docs/web/screenshots/home-es-390-innovation.png');
+
+    await page.locator('#ojo-satelites').scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="orbital-ojo-deck"]', { timeout: 10000 });
+    await page.locator('[data-testid="orbital-tab-hyperframes"]').click();
+    await page.waitForSelector('[data-testid="hf-stage-iframe"]', { timeout: 10000 });
+    await page.locator('[data-testid="hf-stage-iframe"]').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(700);
+    const hfFrame = page.frameLocator('[data-testid="hf-stage-iframe"]');
+    const visibleActsCount = await hfFrame.locator('section.clip').evaluateAll(
+      (els) => els.filter((el) => getComputedStyle(el).visibility === 'visible' && parseFloat(getComputedStyle(el).opacity) > 0.1).length
+    );
+    assert.equal(visibleActsCount, 1, `HyperFrames should render strictly 1 visible act at a time, got ${visibleActsCount}`);
+    await page.screenshot({ path: resolve(shotsDir, 'home-es-390-hyperframes.png') });
+    report.screenshots.push('docs/web/screenshots/home-es-390-hyperframes.png');
+
     await page.locator('#mission-3d').scrollIntoViewIfNeeded();
     await page.waitForSelector('[data-testid="mission-control-deck"]', { timeout: 12000 });
     await page.waitForTimeout(500);

@@ -20,6 +20,10 @@ if (!existsSync(join(OUT, 'index.html'))) {
 }
 
 const USED_M95_M96 = new Set([
+  'media/m95/senda-m95-30s-en.mp4',
+  'media/m95/senda-m95-60s-en.mp4',
+  'media/m95/senda-m95-90s-en.mp4',
+  'media/m95/senda-m95-vertical-45s-en.mp4',
   'media/m95/senda-m95-broadcast-special-en.mp4',
   'media/m95/senda-m95-broadcast-special-es.mp4',
   'media/m95/senda-m95-reel-blacksky-en.mp4',
@@ -30,6 +34,12 @@ const USED_M95_M96 = new Set([
   'media/m95/senda-m95-role-citizen-es.mp4',
   'media/m95/senda-m95-role-developer-en.mp4',
   'media/m95/senda-m95-role-developer-es.mp4',
+  'media/m95/senda-m95-sim-braking-en.mp4',
+  'media/m95/senda-m95-sim-proof-en.mp4',
+  'media/m95/senda-m95-sim-queue-en.mp4',
+  'media/m95/senda-m95-sim-sos-en.mp4',
+  'media/m95/senda-m95-sim-visibility-en.mp4',
+  'media/m95/senda-m95-sim-wrongway-en.mp4',
   'media/m96/senda-m96-promo-en.mp4',
   'media/m96/senda-m96-promo-es.mp4'
 ]);
@@ -96,12 +106,20 @@ const config = {
       continue: true
     },
     {
+      src: '/senda-sw.js',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate'
+      },
+      continue: true
+    },
+    {
       src: '/senda/(.*)',
       headers: {
         'Cache-Control': 'no-cache'
       },
       continue: true
     },
+    { src: '^/hyperframes/?$', dest: '/hyperframes/index.html' },
     { src: '^/senda/?$', dest: '/senda/index.html' },
     { src: '^/senda/papers/?$', dest: '/senda/papers/index.html' },
     { handle: 'filesystem' },

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-20T02:18:42.632Z",
+  "generatedAt": "2026-11-20T03:30:02.451Z",
   "viewports": [
     390,
     834,
@@ -33,6 +33,9 @@
     "docs/web/screenshots/product-es-1440.png",
     "docs/web/screenshots/evidence-es-1440.png",
     "docs/web/screenshots/home-es-390-mobile.png",
+    "docs/web/screenshots/home-es-390-video.png",
+    "docs/web/screenshots/home-es-390-innovation.png",
+    "docs/web/screenshots/home-es-390-hyperframes.png",
     "docs/web/screenshots/home-es-390-mission3d.png",
     "docs/web/screenshots/home-es-390-osint.png"
   ]

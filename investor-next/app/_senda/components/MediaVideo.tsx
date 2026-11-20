@@ -262,8 +262,6 @@ export default function MediaVideo({
           controls={controls}
           preload="none"
           crossOrigin="anonymous"
-          width={1280}
-          height={720}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           onVolumeChange={(e) => setIsMuted(e.currentTarget.muted)}
