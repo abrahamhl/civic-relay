@@ -71,6 +71,9 @@ export function planMultiBearer(lengthBytes, available, { target = 0.99, publicC
         if (score > bestScore) { bestScore = score; bestSlot = g; bestP = p; }
       }
       if (!bestSlot) break;
+      // Ya hay k fragmentos y ningún hueco sube la probabilidad: más fragmentos solo gastarían
+      // aire (p. ej. cientos de copias dentro del mismo envío de un portador de MTU grande).
+      if (n >= k && bestP - P <= 1e-12) break;
       bestSlot.shards++; n++; P = bestP;
       if (n >= k && P >= target) break;
     }

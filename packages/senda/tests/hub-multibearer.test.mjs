@@ -142,3 +142,16 @@ test('auditoría encadenada: alterar, borrar o reordenar una entrada se detecta'
   assert.equal((await verifyAuditLog([e[0], e[2]])).ok, false);
   assert.equal((await verifyAuditLog([e[1], e[0], e[2]])).ok, false);
 });
+
+test('planMultiBearer no rellena un envío con fragmentos que no suben la probabilidad (MTU grande)', () => {
+  // Caso real de la página /senda/explica: con un portador de MTU 1 MiB, el voraz llegaba a n = 255
+  // metiendo copias inútiles en el mismo envío. Tras la corrección, n queda acotado y la P no cambia.
+  const plan = planMultiBearer(284, [{ id: 'PHONE_MESH' }, { id: 'SMS' }, { id: 'SAT_D2C_SMS' }, { id: 'RELAY_INTERNET' }], { target: 0.99 });
+  assert.ok(plan.n < 40, `n = ${plan.n}`);
+  for (const m of plan.messages) assert.ok(m.shards <= plan.k, `un envío lleva ${m.shards} > k = ${plan.k} fragmentos`);
+  // Con estos caminos el máximo es 1 − 0,4⁵ (cinco envíos de p = 0,6 con el mensaje entero): no llega al 99 %.
+  assert.ok(Math.abs(plan.pDelivery - (1 - 0.4 ** 5)) < 1e-12);
+  assert.equal(plan.feasible, false);
+  const groups = plan.messages.map(({ p, shards }) => ({ p, shards }));
+  assert.ok(Math.abs(deliveryProbability(groups, plan.k) - plan.pDelivery) < 1e-12);
+});
