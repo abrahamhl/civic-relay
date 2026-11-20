@@ -1,23 +1,23 @@
 # SENDA · Léeme primero
 
-> **Generado el 2026-11-20** desde el commit `8b66a66`. Dominio de las páginas de inversores: `https://civic-relay-investor.vercel.app`.
+> **Generado el 2026-11-20** desde el commit `dc9ba98`. Dominio de las páginas de inversores: `https://civic-relay-investor.vercel.app`.
 > Esta carpeta se entiende **sin haber seguido ninguna conversación**: aquí está todo lo necesario para publicar la web en otro alojamiento, revisar el código y enseñar el proyecto.
 
 ## 1. Qué es esta carpeta
 
 SENDA es un sistema de avisos y comunicación para emergencias que **funciona sin Internet ni cobertura**. Usa los teléfonos, los coches y lo que ya existe: satélites, cámaras públicas y datos abiertos de tráfico y meteorología.
 
-Esta carpeta lo empaqueta en zips. Tamaño total: **378,6 MB**.
+Esta carpeta lo empaqueta en zips. Tamaño total: **381,7 MB**.
 
 | Zip | Qué contiene | Tamaño | Nota |
 |---|---|---|---|
-| `zips/1-web-hostinger.zip` | Web completa para subir a public_html (sin las dos películas largas) | 90,0 MB | Descomprime en public_html. Contiene .htaccess (fichero oculto). |
+| `zips/1-web-hostinger.zip` | Web completa para subir a public_html (sin las dos películas largas) | 90,1 MB | Descomprime en public_html. Contiene .htaccess (fichero oculto). |
 | `zips/2-web-video-senda-m96-promo-en.zip` | Vídeo de la web: media/m96/senda-m96-promo-en.mp4 | 66,7 MB | Descomprime también en public_html: se coloca solo en media/. |
 | `zips/3-web-video-senda-m96-promo-es.zip` | Vídeo de la web: media/m96/senda-m96-promo-es.mp4 | 67,7 MB | Descomprime también en public_html: se coloca solo en media/. |
 | `zips/4-web-video-senda-film-en.zip` | Vídeo de la web: media/senda-film-en.mp4 | 28,1 MB | Descomprime también en public_html: se coloca solo en media/. |
 | `zips/5-web-video-senda-film-es.zip` | Vídeo de la web: media/senda-film-es.mp4 | 28,5 MB | Descomprime también en public_html: se coloca solo en media/. |
-| `zips/6-codigo-fuente.zip` | Código fuente completo (núcleo, relé, web, visión, scripts, pruebas) | 45,1 MB | Sin los vídeos (van en la web) ni las capturas de evidencias (van aparte). |
-| `zips/7-documentacion.zip` | Documentación: traspaso, arquitectura, financiación, investigación y registro de cambios | 12,5 MB | Empieza por docs/handoff/HANDOFF_COMPLETO_2026-11-05.md. |
+| `zips/6-codigo-fuente.zip` | Código fuente completo (núcleo, relé, web, visión, scripts, pruebas) | 46,6 MB | Sin los vídeos (van en la web) ni las capturas de evidencias (van aparte). |
+| `zips/7-documentacion.zip` | Documentación: traspaso, arquitectura, financiación, investigación y registro de cambios | 14,0 MB | Empieza por docs/handoff/HANDOFF_COMPLETO_2026-11-05.md. |
 | `zips/8-evidencias.zip` | Evidencias: resultados de las pruebas de extremo a extremo y capturas | 36,3 MB | offline-e2e.json resume las comprobaciones sin red. |
 | `zips/9-vision-python.zip` | Visión de tráfico en Python (YOLOX + ByteTrack) con los vídeos anotados | 3,7 MB | Modelos y vídeos de origen se descargan con las instrucciones del README (licencias Apache 2.0, MIT y CC BY 4.0). |
 
