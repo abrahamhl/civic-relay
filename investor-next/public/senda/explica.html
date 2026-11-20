@@ -4,650 +4,436 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SENDA explicado</title>
-<meta name="description" content="SENDA escena a escena: por qué se cae la red en un apagón o un incendio, cómo compite un mensaje por varios caminos (vecinos, antena, satélite, LoRa, dron), cómo la cámara muestra dónde está la señal de una persona atrapada, cómo ayudan los drones y por qué Europa lo necesita. Cada animación usa el código real de SENDA.">
-<meta name="theme-color" content="#05090c">
+<meta name="description" content="SENDA: el ojo que reúne satélites, cámaras públicas y testigos; el camino que lleva cada mensaje por todas las redes que quedan vivas; el mando que coordina a bomberos, Guardia Civil y sanitarios hasta que llega la ayuda. Cada animación ejecuta el código real.">
+<meta name="theme-color" content="#04080b">
 <link rel="icon" href="/senda/icon.svg" type="image/svg+xml">
+<link rel="preload" as="image" href="/senda/fotos/dana-coches.jpg">
 <style>
-:root{--bg:#05090c;--p:#0b141c;--p2:#071018;--l:#203240;--t:#f2f4f4;--m:#9fb2bc;--c:#ff7756;--i:#91d7e8;--e:#34d399;--a:#fbbf24;--v:#b79cff;--r:#ff5b6e}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-body{margin:0;background:var(--bg);color:var(--t);font:16px/1.6 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
-a{color:var(--i)}:focus-visible{outline:2px solid var(--i);outline-offset:2px}
-.top{position:sticky;top:0;z-index:20;display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(5,9,12,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--l)}
-.top b{letter-spacing:.06em}.top nav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}.top nav::-webkit-scrollbar{display:none}
-.top nav a{white-space:nowrap;text-decoration:none;color:var(--m);font-size:13px;padding:6px 10px;border:1px solid var(--l);border-radius:999px}
-.top nav a:hover{color:var(--t);border-color:var(--i)}
-main{max-width:1180px;margin:0 auto;padding:0 16px 80px}
-.hero{padding:56px 0 24px}.eyebrow{font:600 12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;color:var(--c);text-transform:uppercase;margin:0 0 10px}
-h1{font-size:clamp(30px,5vw,52px);line-height:1.08;margin:0 0 16px;letter-spacing:-.02em}
-h2{font-size:clamp(24px,3.4vw,34px);line-height:1.15;margin:0 0 10px;letter-spacing:-.01em}h3{font-size:17px;margin:0 0 8px}
-.lead{font-size:clamp(16px,1.8vw,19px);color:#d4dde1;max-width:860px}
-.m{color:var(--m)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}
-.scene{padding:56px 0 16px;border-top:1px solid var(--l);margin-top:40px;scroll-margin-top:60px}
-.num{display:inline-block;font:700 12px ui-monospace,monospace;color:#140804;background:var(--c);border-radius:6px;padding:2px 8px;margin-right:8px;vertical-align:middle}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
-.wide{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;margin-top:16px}
-@media(max-width:920px){.g2,.g3,.wide{grid-template-columns:1fr}}
-.card{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:16px;min-width:0}
-.card.problem{border-left:3px solid var(--r)}.card.solution{border-left:3px solid var(--e)}.card.limit{border-left:3px solid var(--a)}
-.card h3 small{display:block;font:600 11px ui-monospace,monospace;letter-spacing:.12em;color:var(--m);text-transform:uppercase;margin-bottom:4px}
-canvas{width:100%;height:auto;display:block;border-radius:12px;background:var(--p2);border:1px solid var(--l)}
-.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
-button,select{font:inherit;font-size:14px;min-height:44px;padding:8px 14px;border-radius:10px;border:1px solid var(--l);background:#0f1d27;color:var(--t);cursor:pointer;font-weight:650}
-button:hover{border-color:var(--i)}button.p{background:var(--c);border-color:var(--c);color:#140804}button.on{background:#123326;border-color:var(--e);color:#c9f7e3}
-button:disabled{opacity:.5;cursor:not-allowed}
-input[type=range]{flex:1 1 180px;accent-color:var(--c);min-height:32px}
-.chk{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--l);border-radius:10px;background:var(--p2);font-size:14px;cursor:pointer;min-height:44px}
-.chk input{margin-top:4px;accent-color:var(--e)}.chk .sw{width:10px;height:10px;border-radius:3px;margin-top:6px;flex:none}
-.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-top:12px}
-.kv{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}@media(max-width:640px){.kv{grid-template-columns:repeat(2,1fr)}}
-.kv div{background:var(--p2);border:1px solid var(--l);border-radius:10px;padding:10px;min-width:0}
-.kv b{display:block;font:700 19px/1.25 ui-monospace,monospace;white-space:nowrap}.kv span{font-size:12px;color:var(--m)}
-.tag{display:inline-block;font:700 10.5px/1 ui-monospace,monospace;letter-spacing:.08em;padding:4px 7px;border-radius:5px;vertical-align:middle;margin-left:6px;white-space:nowrap}
-.tag.sim{background:#3b2a0a;color:var(--a);border:1px solid #6b4d12}.tag.real{background:#0c2e22;color:var(--e);border:1px solid #1d5c44}.tag.calc{background:#0d2530;color:var(--i);border:1px solid #1f4c5e}.tag.no{background:#3a1018;color:#ff9aa7;border:1px solid #6e2331}
-.gloss{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:16px}
-.gloss div{background:var(--p);border:1px solid var(--l);border-radius:12px;padding:12px}.gloss dt{font-weight:750}.gloss dt i{font-style:normal;color:var(--m);font-weight:500;font-size:13px}.gloss dd{margin:4px 0 0;color:#cfd8dc;font-size:14px}
-.bars{margin-top:10px}.bar{margin:8px 0}.bar label{display:flex;justify-content:space-between;font-size:13px;color:#cfd8dc;gap:8px}
-.bar .track{height:12px;background:#0e1a22;border-radius:6px;overflow:hidden;border:1px solid var(--l)}.bar .fill{height:100%;border-radius:6px;transition:width .5s}
-table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--l);vertical-align:top}th{color:var(--m);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
-.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.src{font-size:13px;color:var(--m);margin-top:10px}.src a{word-break:break-word}
-.log{font:12.5px/1.5 ui-monospace,monospace;color:#b9c8cf;background:var(--p2);border:1px solid var(--l);border-radius:10px;padding:10px;max-height:190px;overflow:auto;white-space:pre-wrap;margin-top:10px}
-.hex{font:12px/1.5 ui-monospace,monospace;color:var(--a);word-break:break-all}
-.labs{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:16px}
-.labs a{display:block;text-decoration:none;color:var(--t);background:var(--p);border:1px solid var(--l);border-radius:14px;padding:14px;transition:border-color .2s,transform .2s}
-.labs a:hover{border-color:var(--i);transform:translateY(-2px)}.labs a b{display:block;margin-bottom:4px}.labs a p{margin:0;color:var(--m);font-size:14px}.labs a em{display:block;font-style:normal;font-size:12px;color:var(--i);margin-top:8px}
-.truth{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;font-size:13px;color:var(--m)}
-.callout{background:linear-gradient(135deg,#1a1006,#0b141c);border:1px solid #6b4d12;border-radius:14px;padding:16px;margin-top:16px}
-footer{border-top:1px solid var(--l);margin-top:60px;padding:20px 16px;color:var(--m);font-size:13px;text-align:center}
+:root{--bg:#04080b;--ink:#eef3f4;--mute:#93a7b1;--line:rgba(255,255,255,.1);--ember:#ff7756;--mint:#34d399;--sky:#91d7e8;--sun:#fbbf24;--rose:#ff5b6e;--vio:#b79cff}
+*{box-sizing:border-box}html{scroll-behavior:smooth}@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Inter","SF Pro Text",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--sky)}:focus-visible{outline:2px solid var(--sky);outline-offset:3px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px}
+.nav{position:fixed;inset:0 0 auto;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 22px;background:linear-gradient(#04080be6,#04080b00);pointer-events:none}
+.nav>*{pointer-events:auto}.nav b{letter-spacing:.32em;font-size:13px}
+.nav nav{display:flex;gap:18px;font-size:13px;overflow-x:auto;scrollbar-width:none}.nav nav::-webkit-scrollbar{display:none}
+.nav nav a{color:var(--mute);text-decoration:none;white-space:nowrap}.nav nav a:hover{color:var(--ink)}
+.hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.75) brightness(.55);animation:kb 26s ease-in-out infinite alternate}
+@keyframes kb{from{transform:scale(1.04) translate(0,0)}to{transform:scale(1.14) translate(-2%,-1.5%)}}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:screen}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#04080b55 0%,#04080b00 35%,#04080bcc 78%,#04080b 100%)}
+.hero .wrap{position:relative;z-index:2;padding-bottom:9vh;width:100%}
+.kicker{font:600 12px/1 ui-monospace,monospace;letter-spacing:.28em;color:var(--ember);text-transform:uppercase}
+.hero h1{font-size:clamp(40px,7.4vw,108px);line-height:.95;letter-spacing:-.035em;margin:18px 0 22px;font-weight:800;max-width:14ch}
+.hero h1 em{font-style:normal;color:var(--ember)}
+.hero p{font-size:clamp(17px,1.6vw,21px);max-width:58ch;color:#d5dfe2;margin:0}
+.triad{display:flex;gap:clamp(18px,4vw,56px);margin-top:34px;flex-wrap:wrap}
+.triad a{text-decoration:none;color:var(--ink)}.triad b{display:block;font-size:clamp(22px,2.6vw,34px);letter-spacing:-.02em}.triad span{color:var(--mute);font-size:14px}
+.hero .credit,.credit{position:absolute;right:16px;bottom:12px;z-index:3;font-size:11px;line-height:1.4;color:#9fb2bcaa;max-width:60ch;text-align:right;margin:0}
+.credit a{color:inherit}
+.chapter{position:relative;padding:16vh 0 8vh}
+.num{font:700 13px ui-monospace,monospace;letter-spacing:.3em;color:var(--ember);margin:0}
+.chapter h2{font-size:clamp(36px,5.6vw,80px);line-height:1;letter-spacing:-.035em;margin:14px 0 22px;font-weight:800;max-width:16ch}
+.chapter h2 span{color:var(--mute)}
+.lede{font-size:clamp(18px,1.7vw,23px);color:#d5dfe2;max-width:60ch;margin:0 0 10px}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}.rv.in{opacity:1;transform:none}
+.bleed{position:relative;min-height:92svh;display:flex;align-items:flex-end;overflow:hidden;margin:6vh 0}
+.bleed img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.6) saturate(.8)}
+.bleed::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#04080b 0%,#04080b00 22%,#04080b00 50%,#04080bee 100%)}
+.bleed .wrap{position:relative;z-index:2;padding-bottom:8vh;width:100%}
+.big{font-size:clamp(28px,4vw,56px);line-height:1.08;letter-spacing:-.025em;font-weight:750;max-width:20ch;margin:0}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,4vw,60px);margin-top:44px}
+@media(max-width:820px){.facts{grid-template-columns:1fr}}
+.fact b{display:block;font-size:clamp(46px,6vw,88px);line-height:1;letter-spacing:-.04em;font-weight:800}
+.fact b small{font-size:.45em;color:var(--mute);font-weight:700;letter-spacing:0}
+.fact p{margin:10px 0 0;color:#c8d3d7;font-size:15.5px}.fact cite{display:block;font-style:normal;font-size:12px;color:var(--mute);margin-top:8px}.fact cite a{color:var(--mute)}
+.stage{position:relative;margin-top:36px}
+.stage canvas,.stage video{width:100%;height:auto;display:block;border-radius:18px;background:#071018}
+.cap{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:12px 0 0;font-size:13px;color:var(--mute)}
+.truth{font:700 10.5px/1.3 ui-monospace,monospace;letter-spacing:.12em;padding:5px 8px;border-radius:999px;border:1px solid currentColor;text-transform:uppercase;max-width:100%}
+.t-real{color:var(--mint)}.t-calc{color:var(--sky)}.t-sim{color:var(--sun)}
+.split{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:clamp(20px,3vw,44px);align-items:start;margin-top:36px}
+@media(max-width:960px){.split{grid-template-columns:1fr}}
+.side h3{font-size:22px;letter-spacing:-.01em;margin:0 0 10px;line-height:1.25}.side p{color:#c8d3d7;margin:0 0 12px;font-size:16px}
+.side .h-xl{font-size:clamp(26px,3vw,40px);line-height:1.1;letter-spacing:-.02em;margin-top:10px}
+.ctrl{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center}
+button{font:inherit;font-size:14.5px;min-height:44px;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:#0e1a22;color:var(--ink);cursor:pointer;font-weight:650}
+button:hover{border-color:var(--sky)}button.go{background:var(--ember);border-color:var(--ember);color:#160904}button.on{background:#12352a;border-color:var(--mint);color:#cbf7e6}
+button:disabled{opacity:.45;cursor:not-allowed}
+input[type=range]{flex:1 1 180px;accent-color:var(--ember);min-height:32px}
+.stats,.kv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border-radius:14px;overflow:hidden;margin-top:16px}
+@media(max-width:600px){.stats,.kv{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stats>div,.kv>div{background:#071018;padding:14px;min-width:0}.stats b,.kv b{display:block;font:700 20px/1.25 ui-monospace,monospace;white-space:nowrap}.stats span,.kv span{font-size:12px;color:var(--mute)}
+.log{font:12.5px/1.5 ui-monospace,monospace;color:#b9c8cf;background:#071018;border-radius:12px;padding:12px;max-height:200px;overflow:auto;white-space:pre-wrap;margin-top:12px}
+.bar{margin:8px 0}.bar label{display:flex;justify-content:space-between;font-size:13px;color:#cfd8dc;gap:8px}.bar .track{height:8px;background:#0e1a22;border-radius:4px;overflow:hidden}.bar .fill{height:100%;transition:width .5s}
+.tag{font:700 10px/1 ui-monospace,monospace;letter-spacing:.08em;padding:3px 6px;border-radius:4px;border:1px solid currentColor}.tag.sim{color:var(--sun)}.tag.calc{color:var(--sky)}.tag.no{color:var(--rose)}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-top:16px}
+.chk{display:flex;gap:9px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:#0a151c;font-size:14px;cursor:pointer;min-height:44px}
+.chk input{margin-top:4px;accent-color:var(--mint)}.chk .sw{width:10px;height:10px;border-radius:50%;margin-top:6px;flex:none}.m{color:var(--mute)}
+table{width:100%;border-collapse:collapse;font-size:14.5px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--mute);font-weight:600;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase}
+.hex{font:12px/1.5 ui-monospace,monospace;color:var(--sun);word-break:break-all}
+.cmp{position:relative;aspect-ratio:16/10;border-radius:18px;overflow:hidden;cursor:ew-resize;touch-action:pan-y;user-select:none;background:#000}
+.cmp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+#s2-after{clip-path:inset(0 0 0 50%)}.bar2{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fff;box-shadow:0 0 18px #000}
+.bar2::after{content:"⟷";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;color:#000;border-radius:999px;padding:6px 10px;font-weight:800;font-size:14px}
+.cmp .lab{position:absolute;top:14px;font:700 12px ui-monospace,monospace;letter-spacing:.1em;background:#000a;padding:6px 10px;border-radius:999px}.cmp .l{left:14px}.cmp .r{right:14px}
+.wall{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:36px}@media(max-width:700px){.wall{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cam{position:relative;margin:0;aspect-ratio:4/3;overflow:hidden;border-radius:8px;background:#0a0f12}
+.cam img{width:100%;height:100%;object-fit:cover;filter:contrast(1.05) saturate(.85);transition:opacity .4s}
+.cam::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,#0000 0 3px,#0002 3px 4px);pointer-events:none}
+.cam figcaption{position:absolute;left:8px;bottom:6px;font:600 10.5px ui-monospace,monospace;background:#000b;padding:3px 6px;border-radius:4px}
+.cam::before{content:"● FOTO";position:absolute;right:8px;top:6px;z-index:2;font:700 10px ui-monospace,monospace;color:var(--rose);animation:blink 1.6s steps(2) infinite}@keyframes blink{50%{opacity:.2}}
+.note{background:#0b1218;border-radius:20px;padding:22px;border:1px solid var(--line)}
+.note .who{display:flex;gap:12px;align-items:center;font-size:14px;color:var(--mute)}.note .who i{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--ember),var(--vio));flex:none}
+.note h4{font-size:20px;margin:14px 0 8px;line-height:1.3}
+.note figure{margin:12px 0;border-radius:12px;overflow:hidden}.note figure img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
+.cn{margin-top:14px;background:#081017;border-radius:14px;padding:14px}
+.meter{height:10px;background:#0e1a22;border-radius:999px;overflow:hidden;margin:8px 0}.meter i{display:block;height:100%;transition:width .6s,background .6s}
+.cn ul{margin:8px 0 0;padding-left:18px;color:#c8d3d7;font-size:14px}
+.feed{list-style:none;padding:0;margin:10px 0 0;font-size:13.5px;color:#c8d3d7;max-height:150px;overflow:auto}.feed li{padding:6px 0;border-top:1px solid var(--line)}
+.units{list-style:none;padding:0;margin:0;font-size:14px}.units li{display:grid;grid-template-columns:12px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.units i{width:10px;height:10px;border-radius:50%}.units em{font-style:normal;font:600 13px ui-monospace,monospace}.units .mono{color:var(--mute);margin-left:4px}
+#sky-list li{display:block}
+.chat{list-style:none;padding:0;margin:14px 0 0;max-height:300px;overflow:auto;font-size:14px}.chat li{padding:10px 0;border-bottom:1px solid var(--line);color:#d5dfe2}
+.chat .ch{display:block;font:700 10.5px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}.chat small{display:block;color:var(--mint);font:11px ui-monospace,monospace;margin-top:3px}
+.phone{width:min(340px,100%);aspect-ratio:9/18.5;border-radius:44px;background:#0b0f12;border:10px solid #1a2228;position:relative;overflow:hidden;margin:0 auto;box-shadow:0 30px 80px #000c}
+.phone .scr{position:absolute;inset:0;background:url(/senda/fotos/dana-voluntarios.jpg) center/cover;filter:brightness(.45)}
+.phone .clock{position:absolute;top:40px;width:100%;text-align:center;font-size:58px;font-weight:300;letter-spacing:-.02em}
+.phone .al{position:absolute;left:12px;right:12px;top:150px;background:#1b0d0bf2;border:1px solid #ff775688;border-radius:22px;padding:16px;transform:translateY(-140%);opacity:0;transition:transform .6s cubic-bezier(.2,.9,.2,1.2),opacity .4s;backdrop-filter:blur(14px)}
+.phone.arrived .al{transform:none;opacity:1}.phone.arrived{animation:shake .5s 2}@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.al .h{font:800 12px ui-monospace,monospace;letter-spacing:.12em;color:var(--ember)}.al p{font-size:14.5px;margin:8px 0 12px;line-height:1.4}
+.al .ans{display:block;width:100%;margin:6px 0;border-radius:14px;min-height:46px;text-align:left;font-size:14.5px}
+.al .ans[data-r=AYUDA]{background:#4a1018;border-color:var(--rose)}
+.lead-num{font-size:clamp(64px,10vw,150px);font-weight:800;letter-spacing:-.05em;line-height:.9;color:var(--sky)}
+.strip{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(280px,1fr);gap:14px;overflow-x:auto;padding:6px 20px 20px;scroll-snap-type:x mandatory;margin-top:30px}
+.strip a{scroll-snap-align:start;text-decoration:none;color:var(--ink);display:block}
+.strip img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:14px;display:block;transition:transform .5s}
+.strip a:hover img{transform:scale(1.03)}.strip b{display:block;margin-top:10px;font-size:16px}.strip span{color:var(--mute);font-size:14px}
+.statement{font-size:clamp(30px,4.6vw,68px);line-height:1.04;letter-spacing:-.03em;font-weight:800;max-width:18ch;margin:14px 0 0}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(24px,5vw,80px);margin-top:44px}@media(max-width:820px){.cols{grid-template-columns:1fr}}
+.cols h3{font:700 12px ui-monospace,monospace;letter-spacing:.24em;text-transform:uppercase;margin:0 0 14px}
+.cols ul{list-style:none;padding:0;margin:0}.cols li{padding:12px 0;border-top:1px solid var(--line);color:#d5dfe2}
+footer{padding:60px 20px;color:var(--mute);font-size:13px;text-align:center;border-top:1px solid var(--line);margin-top:10vh}
 </style>
 </head>
 <body>
-<header class="top">
-  <b>SENDA · explicado</b>
-  <nav aria-label="Escenas">
-    <a href="#glosario">Glosario</a><a href="#e1">1 · Por qué cae la red</a><a href="#e2">2 · Carrera de caminos</a><a href="#e3">3 · Cámara y señal</a><a href="#e4">4 · Drones</a><a href="#e5">5 · Laboratorios</a><a href="#e6">6 · Por qué invertir</a><a href="/senda/">App</a>
-  </nav>
+<header class="nav">
+  <b>SENDA</b>
+  <nav aria-label="Capítulos"><a href="#ojo">El ojo</a><a href="#vision">La cámara</a><a href="#camino">El camino</a><a href="#mando">El mando</a><a href="#sensores">Los sentidos</a><a href="#drones">Drones</a><a href="#europa">Europa</a><a href="/senda/">App</a></nav>
 </header>
-<main>
-<section class="hero">
-  <p class="eyebrow">SENDA en 6 escenas · cada animación ejecuta el código real</p>
-  <h1>Cuando cae la red, el mensaje busca otro camino.<br><span class="m">Aquí se ve cómo, paso a paso.</span></h1>
-  <p class="lead">SENDA es una capa de software para el móvil y para los centros de coordinación. No construye otra red: <b>aprovecha todas las que quedan vivas</b> (el móvil del vecino, una antena que aún aguanta, el satélite, una radio LoRa, un dron, un coche que pasa) y reparte cada mensaje entre ellas para que llegue aunque varias fallen.</p>
-  <div class="truth">
-    <span><span class="tag real">REAL</span> dato medido o hecho público con fuente</span>
-    <span><span class="tag calc">CALCULADO</span> lo calcula el código de SENDA en tu navegador</span>
-    <span><span class="tag sim">SIMULACIÓN</span> escenario inventado para enseñar el método</span>
-    <span><span class="tag no">NO POSIBLE</span> lo que ningún móvil puede hacer</span>
+
+<section class="hero" aria-labelledby="h1">
+  <img src="/senda/fotos/dana-coches.jpg" alt="Coches destrozados y amontonados tras la DANA de octubre de 2024 en la provincia de Valencia">
+  <canvas id="hero-net" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <p class="kicker rv">Sistema de enrutamiento de emergencia</p>
+    <h1 id="h1" class="rv">Cuando todo se cae, <em>alguien</em> tiene que seguir viendo.</h1>
+    <p class="rv">SENDA es software. Convierte cada móvil, coche, cámara pública, dron y satélite que sigue vivo en una sola red de emergencia: ve lo que pasa, lleva cada mensaje por el camino que quede y coordina a todos hasta que llega la ayuda.</p>
+    <div class="triad rv">
+      <a href="#ojo"><b>El ojo</b><span>satélite, cámaras y testigos en una superficie</span></a>
+      <a href="#camino"><b>El camino</b><span>cada mensaje por todas las redes vivas</span></a>
+      <a href="#mando"><b>El mando</b><span>todos los cuerpos en un mismo mapa</span></a>
+    </div>
   </div>
-  <figure style="margin:22px 0 0">
-    <video controls preload="none" playsinline poster="/media/senda-explica-poster-es.jpg" style="width:100%;border-radius:14px;border:1px solid var(--l);background:#000" aria-label="Recorrido en vídeo por las seis escenas">
+  <p class="credit">Foto real: coches tras la DANA de octubre de 2024 · <a href="https://commons.wikimedia.org/wiki/File:Damaged_cars_after_October_2024_Spain_floods.jpg" rel="noopener">Ellywa, CC BY-SA 4.0</a> · los puntos animados ilustran móviles conectándose</p>
+</section>
+
+<section class="chapter" aria-labelledby="ctx-t">
+  <div class="wrap">
+    <p class="num rv">PRÓLOGO</p>
+    <h2 id="ctx-t" class="rv">La red no cae cuando se va la luz. <span>Cae unas horas después.</span></h2>
+    <p class="lede rv">Las antenas tienen baterías. Cuando se agotan, el móvil sigue encendido pero ya no tiene con quién hablar. Y toda la alerta oficial depende de esas mismas antenas.</p>
+    <div class="facts">
+      <div class="fact rv"><b data-count="90" data-suffix=" %">0 %</b><p>de usuarios con conexión estable al empezar el apagón ibérico del 28-04-2025…</p></div>
+      <div class="fact rv"><b data-count="40" data-suffix=" %">0 %</b><p>…hacia las 15:00, cuando se agotaron las baterías de las antenas («apenas unas horas»).</p><cite>Fuentes: <a href="https://www.laecuaciondigital.com/actualidad/el-apagon-electrico-colapsa-redes-moviles-en-espana-y-portugal-el-28-de-abril/" rel="noopener">La Ecuación Digital</a> · <a href="https://es.wikipedia.org/wiki/Apag%C3%B3n_en_la_pen%C3%ADnsula_ib%C3%A9rica_de_2025" rel="noopener">Wikipedia</a></cite></div>
+      <div class="fact rv"><b>0 <small>vías</small></b><p>de alerta pública sin antena hoy: ES-Alert, NL-Alert y EU-Alert usan la red celular; la vía por satélite de Galileo (EWSS) sigue «en desarrollo».</p><cite>Fuente: <a href="https://www.euspa.europa.eu/galileo-ewss" rel="noopener">EUSPA</a></cite></div>
+    </div>
+    <div class="split">
+      <div class="stage rv">
+        <canvas id="bk-cv" width="900" height="560" aria-label="Ciudad sintética: antenas que se apagan hora a hora y manzanas que se quedan sin cobertura"></canvas>
+        <div class="ctrl"><input id="bk-t" type="range" min="0" max="24" step="0.25" value="0" aria-label="Horas desde el corte de luz"><b id="bk-tv" class="mono">0 h</b><button id="bk-play" class="go">▶ Reproducir</button><button id="bk-gw">Colocar 3 pasarelas</button></div>
+      </div>
+      <div class="side rv">
+        <h3>SENDA lo ve venir</h3>
+        <p>Calcula hora a hora qué barrios se quedan a oscuras y dónde poner 3 pasarelas (satélite, radio LoRa, dron) para llegar al máximo de gente <b>antes</b> de que ocurra.</p>
+        <div class="stats"><div><b id="bk-cov">—</b><span>con cobertura</span></div><div><b id="bk-dark">—</b><span>a oscuras</span></div><div><b id="bk-alive">—</b><span>antenas vivas</span></div><div><b id="bk-reach">—</b><span>alcanzadas por pasarelas</span></div></div>
+        <canvas id="bk-chart" width="520" height="200" style="width:100%;margin-top:14px;border-radius:12px" aria-label="Curva de población con cobertura"></canvas>
+        <p class="cap"><span class="truth t-sim">Ciudad sintética</span><span class="truth t-calc">blackout.mjs</span> Medianas de batería de planificación: 2 h, 6 h y 48 h.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ojo" class="chapter" aria-labelledby="ojo-t">
+  <div class="wrap">
+    <p class="num rv">01 · EL OJO</p>
+    <h2 id="ojo-t" class="rv">Una sola superficie para todo lo que se puede ver.</h2>
+    <p class="lede rv">Satélite, cámaras públicas, vídeo de a bordo y testigos con su móvil. Cada fuente sola engaña; juntas, con su procedencia a la vista, dicen qué está pasando y dónde.</p>
+    <div class="stage rv">
+      <div class="cmp" id="s2-cmp" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="100" aria-label="Comparador antes y después del incendio: arrastra o usa las flechas">
+        <img src="/senda/data/smv2026/tci_pre.jpg" alt="Sentinel-2 antes del incendio de San Martín de Valdeiglesias">
+        <img id="s2-after" src="/senda/data/smv2026/tci_d0808.jpg" alt="Sentinel-2 después del incendio">
+        <div class="bar2" id="s2-bar"></div><span class="lab l">ANTES</span><span class="lab r" id="s2-after-lab">08-08-2026</span>
+      </div>
+      <div class="ctrl"><span class="m" style="font-size:14px">Después:</span><button class="on" data-s2="/senda/data/smv2026/tci_d0808.jpg" data-lab="08-08-2026">Color real 08-08</button><button data-s2="/senda/data/smv2026/tci_d0724.jpg" data-lab="24-07-2026">Color real 24-07</button><button data-s2="/senda/data/smv2026/dnbr_d0808.png" data-lab="SEVERIDAD dNBR">Severidad (dNBR)</button></div>
+      <p class="cap"><span class="truth t-real">Imagen real</span> Incendio de San Martín de Valdeiglesias (23-07-2026) · contiene datos modificados de Copernicus Sentinel-2 · <a href="/senda/fuego3d">verlo en 3D con viento y terreno</a></p>
+    </div>
+    <div class="wall" id="cam-wall" aria-label="Muro de cámaras públicas de tráfico"></div>
+    <p class="cap rv"><span class="truth t-real">Fotos reales fechadas</span> Cámaras públicas de la DGT capturadas el 14-11-2026 (inventario DATEX II, CC BY). SENDA mide en ellas niebla, nieve y tráfico; <b>no identifica personas ni matrículas</b>. <a href="/senda/camaras">Biblioteca de cámaras</a></p>
+    <div class="split">
+      <div class="stage rv">
+        <video src="/media/vision/dashcam.mp4" poster="/media/vision/dashcam-poster.jpg" muted loop playsinline autoplay preload="metadata" aria-label="Vídeo de cámara a bordo con vehículos detectados y seguidos"></video>
+        <p class="cap"><span class="truth t-real">Vídeo real</span> Udacity CarND (MIT) procesado con YOLOX-s + ByteTrack: 12 vehículos seguidos en 36 s; distancias por tamaño de caja, sin calibrar.</p>
+      </div>
+      <div class="side rv">
+        <h3>El coche también mira</h3>
+        <p>Una cámara a bordo detecta y sigue vehículos, estima distancias y ve quién viene de frente. Si hay un accidente 2 km más adelante, SENDA puede pedir al coche más cercano —solo si su conductor lo ha aceptado— que confirme desde un lugar seguro antes de que lleguen los equipos.</p>
+        <p class="m" style="font-size:14.5px">Solo salen números (cuántos, a qué distancia, en qué sentido); el vídeo no sale del coche. <a href="/senda/carretera">Ruta protectora y accidentes</a></p>
+      </div>
+    </div>
+    <div class="split" style="margin-top:12vh">
+      <div class="side rv">
+        <p class="num">NOTAS DE LA COMUNIDAD</p>
+        <h3 class="h-xl">Un aviso ciudadano no es verdad ni mentira: es una pista que se va confirmando.</h3>
+        <p>Como las notas de comunidad, pero con física y probabilidad: cada testigo con una clave distinta y cada medida en una foto suben la credibilidad con reglas que cualquiera puede auditar. Lo que nunca hace es emitir una alerta pública: <b>eso solo lo puede hacer una autoridad con credencial firmada</b>.</p>
+        <p class="cap"><span class="truth t-calc">Motor real: hazard-reports.mjs</span><span class="truth t-sim">Caso inventado</span> Las razones de verosimilitud son hipótesis a calibrar.</p>
+      </div>
+      <article class="note rv" aria-label="Nota de comunidad interactiva">
+        <div class="who"><i></i><div><b style="color:var(--ink)">Aviso ciudadano</b><br>hace 2 min · a 120 m de ti</div></div>
+        <h4>Coche arrastrado en el paso inferior. Hay una persona en el techo.</h4>
+        <figure><img src="/senda/fotos/dana-coches.jpg" alt="Foto de ejemplo: coches arrastrados por el agua" loading="lazy"></figure>
+        <div class="cn">
+          <div style="display:flex;justify-content:space-between;gap:10px;font-size:14px"><b id="cn-state">—</b><span class="mono" id="cn-count">—</span></div>
+          <div class="meter"><i id="cn-bar"></i></div>
+          <div style="font-size:13px;color:var(--mute)">Probabilidad de que sea real según el modelo: <b class="mono" id="cn-p" style="color:var(--ink)">—</b></div>
+          <ul id="cn-why"></ul>
+        </div>
+        <div class="ctrl"><button id="cn-yes" class="go">Lo confirmo, estoy aquí</button><button id="cn-measure">Añadir foto con regla</button><button id="cn-reset">Reiniciar</button></div>
+        <ul class="feed" id="cn-feed" aria-live="polite"></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="vision" class="chapter" aria-labelledby="vis-t">
+  <div class="wrap">
+    <p class="num rv">02 · LA CÁMARA QUE VE LO INVISIBLE</p>
+    <h2 id="vis-t" class="rv">Como una app de estrellas. <span>Pero para salvar a alguien.</span></h2>
+    <p class="lede rv">Las apps de astronomía no ven las estrellas a través de las nubes: saben dónde estás, hacia dónde apuntas el móvil y calculan qué hay ahí. SENDA hace lo mismo con todo lo que emite radio o tiene posición conocida: satélites, el teléfono de una persona atrapada, un compañero, la ambulancia que llega.</p>
+    <div class="split">
+      <div class="stage rv">
+        <canvas id="sky-cv" width="1000" height="600" aria-label="Cielo con los satélites reales que están ahora sobre el horizonte" style="touch-action:none;cursor:grab"></canvas>
+        <div class="ctrl"><button id="sky-cam" class="go">Abrir con cámara y brújula</button><button id="sky-loc">Usar mi ubicación</button></div>
+      </div>
+      <div class="side rv">
+        <h3>Ahora mismo sobre <span id="sky-where">—</span>: <span id="sky-n" class="mono">—</span> satélites</h3>
+        <p>Posiciones calculadas en tu navegador con <span class="mono">orbital.mjs</span> a partir de los elementos orbitales reales que publica AMSAT (época 19-11-2026, 97 satélites, todas las sumas de control válidas): satélites de radioaficionado y la ISS, que SENDA puede usar para mensajes públicos firmados.</p>
+        <ul class="units" id="sky-list"></ul>
+        <p class="cap"><span class="truth t-real">TLE reales AMSAT</span><span class="truth t-calc">Posición calculada</span> El error crece con los días desde la época.</p>
+      </div>
+    </div>
+    <div class="split" style="margin-top:12vh">
+      <div class="stage rv">
+        <canvas id="ar-cv" width="900" height="560" aria-label="Visor de cámara sobre escombros con la posición estimada del teléfono atrapado"></canvas>
+        <div class="ctrl"><button id="ar-go" class="go">▶ Caminar y medir</button><button id="ar-reset">Reiniciar</button><label class="chk" style="background:none;padding:0"><input type="checkbox" id="ar-truth"> Mostrar la posición real (solo en simulación)</label></div>
+      </div>
+      <div class="side rv">
+        <h3>Bajo los escombros, su teléfono sigue hablando</h3>
+        <p>En modo SOS, SENDA hace que el móvil de la persona atrapada emita una baliza Bluetooth. El rescatador rodea el montón; su móvil mide la señal en cada paso, calcula dónde está y la dibuja sobre la imagen de la cámara con su círculo de error.</p>
+        <div class="kv"><div><b id="ar-reads">0</b><span>lecturas</span></div><div><b id="ar-err">—</b><span>error estimado</span></div><div><b id="ar-real">—</b><span>error real</span></div><div><b id="ar-depth">—</b><span>distancia</span></div></div>
+        <canvas id="ar-map" width="520" height="300" style="width:100%;margin-top:12px;border-radius:12px;background:#071018" aria-label="Vista desde arriba del recorrido y la estimación"></canvas>
+        <p class="cap"><span class="truth t-calc">rubble.mjs</span><span class="truth t-sim">Lecturas simuladas, ruido 3 dB</span></p>
+      </div>
+    </div>
+    <div class="split" style="margin-top:8vh">
+      <div class="side rv">
+        <h3>Si no tiene móvil: la respiración altera el Wi-Fi</h3>
+        <p>Una placa ESP32 de unos 10 € mide cómo el cuerpo y la respiración (10–30 veces por minuto) alteran el Wi-Fi. <span class="mono">through-wall.mjs</span> busca ese ritmo. Abajo, una señal sintética de una persona que respira 14 veces por minuto y otra de una sala vacía.</p>
+        <canvas id="csi-cv" width="560" height="220" style="width:100%;border-radius:12px;background:#071018" aria-label="Señal Wi-Fi sintética con y sin persona"></canvas>
+        <p id="csi-out" class="m" style="font-size:14.5px"></p>
+      </div>
+      <div class="side rv">
+        <h3>Lo que es posible, y lo que no</h3>
+        <p class="m" style="font-size:14.5px">Esta tabla la declara el propio módulo (<span class="mono">CAPABILITIES</span>); no se ha escrito para esta página.</p>
+        <table id="cap-t"><thead><tr><th>Capacidad</th><th>Hardware</th><th>Estado</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bleed" aria-label="Incendio forestal">
+  <img src="/senda/fotos/incendio-villela.jpg" alt="Camión de bomberos ante un incendio forestal en Villela (Burgos), agosto de 2024" loading="lazy">
+  <div class="wrap"><p class="big rv">En un incendio el fuego quema antenas y fibra. La brigada sigue trabajando en un valle sin cobertura.</p></div>
+  <p class="credit">Foto real: incendio en Villela (Burgos), 15-08-2024 · <a href="https://commons.wikimedia.org/wiki/File:20240815_fuego_Villela_cami%C3%B3n_de_bomberos.jpg" rel="noopener">Javier Mediavilla Ezquibela, CC BY 4.0</a></p>
+</section>
+
+<section id="camino" class="chapter" aria-labelledby="cam-t">
+  <div class="wrap">
+    <p class="num rv">03 · EL CAMINO</p>
+    <h2 id="cam-t" class="rv">Un mensaje, todos los caminos a la vez.</h2>
+    <p class="lede rv">SENDA parte el SOS en trozos y los lanza por todo lo que siga vivo: el móvil del vecino, una antena que aguanta, el satélite, la radio de la brigada, el dron que pasa. Con <b>k trozos cualesquiera</b> el centro lo reconstruye. Elige escenario, apaga caminos y lanza el mensaje.</p>
+    <div class="ctrl rv" role="group" aria-label="Escenario">
+      <button data-preset="city" class="on">Vecina en el apagón</button><button data-preset="forest">Brigada forestal</button><button data-preset="flood">Pueblo aislado por riada</button><button data-preset="narrow">Solo caminos estrechos</button>
+    </div>
+    <div class="chips" id="rc-bearers" aria-label="Caminos disponibles"></div>
+    <div class="split">
+      <div class="stage rv">
+        <canvas id="rc-cv" width="1000" height="560" aria-label="Fragmentos del mensaje viajando por cada camino hasta el centro de coordinación"></canvas>
+        <div class="ctrl"><button id="rc-go" class="go">▶ Enviar el SOS</button><button id="rc-mc">Repetir 2 000 veces</button><span id="rc-state" class="m" style="font-size:14px"></span></div>
+      </div>
+      <div class="side rv">
+        <h3>El plan, calculado</h3>
+        <p class="m" style="font-size:14px">Mensaje (<span id="rc-bytes" class="mono">—</span>): <span id="rc-msg" style="color:#d5dfe2"></span></p>
+        <div class="kv"><div><b id="rc-k">—</b><span>k que bastan</span></div><div><b id="rc-n">—</b><span>n enviados</span></div><div><b id="rc-p">—</b><span>P(entrega) · objetivo 99 %</span></div><div><b id="rc-eta">—</b><span>tiempo</span></div></div>
+        <p class="m" style="font-size:13.5px;margin-top:10px">Regla: el plan <b>más barato</b> que llega al 99 %; a igual coste, el más rápido. Si el mensaje cabe entero en un camino se <b>copia</b> (k = 1); si los caminos son estrechos se <b>trocea</b>.</p>
+        <div id="rc-bars"></div>
+        <div class="log" id="rc-log" aria-live="polite"></div>
+      </div>
+    </div>
+    <p class="big rv" style="margin-top:10vh;font-size:clamp(24px,3vw,40px);max-width:32ch">¿100 %? Nadie puede prometerlo en una catástrofe. SENDA dice la cifra honesta: <span class="mono" id="rc-claim" style="color:var(--sky)">—</span> si los caminos fallasen por separado, <span class="mono" id="rc-actual" style="color:var(--ember)">—</span> en un apagón, donde fallan juntos.</p>
+    <p class="cap rv"><span class="truth t-calc">planMultiBearer + Reed-Solomon + delivery-assurance.mjs</span> Probabilidades de cada camino: previos de planificación hasta el ensayo de campo.</p>
+    <div class="split" style="margin-top:12vh;align-items:center">
+      <div class="rv">
+        <div class="phone" id="alert-phone"><div class="scr"></div><div class="clock">19:42</div>
+          <div class="al" role="alertdialog" aria-label="Alerta de ejercicio">
+            <div class="h">⚠ AVISO OFICIAL · EJERCICIO</div>
+            <p>Riada en el barranco. El agua llegará a tu calle en 40 min. Sube a un piso alto. No cojas el coche.</p>
+            <button class="ans" data-r="BIEN">✅ Estoy bien, en un piso alto</button>
+            <button class="ans" data-r="AYUDA">🆘 Necesito ayuda (2º piso)</button>
+            <button class="ans" data-r="PUEDO">🤝 Puedo ayudar a vecinos</button>
+            <button class="ans" data-r="VEO">📷 Envío lo que veo</button>
+          </div>
+        </div>
+      </div>
+      <div class="side rv">
+        <p class="num">LA ALERTA QUE SE RESPONDE</p>
+        <h3 class="h-xl">Hoy una alerta es un pitido y un texto que se descarta. Con SENDA es una conversación.</h3>
+        <p>Cada respuesta es un dato estructurado y firmado que viaja por los caminos de arriba. La sala deja de adivinar: sabe quién está bien, quién necesita ayuda, en qué planta, y quién puede echar una mano.</p>
+        <div class="ctrl"><button id="alert-arrive" class="go">Recibir la alerta</button></div>
+        <p id="alert-out" class="m" style="font-size:15px;min-height:4em" aria-live="polite"></p>
+        <p class="cap"><span class="truth t-sim">Ejercicio: ningún organismo la ha emitido</span><span class="truth t-calc">Firma ECDSA real en tu navegador</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="mando" class="chapter" aria-labelledby="man-t">
+  <div class="wrap">
+    <p class="num rv">04 · EL MANDO</p>
+    <h2 id="man-t" class="rv">Bomberos, Guardia Civil y sanitarios en el mismo mapa. <span>Cada uno con su canal.</span></h2>
+    <p class="lede rv">Cada cuerpo habla en su canal cifrado; el mando unificado los ve todos. La persona atrapada sabe que la ayuda está a dos minutos. Y una conductora voluntaria que pasa cerca confirma lo que ocurre antes de que llegue nadie.</p>
+    <div class="split">
+      <div class="stage rv">
+        <canvas id="mando-cv" width="1000" height="580" aria-label="Mapa de coordinación con unidades acercándose al incidente"></canvas>
+        <div class="ctrl"><button id="mando-go" class="go">▶ Activar el incidente</button></div>
+      </div>
+      <div class="side rv">
+        <ul class="units" id="mando-units"></ul>
+        <ul class="chat" id="mando-feed" aria-live="polite"></ul>
+        <p class="cap"><span class="truth t-sim">Ejercicio esquemático</span><span class="truth t-calc">Cada mensaje firmado y verificado con ECDSA P-256</span></p>
+      </div>
+    </div>
+    <p class="m rv" style="max-width:70ch;margin-top:20px;font-size:15px">Interoperabilidad: SENDA ya exporta incidentes y alertas en CAP 1.2, el formato estándar de las alertas públicas, y tiene preparado el mapeo a EMSI (ISO/TR 22351) para el intercambio entre organismos. Conectar con los sistemas actuales de cada cuerpo exige un convenio con cada uno: hoy no hay ninguno firmado.</p>
+  </div>
+</section>
+
+<section class="bleed" aria-label="Voluntarios tras la DANA">
+  <img src="/senda/fotos/dana-voluntarios.jpg" alt="Voluntarios repartiendo comida en Valencia tras la DANA, noviembre de 2024" loading="lazy">
+  <div class="wrap"><p class="big rv">Hasta que llegan los equipos, los primeros en ayudar son los vecinos. SENDA les da información y una tarea, no solo un aviso.</p></div>
+  <p class="credit">Foto real: World Central Kitchen en Valencia, 18-11-2024 · <a href="https://commons.wikimedia.org/wiki/File:2024_nov_18_DANA_Valencia_ONG_World_Central_Kitchen_03.jpg" rel="noopener">Bgasco, CC BY-SA 4.0</a></p>
+</section>
+
+<section id="sensores" class="chapter" aria-labelledby="sen-t">
+  <div class="wrap">
+    <p class="num rv">05 · LOS SENTIDOS</p>
+    <h2 id="sen-t" class="rv">Avisar cuando aún no llueve en tu pueblo.</h2>
+    <p class="lede rv">El agua que inunda un pueblo cae horas antes, kilómetros aguas arriba. SENDA cruza aforos, embalses y lluvia de cabecera para avisar mientras en el pueblo todavía no llueve.</p>
+    <div class="split" style="align-items:center">
+      <div class="stage rv"><canvas id="flood-cv" width="900" height="380" aria-label="Caudal aguas arriba y en el pueblo con el umbral de desborde"></canvas>
+        <p class="cap"><span class="truth t-sim">Cuenca sintética</span><span class="truth t-calc">flood-watch.mjs</span> Azul: aforo de cabecera · naranja: caudal en el pueblo de la desembocadura.</p></div>
+      <div class="side rv"><div class="lead-num" id="flood-lead">—</div><p>de margen entre el primer aviso aguas arriba y el desborde en el pueblo, con solo 3 mm de lluvia local en este escenario.</p>
+        <p class="m" style="font-size:14.5px">Lo mismo con el resto de sentidos: un accidente se confirma con el impacto y el contexto, nunca con una llamada automática (<a href="/senda/roadsafe">RoadSafe</a>); la posición pasa de «estoy en la autovía» al punto kilométrico y el sentido (<a href="/senda/carretera">carretera</a>). Los terremotos <b>no se pueden predecir</b>; lo que sí se puede es detectar las primeras ondas y avisar segundos antes de las fuertes.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="drones" class="chapter" aria-labelledby="dro-t">
+  <div class="wrap">
+    <p class="num rv">06 · DRONES Y EDIFICIOS</p>
+    <h2 id="dro-t" class="rv">El cielo lleno de ayuda. <span>Y ordenado.</span></h2>
+    <p class="lede rv">El móvil ve cada dron que emite su matrícula electrónica; los drones llevan mensajes entre zonas aisladas y barren un barrio casa por casa escuchando cuántos teléfonos hay en cada planta.</p>
+    <div class="split">
+      <div class="stage rv"><canvas id="rid-cv" width="900" height="520" aria-label="Radar del móvil con los drones que emiten Remote ID"></canvas></div>
+      <div class="side rv">
+        <h3>Remote ID, decodificado en el móvil</h3>
+        <p>Mensajes de 25 bytes (ASTM F3411 / ASD-STAN EN 4709-002), obligatorios en la UE para los drones de clase C1, C2 y C3 (<a href="https://eur-lex.europa.eu/eli/reg_del/2019/945/oj" rel="noopener">Reglamento Delegado (UE) 2019/945</a>). Cada punto del radar se dibuja <b>después</b> de codificar y decodificar el mensaje con <span class="mono">drone.mjs</span>.</p>
+        <p class="hex" id="rid-hex">—</p>
+        <table id="rid-t"><thead><tr><th>Dron</th><th>Altura</th><th>Velocidad</th><th>Rumbo</th></tr></thead><tbody></tbody></table>
+        <p class="cap"><span class="truth t-sim">Vuelos inventados</span><span class="truth t-calc">Codificación ODID real</span></p>
+      </div>
+    </div>
+    <div class="split">
+      <div class="stage rv"><canvas id="sw-cv" width="560" height="300" aria-label="Ruta del dron por 24 edificios coloreados por prioridad"></canvas><p id="sw-out" class="m" style="font-size:14.5px"></p></div>
+      <div class="side rv"><h3>Dron mula: mensajes a un pueblo incomunicado</h3><div class="kv" id="mule-kv"></div><p class="cap"><span class="truth t-calc">muleSortie</span> 12 m/s, 30 min de autonomía, 20 % de reserva, coordenadas de ejemplo en l'Horta Sud.</p>
+        <h3 style="margin-top:24px">Visto desde el satélite</h3><img src="/senda/fotos/app-aislamiento.jpg" alt="Captura real de la app: zonas aisladas en l'Horta Sud" style="width:100%;border-radius:12px" loading="lazy"><p class="cap"><span class="truth t-real">Captura de la app</span> Zonas aisladas de l'Horta Sud calculadas sobre la DANA de 2024 (<a href="/senda/aislamiento">abrir</a>).</p></div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="lab-t" style="padding-top:6vh">
+  <div class="wrap"><p class="num rv">TODO ESTO YA FUNCIONA EN LA APP</p><h2 id="lab-t" class="rv" style="font-size:clamp(28px,3.6vw,48px);letter-spacing:-.03em;margin:10px 0 0">Entra en cada laboratorio.</h2></div>
+  <div class="strip">
+    <a href="/senda/consola"><img src="/senda/fotos/app-consola-calor.jpg" alt="Consola geoespacial en modo calor" loading="lazy"><b>Consola geoespacial</b><span>Globo 3D, situaciones fusionadas, muro de vídeo</span></a>
+    <a href="/senda/camaras"><img src="/senda/fotos/app-camara-dgt.jpg" alt="Cámara de la DGT en la consola" loading="lazy"><b>Cámaras públicas</b><span>Visibilidad medida con física, sin mirar personas</span></a>
+    <a href="/senda/radio"><img src="/senda/fotos/app-radio-poyo.jpg" alt="Planificador de radio sobre el barranco del Poyo" loading="lazy"><b>Radio sobre relieve real</b><span>Repetidores para el barranco del Poyo</span></a>
+    <a href="/senda/mulas"><img src="/senda/fotos/app-mulas.jpg" alt="Autobuses de la EMT de València como mulas de datos" loading="lazy"><b>Autobuses como mulas</b><span>Horarios reales de la EMT de València</span></a>
+    <a href="/senda/consola"><img src="/senda/fotos/app-nepal.jpg" alt="Sobrevuelo de Nepal en la consola" loading="lazy"><b>Nepal en 3D</b><span>Sentinel-2 antes y después</span></a>
+    <a href="/senda/atlas"><img src="/senda/fotos/app-cordon.jpg" alt="Cordón de cámaras alrededor de un incidente" loading="lazy"><b>Cordón de cámaras</b><span>Qué cámaras rodean un incidente</span></a>
+    <a href="/senda/consola"><img src="/senda/fotos/app-consola-columnas.jpg" alt="Consola en modo columnas 3D" loading="lazy"><b>Columnas 3D</b><span>Cinco formas de ver los datos</span></a>
+  </div>
+</section>
+
+<section id="europa" class="chapter" aria-labelledby="eu-t">
+  <div class="wrap">
+    <p class="num rv">07 · POR QUÉ AHORA, POR QUÉ EUROPA</p>
+    <p class="statement rv" id="eu-t">Europa tendrá su red crítica común entre 2030 y 2036. Hasta entonces, la gente solo tiene lo que lleva en el bolsillo.</p>
+    <p class="cap rv"><a href="https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en" rel="noopener">Comisión Europea: EUCCS</a> · <a href="https://eena.org/news/the-commission-proposed-a-new-european-union-critical-communication-system-regulation/" rel="noopener">EENA</a> · <a href="https://commission.europa.eu/topics/preparedness_uk" rel="noopener">Unión de la Preparación: 72 h de autosuficiencia</a></p>
+    <div class="facts">
+      <div class="fact rv"><b>365 <small>M USD</small></b><p>software de gestión de emergencias en sentido estricto (2025).</p><cite><a href="https://www.marketsandmarkets.com/Market-Reports/emergency-management-software-market-218079999.html" rel="noopener">MarketsandMarkets</a></cite></div>
+      <div class="fact rv"><b>20 200 <small>M USD</small></b><p>gestión de incidentes y emergencias en sentido amplio (2025), +11,6 % anual estimado. Alcances distintos: no se suman.</p><cite><a href="https://growthmarketreports.com/report/incident-and-emergency-management-software-market-global-industry-analysis" rel="noopener">Growth Market Reports</a></cite></div>
+      <div class="fact rv"><b>2030 <small>→ 2036</small></b><p>despliegue previsto del sistema europeo de comunicaciones críticas: unos 10 Estados primero, todos después.</p><cite><a href="https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en" rel="noopener">Comisión Europea</a></cite></div>
+    </div>
+    <div class="cols">
+      <div class="rv"><h3 style="color:var(--mint)">Lo que ya existe</h3><ul>
+        <li>Cifrado y firma extremo a extremo: quien retransmite no puede leer.</li>
+        <li>Reparto entre caminos con probabilidad exacta y auditoría de fallos en cadena.</li>
+        <li>Previsión de apagón y colocación de pasarelas con garantía matemática.</li>
+        <li>Notas de comunidad con credibilidad auditable, separadas de la alerta oficial.</li>
+        <li>CAP 1.2, auditoría encadenada SHA-256, pruebas automáticas de cada módulo y código abierto.</li></ul></div>
+      <div class="rv"><h3 style="color:var(--sun)">Lo que pagaría la inversión</h3><ul>
+        <li>Ensayo de campo con móviles Android y radios LoRa reales: alcance, batería y entrega medidos (hoy TRL 3–4).</li>
+        <li>Sustituir cada probabilidad de planificación por lo medido en ese ensayo.</li>
+        <li>Auditoría de seguridad independiente y conformidad ENS para pliegos públicos.</li>
+        <li>Convenio con un organismo para un simulacro. Todavía no hay clientes ni ingresos: el piloto es lo que convierte esta base en tracción.</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" style="padding-top:4vh" aria-labelledby="vid-t">
+  <div class="wrap">
+    <h2 id="vid-t" class="rv" style="font-size:clamp(26px,3vw,40px)">Vídeo: el recorrido completo</h2>
+    <video controls preload="none" playsinline poster="/media/senda-explica-poster-es.jpg" style="width:100%;border-radius:18px;background:#000" class="rv" aria-label="Recorrido grabado de esta página">
       <source src="/media/senda-explica-es.mp4" type="video/mp4">
     </video>
-    <figcaption class="m" style="font-size:13px;margin-top:6px">Vídeo de 1 min 38 s: grabación en Chromium de esta misma página con las simulaciones ejecutándose. No es un ensayo de campo ni contiene imágenes reales de una emergencia.</figcaption>
-  </figure>
-</section>
-
-<section id="glosario" class="scene" aria-labelledby="g-t">
-  <h2 id="g-t">Glosario en una línea</h2>
-  <p class="m">Las palabras técnicas que aparecen en los laboratorios, traducidas.</p>
-  <dl class="gloss">
-    <div><dt>Emisor <i>(sender)</i></dt><dd>Quien envía el mensaje: la persona atrapada, la brigada o el centro.</dd></div>
-    <div><dt>Vecino <i>(neighbor)</i></dt><dd>Otro móvil cercano con SENDA que lleva tu mensaje cifrado sin poder leerlo.</dd></div>
-    <div><dt>BLE <i>(Bluetooth Low Energy)</i></dt><dd>Bluetooth de bajo consumo: decenas de metros entre móviles, sin antena ni Internet.</dd></div>
-    <div><dt>Wi-Fi Direct</dt><dd>Wi-Fi de móvil a móvil, sin router. Más alcance y velocidad que el Bluetooth.</dd></div>
-    <div><dt>Portador <i>(bearer)</i></dt><dd>Cualquier cosa que mueva bytes: vecinos, SMS, satélite, LoRa, dron, Internet.</dd></div>
-    <div><dt>Pasarela <i>(gateway)</i></dt><dd>El punto donde la burbuja sin red vuelve a tocar Internet o el 112.</dd></div>
-    <div><dt>Fragmentos k de n</dt><dd>El mensaje se parte en n trozos; con <b>cualquier</b> k de ellos se reconstruye entero (Reed-Solomon).</dd></div>
-    <div><dt>ACK</dt><dd>Acuse de recibo firmado. Sin ACK, SENDA no da nada por entregado.</dd></div>
-    <div><dt>Guardar y reenviar <i>(store-and-forward)</i></dt><dd>Si no hay camino, el mensaje se guarda y sale en cuanto aparece uno.</dd></div>
-    <div><dt>Mula de datos</dt><dd>Algo que se mueve (dron, autobús, coche) y lleva mensajes de una zona aislada a otra con red.</dd></div>
-    <div><dt>LoRa / Meshtastic</dt><dd>Radio de baja potencia a 868 MHz: kilómetros de alcance con pocos bytes. Necesita un accesorio barato.</dd></div>
-    <div><dt>D2C <i>(direct-to-cell)</i></dt><dd>Satélite que habla directamente con un móvil normal, si tu operador ofrece el servicio.</dd></div>
-    <div><dt>Iridium SBD</dt><dd>Mensajes cortos por satélite con un módem pequeño. Funciona en todo el planeta con cielo despejado.</dd></div>
-    <div><dt>RSSI</dt><dd>Fuerza con la que llega una señal de radio. Cuanto más débil, más lejos (aproximadamente).</dd></div>
-    <div><dt>Wi-Fi CSI</dt><dd>Detalle fino de cómo viaja el Wi-Fi; el cuerpo y la respiración lo alteran. Necesita un accesorio (ESP32).</dd></div>
-    <div><dt>Remote ID</dt><dd>Matrícula electrónica que muchos drones emiten por Bluetooth/Wi-Fi: posición, altura y velocidad.</dd></div>
-  </dl>
-</section>
-
-<!-- ============ ESCENA 1 ============ -->
-<section id="e1" class="scene" aria-labelledby="e1-t">
-  <h2 id="e1-t"><span class="num">1</span>Por qué te quedas sin conexión</h2>
-  <p class="lead">El móvil no se apaga cuando se va la luz: <b>se apagan las antenas cuando se les acaba la batería</b>. En un incendio, además, el fuego quema antenas y fibra; y en cualquier catástrofe todo el mundo llama a la vez.</p>
-  <div class="g3">
-    <div class="card problem"><h3><small>Hecho real</small>Apagón ibérico, 28-04-2025 <span class="tag real">REAL</span></h3><p>La red móvil cayó cuando se agotaron las baterías de las antenas («apenas unas horas»). Los usuarios con conexión estable bajaron <b>del 90 % al 40 %</b> hacia las 15:00.</p>
-      <p class="src">Fuentes: <a href="https://www.laecuaciondigital.com/actualidad/el-apagon-electrico-colapsa-redes-moviles-en-espana-y-portugal-el-28-de-abril/" rel="noopener">La Ecuación Digital</a> · <a href="https://www.infobae.com/tecno/2025/04/29/el-apagon-que-desconecto-a-espana-por-que-whatsapp-dejo-de-funcionar-aunque-el-movil-mostraba-cobertura/" rel="noopener">Infobae</a> · <a href="https://es.wikipedia.org/wiki/Apag%C3%B3n_en_la_pen%C3%ADnsula_ib%C3%A9rica_de_2025" rel="noopener">Wikipedia</a></p></div>
-    <div class="card problem"><h3><small>Hecho real</small>Toda la alerta oficial depende de la antena <span class="tag real">REAL</span></h3><p>ES-Alert, NL-Alert y EU-Alert llegan por la red celular. La vía por satélite de Galileo (EWSS) sigue «en desarrollo» según EUSPA.</p>
-      <p class="src">Fuentes: <a href="https://www.euspa.europa.eu/galileo-ewss" rel="noopener">EUSPA</a> · <a href="https://www.dutchnews.nl/2026/06/government-u-turns-on-decision-not-to-replace-air-raid-sirens/" rel="noopener">DutchNews (NL-Alert, 2026)</a></p></div>
-    <div class="card solution"><h3><small>Qué hace SENDA</small>Prevé el apagón y coloca pasarelas antes <span class="tag calc">CALCULADO</span></h3><p>Calcula hora a hora cuánta población se quedará a oscuras y dónde poner pasarelas (satélite, LoRa, dron) para alcanzar al máximo de gente. Muévete por el tiempo en el mapa →</p><p class="m" style="font-size:14px">Módulo <span class="mono">blackout.mjs</span>: supervivencia Weibull por tipo de batería y colocación voraz con garantía ≥ 63 % del óptimo.</p></div>
-  </div>
-  <div class="wide">
-    <div>
-      <canvas id="bk-cv" width="900" height="560" aria-label="Mapa de una ciudad sintética: antenas que se apagan con el paso de las horas y zonas sin cobertura"></canvas>
-      <div class="row"><label for="bk-t" class="m" style="font-size:14px">Horas desde el corte de luz</label><input id="bk-t" type="range" min="0" max="24" step="0.25" value="0"><b id="bk-tv" class="mono">0 h</b><button id="bk-play" class="p">▶ Reproducir</button><button id="bk-gw">Colocar 3 pasarelas</button></div>
-    </div>
-    <div class="card">
-      <h3>Ciudad de ejemplo <span class="tag sim">SIMULACIÓN</span></h3>
-      <p class="m" style="font-size:14px">60 antenas y 576 manzanas sintéticas (<span class="mono">syntheticCity</span>). Cada antena tiene un respaldo: batería estándar (mediana 2 h), ampliada (6 h) o generador (48 h). Medianas de planificación: en un despliegue real se sustituyen por el inventario del operador.</p>
-      <div class="kv"><div><b id="bk-cov">—</b><span>población con cobertura</span></div><div><b id="bk-dark">—</b><span>personas a oscuras</span></div><div><b id="bk-alive">—</b><span>antenas probablemente vivas</span></div><div><b id="bk-reach">—</b><span>a oscuras alcanzadas por pasarelas</span></div></div>
-      <canvas id="bk-chart" width="520" height="200" style="margin-top:12px" aria-label="Curva de población con cobertura frente al tiempo"></canvas>
-      <p class="m" style="font-size:13px">Leyenda: rojo = manzana probablemente sin cobertura · azul = cubierta · ◆ = pasarela propuesta.</p>
-    </div>
+    <p class="cap">Grabación en Chromium de esta página con las simulaciones ejecutándose. No es un ensayo de campo.</p>
   </div>
 </section>
 
-<!-- ============ ESCENA 2 ============ -->
-<section id="e2" class="scene" aria-labelledby="e2-t">
-  <h2 id="e2-t"><span class="num">2</span>La carrera de caminos: cómo llega un mensaje cuando casi nada funciona</h2>
-  <p class="lead">Una persona escribe un SOS. SENDA lo <b>parte en fragmentos</b> y los lanza a la vez por todos los caminos disponibles. No hace falta que lleguen todos: con <b>k cualquiera</b> el centro lo reconstruye. Por eso, aunque se caigan varios caminos, el mensaje sigue llegando.</p>
-  <div class="row" role="group" aria-label="Escenario">
-    <span class="m" style="font-size:14px">Escenario:</span>
-    <button data-preset="city" class="on">Vecina en el apagón (ciudad)</button>
-    <button data-preset="forest">Brigada forestal sin cobertura</button>
-    <button data-preset="flood">Pueblo aislado por una riada</button>
-    <button data-preset="narrow">Solo caminos estrechos (SMS, satélite, LoRa)</button>
-  </div>
-  <div class="chips" id="rc-bearers" aria-label="Caminos disponibles"></div>
-  <div class="wide">
-    <div>
-      <canvas id="rc-cv" width="1000" height="560" aria-label="Animación: fragmentos del mensaje viajando por vecinos, antena, satélite, LoRa, Iridium, dron e Internet de un vecino hasta el centro de coordinación"></canvas>
-      <div class="row"><button id="rc-go" class="p">▶ Enviar el SOS</button><button id="rc-mc">Repetir 2 000 veces</button><span id="rc-state" class="m" style="font-size:14px"></span></div>
-    </div>
-    <div class="card">
-      <h3>El plan que calcula SENDA <span class="tag calc">CALCULADO</span></h3>
-      <p class="m" style="font-size:14px">Mensaje de ejemplo (<span id="rc-bytes" class="mono">—</span>):<br><span class="mono" style="color:#e6edf0;font-size:13px" id="rc-msg"></span></p>
-      <div class="kv"><div><b id="rc-k">—</b><span>k: fragmentos que bastan</span></div><div><b id="rc-n">—</b><span>n: fragmentos enviados</span></div><div><b id="rc-p">—</b><span>P(entrega) si fallan por separado · objetivo 99 %</span></div><div><b id="rc-eta">—</b><span>tiempo para ese objetivo</span></div></div>
-      <p class="m" style="font-size:13px;margin:10px 0 0">Regla del planificador (<span class="mono">planMultiBearer</span>): el plan <b>más barato</b> que alcanza el 99 %; a igualdad de coste, el más rápido. Si el mensaje cabe entero en un camino, lo <b>copia</b> por varios (k = 1); si los caminos son estrechos, lo <b>trocea</b> (k &gt; 1).</p>
-      <div class="bars" id="rc-bars"></div>
-      <div class="log" id="rc-log" aria-live="polite">Pulsa «Enviar el SOS».</div>
-    </div>
-  </div>
-  <div class="callout">
-    <h3>¿Por qué no prometemos el 100 %? <span class="tag calc">CALCULADO</span></h3>
-    <p style="margin:0">Nadie puede garantizar el 100 % en una catástrofe. Lo que SENDA sí hace es <b>calcular la probabilidad con los supuestos a la vista</b>, subirla añadiendo caminos y avisar de cuánto falta. Y es honesto con la trampa principal: en un apagón los caminos <b>no fallan por separado</b> (cae la luz y caen a la vez SMS, datos y el relé del vecino). El auditor <span class="mono">delivery-assurance.mjs</span> recalcula el mismo plan con fallos de causa común: <b id="rc-claim">—</b> prometido si fueran independientes → <b id="rc-actual">—</b> con apagón. Las probabilidades de cada camino son <b>previos de planificación</b>, no medidas de campo: el piloto con móviles y radios reales es lo que las sustituirá.</p>
-  </div>
-</section>
+<footer>SENDA · Las animaciones ejecutan los módulos de <span class="mono">/senda/core/</span> en tu navegador. Fotos reales con autor y licencia en <a href="/senda/fotos/creditos.json">creditos.json</a>. Escenarios sintéticos salvo donde pone «real». Nada de esta página contacta con el 112 ni sustituye una llamada al 112.</footer>
 
-<!-- ============ ESCENA 3 ============ -->
-<section id="e3" class="scene" aria-labelledby="e3-t">
-  <h2 id="e3-t"><span class="num">3</span>La cámara que muestra dónde está la señal de una persona atrapada</h2>
-  <p class="lead">La cámara del móvil <b>no puede ver a través de una pared</b>. Pero el teléfono de la persona atrapada sí emite radio. SENDA, en modo SOS, hace que ese teléfono emita una baliza Bluetooth; el rescatador camina sobre los escombros, su móvil mide la fuerza de la señal en varios puntos, calcula dónde está y <b>lo dibuja encima de la imagen de la cámara</b> con su círculo de incertidumbre. Es realidad aumentada sobre una medida de radio, no visión de rayos X.</p>
-  <div class="wide">
-    <div>
-      <canvas id="ar-cv" width="900" height="560" aria-label="Visor de cámara sobre un edificio derrumbado con la posición estimada del teléfono atrapado y su círculo de incertidumbre"></canvas>
-      <div class="row"><button id="ar-go" class="p">▶ Caminar y medir</button><button id="ar-reset">Reiniciar</button><label class="chk" style="min-height:auto"><input type="checkbox" id="ar-truth"> Mostrar la posición real (solo existe en la simulación)</label></div>
-    </div>
-    <div class="card">
-      <h3>Lo que hace el código <span class="tag calc">CALCULADO</span> <span class="tag sim">SIMULACIÓN</span></h3>
-      <p class="m" style="font-size:14px">Las lecturas de señal se generan con un modelo de propagación por escombros y 3 dB de ruido aleatorio (escenario inventado). La posición la calcula <span class="mono">rubble.mjs</span> (<span class="mono">locateBeacon</span>, mínimos cuadrados) y la proyección sobre la imagen, <span class="mono">projectToCamera</span>.</p>
-      <div class="kv"><div><b id="ar-reads">0</b><span>lecturas de señal</span></div><div><b id="ar-err">—</b><span>incertidumbre estimada</span></div><div><b id="ar-real">—</b><span>error real (simulación)</span></div><div><b id="ar-depth">—</b><span>distancia a la señal</span></div></div>
-      <canvas id="ar-map" width="520" height="300" style="margin-top:12px" aria-label="Vista desde arriba: recorrido del rescatador, lecturas y posición estimada"></canvas>
-    </div>
-  </div>
-  <div class="g2">
-    <div class="card">
-      <h3>¿Y si la persona no tiene móvil? Respiración por Wi-Fi <span class="tag sim">SEÑAL SINTÉTICA</span></h3>
-      <p class="m" style="font-size:14px">El cuerpo altera cómo viaja el Wi-Fi y la respiración lo modula 10–30 veces por minuto. Un móvil no da ese dato (CSI), pero una placa ESP32 de unos 10 € sí. <span class="mono">through-wall.mjs</span> analiza la señal y busca el ritmo respiratorio. Aquí, con una señal sintética de una persona que respira 14 veces por minuto y otra de una sala vacía:</p>
-      <canvas id="csi-cv" width="560" height="220" aria-label="Señal Wi-Fi CSI sintética con y sin persona respirando"></canvas>
-      <p id="csi-out" class="m" style="font-size:14px"></p>
-    </div>
-    <div class="card">
-      <h3>Qué es posible y qué no <span class="tag calc">DEL PROPIO CÓDIGO</span></h3>
-      <p class="m" style="font-size:14px">Esta tabla no está escrita a mano: es la lista <span class="mono">CAPABILITIES</span> que el módulo declara.</p>
-      <div class="scroll"><table id="cap-t"><thead><tr><th>Capacidad</th><th>Hardware</th><th>Estado</th></tr></thead><tbody></tbody></table></div>
-      <p class="m" style="font-size:14px;margin-top:10px">Para personas sin teléfono también existen el sonido (golpes y voz con los micrófonos de los equipos) y la cámara térmica, que ve a través del humo pero no de los muros. SENDA <b>suma</b> todas esas pistas con reglas de Bayes auditables (<span class="mono">occupancy.mjs</span>) y nunca descarta a nadie por silencio.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ============ ESCENA 4 ============ -->
-<section id="e4" class="scene" aria-labelledby="e4-t">
-  <h2 id="e4-t"><span class="num">4</span>Drones: verlos en el móvil, usarlos como mensajeros y para barrer un barrio</h2>
-  <p class="lead">En una emergencia el cielo se llena: drones de bomberos, de la policía, de voluntarios. SENDA los usa de tres formas.</p>
-  <div class="wide">
-    <div>
-      <canvas id="rid-cv" width="900" height="520" aria-label="Radar con drones que emiten su identificación remota, decodificada por el móvil"></canvas>
-    </div>
-    <div class="card">
-      <h3>1 · Ver los drones con el móvil (Remote ID) <span class="tag sim">VUELOS INVENTADOS</span> <span class="tag calc">CODIFICACIÓN REAL</span></h3>
-      <p class="m" style="font-size:14px">Muchos drones emiten por Bluetooth/Wi-Fi una «matrícula electrónica» de 25 bytes con su posición, altura y velocidad (norma ASTM F3411 / ASD-STAN EN 4709-002). En la UE se exige a los drones con marcado de clase C1, C2 y C3 (<a href="https://eur-lex.europa.eu/eli/reg_del/2019/945/oj" rel="noopener">Reglamento Delegado (UE) 2019/945</a>). Un móvil puede escucharla sin red. Aquí cada punto se dibuja <b>después</b> de codificar y decodificar el mensaje con <span class="mono">drone.mjs</span>:</p>
-      <p class="hex" id="rid-hex">—</p>
-      <div class="scroll"><table id="rid-t"><thead><tr><th>Dron</th><th>Altura</th><th>Velocidad</th><th>Rumbo</th></tr></thead><tbody></tbody></table></div>
-    </div>
-  </div>
-  <div class="g2">
-    <div class="card">
-      <h3>2 · El dron como mula de mensajes <span class="tag calc">CALCULADO</span></h3>
-      <p class="m" style="font-size:14px">Un pueblo incomunicado por una riada y un puesto de mando a varios kilómetros. El dron vuela, recoge los mensajes guardados en los móviles del pueblo por Wi-Fi y los suelta en el puesto. <span class="mono">muleSortie</span> comprueba si le llega la batería (con 20 % de reserva):</p>
-      <div class="kv" id="mule-kv"></div>
-      <p class="m" style="font-size:13px">Supuestos declarados: 12 m/s, 30 min de autonomía, 60 s de intercambio. Coordenadas de ejemplo en l'Horta Sud (València).</p>
-    </div>
-    <div class="card">
-      <h3>3 · Barrido casa por casa tras un terremoto <span class="tag sim">BARRIO SINTÉTICO</span> <span class="tag calc">RUTA CALCULADA</span></h3>
-      <canvas id="sw-cv" width="560" height="300" aria-label="Ruta del dron por 24 edificios, coloreados por prioridad"></canvas>
-      <p id="sw-out" class="m" style="font-size:14px"></p>
-    </div>
-  </div>
-</section>
-
-<!-- ============ ESCENA 5 ============ -->
-<section id="e5" class="scene" aria-labelledby="e5-t">
-  <h2 id="e5-t"><span class="num">5</span>Cada problema, su laboratorio</h2>
-  <p class="lead">Cada tarjeta abre la herramienta completa. Debajo del título: el problema que resuelve.</p>
-  <div class="labs">
-    <a href="/senda/incendio"><b>🔥 Incendio forestal</b><p>¿Cuándo llega el fuego a cada pueblo y cuándo se queda sin antena? Avisar por el canal que aún funciona.</p><em>Avance con viento y pendiente × antenas</em></a>
-    <a href="/senda/fuego3d"><b>🏔️ Incendio en 3D con datos reales</b><p>San Martín de Valdeiglesias (23-07-2026): terreno Copernicus, Sentinel-2 y meteorología del día.</p><em>Terreno y viento 3D en el navegador</em></a>
-    <a href="/senda/red"><b>📡 Red, satélites y previsión de apagón</b><p>Cómo se reparte cada mensaje entre satélite, LoRa, Iridium, SMS, drones y vecinos.</p><em>La escena 2, con todos los mandos</em></a>
-    <a href="/senda/radio"><b>🗻 Repetidores sobre relieve real</b><p>Si cae la red móvil, ¿dónde poner radios para llevar un aviso por un barranco?</p><em>Propagación ITU-R P.526 sobre el modelo de terreno</em></a>
-    <a href="/senda/mulas"><b>🚌 Autobuses como mulas de datos</b><p>¿Pueden los autobuses llevar los mensajes si cae la red? Horarios reales de la EMT de València.</p><em>GTFS abierto + Connection Scan Algorithm</em></a>
-    <a href="/senda/carretera"><b>🚗 Coches y carretera</b><p>Aviso de frenada a quien no la ve; un SOS sin cobertura que viaja con los coches que pasan.</p><em>Ruta protectora y coordinación de escena</em></a>
-    <a href="/senda/camaras"><b>🎥 Cámaras públicas</b><p>Cámaras de tráfico y paisaje publicadas para reutilizarse: mide niebla y nieve, nunca mira a las personas.</p><em>Fuentes abiertas, con licencia</em></a>
-    <a href="/senda/edificios"><b>🏢 Edificios afectados</b><p>Edificio por plantas, routers localizados por su señal, personas por estado y alertas por planta.</p><em>Gemelo digital EMS-98</em></a>
-    <a href="/senda/dron"><b>🛸 Censo radioeléctrico con dron</b><p>¿Cuántas personas puede haber en cada planta? Un dron escucha Bluetooth sin identificar a nadie.</p><em>Recuento por planta con intervalo</em></a>
-    <a href="/senda/sentidos"><b>👁️ Sentidos ampliados</b><p>Ver los sonidos, oír la radio, ver la respiración, con la cámara de tu móvil.</p><em>Realidad aumentada real en el navegador</em></a>
-    <a href="/senda/ojo"><b>🛰️ Qué satélite ve cada emergencia</b><p>Constelaciones calculadas en el navegador y la ruta del aviso hasta la sala del 112.</p><em>Órbitas desde TLE fechados</em></a>
-    <a href="/senda/consola"><b>🌍 Consola geoespacial</b><p>Globo 3D, situaciones fusionadas de todas las fuentes, muro de vídeo con imágenes reales.</p><em>Vista de sala de coordinación</em></a>
-    <a href="/senda/atlas"><b>🗺️ Atlas con perímetros</b><p>Mapa con línea de tiempo: detecciones de satélite, cámaras y reportes, con su fuente.</p><em>Dibuja y reproduce perímetros</em></a>
-    <a href="/senda/centro"><b>🎛️ Centro de control</b><p>Alerta firmada y cifrada de verdad, enviada por canales simulados hasta «lo que ve el vecino».</p><em>Cifrado real · canal simulado</em></a>
-  </div>
-</section>
-
-<!-- ============ ESCENA 6 ============ -->
-<section id="e6" class="scene" aria-labelledby="e6-t">
-  <h2 id="e6-t"><span class="num">6</span>Por qué invertir y por qué encaja en Europa</h2>
-  <p class="lead">El hueco está documentado, la ventana regulatoria es concreta y el núcleo técnico existe y se puede auditar. Lo que falta, y lo que pagaría la inversión, es <b>la prueba en el terreno</b>.</p>
-  <div class="g3">
-    <div class="card problem"><h3><small>El hueco</small>La ciudadanía queda fuera</h3><p>Los sistemas de mando (TETRA, MCX y el futuro EUCCS) conectan a los equipos entre sí, <b>no a la persona atrapada con la sala</b>. Y la alerta pública depende de la antena que cae a las pocas horas.</p></div>
-    <div class="card"><h3><small>La ventana</small>2026 → 2030–2036 <span class="tag real">REAL</span></h3><p>La Comisión propuso el Sistema Europeo de Comunicaciones Críticas (EUCCS): unos 10 Estados desde 2030 y todos hacia 2036, con conectividad satelital segura. Hasta entonces, los Estados necesitan algo que funcione con lo que la gente ya lleva en el bolsillo.</p><p class="src"><a href="https://home-affairs.ec.europa.eu/news/enhancing-europes-capacity-react-preparing-european-critical-communication-system-2026-01-30_en" rel="noopener">Comisión Europea</a> · <a href="https://eena.org/news/the-commission-proposed-a-new-european-union-critical-communication-system-regulation/" rel="noopener">EENA</a></p></div>
-    <div class="card"><h3><small>La preparación</small>72 horas de autosuficiencia <span class="tag real">REAL</span></h3><p>La Estrategia de la Unión de la Preparación pide a la población poder aguantar 72 h y refuerza la alerta temprana.</p><p class="src"><a href="https://commission.europa.eu/topics/preparedness_uk" rel="noopener">Comisión Europea</a></p></div>
-  </div>
-  <div class="g2">
-    <div class="card solution"><h3><small>Lo que ya existe</small>Núcleo abierto y comprobable <span class="tag calc">VERIFICADO POR MÁQUINA</span></h3>
-      <ul style="margin:0;padding-left:18px;color:#d4dde1">
-        <li>Cifrado y firma extremo a extremo; el relé no puede leer el mensaje.</li>
-        <li>Reparto k-de-n (Reed-Solomon) entre portadores con probabilidad exacta y auditoría de fallos correlacionados.</li>
-        <li>Previsión de apagón y colocación de pasarelas con garantía matemática.</li>
-        <li>Alertas e incidentes en CAP 1.2 (el formato de las alertas públicas) y auditoría encadenada SHA-256.</li>
-        <li>Pruebas automáticas de cada módulo en el repositorio.</li>
-      </ul></div>
-    <div class="card limit"><h3><small>Lo que falta (sin maquillaje)</small>Prueba de campo <span class="tag sim">TRL 3–4</span></h3>
-      <ul style="margin:0;padding-left:18px;color:#d4dde1">
-        <li>Ensayo con móviles Android y radios LoRa reales: alcance, batería y entrega medidos.</li>
-        <li>Sustituir las probabilidades de planificación por las medidas en ese ensayo.</li>
-        <li>Revisión de seguridad independiente y conformidad ENS para pliegos españoles.</li>
-        <li>Convenio con un organismo para un simulacro (sin piloto pagado todavía).</li>
-      </ul>
-      <p class="m" style="font-size:14px">Por eso la valoración no puede justificarse hoy con clientes ni ingresos: no los hay. Se justifica con el hueco, la ventana y un núcleo técnico difícil de replicar; el piloto es lo que la convierte en tracción.</p></div>
-  </div>
-  <div class="card" style="margin-top:16px"><h3>Tamaño de mercado (alcances distintos, no comparables entre sí) <span class="tag real">CON FUENTE</span></h3>
-    <p style="margin:0">Software de gestión de emergencias en sentido estricto: unos <b>USD 365 M (2025)</b>. Software de gestión de incidentes y emergencias en sentido amplio: unos <b>USD 20 200 M (2025)</b>, con un crecimiento anual estimado del 11,6 %. Son estimaciones de consultoras, no datos oficiales.</p>
-    <p class="src"><a href="https://www.marketsandmarkets.com/Market-Reports/emergency-management-software-market-218079999.html" rel="noopener">MarketsandMarkets</a> · <a href="https://growthmarketreports.com/report/incident-and-emergency-management-software-market-global-industry-analysis" rel="noopener">Growth Market Reports</a> · análisis completo en <span class="mono">docs/research/PROCUREMENT_GAP_2026.md</span></p></div>
-</section>
-</main>
-<footer>SENDA explicado · Las animaciones ejecutan los módulos de <span class="mono">/senda/core/</span> en tu navegador. Los escenarios son sintéticos salvo donde pone REAL. Nada de esta página contacta con el 112 ni sustituye una llamada al 112.</footer>
-
-<script type="module">
-import { planMultiBearer, BEARERS } from '/senda/core/bearers.mjs';
-import { auditIndependentPlan, DEFAULT_HAZARDS } from '/senda/core/delivery-assurance.mjs';
-import { encodeShards, decodeShards } from '/senda/core/erasure.mjs';
-import { syntheticCity, survival, BACKUP, cellCoverage, placeGateways } from '/senda/core/blackout.mjs';
-import { locateBeacon, projectToCamera } from '/senda/core/rubble.mjs';
-import { CAPABILITIES, synthesizeCsi, analyzeCsi } from '/senda/core/through-wall.mjs';
-import { encodeLocation, decodeOdid, muleSortie } from '/senda/core/drone.mjs';
-import { sweepScenario, planSweep, sweepBoard } from '/senda/core/house-sweep.mjs';
-
-const $ = (s) => document.querySelector(s);
-const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const pct = (x, d = 1) => (100 * x).toFixed(d).replace('.', ',') + ' %';
-const fmt = (x) => Math.round(x).toLocaleString('es-ES');
-function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6d2b79f5) >>> 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-function gauss(R) { let u = 0, v = 0; while (!u) u = R(); while (!v) v = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
-/** Ejecuta un bucle de animación solo mientras el lienzo está en pantalla. */
-function loop(canvas, draw) {
-  let on = false, raf = 0, last = performance.now();
-  const tick = (t) => { const dt = Math.min(0.05, (t - last) / 1000); last = t; draw(dt, t / 1000); if (on) raf = requestAnimationFrame(tick); };
-  new IntersectionObserver(([e]) => { on = e.isIntersecting; if (on) { last = performance.now(); raf = requestAnimationFrame(tick); } else cancelAnimationFrame(raf); }).observe(canvas);
-}
-
-/* ======================= ESCENA 1 · apagón ======================= */
-{
-  const city = syntheticCity();
-  const cv = $('#bk-cv'), g = cv.getContext('2d'), ch = $('#bk-chart'), gc = ch.getContext('2d');
-  const lats = city.cells.map((c) => c.lat), lons = city.cells.map((c) => c.lon);
-  const box = { la0: Math.min(...lats), la1: Math.max(...lats), lo0: Math.min(...lons), lo1: Math.max(...lons) };
-  const X = (lon) => 30 + ((lon - box.lo0) / (box.lo1 - box.lo0)) * (cv.width - 60), Y = (lat) => 30 + ((box.la1 - lat) / (box.la1 - box.la0)) * (cv.height - 60);
-  const cw = (cv.width - 60) / 23, chh = (cv.height - 60) / 23;
-  let T = 0, playing = false, gw = null;
-  const covAt = (t) => city.cells.map((c) => cellCoverage(c, city.towers, t));
-  function stats(t) {
-    const cov = covAt(t), pop = city.cells.reduce((a, c) => a + c.pop, 0);
-    const covered = city.cells.reduce((a, c, i) => a + c.pop * cov[i], 0);
-    const alive = city.towers.reduce((a, tw) => a + survival(t, BACKUP[tw.backup]), 0);
-    return { cov, pctCov: covered / pop, dark: pop - covered, alive };
-  }
-  function drawMap() {
-    const s = stats(T);
-    g.fillStyle = '#071018'; g.fillRect(0, 0, cv.width, cv.height);
-    city.cells.forEach((c, i) => { const v = s.cov[i]; g.fillStyle = `rgba(${Math.round(255 * (1 - v))},${Math.round(90 + 60 * v)},${Math.round(110 + 120 * v)},${0.25 + 0.5 * (1 - v) * 0.6 + 0.2 * v})`; g.fillRect(X(c.lon) - cw / 2, Y(c.lat) - chh / 2, cw - 1, chh - 1); });
-    for (const tw of city.towers) {
-      const S = survival(T, BACKUP[tw.backup]), x = X(tw.lon), y = Y(tw.lat);
-      g.globalAlpha = 0.25 + 0.75 * S; g.strokeStyle = S > 0.5 ? '#91d7e8' : '#ff5b6e'; g.lineWidth = 2;
-      g.beginPath(); g.moveTo(x, y - 9); g.lineTo(x - 6, y + 7); g.moveTo(x, y - 9); g.lineTo(x + 6, y + 7); g.moveTo(x - 3, y); g.lineTo(x + 3, y); g.stroke();
-      if (S > 0.5 && !REDUCED) { g.globalAlpha = 0.25 * S * (0.5 + 0.5 * Math.sin(performance.now() / 300 + x)); g.beginPath(); g.arc(x, y - 9, 8, -2.4, -0.7); g.stroke(); }
-      g.globalAlpha = 1;
-    }
-    if (gw) for (const p of gw.picks) { const x = X(p.lon), y = Y(p.lat); g.strokeStyle = '#fbbf24'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 2000 / ((box.lo1 - box.lo0) * 111320 * Math.cos(39.47 * Math.PI / 180)) * (cv.width - 60), 0, 7); g.stroke(); g.fillStyle = '#fbbf24'; g.beginPath(); g.moveTo(x, y - 8); g.lineTo(x + 8, y); g.lineTo(x, y + 8); g.lineTo(x - 8, y); g.fill(); }
-    g.fillStyle = '#f2f4f4'; g.font = '600 15px system-ui'; g.fillText(`${T.toFixed(1).replace('.', ',')} h sin luz`, 18, 24);
-    g.fillStyle = '#9fb2bc'; g.font = '12px system-ui'; g.fillText('Ciudad SINTÉTICA de ejemplo · antenas: azul = probablemente viva, rojo = probablemente apagada', 18, cv.height - 10);
-    $('#bk-tv').textContent = `${T.toFixed(1).replace('.', ',')} h`; $('#bk-cov').textContent = pct(s.pctCov, 0); $('#bk-dark').textContent = fmt(s.dark); $('#bk-alive').textContent = `${Math.round(s.alive)} / 60`;
-    $('#bk-reach').textContent = gw ? pct(gw.reachedPct / 100, 0) : '—';
-    drawChart();
-  }
-  // La curva se calcula una vez por paso de 0,5 h: cachear para no recalcular 49 veces por fotograma.
-  const curve = []; for (let h = 0; h <= 24; h += 0.5) curve.push(stats(h).pctCov);
-  function drawChart() {
-    const W = ch.width, H = ch.height; gc.fillStyle = '#071018'; gc.fillRect(0, 0, W, H);
-    const px = (h) => 40 + (h / 24) * (W - 55), py = (v) => 15 + (1 - v) * (H - 45);
-    gc.strokeStyle = '#203240'; gc.fillStyle = '#9fb2bc'; gc.font = '11px system-ui'; gc.lineWidth = 1;
-    for (const v of [0, 0.5, 1]) { gc.beginPath(); gc.moveTo(40, py(v)); gc.lineTo(W - 15, py(v)); gc.stroke(); gc.fillText(`${v * 100} %`, 4, py(v) + 4); }
-    for (const h of [0, 6, 12, 18, 24]) gc.fillText(`${h} h`, px(h) - 8, H - 12);
-    gc.strokeStyle = '#91d7e8'; gc.lineWidth = 2; gc.beginPath(); curve.forEach((v, i) => (i ? gc.lineTo(px(i / 2), py(v)) : gc.moveTo(px(0), py(v)))); gc.stroke();
-    gc.strokeStyle = '#ff7756'; gc.beginPath(); gc.moveTo(px(T), 10); gc.lineTo(px(T), H - 28); gc.stroke();
-    gc.fillStyle = '#9fb2bc'; gc.fillText('población con cobertura (calculada)', 46, 12);
-  }
-  $('#bk-t').addEventListener('input', (e) => { T = +e.target.value; gw = null; drawMap(); });
-  $('#bk-play').addEventListener('click', () => { playing = !playing; $('#bk-play').textContent = playing ? '❚❚ Pausa' : '▶ Reproducir'; if (playing && T >= 24) T = 0; });
-  $('#bk-gw').addEventListener('click', () => { gw = placeGateways({ ...city, tH: Math.max(T, 0.25), k: 3 }); drawMap(); });
-  loop(cv, (dt) => { if (playing) { T = Math.min(24, T + dt * 2); $('#bk-t').value = T; if (T >= 24) { playing = false; $('#bk-play').textContent = '▶ Reproducir'; } } drawMap(); });
-  drawMap();
-}
-
-/* ======================= ESCENA 2 · carrera de caminos ======================= */
-{
-  const MSG = 'SOS · somos 3 (una niña de 6 años) · C/ Mayor 12, 2º B · el agua nos llega al pecho y sigue subiendo · una herida en la pierna, sangrado controlado · el portal está bloqueado por coches · podemos subir a la azotea · batería del móvil 18 % · sin cobertura desde las 19:40';
-  const data = new TextEncoder().encode(MSG);
-  $('#rc-bytes').textContent = `${data.length} bytes, texto inventado`; $('#rc-msg').textContent = `«${MSG}»`;
-  const cv = $('#rc-cv'), g = cv.getContext('2d');
-  const SRC = { x: 80, y: 420 }, DST = { x: 920, y: 300 };
-  // Cada camino: puntos intermedios (geometría del dibujo), color, nombre llano y qué es físicamente.
-  const LANES = {
-    PHONE_MESH: { pts: [{ x: 230, y: 470 }, { x: 390, y: 455 }, { x: 560, y: 430 }, { x: 720, y: 390 }], color: '#34d399', name: 'Vecinos (Bluetooth / Wi-Fi Direct)', what: 'De móvil en móvil hasta alguien que aún tiene red.' },
-    SMS: { pts: [{ x: 300, y: 250 }], color: '#91d7e8', name: 'Antena móvil (SMS)', what: 'Un SMS pasa con señal débil o 2G cuando los datos ya no.', icon: 'tower' },
-    SAT_D2C_SMS: { pts: [{ x: 470, y: 60 }], color: '#b79cff', name: 'Satélite directo al móvil', what: 'Solo si el operador lo ofrece; funciona por ventanas de paso.', icon: 'sat' },
-    MESHTASTIC: { pts: [{ x: 420, y: 205 }, { x: 640, y: 215 }], color: '#fbbf24', name: 'Radio LoRa (repetidor en el monte)', what: 'Accesorio de radio de 868 MHz: kilómetros, pocos bytes.', icon: 'hill' },
-    IRIDIUM_SBD: { pts: [{ x: 640, y: 40 }], color: '#f0abfc', name: 'Iridium (módem satelital)', what: 'Módem pequeño de la brigada; 340 bytes por mensaje.', icon: 'sat' },
-    DRONE_MULE: { pts: [{ x: 300, y: 360 }, { x: 600, y: 330 }], color: '#ff7756', name: 'Dron mula', what: 'Recoge los mensajes por Wi-Fi y los suelta en el puesto de mando.', icon: 'drone' },
-    RELAY_INTERNET: { pts: [{ x: 300, y: 320 }, { x: 560, y: 150 }], color: '#7dd3fc', name: 'Internet satelital de un vecino', what: 'La antena satelital de un vecino o de un servicio, vía Wi-Fi.', icon: 'dish' },
-  };
-  const PRESETS = {
-    city: { on: ['PHONE_MESH', 'SMS', 'SAT_D2C_SMS', 'RELAY_INTERNET'], scene: 'Ciudad a las 5 h del apagón · la antena del barrio aguanta a medias' },
-    forest: { on: ['PHONE_MESH', 'MESHTASTIC', 'IRIDIUM_SBD', 'DRONE_MULE'], scene: 'Brigada en un valle sin cobertura · compañeros con radio LoRa y un módem Iridium' },
-    flood: { on: ['PHONE_MESH', 'SAT_D2C_SMS', 'DRONE_MULE', 'MESHTASTIC'], scene: 'Pueblo incomunicado por una riada · antena caída, el dron de emergencias pasa cada media hora' },
-    narrow: { on: ['SMS', 'SAT_D2C_SMS', 'MESHTASTIC'], scene: 'Nadie cerca: solo caminos que admiten mensajes muy cortos (SMS 116 B, LoRa 200 B) · aquí se ve el troceo k de n' },
-  };
-  let preset = 'city', enabled = new Set(PRESETS.city.on), plan = null, particles = [], got = new Map(), done = null, simT = 0, attempt = 1, logLines = [];
-  const box = $('#rc-bearers');
-  for (const [id, L] of Object.entries(LANES)) {
-    const lab = document.createElement('label'); lab.className = 'chk';
-    lab.innerHTML = `<input type="checkbox" data-b="${id}"><span class="sw" style="background:${L.color}"></span><span><b>${L.name}</b><br><span class="m" style="font-size:13px">${L.what} · p = ${String(BEARERS[id].p).replace('.', ',')} <span class="tag sim" style="margin:0">PREVIO</span></span></span>`;
-    box.append(lab);
-  }
-  const syncChecks = () => box.querySelectorAll('input').forEach((i) => (i.checked = enabled.has(i.dataset.b)));
-  box.addEventListener('change', (e) => { const id = e.target.dataset.b; if (!id) return; e.target.checked ? enabled.add(id) : enabled.delete(id); replan(); });
-  document.querySelectorAll('[data-preset]').forEach((b) => b.addEventListener('click', () => { preset = b.dataset.preset; enabled = new Set(PRESETS[preset].on); document.querySelectorAll('[data-preset]').forEach((x) => x.classList.toggle('on', x === b)); syncChecks(); replan(); }));
-  function log(s) { logLines.push(s); $('#rc-log').textContent = logLines.slice(-12).join('\n'); $('#rc-log').scrollTop = 1e9; }
-  function replan() {
-    particles = []; got = new Map(); done = null; logLines = [];
-    const avail = [...enabled].map((id) => ({ id }));
-    plan = avail.length ? planMultiBearer(data.length, avail, { target: 0.99 }) : { feasible: false, reason: 'NO_BEARER' };
-    const ok = plan.k != null;
-    $('#rc-k').textContent = ok ? plan.k : '—'; $('#rc-n').textContent = ok ? plan.n : '—';
-    $('#rc-p').textContent = ok ? pct(plan.pDelivery, 2) : '0 %';
-    $('#rc-eta').textContent = ok && Number.isFinite(plan.etaS) ? (plan.etaS < 120 ? `${plan.etaS} s` : `${Math.round(plan.etaS / 60)} min`) : '—';
-    const bars = $('#rc-bars'); bars.innerHTML = '';
-    if (ok) {
-      const per = {}; for (const m of plan.messages) { per[m.id] ??= { shards: 0, msgs: 0 }; per[m.id].shards += m.shards; per[m.id].msgs++; }
-      for (const [id, v] of Object.entries(per)) bars.insertAdjacentHTML('beforeend', `<div class="bar"><label><span>${LANES[id].name}</span><span class="mono">${v.shards} fragm. en ${v.msgs} envío${v.msgs > 1 ? 's' : ''}</span></label><div class="track"><div class="fill" style="width:${(100 * v.shards) / plan.n}%;background:${LANES[id].color}"></div></div></div>`);
-      const audit = auditIndependentPlan(plan, { GRID_DOWN: { ...DEFAULT_HAZARDS.GRID_DOWN, prob: 1 } });
-      $('#rc-claim').textContent = pct(audit.claimed, 2); $('#rc-actual').textContent = pct(audit.actual, 2);
-    } else { $('#rc-claim').textContent = '—'; $('#rc-actual').textContent = '—'; }
-    $('#rc-state').textContent = !ok ? 'Sin ningún camino: el mensaje se queda guardado en el móvil hasta que aparezca uno.' : plan.feasible ? PRESETS[preset].scene : `${PRESETS[preset].scene} · con estos caminos el máximo es ${pct(plan.pDelivery, 2)}: no llega al objetivo del 99 %; añade otro camino.`;
-    $('#rc-log').textContent = ok ? `Plan: partir ${data.length} B en ${plan.n} fragmentos; bastan ${plan.k}. Pulsa «Enviar el SOS».` : 'Sin caminos activos: SENDA guarda el mensaje (store-and-forward).';
-  }
-  const pathOf = (id) => [SRC, ...LANES[id].pts, DST];
-  function pointAt(pts, u) {
-    const seg = []; let tot = 0; for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y); seg.push(d); tot += d; }
-    let r = u * tot; for (let i = 0; i < seg.length; i++) { if (r <= seg[i]) { const f = r / seg[i]; return { x: pts[i].x + f * (pts[i + 1].x - pts[i].x), y: pts[i].y + f * (pts[i + 1].y - pts[i].y) }; } r -= seg[i]; }
-    return pts[pts.length - 1];
-  }
-  let encoded = null;
-  function send() {
-    if (!plan || plan.k == null) return;
-    particles = []; got = new Map(); done = null; simT = 0; logLines = [];
-    encoded = encodeShards(data, plan.k, plan.n);
-    const R = rng(20261120 + attempt++);
-    let idx = 0;
-    log(`Mensaje partido con Reed-Solomon: ${plan.n} fragmentos de ${encoded.shardSize} B; con ${plan.k} cualesquiera se reconstruye.`);
-    plan.messages.forEach((m, j) => {
-      const success = R() < m.p, dur = 1.6 + 1.1 * Math.log10(1 + m.latencyS), start = 0.15 * j + R() * 0.4, failAt = 0.25 + R() * 0.55;
-      for (let s = 0; s < m.shards; s++) particles.push({ id: m.id, idx: idx++, start: start + s * 0.12, dur, success, failAt, latencyS: m.latencyS });
-      log(`${LANES[m.id].name}: envío ${j + 1} con ${m.shards} fragm. → ${success ? 'llegará' : 'se perderá'} (sorteo con p = ${String(m.p).replace('.', ',')})`);
-    });
-  }
-  function draw(dt, t) {
-    g.fillStyle = '#071018'; g.fillRect(0, 0, cv.width, cv.height);
-    // Paisaje: valle, monte, agua o humo según escenario.
-    g.fillStyle = '#0c1b24'; g.beginPath(); g.moveTo(0, 520); g.quadraticCurveTo(250, 300, 470, 470); g.quadraticCurveTo(640, 250, 1000, 420); g.lineTo(1000, 560); g.lineTo(0, 560); g.fill();
-    if (preset === 'flood') { g.fillStyle = 'rgba(56,130,190,.35)'; g.fillRect(0, 470 + 4 * Math.sin(t), 520, 90); }
-    if (preset === 'forest') for (let i = 0; i < 6; i++) { const x = 40 + i * 28, fl = 10 + 6 * Math.sin(t * 6 + i); g.fillStyle = 'rgba(255,119,86,.8)'; g.beginPath(); g.moveTo(x, 520); g.lineTo(x + 8, 520 - fl - 12); g.lineTo(x + 16, 520); g.fill(); }
-    // Caminos
-    for (const [id, L] of Object.entries(LANES)) {
-      const on = enabled.has(id), pts = pathOf(id);
-      g.setLineDash(on ? [] : [4, 6]); g.strokeStyle = on ? L.color : '#2a3a46'; g.globalAlpha = on ? 0.55 : 0.6; g.lineWidth = on ? 2.5 : 1.5;
-      g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y))); g.stroke(); g.setLineDash([]); g.globalAlpha = 1;
-      for (const p of L.pts) drawIcon(L.icon ?? 'phone', p.x, p.y, on ? L.color : '#3b4b57', t);
-      if (!on) { const p = L.pts[0]; g.strokeStyle = '#ff5b6e'; g.lineWidth = 3; g.beginPath(); g.moveTo(p.x - 9, p.y - 9); g.lineTo(p.x + 9, p.y + 9); g.moveTo(p.x + 9, p.y - 9); g.lineTo(p.x - 9, p.y + 9); g.stroke(); }
-      const lp = L.pts[Math.floor((L.pts.length - 1) / 2)];
-      g.fillStyle = on ? '#cfd8dc' : '#4b5b66'; g.font = '12px system-ui'; g.fillText(L.name, lp.x - 50, lp.y - 16);
-    }
-    drawIcon('person', SRC.x, SRC.y, '#ff7756', t); g.fillStyle = '#f2f4f4'; g.font = '600 13px system-ui'; g.fillText('Emisor (persona en apuros)', SRC.x - 60, SRC.y + 34);
-    drawIcon('hq', DST.x, DST.y, '#34d399', t); g.fillText('Centro de coordinación / 112', DST.x - 150, DST.y + 40);
-    // Partículas
-    if (particles.length) simT += dt;
-    for (const q of particles) {
-      const u = (simT - q.start) / q.dur; if (u < 0) continue;
-      const L = LANES[q.id];
-      if (!q.success && u >= q.failAt) { const p = pointAt(pathOf(q.id), q.failAt), a = Math.max(0, 1 - (u - q.failAt) * 2); g.globalAlpha = a; g.strokeStyle = '#ff5b6e'; g.lineWidth = 2; g.beginPath(); g.arc(p.x, p.y, 6 + (1 - a) * 10, 0, 7); g.stroke(); g.globalAlpha = 1; continue; }
-      if (u >= 1) { if (q.success && !got.has(q.idx)) { got.set(q.idx, q); onArrive(q); } continue; }
-      const p = pointAt(pathOf(q.id), u); g.fillStyle = L.color; g.shadowColor = L.color; g.shadowBlur = 10; g.beginPath(); g.arc(p.x, p.y, 4.5, 0, 7); g.fill(); g.shadowBlur = 0;
-    }
-    // Contador en destino
-    if (plan?.k) {
-      const n = got.size, k = plan.k, w = 180;
-      g.fillStyle = '#0b141c'; g.strokeStyle = '#203240'; g.fillRect(DST.x - w + 40, DST.y - 120, w, 62); g.strokeRect(DST.x - w + 40, DST.y - 120, w, 62);
-      g.fillStyle = '#9fb2bc'; g.font = '12px system-ui'; g.fillText('fragmentos recibidos', DST.x - w + 50, DST.y - 102);
-      g.fillStyle = done ? '#34d399' : '#f2f4f4'; g.font = '700 20px ui-monospace,monospace'; g.fillText(`${n} / ${k} necesarios`, DST.x - w + 50, DST.y - 76);
-      for (let i = 0; i < k; i++) { g.fillStyle = i < n ? '#34d399' : '#203240'; g.fillRect(DST.x - w + 50 + i * Math.min(16, 160 / k), DST.y - 68, Math.min(14, 160 / k - 2), 6); }
-    }
-    if (done) { g.fillStyle = 'rgba(52,211,153,.12)'; g.fillRect(560, 470, 420, 70); g.strokeStyle = '#34d399'; g.strokeRect(560, 470, 420, 70); g.fillStyle = '#34d399'; g.font = '700 14px system-ui'; g.fillText(done.ok ? '✓ Mensaje reconstruido y verificado' : '✗ Faltan fragmentos: el mensaje sigue en cola', 574, 494); g.fillStyle = '#cfd8dc'; g.font = '12.5px system-ui'; g.fillText(done.text.length > 64 ? done.text.slice(0, 62) + '…»' : done.text, 574, 520); }
-    const still = particles.some((q) => (simT - q.start) / q.dur < (q.success ? 1 : q.failAt + 0.5));
-    if (particles.length && !still && !done) { done = { ok: false, text: `Recibidos ${got.size} de ${plan.k}. SENDA reintenta en la siguiente ventana.` }; log(done.text); }
-  }
-  function onArrive(q) {
-    if (done || got.size < plan.k) return;
-    const rec = [...got.values()].map((p) => ({ index: p.idx, data: encoded.shards[p.idx] }));
-    const text = new TextDecoder().decode(decodeShards(rec, { k: plan.k, len: encoded.len }));
-    const tReal = Math.max(...[...got.values()].map((p) => p.latencyS));
-    done = { ok: text === MSG, text: `«${text}»` };
-    log(`✓ ${plan.k} fragmentos bastan: reconstruido con decodeShards → idéntico al original: ${text === MSG ? 'sí' : 'NO'}. Tiempo real equivalente ≈ ${tReal < 120 ? tReal + ' s' : Math.round(tReal / 60) + ' min'} (latencias declaradas de cada camino).`);
-  }
-  function drawIcon(kind, x, y, c, t) {
-    g.strokeStyle = c; g.fillStyle = c; g.lineWidth = 2;
-    if (kind === 'tower') { g.beginPath(); g.moveTo(x, y - 18); g.lineTo(x - 10, y + 14); g.moveTo(x, y - 18); g.lineTo(x + 10, y + 14); g.moveTo(x - 6, y); g.lineTo(x + 6, y); g.stroke(); }
-    else if (kind === 'sat') { g.fillRect(x - 5, y - 5, 10, 10); g.fillRect(x - 22, y - 3, 13, 6); g.fillRect(x + 9, y - 3, 13, 6); }
-    else if (kind === 'hill') { g.globalAlpha = .35; g.beginPath(); g.moveTo(x - 40, y + 30); g.lineTo(x, y - 4); g.lineTo(x + 40, y + 30); g.fill(); g.globalAlpha = 1; g.beginPath(); g.moveTo(x, y - 4); g.lineTo(x, y - 20); g.stroke(); g.beginPath(); g.arc(x, y - 20, 3, 0, 7); g.fill(); }
-    else if (kind === 'drone') { const b = Math.sin(t * 3) * 4; g.beginPath(); g.moveTo(x - 12, y + b); g.lineTo(x + 12, y + b); g.stroke(); g.beginPath(); g.arc(x - 12, y - 3 + b, 5, 0, 7); g.arc(x + 12, y - 3 + b, 5, 0, 7); g.stroke(); }
-    else if (kind === 'dish') { g.beginPath(); g.arc(x, y, 10, Math.PI * 0.9, Math.PI * 1.9); g.stroke(); g.beginPath(); g.moveTo(x, y); g.lineTo(x + 2, y + 14); g.stroke(); }
-    else if (kind === 'person') { g.beginPath(); g.arc(x, y - 14, 6, 0, 7); g.fill(); g.fillRect(x - 4, y - 7, 8, 16); g.globalAlpha = 0.4 + 0.3 * Math.sin(t * 4); g.beginPath(); g.arc(x, y - 4, 18, 0, 7); g.stroke(); g.globalAlpha = 1; }
-    else if (kind === 'hq') { g.fillRect(x - 16, y - 12, 32, 24); g.fillStyle = '#071018'; g.fillRect(x - 10, y - 6, 8, 6); g.fillRect(x + 2, y - 6, 8, 6); }
-    else { g.fillRect(x - 5, y - 9, 10, 18); }
-  }
-  $('#rc-go').addEventListener('click', send);
-  $('#rc-mc').addEventListener('click', () => {
-    if (!plan?.k) return; const R = rng(7 + attempt++), N = 2000; let ok = 0;
-    for (let i = 0; i < N; i++) { let s = 0; for (const m of plan.messages) if (R() < m.p) s += m.shards; if (s >= plan.k) ok++; }
-    log(`2 000 sorteos independientes del mismo plan: llegó en ${fmt(ok)} (${pct(ok / N)}). La fórmula exacta dice ${pct(plan.pDelivery)}: coinciden dentro del ruido del sorteo.`);
-  });
-  syncChecks(); replan(); loop(cv, draw);
-}
-
-/* ======================= ESCENA 3 · cámara y señal ======================= */
-{
-  const cv = $('#ar-cv'), g = cv.getContext('2d'), mp = $('#ar-map'), gm = mp.getContext('2d');
-  const VICTIM = { x: 3.2, y: 9.5, z: -1.6 };
-  const MODEL = { txPower1m: -59, n: 3.2 };
-  // Recorrido del rescatador: rodea el montón de escombros (buena geometría para triangular) y sube y baja (varía z).
-  const PILE = { x: 3, y: 8 };
-  const PATH = Array.from({ length: 14 }, (_, i) => { const a = -2.6 + i * 0.42; return { x: PILE.x + 5.5 * Math.cos(a), y: PILE.y + 5.5 * Math.sin(a), z: 0.5 + 1.2 * Math.abs(Math.sin(i * 0.7)) }; });
-  let reads = [], est = null, walking = false, step = 0, R = rng(42);
-  function measure(p) { const d = Math.hypot(VICTIM.x - p.x, VICTIM.y - p.y, VICTIM.z - p.z); return MODEL.txPower1m - 10 * MODEL.n * Math.log10(d) + 3 * gauss(R); }
-  function reset() { reads = []; est = null; step = 0; walking = false; R = rng(42); $('#ar-go').textContent = '▶ Caminar y medir'; upd(); }
-  function upd() {
-    $('#ar-reads').textContent = reads.length;
-    $('#ar-err').textContent = est ? `± ${est.errorM.toFixed(1).replace('.', ',')} m` : '—';
-    $('#ar-real').textContent = est ? `${Math.hypot(est.x - VICTIM.x, est.y - VICTIM.y, est.z - VICTIM.z).toFixed(1).replace('.', ',')} m` : '—';
-  }
-  function cam() { const p = PATH[Math.min(Math.floor(step), PATH.length - 1)], aim = est ?? { ...PILE, z: -1 }, z = p.z + 0.4; return { pos: { x: p.x, y: p.y, z }, yaw: Math.atan2(aim.y - p.y, aim.x - p.x), pitch: -Math.atan2(z - aim.z, Math.hypot(aim.x - p.x, aim.y - p.y)) * 0.8, hfovRad: 1.15, width: cv.width, height: cv.height }; }
-  function draw(dt, t) {
-    if (walking) { step += dt * 1.4; const i = Math.floor(step); if (i < PATH.length && reads.length <= i) { const p = PATH[i]; reads.push({ ...p, rssi: measure(p) }); if (reads.length >= 4) est = locateBeacon(reads, MODEL) ?? est; upd(); } if (step >= PATH.length) { walking = false; $('#ar-go').textContent = '▶ Caminar y medir'; } }
-    const W = cv.width, H = cv.height, c = cam();
-    // «Imagen de cámara» dibujada: cielo con humo, escombros, forjados caídos.
-    const sky = g.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#2a2f33'); sky.addColorStop(0.45, '#4a4440'); sky.addColorStop(1, '#2b2622'); g.fillStyle = sky; g.fillRect(0, 0, W, H);
-    g.fillStyle = 'rgba(200,190,180,.07)'; for (let i = 0; i < 5; i++) { g.beginPath(); g.arc((i * 230 + t * 12) % (W + 200) - 100, 90 + 30 * i % 70, 90, 0, 7); g.fill(); }
-    g.fillStyle = '#3d3833'; g.beginPath(); g.moveTo(0, H * 0.62); for (let x = 0; x <= W; x += 40) g.lineTo(x, H * 0.55 + 30 * Math.sin(x * 0.013) + 18 * Math.sin(x * 0.051)); g.lineTo(W, H); g.lineTo(0, H); g.fill();
-    g.fillStyle = '#5a534c'; [[120, 250, 260, 34, -0.12], [420, 300, 300, 30, 0.18], [650, 240, 200, 26, -0.25], [260, 390, 360, 40, 0.06]].forEach(([x, y, w, h, r]) => { g.save(); g.translate(x, y); g.rotate(r); g.fillRect(0, 0, w, h); g.fillStyle = '#6b645c'; for (let k = 10; k < w; k += 24) g.fillRect(k, 4, 2, h - 8); g.restore(); g.fillStyle = '#5a534c'; });
-    g.fillStyle = '#26221f'; for (let i = 0; i < 70; i++) { const x = (i * 97) % W, y = H * 0.6 + ((i * 53) % (H * 0.4)); g.fillRect(x, y, 6 + (i % 5) * 3, 4 + (i % 3) * 3); }
-    // HUD de cámara
-    g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 2; [[20, 20, 1, 1], [W - 20, 20, -1, 1], [20, H - 20, 1, -1], [W - 20, H - 20, -1, -1]].forEach(([x, y, a, b]) => { g.beginPath(); g.moveTo(x, y + 30 * b); g.lineTo(x, y); g.lineTo(x + 30 * a, y); g.stroke(); });
-    g.fillStyle = '#f2f4f4'; g.font = '600 13px ui-monospace,monospace'; g.fillText('CÁMARA · SENDA búsqueda de baliza BLE', 34, 44);
-    g.fillStyle = '#ffb4a2'; g.fillText('La cámara NO ve a través del escombro: el marcador es la señal de radio medida', 34, 64);
-    if (reads.length) { const r = reads[reads.length - 1]; g.fillStyle = '#91d7e8'; g.fillText(`Última lectura: ${r.rssi.toFixed(0)} dBm`, 34, H - 34); const bars = Math.max(0, Math.min(5, Math.round((r.rssi + 100) / 7))); for (let i = 0; i < 5; i++) { g.fillStyle = i < bars ? '#91d7e8' : 'rgba(255,255,255,.2)'; g.fillRect(260 + i * 9, H - 34 - i * 4, 6, 6 + i * 4); } }
-    const shown = [];
-    if (est) shown.push({ p: projectToCamera({ x: est.x, y: est.y, z: est.z, errorM: est.errorM }, c), col: '#ff7756', label: 'señal del teléfono (estimación)' });
-    if ($('#ar-truth').checked) shown.push({ p: projectToCamera({ ...VICTIM, errorM: 0.3 }, c), col: '#34d399', label: 'posición real (simulación)' });
-    let off = 0;
-    for (const { p, col, label } of shown) {
-      if (!p.visible) { g.fillStyle = col; g.fillText(`${label}: fuera de cuadro, gira el móvil`, 34, H - 60 - 20 * off++); continue; }
-      const pulse = REDUCED ? 0 : 6 * Math.sin(t * 3);
-      g.strokeStyle = col; g.globalAlpha = .9; g.lineWidth = 2; g.setLineDash([6, 6]); g.beginPath(); g.arc(p.u, p.v, Math.min(260, Math.max(14, p.radiusPx)) + pulse, 0, 7); g.stroke(); g.setLineDash([]);
-      g.beginPath(); g.moveTo(p.u - 14, p.v); g.lineTo(p.u + 14, p.v); g.moveTo(p.u, p.v - 14); g.lineTo(p.u, p.v + 14); g.stroke(); g.globalAlpha = 1;
-      g.fillStyle = col; g.font = '700 13px system-ui'; g.fillText(`${label} · ${p.depthM.toFixed(1).replace('.', ',')} m`, p.u + 18, p.v - 10);
-      if (col === '#ff7756') $('#ar-depth').textContent = `${p.depthM.toFixed(1).replace('.', ',')} m`;
-    }
-    // Mapa cenital
-    const MW = mp.width, MH = mp.height, sx = (x) => 30 + ((x + 4) / 16) * (MW - 60), sy = (y) => MH - 20 - ((y - 1.5) / 13.5) * (MH - 40);
-    gm.fillStyle = '#071018'; gm.fillRect(0, 0, MW, MH);
-    gm.fillStyle = 'rgba(120,110,100,.25)'; gm.beginPath(); gm.ellipse(sx(PILE.x), sy(PILE.y), (4 / 16) * (MW - 60), (4 / 13.5) * (MH - 40), 0, 0, 7); gm.fill(); gm.fillStyle = '#9fb2bc'; gm.font = '11px system-ui'; gm.fillText('montón de escombros', sx(PILE.x) - 50, sy(PILE.y) + 4);
-    gm.strokeStyle = '#3b4b57'; gm.setLineDash([4, 4]); gm.beginPath(); PATH.forEach((p, i) => (i ? gm.lineTo(sx(p.x), sy(p.y)) : gm.moveTo(sx(p.x), sy(p.y)))); gm.stroke(); gm.setLineDash([]);
-    for (const r of reads) { gm.fillStyle = '#91d7e8'; gm.beginPath(); gm.arc(sx(r.x), sy(r.y), 4, 0, 7); gm.fill(); }
-    const cp = PATH[Math.min(Math.floor(step), PATH.length - 1)]; gm.fillStyle = '#f2f4f4'; gm.beginPath(); gm.arc(sx(cp.x), sy(cp.y), 6, 0, 7); gm.fill(); gm.fillText('rescatador', sx(cp.x) + 8, sy(cp.y) + 14);
-    if (est) { gm.strokeStyle = '#ff7756'; gm.lineWidth = 2; gm.beginPath(); gm.arc(sx(est.x), sy(est.y), (est.errorM / 16) * (MW - 60), 0, 7); gm.stroke(); gm.fillStyle = '#ff7756'; gm.beginPath(); gm.arc(sx(est.x), sy(est.y), 4, 0, 7); gm.fill(); }
-    if ($('#ar-truth').checked) { gm.fillStyle = '#34d399'; gm.beginPath(); gm.arc(sx(VICTIM.x), sy(VICTIM.y), 4, 0, 7); gm.fill(); }
-    gm.fillStyle = '#9fb2bc'; gm.fillText('vista desde arriba · azul = lecturas · naranja = estimación ± incertidumbre', 10, 14);
-  }
-  $('#ar-go').addEventListener('click', () => { if (step >= PATH.length) reset(); walking = !walking; $('#ar-go').textContent = walking ? '❚❚ Pausa' : '▶ Seguir'; });
-  $('#ar-reset').addEventListener('click', reset);
-  loop(cv, draw); upd();
-
-  // Tabla de capacidades: texto del propio módulo.
-  const ST = { IMPLEMENTED_ALGORITHM: ['Algoritmo implementado', 'calc'], IMPLEMENTED_ALGORITHM_NEEDS_FIELD_CALIBRATION: ['Implementado · falta calibrar en campo', 'sim'], NOT_PHYSICALLY_POSSIBLE: ['No es físicamente posible', 'no'] };
-  $('#cap-t tbody').innerHTML = CAPABILITIES.map((c) => `<tr><td>${c.what}</td><td>${c.hardware}</td><td><span class="tag ${(ST[c.status] ?? [c.status, 'sim'])[1]}" style="margin:0">${(ST[c.status] ?? [c.status])[0]}</span></td></tr>`).join('');
-
-  // CSI sintético con y sin persona.
-  const withP = synthesizeCsi({ rpm: 14, person: true, seed: 3 }), empty = synthesizeCsi({ rpm: 14, person: false, seed: 3 });
-  const aP = analyzeCsi(withP), aE = analyzeCsi(empty);
-  const cc = $('#csi-cv'), gx = cc.getContext('2d'), Wc = cc.width, Hc = cc.height;
-  const series = (fr) => fr.map((row) => row[0]);
-  function plotCsi() {
-    gx.fillStyle = '#071018'; gx.fillRect(0, 0, Wc, Hc);
-    [[series(withP), '#34d399', 60, 'con persona respirando'], [series(empty), '#9fb2bc', 160, 'sala vacía']].forEach(([s, col, mid, lab]) => {
-      const mean = s.reduce((a, v) => a + v, 0) / s.length; gx.strokeStyle = col; gx.lineWidth = 1.5; gx.beginPath();
-      s.forEach((v, i) => { const x = 10 + (i / (s.length - 1)) * (Wc - 20), y = mid - (v - mean) * 60; i ? gx.lineTo(x, y) : gx.moveTo(x, y); }); gx.stroke();
-      gx.fillStyle = col; gx.font = '12px system-ui'; gx.fillText(lab, 12, mid - 32);
-    });
-    gx.fillStyle = '#9fb2bc'; gx.fillText('amplitud de una subportadora Wi-Fi · 40 s · señal SINTÉTICA', 12, Hc - 8);
-  }
-  plotCsi();
-  $('#csi-out').innerHTML = `Resultado de <span class="mono">analyzeCsi</span>: con persona → respiración ${aP.breathing?.detected ? `<b>detectada, ${String(aP.breathing.rpm).replace('.', ',')} rpm</b>` : 'no detectada'}; sala vacía → ${aE.breathing?.detected ? `detectada (${aE.breathing.rpm} rpm)` : '<b>no detectada</b>'}. Es un indicio para orientar la búsqueda, nunca descarta a nadie.`;
-}
-
-/* ======================= ESCENA 4 · drones ======================= */
-{
-  const cv = $('#rid-cv'), g = cv.getContext('2d'), W = cv.width, H = cv.height;
-  const C0 = { lat: 39.405, lon: -0.41 }; // zona de ejemplo (l'Horta Sud)
-  const DR = [
-    { id: 'Bomberos-1', r: 0.006, w: 0.12, ph: 0, alt: 90, col: '#ff7756' },
-    { id: 'Policía-2', r: 0.009, w: -0.08, ph: 2, alt: 60, col: '#91d7e8' },
-    { id: 'Voluntario-3', r: 0.004, w: 0.2, ph: 4, alt: 40, col: '#b79cff' },
-  ];
-  const decoded = {};
-  const kmLat = 111.32, kmLon = 111.32 * Math.cos(C0.lat * Math.PI / 180), RANGE = 1.2; // km del radar
-  const TIME_SCALE = 6; // la animación muestra el vuelo 6 veces más rápido
-  let lastHex = '';
-  function draw(dt, t) {
-    g.fillStyle = '#071018'; g.fillRect(0, 0, W, H);
-    const cx = W / 2, cy = H / 2, Rpx = Math.min(W, H) / 2 - 30;
-    g.strokeStyle = '#1b3a44'; g.lineWidth = 1; for (let i = 1; i <= 4; i++) { g.beginPath(); g.arc(cx, cy, (Rpx * i) / 4, 0, 7); g.stroke(); }
-    g.beginPath(); g.moveTo(cx - Rpx, cy); g.lineTo(cx + Rpx, cy); g.moveTo(cx, cy - Rpx); g.lineTo(cx, cy + Rpx); g.stroke();
-    g.fillStyle = '#4b6b78'; g.font = '11px system-ui'; for (let i = 1; i <= 4; i++) g.fillText(`${((RANGE * i) / 4 * 1000).toFixed(0)} m`, cx + 4, cy - (Rpx * i) / 4 + 12);
-    if (!REDUCED) { const a = (t * 1.2) % (2 * Math.PI); const grd = g.createConicGradient ? g.createConicGradient(a - 0.6, cx, cy) : null; if (grd) { grd.addColorStop(0, 'rgba(52,211,153,0)'); grd.addColorStop(0.09, 'rgba(52,211,153,.25)'); grd.addColorStop(0.1, 'rgba(52,211,153,0)'); g.fillStyle = grd; g.beginPath(); g.arc(cx, cy, Rpx, 0, 7); g.fill(); } }
-    drawPhone(cx, cy);
-    for (const d of DR) {
-      const ang = d.ph + d.w * t, lat = C0.lat + d.r * Math.sin(ang), lon = C0.lon + d.r * 1.3 * Math.cos(ang);
-      // Rumbo desde el norte a partir de la derivada de la trayectoria; la animación va ×6 más rápida que el vuelo.
-      const vN = d.r * d.w * Math.cos(ang) * kmLat, vE = -1.3 * d.r * d.w * Math.sin(ang) * kmLon;
-      const dir = ((Math.atan2(vE, vN) * 180) / Math.PI + 360) % 360;
-      const speed = (Math.hypot(vN, vE) * 1000) / TIME_SCALE;
-      // Codificar → 25 bytes → decodificar: lo que se dibuja es lo DECODIFICADO.
-      const bytes = encodeLocation({ lat, lon, altGeoM: d.alt + 10 * Math.sin(t + d.ph), heightM: d.alt, directionDeg: Math.round(dir), speedMs: +speed.toFixed(2) });
-      const m = decodeOdid(bytes); decoded[d.id] = m; if (d.id === 'Bomberos-1') lastHex = [...bytes].map((b) => b.toString(16).padStart(2, '0')).join(' ');
-      const x = cx + ((m.lon - C0.lon) * kmLon / RANGE) * Rpx, y = cy - ((m.lat - C0.lat) * kmLat / RANGE) * Rpx;
-      g.fillStyle = d.col; g.strokeStyle = d.col; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill();
-      g.beginPath(); g.moveTo(x, y); const rad = (m.directionDeg * Math.PI) / 180; g.lineTo(x + 22 * Math.sin(rad), y - 22 * Math.cos(rad)); g.stroke();
-      g.font = '600 12px system-ui'; g.fillText(`${d.id} · ${Math.round(m.altGeoM)} m`, x + 10, y - 10);
-    }
-    g.fillStyle = '#9fb2bc'; g.font = '12px system-ui'; g.fillText('Radar del móvil · Remote ID · vuelos INVENTADOS (animación ×6), codificación ODID real', 12, H - 10);
-  }
-  function drawPhone(x, y) { g.fillStyle = '#f2f4f4'; g.fillRect(x - 6, y - 10, 12, 20); g.fillStyle = '#071018'; g.fillRect(x - 4, y - 7, 8, 13); g.fillStyle = '#cfd8dc'; g.font = '11px system-ui'; g.fillText('tu móvil', x + 10, y + 18); }
-  loop(cv, draw);
-  setInterval(() => {
-    $('#rid-hex').textContent = lastHex ? `Mensaje ODID «Location» de Bomberos-1 (25 B): ${lastHex}` : '—';
-    $('#rid-t tbody').innerHTML = DR.map((d) => { const m = decoded[d.id]; return m ? `<tr><td>${d.id}</td><td class="mono">${Math.round(m.altGeoM)} m</td><td class="mono">${String(m.speedMs).replace('.', ',')} m/s</td><td class="mono">${m.directionDeg}°</td></tr>` : ''; }).join('');
-  }, 500);
-
-  const mule = muleSortie({ from: { lat: 39.40, lon: -0.43 }, to: { lat: 39.45, lon: -0.38 } });
-  $('#mule-kv').innerHTML = `<div><b>${(mule.distanceM / 1000).toFixed(1).replace('.', ',')} km</b><span>pueblo ↔ puesto de mando</span></div><div><b>${String(mule.roundTripMin).replace('.', ',')} min</b><span>ida, intercambio y vuelta</span></div><div><b>${String(mule.deliveryAfterMin).replace('.', ',')} min</b><span>hasta que el puesto recibe</span></div><div><b style="color:${mule.feasible ? 'var(--e)' : 'var(--r)'}">${mule.feasible ? 'Sí' : 'No'}</b><span>¿le llega la batería?</span></div>`;
-
-  const sc = sweepScenario(), sp = planSweep(sc.houses, { base: sc.base }), board = sweepBoard(sc.houses);
-  const rank = new Map(board.map((b, i) => [b.id, i]));
-  const sw = $('#sw-cv'), gs = sw.getContext('2d');
-  const xs = sc.houses.map((h) => h.x), ys = sc.houses.map((h) => h.y), mx = Math.max(...xs) + 30, my = Math.max(...ys) + 30;
-  const SX = (x) => 20 + (x / mx) * (sw.width - 40), SY = (y) => 20 + (y / my) * (sw.height - 40);
-  const byId = new Map(sc.houses.map((h) => [h.id, h]));
-  const routePts = []; for (const s of sp.sorties) { routePts.push(sc.base); for (const id of s.houses) routePts.push(byId.get(id)); routePts.push(sc.base); }
-  let segLen = []; let tot = 0; for (let i = 1; i < routePts.length; i++) { const d = Math.hypot(routePts[i].x - routePts[i - 1].x, routePts[i].y - routePts[i - 1].y); segLen.push(d); tot += d; }
-  loop(sw, (dt, t) => {
-    gs.fillStyle = '#071018'; gs.fillRect(0, 0, sw.width, sw.height);
-    gs.strokeStyle = 'rgba(145,215,232,.35)'; gs.lineWidth = 1.5; gs.beginPath(); routePts.forEach((p, i) => (i ? gs.lineTo(SX(p.x), SY(p.y)) : gs.moveTo(SX(p.x), SY(p.y)))); gs.stroke();
-    for (const h of sc.houses) { const r = rank.get(h.id), col = r < 5 ? '#ff5b6e' : r < 12 ? '#fbbf24' : '#34d399'; gs.fillStyle = col; gs.fillRect(SX(h.x) - 7, SY(h.y) - 7, 14, 14); gs.fillStyle = '#071018'; gs.font = '700 9px system-ui'; gs.fillText(h.id, SX(h.x) - 6, SY(h.y) + 3); }
-    gs.fillStyle = '#f2f4f4'; gs.beginPath(); gs.arc(SX(sc.base.x), SY(sc.base.y), 6, 0, 7); gs.fill(); gs.font = '11px system-ui'; gs.fillText('base', SX(sc.base.x) + 8, SY(sc.base.y) + 4);
-    let r = ((t * 60) % tot); for (let i = 0; i < segLen.length; i++) { if (r <= segLen[i]) { const a = routePts[i], b = routePts[i + 1], f = r / segLen[i]; gs.fillStyle = '#ff7756'; gs.beginPath(); gs.arc(SX(a.x + f * (b.x - a.x)), SY(a.y + f * (b.y - a.y)), 5, 0, 7); gs.fill(); break; } r -= segLen[i]; }
-    gs.fillStyle = '#9fb2bc'; gs.fillText('rojo = prioridad alta · ámbar = media · verde = baja', 10, sw.height - 6);
-  });
-  const top = board.slice(0, 3).map((b) => `${b.id} (${b.people.mid} personas probables, daño EMS-98 grado ${b.damage})`).join(', ');
-  $('#sw-out').innerHTML = `<span class="mono">planSweep</span>: ${sc.houses.length} edificios en <b>${sp.sorties.length} salidas</b> (cambio de batería en la base), <b>${Math.round(sp.totalS / 60)} min</b> en total. <span class="mono">sweepBoard</span> ordena por personas probables × daño: primero ${top}. El daño lo asigna una persona experta; el barrio es inventado.`;
-}
-</script>
+<script type="module" src="/senda/explica-escenas.mjs"></script>
+<script type="module" src="/senda/explica-vivo.mjs"></script>
 </body>
 </html>

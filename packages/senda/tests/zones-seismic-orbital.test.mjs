@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ingestOfficialAlert, relayActivation, createConsentProfile, zoneFromQuake, inZone } from '../src/zones.mjs';
 import { staLtaTriggers, locateEvent } from '../src/seismic.mjs';
-import { parseTle, propagateKeplerJ2, predictPasses, lookAngles, AUTHENTIC_DATED_TLES } from '../src/orbital.mjs';
+import { parseTle, propagateKeplerJ2, predictPasses, lookAngles, ILLUSTRATIVE_TLES, TLE_CHECKSUM_VALID } from '../src/orbital.mjs';
 import { parseCap, parseUsgs, parseEmsc, parseSatnogsStations, pullAll } from '../src/feeds.mjs';
 import { scenarioQuake } from '../src/scenarios.mjs';
 
@@ -72,8 +72,8 @@ test('geometría: un satélite justo encima tiene elevación ~90°', () => {
   assert.ok(disclaimer.includes('VENTANA GEOMÉTRICA DE VISIBILIDAD'));
 });
 
-test('catálogo de TLEs auténticos: Sentinel-3A y Terra tienen propagación física coherente', () => {
-  const s3 = parseTle(AUTHENTIC_DATED_TLES.SENTINEL_3A.name, AUTHENTIC_DATED_TLES.SENTINEL_3A.line1, AUTHENTIC_DATED_TLES.SENTINEL_3A.line2);
+test('TLE ilustrativos: órbitas plausibles para probar el propagador (Sentinel-3A y Terra)', () => {
+  const s3 = parseTle(ILLUSTRATIVE_TLES.SENTINEL_3A.name, ILLUSTRATIVE_TLES.SENTINEL_3A.line1, ILLUSTRATIVE_TLES.SENTINEL_3A.line2);
   assert.equal(s3.norad, 41335);
   const r = Math.hypot(...Object.values(propagateKeplerJ2(s3, s3.epoch)));
   // Sentinel-3 orbita a ~814 km de altitud -> r ≈ 6378 + 814 ≈ 7192 km
@@ -97,4 +97,12 @@ test('feeds: USGS, EMSC y SatNOGS se normalizan; pullAll tolera fuentes caídas'
   const fake = async (url) => url.includes('usgs') ? { ok: true, text: async () => JSON.stringify({ features: [] }) } : { ok: false, status: 503 };
   const r = await pullAll({ fetchImpl: fake });
   assert.equal(r.errors.length, 3);
+});
+
+test('veracidad: los TLE ilustrativos NO pasan la suma de control (no son efemérides reales) y una línea real sí', () => {
+  const lines = Object.values(ILLUSTRATIVE_TLES).flatMap((t) => [t.line1, t.line2]);
+  assert.ok(lines.filter((l) => !TLE_CHECKSUM_VALID(l)).length >= 7);
+  // ISS, AMSAT nasabare.txt descargado el 20-11-2026 (época 26323.27).
+  assert.equal(TLE_CHECKSUM_VALID('1 25544U 98067A   26323.26944509  .00013909  00000+0  25567-3 0  9994'), true);
+  assert.equal(TLE_CHECKSUM_VALID('2 25544  51.6317 252.6441 0007410  42.3196 317.8363 15.49482233595793'), true);
 });
