@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import '../senda.css';
+import '../../../styles/pro.css';
 import LanguageDocument from '../../language-document';
 import SiteHeader from './SiteHeader';
 import SiteFooter from './SiteFooter';

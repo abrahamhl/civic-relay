@@ -34,12 +34,15 @@ function applyScheme(scheme: Scheme) {
  */
 export default function ThemeToggle({ locale }: { locale: Locale }) {
   const ui = SITE_STRINGS[locale];
-  const [rendered, setRendered] = useState<Scheme>('dark');
+  const [rendered, setRendered] = useState<Scheme>('light');
 
   useEffect(() => {
     const sync = () => {
       const stored = readStored();
-      const target: Scheme = stored ?? 'dark';
+      // Sin preferencia guardada: se sigue la del sistema; claro como respaldo.
+      const system: Scheme =
+        window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      const target: Scheme = stored ?? system;
       applyScheme(target);
       setRendered(target);
     };
