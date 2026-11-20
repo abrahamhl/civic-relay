@@ -1,7 +1,7 @@
 {
   "proyecto": "SENDA",
-  "generado": "2026-11-19",
-  "commit": "d060032",
+  "generado": "2026-11-20",
+  "commit": "b132087",
   "cambiosSinCommit": false,
   "siteUrl": "https://civic-relay-investor.vercel.app",
   "zips": [
@@ -9,12 +9,28 @@
       "file": "1-web-hostinger.zip",
       "title": "Web completa para subir a public_html (sin las dos películas largas)",
       "note": "Descomprime en public_html. Contiene .htaccess (fichero oculto).",
-      "files": 634,
-      "bytes": 77176155,
-      "sha256": "5854ba20f4d58e4967119940658aee28f3ad2164d6d2b79edf8837db74846069"
+      "files": 643,
+      "bytes": 94291604,
+      "sha256": "0ac73cb29a9b0e7a513372143b211331948f7e7b8d2ba36fd3b7b70a8d10bdbf"
     },
     {
-      "file": "2-web-video-senda-film-en.zip",
+      "file": "2-web-video-senda-m96-promo-en.zip",
+      "title": "Vídeo de la web: media/m96/senda-m96-promo-en.mp4",
+      "note": "Descomprime también en public_html: se coloca solo en media/.",
+      "files": 1,
+      "bytes": 69904717,
+      "sha256": "e5619e0b646c46b4648f8c7e7ff8a39781c4dd95f7be2d8884ea26865cf1b9bb"
+    },
+    {
+      "file": "3-web-video-senda-m96-promo-es.zip",
+      "title": "Vídeo de la web: media/m96/senda-m96-promo-es.mp4",
+      "note": "Descomprime también en public_html: se coloca solo en media/.",
+      "files": 1,
+      "bytes": 71028687,
+      "sha256": "b72c2da3c4e24fb84551a268e9a961882bdcf331bf5745142c22587d562184a3"
+    },
+    {
+      "file": "4-web-video-senda-film-en.zip",
       "title": "Vídeo de la web: media/senda-film-en.mp4",
       "note": "Descomprime también en public_html: se coloca solo en media/.",
       "files": 1,
@@ -22,7 +38,7 @@
       "sha256": "d94753783f57ef2fe0f806b402a8ac03c92e4bb5b00bfff42f43fb9f73b739bb"
     },
     {
-      "file": "3-web-video-senda-film-es.zip",
+      "file": "5-web-video-senda-film-es.zip",
       "title": "Vídeo de la web: media/senda-film-es.mp4",
       "note": "Descomprime también en public_html: se coloca solo en media/.",
       "files": 1,
@@ -30,23 +46,23 @@
       "sha256": "248074028b8a00d81b1f01fca9b7efed7811140143c600af5ca4c3c2ba23a209"
     },
     {
-      "file": "4-codigo-fuente.zip",
+      "file": "6-codigo-fuente.zip",
       "title": "Código fuente completo (núcleo, relé, web, visión, scripts, pruebas)",
       "note": "Sin los vídeos (van en la web) ni las capturas de evidencias (van aparte).",
-      "files": 1683,
-      "bytes": 47270864,
-      "sha256": "fb628f8525c66dfd7f2650b7d497da514446751ce9211076fac4340304d0e2ba"
+      "files": 1684,
+      "bytes": 47263500,
+      "sha256": "2bd2522016bbf22cccdcec260bb6bdd6a7329d9c5afbc7ffeccb54d7be3c5042"
     },
     {
-      "file": "5-documentacion.zip",
+      "file": "7-documentacion.zip",
       "title": "Documentación: traspaso, arquitectura, financiación, investigación y registro de cambios",
       "note": "Empieza por docs/handoff/HANDOFF_COMPLETO_2026-11-05.md.",
-      "files": 254,
-      "bytes": 13104795,
-      "sha256": "e74b98c0fef4ebda12738f3ab6ce42e57d72524943d2de65381edb6aa5e13ba9"
+      "files": 255,
+      "bytes": 13090815,
+      "sha256": "308012fe11bba174adce608de927de1ccb86b776facb3195923148856f32db48"
     },
     {
-      "file": "6-evidencias.zip",
+      "file": "8-evidencias.zip",
       "title": "Evidencias: resultados de las pruebas de extremo a extremo y capturas",
       "note": "offline-e2e.json resume las comprobaciones sin red.",
       "files": 159,
@@ -54,7 +70,7 @@
       "sha256": "f5d0436032a45839db74592c0928fa587c32232e239ee08f106de86e661f3649"
     },
     {
-      "file": "7-vision-python.zip",
+      "file": "9-vision-python.zip",
       "title": "Visión de tráfico en Python (YOLOX + ByteTrack) con los vídeos anotados",
       "note": "Modelos y vídeos de origen se descargan con las instrucciones del README (licencias Apache 2.0, MIT y CC BY 4.0).",
       "files": 16,
