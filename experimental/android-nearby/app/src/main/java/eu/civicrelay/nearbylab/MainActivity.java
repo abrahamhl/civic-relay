@@ -1,0 +1,464 @@
+package eu.civicrelay.nearbylab;
+
+import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.SystemClock;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+import com.google.android.gms.nearby.Nearby;
+import com.google.android.gms.nearby.connection.AdvertisingOptions;
+import com.google.android.gms.nearby.connection.ConnectionInfo;
+import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
+import com.google.android.gms.nearby.connection.ConnectionResolution;
+import com.google.android.gms.nearby.connection.ConnectionsClient;
+import com.google.android.gms.nearby.connection.ConnectionsStatusCodes;
+import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo;
+import com.google.android.gms.nearby.connection.DiscoveryOptions;
+import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
+import com.google.android.gms.nearby.connection.Payload;
+import com.google.android.gms.nearby.connection.PayloadCallback;
+import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
+import com.google.android.gms.nearby.connection.Strategy;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+/**
+ * Experimental two-phone link only. Not an emergency service, satellite app, nor a 112 integration.
+ * Explicit app consent + Android permissions + matching-code confirmation required.
+ * Only synthetic messages are allowed; ephemeral in-memory state (no location collection).
+ */
+public final class MainActivity extends Activity {
+    private static final String SERVICE_ID = "eu.civicrelay.nearbylab";
+    private static final Strategy STRATEGY = Strategy.P2P_POINT_TO_POINT;
+    private static final int REQUEST_PERMISSIONS = 6001;
+    private static final int MAX_BYTES = 4096;
+    private static final long TTL_MILLIS = 60000L;
+    private ConnectionsClient connections;
+    private TextView output;
+    private volatile boolean userConsented = false;
+    private volatile boolean connected = false;
+    private volatile String connectedPeer = null;
+    private volatile long sessionEpoch = 0L;
+    private String waitingRole = null;
+    private final LabDeliveryGuard deliveryGuard = new LabDeliveryGuard();
+    private final Set<String> approvedPeers = Collections.synchronizedSet(new HashSet<>());
+    private final Map<Long, String> outgoingPayloads = Collections.synchronizedMap(new HashMap<>());
+    private volatile long sendStartedElapsed = 0L;
+    private volatile String activeTrialId = null;
+    private final LabTrialJournal journal = new LabTrialJournal();
+    private final Handler foregroundTimer = new Handler(Looper.getMainLooper());
+    private Runnable pendingExpiryTask = null;
+
+    @Override public void onCreate(Bundle state) {
+        super.onCreate(state);
+        connections = Nearby.getConnectionsClient(this);
+        LinearLayout body = new LinearLayout(this);
+        body.setOrientation(LinearLayout.VERTICAL);
+        body.setPadding(25, 30, 25, 30);
+        ScrollView scroll = new ScrollView(this);
+        scroll.addView(body);
+        setContentView(scroll);
+        TextView heading = new TextView(this);
+        heading.setText("OEP — TWO PHONE EXPERIMENT\nNO REAL SOS • NO 112 • NO LOCATION");
+        heading.setTextSize(19);
+        body.addView(heading);
+        addButton(body, "1. REVIEW & CONSENT (LAB ONLY)", () -> {
+            new AlertDialog.Builder(MainActivity.this)
+                .setTitle("OEP research trial — consent")
+                .setMessage("This is a non-operational exercise. The app may broadcast its presence to nearby phones; the radio link can use additional battery and reveal proximity to your chosen peer. Nearby permissions are requested by Android. No GPS readings, real distress calls, rescue claims or background discovery are made. Only fictional test messages are exchanged, with both users comparing pairing digits. Optional CSV export is manually shared with an app of your choosing; third-party copies cannot be recalled. STOP clears local trial records. No personal details are required.")
+                .setPositiveButton("I UNDERSTAND & AGREE", (dialog, which) -> {
+                    userConsented = true;
+                    log("Explicit lab consent granted for this foreground session.");
+                })
+                .setNegativeButton("DO NOT PARTICIPATE", (dialog, which) ->
+                    log("Consent declined; no discovery initiated."))
+                .show();
+        });
+        addButton(body, "2A. ADVERTISE AS LAB RECEIVER", () -> startRole("ADVERTISE"));
+        addButton(body, "2B. DISCOVER AS LAB SENDER", () -> startRole("DISCOVER"));
+        addButton(body, "3. SEND SYNTHETIC TEST MESSAGE", this::sendTest);
+        addButton(body, "4. MANUALLY SHARE LAB TRIAL CSV", () -> {
+            if (!userConsented || journal.size() == 0) {
+                log("No consented field trial events to export."); return;
+            }
+            // Explicit system chooser. User controls destination; external copies cannot be revoked.
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("text/plain");
+            share.putExtra(Intent.EXTRA_SUBJECT, "OEP anonymous lab trials — not certified");
+            share.putExtra(Intent.EXTRA_TEXT, journal.csv());
+            startActivity(Intent.createChooser(share, "Share synthetic test evidence manually"));
+        });
+        addButton(body, "OPEN BLUETOOTH SETTINGS", () -> startActivity(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS)));
+        addButton(body, "OPEN WI-FI SETTINGS", () -> startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS)));
+        addButton(body, "STOP / REVOKE CONSENT / CLEAR", this::stopAndClear);
+        output = new TextView(this);
+        output.setTextSize(15);
+        output.setPadding(0, 24, 0, 15);
+        body.addView(output);
+        log("Permissioned lab. Manually turn on radios if disabled; no hidden toggles. " +
+            "Keep both apps foregrounded. Confirm the same pairing digits on BOTH phones.");
+    }
+
+    private void addButton(LinearLayout parent, String label, Runnable action) {
+        Button button = new Button(this);
+        button.setText(label);
+        parent.addView(button);
+        button.setOnClickListener(v -> action.run());
+    }
+
+    private void log(String note) {
+        final long logEpoch = sessionEpoch;
+        runOnUiThread(() -> {
+            if (logEpoch != sessionEpoch) return;
+            if (output != null) {
+                String next = note + "\n" + output.getText();
+                output.setText(next.length() > 6000 ? next.substring(0, 6000) : next);
+            }
+        });
+    }
+
+    /**
+     * Foreground-only watchdog. A lost ACK must become EXPIRED without another tap.
+     * Session epoch and message UUID reject stale timer callbacks after STOP or a new trial.
+     */
+    private void armExpiry(String id, long deadlineMs) {
+        if (pendingExpiryTask != null) foregroundTimer.removeCallbacks(pendingExpiryTask);
+        final long epoch = sessionEpoch;
+        final long monotonicDeadline = SystemClock.elapsedRealtime() + TTL_MILLIS;
+        final Runnable[] self = new Runnable[1];
+        self[0] = () -> {
+            if (!userConsented || sessionEpoch != epoch || !id.equals(activeTrialId)) return;
+            long now = System.currentTimeMillis();
+            long monotonicNow = SystemClock.elapsedRealtime();
+            if (LabDeadlinePolicy.expired(now, deadlineMs, monotonicNow, monotonicDeadline)) {
+                // Deadline can be reached by either conservative wall expiry or monotonic TTL.
+                // Explicit abort also closes a pending guard when the wall clock moved backwards.
+                deliveryGuard.abortOutgoing(id);
+                finishTrial(id, "EXPIRED");
+                log("LAB TIMEOUT: no receiver ACK before expiry; NOT delivered.");
+            } else {
+                foregroundTimer.postDelayed(self[0],
+                    Math.max(1L, LabDeadlinePolicy.nextCheckDelayMs(
+                        now, deadlineMs, monotonicNow, monotonicDeadline)));
+            }
+        };
+        pendingExpiryTask = self[0];
+        foregroundTimer.postDelayed(pendingExpiryTask,
+            Math.max(50L, deadlineMs - System.currentTimeMillis()));
+    }
+
+    /** In-app elapsed time is a single sample, never a claimed throughput or safety metric. */
+    private synchronized long finishTrial(String id, String outcome) {
+        if (id == null || !id.equals(activeTrialId)) return -1L;
+        long elapsed = sendStartedElapsed == 0L ? -1L :
+            Math.max(0L, SystemClock.elapsedRealtime() - sendStartedElapsed);
+        journal.record(id, outcome, elapsed);
+        if (pendingExpiryTask != null) foregroundTimer.removeCallbacks(pendingExpiryTask);
+        pendingExpiryTask = null;
+        activeTrialId = null;
+        sendStartedElapsed = 0L;
+        return elapsed;
+    }
+
+    private String[] runtimePermissions() {
+        List<String> required = new ArrayList<>();
+        if (Build.VERSION.SDK_INT >= 31) {
+            required.add(Manifest.permission.BLUETOOTH_ADVERTISE);
+            required.add(Manifest.permission.BLUETOOTH_SCAN);
+            required.add(Manifest.permission.BLUETOOTH_CONNECT);
+            if (Build.VERSION.SDK_INT >= 33) required.add("android.permission.NEARBY_WIFI_DEVICES");
+        } else if (Build.VERSION.SDK_INT >= 29) {
+            required.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        } else {
+            required.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
+        List<String> missing = new ArrayList<>();
+        for (String p : required) {
+            if (checkSelfPermission(p) != PackageManager.PERMISSION_GRANTED) missing.add(p);
+        }
+        return missing.toArray(new String[0]);
+    }
+
+    private void startRole(String role) {
+        if (!userConsented) {
+            log("DENIED: opt in with button 1 first."); return;
+        }
+        String[] missing = runtimePermissions();
+        if (missing.length > 0) {
+            waitingRole = role;
+            requestPermissions(missing, REQUEST_PERMISSIONS);
+            return;
+        }
+        if ("ADVERTISE".equals(role)) advertise(); else discover();
+    }
+
+    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grants) {
+        super.onRequestPermissionsResult(requestCode, permissions, grants);
+        if (requestCode != REQUEST_PERMISSIONS) return;
+        String role = waitingRole;
+        waitingRole = null;
+        if (!userConsented || runtimePermissions().length != 0 || role == null) {
+            log("Required OS permissions missing; radio discovery not started.");return;
+        }
+        startRole(role);
+    }
+
+    private final ConnectionLifecycleCallback lifecycle = new ConnectionLifecycleCallback() {
+        @Override public void onConnectionInitiated(String endpointId, ConnectionInfo info) {
+            final long requestEpoch = sessionEpoch;
+            runOnUiThread(() -> {
+                if (!userConsented || requestEpoch != sessionEpoch || connected) {
+                    connections.rejectConnection(endpointId);return;
+                }
+                new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("VERIFY PEER / LAB ONLY")
+                    .setMessage("Compare these digits on BOTH devices: " +
+                        info.getAuthenticationDigits() +
+                        "\nDo not accept unless they match. No identity is implied.")
+                    .setPositiveButton("Codes match", (dialog, which) -> {
+                        if (!userConsented || sessionEpoch != requestEpoch || connected) {
+                            connections.rejectConnection(endpointId);return;
+                        }
+                        approvedPeers.add(endpointId); // Only after human-verified matching digits.
+                        connections.acceptConnection(endpointId, payloads)
+                            .addOnFailureListener(e -> {
+                                approvedPeers.remove(endpointId);
+                                log("Accept failed: " + e.getClass().getSimpleName());
+                            });
+                    })
+                    .setNegativeButton("Reject", (dialog, which) -> {
+                        approvedPeers.remove(endpointId);
+                        connections.rejectConnection(endpointId);
+                    })
+                    .setCancelable(false)
+                    .show();
+            });
+        }
+        @Override public void onConnectionResult(String endpointId, ConnectionResolution result) {
+            if (result.getStatus().getStatusCode() == ConnectionsStatusCodes.STATUS_OK &&
+                userConsented && approvedPeers.contains(endpointId) &&
+                (!connected || endpointId.equals(connectedPeer))) {
+                connected = true;
+                connectedPeer = endpointId;
+                connections.stopAdvertising();
+                connections.stopDiscovery();
+                log("LINK CONNECTED (manually verified peer). NOT a delivered-message receipt.");
+            } else {
+                approvedPeers.remove(endpointId);
+                connections.disconnectFromEndpoint(endpointId);
+                log("Unapproved, rejected or failed connection: " + result.getStatus().getStatusCode());
+            }
+        }
+        @Override public void onDisconnected(String endpointId) {
+            if (endpointId.equals(connectedPeer)) {
+                connected = false;connectedPeer = null;approvedPeers.remove(endpointId);
+                finishTrial(activeTrialId, "DISCONNECTED");
+                deliveryGuard.reset();
+                outgoingPayloads.clear();
+                log("DISCONNECTED. Pending payload cleared; no delivery assumed.");
+            }
+        }
+    };
+
+    private final EndpointDiscoveryCallback discovery = new EndpointDiscoveryCallback() {
+        @Override public void onEndpointFound(String endpointId, DiscoveredEndpointInfo info) {
+            final long discoveredEpoch = sessionEpoch;
+            runOnUiThread(() -> {
+                if (!userConsented || connected || sessionEpoch != discoveredEpoch) return;
+                new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Request lab connection?")
+                    .setMessage("Discovered: " + info.getEndpointName() +
+                        "\nAnother confirmation with matching digits will follow.")
+                    .setPositiveButton("Request", (d, which) -> {
+                        if (!userConsented || connected || sessionEpoch != discoveredEpoch) return;
+                        connections.requestConnection("OEP Offline Lab", endpointId, lifecycle)
+                            .addOnFailureListener(e -> log("Request failed: " + e.getClass().getSimpleName()));
+                    })
+                    .setNegativeButton("Ignore", (d, which) -> {})
+                    .show();
+            });
+        }
+        @Override public void onEndpointLost(String endpointId) { log("Peer discovery lost."); }
+    };
+
+    private void advertise() {
+        connections.startAdvertising("OEP Offline Lab", SERVICE_ID, lifecycle,
+                new AdvertisingOptions.Builder().setStrategy(STRATEGY).build())
+            .addOnSuccessListener(v -> log("Advertising LAB receiver; no radios toggled by app."))
+            .addOnFailureListener(e -> log("Advertising unavailable: " + e.getClass().getSimpleName() +
+                ". Check permissions and manually enable radios."));
+    }
+    private void discover() {
+        connections.startDiscovery(SERVICE_ID, discovery,
+                new DiscoveryOptions.Builder().setStrategy(STRATEGY).build())
+            .addOnSuccessListener(v -> log("Discovering lab peers; no radios toggled by app."))
+            .addOnFailureListener(e -> log("Discovery unavailable: " + e.getClass().getSimpleName() +
+                ". Check permissions and manually enable radios."));
+    }
+    private void sendTest() {
+        long now = System.currentTimeMillis();
+        if (deliveryGuard.hasPending(now)) {
+            log("A previous test message still awaits an ACK; retry after its 60s expiry.");
+            return;
+        }
+        if (activeTrialId != null) {
+            finishTrial(activeTrialId, "EXPIRED");
+            log("Previous lab trial timed out; new attempt is now allowed.");
+        }
+        if (!userConsented || !connected || connectedPeer == null) {
+            log("DENIED: obtain consent and accept a matching-code connection first.");return;
+        }
+        try {
+            String id = UUID.randomUUID().toString();
+            String challenge = UUID.randomUUID().toString(); // Echo proof for this packet only.
+            long deadline = now + TTL_MILLIS;
+            JSONObject packet = new JSONObject()
+                .put("v", 2).put("type", "LAB_MESSAGE").put("id", id)
+                .put("challenge", challenge).put("expiresAt", deadline)
+                .put("body", "SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS");
+            if (!deliveryGuard.beginOutgoing(id, connectedPeer, challenge, now, deadline)) {
+                log("DENIED: invalid or pending lab message.");return;
+            }
+            sendStartedElapsed = SystemClock.elapsedRealtime();
+            activeTrialId = id;
+            armExpiry(id, deadline);
+            sendPacket(connectedPeer, packet);
+            log("Message submitted to Nearby API; NOT delivered until receiver ACK: " + id);
+        } catch (JSONException e) { log("Packet encoding failed."); }
+    }
+
+    private final PayloadCallback payloads = new PayloadCallback() {
+        @Override public void onPayloadReceived(String endpointId, Payload payload) {
+            if (!connected || !userConsented || !endpointId.equals(connectedPeer) ||
+                payload.getType() != Payload.Type.BYTES || payload.asBytes() == null ||
+                payload.asBytes().length > MAX_BYTES) return;
+            try {
+                JSONObject packet = new JSONObject(new String(payload.asBytes(), StandardCharsets.UTF_8));
+                if (packet.optInt("v") != 2) return; // Reject incompatible pilot protocol versions.
+                String type = packet.optString("type");
+                String id = packet.optString("id");
+                String challenge = packet.optString("challenge");
+                if (!LabDeliveryGuard.validId(id) ||
+                    !LabDeliveryGuard.validId(challenge)) return;
+                if ("LAB_MESSAGE".equals(type)) {
+                    if (!"SYNTHETIC_STATUS_CHECK_NOT_REAL_SOS".equals(packet.optString("body"))) return;
+                    long expires = packet.optLong("expiresAt", 0L);
+                    LabDeliveryGuard.IncomingState seen = deliveryGuard.acceptIncoming(
+                        id, expires, System.currentTimeMillis());
+                    if (seen == LabDeliveryGuard.IncomingState.REJECTED) {
+                        log("Expired or malformed test message rejected.");return;
+                    }
+                    if (seen == LabDeliveryGuard.IncomingState.NEW)
+                        log("LAB MESSAGE RECEIVED; bounded duplicate guard active.");
+                    JSONObject receipt = new JSONObject()
+                        .put("v", 2).put("type", "LAB_RECEIPT").put("id", id)
+                        .put("challenge", challenge);
+                    sendPacket(endpointId, receipt);
+                } else if ("LAB_RECEIPT".equals(type)) {
+                    // Guard against wall-clock changes: accept only within the sender's monotonic TTL.
+                    if (id.equals(activeTrialId) && sendStartedElapsed > 0L &&
+                        LabDeadlinePolicy.elapsedTtlReached(
+                            sendStartedElapsed, SystemClock.elapsedRealtime(), TTL_MILLIS)) {
+                        deliveryGuard.abortOutgoing(id);
+                        finishTrial(id, "EXPIRED");
+                        log("Late lab receipt rejected by monotonic TTL; NOT delivered.");
+                        return;
+                    }
+                    LabDeliveryGuard.ReceiptState receiptState = deliveryGuard.acceptReceipt(
+                        id, endpointId, challenge, System.currentTimeMillis());
+                    if (receiptState == LabDeliveryGuard.ReceiptState.ACCEPTED) {
+                        long latencyMs = finishTrial(id, "ACK_RECEIVED");
+                        log("RECEIVER ACK from approved peer. Local elapsed: " + latencyMs +
+                            "ms (single test, NOT a performance guarantee). LAB ONLY; not rescue proof.");
+                    } else if (receiptState == LabDeliveryGuard.ReceiptState.EXPIRED) {
+                        finishTrial(id, "EXPIRED");
+                        log("Late lab receipt rejected; timeout allows next trial.");
+                    } else {
+                        log("Unexpected receiver receipt ignored: " + receiptState);
+                    }
+                }
+            } catch (JSONException e) { log("Invalid lab JSON ignored."); }
+        }
+        @Override public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) {
+            int status = update.getStatus();
+            if (status == PayloadTransferUpdate.Status.FAILURE ||
+                status == PayloadTransferUpdate.Status.CANCELED) {
+                String outgoing = outgoingPayloads.remove(update.getPayloadId());
+                if (outgoing != null) {
+                    if (deliveryGuard.abortOutgoing(outgoing))
+                        finishTrial(outgoing, "SEND_FAILED");
+                }
+                log("Nearby payload transfer failed or canceled. Not delivered.");
+            } else if (status == PayloadTransferUpdate.Status.SUCCESS) {
+                outgoingPayloads.remove(update.getPayloadId());
+                // Nearby byte-transfer success is NOT an application receiver ACK.
+            }
+        }
+    };
+
+    private void sendPacket(String endpointId, JSONObject packet) {
+        byte[] bytes = packet.toString().getBytes(StandardCharsets.UTF_8);
+        if (bytes.length > MAX_BYTES) { log("Packet exceeds lab limit."); return; }
+        Payload outgoing = Payload.fromBytes(bytes);
+        String messageId = "LAB_MESSAGE".equals(packet.optString("type"))
+            ? packet.optString("id") : null;
+        if (messageId != null) outgoingPayloads.put(outgoing.getId(), messageId);
+        connections.sendPayload(endpointId, outgoing)
+            .addOnFailureListener(e -> {
+                outgoingPayloads.remove(outgoing.getId());
+                if (messageId != null) {
+                    if (deliveryGuard.abortOutgoing(messageId))
+                        finishTrial(messageId, "SEND_FAILED");
+                }
+                log("Send rejected by Nearby; no delivered status: " + e.getClass().getSimpleName());
+            });
+    }
+
+    private void stopAndClear() {
+        userConsented = false;
+        connected = false;
+        connectedPeer = null;
+        sessionEpoch++; // Invalidates consent dialogs left open across STOP and re-consent.
+        waitingRole = null;
+        deliveryGuard.reset();
+        approvedPeers.clear();
+        outgoingPayloads.clear();
+        activeTrialId = null;
+        sendStartedElapsed = 0L;
+        if (pendingExpiryTask != null) foregroundTimer.removeCallbacks(pendingExpiryTask);
+        pendingExpiryTask = null;
+        journal.clear();
+        if (output != null) output.setText("");
+        connections.stopAdvertising();
+        connections.stopDiscovery();
+        connections.stopAllEndpoints();
+        log("Local lab stopped; consent and message identifiers cleared.");
+    }
+    @Override protected void onStop() {
+        super.onStop();
+        stopAndClear(); // Deliberately no background discovery or transmission.
+    }
+}

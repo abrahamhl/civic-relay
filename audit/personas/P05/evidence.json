@@ -1,0 +1,89 @@
+{
+  "schema": "BUYER_ARENA_PERSONA_EVIDENCE_V1",
+  "actor_id": "P05",
+  "legacy_id": "05-privacy-nl",
+  "disclosure": "AUTOMATED SYNTHETIC ROLE — NOT A RECRUITED HUMAN TESTER",
+  "target_url": "https://civic-relay-investor.vercel.app",
+  "target_commit": "c18c6ac936c8b3c6560997b113e46b50cab51302",
+  "checks": [
+    {
+      "id": "http-response",
+      "pass": true,
+      "critical": true,
+      "expected": "HTTP 200 on language entry route",
+      "observation": "HTTP 200 at https://civic-relay-investor.vercel.app/nl",
+      "suggested_fix": "Fix the deployed language route and monitor availability."
+    },
+    {
+      "id": "visible-hero",
+      "pass": true,
+      "critical": true,
+      "expected": "Hero heading > 15 chars visible above fold",
+      "observation": "ALS HET\nNETWERK\nUITVALT.",
+      "suggested_fix": "Restore a readable hero heading."
+    },
+    {
+      "id": "six-sections",
+      "pass": true,
+      "critical": true,
+      "expected": "All 6 architectural anchor sections exist in DOM",
+      "observation": "Missing section anchors: none",
+      "suggested_fix": "Keep all six chapter navigation targets present in the deployed site."
+    },
+    {
+      "id": "chapter-navigation",
+      "pass": true,
+      "critical": true,
+      "expected": "6 sticky navigation chapter links present",
+      "observation": "Chapter anchor count 6",
+      "suggested_fix": "Restore navigation for all six major sections."
+    },
+    {
+      "id": "truthful-simulation-label",
+      "pass": true,
+      "critical": true,
+      "expected": "Explicit simulation-only disclaimer visible in body copy",
+      "observation": "Visible synthetic/non-operational disclaimer present: true",
+      "suggested_fix": "Put a clear research-only safety statement near the first interaction."
+    },
+    {
+      "id": "no-global-mobile-overflow",
+      "pass": true,
+      "critical": false,
+      "expected": "scrollWidth <= innerWidth + 3",
+      "observation": "{\"scroll\":390,\"window\":390}",
+      "suggested_fix": "Correct global horizontal overflow at this viewport; keep chapter strip locally scrollable."
+    },
+    {
+      "id": "privacy-finds-lab",
+      "pass": true,
+      "critical": true,
+      "expected": "Navigate to #routing-lab in NL locale",
+      "observation": "Clicked Dutch simulation lab",
+      "suggested_fix": "Expose consent choices in Dutch before any hypothetical status request."
+    },
+    {
+      "id": "privacy-radio-boundary",
+      "pass": true,
+      "critical": true,
+      "expected": "Dutch radio/112 non-interference boundary stated",
+      "observation": "Geen echte Bluetooth-, Wi-Fi- of satellietverbinding, CAP-verificatie, triangulatie of contact met 112. ACK is uitsluitend een gesimuleerde ontvangst.",
+      "suggested_fix": "Clarify that the page cannot turn on phone radios or send emergency alerts."
+    },
+    {
+      "id": "permission-model-switches",
+      "pass": true,
+      "critical": true,
+      "expected": ">= 3 consent/radio/gateway checkboxes inspectable",
+      "observation": "Radio/gateway assumption switches 4",
+      "suggested_fix": "Make simulated radio and gateway settings inspectable."
+    }
+  ],
+  "downloaded_scenario_export": null,
+  "console_errors": [],
+  "page_errors": [],
+  "network_origins": [
+    "https://civic-relay-investor.vercel.app"
+  ],
+  "screenshot": "screenshots/05-privacy-nl.png"
+}

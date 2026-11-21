@@ -1,0 +1,97 @@
+{
+  "schema": "BUYER_ARENA_PERSONA_EVIDENCE_V1",
+  "actor_id": "P03",
+  "legacy_id": "03-investor-en",
+  "disclosure": "AUTOMATED SYNTHETIC ROLE — NOT A RECRUITED HUMAN TESTER",
+  "target_url": "https://civic-relay-investor.vercel.app",
+  "target_commit": "c18c6ac936c8b3c6560997b113e46b50cab51302",
+  "checks": [
+    {
+      "id": "http-response",
+      "pass": true,
+      "critical": true,
+      "expected": "HTTP 200 on language entry route",
+      "observation": "HTTP 200 at https://civic-relay-investor.vercel.app/",
+      "suggested_fix": "Fix the deployed language route and monitor availability."
+    },
+    {
+      "id": "visible-hero",
+      "pass": true,
+      "critical": true,
+      "expected": "Hero heading > 15 chars visible above fold",
+      "observation": "WHEN THE\nNETWORK\nGOES DARK.",
+      "suggested_fix": "Restore a readable hero heading."
+    },
+    {
+      "id": "six-sections",
+      "pass": true,
+      "critical": true,
+      "expected": "All 6 architectural anchor sections exist in DOM",
+      "observation": "Missing section anchors: none",
+      "suggested_fix": "Keep all six chapter navigation targets present in the deployed site."
+    },
+    {
+      "id": "chapter-navigation",
+      "pass": true,
+      "critical": true,
+      "expected": "6 sticky navigation chapter links present",
+      "observation": "Chapter anchor count 6",
+      "suggested_fix": "Restore navigation for all six major sections."
+    },
+    {
+      "id": "truthful-simulation-label",
+      "pass": true,
+      "critical": true,
+      "expected": "Explicit simulation-only disclaimer visible in body copy",
+      "observation": "Visible synthetic/non-operational disclaimer present: true",
+      "suggested_fix": "Put a clear research-only safety statement near the first interaction."
+    },
+    {
+      "id": "no-global-mobile-overflow",
+      "pass": true,
+      "critical": false,
+      "expected": "scrollWidth <= innerWidth + 3",
+      "observation": "{\"scroll\":1280,\"window\":1280}",
+      "suggested_fix": "Correct global horizontal overflow at this viewport; keep chapter strip locally scrollable."
+    },
+    {
+      "id": "partner-finds-proof",
+      "pass": true,
+      "critical": true,
+      "expected": "Navigate to #evidence",
+      "observation": "Clicked #evidence from overview",
+      "suggested_fix": "Expose independent evidence and limitations in top navigation."
+    },
+    {
+      "id": "zero-physical-proof",
+      "pass": true,
+      "critical": true,
+      "expected": "Evidence board explicitly states 0 validated physical relays",
+      "observation": "Evidence cards: 01\nSIMULATED\n20–100\n\nVIRTUAL NODES\n\nReproducible topology\n\nSeeded experiments exercise explicit | 02\nAUTOMATED LAB\n810\n\nSYNTHETIC SCENARIO RUNS\n\nAutomated invariants\n\nA fixed-scenario test matr | 03\nNOT PHYSICALLY TESTED\n0\n\nPROVEN REAL-WORLD RELAYS\n\nPhysical interoperability\n\nThe Android re",
+      "suggested_fix": "Distinguish zero validated real device transmissions from synthetic results."
+    },
+    {
+      "id": "link-to-source",
+      "pass": true,
+      "critical": true,
+      "expected": "Direct outbound links to GitHub repository evidence",
+      "observation": "GitHub evidence links 2",
+      "suggested_fix": "Provide inspectable, publicly readable code/evidence references."
+    },
+    {
+      "id": "funding-section",
+      "pass": true,
+      "critical": true,
+      "expected": "#investment section present",
+      "observation": "Investment section exists",
+      "suggested_fix": "Explain target partner, milestones, costs, risks and clear ask."
+    }
+  ],
+  "downloaded_scenario_export": null,
+  "console_errors": [],
+  "page_errors": [],
+  "network_origins": [
+    "https://civic-relay-investor.vercel.app"
+  ],
+  "screenshot": "screenshots/03-investor-en.png"
+}

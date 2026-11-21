@@ -1,4 +1,18 @@
-# Civic Relay Demo (V0.1)
+# OEP / Civic Relay — Offline Emergency Protocol
+
+**Investigación en coordinación descentralizada para emergencias con conectividad degradada.** OEP estudia cómo dispositivos participantes y redes compatibles podrían coordinar avisos sintéticos, almacenar/reintentar mensajes y seleccionar rutas alternativas con consentimiento.
+
+🌐 **[Abrir la web avanzada de OEP — demostración interactiva ES / EN / NL](https://civic-relay-investor.vercel.app)**  
+🧪 **[Ver el código y mejoras de la versión avanzada (PR #3)](https://github.com/abrahamhl/civic-relay/pull/3)**  
+📋 **[Revisar el plan de investigación y validación](https://github.com/abrahamhl/civic-relay/blob/feat/master-emergency-routing-v1-20261020/docs/OEP_VALIDATION_CERTIFICATION_AND_FUNDING_2026.md)**
+
+> **Estado de publicación (21-10-2026):** el enlace anterior es el despliegue de **producción `READY`** verificado en Vercel para el commit `c18c6ac`. La versión avanzada aún vive en una rama experimental y no sustituye la base `master`. Solo demuestra rutas y dispositivos **simulados**; no se han validado comunicaciones físicas entre teléfonos, integración real con 112, comunicaciones satelitales ni certificación institucional. No debe utilizarse en emergencias reales.
+
+---
+
+## Archivo de la demo histórica V0.1
+
+## Historical Civic Relay V0.1 demo
 
 Demo ficticia de comunicación en crisis, offline-first y de transporte múltiple, diseñada como ejercicio de ingeniería para entornos de conectividad degradada.
 
@@ -62,7 +76,24 @@ Servir la demo estática desde `apps/web/dist`. La API y el servicio reales **no
 
 ## Documentación
 
-### Técnica
+### Técnica e Inversión (Dossier 2026)
+- [`docs/investor/EXECUTIVE_SUMMARY.md`](docs/investor/EXECUTIVE_SUMMARY.md) – resumen ejecutivo y posicionamiento técnico (TRL 3–4)
+- [`docs/investor/ONE_PAGE_PITCH.md`](docs/investor/ONE_PAGE_PITCH.md) – pitch de una página para inversores e instituciones
+- [`docs/investor/TECHNICAL_DUE_DILIGENCE.md`](docs/investor/TECHNICAL_DUE_DILIGENCE.md) – guía de due diligence técnica y comandos reproducibles
+- [`docs/investor/ARCHITECTURE.md`](docs/investor/ARCHITECTURE.md) – flujo de 8 etapas (`EMERGENCY EVENT → ZONE → HUMAN STATUS → CONSENT → MESSAGE → NETWORK PATH → ACK → EVIDENCE`)
+- [`docs/investor/EVIDENCE_REGISTER.md`](docs/investor/EVIDENCE_REGISTER.md) – registro maestro de afirmaciones y niveles de evidencia
+- [`docs/investor/DIFFERENTIATION.md`](docs/investor/DIFFERENTIATION.md) – diferenciación frente a SOS satelital, mensajería mesh y alertas broadcast
+- [`docs/investor/RISKS_AND_MITIGATIONS.md`](docs/investor/RISKS_AND_MITIGATIONS.md) – matriz de riesgos técnicos, operativos y regulatorios
+- [`docs/investor/TRL_AND_VALIDATION_ROADMAP.md`](docs/investor/TRL_AND_VALIDATION_ROADMAP.md) – evaluación TRL y hoja de ruta M0–M4
+- [`docs/investor/PILOT_PROPOSAL.md`](docs/investor/PILOT_PROPOSAL.md) – propuesta de piloto controlado de 12 semanas
+- [`docs/investor/FUNDING_OPPORTUNITIES.md`](docs/investor/FUNDING_OPPORTUNITIES.md) – convocatorias verificadas UE / Países Bajos (Horizon Europe Cluster 3, NLnet/NGI, RVO WBSO/MIT)
+- [`docs/investor/FINANCIAL_SCENARIOS.md`](docs/investor/FINANCIAL_SCENARIOS.md) – escenarios financieros (€50k / €180k / €400k)
+- [`docs/security/THREAT_MODEL.md`](docs/security/THREAT_MODEL.md) – modelo de amenazas y controles implementados
+- [`docs/security/DEPENDENCY_AND_LICENSE_AUDIT.md`](docs/security/DEPENDENCY_AND_LICENSE_AUDIT.md) – auditoría de dependencias y licencias (MIT)
+- [`docs/security/DATA_AND_CONSENT_BOUNDARIES.md`](docs/security/DATA_AND_CONSENT_BOUNDARIES.md) – privacidad, consentimiento opt-in y purga local
+- [`docs/audits/SIX_ORACLE_INDEPENDENT_REVIEWS_2026.md`](docs/audits/SIX_ORACLE_INDEPENDENT_REVIEWS_2026.md) – revisión independiente de 6 perspectivas de ingeniería
+- [`docs/audits/INVESTOR_READINESS_STATUS.md`](docs/audits/INVESTOR_READINESS_STATUS.md) – estado integral de preparación e invariantes verificados
+- [`docs/audits/HUMAN_ACTION_REQUIRED.md`](docs/audits/HUMAN_ACTION_REQUIRED.md) – protocolo físico pendiente con 2 teléfonos Android (`PHYSICAL_TEST_PENDING`)
 - [`docs/AUDITORIAS_INVERSION_PUBLICA.md`](docs/AUDITORIAS_INVERSION_PUBLICA.md) – cinco auditorías técnicas y delegaciones de responsabilidad
 - [`docs/RELEASE_TRUTH_V0_1.md`](docs/RELEASE_TRUTH_V0_1.md) – verificación ejecutada (instalación/build/test/lint) vs. afirmaciones
 - [`docs/ASTRA_RED_TEAM.md`](docs/ASTRA_RED_TEAM.md) – revisión adversarial de liberación
