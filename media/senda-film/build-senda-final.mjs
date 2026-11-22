@@ -81,10 +81,10 @@ const scenes = [
       'Esta película cuenta qué hace SENDA con todo eso, cómo lo hace y cómo se comprueba.',
     ]),
   sc('a1', 'OBSERVED', ['investor-next/public/media/m96/senda-m96-promo-es.mp4', 'investor-next/public/senda/estado.json'],
-    { kind: 'kpis', kpis: [kp('Capítulo 1', 'la película del 10 de noviembre: el porqué y la base'), kp('Capítulo 2', 'lo construido después: radar, sin datos, chat, simulador, drones, ciencia'), kp(`${estado.core} pruebas`, 'las cifras de hoy, al final')] },
+    { kind: 'kpis', kpis: [kp('Capítulo 1', 'la película del 10 de noviembre: el porqué y la base'), kp('Capítulo 2', 'lo construido después: radar, sin datos, chat, simulador, drones, ciencia'), kp(`${estado.core} pruebas`, 'del núcleo, ejecutadas hoy')] },
     'Dos capítulos, una sola historia', [
-      'Primero verás la película del diez de noviembre: por qué existe SENDA, los accidentes que la motivaron y la ingeniería de base.',
-      'Sus cifras de pruebas son las de aquel día. Las de hoy, al final de esta película.',
+      'Primero verás la película del diez de noviembre: por qué existe SENDA, los accidentes que la motivaron y la ingeniería de base, con sus cifras de pruebas puestas al día.',
+      'Después, el capítulo dos: todo lo construido desde entonces.',
     ]),
   // ─── Capítulo 2 ───
   sc('b0', 'OBSERVED', ['investor-next/public/senda/estado.json', 'investor-next/app/senda-home.tsx'],

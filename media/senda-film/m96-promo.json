@@ -1279,23 +1279,23 @@
         "nl": "Machinaal geverifieerd. Eerlijk over wat ontbreekt."
       },
       "es": [
-        "Todo se verifica automáticamente en cada cambio: trescientas cincuenta pruebas del núcleo y cuarenta y nueve comprobaciones de principio a fin en navegadores reales, casi todas con la red cortada.",
+        "Todo se verifica automáticamente en cada cambio: novecientas diez pruebas del núcleo y cuarenta y nueve comprobaciones de principio a fin en navegadores reales, en su última ejecución guardada, casi todas con la red cortada.",
         "Lo que falta, lo decimos: pilotos de campo con teléfonos físicos y equipos de rescate, auditoría de seguridad independiente y certificación para compra pública."
       ],
       "es_say": [
-        "Todo se verifica automáticamente en cada cambio: trescientas cincuenta pruebas del núcleo y cuarenta y nueve comprobaciones de principio a fin en navegadores reales, casi todas con la red cortada.",
+        "Todo se verifica automáticamente en cada cambio: novecientas diez pruebas del núcleo y cuarenta y nueve comprobaciones de principio a fin en navegadores reales, en su última ejecución guardada, casi todas con la red cortada.",
         "Lo que falta, lo decimos: pilotos de campo con teléfonos físicos y equipos de rescate, auditoría de seguridad independiente y certificación para compra pública."
       ],
       "en": [
-        "Everything is machine-verified on every change: three hundred and fifty core tests, and forty-nine end-to-end checks in real browsers, almost all with the network cut.",
+        "Everything is machine-verified on every change: nine hundred and ten core tests, and forty-nine end-to-end checks in real browsers, in their last saved run, almost all with the network cut.",
         "What is missing, we say: field pilots with physical phones and rescue teams, an independent security audit, and certification for public procurement."
       ],
       "en_say": [
-        "Everything is machine-verified on every change: three hundred and fifty core tests, and forty-nine end-to-end checks in real browsers, almost all with the network cut.",
+        "Everything is machine-verified on every change: nine hundred and ten core tests, and forty-nine end-to-end checks in real browsers, in their last saved run, almost all with the network cut.",
         "What is missing, we say: field pilots with physical phones and rescue teams, an independent security audit, and certification for public procurement."
       ],
       "nl": [
-        "Alles wordt bij elke wijziging automatisch geverifieerd: driehonderdvijftig kerntests en negenenveertig end-to-end controles in echte browsers, bijna allemaal zonder netwerk.",
+        "Alles wordt bij elke wijziging automatisch geverifieerd: negenhonderdtien kerntests en negenenveertig end-to-end controles in echte browsers, in hun laatste opgeslagen run, bijna allemaal zonder netwerk.",
         "Wat nog ontbreekt, zeggen we eerlijk: veldpilots met fysieke telefoons en reddingsteams, een onafhankelijke beveiligingsaudit en certificering voor openbare aanbesteding."
       ]
     },
@@ -1312,7 +1312,7 @@
         "kind": "kpis",
         "kpis": [
           {
-            "v": "350",
+            "v": "910",
             "l": {
               "es": "pruebas del núcleo, ejecutadas sin red",
               "en": "core tests, run offline",
@@ -1346,35 +1346,35 @@
         "Security is not a promise. It is a chain you can inspect.",
         "Messages are encrypted end to end. Receipts are signed into a hash chain.",
         "The identity key is bound to the card and exported encrypted.",
-        "The core has three hundred and fifty automated tests, and the custody protocol has its own suite.",
+        "The core has nine hundred and ten automated tests, and the custody protocol has its own suite.",
         "That proves the code does what the tests check. It does not prove field performance, and no external audit has certified it yet."
       ],
       "en_say": [
         "Security is not a promise. It is a chain you can inspect.",
         "Messages are encrypted end to end. Receipts are signed into a hash chain.",
         "The identity key is bound to the card and exported encrypted.",
-        "The core has three hundred and fifty automated tests, and the custody protocol has its own suite.",
+        "The core has nine hundred and ten automated tests, and the custody protocol has its own suite.",
         "That proves the code does what the tests check. It does not prove field performance, and no external audit has certified it yet."
       ],
       "es": [
         "La seguridad no es una promesa. Es una cadena que se puede inspeccionar.",
         "Los mensajes van cifrados de extremo a extremo. Los recibos se firman en una cadena de hashes.",
         "La clave de identidad está ligada a la tarjeta y se exporta cifrada.",
-        "El núcleo tiene trescientas cincuenta pruebas automáticas, y el protocolo de custodia tiene su propia batería.",
+        "El núcleo tiene novecientas diez pruebas automáticas, y el protocolo de custodia tiene su propia batería.",
         "Eso demuestra que el código hace lo que comprueban las pruebas. No demuestra su comportamiento en campo, y ninguna auditoría externa lo ha certificado todavía."
       ],
       "es_say": [
         "La seguridad no es una promesa. Es una cadena que se puede inspeccionar.",
         "Los mensajes van cifrados de extremo a extremo. Los recibos se firman en una cadena de hashes.",
         "La clave de identidad está ligada a la tarjeta y se exporta cifrada.",
-        "El núcleo tiene trescientas cincuenta pruebas automáticas, y el protocolo de custodia tiene su propia batería.",
+        "El núcleo tiene novecientas diez pruebas automáticas, y el protocolo de custodia tiene su propia batería.",
         "Eso demuestra que el código hace lo que comprueban las pruebas. No demuestra su comportamiento en campo, y ninguna auditoría externa lo ha certificado todavía."
       ],
       "nl": [
         "Veiligheid is geen belofte. Het is een keten die je kunt controleren.",
         "Berichten zijn end-to-end versleuteld. Ontvangstbewijzen worden ondertekend in een hash-keten.",
         "De identiteitssleutel is aan de kaart gebonden en wordt versleuteld geëxporteerd.",
-        "De kern heeft driehonderdvijftig automatische tests, en het custodieprotocol heeft een eigen suite.",
+        "De kern heeft negenhonderdtien automatische tests, en het custodieprotocol heeft een eigen suite.",
         "Dat bewijst dat de code doet wat de tests controleren. Het bewijst geen veldprestaties, en geen externe audit heeft het gecertificeerd."
       ]
     },

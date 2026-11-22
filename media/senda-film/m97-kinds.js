@@ -46,18 +46,18 @@
   /* ── breakdown: despiece por capas de lo que viaja ── */
   function drawBreakdown(cv, lt, d, v) {
     const g = setup(cv); head(g, tr(v.kick), tr(v.tag), tr(v.title));
-    const L = v.layers, n = L.length, open = ease((lt - 1.2) / 2.2), top = 112;
+    const L = v.layers, n = L.length, open = ease((lt - 1.2) / 2.2), top = 104;
     L.forEach((l, i) => {
-      const p = ease((lt - 0.4 - i * 0.55) / 0.8), y = top + i * (60 + 22 * open) + (1 - open) * (n - 1 - i) * -8, w = 360 - i * 18 * (1 - open);
-      g.globalAlpha = p; g.fillStyle = C.card; rr(g, 22, y, w, 54, 10); g.fill(); g.strokeStyle = l.color ?? C.i; g.lineWidth = 1.5; g.stroke();
-      g.fillStyle = l.color ?? C.i; g.font = '700 14px Inter,system-ui'; g.fillText(tr(l.label), 36, y + 22);
-      g.fillStyle = C.m; g.font = '12px Inter,system-ui'; g.fillText(tr(l.note), 36, y + 42);
-      g.font = '800 16px ui-monospace,monospace'; g.fillStyle = C.t; g.fillText(tr(l.size), 22 + w + 14 * open + 6, y + 33);
+      const p = ease((lt - 0.4 - i * 0.55) / 0.8), y = top + i * (54 + 14 * open) + (1 - open) * (n - 1 - i) * -8, w = 360 - i * 18 * (1 - open);
+      g.globalAlpha = p; g.fillStyle = C.card; rr(g, 22, y, w, 48, 10); g.fill(); g.strokeStyle = l.color ?? C.i; g.lineWidth = 1.5; g.stroke();
+      g.fillStyle = l.color ?? C.i; g.font = '700 14px Inter,system-ui'; g.fillText(tr(l.label), 36, y + 20);
+      g.fillStyle = C.m; g.font = '12px Inter,system-ui'; g.fillText(tr(l.note), 36, y + 38);
+      g.font = '800 16px ui-monospace,monospace'; g.fillStyle = C.t; g.fillText(tr(l.size), 22 + w + 14 * open + 6, y + 30);
       g.globalAlpha = 1;
     });
     const pr = ease((lt - (0.6 + n * 0.55 + 1.6)) / 0.8);
     if (pr > 0) {
-      g.globalAlpha = pr; const y = 486; g.fillStyle = '#0b1a26'; rr(g, 22, y - 26, 596, 66, 10); g.fill();
+      g.globalAlpha = pr; const y = 498; g.fillStyle = '#0b1a26'; rr(g, 22, y - 26, 596, 66, 10); g.fill();
       g.fillStyle = C.a; g.font = '700 12px ui-monospace,monospace'; g.fillText(tr(v.seenLabel).toUpperCase(), 34, y - 8);
       let s = 1234567; const hx = []; for (let k = 0; k < 34; k++) { s = (s * 16807) % 2147483647; hx.push((s % 256).toString(16).padStart(2, '0')); }
       g.fillStyle = C.i; g.font = '600 13px ui-monospace,monospace'; g.fillText(hx.join(' ').slice(0, 74), 34, y + 14); g.fillText(hx.reverse().join(' ').slice(0, 74), 34, y + 32); g.globalAlpha = 1;
@@ -88,7 +88,7 @@
   /* ── formulas: la ciencia, tarjeta a tarjeta, con puntos que fluyen al núcleo ── */
   function drawFormulas(cv, lt, d, v) {
     const g = setup(cv); head(g, tr(v.kick), tr(v.tag), tr(v.title));
-    const F = v.items, cols = 2, cw = 291, ch = Math.min(96, (440 - 10) / Math.ceil(F.length / cols) - 8);
+    const F = v.items, cols = 2, cw = 291, ch = Math.min(96, 440 / Math.ceil(F.length / cols) - 8);
     F.forEach((f, i) => {
       const x = 22 + (i % cols) * (cw + 14), y = 102 + Math.floor(i / cols) * (ch + 8), p = ease((lt - 0.5 - i * ((d - 4) / F.length)) / 0.7);
       g.globalAlpha = 0.15 + 0.85 * p; g.fillStyle = C.card; rr(g, x, y, cw, ch, 10); g.fill(); g.strokeStyle = p > 0.95 ? (f.color ?? C.i) : C.line; g.lineWidth = 1; g.stroke();
@@ -103,14 +103,14 @@
   /* ── rivals: con quién nos comparan y cómo nos sumamos ── */
   function drawRivals(cv, lt, d, v) {
     const g = setup(cv); head(g, tr(v.kick), tr(v.tag), tr(v.title));
-    const R = v.rows, y0 = 108, rh = Math.min(48, 420 / R.length);
+    const R = v.rows, y0 = 108, rh = Math.min(70, 430 / R.length);
     g.font = '700 11px ui-monospace,monospace'; g.fillStyle = C.m; g.fillText(tr(v.cols[0]).toUpperCase(), 22, y0); g.fillText(tr(v.cols[1]).toUpperCase(), 210, y0); g.fillText(tr(v.cols[2]).toUpperCase(), 420, y0);
     R.forEach((r, i) => {
       const p = ease((lt - 0.6 - i * ((d - 4) / R.length)) / 0.6), y = y0 + 14 + i * rh; g.globalAlpha = p;
       g.strokeStyle = '#16303f'; g.beginPath(); g.moveTo(22, y); g.lineTo(618, y); g.stroke();
       g.fillStyle = C.t; g.font = '700 14px Inter,system-ui'; g.fillText(r.name, 22, y + 20); g.fillStyle = C.m; g.font = '11px Inter,system-ui'; g.fillText(tr(r.what), 22, y + 36);
-      g.fillStyle = C.m; g.font = '12px Inter,system-ui'; wrap(g, tr(r.gap), 210, y + 19, 196, 14);
-      g.fillStyle = C.e; wrap(g, tr(r.join), 420, y + 19, 198, 14);
+      g.fillStyle = C.m; g.font = '11.5px Inter,system-ui'; wrap(g, tr(r.gap), 210, y + 19, 196, 13);
+      g.fillStyle = C.e; wrap(g, tr(r.join), 420, y + 19, 198, 13);
       g.globalAlpha = 1;
     });
     foot(g, tr(v.foot));

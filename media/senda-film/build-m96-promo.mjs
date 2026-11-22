@@ -25,10 +25,10 @@ const pick = (doc, id) => {
 // ---------------------------------------------------------------- números verificados
 const CORE = estado.core;
 if (!(CORE > 0 && estado.coreTotal === CORE)) throw new Error('estado.json: el núcleo no está en verde');
-const E2E = estado.e2e;
-const numEs = { 350: 'trescientas cincuenta' };
-const numEn = { 350: 'three hundred and fifty' };
-const numNl = { 350: 'driehonderdvijftig' };
+const E2E = estado.e2e ?? estado.historicalE2E?.passed; // las 49 E2E son una ejecución guardada (HISTORICAL_NOT_RERUN_BY_THIS_BUILD)
+const numEs = { 350: 'trescientas cincuenta', 910: 'novecientas diez' };
+const numEn = { 350: 'three hundred and fifty', 910: 'nine hundred and ten' };
+const numNl = { 350: 'driehonderdvijftig', 910: 'negenhonderdtien' };
 if (!numEs[CORE]) throw new Error(`añade la forma hablada de ${CORE} pruebas en es/en/nl`);
 
 const rain868 = computeRainAttenuation(0.868, 50, 'V').specificAttenuationDbPerKm;
@@ -189,6 +189,16 @@ for (const [k, from, to] of [['es', 'más de doscientas sesenta', numEs[CORE]], 
 }
 s12b.visual.kpis[0].v = String(CORE);
 if (E2E !== 49) throw new Error(`s12 dice «cuarenta y nueve» E2E; estado.json da ${E2E}`);
+// Las 49 comprobaciones E2E no se repiten en cada compilación: se dice que son la última ejecución guardada.
+const e2eFix = { es: ['en cada cambio: ', 'en cada cambio: ', 'casi todas con la red cortada', 'en su última ejecución guardada, casi todas con la red cortada'],
+  en: ['on every change: ', 'on every change: ', 'almost all with the network cut', 'in their last saved run, almost all with the network cut'],
+  nl: ['bij elke wijziging ', 'bij elke wijziging ', 'bijna allemaal zonder netwerk', 'in hun laatste opgeslagen run, bijna allemaal zonder netwerk'] };
+for (const k of ['es', 'es_say', 'en', 'en_say', 'nl']) {
+  const [, , from, to] = e2eFix[k.slice(0, 2)];
+  const before = JSON.stringify(s12[k]); s12[k] = swap(s12[k], from, to);
+  if (before === JSON.stringify(s12[k])) throw new Error(`s12.${k}: no se encontró «${from}»`);
+}
+if (estado.historicalE2E && estado.historicalE2E.status !== 'HISTORICAL_NOT_RERUN_BY_THIS_BUILD') throw new Error('revisar la frase de E2E: estado.json cambió de formato');
 
 const order = [
   origin, spain, gap,
