@@ -5,6 +5,7 @@
 <title>SENDA · película M95</title>
 <script src="/senda/vendor/three-0.158.0.min.js"></script>
 <script src="sims.js"></script>
+<script src="m97-kinds.js"></script>
 <script src="film-i18n.js"></script>
 <!--
   Película SENDA v5 / M95 · 1280×720 @ 1.5x DPR (1920×1080) o 720×1280 @ 1.5x DPR (1080×1920 vertical).
@@ -57,6 +58,10 @@ iframe.pg{width:640px;height:600px;border:0;border-radius:14px;background:#05090
 .hud .h-big{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}.hud .h-big b{display:block;font-size:26px;color:var(--t);line-height:1.1}.hud .h-big span{font-size:11px}.hud .strike{text-decoration:line-through;text-decoration-color:#ff7756;color:#ff9a86!important}
 .hud table{width:100%;border-collapse:collapse}.hud td{padding:2px 4px;border-top:1px solid #16242e;color:var(--t)}.hud td.s{color:#ff9a86;text-decoration:line-through}.hud td i{color:var(--m);font-style:normal;font-size:11px}
 .hud.small{width:232px;font-size:12px;padding:10px 12px}.hud .h-l{display:flex;align-items:center;gap:8px;margin:3px 0;color:var(--t)}.hud .h-l i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.scene.clipscene{grid-template-columns:300px 1fr;gap:28px}.scene.clipscene h1{font-size:34px}
+.clipframe{width:852px;border-radius:14px;overflow:hidden;border:1px solid var(--l);box-shadow:0 30px 90px rgba(0,0,0,.6);background:#05090c;position:relative}
+.clipframe img{display:block;width:852px;height:479px;object-fit:cover}
+.clipcap{position:absolute;left:0;right:0;bottom:-30px;font:600 12px ui-monospace,monospace;color:var(--m);letter-spacing:.06em}
 #sub{display:none}
 body.burnsub #sub{display:flex;position:absolute;left:32px;right:32px;bottom:52px;justify-content:center;z-index:30;pointer-events:none}
 body.burnsub #sub span{background:rgba(5,9,12,.92);border:1px solid rgba(255,119,86,.55);color:#fff;font:600 20px/1.36 Inter,system-ui;padding:12px 18px;border-radius:12px;text-align:center;box-shadow:0 12px 32px rgba(0,0,0,.75)}
@@ -358,7 +363,8 @@ function visualHTML(sc, idx) {
     const src = v.src.includes('lang=') ? v.src : v.src + (v.src.includes('?') ? '&' : '?') + 'lang=' + LANG;
     return `<iframe class="pg" src="${src}" width="640" height="600" title="${T(sc.title)}"></iframe>`;
   }
-  if (['call', 'howsim', 'broadcast', 'math_grid', 'cots_bom', 'pbr_radar', 'drone_hunt'].includes(v.kind)) return '<canvas class="c2d" width="640" height="600"></canvas>';
+  if (['call', 'howsim', 'broadcast', 'math_grid', 'cots_bom', 'pbr_radar', 'drone_hunt', 'graph', 'breakdown', 'route', 'formulas', 'rivals', 'ticks'].includes(v.kind)) return '<canvas class="c2d" width="640" height="600"></canvas>';
+  if (v.kind === 'clip') return `<div class="clipframe"><img class="clipimg" alt="" src="build/clips/${v.clip}/00001.jpg"><div class="clipcap">${T(v.caption ?? '')}</div></div>`;
   if (v.kind === 'spainmap') {
     const P = (lon, lat) => [(128 + (lon + 9.6) * 0.76 * 34).toFixed(1), ((44.1 - lat) * 34).toFixed(1)];
     const outline = [[-9.3,43.0],[-8.0,43.7],[-7.0,43.55],[-5.8,43.6],[-4.5,43.4],[-3.0,43.4],[-1.8,43.4],[-1.4,43.0],[0,42.7],[1.5,42.5],[3.2,42.4],[3.2,41.9],[2.2,41.4],[1.0,41.0],[0.5,40.6],[0.0,40.0],[-0.3,39.5],[0.2,38.8],[-0.5,38.3],[-0.8,37.6],[-1.6,37.3],[-2.2,36.7],[-4.4,36.7],[-5.6,36.0],[-6.3,36.8],[-7.4,37.2],[-7.0,38.0],[-7.3,38.9],[-7.0,39.6],[-6.9,40.2],[-6.8,41.0],[-6.2,41.6],[-6.6,41.95],[-8.2,41.9],[-8.9,42.1]].map(([a,b]) => P(a,b).join(',')).join(' ');
@@ -466,7 +472,7 @@ function build() {
   const head = (sc, i) => `<div><div class="eyebrow">SENDA · ${String(i + 1).padStart(2, '0')} / ${String(SCRIPT.scenes.length).padStart(2, '0')}</div>${badgeHTML(sc)}<h1>${T(sc.title).split(' ').map((w) => `<span>${w}</span>`).join('')}</h1></div>`;
   stage.innerHTML = SCRIPT.scenes.map((sc, i) => SIMS.full(sc.visual.kind)
     ? `<section class="scene full" id="sc-${i}"><div class="slot"></div><div class="shade"></div>${head(sc, i)}<div></div><div class="hud"></div></section>`
-    : `<section class="scene" id="sc-${i}">${head(sc, i)}<div class="vis">${visualHTML(sc, i)}</div></section>`).join('');
+    : `<section class="scene${sc.visual.kind === 'clip' ? ' clipscene' : ''}" id="sc-${i}">${head(sc, i)}<div class="vis">${visualHTML(sc, i)}</div></section>`).join('');
   scenesEl = SCRIPT.scenes.map((_, i) => document.getElementById('sc-' + i));
 }
 
@@ -487,6 +493,7 @@ function drawBg(t) {
 }
 
 window.seek = (t) => {
+  const waits = [];
   drawBg(t);
   document.getElementById('prog').style.width = (100 * t / TL.duration) + '%';
   let activeSub = '';
@@ -524,6 +531,15 @@ window.seek = (t) => {
     el.querySelectorAll('.f0 img,.f1 img').forEach((im) => { const z = 1 + 0.04 * clamp(lt / d); im.style.transformOrigin = '50% 0'; im.style.transform = `scale(${z})`; });
     const slt = Math.max(0, lt);
     SIMS.draw(SCRIPT.scenes[i].visual.kind, el, slt, d, cue);
+    const vv = SCRIPT.scenes[i].visual;
+    if (vv.kind === 'clip') {
+      const im = el.querySelector('img.clipimg'), avail = vv.frames / 25 - (vv.from ?? 0);
+      const r = vv.rate ?? Math.min(1.5, Math.max(0.6, avail / d));
+      const n = Math.max(1, Math.min(vv.frames, Math.floor(((vv.from ?? 0) + slt * r) * 25) + 1));
+      const src = `build/clips/${vv.clip}/${String(n).padStart(5, '0')}.jpg`;
+      if (im && !im.src.endsWith(src)) { im.src = src; waits.push(im.decode().catch(() => {})); }
+      const z = 1 + 0.025 * clamp(slt / d); if (im) im.style.transform = `scale(${z})`;
+    } else if (window.M97) window.M97.draw(vv.kind, el, slt, d, cue, vv);
     const pg = el.querySelector('iframe.pg'); if (pg) pg.contentWindow?.SENDA_VIZ?.seek(Math.max(0, slt - 0.3));
     const url = el.querySelector('.url'); if (url) { const p = ease((slt - Math.min(1.5, cue(1))) / 0.7); url.style.opacity = p; }
     el.querySelectorAll('.smap .ev').forEach((g, j) => { const r = g.querySelector('circle.ring'); if (!r) return; const base = g.classList.contains('bo') ? 60 : 9; const ph = (slt * 0.9 + j * 0.17) % 1; r.setAttribute('r', (base * (0.6 + 0.6 * ph)).toFixed(1)); r.style.opacity = String(1 - ph); });
@@ -541,6 +557,7 @@ window.seek = (t) => {
     subEl.textContent = activeSub;
     subEl.style.display = activeSub ? 'inline-block' : 'none';
   }
+  return waits.length ? Promise.all(waits) : undefined;
 };
 
 (async () => {
@@ -573,6 +590,7 @@ window.seek = (t) => {
   build();
   window.localizeDiagrams?.(document.getElementById('stage'), LANG);
   await SIMS.init();
+  if (window.M97) await window.M97.init(SCRIPT);
   SCRIPT.scenes.forEach((sc, i) => {
     if (!sceneInSlice(i)) return;
     const c = SIMS.canvasFor(sc.visual.kind);

@@ -1,0 +1,1029 @@
+{
+  "note": "Película final de SENDA (noviembre de 2026), capítulos nuevos. Generado por build-senda-final.mjs; no editar a mano.",
+  "voices": {
+    "es": {
+      "voice": "ef_dora",
+      "lang": "es",
+      "speed": 0.95
+    }
+  },
+  "scenes": [
+    {
+      "id": "a0",
+      "claim": "OBSERVED",
+      "source": [
+        "investor-next/public/senda/radar.html",
+        "packages/senda/src/alert-watch.mjs",
+        "investor-next/public/senda/data/alertas/instantanea.json"
+      ],
+      "visual": {
+        "kind": "clip",
+        "clip": "radar",
+        "frames": 1339,
+        "from": 0.5,
+        "caption": {
+          "es": "Grabación real · /senda/radar · avisos reales de fuentes públicas"
+        }
+      },
+      "title": {
+        "es": "Cuando todo se cae, alguien tiene que seguir viendo"
+      },
+      "es": [
+        "Esto no es una maqueta: es el radar de SENDA con avisos reales.",
+        "En la lectura del 22 de noviembre había 541 avisos y eventos de 5 fuentes públicas: AEMET y los servicios meteorológicos europeos a través de MeteoAlarm, los sismógrafos de USGS y EMSC, las alertas de la ONU en GDACS y los eventos de la NASA.",
+        "Esta película cuenta qué hace SENDA con todo eso, cómo lo hace y cómo se comprueba."
+      ],
+      "es_say": [
+        "Esto no es una maqueta: es el radar de Senda con avisos reales.",
+        "En la lectura del 22 de noviembre había 541 avisos y eventos de 5 fuentes públicas: Aemet y los servicios meteorológicos europeos a través de Meteoalarm, los sismógrafos de u ese ge ese y e eme ese ce, las alertas de la onu en gedacs y los eventos de la nasa.",
+        "Esta película cuenta qué hace Senda con todo eso, cómo lo hace y cómo se comprueba."
+      ]
+    },
+    {
+      "id": "a1",
+      "claim": "OBSERVED",
+      "source": [
+        "investor-next/public/media/m96/senda-m96-promo-es.mp4",
+        "investor-next/public/senda/estado.json"
+      ],
+      "visual": {
+        "kind": "kpis",
+        "kpis": [
+          {
+            "v": {
+              "es": "Capítulo 1"
+            },
+            "l": {
+              "es": "la película del 10 de noviembre: el porqué y la base"
+            }
+          },
+          {
+            "v": {
+              "es": "Capítulo 2"
+            },
+            "l": {
+              "es": "lo construido después: radar, sin datos, chat, simulador, drones, ciencia"
+            }
+          },
+          {
+            "v": {
+              "es": "910 pruebas"
+            },
+            "l": {
+              "es": "las cifras de hoy, al final"
+            }
+          }
+        ]
+      },
+      "title": {
+        "es": "Dos capítulos, una sola historia"
+      },
+      "es": [
+        "Primero verás la película del diez de noviembre: por qué existe SENDA, los accidentes que la motivaron y la ingeniería de base.",
+        "Sus cifras de pruebas son las de aquel día. Las de hoy, al final de esta película."
+      ],
+      "es_say": [
+        "Primero verás la película del diez de noviembre: por qué existe Senda, los accidentes que la motivaron y la ingeniería de base.",
+        "Sus cifras de pruebas son las de aquel día. Las de hoy, al final de esta película."
+      ]
+    },
+    {
+      "id": "b0",
+      "claim": "OBSERVED",
+      "source": [
+        "investor-next/public/senda/estado.json",
+        "investor-next/app/senda-home.tsx"
+      ],
+      "visual": {
+        "kind": "kpis",
+        "kpis": [
+          {
+            "v": {
+              "es": "Capítulo 2"
+            },
+            "l": {
+              "es": "lo nuevo, noviembre de 2026"
+            }
+          },
+          {
+            "v": {
+              "es": "5 fuentes"
+            },
+            "l": {
+              "es": "de avisos reales, leídas en vivo"
+            }
+          },
+          {
+            "v": {
+              "es": "910/910"
+            },
+            "l": {
+              "es": "pruebas del núcleo en verde hoy"
+            }
+          }
+        ]
+      },
+      "title": {
+        "es": "Capítulo 2: lo que hemos construido"
+      },
+      "es": [
+        "Capítulo dos. Lo que hemos construido en noviembre.",
+        "Todo lo que vas a ver se puede abrir en la web y su código se ejecuta en tu navegador."
+      ],
+      "es_say": [
+        "Capítulo dos. Lo que hemos construido en noviembre.",
+        "Todo lo que vas a ver se puede abrir en la web y su código se ejecuta en tu navegador."
+      ]
+    },
+    {
+      "id": "b1",
+      "claim": "OBSERVED",
+      "source": [
+        "investor-next/public/senda/ciclo.html",
+        "investor-next/public/senda/ciclo.mjs"
+      ],
+      "visual": {
+        "kind": "clip",
+        "clip": "ciclo",
+        "frames": 477,
+        "from": 0.8,
+        "caption": {
+          "es": "Grabación real · /senda/ciclo"
+        }
+      },
+      "title": {
+        "es": "El ojo que ve, y que no se queda mirando"
+      },
+      "es": [
+        "SENDA se resume en siete verbos: ve, previene, dirige, organiza, alerta, ayuda y gestiona.",
+        "Ve: junta satélite, cámaras públicas, sensores y avisos. Previene: calcula lo que viene. Dirige: elige el camino que sigue abierto.",
+        "Organiza los avisos en incidentes, prepara la alerta para quien la firma, ayuda con la gente cercana y deja todo escrito para rendir cuentas."
+      ],
+      "es_say": [
+        "Senda se resume en siete verbos: ve, previene, dirige, organiza, alerta, ayuda y gestiona.",
+        "Ve: junta satélite, cámaras públicas, sensores y avisos. Previene: calcula lo que viene. Dirige: elige el camino que sigue abierto.",
+        "Organiza los avisos en incidentes, prepara la alerta para quien la firma, ayuda con la gente cercana y deja todo escrito para rendir cuentas."
+      ]
+    },
+    {
+      "id": "b2",
+      "claim": "CALCULATED",
+      "source": [
+        "packages/senda/src/alert-watch.mjs",
+        "packages/senda/tests/alert-watch.test.mjs",
+        "docs/research/SENDA_RADAR_AVISOS_2026-11-20.md"
+      ],
+      "visual": {
+        "kind": "clip",
+        "clip": "radar",
+        "frames": 1339,
+        "from": 10,
+        "caption": {
+          "es": "Grabación real · zonas oficiales de aviso de AEMET dibujadas en el globo"
+        }
+      },
+      "title": {
+        "es": "Radar: SENDA rastrea los avisos por ti"
+      },
+      "es": [
+        "SENDA lee los avisos en cuanto se publican y los pone en el mismo idioma: qué pasa, dónde, cuándo empieza, cuándo acaba y quién lo dice.",
+        "Distingue un aviso oficial de una medida y de una alerta automática, y sabe si está previsto, vigente o cancelado. Las 253 zonas oficiales de España y Países Bajos tienen su forma real.",
+        "Cuando varias fuentes publican el mismo terremoto, lo junta: en la lectura del 22 de noviembre, 147 registros sísmicos se quedaron en 134 eventos, 12 de ellos vistos por más de una fuente."
+      ],
+      "es_say": [
+        "Senda lee los avisos en cuanto se publican y los pone en el mismo idioma: qué pasa, dónde, cuándo empieza, cuándo acaba y quién lo dice.",
+        "Distingue un aviso oficial de una medida y de una alerta automática, y sabe si está previsto, vigente o cancelado. Las 253 zonas oficiales de España y Países Bajos tienen su forma real.",
+        "Cuando varias fuentes publican el mismo terremoto, lo junta: en la lectura del 22 de noviembre, 147 registros sísmicos se quedaron en 134 eventos, 12 de ellos vistos por más de una fuente."
+      ]
+    },
+    {
+      "id": "b3",
+      "claim": "SIMULATED",
+      "source": [
+        "packages/senda/src/alert-watch.mjs",
+        "investor-next/public/senda/radar.mjs"
+      ],
+      "visual": {
+        "kind": "clip",
+        "clip": "radar",
+        "frames": 1339,
+        "from": 22,
+        "caption": {
+          "es": "Grabación real · los móviles del anillo son una simulación rotulada"
+        }
+      },
+      "title": {
+        "es": "Activar SENDA aquí: el radio de acción"
+      },
+      "es": [
+        "Con un aviso activo, SENDA calcula a quién despertar, y solo entre quien lo ha aceptado.",
+        "Dentro de la zona: la guía del aviso y dos botones, estoy bien o necesito ayuda. En el anillo de alrededor: testigos que confirman lo que ven y móviles con datos que hacen de pasarela para los vecinos sin red.",
+        "Y si el aviso es para mañana, SENDA se adelanta: guarda mapas y rutas y enciende las pasarelas antes de que caiga la red. La alerta pública la emite siempre el organismo competente."
+      ],
+      "es_say": [
+        "Con un aviso activo, Senda calcula a quién despertar, y solo entre quien lo ha aceptado.",
+        "Dentro de la zona: la guía del aviso y dos botones, estoy bien o necesito ayuda. En el anillo de alrededor: testigos que confirman lo que ven y móviles con datos que hacen de pasarela para los vecinos sin red.",
+        "Y si el aviso es para mañana, Senda se adelanta: guarda mapas y rutas y enciende las pasarelas antes de que caiga la red. La alerta pública la emite siempre el organismo competente."
+      ]
+    },
+    {
+      "id": "b4",
+      "claim": "CALCULATED",
+      "source": [
+        "packages/senda/src/stranger-gateway.mjs",
+        "docs/research/SENDA_MENSAJERIA_SIN_COBERTURA_2026-11-20.md"
+      ],
+      "visual": {
+        "kind": "route",
+        "kick": "Arnhem → San Martín de Valdeiglesias",
+        "tag": "cálculo",
+        "title": "Tu hermano no tiene datos. Alguien a su lado sí.",
+        "bbox": [
+          -10.5,
+          9.5,
+          37.5,
+          54.5
+        ],
+        "points": [
+          {
+            "label": "Tú · Arnhem",
+            "lat": 51.98,
+            "lon": 5.91,
+            "color": "#91d7e8"
+          },
+          {
+            "label": "Buzón cegado (Internet)",
+            "lat": 47,
+            "lon": 3,
+            "color": "#b48cff",
+            "leg": "Internet",
+            "dx": 10,
+            "dy": 18
+          },
+          {
+            "label": "Vecina con 4G",
+            "lat": 40.55,
+            "lon": -4,
+            "color": "#34d399",
+            "leg": "su conexión",
+            "dx": 12,
+            "dy": -8
+          },
+          {
+            "label": "Tu hermano · sin datos",
+            "lat": 40.36,
+            "lon": -4.4,
+            "color": "#ff7756",
+            "leg": "Bluetooth",
+            "dash": true,
+            "dx": -150,
+            "dy": 26
+          }
+        ],
+        "foot": "Recorrido ilustrativo; las posiciones de la vecina y del buzón son simbólicas."
+      },
+      "title": {
+        "es": "Sin datos, pero no solo"
+      },
+      "es": [
+        "WhatsApp necesita que tu móvil tenga datos. SENDA no habla con WhatsApp ni lo sustituye: entra cuando no hay red.",
+        "El móvil sin datos busca por Bluetooth otro móvil SENDA cercano que sí tenga conexión y que haya aceptado prestarla, aunque sea un desconocido.",
+        "Le entrega el mensaje cifrado, esa persona lo sube a un buzón, y tú lo recoges en el otro extremo de Europa."
+      ],
+      "es_say": [
+        "guasap necesita que tu móvil tenga datos. Senda no habla con guasap ni lo sustituye: entra cuando no hay red.",
+        "El móvil sin datos busca por blutuz otro móvil Senda cercano que sí tenga conexión y que haya aceptado prestarla, aunque sea un desconocido.",
+        "Le entrega el mensaje cifrado, esa persona lo sube a un buzón, y tú lo recoges en el otro extremo de Europa."
+      ]
+    },
+    {
+      "id": "b5",
+      "claim": "OBSERVED",
+      "source": [
+        "investor-next/public/senda/viaje-desconocido.mjs",
+        "packages/senda/tests/stranger-gateway.test.mjs"
+      ],
+      "visual": {
+        "kind": "clip",
+        "clip": "sindatos",
+        "frames": 619,
+        "from": 0.5,
+        "caption": {
+          "es": "Grabación real · /senda/viaje#desconocido · criptografía real en el navegador"
+        }
+      },
+      "title": {
+        "es": "La prueba, ejecutada de verdad"
+      },
+      "es": [
+        "Esto es la criptografía real funcionando en el navegador.",
+        "Dos vecinos prestan su conexión; uno no ha dado permiso y otro tiene poca batería, así que ni se anuncian. Cada vecino devuelve un recibo firmado: es el primer tic.",
+        "El mensaje se trocea: bastan dos trozos de cuatro. Repartir entre desconocidos gana a confiar en uno solo: con tres pasarelas del noventa, setenta y sesenta por ciento, la entrega sube del 90 al 97 por ciento."
+      ],
+      "es_say": [
+        "Esto es la criptografía real funcionando en el navegador.",
+        "Dos vecinos prestan su conexión; uno no ha dado permiso y otro tiene poca batería, así que ni se anuncian. Cada vecino devuelve un recibo firmado: es el primer tic.",
+        "El mensaje se trocea: bastan dos trozos de cuatro. Repartir entre desconocidos gana a confiar en uno solo: con tres pasarelas del noventa, setenta y sesenta por ciento, la entrega sube del 90 al 97 por ciento."
+      ]
+    },
+    {
+      "id": "b6",
+      "claim": "CALCULATED",
+      "source": [
+        "packages/senda/src/envelope.mjs",
+        "packages/senda/src/stranger-gateway.mjs",
+        "packages/senda/src/erasure.mjs"
+      ],
+      "visual": {
+        "kind": "breakdown",
+        "kick": "Despiece de un mensaje",
+        "tag": "medido",
+        "title": "Lo que lleva dentro, capa a capa",
+        "seenLabel": "Lo que ve quien te ayuda",
+        "layers": [
+          {
+            "label": "Tu texto",
+            "note": "lo único que lee tu destinatario",
+            "size": "70 B",
+            "color": "#eef3f4"
+          },
+          {
+            "label": "Sobre de extremo a extremo",
+            "note": "firma ECDSA + cifrado AES-GCM con clave efímera",
+            "size": "384 B",
+            "color": "#34d399"
+          },
+          {
+            "label": "Sobre exterior",
+            "note": "oculta incluso a quién va; buzón que cambia cada día",
+            "size": "412 B",
+            "color": "#91d7e8"
+          },
+          {
+            "label": "Trozos k-de-n",
+            "note": "cuatro trozos; bastan dos cualesquiera",
+            "size": "4 × 211 B",
+            "color": "#b48cff"
+          },
+          {
+            "label": "Baliza de la pasarela",
+            "note": "tengo datos, batería, cuota; identificador que rota",
+            "size": "18 B",
+            "color": "#fbbf24"
+          }
+        ],
+        "foot": "Tamaños medidos con el núcleo al construir la película."
+      },
+      "title": {
+        "es": "Quien te ayuda no puede leer nada"
+      },
+      "es": [
+        "Tu texto ocupa 70 bytes. El sobre de extremo a extremo lo firma y lo cifra: 384 bytes.",
+        "Encima va un sobre exterior que oculta hasta a quién va el mensaje. El buzón es un número que cambia cada día y que solo vosotros dos sabéis calcular.",
+        "Quien presta su conexión ve bytes aleatorios. Y para evitar abusos, pide un pequeño cálculo que tu móvil resuelve en milisegundos y que a un atacante masivo le sale caro."
+      ],
+      "es_say": [
+        "Tu texto ocupa 70 bytes. El sobre de extremo a extremo lo firma y lo cifra: 384 bytes.",
+        "Encima va un sobre exterior que oculta hasta a quién va el mensaje. El buzón es un número que cambia cada día y que solo vosotros dos sabéis calcular.",
+        "Quien presta su conexión ve bytes aleatorios. Y para evitar abusos, pide un pequeño cálculo que tu móvil resuelve en milisegundos y que a un atacante masivo le sale caro."
+      ]
+    },
+    {
+      "id": "b7",
+      "claim": "SIMULATED",
+      "source": [
+        "packages/senda/src/stranger-gateway.mjs"
+      ],
+      "visual": {
+        "kind": "graph",
+        "kick": "Tiempo hasta que el mensaje sale a Internet",
+        "tag": "simulación · ejemplo",
+        "title": "Lo que decide es el alcance, no la app",
+        "log": true,
+        "bars": [
+          {
+            "label": "Ciudad · 5.000 habitantes por km²",
+            "value": 31.855598849807052,
+            "shown": "32 s",
+            "color": "#34d399",
+            "note": "mediana, Monte Carlo"
+          },
+          {
+            "label": "Pueblo con una pasarela de 120 m (bar, ayuntamiento)",
+            "value": 2260.4104525296675,
+            "shown": "38 min",
+            "color": "#91d7e8",
+            "note": "el alcance entra al cuadrado"
+          },
+          {
+            "label": "Pueblo · 60 habitantes por km², alcance 40 m",
+            "value": 7216.557424996384,
+            "shown": "2,0 h",
+            "color": "#ff7756",
+            "note": "andando, sin pasarelas fijas"
+          }
+        ],
+        "foot": "Ejemplo declarado: 5 % de personas con SENDA, datos y permiso. Escala logarítmica."
+      },
+      "title": {
+        "es": "Cuánto tarda en salir el mensaje"
+      },
+      "es": [
+        "La física manda. Las pasarelas cercanas siguen un proceso de Poisson en el espacio, y el alcance de radio entra al cuadrado.",
+        "En una ciudad, el mensaje sale en una mediana de 32 segundos. En un pueblo, andando, unas 2,0 horas.",
+        "Con una sola pasarela fija de buen alcance, el Wi-Fi del bar o del ayuntamiento, baja a unos 38 minutos. Esa es la recomendación concreta para un piloto municipal."
+      ],
+      "es_say": [
+        "La física manda. Las pasarelas cercanas siguen un proceso de Poisson en el espacio, y el alcance de radio entra al cuadrado.",
+        "En una ciudad, el mensaje sale en una mediana de 32 segundos. En un pueblo, andando, unas 2,0 horas.",
+        "Con una sola pasarela fija de buen alcance, el uaifai del bar o del ayuntamiento, baja a unos 38 minutos. Esa es la recomendación concreta para un piloto municipal."
+      ]
+    },
+    {
+      "id": "b8",
+      "claim": "CALCULATED",
+      "source": [
+        "packages/senda/src/familiar-chat.mjs",
+        "packages/senda/tests/familiar-chat-smoke.test.mjs"
+      ],
+      "visual": {
+        "kind": "ticks",
+        "kick": "El chat de siempre",
+        "tag": "medido",
+        "title": "Lo que ya sabes usar, por cualquier vía",
+        "bubbles": [
+          {
+            "me": true,
+            "text": "Estamos bien. Sin cobertura en el pueblo.",
+            "ticks": [
+              {
+                "l": "🕓 en tu móvil"
+              },
+              {
+                "l": "✓ alguien lo lleva (recibo firmado)"
+              },
+              {
+                "l": "✓✓ entregado (solo lo prueba el destinatario)",
+                "c": "blue"
+              }
+            ]
+          },
+          {
+            "me": true,
+            "img": "m97-thumb-100.png",
+            "text": "Foto · 78 B por LoRa",
+            "ticks": [
+              {
+                "l": "✓ vista previa enviada"
+              },
+              {
+                "l": "✓✓ la foto completa, cuando haya Wi-Fi",
+                "c": "blue"
+              }
+            ]
+          },
+          {
+            "me": false,
+            "img": "m97-thumb-2400.png",
+            "text": "La misma foto · 2308 B"
+          },
+          {
+            "me": true,
+            "text": "Nota de voz de 10 s · 875 B (Codec2)",
+            "ticks": [
+              {
+                "l": "✓ enviada"
+              },
+              {
+                "l": "✓✓ escuchada",
+                "c": "blue"
+              }
+            ]
+          }
+        ],
+        "foot": "Miniaturas decodificadas por el códec real del núcleo a partir de una foto de la DANA."
+      },
+      "title": {
+        "es": "Un chat que ya conoces"
+      },
+      "es": [
+        "Dentro de SENDA está lo que ya conoces: chats, grupos, notas de voz, fotos, ubicación y estados.",
+        "Lo nuevo es que cada tic se puede comprobar: uno, alguien lleva tu mensaje y lo firma; dos, ha llegado, y eso solo lo puede probar el destinatario.",
+        "Una foto viaja primero como vista previa de 78 bytes por radio LoRa, y se completa cuando aparece el Wi-Fi. Diez segundos de voz caben en 875 bytes. Y en un grupo de ocho, la clave compartida gasta 4,2 veces menos datos."
+      ],
+      "es_say": [
+        "Dentro de Senda está lo que ya conoces: chats, grupos, notas de voz, fotos, ubicación y estados.",
+        "Lo nuevo es que cada tic se puede comprobar: uno, alguien lleva tu mensaje y lo firma; dos, ha llegado, y eso solo lo puede probar el destinatario.",
+        "Una foto viaja primero como vista previa de 78 bytes por radio Lora, y se completa cuando aparece el uaifai. Diez segundos de voz caben en 875 bytes. Y en un grupo de ocho, la clave compartida gasta 4,2 veces menos datos."
+      ]
+    },
+    {
+      "id": "b9",
+      "claim": "SIMULATED",
+      "source": [
+        "investor-next/public/senda/ciclo.mjs",
+        "packages/senda/src/drive-autostart.mjs",
+        "packages/senda/src/hazard-reports.mjs"
+      ],
+      "visual": {
+        "kind": "clip",
+        "clip": "malla",
+        "frames": 685,
+        "from": 0,
+        "caption": {
+          "es": "Grabación real · /senda/ciclo#malla · carreteras y coches simulados"
+        }
+      },
+      "title": {
+        "es": "Cada conductor puede ser un salvavidas"
+      },
+      "es": [
+        "Como en Waze, SENDA se activa sola al subir al coche, pero solo si la persona lo ha aceptado.",
+        "Hay un accidente: con un solo aviso, SENDA no lo da por cierto, 43 por ciento. El 112 pide ayuda cercana; quien está más cerca acepta o no.",
+        "Con dos testigos, la probabilidad sube al 69 y luego al 87 por ciento, con reglas que cualquiera puede auditar."
+      ],
+      "es_say": [
+        "Como en Waze, Senda se activa sola al subir al coche, pero solo si la persona lo ha aceptado.",
+        "Hay un accidente: con un solo aviso, Senda no lo da por cierto, 43 por ciento. El uno uno dos pide ayuda cercana; quien está más cerca acepta o no.",
+        "Con dos testigos, la probabilidad sube al 69 y luego al 87 por ciento, con reglas que cualquiera puede auditar."
+      ]
+    },
+    {
+      "id": "b10",
+      "claim": "SIMULATED",
+      "source": [
+        "investor-next/public/senda/simulador.mjs",
+        "packages/senda/src/wildfire.mjs",
+        "investor-next/public/senda/data/smv2026/fire3d.json"
+      ],
+      "visual": {
+        "kind": "clip",
+        "clip": "simfuego",
+        "frames": 1255,
+        "from": 0,
+        "caption": {
+          "es": "Grabación real · /senda/simulador · relieve y satélite reales, avance simulado"
+        }
+      },
+      "title": {
+        "es": "Simulador 3D: el fuego, con pocos datos"
+      },
+      "es": [
+        "Relieve real de San Martín de Valdeiglesias, imágenes Sentinel-2 y la masa de aire de ese día, por capas.",
+        "Con un punto de ignición y el viento, SENDA calcula el avance del fuego sobre el terreno en menos de un segundo.",
+        "Y se compara con lo que vio el satélite, sin maquillar: sin calibrar acierta menos que un círculo, 0,013 frente a 0,131; calibrado con el propio incendio llega a 0,352. Falta validarlo con otros incendios."
+      ],
+      "es_say": [
+        "Relieve real de San Martín de Valdeiglesias, imágenes Sentinel-2 y la masa de aire de ese día, por capas.",
+        "Con un punto de ignición y el viento, Senda calcula el avance del fuego sobre el terreno en menos de un segundo.",
+        "Y se compara con lo que vio el satélite, sin maquillar: sin calibrar acierta menos que un círculo, 0,013 frente a 0,131; calibrado con el propio incendio llega a 0,352. Falta validarlo con otros incendios."
+      ]
+    },
+    {
+      "id": "b11",
+      "claim": "SIMULATED",
+      "source": [
+        "investor-next/public/senda/simulador.mjs",
+        "packages/senda/src/seismic.mjs"
+      ],
+      "visual": {
+        "kind": "clip",
+        "clip": "simagua",
+        "frames": 834,
+        "from": 0,
+        "caption": {
+          "es": "Grabación real · nivel del agua y epicentro simulados"
+        }
+      },
+      "title": {
+        "es": "Agua que sube y terremotos"
+      },
+      "es": [
+        "Sube el nivel del agua y el simulador marca lo que queda por debajo. Es un modelo de bañera: sirve para ver las zonas bajas, no sustituye a un modelo hidráulico.",
+        "Con un terremoto, los primeros seis móviles que lo notan bastan para situar el epicentro, y SENDA calcula cuántos segundos faltan para que llegue la onda que más daña a cada pueblo."
+      ],
+      "es_say": [
+        "Sube el nivel del agua y el simulador marca lo que queda por debajo. Es un modelo de bañera: sirve para ver las zonas bajas, no sustituye a un modelo hidráulico.",
+        "Con un terremoto, los primeros seis móviles que lo notan bastan para situar el epicentro, y Senda calcula cuántos segundos faltan para que llegue la onda que más daña a cada pueblo."
+      ]
+    },
+    {
+      "id": "b12",
+      "claim": "CALCULATED",
+      "source": [
+        "packages/senda/src/smoke-exposure.mjs",
+        "packages/senda/tests/familiar-chat-smoke.test.mjs"
+      ],
+      "visual": {
+        "kind": "graph",
+        "kick": "Humo en el suelo por cada gramo por segundo emitido",
+        "tag": "cálculo",
+        "title": "El humo que más daña llega de noche",
+        "log": true,
+        "bars": [
+          {
+            "label": "Rescoldo de noche · pluma a 100 m, atmósfera estable",
+            "value": 0.6357397214421242,
+            "shown": "0,64 µg/m³",
+            "color": "#ff7756",
+            "note": "máximo en el suelo"
+          },
+          {
+            "label": "Llamas de día · pluma a 1880 m",
+            "value": 0.000022836528761375826,
+            "shown": "2,3e-5 µg/m³",
+            "color": "#91d7e8",
+            "note": "la pluma se queda arriba"
+          }
+        ],
+        "foot": "Penacho gaussiano con reflexión, Briggs y Pasquill–Turner; masa conservada (100,0 %). Terreno llano."
+      },
+      "title": {
+        "es": "Calidad del aire, calculada desde casa"
+      },
+      "es": [
+        "Desde casa, con los datos de SENDA, se puede calcular cuánto humo llega al suelo a sotavento de un incendio.",
+        "El resultado sorprende: por cada gramo emitido, el rescoldo de la noche llega al suelo unas 28.000 veces más que las llamas del día, cuya pluma se queda arriba.",
+        "Por eso el aviso de calidad del aire tiene que mirar la noche. El modelo conserva la masa y declara sus límites: terreno llano y sin química."
+      ],
+      "es_say": [
+        "Desde casa, con los datos de Senda, se puede calcular cuánto humo llega al suelo a sotavento de un incendio.",
+        "El resultado sorprende: por cada gramo emitido, el rescoldo de la noche llega al suelo unas 28.000 veces más que las llamas del día, cuya pluma se queda arriba.",
+        "Por eso el aviso de calidad del aire tiene que mirar la noche. El modelo conserva la masa y declara sus límites: terreno llano y sin química."
+      ]
+    },
+    {
+      "id": "b13",
+      "claim": "SIMULATED",
+      "source": [
+        "investor-next/public/senda/dron.html",
+        "packages/senda/src/drone.mjs",
+        "packages/senda/src/sovereign-mesh-kit.mjs"
+      ],
+      "visual": {
+        "kind": "clip",
+        "clip": "dron",
+        "frames": 499,
+        "from": 0.5,
+        "caption": {
+          "es": "Grabación real · /senda/dron · edificio simulado"
+        }
+      },
+      "title": {
+        "es": "Drones: contar personas sin entrar"
+      },
+      "es": [
+        "Los drones se comunican con SENDA por estándares abiertos: identificación remota Open Drone ID, con mensajes de 25 bytes por Bluetooth y Wi-Fi, y telemetría MAVLink firmada.",
+        "Aquí, el dron recorre la fachada y escucha los teléfonos planta a planta. Las direcciones Bluetooth cambian solas: contarlas engaña, así que SENDA deduce teléfonos distintos y da un intervalo honesto, sin identificar a nadie."
+      ],
+      "es_say": [
+        "Los drones se comunican con Senda por estándares abiertos: identificación remota open dron ai di, con mensajes de 25 bytes por blutuz y uaifai, y telemetría mavlink firmada.",
+        "Aquí, el dron recorre la fachada y escucha los teléfonos planta a planta. Las direcciones blutuz cambian solas: contarlas engaña, así que Senda deduce teléfonos distintos y da un intervalo honesto, sin identificar a nadie."
+      ]
+    },
+    {
+      "id": "b14",
+      "claim": "SIMULATED",
+      "source": [
+        "investor-next/public/senda/barrido.html",
+        "packages/senda/src/bearers.mjs"
+      ],
+      "visual": {
+        "kind": "clip",
+        "clip": "barrido",
+        "frames": 398,
+        "from": 0,
+        "caption": {
+          "es": "Grabación real · /senda/barrido · zona simulada"
+        }
+      },
+      "title": {
+        "es": "Dron casa por casa, y dron mula"
+      },
+      "es": [
+        "Después del daño, el dron recorre las casas en el orden que más vidas puede salvar, con sus cambios de batería planificados.",
+        "Y cuando una zona queda aislada, el dron hace de mula: recoge los mensajes cifrados de los móviles de abajo y los entrega donde hay red. Para SENDA es un portador más, con su probabilidad y su retardo."
+      ],
+      "es_say": [
+        "Después del daño, el dron recorre las casas en el orden que más vidas puede salvar, con sus cambios de batería planificados.",
+        "Y cuando una zona queda aislada, el dron hace de mula: recoge los mensajes cifrados de los móviles de abajo y los entrega donde hay red. Para Senda es un portador más, con su probabilidad y su retardo."
+      ]
+    },
+    {
+      "id": "b15",
+      "claim": "OBSERVED",
+      "source": [
+        "investor-next/public/senda/sala.html",
+        "investor-next/public/senda/data/dana2024/emsr773.json"
+      ],
+      "visual": {
+        "kind": "clip",
+        "clip": "sala",
+        "frames": 1125,
+        "from": 0,
+        "caption": {
+          "es": "Grabación real · /senda/sala · DANA de 2024, agua observada por Copernicus"
+        }
+      },
+      "title": {
+        "es": "Sala de decisión: la DANA real"
+      },
+      "es": [
+        "Para quien coordina, una pantalla de operador sobre la DANA de dos mil veinticuatro: agua observada por Copernicus, calles cortadas y servicios sin acceso.",
+        "Cinco pasos hasta una alerta firmada que una persona revisa y autoriza."
+      ],
+      "es_say": [
+        "Para quien coordina, una pantalla de operador sobre la dana de dos mil veinticuatro: agua observada por Copernicus, calles cortadas y servicios sin acceso.",
+        "Cinco pasos hasta una alerta firmada que una persona revisa y autoriza."
+      ]
+    },
+    {
+      "id": "b16",
+      "claim": "CALCULATED",
+      "source": [
+        "packages/senda/src/erasure.mjs",
+        "packages/senda/src/bearers.mjs",
+        "packages/senda/src/delivery-assurance.mjs",
+        "packages/senda/src/stranger-gateway.mjs",
+        "packages/senda/src/envelope.mjs",
+        "packages/senda/src/hazard-reports.mjs",
+        "packages/senda/src/wildfire.mjs",
+        "packages/senda/src/smoke-exposure.mjs",
+        "packages/senda/src/seismic.mjs",
+        "packages/senda/src/atmos3d.mjs"
+      ],
+      "visual": {
+        "kind": "formulas",
+        "kick": "En qué se basa cada cálculo",
+        "tag": "núcleo",
+        "title": "Matemática y física, con nombre y apellido",
+        "items": [
+          {
+            "name": "Reed–Solomon GF(2⁸)",
+            "eq": "k de n trozos → mensaje",
+            "gives": "Cualquier k trozos rehacen el mensaje exacto.",
+            "color": "#34d399"
+          },
+          {
+            "name": "Poisson-binomial",
+            "eq": "P(≥k) = Σ Π pᵢ",
+            "gives": "Probabilidad exacta de entrega por varias vías.",
+            "color": "#34d399"
+          },
+          {
+            "name": "Beta-Binomial",
+            "eq": "Beta(α+éxitos, β+fallos)",
+            "gives": "Fiabilidad aprendida de recibos firmados.",
+            "color": "#91d7e8"
+          },
+          {
+            "name": "Espacio libre",
+            "eq": "FSPL = 20log d + 20log f − 147,55",
+            "gives": "Hasta dónde llega cada radio.",
+            "color": "#91d7e8"
+          },
+          {
+            "name": "Poisson espacial",
+            "eq": "P(≥1) = 1 − e^(−ρφπr²)",
+            "gives": "Cuántas pasarelas hay al alcance.",
+            "color": "#fbbf24"
+          },
+          {
+            "name": "Hashcash",
+            "eq": "2ᵇ intentos ↔ 1 hash",
+            "gives": "Frena el abuso sin pedir identidad.",
+            "color": "#fbbf24"
+          },
+          {
+            "name": "ECDH · AES-GCM · ECDSA",
+            "eq": "P-256 · 256 bits",
+            "gives": "Nadie en medio lee ni falsifica.",
+            "color": "#b48cff"
+          },
+          {
+            "name": "Bayes con verosimilitudes",
+            "eq": "odds × LR por testigo",
+            "gives": "Credibilidad auditable de un aviso.",
+            "color": "#b48cff"
+          },
+          {
+            "name": "Tiempo mínimo de llegada",
+            "eq": "elipse de viento · tan²φ",
+            "gives": "Avance del fuego sobre el relieve real.",
+            "color": "#ff7756"
+          },
+          {
+            "name": "Penacho gaussiano · Briggs",
+            "eq": "C = Q/(πuσyσz)·e^(−H²/2σz²)",
+            "gives": "Humo en el suelo, conservando la masa.",
+            "color": "#ff7756"
+          }
+        ],
+        "foot": "Cada fórmula vive en un módulo del núcleo con sus pruebas."
+      },
+      "title": {
+        "es": "En qué se basa, y qué aporta"
+      },
+      "es": [
+        "Nada de esto es magia. Cada cálculo tiene nombre y apellido.",
+        "Reed-Solomon, para que basten unos pocos trozos; la binomial de Poisson para la probabilidad exacta de entrega; Beta-Binomial para aprender de los recibos.",
+        "La pérdida en espacio libre y el proceso de Poisson espacial para saber a quién alcanzas; hashcash para frenar abusos; criptografía estándar de curva elíptica; Bayes para la credibilidad; y la física del fuego y del humo para prevenir."
+      ],
+      "es_say": [
+        "Nada de esto es magia. Cada cálculo tiene nombre y apellido.",
+        "Reed-Solomon, para que basten unos pocos trozos; la binomial de Poisson para la probabilidad exacta de entrega; Beta-Binomial para aprender de los recibos.",
+        "La pérdida en espacio libre y el proceso de Poisson espacial para saber a quién alcanzas; hashcash para frenar abusos; criptografía estándar de curva elíptica; Bayes para la credibilidad; y la física del fuego y del humo para prevenir."
+      ]
+    },
+    {
+      "id": "b17",
+      "claim": "OBSERVED",
+      "source": [
+        "docs/research/SENDA_MENSAJERIA_SIN_COBERTURA_2026-11-20.md",
+        "docs/research/SENDA_RADAR_AVISOS_2026-11-20.md"
+      ],
+      "visual": {
+        "kind": "rivals",
+        "kick": "Con quién nos comparan",
+        "tag": "posicionamiento",
+        "title": "No venimos a sustituir a nadie: nos sumamos",
+        "cols": [
+          "Quién",
+          "Qué hace",
+          "Qué añade SENDA"
+        ],
+        "rows": [
+          {
+            "name": "WhatsApp · Instagram",
+            "what": "mensajería y redes",
+            "gap": "Funcionan con datos o Wi-Fi.",
+            "join": "Entra cuando no hay red; no las toca."
+          },
+          {
+            "name": "Briar · Bridgefy",
+            "what": "mensajes entre móviles cercanos",
+            "gap": "Bluetooth y Wi-Fi entre teléfonos.",
+            "join": "Suma satélite, LoRa, SMS y pasarelas, con probabilidad exacta."
+          },
+          {
+            "name": "Meshtastic · goTenna",
+            "what": "radios de malla",
+            "gap": "Equipos de radio dedicados.",
+            "join": "Los usa como un portador más."
+          },
+          {
+            "name": "Satélite al móvil",
+            "what": "SOS y mensajes por satélite",
+            "gap": "Según móvil, operador y país.",
+            "join": "Lo reparte con las demás vías, con su coste y su ley."
+          },
+          {
+            "name": "ES-Alert · AlertCops",
+            "what": "avisos oficiales y app del Ministerio",
+            "gap": "Avisan; la respuesta vuelve por la red.",
+            "join": "Lee los avisos y prepara la respuesta de vuelta sin red."
+          },
+          {
+            "name": "Everbridge · Palantir",
+            "what": "plataformas para organismos",
+            "gap": "Gestión y análisis para quien decide.",
+            "join": "Capa de campo abierta que exporta CAP."
+          }
+        ],
+        "foot": "Descripciones generales y públicas de cada producto; SENDA no afirma nada de su funcionamiento interno."
+      },
+      "title": {
+        "es": "Contra quién competimos, y cómo nos sumamos"
+      },
+      "es": [
+        "Nos comparan con aplicaciones de mensajería, con redes de malla, con el satélite en el móvil y con plataformas para organismos.",
+        "SENDA no viene a sustituir a ninguno. Es la capa que los junta: usa cada vía que exista, lee los avisos oficiales y exporta en CAP, el estándar abierto de avisos.",
+        "Lo que nadie hace a la vez es esto: seguir funcionando sin red, decir con qué probabilidad llegará cada mensaje y coordinar a la gente cercana hasta que llegan los servicios de emergencia."
+      ],
+      "es_say": [
+        "Nos comparan con aplicaciones de mensajería, con redes de malla, con el satélite en el móvil y con plataformas para organismos.",
+        "Senda no viene a sustituir a ninguno. Es la capa que los junta: usa cada vía que exista, lee los avisos oficiales y exporta en cap, el estándar abierto de avisos.",
+        "Lo que nadie hace a la vez es esto: seguir funcionando sin red, decir con qué probabilidad llegará cada mensaje y coordinar a la gente cercana hasta que llegan los servicios de emergencia."
+      ]
+    },
+    {
+      "id": "b18",
+      "claim": "OBSERVED",
+      "source": [
+        "packages/senda/src/interop.mjs",
+        "investor-next/public/senda/paises.html",
+        "packages/senda/src/alert-watch.mjs"
+      ],
+      "visual": {
+        "kind": "kpis",
+        "kpis": [
+          {
+            "v": {
+              "es": "CAP 1.2"
+            },
+            "l": {
+              "es": "estándar abierto de avisos (OASIS)"
+            }
+          },
+          {
+            "v": {
+              "es": "112"
+            },
+            "l": {
+              "es": "número común de emergencias en la Unión Europea"
+            }
+          },
+          {
+            "v": {
+              "es": "MeteoAlarm"
+            },
+            "l": {
+              "es": "avisos oficiales de los servicios meteorológicos europeos"
+            }
+          }
+        ]
+      },
+      "title": {
+        "es": "Europa: el mismo núcleo en todos los países"
+      },
+      "es": [
+        "El mismo núcleo sirve en toda Europa: el 112 es común, los avisos meteorológicos oficiales se publican juntos en MeteoAlarm y los avisos se intercambian en CAP.",
+        "De España a los Países Bajos cambian los idiomas y las carreteras; el código es el mismo."
+      ],
+      "es_say": [
+        "El mismo núcleo sirve en toda Europa: el uno uno dos es común, los avisos meteorológicos oficiales se publican juntos en Meteoalarm y los avisos se intercambian en cap.",
+        "De España a los Países Bajos cambian los idiomas y las carreteras; el código es el mismo."
+      ]
+    },
+    {
+      "id": "b19",
+      "claim": "OBSERVED",
+      "source": [
+        "investor-next/public/senda/estado.json",
+        "scripts/prove.mjs"
+      ],
+      "visual": {
+        "kind": "kpis",
+        "kpis": [
+          {
+            "v": {
+              "es": "910/910"
+            },
+            "l": {
+              "es": "pruebas del núcleo, hoy"
+            }
+          },
+          {
+            "v": {
+              "es": "157/157"
+            },
+            "l": {
+              "es": "pruebas de la web"
+            }
+          },
+          {
+            "v": {
+              "es": "0"
+            },
+            "l": {
+              "es": "auditorías externas completadas (pendiente)"
+            }
+          }
+        ]
+      },
+      "title": {
+        "es": "Comprobado hoy, y lo que falta"
+      },
+      "es": [
+        "Hoy el núcleo pasa 910 pruebas de 910, y la web 157 de 157. Las afirmaciones públicas se comprueban con un programa antes de publicarse.",
+        "Lo que falta, dicho claro: ensayos de campo, una auditoría externa, convenios con los organismos y calibrar los modelos con más incidentes reales."
+      ],
+      "es_say": [
+        "Hoy el núcleo pasa 910 pruebas de 910, y la web 157 de 157. Las afirmaciones públicas se comprueban con un programa antes de publicarse.",
+        "Lo que falta, dicho claro: ensayos de campo, una auditoría externa, convenios con los organismos y calibrar los modelos con más incidentes reales."
+      ]
+    },
+    {
+      "id": "b20",
+      "claim": "OBSERVED",
+      "source": [
+        "investor-next/app/senda-home.tsx",
+        "LICENSE"
+      ],
+      "visual": {
+        "kind": "cta"
+      },
+      "title": {
+        "es": "Para que ningún mensaje se pierda"
+      },
+      "es": [
+        "SENDA coordina hasta que llegan los servicios de emergencia, y les ayuda a coordinar mejor.",
+        "Pruébalo ahora, sin instalar nada, en la dirección que ves en pantalla."
+      ],
+      "es_say": [
+        "Senda coordina hasta que llegan los servicios de emergencia, y les ayuda a coordinar mejor.",
+        "Pruébalo ahora, sin instalar nada, en la dirección que ves en pantalla."
+      ]
+    }
+  ]
+}
