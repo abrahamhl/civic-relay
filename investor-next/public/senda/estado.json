@@ -4,8 +4,8 @@
   "defense": 23,
   "relay": 3,
   "web": 157,
-  "sha": "e49a41cfb34f52cae7d330bb592bd44010fb3a71",
-  "generatedAt": "2026-11-20T18:35:42.054Z",
+  "sha": "22cfe77bda2c9ce9227f0af7e042b11752329ac6",
+  "generatedAt": "2026-11-22T19:01:38.202Z",
   "evidenceKind": "BUILD_EXECUTED_SOFTWARE_TESTS",
   "suites": {
     "core": {

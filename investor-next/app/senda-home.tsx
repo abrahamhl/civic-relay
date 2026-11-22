@@ -34,6 +34,8 @@ const C = {
     reel1Desc: 'Qué ocurre cuando cae toda la red eléctrica y cómo SENDA sigue moviendo mensajes por canales alternativos.',
     reel3T: 'Matemáticas que Salvan Vidas',
     reel3Desc: 'Atenuación por lluvia, difracción y códigos que reconstruyen mensajes: la física detrás de SENDA, en simulación.',
+    finalT: 'La película final de SENDA · noviembre de 2026',
+    finalNote: 'La película completa: la del 10 de noviembre con sus cifras puestas al día y el capítulo 2 con todo lo nuevo (radar de avisos, mensajes sin datos, chat, malla de conductores, simulador 3D, humo, drones, la ciencia de cada cálculo, la competencia y Europa). Narración en español con subtítulos y capítulos navegables. Las simulaciones están rotuladas como tales.',
     promoT: 'Película completa 2026: por qué existe SENDA, cómo funciona y qué está probado',
     promoNote: 'Unos 12 minutos. El origen del proyecto, los accidentes en España que lo motivan (Angrois, incendios de la sierra oeste, DANA, apagón, Adamuz y Gelida), el hueco que nadie cubre y todas las funciones civiles. Cada simulación la calcula fotograma a fotograma el mismo núcleo que pasan las pruebas automáticas. Locución en español; versión en inglés con subtítulos ES / EN / NL.',
     promoAltEs: 'Versión en español (MP4)',
@@ -125,6 +127,8 @@ const C = {
     reel1Desc: 'What happens when the whole power grid fails and how SENDA keeps moving messages over alternative channels.',
     reel3T: 'Mathematics Saving Lives',
     reel3Desc: 'Rain attenuation, diffraction and codes that rebuild messages: the physics behind SENDA, in simulation.',
+    finalT: 'The final SENDA film · November 2026',
+    finalNote: 'The complete film: the 10 November film with updated test figures plus chapter 2 with everything new (alert radar, messaging without data, chat, driver mesh, 3D simulator, smoke, drones, the science behind each calculation, competitors and Europe). Spanish narration with subtitles and navigable chapters. Simulations are labelled as such.',
     promoT: 'The full 2026 film: why SENDA exists, how it works and what is proven',
     promoNote: 'About 12 minutes. The origin of the project, the Spanish accidents behind it (Angrois, western-sierra wildfires, Valencia floods, blackout, Adamuz and Gelida), the gap nobody covers and every civil feature. Each simulation is computed frame by frame by the same core the automated tests run. English narration with ES / EN / NL subtitles; Spanish-narrated version available.',
     promoAltEs: 'Spanish version (MP4)',
@@ -216,6 +220,8 @@ const C = {
     reel1Desc: 'Wat er gebeurt als het hele stroomnet uitvalt en hoe SENDA berichten via alternatieve kanalen blijft vervoeren.',
     reel3T: 'Wiskunde die Levens Redt',
     reel3Desc: 'Regendemping, diffractie en codes die berichten herstellen: de natuurkunde achter SENDA, in simulatie.',
+    finalT: 'De definitieve SENDA-film · november 2026',
+    finalNote: 'De volledige film: de film van 10 november met bijgewerkte testcijfers en hoofdstuk 2 met al het nieuwe (waarschuwingsradar, berichten zonder data, chat, bestuurdersnetwerk, 3D-simulator, rook, drones, de wetenschap achter elke berekening, concurrenten en Europa). Spaanse voice-over met ondertitels en hoofdstukken. Simulaties zijn als zodanig gelabeld.',
     promoT: 'De volledige film 2026: waarom SENDA bestaat, hoe het werkt en wat bewezen is',
     promoNote: 'Ongeveer 12 minuten. De oorsprong van het project, de Spaanse ongevallen erachter (Angrois, bosbranden in de westelijke sierra, overstromingen in Valencia, stroomstoring, Adamuz en Gelida), het gat dat niemand dekt en alle civiele functies. Elke simulatie wordt beeld voor beeld berekend door dezelfde kern die de automatische tests draaien. Engelse voice-over met ES / EN / NL-ondertitels.',
     promoAltEs: 'Spaanse versie (MP4)',
@@ -426,6 +432,16 @@ export default function SendaHome({ locale }: { locale: Locale }) {
             <p>{c.reel3Desc}</p>
           </article>
         </div>
+      </div>
+
+      <div className="sh-film" id="final">
+        <h2>{c.finalT}</h2>
+        <video id="senda-final-video" controls preload="metadata" playsInline poster="/media/senda-pelicula-final-poster.jpg" aria-label={c.finalT}>
+          <source src="/media/senda-pelicula-final-es.mp4" type="video/mp4"/>
+          <track kind="subtitles" srcLang="es" label="Español" src="/media/senda-pelicula-final-es.vtt" default={locale === 'es'}/>
+          <track kind="chapters" srcLang="es" label="Capítulos" src="/media/senda-pelicula-final-capitulos.vtt"/>
+        </video>
+        <p className="sh-note">{c.finalNote}</p>
       </div>
 
       <div className="sh-film" id="promo">
