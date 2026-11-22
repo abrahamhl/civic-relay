@@ -44,16 +44,15 @@ fs.writeFileSync(meta, ';FFMETADATA1\ntitle=SENDA · Película final (noviembre 
 
 // ─── vídeo ───
 const kbps = Math.floor((TARGET_MB * 8 * 1024) / total) - 112; // vídeo; 96 kbit/s de audio + margen del contenedor
-const fc = `[0:v]trim=0:${cut},setpts=PTS-STARTPTS,fps=25,scale=1920:1080,setsar=1[v0];[0:a]atrim=0:${cut},asetpts=PTS-STARTPTS,aresample=48000[a0];` +
-  `[1:v]fps=25,scale=1920:1080,setsar=1[v1];[1:a]aresample=48000[a1];` +
-  `[0:v]trim=${cut},setpts=PTS-STARTPTS,fps=25,scale=1920:1080,setsar=1[v2];[0:a]atrim=${cut},asetpts=PTS-STARTPTS,aresample=48000[a2];` +
-  `[v0][a0][v1][a1][v2][a2]concat=n=3:v=1:a=1[v][a]`;
-const common = ['-i', NEW, '-i', M96, '-filter_complex', fc, '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'slow', '-b:v', `${kbps}k`, '-pix_fmt', 'yuv420p'];
+// Concatenador por lista (streaming, sin cargar el vídeo en memoria): avance · m96 · capítulo 2.
+const list = path.join(B, 'final-concat.txt');
+fs.writeFileSync(list, `ffconcat version 1.0\nfile '${NEW}'\noutpoint ${cut}\nfile '${M96}'\nfile '${NEW}'\ninpoint ${cut}\n`);
+const common = ['-f', 'concat', '-safe', '0', '-i', list, '-vf', 'fps=25,scale=1920:1080,setsar=1', '-c:v', 'libx264', '-preset', 'medium', '-b:v', `${kbps}k`, '-pix_fmt', 'yuv420p'];
 console.log(`montaje: avance ${cut.toFixed(1)} s + m96 ${dM96.toFixed(1)} s + nuevo ${(dNew - cut).toFixed(1)} s = ${(total / 60).toFixed(1)} min · vídeo ${kbps} kbit/s`);
 const pass = path.join(B, 'final-pass');
 execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...common, '-pass', '1', '-passlogfile', pass, '-an', '-f', 'mp4', '/dev/null'], { stdio: 'inherit' });
 const tmp = path.join(B, 'final-av.mp4');
-execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...common, '-pass', '2', '-passlogfile', pass, '-c:a', 'aac', '-b:a', '96k', '-ac', '2', tmp], { stdio: 'inherit' });
+execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...common, '-pass', '2', '-passlogfile', pass, '-af', 'aresample=48000', '-c:a', 'aac', '-b:a', '96k', '-ac', '2', tmp], { stdio: 'inherit' });
 execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', tmp, '-i', OUTVTT, '-i', meta, '-map', '0', '-map', '1', '-map_metadata', '2', '-map_chapters', '2', '-c', 'copy', '-c:s', 'mov_text', '-metadata:s:s:0', 'language=spa', '-movflags', '+faststart', OUT], { stdio: 'inherit' });
 fs.rmSync(tmp, { force: true });
 execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', '12', '-i', OUT, '-frames:v', '1', '-vf', 'scale=1280:-2', '-q:v', '3', path.join(media, 'senda-pelicula-final-poster.jpg')]);
