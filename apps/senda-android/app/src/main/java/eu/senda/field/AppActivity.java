@@ -5,7 +5,10 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.WindowInsets;
+import android.widget.FrameLayout;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
@@ -52,7 +55,17 @@ public final class AppActivity extends Activity {
         web.setWebViewClient(new Client());
         web.setWebChromeClient(new Chrome());
         web.addJavascriptInterface(new Bridge(), "SendaNative");
-        setContentView(web);
+        // Android 15 dibuja de borde a borde: sin esto la web queda bajo la hora y los botones del sistema.
+        FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(Color.rgb(5, 9, 12));
+        web.setBackgroundColor(Color.rgb(5, 9, 12));
+        root.addView(web);
+        if (android.os.Build.VERSION.SDK_INT >= 35) root.setOnApplyWindowInsetsListener((v, insets) -> {
+            android.graphics.Insets bars = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout() | WindowInsets.Type.ime());
+            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return WindowInsets.CONSUMED;
+        });
+        setContentView(root);
         if (b != null) web.restoreState(b); else web.loadUrl(OfflineAssets.START);
     }
 
@@ -130,10 +143,16 @@ public final class AppActivity extends Activity {
     /** Puente mínimo hacia lo nativo. Cada método es un permiso: añadir solo lo imprescindible. */
     private final class Bridge {
         @JavascriptInterface public String info() {
-            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"]}";
+            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true}";
         }
 
         /** Abre la pantalla de radios con una acción senda://accion?… validada; el usuario confirma allí. */
         @JavascriptInterface public boolean openRadios(String uri) { return AppActivity.this.openRadios(uri); }
+
+        /** Abre SENDA Drive (consentimiento y vínculo del coche). Ya no es un icono aparte: se entra desde la app. */
+        @JavascriptInterface public boolean openDrive() {
+            runOnUiThread(() -> startActivity(new Intent(AppActivity.this, CarLinkActivity.class)));
+            return true;
+        }
     }
 }

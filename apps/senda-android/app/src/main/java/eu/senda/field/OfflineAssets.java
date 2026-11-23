@@ -12,7 +12,7 @@ import java.util.Locale;
  */
 public final class OfflineAssets {
     public static final String ORIGIN = "https://app.senda.local";
-    public static final String START = ORIGIN + "/senda";
+    public static final String START = ORIGIN + "/senda/app"; // portada de la app (plataforma de módulos)
 
     private OfflineAssets() {}
 
