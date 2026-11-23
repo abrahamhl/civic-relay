@@ -1,0 +1,82 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000"><title>SENDA · Ruta</title>
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/fonts/fonts.css">
+<style>
+:root{--bg:#000;--g1:#1c1c1e;--g2:#2c2c2e;--g3:#3a3a3c;--sep:rgba(84,84,88,.6);--l1:#fff;--l2:rgba(235,235,245,.6);
+--acc:#ff7756;--cielo:#91d7e8;--menta:#34d399;--sol:#fbbf24;--rosa:#ff5b6e;--azul:#0a84ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--l1);font:16px/1.35 Inter,-apple-system,system-ui,sans-serif;letter-spacing:-.01em}
+button,select{font:inherit;color:inherit}
+main{padding:0 16px 40px;max-width:760px;margin:auto}
+h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:18px 0 4px}
+.sub{color:var(--l2);margin:0 0 14px;font-size:15px}
+h2{font-size:13px;font-weight:500;color:var(--l2);text-transform:uppercase;letter-spacing:.02em;margin:22px 4px 8px}
+.seg{display:flex;background:var(--g1);border-radius:9px;padding:2px;gap:2px}
+.seg button{flex:1;border:0;background:none;padding:8px 4px;border-radius:7px;font-size:14px;font-weight:500;color:var(--l2);cursor:pointer}
+.seg button.on{background:var(--g3);color:var(--l1)}
+.map{position:relative;margin-top:10px;border-radius:14px;overflow:hidden;background:#0b1014;touch-action:none}
+canvas{display:block;width:100%;height:min(62vh,520px)}
+.zoom{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.zoom button{width:40px;height:40px;border-radius:10px;border:0;background:rgba(28,28,30,.9);font-size:20px;cursor:pointer}
+.hint{position:absolute;left:10px;bottom:10px;right:60px;background:rgba(0,0,0,.7);border-radius:8px;padding:6px 10px;font-size:13px;color:var(--l2)}
+.group{background:var(--g1);border-radius:12px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;min-height:46px;padding:8px 14px;position:relative;width:100%;border:0;background:none;text-align:left;cursor:pointer}
+.row+.row::before{content:"";position:absolute;top:0;left:14px;right:0;border-top:.5px solid var(--sep)}
+.row .t{flex:1;min-width:0}.row small{display:block;color:var(--l2);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sw{width:14px;height:14px;border-radius:4px;flex:none}
+.row.sel{background:rgba(255,119,86,.12)}
+.row input[type=checkbox]{width:22px;height:22px;accent-color:var(--menta)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.btn{border:0;border-radius:12px;padding:13px;font-weight:600;background:var(--g2);cursor:pointer;text-align:center;text-decoration:none;color:var(--l1)}
+.btn.pri{background:var(--acc);color:#1a0b06}
+.cams{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.cam{background:var(--g1);border-radius:12px;overflow:hidden;font-size:13px}
+.cam img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#111}
+.cam div{padding:8px}.cam small{color:var(--l2)}
+.foot{font-size:13px;color:var(--l2);margin:8px 4px;line-height:1.45}
+.kinds{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.kinds button{border:0;background:var(--g2);border-radius:18px;padding:8px 12px;font-size:14px;cursor:pointer}
+.kinds button.on{background:var(--rosa);color:#fff}
+.voice{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:12px;font-size:18px;padding:16px}
+.voice.on{background:var(--rosa);color:#fff}
+.ok{color:var(--menta)}.ko{color:var(--rosa)}
+</style><script type="module" src="/senda/app-chrome.mjs"></script></head><body><main>
+<h1>Ruta</h1>
+<p class="sub">Elige por dónde quieres ir, dibuja lo que quieres evitar y mira avisos y cámaras del camino.</p>
+
+<div class="seg" id="tool" role="tablist" aria-label="Qué hace un toque en el mapa">
+  <button data-t="from" class="on">Origen</button><button data-t="to">Destino</button><button data-t="via">Paso</button><button data-t="avoid">Evitar</button><button data-t="report">Aviso</button><button data-t="pan">Mover</button>
+</div>
+<div class="map"><canvas id="map" aria-label="Mapa de calles de l'Horta Sud"></canvas>
+  <div class="zoom"><button id="zin" aria-label="Acercar">+</button><button id="zout" aria-label="Alejar">−</button></div>
+  <div class="hint" id="hint">Toca el mapa para poner el origen.</div></div>
+
+<div class="kinds" id="kinds" hidden></div>
+<button class="btn pri voice" id="voice"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span id="voiceTxt">Aviso por voz</span></button>
+<p class="foot" id="voiceMsg">Di, por ejemplo: «coche parado en el arcén» o «accidente en sentido contrario». Siempre te pedimos confirmar.</p>
+
+<h2>Medio de transporte</h2>
+<div class="seg" id="mode"><button data-m="car" class="on">Coche</button><button data-m="bike">Bici</button><button data-m="foot">A pie</button></div>
+
+<h2>Evitar</h2>
+<div class="group">
+  <label class="row"><span class="sw" style="background:rgba(10,132,255,.6)"></span><span class="t">Agua observada<small>Copernicus EMS · EMSR773 (DANA, oct. 2024)</small></span><input type="checkbox" id="avoidWater" checked></label>
+  <label class="row"><span class="sw" style="background:var(--rosa)"></span><span class="t">Avisos en el mapa<small>Radio de 80 m alrededor de cada aviso</small></span><input type="checkbox" id="avoidReports" checked></label>
+  <button class="row" id="clearAvoid"><span class="sw" style="background:var(--sol)"></span><span class="t">Borrar zonas dibujadas y puntos de paso</span></button>
+</div>
+
+<h2>Rutas</h2>
+<div class="group" id="routes"><div class="row"><span class="t"><small>Pon origen y destino en el mapa.</small></span></div></div>
+<div class="btns"><a class="btn pri" id="gmaps" target="_blank" rel="noopener">Abrir en Google Maps</a><a class="btn" id="waze" target="_blank" rel="noopener">Abrir en Waze</a></div>
+<p class="foot" id="handoff"></p>
+
+<h2>Por el camino</h2>
+<div class="group" id="along"><div class="row"><span class="t"><small>Los avisos y las cámaras cercanas a la ruta aparecerán aquí.</small></span></div></div>
+<div class="cams" id="cams" style="margin-top:10px"></div>
+
+<h2>Qué es real y qué no</h2>
+<p class="foot" id="truth"></p>
+</main>
+<script type="module" src="/senda/ruta.mjs"></script>
+</body></html>

@@ -7,6 +7,12 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.util.ArrayList;
 import android.view.WindowInsets;
 import android.widget.FrameLayout;
 import android.webkit.GeolocationPermissions;
@@ -36,7 +42,8 @@ import java.util.Collections;
  */
 public final class AppActivity extends Activity {
     private WebView web;
-    private static final int REQ_MIC = 41, REQ_GEO = 42;
+    private static final int REQ_MIC = 41, REQ_GEO = 42, REQ_VOICE = 43;
+    private SpeechRecognizer recognizer;
     private PermissionRequest pendingMic;
     private GeolocationPermissions.Callback pendingGeo;
     private String pendingGeoOrigin;
@@ -74,7 +81,43 @@ public final class AppActivity extends Activity {
     @SuppressWarnings("deprecation")
     @Override public void onBackPressed() { if (web.canGoBack()) web.goBack(); else super.onBackPressed(); }
 
-    @Override protected void onDestroy() { web.destroy(); super.onDestroy(); }
+    @Override protected void onDestroy() { if (recognizer != null) recognizer.destroy(); web.destroy(); super.onDestroy(); }
+
+    // ── Aviso por voz: reconocimiento del propio Android, en español y prefiriendo el modo sin red. ──
+    // Sin red solo funciona si el móvil tiene descargado el paquete de idioma; si no, el sistema devuelve error.
+    private void startVoice() {
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) { voiceResult(err("NO_DISPONIBLE")); return; }
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[] { Manifest.permission.RECORD_AUDIO }, REQ_VOICE); return;
+        }
+        if (recognizer == null) {
+            recognizer = SpeechRecognizer.createSpeechRecognizer(this);
+            recognizer.setRecognitionListener(new RecognitionListener() {
+                @Override public void onResults(Bundle r) {
+                    ArrayList<String> list = r.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                    try { voiceResult(new JSONObject().put("alternatives", new JSONArray(list == null ? new ArrayList<String>() : list))); }
+                    catch (org.json.JSONException e) { voiceResult(err("JSON")); }
+                }
+                @Override public void onError(int code) { voiceResult(err("ERROR_" + code)); }
+                @Override public void onReadyForSpeech(Bundle p) { voiceResult(state("ESCUCHANDO")); }
+                @Override public void onBeginningOfSpeech() {}
+                @Override public void onRmsChanged(float v) {}
+                @Override public void onBufferReceived(byte[] b) {}
+                @Override public void onEndOfSpeech() { voiceResult(state("PROCESANDO")); }
+                @Override public void onPartialResults(Bundle p) {}
+                @Override public void onEvent(int t, Bundle p) {}
+            });
+        }
+        Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "es-ES");
+        i.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
+        i.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
+        recognizer.startListening(i);
+    }
+    private static JSONObject err(String code) { try { return new JSONObject().put("error", code); } catch (org.json.JSONException e) { return new JSONObject(); } }
+    private static JSONObject state(String s) { try { return new JSONObject().put("state", s); } catch (org.json.JSONException e) { return new JSONObject(); } }
+    private void voiceResult(JSONObject o) { web.post(() -> web.evaluateJavascript("window.sendaVoice&&window.sendaVoice(" + o + ")", null)); }
 
     private boolean openRadios(String uri) {
         try {
@@ -111,6 +154,7 @@ public final class AppActivity extends Activity {
     @Override public void onRequestPermissionsResult(int code, String[] perms, int[] results) {
         super.onRequestPermissionsResult(code, perms, results);
         boolean ok = results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED;
+        if (code == REQ_VOICE) { if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) startVoice(); else voiceResult(err("PERMISO_DENEGADO")); return; }
         if (code == REQ_MIC && pendingMic != null) { if (ok) pendingMic.grant(pendingMic.getResources()); else pendingMic.deny(); pendingMic = null; }
         if (code == REQ_GEO && pendingGeo != null) { pendingGeo.invoke(pendingGeoOrigin, ok, false); pendingGeo = null; pendingGeoOrigin = null; }
     }
@@ -143,13 +187,15 @@ public final class AppActivity extends Activity {
     /** Puente mínimo hacia lo nativo. Cada método es un permiso: añadir solo lo imprescindible. */
     private final class Bridge {
         @JavascriptInterface public String info() {
-            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true}";
+            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"voice\":true}";
         }
 
         /** Abre la pantalla de radios con una acción senda://accion?… validada; el usuario confirma allí. */
         @JavascriptInterface public boolean openRadios(String uri) { return AppActivity.this.openRadios(uri); }
 
         /** Abre SENDA Drive (consentimiento y vínculo del coche). Ya no es un icono aparte: se entra desde la app. */
+        @JavascriptInterface public void listen() { runOnUiThread(AppActivity.this::startVoice); }
+
         @JavascriptInterface public boolean openDrive() {
             runOnUiThread(() -> startActivity(new Intent(AppActivity.this, CarLinkActivity.class)));
             return true;

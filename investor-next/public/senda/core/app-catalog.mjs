@@ -34,6 +34,7 @@ const M = [
   ['consola', 'Consola', 'Fuentes y estado', 'mando', O],
   ['radar', 'Radar de avisos', 'Avisos oficiales en vivo', 'mando', O],
   ['incidente', 'Incidente ferroviario', 'Panel de coordinación', 'mando', O],
+  ['ruta', 'Ruta', 'Elige calles, evita peligros, ve cámaras', 'ver', C],
   ['camaras', 'Cámaras públicas', 'Fuentes con licencia', 'ver', O],
   ['trafico', 'Visión de tráfico', 'Conteo en cámaras', 'ver', O],
   ['dgt', 'Infraestructura DGT', 'Datos abiertos de tráfico', 'ver', O],

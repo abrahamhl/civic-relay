@@ -15,6 +15,13 @@ Prompt de trabajo: `docs/prompts/SONNET_SENDA_APP_2026-11-23.md`. Marcar `[x]` s
 - [ ] Radar, sala, simulador, ciclo, viaje y cámaras dentro de la app; sin red con instantáneas, y en vivo cuando hay red
 - [ ] Menú según el rol — portada `/senda/app` con 49 módulos por secciones y candado por rol, Ajustes con dar/revocar acceso por código (PR de esta sesión; falta probar en los dos móviles)
 
+## 2b · Ruta y avisos estilo Waze (petición del fundador, 2026-11-23)
+- [ ] `/senda/ruta`: calles reales (OSM), puntos de paso, zonas dibujadas a evitar, agua observada, coche/bici/a pie, 3 alternativas, cámaras DGT cercanas, abrir en Google Maps (con paradas) o Waze (solo destino) — PR de esta sesión
+- [ ] Aviso por voz sin red (reconocedor de Android + reglas `voice-report.mjs`), con confirmación — PR de esta sesión; probar en el móvil
+- [ ] Más zonas además de l'Horta Sud (paquetes de calles por zona)
+- [ ] Tiempo de viaje y sentido único (requieren datos con velocidades y `oneway`; hoy «no disponible»)
+- [ ] Convenio con un organismo para Waze for Cities (no hay API pública)
+
 ## 3 · Validación física real (prioridad)
 - [ ] Pruebas guiadas en la app: baliza BLE, sonido, pasarela de un desconocido, DTN/.senda, arranque en coche, barrido Wi-Fi
 - [ ] Resultado en JSON firmado → `evidence/field/AAAA-MM-DD/` → validador
