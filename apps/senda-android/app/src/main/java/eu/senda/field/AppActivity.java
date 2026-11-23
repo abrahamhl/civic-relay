@@ -213,8 +213,24 @@ public final class AppActivity extends Activity {
         if (code == REQ_GEO && pendingGeo != null) { pendingGeo.invoke(pendingGeoOrigin, ok, false); pendingGeo = null; pendingGeoOrigin = null; }
     }
 
+    // Incidencias de la DGT en vivo (DATEX II, CC BY). Solo este host; solo si la versión tiene Internet (play).
+    // La base no tiene permiso de Internet: la descarga falla y la web usa la copia guardada.
+    static final String LIVE_DGT_PATH = "/senda/live/dgt-incidencias.xml";
+    private static final String DGT_URL = "https://nap.dgt.es/datex2/v3/dgt/SituationPublication/datex2_v37.xml";
+    private WebResourceResponse liveDgt() {
+        try {
+            java.net.HttpURLConnection c = (java.net.HttpURLConnection) new java.net.URL(DGT_URL).openConnection();
+            c.setConnectTimeout(15_000); c.setReadTimeout(30_000);
+            if (c.getResponseCode() != 200) return new WebResourceResponse("text/plain", "utf-8", 502, "Bad Gateway", Collections.emptyMap(), new ByteArrayInputStream(new byte[0]));
+            return new WebResourceResponse("text/xml", "utf-8", c.getInputStream());
+        } catch (IOException | SecurityException e) {
+            return new WebResourceResponse("text/plain", "utf-8", 503, "Unavailable", Collections.emptyMap(), new ByteArrayInputStream(new byte[0]));
+        }
+    }
+
     private final class Client extends WebViewClient {
         @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest req) {
+            if ((OfflineAssets.ORIGIN + LIVE_DGT_PATH).equals(req.getUrl().toString())) return liveDgt();
             OfflineAssets.Asset a = OfflineAssets.resolve(req.getUrl().toString());
             if (a == null) return notFound();
             try {
@@ -229,6 +245,10 @@ public final class AppActivity extends Activity {
         @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {
             String url = req.getUrl().toString();
             if (url.startsWith("senda://")) { openRadios(url); return true; }
+            if (ExternalLinks.allowed(url)) { // Waze, Google Maps, SMS y llamada: se abren en su propia app
+                try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); } catch (android.content.ActivityNotFoundException ignored) { }
+                return true;
+            }
             return !OfflineAssets.isInApp(url); // cualquier otro destino se bloquea: la app no navega fuera
         }
 

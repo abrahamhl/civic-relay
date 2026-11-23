@@ -2,6 +2,8 @@
 <!-- Solo en la versión «Play»: detección «en vehículo» de Google Play Services. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
+    <!-- Solo en «Play»: incidencias de la DGT en vivo (nap.dgt.es) en Conducir. La base sigue sin Internet. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application>
         <receiver android:name=".VehicleHintReceiver" android:exported="false"/>
         <!-- Android Auto / Google integrado (Car App Library). Categoría POI PROVISIONAL: por confirmar con Google. -->

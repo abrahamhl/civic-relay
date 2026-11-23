@@ -27,6 +27,7 @@ const M = [
   ['avisos', 'Avisos de peligro', 'Lo que pasa a tu alrededor', 'emergencia', C],
   ['triaje', 'Triaje', 'Primeros auxilios guiados', 'emergencia', C],
   ['monte', 'Perdido en el monte', 'Qué hacer y cómo avisar', 'emergencia', C],
+  ['conducir', 'Conducir', 'Cámara en el salpicadero, avisos y radar', 'emergencia', C],
   ['drive', 'SENDA Drive', 'Arranque automático en el coche', 'emergencia', C],
   ['carretera', 'Ruta protectora', 'Salir por el camino seguro', 'emergencia', C],
   ['sala', 'Sala de decisión', 'Vista de operador', 'mando', O],

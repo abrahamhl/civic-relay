@@ -30,6 +30,11 @@ jobs:
           mkdir -p "$RUNNER_TEMP/jvm3"
           javac --release 17 -d "$RUNNER_TEMP/jvm3" apps/senda-android/app/src/main/java/eu/senda/field/MailboxFrames.java apps/senda-android/app/src/test/java/eu/senda/field/MailboxFramesTest.java
           java -cp "$RUNNER_TEMP/jvm3" eu.senda.field.MailboxFramesTest
+      - name: "Enlaces que la app abre fuera (Waze, Maps, SMS): lista cerrada (JVM)"
+        run: |
+          mkdir -p "$RUNNER_TEMP/jvm4"
+          javac --release 17 -d "$RUNNER_TEMP/jvm4" apps/senda-android/app/src/main/java/eu/senda/field/ExternalLinks.java apps/senda-android/app/src/test/java/eu/senda/field/ExternalLinksTest.java
+          java -cp "$RUNNER_TEMP/jvm4" eu.senda.field.ExternalLinksTest
       - name: Conformidad del arranque automático con la referencia JS (vectores)
         run: |
           mkdir -p "$RUNNER_TEMP/jvm2"
@@ -56,13 +61,14 @@ jobs:
           mkdir -p "$RUNNER_TEMP/dex" && unzip -q -o "$APK" 'classes*.dex' -d "$RUNNER_TEMP/dex"
           if grep -a -l "com/google/android/gms" "$RUNNER_TEMP"/dex/classes*.dex; then echo "la versión base no debe contener Google Play Services"; exit 1; fi
           "$AAPT2" dump permissions apps/senda-android/app/build/outputs/apk/play/debug/app-play-debug.apk | grep -q ACTIVITY_RECOGNITION
+          "$AAPT2" dump permissions apps/senda-android/app/build/outputs/apk/play/debug/app-play-debug.apk | grep -q "android.permission.INTERNET"
           # Android Auto (Car App Library) solo en play; la base no debe declararlo
           "$AAPT2" dump xmltree --file AndroidManifest.xml apps/senda-android/app/build/outputs/apk/play/debug/app-play-debug.apk | grep -q "androidx.car.app.CarAppService"
           if "$AAPT2" dump xmltree --file AndroidManifest.xml "$APK" | grep -q "androidx.car.app.CarAppService"; then echo "la base no debe declarar Android Auto"; exit 1; fi
       - name: La app web va dentro del APK
         run: |
           L=$(unzip -l apps/senda-android/app/build/outputs/apk/base/debug/app-base-debug.apk)
-          for f in assets/senda/vendor/models/efficientdet_lite0_int8.tflite assets/senda/vendor/mediapipe-tasks-vision-1.2.3/wasm/vision_wasm_internal.wasm assets/senda/core/hazard-verify.mjs assets/senda/vendor/qrcode-generator-1.4.4.js assets/senda/vendor/jsqr-1.4.0.js assets/senda/ruta.html assets/senda/ruta.mjs assets/senda/core/route-planner.mjs assets/senda/core/voice-report.mjs assets/senda/app.html assets/senda/app-shell.mjs assets/senda/core/app-roles.mjs assets/senda/core/app-catalog.mjs assets/senda/index.html assets/senda/centro.html assets/senda/visor.html assets/senda/mensaje.html assets/senda/avisos.html assets/senda/core/courier.mjs assets/senda/core/hazard-reports.mjs assets/senda/core/envelope.mjs assets/senda/core/evidence-contract.mjs assets/senda/core/routing-canonical.mjs assets/senda/arr/arr-core.mjs assets/senda/atlas.html assets/senda/demo.html assets/senda/plataforma.html assets/senda/consola.html assets/senda/core/fusion.mjs assets/senda/vuelo.html assets/senda/mulas.html assets/senda/core/bus-mules.mjs assets/senda/aislamiento.html assets/senda/core/flood-isolation.mjs assets/senda/data/aislamiento/dana_horta_sud.json assets/senda/radio.html assets/senda/core/radio-planner.mjs assets/senda/data/radio/poyo.json assets/senda/agua-nl.html assets/senda/core/water-nl.mjs assets/senda/data/nl-water/rws_niveles.json assets/senda/data/mulas/conexiones.bin assets/senda/core/cross-source.mjs assets/senda/data/nepal2026/dem_60m.bin assets/senda/api/v1/catalog.json assets/senda/core/atlas.mjs assets/senda/data/referencias/goes_casos.json assets/geo/land-110m.json; do
+          for f in assets/senda/conducir.html assets/senda/conducir.mjs assets/senda/core/drive-hazard.mjs assets/senda/vendor/models/efficientdet_lite0_int8.tflite assets/senda/vendor/mediapipe-tasks-vision-1.2.3/wasm/vision_wasm_internal.wasm assets/senda/core/hazard-verify.mjs assets/senda/vendor/qrcode-generator-1.4.4.js assets/senda/vendor/jsqr-1.4.0.js assets/senda/ruta.html assets/senda/ruta.mjs assets/senda/core/route-planner.mjs assets/senda/core/voice-report.mjs assets/senda/app.html assets/senda/app-shell.mjs assets/senda/core/app-roles.mjs assets/senda/core/app-catalog.mjs assets/senda/index.html assets/senda/centro.html assets/senda/visor.html assets/senda/mensaje.html assets/senda/avisos.html assets/senda/core/courier.mjs assets/senda/core/hazard-reports.mjs assets/senda/core/envelope.mjs assets/senda/core/evidence-contract.mjs assets/senda/core/routing-canonical.mjs assets/senda/arr/arr-core.mjs assets/senda/atlas.html assets/senda/demo.html assets/senda/plataforma.html assets/senda/consola.html assets/senda/core/fusion.mjs assets/senda/vuelo.html assets/senda/mulas.html assets/senda/core/bus-mules.mjs assets/senda/aislamiento.html assets/senda/core/flood-isolation.mjs assets/senda/data/aislamiento/dana_horta_sud.json assets/senda/radio.html assets/senda/core/radio-planner.mjs assets/senda/data/radio/poyo.json assets/senda/agua-nl.html assets/senda/core/water-nl.mjs assets/senda/data/nl-water/rws_niveles.json assets/senda/data/mulas/conexiones.bin assets/senda/core/cross-source.mjs assets/senda/data/nepal2026/dem_60m.bin assets/senda/api/v1/catalog.json assets/senda/core/atlas.mjs assets/senda/data/referencias/goes_casos.json assets/geo/land-110m.json; do
             echo "$L" | grep -qF "$f" || { echo "falta $f en el APK"; exit 1; }
           done
       - uses: actions/upload-artifact@v4

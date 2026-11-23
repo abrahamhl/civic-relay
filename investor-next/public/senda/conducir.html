@@ -1,0 +1,50 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000"><title>SENDA · Conducir</title>
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/fonts/fonts.css">
+<style>
+:root{--g1:#1c1c1e;--g2:#2c2c2e;--l2:rgba(235,235,245,.6);--acc:#ff7756;--menta:#34d399;--sol:#fbbf24;--rosa:#ff5b6e;--azul:#0a84ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:#000;color:#fff;font:15px/1.3 Inter,-apple-system,system-ui,sans-serif;overflow:hidden}
+button{font:inherit;color:inherit;border:0;cursor:pointer}
+#stage{position:fixed;inset:0;display:flex;flex-direction:column}html.in-app #stage{top:48px}
+#cam{position:relative;flex:1;min-height:0;background:#0b0f12;overflow:hidden}
+#cam video,#cam canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#start{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px}
+#start .big{background:var(--acc);color:#1a0b06;font-weight:700;font-size:20px;padding:18px 28px;border-radius:16px}
+#start p{color:var(--l2);max-width:420px;margin:14px auto 0;font-size:14px}
+.hud{position:absolute;left:10px;right:10px;top:10px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.pill{background:rgba(0,0,0,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:12px;padding:6px 10px;font-size:13px}
+#speed{font-size:34px;font-weight:700;line-height:1;padding:8px 12px}#speed small{font-size:12px;font-weight:500;color:var(--l2)}
+#alert{position:absolute;left:10px;right:10px;bottom:10px;border-radius:14px;padding:12px 14px;font-weight:700;font-size:18px;display:none}
+#alert.AMBAR{display:block;background:rgba(251,191,36,.92);color:#1a1200}#alert.ROJO{display:block;background:rgba(255,91,110,.95);color:#fff}
+#bottom{display:grid;grid-template-columns:148px 1fr;gap:10px;padding:10px 10px calc(10px + env(safe-area-inset-bottom));background:#000}
+#radar{width:148px;height:148px;border-radius:50%;background:radial-gradient(circle,#0f1a20 0,#071014 70%);display:block}
+.btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-content:start}
+.btns button{background:var(--g1);border-radius:12px;padding:11px 6px;font-size:13px;font-weight:600}
+.btns button.on{background:var(--rosa);color:#fff}.btns button.pri{background:var(--acc);color:#1a0b06}
+#info{grid-column:1/-1;color:var(--l2);font-size:12px;margin:0}
+@media (orientation:landscape){#stage{flex-direction:row}#bottom{grid-template-columns:1fr;width:300px;overflow:auto}#radar{margin:auto}}
+</style><script type="module" src="/senda/app-chrome.mjs"></script></head><body>
+<div id="stage">
+  <div id="cam"><video id="v" playsinline muted></video><canvas id="ov"></canvas>
+    <div id="start"><div><button class="big" id="go">Empezar a conducir</button>
+      <p>Pon el móvil en el soporte del salpicadero, mirando a la carretera. SENDA analiza la imagen en el móvil (sin red): recuadros de colores para coches, motos y personas, aviso si algo se acerca deprisa o se mete en tu carril. Es una ayuda: no sustituye tu atención ni detecta intermitentes.</p></div></div>
+    <div class="hud"><div class="pill" id="speed">–<small> km/h</small></div><div class="pill" id="state">Detenido</div></div>
+    <div id="alert" role="alert"></div>
+  </div>
+  <div id="bottom">
+    <canvas id="radar" width="296" height="296" aria-label="Radar de avisos alrededor"></canvas>
+    <div class="btns">
+      <button class="pri" id="report">Aviso por voz</button>
+      <button id="rec">Grabar</button>
+      <button id="eco">Ahorro: no</button>
+      <button id="home">Casa</button>
+      <button id="work">Trabajo</button>
+      <button id="waze">Waze</button>
+      <p id="info"></p>
+    </div>
+  </div>
+</div>
+<script type="module" src="/senda/conducir.mjs"></script>
+</body></html>

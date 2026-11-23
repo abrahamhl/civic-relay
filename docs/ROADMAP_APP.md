@@ -30,6 +30,12 @@ Prompt de trabajo: `docs/prompts/SONNET_SENDA_APP_2026-11-23.md`. Marcar `[x]` s
 - [x] Verificación de avisos con la cámara del que pasa (PR #75; falta probar con la cámara real)
 - [ ] Película: rótulo de Holanda → España corregido en el guion (PR #76); falta volver a renderizar el MP4
 
+## 2d · Conducir (petición del fundador, 2026-11-23)
+- [ ] `/senda/conducir`: cámara en el salpicadero con recuadros y avisos, velocidad, radar, DGT en vivo (play), grabación, favoritos — PR de esta sesión; probar en el coche
+- [ ] Medir consumo de batería en 30 min de conducción (normal y ahorro)
+- [ ] Calibrar umbrales ámbar y lateral con grabaciones reales
+- [ ] Waze: solo abrir; sincronía imposible sin convenio Waze for Cities (organismo socio)
+
 ## 3 · Validación física real (prioridad)
 - [ ] Pruebas guiadas en la app: baliza BLE, sonido, pasarela de un desconocido, DTN/.senda, arranque en coche, barrido Wi-Fi
 - [ ] Resultado en JSON firmado → `evidence/field/AAAA-MM-DD/` → validador
