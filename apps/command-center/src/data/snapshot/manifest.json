@@ -1,6 +1,6 @@
 {
   "schema": "senda-command-center-evidence-snapshot/v1",
-  "generatedAtUTC": "2026-11-19T00:13:20.003Z",
+  "generatedAtUTC": "2026-11-23T13:21:50.142Z",
   "note": "Byte-identical copies of repository evidence. SHA-256 binds the UI snapshot to the committed source. This is a snapshot, not a live feed.",
   "files": [
     {
@@ -32,8 +32,8 @@
       "role": "Last recorded local test status snapshot",
       "repositoryPath": "investor-next/public/senda/estado.json",
       "snapshotPath": "src/data/snapshot/estado.json",
-      "bytes": 298,
-      "sha256": "ad015a4ac75f4739f31f7ea3b14faf91b469249f81763b638eff340da1b9a1ed"
+      "bytes": 897,
+      "sha256": "b5a9e46ee1da7ecd59deec27fe71b17d123cbdeb94532ef2c201d2973fb22849"
     }
   ]
 }
