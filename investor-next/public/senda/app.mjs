@@ -15,7 +15,7 @@ import { initCoordination } from './coord.mjs';
 
 const $ = (s) => document.querySelector(s);
 const now = () => Date.now();
-const S = { me: null, name: '', contacts: [], inbox: [], store: null, consent: null, zones: [], pos: null, listening: null };
+const S = { me: null, name: '', contacts: [], inbox: [], sent: [], chat: null, store: null, consent: null, zones: [], pos: null, listening: null };
 window.SENDA_TEST = { lastEmission: null, state: S };
 
 /* ---------------- utilidades de interfaz ---------------- */
@@ -34,6 +34,7 @@ async function persist() {
   await kv.set('store', S.store.snapshot());
   await kv.set('contacts', S.contacts);
   await kv.set('inbox', S.inbox);
+  await kv.set('sent', S.sent);
   await kv.set('consent', S.consent);
 }
 
@@ -43,6 +44,7 @@ async function boot() {
   S.me = await importIdentity(saved.keys); S.name = saved.name;
   S.contacts = (await kv.get('contacts')) ?? [];
   S.inbox = (await kv.get('inbox')) ?? [];
+  S.sent = (await kv.get('sent')) ?? [];
   S.consent = (await kv.get('consent')) ?? null;
   S.zones = (await kv.get('zones')) ?? [];
   S.store = createBundleStore({ owner: S.me.publicIdentity.fingerprint });
@@ -84,7 +86,7 @@ async function receiveEnvelope(env, via) {
     let incident = null;
     if (typeof m.body === 'string' && m.body.startsWith(INCIDENT_PREFIX)) { try { incident = JSON.parse(m.body.slice(INCIDENT_PREFIX.length).split('\n')[0]); } catch { /* texto libre */ } }
     const coordText = typeof m.body === 'string' && m.body.startsWith(CO.RESPONSE_PREFIX) ? CO.onResponseMessage(m.body, m.from) : null;
-    S.inbox.unshift({ id: env.header.id, from: sender?.name ?? (coordText ? 'Residente (firma válida)' : 'Desconocido (firma válida)'), body: incident ? humanIncident(incident) : coordText ?? m.body, kind: env.header.kind, at: now(), via, incident, coordination: !!coordText });
+    S.inbox.unshift({ id: env.header.id, fromFp: sender?.fingerprint ?? null, from: sender?.name ?? (coordText ? 'Residente (firma válida)' : 'Desconocido (firma válida)'), body: incident ? humanIncident(incident) : coordText ?? m.body, kind: env.header.kind, at: now(), via, incident, coordination: !!coordText });
     await S.store.acceptReceipt(m.receipt); // el recibo viajará y borrará copias en otros teléfonos
     await persist(); render(); return toast(`Mensaje de ${sender?.name ?? 'desconocido'} vía ${via}`);
   }
@@ -98,6 +100,13 @@ async function receiveEnvelope(env, via) {
 /* ---------------- acciones ---------------- */
 // Bluetooth cercano (puente nativo de la app Android: BleMailbox). En la web no existe.
 const hasBle = () => typeof window.SendaNative?.p2pSend === 'function';
+// Contacto elegido en la agenda de Android (sin permiso de leer la agenda: solo el que el usuario toca).
+window.sendaContact = (c) => {
+  if (!c?.phone) return toast(c?.error ? 'No se pudo leer el contacto' : 'Cancelado');
+  const card = 'SENDA:' + b64(packContact(S.me.publicIdentity, S.name));
+  const text = `${S.name} te invita a SENDA (mensajes de emergencia que llegan sin red). Abre la app y pega este código en Contactos: ${card}`;
+  location.href = `sms:${encodeURIComponent(c.phone)}?&body=${encodeURIComponent(text)}`;
+};
 window.sendaP2P = (ev) => {
   if (ev.event === 'status') { const el = $('#ble-status'); if (el) el.textContent = ev.text; return; }
   if (ev.event === 'received') {
@@ -106,7 +115,13 @@ window.sendaP2P = (ev) => {
     run.then(() => persist()).catch((err) => toast('Recibido por Bluetooth, pero no se pudo abrir: ' + err.message));
   }
 };
+document.addEventListener('click', (e) => { const li = e.target.closest('[data-chat]'); if (li) { S.chat = li.dataset.chat; render(); } });
 const ACTIONS = {
+  async 'chat-back'() { S.chat = null; render(); },
+  async 'pick-contact'() {
+    if (typeof window.SendaNative?.pickContact !== 'function') return toast('Elegir contactos del móvil solo funciona en la app de Android');
+    window.SendaNative.pickContact();
+  },
   async 'ble-open'() { if (!hasBle()) return toast('El Bluetooth cercano solo funciona en la app de Android'); window.SendaNative.p2pStart(); },
   async 'ble-send'() {
     if (!hasBle()) return toast('El Bluetooth cercano solo funciona en la app de Android');
@@ -181,8 +196,10 @@ async function sendMessage() {
   const body = $('#body').value.trim(); if (!to || !body) return toast('Elige contacto y escribe algo');
   const prio = +$('#prio').value;
   const env = await sealMessage({ sender: S.me, recipient: to, body, priority: prio, ttlS: 7 * 86400, now: now(), kind: prio === 0 ? 'SOS' : 'PERSONAL' });
-  S.store.put(env, { now: now(), copies: 8 }); await persist(); $('#body').value = ''; render();
-  toast('Cifrado y en camino: emítelo por sonido, comparte el paquete o deja que otros lo transporten');
+  S.store.put(env, { now: now(), copies: 8 });
+  S.sent.unshift({ id: env.header.id, toFp: to.fingerprint, body, kind: prio === 0 ? 'SOS' : 'PERSONAL', at: now() });
+  await persist(); $('#body').value = ''; render();
+  toast('Cifrado y en camino. Envíalo por Bluetooth, SMS o sonido, o deja que otros lo lleven.');
 }
 
 /* Modo fácil: un toque = estado + posición cifrados a todos los contactos. */
@@ -277,8 +294,27 @@ async function sendIncident(det, status) {
 }
 
 /* ---------------- render ---------------- */
+function renderChats() {
+  const conv = S.contacts.map((c) => {
+    const msgs = [...S.inbox.filter((m) => m.fromFp ? m.fromFp === c.fingerprint : m.from === c.name).map((m) => ({ ...m, dir: 'in' })),
+      ...S.sent.filter((m) => m.toFp === c.fingerprint).map((m) => ({ ...m, dir: 'out' }))].sort((a, b) => a.at - b.at);
+    return { c, msgs, last: msgs.at(-1) };
+  }).sort((a, b) => (b.last?.at ?? 0) - (a.last?.at ?? 0));
+  const hhmm = (t) => new Date(t).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  $('#chats').innerHTML = conv.map(({ c, last }) => `<li data-chat="${esc(c.fingerprint)}"><span class="av">${esc((c.name || '?').slice(0, 1).toUpperCase())}</span><span class="t"><b>${esc(c.name)}</b><small>${last ? esc((last.dir === 'out' ? 'Tú: ' : '') + last.body) : 'Sin mensajes todavía'}</small></span>${last ? `<time>${hhmm(last.at)}</time>` : ''}</li>`).join('')
+    || '<li class="fine">Aún no tienes contactos SENDA. Intercambiad tarjetas en «Contactos» o invita a alguien.</li>';
+  const open = S.chat && conv.find((x) => x.c.fingerprint === S.chat);
+  $('#chat-list').hidden = !!open; $('#chat-thread').hidden = !open;
+  if (!open) return;
+  $('#thread-name').textContent = open.c.name; $('#to').value = open.c.fingerprint;
+  const carried = new Set(S.store.list().map((i) => i.id));
+  $('#bubbles').innerHTML = open.msgs.map((m) => `<li class="${m.dir}${m.kind === 'SOS' ? ' sos' : ''}">${esc(m.body)}<span class="meta">${hhmm(m.at)}${m.dir === 'out' ? (carried.has(m.id) ? ' · en camino' : ' · salió de este móvil') : ` · vía ${esc(m.via ?? '')}`}</span></li>`).join('')
+    || '<li class="in">Escribe el primer mensaje. Viaja cifrado: solo lo abre su destinatario.</li>';
+}
+
 function render() {
   if (!S.me) return;
+  renderChats();
   $('#me-name').textContent = S.name; $('#me-fp').textContent = S.me.publicIdentity.fingerprint;
   $('#st-inbox').textContent = S.inbox.length; $('#st-carry').textContent = S.store.count(); $('#st-contacts').textContent = S.contacts.length;
   $('#contact-list').innerHTML = S.contacts.map((c) => `<li><b>${esc(c.name)}</b><div class="meta">${c.fingerprint} · vía ${esc(c.addedVia ?? '')}</div></li>`).join('') || '<li class="fine">Sin contactos. Intercambiad tarjetas por sonido o código.</li>';

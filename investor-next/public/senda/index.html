@@ -61,14 +61,26 @@
   </section>
 
   <section id="messages" class="view" hidden>
-    <h2>Mensajes</h2>
-    <div class="card compose">
-      <select id="to" aria-label="Destinatario"></select>
-      <textarea aria-label="Escribe un mensaje (máx. 400 caracteres)" id="body" maxlength="400" rows="3" placeholder="Escribe un mensaje (máx. 400 caracteres)"></textarea>
-      <div class="row"><select id="prio" aria-label="Prioridad"><option value="3">Familia</option><option value="2">Coordinación</option><option value="0">SOS</option></select><button id="send" class="primary">Cifrar y poner en camino</button></div>
+    <div id="chat-list">
+      <h2>Chats</h2>
+      <ul id="chats" class="chats"></ul>
+      <div class="row"><button data-act="pick-contact">Invitar a un contacto del móvil</button></div>
+      <p class="fine">SENDA no lee tu agenda: eliges un contacto y le enviamos por SMS tu tarjeta cifrada para que te añada.</p>
     </div>
-    <h3>Recibidos</h3><ul id="inbox" class="list"></ul>
-    <h3>En camino (cifrados, este teléfono los transporta)</h3><ul id="carry" class="list"></ul>
+    <div id="chat-thread" hidden>
+      <div class="thread-head"><button data-act="chat-back" aria-label="Volver a los chats">‹ Chats</button><b id="thread-name"></b></div>
+      <ul id="bubbles" class="bubbles" aria-live="polite"></ul>
+      <div class="composer compose">
+        <select id="to" aria-label="Destinatario" hidden></select>
+        <textarea aria-label="Mensaje" id="body" maxlength="400" rows="2" placeholder="Mensaje cifrado"></textarea>
+        <div class="row"><select id="prio" aria-label="Prioridad"><option value="3">Familia</option><option value="2">Coordinación</option><option value="0">SOS</option></select><button id="send" class="primary">Enviar</button></div>
+        <div class="row via"><span class="fine">Enviar lo pendiente por:</span><button data-act="ble-send">Bluetooth</button><button data-act="sms">SMS</button><button data-act="emit">Sonido</button></div>
+      </div>
+    </div>
+    <details class="fine"><summary>Todos los recibidos y lo que este móvil transporta</summary>
+      <h3>Recibidos</h3><ul id="inbox" class="list"></ul>
+      <h3>En camino (cifrados, este teléfono los transporta)</h3><ul id="carry" class="list"></ul>
+    </details>
   </section>
 
   <section id="transfer" class="view" hidden>

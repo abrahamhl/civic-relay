@@ -43,7 +43,7 @@ import java.util.Collections;
  */
 public final class AppActivity extends Activity {
     private WebView web;
-    private static final int REQ_MIC = 41, REQ_GEO = 42, REQ_VOICE = 43, REQ_CAM = 44, REQ_BT = 45;
+    private static final int REQ_MIC = 41, REQ_GEO = 42, REQ_VOICE = 43, REQ_CAM = 44, REQ_BT = 45, REQ_PICK = 46;
     private BleMailbox mailbox;
     private Runnable afterBt;
     private PermissionRequest pendingCam;
@@ -79,6 +79,19 @@ public final class AppActivity extends Activity {
         setContentView(root);
         if (b != null) web.restoreState(b); else web.loadUrl(OfflineAssets.START);
     }
+
+    @SuppressWarnings("deprecation")
+    @Override protected void onActivityResult(int req, int res, Intent data) {
+        super.onActivityResult(req, res, data);
+        if (req != REQ_PICK) return;
+        if (res != RESULT_OK || data == null || data.getData() == null) { contactResult(new JSONObject()); return; }
+        String[] cols = { android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER };
+        try (android.database.Cursor c = getContentResolver().query(data.getData(), cols, null, null, null)) {
+            if (c != null && c.moveToFirst()) contactResult(new JSONObject().put("name", c.getString(0)).put("phone", c.getString(1)));
+            else contactResult(err("VACIO"));
+        } catch (RuntimeException | org.json.JSONException e) { contactResult(err("LECTURA")); }
+    }
+    private void contactResult(JSONObject o) { web.post(() -> web.evaluateJavascript("window.sendaContact&&window.sendaContact(" + o + ")", null)); }
 
     @Override protected void onSaveInstanceState(Bundle out) { super.onSaveInstanceState(out); web.saveState(out); }
 
@@ -228,7 +241,7 @@ public final class AppActivity extends Activity {
     /** Puente mínimo hacia lo nativo. Cada método es un permiso: añadir solo lo imprescindible. */
     private final class Bridge {
         @JavascriptInterface public String info() {
-            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"voice\":true,\"p2p\":\"BLE_GATT\"}";
+            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true}";
         }
 
         /** Abre la pantalla de radios con una acción senda://accion?… validada; el usuario confirma allí. */
@@ -246,6 +259,14 @@ public final class AppActivity extends Activity {
             if (bytes.length == 0 || bytes.length > MailboxFrames.MAX_BYTES) return false;
             runOnUiThread(() -> withBt(() -> mailbox().send(bytes, 8000)));
             return true;
+        }
+
+        /** Abre el selector de contactos del sistema (sin permiso de agenda: solo el contacto que el usuario elige). */
+        @JavascriptInterface public void pickContact() {
+            runOnUiThread(() -> {
+                try { startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI), REQ_PICK); }
+                catch (android.content.ActivityNotFoundException e) { contactResult(err("SIN_AGENDA")); }
+            });
         }
 
         @JavascriptInterface public void listen() { runOnUiThread(AppActivity.this::startVoice); }
