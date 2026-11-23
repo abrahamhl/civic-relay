@@ -64,6 +64,8 @@ check('Tarjetas intercambiadas sin red', (await A.page.evaluate(() => window.SEN
 
 async function compose(p, text, prio = '3') {
   await p.page.click('[data-tab="messages"]');
+  // Mensajes es un chat: se abre la conversación con el (único) contacto antes de escribir.
+  if (await p.page.isHidden('#chat-thread')) await p.page.click('#chats [data-chat]');
   await p.page.selectOption('#prio', prio); await p.page.fill('#body', text); await p.page.click('#send');
   await p.page.waitForFunction((t) => document.querySelector('#body').value === '', text);
 }
