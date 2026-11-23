@@ -9,6 +9,17 @@ android {
         versionCode = 1
         versionName = "0.1-campo"
     }
+    // Firma de PRUEBAS DE CAMPO: clave fija (no secreta, declarada) para que cada APK nuevo se instale
+    // encima del anterior sin desinstalar. NO sirve para tiendas: la clave de publicación irá como secreto.
+    signingConfigs {
+        create("fieldtest") {
+            storeFile = rootProject.file("senda-test.keystore")
+            storePassword = "senda-test"; keyAlias = "senda-test"; keyPassword = "senda-test"
+        }
+    }
+    buildTypes {
+        getByName("debug") { signingConfig = signingConfigs.getByName("fieldtest") }
+    }
     // Dos versiones (decisión del fundador, 2026-11-18):
     //  · base: SIN dependencias externas, solo el SDK de Android. Arranque automático por el Bluetooth del coche.
     //  · play: además, detección «en vehículo» de Google Play Services (pista débil, confirmada por velocidad).

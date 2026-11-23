@@ -1,0 +1,27 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SENDA · Descargar la app</title><link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/fonts/fonts.css"><style>
+:root{--bg:#04080b;--ink:#eef3f4;--gris:#93a7b1;--linea:#1d2c36;--cielo:#91d7e8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 Inter,system-ui,sans-serif}
+main{max-width:640px;margin:auto;padding:40px 20px 72px}h1{font-size:clamp(30px,7vw,44px);line-height:1.1;font-weight:600;letter-spacing:-.025em;margin:8px 0 12px}
+h2{font-size:20px;font-weight:600;margin:40px 0 8px}p{color:var(--gris);margin:8px 0}.ante{color:var(--gris);font-size:15px}
+.boton{display:block;width:100%;padding:20px;border-radius:8px;background:var(--ink);color:#05090c;text-align:center;font-weight:600;font-size:19px;text-decoration:none;margin:22px 0 6px}
+.boton.sec{background:transparent;color:var(--ink);border:1px solid var(--linea);font-size:16px;padding:14px}
+ol{padding-left:22px;color:var(--gris)}li{margin:8px 0}li b{color:var(--ink);font-weight:600}a{color:var(--cielo)}
+.aviso{margin-top:36px;padding-top:18px;border-top:1px solid var(--linea);font-size:14px}code{font:14px "IBM Plex Mono",ui-monospace,monospace;overflow-wrap:anywhere}
+</style></head><body><main>
+<p class="ante">SENDA · fase privada de pruebas</p>
+<h1>Descargar la app para Android</h1>
+<p>Se compila sola cada vez que se aprueba un cambio. Este enlace siempre lleva a la última versión.</p>
+<a class="boton" href="https://github.com/abrahamhl/civic-relay/releases/download/senda-android-latest/senda-base.apk" download>Descargar SENDA (versión base)</a>
+<p>Sin Internet y sin servicios de Google. Es la que se usa en las pruebas de campo.</p>
+<a class="boton sec" href="https://github.com/abrahamhl/civic-relay/releases/download/senda-android-latest/senda-play.apk" download>Versión play (con detección «en coche» de Google)</a>
+<h2>Instalar en el móvil</h2>
+<ol>
+<li><b>Pulsa el botón</b> y espera a que termine la descarga.</li>
+<li><b>Abre el archivo</b> desde el aviso de descargas del navegador.</li>
+<li>Si Android lo pide, <b>permite instalar desde este navegador</b> (Ajustes → Aplicaciones → Instalar apps desconocidas) y vuelve atrás.</li>
+<li>Pulsa <b>Instalar</b>. Las versiones nuevas se instalan encima, sin perder datos.</li>
+</ol>
+<h2>Comprobar que es el archivo correcto</h2>
+<p>La suma SHA-256 de cada archivo y la versión exacta del código están en la <a href="https://github.com/abrahamhl/civic-relay/releases/tag/senda-android-latest">página de la versión</a>. Compárala con la que muestre tu móvil o tu gestor de archivos.</p>
+<p class="aviso"><b>Qué es y qué no.</b> Es una versión de pruebas, firmada con una clave de pruebas que no sirve para tiendas de aplicaciones. No está certificada ni conectada al 112. Las prestaciones de radio (Bluetooth, sonido, Wi-Fi) están por medir en campo: esta app existe precisamente para medirlas.</p>
+</main></body></html>
