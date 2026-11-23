@@ -8,7 +8,7 @@ Prompt de trabajo: `docs/prompts/SONNET_SENDA_APP_2026-11-23.md`. Marcar `[x]` s
 
 ## 1 · Roles sin servidor
 - [x] Credencial de rol firmada por la clave del ADMIN (ECDSA P-256), con caducidad y revocación — núcleo `packages/senda/src/app-roles.mjs` con 11 pruebas (PR de esta sesión; falta la pantalla)
-- [ ] Emparejamiento por QR entre los dos móviles (hoy: código de texto que se comparte por el chat del móvil y se pega en Ajustes; falta el QR)
+- [ ] Emparejamiento por QR entre los dos móviles — mostrar y escanear QR en Ajustes (PR #72; probado en navegador, falta en los móviles)
 - [x] Pruebas: sin firma o caducada → CIUDADANO; el OBSERVADOR no edita (11/11, también revocada, manipulada, ancla ajena y reloj retrocedido)
 
 ## 2 · La web dentro de la app

@@ -42,7 +42,8 @@ import java.util.Collections;
  */
 public final class AppActivity extends Activity {
     private WebView web;
-    private static final int REQ_MIC = 41, REQ_GEO = 42, REQ_VOICE = 43;
+    private static final int REQ_MIC = 41, REQ_GEO = 42, REQ_VOICE = 43, REQ_CAM = 44;
+    private PermissionRequest pendingCam;
     private SpeechRecognizer recognizer;
     private PermissionRequest pendingMic;
     private GeolocationPermissions.Callback pendingGeo;
@@ -132,12 +133,20 @@ public final class AppActivity extends Activity {
 
     /**
      * Permisos del visor: solo para páginas de la propia app y solo tras el diálogo de Android.
-     * Micrófono: lo usa «Escuchar por sonido» (módem acústico). Ubicación: «Usar mi posición».
+     * Micrófono: lo usa «Escuchar por sonido» (módem acústico). Cámara: leer el QR de acceso. Ubicación: «Usar mi posición».
      */
     private final class Chrome extends WebChromeClient {
         @Override public void onPermissionRequest(PermissionRequest req) {
-            boolean onlyAudio = req.getResources().length == 1 && PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(req.getResources()[0]);
-            if (!onlyAudio || !OfflineAssets.isInApp(req.getOrigin().toString())) { req.deny(); return; }
+            boolean single = req.getResources().length == 1;
+            boolean onlyAudio = single && PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(req.getResources()[0]);
+            boolean onlyVideo = single && PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(req.getResources()[0]);
+            if (!(onlyAudio || onlyVideo) || !OfflineAssets.isInApp(req.getOrigin().toString())) { req.deny(); return; }
+            if (onlyVideo) { // cámara: solo para leer el QR de acceso en Ajustes
+                if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) { req.grant(req.getResources()); return; }
+                pendingCam = req;
+                requestPermissions(new String[] { Manifest.permission.CAMERA }, REQ_CAM);
+                return;
+            }
             if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) { req.grant(req.getResources()); return; }
             pendingMic = req;
             requestPermissions(new String[] { Manifest.permission.RECORD_AUDIO }, REQ_MIC);
@@ -155,6 +164,7 @@ public final class AppActivity extends Activity {
         super.onRequestPermissionsResult(code, perms, results);
         boolean ok = results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED;
         if (code == REQ_VOICE) { if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) startVoice(); else voiceResult(err("PERMISO_DENEGADO")); return; }
+        if (code == REQ_CAM && pendingCam != null) { if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) pendingCam.grant(pendingCam.getResources()); else pendingCam.deny(); pendingCam = null; return; }
         if (code == REQ_MIC && pendingMic != null) { if (ok) pendingMic.grant(pendingMic.getResources()); else pendingMic.deny(); pendingMic = null; }
         if (code == REQ_GEO && pendingGeo != null) { pendingGeo.invoke(pendingGeoOrigin, ok, false); pendingGeo = null; pendingGeoOrigin = null; }
     }

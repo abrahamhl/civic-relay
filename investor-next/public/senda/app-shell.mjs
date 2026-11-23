@@ -111,6 +111,41 @@ document.addEventListener('click', (e) => {
 });
 $('#q').addEventListener('input', () => { renderCatalog(); paintIcons(); });
 
+// ── QR (bibliotecas incluidas en /senda/vendor, licencias en LICENSES.md; se cargan solo al usarlas) ──
+const scripts = {};
+const loadScript = (src) => (scripts[src] ??= new Promise((ok, ko) => { const el = document.createElement('script'); el.src = src; el.onload = ok; el.onerror = () => ko(new Error('No se pudo cargar ' + src)); document.head.appendChild(el); }));
+async function showQr(el, text) {
+  await loadScript('/senda/vendor/qrcode-generator-1.4.4.js');
+  const qr = window.qrcode(0, 'L'); qr.addData(text); qr.make();
+  el.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 4, scalable: true }); // SVG generado localmente, sin datos externos
+}
+let scanStream = null, scanOn = false;
+function stopScan() { scanOn = false; scanStream?.getTracks().forEach((t) => t.stop()); scanStream = null; $('#scanner').hidden = true; }
+$('#scan-close').addEventListener('click', stopScan);
+$('#scan').addEventListener('click', async () => {
+  try {
+    await loadScript('/senda/vendor/jsqr-1.4.0.js');
+    scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+  } catch (err) { $('#in-msg').className = 'foot ko'; $('#in-msg').textContent = 'No se pudo abrir la cámara: ' + (err.message || err.name) + '. Puedes pegar el texto.'; return; }
+  const v = $('#scan-video'); v.srcObject = scanStream; await v.play();
+  $('#scanner').hidden = false; $('#scan-msg').textContent = 'Apunta al QR del otro móvil'; scanOn = true;
+  const cv = document.createElement('canvas'), cx = cv.getContext('2d', { willReadFrequently: true });
+  const tick = () => {
+    if (!scanOn) return;
+    if (v.videoWidth) {
+      const w = Math.min(v.videoWidth, 720), h = Math.round(v.videoHeight * (w / v.videoWidth));
+      cv.width = w; cv.height = h; cx.drawImage(v, 0, 0, w, h);
+      const hit = window.jsQR(cx.getImageData(0, 0, w, h).data, w, h, { inversionAttempts: 'dontInvert' });
+      if (hit?.data) {
+        if (hit.data.startsWith(QR_PREFIX.CREDENTIAL) || hit.data.startsWith(QR_PREFIX.REVOCATION)) { stopScan(); $('#in-code').value = hit.data; $('#in-apply').click(); return; }
+        $('#scan-msg').textContent = 'Ese QR no es de SENDA.';
+      }
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+});
+
 // ── Acciones de administración ──
 async function shareText(text, title) {
   try { if (navigator.share) { await navigator.share({ title, text }); return; } } catch { /* cancelado */ }
@@ -131,6 +166,7 @@ $('#g-issue').addEventListener('click', async () => {
   const code = encodeQr(QR_PREFIX.CREDENTIAL, { anchor: LS.get('anchor'), credential: cred });
   LS.set('issued', [{ id: cred.id, subject, validUntil: cred.validUntil, vault: cred.grants.includes(GRANTS.VAULT) }, ...LS.get('issued', [])]);
   $('#g-code').value = code; $('#g-out').classList.remove('hide'); renderSettings();
+  await showQr($('#g-qr'), code);
 });
 $('#g-share').addEventListener('click', () => shareText($('#g-code').value, 'Acceso a SENDA'));
 $('#issued').addEventListener('click', async (e) => {
@@ -140,6 +176,7 @@ $('#issued').addEventListener('click', async (e) => {
   LS.set('issued', issued);
   const rev = await issueRevocation({ keys: adminKeys }, { revokedIds: issued.filter((c) => c.revoked).map((c) => c.id), issuedAt: Date.now() });
   $('#r-code').value = encodeQr(QR_PREFIX.REVOCATION, rev); $('#r-out').classList.remove('hide'); renderSettings();
+  await showQr($('#r-qr'), $('#r-code').value);
 });
 $('#r-share').addEventListener('click', () => shareText($('#r-code').value, 'Revocación de SENDA'));
 
