@@ -7,9 +7,9 @@ Prompt de trabajo: `docs/prompts/SONNET_SENDA_APP_2026-11-23.md`. Marcar `[x]` s
 - [x] (PR #69, verificada en producción 2026-11-23 13:34Z) Página `/senda/descargas` con el enlace y las instrucciones de instalación desde el móvil
 
 ## 1 · Roles sin servidor
-- [ ] Credencial de rol firmada por la clave del ADMIN (ECDSA P-256), con caducidad y revocación
-- [ ] Emparejamiento por QR entre los dos móviles
-- [ ] Pruebas: sin firma o caducada → CIUDADANO; el OBSERVADOR no edita
+- [x] Credencial de rol firmada por la clave del ADMIN (ECDSA P-256), con caducidad y revocación — núcleo `packages/senda/src/app-roles.mjs` con 11 pruebas (PR de esta sesión; falta la pantalla)
+- [ ] Emparejamiento por QR entre los dos móviles (el formato de texto ya existe: `encodeQr/decodeQr`; falta mostrar y leer el QR en la app)
+- [x] Pruebas: sin firma o caducada → CIUDADANO; el OBSERVADOR no edita (11/11, también revocada, manipulada, ancla ajena y reloj retrocedido)
 
 ## 2 · La web dentro de la app
 - [ ] Radar, sala, simulador, ciclo, viaje y cámaras dentro de la app; sin red con instantáneas, y en vivo cuando hay red
