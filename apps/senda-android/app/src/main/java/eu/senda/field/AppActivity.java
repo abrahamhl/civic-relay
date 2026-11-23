@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -42,7 +43,9 @@ import java.util.Collections;
  */
 public final class AppActivity extends Activity {
     private WebView web;
-    private static final int REQ_MIC = 41, REQ_GEO = 42, REQ_VOICE = 43, REQ_CAM = 44;
+    private static final int REQ_MIC = 41, REQ_GEO = 42, REQ_VOICE = 43, REQ_CAM = 44, REQ_BT = 45;
+    private BleMailbox mailbox;
+    private Runnable afterBt;
     private PermissionRequest pendingCam;
     private SpeechRecognizer recognizer;
     private PermissionRequest pendingMic;
@@ -82,7 +85,30 @@ public final class AppActivity extends Activity {
     @SuppressWarnings("deprecation")
     @Override public void onBackPressed() { if (web.canGoBack()) web.goBack(); else super.onBackPressed(); }
 
-    @Override protected void onDestroy() { if (recognizer != null) recognizer.destroy(); web.destroy(); super.onDestroy(); }
+    @Override protected void onDestroy() { if (recognizer != null) recognizer.destroy(); if (mailbox != null) mailbox.stop(); web.destroy(); super.onDestroy(); }
+
+    // ── Buzón Bluetooth cercano (móvil a móvil, también en modo avión con el Bluetooth encendido) ──
+    private String[] btPerms() {
+        return Build.VERSION.SDK_INT >= 31
+                ? new String[] { Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_ADVERTISE }
+                : new String[] { Manifest.permission.ACCESS_FINE_LOCATION };
+    }
+    private void withBt(Runnable r) {
+        for (String p : btPerms()) if (checkSelfPermission(p) != PackageManager.PERMISSION_GRANTED) { afterBt = r; requestPermissions(btPerms(), REQ_BT); return; }
+        r.run();
+    }
+    private BleMailbox mailbox() {
+        if (mailbox == null) mailbox = new BleMailbox(this, new BleMailbox.Listener() {
+            @Override public void received(byte[] msg, String from) {
+                try { p2pPost(new JSONObject().put("event", "received").put("b64", android.util.Base64.encodeToString(msg, android.util.Base64.URL_SAFE | android.util.Base64.NO_WRAP | android.util.Base64.NO_PADDING))); }
+                catch (org.json.JSONException ignored) { }
+            }
+            @Override public void status(String text) { p2pEvent("status", text); }
+        });
+        return mailbox;
+    }
+    private void p2pEvent(String ev, String text) { try { p2pPost(new JSONObject().put("event", ev).put("text", text)); } catch (org.json.JSONException ignored) { } }
+    private void p2pPost(JSONObject o) { web.post(() -> web.evaluateJavascript("window.sendaP2P&&window.sendaP2P(" + o + ")", null)); }
 
     // ── Aviso por voz: reconocimiento del propio Android, en español y prefiriendo el modo sin red. ──
     // Sin red solo funciona si el móvil tiene descargado el paquete de idioma; si no, el sistema devuelve error.
@@ -164,6 +190,11 @@ public final class AppActivity extends Activity {
         super.onRequestPermissionsResult(code, perms, results);
         boolean ok = results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED;
         if (code == REQ_VOICE) { if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) startVoice(); else voiceResult(err("PERMISO_DENEGADO")); return; }
+        if (code == REQ_BT) {
+            boolean all = results.length > 0; for (int r : results) all &= r == PackageManager.PERMISSION_GRANTED;
+            if (all && afterBt != null) afterBt.run(); else p2pEvent("status", "Sin permiso de Bluetooth: no se puede usar el buzón cercano");
+            afterBt = null; return;
+        }
         if (code == REQ_CAM && pendingCam != null) { if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) pendingCam.grant(pendingCam.getResources()); else pendingCam.deny(); pendingCam = null; return; }
         if (code == REQ_MIC && pendingMic != null) { if (ok) pendingMic.grant(pendingMic.getResources()); else pendingMic.deny(); pendingMic = null; }
         if (code == REQ_GEO && pendingGeo != null) { pendingGeo.invoke(pendingGeoOrigin, ok, false); pendingGeo = null; pendingGeoOrigin = null; }
@@ -197,13 +228,26 @@ public final class AppActivity extends Activity {
     /** Puente mínimo hacia lo nativo. Cada método es un permiso: añadir solo lo imprescindible. */
     private final class Bridge {
         @JavascriptInterface public String info() {
-            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"voice\":true}";
+            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"voice\":true,\"p2p\":\"BLE_GATT\"}";
         }
 
         /** Abre la pantalla de radios con una acción senda://accion?… validada; el usuario confirma allí. */
         @JavascriptInterface public boolean openRadios(String uri) { return AppActivity.this.openRadios(uri); }
 
         /** Abre SENDA Drive (consentimiento y vínculo del coche). Ya no es un icono aparte: se entra desde la app. */
+        /** Abre el buzón Bluetooth cercano (pide permisos la primera vez). */
+        @JavascriptInterface public void p2pStart() { runOnUiThread(() -> withBt(() -> mailbox().start())); }
+
+        /** Entrega un sobre (base64url) a los móviles SENDA cercanos con el buzón abierto. */
+        @JavascriptInterface public boolean p2pSend(String b64) {
+            final byte[] bytes;
+            try { bytes = android.util.Base64.decode(b64, android.util.Base64.URL_SAFE | android.util.Base64.NO_WRAP | android.util.Base64.NO_PADDING); }
+            catch (IllegalArgumentException e) { return false; }
+            if (bytes.length == 0 || bytes.length > MailboxFrames.MAX_BYTES) return false;
+            runOnUiThread(() -> withBt(() -> mailbox().send(bytes, 8000)));
+            return true;
+        }
+
         @JavascriptInterface public void listen() { runOnUiThread(AppActivity.this::startVoice); }
 
         @JavascriptInterface public boolean openDrive() {

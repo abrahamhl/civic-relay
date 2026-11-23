@@ -96,7 +96,27 @@ async function receiveEnvelope(env, via) {
 }
 
 /* ---------------- acciones ---------------- */
+// Bluetooth cercano (puente nativo de la app Android: BleMailbox). En la web no existe.
+const hasBle = () => typeof window.SendaNative?.p2pSend === 'function';
+window.sendaP2P = (ev) => {
+  if (ev.event === 'status') { const el = $('#ble-status'); if (el) el.textContent = ev.text; return; }
+  if (ev.event === 'received') {
+    const bytes = unb64(ev.b64);
+    const run = bytes[0] === 0x7b ? receiveText(new TextDecoder().decode(bytes), 'BLUETOOTH') : receiveBytes(bytes, 'BLUETOOTH'); // «{» = paquete .senda
+    run.then(() => persist()).catch((err) => toast('Recibido por Bluetooth, pero no se pudo abrir: ' + err.message));
+  }
+};
 const ACTIONS = {
+  async 'ble-open'() { if (!hasBle()) return toast('El Bluetooth cercano solo funciona en la app de Android'); window.SendaNative.p2pStart(); },
+  async 'ble-send'() {
+    if (!hasBle()) return toast('El Bluetooth cercano solo funciona en la app de Android');
+    const items = outgoing(); if (!items.length) return toast('Nada pendiente de enviar');
+    // Un solo envío con el paquete completo (todos los sobres pendientes): menos conexiones, menos espera.
+    const text = exportBundleFile(S.store, { now: now() });
+    const bytes = new TextEncoder().encode(text);
+    if (bytes.length > 64 * 1024) return toast('Demasiado para Bluetooth de una vez: usa «Compartir paquete»');
+    window.SendaNative.p2pSend(b64(bytes));
+  },
   async 'card-sound'() { toast('Emitiendo tu tarjeta…', 8000); await emit(packContact(S.me.publicIdentity, S.name), { canvas: $('#scope') }); toast('Tarjeta emitida'); },
   async 'card-copy'() { await copy('SENDA:' + b64(packContact(S.me.publicIdentity, S.name))); },
   async 'card-file'() { await shareFile(`${S.name}.sendacard`, 'SENDA:' + b64(packContact(S.me.publicIdentity, S.name)), 'text/plain'); },

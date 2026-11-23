@@ -22,6 +22,14 @@ Prompt de trabajo: `docs/prompts/SONNET_SENDA_APP_2026-11-23.md`. Marcar `[x]` s
 - [ ] Tiempo de viaje y sentido único (requieren datos con velocidades y `oneway`; hoy «no disponible»)
 - [ ] Convenio con un organismo para Waze for Cities (no hay API pública)
 
+## 2c · Comunicación entre móviles y a distancia (petición del fundador, 2026-11-23)
+- [ ] Buzón Bluetooth cercano (GATT, sin Google) en la app — PR de esta sesión; probar en dos móviles
+- [ ] Relé en Internet para larga distancia (Holanda → España): falta decidir alojamiento (servicio nuevo)
+- [ ] Wi-Fi Direct / Wi-Fi Aware para más alcance y velocidad que BLE
+- [ ] Chat estilo WhatsApp con el selector de contactos de Android
+- [ ] Verificación de avisos con la cámara del coche que pasa (detección en el móvil, caras y matrículas borradas)
+- [ ] Película: explicar bien el caso Holanda → España
+
 ## 3 · Validación física real (prioridad)
 - [ ] Pruebas guiadas en la app: baliza BLE, sonido, pasarela de un desconocido, DTN/.senda, arranque en coche, barrido Wi-Fi
 - [ ] Resultado en JSON firmado → `evidence/field/AAAA-MM-DD/` → validador
