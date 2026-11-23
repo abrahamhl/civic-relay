@@ -26,8 +26,8 @@ Prompt de trabajo: `docs/prompts/SONNET_SENDA_APP_2026-11-23.md`. Marcar `[x]` s
 - [ ] Buzón Bluetooth cercano (GATT, sin Google) en la app — PR de esta sesión; probar en dos móviles
 - [ ] Relé en Internet para larga distancia (Holanda → España): falta decidir alojamiento (servicio nuevo)
 - [ ] Wi-Fi Direct / Wi-Fi Aware para más alcance y velocidad que BLE
-- [ ] Chat estilo WhatsApp con el selector de contactos de Android
-- [ ] Verificación de avisos con la cámara del coche que pasa (detección en el móvil, caras y matrículas borradas)
+- [x] Chat estilo WhatsApp con el selector de contactos de Android (PR #74)
+- [ ] Verificación de avisos con la cámara del que pasa — en esta PR (modelo en el móvil, imagen que nunca sale; falta probar con la cámara real)
 - [ ] Película: explicar bien el caso Holanda → España
 
 ## 3 · Validación física real (prioridad)

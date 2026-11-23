@@ -40,6 +40,10 @@ canvas{display:block;width:100%;height:min(62vh,520px)}
 .kinds button.on{background:var(--rosa);color:#fff}
 .voice{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:12px;font-size:18px;padding:16px}
 .voice.on{background:var(--rosa);color:#fff}
+#cam{position:fixed;inset:0;z-index:60;background:#000;display:flex;flex-direction:column;justify-content:center;padding:16px;gap:12px}
+#cam[hidden]{display:none}.camwrap{position:relative;border-radius:14px;overflow:hidden;background:#111}
+#cam-v,#cam-c{width:100%;display:block}#cam-c{position:absolute;inset:0;height:100%}#cam-msg{color:var(--l2);margin:0;font-size:14px}
+.verdict{display:flex;gap:12px;align-items:center;background:var(--g1);border-radius:12px;padding:12px}.verdict svg{width:34px;height:34px;flex:none}
 .ok{color:var(--menta)}.ko{color:var(--rosa)}
 </style><script type="module" src="/senda/app-chrome.mjs"></script></head><body><main>
 <h1>Ruta</h1>
@@ -78,5 +82,9 @@ canvas{display:block;width:100%;height:min(62vh,520px)}
 <h2>Qué es real y qué no</h2>
 <p class="foot" id="truth"></p>
 </main>
+<div id="cam" hidden><div class="camwrap"><video id="cam-v" playsinline muted></video><canvas id="cam-c"></canvas></div>
+  <p id="cam-msg">Apunta al aviso mientras pasas. Las personas se tapan; la imagen no sale del móvil.</p>
+  <div id="cam-res"></div>
+  <div class="btns"><button class="btn pri" id="cam-ok" hidden>Confirmar el aviso</button><button class="btn" id="cam-close">Cerrar</button></div></div>
 <script type="module" src="/senda/ruta.mjs"></script>
 </body></html>

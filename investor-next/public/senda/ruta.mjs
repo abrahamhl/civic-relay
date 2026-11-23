@@ -2,6 +2,7 @@
 import { buildGraph, alternatives, nearRoute, googleMapsUrl, wazeUrl, LIMITS } from './core/route-planner.mjs';
 import { REPORT_KINDS } from './core/road-guard.mjs';
 import { interpretAlternatives } from './core/voice-report.mjs';
+import { verifyReport } from './core/hazard-verify.mjs';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -133,11 +134,11 @@ $('#routes').addEventListener('click', (e) => { const i = e.target.closest('[dat
 function renderAlong() {
   const r = st.routes[st.sel];
   if (!r) { $('#along').innerHTML = '<div class="row"><span class="t"><small>Los avisos y las cámaras cercanas a la ruta aparecerán aquí.</small></span></div>'; $('#cams').innerHTML = ''; return; }
-  const reps = nearRoute(r.coords, st.reports, 150);
+  const reps = nearRoute(r.coords, st.reports.map((x, i) => ({ ...x, idx: i })), 150);
   const cams = camsData ? nearRoute(r.coords, camsData.camaras, 2000).slice(0, 6) : [];
   const nearestCam = camsData && !cams.length ? nearRoute(r.coords, camsData.camaras, 50_000)[0] : null;
   $('#along').innerHTML = [
-    ...reps.map((x) => `<div class="row"><span class="sw" style="background:var(--rosa)"></span><span class="t">${esc(REPORT_KINDS[x.kind]?.label || x.kind)}<small>A ${km(x.distM)} de la ruta · tu aviso, sin verificar · ${new Date(x.t).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</small></span></div>`),
+    ...reps.map((x) => `<div class="row"><span class="sw" style="background:var(--rosa)"></span><span class="t">${esc(REPORT_KINDS[x.kind]?.label || x.kind)}<small>A ${km(x.distM)} de la ruta · ${x.verified ? `visto con cámara: ${esc(x.verified.es || x.verified.verdict)}` : 'sin verificar'} · ${new Date(x.t).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</small></span><button class="btn" style="padding:8px 10px;font-size:13px" data-verify="${x.idx}">Verificar con cámara</button></div>`),
     `<div class="row"><span class="sw" style="background:var(--azul)"></span><span class="t">${cams.length} cámara(s) de la DGT a menos de 2 km<small>${cams.length ? 'Imagen en directo si hay conexión' : nearestCam ? `La más cercana está a ${km(nearestCam.distM)} (${esc(nearestCam.carretera)})` : 'Catálogo no disponible'}</small></span></div>`,
   ].join('');
   const show = cams.length ? cams : nearestCam ? [nearestCam] : [];
@@ -158,6 +159,57 @@ $('#truth').textContent = [
   'Los avisos que pones aquí se guardan solo en este móvil y no están verificados por nadie.',
   `Zona disponible: l'Horta Sud (Valencia). Otras zonas necesitan su paquete de calles.`,
 ].filter(Boolean).join(' ');
+
+// ── Verificar un aviso con la cámara (modelo en el móvil; la imagen no sale de aquí) ──
+// Umbrales ELEGIDOS por la app y declarados (no calibrados con medidas): confianza 0,5 y 3 fotogramas coincidentes.
+const VERIFY = { minScore: 0.5, minFrames: 3, seconds: 4 };
+const MP = '/senda/vendor/mediapipe-tasks-vision-1.2.3';
+let detector = null;
+async function getDetector() {
+  if (detector) return detector;
+  const vision = await import(MP + '/vision_bundle.mjs');
+  const files = await vision.FilesetResolver.forVisionTasks(MP + '/wasm');
+  detector = await vision.ObjectDetector.createFromOptions(files, { baseOptions: { modelAssetPath: '/senda/vendor/models/efficientdet_lite0_int8.tflite', delegate: 'CPU' }, runningMode: 'VIDEO', scoreThreshold: 0.3, maxResults: 6 });
+  return detector;
+}
+const GICON = { vehicle: '<path d="M3 14l2-6h14l2 6v4H3z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>', animal: '<circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="4.5" cy="11" r="2"/><circle cx="19.5" cy="11" r="2"/><path d="M8 17c0-3 2-5 4-5s4 2 4 5-2 3-4 3-4 0-4-3z"/>', object: '<path d="M4 8l8-4 8 4v8l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v8"/>', person: '<circle cx="12" cy="6" r="3"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7"/>' };
+const gIcon = (g, color) => `<svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${GICON[g] || GICON.object}</svg>`;
+let camStream = null, camReport = null, camResult = null;
+function closeCam() { camStream?.getTracks().forEach((t) => t.stop()); camStream = null; $('#cam').hidden = true; }
+$('#cam-close').addEventListener('click', closeCam);
+$('#cam-ok').addEventListener('click', () => {
+  if (camReport != null && camResult) { st.reports[camReport].verified = { verdict: camResult.verdict, es: camResult.es ?? null, t: Date.now() }; LS.set('reports', st.reports); renderAlong(); }
+  closeCam();
+});
+async function verifyWithCamera(i) {
+  const rep = st.reports[i]; camReport = i; camResult = null;
+  $('#cam').hidden = false; $('#cam-ok').hidden = true; $('#cam-res').innerHTML = ''; $('#cam-msg').textContent = 'Cargando el reconocedor (en el móvil, sin red)…';
+  try {
+    const [det, stream] = await Promise.all([getDetector(), navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })]);
+    camStream = stream; const v = $('#cam-v'); v.srcObject = stream; await v.play();
+    const c = $('#cam-c'), x = c.getContext('2d'); c.width = v.videoWidth; c.height = v.videoHeight;
+    $('#cam-msg').textContent = `Mirando ${VERIFY.seconds} s… Las personas se tapan; la imagen no sale del móvil.`;
+    const frames = [], t0 = performance.now();
+    await new Promise((done) => { const tick = () => {
+      if (!camStream) return done();
+      const r = det.detectForVideo(v, performance.now());
+      x.clearRect(0, 0, c.width, c.height);
+      const dets = [];
+      for (const d of r.detections) { const cat = d.categories[0], b = d.boundingBox; dets.push({ label: cat.categoryName, score: cat.score });
+        if (cat.categoryName === 'person') { x.fillStyle = '#000'; x.fillRect(b.originX, b.originY, b.width, b.height); } // privacidad: se tapa
+        else { x.strokeStyle = '#ff7756'; x.lineWidth = 4; x.strokeRect(b.originX, b.originY, b.width, b.height); } }
+      frames.push(dets);
+      if (performance.now() - t0 < VERIFY.seconds * 1000) requestAnimationFrame(tick); else done();
+    }; requestAnimationFrame(tick); });
+    camResult = verifyReport(rep.kind, frames, VERIFY);
+    const color = camResult.verdict === 'COMPATIBLE' ? '#34d399' : camResult.verdict === 'NO_VISTO' ? '#ff5b6e' : '#93a7b1';
+    const title = camResult.verdict === 'COMPATIBLE' ? `Visto: ${camResult.es}` : camResult.verdict === 'NO_VISTO' ? 'No se ha visto nada compatible' : 'No verificable con este modelo';
+    $('#cam-res').innerHTML = `<div class="verdict">${gIcon(camResult.group || 'object', color)}<div><b>${esc(title)}</b><br><small class="sub">${esc(camResult.note || camResult.reason || `${camResult.frames ?? 0} de ${frames.length} fotogramas · umbral 0,5 y 3 fotogramas (elegido por la app, no calibrado)`)}</small></div></div>`;
+    $('#cam-msg').textContent = 'Solo se guarda la etiqueta, nunca la imagen.';
+    $('#cam-ok').hidden = camResult.verdict !== 'COMPATIBLE';
+  } catch (err) { $('#cam-msg').textContent = 'No se pudo usar la cámara o el reconocedor: ' + (err.message || err.name); }
+}
+$('#along').addEventListener('click', (e) => { const i = e.target.closest('[data-verify]')?.dataset.verify; if (i != null) verifyWithCamera(Number(i)); });
 
 // ── Aviso por voz ──
 const ERRV = { NO_DISPONIBLE: 'Este móvil no tiene reconocimiento de voz.', PERMISO_DENEGADO: 'Sin permiso de micrófono.', ERROR_7: 'No se ha entendido nada. Prueba otra vez.', ERROR_6: 'No se oyó nada.', ERROR_2: 'Sin red y sin idioma español descargado: descarga el reconocimiento sin conexión en los ajustes de voz de Android.', ERROR_13: 'Falta el idioma español sin conexión en este móvil.' };
