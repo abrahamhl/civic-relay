@@ -9,7 +9,7 @@
 - `docs/research/VIGIA_NOVEDADES.md` creado.
 
 ## En curso
-- Verificar `/senda/descargas` en https://civic-relay-investor.vercel.app (404 a las 13:33Z; Vercel pendiente).
+- Nada abierto de la Fase 0. `/senda/descargas` verificada en producción (200, 13:34Z).
 
 ## Siguiente
 1. Fase 1: credencial de rol ECDSA P-256 (envelope.mjs), QR, caducidad/revocación, pruebas (sin firma/caducada → CIUDADANO).

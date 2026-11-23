@@ -4,7 +4,7 @@ Prompt de trabajo: `docs/prompts/SONNET_SENDA_APP_2026-11-23.md`. Marcar `[x]` s
 
 ## 0 · Entrega sin ordenador
 - [x] Workflow: en cada fusión a master, APK (base y play) en la Release fija `senda-android-latest`, con su SHA-256 (PR #69; Release verificada)
-- [ ] (PR #69 fusionada; falta verificar en producción) Página `/senda/descargas` con el enlace y las instrucciones de instalación desde el móvil
+- [x] (PR #69, verificada en producción 2026-11-23 13:34Z) Página `/senda/descargas` con el enlace y las instrucciones de instalación desde el móvil
 
 ## 1 · Roles sin servidor
 - [ ] Credencial de rol firmada por la clave del ADMIN (ECDSA P-256), con caducidad y revocación
