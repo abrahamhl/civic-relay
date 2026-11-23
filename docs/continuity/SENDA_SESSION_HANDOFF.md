@@ -1,33 +1,29 @@
 # SENDA · handoff (2026-11-23, sesión app)
 
-## Hecho
-- Fase 0: workflow `.github/workflows/senda-android-release.yml` → Release fija `senda-android-latest` (PR #69). APK base 12,8 MB y play 16,6 MB con SHA256SUMS; comprobado.
-- Firma de pruebas de campo fija: `apps/senda-android/senda-test.keystore` (no secreta, no vale para tiendas).
-- Página `/senda/descargas` (`investor-next/public/senda/descargas.html` + rewrite en `vercel.json`).
-- command-center: instantánea de `estado.json` regenerada (master estaba en rojo).
-- `packages/senda/src/external-links.mjs`: V16 conectada, walkie 4G, híbrido y Xiaomi Offline, sin cifras inventadas; `survivesCellBlackout()`.
-- `docs/research/VIGIA_NOVEDADES.md` creado.
+## Hecho y fusionado
+- Fase 0: APK en la Release fija `senda-android-latest` (workflow), `/senda/descargas` verificada.
+- Fase 1 núcleo: `app-roles.mjs` (ADMIN por clave no exportable, OBSERVADOR_TOTAL por credencial, CIUDADANO) — PR #71.
+- Portada `/senda/app` estilo Apple (Inicio, Módulos por rol, Mensajes, Ajustes con dar/revocar acceso por código) — PR #71.
+- Marco común `app-chrome.mjs` en las 50 páginas (solo dentro de la app). Icono adaptativo. Márgenes Android 15. SENDA Drive como módulo (un solo icono) — PR #71.
+- `external-links.mjs` (V16, walkie 4G, Xiaomi) y `docs/research/VIGIA_NOVEDADES.md`.
 
-## Fase 1 (núcleo hecho)
-- `app-roles.mjs`: ADMIN por clave, OBSERVADOR_TOTAL por credencial firmada (caducidad, revocación con lista firmada monótona, concesión VAULT, anti-retroceso de reloj), CIUDADANO por defecto. Límites declarados en la cabecera del módulo.
+## En esta PR (pendiente de fusionar)
+- `/senda/ruta` + `route-planner.mjs`: rutas moldeables sobre OSM de l'Horta Sud, agua Copernicus, cámaras DGT, Google Maps/Waze.
+- Aviso por voz: `voice-report.mjs` + `SendaNative.listen()` (SpeechRecognizer, prefiere sin red) + `<queries>` en el manifiesto.
 
-## Portada de la app (estilo Apple)
-- `investor-next/public/senda/app.html` + `app-shell.mjs`; catálogo en `packages/senda/src/app-catalog.mjs` (prueba: cada módulo existe y toda página de vercel.json está en el catálogo).
-- Android: icono adaptativo (`res/`), márgenes del sistema en Android 15, arranque en `/senda/app`.
+## Siguiente (todo, sin preguntar el orden)
+1. QR para pasar el código de acceso (mostrar y leer).
+2. Red social: perfiles, contactos y chat de grupo sobre `familiar-chat.mjs`.
+3. Rehacer el interior de las páginas al estilo de la portada (empezar por index/SOS, avisos, sala).
+4. Ruta: más zonas (paquete de calles por zona), sentido único y velocidades si hay datos con fuente.
+5. Agente de I+D: tarea programada que revise el Vigía (pedir confirmación de coste/frecuencia solo si genera gasto).
+6. Fase 3: pruebas guiadas de campo con JSON firmado.
 
-## En curso
-- Nada abierto de la Fase 0. `/senda/descargas` verificada en producción (200, 13:34Z).
-
-## Siguiente
-0. Rehacer la cabecera de chips de las páginas antiguas (index y demás) al estilo de la portada; iconos propios por módulo.
-1. Fase 1 (resto): pantalla de roles en la app — mostrar y leer QR (decidir: lector nativo sin dependencias o librería JS con licencia verificada), guardar ancla y credencial en el móvil, menú por rol.
-2. Fase 3: pruebas guiadas de campo (BLE 5/10/20/40 m, sonido 1/3/5 m, …) con JSON firmado.
-3. Comprobar si DGT publica las V16 en NAP/DATEX II (API para terceros: no documentada).
-
-## Bloqueos / pendientes
+## Bloqueos
+- Sin SDK de Android aquí: lo nativo solo se compila en CI.
 - Clave de publicación real (secreto) cuando se vaya a tiendas u organismos.
-- No hay SDK de Android en el contenedor: el APK solo se prueba en CI.
+- Waze for Cities exige un organismo socio.
 
-## Decisiones del fundador pendientes
-- Nombre o enlace del «walkie 4G chino sin datos» (no encontrado).
-- Repositorio público: el APK es descargable por cualquiera con el enlace.
+## Pendiente del fundador
+- Nombre o enlace del «walkie 4G sin datos».
+- Probar en los dos móviles: Ajustes → administrador → código → hermano; Ruta y aviso por voz.

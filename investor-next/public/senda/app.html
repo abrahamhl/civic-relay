@@ -48,6 +48,11 @@ textarea.field{min-height:96px;resize:vertical;font:13px/1.4 "IBM Plex Mono",ui-
 .btn.sec{background:var(--g2);color:var(--l1)}.btn.del{background:none;color:var(--rosa);border:.5px solid var(--sep)}
 .pad{padding:14px 16px}.ok{color:var(--menta)}.ko{color:var(--rosa)}.hide{display:none}
 code{font:12px "IBM Plex Mono",ui-monospace,monospace;color:var(--l2);overflow-wrap:anywhere}
+.qrbox{background:#fff;border-radius:12px;padding:10px;margin-top:12px;max-width:320px;margin-left:auto;margin-right:auto}.qrbox:empty{display:none}.qrbox svg{width:100%;height:auto;display:block}
+#scanner{position:fixed;inset:0;z-index:50;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px}
+#scanner[hidden]{display:none}#scanner video{width:100%;max-width:480px;border-radius:16px;background:#111}
+.scanframe{position:absolute;width:min(62vw,300px);aspect-ratio:1;border:3px solid var(--acc);border-radius:18px;pointer-events:none}
+#scan-msg{color:var(--l2);margin:0}#scanner .btn{max-width:320px}
 @media (prefers-reduced-motion:reduce){.card{transition:none}}
 </style></head><body>
 
@@ -83,13 +88,15 @@ code{font:12px "IBM Plex Mono",ui-monospace,monospace;color:var(--l2);overflow-w
       <select class="field" id="g-days" style="margin-top:10px"><option value="7">7 días</option><option value="30" selected>30 días</option><option value="90">90 días</option></select>
       <label class="row" style="padding:10px 0;min-height:0"><input type="checkbox" id="g-vault"><span class="t"><b>Incluir la bóveda de defensa</b><small>Solo si lo decides expresamente</small></span></label>
       <button class="btn" id="g-issue">Crear código de acceso</button>
-      <div id="g-out" class="hide"><textarea class="field" id="g-code" readonly style="margin-top:12px"></textarea>
+      <div id="g-out" class="hide"><div class="qrbox" id="g-qr" aria-label="QR del código de acceso"></div>
+        <p class="foot" style="margin:8px 0 0">En el otro móvil: Ajustes → «Escanear QR». O comparte el texto:</p>
+        <textarea class="field" id="g-code" readonly style="margin-top:8px"></textarea>
         <button class="btn sec" id="g-share">Compartir código</button></div>
     </div>
     <h2>Accesos emitidos</h2>
     <div class="group" id="issued"></div>
     <p class="foot">Revocar genera un código que la otra persona debe pegar en su móvil: sin red no hay otra forma de avisarle.</p>
-    <div id="r-out" class="hide group pad" style="margin-top:12px"><textarea class="field" id="r-code" readonly></textarea><button class="btn sec" id="r-share">Compartir revocación</button></div>
+    <div id="r-out" class="hide group pad" style="margin-top:12px"><div class="qrbox" id="r-qr" aria-label="QR de la revocación"></div><textarea class="field" id="r-code" readonly style="margin-top:8px"></textarea><button class="btn sec" id="r-share">Compartir revocación</button></div>
   </div>
 
   <div id="setup-zone" class="hide">
@@ -100,7 +107,8 @@ code{font:12px "IBM Plex Mono",ui-monospace,monospace;color:var(--l2);overflow-w
 
   <div id="import-zone">
     <h2>Pegar un código</h2>
-    <div class="group pad"><textarea class="field" id="in-code" placeholder="SENDA-ROL:… o SENDA-REVOCA:…"></textarea>
+    <div class="group pad"><button class="btn" id="scan" style="margin:0 0 12px">Escanear QR con la cámara</button>
+      <textarea class="field" id="in-code" placeholder="O pega aquí el texto: SENDA-ROL:… o SENDA-REVOCA:…"></textarea>
       <button class="btn sec" id="in-apply">Aplicar código</button><p class="foot" id="in-msg" style="margin:8px 0 0"></p></div>
   </div>
 
@@ -113,6 +121,8 @@ code{font:12px "IBM Plex Mono",ui-monospace,monospace;color:var(--l2);overflow-w
   <p class="foot">Versión de pruebas de campo. No está certificada ni conectada al 112.</p>
 </section>
 
+<div id="scanner" hidden><video id="scan-video" playsinline muted></video><div class="scanframe"></div>
+  <p id="scan-msg">Apunta al QR del otro móvil</p><button class="btn sec" id="scan-close">Cerrar</button></div>
 <nav class="tabs">
   <a href="#inicio" data-tab="inicio" class="on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 3 10.5V21h6v-6h6v6h6V10.5z"/></svg>Inicio</a>
   <a href="#modulos" data-tab="modulos"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Módulos</a>
