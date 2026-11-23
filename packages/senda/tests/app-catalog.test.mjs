@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { MODULES, SECTIONS, allowed, search } from '../src/app-catalog.mjs';
 import { ROLES } from '../src/app-roles.mjs';
@@ -10,7 +10,7 @@ const web = fileURLToPath(new URL('../../../investor-next/public/senda/', import
 test('cada módulo apunta a una página que existe y está en una sección conocida', () => {
   const ids = new Set(SECTIONS.map((s) => s.id));
   for (const m of MODULES) {
-    assert.ok(existsSync(`${web}${m.page}.html`), `${m.page}.html`);
+    if (!m.native) assert.ok(existsSync(`${web}${m.page}.html`), `${m.page}.html`);
     assert.ok(ids.has(m.section), m.page);
   }
   assert.equal(new Set(MODULES.map((m) => m.page)).size, MODULES.length, 'sin duplicados');
@@ -37,4 +37,17 @@ test('búsqueda sin acentos ni mayúsculas', () => {
   assert.ok(search('camaras').some((m) => m.page === 'camaras'));
   assert.ok(search('INCENDIO').length >= 2);
   assert.equal(search('').length, MODULES.length);
+});
+
+test('SENDA Drive es un módulo nativo dentro de la app, no una página', () => {
+  const d = MODULES.find((m) => m.page === 'drive');
+  assert.equal(d.native, 'openDrive');
+  assert.match(d.href, /^#nativo-/);
+});
+
+test('todas las páginas (salvo la portada) cargan el marco común de la app', () => {
+  const dir = fileURLToPath(new URL('../../../investor-next/public/senda/', import.meta.url));
+  for (const f of readdirSync(dir).filter((x) => x.endsWith('.html') && x !== 'app.html')) {
+    assert.match(readFileSync(dir + f, 'utf8'), /\/senda\/app-chrome\.mjs/, f);
+  }
 });

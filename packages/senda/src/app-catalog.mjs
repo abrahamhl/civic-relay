@@ -27,6 +27,7 @@ const M = [
   ['avisos', 'Avisos de peligro', 'Lo que pasa a tu alrededor', 'emergencia', C],
   ['triaje', 'Triaje', 'Primeros auxilios guiados', 'emergencia', C],
   ['monte', 'Perdido en el monte', 'Qué hacer y cómo avisar', 'emergencia', C],
+  ['drive', 'SENDA Drive', 'Arranque automático en el coche', 'emergencia', C],
   ['carretera', 'Ruta protectora', 'Salir por el camino seguro', 'emergencia', C],
   ['sala', 'Sala de decisión', 'Vista de operador', 'mando', O],
   ['centro', 'Centro', 'Panel de control', 'mando', O],
@@ -72,8 +73,11 @@ const M = [
   ['organismo', 'Organismos', 'Anclas y credenciales', 'admin', A],
 ];
 
+/** Módulos nativos: no son una página web, los abre la app Android por su puente. */
+export const NATIVE = Object.freeze({ drive: 'openDrive' });
+
 export const MODULES = Object.freeze(M.map(([page, title, sub, section, minRole]) =>
-  Object.freeze({ page, href: page === 'index' ? '/senda' : `/senda/${page}`, title, sub, section, minRole })));
+  Object.freeze({ page, href: NATIVE[page] ? `#nativo-${page}` : page === 'index' ? '/senda' : `/senda/${page}`, title, sub, section, minRole, native: NATIVE[page] ?? null })));
 
 export const allowed = (mod, role) => (RANK[role] ?? 0) >= RANK[mod.minRole];
 

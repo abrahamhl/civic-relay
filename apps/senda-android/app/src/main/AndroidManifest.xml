@@ -38,13 +38,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!-- SENDA Drive: consentimiento y vinculación del coche. Nada automático sin pulsar aquí. -->
-        <activity android:name=".CarLinkActivity" android:label="SENDA Drive" android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
+        <!-- SENDA Drive: consentimiento y vinculación del coche. Nada automático sin pulsar aquí.
+             Se abre desde la app (módulo «SENDA Drive»), no como segundo icono: el fundador vio dos apps que parecían la misma. -->
+        <activity android:name=".CarLinkActivity" android:label="SENDA Drive" android:exported="false"/>
         <service android:name=".DriveSessionService" android:exported="false" android:foregroundServiceType="location"/>
         <!-- Android 12+: el sistema la despierta cuando aparece o desaparece el coche vinculado. -->
         <service android:name=".CarCompanionService" android:exported="true"

@@ -95,11 +95,18 @@ function show(tab) {
   document.querySelectorAll('nav.tabs a').forEach((a) => a.classList.toggle('on', a.dataset.tab === tab));
   window.scrollTo(0, 0);
 }
+if (window.SendaNative) try { sessionStorage.setItem('senda.inApp', '1'); } catch { /* sin almacenamiento */ }
 const route = () => show(['inicio', 'modulos', 'ajustes'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'inicio');
 addEventListener('hashchange', route);
 
 document.addEventListener('click', (e) => {
   const c = e.target.closest('a.card[data-page]');
+  const mod = c && MODULES.find((m) => m.page === c.dataset.page);
+  if (mod?.native && !c.hasAttribute('aria-disabled')) {
+    e.preventDefault();
+    const fn = window.SendaNative?.[mod.native];
+    if (typeof fn === 'function') fn.call(window.SendaNative); else alert('Esta función solo existe en la app de Android.');
+  }
   if (c && !c.hasAttribute('aria-disabled')) LS.set('recent', [c.dataset.page, ...LS.get('recent', []).filter((p) => p !== c.dataset.page)].slice(0, 8));
 });
 $('#q').addEventListener('input', () => { renderCatalog(); paintIcons(); });
