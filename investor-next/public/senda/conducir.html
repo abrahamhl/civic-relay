@@ -1,0 +1,118 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000"><title>SENDA · Conducir</title>
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/fonts/fonts.css">
+<link rel="stylesheet" href="/senda/vendor/maplibre-gl-4.7.1/maplibre-gl.css">
+<style>
+:root{--card:#ffffff;--ink:#1c1c1e;--muted:#6e6e73;--blue:#0a84ff;--orange:#ff9500;--red:#ff3b30;--green:#34c759;--teal:#30b0c7}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}[hidden]{display:none!important}
+html,body{margin:0;height:100%;overflow:hidden;background:#dfe6ea;color:var(--ink);font:16px/1.3 Inter,-apple-system,system-ui,sans-serif}
+button,input{font:inherit;color:inherit;border:0}button{cursor:pointer;background:none}
+#app{position:fixed;inset:0}html.in-app #app{top:48px}
+#map,#radarWrap{position:absolute;inset:0}
+#radarWrap{display:grid;place-items:center;background:#0b1419;color:#fff;text-align:center;padding:20px}
+#radar{width:min(80vw,360px);height:min(80vw,360px)}
+/* Tarjetas flotantes */
+.card{background:var(--card);border-radius:18px;box-shadow:0 6px 24px rgba(0,0,0,.18)}
+#top{position:absolute;left:10px;right:10px;top:10px;z-index:5}
+#search{display:flex;align-items:center;gap:8px;padding:10px 12px}
+#search input{flex:1;outline:none;font-size:17px;background:none}
+#search svg{flex:none;color:var(--muted)}
+#favs{display:flex;gap:8px;margin-top:8px;overflow-x:auto}
+.chip{background:var(--card);border-radius:20px;padding:8px 14px;font-size:14px;font-weight:600;box-shadow:0 3px 12px rgba(0,0,0,.15);white-space:nowrap}
+#results{margin-top:8px;max-height:40vh;overflow:auto}
+#results button{display:block;width:100%;text-align:left;padding:12px 14px;border-top:1px solid #eee;font-size:15px}
+#results button:first-child{border-top:0}#results small{display:block;color:var(--muted);font-size:12px}
+/* Cartel de maniobra */
+#turn{display:flex;gap:12px;align-items:center;padding:12px 14px;background:var(--green);color:#fff}
+#turn .dist{font-size:26px;font-weight:800;white-space:nowrap}#turn .txt{font-size:17px;font-weight:600;line-height:1.2}
+/* Botones laterales */
+#side{position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px;z-index:4}
+.fab{width:48px;height:48px;border-radius:50%;background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.2);display:grid;place-items:center}
+.fab.on{background:var(--blue);color:#fff}
+/* Abajo */
+#speed{position:absolute;left:12px;bottom:calc(var(--bottomH,96px) + 12px);z-index:6;width:66px;height:66px;border-radius:50%;background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.25);display:grid;place-items:center;text-align:center;font-weight:800;font-size:24px;line-height:1}
+#speed small{display:block;font-size:10px;font-weight:600;color:var(--muted)}
+#reportBtn{position:absolute;right:12px;bottom:calc(var(--bottomH,96px) + 12px);z-index:6;width:66px;height:66px;border-radius:50%;background:var(--orange);color:#fff;box-shadow:0 6px 18px rgba(255,149,0,.5);display:grid;place-items:center}
+#bottom{position:absolute;left:0;right:0;bottom:0;z-index:5;padding:12px 14px calc(12px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0}
+#eta{display:flex;align-items:baseline;gap:10px}#eta b{font-size:24px}#eta span{color:var(--muted)}
+.row{display:flex;gap:8px;margin-top:10px}.row button{flex:1;padding:11px;border-radius:12px;font-weight:700;font-size:15px;background:#f2f2f7}
+.row .waze{background:#33ccff;color:#06323f}.row .maps{background:#e8f0fe;color:#1a56c4}.row .end{background:#ffe5e3;color:var(--red)}
+#hint{color:var(--muted);font-size:13px;margin:0}
+/* Hoja de avisos */
+#sheet{position:absolute;left:0;right:0;bottom:0;z-index:8;padding:16px 14px calc(16px + env(safe-area-inset-bottom));border-radius:22px 22px 0 0}
+#sheet h3{margin:0 0 12px;font-size:20px}
+#grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+#grid button{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:600}
+#grid svg{width:58px;height:58px}
+#veil{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:7}
+/* Cámara con IA (miniatura) */
+#pip{position:absolute;right:68px;top:84px;z-index:4;width:132px;height:176px;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+#pip.big{left:10px;right:10px;top:84px;width:auto;height:52vh}
+#pip video,#pip canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#adas{position:absolute;left:10px;right:10px;z-index:6;border-radius:14px;padding:12px 14px;font-weight:800;font-size:17px;top:84px}
+#adas.AMBAR{background:#ffcc00;color:#1c1c1e}#adas.ROJO{background:var(--red);color:#fff}
+.maplibregl-ctrl-attrib{font-size:10px}
+/* Dashcam */
+#dash{position:absolute;inset:0;z-index:9;background:#000;color:#fff}
+#dashCanvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+#dashHud{position:absolute;left:10px;right:10px;top:10px;display:flex;gap:10px;align-items:center;font-weight:700;font-size:15px;text-shadow:0 1px 3px #000}
+#dashHud span{background:rgba(0,0,0,.55);border-radius:10px;padding:6px 10px}#recDot{color:#ff3b30}
+#dashBar{position:absolute;left:0;right:0;bottom:0;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;padding:12px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.75))}
+.seg{display:flex;background:rgba(255,255,255,.15);border-radius:10px;padding:2px}.seg button{padding:8px 10px;border-radius:8px;color:#fff;font-size:13px;font-weight:600}.seg button.on{background:#fff;color:#000}
+.tog{font-size:13px;display:flex;gap:6px;align-items:center}
+#recBtn{width:64px;height:64px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center}#recBtn span{width:44px;height:44px;border-radius:50%;background:#ff3b30;transition:all .2s}
+#recBtn.on span{width:26px;height:26px;border-radius:6px}
+.dashSmall{background:rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:9px 12px;font-weight:600;font-size:13px}
+/* Mapa en la esquina durante la dashcam (al lado en horizontal) */
+html.dashmode #map{inset:auto;left:10px;top:56px;width:38%;height:30%;z-index:10;border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+html.dashmode.nomini #map{display:none}
+@media (orientation:landscape){html.dashmode #map{left:auto;right:0;top:0;width:36%;height:100%;border-radius:0}html.dashmode #dashCanvas,html.dashmode #dashBar,html.dashmode #dashHud{width:64%;right:auto}html.dashmode #dashBar{gap:6px;padding-bottom:8px}}
+html.dashmode .maplibregl-ctrl-attrib{font-size:9px;max-width:92%}
+html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #reportBtn,html.dashmode #bottom,html.dashmode #pip,html.dashmode #adas{display:none!important}
+</style><script type="module" src="/senda/app-chrome.mjs"></script></head><body>
+<div id="app">
+  <div id="map" aria-label="Mapa"></div>
+  <div id="radarWrap" hidden><div><canvas id="radar" width="720" height="720" aria-label="Radar de avisos alrededor"></canvas><p id="offmsg" style="opacity:.8;font-size:14px"></p></div></div>
+
+  <div id="top">
+    <div id="turn" class="card" hidden><div class="dist" id="turnDist"></div><div class="txt" id="turnTxt"></div></div>
+    <div id="searchBox"><form id="search" class="card" autocomplete="off"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="¿A dónde vas?" enterkeyhint="search" aria-label="Destino"></form>
+      <div id="favs"><button class="chip" id="favHome">Casa</button><button class="chip" id="favWork">Trabajo</button></div>
+      <div id="results" class="card" hidden></div></div>
+  </div>
+  <div id="adas" role="alert" hidden></div>
+  <div id="pip" hidden><video id="v" playsinline muted></video><canvas id="ov"></canvas></div>
+
+  <div id="side">
+    <button class="fab" id="center" aria-label="Centrar en mí"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 4 21l8-4 8 4z"/></svg></button>
+    <button class="fab" id="camBtn" aria-label="Cámara con IA"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg></button>
+    <button class="fab" id="dashBtn" aria-label="Modo dashcam"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="15" height="12" rx="2"/><circle cx="9.5" cy="12" r="3"/><path d="M17 10l5-3v10l-5-3"/></svg></button>
+    <button class="fab" id="voiceBtn" aria-label="Aviso hablado"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+  </div>
+  <div id="speed"><div>–<small>km/h</small></div></div>
+  <button id="reportBtn" aria-label="Avisar"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+
+  <div id="bottom" class="card">
+    <div id="etaBox" hidden><div id="eta"><b id="etaTime"></b><span id="etaInfo"></span></div>
+      <div class="row"><button class="waze" id="goWaze">Waze</button><button class="maps" id="goMaps">Google Maps</button><button class="end" id="endNav">Terminar</button></div></div>
+    <p id="hint">Busca un destino o toca Casa/Trabajo. Avisos: botón naranja.</p>
+  </div>
+
+  <div id="dash" hidden>
+    <canvas id="dashCanvas" aria-label="Dashcam"></canvas>
+    <div id="dashHud"><span id="recDot" hidden>● REC <b id="recTime">00:00</b></span><span id="dashSpeed">– km/h</span><span id="dashInfo"></span></div>
+    <div id="dashBar">
+      <div class="seg" role="group" aria-label="Calidad"><button data-q="low" class="on">Baja 720p</button><button data-q="high">Alta 1080p</button></div>
+      <label class="tog"><input type="checkbox" id="withData" checked> Datos en el vídeo</label>
+      <button id="recBtn" aria-label="Grabar"><span></span></button>
+      <button class="dashSmall" id="miniMap">Mapa</button>
+      <button class="dashSmall" id="dashExit">Salir</button>
+    </div>
+  </div>
+  <div id="veil" hidden></div>
+  <div id="sheet" class="card" hidden><h3>¿Qué ves?</h3><div id="grid"></div></div>
+</div>
+<script src="/senda/vendor/maplibre-gl-4.7.1/maplibre-gl-csp.js"></script>
+<script type="module" src="/senda/conducir.mjs"></script>
+</body></html>

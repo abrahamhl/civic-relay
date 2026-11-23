@@ -45,6 +45,7 @@ public final class AppActivity extends Activity {
     private WebView web;
     private static final int REQ_MIC = 41, REQ_GEO = 42, REQ_VOICE = 43, REQ_CAM = 44, REQ_BT = 45, REQ_PICK = 46;
     private BleMailbox mailbox;
+    private FileSaver saver;
     private Runnable afterBt;
     private PermissionRequest pendingCam;
     private SpeechRecognizer recognizer;
@@ -213,8 +214,24 @@ public final class AppActivity extends Activity {
         if (code == REQ_GEO && pendingGeo != null) { pendingGeo.invoke(pendingGeoOrigin, ok, false); pendingGeo = null; pendingGeoOrigin = null; }
     }
 
+    // Incidencias de la DGT en vivo (DATEX II, CC BY). Solo este host; solo si la versión tiene Internet (play).
+    // La base no tiene permiso de Internet: la descarga falla y la web usa la copia guardada.
+    static final String LIVE_DGT_PATH = "/senda/live/dgt-incidencias.xml";
+    private static final String DGT_URL = "https://nap.dgt.es/datex2/v3/dgt/SituationPublication/datex2_v37.xml";
+    private WebResourceResponse liveDgt() {
+        try {
+            java.net.HttpURLConnection c = (java.net.HttpURLConnection) new java.net.URL(DGT_URL).openConnection();
+            c.setConnectTimeout(15_000); c.setReadTimeout(30_000);
+            if (c.getResponseCode() != 200) return new WebResourceResponse("text/plain", "utf-8", 502, "Bad Gateway", Collections.emptyMap(), new ByteArrayInputStream(new byte[0]));
+            return new WebResourceResponse("text/xml", "utf-8", c.getInputStream());
+        } catch (IOException | SecurityException e) {
+            return new WebResourceResponse("text/plain", "utf-8", 503, "Unavailable", Collections.emptyMap(), new ByteArrayInputStream(new byte[0]));
+        }
+    }
+
     private final class Client extends WebViewClient {
         @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest req) {
+            if ((OfflineAssets.ORIGIN + LIVE_DGT_PATH).equals(req.getUrl().toString())) return liveDgt();
             OfflineAssets.Asset a = OfflineAssets.resolve(req.getUrl().toString());
             if (a == null) return notFound();
             try {
@@ -229,6 +246,10 @@ public final class AppActivity extends Activity {
         @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {
             String url = req.getUrl().toString();
             if (url.startsWith("senda://")) { openRadios(url); return true; }
+            if (ExternalLinks.allowed(url)) { // Waze, Google Maps, SMS y llamada: se abren en su propia app
+                try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); } catch (android.content.ActivityNotFoundException ignored) { }
+                return true;
+            }
             return !OfflineAssets.isInApp(url); // cualquier otro destino se bloquea: la app no navega fuera
         }
 
@@ -241,7 +262,7 @@ public final class AppActivity extends Activity {
     /** Puente mínimo hacia lo nativo. Cada método es un permiso: añadir solo lo imprescindible. */
     private final class Bridge {
         @JavascriptInterface public String info() {
-            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true}";
+            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true,\"fileSave\":true}";
         }
 
         /** Abre la pantalla de radios con una acción senda://accion?… validada; el usuario confirma allí. */
@@ -259,6 +280,17 @@ public final class AppActivity extends Activity {
             if (bytes.length == 0 || bytes.length > MailboxFrames.MAX_BYTES) return false;
             runOnUiThread(() -> withBt(() -> mailbox().send(bytes, 8000)));
             return true;
+        }
+
+        /** Guardar archivos generados por la web (vídeo de la dashcam…) en Descargas/SENDA, por trozos base64. */
+        @JavascriptInterface public String fileBegin(String name, String mime) {
+            try { if (saver == null) saver = new FileSaver(AppActivity.this); return saver.begin(name, mime); } catch (Exception e) { return ""; }
+        }
+        @JavascriptInterface public boolean fileChunk(String id, String b64) {
+            try { saver.chunk(id, b64); return true; } catch (Exception e) { return false; }
+        }
+        @JavascriptInterface public String fileEnd(String id) {
+            try { return saver.end(id); } catch (Exception e) { return ""; }
         }
 
         /** Abre el selector de contactos del sistema (sin permiso de agenda: solo el contacto que el usuario elige). */

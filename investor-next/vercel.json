@@ -9,7 +9,7 @@
       "destination": "/senda/index.html"
     },
     {
-      "source": "/senda/:page(app|descargas|ruta|agua|agua-nl|aislamiento|arquitectura|atlas|avisos|barrido|camaras|carretera|centro|ciclo|consola|demo|dgt|dron|edificios|estado|evacuacion|explica|fuego|fuego3d|incendio|incidente|llamada|mensaje|monte|mulas|ojo|organismo|paises|paper|plataforma|radar|radio|red|referencias|reserva|roadsafe|sala|sentidos|simulador|trafico|triaje|vehiculos|via|viaje|visor|vuelo)",
+      "source": "/senda/:page(app|descargas|ruta|conducir|agua|agua-nl|aislamiento|arquitectura|atlas|avisos|barrido|camaras|carretera|centro|ciclo|consola|demo|dgt|dron|edificios|estado|evacuacion|explica|fuego|fuego3d|incendio|incidente|llamada|mensaje|monte|mulas|ojo|organismo|paises|paper|plataforma|radar|radio|red|referencias|reserva|roadsafe|sala|sentidos|simulador|trafico|triaje|vehiculos|via|viaje|visor|vuelo)",
       "destination": "/senda/:page.html"
     }
   ],
@@ -47,7 +47,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: https: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.vercel.app https://api.civic-relay.com https://earthquake.usgs.gov https://www.seismicportal.eu https://www.gdacs.org https://eonet.gsfc.nasa.gov; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: https: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://tiles.openfreemap.org https://router.project-osrm.org https://nominatim.openstreetmap.org https://*.vercel.app https://api.civic-relay.com https://earthquake.usgs.gov https://www.seismicportal.eu https://www.gdacs.org https://eonet.gsfc.nasa.gov; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
         }
       ]
     },
