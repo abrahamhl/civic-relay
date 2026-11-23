@@ -3,8 +3,8 @@
 Prompt de trabajo: `docs/prompts/SONNET_SENDA_APP_2026-11-23.md`. Marcar `[x]` solo con PR fusionada y verificada (poner su enlace).
 
 ## 0 · Entrega sin ordenador
-- [ ] Workflow: en cada fusión a master, APK (base y play) en la Release fija `senda-android-latest`, con su SHA-256
-- [ ] Página `/senda/descargas` con el enlace y las instrucciones de instalación desde el móvil
+- [x] Workflow: en cada fusión a master, APK (base y play) en la Release fija `senda-android-latest`, con su SHA-256 (PR #69; Release verificada)
+- [x] (PR #69, verificada en producción 2026-11-23 13:34Z) Página `/senda/descargas` con el enlace y las instrucciones de instalación desde el móvil
 
 ## 1 · Roles sin servidor
 - [ ] Credencial de rol firmada por la clave del ADMIN (ECDSA P-256), con caducidad y revocación
@@ -32,4 +32,4 @@ Prompt de trabajo: `docs/prompts/SONNET_SENDA_APP_2026-11-23.md`. Marcar `[x]` s
 - [ ] Catálogo completo para ADMIN y OBSERVADOR; solo lo público para el ciudadano; registro de accesos; sin reconocimiento facial ni de matrículas
 
 ## 7 · Vigía de novedades
-- [ ] `docs/research/VIGIA_NOVEDADES.md` (fecha, fuente, filtro) y revisión en cada sesión
+- [ ] `docs/research/VIGIA_NOVEDADES.md` creado el 2026-11-23 (V16, walkie 4G, Xiaomi); revisión en cada sesión
