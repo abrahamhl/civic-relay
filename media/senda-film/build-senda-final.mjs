@@ -115,7 +115,7 @@ const scenes = [
     { kind: 'route', kick: 'Arnhem → San Martín de Valdeiglesias', tag: 'cálculo', title: 'Tu hermano no tiene datos. Alguien a su lado sí.', bbox: [-10.5, 9.5, 37.5, 54.5],
       points: [{ label: 'Tú · Arnhem', lat: 51.98, lon: 5.91, color: '#91d7e8' }, { label: 'Buzón cegado (Internet)', lat: 47.0, lon: 3.0, color: '#b48cff', leg: 'Internet', dx: 10, dy: 18 },
         { label: 'Vecina con 4G', lat: 40.55, lon: -4.0, color: '#34d399', leg: 'su conexión', dx: 12, dy: -8 }, { label: 'Tu hermano · sin datos', lat: 40.36, lon: -4.4, color: '#ff7756', leg: 'Bluetooth', dash: true, dx: -150, dy: 26 }],
-      foot: 'Recorrido ilustrativo; las posiciones de la vecina y del buzón son simbólicas.' },
+      foot: 'Recorrido ilustrativo; las posiciones de la vecina y del buzón son simbólicas. Estado a 23-11-2026: el buzón en Internet existe y pasa pruebas, pero aún no está publicado en ningún servidor; el enlace Bluetooth entre móviles está en la app y falta medirlo en campo.' },
     'Sin datos, pero no solo', [
       'WhatsApp necesita que tu móvil tenga datos. SENDA no habla con WhatsApp ni lo sustituye: entra cuando no hay red.',
       'El móvil sin datos busca por Bluetooth otro móvil SENDA cercano que sí tenga conexión y que haya aceptado prestarla, aunque sea un desconocido.',

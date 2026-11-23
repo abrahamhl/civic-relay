@@ -280,7 +280,7 @@
             "dy": 26
           }
         ],
-        "foot": "Recorrido ilustrativo; las posiciones de la vecina y del buzón son simbólicas."
+        "foot": "Recorrido ilustrativo; las posiciones de la vecina y del buzón son simbólicas. Estado a 23-11-2026: el buzón en Internet existe y pasa pruebas, pero aún no está publicado en ningún servidor; el enlace Bluetooth entre móviles está en la app y falta medirlo en campo."
       },
       "title": {
         "es": "Sin datos, pero no solo"

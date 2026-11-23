@@ -10,15 +10,16 @@
 ## Fusionado después (PR #72, #73)
 - Ruta, voz y QR (#72). Buzón Bluetooth cercano GATT + MailboxFrames (#73). OJO: validar YAML antes de subir (un «: » sin comillas tumbó el flujo de Android).
 
-## En esta PR (pendiente de fusionar)
-- Chat estilo WhatsApp en Mensajes + historial de enviados + invitar contacto del móvil por SMS (selector del sistema, sin permiso de agenda).
+## Fusionado (#74, #75) y en PR #76
+- Chat estilo WhatsApp (#74). Verificación de avisos con cámara: MediaPipe + EfficientDet-Lite0 int8 en `senda/vendor/` (#75; licencias en LICENSES.md). #76: ✓/✓✓ con recibo verificado y rótulo de la película corregido.
+- OJO: las tareas programadas consumen créditos de pago del plan (el sistema apagó la anterior): no crear sin permiso del fundador.
 
 ## Antes (ya fusionado)
 - `/senda/ruta` + `route-planner.mjs`: rutas moldeables sobre OSM de l'Horta Sud, agua Copernicus, cámaras DGT, Google Maps/Waze.
 - Aviso por voz: `voice-report.mjs` + `SendaNative.listen()` (SpeechRecognizer, prefiere sin red) + `<queries>` en el manifiesto.
 
 ## Siguiente (todo, sin preguntar el orden)
-1. Verificación de avisos con la cámara del coche que pasa (detección en el móvil; caras y matrículas borradas).
+1. Volver a renderizar la película (escena b4) con el rótulo corregido.
 2. Chat: recibos de entrega/lectura visibles, chats de grupo, notas de voz (Codec2/Opus de `familiar-chat.mjs`).
 2b. Relé de Internet para Holanda → España: pendiente de que el fundador elija alojamiento.
 3. Rehacer el interior de las páginas al estilo de la portada (empezar por index/SOS, avisos, sala).
