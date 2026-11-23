@@ -7,13 +7,20 @@
 - Marco común `app-chrome.mjs` en las 50 páginas (solo dentro de la app). Icono adaptativo. Márgenes Android 15. SENDA Drive como módulo (un solo icono) — PR #71.
 - `external-links.mjs` (V16, walkie 4G, Xiaomi) y `docs/research/VIGIA_NOVEDADES.md`.
 
+## Fusionado después (PR #72, #73)
+- Ruta, voz y QR (#72). Buzón Bluetooth cercano GATT + MailboxFrames (#73). OJO: validar YAML antes de subir (un «: » sin comillas tumbó el flujo de Android).
+
 ## En esta PR (pendiente de fusionar)
+- Chat estilo WhatsApp en Mensajes + historial de enviados + invitar contacto del móvil por SMS (selector del sistema, sin permiso de agenda).
+
+## Antes (ya fusionado)
 - `/senda/ruta` + `route-planner.mjs`: rutas moldeables sobre OSM de l'Horta Sud, agua Copernicus, cámaras DGT, Google Maps/Waze.
 - Aviso por voz: `voice-report.mjs` + `SendaNative.listen()` (SpeechRecognizer, prefiere sin red) + `<queries>` en el manifiesto.
 
 ## Siguiente (todo, sin preguntar el orden)
-1. QR para pasar el código de acceso (mostrar y leer).
-2. Red social: perfiles, contactos y chat de grupo sobre `familiar-chat.mjs`.
+1. Verificación de avisos con la cámara del coche que pasa (detección en el móvil; caras y matrículas borradas).
+2. Chat: recibos de entrega/lectura visibles, chats de grupo, notas de voz (Codec2/Opus de `familiar-chat.mjs`).
+2b. Relé de Internet para Holanda → España: pendiente de que el fundador elija alojamiento.
 3. Rehacer el interior de las páginas al estilo de la portada (empezar por index/SOS, avisos, sala).
 4. Ruta: más zonas (paquete de calles por zona), sentido único y velocidades si hay datos con fuente.
 5. Agente de I+D: tarea programada que revise el Vigía (pedir confirmación de coste/frecuencia solo si genera gasto).

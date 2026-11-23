@@ -52,3 +52,18 @@ textarea{margin-bottom:8px}
 body.easy-only #home>:not(#easy):not(.me){display:none}body.easy-only{font-size:19px}body.easy-only .q{min-height:88px;font-size:24px}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--amb);outline-offset:2px}
 .status a.pill{color:var(--ice);text-decoration:none}
+/* Chat (estilo mensajería): lista de conversaciones, hilo con burbujas y redactor fijo abajo */
+.chats{list-style:none;padding:0;margin:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.chats li{display:flex;gap:12px;align-items:center;padding:12px 14px;cursor:pointer;border-top:1px solid var(--line)}
+.chats li:first-child{border-top:0}.chats .av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:600;background:#2c2c2e;flex:none}
+.chats .t{flex:1;min-width:0}.chats .t b{display:block}.chats .t small{display:block;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chats time{font-size:12px;color:var(--muted)}
+.thread-head{display:flex;align-items:center;gap:10px;padding:6px 0 10px}.thread-head button{background:none;border:0;color:#ff7756;font-size:17px;padding:6px 0}
+.bubbles{list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:6px}
+.bubbles li{max-width:80%;padding:8px 12px;border-radius:18px;line-height:1.35;word-wrap:break-word}
+.bubbles li.in{align-self:flex-start;background:#2c2c2e;border-bottom-left-radius:6px}
+.bubbles li.out{align-self:flex-end;background:#0a84ff;color:#fff;border-bottom-right-radius:6px}
+.bubbles li.sos{background:#ff5b6e;color:#fff}
+.bubbles .meta{display:block;font-size:11px;opacity:.75;margin-top:3px}
+.composer{position:sticky;bottom:0;background:var(--bg,#05090c);padding-top:8px}
+.composer .via{gap:6px;flex-wrap:wrap;align-items:center}.composer .via button{padding:6px 10px;font-size:14px}
