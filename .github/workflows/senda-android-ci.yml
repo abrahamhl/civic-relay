@@ -25,6 +25,11 @@ jobs:
           javac --release 17 -d "$RUNNER_TEMP/jvm" apps/senda-android/app/src/main/java/eu/senda/field/SendaFormats.java apps/senda-android/app/src/main/java/eu/senda/field/NativeAction.java apps/senda-android/app/src/main/java/eu/senda/field/OfflineAssets.java apps/senda-android/app/src/test/java/eu/senda/field/SendaFormatsTest.java apps/senda-android/app/src/test/java/eu/senda/field/OfflineAssetsTest.java
           java -cp "$RUNNER_TEMP/jvm" eu.senda.field.SendaFormatsTest
           java -cp "$RUNNER_TEMP/jvm" eu.senda.field.OfflineAssetsTest
+      - name: Buzón Bluetooth cercano: troceado y recompuesto de sobres (JVM)
+        run: |
+          mkdir -p "$RUNNER_TEMP/jvm3"
+          javac --release 17 -d "$RUNNER_TEMP/jvm3" apps/senda-android/app/src/main/java/eu/senda/field/MailboxFrames.java apps/senda-android/app/src/test/java/eu/senda/field/MailboxFramesTest.java
+          java -cp "$RUNNER_TEMP/jvm3" eu.senda.field.MailboxFramesTest
       - name: Conformidad del arranque automático con la referencia JS (vectores)
         run: |
           mkdir -p "$RUNNER_TEMP/jvm2"
