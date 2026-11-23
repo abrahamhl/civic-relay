@@ -11,10 +11,15 @@
 ## Fase 1 (núcleo hecho)
 - `app-roles.mjs`: ADMIN por clave, OBSERVADOR_TOTAL por credencial firmada (caducidad, revocación con lista firmada monótona, concesión VAULT, anti-retroceso de reloj), CIUDADANO por defecto. Límites declarados en la cabecera del módulo.
 
+## Portada de la app (estilo Apple)
+- `investor-next/public/senda/app.html` + `app-shell.mjs`; catálogo en `packages/senda/src/app-catalog.mjs` (prueba: cada módulo existe y toda página de vercel.json está en el catálogo).
+- Android: icono adaptativo (`res/`), márgenes del sistema en Android 15, arranque en `/senda/app`.
+
 ## En curso
 - Nada abierto de la Fase 0. `/senda/descargas` verificada en producción (200, 13:34Z).
 
 ## Siguiente
+0. Rehacer la cabecera de chips de las páginas antiguas (index y demás) al estilo de la portada; iconos propios por módulo.
 1. Fase 1 (resto): pantalla de roles en la app — mostrar y leer QR (decidir: lector nativo sin dependencias o librería JS con licencia verificada), guardar ancla y credencial en el móvil, menú por rol.
 2. Fase 3: pruebas guiadas de campo (BLE 5/10/20/40 m, sonido 1/3/5 m, …) con JSON firmado.
 3. Comprobar si DGT publica las V16 en NAP/DATEX II (API para terceros: no documentada).

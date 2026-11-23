@@ -1,0 +1,123 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000"><title>SENDA</title>
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/fonts/fonts.css">
+<style>
+/* Guías de interfaz de Apple (HIG) en modo oscuro, con la paleta de SENDA como color de acento. */
+:root{--bg:#000;--g1:#1c1c1e;--g2:#2c2c2e;--sep:rgba(84,84,88,.6);--l1:#fff;--l2:rgba(235,235,245,.6);--l3:rgba(235,235,245,.3);
+--acc:#ff7756;--cielo:#91d7e8;--menta:#34d399;--sol:#fbbf24;--rosa:#ff5b6e;--violeta:#a78bfa;--azul:#0a84ff;
+--top:env(safe-area-inset-top,0px);--bot:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--l1);font:17px/1.35 Inter,-apple-system,system-ui,sans-serif;letter-spacing:-.01em}
+button,input,textarea,select{font:inherit;color:inherit}
+.view{display:none;padding:calc(var(--top) + 8px) 16px calc(96px + var(--bot))}.view.on{display:block}
+h1{font-size:34px;line-height:1.1;font-weight:700;letter-spacing:-.02em;margin:24px 4px 12px}
+h2{font-size:13px;font-weight:500;color:var(--l2);text-transform:uppercase;letter-spacing:.02em;margin:28px 16px 8px}
+.foot{font-size:13px;color:var(--l2);margin:8px 16px 0;line-height:1.4}
+.search{display:flex;align-items:center;gap:8px;background:var(--g1);border-radius:10px;padding:8px 10px;margin:0 0 4px}
+.search input{flex:1;border:0;background:none;outline:none;font-size:17px}.search svg{flex:none;opacity:.6}
+/* Lista agrupada (estilo Ajustes) */
+.group{background:var(--g1);border-radius:12px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;min-height:48px;padding:6px 16px;text-decoration:none;color:inherit;border:0;background:none;width:100%;text-align:left;position:relative;cursor:pointer}
+.row+.row::before{content:"";position:absolute;top:0;left:60px;right:0;border-top:.5px solid var(--sep)}
+.row .t{flex:1;min-width:0}.row .t b{display:block;font-weight:400}.row .t small{display:block;color:var(--l2);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .chev{color:var(--l3);flex:none}.row .v{color:var(--l2);font-size:15px}
+.tile{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;flex:none}
+.tile svg{width:18px;height:18px}
+/* Tarjetas de módulos */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{position:relative;background:var(--g1);border-radius:16px;padding:14px;min-height:112px;display:flex;flex-direction:column;justify-content:space-between;text-decoration:none;color:inherit;transition:transform .12s}
+.card:active{transform:scale(.97)}.card .tile{width:36px;height:36px;border-radius:9px}.card .tile svg{width:20px;height:20px}
+.card b,.card small{display:block}.card b{font-weight:600;font-size:15px;line-height:1.25;margin-top:12px}.card small{color:var(--l2);font-size:12px;margin-top:2px}
+.card.lock{opacity:.45}.card .lk{position:absolute;top:12px;right:12px;color:var(--l2)}
+/* Tarjeta de estado */
+.hero{background:linear-gradient(160deg,#1c1c1e,#0d1418);border-radius:16px;padding:18px}
+.hero .who{font-size:22px;font-weight:600;margin:6px 0 2px}.hero p{margin:0;color:var(--l2);font-size:15px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.qa{background:var(--g1);border-radius:14px;padding:14px 8px;text-align:center;text-decoration:none;color:inherit;font-size:13px;font-weight:500}
+.qa .tile{margin:0 auto 8px;width:40px;height:40px;border-radius:12px}.qa.sos .tile{background:var(--rosa)}
+/* Barra de pestañas */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:rgba(18,18,20,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:.5px solid var(--sep);padding:6px 0 calc(6px + var(--bot))}
+nav.tabs a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;font-weight:500;color:var(--l2);text-decoration:none;padding:2px 0}
+nav.tabs a.on{color:var(--acc)}nav.tabs svg{width:26px;height:26px}
+/* Formularios */
+.field{width:100%;background:var(--g2);border:0;border-radius:10px;padding:12px;font-size:16px;outline:none}
+textarea.field{min-height:96px;resize:vertical;font:13px/1.4 "IBM Plex Mono",ui-monospace,monospace}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:14px;font-weight:600;font-size:17px;background:var(--acc);color:#1a0b06;cursor:pointer;margin-top:12px}
+.btn.sec{background:var(--g2);color:var(--l1)}.btn.del{background:none;color:var(--rosa);border:.5px solid var(--sep)}
+.pad{padding:14px 16px}.ok{color:var(--menta)}.ko{color:var(--rosa)}.hide{display:none}
+code{font:12px "IBM Plex Mono",ui-monospace,monospace;color:var(--l2);overflow-wrap:anywhere}
+@media (prefers-reduced-motion:reduce){.card{transition:none}}
+</style></head><body>
+
+<section class="view on" id="v-inicio">
+  <h1>SENDA</h1>
+  <div class="hero" id="hero"><span class="foot" style="margin:0">Cargando…</span></div>
+  <div class="quick">
+    <a class="qa sos" href="/senda"><div class="tile" data-ico="sos"></div>SOS y estado</a>
+    <a class="qa" href="/senda/avisos"><div class="tile" style="background:var(--sol)" data-ico="bell"></div>Avisos</a>
+    <a class="qa" href="/senda/mensaje"><div class="tile" style="background:var(--azul)" data-ico="msg"></div>Mensaje</a>
+  </div>
+  <h2>Accesos recientes</h2>
+  <div class="grid" id="recent"></div>
+  <p class="foot" id="recent-empty">Los módulos que abras aparecerán aquí.</p>
+</section>
+
+<section class="view" id="v-modulos">
+  <h1>Módulos</h1>
+  <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="Buscar" autocomplete="off"></label>
+  <div id="catalog"></div>
+</section>
+
+<section class="view" id="v-ajustes">
+  <h1>Ajustes</h1>
+  <h2>Tu acceso</h2>
+  <div class="group"><div class="row"><div class="tile" style="background:var(--violeta)" data-ico="key"></div><div class="t"><b id="role-name">…</b><small id="role-why"></small></div></div></div>
+  <p class="foot">Los candados ordenan la interfaz según tu rol. El contenido viaja dentro de la app: el candado no es un cifrado.</p>
+
+  <div id="admin-zone" class="hide">
+    <h2>Dar acceso (solo administrador)</h2>
+    <div class="group pad">
+      <input class="field" id="g-name" placeholder="Nombre de la persona" maxlength="40">
+      <select class="field" id="g-days" style="margin-top:10px"><option value="7">7 días</option><option value="30" selected>30 días</option><option value="90">90 días</option></select>
+      <label class="row" style="padding:10px 0;min-height:0"><input type="checkbox" id="g-vault"><span class="t"><b>Incluir la bóveda de defensa</b><small>Solo si lo decides expresamente</small></span></label>
+      <button class="btn" id="g-issue">Crear código de acceso</button>
+      <div id="g-out" class="hide"><textarea class="field" id="g-code" readonly style="margin-top:12px"></textarea>
+        <button class="btn sec" id="g-share">Compartir código</button></div>
+    </div>
+    <h2>Accesos emitidos</h2>
+    <div class="group" id="issued"></div>
+    <p class="foot">Revocar genera un código que la otra persona debe pegar en su móvil: sin red no hay otra forma de avisarle.</p>
+    <div id="r-out" class="hide group pad" style="margin-top:12px"><textarea class="field" id="r-code" readonly></textarea><button class="btn sec" id="r-share">Compartir revocación</button></div>
+  </div>
+
+  <div id="setup-zone" class="hide">
+    <h2>Primer uso</h2>
+    <div class="group pad"><p class="foot" style="margin:0 0 4px">Si eres el responsable, convierte este móvil en el administrador. La clave se crea aquí y no se puede copiar.</p>
+      <button class="btn" id="become-admin">Hacer administrador este móvil</button></div>
+  </div>
+
+  <div id="import-zone">
+    <h2>Pegar un código</h2>
+    <div class="group pad"><textarea class="field" id="in-code" placeholder="SENDA-ROL:… o SENDA-REVOCA:…"></textarea>
+      <button class="btn sec" id="in-apply">Aplicar código</button><p class="foot" id="in-msg" style="margin:8px 0 0"></p></div>
+  </div>
+
+  <h2>Información</h2>
+  <div class="group">
+    <a class="row" href="/senda/estado"><div class="tile" style="background:var(--menta)" data-ico="check"></div><div class="t"><b>Verificación de la versión</b></div><span class="chev">›</span></a>
+    <a class="row" href="/senda/explica"><div class="tile" style="background:var(--cielo)" data-ico="book"></div><div class="t"><b>Qué es SENDA</b></div><span class="chev">›</span></a>
+    <a class="row" href="/senda/descargas"><div class="tile" style="background:var(--g2)" data-ico="down"></div><div class="t"><b>Descargar la app</b></div><span class="chev">›</span></a>
+  </div>
+  <p class="foot">Versión de pruebas de campo. No está certificada ni conectada al 112.</p>
+</section>
+
+<nav class="tabs">
+  <a href="#inicio" data-tab="inicio" class="on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 3 10.5V21h6v-6h6v6h6V10.5z"/></svg>Inicio</a>
+  <a href="#modulos" data-tab="modulos"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Módulos</a>
+  <a href="/senda" data-tab="mensajes"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 4v-4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>Mensajes</a>
+  <a href="#ajustes" data-tab="ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Ajustes</a>
+</nav>
+<script type="module" src="/senda/app-shell.mjs"></script>
+</body></html>

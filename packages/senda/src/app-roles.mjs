@@ -33,7 +33,7 @@ const url = b64; // b64 ya es base64url sin relleno
 const unurl = unb64;
 
 export async function createAdmin() {
-  const keys = await subtle.generateKey(ALG, true, ['sign', 'verify']);
+  const keys = await subtle.generateKey(ALG, false, ['sign', 'verify']); // la privada no se puede exportar ni copiar
   return { keys, anchor: { publicJwk: strip(await subtle.exportKey('jwk', keys.publicKey)) } };
 }
 const strip = (j) => ({ kty: j.kty, crv: j.crv, x: j.x, y: j.y });

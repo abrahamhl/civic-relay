@@ -5,7 +5,10 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.WindowInsets;
+import android.widget.FrameLayout;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
@@ -52,7 +55,17 @@ public final class AppActivity extends Activity {
         web.setWebViewClient(new Client());
         web.setWebChromeClient(new Chrome());
         web.addJavascriptInterface(new Bridge(), "SendaNative");
-        setContentView(web);
+        // Android 15 dibuja de borde a borde: sin esto la web queda bajo la hora y los botones del sistema.
+        FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(Color.rgb(5, 9, 12));
+        web.setBackgroundColor(Color.rgb(5, 9, 12));
+        root.addView(web);
+        if (android.os.Build.VERSION.SDK_INT >= 35) root.setOnApplyWindowInsetsListener((v, insets) -> {
+            android.graphics.Insets bars = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout() | WindowInsets.Type.ime());
+            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return WindowInsets.CONSUMED;
+        });
+        setContentView(root);
         if (b != null) web.restoreState(b); else web.loadUrl(OfflineAssets.START);
     }
 
