@@ -12,7 +12,7 @@
 ## 2. Forma de trabajar
 
 - Idioma con el fundador: español, directo, sin preguntas innecesarias cuando el objetivo está claro.
-- Rama de trabajo actual: `claude/promotional-video-prompts-p5vzh8` (PR #32). No se fuerza el push.
+- Rama de trabajo: la que asigne cada sesión. No se fuerza el push salvo para reiniciar la rama desde master tras una fusión. Hoja de ruta de la app: `docs/ROADMAP_APP.md`; prompt de trabajo: `docs/prompts/SONNET_SENDA_APP_2026-11-23.md`.
 - Pruebas: `node --test packages/senda/tests/*.test.mjs`; copia web con `node packages/senda/scripts/sync-web.mjs`.
 - Seguimiento de compromisos: `docs/CUMPLIMIENTO.md` (se revisa cada hora mientras haya trabajo abierto). Cada entrada lleva la hora y el hash del commit que la respalda; nunca una hora estimada.
 - La bóveda de defensa queda separada de las superficies civiles.
