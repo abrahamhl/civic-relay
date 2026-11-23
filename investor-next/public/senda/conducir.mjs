@@ -8,6 +8,7 @@ import { parseDatex2 } from './core/datex2.mjs';
 import { wazeUrl, googleMapsUrl } from './core/route-planner.mjs';
 import { routeUrl, parseRoute, nextManeuver, shouldReroute, announcement } from './core/nav-osrm.mjs';
 import { CATEGORIES, FROM_REPORT, fromDatex, markerSvg } from './core/report-style.mjs';
+import { saveBlob } from './save-file.mjs';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -201,6 +202,108 @@ function analyse(now) {
   const key = top.id + top.level; if (Date.now() - (saidAdas.get(key) ?? 0) > 6000) { saidAdas.set(key, Date.now()); if (top.level === 'ROJO') { navigator.vibrate?.([200, 100, 200]); say(`Cuidado, ${ES[top.label] ?? 'vehículo'} delante`); } else if (top.reasons.some((rr) => rr.startsWith('se mete'))) say(`${ES[top.label] ?? 'vehículo'} ${top.reasons.find((rr) => rr.startsWith('se mete'))}`); }
 }
 
+// ── Modo dashcam: cámara trasera a pantalla completa + mapa al lado, grabación en calidad baja o alta ──
+// El dibujo se refresca en cada fotograma (recuadros del último análisis); el análisis va 4 veces por segundo.
+const QUALITY = { low: { w: 1280, h: 720, bps: 2_500_000, label: '720p' }, high: { w: 1920, h: 1080, bps: 8_000_000, label: '1080p' } };
+const dash = { on: false, q: 'low', stream: null, objs: [], lastDet: 0, rec: null, chunks: [], t0: 0, timer: null };
+async function getDetector() {
+  if (det) return det;
+  const vision = await import(MP + '/vision_bundle.mjs'); const files = await vision.FilesetResolver.forVisionTasks(MP + '/wasm');
+  det = await vision.ObjectDetector.createFromOptions(files, { baseOptions: { modelAssetPath: '/senda/vendor/models/efficientdet_lite0_int8.tflite', delegate: 'CPU' }, runningMode: 'VIDEO', scoreThreshold: 0.4, maxResults: 8 });
+  return det;
+}
+async function dashCamera() {
+  dash.stream?.getTracks().forEach((t) => t.stop());
+  const q = QUALITY[dash.q];
+  dash.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: q.w }, height: { ideal: q.h }, frameRate: { ideal: 30 } }, audio: false });
+  const v = $('#v'); v.srcObject = dash.stream; await v.play();
+}
+async function dashOpen() {
+  if (camOn) camStop();
+  document.documentElement.classList.add('dashmode'); $('#dash').hidden = false; dash.on = true;
+  $('#dashInfo').textContent = 'Cargando cámara…';
+  try {
+    await Promise.all([getDetector(), dashCamera()]); tracker = createTracker();
+    try { await navigator.wakeLock?.request('screen'); } catch { /* */ }
+    st.map?.resize(); requestAnimationFrame(dashFrame);
+  } catch (e) { $('#dashInfo').textContent = 'Cámara no disponible: ' + (e.message || e.name); }
+}
+function dashClose() {
+  if (dash.rec) dashRecord();
+  dash.on = false; dash.stream?.getTracks().forEach((t) => t.stop()); dash.stream = null;
+  document.documentElement.classList.remove('dashmode', 'nomini'); $('#dash').hidden = true; st.map?.resize();
+}
+function dashFrame(now) {
+  if (!dash.on) return;
+  const v = $('#v'), c = $('#dashCanvas');
+  if (v.videoWidth) {
+    if (c.width !== v.videoWidth) { c.width = v.videoWidth; c.height = v.videoHeight; }
+    const W = c.width, H = c.height, x = c.getContext('2d');
+    x.drawImage(v, 0, 0, W, H);
+    if (now - dash.lastDet >= 250) { dash.lastDet = now; const r = det.detectForVideo(v, now);
+      dash.objs = tracker.update(r.detections.map((d) => ({ label: d.categories[0].categoryName, score: d.categories[0].score, x: d.boundingBox.originX / W, y: d.boundingBox.originY / H, w: d.boundingBox.width / W, h: d.boundingBox.height / H })), now / 1000);
+      const top = topAlert(dash.objs); if (top) warnDash(top); }
+    drawDashData(x, W, H); // en pantalla siempre; si grabas «sin datos» se graba la cámara tal cual
+    $('#dashInfo').textContent = `${dash.objs.length} vehículos/personas · ${W}×${H}`;
+  }
+  requestAnimationFrame(dashFrame);
+}
+function drawDashData(x, W, H) {
+  const k = W / 1280; // tamaños proporcionales a la resolución
+  for (const o of dash.objs) {
+    const bx = o.box.x * W, by = o.box.y * H, bw = o.box.w * W, bh = o.box.h * H;
+    if (o.label === 'person') { x.fillStyle = 'rgba(0,0,0,.9)'; x.fillRect(bx, by, bw, bh); } // privacidad: también en el vídeo
+    x.strokeStyle = COLOR[o.level]; x.lineWidth = (o.level === 'VERDE' ? 3 : 6) * k; x.strokeRect(bx, by, bw, bh);
+    const side = o.zone === 'TU_CARRIL' ? 'delante' : o.zone === 'DERECHA' ? 'derecha' : 'izquierda';
+    const t = `${ES[o.label] ?? o.label} · ${side}${o.ttcS ? ' · ' + o.ttcS.toFixed(1) + ' s' : ''}`;
+    x.font = `600 ${Math.round(18 * k)}px Inter,sans-serif`; const tw = x.measureText(t).width + 12 * k;
+    x.fillStyle = COLOR[o.level]; x.fillRect(bx, by - 26 * k, tw, 26 * k); x.fillStyle = '#000'; x.fillText(t, bx + 6 * k, by - 8 * k);
+  }
+  // Sello de dashcam: fecha, hora, velocidad y posición
+  const stamp = `SENDA · ${new Date().toLocaleString('es-ES')} · ${st.speed == null ? '–' : Math.round(st.speed * 3.6)} km/h${st.pos ? ` · ${st.pos[1].toFixed(5)}, ${st.pos[0].toFixed(5)}` : ''}`;
+  x.font = `600 ${Math.round(20 * k)}px Inter,sans-serif`; x.fillStyle = 'rgba(0,0,0,.6)'; x.fillRect(0, H - 40 * k, x.measureText(stamp).width + 24 * k, 40 * k);
+  x.fillStyle = '#fff'; x.fillText(stamp, 12 * k, H - 13 * k);
+}
+function warnDash(o) {
+  const key = o.id + o.level; if (Date.now() - (saidAdas.get(key) ?? 0) < 6000) return; saidAdas.set(key, Date.now());
+  if (o.level === 'ROJO') { navigator.vibrate?.([200, 100, 200]); say(`Cuidado, ${ES[o.label] ?? 'vehículo'} delante`); }
+  else if (o.reasons.some((r) => r.startsWith('se mete'))) say(`${ES[o.label] ?? 'vehículo'} ${o.reasons.find((r) => r.startsWith('se mete'))}`);
+}
+function pickMime() {
+  for (const m of ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm']) if (window.MediaRecorder?.isTypeSupported?.(m)) return m;
+  return '';
+}
+async function dashRecord() {
+  if (dash.rec) { // parar y guardar
+    const r = dash.rec; dash.rec = null; clearInterval(dash.timer); $('#recBtn').classList.remove('on'); $('#recDot').hidden = true;
+    await new Promise((ok) => { r.onstop = ok; r.stop(); });
+    const mime = r.mimeType || 'video/webm', ext = mime.includes('mp4') ? 'mp4' : 'webm';
+    const blob = new Blob(dash.chunks, { type: mime }); dash.chunks = [];
+    $('#dashInfo').textContent = `Guardando ${(blob.size / 1e6).toFixed(1)} MB…`;
+    const res = await saveBlob(blob, `senda-dashcam-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}-${QUALITY[dash.q].label}.${ext}`, (f) => { $('#dashInfo').textContent = `Guardando… ${Math.round(f * 100)} %`; });
+    say(res.ok ? 'Vídeo guardado' : 'No se pudo guardar el vídeo');
+    $('#dashInfo').textContent = res.ok ? `Vídeo guardado en ${res.where} (${(blob.size / 1e6).toFixed(1)} MB)` : 'No se pudo guardar';
+    return;
+  }
+  if (!dash.stream) return;
+  const q = QUALITY[dash.q], mime = pickMime();
+  const src = $('#withData').checked ? $('#dashCanvas').captureStream(30) : dash.stream; // con datos = lo que ves; sin datos = cámara tal cual
+  dash.chunks = []; dash.rec = new MediaRecorder(src, { mimeType: mime || undefined, videoBitsPerSecond: q.bps });
+  dash.rec.ondataavailable = (e) => { if (e.data.size) dash.chunks.push(e.data); };
+  dash.rec.start(1000); dash.t0 = Date.now(); $('#recBtn').classList.add('on'); $('#recDot').hidden = false;
+  dash.timer = setInterval(() => { const s = Math.floor((Date.now() - dash.t0) / 1000); $('#recTime').textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; $('#dashSpeed').textContent = `${st.speed == null ? '–' : Math.round(st.speed * 3.6)} km/h`; }, 500);
+}
+$('#dashBtn').addEventListener('click', dashOpen);
+$('#dashExit').addEventListener('click', dashClose);
+$('#recBtn').addEventListener('click', dashRecord);
+$('#miniMap').addEventListener('click', () => { document.documentElement.classList.toggle('nomini'); st.map?.resize(); });
+document.querySelectorAll('#dash [data-q]').forEach((b) => b.addEventListener('click', async () => {
+  if (dash.rec) return say('Para la grabación para cambiar la calidad');
+  dash.q = b.dataset.q; document.querySelectorAll('#dash [data-q]').forEach((x) => x.classList.toggle('on', x === b));
+  try { await dashCamera(); } catch (e) { $('#dashInfo').textContent = 'Esa calidad no está disponible: ' + (e.message || e.name); }
+}));
+document.addEventListener('visibilitychange', () => { if (document.hidden && dash.on && !dash.rec) dashClose(); });
+
 // ── Radar sin red (avisos, cámaras e incidencias en 5 km; la marcha hacia arriba) ──
 function drawRadar() {
   const c = $('#radar'); if (!c || $('#radarWrap').hidden) return;
@@ -225,4 +328,4 @@ initMap();
 loadIncidents();
 setInterval(() => { if (!document.hidden) loadIncidents(); }, 5 * 60 * 1000);
 // Para pruebas automáticas
-globalThis.sendaDrive = { st, goTo, onPos };
+globalThis.sendaDrive = { st, goTo, onPos, dash };

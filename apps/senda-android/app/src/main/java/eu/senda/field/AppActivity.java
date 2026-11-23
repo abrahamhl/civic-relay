@@ -45,6 +45,7 @@ public final class AppActivity extends Activity {
     private WebView web;
     private static final int REQ_MIC = 41, REQ_GEO = 42, REQ_VOICE = 43, REQ_CAM = 44, REQ_BT = 45, REQ_PICK = 46;
     private BleMailbox mailbox;
+    private FileSaver saver;
     private Runnable afterBt;
     private PermissionRequest pendingCam;
     private SpeechRecognizer recognizer;
@@ -261,7 +262,7 @@ public final class AppActivity extends Activity {
     /** Puente mínimo hacia lo nativo. Cada método es un permiso: añadir solo lo imprescindible. */
     private final class Bridge {
         @JavascriptInterface public String info() {
-            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true}";
+            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true,\"fileSave\":true}";
         }
 
         /** Abre la pantalla de radios con una acción senda://accion?… validada; el usuario confirma allí. */
@@ -279,6 +280,17 @@ public final class AppActivity extends Activity {
             if (bytes.length == 0 || bytes.length > MailboxFrames.MAX_BYTES) return false;
             runOnUiThread(() -> withBt(() -> mailbox().send(bytes, 8000)));
             return true;
+        }
+
+        /** Guardar archivos generados por la web (vídeo de la dashcam…) en Descargas/SENDA, por trozos base64. */
+        @JavascriptInterface public String fileBegin(String name, String mime) {
+            try { if (saver == null) saver = new FileSaver(AppActivity.this); return saver.begin(name, mime); } catch (Exception e) { return ""; }
+        }
+        @JavascriptInterface public boolean fileChunk(String id, String b64) {
+            try { saver.chunk(id, b64); return true; } catch (Exception e) { return false; }
+        }
+        @JavascriptInterface public String fileEnd(String id) {
+            try { return saver.end(id); } catch (Exception e) { return ""; }
         }
 
         /** Abre el selector de contactos del sistema (sin permiso de agenda: solo el contacto que el usuario elige). */

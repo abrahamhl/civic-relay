@@ -53,6 +53,23 @@ button,input{font:inherit;color:inherit;border:0}button{cursor:pointer;backgroun
 #adas{position:absolute;left:10px;right:10px;z-index:6;border-radius:14px;padding:12px 14px;font-weight:800;font-size:17px;top:84px}
 #adas.AMBAR{background:#ffcc00;color:#1c1c1e}#adas.ROJO{background:var(--red);color:#fff}
 .maplibregl-ctrl-attrib{font-size:10px}
+/* Dashcam */
+#dash{position:absolute;inset:0;z-index:9;background:#000;color:#fff}
+#dashCanvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+#dashHud{position:absolute;left:10px;right:10px;top:10px;display:flex;gap:10px;align-items:center;font-weight:700;font-size:15px;text-shadow:0 1px 3px #000}
+#dashHud span{background:rgba(0,0,0,.55);border-radius:10px;padding:6px 10px}#recDot{color:#ff3b30}
+#dashBar{position:absolute;left:0;right:0;bottom:0;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;padding:12px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.75))}
+.seg{display:flex;background:rgba(255,255,255,.15);border-radius:10px;padding:2px}.seg button{padding:8px 10px;border-radius:8px;color:#fff;font-size:13px;font-weight:600}.seg button.on{background:#fff;color:#000}
+.tog{font-size:13px;display:flex;gap:6px;align-items:center}
+#recBtn{width:64px;height:64px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center}#recBtn span{width:44px;height:44px;border-radius:50%;background:#ff3b30;transition:all .2s}
+#recBtn.on span{width:26px;height:26px;border-radius:6px}
+.dashSmall{background:rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:9px 12px;font-weight:600;font-size:13px}
+/* Mapa en la esquina durante la dashcam (al lado en horizontal) */
+html.dashmode #map{inset:auto;left:10px;top:56px;width:38%;height:30%;z-index:10;border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+html.dashmode.nomini #map{display:none}
+@media (orientation:landscape){html.dashmode #map{left:auto;right:0;top:0;width:36%;height:100%;border-radius:0}html.dashmode #dashCanvas,html.dashmode #dashBar,html.dashmode #dashHud{width:64%;right:auto}html.dashmode #dashBar{gap:6px;padding-bottom:8px}}
+html.dashmode .maplibregl-ctrl-attrib{font-size:9px;max-width:92%}
+html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #reportBtn,html.dashmode #bottom,html.dashmode #pip,html.dashmode #adas{display:none!important}
 </style><script type="module" src="/senda/app-chrome.mjs"></script></head><body>
 <div id="app">
   <div id="map" aria-label="Mapa"></div>
@@ -70,6 +87,7 @@ button,input{font:inherit;color:inherit;border:0}button{cursor:pointer;backgroun
   <div id="side">
     <button class="fab" id="center" aria-label="Centrar en mí"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 4 21l8-4 8 4z"/></svg></button>
     <button class="fab" id="camBtn" aria-label="Cámara con IA"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg></button>
+    <button class="fab" id="dashBtn" aria-label="Modo dashcam"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="15" height="12" rx="2"/><circle cx="9.5" cy="12" r="3"/><path d="M17 10l5-3v10l-5-3"/></svg></button>
     <button class="fab" id="voiceBtn" aria-label="Aviso hablado"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
   </div>
   <div id="speed"><div>–<small>km/h</small></div></div>
@@ -81,6 +99,17 @@ button,input{font:inherit;color:inherit;border:0}button{cursor:pointer;backgroun
     <p id="hint">Busca un destino o toca Casa/Trabajo. Avisos: botón naranja.</p>
   </div>
 
+  <div id="dash" hidden>
+    <canvas id="dashCanvas" aria-label="Dashcam"></canvas>
+    <div id="dashHud"><span id="recDot" hidden>● REC <b id="recTime">00:00</b></span><span id="dashSpeed">– km/h</span><span id="dashInfo"></span></div>
+    <div id="dashBar">
+      <div class="seg" role="group" aria-label="Calidad"><button data-q="low" class="on">Baja 720p</button><button data-q="high">Alta 1080p</button></div>
+      <label class="tog"><input type="checkbox" id="withData" checked> Datos en el vídeo</label>
+      <button id="recBtn" aria-label="Grabar"><span></span></button>
+      <button class="dashSmall" id="miniMap">Mapa</button>
+      <button class="dashSmall" id="dashExit">Salir</button>
+    </div>
+  </div>
   <div id="veil" hidden></div>
   <div id="sheet" class="card" hidden><h3>¿Qué ves?</h3><div id="grid"></div></div>
 </div>

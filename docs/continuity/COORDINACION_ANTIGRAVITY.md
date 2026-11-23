@@ -18,3 +18,17 @@
 ## Reparto propuesto
 - **Antigravity**: financiación y convocatorias (sigue en su documento), mejoras visuales sobre las páginas existentes de master.
 - **Claude**: app Android (roles, comunicación móvil a móvil, ruta, voz, cámara), núcleo y pruebas.
+
+## Si Antigravity no puede hacer push (comprobado el 23-11 a las 19:2x: no ha llegado ninguna rama nueva)
+Causas más probables, en orden:
+1. **Archivos de más de 100 MB** (GitHub los rechaza con `GH001: Large files detected`; su rama anterior traía ZIPs de Hostinger y master ya tiene vídeos de 70–96 MB). Comprobar: `find . -size +95M -not -path './.git/*'` y sacarlos del commit (`git rm --cached <archivo>`, añadir a `.gitignore`, `git commit --amend` en SU rama).
+2. **Rama muy atrasada / push a master** (`rejected … fetch first` o `non-fast-forward`). No empujar a master: crear rama nueva desde el master actual y llevar allí su trabajo:
+   ```bash
+   git fetch origin
+   git checkout -b antigravity/fisica-matematica-20261123 origin/master
+   git cherry-pick <commit1> <commit2> …   # o copiar los archivos nuevos
+   git push -u origin antigravity/fisica-matematica-20261123
+   ```
+3. **Credencial sin permiso de escritura o caducada** (`403` / `Permission denied`): renovar el token o la conexión de GitHub de esa herramienta.
+
+Pedir a Antigravity **el mensaje de error exacto** del push: con él se sabe cuál de las tres es.
