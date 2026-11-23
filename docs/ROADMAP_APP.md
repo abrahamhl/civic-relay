@@ -27,8 +27,8 @@ Prompt de trabajo: `docs/prompts/SONNET_SENDA_APP_2026-11-23.md`. Marcar `[x]` s
 - [ ] Relé en Internet para larga distancia (Holanda → España): falta decidir alojamiento (servicio nuevo)
 - [ ] Wi-Fi Direct / Wi-Fi Aware para más alcance y velocidad que BLE
 - [x] Chat estilo WhatsApp con el selector de contactos de Android (PR #74)
-- [ ] Verificación de avisos con la cámara del que pasa — en esta PR (modelo en el móvil, imagen que nunca sale; falta probar con la cámara real)
-- [ ] Película: explicar bien el caso Holanda → España
+- [x] Verificación de avisos con la cámara del que pasa (PR #75; falta probar con la cámara real)
+- [ ] Película: rótulo de Holanda → España corregido en el guion (PR #76); falta volver a renderizar el MP4
 
 ## 3 · Validación física real (prioridad)
 - [ ] Pruebas guiadas en la app: baliza BLE, sonido, pasarela de un desconocido, DTN/.senda, arranque en coche, barrido Wi-Fi

@@ -125,8 +125,9 @@ const ACTIONS = {
   async 'ble-open'() { if (!hasBle()) return toast('El Bluetooth cercano solo funciona en la app de Android'); window.SendaNative.p2pStart(); },
   async 'ble-send'() {
     if (!hasBle()) return toast('El Bluetooth cercano solo funciona en la app de Android');
-    const items = outgoing(); if (!items.length) return toast('Nada pendiente de enviar');
-    // Un solo envío con el paquete completo (todos los sobres pendientes): menos conexiones, menos espera.
+    const items = outgoing(), sum = S.store.summary();
+    if (!items.length && !sum.receipts.length && !sum.pendingReceipts.length && !sum.broadcasts.length) return toast('Nada pendiente de enviar');
+    // Un solo envío (mensajes + recibos de entrega + alertas) con el paquete completo (todos los sobres pendientes): menos conexiones, menos espera.
     const text = exportBundleFile(S.store, { now: now() });
     const bytes = new TextEncoder().encode(text);
     if (bytes.length > 64 * 1024) return toast('Demasiado para Bluetooth de una vez: usa «Compartir paquete»');
@@ -308,7 +309,8 @@ function renderChats() {
   if (!open) return;
   $('#thread-name').textContent = open.c.name; $('#to').value = open.c.fingerprint;
   const carried = new Set(S.store.list().map((i) => i.id));
-  $('#bubbles').innerHTML = open.msgs.map((m) => `<li class="${m.dir}${m.kind === 'SOS' ? ' sos' : ''}">${esc(m.body)}<span class="meta">${hhmm(m.at)}${m.dir === 'out' ? (carried.has(m.id) ? ' · en camino' : ' · salió de este móvil') : ` · vía ${esc(m.via ?? '')}`}</span></li>`).join('')
+  const delivered = new Set(S.store.summary().receipts); // recibos verificados criptográficamente (el destinatario abrió el sobre)
+  $('#bubbles').innerHTML = open.msgs.map((m) => `<li class="${m.dir}${m.kind === 'SOS' ? ' sos' : ''}">${esc(m.body)}<span class="meta">${hhmm(m.at)}${m.dir === 'out' ? (delivered.has(m.id) ? ' · ✓✓ entregado' : carried.has(m.id) ? ' · ✓ en camino' : ' · salió de este móvil') : ` · vía ${esc(m.via ?? '')}`}</span></li>`).join('')
     || '<li class="in">Escribe el primer mensaje. Viaja cifrado: solo lo abre su destinatario.</li>';
 }
 
