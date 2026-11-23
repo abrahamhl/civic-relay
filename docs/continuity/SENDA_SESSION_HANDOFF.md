@@ -1,37 +1,25 @@
-# SENDA · handoff (2026-11-23, sesión app)
+# SENDA · handoff (2026-11-23 20:00Z, sesión app)
 
-## Hecho y fusionado
-- Fase 0: APK en la Release fija `senda-android-latest` (workflow), `/senda/descargas` verificada.
-- Fase 1 núcleo: `app-roles.mjs` (ADMIN por clave no exportable, OBSERVADOR_TOTAL por credencial, CIUDADANO) — PR #71.
-- Portada `/senda/app` estilo Apple (Inicio, Módulos por rol, Mensajes, Ajustes con dar/revocar acceso por código) — PR #71.
-- Marco común `app-chrome.mjs` en las 50 páginas (solo dentro de la app). Icono adaptativo. Márgenes Android 15. SENDA Drive como módulo (un solo icono) — PR #71.
-- `external-links.mjs` (V16, walkie 4G, Xiaomi) y `docs/research/VIGIA_NOVEDADES.md`.
+## Publicado hoy (master e3789f0, APK en la Release fija `senda-android-latest`)
+- App: portada estilo Apple `/senda/app` con roles (ADMIN/OBSERVADOR/CIUDADANO, credencial ECDSA, QR), marco común en 50 páginas, icono, un solo icono (Drive como módulo).
+- Mensajería: chat estilo WhatsApp (✓ en camino / ✓✓ entregado con recibo verificado), buzón Bluetooth GATT móvil a móvil (`BleMailbox`, `MailboxFrames`), invitar contacto por SMS (selector del sistema).
+- Ruta (`/senda/ruta`, OSM l'Horta Sud), aviso por voz sin red, verificación de avisos con cámara (MediaPipe + EfficientDet-Lite0, imagen nunca sale).
+- **Conducir** (`/senda/conducir`): mapa estilo navegador (MapLibre + OpenFreeMap), búsqueda Nominatim, ruta giro a giro OSRM (FOSSGIS, pruebas), avisos con color/icono propios, incidencias y cámaras DGT (en vivo en play), cámara con IA, **dashcam** 720p/1080p con datos en el vídeo y guardado real en Descargas/SENDA (`FileSaver`).
+- Enlaces externos (Waze/Maps/SMS/tel) por lista cerrada `ExternalLinks`.
 
-## Fusionado después (PR #72, #73)
-- Ruta, voz y QR (#72). Buzón Bluetooth cercano GATT + MailboxFrames (#73). OJO: validar YAML antes de subir (un «: » sin comillas tumbó el flujo de Android).
+## Pendiente del fundador (decisiones)
+1. Buzón de Internet para Holanda → España: A Vercel (verificar plan gratuito) / B servidor propio / C ninguno.
+2. Agente de I+D semanal (consume créditos del plan): sí/no.
+3. Resultados del viaje de vuelta: capturas, avisos falsos, batería, temperatura.
 
-## Fusionado (#74, #75) y en PR #76
-- Chat estilo WhatsApp (#74). Verificación de avisos con cámara: MediaPipe + EfficientDet-Lite0 int8 en `senda/vendor/` (#75; licencias en LICENSES.md). #76: ✓/✓✓ con recibo verificado y rótulo de la película corregido.
-- OJO: las tareas programadas consumen créditos de pago del plan (el sistema apagó la anterior): no crear sin permiso del fundador.
+## Siguiente (sin preguntar el orden)
+1. Calibrar con los vídeos del fundador los umbrales ámbar/lateral (`drive-hazard.mjs`).
+2. Grupos en el chat; notas de voz.
+3. Volver a renderizar la película (rótulo de b4 corregido en el guion).
+4. Fase 3: pruebas guiadas de campo con JSON firmado (BLE a 1/5/10/20/40 m).
+5. Revisar si Antigravity ha subido su rama (ver `COORDINACION_ANTIGRAVITY.md`).
 
-## Antes (ya fusionado)
-- `/senda/ruta` + `route-planner.mjs`: rutas moldeables sobre OSM de l'Horta Sud, agua Copernicus, cámaras DGT, Google Maps/Waze.
-- Aviso por voz: `voice-report.mjs` + `SendaNative.listen()` (SpeechRecognizer, prefiere sin red) + `<queries>` en el manifiesto.
-
-## Siguiente (todo, sin preguntar el orden)
-1. Volver a renderizar la película (escena b4) con el rótulo corregido.
-2. Chat: recibos de entrega/lectura visibles, chats de grupo, notas de voz (Codec2/Opus de `familiar-chat.mjs`).
-2b. Relé de Internet para Holanda → España: pendiente de que el fundador elija alojamiento.
-3. Rehacer el interior de las páginas al estilo de la portada (empezar por index/SOS, avisos, sala).
-4. Ruta: más zonas (paquete de calles por zona), sentido único y velocidades si hay datos con fuente.
-5. Agente de I+D: tarea programada que revise el Vigía (pedir confirmación de coste/frecuencia solo si genera gasto).
-6. Fase 3: pruebas guiadas de campo con JSON firmado.
-
-## Bloqueos
-- Sin SDK de Android aquí: lo nativo solo se compila en CI.
-- Clave de publicación real (secreto) cuando se vaya a tiendas u organismos.
-- Waze for Cities exige un organismo socio.
-
-## Pendiente del fundador
-- Nombre o enlace del «walkie 4G sin datos».
-- Probar en los dos móviles: Ajustes → administrador → código → hermano; Ruta y aviso por voz.
+## Reglas aprendidas hoy
+- Validar YAML antes de subir (un «: » sin comillas tumbó el flujo Android).
+- Las tareas programadas consumen créditos: no crear sin permiso.
+- El visor web de Android ignora descargas blob y enlaces externos: usar el puente (`FileSaver`, `ExternalLinks`).
