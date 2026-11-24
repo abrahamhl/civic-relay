@@ -13,6 +13,7 @@
  *    mantienen «sin verificar» salvo confirmación por cámara.
  */
 import { AASHTO_SSD, REPORT_KINDS } from './road-guard.mjs';
+import { hazardBelief, beliefText, BELIEF_RULES } from './hazard-belief.mjs';
 import { haversineM, pointSegmentM } from './route-planner.mjs';
 import { CATEGORIES, FROM_REPORT, fromDatex } from './report-style.mjs';
 
@@ -101,7 +102,7 @@ export function dedupeHazards(items, dedupM = CORRIDOR_RULES.dedupM) {
  * @param {Array<object>} [p.reports] avisos locales/Bluetooth SENDA
  * @param {object} [p.rules] reglas declaradas (por defecto CORRIDOR_RULES)
  */
-export function hazardsAhead({ pos, headingDeg = null, speedMs = null, routeCoords = null, incidents = [], incSource = 'DGT', reports = [], rules = CORRIDOR_RULES } = {}) {
+export function hazardsAhead({ pos, headingDeg = null, speedMs = null, routeCoords = null, incidents = [], incSource = 'DGT', reports = [], rules = CORRIDOR_RULES, now = Date.now() } = {}) {
   const ssdM = stoppingDistanceM(speedMs);
   const moving = typeof speedMs === 'number' && Number.isFinite(speedMs) && speedMs > 1;
   const horizonM = moving
@@ -175,12 +176,16 @@ export function hazardsAhead({ pos, headingDeg = null, speedMs = null, routeCoor
 
   for (const r of reports) {
     if (r == null || r.lat == null || r.lon == null) continue;
+    // Probabilidad bayesiana de que siga ahí (hazard-belief): los avisos viejos o negados dejan de salir.
+    const belief = Number.isFinite(r.t) ? hazardBelief(r, now) : null;
+    if (belief && belief.p < BELIEF_RULES.dropBelow) continue;
     const cat = FROM_REPORT[r.kind] ?? 'PELIGRO';
     const label = REPORT_KINDS[r.kind]?.label ?? CATEGORIES[cat]?.label ?? 'Aviso';
     consider({
       key: `senda:${r.id ?? `${r.kind}@${Number(r.lat).toFixed(4)},${Number(r.lon).toFixed(4)}`}`,
       source: 'SENDA',
-      sourceLabel: r.verified ? 'SENDA · visto con cámara' : r.own ? 'SENDA · tu aviso' : 'SENDA · otro móvil (sin verificar)',
+      sourceLabel: (r.verified ? 'SENDA · visto con cámara' : r.own ? 'SENDA · tu aviso' : 'SENDA · otro móvil (sin verificar)') + (belief ? ` · ${beliefText(belief)}` : ''),
+      reportId: r.id ?? null, belief: belief ? +belief.p.toFixed(3) : null,
       cat,
       label,
       road: '',

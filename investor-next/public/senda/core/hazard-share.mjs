@@ -44,10 +44,15 @@ export function unpackReports(bytes, { from = 'BLUETOOTH' } = {}) {
 
 /** Une avisos sin duplicar (mismo tipo, cerca y a la vez). Conserva los propios frente a los recibidos. */
 export function mergeReports(existing, incoming, rules = SHARE_RULES) {
-  const out = [...existing]; let added = 0;
+  const out = [...existing]; let added = 0, confirmed = 0;
   for (const r of incoming) {
-    const dup = out.some((e) => e.kind === r.kind && Math.abs(e.t - r.t) < rules.sameMs && haversineM([e.lon, e.lat], [r.lon, r.lat]) < rules.sameM);
-    if (!dup) { out.push(r); added++; }
+    const i = out.findIndex((e) => e.kind === r.kind && Math.abs(e.t - r.t) < rules.sameMs && haversineM([e.lon, e.lat], [r.lon, r.lat]) < rules.sameM);
+    if (i < 0) { out.push(r); added++; continue; }
+    const e = out[i];
+    // Mismo aviso que vuelve (mismo id) = eco, no cuenta. Otro móvil que vio lo mismo = confirmación (hazard-belief).
+    if (r.id != null && r.id === e.id) continue;
+    if ((e.seen ?? []).includes(r.t) || e.t === r.t) continue;
+    out[i] = { ...e, seen: [...(e.seen ?? []), r.t] }; confirmed++;
   }
-  return { reports: out, added };
+  return { reports: out, added, confirmed };
 }

@@ -48,3 +48,15 @@ test('fusión sin duplicados: el mismo aviso recibido dos veces no se repite', (
   assert.equal(b.added, 1);
   assert.equal(mergeReports(b.reports, otro).added, 0);
 });
+
+test('merge: otro móvil que vio lo mismo cuenta como confirmación; el eco del mismo aviso no', async () => {
+  const { mergeReports } = await import('../src/hazard-share.mjs');
+  const mine = { kind: 'accidente', lat: 39.47, lon: -0.38, t: 1_000_000, id: 7 };
+  const echo = { ...mine };
+  const other = { kind: 'accidente', lat: 39.4701, lon: -0.3801, t: 1_060_000, id: 9 };
+  const a = mergeReports([mine], [echo]);
+  assert.equal(a.confirmed, 0); assert.equal(a.added, 0);
+  const b = mergeReports([mine], [other]);
+  assert.equal(b.confirmed, 1); assert.deepEqual(b.reports[0].seen, [1_060_000]);
+  assert.equal(mergeReports(b.reports, [other]).confirmed, 0, 'la misma confirmación no se cuenta dos veces');
+});

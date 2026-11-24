@@ -56,6 +56,7 @@ button,input{font:inherit;color:inherit;border:0}button{cursor:pointer;backgroun
 #corridorAlert.AMBAR{border-left-color:var(--orange)}#corridorAlert.ROJO{border-left-color:var(--red);background:#fff5f5}
 #corridorAlert .ca-ico{flex:none;width:28px;height:28px;display:grid;place-items:center}
 #corridorAlert .ca-body{min-width:0;flex:1}#corridorAlert .ca-title{font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#corridorAlert .ca-vote{display:flex;gap:8px;margin-top:6px}#corridorAlert .ca-vote button{flex:1;border-radius:10px;padding:7px 8px;font-weight:700;font-size:13px;background:#eef2f7;color:#1c1c1e}#corridorAlert .ca-vote #caNo{background:#ffe5e3;color:#c0271f}
 #corridorAlert .ca-sub{font-size:12px;color:var(--muted);line-height:1.25}
 #radarAlert{margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-left:5px solid var(--teal);font-size:13px}
 #radarAlert.OVER{border-left-color:var(--red);background:#fff5f5}
@@ -126,7 +127,7 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
     <div id="searchBox"><form id="search" class="card" autocomplete="off"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="¿A dónde vas?" enterkeyhint="search" aria-label="Destino"></form>
       <div id="favs"><button class="chip" id="favHome">Casa</button><button class="chip" id="favWork">Trabajo</button><button class="chip lab-chip" id="labChip" title="Laboratorio de señal: cobertura de radio, GPS y firme">⚡ Lab Campo</button></div>
       <div id="results" class="card" hidden></div></div>
-    <div id="corridorAlert" class="card" role="status" aria-live="polite" hidden><div class="ca-ico" id="caIco"></div><div class="ca-body"><div class="ca-title" id="caTitle"></div><div class="ca-sub" id="caSub"></div></div></div>
+    <div id="corridorAlert" class="card" role="status" aria-live="polite" hidden><div class="ca-ico" id="caIco"></div><div class="ca-body"><div class="ca-title" id="caTitle"></div><div class="ca-sub" id="caSub"></div><div class="ca-vote" id="caVote" hidden><button id="caYes">Sigue ahí</button><button id="caNo">Ya no está</button></div></div></div>
     <div id="radarAlert" class="card" role="status" aria-live="polite" hidden><div class="ra-body"><div class="ra-title" id="raTitle"></div><div class="ra-sub" id="raSub"></div></div><div class="ra-lim" id="raLim" hidden></div></div>
     <div id="bbBadge" class="card" role="status" hidden><span id="bbText">● Caja negra · 0 muestras</span><div class="bb-acts"><button class="sec" id="aiModeBtn" title="Cambiar cadencia IA">IA: Auto</button><button id="bbSave">Guardar</button></div></div>
   </div>
