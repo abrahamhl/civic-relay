@@ -22,6 +22,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Caja negra: grabar la pantalla de SENDA (el usuario la acepta cada vez en el aviso del sistema). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"/>
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <uses-permission android:name="android.permission.REQUEST_COMPANION_RUN_IN_BACKGROUND"/>
     <uses-permission android:name="android.permission.REQUEST_COMPANION_START_FOREGROUND_SERVICES_FROM_BACKGROUND"/>
@@ -46,6 +48,7 @@
         <!-- SENDA Drive: consentimiento y vinculación del coche. Nada automático sin pulsar aquí.
              Se abre desde la app (módulo «SENDA Drive»), no como segundo icono: el fundador vio dos apps que parecían la misma. -->
         <activity android:name=".CarLinkActivity" android:label="SENDA Drive" android:exported="false"/>
+        <service android:name=".ScreenRecordService" android:exported="false" android:foregroundServiceType="mediaProjection"/>
         <service android:name=".DriveSessionService" android:exported="false" android:foregroundServiceType="location"/>
         <!-- Android 12+: el sistema la despierta cuando aparece o desaparece el coche vinculado. -->
         <service android:name=".CarCompanionService" android:exported="true"
