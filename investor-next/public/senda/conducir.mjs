@@ -3,6 +3,7 @@
 // Red: OpenFreeMap (mapa), OSRM de FOSSGIS (rutas, pruebas), Nominatim (búsqueda, ≤1/s). Sin red: radar.
 import { createTracker, topAlert } from './core/drive-hazard.mjs';
 import { hazardsAhead, corridorAnnouncement } from './core/drive-corridor.mjs';
+import { createBlackBox } from './core/drive-blackbox.mjs';
 import { interpretAlternatives } from './core/voice-report.mjs';
 import { REPORT_KINDS } from './core/road-guard.mjs';
 import { parseDatex2 } from './core/datex2.mjs';
@@ -20,7 +21,7 @@ const say = (t) => { try { speechSynthesis.cancel(); speechSynthesis.speak(Objec
 const fmtDist = (m) => (m >= 1000 ? `${(m / 1000).toFixed(1).replace('.', ',')} km` : `${Math.round(m / 10) * 10} m`);
 const reports = () => LS.get('senda.ruta.reports', []);
 
-const st = { pos: null, speed: null, heading: 0, follow: true, map: null, mapOk: false, route: null, dest: null, said: new Set(), saidCorridor: new Set(), corridor: null, lastRouteS: -1e9, incidents: [], incSource: '', cams: [], me: null };
+const st = { pos: null, speed: null, heading: 0, follow: true, map: null, mapOk: false, route: null, dest: null, said: new Set(), saidCorridor: new Set(), corridor: null, lastRouteS: -1e9, incidents: [], incSource: '', cams: [], me: null, bb: createBlackBox(), ble: { tx: 0, rx: 0, rejected: 0 }, battery: { pct: null, charging: null }, lastVision: null };
 
 // ── Mapa (OpenFreeMap). Si no carga en 10 s (sin red, versión base), se usa el radar. ──
 function initMap() {
@@ -198,6 +199,7 @@ $('#shareBle').addEventListener('click', () => {
   N.p2pStart(); // abre tu buzón para RECIBIR los avisos de otros
   const pack = packReports(reports());
   if (pack[2] === 0) return hint('Buzón Bluetooth abierto: recibirás avisos de móviles SENDA cercanos. No tienes avisos recientes que enviar.');
+  st.ble.tx += pack[2];
   N.p2pSend(b64(pack)); hint(`Enviando ${pack[2]} aviso(s) a móviles SENDA cercanos…`);
 });
 window.sendaP2P = (ev) => {
@@ -207,16 +209,23 @@ window.sendaP2P = (ev) => {
   if (!isReportPack(bytes)) return hint('Ha llegado un mensaje cifrado por Bluetooth: ábrelo en Mensajes.');
   try {
     const { reports: got, rejected } = unpackReports(bytes);
+    st.ble.rx += got.length; st.ble.rejected += rejected;
     const m = mergeReports(reports(), got); LS.set('senda.ruta.reports', m.reports); drawMarkers(); updateCorridor();
     if (m.added) say(`${m.added} aviso${m.added > 1 ? 's' : ''} nuevo${m.added > 1 ? 's' : ''} de otro móvil`);
     hint(`Recibidos ${got.length} aviso(s) de otro móvil (${m.added} nuevos${rejected ? `, ${rejected} descartados por corruptos` : ''}). Sin verificar.`);
   } catch (e) { hint('Paquete de avisos no válido: ' + e.message); }
 };
 
-// ── Cámara con IA en miniatura (toca para ampliar). Análisis 4/s; se apaga al salir. ──
+// ── Cámara con IA en miniatura (toca para ampliar). 4/s (2/s si batería < 25 % sin cargar); se apaga al salir. ──
 const MP = '/senda/vendor/mediapipe-tasks-vision-1.2.3';
 const ES = { car: 'coche', truck: 'camión', bus: 'autobús', motorcycle: 'moto', bicycle: 'bici', person: 'persona', dog: 'perro', horse: 'caballo', cow: 'vaca', sheep: 'oveja' };
 const COLOR = { VERDE: '#34c759', AMBAR: '#ffcc00', ROJO: '#ff3b30' };
+const aiIntervalMs = () => (st.battery.pct != null && st.battery.pct < 25 && st.battery.charging === false ? 500 : 250);
+function summarizeVision(objs, inferMs, intervalMs) {
+  const top = topAlert(objs);
+  const ttcs = objs.map((o) => o.ttcS).filter((x) => x != null);
+  return { active: true, count: objs.length, level: top?.level ?? 'VERDE', minTtcS: ttcs.length ? Math.min(...ttcs) : null, clipped: objs.filter((o) => o.clipped).length, inferMs, hz: +(1000 / intervalMs).toFixed(1) };
+}
 let det = null, stream = null, tracker = null, camOn = false, lastT = 0; const saidAdas = new Map();
 $('#camBtn').addEventListener('click', async () => {
   if (camOn) return camStop();
@@ -229,17 +238,19 @@ $('#camBtn').addEventListener('click', async () => {
   } catch (e) { hint('Cámara no disponible: ' + (e.message || e.name)); }
 });
 $('#pip').addEventListener('click', () => $('#pip').classList.toggle('big'));
-function camStop() { camOn = false; stream?.getTracks().forEach((t) => t.stop()); stream = null; $('#pip').hidden = true; $('#adas').hidden = true; $('#camBtn').classList.remove('on'); }
+function camStop() { camOn = false; st.lastVision = null; stream?.getTracks().forEach((t) => t.stop()); stream = null; $('#pip').hidden = true; $('#adas').hidden = true; $('#camBtn').classList.remove('on'); }
 document.addEventListener('visibilitychange', () => { if (document.hidden && camOn) camStop(); });
 function tick(now) {
   if (!camOn) return;
-  if (now - lastT >= 250) { lastT = now; analyse(now); }
+  const iv = aiIntervalMs();
+  if (now - lastT >= iv) { lastT = now; analyse(now, iv); }
   requestAnimationFrame(tick);
 }
-function analyse(now) {
+function analyse(now, iv = 250) {
   const v = $('#v'); if (!v.videoWidth) return;
-  const W = v.videoWidth, H = v.videoHeight, r = det.detectForVideo(v, now);
+  const W = v.videoWidth, H = v.videoHeight, t0 = performance.now(), r = det.detectForVideo(v, now), inferMs = performance.now() - t0;
   const objs = tracker.update(r.detections.map((d) => ({ label: d.categories[0].categoryName, score: d.categories[0].score, x: d.boundingBox.originX / W, y: d.boundingBox.originY / H, w: d.boundingBox.width / W, h: d.boundingBox.height / H })), now / 1000);
+  st.lastVision = summarizeVision(objs, inferMs, iv);
   const c = $('#ov'), box = c.getBoundingClientRect(), dpr = devicePixelRatio || 1; c.width = box.width * dpr; c.height = box.height * dpr;
   const x = c.getContext('2d'); x.scale(dpr, dpr);
   const s = Math.max(box.width / W, box.height / H), ox = (box.width - W * s) / 2, oy = (box.height - H * s) / 2;
@@ -254,7 +265,7 @@ function analyse(now) {
 }
 
 // ── Modo dashcam: cámara trasera a pantalla completa + mapa al lado, grabación en calidad baja o alta ──
-// El dibujo se refresca en cada fotograma (recuadros del último análisis); el análisis va 4 veces por segundo.
+// El dibujo se refresca en cada fotograma (recuadros del último análisis); el análisis va 4/s (2/s en ahorro).
 const QUALITY = { low: { w: 1280, h: 720, bps: 2_500_000, label: '720p' }, high: { w: 1920, h: 1080, bps: 8_000_000, label: '1080p' } };
 const dash = { on: false, q: 'low', stream: null, objs: [], lastDet: 0, rec: null, chunks: [], t0: 0, timer: null };
 async function getDetector() {
@@ -281,7 +292,7 @@ async function dashOpen() {
 }
 function dashClose() {
   if (dash.rec) dashRecord();
-  dash.on = false; dash.stream?.getTracks().forEach((t) => t.stop()); dash.stream = null;
+  dash.on = false; st.lastVision = null; dash.stream?.getTracks().forEach((t) => t.stop()); dash.stream = null;
   document.documentElement.classList.remove('dashmode', 'nomini'); $('#dash').hidden = true; st.map?.resize();
 }
 function dashFrame(now) {
@@ -291,11 +302,13 @@ function dashFrame(now) {
     if (c.width !== v.videoWidth) { c.width = v.videoWidth; c.height = v.videoHeight; }
     const W = c.width, H = c.height, x = c.getContext('2d');
     x.drawImage(v, 0, 0, W, H);
-    if (now - dash.lastDet >= 250) { dash.lastDet = now; const r = det.detectForVideo(v, now);
+    const iv = aiIntervalMs();
+    if (now - dash.lastDet >= iv) { dash.lastDet = now; const t0 = performance.now(), r = det.detectForVideo(v, now), inferMs = performance.now() - t0;
       dash.objs = tracker.update(r.detections.map((d) => ({ label: d.categories[0].categoryName, score: d.categories[0].score, x: d.boundingBox.originX / W, y: d.boundingBox.originY / H, w: d.boundingBox.width / W, h: d.boundingBox.height / H })), now / 1000);
+      st.lastVision = summarizeVision(dash.objs, inferMs, iv);
       const top = topAlert(dash.objs); if (top) warnDash(top); }
     drawDashData(x, W, H); // en pantalla siempre; si grabas «sin datos» se graba la cámara tal cual
-    $('#dashInfo').textContent = `${dash.objs.length} vehículos/personas · ${W}×${H}`;
+    $('#dashInfo').textContent = `${dash.objs.length} vehículos/personas · ${W}×${H}${iv > 250 ? ' · ahorro 2 Hz' : ''}`;
   }
   requestAnimationFrame(dashFrame);
 }
@@ -372,6 +385,61 @@ function drawRadar() {
   x.fillStyle = '#fff'; x.beginPath(); x.moveTo(0, -22); x.lineTo(15, 17); x.lineTo(0, 8); x.lineTo(-15, 17); x.closePath(); x.fill(); x.restore();
 }
 
+// ── Caja negra de viaje (1 Hz en memoria circular, cadena SHA-256, sin vídeo ni PII, 0 €) ──
+if (typeof navigator.getBattery === 'function') {
+  navigator.getBattery().then((b) => {
+    const syncBat = () => { st.battery.pct = +(b.level * 100).toFixed(1); st.battery.charging = b.charging; };
+    syncBat(); b.addEventListener?.('levelchange', syncBat); b.addEventListener?.('chargingchange', syncBat);
+  }).catch(() => {});
+}
+function rfSnapshot() {
+  const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  return {
+    online: typeof navigator.onLine === 'boolean' ? navigator.onLine : null,
+    netType: c?.effectiveType ?? null,
+    downlinkMbps: typeof c?.downlink === 'number' ? c.downlink : null,
+    rttMs: typeof c?.rtt === 'number' ? c.rtt : null,
+  };
+}
+let bbTimer = null;
+function bbSample() {
+  if (!st.bb.active) return null;
+  const entry = st.bb.record({
+    t: Date.now(), pos: st.pos, accuracyM: st.lastFix?.coords?.accuracy ?? null,
+    speedMs: st.speed, headingDeg: st.heading,
+    vision: st.lastVision, corridor: st.corridor,
+    rf: rfSnapshot(), battery: { ...st.battery }, ble: { ...st.ble },
+  });
+  const batTxt = st.battery.pct != null ? ` · Bat ${Math.round(st.battery.pct)} %` : '';
+  const netTxt = navigator.onLine ? '' : ' · sin red';
+  $('#bbText').textContent = `● Caja negra · ${st.bb.count} muestras${batTxt}${netTxt}`;
+  return entry;
+}
+function bbStart() {
+  st.bb.reset(); st.bb.start();
+  $('#bbBtn')?.classList.add('rec'); $('#bbBadge').hidden = false;
+  bbSample();
+  clearInterval(bbTimer); bbTimer = setInterval(bbSample, 1000);
+  hint('Caja negra activa (1 Hz, solo local, sin vídeo ni datos personales). Pulsa «Guardar» al llegar.');
+}
+async function bbExport() {
+  clearInterval(bbTimer); bbTimer = null; st.bb.stop();
+  $('#bbBtn')?.classList.remove('rec'); $('#bbBadge').hidden = true;
+  if (st.bb.count === 0) return hint('Caja negra vacía: no se guardó archivo.');
+  const doc = await st.bb.exportSealed();
+  const text = JSON.stringify(doc, null, 2);
+  const blob = new Blob([text], { type: 'application/json' });
+  const name = `senda-blackbox-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.json`;
+  const res = await saveBlob(blob, name);
+  const s = doc.summary;
+  hint(res.ok
+    ? `Caja negra sellada SHA-256 guardada en ${res.where} (${(blob.size / 1024).toFixed(1)} KB · ${s.frames} muestras · ${s.distanceKm} km · ${s.deadZoneSamples} sin red).`
+    : 'No se pudo guardar la caja negra.');
+  return doc;
+}
+$('#bbBtn')?.addEventListener('click', () => { if (st.bb.active) bbExport(); else bbStart(); });
+$('#bbSave')?.addEventListener('click', bbExport);
+
 // La tarjeta de abajo cambia de alto (llegada, avisos): los botones flotantes se colocan siempre encima.
 new ResizeObserver(([e]) => document.documentElement.style.setProperty('--bottomH', `${Math.ceil(e.target.getBoundingClientRect().height)}px`)).observe($('#bottom'));
 
@@ -379,4 +447,4 @@ initMap();
 loadIncidents();
 setInterval(() => { if (!document.hidden) loadIncidents(); }, 5 * 60 * 1000);
 // Para pruebas automáticas
-globalThis.sendaDrive = { st, goTo, onPos, dash, updateCorridor };
+globalThis.sendaDrive = { st, goTo, onPos, dash, updateCorridor, bbStart, bbSample, bbExport };
