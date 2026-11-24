@@ -1,0 +1,38 @@
+{
+  "viewport": "Pixel 7 (412x915 / 915x412)",
+  "offlineBaseMode": true,
+  "pass": 6,
+  "total": 6,
+  "checks": [
+    {
+      "name": "Pixel 7 sin red: DGT ACCIDENTE V-31 por delante",
+      "ok": true,
+      "detail": "Accidente \u00b7 1,1 km \u00b7 V-31"
+    },
+    {
+      "name": "Pixel 7 vertical (412x915): sin desborde",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "Sentido contrario (rumbo norte): 0 avisos rebasados",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "Aviso SENDA Bluetooth (200 m a 108 km/h): ROJO + sin verificar",
+      "ok": true,
+      "detail": "SENDA \u00b7 otro m\u00f3vil (sin verificar) \u00b7 parada AASHTO 207 m"
+    },
+    {
+      "name": "Pixel 7 horizontal (915x412): sin desborde",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "0 errores de p\u00e1gina",
+      "ok": true,
+      "detail": []
+    }
+  ]
+}

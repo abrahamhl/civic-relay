@@ -1,0 +1,225 @@
+{
+  "schema": "senda-drive-calibration-report/v1",
+  "generatedUtc": "2026-11-24T15:43:53.873Z",
+  "costEur": 0,
+  "execution": "100 % en el dispositivo, sin red",
+  "inputs": {
+    "udacityTrace": {
+      "path": "packages/senda/calibration/udacity-effdet-4hz.json",
+      "sha256": "bad8d310af579cedaf2836f84ac2ec168fec662f3c79234911be51b4efb84b4a",
+      "videoSha256": "557999ca2628f207a733425c4209aee76f526a3e0c367e3766db9b5950cfa298",
+      "modelSha256": "0720bf247bd76e6594ea28fa9c6f7c5242be774818997dbbeffc4da460c723bb",
+      "frames": 145
+    },
+    "dgtSnapshot": {
+      "path": "investor-next/public/senda/data/referencias/dgt_incidencias.json",
+      "sha256": "aa8afa770920652927a225ade37d4a516cc5109e2734ecdd7a62cbe67ba12df3",
+      "xmlSha256": "dd1a74ea354508027dd0ff1a97b8b44e319ccbff8ec83771a29a5079bed4f2c1",
+      "descargadoUTC": "2026-11-14T14:05:47.613Z",
+      "total": 838
+    }
+  },
+  "udacityReal4Hz": {
+    "basis": "MEDICION_REAL_DETECTOR_SOBRE_VIDEO_MIT",
+    "referenceGroundTruth": {
+      "source": "investor-next/public/media/vision/dashcam.json (YOLOX-s + ByteTrack)",
+      "leadShare": 0,
+      "minTtcS": null,
+      "minApproachTtcS": 7.99,
+      "brakeAlerts": 0
+    },
+    "baseline_c3706a5": {
+      "frames": 145,
+      "rojoFrames": 0,
+      "ambarFrames": 6,
+      "totalAlertFrames": 6,
+      "trackIds": 10,
+      "alerts": [
+        {
+          "t": 6,
+          "id": 1,
+          "label": "car",
+          "zone": "DERECHA",
+          "level": "AMBAR",
+          "ttcS": 3.56,
+          "reasons": [
+            "se acerca: 3.6 s"
+          ]
+        },
+        {
+          "t": 6.25,
+          "id": 1,
+          "label": "car",
+          "zone": "DERECHA",
+          "level": "AMBAR",
+          "ttcS": 3.93,
+          "reasons": [
+            "se acerca: 3.9 s"
+          ]
+        },
+        {
+          "t": 6.5,
+          "id": 1,
+          "label": "car",
+          "zone": "DERECHA",
+          "level": "AMBAR",
+          "ttcS": 4.37,
+          "reasons": [
+            "se acerca: 4.4 s"
+          ]
+        },
+        {
+          "t": 24,
+          "id": 5,
+          "label": "truck",
+          "zone": "DERECHA",
+          "level": "AMBAR",
+          "ttcS": 4.37,
+          "reasons": [
+            "se acerca: 4.4 s"
+          ]
+        },
+        {
+          "t": 35.25,
+          "id": 10,
+          "label": "car",
+          "zone": "DERECHA",
+          "level": "AMBAR",
+          "ttcS": 3.78,
+          "reasons": [
+            "se acerca: 3.8 s"
+          ]
+        },
+        {
+          "t": 35.5,
+          "id": 10,
+          "label": "car",
+          "zone": "DERECHA",
+          "level": "AMBAR",
+          "ttcS": 4.39,
+          "reasons": [
+            "se acerca: 4.4 s"
+          ]
+        }
+      ]
+    },
+    "calibrated": {
+      "frames": 145,
+      "rojoFrames": 0,
+      "ambarFrames": 0,
+      "totalAlertFrames": 0,
+      "trackIds": 3,
+      "alerts": []
+    },
+    "delta": {
+      "falseAlertFramesReduced": 6,
+      "trackFragmentsReduced": 7
+    }
+  },
+  "kinematics4Hz": {
+    "basis": "SIMULATION",
+    "note": "Escenarios cinemáticos ideales a 4 Hz (250 ms/fotograma, la cadencia real de /senda/conducir); no son colisiones reales grabadas.",
+    "closing43kmh": {
+      "baseline": {
+        "firstAmberS": 0.5,
+        "firstRedS": 1.75
+      },
+      "calibrated": {
+        "firstAmberS": 0.75,
+        "firstRedS": 1.75
+      }
+    },
+    "cutIn030": {
+      "baseline": {
+        "speedWps": 0.3,
+        "firstAmberS": null
+      },
+      "calibrated": {
+        "speedWps": 0.3,
+        "firstAmberS": 0.75
+      }
+    },
+    "cutIn036": {
+      "baseline": {
+        "speedWps": 0.36,
+        "firstAmberS": null
+      },
+      "calibrated": {
+        "speedWps": 0.36,
+        "firstAmberS": null
+      }
+    }
+  },
+  "dgtCorridorReal": {
+    "basis": "MEDICION_SOBRE_DATOS_REALES_DGT_DATEX2",
+    "totalIncidents": 838,
+    "nationalAfter120mDedup": 732,
+    "duplicatesCollapsedNational": 106,
+    "fourProbesTotalMs": 30.71,
+    "probes": [
+      {
+        "name": "Valencia V-31 Sur (hacia ACCIDENTE real)",
+        "mode": "CONO",
+        "horizonM": 1500,
+        "ssdM": 154.4,
+        "rawCount": 1,
+        "dedupedCount": 1,
+        "top": {
+          "cat": "ACCIDENTE",
+          "road": "V-31",
+          "distM": 1096,
+          "urgency": "AMBAR",
+          "sourceLabel": "DGT, copia del 14/11/2026"
+        }
+      },
+      {
+        "name": "Valencia V-31 Norte (sentido contrario, sin spam)",
+        "mode": "CONO",
+        "horizonM": 1500,
+        "ssdM": 154.4,
+        "rawCount": 0,
+        "dedupedCount": 0,
+        "top": null
+      },
+      {
+        "name": "Madrid A-6 BUS-VAO NO (doble CORTE real)",
+        "mode": "CONO",
+        "horizonM": 1667,
+        "ssdM": 182.9,
+        "rawCount": 2,
+        "dedupedCount": 1,
+        "top": {
+          "cat": "CORTE",
+          "road": "A-6 BUS-VAO",
+          "distM": 1429,
+          "urgency": "AMBAR",
+          "sourceLabel": "DGT, copia del 14/11/2026"
+        }
+      },
+      {
+        "name": "Madrid A-4 Sur (hacia PARADO + TRAFICO reales)",
+        "mode": "CONO",
+        "horizonM": 1500,
+        "ssdM": 154.4,
+        "rawCount": 2,
+        "dedupedCount": 2,
+        "top": {
+          "cat": "PARADO",
+          "road": "A-4",
+          "distM": 1137,
+          "urgency": "AMBAR",
+          "sourceLabel": "DGT, copia del 14/11/2026"
+        }
+      }
+    ]
+  },
+  "rulesProvenance": {
+    "driveHazard": "rojo = percepción-reacción AASHTO 2.5 s (AASHTO Green Book (2001→), SSD; verificado vía FHWA y TxDOT 2026-11-18); ámbar, lateral, recorte de borde y confirmación (2 fotogramas) = reglas de la app, no calibradas en carretera abierta (regresión verificada en Udacity MIT 4 Hz)",
+    "driveCorridor": "SSD = AASHTO Green Book (2.5 s, 3.4 m/s²; AASHTO Green Book (2001→), SSD; verificado vía FHWA y TxDOT 2026-11-18); cono ±35°, margen de ruta 80 m, horizonte 1,5–5 km y deduplicación 120 m = reglas de la app no calibradas"
+  },
+  "limits": [
+    "Udacity MIT es un único tramo de autopista diurna seca (36,08 s, 0 frenadas de emergencia reales): valida falsos positivos y fragmentación, NO calibra falsos negativos en noche, lluvia ni tráfico urbano.",
+    "La validación de acercamiento e incorporación lateral a 4 Hz es una simulación cinemática declarada (basis: SIMULATION), no ensayos de choque reales.",
+    "Las 838 incidencias DGT son una instantánea real de nap.dgt.es del 2026-11-14 (DATEX II v3.7); en modo sin red la app muestra siempre su fecha y en modo play usa el feed en vivo."
+  ]
+}
