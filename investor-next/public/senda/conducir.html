@@ -65,6 +65,11 @@ button,input{font:inherit;color:inherit;border:0}button{cursor:pointer;backgroun
 #bbBadge .bb-acts{display:flex;gap:6px;flex:none}
 #bbBadge button{background:var(--red);color:#fff;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:700;flex:none}
 #bbBadge button.sec{background:rgba(255,255,255,.18)}
+#tele{position:absolute;left:10px;bottom:calc(var(--bottomH,96px) + 88px);z-index:7;max-width:min(58vw,250px);margin:0;padding:5px 7px;border-radius:9px;background:rgba(0,0,0,.5);color:#e8fff0;font:600 9.5px/1.3 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;pointer-events:none}
+html.dashmode #tele{top:58px;bottom:auto;z-index:10}
+#markBtn{position:absolute;left:84px;bottom:calc(var(--bottomH,96px) + 22px);z-index:8;height:46px;padding:0 16px;border-radius:23px;background:var(--red);color:#fff;font-weight:800;box-shadow:0 4px 14px rgba(255,59,48,.45)}
+html.dashmode #markBtn{bottom:auto;top:58px;left:auto;right:12px;z-index:10}
+#bbBtn.on{background:var(--red);color:#fff}
 .maplibregl-ctrl-attrib{font-size:10px}
 /* Dashcam */
 #dash{position:absolute;inset:0;z-index:9;background:#000;color:#fff}
@@ -76,7 +81,7 @@ button,input{font:inherit;color:inherit;border:0}button{cursor:pointer;backgroun
 .tog{font-size:13px;display:flex;gap:6px;align-items:center}
 #recBtn{width:64px;height:64px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center}#recBtn span{width:44px;height:44px;border-radius:50%;background:#ff3b30;transition:all .2s}
 #recBtn.on span{width:26px;height:26px;border-radius:6px}
-.dashSmall{background:rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:9px 12px;font-weight:600;font-size:13px}
+.dashSmall{background:rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:9px 12px;font-weight:600;font-size:13px}.dashSmall.on{background:var(--red)}
 /* Mapa en la esquina durante la dashcam (al lado en horizontal) */
 html.dashmode #map{inset:auto;left:10px;top:56px;width:38%;height:30%;z-index:10;border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 html.dashmode.nomini #map{display:none}
@@ -104,7 +109,8 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
     <button class="fab" id="center" aria-label="Centrar en mí"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 4 21l8-4 8 4z"/></svg></button>
     <button class="fab" id="camBtn" aria-label="Cámara con IA"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg></button>
     <button class="fab" id="dashBtn" aria-label="Modo dashcam"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="15" height="12" rx="2"/><circle cx="9.5" cy="12" r="3"/><path d="M17 10l5-3v10l-5-3"/></svg></button>
-    <button class="fab" id="bbBtn" aria-label="Caja negra de telemetría"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h3l2.5-6 4 12 2.5-6H21"/></svg></button>
+    <button class="fab" id="teleBtn" aria-label="Datos en pantalla"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></button>
+    <button class="fab" id="bbBtn" aria-label="Caja negra: grabar datos y pantalla"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/></svg></button>
     <button class="fab" id="voiceBtn" aria-label="Aviso hablado"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
   </div>
   <div id="speed"><div>–<small>km/h</small></div></div>
@@ -123,10 +129,13 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
       <div class="seg" role="group" aria-label="Calidad"><button data-q="low" class="on">Baja 720p</button><button data-q="high">Alta 1080p</button></div>
       <label class="tog"><input type="checkbox" id="withData" checked> Datos en el vídeo</label>
       <button id="recBtn" aria-label="Grabar"><span></span></button>
+      <button class="dashSmall" id="bbDash">Caja negra</button>
       <button class="dashSmall" id="miniMap">Mapa</button>
       <button class="dashSmall" id="dashExit">Salir</button>
     </div>
   </div>
+  <pre id="tele" hidden aria-live="off"></pre>
+  <button id="markBtn" hidden aria-label="Marcar este momento">Marcar</button>
   <div id="veil" hidden></div>
   <div id="sheet" class="card" hidden>
     <h3>¿Qué ves?</h3>

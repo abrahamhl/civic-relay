@@ -43,7 +43,8 @@ import java.util.Collections;
  */
 public final class AppActivity extends Activity {
     private WebView web;
-    private static final int REQ_MIC = 41, REQ_GEO = 42, REQ_VOICE = 43, REQ_CAM = 44, REQ_BT = 45, REQ_PICK = 46;
+    private static final int REQ_MIC = 41, REQ_GEO = 42, REQ_VOICE = 43, REQ_CAM = 44, REQ_BT = 45, REQ_PICK = 46, REQ_SCREEN = 47;
+    private boolean screenHigh;
     private BleMailbox mailbox;
     private FileSaver saver;
     private Runnable afterBt;
@@ -84,6 +85,7 @@ public final class AppActivity extends Activity {
     @SuppressWarnings("deprecation")
     @Override protected void onActivityResult(int req, int res, Intent data) {
         super.onActivityResult(req, res, data);
+        if (req == REQ_SCREEN) { screenGranted(res, data); return; }
         if (req != REQ_PICK) return;
         if (res != RESULT_OK || data == null || data.getData() == null) { contactResult(new JSONObject()); return; }
         String[] cols = { android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER };
@@ -91,6 +93,19 @@ public final class AppActivity extends Activity {
             if (c != null && c.moveToFirst()) contactResult(new JSONObject().put("name", c.getString(0)).put("phone", c.getString(1)));
             else contactResult(err("VACIO"));
         } catch (RuntimeException | org.json.JSONException e) { contactResult(err("LECTURA")); }
+    }
+    /** Caja negra: el usuario aceptó (o no) el aviso del sistema para grabar la pantalla. */
+    private void screenGranted(int res, Intent data) {
+        if (res != RESULT_OK || data == null) { screenPost("error", "Grabación de pantalla cancelada"); return; }
+        Intent i = new Intent(this, ScreenRecordService.class).setAction(ScreenRecordService.ACTION_START)
+                .putExtra(ScreenRecordService.EXTRA_CODE, res).putExtra(ScreenRecordService.EXTRA_DATA, data)
+                .putExtra(ScreenRecordService.EXTRA_HIGH, screenHigh);
+        try { startForegroundService(i); } catch (RuntimeException e) { screenPost("error", "Android no dejó grabar: " + e.getClass().getSimpleName()); }
+    }
+    private void screenPost(String event, String detail) {
+        JSONObject o = new JSONObject();
+        try { o.put("event", event).put("detail", detail); } catch (org.json.JSONException ignored) { }
+        web.post(() -> web.evaluateJavascript("window.sendaScreenRec&&window.sendaScreenRec(" + o + ")", null));
     }
     private void contactResult(JSONObject o) { web.post(() -> web.evaluateJavascript("window.sendaContact&&window.sendaContact(" + o + ")", null)); }
 
@@ -262,7 +277,7 @@ public final class AppActivity extends Activity {
     /** Puente mínimo hacia lo nativo. Cada método es un permiso: añadir solo lo imprescindible. */
     private final class Bridge {
         @JavascriptInterface public String info() {
-            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true,\"fileSave\":true}";
+            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true,\"fileSave\":true,\"screenRec\":true}";
         }
 
         /** Abre la pantalla de radios con una acción senda://accion?… validada; el usuario confirma allí. */
@@ -300,6 +315,44 @@ public final class AppActivity extends Activity {
                 catch (android.content.ActivityNotFoundException e) { contactResult(err("SIN_AGENDA")); }
             });
         }
+
+        /** Caja negra: pide al sistema grabar la pantalla de SENDA (el usuario acepta el aviso de Android cada vez). */
+        @JavascriptInterface public boolean screenRecStart(boolean high) {
+            if (ScreenRecordService.recording) return false;
+            screenHigh = high;
+            ScreenRecordService.listener = AppActivity.this::screenPost;
+            runOnUiThread(() -> {
+                if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
+                    requestPermissions(new String[] { Manifest.permission.POST_NOTIFICATIONS }, 0); // aviso visible mientras graba
+                android.media.projection.MediaProjectionManager mpm = (android.media.projection.MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+                try { startActivityForResult(mpm.createScreenCaptureIntent(), REQ_SCREEN); }
+                catch (android.content.ActivityNotFoundException e) { screenPost("error", "Este móvil no permite grabar la pantalla"); }
+            });
+            return true;
+        }
+        /** Qué canales de radio tiene DE VERDAD este móvil (lo dice Android; el alcance real se mide en campo). */
+        @JavascriptInterface public String radioCaps() {
+            JSONObject o = new JSONObject();
+            try {
+                android.bluetooth.BluetoothManager bm = (android.bluetooth.BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
+                android.bluetooth.BluetoothAdapter a = bm == null ? null : bm.getAdapter();
+                o.put("bt", a != null).put("btOn", a != null && a.isEnabled());
+                if (a != null) {
+                    o.put("leCodedPhy", a.isLeCodedPhySupported()).put("le2mPhy", a.isLe2MPhySupported())
+                     .put("leExtAdv", a.isLeExtendedAdvertisingSupported()).put("leMaxAdvBytes", a.getLeMaximumAdvertisingDataLength());
+                }
+                o.put("wifiAware", getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE))
+                 .put("wifiRtt", getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI_RTT))
+                 .put("wifiDirect", getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI_DIRECT))
+                 .put("uwb", Build.VERSION.SDK_INT >= 31 && getPackageManager().hasSystemFeature("android.hardware.uwb"))
+                 .put("sdk", Build.VERSION.SDK_INT).put("model", Build.MANUFACTURER + " " + Build.MODEL);
+            } catch (RuntimeException | org.json.JSONException e) { return "{}"; }
+            return o.toString();
+        }
+        @JavascriptInterface public void screenRecStop() {
+            runOnUiThread(() -> startService(new Intent(AppActivity.this, ScreenRecordService.class).setAction(ScreenRecordService.ACTION_STOP)));
+        }
+        @JavascriptInterface public boolean screenRecording() { return ScreenRecordService.recording; }
 
         @JavascriptInterface public void listen() { runOnUiThread(AppActivity.this::startVoice); }
 

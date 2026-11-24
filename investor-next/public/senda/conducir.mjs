@@ -20,6 +20,7 @@ import { CATEGORIES, FROM_REPORT, fromDatex, markerSvg } from './core/report-sty
 import { saveBlob } from './save-file.mjs';
 import { packReports, unpackReports, mergeReports, isReportPack } from './core/hazard-share.mjs';
 import { b64, unb64 } from './core/b64.mjs';
+import { createBlackbox } from './core/blackbox.mjs';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -199,6 +200,8 @@ function updateCorridor() {
   const ssdTxt = res.ssdM != null ? ` · parada AASHTO ${Math.round(res.ssdM)} m` : '';
   const extra = res.dedupedCount > 1 ? ` · +${res.dedupedCount - 1} más` : '';
   $('#caSub').textContent = `${t.sourceLabel}${ssdTxt}${extra}`;
+  const ck = `${t.label}|${t.urgency}|${Math.round(t.distM / 100)}`; if (ck !== tele.corrKey) { tele.corrKey = ck; bbLog('corridor', { label: t.label, urgency: t.urgency, distM: Math.round(t.distM), src: t.sourceLabel, ssdM: res.ssdM != null ? Math.round(res.ssdM) : null }); }
+  tele.corr = `${t.label} ${fmtDist(t.distM)} ${t.urgency}`;
   const phrase = corridorAnnouncement(t, st.saidCorridor);
   if (phrase) say(phrase);
 }
@@ -262,6 +265,8 @@ function onPos(p) {
   updateCorridor();
   updateRadars(p.timestamp || Date.now());
   updateOsint();
+  bbLog('gps', { lat: +p.coords.latitude.toFixed(6), lon: +p.coords.longitude.toFixed(6), acc: p.coords.accuracy != null ? Math.round(p.coords.accuracy) : null, v: p.coords.speed, hdg: p.coords.heading, alt: p.coords.altitude != null ? Math.round(p.coords.altitude) : null, gt: p.timestamp });
+  tele.gps = p.coords;
 }
 navigator.geolocation?.watchPosition(onPos, () => { $('#speed').innerHTML = '<div>–<small>sin GPS</small></div>'; }, { enableHighAccuracy: true, maximumAge: 1000 });
 
@@ -373,6 +378,7 @@ $('#pmFile')?.addEventListener('change', async (e) => {
   try { await loadPmTilesFile(f); } catch (err) { hint('No se pudo abrir .pmtiles: ' + (err.message || err)); }
 });
 window.sendaP2P = (ev) => {
+  bbLog('ble', { ev: ev.event, text: ev.text ?? null, bytes: ev.b64 ? Math.floor(ev.b64.length * 3 / 4) : null });
   if (ev.event === 'status') return hint(ev.text);
   if (ev.event !== 'received') return;
   const bytes = unb64(ev.b64);
@@ -477,13 +483,14 @@ function tick(now) {
 }
 function analyse(now, iv = 250) {
   const v = $('#v'); if (!v.videoWidth) return;
-  const W = v.videoWidth, H = v.videoHeight, t0 = performance.now(), r = det.detectForVideo(v, now), inferMs = performance.now() - t0;
+  const W = v.videoWidth, H = v.videoHeight, t0 = performance.now(), r = timedDetect(v, now), inferMs = performance.now() - t0;
   const rawObjs = tracker.update(r.detections.map((d) => ({ label: d.categories[0].categoryName, score: d.categories[0].score, x: d.boundingBox.originX / W, y: d.boundingBox.originY / H, w: d.boundingBox.width / W, h: d.boundingBox.height / H })), now / 1000);
   const objs = enrichTracksForHud(rawObjs, { speedMs: st.speed });
   st.lastVision = summarizeVision(objs, inferMs, iv);
   const c = $('#ov'), box = c.getBoundingClientRect(), dpr = devicePixelRatio || 1; c.width = box.width * dpr; c.height = box.height * dpr;
   const x = c.getContext('2d'); x.scale(dpr, dpr);
   renderArHud(x, box.width, box.height, { ...hudPhysicsState(iv), tracks: objs });
+  noteObjects(objs);
   const top = topAlert(objs), a = $('#adas');
   if (!top) { a.hidden = true; return; }
   a.hidden = false; a.className = top.level;
@@ -529,12 +536,13 @@ function dashFrame(now) {
     const W = c.width, H = c.height, x = c.getContext('2d', { willReadFrequently: true });
     x.drawImage(v, 0, 0, W, H);
     const iv = aiIntervalMs();
-    if (now - dash.lastDet >= iv) { dash.lastDet = now; const t0 = performance.now(), r = det.detectForVideo(v, now), inferMs = performance.now() - t0;
+    if (now - dash.lastDet >= iv) { dash.lastDet = now; const t0 = performance.now(), r = timedDetect(v, now), inferMs = performance.now() - t0;
       const rawObjs = tracker.update(r.detections.map((d) => ({ label: d.categories[0].categoryName, score: d.categories[0].score, x: d.boundingBox.originX / W, y: d.boundingBox.originY / H, w: d.boundingBox.width / W, h: d.boundingBox.height / H })), now / 1000);
       dash.objs = enrichTracksForHud(rawObjs, { speedMs: st.speed, sourceCtx: x, W, H });
       st.lastVision = summarizeVision(dash.objs, inferMs, iv);
+      noteObjects(dash.objs);
       const top = topAlert(dash.objs); if (top) warnDash(top); }
-    drawDashData(x, W, H, iv); // AR-HUD 3D + BEV completo en pantalla (y en vídeo si «Datos en el vídeo» está activo)
+    drawDashData(x, W, H, iv);
     $('#dashInfo').textContent = `${dash.objs.length} obj · ${st.region} · ${W}×${H} · ${(1000 / iv).toFixed(0)} Hz`;
   }
   requestAnimationFrame(dashFrame);
@@ -582,7 +590,28 @@ document.querySelectorAll('#dash [data-q]').forEach((b) => b.addEventListener('c
 }));
 document.addEventListener('visibilitychange', () => { if (document.hidden && dash.on && !dash.rec) dashClose(); });
 
-// ── Radar sin red (avisos, cámaras, radares oficiales e incidencias en 5 km; la marcha hacia arriba) ──
+// ── Panel «Datos» + Caja negra unificada (JSONL + SHA-256 v2 + pantalla Android MediaProjection) ──
+const tele = { on: LS.get('senda.drive.tele', false), gps: null, imu: null, gyro: null, det: { ms: null, n: 0, hz: 0, frames: [] }, top: null, corr: null, corrKey: '', net: null, bat: null, ble: null };
+let bb = null, bbScreen = null, bbTimer = null, battery = null;
+const lastAlert = new Map();
+function bbLog(k, data) { if (bb) bb.add(k, data); }
+function timedDetect(v, now) {
+  const t0 = performance.now(), r = det.detectForVideo(v, now), ms = performance.now() - t0;
+  const f = tele.det.frames; f.push(performance.now()); while (f.length && f[0] < performance.now() - 2000) f.shift();
+  tele.det.ms = ms; tele.det.n = r.detections.length; tele.det.hz = f.length / 2;
+  bbLog('det', { ms: Math.round(ms), n: r.detections.length, be: 'CPU' });
+  return r;
+}
+function noteObjects(objs) {
+  const top = topAlert(objs); tele.top = top ? `${ES[top.label] ?? top.label} ${top.zone} ${top.level}${top.ttcS ? ' ' + top.ttcS.toFixed(1) + ' s' : ''}` : `${objs.length} obj · sin alerta`;
+  for (const o of objs) {
+    if (o.level === 'VERDE') continue;
+    const key = o.id + o.level; if (Date.now() - (lastAlert.get(key) ?? 0) < 1000) continue; lastAlert.set(key, Date.now());
+    bbLog('alert', { level: o.level, label: o.label, zone: o.zone, ttcS: o.ttcS != null ? +o.ttcS.toFixed(2) : null, reasons: o.reasons, box: [o.box.x, o.box.y, o.box.w, o.box.h].map((x) => +x.toFixed(3)) });
+  }
+}
+
+// ── Radar sin red (avisos, cámaras, radares ES+NL e incidencias en 5 km; la marcha hacia arriba) ──
 function drawRadar() {
   const c = $('#radar'); if (!c || $('#radarWrap').hidden) return;
   const x = c.getContext('2d'), W = c.width, R = W / 2 - 16, RANGE = 5000;
@@ -603,22 +632,27 @@ function drawRadar() {
 // ── Sensores reales del dispositivo (batería + IMU 3 ejes; null si el móvil no los expone) ──
 if (typeof navigator.getBattery === 'function') {
   navigator.getBattery().then((b) => {
+    battery = b;
     const syncBat = () => { st.battery.pct = +(b.level * 100).toFixed(1); st.battery.charging = b.charging; };
     syncBat(); b.addEventListener?.('levelchange', syncBat); b.addEventListener?.('chargingchange', syncBat);
   }).catch(() => {});
 }
 window.addEventListener('devicemotion', (e) => {
   const a = e.accelerationIncludingGravity || e.acceleration;
+  const g = e.rotationRate;
   if (a) {
     if (typeof a.x === 'number' && Number.isFinite(a.x)) st.imu.ax = a.x;
     if (typeof a.y === 'number' && Number.isFinite(a.y)) st.imu.ay = a.y;
     if (typeof a.z === 'number' && Number.isFinite(a.z)) st.imu.az = a.z;
+    const mag = Math.hypot(a.x ?? 0, a.y ?? 0, a.z ?? 0);
+    tele.imu = mag;
+    tele.gyro = g ? Math.hypot(g.alpha ?? 0, g.beta ?? 0, g.gamma ?? 0) : null;
+    bbLog('imu', { a: +mag.toFixed(2), ax: +(a.x ?? 0).toFixed(2), ay: +(a.y ?? 0).toFixed(2), az: +(a.z ?? 0).toFixed(2), gyro: tele.gyro != null ? Math.round(tele.gyro) : null });
   }
-  const r = e.rotationRate;
-  if (r) {
-    if (typeof r.alpha === 'number' && Number.isFinite(r.alpha)) st.imu.gx = r.alpha;
-    if (typeof r.beta === 'number' && Number.isFinite(r.beta)) st.imu.gy = r.beta;
-    if (typeof r.gamma === 'number' && Number.isFinite(r.gamma)) st.imu.gz = r.gamma;
+  if (g) {
+    if (typeof g.alpha === 'number' && Number.isFinite(g.alpha)) st.imu.gx = g.alpha;
+    if (typeof g.beta === 'number' && Number.isFinite(g.beta)) st.imu.gy = g.beta;
+    if (typeof g.gamma === 'number' && Number.isFinite(g.gamma)) st.imu.gz = g.gamma;
   }
 }, { passive: true });
 window.addEventListener('deviceorientation', (e) => {
@@ -638,7 +672,6 @@ function loadOsintGeoJson(gj) {
   return st.osintEvents.length;
 }
 
-// ── Caja negra de viaje v2 (1 Hz, telemetría completa de calibración, SHA-256, sin vídeo ni PII, 0 €) ──
 function rfSnapshot() {
   const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   return {
@@ -648,7 +681,30 @@ function rfSnapshot() {
     rttMs: typeof c?.rtt === 'number' ? c.rtt : null,
   };
 }
-let bbTimer = null;
+function sampleSlow() {
+  const c = navigator.connection;
+  tele.net = { online: navigator.onLine, type: c?.type ?? null, eff: c?.effectiveType ?? null, down: c?.downlink ?? null, rtt: c?.rtt ?? null };
+  tele.bat = battery ? { level: battery.level, charging: battery.charging } : null;
+  bbLog('net', tele.net); if (tele.bat) bbLog('bat', tele.bat);
+}
+const f1 = (x, d = 1) => (x == null || Number.isNaN(x) ? '–' : Number(x).toFixed(d));
+function drawTele() {
+  const el = $('#tele'); if (!el) return;
+  el.hidden = !tele.on && !bb; if (el.hidden) return;
+  const g = tele.gps, n = tele.net, b = tele.bat;
+  el.textContent = [
+    bb ? `● REC ${new Date(Date.now() - bb.t0).toISOString().slice(11, 19)} · ${bb.rows.length} filas${bbScreen ? ' · pantalla' : ''}` : '',
+    `[${st.region}] GPS ${g ? `±${f1(g.accuracy, 0)}m ${f1((g.speed ?? NaN) * 3.6, 0)}km/h ${f1(g.heading, 0)}° alt ${f1(g.altitude, 0)}m` : 'sin señal'}`,
+    `IMU ${f1(tele.imu, 1)}m/s² giro ${f1(tele.gyro, 0)}°/s`,
+    `IA ${camOn || dash.on ? `${f1(tele.det.hz, 1)}Hz ${f1(tele.det.ms, 0)}ms ${tele.det.n}det · ${tele.top ?? ''}` : 'apagada'}`,
+    `Radares ${st.radars.length} · ${st.region === 'NL' ? `NDW ${st.nlIncidents.length}` : `DGT ${st.incidents.length}`} · SENDA ${reports().length}`,
+    `Red ${n ? `${n.online ? (n.eff ?? 'sí') : 'NO'}${n.down != null ? ' ' + n.down + 'Mb/s' : ''}${n.rtt != null ? ' ' + n.rtt + 'ms' : ''}` : '–'} · Bat ${b ? Math.round(b.level * 100) + '%' + (b.charging ? '⚡' : '') : '–'}`,
+  ].filter(Boolean).join('\n');
+}
+setInterval(() => { sampleSlow(); drawTele(); }, 1000);
+$('#teleBtn')?.addEventListener('click', () => { tele.on = !tele.on; LS.set('senda.drive.tele', tele.on); $('#teleBtn')?.classList.toggle('on', tele.on); drawTele(); });
+$('#teleBtn')?.classList.toggle('on', tele.on);
+
 function bbSample() {
   if (!st.bb.active) return null;
   const coords = st.lastFix?.coords;
@@ -669,29 +725,51 @@ function bbSample() {
 }
 function bbStart() {
   st.bb.reset(); st.bb.start();
-  $('#bbBtn')?.classList.add('rec'); $('#bbBadge').hidden = false;
+  bb = createBlackbox({ meta: { app: 'SENDA Drive', page: 'conducir', region: st.region, ua: navigator.userAgent, screen: `${screen.width}x${screen.height}@${devicePixelRatio}`, native: !!window.SendaNative, radios: (() => { try { return JSON.parse(window.SendaNative?.radioCaps?.() ?? 'null'); } catch { return null; } })(), privacy: 'contiene tu recorrido GPS; sin imágenes de cámara' } });
+  tele.corrKey = ''; sampleSlow();
+  $('#bbBtn')?.classList.add('rec', 'on'); $('#bbDash')?.classList.add('on');
+  $('#bbBadge').hidden = false; $('#markBtn').hidden = false;
+  document.documentElement.classList.add('bbrec');
   syncAiLabels();
   bbSample();
   clearInterval(bbTimer); bbTimer = setInterval(bbSample, 1000);
-  hint('Caja negra v2 activa (1 Hz, telemetría completa de calibración, solo local, sin vídeo ni PII).');
+  if (typeof window.SendaNative?.screenRecStart === 'function') window.SendaNative.screenRecStart(dash.q === 'high');
+  hint('Caja negra v2 + JSONL activa (1 Hz, telemetría completa de calibración, solo local, sin vídeo ni PII).');
+  drawTele();
 }
+window.sendaScreenRec = (ev) => {
+  bbLog('note', { text: `pantalla: ${ev.event}${ev.detail ? ' · ' + ev.detail : ''}` });
+  if (ev.event === 'started') { bbScreen = { native: true }; hint(`Grabando pantalla (${ev.detail}) + datos.`); }
+  else if (ev.event === 'saved') { hint(`Vídeo de pantalla guardado en ${ev.detail}.`); bbScreen = null; }
+  else if (ev.event === 'error') { hint(ev.detail); bbScreen = null; }
+  drawTele();
+};
 async function bbExport() {
   clearInterval(bbTimer); bbTimer = null; st.bb.stop();
-  $('#bbBtn')?.classList.remove('rec'); $('#bbBadge').hidden = true;
-  if (st.bb.count === 0) return hint('Caja negra vacía: no se guardó archivo.');
+  const box = bb; bb = null;
+  $('#bbBtn')?.classList.remove('rec', 'on'); $('#bbDash')?.classList.remove('on');
+  $('#bbBadge').hidden = true; $('#markBtn').hidden = true;
+  document.documentElement.classList.remove('bbrec');
+  if (bbScreen?.native) window.SendaNative?.screenRecStop?.();
+  if (st.bb.count === 0) { drawTele(); return hint('Caja negra vacía: no se guardó archivo.'); }
   const doc = await st.bb.exportSealed();
-  const text = JSON.stringify(doc, null, 2);
-  const blob = new Blob([text], { type: 'application/json' });
-  const name = `senda-blackbox-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.json`;
-  const res = await saveBlob(blob, name);
+  const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+  const blob = new Blob([JSON.stringify(doc, null, 2)], { type: 'application/json' });
+  const res = await saveBlob(blob, `senda-blackbox-${stamp}.json`);
+  if (box && box.rows.length) {
+    await saveBlob(new Blob([box.toJsonl()], { type: 'application/x-ndjson' }), `senda-cajanegra-${stamp}.jsonl`);
+  }
   const s = doc.summary;
   hint(res.ok
     ? `Caja negra v2 sellada SHA-256 guardada en ${res.where} (${(blob.size / 1024).toFixed(1)} KB · ${s.frames} muestras · ${s.distanceKm} km · ${s.deadZoneSamples} sin red · ${s.radarAlertFrames} radares).`
     : 'No se pudo guardar la caja negra.');
+  drawTele();
   return doc;
 }
 $('#bbBtn')?.addEventListener('click', () => { if (st.bb.active) bbExport(); else bbStart(); });
+$('#bbDash')?.addEventListener('click', () => { if (st.bb.active) bbExport(); else bbStart(); });
 $('#bbSave')?.addEventListener('click', bbExport);
+$('#markBtn')?.addEventListener('click', () => { bbLog('note', { text: 'MARCA del conductor' }); navigator.vibrate?.(60); say('Marcado'); });
 
 // La tarjeta de abajo cambia de alto (llegada, avisos): los botones flotantes se colocan siempre encima.
 new ResizeObserver(([e]) => document.documentElement.style.setProperty('--bottomH', `${Math.ceil(e.target.getBoundingClientRect().height)}px`)).observe($('#bottom'));
