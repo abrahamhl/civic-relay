@@ -1,4 +1,4 @@
-# SENDA · handoff (2026-11-24 15:55Z, sesión Antigravity)
+# SENDA · handoff (2026-11-24 16:20Z, sesión Antigravity)
 
 ## Publicado hoy (master c3706a5, APK en la Release fija `senda-android-latest`)
 - App: portada estilo Apple `/senda/app` con roles (ADMIN/OBSERVADOR/CIUDADANO, credencial ECDSA, QR), marco común en 50 páginas, icono, un solo icono (Drive como módulo).
@@ -8,10 +8,12 @@
 - Enlaces externos (Waze/Maps/SMS/tel) por lista cerrada `ExternalLinks`.
 - 24-11 (PR #80): avisos entre móviles por Bluetooth (`hazard-share.mjs`, paquete 0xA5, sin firma → «sin verificar»); texto falso corregido; barrido de secretos limpio (solo el keystore de prueba, público a propósito).
 
-## En rama borrador `antigravity/conducir-calibracion-20261124` (commit `e3c3628`, NO fusionada)
+## En rama borrador `antigravity/conducir-calibracion-20261124` (commits `e3c3628`, `51bf009`, `d870ec3`, NO fusionada)
 - `drive-hazard.mjs`: looming isotrópico con guarda de recorte en bordes, pendiente robusta Theil–Sen, confirmación en 2 fotogramas, continuidad `car/bus/truck` y predicción de movimiento para incorporaciones rápidas a 4 Hz. Medido sobre vídeo real Udacity MIT (145 fotogramas a 4 Hz con EfficientDet-Lite0 int8): falsas alarmas AMBAR **6 → 0**, fragmentos de pista **10 → 3**; en simulación cinemática a 4 Hz (`SIMULATION`), incorporación `0,30/s` pasa de no detectada a 0,75 s (ROJO sin retraso adicional: 1,75 s).
 - `drive-corridor.mjs` + `/senda/conducir` (`#corridorAlert`): avisos por delante en ruta OSRM o cono frontal ±35° con distancia de parada AASHTO y deduplicación de 120 m (106 duplicados colapsados sobre 838 incidencias reales DGT DATEX II); operativo también en radar sin red (APK base) y con avisos Bluetooth («sin verificar»).
-- Batería completa en verde: `packages/senda` 985/985, `investor-next` 157/157, `senda-offline-e2e` 49/49, `prove.mjs` 19/19, Android JVM 119/119, Chromium Pixel 7 6/6 (`evidence/drive-calibration/`).
+- `drive-physics-v2.mjs` + `drive-blackbox.mjs` + `/senda/conducir` (`#bbBtn`, `#bbBadge`): física RSS (IEEE 2846 / arXiv:1708.06374), canal V2V dos rayos + Doppler + ventana de contacto, Bluetooth 6.0 Channel Sounding PBR+RTT, cinemática planar GNSS y **Caja Negra de vuelo sellada SHA-256** (1 Hz, sin vídeo ni PII, mapeo de zonas sin red, drenaje real de batería %/h, recorte automático IA 4 Hz → 2 Hz si batería < 25 %).
+- `docs/research/FRONTERA_FISICA_TELECOM_OSINT_2026-11.md`: dossier con fuentes primarias (BT 6.0 CS + IMU, IEEE 802.11bf-2025, 3GPP Rel-18/19, EUMETSAT MTG-I1/I2/S1, Protomaps PMTiles v3, `Radares Anunciados` `datos.gob.es` ODbL 1.0, Reticulum/Meshtastic/MeshSat/BitChat, ReliefWeb/GDACS/ACLED/OpenSky).
+- Batería completa en verde: `packages/senda` **992/992**, `investor-next` **157/157**, `senda-offline-e2e` **49/49**, `prove.mjs` **19/19**, Android JVM **119/119**, Chromium Pixel 7 **10/10** (6 corredor + 4 caja negra).
 - Nota sobre bundles previos: `antigravity-20261123.bundle` y `senda-waves1-23-validated.bundle` residen únicamente en la VM aislada de la conversación anterior (`df55d99d-2467-4e6f-bb67-798b822dd8e8`) y no estaban disponibles en esta sesión.
 
 ## Pendiente del fundador (decisiones)
