@@ -1,5 +1,5 @@
 {
-  "testedUtc": "2026-11-24T16:39:30.359Z",
+  "testedUtc": "2026-11-24T17:07:12.772Z",
   "viewport": "Pixel 7 (412x915 & 915x412, offline)",
   "passed": 9,
   "total": 9,
@@ -7,7 +7,7 @@
     {
       "name": "official_radars_loaded",
       "pass": true,
-      "radars": 1126,
+      "radars": 1970,
       "stretches": 60
     },
     {
@@ -37,7 +37,7 @@
       "pass": true,
       "radarHidden": false,
       "radarClass": "card OVER",
-      "raTitle": "Radar fijo · 480 m",
+      "raTitle": "Radar fijo / Flitspaal · 480 m",
       "raSub": "EUSKADI · oficial publicado · 13.3 s · VITORIA - GASTEIZ",
       "raLim": "120",
       "caTitle": "Retención · 480 m",
@@ -68,17 +68,17 @@
       "pass": true,
       "schema": "senda-drive-blackbox/2",
       "frames": 3,
-      "chainTipHash": "3f94753296698d0ce99c83302c65cde9023072da514527f41ab5625ad8fb61ff",
+      "chainTipHash": "16f3a1c3b878e04bd5c2f4c94ab0f2cf203835d2787beb0036deb3bee61fd626",
       "summary": {
         "frames": 3,
         "durationS": 0.5,
         "distanceKm": 0,
         "maxSpeedKmh": 130,
         "meanSpeedKmh": 97.4,
-        "maxBrakingMs2": 38.37,
+        "maxBrakingMs2": 37.57,
         "maxAccelMs2": 0,
-        "maxLatG": 2.742,
-        "maxNormG": 4.778,
+        "maxLatG": 2.685,
+        "maxNormG": 4.679,
         "maxImuG": 1.011,
         "batteryStartPct": 15,
         "batteryEndPct": 15,

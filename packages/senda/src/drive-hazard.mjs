@@ -37,6 +37,16 @@ export const RULES = Object.freeze({
 });
 
 export const WATCHED = Object.freeze(['car', 'truck', 'bus', 'motorcycle', 'bicycle', 'person', 'dog', 'horse', 'cow', 'sheep']);
+export const EXTENDED_WATCHED = Object.freeze([...WATCHED, 'traffic light', 'stop sign', 'train']);
+export const INFRA_CLASSES = Object.freeze(new Set(['traffic light', 'stop sign']));
+export const VRU_CLASSES = Object.freeze(new Set(['person', 'bicycle', 'motorcycle']));
+export function classGroup(label) {
+  if (INFRA_CLASSES.has(label)) return 'INFRA';
+  if (VRU_CLASSES.has(label)) return 'VRU';
+  if (label === 'train') return 'RAIL';
+  if (['dog', 'horse', 'cow', 'sheep'].includes(label)) return 'ANIMAL';
+  return 'VEHICLE';
+}
 const MOTOR_4W = new Set(['car', 'truck', 'bus']);
 const sameGroup = (a, b) => a === b || (MOTOR_4W.has(a) && MOTOR_4W.has(b));
 
@@ -100,11 +110,12 @@ function sampleOf(d, t, edge) {
 export function createTracker(rules = RULES) {
   let tracks = [], nextId = 1;
   const edge = rules.edgeMargin ?? RULES.edgeMargin;
+  const allowed = rules.includeInfra ? EXTENDED_WATCHED : WATCHED;
   return {
     /** dets: [{label, score, x, y, w, h}] normalizados; t en segundos. Devuelve los objetos con su evaluación. */
     update(dets, t) {
       const live = tracks.filter((k) => t - k.last <= rules.maxAgeS);
-      const valid = dets.filter((d) => WATCHED.includes(d.label));
+      const valid = dets.filter((d) => allowed.includes(d.label));
       // Emparejamiento global por mejor puntuación (invariante al orden de detecciones)
       const pairs = [];
       for (let di = 0; di < valid.length; di++) {
@@ -137,7 +148,9 @@ export function createTracker(rules = RULES) {
 
 export function assess(k, rules = RULES) {
   const zone = zoneOf(k.box, rules);
-  const out = { id: k.id, label: k.label, box: k.box, zone, ttcS: null, lateral: 0, level: 'VERDE', reasons: [], clipped: false };
+  const group = classGroup(k.label);
+  const out = { id: k.id, label: k.label, group, box: k.box, zone, ttcS: null, lateral: 0, level: 'VERDE', reasons: [], clipped: false };
+  if (INFRA_CLASSES.has(k.label)) { k.streak = 0; return out; }
   if (k.hist.length < rules.minHistory) { k.streak = 0; return out; }
   const win = k.hist.slice(-rules.ttcWindow);
   const anyHClip = win.some((h) => h.hClip);

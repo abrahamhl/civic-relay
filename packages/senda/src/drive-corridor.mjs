@@ -120,6 +120,9 @@ export function hazardsAhead({ pos, headingDeg = null, speedMs = null, routeCoor
 
   const consider = (item) => {
     if (!Number.isFinite(item.lat) || !Number.isFinite(item.lon)) return;
+    if (hasHeading && typeof item.bearing === 'number' && Number.isFinite(item.bearing)) {
+      if (headingDeltaDeg(headingDeg, item.bearing) > 70) return;
+    }
     let distM, lateralM = null, relDeg = null;
     if (hasRoute) {
       const p = projectOnPolyline(routeCoords, [item.lon, item.lat]);
@@ -150,16 +153,19 @@ export function hazardsAhead({ pos, headingDeg = null, speedMs = null, routeCoor
 
   for (const i of incidents) {
     if (i == null || i.lat == null || i.lon == null) continue;
-    const cat = fromDatex(i);
-    const label = CATEGORIES[cat]?.label ?? 'Peligro';
+    const isBridge = i.type === 'BridgeOpening' || i.feed === 'brugopeningen';
+    const cat = isBridge ? 'CORTE' : fromDatex(i);
+    const label = isBridge ? 'Puente levadizo abierto' : (CATEGORIES[cat]?.label ?? 'Peligro');
+    const isNl = i.country === 'NL';
     consider({
-      key: `dgt:${i.id ?? `${cat}@${Number(i.lat).toFixed(4)},${Number(i.lon).toFixed(4)}`}`,
-      source: 'DGT',
+      key: `${isNl ? 'ndw' : 'dgt'}:${i.id ?? `${cat}@${Number(i.lat).toFixed(4)},${Number(i.lon).toFixed(4)}`}`,
+      source: isNl ? 'NDW' : 'DGT',
       sourceLabel: incSource,
       cat,
       label,
       road: i.road || '',
       detail: i.cause || i.type || '',
+      bearing: typeof i.bearing === 'number' && Number.isFinite(i.bearing) ? i.bearing : null,
       lat: Number(i.lat),
       lon: Number(i.lon),
       rank: SEVERITY_RANK[cat] ?? 1,

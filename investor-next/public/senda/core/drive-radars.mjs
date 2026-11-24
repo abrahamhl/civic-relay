@@ -9,9 +9,13 @@
  */
 import { haversineM } from './route-planner.mjs';
 import { bearingDeg, headingDeltaDeg } from './drive-corridor.mjs';
+import { omNlSpeedCheck } from './ndw-nl.mjs';
 
-export const OFFICIAL_RADAR_SOURCES = Object.freeze(['dgt', 'sct', 'euskadi', 'madrid', 'salamanca', 'donostia', 'navarra']);
-export const ALLOWED_RADAR_KINDS = Object.freeze(['fixed', 'section', 'stretch']);
+export const OFFICIAL_RADAR_SOURCES = Object.freeze([
+  'dgt', 'sct', 'euskadi', 'madrid', 'salamanca', 'donostia', 'navarra',
+  'nl_mapatlas', 'nl_om', 'nl_ndw',
+]);
+export const ALLOWED_RADAR_KINDS = Object.freeze(['fixed', 'section', 'stretch', 'redlight']);
 const FORBIDDEN_PATTERNS = /mobile|movil|polic|control_movil|rf_detect|unannounced|camuflado/i;
 
 export const RADAR_RULES = Object.freeze({
@@ -20,10 +24,10 @@ export const RADAR_RULES = Object.freeze({
   radarBearingTolDeg: 55,   // tolerancia respecto al rumbo publicado del radar para filtrar calzada contraria
   voiceM: 800,              // distancia para anuncio por voz (regla de la app)
   sectionEntryM: 90,        // radio de entrada/salida de radar de tramo (regla de la app)
-  source: 'Posiciones oficiales publicadas (DGT CC BY 4.0 / SCT / Euskadi / Ayuntamientos); umbrales de aviso = reglas de la app no calibradas',
+  source: 'Posiciones publicadas fijas/semáforo/tramo (ES: DGT CC BY 4.0 / SCT / Euskadi / Ayuntamientos · NL: European Camera Index CC BY 4.0 / OM); umbrales de aviso = reglas de la app no calibradas',
 });
 
-/** Puerta legal/cívica: solo radares fijos o de tramo de organismos públicos oficiales. */
+/** Puerta legal/cívica: solo radares fijos, de semáforo o de tramo de fuentes abiertas verificadas. */
 export function isAllowedOfficialControl(item) {
   if (!item || typeof item !== 'object') return false;
   const kind = String(item.kind ?? '');
@@ -32,11 +36,17 @@ export function isAllowedOfficialControl(item) {
   return ALLOWED_RADAR_KINDS.includes(kind) && OFFICIAL_RADAR_SOURCES.includes(src);
 }
 
+function isWithinActiveHours(r, nowHour) {
+  if (typeof r.activeFromHour !== 'number' || typeof r.activeToHour !== 'number' || typeof nowHour !== 'number') return true;
+  if (r.activeFromHour <= r.activeToHour) return nowHour >= r.activeFromHour && nowHour < r.activeToHour;
+  return nowHour >= r.activeFromHour || nowHour < r.activeToHour;
+}
+
 /**
- * Busca radares fijos/de tramo oficiales por delante del vehículo.
- * Si el radar trae rumbo publicado (`bearing`), descarta los de la calzada contraria.
+ * Busca radares fijos/semáforo/tramo por delante del vehículo (ES + NL).
+ * Si el radar trae rumbo publicado (`bearing`) y no es bidireccional, descarta los de la calzada contraria.
  */
-export function radarsAhead({ pos, headingDeg = null, speedMs = null, points = [], rules = RADAR_RULES } = {}) {
+export function radarsAhead({ pos, headingDeg = null, speedMs = null, points = [], rules = RADAR_RULES, nowHour = null } = {}) {
   if (!Array.isArray(pos) || pos.length < 2 || !Number.isFinite(pos[0]) || !Number.isFinite(pos[1])) {
     return { top: null, items: [], source: rules.source };
   }
@@ -47,12 +57,13 @@ export function radarsAhead({ pos, headingDeg = null, speedMs = null, points = [
   for (const r of points) {
     if (!isAllowedOfficialControl(r)) continue;
     if (!Number.isFinite(r.lon) || !Number.isFinite(r.lat)) continue;
+    if (!isWithinActiveHours(r, nowHour)) continue;
     const d = haversineM(pos, [r.lon, r.lat]);
     if (d > rules.lookaheadM) continue;
     if (hasHeading) {
       const rel = headingDeltaDeg(headingDeg, bearingDeg(pos, [r.lon, r.lat]));
       if (rel > rules.coneHalfDeg) continue;
-      if (typeof r.bearing === 'number' && Number.isFinite(r.bearing)) {
+      if (!r.bidirectional && typeof r.bearing === 'number' && Number.isFinite(r.bearing)) {
         if (headingDeltaDeg(headingDeg, r.bearing) > rules.radarBearingTolDeg) continue;
       }
     } else if (d > 300) {
@@ -61,10 +72,14 @@ export function radarsAhead({ pos, headingDeg = null, speedMs = null, points = [
     const maxspeed = typeof r.maxspeed === 'number' && Number.isFinite(r.maxspeed) ? r.maxspeed : null;
     const speedKmh = moving ? speedMs * 3.6 : null;
     const overLimit = maxspeed != null && speedKmh != null ? speedKmh > maxspeed : false;
+    const src = String(r.src ?? r.source);
+    const isNl = r.country === 'NL' || src.startsWith('nl_');
+    const omCheck = isNl && maxspeed != null && speedKmh != null ? omNlSpeedCheck(speedKmh, maxspeed) : null;
     out.push({
       id: r.id,
       kind: r.kind,
-      src: r.src ?? r.source,
+      src,
+      country: isNl ? 'NL' : 'ES',
       road: r.road || '',
       km: r.km ?? null,
       dir: r.dir || '',
@@ -72,9 +87,10 @@ export function radarsAhead({ pos, headingDeg = null, speedMs = null, points = [
       distM: Math.round(d),
       etaS: moving ? +(d / speedMs).toFixed(1) : null,
       overLimit,
+      omCheck,
       lon: r.lon,
       lat: r.lat,
-      attribution: `${String(r.src ?? r.source).toUpperCase()} · oficial publicado`,
+      attribution: isNl ? 'NL · Cámara fija/tramo (CC BY 4.0)' : `${src.toUpperCase()} · oficial publicado`,
     });
   }
   out.sort((a, b) => a.distM - b.distM);

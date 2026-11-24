@@ -1,6 +1,6 @@
 {
   "schema": "senda-drive-calibration-report/v1",
-  "generatedUtc": "2026-11-24T15:43:53.873Z",
+  "generatedUtc": "2026-11-24T17:06:48.783Z",
   "costEur": 0,
   "execution": "100 % en el dispositivo, sin red",
   "inputs": {
@@ -155,7 +155,7 @@
     "totalIncidents": 838,
     "nationalAfter120mDedup": 732,
     "duplicatesCollapsedNational": 106,
-    "fourProbesTotalMs": 30.71,
+    "fourProbesTotalMs": 34.42,
     "probes": [
       {
         "name": "Valencia V-31 Sur (hacia ACCIDENTE real)",

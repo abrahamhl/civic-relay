@@ -1,10 +1,13 @@
 // SENDA · Conducir (estilo navegador): mapa a pantalla completa, búsqueda, ruta giro a giro, avisos con
 // colores e iconos, incidencias y cámaras DGT, cámara con IA en miniatura y entrega a Waze o Google Maps.
 // Red: OpenFreeMap (mapa), OSRM de FOSSGIS (rutas, pruebas), Nominatim (búsqueda, ≤1/s). Sin red: radar.
-import { createTracker, topAlert } from './core/drive-hazard.mjs';
-import { hazardsAhead, corridorAnnouncement } from './core/drive-corridor.mjs';
+import { createTracker, topAlert, RULES } from './core/drive-hazard.mjs';
+import { hazardsAhead, corridorAnnouncement, stoppingDistanceM } from './core/drive-corridor.mjs';
 import { createBlackBox } from './core/drive-blackbox.mjs';
 import { radarsAhead, createSectionTracker, RADAR_RULES } from './core/drive-radars.mjs';
+import { detectRegion, ndwToIncident, dutchMotorwayWindow } from './core/ndw-nl.mjs';
+import { enrichTracksForHud, renderArHud } from './core/drive-ar-hud.mjs';
+import { rssLongitudinalSameDir, EXAMPLE_RSS_PARAMS } from './core/drive-physics-v2.mjs';
 import { createLinkProber, isProbePack } from './core/ble-link-probe.mjs';
 import { openPmTilesLocal } from './core/pmtiles-reader.mjs';
 import { parseGdacsRss, parseMtgEvents, osintNear } from './core/osint-feeds.mjs';
@@ -26,9 +29,9 @@ const fmtDist = (m) => (m >= 1000 ? `${(m / 1000).toFixed(1).replace('.', ',')} 
 const reports = () => LS.get('senda.ruta.reports', []);
 
 const st = {
-  pos: null, speed: null, heading: 0, follow: true, map: null, mapOk: false, route: null, dest: null,
+  pos: null, speed: null, heading: 0, region: 'ES', follow: true, map: null, mapOk: false, route: null, dest: null,
   said: new Set(), saidCorridor: new Set(), saidRadar: new Set(), corridor: null, lastRouteS: -1e9,
-  incidents: [], incSource: '', cams: [],
+  incidents: [], nlIncidents: [], incSource: '', nlIncSource: '', cams: [],
   radars: [], stretches: [], sectionTracker: createSectionTracker([]), radarState: null, sectionState: null,
   me: null, bb: createBlackBox(),
   ble: { tx: 0, rx: 0, rejected: 0 }, prober: createLinkProber(),
@@ -133,9 +136,9 @@ function drawMarkers() {
   if (!st.mapOk) return drawRadar();
   markers.forEach((m) => m.remove()); markers = [];
   const b = st.map.getBounds(), inView = (lon, lat) => b.contains([lon, lat]);
-  for (const i of st.incidents) if (i.lat != null && inView(i.lon, i.lat)) {
-    const cat = fromDatex(i);
-    markers.push(marker(i.lon, i.lat, cat, `<b>${esc(CATEGORIES[cat].label)}</b> · ${esc(i.road ?? '')}<br><small>DGT: ${esc(i.type)} / ${esc(i.cause ?? '')}<br>${esc(st.incSource)}</small>`));
+  for (const i of activeIncidents()) if (i.lat != null && inView(i.lon, i.lat)) {
+    const cat = i.type === 'BridgeOpening' ? 'CORTE' : fromDatex(i);
+    markers.push(marker(i.lon, i.lat, cat, `<b>${esc(i.type === 'BridgeOpening' ? 'Puente levadizo' : CATEGORIES[cat].label)}</b> · ${esc(i.road ?? '')}<br><small>${esc(i.type)} / ${esc(i.cause ?? '')}<br>${esc(activeIncSource())}</small>`));
   }
   if (st.map.getZoom() >= 10) {
     for (const c of st.cams) if (inView(c.lon, c.lat))
@@ -149,28 +152,41 @@ function drawMarkers() {
   }
 }
 
-// ── Incidencias DGT: en vivo (app play, la parte nativa las descarga de nap.dgt.es) o copia con su fecha ──
+// ── Incidencias ES (DGT) + NL (NDW DATEX II v3 CC0: SRTI, brugopeningen, afsluitingen) ──
 async function loadIncidents() {
   try { const r = await fetch('/senda/live/dgt-incidencias.xml', { cache: 'no-store' }); if (r.ok) { st.incidents = parseDatex2(await r.text()); st.incSource = `DGT en vivo ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`; drawMarkers(); return updateCorridor(); } } catch { /* copia */ }
   try { const d = await (await fetch('/senda/data/referencias/dgt_incidencias.json')).json(); st.incidents = Object.values(d).find(Array.isArray) ?? []; st.incSource = `DGT, copia del ${new Date(d.descargadoUTC).toLocaleDateString('es-ES')}`; } catch { st.incSource = 'sin incidencias'; }
   drawMarkers(); updateCorridor();
 }
+fetch('/senda/data/referencias/nl_ndw_incidencias.json').then((r) => r.json()).then((d) => {
+  st.nlIncidents = Array.isArray(d.incidencias) ? d.incidencias.map(ndwToIncident) : [];
+  st.nlIncSource = `NDW NL (CC0), ${new Date(d.descargadoUTC).toLocaleDateString('es-ES')}`;
+  drawMarkers(); updateCorridor();
+}).catch(() => {});
 fetch('/senda/data/referencias/dgt_camaras.json').then((r) => r.json()).then((d) => { st.cams = d.camaras; drawMarkers(); }).catch(() => {});
-fetch('/senda/data/referencias/dgt_radares_oficiales.json').then((r) => r.json()).then((d) => {
-  st.radars = Array.isArray(d.puntos) ? d.puntos : [];
-  st.stretches = Array.isArray(d.tramos) ? d.tramos : [];
+Promise.allSettled([
+  fetch('/senda/data/referencias/dgt_radares_oficiales.json').then((r) => r.json()),
+  fetch('/senda/data/referencias/nl_radares_oficiales.json').then((r) => r.json()),
+]).then(([esRes, nlRes]) => {
+  const es = esRes.status === 'fulfilled' ? esRes.value : {};
+  const nl = nlRes.status === 'fulfilled' ? nlRes.value : {};
+  st.radars = [...(Array.isArray(es.puntos) ? es.puntos : []), ...(Array.isArray(nl.puntos) ? nl.puntos : [])];
+  st.stretches = [...(Array.isArray(es.tramos) ? es.tramos : []), ...(Array.isArray(nl.tramos) ? nl.tramos : [])];
   st.sectionTracker = createSectionTracker(st.stretches);
   drawMarkers(); updateRadars();
-}).catch(() => {});
+});
 
-// ── Avisos por delante en el corredor (100 % en el móvil, con o sin red) ──
+const activeIncidents = () => (st.region === 'NL' ? st.nlIncidents : st.incidents);
+const activeIncSource = () => (st.region === 'NL' ? (st.nlIncSource || 'NDW NL') : (st.incSource || 'DGT'));
+
+// ── Avisos por delante en el corredor (100 % en el móvil, con o sin red, auto ES / NL) ──
 function updateCorridor() {
   const el = $('#corridorAlert');
   if (!st.pos) { st.corridor = null; if (el) el.hidden = true; return; }
   const res = hazardsAhead({
     pos: st.pos, headingDeg: st.heading, speedMs: st.speed,
     routeCoords: st.route?.coords ?? null,
-    incidents: st.incidents, incSource: st.incSource || 'DGT',
+    incidents: activeIncidents(), incSource: activeIncSource(),
     reports: reports(),
   });
   st.corridor = res;
@@ -187,11 +203,12 @@ function updateCorridor() {
   if (phrase) say(phrase);
 }
 
-// ── Radares fijos y de tramo oficialmente publicados (100 % legal, sin red, sin móviles policiales) ──
+// ── Radares fijos, de semáforo y de tramo publicados (ES + NL, 100 % legal, sin móviles policiales) ──
 function updateRadars(nowMs = Date.now()) {
   const el = $('#radarAlert');
   if (!st.pos) { st.radarState = null; st.sectionState = null; if (el) el.hidden = true; return; }
-  const res = radarsAhead({ pos: st.pos, headingDeg: st.heading, speedMs: st.speed, points: st.radars });
+  const nowHour = new Date(nowMs).getHours();
+  const res = radarsAhead({ pos: st.pos, headingDeg: st.heading, speedMs: st.speed, points: st.radars, nowHour });
   const sec = st.sectionTracker.update({ pos: st.pos, tMs: nowMs, headingDeg: st.heading, speedMs: st.speed });
   st.radarState = res;
   st.sectionState = sec;
@@ -209,12 +226,15 @@ function updateRadars(nowMs = Date.now()) {
   const r = res.top;
   el.hidden = false;
   el.className = 'card' + (r.overLimit ? ' OVER' : '');
-  $('#raTitle').textContent = `${r.kind === 'section' ? 'Radar de tramo' : 'Radar fijo'} · ${fmtDist(r.distM)}${r.road ? ` · ${r.road}` : ''}`;
-  $('#raSub').textContent = `${r.attribution}${r.etaS != null ? ` · ${r.etaS} s` : ''}${r.dir ? ` · ${r.dir}` : ''}`;
+  const kindLbl = r.kind === 'section' ? 'Trajectcontrole / Tramo' : r.kind === 'redlight' ? 'Cámara semáforo / Roodlicht' : 'Radar fijo / Flitspaal';
+  $('#raTitle').textContent = `${kindLbl} · ${fmtDist(r.distM)}${r.road ? ` · ${r.road}` : ''}`;
+  const omTxt = r.omCheck ? ` · OM corr. ${r.omCheck.correctedKmh} km/h` : '';
+  const nlDay = r.country === 'NL' ? ` · ${dutchMotorwayWindow(new Date(nowMs)).label}` : '';
+  $('#raSub').textContent = `${r.attribution}${r.etaS != null ? ` · ${r.etaS} s` : ''}${omTxt}${r.dir ? ` · ${r.dir}` : ''}${!r.maxspeed ? nlDay : ''}`;
   if (r.maxspeed != null) { limEl.hidden = false; limEl.textContent = String(r.maxspeed); } else limEl.hidden = true;
   if (r.distM <= RADAR_RULES.voiceM && !st.saidRadar.has(r.id)) {
     st.saidRadar.add(r.id);
-    say(`${r.kind === 'section' ? 'Radar de tramo' : 'Radar fijo'} a ${fmtDist(r.distM)}${r.maxspeed ? `, límite ${r.maxspeed}` : ''}`);
+    say(`${r.kind === 'section' ? 'Radar de tramo' : r.kind === 'redlight' ? 'Cámara de semáforo' : 'Radar fijo'} a ${fmtDist(r.distM)}${r.maxspeed ? `, límite ${r.maxspeed}` : ''}`);
   }
 }
 
@@ -230,6 +250,7 @@ function updateOsint() {
 function onPos(p) {
   st.lastFix = p;
   st.pos = [p.coords.longitude, p.coords.latitude]; st.speed = p.coords.speed;
+  st.region = detectRegion(st.pos);
   if (p.coords.heading != null && !Number.isNaN(p.coords.heading) && (p.coords.speed ?? 0) > 1) st.heading = p.coords.heading;
   $('#speed').innerHTML = `<div>${st.speed == null ? '–' : Math.round(st.speed * 3.6)}<small>km/h</small></div>`;
   if (st.mapOk) {
@@ -424,14 +445,25 @@ function summarizeVision(objs, inferMs, intervalMs) {
   };
 }
 let det = null, stream = null, tracker = null, camOn = false, lastT = 0; const saidAdas = new Map();
+const FULL_RULES = { ...RULES, includeInfra: true };
+function hudPhysicsState(iv = 250) {
+  const spd = st.speed;
+  const ssdM = stoppingDistanceM(spd);
+  const rssM = spd != null && spd > 0 ? rssLongitudinalSameDir({ vRearMs: spd, vFrontMs: spd }, EXAMPLE_RSS_PARAMS).dMinM : null;
+  const curvature = spd != null && spd > 3 && typeof st.imu.ay === 'number' ? st.imu.ay / (spd * spd) : 0;
+  return {
+    speedMs: spd, ssdM, rssM, curvature, imu: st.imu, region: st.region,
+    radarTop: st.radarState?.top ?? null, corridorTop: st.corridor?.top ?? null,
+    pos: st.pos, aiHz: +(1000 / iv).toFixed(1), bbActive: st.bb.active,
+  };
+}
 $('#camBtn').addEventListener('click', async () => {
   if (camOn) return camStop();
   try {
-    if (!det) { const vision = await import(MP + '/vision_bundle.mjs'); const files = await vision.FilesetResolver.forVisionTasks(MP + '/wasm');
-      det = await vision.ObjectDetector.createFromOptions(files, { baseOptions: { modelAssetPath: '/senda/vendor/models/efficientdet_lite0_int8.tflite', delegate: 'CPU' }, runningMode: 'VIDEO', scoreThreshold: 0.4, maxResults: 8 }); }
+    await getDetector();
     stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
     $('#v').srcObject = stream; await $('#v').play(); try { await navigator.wakeLock?.request('screen'); } catch { /* */ }
-    camOn = true; tracker = createTracker(); $('#pip').hidden = false; $('#camBtn').classList.add('on'); requestAnimationFrame(tick);
+    camOn = true; tracker = createTracker(FULL_RULES); $('#pip').hidden = false; $('#camBtn').classList.add('on'); requestAnimationFrame(tick);
   } catch (e) { hint('Cámara no disponible: ' + (e.message || e.name)); }
 });
 $('#pip').addEventListener('click', () => $('#pip').classList.toggle('big'));
@@ -446,14 +478,12 @@ function tick(now) {
 function analyse(now, iv = 250) {
   const v = $('#v'); if (!v.videoWidth) return;
   const W = v.videoWidth, H = v.videoHeight, t0 = performance.now(), r = det.detectForVideo(v, now), inferMs = performance.now() - t0;
-  const objs = tracker.update(r.detections.map((d) => ({ label: d.categories[0].categoryName, score: d.categories[0].score, x: d.boundingBox.originX / W, y: d.boundingBox.originY / H, w: d.boundingBox.width / W, h: d.boundingBox.height / H })), now / 1000);
+  const rawObjs = tracker.update(r.detections.map((d) => ({ label: d.categories[0].categoryName, score: d.categories[0].score, x: d.boundingBox.originX / W, y: d.boundingBox.originY / H, w: d.boundingBox.width / W, h: d.boundingBox.height / H })), now / 1000);
+  const objs = enrichTracksForHud(rawObjs, { speedMs: st.speed });
   st.lastVision = summarizeVision(objs, inferMs, iv);
   const c = $('#ov'), box = c.getBoundingClientRect(), dpr = devicePixelRatio || 1; c.width = box.width * dpr; c.height = box.height * dpr;
   const x = c.getContext('2d'); x.scale(dpr, dpr);
-  const s = Math.max(box.width / W, box.height / H), ox = (box.width - W * s) / 2, oy = (box.height - H * s) / 2;
-  for (const o of objs) { const bx = ox + o.box.x * W * s, by = oy + o.box.y * H * s, bw = o.box.w * W * s, bh = o.box.h * H * s;
-    if (o.label === 'person') { x.fillStyle = 'rgba(0,0,0,.85)'; x.fillRect(bx, by, bw, bh); }
-    x.strokeStyle = COLOR[o.level]; x.lineWidth = o.level === 'VERDE' ? 2 : 4; x.strokeRect(bx, by, bw, bh); }
+  renderArHud(x, box.width, box.height, { ...hudPhysicsState(iv), tracks: objs });
   const top = topAlert(objs), a = $('#adas');
   if (!top) { a.hidden = true; return; }
   a.hidden = false; a.className = top.level;
@@ -461,14 +491,13 @@ function analyse(now, iv = 250) {
   const key = top.id + top.level; if (Date.now() - (saidAdas.get(key) ?? 0) > 6000) { saidAdas.set(key, Date.now()); if (top.level === 'ROJO') { navigator.vibrate?.([200, 100, 200]); say(`Cuidado, ${ES[top.label] ?? 'vehículo'} delante`); } else if (top.reasons.some((rr) => rr.startsWith('se mete'))) say(`${ES[top.label] ?? 'vehículo'} ${top.reasons.find((rr) => rr.startsWith('se mete'))}`); }
 }
 
-// ── Modo dashcam: cámara trasera a pantalla completa + mapa al lado, grabación en calidad baja o alta ──
-// El dibujo se refresca en cada fotograma (recuadros del último análisis); el análisis va 4/s (2/s en ahorro).
+// ── Modo dashcam AR-HUD 3D + BEV: cámara trasera a pantalla completa + mapa al lado ──
 const QUALITY = { low: { w: 1280, h: 720, bps: 2_500_000, label: '720p' }, high: { w: 1920, h: 1080, bps: 8_000_000, label: '1080p' } };
 const dash = { on: false, q: 'low', stream: null, objs: [], lastDet: 0, rec: null, chunks: [], t0: 0, timer: null };
 async function getDetector() {
   if (det) return det;
   const vision = await import(MP + '/vision_bundle.mjs'); const files = await vision.FilesetResolver.forVisionTasks(MP + '/wasm');
-  det = await vision.ObjectDetector.createFromOptions(files, { baseOptions: { modelAssetPath: '/senda/vendor/models/efficientdet_lite0_int8.tflite', delegate: 'CPU' }, runningMode: 'VIDEO', scoreThreshold: 0.4, maxResults: 8 });
+  det = await vision.ObjectDetector.createFromOptions(files, { baseOptions: { modelAssetPath: '/senda/vendor/models/efficientdet_lite0_int8.tflite', delegate: 'CPU' }, runningMode: 'VIDEO', scoreThreshold: 0.35, maxResults: 12 });
   return det;
 }
 async function dashCamera() {
@@ -482,7 +511,7 @@ async function dashOpen() {
   document.documentElement.classList.add('dashmode'); $('#dash').hidden = false; dash.on = true;
   $('#dashInfo').textContent = 'Cargando cámara…';
   try {
-    await Promise.all([getDetector(), dashCamera()]); tracker = createTracker();
+    await Promise.all([getDetector(), dashCamera()]); tracker = createTracker(FULL_RULES);
     try { await navigator.wakeLock?.request('screen'); } catch { /* */ }
     st.map?.resize(); requestAnimationFrame(dashFrame);
   } catch (e) { $('#dashInfo').textContent = 'Cámara no disponible: ' + (e.message || e.name); }
@@ -497,33 +526,21 @@ function dashFrame(now) {
   const v = $('#v'), c = $('#dashCanvas');
   if (v.videoWidth) {
     if (c.width !== v.videoWidth) { c.width = v.videoWidth; c.height = v.videoHeight; }
-    const W = c.width, H = c.height, x = c.getContext('2d');
+    const W = c.width, H = c.height, x = c.getContext('2d', { willReadFrequently: true });
     x.drawImage(v, 0, 0, W, H);
     const iv = aiIntervalMs();
     if (now - dash.lastDet >= iv) { dash.lastDet = now; const t0 = performance.now(), r = det.detectForVideo(v, now), inferMs = performance.now() - t0;
-      dash.objs = tracker.update(r.detections.map((d) => ({ label: d.categories[0].categoryName, score: d.categories[0].score, x: d.boundingBox.originX / W, y: d.boundingBox.originY / H, w: d.boundingBox.width / W, h: d.boundingBox.height / H })), now / 1000);
+      const rawObjs = tracker.update(r.detections.map((d) => ({ label: d.categories[0].categoryName, score: d.categories[0].score, x: d.boundingBox.originX / W, y: d.boundingBox.originY / H, w: d.boundingBox.width / W, h: d.boundingBox.height / H })), now / 1000);
+      dash.objs = enrichTracksForHud(rawObjs, { speedMs: st.speed, sourceCtx: x, W, H });
       st.lastVision = summarizeVision(dash.objs, inferMs, iv);
       const top = topAlert(dash.objs); if (top) warnDash(top); }
-    drawDashData(x, W, H); // en pantalla siempre; si grabas «sin datos» se graba la cámara tal cual
-    $('#dashInfo').textContent = `${dash.objs.length} vehículos/personas · ${W}×${H}${iv > 250 ? ' · ahorro 2 Hz' : ''}`;
+    drawDashData(x, W, H, iv); // AR-HUD 3D + BEV completo en pantalla (y en vídeo si «Datos en el vídeo» está activo)
+    $('#dashInfo').textContent = `${dash.objs.length} obj · ${st.region} · ${W}×${H} · ${(1000 / iv).toFixed(0)} Hz`;
   }
   requestAnimationFrame(dashFrame);
 }
-function drawDashData(x, W, H) {
-  const k = W / 1280; // tamaños proporcionales a la resolución
-  for (const o of dash.objs) {
-    const bx = o.box.x * W, by = o.box.y * H, bw = o.box.w * W, bh = o.box.h * H;
-    if (o.label === 'person') { x.fillStyle = 'rgba(0,0,0,.9)'; x.fillRect(bx, by, bw, bh); } // privacidad: también en el vídeo
-    x.strokeStyle = COLOR[o.level]; x.lineWidth = (o.level === 'VERDE' ? 3 : 6) * k; x.strokeRect(bx, by, bw, bh);
-    const side = o.zone === 'TU_CARRIL' ? 'delante' : o.zone === 'DERECHA' ? 'derecha' : 'izquierda';
-    const t = `${ES[o.label] ?? o.label} · ${side}${o.ttcS ? ' · ' + o.ttcS.toFixed(1) + ' s' : ''}`;
-    x.font = `600 ${Math.round(18 * k)}px Inter,sans-serif`; const tw = x.measureText(t).width + 12 * k;
-    x.fillStyle = COLOR[o.level]; x.fillRect(bx, by - 26 * k, tw, 26 * k); x.fillStyle = '#000'; x.fillText(t, bx + 6 * k, by - 8 * k);
-  }
-  // Sello de dashcam: fecha, hora, velocidad y posición
-  const stamp = `SENDA · ${new Date().toLocaleString('es-ES')} · ${st.speed == null ? '–' : Math.round(st.speed * 3.6)} km/h${st.pos ? ` · ${st.pos[1].toFixed(5)}, ${st.pos[0].toFixed(5)}` : ''}`;
-  x.font = `600 ${Math.round(20 * k)}px Inter,sans-serif`; x.fillStyle = 'rgba(0,0,0,.6)'; x.fillRect(0, H - 40 * k, x.measureText(stamp).width + 24 * k, 40 * k);
-  x.fillStyle = '#fff'; x.fillText(stamp, 12 * k, H - 13 * k);
+function drawDashData(x, W, H, iv = 250) {
+  renderArHud(x, W, H, { ...hudPhysicsState(iv), tracks: dash.objs });
 }
 function warnDash(o) {
   const key = o.id + o.level; if (Date.now() - (saidAdas.get(key) ?? 0) < 6000) return; saidAdas.set(key, Date.now());
@@ -577,7 +594,7 @@ function drawRadar() {
       const px = (dx * Math.cos(rot) - dy * Math.sin(rot)) / RANGE * R, py = -(dx * Math.sin(rot) + dy * Math.cos(rot)) / RANGE * R; x.fillStyle = color; x.beginPath(); x.arc(px, py, r, 0, 7); x.fill(); };
     for (const cam of st.cams) plot(cam.lon, cam.lat, CATEGORIES.CAMARA.color, 7);
     for (const rd of st.radars) plot(rd.lon, rd.lat, '#30b0c7', 8);
-    for (const i of st.incidents) if (i.lat != null) plot(i.lon, i.lat, CATEGORIES[fromDatex(i)].color, 10);
+    for (const i of activeIncidents()) if (i.lat != null) plot(i.lon, i.lat, CATEGORIES[i.type === 'BridgeOpening' ? 'CORTE' : fromDatex(i)].color, 10);
     for (const r of reports()) plot(r.lon, r.lat, CATEGORIES[FROM_REPORT[r.kind] ?? 'PELIGRO'].color, 12);
   }
   x.fillStyle = '#fff'; x.beginPath(); x.moveTo(0, -22); x.lineTo(15, 17); x.lineTo(0, 8); x.lineTo(-15, 17); x.closePath(); x.fill(); x.restore();
@@ -687,4 +704,5 @@ globalThis.sendaDrive = {
   st, goTo, onPos, dash, updateCorridor, updateRadars,
   bbStart, bbSample, bbExport, setAiMode, aiIntervalMs,
   sendBleProbe, loadPmTilesFile, loadOsintXml, loadOsintGeoJson,
+  renderArHud, enrichTracksForHud, hudPhysicsState, createTracker, FULL_RULES,
 };
