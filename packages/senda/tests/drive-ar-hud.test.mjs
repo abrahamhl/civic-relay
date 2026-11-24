@@ -7,6 +7,7 @@ import {
   classifyTrafficLightPixels,
   detectBrakeLightsPixels,
   enrichTracksForHud,
+  declaredGeom,
   renderArHud,
 } from '../src/drive-ar-hud.mjs';
 import { createTracker, topAlert, RULES } from '../src/drive-hazard.mjs';
@@ -74,8 +75,12 @@ test('AR-HUD + drive-hazard: identifica semáforos/stop/tren sin falsas alarmas 
   assert.equal(objs.find((o) => o.label === 'stop sign').group, 'INFRA');
   assert.equal(topAlert(objs), null, 'semáforos y señales STOP no deben disparar TTC ROJO');
 
-  const enriched = enrichTracksForHud(objs, { speedMs: 22 });
+  // Sin geometría declarada no hay metros (CLAUDE.md: parámetro sin fuente → sin valor)
+  assert.equal(enrichTracksForHud(objs, { speedMs: 22 }).find((o) => o.label === 'car').p3, null);
+  assert.equal(declaredGeom({ camHeightM: 9, fovVDeg: 48 }), null, 'altura absurda rechazada');
+  const enriched = enrichTracksForHud(objs, { speedMs: 22, geom: declaredGeom({ camHeightM: 1.3, fovVDeg: 50 }) });
   assert.ok(enriched.find((o) => o.label === 'car').p3.zM > 5);
+  assert.match(enriched.find((o) => o.label === 'car').p3.basis, /DECLARADA_POR_EL_USUARIO/);
 
   // Verificar renderizado completo sin excepciones sobre contexto mock Canvas2D
   const calls = [];

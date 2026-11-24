@@ -18,8 +18,16 @@ export const DEFAULT_CAM_GEOM = Object.freeze({
   horizonY: 0.48,       // línea de horizonte normalizada (0 arriba, 1 abajo)
   pitchDeg: 0,          // inclinación cámara hacia abajo (>0 mirando más abajo)
   laneWidthM: 3.5,      // ancho estándar de carril autopista UE (ES/NL)
-  basis: 'ESTIMACION_PINHOLE_PLANO · h_cam=1,25 m, fovV=48° declarados (no calibrado por vehículo)',
+  basis: 'GEOMETRIA_DE_DIBUJO · h_cam=1,25 m, fovV=48° solo para dibujar la alfombra; NO para dar metros',
+  declared: false, // CLAUDE.md: sin medida del montaje no se dan distancias en metros
 });
+
+/** Geometría declarada por la persona (altura de la cámara y campo vertical medidos en SU coche). */
+export function declaredGeom(user, base = DEFAULT_CAM_GEOM) {
+  const h = Number(user?.camHeightM), f = Number(user?.fovVDeg);
+  if (!(h >= 0.5 && h <= 3) || !(f >= 20 && f <= 120)) return null;
+  return { ...base, camHeightM: h, fovVDeg: f, fovHDeg: Number(user?.fovHDeg) || base.fovHDeg, declared: true, basis: `GEOMETRIA_DECLARADA_POR_EL_USUARIO · h_cam=${h} m, fovV=${f}° (pinhole plano, no calibrado con medidas de distancia)` };
+}
 
 const DEG = Math.PI / 180;
 
@@ -145,7 +153,8 @@ const LEVEL_COLOR = { VERDE: '#2ee6a6', AMBAR: '#ffb800', ROJO: '#ff3b30', INFRA
  */
 export function enrichTracksForHud(objs, { speedMs = null, geom = DEFAULT_CAM_GEOM, sourceCtx = null, W = 0, H = 0 } = {}) {
   return objs.map((o) => {
-    const p3 = projectToGround3D(o.box, { speedMs, geom });
+    // Metros (Z, THW) solo con geometría declarada; sin ella → null («sin dist.»), nunca inventados.
+    const p3 = geom?.declared ? projectToGround3D(o.box, { speedMs, geom }) : null;
     let lightState = null;
     let brakeInfo = null;
     if (sourceCtx && W > 0 && H > 0) {
@@ -268,7 +277,7 @@ export function renderArHud(x, W, H, state = {}) {
         x.setLineDash([6 * k, 6 * k]);
         x.beginPath(); x.moveTo(a.u, a.v); x.lineTo(b.u, b.v); x.stroke();
         x.setLineDash([]);
-        x.fillText(`${tickZ}m`, b.u + 6 * k, b.v + 4 * k);
+        if (geom.declared) x.fillText(`${tickZ}m`, b.u + 6 * k, b.v + 4 * k); // metros solo con montaje declarado
       }
     }
     x.restore();

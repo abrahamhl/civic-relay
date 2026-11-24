@@ -4,7 +4,7 @@
  * Fuentes primarias oficiales:
  *  - NDW Nationaal Dataportaal Wegverkeer (`https://opendata.ndw.nu/`, CC0): SRTI (vehículos parados,
  *    accidentes, obstáculos), brugopeningen (puentes levadizos) y afsluitingen (cortes de vía/carril)
- *    con coordenadas WGS84 de 6 decimales (~11 cm) y rumbo de calzada `<loc:bearing>`.
+ *    con coordenadas WGS84 de 6 decimales (~11 cm de resolución del dato, no precisión de posición) y rumbo de calzada `<loc:bearing>`.
  *  - Openbaar Ministerie (`https://www.om.nl/onderwerpen/v/verkeer/handhaving/snelheid-en-te-hard-rijden/trajectcontroles`):
  *    corrección oficial de medida (`meetcorrectie`: −3 km/h hasta 100 km/h; −3 % por encima de 100 km/h)
  *    y umbral sancionador (+4 km/h tras corrección para límites ≤ 120 km/h).

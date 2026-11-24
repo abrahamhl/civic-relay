@@ -6,7 +6,7 @@ import { hazardsAhead, corridorAnnouncement, stoppingDistanceM } from './core/dr
 import { createBlackBox } from './core/drive-blackbox.mjs';
 import { radarsAhead, createSectionTracker, RADAR_RULES } from './core/drive-radars.mjs';
 import { detectRegion, ndwToIncident, dutchMotorwayWindow } from './core/ndw-nl.mjs';
-import { enrichTracksForHud, renderArHud, DEFAULT_CAM_GEOM } from './core/drive-ar-hud.mjs';
+import { enrichTracksForHud, renderArHud, DEFAULT_CAM_GEOM, declaredGeom } from './core/drive-ar-hud.mjs';
 import { rssLongitudinalSameDir, EXAMPLE_RSS_PARAMS } from './core/drive-physics-v2.mjs';
 import { createGnssImuEkf, createHorizonCalibrator } from './core/drive-kalman-fusion.mjs';
 import { sendaToDenm, denmToSenda, encodeDenmCompact, decodeDenmCompact, isDenmCompact, isInsideDenmRelevance } from './core/cits-denm.mjs';
@@ -486,6 +486,18 @@ function summarizeVision(objs, inferMs, intervalMs) {
   };
 }
 let det = null, stream = null, tracker = null, camOn = false, lastT = 0; const saidAdas = new Map();
+// Montaje de la cámara: SOLO lo que la persona mide en su coche (sin esto, no se dan metros).
+function userGeom() { return declaredGeom(LS.get('senda.drive.geom', null)); }
+function askGeom() {
+  const cur = LS.get('senda.drive.geom', {}) ?? {};
+  const h = prompt('Altura de la cámara sobre el suelo, en metros (mídela en tu coche; ej. 1,3). Vacío = no dar distancias.', cur.camHeightM ?? '');
+  if (h === null) return;
+  if (h.trim() === '') { LS.set('senda.drive.geom', null); return hint('Sin geometría: no se muestran distancias en metros.'); }
+  const f = prompt('Campo de visión VERTICAL de la cámara, en grados (ficha del móvil; ej. 50).', cur.fovVDeg ?? '');
+  const g = { camHeightM: parseFloat(String(h).replace(',', '.')), fovVDeg: parseFloat(String(f ?? '').replace(',', '.')) };
+  if (!declaredGeom(g)) return hint('Valores fuera de rango (altura 0,5–3 m, campo 20–120°). No se guardan.');
+  LS.set('senda.drive.geom', g); hint(`Montaje guardado: ${g.camHeightM} m, ${g.fovVDeg}°. Las distancias son estimación de cámara (sin calibrar con medidas).`);
+}
 const FULL_RULES = { ...RULES, includeInfra: true };
 function hudPhysicsState(iv = 250) {
   const spd = st.speed;
@@ -493,7 +505,8 @@ function hudPhysicsState(iv = 250) {
   const rssM = spd != null && spd > 0 ? rssLongitudinalSameDir({ vRearMs: spd, vFrontMs: spd }, EXAMPLE_RSS_PARAMS).dMinM : null;
   const curvature = spd != null && spd > 3 && typeof st.imu.ay === 'number' ? st.imu.ay / (spd * spd) : 0;
   const hCal = st.horizonCal.status();
-  const geom = hCal.calibrated ? { ...DEFAULT_CAM_GEOM, pitchDeg: hCal.pitchDeg, horizonY: hCal.horizonY } : DEFAULT_CAM_GEOM;
+  const base = userGeom() ?? DEFAULT_CAM_GEOM;
+  const geom = hCal.calibrated ? { ...base, pitchDeg: hCal.pitchDeg, horizonY: hCal.horizonY } : base;
   return {
     speedMs: spd, ssdM, rssM, curvature, imu: st.imu, region: st.region,
     radarTop: st.radarState?.top ?? null, corridorTop: st.corridor?.top ?? null,
@@ -522,7 +535,7 @@ function analyse(now, iv = 250) {
   const v = $('#v'); if (!v.videoWidth) return;
   const W = v.videoWidth, H = v.videoHeight, t0 = performance.now(), r = timedDetect(v, now), inferMs = performance.now() - t0;
   const rawObjs = tracker.update(r.detections.map((d) => ({ label: d.categories[0].categoryName, score: d.categories[0].score, x: d.boundingBox.originX / W, y: d.boundingBox.originY / H, w: d.boundingBox.width / W, h: d.boundingBox.height / H })), now / 1000);
-  const objs = enrichTracksForHud(rawObjs, { speedMs: st.speed });
+  const objs = enrichTracksForHud(rawObjs, { speedMs: st.speed, geom: userGeom() });
   st.lastVision = summarizeVision(objs, inferMs, iv);
   const c = $('#ov'), box = c.getBoundingClientRect(), dpr = devicePixelRatio || 1; c.width = box.width * dpr; c.height = box.height * dpr;
   const x = c.getContext('2d'); x.scale(dpr, dpr);
@@ -575,7 +588,7 @@ function dashFrame(now) {
     const iv = aiIntervalMs();
     if (now - dash.lastDet >= iv) { dash.lastDet = now; const t0 = performance.now(), r = timedDetect(v, now), inferMs = performance.now() - t0;
       const rawObjs = tracker.update(r.detections.map((d) => ({ label: d.categories[0].categoryName, score: d.categories[0].score, x: d.boundingBox.originX / W, y: d.boundingBox.originY / H, w: d.boundingBox.width / W, h: d.boundingBox.height / H })), now / 1000);
-      dash.objs = enrichTracksForHud(rawObjs, { speedMs: st.speed, sourceCtx: x, W, H });
+      dash.objs = enrichTracksForHud(rawObjs, { speedMs: st.speed, geom: userGeom(), sourceCtx: x, W, H });
       st.lastVision = summarizeVision(dash.objs, inferMs, iv);
       noteObjects(dash.objs);
       const top = topAlert(dash.objs); if (top) warnDash(top); }
@@ -793,7 +806,7 @@ function bbStart() {
   bbSample();
   clearInterval(bbTimer); bbTimer = setInterval(bbSample, 1000);
   if (typeof window.SendaNative?.screenRecStart === 'function') window.SendaNative.screenRecStart(dash.q === 'high');
-  hint('Caja negra v2 + JSONL activa (1 Hz, telemetría completa de calibración, solo local, sin vídeo ni PII).');
+  hint('Caja negra en marcha: datos cada segundo + JSONL, solo en el móvil. Si Android lo pide, acepta para grabar también la pantalla.');
   drawTele();
 }
 window.sendaScreenRec = (ev) => {

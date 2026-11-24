@@ -1,4 +1,4 @@
-# SENDA Drive · Arquitectura Países Bajos (precisión centimétrica) y Hoja de Ruta I+D para Renderizado AR-HUD 3D + BEV (2026-11)
+# SENDA Drive · Arquitectura Países Bajos (datos oficiales abiertos) y Hoja de Ruta I+D para Renderizado AR-HUD 3D + BEV (2026-11)
 
 > Documento técnico de investigación y desarrollo con fuentes primarias verificadas (`CLAUDE.md` §1 · 0 € gasto nuevo).
 
@@ -19,7 +19,7 @@
 
 ---
 
-## 2. Ecosistema de datos abiertos de Países Bajos (precisión centimétrica, CC0 / 0 €)
+## 2. Ecosistema de datos abiertos de Países Bajos (coordenadas de 6 decimales ≈ 11 cm de RESOLUCIÓN del dato; la precisión real del GPS de un móvil es de metros · CC0 / 0 €)
 
 Todos los endpoints siguientes fueron comprobados en directo el 24-11-2026 sin clave de API:
 
@@ -58,7 +58,7 @@ Todos los endpoints siguientes fueron comprobados en directo el 24-11-2026 sin c
 3. **Auto-calibración online de cabeceo/guiñada tipo `openpilot` (`liveCalibration`)**:
    - Referencia verificada: [`commaai/openpilot`](https://github.com/commaai/openpilot) (v0.11, 2026) y [`hypery11/awesome-openpilot`](https://github.com/hypery11/awesome-openpilot) (incluye evaluación offline `alpamayo-op` de NVIDIA Alpamayo 2 Edge sobre trazas reales).
    - Valor: estima automáticamente el punto de fuga `(u_vp, v_vp)` con flujo óptico de los primeros 30 s en recta para calibrar `horizonY` y `pitchDeg` de cada soporte de parabrisas sin intervención manual.
-4. **Posicionamiento decimétrico / centimétrico en Países Bajos con Raw GNSS + PDOK BGT 20 cm**:
+4. **Propuesta I+D (NO hecha, NO medida): posicionamiento decimétrico en Países Bajos con Raw GNSS + PDOK BGT 20 cm**:
    - Android expone `GnssMeasurement` (pseudorangos y fase portadora dual-frecuencia L1/L5 en Pixel 7+). Combinando correcciones RTCM/SSR (Galileo HAS gratuito vía satélite en el espacio o NETPOS) con **map-matching sobre carriles PDOK BGT (20 cm)** se resuelve incluso **en qué carril concreto** circula el coche.
 5. **Renderizado híbrido WebGL2 / WebGPU con terreno AHN4 + BGT 3D en el HUD**:
    - Proyectar edificios 3D BAG + puentes NDW + pórticos `Matrixsignaalinformatie` en perspectiva AR directamente sobre el horizonte de la cámara (navegación estilo avión / visión sintética SVS cuando hay niebla densa en Holanda).
