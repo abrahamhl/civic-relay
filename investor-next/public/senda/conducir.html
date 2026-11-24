@@ -88,7 +88,7 @@ html.dashmode.nomini #map{display:none}
 @media (orientation:landscape){html.dashmode #map{left:auto;right:0;top:0;width:36%;height:100%;border-radius:0}html.dashmode #dashCanvas,html.dashmode #dashBar,html.dashmode #dashHud{width:64%;right:auto}html.dashmode.nomini #dashCanvas,html.dashmode.nomini #dashBar,html.dashmode.nomini #dashHud{width:100%}html.dashmode #dashBar{gap:6px;padding-bottom:8px}}
 html.dashmode .maplibregl-ctrl-attrib{font-size:9px;max-width:92%}
 html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #reportBtn,html.dashmode #bottom,html.dashmode #pip,html.dashmode #adas{display:none!important}
-/* Lab Campo & Ciberseguridad */
+/* Laboratorio de señal */
 .chip.lab-chip{background:#0d1b2a;color:#7df9ff;border:1px solid rgba(125,249,255,.38)}
 .chip.lab-chip.live{background:#063b2c;color:#6ef7b2;border-color:#34c759;box-shadow:0 0 12px rgba(52,199,89,.4)}
 #labPanel{position:absolute;left:0;right:0;bottom:0;z-index:12;max-height:84vh;display:flex;flex-direction:column;background:#0a1118;color:#e6f1f8;border-top:1px solid rgba(125,249,255,.28);border-radius:20px 20px 0 0;box-shadow:0 -10px 36px rgba(0,0,0,.65);padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
@@ -124,7 +124,7 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
   <div id="top">
     <div id="turn" class="card" hidden><div class="dist" id="turnDist"></div><div class="txt" id="turnTxt"></div></div>
     <div id="searchBox"><form id="search" class="card" autocomplete="off"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="¿A dónde vas?" enterkeyhint="search" aria-label="Destino"></form>
-      <div id="favs"><button class="chip" id="favHome">Casa</button><button class="chip" id="favWork">Trabajo</button><button class="chip lab-chip" id="labChip" title="Laboratorio científico, escucha activa y mapeo RF/edificios">⚡ Lab Campo</button></div>
+      <div id="favs"><button class="chip" id="favHome">Casa</button><button class="chip" id="favWork">Trabajo</button><button class="chip lab-chip" id="labChip" title="Laboratorio de señal: cobertura de radio, GPS y firme">⚡ Lab Campo</button></div>
       <div id="results" class="card" hidden></div></div>
     <div id="corridorAlert" class="card" role="status" aria-live="polite" hidden><div class="ca-ico" id="caIco"></div><div class="ca-body"><div class="ca-title" id="caTitle"></div><div class="ca-sub" id="caSub"></div></div></div>
     <div id="radarAlert" class="card" role="status" aria-live="polite" hidden><div class="ra-body"><div class="ra-title" id="raTitle"></div><div class="ra-sub" id="raSub"></div></div><div class="ra-lim" id="raLim" hidden></div></div>
@@ -171,18 +171,18 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
     <div id="grid"></div>
     <div class="row"><button id="shareBle">Bluetooth: enviar avisos</button><button id="probeBle">Sonda BLE (RTT)</button></div>
     <div class="row"><button id="pmBtn">Mapa offline (.pmtiles)</button><button id="sheetAiMode">IA: Auto</button></div>
-    <div class="row"><button id="sheetLabBtn">⚡ Lab Campo &amp; Escucha activa</button></div>
+    <div class="row"><button id="sheetLabBtn">⚡ Laboratorio de señal</button></div>
     <input type="file" id="pmFile" accept=".pmtiles" hidden>
   </div>
-  <section id="labPanel" role="dialog" aria-label="Laboratorio científico y escucha activa" hidden>
+  <section id="labPanel" role="dialog" aria-label="Laboratorio de señal y calidad de la vía" hidden>
     <div id="labHead">
-      <h3>⚡ Lab Campo · Ciberseguridad &amp; Física</h3>
+      <h3>⚡ Laboratorio de señal · Física de la vía</h3>
       <span id="labStatusPill">EN ESPERA</span>
       <button id="labClose" aria-label="Cerrar laboratorio">✕</button>
     </div>
     <div id="labActs">
       <button class="pri" id="labRunBtn">▶ Ejecutar batería completa (8 motores)</button>
-      <button id="labListenBtn">● Escucha activa: OFF</button>
+      <button id="labListenBtn">● Mapa de cobertura: OFF</button>
       <button id="labProbeBtn">📡 Sonda BLE + DENM</button>
       <button id="labRfBtn">🏙️ Barrido RF / JSONL</button>
       <button id="labExportBtn">💾 Exportar GeoJSON + Lab</button>
@@ -191,7 +191,7 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
       <div class="lkpi"><span>Entorno</span><b id="lkCanyon">–</b></div>
       <div class="lkpi"><span>Mapa 25 m</span><b id="lkCells">0 cel.</b></div>
       <div class="lkpi"><span>Canal RF</span><b id="lkRf">–</b></div>
-      <div class="lkpi"><span>Ciber / PII</span><b id="lkCyber">0 MACs</b></div>
+      <div class="lkpi"><span>Privacidad</span><b id="lkCyber">0 MACs</b></div>
     </div>
     <div id="labCards" aria-live="polite"></div>
     <div id="labFoot">0 MACs/SSIDs almacenados (hash efímero por sesión) · 100 % local (0 €)</div>

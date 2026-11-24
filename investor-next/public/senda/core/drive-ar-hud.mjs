@@ -193,7 +193,7 @@ function drawCornerBrackets(x, bx, by, bw, bh, color, lw) {
 }
 
 /**
- * Renderiza el AR-HUD cibernético completo + carril 3D curvo RSS + vista táctica cenital (BEV)
+ * Renderiza el AR-HUD completo + carril 3D curvo RSS + vista cenital (BEV)
  * + horizonte artificial IMU directamente sobre un contexto Canvas 2D (`W × H`).
  */
 export function renderArHud(x, W, H, state = {}) {
@@ -304,7 +304,7 @@ export function renderArHud(x, W, H, state = {}) {
       x.fillRect(bx + bw * 0.12, by + bh - 3 * k, bw * 0.76, 3.5 * k);
     }
 
-    // Etiqueta cibernética de clase + distancia 3D + THW + TTC + semáforo/freno
+    // Etiqueta de clase + distancia 3D + THW + TTC + semáforo/freno
     const baseName = LABELS[o.label] ?? o.label.toUpperCase();
     const parts = [`${baseName} #${o.id}`];
     if (o.lightState && o.lightState.state !== 'UNKNOWN') parts.push(o.lightState.state);

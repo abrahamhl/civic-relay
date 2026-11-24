@@ -94,7 +94,7 @@ export function parseMtgEvents(geojson) {
   return out;
 }
 
-/** Filtra alertas OSINT/EO dentro de un radio declarado (km) alrededor de una posición [lon, lat]. */
+/** Filtra alertas de fuentes abiertas y observación de la Tierra dentro de un radio declarado (km) alrededor de una posición [lon, lat]. */
 export function osintNear({ pos, events = [], radiusKm = 100 }) {
   if (!Array.isArray(pos) || pos.length < 2 || !(radiusKm > 0)) return [];
   const maxM = radiusKm * 1000;
