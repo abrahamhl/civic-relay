@@ -111,6 +111,15 @@ window.sendaP2P = (ev) => {
   if (ev.event === 'status') { const el = $('#ble-status'); if (el) el.textContent = ev.text; return; }
   if (ev.event === 'received') {
     const bytes = unb64(ev.b64);
+    if (bytes[0] === 0xa5) { // paquete de avisos de carretera (hazard-share): se guarda para Conducir y Ruta
+      import('./core/hazard-share.mjs').then(({ unpackReports, mergeReports }) => {
+        const key = 'senda.ruta.reports'; let cur = []; try { cur = JSON.parse(localStorage.getItem(key)) ?? []; } catch { /* */ }
+        const { reports: got } = unpackReports(bytes); const m = mergeReports(cur, got);
+        try { localStorage.setItem(key, JSON.stringify(m.reports)); } catch { /* */ }
+        toast(`Avisos de carretera recibidos: ${m.added} nuevos (sin verificar). Míralos en Conducir.`);
+      }).catch((err) => toast('Paquete de avisos no válido: ' + err.message));
+      return;
+    }
     const run = bytes[0] === 0x7b ? receiveText(new TextDecoder().decode(bytes), 'BLUETOOTH') : receiveBytes(bytes, 'BLUETOOTH'); // «{» = paquete .senda
     run.then(() => persist()).catch((err) => toast('Recibido por Bluetooth, pero no se pudo abrir: ' + err.message));
   }

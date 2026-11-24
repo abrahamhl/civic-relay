@@ -9,6 +9,8 @@ import { wazeUrl, googleMapsUrl } from './core/route-planner.mjs';
 import { routeUrl, parseRoute, nextManeuver, shouldReroute, announcement } from './core/nav-osrm.mjs';
 import { CATEGORIES, FROM_REPORT, fromDatex, markerSvg } from './core/report-style.mjs';
 import { saveBlob } from './save-file.mjs';
+import { packReports, unpackReports, mergeReports, isReportPack } from './core/hazard-share.mjs';
+import { b64, unb64 } from './core/b64.mjs';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -148,7 +150,7 @@ $('#grid').addEventListener('click', (e) => { const k = e.target.closest('[data-
 function saveReport(kind, side = 'SIN_INDICAR') {
   if (!st.pos) return hint('Sin GPS: no se puede situar el aviso.');
   const list = reports(); list.push({ kind, side, lon: st.pos[0], lat: st.pos[1], t: Date.now(), own: true }); LS.set('senda.ruta.reports', list);
-  drawMarkers(); say(`Aviso de ${REPORT_KINDS[kind].label} guardado`); hint(`Aviso «${REPORT_KINDS[kind].label}» guardado en tu posición. Viaja a otros móviles SENDA por Bluetooth o paquete.`);
+  drawMarkers(); say(`Aviso de ${REPORT_KINDS[kind].label} guardado`); hint(`Aviso «${REPORT_KINDS[kind].label}» guardado en tu posición. Para pasarlo a otros móviles SENDA cercanos: botón naranja → «Bluetooth».`);
 }
 window.sendaVoice = (res) => {
   if (res.state) return hint(res.state === 'ESCUCHANDO' ? 'Habla ahora…' : 'Procesando…');
@@ -161,6 +163,29 @@ $('#voiceBtn').addEventListener('click', () => {
   if (typeof window.SendaNative?.listen === 'function') window.SendaNative.listen();
   else { const t = prompt('Escribe o dicta el aviso:'); if (t) window.sendaVoice({ alternatives: [t] }); }
 });
+
+// ── Avisos entre móviles SENDA por Bluetooth (sin red; paquete de tramas de 24 bytes, sin firma) ──
+$('#shareBle').addEventListener('click', () => {
+  openSheet(false);
+  const N = window.SendaNative;
+  if (typeof N?.p2pSend !== 'function') return hint('Compartir por Bluetooth solo funciona en la app de Android.');
+  N.p2pStart(); // abre tu buzón para RECIBIR los avisos de otros
+  const pack = packReports(reports());
+  if (pack[2] === 0) return hint('Buzón Bluetooth abierto: recibirás avisos de móviles SENDA cercanos. No tienes avisos recientes que enviar.');
+  N.p2pSend(b64(pack)); hint(`Enviando ${pack[2]} aviso(s) a móviles SENDA cercanos…`);
+});
+window.sendaP2P = (ev) => {
+  if (ev.event === 'status') return hint(ev.text);
+  if (ev.event !== 'received') return;
+  const bytes = unb64(ev.b64);
+  if (!isReportPack(bytes)) return hint('Ha llegado un mensaje cifrado por Bluetooth: ábrelo en Mensajes.');
+  try {
+    const { reports: got, rejected } = unpackReports(bytes);
+    const m = mergeReports(reports(), got); LS.set('senda.ruta.reports', m.reports); drawMarkers();
+    if (m.added) say(`${m.added} aviso${m.added > 1 ? 's' : ''} nuevo${m.added > 1 ? 's' : ''} de otro móvil`);
+    hint(`Recibidos ${got.length} aviso(s) de otro móvil (${m.added} nuevos${rejected ? `, ${rejected} descartados por corruptos` : ''}). Sin verificar.`);
+  } catch (e) { hint('Paquete de avisos no válido: ' + e.message); }
+};
 
 // ── Cámara con IA en miniatura (toca para ampliar). Análisis 4/s; se apaga al salir. ──
 const MP = '/senda/vendor/mediapipe-tasks-vision-1.2.3';
