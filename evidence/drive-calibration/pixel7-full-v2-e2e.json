@@ -1,0 +1,124 @@
+{
+  "testedUtc": "2026-11-24T18:06:49.623Z",
+  "viewport": "Pixel 7 (412x915 & 915x412, offline)",
+  "passed": 9,
+  "total": 9,
+  "checks": [
+    {
+      "name": "official_radars_loaded",
+      "pass": true,
+      "radars": 1970,
+      "stretches": 60
+    },
+    {
+      "name": "ai_cadence_unlock_4hz",
+      "pass": true,
+      "autoMs": 500,
+      "lockedMs": 250,
+      "label": "IA: 4 Hz fija"
+    },
+    {
+      "name": "ble_cooperative_probe_rtt",
+      "pass": true,
+      "sentCount": 1,
+      "stats": {
+        "pingsSent": 1,
+        "pongsReceived": 1,
+        "pingsAnswered": 0,
+        "corrupted": 0,
+        "responseRate": 1,
+        "medianRttMs": 1,
+        "lastRttMs": 1
+      },
+      "hint": "Sonda BLE PONG recibido · RTT 1 ms · mediana 1 ms · tasa 100 %."
+    },
+    {
+      "name": "official_fixed_radar_alert_and_ui",
+      "pass": true,
+      "radarHidden": false,
+      "radarClass": "card OVER",
+      "raTitle": "Radar fijo / Flitspaal · 480 m",
+      "raSub": "EUSKADI · oficial publicado · 13.3 s · VITORIA - GASTEIZ",
+      "raLim": "120",
+      "caTitle": "Retención · 480 m",
+      "bbText": "● Caja negra · 2 · Bat 15 %",
+      "overflow": false
+    },
+    {
+      "name": "official_section_radar_average_speed",
+      "pass": true,
+      "raTitle": "Tramo · AVENIDA DE CÓRDOBA · media 74,0 km/h",
+      "raSub": "Quedan 510 m (50 %) · radar de tramo oficial publicado",
+      "raLim": "50",
+      "sec": {
+        "id": "madrid-28",
+        "road": "AVENIDA DE CÓRDOBA",
+        "avgKmh": 74,
+        "maxspeed": 50,
+        "elapsedS": 25,
+        "distM": 514,
+        "remainingM": 514,
+        "progressPct": 50,
+        "overAverage": true,
+        "finished": false
+      }
+    },
+    {
+      "name": "blackbox_v2_sha256_verified",
+      "pass": true,
+      "schema": "senda-drive-blackbox/2",
+      "frames": 3,
+      "chainTipHash": "f58bad7f9c88523510def13e09a639818d6f9f2527236e29fbf34e04625c6915",
+      "summary": {
+        "frames": 3,
+        "durationS": 0.4,
+        "distanceKm": 0,
+        "maxSpeedKmh": 130,
+        "meanSpeedKmh": 97.4,
+        "maxBrakingMs2": 43.12,
+        "maxAccelMs2": 0,
+        "maxLatG": 3.081,
+        "maxNormG": 5.369,
+        "maxImuG": 1.011,
+        "batteryStartPct": 15,
+        "batteryEndPct": 15,
+        "batteryDropPct": 0,
+        "batteryDrainPctPerHr": null,
+        "offlineTransitions": 0,
+        "deadZoneSamples": 0,
+        "deadZones": [],
+        "visionFrames": 3,
+        "adasRedFrames": 0,
+        "adasAmberFrames": 0,
+        "meanInferMs": 38.4,
+        "rawTracksRecorded": 3,
+        "aiHzMin": 4,
+        "aiHzMax": 4,
+        "corridorAlertFrames": 1,
+        "radarAlertFrames": 2,
+        "sectionTrackedFrames": 1,
+        "bleTxMax": 0,
+        "bleRxMax": 0,
+        "bleRejectedMax": 0,
+        "bleProbePings": 1,
+        "bleProbePongs": 1,
+        "bleProbeMedianRttMs": 1
+      }
+    },
+    {
+      "name": "pmtiles_local_offline_loader",
+      "pass": true,
+      "version": 3,
+      "tileType": "mvt",
+      "mapHidden": false
+    },
+    {
+      "name": "pixel7_landscape_no_overflow",
+      "pass": true
+    },
+    {
+      "name": "zero_page_errors",
+      "pass": true
+    }
+  ]
+}

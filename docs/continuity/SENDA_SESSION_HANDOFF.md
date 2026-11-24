@@ -1,17 +1,20 @@
-# SENDA · handoff (2026-11-24 15:55Z, sesión Antigravity)
+# SENDA · handoff (2026-11-24 18:08Z, sesión Antigravity)
 
-## Publicado hoy (master c3706a5, APK en la Release fija `senda-android-latest`)
+## Publicado hoy (master e9f3a69, PRs #80/#81/#82 fusionadas, APK en la Release fija `senda-android-latest`)
 - App: portada estilo Apple `/senda/app` con roles (ADMIN/OBSERVADOR/CIUDADANO, credencial ECDSA, QR), marco común en 50 páginas, icono, un solo icono (Drive como módulo).
 - Mensajería: chat estilo WhatsApp (✓ en camino / ✓✓ entregado con recibo verificado), buzón Bluetooth GATT móvil a móvil (`BleMailbox`, `MailboxFrames`), invitar contacto por SMS (selector del sistema).
 - Ruta (`/senda/ruta`, OSM l'Horta Sud), aviso por voz sin red, verificación de avisos con cámara (MediaPipe + EfficientDet-Lite0, imagen nunca sale).
-- **Conducir** (`/senda/conducir`): mapa estilo navegador (MapLibre + OpenFreeMap), búsqueda Nominatim, ruta giro a giro OSRM (FOSSGIS, pruebas), avisos con color/icono propios, incidencias y cámaras DGT (en vivo en play), cámara con IA, **dashcam** 720p/1080p con datos en el vídeo y guardado real en Descargas/SENDA (`FileSaver`).
+- **Conducir** (`/senda/conducir`): mapa estilo navegador (MapLibre + OpenFreeMap), búsqueda Nominatim, ruta giro a giro OSRM (FOSSGIS, pruebas), avisos con color/icono propios, incidencias y cámaras DGT (en vivo en play), cámara con IA, **dashcam** 720p/1080p con datos en el vídeo y guardado real en Descargas/SENDA (`FileSaver`), más caja negra JSONL (`blackbox.mjs`), panel `#tele`, `#markBtn`, `ScreenRecordService` y `radioCaps()` (PR #82).
 - Enlaces externos (Waze/Maps/SMS/tel) por lista cerrada `ExternalLinks`.
 - 24-11 (PR #80): avisos entre móviles por Bluetooth (`hazard-share.mjs`, paquete 0xA5, sin firma → «sin verificar»); texto falso corregido; barrido de secretos limpio (solo el keystore de prueba, público a propósito).
 
-## En rama borrador `antigravity/conducir-calibracion-20261124` (commit `e3c3628`, NO fusionada)
-- `drive-hazard.mjs`: looming isotrópico con guarda de recorte en bordes, pendiente robusta Theil–Sen, confirmación en 2 fotogramas, continuidad `car/bus/truck` y predicción de movimiento para incorporaciones rápidas a 4 Hz. Medido sobre vídeo real Udacity MIT (145 fotogramas a 4 Hz con EfficientDet-Lite0 int8): falsas alarmas AMBAR **6 → 0**, fragmentos de pista **10 → 3**; en simulación cinemática a 4 Hz (`SIMULATION`), incorporación `0,30/s` pasa de no detectada a 0,75 s (ROJO sin retraso adicional: 1,75 s).
-- `drive-corridor.mjs` + `/senda/conducir` (`#corridorAlert`): avisos por delante en ruta OSRM o cono frontal ±35° con distancia de parada AASHTO y deduplicación de 120 m (106 duplicados colapsados sobre 838 incidencias reales DGT DATEX II); operativo también en radar sin red (APK base) y con avisos Bluetooth («sin verificar»).
-- Batería completa en verde: `packages/senda` 985/985, `investor-next` 157/157, `senda-offline-e2e` 49/49, `prove.mjs` 19/19, Android JVM 119/119, Chromium Pixel 7 6/6 (`evidence/drive-calibration/`).
+## En rama borrador `antigravity/conducir-calibracion-20261124` (fusionada limpiamente con último `origin/master` `e9f3a69`, NO fusionada a `master`)
+- **Consola `⚡ Lab Campo · Ciberseguridad & Física` + Escucha Activa (`drive-field-lab.mjs`, 188 módulos civiles sincronizados)**:
+  - Batería de **1 toque** (`runFieldLabBattery`) que ejecuta e interpreta los **8 motores activos simultáneamente** (EKF+NAP, DENM 36 B CRC-16 + tamper 1-bit, BLE/Two-Ray/Doppler, Cañón Urbano/Fresnel/Rician K/OLS/CRLB, Corredor LWR/RSS, Visión AR-HUD/Horizonte, Firme IMU IRI y Auditoría Ciber/RGPD).
+  - **Escucha activa** con mapeo continuo en rejilla de **25 m × 25 m** (`createSurfaceMapper`) + parser anonimizado de `WifiSurveyRecorder` JSONL (**0 MACs/SSIDs almacenados**) y exportación en 1 toque de **GeoJSON** + informe **SHA-256**.
+- **4 módulos científico-matemáticos integrados**: `cits-denm.mjs` (ETSI EN 302 637-3 36 B CRC-16), `drive-kalman-fusion.mjs` (EKF 6E forma Joseph + puerta $\chi^2$ + *dead-reckoning* + Huber `horizonY`), `traffic-shockwave.mjs` (LWR PDE Rankine–Hugoniot + cola móvil en `#corridorAlert`), `hydro-surge-nl.mjs` (Manning + Martínez-Gomariz/Shand + EurOtop + NAP NL).
+- **Países Bajos con datos oficiales (`ndw-nl.mjs`, 769 NDW CC0 + 844 cámaras NL + OM `meetcorrectie`, total 1 970 cámaras ES+NL)** + **AR-HUD 3D + BEV (`drive-ar-hud.mjs`)** + **Caja Negra unificada (SHA-256 v2 + JSONL + MediaProjection)**.
+- Batería completa en verde: `packages/senda` **1 024/1 024**, `investor-next` **157/157**, `prove.mjs` **19/19**, `claims-lint` **PASS**, Android JVM **119/119**, Chromium Pixel 7 vertical/horizontal & Real-Video **100 % PASS** (Field Lab v4 + Science v3 + Full v2 9/9 + NL/AR-HUD 5/5).
 - Nota sobre bundles previos: `antigravity-20261123.bundle` y `senda-waves1-23-validated.bundle` residen únicamente en la VM aislada de la conversación anterior (`df55d99d-2467-4e6f-bb67-798b822dd8e8`) y no estaban disponibles en esta sesión.
 
 ## Pendiente del fundador (decisiones)

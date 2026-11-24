@@ -1,0 +1,36 @@
+{
+  "testedUtc": "2026-11-24T18:06:56.993Z",
+  "nlCheck": {
+    "region": "NL",
+    "radarsTotal": 1970,
+    "nlIncTotal": 769,
+    "raTitle": "Radar fijo / Flitspaal · 360 m",
+    "raSub": "NL · Cámara fija/tramo (CC BY 4.0) · 14.1 s · OM corr. 89 km/h",
+    "raLim": "80",
+    "radarOver": true,
+    "omCorrected": 89,
+    "overflow": false
+  },
+  "bridgeCheck": {
+    "caHidden": false,
+    "caTitle": "Puente levadizo abierto · 450 m · Brug NL",
+    "caSub": "NDW NL (CC0), 24/11/2026 · parada AASHTO 93 m · cola LWR ~380 m (modelo)"
+  },
+  "arStats": {
+    "W": 960,
+    "H": 540,
+    "detected": 1,
+    "labels": [
+      {
+        "id": 1,
+        "label": "bus",
+        "zM": 8.5,
+        "xM": 2.39,
+        "thwS": 0.31,
+        "level": "VERDE"
+      }
+    ]
+  },
+  "passed": 5,
+  "total": 5
+}

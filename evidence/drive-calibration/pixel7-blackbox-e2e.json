@@ -1,0 +1,28 @@
+{
+  "viewport": "Pixel 7 (412x915 / 915x412)",
+  "offlineBaseMode": true,
+  "pass": 4,
+  "total": 4,
+  "checks": [
+    {
+      "name": "Pixel 7: Caja negra activa + DGT V-31 visible sin desborde",
+      "ok": true,
+      "detail": "\u25cf Caja negra \u00b7 3 muestras \u00b7 Bat 100 % | Accidente \u00b7 900 m \u00b7 V-31"
+    },
+    {
+      "name": "Caja negra sellada SHA-256 verificada en WebCrypto del navegador (sin v\u00eddeo ni PII)",
+      "ok": true,
+      "detail": "frames=4 tip=327cfa0104e46471\u2026"
+    },
+    {
+      "name": "Pixel 7 horizontal (915x412): sin desborde",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "0 errores de p\u00e1gina en Chromium Pixel 7",
+      "ok": true,
+      "detail": []
+    }
+  ]
+}

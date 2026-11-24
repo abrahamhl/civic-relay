@@ -29,7 +29,7 @@ button,input{font:inherit;color:inherit;border:0}button{cursor:pointer;backgroun
 /* Botones laterales */
 #side{position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px;z-index:4}
 .fab{width:48px;height:48px;border-radius:50%;background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.2);display:grid;place-items:center}
-.fab.on{background:var(--blue);color:#fff}
+.fab.on{background:var(--blue);color:#fff}.fab.rec{background:var(--red);color:#fff}
 /* Abajo */
 #speed{position:absolute;left:12px;bottom:calc(var(--bottomH,96px) + 12px);z-index:6;width:66px;height:66px;border-radius:50%;background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.25);display:grid;place-items:center;text-align:center;font-weight:800;font-size:24px;line-height:1}
 #speed small{display:block;font-size:10px;font-weight:600;color:var(--muted)}
@@ -57,6 +57,14 @@ button,input{font:inherit;color:inherit;border:0}button{cursor:pointer;backgroun
 #corridorAlert .ca-ico{flex:none;width:28px;height:28px;display:grid;place-items:center}
 #corridorAlert .ca-body{min-width:0;flex:1}#corridorAlert .ca-title{font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #corridorAlert .ca-sub{font-size:12px;color:var(--muted);line-height:1.25}
+#radarAlert{margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-left:5px solid var(--teal);font-size:13px}
+#radarAlert.OVER{border-left-color:var(--red);background:#fff5f5}
+#radarAlert .ra-body{min-width:0;flex:1}#radarAlert .ra-title{font-weight:700;line-height:1.2}#radarAlert .ra-sub{font-size:11px;color:var(--muted);line-height:1.25}
+#radarAlert .ra-lim{flex:none;width:40px;height:40px;border-radius:50%;border:4px solid var(--red);background:#fff;color:#1c1c1e;display:grid;place-items:center;font-weight:800;font-size:14px}
+#bbBadge{margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:8px 10px;background:rgba(28,28,30,.92);color:#fff;font-size:12px;font-weight:600}
+#bbBadge .bb-acts{display:flex;gap:6px;flex:none}
+#bbBadge button{background:var(--red);color:#fff;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:700;flex:none}
+#bbBadge button.sec{background:rgba(255,255,255,.18)}
 #tele{position:absolute;left:10px;bottom:calc(var(--bottomH,96px) + 88px);z-index:7;max-width:min(58vw,250px);margin:0;padding:5px 7px;border-radius:9px;background:rgba(0,0,0,.5);color:#e8fff0;font:600 9.5px/1.3 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;pointer-events:none}
 html.dashmode #tele{top:58px;bottom:auto;z-index:10}
 #markBtn{position:absolute;left:84px;bottom:calc(var(--bottomH,96px) + 22px);z-index:8;height:46px;padding:0 16px;border-radius:23px;background:var(--red);color:#fff;font-weight:800;box-shadow:0 4px 14px rgba(255,59,48,.45)}
@@ -77,9 +85,37 @@ html.dashmode #markBtn{bottom:auto;top:58px;left:auto;right:12px;z-index:10}
 /* Mapa en la esquina durante la dashcam (al lado en horizontal) */
 html.dashmode #map{inset:auto;left:10px;top:56px;width:38%;height:30%;z-index:10;border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 html.dashmode.nomini #map{display:none}
-@media (orientation:landscape){html.dashmode #map{left:auto;right:0;top:0;width:36%;height:100%;border-radius:0}html.dashmode #dashCanvas,html.dashmode #dashBar,html.dashmode #dashHud{width:64%;right:auto}html.dashmode #dashBar{gap:6px;padding-bottom:8px}}
+@media (orientation:landscape){html.dashmode #map{left:auto;right:0;top:0;width:36%;height:100%;border-radius:0}html.dashmode #dashCanvas,html.dashmode #dashBar,html.dashmode #dashHud{width:64%;right:auto}html.dashmode.nomini #dashCanvas,html.dashmode.nomini #dashBar,html.dashmode.nomini #dashHud{width:100%}html.dashmode #dashBar{gap:6px;padding-bottom:8px}}
 html.dashmode .maplibregl-ctrl-attrib{font-size:9px;max-width:92%}
 html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #reportBtn,html.dashmode #bottom,html.dashmode #pip,html.dashmode #adas{display:none!important}
+/* Lab Campo & Ciberseguridad */
+.chip.lab-chip{background:#0d1b2a;color:#7df9ff;border:1px solid rgba(125,249,255,.38)}
+.chip.lab-chip.live{background:#063b2c;color:#6ef7b2;border-color:#34c759;box-shadow:0 0 12px rgba(52,199,89,.4)}
+#labPanel{position:absolute;left:0;right:0;bottom:0;z-index:12;max-height:84vh;display:flex;flex-direction:column;background:#0a1118;color:#e6f1f8;border-top:1px solid rgba(125,249,255,.28);border-radius:20px 20px 0 0;box-shadow:0 -10px 36px rgba(0,0,0,.65);padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
+#labHead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.1)}
+#labHead h3{margin:0;font-size:15px;font-weight:800;letter-spacing:.2px;color:#7df9ff}
+#labStatusPill{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.1);color:#b0c4d4;white-space:nowrap;flex:none}
+#labStatusPill.live{background:rgba(52,199,89,.22);color:#6ef7b2;border:1px solid rgba(52,199,89,.5)}
+#labClose{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.1);color:#fff;font-weight:800;display:grid;place-items:center}
+#labActs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+#labActs button{padding:9px 8px;border-radius:11px;font-size:12px;font-weight:700;background:#162433;color:#dbeafe;border:1px solid rgba(125,249,255,.2);text-align:center}
+#labActs button.pri{grid-column:1 / -1;background:linear-gradient(90deg,#0284c7,#06b6d4);color:#04131c;border:0;font-size:13px;padding:10px}
+#labActs button.live{background:#0f5132;color:#a7f3d0;border-color:#34c759}
+#labKpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.lkpi{background:#111c27;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:6px 5px;text-align:center}
+.lkpi span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:#8aa4b8}
+.lkpi b{display:block;font-size:11px;font-weight:800;color:#fff;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#labCards{margin-top:8px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-right:2px;flex:1;min-height:120px}
+.lcard{background:#111c27;border-radius:11px;padding:8px 10px;border-left:4px solid #64748b}
+.lcard.OK{border-left-color:#34c759}.lcard.WARN{border-left-color:#ffcc00}.lcard.CRIT{border-left-color:#ff3b30}.lcard.NO_SENSOR{border-left-color:#64748b}
+.lcard-top{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.lcard-name{font-size:12px;font-weight:800;color:#f1f5f9}
+.lcard-tags{display:flex;gap:4px;flex:none}
+.ltag{font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.1);color:#cbd5e1}
+.ltag.OK{background:rgba(52,199,89,.2);color:#6ef7b2}.ltag.WARN{background:rgba(255,204,0,.22);color:#fde047}.ltag.CRIT{background:rgba(255,59,48,.24);color:#fca5a5}
+.lcard-head{font-size:11.5px;font-weight:700;color:#7df9ff;margin-top:3px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.lcard-interp{font-size:11px;color:#cbd5e1;margin-top:2px;line-height:1.3}
+#labFoot{margin-top:6px;font-size:10px;color:#8aa4b8;text-align:center}
 </style><script type="module" src="/senda/app-chrome.mjs"></script></head><body>
 <div id="app">
   <div id="map" aria-label="Mapa"></div>
@@ -88,9 +124,11 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
   <div id="top">
     <div id="turn" class="card" hidden><div class="dist" id="turnDist"></div><div class="txt" id="turnTxt"></div></div>
     <div id="searchBox"><form id="search" class="card" autocomplete="off"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="¿A dónde vas?" enterkeyhint="search" aria-label="Destino"></form>
-      <div id="favs"><button class="chip" id="favHome">Casa</button><button class="chip" id="favWork">Trabajo</button></div>
+      <div id="favs"><button class="chip" id="favHome">Casa</button><button class="chip" id="favWork">Trabajo</button><button class="chip lab-chip" id="labChip" title="Laboratorio científico, escucha activa y mapeo RF/edificios">⚡ Lab Campo</button></div>
       <div id="results" class="card" hidden></div></div>
     <div id="corridorAlert" class="card" role="status" aria-live="polite" hidden><div class="ca-ico" id="caIco"></div><div class="ca-body"><div class="ca-title" id="caTitle"></div><div class="ca-sub" id="caSub"></div></div></div>
+    <div id="radarAlert" class="card" role="status" aria-live="polite" hidden><div class="ra-body"><div class="ra-title" id="raTitle"></div><div class="ra-sub" id="raSub"></div></div><div class="ra-lim" id="raLim" hidden></div></div>
+    <div id="bbBadge" class="card" role="status" hidden><span id="bbText">● Caja negra · 0 muestras</span><div class="bb-acts"><button class="sec" id="aiModeBtn" title="Cambiar cadencia IA">IA: Auto</button><button id="bbSave">Guardar</button></div></div>
   </div>
   <div id="adas" role="alert" hidden></div>
   <div id="pip" hidden><video id="v" playsinline muted></video><canvas id="ov"></canvas></div>
@@ -120,6 +158,7 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
       <label class="tog"><input type="checkbox" id="withData" checked> Datos en el vídeo</label>
       <button id="recBtn" aria-label="Grabar"><span></span></button>
       <button class="dashSmall" id="bbDash">Caja negra</button>
+      <button class="dashSmall" id="geomBtn">Montaje</button>
       <button class="dashSmall" id="miniMap">Mapa</button>
       <button class="dashSmall" id="dashExit">Salir</button>
     </div>
@@ -127,7 +166,37 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
   <pre id="tele" hidden aria-live="off"></pre>
   <button id="markBtn" hidden aria-label="Marcar este momento">Marcar</button>
   <div id="veil" hidden></div>
-  <div id="sheet" class="card" hidden><h3>¿Qué ves?</h3><div id="grid"></div><div class="row"><button id="shareBle">Bluetooth: enviar y recibir avisos</button></div></div>
+  <div id="sheet" class="card" hidden>
+    <h3>¿Qué ves?</h3>
+    <div id="grid"></div>
+    <div class="row"><button id="shareBle">Bluetooth: enviar avisos</button><button id="probeBle">Sonda BLE (RTT)</button></div>
+    <div class="row"><button id="pmBtn">Mapa offline (.pmtiles)</button><button id="sheetAiMode">IA: Auto</button></div>
+    <div class="row"><button id="sheetLabBtn">⚡ Lab Campo &amp; Escucha activa</button></div>
+    <input type="file" id="pmFile" accept=".pmtiles" hidden>
+  </div>
+  <section id="labPanel" role="dialog" aria-label="Laboratorio científico y escucha activa" hidden>
+    <div id="labHead">
+      <h3>⚡ Lab Campo · Ciberseguridad &amp; Física</h3>
+      <span id="labStatusPill">EN ESPERA</span>
+      <button id="labClose" aria-label="Cerrar laboratorio">✕</button>
+    </div>
+    <div id="labActs">
+      <button class="pri" id="labRunBtn">▶ Ejecutar batería completa (8 motores)</button>
+      <button id="labListenBtn">● Escucha activa: OFF</button>
+      <button id="labProbeBtn">📡 Sonda BLE + DENM</button>
+      <button id="labRfBtn">🏙️ Barrido RF / JSONL</button>
+      <button id="labExportBtn">💾 Exportar GeoJSON + Lab</button>
+    </div>
+    <div id="labKpis">
+      <div class="lkpi"><span>Entorno</span><b id="lkCanyon">–</b></div>
+      <div class="lkpi"><span>Mapa 25 m</span><b id="lkCells">0 cel.</b></div>
+      <div class="lkpi"><span>Canal RF</span><b id="lkRf">–</b></div>
+      <div class="lkpi"><span>Ciber / PII</span><b id="lkCyber">0 MACs</b></div>
+    </div>
+    <div id="labCards" aria-live="polite"></div>
+    <div id="labFoot">0 MACs/SSIDs almacenados (hash efímero por sesión) · 100 % local (0 €)</div>
+    <input type="file" id="rfSurveyFile" accept=".jsonl,.txt,.json" hidden>
+  </section>
 </div>
 <script src="/senda/vendor/maplibre-gl-4.7.1/maplibre-gl-csp.js"></script>
 <script type="module" src="/senda/conducir.mjs"></script>
