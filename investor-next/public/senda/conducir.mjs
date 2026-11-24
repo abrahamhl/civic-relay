@@ -4,6 +4,10 @@
 import { createTracker, topAlert } from './core/drive-hazard.mjs';
 import { hazardsAhead, corridorAnnouncement } from './core/drive-corridor.mjs';
 import { createBlackBox } from './core/drive-blackbox.mjs';
+import { radarsAhead, createSectionTracker, RADAR_RULES } from './core/drive-radars.mjs';
+import { createLinkProber, isProbePack } from './core/ble-link-probe.mjs';
+import { openPmTilesLocal } from './core/pmtiles-reader.mjs';
+import { parseGdacsRss, parseMtgEvents, osintNear } from './core/osint-feeds.mjs';
 import { interpretAlternatives } from './core/voice-report.mjs';
 import { REPORT_KINDS } from './core/road-guard.mjs';
 import { parseDatex2 } from './core/datex2.mjs';
@@ -21,27 +25,101 @@ const say = (t) => { try { speechSynthesis.cancel(); speechSynthesis.speak(Objec
 const fmtDist = (m) => (m >= 1000 ? `${(m / 1000).toFixed(1).replace('.', ',')} km` : `${Math.round(m / 10) * 10} m`);
 const reports = () => LS.get('senda.ruta.reports', []);
 
-const st = { pos: null, speed: null, heading: 0, follow: true, map: null, mapOk: false, route: null, dest: null, said: new Set(), saidCorridor: new Set(), corridor: null, lastRouteS: -1e9, incidents: [], incSource: '', cams: [], me: null, bb: createBlackBox(), ble: { tx: 0, rx: 0, rejected: 0 }, battery: { pct: null, charging: null }, lastVision: null };
+const st = {
+  pos: null, speed: null, heading: 0, follow: true, map: null, mapOk: false, route: null, dest: null,
+  said: new Set(), saidCorridor: new Set(), saidRadar: new Set(), corridor: null, lastRouteS: -1e9,
+  incidents: [], incSource: '', cams: [],
+  radars: [], stretches: [], sectionTracker: createSectionTracker([]), radarState: null, sectionState: null,
+  me: null, bb: createBlackBox(),
+  ble: { tx: 0, rx: 0, rejected: 0 }, prober: createLinkProber(),
+  battery: { pct: null, charging: null }, aiMode: LS.get('senda.drive.aiMode', 'auto'),
+  imu: { ax: null, ay: null, az: null, gx: null, gy: null, gz: null, alpha: null, beta: null, gamma: null },
+  osintEvents: [], osintState: null, pmArchives: new Map(), lastVision: null,
+};
 
-// ── Mapa (OpenFreeMap). Si no carga en 10 s (sin red, versión base), se usa el radar. ──
+// ── Mapa (OpenFreeMap en línea o archivo local .pmtiles 100 % sin red; si no carga en 10 s → radar) ──
+function ensureRouteLayers(map) {
+  if (!map.getSource('route')) {
+    map.addSource('route', { type: 'geojson', data: st.route ? { type: 'Feature', geometry: { type: 'LineString', coordinates: st.route.coords } } : { type: 'FeatureCollection', features: [] } });
+    map.addLayer({ id: 'route-casing', type: 'line', source: 'route', paint: { 'line-color': '#0b5394', 'line-width': 11 }, layout: { 'line-cap': 'round', 'line-join': 'round' } });
+    map.addLayer({ id: 'route', type: 'line', source: 'route', paint: { 'line-color': '#2b8cff', 'line-width': 7 }, layout: { 'line-cap': 'round', 'line-join': 'round' } });
+  }
+}
+function registerPmTilesProtocol() {
+  if (!window.maplibregl?.addProtocol) return;
+  maplibregl.addProtocol('pmtiles', async (params) => {
+    const m = /^pmtiles:\/\/local\/([^/]+)\/(\d+)\/(\d+)\/(\d+)$/.exec(params.url);
+    if (!m) return { data: new Uint8Array(0) };
+    const archive = st.pmArchives.get(m[1]);
+    if (!archive) return { data: new Uint8Array(0) };
+    const tile = await archive.getTile(Number(m[2]), Number(m[3]), Number(m[4]));
+    return { data: tile ?? new Uint8Array(0) };
+  });
+}
 function initMap() {
   if (!window.maplibregl) return offline('No se pudo cargar el mapa.');
   maplibregl.setWorkerUrl('/senda/vendor/maplibre-gl-4.7.1/maplibre-gl-csp-worker.js');
+  registerPmTilesProtocol();
   const map = new maplibregl.Map({ container: 'map', style: 'https://tiles.openfreemap.org/styles/liberty', center: [-3.7038, 40.4168], zoom: 12, attributionControl: { compact: true } });
   st.map = map;
-  const t = setTimeout(() => { if (!st.mapOk) offline('Sin conexión al mapa: se muestra el radar. El mapa completo necesita Internet (versión play o navegador).'); }, 10000);
+  const t = setTimeout(() => { if (!st.mapOk) offline('Sin conexión al mapa: se muestra el radar. Puedes cargar un mapa offline (.pmtiles) desde el botón naranja.'); }, 10000);
   map.on('load', () => {
     st.mapOk = true; clearTimeout(t);
-    map.addSource('route', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
-    map.addLayer({ id: 'route-casing', type: 'line', source: 'route', paint: { 'line-color': '#0b5394', 'line-width': 11 }, layout: { 'line-cap': 'round', 'line-join': 'round' } });
-    map.addLayer({ id: 'route', type: 'line', source: 'route', paint: { 'line-color': '#2b8cff', 'line-width': 7 }, layout: { 'line-cap': 'round', 'line-join': 'round' } });
-    if (st.lastFix) onPos(st.lastFix); // la primera posición pudo llegar antes de que cargara el mapa
+    ensureRouteLayers(map);
+    if (st.lastFix) onPos(st.lastFix);
     drawMarkers();
   });
+  map.on('style.load', () => { if (st.mapOk) { ensureRouteLayers(map); drawMarkers(); } });
   map.on('dragstart', () => { st.follow = false; });
   let mv; map.on('moveend', () => { clearTimeout(mv); mv = setTimeout(drawMarkers, 300); });
 }
 function offline(msg) { $('#map').hidden = true; $('#radarWrap').hidden = false; $('#offmsg').textContent = msg; drawRadar(); }
+async function loadPmTilesFile(file) {
+  const archive = await openPmTilesLocal(file);
+  const id = String(Date.now());
+  st.pmArchives.set(id, archive);
+  const h = archive.header;
+  const isRaster = h.tileType !== 'mvt';
+  const layers = [{ id: 'bg', type: 'background', paint: { 'background-color': '#e9eff2' } }];
+  if (isRaster) {
+    layers.push({ id: 'pm-raster', type: 'raster', source: 'pm' });
+  } else {
+    const vLayers = Array.isArray(archive.metadata?.vector_layers) ? archive.metadata.vector_layers : [];
+    for (const vl of vLayers.slice(0, 12)) {
+      const n = String(vl.id || '');
+      const isWater = /water/i.test(n), isRoad = /road|transp/i.test(n);
+      layers.push({
+        id: `pm-${n}`,
+        type: isWater ? 'fill' : 'line',
+        source: 'pm',
+        'source-layer': n,
+        paint: isWater ? { 'fill-color': '#a8d5f2' } : { 'line-color': isRoad ? '#546e7a' : '#90a4ae', 'line-width': isRoad ? 2 : 1 },
+      });
+    }
+  }
+  const style = {
+    version: 8,
+    sources: {
+      pm: {
+        type: isRaster ? 'raster' : 'vector',
+        tiles: [`pmtiles://local/${id}/{z}/{x}/{y}`],
+        minzoom: h.minZoom,
+        maxzoom: h.maxZoom,
+        attribution: archive.metadata?.attribution || 'PMTiles local offline (OSM)',
+      },
+    },
+    layers,
+  };
+  $('#radarWrap').hidden = true; $('#map').hidden = false;
+  if (st.map) {
+    st.mapOk = true;
+    st.map.setStyle(style);
+    const center = st.pos ?? [h.centerLon || -3.7038, h.centerLat || 40.4168];
+    st.map.jumpTo({ center, zoom: Math.max(h.minZoom, Math.min(h.maxZoom, h.centerZoom || 12)) });
+  }
+  hint(`Mapa offline PMTiles v3 cargado (${h.tileType.toUpperCase()} · z${h.minZoom}–z${h.maxZoom} · 0 red).`);
+  return { id, header: h, metadata: archive.metadata };
+}
 
 // ── Marcadores: incidencias DGT, cámaras DGT y avisos de SENDA (cada tipo con su color e icono) ──
 let markers = [];
@@ -59,8 +137,12 @@ function drawMarkers() {
     const cat = fromDatex(i);
     markers.push(marker(i.lon, i.lat, cat, `<b>${esc(CATEGORIES[cat].label)}</b> · ${esc(i.road ?? '')}<br><small>DGT: ${esc(i.type)} / ${esc(i.cause ?? '')}<br>${esc(st.incSource)}</small>`));
   }
-  if (st.map.getZoom() >= 10) for (const c of st.cams) if (inView(c.lon, c.lat))
-    markers.push(marker(c.lon, c.lat, 'CAMARA', `<b>Cámara DGT</b> · ${esc(c.carretera)} ${esc(c.destino ?? '')}<br><img src="${esc(c.url)}" alt="Imagen de la cámara" style="width:100%;border-radius:8px;margin-top:6px"><small>DGT, CC BY · imagen en vivo si hay red</small>`));
+  if (st.map.getZoom() >= 10) {
+    for (const c of st.cams) if (inView(c.lon, c.lat))
+      markers.push(marker(c.lon, c.lat, 'CAMARA', `<b>Cámara DGT</b> · ${esc(c.carretera)} ${esc(c.destino ?? '')}<br><img src="${esc(c.url)}" alt="Imagen de la cámara" style="width:100%;border-radius:8px;margin-top:6px"><small>DGT, CC BY · imagen en vivo si hay red</small>`));
+    for (const rd of st.radars) if (inView(rd.lon, rd.lat))
+      markers.push(marker(rd.lon, rd.lat, 'CAMARA', `<b>${rd.kind === 'section' ? 'Radar de tramo' : 'Radar fijo'} oficial</b>${rd.road ? ` · ${esc(rd.road)}` : ''}${rd.maxspeed ? ` · ${rd.maxspeed} km/h` : ''}<br><small>${esc(String(rd.src).toUpperCase())} · publicado oficialmente (solo fijos y tramo)</small>`));
+  }
   for (const r of reports()) if (inView(r.lon, r.lat)) {
     const cat = FROM_REPORT[r.kind] ?? 'PELIGRO';
     markers.push(marker(r.lon, r.lat, cat, `<b>${esc(REPORT_KINDS[r.kind]?.label ?? r.kind)}</b><br><small>Aviso de SENDA · ${new Date(r.t).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })} · ${r.verified ? 'visto con cámara' : 'sin verificar'}</small>`));
@@ -74,6 +156,12 @@ async function loadIncidents() {
   drawMarkers(); updateCorridor();
 }
 fetch('/senda/data/referencias/dgt_camaras.json').then((r) => r.json()).then((d) => { st.cams = d.camaras; drawMarkers(); }).catch(() => {});
+fetch('/senda/data/referencias/dgt_radares_oficiales.json').then((r) => r.json()).then((d) => {
+  st.radars = Array.isArray(d.puntos) ? d.puntos : [];
+  st.stretches = Array.isArray(d.tramos) ? d.tramos : [];
+  st.sectionTracker = createSectionTracker(st.stretches);
+  drawMarkers(); updateRadars();
+}).catch(() => {});
 
 // ── Avisos por delante en el corredor (100 % en el móvil, con o sin red) ──
 function updateCorridor() {
@@ -99,6 +187,45 @@ function updateCorridor() {
   if (phrase) say(phrase);
 }
 
+// ── Radares fijos y de tramo oficialmente publicados (100 % legal, sin red, sin móviles policiales) ──
+function updateRadars(nowMs = Date.now()) {
+  const el = $('#radarAlert');
+  if (!st.pos) { st.radarState = null; st.sectionState = null; if (el) el.hidden = true; return; }
+  const res = radarsAhead({ pos: st.pos, headingDeg: st.heading, speedMs: st.speed, points: st.radars });
+  const sec = st.sectionTracker.update({ pos: st.pos, tMs: nowMs, headingDeg: st.heading, speedMs: st.speed });
+  st.radarState = res;
+  st.sectionState = sec;
+  if (!el) return;
+  const limEl = $('#raLim');
+  if (sec && !sec.finished) {
+    el.hidden = false;
+    el.className = 'card' + (sec.overAverage ? ' OVER' : '');
+    $('#raTitle').textContent = `Tramo${sec.road ? ` · ${sec.road}` : ''} · media ${sec.avgKmh != null ? sec.avgKmh.toFixed(1).replace('.', ',') : '–'} km/h`;
+    $('#raSub').textContent = `Quedan ${fmtDist(sec.remainingM)} (${sec.progressPct} %) · radar de tramo oficial publicado`;
+    if (sec.maxspeed != null) { limEl.hidden = false; limEl.textContent = String(sec.maxspeed); } else limEl.hidden = true;
+    return;
+  }
+  if (!res.top) { el.hidden = true; return; }
+  const r = res.top;
+  el.hidden = false;
+  el.className = 'card' + (r.overLimit ? ' OVER' : '');
+  $('#raTitle').textContent = `${r.kind === 'section' ? 'Radar de tramo' : 'Radar fijo'} · ${fmtDist(r.distM)}${r.road ? ` · ${r.road}` : ''}`;
+  $('#raSub').textContent = `${r.attribution}${r.etaS != null ? ` · ${r.etaS} s` : ''}${r.dir ? ` · ${r.dir}` : ''}`;
+  if (r.maxspeed != null) { limEl.hidden = false; limEl.textContent = String(r.maxspeed); } else limEl.hidden = true;
+  if (r.distM <= RADAR_RULES.voiceM && !st.saidRadar.has(r.id)) {
+    st.saidRadar.add(r.id);
+    say(`${r.kind === 'section' ? 'Radar de tramo' : 'Radar fijo'} a ${fmtDist(r.distM)}${r.maxspeed ? `, límite ${r.maxspeed}` : ''}`);
+  }
+}
+
+function updateOsint() {
+  if (!st.pos || !st.osintEvents.length) { st.osintState = null; return; }
+  const near = osintNear({ pos: st.pos, events: st.osintEvents, radiusKm: 150 });
+  st.osintState = near.length
+    ? { count: near.length, closestKm: near[0].distKm, topType: near[0].type, topLevel: near[0].level }
+    : { count: 0, closestKm: null, topType: null, topLevel: null };
+}
+
 // ── GPS, seguimiento y navegación ──
 function onPos(p) {
   st.lastFix = p;
@@ -112,6 +239,8 @@ function onPos(p) {
   } else drawRadar();
   if (st.route) guide();
   updateCorridor();
+  updateRadars(p.timestamp || Date.now());
+  updateOsint();
 }
 navigator.geolocation?.watchPosition(onPos, () => { $('#speed').innerHTML = '<div>–<small>sin GPS</small></div>'; }, { enableHighAccuracy: true, maximumAge: 1000 });
 
@@ -191,7 +320,7 @@ $('#voiceBtn').addEventListener('click', () => {
   else { const t = prompt('Escribe o dicta el aviso:'); if (t) window.sendaVoice({ alternatives: [t] }); }
 });
 
-// ── Avisos entre móviles SENDA por Bluetooth (sin red; paquete de tramas de 24 bytes, sin firma) ──
+// ── Avisos y sonda cooperativa RTT entre móviles SENDA por Bluetooth (sin red, sin MACs ajenas) ──
 $('#shareBle').addEventListener('click', () => {
   openSheet(false);
   const N = window.SendaNative;
@@ -202,10 +331,43 @@ $('#shareBle').addEventListener('click', () => {
   st.ble.tx += pack[2];
   N.p2pSend(b64(pack)); hint(`Enviando ${pack[2]} aviso(s) a móviles SENDA cercanos…`);
 });
+function sendBleProbe() {
+  openSheet(false);
+  const N = window.SendaNative;
+  const ping = st.prober.makePing(Date.now());
+  if (typeof N?.p2pSend !== 'function') {
+    hint('Sonda BLE generada (16 bytes CRC-8). Para enviarla por radio BLE, abre SENDA en Android.');
+    return ping;
+  }
+  N.p2pStart();
+  N.p2pSend(b64(ping.bytes));
+  hint(`Sonda BLE PING #${st.prober.stats().pingsSent} enviada a móviles SENDA cercanos (esperando PONG para medir RTT)…`);
+  return ping;
+}
+$('#probeBle')?.addEventListener('click', sendBleProbe);
+$('#pmBtn')?.addEventListener('click', () => { openSheet(false); $('#pmFile')?.click(); });
+$('#pmFile')?.addEventListener('change', async (e) => {
+  const f = e.target.files?.[0];
+  if (!f) return;
+  try { await loadPmTilesFile(f); } catch (err) { hint('No se pudo abrir .pmtiles: ' + (err.message || err)); }
+});
 window.sendaP2P = (ev) => {
   if (ev.event === 'status') return hint(ev.text);
   if (ev.event !== 'received') return;
   const bytes = unb64(ev.b64);
+  if (isProbePack(bytes)) {
+    const res = st.prober.onReceive(bytes, Date.now());
+    if (!res.ok) return hint('Sonda BLE descartada: ' + res.error);
+    if (res.type === 'PING' && res.reply) {
+      window.SendaNative?.p2pSend?.(b64(res.reply));
+      return hint(`Sonda BLE PING respondida automáticamente (PONG #${st.prober.stats().pingsAnswered}).`);
+    }
+    if (res.type === 'PONG') {
+      const s = st.prober.stats();
+      return hint(`Sonda BLE PONG recibido · RTT ${res.rttMs} ms · mediana ${s.medianRttMs} ms · tasa ${Math.round((s.responseRate ?? 0) * 100)} %.`);
+    }
+    return;
+  }
   if (!isReportPack(bytes)) return hint('Ha llegado un mensaje cifrado por Bluetooth: ábrelo en Mensajes.');
   try {
     const { reports: got, rejected } = unpackReports(bytes);
@@ -216,15 +378,50 @@ window.sendaP2P = (ev) => {
   } catch (e) { hint('Paquete de avisos no válido: ' + e.message); }
 };
 
-// ── Cámara con IA en miniatura (toca para ampliar). 4/s (2/s si batería < 25 % sin cargar); se apaga al salir. ──
+// ── Cámara con IA en miniatura (toca para ampliar). Cadencia seleccionable: Auto / 4 Hz fija / 2 Hz ahorro. ──
 const MP = '/senda/vendor/mediapipe-tasks-vision-1.2.3';
 const ES = { car: 'coche', truck: 'camión', bus: 'autobús', motorcycle: 'moto', bicycle: 'bici', person: 'persona', dog: 'perro', horse: 'caballo', cow: 'vaca', sheep: 'oveja' };
 const COLOR = { VERDE: '#34c759', AMBAR: '#ffcc00', ROJO: '#ff3b30' };
-const aiIntervalMs = () => (st.battery.pct != null && st.battery.pct < 25 && st.battery.charging === false ? 500 : 250);
+const AI_MODES = ['auto', '4hz', '2hz'];
+const AI_LABELS = { auto: 'IA: Auto', '4hz': 'IA: 4 Hz fija', '2hz': 'IA: 2 Hz' };
+function syncAiLabels() {
+  const lbl = AI_LABELS[st.aiMode] ?? 'IA: Auto';
+  if ($('#aiModeBtn')) $('#aiModeBtn').textContent = lbl;
+  if ($('#sheetAiMode')) $('#sheetAiMode').textContent = lbl;
+}
+function setAiMode(mode) {
+  st.aiMode = AI_MODES.includes(mode) ? mode : 'auto';
+  LS.set('senda.drive.aiMode', st.aiMode);
+  syncAiLabels();
+  hint(st.aiMode === '4hz'
+    ? 'Cadencia IA fijada en 4 Hz sin recorte por batería (modo calibración).'
+    : st.aiMode === '2hz'
+      ? 'Cadencia IA fijada en 2 Hz (ahorro de batería).'
+      : 'Cadencia IA en modo Auto (4 Hz normal, 2 Hz si batería < 25 % sin cargar).');
+  return st.aiMode;
+}
+const cycleAiMode = () => setAiMode(AI_MODES[(AI_MODES.indexOf(st.aiMode) + 1) % AI_MODES.length]);
+$('#aiModeBtn')?.addEventListener('click', cycleAiMode);
+$('#sheetAiMode')?.addEventListener('click', cycleAiMode);
+syncAiLabels();
+const aiIntervalMs = () => {
+  if (st.aiMode === '4hz') return 250;
+  if (st.aiMode === '2hz') return 500;
+  return st.battery.pct != null && st.battery.pct < 25 && st.battery.charging === false ? 500 : 250;
+};
 function summarizeVision(objs, inferMs, intervalMs) {
   const top = topAlert(objs);
   const ttcs = objs.map((o) => o.ttcS).filter((x) => x != null);
-  return { active: true, count: objs.length, level: top?.level ?? 'VERDE', minTtcS: ttcs.length ? Math.min(...ttcs) : null, clipped: objs.filter((o) => o.clipped).length, inferMs, hz: +(1000 / intervalMs).toFixed(1) };
+  return {
+    active: true,
+    count: objs.length,
+    level: top?.level ?? 'VERDE',
+    minTtcS: ttcs.length ? Math.min(...ttcs) : null,
+    clipped: objs.filter((o) => o.clipped).length,
+    inferMs,
+    hz: +(1000 / intervalMs).toFixed(1),
+    tracks: objs,
+  };
 }
 let det = null, stream = null, tracker = null, camOn = false, lastT = 0; const saidAdas = new Map();
 $('#camBtn').addEventListener('click', async () => {
@@ -368,7 +565,7 @@ document.querySelectorAll('#dash [data-q]').forEach((b) => b.addEventListener('c
 }));
 document.addEventListener('visibilitychange', () => { if (document.hidden && dash.on && !dash.rec) dashClose(); });
 
-// ── Radar sin red (avisos, cámaras e incidencias en 5 km; la marcha hacia arriba) ──
+// ── Radar sin red (avisos, cámaras, radares oficiales e incidencias en 5 km; la marcha hacia arriba) ──
 function drawRadar() {
   const c = $('#radar'); if (!c || $('#radarWrap').hidden) return;
   const x = c.getContext('2d'), W = c.width, R = W / 2 - 16, RANGE = 5000;
@@ -379,19 +576,52 @@ function drawRadar() {
     const plot = (lon, lat, color, r) => { const dx = (lon - st.pos[0]) * 111320 * k, dy = (lat - st.pos[1]) * 110540; if (Math.hypot(dx, dy) > RANGE) return;
       const px = (dx * Math.cos(rot) - dy * Math.sin(rot)) / RANGE * R, py = -(dx * Math.sin(rot) + dy * Math.cos(rot)) / RANGE * R; x.fillStyle = color; x.beginPath(); x.arc(px, py, r, 0, 7); x.fill(); };
     for (const cam of st.cams) plot(cam.lon, cam.lat, CATEGORIES.CAMARA.color, 7);
+    for (const rd of st.radars) plot(rd.lon, rd.lat, '#30b0c7', 8);
     for (const i of st.incidents) if (i.lat != null) plot(i.lon, i.lat, CATEGORIES[fromDatex(i)].color, 10);
     for (const r of reports()) plot(r.lon, r.lat, CATEGORIES[FROM_REPORT[r.kind] ?? 'PELIGRO'].color, 12);
   }
   x.fillStyle = '#fff'; x.beginPath(); x.moveTo(0, -22); x.lineTo(15, 17); x.lineTo(0, 8); x.lineTo(-15, 17); x.closePath(); x.fill(); x.restore();
 }
 
-// ── Caja negra de viaje (1 Hz en memoria circular, cadena SHA-256, sin vídeo ni PII, 0 €) ──
+// ── Sensores reales del dispositivo (batería + IMU 3 ejes; null si el móvil no los expone) ──
 if (typeof navigator.getBattery === 'function') {
   navigator.getBattery().then((b) => {
     const syncBat = () => { st.battery.pct = +(b.level * 100).toFixed(1); st.battery.charging = b.charging; };
     syncBat(); b.addEventListener?.('levelchange', syncBat); b.addEventListener?.('chargingchange', syncBat);
   }).catch(() => {});
 }
+window.addEventListener('devicemotion', (e) => {
+  const a = e.accelerationIncludingGravity || e.acceleration;
+  if (a) {
+    if (typeof a.x === 'number' && Number.isFinite(a.x)) st.imu.ax = a.x;
+    if (typeof a.y === 'number' && Number.isFinite(a.y)) st.imu.ay = a.y;
+    if (typeof a.z === 'number' && Number.isFinite(a.z)) st.imu.az = a.z;
+  }
+  const r = e.rotationRate;
+  if (r) {
+    if (typeof r.alpha === 'number' && Number.isFinite(r.alpha)) st.imu.gx = r.alpha;
+    if (typeof r.beta === 'number' && Number.isFinite(r.beta)) st.imu.gy = r.beta;
+    if (typeof r.gamma === 'number' && Number.isFinite(r.gamma)) st.imu.gz = r.gamma;
+  }
+}, { passive: true });
+window.addEventListener('deviceorientation', (e) => {
+  if (typeof e.alpha === 'number' && Number.isFinite(e.alpha)) st.imu.alpha = e.alpha;
+  if (typeof e.beta === 'number' && Number.isFinite(e.beta)) st.imu.beta = e.beta;
+  if (typeof e.gamma === 'number' && Number.isFinite(e.gamma)) st.imu.gamma = e.gamma;
+}, { passive: true });
+
+function loadOsintXml(xml) {
+  st.osintEvents = parseGdacsRss(xml);
+  updateOsint();
+  return st.osintEvents.length;
+}
+function loadOsintGeoJson(gj) {
+  st.osintEvents = parseMtgEvents(gj);
+  updateOsint();
+  return st.osintEvents.length;
+}
+
+// ── Caja negra de viaje v2 (1 Hz, telemetría completa de calibración, SHA-256, sin vídeo ni PII, 0 €) ──
 function rfSnapshot() {
   const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   return {
@@ -404,23 +634,29 @@ function rfSnapshot() {
 let bbTimer = null;
 function bbSample() {
   if (!st.bb.active) return null;
+  const coords = st.lastFix?.coords;
   const entry = st.bb.record({
-    t: Date.now(), pos: st.pos, accuracyM: st.lastFix?.coords?.accuracy ?? null,
-    speedMs: st.speed, headingDeg: st.heading,
+    t: Date.now(), pos: st.pos, accuracyM: coords?.accuracy ?? null,
+    altM: coords?.altitude ?? null, altAccuracyM: coords?.altitudeAccuracy ?? null,
+    speedMs: st.speed, headingDeg: st.heading, imu: { ...st.imu },
     vision: st.lastVision, corridor: st.corridor,
-    rf: rfSnapshot(), battery: { ...st.battery }, ble: { ...st.ble },
+    radar: st.radarState, section: st.sectionState,
+    rf: rfSnapshot(), battery: { ...st.battery },
+    ble: { ...st.ble }, bleProbe: st.prober.stats(),
+    osint: st.osintState,
   });
   const batTxt = st.battery.pct != null ? ` · Bat ${Math.round(st.battery.pct)} %` : '';
   const netTxt = navigator.onLine ? '' : ' · sin red';
-  $('#bbText').textContent = `● Caja negra · ${st.bb.count} muestras${batTxt}${netTxt}`;
+  $('#bbText').textContent = `● Caja negra · ${st.bb.count}${batTxt}${netTxt}`;
   return entry;
 }
 function bbStart() {
   st.bb.reset(); st.bb.start();
   $('#bbBtn')?.classList.add('rec'); $('#bbBadge').hidden = false;
+  syncAiLabels();
   bbSample();
   clearInterval(bbTimer); bbTimer = setInterval(bbSample, 1000);
-  hint('Caja negra activa (1 Hz, solo local, sin vídeo ni datos personales). Pulsa «Guardar» al llegar.');
+  hint('Caja negra v2 activa (1 Hz, telemetría completa de calibración, solo local, sin vídeo ni PII).');
 }
 async function bbExport() {
   clearInterval(bbTimer); bbTimer = null; st.bb.stop();
@@ -433,7 +669,7 @@ async function bbExport() {
   const res = await saveBlob(blob, name);
   const s = doc.summary;
   hint(res.ok
-    ? `Caja negra sellada SHA-256 guardada en ${res.where} (${(blob.size / 1024).toFixed(1)} KB · ${s.frames} muestras · ${s.distanceKm} km · ${s.deadZoneSamples} sin red).`
+    ? `Caja negra v2 sellada SHA-256 guardada en ${res.where} (${(blob.size / 1024).toFixed(1)} KB · ${s.frames} muestras · ${s.distanceKm} km · ${s.deadZoneSamples} sin red · ${s.radarAlertFrames} radares).`
     : 'No se pudo guardar la caja negra.');
   return doc;
 }
@@ -447,4 +683,8 @@ initMap();
 loadIncidents();
 setInterval(() => { if (!document.hidden) loadIncidents(); }, 5 * 60 * 1000);
 // Para pruebas automáticas
-globalThis.sendaDrive = { st, goTo, onPos, dash, updateCorridor, bbStart, bbSample, bbExport };
+globalThis.sendaDrive = {
+  st, goTo, onPos, dash, updateCorridor, updateRadars,
+  bbStart, bbSample, bbExport, setAiMode, aiIntervalMs,
+  sendBleProbe, loadPmTilesFile, loadOsintXml, loadOsintGeoJson,
+};

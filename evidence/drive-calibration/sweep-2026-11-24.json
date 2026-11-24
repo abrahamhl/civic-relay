@@ -1,0 +1,174 @@
+{
+  "generatedUtc": "2026-11-24T16:34:14.343Z",
+  "sourceTrace": "packages/senda/calibration/udacity-effdet-4hz.json (Udacity CarND MIT, 145 fotogramas a 4 Hz)",
+  "activeDefaults": {
+    "amberTtcS": 5,
+    "cutInSpeed": 0.25,
+    "confirmFrames": 2,
+    "edgeMargin": 0.015
+  },
+  "testedConfigs": 54,
+  "validConfigs": 36,
+  "topPareto": [
+    {
+      "params": {
+        "amberTtcS": 3.5,
+        "cutInSpeed": 0.18,
+        "confirmFrames": 1,
+        "edgeMargin": 0
+      },
+      "real": {
+        "frames": 145,
+        "rojo": 0,
+        "ambar": 0,
+        "totalAlerts": 0,
+        "trackIds": 3
+      },
+      "sim": {
+        "basis": "SIMULATION_4HZ",
+        "closing43kmhRedS": 1.5,
+        "cutIn030AlertS": 0.5
+      }
+    },
+    {
+      "params": {
+        "amberTtcS": 3.5,
+        "cutInSpeed": 0.18,
+        "confirmFrames": 1,
+        "edgeMargin": 0.015
+      },
+      "real": {
+        "frames": 145,
+        "rojo": 0,
+        "ambar": 0,
+        "totalAlerts": 0,
+        "trackIds": 3
+      },
+      "sim": {
+        "basis": "SIMULATION_4HZ",
+        "closing43kmhRedS": 1.5,
+        "cutIn030AlertS": 0.5
+      }
+    },
+    {
+      "params": {
+        "amberTtcS": 3.5,
+        "cutInSpeed": 0.25,
+        "confirmFrames": 1,
+        "edgeMargin": 0
+      },
+      "real": {
+        "frames": 145,
+        "rojo": 0,
+        "ambar": 0,
+        "totalAlerts": 0,
+        "trackIds": 3
+      },
+      "sim": {
+        "basis": "SIMULATION_4HZ",
+        "closing43kmhRedS": 1.5,
+        "cutIn030AlertS": 0.5
+      }
+    },
+    {
+      "params": {
+        "amberTtcS": 3.5,
+        "cutInSpeed": 0.25,
+        "confirmFrames": 1,
+        "edgeMargin": 0.015
+      },
+      "real": {
+        "frames": 145,
+        "rojo": 0,
+        "ambar": 0,
+        "totalAlerts": 0,
+        "trackIds": 3
+      },
+      "sim": {
+        "basis": "SIMULATION_4HZ",
+        "closing43kmhRedS": 1.5,
+        "cutIn030AlertS": 0.5
+      }
+    },
+    {
+      "params": {
+        "amberTtcS": 5,
+        "cutInSpeed": 0.18,
+        "confirmFrames": 1,
+        "edgeMargin": 0
+      },
+      "real": {
+        "frames": 145,
+        "rojo": 0,
+        "ambar": 0,
+        "totalAlerts": 0,
+        "trackIds": 3
+      },
+      "sim": {
+        "basis": "SIMULATION_4HZ",
+        "closing43kmhRedS": 1.5,
+        "cutIn030AlertS": 0.5
+      }
+    },
+    {
+      "params": {
+        "amberTtcS": 5,
+        "cutInSpeed": 0.18,
+        "confirmFrames": 1,
+        "edgeMargin": 0.015
+      },
+      "real": {
+        "frames": 145,
+        "rojo": 0,
+        "ambar": 0,
+        "totalAlerts": 0,
+        "trackIds": 3
+      },
+      "sim": {
+        "basis": "SIMULATION_4HZ",
+        "closing43kmhRedS": 1.5,
+        "cutIn030AlertS": 0.5
+      }
+    },
+    {
+      "params": {
+        "amberTtcS": 5,
+        "cutInSpeed": 0.25,
+        "confirmFrames": 1,
+        "edgeMargin": 0
+      },
+      "real": {
+        "frames": 145,
+        "rojo": 0,
+        "ambar": 0,
+        "totalAlerts": 0,
+        "trackIds": 3
+      },
+      "sim": {
+        "basis": "SIMULATION_4HZ",
+        "closing43kmhRedS": 1.5,
+        "cutIn030AlertS": 0.5
+      }
+    },
+    {
+      "params": {
+        "amberTtcS": 5,
+        "cutInSpeed": 0.25,
+        "confirmFrames": 1,
+        "edgeMargin": 0.015
+      },
+      "real": {
+        "frames": 145,
+        "rojo": 0,
+        "ambar": 0,
+        "totalAlerts": 0,
+        "trackIds": 3
+      },
+      "sim": {
+        "basis": "SIMULATION_4HZ",
+        "closing43kmhRedS": 1.5,
+        "cutIn030AlertS": 0.5
+      }
+    }
+  ]
+}

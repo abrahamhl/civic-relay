@@ -1,20 +1,28 @@
 /**
- * SENDA Drive · Caja Negra de vuelo en el dispositivo (`senda-drive-blackbox/1`, 0 €, sin red).
+ * SENDA Drive · Caja Negra de vuelo sin recortes (`senda-drive-blackbox/2`, 0 €, sin red).
  *
- * Registra telemetría compacta en memoria circular (≤ 7 200 muestras = 2 h a 1 Hz, < 2 MB RAM)
- * durante la conducción y la sella con cadena SHA-256 al exportar para estudiar comunicaciones,
- * zonas sin cobertura, consumo real de batería y comportamiento del detector en carretera real.
+ * Registra telemetría completa de calibración en el dispositivo (por defecto ≤ 14 400 muestras = 4 h a 1 Hz)
+ * y la sella con cadena SHA-256 al exportar para estudiar comunicaciones, cobertura, consumo de batería,
+ * pistas ADAS completas (para re-ejecutar umbrales offline), IMU 3 ejes, distancias RSS, radares oficiales
+ * fijos/tramo y latencia RTT de sonda cooperativa BLE.
  *
  * Privacidad y veracidad (CLAUDE.md):
  *  - NO guarda fotogramas de vídeo, ni caras, ni matrículas, ni identificadores de terceros.
- *  - Todo sensor no disponible queda explícitamente como `null` (jamás se inventan datos de batería ni red).
+ *  - Todo sensor no disponible queda explícitamente como `null` (jamás se inventan datos).
  *  - La salida permanece 100 % local en el móvil hasta que la persona decide guardarla o compartirla.
  */
 import { haversineM } from './route-planner.mjs';
 import { stoppingDistanceM } from './drive-corridor.mjs';
-import { estimatePlanarKinematics } from './drive-physics-v2.mjs';
+import {
+  G_STD,
+  EXAMPLE_RSS_PARAMS,
+  estimatePlanarKinematics,
+  rssLongitudinalSameDir,
+  rssLongitudinalOppositeDir,
+} from './drive-physics-v2.mjs';
 
-export const BLACKBOX_SCHEMA = 'senda-drive-blackbox/1';
+export const BLACKBOX_SCHEMA = 'senda-drive-blackbox/2';
+export const SUPPORTED_SCHEMAS = Object.freeze(['senda-drive-blackbox/1', 'senda-drive-blackbox/2']);
 export const GENESIS_HASH = '0'.repeat(64);
 
 const enc = new TextEncoder();
@@ -25,22 +33,93 @@ async function sha256Hex(str) {
 
 const numOrNull = (v, d = null) => (typeof v === 'number' && Number.isFinite(v) ? (d != null ? +v.toFixed(d) : v) : null);
 
+function cleanImu(imu) {
+  if (!imu || typeof imu !== 'object') return null;
+  const out = {
+    ax: numOrNull(imu.ax, 3),
+    ay: numOrNull(imu.ay, 3),
+    az: numOrNull(imu.az, 3),
+    gx: numOrNull(imu.gx, 2),
+    gy: numOrNull(imu.gy, 2),
+    gz: numOrNull(imu.gz, 2),
+    alpha: numOrNull(imu.alpha, 1),
+    beta: numOrNull(imu.beta, 1),
+    gamma: numOrNull(imu.gamma, 1),
+  };
+  return Object.values(out).some((v) => v != null) ? out : null;
+}
+
+function cleanTracks(tracks) {
+  if (!Array.isArray(tracks)) return null;
+  return tracks.map((o) => ({
+    id: o.id ?? null,
+    label: o.label ?? null,
+    zone: o.zone ?? null,
+    box: o.box
+      ? [numOrNull(o.box.x, 4), numOrNull(o.box.y, 4), numOrNull(o.box.w, 4), numOrNull(o.box.h, 4)]
+      : (Array.isArray(o.box) ? o.box.map((v) => numOrNull(v, 4)) : null),
+    ttcS: numOrNull(o.ttcS, 2),
+    lateral: numOrNull(o.lateral, 3),
+    level: o.level ?? 'VERDE',
+    clipped: !!o.clipped,
+    reasons: Array.isArray(o.reasons) ? o.reasons.slice(0, 4) : [],
+  }));
+}
+
+function cleanCorridorItems(items) {
+  if (!Array.isArray(items)) return null;
+  return items.map((i) => ({
+    cat: i.cat ?? null,
+    road: i.road || null,
+    distM: numOrNull(i.distM, 0),
+    urgency: i.urgency ?? null,
+    source: i.source ?? null,
+  }));
+}
+
+function computeRssSnapshot(speedMs) {
+  if (speedMs == null || speedMs < 0) return null;
+  const sameDirMovingM = rssLongitudinalSameDir({ vRearMs: speedMs, vFrontMs: speedMs }, EXAMPLE_RSS_PARAMS).dMinM;
+  const sameDirStoppedM = rssLongitudinalSameDir({ vRearMs: speedMs, vFrontMs: 0 }, EXAMPLE_RSS_PARAMS).dMinM;
+  const oppDirM = rssLongitudinalOppositeDir({ v1Ms: speedMs, v2Ms: speedMs }, EXAMPLE_RSS_PARAMS).dMinM;
+  return {
+    sameDirMovingM: +sameDirMovingM.toFixed(1),
+    sameDirStoppedM: +sameDirStoppedM.toFixed(1),
+    oppDirM: +oppDirM.toFixed(1),
+    basis: EXAMPLE_RSS_PARAMS.basis,
+  };
+}
+
 /** Canoniza una muestra (sin hashes) para garantizar reproducibilidad en la verificación SHA-256. */
-export function canonicalFramePayload(f) {
+export function canonicalFramePayload(f, schema = BLACKBOX_SCHEMA) {
+  if (schema === 'senda-drive-blackbox/1') {
+    return JSON.stringify({
+      seq: f.seq, t: f.t, pos: f.pos, accuracyM: f.accuracyM, speedMs: f.speedMs,
+      headingDeg: f.headingDeg, kin: f.kin, ssdM: f.ssdM, vision: f.vision,
+      corridor: f.corridor, rf: f.rf, battery: f.battery, ble: f.ble,
+    });
+  }
   return JSON.stringify({
     seq: f.seq,
     t: f.t,
     pos: f.pos,
     accuracyM: f.accuracyM,
+    altM: f.altM,
+    altAccuracyM: f.altAccuracyM,
     speedMs: f.speedMs,
     headingDeg: f.headingDeg,
     kin: f.kin,
+    imu: f.imu,
     ssdM: f.ssdM,
+    rss: f.rss,
     vision: f.vision,
     corridor: f.corridor,
+    radar: f.radar,
     rf: f.rf,
     battery: f.battery,
     ble: f.ble,
+    bleProbe: f.bleProbe,
+    osint: f.osint,
   });
 }
 
@@ -49,34 +128,42 @@ export function summarizeBlackBox(frames) {
   if (!Array.isArray(frames) || !frames.length) {
     return {
       frames: 0, durationS: 0, distanceKm: 0, maxSpeedKmh: null, meanSpeedKmh: null,
-      maxBrakingMs2: null, maxAccelMs2: null, maxLatG: null, maxNormG: null,
+      maxBrakingMs2: null, maxAccelMs2: null, maxLatG: null, maxNormG: null, maxImuG: null,
       batteryStartPct: null, batteryEndPct: null, batteryDropPct: null, batteryDrainPctPerHr: null,
       offlineTransitions: 0, deadZoneSamples: 0, deadZones: [],
-      visionFrames: 0, adasRedFrames: 0, adasAmberFrames: 0, meanInferMs: null,
-      corridorAlertFrames: 0, bleTxMax: 0, bleRxMax: 0, bleRejectedMax: 0,
+      visionFrames: 0, adasRedFrames: 0, adasAmberFrames: 0, meanInferMs: null, rawTracksRecorded: 0,
+      aiHzMin: null, aiHzMax: null,
+      corridorAlertFrames: 0, radarAlertFrames: 0, sectionTrackedFrames: 0,
+      bleTxMax: 0, bleRxMax: 0, bleRejectedMax: 0,
+      bleProbePings: 0, bleProbePongs: 0, bleProbeMedianRttMs: null,
     };
   }
   const durationS = Math.max(0, +((frames.at(-1).t - frames[0].t) / 1000).toFixed(1));
   let distM = 0, prevPos = null;
-  const speeds = [], axVals = [], ayG = [], normG = [], inferVals = [];
+  const speeds = [], axVals = [], ayG = [], normG = [], imuG = [], inferVals = [], hzVals = [];
   let batStart = null, batEnd = null, batStartT = null, batEndT = null;
   let offlineTransitions = 0, prevOnline = null, deadZoneSamples = 0;
   const deadZones = [];
-  let visionFrames = 0, adasRedFrames = 0, adasAmberFrames = 0, corridorAlertFrames = 0;
+  let visionFrames = 0, adasRedFrames = 0, adasAmberFrames = 0, rawTracksRecorded = 0;
+  let corridorAlertFrames = 0, radarAlertFrames = 0, sectionTrackedFrames = 0;
   let bleTxMax = 0, bleRxMax = 0, bleRejectedMax = 0;
+  let bleProbePings = 0, bleProbePongs = 0, bleProbeMedianRttMs = null;
 
   for (const f of frames) {
     if (Array.isArray(f.pos) && f.pos.length === 2) {
       if (prevPos) {
         const step = haversineM(prevPos, f.pos);
-        if (step < 500) distM += step; // descarta saltos GPS aberrantes (>500 m en 1 tick)
+        if (step < 500) distM += step;
       }
       prevPos = f.pos;
     }
     if (f.speedMs != null) speeds.push(f.speedMs * 3.6);
     if (f.kin?.axMs2 != null) axVals.push(f.kin.axMs2);
-    if (f.kin?.ayMs2 != null) ayG.push(Math.abs(f.kin.ayMs2) / 9.80665);
+    if (f.kin?.ayMs2 != null) ayG.push(Math.abs(f.kin.ayMs2) / G_STD);
     if (f.kin?.aNormG != null) normG.push(f.kin.aNormG);
+    if (f.imu && (f.imu.ax != null || f.imu.ay != null || f.imu.az != null)) {
+      imuG.push(Math.hypot(f.imu.ax ?? 0, f.imu.ay ?? 0, f.imu.az ?? 0) / G_STD);
+    }
     if (f.battery?.pct != null) {
       if (batStart == null) { batStart = f.battery.pct; batStartT = f.t; }
       batEnd = f.battery.pct; batEndT = f.t;
@@ -86,7 +173,7 @@ export function summarizeBlackBox(frames) {
       prevOnline = f.rf.online;
       if (f.rf.online === false) {
         deadZoneSamples++;
-        if (f.pos && deadZones.length < 200) {
+        if (f.pos && deadZones.length < 500) {
           const last = deadZones.at(-1);
           if (!last || haversineM([last.lon, last.lat], f.pos) >= 100) {
             deadZones.push({ t: f.t, lon: f.pos[0], lat: f.pos[1] });
@@ -99,12 +186,21 @@ export function summarizeBlackBox(frames) {
       if (f.vision.level === 'ROJO') adasRedFrames++;
       else if (f.vision.level === 'AMBAR') adasAmberFrames++;
       if (f.vision.inferMs != null) inferVals.push(f.vision.inferMs);
+      if (f.vision.hz != null) hzVals.push(f.vision.hz);
+      if (Array.isArray(f.vision.tracks)) rawTracksRecorded += f.vision.tracks.length;
     }
     if (f.corridor?.topCat) corridorAlertFrames++;
+    if (f.radar?.topId) radarAlertFrames++;
+    if (f.radar?.sectionId) sectionTrackedFrames++;
     if (f.ble) {
       if (f.ble.tx > bleTxMax) bleTxMax = f.ble.tx;
       if (f.ble.rx > bleRxMax) bleRxMax = f.ble.rx;
       if (f.ble.rejected > bleRejectedMax) bleRejectedMax = f.ble.rejected;
+    }
+    if (f.bleProbe) {
+      if (f.bleProbe.pingsSent > bleProbePings) bleProbePings = f.bleProbe.pingsSent;
+      if (f.bleProbe.pongsReceived > bleProbePongs) bleProbePongs = f.bleProbe.pongsReceived;
+      if (f.bleProbe.medianRttMs != null) bleProbeMedianRttMs = f.bleProbe.medianRttMs;
     }
   }
 
@@ -122,6 +218,7 @@ export function summarizeBlackBox(frames) {
     maxAccelMs2: axVals.length ? +Math.max(0, Math.max(...axVals)).toFixed(2) : null,
     maxLatG: ayG.length ? +Math.max(...ayG).toFixed(3) : null,
     maxNormG: normG.length ? +Math.max(...normG).toFixed(3) : null,
+    maxImuG: imuG.length ? +Math.max(...imuG).toFixed(3) : null,
     batteryStartPct: batStart,
     batteryEndPct: batEnd,
     batteryDropPct: batDrop,
@@ -133,15 +230,23 @@ export function summarizeBlackBox(frames) {
     adasRedFrames,
     adasAmberFrames,
     meanInferMs: inferVals.length ? +(inferVals.reduce((a, b) => a + b, 0) / inferVals.length).toFixed(1) : null,
+    rawTracksRecorded,
+    aiHzMin: hzVals.length ? Math.min(...hzVals) : null,
+    aiHzMax: hzVals.length ? Math.max(...hzVals) : null,
     corridorAlertFrames,
+    radarAlertFrames,
+    sectionTrackedFrames,
     bleTxMax,
     bleRxMax,
     bleRejectedMax,
+    bleProbePings,
+    bleProbePongs,
+    bleProbeMedianRttMs,
   };
 }
 
-/** Crea una instancia de caja negra en memoria circular. */
-export function createBlackBox({ maxFrames = 7200, appVersion = 'senda-conducir' } = {}) {
+/** Crea una instancia de caja negra en memoria circular (4 h por defecto a 1 Hz). */
+export function createBlackBox({ maxFrames = 14400, appVersion = 'senda-conducir' } = {}) {
   let active = false, seq = 0, startedUtc = null;
   const frames = [];
   const gnssWin = [];
@@ -164,11 +269,13 @@ export function createBlackBox({ maxFrames = 7200, appVersion = 'senda-conducir'
     },
 
     /**
-     * Registra una muestra de telemetría real (sin píxeles, sin PII, null si falta sensor).
+     * Registra una muestra de telemetría completa para calibración real (sin vídeo ni PII, null si falta sensor).
      */
     record({
-      t = Date.now(), pos = null, accuracyM = null, speedMs = null, headingDeg = null,
-      vision = null, corridor = null, rf = null, battery = null, ble = null,
+      t = Date.now(), pos = null, accuracyM = null, altM = null, altAccuracyM = null,
+      speedMs = null, headingDeg = null, imu = null,
+      vision = null, corridor = null, radar = null, section = null,
+      rf = null, battery = null, ble = null, bleProbe = null, osint = null,
     } = {}) {
       if (!active) return null;
       const cleanPos = Array.isArray(pos) && Number.isFinite(pos[0]) && Number.isFinite(pos[1])
@@ -181,15 +288,21 @@ export function createBlackBox({ maxFrames = 7200, appVersion = 'senda-conducir'
       }
       const kin = estimatePlanarKinematics(gnssWin);
       const ssd = stoppingDistanceM(spd);
+      const topRadar = radar?.top ?? (radar?.id ? radar : null);
+      const secState = section ?? radar?.section ?? null;
       const entry = {
         seq: ++seq,
         t: Math.floor(t),
         pos: cleanPos,
         accuracyM: numOrNull(accuracyM, 1),
+        altM: numOrNull(altM, 1),
+        altAccuracyM: numOrNull(altAccuracyM, 1),
         speedMs: spd,
         headingDeg: hdg,
         kin,
+        imu: cleanImu(imu),
         ssdM: ssd != null ? +ssd.toFixed(1) : null,
+        rss: computeRssSnapshot(spd),
         vision: vision ? {
           active: !!vision.active,
           count: numOrNull(vision.count, 0) ?? 0,
@@ -198,6 +311,7 @@ export function createBlackBox({ maxFrames = 7200, appVersion = 'senda-conducir'
           clipped: numOrNull(vision.clipped, 0) ?? 0,
           inferMs: numOrNull(vision.inferMs, 1),
           hz: numOrNull(vision.hz, 1),
+          tracks: cleanTracks(vision.tracks),
         } : null,
         corridor: corridor ? {
           mode: corridor.mode ?? null,
@@ -207,6 +321,22 @@ export function createBlackBox({ maxFrames = 7200, appVersion = 'senda-conducir'
           topDistM: numOrNull(corridor.top?.distM, 0),
           topUrgency: corridor.top?.urgency ?? null,
           topSource: corridor.top?.source ?? null,
+          items: cleanCorridorItems(corridor.items),
+        } : null,
+        radar: (topRadar || secState) ? {
+          count: Array.isArray(radar?.items) ? radar.items.length : (topRadar ? 1 : 0),
+          topId: topRadar?.id ?? null,
+          topKind: topRadar?.kind ?? null,
+          topRoad: topRadar?.road || null,
+          topDistM: numOrNull(topRadar?.distM, 0),
+          topMaxspeed: numOrNull(topRadar?.maxspeed, 0),
+          topOverLimit: typeof topRadar?.overLimit === 'boolean' ? topRadar.overLimit : null,
+          topSrc: topRadar?.src ?? null,
+          sectionId: secState?.id ?? null,
+          sectionAvgKmh: numOrNull(secState?.avgKmh, 1),
+          sectionMaxspeed: numOrNull(secState?.maxspeed, 0),
+          sectionRemainingM: numOrNull(secState?.remainingM, 0),
+          sectionOverAvg: typeof secState?.overAverage === 'boolean' ? secState.overAverage : null,
         } : null,
         rf: rf ? {
           online: typeof rf.online === 'boolean' ? rf.online : null,
@@ -223,6 +353,21 @@ export function createBlackBox({ maxFrames = 7200, appVersion = 'senda-conducir'
           rx: numOrNull(ble.rx, 0) ?? 0,
           rejected: numOrNull(ble.rejected, 0) ?? 0,
         } : null,
+        bleProbe: bleProbe ? {
+          pingsSent: numOrNull(bleProbe.pingsSent, 0) ?? 0,
+          pongsReceived: numOrNull(bleProbe.pongsReceived, 0) ?? 0,
+          pingsAnswered: numOrNull(bleProbe.pingsAnswered, 0) ?? 0,
+          corrupted: numOrNull(bleProbe.corrupted, 0) ?? 0,
+          responseRate: numOrNull(bleProbe.responseRate, 3),
+          medianRttMs: numOrNull(bleProbe.medianRttMs, 2),
+          lastRttMs: numOrNull(bleProbe.lastRttMs, 2),
+        } : null,
+        osint: osint ? {
+          count: numOrNull(osint.count, 0) ?? 0,
+          closestKm: numOrNull(osint.closestKm, 1),
+          topType: osint.topType ?? null,
+          topLevel: osint.topLevel ?? null,
+        } : null,
       };
       frames.push(entry);
       if (frames.length > maxFrames) frames.shift();
@@ -234,7 +379,7 @@ export function createBlackBox({ maxFrames = 7200, appVersion = 'senda-conducir'
       let prevHash = GENESIS_HASH;
       const sealed = [];
       for (const f of frames) {
-        const hash = await sha256Hex(`${prevHash}|${canonicalFramePayload(f)}`);
+        const hash = await sha256Hex(`${prevHash}|${canonicalFramePayload(f, BLACKBOX_SCHEMA)}`);
         sealed.push({ ...f, prevHash, hash });
         prevHash = hash;
       }
@@ -253,16 +398,16 @@ export function createBlackBox({ maxFrames = 7200, appVersion = 'senda-conducir'
   };
 }
 
-/** Verifica criptográficamente una caja negra exportada (detecta cualquier edición o borrado). */
+/** Verifica criptográficamente una caja negra exportada v1 o v2 (detecta cualquier edición o borrado). */
 export async function verifyBlackBox(doc) {
-  if (!doc || doc.schema !== BLACKBOX_SCHEMA || !Array.isArray(doc.frames)) {
+  if (!doc || !SUPPORTED_SCHEMAS.includes(doc.schema) || !Array.isArray(doc.frames)) {
     return { ok: false, count: 0, brokenAt: null, reason: 'esquema no válido' };
   }
   let prev = GENESIS_HASH;
   for (let i = 0; i < doc.frames.length; i++) {
     const f = doc.frames[i];
     if (f.prevHash !== prev) return { ok: false, count: doc.frames.length, brokenAt: i, reason: 'prevHash roto' };
-    const expected = await sha256Hex(`${prev}|${canonicalFramePayload(f)}`);
+    const expected = await sha256Hex(`${prev}|${canonicalFramePayload(f, doc.schema)}`);
     if (f.hash !== expected) return { ok: false, count: doc.frames.length, brokenAt: i, reason: 'hash alterado' };
     prev = expected;
   }
@@ -271,3 +416,4 @@ export async function verifyBlackBox(doc) {
   }
   return { ok: true, count: doc.frames.length, brokenAt: null, reason: null };
 }
+
