@@ -2,6 +2,7 @@
 // colores e iconos, incidencias y cámaras DGT, cámara con IA en miniatura y entrega a Waze o Google Maps.
 // Red: OpenFreeMap (mapa), OSRM de FOSSGIS (rutas, pruebas), Nominatim (búsqueda, ≤1/s). Sin red: radar.
 import { createTracker, topAlert } from './core/drive-hazard.mjs';
+import { hazardsAhead, corridorAnnouncement } from './core/drive-corridor.mjs';
 import { interpretAlternatives } from './core/voice-report.mjs';
 import { REPORT_KINDS } from './core/road-guard.mjs';
 import { parseDatex2 } from './core/datex2.mjs';
@@ -19,7 +20,7 @@ const say = (t) => { try { speechSynthesis.cancel(); speechSynthesis.speak(Objec
 const fmtDist = (m) => (m >= 1000 ? `${(m / 1000).toFixed(1).replace('.', ',')} km` : `${Math.round(m / 10) * 10} m`);
 const reports = () => LS.get('senda.ruta.reports', []);
 
-const st = { pos: null, speed: null, heading: 0, follow: true, map: null, mapOk: false, route: null, dest: null, said: new Set(), lastRouteS: -1e9, incidents: [], incSource: '', cams: [], me: null };
+const st = { pos: null, speed: null, heading: 0, follow: true, map: null, mapOk: false, route: null, dest: null, said: new Set(), saidCorridor: new Set(), corridor: null, lastRouteS: -1e9, incidents: [], incSource: '', cams: [], me: null };
 
 // ── Mapa (OpenFreeMap). Si no carga en 10 s (sin red, versión base), se usa el radar. ──
 function initMap() {
@@ -67,11 +68,35 @@ function drawMarkers() {
 
 // ── Incidencias DGT: en vivo (app play, la parte nativa las descarga de nap.dgt.es) o copia con su fecha ──
 async function loadIncidents() {
-  try { const r = await fetch('/senda/live/dgt-incidencias.xml', { cache: 'no-store' }); if (r.ok) { st.incidents = parseDatex2(await r.text()); st.incSource = `DGT en vivo ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`; return drawMarkers(); } } catch { /* copia */ }
+  try { const r = await fetch('/senda/live/dgt-incidencias.xml', { cache: 'no-store' }); if (r.ok) { st.incidents = parseDatex2(await r.text()); st.incSource = `DGT en vivo ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`; drawMarkers(); return updateCorridor(); } } catch { /* copia */ }
   try { const d = await (await fetch('/senda/data/referencias/dgt_incidencias.json')).json(); st.incidents = Object.values(d).find(Array.isArray) ?? []; st.incSource = `DGT, copia del ${new Date(d.descargadoUTC).toLocaleDateString('es-ES')}`; } catch { st.incSource = 'sin incidencias'; }
-  drawMarkers();
+  drawMarkers(); updateCorridor();
 }
 fetch('/senda/data/referencias/dgt_camaras.json').then((r) => r.json()).then((d) => { st.cams = d.camaras; drawMarkers(); }).catch(() => {});
+
+// ── Avisos por delante en el corredor (100 % en el móvil, con o sin red) ──
+function updateCorridor() {
+  const el = $('#corridorAlert');
+  if (!st.pos) { st.corridor = null; if (el) el.hidden = true; return; }
+  const res = hazardsAhead({
+    pos: st.pos, headingDeg: st.heading, speedMs: st.speed,
+    routeCoords: st.route?.coords ?? null,
+    incidents: st.incidents, incSource: st.incSource || 'DGT',
+    reports: reports(),
+  });
+  st.corridor = res;
+  if (!el) return;
+  if (!res.top) { el.hidden = true; return; }
+  const t = res.top;
+  el.hidden = false; el.className = 'card ' + t.urgency;
+  $('#caIco').innerHTML = markerSvg(t.cat, 26);
+  $('#caTitle').textContent = `${t.label} · ${fmtDist(t.distM)}${t.road ? ` · ${t.road}` : ''}`;
+  const ssdTxt = res.ssdM != null ? ` · parada AASHTO ${Math.round(res.ssdM)} m` : '';
+  const extra = res.dedupedCount > 1 ? ` · +${res.dedupedCount - 1} más` : '';
+  $('#caSub').textContent = `${t.sourceLabel}${ssdTxt}${extra}`;
+  const phrase = corridorAnnouncement(t, st.saidCorridor);
+  if (phrase) say(phrase);
+}
 
 // ── GPS, seguimiento y navegación ──
 function onPos(p) {
@@ -85,6 +110,7 @@ function onPos(p) {
     if (st.follow) st.map.easeTo({ center: st.pos, bearing: st.route ? st.heading : st.map.getBearing(), pitch: st.route ? 45 : 0, duration: 800 });
   } else drawRadar();
   if (st.route) guide();
+  updateCorridor();
 }
 navigator.geolocation?.watchPosition(onPos, () => { $('#speed').innerHTML = '<div>–<small>sin GPS</small></div>'; }, { enableHighAccuracy: true, maximumAge: 1000 });
 
@@ -111,10 +137,10 @@ async function goTo(dest, reroute = false) {
     $('#etaTime').textContent = arrive.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
     $('#etaInfo').textContent = `${Math.round(r.durationS / 60)} min · ${fmtDist(r.distanceM)} · ${dest.name}`;
     hint('Llegada estimada por OSRM, sin tráfico en vivo. Para tráfico en vivo, abre la misma ruta en Waze o Google Maps.');
-    guide();
+    guide(); updateCorridor();
   } catch { hint('Sin conexión al servicio de rutas. Abre el destino en Waze o Google Maps.'); $('#etaTime').textContent = dest.name; $('#etaInfo').textContent = ''; }
 }
-function endNav() { st.route = null; st.dest = null; $('#turn').hidden = true; $('#etaBox').hidden = true; $('#searchBox').hidden = false; st.map?.getSource('route')?.setData({ type: 'FeatureCollection', features: [] }); st.map?.easeTo({ pitch: 0, bearing: 0 }); hint('Busca un destino o toca Casa/Trabajo.'); }
+function endNav() { st.route = null; st.dest = null; $('#turn').hidden = true; $('#etaBox').hidden = true; $('#searchBox').hidden = false; st.map?.getSource('route')?.setData({ type: 'FeatureCollection', features: [] }); st.map?.easeTo({ pitch: 0, bearing: 0 }); hint('Busca un destino o toca Casa/Trabajo.'); updateCorridor(); }
 $('#endNav').addEventListener('click', endNav);
 $('#goWaze').addEventListener('click', () => { if (st.dest) location.href = wazeUrl({ to: st.dest.at }).url; });
 $('#goMaps').addEventListener('click', () => { if (st.dest) location.href = googleMapsUrl({ from: st.pos ?? st.dest.at, to: st.dest.at }).url; });
@@ -150,7 +176,7 @@ $('#grid').addEventListener('click', (e) => { const k = e.target.closest('[data-
 function saveReport(kind, side = 'SIN_INDICAR') {
   if (!st.pos) return hint('Sin GPS: no se puede situar el aviso.');
   const list = reports(); list.push({ kind, side, lon: st.pos[0], lat: st.pos[1], t: Date.now(), own: true }); LS.set('senda.ruta.reports', list);
-  drawMarkers(); say(`Aviso de ${REPORT_KINDS[kind].label} guardado`); hint(`Aviso «${REPORT_KINDS[kind].label}» guardado en tu posición. Para pasarlo a otros móviles SENDA cercanos: botón naranja → «Bluetooth».`);
+  drawMarkers(); updateCorridor(); say(`Aviso de ${REPORT_KINDS[kind].label} guardado`); hint(`Aviso «${REPORT_KINDS[kind].label}» guardado en tu posición. Para pasarlo a otros móviles SENDA cercanos: botón naranja → «Bluetooth».`);
 }
 window.sendaVoice = (res) => {
   if (res.state) return hint(res.state === 'ESCUCHANDO' ? 'Habla ahora…' : 'Procesando…');
@@ -181,7 +207,7 @@ window.sendaP2P = (ev) => {
   if (!isReportPack(bytes)) return hint('Ha llegado un mensaje cifrado por Bluetooth: ábrelo en Mensajes.');
   try {
     const { reports: got, rejected } = unpackReports(bytes);
-    const m = mergeReports(reports(), got); LS.set('senda.ruta.reports', m.reports); drawMarkers();
+    const m = mergeReports(reports(), got); LS.set('senda.ruta.reports', m.reports); drawMarkers(); updateCorridor();
     if (m.added) say(`${m.added} aviso${m.added > 1 ? 's' : ''} nuevo${m.added > 1 ? 's' : ''} de otro móvil`);
     hint(`Recibidos ${got.length} aviso(s) de otro móvil (${m.added} nuevos${rejected ? `, ${rejected} descartados por corruptos` : ''}). Sin verificar.`);
   } catch (e) { hint('Paquete de avisos no válido: ' + e.message); }
@@ -353,4 +379,4 @@ initMap();
 loadIncidents();
 setInterval(() => { if (!document.hidden) loadIncidents(); }, 5 * 60 * 1000);
 // Para pruebas automáticas
-globalThis.sendaDrive = { st, goTo, onPos, dash };
+globalThis.sendaDrive = { st, goTo, onPos, dash, updateCorridor };
