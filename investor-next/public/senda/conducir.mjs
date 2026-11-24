@@ -11,6 +11,7 @@ import { rssLongitudinalSameDir, EXAMPLE_RSS_PARAMS } from './core/drive-physics
 import { createGnssImuEkf, createHorizonCalibrator } from './core/drive-kalman-fusion.mjs';
 import { sendaToDenm, denmToSenda, encodeDenmCompact, decodeDenmCompact, isDenmCompact, isInsideDenmRelevance } from './core/cits-denm.mjs';
 import { movingQueueIntercept, EXAMPLE_LWR_HIGHWAY } from './core/traffic-shockwave.mjs';
+import { analyzeUrbanCanyon, analyzeRfEnvironment, parseWifiSurveyJsonl, analyzeRoadSurfaceImu, createSurfaceMapper, runFieldLabBattery } from './core/drive-field-lab.mjs';
 import { createLinkProber, isProbePack } from './core/ble-link-probe.mjs';
 import { openPmTilesLocal } from './core/pmtiles-reader.mjs';
 import { parseGdacsRss, parseMtgEvents, osintNear } from './core/osint-feeds.mjs';
@@ -39,6 +40,8 @@ const st = {
   radars: [], stretches: [], sectionTracker: createSectionTracker([]), radarState: null, sectionState: null,
   me: null, bb: createBlackBox(),
   ekf: createGnssImuEkf(), ekfState: null, horizonCal: createHorizonCalibrator(),
+  activeListen: false, surfaceMapper: createSurfaceMapper({ cellSizeM: 25 }),
+  gnssHistory: [], imuHistory: [], rfSamples: [], lastLabReport: null,
   ble: { tx: 0, rx: 0, rejected: 0 }, prober: createLinkProber(),
   battery: { pct: null, charging: null }, aiMode: LS.get('senda.drive.aiMode', 'auto'),
   imu: { ax: null, ay: null, az: null, gx: null, gy: null, gz: null, alpha: null, beta: null, gamma: null },
@@ -283,6 +286,9 @@ function onPos(p) {
   updateOsint();
   bbLog('gps', { lat: +p.coords.latitude.toFixed(6), lon: +p.coords.longitude.toFixed(6), acc: p.coords.accuracy != null ? Math.round(p.coords.accuracy) : null, v: p.coords.speed, hdg: p.coords.heading, alt: p.coords.altitude != null ? Math.round(p.coords.altitude) : null, gt: p.timestamp, ekfRej: !!st.ekfState?.gnssRejected });
   tele.gps = p.coords;
+  st.gnssHistory.push({ accuracyM: p.coords.accuracy, altM: p.coords.altitude, maha2: st.ekfState?.maha2 ?? 0, rejected: !!st.ekfState?.gnssRejected });
+  if (st.gnssHistory.length > 120) st.gnssHistory.shift();
+  if (st.activeListen) ingestSurfaceNow(p.timestamp || Date.now());
 }
 navigator.geolocation?.watchPosition(onPos, () => { $('#speed').innerHTML = '<div>–<small>sin GPS</small></div>'; }, { enableHighAccuracy: true, maximumAge: 1000 });
 
@@ -689,6 +695,8 @@ window.addEventListener('devicemotion', (e) => {
   const aLong = e.acceleration?.x ?? 0;
   if (st.imu.ay != null && st.imu.az != null) {
     st.horizonCal.update({ ax: st.imu.ax ?? 0, ay: st.imu.ay, az: st.imu.az, speedMs: st.speed ?? 0, yawRateRadS, aLongMs2: aLong });
+    st.imuHistory.push({ ax: st.imu.ax ?? 0, ay: st.imu.ay, az: st.imu.az, speedMs: st.speed ?? 0 });
+    if (st.imuHistory.length > 120) st.imuHistory.shift();
   }
   if (st.ekf.initialized && st.lastFix) {
     const nowMs = Date.now();
@@ -822,6 +830,159 @@ $('#bbDash')?.addEventListener('click', () => { if (st.bb.active) bbExport(); el
 $('#bbSave')?.addEventListener('click', bbExport);
 $('#markBtn')?.addEventListener('click', () => { bbLog('note', { text: 'MARCA del conductor' }); navigator.vibrate?.(60); say('Marcado'); });
 
+// ── Laboratorio Científico de Campo, Escucha Activa y Mapeo Urbano/RF 25 m (0 PII) ──
+function ingestSurfaceNow(tMs = Date.now()) {
+  if (!st.pos) return null;
+  const road = analyzeRoadSurfaceImu(st.imuHistory.slice(-24));
+  const rf = st.rfSamples.length ? analyzeRfEnvironment(st.rfSamples) : null;
+  const cell = st.surfaceMapper.ingest({
+    lon: st.pos[0], lat: st.pos[1],
+    accuracyM: st.lastFix?.coords?.accuracy ?? null,
+    ekfMaha2: st.ekfState?.maha2 ?? 0,
+    ekfRejected: !!st.ekfState?.gnssRejected,
+    imuRmsZ: road.rmsVerticalMs2,
+    rfCount: rf?.uniqueSaltedNodes ?? 0,
+    rssiMedianDbm: rf?.rssiMedianDbm ?? null,
+    online: navigator.onLine,
+    visionObjects: st.lastVision?.count ?? 0,
+    region: st.region,
+    tMs,
+  });
+  const sum = st.surfaceMapper.summary();
+  if ($('#lkCells')) $('#lkCells').textContent = `${sum.totalCells} cel.`;
+  return cell;
+}
+function renderLabReport(rep) {
+  const canyon = rep.tests.find((t) => t.id === 'URBAN_CANYON_RF')?.metrics?.canyon;
+  const rf = rep.tests.find((t) => t.id === 'URBAN_CANYON_RF')?.metrics?.rf;
+  const cyber = rep.tests.find((t) => t.id === 'CYBER_INTEGRITY_AUDIT');
+  const sum = st.surfaceMapper.summary();
+  if ($('#lkCanyon')) $('#lkCanyon').textContent = (canyon?.canyonClass ?? 'SIN_DATOS').replace('URBAN_CANYON_', '').replace('SUBURBAN_', '');
+  if ($('#lkCells')) $('#lkCells').textContent = `${sum.totalCells} cel.`;
+  if ($('#lkRf')) $('#lkRf').textContent = rf?.ricianKDb != null ? `K ${rf.ricianKDb}dB` : (rf?.sampleCount ? `${rf.rssiMedianDbm}dBm` : 'Sin barr.');
+  if ($('#lkCyber')) $('#lkCyber').textContent = cyber?.status === 'OK' ? '0 MACs OK' : 'ALERTA';
+  const box = $('#labCards');
+  if (!box) return;
+  box.innerHTML = rep.tests.map((t) => `
+    <article class="lcard ${esc(t.status)}" data-test="${esc(t.id)}">
+      <div class="lcard-top">
+        <span class="lcard-name">${esc(t.name)}</span>
+        <span class="lcard-tags"><span class="ltag">${esc(t.basis)}</span><span class="ltag ${esc(t.status)}">${esc(t.status)}</span></span>
+      </div>
+      <div class="lcard-head">${esc(t.headline)}</div>
+      <div class="lcard-interp">${esc(t.interpretation)}</div>
+    </article>`).join('');
+}
+function runLabBattery() {
+  let radioCaps = null;
+  try { radioCaps = JSON.parse(window.SendaNative?.radioCaps?.() ?? 'null'); } catch { radioCaps = null; }
+  const rep = runFieldLabBattery({
+    nowMs: Date.now(),
+    pos: st.pos,
+    speedMs: st.speed,
+    headingDeg: st.heading,
+    altM: st.lastFix?.coords?.altitude ?? null,
+    region: st.region,
+    ekfState: st.ekfState,
+    horizonStatus: st.horizonCal.status(),
+    gnssHistory: st.gnssHistory,
+    imuHistory: st.imuHistory,
+    rfSamples: st.rfSamples,
+    corridor: st.corridor,
+    radarsCount: st.radars.length,
+    incidentsCount: activeIncidents().length,
+    vision: st.lastVision,
+    bleStats: st.ble,
+    probeStats: st.prober.stats(),
+    radioCaps,
+    blackbox: { active: st.bb.active, count: st.bb.count },
+    surfaceSummary: st.surfaceMapper.summary(),
+    online: navigator.onLine,
+  });
+  st.lastLabReport = rep;
+  renderLabReport(rep);
+  bbLog('field_lab', { overall: rep.summary.overall, ok: rep.summary.OK, warn: rep.summary.WARN, crit: rep.summary.CRIT, cells: rep.summary.surfaceCells });
+  hint(`Batería Lab Campo ejecutada: ${rep.summary.OK}/${rep.summary.totalEngines} OK · ${rep.summary.WARN} aviso · ${rep.summary.NO_SENSOR} sin sensor.`);
+  return rep;
+}
+function setActiveListen(on) {
+  st.activeListen = !!on;
+  $('#labChip')?.classList.toggle('live', st.activeListen);
+  if ($('#labChip')) $('#labChip').textContent = st.activeListen ? '● Escucha ON' : '⚡ Lab Campo';
+  $('#labStatusPill')?.classList.toggle('live', st.activeListen);
+  if ($('#labStatusPill')) $('#labStatusPill').textContent = st.activeListen ? 'ESCUCHA ACTIVA' : 'EN ESPERA';
+  $('#labListenBtn')?.classList.toggle('live', st.activeListen);
+  if ($('#labListenBtn')) $('#labListenBtn').textContent = st.activeListen ? '● Escucha activa: ON' : '● Escucha activa: OFF';
+  if (st.activeListen) {
+    window.SendaNative?.p2pStart?.();
+    ingestSurfaceNow();
+    hint('Escucha activa activada: mapeando celdas de 25 m (cañón GNSS/EKF, firme IMU, RF sin PII y buzón BLE).');
+  } else {
+    hint('Escucha activa pausada (las celdas ya capturadas se conservan para exportar GeoJSON).');
+  }
+  return st.activeListen;
+}
+function openLab(on) {
+  openSheet(false);
+  const show = on == null ? $('#labPanel').hidden : !!on;
+  $('#labPanel').hidden = !show;
+  $('#veil').hidden = !show;
+  if (show) runLabBattery();
+}
+function loadRfSurveyText(text) {
+  const parsed = parseWifiSurveyJsonl(text);
+  if (!parsed.length) { hint('El archivo no contiene lecturas Wi-Fi JSONL válidas.'); return 0; }
+  st.rfSamples = st.rfSamples.concat(parsed).slice(-600);
+  if (st.activeListen) ingestSurfaceNow();
+  runLabBattery();
+  hint(`Barrido RF importado: ${parsed.length} lecturas anonimizadas (0 MACs/SSIDs almacenados).`);
+  return parsed.length;
+}
+async function exportLabAndMap() {
+  const rep = st.lastLabReport ?? runLabBattery();
+  const gj = st.surfaceMapper.toGeoJson();
+  const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+  let sha = null;
+  try {
+    const raw = new TextEncoder().encode(JSON.stringify(rep));
+    const dig = await crypto.subtle.digest('SHA-256', raw);
+    sha = [...new Uint8Array(dig)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  } catch { /* sin WebCrypto */ }
+  const sealed = { ...rep, sha256: sha, surfaceSummary: st.surfaceMapper.summary() };
+  const labBlob = new Blob([JSON.stringify(sealed, null, 2)], { type: 'application/json' });
+  const mapBlob = new Blob([JSON.stringify(gj, null, 2)], { type: 'application/geo+json' });
+  const r1 = await saveBlob(labBlob, `senda-field-lab-${stamp}.json`);
+  const r2 = await saveBlob(mapBlob, `senda-surface-map-${stamp}.geojson`);
+  hint(`Lab Campo (${(labBlob.size / 1024).toFixed(1)} KB, SHA-256) y Mapa 25 m (${gj.features.length} celdas GeoJSON) guardados en ${r1.where || r2.where || 'local'}.`);
+  return { sealed, geojson: gj };
+}
+
+$('#labChip')?.addEventListener('click', () => openLab(true));
+$('#sheetLabBtn')?.addEventListener('click', () => openLab(true));
+$('#labClose')?.addEventListener('click', () => openLab(false));
+$('#veil')?.addEventListener('click', () => { openSheet(false); if (!$('#labPanel').hidden) openLab(false); });
+$('#labRunBtn')?.addEventListener('click', runLabBattery);
+$('#labListenBtn')?.addEventListener('click', () => setActiveListen(!st.activeListen));
+$('#labProbeBtn')?.addEventListener('click', () => {
+  sendBleProbe();
+  const d = exportDenm('obstaculo');
+  if (d && typeof window.SendaNative?.p2pSend === 'function') window.SendaNative.p2pSend(d.b64);
+  runLabBattery();
+});
+$('#labRfBtn')?.addEventListener('click', () => {
+  if (typeof window.SendaNative?.openRadios === 'function') {
+    window.SendaNative.openRadios('senda://accion?a=WIFI_SCAN&id=76f202336769f0e2');
+  } else {
+    $('#rfSurveyFile')?.click();
+  }
+});
+$('#rfSurveyFile')?.addEventListener('change', async (e) => {
+  const f = e.target.files?.[0];
+  if (!f) return;
+  loadRfSurveyText(await f.text());
+});
+$('#labExportBtn')?.addEventListener('click', exportLabAndMap);
+
 // La tarjeta de abajo cambia de alto (llegada, avisos): los botones flotantes se colocan siempre encima.
 new ResizeObserver(([e]) => document.documentElement.style.setProperty('--bottomH', `${Math.ceil(e.target.getBoundingClientRect().height)}px`)).observe($('#bottom'));
 
@@ -834,5 +995,6 @@ globalThis.sendaDrive = {
   bbStart, bbSample, bbExport, setAiMode, aiIntervalMs,
   sendBleProbe, loadPmTilesFile, loadOsintXml, loadOsintGeoJson,
   exportDenm, encodeDenmCompact, decodeDenmCompact, ekf: st.ekf, horizonCal: st.horizonCal,
+  openLab, setActiveListen, runLabBattery, loadRfSurveyText, exportLabAndMap, surfaceMapper: st.surfaceMapper,
   renderArHud, enrichTracksForHud, hudPhysicsState, createTracker, FULL_RULES,
 };

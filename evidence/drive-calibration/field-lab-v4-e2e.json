@@ -1,0 +1,37 @@
+{
+  "importedRf": 5,
+  "cardCount": 8,
+  "summary": {
+    "totalEngines": 8,
+    "OK": 5,
+    "WARN": 2,
+    "CRIT": 0,
+    "NO_SENSOR": 1,
+    "overall": "WARN",
+    "surfaceCells": 4
+  },
+  "sha256": "521e5376ba5da877c0453a685152323337716a697eaa235d6f6dc408ce032d9a",
+  "geojsonCells": 4,
+  "kpis": {
+    "canyon": "NLOS",
+    "cells": "4 cel.",
+    "rf": "K -20dB",
+    "cyber": "0 MACs OK"
+  },
+  "chipText": "● Escucha ON",
+  "statusPill": "ESCUCHA ACTIVA",
+  "nativeCalls": {
+    "p2pStart": 2,
+    "p2pSend": 2,
+    "filesSaved": [
+      "senda-field-lab-2026-11-24-18-06-43.json",
+      "senda-surface-map-2026-11-24-18-06-43.geojson"
+    ]
+  },
+  "piiLeaked": false,
+  "overflowX": 0,
+  "panelHeight": 769,
+  "panelTop": 146,
+  "landscapeOverflow": 0,
+  "errors": []
+}

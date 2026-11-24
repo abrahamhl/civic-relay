@@ -1,5 +1,5 @@
 {
-  "testedUtc": "2026-11-24T17:42:05.562Z",
+  "testedUtc": "2026-11-24T18:06:49.623Z",
   "viewport": "Pixel 7 (412x915 & 915x412, offline)",
   "passed": 9,
   "total": 9,
@@ -27,10 +27,10 @@
         "pingsAnswered": 0,
         "corrupted": 0,
         "responseRate": 1,
-        "medianRttMs": 4,
-        "lastRttMs": 4
+        "medianRttMs": 1,
+        "lastRttMs": 1
       },
-      "hint": "Sonda BLE PONG recibido · RTT 4 ms · mediana 4 ms · tasa 100 %."
+      "hint": "Sonda BLE PONG recibido · RTT 1 ms · mediana 1 ms · tasa 100 %."
     },
     {
       "name": "official_fixed_radar_alert_and_ui",
@@ -68,17 +68,17 @@
       "pass": true,
       "schema": "senda-drive-blackbox/2",
       "frames": 3,
-      "chainTipHash": "cdd621a81a2bb7e46915f153dd734268cbaba40260e7f3b9b76fd92d32c3d65f",
+      "chainTipHash": "f58bad7f9c88523510def13e09a639818d6f9f2527236e29fbf34e04625c6915",
       "summary": {
         "frames": 3,
-        "durationS": 0.7,
+        "durationS": 0.4,
         "distanceKm": 0,
         "maxSpeedKmh": 130,
         "meanSpeedKmh": 97.4,
-        "maxBrakingMs2": 29.26,
+        "maxBrakingMs2": 43.12,
         "maxAccelMs2": 0,
-        "maxLatG": 2.091,
-        "maxNormG": 3.643,
+        "maxLatG": 3.081,
+        "maxNormG": 5.369,
         "maxImuG": 1.011,
         "batteryStartPct": 15,
         "batteryEndPct": 15,
@@ -102,7 +102,7 @@
         "bleRejectedMax": 0,
         "bleProbePings": 1,
         "bleProbePongs": 1,
-        "bleProbeMedianRttMs": 4
+        "bleProbeMedianRttMs": 1
       }
     },
     {

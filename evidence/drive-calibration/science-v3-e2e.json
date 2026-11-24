@@ -70,7 +70,7 @@
   },
   "denmBytes": 36,
   "denmCauseCode": 1,
-  "teleText": "● REC 00:00:00 · 9 filas\n[NL] GPS ±5m 88km/h 62° alt -2m\nEKF GNSS_FUSED ±4.8m · 1 salto(s) GPS rej · H-Cal 22/20 (3.51°)\nIMU 0.0m/s² giro 0°/s\nIA apagada\nRadares 1970 · NDW 769 · SENDA 1\nRed 4g 10Mb/s 0ms · Bat 100%⚡",
+  "teleText": "● REC 00:00:00 · 9 filas\n[NL] GPS ±5m 88km/h 62° alt -2m\nEKF GNSS_FUSED ±4.8m · 1 salto(s) GPS rej · H-Cal 22/20 (3.51°)\nIMU 0.0m/s² giro 0°/s\nIA apagada\nRadares 1970 · NDW 769 · SENDA 1\nRed 4g 9.5Mb/s 0ms · Bat 100%⚡",
   "corrVisible": true,
   "corrText": "Retención · 350 mSENDA · otro móvil (sin verificar) · parada AASHTO 150 m · cola LWR ~290 m (modelo)",
   "radarVisible": true,
@@ -84,20 +84,20 @@
       "right": 249
     },
     "corridorAlert": {
-      "top": 104,
-      "bottom": 171,
+      "top": 106,
+      "bottom": 173,
       "left": 10,
       "right": 402
     },
     "radarAlert": {
-      "top": 179,
-      "bottom": 240,
+      "top": 181,
+      "bottom": 242,
       "left": 10,
       "right": 402
     },
     "bbBadge": {
-      "top": 248,
-      "bottom": 290,
+      "top": 250,
+      "bottom": 292,
       "left": 10,
       "right": 402
     },
