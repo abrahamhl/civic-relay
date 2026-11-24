@@ -10,7 +10,7 @@
  *  4. Mapeador geográfico continuo en rejilla de 25 m × 25 m con exportación GeoJSON (0 PII).
  *  5. Orquestador de 1 toque (`runFieldLabBattery`) que ejecuta e interpreta los 8 motores
  *     activos de SENDA en el acto (EKF, DENM 36 B CRC-16, BLE/Two-Ray, RF/Cañón, LWR/RSS,
- *     AR-HUD/Horizonte, IMU firme y Auditoría Ciber/Integridad).
+ *     AR-HUD/Horizonte, IMU firme y Privacidad/Integridad).
  *
  * Privacidad y legalidad (CLAUDE.md §1 + RGPD):
  *  - NUNCA almacena ni exporta direcciones MAC/BSSID ni SSIDs en claro: cualquier identificador
@@ -121,7 +121,7 @@ export function analyzeUrbanCanyon({ gnssHistory = [], buildings = [], linkDistM
 }
 
 /**
- * Analizador físico-estadístico de canal RF pasivo + auditoría ciber (0 PII).
+ * Analizador físico-estadístico de canal RF pasivo + comprobación de privacidad (0 PII).
  * Calcula:
  *  - Factor K de Rice (Greenstein 1999) sobre potencias lineales → LOS vs Rayleigh NLOS.
  *  - Regresión OLS de pérdidas de propagación log-distancia → exponente n̂ y shadowing σ̂ (dB).
@@ -237,7 +237,7 @@ export function analyzeRfEnvironment(samples = []) {
   const snrLin = 10 ** ((rssiMedianDbm - (-107)) / 10);
   const shannonKbps1Mhz = +(1000 * Math.log2(1 + Math.max(0, snrLin))).toFixed(0);
 
-  // 5. Auditoría pasiva de ciberseguridad RF (detección de anomalías sin acción ofensiva)
+  // 5. Comprobación pasiva de anomalías de radio (solo lectura, sin ninguna acción sobre otros equipos)
   const anomalies = [];
   if (rssis.some((r) => r > -15)) anomalies.push('SATURACION_RSSI_CERCANA_O_SPOOF');
   if (rssiStdDb > 18) anomalies.push('VARIANZA_ESPECTRAL_EXTREMA');
@@ -446,7 +446,7 @@ export function createSurfaceMapper({ cellSizeM = 25, maxCells = 4000 } = {}) {
 }
 
 /**
- * Orquestador de 1 toque: ejecuta los 8 motores científicos, RF, visión y ciberseguridad
+ * Orquestador de 1 toque: ejecuta los 8 motores científicos, RF, visión y privacidad
  * sobre el estado vivo del vehículo y devuelve interpretaciones inmediatas para el investigador.
  */
 export function runFieldLabBattery({
@@ -614,12 +614,12 @@ export function runFieldLabBattery({
       : `Calzada clasificada como ${road.surfaceClass} (${road.samples} muestras; IRI es proxy no calibrado en perfilómetro).`,
   });
 
-  // 8. Auditoría de Ciberseguridad, Integridad SHA-256 y Privacidad RGPD
+  // 8. Integridad SHA-256 y privacidad (RGPD)
   const p2pRej = bleStats?.rejected ?? 0;
   const cyberStatus = p2pRej > 0 || rf.securityStatus === 'ANOMALY_FLAGGED' ? 'WARN' : 'OK';
   tests.push({
     id: 'CYBER_INTEGRITY_AUDIT',
-    name: 'Ciberseguridad · Integridad & RGPD',
+    name: 'Privacidad · Integridad & RGPD',
     status: cyberStatus,
     basis: 'MEDIDO',
     headline: `0 MACs/PII · P2P rechazos: ${p2pRej} · BB ${blackbox?.active ? `ACTIVA (${blackbox.count})` : 'en espera'} · Red ${online === false ? 'OFFLINE' : 'OK'}`,

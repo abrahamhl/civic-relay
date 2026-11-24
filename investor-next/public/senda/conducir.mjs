@@ -843,7 +843,7 @@ $('#bbDash')?.addEventListener('click', () => { if (st.bb.active) bbExport(); el
 $('#bbSave')?.addEventListener('click', bbExport);
 $('#markBtn')?.addEventListener('click', () => { bbLog('note', { text: 'MARCA del conductor' }); navigator.vibrate?.(60); say('Marcado'); });
 
-// ── Laboratorio Científico de Campo, Escucha Activa y Mapeo Urbano/RF 25 m (0 PII) ──
+// ── Laboratorio de señal: mapa de cobertura y firme en celdas de 25 m (sin datos personales) ──
 function ingestSurfaceNow(tMs = Date.now()) {
   if (!st.pos) return null;
   const road = analyzeRoadSurfaceImu(st.imuHistory.slice(-24));
@@ -921,17 +921,17 @@ function runLabBattery() {
 function setActiveListen(on) {
   st.activeListen = !!on;
   $('#labChip')?.classList.toggle('live', st.activeListen);
-  if ($('#labChip')) $('#labChip').textContent = st.activeListen ? '● Escucha ON' : '⚡ Lab Campo';
+  if ($('#labChip')) $('#labChip').textContent = st.activeListen ? '● Mapa ON' : '⚡ Laboratorio';
   $('#labStatusPill')?.classList.toggle('live', st.activeListen);
-  if ($('#labStatusPill')) $('#labStatusPill').textContent = st.activeListen ? 'ESCUCHA ACTIVA' : 'EN ESPERA';
+  if ($('#labStatusPill')) $('#labStatusPill').textContent = st.activeListen ? 'MAPEANDO' : 'EN ESPERA';
   $('#labListenBtn')?.classList.toggle('live', st.activeListen);
-  if ($('#labListenBtn')) $('#labListenBtn').textContent = st.activeListen ? '● Escucha activa: ON' : '● Escucha activa: OFF';
+  if ($('#labListenBtn')) $('#labListenBtn').textContent = st.activeListen ? '● Mapa de cobertura: ON' : '● Mapa de cobertura: OFF';
   if (st.activeListen) {
     window.SendaNative?.p2pStart?.();
     ingestSurfaceNow();
-    hint('Escucha activa activada: mapeando celdas de 25 m (cañón GNSS/EKF, firme IMU, RF sin PII y buzón BLE).');
+    hint('Mapa de cobertura activado: celdas de 25 m con calidad del GPS, estado del firme, cobertura de radio (sin guardar identificadores) y buzón Bluetooth.');
   } else {
-    hint('Escucha activa pausada (las celdas ya capturadas se conservan para exportar GeoJSON).');
+    hint('Mapa de cobertura en pausa (las celdas ya capturadas se conservan para exportar GeoJSON).');
   }
   return st.activeListen;
 }
