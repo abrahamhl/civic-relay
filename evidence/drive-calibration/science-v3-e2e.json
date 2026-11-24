@@ -1,0 +1,118 @@
+{
+  "region": "NL",
+  "markVisible": true,
+  "bbBadgeVisible": true,
+  "ekfInit": {
+    "pos": [
+      5.810479,
+      51.294333
+    ],
+    "enuM": [
+      43.22,
+      22.98
+    ],
+    "speedMs": 24.5,
+    "headingDeg": 61.999999999951,
+    "biasAccelMs2": 0,
+    "biasYawRadS": 0,
+    "sigmaPosM": 3.9,
+    "gnssAgeS": 0,
+    "mode": "GNSS_FUSED",
+    "outliersRejected": 0,
+    "gnssRejected": false,
+    "maha2": 0
+  },
+  "ekfAfterJump": {
+    "pos": [
+      5.810791,
+      51.294436
+    ],
+    "enuM": [
+      64.85,
+      34.48
+    ],
+    "speedMs": 24.5,
+    "headingDeg": 61.99999999997078,
+    "biasAccelMs2": 0,
+    "biasYawRadS": 0,
+    "sigmaPosM": 4.78,
+    "gnssAgeS": 1,
+    "mode": "GNSS_FUSED",
+    "outliersRejected": 1,
+    "gnssRejected": true,
+    "maha2": 5786.3
+  },
+  "posDriftAfterJumpM": 24.5,
+  "hCalStatus": {
+    "calibrated": true,
+    "samples": 22,
+    "pitchDeg": 3.51,
+    "horizonY": 0.4069
+  },
+  "hudHorizonY": 0.4069,
+  "drState": {
+    "pos": [
+      5.811724,
+      51.294747
+    ],
+    "enuM": [
+      129.75,
+      68.99
+    ],
+    "speedMs": 24.5,
+    "headingDeg": 62.000000000030354,
+    "biasAccelMs2": 0,
+    "biasYawRadS": 0,
+    "sigmaPosM": 21.82,
+    "gnssAgeS": 4,
+    "mode": "DEAD_RECKONING_IMU",
+    "outliersRejected": 1
+  },
+  "denmBytes": 36,
+  "denmCauseCode": 1,
+  "teleText": "● REC 00:00:00 · 9 filas\n[NL] GPS ±5m 88km/h 62° alt -2m\nEKF GNSS_FUSED ±4.8m · 1 salto(s) GPS rej · H-Cal 22/20 (3.51°)\nIMU 0.0m/s² giro 0°/s\nIA apagada\nRadares 1970 · NDW 769 · SENDA 1\nRed 4g 10Mb/s 0ms · Bat 100%⚡",
+  "corrVisible": true,
+  "corrText": "Retención · 350 mSENDA · otro móvil (sin verificar) · parada AASHTO 150 m · cola LWR ~290 m (modelo)",
+  "radarVisible": true,
+  "radarText": "Radar fijo / Flitspaal · 270 mNL · Cámara fija/tramo (CC BY 4.0) · 10.9 s · OM corr. 85.2 km/h80",
+  "overflowX": 0,
+  "rects": {
+    "tele": {
+      "top": 677,
+      "bottom": 786,
+      "left": 10,
+      "right": 249
+    },
+    "corridorAlert": {
+      "top": 104,
+      "bottom": 171,
+      "left": 10,
+      "right": 402
+    },
+    "radarAlert": {
+      "top": 179,
+      "bottom": 240,
+      "left": 10,
+      "right": 402
+    },
+    "bbBadge": {
+      "top": 248,
+      "bottom": 290,
+      "left": 10,
+      "right": 402
+    },
+    "markBtn": {
+      "top": 806,
+      "bottom": 852,
+      "left": 84,
+      "right": 173
+    },
+    "bottom": {
+      "top": 874,
+      "bottom": 915,
+      "left": 0,
+      "right": 412
+    }
+  },
+  "errors": []
+}

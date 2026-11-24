@@ -6,8 +6,11 @@ import { hazardsAhead, corridorAnnouncement, stoppingDistanceM } from './core/dr
 import { createBlackBox } from './core/drive-blackbox.mjs';
 import { radarsAhead, createSectionTracker, RADAR_RULES } from './core/drive-radars.mjs';
 import { detectRegion, ndwToIncident, dutchMotorwayWindow } from './core/ndw-nl.mjs';
-import { enrichTracksForHud, renderArHud } from './core/drive-ar-hud.mjs';
+import { enrichTracksForHud, renderArHud, DEFAULT_CAM_GEOM } from './core/drive-ar-hud.mjs';
 import { rssLongitudinalSameDir, EXAMPLE_RSS_PARAMS } from './core/drive-physics-v2.mjs';
+import { createGnssImuEkf, createHorizonCalibrator } from './core/drive-kalman-fusion.mjs';
+import { sendaToDenm, denmToSenda, encodeDenmCompact, decodeDenmCompact, isDenmCompact, isInsideDenmRelevance } from './core/cits-denm.mjs';
+import { movingQueueIntercept, EXAMPLE_LWR_HIGHWAY } from './core/traffic-shockwave.mjs';
 import { createLinkProber, isProbePack } from './core/ble-link-probe.mjs';
 import { openPmTilesLocal } from './core/pmtiles-reader.mjs';
 import { parseGdacsRss, parseMtgEvents, osintNear } from './core/osint-feeds.mjs';
@@ -35,6 +38,7 @@ const st = {
   incidents: [], nlIncidents: [], incSource: '', nlIncSource: '', cams: [],
   radars: [], stretches: [], sectionTracker: createSectionTracker([]), radarState: null, sectionState: null,
   me: null, bb: createBlackBox(),
+  ekf: createGnssImuEkf(), ekfState: null, horizonCal: createHorizonCalibrator(),
   ble: { tx: 0, rx: 0, rejected: 0 }, prober: createLinkProber(),
   battery: { pct: null, charging: null }, aiMode: LS.get('senda.drive.aiMode', 'auto'),
   imu: { ax: null, ay: null, az: null, gx: null, gy: null, gz: null, alpha: null, beta: null, gamma: null },
@@ -198,8 +202,14 @@ function updateCorridor() {
   $('#caIco').innerHTML = markerSvg(t.cat, 26);
   $('#caTitle').textContent = `${t.label} · ${fmtDist(t.distM)}${t.road ? ` · ${t.road}` : ''}`;
   const ssdTxt = res.ssdM != null ? ` · parada AASHTO ${Math.round(res.ssdM)} m` : '';
+  const lwrTxt = (t.cat === 'ACCIDENTE' || t.cat === 'CORTE' || t.cat === 'TRAFICO') && (st.speed ?? 0) > 14 && t.distM > 200
+    ? (() => {
+        const lwr = movingQueueIntercept({ distToIncidentM: t.distM, egoSpeedKmh: st.speed * 3.6, incidentAgeS: 60, lwrParams: EXAMPLE_LWR_HIGHWAY });
+        return lwr.queueForming ? ` · cola LWR ~${fmtDist(lwr.interceptDistM)} (modelo)` : '';
+      })()
+    : '';
   const extra = res.dedupedCount > 1 ? ` · +${res.dedupedCount - 1} más` : '';
-  $('#caSub').textContent = `${t.sourceLabel}${ssdTxt}${extra}`;
+  $('#caSub').textContent = `${t.sourceLabel}${ssdTxt}${lwrTxt}${extra}`;
   const ck = `${t.label}|${t.urgency}|${Math.round(t.distM / 100)}`; if (ck !== tele.corrKey) { tele.corrKey = ck; bbLog('corridor', { label: t.label, urgency: t.urgency, distM: Math.round(t.distM), src: t.sourceLabel, ssdM: res.ssdM != null ? Math.round(res.ssdM) : null }); }
   tele.corr = `${t.label} ${fmtDist(t.distM)} ${t.urgency}`;
   const phrase = corridorAnnouncement(t, st.saidCorridor);
@@ -249,10 +259,16 @@ function updateOsint() {
     : { count: 0, closestKm: null, topType: null, topLevel: null };
 }
 
-// ── GPS, seguimiento y navegación ──
+// ── GPS, fusión EKF 6 estados, seguimiento y navegación ──
 function onPos(p) {
   st.lastFix = p;
-  st.pos = [p.coords.longitude, p.coords.latitude]; st.speed = p.coords.speed;
+  st.ekfState = st.ekf.updateGnss({
+    lon: p.coords.longitude, lat: p.coords.latitude,
+    accuracyM: p.coords.accuracy ?? 8, speedMs: p.coords.speed, headingDeg: p.coords.heading,
+    tMs: p.timestamp || Date.now(),
+  });
+  st.pos = st.ekfState?.gnssRejected && st.ekfState.pos ? st.ekfState.pos : [p.coords.longitude, p.coords.latitude];
+  st.speed = p.coords.speed;
   st.region = detectRegion(st.pos);
   if (p.coords.heading != null && !Number.isNaN(p.coords.heading) && (p.coords.speed ?? 0) > 1) st.heading = p.coords.heading;
   $('#speed').innerHTML = `<div>${st.speed == null ? '–' : Math.round(st.speed * 3.6)}<small>km/h</small></div>`;
@@ -265,7 +281,7 @@ function onPos(p) {
   updateCorridor();
   updateRadars(p.timestamp || Date.now());
   updateOsint();
-  bbLog('gps', { lat: +p.coords.latitude.toFixed(6), lon: +p.coords.longitude.toFixed(6), acc: p.coords.accuracy != null ? Math.round(p.coords.accuracy) : null, v: p.coords.speed, hdg: p.coords.heading, alt: p.coords.altitude != null ? Math.round(p.coords.altitude) : null, gt: p.timestamp });
+  bbLog('gps', { lat: +p.coords.latitude.toFixed(6), lon: +p.coords.longitude.toFixed(6), acc: p.coords.accuracy != null ? Math.round(p.coords.accuracy) : null, v: p.coords.speed, hdg: p.coords.heading, alt: p.coords.altitude != null ? Math.round(p.coords.altitude) : null, gt: p.timestamp, ekfRej: !!st.ekfState?.gnssRejected });
   tele.gps = p.coords;
 }
 navigator.geolocation?.watchPosition(onPos, () => { $('#speed').innerHTML = '<div>–<small>sin GPS</small></div>'; }, { enableHighAccuracy: true, maximumAge: 1000 });
@@ -395,6 +411,19 @@ window.sendaP2P = (ev) => {
     }
     return;
   }
+  if (isDenmCompact(bytes)) {
+    try {
+      const denm = decodeDenmCompact(bytes);
+      const rep = denmToSenda(denm);
+      const rel = st.pos ? isInsideDenmRelevance(denm, st.pos, Date.now()) : { relevant: true, distM: null };
+      if (!rel.relevant) return;
+      const m = mergeReports(reports(), [{ kind: rep.kind, side: 'SIN_INDICAR', lon: rep.lon, lat: rep.lat, t: rep.t, own: false }]);
+      LS.set('senda.ruta.reports', m.reports); drawMarkers(); updateCorridor();
+      st.ble.rx++;
+      if (m.added) say(`Aviso C-ITS DENM recibido: ${REPORT_KINDS[rep.kind]?.label ?? rep.kind}`);
+      return hint(`C-ITS DENM recibido (causa ETSI ${rep.causeCode}${rel.distM != null ? ` · ${fmtDist(rel.distM)}` : ''}).`);
+    } catch (e) { return hint('DENM compacto no válido: ' + e.message); }
+  }
   if (!isReportPack(bytes)) return hint('Ha llegado un mensaje cifrado por Bluetooth: ábrelo en Mensajes.');
   try {
     const { reports: got, rejected } = unpackReports(bytes);
@@ -457,10 +486,12 @@ function hudPhysicsState(iv = 250) {
   const ssdM = stoppingDistanceM(spd);
   const rssM = spd != null && spd > 0 ? rssLongitudinalSameDir({ vRearMs: spd, vFrontMs: spd }, EXAMPLE_RSS_PARAMS).dMinM : null;
   const curvature = spd != null && spd > 3 && typeof st.imu.ay === 'number' ? st.imu.ay / (spd * spd) : 0;
+  const hCal = st.horizonCal.status();
+  const geom = hCal.calibrated ? { ...DEFAULT_CAM_GEOM, pitchDeg: hCal.pitchDeg, horizonY: hCal.horizonY } : DEFAULT_CAM_GEOM;
   return {
     speedMs: spd, ssdM, rssM, curvature, imu: st.imu, region: st.region,
     radarTop: st.radarState?.top ?? null, corridorTop: st.corridor?.top ?? null,
-    pos: st.pos, aiHz: +(1000 / iv).toFixed(1), bbActive: st.bb.active,
+    pos: st.pos, aiHz: +(1000 / iv).toFixed(1), bbActive: st.bb.active, geom,
   };
 }
 $('#camBtn').addEventListener('click', async () => {
@@ -654,6 +685,19 @@ window.addEventListener('devicemotion', (e) => {
     if (typeof g.beta === 'number' && Number.isFinite(g.beta)) st.imu.gy = g.beta;
     if (typeof g.gamma === 'number' && Number.isFinite(g.gamma)) st.imu.gz = g.gamma;
   }
+  const yawRadS = (st.imu.gz ?? 0) * Math.PI / 180;
+  const aLong = e.acceleration?.x ?? 0;
+  if (st.imu.ay != null && st.imu.az != null) {
+    st.horizonCal.update({ ax: st.imu.ax ?? 0, ay: st.imu.ay, az: st.imu.az, speedMs: st.speed ?? 0, yawRateRadS, aLongMs2: aLong });
+  }
+  if (st.ekf.initialized && st.lastFix) {
+    const nowMs = Date.now();
+    const fixMs = st.lastFix.timestamp || nowMs;
+    if (nowMs - fixMs > 2500) {
+      st.ekfState = st.ekf.predict({ tMs: nowMs, aLongMs2: aLong, yawRateRadS });
+      if (st.ekfState?.pos) st.pos = st.ekfState.pos;
+    }
+  }
 }, { passive: true });
 window.addEventListener('deviceorientation', (e) => {
   if (typeof e.alpha === 'number' && Number.isFinite(e.alpha)) st.imu.alpha = e.alpha;
@@ -670,6 +714,12 @@ function loadOsintGeoJson(gj) {
   st.osintEvents = parseMtgEvents(gj);
   updateOsint();
   return st.osintEvents.length;
+}
+function exportDenm(kind = 'obstaculo') {
+  if (!st.pos) return null;
+  const denm = sendaToDenm({ kind, lon: st.pos[0], lat: st.pos[1], headingDeg: st.heading, t: Date.now() });
+  const compact = encodeDenmCompact(denm);
+  return { denm, compact, b64: b64(compact), bytes: compact.length };
 }
 
 function rfSnapshot() {
@@ -691,10 +741,11 @@ const f1 = (x, d = 1) => (x == null || Number.isNaN(x) ? '–' : Number(x).toFix
 function drawTele() {
   const el = $('#tele'); if (!el) return;
   el.hidden = !tele.on && !bb; if (el.hidden) return;
-  const g = tele.gps, n = tele.net, b = tele.bat;
+  const g = tele.gps, n = tele.net, b = tele.bat, ek = st.ekfState, hc = st.horizonCal.status();
   el.textContent = [
     bb ? `● REC ${new Date(Date.now() - bb.t0).toISOString().slice(11, 19)} · ${bb.rows.length} filas${bbScreen ? ' · pantalla' : ''}` : '',
     `[${st.region}] GPS ${g ? `±${f1(g.accuracy, 0)}m ${f1((g.speed ?? NaN) * 3.6, 0)}km/h ${f1(g.heading, 0)}° alt ${f1(g.altitude, 0)}m` : 'sin señal'}`,
+    ek ? `EKF ${ek.mode} ±${f1(ek.sigmaPosM, 1)}m${ek.outliersRejected ? ` · ${ek.outliersRejected} salto(s) GPS rej` : ''} · H-Cal ${hc.samples}/20 (${hc.pitchDeg}°)` : '',
     `IMU ${f1(tele.imu, 1)}m/s² giro ${f1(tele.gyro, 0)}°/s`,
     `IA ${camOn || dash.on ? `${f1(tele.det.hz, 1)}Hz ${f1(tele.det.ms, 0)}ms ${tele.det.n}det · ${tele.top ?? ''}` : 'apagada'}`,
     `Radares ${st.radars.length} · ${st.region === 'NL' ? `NDW ${st.nlIncidents.length}` : `DGT ${st.incidents.length}`} · SENDA ${reports().length}`,
@@ -779,8 +830,9 @@ loadIncidents();
 setInterval(() => { if (!document.hidden) loadIncidents(); }, 5 * 60 * 1000);
 // Para pruebas automáticas
 globalThis.sendaDrive = {
-  st, goTo, onPos, dash, updateCorridor, updateRadars,
+  st, goTo, onPos, dash, updateCorridor, updateRadars, drawTele,
   bbStart, bbSample, bbExport, setAiMode, aiIntervalMs,
   sendBleProbe, loadPmTilesFile, loadOsintXml, loadOsintGeoJson,
+  exportDenm, encodeDenmCompact, decodeDenmCompact, ekf: st.ekf, horizonCal: st.horizonCal,
   renderArHud, enrichTracksForHud, hudPhysicsState, createTracker, FULL_RULES,
 };
