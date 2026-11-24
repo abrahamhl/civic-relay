@@ -25,6 +25,7 @@ import { saveBlob } from './save-file.mjs';
 import { packReports, unpackReports, mergeReports, isReportPack } from './core/hazard-share.mjs';
 import { b64, unb64 } from './core/b64.mjs';
 import { createBlackbox } from './core/blackbox.mjs';
+import { observe } from './core/hazard-belief.mjs';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -213,11 +214,23 @@ function updateCorridor() {
     : '';
   const extra = res.dedupedCount > 1 ? ` · +${res.dedupedCount - 1} más` : '';
   $('#caSub').textContent = `${t.sourceLabel}${ssdTxt}${lwrTxt}${extra}`;
+  st.corrVoteId = t.source === 'SENDA' ? t.reportId : null; $('#caVote').hidden = st.corrVoteId == null;
   const ck = `${t.label}|${t.urgency}|${Math.round(t.distM / 100)}`; if (ck !== tele.corrKey) { tele.corrKey = ck; bbLog('corridor', { label: t.label, urgency: t.urgency, distM: Math.round(t.distM), src: t.sourceLabel, ssdM: res.ssdM != null ? Math.round(res.ssdM) : null }); }
   tele.corr = `${t.label} ${fmtDist(t.distM)} ${t.urgency}`;
   const phrase = corridorAnnouncement(t, st.saidCorridor);
   if (phrase) say(phrase);
 }
+
+// «Sigue ahí» / «Ya no está»: cada respuesta actualiza la probabilidad bayesiana del aviso (hazard-belief).
+function voteCorridor(obs) {
+  const id = st.corrVoteId; if (id == null) return;
+  const list = reports(), i = list.findIndex((r) => r.id === id); if (i < 0) return;
+  list[i] = observe(list[i], obs); LS.set('senda.ruta.reports', list);
+  bbLog('note', { text: `voto ${obs === 'neg' ? 'ya no está' : 'sigue ahí'} · aviso ${id}` });
+  say(obs === 'neg' ? 'Gracias, anotado que ya no está' : 'Gracias, confirmado'); updateCorridor(); drawMarkers();
+}
+$('#caYes')?.addEventListener('click', (e) => { e.stopPropagation(); voteCorridor('conf'); });
+$('#caNo')?.addEventListener('click', (e) => { e.stopPropagation(); voteCorridor('neg'); });
 
 // ── Radares fijos, de semáforo y de tramo publicados (ES + NL, 100 % legal, sin móviles policiales) ──
 function updateRadars(nowMs = Date.now()) {
@@ -353,7 +366,7 @@ $('#veil').addEventListener('click', () => openSheet(false));
 $('#grid').addEventListener('click', (e) => { const k = e.target.closest('[data-k]')?.dataset.k; if (k) { openSheet(false); saveReport(k); } });
 function saveReport(kind, side = 'SIN_INDICAR') {
   if (!st.pos) return hint('Sin GPS: no se puede situar el aviso.');
-  const list = reports(); list.push({ kind, side, lon: st.pos[0], lat: st.pos[1], t: Date.now(), own: true }); LS.set('senda.ruta.reports', list);
+  const list = reports(); list.push({ kind, side, lon: st.pos[0], lat: st.pos[1], t: Date.now(), own: true, id: crypto.getRandomValues(new Uint32Array(1))[0] }); LS.set('senda.ruta.reports', list);
   drawMarkers(); updateCorridor(); say(`Aviso de ${REPORT_KINDS[kind].label} guardado`); hint(`Aviso «${REPORT_KINDS[kind].label}» guardado en tu posición. Para pasarlo a otros móviles SENDA cercanos: botón naranja → «Bluetooth».`);
 }
 window.sendaVoice = (res) => {
