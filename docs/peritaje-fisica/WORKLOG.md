@@ -118,3 +118,21 @@
   - `uncertainty-uq.test.mjs`: **4/4 en verde** (estratificación exacta 1-por-estrato en LHS, verificación analítica de los 6 índices de Sobol $S_1, S_2, S_3, S_{T1}, S_{T2}, S_{T3}$ en la función de Ishigami, CRPS/Brier/CSI/cobertura).
   - `index-exports.test.mjs` + `web-parity.test.mjs` → **12/12 en verde (0 fallos)**.
 - **Qué falta:** Fase 3 (integraciones restantes de alto valor de `calmpath-maps-pro` y `civil-sentry` enfocadas en SENDA: `emergency-routing-zones.mjs` y `triage-governance.mjs`) y Fase 4 (benchmarks reales, documentación completa, ejecución íntegra de `node --test`, parches y ZIP final).
+
+## Fase 3 · Integraciones de alto valor de CalmPath Maps Pro y Civil Sentry enfocadas en SENDA
+- **Commit fase anterior:** `28ea077`
+- **Hora UTC real de cierre:** `2026-11-25T18:27:40Z`
+- **Qué se hizo:**
+  - **Módulo 3A (`emergency-routing-zones.mjs`, desde `calmpath-maps-pro` adaptado a emergencias SENDA):**
+    - Enrutador de evacuación multivector A-estrella (`routeEvacuationGraph`) con puertas físicas de intransitabilidad (`assessHumanFloodStability` Cox/DEFRA, `assessVehicleFloodStability` Shand/Martínez-Gomariz, aglomeración Fruin 1971, fuego/humo PM2.5 y perfil de movilidad reducida `low_mobility_accessible`), más respaldo sin grafo por campo potencial (`computeFallbackEscapeBearing`).
+    - Motor multicriterio explicable de zonas seguras/albergues (`rankEmergencySafeZones`) con pesos declarados obligatorios, taxonomía de procedencia de 7 niveles (`PROVENANCE_LEVELS`), fortalezas, factores de riesgo y puertas eliminatorias físicas.
+    - Filtros AOI (`circle`, `bbox`, `polygon`), clustering espacial determinista por zoom (`clusterIncidentsByGrid`) y escáner situacional en 1 clic (`scanViewportSituation`, `canPublicWarn: false`).
+    - Empaquetador de área sin red (`createOfflineAreaPackage` / `verifyOfflineAreaPackage`) con SHA-256 por capa + manifiesto y decaimiento suave de frescura por TTL, y registro de salud de fuentes con degradación honesta (`createSourceHealthRegistry`: nunca etiqueta caché caducada como `OBSERVED`).
+  - **Módulo 3B (`triage-governance.mjs`, desde `civil-sentry` y `calmpath-maps-pro`):**
+    - Grafo de conocimiento situacional (`createSituationGraph`) con nodos tipados y aristas `SUPPORTS | CONTRADICTS | SUPERSEDES | LOCATED_IN | AFFECTS | SOURCED_FROM | AUTHORIZED_BY`.
+    - Panel determinista de 4 especialistas para el comité (`runCommitteeTriagePanel`: Física/Hidrología, Operaciones PC, Forense/Fuentes y Auditor Adversario Red-Team) que reconcilia desacuerdos y mantiene `canPublicWarn === false`.
+    - Auto-auditoría epistémica y de modelo de amenazas (`runEpistemicSecurityAudit`, STRIDE + MITRE ATT&CK + ATLAS) que verifica 8 invariantes críticos (fundamentación, puerta N5, aislamiento de simulacros, error≠ausencia, cadenas hash, consentimiento+firma, cero PII en logs y señales de inyección).
+  - Pruebas nuevas: `emergency-routing-zones.test.mjs` y `triage-governance.test.mjs`. Sincronización web completa (`sync-web.mjs`) y exportaciones en `packages/senda/src/index.mjs`.
+- **Qué se probó:**
+  - `node --test packages/senda/tests/emergency-routing-zones.test.mjs packages/senda/tests/triage-governance.test.mjs packages/senda/tests/index-exports.test.mjs packages/senda/tests/web-parity.test.mjs` → **11/11 en verde (0 fallos)**.
+- **Qué falta:** Fase 4 (script de benchmarks reales en esta VM, documentación completa exigida en §4 + documentos de gobernanza `CURRENT_TRUTH.md`, `EVIDENCE_MATRIX.md`, `THREAT_MODEL.md`, manifiesto SHA-256 de datos abiertos, ejecución completa de toda la suite `node --test`, `git format-patch`, empaquetado y verificación del ZIP final + SHA-256).

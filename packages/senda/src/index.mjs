@@ -107,3 +107,5 @@ export * from './fire-rothermel.mjs';
 export * from './rail-physics-etcs.mjs';
 export * from './radio-propagation-advanced.mjs';
 export * from './uncertainty-uq.mjs';
+export * from './emergency-routing-zones.mjs';
+export * from './triage-governance.mjs';
