@@ -26,6 +26,7 @@ import { packReports, unpackReports, mergeReports, isReportPack } from './core/h
 import { b64, unb64 } from './core/b64.mjs';
 import { createBlackbox } from './core/blackbox.mjs';
 import { observe } from './core/hazard-belief.mjs';
+import { summarizeScan, radarPoints, drawSignalRadar } from './core/signal-radar.mjs';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -232,9 +233,54 @@ function voteCorridor(obs) {
 $('#caYes')?.addEventListener('click', (e) => { e.stopPropagation(); voteCorridor('conf'); });
 $('#caNo')?.addEventListener('click', (e) => { e.stopPropagation(); voteCorridor('neg'); });
 
+// ── Cómo te mueves: coche, bici o a pie (rutas de su tipo; los radares de velocidad solo en coche) ──
+st.mode = ['car', 'bike', 'foot'].includes(LS.get('senda.drive.mode', 'car')) ? LS.get('senda.drive.mode', 'car') : 'car';
+const MODE_ES = { car: 'en coche', bike: 'en bici', foot: 'a pie' };
+function setMode(m, announce = true) {
+  st.mode = m; LS.set('senda.drive.mode', m);
+  document.querySelectorAll('#favs .mode').forEach((b) => b.classList.toggle('on', b.dataset.mode === m));
+  document.documentElement.dataset.mode = m;
+  bbLog('note', { text: `modo ${m}` }); updateRadars(); updateCorridor();
+  if (announce) { hint(`Modo ${MODE_ES[m]}: rutas ${MODE_ES[m]}${m === 'car' ? ', radares fijos oficiales' : ', sin radares de velocidad'}. Prueba «📡 Señales» y la cámara.`); say(`Modo ${MODE_ES[m]}`); }
+  if (st.dest && st.route) goTo(st.dest, true);
+}
+document.querySelectorAll('#favs .mode').forEach((b) => { b.classList.toggle('on', b.dataset.mode === st.mode); b.addEventListener('click', () => setMode(b.dataset.mode)); });
+document.documentElement.dataset.mode = st.mode;
+
+// ── 📡 Señales a tu alrededor: Wi-Fi y Bluetooth cercanos (app Android), sin nombres ni direcciones ──
+const sig = { open: false, pts: [], sum: null, sweep: 0, timer: null, last: 0 };
+function sigScan() {
+  const N = window.SendaNative;
+  if (typeof N?.radioScan !== 'function') { $('#sigStats').textContent = 'Solo en la app de Android: el navegador no puede ver redes Wi-Fi ni Bluetooth.'; return false; }
+  sig.last = Date.now(); $('#sigStats').textContent = 'Escuchando 4 s…'; N.radioScan(); return true;
+}
+window.sendaRadio = (scan) => {
+  sig.pts = radarPoints(scan); sig.sum = summarizeScan(scan);
+  const s = sig.sum;
+  bbLog('radio', { mode: st.mode, wifiN: s.wifiN, w24: s.wifiByBand['2.4'], w5: s.wifiByBand['5'], w6: s.wifiByBand['6'], wifiBest: s.wifiBestDbm, wifiMed: s.wifiMedianDbm, bleN: s.bleN, bleBest: s.bleBestDbm, sendaNear: s.sendaNear, fresh: s.wifiFresh });
+  $('#sigStats').innerHTML = `<b>${s.wifiN}</b> ${s.wifiN === 1 ? 'red Wi-Fi' : 'redes Wi-Fi'}<br><small>${s.wifiByBand['2.4']} en 2,4 · ${s.wifiByBand['5']} en 5 · ${s.wifiByBand['6']} en 6 GHz${s.wifiBestDbm != null ? ` · la más fuerte ${s.wifiBestDbm} dBm` : ''}</small><br><b>${s.bleN}</b> ${s.bleN === 1 ? 'aparato Bluetooth' : 'aparatos Bluetooth'}${s.bleBestDbm != null ? ` <small>(más fuerte ${s.bleBestDbm} dBm)</small>` : ''}<br><b style="color:#ff9f0a">${s.sendaNear}</b> ${s.sendaNear === 1 ? 'móvil SENDA cerca' : 'móviles SENDA cerca'}${s.wifiFresh ? '' : '<br><small>Wi-Fi: Android limitó el barrido, datos de hace poco</small>'}${s.note ? `<br><small>${esc(s.note)}</small>` : ''}`;
+  if (s.sendaNear > 0) { navigator.vibrate?.(80); say(`${s.sendaNear} móvil${s.sendaNear > 1 ? 'es' : ''} SENDA cerca`); }
+};
+function sigFrame() {
+  if (!sig.open) return;
+  sig.sweep = (sig.sweep + 0.05) % (Math.PI * 2);
+  const c = $('#sigCanvas'); drawSignalRadar(c.getContext('2d'), c.width, sig.pts, sig.sweep);
+  requestAnimationFrame(sigFrame);
+}
+function sigOpen(on) {
+  sig.open = on; $('#sig').hidden = !on; clearInterval(sig.timer);
+  if (on) { sigScan(); sig.timer = setInterval(sigScan, 30_000); requestAnimationFrame(sigFrame); } // Android permite ~4 barridos Wi-Fi cada 2 min
+}
+$('#sigChip')?.addEventListener('click', () => sigOpen(!sig.open));
+$('#sigClose')?.addEventListener('click', () => sigOpen(false));
+$('#sigScan')?.addEventListener('click', sigScan);
+// Con la caja negra en marcha y fuera del coche, se mide la malla cada 30 s aunque el radar esté cerrado.
+setInterval(() => { if (bb && st.mode !== 'car' && !sig.open && Date.now() - sig.last > 29_000) { if (typeof window.SendaNative?.radioScan === 'function') { sig.last = Date.now(); window.SendaNative.radioScan(); } } }, 5000);
+
 // ── Radares fijos, de semáforo y de tramo publicados (ES + NL, 100 % legal, sin móviles policiales) ──
 function updateRadars(nowMs = Date.now()) {
   const el = $('#radarAlert');
+  if (st.mode !== 'car') { st.radarState = null; st.sectionState = null; if (el) el.hidden = true; return; } // radares: solo en coche
   if (!st.pos) { st.radarState = null; st.sectionState = null; if (el) el.hidden = true; return; }
   const nowHour = new Date(nowMs).getHours();
   const res = radarsAhead({ pos: st.pos, headingDeg: st.heading, speedMs: st.speed, points: st.radars, nowHour });
@@ -320,7 +366,7 @@ async function goTo(dest, reroute = false) {
   hint(reroute ? 'Recalculando…' : 'Calculando ruta…');
   $('#etaBox').hidden = false; $('#searchBox').hidden = true;
   try {
-    const r = parseRoute(await (await fetch(routeUrl({ from: st.pos, to: dest.at }))).json());
+    const r = parseRoute(await (await fetch(routeUrl({ from: st.pos, to: dest.at, mode: st.mode }))).json());
     if (!r.ok) return hint('No hay ruta: ' + r.reason);
     st.route = r; st.said = new Set(); st.follow = true;
     st.map?.getSource('route')?.setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: r.coords } });
@@ -720,7 +766,7 @@ window.addEventListener('devicemotion', (e) => {
   const yawRadS = (st.imu.gz ?? 0) * Math.PI / 180;
   const aLong = e.acceleration?.x ?? 0;
   if (st.imu.ay != null && st.imu.az != null) {
-    st.horizonCal.update({ ax: st.imu.ax ?? 0, ay: st.imu.ay, az: st.imu.az, speedMs: st.speed ?? 0, yawRateRadS, aLongMs2: aLong });
+    st.horizonCal.update({ ax: st.imu.ax ?? 0, ay: st.imu.ay, az: st.imu.az, speedMs: st.speed ?? 0, yawRateRadS: yawRadS, aLongMs2: aLong });
     st.imuHistory.push({ ax: st.imu.ax ?? 0, ay: st.imu.ay, az: st.imu.az, speedMs: st.speed ?? 0 });
     if (st.imuHistory.length > 120) st.imuHistory.shift();
   }
@@ -728,7 +774,7 @@ window.addEventListener('devicemotion', (e) => {
     const nowMs = Date.now();
     const fixMs = st.lastFix.timestamp || nowMs;
     if (nowMs - fixMs > 2500) {
-      st.ekfState = st.ekf.predict({ tMs: nowMs, aLongMs2: aLong, yawRateRadS });
+      st.ekfState = st.ekf.predict({ tMs: nowMs, aLongMs2: aLong, yawRateRadS: yawRadS });
       if (st.ekfState?.pos) st.pos = st.ekfState.pos;
     }
   }
@@ -810,7 +856,7 @@ function bbSample() {
 }
 function bbStart() {
   st.bb.reset(); st.bb.start();
-  bb = createBlackbox({ meta: { app: 'SENDA Drive', page: 'conducir', region: st.region, ua: navigator.userAgent, screen: `${screen.width}x${screen.height}@${devicePixelRatio}`, native: !!window.SendaNative, radios: (() => { try { return JSON.parse(window.SendaNative?.radioCaps?.() ?? 'null'); } catch { return null; } })(), privacy: 'contiene tu recorrido GPS; sin imágenes de cámara' } });
+  bb = createBlackbox({ meta: { app: 'SENDA Drive', page: 'conducir', mode: st.mode, region: st.region, ua: navigator.userAgent, screen: `${screen.width}x${screen.height}@${devicePixelRatio}`, native: !!window.SendaNative, radios: (() => { try { return JSON.parse(window.SendaNative?.radioCaps?.() ?? 'null'); } catch { return null; } })(), privacy: 'contiene tu recorrido GPS; sin imágenes de cámara' } });
   tele.corrKey = ''; sampleSlow();
   $('#bbBtn')?.classList.add('rec', 'on'); $('#bbDash')?.classList.add('on');
   $('#bbBadge').hidden = false; $('#markBtn').hidden = false;

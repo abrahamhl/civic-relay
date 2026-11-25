@@ -50,3 +50,11 @@ test('resumen: fijos con mala precisión (> 50 m) no suman distancia', () => {
   const rows = [{ k: 'head', schema: SCHEMA, t0: 0 }, { k: 'gps', t: 0, lat: 39, lon: -0.4, acc: 5 }, { k: 'gps', t: 1000, lat: 39.01, lon: -0.4, acc: 300 }];
   assert.equal(summarize(rows).gps.distanceKm, 0);
 });
+
+test('resumen: barridos de señales (malla) sin identificadores', () => {
+  const c = clock(); const bb = createBlackbox({ now: c.now });
+  bb.add('radio', { wifiN: 12, bleN: 30, sendaNear: 0 }); c.step(30_000);
+  bb.add('radio', { wifiN: 20, bleN: 8, sendaNear: 2 });
+  const s = summarize(bb.rows);
+  assert.deepEqual(s.radio, { scans: 2, wifiMax: 20, wifiMedian: 16, bleMax: 30, sendaMax: 2 });
+});
