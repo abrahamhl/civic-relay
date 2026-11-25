@@ -99,3 +99,4 @@ export * from './smoke-exposure.mjs';
 export * from './alert-watch.mjs';
 export * from './citizen-report.mjs';
 export * from './report-forensics.mjs';
+export * from './report-protocol.mjs';

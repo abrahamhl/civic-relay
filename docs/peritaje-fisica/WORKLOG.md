@@ -36,3 +36,15 @@
 - **Qué se probó:**
   - `node --test packages/senda/tests/report-forensics.test.mjs packages/senda/tests/index-exports.test.mjs packages/senda/tests/web-parity.test.mjs` → **12/12 en verde (0 fallos)** (incluye verificación analítica, TLE real AMSAT del repo y casos de abuso).
 - **Qué falta:** Fases 1.3 (`report-protocol.mjs`), 1.4, 1.5, 1.6, 2, 3 y 4.
+
+## Fase 1.3 · Niveles N0–N5, protocolo de transiciones y puerta criptográfica humana (`report-protocol.mjs`)
+- **Commit fase anterior:** `0174632`
+- **Hora UTC real de cierre:** `2026-11-25T17:51:03Z`
+- **Qué se hizo:**
+  - Nuevo módulo [`packages/senda/src/report-protocol.mjs`](../../packages/senda/src/report-protocol.mjs) (sincronizado en `investor-next/public/senda/core/report-protocol.mjs` y exportado en `packages/senda/src/index.mjs`):
+    - Máquina de estados `N0 → N1 → N2 → N3 → N4` automática con trazabilidad por transición, descenso automático por contradicción verificada o decaimiento exponencial bayesiano, umbrales de riesgo con fuente citada obligatoria (`createRiskThreshold`, `PUBLISHED_RISK_THRESHOLDS`), borrador CAP 1.2 restringido en N4 (`buildCommitteeCapDraft` reutilizando `incidentToCap`) y `canPublicWarn: false` inmutable en toda ruta automática.
+    - Puerta criptográfica humana para N5 (`createAuthorityKeyPair`, `issueAuthorityGrant`, `verifyAuthorityGrant`, `authorizePublicWarningN5`, `cancelPublicWarningN5`): exige `operationalStatus === 'ACTUAL'`, `AuthorityGrant` firmado Ed25519 contra ancla institucional, ventana temporal estricta sin hueco `NaN`, geocerca, alcance de peligro, decisión firmada Ed25519 por la autoridad humana y registro en `createAuditLog` (SHA-256).
+  - Pruebas nuevas: `packages/senda/tests/report-protocol.test.mjs`.
+- **Qué se probó:**
+  - `node --test packages/senda/tests/report-protocol.test.mjs packages/senda/tests/index-exports.test.mjs packages/senda/tests/web-parity.test.mjs` → **8/8 en verde (0 fallos)** (incluye todas las transiciones N0–N5, descenso, bloqueo de simulación/grant caducada/fuera de geocerca, cancelación N5 y resistencia a inundación Sybil de 25 reportes).
+- **Qué falta:** Fases 1.4 (`reportar.html`, `comite.html`), 1.5, 1.6, 2, 3 y 4.
