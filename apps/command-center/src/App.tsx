@@ -322,6 +322,7 @@ export function App() {
               <p>Reconstrucción de catástrofes reales sobre relieve 3D con línea del tiempo. Cada dato lleva su etiqueta: REAL (medido, con fuente), ESTIMADO (de un organismo externo), MODELO (calculado por SENDA) o ESCENARIO (parámetros elegidos por el operador).</p>
               <ul style={{ lineHeight: 1.5 }}>
                 <li><b>Incendio 4D</b> · San Martín de Valdeiglesias, 23-07-2026: Sentinel-2, EFFIS, frente modelado minuto a minuto, humo (Briggs), combustible, pendiente, probabilidad.</li>
+                <li><b>Radar de personas</b> · sensor mmWave de 24 GHz (RD-03D/LD2450) por USB: hasta tres personas en movimiento, seguimiento Kalman, calibración con cinta métrica y trazas GeoJSON con huella.</li>
                 <li><b>Tren 4D</b> · Adamuz, 18-01-2026: cronología al segundo con fuentes, diagrama espacio-tiempo, física del frenado y tiempos de respuesta.</li>
                 <li><b>DANA 4D</b> · Valencia, 29-10-2024: agua observada por Copernicus EMS, cauces y cuencas, telemetría del Poyo con fuentes, antelación frente al ES-Alert, tiempo de llegada aguas abajo.</li>
               </ul>
@@ -330,6 +331,7 @@ export function App() {
                 <a className="btn" href="/senda/incendio4d.html?pro=1" style={{ display: 'inline-block', padding: '12px 18px', borderRadius: 12, background: '#ff7756', color: '#1a0b06', textDecoration: 'none', fontWeight: 700 }}>Abrir Incendio 4D</a>
                 <a className="btn" href="/senda/dana4d.html?pro=1" style={{ display: 'inline-block', padding: '12px 18px', borderRadius: 12, background: '#5ac8fa', color: '#001a2a', textDecoration: 'none', fontWeight: 700 }}>Abrir DANA 4D</a>
                 <a className="btn" href="/senda/tren4d.html?pro=1" style={{ display: 'inline-block', padding: '12px 18px', borderRadius: 12, background: '#ff375f', color: '#fff', textDecoration: 'none', fontWeight: 700 }}>Abrir Tren 4D</a>
+                <a className="btn" href="/senda/personas.html?pro=1" style={{ display: 'inline-block', padding: '12px 18px', borderRadius: 12, background: '#34d399', color: '#04150d', textDecoration: 'none', fontWeight: 700 }}>Abrir Radar de personas</a>
               </div>
             </section>
           )}

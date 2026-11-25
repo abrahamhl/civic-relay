@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#04080b">
+<meta name="description" content="SENDA · Radar de personas: conecta un radar mmWave de 24 GHz de bajo coste (RD-03D / LD2450), sigue hasta tres personas en movimiento, calibra el montaje con cinta métrica y exporta las trazas con huella SHA-256.">
+<title>SENDA · Radar de personas</title>
+<link rel="icon" href="/senda/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/senda/fonts/fonts.css">
+<style>
+:root{--bg:#04080b;--p:#0b1116;--p2:#111a21;--line:#1d2830;--t:#eef3f4;--m:#93a7b1;--d:#5d6e77;--ember:#ff7756;--mint:#34d399;--sky:#91d7e8;--sun:#fbbf24;--rose:#ff5b6e}
+*{box-sizing:border-box}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+html,body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 "Inter",system-ui,sans-serif;font-feature-settings:"tnum" 1;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--sky)}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+header{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;padding:18px 20px 10px;border-bottom:1px solid var(--line)}
+header h1{margin:0;font-size:22px;font-weight:650;letter-spacing:-.02em}
+header p{margin:0;color:var(--m);font-size:14px}
+header a.back{margin-left:auto;color:var(--m);font-size:14px;text-decoration:none}
+main{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:0;min-height:calc(100svh - 64px)}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+#scope{position:relative;background:#020507;border-right:1px solid var(--line);min-height:420px}
+#ppi{position:absolute;inset:0;width:100%;height:100%;display:block}
+#hud{position:absolute;left:14px;top:12px;font-size:12px;color:var(--m);line-height:1.6;pointer-events:none}
+#hud b{color:var(--t);font-weight:600}
+#basis{position:absolute;right:14px;top:12px;max-width:min(46%,420px);font-size:12px;color:var(--m);display:flex;align-items:flex-start;gap:6px;text-align:right;justify-content:flex-end}
+#basis .sq{flex:none;margin-top:4px}
+.sq{display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--d)}
+.sq.real{background:var(--mint)}.sq.sim{background:var(--sun)}.sq.calc{background:var(--sky)}
+aside{padding:16px 18px 40px;overflow:auto;max-height:calc(100svh - 64px)}
+@media(max-width:900px){aside{max-height:none}}
+section{padding:14px 0;border-bottom:1px solid var(--line)}
+section:last-child{border-bottom:0}
+h2{margin:0 0 8px;font-size:15px;font-weight:600}
+.note{color:var(--m);font-size:13px;margin:6px 0 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+[hidden]{display:none!important}
+.b{display:inline-block;background:var(--p2);border:1px solid var(--line);border-radius:7px;padding:8px 12px;cursor:pointer}
+  .b:hover{border-color:#2c3a44}
+button.pri{background:#eef3f4;color:#04080b;border-color:#eef3f4;font-weight:600}
+button.b:disabled{opacity:.45;cursor:not-allowed}
+label.f{display:grid;grid-template-columns:1fr 92px;gap:8px;align-items:center;font-size:13px;color:var(--m);margin:4px 0}
+label.f input{background:var(--p);border:1px solid var(--line);border-radius:6px;padding:5px 7px;text-align:right;width:100%}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{color:var(--d);font-weight:500;text-align:left;padding:4px 4px;border-bottom:1px solid var(--line)}
+td{padding:5px 4px;border-bottom:1px solid #121b21}
+td.n{text-align:right}
+.sw{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+details summary{cursor:pointer;color:var(--m);font-size:13px}
+.sci{font-size:13px;color:var(--m)}
+.sci code{color:var(--t)}
+#log{font-size:12px;color:var(--d);max-height:110px;overflow:auto;white-space:pre-wrap;margin-top:6px}
+.limits li{margin:3px 0;color:var(--m);font-size:13px}
+</style>
+<script type="module" src="/senda/app-chrome.mjs"></script>
+</head>
+<body>
+<header>
+  <h1>Radar de personas</h1>
+  <p>Un sensor mmWave de 24 GHz conectado por USB ve moverse hasta tres personas, también a oscuras o con humo.</p>
+  <a class="back" href="/senda/">SENDA</a>
+</header>
+<main>
+  <div id="scope">
+    <canvas id="ppi" aria-label="Pantalla de radar con las personas detectadas"></canvas>
+    <div id="hud" class="mono"></div>
+    <div id="basis"><span class="sq" id="basisSq"></span><span id="basisTxt">Sin fuente conectada</span></div>
+  </div>
+  <aside>
+    <section>
+      <h2>Fuente</h2>
+      <div class="row">
+        <button class="b pri" id="connect">Conectar radar (USB)</button>
+        <label class="b" style="cursor:pointer">Abrir grabación<input type="file" id="file" accept=".jsonl,.bin,.txt" hidden></label>
+        <button class="b" id="demo">Simulación</button>
+        <button class="b" id="stop" disabled>Parar</button>
+      </div>
+      <p class="note" id="serialNote"></p>
+      <label class="f" id="binRateRow" hidden>Intervalo entre tramas del .bin (ms, lo declara usted)<input id="binMs" type="number" min="1" step="1" placeholder="obligatorio"></label>
+      <div id="log" class="mono"></div>
+    </section>
+    <section>
+      <h2>Ajustes del seguimiento</h2>
+      <p class="note" style="margin-top:0">El alcance válido (100–8000 mm) y la fusión de ecos a 1000 mm vienen del firmware abierto de Sudo_solder. Los ruidos y la puerta son elecciones de diseño, no medidas: cámbielos y se reinicia el seguimiento.</p>
+      <label class="f">Alcance mínimo (mm)<input id="minMm" type="number" value="100"></label>
+      <label class="f">Alcance máximo (mm)<input id="maxMm" type="number" value="8000"></label>
+      <label class="f">Fusionar ecos a menos de (mm)<input id="mergeMm" type="number" value="1000"></label>
+      <label class="f">Puerta de asociación (mm)<input id="gateMm" type="number" value="900"></label>
+      <label class="f">Ruido de aceleración (mm/s²)<input id="qMmS2" type="number" value="1500"></label>
+      <label class="f">Ruido de medida (mm)<input id="rMm" type="number" value="120"></label>
+      <label class="f">Baja tras sin ver (s)<input id="maxMissS" type="number" step="0.1" value="1.5"></label>
+    </section>
+    <section>
+      <h2>Personas en seguimiento</h2>
+      <table><thead><tr><th>Pista</th><th class="n">Distancia</th><th class="n">Ángulo</th><th class="n">Velocidad</th><th class="n">σ</th></tr></thead><tbody id="tracks"></tbody></table>
+      <p class="note">Velocidad radial del propio sensor (cm/s; negativa = se acerca). σ = incertidumbre de posición del filtro.</p>
+    </section>
+    <section>
+      <h2>Calibración</h2>
+      <p class="note" style="margin-top:0"><b>Distancia</b>: con una cinta métrica, la persona se balancea suavemente sobre una marca (el radar solo ve lo que se mueve). Escriba la distancia real y pulse «Anotar».</p>
+      <div class="row" style="margin-top:6px"><label class="f" style="grid-template-columns:auto 92px;margin:0">Distancia real (mm)<input id="calTrue" type="number" placeholder="p. ej. 3000"></label><button class="b" id="calAdd">Anotar</button><button class="b" id="calFit">Ajustar</button></div>
+      <p class="note mono" id="calOut"></p>
+      <p class="note"><b>Ángulo de montaje</b>: la persona camina recto por una línea de rumbo conocido (un bordillo en el mapa). Al terminar, escriba el rumbo real y pulse «Medir marcha».</p>
+      <div class="row" style="margin-top:6px"><label class="f" style="grid-template-columns:auto 92px;margin:0">Rumbo real (°)<input id="yawTrue" type="number" placeholder="0–360"></label><button class="b" id="yawAdd">Medir marcha</button></div>
+      <p class="note mono" id="yawOut"></p>
+    </section>
+    <section>
+      <h2>Posición en el mapa</h2>
+      <p class="note" style="margin-top:0">Opcional. Con la posición del radar y hacia dónde mira, cada persona se convierte en coordenadas.</p>
+      <label class="f">Latitud del radar<input id="lat" type="number" step="0.000001" placeholder="—"></label>
+      <label class="f">Longitud del radar<input id="lon" type="number" step="0.000001" placeholder="—"></label>
+      <label class="f">Hacia dónde mira (°, 0 = norte)<input id="hdg" type="number" step="0.1" placeholder="—"></label>
+      <div class="row"><button class="b" id="useGeo">Usar GPS y brújula de este equipo</button></div>
+      <p class="note" id="geoNote"></p>
+    </section>
+    <section>
+      <h2>Exportar</h2>
+      <div class="row"><button class="b" id="saveRec" disabled>Guardar grabación</button><button class="b" id="saveTracks" disabled>Trazas (GeoJSON)</button></div>
+      <p class="note">Cada archivo lleva su huella SHA-256 para que cualquiera compruebe que no se ha tocado.</p>
+    </section>
+    <section>
+      <h2>Lo que puede y lo que no</h2>
+      <ul class="limits">
+        <li>Detecta lo que <b>se mueve</b>. Una persona totalmente quieta puede desaparecer: la pista se mantiene «en espera» unos instantes y luego se da de baja.</li>
+        <li>Con distancia, ángulo y velocidad <b>no se distingue</b> una persona de un perro. El vídeo de referencia muestra un perro; aquí se cuentan «objetivos en movimiento».</li>
+        <li>Funciona a oscuras y, por la física de las ondas de 24 GHz, a través de humo o de una carcasa de plástico; no atraviesa metal ni muros gruesos. Con este equipo no lo hemos medido todavía.</li>
+        <li>Ningún móvil lleva este radar: hace falta el módulo y un adaptador USB‑serie, o un ESP32 que reenvíe las tramas.</li>
+        <li>La conexión USB directa usa Web Serial: funciona en Chrome o Edge de escritorio; no en Safari, Firefox ni en la app Android.</li>
+      </ul>
+      <details><summary>Ciencia</summary>
+        <div class="sci">
+          <p>Trama del RD-03D / LD2450 a 256000 baudios: <code>AA FF 03 00</code>, tres objetivos de 8 bytes (x, y en mm; velocidad en cm/s; resolución), cierre <code>55 CC</code>. En cada valor de 16 bits, el bit 15 indica el signo (1 = positivo). Al conectar se envía la orden multiobjetivo <code>FD FC FB FA … 90 00 …</code> y se repite cada 60 s, como el firmware de referencia.</p>
+          <p>Seguimiento: filtro de Kalman de velocidad constante por pista (estado x, y, vx, vy), asignación óptima probando todas las permutaciones (con tres objetivos son seis) y puerta de distancia. Calibración: ajuste por mínimos cuadrados <code>d_real = escala·d_medida + sesgo</code>; rumbo de marcha por componentes principales de la estela; corrección de montaje como media circular.</p>
+          <p>Módulo: <code>/senda/core/mmwave-radar.mjs</code>. Protocolo tomado del firmware abierto de <a href="https://github.com/Stevee87/Arduino-ESP32-Radarproject" rel="noopener">Sudo_solder (licencia MIT)</a> y contrastado con <a href="https://docs.rs/ld2450-proto" rel="noopener">ld2450-proto</a>.</p>
+        </div>
+      </details>
+    </section>
+  </aside>
+</main>
+<script type="module" src="/senda/personas.mjs"></script>
+</body>
+</html>
