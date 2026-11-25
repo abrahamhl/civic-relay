@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SENDA · Reportar peligro</title>
+<meta name="description" content="Avisa de un peligro civil en 10 segundos desde el móvil sin instalar nada: foto difuminada localmente, audio, vídeo, ubicación y sobre firmado Ed25519 con cola sin red.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="/senda/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/senda/fonts/fonts.css">
+<style>
+/* Apple Human Interface Guidelines (iOS 18 Dark) alineado con app.html y copiloto.html */
+:root{
+  --bg:#000000;--g1:#1c1c1e;--g2:#2c2c2e;--g3:#3a3a3c;
+  --sep:rgba(84,84,88,.58);--t:#ffffff;--m:rgba(235,235,245,.66);--d:rgba(235,235,245,.36);
+  --acc:#ff9f0a;--red:#ff453a;--blue:#0a84ff;--ok:#30d158;
+  --top:env(safe-area-inset-top,0px);--bot:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+  margin:0;background:var(--bg);color:var(--t);
+  font:16px/1.42 "Inter",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  letter-spacing:-.012em;font-feature-settings:"tnum" 1;-webkit-font-smoothing:antialiased;
+}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:12px}
+a{color:var(--blue);text-decoration:none}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+.bar{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  min-height:52px;padding:calc(var(--top) + 8px) 16px 8px;
+  background:rgba(0,0,0,.86);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border-bottom:.5px solid var(--sep);
+}
+html.in-app .bar{top:48px}
+.bar .brand{font-weight:700;font-size:17px;letter-spacing:-.02em}
+.bar .brand span{color:var(--m);font-weight:500;margin-left:6px;font-size:14px}
+.bar .sp{flex:1}
+.bar-pill{
+  height:32px;padding:0 11px;border-radius:999px;background:var(--g1);color:var(--t);
+  font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;
+}
+.net{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--m)}
+.sq{display:inline-block;width:8px;height:8px;border-radius:50%;flex:none}
+.sq.real{background:var(--ok)}.sq.calc{background:var(--blue)}.sq.sim{background:var(--acc)}.sq.err{background:var(--red)}
+
+main{max-width:680px;margin:0 auto;padding:16px 16px calc(72px + var(--bot))}
+h1{font-size:clamp(26px,6vw,34px);line-height:1.12;font-weight:700;letter-spacing:-.025em;margin:6px 2px 8px}
+.lead{color:var(--m);margin:0 2px 16px;font-size:14.5px;line-height:1.45}
+
+.sos-banner{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding:16px;border-radius:20px;margin-bottom:16px;
+  background:linear-gradient(180deg,rgba(255,69,58,.24),#1c1c1e);
+  box-shadow:inset 0 .5px 0 rgba(255,255,255,.08);
+}
+.sos-banner b{color:#ffffff;font-size:16px;display:block}
+.btn-112{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:46px;padding:10px 20px;border-radius:14px;
+  background:var(--red);color:#fff;font-weight:700;font-size:15px;flex:none;
+}
+
+section.blk{
+  background:var(--g1);border-radius:20px;padding:16px;margin-bottom:14px;
+  box-shadow:inset 0 .5px 0 rgba(255,255,255,.06);
+}
+section.blk h2{
+  font-size:13px;font-weight:600;color:var(--m);text-transform:uppercase;letter-spacing:.03em;
+  margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+.kinds{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:520px){.kinds{grid-template-columns:repeat(3,1fr)}}
+
+button{
+  font:inherit;color:var(--t);background:var(--g2);border:0;border-radius:14px;
+  padding:12px 14px;min-height:48px;cursor:pointer;text-align:left;font-weight:600;font-size:14.5px;
+  transition:transform .1s,background .15s;
+}
+button:active{transform:scale(.97)}
+button[aria-pressed=true]{background:var(--blue);color:#ffffff}
+button.pri{background:var(--blue);color:#ffffff;font-weight:700;text-align:center;min-height:52px;border-radius:16px;font-size:16px}
+button.pri:disabled{opacity:.42;cursor:not-allowed}
+button.danger{background:rgba(255,69,58,.18);color:#ff6961}
+
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.field{display:grid;gap:5px;flex:1 1 180px;min-width:0}
+.field label,.field>span{font-size:12.5px;font-weight:500;color:var(--m)}
+input,textarea,select{
+  font:inherit;width:100%;min-height:44px;padding:10px 12px;
+  border-radius:12px;border:0;background:var(--g2);color:var(--t);outline:none;
+}
+textarea{min-height:84px;resize:vertical}
+
+.chk{
+  display:flex;align-items:flex-start;gap:12px;padding:10px 0;cursor:pointer;font-size:14px;line-height:1.4;
+  position:relative;
+}
+.chk+.chk{border-top:.5px solid var(--sep)}
+.chk input{width:22px;height:22px;min-height:22px;margin-top:1px;flex:none;accent-color:var(--blue)}
+
+.cv-wrap{margin-top:10px;border-radius:14px;overflow:hidden;background:#0b0b0d}
+#redact-cv{width:100%;display:block;touch-action:none;cursor:crosshair}
+.explain{font-size:13px;color:var(--m);margin:8px 0 0;line-height:1.45}
+.out-box{margin-top:12px;padding:14px;border-radius:16px;background:#0b0b0d}
+.out-box pre{margin:8px 0 0;white-space:pre-wrap;word-break:break-all;font:12px/1.45 "IBM Plex Mono",monospace;color:#bfead8;max-height:180px;overflow:auto}
+.queue-list{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px}
+.queue-list li{padding:12px 14px;border-radius:14px;background:#0b0b0d;font-size:13.5px}
+.truth{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--m);text-transform:none;letter-spacing:0;font-weight:500}
+details summary{cursor:pointer;font-size:13.5px;color:var(--blue);font-weight:600;padding:6px 0}
+</style>
+<script type="module" src="/senda/app-chrome.mjs"></script>
+</head>
+<body>
+<header class="bar">
+  <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+    <div class="brand">Reportar<span>SENDA</span></div>
+    <span class="net" id="net-status" aria-live="polite"><i class="sq real"></i>Comprobando…</span>
+  </div>
+  <div class="sp"></div>
+  <a class="bar-pill" href="/senda/copiloto">Copiloto</a>
+  <a class="bar-pill" href="/senda/comite">Comité</a>
+</header>
+
+<main>
+  <h1>Avisar de un peligro</h1>
+  <p class="lead">Firma local en tu móvil (Ed25519), difuminado de caras y matrículas antes de salir y cola automática sin cobertura. <strong>Ningún aviso público sale sin una autoridad identificada.</strong></p>
+
+  <div class="sos-banner" role="region" aria-label="Aviso de emergencia 112">
+    <div style="flex:1;min-width:200px"><b>¿Hay peligro inmediato para la vida?</b><div style="font-size:13px;color:rgba(255,255,255,.78);margin-top:2px">Llama primero al 112. SENDA complementa y documenta, nunca sustituye al teléfono de emergencias.</div></div>
+    <a class="btn-112" href="tel:112">Llamar al 112</a>
+  </div>
+
+  <section class="blk" aria-labelledby="h-tipo">
+    <h2 id="h-tipo">1 · ¿Qué está ocurriendo? <span class="truth"><i class="sq calc"></i>Un toque</span></h2>
+    <div class="kinds" id="kinds" role="group" aria-label="Tipo de peligro"></div>
+    <div class="row">
+      <div class="field">
+        <label for="op-status">Modo del envío</label>
+        <select id="op-status">
+          <option value="EXERCISE" selected>EJERCICIO / PRUEBA (no emite avisos reales)</option>
+          <option value="ACTUAL">REAL (emergencia real en curso)</option>
+          <option value="SIMULATION">SIMULACIÓN</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="text-note">Qué ves (breve, sin datos personales)</label>
+        <textarea id="text-note" placeholder="Ej.: El agua del barranco supera el muro norte y entra en la calzada…" maxlength="1000"></textarea>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field"><label for="trapped">Personas atrapadas</label><input id="trapped" type="number" min="0" max="255" value="0"></div>
+      <div class="field"><label for="injured">Personas heridas</label><input id="injured" type="number" min="0" max="255" value="0"></div>
+    </div>
+  </section>
+
+  <section class="blk" aria-labelledby="h-media">
+    <h2 id="h-media">2 · Foto, vídeo o audio <span class="truth"><i class="sq real"></i>Difuminado local</span></h2>
+    <div class="row" style="margin-top:0">
+      <label class="field"><span>Capturar o elegir foto, vídeo o audio (opcional)</span><input id="media-file" type="file" accept="image/*,video/*,audio/*" capture="environment"></label>
+    </div>
+    <div id="photo-tools" hidden>
+      <p class="explain">Arrastra sobre la foto para tapar caras o matrículas antes de compartir. Los metadatos EXIF se eliminan automáticamente en JPEG.</p>
+      <div class="cv-wrap"><canvas id="redact-cv" width="640" height="360" aria-label="Lienzo de difuminado de caras y matrículas"></canvas></div>
+      <div class="row">
+        <button type="button" id="apply-blur">Aplicar difuminado</button>
+        <button type="button" id="clear-boxes">Borrar cajas</button>
+        <span class="mono" id="media-meta" style="color:var(--m)"></span>
+      </div>
+    </div>
+    <div id="nonphoto-meta" class="mono" style="margin-top:8px;color:var(--m)"></div>
+  </section>
+
+  <section class="blk" aria-labelledby="h-loc">
+    <h2 id="h-loc">3 · Ubicación y sensores <span class="truth"><i class="sq real"></i>Permiso explícito</span></h2>
+    <div class="row" style="margin-top:0">
+      <button type="button" id="btn-gps" style="flex:1;text-align:center">📍 Usar mi GPS</button>
+      <button type="button" id="btn-orient" style="flex:1;text-align:center">🧭 Rumbo cámara</button>
+    </div>
+    <div class="mono" id="gps-readout" style="color:var(--m);margin-top:10px" aria-live="polite">Sin ubicación todavía</div>
+    <details style="margin-top:10px">
+      <summary>Coordenadas manuales y sensores opcionales</summary>
+      <div class="row">
+        <div class="field"><label for="lat">Latitud (°)</label><input id="lat" type="number" step="0.00001" placeholder="39.42691"></div>
+        <div class="field"><label for="lon">Longitud (°)</label><input id="lon" type="number" step="0.00001" placeholder="-0.41742"></div>
+        <div class="field"><label for="acc">Precisión ±(m)</label><input id="acc" type="number" step="1" value="25" min="1"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label for="baro">Barómetro (hPa)</label><input id="baro" type="number" step="0.1" placeholder="1012.5"></div>
+        <div class="field"><label for="heading">Rumbo cámara (0–359°)</label><input id="heading" type="number" step="1" min="0" max="359"></div>
+        <div class="field"><label for="server-url">Servidor local de referencia</label><input id="server-url" type="url" value="http://127.0.0.1:8787" placeholder="http://127.0.0.1:8787"></div>
+      </div>
+    </details>
+  </section>
+
+  <section class="blk" aria-labelledby="h-consent">
+    <h2 id="h-consent">4 · Consentimiento y envío <span class="truth"><i class="sq calc"></i>Ed25519</span></h2>
+    <label class="chk"><input type="checkbox" id="c-accept"><span><strong>Consiento enviar este aviso a SENDA</strong> para su peritaje técnico (N0–N4) y remisión al comité de emergencias. Sin identidad personal (solo clave seudónima del dispositivo) y sin avisos públicos automáticos.</span></label>
+    <label class="chk"><input type="checkbox" id="c-redact" checked><span>Difuminar caras y matrículas y limpiar metadatos EXIF antes de compartir.</span></label>
+    <label class="chk"><input type="checkbox" id="c-passerby" checked><span>Permitir verificación anónima (sin imagen) por otros usuarios cercanos.</span></label>
+    <div class="row">
+      <button type="button" class="pri" id="btn-send" style="flex:1 1 220px" disabled>Firmar y enviar aviso</button>
+      <button type="button" id="btn-flush" style="flex:1 1 160px;text-align:center">Reintentar cola</button>
+    </div>
+    <div id="send-result" class="out-box" hidden aria-live="polite"></div>
+  </section>
+
+  <section class="blk" aria-labelledby="h-queue">
+    <h2 id="h-queue">Cola sin red y canales alternativos <span class="mono" id="queue-count">0 pendientes</span></h2>
+    <p class="explain">Sin conexión, el sobre firmado permanece en tu móvil y se envía al recuperar red. También puedes compartirlo por SMS/satélite (<span class="mono">SND3</span>), QR multiparte, enlace <span class="mono">geo:</span> o JSON.</p>
+    <ul class="queue-list" id="queue-list"></ul>
+  </section>
+</main>
+<script type="module" src="/senda/reportar.mjs"></script>
+</body>
+</html>

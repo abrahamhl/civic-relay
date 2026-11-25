@@ -279,7 +279,12 @@ public final class AppActivity extends Activity {
     /** Puente mínimo hacia lo nativo. Cada método es un permiso: añadir solo lo imprescindible. */
     private final class Bridge {
         @JavascriptInterface public String info() {
-            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true,\"fileSave\":true,\"screenRec\":true,\"radioScan\":true}";
+            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"copilotBridge\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true,\"fileSave\":true,\"screenRec\":true,\"radioScan\":true}";
+        }
+
+        /** Publica avisos y métricas físicas del Copiloto 5D hacia Android Auto y la notificación de ruta (sin PII). */
+        @JavascriptInterface public boolean publishDriveState(String json) {
+            return DriveHazards.publishFromBridgeJson(json, System.currentTimeMillis());
         }
 
         /** Abre la pantalla de radios con una acción senda://accion?… validada; el usuario confirma allí. */

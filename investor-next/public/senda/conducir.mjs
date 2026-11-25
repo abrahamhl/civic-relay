@@ -22,12 +22,15 @@ import { wazeUrl, googleMapsUrl, haversineM } from './core/route-planner.mjs';
 import { routeUrl, parseRoute, nextManeuver, shouldReroute, announcement } from './core/nav-osrm.mjs';
 import { CATEGORIES, FROM_REPORT, fromDatex, markerSvg } from './core/report-style.mjs';
 import { saveBlob } from './save-file.mjs';
+import { compassHeading, createHeadingFusion } from './core/heading-fusion.mjs';
 import { packReports, unpackReports, mergeReports, isReportPack } from './core/hazard-share.mjs';
 import { b64, unb64 } from './core/b64.mjs';
 import { createBlackbox } from './core/blackbox.mjs';
 import { observe } from './core/hazard-belief.mjs';
 import { summarizeScan, radarPoints, drawSignalRadarPro, drawHistory, blipKey } from './core/signal-radar.mjs';
 import { MAP_STYLES, styleFor, orthoCovers, circlePolygon, TERRAIN_SOURCE, legendCss } from './core/map-style.mjs';
+import { analyzeRouteCurvesAhead, PUBLISHED_SURFACE_PRESETS, PUBLISHED_VEHICLE_PROFILES } from './core/drive-copilot-physics.mjs';
+import { composeProximityMessage } from './core/drive-community-calibration.mjs';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -38,7 +41,7 @@ const reports = () => LS.get('senda.ruta.reports', []);
 
 const st = {
   pos: null, speed: null, heading: 0, region: 'ES', follow: true, map: null, mapOk: false, route: null, dest: null,
-  said: new Set(), saidCorridor: new Set(), saidRadar: new Set(), corridor: null, lastRouteS: -1e9,
+  said: new Set(), saidCorridor: new Set(), saidRadar: new Set(), corridor: null, curveState: null, lastRouteS: -1e9,
   incidents: [], nlIncidents: [], incSource: '', nlIncSource: '', cams: [],
   radars: [], stretches: [], sectionTracker: createSectionTracker([]), radarState: null, sectionState: null,
   me: null, bb: createBlackBox(),
@@ -76,7 +79,7 @@ function initMap() {
   registerPmTilesProtocol();
   const map = new maplibregl.Map({ container: 'map', style: styleFor(LS.get('senda.map.style', 'mapa')), center: [-3.7038, 40.4168], zoom: 12, attributionControl: { compact: true } });
   st.map = map;
-  const t = setTimeout(() => { if (!st.mapOk) offline('Sin conexión al mapa: se muestra el radar. Puedes cargar un mapa offline (.pmtiles) desde el botón naranja.'); }, 10000);
+  const t = setTimeout(() => { if (!st.mapOk) offline('Sin conexión al mapa: se muestra el radar. Puedes cargar un mapa offline (.pmtiles) desde el botón «+».'); }, 10000);
   map.on('load', () => {
     st.mapOk = true; clearTimeout(t);
     ensureRouteLayers(map);
@@ -451,7 +454,133 @@ function updateOsint() {
     : { count: 0, closestKm: null, topType: null, topLevel: null };
 }
 
+function projectAlongRouteM(coords, pos) {
+  if (!Array.isArray(coords) || coords.length < 2 || !pos) return 0;
+  const lat0 = pos[1];
+  const mLat = 111_132.95, mLon = 111_320 * Math.cos((lat0 * Math.PI) / 180);
+  let bestD2 = Infinity, bestS = 0, acc = 0;
+  for (let i = 0; i < coords.length - 1; i++) {
+    const [x1, y1] = [(coords[i][0] - pos[0]) * mLon, (coords[i][1] - pos[1]) * mLat];
+    const [x2, y2] = [(coords[i + 1][0] - pos[0]) * mLon, (coords[i + 1][1] - pos[1]) * mLat];
+    const dx = x2 - x1, dy = y2 - y1;
+    const segLen = Math.hypot(dx, dy);
+    if (segLen > 0.1) {
+      const t = Math.max(0, Math.min(1, -(x1 * dx + y1 * dy) / (segLen * segLen)));
+      const px = x1 + t * dx, py = y1 + t * dy;
+      const d2 = px * px + py * py;
+      if (d2 < bestD2) { bestD2 = d2; bestS = acc + t * segLen; }
+    }
+    acc += segLen;
+  }
+  return bestS;
+}
+
+function updateCurveHorizon() {
+  const el = $('#curveAlert');
+  if (st.mode !== 'car' || !st.route?.coords || st.route.coords.length < 3 || !st.pos || !(st.speed > 5)) {
+    st.curveState = null;
+    if (el) el.hidden = true;
+    return;
+  }
+  try {
+    const egoAlongM = projectAlongRouteM(st.route.coords, st.pos);
+    const surf = PUBLISHED_SURFACE_PRESETS.dry_asphalt;
+    const veh = PUBLISHED_VEHICLE_PROFILES.sedan;
+    const res = analyzeRouteCurvesAhead({
+      routeCoords: st.route.coords,
+      egoAlongM,
+      egoSpeedMs: st.speed,
+      horizonM: 500,
+      maxLateralMu: surf.muLatMax,
+      superelevationE: veh.defaultSuperelevationE,
+      vehicleSsf: veh.ssf,
+      comfortBrakeMs2: 2.8,
+      reactionTimeS: 1.5,
+    });
+    st.curveState = res;
+    const c = res.topCurve;
+    if (!el) return;
+    if (!c || c.cue === 'COMFORTABLE') { el.hidden = true; return; }
+    el.hidden = false;
+    el.className = `card ${c.cue}`;
+    $('#cuTitle').textContent = `Curva ${c.direction.toLowerCase()} en ${fmtDist(c.entryAheadM)} · ${c.cue === 'BRAKE_NOW' ? 'frena antes' : 'suelta acelerador'}`;
+    $('#cuSub').textContent = `Radio ~${Math.round(c.minRadiusM)} m · vuelco SSF ${Math.round(c.rolloverSpeedKmh)} km/h (ref. asfalto seco)`;
+    $('#cuLim').textContent = String(Math.round(c.safeSpeedKmh));
+  } catch {
+    st.curveState = null;
+    if (el) el.hidden = true;
+  }
+}
+
+function buildAndroidAutoState() {
+  const speedKmh = st.speed != null && Number.isFinite(st.speed) ? +(st.speed * 3.6).toFixed(1) : null;
+  const ssd = st.speed != null && Number.isFinite(st.speed) ? stoppingDistanceM(st.speed) : null;
+  const rows = [];
+  let status = 'VERDE';
+  let recommendedMaxKmh = null;
+
+  if (st.lastVision?.active && (st.lastVision.level === 'ROJO' || st.lastVision.level === 'AMBAR')) {
+    status = st.lastVision.level;
+    const ttc = st.lastVision.minTtcS != null ? ` · TTC ${st.lastVision.minTtcS.toFixed(1)} s` : '';
+    rows.push(`${st.lastVision.level === 'ROJO' ? '!' : '▲'} ADAS cámara: riesgo frontal${ttc}`);
+  }
+  if (st.corridor?.top) {
+    const t = st.corridor.top;
+    if (t.urgency === 'ROJO') status = 'ROJO';
+    else if (t.urgency === 'AMBAR' && status === 'VERDE') status = 'AMBAR';
+    rows.push(`${t.urgency === 'ROJO' ? '!' : '▲'} ${t.label} a ${fmtDist(t.distM)}${t.road ? ` (${t.road})` : ''}`);
+  }
+  if (st.curveState?.topCurve && st.curveState.topCurve.cue !== 'COMFORTABLE') {
+    const c = st.curveState.topCurve;
+    if (c.cue === 'BRAKE_NOW') status = 'ROJO';
+    else if (status === 'VERDE') status = 'AMBAR';
+    const lim = Math.round(c.safeSpeedKmh);
+    recommendedMaxKmh = recommendedMaxKmh == null ? lim : Math.min(recommendedMaxKmh, lim);
+    rows.push(`${c.cue === 'BRAKE_NOW' ? '!' : '▲'} Curva ${c.direction.toLowerCase()} en ${fmtDist(c.entryAheadM)} · máx ${lim} km/h`);
+  }
+  if (st.sectionState && !st.sectionState.finished) {
+    if (st.sectionState.overAverage) status = status === 'ROJO' ? 'ROJO' : 'AMBAR';
+    if (st.sectionState.maxspeed != null) recommendedMaxKmh = recommendedMaxKmh == null ? st.sectionState.maxspeed : Math.min(recommendedMaxKmh, st.sectionState.maxspeed);
+    rows.push(`Tramo ${st.sectionState.road || ''}: media ${st.sectionState.avgKmh != null ? st.sectionState.avgKmh.toFixed(0) : '–'} km/h · quedan ${fmtDist(st.sectionState.remainingM)}`.trim());
+  } else if (st.radarState?.top) {
+    const r = st.radarState.top;
+    if (r.overLimit && status === 'VERDE') status = 'AMBAR';
+    if (r.maxspeed != null) recommendedMaxKmh = recommendedMaxKmh == null ? r.maxspeed : Math.min(recommendedMaxKmh, r.maxspeed);
+    rows.push(`Radar a ${fmtDist(r.distM)}${r.maxspeed ? ` · máx ${r.maxspeed} km/h` : ''}`);
+  }
+  if (st.ekfState?.mode && st.ekfState.mode !== 'GNSS_FUSED') {
+    if (status === 'VERDE') status = 'AMBAR';
+    rows.push(`Túnel / sin GPS · EKF ${st.ekfState.mode} (σ ${Math.round(st.ekfState.sigmaPosM ?? 0)} m)`);
+  }
+
+  return {
+    status,
+    speedKmh,
+    recommendedMaxKmh,
+    stoppingDistM: ssd != null ? +ssd.toFixed(1) : null,
+    gripReservePct: null,
+    rows: rows.slice(0, 6),
+  };
+}
+
+let lastAaPushMs = 0;
+function publishToAndroidAuto(force = false) {
+  const payload = buildAndroidAutoState();
+  const now = Date.now();
+  if (!force && (now - lastAaPushMs) < 900 && payload.status !== 'ROJO') return payload;
+  lastAaPushMs = now;
+  try {
+    if (typeof window.SendaNative?.publishDriveState === 'function') {
+      window.SendaNative.publishDriveState(JSON.stringify(payload));
+    }
+  } catch { /* puente no disponible */ }
+  return payload;
+}
+
 // ── GPS, fusión EKF 6 estados, seguimiento y navegación ──
+// Orientación fusionada (declarada antes de pedir el GPS para que ningún fijo temprano la use sin crear)
+const HF = createHeadingFusion({ gpsMinSpeedMs: 3, tauCompassS: 0.4, tauGpsS: 0.8, tauOffsetS: 20 });
+let lastBearingMs = 0;
 function onPos(p) {
   st.lastFix = p;
   st.ekfState = st.ekf.updateGnss({
@@ -462,25 +591,27 @@ function onPos(p) {
   st.pos = st.ekfState?.gnssRejected && st.ekfState.pos ? st.ekfState.pos : [p.coords.longitude, p.coords.latitude];
   st.speed = p.coords.speed;
   st.region = detectRegion(st.pos);
-  if (p.coords.heading != null && !Number.isNaN(p.coords.heading) && (p.coords.speed ?? 0) > 1) st.heading = p.coords.heading;
+  HF.gps(p.coords.heading, p.coords.speed ?? 0, performance.now() / 1000); applyHeading(false);
   $('#speed').innerHTML = `<div>${st.speed == null ? '–' : Math.round(st.speed * 3.6)}<small>km/h</small></div>`;
   if (st.mapOk) {
     if (!st.me) { const el = document.createElement('div'); el.className = 'me-puck'; el.innerHTML = '<i class="cone"></i><b></b>'; st.me = new maplibregl.Marker({ element: el, rotationAlignment: 'map' }).setLngLat(st.pos).addTo(st.map); st.map.jumpTo({ center: st.pos, zoom: st.mode === 'foot' ? 17 : 15 }); }
-    st.me.setLngLat(st.pos).setRotation(st.heading); st.me.getElement().classList.toggle('has-heading', p.coords.heading != null && (p.coords.speed ?? 0) > 1);
+    st.me.setLngLat(st.pos); applyHeading(false);
     st.map.getSource('me-acc')?.setData(circlePolygon(st.pos, Math.max(3, p.coords.accuracy ?? 10))); // precisión real del GPS (radio = accuracy)
-    if (st.follow) st.map.easeTo({ center: st.pos, bearing: st.route || st.view3d ? st.heading : st.map.getBearing(), pitch: st.view3d ? 60 : st.route ? 45 : 0, duration: 800 });
+    if (st.follow) st.map.easeTo({ center: st.pos, bearing: (st.route || st.view3d || st.headingUp) && st.heading != null ? st.heading : st.map.getBearing(), pitch: st.view3d ? 60 : st.route ? 45 : 0, duration: 800 });
   } else drawRadar();
   if (st.route) guide();
   updateCorridor();
   updateRadars(p.timestamp || Date.now());
+  updateCurveHorizon();
   updateOsint();
+  publishToAndroidAuto();
   bbLog('gps', { lat: +p.coords.latitude.toFixed(6), lon: +p.coords.longitude.toFixed(6), acc: p.coords.accuracy != null ? Math.round(p.coords.accuracy) : null, v: p.coords.speed, hdg: p.coords.heading, alt: p.coords.altitude != null ? Math.round(p.coords.altitude) : null, gt: p.timestamp, ekfRej: !!st.ekfState?.gnssRejected });
   tele.gps = p.coords;
   st.gnssHistory.push({ accuracyM: p.coords.accuracy, altM: p.coords.altitude, maha2: st.ekfState?.maha2 ?? 0, rejected: !!st.ekfState?.gnssRejected });
   if (st.gnssHistory.length > 120) st.gnssHistory.shift();
   if (st.activeListen) ingestSurfaceNow(p.timestamp || Date.now());
 }
-navigator.geolocation?.watchPosition(onPos, () => { $('#speed').innerHTML = '<div>–<small>sin GPS</small></div>'; }, { enableHighAccuracy: true, maximumAge: 1000 });
+navigator.geolocation?.watchPosition(onPos, () => { $('#speed').innerHTML = '<div>–<small>sin GPS</small></div>'; }, { enableHighAccuracy: true, maximumAge: 0 }); // máxima precisión: sin reutilizar posiciones antiguas
 
 function guide() {
   const now = performance.now() / 1000;
@@ -505,14 +636,20 @@ async function goTo(dest, reroute = false) {
     $('#etaTime').textContent = arrive.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
     $('#etaInfo').textContent = `${Math.round(r.durationS / 60)} min · ${fmtDist(r.distanceM)} · ${dest.name}`;
     hint('Llegada estimada por OSRM, sin tráfico en vivo. Para tráfico en vivo, abre la misma ruta en Waze o Google Maps.');
-    guide(); updateCorridor();
+    guide(); updateCorridor(); updateCurveHorizon();
   } catch { hint('Sin conexión al servicio de rutas. Abre el destino en Waze o Google Maps.'); $('#etaTime').textContent = dest.name; $('#etaInfo').textContent = ''; }
 }
-function endNav() { st.route = null; st.dest = null; $('#turn').hidden = true; $('#etaBox').hidden = true; $('#searchBox').hidden = false; st.map?.getSource('route')?.setData({ type: 'FeatureCollection', features: [] }); st.map?.easeTo({ pitch: 0, bearing: 0 }); hint('Navegación terminada.'); updateCorridor(); }
+function endNav() { st.route = null; st.dest = null; $('#turn').hidden = true; $('#etaBox').hidden = true; $('#searchBox').hidden = false; st.map?.getSource('route')?.setData({ type: 'FeatureCollection', features: [] }); st.map?.easeTo({ pitch: 0, bearing: 0 }); hint('Navegación terminada.'); updateCorridor(); updateCurveHorizon(); }
 $('#endNav').addEventListener('click', endNav);
 $('#goWaze').addEventListener('click', () => { if (st.dest) location.href = wazeUrl({ to: st.dest.at }).url; });
 $('#goMaps').addEventListener('click', () => { if (st.dest) location.href = googleMapsUrl({ from: st.pos ?? st.dest.at, to: st.dest.at }).url; });
-$('#center').addEventListener('click', () => { st.follow = true; if (st.pos && st.mapOk) st.map.easeTo({ center: st.pos, zoom: 16 }); });
+$('#center').addEventListener('click', async () => {
+  try { if (typeof DeviceOrientationEvent?.requestPermission === 'function') await DeviceOrientationEvent.requestPermission(); } catch { /* iOS: permiso denegado */ }
+  if (st.follow && !st.headingUp) { st.headingUp = true; hint(st.heading == null ? 'Modo brújula: mueve el móvil en forma de 8 si la flecha no se orienta.' : 'Modo brújula: el mapa gira hacia donde miras.'); }
+  else { st.headingUp = false; if (st.follow) st.map?.easeTo({ bearing: 0, duration: 500 }); }
+  st.follow = true; $('#center').classList.toggle('on', st.headingUp);
+  if (st.pos && st.mapOk) st.map.easeTo({ center: st.pos, zoom: Math.max(st.map.getZoom(), 16), bearing: st.headingUp && st.heading != null ? st.heading : st.map.getBearing() });
+});
 let toastT = 0;
 /** Flecha de la maniobra (como en las apps de navegación) a partir del tipo y el sentido de OSRM. */
 function maneuverIcon(step) {
@@ -576,7 +713,7 @@ $('#grid').addEventListener('click', (e) => { const k = e.target.closest('[data-
 function saveReport(kind, side = 'SIN_INDICAR') {
   if (!st.pos) return hint('Sin GPS: no se puede situar el aviso.');
   const list = reports(); list.push({ kind, side, lon: st.pos[0], lat: st.pos[1], t: Date.now(), own: true, id: crypto.getRandomValues(new Uint32Array(1))[0] }); LS.set('senda.ruta.reports', list);
-  drawMarkers(); updateCorridor(); say(`Aviso de ${REPORT_KINDS[kind].label} guardado`); hint(`Aviso «${REPORT_KINDS[kind].label}» guardado en tu posición. Para pasarlo a otros móviles SENDA cercanos: «Más» → «Enviar mis avisos por Bluetooth».`);
+  drawMarkers(); updateCorridor(); say(`Aviso de ${REPORT_KINDS[kind].label} guardado`); hint(`Aviso «${REPORT_KINDS[kind].label}» guardado en tu posición. Para pasarlo a otros móviles SENDA cercanos: «Más» → «Enviar mis avisos por Bluetooth» o «Compartir avisos sin la app».`);
 }
 window.sendaVoice = (res) => {
   if (res.state) return hint(res.state === 'ESCUCHANDO' ? 'Habla ahora…' : 'Procesando…');
@@ -601,6 +738,41 @@ $('#shareBle').addEventListener('click', () => {
   st.ble.tx += pack[2];
   N.p2pSend(b64(pack)); hint(`Enviando ${pack[2]} aviso(s) a móviles SENDA cercanos…`);
 });
+function mapKindToQuickSignal(kind) {
+  if (kind === 'accidente') return 'ayuda';
+  if (kind === 'retencion') return 'retencion';
+  if (kind === 'parado') return 'parado';
+  if (kind === 'niebla') return 'niebla';
+  if (kind === 'inundacion' || kind === 'hielo') return 'agua';
+  return 'obstaculo';
+}
+async function shareIndirectDrive() {
+  openSheet(false);
+  const latest = reports().slice(-1)[0];
+  const signalId = mapKindToQuickSignal(latest?.kind ?? st.corridor?.top?.kind ?? 'obstaculo');
+  const pos = st.pos ? { lat: st.pos[1], lon: st.pos[0] } : null;
+  const msg = composeProximityMessage({
+    signalId,
+    pos,
+    recommendedMaxKmh: st.curveState?.topCurve?.safeSpeedKmh ?? st.radarState?.top?.maxspeed ?? null,
+    roadHint: st.corridor?.top?.road ?? st.dest?.name ?? '',
+  });
+  try {
+    if (typeof navigator.share === 'function') {
+      await navigator.share({ title: msg.indirect.title, text: msg.indirect.shareText });
+      hint('Aviso compartido para personas sin app SENDA.');
+      return msg;
+    }
+  } catch { /* usuario canceló o share bloqueado */ }
+  try {
+    await navigator.clipboard?.writeText(msg.indirect.shareText);
+    hint('Aviso copiado al portapapeles: pégalo en WhatsApp, SMS o grupo de carretera.');
+  } catch {
+    hint(msg.indirect.shareText);
+  }
+  return msg;
+}
+$('#shareIndirectDrive')?.addEventListener('click', shareIndirectDrive);
 function sendBleProbe() {
   openSheet(false);
   const N = window.SendaNative;
@@ -768,6 +940,7 @@ function analyse(now, iv = 250) {
   if (!top) { a.hidden = true; return; }
   a.hidden = false; a.className = top.level;
   a.textContent = `${ES[top.label] ?? top.label} ${top.zone === 'TU_CARRIL' ? 'delante' : top.zone === 'DERECHA' ? 'a la derecha' : 'a la izquierda'}: ${top.reasons.join(' · ')}`;
+  publishToAndroidAuto(top.level === 'ROJO');
   const key = top.id + top.level; if (Date.now() - (saidAdas.get(key) ?? 0) > 6000) { saidAdas.set(key, Date.now()); if (top.level === 'ROJO') { navigator.vibrate?.([200, 100, 200]); say(`Cuidado, ${ES[top.label] ?? 'vehículo'} delante`); } else if (top.reasons.some((rr) => rr.startsWith('se mete'))) say(`${ES[top.label] ?? 'vehículo'} ${top.reasons.find((rr) => rr.startsWith('se mete'))}`); }
 }
 
@@ -943,6 +1116,21 @@ window.addEventListener('devicemotion', (e) => {
     }
   }
 }, { passive: true });
+// ── Orientación: hacia dónde miras (brújula) y hacia dónde vas (GPS), fusionadas y autocalibradas ──
+// Constantes de diseño (declaradas): el GPS manda desde 3 m/s (≈ 11 km/h); suavizados de 0,4 s (brújula), 0,8 s (GPS)
+// y 20 s para aprender la corrección de la brújula mientras se conduce.
+function applyHeading(fromCompass) {
+  const s = HF.state(); if (s.headingDeg == null) return;
+  st.heading = s.headingDeg; st.headingSrc = s.source; st.headingOffset = s.offsetDeg;
+  if (st.me) { st.me.setRotation(st.heading); st.me.getElement().classList.toggle('has-heading', true); }
+  // El mapa gira con la brújula solo en modo brújula (o navegando/3D), como mucho ~7 veces por segundo y si cambia > 2°
+  if (fromCompass && st.mapOk && st.follow && (st.headingUp || st.route || st.view3d) && performance.now() - lastBearingMs > 140 && Math.abs(((st.map.getBearing() - st.heading + 540) % 360) - 180) > 2) {
+    lastBearingMs = performance.now(); st.map.rotateTo(st.heading, { duration: 140, easing: (k) => k });
+  }
+}
+const onOrient = (e) => { const c = compassHeading(e, { screenAngle: screen.orientation?.angle ?? window.orientation ?? 0 }); if (c) { HF.compass(c.headingDeg, performance.now() / 1000); applyHeading(true); } };
+window.addEventListener('deviceorientationabsolute', onOrient, { passive: true }); // Android: referido al norte
+window.addEventListener('deviceorientation', (e) => { if (typeof e.webkitCompassHeading === 'number' || e.absolute) onOrient(e); }, { passive: true }); // iOS (y navegadores que marcan absolute)
 window.addEventListener('deviceorientation', (e) => {
   if (typeof e.alpha === 'number' && Number.isFinite(e.alpha)) st.imu.alpha = e.alpha;
   if (typeof e.beta === 'number' && Number.isFinite(e.beta)) st.imu.beta = e.beta;
@@ -991,6 +1179,7 @@ function drawTele() {
     `[${st.region}] GPS ${g ? `±${f1(g.accuracy, 0)}m ${f1((g.speed ?? NaN) * 3.6, 0)}km/h ${f1(g.heading, 0)}° alt ${f1(g.altitude, 0)}m` : 'sin señal'}`,
     ek ? `EKF ${ek.mode} ±${f1(ek.sigmaPosM, 1)}m${ek.outliersRejected ? ` · ${ek.outliersRejected} salto(s) GPS rej` : ''} · H-Cal ${hc.samples}/20 (${hc.pitchDeg}°)` : '',
     `IMU ${f1(tele.imu, 1)}m/s² giro ${f1(tele.gyro, 0)}°/s`,
+    st.heading != null ? `RUMBO ${Math.round(st.heading)}° · ${{ gps: 'GPS', brujula: 'brújula', brujula_calibrada: 'brújula calibrada' }[st.headingSrc] ?? '–'}${st.headingOffset != null ? ` (corr ${st.headingOffset > 0 ? '+' : ''}${st.headingOffset}°)` : ''}` : 'RUMBO –',
     `IA ${camOn || dash.on ? `${f1(tele.det.hz, 1)}Hz ${f1(tele.det.ms, 0)}ms ${tele.det.n}det · ${tele.top ?? ''}` : 'apagada'}`,
     `Radares ${st.radars.length} · ${st.region === 'NL' ? `NDW ${st.nlIncidents.length}` : `DGT ${st.incidents.length}`} · SENDA ${reports().length}`,
     `Red ${n ? `${n.online ? (n.eff ?? 'sí') : 'NO'}${n.down != null ? ' ' + n.down + 'Mb/s' : ''}${n.rtt != null ? ' ' + n.rtt + 'ms' : ''}` : '–'} · Bat ${b ? Math.round(b.level * 100) + '%' + (b.charging ? '⚡' : '') : '–'}`,
@@ -1227,7 +1416,8 @@ loadIncidents();
 setInterval(() => { if (!document.hidden) loadIncidents(); }, 5 * 60 * 1000);
 // Para pruebas automáticas
 globalThis.sendaDrive = {
-  st, goTo, onPos, dash, updateCorridor, updateRadars, drawTele,
+  st, goTo, onPos, dash, updateCorridor, updateRadars, updateCurveHorizon, shareIndirectDrive, drawTele,
+  buildAndroidAutoState, publishToAndroidAuto,
   bbStart, bbSample, bbExport, setAiMode, aiIntervalMs,
   sendBleProbe, loadPmTilesFile, loadOsintXml, loadOsintGeoJson,
   exportDenm, encodeDenmCompact, decodeDenmCompact, ekf: st.ekf, horizonCal: st.horizonCal,

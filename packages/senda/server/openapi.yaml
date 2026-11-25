@@ -1,0 +1,233 @@
+openapi: 3.1.0
+info:
+  title: SENDA · API de referencia local de peritaje ciudadano multimodal
+  version: 1.0.0
+  description: >
+    Servidor de referencia local (sin coste de nube, 127.0.0.1 por defecto) para recibir sobres
+    ciudadanos firmados Ed25519 (`senda.citizen-report/v1`), ejecutar el peritaje automático
+    (niveles N0–N4), consultar expedientes, suscribirse en tiempo real (SSE), sincronizar deltas
+    multicanal (web, app, escritorio PRO, malla) y registrar autorizaciones humanas N5 firmadas.
+    Ningún endpoint automático puede activar `canPublicWarn`.
+  license:
+    name: MIT
+servers:
+  - url: http://127.0.0.1:8787
+    description: Servidor de referencia local (sin despliegue en nube)
+paths:
+  /api/v1/health:
+    get:
+      summary: Estado del servidor local y métricas de sincronización
+      responses:
+        '200':
+          description: Servidor operativo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  service: { type: string }
+                  dossiersCount: { type: integer }
+                  auditChainLength: { type: integer }
+                  canPublicWarnAutomatic: { type: boolean, const: false }
+  /api/v1/openapi.yaml:
+    get:
+      summary: Especificación OpenAPI 3.1 de este servidor
+      responses:
+        '200':
+          description: Documento OpenAPI YAML
+          content:
+            application/yaml:
+              schema: { type: string }
+  /api/v1/reports:
+    post:
+      summary: Recibir un sobre ciudadano multimodal firmado Ed25519 y peritarlo (N0–N4)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [envelope]
+              properties:
+                envelope:
+                  $ref: '#/components/schemas/CitizenReportEnvelope'
+                physicalContext: { type: object }
+                satelliteContext: { type: object }
+                riskThreshold: { type: object }
+                riskMeasurement: { type: object }
+      responses:
+        '201':
+          description: Sobre verificado y expediente creado/actualizado (máximo N4 automático)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DossierResponse'
+        '400':
+          description: Sobre malformado, sin consentimiento o firma Ed25519 inválida
+        '413':
+          description: Cuerpo demasiado grande (> 1 MiB)
+        '429':
+          description: Límite de caudal excedido (protección anti-inundación de avisos)
+  /api/v1/dossiers:
+    get:
+      summary: Listar expedientes ordenados por nivel y probabilidad
+      parameters:
+        - name: level
+          in: query
+          schema:
+            type: string
+            enum: [N0, N1, N2, N3, N4, N5]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [ACTUAL, EXERCISE, SIMULATION, TEST]
+      responses:
+        '200':
+          description: Lista de expedientes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count: { type: integer }
+                  dossiers:
+                    type: array
+                    items: { $ref: '#/components/schemas/DossierResponse' }
+  /api/v1/dossiers/{reportId}:
+    get:
+      summary: Consultar expediente pericial completo por ID
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Expediente completo con pruebas, transiciones y CAP 1.2
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DossierResponse' }
+        '404':
+          description: Expediente no encontrado
+  /api/v1/dossiers/{reportId}/verify-request:
+    post:
+      summary: Crear solicitud de verificación a móviles cercanos (solo si el emisor consintió)
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '201':
+          description: Solicitud creada (sin incluir imagen)
+        '403':
+          description: El emisor no concedió permiso para verificación por terceros
+        '404':
+          description: Expediente no encontrado
+  /api/v1/dossiers/{reportId}/verify-response:
+    post:
+      summary: Incorporar resultado de verificación con cámara local (hazard-verify, sin imagen)
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [verifierId, consent, roadKind, frames, minScore, minFrames]
+              properties:
+                verifierId: { type: string }
+                consent: { type: boolean }
+                roadKind: { type: string }
+                frames: { type: array }
+                minScore: { type: number }
+                minFrames: { type: integer }
+      responses:
+        '200':
+          description: Expediente reevaluado con la verificación de cámara
+        '400':
+          description: Datos de verificación o consentimiento inválidos
+        '404':
+          description: Expediente no encontrado
+  /api/v1/dossiers/{reportId}/authorize-n5:
+    post:
+      summary: Elevar un expediente ACTUAL a N5 (aviso público) con decisión firmada por autoridad humana
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [grant, decision, decisionSigB64u]
+              properties:
+                grant: { type: object }
+                decision: { type: object }
+                decisionSigB64u: { type: string }
+      responses:
+        '200':
+          description: Aviso público N5 autorizado, CAP 1.2 emitido y registrado en cadena de auditoría SHA-256
+        '403':
+          description: Autorización bloqueada (ancla, firma, vigencia, geocerca o modo no ACTUAL)
+        '404':
+          description: Expediente no encontrado
+  /api/v1/events:
+    get:
+      summary: Suscripción en tiempo real mediante Server-Sent Events (SSE)
+      responses:
+        '200':
+          description: Flujo `text/event-stream` de nuevos reportes, cambios de nivel y autorizaciones N5
+          content:
+            text/event-stream:
+              schema: { type: string }
+  /api/v1/sync:
+    post:
+      summary: Sincronización bidireccional de deltas CRDT con otros canales (web, app, escritorio, malla)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [schema, deltaSha256]
+              properties:
+                schema: { type: string, const: senda.sync-delta/v1 }
+                deltaSha256: { type: string }
+                reports: { type: array }
+                verifications: { type: array }
+                decisions: { type: array }
+      responses:
+        '200':
+          description: Resumen de fusión y delta completo del servidor para convergencia
+        '400':
+          description: Delta inválido o huella SHA-256 incorrecta
+components:
+  schemas:
+    CitizenReportEnvelope:
+      type: object
+      required: [schema, basis, operationalStatus, reportId, payload, contentSha256, signature]
+      properties:
+        schema: { type: string, const: senda.citizen-report/v1 }
+        basis: { type: string, const: CITIZEN }
+        operationalStatus: { type: string, enum: [ACTUAL, EXERCISE, SIMULATION, TEST] }
+        reportId: { type: string }
+        contentSha256: { type: string }
+        payload: { type: object }
+        signature: { type: object }
+    DossierResponse:
+      type: object
+      properties:
+        reportId: { type: string }
+        envelope: { $ref: '#/components/schemas/CitizenReportEnvelope' }
+        protocol: { type: object }
+        verificationRequests: { type: array }

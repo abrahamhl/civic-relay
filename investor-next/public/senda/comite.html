@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SENDA · Vista de comité de emergencias</title>
+<meta name="description" content="Pantalla de operador del comité de emergencias de SENDA: cola de expedientes periciales por nivel N0–N5, mapa táctico, línea del tiempo, pruebas, petición de verificación a quien pasa y autorización humana N5 firmada Ed25519.">
+<meta name="theme-color" content="#0c0e11">
+<link rel="icon" href="/senda/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/senda/fonts/fonts.css">
+<style>
+:root{--bg:#0c0e11;--p:#13161a;--p2:#181c21;--line:#252a31;--line2:#333a44;--t:#e6e8eb;--m:#8a929c;--d:#616a75;--acc:#f0a73a;--red:#e5484d;--blue:#4f8cff;--ok:#3fb27f;--purp:#a78bfa}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--t);font:13.5px/1.45 "Inter",system-ui,sans-serif;font-feature-settings:"tnum" 1,"cv11" 1;-webkit-font-smoothing:antialiased}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px}
+a{color:#8fb4ff}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+button{font:inherit;color:var(--t);background:var(--p2);border:1px solid var(--line2);border-radius:6px;padding:7px 11px;min-height:36px;cursor:pointer}
+button:hover{border-color:#545e6b}
+button.pri{background:var(--t);color:#0c0e11;border-color:var(--t);font-weight:600}
+button.pri:disabled{opacity:.4;cursor:not-allowed}
+button.danger{background:#2a1114;border-color:#80252a;color:#ffd0d2}
+button[aria-pressed=true]{background:#1e2a3b;border-color:var(--blue);color:#dfe8ff}
+input,textarea,select{font:inherit;background:#0a0c0f;color:var(--t);border:1px solid var(--line2);border-radius:6px;padding:7px 9px;min-height:36px;width:100%}
+textarea{min-height:66px;resize:vertical}
+.bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;min-height:52px;padding:6px 16px;border-bottom:1px solid var(--line);background:var(--p)}
+.bar .brand{font-weight:650}.bar .brand span{color:var(--m);font-weight:450;margin-left:8px}
+.bar .sp{flex:1}
+.truth{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--m)}
+.sq{display:inline-block;width:9px;height:9px;border-radius:1px;flex:none}
+.sq.real{background:var(--ok)}.sq.calc{background:var(--blue)}.sq.sim{background:var(--acc)}.sq.red{background:var(--red)}
+.grid{display:grid;grid-template-columns:310px minmax(0,1fr) 430px;height:calc(100vh - 52px);min-height:640px}
+.col{border-right:1px solid var(--line);overflow:auto;min-width:0}.col:last-child{border-right:0;border-left:1px solid var(--line)}
+.sec{padding:13px 15px;border-bottom:1px solid var(--line)}
+.h{font-size:11.5px;font-weight:600;color:var(--m);margin:0 0 9px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.filters{display:flex;flex-wrap:wrap;gap:5px}
+.filters button{min-height:30px;padding:4px 8px;font-size:12px}
+.qlist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.qitem{padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--p);cursor:pointer}
+.qitem:hover{border-color:#4b5563}
+.qitem[aria-current=true]{border-color:var(--blue);background:#151d28}
+.qitem .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.qitem .lvl{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:11.5px}
+.lvl-N0{color:var(--m)}.lvl-N1{color:#93c5fd}.lvl-N2{color:var(--acc)}.lvl-N3{color:var(--ok)}.lvl-N4{color:#ff7756}.lvl-N5{color:var(--red)}
+.center-col{display:grid;grid-template-rows:minmax(360px,1fr) 220px;height:100%;min-width:0}
+.mapwrap{position:relative;background:#090b0e;overflow:hidden;border-bottom:1px solid var(--line)}
+#map{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
+.mapui{position:absolute;left:12px;top:12px;display:flex;gap:6px;flex-wrap:wrap}
+.mapinfo{position:absolute;right:12px;top:12px;max-width:300px;background:rgba(19,22,26,.94);border:1px solid var(--line);border-radius:6px;padding:9px 11px;font-size:12px;color:#cdd4dc}
+.legend{position:absolute;left:12px;bottom:10px;background:rgba(19,22,26,.92);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:11.5px;color:#c3cbd3;display:flex;gap:12px;flex-wrap:wrap}
+.tl-wrap{overflow:auto;padding:12px 15px;background:var(--p)}
+.tl{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.tl li{padding:6px 8px;border:1px solid var(--line);border-radius:5px;background:#0e1115;font-size:12px;display:flex;gap:10px;align-items:baseline}
+.row{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-top:1px dashed #22272d;font-size:12.5px}
+.row:first-child{border-top:0}.row span{color:var(--m)}.row b{font-weight:600;text-align:right}
+.pbar{position:relative;height:10px;background:#1a1f26;border-radius:3px;margin:6px 0;overflow:hidden}
+.pbar .ci{position:absolute;top:0;bottom:0;background:rgba(79,140,255,.35)}
+.pbar .pt{position:absolute;top:0;bottom:0;width:3px;background:#eef1f4}
+ul.ev{margin:6px 0 0;padding-left:16px;font-size:12.5px;color:#c9d0d8}ul.ev li{margin:3px 0}
+pre.xml{max-height:170px;overflow:auto;background:#0a0c0f;border:1px solid var(--line);border-radius:6px;padding:8px;font:11px/1.45 "IBM Plex Mono",monospace;color:#b9c3cc;white-space:pre-wrap;word-break:break-all;margin:8px 0 0}
+.gate-box{border:1px solid #592629;background:#190d0f;border-radius:6px;padding:11px;margin-top:8px}
+.gate-box.unlocked{border-color:#266346;background:#0d1a14}
+.msg{margin-top:8px;font-size:12.5px;padding:8px 10px;border-radius:6px;border:1px solid var(--line2);background:#0d1014}
+@media (max-width:1100px){.grid{grid-template-columns:minmax(0,1fr);height:auto}.col{border:0;border-bottom:1px solid var(--line)}.center-col{grid-template-rows:380px 220px}}
+</style>
+<script type="module" src="/senda/app-chrome.mjs"></script>
+</head>
+<body>
+<header class="bar">
+  <div class="brand">SENDA<span>Vista de comité · Peritaje N0–N5</span></div>
+  <span class="truth" id="mode-truth"><i class="sq sim"></i>Sin expedientes cargados</span>
+  <div class="sp"></div>
+  <button type="button" id="btn-demo">Cargar ejercicio Poyo (SIMULACIÓN)</button>
+  <button type="button" id="btn-server">Conectar servidor local</button>
+  <a href="/senda/reportar.html" style="font-size:12.5px">Reportar</a>
+  <a href="/senda/sala.html" style="font-size:12.5px">Sala</a>
+</header>
+
+<main class="grid">
+  <aside class="col" aria-label="Cola de expedientes por nivel y filtros">
+    <section class="sec">
+      <p class="h">Filtro por nivel <span class="mono" id="q-count">0</span></p>
+      <div class="filters" id="lvl-filters" role="group" aria-label="Filtrar por nivel N0 a N5">
+        <button type="button" data-lvl="ALL" aria-pressed="true">Todos</button>
+        <button type="button" data-lvl="N5">N5</button>
+        <button type="button" data-lvl="N4">N4</button>
+        <button type="button" data-lvl="N3">N3</button>
+        <button type="button" data-lvl="N2">N2</button>
+        <button type="button" data-lvl="N1">N1</button>
+        <button type="button" data-lvl="N0">N0</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button type="button" id="btn-scan" style="flex:1;font-size:12px">Escanear área visible</button>
+        <button type="button" id="btn-clear-aoi" style="font-size:12px">Limpiar AOI</button>
+      </div>
+      <div id="scan-out" class="msg" hidden aria-live="polite"></div>
+    </section>
+
+    <section class="sec">
+      <p class="h">Cola de expedientes <span>ordenados por nivel y probabilidad</span></p>
+      <ul class="qlist" id="q-list" aria-label="Lista de expedientes"></ul>
+    </section>
+
+    <section class="sec">
+      <p class="h">Importar sobre local (sin red)</p>
+      <input type="file" id="import-json" accept="application/json,.json" aria-label="Importar archivo JSON de sobre ciudadano firmado">
+      <div style="margin-top:8px">
+        <label class="mono" style="color:var(--m)" for="srv-url">API local de referencia</label>
+        <input id="srv-url" type="url" value="http://127.0.0.1:8787" style="margin-top:4px">
+      </div>
+    </section>
+  </aside>
+
+  <section class="center-col" aria-label="Mapa táctico y línea del tiempo">
+    <div class="mapwrap">
+      <canvas id="map" aria-label="Mapa táctico de expedientes N0 a N5"></canvas>
+      <div class="mapui">
+        <button type="button" id="z-in" aria-label="Acercar">+</button>
+        <button type="button" id="z-out" aria-label="Alejar">−</button>
+        <button type="button" id="z-fit">Encuadrar</button>
+        <button type="button" id="btn-aoi" aria-pressed="false">Dibujar AOI circular</button>
+      </div>
+      <div class="mapinfo" id="mapinfo" aria-live="polite">
+        <strong>SENDA · Peritaje</strong>
+        <div style="color:var(--m);margin-top:4px">Pulsa «Cargar ejercicio Poyo» o conecta el servidor local. Borde sólido = verificado por instrumento; borde discontinuo = reporte ciudadano/modelo; opacidad = probabilidad bayesiana.</div>
+      </div>
+      <div class="legend">
+        <span class="truth"><i class="sq red"></i>N5/N4</span>
+        <span class="truth"><i class="sq real"></i>N3 instrumento</span>
+        <span class="truth"><i class="sq sim"></i>N2 corroborado</span>
+        <span class="truth"><i class="sq calc"></i>N1/N0</span>
+      </div>
+    </div>
+    <div class="tl-wrap" aria-label="Línea del tiempo del expediente">
+      <p class="h">Línea del tiempo y transiciones de nivel <span class="mono" id="tl-count">0 eventos</span></p>
+      <ul class="tl" id="tl-list"></ul>
+    </div>
+  </section>
+
+  <aside class="col" aria-label="Inspector del expediente pericial y puerta N5">
+    <section class="sec" id="detail-head">
+      <p class="h">Expediente seleccionado <span class="mono" id="d-id">—</span></p>
+      <div id="d-summary" style="color:var(--m)">Selecciona un expediente de la cola para inspeccionar pruebas, satélite, fiabilidad y borrador CAP 1.2.</div>
+    </section>
+
+    <section class="sec" id="detail-evidence" hidden>
+      <p class="h">Probabilidad bayesiana y pruebas <span class="truth"><i class="sq calc"></i>Horquilla IC 95 %</span></p>
+      <div id="d-prob"></div>
+      <div class="pbar" aria-hidden="true"><div class="ci" id="d-ci"></div><div class="pt" id="d-pt"></div></div>
+      <div id="d-pros-cons"></div>
+    </section>
+
+    <section class="sec" id="detail-sat" hidden>
+      <p class="h">Satélite, física y fiabilidad Dawid-Skene</p>
+      <div id="d-sat-body"></div>
+    </section>
+
+    <section class="sec" id="detail-verify" hidden>
+      <p class="h">Verificación de quien pasa <span class="truth"><i class="sq real"></i>Sin enviar imagen</span></p>
+      <p style="margin:0 0 8px;font-size:12.5px;color:var(--m)">Solicita confirmación con cámara local (`hazard-verify.mjs`, EfficientDet-Lite0 en el móvil). La imagen nunca abandona el dispositivo.</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button type="button" id="btn-ask-verify">Pedir verificación a quien pasa</button>
+        <button type="button" id="btn-sim-cam-ok">Simular cámara: COMPATIBLE</button>
+        <button type="button" id="btn-sim-cam-no">Simular cámara: NO VISTO</button>
+      </div>
+      <div id="verify-msg" class="msg" hidden aria-live="polite"></div>
+    </section>
+
+    <section class="sec" id="detail-n5" hidden>
+      <p class="h">Puerta de aviso público (N5) <span class="truth"><i class="sq red"></i>Solo autoridad humana</span></p>
+      <div class="gate-box" id="gate-box">
+        <div style="font-size:12.5px;margin-bottom:8px" id="gate-status"><strong>Bloqueado:</strong> <span class="mono">canPublicWarn = false</span>. Se requiere identidad criptográfica Ed25519 habilitada (<span class="mono">AuthorityGrant</span>) y expediente en modo <span class="mono">ACTUAL</span>.</div>
+        <div style="display:grid;gap:6px">
+          <button type="button" id="btn-load-auth">Cargar credencial de autoridad de prueba (Ed25519)</button>
+          <input id="n5-rationale" placeholder="Motivo de la autoridad (mín. 10 car.)">
+          <textarea id="n5-instruction" placeholder="Instrucción clara para la población (mín. 10 car.)"></textarea>
+          <button type="button" class="pri" id="btn-emit-n5" disabled>Firmar y emitir aviso público (N5)</button>
+        </div>
+        <div id="n5-msg" class="msg" hidden aria-live="polite"></div>
+      </div>
+      <div id="cap-wrap" style="margin-top:10px" hidden>
+        <p class="h" style="margin-bottom:4px">Salida estándar CAP 1.2 <button type="button" id="btn-dl-cap" style="min-height:28px;padding:3px 8px;font-size:11.5px">Descargar XML</button></p>
+        <pre class="xml" id="cap-xml"></pre>
+      </div>
+    </section>
+
+    <section class="sec">
+      <details>
+        <summary class="h" style="cursor:pointer;margin:0">Fuentes, metodología y límites (transparencia)</summary>
+        <div style="font-size:12px;color:var(--m);margin-top:8px;line-height:1.5">
+          <p style="margin:4px 0"><strong>Núcleo ejecutado en cliente:</strong> <span class="mono">citizen-report.mjs</span>, <span class="mono">report-forensics.mjs</span>, <span class="mono">report-protocol.mjs</span>, <span class="mono">hazard-verify.mjs</span>, <span class="mono">orbital.mjs</span>, <span class="mono">interop.mjs</span>.</p>
+          <p style="margin:4px 0"><strong>Límites declarados:</strong> la probabilidad bayesiana usa pesos sin calibración de campo completa salvo que Dawid-Skene disponga de ≥ 10 casos por seudónimo. Ningún aviso público puede emitirse sin firma Ed25519 de una autoridad identificada ni sobre un expediente en modo <span class="mono">SIMULATION</span> o <span class="mono">EXERCISE</span>.</p>
+        </div>
+      </details>
+    </section>
+  </aside>
+</main>
+<script type="module" src="/senda/comite.mjs"></script>
+</body>
+</html>

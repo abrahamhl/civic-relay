@@ -12,13 +12,13 @@ button,input{font:inherit;color:inherit;border:0}button{cursor:pointer;backgroun
 #map,#radarWrap{position:absolute;inset:0}
 #radarWrap{display:grid;place-items:center;background:#0b1419;color:#fff;text-align:center;padding:20px}
 #radar{width:min(80vw,360px);height:min(80vw,360px)}
-/* Tarjetas flotantes */
-.card{background:var(--card);border-radius:18px;box-shadow:0 6px 24px rgba(0,0,0,.18)}
+/* Tarjetas flotantes estilo Apple Maps */
+.card{background:rgba(255,255,255,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:20px;box-shadow:0 8px 28px rgba(0,0,0,.16)}
 #top{position:absolute;left:10px;right:10px;top:10px;z-index:5}
-#search{display:flex;align-items:center;gap:8px;padding:10px 12px}
+#search{display:flex;align-items:center;gap:8px;padding:11px 14px}
 #search input{flex:1;outline:none;font-size:17px;background:none}
 #search svg{flex:none;color:var(--muted)}
-#favs{display:flex;gap:8px;margin-top:8px;overflow-x:auto}
+#favs{display:flex;gap:8px;margin-top:8px;overflow-x:auto;scrollbar-width:none}#favs::-webkit-scrollbar{display:none}
 .chip{background:var(--card);border-radius:18px;padding:7px 13px;font-size:14px;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.18);white-space:nowrap;display:inline-flex;align-items:center;gap:6px;color:#3c4043}.chip svg{flex:none;color:#5f6368}
 #results{margin-top:8px;max-height:40vh;overflow:auto}
 #results button{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:11px 14px;border-top:1px solid #eee;font-size:15px}#results .ri{flex:none;width:34px;height:34px;border-radius:50%;background:#f1f3f4;color:#5f6368;display:grid;place-items:center}#results .rt{flex:1;min-width:0}#results .rt b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#results .rd{flex:none;font-size:12px;color:var(--muted)}
@@ -36,22 +36,23 @@ button,input{font:inherit;color:inherit;border:0}button{cursor:pointer;backgroun
 #reportBtn{position:absolute;right:12px;bottom:calc(var(--bottomH,0px) + 16px + env(safe-area-inset-bottom));z-index:6;width:62px;height:62px;border-radius:50%;background:var(--orange);color:#fff;box-shadow:0 3px 12px rgba(0,0,0,.25);display:grid;place-items:center}
 #bottom{position:absolute;left:0;right:0;bottom:0;z-index:5;padding:12px 14px calc(12px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0}
 #eta{display:flex;align-items:baseline;gap:10px}#eta b{font-size:24px}#eta span{color:var(--muted)}
-.row{display:flex;gap:8px;margin-top:10px}.row button{flex:1;padding:11px;border-radius:12px;font-weight:700;font-size:15px;background:#f2f2f7}
+.row{display:flex;gap:8px;margin-top:10px}.row button,.row a.btn-link{flex:1;padding:11px;border-radius:12px;font-weight:700;font-size:14.5px;background:#f2f2f7;text-align:center;text-decoration:none;color:inherit}
 .row .waze{background:#33ccff;color:#06323f}.row .maps{background:#e8f0fe;color:#1a56c4}.row .end{background:#ffe5e3;color:var(--red)}
 #bottom:has(> #etaBox[hidden]){display:none}
 #toast{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(var(--bottomH,0px) + 92px + env(safe-area-inset-bottom));z-index:15;max-width:min(92vw,460px);background:#323232;color:#fff;border-radius:8px;padding:11px 14px;font-size:14px;line-height:1.35;box-shadow:0 4px 14px rgba(0,0,0,.3)}
 /* Hoja de avisos */
-#sheet{position:absolute;left:0;right:0;bottom:0;z-index:8;padding:16px 14px calc(16px + env(safe-area-inset-bottom));border-radius:22px 22px 0 0}
-#sheet h3{margin:0 0 12px;font-size:20px}
+#sheet{position:absolute;left:0;right:0;bottom:0;z-index:8;padding:10px 16px calc(16px + env(safe-area-inset-bottom));border-radius:26px 26px 0 0}
+#sheet .grab{width:38px;height:5px;border-radius:999px;background:#c7c7cc;margin:0 auto 10px}
+#sheet h3{margin:0 0 12px;font-size:20px;font-weight:700}
 #grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 #grid button{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:600}
 #grid svg{width:58px;height:58px}
-#veil{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:7}
+#veil{position:absolute;inset:0;background:rgba(0,0,0,.38);backdrop-filter:blur(3px);z-index:7}
 /* Cámara con IA (miniatura) */
-#pip{position:absolute;right:68px;top:84px;z-index:4;width:132px;height:176px;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+#pip{position:absolute;right:68px;top:84px;z-index:4;width:132px;height:176px;border-radius:16px;overflow:hidden;background:#000;box-shadow:0 6px 20px rgba(0,0,0,.35)}
 #pip.big{left:10px;right:10px;top:84px;width:auto;height:52vh}
 #pip video,#pip canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-#adas{position:absolute;left:10px;right:10px;z-index:6;border-radius:14px;padding:12px 14px;font-weight:800;font-size:17px;top:84px}
+#adas{position:absolute;left:10px;right:10px;z-index:6;border-radius:16px;padding:12px 14px;font-weight:800;font-size:17px;top:84px}
 #adas.AMBAR{background:#ffcc00;color:#1c1c1e}#adas.ROJO{background:var(--red);color:#fff}
 #corridorAlert{margin-top:8px;display:flex;align-items:center;gap:10px;padding:10px 12px;font-size:14px}
 #corridorAlert.ROJO{background:#fff5f5}
@@ -59,10 +60,10 @@ button,input{font:inherit;color:inherit;border:0}button{cursor:pointer;backgroun
 #corridorAlert .ca-body{min-width:0;flex:1}#corridorAlert .ca-title{font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #corridorAlert .ca-vote{display:flex;gap:8px;margin-top:6px}#corridorAlert .ca-vote button{flex:1;border-radius:10px;padding:7px 8px;font-weight:700;font-size:13px;background:#eef2f7;color:#1c1c1e}#corridorAlert .ca-vote #caNo{background:#ffe5e3;color:#c0271f}
 #corridorAlert .ca-sub{font-size:12px;color:var(--muted);line-height:1.25}
-#radarAlert{margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;font-size:13px}
-#radarAlert.OVER{background:#fff5f5}
-#radarAlert .ra-body{min-width:0;flex:1}#radarAlert .ra-title{font-weight:700;line-height:1.2}#radarAlert .ra-sub{font-size:11px;color:var(--muted);line-height:1.25}
-#radarAlert .ra-lim{flex:none;width:40px;height:40px;border-radius:50%;border:4px solid var(--red);background:#fff;color:#1c1c1e;display:grid;place-items:center;font-weight:800;font-size:14px}
+#radarAlert,#curveAlert{margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;font-size:13px}
+#radarAlert.OVER,#curveAlert.BRAKE_NOW{background:#fff5f5}#curveAlert.COAST_EARLY{background:#fffaf0}
+#radarAlert .ra-body,#curveAlert .ra-body{min-width:0;flex:1}#radarAlert .ra-title,#curveAlert .ra-title{font-weight:700;line-height:1.2}#radarAlert .ra-sub,#curveAlert .ra-sub{font-size:11px;color:var(--muted);line-height:1.25}
+#radarAlert .ra-lim,#curveAlert .ra-lim{flex:none;width:40px;height:40px;border-radius:50%;border:4px solid var(--red);background:#fff;color:#1c1c1e;display:grid;place-items:center;font-weight:800;font-size:14px}
 #bbBadge{margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:8px 10px;background:rgba(28,28,30,.92);color:#fff;font-size:12px;font-weight:600}
 #bbBadge .bb-acts{display:flex;gap:6px;flex:none}
 #bbBadge button{background:var(--red);color:#fff;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:700;flex:none}
@@ -94,9 +95,10 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
 .me-puck{width:22px;height:22px;position:relative}.me-puck b{position:absolute;inset:0;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.35)}
 .me-puck .cone{position:absolute;left:50%;top:50%;width:70px;height:70px;transform:translate(-50%,-100%);background:radial-gradient(circle at 50% 100%,rgba(26,115,232,.45),rgba(26,115,232,0) 70%);clip-path:polygon(50% 100%,18% 0,82% 0);display:none}
 .me-puck.has-heading .cone{display:block}
+#center.on{background:#1a73e8;color:#fff}
 #side{max-height:calc(100% - 230px);overflow-y:auto;scrollbar-width:none}
 /* Capas (hoja inferior) */
-.sheet2{position:absolute;left:0;right:0;bottom:0;z-index:20;background:var(--card);color:var(--ink);border-radius:20px 20px 0 0;padding:10px 16px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.25);max-height:82vh;overflow-y:auto}
+.sheet2{position:absolute;left:0;right:0;bottom:0;z-index:20;background:var(--card);color:var(--ink);border-radius:24px 24px 0 0;padding:10px 16px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.25);max-height:82vh;overflow-y:auto}
 .sheet2 .grab{width:40px;height:5px;border-radius:3px;background:#c7c7cc;margin:0 auto 8px}
 .sheet2 h3{display:flex;justify-content:space-between;align-items:center;margin:4px 0 10px;font-size:18px}
 .sheet2 h4{margin:16px 0 8px;font-size:14px;font-weight:600;color:var(--muted)}
@@ -125,41 +127,40 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
 #sig .sig-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}#sig .sig-top b{letter-spacing:.12em;font-size:13px;color:#34ff99;text-shadow:0 0 8px rgba(52,255,153,.6)}#sig .sig-top small{display:block;font-size:11px;color:#8fe3b8}
 #sig .sig-body{display:flex;gap:10px;align-items:center}#sigCanvas{width:min(58vw,300px);height:min(58vw,300px);flex:none;border-radius:50%}
 #sig .sig-hud{display:grid;grid-template-columns:1fr;gap:6px;flex:1;min-width:0}
-#sig .tile{background:rgba(52,255,153,.07);border:1px solid rgba(52,255,153,.22);border-radius:12px;padding:6px 8px;display:flex;flex-direction:column}
-#sig .tile b{font-size:24px;line-height:1;color:#fff;text-shadow:0 0 10px rgba(52,255,153,.5)}#sig .tile span{font-size:11px;color:#8fe3b8;text-transform:uppercase;letter-spacing:.06em}#sig .tile small{font-size:10px;color:#6fbf96;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sig .tile{background:#1c1c1e;border-radius:14px;padding:7px 9px;display:flex;flex-direction:column}
+#sig .tile b{font-size:22px;line-height:1;color:#fff}#sig .tile span{font-size:11px;color:rgba(235,235,245,.66);text-transform:uppercase;letter-spacing:.04em}#sig .tile small{font-size:10px;color:rgba(235,235,245,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #sig .tile.w b{color:#64d2ff}#sig .tile.g b{color:#30d158}#sig .tile.o b{color:#ff9f0a}
-#sig .sig-hist{margin-top:8px}#sigHist{width:100%;height:36px;display:block}#sigNote{font-size:10.5px;color:#8fe3b8;display:block;margin-top:4px;line-height:1.35}
-#sig .sig-legend{display:flex;flex-wrap:wrap;gap:8px;font-size:10.5px;margin-top:6px;color:#bfeed4}#sig .sig-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle;box-shadow:0 0 6px currentColor}
-#sig button{border-radius:10px;padding:6px 10px;background:rgba(52,255,153,.14);color:#d8ffe9;font-weight:700;font-size:12px;border:1px solid rgba(52,255,153,.3)}
-.ib.dark{background:rgba(52,255,153,.14);color:#34ff99;width:28px;height:28px;padding:0}
-/* Laboratorio de señal */
-.chip.lab-chip{background:#0d1b2a;color:#7df9ff;border:1px solid rgba(125,249,255,.38)}
-.chip.lab-chip.live{background:#063b2c;color:#6ef7b2;border-color:#34c759;box-shadow:0 0 12px rgba(52,199,89,.4)}
-#labPanel{position:absolute;left:0;right:0;bottom:0;z-index:12;max-height:84vh;display:flex;flex-direction:column;background:#0a1118;color:#e6f1f8;border-top:1px solid rgba(125,249,255,.28);border-radius:20px 20px 0 0;box-shadow:0 -10px 36px rgba(0,0,0,.65);padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
-#labHead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.1)}
-#labHead h3{margin:0;font-size:15px;font-weight:800;letter-spacing:.2px;color:#7df9ff}
-#labStatusPill{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.1);color:#b0c4d4;white-space:nowrap;flex:none}
-#labStatusPill.live{background:rgba(52,199,89,.22);color:#6ef7b2;border:1px solid rgba(52,199,89,.5)}
-#labClose{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.1);color:#fff;font-weight:800;display:grid;place-items:center}
-#labActs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
-#labActs button{padding:9px 8px;border-radius:11px;font-size:12px;font-weight:700;background:#162433;color:#dbeafe;border:1px solid rgba(125,249,255,.2);text-align:center}
-#labActs button.pri{grid-column:1 / -1;background:linear-gradient(90deg,#0284c7,#06b6d4);color:#04131c;border:0;font-size:13px;padding:10px}
-#labActs button.live{background:#0f5132;color:#a7f3d0;border-color:#34c759}
-#labKpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
-.lkpi{background:#111c27;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:6px 5px;text-align:center}
-.lkpi span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:#8aa4b8}
-.lkpi b{display:block;font-size:11px;font-weight:800;color:#fff;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#labCards{margin-top:8px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-right:2px;flex:1;min-height:120px}
-.lcard{background:#111c27;border-radius:11px;padding:8px 10px;border-left:4px solid #64748b}
-.lcard.OK{border-left-color:#34c759}.lcard.WARN{border-left-color:#ffcc00}.lcard.CRIT{border-left-color:#ff3b30}.lcard.NO_SENSOR{border-left-color:#64748b}
+#sig .sig-hist{margin-top:8px}#sigHist{width:100%;height:36px;display:block}#sigNote{font-size:11px;color:rgba(235,235,245,.66);display:block;margin-top:4px;line-height:1.35}
+#sig .sig-legend{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;margin-top:6px;color:rgba(235,235,245,.75)}#sig .sig-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+#sig button{border-radius:999px;padding:6px 11px;background:#2c2c2e;color:#fff;font-weight:600;font-size:12px}
+.ib.dark{background:#2c2c2e;color:#30d158;width:28px;height:28px;padding:0}
+/* Laboratorio de señal · Apple HIG Dark */
+.chip.lab-chip{background:#1c1c1e;color:#fff}
+.chip.lab-chip.live{background:#30d158;color:#041a0a}
+#labPanel{position:absolute;left:0;right:0;bottom:0;z-index:12;max-height:84vh;display:flex;flex-direction:column;background:#000;color:#fff;border-radius:26px 26px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.65);padding:12px 14px calc(14px + env(safe-area-inset-bottom))}
+#labHead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:10px;border-bottom:.5px solid rgba(84,84,88,.6)}
+#labHead h3{margin:0;font-size:16px;font-weight:700;letter-spacing:-.01em;color:#fff}
+#labStatusPill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:#1c1c1e;color:rgba(235,235,245,.66);white-space:nowrap;flex:none}
+#labStatusPill.live{background:rgba(48,209,88,.22);color:#30d158}
+#labClose{width:32px;height:32px;border-radius:50%;background:#2c2c2e;color:#fff;font-weight:700;display:grid;place-items:center}
+#labActs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+#labActs button{padding:10px 8px;border-radius:12px;font-size:13px;font-weight:600;background:#1c1c1e;color:#fff;text-align:center}
+#labActs button.pri{grid-column:1 / -1;background:#0a84ff;color:#fff;font-size:14.5px;padding:12px;border-radius:14px}
+#labActs button.live{background:rgba(48,209,88,.22);color:#30d158}
+#labKpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.lkpi{background:#1c1c1e;border-radius:12px;padding:7px 5px;text-align:center}
+.lkpi span{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.3px;color:rgba(235,235,245,.55)}
+.lkpi b{display:block;font-size:11.5px;font-weight:700;color:#fff;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#labCards{margin-top:10px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:2px;flex:1;min-height:120px}
+.lcard{background:#1c1c1e;border-radius:14px;padding:10px 12px}
 .lcard-top{display:flex;align-items:center;justify-content:space-between;gap:6px}
-.lcard-name{font-size:12px;font-weight:800;color:#f1f5f9}
+.lcard-name{font-size:13px;font-weight:700;color:#fff}
 .lcard-tags{display:flex;gap:4px;flex:none}
-.ltag{font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.1);color:#cbd5e1}
-.ltag.OK{background:rgba(52,199,89,.2);color:#6ef7b2}.ltag.WARN{background:rgba(255,204,0,.22);color:#fde047}.ltag.CRIT{background:rgba(255,59,48,.24);color:#fca5a5}
-.lcard-head{font-size:11.5px;font-weight:700;color:#7df9ff;margin-top:3px;font-family:ui-monospace,Menlo,Consolas,monospace}
-.lcard-interp{font-size:11px;color:#cbd5e1;margin-top:2px;line-height:1.3}
-#labFoot{margin-top:6px;font-size:10px;color:#8aa4b8;text-align:center}
+.ltag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:999px;background:#2c2c2e;color:rgba(235,235,245,.66)}
+.ltag.OK{background:rgba(48,209,88,.2);color:#30d158}.ltag.WARN{background:rgba(255,159,10,.22);color:#ff9f0a}.ltag.CRIT{background:rgba(255,69,58,.24);color:#ff6961}
+.lcard-head{font-size:12px;font-weight:600;color:#64d2ff;margin-top:4px;font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+.lcard-interp{font-size:12px;color:rgba(235,235,245,.72);margin-top:3px;line-height:1.35}
+#labFoot{margin-top:8px;font-size:11px;color:rgba(235,235,245,.45);text-align:center}
 </style><script type="module" src="/senda/app-chrome.mjs"></script></head><body>
 <div id="app">
   <div id="map" aria-label="Mapa"></div>
@@ -173,6 +174,7 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
       <div id="results" class="card" hidden></div></div>
     <div id="corridorAlert" class="card" role="status" aria-live="polite" hidden><div class="ca-ico" id="caIco"></div><div class="ca-body"><div class="ca-title" id="caTitle"></div><div class="ca-sub" id="caSub"></div><div class="ca-vote" id="caVote" hidden><button id="caYes">Sigue ahí</button><button id="caNo">Ya no está</button></div></div></div>
     <div id="radarAlert" class="card" role="status" aria-live="polite" hidden><div class="ra-body"><div class="ra-title" id="raTitle"></div><div class="ra-sub" id="raSub"></div></div><div class="ra-lim" id="raLim" hidden></div></div>
+    <div id="curveAlert" class="card" role="status" aria-live="polite" hidden><div class="ra-body"><div class="ra-title" id="cuTitle"></div><div class="ra-sub" id="cuSub"></div></div><div class="ra-lim" id="cuLim"></div></div>
     <div id="bbBadge" class="card" role="status" hidden><span id="bbText">● Caja negra · 0 muestras</span><div class="bb-acts"><button class="sec" id="aiModeBtn" title="Cambiar cadencia IA">IA: Auto</button><button id="bbSave">Guardar</button></div></div>
   </div>
   <div id="adas" role="alert" hidden></div>
@@ -231,7 +233,9 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
     <h4>Mientras conduces</h4>
     <div class="tlist"><button class="trow" id="camBtn" aria-label="Cámara con IA"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg></i><span>Cámara con IA<small>Detecta vehículos y personas delante</small></span><em></em></button><button class="trow" id="dashBtn" aria-label="Modo dashcam"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="15" height="12" rx="2"/><circle cx="9.5" cy="12" r="3"/><path d="M17 10l5-3v10l-5-3"/></svg></i><span>Dashcam<small>Graba la carretera con los datos del viaje</small></span><em></em></button><button class="trow" id="teleBtn" aria-label="Datos en pantalla"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></i><span>Datos en pantalla<small>Velocidad, GPS, sensores y señal</small></span><em></em></button><button class="trow" id="bbBtn" aria-label="Caja negra: grabar datos y pantalla"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/></svg></i><span>Caja negra<small>Guarda los datos del viaje para revisarlos</small></span><em></em></button></div>
     <h4>Señal y red</h4>
-    <div class="tlist"><button class="trow" id="sigChip"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7M5.5 5.5a9 9 0 0 0 0 13M18.5 5.5a9 9 0 0 1 0 13"/></svg></i><span>Radar de señales<small>Wi-Fi, Bluetooth y otros móviles SENDA</small></span><em></em></button><button class="trow" id="labChip"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></i><span>Laboratorio de señal<small>Cobertura de radio, GPS y estado de la vía</small></span><em></em></button><button class="trow" id="shareBle"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10-5 4V3l5 4L7 17"/></svg></i><span>Enviar mis avisos por Bluetooth<small>A móviles SENDA cercanos, sin internet</small></span><em></em></button><button class="trow" id="probeBle"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10-5 4V3l5 4L7 17"/></svg></i><span>Medir enlace Bluetooth<small>Tiempo de ida y vuelta con otro móvil SENDA</small></span><em></em></button></div>
+    <div class="tlist"><button class="trow" id="sigChip"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7M5.5 5.5a9 9 0 0 0 0 13M18.5 5.5a9 9 0 0 1 0 13"/></svg></i><span>Radar de señales<small>Wi-Fi, Bluetooth y otros móviles SENDA</small></span><em></em></button><button class="trow" id="labChip"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></i><span>Laboratorio de señal<small>Cobertura de radio, GPS y estado de la vía</small></span><em></em></button><button class="trow" id="shareBle"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10-5 4V3l5 4L7 17"/></svg></i><span>Enviar mis avisos por Bluetooth<small>A móviles SENDA cercanos, sin internet</small></span><em></em></button><button class="trow" id="shareIndirectDrive"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v7h-4M14 18v3"/></svg></i><span>Compartir avisos sin la app<small>Por QR o mensaje, a quien no tenga SENDA</small></span><em></em></button><button class="trow" id="probeBle"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10-5 4V3l5 4L7 17"/></svg></i><span>Medir enlace Bluetooth<small>Tiempo de ida y vuelta con otro móvil SENDA</small></span><em></em></button></div>
+    <h4>Más pantallas</h4>
+    <div class="tlist"><a class="trow" id="copilotChip" href="/senda/copiloto" style="color:inherit;text-decoration:none"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg></i><span>Copiloto 5D<small>Física del vehículo, curvas y entorno en directo</small></span><em></em></a></div>
     <h4>Mapa e IA</h4>
     <div class="tlist"><button class="trow" id="pmBtn"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg></i><span>Cargar mapa sin conexión<small>Archivo .pmtiles</small></span><em></em></button><button class="trow" id="sheetAiMode"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg></i><span>IA: Auto<small>Frecuencia del análisis de la cámara</small></span><em></em></button></div>
     <input type="file" id="pmFile" accept=".pmtiles" hidden>
@@ -242,6 +246,7 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
   </section>
   <div id="veil" hidden></div>
   <div id="sheet" class="card" hidden>
+    <div class="grab"></div>
     <h3>¿Qué ves?</h3>
     <div id="grid"></div>
   </div>
