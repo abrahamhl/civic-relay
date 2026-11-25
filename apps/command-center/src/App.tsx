@@ -308,6 +308,14 @@ export function App() {
             </div>
           )}
 
+          {tab === 'explorer' && (
+            <section className="panel" style={{ padding: 24, maxWidth: 760 }}>
+              <h2 style={{ marginTop: 0 }}>Explorador 3D/4D · modo PRO</h2>
+              <p>El mismo Explorador de la web y la app (relieve real, edificios 3D, topografía de la zona, perfiles, planta exterior de edificios en SVG/DXF y luz del Sol real), con más potencia: relieve hasta zoom 15, hasta 64 teselas por levantamiento e imagen a mayor resolución.</p>
+              <p style={{ opacity: 0.75, fontSize: 13 }}>Datos abiertos: OpenStreetMap/OpenFreeMap, Terrain Tiles (AWS), PNOA (IGN), PDOK, NASA GIBS. Orientativo: no sustituye a una topografía de obra ni a planos oficiales.</p>
+              <a className="btn" href="/senda/explorador.html?pro=1" style={{ display: 'inline-block', padding: '12px 18px', borderRadius: 12, background: '#0a84ff', color: '#fff', textDecoration: 'none', fontWeight: 700 }}>Abrir Explorador 3D/4D</a>
+            </section>
+          )}
           {tab === 'rf' && <RfLab />}
           {tab === 'meteorology' && <MeteorologyLab />}
           {tab === 'access' && <AccessControlPanel />}

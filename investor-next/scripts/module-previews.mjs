@@ -15,7 +15,7 @@ const allow = /^https:\/\/(tiles\.openfreemap\.org|router\.project-osrm\.org|rou
 fs.mkdirSync(out, { recursive: true });
 const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
 const ctx = await b.newContext({ ...devices['Pixel 7'], deviceScaleFactor: 1, geolocation: { latitude: 51.9830, longitude: 5.9105, accuracy: 10 }, permissions: ['geolocation'] });
-await ctx.addInitScript(() => { try { localStorage.setItem('senda.drive.welcomed', 'true'); localStorage.setItem('senda.f4d.welcomed', 'true'); } catch { /* */ } });
+await ctx.addInitScript(() => { try { localStorage.setItem('senda.drive.welcomed', 'true'); localStorage.setItem('senda.f4d.welcomed', 'true'); localStorage.setItem('senda.exp.welcomed', 'true'); } catch { /* */ } });
 await ctx.route(/^https?:\/\/(?!localhost)/, (r) => (allow.test(r.request().url()) ? r.continue() : r.abort()));
 const only = process.argv.slice(2);
 const done = [];
@@ -25,7 +25,7 @@ for (const m of MODULES) {
   const url = `http://localhost:8771${page === 'index' ? '/senda/index.html' : `/senda/${page}.html`}`;
   const pg = await ctx.newPage();
   try {
-    await pg.goto(url, { waitUntil: 'load', timeout: 20000 }); await pg.waitForTimeout(m.page === 'incendio4d' ? 9000 : 4000);
+    await pg.goto(url, { waitUntil: 'load', timeout: 20000 }); await pg.waitForTimeout(['incendio4d', 'explorador'].includes(m.page) ? 9000 : 4000);
     const png = path.join(out, `${m.page}.png`);
     // Lo visual de cada pantalla: el mayor mapa, lienzo, 3D, vídeo, imagen o gráfico visible; si no hay, la cabecera.
     const box = await pg.evaluate(() => {

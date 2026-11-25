@@ -23,7 +23,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' ipc: http://ipc.localhost; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
+      "csp": "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; worker-src 'self' blob:; connect-src 'self' ipc: http://ipc.localhost https://tiles.openfreemap.org https://s3.amazonaws.com/elevation-tiles-prod/ https://tms-pnoa-ma.idee.es https://service.pdok.nl https://gibs.earthdata.nasa.gov https://tile.opentopomap.org https://nominatim.openstreetmap.org; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
     }
   },
   "bundle": {
