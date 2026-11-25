@@ -1,5 +1,6 @@
 export type TabId =
   | 'explorer'
+  | 'sim4d'
   | 'overview'
   | 'sources'
   | 'cameras'

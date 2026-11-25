@@ -19,7 +19,15 @@ button,select,input{font:inherit;color:inherit}button{cursor:pointer;border:0;ba
 #panel .grab{width:56px;height:6px;border-radius:3px;background:#636366;margin:0 auto 8px;display:block;cursor:pointer}
 #panel.mini .more{display:none}
 .lvl{display:flex;align-items:center;gap:10px}.lvl input{flex:1;accent-color:var(--water)}
-#play{width:40px;height:40px;border-radius:50%;background:var(--water);color:#001a2a;font-size:16px;font-weight:800;flex:none}
+button.play{width:40px;height:40px;border-radius:50%;background:var(--water);color:#001a2a;font-size:16px;font-weight:800;flex:none}
+#clock{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px;min-width:116px}
+#kpis2{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}#kpis2 div{background:var(--g1);border-radius:10px;padding:6px 8px}#kpis2 b{display:block;font-size:16px}#kpis2 span{font-size:10.5px;color:var(--l2)}
+canvas#tq{width:100%;height:150px;background:var(--g1);border-radius:12px;display:block}
+#evlist .ev{display:flex;gap:8px;align-items:flex-start;padding:7px 2px;border-top:.5px solid rgba(84,84,88,.5);font-size:12.5px;line-height:1.35;cursor:pointer}
+#evlist .ev time{flex:none;width:46px;font-weight:700;font-variant-numeric:tabular-nums}#evlist .ev.fut{opacity:.42}#evlist .ev small{display:block;color:var(--l2);font-size:11px}
+.tv{display:grid;grid-template-columns:1fr 1fr;gap:6px}.tv label{background:var(--g1);border-radius:10px;padding:6px 8px;font-size:11px;color:var(--l2)}.tv select{width:100%;margin-top:4px;background:var(--g2);border:0;border-radius:8px;padding:6px;color:#fff}.tv input{width:100%;accent-color:var(--scen)}.tv b{color:#fff;font-size:14px}
+.out{font-size:12.5px;color:var(--l2);line-height:1.45;margin:6px 2px}.out b{color:#fff}
+.badge.unv{background:rgba(255,159,10,.12);color:#ff9f0a;border:1px solid #ff9f0a}
 #lvlTxt{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px;min-width:116px}
 #kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
 #kpis div{background:var(--g1);border-radius:10px;padding:6px 8px;min-width:0}#kpis b{display:block;font-size:17px}#kpis span{font-size:10.5px;color:var(--l2)}
@@ -44,14 +52,28 @@ canvas#csi{width:100%;height:150px;background:var(--g1);border-radius:12px;displ
 <div id="msg" hidden></div>
 <section id="panel">
   <button class="grab" id="grab" aria-label="Ver más o menos controles"></button>
-  <div class="lvl"><button id="play" aria-label="Subir el agua">▶</button><input id="lvl" type="range" min="0" max="20" step="0.5" value="0" aria-label="Altura del agua sobre el cauce (metros)"><span id="lvlTxt"></span></div>
-  <div id="kpis"><div><b id="kMod">–</b><span>km² modelo</span></div><div><b id="kObs">–</b><span>km² observado</span></div><div><b id="kCsi">–</b><span>acuerdo (CSI)</span></div><div><b id="kBest">–</b><span>mejor nivel</span></div></div>
-  <div class="row"><button id="basinBtn">💧 ¿De dónde viene el agua?</button><button id="sciBtn">🔬 Ciencia</button></div>
+  <div class="lvl"><button id="tplay" class="play" aria-label="Reproducir el día">▶</button><input id="t" type="range" min="360" max="1320" step="5" value="1135" aria-label="Hora local del 29-10-2024"><span id="clock"></span></div>
+  <div id="kpis"><div><b id="kQ">–</b><span>caudal (último dato)</span></div><div><b id="kLvl">–</b><span>frente al cauce urbano (800)</span></div><div><b id="kAlert">–</b><span>ES-Alert</span></div><div><b id="kCsi">–</b><span>acuerdo (CSI)</span></div></div>
+  <div class="row"><button id="basinBtn">💧 ¿De dónde viene?</button><button id="travelBtn">⏱️ ¿Cuándo llega?</button><button id="sciBtn">🔬 Ciencia</button></div>
   <div class="more">
+  <h4>Telemetría del 29-10 (cada dato con su fuente)</h4>
+  <canvas id="tq" width="700" height="300" aria-label="Caudal del Poyo y umbrales"></canvas>
+  <div class="leg"><span><i style="background:#ff453a"></i>medido</span><span><i style="background:#bf5af2"></i>estimado (CEDEX)</span><span><i style="background:transparent;border:2px solid #ff9f0a"></i>no verificado</span><span><i style="background:#ffd60a"></i>umbral de aviso 150</span><span><i style="background:#ff9f0a"></i>capacidad urbana 800</span><span><i style="background:#64d2ff"></i>ES-Alert</span></div>
+  <div id="evlist"></div>
+  <h4>⏱️ ¿Cuándo llega el agua? <span class="badge scen">ESCENARIO</span></h4>
+  <div class="tv"><label>Sale a las <select id="tDep"></select></label><label>Velocidad <b id="tVelTxt"></b> m/s<input id="tVel" type="range" min="1" max="20" step="0.5"></label></div>
+  <div class="row"><button id="tChiva">Ejemplo: desde Chiva</button><button id="tPick">Elegir punto</button><button id="tClear">Borrar</button></div>
+  <div id="tOut" class="out"></div>
+  <h4>Agua por nivel sobre el cauce <span class="badge scen">ESCENARIO</span></h4>
+  <div class="lvl"><button id="play" class="play" aria-label="Subir el agua">▶</button><input id="lvl" type="range" min="0" max="20" step="0.5" value="0" aria-label="Altura del agua sobre el cauce (metros)"><span id="lvlTxt"></span></div>
+  <div id="kpis2"><div><b id="kMod">–</b><span>km² modelo</span></div><div><b id="kObs">–</b><span>km² satélite</span></div><div><b id="kBest">–</b><span>mejor nivel</span></div></div>
+  <div id="proBox" hidden><h4>PRO · escritorio</h4><div class="row"><button id="expPack">⬇️ Paquete de datos con procedencia</button><button id="expCsv">⬇️ Cronología CSV</button></div><p class="src" id="proNote"></p></div>
   <h4>Capas</h4>
   <div id="layers"></div>
   <div class="leg" id="cmpLeg" hidden><span><i style="background:#fff"></i>los dos</span><span><i style="background:#0a84ff"></i>solo el modelo</span><span><i style="background:#34c759"></i>solo el satélite</span></div>
   <section id="science"></section>
+  </div>
+</section>
   </div>
 </section>
 <section id="info" hidden><button class="x" id="infoX" aria-label="Cerrar">✕</button><div id="infoBody"></div></section>

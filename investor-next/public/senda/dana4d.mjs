@@ -3,6 +3,8 @@
 import { MAP_STYLES, styleFor, TERRAIN_SOURCE } from './core/map-style.mjs';
 import { lonToTileX, latToTileY, gridToLonLat } from './core/geo-survey.mjs';
 import { DI, DJ, handRGBA, compareRGBA, agreement, floodMask } from './core/flood-science.mjs';
+import { downstreamPath, closestOnPath, travelMinutes, frontIndex, flowLevel, localToUtcMs, leadMinutes } from './core/flood-warning.mjs';
+import { saveBlob } from './save-file.mjs';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -10,7 +12,9 @@ const LS = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; 
 const fmt = (v, d = 0) => (v == null || !Number.isFinite(v) ? '–' : v.toLocaleString('es-ES', { maximumFractionDigits: d, minimumFractionDigits: d }));
 const D = '/senda/data/dana2024/';
 
-const [meta, ems, obsGj, cauces] = await Promise.all(['hidro.json', 'emsr773.json', 'emsr773_inundacion.geojson', 'cauces.geojson'].map((f) => fetch(D + f).then((r) => r.json())));
+const [meta, ems, obsGj, cauces, TEL] = await Promise.all(['hidro.json', 'emsr773.json', 'emsr773_inundacion.geojson', 'cauces.geojson', 'telemetria.json'].map((f) => fetch(D + f).then((r) => r.json())));
+const TOWNS = (await fetch('/senda/data/radio/poyo.json').then((r) => r.json())).municipios; // puntos de Nominatim (OSM, ODbL)
+const PRO = new URLSearchParams(location.search).has('pro') || !!window.__TAURI_INTERNALS__;
 const bin = (f) => fetch(D + f).then((r) => r.arrayBuffer());
 const [handBuf, obsBuf, dirBuf] = await Promise.all(['hand_roi.bin', 'obs_roi.bin', 'dir_z12.bin'].map(bin));
 const G = meta.malla, R = meta.roi, cellKm2 = (G.celdaM * G.celdaM) / 1e6;
@@ -54,12 +58,18 @@ function addAll() {
   src('obs', { type: 'geojson', data: obsGj });
   src('cauces', { type: 'geojson', data: cauces });
   src('pin', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+  for (const id of ['tpath', 'tmarks', 'tfront', 'towns']) src(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
   const L = (def) => { if (!map.getLayer(def.id)) map.addLayer(def); };
   for (const id of [...(cBasin ? ['basin'] : []), 'hand', 'cmp']) L({ id, type: 'raster', source: id, paint: { 'raster-opacity': id === 'basin' ? 0.55 : 0.9, 'raster-fade-duration': 0, 'raster-resampling': 'nearest' } });
   L({ id: 'obs', type: 'fill', source: 'obs', paint: { 'fill-color': '#34c759', 'fill-opacity': 0.35 } });
   L({ id: 'obs-line', type: 'line', source: 'obs', paint: { 'line-color': '#34c759', 'line-width': 1.2 } });
   L({ id: 'cauces', type: 'line', source: 'cauces', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#64d2ff', 'line-opacity': 0.9, 'line-width': ['interpolate', ['linear'], ['zoom'], 9, ['+', 0.6, ['*', 0.7, ['get', 'clase']]], 14, ['+', 1.5, ['*', 1.8, ['get', 'clase']]]] } });
   L({ id: 'cauces-lbl', type: 'symbol', source: 'cauces', filter: ['>=', ['get', 'clase'], 3], layout: { 'symbol-placement': 'line', 'symbol-spacing': 420, 'text-field': ['concat', ['to-string', ['get', 'km2']], ' km²'], 'text-font': ['Noto Sans Bold'], 'text-size': 11 }, paint: { 'text-color': '#64d2ff', 'text-halo-color': '#000', 'text-halo-width': 1.5 } });
+  L({ id: 'tpath', type: 'line', source: 'tpath', layout: { 'line-cap': 'round' }, paint: { 'line-color': '#bf5af2', 'line-width': 5, 'line-opacity': 0.9 } });
+  L({ id: 'tmarks', type: 'circle', source: 'tmarks', paint: { 'circle-radius': 4, 'circle-color': '#fff', 'circle-stroke-color': '#bf5af2', 'circle-stroke-width': 2 } });
+  L({ id: 'tmarks-lbl', type: 'symbol', source: 'tmarks', layout: { 'text-field': ['get', 'label'], 'text-font': ['Noto Sans Bold'], 'text-size': 11, 'text-offset': [0, 1.2] }, paint: { 'text-color': '#fff', 'text-halo-color': '#5e2a84', 'text-halo-width': 1.6 } });
+  L({ id: 'towns', type: 'symbol', source: 'towns', layout: { 'text-field': ['get', 'label'], 'text-font': ['Noto Sans Bold'], 'text-size': 12, 'text-anchor': 'left', 'text-offset': [0.8, 0] }, paint: { 'text-color': '#ffd60a', 'text-halo-color': '#000', 'text-halo-width': 1.6 } });
+  L({ id: 'tfront', type: 'circle', source: 'tfront', paint: { 'circle-radius': 11, 'circle-color': '#ff453a', 'circle-opacity': 0.85, 'circle-stroke-color': '#fff', 'circle-stroke-width': 3 } });
   L({ id: 'pin', type: 'circle', source: 'pin', paint: { 'circle-radius': 7, 'circle-color': '#0a84ff', 'circle-stroke-color': '#fff', 'circle-stroke-width': 3 } });
   render(true);
 }
@@ -152,7 +162,7 @@ function inspect(lon, lat) {
 <tr><td>¿Se inunda al nivel elegido (${fmt(state.level, 1)} m)?</td><td>${Number.isFinite(hv) ? (hv <= state.level ? 'sí' : `no: le faltan ${fmt(hv - state.level, 1)} m`) : '–'}</td><td><span class="badge scen">ESCENARIO</span></td></tr></table>
 <p class="src">Celda de ${fmt(G.celdaM, 1)} m. «Altura sobre su cauce» = cota del punto menos la del cauce al que drena (HAND, Rennó et al. 2008).</p>`);
 }
-map.on('click', (e) => { if (state.basinMode) { state.basinMode = false; $('#basinBtn').classList.remove('on'); $('#msg').hidden = true; return basinAt(e.lngLat.lng, e.lngLat.lat); } inspect(e.lngLat.lng, e.lngLat.lat); });
+map.on('click', (e) => { if (TT.pick) { TT.pick = false; $('#tPick').classList.remove('on'); $('#msg').hidden = true; return travelFrom(e.lngLat.lng, e.lngLat.lat); } if (state.basinMode) { state.basinMode = false; $('#basinBtn').classList.remove('on'); $('#msg').hidden = true; return basinAt(e.lngLat.lng, e.lngLat.lat); } inspect(e.lngLat.lng, e.lngLat.lat); });
 
 // ── 🔬 Ciencia ──
 function drawCsi() {
@@ -204,6 +214,137 @@ $('#sciBtn').addEventListener('click', () => { panelMini(false); $('#science').s
 $('#styleBtn').addEventListener('click', () => { styleId = STYLES[(STYLES.indexOf(styleId) + 1) % STYLES.length]; LS.set('senda.d4d.style', styleId); map.setStyle(sty(styleId), { diff: false }); showToast(`Mapa: ${MAP_STYLES[styleId].label}${MAP_STYLES[styleId].url === null && !['satelite', 'relieve', 'topo'].includes(styleId) ? ` · NASA ${DAY}` : ''}`); });
 $('#kObs').textContent = fmt(obsCells * cellKm2, 1); $('#kBest').textContent = `${fmt(BEST.level, 1)} m`;
 
+// ── ⏱️ Línea del tiempo del 29-10 con telemetría publicada (cada dato con su fuente y su estado) ──
+const OFF = 1; // CET (UTC+1) el 29-10-2024: el cambio de hora fue el 27-10
+const DAY0 = '2024-10-29';
+const C = Object.fromEntries(TEL.constantes.map((c) => [c.id, c]));
+const TH = { avisoM3s: C.umbral_aviso.valor, capacidadM3s: C.capacidad_urbana.valor };
+const pad2 = (n) => String(n).padStart(2, '0');
+const hhmm = (min) => `${pad2(Math.floor(min / 60))}:${pad2(min % 60)}`;
+const minOf = (local) => (local && local.startsWith(DAY0) ? +local.slice(11, 13) * 60 + +local.slice(14, 16) : null);
+const EV = TEL.eventos.map((e) => ({ ...e, min: minOf(e.local), unv: /no verificado/i.test(e.estado) }));
+const FLOW = EV.filter((e) => e.unidad === 'm³/s' && e.min != null);
+const ESA = EV.find((e) => e.id === 'esalert');
+const TT = { pick: false, path: null, k0: null, dep: LS.get('senda.d4d.dep', 'poyo_1855'), v: LS.get('senda.d4d.v', C.velocidad_chiva.valor), arrivals: [] };
+state.tMin = LS.get('senda.d4d.t', 1135);
+const TIPO = { MEDIDO: ['real', 'MEDIDO'], ESTIMADO: ['scen', 'ESTIMADO'], OFICIAL: ['real', 'OFICIAL'], SIN_HORA: ['model', 'SIN HORA'] };
+
+function renderTime() {
+  const t = state.tMin, utc = new Date(localToUtcMs(`${DAY0}T${hhmm(t)}`, OFF));
+  $('#clock').innerHTML = `${hhmm(t)} <small style="color:var(--l2);font-weight:500">29-10 · ${pad2(utc.getUTCHours())}:${pad2(utc.getUTCMinutes())} UTC</small>`;
+  const last = FLOW.filter((e) => e.min <= t).at(-1);
+  $('#kQ').innerHTML = last ? `${fmt(last.valor)}${last.unv ? '<small style="color:#ff9f0a"> ?</small>' : ''} <small style="font-size:10px;color:var(--l2)">m³/s ${hhmm(last.min)}</small>` : '–';
+  const lv = flowLevel(last?.valor, TH);
+  $('#kLvl').textContent = { normal: 'normal', aviso: 'AVISO', desbordamiento: 'DESBORDA', sin_dato: 'sin dato', no_medido: 'no medido' }[lv.level];
+  $('#kLvl').style.color = { aviso: '#ffd60a', desbordamiento: '#ff453a' }[lv.level] ?? '';
+  $('#kAlert').textContent = t < ESA.min ? `en ${ESA.min - t} min` : `enviado ${hhmm(ESA.min)}`;
+  $('#kAlert').style.color = t < ESA.min ? '#ff9f0a' : '#64d2ff';
+  document.querySelectorAll('#evlist .ev[data-m]').forEach((el) => el.classList.toggle('fut', +el.dataset.m > t));
+  drawFlow();
+  // Frente del escenario de llegada
+  const fr = map.getSource('tfront');
+  if (fr && TT.path) {
+    const dep = EV.find((e) => e.id === TT.dep)?.min ?? null, idx = dep == null ? -1 : frontIndex(TT.path, TT.v, t - dep);
+    fr.setData(idx < 0 ? { type: 'FeatureCollection', features: [] } : { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: cellLonLat(TT.path.cells[idx]) } });
+  }
+}
+function drawFlow() {
+  const cv = $('#tq'); if (!cv || !cv.offsetParent) return; const x = cv.getContext('2d'), W = cv.width, H = cv.height, L = 52, B = 34, T0 = 360, T1 = 1320, QMAX = 4000;
+  const X = (m) => L + ((m - T0) / (T1 - T0)) * (W - L - 12), Y = (q) => H - B - (q / QMAX) * (H - B - 12);
+  x.clearRect(0, 0, W, H); x.font = '19px Inter, system-ui'; x.lineWidth = 1;
+  for (const q of [0, 1000, 2000, 3000, 4000]) { x.strokeStyle = 'rgba(84,84,88,.5)'; x.beginPath(); x.moveTo(L, Y(q)); x.lineTo(W - 12, Y(q)); x.stroke(); x.fillStyle = 'rgba(235,235,245,.62)'; x.fillText(q ? `${q / 1000}k` : '0', 8, Y(q) + 6); }
+  for (let m = 360; m <= 1320; m += 120) x.fillText(hhmm(m).slice(0, 2) + 'h', X(m) - 12, H - 8);
+  const hline = (q, col) => { x.strokeStyle = col; x.lineWidth = 2; x.setLineDash([8, 6]); x.beginPath(); x.moveTo(L, Y(q)); x.lineTo(W - 12, Y(q)); x.stroke(); x.setLineDash([]); };
+  hline(TH.avisoM3s, '#ffd60a'); hline(TH.capacidadM3s, '#ff9f0a');
+  x.strokeStyle = '#64d2ff'; x.lineWidth = 3; x.beginPath(); x.moveTo(X(ESA.min), 8); x.lineTo(X(ESA.min), H - B); x.stroke();
+  for (const e of FLOW) {
+    const px = X(e.min), py = Y(e.valor); x.lineWidth = 3;
+    if (e.tipo === 'ESTIMADO') { x.fillStyle = '#bf5af2'; x.beginPath(); x.moveTo(px, py - 10); x.lineTo(px + 10, py); x.lineTo(px, py + 10); x.lineTo(px - 10, py); x.fill(); }
+    else if (e.unv) { x.strokeStyle = '#ff9f0a'; x.beginPath(); x.arc(px, py, 8, 0, 7); x.stroke(); }
+    else { x.fillStyle = '#ff453a'; x.beginPath(); x.arc(px, py, 8, 0, 7); x.fill(); }
+    x.fillStyle = '#fff'; x.fillText(fmt(e.valor), px + 12, py - 8);
+  }
+  x.strokeStyle = '#fff'; x.lineWidth = 2; x.beginPath(); x.moveTo(X(state.tMin), 8); x.lineTo(X(state.tMin), H - B); x.stroke();
+}
+function evHtml(e) {
+  const [cls, lab] = TIPO[e.tipo] ?? ['model', e.tipo], val = e.valor != null ? ` · <b>${e.masDe ? 'más de ' : ''}${fmt(e.valor, e.valor % 1 ? 1 : 0)} ${esc(e.unidad)}</b>` : '';
+  return `<div class="ev" data-id="${e.id}" ${e.min != null ? `data-m="${e.min}"` : ''}><time>${e.min != null ? (e.aprox ? '~' : '') + hhmm(e.min) : e.local ? esc(e.local.slice(8, 10) + '-' + e.local.slice(5, 7)) : '—'}</time><span><span class="badge ${cls}">${lab}</span>${e.unv ? '<span class="badge unv">NO VERIFICADO</span>' : ''}${esc(e.texto)}${val}<small>${esc(e.lugar ?? e.cuando ?? '')}</small></span></div>`;
+}
+const timed = EV.filter((e) => e.min != null).sort((a, b) => a.min - b.min), untimed = EV.filter((e) => e.min == null);
+const leadTxt = (a, b) => { const l = leadMinutes(TEL.eventos, a, b, OFF); return l ? `${l.approx ? '≈ ' : ''}${fmt(l.minutes)} min` : 'no calculable (sin hora)'; };
+$('#evlist').innerHTML = `<table class="tbl" style="margin-bottom:6px"><tr><td>Último dato del aforo (18:55) → ES-Alert</td><td><b>${leadTxt('poyo_1855', 'esalert')}</b></td><td><span class="badge model">CALCULADO</span></td></tr><tr><td>Pico estimado CEDEX (19:35) → ES-Alert</td><td><b>${leadTxt('cedex_pico', 'esalert')}</b></td><td></td></tr><tr><td>Hora del suceso según Copernicus → ES-Alert</td><td><b>${leadTxt('cems_evento', 'esalert')}</b></td><td></td></tr></table><p class="src" style="font-size:11.5px;color:var(--l2);margin:0 2px 6px">Restas de horas publicadas (fuentes abajo, toca cada dato). No es un juicio sobre la gestión: es la ventana de tiempo que un sistema de aviso puede aprovechar.</p>` + timed.map(evHtml).join('') + `<h4>Sin hora exacta o fuera del día</h4>` + untimed.map(evHtml).join('') +
+  `<p class="src" style="font-size:11.5px;color:var(--l2)">No encontrado: ${TEL.noEncontrado.map(esc).join(' · ')}</p>`;
+$('#evlist').addEventListener('click', (ev) => {
+  const el = ev.target.closest('.ev'); if (!el) return; const e = EV.find((x) => x.id === el.dataset.id), f = TEL.fuentes[e.fuente];
+  if (e.min != null) { state.tMin = e.min; $('#t').value = e.min; LS.set('senda.d4d.t', e.min); renderTime(); }
+  const disc = e.discrepancia ? `<p><b>Discrepancia:</b> otra fuente da ${fmt(e.discrepancia.valor, 1)} ${esc(e.unidad)} (${esc(TEL.fuentes[e.discrepancia.fuente].cita)}). Se muestran las dos.</p>` : '';
+  showInfo(`<h3>${e.min != null ? hhmm(e.min) + ' · ' : ''}${esc(e.texto)}</h3>${e.valor != null ? `<p style="font-size:26px;font-weight:800;margin:4px 0">${e.masDe ? '> ' : ''}${fmt(e.valor, 1)} ${esc(e.unidad)}</p>` : ''}
+<table class="tbl"><tr><td>Tipo</td><td>${esc(e.tipo)}</td><td></td></tr><tr><td>Lugar</td><td>${esc(e.lugar ?? '—')}</td><td></td></tr><tr><td>Hora</td><td>${e.local ? esc(e.local.replace('T', ' ')) + ' (local)' + (e.utc ? ` · ${esc(e.utc.slice(11, 16))} UTC` : '') : esc(e.cuando ?? '—')}</td><td></td></tr><tr><td>Estado</td><td>${esc(e.estado)}</td><td></td></tr></table>${disc}
+<p class="src">${esc(f.cita)}<br>${esc(f.url)}</p>`);
+});
+
+// ⏱️ Escenario de llegada: camino D8 aguas abajo desde un punto, a la velocidad elegida
+const cellLonLat = (k) => gridToLonLat(G, (k % G.w) + 0.5, ((k / G.w) | 0) + 0.5).map((v) => +v.toFixed(6));
+$('#tDep').innerHTML = timed.filter((e) => e.min != null).map((e) => `<option value="${e.id}">${hhmm(e.min)} · ${esc(e.texto.slice(0, 38))}${e.texto.length > 38 ? '…' : ''}</option>`).join('');
+$('#tDep').value = TT.dep; $('#tVel').value = TT.v; $('#tVelTxt').textContent = fmt(TT.v, 1);
+function travelFrom(lon, lat) {
+  const [px, py] = toPx(lon, lat), i = Math.floor(px), j = Math.floor(py);
+  if (i < 1 || j < 1 || i >= G.w - 1 || j >= G.h - 1) return showToast('Fuera de la zona calculada');
+  TT.k0 = snap(i, j); TT.path = downstreamPath(dirAt, G.w, G.h, TT.k0, G.celdaM); travelRender(); state.tMin = Math.max(state.tMin, EV.find((e) => e.id === TT.dep)?.min ?? state.tMin); $('#t').value = state.tMin; renderTime();
+}
+function travelRender() {
+  const p = TT.path; if (!p) { for (const id of ['tpath', 'tmarks', 'towns', 'tfront']) map.getSource(id)?.setData({ type: 'FeatureCollection', features: [] }); $('#tOut').innerHTML = ''; return; }
+  const dep = EV.find((e) => e.id === TT.dep), coords = p.cells.map(cellLonLat), marks = [];
+  for (let m = 10; ; m += 10) { const idx = frontIndex(p, TT.v, m); if (idx >= p.cells.length - 1 || idx < 0) break; marks.push({ type: 'Feature', properties: { label: `+${m} min` }, geometry: { type: 'Point', coordinates: coords[idx] } }); if (marks.length > 40) break; }
+  map.getSource('tpath')?.setData({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: coords } });
+  map.getSource('tmarks')?.setData({ type: 'FeatureCollection', features: marks });
+  TT.arrivals = TOWNS.map((tw) => { const [tx, ty] = toPx(tw.lon, tw.lat), c = closestOnPath(p, G.w, Math.floor(ty) * G.w + Math.floor(tx)); return { ...tw, offM: c.offCells * G.celdaM, distM: c.distM, idx: c.idx }; })
+    .filter((a) => a.offM <= 1500 && a.idx > 0).sort((a, b) => a.distM - b.distM)
+    .map((a) => ({ ...a, min: travelMinutes(a.distM, TT.v), at: dep.min + travelMinutes(a.distM, TT.v) }));
+  map.getSource('towns')?.setData({ type: 'FeatureCollection', features: TT.arrivals.map((a) => ({ type: 'Feature', properties: { label: `${a.nombre} ${hhmm(Math.round(a.at))}` }, geometry: { type: 'Point', coordinates: coords[a.idx] } })) });
+  const totalMin = travelMinutes(p.distM.at(-1), TT.v);
+  $('#tOut').innerHTML = `Camino del agua según el relieve: <b>${fmt(p.distM.at(-1) / 1000, 1)} km</b> hasta el mar o el borde · a ${fmt(TT.v, 1)} m/s, <b>${fmt(totalMin)} min</b>.<br>
+Si sale a las <b>${hhmm(dep.min)}</b> (${esc(dep.texto.slice(0, 60))}):<br>${TT.arrivals.length ? TT.arrivals.map((a) => `· ${esc(a.nombre)}: <b>${hhmm(Math.round(a.at))}</b> (+${fmt(a.min)} min; el cauce del modelo pasa a ${fmt(a.offM)} m del punto del municipio)${a.at < ESA.min ? ` → <b style="color:#ff9f0a">${fmt(ESA.min - a.at)} min antes del ES-Alert</b>` : ` → ${fmt(a.at - ESA.min)} min después del ES-Alert`}`).join('<br>') : 'ningún municipio de la lista a menos de 1,5 km del camino.'}<br>
+${TT.dep === 'cedex_pico' ? '<span class="src">Salida a las 19:35: el texto del CEDEX (vía Roldán 2025) une el pico de 3.500 m³/s a esa hora con el agua «desplazándose por Chiva» a 14 m/s, pero no precisa en qué punto se dio el pico. Es una lectura posible, no confirmada.</span><br>' : TT.dep === 'poyo_1855' ? '<span class="src">Las 18:55 son la hora del último dato del aforo (cruce con la A-3), aguas abajo de Chiva: para este caso, toca un punto del cauce cerca de ese cruce con «Elegir punto».</span><br>' : ''}<span class="src">ESCENARIO: velocidad constante (${fmt(C.velocidad_chiva.valor)} m/s es la del CEDEX por Chiva, preliminar; aplicarla a todo el recorrido es una suposición). Camino D8 sin encauzamientos: en la llanura puede ir por otro lado. Municipios: punto de Nominatim (OSM).</span>`;
+}
+$('#travelBtn').addEventListener('click', () => { panelMini(false); $('#tOut').scrollIntoView({ behavior: 'smooth', block: 'center' }); if (!TT.path) { const [tx, ty] = toPx(TOWNS[0].lon, TOWNS[0].lat); TT.k0 = snap(Math.floor(tx), Math.floor(ty)); TT.path = downstreamPath(dirAt, G.w, G.h, TT.k0, G.celdaM); travelRender(); renderTime(); } });
+$('#tChiva').addEventListener('click', () => { const c = TOWNS.find((t) => t.nombre === 'Chiva'); TT.dep = 'cedex_pico'; $('#tDep').value = TT.dep; LS.set('senda.d4d.dep', TT.dep); travelFrom(c.lon, c.lat); map.fitBounds([[-0.75, 39.38], [-0.33, 39.5]], { padding: 40, pitch: 50 }); });
+$('#tPick').addEventListener('click', () => { TT.pick = !TT.pick; $('#tPick').classList.toggle('on', TT.pick); $('#msg').textContent = 'Toca dónde sale el agua'; $('#msg').hidden = !TT.pick; });
+$('#tClear').addEventListener('click', () => { TT.path = null; travelRender(); });
+$('#tDep').addEventListener('change', (e) => { TT.dep = e.target.value; LS.set('senda.d4d.dep', TT.dep); travelRender(); renderTime(); });
+$('#tVel').addEventListener('input', (e) => { TT.v = +e.target.value; LS.set('senda.d4d.v', TT.v); $('#tVelTxt').textContent = fmt(TT.v, 1); travelRender(); renderTime(); });
+$('#t').value = state.tMin;
+$('#t').addEventListener('input', (e) => { state.tMin = +e.target.value; LS.set('senda.d4d.t', state.tMin); renderTime(); });
+let traf = 0;
+$('#tplay').addEventListener('click', () => {
+  state.tplaying = !state.tplaying; $('#tplay').textContent = state.tplaying ? '❚❚' : '▶';
+  let last = performance.now();
+  const step = (now) => { if (!state.tplaying) return; if (now - last > 90) { last = now; state.tMin = state.tMin >= 1320 ? 360 : state.tMin + 5; $('#t').value = state.tMin; renderTime(); } traf = requestAnimationFrame(step); };
+  if (state.tplaying) traf = requestAnimationFrame(step); else cancelAnimationFrame(traf);
+});
+map.on('style.load', () => { travelRender(); renderTime(); });
+
+// ── PRO (escritorio): paquete de datos con procedencia y huellas ──
+const sha = async (buf) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', buf))].map((b) => b.toString(16).padStart(2, '0')).join('');
+if (PRO) {
+  $('#proBox').hidden = false;
+  $('#proNote').textContent = 'Incluye la cronología con fuentes y estados, las constantes, la calibración completa, el escenario de llegada activo y la huella SHA-256 de cada capa binaria para poder auditarlo.';
+  $('#expPack').addEventListener('click', async () => {
+    const pack = {
+      producto: 'SENDA · DANA 4D · paquete de datos', generadoUTC: new Date().toISOString(), aviso: 'Contiene datos REALES (con fuente), ESTIMADOS por terceros y MODELO/ESCENARIO de SENDA, etiquetados uno a uno.',
+      telemetria: TEL, metodo: meta.metodo, calibracion: meta.calibracion, banera: meta.banera, observado: meta.observado, procedenciaRelieve: meta.procedencia,
+      huellas: { 'hand_roi.bin': await sha(handBuf), 'obs_roi.bin': await sha(obsBuf), 'dir_z12.bin': await sha(dirBuf) },
+      escenarioLlegada: TT.path ? { basis: 'ESCENARIO', sale: TT.dep, velocidadMs: TT.v, longitudM: Math.round(TT.path.distM.at(-1)), camino: TT.path.cells.map(cellLonLat), municipios: TT.arrivals.map(({ nombre, offM, distM, min, at }) => ({ nombre, distanciaCaminoM: Math.round(distM), separacionM: Math.round(offM), minutos: +min.toFixed(1), horaLocal: hhmm(Math.round(at)) })) } : null,
+    };
+    const r = await saveBlob(new Blob([JSON.stringify(pack, null, 1)], { type: 'application/json' }), `senda-dana4d-paquete-${new Date().toISOString().slice(0, 10)}.json`); showToast(r.ok ? `Guardado en ${r.where}` : 'No se pudo guardar');
+  });
+  $('#expCsv').addEventListener('click', async () => {
+    const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const rows = [['id', 'hora_local', 'hora_utc', 'tipo', 'valor', 'unidad', 'lugar', 'texto', 'estado', 'fuente', 'url'].join(',')].concat(TEL.eventos.map((e) => [e.id, e.local ?? e.cuando, e.utc ?? (e.local ? new Date(localToUtcMs(e.local, OFF)).toISOString() : ''), e.tipo, e.valor, e.unidad, e.lugar, e.texto, e.estado, TEL.fuentes[e.fuente].cita, TEL.fuentes[e.fuente].url].map(q).join(',')));
+    const r = await saveBlob(new Blob(['﻿' + rows.join('\n')], { type: 'text/csv' }), 'senda-dana4d-cronologia.csv'); showToast(r.ok ? `Guardado en ${r.where}` : 'No se pudo guardar');
+  });
+  if (window.__TAURI_INTERNALS__ || new URLSearchParams(location.search).has('pro')) { const b = Object.assign(document.createElement('button'), { className: 'tb', textContent: '←', title: 'Volver al Command Center' }); b.setAttribute('aria-label', 'Volver'); b.addEventListener('click', () => history.length > 1 ? history.back() : (location.href = '/')); $('#top').prepend(b); }
+}
 function showInfo(html) { $('#infoBody').innerHTML = html; $('#info').hidden = false; }
 $('#infoX').addEventListener('click', () => { $('#info').hidden = true; });
 let toastT; function showToast(t) { const m = $('#msg'); m.textContent = t; m.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { if (!state.basinMode) m.hidden = true; }, 1800); }
@@ -213,7 +354,7 @@ const HELP = `<h3>Cómo leer la DANA 4D</h3>
 <li><span class="badge real">REAL</span> En verde, el agua que vio el satélite (Copernicus EMS, activación EMSR773). En l'Horta Sud, imagen del 31-10-2024 a las 10:22 UTC.</li>
 <li><span class="badge model">MODELO</span> Cauces calculados con el relieve: por dónde baja el agua y cuánta cuenca recoge cada tramo.</li>
 <li><span class="badge scen">ESCENARIO</span> En azul, lo que quedaría bajo el agua con el nivel que elijas sobre el cauce.</li></ul>
-<h4>Para investigar</h4><ul><li>💧 «¿De dónde viene el agua?»: toca un punto y verás toda su cuenca y sus km².</li><li>Toca cualquier punto: si el satélite vio agua, su altura sobre el cauce y si se inunda al nivel elegido.</li><li>🔬 Ciencia: cuánto acierta el modelo frente al satélite, con qué nivel acierta más y por qué no acierta más.</li></ul>
+<h4>La línea del tiempo (arriba)</h4><ul><li>Mueve la hora del 29-10 (hora local) o pulsa ▶: verás el último caudal medido en el aforo del Poyo, si estaba por encima del umbral de aviso (150 m³/s) o de la capacidad del cauce urbano (800 m³/s), y cuánto faltaba para el ES-Alert.</li><li>Cada dato de la cronología lleva su fuente, su tipo (MEDIDO, ESTIMADO, OFICIAL) y si está verificado. Si dos fuentes no coinciden, se ven las dos.</li><li>⏱️ «¿Cuándo llega?»: elige de dónde sale el agua y a qué hora; el punto rojo avanza por el cauce con la hora y ves a qué hora pasaría junto a cada municipio.</li></ul><h4>Para investigar</h4><ul><li>💧 «¿De dónde viene el agua?»: toca un punto y verás toda su cuenca y sus km².</li><li>Toca cualquier punto: si el satélite vio agua, su altura sobre el cauce y si se inunda al nivel elegido.</li><li>🔬 Ciencia: cuánto acierta el modelo frente al satélite, con qué nivel acierta más y por qué no acierta más.</li></ul>
 <h4>Lo que este modelo NO es</h4><ul><li>No tiene lluvia, caudal ni horas: ordena qué se inunda antes, no cuándo ni con qué calado.</li><li>El nivel que mejor encaja se ha calibrado con la mancha real: no es una predicción hecha antes del suceso.</li><li>No incluye diques, colectores, puentes ni encauzamientos.</li></ul>
 <p class="src">${esc(ems.cita)}. Relieve: Terrain Tiles (AWS Open Data). Fondo «Satélite»: ortofoto PNOA del IGN <b>actual</b>, no la de 2024. Fondos de la NASA (🗺️): MODIS del ${DAY.split('-').reverse().join('-')}, el día siguiente.</p>`;
 $('#helpBtn').addEventListener('click', () => showInfo(HELP));

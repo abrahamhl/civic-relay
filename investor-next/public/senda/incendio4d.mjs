@@ -4,6 +4,7 @@ import { MAP_STYLES, styleFor, TERRAIN_SOURCE } from './core/map-style.mjs';
 import { gridCorners, fireEllipse, plumeRings, arrivalRGBA, arrivalAreaHa, lengthToBreadth } from './core/fire4d.mjs';
 import { CASE_SMV_2026 } from './core/fire-watch.mjs';
 import { haversineM } from './core/route-planner.mjs';
+import { saveBlob } from './save-file.mjs';
 import { FUEL_CLASSES, BURN_DATES, cellOf, slopeAspect, fuelRGBA, slopeRGBA, burnRGBA, probRGBA, burnedByFuel, burnedBySlope, cardinal } from './core/fire-science.mjs';
 
 const $ = (s) => document.querySelector(s);
@@ -247,4 +248,24 @@ const panelMini = (on) => { $('#panel').classList.toggle('mini', on); LS.set('se
 $('#grab').addEventListener('click', () => panelMini(!$('#panel').classList.contains('mini')));
 panelMini(LS.get('senda.f4d.mini', true)); // empieza plegado: se ve el mapa
 if (!LS.get('senda.f4d.welcomed', false)) { LS.set('senda.f4d.welcomed', true); setTimeout(() => showInfo(HELP), 800); }
+// ── PRO (escritorio, ?pro=1): paquete de datos con procedencia y huellas, y vuelta al Command Center ──
+const PRO = new URLSearchParams(location.search).has('pro') || !!window.__TAURI_INTERNALS__;
+if (PRO) {
+  const back = Object.assign(document.createElement('button'), { className: 'tb', textContent: '←', title: 'Volver al Command Center' });
+  back.setAttribute('aria-label', 'Volver'); back.addEventListener('click', () => (history.length > 1 ? history.back() : (location.href = '/'))); $('#top').prepend(back);
+  const box = document.createElement('div');
+  box.innerHTML = '<h4>PRO · escritorio</h4><div class="row"><button id="expPack">⬇️ Paquete de datos con procedencia</button></div><p style="font-size:11.5px;color:var(--l2)">Resumen REAL (Sentinel-2, EFFIS), MODELO (calibración, conjunto, pluma), previsión GFS usada, ignición y huella SHA-256 de cada capa binaria.</p>';
+  $('#panel .more').prepend(box);
+  const sha = async (buf) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', buf))].map((b) => b.toString(16).padStart(2, '0')).join('');
+  $('#expPack').addEventListener('click', async () => {
+    const bins = ['arrival_roi.bin', 'fuel_100m.bin', 'dem_100m.bin', 'burn_100m.bin', 'prob_roi.bin'], bufs = [arrBuf, fuelBuf, demBuf, burnBuf, probBuf], huellas = {};
+    for (let i = 0; i < bins.length; i++) huellas[bins[i]] = await sha(bufs[i]);
+    const bf = burnedByFuel(burn, fuel, 2);
+    const pack = { producto: 'SENDA · Incendio 4D · paquete de datos', generadoUTC: new Date().toISOString(), aviso: 'REAL = medido con fuente; MODELO = calculado por SENDA; ESCENARIO = elegido por el operador. Carga de combustible ORIENTATIVA.',
+      caso: { ignicion: IGN, hechos: CASE_SMV_2026.facts }, real: { fechas: real.fechas, combustible: real.combustible, quemadoPorCombustible: { totalHa: bf.totalHa, filas: bf.rows.map(({ key, ha, pct, biomassT }) => ({ key, ha, pct: +pct.toFixed(1), biomassT: Math.round(biomassT) })), basis: bf.basis } },
+      effis: effisMain.map((f) => f.properties), modelo: { malla: fire.malla, conjunto: fire.conjunto, pluma: fire.pluma, masaDeAire: fire.masaDeAire }, gfs: { fuente: gfs.source, pasada: gfs.times?.[0]?.validUTC }, huellas,
+      escenario: state.lastScen ? { basis: 'ESCENARIO', vientoKmh: +$('#wKmh').value, haciaDeg: +$('#wTo').value, cabezaMMin: +$('#wRos').value, minutos: state.t, areaHa: Math.round(state.lastScen.areaHa) } : null, dibujo: state.pts };
+    const r = await saveBlob(new Blob([JSON.stringify(pack, null, 1)], { type: 'application/json' }), `senda-incendio4d-paquete-${new Date().toISOString().slice(0, 10)}.json`); showToast(r.ok ? `Guardado en ${r.where}` : 'No se pudo guardar');
+  });
+}
 globalThis.sendaFire4d = { map, state, render };
