@@ -71,3 +71,18 @@
 - **Qué se probó:**
   - `node --test packages/senda/tests/sync-and-server.test.mjs packages/senda/tests/index-exports.test.mjs packages/senda/tests/web-parity.test.mjs` → **6/6 en verde (0 fallos)**.
 - **Qué falta:** Fases 1.6 (asimilación EnKF), 2 (física avanzada), 3 (integraciones CalmPath Maps Pro & Civil Sentry) y 4 (benchmarks, documentación, parches y ZIP).
+
+## Fase 1.6 · Asimilación de datos de campo (N2+) con Filtro de Kalman por Conjuntos (`data-assimilation.mjs`)
+- **Commit fase anterior:** `39cce7d`
+- **Hora UTC real de cierre:** `2026-11-25T18:00:41Z`
+- **Qué se hizo:**
+  - Nuevo módulo [`packages/senda/src/data-assimilation.mjs`](../../packages/senda/src/data-assimilation.mjs) (sincronizado en `investor-next/public/senda/core/data-assimilation.mjs` y exportado en `packages/senda/src/index.mjs`):
+    - Puerta de admisión N2+ (`filterAssimilableObservations`): solo admite observaciones N2–N5 sin contradicción activa y con `observationStd > 0`.
+    - Localización espacial de soporte compacto de Gaspari & Cohn (1999, DOI `10.1002/qj.49712555417`, `gaspariCohnWeight`).
+    - Filtro de Kalman por Conjuntos estocástico (`enkfUpdate`: Evensen 1994/2003, DOI `10.1029/94JC00572` y `10.1007/s10236-003-0036-9`; Burgers et al. 1998, DOI `10.1175/1520-0493(1998)126<1719:ASITEK>2.0.CO;2`; inflación Anderson & Anderson 1999).
+    - Acoplamiento directo con `shallow-water.mjs` (`runFloodAssimilationExperiment`) y con propagación de frente de incendio (`assimilateFireFrontObservations`).
+  - Pruebas nuevas: `packages/senda/tests/data-assimilation.test.mjs`.
+- **Qué se probó:**
+  - Verificación analítica EnKF frente a ganancia de Kalman exacta (< 1e-9), Gaspari-Cohn exacto, puerta N2+, asimilación en incendio y caso de desbordamiento de mota en `shallow-water.mjs` (medido: CSI `0,1811 → 1,0000`, RMSE `0,2550 → 0,0317 m` [−87,6 %], horquilla 90 % `0,4181 → 0,1285 m` [−69,3 %]).
+  - `node --test packages/senda/tests/data-assimilation.test.mjs packages/senda/tests/index-exports.test.mjs packages/senda/tests/web-parity.test.mjs` → **9/9 en verde (0 fallos)**.
+- **Qué falta:** Fase 2 (física y computación avanzada: FV 2D WebGPU/CPU + porosidad + estabilidad + Poyo, Rothermel + Scott-Burgan + level-set, ETCS + Nadal + pandeo, ITU-R P.526 avanzada, UQ/LHS/Sobol), Fase 3 (CalmPath Maps Pro & Civil Sentry integraciones de alto valor) y Fase 4 (benchmarks, documentación, parches y ZIP).

@@ -101,3 +101,4 @@ export * from './citizen-report.mjs';
 export * from './report-forensics.mjs';
 export * from './report-protocol.mjs';
 export * from './sync-protocol.mjs';
+export * from './data-assimilation.mjs';
