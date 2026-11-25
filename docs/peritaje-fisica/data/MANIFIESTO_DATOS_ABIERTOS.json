@@ -1,0 +1,133 @@
+{
+  "schema": "senda.open-data-manifest/v1",
+  "generadoUTC": "2026-11-25T18:30:37Z",
+  "nota": "Todos los ficheros enumerados ya residen localmente en el repositorio civic-relay bajo licencia abierta y han sido utilizados sin acceso a red en las validaciones reproducibles.",
+  "conjuntos": [
+    {
+      "id": "dana2024_dem_d4",
+      "rutaRepo": "investor-next/public/senda/data/dana2024/dem_d4.bin",
+      "bytes": 442368,
+      "sha256": "3e4a9acb10169bb4cd956c1df61d6b45e4d853238780ae6f956cd4fd2c3d7080",
+      "url": "https://registry.opendata.aws/terrain-tiles/",
+      "licencia": "AWS Open Data Terrain Tiles (derivado SRTM/Copernicus/Mapzen, atribuciones por fuente)",
+      "uso": "MDE agregado ×4 (576×384, 118,1 m) para validación FV 2D DANA 29-10-2024"
+    },
+    {
+      "id": "dana2024_dir_z12",
+      "rutaRepo": "investor-next/public/senda/data/dana2024/dir_z12.bin",
+      "bytes": 1769472,
+      "sha256": "e19befc0f5c1b5ef8524325f36be10c749ca1a14976ed4701387dfb75e365b9c",
+      "url": "https://registry.opendata.aws/terrain-tiles/",
+      "licencia": "Derivado abierto de Terrain Tiles z12 (generado por SENDA)",
+      "uso": "Red de drenaje D8 para trazado del Barranc del Poyo desde Chiva"
+    },
+    {
+      "id": "dana2024_emsr773",
+      "rutaRepo": "investor-next/public/senda/data/dana2024/emsr773_inundacion.geojson",
+      "bytes": 809739,
+      "sha256": "4b8a61a1e9f2876162799bf7938a64f6b378764de50f8a2c105c04b0c30ee9a9",
+      "url": "https://rapidmapping.emergency.copernicus.eu/EMSR773",
+      "licencia": "Copernicus Emergency Management Service — Uso libre y abierto con atribución (© Unión Europea)",
+      "uso": "Mancha de inundación observada AOI03 (31-10-2024) para cálculo de CSI/Hit/FAR"
+    },
+    {
+      "id": "dana2024_cauces",
+      "rutaRepo": "investor-next/public/senda/data/dana2024/cauces.geojson",
+      "bytes": 582042,
+      "sha256": "a11ed918cd03dbf12643fd03db01afb9300a0c92f2b2fc60ebca4a175da7ccc6",
+      "url": "https://registry.opendata.aws/terrain-tiles/",
+      "licencia": "Derivado abierto de Terrain Tiles z12 (generado por SENDA)",
+      "uso": "Geometría de cauces de la cuenca del Poyo"
+    },
+    {
+      "id": "dana2024_hidro",
+      "rutaRepo": "investor-next/public/senda/data/dana2024/hidro.json",
+      "bytes": 28051,
+      "sha256": "06d4f7d4f82929482ddd26819bcaaac9ea192fa0af8660fab3455417205c065b",
+      "url": "https://rapidmapping.emergency.copernicus.eu/EMSR773",
+      "licencia": "Datos derivados abiertos (SENDA / Copernicus EMSR773)",
+      "uso": "Definición exacta de malla, ROI oficial y referencia HAND"
+    },
+    {
+      "id": "dana2024_swe_ref",
+      "rutaRepo": "investor-next/public/senda/data/dana2024/swe.json",
+      "bytes": 13641,
+      "sha256": "c8421d968e9df95562597cf1a4944a0ce1e2a16f78ff65dbb4fadff118ae2750",
+      "url": "https://github.com/abrahamhl/civic-relay",
+      "licencia": "Repositorio SENDA (abrahamhl/civic-relay)",
+      "uso": "Línea base Bates et al. (2010) a 59 m (mejor CSI 0,2354, llegadas Paiporta/Picanya)"
+    },
+    {
+      "id": "radio_poyo_dem",
+      "rutaRepo": "investor-next/public/senda/data/radio/poyo.json",
+      "bytes": 430246,
+      "sha256": "bdb4666ae51da488aee2429e525bbf8fbc755b3e596f2fe64bc8f8f671e10fb3",
+      "url": "https://spacedata.copernicus.eu/collections/copernicus-digital-elevation-model",
+      "licencia": "© DLR e.V. 2010-2014 y © Airbus Defence and Space GmbH 2014-2018 (Copernicus GLO-30 libre y abierto) + OpenStreetMap ODbL (municipios)",
+      "uso": "Perfiles topográficos reales para validación radio ITU-R P.526-15 / ITM y coordenadas de 22 municipios"
+    },
+    {
+      "id": "smv2026_dem",
+      "rutaRepo": "investor-next/public/senda/data/smv2026/dem_100m.bin",
+      "bytes": 257640,
+      "sha256": "f687fa102d07ed5c0e61f70dc1f6befd0b03bd853bf068899110beccd0360938",
+      "url": "https://spacedata.copernicus.eu/collections/copernicus-digital-elevation-model",
+      "licencia": "Copernicus DEM (UE / ESA, acceso libre y abierto)",
+      "uso": "MDE 100 m (380×339) para pendiente Horn (1981) en incendio SMV 2026"
+    },
+    {
+      "id": "smv2026_fuel",
+      "rutaRepo": "investor-next/public/senda/data/smv2026/fuel_100m.bin",
+      "bytes": 128820,
+      "sha256": "789b30e31fbe12619866db251038b77829b59d82aec12e278e7f4c0ab1049a13",
+      "url": "https://dataspace.copernicus.eu/",
+      "licencia": "Copernicus Sentinel-2 (UE / ESA, libre y abierto)",
+      "uso": "Clasificación de combustible NDVI 16-07-2026 mapeada a Scott & Burgan (2005)"
+    },
+    {
+      "id": "smv2026_burn",
+      "rutaRepo": "investor-next/public/senda/data/smv2026/burn_100m.bin",
+      "bytes": 128820,
+      "sha256": "41525f3ca5f95be553a28c265baa8a2c133a4b34ee2a57bbf1e01f74e399ca99",
+      "url": "https://dataspace.copernicus.eu/",
+      "licencia": "Copernicus Sentinel-2 dNBR (UE / ESA, libre y abierto)",
+      "uso": "Cicatriz real observada por fechas (24-07, 29-07, 08-08-2026)"
+    },
+    {
+      "id": "smv2026_gfs",
+      "rutaRepo": "investor-next/public/senda/data/smv2026/gfs_20260723_12z.json",
+      "bytes": 155257,
+      "sha256": "849cf369777be91ec22a7005f57b533dfe62e05ba37e0cdd89459ea09a03a409",
+      "url": "https://registry.opendata.aws/noaa-gfs-bdp-pds/",
+      "licencia": "Dominio público (NOAA / NCEP)",
+      "uso": "Viento real UGRD/VGRD a 10 m y HR a 2 m para validación Rothermel + Level-Set SMV 2026"
+    },
+    {
+      "id": "smv2026_fire3d",
+      "rutaRepo": "investor-next/public/senda/data/smv2026/fire3d.json",
+      "bytes": 8635,
+      "sha256": "3f0dbf999ed2e5e3e1a8283549c6068be06dda24888dadb447d9b8fa7a3fef1c",
+      "url": "https://github.com/abrahamhl/civic-relay",
+      "licencia": "Repositorio SENDA",
+      "uso": "Coordenadas de ignición, malla UTM y métricas de referencia previas SMV 2026"
+    },
+    {
+      "id": "smv2026_real",
+      "rutaRepo": "investor-next/public/senda/data/smv2026/real.json",
+      "bytes": 2729,
+      "sha256": "fefa46090d90858b1a28a14abd2b80245b298f24c811357149fa94e1c36e7119",
+      "url": "https://dataspace.copernicus.eu/",
+      "licencia": "Copernicus Sentinel-2 / NOAA GFS (abierto)",
+      "uso": "Metadatos de escenas y calibración NDVI/dNBR de SMV 2026"
+    },
+    {
+      "id": "tle_amsat_20261120",
+      "rutaRepo": "investor-next/public/senda/data/tle/amsat-nasabare-2026-11-20.txt",
+      "bytes": 14434,
+      "sha256": "a4e5decd3d75fcfef8840eb8d59a2df488536191d89f21dd5f7975efd060c57f",
+      "url": "https://www.amsat.org/tle/current/nasabare.txt",
+      "licencia": "Datos orbitales TLE públicos (AMSAT / CelesTrak)",
+      "uso": "97 efemérides TLE reales con checksum verificado para predicción de paso satelital en report-forensics.mjs"
+    }
+  ]
+}

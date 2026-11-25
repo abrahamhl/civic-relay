@@ -75,12 +75,15 @@ function renderCatalog() {
 }
 // Destacados (como las tarjetas grandes de las tiendas de apps): qué puedes hacer YA con tu acceso
 const FEATURED = [
-  ['conducir', 'Conduce, anda o pedalea', 'Mapa con capas y satélite oficial, avisos DGT/NDW, radares fijos y cámara con IA'],
+  ['copiloto', 'Copiloto 5D y Entorno', 'Agarre y curvas en tiempo real, avisos directos BLE y sin app, calibración en 1 toque y Android Auto', '', 'copiloto'],
+  ['conducir', 'Conduce, anda o pedalea', 'Mapa con capas, horizonte de curvas OSRM, avisos DGT/NDW, radares fijos y cámara con IA'],
+  ['reportar', 'Aviso ciudadano sin red', 'Envía incidencias con mapa, foto y código corto o compártelas con vecinos sin app', '', 'reportar'],
   ['conducir', 'Radar de señales', 'Mira las redes Wi-Fi y Bluetooth a tu alrededor y otros móviles SENDA', '#senales', 'senales'],
   ['explorador', 'Explorador 3D', 'Cualquier lugar en 3D: topografía, edificios con su planta y la luz del Sol real'],
   ['incendio4d', 'Incendio 4D', 'San Martín 2026: satélite real, modelo y humo en 3D'],
   ['dana4d', 'DANA 4D', 'Valencia 2024: de dónde vino el agua y cuánto acierta el modelo'],
   ['tren4d', 'Tren 4D', 'Adamuz 2026: segundo a segundo, con la física del frenado'],
+  ['personas', 'Radar de personas', 'Sensor mmWave de 24 GHz: quién se mueve y dónde'],
   ['mensaje', 'Mensajes sin red', 'Cifrados, por Bluetooth, sonido o archivo'],
   ['avisos', 'Avisa de un peligro', 'Lo ven los móviles cercanos'],
   ['ruta', 'Ruta segura', 'Elige calles y evita zonas inundadas'],

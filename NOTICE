@@ -20,3 +20,10 @@ The "SENDA" name and visual presentation identity are © 2026 Abraham Haddioui �
    - HRRR 3 km meteorology — NOAA public domain
    - DGT NAP / DATEX II v3.6 public road incident schema — Dirección General de Tráfico (Spain), open public specification
    - No non-commercial datasets (such as God's Eye View CC BY-NC-SA 4.0) or personal data (faces, number plates, identifiers) are included in the M95 video assets.
+
+5. mmWave People Radar (RD-03D / LD2450)
+   - Protocol facts (UART 256000 8N1, frame AA FF 03 00 … 55 CC, sign convention, multi-target command FD FC FB FA … 90 00 …,
+     100–8000 mm validity window and 1000 mm echo merge) taken from the open firmware "Arduino-ESP32-Radarproject" v1.1
+     by Sudo_solder (https://github.com/Stevee87/Arduino-ESP32-Radarproject) — MIT License, Copyright (c) 2026 Sudo_solder.
+     Cross-checked with the ld2450-proto crate documentation (docs.rs). SENDA's implementation (`packages/senda/src/mmwave-radar.mjs`)
+     is an independent rewrite; tracking and calibration are SENDA's own.

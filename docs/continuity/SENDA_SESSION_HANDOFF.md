@@ -1,5 +1,10 @@
 # SENDA · handoff (2026-11-25 16:37Z, sesión app)
 
+## Integración de Antigravity y orientación (commit 2746f3f)
+- PR #99 de Antigravity (peritaje ciudadano N0–N5, FV2D, Rothermel, ETCS, radio, UQ, Copiloto 5D, Android Auto) integrada en
+  la rama de trabajo tras validarla; correcciones: peralte Angrois 130 mm, parámetros sin fuente, CORS, frase sin fuente.
+- SENDA Drive: rediseño familiar (Herramientas, iconos de línea, avisos emergentes), «atrás» arreglado y orientación fusionada.
+
 ## Último bloque (commit 5695aaa)
 - DANA 4D con línea del tiempo y telemetría con fuente (`data/dana2024/telemetria.json`), motor
   `flood-warning.mjs`, escenario «¿Cuándo llega?», PRO con exportación y huellas, pestaña

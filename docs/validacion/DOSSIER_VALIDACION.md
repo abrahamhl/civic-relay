@@ -181,6 +181,18 @@ Resultado en el Poyo (Chiva → mar, 41 km): Témez 0,9 m/s (785 min), Kirpich 1
 
 Validación de lo importado: hora **con zona horaria obligatoria** (una hora ambigua puede mover una alerta 1–2 h), unidades fijas por tipo, valores imposibles rechazados con su línea, orden temporal estricto, fuente obligatoria y huella SHA-256. El dato **no sale del dispositivo** y, en cuanto existe, sustituye a la estimación en el contador de caudal («tu red»). En el escritorio PRO entra en el paquete exportado con su huella.
 
+## 5 quater. Radar de personas mmWave · `mmwave-radar.mjs` · `/senda/personas`
+
+| Pieza | Qué es | Verificación |
+|---|---|---|
+| Protocolo RD-03D / LD2450 | Trama `AA FF 03 00` + 3×8 bytes + `55 CC`, 256000 baudios; bit 15 = signo positivo | Tomado del firmware abierto de Sudo_solder (MIT) y contrastado con `ld2450-proto`; prueba de ida y vuelta, trozos arbitrarios, basura y trama corrupta descartada |
+| Limpieza | Alcance 100–8000 mm y fusión de ecos < 1000 mm (valores del firmware de referencia) | Prueba; sin valores por defecto en el núcleo |
+| Seguimiento | Kalman de velocidad constante por pista; asignación óptima (todas las permutaciones, ≤ 3) con puerta | Prueba: dos personas que se cruzan conservan su identidad; posición final < 150 mm, velocidad < 120 mm/s de error; oclusión breve mantenida y baja tras el tiempo dado |
+| Calibración | Distancia por mínimos cuadrados (escala, sesgo, residuo); rumbo de marcha por componentes principales; montaje por media circular | Pruebas con valores conocidos (escala exacta, 30° y 210°, corrección de 7° cruzando el norte) |
+| Georreferencia | Del sistema del radar a lon/lat con el rumbo del montaje | Prueba: 10 m al frente mirando al este = 10 m al este |
+
+**No medido todavía con hardware real.** Sin datos de campo no se publica precisión de distancia ni de ángulo. Límites: solo objetivos en movimiento; persona y perro no se distinguen; Web Serial solo en Chrome/Edge de escritorio. Guía: `hardware/mmwave-rd03d/README.md`.
+
 ## 6. Precisión: qué se puede prometer
 
 - **No hay precisión milimétrica** con estos datos, y SENDA no la afirma. Las mallas de trabajo son de 29,5 m (DANA) y 100 m (incendio); los satélites usados resuelven 10–20 m (Sentinel-2) o ≈ 25 km (previsión GFS).
