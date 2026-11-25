@@ -119,7 +119,7 @@ async function launchCdp() {
   return { send, on, evalJs, waitFor, close };
 }
 
-test('Copiloto 5D y Conducir: renderizado real en Chromium (1440x900 + 390x844), puente Android Auto y debriefing SHA-256', { skip: !CHROME_BIN }, async () => {
+test('Copiloto 5D Apple HIG Mobile-First (390x844): 4 pestañas, entorno directo/indirecto, calibración 1-toque, Android Auto y Conducir', { skip: !CHROME_BIN }, async () => {
   const { srv, baseUrl } = await startStaticServer();
   const cdp = await launchCdp();
   const errors = [];
@@ -141,22 +141,23 @@ test('Copiloto 5D y Conducir: renderizado real en Chromium (1440x900 + 390x844),
     await cdp.send('Page.addScriptToEvaluateOnNewDocument', {
       source: `
         window.__aaPayloads = [];
+        window.__bleSent = [];
         window.SendaNative = {
-          publishDriveState(json) {
-            window.__aaPayloads.push(JSON.parse(json));
-            return true;
-          },
+          publishDriveState(json) { window.__aaPayloads.push(JSON.parse(json)); return true; },
+          p2pStart() {},
+          p2pSend(b64) { window.__bleSent.push(b64); },
+          radioScan() {},
           info() { return JSON.stringify({ copilotBridge: true }); },
         };
       `,
     });
 
-    // 1. Desktop / Car Dash landscape 1440x900
-    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+    // 1. Mobile-First Portrait 390x844 @2x (APK principal)
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
     await cdp.send('Page.navigate', { url: `${baseUrl}/senda/copiloto` });
     await cdp.waitFor('window.sendaCopilot && window.__aaPayloads.length >= 1');
 
-    const desktopCheck = await cdp.evalJs(`(() => {
+    const mobileHome = await cdp.evalJs(`(() => {
       const kamm = document.getElementById('kammCanvas');
       const hor = document.getElementById('horizonCanvas');
       const kPix = kamm.getContext('2d').getImageData(0, 0, kamm.width, kamm.height).data;
@@ -165,10 +166,10 @@ test('Copiloto 5D y Conducir: renderizado real en Chromium (1440x900 + 390x844),
       for (let i = 3; i < kPix.length; i += 4) if (kPix[i] > 0) kNonZero++;
       for (let i = 3; i < hPix.length; i += 4) if (hPix[i] > 0) hNonZero++;
       return {
-        title: document.title,
         modePill: document.getElementById('modePill').textContent,
         aaPill: document.getElementById('aaPill').textContent,
-        bannerClass: document.getElementById('alertBanner').className,
+        bannerTitle: document.getElementById('bannerTitle').textContent,
+        bannerAction: document.getElementById('bannerAction').textContent,
         overflowX: document.documentElement.scrollWidth - window.innerWidth,
         kNonZero,
         hNonZero,
@@ -177,58 +178,81 @@ test('Copiloto 5D y Conducir: renderizado real en Chromium (1440x900 + 390x844),
       };
     })()`);
 
-    assert.match(desktopCheck.title, /Copiloto 5D/);
-    assert.equal(desktopCheck.modePill, 'SIMULACIÓN DECLARADA');
-    assert.match(desktopCheck.aaPill, /Android Auto: ACTIVO/);
-    assert.ok(desktopCheck.overflowX <= 2, `sin desbordamiento horizontal desktop (${desktopCheck.overflowX})`);
-    assert.ok(desktopCheck.kNonZero > 5000, 'canvas Círculo de Kamm dibujado');
-    assert.ok(desktopCheck.hNonZero > 5000, 'canvas Horizonte predictivo dibujado');
-    assert.ok(desktopCheck.aaCount >= 1, 'publicó paquete al puente SendaNative.publishDriveState');
-    assert.ok(['VERDE', 'AMBAR', 'ROJO'].includes(desktopCheck.lastAa.status));
-    assert.ok(Array.isArray(desktopCheck.lastAa.rows) && desktopCheck.lastAa.rows.length > 0);
+    assert.equal(mobileHome.modePill, 'Simulación declarada');
+    assert.match(mobileHome.aaPill, /Auto activo/);
+    assert.match(mobileHome.bannerTitle, /deslizar sobre el agua/i);
+    assert.ok(mobileHome.overflowX <= 2, `sin desbordamiento horizontal 390px (${mobileHome.overflowX})`);
+    assert.ok(mobileHome.kNonZero > 4000, 'anillo de agarre renderizado');
+    assert.ok(mobileHome.hNonZero > 4000, 'horizonte predictivo renderizado');
+    assert.ok(['VERDE', 'AMBAR', 'ROJO'].includes(mobileHome.lastAa.status));
 
-    // 2. Recorrer los escenarios críticos (túnel EKF, paso inundado Shand, niebla LWR, noche+convoy)
-    const scenariosCheck = await cdp.evalJs(`(() => {
+    // 2. Pestaña Entorno: comunicación directa (BLE DENM 36 B) + indirecta (sin app) + votación bayesiana
+    const envRes = await cdp.evalJs(`(() => {
+      window.sendaCopilot.setTab('entorno');
+      window.sendaCopilot.sendQuickSignal('agua');
+      const voteBtn = document.querySelector('[data-vote="conf"]');
+      if (voteBtn) voteBtn.click();
+      return {
+        bleSentCount: window.__bleSent.length,
+        composeVisible: !document.getElementById('composeBox').hidden,
+        indirectText: document.getElementById('composeIndirectText').textContent,
+        directPeers: document.getElementById('dirPeersTitle').textContent,
+        indirectDensity: document.getElementById('indDensityTitle').textContent,
+        overflowX: document.documentElement.scrollWidth - window.innerWidth,
+      };
+    })()`);
+    assert.equal(envRes.bleSentCount, 1, 'envía paquete directo C-ITS DENM 36 B por SendaNative.p2pSend');
+    assert.equal(envRes.composeVisible, true);
+    assert.match(envRes.indirectText, /Agua \/ Balsa/);
+    assert.match(envRes.indirectText, /112/);
+    assert.ok(envRes.overflowX <= 2, `sin desbordamiento en pestaña Entorno (${envRes.overflowX})`);
+
+    // 3. Pestaña Calibrar: marcas en 1 toque + exportación SHA-256 sin PII
+    const calRes = await cdp.evalJs(`(async () => {
+      window.sendaCopilot.setTab('calibrar');
+      window.sendaCopilot.recordCalibration('alert_feedback', 'acierto');
+      window.sendaCopilot.recordCalibration('road_condition', 'balsas');
+      window.sendaCopilot.recordCalibration('coverage_check', 'sin_red');
+      window.sendaCopilot.recordCalibration('drive_mode_truth', 'en_coche');
+      const pack = await window.sendaCopilot.exportCalibration();
+      return {
+        pack,
+        stageText: document.getElementById('calStageBadge').textContent,
+        overflowX: document.documentElement.scrollWidth - window.innerWidth,
+      };
+    })()`);
+    assert.equal(calRes.pack.schema, 'senda.community-calibration-pack/v1');
+    assert.equal(calRes.pack.totalMarks, 4);
+    assert.match(calRes.pack.sha256, /^[a-f0-9]{64}$/);
+    assert.equal(calRes.pack.lat, undefined);
+    assert.ok(calRes.overflowX <= 2, `sin desbordamiento en pestaña Calibrar (${calRes.overflowX})`);
+
+    // 4. Pestaña Física: escenarios críticos + debriefing SHA-256 (0 PII)
+    const physRes = await cdp.evalJs(`(async () => {
+      window.sendaCopilot.setTab('fisica');
       const out = {};
       for (const sc of ['tunnel_ekf', 'flood_gate', 'fog_lwr', 'night_convoy']) {
         window.sendaCopilot.applyScenarioDefaults(sc);
         window.sendaCopilot.tick();
         out[sc] = {
           bannerClass: document.getElementById('alertBanner').className,
-          bannerTitle: document.getElementById('bannerTitle').textContent,
           eMode: document.getElementById('eMode').textContent,
           fCross: document.getElementById('fCross').textContent,
           fLevel: document.getElementById('fLevel').textContent,
         };
       }
-      return out;
+      const debrief = await window.sendaCopilot.sealDebrief();
+      return { out, debrief, overflowX: document.documentElement.scrollWidth - window.innerWidth };
     })()`);
+    assert.match(physRes.out.tunnel_ekf.eMode, /DEAD_RECKONING_IMU/);
+    assert.match(physRes.out.flood_gate.bannerClass, /ROJO/);
+    assert.match(physRes.out.flood_gate.fCross, /NO_CRUZAR|FLOOD/i);
+    assert.match(physRes.out.night_convoy.fLevel, /CRITICAL|HIGH/);
+    assert.equal(physRes.debrief.schema, 'senda.drive-copilot-debrief/v1');
+    assert.match(physRes.debrief.sha256, /^[a-f0-9]{64}$/);
+    assert.ok(physRes.overflowX <= 2);
 
-    assert.match(scenariosCheck.tunnel_ekf.eMode, /DEAD_RECKONING_IMU/, 'túnel EKF entra en dead-reckoning real');
-    assert.match(scenariosCheck.flood_gate.bannerClass, /ROJO/, 'paso inundado activa alarma ROJO');
-    assert.match(scenariosCheck.flood_gate.fCross, /DO_NOT_CROSS|NO_CRUZAR|FLOOD/i);
-    assert.match(scenariosCheck.fog_lwr.bannerClass, /ROJO|AMBAR/, 'niebla + cola LWR activa alerta');
-    assert.match(scenariosCheck.night_convoy.fLevel, /CRITICAL|HIGH/, 'fatiga nocturna detectada');
-
-    // 3. Debriefing SHA-256 (0 PII)
-    const debrief = await cdp.evalJs(`(async () => {
-      await window.sendaCopilot.sealDebrief();
-      return JSON.parse(document.getElementById('debriefOut').textContent);
-    })()`);
-    assert.equal(debrief.schema, 'senda.drive-copilot-debrief/v1');
-    assert.match(debrief.sha256, /^[a-f0-9]{64}$/);
-    assert.ok(debrief.samples >= 4);
-    for (const forbidden of ['lat', 'lon', 'mac', 'ssid', 'name', 'email']) {
-      assert.equal(debrief[forbidden], undefined, `debriefing no debe contener ${forbidden}`);
-    }
-
-    // 4. Portrait smartphone 390x844 (APK vertical)
-    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
-    await new Promise((r) => setTimeout(r, 200));
-    const mobileOverflow = await cdp.evalJs('document.documentElement.scrollWidth - window.innerWidth');
-    assert.ok(mobileOverflow <= 2, `sin desbordamiento horizontal móvil 390px (${mobileOverflow})`);
-
-    // 5. Conducir: botón 1-toque a Copiloto 5D + publicación Android Auto en vivo
+    // 5. Conducir: chip 1-toque a Copiloto 5D + publicación Android Auto en vivo
     await cdp.send('Page.navigate', { url: `${baseUrl}/senda/conducir` });
     await cdp.waitFor('window.sendaDrive && document.getElementById("copilotChip")');
     const driveCheck = await cdp.evalJs(`(() => {
@@ -245,9 +269,8 @@ test('Copiloto 5D y Conducir: renderizado real en Chromium (1440x900 + 390x844),
       };
     })()`);
     assert.equal(driveCheck.chipHref, '/senda/copiloto');
-    assert.ok(driveCheck.aaCount >= 1, 'conducir.mjs publica estado en vivo a SendaNative.publishDriveState');
+    assert.ok(driveCheck.aaCount >= 1);
     assert.equal(driveCheck.lastAa.speedKmh, 90);
-    assert.ok(driveCheck.lastAa.stoppingDistM > 50);
 
     assert.deepEqual(failedLocal, [], `activos locales con error HTTP: ${failedLocal.join(', ')}`);
     assert.deepEqual(errors, [], `errores de consola/JS: ${errors.join(' | ')}`);

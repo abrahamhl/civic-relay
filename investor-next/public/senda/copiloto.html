@@ -3,244 +3,638 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090d12">
-<title>SENDA · Copiloto 5D de Conducción y Viaje</title>
+<meta name="theme-color" content="#000000">
+<meta name="description" content="SENDA Copiloto: conducción asistida offline, comunicación directa e indirecta con el entorno y calibración comunitaria sin datos personales.">
+<title>SENDA · Copiloto 5D</title>
 <link rel="icon" href="/senda/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/senda/fonts/fonts.css">
 <style>
+/* Apple Human Interface Guidelines (iOS 18 / CarPlay Dark) alineado con app.html */
 :root{
-  --bg:#090d12;--panel:#10161e;--panel2:#151d28;--line:#1f2c3c;--line2:#2c3d52;
-  --ink:#eef4fa;--muted:#8fa3b8;--dim:#61758a;
-  --ok:#2ee6a6;--amber:#ffb800;--red:#ff3b30;--cyan:#38bdf8;--blue:#3b82f6;
+  --bg:#000000;
+  --g1:#1c1c1e;
+  --g2:#2c2c2e;
+  --g3:#3a3a3c;
+  --sep:rgba(84,84,88,.58);
+  --l1:#ffffff;
+  --l2:rgba(235,235,245,.66);
+  --l3:rgba(235,235,245,.36);
+  --acc:#ff7756;
+  --blue:#0a84ff;
+  --green:#30d158;
+  --amber:#ff9f0a;
+  --red:#ff453a;
+  --cyan:#64d2ff;
+  --top:env(safe-area-inset-top,0px);
+  --bot:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:15px/1.4 "Inter",-apple-system,system-ui,sans-serif;font-feature-settings:"tnum" 1;-webkit-font-smoothing:antialiased}
+html,body{
+  margin:0;min-height:100%;background:var(--bg);color:var(--l1);
+  font:16px/1.38 "Inter",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  letter-spacing:-.012em;font-feature-settings:"tnum" 1;
+  -webkit-font-smoothing:antialiased;
+}
 button,select,input{font:inherit;color:inherit}
-button{cursor:pointer}
+button{cursor:pointer;border:0;background:none}
+a{color:inherit;text-decoration:none}
 .mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace}
-.topbar{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 14px;background:rgba(9,13,18,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.brand{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:.03em;font-size:15px}
-.dot{width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
-.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.03em;border:1px solid var(--line2);background:var(--panel2);color:var(--cyan)}
-.pill.sim{border-color:rgba(255,184,0,.45);background:rgba(255,184,0,.12);color:#ffd466}
-.pill.real{border-color:rgba(46,230,166,.45);background:rgba(46,230,166,.12);color:var(--ok)}
-.top-acts{margin-left:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.btn{min-height:38px;padding:6px 11px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);color:var(--ink);font-size:13px;font-weight:650;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
-.btn:hover{border-color:var(--cyan)}
-.btn.on{background:rgba(46,230,166,.16);border-color:var(--ok);color:var(--ok)}
-.btn.sos{background:rgba(255,59,48,.18);border-color:var(--red);color:#ff867f;font-weight:800}
-.wrap{max-width:1360px;margin:0 auto;padding:12px 14px calc(24px + env(safe-area-inset-bottom))}
 
-/* Banner principal ISO 15005 */
-.banner{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:14px 16px;border-radius:16px;border:1px solid var(--line2);background:linear-gradient(135deg,#0f1a24,#0d141d);margin-bottom:12px}
-.banner.VERDE{border-color:rgba(46,230,166,.45);box-shadow:inset 4px 0 0 var(--ok)}
-.banner.AMBAR{border-color:rgba(255,184,0,.55);background:linear-gradient(135deg,#241c0a,#14120c);box-shadow:inset 5px 0 0 var(--amber)}
-.banner.ROJO{border-color:rgba(255,59,48,.75);background:linear-gradient(135deg,#2b0d0e,#170a0b);box-shadow:inset 6px 0 0 var(--red)}
-.spd-box{min-width:104px;text-align:center;padding:6px 10px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid var(--line2)}
-.spd-val{font:800 36px/1 "IBM Plex Mono",monospace;color:#fff}
-.spd-unit{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
-.banner-main h1{margin:0;font-size:clamp(17px,2.3vw,23px);line-height:1.18;font-weight:800}
-.banner-main p{margin:4px 0 0;font-size:13.5px;color:#c7d7e6}
-.cap-badge{min-width:86px;text-align:center;padding:8px 10px;border-radius:14px;border:3px solid var(--line2);background:#0d131a}
-.cap-badge.warn{border-color:var(--red);background:#fff;color:#111}
-.cap-badge b{display:block;font:800 24px/1 "IBM Plex Mono",monospace}
-.cap-badge small{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+/* Cabecera compacta estilo iOS */
+.ios-header{
+  position:sticky;top:0;z-index:20;
+  background:rgba(0,0,0,.86);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border-bottom:.5px solid var(--sep);
+  padding:calc(var(--top) + 10px) 16px 10px;
+}
+html.in-app .ios-header{top:48px}
+.ios-header-in{
+  max-width:680px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.title-stack{min-width:0}
+.title-stack h1{margin:0;font-size:24px;line-height:1.1;font-weight:700;letter-spacing:-.025em}
+.subline{
+  display:flex;align-items:center;gap:6px;margin-top:3px;
+  font-size:12px;color:var(--l2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sub-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);flex:none}
+.sub-dot.real{background:var(--green)}
+.hdr-acts{display:flex;align-items:center;gap:8px;flex:none}
+.icon-btn{
+  height:36px;min-width:36px;padding:0 11px;border-radius:999px;
+  background:var(--g1);color:var(--l1);font-size:13px;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  transition:transform .12s,background .15s;
+}
+.icon-btn:active{transform:scale(.95)}
+.icon-btn.on{background:rgba(48,209,88,.22);color:var(--green)}
+.icon-btn.sos{background:rgba(255,69,58,.22);color:#ff6961;font-weight:700}
 
-/* Escenarios 1-toque */
-.scenarios{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;scrollbar-width:none}.scenarios::-webkit-scrollbar{display:none}
-.sc-btn{flex:none;min-height:40px;padding:7px 12px;border-radius:11px;border:1px solid var(--line2);background:var(--panel);color:var(--ink);font-size:12.5px;font-weight:700;white-space:nowrap}
-.sc-btn.on{background:rgba(56,189,248,.16);border-color:var(--cyan);color:#bdf0ff}
-.sc-btn.real.on{background:rgba(46,230,166,.16);border-color:var(--ok);color:var(--ok)}
+/* Contenedor Mobile-First (fluido en móvil, centrado y ergonómico en tablet/PC) */
+.shell{
+  max-width:680px;margin:0 auto;
+  padding:14px 16px calc(92px + var(--bot));
+}
+.tab-view{display:none}
+.tab-view.on{display:block}
+.sec-label{
+  font-size:12.5px;font-weight:600;color:var(--l2);
+  text-transform:uppercase;letter-spacing:.03em;
+  margin:20px 6px 8px;
+}
+.sec-label:first-child{margin-top:4px}
 
-/* Instrumentos principales */
-.gauges{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);gap:12px;margin-bottom:12px}
-@media(max-width:860px){.gauges{grid-template-columns:1fr}.banner{grid-template-columns:auto 1fr}.cap-badge{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:10px}}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 14px;min-width:0}
-.card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
-.card-head h2{margin:0;font-size:13.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#cfe2f5}
-.tag{font:700 11px/1 "IBM Plex Mono",monospace;padding:3px 7px;border-radius:6px;background:var(--panel2);color:var(--muted);border:1px solid var(--line2)}
-.tag.OK{color:var(--ok);border-color:rgba(46,230,166,.4);background:rgba(46,230,166,.1)}
-.tag.WARN{color:var(--amber);border-color:rgba(255,184,0,.45);background:rgba(255,184,0,.1)}
-.tag.CRIT{color:#ff867f;border-color:rgba(255,59,48,.55);background:rgba(255,59,48,.15)}
-canvas.inst{width:100%;height:260px;display:block;border-radius:12px;background:#070b10;border:1px solid var(--line)}
+/* Tarjeta Hero CarPlay */
+.hero-card{
+  background:var(--g1);border-radius:24px;padding:18px;
+  box-shadow:inset 0 .5px 0 rgba(255,255,255,.08);
+  transition:background .2s;
+}
+.hero-card.VERDE{background:linear-gradient(180deg,#18241d 0%,#1c1c1e 65%)}
+.hero-card.AMBAR{background:linear-gradient(180deg,#2c2210 0%,#1c1c1e 68%)}
+.hero-card.ROJO{background:linear-gradient(180deg,#331416 0%,#1c1c1e 72%)}
 
-/* KPIs y tarjetas de subsistemas */
-.subgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:12px}
-@media(max-width:1100px){.subgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.subgrid{grid-template-columns:1fr}}
-.kv{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid rgba(255,255,255,.06);font-size:13px}
-.kv:first-of-type{border-top:0}
-.kv span{color:var(--muted)}
-.kv b{font-family:"IBM Plex Mono",monospace;font-size:12.5px;text-align:right}
-.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
-.ctrl{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 11px}
-.ctrl label{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px}
-.ctrl select,.ctrl input[type="range"]{width:100%;accent-color:var(--cyan)}
-.ctrl select{background:var(--panel2);border:1px solid var(--line2);border-radius:8px;padding:6px 8px;color:var(--ink)}
+.hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.speed-readout{display:flex;align-items:baseline;gap:5px}
+.speed-num{font-size:52px;line-height:.95;font-weight:700;letter-spacing:-.04em}
+.speed-unit{font-size:14px;font-weight:600;color:var(--l2)}
 
-/* Cola de alertas y Android Auto / Debriefing */
-.bottom-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px}
-@media(max-width:860px){.bottom-grid{grid-template-columns:1fr}}
-.alert-list{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
-.alert-item{padding:8px 10px;border-radius:10px;background:var(--panel2);border-left:4px solid var(--cyan);font-size:13px}
-.alert-item.ROJO{border-left-color:var(--red);background:rgba(255,59,48,.1)}
-.alert-item.AMBAR{border-left-color:var(--amber);background:rgba(255,184,0,.09)}
-.alert-item b{display:block}
-.alert-item small{color:var(--muted);font-size:12px}
-pre.debrief{margin:8px 0 0;padding:10px;border-radius:10px;background:#070b10;border:1px solid var(--line);font:11.5px/1.45 "IBM Plex Mono",monospace;color:#bfead8;max-height:180px;overflow:auto;white-space:pre-wrap;word-break:break-word}
-.foot{margin-top:12px;font-size:12px;color:var(--dim);text-align:center}
+/* Disco señal vial limpia */
+.limit-disc{
+  width:68px;height:68px;border-radius:50%;flex:none;
+  background:#ffffff;color:#111111;border:6px solid var(--g3);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(0,0,0,.35);
+}
+.limit-disc.warn{border-color:var(--red)}
+.limit-disc b{font-size:23px;line-height:1;font-weight:800;letter-spacing:-.03em}
+.limit-disc small{font-size:8.5px;font-weight:700;text-transform:uppercase;color:#444;margin-top:1px}
+
+.hero-copy{margin-top:14px}
+.hero-title{margin:0;font-size:20px;line-height:1.2;font-weight:700;letter-spacing:-.02em}
+.hero-action{margin:5px 0 0;font-size:15px;font-weight:600;color:var(--l1)}
+.hero-card.ROJO .hero-action{color:#ff8a80}
+.hero-card.AMBAR .hero-action{color:#ffd166}
+.hero-card.VERDE .hero-action{color:var(--green)}
+.hero-why{margin:6px 0 0;font-size:13.5px;color:var(--l2);line-height:1.38}
+
+.hero-metrics{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;
+  padding-top:12px;border-top:.5px solid var(--sep);
+}
+.hm{text-align:left}
+.hm span{display:block;font-size:11.5px;color:var(--l2)}
+.hm b{display:block;font-size:16px;font-weight:700;margin-top:2px}
+
+/* Selector horizontal limpio (Segmented pills) */
+.sc-strip{
+  display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;margin:12px -16px 0;
+  padding-left:16px;padding-right:16px;scrollbar-width:none;
+}
+.sc-strip::-webkit-scrollbar{display:none}
+.sc-btn{
+  flex:none;height:36px;padding:0 14px;border-radius:999px;
+  background:var(--g1);color:var(--l2);font-size:13.5px;font-weight:600;
+  white-space:nowrap;transition:background .15s,color .15s;
+}
+.sc-btn.on{background:var(--blue);color:#fff}
+.sc-btn.real.on{background:var(--green);color:#041a0a}
+
+/* Tarjetas de instrumentos limpias */
+.viz-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+@media(min-width:640px){.viz-grid{grid-template-columns:1fr 1.25fr}}
+.ios-card{
+  background:var(--g1);border-radius:20px;padding:14px;
+  box-shadow:inset 0 .5px 0 rgba(255,255,255,.06);
+}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.card-top h2{margin:0;font-size:15px;font-weight:600;letter-spacing:-.01em}
+.soft-badge{
+  font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;
+  background:var(--g2);color:var(--l2);
+}
+.soft-badge.OK{background:rgba(48,209,88,.18);color:var(--green)}
+.soft-badge.WARN{background:rgba(255,159,10,.18);color:var(--amber)}
+.soft-badge.CRIT{background:rgba(255,69,58,.2);color:#ff6961}
+canvas.inst{width:100%;height:200px;display:block;border-radius:14px;background:#0b0b0d}
+
+/* Botón primario estilo iOS */
+.cta-primary{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;min-height:52px;border-radius:16px;margin-top:14px;
+  background:var(--blue);color:#fff;font-size:16px;font-weight:600;
+  transition:transform .12s,opacity .15s;
+}
+.cta-primary:active{transform:scale(.98);opacity:.9}
+.cta-secondary{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;min-height:46px;border-radius:14px;margin-top:10px;
+  background:var(--g2);color:var(--l1);font-size:15px;font-weight:600;
+}
+.cta-secondary:active{opacity:.85}
+
+/* Lista agrupada estilo Ajustes iOS (.group / .row) */
+.group{background:var(--g1);border-radius:16px;overflow:hidden}
+.row{
+  display:flex;align-items:center;gap:12px;min-height:54px;padding:10px 15px;
+  position:relative;width:100%;text-align:left;
+}
+.row+.row::before{
+  content:"";position:absolute;top:0;left:15px;right:0;border-top:.5px solid var(--sep);
+}
+.row-ico{
+  width:34px;height:34px;border-radius:9px;flex:none;
+  display:grid;place-items:center;font-size:17px;background:var(--g2);
+}
+.row-ico.green{background:rgba(48,209,88,.2);color:var(--green)}
+.row-ico.blue{background:rgba(10,132,255,.22);color:var(--cyan)}
+.row-ico.amber{background:rgba(255,159,10,.22);color:var(--amber)}
+.row-ico.red{background:rgba(255,69,58,.22);color:#ff6961}
+.row-body{flex:1;min-width:0}
+.row-body b{display:block;font-size:15px;font-weight:600;line-height:1.25}
+.row-body small{display:block;font-size:13px;color:var(--l2);margin-top:2px;line-height:1.32}
+.row-val{font-size:14px;font-weight:600;color:var(--l2);text-align:right;flex:none}
+
+/* Cuadrícula de aviso rápido 1 toque (2×3 móvil) */
+.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:520px){.quick-grid{grid-template-columns:repeat(3,1fr)}}
+.q-tile{
+  background:var(--g1);border-radius:18px;padding:14px 12px;text-align:left;
+  min-height:84px;display:flex;flex-direction:column;justify-content:space-between;
+  transition:transform .12s,background .15s;
+}
+.q-tile:active{transform:scale(.97);background:var(--g2)}
+.q-tile .q-emo{font-size:24px;line-height:1}
+.q-tile b{display:block;font-size:15px;font-weight:600;margin-top:8px}
+.q-tile small{display:block;font-size:12px;color:var(--l2);margin-top:2px;line-height:1.25}
+.q-tile.danger{background:linear-gradient(180deg,rgba(255,69,58,.18),var(--g1))}
+
+/* Tarjeta de mensaje recién compuesto (Directo + Indirecto) */
+.compose-box{
+  margin-top:12px;background:var(--g1);border-radius:18px;padding:14px;
+}
+.compose-box[hidden]{display:none}
+.compose-msg{
+  margin:8px 0 0;padding:10px 12px;border-radius:12px;background:#0b0b0d;
+  font-size:13.5px;line-height:1.4;color:#e5e5ea;
+}
+.btn-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.pill-btn{
+  flex:1;min-width:110px;min-height:40px;padding:8px 12px;border-radius:12px;
+  background:var(--g2);color:var(--l1);font-size:13.5px;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+}
+.pill-btn.pri{background:var(--blue);color:#fff}
+.pill-btn.ok{background:rgba(48,209,88,.22);color:var(--green)}
+
+/* Feed comunitario con votación bayesiana */
+.feed-list{display:flex;flex-direction:column;gap:8px}
+.feed-item{background:var(--g1);border-radius:16px;padding:12px 14px}
+.feed-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.feed-top b{font-size:15px}
+.feed-sub{font-size:12.5px;color:var(--l2);margin-top:3px}
+.vote-row{display:flex;gap:8px;margin-top:10px}
+.vote-btn{
+  flex:1;min-height:38px;border-radius:11px;background:var(--g2);
+  font-size:13px;font-weight:600;color:var(--l1);
+}
+.vote-btn.yes{background:rgba(48,209,88,.18);color:var(--green)}
+.vote-btn.no{background:rgba(255,69,58,.16);color:#ff6961}
+
+/* Barras de calibración estilo Apple Health */
+.cal-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.cal-pct{font-size:36px;font-weight:700;letter-spacing:-.03em}
+.bar-list{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.bar-item .bi-top{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:5px}
+.bar-item .bi-top span{color:var(--l2)}
+.bar-track{height:8px;border-radius:999px;background:var(--g2);overflow:hidden}
+.bar-fill{height:100%;border-radius:999px;background:var(--blue);transition:width .25s}
+.bar-note{font-size:12px;color:var(--l2);margin-top:4px}
+
+.seg-pills{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.seg-pills.cols2{grid-template-columns:repeat(2,1fr)}
+.seg-pills.cols4{grid-template-columns:repeat(2,1fr)}
+@media(min-width:440px){.seg-pills.cols4{grid-template-columns:repeat(4,1fr)}}
+.cal-btn{
+  min-height:44px;padding:8px 10px;border-radius:12px;
+  background:var(--g2);color:var(--l1);font-size:13.5px;font-weight:600;
+  transition:transform .1s,background .15s;
+}
+.cal-btn:active{transform:scale(.96);background:var(--blue);color:#fff}
+
+/* Controles de Física estilo Ajustes iOS */
+.ctrl-row{padding:12px 15px;position:relative}
+.ctrl-row+.ctrl-row::before{content:"";position:absolute;top:0;left:15px;right:0;border-top:.5px solid var(--sep)}
+.ctrl-row label{display:flex;justify-content:space-between;font-size:14.5px;font-weight:500;margin-bottom:8px}
+.ctrl-row label b{color:var(--l2);font-weight:600}
+.ctrl-row select,.ctrl-row input[type="range"]{width:100%;accent-color:var(--blue)}
+.ctrl-row select{
+  background:var(--g2);border:0;border-radius:10px;padding:10px 12px;
+  color:var(--l1);font-size:15px;outline:none;
+}
+
+pre.json-box{
+  margin:10px 0 0;padding:12px;border-radius:14px;background:#0b0b0d;
+  font:11.5px/1.45 "IBM Plex Mono",ui-monospace,monospace;color:#bfead8;
+  max-height:190px;overflow:auto;white-space:pre-wrap;word-break:break-word;
+}
+.foot-note{font-size:12px;color:var(--l3);text-align:center;margin:18px 8px 4px;line-height:1.45}
+
+/* Barra de pestañas inferior estilo iOS 18 */
+nav.tabs{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  display:flex;justify-content:space-around;
+  background:rgba(18,18,20,.88);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border-top:.5px solid var(--sep);
+  padding:7px 4px calc(7px + var(--bot));
+}
+nav.tabs button{
+  flex:1;max-width:140px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-size:10.5px;font-weight:600;color:var(--l2);padding:2px 0;
+}
+nav.tabs button.on{color:var(--blue)}
+nav.tabs svg{width:24px;height:24px}
+
+/* Hoja modal deslizable inferior (iOS Sheet) */
+.sheet-veil{
+  position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.58);
+  backdrop-filter:blur(4px);
+}
+.sheet-veil[hidden],.ios-sheet[hidden]{display:none}
+.ios-sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:45;
+  max-width:680px;margin:0 auto;
+  background:#1c1c1e;border-radius:26px 26px 0 0;
+  padding:10px 16px calc(18px + var(--bot));
+  box-shadow:0 -12px 40px rgba(0,0,0,.65);
+  max-height:85vh;overflow-y:auto;
+}
+.grabber{width:38px;height:5px;border-radius:999px;background:var(--g3);margin:0 auto 12px}
+.sheet-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sheet-hdr h3{margin:0;font-size:19px;font-weight:700}
+.sheet-x{width:32px;height:32px;border-radius:50%;background:var(--g2);color:var(--l1);font-weight:700}
+
+/* Toast confirmación suave */
+.toast{
+  position:fixed;left:50%;bottom:calc(82px + var(--bot));transform:translateX(-50%);
+  z-index:50;background:rgba(44,44,46,.95);color:#fff;
+  padding:10px 16px;border-radius:999px;font-size:13.5px;font-weight:600;
+  box-shadow:0 8px 24px rgba(0,0,0,.45);max-width:92vw;text-align:center;
+}
+.toast[hidden]{display:none}
 </style>
 <script type="module" src="/senda/app-chrome.mjs"></script>
 </head>
 <body>
-<header class="topbar">
-  <div class="brand"><span class="dot" id="liveDot"></span>SENDA · Copiloto 5D</div>
-  <span class="pill sim" id="modePill">SIMULACIÓN DECLARADA</span>
-  <span class="pill" id="aaPill" title="Estado del puente nativo SendaNative hacia Android Auto">Android Auto: Web</span>
-  <div class="top-acts">
-    <a class="btn" href="/senda/conducir">← Mapa Conducir</a>
-    <button class="btn" id="voiceToggle" aria-pressed="false">🔇 Voz OFF</button>
-    <button class="btn" id="debriefBtn">🔒 Sellar viaje SHA-256</button>
-    <a class="btn sos" href="tel:112">📞 112</a>
+
+<header class="ios-header">
+  <div class="ios-header-in">
+    <div class="title-stack">
+      <h1>Copiloto</h1>
+      <div class="subline">
+        <span class="sub-dot" id="modeDot"></span>
+        <span id="modePill">Simulación declarada</span>
+        <span>·</span>
+        <span id="aaPill">Android Auto: Web</span>
+      </div>
+    </div>
+    <div class="hdr-acts">
+      <a class="icon-btn" href="/senda/conducir" aria-label="Ir al mapa Conducir">Mapa</a>
+      <button class="icon-btn" id="voiceToggle" aria-pressed="false" aria-label="Activar o silenciar voz">Voz</button>
+      <a class="icon-btn sos" href="tel:112" aria-label="Llamar al 112">112</a>
+    </div>
   </div>
 </header>
 
-<main class="wrap">
-  <section class="banner VERDE" id="alertBanner" role="status" aria-live="polite">
-    <div class="spd-box">
-      <div class="spd-val" id="egoSpeed">0</div>
-      <div class="spd-unit">km/h</div>
+<main class="shell">
+
+  <!-- ══════════ PESTAÑA 1: COPILOTO (VISTA LIMPIA DE CONDUCCIÓN) ══════════ -->
+  <section class="tab-view on" id="tab-copiloto" aria-label="Vista principal de conducción">
+    <article class="hero-card VERDE" id="alertBanner" role="status" aria-live="polite">
+      <div class="hero-top">
+        <div class="speed-readout">
+          <span class="speed-num" id="egoSpeed">0</span>
+          <span class="speed-unit">km/h</span>
+        </div>
+        <div class="limit-disc" id="capBadge" aria-label="Velocidad máxima segura recomendada">
+          <b id="capSpeed">—</b>
+          <small>máx km/h</small>
+        </div>
+      </div>
+
+      <div class="hero-copy">
+        <h2 class="hero-title" id="bannerTitle">Copiloto listo</h2>
+        <p class="hero-action" id="bannerAction">Mantén una conducción suave</p>
+        <p class="hero-why" id="bannerDetail">Física en tu móvil sin red y conectada con tu entorno cercano.</p>
+      </div>
+
+      <div class="hero-metrics">
+        <div class="hm"><span>Agarre libre</span><b id="mGrip">—</b></div>
+        <div class="hm"><span>Frenada total</span><b id="mStop">—</b></div>
+        <div class="hm"><span>Entorno SENDA</span><b id="mPeers">—</b></div>
+      </div>
+    </article>
+
+    <nav class="sc-strip" aria-label="Fuente de sensores o escenario demostrativo">
+      <button class="sc-btn real" data-sc="real" id="scReal">Sensores reales</button>
+      <button class="sc-btn on" data-sc="rain_curve">Lluvia y curva</button>
+      <button class="sc-btn" data-sc="fog_lwr">Niebla y cola</button>
+      <button class="sc-btn" data-sc="flood_gate">Paso inundado</button>
+      <button class="sc-btn" data-sc="tunnel_ekf">Túnel sin GPS</button>
+      <button class="sc-btn" data-sc="night_convoy">Noche y convoy</button>
+    </nav>
+
+    <div class="viz-grid">
+      <article class="ios-card">
+        <div class="card-top">
+          <h2>Agarre y agua en calzada</h2>
+          <span class="soft-badge OK" id="gripTag">Óptimo</span>
+        </div>
+        <canvas class="inst" id="kammCanvas" width="520" height="240" aria-label="Anillo de agarre disponible y límite de hidroplaneo"></canvas>
+      </article>
+
+      <article class="ios-card">
+        <div class="card-top">
+          <h2>Por delante (600 m)</h2>
+          <span class="soft-badge" id="horizonTag">Horizonte</span>
+        </div>
+        <canvas class="inst" id="horizonCanvas" width="660" height="240" aria-label="Distancia de frenado frente a visibilidad y peligros por delante"></canvas>
+      </article>
     </div>
-    <div class="banner-main">
-      <h1 id="bannerTitle">Copiloto 5D listo</h1>
-      <p id="bannerDetail">Física de adherencia, aquaplaning NASA, horizonte de curvas, EKF en túneles y emergencias en ruta.</p>
-    </div>
-    <div class="cap-badge" id="capBadge" aria-label="Velocidad máxima segura recomendada">
-      <b id="capSpeed">—</b>
-      <small>Máx seguro km/h</small>
-    </div>
+
+    <button class="cta-primary" id="openQuickSheetBtn">📡 Avisar a conductores y entorno (1 toque)</button>
   </section>
 
-  <nav class="scenarios" aria-label="Modo de operación y escenarios de prueba">
-    <button class="sc-btn real" data-sc="real" id="scReal">📡 Sensores reales (GPS + IMU)</button>
-    <button class="sc-btn on" data-sc="rain_curve">🌧️ Demo: Lluvia + Curva R=60m + Aquaplaning</button>
-    <button class="sc-btn" data-sc="fog_lwr">🌫️ Demo: Niebla 55m + Cola móvil LWR</button>
-    <button class="sc-btn" data-sc="tunnel_ekf">🚇 Demo: Túnel M-30 sin GPS (EKF)</button>
-    <button class="sc-btn" data-sc="flood_gate">🌊 Demo: Paso inferior inundado (Shand)</button>
-    <button class="sc-btn" data-sc="night_convoy">🌙 Demo: Noche 2h30 + Convoy BLE + Fatiga</button>
-  </nav>
-
-  <section class="gauges">
-    <article class="card">
-      <div class="card-head">
-        <h2>Círculo de Kamm y Aquaplaning NASA</h2>
-        <span class="tag OK" id="gripTag">OPTIMAL</span>
+  <!-- ══════════ PESTAÑA 2: ENTORNO (COMUNICACIÓN DIRECTA E INDIRECTA) ══════════ -->
+  <section class="tab-view" id="tab-entorno" aria-label="Comunicación directa e indirecta con conductores cercanos">
+    <div class="sec-label">Comunicación directa · Sin Internet</div>
+    <div class="group">
+      <div class="row">
+        <div class="row-ico green">📡</div>
+        <div class="row-body">
+          <b id="dirPeersTitle">Buscando móviles SENDA cerca…</b>
+          <small id="dirPeersDetail">Intercambio directo Bluetooth en 36 bytes (C-ITS DENM) sin cobertura.</small>
+        </div>
+        <button class="icon-btn" id="scanNearbyBtn">Escanear</button>
       </div>
-      <canvas class="inst" id="kammCanvas" width="540" height="320" aria-label="Círculo de fricción de Kamm y reserva de adherencia"></canvas>
+      <div class="row">
+        <div class="row-ico blue">🚙</div>
+        <div class="row-body">
+          <b id="dirConvoyTitle">Convoy cercano</b>
+          <small id="dirConvoyDetail">Sin vehículos enlazados ahora.</small>
+        </div>
+        <span class="row-val" id="dirConvoyVal">—</span>
+      </div>
+    </div>
+
+    <div class="sec-label">Comunicación indirecta · Aunque no tengan SENDA</div>
+    <div class="group">
+      <div class="row">
+        <div class="row-ico amber">🌐</div>
+        <div class="row-body">
+          <b id="indDensityTitle">Entorno pasivo anónimo</b>
+          <small id="indDensityDetail">Traduce densidad de dispositivos cercanos a claridad de entorno (0 MACs, 0 PII).</small>
+        </div>
+        <span class="row-val" id="indMeshPot">—</span>
+      </div>
+      <div class="row">
+        <div class="row-ico blue">🛣️</div>
+        <div class="row-body">
+          <b id="indOfficialTitle">Fuentes oficiales cercanas</b>
+          <small id="indOfficialDetail">Incidencias DGT/NDW y avisos pre-cargados en caché offline.</small>
+        </div>
+        <span class="row-val" id="indOfficialCount">—</span>
+      </div>
+    </div>
+
+    <div class="sec-label">Avisar en 1 toque (Malla directa + compartir sin app)</div>
+    <div class="quick-grid" id="entornoQuickGrid"></div>
+
+    <article class="compose-box" id="composeBox" hidden>
+      <div class="card-top">
+        <h2 id="composeTitle">Aviso preparado</h2>
+        <span class="soft-badge OK" id="composeBadge">36 B DENM</span>
+      </div>
+      <div class="bar-note" id="composeDirectHint"></div>
+      <div class="compose-msg" id="composeIndirectText"></div>
+      <div class="btn-row">
+        <button class="pill-btn pri" id="shareIndirectBtn">Compartir (WhatsApp / SMS)</button>
+        <button class="pill-btn" id="copyIndirectBtn">Copiar texto</button>
+        <button class="pill-btn ok" id="speakIndirectBtn">Leer en voz</button>
+      </div>
     </article>
 
-    <article class="card">
-      <div class="card-head">
-        <h2>Horizonte de Curvas, Cola LWR y Parada vs Visibilidad</h2>
-        <span class="tag" id="horizonTag">HORIZONTE 600 m</span>
-      </div>
-      <canvas class="inst" id="horizonCanvas" width="760" height="320" aria-label="Horizonte predictivo de curvas, distancia de parada y visibilidad"></canvas>
-    </article>
+    <div class="sec-label">Avisos de alrededor · Confirma para calibrar confianza</div>
+    <div class="feed-list" id="communityFeed"></div>
   </section>
 
-  <section class="controls" aria-label="Parámetros físicos declarados del vehículo y la vía">
-    <div class="ctrl">
-      <label for="surfaceSel"><span>Firme (μ Bosch/AASHTO)</span><b id="muVal">0,35</b></label>
-      <select id="surfaceSel">
-        <option value="dry_asphalt">Asfalto seco (μ=0,80)</option>
-        <option value="wet_asphalt">Asfalto mojado (μ=0,50)</option>
-        <option value="heavy_rain" selected>Lluvia intensa / balsas (μ=0,35)</option>
-        <option value="packed_snow">Nieve compactada (μ=0,22)</option>
-        <option value="black_ice">Hielo / placa negra (μ=0,10)</option>
-        <option value="gravel">Pista / gravilla (μ=0,40)</option>
-      </select>
+  <!-- ══════════ PESTAÑA 3: CALIBRAR (MALLADO PROGRESIVO Y VERDAD TERRENO) ══════════ -->
+  <section class="tab-view" id="tab-calibrar" aria-label="Calibración en 1 toque y traducción de sensores">
+    <div class="sec-label">Madurez de calibración real</div>
+    <article class="ios-card">
+      <div class="cal-head">
+        <div>
+          <div class="cal-pct" id="calOverallPct">0 %</div>
+          <div class="bar-note" id="calStageNote">Sin marcas aún · cada toque ayuda a ajustar SENDA en carretera real</div>
+        </div>
+        <span class="soft-badge" id="calStageBadge">Sin calibrar</span>
+      </div>
+      <div class="bar-list" id="calBars"></div>
+    </article>
+
+    <div class="sec-label">Valida en 1 toque (parado o copiloto)</div>
+    <article class="ios-card">
+      <div class="card-top"><h2>¿El último aviso fue acertado?</h2><span class="soft-badge" id="calPrecBadge">Sin datos</span></div>
+      <div class="seg-pills">
+        <button class="cal-btn" data-cal="alert_feedback:acierto">✅ Acertó</button>
+        <button class="cal-btn" data-cal="alert_feedback:tarde">⏱️ Tarde</button>
+        <button class="cal-btn" data-cal="alert_feedback:falsa_alarma">❌ Falsa alarma</button>
+      </div>
+    </article>
+
+    <article class="ios-card" style="margin-top:10px">
+      <div class="card-top"><h2>¿Cómo está el firme aquí?</h2></div>
+      <div class="seg-pills cols4">
+        <button class="cal-btn" data-cal="road_condition:seco">Seco</button>
+        <button class="cal-btn" data-cal="road_condition:mojado">Mojado</button>
+        <button class="cal-btn" data-cal="road_condition:balsas">Balsas</button>
+        <button class="cal-btn" data-cal="road_condition:baches">Baches</button>
+      </div>
+    </article>
+
+    <article class="ios-card" style="margin-top:10px">
+      <div class="card-top"><h2>Cobertura móvil y modo real (arranque automático)</h2></div>
+      <div class="seg-pills cols2">
+        <button class="cal-btn" data-cal="coverage_check:con_red">📶 Con red</button>
+        <button class="cal-btn" data-cal="coverage_check:sin_red">📵 Sin cobertura</button>
+        <button class="cal-btn" data-cal="drive_mode_truth:en_coche">🚗 Voy en coche</button>
+        <button class="cal-btn" data-cal="drive_mode_truth:parado_o_pie">🚶 Parado / a pie</button>
+      </div>
+    </article>
+
+    <div class="sec-label">Qué está midiendo tu móvil (traducido)</div>
+    <div class="group">
+      <div class="row">
+        <div class="row-ico blue">🛰️</div>
+        <div class="row-body"><b id="sGpsLbl">—</b><small id="sGpsDet">—</small></div>
+      </div>
+      <div class="row">
+        <div class="row-ico green">🛞</div>
+        <div class="row-body"><b id="sGripLbl">—</b><small id="sGripDet">—</small></div>
+      </div>
+      <div class="row">
+        <div class="row-ico amber">👁️</div>
+        <div class="row-body"><b id="sVisLbl">—</b><small id="sVisDet">—</small></div>
+      </div>
     </div>
-    <div class="ctrl">
-      <label for="vehSel"><span>Vehículo (NHTSA SSF / Shand)</span><b id="ssfVal">1,40</b></label>
-      <select id="vehSel">
-        <option value="sedan" selected>Turismo / Berlina (SSF 1,40)</option>
-        <option value="suv">SUV / Todocamino (SSF 1,18)</option>
-        <option value="van_4x4">Furgoneta / 4×4 alto (SSF 1,08)</option>
-      </select>
-    </div>
-    <div class="ctrl">
-      <label for="pressRange"><span>Presión neumáticos</span><b id="pressVal">2,2 bar</b></label>
-      <input id="pressRange" type="range" min="1.6" max="3.4" step="0.1" value="2.2">
-    </div>
-    <div class="ctrl">
-      <label for="gradeRange"><span>Pendiente calzada</span><b id="gradeVal">-4 %</b></label>
-      <input id="gradeRange" type="range" min="-12" max="12" step="1" value="-4">
-    </div>
-    <div class="ctrl">
-      <label for="visRange"><span>Visibilidad (niebla/luces)</span><b id="visVal">90 m</b></label>
-      <input id="visRange" type="range" min="25" max="400" step="5" value="90">
-    </div>
+
+    <button class="cta-primary" id="exportCalBtn">🔒 Generar paquete de calibración (SHA-256 · 0 PII)</button>
+    <pre class="json-box" id="calOut" hidden></pre>
   </section>
 
-  <section class="subgrid">
-    <article class="card">
-      <div class="card-head"><h2>Adherencia y Parada</h2><span class="tag" id="hydroTag">NASA TN D-2056</span></div>
-      <div class="kv"><span>Crítica aquaplaning</span><b id="kHydro">—</b></div>
-      <div class="kv"><span>Reserva agarre Kamm</span><b id="kReserve">—</b></div>
-      <div class="kv"><span>Parada AASHTO (SSD)</span><b id="kSsd">—</b></div>
-      <div class="kv"><span>Máx. parada visible</span><b id="kVisMax">—</b></div>
+  <!-- ══════════ PESTAÑA 4: FÍSICA Y DEBRIEFING (VISTA AVANZADA) ══════════ -->
+  <section class="tab-view" id="tab-fisica" aria-label="Parámetros físicos, espejo Android Auto y debriefing forense">
+    <div class="sec-label">Ajustes del vehículo y calzada (declarados)</div>
+    <div class="group">
+      <div class="ctrl-row">
+        <label for="surfaceSel"><span>Firme (μ Bosch/AASHTO)</span><b id="muVal">0,35</b></label>
+        <select id="surfaceSel">
+          <option value="dry_asphalt">Asfalto seco (μ = 0,80)</option>
+          <option value="wet_asphalt">Asfalto mojado (μ = 0,50)</option>
+          <option value="heavy_rain" selected>Lluvia intensa / balsas (μ = 0,35)</option>
+          <option value="packed_snow">Nieve compactada (μ = 0,22)</option>
+          <option value="black_ice">Hielo / placa negra (μ = 0,10)</option>
+          <option value="gravel">Pista / gravilla (μ = 0,40)</option>
+        </select>
+      </div>
+      <div class="ctrl-row">
+        <label for="vehSel"><span>Vehículo (NHTSA SSF / Shand)</span><b id="ssfVal">1,40</b></label>
+        <select id="vehSel">
+          <option value="sedan" selected>Turismo / Berlina (SSF 1,40)</option>
+          <option value="suv">SUV / Todocamino (SSF 1,18)</option>
+          <option value="van_4x4">Furgoneta / 4×4 alto (SSF 1,08)</option>
+        </select>
+      </div>
+      <div class="ctrl-row">
+        <label for="pressRange"><span>Presión neumáticos</span><b id="pressVal">2,2 bar</b></label>
+        <input id="pressRange" type="range" min="1.6" max="3.4" step="0.1" value="2.2">
+      </div>
+      <div class="ctrl-row">
+        <label for="gradeRange"><span>Pendiente calzada</span><b id="gradeVal">-4 %</b></label>
+        <input id="gradeRange" type="range" min="-12" max="12" step="1" value="-4">
+      </div>
+      <div class="ctrl-row">
+        <label for="visRange"><span>Visibilidad (niebla / luces)</span><b id="visVal">110 m</b></label>
+        <input id="visRange" type="range" min="25" max="400" step="5" value="110">
+      </div>
+    </div>
+
+    <div class="sec-label">Lecturas de ingeniería (NASA · AASHTO · EKF · Shand)</div>
+    <div class="group">
+      <div class="row"><div class="row-body"><b>Límite aquaplaning NASA</b><small>Horne &amp; Dreher (TN D-2056)</small></div><span class="row-val mono" id="kHydro">—</span></div>
+      <div class="row"><div class="row-body"><b>Reserva agarre Kamm</b><small>Tracción + lateral combinadas</small></div><span class="row-val mono" id="kReserve">—</span></div>
+      <div class="row"><div class="row-body"><b>Distancia de parada (SSD)</b><small>AASHTO ajustada por pendiente</small></div><span class="row-val mono" id="kSsd">—</span></div>
+      <div class="row"><div class="row-body"><b>Próxima curva / vuelco SSF</b><small id="cRad">—</small></div><span class="row-val mono" id="cNext">—</span></div>
+      <div class="row"><div class="row-body"><b>Navegación EKF-6</b><small id="eShadow">—</small></div><span class="row-val mono" id="eMode">—</span></div>
+      <div class="row"><div class="row-body"><b>Cruce emergencia (Shand)</b><small>Vadeo e incendios en ruta</small></div><span class="row-val mono" id="fCross">—</span></div>
+      <div class="row"><div class="row-body"><b>Fatiga sin cámara (0 PII)</b><small id="fTime">—</small></div><span class="row-val mono" id="fLevel">—</span></div>
+    </div>
+
+    <div class="sec-label">Espejo Android Auto · Prioridad ISO 15005 (<span id="aaPushCount">0 paquetes</span>)</div>
+    <div class="group" id="alertList"></div>
+
+    <div class="sec-label">Debriefing forense del viaje (SHA-256 · 0 PII · <span id="sampleCount">0 muestras</span>)</div>
+    <article class="ios-card">
+      <div class="btn-row" style="margin-top:0">
+        <button class="pill-btn pri" id="sealDebriefBtn">🔒 Sellar viaje SHA-256</button>
+        <button class="pill-btn" id="copyDebriefBtn" disabled>Copiar JSON</button>
+      </div>
+      <pre class="json-box" id="debriefOut">Pulsa «Sellar viaje SHA-256» para emitir el informe verificable local (0 PII).</pre>
     </article>
 
-    <article class="card">
-      <div class="card-head"><h2>Curvas y Vuelco SSF</h2><span class="tag" id="curveTag">MENGER</span></div>
-      <div class="kv"><span>Próxima curva crítica</span><b id="cNext">—</b></div>
-      <div class="kv"><span>Radio / dirección</span><b id="cRad">—</b></div>
-      <div class="kv"><span>Velocidad segura</span><b id="cSafe">—</b></div>
-      <div class="kv"><span>Techo vuelco SSF</span><b id="cRoll">—</b></div>
-    </article>
-
-    <article class="card">
-      <div class="card-head"><h2>Túnel EKF y Convoy BLE</h2><span class="tag" id="ekfTag">EKF-6</span></div>
-      <div class="kv"><span>Estado navegación</span><b id="eMode">—</b></div>
-      <div class="kv"><span>Incertidumbre σ_pos</span><b id="eSigma">—</b></div>
-      <div class="kv"><span>Próxima zona sombra</span><b id="eShadow">—</b></div>
-      <div class="kv"><span>Convoy cooperativo</span><b id="eConvoy">—</b></div>
-    </article>
-
-    <article class="card">
-      <div class="card-head"><h2>Fatiga y Emergencia</h2><span class="tag" id="fatTag">0 PII</span></div>
-      <div class="kv"><span>Tiempo continuo / WOCL</span><b id="fTime">—</b></div>
-      <div class="kv"><span>Jerk lateral IMU RMS</span><b id="fJerk">—</b></div>
-      <div class="kv"><span>Cruce riada / fuego</span><b id="fCross">—</b></div>
-      <div class="kv"><span>Estado fatiga</span><b id="fLevel">—</b></div>
-    </article>
+    <p class="foot-note">SENDA Copiloto 5D · 100 % en el dispositivo, sin red ni claves. Herramienta de asistencia; el conductor mantiene siempre el control del vehículo.</p>
   </section>
 
-  <section class="bottom-grid">
-    <article class="card">
-      <div class="card-head">
-        <h2>Alertas activas priorizadas (ISO 15005) · Espejo Android Auto</h2>
-        <span class="tag" id="aaPushCount">0 envíos</span>
-      </div>
-      <ul class="alert-list" id="alertList"></ul>
-    </article>
-
-    <article class="card">
-      <div class="card-head">
-        <h2>Debriefing forense local (SHA-256 · 0 PII)</h2>
-        <span class="tag" id="sampleCount">0 muestras</span>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn" id="sealDebriefBtn">Generar resumen SHA-256</button>
-        <button class="btn" id="copyDebriefBtn" disabled>Copiar JSON</button>
-      </div>
-      <pre class="debrief" id="debriefOut">Pulsa «Sellar viaje SHA-256» para generar el informe local verificable de la sesión (sin fotos, sin biometría, sin PII).</pre>
-    </article>
-  </section>
-
-  <p class="foot">SENDA Copiloto 5D · 100 % en el dispositivo, sin red ni claves · Ecuaciones: Horne &amp; Dreher (NASA TN D-2056), Pacejka/Kamm, AASHTO (2018), NHTSA SSF, LWR (Lighthill-Whitham-Richards), Shand (2011), Åkerstedt (1997) y EKF 6 estados. Herramienta de asistencia; el conductor mantiene siempre el control.</p>
 </main>
+
+<!-- Hoja modal rápida estilo iOS para avisar sin salir de Copiloto -->
+<div class="sheet-veil" id="sheetVeil" hidden></div>
+<section class="ios-sheet" id="signalSheet" role="dialog" aria-label="Avisar a conductores y personas cercanas" hidden>
+  <div class="grabber"></div>
+  <div class="sheet-hdr">
+    <h3>Avisar al entorno</h3>
+    <button class="sheet-x" id="closeSheetBtn" aria-label="Cerrar">✕</button>
+  </div>
+  <p class="bar-note" style="margin:0 0 12px">Envía un paquete directo Bluetooth (36 B) a móviles SENDA cercanos y prepara un mensaje claro para compartir con personas sin la app.</p>
+  <div class="quick-grid" id="sheetQuickGrid"></div>
+</section>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<!-- Barra inferior estilo iOS 18 -->
+<nav class="tabs" aria-label="Secciones de Copiloto">
+  <button class="on" data-tab="copiloto" id="nav-copiloto">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 12 16.5 7.5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+    Copiloto
+  </button>
+  <button data-tab="entorno" id="nav-entorno">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12a7 7 0 0 1 14 0"/><path d="M8.5 12a3.5 3.5 0 0 1 7 0"/><circle cx="12" cy="12" r="1" fill="currentColor"/><path d="M12 13v7"/></svg>
+    Entorno
+  </button>
+  <button data-tab="calibrar" id="nav-calibrar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>
+    Calibrar
+  </button>
+  <button data-tab="fisica" id="nav-fisica">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="7"/></svg>
+    Física
+  </button>
+</nav>
+
 <script type="module" src="/senda/copiloto.mjs"></script>
 </body>
 </html>
