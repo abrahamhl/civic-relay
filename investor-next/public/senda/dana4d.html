@@ -56,7 +56,7 @@ canvas#csi{width:100%;height:150px;background:var(--g1);border-radius:12px;displ
 <div id="msg" hidden></div>
 <section id="panel">
   <button class="grab" id="grab" aria-label="Ver más o menos controles"></button>
-  <div class="lvl"><button id="tplay" class="play" aria-label="Reproducir el día">▶</button><input id="t" type="range" min="360" max="1320" step="5" value="1135" aria-label="Hora local del 29-10-2024"><span id="clock"></span></div>
+  <div class="lvl"><button id="tplay" class="play" aria-label="Reproducir el día">▶</button><input id="t" type="range" min="360" max="1800" step="5" value="1135" aria-label="Hora local desde el 29-10-2024 a las 06:00"><span id="clock"></span></div>
   <div id="kpis"><div><b id="kQ">–</b><span>caudal (último dato)</span></div><div><b id="kLvl">–</b><span>frente al cauce urbano (800)</span></div><div><b id="kAlert">–</b><span>ES-Alert</span></div><div><b id="kCsi">–</b><span>acuerdo (CSI)</span></div></div>
   <div class="row"><button id="basinBtn">💧 ¿De dónde viene?</button><button id="travelBtn">⏱️ ¿Cuándo llega?</button><button id="sciBtn">🔬 Ciencia</button></div>
   <div class="more">
@@ -69,6 +69,10 @@ canvas#csi{width:100%;height:150px;background:var(--g1);border-radius:12px;displ
   <label class="sl" id="tVelBox">Velocidad <b id="tVelTxt"></b> m/s<input id="tVel" type="range" min="0.5" max="20" step="0.5"></label>
   <div class="row"><button id="tChiva">Ejemplo: desde Chiva</button><button id="tPick">Elegir punto</button><button id="tClear">Borrar</button></div>
   <div id="tOut" class="out"></div>
+  <h4>🌊 Simulación hidrodinámica 2D <span class="badge model">MODELO</span></h4>
+  <div class="tv"><label>Variante <select id="sweVar"></select></label><label>Mostrar <select id="sweMode"><option value="now">el agua a la hora elegida</option><option value="max">el calado máximo</option></select></label></div>
+  <div class="leg"><span><i style="background:#9be7ff"></i>&lt; 0,5 m</span><span><i style="background:#3aa0ff"></i>0,5–1,5 m</span><span><i style="background:#1652d8"></i>1,5–3 m</span><span><i style="background:#7a2bd6"></i>&gt; 3 m</span></div>
+  <div id="sweOut" class="out"></div>
   <h4>🔌 Conecta los datos de tu red</h4>
   <p class="out" style="margin-top:0">Si tu organismo tiene aforos, pluviómetros o sensores propios, cárgalos aquí: <b>sustituyen a las estimaciones</b> y quedan con su fuente y su huella. El fichero no sale del dispositivo.</p>
   <div class="tv"><label>Tipo <select id="cKind"><option value="caudal">Caudal (m³/s)</option><option value="lluvia">Lluvia (mm por intervalo)</option><option value="nivel">Nivel (m)</option></select></label><label>Estación <input id="cSta" placeholder="p. ej. Poyo en Riba-roja" style="width:100%;margin-top:4px;background:var(--g2);border:0;border-radius:8px;padding:6px;color:#fff"></label><label>Fuente <input id="cSrc" placeholder="quién lo mide" style="width:100%;margin-top:4px;background:var(--g2);border:0;border-radius:8px;padding:6px;color:#fff"></label><label>Licencia <input id="cLic" placeholder="p. ej. uso interno" style="width:100%;margin-top:4px;background:var(--g2);border:0;border-radius:8px;padding:6px;color:#fff"></label></div>
