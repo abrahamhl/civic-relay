@@ -429,6 +429,63 @@ function updateOsint() {
     : { count: 0, closestKm: null, topType: null, topLevel: null };
 }
 
+function buildAndroidAutoState() {
+  const speedKmh = st.speed != null && Number.isFinite(st.speed) ? +(st.speed * 3.6).toFixed(1) : null;
+  const ssd = st.speed != null && Number.isFinite(st.speed) ? stoppingDistanceM(st.speed) : null;
+  const rows = [];
+  let status = 'VERDE';
+  let recommendedMaxKmh = null;
+
+  if (st.lastVision?.active && (st.lastVision.level === 'ROJO' || st.lastVision.level === 'AMBAR')) {
+    status = st.lastVision.level;
+    const ttc = st.lastVision.minTtcS != null ? ` · TTC ${st.lastVision.minTtcS.toFixed(1)} s` : '';
+    rows.push(`${st.lastVision.level === 'ROJO' ? '!' : '▲'} ADAS cámara: riesgo frontal${ttc}`);
+  }
+  if (st.corridor?.top) {
+    const t = st.corridor.top;
+    if (t.urgency === 'ROJO') status = 'ROJO';
+    else if (t.urgency === 'AMBAR' && status === 'VERDE') status = 'AMBAR';
+    rows.push(`${t.urgency === 'ROJO' ? '!' : '▲'} ${t.label} a ${fmtDist(t.distM)}${t.road ? ` (${t.road})` : ''}`);
+  }
+  if (st.sectionState && !st.sectionState.finished) {
+    if (st.sectionState.overAverage) status = status === 'ROJO' ? 'ROJO' : 'AMBAR';
+    if (st.sectionState.maxspeed != null) recommendedMaxKmh = st.sectionState.maxspeed;
+    rows.push(`Tramo ${st.sectionState.road || ''}: media ${st.sectionState.avgKmh != null ? st.sectionState.avgKmh.toFixed(0) : '–'} km/h · quedan ${fmtDist(st.sectionState.remainingM)}`.trim());
+  } else if (st.radarState?.top) {
+    const r = st.radarState.top;
+    if (r.overLimit && status === 'VERDE') status = 'AMBAR';
+    if (r.maxspeed != null) recommendedMaxKmh = recommendedMaxKmh == null ? r.maxspeed : Math.min(recommendedMaxKmh, r.maxspeed);
+    rows.push(`Radar a ${fmtDist(r.distM)}${r.maxspeed ? ` · máx ${r.maxspeed} km/h` : ''}`);
+  }
+  if (st.ekfState?.mode && st.ekfState.mode !== 'GNSS_FUSED') {
+    if (status === 'VERDE') status = 'AMBAR';
+    rows.push(`Túnel / sin GPS · EKF ${st.ekfState.mode} (σ ${Math.round(st.ekfState.sigmaPosM ?? 0)} m)`);
+  }
+
+  return {
+    status,
+    speedKmh,
+    recommendedMaxKmh,
+    stoppingDistM: ssd != null ? +ssd.toFixed(1) : null,
+    gripReservePct: null,
+    rows: rows.slice(0, 6),
+  };
+}
+
+let lastAaPushMs = 0;
+function publishToAndroidAuto(force = false) {
+  const payload = buildAndroidAutoState();
+  const now = Date.now();
+  if (!force && (now - lastAaPushMs) < 900 && payload.status !== 'ROJO') return payload;
+  lastAaPushMs = now;
+  try {
+    if (typeof window.SendaNative?.publishDriveState === 'function') {
+      window.SendaNative.publishDriveState(JSON.stringify(payload));
+    }
+  } catch { /* puente no disponible */ }
+  return payload;
+}
+
 // ── GPS, fusión EKF 6 estados, seguimiento y navegación ──
 function onPos(p) {
   st.lastFix = p;
@@ -452,6 +509,7 @@ function onPos(p) {
   updateCorridor();
   updateRadars(p.timestamp || Date.now());
   updateOsint();
+  publishToAndroidAuto();
   bbLog('gps', { lat: +p.coords.latitude.toFixed(6), lon: +p.coords.longitude.toFixed(6), acc: p.coords.accuracy != null ? Math.round(p.coords.accuracy) : null, v: p.coords.speed, hdg: p.coords.heading, alt: p.coords.altitude != null ? Math.round(p.coords.altitude) : null, gt: p.timestamp, ekfRej: !!st.ekfState?.gnssRejected });
   tele.gps = p.coords;
   st.gnssHistory.push({ accuracyM: p.coords.accuracy, altM: p.coords.altitude, maha2: st.ekfState?.maha2 ?? 0, rejected: !!st.ekfState?.gnssRejected });
@@ -714,6 +772,7 @@ function analyse(now, iv = 250) {
   if (!top) { a.hidden = true; return; }
   a.hidden = false; a.className = top.level;
   a.textContent = `${ES[top.label] ?? top.label} ${top.zone === 'TU_CARRIL' ? 'delante' : top.zone === 'DERECHA' ? 'a la derecha' : 'a la izquierda'}: ${top.reasons.join(' · ')}`;
+  publishToAndroidAuto(top.level === 'ROJO');
   const key = top.id + top.level; if (Date.now() - (saidAdas.get(key) ?? 0) > 6000) { saidAdas.set(key, Date.now()); if (top.level === 'ROJO') { navigator.vibrate?.([200, 100, 200]); say(`Cuidado, ${ES[top.label] ?? 'vehículo'} delante`); } else if (top.reasons.some((rr) => rr.startsWith('se mete'))) say(`${ES[top.label] ?? 'vehículo'} ${top.reasons.find((rr) => rr.startsWith('se mete'))}`); }
 }
 
@@ -1174,6 +1233,7 @@ setInterval(() => { if (!document.hidden) loadIncidents(); }, 5 * 60 * 1000);
 // Para pruebas automáticas
 globalThis.sendaDrive = {
   st, goTo, onPos, dash, updateCorridor, updateRadars, drawTele,
+  buildAndroidAutoState, publishToAndroidAuto,
   bbStart, bbSample, bbExport, setAiMode, aiIntervalMs,
   sendBleProbe, loadPmTilesFile, loadOsintXml, loadOsintGeoJson,
   exportDenm, encodeDenmCompact, decodeDenmCompact, ekf: st.ekf, horizonCal: st.horizonCal,

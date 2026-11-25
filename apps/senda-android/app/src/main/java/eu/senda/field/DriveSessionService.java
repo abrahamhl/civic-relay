@@ -31,9 +31,15 @@ public final class DriveSessionService extends Service implements LocationListen
     static final String ACTION_SYNC = "eu.senda.field.drive.SYNC", ACTION_USER_STOP = "eu.senda.field.drive.USER_STOP";
     /** Intervalo de muestreo del reloj interno (no es un umbral de decisión: los umbrales están en DriveAutostart.Params). */
     private static final long TICK_MS = 15_000L;
+    private static final long NOTIF_THROTTLE_MS = 2_000L;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private boolean listening;
+    private String lastState = "IDLE";
+    private boolean lastSession = false;
+    private long lastNotifMs = 0L;
+    private String lastNotifStatus = "";
+    private final DriveHazards.Listener hazardListener = snap -> handler.post(() -> onHazardSnapshot(snap));
     private final Runnable tick = new Runnable() {
         @Override public void run() { DriveController.get(DriveSessionService.this).event("TICK"); handler.postDelayed(this, TICK_MS); }
     };
@@ -50,17 +56,35 @@ public final class DriveSessionService extends Service implements LocationListen
 
     static void stop(Context c) { c.stopService(new Intent(c, DriveSessionService.class)); }
 
+    @Override public void onCreate() {
+        super.onCreate();
+        DriveHazards.addListener(hazardListener);
+    }
+
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && ACTION_USER_STOP.equals(intent.getAction())) {
             startInForeground(buildNotification("STOP", false));
             DriveController.get(this).event("USER_STOP");
             return START_NOT_STICKY;
         }
-        String state = intent != null ? intent.getStringExtra("state") : null;
-        boolean session = intent != null && intent.getBooleanExtra("session", false);
-        if (!startInForeground(buildNotification(state, session))) { stopSelf(); return START_NOT_STICKY; }
+        lastState = intent != null ? intent.getStringExtra("state") : null;
+        lastSession = intent != null && intent.getBooleanExtra("session", false);
+        if (!startInForeground(buildNotification(lastState, lastSession))) { stopSelf(); return START_NOT_STICKY; }
         startListening();
         return START_NOT_STICKY;
+    }
+
+    private void onHazardSnapshot(DriveHazards.Snapshot snap) {
+        if (!listening || snap == null) return;
+        long now = System.currentTimeMillis();
+        boolean urgentChange = !snap.status.equals(lastNotifStatus) && "ROJO".equals(snap.status);
+        if (!urgentChange && (now - lastNotifMs) < NOTIF_THROTTLE_MS) return;
+        lastNotifMs = now;
+        lastNotifStatus = snap.status;
+        try {
+            NotificationManager nm = getSystemService(NotificationManager.class);
+            if (nm != null) nm.notify(NOTIFICATION_ID, buildNotification(lastState, lastSession));
+        } catch (RuntimeException ignored) { }
     }
 
     private boolean startInForeground(Notification n) {
@@ -80,10 +104,18 @@ public final class DriveSessionService extends Service implements LocationListen
         int imm = PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT;
         PendingIntent open = PendingIntent.getActivity(this, 0, new Intent(this, AppActivity.class), imm);
         PendingIntent stop = PendingIntent.getService(this, 1, new Intent(this, DriveSessionService.class).setAction(ACTION_USER_STOP), imm);
+        String title = "SENDA Drive";
         String text = session ? "En ruta: SENDA te acompaña. Toca para abrir." : "Comprobando si vas conduciendo…";
+        DriveHazards.Snapshot snap = DriveHazards.latestSnapshot();
+        if (snap != null && snap.isFresh(System.currentTimeMillis(), DriveHazards.DEFAULT_TTL_MS)) {
+            title = "SENDA Copiloto 5D · " + snap.status;
+            text = snap.rows.isEmpty()
+                    ? snap.formatCompactSummary()
+                    : snap.rows.get(0) + " (" + snap.formatCompactSummary() + ")";
+        }
         return new Notification.Builder(this, CHANNEL)
                 .setSmallIcon(android.R.drawable.ic_menu_mylocation)
-                .setContentTitle("SENDA Drive")
+                .setContentTitle(title)
                 .setContentText(text)
                 .setContentIntent(open)
                 .setOngoing(true)
@@ -111,7 +143,8 @@ public final class DriveSessionService extends Service implements LocationListen
     @Override public void onStatusChanged(String provider, int status, Bundle extras) { }
 
     @Override public void onDestroy() {
-        handler.removeCallbacks(tick);
+        DriveHazards.removeListener(hazardListener);
+        handler.removeCallbacksAndMessages(null);
         try { getSystemService(LocationManager.class).removeUpdates(this); } catch (RuntimeException ignored) { }
         listening = false;
         super.onDestroy();
