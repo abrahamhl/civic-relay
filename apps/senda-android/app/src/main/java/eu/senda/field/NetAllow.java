@@ -18,8 +18,12 @@ public final class NetAllow {
         "routing.openstreetmap.de",       // rutas a pie y en bici (FOSSGIS)
         "nominatim.openstreetmap.org",    // búsqueda (≤ 1 petición/s)
         "service.pdok.nl",                // ortofoto oficial de Países Bajos (PDOK, CC BY 4.0)
-        "tms-pnoa-ma.idee.es"             // ortofoto oficial de España (PNOA, IGN, CC BY 4.0)
+        "tms-pnoa-ma.idee.es",            // ortofoto oficial de España (PNOA, IGN, CC BY 4.0)
+        "gibs.earthdata.nasa.gov",        // NASA GIBS: satélite del día, térmico, nubes, luces (sin restricciones)
+        "tile.opentopomap.org"            // mapa topográfico (CC BY-SA)
     );
+    /** Hosts compartidos: solo una ruta concreta (el relieve de AWS, no cualquier contenedor de S3). */
+    private static final String S3_HOST = "s3.amazonaws.com", S3_PATH = "/elevation-tiles-prod/terrarium/";
     private NetAllow() {}
 
     public static boolean allowed(String url) {
@@ -28,7 +32,9 @@ public final class NetAllow {
             URI x = new URI(url.trim());
             if (!"https".equals(x.getScheme()) || x.getHost() == null || x.getUserInfo() != null) return false;
             if (x.getPort() != -1 && x.getPort() != 443) return false;
-            return HOSTS.contains(x.getHost().toLowerCase(Locale.ROOT));
+            String h = x.getHost().toLowerCase(Locale.ROOT);
+            if (h.equals(S3_HOST)) return x.getRawPath() != null && x.getRawPath().startsWith(S3_PATH) && !x.getRawPath().contains("..");
+            return HOSTS.contains(h);
         } catch (java.net.URISyntaxException e) { return false; }
     }
 }

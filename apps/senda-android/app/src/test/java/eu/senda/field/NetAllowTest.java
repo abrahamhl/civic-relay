@@ -11,6 +11,11 @@ public final class NetAllowTest {
         check(NetAllow.allowed("https://nominatim.openstreetmap.org/search?q=x"), "búsqueda");
         check(NetAllow.allowed("https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0/Actueel_orthoHR/EPSG:3857/10/1/1.jpeg"), "ortofoto NL");
         check(NetAllow.allowed("https://tms-pnoa-ma.idee.es/1.0.0/pnoa-ma/10/1/1.jpeg"), "ortofoto ES");
+        check(NetAllow.allowed("https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/x.png"), "NASA GIBS");
+        check(NetAllow.allowed("https://s3.amazonaws.com/elevation-tiles-prod/terrarium/10/505/389.png"), "relieve AWS");
+        check(!NetAllow.allowed("https://s3.amazonaws.com/otro-contenedor/x"), "otro contenedor de S3 no");
+        check(!NetAllow.allowed("https://s3.amazonaws.com/elevation-tiles-prod/terrarium/../../otro/x"), "recorrido en S3 no");
+        check(NetAllow.allowed("https://tile.opentopomap.org/10/505/389.png"), "OpenTopoMap");
         check(!NetAllow.allowed("http://tiles.openfreemap.org/x"), "sin cifrar");
         check(!NetAllow.allowed("https://tiles.openfreemap.org.evil.example/x"), "dominio engañoso");
         check(!NetAllow.allowed("https://user@tiles.openfreemap.org/x"), "credenciales en la URL");
