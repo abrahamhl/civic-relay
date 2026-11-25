@@ -55,7 +55,20 @@ public final class OfflineAssets {
             case "svg": return "image/svg+xml";
             case "png": return "image/png";
             case "jpg": case "jpeg": return "image/jpeg";
-            case "bin": return "application/octet-stream";
+            case "bin": case "tflite": case "task": case "pmtiles": case "pbf": case "data": return "application/octet-stream";
+            case "wasm": return "application/wasm"; // motor de la IA de la cámara (MediaPipe): sin esto, 404 y la cámara no analiza
+            case "woff2": return "font/woff2";
+            case "woff": return "font/woff";
+            case "ttf": return "font/ttf";
+            case "webp": return "image/webp";
+            case "gif": return "image/gif";
+            case "ico": return "image/x-icon";
+            case "mp4": return "video/mp4";
+            case "webm": return "video/webm";
+            case "mp3": return "audio/mpeg";
+            case "wav": return "audio/wav";
+            case "xml": return "application/xml";
+            case "geojson": return "application/geo+json";
             case "txt": case "md": return "text/plain";
             default: return null; // tipo no previsto: no se sirve
         }

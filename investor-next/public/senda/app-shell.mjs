@@ -58,7 +58,7 @@ function card(m) {
   const ok = allowed(m, me.role);
   return `<a class="card${ok ? '' : ' lock'}" href="${ok ? m.href : '#ajustes'}" data-page="${m.page}" ${ok ? '' : 'aria-disabled="true"'}>
     ${ok ? '' : `<span class="lk" aria-label="Bloqueado">${ico('lock', 'currentColor').replace('<svg', '<svg width="16" height="16"')}</span>`}
-    <div class="tile" style="background:${sec.color}">${ico(sec.icon)}</div><div><b>${esc(m.title)}</b><small>${esc(m.sub)}</small></div></a>`;
+    <div class="pv"><img src="/senda/previews/${esc(m.page)}.webp" alt="" loading="lazy" onerror="this.remove()"><div class="tile" style="background:${sec.color}">${ico(sec.icon)}</div></div><div class="tx"><b>${esc(m.title)}</b><small>${esc(m.sub)}</small></div></a>`;
 }
 function renderHero() {
   const open = MODULES.filter((m) => allowed(m, me.role)).length;
@@ -72,6 +72,19 @@ function renderCatalog() {
     const mods = list.filter((m) => m.section === s.id);
     return mods.length ? `<h2>${esc(s.title)}</h2><div class="grid">${mods.map(card).join('')}</div>` : '';
   }).join('') || '<p class="foot">Sin resultados.</p>';
+}
+// Destacados (como las tarjetas grandes de las tiendas de apps): qué puedes hacer YA con tu acceso
+const FEATURED = [
+  ['conducir', 'Conduce, anda o pedalea', 'Mapa con capas y satélite oficial, avisos DGT/NDW, radares fijos y cámara con IA'],
+  ['conducir', 'Radar de señales', 'Mira las redes Wi-Fi y Bluetooth a tu alrededor y otros móviles SENDA', '#senales', 'senales'],
+  ['mensaje', 'Mensajes sin red', 'Cifrados, por Bluetooth, sonido o archivo'],
+  ['avisos', 'Avisa de un peligro', 'Lo ven los móviles cercanos'],
+  ['ruta', 'Ruta segura', 'Elige calles y evita zonas inundadas'],
+  ['demo', 'Recorrido de 5 minutos', 'Qué es SENDA, paso a paso'],
+];
+function renderFeatured() {
+  const el = $('#featured'); if (!el) return;
+  el.innerHTML = FEATURED.map(([page, title, sub, hash, img]) => MODULES.find((m) => m.page === page && allowed(m, me.role)) ? `<a href="/senda/${page}${hash ?? ''}" data-page="${page}"><img src="/senda/previews/${img ?? page}.webp" alt="" loading="lazy"><div class="ft"><small>${esc(SECTIONS.find((s) => s.id === MODULES.find((m) => m.page === page).section)?.title ?? '')}</small><b>${esc(title)}</b><span>${esc(sub)}</span></div></a>` : '').join('');
 }
 function renderRecent() {
   const rec = LS.get('recent', []).map((p) => MODULES.find((m) => m.page === p)).filter(Boolean).slice(0, 4);
@@ -88,7 +101,7 @@ function renderSettings() {
   $('#issued').innerHTML = issued.length ? issued.map((c) => `<div class="row"><div class="t"><b>${esc(c.subject)}</b><small>${c.revoked ? 'Revocado' : 'Hasta el ' + new Date(c.validUntil).toLocaleDateString('es-ES')}${c.vault ? ' · con bóveda' : ''}</small></div>${c.revoked ? '' : `<button class="row" style="width:auto;color:var(--rosa);min-height:0;padding:6px" data-revoke="${esc(c.id)}">Revocar</button>`}</div>`).join('')
     : '<div class="row"><div class="t"><small>Todavía no has dado acceso a nadie.</small></div></div>';
 }
-function renderAll() { renderHero(); renderCatalog(); renderRecent(); renderSettings(); paintIcons(); }
+function renderAll() { renderHero(); renderCatalog(); renderFeatured(); renderRecent(); renderSettings(); paintIcons(); }
 
 function show(tab) {
   document.querySelectorAll('.view').forEach((v) => v.classList.toggle('on', v.id === 'v-' + tab));

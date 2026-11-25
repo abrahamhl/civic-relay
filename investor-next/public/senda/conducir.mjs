@@ -26,7 +26,8 @@ import { packReports, unpackReports, mergeReports, isReportPack } from './core/h
 import { b64, unb64 } from './core/b64.mjs';
 import { createBlackbox } from './core/blackbox.mjs';
 import { observe } from './core/hazard-belief.mjs';
-import { summarizeScan, radarPoints, drawSignalRadar } from './core/signal-radar.mjs';
+import { summarizeScan, radarPoints, drawSignalRadarPro, drawHistory, blipKey } from './core/signal-radar.mjs';
+import { MAP_STYLES, satelliteStyle, orthoCovers, circlePolygon } from './core/map-style.mjs';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -73,7 +74,7 @@ function initMap() {
   if (!window.maplibregl) return offline('No se pudo cargar el mapa.');
   maplibregl.setWorkerUrl('/senda/vendor/maplibre-gl-4.7.1/maplibre-gl-csp-worker.js');
   registerPmTilesProtocol();
-  const map = new maplibregl.Map({ container: 'map', style: 'https://tiles.openfreemap.org/styles/liberty', center: [-3.7038, 40.4168], zoom: 12, attributionControl: { compact: true } });
+  const map = new maplibregl.Map({ container: 'map', style: styleFor(LS.get('senda.map.style', 'mapa')), center: [-3.7038, 40.4168], zoom: 12, attributionControl: { compact: true } });
   st.map = map;
   const t = setTimeout(() => { if (!st.mapOk) offline('Sin conexión al mapa: se muestra el radar. Puedes cargar un mapa offline (.pmtiles) desde el botón naranja.'); }, 10000);
   map.on('load', () => {
@@ -82,7 +83,8 @@ function initMap() {
     if (st.lastFix) onPos(st.lastFix);
     drawMarkers();
   });
-  map.on('style.load', () => { if (st.mapOk) { ensureRouteLayers(map); drawMarkers(); } });
+  map.on('style.load', () => { if (st.mapOk) { ensureRouteLayers(map); drawMarkers(); } ensureMeLayers(map); applyMapDetails(); });
+  map.addControl(new maplibregl.NavigationControl({ showZoom: false, visualizePitch: true }), 'top-right'); // brújula: toca para volver al norte
   map.on('dragstart', () => { st.follow = false; });
   let mv; map.on('moveend', () => { clearTimeout(mv); mv = setTimeout(drawMarkers, 300); });
 }
@@ -146,17 +148,18 @@ function drawMarkers() {
   if (!st.mapOk) return drawRadar();
   markers.forEach((m) => m.remove()); markers = [];
   const b = st.map.getBounds(), inView = (lon, lat) => b.contains([lon, lat]);
-  for (const i of activeIncidents()) if (i.lat != null && inView(i.lon, i.lat)) {
+  const L = mapDetails();
+  if (L.inc) for (const i of activeIncidents()) if (i.lat != null && inView(i.lon, i.lat)) {
     const cat = i.type === 'BridgeOpening' ? 'CORTE' : fromDatex(i);
     markers.push(marker(i.lon, i.lat, cat, `<b>${esc(i.type === 'BridgeOpening' ? 'Puente levadizo' : CATEGORIES[cat].label)}</b> · ${esc(i.road ?? '')}<br><small>${esc(i.type)} / ${esc(i.cause ?? '')}<br>${esc(activeIncSource())}</small>`));
   }
   if (st.map.getZoom() >= 10) {
-    for (const c of st.cams) if (inView(c.lon, c.lat))
+    if (L.cams) for (const c of st.cams) if (inView(c.lon, c.lat))
       markers.push(marker(c.lon, c.lat, 'CAMARA', `<b>Cámara DGT</b> · ${esc(c.carretera)} ${esc(c.destino ?? '')}<br><img src="${esc(c.url)}" alt="Imagen de la cámara" style="width:100%;border-radius:8px;margin-top:6px"><small>DGT, CC BY · imagen en vivo si hay red</small>`));
-    for (const rd of st.radars) if (inView(rd.lon, rd.lat))
+    if (L.radar && st.mode === 'car') for (const rd of st.radars) if (inView(rd.lon, rd.lat))
       markers.push(marker(rd.lon, rd.lat, 'CAMARA', `<b>${rd.kind === 'section' ? 'Radar de tramo' : 'Radar fijo'} oficial</b>${rd.road ? ` · ${esc(rd.road)}` : ''}${rd.maxspeed ? ` · ${rd.maxspeed} km/h` : ''}<br><small>${esc(String(rd.src).toUpperCase())} · publicado oficialmente (solo fijos y tramo)</small>`));
   }
-  for (const r of reports()) if (inView(r.lon, r.lat)) {
+  if (L.senda) for (const r of reports()) if (inView(r.lon, r.lat)) {
     const cat = FROM_REPORT[r.kind] ?? 'PELIGRO';
     markers.push(marker(r.lon, r.lat, cat, `<b>${esc(REPORT_KINDS[r.kind]?.label ?? r.kind)}</b><br><small>Aviso de SENDA · ${new Date(r.t).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })} · ${r.verified ? 'visto con cámara' : 'sin verificar'}</small>`));
   }
@@ -248,34 +251,122 @@ document.querySelectorAll('#favs .mode').forEach((b) => { b.classList.toggle('on
 document.documentElement.dataset.mode = st.mode;
 
 // ── 📡 Señales a tu alrededor: Wi-Fi y Bluetooth cercanos (app Android), sin nombres ni direcciones ──
-const sig = { open: false, pts: [], sum: null, sweep: 0, timer: null, last: 0 };
+const sig = { open: false, pts: [], sum: null, sweep: -Math.PI / 2, timer: null, last: 0, next: 0, fresh: new Map(), keys: new Set(), hist: [], waiting: false, lastT: 0 };
+const SCAN_EVERY_MS = 30_000; // Android permite ~4 barridos Wi-Fi cada 2 min en primer plano
 function sigScan() {
   const N = window.SendaNative;
-  if (typeof N?.radioScan !== 'function') { $('#sigStats').textContent = 'Solo en la app de Android: el navegador no puede ver redes Wi-Fi ni Bluetooth.'; return false; }
-  sig.last = Date.now(); $('#sigStats').textContent = 'Escuchando 4 s…'; N.radioScan(); return true;
+  if (typeof N?.radioScan !== 'function') { $('#sigNote').textContent = 'Solo en la app de Android: un navegador no puede ver redes Wi-Fi ni Bluetooth.'; $('#sigClock').textContent = 'sin acceso a las radios'; return false; }
+  if (sig.waiting && Date.now() - sig.last < 12_000) return false; // ya hay un barrido en marcha
+  sig.last = Date.now(); sig.next = sig.last + SCAN_EVERY_MS; sig.waiting = true; N.radioScan();
+  setTimeout(() => { if (sig.waiting && Date.now() - sig.last >= 12_000) { sig.waiting = false; $('#sigNote').textContent = 'El barrido no respondió (¿Bluetooth o ubicación apagados?). Pulsa «Escanear» de nuevo.'; } }, 12_500);
+  return true;
 }
 window.sendaRadio = (scan) => {
-  sig.pts = radarPoints(scan); sig.sum = summarizeScan(scan);
-  const s = sig.sum;
-  bbLog('radio', { mode: st.mode, wifiN: s.wifiN, w24: s.wifiByBand['2.4'], w5: s.wifiByBand['5'], w6: s.wifiByBand['6'], wifiBest: s.wifiBestDbm, wifiMed: s.wifiMedianDbm, bleN: s.bleN, bleBest: s.bleBestDbm, sendaNear: s.sendaNear, fresh: s.wifiFresh });
-  $('#sigStats').innerHTML = `<b>${s.wifiN}</b> ${s.wifiN === 1 ? 'red Wi-Fi' : 'redes Wi-Fi'}<br><small>${s.wifiByBand['2.4']} en 2,4 · ${s.wifiByBand['5']} en 5 · ${s.wifiByBand['6']} en 6 GHz${s.wifiBestDbm != null ? ` · la más fuerte ${s.wifiBestDbm} dBm` : ''}</small><br><b>${s.bleN}</b> ${s.bleN === 1 ? 'aparato Bluetooth' : 'aparatos Bluetooth'}${s.bleBestDbm != null ? ` <small>(más fuerte ${s.bleBestDbm} dBm)</small>` : ''}<br><b style="color:#ff9f0a">${s.sendaNear}</b> ${s.sendaNear === 1 ? 'móvil SENDA cerca' : 'móviles SENDA cerca'}${s.wifiFresh ? '' : '<br><small>Wi-Fi: Android limitó el barrido, datos de hace poco</small>'}${s.note ? `<br><small>${esc(s.note)}</small>` : ''}`;
-  if (s.sendaNear > 0) { navigator.vibrate?.(80); say(`${s.sendaNear} móvil${s.sendaNear > 1 ? 'es' : ''} SENDA cerca`); }
+  sig.waiting = false;
+  const pts = radarPoints(scan), now = performance.now();
+  const keys = new Set(pts.map(blipKey));
+  for (const k of keys) if (!sig.keys.has(k) && sig.keys.size) sig.fresh.set(k, now); // nuevos desde el barrido anterior
+  sig.keys = keys; sig.pts = pts; sig.sum = summarizeScan(scan);
+  const s = sig.sum, age = Number.isFinite(scan?.wifiAgeS) && scan.wifiAgeS >= 0 ? scan.wifiAgeS : null;
+  sig.hist.push({ wifiN: s.wifiN, bleN: s.bleN }); if (sig.hist.length > 20) sig.hist.shift();
+  bbLog('radio', { mode: st.mode, wifiN: s.wifiN, w24: s.wifiByBand['2.4'], w5: s.wifiByBand['5'], w6: s.wifiByBand['6'], wifiBest: s.wifiBestDbm, wifiMed: s.wifiMedianDbm, bleN: s.bleN, bleBest: s.bleBestDbm, sendaNear: s.sendaNear, fresh: s.wifiFresh, wifiAgeS: age });
+  const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+  set('#sgWifi', s.wifiN); set('#sgWifiSub', `${s.wifiByBand['2.4']}·${s.wifiByBand['5']}·${s.wifiByBand['6']} (2,4·5·6 GHz)`);
+  set('#sgBle', s.bleN); set('#sgBleSub', s.bleBestDbm != null ? `mejor ${s.bleBestDbm} dBm` : 'ninguno');
+  set('#sgSenda', s.sendaNear); set('#sgBest', s.wifiBestDbm ?? '–');
+  set('#sigNote', `Wi-Fi: ${age != null ? `dato de hace ${age} s` : 'sin dato'}${s.wifiFresh ? '' : ' (Android limitó el barrido)'} · Bluetooth: escucha de 4 s · centro = más fuerte (medido); el ángulo es solo dibujo.${s.note ? ' · ' + s.note : ''}`);
+  const hc = $('#sigHist'); if (hc) drawHistory(hc.getContext('2d'), hc.width, hc.height, sig.hist);
+  if (s.sendaNear > 0) { navigator.vibrate?.([60, 40, 60]); say(`${s.sendaNear} móvil${s.sendaNear > 1 ? 'es' : ''} SENDA cerca`); }
 };
-function sigFrame() {
+function sigFrame(t) {
   if (!sig.open) return;
-  sig.sweep = (sig.sweep + 0.05) % (Math.PI * 2);
-  const c = $('#sigCanvas'); drawSignalRadar(c.getContext('2d'), c.width, sig.pts, sig.sweep);
+  const dt = sig.lastT ? Math.min(100, t - sig.lastT) : 16; sig.lastT = t;
+  sig.sweep = (sig.sweep + dt * 0.0021) % (Math.PI * 2); // una vuelta cada ~3 s
+  const c = $('#sigCanvas'); drawSignalRadarPro(c.getContext('2d'), c.width, sig.pts, sig.sweep, { fresh: sig.fresh, now: t });
+  const left = Math.max(0, Math.round((sig.next - Date.now()) / 1000));
+  $('#sigClock').textContent = sig.waiting ? 'escuchando…' : sig.last ? `próximo barrido en ${left} s` : 'listo';
   requestAnimationFrame(sigFrame);
 }
 function sigOpen(on) {
-  sig.open = on; $('#sig').hidden = !on; clearInterval(sig.timer);
-  if (on) { sigScan(); sig.timer = setInterval(sigScan, 30_000); requestAnimationFrame(sigFrame); } // Android permite ~4 barridos Wi-Fi cada 2 min
+  sig.open = on; $('#sig').hidden = !on; clearInterval(sig.timer); sig.lastT = 0;
+  if (on) { sigScan(); sig.timer = setInterval(sigScan, SCAN_EVERY_MS); requestAnimationFrame(sigFrame); if (!LS.get('senda.info.senales', false)) { LS.set('senda.info.senales', true); } }
 }
 $('#sigChip')?.addEventListener('click', () => sigOpen(!sig.open));
+if (location.hash === '#senales') setTimeout(() => sigOpen(true), 600);
 $('#sigClose')?.addEventListener('click', () => sigOpen(false));
 $('#sigScan')?.addEventListener('click', sigScan);
 // Con la caja negra en marcha y fuera del coche, se mide la malla cada 30 s aunque el radar esté cerrado.
 setInterval(() => { if (bb && st.mode !== 'car' && !sig.open && Date.now() - sig.last > 29_000) { if (typeof window.SendaNative?.radioScan === 'function') { sig.last = Date.now(); window.SendaNative.radioScan(); } } }, 5000);
+
+// ── Capas y vistas del mapa (como en las apps de mapas conocidas): tipo, detalles y 3D ──
+function styleFor(id) { return id === 'satelite' ? satelliteStyle() : (MAP_STYLES[id]?.url ?? MAP_STYLES.mapa.url); }
+function mapDetails() { return { inc: true, radar: true, cams: true, senda: true, b3d: true, ...(LS.get('senda.map.details', {}) ?? {}) }; }
+function ensureMeLayers(map) {
+  if (!map?.getSource || map.getSource('me-acc')) return;
+  map.addSource('me-acc', { type: 'geojson', data: st.pos && st.lastFix ? circlePolygon(st.pos, Math.max(3, st.lastFix.coords.accuracy ?? 10)) : { type: 'FeatureCollection', features: [] } });
+  map.addLayer({ id: 'me-acc-fill', type: 'fill', source: 'me-acc', paint: { 'fill-color': '#1a73e8', 'fill-opacity': 0.14 } });
+  map.addLayer({ id: 'me-acc-line', type: 'line', source: 'me-acc', paint: { 'line-color': '#1a73e8', 'line-opacity': 0.55, 'line-width': 1.2 } });
+}
+function applyMapDetails() {
+  const m = st.map; if (!m?.getLayer) return;
+  try { if (m.getLayer('building-3d')) m.setLayoutProperty('building-3d', 'visibility', mapDetails().b3d ? 'visible' : 'none'); } catch { /* estilo sin edificios */ }
+}
+function setMapStyle(id) {
+  LS.set('senda.map.style', id); st.map?.setStyle(styleFor(id), { diff: false }); renderLayers();
+  if (id === 'satelite') hint(st.pos && !orthoCovers(st.pos) ? 'Aquí no hay ortofoto oficial: solo de España (PNOA, IGN) y Países Bajos (PDOK).' : 'Satélite: ortofoto oficial (PNOA en España, PDOK en Países Bajos).');
+}
+st.view3d = !!LS.get('senda.map.3d', false);
+function setView3d(on) {
+  st.view3d = on; LS.set('senda.map.3d', on); renderLayers();
+  st.map?.easeTo({ pitch: on ? 60 : 0, bearing: on && st.heading ? st.heading : st.map.getBearing(), duration: 700 });
+}
+const DETAILS = [['inc', '🚧', 'Tráfico e incidencias'], ['radar', '📸', 'Radares fijos'], ['cams', '🎥', 'Cámaras DGT'], ['senda', '⚠️', 'Avisos SENDA'], ['b3d', '🏙️', 'Edificios 3D']];
+function renderLayers() {
+  const cur = LS.get('senda.map.style', 'mapa'), d = mapDetails();
+  $('#layStyles').innerHTML = Object.entries(MAP_STYLES).map(([id, v]) => `<button class="lay-style${id === cur ? ' on' : ''}" data-style="${id}"><img src="/senda/previews/map-${id}.webp" alt="" loading="lazy"><span>${v.label}</span></button>`).join('');
+  $('#layDetails').innerHTML = DETAILS.map(([k, ic, lb]) => `<button class="lay-det${d[k] ? ' on' : ''}" data-det="${k}"><i>${ic}</i><span>${lb}</span></button>`).join('');
+  $('#lay3d').classList.toggle('on', st.view3d);
+}
+$('#layersBtn')?.addEventListener('click', () => { renderLayers(); $('#layers').hidden = false; });
+$('#layClose')?.addEventListener('click', () => { $('#layers').hidden = true; });
+$('#layStyles')?.addEventListener('click', (e) => { const b = e.target.closest('[data-style]'); if (b) setMapStyle(b.dataset.style); });
+$('#layDetails')?.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-det]'); if (!b) return;
+  const d = mapDetails(); d[b.dataset.det] = !d[b.dataset.det]; LS.set('senda.map.details', d); renderLayers(); applyMapDetails(); drawMarkers();
+});
+$('#lay3d')?.addEventListener('click', () => setView3d(!st.view3d));
+$('#layNorth')?.addEventListener('click', () => { st.map?.easeTo({ bearing: 0, pitch: 0, duration: 600 }); setView3d(false); });
+
+// ── Paneles: solo uno abierto a la vez y el botón «atrás» de Android los cierra (antes salía de la pantalla) ──
+const CLOSERS = { '#layers': () => { $('#layers').hidden = true; }, '#sig': () => sigOpen(false), '#labPanel': () => openLab(false), '#info': () => { $('#info').hidden = true; }, '#sheet': () => openSheet(false) };
+let ovSuppress = false;
+function closeOverlays(except = null) { ovSuppress = true; for (const [sel, fn] of Object.entries(CLOSERS)) if (sel !== except && $(sel) && !$(sel).hidden) fn(); ovSuppress = false; }
+for (const sel of Object.keys(CLOSERS)) {
+  const el = $(sel); if (!el) continue;
+  new MutationObserver(() => {
+    if (ovSuppress) return;
+    if (!el.hidden) { if (sel !== '#info') closeOverlays(sel); if (!history.state?.sendaOverlay) history.pushState({ sendaOverlay: true }, ''); } // «ⓘ» se abre encima sin cerrar lo de debajo
+    else if (Object.keys(CLOSERS).every((s2) => !$(s2) || $(s2).hidden) && history.state?.sendaOverlay) history.back();
+  }).observe(el, { attributes: true, attributeFilter: ['hidden'] });
+}
+addEventListener('popstate', () => { if ($('#info') && !$('#info').hidden) { $('#info').hidden = true; if (Object.keys(CLOSERS).some((x) => x !== '#info' && $(x) && !$(x).hidden)) history.pushState({ sendaOverlay: true }, ''); return; } closeOverlays(); });
+
+// ── Qué es cada cosa: explicación al entrar y con «ⓘ» (valores de referencia orientativos, no garantizados) ──
+const INFO = {
+  conducir: { t: 'SENDA · Conducir, andar, pedalear', what: 'Tu mapa con avisos de tráfico oficiales, radares fijos publicados, avisos de otros usuarios de SENDA y una cámara con IA que reconoce lo que tienes delante. Funciona también sin Internet (con menos datos).', see: ['Arriba: 🚗 coche · 🚲 bici · 🚶 a pie (cambia rutas y avisos).', '📡 Señales: radar de redes Wi-Fi y Bluetooth a tu alrededor.', 'Botón naranja: avisar de algo (accidente, obras, objeto…).', 'Botón de capas: tipo de mapa, satélite oficial, 3D y qué se muestra.', 'Botón de grabar: caja negra del viaje.'], values: ['Punto azul = tú. El círculo azul claro es el margen de error del GPS: en calle abierta suele ser de pocos metros; entre edificios, más grande.'], tip: 'Configura todo antes de arrancar. Al volante, no toques el móvil.' },
+  senales: { t: '📡 Señales a tu alrededor', what: 'Las redes Wi-Fi y los aparatos Bluetooth que tu móvil oye ahora mismo, como un radar. Sirve para ver dónde podría crecer la malla de SENDA sin operadoras.', see: ['Cuanto más cerca del centro, más fuerte se oye (medido).', 'Alrededor del círculo es solo dibujo: el móvil no sabe en qué dirección está cada aparato.', 'Naranja: otro móvil con SENDA cerca (también te avisa por voz).', 'Los puntos nuevos destellan al aparecer.'], values: ['Orientativo: −30 a −55 dBm = muy cerca · −55 a −67 = buena · −67 a −80 = débil · por debajo de −80 = casi al límite.', 'Calle con pisos: decenas de redes. Campo: casi ninguna.', 'Android solo deja ~4 barridos Wi-Fi cada 2 minutos: verás la antigüedad del dato.'], tip: 'Camina despacio por distintas calles y compara. Con la caja negra activa, se guarda cada 30 s (sin nombres ni direcciones).' },
+  camara: { t: '🎥 Cámara con IA', what: 'La IA del móvil reconoce coches, camiones, motos, bicis, personas y semáforos en directo. Todo ocurre en tu móvil: la imagen no sale de él.', see: ['Recuadro verde = sin riesgo · ámbar = atención · rojo = se acerca deprisa por tu carril.', 'Las personas se tapan por privacidad.', 'Toca la miniatura para verla en grande.'], values: ['Analiza unas 4 veces por segundo. En un ordenador medimos ~74 ms por imagen; en tu móvil lo mide la caja negra.', 'La primera vez tarda unos segundos en cargar el modelo.'], tip: 'Para distancias en metros, mide la altura del soporte y ponla en Dashcam → «Montaje».' },
+  cajanegra: { t: '⏺ Caja negra', what: 'Guarda lo que SENDA vio y decidió, segundo a segundo, para revisar el viaje después y mejorar la app.', see: ['Al empezar, Android te pide permiso para grabar la pantalla: acéptalo.', '«Marcar» señala un momento raro.', 'Al pararla se guardan: vídeo en Películas/SENDA y datos (.json y .jsonl) en Descargas/SENDA.'], values: ['Incluye tu recorrido GPS. No incluye imágenes de la cámara ni datos de otras personas.'], tip: 'Pásale los archivos a Abraham para analizarlos.' },
+  capas: { t: '🗺️ Capas del mapa', what: 'Elige cómo ves el mapa y qué se muestra encima.', see: ['Mapa, Claro, Noche: mapa de OpenStreetMap.', 'Satélite: ortofoto oficial de España (PNOA, IGN) y Países Bajos (PDOK). Fuera de esos países no hay.', 'Detalles: activa o quita incidencias, radares, cámaras, avisos y edificios 3D.', '3D: inclina el mapa y gira con tu rumbo, como al navegar.'], values: [], tip: 'Pellizca para hacer zoom; con dos dedos arriba/abajo inclinas el mapa.' },
+};
+function showInfo(key) {
+  const i = INFO[key]; if (!i) return;
+  $('#infoBody').innerHTML = `<h3>${i.t}</h3><p>${i.what}</p><h4>Qué verás</h4><ul>${i.see.map((x) => `<li>${x}</li>`).join('')}</ul>${i.values.length ? `<h4>Valores de referencia</h4><ul>${i.values.map((x) => `<li>${x}</li>`).join('')}</ul>` : ''}<p class="info-tip">💡 ${i.tip}</p>`;
+  $('#info').hidden = false;
+}
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-info]'); if (b) { e.stopPropagation(); showInfo(b.dataset.info); } });
+$('#infoClose')?.addEventListener('click', () => { $('#info').hidden = true; });
+if (!LS.get('senda.drive.welcomed', false)) { LS.set('senda.drive.welcomed', true); setTimeout(() => showInfo('conducir'), 900); }
 
 // ── Radares fijos, de semáforo y de tramo publicados (ES + NL, 100 % legal, sin móviles policiales) ──
 function updateRadars(nowMs = Date.now()) {
@@ -335,9 +426,10 @@ function onPos(p) {
   if (p.coords.heading != null && !Number.isNaN(p.coords.heading) && (p.coords.speed ?? 0) > 1) st.heading = p.coords.heading;
   $('#speed').innerHTML = `<div>${st.speed == null ? '–' : Math.round(st.speed * 3.6)}<small>km/h</small></div>`;
   if (st.mapOk) {
-    if (!st.me) { const el = document.createElement('div'); el.innerHTML = '<svg width="40" height="40" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#fff"/><path d="M12 4 6 19l6-3 6 3z" fill="#2b8cff"/></svg>'; st.me = new maplibregl.Marker({ element: el, rotationAlignment: 'map' }).setLngLat(st.pos).addTo(st.map); st.map.jumpTo({ center: st.pos, zoom: 15 }); }
-    st.me.setLngLat(st.pos).setRotation(st.heading);
-    if (st.follow) st.map.easeTo({ center: st.pos, bearing: st.route ? st.heading : st.map.getBearing(), pitch: st.route ? 45 : 0, duration: 800 });
+    if (!st.me) { const el = document.createElement('div'); el.className = 'me-puck'; el.innerHTML = '<i class="cone"></i><b></b>'; st.me = new maplibregl.Marker({ element: el, rotationAlignment: 'map' }).setLngLat(st.pos).addTo(st.map); st.map.jumpTo({ center: st.pos, zoom: st.mode === 'foot' ? 17 : 15 }); }
+    st.me.setLngLat(st.pos).setRotation(st.heading); st.me.getElement().classList.toggle('has-heading', p.coords.heading != null && (p.coords.speed ?? 0) > 1);
+    st.map.getSource('me-acc')?.setData(circlePolygon(st.pos, Math.max(3, p.coords.accuracy ?? 10))); // precisión real del GPS (radio = accuracy)
+    if (st.follow) st.map.easeTo({ center: st.pos, bearing: st.route || st.view3d ? st.heading : st.map.getBearing(), pitch: st.view3d ? 60 : st.route ? 45 : 0, duration: 800 });
   } else drawRadar();
   if (st.route) guide();
   updateCorridor();
@@ -579,7 +671,8 @@ $('#camBtn').addEventListener('click', async () => {
     stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
     $('#v').srcObject = stream; await $('#v').play(); try { await navigator.wakeLock?.request('screen'); } catch { /* */ }
     camOn = true; tracker = createTracker(FULL_RULES); $('#pip').hidden = false; $('#camBtn').classList.add('on'); requestAnimationFrame(tick);
-  } catch (e) { hint('Cámara no disponible: ' + (e.message || e.name)); }
+  } catch (e) { hint('Cámara no disponible: ' + (e.message || e.name) + '. Revisa el permiso de cámara de SENDA en Ajustes de Android.'); }
+  if (camOn && !LS.get('senda.info.camara', false)) { LS.set('senda.info.camara', true); showInfo('camara'); }
 });
 $('#pip').addEventListener('click', () => $('#pip').classList.toggle('big'));
 function camStop() { camOn = false; st.lastVision = null; stream?.getTracks().forEach((t) => t.stop()); stream = null; $('#pip').hidden = true; $('#adas').hidden = true; $('#camBtn').classList.remove('on'); }

@@ -22,6 +22,11 @@ public final class OfflineAssetsTest {
         check("application/json".equals(mime(O + "/senda/estado.json")), "MIME JSON");
         check("geo/land-110m.json".equals(path(O + "/geo/land-110m.json")), "mapa del mundo permitido");
         check("senda/data/a b.json".equals(path(O + "/senda/data/a%20b.json")), "decodifica %20");
+        // la IA de la cámara y las fuentes deben servirse (antes daban 404 dentro de la app)
+        check("application/wasm".equals(mime(O + "/senda/vendor/mediapipe-tasks-vision-1.2.3/wasm/vision_wasm_internal.wasm")), "MIME wasm");
+        check("application/octet-stream".equals(mime(O + "/senda/vendor/models/efficientdet_lite0_int8.tflite")), "modelo tflite");
+        check("font/woff2".equals(mime(O + "/senda/fonts/inter.woff2")), "fuente woff2");
+        check("image/webp".equals(mime(O + "/senda/previews/conducir.webp")), "vista previa webp");
         // rechazos
         check(path("https://evil.example/senda/red") == null, "otro origen");
         check(path("http://app.senda.local/senda/red") == null, "HTTP sin cifrar");

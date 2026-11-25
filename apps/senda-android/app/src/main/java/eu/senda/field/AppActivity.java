@@ -248,6 +248,7 @@ public final class AppActivity extends Activity {
     private final class Client extends WebViewClient {
         @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest req) {
             if ((OfflineAssets.ORIGIN + LIVE_DGT_PATH).equals(req.getUrl().toString())) return liveDgt();
+            if (NetAllow.allowed(req.getUrl().toString())) return null; // mapa, rutas, búsqueda, ortofotos: red normal (solo play tiene INTERNET)
             OfflineAssets.Asset a = OfflineAssets.resolve(req.getUrl().toString());
             if (a == null) return notFound();
             try {
