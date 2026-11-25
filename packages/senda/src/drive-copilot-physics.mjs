@@ -661,19 +661,25 @@ export function createDriveCopilotEngine({ voiceCooldownMs = 15_000 } = {}) {
     });
 
     // Formato compacto listo para `SendaNative.publishDriveState(JSON.stringify(androidAutoPayload))`
+    const topStatus = primaryAlert?.severity === 'ROJO'
+      ? 'ROJO'
+      : primaryAlert?.severity === 'AMBAR'
+        ? 'AMBAR'
+        : 'VERDE';
+
     const androidAutoPayload = Object.freeze({
       ts: nowMs,
       speedKmh: grip.speedKmh,
       recommendedMaxKmh,
       stoppingDistM: grip.stoppingDistM,
       gripReservePct: grip.gripReservePct,
-      status: primaryAlert ? primaryAlert.severity : 'VERDE',
+      status: topStatus,
       rows: alerts.slice(0, 4).map((a) => `${a.severity === 'ROJO' ? '!' : a.severity === 'AMBAR' ? '▲' : '·'} ${a.title}`),
     });
 
     return Object.freeze({
       nowMs,
-      status: primaryAlert ? primaryAlert.severity : 'VERDE',
+      status: topStatus,
       primaryAlert,
       alerts,
       spokenNow,

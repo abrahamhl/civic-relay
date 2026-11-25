@@ -53,7 +53,9 @@ public final class DriveHazardsTest {
         check(DriveHazards.latestSnapshot().rows.get(0).length() <= DriveHazards.MAX_ROW_CHARS, "recorte ≤ 120 chars");
         check(!DriveHazards.latestSnapshot().rows.get(0).contains("\n"), "sin saltos de línea");
 
-        // 4. Rechazo de entradas inválidas o fuera de cuota
+        // 4. Normalización segura de estado informativo (pre-armado de túnel) y rechazo de inválidos
+        check(DriveHazards.publishFromBridgeJson("{\"status\":\"INFO\",\"speedKmh\":72,\"rows\":[\"· Sin cobertura en 350 m (Túnel M-30 Sur)\"]}", 1_764_000_035_000L), "acepta INFO de túnel");
+        check("VERDE".equals(DriveHazards.latestSnapshot().status), "INFO se normaliza a VERDE");
         check(!DriveHazards.publishFromBridgeJson(null, 1000L), "rechaza null");
         check(!DriveHazards.publishFromBridgeJson("{\"status\":\"HACKED\"}", 1000L), "rechaza status desconocido");
         check(!DriveHazards.publishFromBridgeJson("{\"status\":\"VERDE\",\"x\":\"" + "A".repeat(5000) + "\"}", 1000L), "rechaza payload > 4096 B");

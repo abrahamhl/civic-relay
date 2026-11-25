@@ -70,7 +70,7 @@ public final class DriveHazards {
     private static Snapshot LATEST = null;
     private static final CopyOnWriteArrayList<Listener> LISTENERS = new CopyOnWriteArrayList<>();
 
-    private static final Pattern STR_STATUS = Pattern.compile("\"status\"\\s*:\\s*\"(VERDE|AMBAR|ROJO)\"");
+    private static final Pattern STR_STATUS = Pattern.compile("\"status\"\\s*:\\s*\"(VERDE|AMBAR|ROJO|INFO)\"");
     private static final Pattern NUM_SPEED = Pattern.compile("\"speedKmh\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)");
     private static final Pattern NUM_MAX = Pattern.compile("\"recommendedMaxKmh\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)");
     private static final Pattern NUM_SSD = Pattern.compile("\"stoppingDistM\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)");
@@ -120,7 +120,8 @@ public final class DriveHazards {
         if (json == null || json.isEmpty() || json.length() > 4096 || nowMs <= 0L) return false;
         Matcher ms = STR_STATUS.matcher(json);
         if (!ms.find()) return false;
-        String status = ms.group(1);
+        String rawStatus = ms.group(1);
+        String status = "INFO".equals(rawStatus) ? "VERDE" : rawStatus;
         double speed = parseNum(NUM_SPEED, json, 0.0, 400.0);
         double recMax = parseNum(NUM_MAX, json, 0.0, 300.0);
         double ssd = parseNum(NUM_SSD, json, 0.0, 2000.0);
