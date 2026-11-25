@@ -1,0 +1,49 @@
+{
+ "caso": "DANA de Valencia, 29-10-2024 · rambla del Poyo",
+ "basis": "PUBLISHED_SOURCES_COMPILED",
+ "compiladoUTC": "2026-11-25T16:28:29Z",
+ "zonaHoraria": "Hora local peninsular del 29-10-2024 = CET (UTC+1); el cambio de hora fue el 27-10-2024. Las horas de las fuentes españolas son locales salvo que digan UTC.",
+ "tipos": {
+  "MEDIDO": "lectura de un instrumento publicada por quien la midió o por una fuente que la cita",
+  "ESTIMADO": "cifra calculada por un organismo o estudio externo (no por SENDA)",
+  "OFICIAL": "acto o aviso de un organismo, con su hora",
+  "SIN_HORA": "dato publicado sin hora exacta"
+ },
+ "fuentes": {
+  "roldan2025": { "cita": "Roldán Cañas, J. (2025). Aspectos hidrológicos de la DANA del 29 de octubre de 2024. Boletín de la Real Academia de Córdoba, 174: 775-795.", "url": "https://storage.e.jimdo.com/file/3ce96181-d7e1-467e-9283-11238786668f/BRAC-174-39.pdf" },
+  "bonet2024": { "cita": "Bonet, F. La DANA del 29 de octubre de 2024 en la Comunidad Valenciana: apuntes de urgencia. Revista de Obras Públicas 3652.", "url": "https://revistadeobraspublicas.com/coyuntura/la-dana-del-29-de-octubre-de-2024-en-la-comunidad-valenciana-apuntes-de-urgencia/" },
+  "maldita_poyo": { "cita": "Maldita.es, «Qué sabemos de los datos de la riada en la Rambla del Poyo durante la DANA de Valencia», 07-11-2024 (cita a la Confederación Hidrográfica del Júcar)", "url": "https://maldita.es/malditobulo/20241107/datos-rambla-poyo-dana-valencia/" },
+  "maldita_esalert": { "cita": "Maldita.es, artículo del 31-10-2024 sobre la responsabilidad del envío de la alerta a los móviles; la misma hora la recogen varios medios", "url": "https://maldita.es/clima/20241031/generalitat-valenciana-responsable-alerta-movil/" },
+  "cems": { "cita": "Copernicus Emergency Management Service, activación EMSR773 (ficha guardada en emsr773.json)", "url": "https://rapidmapping.emergency.copernicus.eu/backend/dashboard-api/public-activations/?code=EMSR773" },
+  "chiva": { "cita": "Ayuntamiento de Chiva, «Alerta hidrológica en Rambla del Poyo», 29-10-2024 (página con acceso denegado al comprobarla; el dato solo se ha visto en el resumen de un buscador)", "url": "https://www.chiva.es/2024-10-29/alerta-hidrologica-rambla-del-poyo" }
+ },
+ "constantes": [
+  { "id": "umbral_aviso", "valor": 150, "unidad": "m³/s", "que": "Umbral máximo de aviso de caudal en el aforo de la rambla del Poyo", "fuente": "maldita_poyo", "estado": "verificado en la fuente citada" },
+  { "id": "capacidad_urbana", "valor": 800, "unidad": "m³/s", "que": "Capacidad de los encauzamientos del Poyo a su paso por las zonas urbanas", "fuente": "roldan2025", "estado": "verificado en la fuente citada" },
+  { "id": "velocidad_chiva", "valor": 14, "unidad": "m/s", "que": "Velocidad del agua por Chiva según resultados preliminares del CEDEX (citado vía Levante-EMV)", "fuente": "roldan2025", "estado": "verificado en la fuente citada; es un dato preliminar" },
+  { "id": "longitud_poyo", "valor": 40, "unidad": "km", "que": "Longitud del barranco del Poyo hasta su desembocadura en la Albufera", "fuente": "roldan2025", "estado": "verificado en la fuente citada" }
+ ],
+ "eventos": [
+  { "id": "aemet_rojo", "local": null, "cuando": "primeras horas de la mañana", "tipo": "OFICIAL", "texto": "AEMET da aviso rojo para el interior de la provincia de Valencia; después lo extiende a gran parte de la provincia", "fuente": "roldan2025", "estado": "verificado en la fuente citada (sin hora exacta)" },
+  { "id": "chiva_manana", "local": null, "cuando": "a primeras horas de la mañana", "tipo": "SIN_HORA", "valor": 25, "unidad": "mm en 1 h", "lugar": "pluviómetro de Chiva", "texto": "Lluvias de cierta intensidad en el pluviómetro de Chiva, unos 25 mm en una hora", "fuente": "bonet2024", "estado": "verificado en la fuente citada (sin hora exacta)" },
+  { "id": "poyo_manana", "local": null, "cuando": "por la mañana", "tipo": "SIN_HORA", "valor": 200, "unidad": "m³/s", "lugar": "rambla del Poyo", "texto": "Circularon cerca de 200 m³/s por la rambla, habitualmente seca", "fuente": "roldan2025", "estado": "verificado en la fuente citada (sin hora exacta; Bonet dice «hasta 200»)" },
+  { "id": "riba_1220", "local": "2024-10-29T12:20", "tipo": "MEDIDO", "valor": 264, "unidad": "m³/s", "lugar": "aforo de Riba-roja de Túria (rambla del Poyo)", "texto": "Alerta hidrológica de la CHJ con 264 m³/s en el aforo", "fuente": "chiva", "estado": "no verificado: la página oficial no se pudo leer" },
+  { "id": "mediodia", "local": null, "cuando": "a mediodía", "tipo": "SIN_HORA", "texto": "Deja de llover y el caudal desciende", "fuente": "roldan2025", "estado": "verificado en la fuente citada (sin hora exacta)" },
+  { "id": "reanuda_14", "local": "2024-10-29T14:00", "aprox": true, "tipo": "SIN_HORA", "texto": "Sobre las 14 h se reanudan las lluvias", "fuente": "bonet2024", "estado": "verificado en la fuente citada («sobre las 14h»)" },
+  { "id": "cems_evento", "local": "2024-10-29T15:30", "utc": "2024-10-29T14:30:00Z", "tipo": "OFICIAL", "texto": "Hora del suceso que registra Copernicus EMS: «On 29 October 2024 at 14:30 UTC, an extraordinary rainfall event affected the Valencia region»", "fuente": "cems", "estado": "verificado (emsr773.json)" },
+  { "id": "cems_activacion", "local": "2024-10-29T17:40", "utc": "2024-10-29T16:40:00Z", "tipo": "OFICIAL", "texto": "Activación del servicio de cartografía de emergencias de Copernicus (EMSR773)", "fuente": "cems", "estado": "verificado (emsr773.json)" },
+  { "id": "lluvia_18", "local": "2024-10-29T18:00", "tipo": "MEDIDO", "valor": 120, "unidad": "mm en 1 h", "masDe": true, "lugar": "cuenca del Poyo (estación no indicada)", "texto": "Más de 120 mm en una hora a las 18 h", "fuente": "bonet2024", "estado": "verificado en la fuente citada; la estación no se indica" },
+  { "id": "turis_1h", "local": "2024-10-29T18:00", "tipo": "MEDIDO", "valor": 179.4, "unidad": "mm en 1 h", "lugar": "pluviómetro de Turís (cuenca del Magro, vecina)", "texto": "179,4 mm en una hora a las 18 h", "fuente": "bonet2024", "estado": "verificado en la fuente citada; AEMET da 184,6 mm como máximo en 1 h en Turís-Mas de Calabarra (Roldán 2025): las dos cifras no coinciden", "discrepancia": { "valor": 184.6, "fuente": "roldan2025" } },
+  { "id": "poyo_1855", "local": "2024-10-29T18:55", "tipo": "MEDIDO", "valor": 2282, "unidad": "m³/s", "lugar": "aforo de la rambla del Poyo (cruce con la autovía A-3)", "texto": "Último dato fiable: el agua arrastra el medidor. La CHJ desecha las lecturas posteriores por no fiables", "fuente": "maldita_poyo", "estado": "verificado en la fuente citada; Roldán (2025) da 2.292 m³/s para la misma hora", "discrepancia": { "valor": 2292, "fuente": "roldan2025" } },
+  { "id": "cedex_pico", "local": "2024-10-29T19:35", "tipo": "ESTIMADO", "valor": 3500, "unidad": "m³/s", "lugar": "rambla del Poyo (el texto no precisa el punto)", "texto": "Caudal máximo estimado por el CEDEX (resultados preliminares), con el agua desplazándose por Chiva a 14 m/s", "fuente": "roldan2025", "estado": "verificado en la fuente citada; es una estimación preliminar" },
+  { "id": "esalert", "local": "2024-10-29T20:11", "tipo": "OFICIAL", "texto": "Primer mensaje ES-Alert a los móviles de la provincia de Valencia", "fuente": "maldita_esalert", "estado": "hora coincidente en varios medios" },
+  { "id": "turis_24h", "local": null, "cuando": "en 24 horas", "tipo": "SIN_HORA", "valor": 771.8, "unidad": "mm en 24 h", "lugar": "Turís-Mas de Calabarra (AEMET)", "texto": "Precipitación acumulada en 24 horas", "fuente": "roldan2025", "estado": "verificado en la fuente citada" },
+  { "id": "obs_horta", "local": "2024-10-31T11:22", "utc": "2024-10-31T10:22:00Z", "tipo": "OFICIAL", "texto": "Imagen de satélite con la que Copernicus delimita el agua en l'Horta Sud (24,07 km²)", "fuente": "cems", "estado": "verificado (emsr773_inundacion.geojson)" }
+ ],
+ "noEncontrado": [
+  "Serie continua de caudal del SAIH Júcar (la web rechaza el acceso automático).",
+  "Serie horaria de lluvia de AEMET por estación (requiere AEMET OpenData con clave).",
+  "Coordenadas oficiales del aforo de la rambla del Poyo.",
+  "Texto literal del mensaje ES-Alert."
+ ]
+}

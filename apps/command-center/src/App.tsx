@@ -316,6 +316,21 @@ export function App() {
               <a className="btn" href="/senda/explorador.html?pro=1" style={{ display: 'inline-block', padding: '12px 18px', borderRadius: 12, background: '#0a84ff', color: '#fff', textDecoration: 'none', fontWeight: 700 }}>Abrir Explorador 3D/4D</a>
             </section>
           )}
+          {tab === 'sim4d' && (
+            <section className="panel" style={{ padding: 24, maxWidth: 820 }}>
+              <h2 style={{ marginTop: 0 }}>Simuladores 4D · modo PRO</h2>
+              <p>Reconstrucción de catástrofes reales sobre relieve 3D con línea del tiempo. Cada dato lleva su etiqueta: REAL (medido, con fuente), ESTIMADO (de un organismo externo), MODELO (calculado por SENDA) o ESCENARIO (parámetros elegidos por el operador).</p>
+              <ul style={{ lineHeight: 1.5 }}>
+                <li><b>Incendio 4D</b> · San Martín de Valdeiglesias, 23-07-2026: Sentinel-2, EFFIS, frente modelado minuto a minuto, humo (Briggs), combustible, pendiente, probabilidad.</li>
+                <li><b>DANA 4D</b> · Valencia, 29-10-2024: agua observada por Copernicus EMS, cauces y cuencas, telemetría del Poyo con fuentes, antelación frente al ES-Alert, tiempo de llegada aguas abajo.</li>
+              </ul>
+              <p style={{ opacity: 0.8, fontSize: 13 }}>Solo en escritorio: paquete de datos exportable con procedencia y huella SHA-256 de cada capa, cronología en CSV y más resolución. Validación y límites: <code>docs/validacion/DOSSIER_VALIDACION.md</code>.</p>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <a className="btn" href="/senda/incendio4d.html?pro=1" style={{ display: 'inline-block', padding: '12px 18px', borderRadius: 12, background: '#ff7756', color: '#1a0b06', textDecoration: 'none', fontWeight: 700 }}>Abrir Incendio 4D</a>
+                <a className="btn" href="/senda/dana4d.html?pro=1" style={{ display: 'inline-block', padding: '12px 18px', borderRadius: 12, background: '#5ac8fa', color: '#001a2a', textDecoration: 'none', fontWeight: 700 }}>Abrir DANA 4D</a>
+              </div>
+            </section>
+          )}
           {tab === 'rf' && <RfLab />}
           {tab === 'meteorology' && <MeteorologyLab />}
           {tab === 'access' && <AccessControlPanel />}

@@ -1,4 +1,13 @@
-# SENDA · handoff (2026-11-25 16:16Z, sesión app)
+# SENDA · handoff (2026-11-25 16:37Z, sesión app)
+
+## Último bloque (commit 5695aaa)
+- DANA 4D con línea del tiempo y telemetría con fuente (`data/dana2024/telemetria.json`), motor
+  `flood-warning.mjs`, escenario «¿Cuándo llega?», PRO con exportación y huellas, pestaña
+  «Simuladores 4D (PRO)» en el escritorio y `docs/validacion/DOSSIER_VALIDACION.md`.
+- PR #93 y #94 fusionadas; APK publicada 16:25Z con `fire-science` y `flood-science` dentro
+  (sha play 449c2479…, comprobada contra SHA256SUMS).
+- Pendiente de datos: serie SAIH continua (la web rechaza bots: pedir convenio o descarga manual),
+  AEMET OpenData (clave por la herramienta de credenciales, con permiso del fundador).
 
 ## Novedades desde la última versión
 - **PR #93 fusionada 16:04Z (3d5eb8d)**: laboratorio científico del Incendio 4D (📍 Dónde empezó, combustible,

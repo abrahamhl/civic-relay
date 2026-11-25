@@ -1,0 +1,159 @@
+# SENDA · Dossier técnico de validación de los simuladores 4D
+
+**Destinatarios previstos:** equipos técnicos de Protección Civil, UME, Fuerzas y Cuerpos de Seguridad del Estado y organismos de defensa que evalúen SENDA.
+**Versión:** 2026-11-25 · rama `ccr-f7e46a00-mxvkgd` (se fusiona en `master`; cada cifra se puede reproducir con los comandos del apartado 9).
+**Estado:** herramienta de **apoyo a la decisión** en desarrollo. **No está homologada ni certificada** por ningún organismo. Este documento describe lo que hace, con qué datos, con qué métodos, cuánto acierta medido contra la realidad y qué le falta.
+
+---
+
+## 1. Regla de etiquetado (se aplica a cada capa, cifra y exportación)
+
+| Etiqueta | Significado | Ejemplo |
+|---|---|---|
+| **REAL / MEDIDO** | Dato observado por un instrumento o satélite, con su fuente | Mancha de agua de Copernicus EMS; cicatriz Sentinel-2 |
+| **OFICIAL** | Acto o aviso de un organismo, con su hora | Activación EMSR773; ES-Alert 20:11 |
+| **ESTIMADO** | Cifra calculada por un tercero (no por SENDA) | Pico de 3 500 m³/s del CEDEX (preliminar) |
+| **MODELO** | Calculado por SENDA con método citado | Cauces D8, HAND, frente del incendio |
+| **ESCENARIO** | Parámetro elegido por el operador | Velocidad del agua, nivel sobre el cauce, viento |
+| **NO VERIFICADO** | Dato que no se pudo comprobar en su fuente original | 264 m³/s a las 12:20 (página oficial inaccesible) |
+
+Norma interna (`CLAUDE.md` §1): **ningún dato se inventa**, ningún parámetro sin fuente lleva valor por defecto y toda simulación se declara como tal.
+
+## 2. Producto: app y escritorio PRO
+
+| Capacidad | App (Android y web, perfil administrador) | Escritorio PRO (Command Center, Tauri) |
+|---|---|---|
+| Todas las vistas de mapa (satélite oficial, NASA del día, térmico, relieve, topográfico, 3D) | Sí | Sí |
+| Incendio 4D y DANA 4D completos (capas, línea del tiempo, ciencia, inspector) | Sí | Sí |
+| Telemetría con fuentes y antelación frente al ES-Alert | Sí | Sí |
+| Paquete de datos exportable con procedencia y huella SHA-256 de cada capa | — | **Sí** |
+| Cronología exportable en CSV (hora local y UTC, tipo, estado, fuente) | — | **Sí** |
+| Explorador 3D con más resolución (zoom 15, 64 teselas por levantamiento) | zoom 14, 16 teselas | **Sí** |
+| Funcionamiento sin red (datos del caso incluidos) | Sí (APK) | Sí |
+
+La APK solo puede conectarse a una lista cerrada de servidores (`NetAllow.java`, con pruebas en CI). La bóveda de defensa **no** se copia a las superficies civiles: el escritorio la excluye al sincronizar (`apps/command-center/scripts/sync-explorer.mjs`).
+
+## 3. Incendio 4D · San Martín de Valdeiglesias, 23-07-2026
+
+**Datos de entrada**
+
+| Dato | Tipo | Fuente / licencia | Resolución de uso |
+|---|---|---|---|
+| Imágenes antes, 24-07, 29-07 y 08-08 | REAL | Copernicus Sentinel-2 (procesado por SENDA) | malla de 100 m |
+| Severidad dNBR por fecha | REAL (derivado) | Sentinel-2 | 100 m |
+| Perímetro final (19 939 ha) | REAL | EFFIS (JRC, Copernicus EMS) | polígono |
+| Relieve | REAL | Copernicus DEM GLO-30 (© DLR, Airbus; UE/ESA) | 100 m |
+| Combustible antes del fuego | REAL (clasificado) | NDVI Sentinel-2 del 16-07 | 100 m |
+| Viento y masa de aire | MODELO meteorológico | NOAA GFS 0,25° (pasada 23-07 12 UTC) | ≈ 25 km |
+| Carga de combustible | **ORIENTATIVA** | `FUEL_LOAD` de SENDA | no medida en campo |
+
+**Métodos:** pendiente y orientación de Horn (1981); elipse de Alexander (1985) y Anderson (1983) para el escenario; pluma de Briggs (1975); UTM de Snyder (1987); frente por campo de viento con conservación de masa sobre el relieve, calibrado con la cicatriz del 24-07.
+
+**Validación medida** (`data/smv2026/fire3d.json`, `validacion_effis.json`):
+
+| Comparación | Resultado |
+|---|---|
+| Frente calibrado frente a la imagen del 24-07 | Jaccard 0,352 · razón de áreas 1,21 |
+| Conjunto de 24 simulaciones tras asimilar la cicatriz | acierto del 100 % de lo quemado con P ≥ 50 % · **falsa alarma 89,5 %** (sobreestima) |
+| EFFIS frente a cicatriz Sentinel-2 (todos los incendios de la escena) | Jaccard 0,554 · acierto 0,555 · falsa alarma 0,0015 |
+| Perímetro EFFIS rasterizado | 19 018 ha frente a 19 939 ha publicadas |
+
+**Lo que no cuadra (se muestra en la interfaz):** tres horas de inicio distintas en los datos (EFFIS 13:53, modelo 15:00 UTC, conjunto 20:00 UTC); el modelo no cubre la unión con el incendio de Almorox.
+
+## 4. DANA 4D · Valencia, 29-10-2024 (rambla del Poyo, l'Horta Sud)
+
+**Datos de entrada**
+
+| Dato | Tipo | Fuente | Resolución |
+|---|---|---|---|
+| Mancha de agua AOI03 (imagen 31-10-2024 10:22 UTC) | REAL | Copernicus EMS EMSR773 | polígono, rasterizado a 29,5 m |
+| Relieve (54 teselas, SHA-256 guardado) | REAL | Terrain Tiles (AWS Open Data), terrarium z12 | 29,5 m |
+| Cronología y telemetría (15 sucesos, 4 constantes) | MEDIDO / OFICIAL / ESTIMADO | Roldán Cañas (2025, *BRAC* 174); Bonet (*Revista de Obras Públicas* 3652); Maldita.es citando a la CHJ; Copernicus EMS | por suceso |
+
+**Métodos:** relleno de depresiones Priority-Flood+ε (Barnes, Lehman y Mulla, 2014); dirección D8 (O'Callaghan y Mark, 1984); acumulación de flujo; HAND (Rennó et al., 2008; Nobre et al., 2011 y 2016); acuerdo por índice CSI (Bates y De Roo, 2000).
+
+**Validación medida** (`data/dana2024/hidro.json`, reproducible):
+
+| Comprobación | Resultado | Lectura |
+|---|---|---|
+| Superficie de la mancha rasterizada | 24,2 km² frente a 24,07 km² oficiales | error del 0,5 % en el paso a malla |
+| Longitud del cauce del Poyo (Chiva → mar) | 41,1 km del modelo frente a 40 km publicados (Roldán 2025) | +3 % |
+| Cuenca del Poyo junto a Paiporta | 401 km² del modelo frente a 422,3 km² (CEDEX vía Wikipedia, **no verificado** en origen) | −5 % |
+| Agua del modelo frente a satélite (mejor CSI) | **0,168** a 5 m sobre el cauce, cuenca de cauce ≥ 25 km² (acierto 45 %, falsa alarma 79 %) | bajo; **calibrado**, no predicho |
+| Línea base sin hidrología («inundar lo más bajo») | CSI 0,083 | el modelo duplica la línea base |
+
+**Por qué el acuerdo es bajo (dicho en la interfaz):** relieve de ≈ 30 m sin encauzamientos, colectores ni puentes; el Poyo se abre en un cono aluvial aguas abajo de Torrent; la imagen es 44 h posterior al inicio; el cauce del modelo pasa a 772–788 m del punto de Paiporta.
+
+**Telemetría con hora (hora local CET = UTC+1)**
+
+| Hora | Dato | Tipo | Estado |
+|---|---|---|---|
+| 12:20 | 264 m³/s, aforo de Riba-roja | MEDIDO | **no verificado** |
+| ~14:00 | Se reanudan las lluvias | sin hora exacta | verificado («sobre las 14h») |
+| 15:30 (14:30 UTC) | Hora del suceso según Copernicus | OFICIAL | verificado |
+| 17:40 (16:40 UTC) | Activación EMSR773 | OFICIAL | verificado |
+| 18:00 | > 120 mm en 1 h (estación no indicada) | MEDIDO | verificado |
+| 18:00 | Turís 179,4 mm en 1 h (Bonet) frente a 184,6 mm (AEMET vía Roldán) | MEDIDO | **discrepancia mostrada** |
+| 18:55 | 2 282 m³/s (CHJ vía Maldita) / 2 292 m³/s (Roldán); el agua arrastra el medidor | MEDIDO | **discrepancia mostrada** |
+| 19:35 | 3 500 m³/s, CEDEX preliminar | ESTIMADO | verificado en la fuente citada |
+| 20:11 | Primer ES-Alert a la provincia | OFICIAL | coincidente en varios medios |
+
+**Antelaciones calculadas** (restas de horas publicadas; no son juicios sobre la gestión): último dato del aforo → ES-Alert **76 min**; pico estimado → ES-Alert **36 min**; hora del suceso de Copernicus → ES-Alert **281 min**.
+
+**No encontrado:** serie continua del SAIH Júcar (la web rechaza el acceso automático), serie horaria de AEMET por estación (requiere AEMET OpenData con clave), coordenadas oficiales del aforo y texto literal del ES-Alert.
+
+## 5. Motor de prevención (base) · `packages/senda/src/flood-warning.mjs`
+
+Referencia para el motor de alerta temprana de SENDA. Entradas **obligatorias y con fuente**: umbrales y velocidades no tienen valor por defecto.
+
+| Función | Qué hace | Estado |
+|---|---|---|
+| `downstreamPath` | Camino del agua aguas abajo desde cualquier punto (D8) con longitud acumulada | probado |
+| `travelMinutes`, `frontIndex` | Tiempo de llegada y posición del frente a velocidad dada | probado; velocidad constante declarada |
+| `flowLevel` | normal / aviso / desbordamiento con umbrales aportados (aquí: 150 m³/s CHJ, 800 m³/s capacidad urbana) | probado; sin umbral → «no medido» |
+| `leadMinutes`, `eventsUntil` | Antelación entre sucesos de una cronología con fuente; no rellena huecos | probado con la cronología real |
+
+**Escenario mostrado en la app** (ESCENARIO, no reconstrucción): si el pico pasaba por Chiva a las 19:35 a 14 m/s (lectura posible del texto del CEDEX, no confirmada), el modelo situaría el agua junto a Torrent a las 20:10, Picanya a las 20:15 y Paiporta a las 20:16. Con otra hora o velocidad, el resultado cambia: por eso el operador las elige y quedan escritas en la exportación.
+
+**Siguiente paso para uso operativo:** conectar lecturas en vivo (SAIH, AEMET) mediante convenio, calibrar la celeridad por tramo con avenidas históricas y validar el motor en modo ciego (sin ver el resultado) con eventos no usados para calibrar.
+
+## 6. Precisión: qué se puede prometer
+
+- **No hay precisión milimétrica** con estos datos, y SENDA no la afirma. Las mallas de trabajo son de 29,5 m (DANA) y 100 m (incendio); los satélites usados resuelven 10–20 m (Sentinel-2) o ≈ 25 km (previsión GFS).
+- La exactitud vertical de cada relieve depende de su fuente; **no se ha verificado** en esta versión contra puntos de control topográfico. Es la primera prueba pendiente de la validación independiente.
+- Para reconstruir una escena (accidente, rotura, desbordamiento) a escala de centímetros harían falta datos de otro tipo: LiDAR del PNOA, fotogrametría con dron o escaneo láser de la escena. Su integración es una fase futura y sus precisiones se documentarán cuando estén medidas.
+
+## 7. Seguridad, privacidad y licencias
+
+- Sin datos personales en los casos. Los municipios son puntos públicos de OpenStreetMap (ODbL).
+- Secretos: nunca en el código ni en el chat. Las credenciales se guardan en el entorno.
+- **Revisión de licencias antes de vender:** algunas fuentes gratuitas son solo para uso no comercial (p. ej. la API gratuita de Open-Meteo usada para GloFAS). Antes de un contrato con organismos públicos hay que confirmar la licencia comercial de cada fuente o sustituirla.
+
+## 8. Qué falta para una adopción institucional (no se afirma ninguno)
+
+1. Evaluación técnica independiente (organismo técnico o universidad) con eventos no usados para calibrar.
+2. Datos oficiales en vivo mediante convenio (SAIH de las confederaciones, AEMET OpenData, DGT 3.0).
+3. Para sistemas del sector público: estudiar la adecuación al Esquema Nacional de Seguridad (Real Decreto 311/2022) y, para defensa, los requisitos del CCN.
+4. Pruebas de campo con usuarios operativos y accesibilidad.
+5. Contrastar la exactitud del relieve con puntos de control.
+
+## 9. Reproducibilidad
+
+```bash
+node --test packages/senda/tests/*.test.mjs        # núcleo (incluye flood-science, flood-warning, fire-science)
+(cd investor-next && node --test tests/*.test.mjs)  # web
+node scripts/prove.mjs                              # afirmaciones públicas
+node packages/senda/scripts/dana-hand.mjs           # regenera hidrología y calibración de la DANA
+```
+
+Cada paquete exportado desde el escritorio PRO lleva la huella SHA-256 de las capas binarias para comprobar que no se han alterado.
+
+## 10. Registro de cambios de esta fase
+
+| Fecha (UTC) | Cambio | Commit |
+|---|---|---|
+| 2026-11-25 16:04 | Laboratorio científico del Incendio 4D | 3d5eb8d (PR #93) |
+| 2026-11-25 16:23 | DANA 4D: hidrología, calibración CSI y cuencas | 6a4f59f (PR #94) |
+| 2026-11-25 | Línea del tiempo, telemetría con fuentes, motor `flood-warning`, modo PRO de exportación, pestaña de simuladores en el escritorio y este dossier | esta PR |
+
+*Firmado: asistente de ingeniería de SENDA (Claude), para revisión del fundador.*

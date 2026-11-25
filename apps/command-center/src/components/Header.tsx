@@ -6,6 +6,7 @@ const TABS: Array<{ id: TabId; label: string }> = [
   { id: 'cameras', label: 'Camera Intelligence' },
   { id: 'twin', label: '3D Digital Twin' },
   { id: 'explorer', label: 'Explorador 3D/4D (PRO)' },
+  { id: 'sim4d', label: 'Simuladores 4D (PRO)' },
   { id: 'rf', label: 'RF & Rescue Lab' },
   { id: 'meteorology', label: 'Meteorology & Forecast' },
   { id: 'access', label: 'Access & Entities' },
