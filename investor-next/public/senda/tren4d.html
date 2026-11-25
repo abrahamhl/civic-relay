@@ -1,0 +1,64 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000"><title>SENDA · Tren 4D</title>
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/fonts/fonts.css">
+<link rel="stylesheet" href="/senda/vendor/maplibre-gl-4.7.1/maplibre-gl.css">
+<style>
+:root{--bg:#000;--g1:#1c1c1e;--g2:#2c2c2e;--l2:rgba(235,235,245,.62);--real:#34c759;--model:#ff9f0a;--scen:#bf5af2;--iryo:#ff375f;--alvia:#64d2ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:var(--bg);color:#fff;font:15px/1.35 Inter,-apple-system,system-ui,sans-serif;overflow:hidden}
+button,select,input{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
+#map{position:absolute;inset:0}
+#top{position:absolute;left:10px;right:10px;top:58px;z-index:5;display:flex;gap:8px;align-items:flex-start;pointer-events:none}
+#title{pointer-events:auto;background:rgba(20,20,22,.86);backdrop-filter:blur(14px);border-radius:14px;padding:8px 12px;flex:1;min-width:0}
+#title b{display:block;font-size:15px}#title small{color:var(--l2);font-size:12px}
+.badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.05em;border-radius:6px;padding:2px 6px;margin-right:4px}
+.badge.real{background:rgba(52,199,89,.18);color:var(--real)}.badge.model{background:rgba(255,159,10,.18);color:var(--model)}.badge.scen{background:rgba(191,90,242,.18);color:var(--scen)}.badge.unv{color:#ff9f0a;border:1px solid #ff9f0a}
+.tb{pointer-events:auto;width:42px;height:42px;border-radius:12px;background:rgba(20,20,22,.86);backdrop-filter:blur(14px);display:grid;place-items:center;font-size:18px}
+#panel{position:absolute;left:0;right:0;bottom:0;z-index:6;background:rgba(18,18,20,.95);backdrop-filter:blur(18px);border-radius:20px 20px 0 0;padding:8px 14px calc(12px + env(safe-area-inset-bottom));max-height:62vh;overflow-y:auto}
+.grab{width:56px;height:6px;border-radius:3px;background:#636366;margin:0 auto 8px;display:block}
+#panel.mini .more{display:none}
+.lvl{display:flex;align-items:center;gap:10px}.lvl input{flex:1;accent-color:var(--iryo)}
+.play{width:40px;height:40px;border-radius:50%;background:var(--iryo);color:#fff;font-size:16px;font-weight:800;flex:none}
+#clock{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px;min-width:104px}
+.seg{display:flex;background:var(--g1);border-radius:10px;padding:2px;gap:2px;margin:6px 0}.seg button{flex:1;padding:7px 4px;border-radius:8px;font-size:12.5px;color:var(--l2);font-weight:600}.seg button.on{background:#3a3a3c;color:#fff}
+#kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}#kpis div{background:var(--g1);border-radius:10px;padding:6px 8px;min-width:0}#kpis b{display:block;font-size:16px}#kpis span{font-size:10.5px;color:var(--l2)}
+h4{margin:12px 2px 6px;font-size:12px;color:var(--l2);text-transform:uppercase;letter-spacing:.04em}
+canvas#marey{width:100%;height:230px;background:var(--g1);border-radius:12px;display:block}
+.leg{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11.5px;color:var(--l2);margin:4px 2px}.leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl td{padding:5px 4px;border-bottom:.5px solid rgba(84,84,88,.5);vertical-align:top}.tbl td:nth-child(2){padding-left:8px}
+.out{font-size:12.5px;color:var(--l2);line-height:1.45;margin:6px 2px}.out b{color:#fff}
+#evlist .ev{display:flex;gap:8px;padding:7px 2px;border-top:.5px solid rgba(84,84,88,.5);font-size:12.5px;line-height:1.35;cursor:pointer}#evlist .ev time{flex:none;width:62px;font-weight:700;font-variant-numeric:tabular-nums}#evlist .ev.fut{opacity:.42}#evlist small{display:block;color:var(--l2);font-size:11px}
+.row{display:flex;gap:8px;margin-top:8px}.row button{flex:1;padding:10px;border-radius:12px;background:var(--g2);font-weight:700;font-size:13px}
+label.sl{display:block;font-size:12px;color:var(--l2);margin:6px 2px}label.sl input{width:100%;accent-color:var(--scen)}
+#info{position:absolute;left:0;right:0;bottom:0;z-index:9;background:#fff;color:#1c1c1e;border-radius:20px 20px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom));max-height:72vh;overflow-y:auto}
+#info h3{margin:0 0 6px}#info .x{float:right;width:32px;height:32px;border-radius:50%;background:#eef0f3}#info .src{font-size:12px;color:#6e6e73;word-break:break-word}#info p,#info li{line-height:1.45}#info .tbl td{border-bottom-color:#e5e5ea}
+.maplibregl-ctrl-attrib{font-size:9px}
+</style><script type="module" src="/senda/app-chrome.mjs"></script></head><body>
+<div id="map" aria-label="Mapa 3D del accidente"></div>
+<div id="top"><div id="title"><b>Accidente ferroviario de Adamuz · 18-01-2026</b><small><span class="badge real">REAL</span>publicado · <span class="badge model">MODELO</span>calculado · <span class="badge scen">SIMULACIÓN</span>supuesta</small></div><button class="tb" id="helpBtn" aria-label="Cómo leer esta vista">?</button></div>
+<section id="panel">
+  <button class="grab" id="grab" aria-label="Ver más o menos"></button>
+  <div class="seg" id="zoom"><button data-z="s" class="on">Segundos (19:43–19:44)</button><button data-z="m">Minutos (hasta 20:35)</button></div>
+  <div class="lvl"><button id="play" class="play" aria-label="Reproducir">▶</button><input id="t" type="range" aria-label="Hora local"><span id="clock"></span></div>
+  <div id="kpis"><div><b id="kI">–</b><span>Iryo (km/h)</span></div><div><b id="kA">–</b><span>Alvia (km/h)</span></div><div><b id="kD">–</b><span>distancia entre trenes</span></div><div><b id="k2">–</b><span>segundo tren confirmado</span></div></div>
+  <div class="row"><button id="sciBtn">🔬 Física y lecciones</button><button id="senBtn">📱 ¿Y con SENDA?</button></div>
+  <div class="more">
+  <h4>Diagrama espacio-tiempo (Marey) <span class="badge model">MODELO</span></h4>
+  <div class="seg" id="ver"></div>
+  <canvas id="marey" width="700" height="460" aria-label="Posición de los trenes frente al tiempo"></canvas>
+  <div class="leg"><span><i style="background:var(--iryo)"></i>Iryo 6189 (hacia Madrid)</span><span><i style="background:var(--alvia)"></i>Alvia 2384 (hacia Huelva)</span><span><i style="background:#ffd60a"></i>rotura del carril (PK 318,681)</span><span><i style="background:#fff"></i>choque (PK 318,173)</span></div>
+  <section id="science"></section>
+  <h4>📱 ¿Y con SENDA? <span class="badge scen">SIMULACIÓN</span></h4>
+  <label class="sl">Pasajeros con SENDA <b id="adTxt"></b> %<input id="ad" type="range" min="5" max="80" step="5"></label>
+  <label class="sl">Cobertura móvil en el tramo <b id="cvTxt"></b> %<input id="cv" type="range" min="0" max="100" step="5"></label>
+  <div id="senOut" class="out"></div>
+  <h4>Cronología (cada dato con su fuente)</h4>
+  <div id="evlist"></div>
+  <div id="proBox" hidden><h4>PRO · escritorio</h4><div class="row"><button id="expPack">⬇️ Paquete de datos con procedencia</button></div></div>
+  </div>
+</section>
+<section id="info" hidden><button class="x" id="infoX" aria-label="Cerrar">✕</button><div id="infoBody"></div></section>
+<script src="/senda/vendor/maplibre-gl-4.7.1/maplibre-gl-csp.js"></script>
+<script type="module" src="/senda/tren4d.mjs"></script>
+</body></html>

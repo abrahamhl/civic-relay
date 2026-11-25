@@ -5,7 +5,7 @@ import { cpSync, mkdirSync, rmSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url)), src = join(here, '..', '..', '..', 'investor-next', 'public', 'senda'), dst = join(here, '..', 'public', 'senda');
-const FILES = ['explorador.html', 'explorador.mjs', 'incendio4d.html', 'incendio4d.mjs', 'dana4d.html', 'dana4d.mjs', 'app-chrome.mjs', 'save-file.mjs', 'icon.svg', 'core', 'data/smv2026', 'data/dana2024', 'data/radio/poyo.json', 'vendor/maplibre-gl-4.7.1', 'fonts'];
+const FILES = ['explorador.html', 'explorador.mjs', 'incendio4d.html', 'incendio4d.mjs', 'dana4d.html', 'dana4d.mjs', 'tren4d.html', 'tren4d.mjs', 'app-chrome.mjs', 'save-file.mjs', 'icon.svg', 'core', 'data/smv2026', 'data/dana2024', 'data/adamuz2026', 'data/radio/poyo.json', 'vendor/maplibre-gl-4.7.1', 'fonts'];
 rmSync(dst, { recursive: true, force: true }); mkdirSync(dst, { recursive: true });
 for (const f of FILES) { if (!existsSync(join(src, f))) throw new Error(`falta ${f}`); cpSync(join(src, f), join(dst, f), { recursive: true }); }
 rmSync(join(dst, 'core', 'defense'), { recursive: true, force: true }); // la bóveda de defensa no viaja con las superficies civiles
