@@ -101,7 +101,9 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
 .sheet2 h4{margin:14px 0 8px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
 .sheet2 .x{width:34px;height:34px;border-radius:50%;background:#eef0f3;font-size:16px}
 .ib{width:30px;height:30px;border-radius:50%;background:#eef0f3;color:#1a73e8;font-weight:800;font-size:15px}
-#layStyles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+#layStyles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 8px}.lay-note{font-size:12px;color:var(--muted);margin:8px 2px 0}
+#map.bw .maplibregl-canvas{filter:grayscale(1) contrast(1.06)}
+#mapLegend{position:absolute;left:10px;right:70px;bottom:calc(var(--bottomH,96px) + 90px);z-index:5;background:rgba(0,0,0,.65);color:#fff;border-radius:10px;padding:6px 10px;font-size:11px}#mapLegend i{display:block;height:8px;border-radius:4px;margin-bottom:4px}#mapLegend .lgl{display:flex;justify-content:space-between;margin-top:2px}#mapLegend em{font-style:normal}
 .lay-style{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600;background:none}
 .lay-style img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:3px solid transparent;background:#e5e7eb}
 .lay-style.on img{border-color:#1a73e8}.lay-style.on span{color:#1a73e8}
@@ -157,6 +159,7 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
 </style><script type="module" src="/senda/app-chrome.mjs"></script></head><body>
 <div id="app">
   <div id="map" aria-label="Mapa"></div>
+  <div id="mapLegend" hidden><i></i><span></span></div>
   <div id="radarWrap" hidden><div><canvas id="radar" width="720" height="720" aria-label="Radar de avisos alrededor"></canvas><p id="offmsg" style="opacity:.8;font-size:14px"></p></div></div>
 
   <div id="top">
@@ -217,7 +220,8 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
     <h3><span>Capas</span><span><button class="ib" data-info="capas" aria-label="Qué es">i</button> <button class="x" id="layClose" aria-label="Cerrar">✕</button></span></h3>
     <h4>Tipo de mapa</h4><div id="layStyles"></div>
     <h4>Detalles del mapa</h4><div id="layDetails"></div>
-    <h4>Vista</h4><div class="lay-view"><button id="lay3d">3D inclinado</button><button id="layNorth">Norte arriba</button></div>
+    <p id="layNote" class="lay-note"></p>
+    <h4>Vista</h4><div class="lay-view"><button id="lay3d">3D con relieve</button><button id="layBw">Blanco y negro</button><button id="layNorth">Norte arriba</button></div>
   </section>
   <section id="info" class="sheet2" role="dialog" aria-label="Qué es esto" hidden>
     <div class="grab"></div><div style="display:flex;justify-content:flex-end"><button class="x" id="infoClose" aria-label="Cerrar">✕</button></div>

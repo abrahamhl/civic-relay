@@ -27,7 +27,7 @@ import { b64, unb64 } from './core/b64.mjs';
 import { createBlackbox } from './core/blackbox.mjs';
 import { observe } from './core/hazard-belief.mjs';
 import { summarizeScan, radarPoints, drawSignalRadarPro, drawHistory, blipKey } from './core/signal-radar.mjs';
-import { MAP_STYLES, satelliteStyle, orthoCovers, circlePolygon } from './core/map-style.mjs';
+import { MAP_STYLES, styleFor, orthoCovers, circlePolygon, TERRAIN_SOURCE, legendCss } from './core/map-style.mjs';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -148,8 +148,12 @@ function drawMarkers() {
   if (!st.mapOk) return drawRadar();
   markers.forEach((m) => m.remove()); markers = [];
   const b = st.map.getBounds(), inView = (lon, lat) => b.contains([lon, lat]);
-  const L = mapDetails();
-  if (L.inc) for (const i of activeIncidents()) if (i.lat != null && inView(i.lon, i.lat)) {
+  const L = mapDetails(), z = st.map.getZoom();
+  // Con el mapa alejado solo lo grave (como las apps de mapas): evita cientos de iconos amontonados
+  const SEV = { ACCIDENTE: 4, CORTE: 4, PARADO: 3, ANIMAL: 3, PELIGRO: 3, TRAFICO: 2, OBRAS: 1, CLIMA: 1 };
+  const minSev = z >= 10 ? 0 : z >= 8 ? 3 : z >= 6 ? 4 : 99, maxInc = z >= 10 ? 400 : 60;
+  const incs = L.inc ? activeIncidents().filter((i) => i.lat != null && inView(i.lon, i.lat)).map((i) => ({ i, cat: i.type === 'BridgeOpening' ? 'CORTE' : fromDatex(i) })).filter((x) => (SEV[x.cat] ?? 1) >= minSev).sort((a, b) => (SEV[b.cat] ?? 1) - (SEV[a.cat] ?? 1)).slice(0, maxInc) : [];
+  for (const { i } of incs) {
     const cat = i.type === 'BridgeOpening' ? 'CORTE' : fromDatex(i);
     markers.push(marker(i.lon, i.lat, cat, `<b>${esc(i.type === 'BridgeOpening' ? 'Puente levadizo' : CATEGORIES[cat].label)}</b> · ${esc(i.road ?? '')}<br><small>${esc(i.type)} / ${esc(i.cause ?? '')}<br>${esc(activeIncSource())}</small>`));
   }
@@ -299,7 +303,6 @@ $('#sigScan')?.addEventListener('click', sigScan);
 setInterval(() => { if (bb && st.mode !== 'car' && !sig.open && Date.now() - sig.last > 29_000) { if (typeof window.SendaNative?.radioScan === 'function') { sig.last = Date.now(); window.SendaNative.radioScan(); } } }, 5000);
 
 // ── Capas y vistas del mapa (como en las apps de mapas conocidas): tipo, detalles y 3D ──
-function styleFor(id) { return id === 'satelite' ? satelliteStyle() : (MAP_STYLES[id]?.url ?? MAP_STYLES.mapa.url); }
 function mapDetails() { return { inc: true, radar: true, cams: true, senda: true, b3d: true, ...(LS.get('senda.map.details', {}) ?? {}) }; }
 function ensureMeLayers(map) {
   if (!map?.getSource || map.getSource('me-acc')) return;
@@ -307,25 +310,38 @@ function ensureMeLayers(map) {
   map.addLayer({ id: 'me-acc-fill', type: 'fill', source: 'me-acc', paint: { 'fill-color': '#1a73e8', 'fill-opacity': 0.14 } });
   map.addLayer({ id: 'me-acc-line', type: 'line', source: 'me-acc', paint: { 'line-color': '#1a73e8', 'line-opacity': 0.55, 'line-width': 1.2 } });
 }
+function applyTerrain() { // relieve 3D real (Terrain Tiles) cuando la vista 3D está activa
+  const m = st.map; if (!m?.getSource) return;
+  try {
+    if (st.view3d) { if (!m.getSource('terrain3d')) m.addSource('terrain3d', { ...TERRAIN_SOURCE }); m.setTerrain({ source: 'terrain3d', exaggeration: 1.2 }); } // ×1,2: elección de dibujo, declarada
+    else m.setTerrain(null);
+  } catch { /* sin relieve en este estilo */ }
+}
 function applyMapDetails() {
   const m = st.map; if (!m?.getLayer) return;
+  applyTerrain(); $('#map')?.classList.toggle('bw', !!LS.get('senda.map.bw', false));
+  const id = LS.get('senda.map.style', 'mapa'), leg = $('#mapLegend');
+  const lg = legendCss(id);
+  if (leg) { leg.hidden = !lg; if (lg) { leg.querySelector('i').style.background = lg.gradient; leg.querySelector('span').innerHTML = `<b>${lg.title}</b> · paleta oficial NASA${id === 'termico' ? ' · sin color = sin dato (nubes)' : ''}<span class="lgl">${lg.labels.map((x) => `<em>${x}</em>`).join('')}</span>`; } }
   try { if (m.getLayer('building-3d')) m.setLayoutProperty('building-3d', 'visibility', mapDetails().b3d ? 'visible' : 'none'); } catch { /* estilo sin edificios */ }
 }
 function setMapStyle(id) {
   LS.set('senda.map.style', id); st.map?.setStyle(styleFor(id), { diff: false }); renderLayers();
-  if (id === 'satelite') hint(st.pos && !orthoCovers(st.pos) ? 'Aquí no hay ortofoto oficial: solo de España (PNOA, IGN) y Países Bajos (PDOK).' : 'Satélite: ortofoto oficial (PNOA en España, PDOK en Países Bajos).');
+  if (id === 'satelite') hint(st.pos && !orthoCovers(st.pos) ? 'Aquí no hay ortofoto oficial: solo de España (PNOA, IGN) y Países Bajos (PDOK). Prueba «Satélite del día».' : 'Satélite: ortofoto oficial (PNOA en España, PDOK en Países Bajos).');
+  else if (MAP_STYLES[id]?.note) hint(`${MAP_STYLES[id].label}: ${MAP_STYLES[id].note}.`);
 }
 st.view3d = !!LS.get('senda.map.3d', false);
 function setView3d(on) {
   st.view3d = on; LS.set('senda.map.3d', on); renderLayers();
-  st.map?.easeTo({ pitch: on ? 60 : 0, bearing: on && st.heading ? st.heading : st.map.getBearing(), duration: 700 });
+  applyTerrain(); st.map?.easeTo({ pitch: on ? 60 : 0, bearing: on && st.heading ? st.heading : st.map.getBearing(), duration: 700 });
 }
 const DETAILS = [['inc', '🚧', 'Tráfico e incidencias'], ['radar', '📸', 'Radares fijos'], ['cams', '🎥', 'Cámaras DGT'], ['senda', '⚠️', 'Avisos SENDA'], ['b3d', '🏙️', 'Edificios 3D']];
 function renderLayers() {
   const cur = LS.get('senda.map.style', 'mapa'), d = mapDetails();
   $('#layStyles').innerHTML = Object.entries(MAP_STYLES).map(([id, v]) => `<button class="lay-style${id === cur ? ' on' : ''}" data-style="${id}"><img src="/senda/previews/map-${id}.webp" alt="" loading="lazy"><span>${v.label}</span></button>`).join('');
   $('#layDetails').innerHTML = DETAILS.map(([k, ic, lb]) => `<button class="lay-det${d[k] ? ' on' : ''}" data-det="${k}"><i>${ic}</i><span>${lb}</span></button>`).join('');
-  $('#lay3d').classList.toggle('on', st.view3d);
+  $('#lay3d').classList.toggle('on', st.view3d); $('#layBw')?.classList.toggle('on', !!LS.get('senda.map.bw', false));
+  const n = MAP_STYLES[cur]?.note; if ($('#layNote')) $('#layNote').textContent = n ?? 'Mapa de OpenStreetMap (OpenFreeMap).';
 }
 $('#layersBtn')?.addEventListener('click', () => { renderLayers(); $('#layers').hidden = false; });
 $('#layClose')?.addEventListener('click', () => { $('#layers').hidden = true; });
@@ -335,6 +351,7 @@ $('#layDetails')?.addEventListener('click', (e) => {
   const d = mapDetails(); d[b.dataset.det] = !d[b.dataset.det]; LS.set('senda.map.details', d); renderLayers(); applyMapDetails(); drawMarkers();
 });
 $('#lay3d')?.addEventListener('click', () => setView3d(!st.view3d));
+$('#layBw')?.addEventListener('click', () => { LS.set('senda.map.bw', !LS.get('senda.map.bw', false)); applyMapDetails(); renderLayers(); }); // los avisos siguen en color
 $('#layNorth')?.addEventListener('click', () => { st.map?.easeTo({ bearing: 0, pitch: 0, duration: 600 }); setView3d(false); });
 
 // ── Paneles: solo uno abierto a la vez y el botón «atrás» de Android los cierra (antes salía de la pantalla) ──
@@ -357,7 +374,7 @@ const INFO = {
   senales: { t: '📡 Señales a tu alrededor', what: 'Las redes Wi-Fi y los aparatos Bluetooth que tu móvil oye ahora mismo, como un radar. Sirve para ver dónde podría crecer la malla de SENDA sin operadoras.', see: ['Cuanto más cerca del centro, más fuerte se oye (medido).', 'Alrededor del círculo es solo dibujo: el móvil no sabe en qué dirección está cada aparato.', 'Naranja: otro móvil con SENDA cerca (también te avisa por voz).', 'Los puntos nuevos destellan al aparecer.'], values: ['Orientativo: −30 a −55 dBm = muy cerca · −55 a −67 = buena · −67 a −80 = débil · por debajo de −80 = casi al límite.', 'Calle con pisos: decenas de redes. Campo: casi ninguna.', 'Android solo deja ~4 barridos Wi-Fi cada 2 minutos: verás la antigüedad del dato.'], tip: 'Camina despacio por distintas calles y compara. Con la caja negra activa, se guarda cada 30 s (sin nombres ni direcciones).' },
   camara: { t: '🎥 Cámara con IA', what: 'La IA del móvil reconoce coches, camiones, motos, bicis, personas y semáforos en directo. Todo ocurre en tu móvil: la imagen no sale de él.', see: ['Recuadro verde = sin riesgo · ámbar = atención · rojo = se acerca deprisa por tu carril.', 'Las personas se tapan por privacidad.', 'Toca la miniatura para verla en grande.'], values: ['Analiza unas 4 veces por segundo. En un ordenador medimos ~74 ms por imagen; en tu móvil lo mide la caja negra.', 'La primera vez tarda unos segundos en cargar el modelo.'], tip: 'Para distancias en metros, mide la altura del soporte y ponla en Dashcam → «Montaje».' },
   cajanegra: { t: '⏺ Caja negra', what: 'Guarda lo que SENDA vio y decidió, segundo a segundo, para revisar el viaje después y mejorar la app.', see: ['Al empezar, Android te pide permiso para grabar la pantalla: acéptalo.', '«Marcar» señala un momento raro.', 'Al pararla se guardan: vídeo en Películas/SENDA y datos (.json y .jsonl) en Descargas/SENDA.'], values: ['Incluye tu recorrido GPS. No incluye imágenes de la cámara ni datos de otras personas.'], tip: 'Pásale los archivos a Abraham para analizarlos.' },
-  capas: { t: '🗺️ Capas del mapa', what: 'Elige cómo ves el mapa y qué se muestra encima.', see: ['Mapa, Claro, Noche: mapa de OpenStreetMap.', 'Satélite: ortofoto oficial de España (PNOA, IGN) y Países Bajos (PDOK). Fuera de esos países no hay.', 'Detalles: activa o quita incidencias, radares, cámaras, avisos y edificios 3D.', '3D: inclina el mapa y gira con tu rumbo, como al navegar.'], values: [], tip: 'Pellizca para hacer zoom; con dos dedos arriba/abajo inclinas el mapa.' },
+  capas: { t: '🗺️ Capas del mapa', what: 'Elige cómo ves el mapa y qué se muestra encima.', see: ['Mapa, Claro, Noche: OpenStreetMap.', 'Satélite: ortofoto oficial de España (PNOA, IGN) y Países Bajos (PDOK).', 'Satélite del día: NASA MODIS de ayer, todo el mundo, ~250 m por píxel (se ven nubes y humo).', 'Térmico: temperatura de la superficie de día (NASA MODIS); bajo las nubes no hay dato.', 'Nubes, Luces nocturnas, Relieve y Topográfico.', '3D: inclina el mapa con relieve real del terreno.', 'Blanco y negro: el mapa en grises; los avisos siguen en color.'], values: ['Las imágenes de NASA son de satélite: no se actualizan en tiempo real (una o dos pasadas al día).'], tip: 'Pellizca para hacer zoom; con dos dedos arriba/abajo inclinas el mapa.' },
 };
 function showInfo(key) {
   const i = INFO[key]; if (!i) return;
