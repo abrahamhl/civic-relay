@@ -117,6 +117,30 @@ Referencia para el motor de alerta temprana de SENDA. Entradas **obligatorias y 
 
 **Siguiente paso para uso operativo:** conectar lecturas en vivo (SAIH, AEMET) mediante convenio, calibrar la celeridad por tramo con avenidas históricas y validar el motor en modo ciego (sin ver el resultado) con eventos no usados para calibrar.
 
+## 5 bis. Cuando no hay dato: estimación con métodos publicados · `hydro-estimates.mjs`
+
+Si falta una medida, SENDA no la inventa ni deja el hueco vacío: calcula **varios métodos publicados a la vez**, cada uno con su fuente y su ámbito de validez, y muestra la **horquilla** entre ellos. Jerarquía (`pickBest`): **dato medido de la red del organismo** > dato observado publicado > estimación.
+
+| Método | Fórmula | Fuente | Ámbito |
+|---|---|---|---|
+| Témez | tc = 0,3·Lc^0,76·Jc^−0,19 (h; km) | Norma 5.2-IC, Orden FOM/298/2016, apdo. 2.2.2.5 (BOE-A-2016-2405), comprobada en el BOE | cuencas principales, tc > 0,25 h |
+| Kirpich | tc = 0,0195·L^0,77·S^−0,385 (min; m) | Kirpich (1940); forma SI del manual de hidrología de TxDOT | cuencas agrícolas pequeñas |
+| Velocidad observada | dato de un episodio | p. ej. 14 m/s del CEDEX por Chiva (preliminar, vía Roldán 2025) | ese episodio; extenderlo a todo el tramo es una suposición |
+
+Resultado en el Poyo (Chiva → mar, 41 km): Témez 0,9 m/s (785 min), Kirpich 1,4 m/s (480 min), CEDEX 14 m/s (49 min). **No se contradicen**: las fórmulas dan el tiempo de concentración (respuesta media de la cuenca a la lluvia) y el CEDEX, la velocidad en la punta de una crecida ya formada. La interfaz lo explica y recomienda el dato observado para una crecida en marcha.
+
+## 5 ter. Conectores: la red del organismo dentro de SENDA · `data-connectors.mjs`
+
+| Red | Estado hoy |
+|---|---|
+| Fichero propio (CSV/JSON) de aforos, pluviómetros, niveles | **importable** |
+| Malla SENDA (móviles y sensores en campo) | **importable** |
+| Copernicus EMS, Sentinel-2, NASA GIBS | **conectado** |
+| AEMET OpenData | requiere clave (gratuita; se guarda en el entorno) |
+| SAIH de las confederaciones, DGT 3.0 | requiere convenio |
+
+Validación de lo importado: hora **con zona horaria obligatoria** (una hora ambigua puede mover una alerta 1–2 h), unidades fijas por tipo, valores imposibles rechazados con su línea, orden temporal estricto, fuente obligatoria y huella SHA-256. El dato **no sale del dispositivo** y, en cuanto existe, sustituye a la estimación en el contador de caudal («tu red»). En el escritorio PRO entra en el paquete exportado con su huella.
+
 ## 6. Precisión: qué se puede prometer
 
 - **No hay precisión milimétrica** con estos datos, y SENDA no la afirma. Las mallas de trabajo son de 29,5 m (DANA) y 100 m (incendio); los satélites usados resuelven 10–20 m (Sentinel-2) o ≈ 25 km (previsión GFS).
@@ -140,7 +164,7 @@ Referencia para el motor de alerta temprana de SENDA. Entradas **obligatorias y 
 ## 9. Reproducibilidad
 
 ```bash
-node --test packages/senda/tests/*.test.mjs        # núcleo (incluye flood-science, flood-warning, fire-science)
+node --test packages/senda/tests/*.test.mjs        # núcleo (incluye flood-science, flood-warning, hydro-connectors, fire-science)
 (cd investor-next && node --test tests/*.test.mjs)  # web
 node scripts/prove.mjs                              # afirmaciones públicas
 node packages/senda/scripts/dana-hand.mjs           # regenera hidrología y calibración de la DANA
@@ -154,6 +178,7 @@ Cada paquete exportado desde el escritorio PRO lleva la huella SHA-256 de las ca
 |---|---|---|
 | 2026-11-25 16:04 | Laboratorio científico del Incendio 4D | 3d5eb8d (PR #93) |
 | 2026-11-25 16:23 | DANA 4D: hidrología, calibración CSI y cuencas | 6a4f59f (PR #94) |
-| 2026-11-25 | Línea del tiempo, telemetría con fuentes, motor `flood-warning`, modo PRO de exportación, pestaña de simuladores en el escritorio y este dossier | esta PR |
+| 2026-11-25 16:44 | Línea del tiempo, telemetría con fuentes, motor `flood-warning`, modo PRO de exportación, pestaña de simuladores en el escritorio y este dossier | 9d4313f (PR #95) |
+| 2026-11-25 | Estimaciones con métodos publicados cuando falta el dato (Témez, Kirpich, observado) y conectores para la red del organismo | esta PR |
 
 *Firmado: asistente de ingeniería de SENDA (Claude), para revisión del fundador.*

@@ -1,7 +1,7 @@
 {
  "caso": "DANA de Valencia, 29-10-2024 · l'Horta Sud",
  "basis": "MODEL_CALIBRATED_AGAINST_OBSERVED",
- "generadoUTC": "2026-11-25T16:10:47Z",
+ "generadoUTC": "2026-11-25T16:47:50Z",
  "metodo": {
   "relleno": "Priority-Flood+ε (Barnes, Lehman y Mulla 2014)",
   "direccion": "D8 (O’Callaghan y Mark 1984)",
@@ -1272,5 +1272,13 @@
   "licenciaRelieve": "Terrain Tiles (AWS Open Data); atribuciones en https://github.com/tilezen/joerd/blob/master/docs/attribution.md",
   "mancha": "Copernicus EMS Rapid Mapping EMSR773"
  },
- "cita": "Contains modified Copernicus Emergency Management Service information 2024"
+ "cita": "Contains modified Copernicus Emergency Management Service information 2024",
+ "relieveD4": {
+  "fichero": "dem_d4.bin",
+  "factor": 4,
+  "w": 576,
+  "h": 384,
+  "unidad": "m (Int16; −32768 = sin dato)",
+  "celdaM": 118.1
+ }
 }
