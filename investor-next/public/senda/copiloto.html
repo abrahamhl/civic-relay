@@ -54,24 +54,27 @@ html.in-app .ios-header{top:48px}
   max-width:680px;margin:0 auto;
   display:flex;align-items:center;justify-content:space-between;gap:10px;
 }
-.title-stack{min-width:0}
-.title-stack h1{margin:0;font-size:24px;line-height:1.1;font-weight:700;letter-spacing:-.025em}
+.title-stack{min-width:0;flex:1}
+.title-stack h1{margin:0;font-size:23px;line-height:1.1;font-weight:700;letter-spacing:-.025em}
 .subline{
-  display:flex;align-items:center;gap:6px;margin-top:3px;
+  display:flex;align-items:center;gap:5px;margin-top:3px;
   font-size:12px;color:var(--l2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .sub-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);flex:none}
 .sub-dot.real{background:var(--green)}
-.hdr-acts{display:flex;align-items:center;gap:8px;flex:none}
+.hdr-acts{display:flex;align-items:center;gap:6px;flex:none}
 .icon-btn{
-  height:36px;min-width:36px;padding:0 11px;border-radius:999px;
-  background:var(--g1);color:var(--l1);font-size:13px;font-weight:600;
-  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  height:34px;min-width:34px;padding:0 10px;border-radius:999px;
+  background:var(--g1);color:var(--l1);font-size:12.5px;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;
   transition:transform .12s,background .15s;
 }
 .icon-btn:active{transform:scale(.95)}
 .icon-btn.on{background:rgba(48,209,88,.22);color:var(--green)}
 .icon-btn.sos{background:rgba(255,69,58,.22);color:#ff6961;font-weight:700}
+.qr-inline{background:#fff;border-radius:14px;padding:10px;margin:10px auto 0;max-width:210px}
+.qr-inline[hidden]{display:none}
+.qr-inline svg{width:100%;height:auto;display:block}
 
 /* Contenedor Mobile-First (fluido en móvil, centrado y ergonómico en tablet/PC) */
 .shell{
@@ -463,9 +466,11 @@ nav.tabs svg{width:24px;height:24px}
       <div class="compose-msg" id="composeIndirectText"></div>
       <div class="btn-row">
         <button class="pill-btn pri" id="shareIndirectBtn">Compartir (WhatsApp / SMS)</button>
+        <button class="pill-btn" id="qrIndirectBtn">Mostrar QR sin red</button>
         <button class="pill-btn" id="copyIndirectBtn">Copiar texto</button>
         <button class="pill-btn ok" id="speakIndirectBtn">Leer en voz</button>
       </div>
+      <div class="qr-inline" id="composeQrBox" hidden aria-label="Código QR local sin red para compartir el aviso"></div>
     </article>
 
     <div class="sec-label">Avisos de alrededor · Confirma para calibrar confianza</div>

@@ -178,7 +178,7 @@ test('Copiloto 5D Apple HIG Mobile-First (390x844): 4 pestañas, entorno directo
       };
     })()`);
 
-    assert.equal(mobileHome.modePill, 'Simulación declarada');
+    assert.equal(mobileHome.modePill, 'Simulación');
     assert.match(mobileHome.aaPill, /Auto activo/);
     assert.match(mobileHome.bannerTitle, /deslizar sobre el agua/i);
     assert.ok(mobileHome.overflowX <= 2, `sin desbordamiento horizontal 390px (${mobileHome.overflowX})`);
@@ -186,28 +186,39 @@ test('Copiloto 5D Apple HIG Mobile-First (390x844): 4 pestañas, entorno directo
     assert.ok(mobileHome.hNonZero > 4000, 'horizonte predictivo renderizado');
     assert.ok(['VERDE', 'AMBAR', 'ROJO'].includes(mobileHome.lastAa.status));
 
-    // 2. Pestaña Entorno: comunicación directa (BLE DENM 36 B) + indirecta (sin app) + votación bayesiana
-    const envRes = await cdp.evalJs(`(() => {
+    // 2. Pestaña Entorno: comunicación directa (BLE DENM 36 B TX+RX) + indirecta (sin app + QR offline) + votación bayesiana
+    const envRes = await cdp.evalJs(`(async () => {
       window.sendaCopilot.setTab('entorno');
       window.sendaCopilot.sendQuickSignal('agua');
+      const sentB64 = window.__bleSent[0];
+      const qrOk = await window.sendaCopilot.showOfflineQr();
+      const hasQrSvg = Boolean(document.querySelector('#composeQrBox svg'));
+      // Simular recepción BLE real de otro móvil SENDA cercano (paquete DENM 36 B)
+      window.sendaP2P({ event: 'received', b64: sentB64 });
       const voteBtn = document.querySelector('[data-vote="conf"]');
       if (voteBtn) voteBtn.click();
       return {
         bleSentCount: window.__bleSent.length,
+        qrOk,
+        hasQrSvg,
         composeVisible: !document.getElementById('composeBox').hidden,
         indirectText: document.getElementById('composeIndirectText').textContent,
+        feedText: document.getElementById('communityFeed').textContent,
         directPeers: document.getElementById('dirPeersTitle').textContent,
         indirectDensity: document.getElementById('indDensityTitle').textContent,
         overflowX: document.documentElement.scrollWidth - window.innerWidth,
       };
     })()`);
     assert.equal(envRes.bleSentCount, 1, 'envía paquete directo C-ITS DENM 36 B por SendaNative.p2pSend');
+    assert.equal(envRes.qrOk, true, 'genera código QR 100 % offline con qrcode-generator local');
+    assert.equal(envRes.hasQrSvg, true, 'inyecta SVG del QR en #composeQrBox');
     assert.equal(envRes.composeVisible, true);
     assert.match(envRes.indirectText, /Agua \/ Balsa/);
     assert.match(envRes.indirectText, /112/);
+    assert.match(envRes.feedText, /Recibido por Bluetooth/i, 'decodifica paquete C-ITS DENM entrante en window.sendaP2P');
     assert.ok(envRes.overflowX <= 2, `sin desbordamiento en pestaña Entorno (${envRes.overflowX})`);
 
-    // 3. Pestaña Calibrar: marcas en 1 toque + exportación SHA-256 sin PII
+    // 3. Pestaña Calibrar: marcas en 1 toque + encuentro BLE registrado + persistencia local + exportación SHA-256 sin PII
     const calRes = await cdp.evalJs(`(async () => {
       window.sendaCopilot.setTab('calibrar');
       window.sendaCopilot.recordCalibration('alert_feedback', 'acierto');
@@ -215,14 +226,17 @@ test('Copiloto 5D Apple HIG Mobile-First (390x844): 4 pestañas, entorno directo
       window.sendaCopilot.recordCalibration('coverage_check', 'sin_red');
       window.sendaCopilot.recordCalibration('drive_mode_truth', 'en_coche');
       const pack = await window.sendaCopilot.exportCalibration();
+      const persisted = Boolean(localStorage.getItem('senda.copilot.cal.v1'));
       return {
         pack,
+        persisted,
         stageText: document.getElementById('calStageBadge').textContent,
         overflowX: document.documentElement.scrollWidth - window.innerWidth,
       };
     })()`);
     assert.equal(calRes.pack.schema, 'senda.community-calibration-pack/v1');
-    assert.equal(calRes.pack.totalMarks, 4);
+    assert.equal(calRes.pack.totalMarks, 5, '4 marcas manuales + 1 encuentro BLE recibido automáticamente');
+    assert.equal(calRes.persisted, true, 'calibración 0-PII persistida en localStorage');
     assert.match(calRes.pack.sha256, /^[a-f0-9]{64}$/);
     assert.equal(calRes.pack.lat, undefined);
     assert.ok(calRes.overflowX <= 2, `sin desbordamiento en pestaña Calibrar (${calRes.overflowX})`);
@@ -252,25 +266,58 @@ test('Copiloto 5D Apple HIG Mobile-First (390x844): 4 pestañas, entorno directo
     assert.match(physRes.debrief.sha256, /^[a-f0-9]{64}$/);
     assert.ok(physRes.overflowX <= 2);
 
-    // 5. Conducir: chip 1-toque a Copiloto 5D + publicación Android Auto en vivo
+    // 5. Conducir: chip 1-toque a Copiloto 5D, horizonte de curva OSRM en vivo, Android Auto y compartir sin app
     await cdp.send('Page.navigate', { url: `${baseUrl}/senda/conducir` });
     await cdp.waitFor('window.sendaDrive && document.getElementById("copilotChip")');
-    const driveCheck = await cdp.evalJs(`(() => {
+    const driveCheck = await cdp.evalJs(`(async () => {
       const chip = document.getElementById('copilotChip');
       window.__aaPayloads.length = 0;
+      // Polilínea OSRM sintética con curva cerrada de ~60 m de radio 160 m por delante
+      const coords = [];
+      for (let i = 0; i <= 16; i++) coords.push([-3.7038, 40.4168 + i * 0.0001]);
+      for (let a = 1; a <= 12; a++) {
+        const ang = (a / 12) * (Math.PI / 2);
+        const cx = -3.7038 + 0.00072, cy = 40.4168 + 0.0016;
+        coords.push([cx - Math.cos(ang) * 0.00072, cy + Math.sin(ang) * 0.00054]);
+      }
+      window.sendaDrive.st.route = { ok: true, coords, distanceM: 320, durationS: 20, steps: [{ text: 'Sigue recto', distanceM: 250, at: coords[16], type: 'continue' }] };
       window.sendaDrive.onPos({
-        coords: { latitude: 40.4168, longitude: -3.7038, accuracy: 6, speed: 25, heading: 90, altitude: 650 },
+        coords: { latitude: 40.4168, longitude: -3.7038, accuracy: 6, speed: 28, heading: 0, altitude: 650 },
         timestamp: Date.now(),
       });
+      const shared = await window.sendaDrive.shareIndirectDrive();
       return {
         chipHref: chip ? chip.getAttribute('href') : null,
+        curveVisible: !document.getElementById('curveAlert').hidden,
+        curveTitle: document.getElementById('cuTitle').textContent,
+        curveLim: document.getElementById('cuLim').textContent,
+        shareText: shared?.indirect?.shareText ?? '',
         aaCount: window.__aaPayloads.length,
         lastAa: window.__aaPayloads[window.__aaPayloads.length - 1] ?? null,
       };
     })()`);
     assert.equal(driveCheck.chipHref, '/senda/copiloto');
+    assert.equal(driveCheck.curveVisible, true, 'muestra alerta de horizonte de curva en vivo sobre ruta OSRM');
+    assert.match(driveCheck.curveTitle, /Curva/i);
+    assert.ok(Number(driveCheck.curveLim) > 20 && Number(driveCheck.curveLim) < 95);
+    assert.match(driveCheck.shareText, /SENDA/);
     assert.ok(driveCheck.aaCount >= 1);
-    assert.equal(driveCheck.lastAa.speedKmh, 90);
+    assert.ok(driveCheck.lastAa.rows.some((r) => /Curva/i.test(r)), 'incluye curva próxima en el payload Android Auto');
+
+    // 6. Reportar ciudadano (Apple HIG Dark móvil 390x844, 0 errores, 0 desbordamiento)
+    await cdp.send('Page.navigate', { url: `${baseUrl}/senda/reportar` });
+    await cdp.waitFor('document.getElementById("btn-send") && document.querySelectorAll("#kinds button").length >= 4');
+    const reportCheck = await cdp.evalJs(`(() => ({
+      title: document.title,
+      kindCount: document.querySelectorAll('#kinds button').length,
+      has112: Boolean(document.querySelector('a[href="tel:112"]')),
+      hasCopilotLink: Boolean(document.querySelector('a[href="/senda/copiloto"]')),
+      overflowX: document.documentElement.scrollWidth - window.innerWidth,
+    }))()`);
+    assert.ok(reportCheck.kindCount >= 4);
+    assert.equal(reportCheck.has112, true);
+    assert.equal(reportCheck.hasCopilotLink, true);
+    assert.ok(reportCheck.overflowX <= 2, `sin desbordamiento en /senda/reportar (${reportCheck.overflowX})`);
 
     assert.deepEqual(failedLocal, [], `activos locales con error HTTP: ${failedLocal.join(', ')}`);
     assert.deepEqual(errors, [], `errores de consola/JS: ${errors.join(' | ')}`);

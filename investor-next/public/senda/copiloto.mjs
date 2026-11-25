@@ -18,6 +18,11 @@ import {
 } from './core/drive-community-calibration.mjs';
 import { createGnssImuEkf } from './core/drive-kalman-fusion.mjs';
 import { EXAMPLE_LWR_HIGHWAY } from './core/traffic-shockwave.mjs';
+import { decodeDenmCompact, denmToSenda, isDenmCompact, isInsideDenmRelevance } from './core/cits-denm.mjs';
+import { unb64 } from './core/b64.mjs';
+
+const CAL_STORAGE_KEY = 'senda.copilot.cal.v1';
+const KIND_TO_SIGNAL = { retencion: 'retencion', inundacion: 'agua', niebla: 'niebla', obstaculo: 'obstaculo', parado: 'parado', accidente: 'ayuda' };
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -151,11 +156,11 @@ function applyScenarioDefaults(sc) {
   const pill = $('#modePill');
   const dot = $('#modeDot');
   if (sc === 'real') {
-    pill.textContent = 'Sensores reales';
+    pill.textContent = 'GPS real';
     dot.className = 'sub-dot real';
     startRealSensors();
   } else {
-    pill.textContent = 'Simulación declarada';
+    pill.textContent = 'Simulación';
     dot.className = 'sub-dot';
     stopRealSensors();
   }
@@ -246,11 +251,39 @@ window.sendaRadio = (scan) => {
   const bleBestDbm = bleList.length ? Math.max(...bleList.map((b) => b.rssi ?? -95)) : null;
   state.radioScan = { wifiN: wifiList.length, bleN: bleList.length, sendaNear, bleBestDbm };
   if (sendaNear > 0) {
-    state.calibration.recordGroundTruth({ category: 'ble_encounter', value: 'ok', context: { rssiDbm: bleBestDbm } });
-    renderCalibration();
+    recordCalibration('ble_encounter', 'ok', { rssiDbm: bleBestDbm });
   }
   tick();
   showToast(`Entorno actualizado · ${wifiList.length} Wi-Fi · ${bleList.length} BLE (0 PII)`);
+};
+
+// Recepción directa bidireccional BLE de otros móviles SENDA (paquetes C-ITS DENM 36 B)
+window.sendaP2P = (ev) => {
+  if (!ev || ev.event !== 'received' || !ev.b64) return;
+  try {
+    const bytes = unb64(ev.b64);
+    if (!isDenmCompact(bytes)) return;
+    const denm = decodeDenmCompact(bytes);
+    const rep = denmToSenda(denm);
+    const curPos = state.real.pos ? [state.real.pos.lon, state.real.pos.lat] : null;
+    if (curPos) {
+      const rel = isInsideDenmRelevance(denm, curPos, Date.now());
+      if (!rel.relevant) return;
+    }
+    const signalId = KIND_TO_SIGNAL[rep.kind] ?? 'obstaculo';
+    const msg = composeProximityMessage({
+      signalId,
+      pos: { lat: rep.lat, lon: rep.lon },
+      roadHint: 'recibido por Bluetooth cercano',
+      nowMs: rep.t || Date.now(),
+    });
+    state.communityFeed.unshift(msg.communityEntry);
+    if (state.communityFeed.length > 8) state.communityFeed.pop();
+    renderCommunityFeed();
+    recordCalibration('ble_encounter', 'ok', { rssiDbm: ev.rssi ?? -72 });
+    if (state.voiceOn) speak(`Aviso recibido de otro coche SENDA: ${msg.spec.label}`);
+    showToast(`📡 Recibido de otro SENDA: ${msg.spec.label} (36 B)`);
+  } catch { /* paquete no válido o corrupto */ }
 };
 
 function buildTickInputs(nowMs) {
@@ -649,6 +682,7 @@ function sendQuickSignal(signalId) {
   renderCommunityFeed();
 
   $('#composeBox').hidden = false;
+  $('#composeQrBox').hidden = true;
   $('#composeTitle').textContent = `Aviso: ${composed.spec.label}`;
   $('#composeBadge').textContent = sentBle ? 'Enviado BLE 36 B' : `${composed.direct.byteLength || 0} B listo`;
   $('#composeDirectHint').textContent = sentBle
@@ -663,7 +697,26 @@ function sendQuickSignal(signalId) {
   return composed;
 }
 
-/* ───────────── Renderizado de Calibración en 1 toque ───────────── */
+/* ───────────── Renderizado y persistencia 0 PII de Calibración en 1 toque ───────────── */
+
+function saveCalibrationLocal() {
+  try {
+    localStorage.setItem(CAL_STORAGE_KEY, JSON.stringify(state.calibration.getEntries().slice(-300)));
+  } catch { /* modo privado */ }
+}
+
+function loadCalibrationLocal() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(CAL_STORAGE_KEY) || '[]');
+    if (Array.isArray(saved)) {
+      for (const e of saved) {
+        if (e?.category && e?.value) {
+          try { state.calibration.recordGroundTruth({ category: e.category, value: e.value, context: e.ctx || {}, nowMs: e.t || Date.now() }); } catch { /* ignorar obsoleta */ }
+        }
+      }
+    }
+  } catch { /* sin almacenamiento */ }
+}
 
 function renderCalibration() {
   const rep = state.calibration.getReadinessReport();
@@ -677,7 +730,7 @@ function renderCalibration() {
   $('#calStageBadge').textContent = stLbl;
   $('#calStageBadge').className = `soft-badge ${stCls}`;
   $('#calStageNote').textContent = rep.totalMarks > 0
-    ? `${rep.totalMarks} validaciones recogidas en esta sesión · 0 PII · ayudan a ajustar SENDA en carretera real`
+    ? `${rep.totalMarks} validaciones acumuladas en tu móvil · 0 PII · calibran SENDA en carretera real`
     : 'Sin marcas aún · cada toque ayuda a calibrar SENDA mientras crece la malla';
   $('#calPrecBadge').textContent = rep.precisionPct != null ? `${rep.precisionPct} % aciertos` : 'Sin datos';
 
@@ -689,14 +742,16 @@ function renderCalibration() {
     </div>`).join('');
 }
 
-function recordCalibration(category, value) {
+function recordCalibration(category, value, extraCtx = {}) {
   const ctx = {
     speedKmh: state.lastRes?.grip?.speedKmh ?? null,
     effectiveMu: state.lastRes?.grip?.effectiveMu ?? null,
     sigmaPosM: state.lastEkfView?.sigmaM ?? null,
     rssiDbm: state.radioScan?.bleBestDbm ?? null,
+    ...extraCtx,
   };
   const rep = state.calibration.recordGroundTruth({ category, value, context: ctx });
+  saveCalibrationLocal();
   renderCalibration();
   showToast(`Calibración guardada (${rep.totalMarks} marcas · 0 PII)`);
   return rep;
@@ -899,6 +954,36 @@ $('#shareIndirectBtn').addEventListener('click', async () => {
     showToast('Copia el recuadro de aviso para compartirlo');
   }
 });
+let qrLoader = null;
+function loadQrLib() {
+  if (window.qrcode) return Promise.resolve();
+  qrLoader ??= new Promise((ok, ko) => {
+    const s = document.createElement('script');
+    s.src = '/senda/vendor/qrcode-generator-1.4.4.js';
+    s.onload = ok;
+    s.onerror = () => ko(new Error('No se pudo cargar generador QR local'));
+    document.head.appendChild(s);
+  });
+  return qrLoader;
+}
+
+async function showOfflineQr() {
+  if (!state.lastComposed) return false;
+  const box = $('#composeQrBox');
+  if (!box.hidden) { box.hidden = true; return false; }
+  await loadQrLib();
+  const qr = window.qrcode(0, 'L');
+  qr.addData(state.lastComposed.indirect.shareText);
+  qr.make();
+  box.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 3, scalable: true });
+  box.hidden = false;
+  showToast('QR local generado sin Internet');
+  return true;
+}
+
+$('#qrIndirectBtn').addEventListener('click', () => {
+  showOfflineQr().catch(() => showToast('QR no disponible en este entorno'));
+});
 $('#copyIndirectBtn').addEventListener('click', async () => {
   if (!state.lastComposed) return;
   try {
@@ -917,6 +1002,7 @@ $('#copyDebriefBtn').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(state.lastDebriefJson); showToast('Debriefing JSON copiado'); } catch { /* */ }
 });
 
+loadCalibrationLocal();
 applyScenarioDefaults('rain_curve');
 renderCalibration();
 tick();
@@ -929,6 +1015,7 @@ globalThis.sendaCopilot = {
   openSheet,
   applyScenarioDefaults,
   sendQuickSignal,
+  showOfflineQr,
   recordCalibration,
   exportCalibration,
   sealDebrief,

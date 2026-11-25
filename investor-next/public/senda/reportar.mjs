@@ -80,9 +80,9 @@ async function initKeys() {
 function updateNetStatus() {
   const el = $('#net-status');
   if (navigator.onLine) {
-    el.innerHTML = '<i class="sq real"></i>Con red (envío directo y cola automática)';
+    el.innerHTML = '<i class="sq real"></i>Con red · cola automática';
   } else {
-    el.innerHTML = '<i class="sq sim"></i>Sin red (guarda firmado en cola local)';
+    el.innerHTML = '<i class="sq sim"></i>Sin red · cola local firmada';
   }
 }
 
@@ -428,14 +428,22 @@ $('#btn-send').onclick = async () => {
   saveOutbox();
   renderOutbox();
 
+  const shareSummary = `⚠️ Aviso SENDA (${CITIZEN_HAZARD_TYPES[state.kind]?.label ?? state.kind}, ${envelope.operationalStatus}): ${envelope.payload.text || 'Peligro reportado en zona'} · Ubicación ${geoUri}. Si hay riesgo vital llama al 112.`;
   const out = $('#send-result');
   out.hidden = false;
   out.innerHTML = `
     <div><span class="truth"><i class="sq ${entry.uploaded ? 'real' : 'sim'}"></i>${entry.uploaded ? `Recibido por servidor local (nivel ${esc(entry.serverLevel)})` : 'Guardado y firmado en cola local sin red'}</span></div>
     <p class="explain">ID: <span class="mono">${esc(envelope.reportId)}</span> · Seudónimo: <span class="mono">${esc(envelope.signature.pseudonymId)}</span> · Modo: <span class="mono">${esc(envelope.operationalStatus)}</span> · <strong>canPublicWarn: false</strong></p>
+    <div class="row" style="margin-top:8px">
+      <button type="button" id="btn-share-nearby" style="flex:1;background:var(--blue);color:#fff;text-align:center">Compartir con vecinos / conductores (sin app)</button>
+    </div>
     <p class="explain">Línea compacta SMS/satélite (160 car.) y URI <span class="mono">${esc(geoUri)}</span> (${qrChunks.length} código/s QR):</p>
     <pre>${esc(snd3)}</pre>
   `;
+  $('#btn-share-nearby').onclick = async () => {
+    try { if (navigator.share) { await navigator.share({ title: 'Aviso SENDA', text: shareSummary }); return; } } catch { /* cancelado */ }
+    try { await navigator.clipboard.writeText(shareSummary); $('#btn-share-nearby').textContent = '✓ Copiado para WhatsApp / SMS'; } catch { /* */ }
+  };
 };
 
 $('#btn-flush').onclick = flushOutbox;
