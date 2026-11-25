@@ -1,0 +1,1276 @@
+{
+ "caso": "DANA de Valencia, 29-10-2024 · l'Horta Sud",
+ "basis": "MODEL_CALIBRATED_AGAINST_OBSERVED",
+ "generadoUTC": "2026-11-25T16:10:47Z",
+ "metodo": {
+  "relleno": "Priority-Flood+ε (Barnes, Lehman y Mulla 2014)",
+  "direccion": "D8 (O’Callaghan y Mark 1984)",
+  "hand": "Height Above Nearest Drainage (Rennó et al. 2008; Nobre et al. 2011, 2016)",
+  "acuerdo": "CSI = A/(A+B+C) (Bates y De Roo 2000)",
+  "limites": [
+   "Relieve de Terrain Tiles (≈ 30 m), sin diques, puentes, colectores ni edificios.",
+   "HAND es estático: ordena qué se inunda antes, no da calados ni horas.",
+   "El nivel se CALIBRA con la mancha observada: no es una predicción hecha antes del suceso.",
+   "La mancha de Copernicus es del 31-10-2024 10:22 UTC, unas 44 h después del inicio: parte del agua ya se había retirado.",
+   "ROI = rectángulo que envuelve la mancha de AOI03 (el perímetro exacto del área cartografiada no está en el repo).",
+   "El Turia y otros ríos que entran por el borde oeste llegan sin su cuenca de aguas arriba."
+  ]
+ },
+ "malla": {
+  "z": 12,
+  "x0": 2036,
+  "y0": 1556,
+  "size": 256,
+  "w": 2304,
+  "h": 1536,
+  "celdaM": 29.52,
+  "bbox": [
+   -1,
+   39.25,
+   -0.3,
+   39.6
+  ],
+  "esquinas": [
+   [
+    -1.054688,
+    39.639538
+   ],
+   [
+    -0.263672,
+    39.639538
+   ],
+   [
+    -0.263672,
+    39.232253
+   ],
+   [
+    -1.054688,
+    39.232253
+   ]
+  ]
+ },
+ "roi": {
+  "px": [
+   1341,
+   499
+  ],
+  "w": 630,
+  "h": 608,
+  "bbox": [
+   -0.59422,
+   39.34626,
+   -0.37816,
+   39.50727
+  ],
+  "esquinas": [
+   [
+    -0.594292,
+    39.507484
+   ],
+   [
+    -0.377998,
+    39.507484
+   ],
+   [
+    -0.377998,
+    39.346246
+   ],
+   [
+    -0.594292,
+    39.346246
+   ]
+  ],
+  "handEscala": "valor/4 = metros; 255 = sin dato o mar"
+ },
+ "observado": {
+  "fuente": "Copernicus EMS Rapid Mapping EMSR773 AOI03 (Horta Sud), observedEventA",
+  "imagen": "2024-10-31T10:22:00",
+  "km2Oficial": 24.07,
+  "celdas": 27783
+ },
+ "cauceKm2": 25,
+ "cauceDibujoKm2": 5,
+ "calibracion": [
+  {
+   "streamKm2": 1,
+   "streamCells": 1147,
+   "best": {
+    "level": 3,
+    "hits": 15700,
+    "falseAlarms": 95877,
+    "misses": 12083,
+    "cells": 383040,
+    "csi": 0.12696102215752872,
+    "hitRate": 0.565093762372674,
+    "falseAlarmRatio": 0.8592899970424012
+   },
+   "rows": [
+    {
+     "level": 0,
+     "csi": 0.087,
+     "hitRate": 0.1534,
+     "falseAlarmRatio": 0.8326
+    },
+    {
+     "level": 0.5,
+     "csi": 0.1056,
+     "hitRate": 0.2268,
+     "falseAlarmRatio": 0.8351
+    },
+    {
+     "level": 1,
+     "csi": 0.1178,
+     "hitRate": 0.3069,
+     "falseAlarmRatio": 0.8396
+    },
+    {
+     "level": 1.5,
+     "csi": 0.1237,
+     "hitRate": 0.3795,
+     "falseAlarmRatio": 0.8449
+    },
+    {
+     "level": 2,
+     "csi": 0.1267,
+     "hitRate": 0.4474,
+     "falseAlarmRatio": 0.8498
+    },
+    {
+     "level": 2.5,
+     "csi": 0.1267,
+     "hitRate": 0.5063,
+     "falseAlarmRatio": 0.8555
+    },
+    {
+     "level": 3,
+     "csi": 0.127,
+     "hitRate": 0.5651,
+     "falseAlarmRatio": 0.8593
+    },
+    {
+     "level": 3.5,
+     "csi": 0.126,
+     "hitRate": 0.616,
+     "falseAlarmRatio": 0.8632
+    },
+    {
+     "level": 4,
+     "csi": 0.1255,
+     "hitRate": 0.6627,
+     "falseAlarmRatio": 0.8659
+    },
+    {
+     "level": 4.5,
+     "csi": 0.1243,
+     "hitRate": 0.7027,
+     "falseAlarmRatio": 0.8688
+    },
+    {
+     "level": 5,
+     "csi": 0.1227,
+     "hitRate": 0.7381,
+     "falseAlarmRatio": 0.8717
+    },
+    {
+     "level": 5.5,
+     "csi": 0.1216,
+     "hitRate": 0.773,
+     "falseAlarmRatio": 0.8739
+    },
+    {
+     "level": 6,
+     "csi": 0.12,
+     "hitRate": 0.8017,
+     "falseAlarmRatio": 0.8763
+    },
+    {
+     "level": 6.5,
+     "csi": 0.1183,
+     "hitRate": 0.8281,
+     "falseAlarmRatio": 0.8787
+    },
+    {
+     "level": 7,
+     "csi": 0.1168,
+     "hitRate": 0.8526,
+     "falseAlarmRatio": 0.8808
+    },
+    {
+     "level": 7.5,
+     "csi": 0.1153,
+     "hitRate": 0.8742,
+     "falseAlarmRatio": 0.8828
+    },
+    {
+     "level": 8,
+     "csi": 0.114,
+     "hitRate": 0.8935,
+     "falseAlarmRatio": 0.8845
+    },
+    {
+     "level": 8.5,
+     "csi": 0.1127,
+     "hitRate": 0.9101,
+     "falseAlarmRatio": 0.886
+    },
+    {
+     "level": 9,
+     "csi": 0.1114,
+     "hitRate": 0.9241,
+     "falseAlarmRatio": 0.8876
+    },
+    {
+     "level": 9.5,
+     "csi": 0.11,
+     "hitRate": 0.9362,
+     "falseAlarmRatio": 0.8892
+    },
+    {
+     "level": 10,
+     "csi": 0.109,
+     "hitRate": 0.9491,
+     "falseAlarmRatio": 0.8904
+    },
+    {
+     "level": 10.5,
+     "csi": 0.1078,
+     "hitRate": 0.9579,
+     "falseAlarmRatio": 0.8917
+    },
+    {
+     "level": 11,
+     "csi": 0.1065,
+     "hitRate": 0.9647,
+     "falseAlarmRatio": 0.8931
+    },
+    {
+     "level": 11.5,
+     "csi": 0.1051,
+     "hitRate": 0.9696,
+     "falseAlarmRatio": 0.8945
+    },
+    {
+     "level": 12,
+     "csi": 0.1039,
+     "hitRate": 0.9736,
+     "falseAlarmRatio": 0.8958
+    },
+    {
+     "level": 12.5,
+     "csi": 0.1026,
+     "hitRate": 0.9758,
+     "falseAlarmRatio": 0.8971
+    },
+    {
+     "level": 13,
+     "csi": 0.1014,
+     "hitRate": 0.9777,
+     "falseAlarmRatio": 0.8984
+    },
+    {
+     "level": 13.5,
+     "csi": 0.1002,
+     "hitRate": 0.9792,
+     "falseAlarmRatio": 0.8996
+    },
+    {
+     "level": 14,
+     "csi": 0.0991,
+     "hitRate": 0.9804,
+     "falseAlarmRatio": 0.9007
+    },
+    {
+     "level": 14.5,
+     "csi": 0.0982,
+     "hitRate": 0.9823,
+     "falseAlarmRatio": 0.9016
+    },
+    {
+     "level": 15,
+     "csi": 0.0973,
+     "hitRate": 0.9836,
+     "falseAlarmRatio": 0.9026
+    },
+    {
+     "level": 15.5,
+     "csi": 0.0965,
+     "hitRate": 0.9852,
+     "falseAlarmRatio": 0.9033
+    },
+    {
+     "level": 16,
+     "csi": 0.0958,
+     "hitRate": 0.9866,
+     "falseAlarmRatio": 0.904
+    },
+    {
+     "level": 16.5,
+     "csi": 0.0952,
+     "hitRate": 0.9884,
+     "falseAlarmRatio": 0.9047
+    },
+    {
+     "level": 17,
+     "csi": 0.0946,
+     "hitRate": 0.9896,
+     "falseAlarmRatio": 0.9053
+    },
+    {
+     "level": 17.5,
+     "csi": 0.094,
+     "hitRate": 0.9905,
+     "falseAlarmRatio": 0.9059
+    },
+    {
+     "level": 18,
+     "csi": 0.0934,
+     "hitRate": 0.9915,
+     "falseAlarmRatio": 0.9065
+    },
+    {
+     "level": 18.5,
+     "csi": 0.0928,
+     "hitRate": 0.9919,
+     "falseAlarmRatio": 0.9071
+    },
+    {
+     "level": 19,
+     "csi": 0.0923,
+     "hitRate": 0.9925,
+     "falseAlarmRatio": 0.9076
+    },
+    {
+     "level": 19.5,
+     "csi": 0.0918,
+     "hitRate": 0.993,
+     "falseAlarmRatio": 0.9082
+    },
+    {
+     "level": 20,
+     "csi": 0.0913,
+     "hitRate": 0.9933,
+     "falseAlarmRatio": 0.9087
+    }
+   ]
+  },
+  {
+   "streamKm2": 5,
+   "streamCells": 5737,
+   "best": {
+    "level": 4,
+    "hits": 14242,
+    "falseAlarms": 77083,
+    "misses": 13541,
+    "cells": 383040,
+    "csi": 0.13581141647435777,
+    "hitRate": 0.5126156282618868,
+    "falseAlarmRatio": 0.8440514645496852
+   },
+   "rows": [
+    {
+     "level": 0,
+     "csi": 0.0781,
+     "hitRate": 0.1159,
+     "falseAlarmRatio": 0.8066
+    },
+    {
+     "level": 0.5,
+     "csi": 0.0982,
+     "hitRate": 0.1693,
+     "falseAlarmRatio": 0.8105
+    },
+    {
+     "level": 1,
+     "csi": 0.1142,
+     "hitRate": 0.2298,
+     "falseAlarmRatio": 0.8149
+    },
+    {
+     "level": 1.5,
+     "csi": 0.124,
+     "hitRate": 0.286,
+     "falseAlarmRatio": 0.8204
+    },
+    {
+     "level": 2,
+     "csi": 0.1296,
+     "hitRate": 0.3377,
+     "falseAlarmRatio": 0.8262
+    },
+    {
+     "level": 2.5,
+     "csi": 0.1317,
+     "hitRate": 0.3838,
+     "falseAlarmRatio": 0.8331
+    },
+    {
+     "level": 3,
+     "csi": 0.1347,
+     "hitRate": 0.4334,
+     "falseAlarmRatio": 0.8365
+    },
+    {
+     "level": 3.5,
+     "csi": 0.1356,
+     "hitRate": 0.4756,
+     "falseAlarmRatio": 0.8406
+    },
+    {
+     "level": 4,
+     "csi": 0.1358,
+     "hitRate": 0.5126,
+     "falseAlarmRatio": 0.8441
+    },
+    {
+     "level": 4.5,
+     "csi": 0.1355,
+     "hitRate": 0.5462,
+     "falseAlarmRatio": 0.8473
+    },
+    {
+     "level": 5,
+     "csi": 0.1347,
+     "hitRate": 0.5769,
+     "falseAlarmRatio": 0.8505
+    },
+    {
+     "level": 5.5,
+     "csi": 0.1337,
+     "hitRate": 0.6055,
+     "falseAlarmRatio": 0.8535
+    },
+    {
+     "level": 6,
+     "csi": 0.1323,
+     "hitRate": 0.6307,
+     "falseAlarmRatio": 0.8566
+    },
+    {
+     "level": 6.5,
+     "csi": 0.1308,
+     "hitRate": 0.6541,
+     "falseAlarmRatio": 0.8595
+    },
+    {
+     "level": 7,
+     "csi": 0.129,
+     "hitRate": 0.675,
+     "falseAlarmRatio": 0.8624
+    },
+    {
+     "level": 7.5,
+     "csi": 0.1271,
+     "hitRate": 0.6929,
+     "falseAlarmRatio": 0.8653
+    },
+    {
+     "level": 8,
+     "csi": 0.1258,
+     "hitRate": 0.7129,
+     "falseAlarmRatio": 0.8675
+    },
+    {
+     "level": 8.5,
+     "csi": 0.1248,
+     "hitRate": 0.7329,
+     "falseAlarmRatio": 0.8692
+    },
+    {
+     "level": 9,
+     "csi": 0.1241,
+     "hitRate": 0.7529,
+     "falseAlarmRatio": 0.8706
+    },
+    {
+     "level": 9.5,
+     "csi": 0.123,
+     "hitRate": 0.7707,
+     "falseAlarmRatio": 0.8724
+    },
+    {
+     "level": 10,
+     "csi": 0.1223,
+     "hitRate": 0.7901,
+     "falseAlarmRatio": 0.8736
+    },
+    {
+     "level": 10.5,
+     "csi": 0.1214,
+     "hitRate": 0.8052,
+     "falseAlarmRatio": 0.875
+    },
+    {
+     "level": 11,
+     "csi": 0.1206,
+     "hitRate": 0.821,
+     "falseAlarmRatio": 0.8761
+    },
+    {
+     "level": 11.5,
+     "csi": 0.1198,
+     "hitRate": 0.8365,
+     "falseAlarmRatio": 0.8773
+    },
+    {
+     "level": 12,
+     "csi": 0.1188,
+     "hitRate": 0.8493,
+     "falseAlarmRatio": 0.8786
+    },
+    {
+     "level": 12.5,
+     "csi": 0.118,
+     "hitRate": 0.8623,
+     "falseAlarmRatio": 0.8798
+    },
+    {
+     "level": 13,
+     "csi": 0.1171,
+     "hitRate": 0.8746,
+     "falseAlarmRatio": 0.8809
+    },
+    {
+     "level": 13.5,
+     "csi": 0.1161,
+     "hitRate": 0.8854,
+     "falseAlarmRatio": 0.8821
+    },
+    {
+     "level": 14,
+     "csi": 0.1154,
+     "hitRate": 0.8982,
+     "falseAlarmRatio": 0.883
+    },
+    {
+     "level": 14.5,
+     "csi": 0.1147,
+     "hitRate": 0.9091,
+     "falseAlarmRatio": 0.884
+    },
+    {
+     "level": 15,
+     "csi": 0.1138,
+     "hitRate": 0.9186,
+     "falseAlarmRatio": 0.885
+    },
+    {
+     "level": 15.5,
+     "csi": 0.1131,
+     "hitRate": 0.9283,
+     "falseAlarmRatio": 0.8859
+    },
+    {
+     "level": 16,
+     "csi": 0.1123,
+     "hitRate": 0.9361,
+     "falseAlarmRatio": 0.8869
+    },
+    {
+     "level": 16.5,
+     "csi": 0.1114,
+     "hitRate": 0.9433,
+     "falseAlarmRatio": 0.8878
+    },
+    {
+     "level": 17,
+     "csi": 0.1104,
+     "hitRate": 0.9486,
+     "falseAlarmRatio": 0.8889
+    },
+    {
+     "level": 17.5,
+     "csi": 0.1095,
+     "hitRate": 0.953,
+     "falseAlarmRatio": 0.89
+    },
+    {
+     "level": 18,
+     "csi": 0.1086,
+     "hitRate": 0.9574,
+     "falseAlarmRatio": 0.8909
+    },
+    {
+     "level": 18.5,
+     "csi": 0.1078,
+     "hitRate": 0.962,
+     "falseAlarmRatio": 0.8917
+    },
+    {
+     "level": 19,
+     "csi": 0.1071,
+     "hitRate": 0.9665,
+     "falseAlarmRatio": 0.8925
+    },
+    {
+     "level": 19.5,
+     "csi": 0.1064,
+     "hitRate": 0.9705,
+     "falseAlarmRatio": 0.8933
+    },
+    {
+     "level": 20,
+     "csi": 0.1057,
+     "hitRate": 0.9738,
+     "falseAlarmRatio": 0.894
+    }
+   ]
+  },
+  {
+   "streamKm2": 25,
+   "streamCells": 28684,
+   "best": {
+    "level": 5,
+    "hits": 12335,
+    "falseAlarms": 45745,
+    "misses": 15448,
+    "cells": 383040,
+    "csi": 0.16775922097704277,
+    "hitRate": 0.44397653241190654,
+    "falseAlarmRatio": 0.787620523415978
+   },
+   "rows": [
+    {
+     "level": 0,
+     "csi": 0.074,
+     "hitRate": 0.0898,
+     "falseAlarmRatio": 0.7028
+    },
+    {
+     "level": 0.5,
+     "csi": 0.0997,
+     "hitRate": 0.1309,
+     "falseAlarmRatio": 0.7047
+    },
+    {
+     "level": 1,
+     "csi": 0.1242,
+     "hitRate": 0.1791,
+     "falseAlarmRatio": 0.7118
+    },
+    {
+     "level": 1.5,
+     "csi": 0.141,
+     "hitRate": 0.2232,
+     "falseAlarmRatio": 0.7231
+    },
+    {
+     "level": 2,
+     "csi": 0.1522,
+     "hitRate": 0.2628,
+     "falseAlarmRatio": 0.7343
+    },
+    {
+     "level": 2.5,
+     "csi": 0.1574,
+     "hitRate": 0.296,
+     "falseAlarmRatio": 0.7484
+    },
+    {
+     "level": 3,
+     "csi": 0.1627,
+     "hitRate": 0.3315,
+     "falseAlarmRatio": 0.7578
+    },
+    {
+     "level": 3.5,
+     "csi": 0.1652,
+     "hitRate": 0.362,
+     "falseAlarmRatio": 0.767
+    },
+    {
+     "level": 4,
+     "csi": 0.1668,
+     "hitRate": 0.3902,
+     "falseAlarmRatio": 0.7745
+    },
+    {
+     "level": 4.5,
+     "csi": 0.1677,
+     "hitRate": 0.4174,
+     "falseAlarmRatio": 0.7811
+    },
+    {
+     "level": 5,
+     "csi": 0.1678,
+     "hitRate": 0.444,
+     "falseAlarmRatio": 0.7876
+    },
+    {
+     "level": 5.5,
+     "csi": 0.1668,
+     "hitRate": 0.4682,
+     "falseAlarmRatio": 0.7943
+    },
+    {
+     "level": 6,
+     "csi": 0.1654,
+     "hitRate": 0.491,
+     "falseAlarmRatio": 0.8004
+    },
+    {
+     "level": 6.5,
+     "csi": 0.1642,
+     "hitRate": 0.514,
+     "falseAlarmRatio": 0.8057
+    },
+    {
+     "level": 7,
+     "csi": 0.163,
+     "hitRate": 0.5362,
+     "falseAlarmRatio": 0.8102
+    },
+    {
+     "level": 7.5,
+     "csi": 0.1612,
+     "hitRate": 0.5552,
+     "falseAlarmRatio": 0.8148
+    },
+    {
+     "level": 8,
+     "csi": 0.1602,
+     "hitRate": 0.5749,
+     "falseAlarmRatio": 0.8183
+    },
+    {
+     "level": 8.5,
+     "csi": 0.159,
+     "hitRate": 0.5928,
+     "falseAlarmRatio": 0.8215
+    },
+    {
+     "level": 9,
+     "csi": 0.1577,
+     "hitRate": 0.61,
+     "falseAlarmRatio": 0.8246
+    },
+    {
+     "level": 9.5,
+     "csi": 0.1566,
+     "hitRate": 0.6272,
+     "falseAlarmRatio": 0.8273
+    },
+    {
+     "level": 10,
+     "csi": 0.1553,
+     "hitRate": 0.6434,
+     "falseAlarmRatio": 0.8301
+    },
+    {
+     "level": 10.5,
+     "csi": 0.1542,
+     "hitRate": 0.6587,
+     "falseAlarmRatio": 0.8324
+    },
+    {
+     "level": 11,
+     "csi": 0.1526,
+     "hitRate": 0.6722,
+     "falseAlarmRatio": 0.8351
+    },
+    {
+     "level": 11.5,
+     "csi": 0.1505,
+     "hitRate": 0.683,
+     "falseAlarmRatio": 0.8382
+    },
+    {
+     "level": 12,
+     "csi": 0.1487,
+     "hitRate": 0.6941,
+     "falseAlarmRatio": 0.8409
+    },
+    {
+     "level": 12.5,
+     "csi": 0.1476,
+     "hitRate": 0.7077,
+     "falseAlarmRatio": 0.8428
+    },
+    {
+     "level": 13,
+     "csi": 0.1464,
+     "hitRate": 0.7207,
+     "falseAlarmRatio": 0.8448
+    },
+    {
+     "level": 13.5,
+     "csi": 0.145,
+     "hitRate": 0.7328,
+     "falseAlarmRatio": 0.8469
+    },
+    {
+     "level": 14,
+     "csi": 0.1437,
+     "hitRate": 0.7455,
+     "falseAlarmRatio": 0.8489
+    },
+    {
+     "level": 14.5,
+     "csi": 0.1422,
+     "hitRate": 0.7576,
+     "falseAlarmRatio": 0.851
+    },
+    {
+     "level": 15,
+     "csi": 0.1405,
+     "hitRate": 0.7677,
+     "falseAlarmRatio": 0.8533
+    },
+    {
+     "level": 15.5,
+     "csi": 0.1388,
+     "hitRate": 0.778,
+     "falseAlarmRatio": 0.8555
+    },
+    {
+     "level": 16,
+     "csi": 0.1374,
+     "hitRate": 0.7881,
+     "falseAlarmRatio": 0.8573
+    },
+    {
+     "level": 16.5,
+     "csi": 0.1357,
+     "hitRate": 0.7953,
+     "falseAlarmRatio": 0.8594
+    },
+    {
+     "level": 17,
+     "csi": 0.1339,
+     "hitRate": 0.8021,
+     "falseAlarmRatio": 0.8616
+    },
+    {
+     "level": 17.5,
+     "csi": 0.1325,
+     "hitRate": 0.8093,
+     "falseAlarmRatio": 0.8633
+    },
+    {
+     "level": 18,
+     "csi": 0.1313,
+     "hitRate": 0.8178,
+     "falseAlarmRatio": 0.8647
+    },
+    {
+     "level": 18.5,
+     "csi": 0.1304,
+     "hitRate": 0.8269,
+     "falseAlarmRatio": 0.8659
+    },
+    {
+     "level": 19,
+     "csi": 0.1294,
+     "hitRate": 0.8341,
+     "falseAlarmRatio": 0.8672
+    },
+    {
+     "level": 19.5,
+     "csi": 0.1282,
+     "hitRate": 0.8399,
+     "falseAlarmRatio": 0.8686
+    },
+    {
+     "level": 20,
+     "csi": 0.127,
+     "hitRate": 0.8445,
+     "falseAlarmRatio": 0.8699
+    }
+   ]
+  }
+ ],
+ "banera": {
+  "mejor": {
+   "zMaxM": 22,
+   "csi": 0.0831
+  },
+  "filas": [
+   {
+    "zMaxM": 0,
+    "csi": 0
+   },
+   {
+    "zMaxM": 2,
+    "csi": 0.007
+   },
+   {
+    "zMaxM": 4,
+    "csi": 0.0185
+   },
+   {
+    "zMaxM": 6,
+    "csi": 0.0336
+   },
+   {
+    "zMaxM": 8,
+    "csi": 0.0476
+   },
+   {
+    "zMaxM": 10,
+    "csi": 0.0538
+   },
+   {
+    "zMaxM": 12,
+    "csi": 0.0576
+   },
+   {
+    "zMaxM": 14,
+    "csi": 0.0641
+   },
+   {
+    "zMaxM": 16,
+    "csi": 0.0712
+   },
+   {
+    "zMaxM": 18,
+    "csi": 0.0781
+   },
+   {
+    "zMaxM": 20,
+    "csi": 0.0827
+   },
+   {
+    "zMaxM": 22,
+    "csi": 0.0831
+   },
+   {
+    "zMaxM": 24,
+    "csi": 0.0806
+   },
+   {
+    "zMaxM": 26,
+    "csi": 0.0776
+   },
+   {
+    "zMaxM": 28,
+    "csi": 0.0734
+   },
+   {
+    "zMaxM": 30,
+    "csi": 0.0703
+   },
+   {
+    "zMaxM": 32,
+    "csi": 0.0682
+   },
+   {
+    "zMaxM": 34,
+    "csi": 0.0669
+   },
+   {
+    "zMaxM": 36,
+    "csi": 0.0658
+   },
+   {
+    "zMaxM": 38,
+    "csi": 0.0643
+   },
+   {
+    "zMaxM": 40,
+    "csi": 0.0629
+   },
+   {
+    "zMaxM": 42,
+    "csi": 0.0614
+   },
+   {
+    "zMaxM": 44,
+    "csi": 0.0602
+   },
+   {
+    "zMaxM": 46,
+    "csi": 0.0593
+   },
+   {
+    "zMaxM": 48,
+    "csi": 0.0583
+   },
+   {
+    "zMaxM": 50,
+    "csi": 0.0577
+   },
+   {
+    "zMaxM": 52,
+    "csi": 0.0576
+   },
+   {
+    "zMaxM": 54,
+    "csi": 0.0581
+   },
+   {
+    "zMaxM": 56,
+    "csi": 0.0591
+   },
+   {
+    "zMaxM": 58,
+    "csi": 0.0593
+   },
+   {
+    "zMaxM": 60,
+    "csi": 0.0598
+   },
+   {
+    "zMaxM": 62,
+    "csi": 0.0611
+   },
+   {
+    "zMaxM": 64,
+    "csi": 0.0629
+   },
+   {
+    "zMaxM": 66,
+    "csi": 0.0636
+   },
+   {
+    "zMaxM": 68,
+    "csi": 0.0646
+   },
+   {
+    "zMaxM": 70,
+    "csi": 0.0665
+   },
+   {
+    "zMaxM": 72,
+    "csi": 0.0679
+   },
+   {
+    "zMaxM": 74,
+    "csi": 0.0698
+   },
+   {
+    "zMaxM": 76,
+    "csi": 0.0719
+   },
+   {
+    "zMaxM": 78,
+    "csi": 0.0752
+   },
+   {
+    "zMaxM": 80,
+    "csi": 0.0776
+   }
+  ]
+ },
+ "procedencia": {
+  "teselas": [
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2036/1556.png",
+    "sha256": "62073fb6678e7f2f8f0567ca3d2982d3492fe5da28322cc4ed5c39841e825b8c"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2037/1556.png",
+    "sha256": "a21469e3c170b87c6dccb2893ee762bb0568a5208332899de3ee5fdf9e1ceeaf"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2038/1556.png",
+    "sha256": "d5798d05f81f753d39dbb84d48cb6b86fa182c36ac5e1fb7c2bcc14426b16587"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2039/1556.png",
+    "sha256": "ef6f08392bb8e6758ff9c8c6ce542ae385e58e69d7fdc4ec5117bebdf73734fe"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2040/1556.png",
+    "sha256": "be0051585e73187b90555db5a06277e4dd20d00b7b336eb8bb8c6d57fd88e24a"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2041/1556.png",
+    "sha256": "19b4d2ef9a0f4d8bc0c33985d23855a65c119b7cf9a2e1e446568b217e9c00b2"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2042/1556.png",
+    "sha256": "d090991edd0550fc58aea773d838ad8ee278c8edce1135dc565e5b549d9a95ef"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2043/1556.png",
+    "sha256": "4561383696e5965c56d93a8bd9b16c1422533a6c9c8880fdc8cb0256646e422a"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2044/1556.png",
+    "sha256": "105c86badacdf072e0ba649593e6b29d5d42020794919190d164a3cbc1c34cca"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2036/1557.png",
+    "sha256": "8db9e7116dcac47b5789b1b24358513515a93970e87636a2871a3db7b8ee248d"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2037/1557.png",
+    "sha256": "4992ef657cf90ee8ca6be568f00a9774259e1428e1d7909aa2b682cc25f370c2"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2038/1557.png",
+    "sha256": "561ae75ecf319a4d265d42b83278799d9d25db89a3a82ff0d101e257bc69f8a0"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2039/1557.png",
+    "sha256": "8a0da1d65d90571d4ef7a8887496b25a6b17cfc5b86a56c3437c7e55f50f63b6"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2040/1557.png",
+    "sha256": "1237c9e5900d4b3ff4dd3f0233430667377445a62c1c8b2f32e339eb71926636"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2041/1557.png",
+    "sha256": "57fd8dfa406bba1d061d09f13b6bb9d949a60953185b5b61a6c0194ce1e32013"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2042/1557.png",
+    "sha256": "f7fcb17b63c2016cdc0487b60e0c9a3ab05263bc813c9d7489a382cff6ad87a0"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2043/1557.png",
+    "sha256": "8ebd3783446138617e17dd752602ce3eae29c961a014322ab7a75c5972202f00"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2044/1557.png",
+    "sha256": "51a01c16a0dddf8ba322b1de4f4e589f5bf122aeb4d1c97ed3ee152e7096e43e"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2036/1558.png",
+    "sha256": "93a68eb6ac89d09d7872ada42d370cd51ba69462dde7e2996332949e0d80fd1c"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2037/1558.png",
+    "sha256": "752b79227711fa2eb40bf62610260d585d1b2db7539f564a441a841da02134f8"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2038/1558.png",
+    "sha256": "fe4ecb743af8b4e352ce4aa1d7636898467ffdb53da7f4bd1be4b4ec2efc9bc8"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2039/1558.png",
+    "sha256": "5720696906259b9cc79855ef98a5aaca8b19c58473a17f7e21a3e0285376c0a2"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2040/1558.png",
+    "sha256": "6c4b7e9f029fd3057f6ae17f076ea3ead3d27439d28ffbbf79faef9483e816db"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2041/1558.png",
+    "sha256": "976de1a3f3d6f0713622439690f918a1ea42562694bc6cddd819fe3cf419a79c"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2042/1558.png",
+    "sha256": "a34d886da0d1b2050574d3a5fb3609b21668d728d6f9a2f65e4f02162af20ec0"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2043/1558.png",
+    "sha256": "98c73281017ae962c10bf464693e64f621f0781a4452dbb63b0effa55e56ff2b"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2044/1558.png",
+    "sha256": "050675a1630bfc8e0e048757ff638d7ea70fe06714906ef78e4858147cfcc347"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2036/1559.png",
+    "sha256": "c49644221208538a31a17aacfbb7d8f97d0ea1cced50974c94f87063be4c7aba"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2037/1559.png",
+    "sha256": "ab6200038c73586afd9a11179b314cd108e05ff3846240ceb39307a2838a4a10"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2038/1559.png",
+    "sha256": "7d7cdf6e85e14c7b8b592557762c0886382a08e00e38c4575d407da30e6ccc10"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2039/1559.png",
+    "sha256": "ab401917689584aad531f9f259c13e7f2df6da0bdcc3f5edeab428ad69633866"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2040/1559.png",
+    "sha256": "135c097c70fa0d34c58073b047411ad6cf877791a39a4d804af2d6503bd98eb3"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2041/1559.png",
+    "sha256": "f762cbfaa8993e4388fda671b74d2513b587600a65ceafad5f6ae0753ee8fe5a"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2042/1559.png",
+    "sha256": "0b38230a893071dbbbcf533f46b1dd3ed2446c9ac1789da380432285f60fcf31"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2043/1559.png",
+    "sha256": "bd988f0e1699566b06d0d9d9b5d7d52c08621aa8a27c72a75bf74cb5144185ef"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2044/1559.png",
+    "sha256": "fd2a80c1e9c5d62508dcf3f44feb594b1b12177c05f9b588d5112887175fb1ce"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2036/1560.png",
+    "sha256": "eeacbf8f6c94e14fb1279beeefd9fda5d122351df08f3e02c020293f7d307ff1"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2037/1560.png",
+    "sha256": "132dd2862abff19f5cbb8abe37f9c7665fd474dfb502465ce6ad4fd7ad5deed0"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2038/1560.png",
+    "sha256": "e897a7dff929824c1b3d270337cd8d714dbaffe22d1b35631d7482d4832f7eeb"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2039/1560.png",
+    "sha256": "ccd087b6a64dfd629f38f89276eaa7dce7235782b675bdd6c6cab9d3b4bf60e6"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2040/1560.png",
+    "sha256": "f90368d8666f16c39553d3a496c87264c67a12acab1d67285dd51bd16f320cbf"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2041/1560.png",
+    "sha256": "27eac43b46f050197b19beeb4a704ae918f165e0e5346ca2c33fcf5dda562f5a"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2042/1560.png",
+    "sha256": "6056b94f74f19b764628cab169f871c605621d6f293e83c1a0918635a8c82f71"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2043/1560.png",
+    "sha256": "4baa199934bf83471952fe8334f381d60117bc7c1264c36eb3edfc6436dc4b98"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2044/1560.png",
+    "sha256": "2981ac237d840d96f85838397ee0d0165aa139f3f44ff56767cf3d3481983b06"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2036/1561.png",
+    "sha256": "9764a7c7bee400b83cc2289b4c42935829178d48614bd3985cc4ef1f9a044348"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2037/1561.png",
+    "sha256": "510610e2afe0c213a9fbc3a1014b658c3f7fd41929b2838348229e3e476be2be"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2038/1561.png",
+    "sha256": "abd703f28fb2cc94ceb1d54341c26c9ab8acdad47b075355ba391692df704a56"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2039/1561.png",
+    "sha256": "e9a16ba405918683361ce7a061c9e9c549012cdb9b338349988b1b8397dba813"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2040/1561.png",
+    "sha256": "f8ce940efa3c3bd5950c3f5b2ceee091cdec37b163e66408b87c0db7acbf5a65"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2041/1561.png",
+    "sha256": "86d0cdeecdbe680cec6f68e88cb1f7d3f450ddd2c7c74eec9e36ca9fa2df18ea"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2042/1561.png",
+    "sha256": "fd8e2e0dae8382148d61c335808457c1ee33c13ae1f3c48f898d8758094fe866"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2043/1561.png",
+    "sha256": "caba85561089633e996b53281cf33d3f91ee549a6a1b3f7b4a2a83a2c6fcab14"
+   },
+   {
+    "url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2044/1561.png",
+    "sha256": "87fc7e67e94d52db709a2a3eb7f0e92525c7c45f93092d80c8e61c78af3aecf4"
+   }
+  ],
+  "licenciaRelieve": "Terrain Tiles (AWS Open Data); atribuciones en https://github.com/tilezen/joerd/blob/master/docs/attribution.md",
+  "mancha": "Copernicus EMS Rapid Mapping EMSR773"
+ },
+ "cita": "Contains modified Copernicus Emergency Management Service information 2024"
+}

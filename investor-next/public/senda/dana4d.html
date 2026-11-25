@@ -1,0 +1,60 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000"><title>SENDA · DANA 4D</title>
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/fonts/fonts.css">
+<link rel="stylesheet" href="/senda/vendor/maplibre-gl-4.7.1/maplibre-gl.css">
+<style>
+:root{--bg:#000;--g1:#1c1c1e;--g2:#2c2c2e;--l1:#fff;--l2:rgba(235,235,245,.62);--real:#34c759;--model:#ff9f0a;--scen:#bf5af2;--acc:#0a84ff;--water:#5ac8fa}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--l1);font:15px/1.35 Inter,-apple-system,system-ui,sans-serif;overflow:hidden}
+button,select,input{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
+#map{position:absolute;inset:0}
+#top{position:absolute;left:10px;right:10px;top:58px;z-index:5;display:flex;gap:8px;align-items:flex-start;pointer-events:none}
+#title{pointer-events:auto;background:rgba(20,20,22,.86);backdrop-filter:blur(14px);border-radius:14px;padding:8px 12px;flex:1;min-width:0}
+#title b{display:block;font-size:15px}#title small{color:var(--l2);font-size:12px}
+.badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.05em;border-radius:6px;padding:2px 6px;margin-right:4px}
+.badge.real{background:rgba(52,199,89,.18);color:var(--real)}.badge.model{background:rgba(255,159,10,.18);color:var(--model)}.badge.scen{background:rgba(191,90,242,.18);color:var(--scen)}
+.tb{pointer-events:auto;width:42px;height:42px;border-radius:12px;background:rgba(20,20,22,.86);backdrop-filter:blur(14px);display:grid;place-items:center;font-size:18px}
+#panel{position:absolute;left:0;right:0;bottom:0;z-index:6;background:rgba(18,18,20,.94);backdrop-filter:blur(18px);border-radius:20px 20px 0 0;padding:8px 14px calc(12px + env(safe-area-inset-bottom));max-height:58vh;overflow-y:auto}
+#panel .grab{width:56px;height:6px;border-radius:3px;background:#636366;margin:0 auto 8px;display:block;cursor:pointer}
+#panel.mini .more{display:none}
+.lvl{display:flex;align-items:center;gap:10px}.lvl input{flex:1;accent-color:var(--water)}
+#play{width:40px;height:40px;border-radius:50%;background:var(--water);color:#001a2a;font-size:16px;font-weight:800;flex:none}
+#lvlTxt{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px;min-width:116px}
+#kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
+#kpis div{background:var(--g1);border-radius:10px;padding:6px 8px;min-width:0}#kpis b{display:block;font-size:17px}#kpis span{font-size:10.5px;color:var(--l2)}
+h4{margin:12px 2px 6px;font-size:12px;color:var(--l2);text-transform:uppercase;letter-spacing:.04em}
+.layer{display:flex;align-items:center;gap:10px;padding:8px 2px;border-top:.5px solid rgba(84,84,88,.5)}
+.layer .t{flex:1;min-width:0}.layer .t small{display:block;color:var(--l2);font-size:11.5px;line-height:1.3}
+.layer input{width:20px;height:20px;accent-color:var(--acc)}.layer .i{width:26px;height:26px;border-radius:50%;background:var(--g2);color:#64d2ff;font-weight:800;font-size:13px;flex:none}
+.row{display:flex;gap:8px;margin-top:8px}.row button{flex:1;padding:10px;border-radius:12px;background:var(--g2);font-weight:700;font-size:13px}.row button.on{background:var(--water);color:#001a2a}
+#info{position:absolute;left:0;right:0;bottom:0;z-index:9;background:#fff;color:#1c1c1e;border-radius:20px 20px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom));max-height:72vh;overflow-y:auto;box-shadow:0 -10px 30px rgba(0,0,0,.4)}
+#info h3{margin:0 0 6px}#info h4{color:#6e6e73}#info p,#info li{line-height:1.45}#info .src{font-size:12px;color:#6e6e73;word-break:break-word}
+#info .x{float:right;width:32px;height:32px;border-radius:50%;background:#eef0f3}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl td{padding:5px 4px;border-bottom:.5px solid #e5e5ea;vertical-align:top}.tbl td:nth-child(2){padding-left:8px}.tbl td:nth-child(3){text-align:right;white-space:nowrap}
+#science .tbl td{border-bottom-color:rgba(84,84,88,.5)}#science p.src{font-size:11.5px;color:var(--l2);line-height:1.4}
+canvas#csi{width:100%;height:150px;background:var(--g1);border-radius:12px;display:block}
+.leg{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11.5px;color:var(--l2);margin:4px 2px}.leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+#msg{position:absolute;left:50%;transform:translateX(-50%);top:112px;z-index:7;background:rgba(10,132,255,.94);color:#fff;border-radius:12px;padding:6px 12px;font-size:13px;font-weight:600;max-width:90vw;text-align:center}
+.maplibregl-ctrl-attrib{font-size:9px}
+</style><script type="module" src="/senda/app-chrome.mjs"></script></head><body>
+<div id="map" aria-label="Mapa 3D de la DANA"></div>
+<div id="top"><div id="title"><b>DANA de Valencia · 29-10-2024 · l'Horta Sud</b><small><span class="badge real">REAL</span>observado · <span class="badge model">MODELO</span>calculado · <span class="badge scen">ESCENARIO</span>lo eliges tú</small></div>
+  <button class="tb" id="styleBtn" aria-label="Tipo de mapa">🗺️</button><button class="tb" id="helpBtn" aria-label="Cómo leer esta vista">?</button></div>
+<div id="msg" hidden></div>
+<section id="panel">
+  <button class="grab" id="grab" aria-label="Ver más o menos controles"></button>
+  <div class="lvl"><button id="play" aria-label="Subir el agua">▶</button><input id="lvl" type="range" min="0" max="20" step="0.5" value="0" aria-label="Altura del agua sobre el cauce (metros)"><span id="lvlTxt"></span></div>
+  <div id="kpis"><div><b id="kMod">–</b><span>km² modelo</span></div><div><b id="kObs">–</b><span>km² observado</span></div><div><b id="kCsi">–</b><span>acuerdo (CSI)</span></div><div><b id="kBest">–</b><span>mejor nivel</span></div></div>
+  <div class="row"><button id="basinBtn">💧 ¿De dónde viene el agua?</button><button id="sciBtn">🔬 Ciencia</button></div>
+  <div class="more">
+  <h4>Capas</h4>
+  <div id="layers"></div>
+  <div class="leg" id="cmpLeg" hidden><span><i style="background:#fff"></i>los dos</span><span><i style="background:#0a84ff"></i>solo el modelo</span><span><i style="background:#34c759"></i>solo el satélite</span></div>
+  <section id="science"></section>
+  </div>
+</section>
+<section id="info" hidden><button class="x" id="infoX" aria-label="Cerrar">✕</button><div id="infoBody"></div></section>
+<script src="/senda/vendor/maplibre-gl-4.7.1/maplibre-gl-csp.js"></script>
+<script type="module" src="/senda/dana4d.mjs"></script>
+</body></html>
