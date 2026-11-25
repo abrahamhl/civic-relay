@@ -31,7 +31,8 @@ h4{margin:12px 2px 6px;font-size:12px;color:var(--l2);text-transform:uppercase;l
 .whatif{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.whatif label{background:var(--g1);border-radius:10px;padding:6px 8px;font-size:11px;color:var(--l2)}.whatif input{width:100%;accent-color:var(--scen)}.whatif b{color:#fff;font-size:14px}
 .row{display:flex;gap:8px;margin-top:8px}.row button{flex:1;padding:10px;border-radius:12px;background:var(--g2);font-weight:700;font-size:13px}.row button.on{background:var(--acc);color:#1a0b06}
 #info{position:absolute;left:0;right:0;bottom:0;z-index:9;background:#fff;color:#1c1c1e;border-radius:20px 20px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom));max-height:70vh;overflow-y:auto;box-shadow:0 -10px 30px rgba(0,0,0,.4)}
-#info h3{margin:0 0 6px}#info h4{color:#6e6e73}#info p,#info li{line-height:1.45}#info .src{font-size:12px;color:#6e6e73;word-break:break-all}
+#info h3{margin:0 0 6px}.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl td{padding:5px 4px;border-bottom:.5px solid #e5e5ea;vertical-align:top}.tbl td:nth-child(3){text-align:right;white-space:nowrap}.tbl td:nth-child(2){padding-left:8px}
+#science .tbl td{border-bottom-color:rgba(84,84,88,.5)}#science .src{font-size:11px;color:var(--l2)}#info h4{color:#6e6e73}#info p,#info li{line-height:1.45}#info .src{font-size:12px;color:#6e6e73;word-break:break-all}
 #info .x{float:right;width:32px;height:32px;border-radius:50%;background:#eef0f3}
 #drawMsg{position:absolute;left:50%;transform:translateX(-50%);top:112px;z-index:7;background:rgba(191,90,242,.92);color:#fff;border-radius:12px;padding:6px 12px;font-size:13px;font-weight:600}
 .maplibregl-ctrl-attrib{font-size:9px}
@@ -47,8 +48,10 @@ h4{margin:12px 2px 6px;font-size:12px;color:var(--l2);text-transform:uppercase;l
   <div class="more">
   <h4>Satélite (Sentinel-2, color real)</h4>
   <div class="seg" id="scene"><button data-s="pre">16-07 antes</button><button data-s="d0724" class="on">24-07</button><button data-s="d0729">29-07</button><button data-s="d0808">08-08</button><button data-s="none">Ocultar</button></div>
+  <div class="row"><button id="ignBtn">📍 Dónde empezó</button><button id="sciBtn">🔬 Ciencia del incendio</button></div>
   <h4>Capas</h4>
   <div id="layers"></div>
+  <section id="science"></section>
   <h4>Escenario: ¿y si el viento fuera otro?</h4>
   <div class="whatif"><label>Viento <b id="wv">23</b> km/h<input id="wKmh" type="range" min="0" max="60" value="23"></label><label>Hacia <b id="wd">61</b>°<input id="wTo" type="range" min="0" max="359" value="61"></label><label>Cabeza <b id="wr">16,3</b> m/min<input id="wRos" type="range" min="1" max="60" step="0.1" value="16.3"></label></div>
   <div class="row"><button id="drawBtn">✏️ Dibujar</button><button id="drawClose">Cerrar polígono</button><button id="drawClear">Borrar</button></div>
