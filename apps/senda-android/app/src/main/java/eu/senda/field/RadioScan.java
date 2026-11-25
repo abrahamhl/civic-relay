@@ -62,21 +62,13 @@ final class RadioScan {
         final JSONArray wifi = new JSONArray(), ble = new JSONArray();
         boolean fresh = false;
         String note = "";
-        try {
-            WifiManager wm = (WifiManager) ctx.getSystemService(Context.WIFI_SERVICE);
-            if (wm == null) note = "sin Wi-Fi";
-            else {
-                fresh = wm.startScan(); // si Android lo limita, devuelve false y se usa la caché
-                List<android.net.wifi.ScanResult> rs = wm.getScanResults();
-                for (android.net.wifi.ScanResult r : rs) {
-                    if (r.BSSID == null) continue;
-                    wifi.put(new JSONObject().put("a", angleOf(salt, r.BSSID)).put("r", r.level).put("g", band(r.frequency)));
-                }
-            }
-        } catch (SecurityException e) { note = "sin permiso de ubicación precisa: Android no entrega las redes Wi-Fi"; }
-        catch (JSONException ignored) { }
+        final WifiManager wm = (WifiManager) ctx.getSystemService(Context.WIFI_SERVICE);
+        if (wm == null) note = "sin Wi-Fi";
+        else {
+            try { fresh = wm.startScan(); } // Android termina el barrido en 2–4 s; si lo limita, devuelve false
+            catch (SecurityException e) { note = "sin permiso de ubicación precisa: Android no entrega las redes Wi-Fi"; }
+        }
         final boolean freshF = fresh; final String noteF = note;
-
         BluetoothManager bm = (BluetoothManager) ctx.getSystemService(Context.BLUETOOTH_SERVICE);
         BluetoothAdapter a = bm == null ? null : bm.getAdapter();
         BluetoothLeScanner sc = a != null && a.isEnabled() ? a.getBluetoothLeScanner() : null;
@@ -95,19 +87,37 @@ final class RadioScan {
             catch (SecurityException | IllegalStateException ignored) { }
         }
         final boolean bleOnF = bleOn;
-        main.postDelayed(() -> {
+        main.postDelayed(() -> { try {
             if (bleOnF) { try { sc.stopScan(cb); } catch (SecurityException | IllegalStateException ignored) { } }
             int sendaN = 0;
+            String note2 = noteF; long newestUs = 0;
+            // Wi-Fi: se lee AL FINAL de la ventana (antes se leía nada más pedir el barrido y salía el anterior)
+            if (wm != null) {
+                try {
+                    for (android.net.wifi.ScanResult r : wm.getScanResults()) {
+                        if (r.BSSID == null) continue;
+                        newestUs = Math.max(newestUs, r.timestamp);
+                        wifi.put(new JSONObject().put("a", angleOf(salt, r.BSSID)).put("r", r.level).put("g", band(r.frequency)));
+                    }
+                } catch (SecurityException e) { note2 = "sin permiso de ubicación precisa: Android no entrega las redes Wi-Fi"; }
+                catch (JSONException ignored) { }
+            }
+            long ageS = newestUs > 0 ? Math.max(0, (android.os.SystemClock.elapsedRealtime() * 1000L - newestUs) / 1_000_000L) : -1;
             try {
                 for (Map.Entry<String, int[]> e : seen.entrySet()) {
                     ble.put(new JSONObject().put("a", angleOf(salt, e.getKey())).put("r", e.getValue()[0]).put("s", e.getValue()[1] == 1));
                     if (e.getValue()[1] == 1) sendaN++;
                 }
                 out.put("wifi", wifi).put("ble", ble).put("sendaNear", sendaN).put("wifiFresh", freshF)
-                   .put("bleOn", bleOnF).put("bleMs", BLE_MS).put("note", noteF).put("t", System.currentTimeMillis());
+                   .put("bleOn", bleOnF).put("bleMs", BLE_MS).put("note", note2).put("wifiAgeS", ageS).put("t", System.currentTimeMillis());
             } catch (JSONException ignored) { }
             busy = false;
             done.result(out);
-        }, bleOn ? BLE_MS : 0);
+        } catch (RuntimeException e) { // nunca dejar el radar bloqueado: se responde vacío con el motivo
+            busy = false;
+            JSONObject err = new JSONObject();
+            try { err.put("wifi", new JSONArray()).put("ble", new JSONArray()).put("note", "fallo del barrido: " + e.getClass().getSimpleName()); } catch (JSONException ignored) { }
+            done.result(err);
+        } }, bleOn ? BLE_MS : 3500); // sin Bluetooth se espera igual a que termine el barrido Wi-Fi
     }
 }

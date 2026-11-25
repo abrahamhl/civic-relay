@@ -27,3 +27,14 @@ test('entrada vacía o rota no rompe y el dibujo no lanza', () => {
   drawSignalRadar(ctx, 300, radarPoints(scan), 1);
   assert.ok(calls.includes('arc'));
 });
+
+test('fósforo: máximo justo detrás del haz y nunca por debajo del mínimo visible', async () => {
+  const { phosphor, drawSignalRadarPro, drawHistory, blipKey } = await import('../src/signal-radar.mjs');
+  assert.ok(phosphor(1, Math.cos(1), Math.sin(1)) > 0.99);
+  assert.ok(phosphor(1, Math.cos(1.2), Math.sin(1.2)) >= 0.22 && phosphor(1, Math.cos(1.2), Math.sin(1.2)) < 0.3);
+  const calls = []; const ctx = new Proxy({}, { get: (_, k) => (k.startsWith('create') ? () => ({ addColorStop() {} }) : () => calls.push(k)), set: () => true });
+  const pts = radarPoints(scan);
+  drawSignalRadarPro(ctx, 300, pts, 2, { fresh: new Map([[blipKey(pts[0]), 0]]), now: 100 });
+  drawHistory(ctx, 200, 40, [{ wifiN: 3, bleN: 2 }, { wifiN: 10, bleN: 5 }]);
+  assert.ok(calls.includes('arc') && calls.includes('fillRect'));
+});

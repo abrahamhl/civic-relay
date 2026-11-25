@@ -26,10 +26,20 @@ h2{font-size:13px;font-weight:500;color:var(--l2);text-transform:uppercase;lette
 .tile svg{width:18px;height:18px}
 /* Tarjetas de módulos */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-.card{position:relative;background:var(--g1);border-radius:16px;padding:14px;min-height:112px;display:flex;flex-direction:column;justify-content:space-between;text-decoration:none;color:inherit;transition:transform .12s}
+.card{position:relative;background:var(--g1);border-radius:18px;padding:0;min-height:112px;display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:transform .12s;overflow:hidden;box-shadow:0 1px 0 rgba(255,255,255,.04) inset}
+.card .pv{position:relative;aspect-ratio:16/11;background:linear-gradient(135deg,#1c1c1e,#2c2c2e);overflow:hidden}.card .pv img{width:100%;height:100%;object-fit:cover;display:block}
+.card .pv::after{content:"";position:absolute;inset:auto 0 0 0;height:45%;background:linear-gradient(transparent,rgba(0,0,0,.55))}
+.card .pv .tile{position:absolute;left:10px;bottom:10px;z-index:1;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.feat{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px;scrollbar-width:none;margin:0 -16px;padding-left:16px;padding-right:16px}
+.feat a{flex:0 0 82%;max-width:360px;scroll-snap-align:start;position:relative;border-radius:20px;overflow:hidden;background:#1c1c1e;color:#fff;text-decoration:none;aspect-ratio:4/3.3}
+.feat img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.feat a::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.82))}
+.feat .ft{position:absolute;left:16px;right:16px;bottom:14px;z-index:1}.feat .ft small{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#ffb39f}
+.feat .ft b{display:block;font-size:21px;line-height:1.15;margin:3px 0}.feat .ft span{font-size:13px;color:rgba(255,255,255,.82)}
+.card .tx{padding:10px 12px 12px}.card .tx b{margin-top:0!important}
 .card:active{transform:scale(.97)}.card .tile{width:36px;height:36px;border-radius:9px}.card .tile svg{width:20px;height:20px}
 .card b,.card small{display:block}.card b{font-weight:600;font-size:15px;line-height:1.25;margin-top:12px}.card small{color:var(--l2);font-size:12px;margin-top:2px}
-.card.lock{opacity:.45}.card .lk{position:absolute;top:12px;right:12px;color:var(--l2)}
+.card.lock{opacity:.45}.card .lk{position:absolute;top:10px;right:10px;color:#fff;z-index:2;background:rgba(0,0,0,.55);border-radius:50%;width:26px;height:26px;display:grid;place-items:center}
 /* Tarjeta de estado */
 .hero{background:linear-gradient(160deg,#1c1c1e,#0d1418);border-radius:16px;padding:18px}
 .hero .who{font-size:22px;font-weight:600;margin:6px 0 2px}.hero p{margin:0;color:var(--l2);font-size:15px}
@@ -64,6 +74,8 @@ code{font:12px "IBM Plex Mono",ui-monospace,monospace;color:var(--l2);overflow-w
     <a class="qa" href="/senda/avisos"><div class="tile" style="background:var(--sol)" data-ico="bell"></div>Avisos</a>
     <a class="qa" href="/senda/mensaje"><div class="tile" style="background:var(--azul)" data-ico="msg"></div>Mensaje</a>
   </div>
+  <h2>Para empezar</h2>
+  <div class="feat" id="featured"></div>
   <h2>Accesos recientes</h2>
   <div class="grid" id="recent"></div>
   <p class="foot" id="recent-empty">Los módulos que abras aparecerán aquí.</p>

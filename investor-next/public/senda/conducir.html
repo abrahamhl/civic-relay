@@ -89,16 +89,43 @@ html.dashmode.nomini #map{display:none}
 @media (orientation:landscape){html.dashmode #map{left:auto;right:0;top:0;width:36%;height:100%;border-radius:0}html.dashmode #dashCanvas,html.dashmode #dashBar,html.dashmode #dashHud{width:64%;right:auto}html.dashmode.nomini #dashCanvas,html.dashmode.nomini #dashBar,html.dashmode.nomini #dashHud{width:100%}html.dashmode #dashBar{gap:6px;padding-bottom:8px}}
 html.dashmode .maplibregl-ctrl-attrib{font-size:9px;max-width:92%}
 html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #reportBtn,html.dashmode #bottom,html.dashmode #pip,html.dashmode #adas{display:none!important}
+/* Punto azul (como en las apps de mapas): punto, aro blanco y cono de rumbo */
+.me-puck{width:22px;height:22px;position:relative}.me-puck b{position:absolute;inset:0;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.35)}
+.me-puck .cone{position:absolute;left:50%;top:50%;width:70px;height:70px;transform:translate(-50%,-100%);background:radial-gradient(circle at 50% 100%,rgba(26,115,232,.45),rgba(26,115,232,0) 70%);clip-path:polygon(50% 100%,18% 0,82% 0);display:none}
+.me-puck.has-heading .cone{display:block}
+#side{max-height:calc(100% - 230px);overflow-y:auto;scrollbar-width:none}
+/* Capas (hoja inferior) */
+.sheet2{position:absolute;left:0;right:0;bottom:0;z-index:20;background:var(--card);color:var(--ink);border-radius:20px 20px 0 0;padding:10px 16px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.25);max-height:82vh;overflow-y:auto}
+.sheet2 .grab{width:40px;height:5px;border-radius:3px;background:#c7c7cc;margin:0 auto 8px}
+.sheet2 h3{display:flex;justify-content:space-between;align-items:center;margin:4px 0 10px;font-size:18px}
+.sheet2 h4{margin:14px 0 8px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.sheet2 .x{width:34px;height:34px;border-radius:50%;background:#eef0f3;font-size:16px}
+.ib{width:30px;height:30px;border-radius:50%;background:#eef0f3;color:#1a73e8;font-weight:800;font-size:15px}
+#layStyles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.lay-style{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600;background:none}
+.lay-style img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:3px solid transparent;background:#e5e7eb}
+.lay-style.on img{border-color:#1a73e8}.lay-style.on span{color:#1a73e8}
+#layDetails{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.lay-det{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border-radius:14px;background:#f2f3f5;font-size:12px;font-weight:600;text-align:center}
+.lay-det i{font-style:normal;font-size:22px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.lay-det.on{background:#e8f0fe;color:#1a56c4}.lay-det.on i{background:#1a73e8;box-shadow:none}
+.lay-view{display:flex;gap:10px}.lay-view button{flex:1;padding:12px;border-radius:12px;background:#f2f3f5;font-weight:700}.lay-view button.on{background:#1a73e8;color:#fff}
+#info{z-index:22}#infoBody h3{margin:4px 0 8px;font-size:20px}#infoBody p{margin:0 0 8px;line-height:1.45}#infoBody ul{margin:0 0 6px;padding-left:20px;line-height:1.5}
+#infoBody .info-tip{background:#fff8e6;border-radius:12px;padding:10px 12px;margin-top:10px}
 /* Modo (coche/bici/a pie) y radar de señales */
 .modeSeg{display:flex;gap:4px}.chip.mode{padding:8px 11px}.chip.mode.on{background:var(--blue);color:#fff}
 .sig-chip{background:#06121a;color:#64d2ff}
-#sig{position:absolute;left:10px;right:10px;bottom:calc(var(--bottomH,96px) + 10px);z-index:11;border-radius:18px;padding:12px 14px;background:rgba(6,18,26,.96);color:#e8f6ff;box-shadow:0 10px 30px rgba(0,0,0,.45);max-width:520px;margin:auto}
-#sig h3{margin:0 0 6px;font-size:16px;display:flex;justify-content:space-between;align-items:center}
-#sig .sig-body{display:flex;gap:12px;align-items:center}#sigCanvas{width:min(46vw,210px);height:min(46vw,210px);flex:none}
-#sigStats{font:600 13px/1.45 Inter,system-ui,sans-serif}#sigStats b{font-size:20px;color:#fff}
-#sig .sig-foot{font-size:11px;color:#8fb3c4;margin-top:6px;line-height:1.35}
-#sig .sig-legend{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;margin-top:6px}#sig .sig-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
-#sig button{border-radius:10px;padding:6px 10px;background:#13303f;color:#e8f6ff;font-weight:700;font-size:13px}
+#sig{position:absolute;left:8px;right:8px;bottom:calc(var(--bottomH,96px) + 8px);z-index:11;border-radius:22px;padding:12px 12px 10px;background:radial-gradient(120% 90% at 50% 0%,#0b2a1c,#020a06 70%);color:#d8ffe9;box-shadow:0 14px 40px rgba(0,0,0,.6),inset 0 0 0 1px rgba(52,255,153,.25);max-width:560px;margin:auto;font-family:ui-monospace,Menlo,Consolas,monospace}
+#sig .sig-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}#sig .sig-top b{letter-spacing:.12em;font-size:13px;color:#34ff99;text-shadow:0 0 8px rgba(52,255,153,.6)}#sig .sig-top small{display:block;font-size:11px;color:#8fe3b8}
+#sig .sig-body{display:flex;gap:10px;align-items:center}#sigCanvas{width:min(58vw,300px);height:min(58vw,300px);flex:none;border-radius:50%}
+#sig .sig-hud{display:grid;grid-template-columns:1fr;gap:6px;flex:1;min-width:0}
+#sig .tile{background:rgba(52,255,153,.07);border:1px solid rgba(52,255,153,.22);border-radius:12px;padding:6px 8px;display:flex;flex-direction:column}
+#sig .tile b{font-size:24px;line-height:1;color:#fff;text-shadow:0 0 10px rgba(52,255,153,.5)}#sig .tile span{font-size:11px;color:#8fe3b8;text-transform:uppercase;letter-spacing:.06em}#sig .tile small{font-size:10px;color:#6fbf96;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sig .tile.w b{color:#64d2ff}#sig .tile.g b{color:#30d158}#sig .tile.o b{color:#ff9f0a}
+#sig .sig-hist{margin-top:8px}#sigHist{width:100%;height:36px;display:block}#sigNote{font-size:10.5px;color:#8fe3b8;display:block;margin-top:4px;line-height:1.35}
+#sig .sig-legend{display:flex;flex-wrap:wrap;gap:8px;font-size:10.5px;margin-top:6px;color:#bfeed4}#sig .sig-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle;box-shadow:0 0 6px currentColor}
+#sig button{border-radius:10px;padding:6px 10px;background:rgba(52,255,153,.14);color:#d8ffe9;font-weight:700;font-size:12px;border:1px solid rgba(52,255,153,.3)}
+.ib.dark{background:rgba(52,255,153,.14);color:#34ff99;width:28px;height:28px;padding:0}
 /* Laboratorio de señal */
 .chip.lab-chip{background:#0d1b2a;color:#7df9ff;border:1px solid rgba(125,249,255,.38)}
 .chip.lab-chip.live{background:#063b2c;color:#6ef7b2;border-color:#34c759;box-shadow:0 0 12px rgba(52,199,89,.4)}
@@ -145,6 +172,7 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
   <div id="pip" hidden><video id="v" playsinline muted></video><canvas id="ov"></canvas></div>
 
   <div id="side">
+    <button class="fab" id="layersBtn" aria-label="Capas del mapa"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5z"/><path d="m2 13 10 5 10-5"/><path d="m2 18 10 5 10-5" opacity=".5"/></svg></button>
     <button class="fab" id="center" aria-label="Centrar en mí"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 4 21l8-4 8 4z"/></svg></button>
     <button class="fab" id="camBtn" aria-label="Cámara con IA"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg></button>
     <button class="fab" id="dashBtn" aria-label="Modo dashcam"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="15" height="12" rx="2"/><circle cx="9.5" cy="12" r="3"/><path d="M17 10l5-3v10l-5-3"/></svg></button>
@@ -170,6 +198,7 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
       <button id="recBtn" aria-label="Grabar"><span></span></button>
       <button class="dashSmall" id="bbDash">Caja negra</button>
       <button class="dashSmall" id="geomBtn">Montaje</button>
+      <button class="dashSmall" data-info="cajanegra" aria-label="Qué es la caja negra">ⓘ</button>
       <button class="dashSmall" id="miniMap">Mapa</button>
       <button class="dashSmall" id="dashExit">Salir</button>
     </div>
@@ -177,10 +206,22 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
   <pre id="tele" hidden aria-live="off"></pre>
   <button id="markBtn" hidden aria-label="Marcar este momento">Marcar</button>
   <section id="sig" role="dialog" aria-label="Señales a tu alrededor" hidden>
-    <h3><span>📡 Señales a tu alrededor</span><span><button id="sigScan">Escanear</button> <button id="sigClose" aria-label="Cerrar">✕</button></span></h3>
-    <div class="sig-body"><canvas id="sigCanvas" width="420" height="420" aria-label="Radar de señales"></canvas><div id="sigStats">Pulsa «Escanear».</div></div>
-    <div class="sig-legend"><span><i style="background:#0a84ff"></i>Wi-Fi 2,4 GHz</span><span><i style="background:#64d2ff"></i>Wi-Fi 5 GHz</span><span><i style="background:#bf5af2"></i>Wi-Fi 6 GHz</span><span><i style="background:#30d158"></i>Bluetooth</span><span><i style="background:#ff9f0a"></i>Móvil SENDA</span></div>
-    <p class="sig-foot">Más cerca del centro = señal más fuerte (medida). La posición alrededor del círculo es solo de dibujo: el móvil no sabe en qué dirección está cada aparato. No se guardan nombres de redes ni direcciones.</p>
+    <div class="sig-top"><div><b>📡 RADAR DE SEÑALES</b><small id="sigClock">preparando…</small></div><span><button class="ib dark" data-info="senales" aria-label="Qué es">i</button> <button id="sigScan">⟳ Escanear</button> <button id="sigClose" aria-label="Cerrar">✕</button></span></div>
+    <div class="sig-body"><canvas id="sigCanvas" width="600" height="600" aria-label="Radar de señales"></canvas>
+      <div class="sig-hud"><div class="tile w"><b id="sgWifi">–</b><span>Wi-Fi</span><small id="sgWifiSub"></small></div><div class="tile g"><b id="sgBle">–</b><span>Bluetooth</span><small id="sgBleSub"></small></div><div class="tile o"><b id="sgSenda">–</b><span>SENDA cerca</span><small>malla</small></div><div class="tile"><b id="sgBest">–</b><span>Más fuerte</span><small>dBm</small></div></div></div>
+    <div class="sig-hist"><canvas id="sigHist" width="600" height="70" aria-label="Historial de barridos"></canvas><small id="sigNote"></small></div>
+    <div class="sig-legend"><span><i style="background:#0a84ff"></i>Wi-Fi 2,4</span><span><i style="background:#64d2ff"></i>Wi-Fi 5</span><span><i style="background:#bf5af2"></i>Wi-Fi 6</span><span><i style="background:#30d158"></i>Bluetooth</span><span><i style="background:#ff9f0a"></i>SENDA</span></div>
+  </section>
+  <section id="layers" class="sheet2" role="dialog" aria-label="Capas del mapa" hidden>
+    <div class="grab"></div>
+    <h3><span>Capas</span><span><button class="ib" data-info="capas" aria-label="Qué es">i</button> <button class="x" id="layClose" aria-label="Cerrar">✕</button></span></h3>
+    <h4>Tipo de mapa</h4><div id="layStyles"></div>
+    <h4>Detalles del mapa</h4><div id="layDetails"></div>
+    <h4>Vista</h4><div class="lay-view"><button id="lay3d">3D inclinado</button><button id="layNorth">Norte arriba</button></div>
+  </section>
+  <section id="info" class="sheet2" role="dialog" aria-label="Qué es esto" hidden>
+    <div class="grab"></div><div style="display:flex;justify-content:flex-end"><button class="x" id="infoClose" aria-label="Cerrar">✕</button></div>
+    <div id="infoBody"></div>
   </section>
   <div id="veil" hidden></div>
   <div id="sheet" class="card" hidden>
