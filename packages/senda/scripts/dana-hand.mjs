@@ -12,6 +12,7 @@
  *   dir_z12.bin    D8 empaquetado (2 celdas por byte, 4 bits; 15 = salida) de toda la malla, para cuencas
  *   cauces.geojson cauces del modelo (cuenca ≥ 5 km²) con su clase de cuenca
  *   (HAND se guarda con el umbral de cauce de mayor CSI de los probados: 1, 5 o 25 km²)
+ *   dem_d4.bin     relieve reducido ×4 (Int16, m) para pendientes de tramos
  *   hidro.json     malla, recorte, calibración (CSI por nivel) y procedencia con SHA-256 de cada tesela
  */
 import { createHash } from 'node:crypto';
@@ -159,6 +160,14 @@ const meta = {
   procedencia: { teselas: tiles.map((t) => ({ url: TILE_URL(t.z, t.x, t.y), sha256: t.sha256 })), licenciaRelieve: 'Terrain Tiles (AWS Open Data); atribuciones en https://github.com/tilezen/joerd/blob/master/docs/attribution.md', mancha: gj.features[0].properties.source },
   cita: 'Contains modified Copernicus Emergency Management Service information 2024',
 };
+// Relieve reducido ×4 (media de bloques de 4×4 celdas válidas, Int16 en metros) para pendientes de tramos en la app
+const F = 4, dw = Math.ceil(g.w / F), dh = Math.ceil(g.h / F), demD4 = new Int16Array(dw * dh).fill(-32768);
+for (let j = 0; j < dh; j++) for (let i = 0; i < dw; i++) {
+  let s = 0, n = 0; for (let b = 0; b < F; b++) for (let a = 0; a < F; a++) { const x = i * F + a, y = j * F + b; if (x < g.w && y < g.h) { const v = g.data[y * g.w + x]; if (Number.isFinite(v)) { s += v; n++; } } }
+  if (n) demD4[j * dw + i] = Math.round(s / n);
+}
+meta.relieveD4 = { fichero: 'dem_d4.bin', factor: F, w: dw, h: dh, unidad: 'm (Int16; −32768 = sin dato)', celdaM: +(cellM * F).toFixed(1) };
+writeFileSync(new URL('dem_d4.bin', OUT), new Uint8Array(demD4.buffer));
 writeFileSync(new URL('hand_roi.bin', OUT), handRoi);
 writeFileSync(new URL('obs_roi.bin', OUT), obsRoi);
 writeFileSync(new URL('dir_z12.bin', OUT), dirPacked);

@@ -5,6 +5,8 @@ import { lonToTileX, latToTileY, gridToLonLat } from './core/geo-survey.mjs';
 import { DI, DJ, handRGBA, compareRGBA, agreement, floodMask } from './core/flood-science.mjs';
 import { downstreamPath, closestOnPath, travelMinutes, frontIndex, flowLevel, localToUtcMs, leadMinutes } from './core/flood-warning.mjs';
 import { saveBlob } from './save-file.mjs';
+import { meanSlope, velocityEnsemble, arrivalBand, pickBest } from './core/hydro-estimates.mjs';
+import { parseSeries, sha256Hex, valueAt, CONNECTORS, SERIES_KINDS } from './core/data-connectors.mjs';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -16,7 +18,8 @@ const [meta, ems, obsGj, cauces, TEL] = await Promise.all(['hidro.json', 'emsr77
 const TOWNS = (await fetch('/senda/data/radio/poyo.json').then((r) => r.json())).municipios; // puntos de Nominatim (OSM, ODbL)
 const PRO = new URLSearchParams(location.search).has('pro') || !!window.__TAURI_INTERNALS__;
 const bin = (f) => fetch(D + f).then((r) => r.arrayBuffer());
-const [handBuf, obsBuf, dirBuf] = await Promise.all(['hand_roi.bin', 'obs_roi.bin', 'dir_z12.bin'].map(bin));
+const [handBuf, obsBuf, dirBuf, demBuf] = await Promise.all(['hand_roi.bin', 'obs_roi.bin', 'dir_z12.bin', 'dem_d4.bin'].map(bin));
+const DEM4 = new Int16Array(demBuf);
 const G = meta.malla, R = meta.roi, cellKm2 = (G.celdaM * G.celdaM) / 1e6;
 const handQ = new Uint8Array(handBuf), obs = new Uint8Array(obsBuf), dirP = new Uint8Array(dirBuf);
 const HAND = Float32Array.from(handQ, (v) => (v === 255 ? NaN : v / 4)); // metros
@@ -221,20 +224,27 @@ const C = Object.fromEntries(TEL.constantes.map((c) => [c.id, c]));
 const TH = { avisoM3s: C.umbral_aviso.valor, capacidadM3s: C.capacidad_urbana.valor };
 const pad2 = (n) => String(n).padStart(2, '0');
 const hhmm = (min) => `${pad2(Math.floor(min / 60))}:${pad2(min % 60)}`;
+const clock = (min) => { const m = Math.round(min), d = Math.floor(m / 1440); return `${d === 1 ? 'día siguiente ' : d > 1 ? `+${d} días ` : ''}${hhmm(((m % 1440) + 1440) % 1440)}`; };
 const minOf = (local) => (local && local.startsWith(DAY0) ? +local.slice(11, 13) * 60 + +local.slice(14, 16) : null);
 const EV = TEL.eventos.map((e) => ({ ...e, min: minOf(e.local), unv: /no verificado/i.test(e.estado) }));
 const FLOW = EV.filter((e) => e.unidad === 'm³/s' && e.min != null);
 const ESA = EV.find((e) => e.id === 'esalert');
-const TT = { pick: false, path: null, k0: null, dep: LS.get('senda.d4d.dep', 'poyo_1855'), v: LS.get('senda.d4d.v', C.velocidad_chiva.valor), arrivals: [] };
+const TT = { pick: false, path: null, k0: null, dep: LS.get('senda.d4d.dep', 'poyo_1855'), method: LS.get('senda.d4d.meth', 'cedex'), vManual: LS.get('senda.d4d.v', null), v: C.velocidad_chiva.valor, arrivals: [], ens: [] };
+const IMP = []; // series importadas por el operador (solo en memoria: no se guardan al cerrar)
+const R4 = meta.relieveD4, elevAt = (k) => { const i = Math.floor((k % G.w) / R4.factor), j = Math.floor(((k / G.w) | 0) / R4.factor), v = DEM4[j * R4.w + i]; return v === -32768 ? NaN : v; };
+const CEDEX_OBS = [{ id: 'cedex', label: 'Dato del CEDEX en Chiva (observado, preliminar)', velocityMs: C.velocidad_chiva.valor, source: TEL.fuentes[C.velocidad_chiva.fuente].cita }];
+const ensembleFor = (k0, kEnd, distM) => velocityEnsemble({ lengthM: distM, slope: meanSlope(elevAt(k0), elevAt(kEnd), distM), observed: CEDEX_OBS });
 state.tMin = LS.get('senda.d4d.t', 1135);
 const TIPO = { MEDIDO: ['real', 'MEDIDO'], ESTIMADO: ['scen', 'ESTIMADO'], OFICIAL: ['real', 'OFICIAL'], SIN_HORA: ['model', 'SIN HORA'] };
 
 function renderTime() {
   const t = state.tMin, utc = new Date(localToUtcMs(`${DAY0}T${hhmm(t)}`, OFF));
   $('#clock').innerHTML = `${hhmm(t)} <small style="color:var(--l2);font-weight:500">29-10 · ${pad2(utc.getUTCHours())}:${pad2(utc.getUTCMinutes())} UTC</small>`;
-  const last = FLOW.filter((e) => e.min <= t).at(-1);
-  $('#kQ').innerHTML = last ? `${fmt(last.valor)}${last.unv ? '<small style="color:#ff9f0a"> ?</small>' : ''} <small style="font-size:10px;color:var(--l2)">m³/s ${hhmm(last.min)}</small>` : '–';
-  const lv = flowLevel(last?.valor, TH);
+  const pub = FLOW.filter((e) => e.min <= t).at(-1), tMs = localToUtcMs(`${DAY0}T${hhmm(t)}`, OFF);
+  const imp = IMP.filter((x) => x.kind === 'caudal').map((x) => ({ x, p: valueAt(x, tMs) })).filter((o) => o.p).sort((a, b) => b.p.tMs - a.p.tMs)[0];
+  const best = pickBest([...(imp ? [{ basis: 'MEDIDO', value: imp.p.value, at: hhmm(Math.round((imp.p.tMs / 60000 + OFF * 60) % 1440)), imp: true }] : []), ...(pub ? [{ basis: 'OBSERVADO_EXTERNO', value: pub.valor, at: hhmm(pub.min), unv: pub.unv }] : [])]);
+  $('#kQ').innerHTML = best ? `${fmt(best.value)}${best.unv ? '<small style="color:#ff9f0a"> ?</small>' : ''} <small style="font-size:10px;color:var(--l2)">m³/s ${best.at}${best.imp ? ' · tu red' : ''}</small>` : '–';
+  const lv = flowLevel(best?.value, TH);
   $('#kLvl').textContent = { normal: 'normal', aviso: 'AVISO', desbordamiento: 'DESBORDA', sin_dato: 'sin dato', no_medido: 'no medido' }[lv.level];
   $('#kLvl').style.color = { aviso: '#ffd60a', desbordamiento: '#ff453a' }[lv.level] ?? '';
   $('#kAlert').textContent = t < ESA.min ? `en ${ESA.min - t} min` : `enviado ${hhmm(ESA.min)}`;
@@ -264,6 +274,7 @@ function drawFlow() {
     else { x.fillStyle = '#ff453a'; x.beginPath(); x.arc(px, py, 8, 0, 7); x.fill(); }
     x.fillStyle = '#fff'; x.fillText(fmt(e.valor), px + 12, py - 8);
   }
+  for (const s2 of IMP.filter((z) => z.kind === 'caudal')) for (const p of s2.points) { const m = (p.tMs / 60000 + OFF * 60) - Date.parse(`${DAY0}T00:00Z`) / 60000; if (m < T0 || m > T1) continue; x.fillStyle = '#64d2ff'; x.fillRect(X(m) - 6, Y(Math.min(p.value, QMAX)) - 6, 12, 12); }
   x.strokeStyle = '#fff'; x.lineWidth = 2; x.beginPath(); x.moveTo(X(state.tMin), 8); x.lineTo(X(state.tMin), H - B); x.stroke();
 }
 function evHtml(e) {
@@ -286,7 +297,7 @@ $('#evlist').addEventListener('click', (ev) => {
 // ⏱️ Escenario de llegada: camino D8 aguas abajo desde un punto, a la velocidad elegida
 const cellLonLat = (k) => gridToLonLat(G, (k % G.w) + 0.5, ((k / G.w) | 0) + 0.5).map((v) => +v.toFixed(6));
 $('#tDep').innerHTML = timed.filter((e) => e.min != null).map((e) => `<option value="${e.id}">${hhmm(e.min)} · ${esc(e.texto.slice(0, 38))}${e.texto.length > 38 ? '…' : ''}</option>`).join('');
-$('#tDep').value = TT.dep; $('#tVel').value = TT.v; $('#tVelTxt').textContent = fmt(TT.v, 1);
+$('#tDep').value = TT.dep; if (TT.vManual > 0) { $('#tVel').value = TT.vManual; $('#tVelTxt').textContent = fmt(TT.vManual, 1); } else $('#tVelTxt').textContent = '–';
 function travelFrom(lon, lat) {
   const [px, py] = toPx(lon, lat), i = Math.floor(px), j = Math.floor(py);
   if (i < 1 || j < 1 || i >= G.w - 1 || j >= G.h - 1) return showToast('Fuera de la zona calculada');
@@ -295,24 +306,33 @@ function travelFrom(lon, lat) {
 function travelRender() {
   const p = TT.path; if (!p) { for (const id of ['tpath', 'tmarks', 'towns', 'tfront']) map.getSource(id)?.setData({ type: 'FeatureCollection', features: [] }); $('#tOut').innerHTML = ''; return; }
   const dep = EV.find((e) => e.id === TT.dep), coords = p.cells.map(cellLonLat), marks = [];
+  TT.ens = ensembleFor(TT.k0, p.cells.at(-1), p.distM.at(-1));
+  const chosen = TT.method === 'manual' ? null : TT.ens.find((r) => r.id === TT.method);
+  TT.v = chosen ? chosen.velocityMs : TT.vManual;
+  $('#tVelBox').hidden = TT.method !== 'manual';
+  if (!(TT.v > 0)) { $('#tOut').innerHTML = 'Elige una velocidad con la barra: sin fuente no se pone ninguna por defecto.'; for (const id of ['tpath', 'tmarks', 'towns', 'tfront']) map.getSource(id)?.setData({ type: 'FeatureCollection', features: [] }); return; }
   for (let m = 10; ; m += 10) { const idx = frontIndex(p, TT.v, m); if (idx >= p.cells.length - 1 || idx < 0) break; marks.push({ type: 'Feature', properties: { label: `+${m} min` }, geometry: { type: 'Point', coordinates: coords[idx] } }); if (marks.length > 40) break; }
   map.getSource('tpath')?.setData({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: coords } });
   map.getSource('tmarks')?.setData({ type: 'FeatureCollection', features: marks });
   TT.arrivals = TOWNS.map((tw) => { const [tx, ty] = toPx(tw.lon, tw.lat), c = closestOnPath(p, G.w, Math.floor(ty) * G.w + Math.floor(tx)); return { ...tw, offM: c.offCells * G.celdaM, distM: c.distM, idx: c.idx }; })
     .filter((a) => a.offM <= 1500 && a.idx > 0).sort((a, b) => a.distM - b.distM)
-    .map((a) => ({ ...a, min: travelMinutes(a.distM, TT.v), at: dep.min + travelMinutes(a.distM, TT.v) }));
-  map.getSource('towns')?.setData({ type: 'FeatureCollection', features: TT.arrivals.map((a) => ({ type: 'Feature', properties: { label: `${a.nombre} ${hhmm(Math.round(a.at))}` }, geometry: { type: 'Point', coordinates: coords[a.idx] } })) });
+    .map((a) => { const band = arrivalBand(a.distM, ensembleFor(TT.k0, p.cells[a.idx], a.distM)); return { ...a, min: travelMinutes(a.distM, TT.v), at: dep.min + travelMinutes(a.distM, TT.v), band }; });
+  map.getSource('towns')?.setData({ type: 'FeatureCollection', features: TT.arrivals.map((a) => ({ type: 'Feature', properties: { label: `${a.nombre} ${clock(a.at)}` }, geometry: { type: 'Point', coordinates: coords[a.idx] } })) });
   const totalMin = travelMinutes(p.distM.at(-1), TT.v);
   $('#tOut').innerHTML = `Camino del agua según el relieve: <b>${fmt(p.distM.at(-1) / 1000, 1)} km</b> hasta el mar o el borde · a ${fmt(TT.v, 1)} m/s, <b>${fmt(totalMin)} min</b>.<br>
-Si sale a las <b>${hhmm(dep.min)}</b> (${esc(dep.texto.slice(0, 60))}):<br>${TT.arrivals.length ? TT.arrivals.map((a) => `· ${esc(a.nombre)}: <b>${hhmm(Math.round(a.at))}</b> (+${fmt(a.min)} min; el cauce del modelo pasa a ${fmt(a.offM)} m del punto del municipio)${a.at < ESA.min ? ` → <b style="color:#ff9f0a">${fmt(ESA.min - a.at)} min antes del ES-Alert</b>` : ` → ${fmt(a.at - ESA.min)} min después del ES-Alert`}`).join('<br>') : 'ningún municipio de la lista a menos de 1,5 km del camino.'}<br>
-${TT.dep === 'cedex_pico' ? '<span class="src">Salida a las 19:35: el texto del CEDEX (vía Roldán 2025) une el pico de 3.500 m³/s a esa hora con el agua «desplazándose por Chiva» a 14 m/s, pero no precisa en qué punto se dio el pico. Es una lectura posible, no confirmada.</span><br>' : TT.dep === 'poyo_1855' ? '<span class="src">Las 18:55 son la hora del último dato del aforo (cruce con la A-3), aguas abajo de Chiva: para este caso, toca un punto del cauce cerca de ese cruce con «Elegir punto».</span><br>' : ''}<span class="src">ESCENARIO: velocidad constante (${fmt(C.velocidad_chiva.valor)} m/s es la del CEDEX por Chiva, preliminar; aplicarla a todo el recorrido es una suposición). Camino D8 sin encauzamientos: en la llanura puede ir por otro lado. Municipios: punto de Nominatim (OSM).</span>`;
+Si sale a las <b>${hhmm(dep.min)}</b> (${esc(dep.texto.slice(0, 60))}):<br>${TT.arrivals.length ? TT.arrivals.map((a) => `· ${esc(a.nombre)}: <b>${clock(a.at)}</b> (+${fmt(a.min)} min; horquilla de los métodos ${a.band ? `${clock(dep.min + a.band.minMin)}–${clock(dep.min + a.band.maxMin)}` : '–'}; el cauce del modelo pasa a ${fmt(a.offM)} m)${a.at < ESA.min ? ` → <b style="color:#ff9f0a">${fmt(ESA.min - a.at)} min antes del ES-Alert</b>` : ` → ${fmt(a.at - ESA.min)} min después del ES-Alert`}`).join('<br>') : 'ningún municipio de la lista a menos de 1,5 km del camino.'}<br>
+${TT.dep === 'cedex_pico' ? '<span class="src">Salida a las 19:35: el texto del CEDEX (vía Roldán 2025) une el pico de 3.500 m³/s a esa hora con el agua «desplazándose por Chiva» a 14 m/s, pero no precisa en qué punto se dio el pico. Es una lectura posible, no confirmada.</span><br>' : TT.dep === 'poyo_1855' ? '<span class="src">Las 18:55 son la hora del último dato del aforo (cruce con la A-3), aguas abajo de Chiva: para este caso, toca un punto del cauce cerca de ese cruce con «Elegir punto».</span><br>' : ''}<table class="tbl" style="margin:6px 0"><tr><td><b>Método</b></td><td><b>Velocidad media · tiempo de todo el recorrido</b></td><td><b>Ámbito</b></td></tr>${TT.ens.map((r) => `<tr${r.id === TT.method ? ' style="color:#fff;font-weight:700"' : ''}><td>${esc(r.label)}<br><small>${r.basis === 'ESTIMACION' ? 'ESTIMACIÓN SENDA' : 'OBSERVADO'}</small></td><td>${fmt(r.velocityMs, 1)} m/s · ${fmt(r.tcMin)} min</td><td style="white-space:normal;text-align:left">${esc(r.validity)}<br><small>${esc(r.source)}</small></td></tr>`).join('')}</table>
+<span class="src">Pendiente media del recorrido: ${fmt(100 * meanSlope(elevAt(TT.k0), elevAt(p.cells.at(-1)), p.distM.at(-1)), 2)} % (relieve reducido de ${fmt(R4.celdaM)} m). Los métodos no coinciden porque miden cosas distintas: el CEDEX dio la velocidad del agua en la punta de una crecida ya formada; Témez y Kirpich estiman el <b>tiempo de concentración</b>, la respuesta media de la cuenca a la lluvia, y por eso dan llegadas mucho más tardías. <b>Para una crecida en marcha, el dato observado es la mejor referencia</b>; las fórmulas sirven cuando no hay ninguna medida, y la horquilla, para planificar con margen.</span><br>
+<span class="src">ESCENARIO: velocidad constante (${fmt(C.velocidad_chiva.valor)} m/s es la del CEDEX por Chiva, preliminar; aplicarla a todo el recorrido es una suposición). Camino D8 sin encauzamientos: en la llanura puede ir por otro lado. Municipios: punto de Nominatim (OSM).</span>`;
 }
 $('#travelBtn').addEventListener('click', () => { panelMini(false); $('#tOut').scrollIntoView({ behavior: 'smooth', block: 'center' }); if (!TT.path) { const [tx, ty] = toPx(TOWNS[0].lon, TOWNS[0].lat); TT.k0 = snap(Math.floor(tx), Math.floor(ty)); TT.path = downstreamPath(dirAt, G.w, G.h, TT.k0, G.celdaM); travelRender(); renderTime(); } });
 $('#tChiva').addEventListener('click', () => { const c = TOWNS.find((t) => t.nombre === 'Chiva'); TT.dep = 'cedex_pico'; $('#tDep').value = TT.dep; LS.set('senda.d4d.dep', TT.dep); travelFrom(c.lon, c.lat); map.fitBounds([[-0.75, 39.38], [-0.33, 39.5]], { padding: 40, pitch: 50 }); });
 $('#tPick').addEventListener('click', () => { TT.pick = !TT.pick; $('#tPick').classList.toggle('on', TT.pick); $('#msg').textContent = 'Toca dónde sale el agua'; $('#msg').hidden = !TT.pick; });
 $('#tClear').addEventListener('click', () => { TT.path = null; travelRender(); });
 $('#tDep').addEventListener('change', (e) => { TT.dep = e.target.value; LS.set('senda.d4d.dep', TT.dep); travelRender(); renderTime(); });
-$('#tVel').addEventListener('input', (e) => { TT.v = +e.target.value; LS.set('senda.d4d.v', TT.v); $('#tVelTxt').textContent = fmt(TT.v, 1); travelRender(); renderTime(); });
+$('#tMeth').value = TT.method;
+$('#tMeth').addEventListener('change', (e) => { TT.method = e.target.value; LS.set('senda.d4d.meth', TT.method); if (TT.method === 'manual' && !(TT.vManual > 0)) $('#tVelTxt').textContent = '–'; travelRender(); renderTime(); });
+$('#tVel').addEventListener('input', (e) => { TT.vManual = +e.target.value; LS.set('senda.d4d.v', TT.vManual); $('#tVelTxt').textContent = fmt(TT.vManual, 1); travelRender(); renderTime(); });
 $('#t').value = state.tMin;
 $('#t').addEventListener('input', (e) => { state.tMin = +e.target.value; LS.set('senda.d4d.t', state.tMin); renderTime(); });
 let traf = 0;
@@ -324,6 +344,26 @@ $('#tplay').addEventListener('click', () => {
 });
 map.on('style.load', () => { travelRender(); renderTime(); });
 
+// ── 🔌 Conectores: datos de la red del organismo (solo en memoria; sustituyen a las estimaciones) ──
+const STATUS = { conectado: 'CONECTADO', importable: 'IMPORTABLE', requiere_clave: 'REQUIERE CLAVE', requiere_convenio: 'REQUIERE CONVENIO' };
+$('#cCat').innerHTML = CONNECTORS.map((c) => `<div class="ev"><span><b>${esc(c.label)}</b><span class="chip ${c.status}">${STATUS[c.status]}</span><small>${esc(c.note)}</small></span></div>`).join('');
+function renderImports() {
+  $('#cOut').innerHTML = IMP.length ? IMP.map((x, i) => `<div>✅ <span class="badge imp">IMPORTADO</span><b>${esc(x.meta.station || SERIES_KINDS[x.kind].label)}</b> · ${x.points.length} datos de ${esc(SERIES_KINDS[x.kind].label.toLowerCase())} (${esc(x.unit)}) · fuente: ${esc(x.meta.source.name)}${x.meta.source.license ? ` · licencia: ${esc(x.meta.source.license)}` : ''}<br><small>SHA-256 ${x.sha256.slice(0, 16)}… · <a href="#" data-rm="${i}" style="color:#ff453a">quitar</a></small></div>`).join('') : '';
+}
+$('#cOut').addEventListener('click', (e) => { const r = e.target.closest('[data-rm]'); if (!r) return; e.preventDefault(); IMP.splice(+r.dataset.rm, 1); renderImports(); renderTime(); });
+$('#cFile').addEventListener('change', async (e) => {
+  const f = e.target.files?.[0]; if (!f) return; const text = await f.text(); e.target.value = '';
+  const res = parseSeries(text, { kind: $('#cKind').value, station: $('#cSta').value.trim() || null, source: { name: $('#cSrc').value.trim(), license: $('#cLic').value.trim() || null, file: f.name } });
+  if (!res.ok) { $('#cOut').innerHTML = `<b style="color:#ff453a">No se ha cargado:</b><br>${res.errors.slice(0, 8).map((x) => `· ${x.line ? `línea ${x.line}: ` : ''}${esc(x.msg)}`).join('<br>')}${res.errors.length > 8 ? `<br>… y ${res.errors.length - 8} más` : ''}`; return; }
+  IMP.push({ ...res, sha256: await sha256Hex(text) }); renderImports(); renderTime(); showToast('Datos cargados: mandan sobre las estimaciones');
+});
+$('#cSample').addEventListener('click', () => showInfo(`<h3>Formato para cargar datos</h3><p>Un fichero CSV con cabecera <b>hora,valor</b> (o separado por punto y coma) o un JSON con <b>[{"hora": …, "valor": …}]</b>. La hora debe llevar <b>zona horaria</b>: sin ella no se acepta, porque una hora ambigua puede mover una alerta una o dos horas.</p>
+<pre style="background:#f2f2f7;border-radius:10px;padding:10px;font-size:12px;overflow:auto">hora,valor
+2024-10-29T17:30+01:00,10
+2024-10-29T18:00+01:00,20
+2024-10-29T18:30Z,30</pre><p>Unidades: caudal en m³/s, lluvia en mm por intervalo, nivel en m. Hay que indicar quién mide el dato (fuente). El fichero no sale de este dispositivo y se olvida al cerrar la página.</p><p class="src">Los valores 10, 20 y 30 solo enseñan el formato: no son datos de ningún suceso.</p>`));
+renderImports();
+
 // ── PRO (escritorio): paquete de datos con procedencia y huellas ──
 const sha = async (buf) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', buf))].map((b) => b.toString(16).padStart(2, '0')).join('');
 if (PRO) {
@@ -333,8 +373,10 @@ if (PRO) {
     const pack = {
       producto: 'SENDA · DANA 4D · paquete de datos', generadoUTC: new Date().toISOString(), aviso: 'Contiene datos REALES (con fuente), ESTIMADOS por terceros y MODELO/ESCENARIO de SENDA, etiquetados uno a uno.',
       telemetria: TEL, metodo: meta.metodo, calibracion: meta.calibracion, banera: meta.banera, observado: meta.observado, procedenciaRelieve: meta.procedencia,
-      huellas: { 'hand_roi.bin': await sha(handBuf), 'obs_roi.bin': await sha(obsBuf), 'dir_z12.bin': await sha(dirBuf) },
-      escenarioLlegada: TT.path ? { basis: 'ESCENARIO', sale: TT.dep, velocidadMs: TT.v, longitudM: Math.round(TT.path.distM.at(-1)), camino: TT.path.cells.map(cellLonLat), municipios: TT.arrivals.map(({ nombre, offM, distM, min, at }) => ({ nombre, distanciaCaminoM: Math.round(distM), separacionM: Math.round(offM), minutos: +min.toFixed(1), horaLocal: hhmm(Math.round(at)) })) } : null,
+      huellas: { 'hand_roi.bin': await sha(handBuf), 'obs_roi.bin': await sha(obsBuf), 'dir_z12.bin': await sha(dirBuf), 'dem_d4.bin': await sha(demBuf) },
+      datosImportados: IMP.map(({ kind, unit, points, meta: m, sha256 }) => ({ basis: 'MEDIDO_IMPORTADO', kind, unit, estacion: m.station, fuente: m.source, sha256, puntos: points.map((q) => [q.iso, q.value]) })),
+      metodosVelocidad: TT.ens,
+      escenarioLlegada: TT.path ? { basis: 'ESCENARIO', sale: TT.dep, metodo: TT.method, velocidadMs: TT.v, longitudM: Math.round(TT.path.distM.at(-1)), camino: TT.path.cells.map(cellLonLat), municipios: TT.arrivals.map(({ nombre, offM, distM, min, at, band }) => ({ nombre, distanciaCaminoM: Math.round(distM), separacionM: Math.round(offM), minutos: +min.toFixed(1), horaLocal: clock(at), horquillaMetodosMin: band ? [+band.minMin.toFixed(1), +band.maxMin.toFixed(1)] : null })) } : null,
     };
     const r = await saveBlob(new Blob([JSON.stringify(pack, null, 1)], { type: 'application/json' }), `senda-dana4d-paquete-${new Date().toISOString().slice(0, 10)}.json`); showToast(r.ok ? `Guardado en ${r.where}` : 'No se pudo guardar');
   });
