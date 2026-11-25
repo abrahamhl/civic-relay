@@ -1150,3 +1150,38 @@ The **Commission's SSRI-04 scope explicitly expects EUCCS compatibility, 3GPP Mi
 - ISO 22320 — **NOT A GRANT**; incident-management guidance, not a product or rescue-safety certificate.
 
 **No new physical validation, accredited-lab engagement, signed partner, funding award, certification, application, external contact, PR merge or master modification verified.** Documentation-only update on `feat/master-emergency-routing-v1-20261020`.
+
+
+## Audit delta — 25 November 2026 (primary-source recheck)
+
+**Material finding 1 — Horizon Cluster 3 2027 topic windows and indicative budgets are now directly visible in the EU Funding & Tenders Portal.** The 2027 Cluster 3 topics listed for the 5 May–4 November 2027 call window include:
+- `HORIZON-CL3-2027-01-DRS-03` — HORIZON-IA; total indicative budget **EUR 9,000,000**; around **3 projects**; around **EUR 3,000,000/project**.
+- `HORIZON-CL3-2027-01-DRS-04` — HORIZON-IA; total indicative budget **EUR 8,000,000**; around **2 projects**; around **EUR 4,000,000/project**.
+- `HORIZON-CL3-2027-01-SSRI-01` — HORIZON-IA; total indicative budget **EUR 4,500,000**; around **3 projects**; around **EUR 1,500,000/project**.
+
+These are **future call facts, not OEP eligibility or awards**. Topic-specific legal entity rules, consortium composition, exact TRL, validation obligations, eligible cost model, coordinator availability and OEP fit remain **UNKNOWN until the topic pages/call text are reviewed**. Official portal checked 2026-11-25: https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/tr/HORIZON-CL3-2027-01-DRS-03 and the 2027 listing: https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/tr/HORIZON-CL3-2027-01-FCT-03 .
+
+**Material finding 2 — Eurostars-3 Call 12 international criteria are confirmed by Eureka.** The call opens **17 December 2026 00:00 CET** and closes **4 March 2027 14:00 CET**. The consortium must be led by an innovative SME from a Eurostars country; at least **two independent legal entities from at least two participating countries** are required. Funding rates, ceilings and national eligibility remain country-specific and must be verified with RVO for the Dutch participant. OEP remains **FUTURE / applicant-specific UNKNOWN**: no legal entity, lead SME, signed consortium, budget, matching funds, TRL or physical validation evidence has been verified. Official source checked 2026-11-25: https://www.eurekanetwork.org/programmes-and-calls/eurostars/eurostars-call-12-for-projects-deadline-march-2027/
+
+**Material finding 3 — Innowwide Call 5 remains time-critical but not eligible-by-default.** RVO's official page records the application window **1 October 2026 09:00 CEST to 1 December 2026 14:00 CEST**, a fixed **EUR 60,000** grant, minimum project costs **EUR 86,000**, and a total call budget of **EUR 4,200,000 for 70 projects**. The call is for international market feasibility/preparatory work with a local counterpart outside Europe; it is not a Netherlands-only Android engineering grant. OEP classification remains **ACTIVE CONDITIONAL**. Applicant legal identity, SME status, establishment-date condition, independently evidenced TRL 4, eligible third-country counterpart, market-feasibility workplan and own contribution remain **UNKNOWN**. Official source checked 2026-11-25: https://english.rvo.nl/subsidies-financing/innowwide
+
+**Material finding 4 — Additional regional route is not currently open.** The Gelderland MIT feasibility page reports the 2026 budget was exhausted on the first day, **7 April 2026**, and the scheme is **CLOSED**. Keep as a future-monitoring route only; do not present it as a live OEP application opportunity. Official source checked 2026-11-25: https://beterbereikbaarwageningen.gelderland.nl/subsidies/mit-haalbaarheidsprojecten-mkb
+
+**Contact prioritisation (review-only, not sent):**
+1. **RVO / Team IRIS** — ask for a written eligibility reading of OEP against Innowwide and Eurostars Call 12, and whether any Dutch SME-led Cluster 3 consortium is actively assembling for DRS/SSRI 2027. Official RVO channel already recorded in this document; no outreach sent.
+2. **Existing Horizon coordinator lead: STIFTELSEN NORSAR / TOGETHER (101226137)** — a verified coordinator of an existing disaster-governance project, but not a verified 2027 recruiter. Ask only for a technical matchmaking pointer, not endorsement or pilot acceptance.
+3. **Public-sector lead: Ayuntamiento de Orihuela / TOGETHER** — verified participant in the existing project, not a committed OEP pilot. Any pilot/procurement route remains UNKNOWN.
+
+**State ledger after this audit**
+- Innowwide Call 5 — **ACTIVE CONDITIONAL**; 1 Dec 2026 14:00 CEST; EUR 60k fixed grant / EUR 86k minimum costs; applicant and third-country counterpart unverified.
+- Eurostars-3 Call 12 — **FUTURE**; 17 Dec 2026–4 Mar 2027; innovative SME lead + >=2 independent legal entities / >=2 countries; Dutch funding conditions and OEP consortium unverified.
+- Horizon CL3 2026 SSRI/DRS — **CLOSED**; 5 Nov 2026.
+- Horizon CL3 2027 DRS-03 / DRS-04 / SSRI-01 — **FUTURE**; 5 May–4 Nov 2027; budgets/topics above verified, OEP fit and coordinator availability UNKNOWN.
+- RVO Innovation Credit — **NOT A GRANT**; repayable financing, not treated as a subsidy.
+- Gelderland MIT feasibility 2026 — **CLOSED**; monitor 2027 only.
+- ETSI CTI/NG112 Plugtests — **NOT A GRANT**; no OEP participation/result evidenced.
+- EUCC — **CERTIFICATION PATH**; ICT-product cybersecurity only, not rescue-safety certification.
+- ISO/IEC 27001 — **CERTIFICATION PATH**; organisational ISMS only.
+- ISO 22320 — **NOT A GRANT**; incident-management guidance.
+
+**No new grant award, signed consortium, physical Android-to-Android trial, accredited-lab engagement, certificate, application, external contact, merge to `master` or PR merge is claimed. This is a documentation-only change on `feat/master-emergency-routing-v1-20261020`.**
