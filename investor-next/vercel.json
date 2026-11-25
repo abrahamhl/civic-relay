@@ -9,7 +9,7 @@
       "destination": "/senda/index.html"
     },
     {
-      "source": "/senda/:page(app|descargas|ruta|conducir|agua|agua-nl|aislamiento|arquitectura|atlas|avisos|barrido|camaras|carretera|centro|ciclo|consola|demo|dgt|dron|edificios|estado|evacuacion|explica|fuego|fuego3d|incendio|incidente|llamada|mensaje|monte|mulas|ojo|organismo|paises|paper|plataforma|radar|radio|red|referencias|reserva|roadsafe|sala|sentidos|simulador|trafico|triaje|vehiculos|via|viaje|visor|vuelo)",
+      "source": "/senda/:page(app|descargas|ruta|conducir|agua|agua-nl|aislamiento|arquitectura|atlas|avisos|barrido|camaras|carretera|centro|ciclo|consola|demo|dgt|dron|edificios|estado|evacuacion|explica|fuego|fuego3d|incendio|incendio4d|incidente|llamada|mensaje|monte|mulas|ojo|organismo|paises|paper|plataforma|radar|radio|red|referencias|reserva|roadsafe|sala|sentidos|simulador|trafico|triaje|vehiculos|via|viaje|visor|vuelo)",
       "destination": "/senda/:page.html"
     }
   ],
