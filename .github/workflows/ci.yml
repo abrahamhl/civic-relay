@@ -12,8 +12,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Una prueba colgada no puede bloquear el CI durante horas (se vio con Node 24 el 25-11-2026).
-    timeout-minutes: 25
+    # Presupuesto F1: CI completo < 10 min y protección dura contra pruebas colgadas (Node 22 y 24).
+    timeout-minutes: 10
 
     strategy:
       matrix:

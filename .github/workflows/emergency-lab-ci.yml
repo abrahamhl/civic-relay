@@ -16,11 +16,14 @@ on:
 jobs:
   simulator:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: investor-next/package-lock.json
       - name: Canonical public domain gate
         run: node investor-next/scripts/check-canonical-domain.mjs
       - name: Deterministic model invariants

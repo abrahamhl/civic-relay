@@ -55,7 +55,7 @@ export function createRelay({ dataDir = process.env.DATA_DIR ?? './data', maxBod
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify(out));
   });
-  return { server, store, flush, close: () => new Promise((r) => { clearInterval(timer); flush(); server.close(r); }) };
+  return { server, store, flush, close: () => new Promise((r) => { clearInterval(timer); flush(); server.closeAllConnections?.(); server.close(r); }) };
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

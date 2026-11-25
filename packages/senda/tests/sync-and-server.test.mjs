@@ -121,6 +121,7 @@ test('servidor de referencia local: HTTP, OpenAPI, SSE, verificación, puerta N5
   await new Promise((resolve) => ref.server.listen(0, '127.0.0.1', resolve));
   const { port } = ref.server.address();
   const baseUrl = `http://127.0.0.1:${port}`;
+  const sseAbort = new AbortController();
 
   try {
     // 1. Health + cabeceras de seguridad + OpenAPI
@@ -136,7 +137,6 @@ test('servidor de referencia local: HTTP, OpenAPI, SSE, verificación, puerta N5
     assert.match(await specResp.text(), /openapi: 3\.1\.0/);
 
     // 2. Suscripción SSE en tiempo real
-    const sseAbort = new AbortController();
     const sseResp = await fetch(`${baseUrl}/api/v1/events`, { signal: sseAbort.signal });
     assert.equal(sseResp.status, 200);
     const reader = sseResp.body.getReader();
@@ -156,6 +156,7 @@ test('servidor de referencia local: HTTP, OpenAPI, SSE, verificación, puerta N5
     const secondChunk = new TextDecoder().decode((await reader.read()).value);
     assert.match(secondChunk, /event: report_assessed/);
     sseAbort.abort();
+    await reader.cancel().catch(() => {});
 
     await client.submitReport(r2);
     const list = await client.listDossiers({ level: 'N4' });
@@ -248,6 +249,7 @@ test('servidor de referencia local: HTTP, OpenAPI, SSE, verificación, puerta N5
     }
     assert.equal(got429, true, 'el servidor debe frenar inundaciones de avisos con HTTP 429');
   } finally {
+    sseAbort.abort();
     await ref.closeAll();
   }
 });
