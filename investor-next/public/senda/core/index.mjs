@@ -102,3 +102,6 @@ export * from './report-forensics.mjs';
 export * from './report-protocol.mjs';
 export * from './sync-protocol.mjs';
 export * from './data-assimilation.mjs';
+export * from './shallow-water-fv.mjs';
+export * from './fire-rothermel.mjs';
+export * from './rail-physics-etcs.mjs';
