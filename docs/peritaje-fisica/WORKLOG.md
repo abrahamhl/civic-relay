@@ -60,3 +60,14 @@
   - Google Chrome headless (`1440×900` y `390×844`) sobre `/senda/reportar.html` y `/senda/comite.html`: renderizado dinámico confirmado con **0 errores de consola/página**.
   - `node --test packages/senda/tests/web-interfaces.test.mjs` → en verde.
 - **Qué falta:** Fases 1.5 (servidor local + OpenAPI + sincronización), 1.6 (asimilación EnKF), 2 (física avanzada), 3 (CalmPath/Civil Sentry integraciones de alto valor) y 4 (documentación, benchmarks, parches y ZIP).
+
+## Fase 1.5 · Cliente independiente del transporte, sincronización multicanal y servidor de referencia local
+- **Commit fase anterior:** `acf6fff`
+- **Hora UTC real de cierre:** `2026-11-25T17:58:32Z`
+- **Qué se hizo:**
+  - Nuevo módulo [`packages/senda/src/sync-protocol.mjs`](../../packages/senda/src/sync-protocol.mjs) (sincronizado en `investor-next/public/senda/core/sync-protocol.mjs` y exportado en `packages/senda/src/index.mjs`): cliente independiente del transporte (`createTransportClient`, `createHttpTransportAdapter`, `createMemoryTransportAdapter`) y libro CRDT causal (`createSyncLedger`) con exportación/fusión de deltas con SHA-256, convergencia conmutativa/idempotente y resolución de conflictos donde `N5_CANCELLED > N5_AUTHORIZED > AUTO_EVALUATED`.
+  - Servidor de referencia local sin coste de nube [`packages/senda/server/reference-server.mjs`](../../packages/senda/server/reference-server.mjs) (Node `node:http` puro, solo `127.0.0.1`, cabeceras de seguridad, límite de cuerpo, rate-limiter anti-inundación, SSE `/api/v1/events`, `/api/v1/sync`, verificación de paso y puerta Ed25519 N5) + especificación [`packages/senda/server/openapi.yaml`](../../packages/senda/server/openapi.yaml).
+  - Pruebas nuevas: `packages/senda/tests/sync-and-server.test.mjs`.
+- **Qué se probó:**
+  - `node --test packages/senda/tests/sync-and-server.test.mjs packages/senda/tests/index-exports.test.mjs packages/senda/tests/web-parity.test.mjs` → **6/6 en verde (0 fallos)**.
+- **Qué falta:** Fases 1.6 (asimilación EnKF), 2 (física avanzada), 3 (integraciones CalmPath Maps Pro & Civil Sentry) y 4 (benchmarks, documentación, parches y ZIP).
