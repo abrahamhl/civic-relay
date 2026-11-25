@@ -20,6 +20,8 @@ const PRO = new URLSearchParams(location.search).has('pro') || !!window.__TAURI_
 const bin = (f) => fetch(D + f).then((r) => r.arrayBuffer());
 const [handBuf, obsBuf, dirBuf, demBuf] = await Promise.all(['hand_roi.bin', 'obs_roi.bin', 'dir_z12.bin', 'dem_d4.bin'].map(bin));
 const DEM4 = new Int16Array(demBuf);
+const SWE = await fetch(D + 'swe.json').then((r) => r.json());
+const SWEV = await Promise.all(SWE.variantes.map(async (v) => ({ ...v, frames: new Uint8Array(await bin(`swe_${v.id}_frames.bin`)), max: new Uint8Array(await bin(`swe_${v.id}_max.bin`)) })));
 const G = meta.malla, R = meta.roi, cellKm2 = (G.celdaM * G.celdaM) / 1e6;
 const handQ = new Uint8Array(handBuf), obs = new Uint8Array(obsBuf), dirP = new Uint8Array(dirBuf);
 const HAND = Float32Array.from(handQ, (v) => (v === 255 ? NaN : v / 4)); // metros
@@ -39,7 +41,7 @@ map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-
 
 const mkCanvas = (w, h) => Object.assign(document.createElement('canvas'), { width: w, height: h });
 const putRGBA = (c, rgba) => { const x = c.getContext('2d'), img = x.createImageData(c.width, c.height); img.data.set(rgba); x.putImageData(img, 0, 0); };
-const cHand = mkCanvas(R.w, R.h), cCmp = mkCanvas(R.w, R.h);
+const cHand = mkCanvas(R.w, R.h), cCmp = mkCanvas(R.w, R.h), cSwe = mkCanvas(SWE.malla.w, SWE.malla.h);
 let cBasin = null, basinCorners = null; // la capa de cuenca se crea al calcular la primera
 
 const LAYERS = [
@@ -47,6 +49,7 @@ const LAYERS = [
   { id: 'hand', label: 'Agua del modelo (nivel elegido)', badge: 'scen', on: true, sub: 'Celdas a menos altura sobre su cauce que el nivel de arriba', info: `<p>Cada celda de ${fmt(G.celdaM, 1)} m sabe a qué altura está sobre el cauce al que drena (HAND, «altura sobre el drenaje más cercano»). Si subes el nivel, se pintan las celdas que quedarían por debajo: primero se inundan las más bajas respecto a su cauce. Azul oscuro = más bajo.</p><p>Sirve para saber <b>qué se inunda antes</b>. No da calados ni horas: no hay caudal ni lluvia en este cálculo.</p>` },
   { id: 'cmp', label: 'Modelo frente a satélite', badge: 'model', on: false, sub: 'Blanco: aciertan los dos · azul: solo el modelo · verde: solo el satélite', info: '<p>Compara, celda a celda, el agua del modelo al nivel elegido con la mancha observada por Copernicus. Con eso se calcula el índice de éxito crítico (CSI): aciertos / (aciertos + falsas alarmas + fallos). 1 sería perfecto.</p>' },
   { id: 'cauces', label: 'Cauces del modelo', badge: 'model', on: true, sub: 'Por dónde baja el agua según el relieve · más grueso = más cuenca', info: `<p>Dirección del agua celda a celda (método D8: cada celda vierte a su vecina más baja) sobre el relieve con los hoyos rellenados (Priority-Flood). Se dibuja todo cauce que recoge ${meta.cauceDibujoKm2} km² o más.</p><p>Es el relieve natural a ${fmt(G.celdaM, 0)} m: <b>no incluye</b> encauzamientos, colectores, puentes ni el nuevo cauce del Turia como obra. Donde la realidad canaliza el agua, el modelo puede ir por otro lado.</p>` },
+  { id: 'swe', label: 'Simulación hidrodinámica 2D', badge: 'model', on: true, sub: 'Aguas someras (Bates et al. 2010) · avanza con la hora · calado en m', info: `<p>El agua entra por el cauce del Poyo con un hidrograma construido con los datos publicados (subida en 2 h, 2.282 m³/s a las 18:55, 3.500 m³/s estimados a las 19:35) y se mueve por el relieve resolviendo las ecuaciones de aguas someras (formulación inercial de Bates, Horritt y Fewtrell, 2010, base de LISFLOOD-FP) en celdas de ${SWE.malla.celdaM} m.</p><p>Verificado con pruebas clásicas (lago en reposo, conservación de la masa, calado normal de Manning). Comparado con la mancha de Copernicus mejora la superficie respecto al modelo estático, pero <b>los tiempos de llegada no son fiables</b> (ver 🔬).</p>` },
   { id: 'basin', label: 'Cuenca del punto elegido', badge: 'model', on: true, sub: 'Toca «¿De dónde viene el agua?» y luego un punto', info: '<p>Toda la superficie cuya agua de lluvia acaba pasando por el punto que tocas, siguiendo las direcciones D8 hacia arriba. Es la «cuenca vertiente»: cuanto mayor, más agua puede llegar en un aguacero.</p>' },
 ];
 const state = { level: LS.get('senda.d4d.level', BEST.level), on: Object.fromEntries(LAYERS.map((l) => [l.id, LS.get(`senda.d4d.${l.id}`, l.on)])), basinMode: false, playing: false };
@@ -57,13 +60,14 @@ function addAll() {
   const src = (id, def) => { if (!map.getSource(id)) map.addSource(id, def); };
   src('hand', { type: 'canvas', canvas: cHand, coordinates: R.esquinas, animate: false });
   src('cmp', { type: 'canvas', canvas: cCmp, coordinates: R.esquinas, animate: false });
+  src('swe', { type: 'canvas', canvas: cSwe, coordinates: SWE.malla.esquinas, animate: false });
   if (cBasin) src('basin', { type: 'canvas', canvas: cBasin, coordinates: basinCorners, animate: false });
   src('obs', { type: 'geojson', data: obsGj });
   src('cauces', { type: 'geojson', data: cauces });
   src('pin', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
   for (const id of ['tpath', 'tmarks', 'tfront', 'towns']) src(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
   const L = (def) => { if (!map.getLayer(def.id)) map.addLayer(def); };
-  for (const id of [...(cBasin ? ['basin'] : []), 'hand', 'cmp']) L({ id, type: 'raster', source: id, paint: { 'raster-opacity': id === 'basin' ? 0.55 : 0.9, 'raster-fade-duration': 0, 'raster-resampling': 'nearest' } });
+  for (const id of [...(cBasin ? ['basin'] : []), 'hand', 'cmp', 'swe']) L({ id, type: 'raster', source: id, paint: { 'raster-opacity': id === 'basin' ? 0.55 : 0.9, 'raster-fade-duration': 0, 'raster-resampling': 'nearest' } });
   L({ id: 'obs', type: 'fill', source: 'obs', paint: { 'fill-color': '#34c759', 'fill-opacity': 0.35 } });
   L({ id: 'obs-line', type: 'line', source: 'obs', paint: { 'line-color': '#34c759', 'line-width': 1.2 } });
   L({ id: 'cauces', type: 'line', source: 'cauces', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#64d2ff', 'line-opacity': 0.9, 'line-width': ['interpolate', ['linear'], ['zoom'], 9, ['+', 0.6, ['*', 0.7, ['get', 'clase']]], 14, ['+', 1.5, ['*', 1.8, ['get', 'clase']]]] } });
@@ -94,7 +98,7 @@ function render(force = false) {
   $('#lvlTxt').innerHTML = `${fmt(L, 1)} m <small style="color:var(--l2);font-weight:500">sobre el cauce</small>`;
   const vis = (id, on) => { if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', on ? 'visible' : 'none'); };
   vis('obs', state.on.obs); vis('obs-line', state.on.obs); vis('hand', state.on.hand && !state.on.cmp); vis('cmp', state.on.cmp);
-  vis('cauces', state.on.cauces); vis('cauces-lbl', state.on.cauces); vis('basin', state.on.basin); vis('pin', state.on.basin);
+  vis('swe', state.on.swe); vis('cauces', state.on.cauces); vis('cauces-lbl', state.on.cauces); vis('basin', state.on.basin); vis('pin', state.on.basin);
   $('#cmpLeg').hidden = !state.on.cmp;
   renderScience();
 }
@@ -191,6 +195,11 @@ function renderScience() {
 <h4>Acuerdo según el nivel</h4><canvas id="csi" width="700" height="300"></canvas>
 <div class="leg"><span><i style="background:#0a84ff"></i>cauce ≥ 25 km² (el usado)</span><span><i style="background:#64d2ff"></i>≥ 5 km²</span><span><i style="background:#8e8e93"></i>≥ 1 km²</span><span><i style="background:#ffd60a"></i>sin hidrología: «todo lo que esté por debajo de N×4 m de cota»</span></div>
 <p class="src">El mejor acuerdo (CSI ${fmt(BEST.csi, 3)} a ${fmt(BEST.level, 1)} m) <b>se calibra mirando la mancha real</b>: no es una predicción hecha antes. Con hidrología el acuerdo dobla al de «inundar lo más bajo» (CSI ${fmt(meta.banera.mejor.csi, 3)}), pero sigue siendo bajo.</p>
+<h4>🌊 Simulación 2D frente al modelo estático</h4>
+<table class="tbl"><tr><td><b>Rugosidad n · bajada</b></td><td><b>CSI · acierto · falsa alarma</b></td><td><b>Llega a Paiporta</b></td></tr>
+${SWE.calibracion.map((r) => `<tr${r.n === SWE.mejor.n && r.recesionH === SWE.mejor.recesionH ? ' style="font-weight:700;color:#fff"' : ''}><td>${fmt(r.n, 3)} · ${r.recesionH} h</td><td>${fmt(r.csi, 3)} · ${fmt(100 * r.acierto)} % · ${fmt(100 * r.falsaAlarma)} %</td><td>${r.llegadas?.Paiporta != null ? clock(16 * 60 + 55 + r.llegadas.Paiporta) : 'no llega'}</td></tr>`).join('')}
+<tr><td>Modelo estático (HAND)</td><td>${fmt(SWE.comparacionHAND.csi, 3)}</td><td>sin tiempo</td></tr></table>
+<p class="src">La simulación 2D <b>mejora la superficie</b> (CSI ${fmt(SWE.mejor.csi, 3)} frente a ${fmt(SWE.comparacionHAND.csi, 3)}, +${fmt(100 * (SWE.mejor.csi / SWE.comparacionHAND.csi - 1))} %), con balance de masa cerrado (error ≈ 10⁻¹⁵). Pero <b>sus tiempos no son fiables</b>: ${sweFrontTxt()}, cuando el CEDEX estimó 14 m/s por Chiva. Causas conocidas: la formulación inercial omite la advección (está pensada para flujo lento) y la malla de ${fmt(SWE.malla.celdaM)} m no resuelve el cauce encauzado. La rugosidad y la bajada se calibran con la mancha observada: no es una predicción a ciegas. Próximo paso: solver de volúmenes finitos completo (Kurganov y Petrova, 2007) con porosidad urbana.</p>
 <h4>Por qué no acierta más (dicho tal cual)</h4><ul style="margin:0 0 6px 18px;padding:0;color:var(--l2);font-size:12.5px;line-height:1.45">
 ${M.limites.map((t) => `<li>${esc(t)}</li>`).join('')}
 <li>Aguas abajo de Torrent el Poyo se desborda en un cono aluvial: el agua se abre en abanico y deja de seguir un solo cauce, justo lo que HAND (un cauce por celda) no representa.</li></ul>
@@ -238,9 +247,9 @@ state.tMin = LS.get('senda.d4d.t', 1135);
 const TIPO = { MEDIDO: ['real', 'MEDIDO'], ESTIMADO: ['scen', 'ESTIMADO'], OFICIAL: ['real', 'OFICIAL'], SIN_HORA: ['model', 'SIN HORA'] };
 
 function renderTime() {
-  const t = state.tMin, utc = new Date(localToUtcMs(`${DAY0}T${hhmm(t)}`, OFF));
-  $('#clock').innerHTML = `${hhmm(t)} <small style="color:var(--l2);font-weight:500">29-10 · ${pad2(utc.getUTCHours())}:${pad2(utc.getUTCMinutes())} UTC</small>`;
-  const pub = FLOW.filter((e) => e.min <= t).at(-1), tMs = localToUtcMs(`${DAY0}T${hhmm(t)}`, OFF);
+  const t = state.tMin, utc = new Date(localToUtcMs(`${DAY0}T00:00`, OFF) + t * 60_000);
+  $('#clock').innerHTML = `${hhmm(t % 1440)} <small style="color:var(--l2);font-weight:500">${t >= 1440 ? '30-10' : '29-10'} · ${pad2(utc.getUTCHours())}:${pad2(utc.getUTCMinutes())} UTC</small>`;
+  const pub = FLOW.filter((e) => e.min <= t).at(-1), tMs = localToUtcMs(`${DAY0}T00:00`, OFF) + t * 60_000;
   const imp = IMP.filter((x) => x.kind === 'caudal').map((x) => ({ x, p: valueAt(x, tMs) })).filter((o) => o.p).sort((a, b) => b.p.tMs - a.p.tMs)[0];
   const best = pickBest([...(imp ? [{ basis: 'MEDIDO', value: imp.p.value, at: hhmm(Math.round((imp.p.tMs / 60000 + OFF * 60) % 1440)), imp: true }] : []), ...(pub ? [{ basis: 'OBSERVADO_EXTERNO', value: pub.valor, at: hhmm(pub.min), unv: pub.unv }] : [])]);
   $('#kQ').innerHTML = best ? `${fmt(best.value)}${best.unv ? '<small style="color:#ff9f0a"> ?</small>' : ''} <small style="font-size:10px;color:var(--l2)">m³/s ${best.at}${best.imp ? ' · tu red' : ''}</small>` : '–';
@@ -250,7 +259,7 @@ function renderTime() {
   $('#kAlert').textContent = t < ESA.min ? `en ${ESA.min - t} min` : `enviado ${hhmm(ESA.min)}`;
   $('#kAlert').style.color = t < ESA.min ? '#ff9f0a' : '#64d2ff';
   document.querySelectorAll('#evlist .ev[data-m]').forEach((el) => el.classList.toggle('fut', +el.dataset.m > t));
-  drawFlow();
+  drawFlow(); renderSwe();
   // Frente del escenario de llegada
   const fr = map.getSource('tfront');
   if (fr && TT.path) {
@@ -259,11 +268,11 @@ function renderTime() {
   }
 }
 function drawFlow() {
-  const cv = $('#tq'); if (!cv || !cv.offsetParent) return; const x = cv.getContext('2d'), W = cv.width, H = cv.height, L = 52, B = 34, T0 = 360, T1 = 1320, QMAX = 4000;
+  const cv = $('#tq'); if (!cv || !cv.offsetParent) return; const x = cv.getContext('2d'), W = cv.width, H = cv.height, L = 52, B = 34, T0 = 360, T1 = 1800, QMAX = 4000;
   const X = (m) => L + ((m - T0) / (T1 - T0)) * (W - L - 12), Y = (q) => H - B - (q / QMAX) * (H - B - 12);
   x.clearRect(0, 0, W, H); x.font = '19px Inter, system-ui'; x.lineWidth = 1;
   for (const q of [0, 1000, 2000, 3000, 4000]) { x.strokeStyle = 'rgba(84,84,88,.5)'; x.beginPath(); x.moveTo(L, Y(q)); x.lineTo(W - 12, Y(q)); x.stroke(); x.fillStyle = 'rgba(235,235,245,.62)'; x.fillText(q ? `${q / 1000}k` : '0', 8, Y(q) + 6); }
-  for (let m = 360; m <= 1320; m += 120) x.fillText(hhmm(m).slice(0, 2) + 'h', X(m) - 12, H - 8);
+  for (let m = 360; m <= 1800; m += 180) x.fillText(hhmm(m % 1440).slice(0, 2) + 'h', X(m) - 12, H - 8);
   const hline = (q, col) => { x.strokeStyle = col; x.lineWidth = 2; x.setLineDash([8, 6]); x.beginPath(); x.moveTo(L, Y(q)); x.lineTo(W - 12, Y(q)); x.stroke(); x.setLineDash([]); };
   hline(TH.avisoM3s, '#ffd60a'); hline(TH.capacidadM3s, '#ff9f0a');
   x.strokeStyle = '#64d2ff'; x.lineWidth = 3; x.beginPath(); x.moveTo(X(ESA.min), 8); x.lineTo(X(ESA.min), H - B); x.stroke();
@@ -339,10 +348,42 @@ let traf = 0;
 $('#tplay').addEventListener('click', () => {
   state.tplaying = !state.tplaying; $('#tplay').textContent = state.tplaying ? '❚❚' : '▶';
   let last = performance.now();
-  const step = (now) => { if (!state.tplaying) return; if (now - last > 90) { last = now; state.tMin = state.tMin >= 1320 ? 360 : state.tMin + 5; $('#t').value = state.tMin; renderTime(); } traf = requestAnimationFrame(step); };
+  const step = (now) => { if (!state.tplaying) return; if (now - last > 90) { last = now; state.tMin = state.tMin >= 1800 ? 360 : state.tMin + 5; $('#t').value = state.tMin; renderTime(); } traf = requestAnimationFrame(step); };
   if (state.tplaying) traf = requestAnimationFrame(step); else cancelAnimationFrame(traf);
 });
 map.on('style.load', () => { travelRender(); renderTime(); });
+
+// ── 🌊 Simulación hidrodinámica 2D: fotogramas cada 15 min desde las 16:55 locales ──
+const SWE_T0 = 16 * 60 + 55, SW = SWE.malla.w, SH = SWE.malla.h;
+state.sweVar = LS.get('senda.d4d.swevar', 'extension'); state.sweMode = 'now';
+function decodeRle(bytes, off, len, out) { let p = off, k = 0; const end = off + len; while (p < end) { const v = bytes[p++]; if (v === 255) { const r = bytes[p] | (bytes[p + 1] << 8); p += 2; out.fill(0, k, k + r); k += r; } else out[k++] = v; } return out; }
+const sweCol = (v) => (v < 5 ? [155, 231, 255, 150] : v < 15 ? [58, 160, 255, 185] : v < 30 ? [22, 82, 216, 210] : [122, 43, 214, 225]);
+const sweBuf = new Uint8Array(SW * SH); let sweKey = '';
+function renderSwe() {
+  const V = SWEV.find((v) => v.id === state.sweVar) ?? SWEV[0], src = map.getSource('swe'); if (!src) return;
+  let data = null, label;
+  if (state.sweMode === 'max') { data = V.max; label = 'calado máximo de toda la simulación'; }
+  else { const idx = Math.floor((state.tMin - SWE_T0) / 15) - 1; if (idx >= 0) { const f = V.fotogramas[Math.min(idx, V.fotogramas.length - 1)]; data = decodeRle(V.frames, f.offset, f.bytes, sweBuf); label = `agua a las ${hhmm((SWE_T0 + Math.round(f.tSeg / 60)) % 1440)}${idx >= V.fotogramas.length ? ' (fin de la simulación)' : ''}`; } else label = 'la simulación empieza a las 16:55'; }
+  const key = `${V.id}|${state.sweMode}|${label}`; if (key === sweKey) return; sweKey = key;
+  const rgba = new Uint8ClampedArray(SW * SH * 4); let wet = 0;
+  if (data) for (let k = 0; k < data.length; k++) { const v = data[k]; if (!v) continue; rgba.set(sweCol(v), k * 4); wet++; }
+  putRGBA(cSwe, rgba); src.play?.(); src.pause?.();
+  const cell = SWE.malla.celdaM ** 2 / 1e6;
+  $('#sweOut').innerHTML = `${esc(label)} · <b>${fmt(wet * cell, 1)} km²</b> con agua (≥ ${fmt(SWE.umbralMojadoM, 1)} m) · variante n = ${fmt(V.n, 3)}, bajada en ${V.recesionH} h<br>${V.municipios.filter((m) => m.llegadaMin != null).map((m) => `${esc(m.nombre)}: llega ${clock(SWE_T0 + m.llegadaMin)} · calado máx. ${fmt(m.calMaxM, 1)} m`).join(' · ') || 'el agua no llega a los puntos de los municipios de la lista'}`;
+}
+$('#sweVar').innerHTML = SWEV.map((v) => { const r = SWE.calibracion.find((c) => c.n === v.n && c.recesionH === v.recesionH); return `<option value="${v.id}">${v.id === 'extension' ? 'mejor superficie' : 'más rápida'} · CSI ${fmt(r?.csi, 3)}</option>`; }).join('');
+$('#sweVar').value = state.sweVar;
+$('#sweVar').addEventListener('change', (e) => { state.sweVar = e.target.value; LS.set('senda.d4d.swevar', state.sweVar); renderSwe(); });
+$('#sweMode').addEventListener('change', (e) => { state.sweMode = e.target.value; renderSwe(); });
+
+/** Velocidad media del frente simulado (línea recta entrada → municipio más rápido alcanzado), calculada de los datos. */
+function sweFrontTxt() {
+  const fastV = SWEV.find((v) => v.id === 'tiempo') ?? SWEV[0], hit = fastV.municipios.filter((m) => m.llegadaMin != null).sort((a, b) => a.llegadaMin - b.llegadaMin)[0];
+  if (!hit) return 'el frente simulado no llega a los municipios de la lista';
+  const tw = TOWNS.find((t) => t.nombre === hit.nombre), [lo, la] = SWE.entrada.lonlat, R = 6371e3, rad = Math.PI / 180;
+  const dM = 2 * R * Math.asin(Math.sqrt(Math.sin(((tw.lat - la) * rad) / 2) ** 2 + Math.cos(la * rad) * Math.cos(tw.lat * rad) * Math.sin(((tw.lon - lo) * rad) / 2) ** 2));
+  return `el frente simulado avanza a ≈ ${fmt(dM / (hit.llegadaMin * 60), 1)} m/s (${fmt(dM / 1000, 1)} km en línea recta hasta ${esc(hit.nombre)} en ${Math.floor(hit.llegadaMin / 60)} h ${hit.llegadaMin % 60} min, en la variante más rápida, contando desde el inicio de la subida)`;
+}
 
 // ── 🔌 Conectores: datos de la red del organismo (solo en memoria; sustituyen a las estimaciones) ──
 const STATUS = { conectado: 'CONECTADO', importable: 'IMPORTABLE', requiere_clave: 'REQUIERE CLAVE', requiere_convenio: 'REQUIERE CONVENIO' };

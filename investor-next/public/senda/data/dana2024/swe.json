@@ -1,0 +1,806 @@
+{
+ "caso": "DANA 29-10-2024 · crecida del Poyo en l'Horta Sud · simulación hidrodinámica 2D",
+ "basis": "MODEL_CALIBRATED_AGAINST_OBSERVED",
+ "generadoUTC": "2026-11-25T17:16:01Z",
+ "metodo": "Ecuaciones de aguas someras, formulación inercial (Bates, Horritt y Fewtrell 2010, J. Hydrology 387:33-45), Courant α = 0,7; verificado con lago en reposo, conservación de masa y calado normal de Manning (packages/senda/tests/shallow-water.test.mjs)",
+ "malla": {
+  "w": 422,
+  "h": 340,
+  "celdaM": 59.05,
+  "esquinas": [
+   [
+    -0.620041,
+    39.510133
+   ],
+   [
+    -0.330276,
+    39.510133
+   ],
+   [
+    -0.330276,
+    39.329783
+   ],
+   [
+    -0.620041,
+    39.329783
+   ]
+  ],
+  "bbox": [
+   -0.62,
+   39.33,
+   -0.33,
+   39.51
+  ],
+  "agregacion": "media de 2×2 celdas de Terrain Tiles z12"
+ },
+ "entrada": {
+  "lonlat": [
+   -0.61781,
+   39.48563
+  ],
+  "nota": "camino D8 del Poyo desde Chiva al entrar en el dominio (zona del aforo; su posición exacta no está publicada)",
+  "puntos": [
+   [
+    "16:55",
+    0,
+    "inicio de la subida: «en dos horas» (Bonet, ROP)"
+   ],
+   [
+    "18:55",
+    2282,
+    "MEDIDO (CHJ vía Maldita)"
+   ],
+   [
+    "19:35",
+    3500,
+    "ESTIMADO (CEDEX, preliminar)"
+   ],
+   [
+    "+6 h",
+    0,
+    "bajada lineal: ESCENARIO calibrado"
+   ]
+  ]
+ },
+ "origenTiempo": "2024-10-29T16:55 hora local (15:55 UTC)",
+ "umbralMojadoM": 0.1,
+ "observadoKm2Roi": 24.18,
+ "calibracion": [
+  {
+   "n": 0.035,
+   "recesionH": 3,
+   "llegadas": {
+    "Paiporta": 300,
+    "Picanya": 271
+   },
+   "volumenEntradaHm3": 34.05,
+   "volumenHidrogramaHm3": 34.05,
+   "salidaHm3": 23.48,
+   "errorBalance": 3.12e-15,
+   "pasos": 6261,
+   "csi": 0.2028,
+   "acierto": 0.297,
+   "falsaAlarma": 0.61,
+   "km2Max": 18.42,
+   "seg": 8.5
+  },
+  {
+   "n": 0.035,
+   "recesionH": 6,
+   "llegadas": {
+    "Paiporta": 300,
+    "Picanya": 271
+   },
+   "volumenEntradaHm3": 52.95,
+   "volumenHidrogramaHm3": 52.95,
+   "salidaHm3": 40.69,
+   "errorBalance": -6.65e-15,
+   "pasos": 8916,
+   "csi": 0.208,
+   "acierto": 0.3244,
+   "falsaAlarma": 0.6331,
+   "km2Max": 21.38,
+   "seg": 16.7
+  },
+  {
+   "n": 0.06,
+   "recesionH": 3,
+   "llegadas": {
+    "Paiporta": 405,
+    "Picanya": 359
+   },
+   "volumenEntradaHm3": 34.05,
+   "volumenHidrogramaHm3": 34.05,
+   "salidaHm3": 22.06,
+   "errorBalance": -9.57e-15,
+   "pasos": 6045,
+   "csi": 0.2125,
+   "acierto": 0.3235,
+   "falsaAlarma": 0.6176,
+   "km2Max": 20.46,
+   "seg": 5.9
+  },
+  {
+   "n": 0.06,
+   "recesionH": 6,
+   "llegadas": {
+    "Paiporta": 401,
+    "Picanya": 357
+   },
+   "volumenEntradaHm3": 52.95,
+   "volumenHidrogramaHm3": 52.95,
+   "salidaHm3": 36.84,
+   "errorBalance": 7.04e-17,
+   "pasos": 8790,
+   "csi": 0.2283,
+   "acierto": 0.3793,
+   "falsaAlarma": 0.6354,
+   "km2Max": 25.16,
+   "seg": 16.6
+  },
+  {
+   "n": 0.1,
+   "recesionH": 3,
+   "llegadas": {
+    "Picanya": 487
+   },
+   "volumenEntradaHm3": 34.05,
+   "volumenHidrogramaHm3": 34.05,
+   "salidaHm3": 22.18,
+   "errorBalance": 6.02e-15,
+   "pasos": 5642,
+   "csi": 0.1948,
+   "acierto": 0.2885,
+   "falsaAlarma": 0.6251,
+   "km2Max": 18.61,
+   "seg": 4.5
+  },
+  {
+   "n": 0.1,
+   "recesionH": 6,
+   "llegadas": {
+    "Paiporta": 545,
+    "Picanya": 480
+   },
+   "volumenEntradaHm3": 52.95,
+   "volumenHidrogramaHm3": 52.95,
+   "salidaHm3": 34.49,
+   "errorBalance": 5.77e-15,
+   "pasos": 8510,
+   "csi": 0.2354,
+   "acierto": 0.4002,
+   "falsaAlarma": 0.6363,
+   "km2Max": 26.61,
+   "seg": 10.2
+  }
+ ],
+ "mejor": {
+  "n": 0.1,
+  "recesionH": 6,
+  "llegadas": {
+   "Paiporta": 545,
+   "Picanya": 480
+  },
+  "volumenEntradaHm3": 52.95,
+  "volumenHidrogramaHm3": 52.95,
+  "salidaHm3": 34.49,
+  "errorBalance": 5.77e-15,
+  "pasos": 8510,
+  "csi": 0.2354,
+  "acierto": 0.4002,
+  "falsaAlarma": 0.6363,
+  "km2Max": 26.61,
+  "seg": 10.2
+ },
+ "comparacionHAND": {
+  "csi": 0.16775922097704277,
+  "nota": "mismo índice, misma mancha y misma ROI"
+ },
+ "limites": [
+  "Sin edificios, colectores, puentes ni encauzamientos en el relieve (≈ 59 m).",
+  "Hidrograma de entrada construido con 3 puntos publicados; la forma entre ellos y la bajada son ESCENARIO.",
+  "Sin afluentes (Saleta, Horteta, Gallego) ni lluvia local.",
+  "La rugosidad y la duración de la bajada se calibran con la mancha observada: no es una predicción a ciegas.",
+  "La mancha de Copernicus es del 31-10 10:22 UTC; se compara con la extensión MÁXIMA simulada."
+ ],
+ "variantes": [
+  {
+   "id": "extension",
+   "n": 0.1,
+   "recesionH": 6,
+   "municipios": [
+    {
+     "nombre": "Torrent",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Paiporta",
+     "calMaxM": 1.77,
+     "llegadaMin": 545
+    },
+    {
+     "nombre": "Picanya",
+     "calMaxM": 4.67,
+     "llegadaMin": 480
+    },
+    {
+     "nombre": "Alaquàs",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Aldaia",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Loriguilla",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Quart de Poblet",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Catarroja",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Massanassa",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Alfafar",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Benetússer",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Sedaví",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Montserrat",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Alcàsser",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Picassent",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Xirivella",
+     "calMaxM": 0,
+     "llegadaMin": null
+    }
+   ],
+   "fotogramas": [
+    {
+     "tSeg": 10,
+     "offset": 0,
+     "bytes": 9
+    },
+    {
+     "tSeg": 900,
+     "offset": 9,
+     "bytes": 54
+    },
+    {
+     "tSeg": 1800,
+     "offset": 63,
+     "bytes": 103
+    },
+    {
+     "tSeg": 2700,
+     "offset": 166,
+     "bytes": 164
+    },
+    {
+     "tSeg": 3600,
+     "offset": 330,
+     "bytes": 249
+    },
+    {
+     "tSeg": 4500,
+     "offset": 579,
+     "bytes": 375
+    },
+    {
+     "tSeg": 5400,
+     "offset": 954,
+     "bytes": 569
+    },
+    {
+     "tSeg": 6300,
+     "offset": 1523,
+     "bytes": 770
+    },
+    {
+     "tSeg": 7200,
+     "offset": 2293,
+     "bytes": 1094
+    },
+    {
+     "tSeg": 8100,
+     "offset": 3387,
+     "bytes": 1476
+    },
+    {
+     "tSeg": 9000,
+     "offset": 4863,
+     "bytes": 1850
+    },
+    {
+     "tSeg": 9900,
+     "offset": 6713,
+     "bytes": 2181
+    },
+    {
+     "tSeg": 10800,
+     "offset": 8894,
+     "bytes": 2486
+    },
+    {
+     "tSeg": 11700,
+     "offset": 11380,
+     "bytes": 2835
+    },
+    {
+     "tSeg": 12600,
+     "offset": 14215,
+     "bytes": 3124
+    },
+    {
+     "tSeg": 13500,
+     "offset": 17339,
+     "bytes": 3394
+    },
+    {
+     "tSeg": 14400,
+     "offset": 20733,
+     "bytes": 3689
+    },
+    {
+     "tSeg": 15300,
+     "offset": 24422,
+     "bytes": 3996
+    },
+    {
+     "tSeg": 16200,
+     "offset": 28418,
+     "bytes": 4438
+    },
+    {
+     "tSeg": 17100,
+     "offset": 32856,
+     "bytes": 4837
+    },
+    {
+     "tSeg": 18000,
+     "offset": 37693,
+     "bytes": 5117
+    },
+    {
+     "tSeg": 18900,
+     "offset": 42810,
+     "bytes": 5343
+    },
+    {
+     "tSeg": 19800,
+     "offset": 48153,
+     "bytes": 5558
+    },
+    {
+     "tSeg": 20700,
+     "offset": 53711,
+     "bytes": 5844
+    },
+    {
+     "tSeg": 21600,
+     "offset": 59555,
+     "bytes": 6118
+    },
+    {
+     "tSeg": 22500,
+     "offset": 65673,
+     "bytes": 6405
+    },
+    {
+     "tSeg": 23400,
+     "offset": 72078,
+     "bytes": 6681
+    },
+    {
+     "tSeg": 24300,
+     "offset": 78759,
+     "bytes": 6851
+    },
+    {
+     "tSeg": 25200,
+     "offset": 85610,
+     "bytes": 6974
+    },
+    {
+     "tSeg": 26100,
+     "offset": 92584,
+     "bytes": 7024
+    },
+    {
+     "tSeg": 27000,
+     "offset": 99608,
+     "bytes": 7048
+    },
+    {
+     "tSeg": 27900,
+     "offset": 106656,
+     "bytes": 7135
+    },
+    {
+     "tSeg": 28800,
+     "offset": 113791,
+     "bytes": 7149
+    },
+    {
+     "tSeg": 29700,
+     "offset": 120940,
+     "bytes": 7175
+    },
+    {
+     "tSeg": 30600,
+     "offset": 128115,
+     "bytes": 7231
+    },
+    {
+     "tSeg": 31500,
+     "offset": 135346,
+     "bytes": 7314
+    },
+    {
+     "tSeg": 32400,
+     "offset": 142660,
+     "bytes": 7390
+    },
+    {
+     "tSeg": 33300,
+     "offset": 150050,
+     "bytes": 7505
+    },
+    {
+     "tSeg": 34200,
+     "offset": 157555,
+     "bytes": 7637
+    },
+    {
+     "tSeg": 35100,
+     "offset": 165192,
+     "bytes": 7866
+    },
+    {
+     "tSeg": 36000,
+     "offset": 173058,
+     "bytes": 7992
+    },
+    {
+     "tSeg": 36900,
+     "offset": 181050,
+     "bytes": 8169
+    },
+    {
+     "tSeg": 37800,
+     "offset": 189219,
+     "bytes": 8391
+    },
+    {
+     "tSeg": 38700,
+     "offset": 197610,
+     "bytes": 8514
+    },
+    {
+     "tSeg": 39600,
+     "offset": 206124,
+     "bytes": 8533
+    },
+    {
+     "tSeg": 40500,
+     "offset": 214657,
+     "bytes": 8557
+    },
+    {
+     "tSeg": 41400,
+     "offset": 223214,
+     "bytes": 8581
+    }
+   ],
+   "mb": 0.23
+  },
+  {
+   "id": "tiempo",
+   "n": 0.035,
+   "recesionH": 3,
+   "municipios": [
+    {
+     "nombre": "Torrent",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Paiporta",
+     "calMaxM": 1.5,
+     "llegadaMin": 300
+    },
+    {
+     "nombre": "Picanya",
+     "calMaxM": 4.05,
+     "llegadaMin": 271
+    },
+    {
+     "nombre": "Alaquàs",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Aldaia",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Loriguilla",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Quart de Poblet",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Catarroja",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Massanassa",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Alfafar",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Benetússer",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Sedaví",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Montserrat",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Alcàsser",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Picassent",
+     "calMaxM": 0,
+     "llegadaMin": null
+    },
+    {
+     "nombre": "Xirivella",
+     "calMaxM": 0,
+     "llegadaMin": null
+    }
+   ],
+   "fotogramas": [
+    {
+     "tSeg": 10,
+     "offset": 0,
+     "bytes": 9
+    },
+    {
+     "tSeg": 900,
+     "offset": 9,
+     "bytes": 54
+    },
+    {
+     "tSeg": 1800,
+     "offset": 63,
+     "bytes": 124
+    },
+    {
+     "tSeg": 2700,
+     "offset": 187,
+     "bytes": 213
+    },
+    {
+     "tSeg": 3600,
+     "offset": 400,
+     "bytes": 327
+    },
+    {
+     "tSeg": 4500,
+     "offset": 727,
+     "bytes": 479
+    },
+    {
+     "tSeg": 5400,
+     "offset": 1206,
+     "bytes": 775
+    },
+    {
+     "tSeg": 6300,
+     "offset": 1981,
+     "bytes": 1124
+    },
+    {
+     "tSeg": 7200,
+     "offset": 3105,
+     "bytes": 1480
+    },
+    {
+     "tSeg": 8100,
+     "offset": 4585,
+     "bytes": 1849
+    },
+    {
+     "tSeg": 9000,
+     "offset": 6434,
+     "bytes": 2243
+    },
+    {
+     "tSeg": 9900,
+     "offset": 8677,
+     "bytes": 2730
+    },
+    {
+     "tSeg": 10800,
+     "offset": 11407,
+     "bytes": 3364
+    },
+    {
+     "tSeg": 11700,
+     "offset": 14771,
+     "bytes": 3708
+    },
+    {
+     "tSeg": 12600,
+     "offset": 18479,
+     "bytes": 4024
+    },
+    {
+     "tSeg": 13500,
+     "offset": 22503,
+     "bytes": 4295
+    },
+    {
+     "tSeg": 14400,
+     "offset": 26798,
+     "bytes": 4475
+    },
+    {
+     "tSeg": 15300,
+     "offset": 31273,
+     "bytes": 4670
+    },
+    {
+     "tSeg": 16200,
+     "offset": 35943,
+     "bytes": 4859
+    },
+    {
+     "tSeg": 17100,
+     "offset": 40802,
+     "bytes": 4990
+    },
+    {
+     "tSeg": 18000,
+     "offset": 45792,
+     "bytes": 5258
+    },
+    {
+     "tSeg": 18900,
+     "offset": 51050,
+     "bytes": 5583
+    },
+    {
+     "tSeg": 19800,
+     "offset": 56633,
+     "bytes": 5992
+    },
+    {
+     "tSeg": 20700,
+     "offset": 62625,
+     "bytes": 6278
+    },
+    {
+     "tSeg": 21600,
+     "offset": 68903,
+     "bytes": 6425
+    },
+    {
+     "tSeg": 22500,
+     "offset": 75328,
+     "bytes": 6459
+    },
+    {
+     "tSeg": 23400,
+     "offset": 81787,
+     "bytes": 6488
+    },
+    {
+     "tSeg": 24300,
+     "offset": 88275,
+     "bytes": 6592
+    },
+    {
+     "tSeg": 25200,
+     "offset": 94867,
+     "bytes": 6618
+    },
+    {
+     "tSeg": 26100,
+     "offset": 101485,
+     "bytes": 6714
+    },
+    {
+     "tSeg": 27000,
+     "offset": 108199,
+     "bytes": 6755
+    },
+    {
+     "tSeg": 27900,
+     "offset": 114954,
+     "bytes": 6777
+    },
+    {
+     "tSeg": 28800,
+     "offset": 121731,
+     "bytes": 6758
+    },
+    {
+     "tSeg": 29700,
+     "offset": 128489,
+     "bytes": 6770
+    },
+    {
+     "tSeg": 30600,
+     "offset": 135259,
+     "bytes": 6745
+    }
+   ],
+   "mb": 0.14
+  }
+ ],
+ "codificacion": "RLE: 255,lo,hi = racha de ceros; resto = calado en décimas de m (1..254)",
+ "fuentes": [
+  "Roldán Cañas (2025), BRAC 174:775-795",
+  "Bonet, Revista de Obras Públicas 3652",
+  "Maldita.es 07-11-2024 (cita a la CHJ)",
+  "Copernicus EMS EMSR773",
+  "Terrain Tiles (AWS Open Data)"
+ ]
+}

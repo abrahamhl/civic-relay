@@ -102,6 +102,26 @@ La APK solo puede conectarse a una lista cerrada de servidores (`NetAllow.java`,
 
 **No encontrado:** serie continua del SAIH Júcar (la web rechaza el acceso automático), serie horaria de AEMET por estación (requiere AEMET OpenData con clave), coordenadas oficiales del aforo y texto literal del ES-Alert.
 
+## 4 bis. DANA 4D · simulación hidrodinámica 2D · `shallow-water.mjs`
+
+**Método:** ecuaciones de aguas someras en formulación inercial (Bates, Horritt y Fewtrell, 2010, *Journal of Hydrology* 387: 33–45; base de LISFLOOD-FP), Courant α = 0,7, con limitador de flujo para que ninguna celda ceda más agua de la que tiene.
+
+**Verificación numérica** (`packages/senda/tests/shallow-water.test.mjs`): lago en reposo sobre fondo irregular sin movimiento (|q| < 10⁻⁹); conservación de la masa en un recinto cerrado (error relativo < 10⁻⁹); calado normal de Manning en una rampa (error < 5 %).
+
+**Caso real:** dominio de 422×340 celdas de 59.05 m. El agua entra por el cauce del Poyo con un hidrograma construido **solo con puntos publicados**: subida desde las 16:55 («en dos horas», Bonet), 2 282 m³/s a las 18:55 (CHJ) y 3 500 m³/s a las 19:35 (CEDEX, preliminar). La bajada posterior y la rugosidad son ESCENARIO y se calibran con la mancha de Copernicus.
+
+| n · bajada | CSI | acierto / falsa alarma | km² máx. (ROI) | llega a Paiporta | error de balance |
+|---|---|---|---|---|---|
+| 0.035 · 3 h | 0.203 | 30 % / 61 % | 18.4 | 21:55 | 3e-15 |
+| 0.035 · 6 h | 0.208 | 32 % / 63 % | 21.4 | 21:55 | -7e-15 |
+| 0.06 · 3 h | 0.212 | 32 % / 62 % | 20.5 | 23:40 | -1e-14 |
+| 0.06 · 6 h | 0.228 | 38 % / 64 % | 25.2 | 23:36 | 7e-17 |
+| 0.1 · 3 h | 0.195 | 29 % / 63 % | 18.6 | no llega | 6e-15 |
+| 0.1 · 6 h | 0.235 | 40 % / 64 % | 26.6 | 02:00 (30-10) | 6e-15 |
+| Modelo estático HAND | 0.168 | — | — | sin tiempo | — |
+
+**Lectura:** la simulación 2D **mejora la superficie un 40 %** frente al modelo estático. **Sus tiempos no son fiables**: el frente simulado avanza a ≈ 1 m/s, frente a los 14 m/s estimados por el CEDEX. Hay dos causas conocidas: la formulación inercial omite la advección, y la malla de 59 m no resuelve el cauce encauzado. Siguiente paso: un solver de volúmenes finitos completo (Kurganov y Petrova, 2007) con porosidad urbana, encargado al laboratorio de física (`docs/continuity/PROMPT_ANTIGRAVITY_FISICA_AVANZADA.md`).
+
 ## 5. Motor de prevención (base) · `packages/senda/src/flood-warning.mjs`
 
 Referencia para el motor de alerta temprana de SENDA. Entradas **obligatorias y con fuente**: umbrales y velocidades no tienen valor por defecto.
@@ -164,10 +184,11 @@ Validación de lo importado: hora **con zona horaria obligatoria** (una hora amb
 ## 9. Reproducibilidad
 
 ```bash
-node --test packages/senda/tests/*.test.mjs        # núcleo (incluye flood-science, flood-warning, hydro-connectors, fire-science)
+node --test packages/senda/tests/*.test.mjs        # núcleo (incluye flood-science, flood-warning, hydro-connectors, shallow-water, fire-science)
 (cd investor-next && node --test tests/*.test.mjs)  # web
 node scripts/prove.mjs                              # afirmaciones públicas
 node packages/senda/scripts/dana-hand.mjs           # regenera hidrología y calibración de la DANA
+node packages/senda/scripts/dana-swe.mjs            # simulación hidrodinámica 2D y su calibración (≈ 90 s)
 ```
 
 Cada paquete exportado desde el escritorio PRO lleva la huella SHA-256 de las capas binarias para comprobar que no se han alterado.
@@ -179,6 +200,7 @@ Cada paquete exportado desde el escritorio PRO lleva la huella SHA-256 de las ca
 | 2026-11-25 16:04 | Laboratorio científico del Incendio 4D | 3d5eb8d (PR #93) |
 | 2026-11-25 16:23 | DANA 4D: hidrología, calibración CSI y cuencas | 6a4f59f (PR #94) |
 | 2026-11-25 16:44 | Línea del tiempo, telemetría con fuentes, motor `flood-warning`, modo PRO de exportación, pestaña de simuladores en el escritorio y este dossier | 9d4313f (PR #95) |
-| 2026-11-25 | Estimaciones con métodos publicados cuando falta el dato (Témez, Kirpich, observado) y conectores para la red del organismo | esta PR |
+| 2026-11-25 16:59 | Estimaciones con métodos publicados cuando falta el dato (Témez, Kirpich, observado) y conectores para la red del organismo | 54f310e (PR #96) |
+| 2026-11-25 | Motor hidrodinámico 2D verificado y simulación del 29-10 calibrada contra Copernicus | esta PR |
 
 *Firmado: asistente de ingeniería de SENDA (Claude), para revisión del fundador.*
