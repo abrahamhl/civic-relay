@@ -35,9 +35,11 @@ const state = { t: 0, playing: false, scene: 'd0724', on: Object.fromEntries(LAY
 
 // ── Mapa con relieve real ──
 maplibregl.setWorkerUrl('/senda/vendor/maplibre-gl-4.7.1/maplibre-gl-csp-worker.js');
-const STYLES = ['satelite', 'relieve', 'mapa', 'dia', 'termico', 'noche', 'topo'];
+const STYLES = ['satelite', 'fuego', 'falso', 'dia', 'termico', 'relieve', 'mapa', 'noche', 'topo'];
+const FIRE_DAY = '2026-07-24'; // imágenes NASA del día siguiente a la ignición (VIIRS/MODIS pasan 1–2 veces al día)
+const sty = (id) => styleFor(id, { date: FIRE_DAY });
 let styleId = LS.get('senda.f4d.style', 'satelite');
-const map = new maplibregl.Map({ container: 'map', style: styleFor(styleId), center: [IGN.lon + 0.06, IGN.lat - 0.07], zoom: 10.6, pitch: 58, bearing: -25, maxPitch: 80, attributionControl: { compact: true } });
+const map = new maplibregl.Map({ container: 'map', style: sty(styleId), center: [IGN.lon + 0.06, IGN.lat - 0.07], zoom: 10.6, pitch: 58, bearing: -25, maxPitch: 80, attributionControl: { compact: true } });
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
 const frontCanvas = Object.assign(document.createElement('canvas'), { width: ROI.w, height: ROI.h });
 
@@ -133,7 +135,7 @@ $('#play').addEventListener('click', () => {
   const step = (now) => { if (!state.playing) return; if (now - last > 120) { last = now; state.t = (state.t + 5) % 925; $('#t').value = state.t; render(); } raf = requestAnimationFrame(step); };
   if (state.playing) raf = requestAnimationFrame(step); else cancelAnimationFrame(raf);
 });
-$('#styleBtn').addEventListener('click', () => { styleId = STYLES[(STYLES.indexOf(styleId) + 1) % STYLES.length]; LS.set('senda.f4d.style', styleId); map.setStyle(styleFor(styleId), { diff: false }); showToast(`Mapa: ${MAP_STYLES[styleId].label}`); });
+$('#styleBtn').addEventListener('click', () => { styleId = STYLES[(STYLES.indexOf(styleId) + 1) % STYLES.length]; LS.set('senda.f4d.style', styleId); map.setStyle(sty(styleId), { diff: false }); showToast(`Mapa: ${MAP_STYLES[styleId].label}${MAP_STYLES[styleId].url === null && !['satelite', 'relieve', 'topo'].includes(styleId) ? ` · NASA ${FIRE_DAY}` : ''}`); });
 
 // ── Dibujar sobre el mapa (cortafuegos, rutas de evacuación, zonas) ──
 const ringAreaHa = (pts) => { if (pts.length < 3) return 0; const la0 = pts[0][1] * Math.PI / 180, mx = 111_320 * Math.cos(la0), my = 111_320; let s = 0; for (let i = 0; i < pts.length; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[(i + 1) % pts.length]; s += (x1 * mx) * (y2 * my) - (x2 * mx) * (y1 * my); } return Math.abs(s) / 2 / 10_000; };

@@ -19,6 +19,11 @@ export const MAP_STYLES = Object.freeze({
   termico: { label: 'Térmico', url: null, note: 'NASA MODIS: temperatura de la superficie de día (sin dato bajo nubes)' },
   nubes: { label: 'Nubes', url: null, note: 'NASA MODIS: temperatura de la cima de las nubes' },
   luces: { label: 'Luces nocturnas', url: null, note: 'NASA Black Marble 2016' },
+  falso: { label: 'Falso color (incendios)', url: null, note: 'NASA MODIS bandas 7-2-1: zonas quemadas en marrón-rojo, vegetación en verde vivo, agua en azul oscuro' },
+  fuego: { label: 'Fuego (VIIRS)', url: null, note: 'NASA VIIRS bandas M11-I2-I1: frentes activos y cicatrices resaltados, ~375 m' },
+  vegetacion: { label: 'Vegetación (NDVI)', url: null, note: 'NASA MODIS NDVI de 8 días: más verde = más vegetación viva' },
+  nieve: { label: 'Nieve y hielo', url: null, note: 'NASA MODIS bandas 3-6-7: nieve y hielo en rojo-naranja, nubes en blanco' },
+  aerosoles: { label: 'Humo y polvo', url: null, note: 'NASA MODIS: espesor óptico de aerosoles (humo, polvo, contaminación)' },
 });
 
 /** Etiquetas de lugares (OpenFreeMap) encima de los mapas de imagen, para orientarse. */
@@ -49,14 +54,19 @@ function rasterOnly(id, tiles, { maxzoom = 9, attribution, bg = '#0b1014', label
 }
 
 /** Estilo MapLibre de cada tipo (los de imagen se construyen aquí; los vectoriales son URL de OpenFreeMap). */
-export function styleFor(id, { now = Date.now() } = {}) {
-  const d = gibsDate(now);
+export function styleFor(id, { now = Date.now(), date = null } = {}) {
+  const d = date ?? gibsDate(now); // `date` (AAAA-MM-DD) fija el día de las imágenes NASA (p. ej. el de un incendio)
   switch (id) {
     case 'satelite': return satelliteStyle();
     case 'topo': return rasterOnly('otm', ['https://tile.opentopomap.org/{z}/{x}/{y}.png'], { maxzoom: 17, attribution: ATTR.otm, labels: false, bg: '#f2efe9' });
     case 'dia': return rasterOnly('modis', [`${GIBS}/MODIS_Terra_CorrectedReflectance_TrueColor/default/${d}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`], { attribution: `${ATTR.gibs} · MODIS Terra ${d}` });
     case 'termico': return rasterOnly('lst', [`${GIBS}/MODIS_Terra_Land_Surface_Temp_Day/default/${d}/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png`], { maxzoom: 7, attribution: `${ATTR.gibs} · MODIS Terra LST ${d}`, bg: '#111' });
     case 'nubes': return rasterOnly('ctt', [`${GIBS}/MODIS_Terra_Cloud_Top_Temp_Day/default/${d}/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png`], { maxzoom: 6, attribution: `${ATTR.gibs} · MODIS Terra ${d}`, bg: '#0b1014' });
+    case 'falso': return rasterOnly('b721', [`${GIBS}/MODIS_Terra_CorrectedReflectance_Bands721/default/${d}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`], { attribution: `${ATTR.gibs} · MODIS Terra 7-2-1 ${d}` });
+    case 'fuego': return rasterOnly('viirs', [`${GIBS}/VIIRS_NOAA20_CorrectedReflectance_BandsM11-I2-I1/default/${d}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`], { attribution: `${ATTR.gibs} · VIIRS NOAA-20 ${d}` });
+    case 'vegetacion': return rasterOnly('ndvi', [`${GIBS}/MODIS_Terra_NDVI_8Day/default/${d}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png`], { attribution: `${ATTR.gibs} · MODIS NDVI 8 días (${d})`, bg: '#111' });
+    case 'nieve': return rasterOnly('b367', [`${GIBS}/MODIS_Terra_CorrectedReflectance_Bands367/default/${d}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`], { attribution: `${ATTR.gibs} · MODIS Terra 3-6-7 ${d}` });
+    case 'aerosoles': return rasterOnly('aod', [`${GIBS}/MODIS_Terra_Aerosol/default/${d}/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png`], { maxzoom: 6, attribution: `${ATTR.gibs} · MODIS Terra aerosoles ${d}`, bg: '#0b1014' });
     case 'luces': return rasterOnly('bm', [`${GIBS}/VIIRS_Black_Marble/default/2016-01-01/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png`], { maxzoom: 8, attribution: `${ATTR.gibs} · Black Marble 2016`, bg: '#000' });
     case 'relieve': return {
       version: 8, glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
