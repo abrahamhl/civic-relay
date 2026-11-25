@@ -1,4 +1,5 @@
 export type TabId =
+  | 'explorer'
   | 'overview'
   | 'sources'
   | 'cameras'

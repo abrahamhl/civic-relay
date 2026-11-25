@@ -5,12 +5,13 @@
   "type": "module",
   "description": "SENDA Command Center - offline-first premium desktop/web console.",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "node scripts/sync-explorer.mjs && vite",
+    "build": "node scripts/sync-explorer.mjs && tsc -b && vite build",
     "type-check": "tsc --noEmit",
     "test": "node --test tests/*.test.mjs",
     "sync-evidence": "node scripts/sync-evidence.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sync-explorer": "node scripts/sync-explorer.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.96.1",
