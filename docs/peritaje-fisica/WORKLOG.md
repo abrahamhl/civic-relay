@@ -48,3 +48,15 @@
 - **Qué se probó:**
   - `node --test packages/senda/tests/report-protocol.test.mjs packages/senda/tests/index-exports.test.mjs packages/senda/tests/web-parity.test.mjs` → **8/8 en verde (0 fallos)** (incluye todas las transiciones N0–N5, descenso, bloqueo de simulación/grant caducada/fuera de geocerca, cancelación N5 y resistencia a inundación Sybil de 25 reportes).
 - **Qué falta:** Fases 1.4 (`reportar.html`, `comite.html`), 1.5, 1.6, 2, 3 y 4.
+
+## Fase 1.4 · Interfaces web accesibles sin instalación (`reportar.html` y `comite.html`)
+- **Commit fase anterior:** `63a7fcd`
+- **Hora UTC real de cierre:** `2026-11-25T17:56:32Z`
+- **Qué se hizo:**
+  - [`investor-next/public/senda/reportar.html`](../../investor-next/public/senda/reportar.html) + [`reportar.mjs`](../../investor-next/public/senda/reportar.mjs): interfaz móvil sin app en español con selector rápido de peligro, acceso directo `tel:112`, captura foto/vídeo/audio con herramienta local de difuminado de caras/matrículas en `<canvas>` (`redactRgbaRegions`), borrado EXIF (`stripJpegExif`), `dHash-64`, GPS + sensores, consentimiento explícito, cola local sin red y exportación `SND3`/QR/`geo:`/JSON.
+  - [`investor-next/public/senda/comite.html`](../../investor-next/public/senda/comite.html) + [`comite.mjs`](../../investor-next/public/senda/comite.mjs): pantalla de operador de comité siguiendo el lenguaje visual de `/senda/sala` (tipografía local `Inter` + `IBM Plex Mono`, sin dependencias CDN): cola filtrable N0–N5, selección circular AOI y escáner del área visible (adaptados de `calmpath-maps-pro`), mapa `<canvas>` retina con opacidad por probabilidad y borde sólido/discontinuo por verificación instrumental, línea del tiempo, expediente forense, petición de verificación a quien pasa (`hazard-verify.mjs`), borrador CAP 1.2 y puerta criptográfica humana N5 bloqueada por defecto.
+  - Pruebas nuevas: `packages/senda/tests/web-interfaces.test.mjs`.
+- **Qué se probó:**
+  - Google Chrome headless (`1440×900` y `390×844`) sobre `/senda/reportar.html` y `/senda/comite.html`: renderizado dinámico confirmado con **0 errores de consola/página**.
+  - `node --test packages/senda/tests/web-interfaces.test.mjs` → en verde.
+- **Qué falta:** Fases 1.5 (servidor local + OpenAPI + sincronización), 1.6 (asimilación EnKF), 2 (física avanzada), 3 (CalmPath/Civil Sentry integraciones de alto valor) y 4 (documentación, benchmarks, parches y ZIP).
