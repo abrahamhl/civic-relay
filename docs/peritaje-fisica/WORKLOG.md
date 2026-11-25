@@ -136,3 +136,18 @@
 - **Qué se probó:**
   - `node --test packages/senda/tests/emergency-routing-zones.test.mjs packages/senda/tests/triage-governance.test.mjs packages/senda/tests/index-exports.test.mjs packages/senda/tests/web-parity.test.mjs` → **11/11 en verde (0 fallos)**.
 - **Qué falta:** Fase 4 (script de benchmarks reales en esta VM, documentación completa exigida en §4 + documentos de gobernanza `CURRENT_TRUTH.md`, `EVIDENCE_MATRIX.md`, `THREAT_MODEL.md`, manifiesto SHA-256 de datos abiertos, ejecución completa de toda la suite `node --test`, `git format-patch`, empaquetado y verificación del ZIP final + SHA-256).
+
+## Fase 4 · Benchmarks reales, documentación completa, verificación íntegra del repositorio y empaquetado ZIP
+- **Commit fase anterior:** `8f644dd`
+- **Hora UTC real de cierre:** `2026-11-25T18:34:18Z`
+- **Qué se hizo:**
+  - Script de benchmarks reproducibles en hardware real [`packages/senda/scripts/benchmark-peritaje-fisica.mjs`](../../packages/senda/scripts/benchmark-peritaje-fisica.mjs) ejecutado en esta VM (`Intel Xeon @ 2.30GHz`, 2 núcleos, 7,77 GiB RAM, sin GPU).
+  - Documentación completa en `docs/peritaje-fisica/`:
+    - `LEEME.md`, `IDEAS_NO_VALIDADAS.md`, `data/MANIFIESTO_DATOS_ABIERTOS.json` (14 ficheros abiertos con URL, licencia y SHA-256 computado), `RESULTADOS_PRUEBAS.txt` (salida literal de los 1137 tests).
+    - `docs/METODOS.md`, `docs/VALIDACION.md`, `docs/PROTOCOLO_NIVELES.md`, `docs/PRIVACIDAD.md`, `docs/RENDIMIENTO.md`.
+    - Trío de gobernanza adaptado de `civil-sentry` para SENDA: `docs/CURRENT_TRUTH.md`, `docs/EVIDENCE_MATRIX.md`, `docs/THREAT_MODEL.md` (STRIDE + MITRE ATT&CK + MITRE ATLAS).
+- **Qué se probó:**
+  - Suite íntegra del repositorio: `node --test packages/senda/tests/*.test.mjs` → **1137/1137 en verde (0 fallos, 0 omitidas)** en `111,1 s` (`EXIT_CODE=0`).
+  - Benchmark real: `node packages/senda/scripts/benchmark-peritaje-fisica.mjs` → `EXIT_CODE=0`, paridad `f32↔f64` medida `1,14e-6 m` (`< 1e-4 m`).
+  - Verificación de regla §4 (`git diff --name-status master`): únicamente archivos nuevos (`A`) y adición de exportaciones (`M`) en `packages/senda/src/index.mjs` e `investor-next/public/senda/core/index.mjs`.
+- **Qué falta:** Generar `patches/` con `git format-patch master`, ensamblar `/home/antigravity/senda-peritaje-fisica-20261125.zip`, verificar integridad del archivo ZIP y calcular su huella SHA-256 final.
