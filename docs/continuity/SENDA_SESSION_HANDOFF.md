@@ -1,4 +1,15 @@
-# SENDA · handoff (2026-11-25 16:20Z, sesión app)
+# SENDA · handoff (2026-11-25 16:16Z, sesión app)
+
+## Novedades desde la última versión
+- **PR #93 fusionada 16:04Z (3d5eb8d)**: laboratorio científico del Incendio 4D (📍 Dónde empezó, combustible,
+  pendiente, cicatriz por fecha, probabilidad, inspector, 🔬 Ciencia). Producción verificada (`ignBtn`).
+  **APK**: compiló, pero la subida a la Release falló con 502 (incidencia de GitHub del 25-11); relanzar el
+  trabajo fallido de la ejecución 45650804420 o el siguiente push a master la publica. Hasta entonces la
+  APK descargable es la de la PR #92.
+- **DANA 4D** (rama `ccr-f7e46a00-mxvkgd`, commit c323a8c, PR en curso): `/senda/dana4d`, `flood-science.mjs`,
+  `packages/senda/scripts/dana-hand.mjs` (regenera `data/dana2024/{hand_roi,obs_roi,dir_z12}.bin`,
+  `cauces.geojson`, `hidro.json`). CSI máx 0,168 frente a Copernicus (calibrado); cuenca Poyo 401 km² del modelo.
+  Falta el tiempo real (serie de caudal o lluvia con fuente: SAIH Júcar, AEMET) para que sea 4D de verdad.
 
 ## Publicado (master 74f3004, APK fija `senda-android-latest` 14:14Z, play sha 3578398c…)
 - **Arreglos raíz de la app Android**: `NetAllow.java` (antes 404 a toda red → sin mapa/rutas/búsqueda) y
@@ -18,7 +29,7 @@
 3. Nombre de la startup de mapas que vio (para comparar con precisión).
 
 ## Siguiente (sin preguntar el orden)
-1. **DANA 4D**: EMSR773 (data/dana2024) + flujo del agua sobre DEM (D8) + dibujo; mismo motor que Incendio 4D.
+1. **DANA 4D, fase tiempo**: buscar serie de caudal del Poyo (SAIH Júcar) o lluvia (AEMET) con fuente y licencia; añadir dibujo; escritorio PRO.
 2. EOX Sentinel-2: verificar que `s2cloudless_3857` es 2016 (CC BY 4.0) antes de usarlo.
 3. NDW en vivo (play), RSSI por paquete BLE, firma Ed25519 de avisos.
 4. Calibrar con la caja negra real (EM de s/c, SPRT, cadencia por batería: `docs/research/PROPUESTAS_MATEMATICAS_2026-11-24.md`).

@@ -79,6 +79,7 @@ const FEATURED = [
   ['conducir', 'Radar de señales', 'Mira las redes Wi-Fi y Bluetooth a tu alrededor y otros móviles SENDA', '#senales', 'senales'],
   ['explorador', 'Explorador 3D', 'Cualquier lugar en 3D: topografía, edificios con su planta y la luz del Sol real'],
   ['incendio4d', 'Incendio 4D', 'San Martín 2026: satélite real, modelo y humo en 3D'],
+  ['dana4d', 'DANA 4D', 'Valencia 2024: de dónde vino el agua y cuánto acierta el modelo'],
   ['mensaje', 'Mensajes sin red', 'Cifrados, por Bluetooth, sonido o archivo'],
   ['avisos', 'Avisa de un peligro', 'Lo ven los móviles cercanos'],
   ['ruta', 'Ruta segura', 'Elige calles y evita zonas inundadas'],
