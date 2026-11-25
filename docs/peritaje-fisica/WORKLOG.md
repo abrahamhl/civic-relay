@@ -105,3 +105,16 @@
   - `fire-rothermel.test.mjs`: **5/5 en verde** (Rothermel/Scott-Burgan, convergencia $O(\Delta x)$ en círculo analítico, elipse de Huygens + cortafuegos `NB8`, caso real SMV 2026 con `dem_100m.bin`, `fuel_100m.bin`, `burn_100m.bin` y NOAA GFS real `UGRD/VGRD/RH` + conjunto LHS).
   - `rail-physics-etcs.test.mjs`: **4/4 en verde** + `index-exports.test.mjs` + `web-parity.test.mjs` (**0 fallos**).
 - **Qué falta:** Fases 2D (`radio-propagation-advanced.mjs`), 2E (`uncertainty-uq.mjs`), Fase 3 (CalmPath Maps Pro & Civil Sentry integraciones de alto valor en SENDA) y Fase 4 (benchmarks reales, documentación completa, pruebas globales, parches y ZIP final).
+
+## Fases 2D–2E · Radio avanzada (ITU-R P.526-15 / ITM) e Incertidumbre transversal (LHS / Sobol / CRPS)
+- **Commit fase anterior:** `791125e`
+- **Hora UTC real de cierre:** `2026-11-25T18:22:00Z`
+- **Qué se hizo:**
+  - **Fase 2D (`radio-propagation-advanced.mjs`):** pérdida de espacio libre Friis, filo de cuchillo ITU-R P.526-15 §4.2, difracción sobre Tierra esférica lisa §3.1.1, **Delta-Bullington ITU-R P.526-15 §4.5.2** (P.452-17/P.1812-6), cascada Epstein-Peterson (1953), irregularidad del terreno $\Delta h$ y horizontes radioeléctricos estilo Longley-Rice/ITM (NTIA 82-100), clutter ITU-R P.2108-1 §3.2, vegetación ITU-R P.833-10, muestreador de perfiles MDE (`sampleDemProfile`) y evaluación de enlace de malla con horquilla de refractividad atmosférica $k$ (`evaluateMeshLinkWithUncertainty`).
+  - **Fase 2E (`uncertainty-uq.mjs`):** muestreo estratificado por Hipercubo Latino (McKay, Beckman & Conover 1979) con distribuciones uniforme, normal (inversa racional de Acklam 2003), triangular y lognormal, resumen con horquillas (`summarizeEnsemble`), propagación genérica (`propagateUncertainty`), análisis global de sensibilidad Sobol-Saltelli (2010) / Jansen (1999) (`sobolSensitivitySaltelli`), y métricas de verificación determinista/probabilista (MAE, RMSE, sesgo, $R^2$, CSI, POD, FAR, F1, cobertura empírica, Brier 1950 y CRPS empírico Gneiting & Raftery 2007).
+  - Pruebas nuevas: `radio-propagation-advanced.test.mjs` y `uncertainty-uq.test.mjs`. Sincronización web completa (`sync-web.mjs`) y exportaciones en `packages/senda/src/index.mjs`.
+- **Qué se probó:**
+  - `radio-propagation-advanced.test.mjs`: **4/4 en verde** (verificación analítica Friis + filo de cuchillo $J(0) \approx 6,03$ dB, difracción esférica/clutter/vegetación, enlaces reales LoRa 868 MHz Chiva↔Paiporta y Chiva↔Buñol sobre el MDE abierto `radio/poyo.json` con horquilla $k \in [2/3, 4/3, 2,0]$).
+  - `uncertainty-uq.test.mjs`: **4/4 en verde** (estratificación exacta 1-por-estrato en LHS, verificación analítica de los 6 índices de Sobol $S_1, S_2, S_3, S_{T1}, S_{T2}, S_{T3}$ en la función de Ishigami, CRPS/Brier/CSI/cobertura).
+  - `index-exports.test.mjs` + `web-parity.test.mjs` → **12/12 en verde (0 fallos)**.
+- **Qué falta:** Fase 3 (integraciones restantes de alto valor de `calmpath-maps-pro` y `civil-sentry` enfocadas en SENDA: `emergency-routing-zones.mjs` y `triage-governance.mjs`) y Fase 4 (benchmarks reales, documentación completa, ejecución íntegra de `node --test`, parches y ZIP final).
