@@ -10,9 +10,16 @@ export const OSRM_BASE = 'https://router.project-osrm.org';
 /** Reglas de la app (declaradas, no calibradas): a partir de cuántos metros fuera se recalcula y cada cuánto como mínimo. */
 export const NAV_RULES = Object.freeze({ offRouteM: 50, minRerouteS: 30, announceM: [500, 150, 30] });
 
-export function routeUrl({ from, to, via = [], profile = 'driving' }) {
+/** Servidores públicos de OSRM por medio de transporte (FOSSGIS; uso de pruebas, poco volumen). */
+export const OSRM_BY_MODE = Object.freeze({
+  car: OSRM_BASE,
+  bike: 'https://routing.openstreetmap.de/routed-bike',
+  foot: 'https://routing.openstreetmap.de/routed-foot',
+});
+export function routeUrl({ from, to, via = [], profile = 'driving', mode = 'car' }) {
   const pts = [from, ...via, to].map(([lon, lat]) => `${lon.toFixed(6)},${lat.toFixed(6)}`).join(';');
-  return `${OSRM_BASE}/route/v1/${profile}/${pts}?overview=full&geometries=geojson&steps=true&alternatives=true`;
+  const base = OSRM_BY_MODE[mode] ?? OSRM_BASE; // routing.openstreetmap.de usa «driving» en la ruta aunque el perfil sea pie/bici
+  return `${base}/route/v1/${profile}/${pts}?overview=full&geometries=geojson&steps=true&alternatives=true`;
 }
 
 const DIR = { left: 'a la izquierda', right: 'a la derecha', 'slight left': 'ligeramente a la izquierda', 'slight right': 'ligeramente a la derecha', 'sharp left': 'muy cerrado a la izquierda', 'sharp right': 'muy cerrado a la derecha', straight: 'recto', uturn: 'cambio de sentido' };

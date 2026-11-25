@@ -53,3 +53,11 @@ test('salirse de la ruta: recalcula solo si estÃ¡ lejos y ha pasado el tiempo mÃ
 test('respuesta de error de OSRM: no inventa ruta', () => {
   assert.deepEqual(parseRoute({ code: 'NoRoute' }), { ok: false, reason: 'NoRoute' });
 });
+
+test('ruta por medio de transporte: coche, bici y a pie van a su servidor', async () => {
+  const { routeUrl } = await import('../src/nav-osrm.mjs');
+  const a = { from: [5.86, 50.97], to: [5.87, 50.98] };
+  assert.match(routeUrl(a), /^https:\/\/router\.project-osrm\.org\/route\/v1\/driving\//);
+  assert.match(routeUrl({ ...a, mode: 'bike' }), /^https:\/\/routing\.openstreetmap\.de\/routed-bike\/route\/v1\/driving\//);
+  assert.match(routeUrl({ ...a, mode: 'foot' }), /^https:\/\/routing\.openstreetmap\.de\/routed-foot\/route\/v1\/driving\//);
+});

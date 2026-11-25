@@ -13,7 +13,7 @@
 import { haversineM } from './route-planner.mjs';
 
 export const SCHEMA = 'senda-blackbox/v1';
-export const KINDS = Object.freeze(['gps', 'imu', 'det', 'alert', 'corridor', 'net', 'bat', 'ble', 'nav', 'note']);
+export const KINDS = Object.freeze(['gps', 'imu', 'det', 'alert', 'corridor', 'net', 'bat', 'ble', 'nav', 'note', 'radio']);
 export const LIMITS = Object.freeze({ maxRows: 200_000, gpsGapS: 3, imuHz: 10 }); // reglas de la app (tamaño y cadencia)
 
 /** Crea una caja negra. `now` en ms (inyectable para pruebas). */
@@ -51,6 +51,7 @@ export function parseJsonl(text) {
 
 const pct = (arr, p) => { if (!arr.length) return null; const s = [...arr].sort((a, b) => a - b); return s[Math.min(s.length - 1, Math.floor(p * s.length))]; };
 const mean = (arr) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null);
+const median = (a) => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
 const r1 = (x) => (x == null ? null : Math.round(x * 10) / 10);
 
 /** Resumen medido del viaje (todo sale de las filas; nada estimado fuera de ellas). */
@@ -88,6 +89,7 @@ export function summarize(rows) {
     net: by('net').at(-1) ?? null,
     battery: (() => { const b = by('bat').filter((x) => x.level != null); return b.length ? { startPct: Math.round(b[0].level * 100), endPct: Math.round(b.at(-1).level * 100), charging: b.at(-1).charging ?? null } : null; })(),
     ble: by('ble').length,
+    radio: (() => { const r = by('radio'); return r.length ? { scans: r.length, wifiMax: Math.max(...r.map((x) => x.wifiN ?? 0)), wifiMedian: median(r.map((x) => x.wifiN ?? 0)), bleMax: Math.max(...r.map((x) => x.bleN ?? 0)), sendaMax: Math.max(...r.map((x) => x.sendaNear ?? 0)) } : null; })(),
     notes: by('note').map((n) => ({ atS: r1(n.t / 1000), text: n.text })),
   };
 }

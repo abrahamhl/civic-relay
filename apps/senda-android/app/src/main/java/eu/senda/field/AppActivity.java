@@ -47,6 +47,7 @@ public final class AppActivity extends Activity {
     private boolean screenHigh;
     private BleMailbox mailbox;
     private FileSaver saver;
+    private RadioScan radio;
     private Runnable afterBt;
     private PermissionRequest pendingCam;
     private SpeechRecognizer recognizer;
@@ -277,7 +278,7 @@ public final class AppActivity extends Activity {
     /** Puente mínimo hacia lo nativo. Cada método es un permiso: añadir solo lo imprescindible. */
     private final class Bridge {
         @JavascriptInterface public String info() {
-            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true,\"fileSave\":true,\"screenRec\":true}";
+            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true,\"fileSave\":true,\"screenRec\":true,\"radioScan\":true}";
         }
 
         /** Abre la pantalla de radios con una acción senda://accion?… validada; el usuario confirma allí. */
@@ -348,6 +349,13 @@ public final class AppActivity extends Activity {
                  .put("sdk", Build.VERSION.SDK_INT).put("model", Build.MANUFACTURER + " " + Build.MODEL);
             } catch (RuntimeException | org.json.JSONException e) { return "{}"; }
             return o.toString();
+        }
+        /** «Señales a tu alrededor»: Wi-Fi + Bluetooth cercanos, sin nombres ni direcciones → window.sendaRadio(json). */
+        @JavascriptInterface public void radioScan() {
+            runOnUiThread(() -> withBt(() -> {
+                if (radio == null) radio = new RadioScan(AppActivity.this);
+                radio.scan(o -> web.post(() -> web.evaluateJavascript("window.sendaRadio&&window.sendaRadio(" + o + ")", null)));
+            }));
         }
         @JavascriptInterface public void screenRecStop() {
             runOnUiThread(() -> startService(new Intent(AppActivity.this, ScreenRecordService.class).setAction(ScreenRecordService.ACTION_STOP)));

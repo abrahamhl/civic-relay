@@ -89,6 +89,16 @@ html.dashmode.nomini #map{display:none}
 @media (orientation:landscape){html.dashmode #map{left:auto;right:0;top:0;width:36%;height:100%;border-radius:0}html.dashmode #dashCanvas,html.dashmode #dashBar,html.dashmode #dashHud{width:64%;right:auto}html.dashmode.nomini #dashCanvas,html.dashmode.nomini #dashBar,html.dashmode.nomini #dashHud{width:100%}html.dashmode #dashBar{gap:6px;padding-bottom:8px}}
 html.dashmode .maplibregl-ctrl-attrib{font-size:9px;max-width:92%}
 html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #reportBtn,html.dashmode #bottom,html.dashmode #pip,html.dashmode #adas{display:none!important}
+/* Modo (coche/bici/a pie) y radar de señales */
+.modeSeg{display:flex;gap:4px}.chip.mode{padding:8px 11px}.chip.mode.on{background:var(--blue);color:#fff}
+.sig-chip{background:#06121a;color:#64d2ff}
+#sig{position:absolute;left:10px;right:10px;bottom:calc(var(--bottomH,96px) + 10px);z-index:11;border-radius:18px;padding:12px 14px;background:rgba(6,18,26,.96);color:#e8f6ff;box-shadow:0 10px 30px rgba(0,0,0,.45);max-width:520px;margin:auto}
+#sig h3{margin:0 0 6px;font-size:16px;display:flex;justify-content:space-between;align-items:center}
+#sig .sig-body{display:flex;gap:12px;align-items:center}#sigCanvas{width:min(46vw,210px);height:min(46vw,210px);flex:none}
+#sigStats{font:600 13px/1.45 Inter,system-ui,sans-serif}#sigStats b{font-size:20px;color:#fff}
+#sig .sig-foot{font-size:11px;color:#8fb3c4;margin-top:6px;line-height:1.35}
+#sig .sig-legend{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;margin-top:6px}#sig .sig-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
+#sig button{border-radius:10px;padding:6px 10px;background:#13303f;color:#e8f6ff;font-weight:700;font-size:13px}
 /* Laboratorio de señal */
 .chip.lab-chip{background:#0d1b2a;color:#7df9ff;border:1px solid rgba(125,249,255,.38)}
 .chip.lab-chip.live{background:#063b2c;color:#6ef7b2;border-color:#34c759;box-shadow:0 0 12px rgba(52,199,89,.4)}
@@ -125,7 +135,7 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
   <div id="top">
     <div id="turn" class="card" hidden><div class="dist" id="turnDist"></div><div class="txt" id="turnTxt"></div></div>
     <div id="searchBox"><form id="search" class="card" autocomplete="off"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="¿A dónde vas?" enterkeyhint="search" aria-label="Destino"></form>
-      <div id="favs"><button class="chip" id="favHome">Casa</button><button class="chip" id="favWork">Trabajo</button><button class="chip lab-chip" id="labChip" title="Laboratorio de señal: cobertura de radio, GPS y firme">⚡ Lab Campo</button></div>
+      <div id="favs"><span class="modeSeg" role="group" aria-label="Cómo te mueves"><button class="chip mode on" data-mode="car" aria-label="En coche">🚗</button><button class="chip mode" data-mode="bike" aria-label="En bici">🚲</button><button class="chip mode" data-mode="foot" aria-label="A pie">🚶</button></span><button class="chip sig-chip" id="sigChip">📡 Señales</button><button class="chip" id="favHome">Casa</button><button class="chip" id="favWork">Trabajo</button><button class="chip lab-chip" id="labChip" title="Laboratorio de señal: cobertura de radio, GPS y firme">⚡ Laboratorio</button></div>
       <div id="results" class="card" hidden></div></div>
     <div id="corridorAlert" class="card" role="status" aria-live="polite" hidden><div class="ca-ico" id="caIco"></div><div class="ca-body"><div class="ca-title" id="caTitle"></div><div class="ca-sub" id="caSub"></div><div class="ca-vote" id="caVote" hidden><button id="caYes">Sigue ahí</button><button id="caNo">Ya no está</button></div></div></div>
     <div id="radarAlert" class="card" role="status" aria-live="polite" hidden><div class="ra-body"><div class="ra-title" id="raTitle"></div><div class="ra-sub" id="raSub"></div></div><div class="ra-lim" id="raLim" hidden></div></div>
@@ -166,6 +176,12 @@ html.dashmode #top,html.dashmode #side,html.dashmode #speed,html.dashmode #repor
   </div>
   <pre id="tele" hidden aria-live="off"></pre>
   <button id="markBtn" hidden aria-label="Marcar este momento">Marcar</button>
+  <section id="sig" role="dialog" aria-label="Señales a tu alrededor" hidden>
+    <h3><span>📡 Señales a tu alrededor</span><span><button id="sigScan">Escanear</button> <button id="sigClose" aria-label="Cerrar">✕</button></span></h3>
+    <div class="sig-body"><canvas id="sigCanvas" width="420" height="420" aria-label="Radar de señales"></canvas><div id="sigStats">Pulsa «Escanear».</div></div>
+    <div class="sig-legend"><span><i style="background:#0a84ff"></i>Wi-Fi 2,4 GHz</span><span><i style="background:#64d2ff"></i>Wi-Fi 5 GHz</span><span><i style="background:#bf5af2"></i>Wi-Fi 6 GHz</span><span><i style="background:#30d158"></i>Bluetooth</span><span><i style="background:#ff9f0a"></i>Móvil SENDA</span></div>
+    <p class="sig-foot">Más cerca del centro = señal más fuerte (medida). La posición alrededor del círculo es solo de dibujo: el móvil no sabe en qué dirección está cada aparato. No se guardan nombres de redes ni direcciones.</p>
+  </section>
   <div id="veil" hidden></div>
   <div id="sheet" class="card" hidden>
     <h3>¿Qué ves?</h3>
