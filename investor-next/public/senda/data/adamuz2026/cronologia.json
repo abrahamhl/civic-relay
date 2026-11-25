@@ -1,0 +1,295 @@
+{
+ "caso": "Accidente ferroviario de Adamuz (Córdoba), 18-01-2026 · LAV Madrid-Sevilla",
+ "basis": "PUBLISHED_SOURCES_COMPILED",
+ "compiladoUTC": "2026-11-25T17:34:44Z",
+ "zonaHoraria": "Hora peninsular de enero = CET (UTC+1); Wikipedia indica CET",
+ "aviso": "Informe de la CIAF PRELIMINAR y provisional según las propias fuentes; las conclusiones definitivas llegarán con el informe final. Cifras de víctimas: 46 fallecidos en la mayoría de fuentes; heridos entre «más de 100» y 152 según la fuente.",
+ "lugar": {
+  "lat": 38.009806,
+  "lon": -4.564806,
+  "fuente": "wiki",
+  "nota": "coordenadas del artículo de Wikipedia, no oficiales"
+ },
+ "pk": {
+  "rotura": {
+   "valor": 318.681,
+   "fuente": "infobae"
+  },
+  "impacto": {
+   "valor": 318.173,
+   "fuente": "infobae"
+  },
+  "wikipedia": {
+   "valor": 318.8,
+   "fuente": "wiki",
+   "nota": "PK que da Wikipedia para el accidente; no coincide con los de la CIAF vía Infobae"
+  }
+ },
+ "trenes": {
+  "Iryo 6189": {
+   "sentido": "Málaga → Madrid (PK decreciente)",
+   "ocupantes": "289 pasajeros, 4 tripulantes y 1 maquinista (Wikipedia)"
+  },
+  "Alvia 2384": {
+   "sentido": "Madrid → Huelva (PK creciente)",
+   "ocupantes": "184 personas entre pasajeros y tripulación (Wikipedia)"
+  }
+ },
+ "victimas": {
+  "fallecidos": 46,
+  "heridos": "152 (Wikipedia); «más de 150» (COPE); «más de 120» (Infobae); «más de un centenar» (Forbes)",
+  "fuente": "wiki"
+ },
+ "senalPrevia": {
+  "texto": "Caída brusca de tensión del circuito de vía unas 22 h antes, registrada por el sistema de apoyo al mantenimiento sin generar alarma (por encima del umbral de ocupación, 0,78 V según el proveedor). Adif lo discute: una caída de 0,7 V puede deberse a otras incidencias.",
+  "fuente": "accidentes_doc",
+  "estado": "en disputa; pendiente del informe final de la CIAF"
+ },
+ "fuentes": {
+  "forbes": {
+   "cita": "Forbes España, «La CIAF afirma que el accidente de tren de Adamuz se produjo en 15 segundos», 10-03-2026 (cifras atribuidas a la CIAF)",
+   "url": "https://forbes.es/economia/887823/la-ciaf-afirma-que-el-accidente-de-tren-de-adamuz-se-produjo-en-15-segundos/"
+  },
+  "cope": {
+   "cita": "COPE, «La investigación del accidente de Adamuz desvela su cronología: la tragedia sucedió en 14 segundos», 11-03-2026 (cita el informe de la CIAF)",
+   "url": "https://www.cope.es/emisoras/andalucia/cordoba-provincia/cordoba/noticias/investigacion-accidente-adamuz-desvela-cronologia-tragedia-sucedio-14-segundos-20260311_3324406.html"
+  },
+  "infobae": {
+   "cita": "Infobae, 28-04-2026: informe preliminar de la CIAF remitido al Juzgado n.º 2 de Montoro («de carácter interno y aún provisional»)",
+   "url": "https://www.infobae.com/espana/2026/04/28/conclusion-del-accidente-de-adamuz-la-ciaf-dice-que-se-rompio-el-carril-y-descarta-anomalias-previas-en-los-trenes/"
+  },
+  "wiki": {
+   "cita": "Wikipedia (es), «Accidente ferroviario de Adamuz», tabla cronológica con referencias a registros del 112, Adif y Renfe (referencias no leídas una a una)",
+   "url": "https://es.wikipedia.org/wiki/Accidente_ferroviario_de_Adamuz"
+  },
+  "elespanol": {
+   "cita": "El Español, «Renfe sigue sin aclarar cuándo supo que el Alvia había chocado con el Iryo», 25-01-2026",
+   "url": "https://www.elespanol.com/invertia/observatorios/movilidad/20260125/renfe-sigue-sin-aclarar-supo-alvia-chocado-iryo-enigmas-siniestro-adamuz/1003744101738_0.html"
+  },
+  "accidentes_doc": {
+   "cita": "SENDA, docs/research/ACCIDENTES_GRAVES_Y_PREVENCION_2026-11-04.md (Guardia Civil, Adif, CIAF con sus enlaces)",
+   "url": "docs/research/ACCIDENTES_GRAVES_Y_PREVENCION_2026-11-04.md"
+  }
+ },
+ "eventos": [
+  {
+   "id": "alvia_sale",
+   "t": "18:10:00",
+   "tipo": "OFICIAL",
+   "tren": "Alvia 2384",
+   "texto": "Sale de Madrid-Puerta de Atocha hacia Huelva",
+   "fuente": "wiki",
+   "estado": "verificado en la fuente citada"
+  },
+  {
+   "id": "iryo_sale",
+   "t": "18:40:00",
+   "tipo": "OFICIAL",
+   "tren": "Iryo 6189",
+   "texto": "Sale de Málaga hacia Madrid",
+   "fuente": "wiki",
+   "estado": "verificado en la fuente citada"
+  },
+  {
+   "id": "iryo_tramo",
+   "t": "19:43:19",
+   "tipo": "MEDIDO",
+   "tren": "Iryo 6189",
+   "texto": "Entra en el tramo donde está la rotura de vía",
+   "fuente": "wiki",
+   "estado": "verificado en la fuente citada (tabla con referencias no leídas)"
+  },
+  {
+   "id": "iryo_sintoma",
+   "t": "19:43:29",
+   "tipo": "MEDIDO",
+   "tren": "Iryo 6189",
+   "vKmh": 205,
+   "texto": "Se abre el disyuntor: primera anomalía detectada como síntoma del descarrilamiento",
+   "fuente": "forbes",
+   "estado": "verificado en la fuente citada; Infobae sitúa la apertura del disyuntor ~1 s después del descarrilamiento de las 19:43:34",
+   "discrepancia": "infobae"
+  },
+  {
+   "id": "iryo_aguja",
+   "t": "19:43:33",
+   "tipo": "MEDIDO",
+   "tren": "Iryo 6189",
+   "vKmh": 204,
+   "texto": "Pasa por la señal de entrada E669 y la aguja A645",
+   "fuente": "forbes",
+   "estado": "hora deducida («cuatro segundos más tarde» de las 19:43:29)"
+  },
+  {
+   "id": "iryo_descarrila",
+   "t": "19:43:34",
+   "tipo": "MEDIDO",
+   "tren": "Iryo 6189",
+   "texto": "Descarrila el primer eje del coche 6 tras pasar el punto de la rotura (PK 318,681)",
+   "fuente": "infobae",
+   "estado": "verificado en la fuente citada; velocidad «más de 200 km/h»"
+  },
+  {
+   "id": "alvia_s613",
+   "t": "19:43:37",
+   "tipo": "MEDIDO",
+   "tren": "Alvia 2384",
+   "vKmh": 217,
+   "texto": "Se cierra la señal S613; el Alvia está a 188 m de ella y el LZB ordena frenado de emergencia por sobrevelocidad",
+   "fuente": "infobae",
+   "estado": "verificado en la fuente citada; Forbes da 216 km/h a las 19:43:38",
+   "discrepancia": "forbes",
+   "distM": 188
+  },
+  {
+   "id": "alvia_lzb",
+   "t": "19:43:38",
+   "tipo": "MEDIDO",
+   "tren": "Alvia 2384",
+   "vKmh": 216,
+   "texto": "El descarrilamiento activa el LZB, que provoca el freno de emergencia del Alvia",
+   "fuente": "forbes",
+   "estado": "verificado en la fuente citada; Infobae lo sitúa a las 19:43:37 con 217 km/h",
+   "discrepancia": "infobae"
+  },
+  {
+   "id": "cruce",
+   "t": "19:43:40",
+   "tipo": "MEDIDO",
+   "tren": "ambos",
+   "texto": "Cruce visual entre los dos trenes",
+   "fuente": "infobae",
+   "estado": "verificado en la fuente citada"
+  },
+  {
+   "id": "choque_infobae",
+   "t": "19:43:42",
+   "tipo": "MEDIDO",
+   "tren": "Alvia 2384",
+   "vKmh": 204,
+   "texto": "El registrador del Alvia deja de emitir datos (momento de la colisión). Impacto en el entorno del PK 318,173, en la parte trasera del coche 6 del Iryo, que iba a 152 km/h",
+   "fuente": "infobae",
+   "estado": "verificado en la fuente citada; Forbes y COPE sitúan la colisión a las 19:43:44",
+   "discrepancia": "forbes",
+   "vIryoKmh": 152,
+   "pk": 318.173
+  },
+  {
+   "id": "iryo_freno",
+   "t": "19:43:43",
+   "tipo": "MEDIDO",
+   "tren": "Iryo 6189",
+   "vKmh": 141,
+   "texto": "El maquinista del Iryo acciona el freno de emergencia",
+   "fuente": "forbes",
+   "estado": "verificado en la fuente citada"
+  },
+  {
+   "id": "choque_forbes",
+   "t": "19:43:44",
+   "tipo": "MEDIDO",
+   "tren": "Alvia 2384",
+   "vKmh": 204,
+   "texto": "El registrador del Alvia deja de almacenar datos: «presumiblemente» el momento de la colisión",
+   "fuente": "forbes",
+   "estado": "verificado en la fuente citada; Infobae da las 19:43:42",
+   "discrepancia": "infobae"
+  },
+  {
+   "id": "iryo_parado",
+   "t": "19:44:03",
+   "tipo": "MEDIDO",
+   "tren": "Iryo 6189",
+   "texto": "El Iryo queda completamente detenido",
+   "fuente": "forbes",
+   "estado": "verificado en la fuente citada; COPE: «casi 20 segundos después del impacto»"
+  },
+  {
+   "id": "llamada_112",
+   "t": "19:44:51",
+   "tipo": "OFICIAL",
+   "tren": "Iryo 6189",
+   "texto": "Primera llamada al 112 Andalucía, desde el Iryo: «el tren ha volcado»",
+   "fuente": "wiki",
+   "estado": "tabla de Wikipedia con referencias; la misma tabla da otra «primera llamada desde el Alvia» a las 19:55 (contradicción interna)"
+  },
+  {
+   "id": "iryo_crc",
+   "t": "19:45:02",
+   "tipo": "OFICIAL",
+   "tren": "Iryo 6189",
+   "texto": "El maquinista del Iryo al CRC: cree haber tenido «un enganchón con la catenaria»",
+   "fuente": "wiki",
+   "estado": "tabla de Wikipedia con referencias"
+  },
+  {
+   "id": "alvia_112",
+   "t": "19:45:06",
+   "tipo": "OFICIAL",
+   "tren": "Alvia 2384",
+   "texto": "Un pasajero del Alvia llama al 112 Andalucía: «accidente con posibles múltiples heridos»",
+   "fuente": "wiki",
+   "estado": "tabla de Wikipedia con referencias (contradice la «primera llamada desde el Alvia» de las 19:55 de la misma tabla)"
+  },
+  {
+   "id": "seneca",
+   "t": "19:47:06",
+   "tipo": "OFICIAL",
+   "tren": "—",
+   "texto": "El aviso a emergencias da solo las coordenadas del tren de Iryo",
+   "fuente": "wiki",
+   "estado": "tabla de Wikipedia con referencias"
+  },
+  {
+   "id": "iryo_invade",
+   "t": "19:49:35",
+   "tipo": "OFICIAL",
+   "tren": "Iryo 6189",
+   "texto": "El maquinista del Iryo afirma haber descarrilado e invadir la vía contraria",
+   "fuente": "wiki",
+   "estado": "tabla de Wikipedia con referencias"
+  },
+  {
+   "id": "dudas",
+   "t": "20:07:01",
+   "tipo": "OFICIAL",
+   "tren": "Alvia 2384",
+   "texto": "112 Madrid y Andalucía: persisten dudas sobre la implicación de un segundo tren",
+   "fuente": "wiki",
+   "estado": "tabla de Wikipedia con referencias"
+  },
+  {
+   "id": "adif_madrid",
+   "t": "20:09:58",
+   "tipo": "OFICIAL",
+   "tren": "Alvia 2384",
+   "texto": "Adif al 112 Madrid: el Alvia no habría descarrilado sino frenado de emergencia al encontrar otro tren",
+   "fuente": "wiki",
+   "estado": "tabla de Wikipedia con referencias"
+  },
+  {
+   "id": "segundo_tren",
+   "t": "20:16:29",
+   "tipo": "OFICIAL",
+   "tren": "Alvia 2384",
+   "texto": "Adif Sevilla al 112 Andalucía: hay un segundo tren descarrilado y los dos están en la misma ubicación",
+   "fuente": "wiki",
+   "estado": "tabla de Wikipedia con referencias"
+  },
+  {
+   "id": "llega_alvia",
+   "t": "20:31:58",
+   "tipo": "OFICIAL",
+   "tren": "Alvia 2384",
+   "texto": "Un pasajero del Alvia llega al Iryo: el Alvia está a unos 700 m",
+   "fuente": "wiki",
+   "estado": "tabla de Wikipedia con referencias"
+  }
+ ],
+ "noEncontrado": [
+  "Hora en que se detuvo el Alvia",
+  "Masa de los trenes (no se calcula energía)",
+  "Coordenadas oficiales de los PK",
+  "Texto del informe preliminar de la CIAF (solo citas de prensa)"
+ ]
+}

@@ -122,6 +122,26 @@ La APK solo puede conectarse a una lista cerrada de servidores (`NetAllow.java`,
 
 **Lectura:** la simulación 2D **mejora la superficie un 40 %** frente al modelo estático. **Sus tiempos no son fiables**: el frente simulado avanza a ≈ 1 m/s, frente a los 14 m/s estimados por el CEDEX. Hay dos causas conocidas: la formulación inercial omite la advección, y la malla de 59 m no resuelve el cauce encauzado. Siguiente paso: un solver de volúmenes finitos completo (Kurganov y Petrova, 2007) con porosidad urbana, encargado al laboratorio de física (`docs/continuity/PROMPT_ANTIGRAVITY_FISICA_AVANZADA.md`).
 
+## 4 ter. Tren 4D · accidente de Adamuz (18-01-2026) · `rail-reconstruct.mjs`
+
+**Datos:** 22 sucesos de la cronología con su fuente: el informe **preliminar** de la CIAF tal como lo citan Forbes/COPE (marzo) e Infobae (abril), y los registros del 112, Adif y Renfe recogidos por Wikipedia. Hay discrepancias de 1–2 s entre fuentes; se ofrecen las dos versiones.
+
+**Método (cinemática, sin masas porque no están publicadas):** velocidad lineal a trozos entre lecturas publicadas; la posición se integra de forma exacta y se ancla en el PK del impacto (318,173); la distancia de parada se calcula como v²/2a con la deceleración media medida entre dos lecturas. Pruebas: integración exacta, distancias de parada y restas de horas reales.
+
+| Resultado (versión Infobae) | Valor |
+|---|---|
+| Primer síntoma → freno de emergencia del Alvia | 8 s (9 s en la versión Forbes) |
+| Freno → choque | 5 s y 292 m, de 217 a 204 km/h |
+| Deceleración media del Alvia en esos segundos | 0,72 m/s² (0,56 en la versión Forbes) |
+| Distancia para detenerse con esa deceleración | 2,52 km: habría tenido que frenar ~37 s antes, antes incluso del primer síntoma |
+| Velocidad de acercamiento en el choque | 356 km/h |
+| Comprobación cruzada (velocidades frente a PK) | 389 m frente a 508 m: 119 m de diferencia (≈ 2,8 s), compatible con el redondeo de las horas |
+| Respuesta | 112 a los +69 s; segundo tren confirmado a los +32 min 47 s |
+
+**Simulación SENDA (sintética, etiquetada):** con un 25 % de pasajeros con SENDA y un 55 % de cobertura, el segundo emplazamiento se conocería a los 34 s. Pasajeros, posiciones, adopción y cobertura son supuestos.
+
+**Lección:** con el tren ya descarrilado no había margen físico para frenar. El valor está antes (detectar la rotura del carril: `trackCircuitWatch` y el detector por ondas guiadas) y después (saber en segundos que hay dos trenes). La señal de 22 h antes sigue **en disputa** (Guardia Civil frente a Adif).
+
 ## 5. Motor de prevención (base) · `packages/senda/src/flood-warning.mjs`
 
 Referencia para el motor de alerta temprana de SENDA. Entradas **obligatorias y con fuente**: umbrales y velocidades no tienen valor por defecto.
@@ -201,6 +221,7 @@ Cada paquete exportado desde el escritorio PRO lleva la huella SHA-256 de las ca
 | 2026-11-25 16:23 | DANA 4D: hidrología, calibración CSI y cuencas | 6a4f59f (PR #94) |
 | 2026-11-25 16:44 | Línea del tiempo, telemetría con fuentes, motor `flood-warning`, modo PRO de exportación, pestaña de simuladores en el escritorio y este dossier | 9d4313f (PR #95) |
 | 2026-11-25 16:59 | Estimaciones con métodos publicados cuando falta el dato (Témez, Kirpich, observado) y conectores para la red del organismo | 54f310e (PR #96) |
-| 2026-11-25 | Motor hidrodinámico 2D verificado y simulación del 29-10 calibrada contra Copernicus | esta PR |
+| 2026-11-25 17:29 | Motor hidrodinámico 2D verificado y simulación del 29-10 calibrada contra Copernicus | 333996f (PR #97) |
+| 2026-11-25 | Tren 4D: reconstrucción de Adamuz con datos publicados | esta PR |
 
 *Firmado: asistente de ingeniería de SENDA (Claude), para revisión del fundador.*
