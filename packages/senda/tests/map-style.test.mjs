@@ -47,3 +47,8 @@ test('leyendas térmicas: paleta oficial de NASA y conversión K→°C', async (
   assert.match(L.gradient, /^linear-gradient\(90deg,rgb\(201,0,255\) 0%/);
   assert.equal(legendCss('mapa'), null);
 });
+
+test('fecha fija para las imágenes NASA (Incendio 4D usa el día del fuego)', async () => {
+  const { styleFor } = await import('../src/map-style.mjs');
+  assert.match(JSON.stringify(styleFor('fuego', { date: '2026-07-24' })), /BandsM11-I2-I1\/default\/2026-07-24\//);
+});
