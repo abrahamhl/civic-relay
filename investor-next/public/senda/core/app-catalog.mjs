@@ -44,6 +44,7 @@ const M = [
   ['via', 'Vigilancia ferroviaria', 'Vía y trenes', 'ver', O],
   ['atlas', 'Atlas', 'Mapa de capas', 'ver', O],
   ['ojo', 'Ojo de SENDA', 'Satélites y casos', 'ver', O],
+  ['incendio4d', 'Incendio 4D', 'San Martín 2026: relieve, tiempo y humo', 'riesgos', C],
   ['incendio', 'Incendio forestal', 'Avisar antes de la antena', 'riesgos', O],
   ['fuego', 'Seguimiento de incendio', 'Frente y viento', 'riesgos', O],
   ['fuego3d', 'Incendio en 3D', 'Terreno real', 'riesgos', O],

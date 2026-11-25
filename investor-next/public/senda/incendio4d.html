@@ -1,0 +1,61 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000"><title>SENDA · Incendio 4D</title>
+<link rel="icon" href="/senda/icon.svg"><link rel="stylesheet" href="/senda/fonts/fonts.css">
+<link rel="stylesheet" href="/senda/vendor/maplibre-gl-4.7.1/maplibre-gl.css">
+<style>
+:root{--bg:#000;--g1:#1c1c1e;--g2:#2c2c2e;--l1:#fff;--l2:rgba(235,235,245,.62);--real:#34c759;--model:#ff9f0a;--scen:#bf5af2;--acc:#ff7756}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--l1);font:15px/1.35 Inter,-apple-system,system-ui,sans-serif;overflow:hidden}
+button,select,input{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
+#map{position:absolute;inset:0}
+#top{position:absolute;left:10px;right:10px;top:58px;z-index:5;display:flex;gap:8px;align-items:flex-start;pointer-events:none}
+#title{pointer-events:auto;background:rgba(20,20,22,.86);backdrop-filter:blur(14px);border-radius:14px;padding:8px 12px;flex:1;min-width:0}
+#title b{display:block;font-size:15px}#title small{color:var(--l2);font-size:12px}
+.badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.05em;border-radius:6px;padding:2px 6px;margin-right:4px}
+.badge.real{background:rgba(52,199,89,.18);color:var(--real)}.badge.model{background:rgba(255,159,10,.18);color:var(--model)}.badge.scen{background:rgba(191,90,242,.18);color:var(--scen)}
+.tb{pointer-events:auto;width:42px;height:42px;border-radius:12px;background:rgba(20,20,22,.86);backdrop-filter:blur(14px);display:grid;place-items:center;font-size:18px}
+#panel{position:absolute;left:0;right:0;bottom:0;z-index:6;background:rgba(18,18,20,.94);backdrop-filter:blur(18px);border-radius:20px 20px 0 0;padding:8px 14px calc(12px + env(safe-area-inset-bottom));max-height:58vh;overflow-y:auto}
+#panel .grab{width:56px;height:6px;border-radius:3px;background:#636366;margin:0 auto 8px;display:block;cursor:pointer}
+#panel.mini .more{display:none}#panel.mini{max-height:none}
+.time{display:flex;align-items:center;gap:10px}.time input{flex:1;accent-color:var(--acc)}
+#play{width:40px;height:40px;border-radius:50%;background:var(--acc);color:#1a0b06;font-size:16px;font-weight:800}
+#clock{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px;min-width:120px}
+#kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
+#kpis div{background:var(--g1);border-radius:10px;padding:6px 8px}#kpis b{display:block;font-size:17px}#kpis span{font-size:10.5px;color:var(--l2)}
+.seg{display:flex;background:var(--g1);border-radius:10px;padding:2px;gap:2px;margin:6px 0}.seg button{flex:1;padding:7px 4px;border-radius:8px;font-size:12.5px;color:var(--l2);font-weight:600}.seg button.on{background:#3a3a3c;color:#fff}
+h4{margin:12px 2px 6px;font-size:12px;color:var(--l2);text-transform:uppercase;letter-spacing:.04em}
+.layer{display:flex;align-items:center;gap:10px;padding:8px 2px;border-top:.5px solid rgba(84,84,88,.5)}
+.layer .t{flex:1;min-width:0}.layer .t small{display:block;color:var(--l2);font-size:11.5px;line-height:1.3}
+.layer input{width:20px;height:20px;accent-color:var(--acc)}.layer .i{width:26px;height:26px;border-radius:50%;background:var(--g2);color:#64d2ff;font-weight:800;font-size:13px}
+.whatif{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.whatif label{background:var(--g1);border-radius:10px;padding:6px 8px;font-size:11px;color:var(--l2)}.whatif input{width:100%;accent-color:var(--scen)}.whatif b{color:#fff;font-size:14px}
+.row{display:flex;gap:8px;margin-top:8px}.row button{flex:1;padding:10px;border-radius:12px;background:var(--g2);font-weight:700;font-size:13px}.row button.on{background:var(--acc);color:#1a0b06}
+#info{position:absolute;left:0;right:0;bottom:0;z-index:9;background:#fff;color:#1c1c1e;border-radius:20px 20px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom));max-height:70vh;overflow-y:auto;box-shadow:0 -10px 30px rgba(0,0,0,.4)}
+#info h3{margin:0 0 6px}#info h4{color:#6e6e73}#info p,#info li{line-height:1.45}#info .src{font-size:12px;color:#6e6e73;word-break:break-all}
+#info .x{float:right;width:32px;height:32px;border-radius:50%;background:#eef0f3}
+#drawMsg{position:absolute;left:50%;transform:translateX(-50%);top:112px;z-index:7;background:rgba(191,90,242,.92);color:#fff;border-radius:12px;padding:6px 12px;font-size:13px;font-weight:600}
+.maplibregl-ctrl-attrib{font-size:9px}
+</style><script type="module" src="/senda/app-chrome.mjs"></script></head><body>
+<div id="map" aria-label="Mapa 3D del incendio"></div>
+<div id="top"><div id="title"><b>Incendio de San Martín de Valdeiglesias · 23-07-2026</b><small><span class="badge real">REAL</span>medido · <span class="badge model">MODELO</span>calculado · <span class="badge scen">ESCENARIO</span>lo eliges tú</small></div>
+  <button class="tb" id="styleBtn" aria-label="Tipo de mapa">🗺️</button><button class="tb" id="helpBtn" aria-label="Cómo leer esta vista">?</button></div>
+<div id="drawMsg" hidden></div>
+<section id="panel">
+  <button class="grab" id="grab" aria-label="Ver más o menos controles"></button>
+  <div class="time"><button id="play" aria-label="Reproducir">▶</button><input id="t" type="range" min="0" max="920" step="5" value="0" aria-label="Minutos desde la ignición del modelo"><span id="clock"></span></div>
+  <div id="kpis"><div><b id="kHa">–</b><span>ha modelo</span></div><div><b id="kWind">–</b><span>viento GFS</span></div><div><b id="kPlume">1,88 km</b><span>pluma modelo</span></div><div><b id="kReal">19 939</b><span>ha EFFIS final</span></div></div>
+  <div class="more">
+  <h4>Satélite (Sentinel-2, color real)</h4>
+  <div class="seg" id="scene"><button data-s="pre">16-07 antes</button><button data-s="d0724" class="on">24-07</button><button data-s="d0729">29-07</button><button data-s="d0808">08-08</button><button data-s="none">Ocultar</button></div>
+  <h4>Capas</h4>
+  <div id="layers"></div>
+  <h4>Escenario: ¿y si el viento fuera otro?</h4>
+  <div class="whatif"><label>Viento <b id="wv">23</b> km/h<input id="wKmh" type="range" min="0" max="60" value="23"></label><label>Hacia <b id="wd">61</b>°<input id="wTo" type="range" min="0" max="359" value="61"></label><label>Cabeza <b id="wr">16,3</b> m/min<input id="wRos" type="range" min="1" max="60" step="0.1" value="16.3"></label></div>
+  <div class="row"><button id="drawBtn">✏️ Dibujar</button><button id="drawClose">Cerrar polígono</button><button id="drawClear">Borrar</button></div>
+  </div>
+  <p id="drawOut" style="font-size:12px;color:var(--l2);margin:6px 2px 0"></p>
+</section>
+<section id="info" hidden><button class="x" id="infoX" aria-label="Cerrar">✕</button><div id="infoBody"></div></section>
+<script src="/senda/vendor/maplibre-gl-4.7.1/maplibre-gl-csp.js"></script>
+<script type="module" src="/senda/incendio4d.mjs"></script>
+</body></html>

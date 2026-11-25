@@ -11,11 +11,11 @@ const { chromium, devices } = await import(pathToFileURL(pwPath).href);
 const { MODULES } = await import(pathToFileURL(path.join(root, 'senda', 'core', 'app-catalog.mjs')).href);
 const types = { '.html': 'text/html', '.mjs': 'text/javascript', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.wasm': 'application/wasm', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' };
 const srv = http.createServer((q, r) => { let p = decodeURIComponent(q.url.split('?')[0]); let f = path.join(root, p); if (fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, 'index.html'); if (!fs.existsSync(f) && fs.existsSync(f + '.html')) f += '.html'; if (!fs.existsSync(f)) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': types[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(r); }).listen(8771);
-const allow = /^https:\/\/(tiles\.openfreemap\.org|router\.project-osrm\.org|routing\.openstreetmap\.de|service\.pdok\.nl|tms-pnoa-ma\.idee\.es)\//;
+const allow = /^https:\/\/(tiles\.openfreemap\.org|router\.project-osrm\.org|routing\.openstreetmap\.de|service\.pdok\.nl|tms-pnoa-ma\.idee\.es|gibs\.earthdata\.nasa\.gov|tile\.opentopomap\.org|s3\.amazonaws\.com\/elevation-tiles-prod\/)/;
 fs.mkdirSync(out, { recursive: true });
 const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
 const ctx = await b.newContext({ ...devices['Pixel 7'], deviceScaleFactor: 1, geolocation: { latitude: 51.9830, longitude: 5.9105, accuracy: 10 }, permissions: ['geolocation'] });
-await ctx.addInitScript(() => { try { localStorage.setItem('senda.drive.welcomed', 'true'); } catch { /* */ } });
+await ctx.addInitScript(() => { try { localStorage.setItem('senda.drive.welcomed', 'true'); localStorage.setItem('senda.f4d.welcomed', 'true'); } catch { /* */ } });
 await ctx.route(/^https?:\/\/(?!localhost)/, (r) => (allow.test(r.request().url()) ? r.continue() : r.abort()));
 const only = process.argv.slice(2);
 const done = [];
@@ -25,7 +25,7 @@ for (const m of MODULES) {
   const url = `http://localhost:8771${page === 'index' ? '/senda/index.html' : `/senda/${page}.html`}`;
   const pg = await ctx.newPage();
   try {
-    await pg.goto(url, { waitUntil: 'load', timeout: 20000 }); await pg.waitForTimeout(4000);
+    await pg.goto(url, { waitUntil: 'load', timeout: 20000 }); await pg.waitForTimeout(m.page === 'incendio4d' ? 9000 : 4000);
     const png = path.join(out, `${m.page}.png`);
     // Lo visual de cada pantalla: el mayor mapa, lienzo, 3D, vídeo, imagen o gráfico visible; si no hay, la cabecera.
     const box = await pg.evaluate(() => {
