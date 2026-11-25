@@ -447,7 +447,9 @@ export function createReferenceServer({
         try { r.end(); } catch { /* noop */ }
       }
       sseClients.clear();
-      return new Promise((resolve) => server.close(resolve));
+      const done = new Promise((resolve) => server.close(resolve));
+      server.closeAllConnections?.(); // conexiones keep-alive o SSE a medias no deben bloquear el cierre
+      return done;
     },
   };
 }

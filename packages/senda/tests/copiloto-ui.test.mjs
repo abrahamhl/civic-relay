@@ -58,16 +58,22 @@ async function launchCdp() {
     'about:blank',
   ], { stdio: ['ignore', 'ignore', 'pipe'] });
 
+  const killChrome = () => {
+    try { proc.stderr.destroy(); } catch { /* */ }
+    try { proc.kill('SIGKILL'); } catch { /* */ }
+    try { rmSync(userDataDir, { recursive: true, force: true }); } catch { /* */ }
+  };
   const wsUrl = await new Promise((ok, ko) => {
     let buf = '';
-    const timer = setTimeout(() => ko(new Error('Chrome DevTools startup timeout')), 15_000);
+    // Arranque en frío de Chrome en un runner compartido puede pasar de 15 s; 60 s y, si no, fallo limpio.
+    const timer = setTimeout(() => ko(new Error('Chrome DevTools startup timeout (60 s)')), 60_000);
     proc.stderr.on('data', (d) => {
       buf += d.toString();
       const m = buf.match(/DevTools listening on (ws:\/\/[^\s]+)/);
       if (m) { clearTimeout(timer); ok(m[1]); }
     });
     proc.once('exit', (code) => { clearTimeout(timer); ko(new Error(`Chrome exited early: ${code}`)); });
-  });
+  }).catch((e) => { killChrome(); throw e; });
 
   const { port } = new URL(wsUrl);
   const targets = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
@@ -91,9 +97,11 @@ async function launchCdp() {
   };
   const send = (method, params = {}) => new Promise((ok, ko) => {
     const cur = ++id;
-    pending.set(cur, { ok, ko });
+    const timer = setTimeout(() => { pending.delete(cur); ko(new Error(`CDP sin respuesta en 30 s: ${method}`)); }, 30_000);
+    pending.set(cur, { ok: (v) => { clearTimeout(timer); ok(v); }, ko: (e) => { clearTimeout(timer); ko(e); } });
     ws.send(JSON.stringify({ id: cur, method, params }));
   });
+  ws.onclose = () => { for (const [, p] of pending) p.ko(new Error('CDP cerrado')); pending.clear(); };
   const on = (method, fn) => {
     if (!listeners.has(method)) listeners.set(method, []);
     listeners.get(method).push(fn);
@@ -113,15 +121,16 @@ async function launchCdp() {
   };
   const close = () => {
     try { ws.close(); } catch { /* */ }
-    try { proc.kill('SIGKILL'); } catch { /* */ }
-    try { rmSync(userDataDir, { recursive: true, force: true }); } catch { /* */ }
+    killChrome();
   };
   return { send, on, evalJs, waitFor, close };
 }
 
-test('Copiloto 5D Apple HIG Mobile-First (390x844): 4 pestañas, entorno directo/indirecto, calibración 1-toque, Android Auto y Conducir', { skip: !CHROME_BIN }, async () => {
+test('Copiloto 5D Apple HIG Mobile-First (390x844): 4 pestañas, entorno directo/indirecto, calibración 1-toque, Android Auto y Conducir', { skip: !CHROME_BIN, timeout: 240_000 }, async () => {
   const { srv, baseUrl } = await startStaticServer();
-  const cdp = await launchCdp();
+  const stopSrv = () => { try { srv.closeAllConnections(); } catch { /* */ } srv.close(); };
+  let cdp;
+  try { cdp = await launchCdp(); } catch (e) { stopSrv(); throw e; }
   const errors = [];
   const failedLocal = [];
   try {
@@ -323,6 +332,6 @@ test('Copiloto 5D Apple HIG Mobile-First (390x844): 4 pestañas, entorno directo
     assert.deepEqual(errors, [], `errores de consola/JS: ${errors.join(' | ')}`);
   } finally {
     cdp.close();
-    srv.close();
+    stopSrv();
   }
 });
