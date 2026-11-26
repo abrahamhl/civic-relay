@@ -16,14 +16,17 @@ import { createLinkProber, isProbePack } from './core/ble-link-probe.mjs';
 import { openPmTilesLocal } from './core/pmtiles-reader.mjs';
 import { parseGdacsRss, parseMtgEvents, osintNear } from './core/osint-feeds.mjs';
 import { interpretAlternatives } from './core/voice-report.mjs';
-import { REPORT_KINDS } from './core/road-guard.mjs';
+import { REPORT_KINDS, call112Script, LANE_SAY } from './core/road-guard.mjs';
+import { detectCrashEvent, EXAMPLE_DETECTION_CONFIG, syntheticTrace } from './core/roadsafe-crash-detect.mjs';
+import { laneGuide, laneSvg } from './core/lane-guide.mjs';
+import { clusterCrashes, clusterIconSvg } from './core/crash-cluster.mjs';
 import { parseDatex2 } from './core/datex2.mjs';
 import { wazeUrl, googleMapsUrl, haversineM } from './core/route-planner.mjs';
 import { routeUrl, parseRoute, nextManeuver, shouldReroute, announcement } from './core/nav-osrm.mjs';
 import { CATEGORIES, FROM_REPORT, fromDatex, markerSvg } from './core/report-style.mjs';
 import { saveBlob } from './save-file.mjs';
 import { compassHeading, createHeadingFusion } from './core/heading-fusion.mjs';
-import { packReports, unpackReports, mergeReports, isReportPack } from './core/hazard-share.mjs';
+import { packReports, unpackReports, mergeReports, isReportPack, SHARE_RULES } from './core/hazard-share.mjs';
 import { b64, unb64 } from './core/b64.mjs';
 import { createBlackbox } from './core/blackbox.mjs';
 import { observe } from './core/hazard-belief.mjs';
@@ -35,6 +38,8 @@ import { composeProximityMessage } from './core/drive-community-calibration.mjs'
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const LS = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* */ } } };
+// Identificador ALEATORIO de este móvil (no es el IMEI ni nada personal): sirve para contar móviles distintos en un mismo accidente.
+const DEVICE_ID = LS.get('senda.devId', null) ?? (() => { const v = [...crypto.getRandomValues(new Uint8Array(6))].map((b) => b.toString(16).padStart(2, '0')).join(''); LS.set('senda.devId', v); return v; })();
 const say = (t) => { try { speechSynthesis.cancel(); speechSynthesis.speak(Object.assign(new SpeechSynthesisUtterance(t), { lang: 'es-ES' })); } catch { /* sin voz */ } };
 const fmtDist = (m) => (m >= 1000 ? `${(m / 1000).toFixed(1).replace('.', ',')} km` : `${Math.round(m / 10) * 10} m`);
 const reports = () => LS.get('senda.ruta.reports', []);
@@ -188,7 +193,22 @@ function drawMarkers() {
     if (L.radar && st.mode === 'car') for (const rd of st.radars) if (inView(rd.lon, rd.lat))
       markers.push(marker(rd.lon, rd.lat, 'CAMARA', `<b>${rd.kind === 'section' ? 'Radar de tramo' : 'Radar fijo'} oficial</b>${rd.road ? ` · ${esc(rd.road)}` : ''}${rd.maxspeed ? ` · ${rd.maxspeed} km/h` : ''}<br><small>${esc(String(rd.src).toUpperCase())} · publicado oficialmente (solo fijos y tramo)</small>`));
   }
-  if (L.senda) for (const r of reports()) if (inView(r.lon, r.lat)) {
+  if (L.senda) {
+    // Accidentes: un solo icono por accidente con «×N» móviles (no N iconos). Agrupación = las mismas reglas que ya fusionan avisos compartidos.
+    const dets = [];
+    for (const r of reports()) if (r.kind === 'accidente') {
+      dets.push({ id: r.dev ?? `r${r.id}`, tS: r.t / 1000, lat: r.lat, lon: r.lon, accM: r.acc, lane: r.lane, vehicle: r.dev ?? `r${r.id}`, wellbeing: r.wb });
+      for (const t of r.seen ?? []) dets.push({ id: `r${r.id}-${t}`, tS: t / 1000, lat: r.lat, lon: r.lon, accM: null });
+    }
+    for (const c of clusterCrashes(dets, { windowS: SHARE_RULES.sameMs / 1000, radiusM: SHARE_RULES.sameM })) if (inView(c.lon, c.lat)) {
+      const el = document.createElement('div'); el.innerHTML = clusterIconSvg(c, 40); el.style.cursor = 'pointer';
+      const how = c.state === 'CORROBORATED' ? `confirmado por ${c.devices} móviles SENDA distintos` : 'un solo móvil: probable, sin confirmar';
+      const pos = c.sigmaM != null ? `posición combinada de ${c.devices} GPS ± ${c.sigmaM} m` : 'posición media (algún aviso llegó sin su precisión GPS)';
+      const html = `<b>Accidente · ×${c.devices}</b><br><small>${how}<br>${pos}${c.lane ? `<br>Vehículo ${esc(LANE_SAY[c.lane] ?? c.lane)} (declarado)` : ''}${c.needHelp ? `<br><b>${c.needHelp} piden ayuda</b>` : ''}${c.ok ? `<br>${c.ok} dicen estar bien` : ''}<br>Satélite: no se usa para confirmar; las imágenes públicas (Sentinel-2, 10 m por píxel) no distinguen coches ni se piden al momento.</small>`;
+      markers.push(new maplibregl.Marker({ element: el }).setLngLat([c.lon, c.lat]).setPopup(new maplibregl.Popup({ offset: 20, maxWidth: '270px' }).setHTML(html)).addTo(st.map));
+    }
+  }
+  if (L.senda) for (const r of reports()) if (r.kind !== 'accidente' && inView(r.lon, r.lat)) {
     const cat = FROM_REPORT[r.kind] ?? 'PELIGRO';
     markers.push(marker(r.lon, r.lat, cat, `<b>${esc(REPORT_KINDS[r.kind]?.label ?? r.kind)}</b><br><small>Aviso de SENDA · ${new Date(r.t).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })} · ${r.verified ? 'visto con cámara' : 'sin verificar'}</small>`));
   }
@@ -605,6 +625,7 @@ const HF = createHeadingFusion({ gpsMinSpeedMs: 3, tauCompassS: 0.4, tauGpsS: 0.
 let lastBearingMs = 0;
 function onPos(p) {
   st.lastFix = p;
+  crashSpeed(p);
   st.ekfState = st.ekf.updateGnss({
     lon: p.coords.longitude, lat: p.coords.latitude,
     accuracyM: p.coords.accuracy ?? 8, speedMs: p.coords.speed, headingDeg: p.coords.heading,
@@ -640,6 +661,7 @@ function guide() {
   if (shouldReroute(st.route, st.pos, st.lastRouteS, now)) { say('Recalculando'); return goTo(st.dest, true); }
   const n = nextManeuver(st.route, st.pos);
   $('#turn').hidden = false; $('#turnIco').innerHTML = maneuverIcon(n.step); $('#turnDist').textContent = fmtDist(n.distM); $('#turnTxt').textContent = n.step.text;
+  const lg = laneGuide(n.step.lanes); $('#lanes').hidden = !lg || n.distM > 2000; if (lg) { $('#laneSvg').innerHTML = laneSvg(n.step.lanes); $('#laneTxt').textContent = lg.text; }
   const a = announcement(n, st.said); if (a) say(a);
   if (n.step.type === 'arrive' && n.distM < 30) { say('Has llegado'); endNav(); }
 }
@@ -653,6 +675,7 @@ async function goTo(dest, reroute = false) {
     const r = parseRoute(await (await fetch(routeUrl({ from: st.pos, to: dest.at, mode: st.mode }))).json());
     if (!r.ok) return hint('No hay ruta: ' + r.reason);
     st.route = r; st.said = new Set(); st.follow = true;
+    if (!reroute) window.SendaNative?.p2pStart?.(); // APK: buzón Bluetooth abierto mientras navegas, para recibir avisos de accidentes cercanos
     st.map?.getSource('route')?.setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: r.coords } });
     const arrive = new Date(Date.now() + r.durationS * 1000);
     $('#etaTime').textContent = arrive.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
@@ -661,7 +684,7 @@ async function goTo(dest, reroute = false) {
     guide(); updateCorridor(); updateCurveHorizon();
   } catch { hint('Sin conexión al servicio de rutas. Abre el destino en Waze o Google Maps.'); $('#etaTime').textContent = dest.name; $('#etaInfo').textContent = ''; }
 }
-function endNav() { st.route = null; st.dest = null; $('#turn').hidden = true; $('#etaBox').hidden = true; $('#searchBox').hidden = false; st.map?.getSource('route')?.setData({ type: 'FeatureCollection', features: [] }); st.map?.easeTo({ pitch: 0, bearing: 0 }); hint('Navegación terminada.'); updateCorridor(); updateCurveHorizon(); }
+function endNav() { st.route = null; st.dest = null; $('#turn').hidden = true; $('#lanes').hidden = true; $('#etaBox').hidden = true; $('#searchBox').hidden = false; st.map?.getSource('route')?.setData({ type: 'FeatureCollection', features: [] }); st.map?.easeTo({ pitch: 0, bearing: 0 }); hint('Navegación terminada.'); updateCorridor(); updateCurveHorizon(); }
 $('#endNav').addEventListener('click', endNav);
 $('#goWaze').addEventListener('click', () => { if (st.dest) location.href = wazeUrl({ to: st.dest.at }).url; });
 $('#goMaps').addEventListener('click', () => { if (st.dest) location.href = googleMapsUrl({ from: st.pos ?? st.dest.at, to: st.dest.at }).url; });
@@ -732,10 +755,11 @@ const openSheet = (on) => { $('#sheet').hidden = !on; $('#veil').hidden = !on; }
 $('#reportBtn').addEventListener('click', () => openSheet(true));
 $('#veil').addEventListener('click', () => openSheet(false));
 $('#grid').addEventListener('click', (e) => { const k = e.target.closest('[data-k]')?.dataset.k; if (k) { openSheet(false); saveReport(k); } });
-function saveReport(kind, side = 'SIN_INDICAR') {
+function saveReport(kind, side = 'SIN_INDICAR', extra = {}) {
   if (!st.pos) return hint('Sin GPS: no se puede situar el aviso.');
-  const list = reports(); list.push({ kind, side, lon: st.pos[0], lat: st.pos[1], t: Date.now(), own: true, id: crypto.getRandomValues(new Uint32Array(1))[0] }); LS.set('senda.ruta.reports', list);
-  drawMarkers(); updateCorridor(); say(`Aviso de ${REPORT_KINDS[kind].label} guardado`); hint(`Aviso «${REPORT_KINDS[kind].label}» guardado en tu posición. Para pasarlo a otros móviles SENDA cercanos: «Más» → «Enviar mis avisos por Bluetooth» o «Compartir avisos sin la app».`);
+  const id = crypto.getRandomValues(new Uint32Array(1))[0];
+  const list = reports(); list.push({ kind, side, lon: st.pos[0], lat: st.pos[1], t: Date.now(), own: true, id, dev: DEVICE_ID, acc: st.lastFix?.coords?.accuracy ?? null, ...extra }); LS.set('senda.ruta.reports', list);
+  drawMarkers(); updateCorridor(); if (extra.quiet) return id; say(`Aviso de ${REPORT_KINDS[kind].label} guardado`); hint(`Aviso «${REPORT_KINDS[kind].label}» guardado en tu posición. Para pasarlo a otros móviles SENDA cercanos: «Más» → «Enviar mis avisos por Bluetooth» o «Compartir avisos sin la app».`);
 }
 window.sendaVoice = (res) => {
   if (res.state) return hint(res.state === 'ESCUCHANDO' ? 'Habla ahora…' : 'Procesando…');
@@ -1448,3 +1472,111 @@ globalThis.sendaDrive = {
   openLab, setActiveListen, runLabBattery, loadRfSurveyText, exportLabAndMap, surfaceMapper: st.surfaceMapper,
   renderArHud, enrichTracksForHud, hudPhysicsState, createTracker, FULL_RULES,
 };
+
+
+// ── Después de un choque: el detector del núcleo decide si PREGUNTAR; una alarma fuerte ayuda a encontrar el móvil; nadie llama solo al 112 ──
+// Configuración: EXAMPLE_DETECTION_CONFIG, ejemplo SIN CALIBRAR (se dice en pantalla). Por eso la app pregunta y nunca afirma que hubo un choque.
+const CRASH_CFG = EXAMPLE_DETECTION_CONFIG, G0 = 9.80665;
+const crashBuf = { imu: [], speed: [], gyro: [] };
+const crash = { open: false, lastTrigS: -1e9, tick: 0, left: 0, result: null, sim: false, reportId: null, wb: null, rep: { vehicles: null, lane: null, trapped: null, fire: null } };
+const tS = () => performance.now() / 1000;
+const keep = (arr, v, s = 45) => { arr.push(v); while (arr.length && arr[0].t < v.t - s) arr.shift(); };
+let actx = null, siren = null, buzz = 0;
+addEventListener('pointerdown', () => { try { actx ??= new AudioContext(); actx.resume(); } catch { /* sin audio web */ } }, { passive: true });
+window.addEventListener('devicemotion', (e) => {
+  const a = e.accelerationIncludingGravity, t = tS();
+  if (a && Number.isFinite(a.x)) {
+    keep(crashBuf.imu, { t, x: a.x, y: a.y ?? 0, z: a.z ?? 0 });
+    if (!crash.open && t - crash.lastTrigS > 60 && Math.hypot(a.x, a.y ?? 0, a.z ?? 0) / G0 >= CRASH_CFG.trigger.peakG) crashTriggered(t);
+  }
+  const g = e.rotationRate; if (g && Number.isFinite(g.alpha)) keep(crashBuf.gyro, { t, x: g.alpha, y: g.beta ?? 0, z: g.gamma ?? 0 });
+});
+function crashSpeed(p) {
+  const v = p.coords.speed; if (!Number.isFinite(v)) return;
+  const t = tS(), prev = crashBuf.speed[crashBuf.speed.length - 1]; keep(crashBuf.speed, { t, ms: v, src: 'GNSS' });
+  if (prev && t - prev.t > 0 && t - prev.t <= 1.5 && (prev.ms - v) / (t - prev.t) / G0 >= CRASH_CFG.trigger.physicalDecelG && !crash.open && t - crash.lastTrigS > 60) crashTriggered(t);
+}
+function crashTriggered(t0) {
+  crash.lastTrigS = t0; bbLog('note', { text: 'Disparo del detector de choque' });
+  setTimeout(() => crashEvaluate(t0), 3000); // primera lectura: pulso y caída de velocidad
+  setTimeout(() => crashEvaluate(t0), (CRASH_CFG.thresholds.stationaryAfterS + 2) * 1000); // segunda: ¿sigue parado?
+}
+function crashEvaluate(t0) {
+  if (crash.open && crash.result?.state === 'LIKELY_CRASH') return;
+  const from = t0 - 20, f = (arr) => arr.filter((x) => x.t >= from).map((x) => ({ ...x, t: +(x.t - from).toFixed(3) }));
+  const r = detectCrashEvent({ imu: f(crashBuf.imu), speed: f(crashBuf.speed), gyro: f(crashBuf.gyro), distanceToRoadM: null }, CRASH_CFG);
+  bbLog('note', { text: `Detector de choque: ${r.state} (p=${r.posterior ?? '–'})` });
+  if (r.state === 'LIKELY_CRASH' || r.state === 'CHECK_USER') openCrash(r, false);
+}
+function openCrash(r, sim) {
+  const upgrade = crash.open && r.state === 'LIKELY_CRASH' && crash.result?.state !== 'LIKELY_CRASH';
+  if (crash.open && !upgrade) return;
+  if (!crash.open) Object.assign(crash, { sim, reportId: null, wb: null, rep: { vehicles: null, lane: null, trapped: null, fire: null } });
+  crash.open = true; crash.result = r;
+  $('#crash').hidden = false; $('#crashClose').hidden = true; $('#crashRep').hidden = true; $('#crashSay').hidden = true; $('#crashState').textContent = '';
+  for (const b of $('#crashRep').querySelectorAll('button')) b.classList.remove('on');
+  $('#crashBasis').textContent = sim ? 'SIMULACIÓN · prueba con una traza sintética: la alarma suena para que compruebes el volumen' : 'Posible choque detectado por los sensores de este móvil · detector sin calibrar: por eso te pregunta';
+  $('#crashTitle').textContent = r.state === 'LIKELY_CRASH' ? '¿Estáis bien?' : '¿Va todo bien?';
+  $('#crashWhy').textContent = `Pico ${r.peakG} g${r.maxVehicleDecelG ? ` · frenada de ${r.maxVehicleDecelG} g` : ''} · ${r.used?.length ?? 0} indicio(s) físico(s). Si no respondes, se avisa a los de detrás. Nadie llama solo al 112.`;
+  navigator.wakeLock?.request('screen').catch(() => { /* sin permiso */ });
+  if (r.state === 'LIKELY_CRASH' || sim) alarmOn(); else { navigator.vibrate?.([300, 150, 300]); say('¿Va todo bien? Toca la pantalla.'); }
+  clearInterval(crash.tick); crash.left = r.countdownS ?? 30; $('#crashCount').textContent = `${crash.left} s`;
+  $('#crashCount').classList.remove('msg');
+  crash.tick = setInterval(() => { crash.left--; $('#crashCount').textContent = crash.left > 0 ? `${crash.left} s` : 'Sin respuesta'; if (crash.left <= 0) { clearInterval(crash.tick); crashNoAnswer(); } }, 1000);
+}
+function alarmOn() {
+  const N = window.SendaNative;
+  if (typeof N?.alarm === 'function') N.alarm(true);
+  else if (actx && !siren) { try { const o = actx.createOscillator(), gn = actx.createGain(); o.type = 'square'; gn.gain.value = 0.9; o.connect(gn).connect(actx.destination); o.start(); let hi = false; siren = { o, iv: setInterval(() => { hi = !hi; o.frequency.setValueAtTime(hi ? 960 : 770, actx.currentTime); }, 450) }; } catch { /* */ } }
+  clearInterval(buzz); navigator.vibrate?.([800, 300, 800]); buzz = setInterval(() => { navigator.vibrate?.([800, 300, 800]); say('Posible accidente. Toca la pantalla.'); }, 4000);
+}
+function alarmOff() {
+  window.SendaNative?.alarm?.(false);
+  if (siren) { clearInterval(siren.iv); try { siren.o.stop(); } catch { /* */ } siren = null; }
+  clearInterval(buzz); navigator.vibrate?.(0);
+}
+/** Guarda el aviso de accidente (una vez por choque) y lo envía a los móviles SENDA cercanos para que los de detrás lo vean venir. */
+function declareAccident(extra) {
+  if (crash.sim) return $('#crashState').textContent = 'Simulación: no se ha guardado ni enviado ningún aviso.';
+  if (crash.reportId == null) crash.reportId = saveReport('accidente', 'SIN_INDICAR', { quiet: true, ...extra });
+  else { const list = reports(), r = list.find((x) => x.id === crash.reportId); if (r) { Object.assign(r, extra); LS.set('senda.ruta.reports', list); drawMarkers(); } }
+  if (crash.reportId == null) return $('#crashState').textContent = 'Sin GPS todavía: el aviso se guardará en cuanto haya posición. Llama al 112 si lo necesitas.';
+  const N = window.SendaNative;
+  if (typeof N?.p2pSend === 'function') { N.p2pStart(); const pack = packReports(reports()); N.p2pSend(b64(pack)); st.ble.tx += pack[2]; $('#crashState').textContent = 'Aviso de accidente enviado por Bluetooth a los móviles SENDA cercanos (los que vienen detrás lo ven en su mapa).'; }
+  else $('#crashState').textContent = 'Aviso de accidente guardado. En la web no hay Bluetooth: compártelo con «Más» → «Compartir avisos sin la app».';
+}
+function crashNoAnswer() {
+  if (crash.wb) return;
+  alarmOn(); crash.wb = 'NO_ANSWER'; declareAccident({ wb: 'NO_ANSWER' }); show112(); say('Sin respuesta. Aviso enviado. Si puedes, llama al 112.');
+}
+function show112() {
+  const p = st.pos, acc = st.lastFix?.coords?.accuracy;
+  const where = p ? `las coordenadas ${p[1].toFixed(5)}, ${p[0].toFixed(5)}${Number.isFinite(acc) ? ` (GPS ± ${Math.round(acc)} m)` : ''}` : 'una posición que aún no tengo';
+  const R = crash.rep, txt = call112Script({ where, vehicles: R.vehicles, trapped: R.trapped, fire: R.fire, lane: R.lane });
+  $('#crashSay').hidden = false; $('#crashSay').innerHTML = `<b>Si llamas al 112, di:</b><br>${esc(txt)}`;
+}
+function answerCrash(wb, text) {
+  alarmOff(); clearInterval(crash.tick); crash.wb = wb; $('#crashClose').hidden = false; $('#crashCount').textContent = text; $('#crashCount').classList.add('msg');
+  declareAccident({ wb }); show112();
+  if (wb === 'OK') say('Anotado. Ponte a salvo detrás del guardarraíl, con el chaleco puesto.');
+  else say('Anotado. Llama al 112 con el botón blanco.');
+}
+$('#crashOk').addEventListener('click', () => answerCrash('OK', 'Estás bien'));
+$('#crashHurt').addEventListener('click', () => answerCrash('HURT', 'No estás bien: llama al 112'));
+$('#crashHelp').addEventListener('click', () => answerCrash('NEEDS_HELP', 'Pedís ayuda: llama al 112'));
+$('#crashRepBtn').addEventListener('click', () => { alarmOff(); $('#crashClose').hidden = false; clearInterval(crash.tick); $('#crashCount').textContent = 'Cuéntanos qué ha pasado'; $('#crashCount').classList.add('msg'); $('#crashRep').hidden = false; show112(); });
+$('#crash112').addEventListener('click', () => { alarmOff(); clearInterval(crash.tick); $('#crashClose').hidden = false; if (!crash.wb) { crash.wb = 'NEEDS_HELP'; declareAccident({ wb: 'NEEDS_HELP' }); } });
+$('#crashRep').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-v]'), row = b?.closest('[data-f]'); if (!b) return;
+  for (const x of row.querySelectorAll('button')) x.classList.toggle('on', x === b);
+  const f = row.dataset.f, v = b.dataset.v;
+  crash.rep[f] = v === '' ? null : f === 'fire' ? v === 'true' : f === 'lane' ? v : Number(v);
+  declareAccident({ lane: crash.rep.lane, vehicles: crash.rep.vehicles, wb: crash.wb ?? 'REPORTED' }); show112();
+});
+$('#crashClose').addEventListener('click', () => { alarmOff(); crash.open = false; $('#crash').hidden = true; if (!crash.sim) hint('El aviso de accidente sigue en tu mapa y en el de los móviles a los que se envió.'); });
+$('#crashFalse').addEventListener('click', () => {
+  alarmOff(); clearInterval(crash.tick); bbLog('note', { text: 'Choque descartado por el usuario (falsa alarma)' });
+  if (crash.reportId != null && !crash.sim) { LS.set('senda.ruta.reports', reports().filter((r) => r.id !== crash.reportId)); drawMarkers(); updateCorridor(); }
+  crash.open = false; $('#crash').hidden = true; hint('Falsa alarma anotada. Gracias: así se calibra el detector.');
+});
+$('#crashTest')?.addEventListener('click', () => { openCrash(detectCrashEvent(syntheticTrace('CRASH_REAR_END'), CRASH_CFG), true); });

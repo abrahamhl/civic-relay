@@ -1,0 +1,467 @@
+{
+ "note": "Película completa de SENDA (26-11-2026). Cada escena cita sus fuentes en 'source'.",
+ "chapter": "SENDA",
+ "voices": {
+  "es": {
+   "voice": "em_alex",
+   "lang": "es",
+   "speed": 0.97
+  }
+ },
+ "scenes": [
+  {
+   "id": "p1",
+   "claim": "SOURCES",
+   "source": [
+    "investor-next/public/senda/data/dana2024/telemetria.json",
+    "docs/research/PROCUREMENT_GAP_2026.md",
+    "investor-next/public/senda/data/adamuz2026/cronologia.json",
+    "investor-next/public/senda/data/smv2026/real.json"
+   ],
+   "visual": {
+    "kind": "prologue",
+    "chapter": "Prólogo"
+   },
+   "title": {
+    "es": "Días que nadie olvidará"
+   },
+   "es": [
+    "En los últimos años, España ha vivido días que nadie olvidará.",
+    "Valencia, octubre de 2024: el agua avanzó más rápido que los avisos.",
+    "Abril de 2025: un apagón dejó la península sin luz y, en pocas horas, sin red móvil.",
+    "Adamuz, enero de 2026: dos trenes, trece segundos, y más de media hora para saber que había un segundo tren descarrilado.",
+    "San Martín de Valdeiglesias, julio de 2026: el satélite midió casi veinticuatro mil hectáreas quemadas.",
+    "De esos días nace SENDA."
+   ],
+   "es_say": [
+    "En los últimos años, España ha vivido días que nadie olvidará.",
+    "Valencia, octubre de dos mil veinticuatro: el agua avanzó más rápido que los avisos.",
+    "Abril de dos mil veinticinco: un apagón dejó la península sin luz y, en pocas horas, sin red móvil.",
+    "Adamuz, enero de dos mil veintiséis: dos trenes, trece segundos, y más de media hora para saber que había un segundo tren descarrilado.",
+    "San Martín de Valdeiglesias, julio de dos mil veintiséis: el satélite midió casi veinticuatro mil hectáreas quemadas.",
+    "De esos días nace Senda."
+   ]
+  },
+  {
+   "id": "p2",
+   "claim": "CALCULATED",
+   "source": [
+    "docs/continuity/SENDA_SESSION_HANDOFF.md"
+   ],
+   "visual": {
+    "kind": "title",
+    "chapter": "La idea"
+   },
+   "title": {
+    "es": "Una sola imagen, cuando más falta hace"
+   },
+   "es": [
+    "SENDA une lo que ya existe: los móviles de la gente, los sensores, los satélites, las cámaras, los drones y los datos públicos.",
+    "Lo convierte en una sola imagen de lo que está pasando, la comparte con quien la necesita y avisa antes.",
+    "Y cuando cae la red, sigue funcionando."
+   ],
+   "es_say": [
+    "Senda une lo que ya existe: los móviles de la gente, los sensores, los satélites, las cámaras, los drones y los datos públicos.",
+    "Lo convierte en una sola imagen de lo que está pasando, la comparte con quien la necesita y avisa antes.",
+    "Y cuando cae la red, sigue funcionando."
+   ]
+  },
+  {
+   "id": "p3",
+   "claim": "SIMULATION",
+   "source": [
+    "packages/senda/src/house-sweep.mjs",
+    "packages/senda/src/drone.mjs"
+   ],
+   "visual": {
+    "kind": "drones",
+    "chapter": "Drones"
+   },
+   "title": {
+    "es": "Ojos donde nadie llega"
+   },
+   "es": [
+    "Tras una riada o un terremoto hay decenas de edificios y pocos drones. SENDA planifica el vuelo casa por casa.",
+    "Ordena las casas para volar lo mínimo, reparte el recorrido en salidas según la batería y, en cada fachada, escucha las señales Bluetooth planta por planta y hace una pasada térmica.",
+    "El resultado es un tablero de prioridad: dónde es más probable que haya personas y cuánto daño tiene cada edificio.",
+    "SENDA también lee la identificación remota que emite cada dron, el estándar europeo de mensajes de veinticinco bytes, para saber quién vuela y dónde.",
+    "Y si una zona queda aislada, el dron lleva y trae los mensajes como una mula de datos."
+   ],
+   "es_say": [
+    "Tras una riada o un terremoto hay decenas de edificios y pocos drones. Senda planifica el vuelo casa por casa.",
+    "Ordena las casas para volar lo mínimo, reparte el recorrido en salidas según la batería y, en cada fachada, escucha las señales Bluetooth planta por planta y hace una pasada térmica.",
+    "El resultado es un tablero de prioridad: dónde es más probable que haya personas y cuánto daño tiene cada edificio.",
+    "Senda también lee la identificación remota que emite cada dron, el estándar europeo de mensajes de veinticinco bytes, para saber quién vuela y dónde.",
+    "Y si una zona queda aislada, el dron lleva y trae los mensajes como una mula de datos."
+   ]
+  },
+  {
+   "id": "p4",
+   "claim": "MODEL_CALIBRATED_AGAINST_OBSERVED",
+   "source": [
+    "investor-next/public/senda/data/dana2024/telemetria.json",
+    "investor-next/public/senda/data/dana2024/swe.json"
+   ],
+   "visual": {
+    "kind": "dana",
+    "chapter": "Agua"
+   },
+   "title": {
+    "es": "La DANA de Valencia, en cuatro dimensiones"
+   },
+   "es": [
+    "29 de octubre de 2024. A las 18:55, el aforo del barranco del Poyo midió 2.282 metros cúbicos por segundo.",
+    "El primer ES-Alert llegó a las 20:11: setenta y seis minutos después.",
+    "SENDA reconstruye la crecida sobre el relieve real con las ecuaciones de aguas someras: el agua avanza minuto a minuto según la pendiente y el rozamiento del terreno.",
+    "Y la compara, celda a celda, con la mancha que fotografió el satélite Copernicus, para medir cuánto acierta y mejorar."
+   ],
+   "es_say": [
+    "Veintinueve de octubre de dos mil veinticuatro. A las seis y cincuenta y cinco de la tarde, el aforo del barranco del Poyo midió dos mil doscientos ochenta y dos metros cúbicos por segundo.",
+    "El primer es alert llegó a las ocho y once: setenta y seis minutos después.",
+    "Senda reconstruye la crecida sobre el relieve real con las ecuaciones de aguas someras: el agua avanza minuto a minuto según la pendiente y el rozamiento del terreno.",
+    "Y la compara, celda a celda, con la mancha que fotografió el satélite Copérnicus, para medir cuánto acierta y mejorar."
+   ]
+  },
+  {
+   "id": "p5",
+   "claim": "SATELLITE",
+   "source": [
+    "investor-next/public/senda/data/smv2026/real.json",
+    "packages/senda/src/fire-rothermel.mjs"
+   ],
+   "visual": {
+    "kind": "fire",
+    "chapter": "Fuego"
+   },
+   "title": {
+    "es": "San Martín de Valdeiglesias, desde el espacio"
+   },
+   "es": [
+    "Julio de 2026. SENDA procesa las imágenes del satélite Sentinel-2 de antes, durante y después del incendio.",
+    "Con el índice normalizado de área quemada mide la severidad: el 24 de julio, más de seis mil hectáreas; el 29, más de veintitrés mil.",
+    "Y simula la propagación con el modelo de Rothermel, la base de los simuladores de incendios forestales, sobre el combustible y la pendiente reales."
+   ],
+   "es_say": [
+    "Julio de dos mil veintiséis. Senda procesa las imágenes del satélite Sentinel dos de antes, durante y después del incendio.",
+    "Con el índice normalizado de área quemada mide la severidad: el veinticuatro de julio, más de seis mil hectáreas; el veintinueve, más de veintitrés mil.",
+    "Y simula la propagación con el modelo de Rózermel, la base de los simuladores de incendios forestales, sobre el combustible y la pendiente reales."
+   ]
+  },
+  {
+   "id": "p6",
+   "claim": "REAL_RECORDING",
+   "source": [
+    "investor-next/public/media/senda-simulador-fuego-es.mp4"
+   ],
+   "visual": {
+    "kind": "clip",
+    "chapter": "Fuego",
+    "clip": "senda-simulador-fuego-es",
+    "start": 6
+   },
+   "title": {
+    "es": "La aplicación, en directo"
+   },
+   "es": [
+    "Así se ve en la aplicación: el relieve, el humo y la cicatriz que dejó el fuego, tal como la midió el satélite."
+   ],
+   "es_say": [
+    "Así se ve en la aplicación: el relieve, el humo y la cicatriz que dejó el fuego, tal como la midió el satélite."
+   ]
+  },
+  {
+   "id": "p7",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/public/senda/data/adamuz2026/cronologia.json"
+   ],
+   "visual": {
+    "kind": "rail",
+    "chapter": "Trenes"
+   },
+   "title": {
+    "es": "Adamuz, segundo a segundo"
+   },
+   "es": [
+    "18 de enero de 2026. Entre la primera anomalía del Iryo y el choque con el Alvia pasaron trece segundos.",
+    "La primera llamada al 112 llegó sesenta y nueve segundos después del choque.",
+    "Pero confirmar que había un segundo tren descarrilado costó treinta y dos minutos y cuarenta y siete segundos.",
+    "SENDA ordena cada dato al segundo, con su fuente, para que todos los equipos vean la misma imagen a la vez."
+   ],
+   "es_say": [
+    "Dieciocho de enero de dos mil veintiséis. Entre la primera anomalía del Iryo y el choque con el Alvia pasaron trece segundos.",
+    "La primera llamada al uno uno dos llegó sesenta y nueve segundos después del choque.",
+    "Pero confirmar que había un segundo tren descarrilado costó treinta y dos minutos y cuarenta y siete segundos.",
+    "Senda ordena cada dato al segundo, con su fuente, para que todos los equipos vean la misma imagen a la vez."
+   ]
+  },
+  {
+   "id": "p8",
+   "claim": "REAL_RECORDING",
+   "source": [
+    "investor-next/public/media/senda-sala-es.mp4"
+   ],
+   "visual": {
+    "kind": "clip",
+    "chapter": "Coordinación",
+    "clip": "senda-sala-es",
+    "start": 2
+   },
+   "title": {
+    "es": "La sala de decisión"
+   },
+   "es": [
+    "Para los centros de coordinación, SENDA reúne todo en una sala de decisión: el agua observada, los recursos, las fuentes y su integridad, en una sola pantalla."
+   ],
+   "es_say": [
+    "Para los centros de coordinación, Senda reúne todo en una sala de decisión: el agua observada, los recursos, las fuentes y su integridad, en una sola pantalla."
+   ]
+  },
+  {
+   "id": "p9",
+   "claim": "ILLUSTRATIVE",
+   "source": [
+    "docs/roadsafe/18_CASE_HGV_SIDESWIPE_SPIN.md"
+   ],
+   "visual": {
+    "kind": "highway",
+    "chapter": "Carretera",
+    "phase": "crash"
+   },
+   "title": {
+    "es": "Un amigo, una autopista de Bélgica"
+   },
+   "es": [
+    "En la carretera, cada segundo cuenta. Un amigo nuestro lo vivió en una autopista de Bélgica.",
+    "Un camión le golpeó de lado, le arrastró, y su coche quedó girado en el carril rápido, de cara al tráfico.",
+    "Su relato nos enseñó algo: un coche girado engaña a cualquier sistema que se fíe de su rumbo. Ahora SENDA usa el rumbo que llevaba antes del choque."
+   ],
+   "es_say": [
+    "En la carretera, cada segundo cuenta. Un amigo nuestro lo vivió en una autopista de Bélgica.",
+    "Un camión le golpeó de lado, le arrastró, y su coche quedó girado en el carril rápido, de cara al tráfico.",
+    "Su relato nos enseñó algo: un coche girado engaña a cualquier sistema que se fíe de su rumbo. Ahora Senda usa el rumbo que llevaba antes del choque."
+   ]
+  },
+  {
+   "id": "p10",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/road-guard.mjs",
+    "packages/senda/src/roadsafe-incident-twin.mjs"
+   ],
+   "visual": {
+    "kind": "highway",
+    "chapter": "Carretera",
+    "phase": "alert"
+   },
+   "title": {
+    "es": "Aviso a todos los que llegan"
+   },
+   "es": [
+    "Y avisa a todos los que llegan por detrás, de móvil a móvil, antes de que lo vean: vehículo detenido en el carril izquierdo, orientado contra la circulación."
+   ],
+   "es_say": [
+    "Y avisa a todos los que llegan por detrás, de móvil a móvil, antes de que lo vean: vehículo detenido en el carril izquierdo, orientado contra la circulación."
+   ]
+  },
+  {
+   "id": "p11",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/heading-fusion.mjs"
+   ],
+   "visual": {
+    "kind": "drive",
+    "chapter": "Carretera"
+   },
+   "title": {
+    "es": "La flecha que sabe hacia dónde miras"
+   },
+   "es": [
+    "Al volante, SENDA fusiona la brújula y el GPS: la flecha gira aunque estés parado y aprende el error que mete el metal del coche.",
+    "Y si hay un coche detenido en tu carril, lo sabes antes de verlo."
+   ],
+   "es_say": [
+    "Al volante, Senda fusiona la brújula y el ge pe ese: la flecha gira aunque estés parado y aprende el error que mete el metal del coche.",
+    "Y si hay un coche detenido en tu carril, lo sabes antes de verlo."
+   ]
+  },
+  {
+   "id": "p12",
+   "claim": "CALCULATED",
+   "source": [
+    "docs/research/MENSAJE_SIN_RED_ES_NL_2026-11.md",
+    "packages/senda/src/erasure.mjs",
+    "investor-next/public/senda/data/mulas/valencia.json"
+   ],
+   "visual": {
+    "kind": "mesh",
+    "chapter": "Sin red"
+   },
+   "title": {
+    "es": "Cuando cae la red"
+   },
+   "es": [
+    "En el apagón de abril de 2025, las antenas aguantaron solo unas horas con sus baterías.",
+    "SENDA divide cada mensaje en fragmentos con códigos de corrección de errores, la misma matemática que protege un CD o una señal que viaja por el espacio, y los envía a la vez por Bluetooth, wifi, radio e internet.",
+    "Basta con que lleguen algunos para reconstruirlo entero.",
+    "Y si no queda ningún camino, los autobuses de la ciudad pueden llevarlos: en València, SENDA lo ha calculado sobre 44.314 conexiones reales de su red.",
+    "El aviso público lo firma siempre una persona con autoridad: SENDA prepara la decisión, la persona decide."
+   ],
+   "es_say": [
+    "En el apagón de abril de dos mil veinticinco, las antenas aguantaron solo unas horas con sus baterías.",
+    "Senda divide cada mensaje en fragmentos con códigos de corrección de errores, la misma matemática que protege un ce de o una señal que viaja por el espacio, y los envía a la vez por bluetooth, wifi, radio e internet.",
+    "Basta con que lleguen algunos para reconstruirlo entero.",
+    "Y si no queda ningún camino, los autobuses de la ciudad pueden llevarlos: en Valencia, Senda lo ha calculado sobre cuarenta y cuatro mil trescientas catorce conexiones reales de su red.",
+    "El aviso público lo firma siempre una persona con autoridad: Senda prepara la decisión, la persona decide."
+   ]
+  },
+  {
+   "id": "p13",
+   "claim": "SIMULATION",
+   "source": [
+    "packages/senda/src/mmwave-radar.mjs",
+    "packages/senda/src/mmwave-field.mjs"
+   ],
+   "visual": {
+    "kind": "radar",
+    "chapter": "Personas"
+   },
+   "title": {
+    "es": "Un radar que ve quién se mueve"
+   },
+   "es": [
+    "Un radar de 24 gigahercios ve moverse hasta tres personas, a oscuras o con humo.",
+    "SENDA sigue a cada una con un filtro de Kalman, la misma técnica que guía a los aviones, y se calibra en el campo con una cinta métrica.",
+    "Cada sesión se guarda con su huella digital, para que cualquier medida se pueda comprobar."
+   ],
+   "es_say": [
+    "Un radar de veinticuatro gigahercios ve moverse hasta tres personas, a oscuras o con humo.",
+    "Senda sigue a cada una con un filtro de Kálman, la misma técnica que guía a los aviones, y se calibra en el campo con una cinta métrica.",
+    "Cada sesión se guarda con su huella digital, para que cualquier medida se pueda comprobar."
+   ]
+  },
+  {
+   "id": "p14",
+   "claim": "PROJECT",
+   "source": [
+    "docs/CUMPLIMIENTO.md",
+    "CLAUDE.md"
+   ],
+   "visual": {
+    "kind": "memory",
+    "chapter": "Cómo se construye"
+   },
+   "title": {
+    "es": "Una persona y varios agentes de inteligencia artificial"
+   },
+   "es": [
+    "SENDA lo construye un fundador con varios agentes de inteligencia artificial que se reparten el trabajo: uno investiga y programa, otro revisa y valida, y una persona decide.",
+    "Desde septiembre de 2026 suma 590 cambios registrados, más de cien revisiones y más de mil cuatrocientas pruebas automáticas que se ejecutan con cada cambio.",
+    "Y una regla por encima de todas: ningún dato sin fuente. Lo que es simulación se dice; lo que es medida se demuestra."
+   ],
+   "es_say": [
+    "Senda lo construye un fundador con varios agentes de inteligencia artificial que se reparten el trabajo: uno investiga y programa, otro revisa y valida, y una persona decide.",
+    "Desde septiembre de dos mil veintiséis suma quinientos noventa cambios registrados, más de cien revisiones y más de mil cuatrocientas pruebas automáticas que se ejecutan con cada cambio.",
+    "Y una regla por encima de todas: ningún dato sin fuente. Lo que es simulación se dice; lo que es medida se demuestra."
+   ]
+  },
+  {
+   "id": "p15",
+   "claim": "CALCULATED",
+   "source": [
+    "investor-next/public/senda/sala.html",
+    "investor-next/public/senda/reportar.html"
+   ],
+   "visual": {
+    "kind": "audiences",
+    "chapter": "Para quién"
+   },
+   "title": {
+    "es": "¿Y a mí, cómo me sirve?"
+   },
+   "es": [
+    "Un bombero ve, antes de llegar, por dónde avanza el fuego y en qué edificios es más probable que haya personas.",
+    "Guardia Civil, UME y 112 pueden compartir la misma imagen, con la fuente de cada dato y su huella de integridad.",
+    "Un ayuntamiento sabe qué calles se inundan primero y a quién avisar.",
+    "Un ciudadano recibe el aviso aunque no tenga cobertura, y pide ayuda enviando su ubicación.",
+    "Un desarrollador encuentra el código abierto y las pruebas para comprobarlo todo.",
+    "Y un inversor ve un producto con ciencia verificable detrás, preparado para conectarse con los sistemas que ya existen."
+   ],
+   "es_say": [
+    "Un bombero ve, antes de llegar, por dónde avanza el fuego y en qué edificios es más probable que haya personas.",
+    "Guardia Civil, u eme e y uno uno dos pueden compartir la misma imagen, con la fuente de cada dato y su huella de integridad.",
+    "Un ayuntamiento sabe qué calles se inundan primero y a quién avisar.",
+    "Un ciudadano recibe el aviso aunque no tenga cobertura, y pide ayuda enviando su ubicación.",
+    "Un desarrollador encuentra el código abierto y las pruebas para comprobarlo todo.",
+    "Y un inversor ve un producto con ciencia verificable detrás, preparado para conectarse con los sistemas que ya existen."
+   ]
+  },
+  {
+   "id": "p16",
+   "claim": "DESIGN_RENDER",
+   "source": [
+    "docs/continuity/PROMPT_ANTIGRAVITY_HARDWARE_MODULOS.md"
+   ],
+   "visual": {
+    "kind": "module",
+    "chapter": "Extras"
+   },
+   "title": {
+    "es": "Módulos físicos: SENDA Radar"
+   },
+   "es": [
+    "Y como extra, SENDA tendrá su propio hardware: módulos que se imprimen en 3D, baratos de fabricar y fáciles de montar.",
+    "El primero, SENDA Radar, une el radar, una pantalla y una batería, y se conecta al móvil por USB hablando el mismo idioma que la aplicación."
+   ],
+   "es_say": [
+    "Y como extra, Senda tendrá su propio hardware: módulos que se imprimen en tres de, baratos de fabricar y fáciles de montar.",
+    "El primero, Senda Radar, une el radar, una pantalla y una batería, y se conecta al móvil por u ese be hablando el mismo idioma que la aplicación."
+   ]
+  },
+  {
+   "id": "p17",
+   "claim": "PLAN",
+   "source": [
+    "docs/OEP_VALIDATION_CERTIFICATION_AND_FUNDING_2026.md"
+   ],
+   "visual": {
+    "kind": "funding",
+    "chapter": "Hacia dónde vamos"
+   },
+   "title": {
+    "es": "Validar en el campo y crecer"
+   },
+   "es": [
+    "El siguiente paso es validar cada pieza en el campo, con datos reales.",
+    "La hoja de ruta de financiación apunta a programas europeos de innovación como Eurostars-3, cuya convocatoria abre el 17 de diciembre de 2026, y a consorcios de Horizonte Europa en 2027.",
+    "Software abierto, ciencia comprobable y módulos físicos: una base sólida para crecer con quien quiera sumarse."
+   ],
+   "es_say": [
+    "El siguiente paso es validar cada pieza en el campo, con datos reales.",
+    "La hoja de ruta de financiación apunta a programas europeos de innovación como Eurostars tres, cuya convocatoria abre el diecisiete de diciembre de dos mil veintiséis, y a consorcios de Horizonte Europa en dos mil veintisiete.",
+    "Software abierto, ciencia comprobable y módulos físicos: una base sólida para crecer con quien quiera sumarse."
+   ]
+  },
+  {
+   "id": "p18",
+   "claim": "CALCULATED",
+   "source": [
+    "investor-next/public/senda/index.html"
+   ],
+   "visual": {
+    "kind": "end",
+    "chapter": "SENDA"
+   },
+   "title": {
+    "es": "Coordinar hasta que llega la ayuda"
+   },
+   "es": [
+    "SENDA. Coordinar hasta que llega la ayuda, y ayudar a los que ayudan."
+   ],
+   "es_say": [
+    "Senda. Coordinar hasta que llega la ayuda, y ayudar a los que ayudan."
+   ]
+  }
+ ]
+}
