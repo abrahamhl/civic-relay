@@ -19,6 +19,8 @@ public final class NetAllowTest {
         check(!NetAllow.allowed("https://s3.amazonaws.com/elevation-tiles-prod/terrarium/%2E%2E/otro/x"), "recorrido codificado %2E en S3 no");
         check(!NetAllow.allowed("https://s3.amazonaws.com/elevation-tiles-prod/terrarium/10%5c..%5cotro"), "recorrido %5c en S3 no");
         check(NetAllow.allowed("https://tile.opentopomap.org/10/505/389.png"), "OpenTopoMap");
+        check(NetAllow.allowed("https://etraffic.dgt.es/camarasEtraffic/176130.jpg"), "cámaras DGT");
+        check(!NetAllow.allowed("https://etraffic.dgt.es.evil.example/x.jpg"), "cámaras DGT: dominio engañoso no");
         check(!NetAllow.allowed("http://tiles.openfreemap.org/x"), "sin cifrar");
         check(!NetAllow.allowed("https://tiles.openfreemap.org.evil.example/x"), "dominio engañoso");
         check(!NetAllow.allowed("https://user@tiles.openfreemap.org/x"), "credenciales en la URL");

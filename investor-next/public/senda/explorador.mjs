@@ -7,7 +7,7 @@ import { saveBlob } from './save-file.mjs';
 
 const $ = (s) => document.querySelector(s);
 const LS = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* */ } } };
-const PRO = new URLSearchParams(location.search).has('pro') || !!window.__TAURI_INTERNALS__;
+const PRO = new URLSearchParams(location.search).has('pro') || !!window.__TAURI_INTERNALS__ || (() => { try { return localStorage.getItem('senda.pro') === '1'; } catch { return false; } })();
 const LIM = PRO ? { z: 15, tiles: 64, px: Math.min(devicePixelRatio || 1, 2) } : { z: 14, tiles: 16, px: Math.min(devicePixelRatio || 1, 1.5) }; // límites de la app (rendimiento)
 const DEM = 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium';
 const fmt = (v, d = 0) => (Number.isFinite(v) ? v.toLocaleString('es-ES', { maximumFractionDigits: d, minimumFractionDigits: d }) : '–');

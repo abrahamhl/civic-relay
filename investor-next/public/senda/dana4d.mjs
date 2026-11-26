@@ -16,7 +16,7 @@ const D = '/senda/data/dana2024/';
 
 const [meta, ems, obsGj, cauces, TEL] = await Promise.all(['hidro.json', 'emsr773.json', 'emsr773_inundacion.geojson', 'cauces.geojson', 'telemetria.json'].map((f) => fetch(D + f).then((r) => r.json())));
 const TOWNS = (await fetch('/senda/data/radio/poyo.json').then((r) => r.json())).municipios; // puntos de Nominatim (OSM, ODbL)
-const PRO = new URLSearchParams(location.search).has('pro') || !!window.__TAURI_INTERNALS__;
+const PRO = new URLSearchParams(location.search).has('pro') || !!window.__TAURI_INTERNALS__ || (() => { try { return localStorage.getItem('senda.pro') === '1'; } catch { return false; } })();
 const bin = (f) => fetch(D + f).then((r) => r.arrayBuffer());
 const [handBuf, obsBuf, dirBuf, demBuf] = await Promise.all(['hand_roi.bin', 'obs_roi.bin', 'dir_z12.bin', 'dem_d4.bin'].map(bin));
 const DEM4 = new Int16Array(demBuf);
