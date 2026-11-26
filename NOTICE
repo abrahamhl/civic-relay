@@ -27,3 +27,12 @@ The "SENDA" name and visual presentation identity are © 2026 Abraham Haddioui �
      by Sudo_solder (https://github.com/Stevee87/Arduino-ESP32-Radarproject) — MIT License, Copyright (c) 2026 Sudo_solder.
      Cross-checked with the ld2450-proto crate documentation (docs.rs). SENDA's implementation (`packages/senda/src/mmwave-radar.mjs`)
      is an independent rewrite; tracking and calibration are SENDA's own.
+
+6. SENDA External Open Hardware Family, Parametric 3D Models & 4D Renders (`hardware/modules/`, `docs/negocio/`)
+   - Parametric OpenSCAD Enclosures, Printable STLs & Web GLBs (`senda-radar`, `senda-nodo-lora`, `senda-baliza-ble`,
+     `senda-estacion-ambiental`): original in-repository designs — MIT License.
+   - Programmatic 4D Render Pipeline (`Three.js` v0.180.0 `GLTFLoader`, `STLLoader`, `GLTFExporter`): MIT License (https://threejs.org).
+   - Typography in 4D Render HUDs: Inter (SIL Open Font License 1.1, Rasmus Andersson) and IBM Plex Mono (SIL Open Font License 1.1, IBM Corp.).
+   - Third-party open reference schematics cited in BOMs: Seeed Studio XIAO ESP32-S3 / XIAO BLE nRF52840 hardware documentation
+     (Seeed Technology Co., Ltd.) and Heltec Wireless Stick Lite V3 reference schematic (Heltec Automation).
+

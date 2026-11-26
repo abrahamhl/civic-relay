@@ -1,0 +1,78 @@
+{
+  "module": "senda-nodo-lora",
+  "generatedBy": "hardware/modules/shared/build-family-assets.mjs",
+  "generatedAt": "2026-11-26T18:59:00Z",
+  "slicerScenario": {
+    "basis": "ESCENARIO",
+    "note": "Estimación geométrica reproducible de laminador FDM (boquilla 0,4 mm, capa 0,20 mm, 5 perímetros, relleno gyroid 25 %, 0 soportes, caudal efectivo medio 3,5 mm³/s)",
+    "effectiveFillFactor": 0.9464,
+    "effectiveFlowMm3PerSec": 3.5
+  },
+  "parts": {
+    "base": {
+      "file": "stl/base.stl",
+      "bytes": 120484,
+      "sha256": "11e3c0665f2d01178e0ec3e9a18ec981e7584e50e3b7352a8cb93247b1b99d93",
+      "triangles": 2408,
+      "bboxMm": {
+        "x": 50,
+        "y": 109,
+        "z": 16.5
+      },
+      "solidVolumeCm3": 23.47,
+      "surfaceAreaCm2": 200.42,
+      "slicerEstimate": {
+        "basis": "ESCENARIO",
+        "filamentGramsPetg": 28.21,
+        "printTimeMinutes": 106,
+        "filamentCostEurInclVat": 0.5
+      }
+    },
+    "lid": {
+      "file": "stl/lid.stl",
+      "bytes": 100884,
+      "sha256": "22bf3424b1d32367c9ce50e10d01fa124861182c749695c81cb9365bcaed0228",
+      "triangles": 2016,
+      "bboxMm": {
+        "x": 50,
+        "y": 88,
+        "z": 9.4
+      },
+      "solidVolumeCm3": 15.92,
+      "surfaceAreaCm2": 130.59,
+      "slicerEstimate": {
+        "basis": "ESCENARIO",
+        "filamentGramsPetg": 19.13,
+        "printTimeMinutes": 72,
+        "filamentCostEurInclVat": 0.34
+      }
+    }
+  },
+  "totals": {
+    "solidVolumeCm3": 39.39,
+    "slicerEstimate": {
+      "basis": "ESCENARIO",
+      "totalFilamentGramsPetg": 47.34,
+      "billedFilamentGramsWithMargin": 48,
+      "totalPrintTimeMinutes": 178,
+      "totalPrintTimeFormatted": "2 h 58 min",
+      "totalFilamentCostEurInclVat": 0.86,
+      "totalFilamentCostEurExVat": 0.71
+    }
+  },
+  "glb": {
+    "file": "glb/senda-nodo-lora.glb",
+    "bytes": 338812,
+    "kilobytes": 330.87,
+    "under2MbLimit": true,
+    "sha256": "4b4a5463f954c33eea487cb857c68a8154f65c36df187a92a40f5eef00247d81",
+    "namedNodes": [
+      "base",
+      "lid",
+      "heltec_wsl_v3_sx1262",
+      "lipo_1200mah",
+      "antenna_eu868_whip",
+      "switch_ss22g08"
+    ]
+  }
+}
