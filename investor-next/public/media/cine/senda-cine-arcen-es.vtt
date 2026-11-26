@@ -1,0 +1,73 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:06.659
+Una autopista. Una furgoneta se detiene en el arcén derecho, con las luces de emergencia encendidas.
+
+2
+00:00:07.009 --> 00:00:09.462
+Un taxi para detrás, también en el arcén.
+
+3
+00:00:09.812 --> 00:00:14.057
+Es la reconstrucción animada de lo que contó un conductor. No está a escala.
+
+4
+00:00:15.657 --> 00:00:20.991
+Un tercer coche llega por el carril derecho, distraído y muy rápido, y se va hacia el arcén.
+
+5
+00:00:21.341 --> 00:00:25.458
+Choca contra el taxi, y el taxi sale empujado contra la furgoneta.
+
+6
+00:00:25.808 --> 00:00:34.533
+Los tres vehículos son arrastrados varios metros antes de pararse. El movimiento sale de una física sencilla, con masas y velocidad supuestas.
+
+7
+00:00:36.133 --> 00:00:43.835
+Esto es la aplicación real. Mientras conduces, SENDA te dice cuántos carriles hay y cuáles usar, con los datos de OpenStreetMap.
+
+8
+00:00:44.185 --> 00:00:51.673
+Si los sensores del móvil notan un golpe, salta una alarma fuerte, para que encuentres el teléfono aunque haya caído bajo el asiento.
+
+9
+00:00:52.023 --> 00:00:58.785
+Cinco botones grandes: estoy bien, no estoy bien, necesitamos ayuda, reportar situación y llamar al 112.
+
+10
+00:00:59.135 --> 00:01:07.093
+Al reportar eliges cuántos vehículos hay y dónde quedaron, y SENDA te prepara lo que hay que decir al 112. La llamada la haces tú.
+
+11
+00:01:07.443 --> 00:01:10.451
+Aquí es una prueba: no se guarda ni se envía nada.
+
+12
+00:01:12.051 --> 00:01:17.640
+En este caso hay tres móviles, uno en cada vehículo, y cada uno detecta el golpe por su cuenta.
+
+13
+00:01:17.990 --> 00:01:23.259
+SENDA no pinta tres accidentes: los junta en uno solo, con un icono pequeño y un «por tres».
+
+14
+00:01:23.609 --> 00:01:31.033
+La posición combina los tres GPS según su precisión. Con dos o más móviles, el aviso pasa de probable a confirmado.
+
+15
+00:01:31.383 --> 00:01:40.685
+El carril no lo adivina el GPS: lo dice la gente al reportar. Y el satélite no sirve para confirmarlo, porque las imágenes públicas no distinguen coches.
+
+16
+00:01:42.285 --> 00:01:49.005
+El aviso sale por Bluetooth hacia los móviles SENDA cercanos que están en modo conducción, sin necesidad de cobertura.
+
+17
+00:01:49.355 --> 00:01:54.987
+Quien viene detrás ve el accidente en su mapa antes de llegar, se aparta del carril derecho y reduce.
+
+18
+00:01:55.337 --> 00:02:00.478
+SENDA avisa y prepara la llamada. Las personas deciden y las autoridades gestionan.
