@@ -1,9 +1,9 @@
 {
  "format": "senda-proof/1",
- "gitSha": "2216f05c5d51a1cc3087c5b5ed541394e47a951b",
+ "gitSha": "741166b4f9d0902c6528b6ee8e94ae1637f0d96b",
  "gitDirty": true,
  "node": "v22.23.5",
- "generatedAt": "2026-11-26T10:14:40.817Z",
+ "generatedAt": "2026-11-26T13:16:57.946Z",
  "note": "Cifras recalculadas con packages/senda/src. Las marcadas SIMULATED en la película proceden de modelos y escenarios sintéticos, no de ensayos de campo.",
  "claims": [
   {
@@ -138,8 +138,22 @@
    "claim": "reserva de 1 GB elegida con mochila 0/1 exacta y frescura",
    "value": "19 contenidos en 754.4 MB · DP 693 = fuerza bruta 693",
    "ok": true
+  },
+  {
+   "id": "mmwave-rd03d-field",
+   "scene": "h1",
+   "claim": "SIMULACIÓN: trama RD-03D/LD2450 de 30 B decodifica bit a bit, mantiene identidad en cruce de 2 objetivos en movimiento y sella el paquete de campo con SHA-256",
+   "value": "trama 30 B exacta: true · cruce sin intercambio de ID: true · paquete SHA-256 íntegro: true (alterado rechazado: true)",
+   "ok": true
+  },
+  {
+   "id": "dana-f4-crossval",
+   "scene": "f4",
+   "claim": "DANA 29-10-2024: validación cruzada espacial 4-fold con conservación de masa < 10⁻⁹ y geometrías de Chiva rotuladas ESCENARIO",
+   "value": "CSI fuera de muestra 0.2019 vs base 0.1834 (4 particiones) · error masa máx < 10⁻⁹: true · régimen Chiva: ESCENARIO",
+   "ok": true
   }
  ],
  "suite": null,
- "sha256": "9d647cf35dba22270a508936497bd6f0a153289c783917debc68a12699e1fb91"
+ "sha256": "5b2ecaf98ea47ab3643451ce89d39a2c855c088153f0ab6ffc7d12c75deece01"
 }
