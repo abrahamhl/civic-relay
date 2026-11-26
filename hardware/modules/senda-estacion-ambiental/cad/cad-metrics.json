@@ -1,0 +1,79 @@
+{
+  "module": "senda-estacion-ambiental",
+  "generatedBy": "hardware/modules/shared/build-family-assets.mjs",
+  "generatedAt": "2026-11-26T18:59:00Z",
+  "slicerScenario": {
+    "basis": "ESCENARIO",
+    "note": "Estimación geométrica reproducible de laminador FDM (boquilla 0,4 mm, capa 0,20 mm, 5 perímetros, relleno gyroid 25 %, 0 soportes, caudal efectivo medio 3,5 mm³/s)",
+    "effectiveFillFactor": 0.9464,
+    "effectiveFlowMm3PerSec": 3.5
+  },
+  "parts": {
+    "rear_housing": {
+      "file": "stl/rear_housing.stl",
+      "bytes": 137884,
+      "sha256": "931ee10969f826b4ff0bf3986fcfcfe1cd6aa575fd14be12a77687653e8f4f6a",
+      "triangles": 2756,
+      "bboxMm": {
+        "x": 108,
+        "y": 96,
+        "z": 28
+      },
+      "solidVolumeCm3": 54.276,
+      "surfaceAreaCm2": 436.62,
+      "slicerEstimate": {
+        "basis": "ESCENARIO",
+        "filamentGramsPetg": 65.24,
+        "printTimeMinutes": 245,
+        "filamentCostEurInclVat": 1.17
+      }
+    },
+    "front_louvers": {
+      "file": "stl/front_louvers.stl",
+      "bytes": 96084,
+      "sha256": "b08e45470fef1f52e73c7360f2f7b7b926fb6c793a2dc795a93896fab80b5741",
+      "triangles": 1920,
+      "bboxMm": {
+        "x": 84,
+        "y": 96,
+        "z": 16.1
+      },
+      "solidVolumeCm3": 33.376,
+      "surfaceAreaCm2": 266.22,
+      "slicerEstimate": {
+        "basis": "ESCENARIO",
+        "filamentGramsPetg": 40.12,
+        "printTimeMinutes": 150,
+        "filamentCostEurInclVat": 0.72
+      }
+    }
+  },
+  "totals": {
+    "solidVolumeCm3": 87.652,
+    "slicerEstimate": {
+      "basis": "ESCENARIO",
+      "totalFilamentGramsPetg": 105.36,
+      "billedFilamentGramsWithMargin": 106,
+      "totalPrintTimeMinutes": 395,
+      "totalPrintTimeFormatted": "6 h 35 min",
+      "totalFilamentCostEurInclVat": 1.9,
+      "totalFilamentCostEurExVat": 1.57
+    }
+  },
+  "glb": {
+    "file": "glb/senda-estacion-ambiental.glb",
+    "bytes": 355844,
+    "kilobytes": 347.5,
+    "under2MbLimit": true,
+    "sha256": "78f15ccba1f80e2ff58ae9f261781f8cb37f9e343815ed509b8786f7b063fa29",
+    "namedNodes": [
+      "rear_housing",
+      "front_louvers",
+      "sensirion_sps30_pm",
+      "bosch_bme280",
+      "xiao_esp32s3_logger",
+      "jsn_sr04t_driver_pcb",
+      "jsn_sr04t_waterproof_probe"
+    ]
+  }
+}

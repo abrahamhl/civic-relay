@@ -1,0 +1,77 @@
+{
+  "module": "senda-baliza-ble",
+  "generatedBy": "hardware/modules/shared/build-family-assets.mjs",
+  "generatedAt": "2026-11-26T18:59:00Z",
+  "slicerScenario": {
+    "basis": "ESCENARIO",
+    "note": "Estimación geométrica reproducible de laminador FDM (boquilla 0,4 mm, capa 0,20 mm, 5 perímetros, relleno gyroid 25 %, 0 soportes, caudal efectivo medio 3,5 mm³/s)",
+    "effectiveFillFactor": 0.9464,
+    "effectiveFlowMm3PerSec": 3.5
+  },
+  "parts": {
+    "bottom_shell": {
+      "file": "stl/bottom_shell.stl",
+      "bytes": 75684,
+      "sha256": "5010f1466abd3723108312a355256ad1b264c9664e314b66c3d96db51e2aa826",
+      "triangles": 1512,
+      "bboxMm": {
+        "x": 38,
+        "y": 66.5,
+        "z": 11.5
+      },
+      "solidVolumeCm3": 9.358,
+      "surfaceAreaCm2": 89.48,
+      "slicerEstimate": {
+        "basis": "ESCENARIO",
+        "filamentGramsPetg": 11.25,
+        "printTimeMinutes": 42,
+        "filamentCostEurInclVat": 0.2
+      }
+    },
+    "top_shell": {
+      "file": "stl/top_shell.stl",
+      "bytes": 86884,
+      "sha256": "4f070cbbaae900087ab46807397dc99491e883022ee7789c058a42147214ac66",
+      "triangles": 1736,
+      "bboxMm": {
+        "x": 38,
+        "y": 56,
+        "z": 10.2
+      },
+      "solidVolumeCm3": 7.261,
+      "surfaceAreaCm2": 67.51,
+      "slicerEstimate": {
+        "basis": "ESCENARIO",
+        "filamentGramsPetg": 8.73,
+        "printTimeMinutes": 33,
+        "filamentCostEurInclVat": 0.16
+      }
+    }
+  },
+  "totals": {
+    "solidVolumeCm3": 16.619,
+    "slicerEstimate": {
+      "basis": "ESCENARIO",
+      "totalFilamentGramsPetg": 19.98,
+      "billedFilamentGramsWithMargin": 20,
+      "totalPrintTimeMinutes": 75,
+      "totalPrintTimeFormatted": "1 h 15 min",
+      "totalFilamentCostEurInclVat": 0.36,
+      "totalFilamentCostEurExVat": 0.3
+    }
+  },
+  "glb": {
+    "file": "glb/senda-baliza-ble.glb",
+    "bytes": 246868,
+    "kilobytes": 241.08,
+    "under2MbLimit": true,
+    "sha256": "4410754dbef8ef97859f28c41d678855c58758784e5cf98e9189932389dacee0",
+    "namedNodes": [
+      "bottom_shell",
+      "top_shell",
+      "xiao_ble_nrf52840",
+      "lipo_250mah_pcm",
+      "sos_tactile_switch"
+    ]
+  }
+}

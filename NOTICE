@@ -39,4 +39,11 @@ The "SENDA" name and visual presentation identity are © 2026 Abraham Haddioui �
    - 4D Render Pipeline (`scripts/render-4d.mjs`, `renders/*.mp4`, `renders/*.webm`, `renders/*.png`):
      rendered programmatically with Three.js v0.180.0 (`GLTFLoader`, `STLLoader`, `GLTFExporter`, `RoomEnvironment`) — MIT License
      (https://threejs.org), and self-hosted Inter (SIL OFL 1.1, Rasmus Andersson) + IBM Plex Mono (SIL OFL 1.1, IBM Corp.).
+7. SENDA External Open Hardware Family, Parametric 3D Models & 4D Renders (`hardware/modules/`, `docs/negocio/`)
+   - Parametric OpenSCAD Enclosures, Printable STLs & Web GLBs (`senda-radar`, `senda-nodo-lora`, `senda-baliza-ble`,
+     `senda-estacion-ambiental`): original in-repository designs — MIT License.
+   - Programmatic 4D Render Pipeline (`Three.js` v0.180.0 `GLTFLoader`, `STLLoader`, `GLTFExporter`): MIT License (https://threejs.org).
+   - Typography in 4D Render HUDs: Inter (SIL Open Font License 1.1, Rasmus Andersson) and IBM Plex Mono (SIL Open Font License 1.1, IBM Corp.).
+   - Third-party open reference schematics cited in BOMs: Seeed Studio XIAO ESP32-S3 / XIAO BLE nRF52840 hardware documentation
+     (Seeed Technology Co., Ltd.) and Heltec Wireless Stick Lite V3 reference schematic (Heltec Automation).
 
