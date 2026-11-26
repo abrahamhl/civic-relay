@@ -23,7 +23,9 @@ import { clusterCrashes, clusterIconSvg } from './core/crash-cluster.mjs';
 import { parseUtterance, createParkedCalibrator, summarizeSession } from './core/voice-copilot.mjs';
 import { parseDatex2 } from './core/datex2.mjs';
 import { wazeUrl, googleMapsUrl, haversineM } from './core/route-planner.mjs';
-import { routeUrl, parseRoute, nextManeuver, shouldReroute, announcement } from './core/nav-osrm.mjs';
+import { routeUrl, parseRoute, nextManeuver, shouldReroute, announcement, snapToRoute } from './core/nav-osrm.mjs';
+import { fromCamera, fromMmwave, coverage, summarize, SECTORS } from './core/surround-radar.mjs';
+import { createFrameParser, cleanTargets, CMD as RADAR_CMD, SERIAL as RADAR_SERIAL } from './core/mmwave-radar.mjs';
 import { CATEGORIES, FROM_REPORT, fromDatex, markerSvg } from './core/report-style.mjs';
 import { saveBlob } from './save-file.mjs';
 import { compassHeading, createHeadingFusion } from './core/heading-fusion.mjs';
@@ -640,10 +642,17 @@ function onPos(p) {
   const shownMs = VC.cal.gate(st.speed);
   $('#speed').innerHTML = `<div>${shownMs == null ? '–' : Math.round(shownMs * 3.6)}<small>${VC.parked ? 'calibrando' : 'km/h'}</small></div>`;
   if (st.mapOk) {
-    if (!st.me) { const el = document.createElement('div'); el.className = 'me-puck'; el.innerHTML = '<i class="cone"></i><b></b>'; st.me = new maplibregl.Marker({ element: el, rotationAlignment: 'map' }).setLngLat(st.pos).addTo(st.map); st.map.jumpTo({ center: st.pos, zoom: st.mode === 'foot' ? 17 : 15 }); }
-    st.me.setLngLat(st.pos); applyHeading(false);
+    if (!st.me) { const el = document.createElement('div'); el.className = 'me-puck'; el.innerHTML = '<i class="cone"></i><b></b><svg class="arrow" viewBox="0 0 46 46"><path d="M23 4 39 40 23 32 7 40Z" fill="#1a73e8" stroke="#fff" stroke-width="3.5" stroke-linejoin="round"/></svg>'; st.me = new maplibregl.Marker({ element: el, rotationAlignment: 'map' }).setLngLat(st.pos).addTo(st.map); st.map.jumpTo({ center: st.pos, zoom: st.mode === 'foot' ? 17 : 15 }); }
+    // Modo conducción: en coche, flecha de navegación; navegando, la flecha va SOBRE la ruta si el GPS cae dentro de su precisión
+    const driving = st.mode === 'car' && (st.route || (st.speed ?? 0) > 2), snap = st.route ? snapToRoute(st.route.coords, st.pos, Math.max(10, p.coords.accuracy ?? 10)) : null;
+    st.shownPos = snap ? snap.at : st.pos; st.me.getElement().classList.toggle('drive', st.mode === 'car');
+    st.me.setLngLat(st.shownPos); applyHeading(false);
     st.map.getSource('me-acc')?.setData(circlePolygon(st.pos, Math.max(3, p.coords.accuracy ?? 10))); // precisión real del GPS (radio = accuracy)
-    if (st.follow) st.map.easeTo({ center: st.pos, bearing: (st.route || st.view3d || st.headingUp) && st.heading != null ? st.heading : st.map.getBearing(), pitch: st.view3d ? 60 : st.route ? 45 : 0, duration: 800 });
+    if (st.follow) {
+      // Como Waze: rumbo arriba, mapa inclinado y tú en el tercio inferior para ver más carretera por delante; más lejos cuanto más rápido
+      const h = st.map.getContainer().clientHeight, v = st.speed ?? 0, zoom = !driving ? undefined : v > 25 ? 15.6 : v > 14 ? 16.3 : 17;
+      st.map.easeTo({ center: st.shownPos, bearing: (driving || st.route || st.view3d || st.headingUp) && st.heading != null ? st.heading : st.map.getBearing(), pitch: st.view3d ? 60 : driving ? 55 : st.route ? 45 : 0, zoom, padding: driving ? { top: Math.round(h * 0.42), bottom: 0, left: 0, right: 0 } : { top: 0, bottom: 0, left: 0, right: 0 }, duration: 800 });
+    }
   } else drawRadar();
   if (st.route) guide();
   updateCorridor();
@@ -1108,6 +1117,7 @@ function timedDetect(v, now) {
   return r;
 }
 function noteObjects(objs) {
+  st.camObjs = { t: Date.now(), objs };
   const top = topAlert(objs); tele.top = top ? `${ES[top.label] ?? top.label} ${top.zone} ${top.level}${top.ttcS ? ' ' + top.ttcS.toFixed(1) + ' s' : ''}` : `${objs.length} obj · sin alerta`;
   for (const o of objs) {
     if (o.level === 'VERDE') continue;
@@ -1183,7 +1193,7 @@ function applyHeading(fromCompass) {
   st.heading = s.headingDeg; st.headingSrc = s.source; st.headingOffset = s.offsetDeg;
   if (st.me) { st.me.setRotation(st.heading); st.me.getElement().classList.toggle('has-heading', true); }
   // El mapa gira con la brújula solo en modo brújula (o navegando/3D), como mucho ~7 veces por segundo y si cambia > 2°
-  if (fromCompass && st.mapOk && st.follow && (st.headingUp || st.route || st.view3d) && performance.now() - lastBearingMs > 140 && Math.abs(((st.map.getBearing() - st.heading + 540) % 360) - 180) > 2) {
+  if (fromCompass && st.mapOk && st.follow && (st.headingUp || st.route || st.view3d || st.mode === 'car') && performance.now() - lastBearingMs > 140 && Math.abs(((st.map.getBearing() - st.heading + 540) % 360) - 180) > 2) {
     lastBearingMs = performance.now(); st.map.rotateTo(st.heading, { duration: 140, easing: (k) => k });
   }
 }
@@ -1658,3 +1668,79 @@ async function vcSave() {
 $('#vcBtn')?.addEventListener('click', () => (VC.on ? vcStop() : vcStart()));
 $('#vcStop')?.addEventListener('click', vcStop);
 $('#vcSave')?.addEventListener('click', vcSave);
+
+
+// ── Radar 360: lo que ven los sensores REALES alrededor del coche, actualizado cada 10–15 s para ahorrar batería ──
+// Delante: la cámara del móvil (si no está abierta, abre una instantánea, detecta y se apaga). Detrás o a los lados: el SENDA
+// Radar mmWave por USB, montado donde se declare. Donde no hay sensor se dibuja rayado y se dice: el móvil no ve detrás.
+const SR = { on: false, everyS: LS.get('senda.sr.every', 15), timer: 0, last: null, mount: LS.get('senda.sr.mount', null), mm: { t: 0, targets: [] }, usbStop: null };
+const SR_FILTER = { minMm: 100, maxMm: 8000, mergeMm: 1000 }; // mismos valores declarados que /senda/personas (alcance 8 m de la hoja de datos)
+async function srSnapshotCamera() {
+  if (camOn || dash.on) return st.camObjs && Date.now() - st.camObjs.t < 3000 ? st.camObjs.objs : [];
+  let s = null;
+  try {
+    await getDetector(); s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 960 }, height: { ideal: 540 } }, audio: false });
+    const v = document.createElement('video'); v.muted = true; v.playsInline = true; v.srcObject = s; await v.play(); await new Promise((r) => setTimeout(r, 350));
+    const r = timedDetect(v, performance.now());
+    const raw = r.detections.map((d) => ({ label: d.categories[0].categoryName, score: d.categories[0].score, box: { x: d.boundingBox.originX / v.videoWidth, y: d.boundingBox.originY / v.videoHeight, w: d.boundingBox.width / v.videoWidth, h: d.boundingBox.height / v.videoHeight } }));
+    return enrichTracksForHud(raw, { speedMs: st.speed, geom: userGeom() });
+  } catch { return null; } finally { s?.getTracks().forEach((t) => t.stop()); }
+}
+async function srTick() {
+  if (!SR.on) return;
+  const geom = userGeom() ?? DEFAULT_CAM_GEOM, cam = await srSnapshotCamera();
+  const camObjs = cam ? fromCamera(cam, { hfovDeg: geom.fovHDeg }) : [];
+  const mmFresh = SR.mount && Date.now() - SR.mm.t < 2500, mmObjs = mmFresh ? fromMmwave(SR.mm.targets, { mount: SR.mount }) : [];
+  const objs = [...camObjs, ...mmObjs], sum = summarize(objs), cov = coverage({ cameraHfovDeg: cam ? geom.fovHDeg : null, mmwaveMounts: mmFresh ? [SR.mount] : [] });
+  srDraw(objs, cov); $('#srCount').textContent = String(sum.total);
+  $('#srTxt').textContent = `${sum.text}${cov.uncovered.length ? ` · sin sensor en ${cov.uncovered.length === 8 ? 'todas las zonas' : cov.uncovered.length + '/8 zonas'}` : ''}`;
+  bbLog('surround', { total: sum.total, bySector: sum.bySector, cam: camObjs.length, radar: mmObjs.length, uncovered: cov.uncovered });
+  if (SR.last != null && sum.key !== SR.last && (st.speed ?? 0) > 1) say(sum.total ? sum.text.replace(/\((\d+) m\)/g, 'a $1 metros') : 'Despejado alrededor');
+  SR.last = sum.key;
+  clearTimeout(SR.timer); SR.timer = setTimeout(srTick, SR.everyS * 1000);
+}
+function srDraw(objs, cov) {
+  const c = $('#sr'), x = c.getContext('2d'), W = c.width, R = W / 2 - 6, k = R / 20; // escala: 20 m al borde
+  x.clearRect(0, 0, W, W); x.save(); x.translate(W / 2, W / 2);
+  for (const sct of cov.uncovered) { const a = (SECTORS.indexOf(sct) * 45 - 90) * Math.PI / 180; x.beginPath(); x.moveTo(0, 0); x.arc(0, 0, R, a - Math.PI / 8, a + Math.PI / 8); x.closePath(); x.fillStyle = 'rgba(255,255,255,.07)'; x.fill(); }
+  x.strokeStyle = 'rgba(255,255,255,.22)'; x.lineWidth = 2; for (const m of [5, 10, 20]) { x.beginPath(); x.arc(0, 0, m * k, 0, 7); x.stroke(); }
+  x.fillStyle = 'rgba(255,255,255,.5)'; x.font = '600 16px system-ui'; x.fillText('5', 5 * k + 3, -3); x.fillText('10 m', 10 * k + 3, -3);
+  x.fillStyle = '#e8edf0'; x.beginPath(); x.roundRect(-11, -22, 22, 44, 7); x.fill(); x.fillStyle = '#1a73e8'; x.fillRect(-8, -17, 16, 9); // tu coche (delante = arriba)
+  for (const o of objs) {
+    const col = o.src === 'RADAR' ? '#ff9f0a' : '#5ac8fa';
+    if (Number.isFinite(o.x) && Number.isFinite(o.y)) { const px = Math.max(-R, Math.min(R, o.x * k)), py = -Math.max(-R, Math.min(R, o.y * k)); x.fillStyle = col; x.beginPath(); x.arc(px, py, 9, 0, 7); x.fill(); }
+    else { const a = (o.bearingDeg - 90) * Math.PI / 180; x.strokeStyle = col; x.lineWidth = 4; x.beginPath(); x.arc(Math.cos(a) * (R - 10), Math.sin(a) * (R - 10), 8, 0, 7); x.stroke(); } // sin distancia: en el borde y hueco
+  }
+  x.restore();
+}
+function srStart() { SR.on = true; $('#srBox').hidden = false; $('#srEvery').textContent = `${SR.everyS} s`; $('#srTxt').textContent = 'Primera lectura…'; SR.last = null; srTick(); if (!st.camObjs) hint('Radar 360: la cámara del móvil mira hacia delante; para ver detrás, conecta el SENDA Radar por USB y di dónde va montado.'); }
+function srStop() { SR.on = false; clearTimeout(SR.timer); $('#srBox').hidden = true; SR.usbStop?.(); SR.usbStop = null; }
+function srFeedFactory() { const parser = createFrameParser((raw) => { try { SR.mm = { t: Date.now(), targets: cleanTargets(raw, SR_FILTER) }; } catch { /* */ } }); return (bytes) => parser.push(bytes); }
+async function srConnectUsb() {
+  const where = prompt('¿Dónde va montado el SENDA Radar? Escribe: detras, delante, izquierda o derecha', SR.mount?.name ?? 'detras');
+  const M = { detras: { yawDeg: 180, yM: -2 }, delante: { yawDeg: 0, yM: 2 }, izquierda: { yawDeg: -90, xM: -0.9 }, derecha: { yawDeg: 90, xM: 0.9 } }[String(where ?? '').trim().toLowerCase().replace('á', 'a')];
+  if (!M) return hint('Montaje no reconocido: detras, delante, izquierda o derecha.');
+  SR.mount = { ...M, name: where.trim().toLowerCase() }; LS.set('senda.sr.mount', SR.mount);
+  const feed = srFeedFactory(), N = window.SendaNative, unb = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0)), b64o = (b) => btoa(String.fromCharCode(...b));
+  if (typeof N?.usbList === 'function' && !('serial' in navigator)) {
+    let devs = []; try { devs = JSON.parse(N.usbList() || '[]'); } catch { /* */ }
+    if (!devs.length) return hint('No veo el radar por USB. Conéctalo con un cable OTG.');
+    window.sendaUsbSerial = (b) => feed(unb(b)); window.sendaUsbStatus = (ev) => { if (ev?.event === 'open') for (const c of [RADAR_CMD.ENABLE_CONFIG, RADAR_CMD.MULTI_TARGET, RADAR_CMD.END_CONFIG]) N.usbWrite(b64o(c)); };
+    SR.usbStop = () => { window.sendaUsbSerial = null; window.sendaUsbStatus = null; try { N.usbClose(); } catch { /* */ } };
+    if (!N.usbOpen(devs[0].deviceId)) return hint('No se pudo abrir el radar USB.');
+    return hint(`SENDA Radar conectado (${where.trim()}). Alcance 8 m, solo objetivos en movimiento.`);
+  }
+  if (!('serial' in navigator)) return hint('Este navegador no puede leer USB. Usa la app de Android o Chrome de escritorio.');
+  try {
+    const port = await navigator.serial.requestPort(); await port.open(RADAR_SERIAL); const w = port.writable.getWriter();
+    for (const c of [RADAR_CMD.ENABLE_CONFIG, RADAR_CMD.MULTI_TARGET, RADAR_CMD.END_CONFIG]) { await w.write(c); await new Promise((r) => setTimeout(r, 50)); }
+    const reader = port.readable.getReader(); let alive = true;
+    SR.usbStop = async () => { alive = false; try { await reader.cancel(); } catch { /* */ } try { w.releaseLock(); reader.releaseLock(); await port.close(); } catch { /* */ } };
+    (async () => { while (alive) { const { value, done } = await reader.read(); if (done) break; if (value) feed(value); } })().catch(() => {});
+    hint(`SENDA Radar conectado (${where.trim()}).`);
+  } catch (e) { hint('No se abrió el radar: ' + (e.message || e.name)); }
+}
+$('#srBtn')?.addEventListener('click', () => (SR.on ? srStop() : srStart()));
+$('#srOff')?.addEventListener('click', srStop);
+$('#srUsb')?.addEventListener('click', srConnectUsb);
+$('#srEvery')?.addEventListener('click', () => { SR.everyS = SR.everyS === 15 ? 10 : 15; LS.set('senda.sr.every', SR.everyS); $('#srEvery').textContent = `${SR.everyS} s`; });
