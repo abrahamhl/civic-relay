@@ -124,7 +124,7 @@ La APK solo puede conectarse a una lista cerrada de servidores (`NetAllow.java`,
 
 ### Actualización F4 · Volúmenes finitos 2D (`shallow-water-fv.mjs`), celeridad de Manning y validación cruzada espacial
 
-Reproducible sin red con `node packages/senda/scripts/dana-f4-crossval.mjs` (informe sellado `evidence/quality/dana-f4-crossval.json`, SHA-256 `e7442c45cc5f194fe5619bb8f6097b9252f91d6b68d711375d8f0d7e3fb7cedf`).
+Reproducible sin red con `node packages/senda/scripts/dana-f4-crossval.mjs` (informe sellado `evidence/quality/dana-f4-crossval.json`, SHA-256 `256654df829096103ac581b0caba4fee6a54f21f82564b72d3f03f9fa3564025`).
 
 **Diagnóstico físico de la brecha de celeridad (ecuación de Manning, Chow 1959, `Q = 3 500 m³/s`):**
 

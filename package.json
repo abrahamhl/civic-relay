@@ -14,6 +14,7 @@
     "test:mutation": "node packages/senda/scripts/run-mutation-f2.mjs",
     "lint": "pnpm -r type-check",
     "type-check": "pnpm -r type-check",
+    "verify": "node scripts/verify.mjs",
     "manifest": "node scripts/release-manifest.mjs"
   },
   "keywords": [
