@@ -43,7 +43,7 @@ export function instructionEs(step) {
 export function parseRoute(json, i = 0) {
   if (json?.code !== 'Ok' || !json.routes?.[i]) return { ok: false, reason: json?.code ?? 'SIN_RESPUESTA' };
   const r = json.routes[i];
-  const steps = r.legs.flatMap((l) => l.steps).map((s) => ({ type: s.maneuver.type, modifier: s.maneuver.modifier ?? null, name: s.name ?? '', at: s.maneuver.location, distanceM: s.distance, durationS: s.duration, text: instructionEs(s) }));
+  const steps = r.legs.flatMap((l) => l.steps).map((s) => ({ type: s.maneuver.type, modifier: s.maneuver.modifier ?? null, name: s.name ?? '', at: s.maneuver.location, distanceM: s.distance, durationS: s.duration, text: instructionEs(s), lanes: (s.intersections?.[0]?.lanes ?? null)?.map((l) => ({ indications: l.indications ?? [], valid: !!l.valid })) ?? null }));
   return { ok: true, coords: r.geometry.coordinates, distanceM: r.distance, durationS: r.duration, steps, alternatives: json.routes.length - 1, basis: 'ESTIMACION_OSRM_SIN_TRAFICO' };
 }
 

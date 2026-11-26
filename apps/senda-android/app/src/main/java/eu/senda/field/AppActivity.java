@@ -1,6 +1,11 @@
 package eu.senda.field;
 
 import android.app.Activity;
+import android.content.Context;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -116,7 +121,7 @@ public final class AppActivity extends Activity {
     @SuppressWarnings("deprecation")
     @Override public void onBackPressed() { if (web.canGoBack()) web.goBack(); else super.onBackPressed(); }
 
-    @Override protected void onDestroy() { if (recognizer != null) recognizer.destroy(); if (mailbox != null) mailbox.stop(); if (usbBridge != null) usbBridge.destroy(); web.destroy(); super.onDestroy(); }
+    @Override protected void onDestroy() { setAlarm(false); if (recognizer != null) recognizer.destroy(); if (mailbox != null) mailbox.stop(); if (usbBridge != null) usbBridge.destroy(); web.destroy(); super.onDestroy(); }
 
     // ── Buzón Bluetooth cercano (móvil a móvil, también en modo avión con el Bluetooth encendido) ──
     private String[] btPerms() {
@@ -292,13 +297,34 @@ public final class AppActivity extends Activity {
         return usbBridge;
     }
 
+    private Ringtone alarmTone; private int alarmPrevVol = -1;
+    private void setAlarm(boolean on) {
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        if (!on) {
+            if (alarmTone != null) { alarmTone.stop(); alarmTone = null; }
+            if (am != null && alarmPrevVol >= 0) { try { am.setStreamVolume(AudioManager.STREAM_ALARM, alarmPrevVol, 0); } catch (SecurityException ignored) { } alarmPrevVol = -1; }
+            return;
+        }
+        if (alarmTone != null && alarmTone.isPlaying()) return;
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        if (uri == null) uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        alarmTone = RingtoneManager.getRingtone(this, uri);
+        if (alarmTone == null) return;
+        if (am != null) { try { int prev = am.getStreamVolume(AudioManager.STREAM_ALARM); am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0); alarmPrevVol = prev; } catch (SecurityException ignored) { /* modo No molestar: suena al volumen actual */ } }
+        alarmTone.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
+        if (Build.VERSION.SDK_INT >= 28) alarmTone.setLooping(true);
+        alarmTone.play();
+    }
+
     /** Puente mínimo hacia lo nativo. Cada método es un permiso: añadir solo lo imprescindible. */
     private final class Bridge {
         @JavascriptInterface public String info() {
-            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"copilotBridge\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true,\"fileSave\":true,\"screenRec\":true,\"radioScan\":true,\"usbOtgSerial\":true}";
+            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"copilotBridge\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true,\"fileSave\":true,\"screenRec\":true,\"radioScan\":true,\"usbOtgSerial\":true,\"alarm\":true}";
         }
 
         /** Lista adaptadores USB-serie conectados por OTG (CH340/CP210x/FTDI/CDC-ACM) sin revelar nº de serie. */
+        /** Alarma tras un posible choque: tono de alarma del sistema, en bucle y al volumen máximo, para encontrar el móvil. */
+        @JavascriptInterface public boolean alarm(boolean on) { runOnUiThread(() -> setAlarm(on)); return true; }
         @JavascriptInterface public String usbList() { return usbBridge().listDevicesJson(); }
 
         /** Abre el adaptador USB-OTG a 256000 8N1 y reenvía bytes a window.sendaUsbSerial(b64) → createFrameParser. */
