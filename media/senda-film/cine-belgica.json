@@ -1,0 +1,161 @@
+{
+ "note": "Clip del accidente declarado en una autopista de Bélgica (caso anonimizado, docs/roadsafe/18). Reconstrucción ilustrativa sin escala.",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "b1",
+   "claim": "ILLUSTRATIVE",
+   "source": [
+    "docs/roadsafe/18_CASE_HGV_SIDESWIPE_SPIN.md",
+    "packages/senda/src/road-guard.mjs",
+    "packages/senda/tests/roadsafe-case-hgv-sideswipe.test.mjs"
+   ],
+   "visual": {
+    "kind": "highway",
+    "phase": "intro"
+   },
+   "title": {
+    "es": "Una autopista en Bélgica"
+   },
+   "es": [
+    "Una autopista de Bélgica, de noche. Un amigo circula por el carril derecho.",
+    "Esta es la reconstrucción animada de lo que él contó."
+   ],
+   "es_say": [
+    "Una autopista de Bélgica, de noche. Un amigo circula por el carril derecho.",
+    "Esta es la reconstrucción animada de lo que él contó."
+   ]
+  },
+  {
+   "id": "b2",
+   "claim": "ILLUSTRATIVE",
+   "source": [
+    "docs/roadsafe/18_CASE_HGV_SIDESWIPE_SPIN.md",
+    "packages/senda/src/road-guard.mjs",
+    "packages/senda/tests/roadsafe-case-hgv-sideswipe.test.mjs"
+   ],
+   "visual": {
+    "kind": "highway",
+    "phase": "crash"
+   },
+   "title": {
+    "es": "El golpe"
+   },
+   "es": [
+    "La esquina de la cabina de un camión golpea su lateral izquierdo y le arranca el espejo.",
+    "El coche queda pegado al frontal del camión y es arrastrado varios metros, casi en perpendicular.",
+    "El camión acaba en el arcén derecho. El coche sale despedido, gira ciento ochenta grados y choca contra la barrera izquierda."
+   ],
+   "es_say": [
+    "La esquina de la cabina de un camión golpea su lateral izquierdo y le arranca el espejo.",
+    "El coche queda pegado al frontal del camión y es arrastrado varios metros, casi en perpendicular.",
+    "El camión acaba en el arcén derecho. El coche sale despedido, gira ciento ochenta grados y choca contra la barrera izquierda."
+   ]
+  },
+  {
+   "id": "b3",
+   "claim": "ILLUSTRATIVE",
+   "source": [
+    "docs/roadsafe/18_CASE_HGV_SIDESWIPE_SPIN.md",
+    "packages/senda/src/road-guard.mjs",
+    "packages/senda/tests/roadsafe-case-hgv-sideswipe.test.mjs"
+   ],
+   "visual": {
+    "kind": "highway",
+    "phase": "danger"
+   },
+   "title": {
+    "es": "El peligro que llega por detrás"
+   },
+   "es": [
+    "Ahora está detenido en el carril rápido, mirando contra la circulación.",
+    "Los coches que llegan por detrás no lo saben. Los demás conductores solo pueden pitar y dar las luces.",
+    "El mayor riesgo ya no es el primer golpe. Es el segundo."
+   ],
+   "es_say": [
+    "Ahora está detenido en el carril rápido, mirando contra la circulación.",
+    "Los coches que llegan por detrás no lo saben. Los demás conductores solo pueden pitar y dar las luces.",
+    "El mayor riesgo ya no es el primer golpe. Es el segundo."
+   ]
+  },
+  {
+   "id": "b4",
+   "claim": "CALCULATED",
+   "source": [
+    "docs/roadsafe/18_CASE_HGV_SIDESWIPE_SPIN.md",
+    "packages/senda/src/road-guard.mjs",
+    "packages/senda/tests/roadsafe-case-hgv-sideswipe.test.mjs"
+   ],
+   "visual": {
+    "kind": "heading"
+   },
+   "title": {
+    "es": "Lo que este caso enseñó a SENDA"
+   },
+   "es": [
+    "Un coche girado engaña a cualquier sistema que se fíe de su rumbo: su flecha apunta al lado contrario.",
+    "SENDA usa el rumbo de marcha que llevaba antes del choque, calculado con sus últimas posiciones.",
+    "Si ese dato no es fiable, avisa igualmente y lo marca como dudoso. Callar un coche atravesado en tu carril es peor que una falsa alarma."
+   ],
+   "es_say": [
+    "Un coche girado engaña a cualquier sistema que se fíe de su rumbo: su flecha apunta al lado contrario.",
+    "Senda usa el rumbo de marcha que llevaba antes del choque, calculado con sus últimas posiciones.",
+    "Si ese dato no es fiable, avisa igualmente y lo marca como dudoso. Callar un coche atravesado en tu carril es peor que una falsa alarma."
+   ]
+  },
+  {
+   "id": "b5",
+   "claim": "CALCULATED",
+   "source": [
+    "docs/roadsafe/18_CASE_HGV_SIDESWIPE_SPIN.md",
+    "packages/senda/src/road-guard.mjs",
+    "packages/senda/tests/roadsafe-case-hgv-sideswipe.test.mjs"
+   ],
+   "visual": {
+    "kind": "highway",
+    "phase": "alert"
+   },
+   "title": {
+    "es": "Aviso a todos los que llegan"
+   },
+   "es": [
+    "El aviso viaja de móvil a móvil hasta los conductores que se acercan: vehículo detenido en el carril izquierdo, orientado contra la circulación.",
+    "El incidente guarda las dos posiciones, el camión en el arcén y el coche en el carril rápido, y muestra siempre la más peligrosa."
+   ],
+   "es_say": [
+    "El aviso viaja de móvil a móvil hasta los conductores que se acercan: vehículo detenido en el carril izquierdo, orientado contra la circulación.",
+    "El incidente guarda las dos posiciones, el camión en el arcén y el coche en el carril rápido, y muestra siempre la más peligrosa."
+   ]
+  },
+  {
+   "id": "b6",
+   "claim": "CALCULATED",
+   "source": [
+    "docs/roadsafe/18_CASE_HGV_SIDESWIPE_SPIN.md",
+    "packages/senda/src/road-guard.mjs",
+    "packages/senda/tests/roadsafe-case-hgv-sideswipe.test.mjs"
+   ],
+   "visual": {
+    "kind": "call112"
+   },
+   "title": {
+    "es": "La llamada al 112"
+   },
+   "es": [
+    "El guion para el 112 dice el carril y la orientación del coche cuando quien llama los ha declarado.",
+    "Cada relato real se convierte en una regla probada. Este caso tiene su propia prueba automática en SENDA."
+   ],
+   "es_say": [
+    "El guion para el uno uno dos dice el carril y la orientación del coche cuando quien llama los ha declarado.",
+    "Cada relato real se convierte en una regla probada. Este caso tiene su propia prueba automática en Senda."
+   ]
+  }
+ ],
+ "chapter": "Caso real · Bélgica"
+}
