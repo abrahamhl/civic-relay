@@ -1,11 +1,14 @@
 // SENDA · Radar de personas (RD-03D / LD2450). Toda la lógica de protocolo, seguimiento y calibración está en el núcleo probado.
 import { CMD, SERIAL, createFrameParser, cleanTargets, createTracker, encodeFrame, radarToLonLat, trackBearingDeg, calibrateRange, calibrateMountYaw } from '/senda/core/mmwave-radar.mjs';
 import { compassHeading } from '/senda/core/heading-fusion.mjs';
+import { buildFieldPackage } from '/senda/core/mmwave-field.mjs';
+import { saveBlob } from '/senda/save-file.mjs';
 
 const $ = (id) => document.getElementById(id);
 const COLORS = ['#34d399', '#91d7e8', '#fbbf24', '#ff7756', '#ff5b6e', '#c4b5fd'];
 const cv = $('ppi'), ctx = cv.getContext('2d');
 let tracker, parser, tracks = [], lastDets = [], source = null, stopFn = null, frames = 0, t0 = performance.now();
+let field = null; // sesión de práctica de campo en curso
 let rec = [], recording = false, trace = []; // grabación de bytes crudos con tiempo; trazas de pistas
 const calPairs = [], yawPairs = [];
 const log = (m) => { const el = $('log'); el.textContent = `${new Date().toISOString().slice(11, 19)}  ${m}\n` + el.textContent.slice(0, 4000); };
@@ -32,10 +35,12 @@ function onFrame(raw) {
   const pose = poseOrNull();
   for (const tr of tracks) if (!tr.coasting) trace.push({ t: +tS.toFixed(3), id: tr.id, xMm: Math.round(tr.xMm), yMm: Math.round(tr.yMm), speedCms: tr.speedCms, ...(pose ? { lonlat: radarToLonLat(tr, pose).map((v) => +v.toFixed(7)) } : {}) });
   if (trace.length > 20000) trace.splice(0, trace.length - 20000);
+  if (field && field.tracks.length < 200000) { const tMs = Math.round(performance.now() - field.t0); for (const tr of tracks) if (!tr.coasting) field.tracks.push({ tMs, id: tr.id, xMm: Math.round(tr.xMm), yMm: Math.round(tr.yMm), speedCms: tr.speedCms, sigmaMm: Math.round(tr.sigmaMm) }); }
   renderTable();
 }
 function feed(bytes) {
   if (recording) rec.push({ tMs: Math.round(performance.now() - t0), b64: btoa(String.fromCharCode(...bytes)) });
+  if (field && source) { field.raw.push({ tMs: Math.round(performance.now() - field.t0), b64: btoa(String.fromCharCode(...bytes)) }); field.sources.add(source); }
   parser.push(bytes);
 }
 function setBasis(kind, txt) { $('basisSq').className = `sq ${kind}`; $('basisTxt').textContent = txt; }
@@ -47,9 +52,51 @@ function started(kind, label, stop) {
 function stopAll() { if (stopFn) { try { stopFn(); } catch {} } stopFn = null; source = null; $('stop').disabled = true; recording = false; }
 $('stop').onclick = () => { stopAll(); setBasis('', 'Parado'); log('Parado'); };
 
-// ---- Radar real por USB (Web Serial) ----
-if (!('serial' in navigator)) { $('connect').disabled = true; $('serialNote').textContent = 'Este navegador no tiene Web Serial. Use Chrome o Edge de escritorio, o abra una grabación.'; }
+// ---- Radar real por USB: Web Serial (Chrome/Edge escritorio) o USB-OTG nativo en APK Android ----
+const hasWebSerial = 'serial' in navigator;
+const hasAndroidUsb = !!(window.SendaNative && typeof window.SendaNative.usbList === 'function');
+const b64Of = (bytes) => btoa(String.fromCharCode(...bytes));
+const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+
+if (!hasWebSerial && hasAndroidUsb) {
+  $('connect').textContent = 'Conectar radar (USB-OTG Android)';
+  $('serialNote').textContent = 'Puente nativo USB-OTG de SENDA Android disponible (CH340, CP210x, FTDI, CDC-ACM a 256000 8N1). Conecte el adaptador por cable OTG.';
+} else if (!hasWebSerial) {
+  $('connect').disabled = true;
+  $('serialNote').textContent = 'Este navegador no tiene Web Serial. Use Chrome/Edge de escritorio, la APK de SENDA Android (USB-OTG) o abra una grabación.';
+}
+
 $('connect').onclick = async () => {
+  if (!hasWebSerial && hasAndroidUsb) {
+    let devs = [];
+    try { devs = JSON.parse(window.SendaNative.usbList() || '[]'); } catch (e) { log(`Error listando USB-OTG: ${e.message}`); return; }
+    if (!devs.length) { log('No se detectó ningún adaptador USB-serie (CH340/CP210x/FTDI/CDC-ACM). Conecte el cable OTG.'); return; }
+    const dev = devs[0];
+    let alive = true, iv = null;
+    const sendMultiUsb = () => {
+      for (const c of [CMD.ENABLE_CONFIG, CMD.MULTI_TARGET, CMD.END_CONFIG]) {
+        window.SendaNative.usbWrite(b64Of(c));
+      }
+    };
+    window.sendaUsbSerial = (b64) => { if (alive) feed(unb64(b64)); };
+    window.sendaUsbStatus = (ev) => {
+      if (!ev) return;
+      log(`USB-OTG [${ev.event}]: ${ev.detail}`);
+      if (ev.event === 'open' && alive) {
+        sendMultiUsb();
+        clearInterval(iv);
+        iv = setInterval(() => { if (alive) sendMultiUsb(); }, 60_000);
+      }
+    };
+    started('serial', `Radar real por USB-OTG Android (${dev.driver}, 256000 baudios)`, () => {
+      alive = false; clearInterval(iv);
+      window.sendaUsbSerial = null; window.sendaUsbStatus = null;
+      try { window.SendaNative.usbClose(); } catch {}
+    });
+    recording = true; rec = [];
+    if (!window.SendaNative.usbOpen(dev.deviceId)) { stopAll(); setBasis('', 'Error al abrir USB-OTG'); }
+    return;
+  }
   let port;
   try { port = await navigator.serial.requestPort(); await port.open(SERIAL); } catch (e) { log(`No se abrió el puerto: ${e.message}`); return; }
   let alive = true, reader;
@@ -174,12 +221,47 @@ $('useGeo').onclick = () => {
 
 // ---- Exportar con huella ----
 async function sha256hex(data) { const d = await crypto.subtle.digest('SHA-256', data); return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, '0')).join(''); }
-async function download(name, text) {
+async function download(name, text, type = 'application/json') {
   const bytes = new TextEncoder().encode(text), h = await sha256hex(bytes);
-  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([bytes])); a.download = name; a.click();
-  log(`${name} · SHA-256 ${h}`);
+  const r = await saveBlob(new Blob([bytes], { type }), name); // en la app Android va a Descargas/SENDA
+  log(r.ok ? `${name} guardado en ${r.where} · SHA-256 ${h}` : `No se pudo guardar ${name}`);
+  return r;
 }
-$('saveRec').onclick = () => { if (!rec.length) return log('Aún no hay bytes grabados.'); download(`senda-radar-${Date.now()}.jsonl`, rec.map((r) => JSON.stringify(r)).join('\n') + '\n'); };
+
+// ---- Práctica de campo: una sesión = un archivo verificable ----
+const KIND_BASIS = { serial: 'MEASURED', file: 'RECORDING', sim: 'SIMULATION' };
+$('fStart').onclick = () => {
+  field = { t0: performance.now(), startedAtUtc: new Date().toISOString(), raw: [], tracks: [], marks: [], sources: new Set(), scenario: $('fScenario').value };
+  $('fStart').disabled = true; $('fMark').disabled = false; $('fEnd').disabled = false;
+  $('fOut').textContent = `Sesión en curso desde ${field.startedAtUtc.slice(11, 19)} UTC · ${field.scenario}`;
+  if (!source) log('Sesión iniciada: conecte el radar, abra una grabación o lance la simulación para que haya datos.');
+};
+$('fMark').onclick = () => {
+  if (!field) return;
+  const label = $('fNote').value.trim() || `marca ${field.marks.length + 1}`;
+  field.marks.push({ tMs: Math.round(performance.now() - field.t0), label, nearest: (() => { const t = nearest(); return t ? { id: t.id, distanceMm: Math.round(Math.hypot(t.xMm, t.yMm)) } : null; })() });
+  $('fOut').textContent = `${field.marks.length} momentos marcados · ${field.raw.length} bloques de bytes`;
+};
+$('fEnd').onclick = async () => {
+  if (!field) return;
+  const f = field; field = null;
+  $('fStart').disabled = false; $('fMark').disabled = true; $('fEnd').disabled = true;
+  if (!f.raw.length) { $('fOut').textContent = 'Sesión sin datos del radar: no se guarda nada.'; return; }
+  // Si se mezclaron fuentes, gana la más prudente: simulación > grabación > medida.
+  const kinds = [...f.sources];
+  const basis = kinds.includes('sim') ? 'SIMULATION' : kinds.includes('file') ? 'RECORDING' : KIND_BASIS[kinds[0]] ?? 'RECORDING';
+  const pkg = await buildFieldPackage({
+    session: { basis, startedAtUtc: f.startedAtUtc, endedAtUtc: new Date().toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'no indicada',
+      scenario: f.scenario, notes: $('fNote').value.trim() || null, sourcesUsed: kinds, sensor: 'RD-03D/LD2450 (24 GHz)',
+      app: { page: 'personas', nativeAndroid: !!window.SendaNative }, pose: poseOrNull() },
+    raw: f.raw, tracks: f.tracks, marks: f.marks, settings: cfg(),
+    calibration: { rangePairs: calPairs.map((p) => ({ measuredMm: Math.round(p.measuredMm), trueMm: p.trueMm })), yawPairs: yawPairs.slice() },
+  });
+  const name = `senda-campo-${f.startedAtUtc.replace(/[:.]/g, '').slice(0, 15)}Z.json`;
+  const r = await download(name, JSON.stringify(pkg));
+  $('fOut').textContent = r?.ok ? `Guardado: ${name} (${basis}) · huella ${pkg.sha256.slice(0, 16)}… · ${r.where}` : 'No se pudo guardar el paquete.';
+};
+$('saveRec').onclick = () => { if (!rec.length) return log('Aún no hay bytes grabados.'); download(`senda-radar-${Date.now()}.jsonl`, rec.map((r) => JSON.stringify(r)).join('\n') + '\n', 'application/x-ndjson'); };
 $('saveTracks').onclick = () => {
   const basis = source === 'sim' ? 'SIMULATION' : source === 'serial' ? 'MEASURED' : 'RECORDING';
   const byId = new Map(); for (const p of trace) { if (!byId.has(p.id)) byId.set(p.id, []); byId.get(p.id).push(p); }

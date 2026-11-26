@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * SENDA Copiloto 5D · Física avanzada de conducción y asistencia predictiva en el viaje
  * (`drive-copilot-physics.mjs`, 0 €, 100 % en el dispositivo, sin red obligatoria).

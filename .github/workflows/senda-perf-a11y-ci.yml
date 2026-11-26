@@ -1,0 +1,39 @@
+name: SENDA Rendimiento y Accesibilidad (F7 · 4G + axe WCAG 2.2 AA)
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'investor-next/public/senda/**'
+      - 'packages/senda/scripts/run-perf-a11y-f7.mjs'
+      - 'lighthouserc.json'
+      - '.github/workflows/senda-perf-a11y-ci.yml'
+  pull_request:
+    paths:
+      - 'investor-next/public/senda/**'
+      - 'packages/senda/scripts/run-perf-a11y-f7.mjs'
+      - 'lighthouserc.json'
+      - '.github/workflows/senda-perf-a11y-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  perf-a11y:
+    name: Presupuesto 4G (LCP < 2,5 s · JS < 300 KB) + axe WCAG 2.2 AA
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Instalar dependencias del espacio de trabajo
+        run: pnpm install --frozen-lockfile
+      - name: Auditoría real en Chromium (4G, LCP, JS inicial, axe-core WCAG 2.2 AA, prefers-reduced-motion)
+        run: node packages/senda/scripts/run-perf-a11y-f7.mjs
+      - name: Prueba de regresión del informe F7
+        run: node --test packages/senda/tests/perf-a11y-f7.test.mjs

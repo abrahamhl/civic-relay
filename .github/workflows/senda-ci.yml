@@ -10,6 +10,7 @@ on:
 jobs:
   senda:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -50,6 +51,7 @@ jobs:
         run: SENDA_BASE_URL=https://civic-relay-investor.vercel.app/senda NODE_PATH=/tmp/pw/node_modules node investor-next/scripts/senda-offline-e2e.mjs
   senda-adversarial:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -59,6 +61,7 @@ jobs:
         run: node --test packages/senda/tests-adversarial/*.test.mjs
   senda-pci:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -70,6 +73,7 @@ jobs:
         run: node --test packages/senda-pci/tests-adversarial/*.test.mjs
   release-manifest:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

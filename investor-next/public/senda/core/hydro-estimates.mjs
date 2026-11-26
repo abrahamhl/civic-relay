@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * SENDA · estimaciones hidrológicas cuando NO hay dato medido.
  *

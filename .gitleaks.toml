@@ -1,0 +1,17 @@
+# Configuración de gitleaks (senda-security-ci.yml). Se usan TODAS las reglas por defecto.
+# Lista de permitidos por VALOR EXACTO (no por archivo ni por ruta): si aparece un secreto real en cualquier sitio, se detecta.
+# Revisado el 26-11-2026: ninguno de estos valores es un secreto.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Falsos positivos revisados: etiquetas de licencia/protocolo y claves de prueba evidentes"
+regexTarget = "secret"
+regexes = [
+  '''^CC_BY_4_COMMERCIAL_ALLOWED$''',          # etiqueta de licencia de MET Norway (metno-weather-grid)
+  '''^ENVELOPE_V2_SHAPE_AND_RATE_LIMIT$''',    # nombre del modo de autenticación del corredor, no una clave
+  '''^ISM_EU868_1PCT_DUTY_CYCLE$''',           # regla de uso de la banda ISM 868 MHz
+  '''^GALILEO_TESLA_OSNMA_AND_AEAD_V2$''',     # nombre del esquema de autenticación Galileo OSNMA
+  '''^0123456789abcdef0123456789abcdef$''',    # clave ficticia en la prueba de NASA FIRMS (petición simulada)
+  '''^a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90$''', # clave TESLA ficticia en una prueba
+]

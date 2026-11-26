@@ -12,8 +12,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Una prueba colgada no puede bloquear el CI durante horas (se vio con Node 24 el 25-11-2026).
-    timeout-minutes: 25
+    # Presupuesto F1: CI completo < 10 min y protección dura contra pruebas colgadas (Node 22 y 24).
+    timeout-minutes: 10
 
     strategy:
       matrix:
@@ -50,3 +50,26 @@ jobs:
         path: |
           packages/*/dist
           apps/web/dist
+
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v4
+    - name: Enable Corepack
+      run: corepack enable
+    - name: Setup Node.js 22.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'pnpm'
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+    - name: Measure c8 coverage (≥ 90 % calculation modules)
+      run: node packages/senda/scripts/run-coverage-f2.mjs
+    - name: Upload coverage report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: senda-coverage-report
+        path: evidence/quality/coverage-report.json

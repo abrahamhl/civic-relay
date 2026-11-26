@@ -75,11 +75,23 @@ async function launchCdp() {
     proc.once('exit', (code) => { clearTimeout(timer); ko(new Error(`Chrome exited early: ${code}`)); });
   }).catch((e) => { killChrome(); throw e; });
 
-  const { port } = new URL(wsUrl);
-  const targets = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
-  const pageTarget = targets.find((t) => t.type === 'page') ?? targets[0];
-  const ws = new WebSocket(pageTarget.webSocketDebuggerUrl);
-  await new Promise((ok, ko) => { ws.onopen = ok; ws.onerror = ko; });
+  let ws;
+  try {
+    const { port } = new URL(wsUrl);
+    const listResp = await fetch(`http://127.0.0.1:${port}/json/list`, { signal: AbortSignal.timeout(15_000) });
+    const targets = await listResp.json();
+    const pageTarget = targets.find((t) => t.type === 'page') ?? targets[0];
+    ws = new WebSocket(pageTarget.webSocketDebuggerUrl);
+    await new Promise((ok, ko) => {
+      const t = setTimeout(() => ko(new Error('CDP WebSocket open timeout (15 s)')), 15_000);
+      ws.onopen = () => { clearTimeout(t); ok(); };
+      ws.onerror = (err) => { clearTimeout(t); ko(err); };
+    });
+  } catch (e) {
+    try { ws?.close(); } catch { /* */ }
+    killChrome();
+    throw e;
+  }
 
   let id = 0;
   const pending = new Map();

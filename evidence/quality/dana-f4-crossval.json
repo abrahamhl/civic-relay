@@ -1,0 +1,447 @@
+{
+  "schema": "senda.dana-f4-crossval/v1",
+  "basis": "MODEL_CROSSVALIDATED_AGAINST_COPERNICUS_EMSR773",
+  "landUseProxyNotice": "Clases de rugosidad con coeficientes literales publicados (Chow 1959; Kalyanapu 2009) asignadas mediante proxy DEM+OSM (sin ráster oficial CORINE/SIOSE CNIG todavía).",
+  "generatedAtUtc": "2026-11-26T01:06:25.003Z",
+  "domain": {
+    "w": 212,
+    "h": 171,
+    "dxM": 118.1,
+    "bbox": [
+      -0.62,
+      39.33,
+      -0.33,
+      39.51
+    ]
+  },
+  "landUseManning": {
+    "channel_clc511": {
+      "n": 0.03,
+      "source": "Chow (1959) Open-Channel Hydraulics, Tabla 5-6 (canal encauzado / grava limpia)"
+    },
+    "urban_clc111_112": {
+      "n": 0.1,
+      "source": "Kalyanapu et al. (2009) J. Flood Risk Management 2(2):100-111, Tabla 1 (tejido urbano)"
+    },
+    "cropland_clc212_222": {
+      "n": 0.045,
+      "source": "Chow (1959) Tabla 5-6 (cultivos maduros en hileras / huerta)"
+    },
+    "shrub_clc323": {
+      "n": 0.07,
+      "source": "Chow (1959) Tabla 5-6 (matorral medio a denso)"
+    }
+  },
+  "celerityPhysics": {
+    "basis": "CALCULATED_MANNING_CHOW_1959",
+    "referenceObserved": {
+      "velocityMs": 14,
+      "peakFlowM3s": 3500,
+      "source": "CEDEX preliminar vía Roldán Cañas (2025), BRAC 174:775-795"
+    },
+    "regimes": {
+      "chivaConfinedGorge30m": {
+        "Q": 3500,
+        "widthM": 30,
+        "slope": 0.015,
+        "manningN": 0.03,
+        "depthM": 9.02,
+        "velocityMs": 12.93,
+        "kinematicCelerityMs": 21.55,
+        "dynamicCelerityMs": 22.34,
+        "froude": 1.37
+      },
+      "chivaConfinedGorge40m": {
+        "Q": 3500,
+        "widthM": 40,
+        "slope": 0.012,
+        "manningN": 0.032,
+        "depthM": 8,
+        "velocityMs": 10.94,
+        "kinematicCelerityMs": 18.23,
+        "dynamicCelerityMs": 19.8,
+        "froude": 1.24
+      },
+      "coarseGridCell118m": {
+        "Q": 3500,
+        "widthM": 118.1,
+        "slope": 0.008,
+        "manningN": 0.045,
+        "depthM": 5.23,
+        "velocityMs": 5.66,
+        "kinematicCelerityMs": 9.44,
+        "dynamicCelerityMs": 12.83,
+        "froude": 0.79
+      },
+      "alluvialFanHortaSud1500m": {
+        "Q": 3500,
+        "widthM": 1500,
+        "slope": 0.0025,
+        "manningN": 0.06,
+        "depthM": 1.86,
+        "velocityMs": 1.26,
+        "kinematicCelerityMs": 2.09,
+        "dynamicCelerityMs": 5.52,
+        "froude": 0.29
+      }
+    },
+    "explanation": "En el barranco encajonado de Chiva (B ≈ 30 m, S0 ≈ 1,5 %, n = 0,030), Manning + celeridad cinemática produce velocidades del orden de 10–14 m/s compatibles con la cifra preliminar del CEDEX. Al resolver el cauce en una malla gruesa de 59–118 m sin sección subcelda real (o al abrirse el agua en el cono aluvial de l’Horta Sud con B > 1 km y pendiente 0,25 %), el flujo se extiende lateralmente y su velocidad cae físicamente a 1–5 m/s."
+  },
+  "baselineBates": {
+    "id": "bates2010_uniform_n010_R6",
+    "label": "Antes · Bates (2010) inercial uniforme (n=0,10, R=6 h, MDE bruto 118 m)",
+    "splits": {
+      "full": {
+        "csi": 0.245,
+        "hitRate": 0.4429,
+        "far": 0.6459
+      },
+      "north": {
+        "csi": 0.2783,
+        "hitRate": 0.5653,
+        "far": 0.6459
+      },
+      "south": {
+        "csi": 0,
+        "hitRate": 0,
+        "far": null
+      },
+      "west": {
+        "csi": 0.2877,
+        "hitRate": 0.561,
+        "far": 0.6286
+      },
+      "east": {
+        "csi": 0.1677,
+        "hitRate": 0.268,
+        "far": 0.6906
+      }
+    },
+    "front": {
+      "distEntradaPaiportaM": 18273,
+      "llegadaPaiportaMin": 572,
+      "velMediaFrenteMs": 0.53
+    },
+    "massError": -4.78e-15
+  },
+  "bestFvLandUse": {
+    "id": "fv_clc_breach0_R6",
+    "incisionM": 0,
+    "breachSlope": 0.004,
+    "urbanPhi": 0.75,
+    "urbanDrag": 0.02,
+    "orchardN": 0.045,
+    "R": 6,
+    "breachedCells": 170,
+    "cpuSec": 23.47,
+    "massError": 8.44e-16,
+    "maxVelGorgeMs": 4.69,
+    "front": {
+      "distEntradaPaiportaM": 18273,
+      "llegadaPaiportaMin": 282,
+      "velMediaFrenteMs": 1.08
+    },
+    "splits": {
+      "full": {
+        "csi": 0.2311,
+        "hitRate": 0.4645,
+        "far": 0.6849
+      },
+      "north": {
+        "csi": 0.2576,
+        "hitRate": 0.5269,
+        "far": 0.6648
+      },
+      "south": {
+        "csi": 0.1269,
+        "hitRate": 0.2388,
+        "far": 0.7869
+      },
+      "west": {
+        "csi": 0.2478,
+        "hitRate": 0.4286,
+        "far": 0.6299
+      },
+      "east": {
+        "csi": 0.2135,
+        "hitRate": 0.5176,
+        "far": 0.7335
+      }
+    }
+  },
+  "candidates": [
+    {
+      "id": "fv_clc_breach0_R3",
+      "incisionM": 0,
+      "breachSlope": 0.004,
+      "urbanPhi": 0.75,
+      "urbanDrag": 0.02,
+      "orchardN": 0.045,
+      "R": 3,
+      "breachedCells": 170,
+      "cpuSec": 13.07,
+      "massError": 4.92e-15,
+      "maxVelGorgeMs": 4.69,
+      "front": {
+        "distEntradaPaiportaM": 18273,
+        "llegadaPaiportaMin": 282,
+        "velMediaFrenteMs": 1.08
+      },
+      "splits": {
+        "full": {
+          "csi": 0.2249,
+          "hitRate": 0.4105,
+          "far": 0.6677
+        },
+        "north": {
+          "csi": 0.2541,
+          "hitRate": 0.4862,
+          "far": 0.6527
+        },
+        "south": {
+          "csi": 0.0908,
+          "hitRate": 0.1365,
+          "far": 0.7869
+        },
+        "west": {
+          "csi": 0.2377,
+          "hitRate": 0.401,
+          "far": 0.6313
+        },
+        "east": {
+          "csi": 0.2092,
+          "hitRate": 0.4245,
+          "far": 0.7081
+        }
+      }
+    },
+    {
+      "id": "fv_clc_breach0_R6",
+      "incisionM": 0,
+      "breachSlope": 0.004,
+      "urbanPhi": 0.75,
+      "urbanDrag": 0.02,
+      "orchardN": 0.045,
+      "R": 6,
+      "breachedCells": 170,
+      "cpuSec": 23.47,
+      "massError": 8.44e-16,
+      "maxVelGorgeMs": 4.69,
+      "front": {
+        "distEntradaPaiportaM": 18273,
+        "llegadaPaiportaMin": 282,
+        "velMediaFrenteMs": 1.08
+      },
+      "splits": {
+        "full": {
+          "csi": 0.2311,
+          "hitRate": 0.4645,
+          "far": 0.6849
+        },
+        "north": {
+          "csi": 0.2576,
+          "hitRate": 0.5269,
+          "far": 0.6648
+        },
+        "south": {
+          "csi": 0.1269,
+          "hitRate": 0.2388,
+          "far": 0.7869
+        },
+        "west": {
+          "csi": 0.2478,
+          "hitRate": 0.4286,
+          "far": 0.6299
+        },
+        "east": {
+          "csi": 0.2135,
+          "hitRate": 0.5176,
+          "far": 0.7335
+        }
+      }
+    },
+    {
+      "id": "fv_clc_orchard08_R6",
+      "incisionM": 0,
+      "breachSlope": 0.004,
+      "urbanPhi": 0.72,
+      "urbanDrag": 0.02,
+      "orchardN": 0.08,
+      "R": 6,
+      "breachedCells": 170,
+      "cpuSec": 22.69,
+      "massError": 2.18e-15,
+      "maxVelGorgeMs": 4.69,
+      "front": {
+        "distEntradaPaiportaM": 18273,
+        "llegadaPaiportaMin": 281,
+        "velMediaFrenteMs": 1.08
+      },
+      "splits": {
+        "full": {
+          "csi": 0.2311,
+          "hitRate": 0.469,
+          "far": 0.687
+        },
+        "north": {
+          "csi": 0.2572,
+          "hitRate": 0.5312,
+          "far": 0.6673
+        },
+        "south": {
+          "csi": 0.1285,
+          "hitRate": 0.2441,
+          "far": 0.7867
+        },
+        "west": {
+          "csi": 0.2478,
+          "hitRate": 0.4286,
+          "far": 0.6299
+        },
+        "east": {
+          "csi": 0.2138,
+          "hitRate": 0.5289,
+          "far": 0.7359
+        }
+      }
+    },
+    {
+      "id": "fv_clc_inc2_R3",
+      "incisionM": 2,
+      "breachSlope": 0.005,
+      "urbanPhi": 0.75,
+      "urbanDrag": 0.02,
+      "orchardN": 0.045,
+      "R": 3,
+      "breachedCells": 198,
+      "cpuSec": 14.66,
+      "massError": -4.38e-16,
+      "maxVelGorgeMs": 5.79,
+      "front": {
+        "distEntradaPaiportaM": 18273,
+        "llegadaPaiportaMin": 328,
+        "velMediaFrenteMs": 0.93
+      },
+      "splits": {
+        "full": {
+          "csi": 0.1934,
+          "hitRate": 0.332,
+          "far": 0.6835
+        },
+        "north": {
+          "csi": 0.218,
+          "hitRate": 0.3875,
+          "far": 0.6673
+        },
+        "south": {
+          "csi": 0.0876,
+          "hitRate": 0.1312,
+          "far": 0.7917
+        },
+        "west": {
+          "csi": 0.2087,
+          "hitRate": 0.3181,
+          "far": 0.6222
+        },
+        "east": {
+          "csi": 0.1761,
+          "hitRate": 0.3526,
+          "far": 0.7399
+        }
+      }
+    },
+    {
+      "id": "fv_clc_inc2_R6",
+      "incisionM": 2,
+      "breachSlope": 0.005,
+      "urbanPhi": 0.75,
+      "urbanDrag": 0.02,
+      "orchardN": 0.045,
+      "R": 6,
+      "breachedCells": 198,
+      "cpuSec": 30.2,
+      "massError": 2.81e-16,
+      "maxVelGorgeMs": 5.8,
+      "front": {
+        "distEntradaPaiportaM": 18273,
+        "llegadaPaiportaMin": 325,
+        "velMediaFrenteMs": 0.94
+      },
+      "splits": {
+        "full": {
+          "csi": 0.2193,
+          "hitRate": 0.4207,
+          "far": 0.6858
+        },
+        "north": {
+          "csi": 0.2444,
+          "hitRate": 0.4586,
+          "far": 0.6565
+        },
+        "south": {
+          "csi": 0.1371,
+          "hitRate": 0.2835,
+          "far": 0.7903
+        },
+        "west": {
+          "csi": 0.2227,
+          "hitRate": 0.3457,
+          "far": 0.6151
+        },
+        "east": {
+          "csi": 0.2162,
+          "hitRate": 0.5317,
+          "far": 0.733
+        }
+      }
+    }
+  ],
+  "spatialCrossValidation": {
+    "folds": [
+      {
+        "trainSplit": "north",
+        "testSplit": "south",
+        "selectedCandidate": "fv_clc_breach0_R6",
+        "trainCsi": 0.2576,
+        "testCsi": 0.1269,
+        "overfitGap": 0.1307,
+        "baselineTestCsi": 0,
+        "deltaVsBaselineTestCsi": 0.1269
+      },
+      {
+        "trainSplit": "south",
+        "testSplit": "north",
+        "selectedCandidate": "fv_clc_inc2_R6",
+        "trainCsi": 0.1371,
+        "testCsi": 0.2444,
+        "overfitGap": -0.1073,
+        "baselineTestCsi": 0.2783,
+        "deltaVsBaselineTestCsi": -0.0339
+      },
+      {
+        "trainSplit": "west",
+        "testSplit": "east",
+        "selectedCandidate": "fv_clc_breach0_R6",
+        "trainCsi": 0.2478,
+        "testCsi": 0.2135,
+        "overfitGap": 0.0343,
+        "baselineTestCsi": 0.1677,
+        "deltaVsBaselineTestCsi": 0.0458
+      },
+      {
+        "trainSplit": "east",
+        "testSplit": "west",
+        "selectedCandidate": "fv_clc_inc2_R6",
+        "trainCsi": 0.2162,
+        "testCsi": 0.2227,
+        "overfitGap": -0.0065,
+        "baselineTestCsi": 0.2877,
+        "deltaVsBaselineTestCsi": -0.065
+      }
+    ],
+    "meanOutOfSampleCsi": 0.2019,
+    "meanBaselineOutOfSampleCsi": 0.1834,
+    "meanOverfitGap": 0.0128
+  },
+  "sha256": "e7442c45cc5f194fe5619bb8f6097b9252f91d6b68d711375d8f0d7e3fb7cedf"
+}

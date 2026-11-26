@@ -17,11 +17,14 @@ on:
 jobs:
   investor-next:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: investor-next/package-lock.json
       - name: Install pinned site dependencies
         working-directory: investor-next
         run: npm ci --ignore-scripts --no-audit --no-fund

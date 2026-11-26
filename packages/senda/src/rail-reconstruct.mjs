@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * SENDA · reconstrucción cinemática de un accidente ferroviario a partir de velocidades publicadas.
  *

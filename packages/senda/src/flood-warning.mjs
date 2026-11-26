@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * SENDA · motor de prevención de avenidas (base): camino del agua aguas abajo, tiempo de llegada,
  * nivel de aviso por caudal y antelación entre sucesos de una cronología con fuente.
@@ -52,6 +53,8 @@ export function frontIndex(path, velocityMs, tMin) {
 /**
  * Nivel de aviso por caudal. Los umbrales se pasan con su fuente; si falta alguno, ese tramo es «no medido».
  *   q < aviso → 'normal' · aviso ≤ q < capacidad → 'aviso' · q ≥ capacidad → 'desbordamiento'
+ * @param {number} q
+ * @param {{ avisoM3s?: number, capacidadM3s?: number }} [thresholds]
  */
 export function flowLevel(q, { avisoM3s, capacidadM3s } = {}) {
   if (!Number.isFinite(q)) return { level: 'sin_dato', label: 'sin dato' };

@@ -1,0 +1,722 @@
+{
+  "schema": "senda.mutation-report/v1",
+  "tool": "@stryker-mutator/core",
+  "basis": "MEASURED",
+  "generatedAtUtc": "2026-11-26T00:41:14.614Z",
+  "gitSha": "265b76e949ef14b86da68728fcaf39bd92e028b3",
+  "nodeVersion": "v22.23.5",
+  "thresholdPct": 80,
+  "overall": {
+    "totalMutants": 1495,
+    "killed": 1147,
+    "timeout": 72,
+    "survived": 276,
+    "noCoverage": 0,
+    "runtimeError": 0,
+    "mutationScorePct": 81.54,
+    "pass": true
+  },
+  "modules": [
+    {
+      "module": "packages/senda/src/erasure.mjs",
+      "durationSec": 51.4,
+      "totalMutants": 222,
+      "killed": 189,
+      "timeout": 9,
+      "survived": 24,
+      "noCoverage": 0,
+      "runtimeError": 0,
+      "ignored": 0,
+      "mutationScorePct": 89.19,
+      "survivedSample": [
+        {
+          "id": "2",
+          "mutatorName": "EqualityOperator",
+          "line": 13,
+          "replacement": "i <= 255"
+        },
+        {
+          "id": "10",
+          "mutatorName": "EqualityOperator",
+          "line": 13,
+          "replacement": "i <= 512"
+        },
+        {
+          "id": "51",
+          "mutatorName": "ConditionalExpression",
+          "line": 28,
+          "replacement": "true"
+        },
+        {
+          "id": "52",
+          "mutatorName": "EqualityOperator",
+          "line": 28,
+          "replacement": "p <= k"
+        },
+        {
+          "id": "58",
+          "mutatorName": "ConditionalExpression",
+          "line": 29,
+          "replacement": "false"
+        },
+        {
+          "id": "61",
+          "mutatorName": "StringLiteral",
+          "line": 29,
+          "replacement": "\"\""
+        },
+        {
+          "id": "65",
+          "mutatorName": "EqualityOperator",
+          "line": 32,
+          "replacement": "j <= k"
+        },
+        {
+          "id": "80",
+          "mutatorName": "EqualityOperator",
+          "line": 33,
+          "replacement": "j <= k"
+        },
+        {
+          "id": "93",
+          "mutatorName": "ConditionalExpression",
+          "line": 43,
+          "replacement": "true"
+        },
+        {
+          "id": "100",
+          "mutatorName": "EqualityOperator",
+          "line": 43,
+          "replacement": "n < 255"
+        },
+        {
+          "id": "103",
+          "mutatorName": "StringLiteral",
+          "line": 43,
+          "replacement": "\"\""
+        },
+        {
+          "id": "105",
+          "mutatorName": "ArithmeticOperator",
+          "line": 44,
+          "replacement": "data.length * k"
+        },
+        {
+          "id": "120",
+          "mutatorName": "ConditionalExpression",
+          "line": 49,
+          "replacement": "false"
+        },
+        {
+          "id": "123",
+          "mutatorName": "BlockStatement",
+          "line": 49,
+          "replacement": "{}"
+        },
+        {
+          "id": "126",
+          "mutatorName": "EqualityOperator",
+          "line": 51,
+          "replacement": "j <= k"
+        },
+        {
+          "id": "132",
+          "mutatorName": "ConditionalExpression",
+          "line": 51,
+          "replacement": "false"
+        },
+        {
+          "id": "134",
+          "mutatorName": "EqualityOperator",
+          "line": 51,
+          "replacement": "b <= shardSize"
+        },
+        {
+          "id": "140",
+          "mutatorName": "MethodExpression",
+          "line": 59,
+          "replacement": "[...new Map(received.map(r => [r.index, r])).values()]"
+        },
+        {
+          "id": "157",
+          "mutatorName": "EqualityOperator",
+          "line": 64,
+          "replacement": "r <= k"
+        },
+        {
+          "id": "163",
+          "mutatorName": "ConditionalExpression",
+          "line": 64,
+          "replacement": "false"
+        },
+        {
+          "id": "165",
+          "mutatorName": "EqualityOperator",
+          "line": 64,
+          "replacement": "b <= shardSize"
+        },
+        {
+          "id": "182",
+          "mutatorName": "ConditionalExpression",
+          "line": 81,
+          "replacement": "false"
+        },
+        {
+          "id": "183",
+          "mutatorName": "EqualityOperator",
+          "line": 81,
+          "replacement": "b.length <= SHARD_HEADER"
+        },
+        {
+          "id": "198",
+          "mutatorName": "StringLiteral",
+          "line": 90,
+          "replacement": "\"\""
+        }
+      ]
+    },
+    {
+      "module": "packages/senda/src/heading-fusion.mjs",
+      "durationSec": 55,
+      "totalMutants": 191,
+      "killed": 167,
+      "timeout": 0,
+      "survived": 24,
+      "noCoverage": 0,
+      "runtimeError": 0,
+      "ignored": 0,
+      "mutationScorePct": 87.43,
+      "survivedSample": [
+        {
+          "id": "57",
+          "mutatorName": "LogicalOperator",
+          "line": 39,
+          "replacement": "typeof ev.webkitCompassHeading === 'number' || Number.isFini"
+        },
+        {
+          "id": "58",
+          "mutatorName": "ConditionalExpression",
+          "line": 39,
+          "replacement": "true"
+        },
+        {
+          "id": "75",
+          "mutatorName": "ConditionalExpression",
+          "line": 40,
+          "replacement": "true"
+        },
+        {
+          "id": "80",
+          "mutatorName": "EqualityOperator",
+          "line": 41,
+          "replacement": "Math.abs(ev.beta) >= 50"
+        },
+        {
+          "id": "87",
+          "mutatorName": "EqualityOperator",
+          "line": 43,
+          "replacement": "h <= 0.2"
+        },
+        {
+          "id": "91",
+          "mutatorName": "ConditionalExpression",
+          "line": 45,
+          "replacement": "true"
+        },
+        {
+          "id": "110",
+          "mutatorName": "OptionalChaining",
+          "line": 55,
+          "replacement": "cfg[k]"
+        },
+        {
+          "id": "117",
+          "mutatorName": "ConditionalExpression",
+          "line": 57,
+          "replacement": "true"
+        },
+        {
+          "id": "131",
+          "mutatorName": "ArithmeticOperator",
+          "line": 59,
+          "replacement": "-Math.max(0, dt) * tau"
+        },
+        {
+          "id": "136",
+          "mutatorName": "ConditionalExpression",
+          "line": 63,
+          "replacement": "true"
+        },
+        {
+          "id": "137",
+          "mutatorName": "ConditionalExpression",
+          "line": 63,
+          "replacement": "false"
+        },
+        {
+          "id": "138",
+          "mutatorName": "EqualityOperator",
+          "line": 63,
+          "replacement": "lastT != null"
+        },
+        {
+          "id": "139",
+          "mutatorName": "ArithmeticOperator",
+          "line": 63,
+          "replacement": "tS + lastT"
+        },
+        {
+          "id": "144",
+          "mutatorName": "ConditionalExpression",
+          "line": 65,
+          "replacement": "true"
+        },
+        {
+          "id": "151",
+          "mutatorName": "ConditionalExpression",
+          "line": 72,
+          "replacement": "true"
+        },
+        {
+          "id": "152",
+          "mutatorName": "ConditionalExpression",
+          "line": 72,
+          "replacement": "false"
+        },
+        {
+          "id": "153",
+          "mutatorName": "EqualityOperator",
+          "line": 72,
+          "replacement": "lastT != null"
+        },
+        {
+          "id": "154",
+          "mutatorName": "ArithmeticOperator",
+          "line": 72,
+          "replacement": "tS + lastT"
+        },
+        {
+          "id": "162",
+          "mutatorName": "EqualityOperator",
+          "line": 73,
+          "replacement": "speedMs > cfg.gpsMinSpeedMs"
+        },
+        {
+          "id": "168",
+          "mutatorName": "ConditionalExpression",
+          "line": 76,
+          "replacement": "true"
+        },
+        {
+          "id": "169",
+          "mutatorName": "EqualityOperator",
+          "line": 76,
+          "replacement": "tS - this._lastCompass.t < 1"
+        },
+        {
+          "id": "178",
+          "mutatorName": "ConditionalExpression",
+          "line": 79,
+          "replacement": "true"
+        },
+        {
+          "id": "181",
+          "mutatorName": "EqualityOperator",
+          "line": 79,
+          "replacement": "tS - this._lastGps <= 2"
+        },
+        {
+          "id": "190",
+          "mutatorName": "MethodExpression",
+          "line": 83,
+          "replacement": "Math.max(1, r)"
+        }
+      ]
+    },
+    {
+      "module": "packages/senda/src/rail-reconstruct.mjs",
+      "durationSec": 28.2,
+      "totalMutants": 114,
+      "killed": 106,
+      "timeout": 1,
+      "survived": 7,
+      "noCoverage": 0,
+      "runtimeError": 0,
+      "ignored": 0,
+      "mutationScorePct": 93.86,
+      "survivedSample": [
+        {
+          "id": "14",
+          "mutatorName": "StringLiteral",
+          "line": 15,
+          "replacement": "\"\""
+        },
+        {
+          "id": "20",
+          "mutatorName": "OptionalChaining",
+          "line": 22,
+          "replacement": "pts.length"
+        },
+        {
+          "id": "22",
+          "mutatorName": "StringLiteral",
+          "line": 22,
+          "replacement": "\"\""
+        },
+        {
+          "id": "30",
+          "mutatorName": "EqualityOperator",
+          "line": 25,
+          "replacement": "t < P[0].tSec"
+        },
+        {
+          "id": "39",
+          "mutatorName": "EqualityOperator",
+          "line": 26,
+          "replacement": "t < P[i].tSec"
+        },
+        {
+          "id": "66",
+          "mutatorName": "EqualityOperator",
+          "line": 32,
+          "replacement": "x >= t1"
+        },
+        {
+          "id": "69",
+          "mutatorName": "EqualityOperator",
+          "line": 32,
+          "replacement": "x <= t2"
+        }
+      ]
+    },
+    {
+      "module": "packages/senda/src/mmwave-radar.mjs",
+      "durationSec": 175.6,
+      "totalMutants": 471,
+      "killed": 336,
+      "timeout": 42,
+      "survived": 93,
+      "noCoverage": 0,
+      "runtimeError": 0,
+      "ignored": 0,
+      "mutationScorePct": 80.25,
+      "survivedSample": [
+        {
+          "id": "5",
+          "mutatorName": "StringLiteral",
+          "line": 22,
+          "replacement": "\"\""
+        },
+        {
+          "id": "20",
+          "mutatorName": "ArithmeticOperator",
+          "line": 27,
+          "replacement": "v - 0x8000"
+        },
+        {
+          "id": "26",
+          "mutatorName": "EqualityOperator",
+          "line": 32,
+          "replacement": "i <= 3"
+        },
+        {
+          "id": "34",
+          "mutatorName": "ArithmeticOperator",
+          "line": 33,
+          "replacement": "i / 8"
+        },
+        {
+          "id": "33",
+          "mutatorName": "MethodExpression",
+          "line": 33,
+          "replacement": "p"
+        },
+        {
+          "id": "35",
+          "mutatorName": "ArithmeticOperator",
+          "line": 33,
+          "replacement": "i * 8 - 8"
+        },
+        {
+          "id": "36",
+          "mutatorName": "ArithmeticOperator",
+          "line": 33,
+          "replacement": "i / 8"
+        },
+        {
+          "id": "78",
+          "mutatorName": "ConditionalExpression",
+          "line": 52,
+          "replacement": "true"
+        },
+        {
+          "id": "90",
+          "mutatorName": "ConditionalExpression",
+          "line": 54,
+          "replacement": "true"
+        },
+        {
+          "id": "97",
+          "mutatorName": "MethodExpression",
+          "line": 54,
+          "replacement": "pl"
+        },
+        {
+          "id": "110",
+          "mutatorName": "EqualityOperator",
+          "line": 63,
+          "replacement": "v > 0"
+        },
+        {
+          "id": "120",
+          "mutatorName": "EqualityOperator",
+          "line": 64,
+          "replacement": "d >= minMm"
+        },
+        {
+          "id": "123",
+          "mutatorName": "EqualityOperator",
+          "line": 64,
+          "replacement": "d < maxMm"
+        },
+        {
+          "id": "128",
+          "mutatorName": "EqualityOperator",
+          "line": 65,
+          "replacement": "i <= t.length"
+        },
+        {
+          "id": "133",
+          "mutatorName": "EqualityOperator",
+          "line": 65,
+          "replacement": "j <= t.length"
+        },
+        {
+          "id": "144",
+          "mutatorName": "EqualityOperator",
+          "line": 67,
+          "replacement": "Math.hypot(t[i].xMm - t[j].xMm, t[i].yMm - t[j].yMm) <= merg"
+        },
+        {
+          "id": "153",
+          "mutatorName": "ConditionalExpression",
+          "line": 69,
+          "replacement": "true"
+        },
+        {
+          "id": "155",
+          "mutatorName": "EqualityOperator",
+          "line": 69,
+          "replacement": "Math.abs(t[j].speedCms) >= Math.abs(t[i].speedCms)"
+        },
+        {
+          "id": "160",
+          "mutatorName": "ConditionalExpression",
+          "line": 76,
+          "replacement": "false"
+        },
+        {
+          "id": "161",
+          "mutatorName": "EqualityOperator",
+          "line": 76,
+          "replacement": "n < 1"
+        },
+        {
+          "id": "163",
+          "mutatorName": "ArrayDeclaration",
+          "line": 76,
+          "replacement": "[]"
+        },
+        {
+          "id": "164",
+          "mutatorName": "MethodExpression",
+          "line": 76,
+          "replacement": "[0]"
+        },
+        {
+          "id": "165",
+          "mutatorName": "ArrayDeclaration",
+          "line": 76,
+          "replacement": "[]"
+        },
+        {
+          "id": "173",
+          "mutatorName": "EqualityOperator",
+          "line": 76,
+          "replacement": "i <= n"
+        },
+        {
+          "id": "182",
+          "mutatorName": "CallExpression",
+          "line": 76,
+          "replacement": ";"
+        }
+      ]
+    },
+    {
+      "module": "packages/senda/src/shallow-water.mjs",
+      "durationSec": 174,
+      "totalMutants": 497,
+      "killed": 349,
+      "timeout": 20,
+      "survived": 128,
+      "noCoverage": 0,
+      "runtimeError": 0,
+      "ignored": 0,
+      "mutationScorePct": 74.25,
+      "survivedSample": [
+        {
+          "id": "14",
+          "mutatorName": "EqualityOperator",
+          "line": 26,
+          "replacement": "k <= N"
+        },
+        {
+          "id": "50",
+          "mutatorName": "EqualityOperator",
+          "line": 41,
+          "replacement": "i <= b[0]"
+        },
+        {
+          "id": "54",
+          "mutatorName": "EqualityOperator",
+          "line": 41,
+          "replacement": "i >= b[1]"
+        },
+        {
+          "id": "58",
+          "mutatorName": "EqualityOperator",
+          "line": 41,
+          "replacement": "j <= b[2]"
+        },
+        {
+          "id": "62",
+          "mutatorName": "EqualityOperator",
+          "line": 41,
+          "replacement": "j >= b[3]"
+        },
+        {
+          "id": "64",
+          "mutatorName": "ArrayDeclaration",
+          "line": 47,
+          "replacement": "[\"Stryker was here\"]"
+        },
+        {
+          "id": "79",
+          "mutatorName": "MethodExpression",
+          "line": 52,
+          "replacement": "Math.min(0, b[2] - 1)"
+        },
+        {
+          "id": "81",
+          "mutatorName": "MethodExpression",
+          "line": 52,
+          "replacement": "Math.max(h - 1, b[3] + 1)"
+        },
+        {
+          "id": "82",
+          "mutatorName": "ArithmeticOperator",
+          "line": 52,
+          "replacement": "h + 1"
+        },
+        {
+          "id": "95",
+          "mutatorName": "ConditionalExpression",
+          "line": 53,
+          "replacement": "true"
+        },
+        {
+          "id": "97",
+          "mutatorName": "EqualityOperator",
+          "line": 53,
+          "replacement": "v >= dMax"
+        },
+        {
+          "id": "99",
+          "mutatorName": "ConditionalExpression",
+          "line": 54,
+          "replacement": "true"
+        },
+        {
+          "id": "101",
+          "mutatorName": "EqualityOperator",
+          "line": 54,
+          "replacement": "dMax >= hMin"
+        },
+        {
+          "id": "107",
+          "mutatorName": "ConditionalExpression",
+          "line": 54,
+          "replacement": "false"
+        },
+        {
+          "id": "108",
+          "mutatorName": "EqualityOperator",
+          "line": 54,
+          "replacement": "dt >= dtMax"
+        },
+        {
+          "id": "129",
+          "mutatorName": "MethodExpression",
+          "line": 58,
+          "replacement": "Math.min(z[a], z[c])"
+        },
+        {
+          "id": "132",
+          "mutatorName": "EqualityOperator",
+          "line": 59,
+          "replacement": "hf < hMin"
+        },
+        {
+          "id": "152",
+          "mutatorName": "EqualityOperator",
+          "line": 64,
+          "replacement": "j <= j1"
+        },
+        {
+          "id": "165",
+          "mutatorName": "ArithmeticOperator",
+          "line": 66,
+          "replacement": "Math.max(ea, ec) + Math.max(z[a], z[c])"
+        },
+        {
+          "id": "167",
+          "mutatorName": "MethodExpression",
+          "line": 66,
+          "replacement": "Math.min(z[a], z[c])"
+        },
+        {
+          "id": "170",
+          "mutatorName": "EqualityOperator",
+          "line": 67,
+          "replacement": "hf < hMin"
+        },
+        {
+          "id": "203",
+          "mutatorName": "ConditionalExpression",
+          "line": 74,
+          "replacement": "true"
+        },
+        {
+          "id": "202",
+          "mutatorName": "LogicalOperator",
+          "line": 74,
+          "replacement": "i < w - 1 || qx[j * (w - 1) + i] > 0"
+        },
+        {
+          "id": "204",
+          "mutatorName": "EqualityOperator",
+          "line": 74,
+          "replacement": "i <= w - 1"
+        },
+        {
+          "id": "206",
+          "mutatorName": "ArithmeticOperator",
+          "line": 74,
+          "replacement": "w + 1"
+        }
+      ]
+    }
+  ],
+  "sha256": "ba33f1c96ad40c4261eb1692e0a74e4b5fe74cf0fff63ad24043d610d6c29f73"
+}

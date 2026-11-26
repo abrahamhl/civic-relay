@@ -48,6 +48,7 @@ public final class AppActivity extends Activity {
     private BleMailbox mailbox;
     private FileSaver saver;
     private RadioScan radio;
+    private UsbSerialBridge usbBridge;
     private Runnable afterBt;
     private PermissionRequest pendingCam;
     private SpeechRecognizer recognizer;
@@ -115,7 +116,7 @@ public final class AppActivity extends Activity {
     @SuppressWarnings("deprecation")
     @Override public void onBackPressed() { if (web.canGoBack()) web.goBack(); else super.onBackPressed(); }
 
-    @Override protected void onDestroy() { if (recognizer != null) recognizer.destroy(); if (mailbox != null) mailbox.stop(); web.destroy(); super.onDestroy(); }
+    @Override protected void onDestroy() { if (recognizer != null) recognizer.destroy(); if (mailbox != null) mailbox.stop(); if (usbBridge != null) usbBridge.destroy(); web.destroy(); super.onDestroy(); }
 
     // ── Buzón Bluetooth cercano (móvil a móvil, también en modo avión con el Bluetooth encendido) ──
     private String[] btPerms() {
@@ -276,11 +277,38 @@ public final class AppActivity extends Activity {
         }
     }
 
+    private UsbSerialBridge usbBridge() {
+        if (usbBridge == null) usbBridge = new UsbSerialBridge(this, new UsbSerialBridge.Listener() {
+            @Override public void onData(String b64) {
+                String quoted = JSONObject.quote(b64);
+                web.post(() -> web.evaluateJavascript("window.sendaUsbSerial&&window.sendaUsbSerial(" + quoted + ")", null));
+            }
+            @Override public void onStatus(String event, String detail) {
+                JSONObject o = new JSONObject();
+                try { o.put("event", event).put("detail", detail); } catch (org.json.JSONException ignored) {}
+                web.post(() -> web.evaluateJavascript("window.sendaUsbStatus&&window.sendaUsbStatus(" + o + ")", null));
+            }
+        });
+        return usbBridge;
+    }
+
     /** Puente mínimo hacia lo nativo. Cada método es un permiso: añadir solo lo imprescindible. */
     private final class Bridge {
         @JavascriptInterface public String info() {
-            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"copilotBridge\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true,\"fileSave\":true,\"screenRec\":true,\"radioScan\":true}";
+            return "{\"app\":\"SENDA Android\",\"native\":true,\"offlineAssets\":true,\"radios\":[\"BLE_BEACON\",\"LOW_POWER_BEACON\",\"WIFI_SCAN\"],\"drive\":true,\"copilotBridge\":true,\"voice\":true,\"p2p\":\"BLE_GATT\",\"contactPicker\":true,\"fileSave\":true,\"screenRec\":true,\"radioScan\":true,\"usbOtgSerial\":true}";
         }
+
+        /** Lista adaptadores USB-serie conectados por OTG (CH340/CP210x/FTDI/CDC-ACM) sin revelar nº de serie. */
+        @JavascriptInterface public String usbList() { return usbBridge().listDevicesJson(); }
+
+        /** Abre el adaptador USB-OTG a 256000 8N1 y reenvía bytes a window.sendaUsbSerial(b64) → createFrameParser. */
+        @JavascriptInterface public boolean usbOpen(int deviceId) { return usbBridge().open(deviceId); }
+
+        /** Envía órdenes (p. ej. modo multiobjetivo RD-03D/LD2450) al radar conectado por USB-OTG. */
+        @JavascriptInterface public boolean usbWrite(String b64) { return usbBridge().writeBase64(b64); }
+
+        /** Cierra la conexión USB-OTG y detiene el hilo lector. */
+        @JavascriptInterface public void usbClose() { if (usbBridge != null) usbBridge.close(); }
 
         /** Publica avisos y métricas físicas del Copiloto 5D hacia Android Auto y la notificación de ruta (sin PII). */
         @JavascriptInterface public boolean publishDriveState(String json) {

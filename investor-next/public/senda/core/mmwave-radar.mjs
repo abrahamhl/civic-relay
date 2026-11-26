@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * SENDA · radar de personas mmWave de bajo coste (Ai-Thinker RD-03D / Hi-Link LD2450, 24 GHz, hasta 3 objetivos en movimiento).
  *

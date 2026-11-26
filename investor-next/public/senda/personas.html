@@ -9,8 +9,9 @@
 <link rel="icon" href="/senda/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/senda/fonts/fonts.css">
 <style>
-:root{--bg:#04080b;--p:#0b1116;--p2:#111a21;--line:#1d2830;--t:#eef3f4;--m:#93a7b1;--d:#5d6e77;--ember:#ff7756;--mint:#34d399;--sky:#91d7e8;--sun:#fbbf24;--rose:#ff5b6e}
+:root{--bg:#04080b;--p:#0b1116;--p2:#111a21;--line:#1d2830;--t:#eef3f4;--m:#93a7b1;--d:#7c929d;--ember:#ff7756;--mint:#34d399;--sky:#91d7e8;--sun:#fbbf24;--rose:#ff5b6e}
 *{box-sizing:border-box}
+button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 html,body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 "Inter",system-ui,sans-serif;font-feature-settings:"tnum" 1;-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit;color:inherit}
@@ -43,6 +44,8 @@ h2{margin:0 0 8px;font-size:15px;font-weight:600}
 button.pri{background:#eef3f4;color:#04080b;border-color:#eef3f4;font-weight:600}
 button.b:disabled{opacity:.45;cursor:not-allowed}
 label.f{display:grid;grid-template-columns:1fr 92px;gap:8px;align-items:center;font-size:13px;color:var(--m);margin:4px 0}
+label.f.wide{grid-template-columns:1fr;gap:4px}
+label.f select,label.f.wide input{background:var(--p);border:1px solid var(--line);border-radius:6px;padding:7px 8px;width:100%;text-align:left}
 label.f input{background:var(--p);border:1px solid var(--line);border-radius:6px;padding:5px 7px;text-align:right;width:100%}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{color:var(--d);font-weight:500;text-align:left;padding:4px 4px;border-bottom:1px solid var(--line)}
@@ -81,6 +84,24 @@ details summary{cursor:pointer;color:var(--m);font-size:13px}
       <p class="note" id="serialNote"></p>
       <label class="f" id="binRateRow" hidden>Intervalo entre tramas del .bin (ms, lo declara usted)<input id="binMs" type="number" min="1" step="1" placeholder="obligatorio"></label>
       <div id="log" class="mono"></div>
+    </section>
+    <section id="field">
+      <h2>Práctica de campo</h2>
+      <p class="note" style="margin-top:0">Graba la sesión entera en un solo archivo: bytes del radar, personas seguidas, momentos marcados y calibración, con huella SHA-256. Guárdelo en el móvil y envíelo para analizarlo.</p>
+      <label class="f wide">Qué se prueba<select id="fScenario">
+        <option>Una persona caminando hacia el radar</option>
+        <option>Una persona cruzando de lado</option>
+        <option>Dos personas cruzándose</option>
+        <option>Persona quieta (de pie o sentada)</option>
+        <option>Persona detrás de una puerta o pared fina</option>
+        <option>Perro u otro animal</option>
+        <option>Sin nadie (ruido de fondo)</option>
+        <option>Calibración con cinta métrica</option>
+        <option>Otro (escríbalo en la nota)</option>
+      </select></label>
+      <label class="f wide">Nota (opcional)<input id="fNote" type="text" maxlength="300" placeholder="p. ej. puerta de madera a 3 m, lluvia"></label>
+      <div class="row"><button class="b pri" id="fStart">Empezar sesión</button><button class="b" id="fMark" disabled>Marcar momento</button><button class="b" id="fEnd" disabled>Terminar y guardar</button></div>
+      <p class="note mono" id="fOut"></p>
     </section>
     <section>
       <h2>Ajustes del seguimiento</h2>
@@ -128,7 +149,7 @@ details summary{cursor:pointer;color:var(--m);font-size:13px}
         <li>Con distancia, ángulo y velocidad <b>no se distingue</b> una persona de un perro. El vídeo de referencia muestra un perro; aquí se cuentan «objetivos en movimiento».</li>
         <li>Funciona a oscuras y, por la física de las ondas de 24 GHz, a través de humo o de una carcasa de plástico; no atraviesa metal ni muros gruesos. Con este equipo no lo hemos medido todavía.</li>
         <li>Ningún móvil lleva este radar: hace falta el módulo y un adaptador USB‑serie, o un ESP32 que reenvíe las tramas.</li>
-        <li>La conexión USB directa usa Web Serial: funciona en Chrome o Edge de escritorio; no en Safari, Firefox ni en la app Android.</li>
+        <li>La conexión USB directa usa Web Serial en Chrome/Edge de escritorio y puente nativo USB‑OTG en la APK de SENDA Android (CH340, CP210x, FTDI y CDC‑ACM a 256000 8N1; validación con hardware real en campo pendiente). No funciona en Safari ni Firefox.</li>
       </ul>
       <details><summary>Ciencia</summary>
         <div class="sci">

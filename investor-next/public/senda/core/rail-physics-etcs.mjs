@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * SENDA · Física ferroviaria avanzada: curvas de frenado ETCS (UNISIG SUBSET-026-3),
  * pandeo térmico no lineal de carril soldado (Kish & Samavedam 2013), criterio de descarrilamiento

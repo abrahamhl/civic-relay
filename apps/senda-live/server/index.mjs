@@ -145,6 +145,13 @@ export function createServer({ dbFile = DB_PATH, ipSalt = 'senda-ip-salt-default
     createReadStream(filePath).pipe(res);
   }
 
+  const rawClose = server.close.bind(server);
+  server.close = (cb) => {
+    rt.closeAll();
+    server.closeAllConnections?.();
+    return rawClose(cb);
+  };
+
   return { server, db, rt, services: { auth, social, events, emergency, messaging, moderation, admin } };
 }
 

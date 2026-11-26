@@ -30,6 +30,8 @@ export function createRealtimeHub(db, { maxPerUser = 5, heartbeatMs = 20_000 } =
     return row.seq;
   }
 
+  const cleanups = new Set();
+
   function attach(req, res, userId, lastEventId) {
     if (userId && (byUser.get(userId)?.size ?? 0) >= maxPerUser) {
       res.writeHead(429, { 'Content-Type': 'application/json' });
@@ -47,13 +49,17 @@ export function createRealtimeHub(db, { maxPerUser = 5, heartbeatMs = 20_000 } =
     }
     const set = userId ? (byUser.get(userId) ?? byUser.set(userId, new Set()).get(userId)) : anon;
     set.add(res); total++;
-    const hb = setInterval(() => res.write(': hb\n\n'), heartbeatMs);
-    const close = () => { clearInterval(hb); if (set.delete(res)) total--; if (userId && set.size === 0) byUser.delete(userId); };
+    const hb = setInterval(() => { if (!res.writableEnded) res.write(': hb\n\n'); }, heartbeatMs);
+    hb.unref?.();
+    const close = () => { clearInterval(hb); cleanups.delete(close); if (set.delete(res)) total--; if (userId && set.size === 0) byUser.delete(userId); };
+    cleanups.add(close);
     req.on('close', close);
+    res.on('close', close);
     res.on('error', close);
   }
 
   function closeAll() {
+    for (const fn of [...cleanups]) fn();
     for (const set of byUser.values()) for (const res of set) res.end();
     for (const res of anon) res.end();
     byUser.clear(); anon.clear(); total = 0;
