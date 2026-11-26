@@ -129,7 +129,7 @@ async function launchChrome(chromeBin) {
   };
 
   let wsUrl = null;
-  const deadline = Date.now() + 15_000;
+  const deadline = Date.now() + 60_000; // arranque en frío de Chrome en un runner compartido: puede pasar de 15 s
   while (Date.now() < deadline) {
     try {
       const r = await fetch(`http://127.0.0.1:${port}/json/list`, { signal: AbortSignal.timeout(1500) });

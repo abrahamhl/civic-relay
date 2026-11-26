@@ -1,3 +1,4 @@
+// Suite de contratos: necesita las dependencias del espacio de trabajo (ajv). Se ejecuta en ci.yml (pnpm test), no en la suite sin dependencias.
 /**
  * SENDA · F3 Pruebas de contratos JSON Schema (Ajv).
  * Verifica:
@@ -12,10 +13,10 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { validateContract, CONTRACT_SCHEMAS } from '../schemas/validate.mjs';
-import { createCitizenKeyPair, createCitizenReport } from '../src/citizen-report.mjs';
+import { validateContract, CONTRACT_SCHEMAS } from '../../schemas/validate.mjs';
+import { createCitizenKeyPair, createCitizenReport } from '../../src/citizen-report.mjs';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 
 test('F3 Ajv: los 5 esquemas contractuales están registrados', () => {
   assert.deepEqual([...CONTRACT_SCHEMAS].sort(), [

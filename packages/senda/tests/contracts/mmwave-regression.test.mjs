@@ -1,13 +1,14 @@
+// Suite de contratos: necesita las dependencias del espacio de trabajo (ajv). Se ejecuta en ci.yml (pnpm test), no en la suite sin dependencias.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createFrameParser, cleanTargets, createTracker } from '../src/mmwave-radar.mjs';
-import { validateContract } from '../schemas/validate.mjs';
+import { createFrameParser, cleanTargets, createTracker } from '../../src/mmwave-radar.mjs';
+import { validateContract } from '../../schemas/validate.mjs';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const MM_DIR = resolve(ROOT, 'packages/senda/data/mmwave');
 
 test('F5 · Grabación sintética de referencia sellada con SHA-256 y reproducción completa en createFrameParser + tracker', () => {

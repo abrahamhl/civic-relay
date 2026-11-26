@@ -1,7 +1,7 @@
 {
   "schema": "senda.perf-a11y-f7/v1",
   "basis": "MEASURED_HEADLESS_CHROMIUM_4G_AXE",
-  "generatedAtUtc": "2026-11-26T01:21:46.415Z",
+  "generatedAtUtc": "2026-11-26T10:18:25.667Z",
   "environment": {
     "node": "v22.23.5",
     "chrome": "/usr/bin/google-chrome",
@@ -19,11 +19,11 @@
       "id": "senda-home",
       "path": "/senda/",
       "perf": {
-        "lcpMs": 1400,
+        "lcpMs": 380,
         "lcpObserved": true,
-        "lcpElement": "P",
-        "fcpMs": 424,
-        "domContentLoadedMs": 1252,
+        "lcpElement": "DIV",
+        "fcpMs": 380,
+        "domContentLoadedMs": 1230,
         "initialJsTransferBytes": 69203,
         "initialJsTransferKB": 67.6,
         "initialJsUncompressedKB": 164.7,
@@ -103,11 +103,11 @@
       "id": "senda-conducir",
       "path": "/senda/conducir",
       "perf": {
-        "lcpMs": 404,
+        "lcpMs": 356,
         "lcpObserved": true,
         "lcpElement": "P",
-        "fcpMs": 404,
-        "domContentLoadedMs": 2118,
+        "fcpMs": 356,
+        "domContentLoadedMs": 2010,
         "initialJsTransferBytes": 206178,
         "initialJsTransferKB": 201.3,
         "initialJsUncompressedKB": 516.6,
@@ -187,22 +187,22 @@
       "id": "senda-personas",
       "path": "/senda/personas",
       "perf": {
-        "lcpMs": 428,
+        "lcpMs": 388,
         "lcpObserved": true,
         "lcpElement": "P",
-        "fcpMs": 428,
-        "domContentLoadedMs": 696,
-        "initialJsTransferBytes": 16321,
-        "initialJsTransferKB": 15.9,
-        "initialJsUncompressedKB": 36.1,
+        "fcpMs": 388,
+        "domContentLoadedMs": 724,
+        "initialJsTransferBytes": 20941,
+        "initialJsTransferKB": 20.5,
+        "initialJsUncompressedKB": 45.5,
         "deferredJsTransferKB": 0,
         "deferredJsFilesCount": 0,
-        "jsFilesCount": 4,
+        "jsFilesCount": 6,
         "topJsFiles": [
           {
             "url": "/senda/personas.mjs",
-            "transferBytes": 6764,
-            "uncompressedBytes": 16690
+            "transferBytes": 7825,
+            "uncompressedBytes": 20018
           },
           {
             "url": "/senda/core/mmwave-radar.mjs",
@@ -215,9 +215,19 @@
             "uncompressedBytes": 5747
           },
           {
+            "url": "/senda/core/mmwave-field.mjs",
+            "transferBytes": 2599,
+            "uncompressedBytes": 5018
+          },
+          {
             "url": "/senda/app-chrome.mjs",
             "transferBytes": 1608,
             "uncompressedBytes": 2519
+          },
+          {
+            "url": "/senda/save-file.mjs",
+            "transferBytes": 960,
+            "uncompressedBytes": 1216
           }
         ]
       },
@@ -229,13 +239,13 @@
           "wcag21aa",
           "wcag22aa"
         ],
-        "passes": 24,
+        "passes": 25,
         "violationsCount": 0,
         "violations": [],
         "reducedMotion": {
           "mediaMatches": true,
           "hasReducedMotionRule": true,
-          "focusables": 23
+          "focusables": 26
         }
       },
       "consoleErrors": [],
@@ -248,5 +258,5 @@
       }
     }
   ],
-  "sha256": "ceca9fad28ff74d1b0bfb5ae9707410d8793344870dd86b40cfba97f7848f31b"
+  "sha256": "14a75c948f0c6e9f9259b068c46752f42bfdae7f1e5437324cccc28d205296b4"
 }

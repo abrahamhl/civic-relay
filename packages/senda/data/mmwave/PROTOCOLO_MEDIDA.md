@@ -16,5 +16,5 @@ Este protocolo define cómo tomar grabaciones reales reproducibles para validar 
 ## 3. Sellado y archivo en el repositorio
 1. Calcular la huella SHA-256 del `.jsonl` crudo (`sha256sum <archivo>.jsonl`).
 2. Crear `<archivo>.meta.json` con `basis: "MEASURED"`, fecha UTC ISO-8601 con zona (`Z`), modelo de sensor, adaptador USB, condiciones ambientales (interior/exterior, humo/obstáculo si aplica), medidas de cinta y huella `sha256`.
-3. Añadir la entrada al manifiesto de `packages/senda/data/mmwave/README.md` y un caso en `packages/senda/tests/mmwave-regression.test.mjs` que mida el error RMS en los puntos de verificación ciega (separados de los puntos de calibración).
+3. Añadir la entrada al manifiesto de `packages/senda/data/mmwave/README.md` y un caso en `packages/senda/tests/contracts/mmwave-regression.test.mjs` que mida el error RMS en los puntos de verificación ciega (separados de los puntos de calibración).
 4. **Regla estricta:** ninguna cifra de precisión se añade al dossier ni a la web si no supera la prueba de regresión sobre la grabación sellada con SHA-256.

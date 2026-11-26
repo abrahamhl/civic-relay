@@ -8,7 +8,7 @@
 
 | Archivo | Tipo (`basis`) | Tramas | Huella SHA-256 | Estado |
 |---|---|---:|---|---|
-| `synthetic-crossing-2p.jsonl` | **`SIMULATION`** (sintético determinista) | 51 (10 Hz, 5,0 s) | `8a1da7a1765b02cdb9cfa8a70cee8d45a5bb6d4a2662caf11bf630c3dd82a8a3` | Regresión del parser, limpieza y tracker en `packages/senda/tests/mmwave-regression.test.mjs` |
+| `synthetic-crossing-2p.jsonl` | **`SIMULATION`** (sintético determinista) | 51 (10 Hz, 5,0 s) | `8a1da7a1765b02cdb9cfa8a70cee8d45a5bb6d4a2662caf11bf630c3dd82a8a3` | Regresión del parser, limpieza y tracker en `packages/senda/tests/contracts/mmwave-regression.test.mjs` |
 | Grabaciones reales con RD-03D / LD2450 | `MEASURED` | — | *pendiente de hardware físico* | **Bloqueado: sin sensor físico RD-03D/LD2450 en el entorno de desarrollo** |
 
 ## Puente USB-OTG en Android (F5)
