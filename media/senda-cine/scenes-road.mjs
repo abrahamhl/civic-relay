@@ -1,21 +1,23 @@
 // Escenas de carretera: autopista de Bélgica (fases), rumbo de marcha, llamada al 112 y conducción.
 import { THREE, C, g, W, H, ease, clamp, lerp, seg, text, panel, wrap, project } from './kit.mjs';
 import { call112Script } from '/investor-next/public/senda/core/road-guard.mjs';
+import { makeCar, makeTruck, glowTex, lamp } from './models.mjs';
+export { makeCar, makeTruck };
 
 const LANE = { left: -3.5, mid: 0, right: 3.5 }; // conducción por la derecha: el carril rápido es el izquierdo (x negativa)
 const col = (h) => new THREE.Color(h);
 
 function baseScene(fogFar = 220) {
   const scene = new THREE.Scene(); scene.background = col('#03070a'); scene.fog = new THREE.Fog('#03070a', 30, fogFar);
-  scene.add(new THREE.HemisphereLight('#7f9fb5', '#0b1014', 1.35));
-  const moon = new THREE.DirectionalLight('#b9d6ea', 1.25); moon.position.set(-40, 60, 30); scene.add(moon);
+  scene.add(new THREE.HemisphereLight('#6f8ea5', '#0b1014', 0.55));
+  const moon = new THREE.DirectionalLight('#b9d6ea', 0.6); moon.position.set(-40, 60, 30); scene.add(moon);
   const camera = new THREE.PerspectiveCamera(38, W / H, 0.1, 600);
   return { scene, camera };
 }
 
 export function makeRoad(scene, len = 900) {
   const grp = new THREE.Group();
-  const asphalt = new THREE.Mesh(new THREE.PlaneGeometry(15.5, len), new THREE.MeshStandardMaterial({ color: '#23292e', roughness: 0.85 }));
+  const asphalt = new THREE.Mesh(new THREE.PlaneGeometry(15.5, len), new THREE.MeshStandardMaterial({ color: '#1e2428', roughness: 0.42, metalness: 0.15 }));
   asphalt.rotation.x = -Math.PI / 2; asphalt.position.set(0.6, 0, -len / 2 + 60); grp.add(asphalt);
   const verge = new THREE.Mesh(new THREE.PlaneGeometry(160, len), new THREE.MeshStandardMaterial({ color: '#070b0d', roughness: 1 }));
   verge.rotation.x = -Math.PI / 2; verge.position.set(0, -0.02, -len / 2 + 60); grp.add(verge);
@@ -27,68 +29,57 @@ export function makeRoad(scene, len = 900) {
   const barrier = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.8, len), barMat); barrier.position.set(-6.0, 0.4, -len / 2 + 60); grp.add(barrier);
   const rail = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.35, len), barMat); rail.position.set(8.4, 0.55, -len / 2 + 60); grp.add(rail);
   // Farolas con halo (sprites aditivos)
-  const halo = new THREE.SpriteMaterial({ color: '#ffcc88', transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, map: glowTex() });
+  const halo = new THREE.SpriteMaterial({ color: '#ffcc88', transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false, map: glowTex() });
   for (let z = 40; z > -len + 60; z -= 48) {
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 9), barMat); pole.position.set(-6.3, 4.5, z); grp.add(pole);
-    const s = new THREE.Sprite(halo); s.position.set(-5.2, 9, z); s.scale.set(6, 6, 1); grp.add(s);
+    const s = new THREE.Sprite(halo); s.position.set(-5.2, 9, z); s.scale.set(3.2, 3.2, 1); grp.add(s);
     const pl = new THREE.PointLight('#ffc27a', 7, 22, 2); pl.position.set(-4.8, 8.6, z); if (z % 96 === 40 % 96) grp.add(pl);
   }
   scene.add(grp); return grp;
 }
 
-let _glow;
-export function glowTex() {
-  if (_glow) return _glow; const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d');
-  const gr = x.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.25, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
-  x.fillStyle = gr; x.fillRect(0, 0, 128, 128); _glow = new THREE.CanvasTexture(c); return _glow;
-}
-function lamp(color, scale) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ color, map: glowTex(), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); s.scale.set(scale, scale, 1); return s; }
-
-export function makeCar(color = '#91d7e8') {
-  const car = new THREE.Group();
-  const paint = new THREE.MeshStandardMaterial({ color, metalness: 0.55, roughness: 0.35 });
-  const glass = new THREE.MeshStandardMaterial({ color: '#0b141a', metalness: 0.9, roughness: 0.1 });
-  const body = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.62, 4.4), paint); body.position.y = 0.55; car.add(body);
-  const cab = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.52, 2.2), glass); cab.position.set(0, 1.1, 0.25); car.add(cab);
-  const tyre = new THREE.MeshStandardMaterial({ color: '#0a0a0a', roughness: 0.8 });
-  for (const [x, z] of [[-0.85, -1.4], [0.85, -1.4], [-0.85, 1.4], [0.85, 1.4]]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.25, 16), tyre); w.rotation.z = Math.PI / 2; w.position.set(x, 0.34, z); car.add(w); }
-  // Frontal hacia -z (sentido de la marcha)
-  const head = []; for (const x of [-0.6, 0.6]) { const s = lamp('#fff6e0', 1.4); s.position.set(x, 0.62, -2.25); car.add(s); head.push(s); }
-  const tail = []; for (const x of [-0.65, 0.65]) { const s = lamp('#ff3344', 0.9); s.position.set(x, 0.65, 2.22); car.add(s); tail.push(s); }
-  const blink = []; for (const [x, z] of [[-0.85, -2.1], [0.85, -2.1], [-0.85, 2.1], [0.85, 2.1]]) { const s = lamp('#ffb020', 1.1); s.position.set(x, 0.7, z); s.visible = false; car.add(s); blink.push(s); }
-  const beam = new THREE.SpotLight('#fff1d6', 40, 60, 0.45, 0.6, 1.6); beam.position.set(0, 0.7, -2); beam.target.position.set(0, 0, -20); car.add(beam, beam.target);
-  car.userData = { head, tail, blink, body, paint };
-  return car;
-}
-export function makeTruck() {
-  const t = new THREE.Group();
-  const cabM = new THREE.MeshStandardMaterial({ color: '#c9d1d6', metalness: 0.4, roughness: 0.45 });
-  const boxM = new THREE.MeshStandardMaterial({ color: '#5d6b74', metalness: 0.2, roughness: 0.7 });
-  const cab = new THREE.Mesh(new THREE.BoxGeometry(2.5, 3.0, 2.4), cabM); cab.position.set(0, 1.9, -6.4); t.add(cab);
-  const trailer = new THREE.Mesh(new THREE.BoxGeometry(2.55, 3.4, 12.5), boxM); trailer.position.set(0, 2.2, 1.3); t.add(trailer);
-  for (const x of [-0.8, 0.8]) { const s = lamp('#fff6e0', 1.6); s.position.set(x, 1.0, -7.65); t.add(s); }
-  for (let z = -5; z < 7; z += 3) for (const x of [-1.3, 1.3]) { const s = lamp('#ffaa22', 0.5); s.position.set(x, 0.8, z); t.add(s); }
-  const beam = new THREE.SpotLight('#fff1d6', 55, 70, 0.5, 0.6, 1.6); beam.position.set(0, 1.2, -7.5); beam.target.position.set(0, 0, -30); t.add(beam, beam.target);
-  return t;
-}
+export { glowTex };
 const sparkGeo = new THREE.SphereGeometry(0.05, 6, 6);
 function sparks(scene, n = 40) { const grp = new THREE.Group(); const m = new THREE.MeshBasicMaterial({ color: '#ffd27a' }); for (let i = 0; i < n; i++) grp.add(new THREE.Mesh(sparkGeo, m)); scene.add(grp); return grp; }
 function rnd(i) { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
 
 // Coreografía declarada (ilustrativa, sin escala): posiciones en función del progreso de la escena del golpe.
 function crashPose(p) {
-  const v = 22; // unidades de escena por segundo de animación, no una velocidad medida
-  const travel = (q) => v * 20 * (q - 0.5 * q * q * 0.9); // avanza decelerando
-  const s = travel(Math.min(p, 0.85));
-  const car = { x: LANE.right, z: -s, yaw: 0 }, truck = { x: LANE.mid, z: -s + 7.6, yaw: 0 };
-  const a = seg(p, 0.0, 0.16), b = seg(p, 0.16, 0.45), c = seg(p, 0.45, 0.8), d = seg(p, 0.8, 0.88);
-  truck.x = lerp(LANE.mid, 1.7, ease(a)); truck.yaw = -0.08 * ease(a);
-  if (b > 0) { car.yaw = lerp(0, -1.4, ease(b)); car.x = lerp(LANE.right, 2.4, ease(b)); car.z = -s - 1.6 * ease(b); truck.x = lerp(1.7, 2.6, ease(b)); }
-  if (c > 0) { truck.x = lerp(2.6, 6.6, ease(c)); truck.yaw = lerp(-0.08, -0.12, ease(c)) + 0.12 * ease(c);
-    car.x = lerp(2.4, -4.5, ease(c)); car.yaw = lerp(-1.4, -Math.PI, ease(c)); car.z = -s - 1.6 - 9 * ease(c); }
-  if (d > 0) { car.x = lerp(-4.5, -3.7, ease(d)); car.yaw = -Math.PI; }
-  if (p >= 0.88) { car.x = -3.7; }
-  return { car, truck, contact: a > 0.9 && b < 1, barrier: d > 0 && d < 1 ? d : 0, final: p >= 0.85 };
+  // Ilustrativo y sin escala. Fases del relato (docs/roadsafe/18): 1 golpe lateral · 2 arrastre perpendicular · 3 el camión al arcén
+  // y el coche despedido a la izquierda girando 180° · 4 barrera izquierda · 5 detenido en el carril rápido contra la circulación.
+  const v = 21, travel = (q) => v * 20 * (q - 0.45 * q * q);
+  const s = travel(Math.min(p, 0.86));
+  const a = seg(p, 0.0, 0.18), b = seg(p, 0.18, 0.46), c = seg(p, 0.46, 0.8), d = seg(p, 0.8, 0.9);
+  // Al principio, el camión va en paralelo por el carril central con la cabina a la altura de la puerta trasera del coche
+  const car = { x: LANE.right, z: -s, yaw: 0 }, truck = { x: LANE.mid, z: -s + 7.6 + 0.9, yaw: 0 };
+  truck.x = lerp(LANE.mid, 1.25, ease(a)); truck.yaw = -0.07 * Math.sin(a * Math.PI);
+  if (b > 0) { // la cabina empuja: el coche gira con el morro a la izquierda y queda atravesado delante del camión
+    truck.x = lerp(1.25, 2.6, ease(b)); truck.z = -s + 7.6 + 0.9 - 2.2 * ease(b);
+    car.yaw = lerp(0, Math.PI / 2, ease(b)); car.x = lerp(LANE.right, truck.x, ease(b)); car.z = lerp(-s, truck.z - 7.6 - 1.05, ease(b));
+  }
+  if (c > 0) { const tz = -s + 7.6 + 0.9 - 2.2;
+    truck.x = lerp(2.6, 6.7, ease(c)); truck.z = tz + 4 * ease(c); truck.yaw = 0.1 * Math.sin(c * Math.PI);
+    car.x = lerp(2.6, -4.55, ease(c)); car.yaw = lerp(Math.PI / 2, Math.PI, ease(c)); car.z = tz - 7.6 - 1.05 - 10 * ease(c); }
+  if (d > 0) { car.x = lerp(-4.55, -3.6, ease(d)); car.yaw = Math.PI; }
+  if (p >= 0.9) { car.x = -3.6; car.yaw = Math.PI; }
+  const phase = p < 0.18 ? 1 : p < 0.46 ? 2 : p < 0.8 ? 3 : p < 0.9 ? 4 : 5;
+  return { car, truck, contact: a > 0.85 && b < 1, barrier: d > 0 && d < 1 ? d : 0, final: p >= 0.86, phase };
+}
+
+// Croquis cenital (como un atestado): carriles y siluetas en planta con las mismas posiciones que la escena 3D.
+const PHASES = ['', 'Golpe lateral de la cabina', 'Arrastre casi perpendicular', 'El camión va al arcén · el coche sale girando', 'Choque con la barrera izquierda', 'Detenido en el carril rápido, contra la circulación'];
+function croquis(P, alpha, x0 = 1340, y0 = 230, w = 480, h = 600) {
+  if (alpha <= 0) return;
+  g.save(); g.globalAlpha = alpha; g.fillStyle = 'rgba(6,12,16,.86)'; g.beginPath(); g.roundRect(x0, y0, w, h, 10); g.fill();
+  const sx = w / 17, cx = x0 + w / 2 - 0.6 * sx, zc = (P.car.z + P.truck.z) / 2, sy = sx, cy = y0 + h * 0.55;
+  const X = (x) => cx + x * sx, Y = (z) => cy + (z - zc) * sy;
+  g.strokeStyle = 'rgba(207,216,220,.6)'; g.lineWidth = 2; for (const x of [-5.25, 5.25]) { g.beginPath(); g.moveTo(X(x), y0 + 40); g.lineTo(X(x), y0 + h - 20); g.stroke(); }
+  g.setLineDash([10, 12]); for (const x of [-1.75, 1.75]) { g.beginPath(); g.moveTo(X(x), y0 + 40); g.lineTo(X(x), y0 + h - 20); g.stroke(); } g.setLineDash([]);
+  g.fillStyle = 'rgba(147,167,177,.7)'; g.fillRect(X(-6.1), y0 + 40, 4, h - 60);
+  const rect = (o, L, Wd, col, front) => { g.save(); g.translate(X(o.x), Y(o.z + front)); g.rotate(-o.yaw); g.fillStyle = col; g.fillRect(-(Wd * sx) / 2, -(L * sy) / 2, Wd * sx, L * sy); g.fillStyle = '#fff'; g.fillRect(-(Wd * sx) / 2, -(L * sy) / 2, Wd * sx, 4); g.restore(); };
+  rect(P.truck, 15, 2.5, '#9aa6ad', 0); rect(P.car, 4.4, 1.8, C.sky, 0);
+  g.font = "600 20px Inter, system-ui, sans-serif"; g.fillStyle = C.ink; g.textAlign = 'left'; g.fillText('Croquis en planta · ilustrativo', x0 + 20, y0 + 30);
+  g.fillStyle = C.sun; g.fillText(`${P.phase} · ${PHASES[P.phase]}`, x0 + 20, y0 + h - 10 + 0); g.restore();
 }
 
 function highway({ sc }) {
@@ -115,7 +106,7 @@ function highway({ sc }) {
     } else if (phase === 'crash') {
       const P = crashPose(p); place(car, P.car); place(truck, P.truck);
       if (P.contact || (p > 0.12 && p < 0.5)) { sp.visible = true; sp.children.forEach((m, i) => { const age = ((local * 3 + rnd(i)) % 1); m.position.set(car.position.x - 1 + (rnd(i + 3) - 0.5) * 0.6 - age * 2.5 * rnd(i + 9), 0.8 + age * 1.6 * rnd(i + 5) - age * age * 2, car.position.z + (rnd(i + 7) - 0.5) * 2 + age * 3); m.scale.setScalar(1 - age); }); }
-      const mk = seg(p, 0.08, 0.5); if (mk > 0 && mk < 1) { mirror.visible = true; mirror.position.set(LANE.right - 1.2 - mk * 6, 1 + Math.sin(mk * Math.PI) * 1.6, -crashPose(0.1).car.z * 0 + crashPose(0.1).car.z + mk * 6); mirror.rotation.set(mk * 9, mk * 7, 0); }
+      car.userData.mirrors[0].visible = p < 0.15; const mk = seg(p, 0.15, 0.48); if (mk > 0 && mk < 1) { const c0 = crashPose(0.15).car; mirror.visible = true; mirror.position.set(c0.x - 1.0 - mk * 5, 1.0 + Math.sin(mk * Math.PI) * 1.8, c0.z - 0.6 + mk * 7); mirror.rotation.set(mk * 9, mk * 7, 0); }
       if (P.barrier) { flash.visible = true; flash.position.set(-5.7, 0.9, car.position.z); flash.scale.setScalar(6 * Math.sin(P.barrier * Math.PI)); }
       if (P.final) car.userData.blink.forEach((b) => (b.visible = Math.floor(local * 2.2) % 2 === 0));
       const k = ease(p), cz = (car.position.z + truck.position.z) / 2;
@@ -140,12 +131,13 @@ function highway({ sc }) {
       }
     }
   }
-  function overlay({ local, sc: s }) {
+  function overlay({ local, p, sc: s }) {
+    if (phase === 'crash') croquis(crashPose(p), ease(seg(local, 1.2, 2.2)) * (1 - ease(seg(p, 0.97, 1))));
     for (const L of labels) { const q = project(L.v, camera); if (q.behind) continue; g.save(); g.fillStyle = L.c; g.fillRect(q.x - 6, q.y - 6, 12, 12); g.restore(); text(L.s, q.x + 16, q.y + 7, { px: 24, w: 600, color: C.ink }); }
     if (phase === 'alert') { const a = ease(seg(local, 1.5, 2.5)); panel(96, 210, 600, 150, 0.8 * a); text('Aviso SENDA', 126, 260, { px: 22, w: 550, color: C.sun, alpha: a });
       text('Vehículo inmovilizado en el carril izquierdo (rápido),', 126, 302, { px: 24, w: 550, alpha: a }); text('orientado contra la circulación', 126, 336, { px: 24, w: 550, alpha: a }); }
   }
-  return { scene, camera, update, overlay };
+  return { scene, camera, update, overlay, envIntensity: 0.3 };
 }
 
 // Rumbo de marcha antes del choque frente al rumbo final (esquema técnico 2D sobre fondo 3D sutil).
@@ -177,7 +169,7 @@ function heading() {
     const ang = Math.atan2(y1 - y0, x1 - x0); if (Math.hypot(x1 - x0, y1 - y0) > 20) { g.beginPath(); g.moveTo(x1, y1); g.lineTo(x1 - 26 * Math.cos(ang - 0.45), y1 - 26 * Math.sin(ang - 0.45)); g.lineTo(x1 - 26 * Math.cos(ang + 0.45), y1 - 26 * Math.sin(ang + 0.45)); g.closePath(); g.fill(); }
     g.restore(); text(label, side === 'left' ? x0 - 60 : x1 + 40, (y0 + y1) / 2, { px: 24, w: 600, color: c, align: side === 'left' ? 'right' : 'left' });
   }
-  return { scene, camera, update, overlay };
+  return { scene, camera, update, overlay, envIntensity: 0.3 };
 }
 
 // La llamada al 112: el guion lo genera la función real call112Script() con lo declarado en el caso.
@@ -195,7 +187,7 @@ function call112() {
     text('roadsafe-case-hgv-sideswipe.test.mjs', 1030, 705, { px: 24, w: 500, mono: true, alpha: k2 });
     text('5 pruebas en verde en cada cambio del código', 1030, 752, { px: 24, w: 600, color: C.mint, alpha: k2 });
   }
-  return { scene, camera, update, overlay };
+  return { scene, camera, update, overlay, envIntensity: 0.3 };
 }
 
 // Conducción: brújula + GPS fusionados; la flecha gira aunque el coche esté parado.
@@ -217,7 +209,7 @@ function drive() {
     text(moving ? 'GPS · en marcha' : 'Brújula calibrada · parado', 140, 790, { px: 28, w: 600, color: moving ? C.mint : C.sky, alpha: a });
     if (moving) { const k = ease(seg(p, 0.55, 0.65)); panel(W / 2 - 330, 230, 660, 110, 0.88 * k); text('Vehículo detenido en tu carril', W / 2, 297, { px: 32, w: 650, color: C.sun, align: 'center', alpha: k }); }
   }
-  return { scene, camera, update, overlay };
+  return { scene, camera, update, overlay, envIntensity: 0.3 };
 }
 
 export const roadKinds = { highway, heading, call112, drive };

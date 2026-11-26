@@ -1,7 +1,13 @@
 // SENDA · motor de cine determinista: cada fotograma depende solo de t (window.seek). Voz y tiempos: voice.py.
 import { THREE, C, g, W, H, grain, ease, seg, clamp, text, font, wrap } from './kit.mjs';
 import { roadKinds } from './scenes-road.mjs';
+import { envMap } from './models.mjs';
+import { EffectComposer } from '/media/senda-film/cinema/vendor/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from '/media/senda-film/cinema/vendor/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from '/media/senda-film/cinema/vendor/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from '/media/senda-film/cinema/vendor/addons/postprocessing/OutputPass.js';
 import { worldKinds } from './scenes-world.mjs';
+import { filmKinds } from './scenes-film.mjs';
 
 const NAME = new URLSearchParams(location.search).get('script') || 'cine-belgica';
 const TL = await (await fetch(`/media/senda-film/build/timings-${NAME}-es.json`)).json();
@@ -9,6 +15,10 @@ const SCRIPT = await (await fetch(`/media/senda-film/${NAME}.json`)).json();
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gl'), antialias: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(1); renderer.setSize(W, H, false);
 renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.45;
+// Resplandor de cine (bloom) sobre las luces; reflejos de entorno en carrocerías y asfalto.
+const composer = new EffectComposer(renderer); const rp = new RenderPass(new THREE.Scene(), new THREE.PerspectiveCamera());
+composer.addPass(rp); composer.addPass(new UnrealBloomPass(new THREE.Vector2(W, H), 0.55, 0.55, 0.82)); composer.addPass(new OutputPass()); composer.setSize(W, H);
+const ENV = envMap(renderer);
 
 const TRUTH = {
   ILLUSTRATIVE: [C.sun, 'Reconstrucción ilustrativa del relato de un conductor · sin escala'],
@@ -17,12 +27,17 @@ const TRUTH = {
   OBSERVED: [C.mint, 'Datos publicados · informe preliminar de la CIAF y fuentes citadas · escena 3D ilustrativa'],
   MODEL_CALIBRATED_AGAINST_OBSERVED: [C.sky, 'Relieve real · simulación calibrada con lo observado por Copernicus'],
   DESIGN_RENDER: [C.sun, 'Render de diseño · prototipo en desarrollo'],
+  SOURCES: [C.mint, 'Hechos publicados · fuentes citadas en el repositorio'],
+  REAL_RECORDING: [C.mint, 'Grabación real de la aplicación SENDA'],
+  SATELLITE: [C.mint, 'Imágenes reales Sentinel-2 · relieve Copernicus DEM'],
+  PROJECT: [C.sky, 'Datos del propio repositorio'],
+  PLAN: [C.sky, 'Hoja de ruta · convocatorias verificadas en fuentes oficiales'],
 };
 
-const KINDS = { ...roadKinds, ...worldKinds };
+const KINDS = { ...roadKinds, ...worldKinds, ...filmKinds };
 const built = new Map();
 function sceneFor(sc) {
-  if (!built.has(sc.id)) { const mk = KINDS[sc.visual.kind]; if (!mk) throw new Error('tipo de escena desconocido: ' + sc.visual.kind); built.set(sc.id, mk({ sc, renderer })); }
+  if (!built.has(sc.id)) { const mk = KINDS[sc.visual.kind]; if (!mk) throw new Error('tipo de escena desconocido: ' + sc.visual.kind); const made = mk({ sc, renderer }); if (made.scene && !made.noEnv) { made.scene.environment = ENV; const k = made.envIntensity ?? 1; made.scene.traverse((o) => { if (o.material && 'envMapIntensity' in o.material) o.material.envMapIntensity = k; }); } built.set(sc.id, made); }
   return built.get(sc.id);
 }
 // Preparación (datos pesados) antes de declarar READY.
@@ -37,7 +52,7 @@ function drawChrome(sc, t, local, idx) {
   // Capítulo y título
   const a = ease(seg(local, 0.3, 1.4)) * fadeOut;
   const n = String(idx + 1).padStart(2, '0');
-  text(`${n} · ${SCRIPT.chapter ?? 'SENDA'}`, 96, 104, { px: 22, w: 550, color: C.gray, alpha: a });
+  text(`${n} · ${sc.visual.chapter ?? SCRIPT.chapter ?? 'SENDA'}`, 96, 104, { px: 22, w: 550, color: C.gray, alpha: a });
   text(sc.title, 96, 158, { px: 54, w: 650, alpha: a });
   // Etiqueta de veracidad (un cuadrado de color + texto, sin pastilla)
   const [col, lbl] = TRUTH[sc.claim] ?? TRUTH.CALCULATED;
@@ -64,9 +79,9 @@ window.seek = async (t) => {
   const local = t - sc.start, p = local / sc.duration;
   const s = sceneFor(sc);
   g.clearRect(0, 0, W, H);
-  s.update({ t, local, p, sc, lineAt: (i) => sc.lines[i] ? clamp((t - sc.lines[i].start) / (sc.lines[i].end - sc.lines[i].start)) : 0, lineStarted: (i) => sc.lines[i] && t >= sc.lines[i].start });
-  renderer.render(s.scene, s.camera);
-  if (s.overlay) s.overlay({ t, local, p, sc, lineAt: (i) => sc.lines[i] ? clamp((t - sc.lines[i].start) / (sc.lines[i].end - sc.lines[i].start)) : 0 });
+  await s.update({ t, local, p, sc, lineAt: (i) => sc.lines[i] ? clamp((t - sc.lines[i].start) / (sc.lines[i].end - sc.lines[i].start)) : 0, lineStarted: (i) => sc.lines[i] && t >= sc.lines[i].start });
+  rp.scene = s.scene; rp.camera = s.camera; composer.render();
+  if (s.overlay) await s.overlay({ t, local, p, sc, lineAt: (i) => sc.lines[i] ? clamp((t - sc.lines[i].start) / (sc.lines[i].end - sc.lines[i].start)) : 0 });
   drawChrome(sc, t, local, idx);
   return true;
 };

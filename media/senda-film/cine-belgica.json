@@ -2,9 +2,9 @@
  "note": "Clip del accidente declarado en una autopista de Bélgica (caso anonimizado, docs/roadsafe/18). Reconstrucción ilustrativa sin escala.",
  "voices": {
   "es": {
-   "voice": "ef_dora",
+   "voice": "em_alex",
    "lang": "es",
-   "speed": 0.95
+   "speed": 0.97
   }
  },
  "scenes": [
