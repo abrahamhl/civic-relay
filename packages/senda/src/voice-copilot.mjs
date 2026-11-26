@@ -37,6 +37,7 @@ export function plateCandidates(t) {
   for (const m of s.matchAll(/\b(\d{4})\s?([BCDFGHJKLMNPRSTVWXYZ])\s?([BCDFGHJKLMNPRSTVWXYZ])\s?([BCDFGHJKLMNPRSTVWXYZ])\b/g)) out.add(`${m[1]} ${m[2]}${m[3]}${m[4]}`);
   return [...out];
 }
+/** @type {Array<[string, RegExp]>} */
 const TAGS = [
   ['MATRICULA', /\bmatricula\b|\b\d{4}\s?[bcdfghjklmnprstvwxyz]{3}\b/],
   ['INTENCION', /\b(va a|se va a|quiere|intenta|pretende|intermitente|cambia de carril|se mete|se cruza|adelanta|gira|frena|para|invade|se incorpora|sale)\b/],
