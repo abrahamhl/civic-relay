@@ -36,7 +36,7 @@
 
 ## 3. Fabricación de la carcasa (impresión 3D sin soportes)
 
-Los 3 archivos listos para laminar están en [`../stl/`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-radar/stl) y provienen del diseño paramétrico [`../cad/senda_radar_v1.scad`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-radar/cad/senda_radar_v1.scad).
+Los 3 archivos listos para laminar están en [`../stl/`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-radar/stl) y provienen del diseño paramétrico [`../cad/senda_radar_v1.scad`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-radar/cad/senda_radar_v1.scad).
 
 ### Parámetros recomendados del laminador (PrusaSlicer / OrcaSlicer / Cura)
 - **Material recomendado**: **PETG** negro o gris oscuro opaco (resiste hasta $\sim 75\,^\circ\text{C}$ dentro de un vehículo o al sol; en interior también sirve **PLA**). **Prohibido usar filamentos con fibra de carbono o partículas metálicas** porque apantallan la señal de 24 GHz.
@@ -48,20 +48,20 @@ Los 3 archivos listos para laminar están en [`../stl/`](file:///home/antigravit
 
 ### Tabla de piezas, orientación y tiempos estimados
 
-> **Origen de las cifras**: volúmenes sólidos calculados exactamente sobre la malla de triángulos por [`../scripts/build-glb-and-metrics.mjs`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-radar/scripts/build-glb-and-metrics.mjs) (véase [`../cad/cad-metrics.json`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-radar/cad/cad-metrics.json)). Los gramos y minutos de impresión se rotulan como **`ESCENARIO`** (estimación geométrica reproducible del laminador con caudal efectivo medio de $3,5\text{ mm}^3/\text{s}$ y densidad PETG $1,27\text{ g/cm}^3$).
+> **Origen de las cifras**: volúmenes sólidos calculados exactamente sobre la malla de triángulos por [`../scripts/build-glb-and-metrics.mjs`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-radar/scripts/build-glb-and-metrics.mjs) (véase [`../cad/cad-metrics.json`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-radar/cad/cad-metrics.json)). Los gramos y minutos de impresión se rotulan como **`ESCENARIO`** (estimación geométrica reproducible del laminador con caudal efectivo medio de $3,5\text{ mm}^3/\text{s}$ y densidad PETG $1,27\text{ g/cm}^3$).
 
 | Archivo STL | Orientación en la cama | Soportes | Volumen CAD exacto | Filamento PETG (`ESCENARIO`) | Tiempo (`ESCENARIO`) | Coste material IVA incl. (`2026-11-26`) |
 |---|---|---|---:|---:|---:|---:|
-| [`front_bezel.stl`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-radar/stl/front_bezel.stl) | Cara exterior frontal apoyada plana ($Z=0$) | **No** | $17,085\text{ cm}^3$ | $20,53\text{ g}$ | $1\text{ h }17\text{ min}$ | $0,37\text{ €}$ |
-| [`rear_body.stl`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-radar/stl/rear_body.stl) | Espalda exterior apoyada plana ($Z=0$) | **No** | $28,352\text{ cm}^3$ | $34,08\text{ g}$ | $2\text{ h }08\text{ min}$ | $0,61\text{ €}$ |
-| [`belt_clip.stl`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-radar/stl/belt_clip.stl) | Apoyado de canto lateral (ya exportado en esa postura) | **No** | $9,367\text{ cm}^3$ | $11,26\text{ g}$ | $0\text{ h }42\text{ min}$ | $0,20\text{ €}$ |
+| [`front_bezel.stl`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-radar/stl/front_bezel.stl) | Cara exterior frontal apoyada plana ($Z=0$) | **No** | $17,085\text{ cm}^3$ | $20,53\text{ g}$ | $1\text{ h }17\text{ min}$ | $0,37\text{ €}$ |
+| [`rear_body.stl`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-radar/stl/rear_body.stl) | Espalda exterior apoyada plana ($Z=0$) | **No** | $28,352\text{ cm}^3$ | $34,08\text{ g}$ | $2\text{ h }08\text{ min}$ | $0,61\text{ €}$ |
+| [`belt_clip.stl`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-radar/stl/belt_clip.stl) | Apoyado de canto lateral (ya exportado en esa postura) | **No** | $9,367\text{ cm}^3$ | $11,26\text{ g}$ | $0\text{ h }42\text{ min}$ | $0,20\text{ €}$ |
 | **Total conjunto** | Caben las 3 piezas en una sola bandeja | **0** | **$54,804\text{ cm}^3$** | **$65,87\text{ g}$ ($\approx 66\text{ g}$)** | **$4\text{ h }07\text{ min}$** | **$1,18\text{ €}$** |
 
 ---
 
 ## 4. Tabla de conexiones pin a pin y esquema eléctrico
 
-Consulta el esquema vectorial completo en [`wiring-schematic.svg`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-radar/docs/wiring-schematic.svg) (y en formato KiCad en [`senda-radar.kicad_sch`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-radar/docs/senda-radar.kicad_sch)).
+Consulta el esquema vectorial completo en [`wiring-schematic.svg`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-radar/docs/wiring-schematic.svg) (y en formato KiCad en [`senda-radar.kicad_sch`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-radar/docs/senda-radar.kicad_sch)).
 
 ### A. Variante mínima (solo cable USB-C al móvil Android o al ordenador · `23,35 €` IVA incl.)
 Solo necesitas `U1` (Rd-03D), `W1` (latiguillo 4P Picoblade), `U2` (XIAO ESP32-S3) y `C1` ($100\,\mu\text{F}$):
@@ -160,4 +160,4 @@ Al arrancar, en la pantalla OLED verás:
 node packages/senda/scripts/mmwave-field-report.mjs ~/Descargas/senda-campo-*.json
 ```
 
-**Criterio de éxito**: el analizador debe imprimir **`Integridad: OK`** y **`0 tramas corruptas`**. *(Esta misma cadena extremo a extremo —Chromium + `/senda/personas` + motor C++17 `TransparentBridge` + `mmwave-field-report.mjs`— se verifica automáticamente en [`../scripts/smoke-field-session.mjs`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-radar/scripts/smoke-field-session.mjs)).*
+**Criterio de éxito**: el analizador debe imprimir **`Integridad: OK`** y **`0 tramas corruptas`**. *(Esta misma cadena extremo a extremo —Chromium + `/senda/personas` + motor C++17 `TransparentBridge` + `mmwave-field-report.mjs`— se verifica automáticamente en [`../scripts/smoke-field-session.mjs`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-radar/scripts/smoke-field-session.mjs)).*

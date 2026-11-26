@@ -16,10 +16,10 @@
 | **H2.3 · `senda-estacion-ambiental`** | **SENDA Estación Hidrometeo y Humo** | **`diseño`** *(CAD + STL + GLB + renders 4D + BOM)* | Telemetría temprana en garita ventilada: calado de barranco sin contacto (`JSN-SR04T`), humo forestal láser MCERTS (`SPS30`) y $P/T/\text{HR}$ (`BME280`) | `flood-watch.mjs` · `shallow-water.mjs` · `data-assimilation.mjs` · `fire-rothermel.mjs` · `data-connectors.mjs` | `/senda/dana4d` · `/senda/fuego` · `/senda/incendio4d` · `/senda/sala` | **`70,19 €`** | `58,02 €` | `347,50 KB` |
 
 ### Fichas individuales detalladas y protocolos de medida
-- **SENDA Radar v1**: [`hardware/modules/senda-radar/README.md`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-radar/README.md) y guía paso a paso [`GUIA_MONTAJE_Y_FABRICACION.md`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-radar/docs/GUIA_MONTAJE_Y_FABRICACION.md).
-- **SENDA Nodo Malla EU868**: [`hardware/modules/senda-nodo-lora/README.md`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-nodo-lora/README.md).
-- **SENDA Baliza Rescate BLE**: [`hardware/modules/senda-baliza-ble/README.md`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-baliza-ble/README.md).
-- **SENDA Estación Hidrometeo y Humo**: [`hardware/modules/senda-estacion-ambiental/README.md`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-estacion-ambiental/README.md).
+- **SENDA Radar v1**: [`hardware/modules/senda-radar/README.md`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-radar/README.md) y guía paso a paso [`GUIA_MONTAJE_Y_FABRICACION.md`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-radar/docs/GUIA_MONTAJE_Y_FABRICACION.md).
+- **SENDA Nodo Malla EU868**: [`hardware/modules/senda-nodo-lora/README.md`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-nodo-lora/README.md).
+- **SENDA Baliza Rescate BLE**: [`hardware/modules/senda-baliza-ble/README.md`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-baliza-ble/README.md).
+- **SENDA Estación Hidrometeo y Humo**: [`hardware/modules/senda-estacion-ambiental/README.md`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-estacion-ambiental/README.md).
 
 ---
 
@@ -50,7 +50,7 @@ Para proteger la credibilidad técnica ante UME, FCSE y comités de emergencia, 
 ## 4. Costes calculados desde la BOM y matriz `ESCENARIO` de precios y márgenes
 
 ### 4.1 Origen exacto de cada columna
-- **Columna `BOM sin IVA` (`calculado + fuente 2026-11-26`)**: suma exacta verificada por [`hardware/modules/shared/verify-bom.mjs`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/shared/verify-bom.mjs) a precios unitarios de minorista europeo (*TinyTronics B.V.* y *Ruthex GmbH*, consultados el `2026-11-26`; compras en volumen B2B reducirían la BOM, pero no se asume ningún descuento no cotizado).
+- **Columna `BOM sin IVA` (`calculado + fuente 2026-11-26`)**: suma exacta verificada por [`hardware/modules/shared/verify-bom.mjs`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/shared/verify-bom.mjs) a precios unitarios de minorista europeo (*TinyTronics B.V.* y *Ruthex GmbH*, consultados el `2026-11-26`; compras en volumen B2B reducirían la BOM, pero no se asume ningún descuento no cotizado).
 - **Supuestos explícitos de `ESCENARIO` operativo (sin fuente externa, declarados para modelización financiera transparente)**:
   - `Embalaje ESD + caja reciclable + etiqueta` (`ESCENARIO`): **`2,50 €`** sin IVA por unidad.
   - `Mano de obra de montaje, flasheo, prueba funcional individual y provisión del 4 % de garantía` (`ESCENARIO`, solo en unidad montada): **`14,00 €`** sin IVA en módulos compactos ($\approx 35\text{ min}$) y **`18,00 €`** sin IVA en la Estación Hidrometeo y Humo ($\approx 45\text{ min}$).
@@ -101,7 +101,8 @@ Para proteger la credibilidad técnica ante UME, FCSE y comités de emergencia, 
 - **Base legal oficial de Baterías**: **Reglamento (UE) 2023/1542** sobre las pilas y baterías y sus residuos (<https://eur-lex.europa.eu/eli/reg/2023/1542/oj>) y transporte **ONU `UN 38.3`**:
   - Exigir informe de ensayo **`UN 38.3`** completo al proveedor de las celdas `LP503562` / `250 mAh`, inscripción en la sección de pilas/acumuladores del Registro Integrado Industrial y diseño que permita al usuario final **sustituir la batería con herramientas comunes** (cumplido: conector JST y 2/4 tornillos `M2.5`, sin pegamento estructural permanente).
 
-### 5.4 Tasas oficiales verificadas de **Bluetooth SIG** (consultadas el `2026-11-26`)
+### 5.4 Tasas de **Bluetooth SIG** (anotadas el `2026-11-26`; **no verificado** en la revisión)
+- **Estado**: la revisión del 26-11-2026 no pudo abrir la página oficial (bluetooth.com rechaza el acceso automático, HTTP 403). Las cifras de abajo son las anotadas al redactar: **confirmarlas en un navegador antes de usarlas en un presupuesto**.
 - **Fuente primaria oficial**: *Bluetooth SIG Fee Schedule* (vigente desde el `01 de marzo de 2026`, <https://www.bluetooth.com/fee-schedule/>):
   - Cuota anual membresía **Adopter**: **`0 USD`**.
   - Cuota anual membresía **Contributing Adopter**: **`3.500 USD/año`**.

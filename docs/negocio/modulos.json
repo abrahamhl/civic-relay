@@ -200,7 +200,8 @@
           "companyIdentifierOneTimeUsd": 1250,
           "adopterQualificationFeeUsd": 12000,
           "contributingAdopterFirstQualificationFeeUsd": 8000,
-          "contributingAdopterAnnualFeeUsd": 3500
+          "contributingAdopterAnnualFeeUsd": 3500,
+          "reviewStatus": "no verificado en la revisión del 26-11-2026: bluetooth.com rechaza el acceso automático (HTTP 403); confirmar en un navegador antes de presupuestar"
         },
         "labTestingCostEur": "no verificado"
       },

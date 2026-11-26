@@ -16,9 +16,9 @@
 
 | Capa de SENDA | Módulo / Ruta | Función exacta |
 |---|---|---|
-| **Codificación de baliza de emergencia** | [`packages/senda/src/beacon.mjs`](file:///home/antigravity/abrahamhl/civic-relay/packages/senda/src/beacon.mjs) · `SendaFormats.java` | Empaqueta estado de emergencia, contador monotónico anti-repetición y nivel de batería en carga compacta BLE sin datos personales (0 PII). |
-| **Estimación geométrica bajo obstáculos** | [`packages/senda/src/rubble.mjs`](file:///home/antigravity/abrahamhl/civic-relay/packages/senda/src/rubble.mjs) | Calcula anillo de distancia e incertidumbre explícita a partir de lecturas `RSSI` desde varias posiciones de paso (sin prometer precisión centimétrica irreal). |
-| **Barrido coordinado de edificios** | [`packages/senda/src/house-sweep.mjs`](file:///home/antigravity/abrahamhl/civic-relay/packages/senda/src/house-sweep.mjs) | Registra detección de balizas durante inspecciones puerta a puerta. |
+| **Codificación de baliza de emergencia** | [`packages/senda/src/beacon.mjs`](https://github.com/abrahamhl/civic-relay/blob/master/packages/senda/src/beacon.mjs) · `SendaFormats.java` | Empaqueta estado de emergencia, contador monotónico anti-repetición y nivel de batería en carga compacta BLE sin datos personales (0 PII). |
+| **Estimación geométrica bajo obstáculos** | [`packages/senda/src/rubble.mjs`](https://github.com/abrahamhl/civic-relay/blob/master/packages/senda/src/rubble.mjs) | Calcula anillo de distancia e incertidumbre explícita a partir de lecturas `RSSI` desde varias posiciones de paso (sin prometer precisión centimétrica irreal). |
+| **Barrido coordinado de edificios** | [`packages/senda/src/house-sweep.mjs`](https://github.com/abrahamhl/civic-relay/blob/master/packages/senda/src/house-sweep.mjs) | Registra detección de balizas durante inspecciones puerta a puerta. |
 | **Pantallas de la aplicación** | `/senda/barrido` · `/senda/conducir` (`📡 Señales`) | Escaneo pasivo y representación inmediata de balizas cercanas en móvil y escritorio. |
 
 ---
@@ -48,8 +48,8 @@
   - **Unitario prorrateado**: **`24,28 €` IVA incl.** (`20,08 €` sin IVA).
   - **Compra inicial con bobina/bolsas completas**: **`47,50 €` IVA incl.**
 - **CAD, STL, GLB y renders 4D**:
-  - [`cad/senda_baliza_ble.scad`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-baliza-ble/cad/senda_baliza_ble.scad) → [`stl/bottom_shell.stl`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-baliza-ble/stl/bottom_shell.stl) + [`stl/top_shell.stl`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-baliza-ble/stl/top_shell.stl) ($16,619\text{ cm}^3$ sólidos, $20\text{ g}$ PETG, $1\text{ h }15\text{ min}$ `ESCENARIO`).
-  - [`glb/senda-baliza-ble.glb`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-baliza-ble/glb/senda-baliza-ble.glb): **`241,08 KB`** (`< 2 MB`).
-  - [`renders/turntable-360.{mp4,webm}`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-baliza-ble/renders/turntable-360.mp4) y [`renders/exploded-4d.{mp4,webm}`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-baliza-ble/renders/exploded-4d.mp4) (`1920×1080`, $8,0\text{ s}$, rotulados `render`).
+  - [`cad/senda_baliza_ble.scad`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-baliza-ble/cad/senda_baliza_ble.scad) → [`stl/bottom_shell.stl`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-baliza-ble/stl/bottom_shell.stl) + [`stl/top_shell.stl`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-baliza-ble/stl/top_shell.stl) ($16,619\text{ cm}^3$ sólidos, $20\text{ g}$ PETG, $1\text{ h }15\text{ min}$ `ESCENARIO`).
+  - [`glb/senda-baliza-ble.glb`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-baliza-ble/glb/senda-baliza-ble.glb): **`241,08 KB`** (`< 2 MB`).
+  - [`renders/turntable-360.{mp4,webm}`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-baliza-ble/renders/turntable-360.mp4) y [`renders/exploded-4d.{mp4,webm}`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-baliza-ble/renders/exploded-4d.mp4) (`1920×1080`, $8,0\text{ s}$, rotulados `render`).
 - **Licencias**: carcasa OpenSCAD, STL/GLB y formato de trama SENDA bajo **MIT License**; esquemático de hardware XIAO BLE abierto por Seeed Studio.
 - **Camino CE**: **RED 2014/53/UE** (`ETSI EN 300 328`, `EN 301 489-1/-17`, `EN IEC 62368-1`, `EN 62479`), **RoHS**, **RAEE**, **UN 38.3** de batería Li-Po y cualificación **Bluetooth SIG**.

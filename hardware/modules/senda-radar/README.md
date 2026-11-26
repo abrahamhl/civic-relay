@@ -4,8 +4,8 @@
 > **Aviso legal y de veracidad**:
 > - Este módulo **no está a la venta**. La comercialización en la Unión Europea exige evaluación de conformidad y marcado **CE** bajo la **Directiva 2014/53/UE (RED)**, **RoHS (2011/65/UE + UE 2015/863)** y registro **RAEE (RD 110/2015)**.
 > - El sensor **Ai-Thinker Rd-03D / Hi-Link HLK-LD2450** entrega coordenadas $(x, y)$ y velocidad radial de **hasta 3 objetivos EN MOVIMIENTO** dentro de $\pm 60^\circ$ / $8\text{ m}$. No detecta con fiabilidad personas inmóviles ni distingue una persona de un animal o vegetación movida por el viento.
-> - Todos los vídeos e imágenes de [`renders/`](file:///home/antigravity/abrahamhl/civic-relay/hardware/modules/senda-radar/renders) están rotulados como **`render`** (generados por código mediante Three.js + OpenSCAD; no son fotografías de un producto fabricado).
-> - La precisión empírica en campo de SENDA permanece **`pendiente de medir`** hasta que se registren sesiones reales con hardware físico según [`packages/senda/data/mmwave/PROTOCOLO_MEDIDA.md`](file:///home/antigravity/abrahamhl/civic-relay/packages/senda/data/mmwave/PROTOCOLO_MEDIDA.md).
+> - Todos los vídeos e imágenes de [`renders/`](https://github.com/abrahamhl/civic-relay/blob/master/hardware/modules/senda-radar/renders) están rotulados como **`render`** (generados por código mediante Three.js + OpenSCAD; no son fotografías de un producto fabricado).
+> - La precisión empírica en campo de SENDA permanece **`pendiente de medir`** hasta que se registren sesiones reales con hardware físico según [`packages/senda/data/mmwave/PROTOCOLO_MEDIDA.md`](https://github.com/abrahamhl/civic-relay/blob/master/packages/senda/data/mmwave/PROTOCOLO_MEDIDA.md).
 
 ---
 
@@ -53,10 +53,10 @@ hardware/modules/senda-radar/
 
 | Capa de SENDA | Archivo / Ruta | Cómo interactúa con SENDA Radar v1 |
 |---|---|---|
-| **Parser y cinemática del núcleo** | [`packages/senda/src/mmwave-radar.mjs`](file:///home/antigravity/abrahamhl/civic-relay/packages/senda/src/mmwave-radar.mjs) | Consume directamente las tramas `AA FF 03 00 … 55 CC` a `256000 8N1` reenviadas sin alteración por `TransparentBridge` y envía las órdenes `FD FC FB FA …` (`MULTI_TARGET_CMD`, etc.). |
-| **Grabador e integridad SHA-256** | [`packages/senda/src/mmwave-field.mjs`](file:///home/antigravity/abrahamhl/civic-relay/packages/senda/src/mmwave-field.mjs) | Empaqueta sesiones `senda-campo-*.json` con huella `SHA-256` verificables por [`mmwave-field-report.mjs`](file:///home/antigravity/abrahamhl/civic-relay/packages/senda/scripts/mmwave-field-report.mjs). |
+| **Parser y cinemática del núcleo** | [`packages/senda/src/mmwave-radar.mjs`](https://github.com/abrahamhl/civic-relay/blob/master/packages/senda/src/mmwave-radar.mjs) | Consume directamente las tramas `AA FF 03 00 … 55 CC` a `256000 8N1` reenviadas sin alteración por `TransparentBridge` y envía las órdenes `FD FC FB FA …` (`MULTI_TARGET_CMD`, etc.). |
+| **Grabador e integridad SHA-256** | [`packages/senda/src/mmwave-field.mjs`](https://github.com/abrahamhl/civic-relay/blob/master/packages/senda/src/mmwave-field.mjs) | Empaqueta sesiones `senda-campo-*.json` con huella `SHA-256` verificables por [`mmwave-field-report.mjs`](https://github.com/abrahamhl/civic-relay/blob/master/packages/senda/scripts/mmwave-field-report.mjs). |
 | **Aplicación web (Web Serial)** | `/senda/personas` | Botón **«Conectar radar (USB)»** y asistente **«Práctica de campo»**. |
-| **APK nativa Android (USB-OTG)** | `android/.../MmWaveUsbSerialBridge.java` | Reconoce el CDC-ACM nativo de la XIAO ESP32-S3 (`VID 0x2886`, `PID 0x0056` / ESP32-S3 USB JTAG/serial) a `256000 8N1`. |
+| **APK nativa Android (USB-OTG)** | `apps/senda-android/.../UsbSerialBridge.java` | Admite CH340, CP210x, FTDI y CDC-ACM (este último por clase de interfaz USB), que es como se presenta el USB nativo de la XIAO ESP32-S3. **Pendiente de probar con la placa física** (VID/PID reales anotados en la primera conexión). |
 
 ---
 
@@ -113,4 +113,4 @@ node hardware/modules/senda-radar/scripts/build-glb-and-metrics.mjs
 node hardware/modules/senda-radar/scripts/render-4d.mjs
 ```
 
-El workflow de integración continua [`.github/workflows/senda-radar-firmware-ci.yml`](file:///home/antigravity/abrahamhl/civic-relay/.github/workflows/senda-radar-firmware-ci.yml) ejecuta en cada PR las pruebas nativas C++17 en el host y compila el binario real `firmware.ino.bin` para `esp32:esp32:XIAO_ESP32S3` con `arduino-cli` descargado desde su release oficial, publicando el artefacto junto con su huella `SHA-256`.
+El workflow de integración continua [`.github/workflows/senda-radar-firmware-ci.yml`](https://github.com/abrahamhl/civic-relay/blob/master/.github/workflows/senda-radar-firmware-ci.yml) ejecuta en cada PR las pruebas nativas C++17 en el host y compila el binario real `firmware.ino.bin` para `esp32:esp32:XIAO_ESP32S3` con `arduino-cli` descargado desde su release oficial, publicando el artefacto junto con su huella `SHA-256`.
