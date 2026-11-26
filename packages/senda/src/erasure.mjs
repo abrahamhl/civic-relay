@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * SENDA · Codificación por borrado k-de-n (Reed-Solomon sistemático sobre GF(2^8)).
  *

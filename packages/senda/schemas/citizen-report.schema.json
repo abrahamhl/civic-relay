@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://senda.civic-relay.eu/schemas/citizen-report.schema.json",
+  "title": "SENDA Signed Citizen Report Envelope Contract",
+  "type": "object",
+  "required": ["schema", "basis", "operationalStatus", "reportId", "payload", "contentSha256", "signature", "canPublicWarn"],
+  "properties": {
+    "schema": { "type": "string", "pattern": "^senda\\.citizen-report/v\\d+$" },
+    "basis": { "const": "CITIZEN" },
+    "operationalStatus": { "type": "string", "enum": ["ACTUAL", "EXERCISE", "SIMULATION"] },
+    "reportId": { "type": "string", "pattern": "^cr_[a-f0-9]{20}$" },
+    "canPublicWarn": { "const": false },
+    "contentSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "signature": {
+      "type": "object",
+      "required": ["alg", "publicKeyB64u", "pseudonymId", "sigB64u"],
+      "properties": {
+        "alg": { "const": "Ed25519" },
+        "publicKeyB64u": { "type": "string", "minLength": 32 },
+        "pseudonymId": { "type": "string", "minLength": 8 },
+        "sigB64u": { "type": "string", "minLength": 64 }
+      }
+    },
+    "payload": {
+      "type": "object",
+      "required": ["schema", "basis", "operationalStatus", "kind", "capturedAtIso", "capturedAtMs", "location", "consent", "channelOrigin"],
+      "properties": {
+        "schema": { "type": "string", "pattern": "^senda\\.citizen-report/v\\d+$" },
+        "basis": { "const": "CITIZEN" },
+        "operationalStatus": { "type": "string", "enum": ["ACTUAL", "EXERCISE", "SIMULATION"] },
+        "kind": { "type": "string", "minLength": 2 },
+        "capturedAtIso": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$"
+        },
+        "capturedAtMs": { "type": "number" },
+        "channelOrigin": { "type": "string", "minLength": 2 },
+        "location": {
+          "type": "object",
+          "required": ["lat", "lon", "accuracyM"],
+          "properties": {
+            "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+            "lon": { "type": "number", "minimum": -180, "maximum": 180 },
+            "accuracyM": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        "consent": {
+          "type": "object",
+          "required": ["accepted"],
+          "properties": {
+            "accepted": { "const": true }
+          }
+        }
+      }
+    }
+  }
+}

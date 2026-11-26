@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * SENDA · Motor de propagación de incendios forestales: Rothermel (1972) + Scott & Burgan (2005)
  * + frente 2D Level-Set / Huygens elíptico (Finney 1998 / Osher & Sethian 1988) + conjunto probabilista.

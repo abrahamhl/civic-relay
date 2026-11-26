@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * SENDA · orientación fusionada: hacia dónde miras (brújula con compensación de inclinación) y hacia dónde vas (rumbo GPS).
  *

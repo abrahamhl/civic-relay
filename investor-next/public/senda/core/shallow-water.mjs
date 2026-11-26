@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * SENDA · motor hidrodinámico 2D de aguas someras (formulación inercial simplificada).
  *
@@ -107,8 +108,13 @@ export function step(S, dtMax, sources = []) {
   return dt;
 }
 
-/** Avanza hasta tEnd (s) con un hidrograma Q(t) repartido entre las celdas de entrada. onFrame(t) cada frameEvery s. */
-export function runUntil(S, tEnd, { inflow = () => 0, cells = [], dtMax = 10, frameEvery = 0, onFrame = null } = {}) {
+/**
+ * Avanza hasta tEnd (s) con un hidrograma Q(t) repartido entre las celdas de entrada. onFrame(t) cada frameEvery s.
+ * @param {any} S
+ * @param {number} tEnd
+ * @param {{ inflow?: (t: number) => number, cells?: number[], dtMax?: number, frameEvery?: number, onFrame?: ((t: number) => void) | null }} [opts]
+ */
+export function runUntil(S, tEnd, { inflow = /** @type {(t: number) => number} */ (() => 0), cells = [], dtMax = 10, frameEvery = 0, onFrame = null } = {}) {
   let nextFrame = frameEvery ? Math.ceil(S.t / frameEvery) * frameEvery : Infinity;
   while (S.t < tEnd - 1e-9) {
     const q = inflow(S.t), src = q > 0 && cells.length ? cells.map((k) => ({ k, q: q / cells.length })) : [];

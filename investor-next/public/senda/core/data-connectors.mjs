@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * SENDA · conectores de datos: cómo un organismo enchufa SUS redes y sensores (aforos, pluviómetros, umbrales)
  * a los simuladores y al motor de prevención, con validación estricta y procedencia.
@@ -48,6 +49,8 @@ function splitCsv(line, sep) {
  * Lee una serie de un CSV («hora,valor» con cabecera; separador , o ;; decimales con punto o coma si el
  * separador es ;) o de un JSON ([{hora, valor}] o {serie:[...]}).
  * Devuelve { ok, kind, unit, points:[{tMs, iso, value}], errors:[{line, msg}], meta }.
+ * @param {string} text
+ * @param {{ kind?: string, station?: string | null, source?: { name?: string, license?: string, url?: string } | null }} [opts]
  */
 export function parseSeries(text, { kind, station = null, source = null } = {}) {
   const K = SERIES_KINDS[kind]; const errors = [], points = [];
