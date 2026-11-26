@@ -85,3 +85,20 @@ export function announcement(next, alreadySaid, rules = NAV_RULES) {
   alreadySaid.add(key);
   return band <= 30 ? next.step.text : `En ${Math.round(next.distM / 10) * 10} metros, ${next.step.text.charAt(0).toLowerCase()}${next.step.text.slice(1)}`;
 }
+
+/**
+ * Ajusta la posición a la línea de la ruta (como hacen los navegadores): el punto más cercano de la polilínea si está a
+ * menos de maxM metros (maxM lo decide quien llama, p. ej. la precisión del GPS). Devuelve { at:[lon,lat], offM, segIdx } o null.
+ */
+export function snapToRoute(coords, pos, maxM) {
+  if (!Array.isArray(coords) || coords.length < 2 || !pos || !(maxM > 0)) return null;
+  const R = 6371008.8, D = Math.PI / 180, kx = Math.cos(pos[1] * D) * R * D, ky = R * D;
+  let best = null;
+  for (let i = 1; i < coords.length; i++) {
+    const ax = (coords[i - 1][0] - pos[0]) * kx, ay = (coords[i - 1][1] - pos[1]) * ky, bx = (coords[i][0] - pos[0]) * kx, by = (coords[i][1] - pos[1]) * ky;
+    const dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy, t = L2 ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / L2)) : 0;
+    const px = ax + t * dx, py = ay + t * dy, d = Math.hypot(px, py);
+    if (!best || d < best.offM) best = { offM: d, at: [pos[0] + px / kx, pos[1] + py / ky], segIdx: i - 1 };
+  }
+  return best && best.offM <= maxM ? { ...best, offM: +best.offM.toFixed(1) } : null;
+}
