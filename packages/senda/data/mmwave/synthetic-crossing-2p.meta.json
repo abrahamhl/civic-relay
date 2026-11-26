@@ -1,0 +1,40 @@
+{
+  "schema": "senda.mmwave-recording/v1",
+  "file": "synthetic-crossing-2p.jsonl",
+  "basis": "SIMULATION",
+  "sensor": "RD-03D/LD2450 (sintético, sin hardware físico)",
+  "frames": 51,
+  "rateHz": 10,
+  "sha256": "8a1da7a1765b02cdb9cfa8a70cee8d45a5bb6d4a2662caf11bf630c3dd82a8a3",
+  "note": "Grabación SINTÉTICA determinista de referencia para regresión del parser y tracker (dos objetivos que se cruzan a 3,0 m y 3,4 m). NO es una medida de campo ni certifica precisión de hardware.",
+  "groundTruth": {
+    "trackA": {
+      "startMm": [
+        -2000,
+        3000
+      ],
+      "endMm": [
+        2000,
+        3000
+      ],
+      "vxMms": 800,
+      "vyMms": 0
+    },
+    "trackB": {
+      "startMm": [
+        2000,
+        3400
+      ],
+      "endMm": [
+        -2000,
+        3400
+      ],
+      "vxMms": -800,
+      "vyMms": 0
+    },
+    "tolerances": {
+      "maxFinalPosErrorMm": 150,
+      "maxFinalVelErrorMms": 120
+    }
+  }
+}

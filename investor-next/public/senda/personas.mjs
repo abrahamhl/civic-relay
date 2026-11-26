@@ -47,9 +47,51 @@ function started(kind, label, stop) {
 function stopAll() { if (stopFn) { try { stopFn(); } catch {} } stopFn = null; source = null; $('stop').disabled = true; recording = false; }
 $('stop').onclick = () => { stopAll(); setBasis('', 'Parado'); log('Parado'); };
 
-// ---- Radar real por USB (Web Serial) ----
-if (!('serial' in navigator)) { $('connect').disabled = true; $('serialNote').textContent = 'Este navegador no tiene Web Serial. Use Chrome o Edge de escritorio, o abra una grabación.'; }
+// ---- Radar real por USB: Web Serial (Chrome/Edge escritorio) o USB-OTG nativo en APK Android ----
+const hasWebSerial = 'serial' in navigator;
+const hasAndroidUsb = !!(window.SendaNative && typeof window.SendaNative.usbList === 'function');
+const b64Of = (bytes) => btoa(String.fromCharCode(...bytes));
+const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+
+if (!hasWebSerial && hasAndroidUsb) {
+  $('connect').textContent = 'Conectar radar (USB-OTG Android)';
+  $('serialNote').textContent = 'Puente nativo USB-OTG de SENDA Android disponible (CH340, CP210x, FTDI, CDC-ACM a 256000 8N1). Conecte el adaptador por cable OTG.';
+} else if (!hasWebSerial) {
+  $('connect').disabled = true;
+  $('serialNote').textContent = 'Este navegador no tiene Web Serial. Use Chrome/Edge de escritorio, la APK de SENDA Android (USB-OTG) o abra una grabación.';
+}
+
 $('connect').onclick = async () => {
+  if (!hasWebSerial && hasAndroidUsb) {
+    let devs = [];
+    try { devs = JSON.parse(window.SendaNative.usbList() || '[]'); } catch (e) { log(`Error listando USB-OTG: ${e.message}`); return; }
+    if (!devs.length) { log('No se detectó ningún adaptador USB-serie (CH340/CP210x/FTDI/CDC-ACM). Conecte el cable OTG.'); return; }
+    const dev = devs[0];
+    let alive = true, iv = null;
+    const sendMultiUsb = () => {
+      for (const c of [CMD.ENABLE_CONFIG, CMD.MULTI_TARGET, CMD.END_CONFIG]) {
+        window.SendaNative.usbWrite(b64Of(c));
+      }
+    };
+    window.sendaUsbSerial = (b64) => { if (alive) feed(unb64(b64)); };
+    window.sendaUsbStatus = (ev) => {
+      if (!ev) return;
+      log(`USB-OTG [${ev.event}]: ${ev.detail}`);
+      if (ev.event === 'open' && alive) {
+        sendMultiUsb();
+        clearInterval(iv);
+        iv = setInterval(() => { if (alive) sendMultiUsb(); }, 60_000);
+      }
+    };
+    started('serial', `Radar real por USB-OTG Android (${dev.driver}, 256000 baudios)`, () => {
+      alive = false; clearInterval(iv);
+      window.sendaUsbSerial = null; window.sendaUsbStatus = null;
+      try { window.SendaNative.usbClose(); } catch {}
+    });
+    recording = true; rec = [];
+    if (!window.SendaNative.usbOpen(dev.deviceId)) { stopAll(); setBasis('', 'Error al abrir USB-OTG'); }
+    return;
+  }
   let port;
   try { port = await navigator.serial.requestPort(); await port.open(SERIAL); } catch (e) { log(`No se abrió el puerto: ${e.message}`); return; }
   let alive = true, reader;
