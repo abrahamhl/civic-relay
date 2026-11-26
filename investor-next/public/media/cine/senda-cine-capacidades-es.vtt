@@ -1,0 +1,85 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:08.323
+En una emergencia, cada minuto cuenta, y la información llega rota: unos ven el agua, otros tienen el dato, y nadie lo une a tiempo.
+
+2
+00:00:08.673 --> 00:00:15.862
+SENDA une lo que ya existe, móviles, sensores, satélites y datos públicos, y lo convierte en avisos que llegan antes.
+
+3
+00:00:17.462 --> 00:00:28.641
+29 de octubre de 2024. A las 18:55, el aforo del barranco del Poyo midió 2.282 metros cúbicos por segundo.
+
+4
+00:00:28.991 --> 00:00:33.492
+El primer ES-Alert llegó a las 20:11: setenta y seis minutos después.
+
+5
+00:00:33.842 --> 00:00:39.581
+SENDA recrea la crecida sobre el relieve real con las ecuaciones de aguas someras, minuto a minuto.
+
+6
+00:00:39.931 --> 00:00:44.155
+Y la compara celda a celda con el agua que vio el satélite Copernicus.
+
+7
+00:00:45.755 --> 00:00:53.392
+18 de enero de 2026, Adamuz. Entre la primera anomalía del Iryo y el choque con el Alvia pasaron trece segundos.
+
+8
+00:00:53.742 --> 00:00:58.670
+La primera llamada al 112 llegó sesenta y nueve segundos después del choque.
+
+9
+00:00:59.020 --> 00:01:05.633
+Pero confirmar que había un segundo tren descarrilado costó treinta y dos minutos y cuarenta y siete segundos.
+
+10
+00:01:05.983 --> 00:01:11.530
+SENDA ordena cada dato al segundo, con su fuente, para que todos vean la misma imagen a la vez.
+
+11
+00:01:13.130 --> 00:01:18.399
+Un radar de 24 gigahercios ve moverse hasta tres personas, a oscuras o con humo.
+
+12
+00:01:18.749 --> 00:01:24.957
+SENDA lee sus tramas, sigue a cada persona con un filtro de Kalman y mantiene su identidad aunque se crucen.
+
+13
+00:01:25.307 --> 00:01:32.731
+Se calibra en el campo con una cinta métrica, y cada sesión se guarda con su huella digital para que cualquiera pueda comprobarla.
+
+14
+00:01:34.331 --> 00:01:40.987
+El primer módulo físico de SENDA: el radar, una pantalla y una batería, en una carcasa que se imprime en 3D.
+
+15
+00:01:41.337 --> 00:01:45.561
+Se conecta al móvil por USB y habla el mismo idioma que la aplicación.
+
+16
+00:01:47.161 --> 00:01:54.969
+En la carretera, SENDA fusiona la brújula y el GPS: la flecha gira aunque estés parado y aprende el error que mete el metal del coche.
+
+17
+00:01:55.319 --> 00:01:59.586
+Y si hay un coche detenido en tu carril, el aviso llega antes de que lo veas.
+
+18
+00:02:01.186 --> 00:02:09.485
+Si cae la cobertura, cada mensaje se divide en fragmentos que viajan a la vez por todos los caminos vivos: Bluetooth, wifi, radio e internet.
+
+19
+00:02:09.835 --> 00:02:12.992
+Basta con que lleguen algunos para reconstruirlo entero.
+
+20
+00:02:13.342 --> 00:02:19.955
+Y el aviso público lo firma siempre una persona con autoridad: SENDA prepara la decisión, la persona decide.
+
+21
+00:02:21.555 --> 00:02:26.654
+SENDA. Coordinar hasta que llega la ayuda, y ayudar a los que ayudan a coordinarse mejor.

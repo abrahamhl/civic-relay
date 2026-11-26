@@ -1,0 +1,197 @@
+{
+ "note": "Película de capacidades de SENDA (noviembre de 2026). Cifras de los archivos citados en 'source'.",
+ "voices": {
+  "es": {
+   "voice": "ef_dora",
+   "lang": "es",
+   "speed": 0.95
+  }
+ },
+ "scenes": [
+  {
+   "id": "c1",
+   "claim": "CALCULATED",
+   "source": [
+    "docs/continuity/SENDA_SESSION_HANDOFF.md"
+   ],
+   "visual": {
+    "kind": "title"
+   },
+   "title": {
+    "es": "SENDA"
+   },
+   "es": [
+    "En una emergencia, cada minuto cuenta, y la información llega rota: unos ven el agua, otros tienen el dato, y nadie lo une a tiempo.",
+    "SENDA une lo que ya existe, móviles, sensores, satélites y datos públicos, y lo convierte en avisos que llegan antes."
+   ],
+   "es_say": [
+    "En una emergencia, cada minuto cuenta, y la información llega rota: unos ven el agua, otros tienen el dato, y nadie lo une a tiempo.",
+    "Senda une lo que ya existe, móviles, sensores, satélites y datos públicos, y lo convierte en avisos que llegan antes."
+   ]
+  },
+  {
+   "id": "c2",
+   "claim": "MODEL_CALIBRATED_AGAINST_OBSERVED",
+   "source": [
+    "investor-next/public/senda/data/dana2024/telemetria.json",
+    "investor-next/public/senda/data/dana2024/swe.json",
+    "investor-next/public/senda/data/dana2024/dem_d4.bin"
+   ],
+   "visual": {
+    "kind": "dana"
+   },
+   "title": {
+    "es": "Agua · la DANA de Valencia en 4D"
+   },
+   "es": [
+    "29 de octubre de 2024. A las 18:55, el aforo del barranco del Poyo midió 2.282 metros cúbicos por segundo.",
+    "El primer ES-Alert llegó a las 20:11: setenta y seis minutos después.",
+    "SENDA recrea la crecida sobre el relieve real con las ecuaciones de aguas someras, minuto a minuto.",
+    "Y la compara celda a celda con el agua que vio el satélite Copernicus."
+   ],
+   "es_say": [
+    "Veintinueve de octubre de dos mil veinticuatro. A las seis y cincuenta y cinco de la tarde, el aforo del barranco del Poyo midió dos mil doscientos ochenta y dos metros cúbicos por segundo.",
+    "El primer es alert llegó a las ocho y once: setenta y seis minutos después.",
+    "Senda recrea la crecida sobre el relieve real con las ecuaciones de aguas someras, minuto a minuto.",
+    "Y la compara celda a celda con el agua que vio el satélite Copérnicus."
+   ]
+  },
+  {
+   "id": "c3",
+   "claim": "OBSERVED",
+   "source": [
+    "investor-next/public/senda/data/adamuz2026/cronologia.json"
+   ],
+   "visual": {
+    "kind": "rail"
+   },
+   "title": {
+    "es": "Trenes · Adamuz, segundo a segundo"
+   },
+   "es": [
+    "18 de enero de 2026, Adamuz. Entre la primera anomalía del Iryo y el choque con el Alvia pasaron trece segundos.",
+    "La primera llamada al 112 llegó sesenta y nueve segundos después del choque.",
+    "Pero confirmar que había un segundo tren descarrilado costó treinta y dos minutos y cuarenta y siete segundos.",
+    "SENDA ordena cada dato al segundo, con su fuente, para que todos vean la misma imagen a la vez."
+   ],
+   "es_say": [
+    "Dieciocho de enero de dos mil veintiséis, Adamuz. Entre la primera anomalía del Iryo y el choque con el Alvia pasaron trece segundos.",
+    "La primera llamada al uno uno dos llegó sesenta y nueve segundos después del choque.",
+    "Pero confirmar que había un segundo tren descarrilado costó treinta y dos minutos y cuarenta y siete segundos.",
+    "Senda ordena cada dato al segundo, con su fuente, para que todos vean la misma imagen a la vez."
+   ]
+  },
+  {
+   "id": "c4",
+   "claim": "SIMULATION",
+   "source": [
+    "packages/senda/src/mmwave-radar.mjs",
+    "packages/senda/src/mmwave-field.mjs"
+   ],
+   "visual": {
+    "kind": "radar"
+   },
+   "title": {
+    "es": "Personas · radar de 24 GHz"
+   },
+   "es": [
+    "Un radar de 24 gigahercios ve moverse hasta tres personas, a oscuras o con humo.",
+    "SENDA lee sus tramas, sigue a cada persona con un filtro de Kalman y mantiene su identidad aunque se crucen.",
+    "Se calibra en el campo con una cinta métrica, y cada sesión se guarda con su huella digital para que cualquiera pueda comprobarla."
+   ],
+   "es_say": [
+    "Un radar de veinticuatro gigahercios ve moverse hasta tres personas, a oscuras o con humo.",
+    "Senda lee sus tramas, sigue a cada persona con un filtro de Kálman y mantiene su identidad aunque se crucen.",
+    "Se calibra en el campo con una cinta métrica, y cada sesión se guarda con su huella digital para que cualquiera pueda comprobarla."
+   ]
+  },
+  {
+   "id": "c5",
+   "claim": "DESIGN_RENDER",
+   "source": [
+    "docs/continuity/PROMPT_ANTIGRAVITY_HARDWARE_MODULOS.md",
+    "hardware/mmwave-rd03d/README.md"
+   ],
+   "visual": {
+    "kind": "module"
+   },
+   "title": {
+    "es": "SENDA Radar · el primer módulo físico"
+   },
+   "es": [
+    "El primer módulo físico de SENDA: el radar, una pantalla y una batería, en una carcasa que se imprime en 3D.",
+    "Se conecta al móvil por USB y habla el mismo idioma que la aplicación."
+   ],
+   "es_say": [
+    "El primer módulo físico de Senda: el radar, una pantalla y una batería, en una carcasa que se imprime en tres de.",
+    "Se conecta al móvil por USB y habla el mismo idioma que la aplicación."
+   ]
+  },
+  {
+   "id": "c6",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/heading-fusion.mjs",
+    "packages/senda/src/road-guard.mjs"
+   ],
+   "visual": {
+    "kind": "drive"
+   },
+   "title": {
+    "es": "Carretera · la flecha que sabe hacia dónde miras"
+   },
+   "es": [
+    "En la carretera, SENDA fusiona la brújula y el GPS: la flecha gira aunque estés parado y aprende el error que mete el metal del coche.",
+    "Y si hay un coche detenido en tu carril, el aviso llega antes de que lo veas."
+   ],
+   "es_say": [
+    "En la carretera, Senda fusiona la brújula y el ge pe ese: la flecha gira aunque estés parado y aprende el error que mete el metal del coche.",
+    "Y si hay un coche detenido en tu carril, el aviso llega antes de que lo veas."
+   ]
+  },
+  {
+   "id": "c7",
+   "claim": "CALCULATED",
+   "source": [
+    "packages/senda/src/erasure.mjs",
+    "packages/senda/src/report-protocol.mjs"
+   ],
+   "visual": {
+    "kind": "mesh"
+   },
+   "title": {
+    "es": "Sin cobertura"
+   },
+   "es": [
+    "Si cae la cobertura, cada mensaje se divide en fragmentos que viajan a la vez por todos los caminos vivos: Bluetooth, wifi, radio e internet.",
+    "Basta con que lleguen algunos para reconstruirlo entero.",
+    "Y el aviso público lo firma siempre una persona con autoridad: SENDA prepara la decisión, la persona decide."
+   ],
+   "es_say": [
+    "Si cae la cobertura, cada mensaje se divide en fragmentos que viajan a la vez por todos los caminos vivos: bluetooth, wifi, radio e internet.",
+    "Basta con que lleguen algunos para reconstruirlo entero.",
+    "Y el aviso público lo firma siempre una persona con autoridad: Senda prepara la decisión, la persona decide."
+   ]
+  },
+  {
+   "id": "c8",
+   "claim": "CALCULATED",
+   "source": [
+    "investor-next/public/senda/index.html"
+   ],
+   "visual": {
+    "kind": "end"
+   },
+   "title": {
+    "es": "Coordinar hasta que llega la ayuda"
+   },
+   "es": [
+    "SENDA. Coordinar hasta que llega la ayuda, y ayudar a los que ayudan a coordinarse mejor."
+   ],
+   "es_say": [
+    "Senda. Coordinar hasta que llega la ayuda, y ayudar a los que ayudan a coordinarse mejor."
+   ]
+  }
+ ],
+ "chapter": "SENDA"
+}
