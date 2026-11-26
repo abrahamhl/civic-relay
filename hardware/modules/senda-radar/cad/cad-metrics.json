@@ -1,0 +1,107 @@
+{
+  "module": "senda-radar-v1",
+  "generatedBy": "hardware/modules/senda-radar/scripts/build-glb-and-metrics.mjs",
+  "generatedAt": "2026-11-26T13:38:00Z",
+  "petgDensityGCm3": 1.27,
+  "petgEurPerKgInclVat": 17.9,
+  "petgPriceQueryDate": "2026-11-26",
+  "slicerScenario": {
+    "basis": "ESCENARIO",
+    "note": "Estimación geométrica reproducible de laminador FDM (boquilla 0,4 mm, capa 0,20 mm, 5 perímetros, relleno gyroid 25 %, 0 soportes, caudal efectivo medio 3,5 mm³/s)",
+    "effectiveFillFactor": 0.9464,
+    "effectiveFlowMm3PerSec": 3.5
+  },
+  "parts": {
+    "front_bezel": {
+      "file": "stl/front_bezel.stl",
+      "bytes": 198884,
+      "sha256": "a46ff7e526d86c216e440e962b23b114df0993897523a560cdd6c69070e83bf0",
+      "printOrientation": "Cara frontal plana sobre la cama (Z=0), 0 soportes",
+      "triangles": 3976,
+      "bboxMm": {
+        "x": 76,
+        "y": 70,
+        "z": 13.8
+      },
+      "solidVolumeCm3": 17.085,
+      "surfaceAreaCm2": 192.71,
+      "slicerEstimate": {
+        "basis": "ESCENARIO",
+        "filamentGramsPetg": 20.53,
+        "printTimeMinutes": 77,
+        "filamentCostEurInclVat": 0.37
+      }
+    },
+    "rear_body": {
+      "file": "stl/rear_body.stl",
+      "bytes": 154684,
+      "sha256": "b7fcc554c56b6ac7871a68dc4b16176b18bad1560e7616e4ea16722024ea3b06",
+      "printOrientation": "Espalda exterior plana sobre la cama (Z=0), 0 soportes",
+      "triangles": 3092,
+      "bboxMm": {
+        "x": 76,
+        "y": 70,
+        "z": 16
+      },
+      "solidVolumeCm3": 28.352,
+      "surfaceAreaCm2": 220.6,
+      "slicerEstimate": {
+        "basis": "ESCENARIO",
+        "filamentGramsPetg": 34.08,
+        "printTimeMinutes": 128,
+        "filamentCostEurInclVat": 0.61
+      }
+    },
+    "belt_clip": {
+      "file": "stl/belt_clip.stl",
+      "bytes": 8084,
+      "sha256": "9addd768686c866daee7c504442a55cb2c778d0daf19399d43efa4f934aed9d6",
+      "printOrientation": "Apoyado sobre su canto lateral (rotado 90° en Y), 0 soportes",
+      "triangles": 160,
+      "bboxMm": {
+        "x": 13.57,
+        "y": 40,
+        "z": 46
+      },
+      "solidVolumeCm3": 9.367,
+      "surfaceAreaCm2": 71.96,
+      "slicerEstimate": {
+        "basis": "ESCENARIO",
+        "filamentGramsPetg": 11.26,
+        "printTimeMinutes": 42,
+        "filamentCostEurInclVat": 0.2
+      }
+    }
+  },
+  "totals": {
+    "solidVolumeCm3": 54.804,
+    "slicerEstimate": {
+      "basis": "ESCENARIO",
+      "totalFilamentGramsPetg": 65.87,
+      "billedFilamentGramsWithMargin": 66,
+      "totalPrintTimeMinutes": 247,
+      "totalPrintTimeFormatted": "4 h 7 min",
+      "totalFilamentCostEurInclVat": 1.18
+    }
+  },
+  "glb": {
+    "file": "glb/senda-radar-v1.glb",
+    "bytes": 606864,
+    "kilobytes": 592.64,
+    "under2MbLimit": true,
+    "sha256": "e4b7924c336992445c82a8601e0e8579d667da9ee172affd79f6e8b5336bd3cb",
+    "namedNodes": [
+      "rear_body",
+      "front_bezel",
+      "belt_clip",
+      "rd03d_radar_24ghz",
+      "oled_ssd1306",
+      "xiao_esp32s3",
+      "lipo_1200mah",
+      "boost_5v",
+      "switch_ss22g08",
+      "tripod_insert_1_4",
+      "m25_inserts_and_screws"
+    ]
+  }
+}
