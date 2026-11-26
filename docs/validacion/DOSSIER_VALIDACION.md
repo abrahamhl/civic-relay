@@ -120,7 +120,38 @@ La APK solo puede conectarse a una lista cerrada de servidores (`NetAllow.java`,
 | 0.1 · 6 h | 0.235 | 40 % / 64 % | 26.6 | 02:00 (30-10) | 6e-15 |
 | Modelo estático HAND | 0.168 | — | — | sin tiempo | — |
 
-**Lectura:** la simulación 2D **mejora la superficie un 40 %** frente al modelo estático. **Sus tiempos no son fiables**: el frente simulado avanza a ≈ 1 m/s, frente a los 14 m/s estimados por el CEDEX. Hay dos causas conocidas: la formulación inercial omite la advección, y la malla de 59 m no resuelve el cauce encauzado. Siguiente paso: un solver de volúmenes finitos completo (Kurganov y Petrova, 2007) con porosidad urbana, encargado al laboratorio de física (`docs/continuity/PROMPT_ANTIGRAVITY_FISICA_AVANZADA.md`).
+**Lectura:** la simulación 2D **mejora la superficie un 40 %** frente al modelo estático. **Sus tiempos no son fiables**: el frente simulado avanza a ≈ 1 m/s, frente a los 14 m/s estimados por el CEDEX. Hay dos causas conocidas: la formulación inercial omite la advección, y la malla de 59 m no resuelve el cauce encauzado.
+
+### Actualización F4 · Volúmenes finitos 2D (`shallow-water-fv.mjs`), celeridad de Manning y validación cruzada espacial
+
+Reproducible sin red con `node packages/senda/scripts/dana-f4-crossval.mjs` (informe sellado `evidence/quality/dana-f4-crossval.json`, SHA-256 `e7442c45cc5f194fe5619bb8f6097b9252f91d6b68d711375d8f0d7e3fb7cedf`).
+
+**Diagnóstico físico de la brecha de celeridad (ecuación de Manning, Chow 1959, `Q = 3 500 m³/s`):**
+
+| Régimen / geometría | Ancho $B$ | Pendiente $S_0$ | Manning $n$ | Calado $h$ | Velocidad $v$ | Celeridad cinemática $c_k$ | Froude $Fr$ | Origen |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| Barranco encajonado de Chiva | 30 m | 1,5 % | 0,030 | 9,02 m | **12,93 m/s** | 21,55 m/s | 1,37 (supercrítico) | calculado por este código |
+| Barranco de Chiva (sección 40 m) | 40 m | 1,2 % | 0,032 | 8,00 m | **10,94 m/s** | 18,23 m/s | 1,24 (supercrítico) | calculado por este código |
+| Celda gruesa sin sección subcelda | 118,1 m | 0,8 % | 0,045 | 5,23 m | **5,66 m/s** | 9,44 m/s | 0,79 (subcrítico) | calculado por este código |
+| Cono aluvial l'Horta Sud | 1 500 m | 0,25 % | 0,060 | 1,86 m | **1,26 m/s** | 2,09 m/s | 0,29 (subcrítico) | calculado por este código |
+
+Esta física explica por qué los **14 m/s preliminares del CEDEX** (en el barranco encajonado de Chiva) y los **≈ 1 m/s** del frente medio en el cono aluvial de l'Horta Sud no son contradictorios: en una malla de 59–118 m sin batimetría subcelda LiDAR (PNOA) el cauce se ensancha artificialmente y la velocidad cae a `4,7–5,8 m/s` en la garganta y a `≈ 1 m/s` en la llanura.
+
+**Antes / Después (F4, misma malla 118,1 m, Copernicus EMSR773 AOI03, conservación de masa < 10⁻¹⁴):**
+
+| Métrica (ROI oficial) | Antes · Bates (2010) uniforme ($n=0,10$, $R=6\text{ h}$) | Después · FV2D Audusse-HLLC + porosidad urbana Sanders (2008) + Manning CLC-proxy | Origen |
+|---|---:|---:|---|
+| CSI en toda la ROI (calibrado) | 0,2450 | 0,2311 (`fv_clc_breach0_R6`) | calculado por este código |
+| **CSI medio fuera de muestra (validación cruzada espacial 4 particiones N↔S, O↔E)** | **0,1834** | **0,2019 (+10,1 %)** | calculado por este código |
+| Brecha media de sobreajuste ($\text{CSI}_{\text{train}} - \text{CSI}_{\text{test}}$) | — | **+0,0128** | calculado por este código |
+| CSI fuera de muestra · mitad Sur (train Norte → test Sur) | 0,0000 | **0,1269** | calculado por este código |
+| CSI fuera de muestra · mitad Este (train Oeste → test Este) | 0,1677 | **0,2135 (+27,3 %)** | calculado por este código |
+| Velocidad punta en garganta de Chiva | — (inercial) | **4,69–5,80 m/s** (coherente con 5,66 m/s a 118 m) | calculado por este código |
+| Velocidad media del frente hasta Paiporta (18,3 km) | 0,53 m/s (572 min) | **1,08 m/s (282 min, ×2 más rápido)** | calculado por este código |
+
+*Aviso metodológico:* los coeficientes de Manning proceden literalmente de Chow (1959, Tabla 5-6) y Kalyanapu et al. (2009, Tabla 1), asignados mediante **proxy DEM+OSM** al no incluir todavía el ráster oficial CORINE/SIOSE del CNIG ni LiDAR PNOA de 1–2 m.
+
+**Auditoría completa de parámetros físicos (DANA, Incendio Rothermel/Scott-Burgan y Tren ETCS/Nadal/Kish-Samavedam):** véase [`docs/validacion/AUDITORIA_PARAMETROS_F4.md`](AUDITORIA_PARAMETROS_F4.md), donde cada constante lleva cita literal o marca explícita **`NO VERIFICADO`** / **`APROXIMACIÓN DE ORDEN REDUCIDO`**.
 
 ## 4 ter. Tren 4D · accidente de Adamuz (18-01-2026) · `rail-reconstruct.mjs`
 
