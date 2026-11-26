@@ -20,7 +20,8 @@ public final class NetAllow {
         "service.pdok.nl",                // ortofoto oficial de Países Bajos (PDOK, CC BY 4.0)
         "tms-pnoa-ma.idee.es",            // ortofoto oficial de España (PNOA, IGN, CC BY 4.0)
         "gibs.earthdata.nasa.gov",        // NASA GIBS: satélite del día, térmico, nubes, luces (sin restricciones)
-        "tile.opentopomap.org"            // mapa topográfico (CC BY-SA)
+        "tile.opentopomap.org",           // mapa topográfico (CC BY-SA)
+        "etraffic.dgt.es"                 // imágenes de las cámaras públicas de la DGT (solo lectura de JPG)
     );
     /** Hosts compartidos: solo una ruta concreta (el relieve de AWS, no cualquier contenedor de S3). */
     private static final String S3_HOST = "s3.amazonaws.com", S3_PATH = "/elevation-tiles-prod/terrarium/";

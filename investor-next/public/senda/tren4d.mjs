@@ -9,7 +9,7 @@ const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = (v, d = 0) => (v == null || !Number.isFinite(v) ? '–' : v.toLocaleString('es-ES', { maximumFractionDigits: d, minimumFractionDigits: d }));
 const LS = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* */ } } };
-const PRO = new URLSearchParams(location.search).has('pro') || !!window.__TAURI_INTERNALS__;
+const PRO = new URLSearchParams(location.search).has('pro') || !!window.__TAURI_INTERNALS__ || (() => { try { return localStorage.getItem('senda.pro') === '1'; } catch { return false; } })();
 const D = await fetch('/senda/data/adamuz2026/cronologia.json').then((r) => r.json());
 const EV = D.eventos.map((e) => ({ ...e, s: hms(e.t), unv: /no verificado/i.test(e.estado) }));
 const E = Object.fromEntries(EV.map((e) => [e.id, e]));

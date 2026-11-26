@@ -249,7 +249,7 @@ $('#grab').addEventListener('click', () => panelMini(!$('#panel').classList.cont
 panelMini(LS.get('senda.f4d.mini', true)); // empieza plegado: se ve el mapa
 if (!LS.get('senda.f4d.welcomed', false)) { LS.set('senda.f4d.welcomed', true); setTimeout(() => showInfo(HELP), 800); }
 // ── PRO (escritorio, ?pro=1): paquete de datos con procedencia y huellas, y vuelta al Command Center ──
-const PRO = new URLSearchParams(location.search).has('pro') || !!window.__TAURI_INTERNALS__;
+const PRO = new URLSearchParams(location.search).has('pro') || !!window.__TAURI_INTERNALS__ || (() => { try { return localStorage.getItem('senda.pro') === '1'; } catch { return false; } })();
 if (PRO) {
   const back = Object.assign(document.createElement('button'), { className: 'tb', textContent: '←', title: 'Volver al Command Center' });
   back.setAttribute('aria-label', 'Volver'); back.addEventListener('click', () => (history.length > 1 ? history.back() : (location.href = '/'))); $('#top').prepend(back);

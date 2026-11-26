@@ -102,6 +102,7 @@ function renderSettings() {
   $('#role-name').textContent = ROLE_NAME[me.role];
   $('#role-why').textContent = REASON[me.reason] || '';
   const isAdmin = me.role === ROLES.ADMIN;
+  try { localStorage.setItem('senda.pro', isAdmin ? '1' : '0'); } catch { /* */ } // administrador = módulos PRO (más resolución y exportaciones) también en el móvil
   $('#admin-zone').classList.toggle('hide', !isAdmin);
   $('#setup-zone').classList.toggle('hide', isAdmin || !!LS.get('anchor'));
   const issued = LS.get('issued', []);
