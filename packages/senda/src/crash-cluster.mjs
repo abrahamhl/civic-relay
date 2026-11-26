@@ -45,5 +45,5 @@ function summarize(items) {
 /** Icono compacto para el mapa: un solo símbolo con «×N» (no N iconos). confirmed → borde lleno; probable → discontinuo. */
 export function clusterIconSvg({ devices, state }, size = 44) {
   const s = size, c = s / 2, sure = state === 'CORROBORATED';
-  return `<svg viewBox="0 0 ${s} ${s}" width="${s}" height="${s}" aria-label="Accidente con ${devices} dispositivo${devices > 1 ? 's' : ''}"><circle cx="${c}" cy="${c}" r="${c - 3}" fill="#ff5b6e" fill-opacity=".92" stroke="#fff" stroke-width="2.5"${sure ? '' : ' stroke-dasharray="5 4"'}/><path d="M${c - 9} ${c + 1} l3-6 h12 l3 6 v5 h-18z" fill="#fff"/><text x="${c}" y="${s - 5}" text-anchor="middle" font-size="${Math.round(s / 4)}" font-weight="700" fill="#fff" font-family="Inter,system-ui">×${devices}</text></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${s} ${s}" width="${s}" height="${s}" aria-label="Accidente con ${devices} dispositivo${devices > 1 ? 's' : ''}"><circle cx="${c}" cy="${c}" r="${c - 3}" fill="#ff5b6e" fill-opacity=".92" stroke="#fff" stroke-width="2.5"${sure ? '' : ' stroke-dasharray="5 4"'}/><path d="M${c - 9} ${c + 1} l3-6 h12 l3 6 v5 h-18z" fill="#fff"/><text x="${c}" y="${s - 5}" text-anchor="middle" font-size="${Math.round(s / 4)}" font-weight="700" fill="#fff" font-family="Inter,system-ui">×${devices}</text></svg>`;
 }

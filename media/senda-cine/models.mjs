@@ -73,6 +73,36 @@ export function makeTruck() {
   return t;
 }
 
+/** Furgoneta de carga (~5,2 m × 2,0 m × 2,4 m), blanca, sin marca. Frontal hacia −z. */
+export function makeVan(color = '#e9ecee') {
+  const v = new THREE.Group();
+  const paint = new THREE.MeshPhysicalMaterial({ color, metalness: 0.35, roughness: 0.32, clearcoat: 0.9, clearcoatRoughness: 0.12 });
+  const glass = new THREE.MeshPhysicalMaterial({ color: '#0a1218', metalness: 0.2, roughness: 0.05, clearcoat: 1 });
+  const dark = new THREE.MeshStandardMaterial({ color: '#1b1f22', roughness: 0.7 });
+  const body = profileBody([[-2.6, 0.38], [2.45, 0.38], [2.62, 0.7], [2.55, 1.05], [1.95, 1.45], [1.45, 2.35], [-2.6, 2.4]], 2.0, 0.1, paint); v.add(body);
+  const ws = profileBody([[1.5, 1.5], [1.95, 1.47], [1.47, 2.3], [1.3, 2.3]], 1.84, 0.03, glass); v.add(ws);
+  for (const s of [-1, 1]) { const w = new THREE.Mesh(new THREE.PlaneGeometry(0.85, 0.55), glass); w.position.set(s * 1.012, 1.85, -1.05); w.rotation.y = s * Math.PI / 2; v.add(w);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.32, 0.2), dark); m.position.set(s * 1.12, 1.62, -1.55); v.add(m); }
+  const bump = new THREE.Mesh(new THREE.BoxGeometry(2.02, 0.28, 0.22), dark); bump.position.set(0, 0.5, -2.6); v.add(bump);
+  const rbump = new THREE.Mesh(new THREE.BoxGeometry(2.02, 0.22, 0.2), dark); rbump.position.set(0, 0.48, 2.62); v.add(rbump);
+  const seam = new THREE.Mesh(new THREE.BoxGeometry(0.02, 1.8, 0.02), dark); seam.position.set(0, 1.4, 2.66); v.add(seam);
+  for (const [x, z] of [[-0.9, -1.75], [0.9, -1.75], [-0.9, 1.75], [0.9, 1.75]]) { const w = wheel(0.36, 0.26); w.position.set(x, 0.36, z); v.add(w); }
+  const head = []; for (const x of [-0.72, 0.72]) { const s = lamp('#fff3da', 1.2); s.position.set(x, 0.92, -2.64); v.add(s); head.push(s); }
+  const tail = []; for (const x of [-0.92, 0.92]) { const s = lamp('#ff2a3a', 0.9); s.position.set(x, 1.0, 2.64); v.add(s); tail.push(s); }
+  const blink = []; for (const [x, z] of [[-0.95, -2.5], [0.95, -2.5], [-0.95, 2.6], [0.95, 2.6]]) { const s = lamp('#ffb020', 0.9); s.position.set(x, 1.2, z); s.visible = false; v.add(s); blink.push(s); }
+  v.userData = { head, tail, blink, paint };
+  return v;
+}
+
+/** Taxi genérico: turismo con la luz de techo (sin marca ni texto). */
+export function makeTaxi(color = '#f2f2ee') {
+  const t = makeCar(color);
+  const sign = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.18, 0.22), new THREE.MeshStandardMaterial({ color: '#f5f1e0', emissive: '#6e9a52', emissiveIntensity: 0.6 }));
+  sign.position.set(0, 1.64, -0.45); t.add(sign);
+  const glow = lamp('#9be38a', 0.7); glow.position.set(0, 1.66, -0.45); t.add(glow); t.userData.sign = glow;
+  return t;
+}
+
 /** Dron cuadrirrotor (~0,6 m de envergadura, escalado a la escena). */
 export function makeDrone(scale = 1) {
   const d = new THREE.Group(); const body = new THREE.MeshPhysicalMaterial({ color: '#e7ecef', metalness: 0.2, roughness: 0.35, clearcoat: 0.6 }); const dark = new THREE.MeshStandardMaterial({ color: '#202428', roughness: 0.5 });
