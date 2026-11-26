@@ -1,0 +1,306 @@
+{
+  "schemaVersion": "senda-hardware-catalog/1.0",
+  "generatedAtUtc": "2026-11-26T19:00:00Z",
+  "priceQueryDate": "2026-11-26",
+  "currency": "EUR",
+  "vatRateSpainPct": 21,
+  "vatRateSource": "Ley 37/1992 del Impuesto sobre el Valor Añadido (tipo general 21 %)",
+  "commercialNotice": "Ningún módulo está actualmente a la venta. Los diseños CAD, STL, GLB y el firmware se publican como hardware abierto (MIT); la venta comercial en la UE exige completar previamente el marcado CE (Directiva 2014/53/UE RED), RoHS y el registro RAEE documentados en docs/negocio/MODULOS_SENDA.md.",
+  "renderTruthNotice": "Todos los archivos visuales son renders 3D/4D generados por código (Three.js + OpenSCAD) y llevan el rótulo visible «render»; ninguno representa una fotografía de un producto fabricado.",
+  "modules": [
+    {
+      "id": "senda-radar",
+      "name": "SENDA Radar v1",
+      "tagline": "Radar de personas en movimiento a 24 GHz con puente USB-C transparente y pantalla tipo radar",
+      "plainDescription": "Detecta la posición (x, y) y la velocidad de hasta 3 objetivos en movimiento dentro de un abanico de ±60° y hasta 8 m, mostrando los ecos en su pantalla OLED y enviándolos sin cambios al móvil (USB-OTG) o al ordenador (Web Serial).",
+      "limitations": [
+        "Detecta hasta 3 objetivos EN MOVIMIENTO; no detecta con fiabilidad personas completamente inmóviles.",
+        "No distingue una persona de un perro, ciclista o vegetación movida por el viento.",
+        "No sirve para localizar víctimas inmóviles sepultadas bajo escombros."
+      ],
+      "sendaRole": {
+        "coreModules": [
+          "packages/senda/src/mmwave-radar.mjs",
+          "packages/senda/src/mmwave-field.mjs"
+        ],
+        "appScreens": [
+          "/senda/personas"
+        ],
+        "connection": "USB-C CDC nativo transparente a 256000 bps (8N1): Web Serial en escritorio y USB-OTG en la APK Android sin cambios en la app."
+      },
+      "status": "prototipo",
+      "empiricalAccuracyStatus": "pendiente de medir (requiere sesiones reales senda-campo-*.json según packages/senda/data/mmwave/PROTOCOLO_MEDIDA.md)",
+      "license": "MIT (atribución del protocolo UART a Sudo_solder bajo MIT en NOTICE)",
+      "bom": {
+        "csvPath": "hardware/modules/senda-radar/BOM.csv",
+        "queryDate": "2026-11-26",
+        "variants": {
+          "minimalUsb": {
+            "label": "Variante mínima (solo puente USB-C al móvil/PC + carcasa + trípode)",
+            "unitCostEurInclVat": 23.35,
+            "unitCostEurExVat": 19.32,
+            "firstBuildFullPacksEurInclVat": 55.19
+          },
+          "completeAutonomous": {
+            "label": "Variante completa (autónoma con batería Li-Po 1200 mAh + pantalla OLED + interruptor)",
+            "unitCostEurInclVat": 36.87,
+            "unitCostEurExVat": 30.50,
+            "firstBuildFullPacksEurInclVat": 69.04
+          }
+        }
+      },
+      "pricingScenario": {
+        "basis": "ESCENARIO",
+        "kitExVatEur": 55.00,
+        "kitInclVatEur": 66.55,
+        "assembledExVatEur": 82.00,
+        "assembledInclVatEur": 99.22
+      },
+      "euCompliancePath": {
+        "onSale": false,
+        "directives": ["RED 2014/53/UE", "RoHS 2011/65/UE + (UE) 2015/863", "RAEE 2012/19/UE (RD 110/2015)", "Reglamento Baterías (UE) 2023/1542 + UN 38.3"],
+        "standards": ["ETSI EN 300 440 V2.2.1 (24,00-24,25 GHz <=100 mW e.i.r.p.)", "ETSI EN 301 489-1/-3", "EN IEC 62368-1", "EN 62479"],
+        "labTestingCostEur": "no verificado"
+      },
+      "assets": {
+        "glb": "hardware/modules/senda-radar/glb/senda-radar-v1.glb",
+        "glbBytes": 606864,
+        "renders": {
+          "isRender": true,
+          "heroPng": "hardware/modules/senda-radar/renders/hero-preview.png",
+          "explodedPng": "hardware/modules/senda-radar/renders/exploded-preview.png",
+          "turntableMp4": "hardware/modules/senda-radar/renders/turntable-360.mp4",
+          "turntableWebm": "hardware/modules/senda-radar/renders/turntable-360.webm",
+          "explodedMp4": "hardware/modules/senda-radar/renders/exploded-4d.mp4",
+          "explodedWebm": "hardware/modules/senda-radar/renders/exploded-4d.webm",
+          "assemblyStepsMp4": "hardware/modules/senda-radar/renders/assembly-steps.mp4",
+          "assemblyStepsWebm": "hardware/modules/senda-radar/renders/assembly-steps.webm"
+        }
+      }
+    },
+    {
+      "id": "senda-nodo-lora",
+      "name": "SENDA Nodo Malla EU868",
+      "tagline": "Pasarela radio de largo alcance en 868 MHz para mensajes firmados sin cobertura móvil",
+      "plainDescription": "Conecta un móvil o puesto de mando a la banda europea libre de 868 MHz (LoRa SX1262) para enviar y recibir sobres firmados y fragmentos Reed-Solomon k-de-n cuando caen las antenas telefónicas y la electricidad.",
+      "limitations": [
+        "Sujeto a límites legales estrictos en la UE (CEPT ERC/REC 70-03): <=25 mW p.r.a. y <=1 % de tiempo de emisión en 868,0-868,6 MHz (36 s/hora), o <=500 mW p.r.a. y <=10 % en 869,4-869,65 MHz.",
+        "Solo apto para texto compacto, coordenadas y sobres firmados (prohibido enviar vídeo o audio bruto).",
+        "Alcance real dependiente del relieve y de la primera zona de Fresnel (pendiente de medir)."
+      ],
+      "sendaRole": {
+        "coreModules": [
+          "packages/senda/src/bearers.mjs",
+          "packages/senda/src/erasure.mjs",
+          "packages/senda/src/envelope.mjs",
+          "packages/senda/src/courier.mjs"
+        ],
+        "appScreens": [
+          "/senda/mensaje",
+          "/senda/radio",
+          "/senda/sala"
+        ],
+        "connection": "USB-C CDC serie o puente Bluetooth Low Energy GATT hacia el teléfono o portátil."
+      },
+      "status": "diseño",
+      "empiricalAccuracyStatus": "pendiente de medir (protocolo de ráfagas de 51 B en SF7/SF9/SF12 documentado en su README)",
+      "license": "MIT",
+      "bom": {
+        "csvPath": "hardware/modules/senda-nodo-lora/BOM.csv",
+        "queryDate": "2026-11-26",
+        "variants": {
+          "standard": {
+            "label": "Nodo autónomo con Heltec SX1262 EU868 + Li-Po 1200 mAh + carcasa intemperie",
+            "unitCostEurInclVat": 31.67,
+            "unitCostEurExVat": 26.18,
+            "firstBuildFullPacksEurInclVat": 54.00
+          }
+        }
+      },
+      "pricingScenario": {
+        "basis": "ESCENARIO",
+        "kitExVatEur": 48.00,
+        "kitInclVatEur": 58.08,
+        "assembledExVatEur": 74.00,
+        "assembledInclVatEur": 89.54
+      },
+      "euCompliancePath": {
+        "onSale": false,
+        "directives": ["RED 2014/53/UE", "RoHS 2011/65/UE + (UE) 2015/863", "RAEE 2012/19/UE (RD 110/2015)", "Reglamento Baterías (UE) 2023/1542 + UN 38.3"],
+        "standards": ["ETSI EN 300 220-2", "CEPT ERC/REC 70-03 Anexo 1 (h1.4 / h1.7)", "ETSI EN 300 328", "ETSI EN 301 489-1/-3/-17", "EN IEC 62368-1", "EN 62479"],
+        "labTestingCostEur": "no verificado"
+      },
+      "assets": {
+        "glb": "hardware/modules/senda-nodo-lora/glb/senda-nodo-lora.glb",
+        "glbBytes": 338812,
+        "renders": {
+          "isRender": true,
+          "heroPng": "hardware/modules/senda-nodo-lora/renders/hero-preview.png",
+          "explodedPng": "hardware/modules/senda-nodo-lora/renders/exploded-preview.png",
+          "turntableMp4": "hardware/modules/senda-nodo-lora/renders/turntable-360.mp4",
+          "turntableWebm": "hardware/modules/senda-nodo-lora/renders/turntable-360.webm",
+          "explodedMp4": "hardware/modules/senda-nodo-lora/renders/exploded-4d.mp4",
+          "explodedWebm": "hardware/modules/senda-nodo-lora/renders/exploded-4d.webm"
+        }
+      }
+    },
+    {
+      "id": "senda-baliza-ble",
+      "name": "SENDA Baliza Rescate BLE",
+      "tagline": "Baliza Bluetooth 5.0 ultraligera de muy bajo consumo para localización cercana y barrido",
+      "plainDescription": "Cápsula de bolsillo o mosquetón con chip Nordic nRF52840 y batería protegida de 250 mAh que emite anuncios Bluetooth Low Energy sin datos personales para ayudar a localizar personas aisladas o señalizar puntos revisados sin red móvil.",
+      "limitations": [
+        "Alcance limitado a decenas de metros según obstáculos (no atraviesa grandes espesores de hormigón húmedo).",
+        "La venta comercial requiere Company Identifier (1.250 USD) y cualificación de producto ante Bluetooth SIG (12.000 USD Adopter / 8.000 USD Contributing Adopter, tarifa oficial vigente desde 01-03-2026).",
+        "Autonomía y curva RSSI reales: pendiente de medir."
+      ],
+      "sendaRole": {
+        "coreModules": [
+          "packages/senda/src/beacon.mjs",
+          "packages/senda/src/rubble.mjs",
+          "packages/senda/src/house-sweep.mjs"
+        ],
+        "appScreens": [
+          "/senda/barrido",
+          "/senda/conducir"
+        ],
+        "connection": "Emisión pasiva Bluetooth Low Energy 5.0 recibida directamente por la APK Android y herramientas de barrido de SENDA."
+      },
+      "status": "diseño",
+      "empiricalAccuracyStatus": "pendiente de medir (protocolo microamperimétrico y de alcance documentado en su README)",
+      "license": "MIT",
+      "bom": {
+        "csvPath": "hardware/modules/senda-baliza-ble/BOM.csv",
+        "queryDate": "2026-11-26",
+        "variants": {
+          "standard": {
+            "label": "Baliza completa con XIAO BLE nRF52840 + Li-Po 250 mAh protegida + cápsula mosquetón",
+            "unitCostEurInclVat": 24.28,
+            "unitCostEurExVat": 20.08,
+            "firstBuildFullPacksEurInclVat": 47.50
+          }
+        }
+      },
+      "pricingScenario": {
+        "basis": "ESCENARIO",
+        "kitExVatEur": 38.00,
+        "kitInclVatEur": 45.98,
+        "assembledExVatEur": 64.00,
+        "assembledInclVatEur": 77.44
+      },
+      "euCompliancePath": {
+        "onSale": false,
+        "directives": ["RED 2014/53/UE", "RoHS 2011/65/UE + (UE) 2015/863", "RAEE 2012/19/UE (RD 110/2015)", "Bluetooth SIG Qualification + Company ID"],
+        "standards": ["ETSI EN 300 328 (2,4 GHz ISM)", "ETSI EN 301 489-1/-17", "EN IEC 62368-1", "EN 62479"],
+        "bluetoothSigFeesUsd": {
+          "source": "https://www.bluetooth.com/fee-schedule/",
+          "effectiveDate": "2026-03-01",
+          "queryDate": "2026-11-26",
+          "adopterAnnualUsd": 0,
+          "companyIdentifierOneTimeUsd": 1250,
+          "adopterQualificationFeeUsd": 12000,
+          "contributingAdopterFirstQualificationFeeUsd": 8000,
+          "contributingAdopterAnnualFeeUsd": 3500,
+          "reviewStatus": "no verificado en la revisión del 26-11-2026: bluetooth.com rechaza el acceso automático (HTTP 403); confirmar en un navegador antes de presupuestar"
+        },
+        "labTestingCostEur": "no verificado"
+      },
+      "assets": {
+        "glb": "hardware/modules/senda-baliza-ble/glb/senda-baliza-ble.glb",
+        "glbBytes": 246868,
+        "renders": {
+          "isRender": true,
+          "heroPng": "hardware/modules/senda-baliza-ble/renders/hero-preview.png",
+          "explodedPng": "hardware/modules/senda-baliza-ble/renders/exploded-preview.png",
+          "turntableMp4": "hardware/modules/senda-baliza-ble/renders/turntable-360.mp4",
+          "turntableWebm": "hardware/modules/senda-baliza-ble/renders/turntable-360.webm",
+          "explodedMp4": "hardware/modules/senda-baliza-ble/renders/exploded-4d.mp4",
+          "explodedWebm": "hardware/modules/senda-baliza-ble/renders/exploded-4d.webm"
+        }
+      }
+    },
+    {
+      "id": "senda-estacion-ambiental",
+      "name": "SENDA Estación Hidrometeo y Humo",
+      "tagline": "Garita autónoma de nivel de agua sin contacto, humo láser MCERTS y presión/temperatura/humedad",
+      "plainDescription": "Mide desde un puente o poste la altura del agua en un barranco sin tocar el lodo (ultrasonido JSN-SR04T), las partículas finas de humo de incendio forestal (láser Sensirion SPS30) y la presión, temperatura y humedad (Bosch BME280).",
+      "limitations": [
+        "Rango ultrasónico JSN-SR04T de 20 cm a 450 cm; su placa adaptadora interna debe permanecer en la cámara seca superior.",
+        "Nunca emite avisos públicos N5 por sí sola: entrega telemetría firmada con incertidumbre para revisión humana.",
+        "Sesgo radiativo solar y error limnimétrico en campo: pendiente de medir."
+      ],
+      "sendaRole": {
+        "coreModules": [
+          "packages/senda/src/flood-watch.mjs",
+          "packages/senda/src/shallow-water.mjs",
+          "packages/senda/src/data-assimilation.mjs",
+          "packages/senda/src/fire-rothermel.mjs",
+          "packages/senda/src/data-connectors.mjs",
+          "packages/senda/schemas/connector-series.schema.json"
+        ],
+        "appScreens": [
+          "/senda/dana4d",
+          "/senda/fuego",
+          "/senda/incendio4d",
+          "/senda/sala"
+        ],
+        "connection": "Telemetría JSON validada con esquema Ajv (connectorSeries) vía USB-C serie o pasarela SENDA."
+      },
+      "status": "diseño",
+      "empiricalAccuracyStatus": "pendiente de medir (protocolo contra mira limnimétrica y abrigo aspirado en su README)",
+      "license": "MIT",
+      "bom": {
+        "csvPath": "hardware/modules/senda-estacion-ambiental/BOM.csv",
+        "queryDate": "2026-11-26",
+        "variants": {
+          "standard": {
+            "label": "Estación completa con Sensirion SPS30 + Bosch BME280 + sonda JSN-SR04T + XIAO ESP32-S3 + garita PETG",
+            "unitCostEurInclVat": 70.19,
+            "unitCostEurExVat": 58.02,
+            "firstBuildFullPacksEurInclVat": 91.90
+          }
+        }
+      },
+      "pricingScenario": {
+        "basis": "ESCENARIO",
+        "kitExVatEur": 99.00,
+        "kitInclVatEur": 119.79,
+        "assembledExVatEur": 135.00,
+        "assembledInclVatEur": 163.35
+      },
+      "euCompliancePath": {
+        "onSale": false,
+        "directives": ["RED 2014/53/UE (o EMC 2014/30/UE en modo solo cableado)", "RoHS 2011/65/UE + (UE) 2015/863", "RAEE 2012/19/UE (RD 110/2015)"],
+        "standards": ["ETSI EN 300 328", "ETSI EN 301 489-1/-17", "EN IEC 62368-1", "IEC 60825-1 Clase 1 (láser interno SPS30)"],
+        "labTestingCostEur": "no verificado"
+      },
+      "assets": {
+        "glb": "hardware/modules/senda-estacion-ambiental/glb/senda-estacion-ambiental.glb",
+        "glbBytes": 355844,
+        "renders": {
+          "isRender": true,
+          "heroPng": "hardware/modules/senda-estacion-ambiental/renders/hero-preview.png",
+          "explodedPng": "hardware/modules/senda-estacion-ambiental/renders/exploded-preview.png",
+          "turntableMp4": "hardware/modules/senda-estacion-ambiental/renders/turntable-360.mp4",
+          "turntableWebm": "hardware/modules/senda-estacion-ambiental/renders/turntable-360.webm",
+          "explodedMp4": "hardware/modules/senda-estacion-ambiental/renders/exploded-4d.mp4",
+          "explodedWebm": "hardware/modules/senda-estacion-ambiental/renders/exploded-4d.webm"
+        }
+      }
+    }
+  ],
+  "discardedCandidates": [
+    {
+      "candidate": "Sensores de gas semiconductor MOX sin calibrar (MQ-2 / MQ-135) para humo forestal exterior",
+      "reason": "Calefactor de ~800 mW incompatible con batería ligera, fuerte deriva por humedad/temperatura, sensibilidad cruzada a alcoholes/COV y dilución rápida al aire libre frente al sensor láser de partículas Sensirion SPS30."
+    },
+    {
+      "candidate": "Transductor hidrostático sumergido sin compensación barométrica en ramblas torrenciales",
+      "reason": "Una caída barométrica de 25 hPa durante una DANA induce ~25 cm de error si se obstruye el capilar de venteo, y el arrastre de bolos y lodo destruye o colmata las sondas sumergidas; se sustituye por ultrasonido aéreo sin contacto JSN-SR04T."
+    },
+    {
+      "candidate": "Radar de rescate de víctimas inmóviles bajo escombros basado en 24 GHz (RD-03D)",
+      "reason": "Alta atenuación de 24 GHz en hormigón húmedo y filtrado interno de blancos estáticos en el S5KM312CL; anunciarlo para rescate bajo escombros sería falso y peligroso."
+    }
+  ]
+}

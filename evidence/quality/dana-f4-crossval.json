@@ -2,7 +2,7 @@
   "schema": "senda.dana-f4-crossval/v1",
   "basis": "MODEL_CROSSVALIDATED_AGAINST_COPERNICUS_EMSR773",
   "landUseProxyNotice": "Clases de rugosidad con coeficientes literales publicados (Chow 1959; Kalyanapu 2009) asignadas mediante proxy DEM+OSM (sin ráster oficial CORINE/SIOSE CNIG todavía).",
-  "generatedAtUtc": "2026-11-26T01:06:25.003Z",
+  "generatedAtUtc": "2026-11-26T13:02:28.779Z",
   "domain": {
     "w": 212,
     "h": 171,
@@ -33,7 +33,7 @@
     }
   },
   "celerityPhysics": {
-    "basis": "CALCULATED_MANNING_CHOW_1959",
+    "basis": "ESCENARIO",
     "referenceObserved": {
       "velocityMs": 14,
       "peakFlowM3s": 3500,
@@ -85,6 +85,7 @@
         "froude": 0.29
       }
     },
+    "inputsNote": "B, S0 y n de cada sección son supuestos de escenario (no medidos ni publicados); los resultados son calculados por este código a partir de esos supuestos.",
     "explanation": "En el barranco encajonado de Chiva (B ≈ 30 m, S0 ≈ 1,5 %, n = 0,030), Manning + celeridad cinemática produce velocidades del orden de 10–14 m/s compatibles con la cifra preliminar del CEDEX. Al resolver el cauce en una malla gruesa de 59–118 m sin sección subcelda real (o al abrirse el agua en el cono aluvial de l’Horta Sud con B > 1 km y pendiente 0,25 %), el flujo se extiende lateralmente y su velocidad cae físicamente a 1–5 m/s."
   },
   "baselineBates": {
@@ -133,7 +134,7 @@
     "orchardN": 0.045,
     "R": 6,
     "breachedCells": 170,
-    "cpuSec": 23.47,
+    "cpuSec": 23.48,
     "massError": 8.44e-16,
     "maxVelGorgeMs": 4.69,
     "front": {
@@ -179,7 +180,7 @@
       "orchardN": 0.045,
       "R": 3,
       "breachedCells": 170,
-      "cpuSec": 13.07,
+      "cpuSec": 12.79,
       "massError": 4.92e-15,
       "maxVelGorgeMs": 4.69,
       "front": {
@@ -224,7 +225,7 @@
       "orchardN": 0.045,
       "R": 6,
       "breachedCells": 170,
-      "cpuSec": 23.47,
+      "cpuSec": 23.48,
       "massError": 8.44e-16,
       "maxVelGorgeMs": 4.69,
       "front": {
@@ -269,7 +270,7 @@
       "orchardN": 0.08,
       "R": 6,
       "breachedCells": 170,
-      "cpuSec": 22.69,
+      "cpuSec": 22.63,
       "massError": 2.18e-15,
       "maxVelGorgeMs": 4.69,
       "front": {
@@ -314,7 +315,7 @@
       "orchardN": 0.045,
       "R": 3,
       "breachedCells": 198,
-      "cpuSec": 14.66,
+      "cpuSec": 14.58,
       "massError": -4.38e-16,
       "maxVelGorgeMs": 5.79,
       "front": {
@@ -359,7 +360,7 @@
       "orchardN": 0.045,
       "R": 6,
       "breachedCells": 198,
-      "cpuSec": 30.2,
+      "cpuSec": 28.74,
       "massError": 2.81e-16,
       "maxVelGorgeMs": 5.8,
       "front": {
@@ -443,5 +444,5 @@
     "meanBaselineOutOfSampleCsi": 0.1834,
     "meanOverfitGap": 0.0128
   },
-  "sha256": "e7442c45cc5f194fe5619bb8f6097b9252f91d6b68d711375d8f0d7e3fb7cedf"
+  "sha256": "256654df829096103ac581b0caba4fee6a54f21f82564b72d3f03f9fa3564025"
 }

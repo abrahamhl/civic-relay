@@ -1,54 +1,39 @@
-# SENDA · handoff (2026-11-25 16:37Z, sesión app)
+# SENDA · handoff (2026-11-26 13:15Z, commit `741166b` · cierre F8 / H0 y coordinación hardware H1–H2)
 
-## Integración de Antigravity y orientación (commit 2746f3f)
-- PR #99 de Antigravity (peritaje ciudadano N0–N5, FV2D, Rothermel, ETCS, radio, UQ, Copiloto 5D, Android Auto) integrada en
-  la rama de trabajo tras validarla; correcciones: peralte Angrois 130 mm, parámetros sin fuente, CORS, frase sin fuente.
-- SENDA Drive: rediseño familiar (Herramientas, iconos de línea, avisos emergentes), «atrás» arreglado y orientación fusionada.
+## Estado verificado en `master` (`fe696c6` / `0faf51e`)
+- **Integración F1–F7 en producción y APK (`0faf51e`, PR #110 y #111)**:
+  - CI de GitHub en verde (21/21 jobs), producción verificada (`/senda/personas` con «Práctica de campo», `img-src https:` con cámaras públicas DGT visibles, `/senda/estado` en verde) y APK publicada con `mmwave-field.mjs`, `save-file.mjs` y `personas.html` (SHA-256 `0718c681…3de67`).
+  - Correcciones de revisión consolidadas: pruebas con `ajv` aisladas en `packages/senda/tests/contracts/`, `.gitleaks.toml` por valor exacto (no por ruta), geometrías supuestas del barranco de Chiva en F4 rotuladas `ESCENARIO`.
 
-## Último bloque (commit 5695aaa)
-- DANA 4D con línea del tiempo y telemetría con fuente (`data/dana2024/telemetria.json`), motor
-  `flood-warning.mjs`, escenario «¿Cuándo llega?», PRO con exportación y huellas, pestaña
-  «Simuladores 4D (PRO)» en el escritorio y `docs/validacion/DOSSIER_VALIDACION.md`.
-- PR #93 y #94 fusionadas; APK publicada 16:25Z con `fire-science` y `flood-science` dentro
-  (sha play 449c2479…, comprobada contra SHA256SUMS).
-- Pendiente de datos: serie SAIH continua (la web rechaza bots: pedir convenio o descarga manual),
-  AEMET OpenData (clave por la herramienta de credenciales, con permiso del fundador).
+## Cierre de F8 / Bloque H0 (`741166b` · `pnpm verify` único + `prove.mjs` 21/21)
+- **Comando único reproducible `pnpm verify` (`scripts/verify.mjs`)**: ejecuta y verifica en serie 9 puertas sin ensuciar el árbol git:
+  1. Guardia estática de **cero dependencias npm** en `packages/senda/src`, `packages/senda/tests/*.test.mjs`, `packages/senda/tests/defense/*.test.mjs`, `scripts/film-claims.mjs` y `scripts/prove.mjs`.
+  2. Suite del núcleo sin dependencias (`NODE_PATH=""`, civil + defensa: 1 210 pruebas).
+  3. Contratos y compilación de los 5 esquemas JSON Draft 2020-12 (`packages/senda/schemas/validate.mjs` + `tests/contracts/`).
+  4. Suites web (`investor-next/tests`) y relé (`packages/senda-relay/tests`).
+  5. Suite de escritorio (`@senda/command-center`).
+  6. Comprobación estática de tipos (`pnpm type-check` incluido `@ts-check` JSDoc en `packages/senda/src` + `tsc` de `investor-next` si `node_modules` está instalado).
+  7. Prueba pública `node scripts/prove.mjs` ampliada a **21/21 afirmaciones** (`mmwave-rd03d-field` sobre protocolo RD-03D/LD2450 de 30 B, cruce Kalman y paquete SHA-256; `dana-f4-crossval` sobre validación cruzada espacial 4-fold y etiqueta `ESCENARIO`).
+  8. Escaneo de secretos `gitleaks` con `.gitleaks.toml` sobre el árbol completo no ignorado.
+  9. Puerta de publicación de Vercel (`investor-next/scripts/write-release-proof.mjs` + `write-senda-status.mjs`).
+- **Alineación en disco de F4 (`evidence/quality/dana-f4-crossval.json`)**: regenerado con `node packages/senda/scripts/dana-f4-crossval.mjs` (SHA-256 `256654df829096103ac581b0caba4fee6a54f21f82564b72d3f03f9fa3564025`) para que el JSON persistido refleje `celerityPhysics.basis: "ESCENARIO"` igual que el script y `DOSSIER_VALIDACION.md`.
 
-## Novedades desde la última versión
-- **PR #93 fusionada 16:04Z (3d5eb8d)**: laboratorio científico del Incendio 4D (📍 Dónde empezó, combustible,
-  pendiente, cicatriz por fecha, probabilidad, inspector, 🔬 Ciencia). Producción verificada (`ignBtn`).
-  **APK**: compiló, pero la subida a la Release falló con 502 (incidencia de GitHub del 25-11); relanzar el
-  trabajo fallido de la ejecución 45650804420 o el siguiente push a master la publica. Hasta entonces la
-  APK descargable es la de la PR #92.
-- **DANA 4D** (rama `ccr-f7e46a00-mxvkgd`, commit c323a8c, PR en curso): `/senda/dana4d`, `flood-science.mjs`,
-  `packages/senda/scripts/dana-hand.mjs` (regenera `data/dana2024/{hand_roi,obs_roi,dir_z12}.bin`,
-  `cauces.geojson`, `hidro.json`). CSI máx 0,168 frente a Copernicus (calibrado); cuenca Poyo 401 km² del modelo.
-  Falta el tiempo real (serie de caudal o lluvia con fuente: SAIH Júcar, AEMET) para que sea 4D de verdad.
+## Reparto activo entre agentes (bloques H1 y H2)
+1. **Antigravity (ramas propias desde `master`, 1 PR en borrador por bloque, sin tocar páginas de `investor-next`)**:
+   - **H1 · SENDA Radar v1** (`hardware/modules/senda-radar/`): electrónica verificada hoja de datos en mano (Ai-Thinker RD-03D / HLK-LD2450 a 5 V + Seeed XIAO ESP32-S3 + OLED SSD1306 I2C + LiPo 1S protegida + elevador 5 V fijo + interruptor), esquema SVG/KiCad pin a pin, firmware puente USB-CDC transparente + pantalla PPI probado en host (`g++`) y compilado en CI (`arduino-cli`), CAD OpenSCAD paramétrico con ventana de radomo sin metal + STL por pieza + GLB `< 2 MB`, renders 4D 1080p rotulados «render», `BOM.csv` con enlaces y precios fechados, guía de montaje y prueba de humo con `mmwave-field-report.mjs`.
+   - **H2 · Familia de módulos SENDA y negocio**: fichas técnicas, CAD/GLB y renders 4D de la familia (Radar 24 GHz, Nodo malla LoRa EU868, Baliza rescate BLE, Estación hidrometeo/humo con descartes razonados), catálogo y plan legal UE (CE RED 2014/53/UE, RoHS, RAEE) en `docs/negocio/MODULOS_SENDA.md` y contrato `docs/negocio/modulos.json`.
+2. **Claude Code**:
+   - Integra `docs/negocio/modulos.json`, los `.glb` y los renders 4D en `investor-next` y el escritorio PRO.
+   - Revisa protocolo, veracidad, licencias, CSP y CI antes de fusionar cada PR.
+   - Analiza las sesiones físicas `senda-campo-*.json` grabadas por el fundador antes de publicar cualquier cifra de precisión del radar.
 
-## Publicado (master 74f3004, APK fija `senda-android-latest` 14:14Z, play sha 3578398c…)
-- **Arreglos raíz de la app Android**: `NetAllow.java` (antes 404 a toda red → sin mapa/rutas/búsqueda) y
-  tipos `.wasm/.tflite` en `OfflineAssets` (antes la IA de la cámara no cargaba). Pruebas JVM en CI.
-- Conducir: modos 🚗/🚲/🚶, capas tipo apps de mapas (10 tipos: Mapa, Claro, Noche, Satélite oficial PNOA+PDOK,
-  Relieve, Topográfico, Satélite del día NASA, Térmico y Nubes con paleta oficial NASA en °C, Luces), blanco y
-  negro, 3D con relieve real, punto azul con precisión, «atrás» cierra paneles, «ⓘ» en cada sección,
-  radar de señales tipo videojuego (Wi-Fi leído al final del barrido, antigüedad medida), caja negra, probabilidad
-  bayesiana de avisos (`hazard-belief`).
-- Portada: 53 vistas previas reales (`investor-next/scripts/module-previews.mjs`) y destacados.
-- **Incendio 4D** `/senda/incendio4d`: San Martín 23-07-2026 sobre relieve 3D (REAL: EFFIS, Sentinel-2 ×4,
-  dNBR, ignición M-501 km 57; MODELO: frente, humo Briggs, viento GFS; ESCENARIO: elipse Alexander). `fire4d.mjs`.
+## Pendiente del fundador (físico / externo)
+1. Imprimir las piezas STL, montar el prototipo SENDA Radar v1 y grabar sesiones reales con `/senda/personas` → «Práctica de campo» (`senda-campo-*.json`).
+2. Probar la APK en carretera con caja negra y decidir buzón NL→ES / solicitud DGT 3.0 (`docs/fundador/`).
+3. Antes de comercializar cualquier módulo con radio en la UE: ensayos en laboratorio acreditado (RED 2014/53/UE + EMC + seguridad), declaración UE de conformidad, alta RAEE y registro Bluetooth SIG (nunca usar Company ID de prueba `0xFFFF` en producto comercial).
 
-## Pendiente del fundador
-1. Probar la APK de hoy (mapa, cámara, radar, capas, Incendio 4D) y pasar caja negra (.json/.jsonl + vídeo).
-2. Decidir buzón de Internet NL→ES (A Vercel / B servidor propio / C ninguno) y solicitar DGT 3.0 (`docs/fundador/`).
-3. Nombre de la startup de mapas que vio (para comparar con precisión).
-
-## Siguiente (sin preguntar el orden)
-1. **DANA 4D, fase tiempo**: buscar serie de caudal del Poyo (SAIH Júcar) o lluvia (AEMET) con fuente y licencia; añadir dibujo; escritorio PRO.
-2. EOX Sentinel-2: verificar que `s2cloudless_3857` es 2016 (CC BY 4.0) antes de usarlo.
-3. NDW en vivo (play), RSSI por paquete BLE, firma Ed25519 de avisos.
-4. Calibrar con la caja negra real (EM de s/c, SPRT, cadencia por batería: `docs/research/PROPUESTAS_MATEMATICAS_2026-11-24.md`).
-
-## Reglas aprendidas
-- Probar SIEMPRE con las reglas de red de la app (NetAllow) y no solo en navegador: así se escapó el mapa.
-- `bbLog`/`let` en módulos: no llamar antes de declarar (TDZ). Validar YAML antes de subir.
-- Licencias de capas: verificar antes de integrar (EOX quedó fuera por eso).
+## Lecciones obligatorias vigentes
+- Abrir cada PR directamente contra `master` (nunca apiladas) y esperar a que el CI de GitHub quede 100 % en verde en la PR.
+- `packages/senda/tests/*.test.mjs` y `scripts/film-claims.mjs` no pueden importar ningún paquete npm; todo lo que use `ajv` u otros paquetes vive en `packages/senda/tests/contracts/`.
+- Antes de modificar `vercel.json` o cabeceras CSP: verificar las 61 páginas en Chromium con las cabeceras reales (0 bloqueos nuevos).
+- Ninguna cifra sin origen verificable (`medido`, `calculado por <código>`, `fuente <enlace + fecha>`); supuestos sin fuente primaria se rotulan `ESCENARIO` o `no verificado`.
