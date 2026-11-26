@@ -1,0 +1,40 @@
+(kicad_sch (version 20230121) (generator "senda-open-hardware")
+
+  (uuid "8f5120a4-9d21-4c77-8432-1190senda001")
+
+  (paper "A4")
+
+  (title_block
+    (title "SENDA Radar v1 - 24 GHz Moving-Target Bridge & PPI Display")
+    (date "2026-11-26")
+    (rev "v1.0")
+    (company "SENDA Open Hardware (MIT)")
+    (comment 1 "U1: Ai-Thinker Rd-03D / HLK-LD2450 (5V supply, 3.3V UART 256000 8N1)")
+    (comment 2 "U2: Seeed Studio XIAO ESP32-S3 (D7/GPIO44 RX, D6/GPIO43 TX, D4 SDA, D5 SCL, A0 VBAT)")
+    (comment 3 "U3: 0.96in OLED SSD1306 I2C 0x3C (3.3V) | BT1: Li-Po 1S 1200mAh PCM + SW1 SS22G08")
+    (comment 4 "U4: Isolated 5.0V Step-Up Boost for U1 Pin 1 (NEVER tied to USB VBUS)")
+  )
+
+  (lib_symbols
+  )
+
+  (text "NETLIST SUMMARY (Verified against primary datasheets 2026-11-26):\n\n1. POWER & BATTERY DOMAIN (Complete Variant):\n   - BT1_POS (3.0..4.2V Protected Li-Po) -> SW1 Pin 1\n   - SW1 Pin 2 -> NET VBAT_SW\n   - VBAT_SW -> U2 PAD BAT+ (onboard 4.2V Li-Po charger) AND U4 VIN+ (5.0V Boost) AND R1_1 (100k 1%)\n   - U4 VOUT (+5.0V_RADAR, isolated from VUSB!) -> C1_POS (100uF Low-ESR) -> U1 J1 Pin 1 (5V)\n   - Minimal USB-Only Variant (no BT1/U4): U2 Pin 14 (VUSB 5V) -> C1_POS -> U1 J1 Pin 1 (5V)\n   - GND -> BT1_NEG, U2 PAD BAT-, U2 Pin 13 (GND), U4 GND, R2_2, C1_NEG, U1 J1 Pin 2, U3 GND\n\n2. BATTERY TELEMETRY DIVIDER:\n   - R1 (100k 1%): VBAT_SW to VBAT_ADC\n   - R2 (100k 1%): VBAT_ADC to GND\n   - VBAT_ADC (1.50..2.10V, 21 uA) -> U2 Pin 1 (D0 / A0 / GPIO1)\n\n3. UART1 TRANSPARENT BRIDGE (256000 8N1, 3.3V CMOS):\n   - U1 J1 Pin 3 (RADAR_TX, 3.3V) -> U2 Pin 8 (D7 / RX / GPIO44)\n   - U2 Pin 7 (D6 / TX / GPIO43, 3.3V) -> U1 J1 Pin 4 (RADAR_RX, 3.3V)\n\n4. I2C PPI DISPLAY BUS (400 kHz, 3.3V CMOS):\n   - U2 Pin 12 (3V3) -> U3 Pin VCC\n   - U2 Pin 5 (D4 / SDA / GPIO5) <-> U3 Pin SDA\n   - U2 Pin 6 (D5 / SCL / GPIO6) -> U3 Pin SCL"
+    (at 25.4 35.56 0)
+    (effects (font (size 2.0 2.0)) (justify left top))
+    (uuid "5a1120a4-9d21-4c77-8432-1190senda002")
+  )
+
+  (label "VBAT_SW" (at 60.96 142.24 0) (fields_autoplaced) (effects (font (size 1.27 1.27)) (justify left bottom)) (uuid "c0010001-0000-4000-8000-000000000001"))
+  (label "VBAT_ADC" (at 60.96 147.32 0) (fields_autoplaced) (effects (font (size 1.27 1.27)) (justify left bottom)) (uuid "c0010002-0000-4000-8000-000000000002"))
+  (label "+5V_RADAR" (at 60.96 152.40 0) (fields_autoplaced) (effects (font (size 1.27 1.27)) (justify left bottom)) (uuid "c0010003-0000-4000-8000-000000000003"))
+  (label "+3V3" (at 60.96 157.48 0) (fields_autoplaced) (effects (font (size 1.27 1.27)) (justify left bottom)) (uuid "c0010004-0000-4000-8000-000000000004"))
+  (label "RADAR_TX_GPIO44" (at 110.49 142.24 0) (fields_autoplaced) (effects (font (size 1.27 1.27)) (justify left bottom)) (uuid "c0010005-0000-4000-8000-000000000005"))
+  (label "RADAR_RX_GPIO43" (at 110.49 147.32 0) (fields_autoplaced) (effects (font (size 1.27 1.27)) (justify left bottom)) (uuid "c0010006-0000-4000-8000-000000000006"))
+  (label "OLED_SDA_GPIO5" (at 110.49 152.40 0) (fields_autoplaced) (effects (font (size 1.27 1.27)) (justify left bottom)) (uuid "c0010007-0000-4000-8000-000000000007"))
+  (label "OLED_SCL_GPIO6" (at 110.49 157.48 0) (fields_autoplaced) (effects (font (size 1.27 1.27)) (justify left bottom)) (uuid "c0010008-0000-4000-8000-000000000008"))
+  (label "GND" (at 110.49 162.56 0) (fields_autoplaced) (effects (font (size 1.27 1.27)) (justify left bottom)) (uuid "c0010009-0000-4000-8000-000000000009"))
+
+  (sheet_instances
+    (path "/" (page "1"))
+  )
+)

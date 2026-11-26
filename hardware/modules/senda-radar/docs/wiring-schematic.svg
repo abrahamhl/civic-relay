@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1620 900" width="1620" height="900" role="img" aria-labelledby="schTitle schDesc">
+  <title id="schTitle">Esquema eléctrico de conexiones · SENDA Radar v1 (Variantes mínima USB y completa autónoma)</title>
+  <desc id="schDesc">Esquema pin a pin verificado frente a hojas de datos: Ai-Thinker Rd-03D (5V alimentación, UART 3,3V 256000 8N1), Seeed XIAO ESP32-S3 (D7/GPIO44 RX, D6/GPIO43 TX, D4/GPIO5 SDA, D5/GPIO6 SCL, A0/GPIO1 VBAT), OLED SSD1306 0,96 pulgadas I2C 0x3C, Li-Po 1S 1200 mAh con PCM, interruptor SS22G08 y elevador 5V aislado.</desc>
+  <style>
+    .bg { fill: #04080b; }
+    .grid { stroke: #0d1821; stroke-width: 1; }
+    .card { fill: #0b131a; stroke: #294152; stroke-width: 2; rx: 8; }
+    .card-opt { fill: #0b131a; stroke: #38bdf8; stroke-width: 1.8; stroke-dasharray: 6 4; rx: 8; }
+    .hdr { font-family: system-ui, -apple-system, sans-serif; font-size: 22px; font-weight: 600; fill: #eef3f4; }
+    .sub { font-family: system-ui, -apple-system, sans-serif; font-size: 12.5px; fill: #93a7b1; }
+    .blk { font-family: system-ui, -apple-system, sans-serif; font-size: 15px; font-weight: 600; fill: #eef3f4; }
+    .pin { font-family: ui-monospace, monospace; font-size: 11.8px; fill: #d7e3ea; }
+    .net { font-family: ui-monospace, monospace; font-size: 11.2px; font-weight: 500; fill: #91d7e8; }
+    .warn { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; fill: #fbbf24; }
+    .w-5v { stroke: #ef4444; stroke-width: 2.6; fill: none; }
+    .w-3v3 { stroke: #f59e0b; stroke-width: 2.4; fill: none; }
+    .w-gnd { stroke: #64748b; stroke-width: 2.4; fill: none; }
+    .w-uart { stroke: #34d399; stroke-width: 2.4; fill: none; }
+    .w-i2c { stroke: #38bdf8; stroke-width: 2.2; fill: none; }
+    .w-bat { stroke: #f97316; stroke-width: 2.6; fill: none; }
+    .w-adc { stroke: #c084fc; stroke-width: 2.0; fill: none; }
+    .dot-gnd { fill: #64748b; }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="1620" height="900" />
+
+  <g class="grid">
+    <line x1="0" y1="120" x2="1620" y2="120" />
+    <line x1="0" y1="820" x2="1620" y2="820" />
+  </g>
+
+  <!-- Cabecera -->
+  <rect x="40" y="34" width="10" height="10" fill="#34d399" />
+  <text x="60" y="44" class="net">ESQUEMA ELÉCTRICO VERIFICADO · HARDWARE ABIERTO MIT · FECHA DE CONSULTA DE HOJAS DE DATOS: 2026-11-26</text>
+  <text x="40" y="78" class="hdr">SENDA Radar v1 · Interconexión pin a pin y dominios de tensión</text>
+  <text x="40" y="102" class="sub">Línea continua: Variante mínima (USB-C directo al móvil/PC) + base común · Recuadro discontinuo azul: adiciones de la Variante completa (batería + OLED)</text>
+
+  <!-- COLUMNA IZQUIERDA (x=35..400, ancho=365) -->
+  <rect class="card-opt" x="35" y="155" width="365" height="185" />
+  <text x="55" y="183" class="blk">BT1 · Li-Po 1S PKCELL LP503562</text>
+  <text x="55" y="203" class="sub">3,7 V nom. (3,0–4,2 V) · 1200 mAh · PCM S-8261DAA</text>
+  <text x="55" y="223" class="sub">[Solo Variante completa · SKU 005879]</text>
+  <text x="270" y="256" class="pin">BAT+ (Rojo)</text>
+  <text x="262" y="310" class="pin">BAT- (Negro)</text>
+
+  <rect class="card-opt" x="35" y="370" width="365" height="115" />
+  <text x="55" y="398" class="blk">SW1 · Interruptor SS22G08 (ON/OFF)</text>
+  <text x="55" y="418" class="sub">50 VDC 3 A · Corta físicamente la batería (fuga = 0 µA)</text>
+  <text x="55" y="456" class="pin">Pin 1 (COM) ── / ── Pin 2 (VBAT_SW)</text>
+
+  <rect class="card-opt" x="35" y="515" width="365" height="145" />
+  <text x="55" y="543" class="blk">U4 · Elevador DC-DC Step-Up 5,0 V fijo</text>
+  <text x="55" y="562" class="sub">Entrada 0,9–5,0 V → Salida 5,0 V (máx. 480 mA, ~85 %)</text>
+  <text x="55" y="582" class="warn">AISLADO DE USB VBUS (alimenta solo U1 Pin 1)</text>
+  <text x="55" y="618" class="pin">VIN+ / GND</text>
+  <text x="285" y="618" class="pin">VOUT +5,0V</text>
+
+  <rect class="card-opt" x="35" y="685" width="365" height="112" />
+  <text x="55" y="712" class="blk">R1, R2 · Divisor VBAT (2× 100 kΩ 1 %)</text>
+  <text x="55" y="734" class="pin">VBAT_SW ─[R1 100k]─┬─[R2 100k]─ GND</text>
+  <text x="55" y="756" class="pin">                   └► VBAT_ADC (1,5–2,1 V)</text>
+  <text x="55" y="779" class="sub">Tras SW1: 0 µA de descarga apagado; 21 µA encendido</text>
+
+  <!-- COLUMNA CENTRAL U2 (x=515..985, ancho=470) -->
+  <rect class="card" x="515" y="190" width="470" height="535" />
+  <text x="540" y="224" class="blk">U2 · Seeed Studio XIAO ESP32-S3</text>
+  <text x="540" y="245" class="sub">ESP32-S3R8 240 MHz · GPIO estrictos a 3,3 V · SKU 004996</text>
+  <rect x="540" y="262" width="420" height="38" rx="5" fill="#13222e" stroke="#38bdf8" stroke-width="1.2" />
+  <text x="554" y="286" class="pin">USB-C Nativo (CDC · 256000 bps · Web Serial / OTG)</text>
+
+  <text x="540" y="340" class="pin">PAD BAT+ (inferior PCB · cargador 4,2 V / ~100 mA)</text>
+  <text x="540" y="375" class="pin">PAD BAT- (inferior PCB · GND común)</text>
+  <text x="540" y="425" class="pin">Pin 1 · D0 / A0 / GPIO1  ◄── VBAT_ADC (1,5–2,1 V)</text>
+  <text x="540" y="475" class="pin">Pin 14 · VUSB (5,0 V del cable USB-C)</text>
+  <text x="540" y="520" class="pin">Pin 12 · 3V3 (salida regulador 3,3 V)</text>
+  <text x="540" y="565" class="pin">Pin 13 · GND (referencia común)</text>
+
+  <text x="595" y="615" class="pin">Pin 8 · D7 / RX / GPIO44 ◄── UART1 RX (3,3 V)</text>
+  <text x="595" y="645" class="pin">Pin 7 · D6 / TX / GPIO43 ──► UART1 TX (3,3 V)</text>
+  <text x="595" y="675" class="pin">Pin 5 · D4 / SDA / GPIO5 ◄─► I2C SDA (3,3 V)</text>
+  <text x="595" y="705" class="pin">Pin 6 · D5 / SCL / GPIO6 ──► I2C SCL (3,3 V)</text>
+
+  <!-- COLUMNA DERECHA U1 y U3 (x=1135..1585, ancho=450) -->
+  <rect class="card" x="1135" y="165" width="450" height="295" />
+  <text x="1158" y="198" class="blk">U1 · Ai-Thinker Rd-03D (o HLK-LD2450)</text>
+  <text x="1158" y="219" class="sub">Radar FMCW 24,00–24,25 GHz · 1T2R · Hasta 3 objetivos en movimiento</text>
+  <text x="1158" y="239" class="sub">Conector J1 Molex Picoblade 4P 1,25 mm (latiguillo W1 SKU 005806)</text>
+
+  <text x="1158" y="282" class="pin">J1 Pin 1 · 5V   (4,5–5,5 V · media 92 mA, pico ≥200 mA)</text>
+  <text x="1158" y="317" class="pin">J1 Pin 2 · GND  (masa común + C1 100 µF bajo ESR)</text>
+  <text x="1158" y="357" class="pin">J1 Pin 3 · TX   (salida UART 3,3 V · AA FF 03 00 … 55 CC)</text>
+  <text x="1158" y="392" class="pin">J1 Pin 4 · RX   (entrada UART 3,3 V · FD FC FB FA …)</text>
+  <text x="1158" y="432" class="warn">Radomo plástico 1,0 mm delante: CERO metal en ±60° azimut / ±30° elev.</text>
+
+  <!-- Condensador C1 desacoplo junto a J1 -->
+  <rect x="1025" y="264" width="86" height="64" rx="4" fill="#13222e" stroke="#ef4444" stroke-width="1.5" />
+  <text x="1036" y="290" class="pin">C1 100µF</text>
+  <text x="1036" y="312" class="sub">ESR 0,21Ω</text>
+
+  <rect class="card-opt" x="1135" y="510" width="450" height="240" />
+  <text x="1158" y="544" class="blk">U3 · Pantalla OLED 0,96" 128×64 I2C SSD1306</text>
+  <text x="1158" y="565" class="sub">Dirección I2C 0x3C · 400 kHz · SKU 001257 [Solo Variante completa]</text>
+  <text x="1158" y="608" class="pin">Pin VCC  ◄── 3V3 de U2 (~15 mA medios)</text>
+  <text x="1158" y="638" class="pin">Pin GND  ◄── GND común</text>
+  <text x="1158" y="668" class="pin">Pin SDA  ◄─► D4 / GPIO5 (pull-up a 3,3 V)</text>
+  <text x="1158" y="698" class="pin">Pin SCL  ◄── D5 / GPIO6 (pull-up a 3,3 V)</text>
+  <text x="1158" y="730" class="warn">Comprobar serigrafía VCC/GND del módulo antes de soldar</text>
+
+  <!-- TRAZADO DE HILOS -->
+  <path class="w-bat" d="M 400 252 L 425 252 L 425 452 L 400 452" />
+  <path class="w-bat" d="M 400 464 L 450 464 L 450 336 L 515 336" />
+  <path class="w-bat" d="M 450 464 L 450 614 L 400 614" />
+  <path class="w-bat" d="M 450 614 L 450 730 L 400 730" />
+  <circle cx="450" cy="464" r="4.5" fill="#f97316" />
+  <circle cx="450" cy="614" r="4.5" fill="#f97316" />
+
+  <path class="w-adc" d="M 400 752 L 478 752 L 478 421 L 515 421" />
+
+  <path class="w-gnd" d="M 400 306 L 465 306 L 465 371 L 515 371" />
+  <path class="w-gnd" d="M 465 371 L 465 561 L 515 561" />
+  <path class="w-gnd" d="M 985 561 L 1012 561 L 1012 313 L 1135 313" />
+  <path class="w-gnd" d="M 1012 561 L 1012 634 L 1135 634" />
+  <circle class="dot-gnd" cx="465" cy="371" r="4.5" />
+  <circle class="dot-gnd" cx="1012" cy="561" r="4.5" />
+
+  <path class="w-5v" d="M 400 626 L 495 626 L 495 145 L 1068 145 L 1068 264" />
+  <path class="w-5v" d="M 1111 278 L 1135 278" />
+  <text x="530" y="138" class="net">+5,0 V RADAR (En Variante completa procede de U4; en Variante mínima sin batería procede de U2 Pin 14 VUSB)</text>
+  <path d="M 515 471 L 495 471" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 4" fill="none" />
+
+  <path class="w-3v3" d="M 985 516 L 1055 516 L 1055 604 L 1135 604" />
+
+  <path class="w-uart" d="M 1135 353 L 1038 353 L 1038 611 L 985 611" />
+  <path class="w-uart" d="M 985 641 L 1058 641 L 1058 388 L 1135 388" />
+  <text x="1025" y="468" class="net">UART 256000 8N1</text>
+  <text x="1025" y="485" class="sub">TX→D7 · D6→RX</text>
+
+  <path class="w-i2c" d="M 985 671 L 1135 664" />
+  <path class="w-i2c" d="M 985 701 L 1135 694" />
+
+  <text x="40" y="852" class="net">Balance en hojas de datos: Rd-03D 92 mA @ 5 V (0,46 W) + XIAO ESP32-S3 22 mA @ 3,8 V (0,084 W) + OLED ~15 mA @ 3,3 V (0,05 W) ≈ 0,68 W en batería (~5,9–6,5 h ESCENARIO teórico; pendiente de medir)</text>
+  <text x="40" y="876" class="sub">Fuentes primarias: Ai-Thinker Rd-03D Spec V1.0.0 (2023-10-16) · Seeed Studio XIAO ESP32-S3 Wiki/Pinout · Solomon Systech SSD1306 Rev 1.1 · PKCELL LP503562 PCM Spec (consultadas 2026-11-26)</text>
+</svg>
