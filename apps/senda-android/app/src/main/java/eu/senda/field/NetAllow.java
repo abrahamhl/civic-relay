@@ -33,7 +33,12 @@ public final class NetAllow {
             if (!"https".equals(x.getScheme()) || x.getHost() == null || x.getUserInfo() != null) return false;
             if (x.getPort() != -1 && x.getPort() != 443) return false;
             String h = x.getHost().toLowerCase(Locale.ROOT);
-            if (h.equals(S3_HOST)) return x.getRawPath() != null && x.getRawPath().startsWith(S3_PATH) && !x.getRawPath().contains("..");
+            if (h.equals(S3_HOST)) {
+                String p = x.getRawPath();
+                if (p == null || !p.startsWith(S3_PATH)) return false;
+                String low = p.toLowerCase(Locale.ROOT);
+                return !low.contains("..") && !low.contains("%2e") && !low.contains("%2f") && !low.contains("%5c") && !low.contains("\\");
+            }
             return HOSTS.contains(h);
         } catch (java.net.URISyntaxException e) { return false; }
     }

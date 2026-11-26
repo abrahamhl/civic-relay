@@ -15,6 +15,9 @@ public final class NetAllowTest {
         check(NetAllow.allowed("https://s3.amazonaws.com/elevation-tiles-prod/terrarium/10/505/389.png"), "relieve AWS");
         check(!NetAllow.allowed("https://s3.amazonaws.com/otro-contenedor/x"), "otro contenedor de S3 no");
         check(!NetAllow.allowed("https://s3.amazonaws.com/elevation-tiles-prod/terrarium/../../otro/x"), "recorrido en S3 no");
+        check(!NetAllow.allowed("https://s3.amazonaws.com/elevation-tiles-prod/terrarium/%2e%2e/%2e%2e/otro/x"), "recorrido codificado %2e en S3 no");
+        check(!NetAllow.allowed("https://s3.amazonaws.com/elevation-tiles-prod/terrarium/%2E%2E/otro/x"), "recorrido codificado %2E en S3 no");
+        check(!NetAllow.allowed("https://s3.amazonaws.com/elevation-tiles-prod/terrarium/10%5c..%5cotro"), "recorrido %5c en S3 no");
         check(NetAllow.allowed("https://tile.opentopomap.org/10/505/389.png"), "OpenTopoMap");
         check(!NetAllow.allowed("http://tiles.openfreemap.org/x"), "sin cifrar");
         check(!NetAllow.allowed("https://tiles.openfreemap.org.evil.example/x"), "dominio engañoso");

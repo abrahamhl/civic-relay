@@ -26,10 +26,6 @@
           "value": "DENY"
         },
         {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        },
-        {
           "key": "Referrer-Policy",
           "value": "strict-origin-when-cross-origin"
         },
@@ -38,8 +34,12 @@
           "value": "geolocation=(self), camera=(), microphone=(), payment=()"
         },
         {
-          "key": "X-DNS-Prefetch-Control",
-          "value": "on"
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin"
+        },
+        {
+          "key": "Cross-Origin-Resource-Policy",
+          "value": "same-origin"
         },
         {
           "key": "Strict-Transport-Security",
@@ -47,7 +47,16 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: https: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://tiles.openfreemap.org https://router.project-osrm.org https://routing.openstreetmap.de https://service.pdok.nl https://tms-pnoa-ma.idee.es https://gibs.earthdata.nasa.gov https://s3.amazonaws.com/elevation-tiles-prod/ https://tile.opentopomap.org https://nominatim.openstreetmap.org https://*.vercel.app https://api.civic-relay.com https://earthquake.usgs.gov https://www.seismicportal.eu https://www.gdacs.org https://eonet.gsfc.nasa.gov; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tiles.openfreemap.org https://service.pdok.nl https://tms-pnoa-ma.idee.es https://gibs.earthdata.nasa.gov https://s3.amazonaws.com/elevation-tiles-prod/ https://tile.opentopomap.org; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' https://tiles.openfreemap.org https://router.project-osrm.org https://routing.openstreetmap.de https://service.pdok.nl https://tms-pnoa-ma.idee.es https://gibs.earthdata.nasa.gov https://s3.amazonaws.com/elevation-tiles-prod/ https://tile.opentopomap.org https://nominatim.openstreetmap.org https://earthquake.usgs.gov https://www.seismicportal.eu https://www.gdacs.org https://eonet.gsfc.nasa.gov; media-src 'self' blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+        }
+      ]
+    },
+    {
+      "source": "/senda/:page(copiloto|conducir|reportar|comite|personas|tren4d|dana4d|incendio4d|explorador)(.html)?",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tiles.openfreemap.org https://service.pdok.nl https://tms-pnoa-ma.idee.es https://gibs.earthdata.nasa.gov https://s3.amazonaws.com/elevation-tiles-prod/ https://tile.opentopomap.org; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' https://tiles.openfreemap.org https://router.project-osrm.org https://routing.openstreetmap.de https://service.pdok.nl https://tms-pnoa-ma.idee.es https://gibs.earthdata.nasa.gov https://s3.amazonaws.com/elevation-tiles-prod/ https://tile.opentopomap.org https://nominatim.openstreetmap.org; media-src 'self' blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
         }
       ]
     },
