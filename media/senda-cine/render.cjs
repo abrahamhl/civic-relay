@@ -10,18 +10,24 @@ const tmp = path.join(FILM, 'build', `cine-${NAME}`); fs.mkdirSync(tmp, { recurs
 const srv = http.createServer((q, r) => { const f = path.join(ROOT, decodeURIComponent(q.url.split('?')[0])); if (!f.startsWith(ROOT) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(r); });
 srv.listen(0, async () => {
   const port = srv.address().port, t0 = Date.now(); let done = 0;
+  // Tramos de SEG fotogramas: cada uno se escribe en un .tmp y se renombra al terminar; si el proceso se corta, se reanuda.
+  const SEG = Number(process.env.SEG || 200), NSEG = Math.ceil(N / SEG); const segPath = (i) => path.join(tmp, `seg-${String(i).padStart(4, '0')}.mp4`);
+  const todo = [...Array(NSEG).keys()].filter((i) => !fs.existsSync(segPath(i))); console.log(`tramos: ${NSEG} · pendientes: ${todo.length}`);
   const job = async (w) => {
-    const a = Math.floor((N * w) / JOBS), b = Math.floor((N * (w + 1)) / JOBS);
-    const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-', '-c:v', 'libx264', '-preset', 'medium', '-crf', '19', '-pix_fmt', 'yuv420p', '-r', String(FPS), path.join(tmp, `part-${w}.mp4`)], { stdio: ['pipe', 'inherit', 'inherit'] });
     const br = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--disable-dev-shm-usage'] });
     const pg = await br.newPage({ viewport: { width: 1920, height: 1080 } }); pg.on('pageerror', (e) => { console.error('[page]', e.message); process.exitCode = 1; });
     await pg.goto(`http://127.0.0.1:${port}/media/senda-cine/cine.html?script=${NAME}`); await pg.waitForFunction(() => window.READY === true, null, { timeout: 180000 });
-    for (let f = a; f < b; f++) { await pg.evaluate((t) => window.seek(t), f / FPS); const buf = await pg.screenshot({ type: 'jpeg', quality: 92 }); if (!ff.stdin.write(buf)) await new Promise((r) => ff.stdin.once('drain', r)); done++; if (done % 250 === 0) console.log(`${done}/${N} · ${((Date.now() - t0) / 1000).toFixed(0)} s`); }
-    ff.stdin.end(); await new Promise((r) => ff.on('close', r)); await br.close();
+    while (todo.length) {
+      const i = todo.shift(), a = i * SEG, b = Math.min(N, a + SEG), out = segPath(i), part = out + '.tmp.mp4';
+      const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-', '-c:v', 'libx264', '-preset', 'medium', '-crf', '19', '-pix_fmt', 'yuv420p', '-r', String(FPS), part], { stdio: ['pipe', 'inherit', 'inherit'] });
+      for (let f = a; f < b; f++) { await pg.evaluate((t) => window.seek(t), f / FPS); const buf = await pg.screenshot({ type: 'jpeg', quality: 92 }); if (!ff.stdin.write(buf)) await new Promise((r) => ff.stdin.once('drain', r)); done++; if (done % 250 === 0) console.log(`${done} fotogramas nuevos · ${((Date.now() - t0) / 1000).toFixed(0)} s`); }
+      ff.stdin.end(); await new Promise((r) => ff.on('close', r)); fs.renameSync(part, out);
+    }
+    await br.close();
   };
   if (!process.argv.includes('--finalize')) await Promise.all([...Array(JOBS).keys()].map(job)); srv.close();
   try {
-  fs.writeFileSync(path.join(tmp, 'list.txt'), [...Array(JOBS).keys()].map((w) => `file 'part-${w}.mp4'`).join('\n'));
+  fs.writeFileSync(path.join(tmp, 'list.txt'), [...Array(NSEG).keys()].map((i) => `file '${path.basename(segPath(i))}'`).join('\n'));
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', path.join(tmp, 'list.txt'), '-c', 'copy', path.join(tmp, 'video.mp4')]);
   execFileSync('python3', [path.join(ROOT, 'media/promo-video/music.py'), path.join(tmp, 'music.wav'), String(Math.ceil(DUR + 1))]);
   const outMp4 = path.join(OUT, `senda-${NAME}-es.mp4`);
