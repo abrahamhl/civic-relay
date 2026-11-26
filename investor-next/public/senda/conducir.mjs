@@ -73,7 +73,28 @@ function registerPmTilesProtocol() {
     return { data: tile ?? new Uint8Array(0) };
   });
 }
-function initMap() {
+let mapLibrePromise = null;
+function loadMapLibre() {
+  if (!document.querySelector('link[href*="maplibre-gl.css"]')) {
+    const l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = '/senda/vendor/maplibre-gl-4.7.1/maplibre-gl.css';
+    document.head.appendChild(l);
+  }
+  if (window.maplibregl) return Promise.resolve(window.maplibregl);
+  if (mapLibrePromise) return mapLibrePromise;
+  mapLibrePromise = new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = '/senda/vendor/maplibre-gl-4.7.1/maplibre-gl-csp.js';
+    s.async = true;
+    s.onload = () => (window.maplibregl ? res(window.maplibregl) : rej(new Error('maplibregl no inicializado')));
+    s.onerror = () => rej(new Error('Error cargando maplibre-gl-csp.js'));
+    document.head.appendChild(s);
+  });
+  return mapLibrePromise;
+}
+async function initMap() {
+  try { await loadMapLibre(); } catch { return offline('No se pudo cargar el mapa.'); }
   if (!window.maplibregl) return offline('No se pudo cargar el mapa.');
   maplibregl.setWorkerUrl('/senda/vendor/maplibre-gl-4.7.1/maplibre-gl-csp-worker.js');
   registerPmTilesProtocol();
@@ -82,6 +103,7 @@ function initMap() {
   const t = setTimeout(() => { if (!st.mapOk) offline('Sin conexión al mapa: se muestra el radar. Puedes cargar un mapa offline (.pmtiles) desde el botón «+».'); }, 10000);
   map.on('load', () => {
     st.mapOk = true; clearTimeout(t);
+    $('#map')?.classList.add('ready');
     ensureRouteLayers(map);
     if (st.lastFix) onPos(st.lastFix);
     drawMarkers();
@@ -1411,7 +1433,9 @@ $('#labExportBtn')?.addEventListener('click', exportLabAndMap);
 // La tarjeta de abajo cambia de alto (llegada, avisos): los botones flotantes se colocan siempre encima.
 new ResizeObserver(([e]) => document.documentElement.style.setProperty('--bottomH', `${Math.ceil(e.target.getBoundingClientRect().height)}px`)).observe($('#bottom'));
 
-initMap();
+const bootMap = () => setTimeout(() => { initMap(); }, 0);
+if (document.readyState === 'complete') bootMap();
+else window.addEventListener('load', bootMap, { once: true });
 loadIncidents();
 setInterval(() => { if (!document.hidden) loadIncidents(); }, 5 * 60 * 1000);
 // Para pruebas automáticas

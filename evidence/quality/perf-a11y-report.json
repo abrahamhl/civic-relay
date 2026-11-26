@@ -1,0 +1,252 @@
+{
+  "schema": "senda.perf-a11y-f7/v1",
+  "basis": "MEASURED_HEADLESS_CHROMIUM_4G_AXE",
+  "generatedAtUtc": "2026-11-26T01:21:46.415Z",
+  "environment": {
+    "node": "v22.23.5",
+    "chrome": "/usr/bin/google-chrome",
+    "networkProfile": "4G (1.6 Mbps down / 750 Kbps up / 150 ms RTT, gzip transfer, 412x915 mobile)",
+    "axeCoreVersion": "4.14.1"
+  },
+  "budgets": {
+    "maxLcpMs": 2500,
+    "maxInitialJsTransferBytes": 307200,
+    "maxAxeViolations": 0
+  },
+  "allOk": true,
+  "routes": [
+    {
+      "id": "senda-home",
+      "path": "/senda/",
+      "perf": {
+        "lcpMs": 1400,
+        "lcpObserved": true,
+        "lcpElement": "P",
+        "fcpMs": 424,
+        "domContentLoadedMs": 1252,
+        "initialJsTransferBytes": 69203,
+        "initialJsTransferKB": 67.6,
+        "initialJsUncompressedKB": 164.7,
+        "deferredJsTransferKB": 0,
+        "deferredJsFilesCount": 0,
+        "jsFilesCount": 18,
+        "topJsFiles": [
+          {
+            "url": "/senda/app.mjs",
+            "transferBytes": 10081,
+            "uncompressedBytes": 28420
+          },
+          {
+            "url": "/senda/coord.mjs",
+            "transferBytes": 6657,
+            "uncompressedBytes": 17139
+          },
+          {
+            "url": "/senda/core/envelope.mjs",
+            "transferBytes": 6121,
+            "uncompressedBytes": 18412
+          },
+          {
+            "url": "/senda/core/bundle.mjs",
+            "transferBytes": 5589,
+            "uncompressedBytes": 17481
+          },
+          {
+            "url": "/senda/core/rail-incident.mjs",
+            "transferBytes": 4634,
+            "uncompressedBytes": 10691
+          },
+          {
+            "url": "/senda/core/building-twin.mjs",
+            "transferBytes": 4611,
+            "uncompressedBytes": 10285
+          },
+          {
+            "url": "/senda/core/orbital.mjs",
+            "transferBytes": 4203,
+            "uncompressedBytes": 9096
+          },
+          {
+            "url": "/senda/core/remote-command.mjs",
+            "transferBytes": 3960,
+            "uncompressedBytes": 8628
+          }
+        ]
+      },
+      "a11y": {
+        "wcagTags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22aa"
+        ],
+        "passes": 24,
+        "violationsCount": 0,
+        "violations": [],
+        "reducedMotion": {
+          "mediaMatches": true,
+          "hasReducedMotionRule": true,
+          "focusables": 115
+        }
+      },
+      "consoleErrors": [],
+      "gates": {
+        "lcpOk": true,
+        "jsOk": true,
+        "axeOk": true,
+        "rmOk": true,
+        "ok": true
+      }
+    },
+    {
+      "id": "senda-conducir",
+      "path": "/senda/conducir",
+      "perf": {
+        "lcpMs": 404,
+        "lcpObserved": true,
+        "lcpElement": "P",
+        "fcpMs": 404,
+        "domContentLoadedMs": 2118,
+        "initialJsTransferBytes": 206178,
+        "initialJsTransferKB": 201.3,
+        "initialJsUncompressedKB": 516.6,
+        "deferredJsTransferKB": 0,
+        "deferredJsFilesCount": 0,
+        "jsFilesCount": 38,
+        "topJsFiles": [
+          {
+            "url": "/senda/conducir.mjs",
+            "transferBytes": 34401,
+            "uncompressedBytes": 98470
+          },
+          {
+            "url": "/senda/core/road-guard.mjs",
+            "transferBytes": 20822,
+            "uncompressedBytes": 56397
+          },
+          {
+            "url": "/senda/core/drive-copilot-physics.mjs",
+            "transferBytes": 12332,
+            "uncompressedBytes": 36563
+          },
+          {
+            "url": "/senda/core/shallow-water-fv.mjs",
+            "transferBytes": 11517,
+            "uncompressedBytes": 34910
+          },
+          {
+            "url": "/senda/core/drive-field-lab.mjs",
+            "transferBytes": 11247,
+            "uncompressedBytes": 29721
+          },
+          {
+            "url": "/senda/core/drive-community-calibration.mjs",
+            "transferBytes": 8655,
+            "uncompressedBytes": 24019
+          },
+          {
+            "url": "/senda/core/datex2.mjs",
+            "transferBytes": 8204,
+            "uncompressedBytes": 21722
+          },
+          {
+            "url": "/senda/core/drive-ar-hud.mjs",
+            "transferBytes": 7434,
+            "uncompressedBytes": 20149
+          }
+        ]
+      },
+      "a11y": {
+        "wcagTags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22aa"
+        ],
+        "passes": 24,
+        "violationsCount": 0,
+        "violations": [],
+        "reducedMotion": {
+          "mediaMatches": true,
+          "hasReducedMotionRule": true,
+          "focusables": 67
+        }
+      },
+      "consoleErrors": [],
+      "gates": {
+        "lcpOk": true,
+        "jsOk": true,
+        "axeOk": true,
+        "rmOk": true,
+        "ok": true
+      }
+    },
+    {
+      "id": "senda-personas",
+      "path": "/senda/personas",
+      "perf": {
+        "lcpMs": 428,
+        "lcpObserved": true,
+        "lcpElement": "P",
+        "fcpMs": 428,
+        "domContentLoadedMs": 696,
+        "initialJsTransferBytes": 16321,
+        "initialJsTransferKB": 15.9,
+        "initialJsUncompressedKB": 36.1,
+        "deferredJsTransferKB": 0,
+        "deferredJsFilesCount": 0,
+        "jsFilesCount": 4,
+        "topJsFiles": [
+          {
+            "url": "/senda/personas.mjs",
+            "transferBytes": 6764,
+            "uncompressedBytes": 16690
+          },
+          {
+            "url": "/senda/core/mmwave-radar.mjs",
+            "transferBytes": 5227,
+            "uncompressedBytes": 12034
+          },
+          {
+            "url": "/senda/core/heading-fusion.mjs",
+            "transferBytes": 2722,
+            "uncompressedBytes": 5747
+          },
+          {
+            "url": "/senda/app-chrome.mjs",
+            "transferBytes": 1608,
+            "uncompressedBytes": 2519
+          }
+        ]
+      },
+      "a11y": {
+        "wcagTags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa",
+          "wcag22aa"
+        ],
+        "passes": 24,
+        "violationsCount": 0,
+        "violations": [],
+        "reducedMotion": {
+          "mediaMatches": true,
+          "hasReducedMotionRule": true,
+          "focusables": 23
+        }
+      },
+      "consoleErrors": [],
+      "gates": {
+        "lcpOk": true,
+        "jsOk": true,
+        "axeOk": true,
+        "rmOk": true,
+        "ok": true
+      }
+    }
+  ],
+  "sha256": "ceca9fad28ff74d1b0bfb5ae9707410d8793344870dd86b40cfba97f7848f31b"
+}

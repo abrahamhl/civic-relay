@@ -67,3 +67,4 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .bubbles .meta{display:block;font-size:11px;opacity:.75;margin-top:3px}
 .composer{position:sticky;bottom:0;background:var(--bg,#05090c);padding-top:8px}
 .composer .via{gap:6px;flex-wrap:wrap;align-items:center}.composer .via button{padding:6px 10px;font-size:14px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
