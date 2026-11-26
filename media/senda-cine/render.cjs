@@ -19,7 +19,8 @@ srv.listen(0, async () => {
     for (let f = a; f < b; f++) { await pg.evaluate((t) => window.seek(t), f / FPS); const buf = await pg.screenshot({ type: 'jpeg', quality: 92 }); if (!ff.stdin.write(buf)) await new Promise((r) => ff.stdin.once('drain', r)); done++; if (done % 250 === 0) console.log(`${done}/${N} · ${((Date.now() - t0) / 1000).toFixed(0)} s`); }
     ff.stdin.end(); await new Promise((r) => ff.on('close', r)); await br.close();
   };
-  await Promise.all([...Array(JOBS).keys()].map(job)); srv.close();
+  if (!process.argv.includes('--finalize')) await Promise.all([...Array(JOBS).keys()].map(job)); srv.close();
+  try {
   fs.writeFileSync(path.join(tmp, 'list.txt'), [...Array(JOBS).keys()].map((w) => `file 'part-${w}.mp4'`).join('\n'));
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', path.join(tmp, 'list.txt'), '-c', 'copy', path.join(tmp, 'video.mp4')]);
   execFileSync('python3', [path.join(ROOT, 'media/promo-video/music.py'), path.join(tmp, 'music.wav'), String(Math.ceil(DUR + 1))]);
@@ -27,8 +28,9 @@ srv.listen(0, async () => {
   // Voz al frente; música baja con compresión lateral (se aparta cuando habla la voz).
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', path.join(tmp, 'video.mp4'), '-i', path.join(FILM, `build/voice-${NAME}-es.wav`), '-i', path.join(tmp, 'music.wav'),
     '-filter_complex', '[1:a]aresample=48000,loudnorm=I=-16:TP=-1.5:LRA=11,asplit=2[v][sc];[2:a]aresample=48000,volume=0.22[m];[m][sc]sidechaincompress=threshold=0.03:ratio=8:attack=20:release=400[md];[v][md]amix=inputs=2:duration=first:normalize=0[a]',
-    '-map', '0:v', '-map', '[a]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '160k', '-shortest', '-movflags', '+faststart', outMp4]);
+    '-map', '0:v', '-map', '[a]', '-c:v', 'libx264', '-preset', 'slow', '-crf', String(process.env.CRF || 25), '-pix_fmt', 'yuv420p', '-tune', 'animation', '-c:a', 'aac', '-b:a', '160k', '-shortest', '-movflags', '+faststart', outMp4]);
   fs.copyFileSync(path.join(FILM, `build/subtitles-${NAME}-es.vtt`), path.join(OUT, `senda-${NAME}-es.vtt`));
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', String(Math.min(12, DUR / 3)), '-i', outMp4, '-frames:v', '1', '-vf', 'scale=1280:-2', '-q:v', '3', path.join(OUT, `senda-${NAME}-poster.jpg`)]);
   console.log(`=> ${outMp4} · ${(fs.statSync(outMp4).size / 1048576).toFixed(1)} MB · ${DUR.toFixed(1)} s · ${((Date.now() - t0) / 60000).toFixed(1)} min`);
+  } catch (e) { console.error('FALLO:', e.message, String(e.stderr || '').slice(0, 2000)); process.exit(1); }
 });
