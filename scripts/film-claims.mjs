@@ -2,6 +2,8 @@
 // Lo usan scripts/prove.mjs (prueba pública de un comando) y packages/senda/tests/film-claims.test.mjs.
 // Cada afirmación: { id, scene, claim (lo que dice la película), measure() → { value, ok, detail } }.
 // Nada se copia de documentos: todo se ejecuta. Las semillas son fijas para que cualquiera obtenga lo mismo.
+import fs from 'node:fs';
+import crypto from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -133,6 +135,45 @@ export const CLAIMS = [
     const sub = items.slice(0, 14), best = (() => { let b = 0; for (let m = 0; m < 1 << sub.length; m++) { let mb = 0, u = 0; sub.forEach((it, i) => { if (m >> i & 1) { mb += it.mb; u += it.u * r.freshness(it.ageH ?? 0, it.hl); } }); if (mb <= 300 && u > b) b = u; } return b; })();
     const dp = r.planReserve(sub, 300), dpU = (dp.chosen ?? dp.items ?? []).reduce((s, it) => s + it.u * r.freshness(it.ageH ?? 0, it.hl), 0);
     return { value: `${(plan.chosen ?? plan.items ?? []).length} contenidos en ${r1(plan.usedMB ?? plan.mb ?? 0)} MB · DP ${r1(dpU)} = fuerza bruta ${r1(best)}`, ok: Math.abs(dpU - best) < 1e-6 * Math.max(1, best) };
+  } },
+  { id: 'mmwave-rd03d-field', scene: 'h1', claim: 'SIMULACIÓN: trama RD-03D/LD2450 de 30 B decodifica bit a bit, mantiene identidad en cruce de 2 objetivos en movimiento y sella el paquete de campo con SHA-256', async measure() {
+    const R = await core('mmwave-radar.mjs'), F = await core('mmwave-field.mjs');
+    const frame = R.encodeFrame([{ xMm: -420, yMm: 2350, speedCms: -85, resMm: 360 }, { xMm: 510, yMm: 3100, speedCms: 62, resMm: 360 }]);
+    const parsed = []; const parser = R.createFrameParser((t) => parsed.push(t));
+    for (let i = 0; i < frame.length; i += 7) parser.push(frame.subarray(i, i + 7));
+    const exact = frame.length === 30 && frame[0] === 0xaa && frame[28] === 0x55 && frame[29] === 0xcc && parsed.length === 1 && parsed[0][0].xMm === -420 && parsed[0][1].speedCms === 62;
+    const trk = R.createTracker({ gateMm: 900, qMmS2: 1200, rMm: 120, maxMissS: 0.8 });
+    let last = [];
+    for (let k = 0; k <= 20; k++) {
+      const t = k * 0.1;
+      last = trk.step([
+        { xMm: -1000 + 100 * k, yMm: 2500, speedCms: 100 },
+        { xMm: 1000 - 100 * k, yMm: 2650, speedCms: -100 },
+      ], t);
+    }
+    const id1 = last.find((x) => x.id === 1), id2 = last.find((x) => x.id === 2);
+    const noSwap = Boolean(id1 && id2 && id1.xMm > 500 && id2.xMm < -500);
+    const pkg = await F.buildFieldPackage({
+      session: { basis: 'SIMULATION', startedAtUtc: '2026-11-26T12:00:00Z', endedAtUtc: '2026-11-26T12:00:02Z', timeZone: 'Europe/Madrid', scenario: 'cruce sintético', source: 'prove.mjs' },
+      raw: [{ tMs: 0, b64: Buffer.from(frame).toString('base64') }],
+      marks: [{ tMs: 0, label: 'inicio simulación' }],
+      settings: { minMm: 200, maxMm: 6000, mergeMm: 350, gateMm: 900, qMmS2: 1200, rMm: 120, maxMissS: 0.8 },
+    });
+    const okPkg = (await F.verifyFieldPackage(pkg)).ok;
+    const tampered = (await F.verifyFieldPackage({ ...pkg, marks: [{ tMs: 1, label: 'alterado' }] })).ok;
+    return { value: `trama ${frame.length} B exacta: ${exact} · cruce sin intercambio de ID: ${noSwap} · paquete SHA-256 íntegro: ${okPkg} (alterado rechazado: ${!tampered})`, ok: exact && noSwap && okPkg && !tampered };
+  } },
+  { id: 'dana-f4-crossval', scene: 'f4', claim: 'DANA 29-10-2024: validación cruzada espacial 4-fold con conservación de masa < 10⁻⁹ y geometrías de Chiva rotuladas ESCENARIO', async measure() {
+    const raw = JSON.parse(fs.readFileSync(path.join(ROOT, 'evidence', 'quality', 'dana-f4-crossval.json'), 'utf8'));
+    const { sha256, ...body } = raw;
+    const shaOk = sha256 === crypto.createHash('sha256').update(JSON.stringify(body)).digest('hex');
+    const massOk = Math.abs(raw.baselineBates.massError) < 1e-9 && raw.candidates.every((c) => Math.abs(c.massError) < 1e-9);
+    const cv = raw.spatialCrossValidation;
+    const basisOk = raw.celerityPhysics.basis === 'ESCENARIO';
+    return {
+      value: `CSI fuera de muestra ${cv.meanOutOfSampleCsi} vs base ${cv.meanBaselineOutOfSampleCsi} (4 particiones) · error masa máx < 10⁻⁹: ${massOk} · régimen Chiva: ${raw.celerityPhysics.basis}`,
+      ok: shaOk && massOk && cv.folds.length === 4 && cv.meanOutOfSampleCsi > cv.meanBaselineOutOfSampleCsi && basisOk,
+    };
   } },
 ];
 
