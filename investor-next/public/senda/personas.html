@@ -44,6 +44,8 @@ h2{margin:0 0 8px;font-size:15px;font-weight:600}
 button.pri{background:#eef3f4;color:#04080b;border-color:#eef3f4;font-weight:600}
 button.b:disabled{opacity:.45;cursor:not-allowed}
 label.f{display:grid;grid-template-columns:1fr 92px;gap:8px;align-items:center;font-size:13px;color:var(--m);margin:4px 0}
+label.f.wide{grid-template-columns:1fr;gap:4px}
+label.f select,label.f.wide input{background:var(--p);border:1px solid var(--line);border-radius:6px;padding:7px 8px;width:100%;text-align:left}
 label.f input{background:var(--p);border:1px solid var(--line);border-radius:6px;padding:5px 7px;text-align:right;width:100%}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{color:var(--d);font-weight:500;text-align:left;padding:4px 4px;border-bottom:1px solid var(--line)}
@@ -82,6 +84,24 @@ details summary{cursor:pointer;color:var(--m);font-size:13px}
       <p class="note" id="serialNote"></p>
       <label class="f" id="binRateRow" hidden>Intervalo entre tramas del .bin (ms, lo declara usted)<input id="binMs" type="number" min="1" step="1" placeholder="obligatorio"></label>
       <div id="log" class="mono"></div>
+    </section>
+    <section id="field">
+      <h2>Práctica de campo</h2>
+      <p class="note" style="margin-top:0">Graba la sesión entera en un solo archivo: bytes del radar, personas seguidas, momentos marcados y calibración, con huella SHA-256. Guárdelo en el móvil y envíelo para analizarlo.</p>
+      <label class="f wide">Qué se prueba<select id="fScenario">
+        <option>Una persona caminando hacia el radar</option>
+        <option>Una persona cruzando de lado</option>
+        <option>Dos personas cruzándose</option>
+        <option>Persona quieta (de pie o sentada)</option>
+        <option>Persona detrás de una puerta o pared fina</option>
+        <option>Perro u otro animal</option>
+        <option>Sin nadie (ruido de fondo)</option>
+        <option>Calibración con cinta métrica</option>
+        <option>Otro (escríbalo en la nota)</option>
+      </select></label>
+      <label class="f wide">Nota (opcional)<input id="fNote" type="text" maxlength="300" placeholder="p. ej. puerta de madera a 3 m, lluvia"></label>
+      <div class="row"><button class="b pri" id="fStart">Empezar sesión</button><button class="b" id="fMark" disabled>Marcar momento</button><button class="b" id="fEnd" disabled>Terminar y guardar</button></div>
+      <p class="note mono" id="fOut"></p>
     </section>
     <section>
       <h2>Ajustes del seguimiento</h2>

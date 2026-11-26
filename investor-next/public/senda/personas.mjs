@@ -1,11 +1,14 @@
 // SENDA · Radar de personas (RD-03D / LD2450). Toda la lógica de protocolo, seguimiento y calibración está en el núcleo probado.
 import { CMD, SERIAL, createFrameParser, cleanTargets, createTracker, encodeFrame, radarToLonLat, trackBearingDeg, calibrateRange, calibrateMountYaw } from '/senda/core/mmwave-radar.mjs';
 import { compassHeading } from '/senda/core/heading-fusion.mjs';
+import { buildFieldPackage } from '/senda/core/mmwave-field.mjs';
+import { saveBlob } from '/senda/save-file.mjs';
 
 const $ = (id) => document.getElementById(id);
 const COLORS = ['#34d399', '#91d7e8', '#fbbf24', '#ff7756', '#ff5b6e', '#c4b5fd'];
 const cv = $('ppi'), ctx = cv.getContext('2d');
 let tracker, parser, tracks = [], lastDets = [], source = null, stopFn = null, frames = 0, t0 = performance.now();
+let field = null; // sesión de práctica de campo en curso
 let rec = [], recording = false, trace = []; // grabación de bytes crudos con tiempo; trazas de pistas
 const calPairs = [], yawPairs = [];
 const log = (m) => { const el = $('log'); el.textContent = `${new Date().toISOString().slice(11, 19)}  ${m}\n` + el.textContent.slice(0, 4000); };
@@ -32,10 +35,12 @@ function onFrame(raw) {
   const pose = poseOrNull();
   for (const tr of tracks) if (!tr.coasting) trace.push({ t: +tS.toFixed(3), id: tr.id, xMm: Math.round(tr.xMm), yMm: Math.round(tr.yMm), speedCms: tr.speedCms, ...(pose ? { lonlat: radarToLonLat(tr, pose).map((v) => +v.toFixed(7)) } : {}) });
   if (trace.length > 20000) trace.splice(0, trace.length - 20000);
+  if (field && field.tracks.length < 200000) { const tMs = Math.round(performance.now() - field.t0); for (const tr of tracks) if (!tr.coasting) field.tracks.push({ tMs, id: tr.id, xMm: Math.round(tr.xMm), yMm: Math.round(tr.yMm), speedCms: tr.speedCms, sigmaMm: Math.round(tr.sigmaMm) }); }
   renderTable();
 }
 function feed(bytes) {
   if (recording) rec.push({ tMs: Math.round(performance.now() - t0), b64: btoa(String.fromCharCode(...bytes)) });
+  if (field && source) { field.raw.push({ tMs: Math.round(performance.now() - field.t0), b64: btoa(String.fromCharCode(...bytes)) }); field.sources.add(source); }
   parser.push(bytes);
 }
 function setBasis(kind, txt) { $('basisSq').className = `sq ${kind}`; $('basisTxt').textContent = txt; }
@@ -216,12 +221,47 @@ $('useGeo').onclick = () => {
 
 // ---- Exportar con huella ----
 async function sha256hex(data) { const d = await crypto.subtle.digest('SHA-256', data); return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, '0')).join(''); }
-async function download(name, text) {
+async function download(name, text, type = 'application/json') {
   const bytes = new TextEncoder().encode(text), h = await sha256hex(bytes);
-  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([bytes])); a.download = name; a.click();
-  log(`${name} · SHA-256 ${h}`);
+  const r = await saveBlob(new Blob([bytes], { type }), name); // en la app Android va a Descargas/SENDA
+  log(r.ok ? `${name} guardado en ${r.where} · SHA-256 ${h}` : `No se pudo guardar ${name}`);
+  return r;
 }
-$('saveRec').onclick = () => { if (!rec.length) return log('Aún no hay bytes grabados.'); download(`senda-radar-${Date.now()}.jsonl`, rec.map((r) => JSON.stringify(r)).join('\n') + '\n'); };
+
+// ---- Práctica de campo: una sesión = un archivo verificable ----
+const KIND_BASIS = { serial: 'MEASURED', file: 'RECORDING', sim: 'SIMULATION' };
+$('fStart').onclick = () => {
+  field = { t0: performance.now(), startedAtUtc: new Date().toISOString(), raw: [], tracks: [], marks: [], sources: new Set(), scenario: $('fScenario').value };
+  $('fStart').disabled = true; $('fMark').disabled = false; $('fEnd').disabled = false;
+  $('fOut').textContent = `Sesión en curso desde ${field.startedAtUtc.slice(11, 19)} UTC · ${field.scenario}`;
+  if (!source) log('Sesión iniciada: conecte el radar, abra una grabación o lance la simulación para que haya datos.');
+};
+$('fMark').onclick = () => {
+  if (!field) return;
+  const label = $('fNote').value.trim() || `marca ${field.marks.length + 1}`;
+  field.marks.push({ tMs: Math.round(performance.now() - field.t0), label, nearest: (() => { const t = nearest(); return t ? { id: t.id, distanceMm: Math.round(Math.hypot(t.xMm, t.yMm)) } : null; })() });
+  $('fOut').textContent = `${field.marks.length} momentos marcados · ${field.raw.length} bloques de bytes`;
+};
+$('fEnd').onclick = async () => {
+  if (!field) return;
+  const f = field; field = null;
+  $('fStart').disabled = false; $('fMark').disabled = true; $('fEnd').disabled = true;
+  if (!f.raw.length) { $('fOut').textContent = 'Sesión sin datos del radar: no se guarda nada.'; return; }
+  // Si se mezclaron fuentes, gana la más prudente: simulación > grabación > medida.
+  const kinds = [...f.sources];
+  const basis = kinds.includes('sim') ? 'SIMULATION' : kinds.includes('file') ? 'RECORDING' : KIND_BASIS[kinds[0]] ?? 'RECORDING';
+  const pkg = await buildFieldPackage({
+    session: { basis, startedAtUtc: f.startedAtUtc, endedAtUtc: new Date().toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'no indicada',
+      scenario: f.scenario, notes: $('fNote').value.trim() || null, sourcesUsed: kinds, sensor: 'RD-03D/LD2450 (24 GHz)',
+      app: { page: 'personas', nativeAndroid: !!window.SendaNative }, pose: poseOrNull() },
+    raw: f.raw, tracks: f.tracks, marks: f.marks, settings: cfg(),
+    calibration: { rangePairs: calPairs.map((p) => ({ measuredMm: Math.round(p.measuredMm), trueMm: p.trueMm })), yawPairs: yawPairs.slice() },
+  });
+  const name = `senda-campo-${f.startedAtUtc.replace(/[:.]/g, '').slice(0, 15)}Z.json`;
+  const r = await download(name, JSON.stringify(pkg));
+  $('fOut').textContent = r?.ok ? `Guardado: ${name} (${basis}) · huella ${pkg.sha256.slice(0, 16)}… · ${r.where}` : 'No se pudo guardar el paquete.';
+};
+$('saveRec').onclick = () => { if (!rec.length) return log('Aún no hay bytes grabados.'); download(`senda-radar-${Date.now()}.jsonl`, rec.map((r) => JSON.stringify(r)).join('\n') + '\n', 'application/x-ndjson'); };
 $('saveTracks').onclick = () => {
   const basis = source === 'sim' ? 'SIMULATION' : source === 'serial' ? 'MEASURED' : 'RECORDING';
   const byId = new Map(); for (const p of trace) { if (!byId.has(p.id)) byId.set(p.id, []); byId.get(p.id).push(p); }
