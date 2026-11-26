@@ -6,7 +6,7 @@ import { hazardsAhead, corridorAnnouncement, stoppingDistanceM } from './core/dr
 import { createBlackBox } from './core/drive-blackbox.mjs';
 import { radarsAhead, createSectionTracker, RADAR_RULES } from './core/drive-radars.mjs';
 import { detectRegion, ndwToIncident, dutchMotorwayWindow } from './core/ndw-nl.mjs';
-import { enrichTracksForHud, renderArHud, DEFAULT_CAM_GEOM, declaredGeom } from './core/drive-ar-hud.mjs';
+import { enrichTracksForHud, renderArHud, DEFAULT_CAM_GEOM, declaredGeom, project3DToScreen } from './core/drive-ar-hud.mjs';
 import { rssLongitudinalSameDir, EXAMPLE_RSS_PARAMS } from './core/drive-physics-v2.mjs';
 import { createGnssImuEkf, createHorizonCalibrator } from './core/drive-kalman-fusion.mjs';
 import { sendaToDenm, denmToSenda, encodeDenmCompact, decodeDenmCompact, isDenmCompact, isInsideDenmRelevance } from './core/cits-denm.mjs';
@@ -21,6 +21,7 @@ import { detectCrashEvent, EXAMPLE_DETECTION_CONFIG, syntheticTrace } from './co
 import { laneGuide, laneSvg } from './core/lane-guide.mjs';
 import { clusterCrashes, clusterIconSvg } from './core/crash-cluster.mjs';
 import { parseUtterance, createParkedCalibrator, summarizeSession } from './core/voice-copilot.mjs';
+import { createInsights, objectLine, RULE_2S, CYCLIST_CLEARANCE } from './core/camera-insights.mjs';
 import { parseDatex2 } from './core/datex2.mjs';
 import { wazeUrl, googleMapsUrl, haversineM } from './core/route-planner.mjs';
 import { routeUrl, parseRoute, nextManeuver, shouldReroute, announcement, snapToRoute } from './core/nav-osrm.mjs';
@@ -947,7 +948,8 @@ function askGeom() {
   if (h === null) return;
   if (h.trim() === '') { LS.set('senda.drive.geom', null); return hint('Sin geometría: no se muestran distancias en metros.'); }
   const f = prompt('Campo de visión VERTICAL de la cámara, en grados (ficha del móvil; ej. 50).', cur.fovVDeg ?? '');
-  const g = { camHeightM: parseFloat(String(h).replace(',', '.')), fovVDeg: parseFloat(String(f ?? '').replace(',', '.')) };
+  const wv = prompt('Ancho de tu vehículo en metros (coche con espejos ≈ lo que midas; bici = manillar). Sirve para la separación al adelantar. Vacío = no estimarla.', cur.egoWidthM ?? '');
+  const g = { camHeightM: parseFloat(String(h).replace(',', '.')), fovVDeg: parseFloat(String(f ?? '').replace(',', '.')), egoWidthM: parseFloat(String(wv ?? '').replace(',', '.')) || null };
   if (!declaredGeom(g)) return hint('Valores fuera de rango (altura 0,5–3 m, campo 20–120°). No se guardan.');
   LS.set('senda.drive.geom', g); hint(`Montaje guardado: ${g.camHeightM} m, ${g.fovVDeg}°. Las distancias son estimación de cámara (sin calibrar con medidas).`);
 }
@@ -994,6 +996,7 @@ function analyse(now, iv = 250) {
   const c = $('#ov'), box = c.getBoundingClientRect(), dpr = devicePixelRatio || 1; c.width = box.width * dpr; c.height = box.height * dpr;
   const x = c.getContext('2d'); x.scale(dpr, dpr);
   renderArHud(x, box.width, box.height, { ...hudPhysicsState(iv), tracks: objs });
+  drawInsights(x, box.width, box.height, objs);
   noteObjects(objs);
   const top = topAlert(objs), a = $('#adas');
   if (!top) { a.hidden = true; return; }
@@ -1056,6 +1059,7 @@ function dashFrame(now) {
 }
 function drawDashData(x, W, H, iv = 250) {
   renderArHud(x, W, H, { ...hudPhysicsState(iv), tracks: dash.objs });
+  drawInsights(x, W, H, dash.objs, true);
 }
 function warnDash(o) {
   const key = o.id + o.level; if (Date.now() - (saidAdas.get(key) ?? 0) < 6000) return; saidAdas.set(key, Date.now());
@@ -1744,3 +1748,74 @@ $('#srBtn')?.addEventListener('click', () => (SR.on ? srStop() : srStart()));
 $('#srOff')?.addEventListener('click', srStop);
 $('#srUsb')?.addEventListener('click', srConnectUsb);
 $('#srEvery')?.addEventListener('click', () => { SR.everyS = SR.everyS === 15 ? 10 : 15; LS.set('senda.sr.every', SR.everyS); $('#srEvery').textContent = `${SR.everyS} s`; });
+
+
+// ── Cámara con datos que importan, por modo de uso: coche, bici (móvil mirando atrás) o peatón ──
+// + SENDA Radar mmWave superpuesto en la imagen: marca lo que se mueve aunque la cámara no lo vea (p. ej. tapado).
+const CAM_MODES = { COCHE: 'Coche', BICI_ATRAS: 'Bici · mira atrás', PEATON: 'Peatón' };
+const CAMI = { mode: LS.get('senda.cam.uso', 'COCHE'), ins: null, last: [], lastSum: null, said2s: 0, saidOv: 0, logT: 0 };
+function camIns() {
+  if (!CAMI.ins || CAMI.ins.mode !== CAMI.mode) { const g = LS.get('senda.drive.geom', null); CAMI.ins = createInsights({ windowS: 3, egoHalfWidthM: g?.egoWidthM ? g.egoWidthM / 2 : null, mode: CAMI.mode }); } // 3 s de historia: elección de diseño
+  return CAMI.ins;
+}
+function drawInsights(x, W, H, objs, isDash = false) {
+  const tS = performance.now() / 1000, ins = camIns(), list = ins.update(objs, tS, st.speed ?? null), sum = ins.summary(list, tS);
+  CAMI.last = list; CAMI.lastSum = sum;
+  const fs = Math.max(11, Math.round(W / (isDash ? 70 : 42)));
+  x.save(); x.font = `700 ${fs}px system-ui`; x.textBaseline = 'top';
+  const byId = new Map(objs.map((o) => [o.id, o]));
+  for (const i of list) {
+    const o = byId.get(i.id); if (!o?.box || i.kind === 'OTRO') continue;
+    const lines = objectLine(i); if (lines.length < 2) continue; // la etiqueta básica ya la pinta el HUD: aquí solo lo que añade datos
+    const bx = o.box.x * W, by = (o.box.y + o.box.h) * H + 3, wmax = Math.max(...lines.map((l) => x.measureText(l).width)) + 10;
+    x.fillStyle = i.gapBelow2s || i.level === 'ROJO' ? 'rgba(255,59,48,.85)' : i.level === 'AMBAR' ? 'rgba(255,159,10,.85)' : 'rgba(0,0,0,.6)';
+    x.fillRect(Math.min(bx, W - wmax - 2), by, wmax, lines.length * (fs + 3) + 4);
+    x.fillStyle = '#fff'; lines.forEach((l, k) => x.fillText(l, Math.min(bx, W - wmax - 2) + 5, by + 3 + k * (fs + 3)));
+  }
+  // franja superior: lo más útil del modo
+  const top = [];
+  if (CAMI.mode === 'COCHE') {
+    if (sum.lead?.gapS != null) top.push(`Delante: ${String(sum.lead.gapS).replace('.', ',')} s${sum.leadBelow2s ? ` · menos de ${RULE_2S.seconds} s (DGT)` : ' · bien'}`);
+    if (sum.closeOvertakes) top.push(`${sum.closeOvertakes} adelantamiento(s) a ciclistas a menos de ${String(CYCLIST_CLEARANCE.meters).replace('.', ',')} m`);
+  } else if (CAMI.mode === 'BICI_ATRAS') {
+    top.push(`Adelantamientos: ${sum.overtakes.length}${sum.closeOvertakes ? ` · ${sum.closeOvertakes} a menos de 1,5 m` : ''}`);
+    if (sum.nextArrival) top.push(`Viene ${objectLine(sum.nextArrival)[0]} · te alcanza en ${String(sum.nextArrival.ttcS).replace('.', ',')} s`);
+  } else if (sum.nextArrival) top.push(`Se acerca ${objectLine(sum.nextArrival)[0]} · llega en ${String(sum.nextArrival.ttcS).replace('.', ',')} s (información, no una orden de cruzar)`);
+  top.push(`${CAM_MODES[CAMI.mode]} · ${sum.now.vehicles} vehículos · ${sum.now.vulnerable} personas/bicis`);
+  if (!userGeom()) top.push('Sin montaje declarado: sin metros ni velocidades');
+  const tf = Math.max(12, Math.round(W / (isDash ? 60 : 36)));
+  x.font = `800 ${tf}px system-ui`; const tw = Math.max(...top.map((l) => x.measureText(l).width)) + 16;
+  x.fillStyle = sum.leadBelow2s ? 'rgba(255,59,48,.88)' : 'rgba(0,0,0,.62)'; const ty = isDash ? H * 0.24 : 6; x.fillRect(6, ty, Math.min(W - 12, tw), top.length * (tf + 4) + 8);
+  x.fillStyle = '#fff'; top.forEach((l, k) => x.fillText(l, 14, ty + 5 + k * (tf + 4)));
+  drawRadarOnCamera(x, W, H, list);
+  x.restore();
+  // voz con calma: distancia corta sostenida (coche) y adelantamientos cercanos (bici)
+  const now = Date.now();
+  if (CAMI.mode === 'COCHE' && sum.leadBelow2s && (st.speed ?? 0) > 14 && now - CAMI.said2s > 30000) { CAMI.said2s = now; say('Distancia corta: menos de dos segundos con el de delante'); }
+  if (CAMI.mode === 'BICI_ATRAS' && sum.closeOvertakes > CAMI.saidOv) { CAMI.saidOv = sum.closeOvertakes; navigator.vibrate?.([120, 60, 120]); const o = sum.overtakes.at(-1); say(`Te han adelantado a ${String(o.clearanceM).replace('.', ',')} metros`); }
+  if (now - CAMI.logT > 2000) { CAMI.logT = now; bbLog('insight', { mode: CAMI.mode, lead: sum.lead ? { d: sum.lead.distM, gapS: sum.lead.gapS, kmh: sum.lead.sameDirKmh } : null, n: sum.now, overtakes: sum.overtakes.length, close: sum.closeOvertakes }); }
+}
+/** Objetivos del SENDA Radar (montado mirando como la cámara) dibujados sobre la imagen; los que la cámara no ve se marcan. */
+function drawRadarOnCamera(x, W, H, camList) {
+  if (!(SR.mount && SR.mount.yawDeg === 0 && Date.now() - SR.mm.t < 2500)) return;
+  const geom = userGeom() ?? DEFAULT_CAM_GEOM, half = (geom.fovHDeg / 2) * Math.PI / 180, f = (W / 2) / Math.tan(half);
+  for (const t of fromMmwave(SR.mm.targets, { mount: { yawDeg: 0 } })) {
+    const ang = t.bearingDeg * Math.PI / 180; if (Math.abs(ang) > half) continue;
+    const u = W / 2 + Math.tan(ang) * f, p = project3DToScreen(t.x, Math.max(1, t.y), W, H, geom), v = p?.v ?? H * 0.7;
+    const seen = camList.some((i) => i.distM != null && Math.abs(i.distM - t.distM) < 1.5 && Math.abs((i.lateralM ?? 0) - t.x) < 1.2);
+    x.strokeStyle = '#ff9f0a'; x.lineWidth = 4; x.beginPath(); x.moveTo(u, v - 18); x.lineTo(u + 14, v); x.lineTo(u, v + 18); x.lineTo(u - 14, v); x.closePath(); x.stroke();
+    const lab = `radar · ${String(t.distM).replace('.', ',')} m${seen ? '' : ' · solo radar (no se ve: tapado u oscuro)'}`;
+    x.font = '700 13px system-ui'; const w = x.measureText(lab).width + 10; x.fillStyle = 'rgba(255,159,10,.9)'; x.fillRect(u - w / 2, v + 22, w, 19); x.fillStyle = '#000'; x.fillText(lab, u - w / 2 + 5, v + 25);
+  }
+}
+document.querySelectorAll('#dash [data-uso]').forEach((b) => b.addEventListener('click', (e) => {
+  e.stopPropagation(); CAMI.mode = b.dataset.uso; LS.set('senda.cam.uso', CAMI.mode); CAMI.saidOv = 0;
+  document.querySelectorAll('#dash [data-uso]').forEach((y) => y.classList.toggle('on', y === b));
+  if (CAMI.mode === 'BICI_ATRAS') hint('Bici: pon el móvil mirando hacia atrás. Mide los adelantamientos y su separación lateral (mínimo legal 1,5 m, RGC art. 85.4). Declara en «Montaje» el ancho de tu manillar.');
+  else if (CAMI.mode === 'PEATON') hint('Peatón: apunta a la calzada. Verás qué se acerca y en cuántos segundos llega. Es información: mira siempre antes de cruzar.');
+  else hint('Coche: distancia con el de delante en segundos (regla de 2 s), velocidad de los demás y adelantamientos a ciclistas.');
+}));
+$('#dashRadar')?.addEventListener('click', (e) => { e.stopPropagation(); srConnectUsb(); });
+
+document.querySelectorAll('#dash [data-uso]').forEach((y) => y.classList.toggle('on', y.dataset.uso === CAMI.mode));
+$('#geomBtn')?.addEventListener('click', (e) => { e.stopPropagation(); askGeom(); CAMI.ins = null; });
