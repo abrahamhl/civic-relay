@@ -130,12 +130,12 @@ Reproducible sin red con `node packages/senda/scripts/dana-f4-crossval.mjs` (inf
 
 | Régimen / geometría | Ancho $B$ | Pendiente $S_0$ | Manning $n$ | Calado $h$ | Velocidad $v$ | Celeridad cinemática $c_k$ | Froude $Fr$ | Origen |
 |---|---:|---:|---:|---:|---:|---:|---:|---|
-| Barranco encajonado de Chiva | 30 m | 1,5 % | 0,030 | 9,02 m | **12,93 m/s** | 21,55 m/s | 1,37 (supercrítico) | calculado por este código |
-| Barranco de Chiva (sección 40 m) | 40 m | 1,2 % | 0,032 | 8,00 m | **10,94 m/s** | 18,23 m/s | 1,24 (supercrítico) | calculado por este código |
-| Celda gruesa sin sección subcelda | 118,1 m | 0,8 % | 0,045 | 5,23 m | **5,66 m/s** | 9,44 m/s | 0,79 (subcrítico) | calculado por este código |
-| Cono aluvial l'Horta Sud | 1 500 m | 0,25 % | 0,060 | 1,86 m | **1,26 m/s** | 2,09 m/s | 0,29 (subcrítico) | calculado por este código |
+| Barranco encajonado de Chiva | 30 m | 1,5 % | 0,030 | 9,02 m | **12,93 m/s** | 21,55 m/s | 1,37 (supercrítico) | ESCENARIO: calculado por este código con B, S0 y n supuestos (no medidos) |
+| Barranco de Chiva (sección 40 m) | 40 m | 1,2 % | 0,032 | 8,00 m | **10,94 m/s** | 18,23 m/s | 1,24 (supercrítico) | ESCENARIO: calculado por este código con B, S0 y n supuestos (no medidos) |
+| Celda gruesa sin sección subcelda | 118,1 m | 0,8 % | 0,045 | 5,23 m | **5,66 m/s** | 9,44 m/s | 0,79 (subcrítico) | ESCENARIO: calculado por este código con B, S0 y n supuestos (no medidos) |
+| Cono aluvial l'Horta Sud | 1 500 m | 0,25 % | 0,060 | 1,86 m | **1,26 m/s** | 2,09 m/s | 0,29 (subcrítico) | ESCENARIO: calculado por este código con B, S0 y n supuestos (no medidos) |
 
-Esta física explica por qué los **14 m/s preliminares del CEDEX** (en el barranco encajonado de Chiva) y los **≈ 1 m/s** del frente medio en el cono aluvial de l'Horta Sud no son contradictorios: en una malla de 59–118 m sin batimetría subcelda LiDAR (PNOA) el cauce se ensancha artificialmente y la velocidad cae a `4,7–5,8 m/s` en la garganta y a `≈ 1 m/s` en la llanura.
+**Geometrías supuestas, no medidas**: ningún levantamiento publicado da B, S₀ ni n de esas secciones; es un cálculo de escenario que muestra un mecanismo coherente con los datos, no una explicación demostrada. Este cálculo indica por qué los **14 m/s preliminares del CEDEX** (en el barranco encajonado de Chiva) y los **≈ 1 m/s** del frente medio en el cono aluvial de l'Horta Sud no son contradictorios: en una malla de 59–118 m sin batimetría subcelda LiDAR (PNOA) el cauce se ensancha artificialmente y la velocidad cae a `4,7–5,8 m/s` en la garganta y a `≈ 1 m/s` en la llanura.
 
 **Antes / Después (F4, misma malla 118,1 m, Copernicus EMSR773 AOI03, conservación de masa < 10⁻¹⁴):**
 

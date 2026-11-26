@@ -47,7 +47,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tiles.openfreemap.org https://service.pdok.nl https://tms-pnoa-ma.idee.es https://gibs.earthdata.nasa.gov https://s3.amazonaws.com/elevation-tiles-prod/ https://tile.opentopomap.org; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' https://tiles.openfreemap.org https://router.project-osrm.org https://routing.openstreetmap.de https://service.pdok.nl https://tms-pnoa-ma.idee.es https://gibs.earthdata.nasa.gov https://s3.amazonaws.com/elevation-tiles-prod/ https://tile.opentopomap.org https://nominatim.openstreetmap.org https://earthquake.usgs.gov https://www.seismicportal.eu https://www.gdacs.org https://eonet.gsfc.nasa.gov; media-src 'self' blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' https://tiles.openfreemap.org https://router.project-osrm.org https://routing.openstreetmap.de https://service.pdok.nl https://tms-pnoa-ma.idee.es https://gibs.earthdata.nasa.gov https://s3.amazonaws.com/elevation-tiles-prod/ https://tile.opentopomap.org https://nominatim.openstreetmap.org https://earthquake.usgs.gov https://www.seismicportal.eu https://www.gdacs.org https://eonet.gsfc.nasa.gov; media-src 'self' blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
         }
       ]
     },
@@ -56,7 +56,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tiles.openfreemap.org https://service.pdok.nl https://tms-pnoa-ma.idee.es https://gibs.earthdata.nasa.gov https://s3.amazonaws.com/elevation-tiles-prod/ https://tile.opentopomap.org; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' https://tiles.openfreemap.org https://router.project-osrm.org https://routing.openstreetmap.de https://service.pdok.nl https://tms-pnoa-ma.idee.es https://gibs.earthdata.nasa.gov https://s3.amazonaws.com/elevation-tiles-prod/ https://tile.opentopomap.org https://nominatim.openstreetmap.org; media-src 'self' blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' https://tiles.openfreemap.org https://router.project-osrm.org https://routing.openstreetmap.de https://service.pdok.nl https://tms-pnoa-ma.idee.es https://gibs.earthdata.nasa.gov https://s3.amazonaws.com/elevation-tiles-prod/ https://tile.opentopomap.org https://nominatim.openstreetmap.org; media-src 'self' blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
         }
       ]
     },

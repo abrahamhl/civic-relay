@@ -83,6 +83,7 @@ const celerityPhysics = {
     coarseGridCell118m: solveManningChannel({ Q: 3500, widthM: 118.1, slope: 0.008, manningN: 0.045 }),
     alluvialFanHortaSud1500m: solveManningChannel({ Q: 3500, widthM: 1500, slope: 0.0025, manningN: 0.060 }),
   },
+  basis: 'ESCENARIO', inputsNote: 'B, S0 y n de cada sección son supuestos de escenario (no medidos ni publicados); los resultados son calculados por este código a partir de esos supuestos.',
   explanation: 'En el barranco encajonado de Chiva (B ≈ 30 m, S0 ≈ 1,5 %, n = 0,030), Manning + celeridad cinemática produce velocidades del orden de 10–14 m/s compatibles con la cifra preliminar del CEDEX. Al resolver el cauce en una malla gruesa de 59–118 m sin sección subcelda real (o al abrirse el agua en el cono aluvial de l’Horta Sud con B > 1 km y pendiente 0,25 %), el flujo se extiende lateralmente y su velocidad cae físicamente a 1–5 m/s.',
 };
 
