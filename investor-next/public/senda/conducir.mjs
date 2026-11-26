@@ -20,6 +20,7 @@ import { REPORT_KINDS, call112Script, LANE_SAY } from './core/road-guard.mjs';
 import { detectCrashEvent, EXAMPLE_DETECTION_CONFIG, syntheticTrace } from './core/roadsafe-crash-detect.mjs';
 import { laneGuide, laneSvg } from './core/lane-guide.mjs';
 import { clusterCrashes, clusterIconSvg } from './core/crash-cluster.mjs';
+import { parseUtterance, createParkedCalibrator, summarizeSession } from './core/voice-copilot.mjs';
 import { parseDatex2 } from './core/datex2.mjs';
 import { wazeUrl, googleMapsUrl, haversineM } from './core/route-planner.mjs';
 import { routeUrl, parseRoute, nextManeuver, shouldReroute, announcement } from './core/nav-osrm.mjs';
@@ -635,7 +636,9 @@ function onPos(p) {
   st.speed = p.coords.speed;
   st.region = detectRegion(st.pos);
   HF.gps(p.coords.heading, p.coords.speed ?? 0, performance.now() / 1000); applyHeading(false);
-  $('#speed').innerHTML = `<div>${st.speed == null ? '–' : Math.round(st.speed * 3.6)}<small>km/h</small></div>`;
+  if (VC.parked) VC.cal.add(p.coords.speed);
+  const shownMs = VC.cal.gate(st.speed);
+  $('#speed').innerHTML = `<div>${shownMs == null ? '–' : Math.round(shownMs * 3.6)}<small>${VC.parked ? 'calibrando' : 'km/h'}</small></div>`;
   if (st.mapOk) {
     if (!st.me) { const el = document.createElement('div'); el.className = 'me-puck'; el.innerHTML = '<i class="cone"></i><b></b>'; st.me = new maplibregl.Marker({ element: el, rotationAlignment: 'map' }).setLngLat(st.pos).addTo(st.map); st.map.jumpTo({ center: st.pos, zoom: st.mode === 'foot' ? 17 : 15 }); }
     st.me.setLngLat(st.pos); applyHeading(false);
@@ -762,6 +765,7 @@ function saveReport(kind, side = 'SIN_INDICAR', extra = {}) {
   drawMarkers(); updateCorridor(); if (extra.quiet) return id; say(`Aviso de ${REPORT_KINDS[kind].label} guardado`); hint(`Aviso «${REPORT_KINDS[kind].label}» guardado en tu posición. Para pasarlo a otros móviles SENDA cercanos: «Más» → «Enviar mis avisos por Bluetooth» o «Compartir avisos sin la app».`);
 }
 window.sendaVoice = (res) => {
+  if (VC.on) return vcHandle(res);
   if (res.state) return hint(res.state === 'ESCUCHANDO' ? 'Habla ahora…' : 'Procesando…');
   if (res.error) return hint('Voz: ' + res.error);
   const r = interpretAlternatives(res.alternatives);
@@ -1018,8 +1022,10 @@ async function dashOpen() {
 function dashClose() {
   if (dash.rec) dashRecord();
   dash.on = false; st.lastVision = null; dash.stream?.getTracks().forEach((t) => t.stop()); dash.stream = null;
-  document.documentElement.classList.remove('dashmode', 'nomini'); $('#dash').hidden = true; st.map?.resize();
+  document.documentElement.classList.remove('dashmode', 'nomini', 'dashmini'); $('#dash').hidden = true; st.map?.resize();
 }
+/** Minimizar: la cámara sigue grabando en una ventana pequeña y la app queda libre; tocarla la vuelve a ampliar. */
+function dashMini(on) { const h = document.documentElement.classList; h.toggle('dashmini', on); h.toggle('dashmode', !on); st.map?.resize(); if (on) hint(dash.rec ? 'Sigue grabando en la ventana pequeña. Tócala para ampliar.' : 'Cámara en ventana pequeña. Tócala para ampliar.'); }
 function dashFrame(now) {
   if (!dash.on) return;
   const v = $('#v'), c = $('#dashCanvas');
@@ -1054,6 +1060,7 @@ function pickMime() {
 async function dashRecord() {
   if (dash.rec) { // parar y guardar
     const r = dash.rec; dash.rec = null; clearInterval(dash.timer); $('#recBtn').classList.remove('on'); $('#recDot').hidden = true;
+    dash.mic?.getTracks().forEach((tr) => tr.stop()); dash.mic = null;
     await new Promise((ok) => { r.onstop = ok; r.stop(); });
     const mime = r.mimeType || 'video/webm', ext = mime.includes('mp4') ? 'mp4' : 'webm';
     const blob = new Blob(dash.chunks, { type: mime }); dash.chunks = [];
@@ -1066,13 +1073,19 @@ async function dashRecord() {
   if (!dash.stream) return;
   const q = QUALITY[dash.q], mime = pickMime();
   const src = $('#withData').checked ? $('#dashCanvas').captureStream(30) : dash.stream; // con datos = lo que ves; sin datos = cámara tal cual
+  if ($('#withVoice').checked) { // la voz va en una petición aparte (la app solo concede micrófono o cámara por separado)
+    try { dash.mic = await navigator.mediaDevices.getUserMedia({ audio: true }); dash.mic.getAudioTracks().forEach((tr) => src.addTrack(tr)); if (VC.on) hint('Con la voz en el vídeo, algunos móviles pausan el micrófono de apoyo: las notas seguirán en el audio del vídeo.'); }
+    catch (e) { hint('Sin micrófono para el vídeo: ' + (e.message || e.name)); }
+  }
   dash.chunks = []; dash.rec = new MediaRecorder(src, { mimeType: mime || undefined, videoBitsPerSecond: q.bps });
   dash.rec.ondataavailable = (e) => { if (e.data.size) dash.chunks.push(e.data); };
   dash.rec.start(1000); dash.t0 = Date.now(); $('#recBtn').classList.add('on'); $('#recDot').hidden = false;
-  dash.timer = setInterval(() => { const s = Math.floor((Date.now() - dash.t0) / 1000); $('#recTime').textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; $('#dashSpeed').textContent = `${st.speed == null ? '–' : Math.round(st.speed * 3.6)} km/h`; }, 500);
+  dash.timer = setInterval(() => { const s = Math.floor((Date.now() - dash.t0) / 1000); $('#recTime').textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; $('#dashSpeed').textContent = `${VC.cal.gate(st.speed) == null ? '–' : Math.round(st.speed * 3.6)} km/h`; }, 500);
 }
 $('#dashBtn').addEventListener('click', dashOpen);
 $('#dashExit').addEventListener('click', dashClose);
+$('#dashMin').addEventListener('click', (e) => { e.stopPropagation(); dashMini(true); });
+$('#dash').addEventListener('click', () => { if (document.documentElement.classList.contains('dashmini')) dashMini(false); });
 $('#recBtn').addEventListener('click', dashRecord);
 $('#miniMap').addEventListener('click', () => { document.documentElement.classList.toggle('nomini'); st.map?.resize(); });
 document.querySelectorAll('#dash [data-q]').forEach((b) => b.addEventListener('click', async () => {
@@ -1580,3 +1593,68 @@ $('#crashFalse').addEventListener('click', () => {
   crash.open = false; $('#crash').hidden = true; hint('Falsa alarma anotada. Gracias: así se calibra el detector.');
 });
 $('#crashTest')?.addEventListener('click', () => { openCrash(detectCrashEvent(syntheticTrace('CRASH_REAR_END'), CRASH_CFG), true); });
+
+
+// ── Micrófono de apoyo: notas de voz con hora, posición, velocidad y lo que veía la cámara; órdenes para calibrar en vivo ──
+// Las notas (pueden llevar matrículas, que son datos personales) se quedan en este móvil y en la caja negra; no viajan en los avisos.
+const PARKED_MIN = 10; // lecturas de GPS en parado antes de filtrar (≈10 s a 1 Hz): elección de diseño, no un dato
+const VC = { on: false, parked: false, notes: LS.get('senda.voz.notas', []), cal: createParkedCalibrator({ minSamples: PARKED_MIN, saved: LS.get('senda.voz.parado', null) }), rec: null, errs: 0, quietUntil: 0 };
+function vcPill() {
+  $('#vcPill').hidden = !VC.on; $('#vcPill').classList.toggle('parked', VC.parked);
+  const thr = VC.cal.threshold();
+  $('#vcTxt').textContent = VC.parked ? `Calibrando en parado · ${VC.cal.state().n} lecturas` : `Escuchando · ${VC.notes.filter((n) => n.cmd === 'NOTE').length} notas${thr != null ? ` · parado ≤ ${(thr * 3.6).toFixed(1)} km/h` : ''}`;
+}
+function vcSay(t) { VC.quietUntil = Date.now() + 2500 + t.length * 60; say(t); } // no escuchar mientras habla la app
+function vcListen() {
+  if (!VC.on) return;
+  const wait = Math.max(0, VC.quietUntil - Date.now()) + (VC.errs > 3 ? 1500 : 250);
+  setTimeout(() => {
+    if (!VC.on) return;
+    if (typeof window.SendaNative?.listen === 'function') return window.SendaNative.listen();
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { VC.on = false; vcPill(); return hint('Este navegador no tiene reconocimiento de voz. Usa la app de Android.'); }
+    if (VC.rec) return;
+    const r = new SR(); r.lang = 'es-ES'; r.continuous = true; r.interimResults = false; r.maxAlternatives = 3;
+    r.onresult = (e) => { const res = e.results[e.results.length - 1]; vcHandle({ alternatives: [...res].map((a) => a.transcript) }); };
+    r.onerror = () => { VC.errs++; }; r.onend = () => { VC.rec = null; vcListen(); };
+    try { r.start(); VC.rec = r; } catch { VC.rec = null; }
+  }, wait);
+}
+function vcHandle(res) {
+  if (res.state) return; // «escuchando» / «procesando» del reconocedor nativo
+  if (res.error) { VC.errs++; return vcListen(); } // silencio o nada entendido: se vuelve a escuchar
+  VC.errs = 0;
+  const alts = res.alternatives ?? [], p = parseUtterance(alts[0] ?? '');
+  if (p.cmd === 'EMPTY') return vcListen();
+  const c = st.lastFix?.coords, entry = {
+    t: Date.now(), iso: new Date().toISOString(), lat: c?.latitude ?? null, lon: c?.longitude ?? null, accM: c?.accuracy ?? null,
+    gpsKmh: st.speed == null ? null : +(st.speed * 3.6).toFixed(1), shownKmh: VC.cal.gate(st.speed) == null ? null : +(VC.cal.gate(st.speed) * 3.6).toFixed(1), heading: st.heading ?? null,
+    cmd: p.cmd, kmh: p.kmh ?? null, text: p.text, alternatives: alts.slice(0, 3), tags: p.tags, plates: p.plates,
+    camera: st.lastVision ? { objects: st.lastVision.count ?? st.lastVision.objects ?? null } : null, dashcamSecond: dash.rec ? Math.round((Date.now() - dash.t0) / 1000) : null,
+  };
+  VC.notes.push(entry); if (VC.notes.length > 3000) VC.notes.shift(); LS.set('senda.voz.notas', VC.notes);
+  bbLog('voice', entry);
+  if (p.cmd === 'PARKED') { VC.parked = true; vcSay('Calibrando en parado. Cuando salgas, di en marcha.'); }
+  else if (p.cmd === 'MOVING') { VC.parked = false; LS.set('senda.voz.parado', VC.cal.state()); const thr = VC.cal.threshold(); vcSay(thr == null ? `Faltan lecturas en parado: llevo ${VC.cal.state().n} de ${PARKED_MIN}.` : `Calibrado. En parado el GPS marcaba hasta ${(thr * 3.6).toFixed(1)} kilómetros por hora; ahora se mostrará cero.`); }
+  else if (p.cmd === 'SPEED') vcSay(`Anotado: el coche marca ${p.kmh} y el GPS ${entry.gpsKmh == null ? 'no tiene dato' : Math.round(entry.gpsKmh)}.`);
+  else if (p.cmd === 'MARK') { bbLog('note', { text: 'MARCA por voz' }); vcSay('Marcado'); }
+  else if (p.cmd === 'FALSE_ALERT') vcSay('Anotado como falsa alarma');
+  else navigator.vibrate?.(40); // nota: sin voz, para no cortarte
+  vcPill(); vcListen();
+}
+function vcStart() {
+  VC.on = true; VC.errs = 0; vcPill();
+  hint('Micrófono de apoyo activo. Habla con normalidad: cada frase se guarda con hora, posición y velocidad. Órdenes: «estoy parado», «en marcha», «voy a 50», «marca», «falsa alarma».');
+  if (!bb) setTimeout(() => hint('Consejo: activa también la caja negra para que las notas queden en el mismo registro sellado que el GPS, los sensores y la cámara.'), 6000);
+  vcListen();
+}
+function vcStop() { VC.on = false; try { VC.rec?.stop(); } catch { /* */ } VC.rec = null; if (VC.parked) { VC.parked = false; LS.set('senda.voz.parado', VC.cal.state()); } vcPill(); hint(`Micrófono de apoyo parado · ${VC.notes.length} entradas guardadas en el móvil.`); }
+async function vcSave() {
+  const sum = summarizeSession(VC.notes);
+  const doc = { format: 'senda-voz/1', exportedAt: new Date().toISOString(), containsPersonalData: sum.containsPersonalData, notice: 'Puede contener matrículas (datos personales): no publicar; solo para calibrar sensores.', parkedCalibration: { minSamples: PARKED_MIN, ...VC.cal.state() }, summary: sum, notes: VC.notes };
+  const r = await saveBlob(new Blob([JSON.stringify(doc, null, 1)], { type: 'application/json' }), `senda-voz-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}.json`);
+  hint(r.ok ? `Notas de voz guardadas en ${r.where}.` : 'No se pudieron guardar las notas.');
+}
+$('#vcBtn')?.addEventListener('click', () => (VC.on ? vcStop() : vcStart()));
+$('#vcStop')?.addEventListener('click', vcStop);
+$('#vcSave')?.addEventListener('click', vcSave);
