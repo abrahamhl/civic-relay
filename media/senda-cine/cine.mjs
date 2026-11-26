@@ -8,6 +8,7 @@ import { UnrealBloomPass } from '/media/senda-film/cinema/vendor/addons/postproc
 import { OutputPass } from '/media/senda-film/cinema/vendor/addons/postprocessing/OutputPass.js';
 import { worldKinds } from './scenes-world.mjs';
 import { filmKinds } from './scenes-film.mjs';
+import { arcenKinds } from './scenes-arcen.mjs';
 
 const NAME = new URLSearchParams(location.search).get('script') || 'cine-belgica';
 const TL = await (await fetch(`/media/senda-film/build/timings-${NAME}-es.json`)).json();
@@ -34,7 +35,7 @@ const TRUTH = {
   PLAN: [C.sky, 'Hoja de ruta · convocatorias verificadas en fuentes oficiales'],
 };
 
-const KINDS = { ...roadKinds, ...worldKinds, ...filmKinds };
+const KINDS = { ...roadKinds, ...worldKinds, ...filmKinds, ...arcenKinds };
 const built = new Map();
 function sceneFor(sc) {
   if (!built.has(sc.id)) { const mk = KINDS[sc.visual.kind]; if (!mk) throw new Error('tipo de escena desconocido: ' + sc.visual.kind); const made = mk({ sc, renderer }); if (made.scene && !made.noEnv) { made.scene.environment = ENV; const k = made.envIntensity ?? 1; made.scene.traverse((o) => { if (o.material && 'envMapIntensity' in o.material) o.material.envMapIntensity = k; }); } built.set(sc.id, made); }

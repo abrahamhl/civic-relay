@@ -675,6 +675,7 @@ async function goTo(dest, reroute = false) {
     const r = parseRoute(await (await fetch(routeUrl({ from: st.pos, to: dest.at, mode: st.mode }))).json());
     if (!r.ok) return hint('No hay ruta: ' + r.reason);
     st.route = r; st.said = new Set(); st.follow = true;
+    if (!reroute) window.SendaNative?.p2pStart?.(); // APK: buzón Bluetooth abierto mientras navegas, para recibir avisos de accidentes cercanos
     st.map?.getSource('route')?.setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: r.coords } });
     const arrive = new Date(Date.now() + r.durationS * 1000);
     $('#etaTime').textContent = arrive.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });

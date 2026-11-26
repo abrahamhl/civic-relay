@@ -113,10 +113,15 @@ function fire() {
 
 // ---------- Clip real de la aplicación (WebM VP9 derivado del MP4 publicado), buscado fotograma a fotograma
 function clip({ sc }) {
-  const { scene, camera } = stage('#000000'); const v = document.createElement('video'); v.muted = true; v.preload = 'auto'; v.src = `/media/senda-film/build/clips/${sc.visual.clip}.webm`;
-  const ready = new Promise((ok) => { v.addEventListener('loadeddata', ok, { once: true }); v.load(); });
+  const { scene, camera } = stage('#000000'); const v = document.createElement('video'); v.muted = true; v.preload = 'auto'; // Se carga entero en memoria (blob): así se puede saltar a cualquier segundo aunque el servidor no admita peticiones por rangos.
+  const ready = fetch(`/media/senda-film/build/clips/${sc.visual.clip}.webm`).then((r) => r.blob()).then((b) => new Promise((ok) => { v.addEventListener('loadeddata', ok, { once: true }); v.src = URL.createObjectURL(b); v.load(); }));
   async function update({ local }) { const t = Math.min((v.duration || 1) - 0.05, (sc.visual.start || 0) + local); if (Math.abs(v.currentTime - t) > 0.001) { await new Promise((ok) => { v.addEventListener('seeked', ok, { once: true }); v.currentTime = t; }); } }
-  function overlay() { const r = Math.min(W / v.videoWidth, H / v.videoHeight), w = v.videoWidth * r, h = v.videoHeight * r; g.drawImage(v, (W - w) / 2, (H - h) / 2, w, h); g.save(); g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, 0, W, 200); g.restore(); }
+  function overlay() {
+    if (v.videoHeight > v.videoWidth) { // grabación de móvil en vertical: el teléfono a la derecha, sin oscurecer la pantalla
+      const h = H - 190, w = (v.videoWidth / v.videoHeight) * h, x = W * 0.64 - w / 2, y = 135;
+      g.save(); g.fillStyle = '#0b0f12'; g.beginPath(); g.roundRect(x - 14, y - 14, w + 28, h + 28, 34); g.fill(); g.beginPath(); g.roundRect(x, y, w, h, 22); g.clip(); g.drawImage(v, x, y, w, h); g.restore(); return;
+    }
+    const r = Math.min(W / v.videoWidth, H / v.videoHeight), w = v.videoWidth * r, h = v.videoHeight * r; g.drawImage(v, (W - w) / 2, (H - h) / 2, w, h); g.save(); g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, 0, W, 200); g.restore(); }
   return { scene, camera, update, overlay, ready, noEnv: true };
 }
 

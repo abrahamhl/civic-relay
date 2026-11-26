@@ -35,5 +35,5 @@ export function laneSvg(lanes, { laneW = 30, h = 40, valid = '#ffffff', dim = 'r
     const sep = i ? `<line x1="${i * laneW}" y1="3" x2="${i * laneW}" y2="${h - 3}" stroke="rgba(255,255,255,.45)" stroke-width="1.6" stroke-dasharray="5 4"/>` : '';
     return sep + arrows;
   }).join('');
-  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${laneGuide(lanes)?.text ?? ''}">${parts}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${laneGuide(lanes)?.text ?? ''}">${parts}</svg>`;
 }

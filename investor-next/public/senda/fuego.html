@@ -57,6 +57,25 @@ ol.tl{padding-left:20px;margin:6px 0}ol.tl li{margin:4px 0}
   </section>
 </div>
 
+<section class="card" style="margin-top:14px" aria-labelledby="h-nc">
+  <h2 id="h-nc">📸 Reportes con foto → previsión del frente</h2>
+  <p class="m" style="font-size:14px;margin-top:0">La primera patrulla de la Guardia Civil o de la policía hace la foto del atestado y la manda por SENDA. Luego se suman vecinos, bomberos y sensores: «el frente está aquí», «ha saltado la carretera», «foco secundario». Con cada reporte el motor <b>recalcula</b> hacia dónde va y a qué velocidad, lo compara con el viento y estima cuándo llegaría a cada carretera. La foto se queda en el móvil: solo viaja su huella SHA-256.</p>
+  <div class="cl">
+    <label for="nc-k">Qué se ve</label><select id="nc-k"><option value="FRONT">El frente está aquí</option><option value="CROSSED_ROAD">Ha saltado la carretera</option><option value="SPOT">Foco secundario (pavesas)</option><option value="SMOKE">Solo humo (no marca el frente)</option></select><span></span>
+    <label for="nc-s">Quién informa</label><select id="nc-s"><option>GUARDIA_CIVIL</option><option>POLICIA</option><option>BOMBEROS</option><option>UME</option><option>AGENTE_FORESTAL</option><option>CIUDADANO</option><option>SENSOR</option></select><span></span>
+    <label for="nc-r">Carretera (si la ha saltado)</label><input id="nc-r" placeholder="p. ej. M-501" style="min-height:40px;border-radius:10px;border:1px solid var(--l);background:#0f1418;color:inherit;padding:0 10px"><span></span>
+    <label for="nc-w">Viento a 10 m (km/h)</label><input id="nc-w" type="number" min="0" max="150" placeholder="sin dato" style="min-height:40px;border-radius:10px;border:1px solid var(--l);background:#0f1418;color:inherit;padding:0 10px"><span></span>
+    <label for="nc-w2">Viento previsto ahora (km/h)</label><input id="nc-w2" type="number" min="0" max="150" placeholder="igual" style="min-height:40px;border-radius:10px;border:1px solid var(--l);background:#0f1418;color:inherit;padding:0 10px"><span></span>
+    <label for="nc-c">Margen para cortar (min)</label><input id="nc-c" type="number" min="0" max="600" placeholder="lo fija el mando" style="min-height:40px;border-radius:10px;border:1px solid var(--l);background:#0f1418;color:inherit;padding:0 10px"><span></span>
+  </div>
+  <div class="row"><label class="p" style="display:inline-grid;place-items:center;min-height:44px;padding:0 14px;border-radius:12px;cursor:pointer">📷 Foto + mi posición<input id="nc-photo" type="file" accept="image/*" capture="environment" hidden></label><button id="nc-add">Reporte sin foto aquí</button><button id="nc-demo">Escenario de prueba (simulación)</button><button id="nc-clear">Borrar reportes</button></div>
+  <p id="nc-st" class="m" style="font-size:14px" aria-live="polite"></p>
+  <div class="kv" id="nc-kv"></div>
+  <div class="tw" style="margin-top:8px"><table><thead><tr><th>Carretera</th><th>El frente llegaría</th><th>Propuesta</th></tr></thead><tbody id="nc-rd"></tbody></table></div>
+  <div class="tw" style="margin-top:8px"><table><thead><tr><th>Hora</th><th>Qué</th><th>Quién</th><th>Foto (huella)</th></tr></thead><tbody id="nc-ls"></tbody></table></div>
+  <p class="src">Motor <code>fire-nowcast.mjs</code>: dirección = media circular de los rumbos ponderada por la distancia; velocidad = regresión del avance frente al tiempo; forma con viento de Alexander (1985); contraste con la regla del 10 % (Cruz y Alexander 2019, <i>Fire</i> 2(2):19). Sin viento solo se estima la zona de cabeza. Las carreteras son las del caso de San Martín de Valdeiglesias. El corte de una carretera lo decide el mando; SENDA lo propone.</p>
+</section>
+
 <section class="card" style="margin-top:14px" aria-labelledby="h-p">
   <h2 id="h-p">🧭 Prueba con tu móvil: marca la columna de humo</h2>
   <div class="g2" style="margin-top:0">
@@ -283,5 +302,57 @@ show({ ejemplo: 'así sale una observación', ...{ rumbo: '75,0° (a mano)', err
 $('#r-facts').innerHTML = [...CASE_SMV_2026.facts, ...CASE_SMV_2026.context].map((f) => `<li style="margin:5px 0">${f.text} <a href="${f.src}" class="src">[fuente]</a></li>`).join('');
 const chip = { PASIVO: 'ok', CONVENIO: 'sim', NUNCA: 'no' };
 $('#s-tb').innerHTML = FIRE_SOURCES.map((s) => `<tr><td>${s.url ? `<a href="${s.url}">${s.name}</a>` : s.name}</td><td>${s.gives}</td><td>${s.latency}</td><td>${s.legal}</td><td><span class="chip ${chip[s.access]}">${s.access}</span></td></tr>`).join('');
+</script>
+<script type="module">
+import { fitFront, windCheck, roadPlan, REPORT_KINDS_FIRE } from '/senda/core/fire-nowcast.mjs';
+import { fireScenario } from '/senda/core/fire-watch.mjs';
+const $ = (q) => document.querySelector(q), esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const sc = fireScenario({ seed: 7 }), roads = sc.roads.map((r) => ({ name: r.id, coords: r.path.map((p) => [p.lon, p.lat]) }));
+const KEY = 'senda.fuego.reports', load = () => { try { return JSON.parse(localStorage.getItem(KEY)) ?? { ign: null, reps: [], sim: false }; } catch { return { ign: null, reps: [], sim: false }; } };
+let S = load(); const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* */ } };
+const num = (id) => { const v = $(id).value.trim(); return v === '' ? null : Number(v); };
+const dec = (x) => String(x).replace('.', ','), fmtM = (m) => (m < 90 ? `${m} min` : m < 2880 ? `${dec((m / 60).toFixed(1))} h` : 'más de 2 días');
+const hhmm = (tS) => new Date(tS * 1000).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+async function sha(file) { const h = await crypto.subtle.digest('SHA-256', await file.arrayBuffer()); return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, '0')).join(''); }
+function here() { return new Promise((ok, ko) => navigator.geolocation ? navigator.geolocation.getCurrentPosition((p) => ok(p.coords), ko, { enableHighAccuracy: true, timeout: 15000 }) : ko(new Error('sin GPS'))); }
+async function add(photo) {
+  $('#nc-st').textContent = 'Buscando tu posición…';
+  try {
+    const c = await here(), r = { tS: Date.now() / 1000, lat: c.latitude, lon: c.longitude, accM: c.accuracy, kind: $('#nc-k').value, from: $('#nc-s').value, road: $('#nc-r').value.trim() || null, photoSha256: photo ? await sha(photo) : null };
+    if (S.sim) S = { ign: null, reps: [], sim: false };
+    if (!S.ign) S.ign = { tS: r.tS - 60, lat: r.lat, lon: r.lon, note: 'primer reporte (ignición aproximada)' };
+    S.reps.push(r); save(); render(); $('#nc-st').textContent = `Reporte añadido (GPS ± ${Math.round(c.accuracy)} m)${photo ? '; la foto no sale del móvil' : ''}.`;
+  } catch (e) { $('#nc-st').textContent = 'No se pudo leer la posición: ' + e.message; }
+}
+$('#nc-photo').addEventListener('change', (e) => { const f = e.target.files?.[0]; if (f) add(f); e.target.value = ''; });
+$('#nc-add').addEventListener('click', () => add(null));
+$('#nc-clear').addEventListener('click', () => { S = { ign: null, reps: [], sim: false }; save(); render(); });
+$('#nc-demo').addEventListener('click', () => {
+  // SIMULACIÓN: reportes colocados con la geometría ilustrativa del caso (dirección y velocidad del escenario, no medidas).
+  const o = sc.ignition, t0 = Date.now() / 1000 - 3 * 3600, d = sc.spreadToDeg * Math.PI / 180, mLat = 111195, mLon = 111195 * Math.cos(o.lat * Math.PI / 180);
+  const at = (min, off = 0, k = 1) => { const a = d + off * Math.PI / 180, m = sc.rosHeadMMin * min * k; return { lat: o.lat + (m * Math.cos(a)) / mLat, lon: o.lon + (m * Math.sin(a)) / mLon }; };
+  S = { sim: true, ign: { tS: t0, lat: o.lat, lon: o.lon, note: 'ignición del escenario' }, reps: [
+    { tS: t0 + 20 * 60, ...at(20, 5), kind: 'FRONT', from: 'GUARDIA_CIVIL', photoSha256: 'simulación' },
+    { tS: t0 + 50 * 60, ...at(50, -8), kind: 'FRONT', from: 'CIUDADANO', photoSha256: 'simulación' },
+    { tS: t0 + 70 * 60, ...at(70, 60, 0.4), kind: 'FRONT', from: 'BOMBEROS' },
+    { tS: t0 + 95 * 60, ...at(95, 2, 1.15), kind: 'SPOT', from: 'POLICIA', photoSha256: 'simulación' },
+    { tS: t0 + 100 * 60, ...at(60, -90), kind: 'SMOKE', from: 'CIUDADANO' },
+  ] };
+  save(); render(); $('#nc-st').textContent = 'SIMULACIÓN cargada: reportes inventados con la geometría ilustrativa del caso. Prueba a escribir el viento y el margen de corte.';
+});
+for (const id of ['#nc-w', '#nc-w2', '#nc-c']) $(id).addEventListener('input', render);
+function render() {
+  $('#nc-ls').innerHTML = S.reps.map((r) => `<tr><td>${hhmm(r.tS)}</td><td>${esc(REPORT_KINDS_FIRE[r.kind])}${r.road ? ` · ${esc(r.road)}` : ''}</td><td>${esc(r.from)}</td><td>${r.photoSha256 ? esc(r.photoSha256.slice(0, 12)) + (r.photoSha256.length > 12 ? '…' : '') : '—'}</td></tr>`).join('') || '<tr><td colspan="4">Sin reportes todavía.</td></tr>';
+  if (!S.ign || !S.reps.length) { $('#nc-kv').innerHTML = ''; $('#nc-rd').innerHTML = ''; return; }
+  const f = fitFront(S.ign, S.reps), w = num('#nc-w'), w2 = num('#nc-w2'), cut = num('#nc-c');
+  if (!f.ok) { $('#nc-kv').innerHTML = `<div><b>—</b><span>${esc(f.reason)}</span></div>`; $('#nc-rd').innerHTML = ''; return; }
+  const wc = w != null ? windCheck(f, w) : null, card = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'][Math.round(f.dirToDeg / 45) % 8];
+  const TR = { ACELERA: 'acelera', FRENA: 'frena', ESTABLE: 'estable', SIN_DATOS: 'faltan reportes' }, VD = { COHERENTE: 'coherente con el viento', MAS_RAPIDO_QUE_LA_REGLA: 'más rápido de lo que explica el viento: revisar pendiente, combustible o focos', MAS_LENTO_QUE_LA_REGLA: 'más lento de lo que daría el viento' };
+  $('#nc-kv').innerHTML = [[`${S.sim ? 'SIMULACIÓN · ' : ''}${card} (${f.dirToDeg}°)`, 'hacia dónde avanza'], [`${dec(f.rosMMin)} m/min${f.rosSeMMin != null ? ` ± ${dec(f.rosSeMMin)}` : ''}`, `velocidad de cabeza (${f.used} reportes)`], [TR[f.trend], 'tendencia del último tramo'], [wc ? `${dec(wc.ratio)}×` : 'sin viento', wc ? `regla del 10 %: ${VD[wc.verdict]}` : 'escribe el viento para contrastar'], [String(f.smoke), 'reportes de humo (no cuentan)'], [f.sources.join(', ') || '—', 'quién ha informado']].map(([v, k]) => `<div><b>${esc(v)}</b><span>${esc(k)}</span></div>`).join('');
+  if (cut == null) { $('#nc-rd').innerHTML = '<tr><td colspan="3">Escribe el margen para cortar (lo fija el mando) para ver las propuestas.</td></tr>'; return; }
+  const plan = roadPlan(f, roads, { nowS: Date.now() / 1000, cutLeadMin: cut, windKmh: w, windObsKmh: w2 != null ? w : null, windNowKmh: w2 });
+  $('#nc-rd').innerHTML = plan.map((p) => `<tr><td>${esc(p.name)}</td><td>${p.observed ? 'ya la ha cruzado (reportado)' : p.minutes == null ? esc(p.why) : p.minutes <= 0 ? 'ya debería haber llegado: confirmar' : `en ${fmtM(p.minutes)}`}</td><td>${p.cut ? '<b style="color:#ff8a7a">Proponer corte</b>' : 'vigilar'}</td></tr>`).join('');
+}
+render();
 </script>
 </body></html>

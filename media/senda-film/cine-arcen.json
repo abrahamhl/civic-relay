@@ -1,0 +1,150 @@
+{
+ "note": "Caso del arcén: furgoneta parada, taxi detrás y un tercer coche. Reconstrucción ilustrativa de un relato; física simple con supuestos declarados; grabación real de la app.",
+ "chapter": "El arcén",
+ "voices": {
+  "es": {
+   "voice": "em_alex",
+   "lang": "es",
+   "speed": 0.97
+  }
+ },
+ "scenes": [
+  {
+   "id": "c1",
+   "claim": "ILLUSTRATIVE",
+   "source": [
+    "media/senda-cine/scenes-arcen.mjs"
+   ],
+   "visual": {
+    "kind": "shoulder",
+    "phase": "intro",
+    "chapter": "El arcén"
+   },
+   "title": {
+    "es": "Una furgoneta en el arcén"
+   },
+   "es": [
+    "Una autopista. Una furgoneta se detiene en el arcén derecho, con las luces de emergencia encendidas.",
+    "Un taxi para detrás, también en el arcén.",
+    "Es la reconstrucción animada de lo que contó un conductor. No está a escala."
+   ],
+   "es_say": [
+    "Una autopista. Una furgoneta se detiene en el arcén derecho, con las luces de emergencia encendidas.",
+    "Un taxi para detrás, también en el arcén.",
+    "Es la reconstrucción animada de lo que contó un conductor. No está a escala."
+   ]
+  },
+  {
+   "id": "c2",
+   "claim": "ILLUSTRATIVE",
+   "source": [
+    "media/senda-cine/scenes-arcen.mjs"
+   ],
+   "visual": {
+    "kind": "shoulder",
+    "phase": "crash",
+    "chapter": "El arcén"
+   },
+   "title": {
+    "es": "El golpe"
+   },
+   "es": [
+    "Un tercer coche llega por el carril derecho, distraído y muy rápido, y se va hacia el arcén.",
+    "Choca contra el taxi, y el taxi sale empujado contra la furgoneta.",
+    "Los tres vehículos son arrastrados varios metros antes de pararse. El movimiento sale de una física sencilla, con masas y velocidad supuestas."
+   ],
+   "es_say": [
+    "Un tercer coche llega por el carril derecho, distraído y muy rápido, y se va hacia el arcén.",
+    "Choca contra el taxi, y el taxi sale empujado contra la furgoneta.",
+    "Los tres vehículos son arrastrados varios metros antes de pararse. El movimiento sale de una física sencilla, con masas y velocidad supuestas."
+   ]
+  },
+  {
+   "id": "c3",
+   "claim": "REAL_RECORDING",
+   "source": [
+    "investor-next/public/senda/conducir.mjs",
+    "packages/senda/src/lane-guide.mjs",
+    "packages/senda/src/roadsafe-crash-detect.mjs"
+   ],
+   "visual": {
+    "kind": "clip",
+    "chapter": "En el móvil",
+    "clip": "app-conducir-carriles-choque",
+    "start": 7.5
+   },
+   "title": {
+    "es": "La aplicación, de verdad"
+   },
+   "es": [
+    "Esto es la aplicación real. Mientras conduces, SENDA te dice cuántos carriles hay y cuáles usar, con los datos de OpenStreetMap.",
+    "Si los sensores del móvil notan un golpe, salta una alarma fuerte, para que encuentres el teléfono aunque haya caído bajo el asiento.",
+    "Cinco botones grandes: estoy bien, no estoy bien, necesitamos ayuda, reportar situación y llamar al 112.",
+    "Al reportar eliges cuántos vehículos hay y dónde quedaron, y SENDA te prepara lo que hay que decir al 112. La llamada la haces tú.",
+    "Aquí es una prueba: no se guarda ni se envía nada."
+   ],
+   "es_say": [
+    "Esto es la aplicación real. Mientras conduces, SENDA te dice cuántos carriles hay y cuáles usar, con los datos de OpenStreetMap.",
+    "Si los sensores del móvil notan un golpe, salta una alarma fuerte, para que encuentres el teléfono aunque haya caído bajo el asiento.",
+    "Cinco botones grandes: estoy bien, no estoy bien, necesitamos ayuda, reportar situación y llamar al 112.",
+    "Al reportar eliges cuántos vehículos hay y dónde quedaron, y SENDA te prepara lo que hay que decir al 112. La llamada la haces tú.",
+    "Aquí es una prueba: no se guarda ni se envía nada."
+   ]
+  },
+  {
+   "id": "c4",
+   "claim": "SIMULATION",
+   "source": [
+    "packages/senda/src/crash-cluster.mjs",
+    "packages/senda/tests/lane-crash.test.mjs"
+   ],
+   "visual": {
+    "kind": "shoulder",
+    "phase": "phones",
+    "chapter": "Tres móviles"
+   },
+   "title": {
+    "es": "Tres móviles, un accidente"
+   },
+   "es": [
+    "En este caso hay tres móviles, uno en cada vehículo, y cada uno detecta el golpe por su cuenta.",
+    "SENDA no pinta tres accidentes: los junta en uno solo, con un icono pequeño y un «por tres».",
+    "La posición combina los tres GPS según su precisión. Con dos o más móviles, el aviso pasa de probable a confirmado.",
+    "El carril no lo adivina el GPS: lo dice la gente al reportar. Y el satélite no sirve para confirmarlo, porque las imágenes públicas no distinguen coches."
+   ],
+   "es_say": [
+    "En este caso hay tres móviles, uno en cada vehículo, y cada uno detecta el golpe por su cuenta.",
+    "SENDA no pinta tres accidentes: los junta en uno solo, con un icono pequeño y un «por tres».",
+    "La posición combina los tres GPS según su precisión. Con dos o más móviles, el aviso pasa de probable a confirmado.",
+    "El carril no lo adivina el GPS: lo dice la gente al reportar. Y el satélite no sirve para confirmarlo, porque las imágenes públicas no distinguen coches."
+   ]
+  },
+  {
+   "id": "c5",
+   "claim": "ILLUSTRATIVE",
+   "source": [
+    "packages/senda/src/crash-cluster.mjs",
+    "packages/senda/tests/lane-crash.test.mjs",
+    "investor-next/public/senda/core/hazard-share.mjs"
+   ],
+   "visual": {
+    "kind": "shoulder",
+    "phase": "behind",
+    "chapter": "Los que vienen detrás"
+   },
+   "title": {
+    "es": "Los que vienen detrás"
+   },
+   "es": [
+    "El aviso sale por Bluetooth hacia los móviles SENDA cercanos que están en modo conducción, sin necesidad de cobertura.",
+    "Quien viene detrás ve el accidente en su mapa antes de llegar, se aparta del carril derecho y reduce.",
+    "SENDA avisa y prepara la llamada. Las personas deciden y las autoridades gestionan."
+   ],
+   "es_say": [
+    "El aviso sale por Bluetooth hacia los móviles SENDA cercanos que están en modo conducción, sin necesidad de cobertura.",
+    "Quien viene detrás ve el accidente en su mapa antes de llegar, se aparta del carril derecho y reduce.",
+    "SENDA avisa y prepara la llamada. Las personas deciden y las autoridades gestionan."
+   ]
+  }
+ ]
+}
