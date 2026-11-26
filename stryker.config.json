@@ -1,0 +1,48 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "node --test packages/senda/tests/properties-critical.test.mjs packages/senda/tests/heading-fusion.test.mjs packages/senda/tests/mmwave-radar.test.mjs packages/senda/tests/rail-reconstruct.test.mjs"
+  },
+  "mutate": [
+    "packages/senda/src/erasure.mjs",
+    "packages/senda/src/heading-fusion.mjs",
+    "packages/senda/src/mmwave-radar.mjs",
+    "packages/senda/src/shallow-water.mjs",
+    "packages/senda/src/rail-reconstruct.mjs"
+  ],
+  "disableTypeChecks": false,
+  "ignorePatterns": [
+    "apps/**",
+    "investor-next/**",
+    "!investor-next/public/senda/data/adamuz2026/**",
+    "docs/**",
+    "evidence/**",
+    "experimental/**",
+    "hardware/**",
+    "scripts/**",
+    "packages/api/**",
+    "packages/core/**",
+    "packages/schemas/**",
+    "packages/transports/**",
+    "packages/senda-pci/**",
+    "packages/senda-relay/**",
+    "packages/senda-vision/**",
+    "packages/senda/data/**",
+    "packages/senda/calibration/**"
+  ],
+  "coverageAnalysis": "off",
+  "concurrency": 6,
+  "timeoutMS": 15000,
+  "reporters": ["clear-text", "json"],
+  "jsonReporter": {
+    "fileName": "evidence/quality/stryker-raw.json"
+  },
+  "thresholds": {
+    "high": 85,
+    "low": 80,
+    "break": 80
+  },
+  "tempDirName": ".stryker-tmp",
+  "cleanTempDir": true
+}
