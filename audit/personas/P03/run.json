@@ -1,0 +1,82 @@
+{
+  "schema": "BUYER_ARENA_PERSONA_RUN_V1",
+  "actor_id": "P03",
+  "legacy_id": "03-investor-en",
+  "role": "Technology investor, EN",
+  "objective": "Find evidence and funding proposition",
+  "disclosure": "AUTOMATED SYNTHETIC ROLE — NOT A RECRUITED HUMAN TESTER",
+  "campaign_mode": "SINGLE-VERSION SMOKE",
+  "target_url": "https://civic-relay-investor.vercel.app",
+  "target_commit": "c18c6ac936c8b3c6560997b113e46b50cab51302",
+  "language": "en",
+  "viewport": {
+    "width": 1280,
+    "height": 850
+  },
+  "started_at": "2026-10-21T06:08:01.356Z",
+  "completed_at": "2026-10-21T06:08:03.008Z",
+  "visited_urls": [
+    "https://civic-relay-investor.vercel.app/",
+    "https://civic-relay-investor.vercel.app/#evidence"
+  ],
+  "actions_performed": [
+    "goto https://civic-relay-investor.vercel.app/",
+    "click chapter anchor #evidence"
+  ],
+  "selector_interactions": [
+    {
+      "selector": "h1",
+      "action": "innerText",
+      "observed": "WHEN THE\nNETWORK\nGOES DARK."
+    },
+    {
+      "selector": "#what-oep-does",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#architecture",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#how-it-works",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#routing-lab",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#developer-stack",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": "#evidence",
+      "action": "count",
+      "observed": 1
+    },
+    {
+      "selector": ".oep-chapter-nav a",
+      "action": "count",
+      "observed": 6
+    },
+    {
+      "selector": ".oep-chapter-nav a[href=\"#evidence\"]",
+      "action": "click",
+      "result_url": "https://civic-relay-investor.vercel.app/#evidence"
+    },
+    {
+      "selector": "#investment",
+      "action": "count",
+      "observed": 1
+    }
+  ],
+  "verdict": "AUTOMATED_BROWSER_CHECKS_PASSED",
+  "passed_checks": 10,
+  "failed_checks": 0,
+  "critical_failures": 0
+}

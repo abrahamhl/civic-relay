@@ -1,0 +1,607 @@
+{
+  "kind": "OEP_SYNTHETIC_EVIDENCE_EXPORT",
+  "exportVersion": 1,
+  "warning": "SIMULATION_ONLY_NOT_PHYSICALLY_TESTED_NOT_AN_EMERGENCY_SERVICE",
+  "input": {
+    "devices": 20,
+    "seed": 20261020,
+    "participation": 80,
+    "permissions": 85,
+    "battery": 65,
+    "damaged": 85,
+    "responses": 10,
+    "helpRequests": 3,
+    "bluetooth": true,
+    "wifi": true,
+    "gateway": true
+  },
+  "result": {
+    "kind": "RESEARCH_SIMULATION_NOT_OPERATIONAL",
+    "version": "0.1",
+    "seed": 20261020,
+    "zone": {
+      "id": "EXERCISE-20261020",
+      "type": "EARTHQUAKE",
+      "provenance": "SIMULATION_NOT_OFFICIAL",
+      "institutionalAuthentication": false,
+      "intensity": "SYNTHETIC",
+      "certainty": "NOT_ASSESSED",
+      "polygon": [
+        [
+          0.2,
+          0.2
+        ],
+        [
+          0.8,
+          0.2
+        ],
+        [
+          0.8,
+          0.8
+        ],
+        [
+          0.2,
+          0.8
+        ]
+      ],
+      "permissionPolicy": "OPT_IN",
+      "activation": "EXERCISE_ONLY",
+      "expiresAfterSeconds": 3600,
+      "cancellation": "RESET_EXERCISE"
+    },
+    "assumptions": {
+      "geometry": "NORMALIZED_VIRTUAL_UNITS",
+      "radioRange": 0.275,
+      "bluetooth": true,
+      "wifi": true,
+      "gateway": true,
+      "realRadio": false,
+      "realSatellite": false,
+      "authorityVerification": false,
+      "encryption": false,
+      "live112": false,
+      "energyMeasured": false,
+      "latencyMeasured": false,
+      "ack": "SYNTHETIC_GATEWAY_RECEIPT_ONLY"
+    },
+    "summary": {
+      "totalDevices": 20,
+      "participating": 16,
+      "permissioned": 15,
+      "humanSafe": 10,
+      "humanSOS": 3,
+      "humanUnknown": 3,
+      "noContact": 4,
+      "modelledMessages": 13,
+      "syntheticAcks": 12,
+      "queued": 1,
+      "cellularOnlyAcks": 1,
+      "simulatedLocalGatewayAcks": 11,
+      "energyProfile": "ALERT"
+    },
+    "devices": [
+      {
+        "id": "NODE-001",
+        "x": 0.12987374149262906,
+        "y": 0.1287220967421308,
+        "floor": 0,
+        "participating": true,
+        "permission": true,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "SAFE"
+      },
+      {
+        "id": "NODE-002",
+        "x": 0.27001277562696485,
+        "y": 0.13451455206610263,
+        "floor": 1,
+        "participating": true,
+        "permission": true,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "SAFE"
+      },
+      {
+        "id": "NODE-003",
+        "x": 0.5164279907848686,
+        "y": 0.12052526177372784,
+        "floor": 2,
+        "participating": true,
+        "permission": true,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "SAFE"
+      },
+      {
+        "id": "NODE-004",
+        "x": 0.6754525635344907,
+        "y": 0.13748132660984994,
+        "floor": 3,
+        "participating": true,
+        "permission": true,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "SAFE"
+      },
+      {
+        "id": "NODE-005",
+        "x": 0.8807998505048454,
+        "y": 0.13032565612811595,
+        "floor": 4,
+        "participating": true,
+        "permission": false,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "PERMISSION_REQUIRED",
+        "wifi": "PERMISSION_REQUIRED",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "SAFE"
+      },
+      {
+        "id": "NODE-006",
+        "x": 0.12532254675868898,
+        "y": 0.4013075851555914,
+        "floor": 0,
+        "participating": true,
+        "permission": true,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "SAFE"
+      },
+      {
+        "id": "NODE-007",
+        "x": 0.3050817111181095,
+        "y": 0.40436294962652025,
+        "floor": 1,
+        "participating": false,
+        "permission": false,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "RESTRICTED",
+        "wifi": "RESTRICTED",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "UNKNOWN"
+      },
+      {
+        "id": "NODE-008",
+        "x": 0.48189363318495454,
+        "y": 0.36894126479979605,
+        "floor": 2,
+        "participating": true,
+        "permission": true,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "SAFE"
+      },
+      {
+        "id": "NODE-009",
+        "x": 0.6922452370403334,
+        "y": 0.37234863940626384,
+        "floor": 3,
+        "participating": true,
+        "permission": true,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "SAFE"
+      },
+      {
+        "id": "NODE-010",
+        "x": 0.8726772542484105,
+        "y": 0.39579191379714757,
+        "floor": 4,
+        "participating": true,
+        "permission": true,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "SAFE"
+      },
+      {
+        "id": "NODE-011",
+        "x": 0.08734274102840574,
+        "y": 0.5951743854116649,
+        "floor": 0,
+        "participating": true,
+        "permission": true,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "SAFE"
+      },
+      {
+        "id": "NODE-012",
+        "x": 0.31448535569943487,
+        "y": 0.6358596802083776,
+        "floor": 1,
+        "participating": true,
+        "permission": true,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "SOS_EXPLICIT"
+      },
+      {
+        "id": "NODE-013",
+        "x": 0.5039047799166292,
+        "y": 0.6229548055818305,
+        "floor": 2,
+        "participating": false,
+        "permission": false,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "RESTRICTED",
+        "wifi": "RESTRICTED",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "UNKNOWN"
+      },
+      {
+        "id": "NODE-014",
+        "x": 0.7050329969776794,
+        "y": 0.628458350226283,
+        "floor": 3,
+        "participating": true,
+        "permission": true,
+        "online": true,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "SOS_EXPLICIT"
+      },
+      {
+        "id": "NODE-015",
+        "x": 0.9125737703405321,
+        "y": 0.6142401525052265,
+        "floor": 4,
+        "participating": true,
+        "permission": true,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "SOS_EXPLICIT"
+      },
+      {
+        "id": "NODE-016",
+        "x": 0.0744152860576287,
+        "y": 0.8731891527678818,
+        "floor": 0,
+        "participating": true,
+        "permission": true,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "UNKNOWN"
+      },
+      {
+        "id": "NODE-017",
+        "x": 0.2970423003751784,
+        "y": 0.9041960722906515,
+        "floor": 1,
+        "participating": true,
+        "permission": true,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "UNKNOWN"
+      },
+      {
+        "id": "NODE-018",
+        "x": 0.5020108075207099,
+        "y": 0.8885524880699813,
+        "floor": 2,
+        "participating": true,
+        "permission": true,
+        "online": true,
+        "energy": "ALERT",
+        "bluetooth": "AVAILABLE",
+        "wifi": "AVAILABLE",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "UNKNOWN"
+      },
+      {
+        "id": "NODE-019",
+        "x": 0.7058199708489701,
+        "y": 0.896141460351646,
+        "floor": 3,
+        "participating": false,
+        "permission": false,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "RESTRICTED",
+        "wifi": "RESTRICTED",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "UNKNOWN"
+      },
+      {
+        "id": "NODE-020",
+        "x": 0.9169423174252733,
+        "y": 0.900076381508261,
+        "floor": 4,
+        "participating": false,
+        "permission": false,
+        "online": false,
+        "energy": "ALERT",
+        "bluetooth": "RESTRICTED",
+        "wifi": "RESTRICTED",
+        "satellite": "UNSUPPORTED",
+        "humanStatus": "UNKNOWN"
+      }
+    ],
+    "routes": [
+      {
+        "id": "SIM-NODE-001",
+        "source": "NODE-001",
+        "priority": "LOW",
+        "humanStatus": "SAFE",
+        "delivery": "ACK_SYNTHETIC",
+        "path": [
+          "NODE-001",
+          "NODE-002",
+          "NODE-003",
+          "NODE-004",
+          "NODE-009",
+          "GATEWAY"
+        ],
+        "hops": 5,
+        "transport": "SIMULATED_LOCAL_GATEWAY",
+        "evidence": "SIMULATED_ONLY",
+        "ttlSeconds": 3600
+      },
+      {
+        "id": "SIM-NODE-002",
+        "source": "NODE-002",
+        "priority": "LOW",
+        "humanStatus": "SAFE",
+        "delivery": "ACK_SYNTHETIC",
+        "path": [
+          "NODE-002",
+          "NODE-003",
+          "NODE-004",
+          "NODE-009",
+          "GATEWAY"
+        ],
+        "hops": 4,
+        "transport": "SIMULATED_LOCAL_GATEWAY",
+        "evidence": "SIMULATED_ONLY",
+        "ttlSeconds": 3600
+      },
+      {
+        "id": "SIM-NODE-003",
+        "source": "NODE-003",
+        "priority": "LOW",
+        "humanStatus": "SAFE",
+        "delivery": "ACK_SYNTHETIC",
+        "path": [
+          "NODE-003",
+          "NODE-004",
+          "NODE-009",
+          "GATEWAY"
+        ],
+        "hops": 3,
+        "transport": "SIMULATED_LOCAL_GATEWAY",
+        "evidence": "SIMULATED_ONLY",
+        "ttlSeconds": 3600
+      },
+      {
+        "id": "SIM-NODE-004",
+        "source": "NODE-004",
+        "priority": "LOW",
+        "humanStatus": "SAFE",
+        "delivery": "ACK_SYNTHETIC",
+        "path": [
+          "NODE-004",
+          "NODE-009",
+          "GATEWAY"
+        ],
+        "hops": 2,
+        "transport": "SIMULATED_LOCAL_GATEWAY",
+        "evidence": "SIMULATED_ONLY",
+        "ttlSeconds": 3600
+      },
+      {
+        "id": "SIM-NODE-005",
+        "source": "NODE-005",
+        "priority": "LOW",
+        "humanStatus": "SAFE",
+        "delivery": "QUEUED_LOCAL",
+        "path": [],
+        "hops": 0,
+        "transport": "NONE",
+        "evidence": "SIMULATED_ONLY",
+        "ttlSeconds": 3600
+      },
+      {
+        "id": "SIM-NODE-006",
+        "source": "NODE-006",
+        "priority": "LOW",
+        "humanStatus": "SAFE",
+        "delivery": "ACK_SYNTHETIC",
+        "path": [
+          "NODE-006",
+          "NODE-001",
+          "NODE-002",
+          "NODE-003",
+          "NODE-004",
+          "NODE-009",
+          "GATEWAY"
+        ],
+        "hops": 6,
+        "transport": "SIMULATED_LOCAL_GATEWAY",
+        "evidence": "SIMULATED_ONLY",
+        "ttlSeconds": 3600
+      },
+      {
+        "id": "SIM-NODE-008",
+        "source": "NODE-008",
+        "priority": "LOW",
+        "humanStatus": "SAFE",
+        "delivery": "ACK_SYNTHETIC",
+        "path": [
+          "NODE-008",
+          "NODE-009",
+          "GATEWAY"
+        ],
+        "hops": 2,
+        "transport": "SIMULATED_LOCAL_GATEWAY",
+        "evidence": "SIMULATED_ONLY",
+        "ttlSeconds": 3600
+      },
+      {
+        "id": "SIM-NODE-009",
+        "source": "NODE-009",
+        "priority": "LOW",
+        "humanStatus": "SAFE",
+        "delivery": "ACK_SYNTHETIC",
+        "path": [
+          "NODE-009",
+          "GATEWAY"
+        ],
+        "hops": 1,
+        "transport": "SIMULATED_LOCAL_GATEWAY",
+        "evidence": "SIMULATED_ONLY",
+        "ttlSeconds": 3600
+      },
+      {
+        "id": "SIM-NODE-010",
+        "source": "NODE-010",
+        "priority": "LOW",
+        "humanStatus": "SAFE",
+        "delivery": "ACK_SYNTHETIC",
+        "path": [
+          "NODE-010",
+          "GATEWAY"
+        ],
+        "hops": 1,
+        "transport": "SIMULATED_LOCAL_GATEWAY",
+        "evidence": "SIMULATED_ONLY",
+        "ttlSeconds": 3600
+      },
+      {
+        "id": "SIM-NODE-011",
+        "source": "NODE-011",
+        "priority": "LOW",
+        "humanStatus": "SAFE",
+        "delivery": "ACK_SYNTHETIC",
+        "path": [
+          "NODE-011",
+          "NODE-006",
+          "NODE-001",
+          "NODE-002",
+          "NODE-003",
+          "NODE-004",
+          "NODE-009",
+          "GATEWAY"
+        ],
+        "hops": 7,
+        "transport": "SIMULATED_LOCAL_GATEWAY",
+        "evidence": "SIMULATED_ONLY",
+        "ttlSeconds": 3600
+      },
+      {
+        "id": "SIM-NODE-012",
+        "source": "NODE-012",
+        "priority": "CRITICAL",
+        "humanStatus": "SOS_EXPLICIT",
+        "delivery": "ACK_SYNTHETIC",
+        "path": [
+          "NODE-012",
+          "NODE-011",
+          "NODE-006",
+          "NODE-001",
+          "NODE-002",
+          "NODE-003",
+          "NODE-004",
+          "NODE-009",
+          "GATEWAY"
+        ],
+        "hops": 8,
+        "transport": "SIMULATED_LOCAL_GATEWAY",
+        "evidence": "SIMULATED_ONLY",
+        "ttlSeconds": 3600
+      },
+      {
+        "id": "SIM-NODE-014",
+        "source": "NODE-014",
+        "priority": "CRITICAL",
+        "humanStatus": "SOS_EXPLICIT",
+        "delivery": "ACK_SYNTHETIC",
+        "path": [
+          "NODE-014",
+          "CELLULAR_MODEL",
+          "CENTRE_MODEL"
+        ],
+        "hops": 2,
+        "transport": "SIMULATED_CELLULAR",
+        "evidence": "SIMULATED_ONLY",
+        "ttlSeconds": 3600
+      },
+      {
+        "id": "SIM-NODE-015",
+        "source": "NODE-015",
+        "priority": "CRITICAL",
+        "humanStatus": "SOS_EXPLICIT",
+        "delivery": "ACK_SYNTHETIC",
+        "path": [
+          "NODE-015",
+          "GATEWAY"
+        ],
+        "hops": 1,
+        "transport": "SIMULATED_LOCAL_GATEWAY",
+        "evidence": "SIMULATED_ONLY",
+        "ttlSeconds": 3600
+      }
+    ],
+    "audit": [
+      {
+        "event": "EXERCISE_CREATED",
+        "detail": "No official alert or emergency dispatch"
+      },
+      {
+        "event": "CAPABILITY_POLICY",
+        "detail": "15 consented virtual devices can relay"
+      },
+      {
+        "event": "SIMULATED_DELIVERY",
+        "detail": "12 synthetic gateway ACK, 1 queued"
+      },
+      {
+        "event": "HUMAN_SAFETY",
+        "detail": "3 explicit SOS, 3 UNKNOWN; silence never implies injury"
+      }
+    ]
+  }
+}

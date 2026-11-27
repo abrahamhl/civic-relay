@@ -1,10 +1,12 @@
 name: CI
+permissions:
+  contents: read
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, feat/master-emergency-routing-v1-20261020 ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, feat/proyecto-comunicaciones-satelite-emergencias-offline-20261020 ]
 
 jobs:
   build:

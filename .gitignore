@@ -35,3 +35,6 @@ coverage/
 .vercel
 .env*
 docs/internal/
+
+target/
+**/target/
