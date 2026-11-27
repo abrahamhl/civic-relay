@@ -1,0 +1,37 @@
+[
+  {
+    "place_id": 293812716,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 469051459,
+    "lat": "39.4201224",
+    "lon": "-0.3755603",
+    "category": "highway",
+    "type": "motorway",
+    "place_rank": 26,
+    "importance": 0.053391184100099146,
+    "addresstype": "motorway",
+    "name": "Pista de Silla",
+    "display_name": "Pista de Silla, Sant Climent, Senda de Les Vaques, Sedaví, L'Horta Sud, Valencia, Comunidad Valenciana, 46910, España",
+    "address": {
+      "road": "Pista de Silla",
+      "neighbourhood": "Sant Climent",
+      "hamlet": "Senda de Les Vaques",
+      "town": "Sedaví",
+      "region": "L'Horta Sud",
+      "province": "Valencia",
+      "ISO3166-2-lvl6": "ES-V",
+      "state": "Comunidad Valenciana",
+      "ISO3166-2-lvl4": "ES-VC",
+      "postcode": "46910",
+      "country": "España",
+      "country_code": "es"
+    },
+    "boundingbox": [
+      "39.4188007",
+      "39.4211216",
+      "-0.3761686",
+      "-0.3750439"
+    ]
+  }
+]

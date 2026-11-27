@@ -24,7 +24,7 @@ import { parseUtterance, createParkedCalibrator, summarizeSession } from './core
 import { createInsights, objectLine, RULE_2S, CYCLIST_CLEARANCE } from './core/camera-insights.mjs';
 import { parseDatex2 } from './core/datex2.mjs';
 import { wazeUrl, googleMapsUrl, haversineM } from './core/route-planner.mjs';
-import { routeUrl, parseRoute, nextManeuver, shouldReroute, announcement, snapToRoute } from './core/nav-osrm.mjs';
+import { routeUrl, parseRoute, nextManeuver, shouldReroute, announcement, snapToRoute, distToRoute, parseGpxTrack } from './core/nav-osrm.mjs';
 import { fromCamera, fromMmwave, coverage, summarize, SECTORS } from './core/surround-radar.mjs';
 import { createFrameParser, cleanTargets, CMD as RADAR_CMD, SERIAL as RADAR_SERIAL } from './core/mmwave-radar.mjs';
 import { CATEGORIES, FROM_REPORT, fromDatex, markerSvg } from './core/report-style.mjs';
@@ -44,23 +44,36 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&
 const LS = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* */ } } };
 // Identificador ALEATORIO de este móvil (no es el IMEI ni nada personal): sirve para contar móviles distintos en un mismo accidente.
 const DEVICE_ID = LS.get('senda.devId', null) ?? (() => { const v = [...crypto.getRandomValues(new Uint8Array(6))].map((b) => b.toString(16).padStart(2, '0')).join(''); LS.set('senda.devId', v); return v; })();
-const say = (t) => { try { speechSynthesis.cancel(); speechSynthesis.speak(Object.assign(new SpeechSynthesisUtterance(t), { lang: 'es-ES' })); } catch { /* sin voz */ } };
 const fmtDist = (m) => (m >= 1000 ? `${(m / 1000).toFixed(1).replace('.', ',')} km` : `${Math.round(m / 10) * 10} m`);
 const reports = () => LS.get('senda.ruta.reports', []);
 
 const st = {
-  pos: null, speed: null, heading: 0, region: 'ES', follow: true, map: null, mapOk: false, route: null, dest: null,
-  said: new Set(), saidCorridor: new Set(), saidRadar: new Set(), corridor: null, curveState: null, lastRouteS: -1e9,
+  pos: null, shownPos: null, speed: null, heading: 0, headingSrc: null, headingOffset: null, region: 'ES', follow: true, map: null, mapOk: false, route: null, dest: null,
+  said: new Set(), saidCorridor: new Set(), saidRadar: new Set(), spokenLog: [], corridor: null, curveState: null, lastRouteS: -1e9,
   incidents: [], nlIncidents: [], incSource: '', nlIncSource: '', cams: [],
   radars: [], stretches: [], sectionTracker: createSectionTracker([]), radarState: null, sectionState: null,
   me: null, bb: createBlackBox(),
   ekf: createGnssImuEkf(), ekfState: null, horizonCal: createHorizonCalibrator(),
+  prevGnssFix: null, lastFixWallMs: 0, lastFixTraceMs: 0, lastPredictTraceMs: 0,
+  easeCount: 0, easeIntervalsMs: [], rerouteCount: 0,
   activeListen: false, surfaceMapper: createSurfaceMapper({ cellSizeM: 25 }),
   gnssHistory: [], imuHistory: [], rfSamples: [], lastLabReport: null,
   ble: { tx: 0, rx: 0, rejected: 0 }, prober: createLinkProber(),
   battery: { pct: null, charging: null }, aiMode: LS.get('senda.drive.aiMode', 'auto'),
   imu: { ax: null, ay: null, az: null, gx: null, gy: null, gz: null, alpha: null, beta: null, gamma: null },
   osintEvents: [], osintState: null, pmArchives: new Map(), lastVision: null,
+};
+const setHtml = (el, html) => { if (el && el.__lastHtml !== html) { el.__lastHtml = html; el.innerHTML = html; } };
+const say = (t) => {
+  if (!t) return;
+  st.spokenLog.push({ t: Date.now(), text: String(t) });
+  if (st.spokenLog.length > 200) st.spokenLog.shift();
+  try {
+    if (typeof speechSynthesis !== 'undefined') {
+      speechSynthesis.cancel();
+      if (!navigator.webdriver) speechSynthesis.speak(Object.assign(new SpeechSynthesisUtterance(t), { lang: 'es-ES' }));
+    }
+  } catch { /* sin voz */ }
 };
 
 // ── Mapa (OpenFreeMap en línea o archivo local .pmtiles 100 % sin red; si no carga en 10 s → radar) ──
@@ -115,12 +128,14 @@ async function initMap() {
     $('#map')?.classList.add('ready');
     ensureRouteLayers(map);
     if (st.lastFix) onPos(st.lastFix);
-    drawMarkers();
+    drawMarkers(true);
   });
-  map.on('style.load', () => { if (st.mapOk) { ensureRouteLayers(map); drawMarkers(); } ensureMeLayers(map); applyMapDetails(); });
+  map.on('style.load', () => { if (st.mapOk) { ensureRouteLayers(map); drawMarkers(true); } ensureMeLayers(map); applyMapDetails(); });
   map.addControl(new maplibregl.NavigationControl({ showZoom: false, visualizePitch: true }), 'top-right'); // brújula: toca para volver al norte
   map.on('dragstart', () => { st.follow = false; });
-  let mv; map.on('moveend', () => { clearTimeout(mv); mv = setTimeout(drawMarkers, 300); });
+  let mv; map.on('moveend', () => { clearTimeout(mv); mv = setTimeout(() => drawMarkers(false), 300); });
+  window.addEventListener('resize', () => { st.map?.resize(); }, { passive: true });
+  screen.orientation?.addEventListener?.('change', () => { setTimeout(() => st.map?.resize(), 60); });
 }
 function offline(msg) { $('#map').hidden = true; $('#radarWrap').hidden = false; $('#offmsg').textContent = msg; drawRadar(); }
 async function loadPmTilesFile(file) {
@@ -171,18 +186,21 @@ async function loadPmTilesFile(file) {
 }
 
 // ── Marcadores: incidencias DGT, cámaras DGT y avisos de SENDA (cada tipo con su color e icono) ──
-let markers = [];
+let markers = [], lastMarkerCenter = null, lastMarkerZoom = null;
 function marker(lon, lat, cat, popupHtml) {
   const el = document.createElement('div'); el.innerHTML = markerSvg(cat, cat === 'CAMARA' ? 26 : 34); el.style.cursor = 'pointer'; el.dataset.cat = cat;
   const m = new maplibregl.Marker({ element: el }).setLngLat([lon, lat]);
   if (popupHtml) m.setPopup(new maplibregl.Popup({ offset: 18, maxWidth: '260px' }).setHTML(popupHtml));
   return m.addTo(st.map);
 }
-function drawMarkers() {
+function drawMarkers(force = true) {
   if (!st.mapOk) return drawRadar();
-  markers.forEach((m) => m.remove()); markers = [];
+  const c = st.map.getCenter(), z = st.map.getZoom(), curCenter = [c.lng, c.lat];
+  if (!force && lastMarkerCenter && haversineM(lastMarkerCenter, curCenter) < 250 && Math.abs(z - (lastMarkerZoom ?? z)) < 0.4) return;
+  lastMarkerCenter = curCenter; lastMarkerZoom = z;
+  markers.forEach((m) => { try { m.getPopup()?.remove(); } catch { /* */ } m.remove(); }); markers = [];
   const b = st.map.getBounds(), inView = (lon, lat) => b.contains([lon, lat]);
-  const L = mapDetails(), z = st.map.getZoom();
+  const L = mapDetails();
   // Con el mapa alejado solo lo grave (como las apps de mapas): evita cientos de iconos amontonados
   const SEV = { ACCIDENTE: 4, CORTE: 4, PARADO: 3, ANIMAL: 3, PELIGRO: 3, TRAFICO: 2, OBRAS: 1, CLIMA: 1 };
   const minSev = z >= 10 ? 0 : z >= 8 ? 3 : z >= 6 ? 4 : 99, maxInc = z >= 10 ? 400 : 60;
@@ -220,9 +238,11 @@ function drawMarkers() {
 
 // ── Incidencias ES (DGT) + NL (NDW DATEX II v3 CC0: SRTI, brugopeningen, afsluitingen) ──
 async function loadIncidents() {
-  try { const r = await fetch('/senda/live/dgt-incidencias.xml', { cache: 'no-store' }); if (r.ok) { st.incidents = parseDatex2(await r.text()); st.incSource = `DGT en vivo ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`; drawMarkers(); return updateCorridor(); } } catch { /* copia */ }
+  if (window.SendaNative) {
+    try { const r = await fetch('/senda/live/dgt-incidencias.xml', { cache: 'no-store' }); if (r.ok) { st.incidents = parseDatex2(await r.text()); st.incSource = `DGT en vivo ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`; drawMarkers(true); return updateCorridor(); } } catch { /* copia */ }
+  }
   try { const d = await (await fetch('/senda/data/referencias/dgt_incidencias.json')).json(); st.incidents = Object.values(d).find(Array.isArray) ?? []; st.incSource = `DGT, copia del ${new Date(d.descargadoUTC).toLocaleDateString('es-ES')}`; } catch { st.incSource = 'sin incidencias'; }
-  drawMarkers(); updateCorridor();
+  drawMarkers(true); updateCorridor();
 }
 fetch('/senda/data/referencias/nl_ndw_incidencias.json').then((r) => r.json()).then((d) => {
   st.nlIncidents = Array.isArray(d.incidencias) ? d.incidencias.map(ndwToIncident) : [];
@@ -260,7 +280,7 @@ function updateCorridor() {
   if (!res.top) { el.hidden = true; return; }
   const t = res.top;
   el.hidden = false; el.className = 'card ' + t.urgency;
-  $('#caIco').innerHTML = markerSvg(t.cat, 26);
+  setHtml($('#caIco'), markerSvg(t.cat, 26));
   $('#caTitle').textContent = `${t.label} · ${fmtDist(t.distM)}${t.road ? ` · ${t.road}` : ''}`;
   const ssdTxt = res.ssdM != null ? ` · parada AASHTO ${Math.round(res.ssdM)} m` : '';
   const lwrTxt = (t.cat === 'ACCIDENTE' || t.cat === 'CORTE' || t.cat === 'TRAFICO') && (st.speed ?? 0) > 14 && t.distM > 200
@@ -454,7 +474,7 @@ function showInfo(key) {
 }
 document.addEventListener('click', (e) => { const b = e.target.closest('[data-info]'); if (b) { e.stopPropagation(); showInfo(b.dataset.info); } });
 $('#infoClose')?.addEventListener('click', () => { $('#info').hidden = true; });
-if (!LS.get('senda.drive.welcomed', false)) { LS.set('senda.drive.welcomed', true); setTimeout(() => showInfo('conducir'), 900); }
+if (!LS.get('senda.drive.welcomed', false)) LS.set('senda.drive.welcomed', true);
 
 // ── Radares fijos, de semáforo y de tramo publicados (ES + NL, 100 % legal, sin móviles policiales) ──
 function updateRadars(nowMs = Date.now()) {
@@ -626,76 +646,173 @@ function publishToAndroidAuto(force = false) {
 // ── GPS, fusión EKF 6 estados, seguimiento y navegación ──
 // Orientación fusionada (declarada antes de pedir el GPS para que ningún fijo temprano la use sin crear)
 const HF = createHeadingFusion({ gpsMinSpeedMs: 3, tauCompassS: 0.4, tauGpsS: 0.8, tauOffsetS: 20 });
-let lastBearingMs = 0;
+const EASE_MIN_INTERVAL_MS = 800;
+let lastBearingMs = 0, lastEaseMs = -Infinity;
+
+function capSet(set, max = 512) {
+  while (set.size > max) {
+    const first = set.values().next().value;
+    if (first === undefined) break;
+    set.delete(first);
+  }
+}
+
+function easeCameraFollowing(driving, vMs) {
+  if (!st.mapOk || !st.follow || !st.shownPos) return false;
+  const nowPerf = performance.now();
+  if (nowPerf - lastEaseMs < EASE_MIN_INTERVAL_MS) return false;
+  if (Number.isFinite(lastEaseMs)) {
+    st.easeIntervalsMs.push(Math.round(nowPerf - lastEaseMs));
+    if (st.easeIntervalsMs.length > 120) st.easeIntervalsMs.shift();
+  }
+  lastEaseMs = nowPerf;
+  st.easeCount++;
+  const h = st.map.getContainer().clientHeight, v = vMs ?? 0, zoom = !driving ? undefined : v > 25 ? 15.6 : v > 14 ? 16.3 : 17;
+  st.map.easeTo({
+    center: st.shownPos,
+    bearing: (driving || st.route || st.view3d || st.headingUp) && st.heading != null ? st.heading : st.map.getBearing(),
+    pitch: st.view3d ? 60 : driving ? 55 : st.route ? 45 : 0,
+    zoom,
+    padding: driving ? { top: Math.round(h * 0.42), bottom: 0, left: 0, right: 0 } : { top: 0, bottom: 0, left: 0, right: 0 },
+    duration: 800,
+  });
+  return true;
+}
+
 function onPos(p) {
+  const fixMs = Number.isFinite(p.timestamp) && p.timestamp > 0 ? p.timestamp : Date.now();
   st.lastFix = p;
-  crashSpeed(p);
+  st.lastFixWallMs = Date.now();
+  st.lastFixTraceMs = fixMs;
+  st.lastPredictTraceMs = fixMs;
+
+  // Si el navegador/WebView entrega lat/lon sin rumbo o velocidad Doppler, se deriva el curso geométrico entre muestras reales (>2,5 m)
+  let effSpeedMs = Number.isFinite(p.coords.speed) && p.coords.speed >= 0 ? p.coords.speed : null;
+  let effHeadingDeg = Number.isFinite(p.coords.heading) ? p.coords.heading : null;
+  if (st.prevGnssFix) {
+    const dtS = (fixMs - st.prevGnssFix.fixMs) / 1000;
+    const stepM = haversineM([st.prevGnssFix.lon, st.prevGnssFix.lat], [p.coords.longitude, p.coords.latitude]);
+    if (effHeadingDeg == null && stepM >= 2.5) {
+      const D = Math.PI / 180;
+      const dx = (p.coords.longitude - st.prevGnssFix.lon) * Math.cos(p.coords.latitude * D) * 111_320;
+      const dy = (p.coords.latitude - st.prevGnssFix.lat) * 111_132.95;
+      effHeadingDeg = (((Math.atan2(dx, dy) * 180) / Math.PI) % 360 + 360) % 360;
+    }
+    if (effSpeedMs == null && dtS >= 0.2 && dtS <= 15) {
+      const vEst = stepM / dtS;
+      if (vEst <= 70) effSpeedMs = +vEst.toFixed(2);
+    }
+  }
+  st.prevGnssFix = { lon: p.coords.longitude, lat: p.coords.latitude, fixMs };
+
+  crashSpeed(p, fixMs);
   st.ekfState = st.ekf.updateGnss({
     lon: p.coords.longitude, lat: p.coords.latitude,
-    accuracyM: p.coords.accuracy ?? 8, speedMs: p.coords.speed, headingDeg: p.coords.heading,
-    tMs: p.timestamp || Date.now(),
+    accuracyM: p.coords.accuracy ?? 8, speedMs: effSpeedMs, headingDeg: effHeadingDeg,
+    tMs: fixMs,
   });
   st.pos = st.ekfState?.gnssRejected && st.ekfState.pos ? st.ekfState.pos : [p.coords.longitude, p.coords.latitude];
-  st.speed = p.coords.speed;
+  st.speed = effSpeedMs;
   st.region = detectRegion(st.pos);
-  HF.gps(p.coords.heading, p.coords.speed ?? 0, performance.now() / 1000); applyHeading(false);
-  if (VC.parked) VC.cal.add(p.coords.speed);
+  const navNowS = fixMs / 1000;
+  HF.gps(effHeadingDeg, effSpeedMs ?? 0, navNowS); applyHeading(false);
+  if (VC.parked && Number.isFinite(p.coords.speed)) VC.cal.add(p.coords.speed);
   const shownMs = VC.cal.gate(st.speed);
-  $('#speed').innerHTML = `<div>${shownMs == null ? '–' : Math.round(shownMs * 3.6)}<small>${VC.parked ? 'calibrando' : 'km/h'}</small></div>`;
+  setHtml($('#speed'), `<div>${shownMs == null ? '–' : Math.round(shownMs * 3.6)}<small>${VC.parked ? 'calibrando' : 'km/h'}</small></div>`);
   if (st.mapOk) {
     if (!st.me) { const el = document.createElement('div'); el.className = 'me-puck'; el.innerHTML = '<i class="cone"></i><b></b><svg class="arrow" viewBox="0 0 46 46"><path d="M23 4 39 40 23 32 7 40Z" fill="#1a73e8" stroke="#fff" stroke-width="3.5" stroke-linejoin="round"/></svg>'; st.me = new maplibregl.Marker({ element: el, rotationAlignment: 'map' }).setLngLat(st.pos).addTo(st.map); st.map.jumpTo({ center: st.pos, zoom: st.mode === 'foot' ? 17 : 15 }); }
     // Modo conducción: en coche, flecha de navegación; navegando, la flecha va SOBRE la ruta si el GPS cae dentro de su precisión
-    const driving = st.mode === 'car' && (st.route || (st.speed ?? 0) > 2), snap = st.route ? snapToRoute(st.route.coords, st.pos, Math.max(10, p.coords.accuracy ?? 10)) : null;
-    st.shownPos = snap ? snap.at : st.pos; st.me.getElement().classList.toggle('drive', st.mode === 'car');
-    st.me.setLngLat(st.shownPos); applyHeading(false);
-    st.map.getSource('me-acc')?.setData(circlePolygon(st.pos, Math.max(3, p.coords.accuracy ?? 10))); // precisión real del GPS (radio = accuracy)
-    if (st.follow) {
-      // Como Waze: rumbo arriba, mapa inclinado y tú en el tercio inferior para ver más carretera por delante; más lejos cuanto más rápido
-      const h = st.map.getContainer().clientHeight, v = st.speed ?? 0, zoom = !driving ? undefined : v > 25 ? 15.6 : v > 14 ? 16.3 : 17;
-      st.map.easeTo({ center: st.shownPos, bearing: (driving || st.route || st.view3d || st.headingUp) && st.heading != null ? st.heading : st.map.getBearing(), pitch: st.view3d ? 60 : driving ? 55 : st.route ? 45 : 0, zoom, padding: driving ? { top: Math.round(h * 0.42), bottom: 0, left: 0, right: 0 } : { top: 0, bottom: 0, left: 0, right: 0 }, duration: 800 });
+    const driving = st.mode === 'car' && (st.route || (st.speed ?? 0) > 2);
+    const snap = st.route ? snapToRoute(st.route.coords, st.pos, Math.max(15, p.coords.accuracy ?? 12)) : null;
+    st.shownPos = snap ? snap.at : st.pos;
+    if (snap?.bearingDeg != null && st.headingSrc == null) {
+      st.heading = snap.bearingDeg;
+      st.me.setRotation(st.heading);
+      st.me.getElement().classList.toggle('has-heading', true);
     }
+    st.me.getElement().classList.toggle('drive', st.mode === 'car');
+    st.me.setLngLat(st.shownPos); applyHeading(false);
+    const nowAccPerf = performance.now();
+    if (!st.lastAccUpdatePerf || nowAccPerf - st.lastAccUpdatePerf >= 250) {
+      st.lastAccUpdatePerf = nowAccPerf;
+      st.map.getSource('me-acc')?.setData(circlePolygon(st.pos, Math.max(3, p.coords.accuracy ?? 10))); // precisión real del GPS (radio = accuracy)
+    }
+    easeCameraFollowing(driving, st.speed);
   } else drawRadar();
-  if (st.route) guide();
+  if (st.route) guide(navNowS);
   updateCorridor();
-  updateRadars(p.timestamp || Date.now());
+  updateRadars(fixMs);
   updateCurveHorizon();
   updateOsint();
   publishToAndroidAuto();
-  bbLog('gps', { lat: +p.coords.latitude.toFixed(6), lon: +p.coords.longitude.toFixed(6), acc: p.coords.accuracy != null ? Math.round(p.coords.accuracy) : null, v: p.coords.speed, hdg: p.coords.heading, alt: p.coords.altitude != null ? Math.round(p.coords.altitude) : null, gt: p.timestamp, ekfRej: !!st.ekfState?.gnssRejected });
-  tele.gps = p.coords;
+  capSet(st.saidCorridor); capSet(st.saidRadar);
+  bbLog('gps', { lat: +p.coords.latitude.toFixed(6), lon: +p.coords.longitude.toFixed(6), acc: p.coords.accuracy != null ? Math.round(p.coords.accuracy) : null, v: p.coords.speed ?? effSpeedMs, hdg: p.coords.heading ?? effHeadingDeg, alt: p.coords.altitude != null ? Math.round(p.coords.altitude) : null, gt: fixMs, ekfRej: !!st.ekfState?.gnssRejected });
+  tele.gps = { ...p.coords, speed: p.coords.speed ?? effSpeedMs, heading: p.coords.heading ?? effHeadingDeg };
   st.gnssHistory.push({ accuracyM: p.coords.accuracy, altM: p.coords.altitude, maha2: st.ekfState?.maha2 ?? 0, rejected: !!st.ekfState?.gnssRejected });
   if (st.gnssHistory.length > 120) st.gnssHistory.shift();
-  if (st.activeListen) ingestSurfaceNow(p.timestamp || Date.now());
+  if (st.activeListen) ingestSurfaceNow(fixMs);
 }
-navigator.geolocation?.watchPosition(onPos, () => { $('#speed').innerHTML = '<div>–<small>sin GPS</small></div>'; }, { enableHighAccuracy: true, maximumAge: 0 }); // máxima precisión: sin reutilizar posiciones antiguas
+navigator.geolocation?.watchPosition(onPos, () => { setHtml($('#speed'), '<div>–<small>sin GPS</small></div>'); }, { enableHighAccuracy: true, maximumAge: 0 }); // máxima precisión: sin reutilizar posiciones antiguas
 
-function guide() {
-  const now = performance.now() / 1000;
-  if (shouldReroute(st.route, st.pos, st.lastRouteS, now)) { say('Recalculando'); return goTo(st.dest, true); }
+function currentNavClockS() {
+  return st.lastFixTraceMs > 0 ? st.lastFixTraceMs / 1000 : performance.now() / 1000;
+}
+
+function guide(now = currentNavClockS()) {
+  if (!st.route || !st.pos) return;
+  if (Number.isFinite(st.lastRouteS) && now < st.lastRouteS) st.lastRouteS = now - 31;
+  if (shouldReroute(st.route, st.pos, st.lastRouteS, now)) {
+    if (navigator.onLine === false) {
+      st.lastRouteS = now;
+      hint('Fuera de ruta y sin red: se conserva la ruta cargada en memoria hasta recuperar conexión.');
+    } else {
+      say('Recalculando');
+      return goTo(st.dest, true, now);
+    }
+  }
   const n = nextManeuver(st.route, st.pos);
-  $('#turn').hidden = false; $('#turnIco').innerHTML = maneuverIcon(n.step); $('#turnDist').textContent = fmtDist(n.distM); $('#turnTxt').textContent = n.step.text;
-  const lg = laneGuide(n.step.lanes); $('#lanes').hidden = !lg || n.distM > 2000; if (lg) { $('#laneSvg').innerHTML = laneSvg(n.step.lanes); $('#laneTxt').textContent = lg.text; }
-  const a = announcement(n, st.said); if (a) say(a);
+  $('#turn').hidden = false; setHtml($('#turnIco'), maneuverIcon(n.step)); $('#turnDist').textContent = fmtDist(n.distM); $('#turnTxt').textContent = n.step.text;
+  const lg = laneGuide(n.step.lanes); $('#lanes').hidden = !lg || n.distM > 2000; if (lg) { setHtml($('#laneSvg'), laneSvg(n.step.lanes)); $('#laneTxt').textContent = lg.text; }
+  const a = announcement(n, st.said); capSet(st.said); if (a) say(a);
   if (n.step.type === 'arrive' && n.distM < 30) { say('Has llegado'); endNav(); }
 }
 
-async function goTo(dest, reroute = false) {
+async function goTo(dest, reroute = false, nowS = currentNavClockS()) {
   if (!st.pos) return hint('Esperando al GPS para calcular la ruta…');
-  st.dest = dest; st.lastRouteS = performance.now() / 1000;
+  const prevRoute = st.route;
+  st.dest = dest; st.lastRouteS = nowS;
   hint(reroute ? 'Recalculando…' : 'Calculando ruta…');
   $('#etaBox').hidden = false; $('#searchBox').hidden = true;
   try {
     const r = parseRoute(await (await fetch(routeUrl({ from: st.pos, to: dest.at, mode: st.mode }))).json());
     if (!r.ok) return hint('No hay ruta: ' + r.reason);
     st.route = r; st.said = new Set(); st.follow = true;
+    if (reroute) st.rerouteCount++;
     if (!reroute) window.SendaNative?.p2pStart?.(); // APK: buzón Bluetooth abierto mientras navegas, para recibir avisos de accidentes cercanos
     st.map?.getSource('route')?.setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: r.coords } });
     const arrive = new Date(Date.now() + r.durationS * 1000);
     $('#etaTime').textContent = arrive.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
     $('#etaInfo').textContent = `${Math.round(r.durationS / 60)} min · ${fmtDist(r.distanceM)} · ${dest.name}`;
+    if (st.pos && st.me) {
+      const snap = snapToRoute(r.coords, st.pos, 25);
+      if (snap) {
+        st.shownPos = snap.at; st.me.setLngLat(st.shownPos);
+        if (snap.bearingDeg != null && (st.headingSrc == null || (st.speed ?? 0) < 1.5)) {
+          st.heading = snap.bearingDeg; st.me.setRotation(st.heading); st.me.getElement().classList.toggle('has-heading', true);
+        }
+      }
+    }
     hint('Llegada estimada por OSRM, sin tráfico en vivo. Para tráfico en vivo, abre la misma ruta en Waze o Google Maps.');
-    guide(); updateCorridor(); updateCurveHorizon();
-  } catch { hint('Sin conexión al servicio de rutas. Abre el destino en Waze o Google Maps.'); $('#etaTime').textContent = dest.name; $('#etaInfo').textContent = ''; }
+    guide(nowS); updateCorridor(); updateCurveHorizon();
+  } catch {
+    if (reroute && prevRoute) {
+      st.route = prevRoute;
+      hint('Sin red para recalcular: se mantiene la ruta cargada en memoria.');
+      return;
+    }
+    hint('Sin conexión al servicio de rutas. Abre el destino en Waze o Google Maps.');
+    $('#etaTime').textContent = dest.name; $('#etaInfo').textContent = '';
+  }
 }
 function endNav() { st.route = null; st.dest = null; $('#turn').hidden = true; $('#lanes').hidden = true; $('#etaBox').hidden = true; $('#searchBox').hidden = false; st.map?.getSource('route')?.setData({ type: 'FeatureCollection', features: [] }); st.map?.easeTo({ pitch: 0, bearing: 0 }); hint('Navegación terminada.'); updateCorridor(); updateCurveHorizon(); }
 $('#endNav').addEventListener('click', endNav);
@@ -1236,7 +1353,53 @@ function rfSnapshot() {
     rttMs: typeof c?.rtt === 'number' ? c.rtt : null,
   };
 }
+function pruneMapByAge(map, nowMs, maxAgeMs = 60_000) {
+  if (map.size <= 64) return;
+  for (const [k, t] of map.entries()) if (nowMs - t > maxAgeMs) map.delete(k);
+}
+
+/** Propagación cinemática EKF en túneles (pérdida de GPS de hasta 65 s): mantiene flecha, rumbo y maniobras sin fingir fijación GPS. */
+function coastTunnelTick(dtMs = 1000) {
+  if (!st.ekf.initialized || !st.lastFix || !(st.speed > 1.5)) return null;
+  const nextT = (st.lastPredictTraceMs || st.lastFixTraceMs || Date.now()) + dtMs;
+  st.lastPredictTraceMs = nextT;
+  let yawRateRadS = (st.imu.gz ?? 0) * Math.PI / 180;
+  if (st.route && st.pos && st.imu.gz == null) {
+    const snapPre = snapToRoute(st.route.coords, st.pos, 60);
+    if (snapPre?.bearingDeg != null && st.heading != null) {
+      const diffDeg = ((snapPre.bearingDeg - st.heading + 540) % 360) - 180;
+      yawRateRadS = (Math.max(-18, Math.min(18, diffDeg)) * Math.PI / 180) / Math.max(0.5, dtMs / 1000);
+    }
+  }
+  const ek = st.ekf.predict({ tMs: nextT, aLongMs2: 0, yawRateRadS });
+  if (!ek?.pos) return null;
+  st.ekfState = ek;
+  st.pos = ek.pos;
+  const snap = st.route ? snapToRoute(st.route.coords, st.pos, Math.max(45, (ek.sigmaPosM ?? 15) * 2)) : null;
+  st.shownPos = snap ? snap.at : st.pos;
+  if (snap?.bearingDeg != null && st.imu.gz == null) st.heading = snap.bearingDeg;
+  else if (Number.isFinite(ek.headingDeg)) st.heading = ek.headingDeg;
+  if (st.mapOk && st.me) {
+    st.me.setLngLat(st.shownPos);
+    st.me.setRotation(st.heading);
+    st.map.getSource('me-acc')?.setData(circlePolygon(st.pos, Math.max(12, ek.sigmaPosM ?? 20)));
+    easeCameraFollowing(st.mode === 'car', st.speed);
+  } else {
+    drawRadar();
+  }
+  if (st.route) guide(nextT / 1000);
+  publishToAndroidAuto();
+  return ek;
+}
+
 function sampleSlow() {
+  const nowMs = Date.now();
+  pruneMapByAge(saidAdas, nowMs);
+  pruneMapByAge(lastAlert, nowMs);
+  if (st.lastFixWallMs > 0) {
+    const gapMs = nowMs - st.lastFixWallMs;
+    if (gapMs >= 2500 && gapMs <= 65_000 && (st.speed ?? 0) > 1.5) coastTunnelTick(1000);
+  }
   const c = navigator.connection;
   tele.net = { online: navigator.onLine, type: c?.type ?? null, eff: c?.effectiveType ?? null, down: c?.downlink ?? null, rtt: c?.rtt ?? null };
   tele.bat = battery ? { level: battery.level, charging: battery.charging } : null;
@@ -1489,39 +1652,32 @@ if (document.readyState === 'complete') bootMap();
 else window.addEventListener('load', bootMap, { once: true });
 loadIncidents();
 setInterval(() => { if (!document.hidden) loadIncidents(); }, 5 * 60 * 1000);
-// Para pruebas automáticas
-globalThis.sendaDrive = {
-  st, goTo, onPos, dash, updateCorridor, updateRadars, updateCurveHorizon, shareIndirectDrive, drawTele,
-  buildAndroidAutoState, publishToAndroidAuto,
-  bbStart, bbSample, bbExport, setAiMode, aiIntervalMs,
-  sendBleProbe, loadPmTilesFile, loadOsintXml, loadOsintGeoJson,
-  exportDenm, encodeDenmCompact, decodeDenmCompact, ekf: st.ekf, horizonCal: st.horizonCal,
-  openLab, setActiveListen, runLabBattery, loadRfSurveyText, exportLabAndMap, surfaceMapper: st.surfaceMapper,
-  renderArHud, enrichTracksForHud, hudPhysicsState, createTracker, FULL_RULES,
-};
-
-
 // ── Después de un choque: el detector del núcleo decide si PREGUNTAR; una alarma fuerte ayuda a encontrar el móvil; nadie llama solo al 112 ──
 // Configuración: EXAMPLE_DETECTION_CONFIG, ejemplo SIN CALIBRAR (se dice en pantalla). Por eso la app pregunta y nunca afirma que hubo un choque.
 const CRASH_CFG = EXAMPLE_DETECTION_CONFIG, G0 = 9.80665;
 const crashBuf = { imu: [], speed: [], gyro: [] };
 const crash = { open: false, lastTrigS: -1e9, tick: 0, left: 0, result: null, sim: false, reportId: null, wb: null, rep: { vehicles: null, lane: null, trapped: null, fire: null } };
 const tS = () => performance.now() / 1000;
-const keep = (arr, v, s = 45) => { arr.push(v); while (arr.length && arr[0].t < v.t - s) arr.shift(); };
+const keep = (arr, v, s = 45, maxLen = 4500) => {
+  arr.push(v);
+  while (arr.length > maxLen || (arr.length && arr[0].t < v.t - s)) arr.shift();
+};
 let actx = null, siren = null, buzz = 0;
 addEventListener('pointerdown', () => { try { actx ??= new AudioContext(); actx.resume(); } catch { /* sin audio web */ } }, { passive: true });
 window.addEventListener('devicemotion', (e) => {
   const a = e.accelerationIncludingGravity, t = tS();
   if (a && Number.isFinite(a.x)) {
-    keep(crashBuf.imu, { t, x: a.x, y: a.y ?? 0, z: a.z ?? 0 });
+    keep(crashBuf.imu, { t, x: a.x, y: a.y ?? 0, z: a.z ?? 0 }, 45, 4500);
     if (!crash.open && t - crash.lastTrigS > 60 && Math.hypot(a.x, a.y ?? 0, a.z ?? 0) / G0 >= CRASH_CFG.trigger.peakG) crashTriggered(t);
   }
-  const g = e.rotationRate; if (g && Number.isFinite(g.alpha)) keep(crashBuf.gyro, { t, x: g.alpha, y: g.beta ?? 0, z: g.gamma ?? 0 });
+  const g = e.rotationRate; if (g && Number.isFinite(g.alpha)) keep(crashBuf.gyro, { t, x: g.alpha, y: g.beta ?? 0, z: g.gamma ?? 0 }, 45, 4500);
 });
-function crashSpeed(p) {
+function crashSpeed(p, fixMs = Date.now()) {
   const v = p.coords.speed; if (!Number.isFinite(v)) return;
-  const t = tS(), prev = crashBuf.speed[crashBuf.speed.length - 1]; keep(crashBuf.speed, { t, ms: v, src: 'GNSS' });
-  if (prev && t - prev.t > 0 && t - prev.t <= 1.5 && (prev.ms - v) / (t - prev.t) / G0 >= CRASH_CFG.trigger.physicalDecelG && !crash.open && t - crash.lastTrigS > 60) crashTriggered(t);
+  const t = tS(), prev = crashBuf.speed[crashBuf.speed.length - 1];
+  const dtFixS = prev && Number.isFinite(prev.fixMs) && fixMs > prev.fixMs ? (fixMs - prev.fixMs) / 1000 : (prev ? t - prev.t : 0);
+  keep(crashBuf.speed, { t, fixMs, ms: v, src: 'GNSS' }, 45, 120);
+  if (prev && dtFixS > 0 && dtFixS <= 1.5 && (prev.ms - v) / dtFixS / G0 >= CRASH_CFG.trigger.physicalDecelG && !crash.open && t - crash.lastTrigS > 60) crashTriggered(t);
 }
 function crashTriggered(t0) {
   crash.lastTrigS = t0; bbLog('note', { text: 'Disparo del detector de choque' });
@@ -1531,10 +1687,30 @@ function crashTriggered(t0) {
 function crashEvaluate(t0) {
   if (crash.open && crash.result?.state === 'LIKELY_CRASH') return;
   const from = t0 - 20, f = (arr) => arr.filter((x) => x.t >= from).map((x) => ({ ...x, t: +(x.t - from).toFixed(3) }));
-  const r = detectCrashEvent({ imu: f(crashBuf.imu), speed: f(crashBuf.speed), gyro: f(crashBuf.gyro), distanceToRoadM: null }, CRASH_CFG);
+  const dRoadM = st.route && st.pos ? +distToRoute(st.route, st.pos).toFixed(1) : null;
+  const r = detectCrashEvent({ imu: f(crashBuf.imu), speed: f(crashBuf.speed), gyro: f(crashBuf.gyro), distanceToRoadM: dRoadM }, CRASH_CFG);
   bbLog('note', { text: `Detector de choque: ${r.state} (p=${r.posterior ?? '–'})` });
   if (r.state === 'LIKELY_CRASH' || r.state === 'CHECK_USER') openCrash(r, false);
 }
+/** Verifica en caliente una traza sintética rotulada por la misma puerta de `crashEvaluate` (solo abre `#crash` si `LIKELY_CRASH` o `CHECK_USER`). */
+function evaluateSyntheticCrash(kind, { openUi = true } = {}) {
+  const tr = syntheticTrace(kind);
+  const r = detectCrashEvent(tr, CRASH_CFG);
+  const triggeredAlarm = r.state === 'LIKELY_CRASH' || r.state === 'CHECK_USER';
+  if (openUi && triggeredAlarm) openCrash(r, true);
+  return { kind, label: tr.label, state: r.state, posterior: r.posterior, peakG: r.peakG, triggeredAlarm, crashModalOpen: !$('#crash')?.hidden };
+}
+
+// Para pruebas automáticas
+globalThis.sendaDrive = {
+  st, goTo, onPos, dash, updateCorridor, updateRadars, updateCurveHorizon, shareIndirectDrive, drawTele,
+  buildAndroidAutoState, publishToAndroidAuto, coastTunnelTick, evaluateSyntheticCrash, parseGpxTrack,
+  bbStart, bbSample, bbExport, setAiMode, aiIntervalMs,
+  sendBleProbe, loadPmTilesFile, loadOsintXml, loadOsintGeoJson,
+  exportDenm, encodeDenmCompact, decodeDenmCompact, ekf: st.ekf, horizonCal: st.horizonCal,
+  openLab, setActiveListen, runLabBattery, loadRfSurveyText, exportLabAndMap, surfaceMapper: st.surfaceMapper,
+  renderArHud, enrichTracksForHud, hudPhysicsState, createTracker, FULL_RULES,
+};
 function openCrash(r, sim) {
   const upgrade = crash.open && r.state === 'LIKELY_CRASH' && crash.result?.state !== 'LIKELY_CRASH';
   if (crash.open && !upgrade) return;

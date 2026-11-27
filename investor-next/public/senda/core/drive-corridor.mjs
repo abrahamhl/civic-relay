@@ -117,10 +117,16 @@ export function hazardsAhead({ pos, headingDeg = null, speedMs = null, routeCoor
   }
 
   const egoProj = hasRoute ? projectOnPolyline(routeCoords, pos) : null;
+  // Desigualdad triangular exacta: ningún punto con proyección ≤ horizonM sobre la ruta y desplazamiento lateral ≤ routeMaxOffsetM
+  // puede estar en línea recta a más de egoProj.distM + horizonM + routeMaxOffsetM (evita proyectar cientos de incidencias lejanas cada segundo).
+  const maxStraightM = (egoProj ? egoProj.distM : 0) + horizonM + rules.routeMaxOffsetM + 100;
+  const cosLat0 = Math.max(0.1, Math.cos(rad(pos[1])));
   const candidates = [];
 
   const consider = (item) => {
     if (!Number.isFinite(item.lat) || !Number.isFinite(item.lon)) return;
+    if (Math.abs(item.lat - pos[1]) * 110_000 > maxStraightM) return;
+    if (Math.abs(item.lon - pos[0]) * 111_320 * cosLat0 > maxStraightM) return;
     if (hasHeading && typeof item.bearing === 'number' && Number.isFinite(item.bearing)) {
       if (headingDeltaDeg(headingDeg, item.bearing) > 70) return;
     }

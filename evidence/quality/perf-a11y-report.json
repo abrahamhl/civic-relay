@@ -1,7 +1,7 @@
 {
   "schema": "senda.perf-a11y-f7/v1",
   "basis": "MEASURED_HEADLESS_CHROMIUM_4G_AXE",
-  "generatedAtUtc": "2026-11-26T10:18:25.667Z",
+  "generatedAtUtc": "2026-11-27T13:52:43.359Z",
   "environment": {
     "node": "v22.23.5",
     "chrome": "/usr/bin/google-chrome",
@@ -19,11 +19,11 @@
       "id": "senda-home",
       "path": "/senda/",
       "perf": {
-        "lcpMs": 380,
+        "lcpMs": 1368,
         "lcpObserved": true,
-        "lcpElement": "DIV",
-        "fcpMs": 380,
-        "domContentLoadedMs": 1230,
+        "lcpElement": "P",
+        "fcpMs": 416,
+        "domContentLoadedMs": 1258,
         "initialJsTransferBytes": 69203,
         "initialJsTransferKB": 67.6,
         "initialJsUncompressedKB": 164.7,
@@ -103,22 +103,22 @@
       "id": "senda-conducir",
       "path": "/senda/conducir",
       "perf": {
-        "lcpMs": 356,
+        "lcpMs": 392,
         "lcpObserved": true,
         "lcpElement": "P",
-        "fcpMs": 356,
-        "domContentLoadedMs": 2010,
-        "initialJsTransferBytes": 206178,
-        "initialJsTransferKB": 201.3,
-        "initialJsUncompressedKB": 516.6,
+        "fcpMs": 392,
+        "domContentLoadedMs": 2400,
+        "initialJsTransferBytes": 251244,
+        "initialJsTransferKB": 245.4,
+        "initialJsUncompressedKB": 623.1,
         "deferredJsTransferKB": 0,
         "deferredJsFilesCount": 0,
-        "jsFilesCount": 38,
+        "jsFilesCount": 46,
         "topJsFiles": [
           {
             "url": "/senda/conducir.mjs",
-            "transferBytes": 34401,
-            "uncompressedBytes": 98470
+            "transferBytes": 49469,
+            "uncompressedBytes": 141896
           },
           {
             "url": "/senda/core/road-guard.mjs",
@@ -165,13 +165,13 @@
           "wcag21aa",
           "wcag22aa"
         ],
-        "passes": 24,
+        "passes": 22,
         "violationsCount": 0,
         "violations": [],
         "reducedMotion": {
           "mediaMatches": true,
           "hasReducedMotionRule": true,
-          "focusables": 67
+          "focusables": 103
         }
       },
       "consoleErrors": [],
@@ -187,49 +187,18 @@
       "id": "senda-personas",
       "path": "/senda/personas",
       "perf": {
-        "lcpMs": 388,
+        "lcpMs": 328,
         "lcpObserved": true,
         "lcpElement": "P",
-        "fcpMs": 388,
-        "domContentLoadedMs": 724,
-        "initialJsTransferBytes": 20941,
-        "initialJsTransferKB": 20.5,
-        "initialJsUncompressedKB": 45.5,
+        "fcpMs": 328,
+        "domContentLoadedMs": 0,
+        "initialJsTransferBytes": 0,
+        "initialJsTransferKB": 0,
+        "initialJsUncompressedKB": 0,
         "deferredJsTransferKB": 0,
         "deferredJsFilesCount": 0,
-        "jsFilesCount": 6,
-        "topJsFiles": [
-          {
-            "url": "/senda/personas.mjs",
-            "transferBytes": 7825,
-            "uncompressedBytes": 20018
-          },
-          {
-            "url": "/senda/core/mmwave-radar.mjs",
-            "transferBytes": 5227,
-            "uncompressedBytes": 12034
-          },
-          {
-            "url": "/senda/core/heading-fusion.mjs",
-            "transferBytes": 2722,
-            "uncompressedBytes": 5747
-          },
-          {
-            "url": "/senda/core/mmwave-field.mjs",
-            "transferBytes": 2599,
-            "uncompressedBytes": 5018
-          },
-          {
-            "url": "/senda/app-chrome.mjs",
-            "transferBytes": 1608,
-            "uncompressedBytes": 2519
-          },
-          {
-            "url": "/senda/save-file.mjs",
-            "transferBytes": 960,
-            "uncompressedBytes": 1216
-          }
-        ]
+        "jsFilesCount": 0,
+        "topJsFiles": []
       },
       "a11y": {
         "wcagTags": [
@@ -239,13 +208,13 @@
           "wcag21aa",
           "wcag22aa"
         ],
-        "passes": 25,
+        "passes": 23,
         "violationsCount": 0,
         "violations": [],
         "reducedMotion": {
           "mediaMatches": true,
           "hasReducedMotionRule": true,
-          "focusables": 26
+          "focusables": 24
         }
       },
       "consoleErrors": [],
@@ -258,5 +227,5 @@
       }
     }
   ],
-  "sha256": "14a75c948f0c6e9f9259b068c46752f42bfdae7f1e5437324cccc28d205296b4"
+  "sha256": "cb48d478634f9e5b94a7b16b721c9347b66932645f557ef14616b485501cf9ad"
 }

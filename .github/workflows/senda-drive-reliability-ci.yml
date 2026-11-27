@@ -1,0 +1,54 @@
+name: SENDA Fiabilidad de Conducción (A0 · Playwright GPX E2E + 2h Soak)
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'investor-next/public/senda/conducir*'
+      - 'investor-next/scripts/drive-reliability-a0.mjs'
+      - 'packages/senda/src/nav-osrm.mjs'
+      - 'packages/senda/src/drive-kalman-fusion.mjs'
+      - 'packages/senda/src/roadsafe-crash-detect.mjs'
+      - 'packages/senda/tests/drive-reliability-a0.test.mjs'
+      - '.github/workflows/senda-drive-reliability-ci.yml'
+  pull_request:
+    paths:
+      - 'investor-next/public/senda/conducir*'
+      - 'investor-next/scripts/drive-reliability-a0.mjs'
+      - 'packages/senda/src/nav-osrm.mjs'
+      - 'packages/senda/src/drive-kalman-fusion.mjs'
+      - 'packages/senda/src/roadsafe-crash-detect.mjs'
+      - 'packages/senda/tests/drive-reliability-a0.test.mjs'
+      - '.github/workflows/senda-drive-reliability-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  drive-reliability-a0:
+    name: E2E Chromium Pixel 7 + Tablet + GPX Real (30–120 km/h, 1×/×4, Túnel 60 s, 2 h Heap ±10 %)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Instalar playwright-core efímero (sin tocar lockfiles, usa Google Chrome del runner)
+        run: |
+          mkdir -p /tmp/pw
+          npm --prefix /tmp/pw install --no-audit --no-fund playwright-core@1.51.0
+      - name: Ejecutar batería E2E A0 sobre /senda/conducir con CSP estricta
+        env:
+          NODE_PATH: /tmp/pw/node_modules
+        run: node investor-next/scripts/drive-reliability-a0.mjs --ci
+      - name: Verificar invariantes y sello SHA-256 del informe A0
+        run: node --test packages/senda/tests/drive-reliability-a0.test.mjs
+      - name: Subir evidencia A0
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: senda-drive-reliability-a0
+          path: evidence/drive-reliability/
+          retention-days: 14
