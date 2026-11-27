@@ -21,7 +21,7 @@ export function initNostr({ S, kv, $, toast, receiveEnvelope, log, render }) {
   let pool = null, tr = null, timer = null;
   const status = { open: 0, total: 0, own: 0 };
   const lists = () => {
-    const own = parseNostrRelays(S.net?.servers ?? SENDA_SERVERS);
+    const own = parseNostrRelays(S.net?.servers || SENDA_SERVERS);
     const extra = S.net?.publicExtra === false ? [] : parseNostrRelays(PUBLIC_EXTRA_RELAYS);
     return { own, all: [...new Set([...own, ...extra])].slice(0, 8) };
   };

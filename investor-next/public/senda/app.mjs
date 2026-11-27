@@ -13,8 +13,6 @@ import { detectCrash, crashResponsePolicy, buildIncidentReport, fuseIncidentRepo
 import * as kv from './db.mjs';
 import { emit, listen, decodeSamples } from './audio.mjs';
 import { initCoordination } from './coord.mjs';
-import { initNostr, PUBLIC_EXTRA_RELAYS, SENDA_SERVERS } from './nostr-link.mjs';
-import { prewrap } from './core/nostr-mailbox.mjs';
 
 const $ = (s) => document.querySelector(s);
 const now = () => Date.now();
@@ -58,8 +56,8 @@ async function boot() {
   await CO.load();
   for (const b of S.store.listBroadcasts()) await CO.handleBroadcast(b, 'almacenado');
   CO.startAutoRelay(); // si hay relés configurados, sube y baja solo cada vez que haya red
-  S.net = (await kv.get('net')) ?? { servers: SENDA_SERVERS, publicExtra: true };
-  NOSTR.start(); // red descentralizada: buzones cifrados y cegados en varios relés Nostr públicos
+  S.net = (await kv.get('net')) ?? { servers: '', publicExtra: true };
+  startNetLater(); // red SENDA: se carga después de pintar la pantalla (no retrasa el arranque en 4G)
   if (await kv.get('easyOnly')) { document.body.classList.add('easy-only'); $('#easy-only').checked = true; }
   $('#tabs').hidden = false; show('home');
 }
@@ -391,7 +389,18 @@ if ('serviceWorker' in navigator) {
 
 /* Coordinación (residente / coordinador / relé) */
 const CO = initCoordination({ S, kv, $, toast, persist, render: () => render(), esc, ask, copy, receiveEnvelope: (e, v) => receiveEnvelope(e, v), log: (e) => logEv(e) });
-const NOSTR = initNostr({ S, kv, $, toast, receiveEnvelope: (e, v) => receiveEnvelope(e, v), log: (e) => logEv(e), render: () => render() });
+/* Red SENDA (Nostr): carga diferida. Hasta que llega, NOSTR es un sustituto inerte; los mensajes esperan en el almacén. */
+let NOSTR = { start() {}, flush() {}, sendReceipt() {}, paint() {}, contactsChanged() {}, active: () => false, async configure() { toast('La red aún se está cargando'); } };
+function startNetLater() {
+  const go = async () => {
+    try {
+      const { initNostr } = await import('./nostr-link.mjs');
+      NOSTR = initNostr({ S, kv, $, toast, receiveEnvelope: (e, v) => receiveEnvelope(e, v), log: (e) => logEv(e), render: () => render() });
+      await NOSTR.start(); render();
+    } catch { /* sin red SENDA: siguen Bluetooth, SMS, sonido, archivo y relé */ }
+  };
+  if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 2000 }); else setTimeout(go, 300);
+}
 
 /* Ganchos para pruebas automáticas (sin efecto para el usuario). */
 Object.assign(window.SENDA_TEST, {
@@ -416,7 +425,7 @@ Object.assign(window.SENDA_TEST, {
 /* ---------------- fotos y registro de pruebas ---------------- */
 /** Guarda un sobre propio con su evento exterior ya preparado (sin red): quien llegue antes a Internet lo publica tal cual. */
 async function putOwn(env, contact, copies) {
-  let wrap = null; try { wrap = await prewrap({ identity: S.me, contact, envelope: env, nowMs: now() }); } catch { /* sin evento exterior: viaja igual por las demás vías */ }
+  let wrap = null; try { const { prewrap } = await import('./core/nostr-mailbox.mjs'); wrap = await prewrap({ identity: S.me, contact, envelope: env, nowMs: now() }); } catch { /* sin evento exterior: viaja igual por las demás vías */ }
   return S.store.put(env, { now: now(), copies, wrap });
 }
 function logEv(e) { (S.log ??= []).push({ t: now(), ...e }); if (S.log.length > 3000) S.log.shift(); }
