@@ -5,15 +5,18 @@
  *  - GET  /health
  * No puede leer mensajes (cifrado extremo a extremo); valida forma, tamaño y caducidad,
  * limita peticiones por IP y persiste en disco para sobrevivir a reinicios.
- * Variables: PORT (8787), DATA_DIR (./data), ALLOWED_ORIGINS (coma; por defecto *), MAX_BODY (2 MB).
+ * Federación: con PEERS (lista de relés https separada por comas) este relé se sincroniza con los otros cada
+ * PEER_INTERVAL_S (60 s). Un sobre que entra por el relé de Suecia aparece en el de España sin intervención.
+ * Variables: PORT (8787), DATA_DIR (./data), ALLOWED_ORIGINS (coma; por defecto *), MAX_BODY (2 MB), PEERS, PEER_INTERVAL_S.
  */
 import { createServer } from 'node:http';
 import { mkdirSync, readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createBundleStore } from '../senda/src/bundle.mjs';
 import { validateEnvelopeShape } from '../senda/src/envelope.mjs';
+import { syncWithRelay, parseRelayList } from '../senda/src/relay-client.mjs';
 
-export function createRelay({ dataDir = process.env.DATA_DIR ?? './data', maxBody = +(process.env.MAX_BODY ?? 2 * 1024 * 1024), allowedOrigins = (process.env.ALLOWED_ORIGINS ?? '*').split(','), ratePerMin = 120, now = () => Date.now() } = {}) {
+export function createRelay({ dataDir = process.env.DATA_DIR ?? './data', maxBody = +(process.env.MAX_BODY ?? 2 * 1024 * 1024), allowedOrigins = (process.env.ALLOWED_ORIGINS ?? '*').split(','), ratePerMin = 120, now = () => Date.now(), peers = parseRelayList(process.env.PEERS ?? ''), peerIntervalMs = 1000 * +(process.env.PEER_INTERVAL_S ?? 60), fetchImpl = globalThis.fetch } = {}) {
   mkdirSync(dataDir, { recursive: true });
   const file = resolve(dataDir, 'store.json');
   const store = createBundleStore({ owner: 'senda-relay', quotaBytes: 256 * 1024 * 1024, initialCopies: 64 });
@@ -32,7 +35,7 @@ export function createRelay({ dataDir = process.env.DATA_DIR ?? './data', maxBod
     if (cors) { res.setHeader('access-control-allow-origin', cors); res.setHeader('access-control-allow-headers', 'content-type'); res.setHeader('access-control-allow-methods', 'GET,POST,OPTIONS'); }
     res.setHeader('cache-control', 'no-store');
     if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
-    if (req.method === 'GET' && req.url === '/health') { res.writeHead(200, { 'content-type': 'application/json' }); return res.end(JSON.stringify({ ok: true, items: store.count(), broadcasts: store.listBroadcasts().length, bytes: store.bytesUsed() })); }
+    if (req.method === 'GET' && req.url === '/health') { res.writeHead(200, { 'content-type': 'application/json' }); return res.end(JSON.stringify({ ok: true, items: store.count(), broadcasts: store.listBroadcasts().length, bytes: store.bytesUsed(), peers: federation.peers.length, federatedAt: federation.last?.at ?? null, peersOk: federation.last ? federation.last.results.filter((x) => x.ok).length : null })); }
     if (req.method !== 'POST' || req.url !== '/sync') { res.writeHead(404); return res.end(); }
     if (!allow(req.socket.remoteAddress)) { res.writeHead(429); return res.end(); }
     let size = 0; const chunks = [];
@@ -51,11 +54,26 @@ export function createRelay({ dataDir = process.env.DATA_DIR ?? './data', maxBod
     };
     await store.ingest({ envelopes, receipts, broadcasts }, { now: t });
     dirty = true;
-    const out = store.prepareFor(summary, { now: t, maxBytes: 1024 * 1024 });
+    // Otro relé (federación) recibe también con 1 sola copia: es infraestructura, no inunda.
+    const out = store.prepareFor(summary, { now: t, maxBytes: 1024 * 1024, infrastructure: body.role === 'relay' });
+    if (body.wantSummary === true) out.summary = store.summary();
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify(out));
   });
-  return { server, store, flush, close: () => new Promise((r) => { clearInterval(timer); flush(); server.closeAllConnections?.(); server.close(r); }) };
+  /* ---------- federación con otros relés ---------- */
+  const federation = { peers, last: null, runs: 0 };
+  async function federateOnce() {
+    const results = [];
+    for (const url of peers) {
+      const r = await syncWithRelay({ store, url, role: 'relay', fetchImpl, now });
+      results.push({ url, ok: r.ok, error: r.error, uploaded: r.uploaded, downloaded: r.downloaded, rttMs: r.rttMs });
+    }
+    if (results.length) { dirty = true; federation.last = { at: now(), results }; federation.runs++; }
+    return results;
+  }
+  const fedTimer = peers.length ? setInterval(() => { federateOnce().catch(() => {}); }, peerIntervalMs) : null;
+  fedTimer?.unref?.();
+  return { server, store, flush, federateOnce, federation, close: () => new Promise((r) => { clearInterval(timer); if (fedTimer) clearInterval(fedTimer); flush(); server.closeAllConnections?.(); server.close(r); }) };
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

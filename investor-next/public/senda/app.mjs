@@ -55,6 +55,7 @@ async function boot() {
   S.store.purgeExpired(now());
   await CO.load();
   for (const b of S.store.listBroadcasts()) await CO.handleBroadcast(b, 'almacenado');
+  CO.startAutoRelay(); // si hay relés configurados, sube y baja solo cada vez que haya red
   if (await kv.get('easyOnly')) { document.body.classList.add('easy-only'); $('#easy-only').checked = true; }
   $('#tabs').hidden = false; show('home');
 }
@@ -201,7 +202,7 @@ function outgoing() { return S.store.list().filter((i) => i.to !== S.me.publicId
 
 async function receiveText(t, via) {
   t = t.trim();
-  if (t.startsWith('{')) { const r = await importBundleFile(S.store, t, { now: now() }); for (const e of r.forMe) await receiveEnvelope(e, via); for (const b of r.newBroadcasts ?? []) await CO.handleBroadcast(b, via); await persist(); render(); return toast(`Paquete: ${r.forMe.length} para ti, ${r.stored.length} en tránsito${r.newBroadcasts?.length ? `, ${r.newBroadcasts.length} alerta(s)` : ''}`); }
+  if (t.startsWith('{')) { const r = await importBundleFile(S.store, t, { now: now() }); for (const e of r.forMe) await receiveEnvelope(e, via); for (const b of r.newBroadcasts ?? []) await CO.handleBroadcast(b, via); await persist(); render(); if (r.stored.length) CO.relayNow(); return toast(`Paquete: ${r.forMe.length} para ti, ${r.stored.length} en tránsito${r.newBroadcasts?.length ? `, ${r.newBroadcasts.length} alerta(s)` : ''}`); }
   const m = t.match(/SENDA:([A-Za-z0-9_-]+)/); if (!m) return toast('No es un código SENDA');
   await receiveBytes(unb64(m[1]), via);
 }
@@ -223,6 +224,7 @@ async function sendMessage() {
   S.store.put(env, { now: now(), copies: 8 });
   S.sent.unshift({ id: env.header.id, toFp: to.fingerprint, body, kind: prio === 0 ? 'SOS' : 'PERSONAL', at: createdAt, img: img?.url ?? null });
   logEv({ ev: 'CIFRADO', id: env.header.id, to: to.name, createdAt, bytes: packEnvelope(env).length, textChars: [...body].length, imageBytes: img?.bytes.length ?? 0, cipher: 'ECDH P-256 efímero → HKDF-SHA-256 → AES-256-GCM · firma ECDSA P-256' });
+  CO.relayNow(); // con red y relé configurado, sale ya hacia el otro país
   S.pendingImg = null; $('#attach-preview').hidden = true;
   await persist(); $('#body').value = ''; $('#body-count').textContent = `0/${MAX_TEXT_CHARS}`; render();
   toast('Cifrado y en camino. Envíalo por Bluetooth, SMS o sonido, o deja que otros lo lleven.');
@@ -380,7 +382,7 @@ if ('serviceWorker' in navigator) {
 }
 
 /* Coordinación (residente / coordinador / relé) */
-const CO = initCoordination({ S, kv, $, toast, persist, render: () => render(), esc, ask, copy, receiveEnvelope: (e, v) => receiveEnvelope(e, v) });
+const CO = initCoordination({ S, kv, $, toast, persist, render: () => render(), esc, ask, copy, receiveEnvelope: (e, v) => receiveEnvelope(e, v), log: (e) => logEv(e) });
 
 /* Ganchos para pruebas automáticas (sin efecto para el usuario). */
 Object.assign(window.SENDA_TEST, {

@@ -13,6 +13,7 @@ import { signCommand, evaluateCommand, keyThumb, buildResidentResponse, aggregat
 import { prepareBuilding, locateAccessPoints, FLOOR_HEIGHT_M } from './core/building-twin.mjs';
 import { relayActivation } from './core/zones.mjs';
 import { packContact } from './core/envelope.mjs';
+import { syncAllRelays, parseRelayList, createAutoSync } from './core/relay-client.mjs';
 import { emit } from './audio.mjs';
 import { beaconIdOf, nativeActionLink, parseSurvey } from './core/beacon.mjs';
 
@@ -133,18 +134,27 @@ export function initCoordination(app) {
   }
 
   /* ---------- relé por Internet ---------- */
-  async function syncRelay() {
-    const url = ($('#relay-url').value.trim() || S.relayUrl).replace(/\/$/, ''); if (!url) return toast('Indica la dirección del relé');
-    S.relayUrl = url; await save();
-    const p = S.store.prepareFor({ owner: 'senda-relay', ids: [], receipts: [], broadcasts: [] }, { now: now() });
-    const r = await fetch(url + '/sync', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ summary: S.store.summary(), ...p }) });
-    if (!r.ok) throw new Error(`Relé respondió ${r.status}`);
-    const got = await S.store.ingest(await r.json(), { now: now() });
-    for (const e of got.forMe) await app.receiveEnvelope(e, 'relé');
-    for (const b of got.newBroadcasts) await handleBroadcast(b, 'relé');
-    await save(); render(); toast(`Relé: ${got.forMe.length} para ti, ${got.stored.length} en tránsito, ${got.newBroadcasts.length} alertas`);
-    return got;
+  // Varios relés separados por comas: basta con que funcione uno. Se sincroniza solo al ganar red y cada minuto.
+  async function syncRelay({ silent = false } = {}) {
+    const typed = $('#relay-url')?.value.trim();
+    const urls = parseRelayList(typed || S.relayUrl);
+    if (!urls.length) { if (!silent) toast('Indica la dirección del relé (https://…)'); return null; }
+    S.relayUrl = urls.join(', '); await save();
+    const res = await syncAllRelays({ store: S.store, urls });
+    for (const r of res.results) app.log?.({ ev: r.ok ? 'RELE_SINCRONIZADO' : 'RELE_FALLO', via: 'RELÉ', relay: new URL(r.url).host, uploaded: r.uploaded, downloaded: r.downloaded, bytesUp: r.bytesUp, bytesDown: r.bytesDown, rttMs: r.rttMs, error: r.error ?? null });
+    for (const e of res.forMe) await app.receiveEnvelope(e, 'relé');
+    const nb = res.results.flatMap((r) => r.newBroadcasts);
+    for (const b of nb) await handleBroadcast(b, 'relé');
+    await save(); render();
+    const up = res.results.reduce((a, r) => a + r.uploaded, 0);
+    if (!silent || res.forMe.length || up) toast(res.okCount ? `Relé (${res.okCount}/${urls.length}): ${res.forMe.length} para ti, ${up} subidos` : `Ningún relé respondió (${res.results[0]?.error ?? 'sin red'})`);
+    return res;
   }
+  const autoRelay = createAutoSync({ run: () => syncRelay({ silent: true }).then((r) => r ?? { okCount: 0, results: [] }), isOnline: () => navigator.onLine !== false && !!S.relayUrl, intervalMs: 60_000 });
+  addEventListener('online', () => autoRelay.now());
+  /** Arranca la sincronización automática si hay relés configurados. */
+  function startAutoRelay() { if (S.relayUrl) autoRelay.start(); }
+  function relayState() { return autoRelay.state(); }
 
   /* ---------- render de la parte de coordinación ---------- */
   async function renderCoord() {
@@ -180,7 +190,7 @@ export function initCoordination(app) {
       if (a.dataset.co === 'request') { await app.copy(encodeCode(CODE.REQUEST, { name: S.name, thumb: await keyThumb(S.me.publicIdentity.signPub) })); }
       if (a.dataset.co === 'cred-import') { const t = await app.ask('Pega la credencial firmada por el organismo (SENDA-CREDENCIAL:…)'); if (!t) return; S.coord.credential = decodeCode(CODE.CREDENTIAL, t); await save(); render(); toast((await coordStatus()).text, 5000); }
       if (a.dataset.co === 'send-alert') await sendAlert();
-      if (a.dataset.co === 'relay-sync') await syncRelay();
+      if (a.dataset.co === 'relay-sync') { await syncRelay(); startAutoRelay(); }
     } catch (err) { toast(err.message, 5000); }
   });
 
@@ -189,5 +199,5 @@ export function initCoordination(app) {
   const importCredentialCode = async (t) => { S.coord.credential = decodeCode(CODE.CREDENTIAL, t); await save(); render(); return coordStatus(); };
   const setProfile = async (p) => { S.profile = { ...S.profile, ...p }; await save(); render(); };
   const requestCode = async () => encodeCode(CODE.REQUEST, { name: S.name, thumb: await keyThumb(S.me.publicIdentity.signPub) });
-  return { load, handleBroadcast, onResponseMessage, renderCoord, sendAlert, importSurvey, syncRelay, coordStatus, RESPONSE_PREFIX, importAnchorCode, importCredentialCode, setProfile, requestCode };
+  return { load, handleBroadcast, onResponseMessage, renderCoord, sendAlert, importSurvey, syncRelay, startAutoRelay, relayState, relayNow: () => { if (S.relayUrl) autoRelay.now(); }, coordStatus, RESPONSE_PREFIX, importAnchorCode, importCredentialCode, setProfile, requestCode };
 }

@@ -22,6 +22,13 @@ Las **alertas firmadas** (`SENDA_SIGNED_COMMAND`) se transportan pero **no se ve
 la verificación (ancla del organismo → credencial → clave → firma, consentimiento, zona, destino)
 ocurre en cada teléfono, que es quien decide. Una alerta falsa ocupa cuota, no ejecuta nada.
 
+## Federación entre países
+
+`PEERS=https://rele-es.ejemplo,https://rele-nl.ejemplo` hace que este relé se sincronice con los otros cada
+`PEER_INTERVAL_S` (60 s): un sobre que entra por Suecia aparece en España sin intervención. Los relés se ceden los
+sobres como infraestructura (también con 1 copia). Prueba: `tests/long-distance.test.mjs`. Definición completa de
+la escalera de vías en `docs/red/PASARELAS_SENDA.md`.
+
 ## Ejecutar
 
 ```bash
