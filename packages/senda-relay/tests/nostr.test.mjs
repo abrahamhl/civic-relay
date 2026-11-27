@@ -12,7 +12,7 @@ import { createRelay } from '../server.mjs';
 import { generateIdentity, sealMessage, openMessage } from '../../senda/src/envelope.mjs';
 import { createBundleStore, syncPair } from '../../senda/src/bundle.mjs';
 import { createNostrPool, createNostrTransport } from '../../senda/src/nostr-client.mjs';
-import { pairMailbox, pairSecret, wrapEnvelope, DAY_MS } from '../../senda/src/nostr-mailbox.mjs';
+import { pairMailbox, pairSecret, wrapEnvelope, prewrap, DAY_MS } from '../../senda/src/nostr-mailbox.mjs';
 
 const listen = (r) => new Promise((ok) => r.server.listen(0, '127.0.0.1', () => ok(`ws://127.0.0.1:${r.server.address().port}/nostr`)));
 const until = async (fn, ms = 5000) => { const t = Date.now(); while (Date.now() - t < ms) { if (await fn()) return true; await new Promise((r) => setTimeout(r, 20)); } return false; };
@@ -58,28 +58,31 @@ test('Nostr SE→ES: publicado en 3 relés (1 caído), entregado en tiempo real,
   } finally { A.pool.close(); H.pool.close(); await r1.close(); await r2.close(); }
 });
 
-test('Nostr: el que conecta después lo recibe (almacenado), y un mensajero sin red lo pasa a Internet por el buzón de mensajero', async () => {
-  const r1 = createRelay({ dataDir: mkdtempSync(join(tmpdir(), 'n3-')) });
-  const relays = [await listen(r1)];
+test('red SENDA: Ana sin red escribe; Bo (sin conocer a nadie) lo publica tal cual; servidores NL⇄ES federados; Hermano conectado a otro servidor lo recibe', async () => {
+  const nl = createRelay({ dataDir: mkdtempSync(join(tmpdir(), 'n3-')) }), es = createRelay({ dataDir: mkdtempSync(join(tmpdir(), 'n5-')) });
+  const uNL = await listen(nl), uES = await listen(es);
+  nl.federation.peers.push(uES.replace('ws://', 'http://').replace('/nostr', ''));
   const [ana, bo, her] = await Promise.all([generateIdentity(), generateIdentity(), generateIdentity()]);
   const now = Date.now();
-  // Ana, sin Internet, se cruza con Bo por Bluetooth.
   const sAna = createBundleStore({ owner: ana.publicIdentity.fingerprint });
-  const env = await sealMessage({ sender: ana, recipient: her.publicIdentity, body: 'Ana sin red → Bo → Nostr → Hermano', priority: 3, ttlS: 7 * 86400, now });
-  sAna.put(env, { now });
-  const B = await phone(bo, relays, []); // Bo NO tiene a Hermano de contacto
+  const env = await sealMessage({ sender: ana, recipient: her.publicIdentity, body: 'Ana sin red → Bo → servidor NL → servidor ES → Hermano', priority: 3, ttlS: 7 * 86400, now });
+  sAna.put(env, { now, wrap: await prewrap({ identity: ana, contact: her.publicIdentity, envelope: env, nowMs: now }) });
+  const B = await phone(bo, [uNL], []); // Bo no tiene contactos: no sabe a quién va
   try {
     await syncPair(sAna, B.store, { now });
     await until(() => B.pool.status()[0].open);
     const sent = await B.tr.flush();
-    assert.equal(sent[0].ok, true); assert.equal(sent[0].mailbox, 'DROP');
-    // Hermano se conecta más tarde: lo recibe del almacén del relé.
-    const H = await phone(her, relays, [ana.publicIdentity]);
+    assert.equal(sent[0].ok, true); assert.equal(sent[0].mailbox, 'PAIR_CARRIED');
+    assert.ok(await until(() => es.nostr.count() === 1), 'el servidor NL empuja el buzón al de ES al instante');
+    const fed = await nl.federateOnce();
+    assert.equal(fed[0].nostrError, null); assert.equal(fed[0].nostrOut, 0, 'la federación periódica no repite lo ya empujado');
+    // Hermano se conecta más tarde y SOLO al servidor de España.
+    const H = await phone(her, [uES], [ana.publicIdentity]);
     try {
       assert.ok(await until(() => H.inbox.length === 1));
-      assert.equal((await openMessage({ recipient: her, envelope: H.inbox[0].env, now: Date.now() })).body, 'Ana sin red → Bo → Nostr → Hermano');
+      assert.equal((await openMessage({ recipient: her, envelope: H.inbox[0].env, now: Date.now() })).body, 'Ana sin red → Bo → servidor NL → servidor ES → Hermano');
     } finally { H.pool.close(); }
-  } finally { B.pool.close(); await r1.close(); }
+  } finally { B.pool.close(); await nl.close(); await es.close(); }
 });
 
 test('relé Nostr SENDA: rechaza otros kinds, firmas falsas, sin caducidad; persiste tras reinicio', async () => {

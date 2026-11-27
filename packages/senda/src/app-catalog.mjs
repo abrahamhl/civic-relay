@@ -29,6 +29,7 @@ const M = [
   ['triaje', 'Triaje', 'Primeros auxilios guiados', 'emergencia', C],
   ['monte', 'Perdido en el monte', 'Qué hacer y cómo avisar', 'emergencia', C],
   ['conducir', 'Conducir', 'Cámara en el salpicadero, avisos y radar', 'emergencia', C],
+  ['alrededor', 'Alrededor', 'La cámara con incidencias, avisos, radares, cámaras y dispositivos cercanos', 'emergencia', C],
   ['copiloto', 'Copiloto 5D', 'Adherencia, entorno directo/indirecto, calibración y Android Auto', 'emergencia', C],
   ['drive', 'SENDA Drive', 'Arranque automático en el coche', 'emergencia', C],
   ['carretera', 'Ruta protectora', 'Salir por el camino seguro', 'emergencia', C],

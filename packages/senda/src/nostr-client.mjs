@@ -4,11 +4,11 @@
  * - Pool: una conexión WebSocket por relé, reconexión con retroceso, suscripción en tiempo real que se reenvía al
  *   reconectar, y publicación en TODOS a la vez (basta con que uno confirme). Funciona en navegador, WebView de
  *   Android y Node ≥ 22 (WebSocket global).
- * - Transporte: decide a qué buzón va cada sobre (pareja si el destinatario es contacto; mensajero si lo llevo de
- *   otro), publica lo pendiente, escucha mis buzones y entrega lo recibido al almacén y a la app. Mide la latencia
+ * - Transporte: publica cada sobre pendiente (con el evento exterior que preparó el remitente, o creándolo si el
+ *   destinatario es mi contacto), publica lo pendiente, escucha mis buzones y entrega lo recibido al almacén y a la app. Mide la latencia
  *   (creación del sobre → llegada) con el reloj de cada móvil.
  */
-import { myMailboxes, mailboxFilter, wrapEnvelope, wrapReceipt, unwrapEvent, pairSecret, pairMailbox, dropMailbox, DAY_MS } from './nostr-mailbox.mjs';
+import { myMailboxes, mailboxFilter, wrapEnvelope, wrapReceipt, unwrapEvent, pairSecret, pairMailbox, DAY_MS } from './nostr-mailbox.mjs';
 
 /** Solo relés wss:// (o ws:// a localhost para pruebas), sin credenciales en la URL; máximo 8. */
 export function parseNostrRelays(text) {
@@ -82,14 +82,14 @@ export function createNostrPool({ relays, WebSocketImpl = globalThis.WebSocket, 
  * @param {(env:object, info:{relay:string}) => Promise<void>} p.onEnvelope  sobre para mí
  * @param {(e:object) => void} [p.log]
  */
-export function createNostrTransport({ pool, identity, contacts, store, onEnvelope, log = () => {}, now = () => Date.now(), acceptDrops = true, carryForOthers = true, published = new Set() }) {
+export function createNostrTransport({ pool, identity, contacts, store, onEnvelope, log = () => {}, now = () => Date.now(), carryForOthers = true, published = new Set() }) {
   let boxes = new Map(); const seen = new Set();
   const me = identity.publicIdentity.fingerprint;
   const pairCache = new Map();
   async function secretFor(c) { if (!pairCache.has(c.fingerprint)) pairCache.set(c.fingerprint, await pairSecret(identity, c)); return pairCache.get(c.fingerprint); }
 
   async function refresh() {
-    boxes = await myMailboxes({ identity, contacts: contacts(), nowMs: now(), acceptDrops });
+    boxes = await myMailboxes({ identity, contacts: contacts(), nowMs: now() });
     pool.subscribe(mailboxFilter(boxes.keys(), now() - 8 * DAY_MS));
     return boxes.size;
   }
@@ -105,17 +105,22 @@ export function createNostrTransport({ pool, identity, contacts, store, onEnvelo
     return got;
   }
 
-  /** Publica cada sobre pendiente una vez: a la pareja si el destinatario es contacto, si no al buzón de mensajero. */
+  /**
+   * Publica cada sobre pendiente una vez. Si lleva evento exterior del remitente, se publica TAL CUAL (vale igual para
+   * mis mensajes y para los que transporto de otros). Si no lo lleva y el destinatario es mi contacto, lo creo.
+   * Un sobre ajeno sin evento exterior no se publica: viajará por Bluetooth o por el relé SENDA de sincronización.
+   */
   async function flush() {
     const t = now(), day = Math.floor(t / DAY_MS), res = [];
     const byFp = new Map(contacts().map((c) => [c.fingerprint, c]));
     for (const it of store.list()) {
       if (published.has(it.id) || it.to === me || t > it.expiresAt) continue;
       const env = store.get(it.id); if (!env) continue;
-      const c = byFp.get(it.to);
-      if (!c && !carryForOthers) continue;
-      const mailbox = c ? await pairMailbox(await secretFor(c), day) : await dropMailbox(it.to, day);
-      const ev = await wrapEnvelope({ mailbox, envelope: env, nowMs: t });
+      const c = byFp.get(it.to), pre = store.getWrap?.(it.id) ?? null;
+      if (!pre && !c) continue;
+      if (pre && !c && !carryForOthers) continue;
+      const ev = pre ?? await wrapEnvelope({ mailbox: await pairMailbox(await secretFor(c), day), envelope: env, nowMs: t });
+      const mailbox = { kind: pre ? (c ? 'PAIR' : 'PAIR_CARRIED') : 'PAIR' };
       const r = await pool.publish(ev);
       log({ ev: r.ok ? 'ENVIADO' : 'NOSTR_FALLO', via: 'NOSTR', ids: [it.id], mailbox: mailbox.kind, bytes: ev.content.length, relaysOk: r.answers.filter((a) => a.ok).length, relays: r.answers.length, firstOkMs: Math.min(...r.answers.filter((a) => a.ok).map((a) => a.ms), Infinity), msgs: r.answers.filter((a) => !a.ok).map((a) => `${host(a.url)}: ${a.msg}`) });
       if (r.ok) published.add(it.id);

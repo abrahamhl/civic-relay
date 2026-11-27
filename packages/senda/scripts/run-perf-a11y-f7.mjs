@@ -408,12 +408,21 @@ const cdp = await launchChrome(chromeBin);
 
 try {
   const results = [];
+  // Calentamiento: la primera navegación de un Chrome recién arrancado paga su inicialización (procesos, compositor,
+  // compilador) y salía SOLO en la primera ruta medida (/senda/: 1,3–3,7 s en CI con el mismo código, frente a ~0,4 s de
+  // las demás). Se navega una vez a una página mínima del mismo origen, sin código de la app, y se descarta.
+  try {
+    await cdp.send('Page.enable');
+    const warm = new Promise((res) => { const off = cdp.on('Page.loadEventFired', () => { off(); res(); }); });
+    await cdp.send('Page.navigate', { url: `${baseUrl}/senda/icon.svg` });
+    await Promise.race([warm, new Promise((r) => setTimeout(r, 5000))]);
+  } catch { /* sin calentamiento: se mide igual */ }
   for (const route of ROUTES) {
     const r = await auditRoute(cdp, baseUrl, route, axeSource);
     results.push(r);
     const status = r.gates.ok ? 'PASS' : 'FAIL';
     console.log(
-      `[${status}] ${r.path.padEnd(18)} LCP=${r.perf.lcpMs} ms (<${BUDGETS.maxLcpMs}) · JS=${r.perf.initialJsTransferKB} KB (<300 KB, ${r.perf.jsFilesCount} ficheros) · axe=${r.a11y.violationsCount} violaciones (${r.a11y.passes} OK) · reduced-motion=${r.a11y.reducedMotion.hasReducedMotionRule}`
+      `[${status}] ${r.path.padEnd(18)} LCP=${r.perf.lcpMs} ms (<${BUDGETS.maxLcpMs}, ${r.perf.lcpElement ?? '?'}, FCP ${r.perf.fcpMs ?? '?'} ms) · JS=${r.perf.initialJsTransferKB} KB (<300 KB, ${r.perf.jsFilesCount} ficheros) · axe=${r.a11y.violationsCount} violaciones (${r.a11y.passes} OK) · reduced-motion=${r.a11y.reducedMotion.hasReducedMotionRule}`
     );
     if (r.a11y.violationsCount > 0) {
       for (const v of r.a11y.violations) {

@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { schnorr } from '../src/noble-secp256k1.mjs';
 import { generateIdentity, sealMessage, openMessage } from '../src/envelope.mjs';
-import { pairSecret, pairMailbox, dropMailbox, wrapEnvelope, wrapReceipt, unwrapEvent, verifyEvent, myMailboxes, daysAround, unhex, hex, DAY_MS, PAD_BLOCK } from '../src/nostr-mailbox.mjs';
+import { pairSecret, pairMailbox, prewrap, wrapEnvelope, wrapReceipt, unwrapEvent, verifyEvent, myMailboxes, daysAround, unhex, hex, DAY_MS, PAD_BLOCK } from '../src/nostr-mailbox.mjs';
+import { createBundleStore, syncPair, isWrapShape } from '../src/bundle.mjs';
 import { parseNostrRelays } from '../src/nostr-client.mjs';
 
 test('BIP-340: vector oficial 0 (clave 3, mensaje y aux a cero) con la librería vendorizada', async () => {
@@ -45,19 +46,32 @@ test('evento: autor de un solo uso, sin huella ni texto a la vista, tamaño en b
   assert.equal(await unwrapEvent({ ...e1, content: e1.content.slice(0, -4) + 'AAAA' }, herBoxes), null);
 });
 
-test('recibo por el buzón de pareja y buzón de mensajero para quien transporta', async () => {
-  const [ana, her] = await Promise.all([generateIdentity(), generateIdentity()]);
+test('recibo por el buzón de pareja; el evento exterior del remitente viaja pegado al sobre y nadie más lo puede rehacer', async () => {
+  const [ana, bo, her] = await Promise.all([generateIdentity(), generateIdentity(), generateIdentity()]);
   const now = Date.now(), day = Math.floor(now / DAY_MS);
   const mb = await pairMailbox(await pairSecret(her, ana.publicIdentity), day);
   const r = await wrapReceipt({ mailbox: mb, receipt: { id: 'AAAAAAAAAAAAAAAAAAAAAA', ackSecret: 'BBBBBBBBBBBBBBBBBBBBBB' }, nowMs: now });
   const anaBoxes = await myMailboxes({ identity: ana, contacts: [her.publicIdentity], nowMs: now });
   assert.deepEqual((await unwrapEvent(r, anaBoxes)).receipt, { id: 'AAAAAAAAAAAAAAAAAAAAAA', ackSecret: 'BBBBBBBBBBBBBBBBBBBBBB' });
+  // Ana escribe SIN red: prepara el evento exterior y lo guarda con el sobre.
   const env = await sealMessage({ sender: ana, recipient: her.publicIdentity, body: 'llevado por Bo', priority: 3, ttlS: 3600, now });
-  const drop = await wrapEnvelope({ mailbox: await dropMailbox(her.publicIdentity.fingerprint, day), envelope: env, nowMs: now });
-  const herBoxes = await myMailboxes({ identity: her, contacts: [], nowMs: now });
-  assert.equal((await unwrapEvent(drop, herBoxes)).mailbox.kind, 'DROP');
-  const noDrops = await myMailboxes({ identity: her, contacts: [], nowMs: now, acceptDrops: false });
-  assert.equal(await unwrapEvent(drop, noDrops), null, 'se puede desactivar');
+  const wrap = await prewrap({ identity: ana, contact: her.publicIdentity, envelope: env, nowMs: now });
+  assert.equal(isWrapShape(wrap), true);
+  const sAna = createBundleStore({ owner: ana.publicIdentity.fingerprint }), sBo = createBundleStore({ owner: bo.publicIdentity.fingerprint });
+  sAna.put(env, { now, wrap });
+  await syncPair(sAna, sBo, { now });
+  assert.deepEqual(sBo.getWrap(env.header.id), wrap, 'Bo lleva el evento exterior intacto (sin saber a quién va)');
+  // Persistencia: sobrevive a un reinicio del móvil de Bo.
+  const sBo2 = createBundleStore({ owner: bo.publicIdentity.fingerprint }).restore(sBo.snapshot(), { now });
+  assert.deepEqual(sBo2.getWrap(env.header.id), wrap);
+  // Hermano lo abre por su buzón de pareja; Bo no puede (no conoce la clave de la pareja).
+  const herBoxes = await myMailboxes({ identity: her, contacts: [ana.publicIdentity], nowMs: now });
+  assert.equal((await unwrapEvent(wrap, herBoxes)).envelope.header.id, env.header.id);
+  const boBoxes = await myMailboxes({ identity: bo, contacts: [ana.publicIdentity, her.publicIdentity], nowMs: now });
+  assert.equal(await unwrapEvent(wrap, boBoxes), null);
+  // Un evento exterior con forma inválida no se guarda.
+  const sX = createBundleStore({ owner: 'x' }); sX.put(env, { now, wrap: { ...wrap, sig: 'zz' } });
+  assert.equal(sX.getWrap(env.header.id), null);
 });
 
 test('lista de relés Nostr: solo wss:// (o ws:// local), sin credenciales, sin duplicados', () => {

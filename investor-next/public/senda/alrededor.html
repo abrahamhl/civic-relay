@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#04080b">
+<meta name="description" content="SENDA · Alrededor: la cámara del móvil con lo que hay alrededor según datos oficiales y de la red SENDA (incidencias, avisos, radares, cámaras públicas) y los dispositivos de radio cercanos, cada uno con su ficha y su fuente.">
+<title>SENDA · Alrededor</title>
+<link rel="icon" href="/senda/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/senda/fonts/fonts.css">
+<script type="module" src="/senda/app-chrome.mjs"></script>
+<style>
+:root{--bg:#04080b;--p:#0b1116ee;--p2:#111a21;--line:#1d2830;--t:#eef3f4;--m:#93a7b1;--ember:#ff7756;--mint:#34d399;--sky:#91d7e8;--sun:#fbbf24;--rose:#ff5b6e}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--t);font:15px/1.45 "Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+button,input,select{font:inherit;color:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+a{color:var(--sky)}
+#stage{position:fixed;inset:0;background:radial-gradient(120% 80% at 50% 30%,#0e1820,#04080b)}
+video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#ovl{position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none}
+#horizon{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#91d7e855,transparent)}
+.mk{position:absolute;transform:translate(-50%,-100%);pointer-events:auto;display:flex;align-items:center;gap:6px;max-width:220px;padding:5px 9px 5px 6px;border-radius:999px;border:1px solid #ffffff2e;background:#04080bcc;backdrop-filter:blur(6px);font-size:12.5px;line-height:1.2;white-space:nowrap;cursor:pointer}
+.mk span.t{overflow:hidden;text-overflow:ellipsis}
+.mk small{color:var(--m);font-family:"IBM Plex Mono",ui-monospace,monospace}
+.mk.INCIDENT{border-color:var(--ember)} .mk.SENDA{border-color:var(--sun)} .mk.RADAR{border-color:var(--rose)} .mk.CAMERA{border-color:var(--sky)}
+.mk.edge{transform:translate(-50%,-50%);padding:6px 8px}
+.mk.sel{box-shadow:0 0 0 3px var(--sky)}
+header{position:fixed;top:0;left:0;right:0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:calc(env(safe-area-inset-top) + 10px) 12px 8px;background:linear-gradient(#04080bf0,#04080b00)}
+header h1{margin:0;font-size:17px;font-weight:650}
+header a.back{margin-left:auto;color:var(--m);text-decoration:none;font-size:14px}
+#pose{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;color:var(--m);width:100%}
+.chips{display:flex;gap:6px;flex-wrap:wrap;width:100%}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:#0b1116cc;font-size:12.5px;cursor:pointer}
+.chip input{margin:0}
+#sheet{position:fixed;left:0;right:0;bottom:0;max-height:46svh;display:flex;flex-direction:column;background:var(--p);border-top:1px solid var(--line);border-radius:16px 16px 0 0;padding-bottom:env(safe-area-inset-bottom)}
+.tabs{display:flex;gap:4px;padding:8px 10px 0}
+.tabs button{flex:1;padding:9px;border:0;border-radius:10px;background:transparent;color:var(--m);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--p2);color:var(--t)}
+#list{overflow:auto;padding:6px 10px 12px;margin:0;list-style:none}
+#list li button{width:100%;display:flex;gap:10px;align-items:center;text-align:left;padding:9px 8px;border:0;border-bottom:1px solid var(--line);background:transparent;cursor:pointer}
+#list li button .d{margin-left:auto;color:var(--m);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;white-space:nowrap}
+#list li .s{color:var(--m);font-size:12.5px}
+#card{position:fixed;left:10px;right:10px;bottom:calc(46svh + 10px);max-height:42svh;overflow:auto;padding:14px;border-radius:14px;background:#0b1116f5;border:1px solid var(--line);box-shadow:0 10px 40px #000a}
+#card h2{margin:0 0 4px;font-size:17px}
+#card dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:8px 0 0;font-size:13.5px}
+#card dt{color:var(--m)} #card dd{margin:0}
+#card img{width:100%;border-radius:10px;margin-top:8px;background:#111}
+#card .close{position:absolute;top:8px;right:8px;border:0;background:var(--p2);border-radius:999px;width:32px;height:32px;cursor:pointer}
+#start{position:fixed;inset:0;display:grid;place-items:center;padding:24px;background:#04080bf2}
+#start div{max-width:460px}
+#start h2{margin:0 0 8px;font-size:22px}
+#start p{color:var(--m)}
+#start button{margin-top:10px;padding:12px 18px;border-radius:12px;border:0;background:var(--ember);color:#160806;font-weight:650;cursor:pointer}
+.fine{color:var(--m);font-size:12.5px}
+.ok{color:var(--mint)} .warn{color:var(--sun)}
+</style>
+</head>
+<body>
+<div id="stage">
+  <video id="cam" playsinline muted autoplay aria-hidden="true"></video>
+  <div id="ovl" aria-live="off"><div id="horizon" hidden></div></div>
+</div>
+<header>
+  <h1>👁️ Alrededor</h1>
+  <a class="back" href="/senda/conducir">← Conducir</a>
+  <div id="pose">esperando GPS y brújula…</div>
+  <div class="chips" role="group" aria-label="Capas visibles">
+    <label class="chip"><input type="checkbox" data-layer="INCIDENT" checked> ⚠️ Incidencias</label>
+    <label class="chip"><input type="checkbox" data-layer="SENDA" checked> 📣 Avisos SENDA</label>
+    <label class="chip"><input type="checkbox" data-layer="RADAR" checked> 📷 Radares</label>
+    <label class="chip"><input type="checkbox" data-layer="CAMERA" checked> 🎥 Cámaras</label>
+    <label class="chip">Alcance <select id="range" aria-label="Alcance"><option value="1000">1 km</option><option value="5000" selected>5 km</option><option value="20000">20 km</option></select></label>
+  </div>
+</header>
+<section id="sheet" aria-label="Listas">
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tabNear" aria-selected="true" aria-controls="list">Alrededor</button>
+    <button role="tab" id="tabDev" aria-selected="false" aria-controls="list">Dispositivos</button>
+  </div>
+  <p id="note" class="fine" style="margin:6px 12px 0"></p>
+  <ul id="list" role="tabpanel"></ul>
+</section>
+<aside id="card" hidden aria-live="polite"></aside>
+<div id="start">
+  <div>
+    <h2>Lo que hay alrededor, sobre tu cámara</h2>
+    <p>Incidencias oficiales (DGT, NDW), avisos de la red SENDA, radares oficiales y cámaras públicas con su imagen, colocados según tu GPS y tu brújula. Abajo, los dispositivos de radio cercanos (en la app de Android), cada uno con su ficha.</p>
+    <p class="fine">La posición en pantalla tiene el error de tu GPS (metros) y de tu brújula (grados). Los dispositivos de radio no se dibujan en la imagen: Android no da su dirección, solo su intensidad.</p>
+    <button id="go">Abrir la cámara</button>
+  </div>
+</div>
+<script type="module" src="/senda/alrededor.mjs"></script>
+</body>
+</html>

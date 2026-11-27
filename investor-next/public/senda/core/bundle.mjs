@@ -27,6 +27,20 @@ const MAX_PENDING_SECRETS_PER_ID = 2;
 const MAX_BROADCAST_BYTES = 16 * 1024;
 const MAX_BROADCASTS = 200;
 const MAX_COPIES = 4096;
+const MAX_WRAP_BYTES = 160 * 1024;
+const HEX = (n) => new RegExp(`^[0-9a-f]{${n}}$`);
+/**
+ * «Sobre exterior» opcional que viaja pegado al sobre: un evento de buzón ya firmado y cifrado por el REMITENTE
+ * (nostr-mailbox.mjs), opaco para quien transporta. Así un transportista que gana Internet solo lo reenvía tal cual:
+ * no necesita saber nada del destinatario ni usar ningún buzón que revele quién recibe. Aquí solo se valida la forma;
+ * la firma la comprueba el relé que lo recibe.
+ */
+export function isWrapShape(w) {
+  if (!w || typeof w !== 'object' || w.kind !== 1059) return false;
+  if (!HEX(64).test(w.id ?? '') || !HEX(64).test(w.pubkey ?? '') || !HEX(128).test(w.sig ?? '')) return false;
+  if (!Number.isSafeInteger(w.created_at) || !Array.isArray(w.tags) || typeof w.content !== 'string') return false;
+  return JSON.stringify(w).length <= MAX_WRAP_BYTES;
+}
 
 export function createBundleStore({
   owner,
@@ -121,7 +135,7 @@ export function createBundleStore({
       const direct = i.env.header.to === peerSummary.owner;
       const give = direct ? 1 : infrastructure ? Math.max(1, Math.floor(i.copies / 2)) : Math.floor(i.copies / 2);
       if (!direct && give < 1) continue;
-      envelopes.push({ env: i.env, copies: give, hops: i.hops + 1 });
+      envelopes.push({ env: i.env, copies: give, hops: i.hops + 1, ...(i.wrap ? { wrap: i.wrap } : {}) });
       // Al relé se le cede la mitad; con 1 sola copia se le entrega sin descontar (el teléfono sigue pudiendo
       // dársela en mano al destinatario).
       if (!direct && !(infrastructure && i.copies <= 1)) commits.push({ id: i.env.header.id, give });
@@ -144,12 +158,13 @@ export function createBundleStore({
     owner,
     has: (id) => items.has(id),
     get: (id) => items.get(id)?.env,
+    getWrap: (id) => items.get(id)?.wrap ?? null,
     count: () => items.size,
     bytesUsed: () => used,
     copiesOf: (id) => items.get(id)?.copies,
 
     /** Añade un sobre propio o recibido. Valida forma, caducidad, saltos y cuota. */
-    put(env, { copies = initialCopies, hops = 0, now = Date.now() } = {}) {
+    put(env, { copies = initialCopies, hops = 0, now = Date.now(), wrap = null } = {}) {
       if (!env || typeof env !== 'object' || !env.header) return { stored: false, reason: 'MALFORMED_ENVELOPE' };
       const shape = validateEnvelopeShape(env, { now, maxBytes: maxEnvelopeBytes, maxTtlS });
       if (!shape.ok) return { stored: false, reason: shape.reason };
@@ -160,11 +175,16 @@ export function createBundleStore({
       if (now > env.header.expiresAt) return { stored: false, reason: 'EXPIRED' };
       if (!Number.isSafeInteger(hops) || hops < 0 || hops > maxHops) return { stored: false, reason: 'HOP_LIMIT' };
       if (!Number.isSafeInteger(copies) || copies < 0 || copies > MAX_COPIES) return { stored: false, reason: 'BAD_COPIES' };
-      if (items.has(id)) { items.get(id).copies = Math.max(items.get(id).copies, copies); return { stored: false, reason: 'DUPLICATE' }; }
-      const s = size(env);
+      const okWrap = wrap && isWrapShape(wrap) ? wrap : null;
+      if (items.has(id)) {
+        const it = items.get(id); it.copies = Math.max(it.copies, copies);
+        if (!it.wrap && okWrap) { const extra = size(okWrap); if (evictFor(extra) && items.get(id) === it) { it.wrap = okWrap; it.size += extra; used += extra; } } // el primero que llega se queda
+        return { stored: false, reason: 'DUPLICATE' };
+      }
+      const s = size(env) + (okWrap ? size(okWrap) : 0);
       if (s > maxEnvelopeBytes + 64 * 1024) return { stored: false, reason: 'ENVELOPE_TOO_LARGE' };
       if (!evictFor(s)) return { stored: false, reason: 'QUOTA' };
-      items.set(id, { env, copies, hops, size: s, storedAt: now }); used += s;
+      items.set(id, { env, copies, hops, size: s, storedAt: now, ...(okWrap ? { wrap: okWrap } : {}) }); used += s;
       return { stored: true };
     },
 
@@ -231,7 +251,7 @@ export function createBundleStore({
     snapshot() {
       return {
         owner,
-        items: [...items.values()].map(({ env, copies, hops, storedAt }) => ({ env, copies, hops, storedAt })),
+        items: [...items.values()].map(({ env, copies, hops, storedAt, wrap }) => ({ env, copies, hops, storedAt, ...(wrap ? { wrap } : {}) })),
         receipts: [...receipts],
         pendingReceipts: [...pending].map(([id, group]) => [id, [...group.keys()]]),
         broadcasts: [...broadcasts.values()].map((b) => b.payload),
@@ -254,7 +274,7 @@ export function createBundleStore({
       for (const [id, secrets] of Array.isArray(snap.pendingReceipts) ? snap.pendingReceipts : []) {
         for (const secret of Array.isArray(secrets) ? secrets : []) addPending(id, secret, now);
       }
-      for (const it of snapItems.values()) this.put(it.env, { copies: it.copies, hops: it.hops, now });
+      for (const it of snapItems.values()) this.put(it.env, { copies: it.copies, hops: it.hops, now, wrap: it.wrap ?? null });
       for (const b of Array.isArray(snap.broadcasts) ? snap.broadcasts : []) this.putBroadcast(b, { now });
       return this;
     },
@@ -316,7 +336,7 @@ export function createBundleStore({
           if (secret) { rememberVerified(id, secret); continue; }
           pending.delete(id);
         }
-        const res = this.put(env, { copies: entry.copies, hops: entry.hops, now });
+        const res = this.put(env, { copies: entry.copies, hops: entry.hops, now, wrap: entry.wrap ?? null });
         if (res.stored) stored.push(id);
       }
       return { forMe, stored, newBroadcasts, rejected, receipts: acceptedReceipts };
