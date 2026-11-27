@@ -29,6 +29,7 @@ metro. Por eso el viaje se divide en tres tramos:
 
 | # | Vía | Tramo | Automática | Estado | Código |
 |---|---|---|---|---|---|
+| 0 | **Red descentralizada Nostr** (por defecto): en cuanto el móvil tiene Internet, publica el sobre en **4 relés Nostr públicos e independientes a la vez**, en un **buzón cegado** que solo la pareja sabe calcular. El destinatario lo recibe **en tiempo real** por WebSocket; si estaba desconectado, al volver (los relés lo guardan hasta que caduca). Un móvil que transporta un sobre ajeno lo deja en el **buzón de mensajero** del destinatario. Sin servidor propio, sin cuenta y sin coste. | Tronco + primera y última milla | **Sí**: al enviar, al ganar red y cada 30 s | **FUNCIONA** (probado contra relés públicos reales, §3) | `nostr-mailbox.mjs`, `nostr-client.mjs`, `nostr-link.mjs` |
 | 1 | **Relés SENDA federados por Internet**: en cuanto el móvil tiene Internet (datos propios, itinerancia o la Wi-Fi de una gasolinera, un bar, una biblioteca o un Punto SENDA), sube **todo lo cifrado que lleva, suyo y ajeno**, y baja lo suyo. Los relés se pasan los mensajes entre ellos. | Tronco + primera y última milla | **Sí**: al ganar red, cada 60 s y al enviar | **FALTA DESPLEGAR** (decisión del fundador, §6) | `packages/senda-relay/server.mjs`, `packages/senda/src/relay-client.mjs` |
 | 2 | **De móvil en móvil (DTN)**: Bluetooth entre móviles SENDA. Cada móvil que acepta «transportar» guarda copias cifradas que no puede leer y las entrega al cruzarse con otro. Basta con que **uno** de la cadena toque Internet para que entre en el tronco (vía 1). | Primera y última milla | Al abrir el buzón Bluetooth y pulsar Bluetooth (Android) | **FUNCIONA** | `bundle.mjs` (spray-and-wait), `BleMailbox` en el APK |
 | 3 | **Otra app**: el mensaje cifrado viaja como archivo `.senda` por WhatsApp, Telegram o correo. Esas apps solo ven un archivo que no pueden leer. | Tronco | No: un toque | **FUNCIONA** | `exportBundleFile` |
@@ -53,6 +54,10 @@ metro. Por eso el viaje se divide en tres tramos:
 
 | Prueba | Qué demuestra | Resultado |
 |---|---|---|
+| **App real (Chromium, 2 móviles) por relés Nostr PÚBLICOS** (27-11-2026, ~15:53 UTC) | Texto + foto de 4 KB, de «Suecia» a «España», con la configuración por defecto, sin tocar nada en el receptor | **Llegada en 194 ms** (`latencyMs` del registro del receptor) y **«✓✓ entregado» en el remitente a los 447 ms**. Los dos «móviles» estaban en el mismo servidor de pruebas: entre países reales se suma el trayecto de cada red, **sin medir todavía** |
+| Script en vivo contra relés públicos (5 mensajes, 2 con imagen de 8 KB) | Publicación en 3–4 relés, llegada y recibo | Llegada **138–225 ms**; recibo **175–253 ms**; 3/3 relés aceptaron cada evento. `offchain.pub` rechazó eventos («web of trust») y se quitó de la lista por defecto |
+| `packages/senda-relay/tests/nostr.test.mjs` | 3 relés (1 caído), tiempo real, recibo de vuelta, almacenado para quien conecta después, mensajero sin red → buzón de mensajero; ningún relé ve huellas, id ni texto; rechazo de otros kinds, firmas falsas y eventos sin caducidad; persistencia | 3/3 en verde |
+| `packages/senda/tests/nostr-mailbox.test.mjs` | Vector oficial BIP-340 nº 0 con la librería incorporada; buzón simétrico y diario; autor de un solo uso; relleno a bloques de 256 B; solo la pareja abre; alterado → rechazado | 5/5 en verde |
 | `packages/senda-relay/tests/long-distance.test.mjs` | Ana (SE) sin red → Bluetooth → Bo (SE) gana Internet → relé SE ⇄ relé NL ⇄ relé ES → Hermano (ES) abre texto de 200 caracteres + imagen de 10 KB. El recibo vuelve hasta Ana y borra las copias de Bo y de los relés. Ningún relé ve el texto. | 4/4 en verde |
 | La misma prueba | Una copia sola también sube al relé y el transportista la conserva para entregarla en mano. | Verde |
 | La misma prueba | Con un relé caído, basta con otro. Lista de relés: solo `https` (o `localhost`) y sin credenciales en la URL. | Verde |
@@ -76,18 +81,48 @@ metro. Por eso el viaje se divide en tres tramos:
   limitar a 120 peticiones por minuto y no la escribe en disco). La prueba E2E comprueba que el texto no aparece en
   el almacén de ningún relé.
 - **WhatsApp/SMS (vías 3 y 4):** un bloque cifrado.
+- **Relé Nostr (vía 0) o cualquiera que lea los relés públicos:**
+  - Lo que ve:
+    - un evento firmado por una clave de **un solo uso**;
+    - una etiqueta `p` con aspecto de clave pública cualquiera, que es el buzón de la pareja **de ese día**;
+    - la caducidad;
+    - un bloque cifrado con relleno a 256 B;
+    - la **IP** del móvil, como cualquier web.
+  - Lo que no ve: ni remitente, ni destinatario, ni huellas, ni el id del sobre, ni el texto.
+  - Dentro de un mismo día, se puede ver que varios eventos van al mismo buzón.
+  - Para ocultar también la IP haría falta Tor o una VPN, que añaden latencia. Hoy **no está integrado**.
+- **Doble cifrado:**
+  - el sobre SENDA va cifrado de extremo a extremo (ECDH P-256 → AES-256-GCM, con firma ECDSA del remitente);
+  - por fuera va otra capa AES-256-GCM con la clave de la pareja del día;
+  - la firma del evento es BIP-340 (Schnorr secp256k1), con `@noble/secp256k1` 3.2.0 (MIT, auditada) copiada en el
+    repo con su huella SHA-256.
 
-## 6. Lo que falta para que funcione entre países fuera del laboratorio (decisión del fundador)
+## 6. Servidor propio (opcional, pocos euros): para qué sirve y cuánto cuesta
 
-1. **Alojar al menos un relé** con HTTPS. Mejor dos en países distintos, federados con `PEERS`. El código y el
-   `Dockerfile` están listos; no hay servidor en marcha. No se ha contratado nada (regla: sin gasto nuevo sin
-   preguntar).
-2. **Añadir el dominio del relé** a `connect-src` de `investor-next/vercel.json` y a `NetAllow.java` del APK.
-   Hoy la app en producción **bloquea** cualquier relé no listado, por seguridad.
-3. **Configurar por defecto** la lista de relés en la app, para que nadie tenga que escribirla.
+**Con la vía 0, la mensajería entre países ya funciona sin servidor propio.** Un servidor propio añade independencia:
+si un día los relés públicos fallan o cambian sus normas, el tuyo sigue funcionando. El mismo programa
+(`packages/senda-relay`) hace las dos cosas a la vez:
 
-Hasta entonces, para la prueba del fin de semana valen las vías 3 (Otra app) y 4 (SMS) a distancia, y la 2 y la 8
-de cerca (ver `docs/campo/GUIA_PRUEBAS_MENSAJES_FIN_DE_SEMANA.md`).
+- es **un relé Nostr más** (`wss://tu-dominio/nostr`, solo para buzones SENDA kind 1059);
+- es el **relé SENDA de sincronización** (`/sync`, con federación `PEERS`).
+
+Los móviles lo usan **junto con** los públicos, no en su lugar: no hay un punto único de fallo.
+
+Precios leídos el 27-11-2026 en las páginas oficiales (sin fecha de actualización en ellas):
+
+| Opción | Precio/mes | Condiciones | Fuente |
+|---|---|---|---|
+| netcup **VPS pico G11.5s** (1 vCore, 1 GB, 30 GB) | **2,21 € con IVA** | Contrato de 12 meses, 1 por cliente, solo en Núremberg (DE) | netcup.com/en/server/vps-lite |
+| OVHcloud **VPS-1** (2 vCores, 4 GB, 40 GB) | **desde 3,81 € sin IVA** | Permanencia y país: no verificados | ovhcloud.com/en-ie/vps · blog.ovhcloud.com/vps-2027 |
+| Hetzner CPX02 / CX23 / CAX11 | 5,49–6,49 € sin IVA | La página indicaba «currently unavailable» en todos; Hetzner subió precios el 1-04 y el 15-06-2026 | hetzner.com/cloud · hetzner.com/pressroom |
+| Oracle Cloud Always Free | 0 € | Puede quedarse sin capacidad; recupera máquinas casi inactivas | docs.oracle.com (Always Free Resources) |
+
+Además hace falta un **nombre de dominio** con HTTPS (precio no verificado). Para el HTTPS, un proxy como Caddy
+pide el certificado solo.
+
+Recomendación: **netcup VPS pico** si vale el año de permanencia; si no, **OVH VPS-1**. Pasos: Docker
+(`packages/senda-relay/Dockerfile`) + Caddy + el dominio. Después se añade `wss://dominio/nostr` a la lista por
+defecto y a la CSP. **No se ha contratado nada.**
 
 ## 7. Registro de pruebas
 
@@ -95,8 +130,11 @@ Cada sincronización con un relé queda en el registro exportable (Transferir �
 
 - `RELE_SINCRONIZADO` / `RELE_FALLO`, con `relay` (host), `uploaded`, `downloaded`, `bytesUp`, `bytesDown`,
   `rttMs` y `error`;
-- `RECIBIDO`, con `via: "relé"` y `latencyMs`.
+- `RECIBIDO`, con `via: "relé"` o `"Internet (Nostr · relé)"` y `latencyMs`;
+- `ENVIADO` con `via: "NOSTR"`, `mailbox` (PAIR/DROP), `relaysOk/relays`, `firstOkMs` y los motivos de rechazo de cada relé; `RECIBO_NOSTR` cuando vuelve el «entregado».
 
 ---
 *Registro de cambios* · 27-11-2026 · Relés federados (`PEERS`), cliente en 2 rondas con varios relés, sincronización
 automática, entrega a infraestructura con 1 copia y prueba E2E SE→NL→ES. Firma: Claude (sesión de orquestación SENDA).
+
+*Registro de cambios* · 27-11-2026 (tarde) · Vía 0: red descentralizada Nostr con buzones cegados por pareja y día, autor de un solo uso, doble cifrado, buzón de mensajero, recibos por el mismo camino; relé Nostr propio sin dependencias dentro de `senda-relay`; medido contra relés públicos. Firma: Claude (sesión de orquestación SENDA).

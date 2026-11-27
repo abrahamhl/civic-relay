@@ -15,14 +15,21 @@ import { resolve } from 'node:path';
 import { createBundleStore } from '../senda/src/bundle.mjs';
 import { validateEnvelopeShape } from '../senda/src/envelope.mjs';
 import { syncWithRelay, parseRelayList } from '../senda/src/relay-client.mjs';
+import { createNostrRelay } from './nostr-ws.mjs';
 
 export function createRelay({ dataDir = process.env.DATA_DIR ?? './data', maxBody = +(process.env.MAX_BODY ?? 2 * 1024 * 1024), allowedOrigins = (process.env.ALLOWED_ORIGINS ?? '*').split(','), ratePerMin = 120, now = () => Date.now(), peers = parseRelayList(process.env.PEERS ?? ''), peerIntervalMs = 1000 * +(process.env.PEER_INTERVAL_S ?? 60), fetchImpl = globalThis.fetch } = {}) {
   mkdirSync(dataDir, { recursive: true });
   const file = resolve(dataDir, 'store.json');
   const store = createBundleStore({ owner: 'senda-relay', quotaBytes: 256 * 1024 * 1024, initialCopies: 64 });
   if (existsSync(file)) store.restore(JSON.parse(readFileSync(file, 'utf8')), { now: now() });
-  let dirty = false;
-  const flush = () => { if (!dirty) return; const tmp = file + '.tmp'; writeFileSync(tmp, JSON.stringify(store.snapshot())); renameSync(tmp, file); dirty = false; };
+  // Buzón Nostr (wss://…/nostr): este servidor es también un relé Nostr más para los buzones cifrados SENDA.
+  const nostrFile = resolve(dataDir, 'nostr.json');
+  const nostr = createNostrRelay({ now, snapshot: existsSync(nostrFile) ? JSON.parse(readFileSync(nostrFile, 'utf8')) : [] });
+  let dirty = false, nostrCount = nostr.count();
+  const flush = () => {
+    if (nostr.count() !== nostrCount) { nostr.purge(); const tmp = nostrFile + '.tmp'; writeFileSync(tmp, JSON.stringify(nostr.snapshot())); renameSync(tmp, nostrFile); nostrCount = nostr.count(); }
+    if (!dirty) return; const tmp = file + '.tmp'; writeFileSync(tmp, JSON.stringify(store.snapshot())); renameSync(tmp, file); dirty = false;
+  };
   const timer = setInterval(() => { store.purgeExpired(now()); flush(); }, 5000); timer.unref();
   const buckets = new Map();
   const allow = (ip) => { const t = now(), b = buckets.get(ip) ?? { n: 0, t }; if (t - b.t > 60_000) { b.n = 0; b.t = t; } b.n++; buckets.set(ip, b); return b.n <= ratePerMin; };
@@ -35,7 +42,8 @@ export function createRelay({ dataDir = process.env.DATA_DIR ?? './data', maxBod
     if (cors) { res.setHeader('access-control-allow-origin', cors); res.setHeader('access-control-allow-headers', 'content-type'); res.setHeader('access-control-allow-methods', 'GET,POST,OPTIONS'); }
     res.setHeader('cache-control', 'no-store');
     if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
-    if (req.method === 'GET' && req.url === '/health') { res.writeHead(200, { 'content-type': 'application/json' }); return res.end(JSON.stringify({ ok: true, items: store.count(), broadcasts: store.listBroadcasts().length, bytes: store.bytesUsed(), peers: federation.peers.length, federatedAt: federation.last?.at ?? null, peersOk: federation.last ? federation.last.results.filter((x) => x.ok).length : null })); }
+    if (req.method === 'GET' && (req.url === '/nostr' || req.url === '/') && req.headers.accept === 'application/nostr+json') { res.writeHead(200, { 'content-type': 'application/nostr+json' }); return res.end(JSON.stringify({ name: 'Relé SENDA', description: 'Buzones cifrados SENDA (solo kind 1059). Ciego al contenido.', supported_nips: [1, 11, 40, 59], software: 'senda-relay', limitation: { max_message_length: 131072, auth_required: false, payment_required: false } })); }
+    if (req.method === 'GET' && req.url === '/health') { res.writeHead(200, { 'content-type': 'application/json' }); return res.end(JSON.stringify({ ok: true, items: store.count(), broadcasts: store.listBroadcasts().length, bytes: store.bytesUsed(), nostrEvents: nostr.count(), peers: federation.peers.length, federatedAt: federation.last?.at ?? null, peersOk: federation.last ? federation.last.results.filter((x) => x.ok).length : null })); }
     if (req.method !== 'POST' || req.url !== '/sync') { res.writeHead(404); return res.end(); }
     if (!allow(req.socket.remoteAddress)) { res.writeHead(429); return res.end(); }
     let size = 0; const chunks = [];
@@ -73,7 +81,8 @@ export function createRelay({ dataDir = process.env.DATA_DIR ?? './data', maxBod
   }
   const fedTimer = peers.length ? setInterval(() => { federateOnce().catch(() => {}); }, peerIntervalMs) : null;
   fedTimer?.unref?.();
-  return { server, store, flush, federateOnce, federation, close: () => new Promise((r) => { clearInterval(timer); if (fedTimer) clearInterval(fedTimer); flush(); server.closeAllConnections?.(); server.close(r); }) };
+  server.on('upgrade', (req, socket) => { if (req.url === '/nostr' || req.url === '/') nostr.handleUpgrade(req, socket); else socket.destroy(); });
+  return { server, store, nostr, flush, federateOnce, federation, close: () => new Promise((r) => { clearInterval(timer); if (fedTimer) clearInterval(fedTimer); nostr.closeAll(); flush(); server.closeAllConnections?.(); server.close(r); }) };
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
