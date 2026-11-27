@@ -13,6 +13,7 @@ import { detectCrash, crashResponsePolicy, buildIncidentReport, fuseIncidentRepo
 import * as kv from './db.mjs';
 import { emit, listen, decodeSamples } from './audio.mjs';
 import { initCoordination } from './coord.mjs';
+import { initNostr, DEFAULT_NOSTR_RELAYS } from './nostr-link.mjs';
 
 const $ = (s) => document.querySelector(s);
 const now = () => Date.now();
@@ -56,6 +57,8 @@ async function boot() {
   await CO.load();
   for (const b of S.store.listBroadcasts()) await CO.handleBroadcast(b, 'almacenado');
   CO.startAutoRelay(); // si hay relés configurados, sube y baja solo cada vez que haya red
+  S.nostr = (await kv.get('nostr')) ?? { on: true, relays: DEFAULT_NOSTR_RELAYS, drops: true };
+  NOSTR.start(); // red descentralizada: buzones cifrados y cegados en varios relés Nostr públicos
   if (await kv.get('easyOnly')) { document.body.classList.add('easy-only'); $('#easy-only').checked = true; }
   $('#tabs').hidden = false; show('home');
 }
@@ -75,7 +78,7 @@ async function receiveBytes(bytes, via) {
   if (bytes[0] === 0xc1) {
     const c = await unpackContact(bytes);
     if (c.fingerprint === S.me.publicIdentity.fingerprint) return toast('Es tu propia tarjeta');
-    if (!S.contacts.some((x) => x.fingerprint === c.fingerprint)) S.contacts.push({ ...c, addedVia: via, addedAt: now() });
+    if (!S.contacts.some((x) => x.fingerprint === c.fingerprint)) { S.contacts.push({ ...c, addedVia: via, addedAt: now() }); NOSTR.contactsChanged(); }
     await persist(); render(); return toast(`Contacto añadido: ${c.name}`);
   }
   if (bytes[0] === 0xe2) return receiveEnvelope(unpackEnvelope(bytes), via);
@@ -94,6 +97,7 @@ async function receiveEnvelope(env, via) {
     S.inbox.unshift({ id: env.header.id, fromFp: sender?.fingerprint ?? null, from: sender?.name ?? (coordText ? 'Residente (firma válida)' : 'Desconocido (firma válida)'), body: incident ? humanIncident(incident) : coordText ?? m.body, kind: env.header.kind, at: now(), via, incident, coordination: !!coordText, img: rich?.image ? await toDataUrl(rich.image) : null, createdAt: rich?.createdAt ?? null });
     logEv({ ev: 'RECIBIDO', id: env.header.id, via, bytes: packEnvelope(env).length, createdAt: rich?.createdAt ?? null, receivedAt: now(), latencyMs: rich?.createdAt ? now() - rich.createdAt : null, withImage: !!rich?.image, from: sender?.name ?? null });
     await S.store.acceptReceipt(m.receipt); // el recibo viajará y borrará copias en otros teléfonos
+    NOSTR.sendReceipt(m.receipt, sender?.fingerprint); // y llega al remitente en segundos si hay Internet
     await persist(); render(); return toast(`Mensaje de ${sender?.name ?? 'desconocido'} vía ${via}`);
   }
   const act = relayActivation({ zones: S.zones, position: S.pos ?? { lat: 0, lon: 0 }, consent: S.consent, now: now() });
@@ -137,6 +141,7 @@ const ACTIONS = {
     if (typeof window.SendaNative?.pickContact !== 'function') return toast('Elegir contactos del móvil solo funciona en la app de Android');
     window.SendaNative.pickContact();
   },
+  async 'nostr-save'() { await NOSTR.configure({ on: $('#nostr-on').checked, relays: $('#nostr-relays').value.trim(), drops: $('#nostr-drops').checked }); },
   async 'ble-open'() { if (!hasBle()) return toast('El Bluetooth cercano solo funciona en la app de Android'); window.SendaNative.p2pStart(); },
   async 'ble-send'() {
     if (!hasBle()) return toast('El Bluetooth cercano solo funciona en la app de Android');
@@ -202,7 +207,7 @@ function outgoing() { return S.store.list().filter((i) => i.to !== S.me.publicId
 
 async function receiveText(t, via) {
   t = t.trim();
-  if (t.startsWith('{')) { const r = await importBundleFile(S.store, t, { now: now() }); for (const e of r.forMe) await receiveEnvelope(e, via); for (const b of r.newBroadcasts ?? []) await CO.handleBroadcast(b, via); await persist(); render(); if (r.stored.length) CO.relayNow(); return toast(`Paquete: ${r.forMe.length} para ti, ${r.stored.length} en tránsito${r.newBroadcasts?.length ? `, ${r.newBroadcasts.length} alerta(s)` : ''}`); }
+  if (t.startsWith('{')) { const r = await importBundleFile(S.store, t, { now: now() }); for (const e of r.forMe) await receiveEnvelope(e, via); for (const b of r.newBroadcasts ?? []) await CO.handleBroadcast(b, via); await persist(); render(); if (r.stored.length) { CO.relayNow(); NOSTR.flush(); } return toast(`Paquete: ${r.forMe.length} para ti, ${r.stored.length} en tránsito${r.newBroadcasts?.length ? `, ${r.newBroadcasts.length} alerta(s)` : ''}`); }
   const m = t.match(/SENDA:([A-Za-z0-9_-]+)/); if (!m) return toast('No es un código SENDA');
   await receiveBytes(unb64(m[1]), via);
 }
@@ -225,9 +230,10 @@ async function sendMessage() {
   S.sent.unshift({ id: env.header.id, toFp: to.fingerprint, body, kind: prio === 0 ? 'SOS' : 'PERSONAL', at: createdAt, img: img?.url ?? null });
   logEv({ ev: 'CIFRADO', id: env.header.id, to: to.name, createdAt, bytes: packEnvelope(env).length, textChars: [...body].length, imageBytes: img?.bytes.length ?? 0, cipher: 'ECDH P-256 efímero → HKDF-SHA-256 → AES-256-GCM · firma ECDSA P-256' });
   CO.relayNow(); // con red y relé configurado, sale ya hacia el otro país
+  setTimeout(() => NOSTR.flush(), 0); // y por la red descentralizada, si hay Internet
   S.pendingImg = null; $('#attach-preview').hidden = true;
   await persist(); $('#body').value = ''; $('#body-count').textContent = `0/${MAX_TEXT_CHARS}`; render();
-  toast('Cifrado y en camino. Envíalo por Bluetooth, SMS o sonido, o deja que otros lo lleven.');
+  toast(S.nostr?.on !== false && navigator.onLine !== false ? 'Cifrado y enviado por Internet (red descentralizada). Si no hay red, sale solo al volver o por Bluetooth, SMS o sonido.' : 'Cifrado y en camino. Sin Internet: envíalo por Bluetooth, SMS o sonido, o deja que otros lo lleven.');
 }
 
 /* Modo fácil: un toque = estado + posición cifrados a todos los contactos. */
@@ -343,6 +349,7 @@ function renderChats() {
 
 function render() {
   if (!S.me) return;
+  if ($('#nostr-on') && document.activeElement?.id?.startsWith('nostr-') !== true) { $('#nostr-on').checked = S.nostr?.on !== false; $('#nostr-drops').checked = S.nostr?.drops !== false; $('#nostr-relays').value = S.nostr?.relays ?? DEFAULT_NOSTR_RELAYS; NOSTR.paint(); }
   renderChats();
   $('#me-name').textContent = S.name; $('#me-fp').textContent = S.me.publicIdentity.fingerprint;
   $('#st-inbox').textContent = S.inbox.length; $('#st-carry').textContent = S.store.count(); $('#st-contacts').textContent = S.contacts.length;
@@ -383,6 +390,7 @@ if ('serviceWorker' in navigator) {
 
 /* Coordinación (residente / coordinador / relé) */
 const CO = initCoordination({ S, kv, $, toast, persist, render: () => render(), esc, ask, copy, receiveEnvelope: (e, v) => receiveEnvelope(e, v), log: (e) => logEv(e) });
+const NOSTR = initNostr({ S, kv, $, toast, receiveEnvelope: (e, v) => receiveEnvelope(e, v), log: (e) => logEv(e), render: () => render() });
 
 /* Ganchos para pruebas automáticas (sin efecto para el usuario). */
 Object.assign(window.SENDA_TEST, {

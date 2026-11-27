@@ -1,9 +1,9 @@
 {
  "format": "senda-proof/1",
- "gitSha": "7f35093b45008fa78f2ba0a42335fef0b00ca356",
+ "gitSha": "111013d5ed4f28416ec0a4b760ea1982a60e1462",
  "gitDirty": true,
  "node": "v22.23.5",
- "generatedAt": "2026-11-27T15:11:32.875Z",
+ "generatedAt": "2026-11-27T15:54:57.990Z",
  "note": "Cifras recalculadas con packages/senda/src. Las marcadas SIMULATED en la película proceden de modelos y escenarios sintéticos, no de ensayos de campo.",
  "claims": [
   {
@@ -155,5 +155,5 @@
   }
  ],
  "suite": null,
- "sha256": "bb921e7732975f7e38e71040b7763465d8a0a55bd26810f650bc37f90cc96121"
+ "sha256": "1c6b6aec91de261dd5d40901946ed19d63c4755c112dc7ac2c2eb6cc4ee117d1"
 }

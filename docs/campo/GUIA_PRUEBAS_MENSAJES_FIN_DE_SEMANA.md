@@ -10,6 +10,9 @@ Objetivo: comprobar que los mensajes cifrados, con o sin foto, **llegan, se abre
 - **Entre Holanda, Suecia y España, sin ningún móvil SENDA en medio, el mensaje NO puede llegar «sin nada»**: sin internet, sin red
   móvil, sin satélite y sin personas que lo lleven. Ninguna app puede: el Bluetooth llega a decenas de metros y el sonido a menos de un
   metro. Lo que SÍ funciona a esa distancia:
+  0. **Automático por Internet (red descentralizada Nostr, activada por defecto)**: si los dos tenéis Internet (datos o Wi-Fi,
+     aunque sea la de un bar), el mensaje llega solo en menos de un segundo en las pruebas y vuelve el «✓✓ entregado». Nadie en medio sabe
+     quién escribe a quién. Comprobad en «Transferir → 🌍 Red descentralizada» que pone «N/4 relés conectados».
   1. **Por internet, a través de cualquier app** (WhatsApp, Telegram, correo…). Botón **«Otra app»** del chat o «Compartir paquete».
      WhatsApp solo ve un archivo cifrado que no puede leer.
   2. **Por SMS**, si hay red móvil aunque no haya datos. Solo texto corto. Una foto no cabe en un SMS.
@@ -41,6 +44,7 @@ Objetivo: comprobar que los mensajes cifrados, con o sin foto, **llegan, se abre
 
 | # | Qué hacéis | Camino | Qué debe pasar |
 |---|---|---|---|
+| D0 | Mensaje + foto con **los dos con Internet** (datos o Wi-Fi) | Chat → Enviar. Nada más | Le llega solo en segundos («vía Internet (Nostr · …)») y a ti te sale «✓✓ entregado». Repetidlo con uno sin Internet: le llega en cuanto la recupere |
 | D1 | Mensaje de texto (≤ 200 caracteres): «Prueba D1 desde NL» | Chat → Enviar → **Otra app** → WhatsApp o Telegram al amigo | Él guarda el archivo `.senda` que le llega por WhatsApp y en SENDA pulsa «Transferir → Importar paquete». Le aparece en su chat («vía archivo») y en tu móvil queda «✓ en camino» hasta que vuelva su recibo |
 | D2 | Mensaje + **foto** (📎 en el chat; se comprime sola a ≤ 12 KB) | Igual que D1 | Le llega la foto dentro de la burbuja. Mirad el tamaño en la vista previa: «… KB cifrados» |
 | D3 | Solo texto | Chat → **SMS** (con red móvil, aunque sea sin datos) | Él copia el SMS que empieza por `SENDA:` y lo pega en «Contactos → Pegar código» o en «Transferir → Pegar texto recibido» |

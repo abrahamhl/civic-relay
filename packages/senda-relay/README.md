@@ -22,6 +22,12 @@ Las **alertas firmadas** (`SENDA_SIGNED_COMMAND`) se transportan pero **no se ve
 la verificación (ancla del organismo → credencial → clave → firma, consentimiento, zona, destino)
 ocurre en cada teléfono, que es quien decide. Una alerta falsa ocupa cuota, no ejecuta nada.
 
+## Relé Nostr incluido (`wss://…/nostr`)
+
+El mismo servidor es también un relé Nostr mínimo (NIP-01, NIP-11, NIP-40), sin dependencias, que solo acepta los
+buzones cifrados SENDA (kind 1059, firma BIP-340 válida, caducidad obligatoria, ≤ 128 KB). Los móviles lo usan junto con
+relés Nostr públicos. Ver `nostr-ws.mjs` y `tests/nostr.test.mjs`.
+
 ## Federación entre países
 
 `PEERS=https://rele-es.ejemplo,https://rele-nl.ejemplo` hace que este relé se sincronice con los otros cada
