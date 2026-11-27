@@ -2,9 +2,9 @@
   "schema": "senda-drive-reliability/v1",
   "block": "A0",
   "basis": "MEDIDO_E2E_CHROMIUM_PLAYWRIGHT_CON_GPX_OSM_REAL",
-  "startedAtUtc": "2026-11-27T13:41:22.461Z",
-  "finishedAtUtc": "2026-11-27T13:42:02.884Z",
-  "browser": "Chromium 158.0.8127.36",
+  "startedAtUtc": "2026-11-27T14:16:32.151Z",
+  "finishedAtUtc": "2026-11-27T14:17:02.625Z",
+  "browser": "Chromium 153.0.8010.12",
   "gpxFixture": {
     "file": "packages/senda/tests/fixtures/osm_valencia_pista_silla_2023-06-24.gpx",
     "source": "OpenStreetMap public GPS trackpoints API (ODbL) · València Av. Germans Maristes → Pista de Silla",
@@ -44,7 +44,7 @@
         "reroutedOk": true,
         "tunnelOk": true,
         "arrived": true,
-        "minEaseIntervalMs": 806,
+        "minEaseIntervalMs": 830,
         "easeCount": 4,
         "duplicateNavAnnouncements": 0,
         "consoleErrors": 0,
@@ -72,8 +72,8 @@
         "reroutedOk": true,
         "tunnelOk": true,
         "arrived": true,
-        "minEaseIntervalMs": 808,
-        "easeCount": 2,
+        "minEaseIntervalMs": 810,
+        "easeCount": 4,
         "duplicateNavAnnouncements": 0,
         "consoleErrors": 0,
         "consoleErrorSamples": [],
@@ -94,7 +94,7 @@
       "metrics": {
         "arrived": true,
         "shownKmh": 30,
-        "minEaseIntervalMs": 800,
+        "minEaseIntervalMs": 814,
         "crashFalseAlarm": false,
         "consoleErrors": 0,
         "pageErrors": 0
@@ -113,7 +113,7 @@
       "metrics": {
         "arrived": true,
         "shownKmh": 30,
-        "minEaseIntervalMs": 800,
+        "minEaseIntervalMs": 808,
         "crashFalseAlarm": false,
         "consoleErrors": 0,
         "pageErrors": 0
@@ -132,7 +132,7 @@
       "metrics": {
         "arrived": true,
         "shownKmh": 50,
-        "minEaseIntervalMs": 800,
+        "minEaseIntervalMs": 802,
         "crashFalseAlarm": false,
         "consoleErrors": 0,
         "pageErrors": 0
@@ -151,7 +151,7 @@
       "metrics": {
         "arrived": true,
         "shownKmh": 50,
-        "minEaseIntervalMs": 800,
+        "minEaseIntervalMs": 808,
         "crashFalseAlarm": false,
         "consoleErrors": 0,
         "pageErrors": 0
@@ -339,15 +339,64 @@
       "passed": true,
       "metrics": {
         "simulatedDurationS": 7200,
-        "heapWarmMB": 5.79,
-        "heap1hMB": 6.32,
-        "heap2hMB": 6.28,
-        "heapDriftPct": 8.45,
+        "heapWarmMB": 6.3,
+        "heap1hMB": 6.44,
+        "heap2hMB": 7,
+        "heapDriftPct": 8.2,
+        "heapDriftWindow": "pendiente de Theil–Sen de 7 muestras entre 1 h y 2 h, % por hora",
+        "heapSamplesMB": [
+          {
+            "tS": 1200,
+            "mb": 6.3
+          },
+          {
+            "tS": 1800,
+            "mb": 6.4
+          },
+          {
+            "tS": 2400,
+            "mb": 6.58
+          },
+          {
+            "tS": 3000,
+            "mb": 6.73
+          },
+          {
+            "tS": 3600,
+            "mb": 6.44
+          },
+          {
+            "tS": 4200,
+            "mb": 6.78
+          },
+          {
+            "tS": 4800,
+            "mb": 6.41
+          },
+          {
+            "tS": 5400,
+            "mb": 6.75
+          },
+          {
+            "tS": 6000,
+            "mb": 6.76
+          },
+          {
+            "tS": 6600,
+            "mb": 6.95
+          },
+          {
+            "tS": 7200,
+            "mb": 7
+          }
+        ],
+        "heapFillFromWarmPct": 7.26,
+        "budgetMaxFillFromWarmPct": 25,
         "budgetMaxAbsDriftPct": 10,
         "consoleErrors": 0,
         "pageErrors": 0
       }
     }
   ],
-  "sha256": "7fea4371eed7366035ea082fbb2f8efe151a4f00762d44b26bb88f2e81cf327b"
+  "sha256": "9a119e031c02b0cec76662efe0d91c7f3e8421864b6c9a6fd7f072d0286022d4"
 }

@@ -21,6 +21,7 @@ public final class NetAllowTest {
         check(NetAllow.allowed("https://tile.opentopomap.org/10/505/389.png"), "OpenTopoMap");
         check(NetAllow.allowed("https://etraffic.dgt.es/camarasEtraffic/176130.jpg"), "cámaras DGT");
         check(!NetAllow.allowed("https://etraffic.dgt.es.evil.example/x.jpg"), "cámaras DGT: dominio engañoso no");
+        check(NetAllow.allowed("https://informo.madrid.es/cameras/Camara06303.jpg"), "cámaras Madrid");
         check(!NetAllow.allowed("http://tiles.openfreemap.org/x"), "sin cifrar");
         check(!NetAllow.allowed("https://tiles.openfreemap.org.evil.example/x"), "dominio engañoso");
         check(!NetAllow.allowed("https://user@tiles.openfreemap.org/x"), "credenciales en la URL");

@@ -21,7 +21,8 @@ public final class NetAllow {
         "tms-pnoa-ma.idee.es",            // ortofoto oficial de España (PNOA, IGN, CC BY 4.0)
         "gibs.earthdata.nasa.gov",        // NASA GIBS: satélite del día, térmico, nubes, luces (sin restricciones)
         "tile.opentopomap.org",           // mapa topográfico (CC BY-SA)
-        "etraffic.dgt.es"                 // imágenes de las cámaras públicas de la DGT (solo lectura de JPG)
+        "etraffic.dgt.es",                // imágenes de las cámaras públicas de la DGT (solo lectura de JPG)
+        "informo.madrid.es"               // imágenes de las cámaras de tráfico del Ayuntamiento de Madrid (datos abiertos)
     );
     /** Hosts compartidos: solo una ruta concreta (el relieve de AWS, no cualquier contenedor de S3). */
     private static final String S3_HOST = "s3.amazonaws.com", S3_PATH = "/elevation-tiles-prod/terrarium/";

@@ -210,8 +210,12 @@ function drawMarkers(force = true) {
     markers.push(marker(i.lon, i.lat, cat, `<b>${esc(i.type === 'BridgeOpening' ? 'Puente levadizo' : CATEGORIES[cat].label)}</b> · ${esc(i.road ?? '')}<br><small>${esc(i.type)} / ${esc(i.cause ?? '')}<br>${esc(activeIncSource())}</small>`));
   }
   if (st.map.getZoom() >= 10) {
-    if (L.cams) for (const c of st.cams) if (inView(c.lon, c.lat))
-      markers.push(marker(c.lon, c.lat, 'CAMARA', `<b>Cámara DGT</b> · ${esc(c.carretera)} ${esc(c.destino ?? '')}<br><img src="${esc(c.url)}" alt="Imagen de la cámara" style="width:100%;border-radius:8px;margin-top:6px"><small>DGT, CC BY · imagen en vivo si hay red</small>`));
+    if (L.cams) { let nCam = 0; for (const c of st.cams) if (inView(c.lon, c.lat) && nCam++ < 150) { // como mucho 150 en pantalla: el mapa sigue fluido
+      const srcInfo = st.camSources?.[c.src] ?? { name: c.src, license: '' }, img = c.img ? `${c.img}${c.img.includes('?') ? '&' : '?'}t=${Math.floor(Date.now() / 60000)}` : null;
+      const body = img ? `<img src="${esc(img)}" alt="Imagen de la cámara" style="width:100%;border-radius:8px;margin-top:6px"><small>${esc(srcInfo.name)} · ${esc(srcInfo.license)} · imagen en vivo si hay red</small>`
+        : `<small>${esc(srcInfo.name)} publica solo la ubicación${c.page ? ` · <a href="${esc(c.page)}" target="_blank" rel="noopener">ver la emisión oficial</a>` : ''}<br>${esc(srcInfo.license)}</small>`;
+      markers.push(marker(c.lon, c.lat, 'CAMARA', `<b>Cámara · ${esc(c.cc)}</b>${c.name ? ` · ${esc(c.name)}` : ''}${c.road && !String(c.name ?? '').includes(c.road) ? ` · ${esc(c.road)}` : ''}<br>${body}`));
+    } }
     if (L.radar && st.mode === 'car') for (const rd of st.radars) if (inView(rd.lon, rd.lat))
       markers.push(marker(rd.lon, rd.lat, 'CAMARA', `<b>${rd.kind === 'section' ? 'Radar de tramo' : 'Radar fijo'} oficial</b>${rd.road ? ` · ${esc(rd.road)}` : ''}${rd.maxspeed ? ` · ${rd.maxspeed} km/h` : ''}<br><small>${esc(String(rd.src).toUpperCase())} · publicado oficialmente (solo fijos y tramo)</small>`));
   }
@@ -249,7 +253,9 @@ fetch('/senda/data/referencias/nl_ndw_incidencias.json').then((r) => r.json()).t
   st.nlIncSource = `NDW NL (CC0), ${new Date(d.descargadoUTC).toLocaleDateString('es-ES')}`;
   drawMarkers(); updateCorridor();
 }).catch(() => {});
-fetch('/senda/data/referencias/dgt_camaras.json').then((r) => r.json()).then((d) => { st.cams = d.camaras; drawMarkers(); }).catch(() => {});
+// Cámaras públicas de fuentes oficiales (DGT, Madrid, Euskadi, Rijkswaterstaat, Bruselas…), cada una con su licencia; si falta el archivo, solo la DGT.
+fetch('/senda/data/referencias/camaras_publicas.json').then((r) => r.json()).then((d) => { st.cams = d.cameras; st.camSources = Object.fromEntries(d.sources.map((x) => [x.id, x])); drawMarkers(); })
+  .catch(() => fetch('/senda/data/referencias/dgt_camaras.json').then((r) => r.json()).then((d) => { st.cams = d.camaras.map((c) => ({ id: c.id, src: 'DGT', cc: 'ES', lat: c.lat, lon: c.lon, name: `${c.carretera} ${c.destino ?? ''}`.trim(), img: c.url })); drawMarkers(); }).catch(() => {}));
 Promise.allSettled([
   fetch('/senda/data/referencias/dgt_radares_oficiales.json').then((r) => r.json()),
   fetch('/senda/data/referencias/nl_radares_oficiales.json').then((r) => r.json()),
