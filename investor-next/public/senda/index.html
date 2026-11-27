@@ -72,9 +72,11 @@
       <ul id="bubbles" class="bubbles" aria-live="polite"></ul>
       <div class="composer compose">
         <select id="to" aria-label="Destinatario" hidden></select>
-        <textarea aria-label="Mensaje" id="body" maxlength="400" rows="2" placeholder="Mensaje cifrado"></textarea>
+        <div id="attach-preview" class="attach-prev" hidden><img id="attach-img" alt="Foto que vas a enviar"><span id="attach-info" class="fine"></span><button data-act="attach-clear" aria-label="Quitar la foto">✕</button></div>
+        <div class="wa-bar"><button data-act="attach" class="clip" aria-label="Adjuntar una foto">📎</button><textarea aria-label="Mensaje" id="body" maxlength="200" rows="1" placeholder="Mensaje (máx. 200)"></textarea><span id="body-count" class="cnt">0/200</span></div>
+        <input type="file" id="attach-file" accept="image/*" capture="environment" aria-label="Elegir una foto para adjuntar" hidden>
         <div class="row"><select id="prio" aria-label="Prioridad"><option value="3">Familia</option><option value="2">Coordinación</option><option value="0">SOS</option></select><button id="send" class="primary">Enviar</button></div>
-        <div class="row via"><span class="fine">Enviar lo pendiente por:</span><button data-act="ble-send">Bluetooth</button><button data-act="sms">SMS</button><button data-act="emit">Sonido</button></div>
+        <div class="row via"><span class="fine">Enviar lo pendiente por:</span><button data-act="ble-send">Bluetooth</button><button data-act="sms">SMS</button><button data-act="emit">Sonido</button><button data-act="bundle-share">Otra app</button></div>
       </div>
     </div>
     <details class="fine"><summary>Todos los recibidos y lo que este móvil transporta</summary>
@@ -100,6 +102,9 @@
       <p class="fine">El relé no puede leer nada: solo ve a quién va cada sobre cifrado. Lo puede operar tu ayuntamiento o protección civil.</p></div>
     <div class="card"><h3>✉️ Texto / SMS</h3>
       <div class="row"><button data-act="sms">Enviar como SMS</button><button data-act="text-copy">Copiar como texto</button><button data-act="paste">Pegar texto recibido</button></div></div>
+    <div class="card"><h3>🧪 Registro de pruebas</h3>
+      <p class="fine">Guarda cuándo se cifró cada mensaje, por qué camino salió, cuándo llegó y cuánto tardó (sin el contenido). Pásalo después para analizarlo.</p>
+      <div class="row"><button data-act="log-export" class="primary">Exportar registro</button></div></div>
   </section>
 
   <section id="zone" class="view" hidden>

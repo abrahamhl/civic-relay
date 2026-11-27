@@ -5,6 +5,7 @@
  */
 import { b64, unb64 } from './core/b64.mjs';
 import { generateIdentity, exportIdentity, importIdentity, sealMessage, openMessage, packEnvelope, unpackEnvelope, packContact, unpackContact } from './core/envelope.mjs';
+import { packRich, unpackRich, isRich, MAX_TEXT_CHARS, MAX_IMAGE_BYTES } from './core/message-media.mjs';
 import { createBundleStore, exportBundleFile, importBundleFile } from './core/bundle.mjs';
 import { parseUsgs, SOURCES } from './core/feeds.mjs';
 import { zoneFromQuake, relayActivation, createConsentProfile } from './core/zones.mjs';
@@ -36,6 +37,7 @@ async function persist() {
   await kv.set('inbox', S.inbox);
   await kv.set('sent', S.sent);
   await kv.set('consent', S.consent);
+  await kv.set('msglog', S.log ?? []);
 }
 
 async function boot() {
@@ -45,6 +47,7 @@ async function boot() {
   S.contacts = (await kv.get('contacts')) ?? [];
   S.inbox = (await kv.get('inbox')) ?? [];
   S.sent = (await kv.get('sent')) ?? [];
+  S.log = (await kv.get('msglog')) ?? [];
   S.consent = (await kv.get('consent')) ?? null;
   S.zones = (await kv.get('zones')) ?? [];
   S.store = createBundleStore({ owner: S.me.publicIdentity.fingerprint });
@@ -80,13 +83,15 @@ async function receiveBytes(bytes, via) {
 
 async function receiveEnvelope(env, via) {
   if (env.header.to === S.me.publicIdentity.fingerprint) {
-    if (S.inbox.some((m) => m.id === env.header.id)) return toast('Ya lo tenías (duplicado descartado)');
+    if (S.inbox.some((m) => m.id === env.header.id)) { logEv({ ev: 'DUPLICADO', id: env.header.id, via }); return toast('Ya lo tenías (duplicado descartado)'); }
     const m = await openMessage({ recipient: S.me, envelope: env, now: now() });
+    let rich = null; if (m.body instanceof Uint8Array && isRich(m.body)) { rich = unpackRich(m.body); m.body = rich.text; }
     const sender = S.contacts.find((c) => c.signPub.x === m.from.x && c.signPub.y === m.from.y);
     let incident = null;
     if (typeof m.body === 'string' && m.body.startsWith(INCIDENT_PREFIX)) { try { incident = JSON.parse(m.body.slice(INCIDENT_PREFIX.length).split('\n')[0]); } catch { /* texto libre */ } }
     const coordText = typeof m.body === 'string' && m.body.startsWith(CO.RESPONSE_PREFIX) ? CO.onResponseMessage(m.body, m.from) : null;
-    S.inbox.unshift({ id: env.header.id, fromFp: sender?.fingerprint ?? null, from: sender?.name ?? (coordText ? 'Residente (firma válida)' : 'Desconocido (firma válida)'), body: incident ? humanIncident(incident) : coordText ?? m.body, kind: env.header.kind, at: now(), via, incident, coordination: !!coordText });
+    S.inbox.unshift({ id: env.header.id, fromFp: sender?.fingerprint ?? null, from: sender?.name ?? (coordText ? 'Residente (firma válida)' : 'Desconocido (firma válida)'), body: incident ? humanIncident(incident) : coordText ?? m.body, kind: env.header.kind, at: now(), via, incident, coordination: !!coordText, img: rich?.image ? await toDataUrl(rich.image) : null, createdAt: rich?.createdAt ?? null });
+    logEv({ ev: 'RECIBIDO', id: env.header.id, via, bytes: packEnvelope(env).length, createdAt: rich?.createdAt ?? null, receivedAt: now(), latencyMs: rich?.createdAt ? now() - rich.createdAt : null, withImage: !!rich?.image, from: sender?.name ?? null });
     await S.store.acceptReceipt(m.receipt); // el recibo viajará y borrará copias en otros teléfonos
     await persist(); render(); return toast(`Mensaje de ${sender?.name ?? 'desconocido'} vía ${via}`);
   }
@@ -140,7 +145,7 @@ const ACTIONS = {
     const text = exportBundleFile(S.store, { now: now() });
     const bytes = new TextEncoder().encode(text);
     if (bytes.length > 64 * 1024) return toast('Demasiado para Bluetooth de una vez: usa «Compartir paquete»');
-    window.SendaNative.p2pSend(b64(bytes));
+    window.SendaNative.p2pSend(b64(bytes)); logEv({ ev: 'ENVIADO', via: 'BLUETOOTH', ids: items.map((i) => i.id), bytes: bytes.length });
   },
   async 'card-sound'() { toast('Emitiendo tu tarjeta…', 8000); await emit(packContact(S.me.publicIdentity, S.name), { canvas: $('#scope') }); toast('Tarjeta emitida'); },
   async 'card-copy'() { await copy('SENDA:' + b64(packContact(S.me.publicIdentity, S.name))); },
@@ -163,18 +168,25 @@ const ACTIONS = {
     if (!items.length) return toast('Nada pendiente de enviar');
     const env = S.store.get(items[0].id);
     $('#audio-status').textContent = `Emitiendo ${packEnvelope(env).length} bytes cifrados (prioridad ${env.header.priority})…`;
-    await emit(packEnvelope(env), { canvas: $('#scope') });
+    const t0 = now(); await emit(packEnvelope(env), { canvas: $('#scope') }); logEv({ ev: 'ENVIADO', via: 'SONIDO', ids: [items[0].id], bytes: packEnvelope(env).length, durationMs: now() - t0 });
     $('#audio-status').textContent = 'Emitido. Si el otro teléfono lo recibió, verás su recibo en la próxima sincronización.';
   },
   async 'bundle-share'() {
-    const text = exportBundleFile(S.store, { now: now() });
+    const text = exportBundleFile(S.store, { now: now() }); logEv({ ev: 'ENVIADO', via: 'PAQUETE_COMPARTIDO', ids: outgoing().map((i) => i.id), bytes: text.length });
     await persist(); await shareFile(`senda-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '')}.senda`, text, 'application/json');
   },
   async sms() {
     const it = outgoing()[0]; if (!it) return toast('Nada pendiente');
-    location.href = `sms:?&body=${encodeURIComponent('SENDA:' + b64(packEnvelope(S.store.get(it.id))))}`;
+    const sms = 'SENDA:' + b64(packEnvelope(S.store.get(it.id))); logEv({ ev: 'ENVIADO', via: 'SMS', ids: [it.id], chars: sms.length }); await persist();
+    location.href = `sms:?&body=${encodeURIComponent(sms)}`;
   },
-  async 'text-copy'() { const it = outgoing()[0]; if (!it) return toast('Nada pendiente'); await copy('SENDA:' + b64(packEnvelope(S.store.get(it.id)))); },
+  async 'text-copy'() { const it = outgoing()[0]; if (!it) return toast('Nada pendiente'); const t = 'SENDA:' + b64(packEnvelope(S.store.get(it.id))); logEv({ ev: 'ENVIADO', via: 'TEXTO_COPIADO', ids: [it.id], chars: t.length }); await persist(); await copy(t); },
+  async 'log-export'() {
+    const doc = { format: 'senda-registro-mensajes/1', exportedAt: new Date().toISOString(), device: S.name, note: 'Latencias con los relojes de cada móvil: activad la hora automática en los dos. Sin contenido de los mensajes.', events: S.log ?? [] };
+    await shareFile(`senda-registro-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '')}.json`, JSON.stringify(doc, null, 1), 'application/json');
+  },
+  async attach() { $('#attach-file').click(); },
+  async 'attach-clear'() { S.pendingImg = null; $('#attach-preview').hidden = true; },
   async feeds() {
     if (!navigator.onLine) return toast('Sin red: se usan las últimas fuentes guardadas');
     try {
@@ -203,12 +215,16 @@ async function shareFile(name, text, type) {
 
 async function sendMessage() {
   const to = S.contacts.find((c) => c.fingerprint === $('#to').value);
-  const body = $('#body').value.trim(); if (!to || !body) return toast('Elige contacto y escribe algo');
-  const prio = +$('#prio').value;
-  const env = await sealMessage({ sender: S.me, recipient: to, body, priority: prio, ttlS: 7 * 86400, now: now(), kind: prio === 0 ? 'SOS' : 'PERSONAL' });
+  const body = $('#body').value.trim(), img = S.pendingImg; if (!to || (!body && !img)) return toast('Elige contacto y escribe algo o adjunta una foto');
+  if ([...body].length > MAX_TEXT_CHARS) return toast(`Máximo ${MAX_TEXT_CHARS} caracteres`);
+  const prio = +$('#prio').value, createdAt = now();
+  const rich = packRich({ text: body, createdAt, image: img ? { mime: img.mime, bytes: img.bytes } : null });
+  const env = await sealMessage({ sender: S.me, recipient: to, body: rich, priority: prio, ttlS: 7 * 86400, now: createdAt, kind: prio === 0 ? 'SOS' : 'PERSONAL' });
   S.store.put(env, { now: now(), copies: 8 });
-  S.sent.unshift({ id: env.header.id, toFp: to.fingerprint, body, kind: prio === 0 ? 'SOS' : 'PERSONAL', at: now() });
-  await persist(); $('#body').value = ''; render();
+  S.sent.unshift({ id: env.header.id, toFp: to.fingerprint, body, kind: prio === 0 ? 'SOS' : 'PERSONAL', at: createdAt, img: img?.url ?? null });
+  logEv({ ev: 'CIFRADO', id: env.header.id, to: to.name, createdAt, bytes: packEnvelope(env).length, textChars: [...body].length, imageBytes: img?.bytes.length ?? 0, cipher: 'ECDH P-256 efímero → HKDF-SHA-256 → AES-256-GCM · firma ECDSA P-256' });
+  S.pendingImg = null; $('#attach-preview').hidden = true;
+  await persist(); $('#body').value = ''; $('#body-count').textContent = `0/${MAX_TEXT_CHARS}`; render();
   toast('Cifrado y en camino. Envíalo por Bluetooth, SMS o sonido, o deja que otros lo lleven.');
 }
 
@@ -319,7 +335,7 @@ function renderChats() {
   $('#thread-name').textContent = open.c.name; $('#to').value = open.c.fingerprint;
   const carried = new Set(S.store.list().map((i) => i.id));
   const delivered = new Set(S.store.summary().receipts); // recibos verificados criptográficamente (el destinatario abrió el sobre)
-  $('#bubbles').innerHTML = open.msgs.map((m) => `<li class="${m.dir}${m.kind === 'SOS' ? ' sos' : ''}">${esc(m.body)}<span class="meta">${hhmm(m.at)}${m.dir === 'out' ? (delivered.has(m.id) ? ' · ✓✓ entregado' : carried.has(m.id) ? ' · ✓ en camino' : ' · salió de este móvil') : ` · vía ${esc(m.via ?? '')}`}</span></li>`).join('')
+  $('#bubbles').innerHTML = open.msgs.map((m) => `<li class="${m.dir}${m.kind === 'SOS' ? ' sos' : ''}">${m.img ? `<img class="bimg" src="${esc(m.img)}" alt="Foto adjunta">` : ''}${esc(m.body)}<span class="meta">${hhmm(m.at)}${m.dir === 'out' ? (delivered.has(m.id) ? ' · ✓✓ entregado' : carried.has(m.id) ? ' · ✓ en camino' : ' · salió de este móvil') : ` · vía ${esc(m.via ?? '')}`}</span></li>`).join('')
     || '<li class="in">Escribe el primer mensaje. Viaja cifrado: solo lo abre su destinatario.</li>';
 }
 
@@ -381,4 +397,31 @@ Object.assign(window.SENDA_TEST, {
   co: () => CO,
   lastResponse: () => S.lastResponse ?? null,
   quick: (st) => quickStatus(st),
+  log: () => S.log ?? [],
+  inbox: () => S.inbox,
 });
+
+
+/* ---------------- fotos y registro de pruebas ---------------- */
+function logEv(e) { (S.log ??= []).push({ t: now(), ...e }); if (S.log.length > 3000) S.log.shift(); }
+async function toDataUrl(image) { const blob = new Blob([image.bytes], { type: image.mime }); return await new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(blob); }); }
+/** Foto → WebP (o JPEG si el móvil no sabe WebP) de ≤ 12 KB, bajando tamaño y calidad hasta que quepa. */
+async function compressImage(file) {
+  const bmp = await createImageBitmap(file), c = document.createElement('canvas');
+  for (const [side, q] of [[480, 0.55], [400, 0.5], [320, 0.45], [256, 0.4], [200, 0.35], [160, 0.3]]) {
+    const k = Math.min(1, side / Math.max(bmp.width, bmp.height)); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    for (const mime of ['image/webp', 'image/jpeg']) {
+      const blob = await new Promise((ok) => c.toBlob(ok, mime, q)); if (!blob || blob.type !== mime) continue;
+      if (blob.size <= MAX_IMAGE_BYTES) return { mime, bytes: new Uint8Array(await blob.arrayBuffer()), w: c.width, h: c.height };
+      break;
+    }
+  }
+  throw new Error('No se pudo dejar la foto en 12 KB');
+}
+$('#attach-file')?.addEventListener('change', async (e) => {
+  const f = e.target.files?.[0]; e.target.value = ''; if (!f) return;
+  try { const im = await compressImage(f); im.url = await toDataUrl(im); S.pendingImg = im; $('#attach-img').src = im.url; $('#attach-info').textContent = `${im.w}×${im.h} · ${(im.bytes.length / 1024).toFixed(1)} KB cifrados`; $('#attach-preview').hidden = false; }
+  catch (err) { toast(err.message); }
+});
+$('#body')?.addEventListener('input', () => { const n = [...$('#body').value].length; $('#body-count').textContent = `${n}/${MAX_TEXT_CHARS}`; $('#body-count').classList.toggle('over', n > MAX_TEXT_CHARS); });

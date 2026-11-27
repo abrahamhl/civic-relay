@@ -790,8 +790,11 @@ async function goTo(dest, reroute = false, nowS = currentNavClockS()) {
   hint(reroute ? 'Recalculando…' : 'Calculando ruta…');
   $('#etaBox').hidden = false; $('#searchBox').hidden = true;
   try {
-    const r = parseRoute(await (await fetch(routeUrl({ from: st.pos, to: dest.at, mode: st.mode }))).json());
+    const json = await (await fetch(routeUrl({ from: st.pos, to: dest.at, mode: st.mode }))).json();
+    const r = parseRoute(json);
     if (!r.ok) return hint('No hay ruta: ' + r.reason);
+    // Alternativas de OSRM (hasta 3): cada una en su color, con su tiempo, distancia y avisos conocidos a lo largo
+    if (!reroute) { st.alts = (json.routes ?? []).map((_, i) => parseRoute(json, i)).filter((x) => x.ok).slice(0, 3); st.altIdx = 0; drawAlts(); }
     st.route = r; st.said = new Set(); st.follow = true;
     if (reroute) st.rerouteCount++;
     if (!reroute) window.SendaNative?.p2pStart?.(); // APK: buzón Bluetooth abierto mientras navegas, para recibir avisos de accidentes cercanos
@@ -820,7 +823,7 @@ async function goTo(dest, reroute = false, nowS = currentNavClockS()) {
     $('#etaTime').textContent = dest.name; $('#etaInfo').textContent = '';
   }
 }
-function endNav() { st.route = null; st.dest = null; $('#turn').hidden = true; $('#lanes').hidden = true; $('#etaBox').hidden = true; $('#searchBox').hidden = false; st.map?.getSource('route')?.setData({ type: 'FeatureCollection', features: [] }); st.map?.easeTo({ pitch: 0, bearing: 0 }); hint('Navegación terminada.'); updateCorridor(); updateCurveHorizon(); }
+function endNav() { st.alts = null; st.map?.getSource('route-alts')?.setData({ type: 'FeatureCollection', features: [] }); if ($('#altsRow')) $('#altsRow').hidden = true; st.map?.setPaintProperty('route', 'line-color', ALT_COLORS[0]); st.route = null; st.dest = null; $('#turn').hidden = true; $('#lanes').hidden = true; $('#etaBox').hidden = true; $('#searchBox').hidden = false; st.map?.getSource('route')?.setData({ type: 'FeatureCollection', features: [] }); st.map?.easeTo({ pitch: 0, bearing: 0 }); hint('Navegación terminada.'); updateCorridor(); updateCurveHorizon(); }
 $('#endNav').addEventListener('click', endNav);
 $('#goWaze').addEventListener('click', () => { if (st.dest) location.href = wazeUrl({ to: st.dest.at }).url; });
 $('#goMaps').addEventListener('click', () => { if (st.dest) location.href = googleMapsUrl({ from: st.pos ?? st.dest.at, to: st.dest.at }).url; });
@@ -2001,3 +2004,33 @@ $('#dashRadar')?.addEventListener('click', (e) => { e.stopPropagation(); srConne
 
 document.querySelectorAll('#dash [data-uso]').forEach((y) => y.classList.toggle('on', y.dataset.uso === CAMI.mode));
 $('#geomBtn')?.addEventListener('click', (e) => { e.stopPropagation(); askGeom(); CAMI.ins = null; });
+
+
+// ── Rutas alternativas en colores, con los avisos conocidos de cada una (incidencias oficiales + avisos SENDA a ≤ 150 m) ──
+const ALT_COLORS = ['#2b8cff', '#a259ff', '#ff9f0a'];
+function routeHazards(rt) {
+  const xs = rt.coords.map((c) => c[0]), ys = rt.coords.map((c) => c[1]), pad = 0.01, bb = [Math.min(...xs) - pad, Math.min(...ys) - pad, Math.max(...xs) + pad, Math.max(...ys) + pad];
+  const pts = [...(activeIncidents() ?? []).filter((i) => i.lat != null).map((i) => [i.lon, i.lat]), ...reports().map((x) => [x.lon, x.lat])].filter((p) => p[0] >= bb[0] && p[0] <= bb[2] && p[1] >= bb[1] && p[1] <= bb[3]);
+  return pts.filter((p) => distToRoute(rt, p) <= 150).length; // 150 m: margen de diseño para «en esta carretera»
+}
+function drawAlts() {
+  const alts = st.alts ?? [];
+  if (st.map && !st.map.getSource('route-alts')) {
+    st.map.addSource('route-alts', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+    st.map.addLayer({ id: 'route-alts', type: 'line', source: 'route-alts', paint: { 'line-color': ['get', 'color'], 'line-width': 6, 'line-opacity': 0.55 }, layout: { 'line-cap': 'round', 'line-join': 'round' } }, st.map.getLayer('route-casing') ? 'route-casing' : undefined);
+  }
+  st.map?.getSource('route-alts')?.setData({ type: 'FeatureCollection', features: alts.map((a, i) => ({ type: 'Feature', properties: { color: ALT_COLORS[i] }, geometry: { type: 'LineString', coordinates: a.coords } })).filter((_, i) => i !== st.altIdx) });
+  const box = $('#altsRow'); if (!box) return;
+  box.hidden = alts.length < 2;
+  box.innerHTML = alts.map((a, i) => { const n = routeHazards(a); return `<button data-alt="${i}" class="${i === st.altIdx ? 'on' : ''}"><i style="background:${ALT_COLORS[i]}"></i>${Math.round(a.durationS / 60)} min · ${fmtDist(a.distanceM)}<small>${n ? `${n} aviso${n > 1 ? 's' : ''}` : 'sin avisos conocidos'}</small></button>`; }).join('');
+}
+$('#altsRow')?.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-alt]'); if (!b || !st.alts) return;
+  const i = +b.dataset.alt, r = st.alts[i]; if (!r) return;
+  st.altIdx = i; st.route = r; st.said = new Set();
+  st.map?.getSource('route')?.setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: r.coords } });
+  st.map?.setPaintProperty('route', 'line-color', ALT_COLORS[i]);
+  $('#etaTime').textContent = new Date(Date.now() + r.durationS * 1000).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  $('#etaInfo').textContent = `${Math.round(r.durationS / 60)} min · ${fmtDist(r.distanceM)} · ${st.dest?.name ?? ''}`;
+  drawAlts(); guide(); updateCorridor();
+});

@@ -68,3 +68,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .composer{position:sticky;bottom:0;background:var(--bg,#05090c);padding-top:8px}
 .composer .via{gap:6px;flex-wrap:wrap;align-items:center}.composer .via button{padding:6px 10px;font-size:14px}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Mensajes con foto (estilo WhatsApp) */
+.bubbles .bimg{display:block;max-width:220px;width:100%;border-radius:12px;margin:-2px -4px 6px}
+.wa-bar{display:flex;align-items:flex-end;gap:6px;background:#1c1c1e;border-radius:22px;padding:4px 6px}
+.wa-bar textarea{flex:1;border:0;background:transparent;resize:none;min-height:36px;padding:8px 4px;color:inherit;font:inherit}
+.wa-bar .clip{background:none;border:0;font-size:22px;padding:6px}
+.wa-bar .cnt{font-size:11px;opacity:.6;padding:0 6px 10px}.wa-bar .cnt.over{color:#ff5b6e;opacity:1}
+.attach-prev[hidden]{display:none}.attach-prev{display:flex;align-items:center;gap:8px;margin-bottom:6px}.attach-prev img{width:64px;height:64px;object-fit:cover;border-radius:10px}
