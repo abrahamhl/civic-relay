@@ -1217,3 +1217,79 @@ These are **future call facts, not OEP eligibility or awards**. Topic-specific l
 3. **NORSAR / TOGETHER:** request only a technical matchmaking pointer, not endorsement, pilot acceptance or funding.
 
 **No application, external contact, grant award, signed consortium, physical Android-to-Android trial, accredited-lab engagement, certificate, PR merge or `master` modification is claimed.** Documentation-only update on `feat/master-emergency-routing-v1-20261020`.
+
+
+---
+
+## Independent funding-agent delta — 27 November 2026
+
+**Review date:** 27 November 2026 (Europe/Amsterdam). **Method:** primary-source recheck only; no application, outreach, merge, or certification filing performed.
+
+### Material finding 1 — Innowwide Call 5 must remain submission-status-unconfirmed
+
+RVO's official Innowwide page publishes the Call 5 window as **1 October 2026, 09:00 CEST to 1 December 2026, 14:00 CEST**, a fixed grant of **€60,000**, minimum project costs of **€86,000**, and a total call budget of **€4.2 million for 70 projects**. The same official page currently displays **"Temporarily closed for application"**. The RVO subsidy overview separately lists the 5th international call as open for applications in the same date window.
+
+**Classification:** `ACTIVE CONDITIONAL` — **SUBMISSION-STATUS-UNCONFIRMED**, not `ACTIVE ELIGIBLE`.
+
+**Verified conditions:** EU-eligible SME applicant; one application per company; civil application; international feasibility / market-preparation project with an eligible local counterpart in Africa, the Americas, the Middle East, Asia or Oceania.
+
+**Not verified for OEP:** legal applicant entity and SME status, external-country counterpart, TRL 4 evidence, market study work plan, own contribution, live submission form, and whether the portal will accept a submission before 1 December 2026.
+
+**Primary sources:**
+- https://english.rvo.nl/subsidies-financing/innowwide
+- https://www.rvo.nl/subsidies-financiering?sortBy=title&status=3294%2C3295
+
+### Material finding 2 — Eurostars-3 Call 12 is the next actionable funding window
+
+Eureka's official page confirms:
+- opening: **17 December 2026, 00:00 CET**
+- deadline: **4 March 2027, 14:00 CET**
+- consortium led by an **innovative SME from a Eurostars country**
+- at least **two independent legal entities from at least two participating countries**
+- national funding rules and rates are controlled by each National Funding Body; non-Eurostars participants may participate self-funded
+
+**Classification:** `FUTURE`.
+
+**Not verified for OEP:** Dutch legal applicant, SME status, lead partner, second country partner, signed consortium, Dutch co-financing, TRL, physical Android-to-Android validation plan, and budget.
+
+**Primary source:** https://www.eurekanetwork.org/programmes-and-calls/eurostars/eurostars-call-12-for-projects-deadline-march-2027/
+
+### Material finding 3 — TOGETHER confirms a technically relevant coordinator, not availability
+
+CORDIS confirms that **STIFTELSEN NORSAR** coordinates TOGETHER under grant agreement **101226137**, from **1 November 2025 to 31 October 2028**, with EU contribution **€2,999,962.50**. The project tests disaster-risk-management solutions in innovation hubs in Greece, Norway, Portugal, Spain and Türkiye, including an innovation hub in Spain with **AYUNTAMIENTO DE ORIHUELA** as a participant.
+
+**Classification:** `NOT A GRANT` for OEP's current purposes; potential technical-matchmaking lead only.
+
+**Important boundary:** this verifies an existing project and coordinator experience. It does **not** verify an open Horizon 2027 consortium, a place for OEP, a pilot commitment, procurement, certification, or funding for OEP.
+
+**Primary source:** https://cordis.europa.eu/project/id/101226137
+
+### Material finding 4 — ETSI NG112 Plugtests 2026 is closed and was an interoperability event
+
+ETSI's official event page records the NG112 Plugtests 2026 as held **26–29 May 2026 in Ljubljana, Slovenia**. Participation required signed Rules of Engagement and NDA; the event was an interoperability test campaign, not an automatic certification of emergency-rescue safety.
+
+**Classification:** `NOT A GRANT`.
+
+**OEP status:** no participation, test result, or certification verified.
+
+**Primary source:** https://www.etsi.org/events/2631-ng112-plugtests-2026/
+
+### Material finding 5 — EUCC remains a product-cybersecurity certification path only
+
+ENISA / EU sources describe EUCC as a Common Criteria-based cybersecurity certification scheme for qualifying ICT products. No OEP Target of Evaluation, Security Target, accredited evaluation body, laboratory engagement, certificate, or cost estimate is verified.
+
+**Classification:** `CERTIFICATION PATH`.
+
+**Boundary:** EUCC does not certify operational rescue safety, emergency-operator readiness, radio coverage, or authority to issue 112/CAP alerts.
+
+**Primary source:** https://certification.enisa.europa.eu/news/eu-prime-eu-adopts-first-cybersecurity-certification-scheme-2024-01-31_en
+
+### Current decision and blockers
+
+1. **Do not label Innowwide `ACTIVE ELIGIBLE`** while the RVO page simultaneously shows a published window and “Temporarily closed for application”.
+2. **Prepare Eurostars Call 12**, but only as a future consortium track; no partner or Dutch funding is committed.
+3. **Use NORSAR / TOGETHER only as a verified matchmaking lead**, not as a claimed OEP partner.
+4. **Do not claim physical validation, certification, or operational emergency capability.**
+5. Priority evidence gate remains a consenting, reproducible, two-Android physical test with logged failures and independent review. CI artifacts remain software/virtual evidence only.
+
+**Repository state checked:** branch feat/master-emergency-routing-v1-20261020, PR #3, head before this update was verified through GitHub metadata. No master merge and no PR merge performed.
