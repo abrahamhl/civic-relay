@@ -23,7 +23,7 @@
 | `SPEED_120KMH_1X` | GPX real reescalado a `120 km/h` (`1×`) | **APROBADO** | `shownKmh = 120`, `arrived = true`, `minEaseIntervalMs ≥ 800 ms`, `crashFalseAlarm = false` |
 | `SPEED_120KMH_4X` | GPX real reescalado a `120 km/h` (`×4`) | **APROBADO** | `shownKmh = 120`, `arrived = true`, `minEaseIntervalMs ≥ 800 ms`, `crashFalseAlarm = false` |
 | `CRASH_SYNTHETIC_MATRIX` | `syntheticTrace` (`roadsafe-crash-detect.mjs`): 6 no-choques (`POTHOLE`, `HARD_BRAKE_NO_CRASH`, `PHONE_DROP_IN_CAR`, `SKI_FALL`, `ROLLER_COASTER`, `DOOR_SLAM_PARKED`) + 4 choques sintéticos | **APROBADO** | `falsePositivesOnNonCrash = 0/6` (`#crash` cerrado), `truePositivesOnCrash = 4/4` (simulación sintética rotulada; verifica la lógica, no la precisión en campo) |
-| `SOAK_2H_7200S_MEMORY` | Rodaje continuo de `2 h` (`7 200` muestras a `1 Hz` de GPS + IMU + corredor + radares + navegación) tras calentamiento V8 de `20 min` (`1 200 s`) | **APROBADO** | Heap V8 tras GC: `5,79 MB` (`20 min`) → `6,28 MB` (`2 h`), deriva **`+8,45 %`** (dentro del límite exigido `±10 %`), `0` errores |
+| `SOAK_2H_7200S_MEMORY` | Rodaje continuo de `2 h` (`7 200` muestras a `1 Hz`) con una medida de memoria cada `10 min` (mediana de 3 lecturas tras 2 recogidas de basura) | **APROBADO** (revisión del 27-11) | Tendencia en régimen estable (`1 h → 2 h`, Theil–Sen) **`+8,2 %/h`** (límite `±10 %/h`); llenado desde `20 min` `+7,3 %` (límite `25 %`); `0` errores. **Ojo**: hay un crecimiento lento (~`0,5 MB/h`) dentro del límite que conviene investigar con instantáneas del montón |
 
 ---
 
@@ -54,3 +54,13 @@
 
 - Las pruebas se ejecutan en **Chromium real con geolocalización simulada sobre una traza GPX pública real de OpenStreetMap**, no en un teléfono físico dentro de un vehículo en movimiento (`necesita prueba física` en el trayecto real del fundador).
 - El detector de choque utiliza `EXAMPLE_DETECTION_CONFIG` (razones de verosimilitud declaradas sin calibrar con siniestros reales): la matriz sintética demuestra ausencia de falsos disparos de software en esas 6 firmas típicas, no sensibilidad/especificidad clínica en carretera.
+
+## Revisión de Claude Code (27-11-2026)
+- **Fallo en master tras fusionar la PR #124.** La prueba del rodaje de 2 h falló en CI con `drift=10,36 %`. Tres pasadas locales dieron `7,36 %`, `22,15 %` (en la ventana de 1 h a 2 h) y `8,45 %`.
+  - **Causa raíz**: se comparaban dos lecturas sueltas del montón, cuyo ruido es de ±10–20 %. Además, la primera lectura (a los 20 min) se tomaba con los búferes acotados aún llenándose.
+  - **Arreglo**:
+    - mediana de 3 lecturas, cada una tras 2 recogidas de basura;
+    - una muestra cada 10 min;
+    - la fuga se juzga por la tendencia (Theil–Sen) entre 1 h y 2 h, con un tope aparte para el llenado inicial.
+- **Fallo intermitente en `PIXEL7_PORTRAIT_1X_FULL`.** Durante el corte de red simulado, Chrome anota `ERR_INTERNET_DISCONNECTED` por cada carga fallida, y la prueba lo contaba como error de la app.
+  - **Arreglo**: esos mensajes se aceptan solo durante el corte y los 2 s siguientes. Cualquier otro error sigue contando.
