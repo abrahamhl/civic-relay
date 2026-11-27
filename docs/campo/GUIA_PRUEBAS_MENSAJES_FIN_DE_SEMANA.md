@@ -15,7 +15,9 @@ Objetivo: comprobar que los mensajes cifrados, con o sin foto, **llegan, se abre
   2. **Por SMS**, si hay red móvil aunque no haya datos. Solo texto corto. Una foto no cabe en un SMS.
   3. **Por satélite**, solo si vuestro móvil tiene mensajería por satélite en ese país. SENDA lo usaría a través del SMS. No está
      comprobado en vuestros móviles.
-  4. **Relé SENDA por internet**: la casilla existe en «Transferir», pero **todavía no hay un servidor en marcha** (decisión pendiente).
+  4. **Relé SENDA por internet (automático)**: el código ya sincroniza solo (al ganar red, cada minuto y al enviar) y los relés de
+     distintos países se pasan los mensajes entre sí; probado SE→NL→ES en laboratorio. **Todavía no hay un servidor en marcha**
+     (decisión pendiente). Definición completa en `docs/red/PASARELAS_SENDA.md`.
 - **Sin ninguna red** (modo avión), SENDA funciona **cerca**:
   - Bluetooth (APK de Android en los dos móviles), con un alcance de decenas de metros;
   - sonido, a menos de 1 m;

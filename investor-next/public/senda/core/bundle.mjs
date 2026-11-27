@@ -93,7 +93,11 @@ export function createBundleStore({
     return used + bytes <= quotaBytes;
   }
 
-  function planTransfers(peerSummary = {}, { maxBytes = 512 * 1024, now = Date.now() } = {}) {
+  /**
+   * `infrastructure: true` → el par es un relé fijo (servidor SENDA, Punto SENDA): se le entrega aunque solo
+   * quede 1 copia, porque un relé no inunda (solo reparte a quien lo pide) y es el puente entre países.
+   */
+  function planTransfers(peerSummary = {}, { maxBytes = 512 * 1024, now = Date.now(), infrastructure = false } = {}) {
     const peerHas = new Set(Array.isArray(peerSummary.ids) ? peerSummary.ids : []);
     const peerReceipts = new Set(Array.isArray(peerSummary.receipts) ? peerSummary.receipts : []);
     const peerPending = new Set(Array.isArray(peerSummary.pendingReceipts) ? peerSummary.pendingReceipts : []);
@@ -108,17 +112,19 @@ export function createBundleStore({
     outReceipts.length = Math.min(outReceipts.length, maxIngestReceipts);
 
     const cands = [...items.values()].filter((i) => !peerHas.has(i.env.header.id) && !peerReceipts.has(i.env.header.id) && now <= i.env.header.expiresAt)
-      .filter((i) => i.env.header.to === peerSummary.owner || i.copies > 1)
+      .filter((i) => i.env.header.to === peerSummary.owner || i.copies > 1 || infrastructure)
       .sort((a, b) => (b.env.header.to === peerSummary.owner) - (a.env.header.to === peerSummary.owner)
         || a.env.header.priority - b.env.header.priority || a.env.header.expiresAt - b.env.header.expiresAt);
     const envelopes = []; const commits = []; let bytes = 0;
     for (const i of cands) {
       if (bytes + i.size > maxBytes) continue;
       const direct = i.env.header.to === peerSummary.owner;
-      const give = direct ? 1 : Math.floor(i.copies / 2);
+      const give = direct ? 1 : infrastructure ? Math.max(1, Math.floor(i.copies / 2)) : Math.floor(i.copies / 2);
       if (!direct && give < 1) continue;
       envelopes.push({ env: i.env, copies: give, hops: i.hops + 1 });
-      if (!direct) commits.push({ id: i.env.header.id, give });
+      // Al relé se le cede la mitad; con 1 sola copia se le entrega sin descontar (el teléfono sigue pudiendo
+      // dársela en mano al destinatario).
+      if (!direct && !(infrastructure && i.copies <= 1)) commits.push({ id: i.env.header.id, give });
       bytes += i.size;
     }
 
