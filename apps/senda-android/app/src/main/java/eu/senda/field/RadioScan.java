@@ -97,7 +97,7 @@ final class RadioScan {
                     for (android.net.wifi.ScanResult r : wm.getScanResults()) {
                         if (r.BSSID == null) continue;
                         newestUs = Math.max(newestUs, r.timestamp);
-                        wifi.put(new JSONObject().put("a", angleOf(salt, r.BSSID)).put("r", r.level).put("g", band(r.frequency)));
+                        wifi.put(new JSONObject().put("a", angleOf(salt, r.BSSID)).put("r", r.level).put("g", band(r.frequency)).put("o", WifiSecurity.isOpen(r.capabilities))); // o = red abierta (sin contraseña); nunca el nombre ni la dirección
                     }
                 } catch (SecurityException e) { note2 = "sin permiso de ubicación precisa: Android no entrega las redes Wi-Fi"; }
                 catch (JSONException ignored) { }

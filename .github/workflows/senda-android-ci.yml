@@ -36,6 +36,8 @@ jobs:
           javac --release 17 -d "$RUNNER_TEMP/jvm4" apps/senda-android/app/src/main/java/eu/senda/field/ExternalLinks.java apps/senda-android/app/src/test/java/eu/senda/field/ExternalLinksTest.java apps/senda-android/app/src/main/java/eu/senda/field/NetAllow.java apps/senda-android/app/src/test/java/eu/senda/field/NetAllowTest.java
           java -cp "$RUNNER_TEMP/jvm4" eu.senda.field.ExternalLinksTest
           java -cp "$RUNNER_TEMP/jvm4" eu.senda.field.NetAllowTest
+          javac --release 17 -d "$RUNNER_TEMP/jvm5" apps/senda-android/app/src/main/java/eu/senda/field/WifiSecurity.java apps/senda-android/app/src/test/java/eu/senda/field/WifiSecurityTest.java
+          java -cp "$RUNNER_TEMP/jvm5" eu.senda.field.WifiSecurityTest
       - name: Conformidad del arranque automático, puente Android Auto y USB-OTG mmWave (JVM)
         run: |
           mkdir -p "$RUNNER_TEMP/jvm2"
