@@ -13,7 +13,8 @@ import { detectCrash, crashResponsePolicy, buildIncidentReport, fuseIncidentRepo
 import * as kv from './db.mjs';
 import { emit, listen, decodeSamples } from './audio.mjs';
 import { initCoordination } from './coord.mjs';
-import { initNostr, DEFAULT_NOSTR_RELAYS } from './nostr-link.mjs';
+import { initNostr, PUBLIC_EXTRA_RELAYS, SENDA_SERVERS } from './nostr-link.mjs';
+import { prewrap } from './core/nostr-mailbox.mjs';
 
 const $ = (s) => document.querySelector(s);
 const now = () => Date.now();
@@ -57,7 +58,7 @@ async function boot() {
   await CO.load();
   for (const b of S.store.listBroadcasts()) await CO.handleBroadcast(b, 'almacenado');
   CO.startAutoRelay(); // si hay relés configurados, sube y baja solo cada vez que haya red
-  S.nostr = (await kv.get('nostr')) ?? { on: true, relays: DEFAULT_NOSTR_RELAYS, drops: true };
+  S.net = (await kv.get('net')) ?? { servers: SENDA_SERVERS, publicExtra: true };
   NOSTR.start(); // red descentralizada: buzones cifrados y cegados en varios relés Nostr públicos
   if (await kv.get('easyOnly')) { document.body.classList.add('easy-only'); $('#easy-only').checked = true; }
   $('#tabs').hidden = false; show('home');
@@ -141,7 +142,7 @@ const ACTIONS = {
     if (typeof window.SendaNative?.pickContact !== 'function') return toast('Elegir contactos del móvil solo funciona en la app de Android');
     window.SendaNative.pickContact();
   },
-  async 'nostr-save'() { await NOSTR.configure({ on: $('#nostr-on').checked, relays: $('#nostr-relays').value.trim(), drops: $('#nostr-drops').checked }); },
+  async 'net-save'() { await NOSTR.configure({ servers: $('#net-servers').value.trim(), publicExtra: $('#net-public').checked }); },
   async 'ble-open'() { if (!hasBle()) return toast('El Bluetooth cercano solo funciona en la app de Android'); window.SendaNative.p2pStart(); },
   async 'ble-send'() {
     if (!hasBle()) return toast('El Bluetooth cercano solo funciona en la app de Android');
@@ -226,14 +227,14 @@ async function sendMessage() {
   const prio = +$('#prio').value, createdAt = now();
   const rich = packRich({ text: body, createdAt, image: img ? { mime: img.mime, bytes: img.bytes } : null });
   const env = await sealMessage({ sender: S.me, recipient: to, body: rich, priority: prio, ttlS: 7 * 86400, now: createdAt, kind: prio === 0 ? 'SOS' : 'PERSONAL' });
-  S.store.put(env, { now: now(), copies: 8 });
+  await putOwn(env, to, 8);
   S.sent.unshift({ id: env.header.id, toFp: to.fingerprint, body, kind: prio === 0 ? 'SOS' : 'PERSONAL', at: createdAt, img: img?.url ?? null });
   logEv({ ev: 'CIFRADO', id: env.header.id, to: to.name, createdAt, bytes: packEnvelope(env).length, textChars: [...body].length, imageBytes: img?.bytes.length ?? 0, cipher: 'ECDH P-256 efímero → HKDF-SHA-256 → AES-256-GCM · firma ECDSA P-256' });
   CO.relayNow(); // con red y relé configurado, sale ya hacia el otro país
   setTimeout(() => NOSTR.flush(), 0); // y por la red descentralizada, si hay Internet
   S.pendingImg = null; $('#attach-preview').hidden = true;
   await persist(); $('#body').value = ''; $('#body-count').textContent = `0/${MAX_TEXT_CHARS}`; render();
-  toast(S.nostr?.on !== false && navigator.onLine !== false ? 'Cifrado y enviado por Internet (red descentralizada). Si no hay red, sale solo al volver o por Bluetooth, SMS o sonido.' : 'Cifrado y en camino. Sin Internet: envíalo por Bluetooth, SMS o sonido, o deja que otros lo lleven.');
+  toast(NOSTR.active() && navigator.onLine !== false ? 'Cifrado y enviado por Internet (red SENDA). Si no hay red, sale solo al volver o por Bluetooth, SMS o sonido.' : 'Cifrado y en camino. Sin Internet: envíalo por Bluetooth, SMS o sonido, o deja que otros lo lleven.');
 }
 
 /* Modo fácil: un toque = estado + posición cifrados a todos los contactos. */
@@ -243,7 +244,7 @@ async function quickStatus(status) {
   const where = S.pos ? `${S.pos.lat.toFixed(5)},${S.pos.lon.toFixed(5)}` : 'posición desconocida';
   const urgent = status !== 'OK';
   const body = `${QUICK[status]} · ${S.name} · ${where} · ${new Date().toLocaleString()}`;
-  for (const c of S.contacts) S.store.put(await sealMessage({ sender: S.me, recipient: c, body, priority: urgent ? 0 : 3, ttlS: 3 * 86400, now: now(), kind: urgent ? 'SOS' : 'HUMAN_STATUS' }), { now: now(), copies: 16 });
+  for (const c of S.contacts) await putOwn(await sealMessage({ sender: S.me, recipient: c, body, priority: urgent ? 0 : 3, ttlS: 3 * 86400, now: now(), kind: urgent ? 'SOS' : 'HUMAN_STATUS' }), c, 16);
   S.lastQuick = { status, body, at: now() }; await persist(); render();
   toast(`«${QUICK[status]}» cifrado para ${S.contacts.length} contacto(s).${urgent ? ' Emítelo o compártelo ya.' : ''}`, 5000);
   if (urgent) show('transfer');
@@ -257,7 +258,7 @@ async function sos() {
   let where = 'posición no disponible';
   try { const p = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }));
     S.pos = { lat: p.coords.latitude, lon: p.coords.longitude }; where = `${p.coords.latitude.toFixed(5)},${p.coords.longitude.toFixed(5)} ±${Math.round(p.coords.accuracy)} m`; } catch { /* GPS no disponible */ }
-  for (const c of S.contacts) S.store.put(await sealMessage({ sender: S.me, recipient: c, body: `SOS · ${S.name} necesita ayuda · ${where} · ${new Date().toLocaleString()}`, priority: 0, ttlS: 3 * 86400, now: now(), kind: 'SOS' }), { now: now(), copies: 16 });
+  for (const c of S.contacts) await putOwn(await sealMessage({ sender: S.me, recipient: c, body: `SOS · ${S.name} necesita ayuda · ${where} · ${new Date().toLocaleString()}`, priority: 0, ttlS: 3 * 86400, now: now(), kind: 'SOS' }), c, 16);
   await persist(); render(); toast(`SOS cifrado para ${S.contacts.length} contacto(s). Emítelo o compártelo ya.`, 5000); show('transfer');
 }
 
@@ -320,7 +321,7 @@ async function sendIncident(det, status) {
     trip: { train: S.trip.train, coach: S.trip.coach }, nearbyInjured: +$('#crash-near').value || 0 });
   const body = INCIDENT_PREFIX + JSON.stringify(report); // compacto: el receptor lo muestra legible
   const urgent = status !== 'OK' && status !== 'HELPING_OTHERS';
-  for (const c of S.contacts) S.store.put(await sealMessage({ sender: S.me, recipient: c, body, priority: urgent ? 0 : 3, ttlS: 3 * 86400, now: now(), kind: urgent ? 'SOS' : 'HUMAN_STATUS' }), { now: now(), copies: 16 });
+  for (const c of S.contacts) await putOwn(await sealMessage({ sender: S.me, recipient: c, body, priority: urgent ? 0 : 3, ttlS: 3 * 86400, now: now(), kind: urgent ? 'SOS' : 'HUMAN_STATUS' }), c, 16);
   S.lastIncident = report; await persist(); render();
   toast(urgent ? 'Aviso de accidente cifrado para tus contactos. Emítelo o compártelo; viaja también por otros teléfonos.' : 'Aviso «estoy bien» preparado para tu familia.', 6000);
   if (urgent) show('transfer');
@@ -349,7 +350,7 @@ function renderChats() {
 
 function render() {
   if (!S.me) return;
-  if ($('#nostr-on') && document.activeElement?.id?.startsWith('nostr-') !== true) { $('#nostr-on').checked = S.nostr?.on !== false; $('#nostr-drops').checked = S.nostr?.drops !== false; $('#nostr-relays').value = S.nostr?.relays ?? DEFAULT_NOSTR_RELAYS; NOSTR.paint(); }
+  if ($('#net-servers') && document.activeElement?.id?.startsWith('net-') !== true) { $('#net-servers').value = S.net?.servers ?? ''; $('#net-public').checked = S.net?.publicExtra !== false; NOSTR.paint(); }
   renderChats();
   $('#me-name').textContent = S.name; $('#me-fp').textContent = S.me.publicIdentity.fingerprint;
   $('#st-inbox').textContent = S.inbox.length; $('#st-carry').textContent = S.store.count(); $('#st-contacts').textContent = S.contacts.length;
@@ -413,6 +414,11 @@ Object.assign(window.SENDA_TEST, {
 
 
 /* ---------------- fotos y registro de pruebas ---------------- */
+/** Guarda un sobre propio con su evento exterior ya preparado (sin red): quien llegue antes a Internet lo publica tal cual. */
+async function putOwn(env, contact, copies) {
+  let wrap = null; try { wrap = await prewrap({ identity: S.me, contact, envelope: env, nowMs: now() }); } catch { /* sin evento exterior: viaja igual por las demás vías */ }
+  return S.store.put(env, { now: now(), copies, wrap });
+}
 function logEv(e) { (S.log ??= []).push({ t: now(), ...e }); if (S.log.length > 3000) S.log.shift(); }
 async function toDataUrl(image) { const blob = new Blob([image.bytes], { type: image.mime }); return await new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(blob); }); }
 /** Foto → WebP (o JPEG si el móvil no sabe WebP) de ≤ 12 KB, bajando tamaño y calidad hasta que quepa. */

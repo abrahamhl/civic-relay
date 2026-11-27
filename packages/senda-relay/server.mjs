@@ -24,7 +24,9 @@ export function createRelay({ dataDir = process.env.DATA_DIR ?? './data', maxBod
   if (existsSync(file)) store.restore(JSON.parse(readFileSync(file, 'utf8')), { now: now() });
   // Buzón Nostr (wss://…/nostr): este servidor es también un relé Nostr más para los buzones cifrados SENDA.
   const nostrFile = resolve(dataDir, 'nostr.json');
-  const nostr = createNostrRelay({ now, snapshot: existsSync(nostrFile) ? JSON.parse(readFileSync(nostrFile, 'utf8')) : [] });
+  // Empuje inmediato a los demás servidores SENDA al recibir un buzón nuevo de un móvil (la federación periódica es la red de seguridad).
+  const pushToPeers = (ev) => { for (const url of peers) fetchImpl(url + '/nostr-sync', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ have: [], events: [ev], noReply: true }) }).catch(() => {}); };
+  const nostr = createNostrRelay({ onNew: (ev) => pushToPeers(ev), now, snapshot: existsSync(nostrFile) ? JSON.parse(readFileSync(nostrFile, 'utf8')) : [] });
   let dirty = false, nostrCount = nostr.count();
   const flush = () => {
     if (nostr.count() !== nostrCount) { nostr.purge(); const tmp = nostrFile + '.tmp'; writeFileSync(tmp, JSON.stringify(nostr.snapshot())); renameSync(tmp, nostrFile); nostrCount = nostr.count(); }
@@ -44,6 +46,17 @@ export function createRelay({ dataDir = process.env.DATA_DIR ?? './data', maxBod
     if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
     if (req.method === 'GET' && (req.url === '/nostr' || req.url === '/') && req.headers.accept === 'application/nostr+json') { res.writeHead(200, { 'content-type': 'application/nostr+json' }); return res.end(JSON.stringify({ name: 'Relé SENDA', description: 'Buzones cifrados SENDA (solo kind 1059). Ciego al contenido.', supported_nips: [1, 11, 40, 59], software: 'senda-relay', limitation: { max_message_length: 131072, auth_required: false, payment_required: false } })); }
     if (req.method === 'GET' && req.url === '/health') { res.writeHead(200, { 'content-type': 'application/json' }); return res.end(JSON.stringify({ ok: true, items: store.count(), broadcasts: store.listBroadcasts().length, bytes: store.bytesUsed(), nostrEvents: nostr.count(), peers: federation.peers.length, federatedAt: federation.last?.at ?? null, peersOk: federation.last ? federation.last.results.filter((x) => x.ok).length : null })); }
+    if (req.method === 'POST' && req.url === '/nostr-sync') {
+      // Federación de buzones entre servidores SENDA: {have:[ids], events:[...]} → {events: los que te faltan, have: mis ids}
+      if (!allow(req.socket.remoteAddress)) { res.writeHead(429); return res.end(); }
+      let size = 0; const chunks = [];
+      for await (const c of req) { size += c.length; if (size > maxBody * 4) { res.writeHead(413); return res.end(); } chunks.push(c); }
+      let body; try { body = JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { res.writeHead(400); return res.end(); }
+      const added = await nostr.acceptMany(body.events);
+      const have = Array.isArray(body.have) ? body.have.filter((x) => typeof x === 'string').slice(0, 50_000) : [];
+      res.writeHead(200, { 'content-type': 'application/json' });
+      return res.end(JSON.stringify(body.noReply ? { added } : { added, events: nostr.missingFor(have), have: body.wantIds ? nostr.ids() : undefined }));
+    }
     if (req.method !== 'POST' || req.url !== '/sync') { res.writeHead(404); return res.end(); }
     if (!allow(req.socket.remoteAddress)) { res.writeHead(429); return res.end(); }
     let size = 0; const chunks = [];
@@ -74,7 +87,16 @@ export function createRelay({ dataDir = process.env.DATA_DIR ?? './data', maxBod
     const results = [];
     for (const url of peers) {
       const r = await syncWithRelay({ store, url, role: 'relay', fetchImpl, now });
-      results.push({ url, ok: r.ok, error: r.error, uploaded: r.uploaded, downloaded: r.downloaded, rttMs: r.rttMs });
+      // Buzones Nostr: 1) le digo qué tengo y pido sus ids; 2) le mando lo que le falta.
+      let nostrIn = 0, nostrOut = 0, nostrError = null;
+      try {
+        const post = async (b) => { const x = await fetchImpl(url + '/nostr-sync', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b) }); if (!x.ok) throw new Error(`nostr-sync ${x.status}`); return x.json(); };
+        const r1 = await post({ have: nostr.ids(), wantIds: true });
+        nostrIn = await nostr.acceptMany(r1.events);
+        const toSend = nostr.missingFor(r1.have ?? []);
+        if (toSend.length) { nostrOut = (await post({ have: nostr.ids(), events: toSend })).added ?? 0; }
+      } catch (e) { nostrError = String(e?.message ?? e); }
+      results.push({ url, ok: r.ok, error: r.error, uploaded: r.uploaded, downloaded: r.downloaded, rttMs: r.rttMs, nostrIn, nostrOut, nostrError });
     }
     if (results.length) { dirty = true; federation.last = { at: now(), results }; federation.runs++; }
     return results;

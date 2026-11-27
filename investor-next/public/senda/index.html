@@ -97,12 +97,11 @@
       <canvas id="scope" width="600" height="80"></canvas><p id="audio-status" class="fine"></p></div>
     <div class="card"><h3>📦 Paquete .senda · Quick Share / AirDrop / Bluetooth / USB</h3>
       <div class="row"><button data-act="bundle-share" class="primary">Compartir paquete</button><label class="btn">Importar paquete<input type="file" id="bundle-file" accept=".senda,application/json" hidden></label></div></div>
-    <div class="card"><h3>🌍 Red descentralizada (Nostr) · entre países en segundos</h3>
-      <p id="nostr-state" class="warn">Desactivada</p>
-      <label class="check"><input type="checkbox" id="nostr-on" checked> Enviar y recibir por varios relés Nostr públicos e independientes cuando haya Internet</label>
-      <label class="check"><input type="checkbox" id="nostr-drops" checked> Aceptar mensajes que otros móviles SENDA me traigan sin conocerme (buzón de mensajero)</label>
-      <div class="row"><input aria-label="Relés Nostr, separados por comas" id="nostr-relays" style="flex:1"><button data-act="nostr-save">Guardar</button></div>
-      <p class="fine">Cada mensaje va cifrado dos veces y firmado con una clave de un solo uso, en un buzón que cambia cada día y que solo vosotros dos sabéis calcular. Los relés no ven quién escribe, a quién, ni qué. Ven tu IP, como cualquier web. Se publica en todos a la vez: basta con que funcione uno.</p></div>
+    <div class="card"><h3>🌍 Red SENDA · entre países en tiempo real</h3>
+      <p id="net-state" class="warn">…</p>
+      <div class="row"><input aria-label="Servidores SENDA, separados por comas (wss://…/nostr)" id="net-servers" placeholder="wss://servidor-senda.ejemplo/nostr" style="flex:1"><button data-act="net-save">Guardar</button></div>
+      <label class="check"><input type="checkbox" id="net-public" checked> Sumar relés Nostr públicos como canal adicional (más redundancia; nada depende de ellos)</label>
+      <p class="fine">Cada mensaje sale cifrado de extremo a extremo y envuelto otra vez, ya en tu móvil, en un buzón que cambia cada día y que solo vosotros dos sabéis calcular, firmado con una clave de un solo uso. Los servidores no ven quién escribe, a quién, ni qué; sí ven tu IP, como cualquier web. Tu móvil no presta nada a cambio.</p></div>
     <div class="card"><h3>🌐 Relé por Internet (cuando haya conexión)</h3>
       <div class="row"><input aria-label="Direcciones de los relés, separadas por comas" id="relay-url" placeholder="https://rele-se.ejemplo, https://rele-es.ejemplo" style="flex:1"><button data-co="relay-sync">Sincronizar</button></div>
       <p class="fine">El relé no puede leer nada: solo ve a quién va cada sobre cifrado. Puedes poner varios separados por comas (basta con que funcione uno). Una vez configurado, el móvil sincroniza <b>solo</b> cada vez que tiene red, cada minuto y al enviar: sube lo que lleva (tuyo y de otros) y baja lo tuyo. Los relés se pasan los mensajes entre sí.</p></div>

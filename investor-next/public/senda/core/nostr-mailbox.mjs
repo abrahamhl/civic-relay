@@ -17,9 +17,9 @@
  *    con AES-256-GCM y la clave de la pareja del día: así ni la huella del destinatario, que va en la cabecera del
  *    sobre, queda a la vista. Con relleno a bloques de 256 B, el tamaño no delata la longitud del texto.
  *
- * Buzón de mensajero (DTN → Internet): un móvil que transporta un sobre ajeno no conoce la clave de la pareja. Si
- * gana Internet, lo deja en el buzón del DESTINATARIO del día, `H(huella, día)`. Solo puede calcularlo quien tiene la
- * huella (es decir, quien tiene la tarjeta de contacto): menos anónimo que el de pareja, y se puede desactivar.
+ * Sin contrapartidas para quien transporta: el REMITENTE prepara este evento al escribir, aunque no tenga red
+ * (`prewrap`). El evento viaja pegado al sobre (bundle.mjs, campo `wrap`) y cualquier móvil o relé que gane Internet lo
+ * publica TAL CUAL: no necesita saber a quién va, ni usar un buzón que delate al destinatario, ni aceptar nada a cambio.
  *
  * El relé no puede falsificar mensajes: el sobre interior lleva firma ECDSA P-256 del remitente y se verifica al
  * abrirlo. Repetir un evento no sirve de nada: el almacén descarta duplicados por id.
@@ -68,14 +68,6 @@ export async function pairMailbox(secret, day) {
   const sk = await toSecretKey(await hkdf(secret, `senda-nostr-mailbox/v1/${day}`));
   const aes = await hkdf(secret, `senda-nostr-wrap/v1/${day}`);
   return { day, sk, pub: hex(schnorr.getPublicKey(sk)), aes, kind: 'PAIR' };
-}
-
-/** Buzón de mensajero del destinatario (para transportistas que no conocen la clave de la pareja). */
-export async function dropMailbox(recipientFingerprint, day) {
-  const seed = await hkdf(unb64(recipientFingerprint), `senda-nostr-drop/v1/${day}`);
-  const sk = await toSecretKey(seed);
-  const aes = await hkdf(seed, 'senda-nostr-drop-wrap/v1');
-  return { day, sk, pub: hex(schnorr.getPublicKey(sk)), aes, kind: 'DROP' };
 }
 
 /** Días a vigilar: desde `back` días atrás hasta mañana (relojes desfasados entre países). */
@@ -149,18 +141,20 @@ export async function unwrapEvent(ev, mailboxesByPub) {
 /** Filtro NIP-01 para suscribirse a mis buzones. */
 export function mailboxFilter(pubs, sinceMs) { return { kinds: [MAILBOX_KIND], '#p': [...pubs], since: Math.floor(sinceMs / 1000) }; }
 
-/**
- * Todos los buzones que debe vigilar un teléfono: pareja con cada contacto (días −7…+1) y, si se acepta, el de
- * mensajero propio. Devuelve un Map pub → buzón.
- */
-export async function myMailboxes({ identity, contacts, nowMs, back = 7, acceptDrops = true }) {
+/** Todos los buzones que debe vigilar un teléfono: pareja con cada contacto (días −7…+1). Map pub → buzón. */
+export async function myMailboxes({ identity, contacts, nowMs, back = 7 }) {
   const map = new Map(), days = daysAround(nowMs, back);
   for (const c of contacts) {
     const s = await pairSecret(identity, c);
     for (const d of days) { const mb = await pairMailbox(s, d); mb.peer = c.fingerprint; map.set(mb.pub, mb); }
   }
-  if (acceptDrops) for (const d of days) { const mb = await dropMailbox(identity.publicIdentity.fingerprint, d); map.set(mb.pub, mb); }
   return map;
 }
 
-
+/**
+ * Evento exterior preparado por el remitente al escribir (sin red). Viaja con el sobre y lo publica quien llegue antes
+ * a Internet. El día del buzón es el de escritura; el destinatario vigila 7 días atrás.
+ */
+export async function prewrap({ identity, contact, envelope, nowMs }) {
+  return wrapEnvelope({ mailbox: await pairMailbox(await pairSecret(identity, contact), Math.floor(nowMs / DAY_MS)), envelope, nowMs });
+}

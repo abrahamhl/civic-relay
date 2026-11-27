@@ -1,0 +1,26 @@
+# Servidor de la red SENDA: relé propio (Nostr en /nostr + sincronización /sync) detrás de Caddy (HTTPS automático).
+# Uso (en la raíz del repositorio, en el servidor):  SENDA_DOMAIN=senda-nl.tudominio.eu docker compose -f packages/senda-relay/deploy/compose.yaml up -d --build
+# Otro servidor SENDA para federar:                  PEERS=https://senda-es.tudominio.eu
+services:
+  relay:
+    build: { context: ../../.., dockerfile: packages/senda-relay/Dockerfile }
+    restart: unless-stopped
+    environment:
+      PEERS: ${PEERS:-}
+      PEER_INTERVAL_S: ${PEER_INTERVAL_S:-30}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://civic-relay-investor.vercel.app}
+    volumes: [ "senda-data:/data" ]
+    expose: [ "8787" ]
+  caddy:
+    image: caddy:2.8.4-alpine
+    restart: unless-stopped
+    depends_on: [ relay ]
+    environment:
+      SENDA_DOMAIN: ${SENDA_DOMAIN:?Pon SENDA_DOMAIN=tu.dominio}
+    ports: [ "80:80", "443:443" ]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+volumes:
+  senda-data: {}
+  caddy-data: {}

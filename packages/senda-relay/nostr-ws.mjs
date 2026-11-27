@@ -63,12 +63,12 @@ const expOf = (ev) => +(ev.tags.find((t) => t[0] === 'expiration')?.[1] ?? NaN);
 /**
  * @param {{now?:()=>number, maxEventBytes?:number, maxEvents?:number, maxTtlS?:number, ratePerMin?:number, snapshot?:object[]}} o
  */
-export function createNostrRelay({ now = () => Date.now(), maxEventBytes = 128 * 1024, maxEvents = 50_000, maxTtlS = 90 * 86400, ratePerMin = 240, snapshot = [] } = {}) {
+export function createNostrRelay({ onNew = null, now = () => Date.now(), maxEventBytes = 128 * 1024, maxEvents = 50_000, maxTtlS = 90 * 86400, ratePerMin = 240, snapshot = [] } = {}) {
   const events = new Map(); const conns = new Set();
   for (const ev of snapshot) if (ev?.id) events.set(ev.id, ev);
   const purge = () => { const t = now() / 1000; for (const [id, ev] of events) if (!(expOf(ev) > t)) events.delete(id); };
 
-  async function accept(ev) {
+  async function accept(ev, { fromPeer = false } = {}) {
     if (!ev || ev.kind !== MAILBOX_KIND || !Array.isArray(ev.tags) || typeof ev.content !== 'string') return [false, 'invalid: solo buzones SENDA (kind 1059)'];
     if (JSON.stringify(ev).length > maxEventBytes) return [false, 'invalid: demasiado grande'];
     const t = now() / 1000, exp = expOf(ev);
@@ -80,6 +80,7 @@ export function createNostrRelay({ now = () => Date.now(), maxEventBytes = 128 *
     if (events.size >= maxEvents) { purge(); if (events.size >= maxEvents) return [false, 'error: relé lleno'] }
     events.set(ev.id, ev);
     for (const c of conns) for (const [sid, filters] of c.subs) if (filters.some((f) => matches(ev, f))) c.ws.send(['EVENT', sid, ev]);
+    if (!fromPeer && onNew) { try { onNew(ev); } catch { /* la federación periódica lo recogerá */ } }
     return [true, ''];
   }
 
@@ -109,5 +110,9 @@ export function createNostrRelay({ now = () => Date.now(), maxEventBytes = 128 *
     conns.add(c);
   }
 
-  return { handleUpgrade, accept, count: () => events.size, snapshot: () => [...events.values()], purge, connections: () => conns.size, closeAll: () => { for (const c of conns) c.ws.close(); } };
+  /** Federación entre servidores SENDA: ids que tengo y eventos que le faltan a quien me da los suyos. */
+  const ids = () => { purge(); return [...events.keys()]; };
+  const missingFor = (have, limit = 2000) => { const h = new Set(have); return [...events.values()].filter((ev) => !h.has(ev.id)).sort((x, y) => y.created_at - x.created_at).slice(0, limit); };
+  async function acceptMany(list) { let n = 0; for (const ev of (Array.isArray(list) ? list : []).slice(0, 2000)) { const [ok, msg] = await accept(ev, { fromPeer: true }); if (ok && msg === '') n++; } return n; }
+  return { handleUpgrade, accept, ids, missingFor, acceptMany, count: () => events.size, snapshot: () => [...events.values()], purge, connections: () => conns.size, closeAll: () => { for (const c of conns) c.ws.close(); } };
 }
