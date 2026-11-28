@@ -18,7 +18,7 @@ export const AlertsView: React.FC<Props> = ({ user, onSelectEvent }) => {
   const [alertSeverity, setAlertSeverity] = useState('SEVERE');
   const [alertUrgency, setAlertUrgency] = useState('IMMEDIATE');
   const [selectedOrgId, setSelectedOrgId] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);\n  const [emergencyLocation, setEmergencyLocation] = useState<{ lat: number; lon: number; accuracy: number } | null>(null);\n  const [locationMessage, setLocationMessage] = useState('');
 
   const isOperator = user?.roles?.includes('INSTITUTIONAL_OPERATOR');
 
@@ -112,24 +112,48 @@ export const AlertsView: React.FC<Props> = ({ user, onSelectEvent }) => {
 
   return (
     <div style={{ padding: '1.25rem', maxWidth: '680px', margin: '0 auto' }}>
-      {/* Botón de Emergencia SOS */}
-      <div style={{ background: '#be123c', color: '#fff', padding: '1rem 1.25rem', borderRadius: 'var(--radius)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: 'var(--shadow-md)' }}>
-        <div>
-          <div style={{ fontWeight: 800, fontSize: '1.125rem' }}>🚨 BOTÓN SOS DE EMERGENCIA</div>
-          <div style={{ fontSize: '0.8125rem', opacity: 0.9 }}>Emite un paquete de auxilio cifrado por canales de emergencia.</div>
+      {/* Acceso real a emergencias: no simular un envío SOS inexistente */}
+      <section aria-labelledby="emergency-help-title" style={{ background: '#7f1d1d', color: '#fff', padding: '1.1rem 1.25rem', borderRadius: 'var(--radius)', marginBottom: '1.5rem', boxShadow: 'var(--shadow-md)' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 230px' }}>
+            <div id="emergency-help-title" style={{ fontWeight: 850, fontSize: '1.05rem' }}>🚨 ¿Necesitas ayuda inmediata?</div>
+            <p style={{ fontSize: '0.82rem', opacity: 0.95, marginTop: 5, lineHeight: 1.5 }}>
+              SENDA todavía no transmite llamadas de socorro ni contacta con el 112. Si existe peligro inmediato en la UE, llama al 112.
+            </p>
+            <p style={{ fontSize: '0.72rem', opacity: 0.82, marginTop: 5 }}>La ubicación se obtiene solo si tú lo solicitas y permanece en esta pantalla; no se envía a ningún servidor.</p>
+          </div>
+          <a href="tel:112" aria-label="Llamar al 112" className="btn" style={{ background: '#fff', color: '#991b1b', fontWeight: 900, padding: '0.75rem 1.1rem', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+            LLAMAR AL 112
+          </a>
         </div>
-        <button
-          className="btn"
-          style={{ background: '#fff', color: '#be123c', fontWeight: 800, padding: '0.625rem 1rem' }}
-          onClick={() => {
-            if (confirm('¿Deseas activar una señal SOS? SENDA enviará tu estado a los nodos y canales de custodia.')) {
-              alert('Señal SOS registrada en custodia DTN local y remitida a la red.');
-            }
-          }}
-        >
-          ACTIVAR SOS
-        </button>
-      </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 14 }}>
+          <button type="button" className="btn" style={{ background: '#991b1b', border: '1px solid rgba(255,255,255,.55)', color: '#fff', fontSize: '0.78rem' }}
+            onClick={() => {
+              if (!navigator.geolocation) { setLocationMessage('Este dispositivo no ofrece geolocalización en el navegador.'); return; }
+              setLocationMessage('Solicitando ubicación al dispositivo…');
+              navigator.geolocation.getCurrentPosition(
+                (position) => {
+                  setEmergencyLocation({ lat: position.coords.latitude, lon: position.coords.longitude, accuracy: position.coords.accuracy });
+                  setLocationMessage('Ubicación obtenida. Comprueba el margen de precisión antes de comunicarla.');
+                },
+                (error) => setLocationMessage(error.code === error.PERMISSION_DENIED ? 'Permiso denegado. Puedes indicar manualmente la carretera, sentido y punto kilométrico.' : 'No se pudo obtener la ubicación. Indica al 112 la carretera, sentido y punto kilométrico.'),
+                { enableHighAccuracy: true, timeout: 12000, maximumAge: 10000 }
+              );
+            }}>
+            Obtener mi ubicación
+          </button>
+          {emergencyLocation && <button type="button" className="btn" style={{ background: '#fff', color: '#7f1d1d', fontSize: '0.78rem' }}
+            onClick={() => {
+              const text = `Ubicación aproximada: ${emergencyLocation.lat.toFixed(6)}, ${emergencyLocation.lon.toFixed(6)} (precisión estimada ±${Math.round(emergencyLocation.accuracy)} m)`;
+              if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(() => setLocationMessage('Coordenadas copiadas. Léelas al operador del 112.')).catch(() => setLocationMessage(text));
+              else setLocationMessage(text);
+            }}>
+            Copiar coordenadas
+          </button>}
+        </div>
+        {locationMessage && <p role="status" aria-live="polite" style={{ marginTop: 9, fontSize: '0.75rem', lineHeight: 1.45 }}>{locationMessage}</p>}
+        {emergencyLocation && <p style={{ marginTop: 5, fontSize: '0.75rem', fontVariantNumeric: 'tabular-nums' }}>{emergencyLocation.lat.toFixed(6)}, {emergencyLocation.lon.toFixed(6)} · precisión estimada ±{Math.round(emergencyLocation.accuracy)} m</p>}
+      </section>
 
       {/* Header con botón para operadores */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
