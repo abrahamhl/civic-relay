@@ -18,7 +18,9 @@ export const AlertsView: React.FC<Props> = ({ user, onSelectEvent }) => {
   const [alertSeverity, setAlertSeverity] = useState('SEVERE');
   const [alertUrgency, setAlertUrgency] = useState('IMMEDIATE');
   const [selectedOrgId, setSelectedOrgId] = useState('');
-  const [loading, setLoading] = useState(false);\n  const [emergencyLocation, setEmergencyLocation] = useState<{ lat: number; lon: number; accuracy: number } | null>(null);\n  const [locationMessage, setLocationMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [emergencyLocation, setEmergencyLocation] = useState<{ lat: number; lon: number; accuracy: number } | null>(null);
+  const [locationMessage, setLocationMessage] = useState('');
 
   const isOperator = user?.roles?.includes('INSTITUTIONAL_OPERATOR');
 
