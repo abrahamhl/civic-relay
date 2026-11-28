@@ -56,10 +56,10 @@ export const Navigation: React.FC<Props> = ({
             gap: '0.5rem',
             boxShadow: '0 2px 8px rgba(239, 68, 68, 0.4)'
           }}
-          title="Botón de Emergencia Permanente"
+          title="Abrir ayuda de emergencia y acceso al 112"
         >
           <span>🚨</span>
-          <span>SOS EMERGENCIA</span>
+          <span>AYUDA / 112</span>
         </button>
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', flex: 1, overflowY: 'auto' }}>
